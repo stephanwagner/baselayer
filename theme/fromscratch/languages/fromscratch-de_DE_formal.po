@@ -2010,3 +2010,40 @@ msgstr "Endzeit"
 # Media Library: add folder modal title
 msgid "Add folder"
 msgstr "Ordner hinzufügen"
+
+# Developer settings: helpers section (inc/developer-settings/developer.php)
+msgid "Helpers"
+msgstr "Helfer"
+
+msgid "Common helper functions and utilities for use in templates and theme code."
+msgstr "Häufig genutzte Helferfunktionen und Utilities für Templates und Theme-Code."
+
+msgid "Asset Helper"
+msgstr "Asset-Helfer"
+
+msgid "Builds versioned asset URLs from the theme assets folder."
+msgstr "Erzeugt versionierte Asset-URLs aus dem Assets-Ordner des Themes."
+
+msgid "Inline SVG Helper"
+msgstr "Inline-SVG-Helfer"
+
+msgid "Reads an SVG file and returns inline markup you can echo in templates."
+msgstr "Liest eine SVG-Datei und gibt Inline-Markup zurück, das in Templates ausgegeben werden kann."
+
+msgid "Image Helper"
+msgstr "Bild-Helfer"
+
+msgid "Builds a WordPress image tag from an attachment ID (or WP_Post attachment)."
+msgstr "Erzeugt ein WordPress-Image-Tag aus einer Attachment-ID (oder einem WP_Post-Attachment)."
+
+msgid "Config Helper"
+msgstr "Config-Helfer"
+
+msgid "Reads values from config/theme.php and config/theme-design.php via optional dot-path keys."
+msgstr "Liest Werte aus config/theme.php und config/theme-design.php über optionale Dot-Path-Keys."
+
+msgid "Content Helper"
+msgstr "Inhalt-Helfer"
+
+msgid "Reads saved Theme Content option values with an optional fallback default."
+msgstr "Liest gespeicherte Theme-Inhalt-Optionen mit optionalem Fallback-Standardwert."
