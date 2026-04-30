@@ -111,27 +111,64 @@ function fs_render_developer_cheatsheet(): void
 
 		<div class="fs-page-settings-form" style="margin-top: 28px;">
 
-			<h2 class="title" style="margin-top: 24px;"><?= esc_html__('Cheat Sheet', 'fromscratch') ?></h2>
-			<p class="description"><?= esc_html__('Quick explanations and starter code snippets for common FromScratch helpers.', 'fromscratch') ?></p>
+			<h2 class="title" style="margin-top: 24px;"><?= esc_html__('Helpers', 'fromscratch') ?></h2>
+			<p class="description"><?= esc_html__('Common helper functions and utilities for use in templates and theme code.', 'fromscratch') ?></p>
 
-			<table class="widefat striped" style="margin-top: 16px;">
-				<thead>
-					<tr>
-						<th><?= esc_html__('Helper', 'fromscratch') ?></th>
-						<th><?= esc_html__('Explanation', 'fromscratch') ?></th>
-						<th><?= esc_html__('Code intro', 'fromscratch') ?></th>
-					</tr>
-				</thead>
+			<table class="widefat striped helpers-table__table">
 				<tbody>
 					<tr>
-						<td><strong><?= esc_html__('Asset Helper', 'fromscratch') ?></strong></td>
-						<td><?= esc_html__('Builds versioned asset URLs from the theme assets folder.', 'fromscratch') ?></td>
-						<td><code><?= esc_html("asset_url('/img/fromscratch-logo.svg')") ?></code></td>
+						<td>
+							<strong><?= esc_html__('Asset Helper', 'fromscratch') ?></strong><br>
+							<span class="description"><?= esc_html__('Builds versioned asset URLs from the theme assets folder.', 'fromscratch') ?></span>
+						</td>
+						<td>
+							<code class="fs-code-text fs-code-small">PHP</code>
+						</td>
+						<td>
+							<code class="fs-code-small"><?= esc_html("asset_url('/img/logo.svg')") ?></code>
+							<div class="helpers-table__preview-code">
+								<span class="helpers-table__preview-pointer">→</span> <code class="fs-code-text fs-code-small">/assets/img/logo.svg?ver=1</code>
+							</div>
+						</td>
 					</tr>
 					<tr>
-						<td><strong><?= esc_html__('Inline SVG Helper', 'fromscratch') ?></strong></td>
-						<td><?= esc_html__('Reads an SVG file and returns inline markup you can echo in templates.', 'fromscratch') ?></td>
-						<td><code><?= esc_html("echo fs_svg_code('/img/fromscratch-logo.svg', ['class' => 'logo__image']);") ?></code></td>
+						<td>
+							<strong><?= esc_html__('Inline SVG Helper', 'fromscratch') ?></strong><br>
+							<span class="description"><?= esc_html__('Reads an SVG file and returns inline markup you can echo in templates.', 'fromscratch') ?></span>
+						</td>
+						<td>
+							<code class="fs-code-text fs-code-small">PHP</code>
+						</td>
+						<td>
+							<code class="fs-code-small"><?= esc_html("svg_code('/img/icon.svg', ['class' => 'my-class']);") ?></code>
+							<div class="helpers-table__preview-code">
+								<span class="helpers-table__preview-pointer">→</span> <code class="fs-code-text fs-code-small">&lt;svg class="my-class" ...&gt;...&lt;/svg&gt;</code>
+							</div>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<strong><?= esc_html__('Config Helper', 'fromscratch') ?></strong><br>
+							<span class="description"><?= esc_html__('Reads values from config/theme.php and config/theme-design.php via optional dot-path keys.', 'fromscratch') ?></span>
+						</td>
+						<td>
+							<code class="fs-code-text fs-code-small">PHP</code>
+						</td>
+						<td>
+							<code class="fs-code-small"><?= esc_html("fs_config('headers.Cache-Control')") ?></code>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<strong><?= esc_html__('Content Helper', 'fromscratch') ?></strong><br>
+							<span class="description"><?= esc_html__('Reads saved Theme Content option values with an optional fallback default.', 'fromscratch') ?></span>
+						</td>
+						<td>
+							<code class="fs-code-text fs-code-small">PHP</code>
+						</td>
+						<td>
+							<code class="fs-code-small"><?= esc_html("fs_content('hero_title', 'Default headline')") ?></code>
+						</td>
 					</tr>
 				</tbody>
 			</table>
@@ -145,7 +182,7 @@ function fs_render_developer_cheatsheet(): void
 					<th scope="row"><?= esc_html__('Cache version', 'fromscratch') ?></th>
 					<td>
 						<div style="display: flex; align-items: center;">
-							<code style="font-size: 14px; height: 30px; line-height: 30px; padding: 0 8px; min-width: 30px; text-align: center; box-sizing: border-box; border-radius: 3px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);">
+							<code style="font-size: 14px; height: 30px; line-height: 30px; padding: 0 8px; min-width: 30px; text-align: center; box-sizing: border-box; border-radius: 3px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5);">
 								<?= esc_html($asset_version) ?>
 							</code>
 							<?php $bump_url = wp_nonce_url(add_query_arg(['page' => fs_developer_settings_page_slug('developer'), 'fromscratch_bump' => '1'], admin_url('options-general.php')), 'fromscratch_bump_asset_version'); ?>

@@ -1378,9 +1378,9 @@ function fs_content_base_option_id(string $variableId): string
 }
 
 /**
- * Output option name row (for developers only): copy option name, copy snippet (fs_content_option or get_option), monospace option id.
+ * Output option name row (for developers only): copy option name, copy snippet (fs_content or get_option), monospace option id.
  * Shows the actual option key for this row (including _lang suffix when applicable) so it matches the field above.
- * The snippet still uses the base id with fs_content_option() for correct theme API usage.
+ * The snippet still uses the base id with fs_content() for correct theme API usage.
  */
 function fs_content_field_option_name_row(string $variableId, array $variable = []): void
 {
@@ -1391,7 +1391,7 @@ function fs_content_field_option_name_row(string $variableId, array $variable = 
 	$base_id = fs_content_base_option_id($variableId);
 	$type = $variable['type'] ?? 'textfield';
 	$default = ($type === 'multiselect') ? '[]' : (($type === 'image') ? '0' : "''");
-	$snippet = "fs_content_option('" . $base_id . "', " . $default . ")";
+	$snippet = "fs_content('" . $base_id . "', " . $default . ")";
 	$display_id = $variableId;
 	$id_attr = 'fs-opt-' . preg_replace('/[^a-zA-Z0-9_-]/', '-', $variableId);
 	$id_snippet_attr = 'fs-opt-snippet-' . preg_replace('/[^a-zA-Z0-9_-]/', '-', $variableId);

@@ -88,6 +88,20 @@ function fs_svg_code(string $path, array $attributes = []): string
 }
 
 /**
+ * Short name for inline SVG code. Only defined if not already provided.
+ *
+ * @param string $path Path relative to theme root.
+ * @param array<string,string> $attributes Optional attributes added to the root <svg> element.
+ * @return string Inline SVG markup (empty string on failure).
+ */
+if (!function_exists('svg_code')) {
+	function svg_code(string $path, array $attributes = []): string
+	{
+		return fs_svg_code($path, $attributes);
+	}
+}
+
+/**
  * Get the hash for assets (file modification time). Path is under assets/ (e.g. /assets/css/main.css or /css/main.css).
  *
  * @param string $file Path relative to theme root, e.g. '/assets/css/main.css'.
