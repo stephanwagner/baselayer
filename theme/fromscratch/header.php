@@ -16,7 +16,7 @@
 
 				<div class="logo__container">
 					<a href="/">
-						<img class="logo__image" src="<?= asset_url('/img/fromscratch-logo.svg') ?>" alt="">
+						<?= fs_svg_code('/img/fromscratch-logo.svg', ['class' => 'logo__image', 'aria-hidden' => 'true', 'focusable' => 'false']); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 					</a>
 				</div>
 

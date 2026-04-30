@@ -48,6 +48,46 @@ if (!function_exists('asset_url')) {
 }
 
 /**
+ * Read SVG code from theme assets (e.g. /img/logo.svg).
+ *
+ * @param string $path Path relative to theme root or assets/, e.g. '/img/logo.svg'.
+ * @param array<string,string> $attributes Optional attributes added to the root <svg> element.
+ * @return string Inline SVG markup (empty string on failure).
+ */
+function fs_svg_code(string $path, array $attributes = []): string
+{
+	$path = ltrim($path, '/');
+	if ($path !== '' && strpos($path, 'assets/') !== 0) {
+		$path = 'assets/' . $path;
+	}
+	$full = get_template_directory() . '/' . $path;
+	if (!is_file($full)) {
+		return '';
+	}
+
+	$svg = (string) file_get_contents($full);
+	if ($svg === '' || stripos($svg, '<svg') === false) {
+		return '';
+	}
+
+	if ($attributes !== []) {
+		$attr_html = '';
+		foreach ($attributes as $name => $value) {
+			$name = trim((string) $name);
+			if ($name === '') {
+				continue;
+			}
+			$attr_html .= ' ' . $name . '="' . esc_attr((string) $value) . '"';
+		}
+		if ($attr_html !== '') {
+			$svg = (string) preg_replace('/<svg\b([^>]*)>/i', '<svg$1' . $attr_html . '>', $svg, 1);
+		}
+	}
+
+	return $svg;
+}
+
+/**
  * Get the hash for assets (file modification time). Path is under assets/ (e.g. /assets/css/main.css or /css/main.css).
  *
  * @param string $file Path relative to theme root, e.g. '/assets/css/main.css'.
