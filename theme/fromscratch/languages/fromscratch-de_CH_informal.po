@@ -1845,6 +1845,30 @@ msgstr "Minuten"
 msgid "Sent once per week on the first visit after your chosen day and time."
 msgstr "Wird einmal pro Woche beim ersten Besuch nach deinem gewählten Tag und Zeitpunkt versendet."
 
+msgid "Next send"
+msgstr "Nächster Versand"
+
+msgid "No send scheduled in WordPress yet. Save settings, then click Apply schedule."
+msgstr "In WordPress ist noch kein Versand geplant. Einstellungen speichern, dann „Zeitplan anwenden“ klicken."
+
+msgid "Next send: %s"
+msgstr "Nächster Versand: %s"
+
+msgid "Apply schedule"
+msgstr "Zeitplan anwenden"
+
+msgid "Apply schedule updates WordPress cron from the weekday and time above. Reset for testing clears the “already sent this week” lock, the Matomo bundle cache and any pending Matomo refresh job, then applies the schedule again."
+msgstr "„Zeitplan anwenden“ schreibt Wochentag und Uhrzeit in den WordPress-Cron. „Zurücksetzen (Test)“ löscht die Kennung „diese Woche schon gesendet“, den zwischengespeicherten Matomo-Paket-Cache sowie ausstehende Matomo-Hintergrund-Aktualisierungen und legt den Zeitplan danach erneut an."
+
+msgid "Reset for testing"
+msgstr "Zurücksetzen (Test)"
+
+msgid "Reset complete: dedup flag and report Matomo cache cleared; weekly send time re-applied."
+msgstr "Zurücksetzen abgeschlossen: Sperrmarke und Matomo-Zwischenspeicher für Berichte geleert; nächster Versand neu eingetragen."
+
+msgid "Schedule saved to WordPress (next send updated)."
+msgstr "Zeitplan wurde in WordPress gespeichert (nächster Versand aktualisiert)."
+
 msgid "Enable reports"
 msgstr "Website-Berichte aktivieren"
 

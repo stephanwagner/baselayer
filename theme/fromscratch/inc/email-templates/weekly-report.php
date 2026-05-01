@@ -97,8 +97,18 @@ if (!$has_insights && !$has_matomo) {
 										text-wrap: balance;
 										max-width: 320px;
 									">
-				<?= wp_kses(__('Visitors and page views <div class="fs-mail__small-mobile-inline">of the last week</div>', 'fromscratch'), ['br' => [], 'div' => ['class' => []]]) ?>
+				<?= wp_kses(__('Visitors and page views <div class="fs-mail__small-mobile-inline">for this reporting period</div>', 'fromscratch'), ['br' => [], 'div' => ['class' => []]]) ?>
 			</div>
+			<?php if (!empty($report_period_range)) : ?>
+				<div
+					style="
+							margin: 8px auto 0;
+							font-size: 14px;
+							line-height: 1.4;
+							color: #94a3b8;
+							text-align: center;
+						"><?= esc_html((string) $report_period_range) ?></div>
+			<?php endif; ?>
 			<?php if (!empty($daily_chart_url)) : ?>
 				<img
 					src="<?= esc_url($daily_chart_url) ?>"
@@ -195,17 +205,10 @@ if (!$has_insights && !$has_matomo) {
 				</tr>
 				<?php foreach (($weekly ?? []) as $row) : ?>
 					<?php
-					$w_date = isset($row['date']) ? (string) $row['date'] : '';
 					$week_line = '';
 					$monday_written = '';
-					if (preg_match('/^\d{4}-\d{2}-\d{2}$/', $w_date)) {
-						$wd = \DateTimeImmutable::createFromFormat('Y-m-d', $w_date, wp_timezone());
-						if ($wd instanceof \DateTimeImmutable) {
-							$monday = $wd->modify('monday this week');
-							$week_no = (int) $monday->format('W');
-							$week_line = sprintf(__('Week %d', 'fromscratch'), $week_no);
-							$monday_written = wp_date('j. M Y', $monday->getTimestamp());
-						}
+					if (function_exists('fs_weekly_report_wp_calendar_week_row_labels')) {
+						[$week_line, $monday_written] = fs_weekly_report_wp_calendar_week_row_labels($row);
 					}
 					?>
 					<tr>

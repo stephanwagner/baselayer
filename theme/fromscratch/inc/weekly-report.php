@@ -14,7 +14,7 @@ add_filter('cron_schedules', function (array $schedules): array {
 });
 
 /**
- * Whether the site uses a 12-hour clock in Settings → General (time format contains meridian).
+ * Whether the site time format uses AM/PM (Settings → General).
  */
 function fs_weekly_report_uses_12h_time_format(): bool
 {
@@ -36,15 +36,14 @@ function fs_sanitize_weekly_report_wday($value): string
 }
 
 /**
- * Sanitize hour (stored 0–23). When the site uses 12-hour time, combines with meridian POST fields.
+ * Sanitize hour (stored 0–23). With 12-hour site time, requires meridian in POST.
  *
  * @param mixed $value Raw option value.
  */
 function fs_sanitize_weekly_report_hour($value): string
 {
 	if (fs_weekly_report_uses_12h_time_format() && isset($_POST['fromscratch_weekly_report_meridian'])) {
-		$h = (int) $value;
-		$h = max(1, min(12, $h));
+		$h = max(1, min(12, (int) $value));
 		$meridian = strtolower((string) wp_unslash((string) ($_POST['fromscratch_weekly_report_meridian'] ?? '')));
 		if ($h === 12) {
 			$h24 = ($meridian === 'pm') ? 12 : 0;
@@ -54,9 +53,8 @@ function fs_sanitize_weekly_report_hour($value): string
 
 		return (string) max(0, min(23, $h24));
 	}
-	$h24 = (int) $value;
 
-	return (string) max(0, min(23, $h24));
+	return (string) max(0, min(23, (int) $value));
 }
 
 /**
@@ -102,6 +100,112 @@ function fs_weekly_report_next_run_timestamp(): int
 }
 
 /**
+ * Most recent scheduled weekday + time in the site timezone that is on or before $now.
+ */
+function fs_weekly_report_previous_slot_immutable(\DateTimeImmutable $now): \DateTimeImmutable
+{
+	$wday = (int) get_option('fromscratch_weekly_report_wday', '1');
+	$wday = max(0, min(6, $wday));
+	$hour = (int) get_option('fromscratch_weekly_report_hour', '8');
+	$hour = max(0, min(23, $hour));
+	$minute = (int) get_option('fromscratch_weekly_report_minute', '0');
+	$minute = max(0, min(55, (int) round($minute / 5) * 5));
+
+	$candidate = $now->setTime($hour, $minute, 0);
+	$current_w = (int) $candidate->format('w');
+	$delta_back = ($current_w - $wday + 7) % 7;
+	$target = $candidate->modify(sprintf('-%d days', $delta_back));
+	while ($target > $now) {
+		$target = $target->modify('-7 days');
+	}
+
+	return $target;
+}
+
+/**
+ * Start of the reporting week (00:00 local) that contains $local_midnight, for weeks that run from schedule weekday through the following 6 days.
+ *
+ * @param int $schedule_wday PHP date('w'): 0 Sunday … 6 Saturday (same as option fromscratch_weekly_report_wday).
+ */
+function fs_weekly_report_week_period_start_for_date(\DateTimeImmutable $local_midnight, int $schedule_wday): \DateTimeImmutable
+{
+	$schedule_wday = max(0, min(6, $schedule_wday));
+	$d = $local_midnight->setTime(0, 0, 0);
+	$current_w = (int) $d->format('w');
+	$back = ($current_w - $schedule_wday + 7) % 7;
+
+	return $d->modify(sprintf('-%d days', $back));
+}
+
+/**
+ * Reporting period for the send implied by $now: the 7 full local days ending the day before the slot’s calendar day (e.g. Fri–Thu when the send falls on Friday).
+ *
+ * @return array{slot:\DateTimeImmutable, week_start:\DateTimeImmutable, week_after_exclusive:\DateTimeImmutable}
+ */
+function fs_weekly_report_report_period_for_now(\DateTimeImmutable $now): array
+{
+	$slot = fs_weekly_report_previous_slot_immutable($now);
+	$week_after_exclusive = $slot->setTime(0, 0, 0);
+	$week_start = $week_after_exclusive->modify('-7 days');
+
+	return [
+		'slot' => $slot,
+		'week_start' => $week_start,
+		'week_after_exclusive' => $week_after_exclusive,
+	];
+}
+
+/**
+ * Two-line chart/table labels for a Matomo weekly row: line 1 “Week N”; line 2 long range (WP week).
+ *
+ * @return array{0:string,1:string}
+ */
+function fs_weekly_report_wp_calendar_week_row_labels(array $row): array
+{
+	$tz = function_exists('wp_timezone') ? wp_timezone() : new \DateTimeZone(wp_timezone_string() ?: 'UTC');
+	$d = isset($row['date']) ? (string) $row['date'] : '';
+	if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $d)) {
+		return ['', ''];
+	}
+	$row_dt = new \DateTimeImmutable($d . ' 00:00:00', $tz);
+	$ws = fs_dashboard_wp_week_period_start_for_date($row_dt, null);
+	$we = $ws->modify('+6 days');
+	$t0 = $ws->getTimestamp();
+	$t1 = $we->getTimestamp();
+	$week_no = fs_dashboard_iso_week_number_for_wp_calendar_start($ws);
+	$line2 = function_exists('fs_dashboard_format_week_date_range')
+		? fs_dashboard_format_week_date_range($ws)
+		: (wp_date('j. M', $t0) . ' – ' . wp_date('j. M Y', $t1));
+
+	return [
+		sprintf(__('Week %d', 'fromscratch'), $week_no),
+		$line2,
+	];
+}
+
+/**
+ * Compact x-axis labels for the weekly trend chart (email table keeps the long range on line 2).
+ *
+ * @return array{0:string,1:string}
+ */
+function fs_weekly_report_weekly_chart_axis_labels(array $row): array
+{
+	$tz = function_exists('wp_timezone') ? wp_timezone() : new \DateTimeZone(wp_timezone_string() ?: 'UTC');
+	$d = isset($row['date']) ? (string) $row['date'] : '';
+	if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $d)) {
+		return ['', ''];
+	}
+	$row_mid = new \DateTimeImmutable($d . ' 00:00:00', $tz);
+	$week_start_wp = fs_dashboard_wp_week_period_start_for_date($row_mid, null);
+	$week_no = fs_dashboard_iso_week_number_for_wp_calendar_start($week_start_wp);
+
+	return [
+		sprintf(__('Week %d', 'fromscratch'), $week_no),
+		wp_date('d.m.Y', $week_start_wp->getTimestamp()),
+	];
+}
+
+/**
  * Clear and reschedule the weekly report cron from current options.
  */
 function fs_weekly_report_reschedule_cron(): void
@@ -116,7 +220,7 @@ function fs_weekly_report_reschedule_cron(): void
 }
 
 /**
- * Output General settings table row: weekday + time (matches site time format).
+ * General settings: weekday + time (site timezone).
  */
 function fs_weekly_report_render_schedule_settings_row(): void
 {
@@ -128,16 +232,14 @@ function fs_weekly_report_render_schedule_settings_row(): void
 	$hour_stored = (int) get_option('fromscratch_weekly_report_hour', '8');
 	$minute = (string) get_option('fromscratch_weekly_report_minute', '0');
 	$use_12h = fs_weekly_report_uses_12h_time_format();
-	$start = (int) get_option('start_of_week', 1);
-	$start = max(0, min(6, $start));
+	$start = max(0, min(6, (int) get_option('start_of_week', 1)));
 	?>
 	<tr>
 		<th scope="row"><?= esc_html__('Schedule', 'fromscratch') ?></th>
 		<td>
-			<fieldset style="display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px;" role="group">
-				<legend class="screen-reader-text"><?= esc_html__('Schedule', 'fromscratch') ?></legend>
+			<div style="display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px;">
 				<p style="margin:0;">
-					<label for="fromscratch_weekly_report_wday"><?= esc_html__('Weekday', 'fromscratch') ?></label><br>
+					<label for="fromscratch_weekly_report_wday"><?= esc_html__('Day', 'fromscratch') ?></label><br>
 					<select name="fromscratch_weekly_report_wday" id="fromscratch_weekly_report_wday">
 						<?php for ($k = 0; $k < 7; $k++) :
 							$d = ($start + $k) % 7;
@@ -148,7 +250,7 @@ function fs_weekly_report_render_schedule_settings_row(): void
 				</p>
 				<p style="margin:0;">
 					<span id="fromscratch-weekly-report-time-label"><?= esc_html__('Time', 'fromscratch') ?></span><br>
-					<span style="display:inline-flex; flex-wrap:wrap; align-items:center; gap:4px;" aria-labelledby="fromscratch-weekly-report-time-label">
+					<span style="display:inline-flex; flex-wrap:wrap; align-items:center; gap:4px;">
 						<?php if ($use_12h) :
 							$h12 = $hour_stored % 12;
 							if ($h12 === 0) {
@@ -156,7 +258,7 @@ function fs_weekly_report_render_schedule_settings_row(): void
 							}
 							$meridian = ($hour_stored >= 12) ? 'pm' : 'am';
 							?>
-							<select name="fromscratch_weekly_report_hour" id="fromscratch_weekly_report_hour" aria-describedby="fromscratch-weekly-report-time-label">
+							<select name="fromscratch_weekly_report_hour" id="fromscratch_weekly_report_hour" aria-labelledby="fromscratch-weekly-report-time-label">
 								<?php for ($h = 1; $h <= 12; $h++) : ?>
 									<option value="<?= esc_attr((string) $h) ?>" <?= selected((string) $h12, (string) $h, false) ?>><?= esc_html((string) $h) ?></option>
 								<?php endfor; ?>
@@ -166,15 +268,14 @@ function fs_weekly_report_render_schedule_settings_row(): void
 								<option value="pm" <?= selected($meridian, 'pm', false) ?>><?= esc_html__('pm', 'fromscratch') ?></option>
 							</select>
 						<?php else : ?>
-							<select name="fromscratch_weekly_report_hour" id="fromscratch_weekly_report_hour" aria-describedby="fromscratch-weekly-report-time-label">
+							<select name="fromscratch_weekly_report_hour" id="fromscratch_weekly_report_hour" aria-labelledby="fromscratch-weekly-report-time-label">
 								<?php for ($h = 0; $h <= 23; $h++) : ?>
 									<option value="<?= esc_attr((string) $h) ?>" <?= selected((string) $hour_stored, (string) $h, false) ?>><?= esc_html(sprintf('%02d', $h)) ?></option>
 								<?php endfor; ?>
 							</select>
 						<?php endif; ?>
-						<span class="screen-reader-text"><?= esc_html__('Minutes', 'fromscratch') ?></span>
 						<span aria-hidden="true">:</span>
-						<select name="fromscratch_weekly_report_minute" id="fromscratch_weekly_report_minute">
+						<select name="fromscratch_weekly_report_minute" id="fromscratch_weekly_report_minute" aria-label="<?= esc_attr__('Minutes', 'fromscratch') ?>">
 							<?php for ($m = 0; $m <= 55; $m += 5) :
 								$ms = (string) $m;
 								?>
@@ -183,33 +284,51 @@ function fs_weekly_report_render_schedule_settings_row(): void
 						</select>
 					</span>
 				</p>
-			</fieldset>
-			<p class="description">
-				<?= esc_html__('Sent once per week on the first visit after your chosen day and time.', 'fromscratch') ?>
-			</p>
+			</div>
+			<p class="description"><?= esc_html__('Uses your WordPress timezone. After this day & time passes, WordPress sends on the next request that runs cron (normally the next visitor).', 'fromscratch') ?></p>
+		</td>
+	</tr>
+	<tr>
+		<th scope="row"><?= esc_html__('Cron', 'fromscratch') ?></th>
+		<td>
+			<p style="margin:0 0 8px;"><strong><?= esc_html(fs_weekly_report_next_send_label()) ?></strong></p>
+			<button type="submit" form="fs-reset-weekly-report-test" class="button"><?= esc_html__('Reset weekly send lock (developer test)', 'fromscratch') ?></button>
+			<p class="description" style="margin-top:8px;"><?= esc_html__('Clears the “already sent this week” flag and queues one overdue cron job. Open the site as a visitor (or reload the front end) to act as that “next request”.', 'fromscratch') ?></p>
 		</td>
 	</tr>
 	<?php
 }
 
-add_action('update_option', static function ($option): void {
-	static $shutdown_registered = false;
-	$watch = [
-		'fromscratch_weekly_report_wday',
-		'fromscratch_weekly_report_hour',
-		'fromscratch_weekly_report_minute',
-	];
-	if (!in_array($option, $watch, true)) {
-		return;
+/**
+ * Developer: allow one more send this week; next HTTP request that runs wp-cron can fire the hook.
+ */
+function fs_weekly_report_reset_for_testing(): void
+{
+	delete_option('fromscratch_weekly_report_last_sent_week');
+
+	while (($ts = wp_next_scheduled('fs_weekly_report_weekly')) !== false) {
+		wp_unschedule_event((int) $ts, 'fs_weekly_report_weekly');
 	}
-	if ($shutdown_registered) {
-		return;
+
+	wp_schedule_single_event(time() - 1, 'fs_weekly_report_weekly');
+}
+
+/**
+ * Human-readable label for the next cron run (General settings UI).
+ */
+function fs_weekly_report_next_send_label(): string
+{
+	$next = wp_next_scheduled('fs_weekly_report_weekly');
+	if ($next === false) {
+		return __('No cron event yet — save settings below.', 'fromscratch');
 	}
-	$shutdown_registered = true;
-	add_action('shutdown', static function (): void {
-		fs_weekly_report_reschedule_cron();
-	}, 5);
-}, 10, 1);
+
+	return sprintf(
+		/* translators: %s localized date/time */
+		__('Next cron run: %s', 'fromscratch'),
+		wp_date(get_option('date_format') . ' ' . get_option('time_format'), $next)
+	);
+}
 
 add_action('init', static function (): void {
 	if (wp_installing()) {
@@ -225,7 +344,7 @@ add_action('init', static function (): void {
 /**
  * @return array{went_live_last_week: array<int,array{title:string,url:string,date:string}>, scheduled_upcoming: array<int,array{title:string,url:string,date:string}>, expired_last_week: array<int,array{title:string,url:string,date:string}>, expiring_upcoming: array<int,array{title:string,url:string,date:string}>}
  */
-function fs_weekly_report_build_insights(\DateTimeImmutable $last_monday, \DateTimeImmutable $this_monday): array
+function fs_weekly_report_build_insights(\DateTimeImmutable $week_start, \DateTimeImmutable $week_after_exclusive): array
 {
 	$insight_date_format = 'd.m.Y H:i';
 
@@ -239,8 +358,8 @@ function fs_weekly_report_build_insights(\DateTimeImmutable $last_monday, \DateT
 		return $out;
 	}
 	$post_types = fs_theme_post_types();
-	$last_week_start = $last_monday->format('Y-m-d H:i:s');
-	$last_week_end = $this_monday->modify('-1 second')->format('Y-m-d H:i:s');
+	$last_week_start = $week_start->format('Y-m-d H:i:s');
+	$last_week_end = $week_after_exclusive->modify('-1 second')->format('Y-m-d H:i:s');
 
 	$scheduled = get_posts([
 		'post_type' => $post_types,
@@ -306,8 +425,8 @@ function fs_weekly_report_build_insights(\DateTimeImmutable $last_monday, \DateT
 				],
 			],
 		]);
-		$last_week_start_ts = $last_monday->getTimestamp();
-		$this_monday_ts = $this_monday->getTimestamp();
+		$last_week_start_ts = $week_start->getTimestamp();
+		$week_after_ts = $week_after_exclusive->getTimestamp();
 		foreach ($expiring as $p) {
 			$raw = (string) get_post_meta((int) $p->ID, FS_EXPIRATION_META_KEY, true);
 			$ts = fs_weekly_report_parse_expiration_timestamp($raw);
@@ -319,13 +438,13 @@ function fs_weekly_report_build_insights(\DateTimeImmutable $last_monday, \DateT
 				'url' => (string) get_permalink((int) $p->ID),
 				'date' => (string) wp_date($insight_date_format, $ts),
 			];
-			if ($ts >= $this_monday_ts) {
+			if ($ts >= $week_after_ts) {
 				if (count($out['expiring_upcoming']) < 10) {
 					$out['expiring_upcoming'][] = $row;
 				}
 				continue;
 			}
-			if ($ts >= $last_week_start_ts && $ts < $this_monday_ts) {
+			if ($ts >= $last_week_start_ts && $ts < $week_after_ts) {
 				if (count($out['expired_last_week']) < 10) {
 					$out['expired_last_week'][] = $row;
 				}
@@ -372,11 +491,16 @@ function fs_weekly_report_build_html(): string
 	$matomo_on = function_exists('fs_theme_feature_enabled') && fs_theme_feature_enabled('matomo');
 	$tz = function_exists('wp_timezone') ? wp_timezone() : new \DateTimeZone(wp_timezone_string() ?: 'UTC');
 	$today = new \DateTimeImmutable('now', $tz);
-	// Periods are anchored to “today” in the site timezone (send weekday/time does not change ranges): last completed ISO week for daily chart; weekly trends omit the current ISO week.
-	$this_monday = $today->modify('monday this week')->setTime(0, 0, 0);
-	$last_monday = $this_monday->modify('-7 days');
-	$last_sunday = $this_monday->modify('-1 day');
-	$insights = fs_weekly_report_build_insights($last_monday, $this_monday);
+	$report_period = fs_weekly_report_report_period_for_now($today);
+	$week_start = $report_period['week_start'];
+	$week_after_exclusive = $report_period['week_after_exclusive'];
+	$week_end_inclusive = $week_after_exclusive->modify('-1 day');
+	$date_fmt = get_option('date_format');
+	$report_period_range = wp_date((string) $date_fmt, $week_start->getTimestamp())
+		. ' – '
+		. wp_date((string) $date_fmt, $week_end_inclusive->getTimestamp());
+	// Content + Matomo slices use the configured send weekday as week start (e.g. Fri–Thu when sending on Friday).
+	$insights = fs_weekly_report_build_insights($week_start, $week_after_exclusive);
 
 	$daily = [];
 	$weekly = [];
@@ -384,10 +508,8 @@ function fs_weekly_report_build_html(): string
 	$weekly_chart_url = '';
 
 	if ($matomo_on && function_exists('fs_matomo_get_statistics')) {
-		// Fetch a little extra; then filter to full periods only.
 		$series = fs_matomo_get_statistics();
 		$daily_src = isset($series['daily']) && is_array($series['daily']) ? $series['daily'] : [];
-		$weekly_src = isset($series['weekly']) && is_array($series['weekly']) ? $series['weekly'] : [];
 		$daily = [];
 		foreach ($daily_src as $row) {
 			$date = isset($row['date']) ? (string) $row['date'] : '';
@@ -395,28 +517,38 @@ function fs_weekly_report_build_html(): string
 				continue;
 			}
 			$dt = new \DateTimeImmutable($date . ' 00:00:00', $tz);
-			if ($dt < $last_monday || $dt > $last_sunday) {
+			if ($dt < $week_start || $dt >= $week_after_exclusive) {
 				continue;
 			}
 			$daily[] = $row;
 		}
-		$weekly = [];
-		foreach ($weekly_src as $row) {
-			$date = isset($row['date']) ? (string) $row['date'] : '';
-			if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+		usort(
+			$daily,
+			static function ($a, $b): int {
+				return strcmp((string) ($a['date'] ?? ''), (string) ($b['date'] ?? ''));
+			}
+		);
+
+		$weekly_src = isset($series['weekly']) && is_array($series['weekly']) ? $series['weekly'] : [];
+		$wp_week_starts = get_option('start_of_week', 1);
+		$wp_week_starts = ($wp_week_starts === '' || $wp_week_starts === false) ? 1 : (int) $wp_week_starts;
+		$wp_week_starts = max(0, min(6, $wp_week_starts));
+		$weekly_trend = [];
+		foreach ($weekly_src as $wrow) {
+			$wdate = isset($wrow['date']) ? (string) $wrow['date'] : '';
+			if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $wdate)) {
 				continue;
 			}
-			$week_start = new \DateTimeImmutable($date . ' 00:00:00', $tz);
-			$week_start = $week_start->modify('monday this week');
-			// Exclude the current week; include only full, completed weeks.
-			if ($week_start >= $this_monday) {
+			if (fs_dashboard_wp_calendar_week_row_is_current_week($wdate, $wp_week_starts)) {
 				continue;
 			}
-			$weekly[] = $row;
+			$weekly_trend[] = $wrow;
 		}
-		if (count($weekly) > 8) {
-			$weekly = array_slice($weekly, -8);
+		if (count($weekly_trend) > 8) {
+			$weekly_trend = array_slice($weekly_trend, -8);
 		}
+		$weekly = $weekly_trend;
+
 		$daily_chart_url = fs_weekly_report_build_chart_url(
 			array_map(static function ($row) use ($tz): array {
 				$date = isset($row['date']) ? (string) $row['date'] : '';
@@ -425,8 +557,6 @@ function fs_weekly_report_build_html(): string
 				}
 				$dt = new \DateTimeImmutable($date . ' 12:00:00', $tz);
 				$ts = $dt->getTimestamp();
-				$week_monday = $dt->modify('monday this week');
-				$week_no = (int) $week_monday->format('W');
 
 				return [
 					wp_date('l', $ts),
@@ -456,19 +586,10 @@ function fs_weekly_report_build_html(): string
 			'line'
 		);
 		$weekly_chart_url = fs_weekly_report_build_chart_url(
-			array_map(static function ($row) use ($tz): array {
-				$d = isset($row['date']) ? (string) $row['date'] : '';
-				if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $d)) {
-					return ['', ''];
-				}
-				$monday = (new \DateTimeImmutable($d . ' 12:00:00', $tz))->modify('monday this week');
-				$m_ts = $monday->getTimestamp();
-				$week_no = (int) $monday->format('W');
+			array_map(static function ($row): array {
+				[$l1, $l2] = fs_weekly_report_weekly_chart_axis_labels($row);
 
-				return [
-					sprintf(__('Week %d', 'fromscratch'), $week_no),
-					wp_date('d.m.Y', $m_ts),
-				];
+				return [$l1, $l2];
 			}, $weekly),
 			[
 				[
@@ -495,6 +616,7 @@ function fs_weekly_report_build_html(): string
 	}
 	$template_args = [
 		'site_name' => $site_name,
+		'report_period_range' => $report_period_range,
 		'date_now' => $date_now,
 		'site_url' => $site_url,
 		'admin_url' => $admin_url,
@@ -615,24 +737,33 @@ function fs_weekly_report_send(array $emails): bool
  */
 function fs_weekly_report_monday_send(): void
 {
-	if (get_option('fromscratch_weekly_report_enabled', '0') !== '1') {
-		return;
-	}
-	if (!function_exists('fs_report_emails')) {
-		return;
-	}
-	$emails = fs_report_emails();
-	if ($emails === []) {
-		return;
-	}
-	$monday_key = wp_date('o-\WW');
-	$last_sent = (string) get_option('fromscratch_weekly_report_last_sent_week', '');
-	if ($last_sent === $monday_key) {
-		return;
-	}
+	try {
+		if (get_option('fromscratch_weekly_report_enabled', '0') !== '1') {
+			return;
+		}
+		if (!function_exists('fs_report_emails')) {
+			return;
+		}
+		$emails = fs_report_emails();
+		if ($emails === []) {
+			return;
+		}
+		$tz = function_exists('wp_timezone') ? wp_timezone() : new \DateTimeZone(wp_timezone_string() ?: 'UTC');
+		$now = new \DateTimeImmutable('now', $tz);
+		$period = fs_weekly_report_report_period_for_now($now);
+		$period_key = $period['week_start']->format('Y-m-d');
+		$last_sent = (string) get_option('fromscratch_weekly_report_last_sent_week', '');
+		if ($last_sent === $period_key) {
+			return;
+		}
 
-	if (fs_weekly_report_send($emails)) {
-		update_option('fromscratch_weekly_report_last_sent_week', $monday_key, false);
+		if (fs_weekly_report_send($emails)) {
+			update_option('fromscratch_weekly_report_last_sent_week', $period_key, false);
+		}
+	} finally {
+		if (!wp_installing()) {
+			fs_weekly_report_reschedule_cron();
+		}
 	}
 }
 add_action('fs_weekly_report_weekly', 'fs_weekly_report_monday_send');

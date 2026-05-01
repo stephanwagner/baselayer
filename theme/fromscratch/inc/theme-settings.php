@@ -97,6 +97,102 @@ add_action('admin_init', function () {
 	exit;
 }, 1);
 
+/**
+ * Persist General-tab fields (explicit list; avoids get_registered_settings before register_setting runs).
+ */
+function fs_theme_settings_save_general_options_from_post(): void
+{
+	$trio_opts = ['fromscratch_weekly_report_wday', 'fromscratch_weekly_report_hour', 'fromscratch_weekly_report_minute'];
+	$schedule_before = [
+		'fromscratch_weekly_report_wday' => (string) get_option('fromscratch_weekly_report_wday', '1'),
+		'fromscratch_weekly_report_hour' => (string) get_option('fromscratch_weekly_report_hour', '8'),
+		'fromscratch_weekly_report_minute' => (string) get_option('fromscratch_weekly_report_minute', '0'),
+	];
+
+	$pairs = [
+		'fromscratch_weekly_report_enabled' => static function ($raw): string {
+			return !empty($raw) ? '1' : '0';
+		},
+		'fromscratch_weekly_report_wday' => 'fs_sanitize_weekly_report_wday',
+		'fromscratch_weekly_report_hour' => 'fs_sanitize_weekly_report_hour',
+		'fromscratch_weekly_report_minute' => 'fs_sanitize_weekly_report_minute',
+		'fromscratch_report_email' => 'fs_sanitize_report_email_list',
+		'posts_per_page' => 'fs_sanitize_posts_per_page',
+		'fromscratch_excerpt_length' => 'fs_sanitize_excerpt_length',
+		'fromscratch_excerpt_more' => 'sanitize_text_field',
+		'fromscratch_client_logo' => 'fs_sanitize_client_logo',
+		'fromscratch_og_image_fallback' => 'fs_sanitize_og_image_fallback',
+	];
+	foreach ($pairs as $name => $sanitize) {
+		if (!array_key_exists($name, $_POST)) {
+			continue;
+		}
+		$raw = wp_unslash($_POST[$name]);
+		if ($sanitize instanceof \Closure) {
+			$value = $sanitize($raw);
+		} else {
+			$value = call_user_func($sanitize, $raw);
+		}
+		update_option($name, $value);
+	}
+
+	foreach ($trio_opts as $tkey) {
+		if (
+			array_key_exists($tkey, $_POST)
+			&& (string) get_option($tkey, '') !== $schedule_before[$tkey]
+		) {
+			delete_option('fromscratch_weekly_report_last_sent_week');
+			break;
+		}
+	}
+}
+
+// General tab (self-POST): save & reset stay on Theme settings; no redirect to options.php.
+add_action('admin_init', function (): void {
+	global $pagenow;
+	if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+		return;
+	}
+	if ($pagenow !== 'options-general.php' || (isset($_GET['page']) ? $_GET['page'] : '') !== 'fs-theme-settings') {
+		return;
+	}
+	$tab = isset($_GET['tab']) ? sanitize_key((string) $_GET['tab']) : 'general';
+	if ($tab !== 'general') {
+		return;
+	}
+	if (!current_user_can('manage_options')) {
+		return;
+	}
+	$url = admin_url('options-general.php?page=fs-theme-settings&tab=general');
+
+	if (!empty($_POST['fromscratch_weekly_report_reset_test'])) {
+		check_admin_referer('fromscratch_weekly_report_reset_test');
+		if (!function_exists('fs_weekly_report_reset_for_testing')) {
+			wp_safe_redirect($url);
+			exit;
+		}
+		fs_weekly_report_reset_for_testing();
+		$notice = __('Reset done. The next page load that runs WordPress cron can send the report (if enabled and not already sent this week). Regular schedule is restored after cron runs. ', 'fromscratch');
+		if (function_exists('fs_weekly_report_next_send_label')) {
+			$notice .= fs_weekly_report_next_send_label();
+		}
+		set_transient('fromscratch_weekly_report_reset_notice', $notice, 60);
+		wp_safe_redirect($url);
+		exit;
+	}
+
+	if (($_POST['action'] ?? '') === 'update' && ($_POST['option_page'] ?? '') === FS_THEME_OPTION_GROUP_GENERAL) {
+		check_admin_referer(FS_THEME_OPTION_GROUP_GENERAL . '-options');
+		fs_theme_settings_save_general_options_from_post();
+		if (function_exists('fs_weekly_report_reschedule_cron')) {
+			fs_weekly_report_reschedule_cron();
+		}
+		set_transient('fromscratch_general_saved', '1', 30);
+		wp_safe_redirect($url);
+		exit;
+	}
+}, 20);
+
 // General tab: send the full weekly report immediately (manual send, same content as cron).
 add_action('admin_init', function () {
 	global $pagenow;
@@ -796,12 +892,20 @@ function theme_settings_page(): void
 	if ($weekly_send_error !== false) {
 		delete_transient('fromscratch_weekly_report_send_error');
 	}
+	$general_saved = get_transient('fromscratch_general_saved');
+	if ($general_saved !== false) {
+		delete_transient('fromscratch_general_saved');
+	}
+	$weekly_reset_notice = get_transient('fromscratch_weekly_report_reset_notice');
+	if ($weekly_reset_notice !== false) {
+		delete_transient('fromscratch_weekly_report_reset_notice');
+	}
 ?>
 	<div class="wrap">
 		<h1><?= esc_html__('Theme settings', 'fromscratch') ?></h1>
 		<?php
 		$notices = [];
-		if ($redirects_saved !== false || $css_saved !== false) {
+		if ($redirects_saved !== false || $css_saved !== false || $general_saved !== false) {
 			$notices[] = __('Settings saved.', 'fromscratch');
 		}
 		if ($weekly_send_success !== false) {
@@ -809,6 +913,9 @@ function theme_settings_page(): void
 		}
 		if ($weekly_send_error !== false) {
 			$notices[] = (string) $weekly_send_error;
+		}
+		if ($weekly_reset_notice !== false) {
+			$notices[] = (string) $weekly_reset_notice;
 		}
 		foreach ($notices as $msg) : ?>
 			<div class="notice <?= ($weekly_send_error !== false && $msg === (string) $weekly_send_error) ? 'notice-error' : 'notice-success' ?> is-dismissible">
@@ -832,7 +939,7 @@ function theme_settings_page(): void
 			$og_fallback_url = $og_fallback_id > 0 ? wp_get_attachment_image_url($og_fallback_id, 'medium') : '';
 			$weekly_manual_send_default_email = function_exists('fs_developer_email') ? fs_developer_email() : '';
 			?>
-			<form method="post" action="options.php" class="fs-page-settings-form">
+			<form method="post" action="<?= esc_url(admin_url('options-general.php?page=fs-theme-settings&tab=general')) ?>" class="fs-page-settings-form">
 				<?php settings_fields(FS_THEME_OPTION_GROUP_GENERAL); ?>
 				<h2 class="title"><?= esc_html__('Weekly website report', 'fromscratch') ?></h2>
 				<p class="description" style="margin-bottom: 12px;"><?= esc_html__('Sends a weekly summary on the schedule below (site timezone), with analytics when Matomo is enabled.', 'fromscratch') ?></p>
@@ -997,6 +1104,10 @@ function theme_settings_page(): void
 			<form method="post" action="<?= esc_url(admin_url('options-general.php?page=fs-theme-settings&tab=general')) ?>" id="fs-send-weekly-report-to-developer" style="display:none;">
 				<?php wp_nonce_field('fromscratch_send_weekly_report_to_developer'); ?>
 				<input type="hidden" name="fromscratch_send_weekly_report_to_developer" value="1">
+			</form>
+			<form method="post" action="<?= esc_url(admin_url('options-general.php?page=fs-theme-settings&tab=general')) ?>" id="fs-reset-weekly-report-test" style="display:none;">
+				<?php wp_nonce_field('fromscratch_weekly_report_reset_test'); ?>
+				<input type="hidden" name="fromscratch_weekly_report_reset_test" value="1">
 			</form>
 		<?php elseif ($tab === 'texts') : ?>
 			<form method="post" action="options.php" class="fs-page-settings-form" id="fs-content-form">
