@@ -356,7 +356,7 @@ body.fs-feature-media-folders {
   .fs-media-folder-assign-backdrop {
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.45);
+    background: rgba(0, 0, 0, 0.6);
   }
 
   .fs-media-folder-delete-dialog,
@@ -364,7 +364,7 @@ body.fs-feature-media-folders {
   .fs-media-folder-assign-dialog {
     position: relative;
     background: #fff;
-    width: 480px;
+    width: 400px;
     max-width: calc(100vw - 64px);
     margin: 10vh auto 0;
     padding: 16px;
@@ -374,6 +374,15 @@ body.fs-feature-media-folders {
     h2 {
       margin: 0 0 12px;
     }
+
+    select {
+      display: block;
+      width: 100%;
+    }
+  }
+
+  #fs-media-folder-delete-text {
+    text-wrap: pretty;
   }
 
   .fs-media-folder-delete-actions {
