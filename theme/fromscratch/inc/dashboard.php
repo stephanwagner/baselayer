@@ -465,19 +465,88 @@ JS;
 add_action('admin_enqueue_scripts', 'fs_dashboard_enqueue_matomo_stats', 20);
 
 /**
- * @return array{today: int, yesterday: int}|null Cached counts if transient is still valid.
+ * @param mixed $raw Option row or legacy shape.
+ * @return array{today: int, yesterday: int}|null
  */
-function fs_dashboard_matomo_stats_get_cached_counts(): ?array
+function fs_dashboard_matomo_stats_normalize_stored_counts($raw): ?array
 {
-	$c = get_transient(FS_MATOMO_DASHBOARD_VISITS_TRANSIENT);
-	if (!is_array($c) || !array_key_exists('today', $c) || !array_key_exists('yesterday', $c)) {
+	if (!is_array($raw) || !array_key_exists('today', $raw) || !array_key_exists('yesterday', $raw)) {
 		return null;
 	}
 
 	return [
-		'today'     => (int) $c['today'],
-		'yesterday' => (int) $c['yesterday'],
+		'today'     => (int) $raw['today'],
+		'yesterday' => (int) $raw['yesterday'],
 	];
+}
+
+/**
+ * Last known today/yesterday counts for the dashboard widget (persists until Matomo sync updates them).
+ *
+ * @return array{today: int, yesterday: int}|null Null only when no snapshot exists yet.
+ */
+function fs_dashboard_matomo_stats_get_cached_counts(): ?array
+{
+	if (!defined('FS_MATOMO_DASHBOARD_VISITS_OPTION')) {
+		return null;
+	}
+
+	$opt = get_option(FS_MATOMO_DASHBOARD_VISITS_OPTION, null);
+	$norm = fs_dashboard_matomo_stats_normalize_stored_counts($opt);
+	if ($norm !== null) {
+		return $norm;
+	}
+
+	if (!defined('FS_MATOMO_DASHBOARD_VISITS_TRANSIENT')) {
+		return null;
+	}
+
+	$legacy = get_transient(FS_MATOMO_DASHBOARD_VISITS_TRANSIENT);
+	if (!is_array($legacy)) {
+		return null;
+	}
+
+	$norm = fs_dashboard_matomo_stats_normalize_stored_counts($legacy);
+	if ($norm === null) {
+		return null;
+	}
+
+	update_option(
+		FS_MATOMO_DASHBOARD_VISITS_OPTION,
+		[
+			'today' => $norm['today'],
+			'yesterday' => $norm['yesterday'],
+			'series_end_date' => '',
+			'updated_at' => time(),
+		],
+		false
+	);
+	delete_transient(FS_MATOMO_DASHBOARD_VISITS_TRANSIENT);
+
+	return $norm;
+}
+
+/**
+ * When the stored daily series end date is behind site "today", queue a background Matomo refresh (non-blocking).
+ */
+function fs_dashboard_matomo_stats_maybe_schedule_refresh(): void
+{
+	if (!defined('FS_MATOMO_DASHBOARD_VISITS_OPTION') || !function_exists('fs_matomo_statistics_refresh_full')) {
+		return;
+	}
+
+	$opt = get_option(FS_MATOMO_DASHBOARD_VISITS_OPTION, null);
+	if (!is_array($opt)) {
+		return;
+	}
+
+	$site_today = wp_date('Y-m-d');
+	$end = isset($opt['series_end_date']) ? (string) $opt['series_end_date'] : '';
+	if ($end !== '' && preg_match('/^\d{4}-\d{2}-\d{2}$/', $end) && $end >= $site_today) {
+		return;
+	}
+
+	fs_dashboard_matomo_stats_schedule_background_refresh();
 }
 
 /**
@@ -513,7 +582,7 @@ add_action('init', function (): void {
 }, 25);
 
 /**
- * AJAX: formatted visit lines for dashboard (Matomo). Cached 1 hour; cache miss queues a cron refresh (non-blocking).
+ * AJAX: formatted visit lines for dashboard (Matomo). Uses persistent snapshot; schedules refresh when stale (non-blocking).
  */
 function fs_dashboard_ajax_matomo_stats(): void
 {
@@ -524,9 +593,25 @@ function fs_dashboard_ajax_matomo_stats(): void
 
 	$counts = fs_dashboard_matomo_stats_get_cached_counts();
 	if ($counts !== null) {
+		fs_dashboard_matomo_stats_maybe_schedule_refresh();
 		wp_send_json_success(fs_dashboard_matomo_stats_format_lines($counts));
 
 		return;
+	}
+
+	// No snapshot yet: fetch in this request so the dashboard works without wp-cron (e.g. DISABLE_WP_CRON).
+	if (
+		function_exists('fs_dashboard_matomo_settings')
+		&& fs_dashboard_matomo_settings() !== null
+		&& function_exists('fs_matomo_statistics_refresh_full')
+	) {
+		fs_matomo_statistics_refresh_full();
+		$counts = fs_dashboard_matomo_stats_get_cached_counts();
+		if ($counts !== null) {
+			wp_send_json_success(fs_dashboard_matomo_stats_format_lines($counts));
+
+			return;
+		}
 	}
 
 	fs_dashboard_matomo_stats_schedule_background_refresh();

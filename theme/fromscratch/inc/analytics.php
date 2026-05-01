@@ -7,10 +7,18 @@ const FS_MATOMO_STATS_CANONICAL_DAYS = 14;
 const FS_MATOMO_STATS_CANONICAL_WEEKS = 9;
 
 /**
- * Transient holding raw today/yesterday visit totals for the wp-admin dashboard widget.
- * Derived from FS_MATOMO_STATS_CANONICAL_* daily series (no separate Matomo requests).
+ * Legacy transient (v3): today/yesterday visit totals for the dashboard widget.
+ * Migrated to FS_MATOMO_DASHBOARD_VISITS_OPTION on read; no longer written.
  */
 const FS_MATOMO_DASHBOARD_VISITS_TRANSIENT = 'fs_dashboard_matomo_stats_counts_v3';
+
+/**
+ * Option (autoload=no): last known dashboard today/yesterday visit totals.
+ * Persists across requests so the widget keeps showing numbers while Matomo refreshes in the background.
+ *
+ * Shape: today (int), yesterday (int), series_end_date (Y-m-d of last daily row), updated_at (unix).
+ */
+const FS_MATOMO_DASHBOARD_VISITS_OPTION = 'fs_dashboard_matomo_quick_stats_v4';
 
 /** Prevents stacking multiple wp-cron jobs for the same dashboard refresh. */
 const FS_MATOMO_BACKGROUND_REFRESH_LOCK = 'fs_matomo_bg_refresh_lock';
@@ -158,7 +166,7 @@ function fs_dashboard_matomo_bulk_cache_key(int $days, int $weeks): string
 }
 
 /**
- * Store today / yesterday visit counts for the admin home screen (integers, 1h TTL).
+ * Store today / yesterday visit counts for the admin home screen (persisted option).
  *
  * @param array<int, array{date:string,unique:int,visits:int,pageviews:int}> $daily
  */
@@ -166,13 +174,22 @@ function fs_matomo_sync_dashboard_quick_stats_from_daily(array $daily): void
 {
     $n = count($daily);
     if ($n === 0) {
-        set_transient(FS_MATOMO_DASHBOARD_VISITS_TRANSIENT, ['today' => 0, 'yesterday' => 0], HOUR_IN_SECONDS);
-
+        // Do not overwrite last good snapshot when the daily series is empty (e.g. API error).
         return;
     }
     $today = (int) ($daily[$n - 1]['visits'] ?? 0);
     $yesterday = $n >= 2 ? (int) ($daily[$n - 2]['visits'] ?? 0) : 0;
-    set_transient(FS_MATOMO_DASHBOARD_VISITS_TRANSIENT, ['today' => $today, 'yesterday' => $yesterday], HOUR_IN_SECONDS);
+    $series_end = (string) ($daily[$n - 1]['date'] ?? '');
+    update_option(
+        FS_MATOMO_DASHBOARD_VISITS_OPTION,
+        [
+            'today' => $today,
+            'yesterday' => $yesterday,
+            'series_end_date' => $series_end,
+            'updated_at' => time(),
+        ],
+        false
+    );
 }
 
 /**
