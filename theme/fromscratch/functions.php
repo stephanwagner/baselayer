@@ -39,6 +39,7 @@ if (is_admin()) {
 
 // Helpers
 require_once 'inc/helpers/page-blocker.php';
+require_once 'inc/helpers/breadcrumbs.php';
 
 // Features
 require_once 'inc/login-client-logo.php';

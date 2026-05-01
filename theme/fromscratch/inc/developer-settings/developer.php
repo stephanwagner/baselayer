@@ -187,6 +187,23 @@ function fs_render_developer_cheatsheet(): void
 					</tr>
 					<tr>
 						<td>
+							<strong><?= esc_html__('Breadcrumbs', 'fromscratch') ?></strong><br>
+							<span class="description"><?= esc_html__('Renders a breadcrumb trail for the current page, handling pages, posts, archives, and search.', 'fromscratch') ?></span>
+						</td>
+						<td>
+							<code class="fs-code-text fs-code-small">PHP</code>
+						</td>
+						<td>
+							<code class="fs-code-small" style="white-space: pre-wrap;"><?= esc_html('fs_breadcrumbs([
+  \'home_label\' => \'Home\',
+  \'home_url\' => home_url(\'/\'),
+  \'separator\' => \'›\',
+  \'separator_html\' => \'<b>→</b>\',
+]);') ?></code>
+						</td>
+					</tr>
+					<tr>
+						<td>
 							<strong><?= esc_html__('Modal', 'fromscratch') ?></strong><br>
 							<span class="description"><?= esc_html__('Full-screen overlay. Match IDs between trigger and content. Content is moved into the modal on open.', 'fromscratch') ?></span>
 						</td>

@@ -231,6 +231,9 @@ msgstr "%s-Seite hinzufügen"
 msgid "Homepage"
 msgstr "Startseite"
 
+msgid "Home"
+msgstr "Start"
+
 msgid "homepage"
 msgstr "startseite"
 
@@ -2110,3 +2113,9 @@ msgstr "Manuell öffnen:"
 
 msgid "Add content:"
 msgstr "Inhalt hinzufügen:"
+
+msgid "Breadcrumbs"
+msgstr "Breadcrumbs"
+
+msgid "Renders a breadcrumb trail for the current page, handling pages, posts, archives, and search."
+msgstr "Rendert eine Breadcrumb-Navigation für die aktuelle Seite inklusive Seiten, Beiträge, Archive, Suche."
