@@ -199,7 +199,7 @@ add_action('enqueue_block_editor_assets', function (): void {
 }, 12);
 
 /**
- * Admin list table: Event dates column (sortable by start timestamp).
+ * Admin list table: Event dates column (display only).
  */
 add_filter('manage_' . FS_EVENT_POST_TYPE . '_posts_columns', function (array $columns): array {
 	$label = __('Event dates', 'fromscratch');
@@ -241,75 +241,12 @@ add_action('manage_' . FS_EVENT_POST_TYPE . '_posts_custom_column', function (st
 	echo esc_html($range);
 }, 10, 2);
 
-add_filter('manage_edit-' . FS_EVENT_POST_TYPE . '_sortable_columns', function (array $columns): array {
-	$columns['fs_event_dates'] = 'fs_event_start';
-
-	return $columns;
-});
-
-/** @internal Admin list ORDER BY slug for FS_EVENT_META_START_TS. */
-const FS_EVENT_ADMIN_ORDERBY_START = 'fs_event_start';
-
-/**
- * LEFT JOIN alias for admin event date sort — must match fs_event_posts_clauses_sort_events().
- */
-function fs_event_admin_sort_join_alias(): string
-{
-	return 'fs_evt_dt_sort';
-}
-
-add_action('pre_get_posts', static function (\WP_Query $query): void {
-	if (!is_admin() || !$query->is_main_query()) {
-		return;
-	}
-	$post_type = $query->get('post_type');
-	if ($post_type !== FS_EVENT_POST_TYPE && !(is_array($post_type) && in_array(FS_EVENT_POST_TYPE, $post_type, true))) {
-		return;
-	}
-	$orderby_requested = isset($_GET['orderby']) ? sanitize_key(wp_unslash((string) $_GET['orderby'])) : '';
-	if ($orderby_requested !== FS_EVENT_ADMIN_ORDERBY_START) {
-		return;
-	}
-	$query->set('orderby', FS_EVENT_ADMIN_ORDERBY_START);
-	add_filter('posts_clauses', 'fs_event_posts_clauses_sort_events', 10, 2);
-}, 999);
-
-function fs_event_posts_clauses_sort_events(array $clauses, \WP_Query $query): array
-{
-	remove_filter('posts_clauses', 'fs_event_posts_clauses_sort_events', 10);
-	if ((string) $query->get('post_type') !== FS_EVENT_POST_TYPE) {
-		return $clauses;
-	}
-	if ((string) $query->get('orderby') !== FS_EVENT_ADMIN_ORDERBY_START) {
-		return $clauses;
-	}
-	global $wpdb;
-	$alias = fs_event_admin_sort_join_alias();
-	if (!preg_match('/\b' . preg_quote($alias, '/') . '\b/', $clauses['join'])) {
-		$clauses['join'] .= $wpdb->prepare(
-			" LEFT JOIN {$wpdb->postmeta} AS {$alias} ON ( {$wpdb->posts}.ID = {$alias}.post_id AND {$alias}.meta_key = %s ) ",
-			FS_EVENT_META_START_TS
-		);
-	}
-	$desc = strtoupper((string) $query->get('order')) === 'DESC';
-	// Undated rows (no meta): sort after all dated rows regardless of ASC/DESC.
-	$grp = "{$alias}.meta_id IS NOT NULL AND TRIM(IFNULL({$alias}.meta_value, '')) <> ''";
-	$ts = "(CASE WHEN {$grp} THEN CAST({$alias}.meta_value AS UNSIGNED) ELSE 0 END)";
-	if ($desc) {
-		$clauses['orderby'] = "{$grp} DESC, {$ts} DESC, {$wpdb->posts}.post_date DESC";
-	} else {
-		$clauses['orderby'] = "{$grp} DESC, {$ts} ASC, {$wpdb->posts}.post_date DESC";
-	}
-
-	return $clauses;
-}
-
 add_action('admin_head', static function (): void {
 	global $pagenow;
 	if ($pagenow !== 'edit.php' || sanitize_key(wp_unslash((string) ($_GET['post_type'] ?? ''))) !== FS_EVENT_POST_TYPE) {
 		return;
 	}
-	echo '<style>.column-fs_event_dates{width:18em;} @media(min-width:1200px){.column-fs_event_dates{width:22em}}</style>';
+	echo '<style>.column-fs_event_dates{width:14em;} @media(min-width:900px){.column-fs_event_dates{width:20em}}</style>';
 });
 
 /**
