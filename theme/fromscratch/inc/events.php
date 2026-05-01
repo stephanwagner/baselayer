@@ -199,9 +199,150 @@ add_action('enqueue_block_editor_assets', function (): void {
 }, 12);
 
 /**
- * Human-readable range for templates.
+ * Admin list table: Event dates column (sortable by start timestamp).
  */
-function fs_event_format_range_text(int $post_id): string
+add_filter('manage_' . FS_EVENT_POST_TYPE . '_posts_columns', function (array $columns): array {
+	$label = __('Event dates', 'fromscratch');
+	$new = [];
+	$inserted = false;
+	foreach ($columns as $key => $heading) {
+		if ($key === 'date' && !$inserted) {
+			$new['fs_event_dates'] = $label;
+			$inserted = true;
+		}
+		$new[$key] = $heading;
+	}
+	if ($inserted) {
+		return $new;
+	}
+	$out = [];
+	foreach ($columns as $key => $heading) {
+		$out[$key] = $heading;
+		if ($key === 'title') {
+			$out['fs_event_dates'] = $label;
+		}
+	}
+
+	return $out;
+});
+
+add_action('manage_' . FS_EVENT_POST_TYPE . '_posts_custom_column', function (string $column, int $post_id): void {
+	if ($column !== 'fs_event_dates') {
+		return;
+	}
+	if (get_post_type($post_id) !== FS_EVENT_POST_TYPE) {
+		return;
+	}
+	$range = fs_event_format_range_text($post_id, true);
+	if ($range === '') {
+		echo '<span aria-hidden="true">—</span>';
+		return;
+	}
+	echo esc_html($range);
+}, 10, 2);
+
+add_filter('manage_edit-' . FS_EVENT_POST_TYPE . '_sortable_columns', function (array $columns): array {
+	$columns['fs_event_dates'] = 'fs_event_start';
+
+	return $columns;
+});
+
+/** @internal Admin list ORDER BY slug for FS_EVENT_META_START_TS. */
+const FS_EVENT_ADMIN_ORDERBY_START = 'fs_event_start';
+
+/**
+ * LEFT JOIN alias for admin event date sort — must match fs_event_posts_clauses_sort_events().
+ */
+function fs_event_admin_sort_join_alias(): string
+{
+	return 'fs_evt_dt_sort';
+}
+
+add_action('pre_get_posts', static function (\WP_Query $query): void {
+	if (!is_admin() || !$query->is_main_query()) {
+		return;
+	}
+	$post_type = $query->get('post_type');
+	if ($post_type !== FS_EVENT_POST_TYPE && !(is_array($post_type) && in_array(FS_EVENT_POST_TYPE, $post_type, true))) {
+		return;
+	}
+	$orderby_requested = isset($_GET['orderby']) ? sanitize_key(wp_unslash((string) $_GET['orderby'])) : '';
+	if ($orderby_requested !== FS_EVENT_ADMIN_ORDERBY_START) {
+		return;
+	}
+	$query->set('orderby', FS_EVENT_ADMIN_ORDERBY_START);
+	add_filter('posts_clauses', 'fs_event_posts_clauses_sort_events', 10, 2);
+}, 999);
+
+function fs_event_posts_clauses_sort_events(array $clauses, \WP_Query $query): array
+{
+	remove_filter('posts_clauses', 'fs_event_posts_clauses_sort_events', 10);
+	if ((string) $query->get('post_type') !== FS_EVENT_POST_TYPE) {
+		return $clauses;
+	}
+	if ((string) $query->get('orderby') !== FS_EVENT_ADMIN_ORDERBY_START) {
+		return $clauses;
+	}
+	global $wpdb;
+	$alias = fs_event_admin_sort_join_alias();
+	if (!preg_match('/\b' . preg_quote($alias, '/') . '\b/', $clauses['join'])) {
+		$clauses['join'] .= $wpdb->prepare(
+			" LEFT JOIN {$wpdb->postmeta} AS {$alias} ON ( {$wpdb->posts}.ID = {$alias}.post_id AND {$alias}.meta_key = %s ) ",
+			FS_EVENT_META_START_TS
+		);
+	}
+	$desc = strtoupper((string) $query->get('order')) === 'DESC';
+	// Undated rows (no meta): sort after all dated rows regardless of ASC/DESC.
+	$grp = "{$alias}.meta_id IS NOT NULL AND TRIM(IFNULL({$alias}.meta_value, '')) <> ''";
+	$ts = "(CASE WHEN {$grp} THEN CAST({$alias}.meta_value AS UNSIGNED) ELSE 0 END)";
+	if ($desc) {
+		$clauses['orderby'] = "{$grp} DESC, {$ts} DESC, {$wpdb->posts}.post_date DESC";
+	} else {
+		$clauses['orderby'] = "{$grp} DESC, {$ts} ASC, {$wpdb->posts}.post_date DESC";
+	}
+
+	return $clauses;
+}
+
+add_action('admin_head', static function (): void {
+	global $pagenow;
+	if ($pagenow !== 'edit.php' || sanitize_key(wp_unslash((string) ($_GET['post_type'] ?? ''))) !== FS_EVENT_POST_TYPE) {
+		return;
+	}
+	echo '<style>.column-fs_event_dates{width:18em;} @media(min-width:1200px){.column-fs_event_dates{width:22em}}</style>';
+});
+
+/**
+ * Adapt a php date()/wp_date format string so full-month tokens (F) become abbreviated months (M).
+ * Respects backslash escapes: e.g. \F stays a literal letter F in output.
+ *
+ * @param string $php_format Same style as Options → Date format option.
+ */
+function fs_event_abbr_month_datetime_format(string $php_format): string
+{
+	$out = '';
+	$len = strlen($php_format);
+	for ($i = 0; $i < $len; ++$i) {
+		$c = $php_format[$i];
+		if ($c === '\\') {
+			$out .= '\\';
+			if (++$i < $len) {
+				$out .= $php_format[$i];
+			}
+			continue;
+		}
+		$out .= $c === 'F' ? 'M' : $c;
+	}
+
+	return $out;
+}
+
+/**
+ * Human-readable range for templates.
+ *
+ * @param bool $abbr_month_names When true (e.g. admin list column), formatted months use abbreviated names (M not F).
+ */
+function fs_event_format_range_text(int $post_id, bool $abbr_month_names = false): string
 {
 	$start_date = get_post_meta($post_id, FS_EVENT_META_START_DATE, true);
 	if (!is_string($start_date) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $start_date)) {
@@ -225,6 +366,9 @@ function fs_event_format_range_text(int $post_id): string
 	}
 
 	$df = get_option('date_format', 'F j, Y');
+	if ($abbr_month_names) {
+		$df = fs_event_abbr_month_datetime_format((string) $df);
+	}
 	$tf = get_option('time_format', 'g:i a');
 	$ds = wp_date($df, $start_ts, $tz);
 	$de = wp_date($df, $end_ts, $tz);
