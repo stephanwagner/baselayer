@@ -17,6 +17,9 @@
 // Common
 @forward 'lib/common';
 
+// Components
+@forward 'components/modal';
+
 // App
 @forward 'layout/app';
 @forward 'layout/containers';

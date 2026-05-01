@@ -8,13 +8,21 @@ import './service-worker';
 import './menu';
 import './scrolled';
 
+// Components
+import { initModals, openModal } from '../components/modal';
+
 // Blocks
 // TODO find solution to sunc with blocks plugin
 // import '../blocks/all-blocks';
 
-// Page init
+// Domready
 document.addEventListener('DOMContentLoaded', () => {
+
+  // Delay initial animations
   setTimeout(function () {
     document.body.classList.add('-init');
   }, 64);
+
+  // Init modals
+  initModals();
 });

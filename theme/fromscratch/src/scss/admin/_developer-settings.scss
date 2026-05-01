@@ -104,3 +104,12 @@
   text-align: center;
   margin: 0 4px 0 0;
 }
+
+.helpers-table__code-description {
+  font-weight: 500;
+  margin: 8px 0 2px;
+
+  &:first-child {
+    margin-top: 0;
+  }
+}

@@ -1,0 +1,152 @@
+@use '../_core' as *;
+
+.modal__wrapper {
+  display: none;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  max-height: 100vh;
+  background: rgba(#000, 0.85);
+  overflow: auto;
+  z-index: 2000;
+  opacity: 0;
+  transition: transition('opacity');
+
+  &.-show {
+    display: block;
+  }
+
+  &.-animate {
+    opacity: 1;
+  }
+}
+
+.modal__container {
+  padding: 48px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  transform: scale(0.95);
+  opacity: 0;
+  transition: transition('transform', 'opacity');
+
+  .modal__wrapper.-animate & {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  @media (max-width: 900px) {
+    padding: 32px 0;
+  }
+
+  @media (max-width: 600px) {
+    padding: 24px 0;
+  }
+}
+
+.modal__content-container {
+  position: relative;
+  background: #fff;
+  border-radius: 16px;
+  width: 600px;
+  margin: auto;
+  padding: 24px;
+  max-width: calc(100vw - 32px - 32px);
+
+  @media (max-width: 600px) {
+    max-width: calc(100vw - 24px - 24px);
+    padding: 16px;
+  }
+
+  @media (max-width: 400px) {
+    max-width: calc(100vw - 12px - 12px);
+    padding: 16px 12px;
+  }
+
+  .modal__wrapper[data-id='delete-account'] & {
+    width: 440px;
+  }
+}
+
+[data-modal-content] {
+  display: none;
+
+  .modal__wrapper & {
+    display: block;
+  }
+}
+
+.modal__close-button {
+  background: #fff;
+  border-radius: 50%;
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 34px;
+  height: 34px;
+  line-height: 0;
+  transform: translate(8px, -8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: transition('color');
+  color: color('gray-500');
+
+  &:hover {
+    color: #000;
+  }
+}
+
+.modal__close-button-icon {
+  display: block;
+  width: 20px;
+  height: 20px;
+  font-size: 20px;
+  line-height: 20px;
+
+  svg {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.modal__title {
+  font-size: 19px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.modal__text {
+  font-size: 14px;
+}
+
+.modal__footer {
+  display: flex;
+  justify-content: end;
+  gap: 12px;
+  margin: 16px 0 0;
+  padding: 16px 0 0;
+  border-top: 1px solid #eee;
+
+  @media (max-width: 380px) {
+    margin: 12px 0 0;
+    padding: 12px 0 0;
+  }
+}
+
+// Confirm modal
+
+.modal__wrapper[data-id='confirm'] {
+  .modal__content-container {
+    padding: 16px;
+    width: 420px;
+
+    @media (max-width: 380px) {
+      padding: 16px 12px;
+    }
+  }
+}

@@ -2095,3 +2095,18 @@ msgstr "Inhalt-Helfer"
 
 msgid "Reads saved Theme Content option values with an optional fallback default."
 msgstr "Liest gespeicherte Theme-Inhalt-Optionen mit optionalem Fallback-Standardwert."
+
+msgid "Modal"
+msgstr "Modal"
+
+msgid "Full-screen overlay. Match IDs between trigger and content. Content is moved into the modal on open."
+msgstr "Vollbild-Overlay. IDs von Trigger und Inhalt müssen übereinstimmen. Der Inhalt wird beim Öffnen in das Modal verschoben."
+
+msgid "Attach modal:"
+msgstr "Modal zuweisen:"
+
+msgid "Open manually:"
+msgstr "Manuell öffnen:"
+
+msgid "Add content:"
+msgstr "Inhalt hinzufügen:"

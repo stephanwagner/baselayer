@@ -112,7 +112,7 @@ function fs_render_developer_cheatsheet(): void
 		<div class="fs-page-settings-form" style="margin-top: 28px;">
 
 			<h2 class="title" style="margin-top: 24px;"><?= esc_html__('Helpers', 'fromscratch') ?></h2>
-			<p class="description"><?= esc_html__('Common helper functions and utilities for use in templates and theme code.', 'fromscratch') ?></p>
+			<p class="description"><?= esc_html__('Common helper functions and utilities for templates, theme code, and frontend scripts.', 'fromscratch') ?></p>
 
 			<table class="widefat striped helpers-table__table">
 				<tbody>
@@ -183,6 +183,25 @@ function fs_render_developer_cheatsheet(): void
 						</td>
 						<td>
 							<code class="fs-code-small"><?= esc_html("fs_content('hero_title', 'Default headline')") ?></code>
+						</td>
+					</tr>
+					<tr>
+						<td>
+							<strong><?= esc_html__('Modal', 'fromscratch') ?></strong><br>
+							<span class="description"><?= esc_html__('Full-screen overlay. Match IDs between trigger and content. Content is moved into the modal on open.', 'fromscratch') ?></span>
+						</td>
+						<td>
+							<code class="fs-code-text fs-code-small">JavaScript</code>
+						</td>
+						<td>
+							<div class="helpers-table__code-description"><?= esc_html__('Attach modal:', 'fromscratch') ?></div>
+							<code class="fs-code-small"><?= esc_html('<button data-modal="my-modal">Open</button>') ?></code>
+
+							<div class="helpers-table__code-description"><?= esc_html__('Open manually:', 'fromscratch') ?></div>
+							<code class="fs-code-small"><?= esc_html("openModal('my-modal');") ?></code>
+
+							<div class="helpers-table__code-description"><?= esc_html__('Add content:', 'fromscratch') ?></div>
+							<code class="fs-code-small"><?= esc_html('<div data-modal-content="my-modal">…</div>') ?></code>
 						</td>
 					</tr>
 				</tbody>
