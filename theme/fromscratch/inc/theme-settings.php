@@ -97,7 +97,7 @@ add_action('admin_init', function () {
 	exit;
 }, 1);
 
-// General tab: send weekly report immediately to developer email (manual test/send).
+// General tab: send the full weekly report immediately (manual send, same content as cron).
 add_action('admin_init', function () {
 	global $pagenow;
 	if (!current_user_can('manage_options') || $_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -117,8 +117,8 @@ add_action('admin_init', function () {
 		return;
 	}
 	$url = admin_url('options-general.php?page=fs-theme-settings&tab=general');
-	$posted = isset($_POST['fromscratch_weekly_report_test_recipient'])
-		? sanitize_email(wp_unslash((string) $_POST['fromscratch_weekly_report_test_recipient']))
+	$posted = isset($_POST['fromscratch_weekly_report_manual_recipient'])
+		? sanitize_email(wp_unslash((string) $_POST['fromscratch_weekly_report_manual_recipient']))
 		: '';
 	$developer_email = function_exists('fs_developer_email') ? fs_developer_email() : '';
 	$recipient = $posted !== '' ? $posted : $developer_email;
@@ -817,7 +817,7 @@ function theme_settings_page(): void
 			$client_logo_url = $client_logo_id > 0 ? wp_get_attachment_image_url($client_logo_id, 'medium') : '';
 			$og_fallback_id = (int) get_option('fromscratch_og_image_fallback', 0);
 			$og_fallback_url = $og_fallback_id > 0 ? wp_get_attachment_image_url($og_fallback_id, 'medium') : '';
-			$weekly_test_developer_email = function_exists('fs_developer_email') ? fs_developer_email() : '';
+			$weekly_manual_send_default_email = function_exists('fs_developer_email') ? fs_developer_email() : '';
 			?>
 			<form method="post" action="options.php" class="fs-page-settings-form">
 				<?php settings_fields(FS_THEME_OPTION_GROUP_GENERAL); ?>
@@ -842,21 +842,21 @@ function theme_settings_page(): void
 						</td>
 					</tr>
 					<tr>
-						<th scope="row"><?= esc_html__('Test email', 'fromscratch') ?></th>
+						<th scope="row"><?= esc_html__('Send report', 'fromscratch') ?></th>
 						<td>
 							<div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px; max-width:100%;">
-								<label for="fromscratch_weekly_report_test_recipient" class="screen-reader-text"><?= esc_html__('Recipient email', 'fromscratch') ?></label>
+								<label for="fromscratch_weekly_report_manual_recipient" class="screen-reader-text"><?= esc_html__('Recipient email', 'fromscratch') ?></label>
 								<input
 									type="email"
-									name="fromscratch_weekly_report_test_recipient"
-									id="fromscratch_weekly_report_test_recipient"
+									name="fromscratch_weekly_report_manual_recipient"
+									id="fromscratch_weekly_report_manual_recipient"
 									form="fs-send-weekly-report-to-developer"
-									value="<?= esc_attr($weekly_test_developer_email) ?>"
+									value="<?= esc_attr($weekly_manual_send_default_email) ?>"
 									class="regular-text"
 									style="flex:1; min-width:200px; max-width:420px;"
 									autocomplete="email"
 								>
-								<button type="submit" form="fs-send-weekly-report-to-developer" class="button"><?= esc_html__('Send email', 'fromscratch') ?></button>
+								<button type="submit" form="fs-send-weekly-report-to-developer" class="button"><?= esc_html__('Send report', 'fromscratch') ?></button>
 							</div>
 							<p class="description">
 								<?= esc_html__('Sends the current weekly report to provided email address.', 'fromscratch') ?>
