@@ -2066,8 +2066,8 @@ msgstr "Ordner hinzufügen"
 msgid "Helpers"
 msgstr "Helfer"
 
-msgid "Common helper functions and utilities for use in templates and theme code."
-msgstr "Häufig genutzte Helferfunktionen und Utilities für Templates und Theme-Code."
+msgid "Common helper functions and utilities for templates, theme code, and frontend scripts."
+msgstr "Allgemeine Helferfunktionen und Utilities für Templates, Theme-Code und Frontend."
 
 msgid "Asset Helper"
 msgstr "Asset-Helfer"
