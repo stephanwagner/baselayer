@@ -441,7 +441,7 @@ add_action('admin_footer', function (): void {
 			'heading' => __('Folders', 'fromscratch'),
 			'allFiles' => __('All files', 'fromscratch'),
 			'notInFolder' => __('Not in a folder', 'fromscratch'),
-			'editInLibrary' => __('Edit in Library', 'fromscratch'),
+			'openMediaLibrary' => __('Open Media Library', 'fromscratch'),
 			'expandCollapse' => __('Expand or collapse subfolders', 'fromscratch'),
 		],
 	];
@@ -763,7 +763,7 @@ add_action('admin_footer', function (): void {
 				var html = '<div class="fs-media-modal-folders__heading-row">';
 				html += '<span class="fs-media-modal-folders__heading">' + fsEsc(L.heading || 'Folders') + '</span>';
 				if (uploadLibraryUrl) {
-					html += '<a class="button button-small fs-media-modal-folders__edit-library" href="' + fsEscAttr(uploadLibraryUrl) + '" target="_blank" rel="noopener noreferrer">' + fsEsc(L.editInLibrary || 'Edit in Library') + '</a>';
+					html += '<a class="components-button is-small is-tertiary fs-media-modal-folders__edit-library" href="' + fsEscAttr(uploadLibraryUrl) + '">' + fsEsc(L.openMediaLibrary || 'Open Media Library') + '</a>';
 				}
 				html += '</div>';
 				html += '<ul class="fs-media-modal-folders__list">';
@@ -1445,7 +1445,7 @@ add_action('admin_footer-upload.php', function (): void {
 								<path d="M440-440H240q-17 0-28.5-11.5T200-480q0-17 11.5-28.5T240-520h200v-200q0-17 11.5-28.5T480-760q17 0 28.5 11.5T520-720v200h200q17 0 28.5 11.5T760-480q0 17-11.5 28.5T720-440H520v200q0 17-11.5 28.5T480-200q-17 0-28.5-11.5T440-240v-200Z" />
 							</svg>
 						</div>
-						<div class="fs-media-folders-add-btn__text"><?= esc_html__('Add', 'fromscratch') ?></div>
+						<div class="fs-media-folders-add-btn__text"><?= esc_html__('New folder', 'fromscratch') ?></div>
 					</button>
 					<div class="fs-media-folders-header-mode-toggles">
 						<button type="button" class="components-button is-small is-tertiary fs-media-folders-edit-toggle-btn" id="fs-media-folders-edit-toggle" aria-pressed="false" aria-label="<?= esc_attr__('Show folder rename buttons', 'fromscratch') ?>" title="<?= esc_attr__('Show folder rename buttons', 'fromscratch') ?>">

@@ -1938,6 +1938,33 @@ msgstr "Ordnerleiste anzeigen"
 msgid "Hide folders panel"
 msgstr "Ordnerleiste ausblenden"
 
+msgid "Open Media Library"
+msgstr "Mediathek öffnen"
+
+msgid "Rename folder"
+msgstr "Ordner umbenennen"
+
+msgid "Show folder rename buttons"
+msgstr "Schaltflächen zum Umbenennen einblenden"
+
+msgid "Hide folder rename buttons"
+msgstr "Schaltflächen zum Umbenennen ausblenden"
+
+msgid "Show folder delete buttons"
+msgstr "Schaltflächen zum Löschen einblenden"
+
+msgid "Hide folder delete buttons"
+msgstr "Schaltflächen zum Löschen ausblenden"
+
+msgid "Expand or collapse subfolders"
+msgstr "Unterordner ein- oder ausklappen"
+
+msgid "Could not rename this folder."
+msgstr "Dieser Ordner konnte nicht umbenannt werden."
+
+msgid "Folder renamed."
+msgstr "Ordner umbenannt."
+
 msgid "No folder"
 msgstr "Kein Ordner"
 
@@ -1979,6 +2006,9 @@ msgstr "Ordner"
 
 msgid "All files"
 msgstr "Alle Dateien"
+
+msgid "New folder"
+msgstr "Neuer Ordner"
 
 msgid "Folder name"
 msgstr "Ordnername"

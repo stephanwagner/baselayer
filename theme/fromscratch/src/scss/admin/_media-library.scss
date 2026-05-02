@@ -20,6 +20,11 @@
   }
 }
 
+.media-frame.mode-grid .attachments-browser .attachments-wrapper {
+  width: calc(100% + 16px);
+  margin: -8px;
+}
+
 // Folders
 
 .fs-media-folders-count {
@@ -27,18 +32,24 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0 6px;
-  border-radius: 4px;
-  background: #fff;
+  padding: 0 5px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.08);
   color: #50575e;
   pointer-events: none;
   font-size: 11px;
   line-height: 18px;
+  text-align: center;
+  min-width: 18px;
+  box-sizing: border-box;
 
   :is(.fs-media-folders-item.fs-media-folders-link, .fs-media-modal-folders__row).is-active & {
-    background: #fff;
+    background: #fff !important;
     color: #1d2327;
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35), 0 1px 2px rgba(0, 0, 0, 0.08);
+  }
+
+  :is(.fs-media-folders-item.fs-media-folders-link, .fs-media-modal-folders__row):hover & {
+    background: rgba(0, 0, 0, 0.08);
   }
 
   #fs-media-folders-sidebar.is-edit-mode &,
@@ -111,7 +122,7 @@ a.fs-media-folder-row {
   box-shadow: none !important;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.06);
+    background: rgba(0, 0, 0, 0.08);
   }
 }
 
@@ -211,7 +222,11 @@ a.fs-media-folder-row {
 }
 
 .fs-media-folders-item.fs-media-folders-link:hover:not(.is-active) {
-  background: #f6f7f7;
+  background: #eef0f0;
+
+  .fs-media-modal-folders & {
+    background: #e6e9e9;
+  }
 }
 
 .fs-media-folders-item.fs-media-folders-link.is-active {
@@ -229,7 +244,7 @@ a.fs-media-folder-row {
 }
 
 .fs-media-folders-item.fs-media-folders-link.is-active .fs-media-folders-folder-toggle:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .fs-media-folders-item.fs-media-folders-link.is-active .fs-media-folders-folder-toggle--leaf:hover {
@@ -310,7 +325,7 @@ body.fs-feature-media-folders {
     background: #fff;
     border: 1px solid #c3c4c7;
     border-radius: 6px;
-    padding: 8px 12px 12px;
+    padding: 8px 10px 10px;
     position: sticky;
     top: 46px;
     z-index: 20;
@@ -321,7 +336,7 @@ body.fs-feature-media-folders {
     -webkit-overflow-scrolling: touch;
 
     @media (max-width: 782px) {
-      width: calc(100% - 12px - 12px - 1px - 1px);
+      width: calc(100% - 10px - 10px - 1px - 1px);
       max-width: none;
     }
   }
@@ -364,10 +379,22 @@ body.fs-feature-media-folders {
   }
 
   .fs-media-folders-header-toolbar {
-    padding: 6px 8px;
+    padding: 6px;
     border-radius: 4px;
     background: #f0f0f1;
-    box-shadow: inset 0 0 0 1px #dcdcde;
+
+    .components-button.is-tertiary {
+      border: 1px solid transparent;
+      color: #2271b1;
+      border-radius: 3px;
+      outline: none !important;
+      box-shadow: none !important;
+
+      &:hover {
+        border-color: #2271b1;
+        background: #fff !important;
+      }
+    }
   }
 
   .fs-media-folders-header-actions {
@@ -392,6 +419,7 @@ body.fs-feature-media-folders {
     display: flex;
     align-items: center;
     gap: 2px;
+    padding-left: 6px;
   }
 
   .fs-media-folders-add-btn__icon {
@@ -404,65 +432,37 @@ body.fs-feature-media-folders {
     }
   }
 
-  .fs-media-folders-delete-toggle-btn {
-    flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 28px;
-    padding-left: 6px;
-    padding-right: 6px;
-    color: #646970;
-
-    &[aria-pressed='true'] {
-      color: #b32d2e;
-      background: rgba(179, 45, 46, 0.08);
-      box-shadow: inset 0 0 0 1px rgba(179, 45, 46, 0.35);
-    }
-  }
-
-  .fs-media-folders-delete-toggle-btn__icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: -1px;
-    margin-right: -1px;
-
-    svg {
-      display: block;
-      width: 14px;
-      height: 14px;
-    }
-  }
-
+  .fs-media-folders-delete-toggle-btn,
   .fs-media-folders-edit-toggle-btn {
     flex-shrink: 0;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    min-width: 28px;
-    padding-left: 6px;
-    padding-right: 6px;
-    color: #646970;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    color: #7a8087 !important;
+    outline: none !important;
+    box-shadow: none !important;
 
+    &:hover,
     &[aria-pressed='true'] {
-      color: #2271b1;
-      background: rgba(34, 113, 177, 0.08);
-      box-shadow: inset 0 0 0 1px rgba(34, 113, 177, 0.35);
+      color: #2271b1 !important;
+      background: #fff !important;
+      border-color: #2271b1 !important;
     }
   }
 
+  .fs-media-folders-delete-toggle-btn__icon,
   .fs-media-folders-edit-toggle-btn__icon {
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-left: -1px;
-    margin-right: -1px;
 
     svg {
       display: block;
-      width: 14px;
-      height: 14px;
+      width: 16px;
+      height: 16px;
     }
   }
 
@@ -479,7 +479,7 @@ body.fs-feature-media-folders {
   /* Sidebar: room for rename/delete toolbar on folder rows */
   #fs-media-folders-sidebar.is-edit-mode .fs-media-folders-item.fs-media-folders-link:not(.fs-media-folders-item--all):not(.fs-media-folders-item--unassigned)>.fs-media-folder-row,
   #fs-media-folders-sidebar.is-delete-mode .fs-media-folders-item.fs-media-folders-link:not(.fs-media-folders-item--all):not(.fs-media-folders-item--unassigned)>.fs-media-folder-row {
-    padding-right: 44px;
+    padding-right: calc(28px + 4px);
   }
 
   .fs-media-folders-item--all>button.fs-media-folder-row {
@@ -489,13 +489,12 @@ body.fs-feature-media-folders {
   .fs-media-folders-item-toolbar {
     position: absolute;
     top: 50%;
-    right: 2px;
+    right: 0;
     z-index: 1;
     display: none;
     flex-direction: row;
     align-items: center;
     justify-content: flex-end;
-    gap: 2px;
     transform: translateY(-50%);
   }
 
@@ -504,55 +503,32 @@ body.fs-feature-media-folders {
     display: flex;
   }
 
-  .fs-media-folder-delete-btn {
-    position: static;
-    transform: none;
-    border: 0;
-    background: transparent;
-    color: #b32d2e;
-    cursor: pointer;
-    font-size: 16px;
-    line-height: 1;
-    width: 26px;
-    height: 26px;
-    padding: 0;
-    border-radius: 4px;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid transparent;
-    transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
-
-    svg {
-      display: block;
-      width: 14px;
-      height: 14px;
-    }
-  }
-
+  .fs-media-folder-delete-btn,
   .fs-media-folder-edit-btn {
     position: static;
     transform: none;
     border: 0;
     background: transparent;
-    color: #2271b1;
+    color: #8a9096;
     cursor: pointer;
     font-size: 16px;
     line-height: 1;
-    width: 26px;
-    height: 26px;
+    width: 28px;
+    height: 28px;
     padding: 0;
-    border-radius: 4px;
+    border-radius: 0 4px 4px 0;
     display: none;
     align-items: center;
     justify-content: center;
-    border: 1px solid transparent;
-    transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+    border: 0;
+    outline: none !important;
+    box-shadow: none !important;
+    /// color: #b32d2e;
 
     svg {
       display: block;
-      width: 14px;
-      height: 14px;
+      width: 16px;
+      height: 16px;
     }
   }
 
@@ -567,9 +543,8 @@ body.fs-feature-media-folders {
   .fs-media-folder-edit-btn:hover,
   .fs-media-folders-item.fs-media-folders-link.is-active .fs-media-folder-edit-btn:hover,
   .fs-media-folders-item.fs-media-folders-link.is-active .fs-media-folder-edit-btn:focus-visible {
-    background: #f0f6fc;
-    border-color: #2271b1;
-    color: #2271b1;
+    background: #2271b1;
+    color: #fff;
   }
 
   .fs-media-folders-item.fs-media-folders-link.is-active .fs-media-folder-edit-btn:focus-visible {
@@ -587,9 +562,8 @@ body.fs-feature-media-folders {
   .fs-media-folder-delete-btn:hover,
   .fs-media-folders-item.fs-media-folders-link.is-active .fs-media-folder-delete-btn:hover,
   .fs-media-folders-item.fs-media-folders-link.is-active .fs-media-folder-delete-btn:focus-visible {
-    background: #fcf0f1;
-    border-color: #b32d2e;
-    color: #b32d2e;
+    background: #b32d2e;
+    color: #fff;
   }
 
   .fs-media-folders-item.fs-media-folders-link.is-active .fs-media-folder-delete-btn:focus-visible {
@@ -614,7 +588,7 @@ body.fs-feature-media-folders {
 
   .fs-media-folders-message {
     margin: 0 0 8px;
-    padding: 8px 12px;
+    padding: 8px 10px;
     border-radius: 4px;
     font-size: 12px;
     line-height: 1.35;
@@ -748,6 +722,8 @@ body.fs-feature-media-folders {
   }
 
   .media-modal-content {
+    -webkit-font-smoothing: antialiased;
+
     .fs-media-folders-toggle {
       align-self: flex-end;
       margin: 0 0 10px;
@@ -775,7 +751,7 @@ body.fs-feature-media-folders {
     width: 248px;
     box-sizing: border-box;
     overflow: auto;
-    padding: 12px 16px 16px;
+    padding: 10px 12px 12px;
     background: #f6f7f7;
     border-right: 1px solid #c3c4c7;
     z-index: 3;
@@ -804,19 +780,25 @@ body.fs-feature-media-folders {
   .fs-media-modal-folders__edit-library {
     flex-shrink: 0;
     font-size: 11px;
-    line-height: 1.35;
-    padding: 4px 9px;
+    line-height: 16px;
+    padding: 4px 8px;
     height: auto;
     min-height: 26px;
     white-space: nowrap;
+    border: 1px solid transparent;
+    color: #2271b1;
+    border-radius: 3px;
+
+    &:hover {
+      border-color: #2271b1;
+      background: #fff !important;
+    }
   }
 
   .fs-media-modal-folders__list {
     margin: 0;
     padding: 0;
     list-style: none;
-    width: calc(100% + 12px);
-    margin: 0 -6px;
   }
 
   .fs-media-modal-folders__item,
