@@ -598,9 +598,6 @@ msgstr "Standardmäßig werden nur verkleinerte Bildversionen konvertiert. Das h
 msgid "Clear all overrides"
 msgstr "Alle Overrides zurücksetzen"
 
-msgid "Tools"
-msgstr "Werkzeuge"
-
 msgid "Permalink rules have been successfully refreshed."
 msgstr "Permalink-Regeln wurden erfolgreich aktualisiert."
 
@@ -1041,14 +1038,73 @@ msgstr "Deine aktuelle IP-Adresse konnte nicht ermittelt werden."
 msgid "Failed login attempts"
 msgstr "Fehlgeschlagene Anmeldeversuche"
 
-msgid "Shows recent failed login attempts."
-msgstr "Zeigt die letzten fehlgeschlagenen Anmeldeversuche."
+msgid "Shows recent failed login attempts. IPs that reach the threshold (set in theme config) are temporarily blocked from the whole site."
+msgstr "Zeigt die letzten fehlgeschlagenen Anmeldeversuche. IPs, die den in der Theme-Konfiguration festgelegten Schwellenwert erreichen, werden vorübergehend für die gesamte Website gesperrt."
 
-msgid "IPs exceeding the configured threshold are listed as suspicious and can be blocked."
-msgstr "IPs über dem konfigurierten Schwellenwert werden als verdächtig aufgeführt und können blockiert werden."
+msgid "Auto-block"
+msgstr "Auto-Sperre"
+
+msgid "Clear auto-block"
+msgstr "Auto-Sperre aufheben"
+
+msgid "Block permanently"
+msgstr "Dauerhaft blockieren"
+
+msgid "Threshold met. Auto-block is disabled in theme config."
+msgstr "Schwellenwert erreicht. Die automatische Sperre ist in der Theme-Konfiguration deaktiviert."
+
+msgid "ends in %s"
+msgstr "endet in %s"
+
+msgid "%1$s (%2$s)"
+msgstr "%1$s (%2$s)"
 
 msgid "No failed login attempts recorded."
 msgstr "Keine fehlgeschlagenen Anmeldeversuche aufgezeichnet."
+
+#. Email template: suspicious-ip-blocked.php and ip-blocker.php
+msgid "IP temporarily blocked"
+msgstr "IP vorübergehend blockiert"
+
+msgid "The following IP address was temporarily blocked after failed logins exceeded the configured threshold on %s."
+msgstr "Die folgende IP-Adresse wurde vorübergehend blockiert, weil fehlgeschlagene Anmeldungen den konfigurierten Schwellenwert auf %s überschritten haben."
+
+msgid "Blocked for"
+msgstr "Gesperrt für"
+
+msgid "Threshold"
+msgstr "Schwellenwert"
+
+#. Lockout duration (fs_blocked_ips_format_lockout_human)
+msgid "%d hour"
+msgid_plural "%d hours"
+msgstr[0] "%d Stunde"
+msgstr[1] "%d Stunden"
+
+msgid "%d minute"
+msgid_plural "%d minutes"
+msgstr[0] "%d Minute"
+msgstr[1] "%d Minuten"
+
+msgid "%1$d hours %2$d minutes"
+msgstr "%1$d Stunden %2$d Minuten"
+
+msgid "%1$d failed attempt within %2$d minutes"
+msgid_plural "%1$d failed attempts within %2$d minutes"
+msgstr[0] "%1$d fehlgeschlagener Versuch innerhalb von %2$d Minuten"
+msgstr[1] "%1$d fehlgeschlagene Versuche innerhalb von %2$d Minuten"
+
+msgid "This IP cannot use the site until the block expires. You can unblock the IP manually from the failed-login list in <a href=\"%s\">Developer › Security</a>."
+msgstr "Diese IP kann die Website erst wieder nutzen, wenn die Sperre abgelaufen ist. Du kannst die IP manuell in der Liste fehlgeschlagener Anmeldungen unter <a href=\"%s\">Entwickler › Sicherheit</a> entsperren."
+
+msgid "Suspicious login — IP blocked"
+msgstr "Verdächtige Anmeldung — IP blockiert"
+
+msgid "This is an automatic security notice from your WordPress site."
+msgstr "Dies ist eine automatische Sicherheitsmitteilung deiner WordPress-Website."
+
+msgid "IP blocked after suspicious login attempts"
+msgstr "IP wegen verdächtiger Anmeldeversuche blockiert"
 
 msgid "IP address"
 msgstr "IP-Adresse"
@@ -2105,6 +2161,22 @@ msgstr "Endzeit"
 # Media Library: add folder modal title
 msgid "Add folder"
 msgstr "Ordner hinzufügen"
+
+# Developer settings: configs section (inc/developer-settings/developer.php)
+msgid "Configs"
+msgstr "Konfiguration"
+
+msgid "Optional defines in wp-config.php for local development and testing."
+msgstr "Optionale define-Einträge in der wp-config.php für lokale Entwicklung und Tests."
+
+msgid "Simulate client IP"
+msgstr "Client-IP simulieren"
+
+msgid "Overrides the client IP with a fixed IP address. Active only when WP_DEBUG is true."
+msgstr "Überschreibt die Client-IP mit einer festen Adresse. Nur aktiv, wenn WP_DEBUG true ist."
+
+msgid "wp-config"
+msgstr "wp-config"
 
 # Developer settings: helpers section (inc/developer-settings/developer.php)
 msgid "Helpers"

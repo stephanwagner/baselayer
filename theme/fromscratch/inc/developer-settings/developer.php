@@ -58,11 +58,8 @@ function fs_render_developer_cheatsheet(): void
 							<strong><?= esc_html__('Simulate client IP', 'fromscratch') ?></strong><br>
 							<span class="description"><?= esc_html__('Overrides the client IP with a fixed IP address. Active only when WP_DEBUG is true.', 'fromscratch') ?></span>
 						</td>
-						<td>
-							<code class="fs-code-text fs-code-small"><?= esc_html__('wp-config', 'fromscratch') ?></code>
-						</td>
-						<td>
-							<code class="fs-code-small"><?= esc_html("define( 'FS_SIMULATE_CLIENT_IP', '127.0.0.20' );") ?></code>
+						<td style="width: 100%;">
+							<code class="fs-code-small">define('FS_SIMULATE_CLIENT_IP', '127.0.0.22');</code>
 						</td>
 					</tr>
 				</tbody>

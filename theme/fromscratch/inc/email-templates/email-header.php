@@ -31,8 +31,8 @@ $email_html_lang = isset($email_html_lang) && is_string($email_html_lang) && $em
 			padding: 32px;
 		}
 
-		.fs-mail-weekly-report-container {
-			padding: 32px
+		.fs-mail-weekly-report-content {
+			padding: 24px 32px 32px;
 		}
 
 		.fs-mail-weekly-report-has-link a {
@@ -67,8 +67,8 @@ $email_html_lang = isset($email_html_lang) && is_string($email_html_lang) && $em
 				padding: 24px;
 			}
 
-			.fs-mail-weekly-report-container {
-				padding: 32px 24px;
+			.fs-mail-weekly-report-content {
+				padding: 20px 24px 24px;
 			}
 		}
 
@@ -78,8 +78,8 @@ $email_html_lang = isset($email_html_lang) && is_string($email_html_lang) && $em
 				padding: 16px;
 			}
 
-			.fs-mail-weekly-report-container {
-				padding: 24px 16px 32px;
+			.fs-mail-weekly-report-content {
+				padding: 20px 16px 24px;
 			}
 		}
 
@@ -88,8 +88,8 @@ $email_html_lang = isset($email_html_lang) && is_string($email_html_lang) && $em
 				padding: 16px 12px;
 			}
 
-			.fs-mail-weekly-report-container {
-				padding: 24px 12px 32px;
+			.fs-mail-weekly-report-content {
+				padding: 20px 12px 24px;
 			}
 
 			.fs-mail__small-mobile-inline {
@@ -125,7 +125,6 @@ $email_html_lang = isset($email_html_lang) && is_string($email_html_lang) && $em
 		<tr>
 			<td>
 				<table
-					class="fs-mail-weekly-report-container"
 					role="presentation"
 					width="100%"
 					cellpadding="0"
@@ -140,4 +139,4 @@ $email_html_lang = isset($email_html_lang) && is_string($email_html_lang) && $em
 						margin: 0 auto;
 					">
 					<tr>
-						<td>
+						<td class="fs-mail-weekly-report-content">

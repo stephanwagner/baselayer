@@ -441,11 +441,7 @@ function fs_blocked_ips_send_suspicious_block_email(string $ip, int $lockout_min
 	if ($body === '') {
 		return;
 	}
-	$subject = sprintf(
-		/* translators: %s: site name */
-		__('[%s] IP blocked after suspicious login attempts', 'fromscratch'),
-		$site_name
-	);
+	$subject = __('IP blocked after suspicious login attempts', 'fromscratch');
 	$headers = ['Content-Type: text/html; charset=UTF-8'];
 	if (wp_mail($to, $subject, $body, $headers)) {
 		fs_blocked_ips_suspicious_block_email_mark_sent($ip);

@@ -13,7 +13,7 @@ defined('ABSPATH') || exit;
 <p style="margin: 0 0 16px; font-size: 16px; line-height: 1.5; color: #1f2937;">
 	<?= esc_html(sprintf(__('This is a test email from %s.', 'fromscratch'), $site_name)) ?>
 </p>
-<p style="margin: 0 0 16px; font-size: 16px; line-height: 1.5; color: #1f2937;">
+<p style="margin: 0 0 16px; font-size: 16px; line-height: 1.5; color: #1f2937; text-wrap: balance;">
 	<?= esc_html__('If you received this, your mail delivery settings are working.', 'fromscratch') ?>
 </p>
 <p class="fs-mail-weekly-report-has-link" style="margin: 0; font-size: 14px; line-height: 1.5; color: #64748b;">

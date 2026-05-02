@@ -226,7 +226,7 @@ function fs_render_developer_security(): void
 				<tr>
 					<th scope="row"><label for="fromscratch_maintenance_description"><?= esc_html__('Description', 'fromscratch') ?></label></th>
 					<td>
-						<textarea name="fromscratch_maintenance_description" id="fromscratch_maintenance_description" rows="3" class="large-text" placeholder="<?= esc_attr__('We are currently performing scheduled maintenance. Please check back shortly.', 'fromscratch') ?>" style="display: block;"><?= esc_textarea(get_option('fromscratch_maintenance_description', '')) ?></textarea>
+						<textarea name="fromscratch_maintenance_description" id="fromscratch_maintenance_description" rows="3" class="regular-text" placeholder="<?= esc_attr__('We are currently performing scheduled maintenance. Please check back shortly.', 'fromscratch') ?>" style="display: block;"><?= esc_textarea(get_option('fromscratch_maintenance_description', '')) ?></textarea>
 						<p class="description"><?= esc_html__('Short message shown below the title. Leave blank for default.', 'fromscratch') ?></p>
 					</td>
 				</tr>
@@ -265,9 +265,8 @@ function fs_render_developer_security(): void
 
 			<hr class="fs-page-settings-divider">
 
-			<h2 class="title"><?= esc_html__('Failed login attempts', 'fromscratch') ?></h2>
-			<p class="description"><?= esc_html__('Shows recent failed login attempts.', 'fromscratch') ?></p>
-			<p class="description"><?= esc_html__('IPs that reach the threshold (set in theme config) are temporarily blocked from the whole site; the list shows how long that block lasts. You can still add an IP to the permanent block list below.', 'fromscratch') ?></p>
+			<h2 class="title" id="fs-security-failed-logins"><?= esc_html__('Failed login attempts', 'fromscratch') ?></h2>
+			<p class="description"><?= esc_html__('Shows recent failed login attempts. IPs that reach the threshold (set in theme config) are temporarily blocked from the whole site.', 'fromscratch') ?></p>
 			<?php
 			$failed = function_exists('fs_blocked_ips_get_failed_attempts') ? fs_blocked_ips_get_failed_attempts(true) : [];
 			$suspicious_config = function_exists('fs_blocked_ips_suspicious_config') ? fs_blocked_ips_suspicious_config() : [
@@ -282,14 +281,14 @@ function fs_render_developer_security(): void
 			<?php if (empty($failed)) : ?>
 				<p class="description" style="font-style: italic; color: #a7aaad; margin-top: 16px;"><?= esc_html__('No failed login attempts recorded.', 'fromscratch') ?></p>
 			<?php else : ?>
-				<table class="widefat striped" style="max-width: 720px; margin-top: 16px;">
+				<table class="widefat striped" style="margin-top: 16px;">
 					<thead>
 						<tr>
-							<th><?= esc_html__('IP address', 'fromscratch') ?></th>
-							<th><?= esc_html__('Attempts', 'fromscratch') ?></th>
-							<th><?= esc_html__('Last attempt', 'fromscratch') ?></th>
-							<th><?= esc_html__('Auto-block', 'fromscratch') ?></th>
-							<th></th>
+							<th style="white-space: nowrap;"><?= esc_html__('IP address', 'fromscratch') ?></th>
+							<th style="white-space: nowrap;"><?= esc_html__('Attempts', 'fromscratch') ?></th>
+							<th style="white-space: nowrap;"><?= esc_html__('Last attempt', 'fromscratch') ?></th>
+							<th style="white-space: nowrap;"><?= esc_html__('Auto-block', 'fromscratch') ?></th>
+							<th style="white-space: nowrap;"></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -327,7 +326,7 @@ function fs_render_developer_security(): void
 									)
 									: $remaining;
 							} elseif ($show_block && empty($suspicious_config['enabled'])) {
-								$block_note = __('Threshold met; auto-block is disabled in theme config.', 'fromscratch');
+								$block_note = __('Threshold met. Auto-block is disabled in theme config.', 'fromscratch');
 							} else {
 								$block_note = '–';
 							}
@@ -335,9 +334,9 @@ function fs_render_developer_security(): void
 								|| (function_exists('fs_blocked_ips_is_suspicious_locked') && fs_blocked_ips_is_suspicious_locked($ip));
 						?>
 							<tr>
-								<td style="vertical-align: middle;"><code class="fs-code-small"><?= esc_html($ip) ?></code></td>
-								<td style="vertical-align: middle;"><?= (int) $attempts ?> <?= esc_html(_n('attempt', 'attempts', $attempts, 'fromscratch')) ?></td>
-								<td style="vertical-align: middle;"><?= $last ? esc_html(sprintf(__('%s ago', 'fromscratch'), human_time_diff($last, time()))) : '–' ?></td>
+								<td style="vertical-align: middle; white-space: nowrap;"><code class="fs-code-small"><?= esc_html($ip) ?></code></td>
+								<td style="vertical-align: middle; white-space: nowrap;"><?= (int) $attempts ?> <?= esc_html(_n('attempt', 'attempts', $attempts, 'fromscratch')) ?></td>
+								<td style="vertical-align: middle; white-space: nowrap;"><?= $last ? esc_html(sprintf(__('%s ago', 'fromscratch'), human_time_diff($last, time()))) : '–' ?></td>
 								<td style="vertical-align: middle;"><?= $block_note === '–' ? '–' : esc_html($block_note) ?></td>
 								<td style="vertical-align: middle;">
 									<?php if ($show_clear_auto) : ?>

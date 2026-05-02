@@ -152,15 +152,12 @@ function fs_styles(): void
 add_action('wp_enqueue_scripts', 'fs_styles');
 
 /**
- * Enqueue admin stylesheets (admin.css).
- * Also loaded on block editor screens (post.php, post-new.php) so the document
- * sidebar (e.g. Expiration, SEO panels) gets theme admin styles. The editor
- * content iframe is unaffected; styles apply to the parent admin document.
+ * Enqueue theme admin.css (same bundle as wp-admin).
+ * Used on login screen via login_enqueue_scripts as well.
  *
- * @param string $hook_suffix Current admin page hook from admin_enqueue_scripts.
  * @return void
  */
-function fs_admin_styles(string $hook_suffix): void
+function fs_enqueue_admin_styles(): void
 {
 	$min = fs_is_debug() ? '' : '.min';
 
@@ -172,7 +169,20 @@ function fs_admin_styles(string $hook_suffix): void
 		fs_asset_hash($file),
 	);
 }
+
+/**
+ * Also loaded on block editor screens (post.php, post-new.php) so the document
+ * sidebar (e.g. Expiration, SEO panels) gets theme admin styles. The editor
+ * content iframe is unaffected; styles apply to the parent admin document.
+ *
+ * @param string $hook_suffix Current admin page hook from admin_enqueue_scripts.
+ */
+function fs_admin_styles(string $hook_suffix): void
+{
+	fs_enqueue_admin_styles();
+}
 add_action('admin_enqueue_scripts', 'fs_admin_styles');
+add_action('login_enqueue_scripts', 'fs_enqueue_admin_styles');
 
 /**
  * Enqueue admin-bar styles used in backend and frontend when the bar is visible.
