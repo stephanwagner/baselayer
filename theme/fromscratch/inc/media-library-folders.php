@@ -993,6 +993,33 @@ add_filter('attachment_fields_to_edit', function (array $form_fields, WP_Post $p
 }, 10, 2);
 
 /**
+ * In the media modal, core prints the "required fields" &lt;p&gt; before the compat
+ * &lt;table&gt;, so the folder field sits under that line. Output the table first, then
+ * the notice, so the folder control reads above the general required-fields hint.
+ */
+function fs_media_folders_reorder_attachment_compat_item(string $item): string
+{
+	if ($item === '' || !str_contains($item, 'compat-attachment-fields') || !str_contains($item, 'media-types-required-info')) {
+		return $item;
+	}
+	$pattern = '/^(.*)(<p[^>]*\bclass="[^"]*\bmedia-types-required-info\b[^"]*"[^>]*>[\s\S]*?<\/p>)\s*(<table[^>]*\bclass="[^"]*\bcompat-attachment-fields\b[^"]*"[^>]*>[\s\S]*?<\/table>)(.*)$/s';
+	if (!preg_match($pattern, $item, $m)) {
+		return $item;
+	}
+
+	return $m[1] . $m[3] . $m[2] . $m[4];
+}
+
+add_filter('wp_prepare_attachment_for_js', function (array $response, WP_Post $attachment, $meta): array {
+	if (!taxonomy_exists(FS_MEDIA_FOLDER_TAXONOMY) || empty($response['compat']['item']) || !is_string($response['compat']['item'])) {
+		return $response;
+	}
+	$response['compat']['item'] = fs_media_folders_reorder_attachment_compat_item($response['compat']['item']);
+
+	return $response;
+}, 20, 3);
+
+/**
  * Save folder assignment from attachment edit details.
  */
 add_filter('attachment_fields_to_save', function (array $post, array $attachment): array {

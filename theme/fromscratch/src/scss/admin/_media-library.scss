@@ -300,6 +300,17 @@ body.fs-feature-media-folders {
 
 .compat-field-fs_media_folder_id {
   vertical-align: top;
+
+  p.help {
+    font-size: 12px;
+    margin: 4px 1px 10px;
+  }
+}
+
+// Core prints the "required fields" <p> before the compat <table>; we swap order in PHP
+// (see fs_media_folders_reorder_attachment_compat_item) so space the footnote from the table.
+.attachment-compat .compat-attachment-fields+.media-types-required-info {
+  margin: 12px 0 0;
 }
 
 .upload-php {
