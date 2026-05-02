@@ -257,13 +257,116 @@ body.fs-feature-media-folders {
     margin: 0;
   }
 
+  .fs-media-folders-tree-item {
+    margin: 0;
+  }
+
+  /* Grid row 0fr→1fr animates to intrinsic height (smooth); max-height hacks do not. */
+  .fs-media-folders-branch {
+    display: grid;
+    grid-template-rows: 0fr;
+    margin: 0;
+    padding: 0;
+    transition: grid-template-rows 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .fs-media-folders-tree-item.is-expanded > .fs-media-folders-branch {
+    grid-template-rows: 1fr;
+  }
+
+  .fs-media-folders-branch-list {
+    list-style: none;
+    margin: 0;
+    min-height: 0;
+    overflow: hidden;
+    padding: 0 0 0 14px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .fs-media-folders-branch {
+      transition: none;
+    }
+  }
+
+  .fs-media-folders-folder-toggle {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 26px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    box-sizing: border-box;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.06);
+    }
+
+    &:focus-visible {
+      outline: 2px solid #2271b1;
+      outline-offset: 1px;
+    }
+  }
+
+  .fs-media-folders-item-icon {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    color: #646970;
+
+    .fs-media-folders-svg {
+      display: block;
+      width: 18px;
+      height: 18px;
+    }
+  }
+
+  .fs-media-folders-item-icon-visual {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .fs-media-folders-item-icon--branch .fs-media-folders-item-icon-visual--open {
+    display: none;
+  }
+
+  .fs-media-folders-tree-item.is-expanded .fs-media-folders-item-icon--branch .fs-media-folders-item-icon-visual--open {
+    display: inline-flex;
+  }
+
+  .fs-media-folders-tree-item.is-expanded .fs-media-folders-item-icon--branch .fs-media-folders-item-icon-visual--closed {
+    display: none;
+  }
+
+  .fs-media-folders-tree-item:not(.is-expanded) .fs-media-folders-item-icon--branch .fs-media-folders-item-icon-visual--closed {
+    display: inline-flex;
+  }
+
+  .fs-media-folders-tree-item:not(.is-expanded) .fs-media-folders-item-icon--branch .fs-media-folders-item-icon-visual--open {
+    display: none;
+  }
+
   .fs-media-folders-item.fs-media-folders-link {
     position: relative;
     display: flex;
-    align-items: stretch;
+    flex-direction: row;
+    align-items: center;
+    gap: 4px;
     border-radius: 4px;
     font-size: 13px;
     line-height: 20px;
+    min-height: 30px;
+    padding-left: 0;
   }
 
   .fs-media-folders-item.fs-media-folders-link:hover:not(.is-active) {
@@ -279,10 +382,23 @@ body.fs-feature-media-folders {
     position: relative;
     flex: 1 1 auto;
     min-width: 0;
-    padding: 5px 36px 5px 8px;
+    padding: 5px 36px 5px 4px;
     border-radius: 4px;
     color: #1d2327;
     text-decoration: none;
+  }
+
+  .fs-media-folders-item--unassigned > a.fs-media-folders-link {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    padding-left: 4px;
+  }
+
+  .fs-media-folders-item--unassigned > a.fs-media-folders-link .name {
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   .fs-media-folders-item > a.fs-media-folders-link .name {
@@ -349,12 +465,22 @@ body.fs-feature-media-folders {
   }
 
   .fs-media-folders-item--all > button.fs-media-folders-link {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
     flex: 1 1 auto;
     min-width: 0;
     width: auto;
     padding: 5px 8px;
     border-radius: 4px;
     color: #1d2327;
+  }
+
+  .fs-media-folders-link-label {
+    flex: 1 1 auto;
+    min-width: 0;
+    text-align: left;
   }
 
   .fs-media-folders-item:hover>.fs-media-folders-link {
@@ -364,6 +490,14 @@ body.fs-feature-media-folders {
   .fs-media-folders-item.fs-media-folders-link.is-active>.fs-media-folders-link {
     background: transparent;
     color: #fff;
+  }
+
+  .fs-media-folders-item.fs-media-folders-link.is-active .fs-media-folders-item-icon {
+    color: #fff;
+  }
+
+  .fs-media-folders-item.fs-media-folders-link.is-active .fs-media-folders-folder-toggle:hover {
+    background: rgba(255, 255, 255, 0.15);
   }
 
   .fs-media-folders-item.fs-media-folders-link.is-active > a.fs-media-folders-link .count {

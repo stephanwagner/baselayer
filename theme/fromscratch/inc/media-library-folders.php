@@ -934,7 +934,58 @@ add_action('admin_post_fs_media_folder_create', function (): void {
 });
 
 /**
- * Build tree list markup for folder sidebar.
+ * Whether a folder term has child folders.
+ *
+ * @param WP_Term[] $terms
+ */
+function fs_media_folders_term_has_children(array $terms, int $term_id): bool
+{
+	foreach ($terms as $term) {
+		if (!$term instanceof WP_Term) {
+			continue;
+		}
+		if ((int) $term->parent === $term_id) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
+ * Inline SVG icon for folder sidebar (Material-style paths, viewBox 0 -960 960 960).
+ */
+function fs_media_folders_icon_svg(string $variant): string
+{
+	$paths = [
+		'all' => 'M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-480H160v480Zm120-80h400v-80H280v80Zm0-160h400v-80H280v80Zm0-160h240v-80H280v80Z',
+		'unassigned' => 'M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm40-80h480v-120H240v120Zm240-564 204 244H276l204-244Z',
+		'folder_leaf' => 'M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h207q16 0 30.5 6t25.5 17l57 57h320q33 0 56.5 23.5T880-640v400q0 33-23.5 56.5T800-160H160Z',
+		'folder_closed' => 'M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h207q16 0 30.5 6t25.5 17l57 57h320q33 0 56.5 23.5T880-640v400q0 33-23.5 56.5T800-160H160Z',
+		'folder_open' => 'M880-120H160q-33 0-56.5-23.5T80-200v-520q0-33 23.5-56.5T160-800h207q16 0 30.5 6t25.5 17l57 57h320q33 0 56.5 23.5T880-640v440q0 33-23.5 56.5T800-120ZM160-240h640v-320H447q-16 0-31-6t-26-18l-57-57H160v401Z',
+	];
+	$d = $paths[$variant] ?? $paths['folder_leaf'];
+
+	return '<svg xmlns="http://www.w3.org/2000/svg" class="fs-media-folders-svg" width="20" height="20" viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="' . esc_attr($d) . '"/></svg>';
+}
+
+/**
+ * Folder row icon(s): leaf, or branch with open/closed pair toggled via CSS.
+ */
+function fs_media_folders_folder_icon_markup(bool $has_children): string
+{
+	if (!$has_children) {
+		return '<span class="fs-media-folders-item-icon fs-media-folders-item-icon--leaf">' . fs_media_folders_icon_svg('folder_leaf') . '</span>';
+	}
+
+	return '<span class="fs-media-folders-item-icon fs-media-folders-item-icon--branch">'
+		. '<span class="fs-media-folders-item-icon-visual fs-media-folders-item-icon-visual--open">' . fs_media_folders_icon_svg('folder_open') . '</span>'
+		. '<span class="fs-media-folders-item-icon-visual fs-media-folders-item-icon-visual--closed">' . fs_media_folders_icon_svg('folder_closed') . '</span>'
+		. '</span>';
+}
+
+/**
+ * Build tree list markup for folder sidebar (nested UL per branch).
  *
  * @param WP_Term[] $terms
  * @param array<int,int> $display_counts
@@ -952,17 +1003,30 @@ function fs_media_folders_render_list(array $terms, array $display_counts, int $
 		if (!$unassigned_active && $term_id === $current_id) {
 			$item_classes[] = 'is-active';
 		}
-		$prefix = $depth > 0 ? str_repeat('– ', $depth) : '';
+		$has_children = fs_media_folders_term_has_children($terms, $term_id);
+		$li_classes = ['fs-media-folders-tree-item'];
+		if ($has_children) {
+			$li_classes[] = 'fs-media-folders-tree-item--branch';
+			$li_classes[] = 'is-expanded';
+		}
 		$delete_url = add_query_arg([
 			'action' => 'fs_media_folder_delete',
 			'term_id' => $term_id,
 			'redirect_to' => $redirect_url,
 		], admin_url('admin-post.php'));
 		$delete_url = wp_nonce_url($delete_url, 'fs_media_folder_delete_' . $term_id);
-		echo '<li>';
+		$li_attr = $has_children ? ' data-folder-term-id="' . esc_attr((string) $term_id) . '"' : '';
+		echo '<li class="' . esc_attr(implode(' ', $li_classes)) . '"' . $li_attr . '>';
 		echo '<div class="' . esc_attr(implode(' ', $item_classes)) . '">';
+		if ($has_children) {
+			echo '<button type="button" class="fs-media-folders-folder-toggle" aria-expanded="true" aria-label="' . esc_attr__('Expand or collapse subfolders', 'fromscratch') . '">';
+			echo fs_media_folders_folder_icon_markup(true);
+			echo '</button>';
+		} else {
+			echo fs_media_folders_folder_icon_markup(false);
+		}
 		echo '<a class="fs-media-folders-link" href="' . esc_url($url) . '">';
-		echo '<span class="name">' . esc_html($prefix . $term->name) . '</span>';
+		echo '<span class="name">' . esc_html($term->name) . '</span>';
 		echo '<span class="count">' . esc_html((string) $display_count) . '</span>';
 		echo '</a>';
 		echo '<span class="fs-media-folders-item-toolbar">';
@@ -970,8 +1034,14 @@ function fs_media_folders_render_list(array $terms, array $display_counts, int $
 		echo '<button type="button" class="fs-media-folder-delete-btn" aria-label="' . esc_attr__('Delete folder', 'fromscratch') . '" data-folder-name="' . esc_attr($term->name) . '" data-folder-count="' . $display_count . '" data-delete-url="' . esc_url($delete_url) . '"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M480-424 284-228q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536-480l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480-424Z"/></svg></button>';
 		echo '</span>';
 		echo '</div>';
+		if ($has_children) {
+			echo '<div class="fs-media-folders-branch">';
+			echo '<ul class="fs-media-folders-branch-list">';
+			fs_media_folders_render_list($terms, $display_counts, $term_id, $depth + 1, $current_id, $unassigned_active, $base_url, $redirect_url);
+			echo '</ul>';
+			echo '</div>';
+		}
 		echo '</li>';
-		fs_media_folders_render_list($terms, $display_counts, $term_id, $depth + 1, $current_id, $unassigned_active, $base_url, $redirect_url);
 	}
 }
 
@@ -1221,7 +1291,8 @@ add_action('admin_footer-upload.php', function (): void {
 				?>
 				<div class="<?= esc_attr(implode(' ', $all_item_classes)) ?>">
 					<button type="button" class="fs-media-folders-link fs-media-folders-link--all" data-fs-all-url="<?= esc_url($all_files_url) ?>">
-						<?= esc_html__('All files', 'fromscratch') ?>
+						<span class="fs-media-folders-item-icon fs-media-folders-item-icon--all" aria-hidden="true"><?php echo fs_media_folders_icon_svg('all'); ?></span>
+						<span class="fs-media-folders-link-label"><?= esc_html__('All files', 'fromscratch') ?></span>
 					</button>
 				</div>
 			</li>
@@ -1235,6 +1306,7 @@ add_action('admin_footer-upload.php', function (): void {
 				?>
 				<div class="<?= esc_attr(implode(' ', $un_item_classes)) ?>">
 					<a class="fs-media-folders-link" href="<?= esc_url($unassigned_url) ?>">
+						<span class="fs-media-folders-item-icon fs-media-folders-item-icon--unassigned" aria-hidden="true"><?php echo fs_media_folders_icon_svg('unassigned'); ?></span>
 						<span class="name"><?= esc_html__('Not in a folder', 'fromscratch') ?></span>
 						<span class="count"><?= esc_html((string) (int) $unassigned_count) ?></span>
 					</a>
@@ -1345,6 +1417,83 @@ add_action('admin_footer-upload.php', function (): void {
 			if (!sidebar || !wrap || wrap.dataset.fsMediaFoldersReady === '1') {
 				return;
 			}
+
+			var fsBranchCollapsedKey = 'fromscratch_fs_media_folder_collapsed_branches';
+
+			function fsMediaFoldersReadCollapsedBranches() {
+				try {
+					if (!window.localStorage) {
+						return [];
+					}
+					var raw = window.localStorage.getItem(fsBranchCollapsedKey);
+					if (!raw) {
+						return [];
+					}
+					var parsed = JSON.parse(raw);
+					if (!Array.isArray(parsed)) {
+						return [];
+					}
+					return parsed.map(function(x) {
+						return parseInt(x, 10);
+					}).filter(function(n) {
+						return !isNaN(n) && n > 0;
+					});
+				} catch (err) {
+					return [];
+				}
+			}
+
+			function fsMediaFoldersWriteCollapsedBranches(ids) {
+				try {
+					if (window.localStorage) {
+						window.localStorage.setItem(fsBranchCollapsedKey, JSON.stringify(ids));
+					}
+				} catch (err) {}
+			}
+
+			function fsMediaFoldersPersistBranchCollapse(termId, collapsed) {
+				var ids = fsMediaFoldersReadCollapsedBranches();
+				var ix = ids.indexOf(termId);
+				if (collapsed && ix === -1) {
+					ids.push(termId);
+				}
+				if (!collapsed && ix !== -1) {
+					ids.splice(ix, 1);
+				}
+				fsMediaFoldersWriteCollapsedBranches(ids);
+			}
+
+			function fsMediaFoldersApplyStoredBranchState(root) {
+				if (!root) {
+					return;
+				}
+				var collapsed = {};
+				fsMediaFoldersReadCollapsedBranches().forEach(function(id) {
+					collapsed[id] = true;
+				});
+				var branches = root.querySelectorAll('.fs-media-folders-tree-item--branch[data-folder-term-id]');
+				var i;
+				for (i = 0; i < branches.length; i++) {
+					var li = branches[i];
+					var tid = parseInt(li.getAttribute('data-folder-term-id') || '0', 10);
+					if (isNaN(tid) || tid < 1) {
+						continue;
+					}
+					var btn = li.querySelector('.fs-media-folders-folder-toggle');
+					if (collapsed[tid]) {
+						li.classList.remove('is-expanded');
+						if (btn) {
+							btn.setAttribute('aria-expanded', 'false');
+						}
+					} else {
+						li.classList.add('is-expanded');
+						if (btn) {
+							btn.setAttribute('aria-expanded', 'true');
+						}
+					}
+				}
+			}
+
 			var heading = wrap.querySelector('h1.wp-heading-inline');
 			var addButton = wrap.querySelector('.page-title-action');
 			var headerEnd = wrap.querySelector('hr.wp-header-end');
@@ -1370,6 +1519,7 @@ add_action('admin_footer-upload.php', function (): void {
 			});
 
 			sidebar.style.display = '';
+			fsMediaFoldersApplyStoredBranchState(sidebar);
 			wrap.dataset.fsMediaFoldersReady = '1';
 
 			var toggleButton = document.createElement('button');
@@ -1429,6 +1579,11 @@ add_action('admin_footer-upload.php', function (): void {
 				}, 15000);
 			}
 			if (window.fsMediaFolderPanel && typeof window.fsMediaFolderPanel.applyFromStorage === 'function') {
+				var _fsOrigApplyFromStorage = window.fsMediaFolderPanel.applyFromStorage;
+				window.fsMediaFolderPanel.applyFromStorage = function() {
+					_fsOrigApplyFromStorage.call(window.fsMediaFolderPanel);
+					fsMediaFoldersApplyStoredBranchState(sidebar);
+				};
 				window.fsMediaFolderPanel.applyFromStorage();
 			}
 
@@ -1628,6 +1783,22 @@ add_action('admin_footer-upload.php', function (): void {
 			}
 
 			sidebar.addEventListener('click', function(e) {
+				var folderToggle = e.target.closest('.fs-media-folders-folder-toggle');
+				if (folderToggle) {
+					e.preventDefault();
+					e.stopPropagation();
+					var treeItem = folderToggle.closest('.fs-media-folders-tree-item');
+					if (!treeItem || !treeItem.classList.contains('fs-media-folders-tree-item--branch')) {
+						return;
+					}
+					var expanded = treeItem.classList.toggle('is-expanded');
+					folderToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+					var tid = parseInt(treeItem.getAttribute('data-folder-term-id') || '0', 10);
+					if (!isNaN(tid) && tid > 0) {
+						fsMediaFoldersPersistBranchCollapse(tid, !expanded);
+					}
+					return;
+				}
 				var allNav = e.target.closest('button.fs-media-folders-link--all[data-fs-all-url]');
 				if (allNav) {
 					e.preventDefault();
