@@ -572,16 +572,18 @@ add_action('admin_footer', function (): void {
 					}
 					out += '>';
 					out += '<div class="fs-media-modal-folders__row fs-media-folders-item fs-media-folders-link">';
-					if (hasChildren) {
-						out += '<button type="button" class="fs-media-folders-folder-toggle" aria-expanded="true" aria-label="' + fsEscAttr(L.expandCollapse || '') + '">';
-						out += icons.folderBranch || '';
-						out += '</button>';
-					} else {
-						out += icons.folderLeaf || '';
-					}
 					var cnt = typeof it.count !== 'undefined' ? it.count : 0;
-					out += '<button type="button" class="fs-media-modal-folder-btn fs-media-modal-folder-btn--grow" data-folder-id="' + id + '">';
-					out += '<span class="fs-media-modal-folder-btn__label">' + name + '</span>';
+					out += '<button type="button" class="fs-media-folder-row" data-folder-id="' + id + '">';
+					if (hasChildren) {
+						out += '<span class="fs-media-folders-folder-toggle" role="button" tabindex="0" aria-expanded="true" aria-label="' + fsEscAttr(L.expandCollapse || '') + '">';
+						out += icons.folderBranch || '';
+						out += '</span>';
+					} else {
+						out += '<span class="fs-media-folders-folder-toggle fs-media-folders-folder-toggle--leaf" aria-hidden="true">';
+						out += icons.folderLeaf || '';
+						out += '</span>';
+					}
+					out += '<span class="name">' + name + '</span>';
 					out += '<span class="fs-media-folders-count">' + fsModalFmtCount(cnt) + '</span>';
 					out += '</button>';
 					out += '</div>';
@@ -766,13 +768,13 @@ add_action('admin_footer', function (): void {
 				html += '</div>';
 				html += '<ul class="fs-media-modal-folders__list">';
 				html += '<li class="fs-media-modal-folders__item"><div class="fs-media-modal-folders__row fs-media-folders-item fs-media-folders-item--all fs-media-folders-link">';
-				html += '<button type="button" class="fs-media-modal-folder-btn fs-media-modal-folder-btn--with-icon" data-folder-id="0" data-fs-all="1">';
+				html += '<button type="button" class="fs-media-folder-row fs-media-folder-row--all" data-folder-id="0" data-fs-all="1">';
 				html += icons.all || '';
 				html += '<span class="fs-media-folders-link-label">' + fsEsc(L.allFiles || 'All files') + '</span>';
 				html += '<span class="fs-media-folders-count">' + fsModalFmtCount(counts.allFiles) + '</span>';
 				html += '</button></div></li>';
 				html += '<li class="fs-media-modal-folders__item"><div class="fs-media-modal-folders__row fs-media-folders-item fs-media-folders-item--unassigned fs-media-folders-link">';
-				html += '<button type="button" class="fs-media-modal-folder-btn fs-media-modal-folder-btn--with-icon" data-folder-id="0" data-fs-unassigned="1">';
+				html += '<button type="button" class="fs-media-folder-row fs-media-folder-row--unassigned" data-folder-id="0" data-fs-unassigned="1">';
 				html += icons.unassigned || '';
 				html += '<span class="name">' + fsEsc(L.notInFolder || 'Not in a folder') + '</span>';
 				html += '<span class="fs-media-folders-count">' + fsModalFmtCount(counts.unassigned) + '</span>';
@@ -790,7 +792,7 @@ add_action('admin_footer', function (): void {
 					var ri;
 					for (ri = 0; ri < rows.length; ri++) {
 						var row = rows[ri];
-						var b = row.querySelector('.fs-media-modal-folder-btn');
+						var b = row.querySelector('.fs-media-folder-row');
 						if (!b) {
 							continue;
 						}
@@ -811,7 +813,7 @@ add_action('admin_footer', function (): void {
 				}
 
 				panel.addEventListener('click', function(e) {
-					var folderToggle = e.target.closest('.fs-media-folders-folder-toggle');
+					var folderToggle = e.target.closest('.fs-media-folders-folder-toggle:not(.fs-media-folders-folder-toggle--leaf)');
 					if (folderToggle && panel.contains(folderToggle)) {
 						e.preventDefault();
 						e.stopPropagation();
@@ -827,7 +829,7 @@ add_action('admin_footer', function (): void {
 						}
 						return;
 					}
-					var btn = e.target.closest('.fs-media-modal-folder-btn');
+					var btn = e.target.closest('.fs-media-folder-row');
 					if (!btn || !panel.contains(btn)) {
 						return;
 					}
@@ -1203,14 +1205,16 @@ function fs_media_folders_render_list(array $terms, array $display_counts, int $
 		$li_attr = $has_children ? ' data-folder-term-id="' . esc_attr((string) $term_id) . '"' : '';
 		echo '<li class="' . esc_attr(implode(' ', $li_classes)) . '"' . $li_attr . '>';
 		echo '<div class="' . esc_attr(implode(' ', $item_classes)) . '">';
+		echo '<a class="fs-media-folders-link fs-media-folder-row" href="' . esc_url($url) . '">';
 		if ($has_children) {
-			echo '<button type="button" class="fs-media-folders-folder-toggle" aria-expanded="true" aria-label="' . esc_attr__('Expand or collapse subfolders', 'fromscratch') . '">';
+			echo '<span class="fs-media-folders-folder-toggle" role="button" tabindex="0" aria-expanded="true" aria-label="' . esc_attr__('Expand or collapse subfolders', 'fromscratch') . '">';
 			echo fs_media_folders_folder_icon_markup(true);
-			echo '</button>';
+			echo '</span>';
 		} else {
+			echo '<span class="fs-media-folders-folder-toggle fs-media-folders-folder-toggle--leaf" aria-hidden="true">';
 			echo fs_media_folders_folder_icon_markup(false);
+			echo '</span>';
 		}
-		echo '<a class="fs-media-folders-link" href="' . esc_url($url) . '">';
 		echo '<span class="name">' . esc_html($term->name) . '</span>';
 		echo '<span class="fs-media-folders-count">' . esc_html((string) $display_count) . '</span>';
 		echo '</a>';
@@ -1476,7 +1480,7 @@ add_action('admin_footer-upload.php', function (): void {
 				}
 				?>
 				<div class="<?= esc_attr(implode(' ', $all_item_classes)) ?>">
-					<button type="button" class="fs-media-folders-link fs-media-folders-link--all" data-fs-all-url="<?= esc_url($all_files_url) ?>">
+					<button type="button" class="fs-media-folders-link fs-media-folders-link--all fs-media-folder-row fs-media-folder-row--all" data-fs-all-url="<?= esc_url($all_files_url) ?>">
 						<span class="fs-media-folders-item-icon fs-media-folders-item-icon--all" aria-hidden="true"><?php echo fs_media_folders_icon_svg('all'); ?></span>
 						<span class="fs-media-folders-link-label"><?= esc_html__('All files', 'fromscratch') ?></span>
 						<span class="fs-media-folders-count"><?= esc_html((string) (int) $all_files_count) ?></span>
@@ -1492,7 +1496,7 @@ add_action('admin_footer-upload.php', function (): void {
 				}
 				?>
 				<div class="<?= esc_attr(implode(' ', $un_item_classes)) ?>">
-					<a class="fs-media-folders-link" href="<?= esc_url($unassigned_url) ?>">
+					<a class="fs-media-folders-link fs-media-folder-row fs-media-folder-row--unassigned" href="<?= esc_url($unassigned_url) ?>">
 						<span class="fs-media-folders-item-icon fs-media-folders-item-icon--unassigned" aria-hidden="true"><?php echo fs_media_folders_icon_svg('unassigned'); ?></span>
 						<span class="name"><?= esc_html__('Not in a folder', 'fromscratch') ?></span>
 						<span class="fs-media-folders-count"><?= esc_html((string) (int) $unassigned_count) ?></span>
@@ -1971,7 +1975,7 @@ add_action('admin_footer-upload.php', function (): void {
 			}
 
 			sidebar.addEventListener('click', function(e) {
-				var folderToggle = e.target.closest('.fs-media-folders-folder-toggle');
+				var folderToggle = e.target.closest('.fs-media-folders-folder-toggle:not(.fs-media-folders-folder-toggle--leaf)');
 				if (folderToggle) {
 					e.preventDefault();
 					e.stopPropagation();

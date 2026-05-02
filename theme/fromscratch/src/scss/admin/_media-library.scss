@@ -47,6 +47,200 @@
   }
 }
 
+// Folder row control + tree chrome (Media Library sidebar + media modal — shared)
+.fs-media-folder-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 5px;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 18px;
+  color: #1d2327;
+  box-sizing: border-box;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+button.fs-media-folder-row {
+  appearance: none;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+}
+
+a.fs-media-folder-row {
+  text-decoration: none;
+  color: #1d2327;
+}
+
+.fs-media-folder-row .name,
+.fs-media-folder-row .fs-media-folders-link-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
+.fs-media-folders-folder-toggle {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  margin: -5px -2px -5px -5px;
+  padding: 5px 2px 5px 5px;
+  border: 0;
+  border-radius: 4px 0 0 4px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  box-sizing: border-box;
+  outline: none !important;
+  box-shadow: none !important;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.06);
+  }
+}
+
+.fs-media-folders-folder-toggle--leaf {
+  cursor: default;
+  pointer-events: none;
+
+  &:hover {
+    background: transparent;
+  }
+}
+
+.fs-media-folders-item-icon {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  color: #646970;
+
+  .fs-media-folders-svg {
+    display: block;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.fs-media-folders-item-icon-visual {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fs-media-folders-tree-item {
+  margin: 0;
+}
+
+.fs-media-folders-branch {
+  display: grid;
+  grid-template-rows: 0fr;
+  margin: 0;
+  padding: 0;
+  transition: grid-template-rows 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fs-media-folders-tree-item.is-expanded>.fs-media-folders-branch {
+  grid-template-rows: 1fr;
+}
+
+.fs-media-folders-branch-list {
+  list-style: none;
+  margin: 0;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 0 0 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fs-media-folders-branch {
+    transition: none;
+  }
+}
+
+.fs-media-folders-item-icon--branch .fs-media-folders-item-icon-visual--open {
+  display: none;
+}
+
+.fs-media-folders-tree-item.is-expanded .fs-media-folders-item-icon--branch .fs-media-folders-item-icon-visual--open {
+  display: inline-flex;
+}
+
+.fs-media-folders-tree-item.is-expanded .fs-media-folders-item-icon--branch .fs-media-folders-item-icon-visual--closed {
+  display: none;
+}
+
+.fs-media-folders-tree-item:not(.is-expanded) .fs-media-folders-item-icon--branch .fs-media-folders-item-icon-visual--closed {
+  display: inline-flex;
+}
+
+.fs-media-folders-tree-item:not(.is-expanded) .fs-media-folders-item-icon--branch .fs-media-folders-item-icon-visual--open {
+  display: none;
+}
+
+.fs-media-folders-item.fs-media-folders-link {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 4px;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 18px;
+  padding-left: 0;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.fs-media-folders-item.fs-media-folders-link:hover:not(.is-active) {
+  background: #f6f7f7;
+}
+
+.fs-media-folders-item.fs-media-folders-link.is-active {
+  background: #2271b1;
+}
+
+.fs-media-folders-item.fs-media-folders-link.is-active>.fs-media-folders-link,
+.fs-media-folders-item.fs-media-folders-link.is-active>.fs-media-folder-row {
+  background: transparent;
+  color: #fff;
+}
+
+.fs-media-folders-item.fs-media-folders-link.is-active .fs-media-folders-item-icon {
+  color: #fff;
+}
+
+.fs-media-folders-item.fs-media-folders-link.is-active .fs-media-folders-folder-toggle:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.fs-media-folders-item.fs-media-folders-link.is-active .fs-media-folders-folder-toggle--leaf:hover {
+  background: transparent;
+}
+
+.fs-media-folders-item:hover>.fs-media-folders-link,
+.fs-media-folders-item:hover>.fs-media-folder-row {
+  background: transparent;
+}
+
 body.fs-feature-media-folders {
 
   .fs-media-folders-content .wp-filter,
@@ -282,219 +476,14 @@ body.fs-feature-media-folders {
     margin: 0;
   }
 
-  .fs-media-folders-tree-item {
-    margin: 0;
-  }
-
-  /* Grid row 0fr→1fr animates to intrinsic height (smooth); max-height hacks do not. */
-  .fs-media-folders-branch {
-    display: grid;
-    grid-template-rows: 0fr;
-    margin: 0;
-    padding: 0;
-    transition: grid-template-rows 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .fs-media-folders-tree-item.is-expanded > .fs-media-folders-branch {
-    grid-template-rows: 1fr;
-  }
-
-  .fs-media-folders-branch-list {
-    list-style: none;
-    margin: 0;
-    min-height: 0;
-    overflow: hidden;
-    padding: 0 0 0 14px;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .fs-media-folders-branch {
-      transition: none;
-    }
-  }
-
-  .fs-media-folders-folder-toggle {
-    flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 22px;
-    height: 26px;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    border-radius: 4px;
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
-    box-sizing: border-box;
-
-    &:hover {
-      background: rgba(0, 0, 0, 0.06);
-    }
-
-    &:focus-visible {
-      outline: 2px solid #2271b1;
-      outline-offset: 1px;
-    }
-  }
-
-  .fs-media-folders-item-icon {
-    flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 18px;
-    height: 18px;
-    color: #646970;
-
-    .fs-media-folders-svg {
-      display: block;
-      width: 18px;
-      height: 18px;
-    }
-  }
-
-  .fs-media-folders-item-icon-visual {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .fs-media-folders-item-icon--branch .fs-media-folders-item-icon-visual--open {
-    display: none;
-  }
-
-  .fs-media-folders-tree-item.is-expanded .fs-media-folders-item-icon--branch .fs-media-folders-item-icon-visual--open {
-    display: inline-flex;
-  }
-
-  .fs-media-folders-tree-item.is-expanded .fs-media-folders-item-icon--branch .fs-media-folders-item-icon-visual--closed {
-    display: none;
-  }
-
-  .fs-media-folders-tree-item:not(.is-expanded) .fs-media-folders-item-icon--branch .fs-media-folders-item-icon-visual--closed {
-    display: inline-flex;
-  }
-
-  .fs-media-folders-tree-item:not(.is-expanded) .fs-media-folders-item-icon--branch .fs-media-folders-item-icon-visual--open {
-    display: none;
-  }
-
-  .fs-media-folders-item.fs-media-folders-link {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 4px;
-    border-radius: 4px;
-    font-size: 13px;
-    line-height: 20px;
-    min-height: 30px;
-    padding-left: 0;
-  }
-
-  .fs-media-folders-item.fs-media-folders-link:hover:not(.is-active) {
-    background: #f6f7f7;
-  }
-
-  .fs-media-folders-item.fs-media-folders-link.is-active {
-    background: #2271b1;
-  }
-
-  .fs-media-folders-item > a.fs-media-folders-link {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 6px;
-    flex: 1 1 auto;
-    min-width: 0;
-    padding: 5px 8px 5px 4px;
-    border-radius: 4px;
-    color: #1d2327;
-    text-decoration: none;
-  }
-
-  .fs-media-folders-item--unassigned > a.fs-media-folders-link {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 6px;
-    padding-left: 4px;
-  }
-
-  .fs-media-folders-item--unassigned > a.fs-media-folders-link .name {
-    flex: 1 1 auto;
-    min-width: 0;
-  }
-
-  .fs-media-folders-item > a.fs-media-folders-link .name {
-    flex: 1 1 auto;
-    min-width: 0;
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    max-width: 100%;
-  }
-
-  /* Folder rows: room for action toolbar while renaming/deleting */
-  #fs-media-folders-sidebar.is-edit-mode .fs-media-folders-item.fs-media-folders-link:not(.fs-media-folders-item--all):not(.fs-media-folders-item--unassigned) > a.fs-media-folders-link,
-  #fs-media-folders-sidebar.is-delete-mode .fs-media-folders-item.fs-media-folders-link:not(.fs-media-folders-item--all):not(.fs-media-folders-item--unassigned) > a.fs-media-folders-link {
+  /* Sidebar: room for rename/delete toolbar on folder rows */
+  #fs-media-folders-sidebar.is-edit-mode .fs-media-folders-item.fs-media-folders-link:not(.fs-media-folders-item--all):not(.fs-media-folders-item--unassigned)>.fs-media-folder-row,
+  #fs-media-folders-sidebar.is-delete-mode .fs-media-folders-item.fs-media-folders-link:not(.fs-media-folders-item--all):not(.fs-media-folders-item--unassigned)>.fs-media-folder-row {
     padding-right: 44px;
   }
 
-  button.fs-media-folders-link {
-    appearance: none;
-    margin: 0;
-    border: 0;
-    background: transparent;
-    font: inherit;
-    line-height: inherit;
-    text-align: left;
-    cursor: pointer;
-    box-sizing: border-box;
-  }
-
-  button.fs-media-folders-link:focus-visible {
-    outline: 2px solid #2271b1;
-    outline-offset: 1px;
-  }
-
-  .fs-media-folders-item--all > button.fs-media-folders-link {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 6px;
-    flex: 1 1 auto;
-    min-width: 0;
+  .fs-media-folders-item--all>button.fs-media-folder-row {
     width: auto;
-    padding: 5px 8px;
-    border-radius: 4px;
-    color: #1d2327;
-  }
-
-  .fs-media-folders-link-label {
-    flex: 1 1 auto;
-    min-width: 0;
-    text-align: left;
-  }
-
-  .fs-media-folders-item:hover>.fs-media-folders-link {
-    background: transparent;
-  }
-
-  .fs-media-folders-item.fs-media-folders-link.is-active>.fs-media-folders-link {
-    background: transparent;
-    color: #fff;
-  }
-
-  .fs-media-folders-item.fs-media-folders-link.is-active .fs-media-folders-item-icon {
-    color: #fff;
-  }
-
-  .fs-media-folders-item.fs-media-folders-link.is-active .fs-media-folders-folder-toggle:hover {
-    background: rgba(255, 255, 255, 0.15);
   }
 
   .fs-media-folders-item-toolbar {
@@ -583,11 +572,6 @@ body.fs-feature-media-folders {
     color: #2271b1;
   }
 
-  .fs-media-folder-edit-btn:focus-visible {
-    outline: 2px solid #2271b1;
-    outline-offset: 1px;
-  }
-
   .fs-media-folders-item.fs-media-folders-link.is-active .fs-media-folder-edit-btn:focus-visible {
     outline-color: #fff;
   }
@@ -606,11 +590,6 @@ body.fs-feature-media-folders {
     background: #fcf0f1;
     border-color: #b32d2e;
     color: #b32d2e;
-  }
-
-  .fs-media-folder-delete-btn:focus-visible {
-    outline: 2px solid #2271b1;
-    outline-offset: 1px;
   }
 
   .fs-media-folders-item.fs-media-folders-link.is-active .fs-media-folder-delete-btn:focus-visible {
@@ -843,212 +822,6 @@ body.fs-feature-media-folders {
   .fs-media-modal-folders__item,
   .fs-media-modal-folders__tree-item {
     margin: 0;
-  }
-
-  /* Same expand/collapse animation as upload sidebar */
-  .fs-media-modal-folders .fs-media-folders-branch {
-    display: grid;
-    grid-template-rows: 0fr;
-    margin: 0;
-    padding: 0;
-    transition: grid-template-rows 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .fs-media-modal-folders .fs-media-folders-tree-item.is-expanded > .fs-media-folders-branch {
-    grid-template-rows: 1fr;
-  }
-
-  .fs-media-modal-folders .fs-media-folders-branch-list {
-    list-style: none;
-    margin: 0;
-    min-height: 0;
-    overflow: hidden;
-    padding: 0 0 0 14px;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .fs-media-modal-folders .fs-media-folders-branch {
-      transition: none;
-    }
-  }
-
-  .fs-media-modal-folders .fs-media-folders-folder-toggle {
-    flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 22px;
-    height: 26px;
-    margin: 0;
-    padding: 0;
-    border: 0;
-    border-radius: 4px;
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
-    box-sizing: border-box;
-
-    &:hover {
-      background: rgba(0, 0, 0, 0.06);
-    }
-
-    &:focus-visible {
-      outline: 2px solid #2271b1;
-      outline-offset: 1px;
-    }
-  }
-
-  .fs-media-modal-folders .fs-media-folders-item-icon {
-    flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 18px;
-    height: 18px;
-    color: #646970;
-
-    .fs-media-folders-svg {
-      display: block;
-      width: 18px;
-      height: 18px;
-    }
-  }
-
-  .fs-media-modal-folders .fs-media-folders-item-icon--branch .fs-media-folders-item-icon-visual--open {
-    display: none;
-  }
-
-  .fs-media-modal-folders .fs-media-folders-tree-item.is-expanded .fs-media-folders-item-icon--branch .fs-media-folders-item-icon-visual--open {
-    display: inline-flex;
-  }
-
-  .fs-media-modal-folders .fs-media-folders-tree-item.is-expanded .fs-media-folders-item-icon--branch .fs-media-folders-item-icon-visual--closed {
-    display: none;
-  }
-
-  .fs-media-modal-folders .fs-media-folders-tree-item:not(.is-expanded) .fs-media-folders-item-icon--branch .fs-media-folders-item-icon-visual--closed {
-    display: inline-flex;
-  }
-
-  .fs-media-modal-folders .fs-media-folders-tree-item:not(.is-expanded) .fs-media-folders-item-icon--branch .fs-media-folders-item-icon-visual--open {
-    display: none;
-  }
-
-  .fs-media-modal-folders .fs-media-modal-folders__row.fs-media-folders-item.fs-media-folders-link {
-    position: relative;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 4px;
-    border-radius: 4px;
-    font-size: 13px;
-    line-height: 20px;
-    min-height: 30px;
-    padding-left: 0;
-  }
-
-  .fs-media-modal-folders .fs-media-modal-folders__row.fs-media-folders-item.fs-media-folders-link:hover:not(.is-active) {
-    background: #f6f7f7;
-  }
-
-  .fs-media-modal-folders .fs-media-modal-folders__row.fs-media-folders-item.fs-media-folders-link.is-active {
-    background: #2271b1;
-    color: #fff;
-  }
-
-  .fs-media-modal-folders .fs-media-modal-folders__row.is-active .fs-media-folders-item-icon {
-    color: #fff;
-  }
-
-  .fs-media-modal-folders .fs-media-modal-folders__row.is-active .fs-media-folders-folder-toggle:hover {
-    background: rgba(255, 255, 255, 0.15);
-  }
-
-  .fs-media-modal-folder-btn {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 4px 6px;
-    border: 0;
-    border-radius: 4px;
-    background: transparent;
-    color: inherit;
-    font-size: 13px;
-    line-height: 18px;
-    text-align: left;
-    cursor: pointer;
-    font-family: inherit;
-  }
-
-  .fs-media-modal-folder-btn--with-icon {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 6px;
-    width: 100%;
-    min-width: 0;
-  }
-
-  .fs-media-modal-folders .fs-media-folders-item--all .fs-media-modal-folder-btn--with-icon .fs-media-folders-link-label {
-    flex: 1 1 auto;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    text-align: left;
-  }
-
-  .fs-media-modal-folder-btn--grow {
-    flex: 1 1 auto;
-    min-width: 0;
-    width: auto;
-    overflow: hidden;
-    padding: 5px 8px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 6px;
-  }
-
-  .fs-media-modal-folder-btn__label {
-    flex: 1 1 auto;
-    min-width: 0;
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .fs-media-modal-folders .fs-media-folders-item--unassigned .fs-media-modal-folder-btn--with-icon .name {
-    flex: 1 1 auto;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    text-align: left;
-  }
-
-  .fs-media-modal-folder-btn:hover,
-  .fs-media-modal-folder-btn:focus-visible {
-    outline: none;
-  }
-
-  .fs-media-modal-folders__row:not(.is-active) .fs-media-modal-folder-btn:hover,
-  .fs-media-modal-folders__row:not(.is-active) .fs-media-modal-folder-btn:focus-visible {
-    background: transparent;
-  }
-
-  .fs-media-modal-folders__row:not(.is-active):hover .fs-media-modal-folder-btn {
-    background: transparent;
-  }
-
-  .fs-media-modal-folders__row.is-active .fs-media-modal-folder-btn {
-    color: #fff;
-    background: transparent;
-  }
-
-  .fs-media-modal-folders__row.is-active .fs-media-modal-folder-btn:focus-visible {
-    outline: 2px solid rgba(255, 255, 255, 0.85);
-    outline-offset: 1px;
   }
 
   .attachments-browser.fs-modal-sidebar-layout .attachments-wrapper,
