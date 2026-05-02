@@ -143,6 +143,19 @@ function fs_media_folders_count_unassigned(): int
 }
 
 /**
+ * Count attachments shown under “All files” (published/inherited media, excluding trash).
+ */
+function fs_media_folders_count_all_attachments(): int
+{
+	$counts = wp_count_posts('attachment');
+	if (!$counts || !is_object($counts)) {
+		return 0;
+	}
+
+	return (int) ($counts->inherit ?? 0);
+}
+
+/**
  * Assign an attachment to a folder term (or clear it).
  *
  * @param mixed $raw_folder_value
@@ -383,6 +396,7 @@ add_action('admin_footer', function (): void {
 	if (is_wp_error($terms)) {
 		$terms = [];
 	}
+	$display_counts = fs_media_folders_build_display_counts($terms);
 	$by_parent = [];
 	foreach ($terms as $term) {
 		if (!$term instanceof WP_Term) {
@@ -394,40 +408,191 @@ add_action('admin_footer', function (): void {
 		}
 		$by_parent[$pid][] = $term;
 	}
-	$flat = [];
-	$walk = static function (int $parent_id, int $depth) use (&$walk, &$by_parent, &$flat): void {
-		if (empty($by_parent[$parent_id])) {
-			return;
-		}
-		foreach ($by_parent[$parent_id] as $t) {
-			$flat[] = [
-				'id' => (int) $t->term_id,
+	$by_parent_modal = [];
+	foreach ($by_parent as $pid => $children) {
+		$key = (string) (int) $pid;
+		$by_parent_modal[$key] = [];
+		foreach ($children as $t) {
+			if (!$t instanceof WP_Term) {
+				continue;
+			}
+			$tid = (int) $t->term_id;
+			$by_parent_modal[$key][] = [
+				'id' => $tid,
 				'name' => (string) $t->name,
-				'depth' => $depth,
+				'count' => (int) ($display_counts[$tid] ?? $t->count),
 			];
-			$walk((int) $t->term_id, $depth + 1);
 		}
-	};
-	$walk(0, 0);
+	}
 	$fs_modal_folders_config = [
-		'terms' => $flat,
+		'byParent' => $by_parent_modal,
+		'counts' => [
+			'allFiles' => fs_media_folders_count_all_attachments(),
+			'unassigned' => fs_media_folders_count_unassigned(),
+		],
+		'uploadLibraryUrl' => admin_url('upload.php'),
+		'icons' => [
+			'all' => '<span class="fs-media-folders-item-icon fs-media-folders-item-icon--all" aria-hidden="true">' . fs_media_folders_icon_svg('all') . '</span>',
+			'unassigned' => '<span class="fs-media-folders-item-icon fs-media-folders-item-icon--unassigned" aria-hidden="true">' . fs_media_folders_icon_svg('unassigned') . '</span>',
+			'folderLeaf' => fs_media_folders_folder_icon_markup(false),
+			'folderBranch' => fs_media_folders_folder_icon_markup(true),
+		],
 		'i18n' => [
 			'heading' => __('Folders', 'fromscratch'),
 			'allFiles' => __('All files', 'fromscratch'),
 			'notInFolder' => __('Not in a folder', 'fromscratch'),
+			'editInLibrary' => __('Edit in Library', 'fromscratch'),
+			'expandCollapse' => __('Expand or collapse subfolders', 'fromscratch'),
 		],
 	];
 ?>
 	<script>
 		(function(cfg) {
-			var folders = cfg.terms || [];
+			var byParent = cfg.byParent || {};
+			var icons = cfg.icons || {};
+			var counts = cfg.counts || {};
+			var uploadLibraryUrl = cfg.uploadLibraryUrl || '';
 			var L = cfg.i18n || {};
+
+			function fsModalFmtCount(n) {
+				var x = parseInt(n, 10);
+				if (isNaN(x) || x < 0) {
+					x = 0;
+				}
+				return String(x);
+			}
+			var fsBranchCollapsedKey = 'fromscratch_fs_media_folder_collapsed_branches';
 
 			function fsEsc(s) {
 				return String(s)
 					.replace(/&/g, '&amp;')
 					.replace(/</g, '&lt;')
 					.replace(/>/g, '&gt;');
+			}
+
+			function fsEscAttr(s) {
+				return String(s)
+					.replace(/&/g, '&amp;')
+					.replace(/"/g, '&quot;')
+					.replace(/</g, '&lt;')
+					.replace(/>/g, '&gt;');
+			}
+
+			function fsModalReadCollapsedBranches() {
+				try {
+					if (!window.localStorage) {
+						return [];
+					}
+					var raw = window.localStorage.getItem(fsBranchCollapsedKey);
+					if (!raw) {
+						return [];
+					}
+					var parsed = JSON.parse(raw);
+					if (!Array.isArray(parsed)) {
+						return [];
+					}
+					return parsed.map(function(x) {
+						return parseInt(x, 10);
+					}).filter(function(n) {
+						return !isNaN(n) && n > 0;
+					});
+				} catch (err) {
+					return [];
+				}
+			}
+
+			function fsModalWriteCollapsedBranches(ids) {
+				try {
+					if (window.localStorage) {
+						window.localStorage.setItem(fsBranchCollapsedKey, JSON.stringify(ids));
+					}
+				} catch (err) {}
+			}
+
+			function fsModalPersistBranchCollapse(termId, collapsed) {
+				var ids = fsModalReadCollapsedBranches();
+				var ix = ids.indexOf(termId);
+				if (collapsed && ix === -1) {
+					ids.push(termId);
+				}
+				if (!collapsed && ix !== -1) {
+					ids.splice(ix, 1);
+				}
+				fsModalWriteCollapsedBranches(ids);
+			}
+
+			function fsModalApplyStoredBranchState(root) {
+				if (!root) {
+					return;
+				}
+				var collapsed = {};
+				fsModalReadCollapsedBranches().forEach(function(id) {
+					collapsed[id] = true;
+				});
+				var branches = root.querySelectorAll('.fs-media-folders-tree-item--branch[data-folder-term-id]');
+				var i;
+				for (i = 0; i < branches.length; i++) {
+					var li = branches[i];
+					var tid = parseInt(li.getAttribute('data-folder-term-id') || '0', 10);
+					if (isNaN(tid) || tid < 1) {
+						continue;
+					}
+					var btn = li.querySelector('.fs-media-folders-folder-toggle');
+					if (collapsed[tid]) {
+						li.classList.remove('is-expanded');
+						if (btn) {
+							btn.setAttribute('aria-expanded', 'false');
+						}
+					} else {
+						li.classList.add('is-expanded');
+						if (btn) {
+							btn.setAttribute('aria-expanded', 'true');
+						}
+					}
+				}
+			}
+
+			function fsModalRenderFolderTree(parentId) {
+				var items = byParent[String(parentId)] || [];
+				var out = '';
+				var ti;
+				for (ti = 0; ti < items.length; ti++) {
+					var it = items[ti];
+					var id = parseInt(it.id, 10);
+					var name = fsEsc(it.name);
+					var kids = byParent[String(id)] || [];
+					var hasChildren = kids.length > 0;
+					var liClass = 'fs-media-modal-folders__tree-item fs-media-folders-tree-item';
+					if (hasChildren) {
+						liClass += ' fs-media-folders-tree-item--branch is-expanded';
+					}
+					out += '<li class="' + liClass + '"';
+					if (hasChildren) {
+						out += ' data-folder-term-id="' + id + '"';
+					}
+					out += '>';
+					out += '<div class="fs-media-modal-folders__row fs-media-folders-item fs-media-folders-link">';
+					if (hasChildren) {
+						out += '<button type="button" class="fs-media-folders-folder-toggle" aria-expanded="true" aria-label="' + fsEscAttr(L.expandCollapse || '') + '">';
+						out += icons.folderBranch || '';
+						out += '</button>';
+					} else {
+						out += icons.folderLeaf || '';
+					}
+					var cnt = typeof it.count !== 'undefined' ? it.count : 0;
+					out += '<button type="button" class="fs-media-modal-folder-btn fs-media-modal-folder-btn--grow" data-folder-id="' + id + '">';
+					out += '<span class="fs-media-modal-folder-btn__label">' + name + '</span>';
+					out += '<span class="count">' + fsModalFmtCount(cnt) + '</span>';
+					out += '</button>';
+					out += '</div>';
+					if (hasChildren) {
+						out += '<div class="fs-media-folders-branch"><ul class="fs-media-folders-branch-list">';
+						out += fsModalRenderFolderTree(id);
+						out += '</ul></div>';
+					}
+					out += '</li>';
+				}
+				return out;
 			}
 			(function(wp) {
 				if (!wp || !wp.media || !wp.media.model || !wp.media.model.Query) {
@@ -593,57 +758,77 @@ add_action('admin_footer', function (): void {
 				var panel = document.createElement('div');
 				panel.id = 'fs-media-modal-folders';
 				panel.className = 'fs-media-modal-folders';
-				var html = '<div class="fs-media-modal-folders__heading">' + fsEsc(L.heading || 'Folders') + '</div>';
-				html += '<ul class="fs-media-modal-folders__list">';
-				html += '<li class="fs-media-modal-folders__item"><button type="button" class="fs-media-modal-folder-btn" data-folder-id="0">' + fsEsc(L.allFiles || 'All files') + '</button></li>';
-				html += '<li class="fs-media-modal-folders__item"><button type="button" class="fs-media-modal-folder-btn" data-folder-id="0" data-fs-unassigned="1">' + fsEsc(L.notInFolder || 'Not in a folder') + '</button></li>';
-				for (var i = 0; i < folders.length; i++) {
-					var f = folders[i];
-					if (!f || typeof f.name !== 'string') {
-						continue;
-					}
-					var id = parseInt(f.id, 10);
-					if (isNaN(id) || id < 1) {
-						continue;
-					}
-					var depth = parseInt(f.depth, 10);
-					if (isNaN(depth) || depth < 0) {
-						depth = 0;
-					}
-					var pad = 8 + (depth * 14);
-					html += '<li class="fs-media-modal-folders__item"><button type="button" class="fs-media-modal-folder-btn" data-folder-id="' + id + '" style="padding-left:' + pad + 'px">' + String(f.name).replace(/</g, '&lt;').replace(/>/g, '&gt;') + '</button></li>';
+				var html = '<div class="fs-media-modal-folders__heading-row">';
+				html += '<span class="fs-media-modal-folders__heading">' + fsEsc(L.heading || 'Folders') + '</span>';
+				if (uploadLibraryUrl) {
+					html += '<a class="button button-small fs-media-modal-folders__edit-library" href="' + fsEscAttr(uploadLibraryUrl) + '" target="_blank" rel="noopener noreferrer">' + fsEsc(L.editInLibrary || 'Edit in Library') + '</a>';
 				}
+				html += '</div>';
+				html += '<ul class="fs-media-modal-folders__list">';
+				html += '<li class="fs-media-modal-folders__item"><div class="fs-media-modal-folders__row fs-media-folders-item fs-media-folders-item--all fs-media-folders-link">';
+				html += '<button type="button" class="fs-media-modal-folder-btn fs-media-modal-folder-btn--with-icon" data-folder-id="0" data-fs-all="1">';
+				html += icons.all || '';
+				html += '<span class="fs-media-folders-link-label">' + fsEsc(L.allFiles || 'All files') + '</span>';
+				html += '<span class="count">' + fsModalFmtCount(counts.allFiles) + '</span>';
+				html += '</button></div></li>';
+				html += '<li class="fs-media-modal-folders__item"><div class="fs-media-modal-folders__row fs-media-folders-item fs-media-folders-item--unassigned fs-media-folders-link">';
+				html += '<button type="button" class="fs-media-modal-folder-btn fs-media-modal-folder-btn--with-icon" data-folder-id="0" data-fs-unassigned="1">';
+				html += icons.unassigned || '';
+				html += '<span class="name">' + fsEsc(L.notInFolder || 'Not in a folder') + '</span>';
+				html += '<span class="count">' + fsModalFmtCount(counts.unassigned) + '</span>';
+				html += '</button></div></li>';
+				html += fsModalRenderFolderTree(0);
 				html += '</ul>';
 				panel.innerHTML = html;
 				browser.appendChild(panel);
+				fsModalApplyStoredBranchState(panel);
 
 				function repaintActive() {
 					var active = selectedFolderId();
 					var unassigned = isUnassignedFilterActive();
-					var buttons = panel.querySelectorAll('.fs-media-modal-folder-btn');
-					for (var bi = 0; bi < buttons.length; bi++) {
-						var b = buttons[bi];
+					var rows = panel.querySelectorAll('.fs-media-modal-folders__row.fs-media-folders-link');
+					var ri;
+					for (ri = 0; ri < rows.length; ri++) {
+						var row = rows[ri];
+						var b = row.querySelector('.fs-media-modal-folder-btn');
+						if (!b) {
+							continue;
+						}
 						var isUn = b.getAttribute('data-fs-unassigned') === '1';
+						var isAll = b.getAttribute('data-fs-all') === '1';
 						var bid = parseInt(b.getAttribute('data-folder-id') || '0', 10);
 						var on = false;
 						if (isUn) {
 							on = unassigned;
-						} else if (bid === 0) {
+						} else if (isAll) {
 							on = !unassigned && active === 0;
 						} else {
 							on = !unassigned && bid === active;
 						}
-						if (on) {
-							b.classList.add('is-active');
-						} else {
-							b.classList.remove('is-active');
-						}
+						row.classList.toggle('is-active', on);
+						b.classList.toggle('is-active', on);
 					}
 				}
 
 				panel.addEventListener('click', function(e) {
+					var folderToggle = e.target.closest('.fs-media-folders-folder-toggle');
+					if (folderToggle && panel.contains(folderToggle)) {
+						e.preventDefault();
+						e.stopPropagation();
+						var treeItem = folderToggle.closest('.fs-media-folders-tree-item');
+						if (!treeItem || !treeItem.classList.contains('fs-media-folders-tree-item--branch')) {
+							return;
+						}
+						var expanded = treeItem.classList.toggle('is-expanded');
+						folderToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
+						var tid = parseInt(treeItem.getAttribute('data-folder-term-id') || '0', 10);
+						if (!isNaN(tid) && tid > 0) {
+							fsModalPersistBranchCollapse(tid, !expanded);
+						}
+						return;
+					}
 					var btn = e.target.closest('.fs-media-modal-folder-btn');
-					if (!btn) {
+					if (!btn || !panel.contains(btn)) {
 						return;
 					}
 					e.preventDefault();
@@ -670,7 +855,7 @@ add_action('admin_footer', function (): void {
 				childList: true,
 				subtree: true
 			});
-		})(<?php echo wp_json_encode($fs_modal_folders_config); ?>);
+		})(<?php echo wp_json_encode($fs_modal_folders_config, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT); ?>);
 	</script>
 <?php
 });
@@ -958,11 +1143,11 @@ function fs_media_folders_term_has_children(array $terms, int $term_id): bool
 function fs_media_folders_icon_svg(string $variant): string
 {
 	$paths = [
-		'all' => 'M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm0-80h640v-480H160v480Zm120-80h400v-80H280v80Zm0-160h400v-80H280v80Zm0-160h240v-80H280v80Z',
-		'unassigned' => 'M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm40-80h480v-120H240v120Zm240-564 204 244H276l204-244Z',
-		'folder_leaf' => 'M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h207q16 0 30.5 6t25.5 17l57 57h320q33 0 56.5 23.5T880-640v400q0 33-23.5 56.5T800-160H160Z',
-		'folder_closed' => 'M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h207q16 0 30.5 6t25.5 17l57 57h320q33 0 56.5 23.5T880-640v400q0 33-23.5 56.5T800-160H160Z',
-		'folder_open' => 'M880-120H160q-33 0-56.5-23.5T80-200v-520q0-33 23.5-56.5T160-800h207q16 0 30.5 6t25.5 17l57 57h320q33 0 56.5 23.5T880-640v440q0 33-23.5 56.5T800-120ZM160-240h640v-320H447q-16 0-31-6t-26-18l-57-57H160v401Z',
+		'all' => 'M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h207q16 0 30.5 6t25.5 17l57 57h320q33 0 56.5 23.5T880-640v400q0 33-23.5 56.5T800-160H160Zm436-202 68 51q6 5 11.5 1t3.5-11l-25-85 70-56q5-5 3-11.5t-9-6.5h-86l-26-82q-2-7-10-7t-10 7l-26 82h-86q-7 0-9 6.5t3 11.5l70 56-25 85q-2 7 3.5 11t11.5-1l68-51Z',
+		'unassigned' => 'M812-261 342-731q-19-19-8.5-44t37.5-25q8 0 15.5 3t13.5 9l68 68h332q33 0 56.5 23.5T880-640v350q0 27-24.5 37.5T812-261ZM160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800l80 80H128l-72-72q-11-11-11.5-27.5T56-848q11-11 28-11t28 11l736 736q12 12 11.5 28T847-56q-12 11-28 11.5T791-56L687-160H160Z',
+		'folder_leaf' => 'M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h207q16 0 30.5 6t25.5 17l57 57h320q33 0 56.5 23.5T880-640v400q0 33-23.5 56.5T800-160H160',
+		'folder_closed' => 'M120-120q-33 0-56.5-23.5T40-200v-480q0-17 11.5-28.5T80-720q17 0 28.5 11.5T120-680v480h640q17 0 28.5 11.5T800-160q0 17-11.5 28.5T760-120H120Zm160-160q-33 0-56.5-23.5T200-360v-440q0-33 23.5-56.5T280-880h167q16 0 30.5 6t25.5 17l57 57h280q33 0 56.5 23.5T920-720v360q0 33-23.5 56.5T840-280H280Z',
+		'folder_open' => 'M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h207q16 0 30.5 6t25.5 17l57 57h360q17 0 28.5 11.5T880-680q0 17-11.5 28.5T840-640H314q-62 0-108 39t-46 99v262l79-263q8-26 29.5-41.5T316-560h516q41 0 64.5 32.5T909-457l-72 240q-8 26-29.5 41.5T760-160H160Z',
 	];
 	$d = $paths[$variant] ?? $paths['folder_leaf'];
 
@@ -1030,8 +1215,8 @@ function fs_media_folders_render_list(array $terms, array $display_counts, int $
 		echo '<span class="count">' . esc_html((string) $display_count) . '</span>';
 		echo '</a>';
 		echo '<span class="fs-media-folders-item-toolbar">';
-		echo '<button type="button" class="fs-media-folder-edit-btn" aria-label="' . esc_attr__('Rename folder', 'fromscratch') . '" data-term-id="' . esc_attr((string) $term_id) . '" data-folder-name="' . esc_attr($term->name) . '"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M180-180h44l443-443-44-44-443 443v44Zm614-486L666-794l42-42q17-17 42-17t42 17l44 44q17 17 17 42t-17 42l-42 42Zm-42 42L204-120H120v-84l396-396 84 84Zm-42-42-44-44 22 22 44 44-22-22Z"/></svg></button>';
-		echo '<button type="button" class="fs-media-folder-delete-btn" aria-label="' . esc_attr__('Delete folder', 'fromscratch') . '" data-folder-name="' . esc_attr($term->name) . '" data-folder-count="' . $display_count . '" data-delete-url="' . esc_url($delete_url) . '"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M480-424 284-228q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536-480l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480-424Z"/></svg></button>';
+		echo '<button type="button" class="fs-media-folder-edit-btn" aria-label="' . esc_attr__('Rename folder', 'fromscratch') . '" data-term-id="' . esc_attr((string) $term_id) . '" data-folder-name="' . esc_attr($term->name) . '"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M160-120q-17 0-28.5-11.5T120-160v-97q0-16 6-30.5t17-25.5l505-504q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L313-143q-11 11-25.5 17t-30.5 6h-97Zm544-528 56-56-56-56-56 56 56 56Z"/></svg></button>';
+		echo '<button type="button" class="fs-media-folder-delete-btn" aria-label="' . esc_attr__('Delete folder', 'fromscratch') . '" data-folder-name="' . esc_attr($term->name) . '" data-folder-count="' . $display_count . '" data-delete-url="' . esc_url($delete_url) . '"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M280-120q-33 0-56.5-23.5T200-200v-520q-17 0-28.5-11.5T160-760q0-17 11.5-28.5T200-800h160q0-17 11.5-28.5T400-840h160q17 0 28.5 11.5T600-800h160q17 0 28.5 11.5T800-760q0 17-11.5 28.5T760-720v520q0 33-23.5 56.5T680-120H280Zm148.5-171.5Q440-303 440-320v-280q0-17-11.5-28.5T400-640q-17 0-28.5 11.5T360-600v280q0 17 11.5 28.5T400-280q17 0 28.5-11.5Zm160 0Q600-303 600-320v-280q0-17-11.5-28.5T560-640q-17 0-28.5 11.5T520-600v280q0 17 11.5 28.5T560-280q17 0 28.5-11.5Z"/></svg></button>';
 		echo '</span>';
 		echo '</div>';
 		if ($has_children) {
@@ -1196,6 +1381,7 @@ add_action('admin_footer-upload.php', function (): void {
 	$folder_id = fs_media_folders_current_id();
 	$unassigned_active = fs_media_folders_is_unassigned_filter();
 	$unassigned_count = fs_media_folders_count_unassigned();
+	$all_files_count = fs_media_folders_count_all_attachments();
 	$terms = get_terms([
 		'taxonomy' => FS_MEDIA_FOLDER_TAXONOMY,
 		'hide_empty' => false,
@@ -1261,14 +1447,14 @@ add_action('admin_footer-upload.php', function (): void {
 						<button type="button" class="components-button is-small is-tertiary fs-media-folders-edit-toggle-btn" id="fs-media-folders-edit-toggle" aria-pressed="false" aria-label="<?= esc_attr__('Show folder rename buttons', 'fromscratch') ?>" title="<?= esc_attr__('Show folder rename buttons', 'fromscratch') ?>">
 							<span class="fs-media-folders-edit-toggle-btn__icon" aria-hidden="true">
 								<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
-									<path d="M180-180h44l443-443-44-44-443 443v44Zm614-486L666-794l42-42q17-17 42-17t42 17l44 44q17 17 17 42t-17 42l-42 42Zm-42 42L204-120H120v-84l396-396 84 84Zm-42-42-44-44 22 22 44 44-22-22Z" />
+									<path d="M160-120q-17 0-28.5-11.5T120-160v-97q0-16 6-30.5t17-25.5l505-504q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L313-143q-11 11-25.5 17t-30.5 6h-97Zm544-528 56-56-56-56-56 56 56 56Z" />
 								</svg>
 							</span>
 						</button>
 						<button type="button" class="components-button is-small is-tertiary fs-media-folders-delete-toggle-btn" id="fs-media-folders-delete-toggle" aria-pressed="false" aria-label="<?= esc_attr__('Show folder delete buttons', 'fromscratch') ?>" title="<?= esc_attr__('Show folder delete buttons', 'fromscratch') ?>">
 							<span class="fs-media-folders-delete-toggle-btn__icon" aria-hidden="true">
 								<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
-									<path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" />
+									<path d="M280-120q-33 0-56.5-23.5T200-200v-520q-17 0-28.5-11.5T160-760q0-17 11.5-28.5T200-800h160q0-17 11.5-28.5T400-840h160q17 0 28.5 11.5T600-800h160q17 0 28.5 11.5T800-760q0 17-11.5 28.5T760-720v520q0 33-23.5 56.5T680-120H280Zm148.5-171.5Q440-303 440-320v-280q0-17-11.5-28.5T400-640q-17 0-28.5 11.5T360-600v280q0 17 11.5 28.5T400-280q17 0 28.5-11.5Zm160 0Q600-303 600-320v-280q0-17-11.5-28.5T560-640q-17 0-28.5 11.5T520-600v280q0 17 11.5 28.5T560-280q17 0 28.5-11.5Z" />
 								</svg>
 							</span>
 						</button>
@@ -1293,6 +1479,7 @@ add_action('admin_footer-upload.php', function (): void {
 					<button type="button" class="fs-media-folders-link fs-media-folders-link--all" data-fs-all-url="<?= esc_url($all_files_url) ?>">
 						<span class="fs-media-folders-item-icon fs-media-folders-item-icon--all" aria-hidden="true"><?php echo fs_media_folders_icon_svg('all'); ?></span>
 						<span class="fs-media-folders-link-label"><?= esc_html__('All files', 'fromscratch') ?></span>
+						<span class="count"><?= esc_html((string) (int) $all_files_count) ?></span>
 					</button>
 				</div>
 			</li>
@@ -1554,6 +1741,7 @@ add_action('admin_footer-upload.php', function (): void {
 					wrap.insertBefore(toggleButton, layout);
 				}
 			}
+
 			function retryPlaceToggleNearViewSwitch() {
 				placeUploadFoldersToggleNextToViewSwitch();
 			}
@@ -1851,6 +2039,7 @@ add_action('admin_footer-upload.php', function (): void {
 					openCreateModal();
 				});
 			}
+
 			function fsSetFolderDeleteMode(on) {
 				if (!sidebar || !deleteToggleBtn) {
 					return;
@@ -1938,6 +2127,7 @@ add_action('admin_footer-upload.php', function (): void {
 						return r.json();
 					}).then(function(payload) {
 						assignSaveBtn.disabled = false;
+
 						function showNotice(t, m) {
 							if (typeof window.fsAdminNoticeShow === 'function' && m) {
 								window.fsAdminNoticeShow(t, m);
