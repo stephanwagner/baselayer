@@ -293,6 +293,12 @@ body.fs-feature-media-folders {
       .media-toolbar-primary.search-form {
         float: none;
         margin-left: auto;
+
+        @media (min-width: calc(900px + 1px)) {
+          position: absolute;
+          right: 16px;
+          top: 0;
+        }
       }
     }
   }
