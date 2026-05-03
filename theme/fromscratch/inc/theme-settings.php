@@ -974,7 +974,7 @@ function theme_settings_page(): void
 				$fs_show_on_front = ($fs_show_on_front === 'page') ? 'page' : 'posts';
 				?>
 				<h2 class="title"><?= esc_html__('General', 'fromscratch') ?></h2>
-				<table class="form-table" role="presentation">
+				<table class="form-table" style="margin-top: -8px;" role="presentation">
 					<tr>
 						<th scope="row"><?= esc_html(__('Your homepage displays', 'default')) ?></th>
 						<td>
@@ -992,9 +992,9 @@ function theme_settings_page(): void
 										<?= esc_html(__('A static page (select below)', 'default')) ?>
 									</label>
 								</p>
-								<ul id="fs-homepage-static-fields" style="margin: 12px 0 0 24px; list-style: none; padding: 0;">
-									<li style="margin-bottom: 12px;">
-										<label for="page_on_front"><?php echo esc_html(__('Homepage', 'default')); ?>:</label>
+								<ul id="fs-homepage-static-fields" style="margin: 0 0 0 24px; list-style: none; padding: 0;">
+									<li style="margin-bottom: 8px;">
+										<label for="page_on_front"><?php echo esc_html(__('Homepage', 'default')); ?>:</label><br>
 										<?php
 										wp_dropdown_pages([
 											'name' => 'page_on_front',
@@ -1007,7 +1007,7 @@ function theme_settings_page(): void
 										?>
 									</li>
 									<li>
-										<label for="page_for_posts"><?php echo esc_html(__('Posts page', 'default')); ?>:</label>
+										<label for="page_for_posts"><?php echo esc_html(__('Posts page', 'default')); ?>:</label><br>
 										<?php
 										wp_dropdown_pages([
 											'name' => 'page_for_posts',
