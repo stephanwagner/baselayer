@@ -65,6 +65,81 @@ function fs_extract_scss_root_block(string $scss): string
 }
 
 /**
+ * Turn SCSS line-style comments (slash-slash) into CSS block comments for display (strings respected; asterisk-slash in comment text is neutralized).
+ *
+ * @param string $scss SCSS/CSS fragment.
+ * @return string
+ */
+function fs_scss_line_comments_to_css_block(string $scss): string
+{
+	$len = strlen($scss);
+	$out = '';
+	$i = 0;
+	while ($i < $len) {
+		$c = $scss[$i];
+		if ($c === "'") {
+			$out .= $c;
+			$i++;
+			while ($i < $len) {
+				$ch = $scss[$i];
+				$out .= $ch;
+				if ($ch === '\\' && $i + 1 < $len) {
+					$i++;
+					$out .= $scss[$i];
+				} elseif ($ch === "'") {
+					break;
+				}
+				$i++;
+			}
+			$i++;
+			continue;
+		}
+		if ($c === '"') {
+			$out .= $c;
+			$i++;
+			while ($i < $len) {
+				$ch = $scss[$i];
+				$out .= $ch;
+				if ($ch === '\\' && $i + 1 < $len) {
+					$i++;
+					$out .= $scss[$i];
+				} elseif ($ch === '"') {
+					break;
+				}
+				$i++;
+			}
+			$i++;
+			continue;
+		}
+		if ($c === '/' && ($i + 1) < $len && $scss[$i + 1] === '/') {
+			$i += 2;
+			$comment = '';
+			while ($i < $len && $scss[$i] !== "\n" && $scss[$i] !== "\r") {
+				$comment .= $scss[$i];
+				$i++;
+			}
+			$comment = trim($comment);
+			if ($comment !== '') {
+				$comment = str_replace('*/', '* /', $comment);
+				$out .= '/* ' . $comment . ' */';
+			}
+			if ($i < $len && $scss[$i] === "\r") {
+				$out .= "\r";
+				$i++;
+			}
+			if ($i < $len && $scss[$i] === "\n") {
+				$out .= "\n";
+				$i++;
+			}
+			continue;
+		}
+		$out .= $c;
+		$i++;
+	}
+	return $out;
+}
+
+/**
  * Contents of `src/scss/_variables.scss` — the `:root { … }` block only (for documentation in admin).
  *
  * @return string
@@ -80,7 +155,11 @@ function fs_variables_scss_root_block(): string
 		return '';
 	}
 	$block = fs_extract_scss_root_block($raw);
-	return is_string($block) ? trim($block) : '';
+	if (!is_string($block) || $block === '') {
+		return '';
+	}
+	$block = trim($block);
+	return fs_scss_line_comments_to_css_block($block);
 }
 
 /**

@@ -246,17 +246,14 @@ msgstr "Eigenes CSS"
 msgid "Custom CSS runs last and overrides theme styles."
 msgstr "Eigenes CSS wird zuletzt geladen und überschreibt die Theme-Styles."
 
-msgid "All CSS variables are available, e.g. var(--color-primary)."
-msgstr "Alle CSS-Variablen sind verfügbar, z. B. var(--color-primary)."
+msgid "All CSS variables are available, e.g. %s:"
+msgstr "Alle CSS-Variablen sind verfügbar, z. B. %s:"
 
 msgid "Variable overview"
 msgstr "Variablenübersicht"
 
-msgid "CSS variables (:root)"
-msgstr "CSS-Variablen (:root)"
-
-msgid "Parsed from src/scss/_variables.scss in the theme."
-msgstr "Aus src/scss/_variables.scss im Theme gelesen."
+msgid "CSS variables"
+msgstr "CSS-Variablen"
 
 msgid "Could not read the :root block from _variables.scss."
 msgstr "Der :root-Block aus _variables.scss konnte nicht gelesen werden."

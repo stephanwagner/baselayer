@@ -129,25 +129,32 @@ body.fs-css-vars-overview-modal-active {
   margin: 0 0 12px !important;
 }
 
-.fs-css-vars-overview-pre {
+.fs-css-vars-overview-editor-wrap {
   margin: 0;
-  padding: 12px 14px;
-  overflow: auto;
-  max-height: min(520px, 58vh);
-  background: #f6f7f7;
   border: 1px solid #dcdcde;
   border-radius: 2px;
-  font-family: Consolas, Monaco, monospace;
-  font-size: 12px;
-  line-height: 1.45;
-  white-space: pre;
-  tab-size: 2;
+  overflow: hidden;
+  background: #f6f7f7;
 
-  code {
-    font-family: inherit;
-    font-size: inherit;
-    line-height: inherit;
-    white-space: inherit;
+  textarea {
+    margin: 0;
+    width: 100%;
+    box-sizing: border-box;
+    resize: vertical;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 12px;
+    line-height: 1.45;
+    tab-size: 2;
+  }
+
+  .CodeMirror {
+    height: auto;
+    max-height: min(520px, 58vh);
+    font-size: 12px;
+  }
+
+  .CodeMirror-scroll {
+    max-height: min(520px, 58vh);
   }
 }
 

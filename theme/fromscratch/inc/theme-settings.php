@@ -277,6 +277,22 @@ add_action('admin_enqueue_scripts', function ($hook_suffix) {
 		'jQuery(function() { if (wp.codeEditor && document.getElementById("fromscratch_custom_css")) { wp.codeEditor.initialize("fromscratch_custom_css", %s); } });',
 		wp_json_encode($settings)
 	));
+
+	$overview_settings = $settings;
+	if (is_array($overview_settings)) {
+		$codemirror = isset($overview_settings['codemirror']) && is_array($overview_settings['codemirror'])
+			? $overview_settings['codemirror']
+			: [];
+		$codemirror['readOnly'] = true;
+		$overview_settings['codemirror'] = $codemirror;
+	}
+	wp_add_inline_script(
+		'code-editor',
+		sprintf(
+			'jQuery(function() { if (wp.codeEditor && document.getElementById("fs-css-vars-overview-code")) { wp.codeEditor.initialize("fs-css-vars-overview-code", %s); } });',
+			wp_json_encode($overview_settings)
+		)
+	);
 }, 10);
 
 // Redirect when access to requested tab is denied
@@ -1327,7 +1343,8 @@ function theme_settings_page(): void
 				$redirect_method = function_exists('fs_config_redirects') ? fs_config_redirects('method') : 'wordpress';
 				if (
 					function_exists('fs_can_use_htaccess_redirects') && fs_can_use_htaccess_redirects() &&
-					$redirect_method === 'wordpress'
+					$redirect_method === 'wordpress' &&
+					function_exists('fs_is_developer_user') && fs_is_developer_user((int) get_current_user_id())
 				) : ?>
 					<div class="notice notice-info inline">
 						<p><?= esc_html__('You are running Apache. For better performance, you can set the redirect method to htaccess in config/theme.php under redirects.', 'fromscratch') ?></p>
@@ -1410,7 +1427,18 @@ function theme_settings_page(): void
 				<h2 class="title"><?= esc_html__('Custom CSS', 'fromscratch') ?></h2>
 				<p class="description"><?= esc_html__('Custom CSS runs last and overrides theme styles.', 'fromscratch') ?></p>
 				<p class="description">
-					<?= esc_html__('All CSS variables are available, e.g. var(--color-primary).', 'fromscratch') ?>
+					<?php
+					echo wp_kses(
+						sprintf(
+							/* translators: %s: example CSS variable usage (wrapped in code.fs-code-small). */
+							__('All CSS variables are available, e.g. %s:', 'fromscratch'),
+							'<code class="fs-code-small">' . esc_html('var(--color-primary)') . '</code>'
+						),
+						[
+							'code' => ['class' => true],
+						]
+					);
+					?>
 					<button type="button" class="button-link fs-css-vars-overview-open" id="fs-css-vars-overview-open" aria-haspopup="dialog" aria-controls="fs-css-vars-overview-modal"><?= esc_html__('Variable overview', 'fromscratch') ?></button>
 				</p>
 				<table class="form-table" style="margin-top: 24px;" role="presentation">
@@ -1433,10 +1461,11 @@ function theme_settings_page(): void
 			<div id="fs-css-vars-overview-modal" class="fs-css-vars-overview-modal" aria-hidden="true">
 				<div class="fs-css-vars-overview-backdrop" data-fs-css-vars-overview-close tabindex="-1"></div>
 				<div class="fs-css-vars-overview-dialog" role="dialog" aria-modal="true" aria-labelledby="fs-css-vars-overview-title" tabindex="-1">
-					<h2 id="fs-css-vars-overview-title" class="fs-css-vars-overview-title"><?= esc_html__('CSS variables (:root)', 'fromscratch') ?></h2>
-					<p class="description fs-css-vars-overview-source"><?= esc_html__('Parsed from src/scss/_variables.scss in the theme.', 'fromscratch') ?></p>
+					<h2 id="fs-css-vars-overview-title" class="fs-css-vars-overview-title"><?= esc_html__('CSS variables', 'fromscratch') ?></h2>
 					<?php if ($fs_variables_root_preview !== '') : ?>
-						<pre class="fs-css-vars-overview-pre"><code><?= esc_html($fs_variables_root_preview) ?></code></pre>
+						<div class="fs-css-vars-overview-editor-wrap">
+							<textarea id="fs-css-vars-overview-code" readonly rows="14" class="large-text code" autocomplete="off"><?= esc_textarea($fs_variables_root_preview) ?></textarea>
+						</div>
 					<?php else : ?>
 						<p class="fs-css-vars-overview-empty"><?= esc_html__('Could not read the :root block from _variables.scss.', 'fromscratch') ?></p>
 					<?php endif; ?>
@@ -1458,6 +1487,12 @@ function theme_settings_page(): void
 						if (dialog) {
 							dialog.focus();
 						}
+						window.setTimeout(function() {
+							var cmEl = modal.querySelector('.fs-css-vars-overview-editor-wrap .CodeMirror');
+							if (cmEl && cmEl.CodeMirror) {
+								cmEl.CodeMirror.refresh();
+							}
+						}, 100);
 					}
 					function closeModal() {
 						modal.classList.remove('is-open');
