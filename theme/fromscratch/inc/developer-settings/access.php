@@ -78,7 +78,7 @@ function fs_render_developer_access(): void
 			'options_privacy' => __('Privacy', 'fromscratch'),
 		]],
 		['title' => __('Theme settings', 'fromscratch'), 'items' => [
-			'theme_settings_general' => __('General', 'fromscratch'),
+			'theme_settings_general' => __('Theme', 'fromscratch'),
 			'theme_settings_texts' => __('Content', 'fromscratch'),
 			'theme_settings_css' => __('CSS', 'fromscratch'),
 			'theme_settings_redirects' => __('Redirects', 'fromscratch'),
@@ -86,7 +86,7 @@ function fs_render_developer_access(): void
 	];
 	?>
 	<div class="wrap">
-		<h1><?= esc_html(__('Developer settings', 'fromscratch')) ?></h1>
+		<?php fs_developer_settings_screen_heading(); ?>
 		<?php if ($access_saved !== false) : ?>
 			<div class="notice notice-success is-dismissible">
 				<p><strong><?= esc_html(__('Settings saved.', 'fromscratch')) ?></strong></p>

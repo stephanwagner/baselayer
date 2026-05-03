@@ -101,7 +101,7 @@ function fs_render_developer_languages(): void
 	}
 ?>
 	<div class="wrap">
-		<h1><?= esc_html(__('Developer settings', 'fromscratch')) ?></h1>
+		<?php fs_developer_settings_screen_heading(); ?>
 		<?php if ($languages_saved !== false) : ?>
 			<div class="notice notice-success is-dismissible">
 				<p><strong><?= esc_html(__('Settings saved.', 'fromscratch')) ?></strong></p>

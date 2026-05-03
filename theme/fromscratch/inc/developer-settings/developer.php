@@ -36,7 +36,7 @@ function fs_render_developer_cheatsheet(): void
 
 ?>
 	<div class="wrap">
-		<h1><?= esc_html(__('Developer settings', 'fromscratch')) ?></h1>
+		<?php fs_developer_settings_screen_heading(); ?>
 		<?php fs_developer_settings_render_nav(); ?>
 
 		<?php

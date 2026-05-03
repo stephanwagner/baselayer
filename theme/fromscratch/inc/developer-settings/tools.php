@@ -100,7 +100,7 @@ function fs_render_developer_tools(): void
 	$revisions_total = (int) $wpdb->get_var("SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = 'revision'");
 	?>
 	<div class="wrap">
-		<h1><?= esc_html(__('Developer settings', 'fromscratch')) ?></h1>
+		<?php fs_developer_settings_screen_heading(); ?>
 		<?php foreach ($notices as $msg) : ?>
 			<div class="notice notice-success is-dismissible">
 				<p><strong><?= esc_html($msg) ?></strong></p>

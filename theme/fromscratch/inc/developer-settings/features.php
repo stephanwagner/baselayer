@@ -76,7 +76,7 @@ function fs_render_developer_features(): void
 	$webp_enabled_no_support = ($feat('enable_webp') === 1 && !fs_webp_supported());
 ?>
 	<div class="wrap">
-		<h1><?= esc_html(__('Developer settings', 'fromscratch')) ?></h1>
+		<?php fs_developer_settings_screen_heading(); ?>
 
 		<?php if ($features_saved !== false) : ?>
 			<div class="notice notice-success is-dismissible">

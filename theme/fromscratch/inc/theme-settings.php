@@ -3,17 +3,74 @@
 defined('ABSPATH') || exit;
 
 /**
- * Theme settings page: Settings → Theme.
+ * Theme settings page under Settings (titles use core-style “Settings › …”).
  * Developer-first: some tabs/sections are only visible to users with developer rights.
  */
 
 /** Tab definitions: slug => [ 'label' => string, 'developer_only' => bool ] */
 const FS_THEME_SETTINGS_TABS = [
-	'general'   => ['label' => 'General', 'developer_only' => false],
-	'texts'     => ['label' => 'Content', 'developer_only' => false],
+	'theme'     => ['label' => 'Theme', 'developer_only' => false],
+	'content'   => ['label' => 'Content', 'developer_only' => false],
 	'css'       => ['label' => 'CSS', 'developer_only' => false],
 	'redirects' => ['label' => 'Redirects', 'developer_only' => false],
 ];
+
+/**
+ * Sub-tab query arg: use `fs_tab`, not `tab`, so slug `theme` is not mixed with core `tab` handling.
+ */
+const FS_THEME_SETTINGS_TAB_QUERY_VAR = 'fs_tab';
+
+/** Tab slug => User rights key (Developer → User rights). */
+const FS_THEME_SETTINGS_TAB_ACCESS = [
+	'theme'     => 'theme_settings_general',
+	'content'   => 'theme_settings_texts',
+	'css'       => 'theme_settings_css',
+	'redirects' => 'theme_settings_redirects',
+];
+
+/**
+ * Current Theme settings sub-tab from the request (empty if none; callers default to first available tab).
+ */
+function fs_theme_settings_request_tab_slug(): string
+{
+	$k = FS_THEME_SETTINGS_TAB_QUERY_VAR;
+	if (!isset($_GET[$k]) || (string) $_GET[$k] === '') {
+		return '';
+	}
+	return sanitize_key((string) wp_unslash($_GET[$k]));
+}
+
+/**
+ * URL to Theme settings with a given sub-tab (e.g. theme, content, css, redirects).
+ */
+function fs_theme_settings_url_with_tab(string $slug): string
+{
+	return add_query_arg(
+		[
+			'page' => 'fs-theme-settings',
+			FS_THEME_SETTINGS_TAB_QUERY_VAR => $slug,
+		],
+		admin_url('options-general.php')
+	);
+}
+
+function fs_theme_settings_is_settings_page_post(): bool
+{
+	if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+		return false;
+	}
+	global $pagenow;
+	return $pagenow === 'options-general.php' && isset($_GET['page']) && $_GET['page'] === 'fs-theme-settings';
+}
+
+/**
+ * POST body targets the Theme sub-tab (homepage, weekly report, etc.); action URL may omit fs_tab when empty.
+ */
+function fs_theme_settings_post_is_theme_tab(): bool
+{
+	$tab = fs_theme_settings_request_tab_slug();
+	return $tab === '' || $tab === 'theme';
+}
 
 function fs_theme_settings_available_tabs(): array
 {
@@ -24,16 +81,7 @@ function fs_theme_settings_available_tabs(): array
 			continue;
 		}
 		if (function_exists('fs_admin_can_access')) {
-			$access_key = null;
-			if ($slug === 'general') {
-				$access_key = 'theme_settings_general';
-			} elseif ($slug === 'texts') {
-				$access_key = 'theme_settings_texts';
-			} elseif ($slug === 'css') {
-				$access_key = 'theme_settings_css';
-			} elseif ($slug === 'redirects') {
-				$access_key = 'theme_settings_redirects';
-			}
+			$access_key = FS_THEME_SETTINGS_TAB_ACCESS[$slug] ?? null;
 			if ($access_key !== null && !fs_admin_can_access($access_key)) {
 				continue;
 			}
@@ -46,20 +94,33 @@ function fs_theme_settings_available_tabs(): array
 function fs_theme_settings_current_tab(): string
 {
 	$available = array_keys(fs_theme_settings_available_tabs());
-	$requested = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : '';
+	$requested = fs_theme_settings_request_tab_slug();
 	if ($requested !== '' && in_array($requested, $available, true)) {
 		return $requested;
 	}
-	return $available[0] ?? 'general';
+	return $available[0] ?? 'theme';
+}
+
+/**
+ * Admin screen title like WordPress core (e.g. Einstellungen › Allgemein): translated Settings + › + segment(s).
+ *
+ * @param string ...$parts Labels shown after “Settings ›”.
+ */
+function fs_admin_settings_submenu_title(string ...$parts): string
+{
+	$filtered = [];
+	foreach ($parts as $p) {
+		if ($p !== null && $p !== '') {
+			$filtered[] = $p;
+		}
+	}
+	$suffix = implode(' › ', $filtered);
+	return __('Settings', 'default') . ' › ' . $suffix;
 }
 
 // Redirects form (self-POST to avoid options.php redirect flicker). Use admin_init so we run regardless of load-hook.
 add_action('admin_init', function () {
-	global $pagenow;
-	if (!current_user_can('manage_options') || $_SERVER['REQUEST_METHOD'] !== 'POST') {
-		return;
-	}
-	if ($pagenow !== 'options-general.php' || (isset($_GET['page']) ? $_GET['page'] : '') !== 'fs-theme-settings') {
+	if (!current_user_can('manage_options') || !fs_theme_settings_is_settings_page_post()) {
 		return;
 	}
 	if (empty($_POST['fromscratch_save_redirects']) || empty($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], 'fromscratch_save_redirects')) {
@@ -69,17 +130,13 @@ add_action('admin_init', function () {
 	$sanitized = fs_sanitize_redirects($value);
 	update_option('fs_redirects', $sanitized);
 	set_transient('fromscratch_redirects_saved', '1', 30);
-	wp_safe_redirect(admin_url('options-general.php?page=fs-theme-settings&tab=redirects'));
+	wp_safe_redirect(fs_theme_settings_url_with_tab('redirects'));
 	exit;
 }, 1);
 
 // CSS form (self-POST to avoid options.php redirect flicker)
 add_action('admin_init', function () {
-	global $pagenow;
-	if (!current_user_can('manage_options') || $_SERVER['REQUEST_METHOD'] !== 'POST') {
-		return;
-	}
-	if ($pagenow !== 'options-general.php' || (isset($_GET['page']) ? $_GET['page'] : '') !== 'fs-theme-settings') {
+	if (!current_user_can('manage_options') || !fs_theme_settings_is_settings_page_post()) {
 		return;
 	}
 	if (empty($_POST['fromscratch_save_css']) || empty($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], 'fromscratch_save_css')) {
@@ -89,12 +146,12 @@ add_action('admin_init', function () {
 	$sanitized = fs_sanitize_custom_css($value);
 	update_option('fromscratch_custom_css', $sanitized);
 	set_transient('fromscratch_css_saved', '1', 30);
-	wp_safe_redirect(admin_url('options-general.php?page=fs-theme-settings&tab=css'));
+	wp_safe_redirect(fs_theme_settings_url_with_tab('css'));
 	exit;
 }, 1);
 
 /**
- * Persist General-tab fields (explicit list; avoids get_registered_settings before register_setting runs).
+ * Persist Theme sub-tab fields (explicit list; avoids get_registered_settings before register_setting runs).
  */
 function fs_theme_settings_save_general_options_from_post(): void
 {
@@ -152,23 +209,12 @@ function fs_theme_settings_save_general_options_from_post(): void
 	}
 }
 
-// General tab (self-POST): save stays on Theme settings; no redirect to options.php.
+// Theme sub-tab (self-POST): save stays on Theme settings; no redirect to options.php.
 add_action('admin_init', function (): void {
-	global $pagenow;
-	if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+	if (!current_user_can('manage_options') || !fs_theme_settings_is_settings_page_post() || !fs_theme_settings_post_is_theme_tab()) {
 		return;
 	}
-	if ($pagenow !== 'options-general.php' || (isset($_GET['page']) ? $_GET['page'] : '') !== 'fs-theme-settings') {
-		return;
-	}
-	$tab = isset($_GET['tab']) ? sanitize_key((string) $_GET['tab']) : 'general';
-	if ($tab !== 'general') {
-		return;
-	}
-	if (!current_user_can('manage_options')) {
-		return;
-	}
-	$url = admin_url('options-general.php?page=fs-theme-settings&tab=general');
+	$url = fs_theme_settings_url_with_tab('theme');
 
 	if (($_POST['action'] ?? '') === 'update' && ($_POST['option_page'] ?? '') === FS_THEME_OPTION_GROUP_GENERAL) {
 		check_admin_referer(FS_THEME_OPTION_GROUP_GENERAL . '-options');
@@ -182,17 +228,9 @@ add_action('admin_init', function (): void {
 	}
 }, 20);
 
-// General tab: send the full weekly report immediately (manual send, same content as cron).
+// Theme sub-tab: send the full weekly report immediately (manual send, same content as cron).
 add_action('admin_init', function () {
-	global $pagenow;
-	if (!current_user_can('manage_options') || $_SERVER['REQUEST_METHOD'] !== 'POST') {
-		return;
-	}
-	if ($pagenow !== 'options-general.php' || (isset($_GET['page']) ? $_GET['page'] : '') !== 'fs-theme-settings') {
-		return;
-	}
-	$tab = isset($_GET['tab']) ? sanitize_key((string) $_GET['tab']) : 'general';
-	if ($tab !== 'general') {
+	if (!current_user_can('manage_options') || !fs_theme_settings_is_settings_page_post() || !fs_theme_settings_post_is_theme_tab()) {
 		return;
 	}
 	if (empty($_POST['fromscratch_send_weekly_report_to_developer'])) {
@@ -201,7 +239,7 @@ add_action('admin_init', function () {
 	if (empty($_POST['_wpnonce']) || !wp_verify_nonce((string) $_POST['_wpnonce'], 'fromscratch_send_weekly_report_to_developer')) {
 		return;
 	}
-	$url = admin_url('options-general.php?page=fs-theme-settings&tab=general');
+	$url = fs_theme_settings_url_with_tab('theme');
 	$posted = isset($_POST['fromscratch_weekly_report_manual_recipient'])
 		? sanitize_email(wp_unslash((string) $_POST['fromscratch_weekly_report_manual_recipient']))
 		: '';
@@ -251,14 +289,14 @@ add_action('wp_ajax_fromscratch_toggle_content_developer_options', function () {
 	wp_send_json_success(['visible' => $visible]);
 });
 
-// Ensure media modal is available on General tab (client logo, OG image) and Content tab (image fields).
+// Ensure media modal is available on Theme sub-tab (client logo, OG image) and Content tab (image fields).
 add_action('admin_enqueue_scripts', function ($hook_suffix) {
 	if ($hook_suffix !== 'settings_page_fs-theme-settings') {
 		return;
 	}
-	$can_general = current_user_can('manage_options') && (!function_exists('fs_admin_can_access') || fs_admin_can_access('theme_settings_general'));
-	$can_content = current_user_can('manage_options') && (!function_exists('fs_admin_can_access') || fs_admin_can_access('theme_settings_texts'));
-	if (!$can_general && !$can_content) {
+	$can_theme = current_user_can('manage_options') && (!function_exists('fs_admin_can_access') || fs_admin_can_access('theme_settings_general'));
+	$can_content_tab = current_user_can('manage_options') && (!function_exists('fs_admin_can_access') || fs_admin_can_access('theme_settings_texts'));
+	if (!$can_theme && !$can_content_tab) {
 		return;
 	}
 	wp_enqueue_media();
@@ -269,7 +307,7 @@ add_action('admin_enqueue_scripts', function ($hook_suffix) {
 	if ($hook_suffix !== 'settings_page_fs-theme-settings') {
 		return;
 	}
-	$tab = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : '';
+	$tab = fs_theme_settings_request_tab_slug();
 	if ($tab !== 'css') {
 		return;
 	}
@@ -309,7 +347,7 @@ add_action('load-settings_page_fs-theme-settings', function () {
 	if (!current_user_can('manage_options')) {
 		return;
 	}
-	$requested = isset($_GET['tab']) ? sanitize_key($_GET['tab']) : '';
+	$requested = fs_theme_settings_request_tab_slug();
 	if ($requested === '') {
 		return;
 	}
@@ -317,28 +355,16 @@ add_action('load-settings_page_fs-theme-settings', function () {
 		wp_safe_redirect(admin_url('options-general.php?page=fs-theme-settings'));
 		exit;
 	}
-	if ($requested === 'general') {
-		if (function_exists('fs_admin_can_access') && !fs_admin_can_access('theme_settings_general')) {
-			wp_safe_redirect(admin_url('options-general.php?page=fs-theme-settings'));
-			exit;
-		}
+	$access_key = FS_THEME_SETTINGS_TAB_ACCESS[$requested] ?? null;
+	if ($access_key === null || !function_exists('fs_admin_can_access') || fs_admin_can_access($access_key)) {
 		return;
 	}
-	if (!function_exists('fs_admin_can_access')) {
-		return;
-	}
-	$access_key = null;
-	if ($requested === 'texts') {
-		$access_key = 'theme_settings_texts';
-	} elseif ($requested === 'css') {
-		$access_key = 'theme_settings_css';
-	} elseif ($requested === 'redirects') {
-		$access_key = 'theme_settings_redirects';
-	}
-	if ($access_key !== null && !fs_admin_can_access($access_key)) {
-		wp_safe_redirect(admin_url('options-general.php?page=fs-theme-settings&tab=general'));
-		exit;
-	}
+	wp_safe_redirect(
+		$requested === 'theme'
+			? admin_url('options-general.php?page=fs-theme-settings')
+			: fs_theme_settings_url_with_tab('theme')
+	);
+	exit;
 }, 1);
 
 const FS_THEME_OPTION_GROUP_GENERAL = 'fs_theme_general';
@@ -902,7 +928,6 @@ function theme_settings_page(): void
 	}
 	$tab = fs_theme_settings_current_tab();
 	$available_tabs = fs_theme_settings_available_tabs();
-	$base_url = admin_url('options-general.php?page=fs-theme-settings');
 
 	$bump_notice = get_transient('fromscratch_bump_notice');
 	if ($bump_notice !== false) {
@@ -930,7 +955,7 @@ function theme_settings_page(): void
 	}
 ?>
 	<div class="wrap">
-		<h1><?= esc_html__('Theme settings', 'fromscratch') ?></h1>
+		<h1><?= esc_html(fs_admin_settings_submenu_title(__('Theme', 'fromscratch'))) ?></h1>
 		<?php
 		$notices = [];
 		if ($redirects_saved !== false || $css_saved !== false || $general_saved !== false) {
@@ -948,15 +973,15 @@ function theme_settings_page(): void
 			</div>
 		<?php endforeach; ?>
 
-		<?php if (count($available_tabs) > 1) : ?>
+		<?php if (!empty($available_tabs)) : ?>
 			<nav class="nav-tab-wrapper wp-clearfix" aria-label="Secondary menu">
 				<?php foreach ($available_tabs as $slug => $label) : ?>
-					<a href="<?= esc_url(add_query_arg('tab', $slug, $base_url)) ?>" class="nav-tab <?= $tab === $slug ? 'nav-tab-active' : '' ?>"><?= esc_html(__($label, 'fromscratch')) ?></a>
+					<a href="<?= esc_url(fs_theme_settings_url_with_tab($slug)) ?>" class="nav-tab <?= $tab === $slug ? 'nav-tab-active' : '' ?>"><?= esc_html(__($label, 'fromscratch')) ?></a>
 				<?php endforeach; ?>
 			</nav>
 		<?php endif; ?>
 
-		<?php if ($tab === 'general') : ?>
+		<?php if ($tab === 'theme') : ?>
 			<?php
 			$client_logo_id = (int) get_option('fromscratch_client_logo', 0);
 			$client_logo_url = $client_logo_id > 0 ? wp_get_attachment_image_url($client_logo_id, 'medium') : '';
@@ -967,13 +992,12 @@ function theme_settings_page(): void
 				? (string) $_weekly_sender->user_email
 				: (function_exists('fs_developer_email') ? fs_developer_email() : '');
 			?>
-			<form method="post" action="<?= esc_url(admin_url('options-general.php?page=fs-theme-settings&tab=general')) ?>" class="fs-page-settings-form">
+			<form method="post" action="<?= esc_url(fs_theme_settings_url_with_tab('theme')) ?>" class="fs-page-settings-form">
 				<?php settings_fields(FS_THEME_OPTION_GROUP_GENERAL); ?>
 				<?php
 				$fs_show_on_front = get_option('show_on_front');
 				$fs_show_on_front = ($fs_show_on_front === 'page') ? 'page' : 'posts';
 				?>
-				<h2 class="title"><?= esc_html__('General', 'fromscratch') ?></h2>
 				<table class="form-table" style="margin-top: -8px;" role="presentation">
 					<tr>
 						<th scope="row"><?= esc_html(__('Your homepage displays', 'default')) ?></th>
@@ -1177,11 +1201,11 @@ function theme_settings_page(): void
 					<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
 				</div>
 			</form>
-			<form method="post" action="<?= esc_url(admin_url('options-general.php?page=fs-theme-settings&tab=general')) ?>" id="fs-send-weekly-report-to-developer" style="display:none;">
+			<form method="post" action="<?= esc_url(fs_theme_settings_url_with_tab('theme')) ?>" id="fs-send-weekly-report-to-developer" style="display:none;">
 				<?php wp_nonce_field('fromscratch_send_weekly_report_to_developer'); ?>
 				<input type="hidden" name="fromscratch_send_weekly_report_to_developer" value="1">
 			</form>
-		<?php elseif ($tab === 'texts') : ?>
+		<?php elseif ($tab === 'content') : ?>
 			<form method="post" action="options.php" class="fs-page-settings-form" id="fs-content-form">
 				<?php
 				$content_tabs = fs_config_settings('content.tabs');
@@ -1420,7 +1444,7 @@ function theme_settings_page(): void
 				];
 			}
 			?>
-			<form method="post" action="<?= esc_url(admin_url('options-general.php?page=fs-theme-settings&tab=redirects')) ?>" class="fs-page-settings-form" id="fs-redirects-form">
+			<form method="post" action="<?= esc_url(fs_theme_settings_url_with_tab('redirects')) ?>" class="fs-page-settings-form" id="fs-redirects-form">
 				<?php wp_nonce_field('fromscratch_save_redirects'); ?>
 				<input type="hidden" name="fromscratch_save_redirects" value="1">
 				<?php
@@ -1505,7 +1529,7 @@ function theme_settings_page(): void
 				})();
 			</script>
 		<?php elseif ($tab === 'css') : ?>
-			<form method="post" action="<?= esc_url(admin_url('options-general.php?page=fs-theme-settings&tab=css')) ?>" class="fs-page-settings-form">
+			<form method="post" action="<?= esc_url(fs_theme_settings_url_with_tab('css')) ?>" class="fs-page-settings-form">
 				<?php wp_nonce_field('fromscratch_save_css'); ?>
 				<input type="hidden" name="fromscratch_save_css" value="1">
 				<h2 class="title"><?= esc_html__('Custom CSS', 'fromscratch') ?></h2>
@@ -1867,8 +1891,7 @@ function fs_theme_settings_has_any_access(): bool
 	if (!function_exists('fs_admin_can_access')) {
 		return true;
 	}
-	$keys = ['theme_settings_general', 'theme_settings_texts', 'theme_settings_css', 'theme_settings_redirects'];
-	foreach ($keys as $key) {
+	foreach (array_values(FS_THEME_SETTINGS_TAB_ACCESS) as $key) {
 		if (fs_admin_can_access($key)) {
 			return true;
 		}
@@ -1895,6 +1918,11 @@ function add_theme_settings_menu_item(): void
 	);
 }
 add_action('admin_menu', 'add_theme_settings_menu_item', 1);
+
+add_action('load-settings_page_fs-theme-settings', static function (): void {
+	global $title;
+	$title = fs_admin_settings_submenu_title(__('Theme', 'fromscratch'));
+});
 
 add_filter('submenu_file', function ($submenu_file, $parent_file) {
 	if ($parent_file === 'options-general.php' && isset($_GET['page']) && $_GET['page'] === 'fs-theme-settings') {

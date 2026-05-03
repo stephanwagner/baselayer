@@ -269,26 +269,15 @@ add_action('admin_menu', function () {
     return;
   }
 
-  // Admins only: move Menus from Appearance to Settings (after Theme settings).
+  // Admins only: Menus lives under Settings (not Appearance); order is finalized in fs_reorder_settings_submenu().
   remove_submenu_page('themes.php', 'nav-menus.php');
-  $menus_item = [
+  add_submenu_page(
+    'options-general.php',
+    __('Menus'),
     __('Menus'),
     'edit_theme_options',
-    admin_url('nav-menus.php'),
-  ];
-  $settings = &$submenu['options-general.php'];
-  $insert_at = null;
-  foreach ($settings as $i => $item) {
-    if (isset($item[2]) && $item[2] === 'fs-theme-settings') {
-      $insert_at = $i + 1;
-      break;
-    }
-  }
-  if ($insert_at !== null) {
-    array_splice($settings, $insert_at, 0, [$menus_item]);
-  } else {
-    $settings[] = $menus_item;
-  }
+    'nav-menus.php'
+  );
 
   if (!is_user_logged_in()) {
     return;
@@ -323,6 +312,57 @@ add_action('admin_menu', function () {
 }, 30);
 
 /**
+ * Settings submenu order: General → Menus → Theme → Developer → everything else (stable).
+ */
+add_action('admin_menu', function (): void {
+  if (!function_exists('fs_setup_completed') || !fs_setup_completed()) {
+    return;
+  }
+  if (!current_user_can('manage_options')) {
+    return;
+  }
+  global $submenu;
+  if (!isset($submenu['options-general.php']) || !is_array($submenu['options-general.php'])) {
+    return;
+  }
+  $items = array_values($submenu['options-general.php']);
+  $pick = [
+    'general' => null,
+    'menus' => null,
+    'theme' => null,
+    'developer' => null,
+  ];
+  $rest = [];
+  foreach ($items as $item) {
+    $slug = isset($item[2]) ? (string) $item[2] : '';
+    if ($slug === 'options-general.php') {
+      $pick['general'] = $item;
+      continue;
+    }
+    if ($slug === 'nav-menus.php' || str_contains($slug, 'nav-menus.php')) {
+      $pick['menus'] = $item;
+      continue;
+    }
+    if ($slug === 'fs-theme-settings') {
+      $pick['theme'] = $item;
+      continue;
+    }
+    if ($slug === 'fs-developer-system') {
+      $pick['developer'] = $item;
+      continue;
+    }
+    $rest[] = $item;
+  }
+  $ordered = [];
+  foreach (['general', 'menus', 'theme', 'developer'] as $key) {
+    if ($pick[$key] !== null) {
+      $ordered[] = $pick[$key];
+    }
+  }
+  $submenu['options-general.php'] = array_merge($ordered, $rest);
+}, 999);
+
+/**
  * When Design (Themes) menu is disabled for the user, add no-customize-support so
  * elements with class hide-if-no-customize (e.g. "Manage with live preview") are hidden.
  */
@@ -337,7 +377,7 @@ add_filter('admin_body_class', function (string $classes): string {
 add_action('load-nav-menus.php', function () {
   global $parent_file, $submenu_file;
   $parent_file = 'options-general.php';
-  $submenu_file = admin_url('nav-menus.php');
+  $submenu_file = 'nav-menus.php';
 });
 
 /**

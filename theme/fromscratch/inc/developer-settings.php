@@ -93,21 +93,39 @@ function fs_developer_settings_load_hook(string $page_slug): string
 	return 'load-settings_page_' . $page_slug;
 }
 
+/**
+ * Browser/window title and page &lt;h1&gt;: Settings › Developer [› Tab] (core-style).
+ */
+function fs_developer_settings_admin_title(string $slug): string
+{
+	if (!function_exists('fs_admin_settings_submenu_title')) {
+		return __('Developer', 'fromscratch');
+	}
+	if ($slug === 'fs-developer-system') {
+		return fs_admin_settings_submenu_title(__('Developer', 'fromscratch'));
+	}
+	$tabs = fs_developer_settings_available_tabs();
+	if ($slug === 'fs-developer-settings') {
+		$tab_key = 'system';
+	} else {
+		$tab_key = substr($slug, strlen('fs-developer-'));
+	}
+	$label = isset($tabs[$tab_key]['label']) ? (string) $tabs[$tab_key]['label'] : $tab_key;
+	return fs_admin_settings_submenu_title(__('Developer', 'fromscratch'), __($label, 'fromscratch'));
+}
+
+function fs_developer_settings_screen_heading(): void
+{
+	$page = isset($_GET['page']) ? sanitize_key((string) $_GET['page']) : '';
+	echo '<h1>' . esc_html(fs_developer_settings_admin_title($page)) . '</h1>';
+}
+
 // Non-developer: redirect to Theme settings when opening any Developer page.
 // Set global $title so admin-header.php doesn't get null (we hide submenu items below).
 foreach (fs_developer_settings_page_slugs() as $slug) {
 	add_action(fs_developer_settings_load_hook($slug), function () use ($slug) {
 		global $title;
-		if ($slug === 'fs-developer-system') {
-			$tab = 'developer';
-		} elseif ($slug === 'fs-developer-settings') {
-			$tab = 'system';
-		} else {
-			$tab = substr($slug, strlen('fs-developer-'));
-		}
-		$tabs = fs_developer_settings_available_tabs();
-		$label = $tabs[$tab]['label'] ?? $slug;
-		$title = $slug === 'fs-developer-system' ? __('Developer', 'fromscratch') : sprintf(__('Developer › %s', 'fromscratch'), $label);
+		$title = fs_developer_settings_admin_title($slug);
 		if (!current_user_can('manage_options')) {
 			return;
 		}
@@ -257,7 +275,9 @@ add_action('admin_menu', function (): void {
 add_action('load-settings_page_redis-cache', function (): void {
 	global $title;
 	if (!is_string($title) || $title === '') {
-		$title = __('Developer › Redis', 'fromscratch');
+		$title = function_exists('fs_admin_settings_submenu_title')
+			? fs_admin_settings_submenu_title(__('Developer', 'fromscratch'), __('Redis', 'fromscratch'))
+			: __('Developer › Redis', 'fromscratch');
 	}
 	if (!current_user_can('manage_options')) {
 		return;
