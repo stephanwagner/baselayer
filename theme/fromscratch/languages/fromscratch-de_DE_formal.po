@@ -243,11 +243,23 @@ msgstr "Weiterleitung hinzufügen"
 msgid "Custom CSS"
 msgstr "Eigenes CSS"
 
-msgid "The CSS is output after the design variables (:root)."
-msgstr "Eigenes CSS wird nach den Design-Variablen (:root) ausgegeben."
+msgid "Custom CSS runs last and overrides theme styles."
+msgstr "Eigenes CSS wird zuletzt geladen und überschreibt die Theme-Styles."
 
-msgid "You can use design variables, e.g. var(--color-primary)."
-msgstr "Du kannst Design-Variablen nutzen, z. B. var(--color-primary)."
+msgid "All CSS variables are available, e.g. var(--color-primary)."
+msgstr "Alle CSS-Variablen sind verfügbar, z. B. var(--color-primary)."
+
+msgid "Variable overview"
+msgstr "Variablenübersicht"
+
+msgid "CSS variables (:root)"
+msgstr "CSS-Variablen (:root)"
+
+msgid "Parsed from src/scss/_variables.scss in the theme."
+msgstr "Aus src/scss/_variables.scss im Theme gelesen."
+
+msgid "Could not read the :root block from _variables.scss."
+msgstr "Der :root-Block aus _variables.scss konnte nicht gelesen werden."
 
 msgid "Copy option name"
 msgstr "Optionsnamen kopieren"

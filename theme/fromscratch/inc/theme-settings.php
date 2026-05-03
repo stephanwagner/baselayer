@@ -1408,9 +1408,11 @@ function theme_settings_page(): void
 				<?php wp_nonce_field('fromscratch_save_css'); ?>
 				<input type="hidden" name="fromscratch_save_css" value="1">
 				<h2 class="title"><?= esc_html__('Custom CSS', 'fromscratch') ?></h2>
-				<p class="description"><?= esc_html__('The CSS is output after the design variables (:root).', 'fromscratch') ?></p>
-				<p class="description"><?= esc_html__('You can use design variables, e.g. var(--color-primary).', 'fromscratch') ?></p>
-
+				<p class="description"><?= esc_html__('Custom CSS runs last and overrides theme styles.', 'fromscratch') ?></p>
+				<p class="description">
+					<?= esc_html__('All CSS variables are available, e.g. var(--color-primary).', 'fromscratch') ?>
+					<button type="button" class="button-link fs-css-vars-overview-open" id="fs-css-vars-overview-open" aria-haspopup="dialog" aria-controls="fs-css-vars-overview-modal"><?= esc_html__('Variable overview', 'fromscratch') ?></button>
+				</p>
 				<table class="form-table" style="margin-top: 24px;" role="presentation">
 					<tr>
 						<td colspan="2" style="padding: 0;">
@@ -1425,6 +1427,58 @@ function theme_settings_page(): void
 					<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
 				</div>
 			</form>
+			<?php
+			$fs_variables_root_preview = function_exists('fs_variables_scss_root_block') ? fs_variables_scss_root_block() : '';
+			?>
+			<div id="fs-css-vars-overview-modal" class="fs-css-vars-overview-modal" aria-hidden="true">
+				<div class="fs-css-vars-overview-backdrop" data-fs-css-vars-overview-close tabindex="-1"></div>
+				<div class="fs-css-vars-overview-dialog" role="dialog" aria-modal="true" aria-labelledby="fs-css-vars-overview-title" tabindex="-1">
+					<h2 id="fs-css-vars-overview-title" class="fs-css-vars-overview-title"><?= esc_html__('CSS variables (:root)', 'fromscratch') ?></h2>
+					<p class="description fs-css-vars-overview-source"><?= esc_html__('Parsed from src/scss/_variables.scss in the theme.', 'fromscratch') ?></p>
+					<?php if ($fs_variables_root_preview !== '') : ?>
+						<pre class="fs-css-vars-overview-pre"><code><?= esc_html($fs_variables_root_preview) ?></code></pre>
+					<?php else : ?>
+						<p class="fs-css-vars-overview-empty"><?= esc_html__('Could not read the :root block from _variables.scss.', 'fromscratch') ?></p>
+					<?php endif; ?>
+					<p class="fs-css-vars-overview-actions">
+						<button type="button" class="button button-primary" data-fs-css-vars-overview-close><?= esc_html__('Close', 'fromscratch') ?></button>
+					</p>
+				</div>
+			</div>
+			<script>
+				(function() {
+					var modal = document.getElementById('fs-css-vars-overview-modal');
+					var openBtn = document.getElementById('fs-css-vars-overview-open');
+					if (!modal || !openBtn) return;
+					var dialog = modal.querySelector('.fs-css-vars-overview-dialog');
+					function openModal() {
+						modal.classList.add('is-open');
+						modal.setAttribute('aria-hidden', 'false');
+						document.body.classList.add('fs-css-vars-overview-modal-active');
+						if (dialog) {
+							dialog.focus();
+						}
+					}
+					function closeModal() {
+						modal.classList.remove('is-open');
+						modal.setAttribute('aria-hidden', 'true');
+						document.body.classList.remove('fs-css-vars-overview-modal-active');
+						openBtn.focus();
+					}
+					openBtn.addEventListener('click', function(e) {
+						e.preventDefault();
+						openModal();
+					});
+					modal.querySelectorAll('[data-fs-css-vars-overview-close]').forEach(function(el) {
+						el.addEventListener('click', closeModal);
+					});
+					document.addEventListener('keydown', function(e) {
+						if (e.key === 'Escape' && modal.classList.contains('is-open')) {
+							closeModal();
+						}
+					});
+				})();
+			</script>
 		<?php endif; ?>
 	</div>
 <?php

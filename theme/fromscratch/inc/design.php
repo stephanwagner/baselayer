@@ -20,6 +20,70 @@ function fs_sanitize_css_custom_property_value(string $value): string
 }
 
 /**
+ * Extract the first `:root { … }` block from SCSS/CSS source (brace matching; skips line and block comments).
+ *
+ * @param string $scss Raw file contents.
+ * @return string Full block including `:root {` … `}`, or empty string.
+ */
+function fs_extract_scss_root_block(string $scss): string
+{
+	if (!preg_match('/:root\s*\{/', $scss, $m, PREG_OFFSET_CAPTURE)) {
+		return '';
+	}
+	$start = (int) $m[0][1];
+	$openBrace = strpos($scss, '{', $start);
+	if ($openBrace === false) {
+		return '';
+	}
+	$depth = 0;
+	$len = strlen($scss);
+	for ($i = $openBrace; $i < $len; $i++) {
+		$c = $scss[$i];
+		if ($c === '/' && ($i + 1) < $len && $scss[$i + 1] === '/') {
+			$nl = strpos($scss, "\n", $i);
+			$i = $nl !== false ? $nl : $len - 1;
+			continue;
+		}
+		if ($c === '/' && ($i + 1) < $len && $scss[$i + 1] === '*') {
+			$end = strpos($scss, '*/', $i + 2);
+			if ($end === false) {
+				break;
+			}
+			$i = $end + 1;
+			continue;
+		}
+		if ($c === '{') {
+			$depth++;
+		} elseif ($c === '}') {
+			$depth--;
+			if ($depth === 0) {
+				return substr($scss, $start, $i - $start + 1);
+			}
+		}
+	}
+	return '';
+}
+
+/**
+ * Contents of `src/scss/_variables.scss` — the `:root { … }` block only (for documentation in admin).
+ *
+ * @return string
+ */
+function fs_variables_scss_root_block(): string
+{
+	$path = get_template_directory() . '/src/scss/_variables.scss';
+	if (!is_readable($path)) {
+		return '';
+	}
+	$raw = file_get_contents($path);
+	if (!is_string($raw) || $raw === '') {
+		return '';
+	}
+	$block = fs_extract_scss_root_block($raw);
+	return is_string($block) ? trim($block) : '';
+}
+
+/**
  * Get all design sections from config (design = array of tabs, each tab has sections with id).
  * Returns section_id => section config for resolution.
  *
