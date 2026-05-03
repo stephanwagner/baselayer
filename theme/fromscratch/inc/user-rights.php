@@ -366,9 +366,6 @@ add_action('admin_init', function () {
     'home',
     'users_can_register',
     'default_role',
-    'show_on_front',
-    'page_on_front',
-    'page_for_posts',
   ];
   foreach ($protected_options as $option) {
     add_filter('pre_update_option_' . $option, function ($value, $old_value) {

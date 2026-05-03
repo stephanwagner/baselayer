@@ -97,6 +97,12 @@ input[type="checkbox"][data-fs-forced='1'] {
     border-radius: 4px;
     background: #fff;
   }
+
+  img[src$=".svg"],
+  img[src*=".svg?"] {
+    border-radius: 0;
+    background: none;
+  }
 }
 
 .fs-image-picker-preview {

@@ -118,6 +118,9 @@ function fs_theme_settings_save_general_options_from_post(): void
 		'fromscratch_excerpt_more' => 'sanitize_text_field',
 		'fromscratch_client_logo' => 'fs_sanitize_client_logo',
 		'fromscratch_og_image_fallback' => 'fs_sanitize_og_image_fallback',
+		'show_on_front' => 'fs_sanitize_show_on_front',
+		'page_on_front' => 'fs_sanitize_homepage_page_id',
+		'page_for_posts' => 'fs_sanitize_homepage_page_id',
 	];
 	foreach ($pairs as $name => $sanitize) {
 		if (!array_key_exists($name, $_POST)) {
@@ -130,6 +133,12 @@ function fs_theme_settings_save_general_options_from_post(): void
 			$value = call_user_func($sanitize, $raw);
 		}
 		update_option($name, $value);
+	}
+
+	$front_id = (int) get_option('page_on_front');
+	$posts_id = (int) get_option('page_for_posts');
+	if ($front_id > 0 && $front_id === $posts_id) {
+		update_option('page_for_posts', 0);
 	}
 
 	foreach ($trio_opts as $tkey) {
@@ -633,6 +642,32 @@ function fs_sanitize_posts_per_page($value): int
 	return min($n, 999);
 }
 
+/**
+ * Core option `show_on_front` (Settings → Reading). Saved from Theme → General.
+ *
+ * @param mixed $value Raw value from form.
+ */
+function fs_sanitize_show_on_front($value): string
+{
+	$value = is_string($value) ? $value : '';
+	return in_array($value, ['posts', 'page'], true) ? $value : 'posts';
+}
+
+/**
+ * Core options `page_on_front` / `page_for_posts` (Settings → Reading). Saved from Theme → General.
+ *
+ * @param mixed $value Raw value from form.
+ */
+function fs_sanitize_homepage_page_id($value): int
+{
+	$id = absint($value);
+	if ($id <= 0) {
+		return 0;
+	}
+	$post = get_post($id);
+	return ($post && $post->post_type === 'page') ? $id : 0;
+}
+
 function fs_sanitize_client_logo($value): int
 {
 	$id = absint($value);
@@ -934,9 +969,60 @@ function theme_settings_page(): void
 			?>
 			<form method="post" action="<?= esc_url(admin_url('options-general.php?page=fs-theme-settings&tab=general')) ?>" class="fs-page-settings-form">
 				<?php settings_fields(FS_THEME_OPTION_GROUP_GENERAL); ?>
-				<h2 class="title"><?= esc_html__('Posts per page', 'fromscratch') ?></h2>
-				<p class="description" style="margin-bottom: 12px;"><?= esc_html__('How many posts appear per page on the blog, archives, and search results.', 'fromscratch') ?></p>
+				<?php
+				$fs_show_on_front = get_option('show_on_front');
+				$fs_show_on_front = ($fs_show_on_front === 'page') ? 'page' : 'posts';
+				?>
+				<h2 class="title"><?= esc_html__('General', 'fromscratch') ?></h2>
 				<table class="form-table" role="presentation">
+					<tr>
+						<th scope="row"><?= esc_html(__('Your homepage displays', 'default')) ?></th>
+						<td>
+							<fieldset class="fs-homepage-display-fieldset">
+								<legend class="screen-reader-text"><?= esc_html(__('Your homepage displays', 'default')) ?></legend>
+								<p>
+									<label>
+										<input type="radio" name="show_on_front" id="fs_show_on_front_posts" value="posts" class="tog" <?= checked($fs_show_on_front, 'posts', false) ?>>
+										<?= esc_html(__('Your latest posts', 'default')) ?>
+									</label>
+								</p>
+								<p>
+									<label>
+										<input type="radio" name="show_on_front" id="fs_show_on_front_page" value="page" class="tog" <?= checked($fs_show_on_front, 'page', false) ?>>
+										<?= esc_html(__('A static page (select below)', 'default')) ?>
+									</label>
+								</p>
+								<ul id="fs-homepage-static-fields" style="margin: 12px 0 0 24px; list-style: none; padding: 0;">
+									<li style="margin-bottom: 12px;">
+										<label for="page_on_front"><?php echo esc_html(__('Homepage', 'default')); ?>:</label>
+										<?php
+										wp_dropdown_pages([
+											'name' => 'page_on_front',
+											'id' => 'page_on_front',
+											'echo' => 1,
+											'show_option_none' => __('– Select –', 'default'),
+											'option_none_value' => '0',
+											'selected' => (int) get_option('page_on_front'),
+										]);
+										?>
+									</li>
+									<li>
+										<label for="page_for_posts"><?php echo esc_html(__('Posts page', 'default')); ?>:</label>
+										<?php
+										wp_dropdown_pages([
+											'name' => 'page_for_posts',
+											'id' => 'page_for_posts',
+											'echo' => 1,
+											'show_option_none' => __('– Select –', 'default'),
+											'option_none_value' => '0',
+											'selected' => (int) get_option('page_for_posts'),
+										]);
+										?>
+									</li>
+								</ul>
+							</fieldset>
+						</td>
+					</tr>
 					<tr>
 						<th scope="row">
 							<label for="posts_per_page"><?= esc_html__('Posts per page', 'fromscratch') ?></label>
@@ -944,19 +1030,9 @@ function theme_settings_page(): void
 						<td>
 							<?php $posts_per_page_val = max(1, (int) get_option('posts_per_page', 10)); ?>
 							<input type="number" name="posts_per_page" id="posts_per_page" value="<?= esc_attr((string) $posts_per_page_val) ?>" min="1" max="999" step="1" class="small-text">
-							<p class="description"><?= esc_html__('Same as Settings → Reading → “Blog pages show at most”.', 'fromscratch') ?></p>
+							<p class="description"><?= esc_html__('How many posts appear per page on the blog, archives, and search results.', 'fromscratch') ?></p>
 						</td>
 					</tr>
-				</table>
-				<div class="fs-submit-row">
-					<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
-				</div>
-
-				<hr>
-
-				<h2 class="title"><?= esc_html__('Excerpt', 'fromscratch') ?></h2>
-				<p class="description" style="margin-bottom: 12px;"><?= esc_html__('Defines how automatically generated excerpts are shortened.', 'fromscratch') ?></p>
-				<table class="form-table" role="presentation">
 					<tr>
 						<th scope="row">
 							<label for="fromscratch_excerpt_length"><?= esc_html__('Excerpt length', 'fromscratch') ?></label>
@@ -984,9 +1060,26 @@ function theme_settings_page(): void
 						</td>
 					</tr>
 				</table>
+
 				<div class="fs-submit-row">
 					<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
 				</div>
+
+				<script>
+					(function() {
+						function fsSyncHomepageStaticFields() {
+							var posts = document.getElementById('fs_show_on_front_posts');
+							var wrap = document.getElementById('fs-homepage-static-fields');
+							if (!wrap) return;
+							var showStatic = document.getElementById('fs_show_on_front_page');
+							wrap.style.display = showStatic && showStatic.checked ? '' : 'none';
+						}
+						document.querySelectorAll('input[name="show_on_front"]').forEach(function(el) {
+							el.addEventListener('change', fsSyncHomepageStaticFields);
+						});
+						fsSyncHomepageStaticFields();
+					})();
+				</script>
 
 				<hr>
 
@@ -1045,50 +1138,41 @@ function theme_settings_page(): void
 
 				<h2 class="title"><?= esc_html__('Client logo', 'fromscratch') ?></h2>
 				<p class="description" style="margin-bottom: 12px;"><?= esc_html__('Shown on the login page instead of the WordPress logo. Also used for branding in emails.', 'fromscratch') ?></p>
-				<table class="form-table" role="presentation">
-					<tr>
-						<th scope="row"><?= esc_html__('Image', 'fromscratch') ?></th>
-						<td>
-							<div class="fs-image-picker" data-fs-image-picker>
-								<input type="hidden" name="fromscratch_client_logo" id="fromscratch_client_logo" value="<?= esc_attr($client_logo_id) ?>" data-fs-image-picker-input>
-								<div class="fs-image-picker-preview" data-fs-image-picker-preview>
-									<?php if ($client_logo_url) : ?>
-										<img src="<?= esc_url($client_logo_url) ?>" alt="">
-									<?php endif; ?>
-								</div>
-								<p>
-									<button type="button" class="button" data-fs-image-picker-select><?= esc_html__('Select image', 'fromscratch') ?></button>
-									<button type="button" class="button" data-fs-image-picker-remove<?= $client_logo_id <= 0 ? ' style="display:none;"' : '' ?>><?= esc_html__('Remove', 'fromscratch') ?></button>
-								</p>
-							</div>
-						</td>
-					</tr>
-				</table>
+				
+				<div class="fs-image-picker" style="margin-top: 16px;" data-fs-image-picker>
+					<input type="hidden" name="fromscratch_client_logo" id="fromscratch_client_logo" value="<?= esc_attr($client_logo_id) ?>" data-fs-image-picker-input>
+					<div class="fs-image-picker-preview" data-fs-image-picker-preview>
+						<?php if ($client_logo_url) : ?>
+							<img src="<?= esc_url($client_logo_url) ?>" alt="">
+						<?php endif; ?>
+					</div>
+					<p style="margin-bottom: 0;">
+						<button type="button" class="button" data-fs-image-picker-select><?= esc_html__('Select image', 'fromscratch') ?></button>
+						<button type="button" class="button" data-fs-image-picker-remove<?= $client_logo_id <= 0 ? ' style="display:none;"' : '' ?>><?= esc_html__('Remove', 'fromscratch') ?></button>
+					</p>
+				</div>
 
 				<hr>
 
 				<h2 class="title"><?= esc_html__('Fallback OG image', 'fromscratch') ?></h2>
 				<p class="description"><?= esc_html__('Used as the social preview image (og:image) when a page or post has no SEO image and no featured image.', 'fromscratch') ?></p>
 				<p class="description" style="margin-bottom: 12px;"><?= esc_html__('Best size: 1200 × 630 px.', 'fromscratch') ?></p>
-				<table class="form-table" role="presentation">
-					<tr>
-						<th scope="row"><?= esc_html__('Image', 'fromscratch') ?></th>
-						<td>
-							<div class="fs-image-picker" data-fs-image-picker>
-								<input type="hidden" name="fromscratch_og_image_fallback" id="fromscratch_og_image_fallback" value="<?= esc_attr($og_fallback_id) ?>" data-fs-image-picker-input>
-								<div class="fs-image-picker-preview" data-fs-image-picker-preview>
-									<?php if ($og_fallback_url) : ?>
-										<img src="<?= esc_url($og_fallback_url) ?>" alt="" style="max-width: 240px; height: auto; display: block; border-radius: 3px;">
-									<?php endif; ?>
-								</div>
-								<p>
-									<button type="button" class="button" data-fs-image-picker-select><?= esc_html__('Select image', 'fromscratch') ?></button>
-									<button type="button" class="button" data-fs-image-picker-remove<?= $og_fallback_id <= 0 ? ' style="display:none;"' : '' ?>><?= esc_html__('Remove', 'fromscratch') ?></button>
-								</p>
-							</div>
-						</td>
-					</tr>
-				</table>
+
+				<div class="fs-image-picker" style="margin-top: 16px;" data-fs-image-picker>
+					<input type="hidden" name="fromscratch_og_image_fallback" id="fromscratch_og_image_fallback" value="<?= esc_attr($og_fallback_id) ?>" data-fs-image-picker-input>
+					<div class="fs-image-picker-preview" data-fs-image-picker-preview>
+						<?php if ($og_fallback_url) : ?>
+							<img src="<?= esc_url($og_fallback_url) ?>" alt="" style="max-width: 240px; height: auto; display: block; border-radius: 3px;">
+						<?php endif; ?>
+					</div>
+					<p style="margin-bottom: 0;">
+						<button type="button" class="button" data-fs-image-picker-select><?= esc_html__('Select image', 'fromscratch') ?></button>
+						<button type="button" class="button" data-fs-image-picker-remove<?= $og_fallback_id <= 0 ? ' style="display:none;"' : '' ?>><?= esc_html__('Remove', 'fromscratch') ?></button>
+					</p>
+				</div>
+
+				<hr>
+
 				<div class="fs-submit-row">
 					<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
 				</div>

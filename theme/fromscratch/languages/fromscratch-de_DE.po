@@ -25,6 +25,15 @@ msgstr "Seite"
 msgid "Pages"
 msgstr "Seiten"
 
+msgid "Homepage"
+msgstr "Startseite"
+
+msgid "Home"
+msgstr "Start"
+
+msgid "Posts page"
+msgstr "Beitragsseite"
+
 msgid "Draft"
 msgstr "Entwurf"
 
@@ -134,6 +143,9 @@ msgstr "Abbrechen"
 msgid "Save"
 msgstr "Speichern"
 
+msgid "Save Changes"
+msgstr "Änderungen sepeichern.."
+
 msgid "Error"
 msgstr "Fehler"
 
@@ -148,6 +160,9 @@ msgstr "Normal"
 
 msgid "Large"
 msgstr "Groß"
+
+msgid "– Select –"
+msgstr "– Auswählen –"
 
 # Templates
 
@@ -169,19 +184,16 @@ msgstr "Keine Beiträge gefunden."
 msgid "Read more"
 msgstr "Mehr lesen"
 
+msgid "Excerpt"
+msgstr "Auszug"
+
 # Theme settings
 
 msgid "Client logo"
 msgstr "Kundenlogo"
 
-msgid "Excerpt"
-msgstr "Auszug"
-
 msgid "Fallback OG image"
 msgstr "Fallback-OG-Bild"
-
-msgid "Defines how automatically generated excerpts are shortened."
-msgstr "Legt fest, wie automatisch erzeugte Auszüge gekürzt werden."
 
 msgid "Excerpt length"
 msgstr "Auszugslänge"
@@ -306,14 +318,20 @@ msgstr "Empfänger-E-Mail"
 msgid "Sends the current weekly report to provided email address."
 msgstr "Sendet den aktuellen Wochenbericht an die angegebene E-Mail-Adresse."
 
+msgid "Your homepage displays"
+msgstr "Deine Homepage zeigt"
+
+msgid "Your latest posts"
+msgstr "Deine letzten Beiträge"
+
+msgid "A static page (select below)"
+msgstr "Eine statische Seite (unten auswählen)"
+
 msgid "Posts per page"
 msgstr "Beiträge pro Seite"
 
 msgid "How many posts appear per page on the blog, archives, and search results."
 msgstr "Legt fest, wie viele Beiträge pro Seite im Blog, in Archiven und in Suchergebnissen angezeigt werden."
-
-msgid "Same as Settings → Reading → “Blog pages show at most”."
-msgstr "Entspricht den Einstellungen unter Lesen → „Blogseiten zeigen maximal“."
 
 # Dashboard
 
@@ -430,9 +448,6 @@ msgstr "Zum Dashboard"
 
 msgid "The following errors occurred during initialization:"
 msgstr "Bei der Initialisierung sind folgende Fehler aufgetreten:"
-
-msgid "Homepage"
-msgstr "Startseite"
 
 msgid "Contact"
 msgstr "Kontakt"
@@ -2077,9 +2092,6 @@ msgstr "Suchergebnisse"
 
 msgid "Breadcrumb"
 msgstr "Breadcrumb"
-
-msgid "Home"
-msgstr "Start"
 
 # Editor
 
