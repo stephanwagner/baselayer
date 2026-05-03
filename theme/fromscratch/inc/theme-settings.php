@@ -1203,57 +1203,113 @@ function theme_settings_page(): void
 			<script>
 				(function() {
 					function run() {
-						var switcher = document.querySelector('[data-fs-content-lang-switcher]');
-						if (!switcher) return;
 						var form = document.getElementById('fs-content-form');
 						if (!form) return;
+						var globalSwitcher = document.querySelector('[data-fs-content-lang-switcher]');
+						var fieldGroups = form.querySelectorAll('[data-fs-content-field-group]');
+						if (!fieldGroups.length && !globalSwitcher) return;
 
-						function fieldContainers() {
+						var globalLang = '';
+						var rowOverrides = {};
+
+						function allLangContainers() {
 							return form.querySelectorAll('.fs-content-lang-container[data-fs-content-lang]');
 						}
 
 						function pickInitialLang(requested) {
-							var containers = fieldContainers();
 							var ids = {};
-							for (var i = 0; i < containers.length; i++) {
-								var lid = containers[i].getAttribute('data-fs-content-lang');
+							allLangContainers().forEach(function(c) {
+								var lid = c.getAttribute('data-fs-content-lang');
 								if (lid) ids[lid] = true;
-							}
+							});
 							if (requested && ids[requested]) return requested;
-							var btns = switcher.querySelectorAll('[data-fs-content-lang-btn]');
-							for (var j = 0; j < btns.length; j++) {
-								var bid = btns[j].getAttribute('data-fs-content-lang');
-								if (bid && ids[bid]) return bid;
+							if (globalSwitcher) {
+								var btns = globalSwitcher.querySelectorAll('[data-fs-content-lang-btn]');
+								for (var j = 0; j < btns.length; j++) {
+									var bid = btns[j].getAttribute('data-fs-content-lang');
+									if (bid && ids[bid]) return bid;
+								}
 							}
-							return containers[0] ? (containers[0].getAttribute('data-fs-content-lang') || '') : '';
+							var first = form.querySelector('.fs-content-lang-container[data-fs-content-lang]');
+							return first ? (first.getAttribute('data-fs-content-lang') || '') : '';
 						}
 
-						function setContentLang(langId) {
-							switcher.querySelectorAll('[data-fs-content-lang-btn]').forEach(function(b) {
-								b.classList.toggle('active', b.getAttribute('data-fs-content-lang') === langId);
-							});
-							fieldContainers().forEach(function(container) {
-								var containerLang = container.getAttribute('data-fs-content-lang');
-								var show = containerLang === langId;
-								var tr = container.closest('tr');
+						function effectiveLangForGroup(groupId) {
+							return rowOverrides[groupId] || globalLang;
+						}
+
+						function applyVisibility() {
+							fieldGroups.forEach(function(groupEl) {
+								var groupId = groupEl.getAttribute('data-fs-content-field-group') || '';
+								var lang = effectiveLangForGroup(groupId);
+								groupEl.querySelectorAll('.fs-content-lang-container[data-fs-content-lang]').forEach(function(container) {
+									var containerLang = container.getAttribute('data-fs-content-lang');
+									container.style.display = containerLang === lang ? '' : 'none';
+								});
+								var tr = groupEl.closest('tr');
 								if (tr) {
-									tr.style.display = show ? '' : 'none';
-								} else {
-									container.style.display = show ? '' : 'none';
+									var rsw = tr.querySelector('[data-fs-content-field-lang-switcher]');
+									if (rsw) {
+										rsw.querySelectorAll('[data-fs-content-field-lang-btn]').forEach(function(b) {
+											b.classList.toggle('active', b.getAttribute('data-fs-content-lang') === lang);
+										});
+									}
 								}
 							});
+							if (!fieldGroups.length && globalSwitcher) {
+								var lid = globalLang;
+								allLangContainers().forEach(function(container) {
+									var containerLang = container.getAttribute('data-fs-content-lang');
+									var show = containerLang === lid;
+									var tr = container.closest('tr');
+									if (tr) tr.style.display = show ? '' : 'none';
+									else container.style.display = show ? '' : 'none';
+								});
+							}
 						}
 
-						var requestedDefault = switcher.getAttribute('data-fs-content-lang-default') || '';
-						// Capture phase so other handlers cannot swallow the click.
-						document.addEventListener('click', function onLangBtnClick(e) {
-							var btn = e.target.closest('[data-fs-content-lang-btn]');
-							if (!btn || !switcher.contains(btn)) return;
-							e.preventDefault();
-							setContentLang(btn.getAttribute('data-fs-content-lang') || '');
-						}, true);
+						function setGlobalLang(langId) {
+							rowOverrides = {};
+							globalLang = langId;
+							if (globalSwitcher) {
+								globalSwitcher.querySelectorAll('[data-fs-content-lang-btn]').forEach(function(b) {
+									b.classList.toggle('active', b.getAttribute('data-fs-content-lang') === langId);
+								});
+							}
+							applyVisibility();
+						}
 
-						setContentLang(pickInitialLang(requestedDefault));
+						function setRowOverride(groupId, langId) {
+							rowOverrides[groupId] = langId;
+							applyVisibility();
+						}
+
+						var requestedDefault = globalSwitcher ? (globalSwitcher.getAttribute('data-fs-content-lang-default') || '') : '';
+						globalLang = pickInitialLang(requestedDefault);
+						if (globalSwitcher) {
+							globalSwitcher.querySelectorAll('[data-fs-content-lang-btn]').forEach(function(b) {
+								b.classList.toggle('active', b.getAttribute('data-fs-content-lang') === globalLang);
+							});
+						}
+						applyVisibility();
+
+						document.addEventListener('click', function onContentLangClick(e) {
+							var gBtn = e.target.closest('[data-fs-content-lang-switcher] [data-fs-content-lang-btn]');
+							if (gBtn && globalSwitcher && globalSwitcher.contains(gBtn)) {
+								e.preventDefault();
+								setGlobalLang(gBtn.getAttribute('data-fs-content-lang') || '');
+								return;
+							}
+							var rBtn = e.target.closest('[data-fs-content-field-lang-btn]');
+							if (!rBtn || !form.contains(rBtn)) return;
+							var rowSw = rBtn.closest('[data-fs-content-field-lang-switcher]');
+							if (!rowSw) return;
+							e.preventDefault();
+							var tr = rowSw.closest('tr');
+							var groupEl = tr && tr.querySelector('[data-fs-content-field-group]');
+							if (!groupEl) return;
+							setRowOverride(groupEl.getAttribute('data-fs-content-field-group') || '', rBtn.getAttribute('data-fs-content-lang') || '');
+						}, true);
 					}
 					if (document.readyState === 'loading') {
 						document.addEventListener('DOMContentLoaded', run);
@@ -1660,11 +1716,45 @@ function display_custom_info_fields(): void
 				if (!empty($variable['translate'])) {
 					$content_langs = fs_get_content_languages();
 					if (!empty($content_langs)) {
+						$field_id_bundle = $variableId . '__fs_i18n_row';
+						$title_markup = '<span class="fs-content-field-label">' . esc_html($variable_title) . '</span>';
+						if (count($content_langs) >= 2) {
+							$title_markup .= '<div class="fs-content-field-lang-switcher" data-fs-content-field-lang-switcher role="group" aria-label="' . esc_attr__('Language for this field', 'fromscratch') . '">';
+							foreach ($content_langs as $language) {
+								$lid = isset($language['id']) ? (string) $language['id'] : '';
+								if ($lid === '') {
+									continue;
+								}
+								$short = strtoupper(explode('_', $lid, 2)[0]);
+								$title_markup .= '<button type="button" class="button fs-content-field-lang-btn fs-button-can-toggle button-small" data-fs-content-field-lang-btn data-fs-content-lang="' . esc_attr($lid) . '">' . esc_html($short) . '</button>';
+							}
+							$title_markup .= '</div>';
+						}
+						add_settings_field(
+							$field_id_bundle,
+							$title_markup,
+							static function () use ($variable, $variableId, $content_langs): void {
+								echo '<div class="fs-content-field-lang-fields" data-fs-content-field-group="' . esc_attr($variableId) . '">';
+								foreach ($content_langs as $language) {
+									$lid = isset($language['id']) ? (string) $language['id'] : '';
+									if ($lid === '') {
+										continue;
+									}
+									$variableIdLang = $variableId . '_' . $lid;
+									display_custom_info_field($variable, $variableIdLang, $lid);
+								}
+								echo '</div>';
+							},
+							$content_page,
+							'section',
+							['class' => '-is-translatable']
+						);
 						foreach ($content_langs as $language) {
-							$variableIdLang = $variableId . '_' . $language['id'];
-							add_settings_field($variableIdLang, $variable_title, function () use ($variable, $variableIdLang, $language) {
-								display_custom_info_field($variable, $variableIdLang, $language['id']);
-							}, $content_page, 'section', ['class' => '-is-translatable']);
+							$lid = isset($language['id']) ? (string) $language['id'] : '';
+							if ($lid === '') {
+								continue;
+							}
+							$variableIdLang = $variableId . '_' . $lid;
 							register_setting(FS_THEME_OPTION_GROUP_TEXTE, $variableIdLang, $register_args);
 						}
 					} else {

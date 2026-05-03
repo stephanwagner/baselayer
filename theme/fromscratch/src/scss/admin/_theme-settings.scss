@@ -4,6 +4,31 @@
   margin: 0 0 24px;
 }
 
+.fs-content-field-label {
+  display: block;
+  font-weight: 600;
+  margin: 0 0 6px;
+}
+
+.fs-content-field-lang-switcher {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin: 8px 0 0;
+}
+
+.button.button-small.fs-content-field-lang-btn {
+  min-width: 0;
+  padding: 0;
+  height: auto;
+  width: 24px;
+  height: 18px;
+  min-height: 18px;
+  line-height: 16px;
+  font-size: 10px;
+}
+
 .fs-content-multiselect {
   display: flex;
   flex-direction: column;
