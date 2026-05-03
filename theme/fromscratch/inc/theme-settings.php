@@ -5,14 +5,12 @@ defined('ABSPATH') || exit;
 /**
  * Theme settings page: Settings → Theme.
  * Developer-first: some tabs/sections are only visible to users with developer rights.
- * Requires inc/design.php for Design tab.
  */
 
 /** Tab definitions: slug => [ 'label' => string, 'developer_only' => bool ] */
 const FS_THEME_SETTINGS_TABS = [
 	'general'   => ['label' => 'General', 'developer_only' => false],
 	'texts'     => ['label' => 'Content', 'developer_only' => false],
-	'design'    => ['label' => 'Design', 'developer_only' => false],
 	'css'       => ['label' => 'CSS', 'developer_only' => false],
 	'redirects' => ['label' => 'Redirects', 'developer_only' => false],
 ];
@@ -31,8 +29,6 @@ function fs_theme_settings_available_tabs(): array
 				$access_key = 'theme_settings_general';
 			} elseif ($slug === 'texts') {
 				$access_key = 'theme_settings_texts';
-			} elseif ($slug === 'design') {
-				$access_key = 'theme_settings_design';
 			} elseif ($slug === 'css') {
 				$access_key = 'theme_settings_css';
 			} elseif ($slug === 'redirects') {
@@ -292,6 +288,10 @@ add_action('load-settings_page_fs-theme-settings', function () {
 	if ($requested === '') {
 		return;
 	}
+	if ($requested === 'design') {
+		wp_safe_redirect(admin_url('options-general.php?page=fs-theme-settings'));
+		exit;
+	}
 	if ($requested === 'general') {
 		if (function_exists('fs_admin_can_access') && !fs_admin_can_access('theme_settings_general')) {
 			wp_safe_redirect(admin_url('options-general.php?page=fs-theme-settings'));
@@ -305,8 +305,6 @@ add_action('load-settings_page_fs-theme-settings', function () {
 	$access_key = null;
 	if ($requested === 'texts') {
 		$access_key = 'theme_settings_texts';
-	} elseif ($requested === 'design') {
-		$access_key = 'theme_settings_design';
 	} elseif ($requested === 'css') {
 		$access_key = 'theme_settings_css';
 	} elseif ($requested === 'redirects') {
@@ -321,7 +319,6 @@ add_action('load-settings_page_fs-theme-settings', function () {
 const FS_THEME_OPTION_GROUP_GENERAL = 'fs_theme_general';
 const FS_THEME_OPTION_GROUP_FEATURES = 'fs_theme_features';
 const FS_THEME_OPTION_GROUP_TEXTE = 'fs_theme_texte';
-const FS_THEME_OPTION_GROUP_DESIGN = 'fs_theme_design';
 const FS_THEME_OPTION_GROUP_CSS = 'fs_theme_css';
 const FS_THEME_OPTION_GROUP_SECURITY = 'fs_theme_security';
 const FS_THEME_OPTION_GROUP_REDIRECTS = 'fs_theme_redirects';
@@ -479,13 +476,6 @@ add_action('admin_init', function () {
 	register_setting(FS_THEME_OPTION_GROUP_FEATURES, 'fromscratch_features', [
 		'type' => 'array',
 		'sanitize_callback' => 'fs_sanitize_features',
-	]);
-}, 5);
-
-add_action('admin_init', function () {
-	register_setting(FS_THEME_OPTION_GROUP_DESIGN, 'fromscratch_design', [
-		'type' => 'array',
-		'sanitize_callback' => 'fs_sanitize_design_variables',
 	]);
 }, 5);
 
@@ -1435,87 +1425,6 @@ function theme_settings_page(): void
 					<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
 				</div>
 			</form>
-		<?php else : ?>
-			<form method="post" action="options.php" class="fs-page-settings-form">
-				<h2 class="title"><?= esc_html__('Design', 'fromscratch') ?></h2>
-				<p class="description"><?= esc_html__('Define design values used across the website.', 'fromscratch') ?></p>
-				<p class="description"><?= esc_html__('Changes are automatically applied wherever they are used.', 'fromscratch') ?></p>
-
-				<hr>
-
-				<?php settings_fields(FS_THEME_OPTION_GROUP_DESIGN); ?>
-				<?php
-				$design_sections = fs_get_design_sections_resolved();
-				$design_tabs = is_array(fs_config('design')) ? fs_config('design') : [];
-				?>
-				<div class="fs-tabs" data-fs-tabs>
-					<nav class="fs-tabs-nav" data-fs-tabs-nav role="tablist">
-						<?php foreach ($design_tabs as $i => $dt) :
-							$tab_id = isset($dt['title']) ? sanitize_title($dt['title']) : 'tab-' . $i;
-						?>
-							<button type="button" class="button fs-tabs-btn fs-button-can-toggle <?= ($i === 0) ? 'active' : '' ?>" role="tab" aria-selected="<?= ($i === 0) ? 'true' : 'false' ?>" aria-controls="fs-design-panel-<?= esc_attr($tab_id) ?>" data-fs-tabs-btn data-tab="<?= esc_attr($tab_id) ?>"><?= esc_html(_x($dt['title'] ?? $tab_id, 'Design variables', 'fromscratch')) ?></button>
-						<?php endforeach; ?>
-					</nav>
-					<div class="fs-tabs-panels" data-fs-tabs-panels>
-						<?php foreach ($design_tabs as $i => $dt) :
-							$tab_id = isset($dt['title']) ? sanitize_title($dt['title']) : 'tab-' . $i;
-							$tab_sections = isset($dt['sections']) && is_array($dt['sections']) ? $dt['sections'] : [];
-						?>
-							<div id="fs-design-panel-<?= esc_attr($tab_id) ?>" class="fs-tabs-panel <?= $i === 0 ? 'fs-tabs-panel--active' : '' ?>" data-fs-tabs-panel role="tabpanel" data-tab="<?= esc_attr($tab_id) ?>" <?= $i === 0 ? 'data-fs-tabs-panel-active="1"' : '' ?>>
-								<?php foreach ($tab_sections as $section_config) :
-									$section_id = $section_config['id'] ?? null;
-									if ($section_id === null || !isset($design_sections[$section_id])) {
-										continue;
-									}
-									$section = $design_sections[$section_id];
-									$section_title = $section['title'];
-								?>
-									<div class="fromscratch-design-section">
-										<h3 class="title"><?= esc_html(_x($section_title, 'Design variables', 'fromscratch')) ?></h3>
-										<table class="widefat striped fs-design-section-table" role="presentation">
-											<tbody>
-												<?php foreach ($section['variables'] as $v) :
-													$var_id = $v['id'] ?? '';
-													$var_title = $v['title'] ?? $var_id;
-													$var_type = isset($v['type']) && is_string($v['type']) && $v['type'] !== '' ? $v['type'] : 'text';
-													$override = fs_design_variable_override($var_id);
-													$default = $v['default'] ?? '';
-													$input_name = 'fromscratch_design[' . esc_attr($var_id) . ']';
-													$type_class = '-' . sanitize_html_class($var_type);
-													$row_type_class = 'fromscratch-design-row -' . sanitize_html_class($var_type);
-													$preview_color = ($override !== '') ? $override : $default;
-												?>
-													<tr class="<?= esc_attr($row_type_class) ?>">
-														<th scope="row">
-															<code class="fs-code-small">--<?= esc_html($var_id) ?></code>
-														</th>
-														<td>
-															<div class="fromscratch-design-field <?= $type_class ?>">
-																<label for="fromscratch_design_<?= esc_attr($var_id) ?>" class="screen-reader-text"><?= esc_html(_x($var_title, 'Design variables', 'fromscratch')) ?></label>
-																<input type="text" name="<?= $input_name ?>" id="fromscratch_design_<?= esc_attr($var_id) ?>" value="<?= esc_attr($override) ?>" placeholder="<?= esc_attr($default) ?>" class="code fs-code-small fromscratch-design-input <?= esc_attr($type_class) ?>" <?= $var_type === 'color' ? 'maxlength="22" data-design-color-input' : '' ?>>
-																<?php if ($var_type === 'color') : ?>
-																	<span class="fromscratch-design-color-preview<?= $preview_color === '' ? ' -empty' : '' ?>" <?= $preview_color !== '' ? ' style="background-color: ' . esc_attr($preview_color) . ';"' : '' ?> aria-hidden="true" data-design-color-preview></span>
-																<?php endif; ?>
-																<span class="fromscratch-design-field-description"><?= esc_html(_x($var_title, 'Design variables', 'fromscratch')) ?></span>
-															</div>
-														</td>
-													</tr>
-												<?php endforeach; ?>
-											</tbody>
-										</table>
-									</div>
-								<?php endforeach; ?>
-							</div>
-						<?php endforeach; ?>
-					</div>
-				</div>
-
-				<hr>
-
-				<div class="fs-submit-row">
-					<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
-				</div>
-			</form>
 		<?php endif; ?>
 	</div>
 <?php
@@ -1785,7 +1694,7 @@ function fs_theme_settings_has_any_access(): bool
 	if (!function_exists('fs_admin_can_access')) {
 		return true;
 	}
-	$keys = ['theme_settings_general', 'theme_settings_texts', 'theme_settings_design', 'theme_settings_css', 'theme_settings_redirects'];
+	$keys = ['theme_settings_general', 'theme_settings_texts', 'theme_settings_css', 'theme_settings_redirects'];
 	foreach ($keys as $key) {
 		if (fs_admin_can_access($key)) {
 			return true;

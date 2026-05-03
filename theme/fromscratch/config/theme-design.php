@@ -1,15 +1,14 @@
 <?php
 
 /**
- * Theme settings: Design
- * Used by Settings → Theme → Design.
+ * Design tokens and :root variable definitions (merged into theme config).
  *
- * Edit to customize the theme. Design overrides can also be set in Settings → Theme → Design.
+ * Edit here to change colors, gradients, typography tokens, and custom CSS variables.
  * User-facing strings are English (msgids); German lives in languages/fromscratch-de_DE.po.
  */
 return [
 	/**
-	 * Colors: used for colors in Settings → Theme → Design.
+	 * Colors: referenced by the design.sections colors block and SCSS.
 	 */
 	'colors' => [
 		// Primary colors
@@ -29,7 +28,7 @@ return [
 	],
 
 	/**
-	 * Gradients: used for gradients in Settings → Theme → Design.
+	 * Gradients: referenced by the design.sections gradients block.
 	 */
 	'gradients' => [
 		[
@@ -40,7 +39,7 @@ return [
 	],
 
 	/**
-	 * Font sizes: used for typography in Settings → Theme → Design.
+	 * Font sizes: referenced by the design.sections font_sizes block.
 	 */
 	'font_sizes' => [
 		['name' => 'Small', 'shortName' => 'S', 'size' => 14, 'slug' => 's'],
@@ -50,8 +49,7 @@ return [
 	],
 
 	/**
-	 * Design tabs (Settings → Theme → Design). Each tab has title and sections.
-	 * Tab/section titles are English; theme-settings wraps them with _x(…, 'Design tab'|'Design variables').
+	 * Declares which token groups become :root CSS variables (order and section ids).
 	 */
 	'design' => [
 		[
