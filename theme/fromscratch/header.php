@@ -20,7 +20,7 @@
 					</a>
 				</div>
 
-				<?= do_shortcode('[fs_language_switcher]') ?>
+				<?= function_exists('fs_language_switcher_html') ? fs_language_switcher_html() : '' ?>
 
 				<div class="header-menu__wrapper">
 					<?php fs_nav_menu([
@@ -29,8 +29,6 @@
 						'container' => 'nav'
 					]); ?>
 				</div>
-
-				|1|
 
 				<div class="header-menu__toggler-container" data-toggle-menu>
 					<div class="main-menu__toggler-icon-container">

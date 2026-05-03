@@ -1101,11 +1101,22 @@ add_filter('wp_nav_menu_objects', function (array $items, stdClass $args): array
 }, 10, 2);
 
 /**
- * Language toggler shortcode: list of language links with active class on current language.
- * When a language has no translation for the current page, behavior is controlled by Settings → Developer → Languages (no_translation).
+ * Whether the language switcher shortcode should output anything (Developer → Features → Languages).
  */
-add_shortcode('fs_language_switcher', function (): string {
-	if (!function_exists('fs_theme_feature_enabled') || !fs_theme_feature_enabled('languages')) {
+function fs_language_switcher_available(): bool
+{
+	return function_exists('fs_theme_feature_enabled') && fs_theme_feature_enabled('languages');
+}
+
+/**
+ * Language switcher markup (same output as shortcode [fs_language_switcher]).
+ * When a language has no translation for the current page, behavior is controlled by Settings → Developer → Languages (no_translation).
+ *
+ * @return string HTML or empty string when the feature is off or there is nothing to show.
+ */
+function fs_language_switcher_html(): string
+{
+	if (!fs_language_switcher_available()) {
 		return '';
 	}
 	$languages = fs_get_content_languages();
@@ -1178,6 +1189,10 @@ add_shortcode('fs_language_switcher', function (): string {
 	}
 
 	return '<ul class="fs-language-toggler"><li>' . implode('</li><li>', $items) . '</li></ul>';
+}
+
+add_shortcode('fs_language_switcher', static function ($atts = [], $content = null, $tag = ''): string {
+	return fs_language_switcher_html();
 });
 
 /**
