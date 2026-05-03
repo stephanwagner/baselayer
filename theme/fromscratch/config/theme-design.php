@@ -51,7 +51,7 @@ return [
 
 	/**
 	 * Design tabs (Settings → Theme → Design). Each tab has title and sections.
-	 * Tab/section titles are English; theme-settings wraps them with _x(…, 'Design tab'|'Design section').
+	 * Tab/section titles are English; theme-settings wraps them with _x(…, 'Design tab'|'Design variables').
 	 */
 	'design' => [
 		[

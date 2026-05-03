@@ -204,15 +204,6 @@ msgstr "Wird als Vorschaubild für soziale Medien (og:image) genutzt, wenn eine 
 msgid "Best size: 1200 × 630 px."
 msgstr "Ideale Größe: 1200 × 630 px."
 
-msgid "Global Content"
-msgstr "Globale Inhalte"
-
-msgid "Define content that is used across the website."
-msgstr "Definiere Inhalte, die websiteweit verwendet werden."
-
-msgid "Updating these values will automatically update them wherever they are used."
-msgstr "Änderungen werden automatisch überall übernommen, wo sie genutzt werden."
-
 msgid "Hide developer options"
 msgstr "Entwickleroptionen ausblenden"
 
@@ -314,233 +305,6 @@ msgstr "Legt fest, wie viele Beiträge pro Seite im Blog, in Archiven und in Suc
 
 msgid "Same as Settings → Reading → “Blog pages show at most”."
 msgstr "Entspricht den Einstellungen unter Lesen → „Blogseiten zeigen maximal“."
-
-# Design variables
-
-msgid "Design"
-msgstr "Design"
-
-msgid "Define design values used across the website."
-msgstr "Definiere Designwerte, die webseitenweit verwendet werden."
-
-msgid "Changes are automatically applied wherever they are used."
-msgstr "Änderungen werden automatisch überall übernommen, wo sie genutzt werden."
-
-msgctxt "Design section"
-msgid "Colors"
-msgstr "Farben"
-
-msgctxt "Design section"
-msgid "Gradients"
-msgstr "Verläufe"
-
-msgctxt "Design section"
-msgid "Text"
-msgstr "Text"
-
-msgctxt "Design section"
-msgid "Scaffold"
-msgstr "Grundstruktur"
-
-msgctxt "Design section"
-msgid "Dimensions"
-msgstr "Abmessungen"
-
-msgctxt "Design section"
-msgid "Breakpoints"
-msgstr "Breakpoints"
-
-msgctxt "Design section"
-msgid "Other"
-msgstr "Sonstiges"
-
-msgctxt "Design variable"
-msgid "Primary color"
-msgstr "Primärfarbe"
-
-msgctxt "Design variable"
-msgid "Secondary color"
-msgstr "Sekundärfarbe"
-
-msgctxt "Design variable"
-msgid "White"
-msgstr "Weiß"
-
-msgctxt "Design variable"
-msgid "Black"
-msgstr "Schwarz"
-
-msgctxt "Design variable"
-msgid "Lighter black"
-msgstr "Helleres Schwarz"
-
-msgctxt "Design variable"
-msgid "Gray 600"
-msgstr "Grau 600"
-
-msgctxt "Design variable"
-msgid "Gray 500"
-msgstr "Grau 500"
-
-msgctxt "Design variable"
-msgid "Gray 400"
-msgstr "Grau 400"
-
-msgctxt "Design variable"
-msgid "Gray 300"
-msgstr "Grau 300"
-
-msgctxt "Design variable"
-msgid "Gray 200"
-msgstr "Grau 200"
-
-msgctxt "Design variable"
-msgid "Gray 100"
-msgstr "Grau 100"
-
-msgctxt "Design variable"
-msgid "Primary gradient"
-msgstr "Primärer Verlauf"
-
-msgctxt "Design variable"
-msgid "Small"
-msgstr "Klein"
-
-msgctxt "Design variable"
-msgid "Normal"
-msgstr "Normal"
-
-msgctxt "Design variable"
-msgid "Large"
-msgstr "Groß"
-
-msgctxt "Design variable"
-msgid "Extra large"
-msgstr "Extra groß"
-
-msgctxt "Design section"
-msgid "Font sizes"
-msgstr "Schriftgrößen"
-
-msgctxt "Design variable"
-msgid "Default font size"
-msgstr "Standard Schriftgröße"
-
-msgctxt "Design variable"
-msgid "Default line height"
-msgstr "Standard Zeilenabstand"
-
-msgctxt "Design variable"
-msgid "Default text color"
-msgstr "Standard Textfarbe"
-
-msgctxt "Design variable"
-msgid "Link color"
-msgstr "Linkfarbe"
-
-msgctxt "Design variable"
-msgid "Link color (hover)"
-msgstr "Linkfarbe (hover)"
-
-msgctxt "Design section"
-msgid "Content"
-msgstr "Inhalt"
-
-msgctxt "Design variable"
-msgid "Max content width"
-msgstr "Max. Inhaltsbreite"
-
-msgctxt "Design variable"
-msgid "Narrow content width"
-msgstr "Schmale Inhaltsbreite"
-
-msgctxt "Design variable"
-msgid "Very narrow width"
-msgstr "Sehr schmale Breite"
-
-msgctxt "Design variable"
-msgid "Padding XL"
-msgstr "Innenabstand XL"
-
-msgctxt "Design variable"
-msgid "Padding L"
-msgstr "Innenabstand L"
-
-msgctxt "Design variable"
-msgid "Padding M"
-msgstr "Innenabstand M"
-
-msgctxt "Design variable"
-msgid "Padding S"
-msgstr "Innenabstand S"
-
-msgctxt "Design variable"
-msgid "Padding XS"
-msgstr "Innenabstand XS"
-
-msgctxt "Design variable"
-msgid "Header height"
-msgstr "Header-Höhe"
-
-msgctxt "Design variable"
-msgid "Header height (mobile)"
-msgstr "Header-Höhe (mobil)"
-
-msgctxt "Design variable"
-msgid "Header height (scrolled)"
-msgstr "Header-Höhe (gescrollt)"
-
-msgctxt "Design variable"
-msgid "Mobile menu width"
-msgstr "Breite mobiles Menü"
-
-msgctxt "Design variable"
-msgid "Mobile breakpoint"
-msgstr "Mobil-Umschlag"
-
-msgctxt "Design variable"
-msgid "Breakpoint XL"
-msgstr "Breakpoint XL"
-
-msgctxt "Design variable"
-msgid "Breakpoint L"
-msgstr "Breakpoint L"
-
-msgctxt "Design variable"
-msgid "Breakpoint M"
-msgstr "Breakpoint M"
-
-msgctxt "Design variable"
-msgid "Breakpoint S"
-msgstr "Breakpoint S"
-
-msgctxt "Design variable"
-msgid "Breakpoint XS"
-msgstr "Breakpoint XS"
-
-msgctxt "Design variable"
-msgid "Default transition duration"
-msgstr "Standard Übergangsdauer"
-
-msgctxt "Design variable"
-msgid "Slow transition duration"
-msgstr "Langsame Übergangsdauer"
-
-msgctxt "Design section"
-msgid "Transitions"
-msgstr "Übergänge"
-
-msgctxt "Design section"
-msgid "Border radius"
-msgstr "Eckenradius"
-
-msgctxt "Design variable"
-msgid "Small radius"
-msgstr "Kleiner Radius"
-
-msgctxt "Design variable"
-msgid "Default radius"
-msgstr "Standard-Radius"
 
 # Dashboard
 
@@ -2350,3 +2114,269 @@ msgstr "Entwicklerrechte"
 
 msgid "This user has developer rights"
 msgstr "Dieser Benutzer hat Entwicklerrechte"
+
+# Design variables
+
+msgid "Design"
+msgstr "Design"
+
+msgid "Define design values used across the website."
+msgstr "Definiere Designwerte, die webseitenweit verwendet werden."
+
+msgid "Changes are automatically applied wherever they are used."
+msgstr "Änderungen werden automatisch überall übernommen, wo sie genutzt werden."
+
+msgctxt "Design variables"
+msgid "Colors"
+msgstr "Farben"
+
+msgctxt "Design variables"
+msgid "Gradients"
+msgstr "Verläufe"
+
+msgctxt "Design variables"
+msgid "Text"
+msgstr "Text"
+
+msgctxt "Design variables"
+msgid "Scaffold"
+msgstr "Grundstruktur"
+
+msgctxt "Design variables"
+msgid "Dimensions"
+msgstr "Abmessungen"
+
+msgctxt "Design variables"
+msgid "Breakpoints"
+msgstr "Breakpoints"
+
+msgctxt "Design variables"
+msgid "Other"
+msgstr "Sonstiges"
+
+msgctxt "Design variables"
+msgid "Primary color"
+msgstr "Primärfarbe"
+
+msgctxt "Design variables"
+msgid "Secondary color"
+msgstr "Sekundärfarbe"
+
+msgctxt "Design variables"
+msgid "White"
+msgstr "Weiß"
+
+msgctxt "Design variables"
+msgid "Black"
+msgstr "Schwarz"
+
+msgctxt "Design variables"
+msgid "Lighter black"
+msgstr "Helleres Schwarz"
+
+msgctxt "Design variables"
+msgid "Gray 600"
+msgstr "Grau 600"
+
+msgctxt "Design variables"
+msgid "Gray 500"
+msgstr "Grau 500"
+
+msgctxt "Design variables"
+msgid "Gray 400"
+msgstr "Grau 400"
+
+msgctxt "Design variables"
+msgid "Gray 300"
+msgstr "Grau 300"
+
+msgctxt "Design variables"
+msgid "Gray 200"
+msgstr "Grau 200"
+
+msgctxt "Design variables"
+msgid "Gray 100"
+msgstr "Grau 100"
+
+msgctxt "Design variables"
+msgid "Primary gradient"
+msgstr "Primärer Verlauf"
+
+msgctxt "Design variables"
+msgid "Small"
+msgstr "Klein"
+
+msgctxt "Design variables"
+msgid "Normal"
+msgstr "Normal"
+
+msgctxt "Design variables"
+msgid "Large"
+msgstr "Groß"
+
+msgctxt "Design variables"
+msgid "Extra large"
+msgstr "Extra groß"
+
+msgctxt "Design variables"
+msgid "Font sizes"
+msgstr "Schriftgrößen"
+
+msgctxt "Design variables"
+msgid "Default font size"
+msgstr "Standard Schriftgröße"
+
+msgctxt "Design variables"
+msgid "Default line height"
+msgstr "Standard Zeilenabstand"
+
+msgctxt "Design variables"
+msgid "Default text color"
+msgstr "Standard Textfarbe"
+
+msgctxt "Design variables"
+msgid "Link color"
+msgstr "Linkfarbe"
+
+msgctxt "Design variables"
+msgid "Link color (hover)"
+msgstr "Linkfarbe (hover)"
+
+msgctxt "Design variables"
+msgid "Content"
+msgstr "Inhalt"
+
+msgctxt "Design variables"
+msgid "Max content width"
+msgstr "Max. Inhaltsbreite"
+
+msgctxt "Design variables"
+msgid "Narrow content width"
+msgstr "Schmale Inhaltsbreite"
+
+msgctxt "Design variables"
+msgid "Very narrow width"
+msgstr "Sehr schmale Breite"
+
+msgctxt "Design variables"
+msgid "Padding XL"
+msgstr "Innenabstand XL"
+
+msgctxt "Design variables"
+msgid "Padding L"
+msgstr "Innenabstand L"
+
+msgctxt "Design variables"
+msgid "Padding M"
+msgstr "Innenabstand M"
+
+msgctxt "Design variables"
+msgid "Padding S"
+msgstr "Innenabstand S"
+
+msgctxt "Design variables"
+msgid "Padding XS"
+msgstr "Innenabstand XS"
+
+msgctxt "Design variables"
+msgid "Header height"
+msgstr "Header-Höhe"
+
+msgctxt "Design variables"
+msgid "Header height (mobile)"
+msgstr "Header-Höhe (mobil)"
+
+msgctxt "Design variables"
+msgid "Header height (scrolled)"
+msgstr "Header-Höhe (gescrollt)"
+
+msgctxt "Design variables"
+msgid "Mobile menu width"
+msgstr "Breite mobiles Menü"
+
+msgctxt "Design variables"
+msgid "Mobile breakpoint"
+msgstr "Mobil-Umschlag"
+
+msgctxt "Design variables"
+msgid "Breakpoint XL"
+msgstr "Breakpoint XL"
+
+msgctxt "Design variables"
+msgid "Breakpoint L"
+msgstr "Breakpoint L"
+
+msgctxt "Design variables"
+msgid "Breakpoint M"
+msgstr "Breakpoint M"
+
+msgctxt "Design variables"
+msgid "Breakpoint S"
+msgstr "Breakpoint S"
+
+msgctxt "Design variables"
+msgid "Breakpoint XS"
+msgstr "Breakpoint XS"
+
+msgctxt "Design variables"
+msgid "Default transition duration"
+msgstr "Standard Übergangsdauer"
+
+msgctxt "Design variables"
+msgid "Slow transition duration"
+msgstr "Langsame Übergangsdauer"
+
+msgctxt "Design variables"
+msgid "Transitions"
+msgstr "Übergänge"
+
+msgctxt "Design variables"
+msgid "Border radius"
+msgstr "Eckenradius"
+
+msgctxt "Design variables"
+msgid "Small radius"
+msgstr "Kleiner Radius"
+
+msgctxt "Design variables"
+msgid "Default radius"
+msgstr "Standard-Radius"
+
+# Content variables
+
+msgid "Global Content"
+msgstr "Globale Inhalte"
+
+msgid "Define content that is used across the website."
+msgstr "Definiere Inhalte, die websiteweit verwendet werden."
+
+msgid "Updating these values will automatically update them wherever they are used."
+msgstr "Änderungen werden automatisch überall übernommen, wo sie genutzt werden."
+
+msgctxt "Content variables"
+msgid "General"
+msgstr "Allgemein"
+
+msgctxt "Content variables"
+msgid "Examples"
+msgstr "Beispiele"
+
+msgctxt "Content variables"
+msgid "Company data"
+msgstr "Unternehmensdaten"
+
+msgctxt "Content variables"
+msgid "Company name"
+msgstr "Firmenname"
+
+msgctxt "Content variables"
+msgid "Address"
+msgstr "Adresse"
+
+msgctxt "Content variables"
+msgid "Phone"
+msgstr "Telefon"
+
+msgctxt "Content variables"
+msgid "Email"
+msgstr "E-Mail"

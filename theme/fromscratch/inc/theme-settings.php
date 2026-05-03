@@ -1119,7 +1119,7 @@ function theme_settings_page(): void
 				<div class="fs-tabs" data-fs-tabs>
 					<nav class="fs-tabs-nav" data-fs-tabs-nav role="tablist">
 						<?php foreach ($content_tabs as $i => $ct) : ?>
-							<button type="button" class="button fs-tabs-btn fs-button-can-toggle <?= ($i === 0) ? 'active' : '' ?>" role="tab" aria-selected="<?= ($i === 0) ? 'true' : 'false' ?>" aria-controls="fs-content-panel-<?= esc_attr($ct['id']) ?>" data-fs-tabs-btn data-tab="<?= esc_attr($ct['id']) ?>"><?= esc_html($ct['title'] ?? $ct['id']) ?></button>
+							<button type="button" class="button fs-tabs-btn fs-button-can-toggle <?= ($i === 0) ? 'active' : '' ?>" role="tab" aria-selected="<?= ($i === 0) ? 'true' : 'false' ?>" aria-controls="fs-content-panel-<?= esc_attr($ct['id']) ?>" data-fs-tabs-btn data-tab="<?= esc_attr($ct['id']) ?>"><?= esc_html_x($ct['title'] ?? $ct['id'], 'Content variables', 'fromscratch') ?></button>
 						<?php endforeach; ?>
 					</nav>
 					<div class="fs-tabs-panels" data-fs-tabs-panels>
@@ -1453,7 +1453,7 @@ function theme_settings_page(): void
 						<?php foreach ($design_tabs as $i => $dt) :
 							$tab_id = isset($dt['title']) ? sanitize_title($dt['title']) : 'tab-' . $i;
 						?>
-							<button type="button" class="button fs-tabs-btn fs-button-can-toggle <?= ($i === 0) ? 'active' : '' ?>" role="tab" aria-selected="<?= ($i === 0) ? 'true' : 'false' ?>" aria-controls="fs-design-panel-<?= esc_attr($tab_id) ?>" data-fs-tabs-btn data-tab="<?= esc_attr($tab_id) ?>"><?= esc_html(_x($dt['title'] ?? $tab_id, 'Design section', 'fromscratch')) ?></button>
+							<button type="button" class="button fs-tabs-btn fs-button-can-toggle <?= ($i === 0) ? 'active' : '' ?>" role="tab" aria-selected="<?= ($i === 0) ? 'true' : 'false' ?>" aria-controls="fs-design-panel-<?= esc_attr($tab_id) ?>" data-fs-tabs-btn data-tab="<?= esc_attr($tab_id) ?>"><?= esc_html(_x($dt['title'] ?? $tab_id, 'Design variables', 'fromscratch')) ?></button>
 						<?php endforeach; ?>
 					</nav>
 					<div class="fs-tabs-panels" data-fs-tabs-panels>
@@ -1471,7 +1471,7 @@ function theme_settings_page(): void
 									$section_title = $section['title'];
 								?>
 									<div class="fromscratch-design-section">
-										<h3 class="title"><?= esc_html(_x($section_title, 'Design section', 'fromscratch')) ?></h3>
+										<h3 class="title"><?= esc_html(_x($section_title, 'Design variables', 'fromscratch')) ?></h3>
 										<table class="widefat striped fs-design-section-table" role="presentation">
 											<tbody>
 												<?php foreach ($section['variables'] as $v) :
@@ -1491,12 +1491,12 @@ function theme_settings_page(): void
 														</th>
 														<td>
 															<div class="fromscratch-design-field <?= $type_class ?>">
-																<label for="fromscratch_design_<?= esc_attr($var_id) ?>" class="screen-reader-text"><?= esc_html(_x($var_title, 'Design variable', 'fromscratch')) ?></label>
+																<label for="fromscratch_design_<?= esc_attr($var_id) ?>" class="screen-reader-text"><?= esc_html(_x($var_title, 'Design variables', 'fromscratch')) ?></label>
 																<input type="text" name="<?= $input_name ?>" id="fromscratch_design_<?= esc_attr($var_id) ?>" value="<?= esc_attr($override) ?>" placeholder="<?= esc_attr($default) ?>" class="code fs-code-small fromscratch-design-input <?= esc_attr($type_class) ?>" <?= $var_type === 'color' ? 'maxlength="22" data-design-color-input' : '' ?>>
 																<?php if ($var_type === 'color') : ?>
 																	<span class="fromscratch-design-color-preview<?= $preview_color === '' ? ' -empty' : '' ?>" <?= $preview_color !== '' ? ' style="background-color: ' . esc_attr($preview_color) . ';"' : '' ?> aria-hidden="true" data-design-color-preview></span>
 																<?php endif; ?>
-																<span class="fromscratch-design-field-description"><?= esc_html(_x($var_title, 'Design variable', 'fromscratch')) ?></span>
+																<span class="fromscratch-design-field-description"><?= esc_html(_x($var_title, 'Design variables', 'fromscratch')) ?></span>
 															</div>
 														</td>
 													</tr>
@@ -1698,6 +1698,7 @@ function display_custom_info_fields(): void
 			foreach ($section['variables'] as $variable) {
 				$variableId = FS_THEME_CONTENT_OPTION_PREFIX . $tab['id'] . '_' . $section['id'] . '_' . $variable['id'];
 				$variable_title = $variable['title'] ?? $variable['id'] ?? '';
+				$variable_label = esc_html_x($variable_title, 'Content variables', 'fromscratch');
 				$is_multiselect = isset($variable['type']) && $variable['type'] === 'multiselect';
 				$register_args = [];
 				if ($is_multiselect && !empty($variable['options'])) {
@@ -1717,7 +1718,7 @@ function display_custom_info_fields(): void
 					$content_langs = fs_get_content_languages();
 					if (!empty($content_langs)) {
 						$field_id_bundle = $variableId . '__fs_i18n_row';
-						$title_markup = '<span class="fs-content-field-label">' . esc_html($variable_title) . '</span>';
+						$title_markup = '<span class="fs-content-field-label">' . $variable_label . '</span>';
 						if (count($content_langs) >= 2) {
 							$title_markup .= '<div class="fs-content-field-lang-switcher" data-fs-content-field-lang-switcher role="group" aria-label="' . esc_attr__('Language for this field', 'fromscratch') . '">';
 							foreach ($content_langs as $language) {
@@ -1758,13 +1759,13 @@ function display_custom_info_fields(): void
 							register_setting(FS_THEME_OPTION_GROUP_TEXTE, $variableIdLang, $register_args);
 						}
 					} else {
-						add_settings_field($variableId, $variable_title, function () use ($variable, $variableId) {
+						add_settings_field($variableId, $variable_label, function () use ($variable, $variableId) {
 							display_custom_info_field($variable, $variableId);
 						}, $content_page, 'section');
 						register_setting(FS_THEME_OPTION_GROUP_TEXTE, $variableId, $register_args);
 					}
 				} else {
-					add_settings_field($variableId, $variable_title, function () use ($variable, $variableId) {
+					add_settings_field($variableId, $variable_label, function () use ($variable, $variableId) {
 						display_custom_info_field($variable, $variableId);
 					}, $content_page, 'section');
 					register_setting(FS_THEME_OPTION_GROUP_TEXTE, $variableId, $register_args);
