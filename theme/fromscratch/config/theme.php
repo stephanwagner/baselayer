@@ -24,7 +24,7 @@ return [
 
 	/**
 	 * Comments.
-	 * enabled: when false, comments are disabled globally in frontend and admin.
+	 * When false, comments are disabled globally in frontend and admin.
 	 */
 	'comments' => false,
 

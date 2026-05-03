@@ -4,6 +4,10 @@ defined('ABSPATH') || exit;
 
 require_once __DIR__ . '/install-system.php';
 
+/** Written to style.css when Author / Author URI are left empty at install (matches shipped theme header). */
+const FS_INSTALL_DEFAULT_THEME_AUTHOR = 'Stephan Wagner';
+const FS_INSTALL_DEFAULT_THEME_AUTHOR_URI = 'https://bytesandstripes.com';
+
 /**
  * Redirect to install page only when setup is not completed and user tries to access Theme settings, Tools, Users, or their subpages.
  * On all other admin pages (e.g. Dashboard, Themes list) we do not redirect — the notice is shown only.
@@ -260,7 +264,7 @@ function fs_render_installer(): void
               <label for="theme_author"><?= esc_html__('Theme Author', 'fromscratch') ?></label>
             </th>
             <td>
-              <input type="text" name="theme[author]" id="theme_author" value="<?= esc_attr($fs_install_val(['theme', 'author'])) ?>" class="regular-text">
+              <input type="text" name="theme[author]" id="theme_author" value="<?= esc_attr($fs_install_val(['theme', 'author'], FS_INSTALL_DEFAULT_THEME_AUTHOR)) ?>" class="regular-text">
             </td>
           </tr>
           <tr>
@@ -268,7 +272,7 @@ function fs_render_installer(): void
               <label for="theme_author_uri"><?= esc_html__('Theme Author URI', 'fromscratch') ?></label>
             </th>
             <td>
-              <input type="text" name="theme[author_uri]" id="theme_author_uri" value="<?= esc_attr($fs_install_val(['theme', 'author_uri'])) ?>" class="regular-text">
+              <input type="text" name="theme[author_uri]" id="theme_author_uri" value="<?= esc_attr($fs_install_val(['theme', 'author_uri'], FS_INSTALL_DEFAULT_THEME_AUTHOR_URI)) ?>" class="regular-text">
             </td>
           </tr>
         </table>
@@ -941,6 +945,12 @@ function fromscratch_run_install(): void
   $theme_desc = sanitize_text_field($_POST['theme']['description'] ?? '');
   $theme_author = sanitize_text_field($_POST['theme']['author'] ?? '');
   $theme_author_uri = esc_url_raw($_POST['theme']['author_uri'] ?? '');
+  if ($theme_author === '') {
+    $theme_author = FS_INSTALL_DEFAULT_THEME_AUTHOR;
+  }
+  if ($theme_author_uri === '') {
+    $theme_author_uri = FS_INSTALL_DEFAULT_THEME_AUTHOR_URI;
+  }
 
   /**
    * Theme infos (style.css header)
