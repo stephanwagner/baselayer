@@ -10,7 +10,7 @@ if (!defined('FS_THEME_CONTENT_OPTION_PREFIX')) {
 /**
  * Get theme config: config/theme.php merged with config/theme-design.php.
  *
- * @param string|null $key Optional. Dot path, e.g. 'menus', 'design.sections'.
+ * @param string|null $key Optional. Dot path, e.g. 'menus', 'colors'.
  * @return array|mixed Full config if $key is null, else value at $key.
  */
 function fs_config(?string $key = null)

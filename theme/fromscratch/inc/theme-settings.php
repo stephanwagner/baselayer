@@ -102,6 +102,26 @@ function fs_theme_settings_current_tab(): string
 }
 
 /**
+ * Browser/window title and page &lt;h1&gt;: Settings › Theme [› Tab] when not on the first visible tab (core-style).
+ */
+function fs_theme_settings_admin_title(string $current_tab): string
+{
+	if (!function_exists('fs_admin_settings_submenu_title')) {
+		return __('Theme', 'fromscratch');
+	}
+	$available = fs_theme_settings_available_tabs();
+	if ($available === []) {
+		return fs_admin_settings_submenu_title(__('Theme', 'fromscratch'));
+	}
+	$first_slug = array_key_first($available);
+	if ($current_tab === $first_slug) {
+		return fs_admin_settings_submenu_title(__('Theme', 'fromscratch'));
+	}
+	$label = $available[$current_tab] ?? $current_tab;
+	return fs_admin_settings_submenu_title(__('Theme', 'fromscratch'), __($label, 'fromscratch'));
+}
+
+/**
  * Admin screen title like WordPress core (e.g. Einstellungen › Allgemein): translated Settings + › + segment(s).
  *
  * @param string ...$parts Labels shown after “Settings ›”.
@@ -955,7 +975,7 @@ function theme_settings_page(): void
 	}
 ?>
 	<div class="wrap">
-		<h1><?= esc_html(fs_admin_settings_submenu_title(__('Theme', 'fromscratch'))) ?></h1>
+		<h1><?= esc_html(fs_theme_settings_admin_title($tab)) ?></h1>
 		<?php
 		$notices = [];
 		if ($redirects_saved !== false || $css_saved !== false || $general_saved !== false) {
@@ -1921,7 +1941,7 @@ add_action('admin_menu', 'add_theme_settings_menu_item', 1);
 
 add_action('load-settings_page_fs-theme-settings', static function (): void {
 	global $title;
-	$title = fs_admin_settings_submenu_title(__('Theme', 'fromscratch'));
+	$title = fs_theme_settings_admin_title(fs_theme_settings_current_tab());
 });
 
 add_filter('submenu_file', function ($submenu_file, $parent_file) {

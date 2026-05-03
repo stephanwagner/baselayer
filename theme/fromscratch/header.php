@@ -3,7 +3,6 @@
 
 <head>
 <?php wp_head(); ?>
-<?php function_exists('fs_output_design_css') && fs_output_design_css(); ?>
 <?php function_exists('fs_output_custom_css') && fs_output_custom_css(); ?>
 </head>
 
