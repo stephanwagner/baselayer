@@ -24,15 +24,15 @@ $breakpoint-mobile: 900px;
 
 // Padding
 $content-padding-xs: 24px;
-$content-padding-m: 48px;
 $content-padding-s: 32px;
+$content-padding-m: 48px;
 $content-padding-l: 64px;
 $content-padding-xl: 64px;
 
 // Header
 $header-height: 96px;
-$header-height-mobile: 64px;
 $header-height-scrolled: 64px;
+$header-height-mobile: 64px;
 
 // Variables
 :root {
@@ -97,8 +97,8 @@ $header-height-scrolled: 64px;
 
   // Header
   --fs-header-height: 96px;
-  --fs-header-height-mobile: 64px;
   --fs-header-height-scrolled: 64px;
+  --fs-header-height-mobile: 64px;
 
   // Mobile menu
   --fs-mobile-menu-width: 280px;

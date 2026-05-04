@@ -149,14 +149,18 @@
   pointer-events: none;
   transition: transition('opacity');
 
-  body.-menu-open & {
-    opacity: 1;
-    pointer-events: all;
+  @media (max-width: $breakpoint-mobile) {
+    body.-menu-open & {
+      opacity: 1;
+      pointer-events: all;
+    }
   }
 }
 
 body.-menu-block-scroll {
-  overflow: hidden;
+  @media (max-width: $breakpoint-mobile) {
+    overflow: hidden;
+  }
 }
 
 // Toggler
