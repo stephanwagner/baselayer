@@ -86,7 +86,9 @@ class FS_Walker_Nav_Menu extends Walker_Nav_Menu
 				__('Toggle submenu for %s', 'fromscratch'),
 				wp_strip_all_tags((string) $title)
 			);
-			$item_output .= '<button class="sub-menu-toggle" aria-expanded="false" aria-controls="' . esc_attr($submenu_id) . '" aria-label="' . esc_attr($toggle_label) . '" type="button"></button>';
+			$item_output .= '<button class="sub-menu-toggle" aria-expanded="false" aria-controls="' . esc_attr($submenu_id) . '" aria-label="' . esc_attr($toggle_label) . '" type="button">';
+			$item_output .= '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M466.54-375.23q-6.23-2.31-11.85-7.92L274.92-562.92q-8.3-8.31-8.5-20.89-.19-12.57 8.5-21.27 8.7-8.69 21.08-8.69 12.38 0 21.08 8.69L480-442.15l162.92-162.93q8.31-8.3 20.89-8.5 12.57-.19 21.27 8.5 8.69 8.7 8.69 21.08 0 12.38-8.69 21.08L505.31-383.15q-5.62 5.61-11.85 7.92-6.23 2.31-13.46 2.31t-13.46-2.31Z"/></svg>';
+			$item_output .= '</button>';
 		}
 
 		$output .= apply_filters('walker_nav_menu_start_el', $item_output, $item, $depth, $args);

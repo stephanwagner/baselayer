@@ -3,6 +3,7 @@
 // Global
 
 @mixin tags {
+
   *,
   *:before,
   *:after {
@@ -14,7 +15,7 @@
 
   a {
     color: var(--fs-link-color);
-    transition: transition('color');
+    transition: transition('color', 'background-color');
     text-decoration: none;
 
     &:hover {

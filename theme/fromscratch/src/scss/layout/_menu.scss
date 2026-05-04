@@ -1,11 +1,13 @@
 @use '../variables' as *;
 
-// Header menu
+// Main menu
 
 .main-menu__wrapper {
   margin-left: auto;
   display: flex;
   align-items: center;
+
+  // Mobile menu
 
   @media (max-width: $breakpoint-mobile) {
     position: absolute;
@@ -17,7 +19,7 @@
     margin: 0;
     transition: transition('right');
     height: calc(100vh - var(--fs-header-height));
-    padding: 24px var(--fs-content-padding-l) 24px 24px;
+    padding: 24px calc(var(--fs-content-padding-l) + 8px) 24px 24px;
 
     body.-scrolled & {
       height: calc(100vh - var(--fs-header-height-scrolled));
@@ -40,17 +42,17 @@
     }
 
     @media (max-width: $breakpoint-m) {
-      padding-right: var(--fs-content-padding-m);
+      padding-right: calc(var(--fs-content-padding-m) + 8px);
       right: calc(var(--fs-mobile-menu-width) * -1 - var(--fs-content-padding-m));
     }
 
     @media (max-width: $breakpoint-s) {
-      padding-right: var(--fs-content-padding-s);
+      padding-right: calc(var(--fs-content-padding-s) + 8px);
       right: calc(var(--fs-mobile-menu-width) * -1 - var(--fs-content-padding-s));
     }
 
     @media (max-width: $breakpoint-xs) {
-      padding-right: var(--fs-content-padding-xs);
+      padding-right: calc(var(--fs-content-padding-xs) + 8px);
       width: 100vw;
       right: calc(100vw * -1 - var(--fs-content-padding-xs));
     }
@@ -78,25 +80,42 @@
   padding: 0;
   margin: 0;
   display: flex;
+  align-items: center;
+  gap: 24px;
+  font-size: var(--fs-font-size-m);
+  line-height: var(--fs-line-height-m);
 
   @media (max-width: $breakpoint-mobile) {
     width: 100%;
     flex-direction: column;
-    padding: 8px 0;
+  }
+
+  li {
+    a {
+      display: block;
+      white-space: nowrap;
+      background: rgba(0, 200, 0, 0.1); // TMP
+    }
+
+    &.menu-item-has-children {
+      display: flex;
+      align-items: center;
+
+      >a {
+        padding-right: 2px;
+      }
+    }
   }
 
   >li {
+    position: relative;
     padding: 0;
-    margin: 0 24px 0 0;
+    margin: 0;
+    line-height: 24px;
 
     @media (max-width: $breakpoint-mobile) {
-      margin: 0;
+      padding: 0;
       text-align: right;
-      padding: 8px 0;
-    }
-
-    &:last-child {
-      margin-right: 0;
     }
 
     >a {
@@ -104,38 +123,170 @@
       text-decoration: none;
 
       &:hover {
-        color: var(--fs-color-primary);
+        color: var(--fs-link-color-hover);
         text-decoration: none;
+      }
+    }
+
+    &:hover {
+      >a {
+        color: var(--fs-link-color);
+
+        &:hover {
+          color: var(--fs-link-color-hover);
+        }
       }
     }
 
     &.-current-active {
       >a {
         color: var(--fs-color-primary);
+
+        &:hover {
+          color: var(--fs-link-color-hover);
+        }
       }
     }
 
-    &.menu-item-is-button {
+    &:last-child {
+      line-height: var(--fs-default-line-height);
+      margin: 0 0 0 12px;
+
       @media (max-width: $breakpoint-mobile) {
-        margin-top: 16px;
+        margin: 16px 0 0 0;
       }
 
       >a {
-        background: var(--fs-color-primary);
         color: #fff;
-        padding: 12px 24px;
-        border-radius: 8px;
+        background: var(--fs-link-color);
+        padding: 6px 20px;
+        border-radius: var(--fs-border-radius);
         text-decoration: none;
         font-weight: 600;
         transition: transition('background-color', 'color');
 
         &:hover {
-          background: var(--fs-color-secondary);
+          color: #fff;
+          background: var(--fs-link-color-hover);
+          text-decoration: none;
+        }
+      }
+    }
+
+    &.menu-item-has-children {
+      display: flex;
+      align-items: center;
+
+      &:hover {
+        >.sub-menu {
+          opacity: 1;
+          transform: translateY(0);
+          pointer-events: all;
+          visibility: visible;
+
+          transition: opacity 0.2s ease,
+            transform 0.2s ease,
+            visibility 0s;
         }
       }
     }
   }
 }
+
+// Submenu
+
+.sub-menu {
+  list-style-type: none;
+  padding: 8px 0;
+  margin: 0;
+  position: absolute;
+  top: calc(100% + 20px);
+  left: -16px;
+  background: #fff;
+  border-radius: var(--fs-border-radius);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  transform: translateY(6px);
+  font-size: var(--fs-font-size-s);
+  line-height: 22px;
+  min-width: 220px;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease,
+    transform 0.2s ease,
+    visibility 0s linear 0.2s;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: calc(100% - 1px);
+    left: 0;
+    right: 0;
+    height: calc(20px + 2px);
+    background: transparent;
+    background: rgba(0, 0, 200, 0.1); // TMP
+  }
+
+  li {
+    margin: 0;
+    padding: 0;
+
+    a {
+      display: block;
+      color: var(--fs-default-text-color);
+      text-decoration: none;
+      padding: 4px 16px;
+
+      &:hover {
+        color: var(--fs-link-color-hover);
+      }
+    }
+
+    &.menu-item-has-children {
+      display: flex;
+      align-items: center;
+      padding-right: 12px;
+    }
+  }
+
+
+  .sub-menu-toggle {
+    cursor: pointer;
+    height: calc(22px + 4px + 4px);
+
+    &:hover {
+      color: var(--fs-link-color-hover);
+    }
+  }
+}
+
+.sub-menu-toggle {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  appearance: none;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fs-default-text-color);
+  transition: transition('color');
+  cursor: default;
+
+  background: rgba(123, 66, 44, 0.1); // TMP
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+}
+
+// Menu overlay
 
 .header__menu-overlay {
   position: fixed;
@@ -157,13 +308,15 @@
   }
 }
 
+// Menu block scroll
+
 body.-menu-block-scroll {
   @media (max-width: $breakpoint-mobile) {
     overflow: hidden;
   }
 }
 
-// Toggler
+// Menu toggler
 
 .main-menu__toggler {
   display: none;
@@ -173,6 +326,8 @@ body.-menu-block-scroll {
   position: relative;
   cursor: pointer;
   margin-left: auto;
+
+  background: rgba(123, 66, 44, 0.1); // TMP
 
   @media (max-width: $breakpoint-mobile) {
     display: block;
