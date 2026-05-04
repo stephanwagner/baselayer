@@ -6,8 +6,9 @@ import config from '../config';
  * @param {Element} el - The element to animate
  * @returns {void}
  */
-document.addEventListener('DOMContentLoaded', () => {
-  onEnterViewport('[data-animation]', (el, index) => {
+onEnterViewport(
+  '[data-animation]',
+  (el, index) => {
     // Delay
     let delay = 0;
 
@@ -22,27 +23,39 @@ document.addEventListener('DOMContentLoaded', () => {
       let delayColumnsXS = -1;
 
       if (el.hasAttribute('data-animation-delay-columns')) {
-        delayColumns = parseInt(el.getAttribute('data-animation-delay-columns'));
+        delayColumns = parseInt(
+          el.getAttribute('data-animation-delay-columns')
+        );
       }
 
       if (el.hasAttribute('data-animation-delay-columns-xl')) {
-        delayColumnsXL = parseInt(el.getAttribute('data-animation-delay-columns-xl'));
+        delayColumnsXL = parseInt(
+          el.getAttribute('data-animation-delay-columns-xl')
+        );
       }
 
       if (el.hasAttribute('data-animation-delay-columns-l')) {
-        delayColumnsL = parseInt(el.getAttribute('data-animation-delay-columns-l'));
+        delayColumnsL = parseInt(
+          el.getAttribute('data-animation-delay-columns-l')
+        );
       }
 
       if (el.hasAttribute('data-animation-delay-columns-m')) {
-        delayColumnsM = parseInt(el.getAttribute('data-animation-delay-columns-m'));
+        delayColumnsM = parseInt(
+          el.getAttribute('data-animation-delay-columns-m')
+        );
       }
 
       if (el.hasAttribute('data-animation-delay-columns-s')) {
-        delayColumnsS = parseInt(el.getAttribute('data-animation-delay-columns-s'));
+        delayColumnsS = parseInt(
+          el.getAttribute('data-animation-delay-columns-s')
+        );
       }
 
       if (el.hasAttribute('data-animation-delay-columns-xs')) {
-        delayColumnsXS = parseInt(el.getAttribute('data-animation-delay-columns-xs'));
+        delayColumnsXS = parseInt(
+          el.getAttribute('data-animation-delay-columns-xs')
+        );
       }
 
       if (delayColumns > 0) {
@@ -57,7 +70,10 @@ document.addEventListener('DOMContentLoaded', () => {
         delay = (index % delayColumnsM) * delay;
       } else if (window.innerWidth <= config.breakpointL && delayColumnsL > 0) {
         delay = (index % delayColumnsL) * delay;
-      } else if (window.innerWidth <= config.breakpointXL && delayColumnsXL > 0) {
+      } else if (
+        window.innerWidth <= config.breakpointXL &&
+        delayColumnsXL > 0
+      ) {
         delay = (index % delayColumnsXL) * delay;
       }
 
@@ -67,8 +83,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     el.setAttribute('data-animation-active', '');
-  }, {
+  },
+  {
     rootMargin: '0px',
     threshold: 0.1
-  });
-});
+  }
+);
