@@ -1,11 +1,5 @@
 import config from '../config';
 
-document.addEventListener('DOMContentLoaded', () => {
-  window.addEventListener('scroll', checkScroll);
-  window.addEventListener('resize', checkScroll);
-  checkScroll();
-});
-
 let isScrolled = false;
 
 function checkScroll() {
@@ -16,3 +10,7 @@ function checkScroll() {
     isScrolled = shouldBeScrolled;
   }
 }
+
+window.addEventListener('scroll', checkScroll, { passive: true });
+window.addEventListener('resize', checkScroll, { passive: true });
+checkScroll();

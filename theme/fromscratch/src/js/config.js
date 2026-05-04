@@ -6,61 +6,61 @@
 const ROOT_VAR_MAP = [
   {
     key: 'mobileBreakpoint',
-    prop: '--breakpoint-mobile',
+    prop: '--fs-breakpoint-mobile',
     parse: 'unit',
     fallback: 900
   },
   {
     key: 'breakpointXL',
-    prop: '--breakpoint-xl',
+    prop: '--fs-breakpoint-xl',
     parse: 'unit',
     fallback: 1400
   },
   {
     key: 'breakpointL',
-    prop: '--breakpoint-l',
+    prop: '--fs-breakpoint-l',
     parse: 'unit',
     fallback: 1200
   },
   {
     key: 'breakpointM',
-    prop: '--breakpoint-m',
+    prop: '--fs-breakpoint-m',
     parse: 'unit',
     fallback: 900
   },
   {
     key: 'breakpointS',
-    prop: '--breakpoint-s',
+    prop: '--fs-breakpoint-s',
     parse: 'unit',
     fallback: 600
   },
   {
     key: 'breakpointXS',
-    prop: '--breakpoint-xs',
+    prop: '--fs-breakpoint-xs',
     parse: 'unit',
     fallback: 400
   },
   {
     key: 'scrolledHeaderHeight',
-    prop: '--header-height-scrolled',
+    prop: '--fs-header-height-scrolled',
     parse: 'unit',
     fallback: 64
   },
   {
     key: 'startScrolled',
-    prop: '--header-height-scrolled',
+    prop: '--fs-header-height-scrolled',
     parse: 'unit',
     fallback: 64
   },
   {
     key: 'defaultTransitionSpeed',
-    prop: '--transition-speed',
+    prop: '--fs-transition-speed',
     parse: 'unit',
     fallback: 240
   },
   {
     key: 'slowTransitionSpeed',
-    prop: '--transition-speed-slow',
+    prop: '--fs-transition-speed-slow',
     parse: 'unit',
     fallback: 360
   }
@@ -91,8 +91,6 @@ function readRootVars() {
 }
 
 const fromCss = readRootVars();
-
-console.log(fromCss);
 
 export default {
   // From CSS :root variables

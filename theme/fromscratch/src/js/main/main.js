@@ -15,14 +15,10 @@ import { initModals, openModal } from '../components/modal';
 // TODO find solution to sunc with blocks plugin
 // import '../blocks/all-blocks';
 
-// Domready
-document.addEventListener('DOMContentLoaded', () => {
+// Delay initial animations
+setTimeout(function () {
+  document.body.classList.add('-init');
+}, 128);
 
-  // Delay initial animations
-  setTimeout(function () {
-    document.body.classList.add('-init');
-  }, 64);
-
-  // Init modals
-  initModals();
-});
+// Init modals
+initModals();

@@ -1,117 +1,119 @@
+@use 'sass:list';
+
 // Paths
 $themePath: '/wp-content/themes/fromscratch';
 
 // Variables
 :root {
   // Colors
-  --color-primary: #4080ff;
-  --color-secondary: #00ddff;
+  --fs-color-primary: #4080ff;
+  --fs-color-secondary: #10ddff;
 
   // Grayscale
-  --color-white: #fff;
-  --color-black: #000;
-  --color-off-black: #222;
-  --color-gray-600: #666;
-  --color-gray-500: #999;
-  --color-gray-400: #ccc;
-  --color-gray-300: #ddd;
-  --color-gray-200: #eee;
-  --color-gray-100: #f6f6f6;
+  --fs-color-white: #fff;
+  --fs-color-black: #000;
+  --fs-color-off-black: #222;
+  --fs-color-gray-600: #666;
+  --fs-color-gray-500: #999;
+  --fs-color-gray-400: #ccc;
+  --fs-color-gray-300: #ddd;
+  --fs-color-gray-200: #eee;
+  --fs-color-gray-100: #f6f6f6;
 
   // Status colors
-  --color-error: #f33;
-  --color-warning: #fc0;
-  --color-success: #5d5;
+  --fs-color-error: #f33;
+  --fs-color-warning: #fc0;
+  --fs-color-success: #5d5;
 
   // Gradients
-  --gradient-primary: linear-gradient(to right, var(--color-primary), var(--color-secondary));
+  --fs-gradient-primary: linear-gradient(to right, var(--fs-color-primary), var(--fs-color-secondary));
 
   // Font sizes
-  --font-size-s: 14px;
-  --font-size-m: 16px;
-  --font-size-l: 18px;
-  --font-size-xl: 22px;
+  --fs-font-size-s: 14px;
+  --fs-font-size-m: 16px;
+  --fs-font-size-l: 18px;
+  --fs-font-size-xl: 22px;
 
   // Text
-  --primary-font-family: 'Open Sans', sans-serif;
-  --default-text-color: var(--color-off-black);
-  --default-font-size: var(--font-size-m);
-  --default-line-height: 1.6;
-  --link-color: var(--color-primary);
-  --link-color-hover: var(--color-secondary);
+  --fs-primary-font-family: 'Open Sans', sans-serif;
+  --fs-default-text-color: var(--fs-color-off-black);
+  --fs-default-font-size: var(--fs-font-size-m);
+  --fs-default-line-height: 1.6;
+  --fs-link-color: var(--fs-color-primary);
+  --fs-link-color-hover: var(--fs-color-secondary);
 
   // Content
-  --content-max-width: 1200px;
-  --content-narrow-width: 900px;
-  --content-very-narrow-width: 600px;
+  --fs-content-max-width: 1200px;
+  --fs-content-narrow-width: 900px;
+  --fs-content-very-narrow-width: 600px;
 
   // Breakpoints
-  --breakpoint-xs: 400px;
-  --breakpoint-s: 600px;
-  --breakpoint-m: 900px;
-  --breakpoint-l: 1200px;
-  --breakpoint-xl: 1400px;
+  --fs-breakpoint-xs: 400px;
+  --fs-breakpoint-s: 600px;
+  --fs-breakpoint-m: 900px;
+  --fs-breakpoint-l: 1200px;
+  --fs-breakpoint-xl: 1400px;
 
-  --breakpoint-mobile: 900px;
+  --fs-breakpoint-mobile: 900px;
 
   // Padding
-  --content-padding-xs: 24px;
-  --content-padding-m: 48px;
-  --content-padding-s: 32px;
-  --content-padding-l: 64px;
-  --content-padding-xl: 64px;
+  --fs-content-padding-xs: 24px;
+  --fs-content-padding-m: 48px;
+  --fs-content-padding-s: 32px;
+  --fs-content-padding-l: 64px;
+  --fs-content-padding-xl: 64px;
 
   // Header
-  --header-height: 96px;
-  --header-height-mobile: 64px;
-  --header-height-scrolled: 64px;
+  --fs-header-height: 96px;
+  --fs-header-height-mobile: 64px;
+  --fs-header-height-scrolled: 64px;
 
   // Mobile menu
-  --mobile-menu-width: 280px;
+  --fs-mobile-menu-width: 280px;
 
   // Transitions
-  --transition-speed: 240ms;
-  --transition-speed-slow: 360ms;
+  --fs-transition-speed: 240ms;
+  --fs-transition-speed-slow: 360ms;
 
   // Border radius
-  --border-radius: 8px;
-  --border-radius-large: 16px;
+  --fs-border-radius: 8px;
+  --fs-border-radius-large: 16px;
 }
 
 // Colors
 $colors: (
   // Primary colors
-  'primary' var(--color-primary),
-  'secondary' var(--color-secondary),
+  'primary' var(--fs-color-primary),
+  'secondary' var(--fs-color-secondary),
 
   // Grayscale
-  'white' var(--color-white),
-  'black' var(--color-black),
-  'off-black' var(--color-off-black),
-  'gray-100' var(--color-gray-100),
-  'gray-200' var(--color-gray-200),
-  'gray-300' var(--color-gray-300),
-  'gray-400' var(--color-gray-400),
-  'gray-500' var(--color-gray-500),
-  'gray-600' var(--color-gray-600),
+  'white' var(--fs-color-white),
+  'black' var(--fs-color-black),
+  'off-black' var(--fs-color-off-black),
+  'gray-100' var(--fs-color-gray-100),
+  'gray-200' var(--fs-color-gray-200),
+  'gray-300' var(--fs-color-gray-300),
+  'gray-400' var(--fs-color-gray-400),
+  'gray-500' var(--fs-color-gray-500),
+  'gray-600' var(--fs-color-gray-600),
 
   // Status colors
-  'error' var(--color-error),
-  'warning' var(--color-warning),
-  'success' var(--color-success),
+  'error' var(--fs-color-error),
+  'warning' var(--fs-color-warning),
+  'success' var(--fs-color-success),
 );
 
 // Gradients
 $gradients: (
-  "primary": var(--gradient-primary),
+  "primary": var(--fs-gradient-primary),
 );
 
 // Font sizes
 $fontSizes: (
-  's' var(--font-size-s) 1.5,
-  'm' var(--font-size-m) 1.6,
-  'l' var(--font-size-l) 1.5,
-  'xl' var(--font-size-xl) 1.4
+  's' var(--fs-font-size-s) 1.5,
+  'm' var(--fs-font-size-m) 1.6,
+  'l' var(--fs-font-size-l) 1.5,
+  'xl' var(--fs-font-size-xl) 1.4
 );
 
 // Transition helpers
@@ -119,7 +121,7 @@ $fontSizes: (
 @function transition($properties...) {
   $out: ();
   @each $p in $properties {
-    $out: append($out, #{$p} var(--transition-speed) ease-in-out, comma);
+    $out: list.append($out, #{$p} var(--fs-transition-speed), comma);
   }
   @return $out;
 }
@@ -127,7 +129,7 @@ $fontSizes: (
 @function transition-slow($properties...) {
   $out: ();
   @each $p in $properties {
-    $out: append($out, #{$p} var(--transition-speed-slow) ease-in-out, comma);
+    $out: list.append($out, #{$p} var(--fs-transition-speed-slow), comma);
   }
   @return $out;
 }

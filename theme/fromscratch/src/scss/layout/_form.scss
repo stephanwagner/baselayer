@@ -17,7 +17,7 @@
       margin-bottom: 0;
     }
 
-    @media (max-width: var(--breakpoint-s)) {
+    @media (max-width: var(--fs-breakpoint-s)) {
       margin-top: 16px;
       margin-bottom: 16px;
 
@@ -52,7 +52,7 @@
     text-align: left;
     cursor: pointer;
     text-decoration: none !important;
-    background: var(--color-secondary);
+    background: var(--fs-color-secondary);
     transition: transition('background');
     font-weight: 600;
     height: auto;
@@ -60,7 +60,7 @@
     &:hover,
     .-button-trigger:hover & {
       text-decoration: none !important;
-      background: var(--color-primary);
+      background: var(--fs-color-primary);
     }
 
     &[disabled] {

@@ -1,6 +1,6 @@
 @use '../variables' as *;
 
-// Header styles
+// Header
 
 .header__wrapper {
   position: fixed;
@@ -8,7 +8,7 @@
   left: 0;
   right: 0;
   z-index: 100;
-  background: #ccc;
+  background: var(--fs-color-gray-200);
 
   // Adjust when wordpress admin bar is present
   .logged-in.admin-bar & {
@@ -21,31 +21,31 @@
 }
 
 .header__placeholder {
-  height: var(--header-height);
+  height: var(--fs-header-height);
 
-  @media (max-width: var(--breakpoint-mobile)) {
-    height: var(--header-height-mobile);
+  @media (max-width: var(--fs-breakpoint-mobile)) {
+    height: var(--fs-header-height-mobile);
   }
 }
 
 .header__container {
   display: flex;
   align-items: center;
-  height: var(--header-height);
+  height: var(--fs-header-height);
 
   body.-init & {
     transition: transition('height');
   }
 
   body.-scrolled & {
-    height: var(--header-height-scrolled);
+    height: var(--fs-header-height-scrolled);
   }
 
-  @media (max-width: var(--breakpoint-mobile)) {
-    height: var(--header-height-mobile);
+  @media (max-width: var(--fs-breakpoint-mobile)) {
+    height: var(--fs-header-height-mobile);
 
     body.-scrolled & {
-      height: var(--header-height-scrolled);
+      height: var(--fs-header-height-scrolled);
     }
   }
 }
@@ -55,7 +55,7 @@
 }
 
 .logo__image {
-  height: 42px;
+  height: 40px;
   width: auto;
 
   body.-init & {
@@ -66,7 +66,7 @@
     height: 32px;
   }
 
-  @media (max-width: var(--breakpoint-mobile)) {
+  @media (max-width: var(--fs-breakpoint-mobile)) {
     height: 40px;
 
     body.-scrolled & {
@@ -82,67 +82,67 @@
   display: flex;
   align-items: center;
 
-  @media (max-width: var(--breakpoint-mobile)) {
+  @media (max-width: var(--fs-breakpoint-mobile)) {
     position: absolute;
     display: block;
     top: 100%;
     width: var(--mobile-menu-width);
-    right: calc(var(--mobile-menu-width) * -1 - 8px - var(--content-padding-l));
+    right: calc(var(--mobile-menu-width) * -1 - 8px - var(--fs-content-padding-l));
     background: #fff;
     margin: 0;
     transition: transition('right');
-    height: calc(100vh - var(--header-height));
-    padding: 24px var(--content-padding-l) 24px 24px;
+    height: calc(100vh - var(--fs-header-height));
+    padding: 24px var(--fs-content-padding-l) 24px 24px;
 
     body.-scrolled & {
-      height: calc(100vh - var(--header-height-scrolled));
+      height: calc(100vh - var(--fs-header-height-scrolled));
     }
 
     body.admin-bar & {
-      height: calc(100vh - var(--header-height-mobile) - 32px);
+      height: calc(100vh - var(--fs-header-height-mobile) - 32px);
 
       @media (max-width: 782px) {
-        height: calc(100vh - var(--header-height-mobile) - 46px);
+        height: calc(100vh - var(--fs-header-height-mobile) - 46px);
       }
     }
 
     body.admin-bar.-scrolled & {
-      height: calc(100vh - var(--header-height-scrolled) - 32px);
+      height: calc(100vh - var(--fs-header-height-scrolled) - 32px);
 
       @media (max-width: 782px) {
-        height: calc(100vh - var(--header-height-scrolled) - 46px);
+        height: calc(100vh - var(--fs-header-height-scrolled) - 46px);
       }
     }
 
-    @media (max-width: var(--breakpoint-m)) {
-      padding-right: var(--content-padding-m);
-      right: calc(var(--mobile-menu-width) * -1 - var(--content-padding-m));
+    @media (max-width: var(--fs-breakpoint-m)) {
+      padding-right: var(--fs-content-padding-m);
+      right: calc(var(--mobile-menu-width) * -1 - var(--fs-content-padding-m));
     }
 
-    @media (max-width: var(--breakpoint-s)) {
-      padding-right: var(--content-padding-s);
-      right: calc(var(--mobile-menu-width) * -1 - var(--content-padding-s));
+    @media (max-width: var(--fs-breakpoint-s)) {
+      padding-right: var(--fs-content-padding-s);
+      right: calc(var(--mobile-menu-width) * -1 - var(--fs-content-padding-s));
     }
 
-    @media (max-width: var(--breakpoint-xs)) {
-      padding-right: var(--content-padding-xs);
+    @media (max-width: var(--fs-breakpoint-xs)) {
+      padding-right: var(--fs-content-padding-xs);
       width: 100vw;
-      right: calc(100vw * -1 - var(--content-padding-xs));
+      right: calc(100vw * -1 - var(--fs-content-padding-xs));
     }
 
     body.-menu-open & {
-      right: calc(var(--content-padding-l) * -1);
+      right: calc(var(--fs-content-padding-l) * -1);
 
-      @media (max-width: var(--breakpoint-m)) {
-        right: calc(var(--content-padding-m) * -1);
+      @media (max-width: var(--fs-breakpoint-m)) {
+        right: calc(var(--fs-content-padding-m) * -1);
       }
 
-      @media (max-width: var(--breakpoint-s)) {
-        right: calc(var(--content-padding-s) * -1);
+      @media (max-width: var(--fs-breakpoint-s)) {
+        right: calc(var(--fs-content-padding-s) * -1);
       }
 
-      @media (max-width: var(--breakpoint-xs)) {
-        right: calc(var(--content-padding-xs) * -1);
+      @media (max-width: var(--fs-breakpoint-xs)) {
+        right: calc(var(--fs-content-padding-xs) * -1);
       }
     }
   }
@@ -154,7 +154,7 @@
   margin: 0;
   display: flex;
 
-  @media (max-width: var(--breakpoint-mobile)) {
+  @media (max-width: var(--fs-breakpoint-mobile)) {
     width: 100%;
     flex-direction: column;
     padding: 8px 0;
@@ -164,7 +164,7 @@
     padding: 0;
     margin: 0 24px 0 0;
 
-    @media (max-width: var(--breakpoint-mobile)) {
+    @media (max-width: var(--fs-breakpoint-mobile)) {
       margin: 0;
       text-align: right;
       padding: 8px 0;
@@ -175,28 +175,28 @@
     }
 
     >a {
-      color: var(--default-text-color);
+      color: var(--fs-default-text-color);
       text-decoration: none;
 
       &:hover {
-        color: var(--color-primary);
+        color: var(--fs-color-primary);
         text-decoration: none;
       }
     }
 
     &.-current-active {
       >a {
-        color: var(--color-primary);
+        color: var(--fs-color-primary);
       }
     }
 
     &.menu-item-is-button {
-      @media (max-width: var(--breakpoint-mobile)) {
+      @media (max-width: var(--fs-breakpoint-mobile)) {
         margin-top: 16px;
       }
 
       >a {
-        background: var(--color-primary);
+        background: var(--fs-color-primary);
         color: #fff;
         padding: 12px 24px;
         border-radius: 8px;
@@ -205,7 +205,7 @@
         transition: transition('background-color', 'color');
 
         &:hover {
-          background: var(--color-secondary);
+          background: var(--fs-color-secondary);
         }
       }
     }
@@ -242,7 +242,7 @@ body.-menu-block-scroll {
   cursor: pointer;
   margin-left: auto;
   border-radius: 50%;
-  background: var(--color-primary);
+  background: var(--fs-color-primary);
 
   body.-page-init & {
     transition: transition('background-color');
@@ -250,7 +250,7 @@ body.-menu-block-scroll {
 
   &:hover,
   body.-menu-open & {
-    background: var(--color-secondary);
+    background: var(--fs-color-secondary);
   }
 }
 

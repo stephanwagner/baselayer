@@ -1560,7 +1560,7 @@ function theme_settings_page(): void
 						sprintf(
 							/* translators: %s: example CSS variable usage (wrapped in code.fs-code-small). */
 							__('All CSS variables are available, e.g. %s:', 'fromscratch'),
-							'<code class="fs-code-small">' . esc_html('var(--color-primary)') . '</code>'
+							'<code class="fs-code-small">' . esc_html('var(--fs-color-primary)') . '</code>'
 						),
 						[
 							'code' => ['class' => true],

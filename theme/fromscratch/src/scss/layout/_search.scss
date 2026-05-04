@@ -5,7 +5,7 @@
 .search__wrapper {
   margin-left: 16px;
 
-  @media (max-width: var(--breakpoint-m)) {
+  @media (max-width: var(--fs-breakpoint-m)) {
     margin-left: 0;
     padding: 8px 14px;
   }
@@ -25,7 +25,7 @@
   width: 160px;
   margin: 0 8px 0 0;
 
-  @media (max-width: var(--breakpoint-m)) {
+  @media (max-width: var(--fs-breakpoint-m)) {
     width: 100%;
     display: block;
   }
