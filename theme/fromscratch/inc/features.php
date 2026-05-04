@@ -60,7 +60,7 @@ function fs_theme_feature_option_keys_map(): array
 }
 
 /**
- * Body / admin body classes for enabled features (prefix fs-feature-), for CSS scoping.
+ * Admin body classes for enabled features (prefix fs-feature-), for CSS scoping in wp-admin only.
  *
  * @return list<string>
  */
@@ -74,10 +74,6 @@ function fs_theme_feature_body_classes(): array
 	}
 	return $classes;
 }
-
-add_filter('body_class', function (array $classes): array {
-	return array_merge($classes, fs_theme_feature_body_classes());
-});
 
 add_filter('admin_body_class', function (string $classes): string {
 	$extra = fs_theme_feature_body_classes();

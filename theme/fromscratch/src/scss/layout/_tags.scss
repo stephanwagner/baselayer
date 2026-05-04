@@ -13,12 +13,13 @@
   // Links
 
   a {
-    color: var(--fs-color-primary);
+    color: var(--fs-link-color);
     transition: transition('color');
     text-decoration: none;
 
     &:hover {
-      text-decoration: underline;
+      text-decoration: none;
+      color: var(--fs-link-color-hover);
     }
   }
 
@@ -61,17 +62,17 @@
       margin-bottom: 0;
     }
 
-    @media (max-width: var(--fs-breakpoint-l)) {
+    @media (max-width: $breakpoint-l) {
       font-size: 32px;
       line-height: 1.3;
     }
 
-    @media (max-width: var(--fs-breakpoint-m)) {
+    @media (max-width: $breakpoint-m) {
       font-size: 26px;
       line-height: 1.4;
     }
 
-    @media (max-width: var(--fs-breakpoint-s)) {
+    @media (max-width: $breakpoint-s) {
       font-size: 20px;
       line-height: 1.4;
       margin-top: 32px;

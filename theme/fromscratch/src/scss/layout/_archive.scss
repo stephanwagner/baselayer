@@ -38,7 +38,7 @@
     padding-bottom: 0;
   }
 
-  @media (max-width: var(--fs-breakpoint-mobile)) {
+  @media (max-width: $breakpoint-mobile) {
     grid-template-columns: 1fr;
   }
 

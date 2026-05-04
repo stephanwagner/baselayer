@@ -1,13 +1,46 @@
 @use 'sass:list';
+@use 'sass:color';
 
 // Paths
 $themePath: '/wp-content/themes/fromscratch';
 
+$color-primary: #4080ff;
+$color-primary-dark: #{color.adjust($color-primary, $lightness: -10%)};
+$color-primary-light: #{color.adjust($color-primary, $lightness: 10%)};
+$color-secondary: #00ddff;
+
+// Content
+$content-max-width: 1200px;
+$content-narrow-width: 900px;
+$content-very-narrow-width: 600px;
+
+// Breakpoints
+$breakpoint-xs: 400px;
+$breakpoint-s: 600px;
+$breakpoint-m: 900px;
+$breakpoint-l: 1200px;
+$breakpoint-Xl: 1400px;
+$breakpoint-mobile: 900px;
+
+// Padding
+$content-padding-xs: 24px;
+$content-padding-m: 48px;
+$content-padding-s: 32px;
+$content-padding-l: 64px;
+$content-padding-xl: 64px;
+
+// Header
+$header-height: 96px;
+$header-height-mobile: 64px;
+$header-height-scrolled: 64px;
+
 // Variables
 :root {
   // Colors
-  --fs-color-primary: #4080ff;
-  --fs-color-secondary: #10ddff;
+  --fs-color-primary: #{$color-primary};
+  --fs-color-primary-dark: #{$color-primary-dark};
+  --fs-color-primary-light: #{$color-primary-light};
+  --fs-color-secondary: #{$color-secondary};
 
   // Grayscale
   --fs-color-white: #fff;
@@ -40,28 +73,27 @@ $themePath: '/wp-content/themes/fromscratch';
   --fs-default-font-size: var(--fs-font-size-m);
   --fs-default-line-height: 1.6;
   --fs-link-color: var(--fs-color-primary);
-  --fs-link-color-hover: var(--fs-color-secondary);
+  --fs-link-color-hover: var(--fs-color-primary-dark);
 
   // Content
-  --fs-content-max-width: 1200px;
-  --fs-content-narrow-width: 900px;
-  --fs-content-very-narrow-width: 600px;
+  --fs-content-max-width: #{$content-max-width};
+  --fs-content-narrow-width: #{$content-narrow-width};
+  --fs-content-very-narrow-width: #{$content-very-narrow-width};
 
   // Breakpoints
-  --fs-breakpoint-xs: 400px;
-  --fs-breakpoint-s: 600px;
-  --fs-breakpoint-m: 900px;
-  --fs-breakpoint-l: 1200px;
-  --fs-breakpoint-xl: 1400px;
-
-  --fs-breakpoint-mobile: 900px;
+  --fs-breakpoint-xs: #{$breakpoint-xs};
+  --fs-breakpoint-s: #{$breakpoint-s};
+  --fs-breakpoint-m: #{$breakpoint-m};
+  --fs-breakpoint-l: #{$breakpoint-l};
+  --fs-breakpoint-xl: #{$breakpoint-Xl};
+  --fs-breakpoint-mobile: #{$breakpoint-mobile};
 
   // Padding
-  --fs-content-padding-xs: 24px;
-  --fs-content-padding-m: 48px;
-  --fs-content-padding-s: 32px;
-  --fs-content-padding-l: 64px;
-  --fs-content-padding-xl: 64px;
+  --fs-content-padding-xs: #{$content-padding-xs};
+  --fs-content-padding-m: #{$content-padding-m};
+  --fs-content-padding-s: #{$content-padding-s};
+  --fs-content-padding-l: #{$content-padding-l};
+  --fs-content-padding-xl: #{$content-padding-xl};
 
   // Header
   --fs-header-height: 96px;

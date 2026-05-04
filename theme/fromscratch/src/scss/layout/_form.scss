@@ -17,7 +17,7 @@
       margin-bottom: 0;
     }
 
-    @media (max-width: var(--fs-breakpoint-s)) {
+    @media (max-width: $breakpoint-s) {
       margin-top: 16px;
       margin-bottom: 16px;
 

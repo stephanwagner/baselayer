@@ -17,7 +17,7 @@ import { initModals, openModal } from '../components/modal';
 
 // Delay initial animations
 setTimeout(function () {
-  document.body.classList.add('-init');
+  document.body.classList.add('-transition-init');
 }, 128);
 
 // Init modals
