@@ -5,28 +5,10 @@
  */
 const ROOT_VAR_MAP = [
   {
-    key: 'mobileBreakpoint',
-    prop: '--fs-breakpoint-mobile',
+    key: 'breakpointXS',
+    prop: '--fs-breakpoint-xs',
     parse: 'unit',
-    fallback: 900
-  },
-  {
-    key: 'breakpointXL',
-    prop: '--fs-breakpoint-xl',
-    parse: 'unit',
-    fallback: 1400
-  },
-  {
-    key: 'breakpointL',
-    prop: '--fs-breakpoint-l',
-    parse: 'unit',
-    fallback: 1200
-  },
-  {
-    key: 'breakpointM',
-    prop: '--fs-breakpoint-m',
-    parse: 'unit',
-    fallback: 900
+    fallback: 400
   },
   {
     key: 'breakpointS',
@@ -35,13 +17,31 @@ const ROOT_VAR_MAP = [
     fallback: 600
   },
   {
-    key: 'breakpointXS',
-    prop: '--fs-breakpoint-xs',
+    key: 'breakpointM',
+    prop: '--fs-breakpoint-m',
     parse: 'unit',
-    fallback: 400
+    fallback: 900
   },
   {
-    key: 'scrolledHeaderHeight',
+    key: 'breakpointL',
+    prop: '--fs-breakpoint-l',
+    parse: 'unit',
+    fallback: 1200
+  },
+  {
+    key: 'breakpointXL',
+    prop: '--fs-breakpoint-xl',
+    parse: 'unit',
+    fallback: 1400
+  },
+  {
+    key: 'breakpointMobile',
+    prop: '--fs-breakpoint-mobile',
+    parse: 'unit',
+    fallback: 900
+  },
+  {
+    key: 'headerHeightScrolled',
     prop: '--fs-header-height-scrolled',
     parse: 'unit',
     fallback: 64
@@ -53,13 +53,13 @@ const ROOT_VAR_MAP = [
     fallback: 64
   },
   {
-    key: 'defaultTransitionSpeed',
+    key: 'transitionSpeed',
     prop: '--fs-transition-speed',
     parse: 'unit',
     fallback: 240
   },
   {
-    key: 'slowTransitionSpeed',
+    key: 'transitionSpeedSlow',
     prop: '--fs-transition-speed-slow',
     parse: 'unit',
     fallback: 360
@@ -97,5 +97,5 @@ export default {
   ...fromCss,
 
   // Default scroll offset
-  defaultScrollOffset: 16
+  scrollOffset: 16
 };

@@ -25,9 +25,9 @@ export function scrollToElement(element, offset = 0) {
  * @returns {number} The offset
  */
 export function getOffset() {
-  let offset = config.defaultScrollOffset * -1;
+  let offset = config.scrollOffset * -1;
 
-  offset -= config.scrolledHeaderHeight;
+  offset -= config.headerHeightScrolled;
 
   const adminBar = document.getElementById('wpadminbar');
   if (adminBar) {

@@ -65,7 +65,7 @@ export function closeModal(id, onClose, onCloseComplete) {
   timeouts[`closeModal-${id}`] = setTimeout(() => {
     modalEl.classList.remove('-show');
     onCloseComplete?.();
-  }, config.defaultTransitionSpeed);
+  }, config.transitionSpeed);
 
   // Remove keyup listener
   if (keyupHandlers[id]) {
