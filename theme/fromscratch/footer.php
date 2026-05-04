@@ -1,8 +1,7 @@
 <footer class="footer__wrapper">
 	<div class="footer__container container">
 		<div class="footer__text">
-			<?= fs_content('theme_content_examples_language_translatable') ?><br>
-			<?= fs_content('theme_content_general_company_name') ?><br>
+			<b><?= fs_content('theme_content_general_company_name') ?></b><br>
 			<?= nl2br(fs_content('theme_content_general_company_address')) ?><br>
 			<a href="tel:<?= fs_content('theme_content_general_company_phone') ?>"><?= fs_content('theme_content_general_company_phone') ?></a><br>
 			<a href="mailto:<?= fs_content('theme_content_general_company_email') ?>"><?= fs_content('theme_content_general_company_email') ?></a>

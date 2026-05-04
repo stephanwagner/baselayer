@@ -26,18 +26,18 @@
 
   // Wordpress gradients
 
-  @each $name, $direction, $color1, $color2 in $gradients {
+  @each $name, $gradient in $gradients {
     .has-#{$name}-gradient-background {
-      background-image: gradient($name);
+      background-image: $gradient;
     }
   }
 
   // Wordpress font sizes
 
-  @each $name, $size, $lineHeight in $fontSizes {
+  @each $name, $size, $line-height in $fontSizes {
     .has-#{$name}-font-size {
       font-size: $size;
-      line-height: $lineHeight;
+      line-height: $line-height;
     }
   }
 }

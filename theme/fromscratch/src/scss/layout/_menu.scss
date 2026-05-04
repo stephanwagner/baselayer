@@ -11,8 +11,8 @@
     position: absolute;
     display: block;
     top: 100%;
-    width: var(--mobile-menu-width);
-    right: calc(var(--mobile-menu-width) * -1 - 8px - var(--fs-content-padding-l));
+    width: var(--fs-mobile-menu-width);
+    right: calc(var(--fs-mobile-menu-width) * -1 - 8px - var(--fs-content-padding-l));
     background: #fff;
     margin: 0;
     transition: transition('right');
@@ -41,12 +41,12 @@
 
     @media (max-width: $breakpoint-m) {
       padding-right: var(--fs-content-padding-m);
-      right: calc(var(--mobile-menu-width) * -1 - var(--fs-content-padding-m));
+      right: calc(var(--fs-mobile-menu-width) * -1 - var(--fs-content-padding-m));
     }
 
     @media (max-width: $breakpoint-s) {
       padding-right: var(--fs-content-padding-s);
-      right: calc(var(--mobile-menu-width) * -1 - var(--fs-content-padding-s));
+      right: calc(var(--fs-mobile-menu-width) * -1 - var(--fs-content-padding-s));
     }
 
     @media (max-width: $breakpoint-xs) {

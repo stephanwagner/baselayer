@@ -67,11 +67,17 @@ $header-height-mobile: 64px;
   --fs-font-size-l: 18px;
   --fs-font-size-xl: 22px;
 
+  // Line heights
+  --fs-line-height-s: 1.5;
+  --fs-line-height-m: 1.6;
+  --fs-line-height-l: 1.5;
+  --fs-line-height-xl: 1.4;
+
   // Text
   --fs-primary-font-family: 'Open Sans', sans-serif;
   --fs-default-text-color: var(--fs-color-off-black);
   --fs-default-font-size: var(--fs-font-size-m);
-  --fs-default-line-height: 1.6;
+  --fs-default-line-height: var(--fs-line-height-m);
   --fs-link-color: var(--fs-color-primary);
   --fs-link-color-hover: var(--fs-color-primary-dark);
 
@@ -137,31 +143,35 @@ $colors: (
 
 // Gradients
 $gradients: (
-  "primary": var(--fs-gradient-primary),
+  'primary': var(--fs-gradient-primary),
 );
 
 // Font sizes
 $fontSizes: (
-  's' var(--fs-font-size-s) 1.5,
-  'm' var(--fs-font-size-m) 1.6,
-  'l' var(--fs-font-size-l) 1.5,
-  'xl' var(--fs-font-size-xl) 1.4
+  's' var(--fs-font-size-s) var(--fs-line-height-s),
+  'm' var(--fs-font-size-m) var(--fs-line-height-m),
+  'l' var(--fs-font-size-l) var(--fs-line-height-l),
+  'xl' var(--fs-font-size-xl) var(--fs-line-height-xl)
 );
 
 // Transition helpers
 
 @function transition($properties...) {
   $out: ();
+
   @each $p in $properties {
     $out: list.append($out, #{$p} var(--fs-transition-speed), comma);
   }
+
   @return $out;
 }
 
 @function transition-slow($properties...) {
   $out: ();
+
   @each $p in $properties {
     $out: list.append($out, #{$p} var(--fs-transition-speed-slow), comma);
   }
+
   @return $out;
 }
