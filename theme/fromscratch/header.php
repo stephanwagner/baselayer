@@ -2,8 +2,8 @@
 <html <?php language_attributes(); ?>>
 
 <head>
-<?php wp_head(); ?>
-<?php function_exists('fs_output_custom_css') && fs_output_custom_css(); ?>
+	<?php wp_head(); ?>
+	<?php function_exists('fs_output_custom_css') && fs_output_custom_css(); ?>
 </head>
 
 <body <?php body_class(); ?>>
@@ -19,6 +19,14 @@
 					</a>
 				</div>
 
+				<button class="main-menu__toggler" data-toggle-menu>
+					<div class="main-menu__toggler-icon">
+						<span class="main-menu__toggler-icon-line1"></span>
+						<span class="main-menu__toggler-icon-line2"></span>
+						<span class="main-menu__toggler-icon-line3"></span>
+					</div>
+				</button>
+
 				<?= function_exists('fs_language_switcher_html') ? fs_language_switcher_html() : '' ?>
 
 				<div class="main-menu__wrapper">
@@ -29,17 +37,8 @@
 					]); ?>
 				</div>
 
-				<div class="main-menu__toggler" data-toggle-menu>
-					<div class="main-menu__toggler-icon">
-						<span class="main-menu__toggler-icon-line1"></span>
-						<span class="main-menu__toggler-icon-line2"></span>
-						<span class="main-menu__toggler-icon-line3"></span>
-					</div>
-				</div>
-
 			</div>
 		</header>
 
 		<div class="header__placeholder"></div>
 		<div class="header__menu-overlay"></div>
-

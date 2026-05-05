@@ -72,15 +72,22 @@ class FS_Walker_Nav_Menu extends Walker_Nav_Menu
 		$title = apply_filters('the_title', $item->title, $item->ID);
 		$title = apply_filters('nav_menu_item_title', $title, $item, $args, $depth);
 
-		$item_output = '<a' . $attributes . '>';
-		$item_output .= '<span class="menu-label">' . $title . '</span>';
-		$item_output .= '</a>';
-
 		$has_children = in_array('menu-item-has-children', $classes, true);
 		unset($this->submenu_ids_by_depth[$depth]);
+
+		$item_output = '';
+		$submenu_id = '';
 		if ($has_children) {
 			$submenu_id = $this->fs_build_submenu_id($args, (int) $item->ID);
 			$this->submenu_ids_by_depth[$depth] = $submenu_id;
+			$item_output .= '<span class="menu-item__inner">';
+		}
+
+		$item_output .= '<a' . $attributes . '>';
+		$item_output .= '<span class="menu-label">' . $title . '</span>';
+		$item_output .= '</a>';
+
+		if ($has_children) {
 			$toggle_label = sprintf(
 				/* translators: %s is menu item label. */
 				__('Toggle submenu for %s', 'fromscratch'),
@@ -89,6 +96,7 @@ class FS_Walker_Nav_Menu extends Walker_Nav_Menu
 			$item_output .= '<button class="sub-menu-toggle" aria-expanded="false" aria-controls="' . esc_attr($submenu_id) . '" aria-label="' . esc_attr($toggle_label) . '" type="button">';
 			$item_output .= '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M466.54-375.23q-6.23-2.31-11.85-7.92L274.92-562.92q-8.3-8.31-8.5-20.89-.19-12.57 8.5-21.27 8.7-8.69 21.08-8.69 12.38 0 21.08 8.69L480-442.15l162.92-162.93q8.31-8.3 20.89-8.5 12.57-.19 21.27 8.5 8.69 8.7 8.69 21.08 0 12.38-8.69 21.08L505.31-383.15q-5.62 5.61-11.85 7.92-6.23 2.31-13.46 2.31t-13.46-2.31Z"/></svg>';
 			$item_output .= '</button>';
+			$item_output .= '</span>';
 		}
 
 		$output .= apply_filters('walker_nav_menu_start_el', $item_output, $item, $depth, $args);
