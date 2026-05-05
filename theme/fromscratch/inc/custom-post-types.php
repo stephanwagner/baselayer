@@ -410,9 +410,16 @@ add_action('save_post', function (int $post_id, \WP_Post $post): void {
 }, 20, 2);
 
 /**
- * Add reorder column for ordered CPTs.
+ * Insert "Order" column on admin list tables for ordered CPTs.
+ *
+ * {@see manage_posts_columns} only runs for the built-in `post` type. CPT screens use
+ * `manage_{$post_type}_posts_columns` (e.g. manage_project_posts_columns).
+ *
+ * @param array<string, string> $columns List table columns.
+ * @return array<string, string>
  */
-add_filter('manage_posts_columns', function (array $columns): array {
+function fs_cpt_admin_list_insert_order_column(array $columns): array
+{
 	$post_type = fs_cpt_current_admin_post_type();
 	if ($post_type === '') {
 		$post_type = 'post';
@@ -446,44 +453,16 @@ add_filter('manage_posts_columns', function (array $columns): array {
 		$out['fs_cpt_reorder'] = $reorder_label;
 	}
 	return $out;
-}, 20);
+}
 
 /**
- * Make "Order" column header clickable/sortable for ordered CPTs.
+ * Render Order column cells (move up/down/top/bottom controls).
+ *
+ * {@see manage_posts_custom_column} only runs for `post`. CPTs need
+ * `manage_{$post_type}_posts_custom_column`.
  */
-add_action('init', function (): void {
-	$ordered = fs_cpt_ordered_map();
-	if ($ordered === []) {
-		return;
-	}
-	foreach (array_keys($ordered) as $post_type) {
-		add_filter('manage_edit-' . $post_type . '_sortable_columns', function (array $columns): array {
-			$columns['fs_cpt_reorder'] = 'menu_order';
-			return $columns;
-		});
-	}
-}, 20);
-
-/**
- * Default list-table sort UI for ordered CPTs: show Order as active (not Date).
- */
-add_filter('request', function (array $vars): array {
-	if (!is_admin()) {
-		return $vars;
-	}
-	$post_type = isset($vars['post_type']) ? sanitize_key((string) $vars['post_type']) : '';
-	if ($post_type === '' || !fs_cpt_is_ordered($post_type)) {
-		return $vars;
-	}
-	if (!empty($vars['orderby'])) {
-		return $vars;
-	}
-	$vars['orderby'] = 'menu_order';
-	$vars['order'] = 'asc';
-	return $vars;
-}, 20);
-
-add_action('manage_posts_custom_column', function (string $column, int $post_id): void {
+function fs_cpt_admin_list_render_order_column(string $column, int $post_id): void
+{
 	if ($column !== 'fs_cpt_reorder') {
 		return;
 	}
@@ -529,7 +508,44 @@ add_action('manage_posts_custom_column', function (string $column, int $post_id)
 	echo $mk('bottom', __('Move to bottom', 'fromscratch'), 'dashicons-download', $is_last);
 	echo '</div>';
 	echo '</div>';
-}, 20, 2);
+}
+
+/**
+ * Register list-table hooks per ordered CPT (`manage_posts_*` only applies to built-in Posts).
+ */
+add_action('init', function (): void {
+	$ordered = fs_cpt_ordered_map();
+	if ($ordered === []) {
+		return;
+	}
+	foreach (array_keys($ordered) as $post_type) {
+		add_filter('manage_' . $post_type . '_posts_columns', 'fs_cpt_admin_list_insert_order_column', 20);
+		add_action('manage_' . $post_type . '_posts_custom_column', 'fs_cpt_admin_list_render_order_column', 20, 2);
+		add_filter('manage_edit-' . $post_type . '_sortable_columns', function (array $columns): array {
+			$columns['fs_cpt_reorder'] = 'menu_order';
+			return $columns;
+		});
+	}
+}, 20);
+
+/**
+ * Default list-table sort UI for ordered CPTs: show Order as active (not Date).
+ */
+add_filter('request', function (array $vars): array {
+	if (!is_admin()) {
+		return $vars;
+	}
+	$post_type = isset($vars['post_type']) ? sanitize_key((string) $vars['post_type']) : '';
+	if ($post_type === '' || !fs_cpt_is_ordered($post_type)) {
+		return $vars;
+	}
+	if (!empty($vars['orderby'])) {
+		return $vars;
+	}
+	$vars['orderby'] = 'menu_order';
+	$vars['order'] = 'asc';
+	return $vars;
+}, 20);
 
 add_action('admin_head', function (): void {
 	global $pagenow;
