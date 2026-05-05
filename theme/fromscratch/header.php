@@ -19,7 +19,7 @@
 					</a>
 				</div>
 
-				<button class="main-menu__toggler" data-toggle-menu>
+				<button class="main-menu__toggler" data-toggle-menu aria-expanded="false" aria-controls="main-navigation">
 					<div class="main-menu__toggler-icon">
 						<span class="main-menu__toggler-icon-line1"></span>
 						<span class="main-menu__toggler-icon-line2"></span>
@@ -34,7 +34,8 @@
 						'theme_location' => 'main_menu',
 						'menu_class' => 'main-menu__container',
 						'container' => 'nav',
-						'aria_label' => esc_attr__('Main navigation', 'fromscratch'),
+						'container_id' => 'main-navigation',
+						'container_aria_label' => esc_attr__('Main navigation', 'fromscratch'),
 					]); ?>
 				</div>
 
