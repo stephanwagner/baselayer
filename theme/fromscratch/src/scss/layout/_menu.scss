@@ -14,11 +14,11 @@
     display: block;
     top: 100%;
     width: var(--fs-mobile-menu-width);
-    right: calc(var(--fs-mobile-menu-width) * -1 - 8px - var(--fs-content-padding-l));
+    right: calc(var(--fs-mobile-menu-width) * -1 - var(--fs-content-padding-l));
     background: #fff;
     margin: 0;
     height: calc(100vh - var(--fs-header-height));
-    padding: 24px calc(var(--fs-content-padding-l) + 8px) 24px 24px;
+    padding: 24px var(--fs-content-padding-l) 24px 32px;
     pointer-events: none;
     visibility: hidden;
 
@@ -49,17 +49,18 @@
     }
 
     @media (max-width: $breakpoint-m) {
-      padding-right: calc(var(--fs-content-padding-m) + 8px);
+      padding-right: var(--fs-content-padding-m);
       right: calc(var(--fs-mobile-menu-width) * -1 - var(--fs-content-padding-m));
     }
 
     @media (max-width: $breakpoint-s) {
-      padding-right: calc(var(--fs-content-padding-s) + 8px);
+      padding-right: var(--fs-content-padding-s);
+      padding-left: 24px;
       right: calc(var(--fs-mobile-menu-width) * -1 - var(--fs-content-padding-s));
     }
 
     @media (max-width: $breakpoint-xs) {
-      padding-right: calc(var(--fs-content-padding-xs) + 8px);
+      padding-right: var(--fs-content-padding-xs);
       width: 100vw;
       right: calc(100vw * -1 - var(--fs-content-padding-xs));
     }
@@ -99,16 +100,14 @@
   @media (max-width: $breakpoint-mobile) {
     width: 100%;
     flex-direction: column;
+    align-items: flex-start;
   }
 
   li {
     a {
       display: block;
-      white-space: nowrap;
       color: var(--fs-default-text-color);
       text-decoration: none;
-
-      background: rgba(0, 200, 0, 0.1); // TMP
 
       &:hover {
         color: var(--fs-link-color-hover);
@@ -136,12 +135,17 @@
 
     @media (max-width: $breakpoint-mobile) {
       padding: 0;
-      text-align: right;
+      width: 100%;
     }
 
     >a,
     >.menu-item__inner>a {
       padding: 0 12px;
+      white-space: nowrap;
+
+      @media (max-width: $breakpoint-mobile) {
+        padding: 4px 0;
+      }
     }
 
     &:hover,
@@ -174,6 +178,7 @@
         text-decoration: none;
         font-weight: 600;
         transition: transition('background-color', 'color');
+        display: inline-block;
 
         &:hover {
           color: #fff;
@@ -185,6 +190,10 @@
 
     &.menu-item-has-children {
       padding-right: 12px;
+
+      @media (max-width: $breakpoint-mobile) {
+        padding-right: 0;
+      }
 
       >a,
       >.menu-item__inner>a {
@@ -206,11 +215,23 @@
         }
       }
     }
+
+    >.menu-item__inner>.sub-menu-toggle {
+      @media (min-width: calc($breakpoint-mobile + 1px)) {
+        cursor: default;
+        pointer-events: none;
+
+        &:hover {
+          color: var(--fs-default-text-color);
+        }
+      }
+    }
   }
 
   .menu-item__inner {
     display: flex;
     align-items: center;
+    width: 100%;
 
     .menu-link {
       flex: 1;
@@ -266,14 +287,17 @@
         body.-scrolled & {
           height: calc(12px + 2px);
         }
-
-        background: rgba(0, 0, 200, 0.1); // TMP
       }
     }
   }
 
   .menu-item__inner {
     padding-right: 12px;
+    align-items: flex-start;
+
+    @media (max-width: $breakpoint-mobile) {
+      padding-right: 0;
+    }
   }
 
   li {
@@ -306,12 +330,7 @@
   }
 
   .sub-menu-toggle {
-    cursor: pointer;
     height: calc(22px + 4px + 4px);
-
-    &:hover {
-      color: var(--fs-link-color-hover);
-    }
   }
 }
 
@@ -330,9 +349,11 @@
   justify-content: center;
   color: var(--fs-default-text-color);
   transition: transition('color');
-  cursor: default;
+  cursor: pointer;
 
-  background: rgba(123, 66, 44, 0.1); // TMP
+  &:hover {
+    color: var(--fs-link-color-hover);
+  }
 
   svg {
     display: block;
@@ -389,8 +410,6 @@ body.-menu-block-scroll {
   position: relative;
   cursor: pointer;
   margin: 0 0 0 auto;
-
-  background: rgba(123, 66, 44, 0.1); // TMP
 
   @media (max-width: $breakpoint-mobile) {
     display: block;
