@@ -115,6 +115,19 @@
       }
     }
 
+    &.current-menu-parent,
+    &.current-menu-item {
+
+      >a,
+      >.menu-item__inner>a {
+        color: var(--fs-link-color);
+
+        &:hover {
+          color: var(--fs-link-color-hover);
+        }
+      }
+    }
+
     &.-submenu-open>.sub-menu-toggle svg,
     &.-submenu-open>.menu-item__inner>.sub-menu-toggle svg {
       transform: scaleY(-1);

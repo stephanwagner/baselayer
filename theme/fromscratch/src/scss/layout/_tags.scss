@@ -51,7 +51,7 @@
   h6.h2 {
     font-size: 32px;
     line-height: 1.3;
-    font-weight: bold;
+    font-weight: 600;
     margin-top: 48px;
     margin-bottom: 24px;
 
@@ -64,8 +64,7 @@
     }
 
     @media (max-width: $breakpoint-l) {
-      font-size: 32px;
-      line-height: 1.3;
+      font-size: 28px;
     }
 
     @media (max-width: $breakpoint-m) {
@@ -74,7 +73,7 @@
     }
 
     @media (max-width: $breakpoint-s) {
-      font-size: 20px;
+      font-size: 24px;
       line-height: 1.4;
       margin-top: 32px;
       margin-bottom: 16px;
@@ -98,7 +97,7 @@
     font-size: 24px;
     font-weight: bold;
     margin-top: 24px;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
 
     &:first-child {
       margin-top: 0;
@@ -106,6 +105,14 @@
 
     &:last-child {
       margin-bottom: 0;
+    }
+
+    @media (max-width: $breakpoint-s) {
+      font-size: 22px;
+    }
+
+    @media (max-width: $breakpoint-xs) {
+      font-size: 20px;
     }
   }
 
@@ -131,8 +138,9 @@
   h4.h6,
   h5.h6 {
     font-size: var(--fs-default-font-size);
-    font-weight: bold;
-    margin-bottom: 8px;
+    line-height: var(--fs-default-line-height);
+    font-weight: 600;
+    margin-bottom: 6px;
   }
 
   // Horizontal line
