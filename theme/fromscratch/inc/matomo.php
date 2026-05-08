@@ -36,6 +36,7 @@ function fs_matomo_skip_frontend_tracker(): bool
 	if ($host_only === 'localhost' || $host_only === '127.0.0.1') {
 		$skip = true;
 	}
+	
 	if ($host_only !== '' && preg_match('/\.local$/', $host_only)) {
 		$skip = true;
 	}
@@ -77,10 +78,16 @@ add_action('wp_head', function (): void {
 	}
 
 	$matomo_url = trailingslashit($matomo_url);
+	// IMPORTANT: `token_auth` is for the Matomo API (dashboard/email), not for frontend tracking.
+	// Tracking should POST to matomo.php without auth token.
 	$tracker_url = $matomo_url . 'matomo.php';
-	if ($token !== '') {
-		$tracker_url .= '?token_auth=' . rawurlencode($token);
-	}
+	$noscript_url = add_query_arg(
+		[
+			'idsite' => (string) $site_id,
+			'rec' => '1',
+		],
+		$tracker_url
+	);
 	?>
 	<script>
 		var _paq = window._paq = window._paq || [];
@@ -111,6 +118,6 @@ add_action('wp_head', function (): void {
 			s.parentNode.insertBefore(g, s);
 		})();
 	</script>
-	<noscript><img src="<?= esc_url($tracker_url) ?>&amp;idsite=<?= esc_attr((string) $site_id) ?>&amp;rec=1" style="border:0;" alt=""></noscript>
+	<noscript><img src="<?= esc_url($noscript_url) ?>" style="border:0;" alt=""></noscript>
 	<?php
 }, 20);
