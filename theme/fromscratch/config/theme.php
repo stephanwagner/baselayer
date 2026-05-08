@@ -86,7 +86,7 @@ return [
 	 * attempts / window / lockout — times in minutes (same shape as login_suspicious_attempts).
 	 */
 	'login_limit' => [
-		'enabled' => false, // Enable login limit
+		'enabled' => true, // Enable login limit
 		'attempts' => 5,   // Failed attempts per time window per IP
 		'window' => 5,     // Time window in minutes
 		'lockout' => 10,   // Lockout duration in minutes

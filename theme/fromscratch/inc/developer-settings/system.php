@@ -796,7 +796,7 @@ function fs_render_developer_system(): void
 					<tr>
 						<th scope="row"><label for="fromscratch_matomo_custom_js"><?= esc_html__('Tracking settings', 'fromscratch') ?></label></th>
 						<td>
-							<textarea name="fromscratch_matomo_custom_js" id="fromscratch_matomo_custom_js" rows="4" class="large-text code fs-code-small" placeholder="_paq.push(['setUserId', '123']);"><?= esc_textarea($matomo_custom_js_value) ?></textarea>
+							<textarea name="fromscratch_matomo_custom_js" id="fromscratch_matomo_custom_js" rows="4" class="large-text code fs-code-small" placeholder="_paq.push(['disableCookies']);"><?= esc_textarea($matomo_custom_js_value) ?></textarea>
 							<p class="description"><?= esc_html__('Optional additional _paq commands. One command per line.', 'fromscratch') ?></p>
 						</td>
 					</tr>
