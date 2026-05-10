@@ -2189,3 +2189,11 @@ msgstr "Hauptnavigation"
 
 msgid "Footer navigation"
 msgstr "Fußnavigation"
+
+# Blocks
+
+msgid "Next slide"
+msgstr "Nächste Folie"
+
+msgid "Previous slide"
+msgstr "Vorherige Folie"

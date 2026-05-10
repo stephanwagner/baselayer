@@ -35,9 +35,18 @@ return [
 		'name' => 'slider',
 		'title' => 'Slider',
 		'icon' => 'images-alt',
-		'keywords' => ['Bild', 'Slider', 'Carousel'],
+		'keywords' => ['Bild', 'Video', 'Slider', 'Carousel'],
 		'supports' => [
 			'align' => ['wide', 'full'],
+		],
+	],
+	[
+		'name' => 'slider-slide',
+		'title' => 'Slider-Slide',
+		'icon' => 'images-alt',
+		'keywords' => ['Bild', 'Video', 'Slider', 'Carousel'],
+		'ancestor' => [
+			'acf/slider'
 		],
 	],
 

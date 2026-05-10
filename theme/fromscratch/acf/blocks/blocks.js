@@ -4,14 +4,11 @@
 // // Map DSGVO consent
 // import'./map-dsgvo/map-dsgvo.js';
 
-// // Slider
-// import './blocks/map/map.js';
-
-// // Accordion
-// import './blocks/slider/slider.js';
+// Anchor
+import './anchor/anchor.js';
 
 // Accordion
 import './accordion/accordion.js';
 
-// Anchor
-import './anchor/anchor.js';
+// Slider
+import './slider/slider.js';

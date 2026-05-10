@@ -18,7 +18,9 @@ function fs_acf_init_core()
 				'keywords' => $acfBlock['keywords'],
 				'supports' => [
 					'align' => !empty($acfBlock['supports']['align']) ? $acfBlock['supports']['align'] : false,
+					'multiple' => isset($acfBlock['supports']['multiple']) ? $acfBlock['supports']['multiple'] : true,
 				],
+				'parent' => !empty($acfBlock['parent']) ? $acfBlock['parent'] : null,
 				'api_version' => 3,
 				'acf_block_version' => 3,
 			]);

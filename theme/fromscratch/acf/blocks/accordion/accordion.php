@@ -1,9 +1,34 @@
 <?php
+
+// Block name
+$blockName = 'accordion';
+
+// ID for specific styling
+$classNames = [$block['id']];
+
+// Align class ("alignwide") from block setting ("wide")
+if (!empty($block['align'])) {
+	$classNames[] = 'align' . $block['align'];
+}
+
+// Add class provided via class_field in WP Backend
+if (!empty($block['className'])) {
+	$classNames[] = $block['className'];
+}
+
+// Add wrapper class
+$classNames[] = 'accordion__wrapper';
+
+// Fields
 $title = get_field('title');
 $id = get_field('id');
 $closeNeighbouringAccordions = get_field('close_neighbouring_accordions');
 $scrollToAccordionTop = get_field('scroll_to_accordion_top');
 $isOpen = get_field('accordion_is_open');
+
+if (!empty($isOpen)) {
+	$classNames[] = 'accordion-open';
+}
 
 global $globalAccordionId;
 
@@ -16,7 +41,7 @@ $accordionId = $id ? $id : 'accordion-' . $globalAccordionId;
 ?>
 
 <div
-    class="accordion__wrapper<?= $isOpen ? ' accordion-open' : '' ?>"
+    class="<?= implode(' ', $classNames) ?>"
 	data-accordion-id="<?= $accordionId ?>"
     data-close-neighbouring-accordions="<?= $closeNeighbouringAccordions ? 'true' : 'false' ?>"
     data-scroll-to-accordion-top="<?= $scrollToAccordionTop ? 'true' : 'false' ?>"
