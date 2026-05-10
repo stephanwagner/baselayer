@@ -19,5 +19,4 @@ add_action('init', function () {
         'label' => __('Sharp', 'fromscratch'),
     ]);
 
-
 }, 100);

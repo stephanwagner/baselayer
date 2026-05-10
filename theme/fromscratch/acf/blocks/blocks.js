@@ -13,5 +13,5 @@
 // Accordion
 import './accordion/accordion.js';
 
-// // Anchor
-// import './blocks/anchor/anchor.js';
+// Anchor
+import './anchor/anchor.js';
