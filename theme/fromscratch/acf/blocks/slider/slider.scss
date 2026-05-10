@@ -1,8 +1,5 @@
 @use '../../../src/scss/variables' as *;
 
-// Must match gap on `.acf-innerblocks-container` in the block editor (see `.slider__wrapper` below).
-$slider-editor-slide-gap: 8px;
-
 .slider__wrapper {
   margin: 32px 0;
 
@@ -32,7 +29,7 @@ $slider-editor-slide-gap: 8px;
     box-sizing: content-box;
 
     .editor-styles-wrapper & {
-      gap: $slider-editor-slide-gap;
+      gap: var(--slider-editor-slide-gap, 16px);
     }
 
     .wp-block-acf-slider-slide {
@@ -90,15 +87,15 @@ $slider-editor-slide-gap: 8px;
   object-position: center;
 }
 
-// Admin: wrap slides into rows of N (matches slides-per-view), same gap as above.
+// Admin: wrap slides into rows of N (matches slides-per-view). Gap matches ACF space-between via `--slider-editor-slide-gap` on `.slider__wrapper`.
 @mixin slider-editor-innerblocks-wrap($max-slides-per-view: 12) {
   @for $n from 1 through $max-slides-per-view {
     .editor-styles-wrapper .slider__wrapper[data-slider-slides-per-view='#{$n}'] .acf-innerblocks-container {
       flex-wrap: wrap;
 
       .wp-block-acf-slider-slide {
-        flex: 0 0 calc((100% - (#{$n} - 1) * #{$slider-editor-slide-gap}) / #{$n});
-        max-width: calc((100% - (#{$n} - 1) * #{$slider-editor-slide-gap}) / #{$n});
+        flex: 0 0 calc((100% - (#{$n} - 1) * var(--slider-editor-slide-gap, 16px)) / #{$n});
+        max-width: calc((100% - (#{$n} - 1) * var(--slider-editor-slide-gap, 16px)) / #{$n});
         min-width: 0;
       }
     }

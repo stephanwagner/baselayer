@@ -47,7 +47,7 @@ $paddingTop = floatval($paddingTop);
 
 <div
 	class="<?= implode(' ', $classNames) ?>"
-	style="--slide-padding-top: <?= $paddingTop ?>%;"
+	style="--slide-padding-top: <?= $paddingTop ?>%; --slider-editor-slide-gap: <?= max(0, (int) $spaceBetween) ?>px;"
 
 	data-slider-id="<?= $block['id'] ?>"
 	data-slider-slides-per-view="<?= $slidesPerView ?>"
