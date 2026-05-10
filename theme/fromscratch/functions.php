@@ -21,6 +21,9 @@ require_once 'inc/redirects.php';
 require_once 'inc/analytics.php';
 require_once 'inc/admin-bar.php';
 
+// Blocks
+require_once 'inc/blocks.php';
+
 // Theme settings
 require_once 'inc/user-rights.php';
 require_once 'inc/theme-settings.php';

@@ -2120,6 +2120,15 @@ msgstr "Maximale Breite"
 msgid "Max Height"
 msgstr "Maximale Höhe"
 
+msgid "Framed"
+msgstr "Rahmen"
+
+msgid "Sharp"
+msgstr "Eckig"
+
+msgid "Round"
+msgstr "Rund"
+
 # Menus
 
 msgid "Toggle submenu for %s"
