@@ -7,7 +7,9 @@
   "scripts": {
     "watch": "concurrently \"npm run watch:js\" \"npm run watch:css\"",
     "watch:js": "MODE=dev rollup -c -w",
-    "watch:css": "sass theme/fromscratch/src/scss/main.scss:theme/fromscratch/assets/css/main.css theme/fromscratch/src/scss/admin.scss:theme/fromscratch/assets/css/admin.css theme/fromscratch/src/scss/admin-bar.scss:theme/fromscratch/assets/css/admin-bar.css --watch --source-map",
+    "watch:css": "concurrently \"npm run watch:css:sass\" \"npm run watch:css:acf-blocks\"",
+    "watch:css:sass": "sass theme/fromscratch/src/scss/main.scss:theme/fromscratch/assets/css/main.css theme/fromscratch/src/scss/admin.scss:theme/fromscratch/assets/css/admin.css theme/fromscratch/src/scss/admin-bar.scss:theme/fromscratch/assets/css/admin-bar.css --watch --poll --source-map",
+    "watch:css:acf-blocks": "chokidar \"theme/fromscratch/acf/blocks/**/*.scss\" -c \"node scripts/bump-scss-entries.cjs\"",
     "build": "npm run build:js && npm run build:css",
     "build:js": "MODE=dev rollup -c && MODE=prod rollup -c",
     "build:css": "npm run build:css:dev && npm run build:css:prod",
@@ -28,6 +30,7 @@
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-terser": "^1.0.0",
     "baseline-browser-mapping": "^2.10.29",
+    "chokidar-cli": "^3.0.0",
     "concurrently": "^9.2.1",
     "rollup": "^4.60.3",
     "sass": "^1.99.0"
