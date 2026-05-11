@@ -37,7 +37,8 @@
             [META_KEY]: val ? true : false
           })
         );
-      }
+      },
+      __nextHasNoMarginBottom: true
     });
   }
 

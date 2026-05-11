@@ -89,7 +89,9 @@
           value: get('title'),
           onChange: function (val) {
             set('title', val || '');
-          }
+          },
+          __nextHasNoMarginBottom: true,
+          __next40pxDefaultSize: true
         })
       ),
       el(
@@ -102,7 +104,8 @@
           onChange: function (val) {
             set('description', val || '');
           },
-          rows: 3
+          rows: 3,
+          __nextHasNoMarginBottom: true
         })
       ),
       el(
@@ -117,7 +120,8 @@
           })(),
           onChange: function (checked) {
             set('noindex', checked ? true : false);
-          }
+          },
+          __nextHasNoMarginBottom: true
         })
       ),
       el(

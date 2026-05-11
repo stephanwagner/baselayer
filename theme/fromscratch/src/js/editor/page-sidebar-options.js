@@ -55,7 +55,8 @@
               [META_SHOW]: val ? true : false
             })
           );
-        }
+        },
+        __nextHasNoMarginBottom: true
       }),
       el(CheckboxControl, {
         label: cfg.labelPinDashboard || 'Pin to dashboard',
@@ -66,7 +67,8 @@
               [META_PIN]: val ? true : false
             })
           );
-        }
+        },
+        __nextHasNoMarginBottom: true
       })
     );
   }

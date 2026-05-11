@@ -419,7 +419,9 @@
                   value: redirectValue,
                   onChange: handleRedirectChange,
                   placeholder: redirectPlaceholder,
-                  type: 'url'
+                  type: 'url',
+                  __nextHasNoMarginBottom: true,
+                  __next40pxDefaultSize: true
                 })
               )
             : null
