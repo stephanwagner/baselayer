@@ -67,7 +67,8 @@
   max-width: calc(100% - 32px);
   padding: 32px 24px;
   text-align: center;
-  border: 2px solid var(--color-primary);
+  border: 2px solid var(--fs-color-primary);
+  border-radius: var(--fs-border-radius-large);
 
   @media (max-width: 600px) {
     padding: 24px 16px;
@@ -80,14 +81,14 @@
 
 .map__notice-title {
   font-weight: 600;
-  font-size: var(--font-size-l);
-  line-height: var(--line-height-l);
+  font-size: var(--fs-font-size-l);
+  line-height: var(--fs-line-height-l);
 }
 
 .map__notice-text {
   margin: 12px 0 24px;
-  font-size: var(--font-size-s);
-  line-height: var(--line-height-s);
+  font-size: var(--fs-font-size-s);
+  line-height: var(--fs-line-height-s);
 
   @media (max-width: $breakpoint-s) {
     margin: 8px 0 16px;

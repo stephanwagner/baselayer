@@ -17,7 +17,7 @@ return [
 	// Map consent
 	[
 		'name' => 'map-dsgvo',
-		'title' => 'Anfahrts-Karte: Google Maps DSGVO',
+		'title' => 'Anfahrts-Karte: DSGVO',
 		'icon' => 'editor-paragraph',
 		'keywords' => ['Anfahrt', 'Karte', 'Map', 'Google', 'DSGVO', 'Datenschutz', 'Privacy'],
 	],

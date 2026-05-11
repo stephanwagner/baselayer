@@ -3,17 +3,22 @@
 // Block name
 $blockName = 'map-dsgvo';
 
-// Class name
-$classNames = 'block__' . $blockName;
-
 // ID for specific styling
-$classNames .= ' block__' . $blockName . '-' . $block['id'];
+$classNames = [$block['id']];
 
-// Align class ("alignwide") from block setting ("wide")
-$classNames .= $block['align'] ? ' align' . $block['align'] : '';
+// Add class provided via class_field in WP Backend
+if (!empty($block['className'])) {
+    $classNames[] = $block['className'];
+}
 
-// Class provided via class_field in WP Backend
-$classNames .= !empty($block['className']) ? ' ' . $block['className'] : '';
+// Add wrapper class
+$classNames[] = $blockName . '__wrapper';
 ?>
 
-<div class="<?= $classNames ?>" data-google-maps-consent-container></div>
+<?php if (is_admin()) { ?>
+    <div class="admin-block-preview">
+        <b>Anfahrts-Karte: DSGVO</b>
+    </div>
+<?php } else { ?>
+    <div class="<?= implode(' ', $classNames) ?>" data-google-maps-dsgvo-container></div>
+<?php } ?>

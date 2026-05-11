@@ -1,4 +1,19 @@
 <?php
+
+// Block name
+$blockName = 'anchor';
+
+// ID for specific styling
+$classNames = [$block['id']];
+
+// Add class provided via class_field in WP Backend
+if (!empty($block['className'])) {
+	$classNames[] = $block['className'];
+}
+
+// Add wrapper class
+$classNames[] = $blockName . '__wrapper';
+
 // Fields
 $id = get_field('id');
 $offset = get_field('offset');
@@ -10,5 +25,9 @@ $offset = $offset || $offset === -1 ? $offset : 0;
         <b>Anker:</b> <code>#<?= $id ?></code>
     </div>
 <?php } else { ?>
-    <div data-anchor-id="<?= $id ?>" data-anchor-offset="<?= $offset ?>"></div>
+    <div
+        class="<?= implode(' ', $classNames) ?>"
+        data-anchor-id="<?= $id ?>"
+        data-anchor-offset="<?= $offset ?>"
+    ></div>
 <?php } ?>

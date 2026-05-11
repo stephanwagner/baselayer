@@ -1,8 +1,15 @@
+import $ from 'jquery';
+import {
+  isGoogleMapsAccepted,
+  setGoogleMapsAccepted,
+  removeGoogleMapsAccepted
+} from '../map/map.js';
+
 /**
  * Initialize the Google Maps consent block
  */
 function initGoogleMapsConsentBlock() {
-  if ($('[data-google-maps-consent-container]').length) {
+  if ($('[data-google-maps-dsgvo-container]').length) {
     const hasAcceptedTitle =
       'Sie haben zugestimmt, dass Daten an Google gesendet werden, um Google Maps anzuzeigen.';
     const hasNotAcceptedTitle =
@@ -17,35 +24,35 @@ function initGoogleMapsConsentBlock() {
     const hasNotAcceptedButtonText = 'Verbindung zu Google Maps erlauben';
 
     let html = '';
-    html += '<div class="google-maps-consent__title">';
+    html += '<div class="map-dsgvo__title">';
     html += isGoogleMapsAccepted() ? hasAcceptedTitle : hasNotAcceptedTitle;
     html += '</div>';
 
-    html += '<div class="google-maps-consent__text">';
+    html += '<div class="map-dsgvo__text">';
     html += isGoogleMapsAccepted() ? hasAcceptedText : hasNotAcceptedText;
     html += '</div>';
 
-    html += '<div class="google-maps-consent__link-container">';
-    html += '  <span class="google-maps-consent__link link">';
+    html += '<div class="map-dsgvo__link-container">';
+    html += '  <span class="map-dsgvo__link" tabindex="0">';
     html += isGoogleMapsAccepted()
       ? hasAcceptedButtonText
       : hasNotAcceptedButtonText;
     html += '  </span>';
     html += '</div>';
 
-    $('[data-google-maps-consent-container]').html(html);
+    $('[data-google-maps-dsgvo-container]').html(html);
 
-    $('.google-maps-consent__link').on('click', function () {
+    $('.map-dsgvo__link').on('click', function () {
       if (isGoogleMapsAccepted()) {
         removeGoogleMapsAccepted();
-        $('.google-maps-consent__title').html(hasNotAcceptedTitle);
-        $('.google-maps-consent__text').html(hasNotAcceptedText);
-        $('.google-maps-consent__link').html(hasNotAcceptedButtonText);
+        $('.map-dsgvo__title').html(hasNotAcceptedTitle);
+        $('.map-dsgvo__text').html(hasNotAcceptedText);
+        $('.map-dsgvo__link').html(hasNotAcceptedButtonText);
       } else {
         setGoogleMapsAccepted();
-        $('.google-maps-consent__title').html(hasAcceptedTitle);
-        $('.google-maps-consent__text').html(hasAcceptedText);
-        $('.google-maps-consent__link').html(hasAcceptedButtonText);
+        $('.map-dsgvo__title').html(hasAcceptedTitle);
+        $('.map-dsgvo__text').html(hasAcceptedText);
+        $('.map-dsgvo__link').html(hasAcceptedButtonText);
       }
     });
   }

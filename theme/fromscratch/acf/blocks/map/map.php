@@ -3,17 +3,21 @@
 // Block name
 $blockName = 'map';
 
-// Class name
-$classNames = 'block__' . $blockName;
-
 // ID for specific styling
-$classNames .= ' block__' . $blockName . '-' . $block['id'];
+$classNames = [$block['id']];
 
 // Align class ("alignwide") from block setting ("wide")
-$classNames .= $block['align'] ? ' align' . $block['align'] : '';
+if (!empty($block['align'])) {
+	$classNames[] = 'align' . $block['align'];
+}
 
-// Class provided via class_field in WP Backend
-$classNames .= !empty($block['className']) ? ' ' . $block['className'] : '';
+// Add class provided via class_field in WP Backend
+if (!empty($block['className'])) {
+	$classNames[] = $block['className'];
+}
+
+// Add wrapper class
+$classNames[] = $blockName . '__wrapper';
 
 // Fields
 $type = get_field('type');
@@ -34,7 +38,7 @@ if ($image) {
 }
 ?>
 
-<div class="<?= $classNames ?>">
+<div class="<?= implode(' ', $classNames) ?>">
 	<div
 		class="map__wrapper"
 		data-google-maps-wrapper
@@ -45,7 +49,7 @@ if ($image) {
 		data-zoom="<?= $zoom ?>"
 	>
 		<div class="map__container">
-			<div class="map__notice-container" style="background-image: url('<?= !empty($imageSrc) ? $imageSrc : '' ?>')" data-google-maps-dsgvo-container>
+			<div class="map__notice-container" style="background-image: url('<?= !empty($imageSrc) ? $imageSrc : '' ?>')" data-google-maps-notice-container>
 				<div class="map__notice">
 					<div class="map__notice-title">Karte laden</div>
 					<div class="map__notice-text">
@@ -54,7 +58,7 @@ if ($image) {
 						<a href="/datenschutz">Datenschutz</a>
 					</div>
 					<div class="map__notice-button-container">
-						<button class="map__notice-button b5-button -no-pointer" data-google-maps-accept-button>Karte anzeigen</button>
+						<button class="map__notice-button button" data-google-maps-accept-button>Karte anzeigen</button>
 					</div>
 				</div>
 			</div>

@@ -12,7 +12,7 @@ if (!empty($block['className'])) {
 }
 
 // Add wrapper class
-$classNames[] = 'slider-slide__wrapper';
+$classNames[] = $blockName . '__wrapper';
 
 // Add swiper class
 $classNames[] = 'swiper-slide';

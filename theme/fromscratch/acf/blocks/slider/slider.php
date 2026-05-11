@@ -17,7 +17,7 @@ if (!empty($block['className'])) {
 }
 
 // Add wrapper class
-$classNames[] = 'slider__wrapper';
+$classNames[] = $blockName . '__wrapper';
 
 // Fields
 $slidesPerView = get_field('slides-per-view') ?? 1;

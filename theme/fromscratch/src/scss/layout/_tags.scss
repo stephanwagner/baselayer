@@ -150,8 +150,31 @@
     display: block;
     border: 0;
     height: 2px;
-    background: var(--fs-color-gray-500);
+    background: var(--fs-color-gray-400);
     width: 100% !important;
     max-width: 100% !important;
+    margin-top: 32px;
+    margin-bottom: 32px;
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    @media (max-width: $breakpoint-s) {
+      margin-top: 24px;
+      margin-bottom: 24px;
+
+      &:first-child {
+        margin-top: 0;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
   }
 }

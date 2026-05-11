@@ -17,7 +17,7 @@ if (!empty($block['className'])) {
 }
 
 // Add wrapper class
-$classNames[] = 'accordion__wrapper';
+$classNames[] = $blockName . '__wrapper';
 
 // Fields
 $title = get_field('title');

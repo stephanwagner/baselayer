@@ -1,8 +1,8 @@
-// // Map
-// import './map/map.js';
+// Map
+import './map/map.js';
 
-// // Map DSGVO consent
-// import'./map-dsgvo/map-dsgvo.js';
+// Map DSGVO consent
+import'./map-dsgvo/map-dsgvo.js';
 
 // Anchor
 import './anchor/anchor.js';
