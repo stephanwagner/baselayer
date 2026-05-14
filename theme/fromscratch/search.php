@@ -48,7 +48,7 @@ $s = trim((string) get_search_query());
 						<?php
 						while ($the_query->have_posts()) {
 							$the_query->the_post();
-							fs_render_template('post-preview.php');
+							fs_render_template('post-preview');
 						}
 						wp_reset_postdata();
 						?>

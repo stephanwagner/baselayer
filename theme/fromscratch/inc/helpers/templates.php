@@ -17,7 +17,7 @@ function fs_render_template(string $template, array $data = []): void
 	}
 
 	$base = trailingslashit(get_template_directory()) . 'templates/';
-	$path = $base . $template;
+	$path = $base . $template . '.php';
 
 	if (!is_file($path) || !is_readable($path)) {
 		return;
@@ -40,15 +40,13 @@ function fs_render_template(string $template, array $data = []): void
 }
 
 /**
- * Default arguments for {@see paginate_links()} for a secondary {@see WP_Query}.
- * Uses the current request URL via {@see get_pagenum_link()} so links match the viewed page.
+ * Full argument list for {@see paginate_links()} from any {@see WP_Query} (main loop or custom query).
+ * Theme defaults and URL/total/current live here only — override keys via `$overrides` when rendering the template.
  *
- * Override `base`, `format`, or `current` when multiple paged lists share one URL (pass a unique query arg).
- *
- * @param array<string, mixed> $overrides Merged on top of defaults.
+ * @param array<string, mixed> $overrides Merged last (e.g. from `templates/pagination.php` as `pagination_args`).
  * @return array<string, mixed>
  */
-function fs_paginate_links_defaults_for_query(\WP_Query $query, array $overrides = []): array
+function fs_paginate_links_args_for_wp_query(\WP_Query $query, array $overrides = []): array
 {
 	$total = max(1, (int) $query->max_num_pages);
 	$paged_from_query = (int) $query->get('paged');
@@ -60,27 +58,28 @@ function fs_paginate_links_defaults_for_query(\WP_Query $query, array $overrides
 	$big = 999999999;
 	$base = str_replace((string) $big, '%#%', esc_url(get_pagenum_link($big, false)));
 
-	$defaults = [
-		'base'      => $base,
-		'format'    => '',
-		'total'     => $total,
-		'current'   => $current,
-		'mid_size'  => 2,
-		'end_size'  => 1,
-		'prev_text' => __('Previous', 'fromscratch'),
-		'next_text' => __('Next', 'fromscratch'),
-		'type'      => 'list',
-	];
-
-	return array_merge($defaults, $overrides);
+	return array_merge(
+		[
+			'base'      => $base,
+			'format'    => '',
+			'total'     => $total,
+			'current'   => $current,
+			'mid_size'  => 2,
+			'end_size'  => 1,
+			'prev_text' => __('Previous', 'fromscratch'),
+			'next_text' => __('Next', 'fromscratch'),
+			'type'      => 'list',
+		],
+		$overrides
+	);
 }
 
 /**
  * Render `templates/pagination.php` for a custom {@see WP_Query} (same template as the main loop; pass `query`).
  *
- * Optional `$data` keys: `aria_label`, `nav_class`, `paginate_links_args` (merged into defaults).
+ * Optional `$data` keys: `aria_label`, `nav_class`, `pagination_args` (merged into {@see fs_paginate_links_args_for_wp_query()}).
  */
 function fs_render_pagination_for_query(\WP_Query $query, array $data = []): void
 {
-	fs_render_template('pagination.php', array_merge(['query' => $query], $data));
+	fs_render_template('pagination', array_merge(['query' => $query], $data));
 }

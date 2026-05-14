@@ -1091,7 +1091,7 @@ function theme_settings_page(): void
 						<td>
 							<?php
 							$excerpt_length_opt = get_option('fromscratch_excerpt_length', '');
-							$excerpt_length_val = $excerpt_length_opt !== '' ? $excerpt_length_opt : '60';
+							$excerpt_length_val = $excerpt_length_opt !== '' ? $excerpt_length_opt : '50';
 							?>
 							<input type="number" name="fromscratch_excerpt_length" id="fromscratch_excerpt_length" value="<?= esc_attr($excerpt_length_val) ?>" min="1" max="999" step="1" class="small-text">
 							<p class="description"><?= esc_html__('Number of words used when trimming excerpts.', 'fromscratch') ?></p>

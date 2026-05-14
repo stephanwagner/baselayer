@@ -1,0 +1,56 @@
+@use '../variables' as *;
+
+.post-preview__container {
+  position: relative;
+  margin: 0 0 32px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.post-preview__link {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  text-decoration: none;
+  color: var(--fs-default-text-color);
+
+  &:hover {
+    text-decoration: none;
+    color: var(--fs-default-text-color);
+  }
+}
+
+.post-preview__image-container {
+  align-self: flex-start;
+  flex-shrink: 0;
+  width: 280px;
+}
+
+.post-preview__image {
+  width: 100%;
+  height: auto;
+  object-fit: cover;
+  aspect-ratio: 3/2;
+  border-radius: var(--fs-border-radius);
+}
+
+.post-preview__content {
+  flex: 1;
+
+}
+
+.post-preview__title {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.post-preview__read-more-container {
+  margin: 4px 0 0;
+}
+
+.post-preview__excerpt {
+  text-wrap: pretty;
+}

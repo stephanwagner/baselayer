@@ -5,36 +5,39 @@ defined('ABSPATH') || exit;
 /**
  * Archive-style post card. Expects global $post (main loop, custom query after the_post(), or setup_postdata()).
  *
- * Optional (via fs_render_template $data): permalink, range, post_class_extra, heading (h3 for nested lists).
+ * Optional (via fs_render_template $data): id, url, classes, title_tag.
  */
 
-$url = (isset($permalink) && is_string($permalink) && $permalink !== '') ? $permalink : get_permalink();
-$range = (isset($range) && is_string($range)) ? $range : '';
-$extra = (isset($post_class_extra) && is_string($post_class_extra)) ? trim($post_class_extra) : '';
-$tag = (isset($heading) && $heading === 'h3') ? 'h3' : 'h2';
+$id = isset($id) ? $id : get_the_ID();
+$url = (isset($url) && is_string($url) && $url !== '') ? $url : get_permalink();
+// $range = (isset($range) && is_string($range)) ? $range : ''; // TODO
+$classes = (isset($classes) && is_string($classes)) ? trim($classes) : '';
+$title_tag = (isset($title_tag) && in_array($title_tag, ['div', 'span', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'])) ? $title_tag : 'h3';
 
-$classes = ['archive__item'];
-if ($extra !== '') {
-	foreach (preg_split('/\s+/', $extra, -1, PREG_SPLIT_NO_EMPTY) as $c) {
-		$classes[] = $c;
+$post_classes = ['post-preview__container'];
+if ($classes !== '') {
+	foreach (preg_split('/\s+/', $classes, -1, PREG_SPLIT_NO_EMPTY) as $c) {
+		$post_classes[] = $c;
 	}
 }
 ?>
 
-<article id="post-<?php the_ID(); ?>" <?php post_class($classes); ?>>
-	<a class="archive__thumb-link" href="<?php echo esc_url($url); ?>" tabindex="-1" aria-hidden="true">
-		<?= fs_image_with_placeholder(get_post_thumbnail_id(), 'medium', ['class' => 'archive__thumb']); ?>
+<article id="post-<?= $id ?>" <?php post_class($post_classes); ?>>
+	<a href="<?php echo esc_url($url); ?>" class="post-preview__link read-more-link-trigger">
+		<div class="post-preview__image-container" href="<?php echo esc_url($url); ?>">
+			<?= fs_image_with_placeholder(get_post_thumbnail_id(), 'medium', ['class' => 'post-preview__image']); ?>
+		</div>
+		<div class="post-preview__content">
+			<?php /* if ($range !== '') : ?>
+				<p class="event-archive__range"><?php echo esc_html($range); ?></p>
+			<?php endif; */ ?>
+			<<?= esc_attr($title_tag) ?> class="post-preview__title">
+				<?php the_title(); ?>
+			</<?= esc_attr($title_tag) ?>>
+			<div class="post-preview__excerpt"><?php the_excerpt(); ?></div>
+			<div class="post-preview__read-more-container">
+				<?php fs_render_template('read-more', ['class' => 'post-preview__read-more-link']); ?>
+			</div>
+		</div>
 	</a>
-	<div class="archive__body">
-		<?php if ($range !== '') : ?>
-			<p class="event-archive__range"><?php echo esc_html($range); ?></p>
-		<?php endif; ?>
-		<<?php echo esc_attr($tag); ?> class="archive__title">
-			<a href="<?php echo esc_url($url); ?>"><?php the_title(); ?></a>
-		</<?php echo esc_attr($tag); ?>>
-		<div class="archive__excerpt"><?php the_excerpt(); ?></div>
-		<p class="archive__more">
-			<a class="archive__readmore" href="<?php echo esc_url($url); ?>"><?php esc_html_e('Read more', 'fromscratch'); ?></a>
-		</p>
-	</div>
 </article>

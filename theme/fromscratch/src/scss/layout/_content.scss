@@ -1,0 +1,20 @@
+@use '../variables' as *;
+
+// Read more link
+
+.read-more-link {
+  color: var(--fs-link-color);
+  transition: transition('color');
+  text-decoration: none;
+}
+
+.read-more-link,
+.read-more-link-trigger {
+  cursor: pointer;
+}
+
+.read-more-link:hover,
+.read-more-link-trigger:hover .read-more-link {
+  text-decoration: none;
+  color: var(--fs-link-color-hover);
+}

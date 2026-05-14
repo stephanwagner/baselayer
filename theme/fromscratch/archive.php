@@ -12,6 +12,7 @@ if (is_post_type_archive()) {
 	}
 }
 
+// TODO
 $is_event_archive = defined('FS_EVENT_POST_TYPE') && is_post_type_archive(FS_EVENT_POST_TYPE);
 ?>
 
@@ -24,8 +25,8 @@ $is_event_archive = defined('FS_EVENT_POST_TYPE') && is_post_type_archive(FS_EVE
 
 			<h1><?php echo wp_kses_post($archive_heading); ?></h1>
 
-			<?php if (have_posts()) : ?>
-				<?php if ($is_event_archive) : ?>
+			<?php if (have_posts()) { ?>
+				<?php /*if ($is_event_archive) : ?>
 					<div class="event-archive">
 						<?php
 						$month_marker = '';
@@ -44,34 +45,30 @@ $is_event_archive = defined('FS_EVENT_POST_TYPE') && is_post_type_archive(FS_EVE
 								$month_marker = $month_label;
 								echo '<h2 class="event-archive__month">' . esc_html($month_label) . '</h2>';
 							}
-							fs_render_template('__content-event.php');
+							// TODO
+							// TODO fs_render_template('__content-event');
 						}
 						?>
 					</div>
-				<?php else : ?>
-					<div class="archive__list">
+				<?php else : */ ?>
+
+				<div class="archive__items-container">
+					<div class="archive__items">
 						<?php
 						while (have_posts()) {
 							the_post();
-							fs_render_template('post-preview.php');
+							fs_render_template('post-preview');
 						}
 						?>
 					</div>
-				<?php endif; ?>
+				</div>
 
 				<?php
-				fs_render_template('pagination.php', [
-					'aria_label' => __('Posts pagination', 'fromscratch'),
-					'pagination_args' => [
-						'mid_size'  => 2,
-						'prev_text' => __('Previous', 'fromscratch'),
-						'next_text' => __('Next', 'fromscratch'),
-					],
-				]);
+				fs_render_template('pagination');
 				?>
-			<?php else : ?>
+			<?php } else { ?>
 				<p class="archive__empty"><?php echo $is_event_archive ? esc_html__('No events found.', 'fromscratch') : esc_html__('No posts found.', 'fromscratch'); ?></p>
-			<?php endif; ?>
+			<?php } ?>
 		</div>
 
 	</div>

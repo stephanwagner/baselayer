@@ -19,6 +19,11 @@
 // Editor
 @forward 'admin/editor';
 
+// Layout
+@forward 'layout/content';
+@forward 'layout/archive';
+@forward 'layout/post-preview';
+
 // Sections
 @forward 'admin/developer-settings';
 @forward 'admin/theme-settings';

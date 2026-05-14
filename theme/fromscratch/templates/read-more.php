@@ -3,11 +3,18 @@
 defined('ABSPATH') || exit;
 
 $url = isset($url) ? (string) $url : '';
-if ($url === '') {
-	return;
-}
-
 $label = isset($label) && is_string($label) ? $label : __('Read more', 'fromscratch');
-$class = isset($class) && is_string($class) ? $class : 'archive__readmore';
+$class = isset($class) && is_string($class) ? $class : 'archive__read-more';
+$link_tag = isset($link_tag) && in_array($link_tag, ['a', 'button', 'div', 'span']) ? $link_tag : (!empty($url) ? 'a' : 'span');
 ?>
-<a class="<?php echo esc_attr($class); ?>" href="<?php echo esc_url($url); ?>"><?php echo esc_html($label); ?></a>
+<<?= $link_tag ?>
+	class="read-more-link <?= esc_attr($class) ?>"
+	<?php if ($url !== '') { ?>
+		href="<?= esc_url($url) ?>"
+		<?php if (!empty($target)) { ?>
+			target="<?= esc_attr($target) ?>"
+		<?php } ?>
+	<?php } ?>
+>
+	<?= esc_html($label); ?>
+</<?= $link_tag ?>>

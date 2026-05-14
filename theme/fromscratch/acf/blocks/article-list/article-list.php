@@ -65,9 +65,7 @@ $posts = $query->posts;
             foreach ($posts as $post) {
                 $GLOBALS['post'] = $post;
                 setup_postdata($post);
-                fs_render_template('post-preview.php', [
-                    'heading' => 'h3',
-                ]);
+                fs_render_template('post-preview');
             }
             wp_reset_postdata();
             ?>
