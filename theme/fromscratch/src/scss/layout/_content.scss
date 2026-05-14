@@ -6,6 +6,10 @@
   color: var(--fs-link-color);
   transition: transition('color');
   text-decoration: none;
+
+  @media print {
+    display: none;
+  }
 }
 
 .read-more-link,

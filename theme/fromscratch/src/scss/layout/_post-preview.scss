@@ -49,6 +49,10 @@
 
 .post-preview__read-more-container {
   margin: 4px 0 0;
+
+  @media print {
+    display: none;
+  }
 }
 
 .post-preview__excerpt {

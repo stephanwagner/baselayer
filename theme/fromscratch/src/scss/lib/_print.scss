@@ -11,6 +11,12 @@
     padding: 0;
   }
 
+  .container {
+    max-width: 100%;
+    width: 100%;
+    padding: 0;
+  }
+
   .entry .entry-header,
   .site-footer .site-info {
     margin: 0;
@@ -101,10 +107,6 @@
     page-break-inside: avoid;
   }
 
-  a[href^="http"]:after {
-    content: " < " attr(href) "> ";
-  }
-
   a:after > img {
     content: "";
   }
@@ -113,17 +115,17 @@
     content: "";
   }
 
-  a:not(:local-link):after {
-    content: " < " attr(href) "> ";
-  }
-
-  // Visibility
-
+  // Header, footer
   .footer__wrapper,
   .header__wrapper,
   .header__placeholder,
-  .hero__wrapper,
   .main-navigation,
+
+  // Content
+  .hero__wrapper,
+  .archive__pagination,
+
+  // Wordpress
   .author-description:before,
   .post-navigation,
   .widget-area,
