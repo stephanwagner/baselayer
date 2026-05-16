@@ -60,7 +60,9 @@ function fs_theme_settings_is_settings_page_post(): bool
 		return false;
 	}
 	global $pagenow;
-	return $pagenow === 'options-general.php' && isset($_GET['page']) && $_GET['page'] === 'fs-theme-settings';
+	$page = isset($_REQUEST['page']) ? sanitize_key((string) wp_unslash($_REQUEST['page'])) : '';
+
+	return $pagenow === 'options-general.php' && $page === 'fs-theme-settings';
 }
 
 /**
@@ -146,8 +148,10 @@ add_action('admin_init', function () {
 	if (empty($_POST['fromscratch_save_redirects']) || empty($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], 'fromscratch_save_redirects')) {
 		return;
 	}
+	// TODO Too much in amin init hook?
 	$value = isset($_POST['fs_redirects']) && is_array($_POST['fs_redirects']) ? $_POST['fs_redirects'] : [];
 	$sanitized = fs_sanitize_redirects($value);
+	fs_redirects_sync_htaccess($sanitized);
 	update_option('fs_redirects', $sanitized);
 	set_transient('fromscratch_redirects_saved', '1', 30);
 	wp_safe_redirect(fs_theme_settings_url_with_tab('redirects'));
@@ -776,16 +780,40 @@ function fs_sanitize_redirects($value): array
 		$code = in_array($code, $allowed_codes, true) ? $code : 301;
 		$out[$from] = ['to' => $to, 'code' => $code];
 	}
+	return $out;
+}
+
+/**
+ * Write or remove .htaccess redirect rules according to config/theme.php → redirects.method.
+ *
+ * @return bool True when no write was required or the file was updated successfully.
+ */
+function fs_redirects_sync_htaccess(array $redirects): bool
+{
 	$method = function_exists('fs_config_redirects') ? fs_config_redirects('method') : 'wordpress';
 	if (!in_array($method, ['wordpress', 'htaccess'], true)) {
 		$method = 'wordpress';
 	}
-	if ($method === 'htaccess') {
-		fs_write_redirects_htaccess($out);
-	} else {
+
+	if ($method !== 'htaccess') {
 		fs_remove_redirects_htaccess_block();
+		delete_transient('fromscratch_redirects_htaccess_error');
+		return true;
 	}
-	return $out;
+
+	if (!function_exists('fs_can_use_htaccess_redirects') || !fs_can_use_htaccess_redirects()) {
+		set_transient('fromscratch_redirects_htaccess_error', 'unavailable', 30);
+		return false;
+	}
+
+	$ok = fs_write_redirects_htaccess($redirects);
+	if (!$ok) {
+		set_transient('fromscratch_redirects_htaccess_error', 'writable', 30);
+	} else {
+		delete_transient('fromscratch_redirects_htaccess_error');
+	}
+
+	return $ok;
 }
 
 /**
@@ -856,12 +884,16 @@ function fs_write_redirects_htaccess(array $redirects): bool
 	if ($redirects !== []) {
 		$block = FS_HTACCESS_REDIRECTS_MARKER_START . "\n";
 		$block .= "<IfModule mod_rewrite.c>\nRewriteEngine On\n";
+		$home_path = parse_url(home_url('/'), PHP_URL_PATH);
+		$home_path = is_string($home_path) ? trim($home_path, '/') : '';
+		$block .= $home_path !== '' ? 'RewriteBase /' . $home_path . "\n" : "RewriteBase /\n";
 		foreach ($redirects as $from => $item) {
 			$to = $item['to'];
 			$code = (int) ($item['code'] ?? 301);
 			$path_for_regex = ltrim($from, '/');
 			$rewrite_pattern = $path_for_regex === '' ? '^/?$' : '^' . preg_quote($path_for_regex, '#') . '/?$';
-			$target = strpos($to, ' ') !== false ? '"' . $to . '"' : $to;
+			$target = fs_redirect_htaccess_rewrite_target($to);
+			$target = strpos($target, ' ') !== false ? '"' . $target . '"' : $target;
 			$block .= 'RewriteRule ' . $rewrite_pattern . ' ' . $target . ' [R=' . $code . ',L,NC]' . "\n";
 		}
 		$block .= "</IfModule>\n";
@@ -962,6 +994,10 @@ function theme_settings_page(): void
 	if ($redirects_saved !== false) {
 		delete_transient('fromscratch_redirects_saved');
 	}
+	$redirects_htaccess_error = get_transient('fromscratch_redirects_htaccess_error');
+	if ($redirects_htaccess_error !== false) {
+		delete_transient('fromscratch_redirects_htaccess_error');
+	}
 	$css_saved = get_transient('fromscratch_css_saved');
 	if ($css_saved !== false) {
 		delete_transient('fromscratch_css_saved');
@@ -984,17 +1020,24 @@ function theme_settings_page(): void
 		<?php
 		$notices = [];
 		if ($redirects_saved !== false || $css_saved !== false || $general_saved !== false) {
-			$notices[] = __('Settings saved.', 'fromscratch');
+			$notices[] = ['type' => 'success', 'message' => __('Settings saved.', 'fromscratch')];
+		}
+		if ($redirects_htaccess_error === 'writable') {
+			$notices[] = ['type' => 'error', 'message' => __('Redirects were saved, but the .htaccess file could not be updated. Check file permissions.', 'fromscratch')];
+		} elseif ($redirects_htaccess_error === 'unavailable') {
+			$notices[] = ['type' => 'error', 'message' => __('Redirects were saved, but Apache .htaccess redirects are not available on this server (not Apache, mod_rewrite missing, or .htaccess not writable). Use redirects.method = wordpress in config/theme.php or fix the server.', 'fromscratch')];
 		}
 		if ($weekly_send_success !== false) {
-			$notices[] = sprintf(__('Weekly website report sent to %s.', 'fromscratch'), (string) $weekly_send_success);
+			$notices[] = ['type' => 'success', 'message' => sprintf(__('Weekly website report sent to %s.', 'fromscratch'), (string) $weekly_send_success)];
 		}
 		if ($weekly_send_error !== false) {
-			$notices[] = (string) $weekly_send_error;
+			$notices[] = ['type' => 'error', 'message' => (string) $weekly_send_error];
 		}
-		foreach ($notices as $msg) : ?>
-			<div class="notice <?= ($weekly_send_error !== false && $msg === (string) $weekly_send_error) ? 'notice-error' : 'notice-success' ?> is-dismissible">
-				<p><strong><?= esc_html($msg) ?></strong></p>
+		foreach ($notices as $notice) :
+			$notice_type = ($notice['type'] ?? '') === 'error' ? 'notice-error' : 'notice-success';
+			?>
+			<div class="notice <?= esc_attr($notice_type) ?> is-dismissible">
+				<p><strong><?= esc_html((string) ($notice['message'] ?? '')) ?></strong></p>
 			</div>
 		<?php endforeach; ?>
 
@@ -1493,11 +1536,18 @@ function theme_settings_page(): void
 			<form method="post" action="<?= esc_url(fs_theme_settings_url_with_tab('redirects')) ?>" class="fs-page-settings-form" id="fs-redirects-form">
 				<?php wp_nonce_field('fromscratch_save_redirects'); ?>
 				<input type="hidden" name="fromscratch_save_redirects" value="1">
+				<input type="hidden" name="page" value="fs-theme-settings">
+				<input type="hidden" name="<?= esc_attr(FS_THEME_SETTINGS_TAB_QUERY_VAR) ?>" value="redirects">
 				<?php
 				$redirect_method = function_exists('fs_config_redirects') ? fs_config_redirects('method') : 'wordpress';
-				if (
+				if ($redirect_method === 'htaccess') : ?>
+					<?php if (function_exists('fs_can_use_htaccess_redirects') && !fs_can_use_htaccess_redirects()) : ?>
+						<div class="notice notice-warning inline">
+							<p><?= esc_html__('This server does not support .htaccess redirects. Redirects will not work unless Apache with mod_rewrite and a writable .htaccess file are available – or redirects.method is set to wordpress in config/theme.php.', 'fromscratch') ?></p>
+						</div>
+					<?php endif; ?>
+				<?php elseif (
 					function_exists('fs_can_use_htaccess_redirects') && fs_can_use_htaccess_redirects() &&
-					$redirect_method === 'wordpress' &&
 					function_exists('fs_is_developer_user') && fs_is_developer_user((int) get_current_user_id())
 				) : ?>
 					<div class="notice notice-info inline">

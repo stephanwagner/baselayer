@@ -261,6 +261,15 @@ msgstr "Entwickleroptionen anzeigen"
 msgid "You are running Apache. For better performance, you can set the redirect method to htaccess in config/theme.php under redirects."
 msgstr "Apache erkannt. Für eine bessere Performance kannst du die Redirect-Methode in config/theme.php unter redirects auf htaccess setzen."
 
+msgid "This server does not support .htaccess redirects. Redirects will not work unless Apache with mod_rewrite and a writable .htaccess file are available – or redirects.method is set to wordpress in config/theme.php."
+msgstr "Dieser Server unterstützt keine .htaccess-Weiterleitungen. Weiterleitungen funktionieren nur mit Apache, mod_rewrite und einer beschreibbaren .htaccess-Datei – alternativ kann redirects.method in der config/theme.php auf wordpress gesetzt werden."
+
+msgid "Redirects were saved, but the .htaccess file could not be updated. Check file permissions."
+msgstr "Die Weiterleitungen wurden gespeichert, aber die .htaccess-Datei konnte nicht aktualisiert werden. Bitte Dateiberechtigungen prüfen."
+
+msgid "Redirects were saved, but Apache .htaccess redirects are not available on this server (not Apache, mod_rewrite missing, or .htaccess not writable). Use redirects.method = wordpress in config/theme.php or fix the server."
+msgstr "Die Weiterleitungen wurden gespeichert, aber .htaccess-Weiterleitungen stehen auf diesem Server nicht zur Verfügung (kein Apache, mod_rewrite fehlt oder .htaccess ist nicht beschreibbar). Setze redirects.method in der config/theme.php auf wordpress oder passe den Server an."
+
 msgid "Enter paths without the domain (e.g. /old-path)."
 msgstr "Pfade ohne Domain eingeben (z. B. /alter-pfad)."
 

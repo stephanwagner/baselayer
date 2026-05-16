@@ -66,7 +66,7 @@ return [
 	 * If you run Apache, use 'htaccess' for better performance.
 	 */
 	'redirects' => [
-		'method' => 'wordpress',
+		'method' => 'htaccess',
 	],
 
 	/**

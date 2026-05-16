@@ -57,6 +57,36 @@ function fs_can_use_htaccess_redirects(): bool
 }
 
 /**
+ * Redirect target for Apache RewriteRule.
+ *
+ * Internal paths stay as root-relative `/target` so .htaccess works on any domain/port in production.
+ * External URLs are kept as full `https://…` (see {@see fs_normalize_redirect_to_path()}).
+ */
+function fs_redirect_htaccess_rewrite_target(string $to): string
+{
+	$to = trim($to);
+	if ($to === '') {
+		return '';
+	}
+	if (preg_match('#^https?://#i', $to)) {
+		return $to;
+	}
+
+	if ($to[0] !== '/') {
+		$to = '/' . $to;
+	}
+
+	// WordPress in a subdirectory: prefix install path so `/page` resolves under the site, not domain root.
+	$home_path = parse_url(home_url('/'), PHP_URL_PATH);
+	$home_path = is_string($home_path) ? trim($home_path, '/') : '';
+	if ($home_path !== '' && !str_starts_with($to, '/' . $home_path . '/') && $to !== '/' . $home_path) {
+		return '/' . $home_path . $to;
+	}
+
+	return $to;
+}
+
+/**
  * Paths that must never be overridden by the redirect router (WordPress internals).
  */
 function fs_redirects_internal_paths(): array
