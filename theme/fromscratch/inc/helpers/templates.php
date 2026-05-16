@@ -64,7 +64,7 @@ function fs_paginate_links_args_for_wp_query(\WP_Query $query, array $overrides 
 			'format'    => '',
 			'total'     => $total,
 			'current'   => $current,
-			'mid_size'  => 1, // TODO from config
+			'mid_size'  => 0, // TODO from config
 			'end_size'  => 1,
 			'prev_text' => __('Previous', 'fromscratch'),
 			'next_text' => __('Next', 'fromscratch'),
@@ -72,6 +72,41 @@ function fs_paginate_links_args_for_wp_query(\WP_Query $query, array $overrides 
 		],
 		$overrides
 	);
+}
+
+/**
+ * {@see paginate_links()} markup with theme BEM classes ({@see fs_paginate_links_apply_theme_classes()}).
+ *
+ * @param array<string, mixed> $args Same as {@see paginate_links()}; `type` is forced to `list`.
+ */
+function fs_paginate_links_html(array $args): string
+{
+	$args['type'] = 'list';
+	$html = paginate_links($args);
+	if (!is_string($html) || $html === '') {
+		return '';
+	}
+
+	return fs_paginate_links_apply_theme_classes($html);
+}
+
+/**
+ * Replace core `page-numbers` classes with `pagination__*` so archive and blocks share one stylesheet.
+ */
+function fs_paginate_links_apply_theme_classes(string $html): string
+{
+	$html = preg_replace('/<ul class=[\'"]page-numbers[\'"]>/', '<ul class="pagination__items">', $html, 1) ?? $html;
+	$html = str_replace('<li>', '<li class="pagination__item">', $html);
+
+	$replacements = [
+		'page-numbers dots'     => 'pagination__ellipsis',
+		'page-numbers current'  => 'pagination__link -current',
+		'next page-numbers'     => 'pagination__link -next',
+		'prev page-numbers'     => 'pagination__link -prev',
+		'page-numbers'          => 'pagination__link',
+	];
+
+	return str_replace(array_keys($replacements), array_values($replacements), $html);
 }
 
 /**

@@ -1,0 +1,46 @@
+@use '../variables' as *;
+
+.pagination {
+  margin-top: 2.5rem;
+}
+
+.pagination__container {
+  display: flex;
+  justify-content: center;
+}
+
+.pagination__items {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pagination__item {
+  margin: 0;
+}
+
+.pagination__link {
+  display: inline-block;
+  padding: 0.35rem 0.65rem;
+  border-radius: var(--fs-border-radius);
+  text-decoration: none;
+  color: inherit;
+
+  &:hover {
+    background: color-mix(in srgb, var(--fs-default-text-color) 8%, transparent);
+  }
+
+  &.-current {
+    font-weight: 600;
+  }
+}
+
+.pagination__ellipsis {
+  display: inline-block;
+  padding: 0.35rem 0.65rem;
+}

@@ -21,14 +21,18 @@ if ($total <= 1) {
 
 $overrides = isset($pagination_args) && is_array($pagination_args) ? $pagination_args : [];
 $args = fs_paginate_links_args_for_wp_query($query, $overrides);
-$links = paginate_links($args);
-if (!is_string($links) || $links === '') {
+$links = fs_paginate_links_html($args);
+if ($links === '') {
 	return;
 }
+
+$nav_classes = array_filter(array_unique(array_merge(['pagination'], preg_split('/\s+/', trim($nav_class), -1, PREG_SPLIT_NO_EMPTY) ?: [])));
 ?>
-<nav class="<?php echo esc_attr($nav_class); ?>" aria-label="<?php echo esc_attr($aria_label); ?>">
-	<?php
-	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- markup from core paginate_links().
-	echo $links;
-	?>
+<nav class="<?php echo esc_attr(implode(' ', $nav_classes)); ?>" aria-label="<?php echo esc_attr($aria_label); ?>">
+	<div class="pagination__container">
+		<?php
+		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- classes normalized in fs_paginate_links_apply_theme_classes().
+		echo $links;
+		?>
+	</div>
 </nav>
