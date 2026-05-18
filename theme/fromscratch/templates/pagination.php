@@ -26,7 +26,8 @@ if ($links === '') {
 	return;
 }
 
-$nav_classes = array_filter(array_unique(array_merge(['pagination__wrapper'], preg_split('/\s+/', trim($nav_class), -1, PREG_SPLIT_NO_EMPTY) ?: [])));
+$default_nav_classes = ['pagination__wrapper', '-content-margin-m'];
+$nav_classes = array_filter(array_unique(array_merge($default_nav_classes, preg_split('/\s+/', trim($nav_class), -1, PREG_SPLIT_NO_EMPTY) ?: [])));
 ?>
 <nav class="<?php echo esc_attr(implode(' ', $nav_classes)); ?>" aria-label="<?php echo esc_attr($aria_label); ?>">
 	<div class="pagination__container">

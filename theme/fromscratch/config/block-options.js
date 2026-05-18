@@ -1,16 +1,41 @@
 function getContentMarginOptions(defaultValue = '') {
   return {
     type: 'select',
-    label: 'Abstände',
+    label: 'Abstand oben und unten',
     default: defaultValue,
     attributeName: 'contentMargin',
     options: [
-      { label: 'Ohne', value: '' },
+      { label: 'Standard', value: '' },
+      { label: 'Ohne', value: '-content-margin-none' },
       { label: 'Sehr Klein', value: '-content-margin-xs' },
       { label: 'Klein', value: '-content-margin-s' },
       { label: 'Mittel', value: '-content-margin-m' },
       { label: 'Groß', value: '-content-margin-l' },
       { label: 'Sehr groß', value: '-content-margin-xl' }
+    ]
+  };
+}
+
+function getContentMarginAdjustOptions(defaultValue = '') {
+  return {
+    type: 'select',
+    label: 'Abstand anpassen',
+    default: defaultValue,
+    attributeName: 'contentMarginAdjust',
+    options: [
+      { label: 'Standard', value: '' },
+      { label: 'Abstand oben: Ohne', value: '-content-margin-top-none' },
+      { label: 'Abstand oben: Sehr Klein', value: '-content-margin-top-xs' },
+      { label: 'Abstand oben: Klein', value: '-content-margin-top-s' },
+      { label: 'Abstand oben: Mittel', value: '-content-margin-top-m' },
+      { label: 'Abstand oben: Groß', value: '-content-margin-top-l' },
+      { label: 'Abstand oben: Sehr groß', value: '-content-margin-top-xl' },
+      { label: 'Abstand unten: Ohne', value: '-content-margin-bottom-none' },
+      { label: 'Abstand unten: Sehr Klein', value: '-content-margin-bottom-xs' },
+      { label: 'Abstand unten: Klein', value: '-content-margin-bottom-s' },
+      { label: 'Abstand unten: Mittel', value: '-content-margin-bottom-m' },
+      { label: 'Abstand unten: Groß', value: '-content-margin-bottom-l' },
+      { label: 'Abstand unten: Sehr groß', value: '-content-margin-bottom-xl' }
     ]
   };
 }
@@ -37,6 +62,7 @@ export const blockOptions = [
     name: 'core/columns',
     options: [
       getContentMarginOptions('-content-margin-m'),
+      getContentMarginOptions(),
       {
         type: 'select',
         label: 'Spaltenabstand',
@@ -130,7 +156,10 @@ export const blockOptions = [
   // Image
   {
     name: 'core/image',
-    options: [getContentMarginOptions()]
+    options: [
+      getContentMarginOptions(),
+      getContentMarginAdjustOptions()
+    ]
   },
 
   // Group
@@ -138,6 +167,7 @@ export const blockOptions = [
     name: 'core/group',
     options: [
       getContentMarginOptions('-content-margin-m'),
+      getContentMarginAdjustOptions(),
       getLimitWidthOptions()
     ]
   },
@@ -145,6 +175,9 @@ export const blockOptions = [
   // Separator
   {
     name: 'core/separator',
-    options: [getContentMarginOptions('-content-margin-m')]
+    options: [
+      getContentMarginOptions('-content-margin-m'),
+      getContentMarginAdjustOptions()
+    ]
   }
 ];

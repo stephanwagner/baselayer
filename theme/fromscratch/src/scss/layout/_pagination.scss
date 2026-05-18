@@ -1,9 +1,7 @@
 @use '../variables' as *;
 
 .pagination__wrapper {
-  margin: 48px 0;
-
-  // TODO use content-margin-class
+  position: relative;
 }
 
 .pagination__container {

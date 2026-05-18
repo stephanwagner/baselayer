@@ -1,4 +1,48 @@
 @use '../variables' as *;
+@use 'sass:map';
+
+// Content margin mixin
+
+@mixin content-margin(
+  $top: null,
+  $bottom: null,
+  $responsive: ()
+) {
+
+  // Base
+  @if $top != null {
+    margin-top: $top;
+
+    &:first-child {
+      margin-top: 0;
+    }
+  }
+
+  @if $bottom != null {
+    margin-bottom: $bottom;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  // Responsive
+  @each $breakpoint, $values in $responsive {
+
+    @media (max-width: $breakpoint) {
+
+      @if map.has-key($values, top) {
+        margin-top: map.get($values, top);
+      }
+
+      @if map.has-key($values, bottom) {
+        margin-bottom: map.get($values, bottom);
+      }
+    }
+  }
+}
+
+// WordPress blocks mixin
 
 @mixin wordpress-blocks {
   // Groups
@@ -239,162 +283,230 @@
     margin-right: auto;
   }
 
-  // Margins
+  // Content margin top and bottom
 
-  *.-content-margin-xs {
-    margin-top: var(--fs-content-margin-xs);
-    margin-bottom: var(--fs-content-margin-xs);
-
-    &:first-child {
-      margin-top: 0;
-    }
-
-    &:last-child {
-      margin-bottom: 0;
-    }
+  .-content-margin-none {
+    @include content-margin(
+      0,
+      0
+    );
   }
 
-  *.-content-margin-s {
-    margin-top: var(--fs-content-margin-s);
-    margin-bottom: var(--fs-content-margin-s);
-
-    &:first-child {
-      margin-top: 0;
-    }
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-
-    @media (max-width: $breakpoint-xs) {
-      margin-top: var(--fs-content-margin-xs);
-      margin-bottom: var(--fs-content-margin-xs);
-
-      &:first-child {
-        margin-top: 0;
-      }
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
+  .-content-margin-xs {
+    @include content-margin(
+      var(--fs-content-margin-xs),
+      var(--fs-content-margin-xs)
+    );
   }
 
-  *.-content-margin-m {
-    margin-top: var(--fs-content-margin-m);
-    margin-bottom: var(--fs-content-margin-m);
-
-    &:first-child {
-      margin-top: 0;
-    }
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-
-    @media (max-width: $breakpoint-s) {
-      margin-top: var(--fs-content-margin-s);
-      margin-bottom: var(--fs-content-margin-s);
-
-      &:first-child {
-        margin-top: 0;
-      }
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-
-    @media (max-width: $breakpoint-xs) {
-      margin-top: var(--fs-content-margin-xs);
-      margin-bottom: var(--fs-content-margin-xs);
-
-      &:first-child {
-        margin-top: 0;
-      }
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
+  .-content-margin-s {
+    @include content-margin(
+      var(--fs-content-margin-s),
+      var(--fs-content-margin-s),
+      (
+        $breakpoint-xs: (
+          top: var(--fs-content-margin-xs),
+          bottom: var(--fs-content-margin-xs)
+        ),
+      )
+    );
   }
 
-  *.-content-margin-l {
-    margin-top: var(--fs-content-margin-l);
-    margin-bottom: var(--fs-content-margin-l);
-
-    &:first-child {
-      margin-top: 0;
-    }
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-
-    @media (max-width: $breakpoint-m) {
-      margin-top: var(--fs-content-margin-m);
-      margin-bottom: var(--fs-content-margin-m);
-
-      &:first-child {
-        margin-top: 0;
-      }
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-
-    @media (max-width: $breakpoint-s) {
-      margin-top: var(--fs-content-margin-s);
-      margin-bottom: var(--fs-content-margin-s);
-
-      &:first-child {
-        margin-top: 0;
-      }
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
+  .-content-margin-m {
+    @include content-margin(
+      var(--fs-content-margin-m),
+      var(--fs-content-margin-m),
+      (
+        $breakpoint-s: (
+          top: var(--fs-content-margin-s),
+          bottom: var(--fs-content-margin-s),
+        ),
+        $breakpoint-xs: (
+          top: var(--fs-content-margin-xs),
+          bottom: var(--fs-content-margin-xs)
+        )
+      )
+    );
   }
 
-  *.-content-margin-xl {
-    margin-top: var(--fs-content-margin-xl);
-    margin-bottom: var(--fs-content-margin-xl);
+  .-content-margin-l {
+    @include content-margin(
+      var(--fs-content-margin-l),
+      var(--fs-content-margin-l),
+      (
+        $breakpoint-m: (
+          top: var(--fs-content-margin-m),
+          bottom: var(--fs-content-margin-m),
+        ),
+        $breakpoint-s: (
+          top: var(--fs-content-margin-s),
+          bottom: var(--fs-content-margin-s),
+        )
+      )
+    );
+  }
 
-    &:first-child {
-      margin-top: 0;
-    }
+  .-content-margin-xl {
+    @include content-margin(
+      var(--fs-content-margin-xl),
+      var(--fs-content-margin-xl),
+      (
+        $breakpoint-l: (
+          top: var(--fs-content-margin-l),
+          bottom: var(--fs-content-margin-l),
+        ),
+        $breakpoint-m: (
+          top: var(--fs-content-margin-m),
+          bottom: var(--fs-content-margin-m),
+        )
+      )
+    );
+  }
 
-    &:last-child {
-      margin-bottom: 0;
-    }
+  // Content margin top
+  
+  .-content-margin-top-none {
+    @include content-margin(
+      0,
+      null
+    );
+  }
+  
+  .-content-margin-top-xs {
+    @include content-margin(
+      var(--fs-content-margin-xs),
+      null
+    );
+  }
+  
+  .-content-margin-top-s {
+    @include content-margin(
+      var(--fs-content-margin-s),
+      null,
+      (
+        $breakpoint-xs: (
+          top: var(--fs-content-margin-xs),
+        )
+      )
+    );
+  }
+  
+  .-content-margin-top-m {
+    @include content-margin(
+      var(--fs-content-margin-m),
+      null,
+      (
+        $breakpoint-s: (
+          top: var(--fs-content-margin-s),
+        ),
+        $breakpoint-xs: (
+          top: var(--fs-content-margin-xs),
+        )
+      )
+    );
+  }
+  
+  .-content-margin-top-l {
+    @include content-margin(
+      var(--fs-content-margin-l),
+      null,
+      (
+        $breakpoint-m: (
+          top: var(--fs-content-margin-m),
+        ),
+        $breakpoint-s: (
+          top: var(--fs-content-margin-s),
+        )
+      )
+    );
+  }
+  
+  .-content-margin-top-xl {
+    @include content-margin(
+      var(--fs-content-margin-xl),
+      null,
+      (
+        $breakpoint-l: (
+          top: var(--fs-content-margin-l),
+        ),
+        $breakpoint-m: (
+          top: var(--fs-content-margin-m),
+        )
+      )
+    );
+  }
 
-    @media (max-width: $breakpoint-l) {
-      margin-top: var(--fs-content-margin-l);
-      margin-bottom: var(--fs-content-margin-l);
-
-      &:first-child {
-        margin-top: 0;
-      }
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-
-    @media (max-width: $breakpoint-m) {
-      margin-top: var(--fs-content-margin-m);
-      margin-bottom: var(--fs-content-margin-m);
-
-      &:first-child {
-        margin-top: 0;
-      }
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
+  // Content margin bottom
+  
+  .-content-margin-bottom-none {
+    @include content-margin(
+      null,
+      0
+    );
+  }
+  
+  .-content-margin-bottom-xs {
+    @include content-margin(
+      null,
+      var(--fs-content-margin-xs)
+    );
+  }
+  
+  .-content-margin-bottom-s {
+    @include content-margin(
+      null,
+      var(--fs-content-margin-s),
+      (
+        $breakpoint-xs: (
+          bottom: var(--fs-content-margin-xs)
+        )
+      )
+    );
+  }
+  
+  .-content-margin-bottom-m {
+    @include content-margin(
+      null,
+      var(--fs-content-margin-m),
+      (
+        $breakpoint-s: (
+          bottom: var(--fs-content-margin-s),
+        ),
+        $breakpoint-xs: (
+          bottom: var(--fs-content-margin-xs)
+        )
+      )
+    );
+  }
+  
+  .-content-margin-bottom-l {
+    @include content-margin(
+      null,
+      var(--fs-content-margin-l),
+      (
+        $breakpoint-m: (
+          bottom: var(--fs-content-margin-m),
+        ),
+        $breakpoint-s: (
+          bottom: var(--fs-content-margin-s),
+        )
+      )
+    );
+  }
+  
+  .-content-margin-bottom-xl {
+    @include content-margin(
+      null,
+      var(--fs-content-margin-xl),
+      (
+        $breakpoint-l: (
+          bottom: var(--fs-content-margin-l),
+        ),
+        $breakpoint-m: (
+          bottom: var(--fs-content-margin-m),
+        )
+      )
+    );
   }
 
   // Text-wrap

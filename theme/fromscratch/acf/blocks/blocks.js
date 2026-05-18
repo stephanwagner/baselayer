@@ -16,8 +16,3 @@ import './number-ticker/number-ticker.js';
 
 // Slider
 import './slider/slider.js';
-
-
-// // TODO
-// // Filters
-// import '../block-filters.js';
