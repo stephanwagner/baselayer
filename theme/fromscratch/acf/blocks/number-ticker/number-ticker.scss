@@ -2,16 +2,6 @@
 
 .number-ticker__wrapper {
   position: relative;
-  margin-top: 32px;
-  margin-bottom: 32px;
-
-  &:first-child {
-    margin-top: 0;
-  }
-
-  &:last-child {
-    margin-bottom: 0;
-  }
 }
 
 .number-ticker__items {

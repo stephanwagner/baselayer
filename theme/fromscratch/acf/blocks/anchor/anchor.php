@@ -1,8 +1,5 @@
 <?php
 
-// Block name
-$blockName = 'anchor';
-
 // Class names
 $classNames = ['fs-wp-block'];
 
@@ -15,7 +12,7 @@ if (!empty($block['className'])) {
 }
 
 // Add wrapper class
-$classNames[] = $blockName . '__wrapper';
+$classNames[] = 'anchor__wrapper';
 
 // Fields
 $id = get_field('id');

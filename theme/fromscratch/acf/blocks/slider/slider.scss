@@ -2,29 +2,6 @@
 
 .slider__wrapper {
   position: relative;
-  margin-top: 32px;
-  margin-bottom: 32px;
-
-  &:first-child {
-    margin-top: 0;
-  }
-
-  &:last-child {
-    margin-bottom: 0;
-  }
-
-  @media (max-width: 600px) {
-    margin-top: 24px;
-    margin-bottom: 24px;
-
-    &:first-child {
-      margin-top: 0;
-    }
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
 
   .acf-innerblocks-container {
     display: flex;

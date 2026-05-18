@@ -1,8 +1,5 @@
 <?php
 
-// Block name
-$blockName = 'accordion';
-
 // Class names
 $classNames = ['fs-wp-block'];
 
@@ -20,7 +17,7 @@ if (!empty($block['className'])) {
 }
 
 // Add wrapper class
-$classNames[] = $blockName . '__wrapper';
+$classNames[] = 'accordion__wrapper';
 
 // Fields
 $title = get_field('title');

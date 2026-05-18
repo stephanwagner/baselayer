@@ -1,8 +1,5 @@
 <?php
 
-// Block name
-$blockName = 'number-ticker';
-
 // Class names
 $classNames = ['fs-wp-block'];
 
@@ -20,7 +17,10 @@ if (!empty($block['className'])) {
 }
 
 // Add wrapper class
-$classNames[] = $blockName . '__wrapper';
+$classNames[] = 'number-ticker__wrapper';
+
+// Add margin class
+$classNames[] = '-content-margin-m';
 
 // Items
 $items = get_field('items');

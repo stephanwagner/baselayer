@@ -1,8 +1,5 @@
 <?php
 
-// Block name
-$blockName = 'map-dsgvo';
-
 // Class names
 $classNames = ['fs-wp-block'];
 
@@ -15,7 +12,10 @@ if (!empty($block['className'])) {
 }
 
 // Add wrapper class
-$classNames[] = $blockName . '__wrapper';
+$classNames[] = 'map-dsgvo__wrapper';
+
+// Add margin class
+$classNames[] = '-content-margin-xs';
 ?>
 
 <?php if (is_admin()) { ?>

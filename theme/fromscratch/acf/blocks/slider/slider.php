@@ -1,8 +1,5 @@
 <?php
 
-// Block name
-$blockName = 'slider';
-
 // Class names
 $classNames = ['fs-wp-block'];
 
@@ -20,7 +17,10 @@ if (!empty($block['className'])) {
 }
 
 // Add wrapper class
-$classNames[] = $blockName . '__wrapper';
+$classNames[] = 'slider__wrapper';
+
+// Add margin class
+$classNames[] = '-content-margin-m';
 
 // Fields
 $slidesPerView = get_field('slides-per-view') ?? 1;

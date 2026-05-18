@@ -1,8 +1,5 @@
 <?php
 
-// Block name
-$blockName = 'slider-slide';
-
 // Class names
 $classNames = ['fs-wp-block'];
 
@@ -15,7 +12,7 @@ if (!empty($block['className'])) {
 }
 
 // Add wrapper class
-$classNames[] = $blockName . '__wrapper';
+$classNames[] = 'slider-slide__wrapper';
 
 // Add swiper class
 $classNames[] = 'swiper-slide';
