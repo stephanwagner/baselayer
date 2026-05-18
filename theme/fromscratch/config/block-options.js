@@ -103,7 +103,7 @@ export const blockOptions = [
     options: [
       {
         type: 'boolean',
-        label: 'Inhalt zentrieren',
+        label: 'Inhalt vertikal zentrieren',
         default: false,
         attributeName: 'columnCenterContent',
         className: '-center-content'

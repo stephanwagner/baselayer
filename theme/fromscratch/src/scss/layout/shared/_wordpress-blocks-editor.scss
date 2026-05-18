@@ -3,6 +3,8 @@
 .editor-styles-wrapper {
   @include wordpress-blocks();
 
+  // Content widths
+
   .-narrow,
   .-narrow-left {
     max-width: min(var(--fs-content-narrow-width), 840px);
@@ -11,5 +13,14 @@
   .-very-narrow,
   .-very-narrow-left {
     max-width: min(var(--fs-content-very-narrow-width), 840px);
+  }
+
+  // Columns
+
+  .wp-block-column.-center-content {
+    >.wp-block {
+      margin-left: unset;
+      margin-right: unset;
+    }
   }
 }

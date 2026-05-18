@@ -208,6 +208,12 @@
         padding: 12px 16px;
       }
     }
+
+    &.-center-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
   }
 
   // Images

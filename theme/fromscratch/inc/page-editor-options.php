@@ -119,7 +119,7 @@ function fs_page_should_show_title(int $post_id): bool
 	}
 	$raw = get_post_meta($post_id, FS_SHOW_PAGE_TITLE_META, true);
 	if ($raw === '' || $raw === false) {
-		return true;
+		return false;
 	}
 
 	return filter_var($raw, FILTER_VALIDATE_BOOLEAN);
