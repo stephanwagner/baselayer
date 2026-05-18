@@ -3,7 +3,7 @@
 defined('ABSPATH') || exit;
 
 $aria_label = isset($aria_label) && is_string($aria_label) ? $aria_label : __('Posts pagination', 'fromscratch');
-$nav_class = isset($nav_class) && is_string($nav_class) ? $nav_class : 'archive__pagination';
+$nav_class = isset($nav_class) && is_string($nav_class) ? $nav_class : '';
 
 if (!isset($query) || !$query instanceof \WP_Query) {
 	global $wp_query;
@@ -26,7 +26,7 @@ if ($links === '') {
 	return;
 }
 
-$nav_classes = array_filter(array_unique(array_merge(['pagination'], preg_split('/\s+/', trim($nav_class), -1, PREG_SPLIT_NO_EMPTY) ?: [])));
+$nav_classes = array_filter(array_unique(array_merge(['pagination__wrapper'], preg_split('/\s+/', trim($nav_class), -1, PREG_SPLIT_NO_EMPTY) ?: [])));
 ?>
 <nav class="<?php echo esc_attr(implode(' ', $nav_classes)); ?>" aria-label="<?php echo esc_attr($aria_label); ?>">
 	<div class="pagination__container">

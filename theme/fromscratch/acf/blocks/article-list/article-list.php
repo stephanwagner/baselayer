@@ -74,7 +74,7 @@ $posts = $query->posts;
         if ($hasLimit && $limitType === 'pagination' && $query->max_num_pages > 1) {
             fs_render_pagination_for_query($query, [
                 'aria_label' => __('Articles pagination', 'fromscratch'),
-                'nav_class'  => 'article-list__pagination archive__pagination',
+                'nav_class'  => 'article-list__pagination',
             ]);
         }
         ?>
