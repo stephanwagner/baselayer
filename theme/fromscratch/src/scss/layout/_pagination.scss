@@ -2,6 +2,10 @@
 
 .pagination__wrapper {
   position: relative;
+
+  @media print {
+    display: none;
+  }
 }
 
 .pagination__container {

@@ -12,7 +12,7 @@ $id = isset($id) ? $id : get_the_ID();
 $url = (isset($url) && is_string($url) && $url !== '') ? $url : get_permalink();
 // $range = (isset($range) && is_string($range)) ? $range : ''; // TODO
 $classes = (isset($classes) && is_string($classes)) ? trim($classes) : '';
-$title_tag = (isset($title_tag) && in_array($title_tag, ['div', 'span', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'])) ? $title_tag : 'h3';
+$title_tag = (isset($title_tag) && in_array($title_tag, ['div', 'span', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'])) ? $title_tag : 'h4';
 
 $post_classes = ['post-preview__container'];
 if ($classes !== '') {

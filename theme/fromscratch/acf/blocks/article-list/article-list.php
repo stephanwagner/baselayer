@@ -55,9 +55,7 @@ $posts = $query->posts;
 
 ?>
 
-<div
-    class="article-list__wrapper"
->
+<div class="<?= implode(' ', $classNames) ?>">
     <div class="article-list__container">
         <div class="article-list__items archive__list">
             <?php

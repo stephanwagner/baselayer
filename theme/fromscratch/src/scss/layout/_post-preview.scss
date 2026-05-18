@@ -20,12 +20,24 @@
     text-decoration: none;
     color: var(--fs-default-text-color);
   }
+
+  @media print {
+    text-decoration: none !important;
+  }
 }
 
 .post-preview__image-container {
   align-self: flex-start;
   flex-shrink: 0;
   width: 280px;
+
+  @media (max-width: $breakpoint-m) {
+    width: 200px;
+  }
+
+  @media print {
+    width: 160px;
+  }
 }
 
 .post-preview__image {
@@ -42,8 +54,7 @@
 }
 
 .post-preview__title {
-  font-size: 24px;
-  font-weight: 600;
+  position: relative;
   margin: 0 0 8px;
 }
 
@@ -57,4 +68,5 @@
 
 .post-preview__excerpt {
   text-wrap: pretty;
+  font-weight: 400;
 }
