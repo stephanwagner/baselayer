@@ -29,6 +29,13 @@ $content-padding-m: 48px;
 $content-padding-l: 64px;
 $content-padding-xl: 64px;
 
+// Margins
+$content-margin-xs: 24px;
+$content-margin-s: 32px;
+$content-margin-m: 48px;
+$content-margin-l: 64px;
+$content-margin-xl: 96px;
+
 // Header
 $header-height: 96px;
 $header-height-scrolled: 64px;
@@ -101,6 +108,13 @@ $header-height-mobile: 64px;
   --fs-content-padding-l: #{$content-padding-l};
   --fs-content-padding-xl: #{$content-padding-xl};
 
+  // Margins
+  --fs-content-margin-xs: #{$content-margin-xs};
+  --fs-content-margin-s: #{$content-margin-s};
+  --fs-content-margin-m: #{$content-margin-m};
+  --fs-content-margin-l: #{$content-margin-l};
+  --fs-content-margin-xl: #{$content-margin-xl};
+
   // Header
   --fs-header-height: 96px;
   --fs-header-height-scrolled: 64px;
@@ -158,20 +172,16 @@ $fontSizes: (
 
 @function transition($properties...) {
   $out: ();
-
   @each $p in $properties {
     $out: list.append($out, #{$p} var(--fs-transition-speed), comma);
   }
-
   @return $out;
 }
 
 @function transition-slow($properties...) {
   $out: ();
-
   @each $p in $properties {
     $out: list.append($out, #{$p} var(--fs-transition-speed-slow), comma);
   }
-
   @return $out;
 }

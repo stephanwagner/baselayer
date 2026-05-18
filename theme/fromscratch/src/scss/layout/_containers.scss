@@ -30,7 +30,7 @@
     padding-right: 80px;
   }
 
-  @media (max-width: $content-max-width + 80px + 80px + 24px + 24px) {
+  @media (max-width: calc($content-max-width + 80px + 80px + 24px + 24px)) {
     margin-left: calc(var(--fs-content-padding-l) * -1);
     margin-right: calc(var(--fs-content-padding-l) * -1);
 
@@ -40,7 +40,7 @@
     }
   }
 
-  @media (max-width: $content-max-width + $content-padding-l + $content-padding-l + 24px + 24px) {
+  @media (max-width: calc($content-max-width + $content-padding-l + $content-padding-l + 24px + 24px)) {
     margin-left: calc((100vw - var(--fs-content-max-width)) / 2 / 2 * -1 - 16px);
     margin-right: calc((100vw - var(--fs-content-max-width)) / 2 / 2 * -1 - 16px);
 
@@ -50,7 +50,7 @@
     }
   }
 
-  @media (max-width: $content-max-width + $content-padding-l + $content-padding-l) {
+  @media (max-width: calc($content-max-width + $content-padding-l + $content-padding-l)) {
     margin-left: calc(var(--fs-content-padding-l) / 2 * -1 - 12px);
     margin-right: calc(var(--fs-content-padding-l) / 2 * -1 - 12px);
 
@@ -95,7 +95,7 @@
   margin-left: calc((100vw - var(--fs-content-max-width)) * -0.5);
   margin-right: calc((100vw - var(--fs-content-max-width)) * -0.5);
 
-  @media (max-width: $content-max-width + $content-padding-l + $content-padding-l) {
+  @media (max-width: calc($content-max-width + $content-padding-l + $content-padding-l)) {
     margin-left: calc(var(--fs-content-padding-l) * -1);
     margin-right: calc(var(--fs-content-padding-l) * -1);
   }

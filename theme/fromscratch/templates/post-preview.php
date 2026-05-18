@@ -23,8 +23,8 @@ if ($classes !== '') {
 ?>
 
 <article id="post-<?= $id ?>" <?php post_class($post_classes); ?>>
-	<a href="<?php echo esc_url($url); ?>" class="post-preview__link read-more-link-trigger">
-		<div class="post-preview__image-container" href="<?php echo esc_url($url); ?>">
+	<<?= is_admin() ? 'div' : 'a href="' . esc_url($url) . '"' ?> class="post-preview__link read-more-link-trigger">
+		<div class="post-preview__image-container">
 			<?= fs_image_with_placeholder(get_post_thumbnail_id(), 'medium', ['class' => 'post-preview__image']); ?>
 		</div>
 		<div class="post-preview__content">
@@ -39,5 +39,5 @@ if ($classes !== '') {
 				<?php fs_render_template('read-more', ['class' => 'post-preview__read-more-link']); ?>
 			</div>
 		</div>
-	</a>
+	</<?= is_admin() ? 'div' : 'a' ?>>
 </article>

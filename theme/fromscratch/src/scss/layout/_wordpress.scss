@@ -24,6 +24,12 @@
     }
   }
 
+  .has-black-background-color,
+  .has-off-black-background-color,
+  .has-gray-600-background-color {
+    color: #fff;
+  }
+
   // Wordpress gradients
 
   @each $name, $gradient in $gradients {

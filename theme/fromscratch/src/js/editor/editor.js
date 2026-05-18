@@ -1,3 +1,4 @@
+import './block-options';
 import './expirator';
 import './events';
 import './page-show-title';

@@ -2,4 +2,14 @@
 
 .editor-styles-wrapper {
   @include wordpress-blocks();
+
+  .-narrow,
+  .-narrow-left {
+    max-width: min(var(--fs-content-narrow-width), 840px);
+  }
+
+  .-very-narrow,
+  .-very-narrow-left {
+    max-width: min(var(--fs-content-very-narrow-width), 840px);
+  }
 }

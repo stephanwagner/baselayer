@@ -15,6 +15,10 @@
 .read-more-link,
 .read-more-link-trigger {
   cursor: pointer;
+
+  .editor-styles-wrapper & {
+    cursor: unset;
+  }
 }
 
 .read-more-link:hover,

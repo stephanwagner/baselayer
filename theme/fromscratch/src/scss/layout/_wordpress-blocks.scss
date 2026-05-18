@@ -7,22 +7,17 @@
     position: relative;
 
     &.has-background {
-      padding-top: 64px;
-      padding-bottom: 64px;
-
-      @media (max-width: $content-max-width + $content-padding-l + $content-padding-l) {
-        padding-top: 48px;
-        padding-bottom: 48px;
-      }
+      padding-top: 40px;
+      padding-bottom: 40px;
 
       @media (max-width: $breakpoint-m) {
-        padding-top: 32px;
-        padding-bottom: 32px;
+        padding-top: 28px;
+        padding-bottom: 28px;
       }
 
       @media (max-width: $breakpoint-xs) {
-        padding-top: 16px;
-        padding-bottom: 16px;
+        padding-top: 12px;
+        padding-bottom: 12px;
       }
 
       &:not(.alignfull) {
@@ -57,17 +52,12 @@
         }
       }
     }
-
-    &.has-black-background-color,
-    &.has-off-black-background-color,
-    &.has-gray-600-background-color {
-      color: #fff;
-    }
   }
 
   // Columns
 
   .wp-block-columns {
+    position: relative;
     margin-top: 0;
     margin-bottom: 0;
     gap: 48px;
@@ -79,27 +69,99 @@
     @media (max-width: $breakpoint-s) {
       gap: 24px;
     }
+
+    &.-column-gap-xs {
+      gap: 16px;
+    }
+
+    &.-column-gap-s {
+      gap: 32px;
+
+      @media (max-width: $breakpoint-s) {
+        gap: 24px;
+      }
+    }
+
+    &.-column-gap-l {
+      gap: 48px 64px;
+
+      @media (max-width: $breakpoint-l) {
+        gap: 48px;
+      }
+
+      @media (max-width: $breakpoint-m) {
+        gap: 32px;
+      }
+
+      @media (max-width: $breakpoint-s) {
+        gap: 24px;
+      }
+    }
+
+    &.-column-gap-xl {
+      gap: 48px 96px;
+
+      @media (max-width: $breakpoint-l) {
+        gap: 48px 64px;
+      }
+
+      @media (max-width: $breakpoint-m) {
+        gap: 32px 48px;
+      }
+
+      @media (max-width: $breakpoint-s) {
+        gap: 24px 32px;
+      }
+    }
+
+    // Columns: Designs
+
+    &.-image-left-text-right {
+      .wp-block-column:first-child {
+        align-self: flex-start;
+      }
+
+      .wp-block-column:last-child {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+    }
+
+    &.-image-right-text-left {
+      .wp-block-column:first-child {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .wp-block-column:last-child {
+        align-self: flex-start;
+      }
+    }
+
+    // Columns: Reverse on mobile
+
+    &.-reverse-order-on-mobile {
+      @media (max-width: 782px) {
+        flex-direction: column-reverse;
+      }
+    }
   }
 
+  // Column
+
   .wp-block-column {
-    &.-has-background-color {
-      background-color: var(--fs-color-gray-300);
+    &.has-background {
       border-radius: var(--fs-border-radius);
+      padding: 28px 32px;
 
-      >.wp-block-group {
-        padding: 64px;
+      @media (max-width: $breakpoint-s) {
+        padding: 20px 24px;
+      }
 
-        @media (max-width: $breakpoint-l) {
-          padding: 48px;
-        }
-
-        @media (max-width: $breakpoint-s) {
-          padding: 32px;
-        }
-
-        @media (max-width: $breakpoint-xs) {
-          padding: 24px;
-        }
+      @media (max-width: $breakpoint-xs) {
+        padding: 12px 16px;
       }
     }
   }
@@ -157,5 +219,191 @@
         }
       }
     }
+  }
+
+  // Content widths
+
+  .-narrow,
+  .-narrow-left {
+    max-width: var(--fs-content-narrow-width);
+  }
+
+  .-very-narrow,
+  .-very-narrow-left {
+    max-width: var(--fs-content-very-narrow-width);
+  }
+
+  .-narrow,
+  .-very-narrow {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  // Margins
+
+  *.-content-margin-xs {
+    margin-top: var(--fs-content-margin-xs);
+    margin-bottom: var(--fs-content-margin-xs);
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  *.-content-margin-s {
+    margin-top: var(--fs-content-margin-s);
+    margin-bottom: var(--fs-content-margin-s);
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    @media (max-width: $breakpoint-xs) {
+      margin-top: var(--fs-content-margin-xs);
+      margin-bottom: var(--fs-content-margin-xs);
+
+      &:first-child {
+        margin-top: 0;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  *.-content-margin-m {
+    margin-top: var(--fs-content-margin-m);
+    margin-bottom: var(--fs-content-margin-m);
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    @media (max-width: $breakpoint-s) {
+      margin-top: var(--fs-content-margin-s);
+      margin-bottom: var(--fs-content-margin-s);
+
+      &:first-child {
+        margin-top: 0;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    @media (max-width: $breakpoint-xs) {
+      margin-top: var(--fs-content-margin-xs);
+      margin-bottom: var(--fs-content-margin-xs);
+
+      &:first-child {
+        margin-top: 0;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  *.-content-margin-l {
+    margin-top: var(--fs-content-margin-l);
+    margin-bottom: var(--fs-content-margin-l);
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    @media (max-width: $breakpoint-m) {
+      margin-top: var(--fs-content-margin-m);
+      margin-bottom: var(--fs-content-margin-m);
+
+      &:first-child {
+        margin-top: 0;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    @media (max-width: $breakpoint-s) {
+      margin-top: var(--fs-content-margin-s);
+      margin-bottom: var(--fs-content-margin-s);
+
+      &:first-child {
+        margin-top: 0;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  *.-content-margin-xl {
+    margin-top: var(--fs-content-margin-xl);
+    margin-bottom: var(--fs-content-margin-xl);
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    @media (max-width: $breakpoint-l) {
+      margin-top: var(--fs-content-margin-l);
+      margin-bottom: var(--fs-content-margin-l);
+
+      &:first-child {
+        margin-top: 0;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+
+    @media (max-width: $breakpoint-m) {
+      margin-top: var(--fs-content-margin-m);
+      margin-bottom: var(--fs-content-margin-m);
+
+      &:first-child {
+        margin-top: 0;
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+
+  // Text-wrap
+
+  .text-wrap-balance {
+    text-wrap: balance;
+  }
+
+  .text-wrap-pretty {
+    text-wrap: pretty;
   }
 }
