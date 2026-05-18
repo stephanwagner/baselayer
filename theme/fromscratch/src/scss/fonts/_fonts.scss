@@ -1,26 +1,26 @@
 // Inter
-// @forward '../../../fonts/inter/inter';
+// @use '../../../fonts/inter/inter';
 
 // Lato
-// @forward '../../../fonts/lato/lato';
+// @use '../../../fonts/lato/lato';
 
 // Montserrat
-// @forward '../../../fonts/montserrat/montserrat';
+// @use '../../../fonts/montserrat/montserrat';
 
 // Nunito
-// @forward '../../../fonts/nunito/nunito';
+// @use '../../../fonts/nunito/nunito';
 
 // Nunito Sans
-// @forward '../../../fonts/nunitosans/nunitosans';
+@use '../../../fonts/nunitosans/nunitosans';
 
 // Open Sans
-@forward '../../../fonts/opensans/opensans';
+// @use '../../../fonts/opensans/opensans';
 
 // Poppins
-// @forward '../../../fonts/poppins/poppins';
+// @use '../../../fonts/poppins/poppins';
 
 // Roboto
-// @forward '../../../fonts/roboto/roboto';
+// @use '../../../fonts/roboto/roboto';
 
 // Source Sans 3
-// @forward '../../../fonts/sourcesans3/sourcesans3';
+// @use '../../../fonts/sourcesans3/sourcesans3';
