@@ -1522,8 +1522,10 @@ msgstr "Tablet"
 msgid "Matomo error"
 msgstr "Matomo-Fehler"
 
-msgid "%1$s visits"
-msgstr "%1$s Besuche"
+msgid "%1$s visit"
+msgid_plural "%1$s visits"
+msgstr[0] "%1$s Besucher"
+msgstr[1] "%1$s Besuche"
 
 msgid "Open Matomo"
 msgstr "Matomo öffnen"

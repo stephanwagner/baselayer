@@ -26,6 +26,17 @@ if (!defined('FS_MATOMO_STATS_CACHE_TTL')) {
 }
 
 /**
+ * Localized label for a visit count (Matomo nb_visits).
+ */
+function fs_format_visit_count(int $count): string
+{
+	return sprintf(
+		_n('%1$s visit', '%1$s visits', $count, 'fromscratch'),
+		number_format_i18n($count)
+	);
+}
+
+/**
  * Effective Matomo stats cache TTL (minimum 1 second).
  */
 function fs_matomo_stats_cache_ttl_seconds(): int
@@ -1726,7 +1737,7 @@ function fs_render_dashboard_statistics_page(): void
             <div style="margin: 0; display: flex; flex-wrap: wrap; gap: 8px;">
                 <div>
                     <strong><?= esc_html__('Total', 'fromscratch') ?>:</strong>
-                    <?= esc_html(sprintf(__('%1$s visits', 'fromscratch'), number_format_i18n($alltime_visits))) ?>
+                    <?= esc_html(fs_format_visit_count($alltime_visits)) ?>
                     <?php if ($matomo_login_url !== '') : ?>
                         · <a href="<?= esc_url($matomo_login_url) ?>" target="_blank" rel="noopener noreferrer"><?= esc_html__('Open Matomo', 'fromscratch') ?></a>
                     <?php endif; ?>

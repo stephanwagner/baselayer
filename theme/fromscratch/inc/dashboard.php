@@ -9,14 +9,8 @@ defined('ABSPATH') || exit;
 function fs_dashboard_matomo_stats_format_lines(array $counts): array
 {
 	return [
-		'today' => sprintf(
-			__('%1$s visits', 'fromscratch'),
-			number_format_i18n($counts['today'])
-		),
-		'yesterday' => sprintf(
-			__('%1$s visits', 'fromscratch'),
-			number_format_i18n($counts['yesterday'])
-		),
+		'today'     => fs_format_visit_count((int) $counts['today']),
+		'yesterday' => fs_format_visit_count((int) $counts['yesterday']),
 	];
 }
 
