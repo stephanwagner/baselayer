@@ -2,7 +2,7 @@
 @use 'sass:color';
 
 // Paths
-$themePath: '/wp-content/themes/fromscratch';
+$theme-path: '/wp-content/themes/fromscratch';
 
 $color-primary: #4080ff;
 $color-primary-dark: #{color.adjust($color-primary, $lightness: -10%)};
