@@ -1770,7 +1770,9 @@ add_action('template_redirect', function (): void {
 	}
 });
 
-// Add hreflang links to head for posts that have linked translations
+/**
+ * Add hreflang links to head for posts that have linked translations
+ */
 add_action('wp_head', function () {
 	if (!is_singular()) {
 		return;
@@ -1816,14 +1818,9 @@ add_action('wp_head', function () {
 	}
 }, 5);
 
-
-
-
-
-// TODO TEST
-
-// Shouldnt we rather when we save a page make sure that it is the frontpage?
-
+/**
+ * When the default language is not the same as the language of the frontpage, redirect the frontpage to the default language.
+ */
 add_action('init', function () {
 
 	if (!function_exists('fs_theme_feature_enabled') || !fs_theme_feature_enabled('languages')) {

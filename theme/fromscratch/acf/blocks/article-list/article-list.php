@@ -52,7 +52,6 @@ $posts = $query->posts;
 
 // TODO
 // - no articles list message
-// - fallback image
 
 ?>
 

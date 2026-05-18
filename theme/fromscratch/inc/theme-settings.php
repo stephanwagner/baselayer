@@ -148,7 +148,6 @@ add_action('admin_init', function () {
 	if (empty($_POST['fromscratch_save_redirects']) || empty($_POST['_wpnonce']) || !wp_verify_nonce($_POST['_wpnonce'], 'fromscratch_save_redirects')) {
 		return;
 	}
-	// TODO Too much in amin init hook?
 	$value = isset($_POST['fs_redirects']) && is_array($_POST['fs_redirects']) ? $_POST['fs_redirects'] : [];
 	$sanitized = fs_sanitize_redirects($value);
 	fs_redirects_sync_htaccess($sanitized);

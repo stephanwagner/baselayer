@@ -781,6 +781,8 @@ add_action('admin_footer', function (): void {
 	}
 	$has_explicit_orderby = !empty($_GET['orderby']);
 	$default_dir = strtoupper((string) ($_GET['order'] ?? 'ASC')) === 'DESC' ? 'DESC' : 'ASC';
+	
+	// TODO in ja
 	echo '<script>
 	(function(){
 		var defaultOrderActive = ' . ($has_explicit_orderby ? 'false' : 'true') . ';

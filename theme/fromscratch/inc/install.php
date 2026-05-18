@@ -1053,7 +1053,7 @@ Tags:
 
     // Delete Privacy Policy page (ONLY if WP created/assigned it)
     $privacy_id = (int) get_option('wp_page_for_privacy_policy');
-    if ($privacy_id && $privacy_id < 3) { // TODO check post id
+    if ($privacy_id && $privacy_id < 3) { // TODO check post id // TODO see comment Jens, lets keep the original
       wp_delete_post($privacy_id, true);
       update_option('wp_page_for_privacy_policy', 0);
     }
