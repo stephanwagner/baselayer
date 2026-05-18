@@ -74,7 +74,7 @@ function fs_render_developer_cheatsheet(): void
 				<tbody>
 					<tr>
 						<td>
-							<strong><?= esc_html__('Asset Helper', 'fromscratch') ?></strong><br>
+							<strong><?= esc_html__('Asset URL', 'fromscratch') ?></strong><br>
 							<span class="description"><?= esc_html__('Builds versioned asset URLs from the theme assets folder.', 'fromscratch') ?></span>
 						</td>
 						<td>
@@ -89,7 +89,7 @@ function fs_render_developer_cheatsheet(): void
 					</tr>
 					<tr>
 						<td>
-							<strong><?= esc_html__('Inline SVG Helper', 'fromscratch') ?></strong><br>
+							<strong><?= esc_html__('Inline SVG Code', 'fromscratch') ?></strong><br>
 							<span class="description"><?= esc_html__('Reads an SVG file and returns inline markup you can echo in templates.', 'fromscratch') ?></span>
 						</td>
 						<td>
@@ -104,7 +104,7 @@ function fs_render_developer_cheatsheet(): void
 					</tr>
 					<tr>
 						<td>
-							<strong><?= esc_html__('Image Helper', 'fromscratch') ?></strong><br>
+							<strong><?= esc_html__('Image HTML', 'fromscratch') ?></strong><br>
 							<span class="description"><?= esc_html__('Builds a WordPress image tag from an attachment ID (or WP_Post attachment).', 'fromscratch') ?></span>
 						</td>
 						<td>
@@ -132,7 +132,7 @@ function fs_render_developer_cheatsheet(): void
 					</tr>
 					<tr>
 						<td>
-							<strong><?= esc_html__('Config Helper', 'fromscratch') ?></strong><br>
+							<strong><?= esc_html__('Config Variable', 'fromscratch') ?></strong><br>
 							<span class="description"><?= esc_html__('Reads values from config/theme.php and config/theme-design.php via optional dot-path keys.', 'fromscratch') ?></span>
 						</td>
 						<td>
@@ -145,7 +145,7 @@ function fs_render_developer_cheatsheet(): void
 					</tr>
 					<tr>
 						<td>
-							<strong><?= esc_html__('Content Helper', 'fromscratch') ?></strong><br>
+							<strong><?= esc_html__('Content Variable', 'fromscratch') ?></strong><br>
 							<span class="description"><?= esc_html__('Reads saved Theme Content option values with an optional fallback default.', 'fromscratch') ?></span>
 						</td>
 						<td>
