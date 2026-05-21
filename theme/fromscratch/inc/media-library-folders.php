@@ -1151,14 +1151,61 @@ add_action('pre_get_posts', function (WP_Query $query): void {
 }, 10);
 
 /**
- * Add a folder selector in attachment edit details.
+ * Current folder term ID for an attachment (0 = none).
+ */
+function fs_media_folders_attachment_folder_id(int $attachment_id): int
+{
+	$terms = wp_get_object_terms($attachment_id, FS_MEDIA_FOLDER_TAXONOMY, ['fields' => 'ids']);
+	if (is_wp_error($terms) || $terms === []) {
+		return 0;
+	}
+
+	return (int) $terms[0];
+}
+
+/**
+ * Folder field markup aligned with the media modal attachment-details `.setting` pattern.
+ */
+function fs_media_folders_attachment_folder_setting_html(int $attachment_id, int $current_id = 0): string
+{
+	$attachment_id = (int) $attachment_id;
+	if ($attachment_id <= 0 || !taxonomy_exists(FS_MEDIA_FOLDER_TAXONOMY)) {
+		return '';
+	}
+
+	$id_attr = 'attachment-details-fs-media-folder-id';
+	$name = 'attachments[' . $attachment_id . '][fs_media_folder_id]';
+
+	ob_start();
+	echo '<span class="setting" data-setting="fs_media_folder_id">';
+	echo '<label for="' . esc_attr($id_attr) . '" class="name">' . esc_html__('Folder', 'fromscratch') . '</label>';
+	wp_dropdown_categories([
+		'taxonomy' => FS_MEDIA_FOLDER_TAXONOMY,
+		'name' => $name,
+		'id' => $id_attr,
+		'orderby' => 'name',
+		'hide_empty' => false,
+		'hierarchical' => true,
+		'show_option_none' => __('No folder', 'fromscratch'),
+		'option_none_value' => '0',
+		'selected' => $current_id,
+		'value_field' => 'term_id',
+	]);
+	echo '</span>';
+
+	return (string) ob_get_clean();
+}
+
+/**
+ * Legacy upload/compat screens still use attachment_fields_to_edit (table layout).
+ * The grid modal uses wp_prepare_attachment_for_js below.
  */
 add_filter('attachment_fields_to_edit', function (array $form_fields, WP_Post $post): array {
 	if (!taxonomy_exists(FS_MEDIA_FOLDER_TAXONOMY)) {
 		return $form_fields;
 	}
-	$current_terms = wp_get_object_terms($post->ID, FS_MEDIA_FOLDER_TAXONOMY, ['fields' => 'ids']);
-	$current_id = !is_wp_error($current_terms) && !empty($current_terms) ? (int) $current_terms[0] : 0;
+
+	$current_id = fs_media_folders_attachment_folder_id((int) $post->ID);
 
 	ob_start();
 	wp_dropdown_categories([
@@ -1178,40 +1225,32 @@ add_filter('attachment_fields_to_edit', function (array $form_fields, WP_Post $p
 		'label' => __('Folder', 'fromscratch'),
 		'input' => 'html',
 		'html' => $field_html,
-		'helps' => __('Assign this file to a media folder.', 'fromscratch'),
+		'show_in_modal' => false,
 	];
 	return $form_fields;
 }, 10, 2);
-
-/**
- * In the media modal, core prints the "required fields" &lt;p&gt; before the compat
- * &lt;table&gt;, so the folder field sits under that line. Output the table first, then
- * the notice, so the folder control reads above the general required-fields hint.
- */
-function fs_media_folders_reorder_attachment_compat_item(string $item): string
-{
-	if ($item === '' || !str_contains($item, 'compat-attachment-fields') || !str_contains($item, 'media-types-required-info')) {
-		return $item;
-	}
-	$pattern = '/^(.*)(<p[^>]*\bclass="[^"]*\bmedia-types-required-info\b[^"]*"[^>]*>[\s\S]*?<\/p>)\s*(<table[^>]*\bclass="[^"]*\bcompat-attachment-fields\b[^"]*"[^>]*>[\s\S]*?<\/table>)(.*)$/s';
-	if (!preg_match($pattern, $item, $m)) {
-		return $item;
-	}
-
-	return $m[1] . $m[3] . $m[2] . $m[4];
-}
 
 add_filter('wp_prepare_attachment_for_js', function (array $response, WP_Post $attachment, $meta): array {
 	if (!taxonomy_exists(FS_MEDIA_FOLDER_TAXONOMY)) {
 		return $response;
 	}
 
-	$terms = wp_get_object_terms($attachment->ID, FS_MEDIA_FOLDER_TAXONOMY, ['fields' => 'ids']);
-	$response['fs_media_folder_id'] = !is_wp_error($terms) && $terms !== [] ? (int) $terms[0] : 0;
+	$folder_id = fs_media_folders_attachment_folder_id((int) $attachment->ID);
+	$response['fs_media_folder_id'] = $folder_id;
 
-	if (!empty($response['compat']['item']) && is_string($response['compat']['item'])) {
-		$response['compat']['item'] = fs_media_folders_reorder_attachment_compat_item($response['compat']['item']);
+	$setting_html = fs_media_folders_attachment_folder_setting_html((int) $attachment->ID, $folder_id);
+	if ($setting_html === '') {
+		return $response;
 	}
+
+	if (!isset($response['compat']) || !is_array($response['compat'])) {
+		$response['compat'] = [];
+	}
+
+	$existing = isset($response['compat']['item']) && is_string($response['compat']['item'])
+		? $response['compat']['item']
+		: '';
+	$response['compat']['item'] = $existing === '' ? $setting_html : $setting_html . $existing;
 
 	return $response;
 }, 20, 3);
