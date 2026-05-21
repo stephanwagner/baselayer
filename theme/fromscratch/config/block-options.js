@@ -1,3 +1,8 @@
+/**
+ * Get content margin options
+ * @param {*} defaultValue 
+ * @returns 
+ */
 function getContentMarginOptions(defaultValue = '') {
   return {
     type: 'select',
@@ -16,6 +21,11 @@ function getContentMarginOptions(defaultValue = '') {
   };
 }
 
+/**
+ * Get content margin adjust options
+ * @param {*} defaultValue 
+ * @returns 
+ */
 function getContentMarginAdjustOptions(defaultValue = '') {
   return {
     type: 'select',
@@ -40,6 +50,10 @@ function getContentMarginAdjustOptions(defaultValue = '') {
   };
 }
 
+/**
+ * Get limit width options
+ * @returns 
+ */
 function getLimitWidthOptions() {
   return {
     type: 'select',
@@ -56,6 +70,9 @@ function getLimitWidthOptions() {
   };
 }
 
+/**
+ * Apply block options
+ */
 export const blockOptions = [
   // Columns
   {
