@@ -16,7 +16,7 @@ function fs_register_admin_color_scheme(): void
 	wp_admin_css_color(
 		'fromscratch',
 		__('FromScratch', 'fromscratch'),
-		get_template_directory_uri() . '/assets/admin/theme.css',
+		get_template_directory_uri() . '/assets/admin/theme-fromscratch.css',
 		['#0c0c0c', '#1e1e1e', '#1d6ebf', '#4387db']
 	);
 }
