@@ -288,19 +288,12 @@ body.fs-feature-media-folders {
         position: relative;
         float: none;
       }
-
-      .media-toolbar-primary.search-form {
-        float: none;
-        margin-left: auto;
-
-        @media (min-width: calc(900px + 1px)) {
-          position: absolute;
-          right: 16px;
-          top: 0;
-        }
-      }
     }
   }
+}
+
+.media-modal-content {
+  border-radius: 8px;
 }
 
 .compat-field-fs_media_folder_id {
@@ -745,7 +738,8 @@ body.fs-feature-media-folders {
 
     .fs-media-folders-toggle {
       align-self: flex-end;
-      margin: 0 0 10px;
+      margin: 0 0 -2px;
+      flex-shrink: 0;
     }
   }
 
@@ -871,4 +865,42 @@ body.fs-feature-media-folders {
   min-height: 32px;
   line-height: 1.4;
   padding-left: 8px;
+}
+
+.wp-core-ui .attachments-wrapper .attachment {
+  border-radius: 11px;
+}
+
+.wp-core-ui .attachment.details:focus,
+.wp-core-ui .attachment:focus,
+.wp-core-ui .selected.attachment:focus {
+  box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 7px var(--wp-admin-theme-color, #3858e9);
+}
+
+.wp-core-ui .attachment:not(:has(.filename))::after {
+  line-height: 1.25;
+  line-height: 16px;
+  padding: 4px 8px;
+  max-height: calc(16px * 3 + 4px + 4px - 1px);
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  border-radius: 0 0 4px 4px;
+}
+
+.wp-core-ui .attachment.details .check,
+.wp-core-ui .attachment.selected .check:focus,
+.wp-core-ui .media-frame.mode-grid .attachment.selected .check {
+  border-radius: 4px;
+}
+
+.media-router .media-menu-item {
+  border-radius: 4px 4px 0 0;
+}
+
+.media-modal.acf-expanded .compat-item .label {
+  min-width: 20%;
 }
