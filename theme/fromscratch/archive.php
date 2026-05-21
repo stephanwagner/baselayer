@@ -9,16 +9,9 @@ defined('ABSPATH') || exit;
 
 get_header();
 
-$archive_heading = get_the_archive_title();
-if (is_post_type_archive()) {
-	$pto = get_queried_object();
-	if ($pto instanceof \WP_Post_Type && isset($pto->labels->name)) {
-		$archive_heading = $pto->labels->name;
-	}
-}
+$archive_heading = fs_archive_heading();
 
-// TODO
-$is_event_archive = defined('FS_EVENT_POST_TYPE') && is_post_type_archive(FS_EVENT_POST_TYPE);
+$archive_type = fs_archive_cpt_type();
 ?>
 
 <div class="content__wrapper">
@@ -31,7 +24,7 @@ $is_event_archive = defined('FS_EVENT_POST_TYPE') && is_post_type_archive(FS_EVE
 			<h1><?php echo wp_kses_post($archive_heading); ?></h1>
 
 			<?php if (have_posts()) { ?>
-				<?php /*if ($is_event_archive) : ?>
+				<?php /*if ($archive_type === 'event') : ?>
 					<div class="event-archive">
 						<?php
 						$month_marker = '';
@@ -72,7 +65,7 @@ $is_event_archive = defined('FS_EVENT_POST_TYPE') && is_post_type_archive(FS_EVE
 				fs_render_template('pagination');
 				?>
 			<?php } else { ?>
-				<div class="article-list__empty"><?php echo $is_event_archive ? esc_html__('No events found.', 'fromscratch') : esc_html__('No posts found.', 'fromscratch'); ?></div>
+				<div class="article-list__empty"><?= esc_html(fs_cpt_text('empty')) ?></div>
 			<?php } ?>
 		</div>
 

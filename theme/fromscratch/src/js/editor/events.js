@@ -2,7 +2,17 @@
   'use strict';
 
   const wp = typeof window !== 'undefined' ? window.wp : null;
-  if (!wp || typeof fromscratchEvents === 'undefined' || !fromscratchEvents.postType) {
+  if (!wp || typeof fromscratchEvents === 'undefined') {
+    return;
+  }
+
+  const EVENT_TYPES =
+    fromscratchEvents.postTypes && Array.isArray(fromscratchEvents.postTypes)
+      ? fromscratchEvents.postTypes
+      : fromscratchEvents.postType
+        ? [fromscratchEvents.postType]
+        : [];
+  if (!EVENT_TYPES.length) {
     return;
   }
 
@@ -14,7 +24,6 @@
   const { PluginDocumentSettingPanel } = wp.editor;
   const { PanelRow, ToggleControl } = wp.components;
 
-  const PT = fromscratchEvents.postType;
   const L = fromscratchEvents;
 
   const META_START_DATE = '_fs_event_start_date';
@@ -30,7 +39,7 @@
       return select('core/editor')?.getCurrentPostId?.();
     }, []);
 
-    if (!postType || postType !== PT || !postId) {
+    if (!postType || EVENT_TYPES.indexOf(postType) === -1 || !postId) {
       return null;
     }
 

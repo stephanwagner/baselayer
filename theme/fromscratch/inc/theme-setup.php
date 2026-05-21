@@ -3,7 +3,7 @@
 defined('ABSPATH') || exit;
 
 /**
- * Post types used by theme features: post, page, and CPTs from config/custom-post-types.php.
+ * Post types used by theme features: post, page, and CPTs from config/content-types/.
  * Used by SEO panel, post expirator, duplicate row action, and similar.
  *
  * @return string[]

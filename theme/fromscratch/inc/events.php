@@ -3,12 +3,8 @@
 defined('ABSPATH') || exit;
 
 /**
- * Event CPT: start/end date, optional times, sidebar panel in block editor.
- * Archive: upcoming/current only, ordered by start; template groups by month.
+ * Event CPTs (`type` => `event` in config/content-types/): dates, archive query, editor panel.
  */
-
-// TODO use flag in CPT
-const FS_EVENT_POST_TYPE = 'event';
 
 const FS_EVENT_META_START_DATE = '_fs_event_start_date';
 const FS_EVENT_META_END_DATE = '_fs_event_end_date';
@@ -16,6 +12,23 @@ const FS_EVENT_META_START_TIME = '_fs_event_start_time';
 const FS_EVENT_META_END_TIME = '_fs_event_end_time';
 const FS_EVENT_META_START_TS = '_fs_event_start_ts';
 const FS_EVENT_META_END_TS = '_fs_event_end_ts';
+
+/**
+ * @return string[]
+ */
+function fs_event_post_types(): array
+{
+	return fs_cpt_slugs_by_type('event');
+}
+
+function fs_is_event_post_type(?string $post_type = null): bool
+{
+	if ($post_type === null || $post_type === '') {
+		$post_type = function_exists('get_post_type') ? (string) get_post_type() : '';
+	}
+
+	return $post_type !== '' && fs_cpt_type($post_type) === 'event';
+}
 
 /**
  * @return \DateTimeZone
@@ -55,7 +68,7 @@ function fs_event_to_timestamp(string $date, string $time, bool $end_day): int
  */
 function fs_event_save_timestamps(int $post_id): void
 {
-	if (get_post_type($post_id) !== FS_EVENT_POST_TYPE) {
+	if (!fs_is_event_post_type(get_post_type($post_id))) {
 		return;
 	}
 	if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
@@ -105,12 +118,29 @@ function fs_event_save_timestamps(int $post_id): void
 	update_post_meta($post_id, FS_EVENT_META_END_TS, $end_ts);
 }
 
-add_action('save_post_' . FS_EVENT_POST_TYPE, 'fs_event_save_timestamps', 20);
-
 /**
- * Register meta for REST / block editor.
+ * Register meta, save hooks, and admin columns for every CPT with `type` => `event`.
  */
-add_action('init', function (): void {
+function fs_event_register_post_type_hooks(): void
+{
+	static $registered = false;
+	if ($registered) {
+		return;
+	}
+	$registered = true;
+
+	$event_types = fs_event_post_types();
+	if ($event_types === []) {
+		return;
+	}
+
+	foreach ($event_types as $post_type) {
+		if (!post_type_exists($post_type)) {
+			continue;
+		}
+		add_action('save_post_' . $post_type, 'fs_event_save_timestamps', 20);
+	}
+
 	$auth = static function (bool $allowed, string $meta_key, int $post_id): bool {
 		return current_user_can('edit_post', $post_id);
 	};
@@ -122,49 +152,67 @@ add_action('init', function (): void {
 		'auth_callback' => $auth,
 	];
 
-	register_post_meta(FS_EVENT_POST_TYPE, FS_EVENT_META_START_DATE, array_merge($string_meta, [
-		'sanitize_callback' => static function ($value): string {
-			$value = is_string($value) ? trim($value) : '';
-			return preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) ? $value : '';
-		},
-	]));
-	register_post_meta(FS_EVENT_POST_TYPE, FS_EVENT_META_END_DATE, array_merge($string_meta, [
-		'sanitize_callback' => static function ($value): string {
-			$value = is_string($value) ? trim($value) : '';
-			return preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) ? $value : '';
-		},
-	]));
-	register_post_meta(FS_EVENT_POST_TYPE, FS_EVENT_META_START_TIME, array_merge($string_meta, [
-		'sanitize_callback' => static function ($value): string {
-			$value = is_string($value) ? trim($value) : '';
-			return preg_match('/^\d{2}:\d{2}$/', $value) ? $value : '';
-		},
-	]));
-	register_post_meta(FS_EVENT_POST_TYPE, FS_EVENT_META_END_TIME, array_merge($string_meta, [
-		'sanitize_callback' => static function ($value): string {
-			$value = is_string($value) ? trim($value) : '';
-			return preg_match('/^\d{2}:\d{2}$/', $value) ? $value : '';
-		},
-	]));
+	foreach ($event_types as $post_type) {
+		if (!post_type_exists($post_type)) {
+			continue;
+		}
 
-	foreach ([FS_EVENT_META_START_TS, FS_EVENT_META_END_TS] as $key) {
-		register_post_meta(FS_EVENT_POST_TYPE, $key, [
-			'type' => 'integer',
-			'single' => true,
-			'show_in_rest' => false,
-			'auth_callback' => $auth,
-			'sanitize_callback' => static function ($value): int {
-				return (int) $value;
+		register_post_meta($post_type, FS_EVENT_META_START_DATE, array_merge($string_meta, [
+			'sanitize_callback' => static function ($value): string {
+				$value = is_string($value) ? trim($value) : '';
+				return preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) ? $value : '';
 			},
-		]);
+		]));
+		register_post_meta($post_type, FS_EVENT_META_END_DATE, array_merge($string_meta, [
+			'sanitize_callback' => static function ($value): string {
+				$value = is_string($value) ? trim($value) : '';
+				return preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) ? $value : '';
+			},
+		]));
+		register_post_meta($post_type, FS_EVENT_META_START_TIME, array_merge($string_meta, [
+			'sanitize_callback' => static function ($value): string {
+				$value = is_string($value) ? trim($value) : '';
+				return preg_match('/^\d{2}:\d{2}$/', $value) ? $value : '';
+			},
+		]));
+		register_post_meta($post_type, FS_EVENT_META_END_TIME, array_merge($string_meta, [
+			'sanitize_callback' => static function ($value): string {
+				$value = is_string($value) ? trim($value) : '';
+				return preg_match('/^\d{2}:\d{2}$/', $value) ? $value : '';
+			},
+		]));
+
+		foreach ([FS_EVENT_META_START_TS, FS_EVENT_META_END_TS] as $key) {
+			register_post_meta($post_type, $key, [
+				'type' => 'integer',
+				'single' => true,
+				'show_in_rest' => false,
+				'auth_callback' => $auth,
+				'sanitize_callback' => static function ($value): int {
+					return (int) $value;
+				},
+			]);
+		}
+
+		add_filter('manage_' . $post_type . '_posts_columns', 'fs_event_posts_columns');
+		add_action('manage_' . $post_type . '_posts_custom_column', 'fs_event_posts_custom_column', 10, 2);
 	}
-}, 20);
+}
+
+add_action('init', 'fs_event_register_post_type_hooks', 21);
 
 /**
  * Frontend archive: upcoming and in-progress events only; sort by start.
  */
 add_action('pre_get_posts', function (\WP_Query $query): void {
-	if (is_admin() || !$query->is_main_query() || !$query->is_post_type_archive(FS_EVENT_POST_TYPE)) {
+	if (is_admin() || !$query->is_main_query() || !$query->is_post_type_archive()) {
+		return;
+	}
+	$pt = $query->get('post_type');
+	if (is_array($pt)) {
+		$pt = (string) reset($pt);
+	}
+	if (!is_string($pt) || $pt === '' || !fs_is_event_post_type($pt)) {
 		return;
 	}
 	$now = time();
@@ -185,11 +233,13 @@ add_action('pre_get_posts', function (\WP_Query $query): void {
  * Block editor: strings for the Event panel (same script as expirator).
  */
 add_action('enqueue_block_editor_assets', function (): void {
-	if (! post_type_exists(FS_EVENT_POST_TYPE)) {
+	$post_types = fs_event_post_types();
+	if ($post_types === []) {
 		return;
 	}
 	wp_localize_script('fromscratch-editor', 'fromscratchEvents', [
-		'postType' => FS_EVENT_POST_TYPE,
+		'postTypes' => $post_types,
+		'postType' => $post_types[0],
 		'panelTitle' => __('Event', 'fromscratch'),
 		'startDateLabel' => __('Start date', 'fromscratch'),
 		'endDateLabel' => __('End date', 'fromscratch'),
@@ -201,8 +251,12 @@ add_action('enqueue_block_editor_assets', function (): void {
 
 /**
  * Admin list table: Event dates column (display only).
+ *
+ * @param array<string, string> $columns
+ * @return array<string, string>
  */
-add_filter('manage_' . FS_EVENT_POST_TYPE . '_posts_columns', function (array $columns): array {
+function fs_event_posts_columns(array $columns): array
+{
 	$label = __('Event dates', 'fromscratch');
 	$new = [];
 	$inserted = false;
@@ -225,13 +279,11 @@ add_filter('manage_' . FS_EVENT_POST_TYPE . '_posts_columns', function (array $c
 	}
 
 	return $out;
-});
+}
 
-add_action('manage_' . FS_EVENT_POST_TYPE . '_posts_custom_column', function (string $column, int $post_id): void {
-	if ($column !== 'fs_event_dates') {
-		return;
-	}
-	if (get_post_type($post_id) !== FS_EVENT_POST_TYPE) {
+function fs_event_posts_custom_column(string $column, int $post_id): void
+{
+	if ($column !== 'fs_event_dates' || !fs_is_event_post_type(get_post_type($post_id))) {
 		return;
 	}
 	$range = fs_event_format_range_text($post_id, true);
@@ -240,11 +292,15 @@ add_action('manage_' . FS_EVENT_POST_TYPE . '_posts_custom_column', function (st
 		return;
 	}
 	echo esc_html($range);
-}, 10, 2);
+}
 
 add_action('admin_head', static function (): void {
 	global $pagenow;
-	if ($pagenow !== 'edit.php' || sanitize_key(wp_unslash((string) ($_GET['post_type'] ?? ''))) !== FS_EVENT_POST_TYPE) {
+	if ($pagenow !== 'edit.php') {
+		return;
+	}
+	$screen_type = sanitize_key(wp_unslash((string) ($_GET['post_type'] ?? '')));
+	if ($screen_type === '' || !fs_is_event_post_type($screen_type)) {
 		return;
 	}
 	echo '<style>.column-fs_event_dates{width:14em;} @media(min-width:900px){.column-fs_event_dates{width:20em}}</style>';
@@ -282,6 +338,10 @@ function fs_event_abbr_month_datetime_format(string $php_format): string
  */
 function fs_event_format_range_text(int $post_id, bool $abbr_month_names = false): string
 {
+	if (!fs_is_event_post_type(get_post_type($post_id))) {
+		return '';
+	}
+
 	$start_date = get_post_meta($post_id, FS_EVENT_META_START_DATE, true);
 	if (!is_string($start_date) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $start_date)) {
 		return '';

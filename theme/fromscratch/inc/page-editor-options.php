@@ -27,7 +27,7 @@ function fs_pin_to_dashboard_post_types(): array
 
 /**
  * Whether this post type supports the “Show title” Summary control and singular &lt;h1&gt; toggle.
- * Pages always do. Blog (`post`) and CPTs only when `has_page_title_toggle` is true in config/custom-post-types.php.
+ * Pages always do. Blog (`post`) and CPTs only when `admin.page_title_toggle` is true in config/content-types/.
  *
  * @param string $post_type Post type slug.
  */
@@ -39,14 +39,18 @@ function fs_post_type_has_page_title_toggle(string $post_type): bool
 	if ($post_type === 'post') {
 		$post_cfg = fs_config_cpt('post');
 
-		return is_array($post_cfg) && !empty($post_cfg['has_page_title_toggle']);
+		$admin = is_array($post_cfg) ? fs_content_type_admin('post') : [];
+
+		return !empty($admin['page_title_toggle']);
 	}
 	$cpts = fs_config_cpt('all');
 	if (!is_array($cpts) || !isset($cpts[$post_type]) || !is_array($cpts[$post_type])) {
 		return false;
 	}
 
-	return !empty($cpts[$post_type]['has_page_title_toggle']);
+	$admin = fs_content_type_admin($post_type);
+
+	return !empty($admin['page_title_toggle']);
 }
 
 /**

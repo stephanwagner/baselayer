@@ -3,12 +3,100 @@
 defined('ABSPATH') || exit;
 
 /**
- * Register custom post types from config/custom-post-types.php.
+ * Register custom post types from config/content-types/*.php.
  * Registered CPTs are included in fs_theme_post_types() (theme-setup.php) and thus in SEO, post expirator, duplicate, etc.
  */
 
 /**
- * Register all CPTs defined in config/custom-post-types.php.
+ * Map content-type config to register_post_type() arguments (strips theme-only keys).
+ *
+ * @param array<string, mixed> $cfg
+ * @return array<string, mixed>
+ */
+function fs_content_type_wp_register_args(array $cfg): array
+{
+	$archive = fs_content_type_archive_from_cfg($cfg);
+	$query = fs_content_type_query_from_cfg($cfg);
+	$admin = fs_content_type_admin_from_cfg($cfg);
+
+	$args = [];
+	foreach (['public', 'hierarchical', 'labels', 'supports', 'show_ui', 'show_in_menu', 'show_in_rest', 'capability_type', 'map_meta_cap', 'rewrite', 'query_var'] as $key) {
+		if (array_key_exists($key, $cfg)) {
+			$args[$key] = $cfg[$key];
+		}
+	}
+
+	$args['has_archive'] = !empty($archive['enabled']);
+	if (!empty($archive['slug']) && is_string($archive['slug'])) {
+		$args['url'] = $archive['slug'];
+	}
+
+	$args['menu_position'] = isset($admin['menu_position']) ? (int) $admin['menu_position'] : 5;
+	if (!empty($admin['menu_icon'])) {
+		$args['menu_icon'] = $admin['menu_icon'];
+	}
+
+	$args['_fs_has_menu_order'] = !empty($query['menu_order']);
+	$args['_fs_orderby'] = isset($query['orderby']) && is_string($query['orderby']) ? $query['orderby'] : '';
+	$args['_fs_order'] = isset($query['order']) && is_string($query['order']) ? $query['order'] : '';
+
+	return $args;
+}
+
+/**
+ * @param array<string, mixed> $cfg
+ * @return array<string, mixed>
+ */
+function fs_content_type_archive_from_cfg(array $cfg): array
+{
+	if (isset($cfg['archive']) && is_array($cfg['archive'])) {
+		return $cfg['archive'];
+	}
+
+	return [
+		'enabled' => !empty($cfg['has_archive']),
+		'slug' => isset($cfg['url']) && is_string($cfg['url']) ? $cfg['url'] : '',
+		'design' => isset($cfg['archive_design']) ? (string) $cfg['archive_design'] : 'list',
+		'texts' => isset($cfg['texts']) && is_array($cfg['texts']) ? $cfg['texts'] : [],
+	];
+}
+
+/**
+ * @param array<string, mixed> $cfg
+ * @return array<string, mixed>
+ */
+function fs_content_type_query_from_cfg(array $cfg): array
+{
+	if (isset($cfg['query']) && is_array($cfg['query'])) {
+		return $cfg['query'];
+	}
+
+	return [
+		'orderby' => isset($cfg['orderby']) && is_string($cfg['orderby']) ? $cfg['orderby'] : '',
+		'order' => isset($cfg['order']) && is_string($cfg['order']) ? $cfg['order'] : '',
+		'menu_order' => !empty($cfg['has_order']),
+	];
+}
+
+/**
+ * @param array<string, mixed> $cfg
+ * @return array<string, mixed>
+ */
+function fs_content_type_admin_from_cfg(array $cfg): array
+{
+	if (isset($cfg['admin']) && is_array($cfg['admin'])) {
+		return $cfg['admin'];
+	}
+
+	return [
+		'menu_icon' => $cfg['menu_icon'] ?? null,
+		'menu_position' => $cfg['menu_position'] ?? 5,
+		'page_title_toggle' => !empty($cfg['has_page_title_toggle']),
+	];
+}
+
+/**
+ * Register all enabled CPTs from config/content-types/.
  *
  * @return void
  */
@@ -33,11 +121,11 @@ function fs_register_cpts(): void
 		'menu_position'     => 5,
 	];
 
-	foreach ($cpts as $post_type => $args) {
-		if (!is_string($post_type) || $post_type === '' || !is_array($args)) {
+	foreach ($cpts as $post_type => $cfg) {
+		if (!is_string($post_type) || $post_type === '' || !is_array($cfg)) {
 			continue;
 		}
-		$args = array_merge($defaults, $args);
+		$args = array_merge($defaults, fs_content_type_wp_register_args($cfg));
 		// Convenience: `url` => 'projects' sets rewrite slug (same as rewrite => ['slug' => 'projects']).
 		if (isset($args['url'])) {
 			$url_raw = $args['url'];
@@ -54,11 +142,10 @@ function fs_register_cpts(): void
 				}
 			}
 		}
-		$has_order = !empty($args['has_order']);
-		unset($args['has_order']);
-		unset($args['orderby'], $args['order']);
+		$has_order = !empty($args['_fs_has_menu_order']);
+		unset($args['_fs_has_menu_order'], $args['_fs_orderby'], $args['_fs_order']);
 		// Taxonomies are attached separately so config can define/register custom taxonomies too.
-		unset($args['taxonomies'], $args['has_categories'], $args['has_page_title_toggle'], $args['archive_design']);
+		unset($args['taxonomies']);
 		// Block editor needs custom-fields support to expose/save post meta (e.g. SEO panel).
 		if (isset($args['supports']) && is_array($args['supports']) && !in_array('custom-fields', $args['supports'], true)) {
 			$args['supports'][] = 'custom-fields';
@@ -104,7 +191,7 @@ function fs_cpt_menu_icon($icon): string
  * Collect taxonomy config for built-in posts and configured CPTs.
  *
  * Supports:
- * - `has_categories => true` (shared core category taxonomy)
+ * - `wp_categories => true` (shared core category taxonomy)
  * - `taxonomies => ['category']` (attach existing taxonomy)
  * - `taxonomies => ['project_category' => ['label' => 'Projekt-Kategorien']]` (register custom taxonomy)
  *
@@ -132,7 +219,7 @@ function fs_cpt_taxonomy_map(): array
 	foreach ($sources as $object_type => $cfg) {
 		$taxonomies = [];
 
-		if (!empty($cfg['has_categories'])) {
+		if (fs_content_type_uses_wp_categories($cfg)) {
 			$taxonomies[] = 'category';
 		}
 		if (isset($cfg['taxonomies']) && is_array($cfg['taxonomies'])) {
@@ -293,7 +380,7 @@ add_action('init', 'fs_register_cpt_taxonomies', 11);
 
 /**
  * Built-in posts use the shared core `category` taxonomy by default.
- * Allow config/custom-post-types.php to opt out via `post.has_categories => false`
+ * Allow config/content-types/post.php to opt out via `wp_categories => false`
  * so posts can use a dedicated taxonomy instead.
  */
 add_action('init', function (): void {
@@ -301,7 +388,7 @@ add_action('init', function (): void {
 	if (!is_array($post_cfg)) {
 		return;
 	}
-	if (array_key_exists('has_categories', $post_cfg) && !$post_cfg['has_categories']) {
+	if (!fs_content_type_uses_wp_categories($post_cfg)) {
 		unregister_taxonomy_for_object_type('category', 'post');
 	}
 }, 12);
@@ -342,7 +429,8 @@ function fs_cpt_admin_menu_icon_css(): string
 		if (!is_string($post_type) || $post_type === '' || !is_array($args)) {
 			continue;
 		}
-		$icon_value = $args['menu_icon'] ?? ($args['icon'] ?? null);
+		$admin = fs_content_type_admin($post_type);
+		$icon_value = $admin['menu_icon'] ?? null;
 		$icon = fs_cpt_menu_icon($icon_value);
 		if (!is_string($icon) || $icon === '' || strpos($icon, 'dashicons-') === 0) {
 			continue;
@@ -384,7 +472,8 @@ function fs_cpt_ordered_map(): array
 		if (!is_string($post_type) || $post_type === '' || !is_array($args)) {
 			continue;
 		}
-		if (!empty($args['has_order'])) {
+		$query = fs_content_type_query($post_type);
+		if (!empty($query['menu_order'])) {
 			$ordered[sanitize_key($post_type)] = true;
 		}
 	}
@@ -415,18 +504,18 @@ function fs_cpt_pre_get_posts_order(\WP_Query $query): void
 	if (!is_string($pt) || $pt === '') {
 		return;
 	}
-	if (defined('FS_EVENT_POST_TYPE') && $pt === FS_EVENT_POST_TYPE) {
+	if (fs_cpt_type($pt) === 'event') {
 		return;
 	}
 	$cpts = fs_config_cpt('all');
 	if (!is_array($cpts) || !isset($cpts[$pt]) || !is_array($cpts[$pt])) {
 		return;
 	}
-	$cfg = $cpts[$pt];
-	$has_order = !empty($cfg['has_order']);
+	$query = fs_content_type_query($pt);
+	$has_order = !empty($query['menu_order']);
 
-	$raw_orderby = isset($cfg['orderby']) && is_string($cfg['orderby'])
-		? strtolower(trim($cfg['orderby']))
+	$raw_orderby = isset($query['orderby']) && is_string($query['orderby'])
+		? strtolower(trim($query['orderby']))
 		: '';
 	if ($raw_orderby === 'publish_date' || $raw_orderby === 'published') {
 		$raw_orderby = 'date';
@@ -436,8 +525,8 @@ function fs_cpt_pre_get_posts_order(\WP_Query $query): void
 		$raw_orderby = $has_order ? 'menu_order' : 'date';
 	}
 
-	$raw_order = isset($cfg['order']) && is_string($cfg['order'])
-		? strtoupper(trim($cfg['order']))
+	$raw_order = isset($query['order']) && is_string($query['order'])
+		? strtoupper(trim($query['order']))
 		: '';
 	if ($raw_order !== 'ASC' && $raw_order !== 'DESC') {
 		if ($raw_orderby === 'menu_order') {
@@ -997,14 +1086,150 @@ function fs_archive_design(?string $post_type = null): string
 		$post_type = fs_archive_current_post_type();
 	}
 
-	$design = 'list';
-	$cfg = $post_type !== '' ? fs_config_cpt($post_type) : null;
-
-	if (is_array($cfg) && isset($cfg['archive_design'])) {
-		$design = (string) $cfg['archive_design'];
-	}
+	$archive = fs_content_type_archive($post_type);
+	$design = isset($archive['design']) && is_string($archive['design']) ? $archive['design'] : 'list';
 
 	return in_array($design, ['grid', 'list'], true) ? $design : 'list';
+}
+
+/**
+ * Theme CPT kind from config (`type`). Default `default`; use `event` for event behaviour.
+ */
+function fs_cpt_type(?string $post_type = null): string
+{
+	if ($post_type === null || $post_type === '') {
+		$post_type = function_exists('get_post_type') ? (string) get_post_type() : '';
+	}
+	if ($post_type === '') {
+		return 'default';
+	}
+
+	$cfg = fs_config_cpt($post_type);
+	if (!is_array($cfg)) {
+		return 'default';
+	}
+
+	$type = isset($cfg['type']) && is_string($cfg['type']) ? strtolower(trim($cfg['type'])) : 'default';
+
+	return in_array($type, ['default', 'event'], true) ? $type : 'default';
+}
+
+/**
+ * CPT slugs in config with the given `type`.
+ *
+ * @return string[]
+ */
+function fs_cpt_slugs_by_type(string $type): array
+{
+	$type = strtolower(trim($type));
+	$cpts = fs_config_cpt('all');
+	if (!is_array($cpts)) {
+		return [];
+	}
+
+	$slugs = [];
+	foreach ($cpts as $slug => $cfg) {
+		if (!is_string($slug) || $slug === '' || !is_array($cfg)) {
+			continue;
+		}
+		if (fs_cpt_type($slug) === $type) {
+			$slugs[] = $slug;
+		}
+	}
+
+	return $slugs;
+}
+
+/**
+ * Event-specific options from config (`event_options`). Reserved for future archive/editor behaviour.
+ *
+ * @return array<string, mixed>
+ */
+function fs_cpt_event_options(?string $post_type = null): array
+{
+	if ($post_type === null || $post_type === '') {
+		$post_type = fs_archive_current_post_type();
+	}
+	if ($post_type === '' || fs_cpt_type($post_type) !== 'event') {
+		return [];
+	}
+
+	$cfg = fs_config_cpt($post_type);
+	if (!is_array($cfg) || !isset($cfg['event_options']) || !is_array($cfg['event_options'])) {
+		return [];
+	}
+
+	return $cfg['event_options'];
+}
+
+/**
+ * Theme copy from config (`texts` array). Falls back to defaults when not set.
+ */
+function fs_cpt_text(string $key, ?string $post_type = null): string
+{
+	$aliases = [
+		'archive_empty' => 'empty',
+	];
+	$key = $aliases[$key] ?? $key;
+
+	$defaults = [
+		'empty' => __('No posts found.', 'fromscratch'),
+		'heading' => '',
+	];
+
+	if ($post_type === null || $post_type === '') {
+		$post_type = fs_archive_current_post_type();
+	}
+
+	if ($post_type === '') {
+		return $defaults[$key] ?? '';
+	}
+
+	$archive = fs_content_type_archive($post_type);
+	$texts = isset($archive['texts']) && is_array($archive['texts']) ? $archive['texts'] : [];
+	if (isset($texts[$key]) && is_string($texts[$key]) && $texts[$key] !== '') {
+		return $texts[$key];
+	}
+
+	return $defaults[$key] ?? '';
+}
+
+/**
+ * Archive &lt;h1&gt; from `archive.texts.heading`, else post type label / WP archive title.
+ */
+function fs_archive_heading(): string
+{
+	$heading = fs_cpt_text('heading');
+	if ($heading !== '') {
+		return $heading;
+	}
+
+	if (is_post_type_archive()) {
+		$pto = get_queried_object();
+		if ($pto instanceof \WP_Post_Type && isset($pto->labels->name)) {
+			return (string) $pto->labels->name;
+		}
+	}
+
+	return (string) get_the_archive_title();
+}
+
+/**
+ * `type` for the current archive listing (from {@see fs_archive_current_post_type()}).
+ */
+function fs_archive_cpt_type(): string
+{
+	$post_type = fs_archive_current_post_type();
+
+	return $post_type !== '' ? fs_cpt_type($post_type) : 'default';
+}
+
+/**
+ * Whether the main query is a CPT archive with `type` => `event`.
+ */
+function fs_is_event_archive(): bool
+{
+	return is_post_type_archive() && fs_archive_cpt_type() === 'event';
 }
 
 // Register after theme textdomain is loaded (init priority 1 in inc/language.php).
