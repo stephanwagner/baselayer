@@ -116,6 +116,89 @@ function fs_media_folders_is_unassigned_filter(): bool
 }
 
 /**
+ * Active folder for an upload request (query, POST, or Referer from Media Library).
+ */
+function fs_media_folders_upload_folder_id(): int
+{
+	if (fs_media_folders_is_unassigned_filter()) {
+		return 0;
+	}
+
+	$request = wp_unslash($_REQUEST);
+	if (isset($request['fs_media_folder_id'])) {
+		$id = absint($request['fs_media_folder_id']);
+		if ($id > 0) {
+			return $id;
+		}
+	}
+
+	if (!empty($_SERVER['HTTP_REFERER'])) {
+		$query = wp_parse_url((string) wp_unslash($_SERVER['HTTP_REFERER']), PHP_URL_QUERY);
+		if (is_string($query) && $query !== '') {
+			parse_str($query, $ref_args);
+			if (!empty($ref_args['fs_media_folder_id'])) {
+				$id = absint($ref_args['fs_media_folder_id']);
+				if ($id > 0) {
+					return $id;
+				}
+			}
+		}
+	}
+
+	return fs_media_folders_current_id();
+}
+
+/**
+ * Assign uploaded files to the folder currently open in the Media Library.
+ */
+function fs_media_folders_assign_on_upload(int $attachment_id): void
+{
+	if (!taxonomy_exists(FS_MEDIA_FOLDER_TAXONOMY) || get_post_type($attachment_id) !== 'attachment') {
+		return;
+	}
+
+	$folder_id = fs_media_folders_upload_folder_id();
+	if ($folder_id <= 0) {
+		return;
+	}
+
+	$term = get_term($folder_id, FS_MEDIA_FOLDER_TAXONOMY);
+	if (!$term instanceof WP_Term || is_wp_error($term)) {
+		return;
+	}
+
+	$existing = wp_get_object_terms($attachment_id, FS_MEDIA_FOLDER_TAXONOMY, ['fields' => 'ids']);
+	if (!is_wp_error($existing) && $existing !== []) {
+		return;
+	}
+
+	fs_media_folders_set_attachment_folder($attachment_id, $folder_id);
+}
+
+add_action('add_attachment', 'fs_media_folders_assign_on_upload', 10, 1);
+
+/**
+ * Pass active folder into Plupload (drag & drop / multi-upload on upload.php).
+ */
+add_filter('plupload_init', function (array $config): array {
+	if (!is_admin() || !current_user_can('upload_files')) {
+		return $config;
+	}
+
+	$folder_id = fs_media_folders_upload_folder_id();
+	if ($folder_id <= 0) {
+		return $config;
+	}
+
+	if (!isset($config['multipart_params']) || !is_array($config['multipart_params'])) {
+		$config['multipart_params'] = [];
+	}
+	$config['multipart_params']['fs_media_folder_id'] = $folder_id;
+
+	return $config;
+});
+
+/**
  * Count attachments that have no media folder assigned.
  */
 function fs_media_folders_count_unassigned(): int
@@ -194,6 +277,10 @@ function fs_media_folders_set_attachment_folder(int $attachment_id, $raw_folder_
 function fs_media_folders_get_ajax_folder_value(int $attachment_id)
 {
 	$request = wp_unslash($_REQUEST);
+
+	if (isset($request['fs_media_folder_id'])) {
+		return $request['fs_media_folder_id'];
+	}
 
 	$attachments = isset($request['attachments']) && is_array($request['attachments']) ? $request['attachments'] : [];
 	if (isset($attachments[$attachment_id]) && is_array($attachments[$attachment_id])) {
@@ -1739,6 +1826,49 @@ add_action('admin_footer-upload.php', function (): void {
 			sidebar.style.display = '';
 			fsMediaFoldersApplyStoredBranchState(sidebar);
 			wrap.dataset.fsMediaFoldersReady = '1';
+
+			function fsMediaFoldersGetUploadFolderId() {
+				try {
+					var fromUrl = parseInt(new URLSearchParams(window.location.search).get('fs_media_folder_id') || '0', 10);
+					if (!isNaN(fromUrl) && fromUrl > 0) {
+						return fromUrl;
+					}
+				} catch (errUrl) {}
+				var activeLink = sidebar.querySelector('.fs-media-folders-item.fs-media-folders-link.is-active a.fs-media-folder-row');
+				if (activeLink && activeLink.href) {
+					try {
+						var u = new URL(activeLink.href, window.location.origin);
+						var fromActive = parseInt(u.searchParams.get('fs_media_folder_id') || '0', 10);
+						if (!isNaN(fromActive) && fromActive > 0) {
+							return fromActive;
+						}
+					} catch (errActive) {}
+				}
+				return 0;
+			}
+
+			function fsMediaFoldersPatchUploadParams() {
+				var folderId = fsMediaFoldersGetUploadFolderId();
+				if (folderId < 1) {
+					return;
+				}
+				if (window.wp && wp.Uploader && wp.Uploader.defaults) {
+					wp.Uploader.defaults.multipart_params = wp.Uploader.defaults.multipart_params || {};
+					wp.Uploader.defaults.multipart_params.fs_media_folder_id = folderId;
+				}
+				if (window.plupload && plupload.defaultSettings) {
+					plupload.defaultSettings.multipart_params = plupload.defaultSettings.multipart_params || {};
+					plupload.defaultSettings.multipart_params.fs_media_folder_id = folderId;
+				}
+			}
+
+			fsMediaFoldersPatchUploadParams();
+			if (window.jQuery) {
+				window.jQuery(document).on('uploader:ready', fsMediaFoldersPatchUploadParams);
+				window.jQuery(wrap).on('wp-media-grid-ready', fsMediaFoldersPatchUploadParams);
+			}
+			setTimeout(fsMediaFoldersPatchUploadParams, 0);
+			setTimeout(fsMediaFoldersPatchUploadParams, 500);
 
 			var toggleButton = document.createElement('button');
 			toggleButton.type = 'button';
