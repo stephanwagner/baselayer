@@ -20,6 +20,7 @@ require_once 'inc/design.php';
 require_once 'inc/redirects.php';
 require_once 'inc/analytics.php';
 require_once 'inc/admin-bar.php';
+require_once 'inc/admin-theme.php';
 
 // Blocks
 require_once 'inc/blocks.php';
