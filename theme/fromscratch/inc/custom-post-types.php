@@ -967,7 +967,8 @@ function fs_cpt_default_labels(string $post_type, array $labels = []): array
 }
 
 /**
- * Post type for the current archive listing (built-in post archives and CPT archives).
+ * Post type for the current archive listing (CPT archives and post taxonomy archives only).
+ * Does not cover the blog posts index (`is_home()`); FromScratch does not ship a default posts listing.
  */
 function fs_archive_current_post_type(): string
 {
@@ -980,7 +981,7 @@ function fs_archive_current_post_type(): string
 		return is_string($pto) && $pto !== '' ? $pto : 'post';
 	}
 
-	if (is_home() || is_category() || is_tag() || is_author() || is_date()) {
+	if (is_category() || is_tag() || is_author() || is_date()) {
 		return 'post';
 	}
 

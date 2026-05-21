@@ -1,5 +1,10 @@
 <?php
 
+/**
+ * Public archive listings for custom post types (`has_archive` in config).
+ * Not used for a default blog posts index; build listings with pages/blocks instead.
+ */
+
 defined('ABSPATH') || exit;
 
 get_header();

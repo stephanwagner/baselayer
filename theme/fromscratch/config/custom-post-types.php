@@ -7,8 +7,9 @@
  * @see register_post_type() for all supported args.
  * Use `url` for the public path segment (sets `rewrite.slug`); e.g. `'url' => 'projects'`.
  *
- * Archive listing (frontend only):
- * - `archive_design`: `grid` | `list` (optional). Adds `archive__items--design-grid` or `archive__items--design-list` on the archive template.
+ * Archive listing (CPT archives only — not a public blog posts index; use blocks/pages for that):
+ * - `has_archive` and `url` on custom types (e.g. `/projects/`).
+ * - `archive_design`: `grid` | `list` on `.article-list__items` in archive.php.
  * - `orderby`: `date` | `title` | `menu_order` (optional). Default: `date` unless `has_order` is true, then `menu_order`.
  * - `order`: `ASC` | `DESC` (optional). Sensible defaults per orderby (date DESC, title ASC, menu_order ASC).
  *
@@ -41,7 +42,6 @@ return [
 		],
 		'has_categories' => false,
 		'has_page_title_toggle' => false,
-		'archive_design' => 'list',
 	],
 
 	/**
