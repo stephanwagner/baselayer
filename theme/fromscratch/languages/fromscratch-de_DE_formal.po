@@ -13,7 +13,7 @@ msgstr "Theme"
 msgid "Post"
 msgstr "Beitrag"
 
-msgid "Blogs"
+msgid "Blog"
 msgstr "Beiträge"
 
 msgid "Site"
@@ -602,8 +602,8 @@ msgstr "Erstellte Seiten in Menüs eintragen"
 msgid "Adds the pages to the configured menu locations."
 msgstr "Fügt die Seiten den konfigurierten Menü-Positionen hinzu."
 
-msgid "Enable blogs"
-msgstr "Blogs aktivieren"
+msgid "Enable blog posts"
+msgstr "Beiträge aktivieren"
 
 msgid "Shows the Posts menu in the admin and allows creating and editing blog posts. You can change this later in Theme settings."
 msgstr "Zeigt das Menü „Beiträge“ im Admin und erlaubt das Anlegen und Bearbeiten von Blog-Beiträgen. Später unter Theme Einstellungen änderbar."

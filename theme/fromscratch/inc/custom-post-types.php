@@ -96,6 +96,141 @@ function fs_content_type_admin_from_cfg(array $cfg): array
 }
 
 /**
+ * Whether config enables a public archive for built-in posts (`config/content-types/post.php`).
+ */
+function fs_post_type_has_config_archive(?string $post_type = null): bool
+{
+	if ($post_type === null || $post_type === '') {
+		$post_type = 'post';
+	}
+	if ($post_type !== 'post') {
+		return false;
+	}
+	if (function_exists('fs_theme_feature_enabled') && !fs_theme_feature_enabled('blogs')) {
+		return false;
+	}
+
+	$archive = fs_content_type_archive('post');
+
+	return !empty($archive['enabled']);
+}
+
+/**
+ * Archive slug from `config/content-types/post.php` (`archive.slug`).
+ */
+function fs_post_archive_slug(): string
+{
+	if (!fs_post_type_has_config_archive('post')) {
+		return '';
+	}
+
+	$archive = fs_content_type_archive('post');
+	$slug = isset($archive['slug']) && is_string($archive['slug']) ? sanitize_title($archive['slug']) : '';
+
+	return $slug !== '' ? $slug : 'blog';
+}
+
+/**
+ * Apply `config/content-types/post.php` archive settings to the built-in `post` type.
+ *
+ * Core registers `post` with `rewrite => false`, so archive rewrites are added separately.
+ *
+ * @param array<string, mixed> $args
+ * @return array<string, mixed>
+ */
+function fs_post_register_args_from_config(array $args, string $post_type): array
+{
+	if ($post_type !== 'post') {
+		return $args;
+	}
+	if (function_exists('fs_theme_feature_enabled') && !fs_theme_feature_enabled('blogs')) {
+		$args['has_archive'] = false;
+
+		return $args;
+	}
+
+	$cfg = fs_config_cpt('post');
+	if (!is_array($cfg)) {
+		return $args;
+	}
+
+	$archive = fs_content_type_archive_from_cfg($cfg);
+	if (empty($archive['enabled'])) {
+		$args['has_archive'] = false;
+
+		return $args;
+	}
+
+	$slug = fs_post_archive_slug();
+	$args['has_archive'] = $slug !== '' ? $slug : true;
+
+	return $args;
+}
+
+add_filter('register_post_type_args', 'fs_post_register_args_from_config', 10, 2);
+
+/**
+ * Built-in `post` keeps `rewrite => false`; register archive URL rules explicitly.
+ */
+function fs_post_archive_register_rewrites(): void
+{
+	$slug = fs_post_archive_slug();
+	if ($slug === '') {
+		return;
+	}
+
+	global $wp_rewrite;
+
+	add_rewrite_rule("{$slug}/?$", 'index.php?post_type=post', 'top');
+	add_rewrite_rule("{$slug}/{$wp_rewrite->pagination_base}/([0-9]{1,})/?$", 'index.php?post_type=post&paged=$matches[1]', 'top');
+}
+
+add_action('init', 'fs_post_archive_register_rewrites', 20);
+
+/**
+ * Core `get_post_type_archive_link( 'post' )` ignores `has_archive` and uses Posts page / home.
+ */
+add_filter('post_type_archive_link', function (string $link, string $post_type): string {
+	if ($post_type !== 'post') {
+		return $link;
+	}
+
+	$slug = fs_post_archive_slug();
+	if ($slug === '') {
+		return $link;
+	}
+
+	return home_url(user_trailingslashit($slug, 'post_type_archive'));
+}, 10, 2);
+
+/**
+ * Flush rewrite rules when the post archive slug/enabled state changes.
+ */
+function fs_post_archive_maybe_flush_rewrites(): void
+{
+	if (!fs_post_type_has_config_archive()) {
+		delete_option('fs_post_archive_rewrite_sig');
+
+		return;
+	}
+
+	$archive = fs_content_type_archive('post');
+	$sig = md5(wp_json_encode([
+		'enabled' => !empty($archive['enabled']),
+		'slug' => isset($archive['slug']) ? (string) $archive['slug'] : '',
+		'v' => 2,
+	]));
+	if (get_option('fs_post_archive_rewrite_sig') === $sig) {
+		return;
+	}
+
+	flush_rewrite_rules(true);
+	update_option('fs_post_archive_rewrite_sig', $sig, false);
+}
+
+add_action('init', 'fs_post_archive_maybe_flush_rewrites', 99);
+
+/**
  * Register all enabled CPTs from config/content-types/.
  *
  * @return void
@@ -507,8 +642,10 @@ function fs_cpt_pre_get_posts_order(\WP_Query $query): void
 	if (fs_cpt_type($pt) === 'event') {
 		return;
 	}
-	$cpts = fs_config_cpt('all');
-	if (!is_array($cpts) || !isset($cpts[$pt]) || !is_array($cpts[$pt])) {
+	if (!is_array(fs_config_cpt($pt))) {
+		return;
+	}
+	if ($pt === 'post' && !fs_post_type_has_config_archive('post')) {
 		return;
 	}
 	$query_config = fs_content_type_query($pt);

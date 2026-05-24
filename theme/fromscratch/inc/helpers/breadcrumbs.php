@@ -52,15 +52,32 @@ function fs_breadcrumbs(array $args = []): string
     elseif (is_single()) {
         $post_type = get_post_type();
 
-        // Blog page (for posts)
+        // Blog archive (config) or legacy Posts page.
         if ($post_type === 'post') {
-            $blog_id = get_option('page_for_posts');
+            if (function_exists('fs_post_type_has_config_archive') && fs_post_type_has_config_archive('post')) {
+                $heading = function_exists('fs_cpt_text') ? fs_cpt_text('heading', 'post') : '';
+                $obj = get_post_type_object('post');
+                $archive_url = get_post_type_archive_link('post');
+                if ($heading !== '' && is_string($archive_url) && $archive_url !== '') {
+                    $items[] = [
+                        'label' => $heading,
+                        'url'   => $archive_url,
+                    ];
+                } elseif ($obj && !empty($obj->has_archive) && is_string($archive_url) && $archive_url !== '') {
+                    $items[] = [
+                        'label' => $obj->labels->name,
+                        'url'   => $archive_url,
+                    ];
+                }
+            } else {
+                $blog_id = get_option('page_for_posts');
 
-            if ($blog_id) {
-                $items[] = [
-                    'label' => get_the_title($blog_id),
-                    'url'   => get_permalink($blog_id),
-                ];
+                if ($blog_id) {
+                    $items[] = [
+                        'label' => get_the_title($blog_id),
+                        'url'   => get_permalink($blog_id),
+                    ];
+                }
             }
         }
 

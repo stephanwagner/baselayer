@@ -1,4 +1,7 @@
 <?php
+
+// TODO add comments
+
 return [
 	'event' => [
 		'enabled' => true,

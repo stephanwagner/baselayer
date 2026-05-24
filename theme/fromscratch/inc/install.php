@@ -532,12 +532,12 @@ function fs_render_installer(): void
           </tr>
 
           <tr>
-            <th scope="row"><?= esc_html__('Blogs', 'fromscratch') ?></th>
+            <th scope="row"><?= esc_html__('Blog', 'fromscratch') ?></th>
             <td>
               <p style="margin-top: 0;">
                 <label>
                   <input type="checkbox" name="install[blogs]" value="1" <?= !empty($fs_install_val(['install', 'blogs'], true)) ? ' checked' : '' ?>>
-                  <?= esc_html__('Enable blogs', 'fromscratch') ?>
+                  <?= esc_html__('Enable blog posts', 'fromscratch') ?>
                 </label>
               </p>
               <p class="description"><?= esc_html__('Shows the Posts menu in the admin and allows creating and editing blog posts. You can change this later in Theme settings.', 'fromscratch') ?></p>
