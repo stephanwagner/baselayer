@@ -81,7 +81,15 @@
 
 .article-preview__title {
   position: relative;
+  margin: 0 0 6px;
+}
+
+.article-preview__date {
   margin: 0 0 4px;
+  font-weight: 400;
+  color: var(--fs-color-gray-600);
+  font-size: var(--fs-font-size-s);
+  line-height: var(--fs-line-height-s);
 }
 
 .article-preview__read-more-container {
@@ -97,8 +105,13 @@
   text-wrap: pretty;
   font-weight: 400;
   display: -webkit-box;
-  line-clamp: 4;
-	-webkit-line-clamp: 4;
+  line-clamp: 3;
+	-webkit-line-clamp: 3;
 	-webkit-box-orient: vertical;
 	overflow: hidden;
+
+  @media (max-width: $breakpoint-s) {
+    line-clamp: 4;
+    -webkit-line-clamp: 4;
+  }
 }

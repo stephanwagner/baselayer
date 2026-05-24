@@ -38,6 +38,16 @@ function fs_event_timezone(): \DateTimeZone
 	return function_exists('wp_timezone') ? wp_timezone() : new \DateTimeZone(wp_timezone_string() ?: 'UTC');
 }
 
+function fs_event_normalize_time(string $time): string
+{
+	$time = trim($time);
+	if (preg_match('/^(\d{2}:\d{2})(?::\d{2})?$/', $time, $m)) {
+		return $m[1];
+	}
+
+	return '';
+}
+
 /**
  * Combine date + optional time into a Unix timestamp (site timezone).
  *
@@ -51,9 +61,10 @@ function fs_event_to_timestamp(string $date, string $time, bool $end_day): int
 		return 0;
 	}
 	$tz = fs_event_timezone();
-	$has_time = is_string($time) && preg_match('/^\d{2}:\d{2}$/', trim($time));
+	$time = fs_event_normalize_time($time);
+	$has_time = $time !== '';
 	if ($has_time) {
-		$dt = \DateTimeImmutable::createFromFormat('Y-m-d H:i', $date . ' ' . trim($time), $tz);
+		$dt = \DateTimeImmutable::createFromFormat('Y-m-d H:i', $date . ' ' . $time, $tz);
 	} elseif ($end_day) {
 		$dt = \DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $date . ' 23:59:59', $tz);
 	} else {
@@ -64,20 +75,91 @@ function fs_event_to_timestamp(string $date, string $time, bool $end_day): int
 }
 
 /**
- * Persist sort/filter timestamps from date/time meta.
+ * Normalized event schedule from post meta, or null when no valid start date.
+ *
+ * @return array{start_date: string, end_date: string, start_time: string, end_time: string}|null
  */
-function fs_event_save_timestamps(int $post_id): void
+function fs_event_get_schedule(int $post_id): ?array
+{
+	if (!fs_is_event_post_type(get_post_type($post_id))) {
+		return null;
+	}
+
+	$start_date = get_post_meta($post_id, FS_EVENT_META_START_DATE, true);
+	if (!is_string($start_date) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', trim($start_date))) {
+		return null;
+	}
+	$start_date = trim($start_date);
+
+	$end_date = get_post_meta($post_id, FS_EVENT_META_END_DATE, true);
+	if (!is_string($end_date) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', trim($end_date))) {
+		$end_date = $start_date;
+	} else {
+		$end_date = trim($end_date);
+	}
+
+	$start_time = get_post_meta($post_id, FS_EVENT_META_START_TIME, true);
+	$end_time = get_post_meta($post_id, FS_EVENT_META_END_TIME, true);
+	$start_time = is_string($start_time) ? fs_event_normalize_time($start_time) : '';
+	$end_time = is_string($end_time) ? fs_event_normalize_time($end_time) : '';
+
+	return [
+		'start_date' => $start_date,
+		'end_date' => $end_date,
+		'start_time' => $start_time,
+		'end_time' => $end_time,
+	];
+}
+
+function fs_event_get_start_timestamp(int $post_id): int
+{
+	$schedule = fs_event_get_schedule($post_id);
+	if ($schedule === null) {
+		return 0;
+	}
+
+	return fs_event_to_timestamp($schedule['start_date'], $schedule['start_time'], false);
+}
+
+function fs_event_get_end_timestamp(int $post_id): int
+{
+	$schedule = fs_event_get_schedule($post_id);
+	if ($schedule === null) {
+		return 0;
+	}
+
+	$end_ts = fs_event_to_timestamp($schedule['end_date'], $schedule['end_time'], $schedule['end_time'] === '');
+	if ($end_ts <= 0) {
+		return 0;
+	}
+
+	$start_ts = fs_event_get_start_timestamp($post_id);
+	if ($start_ts > 0 && $end_ts < $start_ts) {
+		return $start_ts;
+	}
+
+	return $end_ts;
+}
+
+function fs_event_is_upcoming(int $post_id, ?int $now = null): bool
+{
+	$end_ts = fs_event_get_end_timestamp($post_id);
+	if ($end_ts <= 0) {
+		return false;
+	}
+
+	return $end_ts >= ($now ?? time());
+}
+
+/**
+ * Derive and persist sort/filter timestamps from date/time meta.
+ */
+function fs_event_recalculate_timestamps(int $post_id): void
 {
 	if (!fs_is_event_post_type(get_post_type($post_id))) {
 		return;
 	}
-	if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
-		return;
-	}
 	if (wp_is_post_revision($post_id)) {
-		return;
-	}
-	if (!current_user_can('edit_post', $post_id)) {
 		return;
 	}
 
@@ -88,8 +170,8 @@ function fs_event_save_timestamps(int $post_id): void
 
 	$start_date = is_string($start_date) ? trim($start_date) : '';
 	$end_date = is_string($end_date) ? trim($end_date) : '';
-	$start_time = is_string($start_time) ? trim($start_time) : '';
-	$end_time = is_string($end_time) ? trim($end_time) : '';
+	$start_time = is_string($start_time) ? fs_event_normalize_time($start_time) : '';
+	$end_time = is_string($end_time) ? fs_event_normalize_time($end_time) : '';
 
 	if ($start_date === '') {
 		delete_post_meta($post_id, FS_EVENT_META_START_TS);
@@ -116,6 +198,27 @@ function fs_event_save_timestamps(int $post_id): void
 
 	update_post_meta($post_id, FS_EVENT_META_START_TS, $start_ts);
 	update_post_meta($post_id, FS_EVENT_META_END_TS, $end_ts);
+}
+
+/**
+ * Persist sort/filter timestamps from date/time meta (classic save path).
+ */
+function fs_event_save_timestamps(int $post_id): void
+{
+	if (!fs_is_event_post_type(get_post_type($post_id))) {
+		return;
+	}
+	if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+		return;
+	}
+	if (wp_is_post_revision($post_id)) {
+		return;
+	}
+	if (!current_user_can('edit_post', $post_id)) {
+		return;
+	}
+
+	fs_event_recalculate_timestamps($post_id);
 }
 
 /**
@@ -172,13 +275,13 @@ function fs_event_register_post_type_hooks(): void
 		register_post_meta($post_type, FS_EVENT_META_START_TIME, array_merge($string_meta, [
 			'sanitize_callback' => static function ($value): string {
 				$value = is_string($value) ? trim($value) : '';
-				return preg_match('/^\d{2}:\d{2}$/', $value) ? $value : '';
+				return fs_event_normalize_time($value);
 			},
 		]));
 		register_post_meta($post_type, FS_EVENT_META_END_TIME, array_merge($string_meta, [
 			'sanitize_callback' => static function ($value): string {
 				$value = is_string($value) ? trim($value) : '';
-				return preg_match('/^\d{2}:\d{2}$/', $value) ? $value : '';
+				return fs_event_normalize_time($value);
 			},
 		]));
 
@@ -202,9 +305,10 @@ function fs_event_register_post_type_hooks(): void
 add_action('init', 'fs_event_register_post_type_hooks', 21);
 
 /**
- * Frontend archive: upcoming and in-progress events only; sort by start.
+ * Frontend archive: show events that have not ended yet; sort by start date/time.
  */
-add_action('pre_get_posts', function (\WP_Query $query): void {
+function fs_event_archive_pre_get_posts(\WP_Query $query): void
+{
 	if (is_admin() || !$query->is_main_query() || !$query->is_post_type_archive()) {
 		return;
 	}
@@ -215,19 +319,41 @@ add_action('pre_get_posts', function (\WP_Query $query): void {
 	if (!is_string($pt) || $pt === '' || !fs_is_event_post_type($pt)) {
 		return;
 	}
+
 	$now = time();
-	$query->set('meta_query', [
-		[
-			'key' => FS_EVENT_META_END_TS,
-			'value' => $now,
-			'compare' => '>=',
-			'type' => 'NUMERIC',
-		],
+	$candidate_ids = get_posts([
+		'post_type' => $pt,
+		'post_status' => 'publish',
+		'posts_per_page' => -1,
+		'fields' => 'ids',
+		'orderby' => 'ID',
+		'order' => 'ASC',
+		'no_found_rows' => true,
 	]);
-	$query->set('meta_key', FS_EVENT_META_START_TS);
-	$query->set('orderby', 'meta_value_num');
-	$query->set('order', 'ASC');
-}, 25);
+
+	$upcoming = [];
+	foreach ($candidate_ids as $post_id) {
+		$post_id = (int) $post_id;
+		if (fs_event_is_upcoming($post_id, $now)) {
+			$upcoming[] = $post_id;
+		}
+	}
+
+	usort($upcoming, static function (int $a, int $b): int {
+		$start_a = fs_event_get_start_timestamp($a);
+		$start_b = fs_event_get_start_timestamp($b);
+		if ($start_a === $start_b) {
+			return $a <=> $b;
+		}
+
+		return $start_a <=> $start_b;
+	});
+
+	$query->set('post__in', $upcoming !== [] ? $upcoming : [0]);
+	$query->set('orderby', 'post__in');
+}
+
+add_action('pre_get_posts', 'fs_event_archive_pre_get_posts', 25);
 
 /**
  * Block editor: strings for the Event panel (same script as expirator).
@@ -338,30 +464,22 @@ function fs_event_abbr_month_datetime_format(string $php_format): string
  */
 function fs_event_format_range_text(int $post_id, bool $abbr_month_names = false): string
 {
-	if (!fs_is_event_post_type(get_post_type($post_id))) {
+	$schedule = fs_event_get_schedule($post_id);
+	if ($schedule === null) {
 		return '';
 	}
 
-	$start_date = get_post_meta($post_id, FS_EVENT_META_START_DATE, true);
-	if (!is_string($start_date) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $start_date)) {
-		return '';
-	}
-	$end_date = get_post_meta($post_id, FS_EVENT_META_END_DATE, true);
-	if (!is_string($end_date) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $end_date)) {
-		$end_date = $start_date;
-	}
-	$st = get_post_meta($post_id, FS_EVENT_META_START_TIME, true);
-	$et = get_post_meta($post_id, FS_EVENT_META_END_TIME, true);
-	$st = is_string($st) && preg_match('/^\d{2}:\d{2}$/', trim($st)) ? trim($st) : '';
-	$et = is_string($et) && preg_match('/^\d{2}:\d{2}$/', trim($et)) ? trim($et) : '';
-
-	$tz = fs_event_timezone();
-	$start_ts = fs_event_to_timestamp($start_date, $st, false);
-	$end_ts = fs_event_to_timestamp($end_date, $et, $et === '');
-
+	$start_ts = fs_event_get_start_timestamp($post_id);
+	$end_ts = fs_event_get_end_timestamp($post_id);
 	if ($start_ts <= 0 || $end_ts <= 0) {
 		return '';
 	}
+
+	$start_date = $schedule['start_date'];
+	$end_date = $schedule['end_date'];
+	$st = $schedule['start_time'];
+	$et = $schedule['end_time'];
+	$tz = fs_event_timezone();
 
 	$df = get_option('date_format', 'F j, Y');
 	if ($abbr_month_names) {
