@@ -95,8 +95,7 @@ function fs_seo_register_meta(): void
 add_action('init', 'fs_seo_register_meta');
 
 /**
- * Use SEO title in document title when set (single post/page).
- * Custom SEO titles are used as-is (no site name suffix).
+ * Use custom SEO title for singular post types when set.
  *
  * @param array<string, string> $title Parts (title, page, tagline, site).
  * @return array<string, string>
@@ -110,11 +109,11 @@ function fs_seo_document_title(array $title): array
 	$seo_title = get_post_meta($post_id, FS_SEO_META_TITLE, true);
 	if ($seo_title !== '') {
 		$title['title'] = $seo_title;
-		unset($title['site'], $title['tagline']);
 	}
+
 	return $title;
 }
-add_filter('document_title_parts', 'fs_seo_document_title');
+add_filter('document_title_parts', 'fs_seo_document_title', 10);
 
 /**
  * Output explicit index (or noindex) and follow in robots meta.

@@ -14,6 +14,23 @@ function fs_add_title_tag(): void
 add_action('after_setup_theme', 'fs_add_title_tag');
 
 /**
+ * Document title without site name / tagline suffix.
+ *
+ * WordPress default: "Page not found - Site Name" (and tagline on home). We keep only
+ * the primary title part (plus optional "Page 2" pagination).
+ *
+ * @param array<string, string> $title Parts (title, page, tagline, site).
+ * @return array<string, string>
+ */
+function fs_document_title_parts(array $title): array
+{
+	unset($title['site'], $title['tagline']);
+
+	return $title;
+}
+add_filter('document_title_parts', 'fs_document_title_parts', 20);
+
+/**
  * Output manifest link in head.
  *
  * @return void
