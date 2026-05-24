@@ -511,11 +511,11 @@ function fs_cpt_pre_get_posts_order(\WP_Query $query): void
 	if (!is_array($cpts) || !isset($cpts[$pt]) || !is_array($cpts[$pt])) {
 		return;
 	}
-	$query = fs_content_type_query($pt);
-	$has_order = !empty($query['menu_order']);
+	$query_config = fs_content_type_query($pt);
+	$has_order = !empty($query_config['menu_order']);
 
-	$raw_orderby = isset($query['orderby']) && is_string($query['orderby'])
-		? strtolower(trim($query['orderby']))
+	$raw_orderby = isset($query_config['orderby']) && is_string($query_config['orderby'])
+		? strtolower(trim($query_config['orderby']))
 		: '';
 	if ($raw_orderby === 'publish_date' || $raw_orderby === 'published') {
 		$raw_orderby = 'date';
@@ -525,8 +525,8 @@ function fs_cpt_pre_get_posts_order(\WP_Query $query): void
 		$raw_orderby = $has_order ? 'menu_order' : 'date';
 	}
 
-	$raw_order = isset($query['order']) && is_string($query['order'])
-		? strtoupper(trim($query['order']))
+	$raw_order = isset($query_config['order']) && is_string($query_config['order'])
+		? strtoupper(trim($query_config['order']))
 		: '';
 	if ($raw_order !== 'ASC' && $raw_order !== 'DESC') {
 		if ($raw_orderby === 'menu_order') {
