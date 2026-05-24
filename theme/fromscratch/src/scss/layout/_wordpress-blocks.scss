@@ -364,6 +364,10 @@
         $breakpoint-m: (
           top: var(--fs-content-margin-m),
           bottom: var(--fs-content-margin-m),
+        ),
+        $breakpoint-s: (
+          top: var(--fs-content-margin-s),
+          bottom: var(--fs-content-margin-s),
         )
       )
     );
@@ -437,6 +441,9 @@
         ),
         $breakpoint-m: (
           top: var(--fs-content-margin-m),
+        ),
+        $breakpoint-s: (
+          top: var(--fs-content-margin-s),
         )
       )
     );
@@ -510,6 +517,9 @@
         ),
         $breakpoint-m: (
           bottom: var(--fs-content-margin-m),
+        ),
+        $breakpoint-s: (
+          bottom: var(--fs-content-margin-s),
         )
       )
     );
