@@ -104,6 +104,37 @@ table.widefat {
 
 .notice {
   border-radius: 6px;
+  border-top: 1px solid #72aee6;
+  border-right: 1px solid #72aee6;
+  border-bottom: 1px solid #72aee6;
+  border-left-color: #72aee6;
+  padding: 6px 12px;
+  font-size: 13px;
+  line-height: 24px;
+
+  >p:first-child {
+    margin: 4px 0;
+  }
+
+  &.notice-success {
+    border-color: #4ab866;
+  }
+
+  &.notice-error {
+    border-color: #cc1818;
+  }
+
+  &.notice-warning {
+    border-color: #f0b84a;
+  }
+
+  &.notice-info {
+    border-color: #72aee6;
+  }
+}
+
+.notice-dismiss {
+  top: 8px;
 }
 
 .fs-notice-error {
