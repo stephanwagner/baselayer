@@ -38,8 +38,8 @@ return [
 			'slug' => 'projects',
 			'design' => 'list',
 			'texts' => [
-				'heading' => __('Projects', 'fromscratch'),
-				'empty' => __('No projects found.', 'fromscratch'),
+				'heading' => 'Projects',
+				'empty' => 'No projects found.',
 			],
 		],
 

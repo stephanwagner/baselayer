@@ -218,7 +218,6 @@ function fs_post_archive_maybe_flush_rewrites(): void
 	$sig = md5(wp_json_encode([
 		'enabled' => !empty($archive['enabled']),
 		'slug' => isset($archive['slug']) ? (string) $archive['slug'] : '',
-		'v' => 2,
 	]));
 	if (get_option('fs_post_archive_rewrite_sig') === $sig) {
 		return;
@@ -1310,7 +1309,7 @@ function fs_cpt_text(string $key, ?string $post_type = null): string
 	$key = $aliases[$key] ?? $key;
 
 	$defaults = [
-		'empty' => __('No posts found.', 'fromscratch'),
+		'empty' => 'No posts found.',
 		'heading' => '',
 	];
 
@@ -1319,16 +1318,43 @@ function fs_cpt_text(string $key, ?string $post_type = null): string
 	}
 
 	if ($post_type === '') {
-		return $defaults[$key] ?? '';
+		$default = $defaults[$key] ?? '';
+
+		return $default !== '' ? __($default, 'fromscratch') : '';
 	}
 
 	$archive = fs_content_type_archive($post_type);
 	$texts = isset($archive['texts']) && is_array($archive['texts']) ? $archive['texts'] : [];
 	if (isset($texts[$key]) && is_string($texts[$key]) && $texts[$key] !== '') {
-		return $texts[$key];
+		return __($texts[$key], 'fromscratch');
 	}
 
-	return $defaults[$key] ?? '';
+	$default = $defaults[$key] ?? '';
+
+	return $default !== '' ? __($default, 'fromscratch') : '';
+}
+
+/**
+ * Public archive label (breadcrumbs, archive &lt;h1&gt;, etc.).
+ * Uses `archive.texts.heading` when set, else the post type plural label (translated at output).
+ */
+function fs_cpt_archive_label(string $post_type): string
+{
+	if ($post_type === '') {
+		return '';
+	}
+
+	$heading = fs_cpt_text('heading', $post_type);
+	if ($heading !== '') {
+		return $heading;
+	}
+
+	$obj = get_post_type_object($post_type);
+	if ($obj instanceof \WP_Post_Type && isset($obj->labels->name) && is_string($obj->labels->name) && $obj->labels->name !== '') {
+		return __($obj->labels->name, 'fromscratch');
+	}
+
+	return '';
 }
 
 /**
@@ -1336,9 +1362,12 @@ function fs_cpt_text(string $key, ?string $post_type = null): string
  */
 function fs_archive_heading(): string
 {
-	$heading = fs_cpt_text('heading');
-	if ($heading !== '') {
-		return $heading;
+	$post_type = fs_archive_current_post_type();
+	if ($post_type !== '') {
+		$heading = fs_cpt_archive_label($post_type);
+		if ($heading !== '') {
+			return $heading;
+		}
 	}
 
 	if (is_post_type_archive()) {

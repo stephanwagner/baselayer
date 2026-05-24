@@ -40,8 +40,8 @@ return [
 			'slug' => 'events',
 			'design' => 'list',
 			'texts' => [
-				'heading' => __('Events', 'fromscratch'),
-				'empty' => __('No events found.', 'fromscratch'),
+				'heading' => 'Events',
+				'empty' => 'No events found.',
 			],
 		],
 

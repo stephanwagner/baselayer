@@ -55,17 +55,11 @@ function fs_breadcrumbs(array $args = []): string
         // Blog archive (config) or legacy Posts page.
         if ($post_type === 'post') {
             if (function_exists('fs_post_type_has_config_archive') && fs_post_type_has_config_archive('post')) {
-                $heading = function_exists('fs_cpt_text') ? fs_cpt_text('heading', 'post') : '';
-                $obj = get_post_type_object('post');
+                $label = function_exists('fs_cpt_archive_label') ? fs_cpt_archive_label('post') : '';
                 $archive_url = get_post_type_archive_link('post');
-                if ($heading !== '' && is_string($archive_url) && $archive_url !== '') {
+                if ($label !== '' && is_string($archive_url) && $archive_url !== '') {
                     $items[] = [
-                        'label' => $heading,
-                        'url'   => $archive_url,
-                    ];
-                } elseif ($obj && !empty($obj->has_archive) && is_string($archive_url) && $archive_url !== '') {
-                    $items[] = [
-                        'label' => $obj->labels->name,
+                        'label' => $label,
                         'url'   => $archive_url,
                     ];
                 }
@@ -86,10 +80,13 @@ function fs_breadcrumbs(array $args = []): string
             $obj = get_post_type_object($post_type);
 
             if ($obj && ! empty($obj->has_archive)) {
-                $items[] = [
-                    'label' => $obj->labels->name,
-                    'url'   => get_post_type_archive_link($post_type),
-                ];
+                $label = function_exists('fs_cpt_archive_label') ? fs_cpt_archive_label($post_type) : (string) $obj->labels->name;
+                if ($label !== '') {
+                    $items[] = [
+                        'label' => $label,
+                        'url'   => get_post_type_archive_link($post_type),
+                    ];
+                }
             }
         }
 
@@ -134,12 +131,21 @@ function fs_breadcrumbs(array $args = []): string
 
     // Archive
     elseif (is_archive()) {
-        add_filter('get_the_archive_title_prefix', '__return_empty_string', 99);
-        $archive_title = get_the_archive_title();
-        remove_filter('get_the_archive_title_prefix', '__return_empty_string', 99);
+        $label = '';
+        if (is_post_type_archive()) {
+            $pto = get_queried_object();
+            if ($pto instanceof \WP_Post_Type && function_exists('fs_cpt_archive_label')) {
+                $label = fs_cpt_archive_label($pto->name);
+            }
+        }
+        if ($label === '') {
+            add_filter('get_the_archive_title_prefix', '__return_empty_string', 99);
+            $label = wp_strip_all_tags(get_the_archive_title());
+            remove_filter('get_the_archive_title_prefix', '__return_empty_string', 99);
+        }
 
         $items[] = [
-            'label' => wp_strip_all_tags($archive_title),
+            'label' => $label,
             'url'   => null,
         ];
     }

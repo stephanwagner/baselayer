@@ -16,6 +16,12 @@ msgstr "Beitrag"
 msgid "Blog"
 msgstr "Beiträge"
 
+msgid "Projects"
+msgstr "Projekte"
+
+msgid "Events"
+msgstr "Veranstaltungen"
+
 msgid "Site"
 msgstr "Seite"
 
@@ -202,11 +208,14 @@ msgstr "Zurück"
 msgid "Next"
 msgstr "Weiter"
 
-msgid "No events found."
-msgstr "Keine Termine gefunden."
-
 msgid "No posts found."
 msgstr "Keine Beiträge gefunden."
+
+msgid "No projects found."
+msgstr "Keine Projekte gefunden."
+
+msgid "No events found."
+msgstr "Keine Termine gefunden."
 
 msgid "Read more"
 msgstr "Mehr lesen"

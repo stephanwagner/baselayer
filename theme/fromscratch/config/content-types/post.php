@@ -11,14 +11,13 @@ return [
 		],
 		'wp_categories' => false,
 
-
 		'archive' => [
 			'enabled' => true,
 			'slug' => 'my-blogs',
 			'design' => 'list',
 			'texts' => [
-				'heading' => __('Blog', 'fromscratch'),
-				'empty' => __('No posts found.', 'fromscratch'),
+				'heading' => 'Blog',
+				'empty' => 'No posts found.',
 			],
 		],
 
