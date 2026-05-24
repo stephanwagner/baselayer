@@ -73,3 +73,23 @@ add_filter('nav_menu_css_class', function (array $classes, $item, $args, $depth)
 	return $classes;
 }, 10, 4);
 
+/**
+ * Use archive menu label from config for post type archive nav items (not “Veranstaltung-Archive”).
+ */
+add_filter('nav_menu_item_title', function (string $title, $item, $args, $depth): string {
+	unset($args, $depth);
+
+	if (is_admin() || !isset($item->type, $item->object) || $item->type !== 'post_type_archive') {
+		return $title;
+	}
+
+	$post_type = is_string($item->object) ? $item->object : '';
+	if ($post_type === '' || !function_exists('fs_cpt_archive_menu_label')) {
+		return $title;
+	}
+
+	$label = fs_cpt_archive_menu_label($post_type);
+
+	return $label !== '' ? $label : $title;
+}, 10, 4);
+

@@ -310,6 +310,10 @@ function fs_post_apply_labels_from_config(): void
 
 	$provided_labels = fs_cpt_translate_config_label_strings($provided_labels);
 	$labels = fs_cpt_merge_labels('post', $provided_labels);
+	$menu_label = fs_cpt_archive_menu_label('post');
+	if ($menu_label !== '') {
+		$labels['archives'] = $menu_label;
+	}
 	fs_apply_post_type_labels('post', $labels);
 }
 
@@ -377,6 +381,10 @@ function fs_register_cpts(): void
 		$provided_labels = isset($args['labels']) && is_array($args['labels']) ? $args['labels'] : [];
 		$provided_labels = fs_cpt_translate_config_label_strings($provided_labels);
 		$args['labels'] = fs_cpt_merge_labels($post_type, $provided_labels);
+		$menu_label = fs_cpt_archive_menu_label($post_type);
+		if ($menu_label !== '') {
+			$args['labels']['archives'] = $menu_label;
+		}
 		// Support inline SVG menu icons in config; allow "icon" alias; always ensure fallback icon.
 		$menu_icon_value = $args['menu_icon'] ?? ($args['icon'] ?? null);
 		unset($args['icon']);
@@ -1427,6 +1435,27 @@ function fs_cpt_text(string $key, ?string $post_type = null): string
 	$default = $defaults[$key] ?? '';
 
 	return $default !== '' ? __($default, 'fromscratch') : '';
+}
+
+/**
+ * Nav menu / post-type “archives” label from config (`archive.texts.menu`, else `archive.texts.heading`).
+ */
+function fs_cpt_archive_menu_label(string $post_type): string
+{
+	if ($post_type === '') {
+		return '';
+	}
+
+	$archive = fs_content_type_archive($post_type);
+	$texts = isset($archive['texts']) && is_array($archive['texts']) ? $archive['texts'] : [];
+	if (isset($texts['menu']) && is_string($texts['menu']) && $texts['menu'] !== '') {
+		return __($texts['menu'], 'fromscratch');
+	}
+	if (isset($texts['heading']) && is_string($texts['heading']) && $texts['heading'] !== '') {
+		return __($texts['heading'], 'fromscratch');
+	}
+
+	return '';
 }
 
 /**
