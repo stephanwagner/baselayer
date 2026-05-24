@@ -96,8 +96,9 @@ add_action('init', 'fs_seo_register_meta');
 
 /**
  * Use SEO title in document title when set (single post/page).
+ * Custom SEO titles are used as-is (no site name suffix).
  *
- * @param array<string, string> $title Parts (title, page, tagline).
+ * @param array<string, string> $title Parts (title, page, tagline, site).
  * @return array<string, string>
  */
 function fs_seo_document_title(array $title): array
@@ -109,6 +110,7 @@ function fs_seo_document_title(array $title): array
 	$seo_title = get_post_meta($post_id, FS_SEO_META_TITLE, true);
 	if ($seo_title !== '') {
 		$title['title'] = $seo_title;
+		unset($title['site'], $title['tagline']);
 	}
 	return $title;
 }
