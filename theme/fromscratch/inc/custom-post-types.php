@@ -230,6 +230,92 @@ function fs_post_archive_maybe_flush_rewrites(): void
 add_action('init', 'fs_post_archive_maybe_flush_rewrites', 99);
 
 /**
+ * Merge configured labels with generated defaults (same shape as register_post_type() labels).
+ *
+ * @param array<string, string> $provided_labels
+ * @return array<string, string>
+ */
+function fs_cpt_merge_labels(string $post_type, array $provided_labels = []): array
+{
+	return array_merge(fs_cpt_default_labels($post_type, $provided_labels), $provided_labels);
+}
+
+/**
+ * Translate plain English label strings from content-type config.
+ * Must run before {@see fs_cpt_merge_labels()} so derived labels (e.g. “All %s”) use translated names.
+ *
+ * @param array<string, string> $strings
+ * @return array<string, string>
+ */
+function fs_cpt_translate_config_label_strings(array $strings): array
+{
+	foreach ($strings as $key => $value) {
+		if (!is_string($key) || !is_string($value) || $value === '') {
+			continue;
+		}
+		$strings[$key] = __($value, 'fromscratch');
+	}
+
+	return $strings;
+}
+
+/**
+ * Replace labels on a registered post type object.
+ *
+ * @param array<string, string> $labels
+ */
+function fs_apply_post_type_labels(string $post_type, array $labels): void
+{
+	$obj = get_post_type_object($post_type);
+	if (!$obj instanceof \WP_Post_Type) {
+		return;
+	}
+
+	foreach ($labels as $key => $value) {
+		if (!is_string($key) || !is_string($value)) {
+			continue;
+		}
+		$obj->labels->$key = $value;
+	}
+
+	if (isset($labels['name']) && is_string($labels['name'])) {
+		$obj->label = $labels['name'];
+	}
+}
+
+/**
+ * Apply `config/content-types/post.php` labels to the built-in `post` type.
+ *
+ * Core registers `post` before the text domain loads; labels are applied on init instead.
+ */
+function fs_post_apply_labels_from_config(): void
+{
+	if (function_exists('fs_theme_feature_enabled') && !fs_theme_feature_enabled('blogs')) {
+		return;
+	}
+
+	$cfg = fs_config_cpt('post');
+	if (!is_array($cfg) || !isset($cfg['labels']) || !is_array($cfg['labels'])) {
+		return;
+	}
+
+	$provided_labels = array_filter(
+		$cfg['labels'],
+		static fn($value, $key) => is_string($key) && is_string($value) && $value !== '',
+		ARRAY_FILTER_USE_BOTH
+	);
+	if ($provided_labels === []) {
+		return;
+	}
+
+	$provided_labels = fs_cpt_translate_config_label_strings($provided_labels);
+	$labels = fs_cpt_merge_labels('post', $provided_labels);
+	fs_apply_post_type_labels('post', $labels);
+}
+
+add_action('init', 'fs_post_apply_labels_from_config', 10);
+
+/**
  * Register all enabled CPTs from config/content-types/.
  *
  * @return void
@@ -289,7 +375,8 @@ function fs_register_cpts(): void
 		}
 		// Ensure labels exist and derive missing labels from configured name/singular_name.
 		$provided_labels = isset($args['labels']) && is_array($args['labels']) ? $args['labels'] : [];
-		$args['labels'] = array_merge(fs_cpt_default_labels($post_type, $provided_labels), $provided_labels);
+		$provided_labels = fs_cpt_translate_config_label_strings($provided_labels);
+		$args['labels'] = fs_cpt_merge_labels($post_type, $provided_labels);
 		// Support inline SVG menu icons in config; allow "icon" alias; always ensure fallback icon.
 		$menu_icon_value = $args['menu_icon'] ?? ($args['icon'] ?? null);
 		unset($args['icon']);

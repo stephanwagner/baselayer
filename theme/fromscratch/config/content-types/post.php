@@ -2,10 +2,16 @@
 
 return [
 	'post' => [
+		'labels' => [
+			'name' => 'Blog',
+			'singular_name' => 'Blog post',
+			'menu_name' => 'Blog',
+		],
+
 		'taxonomies' => [
 			'blog_category' => [
-				'label' => 'Kategorien',
-				'singular_label' => 'Kategorie',
+				'label' => 'Categories',
+				'singular_label' => 'Category',
 				'url' => 'blog-category',
 			],
 		],

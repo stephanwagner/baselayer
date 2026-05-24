@@ -10,17 +10,14 @@ msgstr "Report-Msgid-Bugs-To: https://wordpress.org/support/theme/fromscratch\nP
 msgid "Theme"
 msgstr "Theme"
 
-msgid "Post"
-msgstr "Beitrag"
-
 msgid "Blog"
 msgstr "Beiträge"
 
-msgid "Projects"
-msgstr "Projekte"
+msgid "Post"
+msgstr "Beitrag"
 
-msgid "Events"
-msgstr "Veranstaltungen"
+msgid "Blog post"
+msgstr "Beitrag"
 
 msgid "Site"
 msgstr "Seite"
@@ -172,6 +169,12 @@ msgstr "– Auswählen –"
 
 msgid "Search categories"
 msgstr "Kategorien suchen"
+
+msgid "Category"
+msgstr "Kategorie"
+
+msgid "Categories"
+msgstr "Kategorien"
 
 msgid "All categories"
 msgstr "Alle Kategorien"
@@ -2101,6 +2104,9 @@ msgstr "%s-Liste"
 
 # Events
 
+msgid "Events"
+msgstr "Veranstaltungen"
+
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -2120,7 +2126,15 @@ msgid "End time"
 msgstr "Endzeit"
 
 msgid "Event dates"
-msgstr ""
+msgstr "Termin"
+
+# Projects
+
+msgid "Project"
+msgstr "Projekt"
+
+msgid "Projects"
+msgstr "Projekte"
 
 # Editor workflow
 
