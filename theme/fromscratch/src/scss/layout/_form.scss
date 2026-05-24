@@ -7,7 +7,8 @@
     margin-top: 24px;
     margin-bottom: 24px;
     display: flex;
-    gap: 8px;
+    flex-wrap: wrap;
+    gap: 8px 12px;
 
     &:first-child {
       margin-top: 0;
@@ -20,14 +21,6 @@
     @media (max-width: $breakpoint-s) {
       margin-top: 16px;
       margin-bottom: 16px;
-
-      &:first-child {
-        margin-top: 0;
-      }
-
-      &:last-child {
-        margin-bottom: 0;
-      }
     }
   }
 
