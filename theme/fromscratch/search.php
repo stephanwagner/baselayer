@@ -17,7 +17,7 @@ $s = trim((string) get_search_query());
 			<h1><?= esc_html(__('Search results', 'fromscratch')) ?></h1>
 
 			<div class="search__page-form">
-				<?php get_search_form(); ?>
+				<?php fs_the_search_form(['id' => 'fs-search-page']); ?>
 			</div>
 
 			<?php if ($s === '' || !get_search_query()) : ?>

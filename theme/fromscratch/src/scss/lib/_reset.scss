@@ -36,6 +36,10 @@ textarea {
   font-size: 100%;
 }
 
+input[type="search"] {
+  outline-offset: inherit;
+}
+
 input::-moz-focus-inner,
 button::-moz-focus-inner {
   border: 0;

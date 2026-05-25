@@ -2155,6 +2155,21 @@ msgstr "Duplikat konnte nicht erstellt werden."
 
 # Search
 
+msgid "Search"
+msgstr "Suche"
+
+msgid "Search..."
+msgstr "Suchen..."
+
+msgid "Search for:"
+msgstr "Suche nach:"
+
+msgid "Open search"
+msgstr "Suche öffnen"
+
+msgid "Enter search term…"
+msgstr "Suchbegriff eingeben…"
+
 msgid "Exclude from search"
 msgstr "Von der Suche ausschließen"
 
