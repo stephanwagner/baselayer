@@ -7,6 +7,7 @@ import './service-worker';
 // Main
 import './menu';
 import './scrolled';
+import './search';
 
 // Components
 import '../components/modal';

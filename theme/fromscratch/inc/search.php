@@ -98,8 +98,15 @@ function fs_search_modal_markup(): void
 			<?php fs_the_search_form([
 				'id' => 'fs-search-modal',
 				'autofocus' => true,
-				'class' => 'search-form--modal',
+				'class' => 'search-modal__form',
 			]); ?>
+			<button
+				class="search-modal__close-button"
+				data-modal-close="search"
+				aria-label="<?php esc_html_e('Cancel search', 'fromscratch'); ?>"
+			>
+				<?php esc_html_e('Cancel', 'fromscratch'); ?>
+			</button>
 		</div>
 	</div>
 	<?php
