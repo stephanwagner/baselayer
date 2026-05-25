@@ -43,7 +43,7 @@ if ($image) {
 
 <div class="<?= implode(' ', $classNames) ?>">
 	<div
-		class="map__wrapper"
+		class="map__container"
 		data-google-maps-wrapper
 		data-type="<?= $type ?>"
 		data-address="<?= $address ?>"
@@ -51,21 +51,19 @@ if ($image) {
 		data-lng="<?= $lng ?>"
 		data-zoom="<?= $zoom ?>"
 	>
-		<div class="map__container">
-			<div class="map__notice-container" style="background-image: url('<?= !empty($imageSrc) ? $imageSrc : '' ?>')" data-google-maps-notice-container>
-				<div class="map__notice">
-					<div class="map__notice-title">Karte laden</div>
-					<div class="map__notice-text">
-						Mit Klick auf "Karte anzeigen" wird eine Verbindung zu Google Maps aufgebaut. Dabei werden Daten an Google übertragen.
-						<br>
-						<a href="/datenschutz">Datenschutz</a>
-					</div>
-					<div class="map__notice-button-container">
-						<button class="map__notice-button button" data-google-maps-accept-button>Karte anzeigen</button>
-					</div>
+		<div class="map__notice-container" style="background-image: url('<?= !empty($imageSrc) ? $imageSrc : '' ?>')" data-google-maps-notice-container>
+			<div class="map__notice">
+				<div class="map__notice-title">Karte laden</div>
+				<div class="map__notice-text">
+					Mit Klick auf "Karte anzeigen" wird eine Verbindung zu Google Maps aufgebaut. Dabei werden Daten an Google übertragen.
+					<br>
+					<a href="/datenschutz">Datenschutz</a>
+				</div>
+				<div class="map__notice-button-container">
+					<button class="map__notice-button button" data-google-maps-accept-button>Karte anzeigen</button>
 				</div>
 			</div>
-			<div class="map__canvas-container" data-google-maps-canvas></div>
 		</div>
+		<div class="map__canvas-container" data-google-maps-canvas></div>
 	</div>
 </div>
