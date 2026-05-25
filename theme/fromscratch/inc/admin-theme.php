@@ -64,8 +64,8 @@ add_action('after_switch_theme', static function (): void {
 });
 
 /**
- * Load theme-fromscratch.css on the public site when the toolbar is visible (logged in).
- * Core only auto-enqueues registered schemes on the frontend if they were registered before admin bar styles.
+ * Toolbar-only accent colors on the public site (logged in).
+ * Do not load theme-fromscratch.css here: it imports wp-admin colors and global link rules.
  */
 function fs_enqueue_admin_color_scheme_toolbar(): void
 {
@@ -78,11 +78,14 @@ function fs_enqueue_admin_color_scheme_toolbar(): void
 		return;
 	}
 
-	if (wp_style_is('colors-fromscratch', 'enqueued') || wp_style_is('colors-fromscratch', 'done')) {
+	// Core may enqueue the full wp-admin scheme; that leaks global link and menu styles.
+	wp_dequeue_style('colors-fromscratch');
+
+	if (wp_style_is('fromscratch-admin-color', 'enqueued') || wp_style_is('fromscratch-admin-color', 'done')) {
 		return;
 	}
 
-	$file = 'assets/admin/theme-fromscratch.css';
+	$file = 'assets/admin/theme-fromscratch-toolbar.css';
 
 	wp_enqueue_style(
 		'fromscratch-admin-color',
