@@ -21,34 +21,34 @@ $archive_type = fs_archive_cpt_type();
 
 		<div class="content__content">
 
-			<h1><?php echo wp_kses_post($archive_heading); ?></h1>
+			<?php
+			$archive_post_type = fs_archive_current_post_type();
+			$archive_filter_taxonomy = $archive_post_type !== '' ? fs_cpt_filter_taxonomy($archive_post_type) : '';
+			$archive_filter_term_id = $archive_filter_taxonomy !== ''
+				? fs_article_list_filter_term_id_from_request($archive_filter_taxonomy)
+				: 0;
+			$archive_pagination_args = $archive_filter_taxonomy !== ''
+				? ['add_args' => fs_article_list_active_filter_query_args($archive_filter_taxonomy, $archive_filter_term_id)]
+				: [];
+
+			$has_category_filter = fs_archive_has_category_filter($archive_post_type);
+			?>
+
+			<h1 class="article-list__title<?= $has_category_filter ? ' -has-category-filter' : '' ?>">
+				<span class="article-list__title-text"><?= wp_kses_post($archive_heading) ?></span>
+
+				<?php
+				if ($has_category_filter) {
+					fs_render_template('article-list-filter', [
+						'taxonomy'         => $archive_filter_taxonomy,
+						'selected_term_id' => $archive_filter_term_id,
+						'form_action'      => $archive_post_type !== '' ? (string) get_post_type_archive_link($archive_post_type) : '',
+					]);
+				}
+				?>
+			</h1>
 
 			<?php if (have_posts()) { ?>
-				<?php /*if ($archive_type === 'event') : ?>
-					<div class="event-archive">
-						<?php
-						$month_marker = '';
-						while (have_posts()) {
-							the_post();
-							$start_ts = (int) get_post_meta(get_the_ID(), FS_EVENT_META_START_TS, true);
-							if ($start_ts > 0) {
-								$month_label = wp_date('F Y', $start_ts);
-							} else {
-								$sd = get_post_meta(get_the_ID(), FS_EVENT_META_START_DATE, true);
-								$month_label = is_string($sd) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $sd)
-									? wp_date('F Y', strtotime($sd . ' 12:00:00'))
-									: '';
-							}
-							if ($month_label !== '' && $month_label !== $month_marker) {
-								$month_marker = $month_label;
-								echo '<h2 class="event-archive__month">' . esc_html($month_label) . '</h2>';
-							}
-							// TODO
-							// TODO fs_render_template('__content-event');
-						}
-						?>
-					</div>
-				<?php else : */ ?>
 
 				<div class="article-list__container">
 					<div class="article-list__items -design-<?= esc_attr(fs_archive_design()) ?>">
@@ -62,7 +62,9 @@ $archive_type = fs_archive_cpt_type();
 				</div>
 
 				<?php
-				fs_render_template('pagination');
+				fs_render_template('pagination', [
+					'pagination_args' => $archive_pagination_args,
+				]);
 				?>
 			<?php } else { ?>
 				<div class="article-list__empty"><?= esc_html(fs_cpt_text('empty')) ?></div>

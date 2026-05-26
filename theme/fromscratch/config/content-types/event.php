@@ -39,6 +39,7 @@ return [
 			'enabled' => true,
 			'slug' => 'events',
 			'design' => 'list',
+			'category_filter' => true,
 			'texts' => [
 				'heading' => 'Events',
 				'empty' => 'No events found.',

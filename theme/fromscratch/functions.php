@@ -53,6 +53,7 @@ require_once 'inc/assets.php';
 require_once 'inc/helpers/images.php';
 require_once 'inc/service-worker.php';
 require_once 'inc/custom-post-types.php';
+require_once 'inc/article-list-filters.php';
 require_once 'inc/events.php';
 require_once 'inc/exclude-from-search.php';
 require_once 'inc/page-editor-options.php';

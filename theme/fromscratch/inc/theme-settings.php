@@ -1082,7 +1082,7 @@ function theme_settings_page(): void
 								<p>
 									<label>
 										<input type="radio" name="show_on_front" id="fs_show_on_front_page" value="page" class="tog" <?= checked($fs_show_on_front, 'page', false) ?>>
-										<?= esc_html(__('A static page (select below)', 'default')) ?>
+										<?= esc_html(__('A static page (select below)', 'fromscratch')) ?>
 									</label>
 								</p>
 								<ul id="fs-homepage-static-fields" style="margin: 0 0 0 24px; list-style: none; padding: 0;">

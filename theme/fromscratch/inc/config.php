@@ -98,7 +98,7 @@ function fs_content_type_enabled(string $slug, ?array $cfg = null): bool
 }
 
 /**
- * Archive section for a content type (`archive.enabled`, `archive.slug`, `archive.design`, `archive.texts`).
+ * Archive section for a content type (`archive.enabled`, `archive.slug`, `archive.design`, `archive.category_filter`, `archive.filter_taxonomy`, `archive.texts`).
  *
  * @return array<string, mixed>
  */

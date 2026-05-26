@@ -21,6 +21,7 @@ return [
 			'enabled' => true,
 			'slug' => 'my-blogs',
 			'design' => 'list',
+			'category_filter' => true,
 			'texts' => [
 				'heading' => 'Blog',
 				'empty' => 'No posts found.',

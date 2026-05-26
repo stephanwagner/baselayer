@@ -37,6 +37,7 @@ return [
 			'enabled' => true,
 			'slug' => 'projects',
 			'design' => 'list',
+			'category_filter' => true,
 			'texts' => [
 				'heading' => 'Projects',
 				'empty' => 'No projects found.',
