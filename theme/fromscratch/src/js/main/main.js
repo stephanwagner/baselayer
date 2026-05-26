@@ -8,6 +8,7 @@ import './service-worker';
 import './menu';
 import './scrolled';
 import './search';
+import './article-list';
 
 // Components
 import '../components/modal';
