@@ -828,16 +828,16 @@ function fs_render_developer_system(): void
 					<th scope="row"><?= esc_html__('Source', 'fromscratch') ?></th>
 					<td>
 						<fieldset>
-							<label>
+							<label style="display: block; margin-bottom: 0 !important;">
 								<input type="radio" name="fromscratch_profile_picture_mode" value="upload" <?= checked($profile_picture_mode, 'upload', false) ?>>
 								<?= esc_html__('Upload image', 'fromscratch') ?>
 							</label>
-							<p class="description fs-indent-checkbox" style="margin: 4px 0 0 24px;"><?= esc_html__('Allows users to upload a custom picture on their profile page.', 'fromscratch') ?></p>
-							<label style="display: block; margin-top: 12px;">
+							<p class="description fs-indent-checkbox"><?= esc_html__('Allows users to upload a custom picture on their profile page.', 'fromscratch') ?></p>
+							<label style="display: block; margin-top: 16px !important; margin-bottom: 0 !important;">
 								<input type="radio" name="fromscratch_profile_picture_mode" value="gravatar" <?= checked($profile_picture_mode, 'gravatar', false) ?>>
 								<?= esc_html__('Gravatar (WordPress default)', 'fromscratch') ?>
 							</label>
-							<p class="description fs-indent-checkbox" style="margin: 4px 0 0 24px;"><?= esc_html__('Uses the account email and Gravatar.com, as in a standard WordPress install.', 'fromscratch') ?></p>
+							<p class="description fs-indent-checkbox"><?= esc_html__('Uses the account email and Gravatar.com, as in a standard WordPress install.', 'fromscratch') ?></p>
 						</fieldset>
 					</td>
 				</tr>
