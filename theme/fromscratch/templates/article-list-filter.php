@@ -5,6 +5,7 @@ defined('ABSPATH') || exit;
 $taxonomy = isset($taxonomy) && is_string($taxonomy) ? $taxonomy : '';
 $selected_term_id = isset($selected_term_id) ? (int) $selected_term_id : 0;
 $form_action = isset($form_action) && is_string($form_action) ? $form_action : '';
+$scroll_anchor = isset($scroll_anchor) && is_string($scroll_anchor) ? sanitize_html_class($scroll_anchor) : '';
 $wrapper_class = isset($wrapper_class) && is_string($wrapper_class) ? $wrapper_class : '';
 
 if ($taxonomy === '' || !taxonomy_exists($taxonomy)) {
@@ -43,6 +44,10 @@ if ($form_action === '' && is_singular()) {
 }
 if ($form_action === '') {
 	$form_action = home_url('/');
+}
+
+if ($scroll_anchor !== '') {
+	$form_action = fs_article_list_url_with_anchor($form_action, $scroll_anchor);
 }
 
 $filter_id = 'fs-article-list-filter-' . sanitize_html_class($taxonomy);

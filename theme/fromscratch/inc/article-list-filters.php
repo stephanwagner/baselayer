@@ -6,6 +6,38 @@ defined('ABSPATH') || exit;
  * Category filter for article-list blocks (ACF) and CPT archives (config).
  */
 
+/** Scroll target id for CPT archive listings (filter + pagination). */
+const FS_ARTICLE_LIST_ARCHIVE_ANCHOR = 'fs-article-list';
+
+/**
+ * HTML id for an ACF article-list block instance.
+ *
+ * @param array<string, mixed> $block ACF block array.
+ */
+function fs_article_list_block_scroll_anchor(array $block): string
+{
+	if (empty($block['id']) || !is_string($block['id'])) {
+		return '';
+	}
+
+	return sanitize_html_class(substr(md5($block['id']), 0, 6));
+}
+
+/**
+ * Append a URL fragment so navigation scrolls to the list block.
+ */
+function fs_article_list_url_with_anchor(string $url, string $anchor_id): string
+{
+	$anchor_id = sanitize_html_class($anchor_id);
+	if ($anchor_id === '' || $url === '') {
+		return $url;
+	}
+
+	$url = (string) strtok($url, '#');
+
+	return $url . '#' . $anchor_id;
+}
+
 /**
  * Whether the CPT archive should show a category filter (`archive.category_filter`).
  */

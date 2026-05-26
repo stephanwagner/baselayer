@@ -73,14 +73,17 @@ $filterPaginationArgs = $taxonomy !== ''
     : [];
 
 $formAction = is_singular() ? (string) get_permalink() : '';
+$scrollAnchor = fs_article_list_block_scroll_anchor($block);
 ?>
 
 <div class="<?= implode(' ', $classNames) ?>">
+    <div class="article-list__scroll-anchor"<?= $scrollAnchor !== '' ? ' id="' . esc_attr($scrollAnchor) . '"' : '' ?>></div>
     <?php if ($hasCategoryFilters && $taxonomy !== '') { ?>
         <?php fs_render_template('article-list-filter', [
             'taxonomy'         => $taxonomy,
             'selected_term_id' => $selectedTermId,
             'form_action'      => $formAction,
+            'scroll_anchor'    => $scrollAnchor,
         ]); ?>
     <?php } ?>
 
@@ -98,10 +101,14 @@ $formAction = is_singular() ? (string) get_permalink() : '';
             </div>
             <?php
             if ($hasLimit && $limitType === 'pagination' && $query->max_num_pages > 1) {
+                $paginationOverrides = $filterPaginationArgs;
+                if ($scrollAnchor !== '') {
+                    $paginationOverrides['scroll_anchor'] = $scrollAnchor;
+                }
                 fs_render_pagination_for_query($query, [
                     'aria_label'       => __('Articles pagination', 'fromscratch'),
                     'nav_class'        => 'article-list__pagination',
-                    'pagination_args'  => $filterPaginationArgs,
+                    'pagination_args'  => $paginationOverrides,
                 ]);
             }
             ?>

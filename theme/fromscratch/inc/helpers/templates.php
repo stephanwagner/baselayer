@@ -121,13 +121,49 @@ function fs_pagination_icon_svg(string $direction): string
  */
 function fs_paginate_links_html(array $args): string
 {
+	$scroll_anchor = '';
+	if (isset($args['scroll_anchor']) && is_string($args['scroll_anchor'])) {
+		$scroll_anchor = sanitize_html_class($args['scroll_anchor']);
+		unset($args['scroll_anchor']);
+	}
+
 	$args['type'] = 'list';
 	$html = paginate_links($args);
 	if (!is_string($html) || $html === '') {
 		return '';
 	}
 
-	return fs_paginate_links_apply_theme_classes($html);
+	$html = fs_paginate_links_apply_theme_classes($html);
+
+	if ($scroll_anchor !== '') {
+		$html = fs_paginate_links_append_scroll_anchor($html, $scroll_anchor);
+	}
+
+	return $html;
+}
+
+/**
+ * Add `#anchor` to each pagination link href.
+ */
+function fs_paginate_links_append_scroll_anchor(string $html, string $anchor_id): string
+{
+	$anchor_id = sanitize_html_class($anchor_id);
+	if ($anchor_id === '' || $html === '') {
+		return $html;
+	}
+
+	$fragment = '#' . $anchor_id;
+
+	return (string) preg_replace_callback(
+		'/href=(["\'])([^"\']+)\1/',
+		static function (array $matches) use ($fragment): string {
+			$quote = $matches[1];
+			$url = (string) strtok($matches[2], '#');
+
+			return 'href=' . $quote . $url . $fragment . $quote;
+		},
+		$html
+	);
 }
 
 /**

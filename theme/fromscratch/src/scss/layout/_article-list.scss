@@ -1,5 +1,9 @@
 @use '../variables' as *;
 
+.article-list__wrapper {
+  scroll-margin-top: var(--fs-header-height-scrolled, #{$header-height-scrolled});
+}
+
 .article-list__title {
   &.-has-category-filter {
     display: flex;
