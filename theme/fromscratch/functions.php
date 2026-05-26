@@ -28,6 +28,7 @@ require_once 'inc/blocks.php';
 
 // Theme settings
 require_once 'inc/user-rights.php';
+require_once 'inc/profile-picture.php';
 require_once 'inc/theme-settings.php';
 require_once 'inc/admin-notice.php';
 require_once 'inc/developer-settings.php';

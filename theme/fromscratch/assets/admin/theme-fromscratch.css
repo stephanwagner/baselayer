@@ -19,6 +19,8 @@ a:active {
   color: var(--wp-admin-theme-color-darker-10);
 }
 
+/* Admin bar */
+
 #adminmenu li.current a.menu-top,
 #adminmenu li.wp-has-current-submenu .wp-submenu .wp-submenu-head,
 #adminmenu li.wp-has-current-submenu a.wp-has-current-submenu,
@@ -103,4 +105,17 @@ a:active {
 #adminmenu .menu-counter,
 #adminmenu .update-plugins {
   background-color: var(--wp-admin-theme-color);
+}
+
+#wp-admin-bar-user-info .avatar {
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+#wpadminbar #wp-admin-bar-my-account.with-avatar > .ab-empty-item img,
+#wpadminbar #wp-admin-bar-my-account.with-avatar > a img {
+  width: 16px;
+  height: 16px;
+  object-fit: cover;
+  border-radius: 3px;
 }

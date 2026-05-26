@@ -68,8 +68,8 @@ function fs_is_last_developer(int $user_id): bool
 /**
  * Show Developer section only when the current user is a developer (so only they can set developer rights).
  */
-add_action('show_user_profile', 'fs_developer_user_profile_section');
-add_action('edit_user_profile', 'fs_developer_user_profile_section');
+add_action('show_user_profile', 'fs_developer_user_profile_section', 12);
+add_action('edit_user_profile', 'fs_developer_user_profile_section', 12);
 
 function fs_developer_user_profile_section(WP_User $user): void
 {
