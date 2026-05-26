@@ -43,9 +43,16 @@
   font-weight: 600;
 }
 
-.number-ticker__prefix,
-.number-ticker__suffix {
+.number-ticker__prefix {
   font-size: 32px;
+  transform: translateY(-3px);
+  margin-right: 4px;
+}
+
+.number-ticker__suffix {
+  font-size: 38px;
+  align-self: center;
+  font-weight: bold;
 }
 
 .number-ticker__label {
