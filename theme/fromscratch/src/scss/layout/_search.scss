@@ -57,8 +57,7 @@
   box-shadow: none;
   appearance: none;
   transition: transition('color', 'background-color', 'border-color');
-  background: #fff;
-  border: 1px solid var(--fs-color-gray-300);
+  background: transparent;
   color: var(--fs-default-text-color);
   border-radius: 50%;
   cursor: pointer;
@@ -72,7 +71,6 @@
   &:hover {
     color: #fff;
     background-color: var(--fs-color-primary);
-    border-color: var(--fs-color-primary);
   }
 
   @media (max-width: $breakpoint-mobile) {
@@ -125,6 +123,7 @@
   background: transparent;
   box-shadow: none;
   appearance: none;
+  text-shadow: 0 0 3px #000;
 
   &:hover {
     color: #fff;
