@@ -34,6 +34,7 @@ return [
 			],
 		],
 		'wp_categories' => false,
+		'wp_tags' => false,
 
 		'archive' => [
 			'enabled' => true,

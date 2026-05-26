@@ -184,7 +184,7 @@ function fs_content_type_uses_wp_categories(array $cfg): bool
 }
 
 /**
- * Attach core `post_tag` taxonomy when true (`wp_tags`).
+ * Attach core `post_tag` taxonomy when true (`wp_tags`). Default false for all content types.
  */
 function fs_content_type_uses_wp_tags(array $cfg): bool
 {

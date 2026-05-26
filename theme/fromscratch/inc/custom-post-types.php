@@ -421,6 +421,7 @@ function fs_cpt_menu_icon($icon): string
  *
  * Supports:
  * - `wp_categories => true` (shared core category taxonomy)
+ * - `wp_tags => true` (shared core post_tag taxonomy; default off when omitted)
  * - `taxonomies => ['category']` (attach existing taxonomy)
  * - `taxonomies => ['project_category' => ['label' => 'Projekt-Kategorien']]` (register custom taxonomy)
  *
