@@ -2,7 +2,7 @@
 
 return [
 	'post' => [
-		'enabled' => false,
+		'enabled' => true,
 
 		'labels' => [
 			'name' => 'Blog',
