@@ -10,7 +10,10 @@ defined('ABSPATH') || exit;
  */
 function fs_theme_post_types(): array
 {
-	$types = ['post', 'page'];
+	$types = ['page'];
+	if (function_exists('fs_content_type_enabled') && fs_content_type_enabled('post')) {
+		$types[] = 'post';
+	}
 	$cpts = fs_config_cpt('all');
 	if (is_array($cpts) && $cpts !== []) {
 		$types = array_merge($types, array_keys($cpts));
@@ -38,19 +41,6 @@ function fs_menus(): void
 	register_nav_menus($translated);
 }
 add_action('init', 'fs_menus', 10);
-
-/**
- * Unregister post_tag for posts when Settings → Developer → Features: Blogs is on and "Disable tags" is on.
- */
-add_action('init', function (): void {
-	if (!function_exists('fs_theme_feature_enabled')) {
-		return;
-	}
-	if (!fs_theme_feature_enabled('blogs') || !fs_theme_feature_enabled('remove_post_tags')) {
-		return;
-	}
-	unregister_taxonomy_for_object_type('post_tag', 'post');
-}, 11);
 
 /**
  * Support alignwide and alignfull for block editor.
@@ -141,17 +131,15 @@ add_filter('intermediate_image_sizes_advanced', function ($sizes) {
 });
 
 /**
- * Remove blogs menu and block direct access to post screens when blogs are disabled.
- *
- * @return void
+ * Remove Posts admin menu when `config/content-types/post.php` has `enabled` => false.
  */
-function fs_remove_blogs(): void
+function fs_disable_builtin_posts_admin(): void
 {
-	add_action('admin_menu', function () {
+	add_action('admin_menu', function (): void {
 		remove_menu_page('edit.php');
 	});
 
-	add_action('admin_init', function () {
+	add_action('admin_init', function (): void {
 		global $pagenow;
 		$blocked = ['edit.php', 'post.php', 'post-new.php'];
 		if (in_array($pagenow, $blocked, true)) {
@@ -161,10 +149,9 @@ function fs_remove_blogs(): void
 	});
 }
 
-// Disable blogs when the feature is turned off in Settings → Theme (default: enabled). Run late so options are available.
-add_action('after_setup_theme', function () {
-	if (function_exists('fs_theme_feature_enabled') && !fs_theme_feature_enabled('blogs')) {
-		fs_remove_blogs();
+add_action('after_setup_theme', function (): void {
+	if (function_exists('fs_content_type_enabled') && !fs_content_type_enabled('post')) {
+		fs_disable_builtin_posts_admin();
 	}
 }, 20);
 

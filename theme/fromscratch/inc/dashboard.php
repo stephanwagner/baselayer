@@ -233,7 +233,7 @@ function fs_dashboard_panel()
 					<?php if ($is_developer) : ?>
 						<li><a href="<?= esc_url(admin_url('options-general.php?page=' . fs_developer_settings_page_slug('developer'))) ?>"><?= esc_html__('Developer settings', 'fromscratch') ?></a></li>
 					<?php endif; ?>
-					<?php if (fs_theme_feature_enabled('blogs') && current_user_can('edit_posts')) : ?>
+					<?php if (function_exists('fs_content_type_enabled') && fs_content_type_enabled('post') && current_user_can('edit_posts')) : ?>
 						<li><a href="<?= esc_url(admin_url('post-new.php?post_type=post')) ?>"><?= esc_html__('Create post', 'fromscratch') ?></a></li>
 					<?php endif; ?>
 					<?php if (current_user_can('edit_pages')) : ?>

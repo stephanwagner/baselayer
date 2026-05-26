@@ -2,6 +2,8 @@
 
 return [
 	'post' => [
+		'enabled' => true,
+
 		'labels' => [
 			'name' => 'Blog',
 			'singular_name' => 'Blog post',
@@ -16,6 +18,7 @@ return [
 			],
 		],
 		'wp_categories' => false,
+		'wp_tags' => false,
 
 		'archive' => [
 			'enabled' => true,

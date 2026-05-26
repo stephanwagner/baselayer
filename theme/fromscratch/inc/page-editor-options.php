@@ -37,6 +37,9 @@ function fs_post_type_has_page_title_toggle(string $post_type): bool
 		return true;
 	}
 	if ($post_type === 'post') {
+		if (!function_exists('fs_content_type_enabled') || !fs_content_type_enabled('post')) {
+			return false;
+		}
 		$post_cfg = fs_config_cpt('post');
 
 		$admin = is_array($post_cfg) ? fs_content_type_admin('post') : [];

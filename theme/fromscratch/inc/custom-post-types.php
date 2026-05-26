@@ -106,7 +106,7 @@ function fs_post_type_has_config_archive(?string $post_type = null): bool
 	if ($post_type !== 'post') {
 		return false;
 	}
-	if (function_exists('fs_theme_feature_enabled') && !fs_theme_feature_enabled('blogs')) {
+	if (!fs_content_type_enabled('post')) {
 		return false;
 	}
 
@@ -143,7 +143,7 @@ function fs_post_register_args_from_config(array $args, string $post_type): arra
 	if ($post_type !== 'post') {
 		return $args;
 	}
-	if (function_exists('fs_theme_feature_enabled') && !fs_theme_feature_enabled('blogs')) {
+	if (!fs_content_type_enabled('post')) {
 		$args['has_archive'] = false;
 
 		return $args;
@@ -290,7 +290,7 @@ function fs_apply_post_type_labels(string $post_type, array $labels): void
  */
 function fs_post_apply_labels_from_config(): void
 {
-	if (function_exists('fs_theme_feature_enabled') && !fs_theme_feature_enabled('blogs')) {
+	if (!fs_content_type_enabled('post')) {
 		return;
 	}
 
@@ -432,7 +432,7 @@ function fs_cpt_taxonomy_map(): array
 	$sources = [];
 
 	$post_cfg = fs_config_cpt('post');
-	if (is_array($post_cfg)) {
+	if (is_array($post_cfg) && fs_content_type_enabled('post', $post_cfg)) {
 		$sources['post'] = $post_cfg;
 	}
 
@@ -622,13 +622,38 @@ add_action('init', 'fs_register_cpt_taxonomies', 11);
  */
 add_action('init', function (): void {
 	$post_cfg = fs_config_cpt('post');
-	if (!is_array($post_cfg)) {
+	if (!is_array($post_cfg) || !fs_content_type_enabled('post', $post_cfg)) {
 		return;
 	}
 	if (!fs_content_type_uses_wp_categories($post_cfg)) {
 		unregister_taxonomy_for_object_type('category', 'post');
 	}
 }, 12);
+
+/**
+ * Apply `wp_tags` from content-type config (built-in posts and CPTs).
+ */
+function fs_content_type_apply_wp_tags(): void
+{
+	foreach (fs_get_content_types() as $slug => $cfg) {
+		if (!is_string($slug) || $slug === '' || !is_array($cfg) || !fs_content_type_enabled($slug, $cfg)) {
+			continue;
+		}
+		if ($slug !== 'post' && !post_type_exists($slug)) {
+			continue;
+		}
+		if (!taxonomy_exists('post_tag')) {
+			continue;
+		}
+		if (fs_content_type_uses_wp_tags($cfg)) {
+			register_taxonomy_for_object_type('post_tag', $slug);
+		} else {
+			unregister_taxonomy_for_object_type('post_tag', $slug);
+		}
+	}
+}
+
+add_action('init', 'fs_content_type_apply_wp_tags', 12);
 
 /**
  * Convert inline SVG markup to data URI accepted by register_post_type menu_icon.

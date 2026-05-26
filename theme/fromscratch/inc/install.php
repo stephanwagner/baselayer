@@ -531,18 +531,6 @@ function fs_render_installer(): void
             </td>
           </tr>
 
-          <tr>
-            <th scope="row"><?= esc_html__('Blog', 'fromscratch') ?></th>
-            <td>
-              <p style="margin-top: 0;">
-                <label>
-                  <input type="checkbox" name="install[blogs]" value="1" <?= !empty($fs_install_val(['install', 'blogs'], true)) ? ' checked' : '' ?>>
-                  <?= esc_html__('Enable blog posts', 'fromscratch') ?>
-                </label>
-              </p>
-              <p class="description"><?= esc_html__('Shows the Posts menu in the admin and allows creating and editing blog posts. You can change this later in Theme settings.', 'fromscratch') ?></p>
-            </td>
-          </tr>
         </table>
 
         <hr>
@@ -792,7 +780,6 @@ function fromscratch_install_redirect_with_errors(array $errors): void
       'htaccess' => !empty($_POST['install']['htaccess']),
       'pages' => !empty($_POST['install']['pages']),
       'menus' => !empty($_POST['install']['menus']),
-      'blogs' => !empty($_POST['install']['blogs']),
     ],
     'developer' => [
       'current_user' => [
@@ -1193,7 +1180,7 @@ Tags:
   }
 
   /**
-   * Features: merge central defaults with existing, then set enable_blogs from install form.
+   * Features: merge central defaults with existing.
    */
   $defaults = function_exists('fs_theme_feature_defaults') ? fs_theme_feature_defaults() : [];
   $features = get_option('fromscratch_features', []);
@@ -1201,7 +1188,6 @@ Tags:
     $features = [];
   }
   $features = array_merge($defaults, $features);
-  $features['enable_blogs'] = !empty($_POST['install']['blogs']) ? 1 : 0;
   update_option('fromscratch_features', $features);
 
   $profile_picture_default = defined('FS_PROFILE_PICTURE_MODE_DEFAULT') ? FS_PROFILE_PICTURE_MODE_DEFAULT : 'upload';

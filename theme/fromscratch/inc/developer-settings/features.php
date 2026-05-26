@@ -107,30 +107,12 @@ function fs_render_developer_features(): void
 			<h2 class="title"><?= esc_html__('Features', 'fromscratch') ?></h2>
 			<p class="description"><?= esc_html__('Enable the features your project needs.', 'fromscratch') ?></p>
 			<p class="description"><?= esc_html__('All features are modular and can be toggled at any time to keep the theme lean and maintainable.', 'fromscratch') ?></p>
-
+			
 			<h3 style="margin-top: 24px;"><?= esc_html__('Content', 'fromscratch') ?></h3>
 
 			<div class="fs-feature-group">
 
 				<?php settings_fields(FS_THEME_OPTION_GROUP_FEATURES); ?>
-				<table class="form-table" role="presentation">
-					<tr>
-						<th scope="row" class="form-table-checkbox-label"><?= esc_html__('Blogs', 'fromscratch') ?></th>
-						<td>
-							<input type="hidden" name="fromscratch_features[enable_blogs]" value="0">
-							<label><input type="checkbox" name="fromscratch_features[enable_blogs]" id="fromscratch_features_enable_blogs" value="1" <?= checked($feat('enable_blogs'), 1, false) ?>> <?= esc_html__('Allow posts', 'fromscratch') ?></label>
-							<p class="description fs-indent-checkbox"><?= esc_html__('Shows the Posts menu in the admin and allows creating and editing blog posts.', 'fromscratch') ?></p>
-							<div class="fs-feature-sub" id="fs-feature-sub-blogs" style="margin-top: 12px; <?= $feat('enable_blogs') !== 1 ? 'display:none;' : '' ?>">
-								<input type="hidden" name="fromscratch_features[enable_remove_post_tags]" value="0">
-								<label><input type="checkbox" name="fromscratch_features[enable_remove_post_tags]" value="1" <?= checked($feat('enable_remove_post_tags'), 1, false) ?>> <?= esc_html__('Disable tags', 'fromscratch') ?></label>
-								<p class="description fs-indent-checkbox" style="margin-top: 4px;"><?= esc_html__('Unregisters the Tags taxonomy for posts.', 'fromscratch') ?></p>
-							</div>
-						</td>
-					</tr>
-				</table>
-
-				<hr>
-
 				<table class="form-table" role="presentation">
 					<tr>
 						<th scope="row" class="form-table-checkbox-label"><?= esc_html__('Duplicate', 'fromscratch') ?></th>
@@ -281,7 +263,6 @@ function fs_render_developer_features(): void
 					}
 					main.addEventListener('change', toggle);
 				}
-				bindToggle('fromscratch_features_enable_blogs', 'fs-feature-sub-blogs');
 				bindToggle('fromscratch_features_enable_webp', 'fs-feature-sub-webp');
 			})();
 		</script>

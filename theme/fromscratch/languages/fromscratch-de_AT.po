@@ -614,12 +614,6 @@ msgstr "Erstellte Seiten in Menüs eintragen"
 msgid "Adds the pages to the configured menu locations."
 msgstr "Fügt die Seiten den konfigurierten Menü-Positionen hinzu."
 
-msgid "Enable blog posts"
-msgstr "Beiträge aktivieren"
-
-msgid "Shows the Posts menu in the admin and allows creating and editing blog posts. You can change this later in Theme settings."
-msgstr "Zeigt das Menü „Beiträge“ im Admin und erlaubt das Anlegen und Bearbeiten von Blog-Beiträgen. Später unter Theme Einstellungen änderbar."
-
 msgid "Administrator email"
 msgstr "Administrator-E-Mail"
 
@@ -888,18 +882,6 @@ msgstr "Aktiviere die Funktionen, die dein Projekt benötigt."
 
 msgid "All features are modular and can be toggled at any time to keep the theme lean and maintainable."
 msgstr "Alle Features sind modular aufgebaut und können jederzeit ein- oder ausgeschaltet werden, um das Theme schlank und übersichtlich zu halten."
-
-msgid "Allow posts"
-msgstr "Beiträge erlauben"
-
-msgid "Shows the Posts menu in the admin and allows creating and editing blog posts."
-msgstr "Zeigt im Admin das Menü „Beiträge“ und erlaubt das Erstellen und Bearbeiten von Blogbeiträgen."
-
-msgid "Disable tags"
-msgstr "Tags deaktivieren"
-
-msgid "Unregisters the Tags taxonomy for posts."
-msgstr "Entfernt die Tags-Taxonomie für Beiträge."
 
 msgid "Duplicate"
 msgstr "Duplizieren"

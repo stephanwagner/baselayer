@@ -11,8 +11,6 @@ defined('ABSPATH') || exit;
 function fs_theme_feature_defaults(): array
 {
 	return [
-		'enable_blogs'              => 1,
-		'enable_remove_post_tags'   => 1,
 		'enable_svg'                => 1,
 		'enable_duplicate_post'     => 1,
 		'enable_seo'                => 1,
@@ -33,7 +31,7 @@ function fs_theme_feature_defaults(): array
  */
 function fs_theme_feature_default_off_when_missing(): array
 {
-	return ['enable_remove_post_tags', 'enable_languages', 'enable_webp', 'enable_webp_convert_original', 'enable_matomo'];
+	return ['enable_languages', 'enable_webp', 'enable_webp_convert_original', 'enable_matomo'];
 }
 
 /**
@@ -44,8 +42,6 @@ function fs_theme_feature_default_off_when_missing(): array
 function fs_theme_feature_option_keys_map(): array
 {
 	return [
-		'blogs'                   => 'enable_blogs',
-		'remove_post_tags'        => 'enable_remove_post_tags',
 		'svg'                     => 'enable_svg',
 		'duplicate_post'          => 'enable_duplicate_post',
 		'seo'                     => 'enable_seo',

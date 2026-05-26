@@ -84,9 +84,6 @@ function fs_get_content_types(): array
  */
 function fs_content_type_enabled(string $slug, ?array $cfg = null): bool
 {
-	if ($slug === 'post') {
-		return true;
-	}
 	if ($cfg === null) {
 		$cfg = fs_config_cpt($slug);
 	}
@@ -184,6 +181,18 @@ function fs_content_type_uses_wp_categories(array $cfg): bool
 	}
 
 	return !empty($cfg['has_categories']);
+}
+
+/**
+ * Attach core `post_tag` taxonomy when true (`wp_tags`).
+ */
+function fs_content_type_uses_wp_tags(array $cfg): bool
+{
+	if (array_key_exists('wp_tags', $cfg)) {
+		return (bool) $cfg['wp_tags'];
+	}
+
+	return !empty($cfg['has_tags']);
 }
 
 /**

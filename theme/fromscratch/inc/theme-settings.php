@@ -914,9 +914,6 @@ function fs_sanitize_features($value): array
 	foreach (array_keys($defaults) as $key) {
 		$out[$key] = (!empty($value[$key])) ? 1 : 0;
 	}
-	if (empty($out['enable_blogs'])) {
-		$out['enable_remove_post_tags'] = 0;
-	}
 	if (empty($out['enable_webp'])) {
 		$out['enable_webp_convert_original'] = 0;
 	}
