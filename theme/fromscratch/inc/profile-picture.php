@@ -154,7 +154,7 @@ function fs_profile_picture_profile_section(WP_User $user): void
 		<tr>
 			<th scope="row"><?= esc_html__('Current picture', 'fromscratch') ?></th>
 			<td>
-				<img src="<?= esc_attr($url !== '' ? $url : fs_profile_picture_placeholder_url()) ?>" alt="" width="96" height="96" class="avatar avatar-96 photo" style="border-radius:50%;object-fit:cover;display:block;" decoding="async">
+				<img src="<?= esc_attr($url !== '' ? $url : fs_profile_picture_placeholder_url()) ?>" alt="" width="96" height="96" class="avatar avatar-96 photo" style="border-radius:8px;object-fit:cover;display:block;border:1px solid #ddd;" decoding="async">
 				<?php if ($url === '') { ?>
 					<p class="description" style="margin:8px 0 0;"><?= esc_html__('No picture uploaded yet.', 'fromscratch') ?></p>
 				<?php } ?>

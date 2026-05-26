@@ -1425,6 +1425,63 @@ msgstr "Suchmaschinen davon abhalten, diese Webseite zu indexieren"
 msgid "It is up to search engines whether they follow this request."
 msgstr "Es liegt bei den Suchmaschinen, ob sie dieser Bitte folgen."
 
+msgid "Profile picture"
+msgstr "Profilbild"
+
+msgid "Source"
+msgstr "Quelle"
+
+msgid "Upload image"
+msgstr "Bild hochladen"
+
+msgid "Allows users to upload a custom picture on their profile page."
+msgstr "Ermöglicht Nutzern, ein eigenes Bild auf der Profilseite hochzuladen."
+
+msgid "Gravatar (WordPress default)"
+msgstr "Gravatar (WordPress-Standard)"
+
+msgid "Uses the account email and Gravatar.com, as in a standard WordPress install."
+msgstr "Nutzt die Account-E-Mail und Gravatar.com wie in einer Standard-WordPress-Installation."
+
+msgid "You can change your profile picture on <a href=\"%s\">Gravatar</a>."
+msgstr "Du kannst dein Profilbild auf <a href=\"%s\">Gravatar</a> ändern."
+
+msgid "https://gravatar.com/"
+msgstr "https://gravatar.com/"
+
+msgid "Current picture"
+msgstr "Aktuelles Bild"
+
+msgid "No picture uploaded yet."
+msgstr "Noch kein Bild hochgeladen."
+
+msgid "Upload new"
+msgstr "Neues Bild hochladen"
+
+msgid "Choose a file, then click “Update Profile” at the bottom of this page."
+msgstr "Wähle eine Datei und klicke dann unten auf dieser Seite auf „Profil aktualisieren“."
+
+msgid "Remove picture"
+msgstr "Bild entfernen"
+
+msgid "Upload failed."
+msgstr "Upload fehlgeschlagen."
+
+msgid "Could not save the image."
+msgstr "Das Bild konnte nicht gespeichert werden."
+
+msgid "You can upload a custom picture in the Profile picture section below. Gravatar is disabled for this site."
+msgstr "Du kannst unten im Abschnitt „Profilbild“ ein eigenes Bild hochladen. Gravatar ist auf dieser Website deaktiviert."
+
+msgid "This user’s profile picture is loaded from Gravatar using their account email."
+msgstr "Das Profilbild dieses Nutzers wird über Gravatar mit der Account-E-Mail geladen."
+
+msgid "Profile picture saved."
+msgstr "Profilbild gespeichert."
+
+msgid "Profile picture removed."
+msgstr "Profilbild entfernt."
+
 msgid "Asset Cache"
 msgstr "Asset Cache"
 
