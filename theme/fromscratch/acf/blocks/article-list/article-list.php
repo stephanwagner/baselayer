@@ -18,40 +18,40 @@ $classNames[] = '-block';
 // Add margin class
 $classNames[] = '-content-margin-m';
 
-// Fields
-$postType = get_field('post-type');
-$postTaxonomy = get_field('post-taxonomy');
-$hasCategoryFilters = (bool) get_field('has-category-filters');
-$hasLimit = get_field('has-limit');
-$limitType = get_field('limit-type');
-$limit = get_field('limit');
-$sortBy = get_field('sort-by');
-$sortDirection = get_field('sort-direction');
-$design = get_field('design');
+// Fields (block JSON data fallback — get_field alone can miss saved block attrs)
+$postType = fs_acf_block_field($block, 'post-type');
+$postTaxonomy = fs_acf_block_field($block, 'post-taxonomy');
+$hasCategoryFilters = (bool) fs_acf_block_field($block, 'has-category-filters');
+$queryLimit = fs_article_list_block_query_limit($block);
+$usesPagination = $queryLimit['uses_pagination'];
+$sortBy = fs_acf_block_field($block, 'sort-by');
+$sortDirection = fs_acf_block_field($block, 'sort-direction');
+$design = fs_acf_block_field($block, 'design');
 
 if (!is_string($postType) || $postType === '') {
     return;
 }
 
-$taxonomy = '';
-$selectedTermId = 0;
-if ($hasCategoryFilters) {
-    $taxonomy = fs_cpt_filter_taxonomy($postType);
-    if ($taxonomy !== '') {
-        $editorDefaultTermId = is_numeric($postTaxonomy) ? (int) $postTaxonomy : 0;
-        $selectedTermId = fs_article_list_selected_term_id($taxonomy, $editorDefaultTermId, 'block');
-    } else {
-        $hasCategoryFilters = false;
-    }
+$postTaxonomyTerm = fs_article_list_post_taxonomy_term($postType, $postTaxonomy);
+$taxonomy = fs_cpt_filter_taxonomy($postType);
+if ($postTaxonomyTerm !== null) {
+    $taxonomy = $postTaxonomyTerm['taxonomy'];
+}
+$editorDefaultTermId = $postTaxonomyTerm['term_id'] ?? 0;
+$selectedTermId = $taxonomy !== ''
+    ? fs_article_list_selected_term_id($taxonomy, $editorDefaultTermId, 'block')
+    : 0;
+
+if ($hasCategoryFilters && $taxonomy === '') {
+    $hasCategoryFilters = false;
 }
 
+$formAction = fs_article_list_block_form_action();
+$scrollAnchor = fs_article_list_block_scroll_anchor($block);
+
 // Posts per page
-$postsPerPage = -1;
-$paged = 1;
-if ($hasLimit && $limitType === 'pagination') {
-    $postsPerPage = (int) $limit;
-    $paged = max(1, (int) get_query_var('paged'), (int) get_query_var('page'));
-}
+$postsPerPage = $queryLimit['posts_per_page'];
+$paged = $queryLimit['paged'];
 
 $queryArgs = [
     'post_type'      => $postType,
@@ -69,12 +69,16 @@ if ($taxQuery !== []) {
 $query = new WP_Query($queryArgs);
 $posts = $query->posts;
 
-$filterPaginationArgs = $taxonomy !== ''
-    ? ['add_args' => fs_article_list_active_filter_query_args($taxonomy, $selectedTermId, 'block')]
-    : [];
-
-$formAction = fs_article_list_block_form_action();
-$scrollAnchor = fs_article_list_block_scroll_anchor($block);
+$paginationArgs = [];
+if ($usesPagination && $query->max_num_pages > 1) {
+    $paginationArgs = [
+        'pagination_base_url' => $formAction,
+        'add_args'            => fs_article_list_active_filter_query_args($taxonomy, $selectedTermId, 'block'),
+    ];
+    if ($scrollAnchor !== '') {
+        $paginationArgs['scroll_anchor'] = $scrollAnchor;
+    }
+}
 ?>
 
 <div class="<?= implode(' ', $classNames) ?>">
@@ -101,21 +105,16 @@ $scrollAnchor = fs_article_list_block_scroll_anchor($block);
                 wp_reset_postdata();
                 ?>
             </div>
-            <?php
-            if ($hasLimit && $limitType === 'pagination' && $query->max_num_pages > 1) {
-                $paginationOverrides = $filterPaginationArgs;
-                if ($scrollAnchor !== '') {
-                    $paginationOverrides['scroll_anchor'] = $scrollAnchor;
-                }
-                fs_render_pagination_for_query($query, [
-                    'aria_label'       => __('Articles pagination', 'fromscratch'),
-                    'nav_class'        => 'article-list__pagination',
-                    'pagination_args'  => $paginationOverrides,
-                ]);
-            }
-            ?>
         </div>
     <?php } else { ?>
         <div class="article-list__empty"><?= esc_html__('No posts found.', 'fromscratch') ?></div>
+    <?php } ?>
+
+    <?php if ($paginationArgs !== []) { ?>
+        <?php fs_render_pagination_for_query($query, [
+            'aria_label'      => __('Articles pagination', 'fromscratch'),
+            'nav_class'       => 'article-list__pagination',
+            'pagination_args' => $paginationArgs,
+        ]); ?>
     <?php } ?>
 </div>

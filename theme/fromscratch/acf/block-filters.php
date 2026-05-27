@@ -49,13 +49,11 @@ add_filter('acf/prepare_field/name=post-taxonomy', function ($field) {
         return $field;
     }
 
-    $cpt = fs_config_cpt($fs_selected_article_list_post_type);
+    $taxonomy = fs_cpt_filter_taxonomy($fs_selected_article_list_post_type);
 
-    if (!$cpt || empty($cpt['taxonomies'])) {
+    if ($taxonomy === '') {
         return $field;
     }
-
-    $taxonomy = array_key_first($cpt['taxonomies']);
 
     $terms = get_terms([
         'taxonomy'   => $taxonomy,

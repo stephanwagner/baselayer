@@ -55,13 +55,32 @@ function fs_paginate_links_args_for_wp_query(\WP_Query $query, array $overrides 
 		$current = $total;
 	}
 
-	$big = 999999999;
-	$base = str_replace((string) $big, '%#%', esc_url(get_pagenum_link($big, false)));
+	$pagination_base_url = '';
+	if (isset($overrides['pagination_base_url']) && is_string($overrides['pagination_base_url'])) {
+		$pagination_base_url = $overrides['pagination_base_url'];
+		unset($overrides['pagination_base_url']);
+	}
+
+	if ($pagination_base_url !== '') {
+		$pagination_base_url = trailingslashit((string) strtok($pagination_base_url, '#?'));
+		global $wp_rewrite;
+		if ($wp_rewrite instanceof \WP_Rewrite && $wp_rewrite->using_permalinks()) {
+			$base = user_trailingslashit($pagination_base_url . '%_%', 'pagination');
+			$format = user_trailingslashit($wp_rewrite->pagination_base . '/%#%', 'pagination');
+		} else {
+			$base = $pagination_base_url . '%_%';
+			$format = '?page=%#%';
+		}
+	} else {
+		$big = 999999999;
+		$base = str_replace((string) $big, '%#%', esc_url(get_pagenum_link($big, false)));
+		$format = '';
+	}
 
 	return array_merge(
 		[
 			'base'      => $base,
-			'format'    => '',
+			'format'    => $format,
 			'total'     => $total,
 			'current'   => $current,
 			'mid_size'  => 1,

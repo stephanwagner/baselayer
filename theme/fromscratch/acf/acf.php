@@ -42,6 +42,106 @@ function fs_acf_block_render_callback($block)
 	}
 }
 
+/**
+ * Read an ACF block field on the front end (get_field + block JSON data).
+ *
+ * @param array<string, mixed> $block ACF block array from the render callback.
+ * @return mixed|null Field value, or null when unset.
+ */
+function fs_acf_block_field(array $block, string $field_name)
+{
+	if ($field_name === '') {
+		return null;
+	}
+
+	$value = get_field($field_name);
+	if ($value !== null && $value !== false && $value !== '') {
+		return $value;
+	}
+
+	if (empty($block['data']) || !is_array($block['data'])) {
+		return null;
+	}
+
+	$data = $block['data'];
+	$underscore = str_replace('-', '_', $field_name);
+
+	$ref_keys = ['_' . $field_name];
+	if ($underscore !== $field_name) {
+		$ref_keys[] = '_' . $underscore;
+	}
+
+	foreach ($ref_keys as $ref_key) {
+		if (!array_key_exists($ref_key, $data) || !is_string($data[$ref_key]) || $data[$ref_key] === '') {
+			continue;
+		}
+
+		$field_key = $data[$ref_key];
+		if (!array_key_exists($field_key, $data)) {
+			continue;
+		}
+
+		$raw = $data[$field_key];
+		if ($raw !== null && $raw !== false && $raw !== '') {
+			return $raw;
+		}
+	}
+
+	if (array_key_exists($field_name, $data)) {
+		$raw = $data[$field_name];
+		if ($raw !== null && $raw !== false && $raw !== '') {
+			return $raw;
+		}
+	}
+
+	if ($underscore !== $field_name && array_key_exists($underscore, $data)) {
+		$raw = $data[$underscore];
+		if ($raw !== null && $raw !== false && $raw !== '') {
+			return $raw;
+		}
+	}
+
+	if (function_exists('acf_get_field')) {
+		foreach (array_unique([$field_name, $underscore]) as $name) {
+			$acf_field = acf_get_field($name);
+			if (!is_array($acf_field) || empty($acf_field['key']) || !is_string($acf_field['key'])) {
+				continue;
+			}
+
+			if (!array_key_exists($acf_field['key'], $data)) {
+				continue;
+			}
+
+			$raw = $data[$acf_field['key']];
+			if ($raw !== null && $raw !== false && $raw !== '') {
+				return $raw;
+			}
+		}
+	}
+
+	return null;
+}
+
+/**
+ * Normalized ACF select/radio value (supports array return format).
+ */
+function fs_acf_block_field_choice_value($value): string
+{
+	if (is_array($value)) {
+		if (isset($value['value']) && is_scalar($value['value'])) {
+			return sanitize_key((string) $value['value']);
+		}
+
+		return '';
+	}
+
+	if (!is_scalar($value)) {
+		return '';
+	}
+
+	return sanitize_key((string) $value);
+}
+
 // Customize WYSIWYG Toolbar
 // https://www.advancedcustomfields.com/resources/customize-the-wysiwyg-toolbars
 function fs_acf_toolbars($toolbars)

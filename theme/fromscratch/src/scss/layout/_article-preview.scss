@@ -83,6 +83,10 @@
 .article-preview__title {
   position: relative;
   margin: 0 0 6px;
+
+  .article-list__items.-design-grid & {
+    @include line-clamp(3);
+  }
 }
 
 .article-preview__date {
@@ -105,14 +109,9 @@
 .article-preview__excerpt > p {
   text-wrap: pretty;
   font-weight: 400;
-  display: -webkit-box;
-  line-clamp: 3;
-	-webkit-line-clamp: 3;
-	-webkit-box-orient: vertical;
-	overflow: hidden;
+  @include line-clamp(3);
 
   @media (max-width: $breakpoint-s) {
-    line-clamp: 4;
-    -webkit-line-clamp: 4;
+    @include line-clamp(4);
   }
 }

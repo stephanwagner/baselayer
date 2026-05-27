@@ -187,15 +187,127 @@ function fs_article_list_filter_term_id_from_request(string $taxonomy, string $c
 }
 
 /**
- * Selected term: request wins, then optional editor default (block field).
+ * Posts-per-page + pagination state from block limit fields (matches original block logic).
+ *
+ * @param array<string, mixed> $block
+ * @return array{posts_per_page: int, paged: int, uses_pagination: bool}
+ */
+function fs_article_list_block_query_limit(array $block): array
+{
+	$has_limit = fs_acf_block_field($block, 'has-limit');
+	$limit_type = fs_acf_block_field_choice_value(fs_acf_block_field($block, 'limit-type'));
+	$limit = fs_acf_block_field($block, 'limit');
+
+	$posts_per_page = -1;
+	$paged = 1;
+	$uses_pagination = false;
+
+	// Backward compatible: if `has-limit` is true and `limit` is set but `limit-type`
+	// is missing (older field group), treat it as pagination.
+	$has_limit_bool = filter_var($has_limit, FILTER_VALIDATE_BOOLEAN) || $has_limit === '1' || $has_limit === 1;
+	if (!$has_limit_bool) {
+		return [
+			'posts_per_page'  => $posts_per_page,
+			'paged'           => $paged,
+			'uses_pagination' => $uses_pagination,
+		];
+	}
+
+	if ($limit_type === '') {
+		$limit_type = 'pagination';
+	}
+
+	if ($limit_type !== 'pagination') {
+		return [
+			'posts_per_page'  => $posts_per_page,
+			'paged'           => $paged,
+			'uses_pagination' => $uses_pagination,
+		];
+	}
+
+	$posts_per_page = is_numeric($limit) ? (int) $limit : 0;
+	$uses_pagination = true;
+	$paged = max(1, (int) get_query_var('paged'), (int) get_query_var('page'));
+
+	return [
+		'posts_per_page'  => $posts_per_page,
+		'paged'           => $paged,
+		'uses_pagination' => $uses_pagination,
+	];
+}
+
+/**
+ * Resolve the block editor `post-taxonomy` field to a term (manually populated select).
+ *
+ * @return array{term_id: int, taxonomy: string}|null
+ */
+function fs_article_list_post_taxonomy_term(string $post_type, $field_value): ?array
+{
+	if ($post_type === '' || $field_value === null || $field_value === '' || $field_value === false) {
+		return null;
+	}
+
+	$term = null;
+	$filter_taxonomy = fs_cpt_filter_taxonomy($post_type);
+
+	if ($field_value instanceof \WP_Term) {
+		$term = $field_value;
+	} elseif (is_array($field_value)) {
+		if (!empty($field_value['term_id'])) {
+			$tax = isset($field_value['taxonomy']) && is_string($field_value['taxonomy'])
+				? $field_value['taxonomy']
+				: $filter_taxonomy;
+			$term = $tax !== '' ? get_term((int) $field_value['term_id'], $tax) : get_term((int) $field_value['term_id']);
+		}
+	} elseif (is_numeric($field_value)) {
+		$term_id = (int) $field_value;
+		if ($term_id > 0) {
+			if ($filter_taxonomy !== '') {
+				$term = get_term($term_id, $filter_taxonomy);
+			}
+			if (!$term instanceof \WP_Term || is_wp_error($term)) {
+				$term = get_term($term_id);
+			}
+		}
+	} elseif (is_string($field_value) && $field_value !== '') {
+		if ($filter_taxonomy !== '') {
+			$term = get_term_by('slug', $field_value, $filter_taxonomy);
+			if (!$term) {
+				$term = get_term_by('name', $field_value, $filter_taxonomy);
+			}
+		}
+		if ((!$term instanceof \WP_Term || is_wp_error($term)) && ctype_digit($field_value)) {
+			$term = get_term((int) $field_value);
+		}
+	}
+
+	if (!$term instanceof \WP_Term || is_wp_error($term)) {
+		return null;
+	}
+
+	if (!is_object_in_taxonomy($post_type, $term->taxonomy)) {
+		return null;
+	}
+
+	return [
+		'term_id'  => (int) $term->term_id,
+		'taxonomy' => $term->taxonomy,
+	];
+}
+
+/**
+ * Selected term: URL filter wins (including explicit “all”), else block field default.
  *
  * @param 'block'|'archive' $context
  */
 function fs_article_list_selected_term_id(string $taxonomy, int $editor_default_term_id = 0, string $context = 'archive'): int
 {
-	$from_request = fs_article_list_filter_term_id_from_request($taxonomy, $context);
-	if ($from_request > 0) {
-		return $from_request;
+	$query_var = fs_article_list_filter_query_var($taxonomy, $context);
+	if ($query_var !== '') {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- public filter URLs.
+		if (array_key_exists($query_var, $_GET)) {
+			return fs_article_list_filter_term_id_from_request($taxonomy, $context);
+		}
 	}
 
 	if ($editor_default_term_id > 0) {

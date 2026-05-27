@@ -39,7 +39,7 @@ return [
 		'archive' => [
 			'enabled' => true,
 			'slug' => 'events',
-			'design' => 'list',
+			'design' => 'grid',
 			'category_filter' => true,
 			'texts' => [
 				'heading' => 'Events',

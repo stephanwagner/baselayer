@@ -16,6 +16,8 @@ return [
 				'singular_label' => 'Category',
 				'url' => 'blog-category',
 			],
+			// Add more taxonomies here
+			// The first one will be used as the default filter
 		],
 		'wp_categories' => false,
 		'wp_tags' => false,
