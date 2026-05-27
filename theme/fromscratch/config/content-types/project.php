@@ -48,7 +48,11 @@ return [
 		],
 
 		'query' => [
-			'orderby' => 'date',
+			 // Adds option to sort projects by menu order in the admin list view
+			'menu_order' => true,
+
+			// Sorts projects by menu order
+			'orderby' => 'menu_order',
 			'order' => 'DESC',
 		],
 
