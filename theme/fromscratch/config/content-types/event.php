@@ -32,6 +32,8 @@ return [
 				'singular_label' => 'Category',
 				'url' => 'event-category',
 			],
+			// Add more taxonomies here
+			// The first one will be used as the default filter
 		],
 		'wp_categories' => false,
 		'wp_tags' => false,
@@ -39,7 +41,7 @@ return [
 		'archive' => [
 			'enabled' => true,
 			'slug' => 'events',
-			'design' => 'grid',
+			'design' => 'list', // list | grid
 			'category_filter' => true,
 			'texts' => [
 				'heading' => 'Events',

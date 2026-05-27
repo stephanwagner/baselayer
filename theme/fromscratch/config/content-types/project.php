@@ -30,6 +30,8 @@ return [
 				'singular_label' => 'Category',
 				'url' => 'project-category',
 			],
+			// Add more taxonomies here
+			// The first one will be used as the default filter
 		],
 		'wp_categories' => false,
 		'wp_tags' => false,
@@ -37,7 +39,7 @@ return [
 		'archive' => [
 			'enabled' => true,
 			'slug' => 'projects',
-			'design' => 'list',
+			'design' => 'list', // list | grid
 			'category_filter' => true,
 			'texts' => [
 				'heading' => 'Projects',

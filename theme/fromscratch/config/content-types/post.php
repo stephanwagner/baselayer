@@ -25,7 +25,7 @@ return [
 		'archive' => [
 			'enabled' => true,
 			'slug' => 'my-blogs',
-			'design' => 'list',
+			'design' => 'list', // list | grid
 			'category_filter' => true,
 			'texts' => [
 				'heading' => 'Blog',
