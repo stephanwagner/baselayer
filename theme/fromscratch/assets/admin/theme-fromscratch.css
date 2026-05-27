@@ -106,16 +106,3 @@ a:active {
 #adminmenu .update-plugins {
   background-color: var(--wp-admin-theme-color);
 }
-
-#wp-admin-bar-user-info .avatar {
-  border-radius: 6px;
-  object-fit: cover;
-}
-
-#wpadminbar #wp-admin-bar-my-account.with-avatar > .ab-empty-item img,
-#wpadminbar #wp-admin-bar-my-account.with-avatar > a img {
-  width: 16px;
-  height: 16px;
-  object-fit: cover;
-  border-radius: 3px;
-}
