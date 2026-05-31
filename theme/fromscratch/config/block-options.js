@@ -175,7 +175,14 @@ export const blockOptions = [
     name: 'core/image',
     options: [
       getContentMarginOptions(),
-      getContentMarginAdjustOptions()
+      getContentMarginAdjustOptions(),
+      {
+        type: 'boolean',
+        label: 'Ohne Bildtext',
+        default: false,
+        attributeName: 'noImageLabel',
+        className: '-no-image-caption'
+      }
     ]
   },
 

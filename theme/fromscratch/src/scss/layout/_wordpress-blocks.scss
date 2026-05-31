@@ -3,14 +3,12 @@
 
 // Content margin mixin
 
-@mixin content-margin(
-  $top: null,
+@mixin content-margin($top: null,
   $bottom: null,
-  $responsive: ()
-) {
+  $responsive: ()) {
 
   // Base
-  @if $top != null {
+  @if $top !=null {
     margin-top: $top;
 
     &:first-child {
@@ -18,7 +16,7 @@
     }
   }
 
-  @if $bottom != null {
+  @if $bottom !=null {
     margin-bottom: $bottom;
 
     &:last-child {
@@ -268,6 +266,35 @@
           border-radius: 0;
         }
       }
+
+      .wp-element-caption {
+        margin: 4px 0 0;
+        font-size: var(--fs-font-size-s);
+        line-height: var(--fs-line-height-s);
+        color: var(--fs-color-gray-600);
+      }
+
+      &.-no-image-caption {
+        .wp-element-caption {
+          display: none;
+        }
+      }
+    }
+  }
+
+  // Gallery
+
+  .wp-block-gallery {
+    figure.wp-block-image {
+
+      figcaption.wp-element-caption {
+        padding: 16px 12px 8px;
+      }
+
+      figcaption.wp-element-caption,
+      &:has(figcaption)::before {
+        border-radius: 0 0 var(--fs-border-radius) var(--fs-border-radius);
+      }
     }
   }
 
@@ -292,237 +319,150 @@
   // Content margin top and bottom
 
   .-content-margin-none {
-    @include content-margin(
-      0,
-      0
-    );
+    @include content-margin(0,
+      0);
   }
 
   .-content-margin-xs {
-    @include content-margin(
-      var(--fs-content-margin-xs),
-      var(--fs-content-margin-xs)
-    );
+    @include content-margin(var(--fs-content-margin-xs),
+      var(--fs-content-margin-xs));
   }
 
   .-content-margin-s {
-    @include content-margin(
+    @include content-margin(var(--fs-content-margin-s),
       var(--fs-content-margin-s),
-      var(--fs-content-margin-s),
-      (
-        $breakpoint-xs: (
-          top: var(--fs-content-margin-xs),
-          bottom: var(--fs-content-margin-xs)
-        ),
-      )
-    );
+      ($breakpoint-xs: (top: var(--fs-content-margin-xs),
+          bottom: var(--fs-content-margin-xs)),
+      ));
   }
 
   .-content-margin-m {
-    @include content-margin(
+    @include content-margin(var(--fs-content-margin-m),
       var(--fs-content-margin-m),
-      var(--fs-content-margin-m),
-      (
-        $breakpoint-s: (
-          top: var(--fs-content-margin-s),
+      ($breakpoint-s: (top: var(--fs-content-margin-s),
           bottom: var(--fs-content-margin-s),
         ),
-        $breakpoint-xs: (
-          top: var(--fs-content-margin-xs),
-          bottom: var(--fs-content-margin-xs)
-        )
-      )
-    );
+        $breakpoint-xs: (top: var(--fs-content-margin-xs),
+          bottom: var(--fs-content-margin-xs))));
   }
 
   .-content-margin-l {
-    @include content-margin(
+    @include content-margin(var(--fs-content-margin-l),
       var(--fs-content-margin-l),
-      var(--fs-content-margin-l),
-      (
-        $breakpoint-m: (
-          top: var(--fs-content-margin-m),
+      ($breakpoint-m: (top: var(--fs-content-margin-m),
           bottom: var(--fs-content-margin-m),
         ),
-        $breakpoint-s: (
-          top: var(--fs-content-margin-s),
+        $breakpoint-s: (top: var(--fs-content-margin-s),
           bottom: var(--fs-content-margin-s),
-        )
-      )
-    );
+        )));
   }
 
   .-content-margin-xl {
-    @include content-margin(
+    @include content-margin(var(--fs-content-margin-xl),
       var(--fs-content-margin-xl),
-      var(--fs-content-margin-xl),
-      (
-        $breakpoint-l: (
-          top: var(--fs-content-margin-l),
+      ($breakpoint-l: (top: var(--fs-content-margin-l),
           bottom: var(--fs-content-margin-l),
         ),
-        $breakpoint-m: (
-          top: var(--fs-content-margin-m),
+        $breakpoint-m: (top: var(--fs-content-margin-m),
           bottom: var(--fs-content-margin-m),
         ),
-        $breakpoint-s: (
-          top: var(--fs-content-margin-s),
+        $breakpoint-s: (top: var(--fs-content-margin-s),
           bottom: var(--fs-content-margin-s),
-        )
-      )
-    );
+        )));
   }
 
   // Content margin top
-  
+
   .-content-margin-top-none {
-    @include content-margin(
-      0,
-      null
-    );
+    @include content-margin(0,
+      null);
   }
-  
+
   .-content-margin-top-xs {
-    @include content-margin(
-      var(--fs-content-margin-xs),
-      null
-    );
+    @include content-margin(var(--fs-content-margin-xs),
+      null);
   }
-  
+
   .-content-margin-top-s {
-    @include content-margin(
-      var(--fs-content-margin-s),
+    @include content-margin(var(--fs-content-margin-s),
       null,
-      (
-        $breakpoint-xs: (
-          top: var(--fs-content-margin-xs),
-        )
-      )
-    );
+      ($breakpoint-xs: (top: var(--fs-content-margin-xs),
+        )));
   }
-  
+
   .-content-margin-top-m {
-    @include content-margin(
-      var(--fs-content-margin-m),
+    @include content-margin(var(--fs-content-margin-m),
       null,
-      (
-        $breakpoint-s: (
-          top: var(--fs-content-margin-s),
+      ($breakpoint-s: (top: var(--fs-content-margin-s),
         ),
-        $breakpoint-xs: (
-          top: var(--fs-content-margin-xs),
-        )
-      )
-    );
+        $breakpoint-xs: (top: var(--fs-content-margin-xs),
+        )));
   }
-  
+
   .-content-margin-top-l {
-    @include content-margin(
-      var(--fs-content-margin-l),
+    @include content-margin(var(--fs-content-margin-l),
       null,
-      (
-        $breakpoint-m: (
-          top: var(--fs-content-margin-m),
+      ($breakpoint-m: (top: var(--fs-content-margin-m),
         ),
-        $breakpoint-s: (
-          top: var(--fs-content-margin-s),
-        )
-      )
-    );
+        $breakpoint-s: (top: var(--fs-content-margin-s),
+        )));
   }
-  
+
   .-content-margin-top-xl {
-    @include content-margin(
-      var(--fs-content-margin-xl),
+    @include content-margin(var(--fs-content-margin-xl),
       null,
-      (
-        $breakpoint-l: (
-          top: var(--fs-content-margin-l),
+      ($breakpoint-l: (top: var(--fs-content-margin-l),
         ),
-        $breakpoint-m: (
-          top: var(--fs-content-margin-m),
+        $breakpoint-m: (top: var(--fs-content-margin-m),
         ),
-        $breakpoint-s: (
-          top: var(--fs-content-margin-s),
-        )
-      )
-    );
+        $breakpoint-s: (top: var(--fs-content-margin-s),
+        )));
   }
 
   // Content margin bottom
-  
+
   .-content-margin-bottom-none {
-    @include content-margin(
-      null,
-      0
-    );
+    @include content-margin(null,
+      0);
   }
-  
+
   .-content-margin-bottom-xs {
-    @include content-margin(
-      null,
-      var(--fs-content-margin-xs)
-    );
+    @include content-margin(null,
+      var(--fs-content-margin-xs));
   }
-  
+
   .-content-margin-bottom-s {
-    @include content-margin(
-      null,
+    @include content-margin(null,
       var(--fs-content-margin-s),
-      (
-        $breakpoint-xs: (
-          bottom: var(--fs-content-margin-xs)
-        )
-      )
-    );
+      ($breakpoint-xs: (bottom: var(--fs-content-margin-xs))));
   }
-  
+
   .-content-margin-bottom-m {
-    @include content-margin(
-      null,
+    @include content-margin(null,
       var(--fs-content-margin-m),
-      (
-        $breakpoint-s: (
-          bottom: var(--fs-content-margin-s),
+      ($breakpoint-s: (bottom: var(--fs-content-margin-s),
         ),
-        $breakpoint-xs: (
-          bottom: var(--fs-content-margin-xs)
-        )
-      )
-    );
+        $breakpoint-xs: (bottom: var(--fs-content-margin-xs))));
   }
-  
+
   .-content-margin-bottom-l {
-    @include content-margin(
-      null,
+    @include content-margin(null,
       var(--fs-content-margin-l),
-      (
-        $breakpoint-m: (
-          bottom: var(--fs-content-margin-m),
+      ($breakpoint-m: (bottom: var(--fs-content-margin-m),
         ),
-        $breakpoint-s: (
-          bottom: var(--fs-content-margin-s),
-        )
-      )
-    );
+        $breakpoint-s: (bottom: var(--fs-content-margin-s),
+        )));
   }
-  
+
   .-content-margin-bottom-xl {
-    @include content-margin(
-      null,
+    @include content-margin(null,
       var(--fs-content-margin-xl),
-      (
-        $breakpoint-l: (
-          bottom: var(--fs-content-margin-l),
+      ($breakpoint-l: (bottom: var(--fs-content-margin-l),
         ),
-        $breakpoint-m: (
-          bottom: var(--fs-content-margin-m),
+        $breakpoint-m: (bottom: var(--fs-content-margin-m),
         ),
-        $breakpoint-s: (
-          bottom: var(--fs-content-margin-s),
-        )
-      )
-    );
+        $breakpoint-s: (bottom: var(--fs-content-margin-s),
+        )));
   }
 
   // Text-wrap
