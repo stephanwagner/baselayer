@@ -186,6 +186,29 @@ export const blockOptions = [
     ]
   },
 
+  // Gallery
+  {
+    name: 'core/gallery',
+    options: [
+      getContentMarginOptions(),
+      getContentMarginAdjustOptions(),
+      {
+        type: 'boolean',
+        label: 'Ohne Bildtexte',
+        default: false,
+        attributeName: 'noImageLabels',
+        className: '-no-image-captions'
+      },
+      {
+        type: 'boolean',
+        label: 'Bild bei Klick vergrößern',
+        default: true,
+        attributeName: 'hasLightbox',
+        className: '-has-lightbox'
+      }
+    ]
+  },
+
   // Group
   {
     name: 'core/group',

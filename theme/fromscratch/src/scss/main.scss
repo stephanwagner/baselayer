@@ -2,8 +2,9 @@
 @forward '../../../../node_modules/normalize.css/normalize';
 @forward 'lib/reset';
 
-// Swiper
+// Libraries
 @forward '../../../../node_modules/swiper/swiper-bundle.min';
+@forward '../../../../node_modules/photoswipe/dist/photoswipe.css';
 
 // Fonts
 @forward 'fonts/fonts';

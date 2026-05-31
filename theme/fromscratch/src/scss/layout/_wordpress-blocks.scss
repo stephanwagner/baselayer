@@ -296,6 +296,14 @@
         border-radius: 0 0 var(--fs-border-radius) var(--fs-border-radius);
       }
     }
+
+    &.-no-image-captions {
+      figure.wp-block-image {
+        figcaption.wp-element-caption {
+          display: none;
+        }
+      }
+    }
   }
 
   // Content widths
