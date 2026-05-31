@@ -182,6 +182,13 @@ export const blockOptions = [
         default: false,
         attributeName: 'noImageLabel',
         className: '-no-image-caption'
+      },
+      {
+        type: 'boolean',
+        label: 'Bild bei Klick vergrößern',
+        default: false,
+        attributeName: 'hasLightbox',
+        className: '-has-lightbox'
       }
     ]
   },
@@ -201,7 +208,7 @@ export const blockOptions = [
       },
       {
         type: 'boolean',
-        label: 'Bild bei Klick vergrößern',
+        label: 'Bilder bei Klick vergrößern',
         default: true,
         attributeName: 'hasLightbox',
         className: '-has-lightbox'
