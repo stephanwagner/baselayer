@@ -30,8 +30,8 @@ function fs_theme_post_types(): array
 function fs_menus(): void
 {
 	add_theme_support('menus');
-	$menus = fs_config('menus');
-	if (!is_array($menus)) {
+	$menus = fs_theme_menu_register_map();
+	if ($menus === []) {
 		return;
 	}
 	$translated = [];

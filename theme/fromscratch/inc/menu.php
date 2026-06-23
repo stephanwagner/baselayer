@@ -3,6 +3,7 @@
 defined('ABSPATH') || exit;
 
 require_once get_template_directory() . '/inc/menu-walker.php';
+require_once get_template_directory() . '/inc/menu-options.php';
 
 /**
  * Normalize a URL to its path for menu/archive comparison (no trailing slash).

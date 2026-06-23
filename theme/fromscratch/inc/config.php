@@ -272,6 +272,129 @@ function fs_config_comments_enabled(): bool
 }
 
 /**
+ * Normalized theme menus from config (`id`, `title`, `options`).
+ *
+ * @return array<int, array{id: string, title: string, options: array<int, array{id: string, className: string, label: string, default: bool}>}>
+ */
+function fs_theme_menus_config(): array
+{
+	static $normalized = null;
+	if ($normalized !== null) {
+		return $normalized;
+	}
+
+	$raw = fs_config('menus');
+	if (!is_array($raw)) {
+		$normalized = [];
+		return $normalized;
+	}
+
+	$normalized = [];
+	foreach ($raw as $key => $entry) {
+		if (is_string($entry) && is_string($key) && $key !== '') {
+			$normalized[] = [
+				'id' => $key,
+				'title' => $entry,
+				'options' => [],
+			];
+			continue;
+		}
+
+		if (!is_array($entry)) {
+			continue;
+		}
+
+		$id = isset($entry['id']) && is_string($entry['id']) && $entry['id'] !== ''
+			? $entry['id']
+			: (is_string($key) ? $key : '');
+		if ($id === '') {
+			continue;
+		}
+
+		$title = isset($entry['title']) && is_string($entry['title']) && $entry['title'] !== ''
+			? $entry['title']
+			: $id;
+
+		$options = [];
+		if (!empty($entry['options']) && is_array($entry['options'])) {
+			foreach ($entry['options'] as $option) {
+				if (!is_array($option) || empty($option['id']) || !is_string($option['id'])) {
+					continue;
+				}
+				$options[] = [
+					'id' => sanitize_key($option['id']),
+					'className' => isset($option['className']) && is_string($option['className']) ? $option['className'] : '',
+					'label' => isset($option['label']) && is_string($option['label']) ? $option['label'] : '',
+					'default' => !empty($option['default']),
+				];
+			}
+		}
+
+		$normalized[] = [
+			'id' => $id,
+			'title' => $title,
+			'options' => $options,
+		];
+	}
+
+	return $normalized;
+}
+
+/**
+ * @return array<string, string> Slug => title for register_nav_menus().
+ */
+function fs_theme_menu_register_map(): array
+{
+	$map = [];
+	foreach (fs_theme_menus_config() as $menu) {
+		$map[$menu['id']] = $menu['title'];
+	}
+	return $map;
+}
+
+/**
+ * @return array{id: string, title: string, options: array<int, array{id: string, className: string, label: string, default: bool}>}|null
+ */
+function fs_theme_menu(string $menu_id): ?array
+{
+	$menu_id = sanitize_key($menu_id);
+	if ($menu_id === '') {
+		return null;
+	}
+
+	foreach (fs_theme_menus_config() as $menu) {
+		if ($menu['id'] === $menu_id) {
+			return $menu;
+		}
+	}
+
+	return null;
+}
+
+/**
+ * Menu item options for a theme location.
+ *
+ * @return array<int, array{id: string, className: string, label: string, default: bool}>
+ */
+function fs_theme_menu_options(string $menu_id): array
+{
+	$menu = fs_theme_menu($menu_id);
+	if ($menu === null) {
+		return [];
+	}
+
+	return $menu['options'];
+}
+
+/**
+ * Post meta key for a menu item option checkbox.
+ */
+function fs_menu_item_option_meta_key(string $option_id): string
+{
+	return '_menu_item_fs_option_' . sanitize_key($option_id);
+}
+
+/**
  * Resolve dot-path key into config value.
  *
  * @param array $config Config array.

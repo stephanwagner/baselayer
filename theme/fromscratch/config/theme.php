@@ -16,10 +16,27 @@ return [
 	/**
 	 * Menus
 	 * Registered navigation menus.
+	 *
+	 * Each menu: id, title, optional options (checkboxes on menu items).
+	 * Option: id, className (added to <li> when checked), label, default.
 	 */
 	'menus' => [
-		'main_menu' => 'Main menu',
-		'footer_menu' => 'Footer menu',
+		[
+			'id' => 'main_menu',
+			'title' => 'Main menu',
+			'options' => [
+				[
+					'id' => 'highlight',
+					'className' => '-highlight',
+					'label' => 'Highlight link',
+					'default' => false,
+				],
+			],
+		],
+		[
+			'id' => 'footer_menu',
+			'title' => 'Footer menu',
+		],
 	],
 
 	/**

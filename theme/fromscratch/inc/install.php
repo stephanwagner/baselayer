@@ -1124,7 +1124,9 @@ Tags:
       'contact' => [
         'title' => __('Contact', 'fromscratch'),
         'menu' => 'main_menu',
-        'is-button' => true
+        'options' => [
+          'highlight' => true,
+        ],
       ],
     ];
     if (!empty($_POST['pages']['imprint']['add'])) {
@@ -1172,9 +1174,17 @@ Tags:
         ]);
       }
 
-      // Link is a button
-      if (!empty($config['is-button']) && $item_id) {
-        update_post_meta($item_id, '_menu_item_is_button', '1');
+      // Menu item options from theme config (e.g. highlight link).
+      if (!empty($config['options']) && is_array($config['options']) && $item_id) {
+        foreach ($config['options'] as $option_id => $enabled) {
+          if (!$enabled || !is_string($option_id) || $option_id === '') {
+            continue;
+          }
+          if (!function_exists('fs_menu_item_option_meta_key')) {
+            continue;
+          }
+          update_post_meta($item_id, fs_menu_item_option_meta_key($option_id), '1');
+        }
       }
     }
   }
@@ -1233,10 +1243,11 @@ Tags:
  */
 function fs_get_or_create_menu_id(string $menu_slug): int
 {
-  $menu_name = fs_config('menus.' . $menu_slug);
-  if ($menu_name === null) {
+  $menu_config = function_exists('fs_theme_menu') ? fs_theme_menu($menu_slug) : null;
+  if ($menu_config === null) {
     throw new RuntimeException("Menu config missing for slug: {$menu_slug}");
   }
+  $menu_name = $menu_config['title'];
 
   $menu = wp_get_nav_menu_object($menu_name);
 
