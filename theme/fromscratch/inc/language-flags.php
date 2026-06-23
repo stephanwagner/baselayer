@@ -3,6 +3,73 @@
 defined('ABSPATH') || exit;
 
 /**
+ * Path to bundled language data (not user-editable theme config).
+ */
+function fs_language_data_path(string $filename): string
+{
+	return get_template_directory() . '/data/languages/' . ltrim($filename, '/');
+}
+
+/**
+ * ISO 639-1 language catalog for Developer → Languages quick-add.
+ *
+ * @return list<array{id: string, name: string, nameNative: string}>
+ */
+function fs_iso639_language_catalog(): array
+{
+	static $catalog = null;
+	if ($catalog !== null) {
+		return $catalog;
+	}
+
+	$file = fs_language_data_path('iso639-catalog.json');
+	if (!is_readable($file)) {
+		$catalog = [];
+		return $catalog;
+	}
+
+	$decoded = json_decode((string) file_get_contents($file), true);
+	if (!is_array($decoded)) {
+		$catalog = [];
+		return $catalog;
+	}
+
+	$catalog = [];
+	foreach ($decoded as $entry) {
+		if (!is_array($entry) || empty($entry['id']) || !is_string($entry['id'])) {
+			continue;
+		}
+		$id = strtolower(preg_replace('/[^a-z]/', '', $entry['id']));
+		if ($id === '') {
+			continue;
+		}
+		$catalog[] = [
+			'id' => $id,
+			'name' => isset($entry['name']) && is_string($entry['name']) ? $entry['name'] : $id,
+			'nameNative' => isset($entry['nameNative']) && is_string($entry['nameNative']) ? $entry['nameNative'] : '',
+		];
+	}
+
+	usort($catalog, static function (array $a, array $b): int {
+		return strcasecmp($a['name'], $b['name']);
+	});
+
+	return $catalog;
+}
+
+/**
+ * @return array<string, array{id: string, name: string, nameNative: string}> Keyed by language id.
+ */
+function fs_iso639_language_catalog_by_id(): array
+{
+	$by_id = [];
+	foreach (fs_iso639_language_catalog() as $entry) {
+		$by_id[$entry['id']] = $entry;
+	}
+	return $by_id;
+}
+
+/**
  * ISO 639-1 language flag helpers (flags-iso-639/).
  */
 
@@ -16,7 +83,7 @@ function fs_language_flag_map(): array
 		return $map;
 	}
 
-	$file = get_template_directory() . '/config/language-flags.json';
+	$file = fs_language_data_path('flag-map.json');
 	if (!is_readable($file)) {
 		$map = [];
 		return $map;
@@ -55,6 +122,29 @@ function fs_language_flag_url(string $lang_id): string
 	}
 
 	return function_exists('fs_asset_url') ? fs_asset_url('/' . $relative) : '';
+}
+
+/**
+ * Admin flag preview markup (Developer → Languages table).
+ */
+function fs_language_flag_preview_markup(string $lang_id = ''): string
+{
+	$url = fs_language_flag_url($lang_id);
+	$hidden = $url === '' ? ' hidden' : '';
+
+	return sprintf(
+		'<span class="fs-language-flag-preview"><img class="fs-language-flag-preview__img" src="%s" width="28" height="21" alt="" decoding="async"%s /></span>',
+		$url !== '' ? esc_url($url) : '',
+		$hidden
+	);
+}
+
+/**
+ * Table cell with language flag preview for the languages settings table.
+ */
+function fs_language_flag_admin_cell(string $lang_id = ''): string
+{
+	return '<td class="fs-language-flag-cell">' . fs_language_flag_preview_markup($lang_id) . '</td>';
 }
 
 /**

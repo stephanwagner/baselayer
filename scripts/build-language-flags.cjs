@@ -1,5 +1,5 @@
 /**
- * Build flags-iso-639/ from flags-alpha-2/ using config/language-flags.json.
+ * Build flags-iso-639/ from flags-alpha-2/ using data/languages/flag-map.json.
  *
  * Usage: node scripts/build-language-flags.cjs
  */
@@ -8,7 +8,7 @@ const fs = require('fs');
 const path = require('path');
 
 const root = path.resolve(__dirname, '..');
-const mapPath = path.join(root, 'theme/fromscratch/config/language-flags.json');
+const mapPath = path.join(root, 'theme/fromscratch/data/languages/flag-map.json');
 const sourceDir = path.join(root, 'theme/fromscratch/assets/img/flags-alpha-2');
 const targetDir = path.join(root, 'theme/fromscratch/assets/img/flags-iso-639');
 

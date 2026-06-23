@@ -39,6 +39,55 @@
   display: none;
 }
 
+.fs-language-flag-cell {
+  text-align: center;
+  vertical-align: middle;
+  width: 44px;
+}
+
+.fs-language-flag-preview {
+  align-items: center;
+  background: #f6f7f7;
+  border: 1px solid #dcdcde;
+  border-radius: 3px;
+  display: inline-flex;
+  height: 23px;
+  justify-content: center;
+  overflow: hidden;
+  width: 32px;
+}
+
+.fs-language-flag-preview__img {
+  display: block;
+  height: 21px;
+  object-fit: cover;
+  width: 28px;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.fs-languages-table .fs-language-code-input {
+  text-transform: lowercase;
+}
+
+.fs-language-quick-add {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 0;
+}
+
+.fs-language-quick-add__sep {
+  color: #c3c4c7;
+}
+
+#fs-language-catalog-select {
+  max-width: 320px;
+}
+
 // Sections
 
 .fs-feature-group {
