@@ -248,7 +248,7 @@ function fs_render_developer_languages(): void
 					var usePrefix = document.getElementById('fs_use_url_prefix');
 					var prefixWrap = document.getElementById('fs-prefix-default-wrap');
 					var prefixDefault = document.getElementById('fs_prefix_default');
-					var flagBaseUrl = <?= wp_json_encode(trailingslashit(get_template_directory_uri() . '/assets/img/flags-iso-639')) ?>;
+					var flagBaseUrl = <?= wp_json_encode(trailingslashit(get_template_directory_uri() . '/assets/flags/iso-639')) ?>;
 					var flagAssetVer = <?= wp_json_encode(function_exists('fs_asset_version') ? fs_asset_version() : '1') ?>;
 					var languageCatalog = <?= wp_json_encode(array_values(array_map(static function (array $entry): array {
 						return [

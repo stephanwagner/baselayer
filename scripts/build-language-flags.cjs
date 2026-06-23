@@ -1,5 +1,5 @@
 /**
- * Build flags-iso-639/ from flags-alpha-2/ using data/languages/flag-map.json.
+ * Build assets/flags/iso-639/ from assets/flags/alpha-2/ using data/languages/flag-map.json.
  *
  * Usage: node scripts/build-language-flags.cjs
  */
@@ -9,8 +9,8 @@ const path = require('path');
 
 const root = path.resolve(__dirname, '..');
 const mapPath = path.join(root, 'theme/fromscratch/data/languages/flag-map.json');
-const sourceDir = path.join(root, 'theme/fromscratch/assets/img/flags-alpha-2');
-const targetDir = path.join(root, 'theme/fromscratch/assets/img/flags-iso-639');
+const sourceDir = path.join(root, 'theme/fromscratch/assets/flags/alpha-2');
+const targetDir = path.join(root, 'theme/fromscratch/assets/flags/iso-639');
 
 const map = JSON.parse(fs.readFileSync(mapPath, 'utf8'));
 
@@ -46,7 +46,7 @@ for (const lang of langs) {
 	copied += 1;
 }
 
-console.log(`Copied ${copied} flags to flags-iso-639/`);
+console.log(`Copied ${copied} flags to assets/flags/iso-639/`);
 if (missing.length) {
 	console.warn('Missing source flags for:', missing.join(', '));
 	process.exitCode = 1;

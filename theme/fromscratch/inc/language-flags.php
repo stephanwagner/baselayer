@@ -70,7 +70,7 @@ function fs_iso639_language_catalog_by_id(): array
 }
 
 /**
- * ISO 639-1 language flag helpers (flags-iso-639/).
+ * ISO 639-1 language flag helpers (assets/flags/iso-639/).
  */
 
 /**
@@ -96,7 +96,7 @@ function fs_language_flag_map(): array
 }
 
 /**
- * Path to an ISO 639-1 flag SVG relative to theme assets (e.g. img/flags-iso-639/de.svg).
+ * Path to an ISO 639-1 flag SVG relative to theme assets (e.g. flags/iso-639/de.svg).
  */
 function fs_language_flag_asset_path(string $lang_id): string
 {
@@ -105,7 +105,7 @@ function fs_language_flag_asset_path(string $lang_id): string
 		return '';
 	}
 
-	$relative = 'img/flags-iso-639/' . $lang_id . '.svg';
+	$relative = 'flags/iso-639/' . $lang_id . '.svg';
 	$full = get_template_directory() . '/assets/' . $relative;
 
 	return is_readable($full) ? $relative : '';
