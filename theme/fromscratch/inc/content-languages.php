@@ -1101,20 +1101,12 @@ add_filter('wp_nav_menu_objects', function (array $items, stdClass $args): array
 }, 10, 2);
 
 /**
- * Whether the language switcher shortcode should output anything (Developer → Features → Languages).
- */
-function fs_language_switcher_available(): bool
-{
-	return function_exists('fs_theme_feature_enabled') && fs_theme_feature_enabled('languages');
-}
-
-/**
- * Language switcher markup (same output as shortcode [fs_language_switcher]).
+ * Content language switcher markup (per-post translations and URL prefixes).
  * When a language has no translation for the current page, behavior is controlled by Settings → Developer → Languages (no_translation).
  *
- * @return string HTML or empty string when the feature is off or there is nothing to show.
+ * @return string HTML or empty string when there is nothing to show.
  */
-function fs_language_switcher_html(): string
+function fs_content_language_switcher_html(): string
 {
 	if (!fs_language_switcher_available()) {
 		return '';
@@ -1162,12 +1154,13 @@ function fs_language_switcher_html(): string
 			if ($behavior === 'hide') {
 				continue;
 			}
+			$item_content = fs_language_switcher_item_content($id, $label);
 			if ($behavior === 'disabled') {
-				$items[] = '<span class="fs-lang-item fs-lang-disabled' . ($is_active ? ' active' : '') . '" aria-current="' . ($is_active ? 'true' : 'false') . '">' . esc_html($label) . '</span>';
+				$items[] = '<span class="fs-lang-item fs-lang-disabled' . ($is_active ? ' active' : '') . '" aria-current="' . ($is_active ? 'true' : 'false') . '">' . $item_content . '</span>';
 				continue;
 			}
 			$url = fs_language_home_url($id);
-			$items[] = '<a class="fs-lang-item' . ($is_active ? ' active' : '') . '" href="' . esc_url($url) . '" aria-current="' . ($is_active ? 'true' : 'false') . '">' . esc_html($label) . '</a>';
+			$items[] = '<a class="fs-lang-item' . ($is_active ? ' active' : '') . '" href="' . esc_url($url) . '" aria-current="' . ($is_active ? 'true' : 'false') . '">' . $item_content . '</a>';
 			continue;
 		}
 
@@ -1181,7 +1174,7 @@ function fs_language_switcher_html(): string
 			? fs_language_home_url($id)
 			: get_permalink($translation_id);
 
-		$items[] = '<a class="fs-lang-item' . ($is_active ? ' active' : '') . '" href="' . esc_url($url) . '" aria-current="' . ($is_active ? 'true' : 'false') . '">' . esc_html($label) . '</a>';
+		$items[] = '<a class="fs-lang-item' . ($is_active ? ' active' : '') . '" href="' . esc_url($url) . '" aria-current="' . ($is_active ? 'true' : 'false') . '">' . fs_language_switcher_item_content($id, $label) . '</a>';
 	}
 
 	if (empty($items)) {
@@ -1190,10 +1183,6 @@ function fs_language_switcher_html(): string
 
 	return '<ul class="fs-language-toggler"><li>' . implode('</li><li>', $items) . '</li></ul>';
 }
-
-add_shortcode('fs_language_switcher', static function ($atts = [], $content = null, $tag = ''): string {
-	return fs_language_switcher_html();
-});
 
 /**
  * Ensure translation group is set when a post is saved (block editor saves language term via REST).

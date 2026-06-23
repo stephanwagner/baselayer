@@ -13,6 +13,7 @@ import './article-list';
 // Components
 import '../components/modal';
 import '../components/lightbox';
+import '../components/google-translate';
 
 // Blocks
 import '../../../acf/blocks/blocks.js';

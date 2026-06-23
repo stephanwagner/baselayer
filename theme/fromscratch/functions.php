@@ -84,7 +84,13 @@ if (fs_theme_feature_enabled('post_expirator')) {
 	require_once 'inc/post-expirator.php';
 }
 if (fs_theme_feature_enabled('languages')) {
-	require_once 'inc/content-languages.php';
+	require_once 'inc/language-flags.php';
+	require_once 'inc/language-switcher.php';
+	if (function_exists('fs_uses_google_translate') && fs_uses_google_translate()) {
+		require_once 'inc/google-translate.php';
+	} else {
+		require_once 'inc/content-languages.php';
+	}
 }
 if (fs_theme_feature_enabled('blocked_ips')) {
 	require_once 'inc/security/ip-blocker.php';

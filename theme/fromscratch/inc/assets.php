@@ -252,6 +252,20 @@ function fs_scripts(): void
 		fs_asset_hash($file),
 		true
 	);
+
+	if (function_exists('fs_uses_google_translate') && fs_uses_google_translate()) {
+		$languages = function_exists('fs_get_content_languages') ? fs_get_content_languages() : [];
+		$lang_codes = [];
+		foreach ($languages as $lang) {
+			if (!empty($lang['id'])) {
+				$lang_codes[] = (string) $lang['id'];
+			}
+		}
+		wp_localize_script('main-scripts', 'fsGoogleTranslate', [
+			'pageLang' => function_exists('fs_get_default_language') ? fs_get_default_language() : '',
+			'languages' => $lang_codes,
+		]);
+	}
 }
 add_action('wp_enqueue_scripts', 'fs_scripts');
 
@@ -308,7 +322,7 @@ function fs_editor_scripts(): void
 	wp_localize_script('fromscratch-editor', 'fromscratchFeatures', [
 		'seo' => function_exists('fs_theme_feature_enabled') && fs_theme_feature_enabled('seo'),
 		'post_expirator' => function_exists('fs_theme_feature_enabled') && fs_theme_feature_enabled('post_expirator'),
-		'languages' => function_exists('fs_theme_feature_enabled') && fs_theme_feature_enabled('languages'),
+		'languages' => function_exists('fs_uses_content_languages') && fs_uses_content_languages(),
 	]);
 }
 add_action('enqueue_block_editor_assets', 'fs_editor_scripts');

@@ -16,6 +16,7 @@ function fs_theme_feature_defaults(): array
 		'enable_seo'                => 1,
 		'enable_post_expirator'     => 1,
 		'enable_languages'          => 0,
+		'language_mode'             => 'content',
 		'enable_blocked_ips'        => 1,
 		'enable_webp'               => 1,
 		'enable_webp_convert_original' => 0,
@@ -113,6 +114,43 @@ function fs_theme_feature_enabled(string $feature): bool
 	}
 
 	return (int) $options[$key] === 1;
+}
+
+/**
+ * Multilingual mode when Languages feature is on: content (per-post translations) or google_translate.
+ *
+ * @return 'content'|'google_translate'
+ */
+function fs_language_mode(): string
+{
+	if (!fs_theme_feature_enabled('languages')) {
+		return 'content';
+	}
+
+	$options = get_option('fromscratch_features', []);
+	if (!is_array($options)) {
+		return 'content';
+	}
+
+	$mode = isset($options['language_mode']) ? (string) $options['language_mode'] : 'content';
+
+	return $mode === 'google_translate' ? 'google_translate' : 'content';
+}
+
+/**
+ * Whether the site uses Google Translate for frontend language switching.
+ */
+function fs_uses_google_translate(): bool
+{
+	return fs_language_mode() === 'google_translate';
+}
+
+/**
+ * Whether built-in content translations (taxonomy, URL prefixes, editor panels) are active.
+ */
+function fs_uses_content_languages(): bool
+{
+	return fs_theme_feature_enabled('languages') && !fs_uses_google_translate();
 }
 
 /**
@@ -219,7 +257,7 @@ function fs_content_option(string $option_id, $default = '')
  */
 function fs_use_language_url_prefix(): bool
 {
-	if (!fs_theme_feature_enabled('languages')) {
+	if (!function_exists('fs_uses_content_languages') || !fs_uses_content_languages()) {
 		return false;
 	}
 	$data = get_option('fs_theme_languages', ['list' => [], 'default' => '', 'prefix_default' => false, 'use_url_prefix' => true]);
@@ -250,7 +288,7 @@ function fs_prefix_default_language(): bool
  */
 function fs_language_no_translation_behavior(): string
 {
-	if (!fs_theme_feature_enabled('languages')) {
+	if (!function_exists('fs_uses_content_languages') || !fs_uses_content_languages()) {
 		return 'disabled';
 	}
 	$data = get_option('fs_theme_languages', ['no_translation' => 'disabled']);

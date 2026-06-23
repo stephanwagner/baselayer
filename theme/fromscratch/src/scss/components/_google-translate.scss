@@ -1,0 +1,39 @@
+@use '../variables' as *;
+
+// Google Translate skips nodes with class "notranslate" or attribute translate="no"
+
+.google-translate__element {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+}
+
+.google-translate-modal__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 16px;
+
+  .modal__button {
+    @media (max-width: $breakpoint-s) {
+      display: block;
+      width: 100%;
+      text-align: center;
+    }
+  }
+}
+
+// Hide Google’s default translate UI chrome (widget still runs).
+.goog-te-banner-frame,
+.skiptranslate,
+#goog-gt-tt {
+  display: none !important;
+}
+
+body {
+  top: 0 !important;
+  min-height: 0 !important;
+}

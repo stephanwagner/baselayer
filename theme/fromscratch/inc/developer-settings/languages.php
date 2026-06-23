@@ -99,6 +99,7 @@ function fs_render_developer_languages(): void
 	if ($lang_default === '' && !empty($lang_list)) {
 		$lang_default = $lang_list[0]['id'] ?? '';
 	}
+	$uses_google_translate = function_exists('fs_uses_google_translate') && fs_uses_google_translate();
 ?>
 	<div class="wrap">
 		<?php fs_developer_settings_screen_heading(); ?>
@@ -135,6 +136,7 @@ function fs_render_developer_languages(): void
 						<?php endif; ?>
 					</td>
 				</tr>
+				<?php if (!$uses_google_translate) : ?>
 				<tr>
 					<th scope="row"><?= esc_html__('URL prefix', 'fromscratch') ?></th>
 					<td>
@@ -166,6 +168,18 @@ function fs_render_developer_languages(): void
 						<p class="description"><?= esc_html__('Defines how the language switcher behaves when the current page is not available in another language.', 'fromscratch') ?></p>
 					</td>
 				</tr>
+				<?php else : ?>
+				<tr>
+					<th scope="row"><?= esc_html__('Language switcher', 'fromscratch') ?></th>
+					<td>
+						<div style="display: flex; align-items: center; gap: 8px">
+							<input type="text" id="fs-language-toggler-shortcode" readonly class="regular-text code fs-code-small" value="[fs_language_switcher]" />
+							<button type="button" class="button" data-fs-copy-from-source="fs-language-toggler-shortcode" data-fs-copy-feedback-text="<?= esc_attr__('Copied', 'fromscratch') ?>"><?= esc_html__('Copy', 'fromscratch') ?></button>
+						</div>
+						<p class="description"><?= esc_html__('To display a language switcher in your theme, use the shortcode [fs_language_switcher].', 'fromscratch') ?></p>
+					</td>
+				</tr>
+				<?php endif; ?>
 			</table>
 			<h3 class="title" style="margin-top: 24px;"><?= esc_html__('Available languages', 'fromscratch') ?></h3>
 			<p class="description"><?= esc_html__('Add and manage the languages available for your site’s content.', 'fromscratch') ?></p>

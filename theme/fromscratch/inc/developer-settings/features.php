@@ -69,6 +69,7 @@ function fs_render_developer_features(): void
 	$feat = function ($key) use ($features, $defaults) {
 		return isset($features[$key]) ? (int) $features[$key] : (int) ($defaults[$key] ?? 0);
 	};
+	$language_mode = function_exists('fs_language_mode') ? fs_language_mode() : 'content';
 
 	if (!function_exists('fs_webp_supported')) {
 		require_once get_template_directory() . '/inc/image-webp.php';
@@ -159,9 +160,35 @@ function fs_render_developer_features(): void
 							<input type="hidden" name="fromscratch_features[enable_languages]" value="0">
 							<label><input type="checkbox" name="fromscratch_features[enable_languages]" id="fromscratch_features_enable_languages" value="1" <?= checked($feat('enable_languages'), 1, false) ?>> <?= esc_html__('Enable languages', 'fromscratch') ?></label>
 							<p class="description fs-indent-checkbox"><?= esc_html__('Enables built-in support for multiple content languages.', 'fromscratch') ?></p>
+							<div id="fs-language-mode-wrap" class="fs-language-mode-wrap" style="margin-top: 12px; <?= $feat('enable_languages') ? '' : 'display:none;' ?>">
+								<fieldset>
+									<legend class="screen-reader-text"><?= esc_html__('Translation method', 'fromscratch') ?></legend>
+									<label style="display: block; margin-bottom: 8px;">
+										<input type="radio" name="fromscratch_features[language_mode]" value="content" <?= checked($language_mode, 'content', false) ?>>
+										<?= esc_html__('Content translations', 'fromscratch') ?>
+									</label>
+									<p class="description fs-indent-checkbox" style="margin-top: 0; margin-bottom: 12px;"><?= esc_html__('Separate posts or pages per language with URL prefixes and editor translation panels.', 'fromscratch') ?></p>
+									<label style="display: block;">
+										<input type="radio" name="fromscratch_features[language_mode]" value="google_translate" <?= checked($language_mode, 'google_translate', false) ?>>
+										<?= esc_html__('Google Translate', 'fromscratch') ?>
+									</label>
+									<p class="description fs-indent-checkbox" style="margin-top: 0;"><?= esc_html__('Single-language content with automatic on-page translation via Google Translate. Configure languages under Developer → Languages.', 'fromscratch') ?></p>
+								</fieldset>
+							</div>
 						</td>
 					</tr>
 				</table>
+				<script>
+					(function () {
+						var checkbox = document.getElementById('fromscratch_features_enable_languages');
+						var wrap = document.getElementById('fs-language-mode-wrap');
+						if (!checkbox || !wrap) return;
+						function toggle() {
+							wrap.style.display = checkbox.checked ? '' : 'none';
+						}
+						checkbox.addEventListener('change', toggle);
+					})();
+				</script>
 
 			</div>
 

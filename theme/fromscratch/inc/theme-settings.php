@@ -912,8 +912,13 @@ function fs_sanitize_features($value): array
 	$defaults = function_exists('fs_theme_feature_defaults') ? fs_theme_feature_defaults() : [];
 	$out = [];
 	foreach (array_keys($defaults) as $key) {
+		if ($key === 'language_mode') {
+			continue;
+		}
 		$out[$key] = (!empty($value[$key])) ? 1 : 0;
 	}
+	$mode = isset($value['language_mode']) ? (string) $value['language_mode'] : 'content';
+	$out['language_mode'] = in_array($mode, ['content', 'google_translate'], true) ? $mode : 'content';
 	if (empty($out['enable_webp'])) {
 		$out['enable_webp_convert_original'] = 0;
 	}
@@ -1301,7 +1306,9 @@ function theme_settings_page(): void
 				if ($content_default_lang === '' && !empty($content_languages)) {
 					$content_default_lang = (string) ($content_languages[0]['id'] ?? '');
 				}
-				$show_lang_switcher = count($content_languages) >= 2;
+				$show_lang_switcher = count($content_languages) >= 2
+					&& function_exists('fs_uses_content_languages')
+					&& fs_uses_content_languages();
 				?>
 				<h2><?= esc_html__('Global Content', 'fromscratch') ?></h2>
 				<p class="description">
