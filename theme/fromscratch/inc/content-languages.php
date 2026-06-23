@@ -1138,7 +1138,8 @@ function fs_content_language_switcher_html(): string
 		}
 	}
 
-	$items = [];
+	$submenu_items = [];
+	$current_label = '';
 	foreach ($languages as $lang) {
 		$id = isset($lang['id']) ? (string) $lang['id'] : '';
 		if ($id === '') {
@@ -1146,6 +1147,9 @@ function fs_content_language_switcher_html(): string
 		}
 		$label = function_exists('fs_content_language_label') ? fs_content_language_label($lang, 'name') : $id;
 		$is_active = ($id === $current_lang);
+		if ($is_active) {
+			$current_label = $label;
+		}
 
 		$translation_id = isset($linked[$id]) ? (int) $linked[$id] : 0;
 		$has_translation = $translation_id > 0 && get_post_status($translation_id) === 'publish';
@@ -1154,13 +1158,12 @@ function fs_content_language_switcher_html(): string
 			if ($behavior === 'hide') {
 				continue;
 			}
-			$item_content = fs_language_switcher_item_content($id, $label);
 			if ($behavior === 'disabled') {
-				$items[] = '<span class="fs-lang-item fs-lang-disabled' . ($is_active ? ' active' : '') . '" aria-current="' . ($is_active ? 'true' : 'false') . '">' . $item_content . '</span>';
+				$submenu_items[] = fs_language_switcher_submenu_item_html($id, $label, '', $is_active, true);
 				continue;
 			}
 			$url = fs_language_home_url($id);
-			$items[] = '<a class="fs-lang-item' . ($is_active ? ' active' : '') . '" href="' . esc_url($url) . '" aria-current="' . ($is_active ? 'true' : 'false') . '">' . $item_content . '</a>';
+			$submenu_items[] = fs_language_switcher_submenu_item_html($id, $label, $url, $is_active);
 			continue;
 		}
 
@@ -1174,14 +1177,14 @@ function fs_content_language_switcher_html(): string
 			? fs_language_home_url($id)
 			: get_permalink($translation_id);
 
-		$items[] = '<a class="fs-lang-item' . ($is_active ? ' active' : '') . '" href="' . esc_url($url) . '" aria-current="' . ($is_active ? 'true' : 'false') . '">' . fs_language_switcher_item_content($id, $label) . '</a>';
+		$submenu_items[] = fs_language_switcher_submenu_item_html($id, $label, (string) $url, $is_active);
 	}
 
-	if (empty($items)) {
+	if ($submenu_items === []) {
 		return '';
 	}
 
-	return '<ul class="fs-language-toggler"><li>' . implode('</li><li>', $items) . '</li></ul>';
+	return fs_language_switcher_dropdown_html($submenu_items, $current_lang, $current_label);
 }
 
 /**

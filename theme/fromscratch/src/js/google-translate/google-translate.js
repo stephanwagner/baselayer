@@ -41,13 +41,62 @@ export function getActiveLanguage() {
   }
 }
 
+function getLanguageSwitcherRoot() {
+  return document.querySelector('.fs-language-switcher[data-google-translate-toggler]');
+}
+
+function updateLanguageSwitcherTrigger(lang) {
+  const switcher = getLanguageSwitcherRoot();
+  if (!switcher) {
+    return;
+  }
+
+  const trigger = switcher.querySelector('.fs-language-switcher__trigger');
+  const activeItem = switcher.querySelector(
+    `.sub-menu [data-language="${CSS.escape(lang)}"]`
+  );
+  if (!trigger || !activeItem) {
+    return;
+  }
+
+  const activeFlag = activeItem.querySelector('.fs-lang-item__flag');
+  const triggerFlag = trigger.querySelector('.fs-language-switcher__current-flag');
+  if (activeFlag && triggerFlag) {
+    if (activeFlag.src) {
+      triggerFlag.src = activeFlag.src;
+    }
+    triggerFlag.alt = activeFlag.alt || '';
+  }
+
+  trigger.setAttribute('data-language', lang);
+
+  const label = activeItem.querySelector('.fs-lang-item__label')?.textContent?.trim() || '';
+  const config = window.fsGoogleTranslate || {};
+  const labelTemplate =
+    typeof config.triggerLabel === 'string' ? config.triggerLabel : 'Select language, current: %s';
+  const labelEmpty =
+    typeof config.triggerLabelEmpty === 'string' ? config.triggerLabelEmpty : 'Select language';
+
+  trigger.setAttribute(
+    'aria-label',
+    label !== '' ? labelTemplate.replace('%s', label) : labelEmpty
+  );
+}
+
 export function syncLanguageTogglerUI(lang) {
-  document.querySelectorAll('.fs-language-toggler [data-language]').forEach((el) => {
+  const switcher = getLanguageSwitcherRoot();
+  if (!switcher) {
+    return;
+  }
+
+  switcher.querySelectorAll('.sub-menu [data-language]').forEach((el) => {
     const itemLang = el.getAttribute('data-language');
     const isActive = itemLang === lang;
     el.classList.toggle('active', isActive);
     el.setAttribute('aria-current', isActive ? 'true' : 'false');
   });
+
+  updateLanguageSwitcherTrigger(lang);
 }
 
 function loadGoogleTranslateScript() {

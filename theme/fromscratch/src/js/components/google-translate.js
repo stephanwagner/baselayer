@@ -1,4 +1,4 @@
-import { closeMenu } from '../main/menu';
+import { closeMenu, closeSubmenuForToggle } from '../main/menu';
 import { closeModal, openModal } from './modal';
 import {
   PAGE_LANG,
@@ -39,16 +39,24 @@ function initGoogleTranslateConsentModal() {
     });
 }
 
-function initLanguageToggler() {
-  const items = document.querySelectorAll(
-    '.fs-language-toggler [data-language]'
+function closeLanguageSubmenu() {
+  const trigger = document.querySelector(
+    '.fs-language-switcher[data-google-translate-toggler] .fs-language-switcher__trigger'
   );
+  if (trigger) {
+    closeSubmenuForToggle(trigger);
+  }
+}
 
-  if (!items.length) {
+function initLanguageToggler() {
+  const switcher = document.querySelector(
+    '.fs-language-switcher[data-google-translate-toggler]'
+  );
+  if (!switcher) {
     return;
   }
 
-  items.forEach((item) => {
+  switcher.querySelectorAll('.sub-menu [data-language]').forEach((item) => {
     item.addEventListener('click', (ev) => {
       ev.preventDefault();
       const lang = item.getAttribute('data-language');
@@ -62,6 +70,7 @@ function initLanguageToggler() {
         } else {
           syncLanguageTogglerUI(PAGE_LANG);
         }
+        closeLanguageSubmenu();
         closeMenu();
         return;
       }
@@ -69,11 +78,13 @@ function initLanguageToggler() {
       if (!isGoogleTranslateAccepted()) {
         pendingLang = lang;
         openModal(MODAL_ID);
+        closeLanguageSubmenu();
         closeMenu();
         return;
       }
 
       applyGoogleTranslate(lang);
+      closeLanguageSubmenu();
       closeMenu();
     });
   });

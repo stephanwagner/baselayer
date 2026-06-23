@@ -24,7 +24,8 @@ function fs_google_translate_switcher_html(): string
 		return '';
 	}
 
-	$items = [];
+	$current_label = '';
+	$submenu_items = [];
 	foreach ($languages as $lang) {
 		$id = isset($lang['id']) ? (string) $lang['id'] : '';
 		if ($id === '') {
@@ -35,23 +36,16 @@ function fs_google_translate_switcher_html(): string
 			? fs_content_language_label($lang, 'name')
 			: $id;
 		$is_active = ($id === $page_lang);
+		if ($is_active) {
+			$current_label = $label;
+		}
 
-		$items[] = sprintf(
-			'<button type="button" class="fs-lang-item%s" data-language="%s" aria-current="%s">%s</button>',
-			$is_active ? ' active' : '',
-			esc_attr($id),
-			$is_active ? 'true' : 'false',
-			fs_language_switcher_item_content($id, $label)
-		);
+		$submenu_items[] = fs_language_switcher_submenu_item_html($id, $label, '', $is_active, false, true);
 	}
 
-	if ($items === []) {
-		return '';
-	}
-
-	return '<ul class="fs-language-toggler" data-google-translate-toggler translate="no"><li>'
-		. implode('</li><li>', $items)
-		. '</li></ul>';
+	return fs_language_switcher_dropdown_html($submenu_items, $page_lang, $current_label, [
+		'google_translate' => true,
+	]);
 }
 
 /**

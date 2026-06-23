@@ -316,10 +316,35 @@
     margin: 0;
     padding: 0;
 
-    a {
+    a,
+    button.fs-lang-item,
+    span.fs-lang-item {
       display: block;
       text-decoration: none;
       padding: 4px 16px;
+    }
+
+    button.fs-lang-item {
+      appearance: none;
+      background: none;
+      border: 0;
+      box-shadow: none;
+      color: inherit;
+      cursor: pointer;
+      font: inherit;
+      margin: 0;
+      text-align: left;
+      width: 100%;
+    }
+
+    span.fs-lang-item {
+      display: flex;
+    }
+
+    .fs-lang-item {
+      align-items: center;
+      display: flex;
+      gap: 8px;
     }
 
     &.menu-depth-2 {

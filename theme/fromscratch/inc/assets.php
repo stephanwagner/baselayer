@@ -264,6 +264,8 @@ function fs_scripts(): void
 		wp_localize_script('main-scripts', 'fsGoogleTranslate', [
 			'pageLang' => function_exists('fs_get_default_language') ? fs_get_default_language() : '',
 			'languages' => $lang_codes,
+			'triggerLabel' => __('Select language, current: %s', 'fromscratch'),
+			'triggerLabelEmpty' => __('Select language', 'fromscratch'),
 		]);
 	}
 }
