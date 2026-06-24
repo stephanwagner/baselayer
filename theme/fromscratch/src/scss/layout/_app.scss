@@ -8,6 +8,10 @@ body {
   background: #fff;
 }
 
+@view-transition {
+  navigation: auto;
+}
+
 // Scaffold
 
 .page__wrapper {
