@@ -72,7 +72,7 @@
 }
 
 .fs-language-switcher {
-  margin: 0 0 0 auto;
+  margin: 0 0 0 24px;
   position: relative;
   z-index: 2;
 }
@@ -92,25 +92,6 @@
 
 .fs-language-switcher__item.-submenu-open > .sub-menu-toggle svg {
   transform: scaleY(-1);
-}
-
-.fs-language-switcher__item.-submenu-open > .sub-menu {
-  display: block;
-}
-
-@media (min-width: calc($breakpoint-mobile + 1px)) {
-  .fs-language-switcher__item.-submenu-open > .sub-menu,
-  .fs-language-switcher__item:hover > .sub-menu,
-  .fs-language-switcher__item:focus-within > .sub-menu {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: all;
-    visibility: visible;
-    transition:
-      opacity var(--fs-transition-speed),
-      transform var(--fs-transition-speed),
-      visibility 0s;
-  }
 }
 
 .fs-language-switcher__trigger {
@@ -138,11 +119,6 @@
   gap: 8px;
   line-height: 1.2;
   text-decoration: none;
-
-  &.active {
-    color: var(--fs-link-color);
-    font-weight: 600;
-  }
 
   &.fs-lang-disabled {
     cursor: default;

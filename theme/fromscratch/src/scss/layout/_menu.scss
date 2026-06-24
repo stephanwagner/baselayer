@@ -1,5 +1,153 @@
 @use '../variables' as *;
 
+@mixin sub-menu-flyout-depth-1 {
+  display: block;
+  visibility: hidden;
+  opacity: 0;
+  padding: 8px;
+  position: absolute;
+  top: calc(100% + 16px);
+  background: #fff;
+  border-radius: var(--fs-border-radius);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  transform: translateY(6px);
+  min-width: 220px;
+  pointer-events: none;
+  transition:
+    top var(--fs-transition-speed),
+    opacity var(--fs-transition-speed),
+    transform var(--fs-transition-speed),
+    visibility 0s linear var(--fs-transition-speed);
+
+  body.-scrolled & {
+    top: calc(100% + 12px);
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: calc(100% - 1px);
+    left: 0;
+    right: 0;
+    height: calc(16px + 2px);
+    background: transparent;
+    transition: transition('height');
+
+    body.-scrolled & {
+      height: calc(12px + 2px);
+    }
+  }
+}
+
+@mixin sub-menu-flyout-depth-1-open {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: all;
+  visibility: visible;
+  transition:
+    opacity var(--fs-transition-speed),
+    transform var(--fs-transition-speed),
+    visibility 0s;
+}
+
+@mixin sub-menu-flyout-item-states {
+  padding: 2px 0;
+
+  > a,
+  > button.fs-lang-item {
+    background: transparent;
+    border-radius: var(--fs-border-radius);
+    color: var(--fs-default-text-color);
+    padding: 8px 12px;
+    transition: transition('background-color');
+    width: 100%;
+
+    &:hover {
+      background: var(--fs-color-gray-100);
+      color: var(--fs-default-text-color);
+      text-decoration: none;
+    }
+  }
+
+  &.menu-item-has-children {
+    > .menu-item__inner {
+      align-items: center;
+      border-radius: var(--fs-border-radius);
+      display: flex;
+      padding-right: 4px;
+      transition: transition('background-color');
+
+      > a {
+        background: transparent;
+        border-radius: 0;
+        flex: 1;
+        min-width: 0;
+        padding: 8px 4px 8px 12px;
+        width: auto;
+
+        &:hover {
+          background: transparent;
+          color: var(--fs-default-text-color);
+          text-decoration: none;
+        }
+      }
+
+      > .sub-menu-toggle {
+        align-self: stretch;
+        border-radius: var(--fs-border-radius-small);
+        flex-shrink: 0;
+        height: auto;
+        margin: 4px 0;
+        min-height: 24px;
+        transition: transition('background-color');
+        width: 28px;
+
+        &:hover {
+          background: var(--fs-color-gray-200);
+          color: var(--fs-default-text-color);
+        }
+      }
+
+      &:hover {
+        background: var(--fs-color-gray-100);
+      }
+    }
+
+    &.-submenu-open > .menu-item__inner,
+    &.current-menu-item > .menu-item__inner,
+    &.current-menu-parent > .menu-item__inner {
+      background: var(--fs-color-gray-100);
+
+      > a {
+        color: var(--fs-default-text-color);
+        font-weight: 600;
+      }
+    }
+  }
+
+  &.current-menu-item:not(.menu-item-has-children) > a {
+    background: var(--fs-color-gray-100);
+    color: var(--fs-default-text-color);
+    font-weight: 600;
+  }
+
+  a.active,
+  button.fs-lang-item.active {
+    background: var(--fs-color-gray-100);
+    color: var(--fs-default-text-color);
+    font-weight: 600;
+  }
+}
+
+@mixin sub-menu-flyout-reset-depth-padding {
+  &[class*='menu-depth-'] {
+    > a,
+    > .menu-item__inner > a {
+      padding-left: 12px;
+    }
+  }
+}
+
 // Main menu
 
 .main-menu__wrapper {
@@ -216,15 +364,9 @@
       &.-submenu-open,
       &:hover {
         >.sub-menu {
-          opacity: 1;
-          transform: translateY(0);
-          pointer-events: all;
-          visibility: visible;
-
-          transition:
-            opacity var(--fs-transition-speed),
-            transform var(--fs-transition-speed),
-            visibility 0s;
+          @media (min-width: calc($breakpoint-mobile + 1px)) {
+            @include sub-menu-flyout-depth-1-open;
+          }
         }
       }
     }
@@ -263,42 +405,14 @@
   display: none;
 
   &.menu-depth-1 {
-    @media (min-width: calc($breakpoint-mobile + 1px)) {
-      display: block;
-      visibility: hidden;
-      opacity: 0;
-      padding: 8px 0;
-      position: absolute;
-      top: calc(100% + 16px);
-      left: -16px;
-      background: #fff;
-      border-radius: var(--fs-border-radius);
-      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-      transform: translateY(6px);
-      min-width: 220px;
-      pointer-events: none;
-      transition:
-        top var(--fs-transition-speed),
-        opacity var(--fs-transition-speed),
-        transform var(--fs-transition-speed),
-        visibility 0s linear var(--fs-transition-speed);
+    .main-menu__container & {
+      @media (min-width: calc($breakpoint-mobile + 1px)) {
+        @include sub-menu-flyout-depth-1;
+        left: -16px;
 
-      body.-scrolled & {
-        top: calc(100% + 12px);
-      }
-
-      &::after {
-        content: '';
-        position: absolute;
-        bottom: calc(100% - 1px);
-        left: 0;
-        right: 0;
-        height: calc(16px + 2px);
-        background: transparent;
-        transition: transition('height');
-
-        body.-scrolled & {
-          height: calc(12px + 2px);
+        li {
+          @include sub-menu-flyout-item-states;
+          @include sub-menu-flyout-reset-depth-padding;
         }
       }
     }
@@ -370,6 +484,42 @@
   .sub-menu-toggle {
     height: calc(22px + 4px + 4px);
   }
+}
+
+// Language switcher: flyout submenu at all breakpoints (header stays outside mobile drawer).
+
+.fs-language-switcher .sub-menu.menu-depth-1 {
+  @include sub-menu-flyout-depth-1;
+  left: auto;
+  right: 0;
+  z-index: 3;
+
+  li {
+    @include sub-menu-flyout-item-states;
+    @include sub-menu-flyout-reset-depth-padding;
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    top: calc(100% + 8px);
+
+    body.-scrolled & {
+      top: calc(100% + 8px);
+    }
+
+    &::after {
+      height: calc(8px + 2px);
+
+      body.-scrolled & {
+        height: calc(8px + 2px);
+      }
+    }
+  }
+}
+
+.fs-language-switcher__item.-submenu-open > .sub-menu,
+.fs-language-switcher__item:hover > .sub-menu,
+.fs-language-switcher__item:focus-within > .sub-menu {
+  @include sub-menu-flyout-depth-1-open;
 }
 
 .sub-menu-toggle {

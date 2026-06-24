@@ -19,8 +19,6 @@
 					</a>
 				</div>
 
-				<?= function_exists('fs_language_switcher_html') ? fs_language_switcher_html() : '' ?>
-
 				<button class="main-menu__toggler" data-toggle-menu aria-expanded="false" aria-controls="main-navigation">
 					<div class="main-menu__toggler-icon">
 						<span class="main-menu__toggler-icon-line1"></span>
@@ -38,6 +36,8 @@
 						'container_aria_label' => esc_attr__('Main navigation', 'fromscratch'),
 					]); ?>
 				</div>
+
+				<?= function_exists('fs_language_switcher_html') ? fs_language_switcher_html() : '' ?>
 
 				<button
 					type="button"
