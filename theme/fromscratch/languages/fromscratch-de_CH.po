@@ -1042,8 +1042,23 @@ msgstr "Code"
 msgid "Native name"
 msgstr "Name in Muttersprache"
 
+msgid "Flag"
+msgstr "Flagge"
+
+msgid "Flag for %s"
+msgstr "Flagge für %s"
+
 msgid "Add language"
 msgstr "Sprache hinzufügen"
+
+msgid "Select a language…"
+msgstr "Sprache auswählen …"
+
+msgid "Add selected"
+msgstr "Ausgewählte hinzufügen"
+
+msgid "Add empty row"
+msgstr "Leere Zeile hinzufügen"
 
 msgid "%1$s %2$s: %3$s"
 msgstr "%1$s %2$s: %3$s"

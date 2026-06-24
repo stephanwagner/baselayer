@@ -22,14 +22,16 @@ document.addEventListener('DOMContentLoaded', () => {
   new PhotoSwipeLightbox({
     gallery: '.wp-block-gallery.-has-lightbox',
     children: 'a',
-    pswpModule: PhotoSwipe
+    pswpModule: PhotoSwipe,
+    bgOpacity: 1
   }).init();
 
   new PhotoSwipeLightbox({
     gallery:
       '.wp-block-image.-has-lightbox:not(.wp-block-gallery .wp-block-image)',
     children: 'a',
-    pswpModule: PhotoSwipe
+    pswpModule: PhotoSwipe,
+    bgOpacity: 1
   }).init();
 });
 

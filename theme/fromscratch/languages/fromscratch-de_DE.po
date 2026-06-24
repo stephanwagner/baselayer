@@ -1033,8 +1033,8 @@ msgstr "Verfügbare Sprachen"
 msgid "Add and manage the languages available for your site’s content."
 msgstr "Sprachen für die Inhalte deiner Website hinzufügen und verwalten."
 
-msgid "Language codes follow ISO-639-1 (e.g. en, de, fr)."
-msgstr "Sprachcodes folgen ISO-639-1 (z. B. en, de, fr)."
+msgid "Language codes follow %s (e.g. en, de, fr)."
+msgstr "Sprachcodes folgen %s (z. B. en, de, fr)."
 
 msgid "Code"
 msgstr "Code"
@@ -1042,8 +1042,23 @@ msgstr "Code"
 msgid "Native name"
 msgstr "Name in Muttersprache"
 
+msgid "Flag"
+msgstr "Flagge"
+
+msgid "Flag for %s"
+msgstr "Flagge für %s"
+
 msgid "Add language"
 msgstr "Sprache hinzufügen"
+
+msgid "Select a language…"
+msgstr "Sprache auswählen …"
+
+msgid "Add selected"
+msgstr "Ausgewählte hinzufügen"
+
+msgid "Add empty row"
+msgstr "Leere Zeile hinzufügen"
 
 msgid "%1$s %2$s: %3$s"
 msgstr "%1$s %2$s: %3$s"

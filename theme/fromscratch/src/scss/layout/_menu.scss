@@ -12,13 +12,14 @@
   @media (max-width: $breakpoint-mobile) {
     position: absolute;
     display: block;
-    top: 100%;
+    top: calc(100% + 8px);
     width: var(--fs-mobile-menu-width);
     right: calc(var(--fs-mobile-menu-width) * -1 - var(--fs-content-padding-l));
     background: #fff;
     margin: 0;
-    height: calc(100vh - var(--fs-header-height));
+    height: calc(100vh - var(--fs-header-height) - 8px - 8px);
     padding: 24px var(--fs-content-padding-l) 24px 32px;
+    border-radius: var(--fs-border-radius-large);
     pointer-events: none;
     visibility: hidden;
 
@@ -29,22 +30,22 @@
     }
 
     body.-scrolled & {
-      height: calc(100vh - var(--fs-header-height-scrolled));
+      height: calc(100vh - var(--fs-header-height-scrolled) - 8px - 8px);
     }
 
     body.admin-bar & {
-      height: calc(100vh - var(--fs-header-height-mobile) - 32px);
+      height: calc(100vh - var(--fs-header-height-mobile) - 32px - 8px - 8px);
 
       @media (max-width: 782px) {
-        height: calc(100vh - var(--fs-header-height-mobile) - 46px);
+        height: calc(100vh - var(--fs-header-height-mobile) - 46px - 8px - 8px);
       }
     }
 
     body.admin-bar.-scrolled & {
-      height: calc(100vh - var(--fs-header-height-scrolled) - 32px);
+      height: calc(100vh - var(--fs-header-height-scrolled) - 32px - 8px - 8px);
 
       @media (max-width: 782px) {
-        height: calc(100vh - var(--fs-header-height-scrolled) - 46px);
+        height: calc(100vh - var(--fs-header-height-scrolled) - 46px - 8px - 8px);
       }
     }
 
@@ -61,28 +62,28 @@
 
     @media (max-width: $breakpoint-xs) {
       padding-right: var(--fs-content-padding-xs);
-      width: 100vw;
+      width: calc(100vw - 8px - 8px);
       right: calc(100vw * -1 - var(--fs-content-padding-xs));
     }
 
     body.-menu-open & {
       visibility: visible;
       pointer-events: all;
-      right: calc(var(--fs-content-padding-l) * -1);
+      right: calc(var(--fs-content-padding-l) * -1 + 8px);
       transition:
         right var(--fs-transition-speed),
         visibility 0s;
 
       @media (max-width: $breakpoint-m) {
-        right: calc(var(--fs-content-padding-m) * -1);
+        right: calc(var(--fs-content-padding-m) * -1 + 8px);
       }
 
       @media (max-width: $breakpoint-s) {
-        right: calc(var(--fs-content-padding-s) * -1);
+        right: calc(var(--fs-content-padding-s) * -1 + 8px);
       }
 
       @media (max-width: $breakpoint-xs) {
-        right: calc(var(--fs-content-padding-xs) * -1);
+        right: calc(var(--fs-content-padding-xs) * -1 + 8px);
       }
     }
   }

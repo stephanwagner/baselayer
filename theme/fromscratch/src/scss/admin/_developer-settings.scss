@@ -49,19 +49,18 @@
   align-items: center;
   background: #f6f7f7;
   border: 1px solid #dcdcde;
-  border-radius: 3px;
+  border-radius: 4px;
   display: inline-flex;
-  height: 23px;
   justify-content: center;
   overflow: hidden;
-  width: 32px;
+  margin: 4px 0 0;
 }
 
 .fs-language-flag-preview__img {
   display: block;
-  height: 21px;
   object-fit: cover;
-  width: 28px;
+  height: 30px;
+  width: 45px;
 
   &[hidden] {
     display: none;

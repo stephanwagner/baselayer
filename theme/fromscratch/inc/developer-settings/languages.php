@@ -184,7 +184,16 @@ function fs_render_developer_languages(): void
 			</table>
 			<h3 class="title" style="margin-top: 24px;"><?= esc_html__('Available languages', 'fromscratch') ?></h3>
 			<p class="description"><?= esc_html__('Add and manage the languages available for your site’s content.', 'fromscratch') ?></p>
-			<p class="description"><?= esc_html__('Language codes follow ISO-639-1 (e.g. en, de, fr).', 'fromscratch') ?></p>
+			<p class="description"><?php
+				echo wp_kses(
+					sprintf(
+						/* translators: %s: link to ISO 639-1 on Wikipedia */
+						__('Language codes follow %s (e.g. en, de, fr).', 'fromscratch'),
+						'<a href="' . esc_url('https://en.wikipedia.org/wiki/ISO_639-1') . '" target="_blank" rel="noopener noreferrer">ISO 639-1</a>'
+					),
+					['a' => ['href' => true, 'target' => true, 'rel' => true]]
+				);
+			?></p>
 			<?php if ($iso639_catalog !== []) : ?>
 				<div class="fs-language-quick-add">
 					<label for="fs-language-catalog-select" class="screen-reader-text"><?= esc_html__('Add language from catalog', 'fromscratch') ?></label>
