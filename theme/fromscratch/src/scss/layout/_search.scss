@@ -51,15 +51,14 @@
   justify-content: center;
   line-height: 0;
   margin-left: 16px;
-  height: 36px;
-  width: 36px;
+  height: 32px;
+  width: 32px;
   border: 0;
   box-shadow: none;
   appearance: none;
-  transition: transition('color', 'background-color', 'border-color');
   background: transparent;
   color: var(--fs-default-text-color);
-  border-radius: 50%;
+  transition: transition('color');
   cursor: pointer;
 
   svg {
@@ -69,8 +68,7 @@
   }
 
   &:hover {
-    color: #fff;
-    background-color: var(--fs-color-primary);
+    color: var(--fs-color-primary);
   }
 
   @media (max-width: $breakpoint-mobile) {

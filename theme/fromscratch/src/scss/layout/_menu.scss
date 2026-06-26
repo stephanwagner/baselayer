@@ -4,7 +4,7 @@
   display: block;
   visibility: hidden;
   opacity: 0;
-  padding: 8px;
+  padding: 6px;
   position: absolute;
   top: calc(100% + 16px);
   background: #fff;
@@ -51,12 +51,11 @@
 }
 
 @mixin sub-menu-flyout-item-states {
-  padding: 2px 0;
 
-  > a,
-  > button.fs-lang-item {
+  >a,
+  >button.fs-lang-item {
     background: transparent;
-    border-radius: var(--fs-border-radius);
+    border-radius: calc(var(--fs-border-radius) - 3px);
     color: var(--fs-default-text-color);
     padding: 8px 12px;
     transition: transition('background-color');
@@ -70,14 +69,14 @@
   }
 
   &.menu-item-has-children {
-    > .menu-item__inner {
+    >.menu-item__inner {
       align-items: center;
       border-radius: var(--fs-border-radius);
       display: flex;
       padding-right: 4px;
       transition: transition('background-color');
 
-      > a {
+      >a {
         background: transparent;
         border-radius: 0;
         flex: 1;
@@ -92,7 +91,7 @@
         }
       }
 
-      > .sub-menu-toggle {
+      >.sub-menu-toggle {
         align-self: stretch;
         border-radius: var(--fs-border-radius-small);
         flex-shrink: 0;
@@ -113,38 +112,19 @@
       }
     }
 
-    &.-submenu-open > .menu-item__inner,
-    &.current-menu-item > .menu-item__inner,
-    &.current-menu-parent > .menu-item__inner {
-      background: var(--fs-color-gray-100);
-
-      > a {
-        color: var(--fs-default-text-color);
-        font-weight: 600;
+    &.-submenu-open>.menu-item__inner,
+    &.current-menu-item>.menu-item__inner,
+    &.current-menu-parent>.menu-item__inner {
+      >a {
+        color: var(--fs-link-color-hover);
       }
     }
   }
 
-  &.current-menu-item:not(.menu-item-has-children) > a {
-    background: var(--fs-color-gray-100);
-    color: var(--fs-default-text-color);
-    font-weight: 600;
-  }
-
   a.active,
-  button.fs-lang-item.active {
-    background: var(--fs-color-gray-100);
-    color: var(--fs-default-text-color);
-    font-weight: 600;
-  }
-}
-
-@mixin sub-menu-flyout-reset-depth-padding {
-  &[class*='menu-depth-'] {
-    > a,
-    > .menu-item__inner > a {
-      padding-left: 12px;
-    }
+  button.fs-lang-item.active,
+  &.current-menu-item:not(.menu-item-has-children)>a {
+    color: var(--fs-link-color-hover);
   }
 }
 
@@ -162,7 +142,7 @@
     display: block;
     top: calc(100% + 8px);
     width: var(--fs-mobile-menu-width);
-    right: calc(var(--fs-mobile-menu-width) * -1 - var(--fs-content-padding-l));
+    right: calc(var(--fs-content-padding-l) * -1 + 8px - 24px);
     background: #fff;
     margin: 0;
     height: calc(100vh - var(--fs-header-height) - 8px - 8px);
@@ -170,10 +150,12 @@
     border-radius: var(--fs-border-radius-large);
     pointer-events: none;
     visibility: hidden;
+    opacity: 0;
 
     body.-transition-init & {
       transition:
         right var(--fs-transition-speed),
+        opacity var(--fs-transition-speed),
         visibility 0s linear var(--fs-transition-speed);
     }
 
@@ -199,24 +181,25 @@
 
     @media (max-width: $breakpoint-m) {
       padding-right: var(--fs-content-padding-m);
-      right: calc(var(--fs-mobile-menu-width) * -1 - var(--fs-content-padding-m));
+      right: calc(var(--fs-content-padding-m) * -1 + 8px - 24px);
     }
 
     @media (max-width: $breakpoint-s) {
       padding-right: var(--fs-content-padding-s);
       padding-left: 24px;
-      right: calc(var(--fs-mobile-menu-width) * -1 - var(--fs-content-padding-s));
+      right: calc(var(--fs-content-padding-s) * -1 + 8px - 24px);
     }
 
     @media (max-width: $breakpoint-xs) {
       padding-right: var(--fs-content-padding-xs);
       width: calc(100vw - 8px - 8px);
-      right: calc(100vw * -1 - var(--fs-content-padding-xs));
+      right: calc(var(--fs-content-padding-xs) * -1 + 8px - 24px);
     }
 
     body.-menu-open & {
       visibility: visible;
       pointer-events: all;
+      opacity: 1;
       right: calc(var(--fs-content-padding-l) * -1 + 8px);
       transition:
         right var(--fs-transition-speed),
@@ -269,7 +252,7 @@
 
       >a,
       >.menu-item__inner>a {
-        color: var(--fs-link-color);
+        color: var(--fs-link-color-hover);
 
         &:hover {
           color: var(--fs-link-color-hover);
@@ -401,18 +384,17 @@
   padding: 0;
   margin: 0;
   font-size: var(--fs-font-size-s);
-  line-height: 22px;
+  line-height: 18px;
   display: none;
 
   &.menu-depth-1 {
     .main-menu__container & {
       @media (min-width: calc($breakpoint-mobile + 1px)) {
         @include sub-menu-flyout-depth-1;
-        left: -16px;
+        left: -6px;
 
         li {
           @include sub-menu-flyout-item-states;
-          @include sub-menu-flyout-reset-depth-padding;
         }
       }
     }
@@ -437,6 +419,13 @@
       display: block;
       text-decoration: none;
       padding: 4px 16px;
+    }
+
+    a.fs-lang-item,
+    button.fs-lang-item,
+    span.fs-lang-item {
+      display: flex;
+      padding-left: 8px !important;
     }
 
     button.fs-lang-item {
@@ -489,6 +478,8 @@
 // Language switcher: flyout submenu at all breakpoints (header stays outside mobile drawer).
 
 .fs-language-switcher .sub-menu.menu-depth-1 {
+  min-width: 0 !important;
+
   @include sub-menu-flyout-depth-1;
   left: auto;
   right: 0;
@@ -496,7 +487,6 @@
 
   li {
     @include sub-menu-flyout-item-states;
-    @include sub-menu-flyout-reset-depth-padding;
   }
 
   @media (max-width: $breakpoint-mobile) {
@@ -516,9 +506,9 @@
   }
 }
 
-.fs-language-switcher__item.-submenu-open > .sub-menu,
-.fs-language-switcher__item:hover > .sub-menu,
-.fs-language-switcher__item:focus-within > .sub-menu {
+.fs-language-switcher__item.-submenu-open>.sub-menu,
+.fs-language-switcher__item:hover>.sub-menu,
+.fs-language-switcher__item:focus-within>.sub-menu {
   @include sub-menu-flyout-depth-1-open;
 }
 
@@ -597,7 +587,6 @@ body.-menu-block-scroll {
   height: 42px;
   position: relative;
   cursor: pointer;
-  margin: 0 0 0 auto;
 
   @media (max-width: $breakpoint-mobile) {
     display: block;
@@ -629,7 +618,7 @@ body.-menu-block-scroll {
   }
 
   .main-menu__toggler:hover & {
-    background: var(--fs-color-primary);
+    background: var(--fs-link-color-hover);
   }
 }
 
