@@ -688,6 +688,9 @@ msgstr "Medien"
 msgid "Permalinks"
 msgstr "Permalinks"
 
+msgid "Connectors"
+msgstr "Konnektoren"
+
 msgid "Privacy"
 msgstr "Datenschutz"
 

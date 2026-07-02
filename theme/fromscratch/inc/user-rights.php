@@ -166,6 +166,7 @@ function fs_admin_access_defaults(): array
     'options_reading' => ['admin' => 0, 'developer' => 1],
     'options_media' => ['admin' => 0, 'developer' => 1],
     'options_permalink' => ['admin' => 0, 'developer' => 1],
+    'options_connectors' => ['admin' => 1, 'developer' => 1],
     'options_privacy' => ['admin' => 1, 'developer' => 1],
     'tools' => ['admin' => 0, 'developer' => 1],
     'themes' => ['admin' => 0, 'developer' => 1],
@@ -226,6 +227,7 @@ add_action('admin_init', function () {
       'options-reading.php' => 'options_reading',
       'options-media.php' => 'options_media',
       'options-permalink.php' => 'options_permalink',
+      'options-connectors.php' => 'options_connectors',
       'options-privacy.php' => 'options_privacy',
     ];
     $item = isset($map[$page]) ? $map[$page] : 'options_general';
@@ -305,6 +307,9 @@ add_action('admin_menu', function () {
   }
   if (!fs_admin_can_access('options_permalink')) {
     remove_submenu_page('options-general.php', 'options-permalink.php');
+  }
+  if (!fs_admin_can_access('options_connectors')) {
+    remove_submenu_page('options-general.php', 'options-connectors.php');
   }
   if (!fs_admin_can_access('options_privacy')) {
     remove_submenu_page('options-general.php', 'options-privacy.php');

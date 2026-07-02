@@ -75,6 +75,7 @@ function fs_render_developer_access(): void
 			'options_reading' => __('Reading', 'fromscratch'),
 			'options_media' => __('Media', 'fromscratch'),
 			'options_permalink' => __('Permalinks', 'fromscratch'),
+			'options_connectors' => __('Connectors', 'fromscratch'),
 			'options_privacy' => __('Privacy', 'fromscratch'),
 		]],
 		['title' => __('Theme settings', 'fromscratch'), 'items' => [
