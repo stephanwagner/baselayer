@@ -63,9 +63,11 @@ function getLimitWidthOptions() {
     options: [
       { label: 'Ohne', value: '' },
       { label: 'Eng', value: '-narrow' },
-      { label: 'Eng (links orientiert)', value: '-narrow-left' },
       { label: 'Sehr Eng', value: '-very-narrow' },
-      { label: 'Sehr Eng (links orientiert)', value: '-very-narrow-left' }
+      { label: 'Extra Eng', value: '-extra-narrow' },
+      { label: 'Eng (links orientiert)', value: '-narrow-left' },
+      { label: 'Sehr Eng (links orientiert)', value: '-very-narrow-left' },
+      { label: 'Extra Eng (links orientiert)', value: '-extra-narrow-left' }
     ]
   };
 }
@@ -79,7 +81,7 @@ export const blockOptions = [
     name: 'core/columns',
     options: [
       getContentMarginOptions('-content-margin-m'),
-      getContentMarginOptions(),
+      getContentMarginAdjustOptions(),
       {
         type: 'select',
         label: 'Spaltenabstand',

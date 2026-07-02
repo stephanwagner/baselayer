@@ -78,7 +78,7 @@
   border: 2px solid var(--fs-color-primary);
   border-radius: var(--fs-border-radius-large);
 
-  @media (max-width: 600px) {
+  @media (max-width: $breakpoint-s) {
     padding: 24px 16px;
   }
 

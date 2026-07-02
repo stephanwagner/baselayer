@@ -48,6 +48,7 @@ $line-height-xl: 1.4;
 $content-max-width: 1200px;
 $content-narrow-width: 900px;
 $content-very-narrow-width: 600px;
+$content-extra-narrow-width: 300px;
 
 // Breakpoints
 $breakpoint-xs: 400px;
@@ -139,6 +140,7 @@ $border-radius-large: 16px;
   --fs-content-max-width: #{$content-max-width};
   --fs-content-narrow-width: #{$content-narrow-width};
   --fs-content-very-narrow-width: #{$content-very-narrow-width};
+  --fs-content-extra-narrow-width: #{$content-extra-narrow-width};
 
   // Breakpoints
   --fs-breakpoint-xs: #{$breakpoint-xs};

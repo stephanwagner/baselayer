@@ -15,6 +15,11 @@
     max-width: min(var(--fs-content-very-narrow-width), 840px);
   }
 
+  .-extra-narrow,
+  .-extra-narrow-left {
+    max-width: min(var(--fs-content-extra-narrow-width), 840px);
+  }
+
   // Columns
 
   .wp-block-column.-center-content {

@@ -42,7 +42,7 @@
     padding: 32px 0;
   }
 
-  @media (max-width: 600px) {
+  @media (max-width: $breakpoint-s) {
     padding: 24px 0;
   }
 }
@@ -56,12 +56,12 @@
   padding: 24px;
   max-width: calc(100vw - 32px - 32px);
 
-  @media (max-width: 600px) {
+  @media (max-width: $breakpoint-s) {
     max-width: calc(100vw - 24px - 24px);
     padding: 16px;
   }
 
-  @media (max-width: 400px) {
+  @media (max-width: $breakpoint-xs) {
     max-width: calc(100vw - 12px - 12px);
     padding: 16px 12px;
   }
