@@ -133,7 +133,7 @@ return [
 	 * When false, Redis-specific UI/actions are hidden.
 	 */
 	'redis_object_cache' => [
-		'enabled' => true,
+		'enabled' => false,
 	],
 
 	/**
@@ -141,6 +141,6 @@ return [
 	 * enabled: globally enable/disable cache purge actions.
 	 */
 	'nginx_site_cache' => [
-		'enabled' => true,
+		'enabled' => false,
 	],
 ];
