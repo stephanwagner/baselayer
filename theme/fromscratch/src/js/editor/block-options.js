@@ -18,7 +18,7 @@ blockOptions.forEach((block) => {
           settings.attributes = {
             ...settings.attributes,
             [option.attributeName]: {
-              type: option.type,
+              type: option.type === 'boolean' ? 'boolean' : 'string',
               default: option.default
             }
           };

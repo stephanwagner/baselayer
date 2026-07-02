@@ -19,9 +19,6 @@ if (!empty($block['className'])) {
 // Add wrapper class
 $classNames[] = 'slider__wrapper';
 
-// Add margin class
-$classNames[] = '-content-margin-m';
-
 // Fields
 $slidesPerView = get_field('slides-per-view') ?? 1;
 $slidesPerGroup = get_field('slides-per-group') ?? 1;

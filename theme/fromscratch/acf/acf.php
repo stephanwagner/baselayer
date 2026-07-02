@@ -33,9 +33,107 @@ function fs_acf_init_core()
 }
 add_action('acf/init', 'fs_acf_init_core');
 
+/**
+ * Block option config for ACF blocks (mirrors config/block-options.js).
+ *
+ * @return array<string, array<int, array<string, mixed>>>
+ */
+function fs_block_options_config(): array
+{
+	static $config = null;
+
+	if ($config === null) {
+		$path = get_template_directory() . '/config/block-options.php';
+		$loaded = is_readable($path) ? include $path : [];
+		$config = is_array($loaded) ? $loaded : [];
+	}
+
+	return $config;
+}
+
+/**
+ * CSS classes from custom block options stored in block attributes.
+ *
+ * @param array<string, mixed> $block
+ * @return array<int, string>
+ */
+function fs_block_option_classes(array $block): array
+{
+	$block_name = isset($block['name']) && is_string($block['name']) ? $block['name'] : '';
+	if ($block_name === '') {
+		return [];
+	}
+
+	$options = fs_block_options_config()[$block_name] ?? [];
+	if ($options === []) {
+		return [];
+	}
+
+	$classes = [];
+
+	foreach ($options as $option) {
+		if (!is_array($option)) {
+			continue;
+		}
+
+		$type = isset($option['type']) && is_string($option['type']) ? $option['type'] : '';
+		$attribute_name = isset($option['attributeName']) && is_string($option['attributeName'])
+			? $option['attributeName']
+			: '';
+
+		if ($attribute_name === '') {
+			continue;
+		}
+
+		$value = $block[$attribute_name] ?? ($option['default'] ?? null);
+
+		if ($type === 'boolean') {
+			if ($value) {
+				$class_name = isset($option['className']) && is_string($option['className'])
+					? $option['className']
+					: '';
+				if ($class_name !== '') {
+					$classes[] = $class_name;
+				}
+			}
+			continue;
+		}
+
+		if ($type === 'select' && is_string($value) && $value !== '') {
+			$classes[] = $value;
+		}
+	}
+
+	return $classes;
+}
+
+/**
+ * Merge block option classes into the block className before template render.
+ *
+ * @param array<string, mixed> $block
+ * @return array<string, mixed>
+ */
+function fs_acf_block_apply_option_classes(array $block): array
+{
+	$option_classes = fs_block_option_classes($block);
+	if ($option_classes === []) {
+		return $block;
+	}
+
+	$existing = isset($block['className']) && is_string($block['className'])
+		? trim($block['className'])
+		: '';
+
+	$block['className'] = trim($existing . ' ' . implode(' ', $option_classes));
+
+	return $block;
+}
+
 // Render callback for ACF blocks
 function fs_acf_block_render_callback($block)
 {
+	$block = fs_acf_block_apply_option_classes($block);
+
 	$slug = str_replace('acf/', '', $block['name']);
 	if (file_exists(get_theme_file_path("/acf/blocks/{$slug}/{$slug}.php"))) {
 		include(get_theme_file_path("/acf/blocks/{$slug}/{$slug}.php"));
@@ -154,38 +252,33 @@ function fs_acf_toolbars($toolbars)
 }
 add_filter('acf/fields/wysiwyg/toolbars', 'fs_acf_toolbars');
 
-// Add ACF Options Page
-function fs_acf_add_options_page()
-{
-	if (function_exists('acf_add_options_page')) {
-		$args = array(
-			'page_title' => 'Theme-Config',
-			'capability' => 'edit_posts',
-			'menu_slug' => 'theme-settings',
-			'redirect' => false,
-			'icon_url' => 'dashicons-admin-settings',
-			'update_button' => 'Speichern'
-		);
-		acf_add_options_page($args);
+/**
+ * ACF admin UI: developers only (menu + direct screen access).
+ */
+add_filter('acf/settings/show_admin', function ($show) {
+	if (!function_exists('fs_is_developer_user')) {
+		return $show;
 	}
-}
-add_action('acf/init', 'fs_acf_add_options_page');
+
+	return fs_is_developer_user((int) get_current_user_id());
+});
 
 // Remove core blocks
 add_filter('allowed_block_types_all', function ($allowed_blocks, $editor_context) {
 
-    $blocked = [
-        'core/accordion',
-        'core/accordion-item',
-        'core/accordion-heading',
-        'core/accordion-panel',
-    ];
+	$blocked = [
+		'core/accordion',
+		'core/accordion-item',
+		'core/accordion-heading',
+		'core/accordion-panel',
+		'core/icon',
+	];
 
-    // If WP already passed all registered blocks as true
-    if ($allowed_blocks === true) {
-        $allowed_blocks = WP_Block_Type_Registry::get_instance()->get_all_registered();
-        $allowed_blocks = array_keys($allowed_blocks);
-    }
+	// If WP already passed all registered blocks as true
+	if ($allowed_blocks === true) {
+		$allowed_blocks = WP_Block_Type_Registry::get_instance()->get_all_registered();
+		$allowed_blocks = array_keys($allowed_blocks);
+	}
 
-    return array_values(array_diff($allowed_blocks, $blocked));
+	return array_values(array_diff($allowed_blocks, $blocked));
 }, 10, 2);
