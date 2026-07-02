@@ -33,9 +33,9 @@ return [
 
 	// Font sizes
 	'font_sizes' => [
-		['name' => 'Small', 'shortName' => 'S', 'size' => 14, 'slug' => 's'],
-		['name' => 'Normal', 'shortName' => 'M', 'size' => 16, 'slug' => 'm'],
-		['name' => 'Large', 'shortName' => 'L', 'size' => 18, 'slug' => 'l'],
-		['name' => 'Extra large', 'shortName' => 'XL', 'size' => 22, 'slug' => 'xl'],
+		['name' => 'Small', 'shortName' => 'S', 'size' => '14px', 'slug' => 's'],
+		['name' => 'Normal', 'shortName' => 'M', 'size' => '16px', 'slug' => 'm'],
+		['name' => 'Large', 'shortName' => 'L', 'size' => '18px', 'slug' => 'l'],
+		['name' => 'Extra large', 'shortName' => 'XL', 'size' => '22px', 'slug' => 'xl'],
 	],
 ];

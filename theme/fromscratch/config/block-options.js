@@ -1,7 +1,7 @@
 /**
  * Get content margin options
- * @param {*} defaultValue 
- * @returns 
+ * @param {*} defaultValue
+ * @returns
  */
 function getContentMarginOptions(defaultValue = '') {
   return {
@@ -23,8 +23,8 @@ function getContentMarginOptions(defaultValue = '') {
 
 /**
  * Get content margin adjust options
- * @param {*} defaultValue 
- * @returns 
+ * @param {*} defaultValue
+ * @returns
  */
 function getContentMarginAdjustOptions(defaultValue = '') {
   return {
@@ -41,7 +41,10 @@ function getContentMarginAdjustOptions(defaultValue = '') {
       { label: 'Abstand oben: Groß', value: '-content-margin-top-l' },
       { label: 'Abstand oben: Sehr groß', value: '-content-margin-top-xl' },
       { label: 'Abstand unten: Ohne', value: '-content-margin-bottom-none' },
-      { label: 'Abstand unten: Sehr Klein', value: '-content-margin-bottom-xs' },
+      {
+        label: 'Abstand unten: Sehr Klein',
+        value: '-content-margin-bottom-xs'
+      },
       { label: 'Abstand unten: Klein', value: '-content-margin-bottom-s' },
       { label: 'Abstand unten: Mittel', value: '-content-margin-bottom-m' },
       { label: 'Abstand unten: Groß', value: '-content-margin-bottom-l' },
@@ -51,8 +54,26 @@ function getContentMarginAdjustOptions(defaultValue = '') {
 }
 
 /**
+ * Get text wrap options
+ * @returns
+ */
+function getTextWrapOptions() {
+  return {
+    type: 'select',
+    label: 'Text Wrap',
+    default: '',
+    attributeName: 'textWrap',
+    options: [
+      { label: 'Standard', value: '' },
+      { label: 'Balanced', value: 'text-wrap-balance' },
+      { label: 'Pretty', value: 'text-wrap-pretty' }
+    ]
+  };
+}
+
+/**
  * Get limit width options
- * @returns 
+ * @returns
  */
 function getLimitWidthOptions() {
   return {
@@ -108,7 +129,7 @@ export const blockOptions = [
       },
       {
         type: 'boolean',
-        label: 'Spalten auf Mobilgeräten umkehren',
+        label: 'Spalten wenn gestapelt umkehren',
         default: false,
         attributeName: 'columnReverseOrderOnMobile',
         className: '-reverse-order-on-mobile'
@@ -149,7 +170,8 @@ export const blockOptions = [
           { label: 'H6', value: 'h6' }
         ]
       },
-      getLimitWidthOptions()
+      getLimitWidthOptions(),
+      getTextWrapOptions()
     ]
   },
 
@@ -158,17 +180,7 @@ export const blockOptions = [
     name: 'core/paragraph',
     options: [
       getLimitWidthOptions(),
-      {
-        type: 'select',
-        label: 'Text Wrap',
-        default: '',
-        attributeName: 'textWrap',
-        options: [
-          { label: 'Standard', value: '' },
-          { label: 'Balanced', value: 'text-wrap-balance' },
-          { label: 'Pretty', value: 'text-wrap-pretty' }
-        ]
-      }
+      getTextWrapOptions()
     ]
   },
 
@@ -231,6 +243,24 @@ export const blockOptions = [
   // Separator
   {
     name: 'core/separator',
+    options: [
+      getContentMarginOptions('-content-margin-m'),
+      getContentMarginAdjustOptions()
+    ]
+  },
+
+  // Cover
+  {
+    name: 'core/cover',
+    options: [
+      getContentMarginOptions('-content-margin-m'),
+      getContentMarginAdjustOptions()
+    ]
+  },
+
+  // ACF: Slider
+  {
+    name: 'acf/slider',
     options: [
       getContentMarginOptions('-content-margin-m'),
       getContentMarginAdjustOptions()
