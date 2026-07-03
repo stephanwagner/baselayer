@@ -12,7 +12,7 @@
     margin-bottom: 0;
   }
 
-  +.accordion__wrapper {
+  + .accordion__wrapper {
     margin-top: -20px;
 
     @media (max-width: $breakpoint-s) {

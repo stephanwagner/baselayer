@@ -1,0 +1,11 @@
+@use '../../../src/scss/variables' as *;
+
+.editor-styles-wrapper {
+  .accordion__content {
+    .accordion__wrapper.accordion-open &,
+    .wp-block.is-selected &,
+    .wp-block.has-child-selected & {
+      display: block !important;
+    }
+  }
+}

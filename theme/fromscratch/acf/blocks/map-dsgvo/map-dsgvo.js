@@ -1,17 +1,12 @@
 import $ from 'jquery';
-import {
-  isGoogleMapsAccepted,
-  setGoogleMapsAccepted,
-  removeGoogleMapsAccepted
-} from '../map/map.js';
+import { isGoogleMapsAccepted, setGoogleMapsAccepted, removeGoogleMapsAccepted } from '../map/map.js';
 
 /**
  * Initialize the Google Maps consent block
  */
 function initGoogleMapsConsentBlock() {
   if ($('[data-google-maps-dsgvo-container]').length) {
-    const hasAcceptedTitle =
-      'Sie haben zugestimmt, dass Daten an Google gesendet werden, um Google Maps anzuzeigen.';
+    const hasAcceptedTitle = 'Sie haben zugestimmt, dass Daten an Google gesendet werden, um Google Maps anzuzeigen.';
     const hasNotAcceptedTitle =
       'Sie haben nicht zugestimmt, dass Daten an Google gesendet werden, um Google Maps anzuzeigen.';
 
@@ -34,9 +29,7 @@ function initGoogleMapsConsentBlock() {
 
     html += '<div class="map-dsgvo__link-container">';
     html += '  <span class="map-dsgvo__link" tabindex="0">';
-    html += isGoogleMapsAccepted()
-      ? hasAcceptedButtonText
-      : hasNotAcceptedButtonText;
+    html += isGoogleMapsAccepted() ? hasAcceptedButtonText : hasNotAcceptedButtonText;
     html += '  </span>';
     html += '</div>';
 

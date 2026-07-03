@@ -14,7 +14,7 @@
   overflow: hidden;
 
   &::after {
-    content: "";
+    content: '';
     display: block;
     padding-top: var(--slider-padding-top, 100%);
     position: relative;

@@ -49,8 +49,7 @@ if ($image) {
 		data-address="<?= $address ?>"
 		data-lat="<?= $lat ?>"
 		data-lng="<?= $lng ?>"
-		data-zoom="<?= $zoom ?>"
-	>
+		data-zoom="<?= $zoom ?>">
 		<div class="map__notice-container" style="background-image: url('<?= !empty($imageSrc) ? $imageSrc : '' ?>')" data-google-maps-notice-container>
 			<div class="map__notice">
 				<div class="map__notice-title">Karte laden</div>

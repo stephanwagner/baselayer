@@ -32,7 +32,7 @@ $.each(sliders, function (index, slider) {
   const sliderConfig = {
     wrapperClass: 'acf-innerblocks-container',
     effect: sliderWrapper.attr('data-slider-animation') || 'slide',
-    speed: 800
+    speed: 800,
   };
 
   // Animation effect
@@ -40,7 +40,7 @@ $.each(sliders, function (index, slider) {
     case 'fade':
       modules.push(EffectFade);
       sliderConfig.fadeEffect = {
-        crossFade: true
+        crossFade: true,
       };
       break;
   }
@@ -49,118 +49,106 @@ $.each(sliders, function (index, slider) {
   sliderConfig.loop = sliderWrapper.attr('data-slider-loop') === 'true';
 
   // Space between
-  sliderConfig.spaceBetween =
-    parseInt(sliderWrapper.attr('data-slider-space-between')) || 16;
+  let spaceBetween = parseInt(sliderWrapper.attr('data-slider-space-between'));
+  sliderConfig.spaceBetween = spaceBetween || spaceBetween === 0 ? spaceBetween : 16;
 
   // Slides per view
-  sliderConfig.slidesPerView =
-    parseInt(sliderWrapper.attr('data-slider-slides-per-view')) || 1;
+  sliderConfig.slidesPerView = parseInt(sliderWrapper.attr('data-slider-slides-per-view')) || 1;
 
   // Slides per group
-  sliderConfig.slidesPerGroup =
-    parseInt(sliderWrapper.attr('data-slider-slides-per-group')) || 1;
+  sliderConfig.slidesPerGroup = parseInt(sliderWrapper.attr('data-slider-slides-per-group')) || 1;
 
   if (sliderConfig.slidesPerView == 2) {
     sliderConfig.breakpoints = {
       600: {
         slidesPerView: 2,
-        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, 2)
+        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, 2),
       },
       0: {
         slidesPerView: 1,
-        slidesPerGroup: 1
-      }
+        slidesPerGroup: 1,
+      },
     };
   }
   if (sliderConfig.slidesPerView == 3) {
     sliderConfig.breakpoints = {
       900: {
         slidesPerView: 3,
-        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, 3)
+        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, 3),
       },
       600: {
         slidesPerView: 2,
-        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, 2)
+        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, 2),
       },
       0: {
         slidesPerView: 1,
-        slidesPerGroup: 1
-      }
+        slidesPerGroup: 1,
+      },
     };
   }
   if (sliderConfig.slidesPerView == 4) {
     sliderConfig.breakpoints = {
       1200: {
         slidesPerView: 4,
-        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, 4)
+        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, 4),
       },
       900: {
         slidesPerView: 3,
-        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, 3)
+        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, 3),
       },
       600: {
         slidesPerView: 2,
-        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, 2)
+        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, 2),
       },
       0: {
         slidesPerView: 1,
-        slidesPerGroup: 1
-      }
+        slidesPerGroup: 1,
+      },
     };
   }
   if (sliderConfig.slidesPerView >= 5) {
     sliderConfig.breakpoints = {
       1200: {
         slidesPerView: sliderConfig.slidesPerView,
-        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, sliderConfig.slidesPerView)
+        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, sliderConfig.slidesPerView),
       },
       900: {
         slidesPerView: 4,
-        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, 4)
+        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, 4),
       },
       600: {
         slidesPerView: 2,
-        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, 2)
+        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, 2),
       },
       0: {
         slidesPerView: 1,
-        slidesPerGroup: 1
-      }
+        slidesPerGroup: 1,
+      },
     };
   }
 
   // Pagination (scoped per slider — global selectors break with multiple blocks on one page)
-  if (
-    slideCount > 1 &&
-    sliderWrapper.attr('data-slider-pagination') === 'true' &&
-    paginationEl
-  ) {
+  const hasDynamicBullets = sliderWrapper.attr('data-slider-dynamic-bullets') === 'true';
+  if (slideCount > 1 && sliderWrapper.attr('data-slider-pagination') === 'true' && paginationEl) {
     sliderConfig.pagination = {
       el: paginationEl,
       clickable: true,
-      dynamicBullets: true,
-      dynamicMainBullets: 3
+      dynamicBullets: hasDynamicBullets,
+      dynamicMainBullets: 3,
     };
   }
 
   // Navigation
-  if (
-    slideCount > 1 &&
-    sliderWrapper.attr('data-slider-navigation') === 'true' &&
-    nextEl &&
-    prevEl
-  ) {
+  if (slideCount > 1 && sliderWrapper.attr('data-slider-navigation') === 'true' && nextEl && prevEl) {
     sliderConfig.navigation = {
       nextEl,
-      prevEl
+      prevEl,
     };
   }
 
   // Autoplay
   if (sliderWrapper.attr('data-slider-autoplay') === 'true') {
-    let autoplayDelay = parseFloat(
-      sliderWrapper.attr('data-slider-autoplay-delay')
-    );
+    let autoplayDelay = parseFloat(sliderWrapper.attr('data-slider-autoplay-delay'));
     if (!autoplayDelay) {
       autoplayDelay = 6000;
     } else {
@@ -170,7 +158,7 @@ $.each(sliders, function (index, slider) {
     sliderConfig.autoplay = {
       delay: autoplayDelay,
       disableOnInteraction: true,
-      pauseOnMouseEnter: false
+      pauseOnMouseEnter: false,
     };
   }
 
@@ -178,8 +166,7 @@ $.each(sliders, function (index, slider) {
   sliderConfig.modules = modules;
 
   // Slider selector
-  const sliderSelector =
-    '.slider__wrapper[data-slider-id="' + id + '"] .swiper';
+  const sliderSelector = '.slider__wrapper[data-slider-id="' + id + '"] .swiper';
 
   // Init slider
   const swiper = new Swiper(sliderSelector, sliderConfig);

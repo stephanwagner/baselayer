@@ -59,7 +59,8 @@ $spaceBetween = max(0, (int) $spaceBetween);
 	data-slider-autoplay="<?= $autoplay ? 'true' : 'false' ?>"
 	data-slider-autoplay-delay="<?= $autoplayDelay ?>"
 	data-slider-pagination="<?= $pagination ? 'true' : 'false' ?>"
-	data-slider-navigation="<?= $navigation ? 'true' : 'false' ?>">
+	data-slider-navigation="<?= $navigation ? 'true' : 'false' ?>"
+	data-slider-dynamic-bullets="true">
 	<?php if (is_admin()) { ?>
 		<div class="slider__editor-badge" aria-hidden="true">
 			<span class="slider__editor-badge-icon">

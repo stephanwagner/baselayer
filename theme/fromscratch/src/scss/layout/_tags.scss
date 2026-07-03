@@ -14,8 +14,11 @@
 
   a {
     color: var(--fs-link-color);
-    transition: transition('color', 'background-color');
     text-decoration: none;
+
+    body.-transition-init & {
+      transition: transition('color', 'background-color');
+    }
 
     &:hover {
       text-decoration: none;

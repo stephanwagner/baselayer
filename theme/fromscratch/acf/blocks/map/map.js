@@ -27,8 +27,7 @@ if (googleMapsWrappers.length) {
 export function isGoogleMapsAccepted() {
   return (
     localStorage.getItem(googleMapsLocalStorageKey) === '1' ||
-    (typeof window.BorlabsCookie !== 'undefined' &&
-      window.BorlabsCookie.Consents.hasConsent('maps'))
+    (typeof window.BorlabsCookie !== 'undefined' && window.BorlabsCookie.Consents.hasConsent('maps'))
   );
 }
 window.isGoogleMapsAccepted = isGoogleMapsAccepted;
