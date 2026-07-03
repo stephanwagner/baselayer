@@ -617,8 +617,8 @@ msgstr "Fügt die Seiten den konfigurierten Menü-Positionen hinzu."
 msgid "Administrator email"
 msgstr "Administrator-E-Mail"
 
-msgid "Used for system notifications, updates, and critical error recovery."
-msgstr "Wird für Systembenachrichtigungen, Updates und die Fehlerwiederherstellung verwendet."
+msgid "Used for system notifications, updates, and critical error reporting."
+msgstr "Wird für Systembenachrichtigungen, Updates und kritische Fehlermeldungen verwendet."
 
 msgid "At least one user requires developer privileges to manage technical settings and system-level functionality."
 msgstr "Mindestens ein Benutzer benötigt Entwicklerrechte, um technische Einstellungen und systemrelevante Funktionen verwalten zu können."
@@ -1036,8 +1036,8 @@ msgstr "Verfügbare Sprachen"
 msgid "Add and manage the languages available for your site’s content."
 msgstr "Sprachen für die Inhalte deiner Website hinzufügen und verwalten."
 
-msgid "Language codes follow ISO-639-1 (e.g. en, de, fr)."
-msgstr "Sprachcodes folgen ISO-639-1 (z. B. en, de, fr)."
+msgid "Language codes follow %s (e.g. en, de, fr)."
+msgstr "Sprachcodes folgen %s (z. B. en, de, fr)."
 
 msgid "Code"
 msgstr "Code"

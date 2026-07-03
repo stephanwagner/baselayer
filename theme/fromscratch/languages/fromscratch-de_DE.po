@@ -617,8 +617,8 @@ msgstr "Fügt die Seiten den konfigurierten Menü-Positionen hinzu."
 msgid "Administrator email"
 msgstr "Administrator-E-Mail"
 
-msgid "Used for system notifications, updates, and critical error recovery."
-msgstr "Wird für Systembenachrichtigungen, Updates und die Fehlerwiederherstellung verwendet."
+msgid "Used for system notifications, updates, and critical error reporting."
+msgstr "Wird für Systembenachrichtigungen, Updates und kritische Fehlermeldungen verwendet."
 
 msgid "At least one user requires developer privileges to manage technical settings and system-level functionality."
 msgstr "Mindestens ein Benutzer benötigt Entwicklerrechte, um technische Einstellungen und systemrelevante Funktionen verwalten zu können."
