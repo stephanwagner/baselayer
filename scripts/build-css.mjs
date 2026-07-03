@@ -1,26 +1,27 @@
+import { createRequire } from 'node:module';
 import { spawn } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+const require = createRequire(import.meta.url);
+const { themeDir } = require('./config.cjs');
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
 const sassBin = path.join(root, 'node_modules/.bin/sass');
 const chokidarBin = path.join(root, 'node_modules/.bin/chokidar');
 
-const theme = 'fromscratch';
-const base = `theme/${theme}`;
-
 const entries = [
-  { src: `${base}/src/scss/main.scss`, name: 'main' },
-  { src: `${base}/src/scss/admin.scss`, name: 'admin' },
-  { src: `${base}/src/scss/admin-bar.scss`, name: 'admin-bar' }
+  { src: `${themeDir}/src/scss/main.scss`, name: 'main' },
+  { src: `${themeDir}/src/scss/admin.scss`, name: 'admin' },
+  { src: `${themeDir}/src/scss/admin-bar.scss`, name: 'admin-bar' }
 ];
 
 function sassPairs(prod) {
   const suffix = prod ? '.min' : '';
 
   return entries.map(
-    ({ src, name }) => `${src}:${base}/assets/css/${name}${suffix}.css`
+    ({ src, name }) => `${src}:${themeDir}/assets/css/${name}${suffix}.css`
   );
 }
 
@@ -81,7 +82,7 @@ function watch() {
       '--source-map'
     ]),
     spawnWatch(chokidarBin, [
-      'theme/fromscratch/acf/blocks/**/*.scss',
+      `${themeDir}/acf/blocks/**/*.scss`,
       '-c',
       'node scripts/bump-scss-entries.cjs'
     ])

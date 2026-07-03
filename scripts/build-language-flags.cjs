@@ -6,14 +6,12 @@
 
 const fs = require('fs');
 const path = require('path');
+const { themeDir } = require('./config.cjs');
 
 const root = path.resolve(__dirname, '..');
-const mapPath = path.join(
-  root,
-  'theme/fromscratch/data/languages/flag-map.json'
-);
-const sourceDir = path.join(root, 'theme/fromscratch/assets/flags/alpha-2');
-const targetDir = path.join(root, 'theme/fromscratch/assets/flags/iso-639');
+const mapPath = path.join(root, themeDir, 'data/languages/flag-map.json');
+const sourceDir = path.join(root, themeDir, 'assets/flags/alpha-2');
+const targetDir = path.join(root, themeDir, 'assets/flags/iso-639');
 
 const map = JSON.parse(fs.readFileSync(mapPath, 'utf8'));
 

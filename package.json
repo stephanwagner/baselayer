@@ -9,9 +9,9 @@
     "watch:js": "node scripts/build-js.mjs --watch",
     "watch:css": "node scripts/build-css.mjs --watch",
     "build": "npm run build:js && npm run build:css",
-    "build:language-flags": "node scripts/build-language-flags.cjs",
     "build:js": "node scripts/build-js.mjs",
     "build:css": "node scripts/build-css.mjs",
+    "build:language-flags": "node scripts/build-language-flags.cjs",
     "format": "prettier \"theme/fromscratch/src\" --write"
   },
   "dependencies": {

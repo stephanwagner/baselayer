@@ -5,11 +5,12 @@
 
 const fs = require('fs');
 const path = require('path');
+const { themeDir } = require('./config.cjs');
 
 const root = path.join(__dirname, '..');
 const entries = [
-  path.join(root, 'theme/fromscratch/src/scss/main.scss'),
-  path.join(root, 'theme/fromscratch/src/scss/admin.scss')
+  path.join(root, themeDir, 'src/scss/main.scss'),
+  path.join(root, themeDir, 'src/scss/admin.scss')
 ];
 
 const t = new Date();

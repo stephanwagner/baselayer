@@ -1,13 +1,14 @@
+import { createRequire } from 'node:module';
 import * as esbuild from 'esbuild';
 
-const theme = 'fromscratch';
-const base = `theme/${theme}`;
+const require = createRequire(import.meta.url);
+const { themeDir } = require('./config.cjs');
 
 const bundles = [
-  { input: `${base}/src/js/main/main.js`, name: 'main' },
-  { input: `${base}/src/js/admin/admin.js`, name: 'admin' },
+  { input: `${themeDir}/src/js/main/main.js`, name: 'main' },
+  { input: `${themeDir}/src/js/admin/admin.js`, name: 'admin' },
   {
-    input: `${base}/src/js/editor/editor.js`,
+    input: `${themeDir}/src/js/editor/editor.js`,
     name: 'editor',
     jsx: {
       loader: { '.js': 'jsx' },
@@ -16,13 +17,13 @@ const bundles = [
       jsxFragment: 'wp.element.Fragment'
     }
   },
-  { input: `${base}/src/js/service-worker/index.js`, name: 'service-worker' }
+  { input: `${themeDir}/src/js/service-worker/index.js`, name: 'service-worker' }
 ];
 
 function bundleOptions(prod) {
   return bundles.map(({ input, name, jsx }) => ({
     entryPoints: [input],
-    outfile: `${base}/assets/js/${name}${prod ? '.min' : ''}.js`,
+    outfile: `${themeDir}/assets/js/${name}${prod ? '.min' : ''}.js`,
     bundle: true,
     format: 'iife',
     platform: 'browser',
