@@ -883,7 +883,7 @@ function fs_dashboard_get_matomo_daily_and_weekly(int $days = 7, int $weeks = 8)
     $days = max(1, min(365, $days));
     $weeks = max(1, min(104, $weeks));
     $settings = fs_dashboard_matomo_settings();
-    if ($settings === null || !function_exists('wp_remote_get')) {
+    if ($settings === null || !function_exists('wp_remote_post')) {
         return [
             'daily' => [],
             'weekly' => [],
@@ -993,11 +993,11 @@ function fs_dashboard_get_matomo_daily_and_weekly(int $days = 7, int $weeks = 8)
             (int) $settings['site_id']
         )),
     ];
-    $bulk_url = $bulk_base . '?' . http_build_query($bulk_query, '', '&', PHP_QUERY_RFC3986);
-
-    $response = wp_remote_get($bulk_url, [
+    // Matomo requires token_auth as a POST parameter (GET is rejected on current versions).
+    $response = wp_remote_post($bulk_base, [
         'timeout' => 10,
         'headers' => ['Accept' => 'application/json'],
+        'body' => $bulk_query,
     ]);
     $empty = [
         'daily' => [],
