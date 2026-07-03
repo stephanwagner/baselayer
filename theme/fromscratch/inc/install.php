@@ -1038,13 +1038,6 @@ Tags:
       wp_delete_post($hello_post->ID, true);
     }
 
-    // Delete Privacy Policy page (ONLY if WP created/assigned it)
-    $privacy_id = (int) get_option('wp_page_for_privacy_policy');
-    if ($privacy_id && $privacy_id < 3) { // TODO check post id // TODO see comment Jens, lets keep the original
-      wp_delete_post($privacy_id, true);
-      update_option('wp_page_for_privacy_policy', 0);
-    }
-
     // Delete comments
     $comments = get_comments([
       'number' => -1,
@@ -1056,6 +1049,23 @@ Tags:
 
     // Add pages (imprint only if checkbox checked; others always added via hidden input)
     $pages = $_POST['pages'] ?? [];
+
+    // Drop WordPress default privacy page when the installer creates/uses its own.
+    if (!empty($pages['privacy']['add'])) {
+      $install_privacy_slug = sanitize_title((string) ($pages['privacy']['slug'] ?? 'privacy'));
+      $install_privacy_page = $install_privacy_slug !== ''
+        ? get_page_by_path($install_privacy_slug, OBJECT, 'page')
+        : null;
+      $wp_privacy_id = (int) get_option('wp_page_for_privacy_policy');
+
+      if ($wp_privacy_id > 0) {
+        $is_install_page = $install_privacy_page && (int) $install_privacy_page->ID === $wp_privacy_id;
+        if (!$is_install_page) {
+          wp_delete_post($wp_privacy_id, true);
+          update_option('wp_page_for_privacy_policy', 0);
+        }
+      }
+    }
 
     foreach ($pages as $page_id => $page) {
       $add_page = !empty($page['add']);
@@ -1095,16 +1105,18 @@ Tags:
           'post_name'   => $page['slug'],
           'post_content' => $page_content,
         ]);
+      }
 
-        if ($page_id === 'homepage') {
-          update_option('show_on_front', 'page');
-          update_option('page_on_front', (int) $page_post_id);
-          update_option('page_for_posts', 0);
-        }
+      $resolved_page_id = $page_obj ? (int) $page_obj->ID : (int) ($page_post_id ?? 0);
 
-        if ($page_id === 'privacy') {
-          update_option('wp_page_for_privacy_policy', (int) $page_post_id);
-        }
+      if ($page_id === 'homepage' && $resolved_page_id > 0) {
+        update_option('show_on_front', 'page');
+        update_option('page_on_front', $resolved_page_id);
+        update_option('page_for_posts', 0);
+      }
+
+      if ($page_id === 'privacy' && $resolved_page_id > 0) {
+        update_option('wp_page_for_privacy_policy', $resolved_page_id);
       }
     }
   }
