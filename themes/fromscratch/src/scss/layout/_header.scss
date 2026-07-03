@@ -43,6 +43,10 @@
 
   @media (max-width: $breakpoint-mobile) {
     height: var(--fs-header-height-mobile);
+
+    body.-scrolled & {
+      height: var(--fs-header-height-mobile-scrolled);
+    }
   }
 }
 

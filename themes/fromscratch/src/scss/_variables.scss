@@ -76,6 +76,7 @@ $content-margin-xl: 96px;
 $header-height: 96px;
 $header-height-scrolled: 64px;
 $header-height-mobile: 64px;
+$header-height-mobile-scrolled: 56px;
 
 // Mobile menu
 $mobile-menu-width: 280px;
@@ -168,6 +169,7 @@ $border-radius-large: 16px;
   --fs-header-height: #{$header-height};
   --fs-header-height-scrolled: #{$header-height-scrolled};
   --fs-header-height-mobile: #{$header-height-mobile};
+  --fs-header-height-mobile-scrolled: #{$header-height-mobile-scrolled};
 
   // Mobile menu
   --fs-mobile-menu-width: #{$mobile-menu-width};
