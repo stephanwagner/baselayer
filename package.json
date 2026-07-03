@@ -6,36 +6,29 @@
   "type": "module",
   "scripts": {
     "watch": "concurrently \"npm run watch:js\" \"npm run watch:css\"",
-    "watch:js": "MODE=dev rollup -c -w",
+    "watch:js": "node scripts/build-js.mjs --watch",
     "watch:css": "concurrently \"npm run watch:css:sass\" \"npm run watch:css:acf-blocks\"",
     "watch:css:sass": "sass theme/fromscratch/src/scss/main.scss:theme/fromscratch/assets/css/main.css theme/fromscratch/src/scss/admin.scss:theme/fromscratch/assets/css/admin.css theme/fromscratch/src/scss/admin-bar.scss:theme/fromscratch/assets/css/admin-bar.css --watch --poll --source-map",
     "watch:css:acf-blocks": "chokidar \"theme/fromscratch/acf/blocks/**/*.scss\" -c \"node scripts/bump-scss-entries.cjs\"",
     "build": "npm run build:js && npm run build:css",
     "build:language-flags": "node scripts/build-language-flags.cjs",
-    "build:js": "MODE=dev rollup -c && MODE=prod rollup -c",
+    "build:js": "node scripts/build-js.mjs",
     "build:css": "npm run build:css:dev && npm run build:css:prod",
     "build:css:dev": "sass theme/fromscratch/src/scss/main.scss:theme/fromscratch/assets/css/main.css theme/fromscratch/src/scss/admin.scss:theme/fromscratch/assets/css/admin.css theme/fromscratch/src/scss/admin-bar.scss:theme/fromscratch/assets/css/admin-bar.css --style=expanded --source-map",
     "build:css:prod": "sass theme/fromscratch/src/scss/main.scss:theme/fromscratch/assets/css/main.min.css theme/fromscratch/src/scss/admin.scss:theme/fromscratch/assets/css/admin.min.css theme/fromscratch/src/scss/admin-bar.scss:theme/fromscratch/assets/css/admin-bar.min.css --style=compressed --no-source-map"
   },
   "dependencies": {
     "chart.js": "^4.5.1",
-    "countup.js": "^2.10.0",
+    "countup.js": "^2.10.1",
     "jquery": "^4.0.0",
     "normalize.css": "^8.0.1",
     "photoswipe": "^5.4.4",
-    "swiper": "^12.2.0"
+    "swiper": "^14.0.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.29.7",
-    "@babel/preset-env": "^7.29.7",
-    "@babel/preset-react": "^7.29.7",
-    "@rollup/plugin-babel": "^7.1.0",
-    "@rollup/plugin-node-resolve": "^16.0.3",
-    "@rollup/plugin-terser": "^1.0.0",
-    "baseline-browser-mapping": "^2.10.33",
     "chokidar-cli": "^3.0.0",
-    "concurrently": "^10.0.0",
-    "rollup": "^4.60.4",
-    "sass": "^1.100.0"
+    "concurrently": "^10.0.3",
+    "esbuild": "^0.28.1",
+    "sass": "^1.101.0"
   }
 }

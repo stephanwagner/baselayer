@@ -7,16 +7,16 @@ const path = require('path');
 
 const root = path.join(__dirname, '..');
 const entries = [
-	path.join(root, 'theme/fromscratch/src/scss/main.scss'),
-	path.join(root, 'theme/fromscratch/src/scss/admin.scss'),
+  path.join(root, 'theme/fromscratch/src/scss/main.scss'),
+  path.join(root, 'theme/fromscratch/src/scss/admin.scss')
 ];
 
 const t = new Date();
 for (const file of entries) {
-	try {
-		fs.utimesSync(file, t, t);
-	} catch (err) {
-		process.stderr.write(`bump-scss-entries: ${file}: ${err.message}\n`);
-		process.exitCode = 1;
-	}
+  try {
+    fs.utimesSync(file, t, t);
+  } catch (err) {
+    process.stderr.write(`bump-scss-entries: ${file}: ${err.message}\n`);
+    process.exitCode = 1;
+  }
 }
