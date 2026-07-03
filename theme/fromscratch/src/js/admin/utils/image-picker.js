@@ -43,8 +43,7 @@ function initImagePicker(root = document) {
       });
       frame.on('select', () => {
         const attachment = frame.state().get('selection').first().toJSON();
-        const url =
-          attachment.sizes?.medium?.url ?? attachment.url ?? '';
+        const url = attachment.sizes?.medium?.url ?? attachment.url ?? '';
         inputEl.value = String(attachment.id);
         previewEl.innerHTML = '';
         const img = document.createElement('img');

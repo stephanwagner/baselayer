@@ -30,9 +30,7 @@ export function openModal(id, onOpen, sourceEl) {
 
   onOpen?.(modalEl, sourceEl);
 
-  const modalOnOpenCallback = modalEl.querySelector(
-    '[data-modal-content]'
-  )?.modalOnOpen;
+  const modalOnOpenCallback = modalEl.querySelector('[data-modal-content]')?.modalOnOpen;
 
   if (modalOnOpenCallback && typeof modalOnOpenCallback === 'function') {
     modalOnOpenCallback(modalEl, sourceEl);
@@ -111,8 +109,7 @@ export function getModal(id) {
 
   const closeButtonEl = document.createElement('div');
   closeButtonEl.classList.add('modal__close-button');
-  closeButtonEl.innerHTML =
-    '<div class="modal__close-button-icon">' + closeIcon + '</div>';
+  closeButtonEl.innerHTML = '<div class="modal__close-button-icon">' + closeIcon + '</div>';
   closeButtonEl.addEventListener('click', () => closeModal(id));
   contentContainerEl.appendChild(closeButtonEl);
 
@@ -139,22 +136,12 @@ export function enableClosingModal(id) {
 }
 
 export function confirmModal(data) {
-  const {
-    title,
-    text,
-    cancelButtonText,
-    submitButtonText,
-    cancelCallback,
-    submitCallback,
-    onOpen
-  } = data;
+  const { title, text, cancelButtonText, submitButtonText, cancelCallback, submitCallback, onOpen } = data;
 
   const modalId = 'confirm';
 
   function onConfirmOpen(modalEl, sourceEl) {
-    document
-      .querySelectorAll(`[data-modal-content="${modalId}"]`)
-      .forEach((el) => el.remove());
+    document.querySelectorAll(`[data-modal-content="${modalId}"]`).forEach((el) => el.remove());
 
     const containerEl = document.createElement('div');
     containerEl.classList.add('confirm-modal__container');
@@ -174,14 +161,7 @@ export function confirmModal(data) {
     footerEl.classList.add('modal__footer', 'confirm-modal__footer');
 
     const cancelBtn = document.createElement('button');
-    cancelBtn.classList.add(
-      'modal__button',
-      'confirm-modal__button',
-      'button',
-      '-small',
-      '-secondary',
-      '-cancel'
-    );
+    cancelBtn.classList.add('modal__button', 'confirm-modal__button', 'button', '-small', '-secondary', '-cancel');
     cancelBtn.innerHTML = `<span>${cancelButtonText}</span>`;
     cancelBtn.addEventListener('click', () => {
       closeConfirmModal();
@@ -189,14 +169,7 @@ export function confirmModal(data) {
     });
 
     const submitBtn = document.createElement('button');
-    submitBtn.classList.add(
-      'modal__button',
-      'confirm-modal__button',
-      'button',
-      '-small',
-      '-primary',
-      '-submit'
-    );
+    submitBtn.classList.add('modal__button', 'confirm-modal__button', 'button', '-small', '-primary', '-submit');
     submitBtn.innerHTML = `<span>${submitButtonText}</span><em></em><u></u>`;
     submitBtn.addEventListener('click', () => {
       submitCallback?.(modalEl, submitBtn);
@@ -206,9 +179,7 @@ export function confirmModal(data) {
     footerEl.appendChild(submitBtn);
     containerEl.appendChild(footerEl);
 
-    document
-      .querySelector(`.modal__wrapper[data-id="${modalId}"] .modal__content`)
-      .appendChild(containerEl);
+    document.querySelector(`.modal__wrapper[data-id="${modalId}"] .modal__content`).appendChild(containerEl);
 
     onOpen?.(modalEl, sourceEl);
   }

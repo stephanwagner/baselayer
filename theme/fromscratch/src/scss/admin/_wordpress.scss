@@ -18,7 +18,7 @@ div#wpwrap {
 }
 
 .is-root-container {
-  >*:first-child {
+  > *:first-child {
     padding-top: 0;
     margin-top: 0;
   }
@@ -26,7 +26,7 @@ div#wpwrap {
 
 // Title
 
-h2.title+p.description {
+h2.title + p.description {
   margin-top: -4px;
 }
 
@@ -98,7 +98,6 @@ body.fs-cpt-reorder-list {
 }
 
 .fs-table-small-gaps {
-
   th:not(:first-child),
   td:not(:first-child) {
     padding-left: 0;
@@ -124,7 +123,7 @@ body.fs-cpt-reorder-list {
   font-size: 13px;
   line-height: 24px;
 
-  >p:first-child {
+  > p:first-child {
     margin: 4px 0;
   }
 
@@ -160,7 +159,7 @@ body.fs-cpt-reorder-list {
       padding-left: 12px;
 
       &::before {
-        content: "›";
+        content: '›';
         position: absolute;
         left: 2px;
         top: -1px;
@@ -216,7 +215,7 @@ body.fs-cpt-reorder-list {
     }
 
     &::before {
-      content: "›";
+      content: '›';
       position: absolute;
       left: 0;
       top: 0;

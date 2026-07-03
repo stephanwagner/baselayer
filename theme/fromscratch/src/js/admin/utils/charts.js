@@ -62,8 +62,8 @@ function initCharts() {
           item && typeof item.formattedValue !== 'undefined'
             ? item.formattedValue
             : item && typeof item.raw !== 'undefined'
-            ? item.raw
-            : '';
+              ? item.raw
+              : '';
         return dsLabel ? dsLabel + ': ' + val : val;
       };
     }

@@ -6,18 +6,14 @@
  */
 function initCheckboxToggleContent(root = document) {
   const scope = root || document;
-  const checkboxes = scope.querySelectorAll(
-    'input[type="checkbox"][data-fs-checkbox-toggle]'
-  );
+  const checkboxes = scope.querySelectorAll('input[type="checkbox"][data-fs-checkbox-toggle]');
   checkboxes.forEach((checkbox) => {
     const toggleScope = checkbox.getAttribute('data-fs-checkbox-toggle');
     if (!toggleScope) return;
 
-    const allWithScope = scope.querySelectorAll(
-      '[data-fs-checkbox-toggle-content]'
-    );
+    const allWithScope = scope.querySelectorAll('[data-fs-checkbox-toggle-content]');
     const contentElements = Array.from(allWithScope).filter(
-      (el) => el.getAttribute('data-fs-checkbox-toggle-content') === toggleScope
+      (el) => el.getAttribute('data-fs-checkbox-toggle-content') === toggleScope,
     );
     if (!contentElements.length) return;
 

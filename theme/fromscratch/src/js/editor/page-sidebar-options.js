@@ -18,12 +18,7 @@
     const postId = props.postId;
     const cfg = props.cfg || {};
 
-    const [meta, setMeta] = useEntityProp(
-      'postType',
-      postType,
-      'meta',
-      postId
-    );
+    const [meta, setMeta] = useEntityProp('postType', postType, 'meta', postId);
     if (!meta || typeof setMeta !== 'function') {
       return null;
     }
@@ -37,8 +32,7 @@
       showTitleVal === 1;
 
     var pinVal = meta[META_PIN];
-    var pinChecked =
-      pinVal === true || pinVal === '1' || pinVal === 1;
+    var pinChecked = pinVal === true || pinVal === '1' || pinVal === 1;
 
     /**
      * Same slot as exclude-from-search: PluginPostStatusInfo + inner stack for two controls.
@@ -52,11 +46,11 @@
         onChange: function (val) {
           setMeta(
             Object.assign({}, meta, {
-              [META_SHOW]: val ? true : false
-            })
+              [META_SHOW]: val ? true : false,
+            }),
           );
         },
-        __nextHasNoMarginBottom: true
+        __nextHasNoMarginBottom: true,
       }),
       el(CheckboxControl, {
         label: cfg.labelPinDashboard || 'Pin to dashboard',
@@ -64,12 +58,12 @@
         onChange: function (val) {
           setMeta(
             Object.assign({}, meta, {
-              [META_PIN]: val ? true : false
-            })
+              [META_PIN]: val ? true : false,
+            }),
           );
         },
-        __nextHasNoMarginBottom: true
-      })
+        __nextHasNoMarginBottom: true,
+      }),
     );
   }
 
@@ -81,10 +75,7 @@
       return select('core/editor')?.getCurrentPostId?.();
     }, []);
 
-    var cfg =
-      typeof fromscratchPageSidebarOptions !== 'undefined'
-        ? fromscratchPageSidebarOptions
-        : {};
+    var cfg = typeof fromscratchPageSidebarOptions !== 'undefined' ? fromscratchPageSidebarOptions : {};
 
     if (!PluginPostStatusInfo) {
       return null;
@@ -99,12 +90,12 @@
       el(PageSidebarOptions, {
         postType: postType,
         postId: postId,
-        cfg: cfg
-      })
+        cfg: cfg,
+      }),
     );
   }
 
   registerPlugin('fromscratch-page-sidebar-options', {
-    render: PageSidebarOptionsPlugin
+    render: PageSidebarOptionsPlugin,
   });
 })(typeof wp !== 'undefined' ? wp : window.wp);

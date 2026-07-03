@@ -52,9 +52,7 @@ function updateLanguageSwitcherTrigger(lang) {
   }
 
   const trigger = switcher.querySelector('.fs-language-switcher__trigger');
-  const activeItem = switcher.querySelector(
-    `.sub-menu [data-language="${CSS.escape(lang)}"]`
-  );
+  const activeItem = switcher.querySelector(`.sub-menu [data-language="${CSS.escape(lang)}"]`);
   if (!trigger || !activeItem) {
     return;
   }
@@ -72,15 +70,10 @@ function updateLanguageSwitcherTrigger(lang) {
 
   const label = activeItem.querySelector('.fs-lang-item__label')?.textContent?.trim() || '';
   const config = window.fsGoogleTranslate || {};
-  const labelTemplate =
-    typeof config.triggerLabel === 'string' ? config.triggerLabel : 'Select language, current: %s';
-  const labelEmpty =
-    typeof config.triggerLabelEmpty === 'string' ? config.triggerLabelEmpty : 'Select language';
+  const labelTemplate = typeof config.triggerLabel === 'string' ? config.triggerLabel : 'Select language, current: %s';
+  const labelEmpty = typeof config.triggerLabelEmpty === 'string' ? config.triggerLabelEmpty : 'Select language';
 
-  trigger.setAttribute(
-    'aria-label',
-    label !== '' ? labelTemplate.replace('%s', label) : labelEmpty
-  );
+  trigger.setAttribute('aria-label', label !== '' ? labelTemplate.replace('%s', label) : labelEmpty);
 }
 
 export function syncLanguageTogglerUI(lang) {
@@ -109,8 +102,7 @@ function loadGoogleTranslateScript() {
     window.googleTranslateElementInit = () => resolve();
 
     const script = document.createElement('script');
-    script.src =
-      'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
+    script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit';
     script.async = true;
     document.head.appendChild(script);
   });
@@ -129,8 +121,7 @@ async function ensureWidget() {
     return;
   }
 
-  const layout =
-    window.google?.translate?.TranslateElement?.InlineLayout?.SIMPLE ?? 0;
+  const layout = window.google?.translate?.TranslateElement?.InlineLayout?.SIMPLE ?? 0;
 
   new window.google.translate.TranslateElement(
     {
@@ -139,7 +130,7 @@ async function ensureWidget() {
       autoDisplay: false,
       layout,
     },
-    'google_translate_element'
+    'google_translate_element',
   );
 
   widgetReady = true;

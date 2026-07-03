@@ -27,16 +27,16 @@ a {
 }
 
 input,
-input[type="text"],
-input[type="email"],
-input[type="password"],
+input[type='text'],
+input[type='email'],
+input[type='password'],
 textarea {
   line-height: inherit;
   font-family: inherit;
   font-size: 100%;
 }
 
-input[type="search"] {
+input[type='search'] {
   outline-offset: inherit;
 }
 

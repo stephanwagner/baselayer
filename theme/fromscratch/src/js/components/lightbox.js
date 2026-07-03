@@ -3,35 +3,30 @@ import PhotoSwipe from 'photoswipe';
 
 document.addEventListener('DOMContentLoaded', () => {
   // Wrap gallery images
-  document
-    .querySelectorAll('.wp-block-gallery.-has-lightbox img')
-    .forEach(wrapImage);
+  document.querySelectorAll('.wp-block-gallery.-has-lightbox img').forEach(wrapImage);
 
   // Wrap standalone images
-  document
-    .querySelectorAll('.wp-block-image.-has-lightbox img')
-    .forEach((img) => {
-      // Gallery setting takes precedence
-      if (img.closest('.wp-block-gallery')) {
-        return;
-      }
+  document.querySelectorAll('.wp-block-image.-has-lightbox img').forEach((img) => {
+    // Gallery setting takes precedence
+    if (img.closest('.wp-block-gallery')) {
+      return;
+    }
 
-      wrapImage(img);
-    });
+    wrapImage(img);
+  });
 
   new PhotoSwipeLightbox({
     gallery: '.wp-block-gallery.-has-lightbox',
     children: 'a',
     pswpModule: PhotoSwipe,
-    bgOpacity: 1
+    bgOpacity: 1,
   }).init();
 
   new PhotoSwipeLightbox({
-    gallery:
-      '.wp-block-image.-has-lightbox:not(.wp-block-gallery .wp-block-image)',
+    gallery: '.wp-block-image.-has-lightbox:not(.wp-block-gallery .wp-block-image)',
     children: 'a',
     pswpModule: PhotoSwipe,
-    bgOpacity: 1
+    bgOpacity: 1,
   }).init();
 });
 

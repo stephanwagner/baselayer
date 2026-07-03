@@ -34,10 +34,10 @@ export function handleOfflineNavigation(event) {
         status: 503,
         statusText: 'Offline',
         headers: {
-          'Content-Type': 'text/html; charset=utf-8'
-        }
+          'Content-Type': 'text/html; charset=utf-8',
+        },
       });
-    })
+    }),
   );
   return true;
 }

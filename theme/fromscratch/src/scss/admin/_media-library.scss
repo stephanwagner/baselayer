@@ -168,7 +168,7 @@ a.fs-media-folder-row {
   transition: grid-template-rows 0.28s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.fs-media-folders-tree-item.is-expanded>.fs-media-folders-branch {
+.fs-media-folders-tree-item.is-expanded > .fs-media-folders-branch {
   grid-template-rows: 1fr;
 }
 
@@ -198,11 +198,15 @@ a.fs-media-folder-row {
   display: none;
 }
 
-.fs-media-folders-tree-item:not(.is-expanded) .fs-media-folders-item-icon--branch .fs-media-folders-item-icon-visual--closed {
+.fs-media-folders-tree-item:not(.is-expanded)
+  .fs-media-folders-item-icon--branch
+  .fs-media-folders-item-icon-visual--closed {
   display: inline-flex;
 }
 
-.fs-media-folders-tree-item:not(.is-expanded) .fs-media-folders-item-icon--branch .fs-media-folders-item-icon-visual--open {
+.fs-media-folders-tree-item:not(.is-expanded)
+  .fs-media-folders-item-icon--branch
+  .fs-media-folders-item-icon-visual--open {
   display: none;
 }
 
@@ -232,8 +236,8 @@ a.fs-media-folder-row {
   background: #2271b1;
 }
 
-.fs-media-folders-item.fs-media-folders-link.is-active>.fs-media-folders-link,
-.fs-media-folders-item.fs-media-folders-link.is-active>.fs-media-folder-row {
+.fs-media-folders-item.fs-media-folders-link.is-active > .fs-media-folders-link,
+.fs-media-folders-item.fs-media-folders-link.is-active > .fs-media-folder-row {
   background: transparent;
   color: #fff;
 }
@@ -250,13 +254,12 @@ a.fs-media-folder-row {
   background: transparent;
 }
 
-.fs-media-folders-item:hover>.fs-media-folders-link,
-.fs-media-folders-item:hover>.fs-media-folder-row {
+.fs-media-folders-item:hover > .fs-media-folders-link,
+.fs-media-folders-item:hover > .fs-media-folder-row {
   background: transparent;
 }
 
 body.fs-feature-media-folders {
-
   .fs-media-folders-content .wp-filter,
   .attachments-browser .media-toolbar {
     margin-top: 0;
@@ -264,7 +267,6 @@ body.fs-feature-media-folders {
 
   .media-modal-content {
     .attachments-browser {
-
       .media-attachments-filter-heading {
         left: 0;
       }
@@ -309,15 +311,17 @@ body.fs-feature-media-folders {
     gap: 0 8px;
   }
 
-  .media-sidebar .compat-item .setting[data-setting=fs_media_folder_id] select,
-  .attachment-details .setting[data-setting=fs_media_folder_id] select {
+  .media-sidebar .compat-item .setting[data-setting='fs_media_folder_id'] select,
+  .attachment-details .setting[data-setting='fs_media_folder_id'] select {
     width: 65%;
   }
 
   .media-frame.mode-grid .attachment.details:focus,
   .media-frame.mode-grid .attachment:focus,
   .media-frame.mode-grid .selected.attachment:focus {
-    box-shadow: inset 0 0 0 5px #f0f0f0, inset 0 0 0 7px var(--wp-admin-theme-color, #3858e9);
+    box-shadow:
+      inset 0 0 0 5px #f0f0f0,
+      inset 0 0 0 7px var(--wp-admin-theme-color, #3858e9);
   }
 
   .fs-media-folders-layout {
@@ -344,7 +348,7 @@ body.fs-feature-media-folders {
     border-radius: 6px;
     padding: 8px 10px 10px;
     z-index: 20;
-    box-shadow: 0 1px 1px rgba(0, 0, 0, .04);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
     align-self: flex-start;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
@@ -493,12 +497,20 @@ body.fs-feature-media-folders {
   }
 
   /* Sidebar: room for rename/delete toolbar on folder rows */
-  #fs-media-folders-sidebar.is-edit-mode .fs-media-folders-item.fs-media-folders-link:not(.fs-media-folders-item--all):not(.fs-media-folders-item--unassigned)>.fs-media-folder-row,
-  #fs-media-folders-sidebar.is-delete-mode .fs-media-folders-item.fs-media-folders-link:not(.fs-media-folders-item--all):not(.fs-media-folders-item--unassigned)>.fs-media-folder-row {
+  #fs-media-folders-sidebar.is-edit-mode
+    .fs-media-folders-item.fs-media-folders-link:not(.fs-media-folders-item--all):not(
+      .fs-media-folders-item--unassigned
+    )
+    > .fs-media-folder-row,
+  #fs-media-folders-sidebar.is-delete-mode
+    .fs-media-folders-item.fs-media-folders-link:not(.fs-media-folders-item--all):not(
+      .fs-media-folders-item--unassigned
+    )
+    > .fs-media-folder-row {
     padding-right: calc(28px + 4px);
   }
 
-  .fs-media-folders-item--all>button.fs-media-folder-row {
+  .fs-media-folders-item--all > button.fs-media-folder-row {
     width: auto;
   }
 
@@ -849,19 +861,19 @@ body.fs-feature-media-folders {
 .edit-attachment-frame input,
 .edit-attachment-frame textarea,
 .edit-attachment-frame select,
-.media-frame input[type=date],
-.media-frame input[type=datetime-local],
-.media-frame input[type=datetime],
-.media-frame input[type=email],
-.media-frame input[type=month],
-.media-frame input[type=number],
-.media-frame input[type=password],
-.media-frame input[type=search],
-.media-frame input[type=tel],
-.media-frame input[type=text],
-.media-frame input[type=time],
-.media-frame input[type=url],
-.media-frame input[type=week] {
+.media-frame input[type='date'],
+.media-frame input[type='datetime-local'],
+.media-frame input[type='datetime'],
+.media-frame input[type='email'],
+.media-frame input[type='month'],
+.media-frame input[type='number'],
+.media-frame input[type='password'],
+.media-frame input[type='search'],
+.media-frame input[type='tel'],
+.media-frame input[type='text'],
+.media-frame input[type='time'],
+.media-frame input[type='url'],
+.media-frame input[type='week'] {
   padding: 0 8px;
   min-height: 32px;
   line-height: 1.4;
@@ -888,7 +900,9 @@ body.fs-feature-media-folders {
 .wp-core-ui .attachment.details:focus,
 .wp-core-ui .attachment:focus,
 .wp-core-ui .selected.attachment:focus {
-  box-shadow: inset 0 0 0 3px #fff, inset 0 0 0 7px var(--wp-admin-theme-color, #3858e9);
+  box-shadow:
+    inset 0 0 0 3px #fff,
+    inset 0 0 0 7px var(--wp-admin-theme-color, #3858e9);
 }
 
 .wp-core-ui .attachment:not(:has(.filename))::after {
@@ -918,7 +932,6 @@ body.fs-feature-media-folders {
 // Fix ACF expanded mode styles
 
 .media-modal.acf-expanded {
-
   .media-frame-content .attachments-browser .media-toolbar,
   .media-frame-content .attachments-browser .attachments {
     right: 300px;
@@ -929,12 +942,12 @@ body.fs-feature-media-folders {
     overscroll-behavior: none;
   }
 
-  label[for="attachment-details-fs-media-folder-id"] {
+  label[for='attachment-details-fs-media-folder-id'] {
     margin-right: 0;
     min-width: 20%;
   }
 
-  select[id="attachment-details-fs-media-folder-id"] {
+  select[id='attachment-details-fs-media-folder-id'] {
     float: right;
     min-width: 77%;
   }

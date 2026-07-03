@@ -15,22 +15,18 @@ const MODAL_ID = 'google-translate-consent';
 let pendingLang = null;
 
 function initGoogleTranslateConsentModal() {
-  document
-    .querySelector('[data-google-translate-accept]')
-    ?.addEventListener('click', () => {
-      setGoogleTranslateAccepted();
-      closeModal(MODAL_ID);
-      const lang = pendingLang;
-      pendingLang = null;
-      if (lang) {
-        applyGoogleTranslate(lang);
-      }
-    });
+  document.querySelector('[data-google-translate-accept]')?.addEventListener('click', () => {
+    setGoogleTranslateAccepted();
+    closeModal(MODAL_ID);
+    const lang = pendingLang;
+    pendingLang = null;
+    if (lang) {
+      applyGoogleTranslate(lang);
+    }
+  });
 
   document
-    .querySelectorAll(
-      '[data-google-translate-decline], [data-modal-close="google-translate-consent"]'
-    )
+    .querySelectorAll('[data-google-translate-decline], [data-modal-close="google-translate-consent"]')
     .forEach((el) => {
       el.addEventListener('click', () => {
         pendingLang = null;
@@ -41,7 +37,7 @@ function initGoogleTranslateConsentModal() {
 
 function closeLanguageSubmenu() {
   const trigger = document.querySelector(
-    '.fs-language-switcher[data-google-translate-toggler] .fs-language-switcher__trigger'
+    '.fs-language-switcher[data-google-translate-toggler] .fs-language-switcher__trigger',
   );
   if (trigger) {
     closeSubmenuForToggle(trigger);
@@ -49,9 +45,7 @@ function closeLanguageSubmenu() {
 }
 
 function initLanguageToggler() {
-  const switcher = document.querySelector(
-    '.fs-language-switcher[data-google-translate-toggler]'
-  );
+  const switcher = document.querySelector('.fs-language-switcher[data-google-translate-toggler]');
   if (!switcher) {
     return;
   }

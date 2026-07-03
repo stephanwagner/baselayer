@@ -16,7 +16,7 @@ export function scrollToElement(element, offset = 0, completeCallback = null) {
 
   window.scrollTo({
     top: scrollTop,
-    behavior: 'smooth'
+    behavior: 'smooth',
   });
 
   const onScrollEnd = () => {

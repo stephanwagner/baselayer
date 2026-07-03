@@ -8,62 +8,62 @@ const ROOT_VAR_MAP = [
     key: 'breakpointXS',
     prop: '--fs-breakpoint-xs',
     parse: 'unit',
-    fallback: 400
+    fallback: 400,
   },
   {
     key: 'breakpointS',
     prop: '--fs-breakpoint-s',
     parse: 'unit',
-    fallback: 600
+    fallback: 600,
   },
   {
     key: 'breakpointM',
     prop: '--fs-breakpoint-m',
     parse: 'unit',
-    fallback: 900
+    fallback: 900,
   },
   {
     key: 'breakpointL',
     prop: '--fs-breakpoint-l',
     parse: 'unit',
-    fallback: 1200
+    fallback: 1200,
   },
   {
     key: 'breakpointXL',
     prop: '--fs-breakpoint-xl',
     parse: 'unit',
-    fallback: 1400
+    fallback: 1400,
   },
   {
     key: 'breakpointMobile',
     prop: '--fs-breakpoint-mobile',
     parse: 'unit',
-    fallback: 900
+    fallback: 900,
   },
   {
     key: 'headerHeightScrolled',
     prop: '--fs-header-height-scrolled',
     parse: 'unit',
-    fallback: 64
+    fallback: 64,
   },
   {
     key: 'startScrolled',
     prop: '--fs-header-height-scrolled',
     parse: 'unit',
-    fallback: 64
+    fallback: 64,
   },
   {
     key: 'transitionSpeed',
     prop: '--fs-transition-speed',
     parse: 'unit',
-    fallback: 240
+    fallback: 240,
   },
   {
     key: 'transitionSpeedSlow',
     prop: '--fs-transition-speed-slow',
     parse: 'unit',
-    fallback: 360
-  }
+    fallback: 360,
+  },
 ];
 
 function parseUnit(raw) {
@@ -97,5 +97,5 @@ export default {
   ...fromCss,
 
   // Default scroll offset
-  scrollOffset: 8
+  scrollOffset: 8,
 };

@@ -5,7 +5,7 @@ const searchModalContent = document.querySelector('[data-modal-content="search"]
 if (searchModalContent) {
   searchModalContent.modalOnOpen = (modalEl, sourceEl) => {
     requestAnimationFrame(() => {
-    const searchInput = modalEl.querySelector('.search-form__input');
+      const searchInput = modalEl.querySelector('.search-form__input');
       if (searchInput) {
         searchInput.focus();
       }

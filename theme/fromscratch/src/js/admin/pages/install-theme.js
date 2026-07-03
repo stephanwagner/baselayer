@@ -13,13 +13,11 @@ function initDeveloperInstaller() {
   }
 
   const currentDevCheckbox = form.querySelector(
-    'input[type="checkbox"][name="developer[current_user][has_developer_rights]"]'
+    'input[type="checkbox"][name="developer[current_user][has_developer_rights]"]',
   );
-  const newDevCheckbox = form.querySelector(
-    'input[type="checkbox"][name="developer[new_user][has_developer_rights]"]'
-  );
+  const newDevCheckbox = form.querySelector('input[type="checkbox"][name="developer[new_user][has_developer_rights]"]');
   const loginAfterSetupCheckbox = form.querySelector(
-    'input[type="checkbox"][name="developer[new_user][login_after_setup]"]'
+    'input[type="checkbox"][name="developer[new_user][login_after_setup]"]',
   );
 
   if (!newDevCheckbox || !loginAfterSetupCheckbox) {

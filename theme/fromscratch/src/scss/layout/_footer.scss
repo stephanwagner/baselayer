@@ -50,7 +50,7 @@
     justify-content: center;
   }
 
-  >li {
+  > li {
     padding: 0;
     margin: 0 0 0 16px;
 
@@ -62,7 +62,7 @@
       margin: 0;
     }
 
-    >a {
+    > a {
       color: var(--fs-color-gray-500);
 
       &:hover {

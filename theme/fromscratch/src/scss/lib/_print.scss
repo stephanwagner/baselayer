@@ -108,11 +108,11 @@
   }
 
   a:after > img {
-    content: "";
+    content: '';
   }
 
-  article a[href^="#"]:after {
-    content: "";
+  article a[href^='#']:after {
+    content: '';
   }
 
   // Header, footer

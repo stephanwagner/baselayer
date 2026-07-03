@@ -9,24 +9,20 @@ const { Fragment } = wp.element;
 blockOptions.forEach((block) => {
   const blockSlug = getBlockSlug(block.name);
 
-  wp.hooks.addFilter(
-    'blocks.registerBlockType',
-    'custom-block-options/block-' + blockSlug,
-    (settings, name) => {
-      if (name === block.name) {
-        block.options.forEach((option) => {
-          settings.attributes = {
-            ...settings.attributes,
-            [option.attributeName]: {
-              type: option.type === 'boolean' ? 'boolean' : 'string',
-              default: option.default
-            }
-          };
-        });
-      }
-      return settings;
+  wp.hooks.addFilter('blocks.registerBlockType', 'custom-block-options/block-' + blockSlug, (settings, name) => {
+    if (name === block.name) {
+      block.options.forEach((option) => {
+        settings.attributes = {
+          ...settings.attributes,
+          [option.attributeName]: {
+            type: option.type === 'boolean' ? 'boolean' : 'string',
+            default: option.default,
+          },
+        };
+      });
     }
-  );
+    return settings;
+  });
 });
 
 // Add custom control
@@ -43,7 +39,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
           <BlockEdit {...props} />
           {isSelected && (
             <InspectorControls>
-              <PanelBody title='Block Einstellungen'>
+              <PanelBody title="Block Einstellungen">
                 {blockConfig.options.map((option) => {
                   if (option.type === 'boolean') {
                     return (
@@ -51,9 +47,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                         key={option.attributeName}
                         label={option.label}
                         checked={attributes[option.attributeName]}
-                        onChange={(newValue) =>
-                          setAttributes({ [option.attributeName]: newValue })
-                        }
+                        onChange={(newValue) => setAttributes({ [option.attributeName]: newValue })}
                       />
                     );
                   } else if (option.type === 'select') {
@@ -63,9 +57,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                         label={option.label}
                         value={attributes[option.attributeName]}
                         options={option.options}
-                        onChange={(newValue) =>
-                          setAttributes({ [option.attributeName]: newValue })
-                        }
+                        onChange={(newValue) => setAttributes({ [option.attributeName]: newValue })}
                       />
                     );
                   }
@@ -97,16 +89,13 @@ const applyClasses = (BlockListBlock) => {
       blockConfig.options.forEach((option) => {
         if (option.type === 'boolean' && attributes[option.attributeName]) {
           classNames += ` ${option.className}`;
-        } else if (
-          option.type === 'select' &&
-          attributes[option.attributeName]
-        ) {
+        } else if (option.type === 'select' && attributes[option.attributeName]) {
           classNames += ` ${attributes[option.attributeName]}`;
         }
       });
 
       const blockProps = useBlockProps({
-        className: classNames.trim()
+        className: classNames.trim(),
       });
 
       return <BlockListBlock {...props} {...blockProps} />;
@@ -119,9 +108,7 @@ const applyClasses = (BlockListBlock) => {
 // Apply classes when the block is saved
 const saveClasses = (extraProps, blockType, attributes) => {
   // Find the block configuration based on the blockType name
-  const blockConfig = blockOptions.find(
-    (block) => block.name === blockType.name
-  );
+  const blockConfig = blockOptions.find((block) => block.name === blockType.name);
 
   if (blockConfig && attributes) {
     let classNames = extraProps.className || '';
@@ -142,21 +129,9 @@ const saveClasses = (extraProps, blockType, attributes) => {
 };
 
 // Hooks to add control and class
-wp.hooks.addFilter(
-  'editor.BlockEdit',
-  'custom-block-options/add-control',
-  addControl
-);
-wp.hooks.addFilter(
-  'editor.BlockListBlock',
-  'custom-block-options/apply-classes',
-  applyClasses
-);
-wp.hooks.addFilter(
-  'blocks.getSaveContent.extraProps',
-  'custom-block-options/save-classes',
-  saveClasses
-);
+wp.hooks.addFilter('editor.BlockEdit', 'custom-block-options/add-control', addControl);
+wp.hooks.addFilter('editor.BlockListBlock', 'custom-block-options/apply-classes', applyClasses);
+wp.hooks.addFilter('blocks.getSaveContent.extraProps', 'custom-block-options/save-classes', saveClasses);
 
 /**
  * Get the slug of a block name

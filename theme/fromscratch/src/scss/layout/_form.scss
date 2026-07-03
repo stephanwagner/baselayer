@@ -3,7 +3,6 @@
 // Buttons
 
 @mixin form {
-
   .buttons,
   .wp-block-buttons {
     margin-top: 24px;
@@ -125,6 +124,6 @@
 
 // Inputs
 
-input[type="search"] {
+input[type='search'] {
   outline-offset: 1px;
 }

@@ -187,7 +187,6 @@ $colors: (
   // Primary colors
   'primary' var(--fs-color-primary),
   'secondary' var(--fs-color-secondary),
-
   // Grayscale
   'white' var(--fs-color-white),
   'black' var(--fs-color-black),
@@ -198,11 +197,10 @@ $colors: (
   'gray-400' var(--fs-color-gray-400),
   'gray-500' var(--fs-color-gray-500),
   'gray-600' var(--fs-color-gray-600),
-
   // Status colors
   'error' var(--fs-color-error),
   'warning' var(--fs-color-warning),
-  'success' var(--fs-color-success),
+  'success' var(--fs-color-success)
 );
 
 // Gradients
@@ -240,7 +238,7 @@ $fontSizes: (
 @mixin line-clamp($lines) {
   display: -webkit-box;
   line-clamp: $lines;
-	-webkit-line-clamp: $lines;
-	-webkit-box-orient: vertical;
-	overflow: hidden;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

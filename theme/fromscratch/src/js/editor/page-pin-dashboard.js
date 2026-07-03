@@ -17,12 +17,7 @@
     const postId = props.postId;
     const cfg = props.cfg || {};
 
-    const [meta, setMeta] = useEntityProp(
-      'postType',
-      postType,
-      'meta',
-      postId
-    );
+    const [meta, setMeta] = useEntityProp('postType', postType, 'meta', postId);
     if (!meta || typeof setMeta !== 'function') {
       return null;
     }
@@ -36,11 +31,11 @@
       onChange: function (val) {
         setMeta(
           Object.assign({}, meta, {
-            [META_KEY]: val ? true : false
-          })
+            [META_KEY]: val ? true : false,
+          }),
         );
       },
-      __nextHasNoMarginBottom: true
+      __nextHasNoMarginBottom: true,
     });
   }
 
@@ -52,14 +47,8 @@
       return select('core/editor')?.getCurrentPostId?.();
     }, []);
 
-    var cfg =
-      typeof fromscratchPageSidebarOptions !== 'undefined'
-        ? fromscratchPageSidebarOptions
-        : {};
-    var allowed =
-      cfg.pinPostTypes && Array.isArray(cfg.pinPostTypes)
-        ? cfg.pinPostTypes
-        : ['post', 'page'];
+    var cfg = typeof fromscratchPageSidebarOptions !== 'undefined' ? fromscratchPageSidebarOptions : {};
+    var allowed = cfg.pinPostTypes && Array.isArray(cfg.pinPostTypes) ? cfg.pinPostTypes : ['post', 'page'];
 
     if (!PluginPostStatusInfo) {
       return null;
@@ -74,12 +63,12 @@
       el(PinToDashboardCheckbox, {
         postType: postType,
         postId: postId,
-        cfg: cfg
-      })
+        cfg: cfg,
+      }),
     );
   }
 
   registerPlugin('fromscratch-page-pin-dashboard', {
-    render: PinToDashboardPlugin
+    render: PinToDashboardPlugin,
   });
 })(typeof wp !== 'undefined' ? wp : window.wp);

@@ -23,8 +23,7 @@
     }
 
     var v = meta[META_KEY];
-    var checked =
-      v === undefined || v === null || v === true || v === '1' || v === 1;
+    var checked = v === undefined || v === null || v === true || v === '1' || v === 1;
 
     var label = cfg.labelShowTitlePage || 'Show page title';
 
@@ -34,11 +33,11 @@
       onChange: function (val) {
         setMeta(
           Object.assign({}, meta, {
-            [META_KEY]: val ? true : false
-          })
+            [META_KEY]: val ? true : false,
+          }),
         );
       },
-      __nextHasNoMarginBottom: true
+      __nextHasNoMarginBottom: true,
     });
   }
 
@@ -50,14 +49,8 @@
       return select('core/editor')?.getCurrentPostId?.();
     }, []);
 
-    var cfg =
-      typeof fromscratchPageSidebarOptions !== 'undefined'
-        ? fromscratchPageSidebarOptions
-        : {};
-    var allowed =
-      cfg.showTitlePostTypes && Array.isArray(cfg.showTitlePostTypes)
-        ? cfg.showTitlePostTypes
-        : ['page'];
+    var cfg = typeof fromscratchPageSidebarOptions !== 'undefined' ? fromscratchPageSidebarOptions : {};
+    var allowed = cfg.showTitlePostTypes && Array.isArray(cfg.showTitlePostTypes) ? cfg.showTitlePostTypes : ['page'];
 
     if (!PluginPostStatusInfo) {
       return null;
@@ -72,12 +65,12 @@
       el(ShowPageTitleCheckbox, {
         postType: postType,
         postId: postId,
-        cfg: cfg
-      })
+        cfg: cfg,
+      }),
     );
   }
 
   registerPlugin('fromscratch-page-show-title', {
-    render: ShowPageTitlePlugin
+    render: ShowPageTitlePlugin,
   });
 })(typeof wp !== 'undefined' ? wp : window.wp);

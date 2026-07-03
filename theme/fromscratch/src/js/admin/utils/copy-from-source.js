@@ -7,11 +7,7 @@
  * @param {HTMLElement} [root=document] - Root to query within.
  */
 function copyTextToClipboard(text) {
-  if (
-    typeof navigator !== 'undefined' &&
-    navigator.clipboard &&
-    typeof navigator.clipboard.writeText === 'function'
-  ) {
+  if (typeof navigator !== 'undefined' && navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
     return navigator.clipboard.writeText(text);
   }
 
@@ -58,8 +54,7 @@ function initCopyFromSource(root = document) {
     const defaultLabel = trigger.textContent.trim();
 
     trigger.addEventListener('click', () => {
-      const text =
-        source.value !== undefined ? source.value : source.textContent;
+      const text = source.value !== undefined ? source.value : source.textContent;
       if (text == null) return;
 
       copyTextToClipboard(text)

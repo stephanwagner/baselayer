@@ -17,20 +17,12 @@
     const postId = props.postId;
     const cfg = props.cfg || {};
 
-    const [meta, setMeta] = useEntityProp(
-      'postType',
-      postType,
-      'meta',
-      postId
-    );
+    const [meta, setMeta] = useEntityProp('postType', postType, 'meta', postId);
     if (!meta || typeof setMeta !== 'function') {
       return null;
     }
 
-    var checked =
-      meta[META_KEY] === true ||
-      meta[META_KEY] === '1' ||
-      meta[META_KEY] === 1;
+    var checked = meta[META_KEY] === true || meta[META_KEY] === '1' || meta[META_KEY] === 1;
 
     return el(CheckboxControl, {
       label: cfg.label || 'Exclude from search',
@@ -39,11 +31,11 @@
       onChange: function (val) {
         setMeta(
           Object.assign({}, meta, {
-            [META_KEY]: val ? true : false
-          })
+            [META_KEY]: val ? true : false,
+          }),
         );
       },
-      __nextHasNoMarginBottom: true
+      __nextHasNoMarginBottom: true,
     });
   }
 
@@ -55,14 +47,8 @@
       return select('core/editor')?.getCurrentPostId?.();
     }, []);
 
-    var cfg =
-      typeof fromscratchExcludeFromSearch !== 'undefined'
-        ? fromscratchExcludeFromSearch
-        : {};
-    var allowed =
-      cfg.postTypes && Array.isArray(cfg.postTypes)
-        ? cfg.postTypes
-        : ['post', 'page'];
+    var cfg = typeof fromscratchExcludeFromSearch !== 'undefined' ? fromscratchExcludeFromSearch : {};
+    var allowed = cfg.postTypes && Array.isArray(cfg.postTypes) ? cfg.postTypes : ['post', 'page'];
 
     if (!PluginPostStatusInfo) {
       return null;
@@ -82,12 +68,12 @@
       el(ExcludeFromSearchCheckbox, {
         postType: postType,
         postId: postId,
-        cfg: cfg
-      })
+        cfg: cfg,
+      }),
     );
   }
 
   registerPlugin('fromscratch-exclude-from-search', {
-    render: ExcludeFromSearchPlugin
+    render: ExcludeFromSearchPlugin,
   });
 })(typeof wp !== 'undefined' ? wp : window.wp);

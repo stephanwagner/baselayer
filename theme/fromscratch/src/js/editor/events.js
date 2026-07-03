@@ -53,16 +53,14 @@
     const startTime = meta[META_START_TIME] || '';
     const endTime = meta[META_END_TIME] || '';
 
-    const [timesEnabled, setTimesEnabled] = useState(
-      function () {
-        return !!(startTime || endTime);
-      }
-    );
+    const [timesEnabled, setTimesEnabled] = useState(function () {
+      return !!(startTime || endTime);
+    });
     useEffect(
       function () {
         setTimesEnabled(!!(startTime || endTime));
       },
-      [postId]
+      [postId],
     );
 
     function patch(next) {
@@ -74,7 +72,7 @@
       if (!on) {
         patch({
           [META_START_TIME]: '',
-          [META_END_TIME]: ''
+          [META_END_TIME]: '',
         });
       }
     }
@@ -84,7 +82,7 @@
       {
         name: 'fromscratch-event',
         title: L.panelTitle || 'Event',
-        className: 'fromscratch-event-panel'
+        className: 'fromscratch-event-panel',
       },
       el(
         'div',
@@ -95,7 +93,7 @@
           el(
             'label',
             { className: 'components-base-control__label', htmlFor: 'fs-event-start-date' },
-            L.startDateLabel || 'Start date'
+            L.startDateLabel || 'Start date',
           ),
           el('input', {
             id: 'fs-event-start-date',
@@ -106,10 +104,10 @@
               var v = e.target.value;
               patch({
                 [META_START_DATE]: v,
-                [META_END_DATE]: endDate && endDate >= v ? endDate : v
+                [META_END_DATE]: endDate && endDate >= v ? endDate : v,
               });
-            }
-          })
+            },
+          }),
         ),
         el(
           PanelRow,
@@ -117,7 +115,7 @@
           el(
             'label',
             { className: 'components-base-control__label', htmlFor: 'fs-event-end-date' },
-            L.endDateLabel || 'End date'
+            L.endDateLabel || 'End date',
           ),
           el('input', {
             id: 'fs-event-end-date',
@@ -127,8 +125,8 @@
             min: startDate || undefined,
             onChange: function (e) {
               patch({ [META_END_DATE]: e.target.value });
-            }
-          })
+            },
+          }),
         ),
         el(
           PanelRow,
@@ -140,8 +138,8 @@
             checked: timesEnabled,
             onChange: function (on) {
               onToggleTimes(on);
-            }
-          })
+            },
+          }),
         ),
         timesEnabled
           ? el(
@@ -150,7 +148,7 @@
               el(
                 'label',
                 { className: 'components-base-control__label', htmlFor: 'fs-event-start-time' },
-                L.startTimeLabel || 'Start time'
+                L.startTimeLabel || 'Start time',
               ),
               el('input', {
                 id: 'fs-event-start-time',
@@ -159,8 +157,8 @@
                 value: startTime,
                 onChange: function (e) {
                   patch({ [META_START_TIME]: e.target.value });
-                }
-              })
+                },
+              }),
             )
           : null,
         timesEnabled
@@ -170,7 +168,7 @@
               el(
                 'label',
                 { className: 'components-base-control__label', htmlFor: 'fs-event-end-time' },
-                L.endTimeLabel || 'End time'
+                L.endTimeLabel || 'End time',
               ),
               el('input', {
                 id: 'fs-event-end-time',
@@ -179,11 +177,11 @@
                 value: endTime,
                 onChange: function (e) {
                   patch({ [META_END_TIME]: e.target.value });
-                }
-              })
+                },
+              }),
             )
-          : null
-      )
+          : null,
+      ),
     );
   }
 
@@ -193,7 +191,7 @@
 
   if (PluginDocumentSettingPanel) {
     registerPlugin('fromscratch-event', {
-      render: EventPanel
+      render: EventPanel,
     });
   }
 })();
