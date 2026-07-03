@@ -7,15 +7,11 @@
   "scripts": {
     "watch": "concurrently \"npm run watch:js\" \"npm run watch:css\"",
     "watch:js": "node scripts/build-js.mjs --watch",
-    "watch:css": "concurrently \"npm run watch:css:sass\" \"npm run watch:css:acf-blocks\"",
-    "watch:css:sass": "sass theme/fromscratch/src/scss/main.scss:theme/fromscratch/assets/css/main.css theme/fromscratch/src/scss/admin.scss:theme/fromscratch/assets/css/admin.css theme/fromscratch/src/scss/admin-bar.scss:theme/fromscratch/assets/css/admin-bar.css --watch --poll --source-map",
-    "watch:css:acf-blocks": "chokidar \"theme/fromscratch/acf/blocks/**/*.scss\" -c \"node scripts/bump-scss-entries.cjs\"",
+    "watch:css": "node scripts/build-css.mjs --watch",
     "build": "npm run build:js && npm run build:css",
     "build:language-flags": "node scripts/build-language-flags.cjs",
     "build:js": "node scripts/build-js.mjs",
-    "build:css": "npm run build:css:dev && npm run build:css:prod",
-    "build:css:dev": "sass theme/fromscratch/src/scss/main.scss:theme/fromscratch/assets/css/main.css theme/fromscratch/src/scss/admin.scss:theme/fromscratch/assets/css/admin.css theme/fromscratch/src/scss/admin-bar.scss:theme/fromscratch/assets/css/admin-bar.css --style=expanded --source-map",
-    "build:css:prod": "sass theme/fromscratch/src/scss/main.scss:theme/fromscratch/assets/css/main.min.css theme/fromscratch/src/scss/admin.scss:theme/fromscratch/assets/css/admin.min.css theme/fromscratch/src/scss/admin-bar.scss:theme/fromscratch/assets/css/admin-bar.min.css --style=compressed --no-source-map"
+    "build:css": "node scripts/build-css.mjs"
   },
   "dependencies": {
     "chart.js": "^4.5.1",
