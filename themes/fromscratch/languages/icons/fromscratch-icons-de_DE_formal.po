@@ -90,6 +90,22 @@ msgid "Arrow right"
 msgstr "Pfeil rechts"
 
 msgctxt "icon name"
+msgid "Arrow up"
+msgstr "Pfeil nach oben"
+
+msgctxt "icon name"
+msgid "Arrow down"
+msgstr "Pfeil nach unten"
+
+msgctxt "icon name"
+msgid "Arrow outward"
+msgstr "Pfeil nach außen"
+
+msgctxt "icon name"
+msgid "Arrow range"
+msgstr "Bereichspfeil"
+
+msgctxt "icon name"
 msgid "Chevron left"
 msgstr "Chevron links"
 
@@ -236,8 +252,16 @@ msgid "Download"
 msgstr "Herunterladen"
 
 msgctxt "icon name"
+msgid "Download (alt)"
+msgstr "Herunterladen (alternativ)"
+
+msgctxt "icon name"
 msgid "Upload"
 msgstr "Hochladen"
+
+msgctxt "icon name"
+msgid "Upload (alt)"
+msgstr "Hochladen (alternativ)"
 
 msgctxt "icon name"
 msgid "Print"
@@ -500,6 +524,22 @@ msgid "Play (circle)"
 msgstr "Abspielen (Kreis)"
 
 msgctxt "icon name"
+msgid "Pause"
+msgstr "Pause"
+
+msgctxt "icon name"
+msgid "Stop"
+msgstr "Stopp"
+
+msgctxt "icon name"
+msgid "Skip next"
+msgstr "Nächster Titel"
+
+msgctxt "icon name"
+msgid "Skip previous"
+msgstr "Vorheriger Titel"
+
+msgctxt "icon name"
 msgid "Music"
 msgstr "Musik"
 
@@ -546,6 +586,14 @@ msgid "Video file"
 msgstr "Videodatei"
 
 msgctxt "icon name"
+msgid "PDF file"
+msgstr "PDF-Datei"
+
+msgctxt "icon name"
+msgid "File attachment"
+msgstr "Dateianhang"
+
+msgctxt "icon name"
 msgid "Database"
 msgstr "Datenbank"
 
@@ -562,6 +610,30 @@ msgstr "Backup"
 msgctxt "icon name"
 msgid "Bar chart"
 msgstr "Balkendiagramm"
+
+msgctxt "icon name"
+msgid "Bar chart (alt)"
+msgstr "Balkendiagramm (alternativ)"
+
+msgctxt "icon name"
+msgid "Data chart"
+msgstr "Datendiagramm"
+
+msgctxt "icon name"
+msgid "Line chart"
+msgstr "Liniendiagramm"
+
+msgctxt "icon name"
+msgid "Trending up"
+msgstr "Aufwärtstrend"
+
+msgctxt "icon name"
+msgid "Trending down"
+msgstr "Abwärtstrend"
+
+msgctxt "icon name"
+msgid "Timeline"
+msgstr "Zeitleiste"
 
 msgctxt "icon name"
 msgid "Pie chart"
@@ -736,6 +808,10 @@ msgstr "Karte"
 msgctxt "icon name"
 msgid "Compass"
 msgstr "Kompass"
+
+msgctxt "icon name"
+msgid "Navigation"
+msgstr "Navigation"
 
 msgctxt "icon name"
 msgid "Globe"
@@ -916,6 +992,10 @@ msgid "Visibility"
 msgstr "Sichtbarkeit"
 
 msgctxt "icon name"
+msgid "Visibility off"
+msgstr "Sichtbarkeit aus"
+
+msgctxt "icon name"
 msgid "Dark mode"
 msgstr "Dunkelmodus"
 
@@ -936,6 +1016,10 @@ msgstr "Hilfe"
 msgctxt "icon name"
 msgid "Warning"
 msgstr "Warnung"
+
+msgctxt "icon name"
+msgid "Error"
+msgstr "Fehler"
 
 msgctxt "icon name"
 msgid "Notifications"
@@ -962,6 +1046,14 @@ msgid "Calendar (text)"
 msgstr "Kalender (Text)"
 
 # Icon names — Symbols & misc
+
+msgctxt "icon name"
+msgid "Crown"
+msgstr "Krone"
+
+msgctxt "icon name"
+msgid "Celebration"
+msgstr "Feier"
 
 msgctxt "icon name"
 msgid "Bolt"
