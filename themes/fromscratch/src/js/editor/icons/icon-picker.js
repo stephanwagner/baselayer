@@ -26,9 +26,12 @@ const humanize = (slug) =>
     .replace(/-/g, ' ')
     .replace(/^\w/, (char) => char.toUpperCase());
 
-const iconName = (icon) => iconLabels[icon.filename] || humanize(icon.filename);
+// Prefer an inline label (theme icons carry their own), then the PHP-localized
+// label, then a humanized file name / slug.
+const iconName = (icon) =>
+  icon.label || iconLabels[icon.filename] || humanize(icon.filename);
 const categoryName = (category) =>
-  categoryLabels[category.slug] || humanize(category.slug);
+  category.label || categoryLabels[category.slug] || humanize(category.slug);
 
 // Remember the outline/filled preference across pickers and sessions.
 const VARIANT_STORAGE_KEY = 'fromscratchIconVariant';

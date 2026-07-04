@@ -375,19 +375,42 @@ $fs-icon-fill: (
   -webkit-mask-size: contain;
 }
 
-// Point the mask at a specific catalog icon.
-@mixin fs-icon-mask($name) {
-  mask-image: url('#{$fs-icon-path}/#{$name}.svg');
-  -webkit-mask-image: url('#{$fs-icon-path}/#{$name}.svg');
+// Point the mask at an explicit icon URL.
+@mixin fs-icon-mask-url($url) {
+  mask-image: url($url);
+  -webkit-mask-image: url($url);
 }
 
-// The `::before` icon shown in front of a button label.
-@mixin fs-button-icon-before($name) {
+// Point the mask at a catalog icon in the default icon folder.
+@mixin fs-icon-mask($name) {
+  @include fs-icon-mask-url('#{$fs-icon-path}/#{$name}.svg');
+}
+
+// The `::before` icon shown in front of a button label, from an explicit URL.
+@mixin fs-button-icon-before-url($url) {
   content: '';
   margin-right: 8px;
   vertical-align: -0.15em;
   @include fs-icon-box;
-  @include fs-icon-mask($name);
+  @include fs-icon-mask-url($url);
+}
+
+// The `::before` icon shown in front of a button label (default icon folder).
+@mixin fs-button-icon-before($name) {
+  @include fs-button-icon-before-url('#{$fs-icon-path}/#{$name}.svg');
+}
+
+// Emit both the standalone (.fs-icon) and button (::before) rules for a single
+// icon, identified by its class suffix and an explicit file URL. Used by the
+// generated theme-icon partial (see scripts/build-icons.mjs).
+@mixin fs-icon-entry($class, $url) {
+  .fs-icon.-icon-#{$class} {
+    @include fs-icon-mask-url($url);
+  }
+
+  .wp-block-button.-icon-#{$class} .wp-block-button__link::before {
+    @include fs-button-icon-before-url($url);
+  }
 }
 
 // Icon-name class variants (`.-icon-<name>` / `.-icon-<name>-fill`).
