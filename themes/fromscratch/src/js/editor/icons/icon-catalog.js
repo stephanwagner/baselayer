@@ -386,18 +386,23 @@ const builtInCategories = [
       { filename: 'pinterest', alternatives: [], keywords: ['social', 'pin', 'board'] },
       { filename: 'reddit', alternatives: [], keywords: ['social', 'forum', 'community'] },
       { filename: 'tumblr', alternatives: [], keywords: ['social', 'blog'] },
+      { filename: 'medium', alternatives: [], keywords: ['blog', 'publishing', 'articles', 'writing'] },
       { filename: 'snapchat', alternatives: [], keywords: ['social', 'snap', 'ghost'] },
       { filename: 'tiktok', alternatives: [], keywords: ['social', 'video', 'short'] },
       { filename: 'xing', alternatives: [], keywords: ['social', 'jobs', 'network', 'professional', 'business'] },
+      { filename: 'linkedin', alternatives: [], keywords: ['social', 'jobs', 'network', 'professional', 'business', 'career'] },
+      { filename: 'weibo', alternatives: [], keywords: ['social', 'china', 'microblog'] },
       { filename: 'behance', alternatives: [], keywords: ['portfolio', 'design', 'creative', 'adobe'] },
       { filename: 'dribbble', alternatives: [], keywords: ['portfolio', 'design', 'creative', 'shots'] },
       { filename: 'whatsapp', alternatives: [], keywords: ['messaging', 'chat', 'meta', 'message'] },
       { filename: 'telegram', alternatives: [], keywords: ['messaging', 'chat', 'message'] },
       { filename: 'signal', alternatives: [], keywords: ['messaging', 'chat', 'private', 'message'] },
       { filename: 'imessage', alternatives: [], keywords: ['messaging', 'messages', 'apple', 'chat'] },
+      { filename: 'messenger', alternatives: [], keywords: ['messaging', 'facebook', 'meta', 'chat', 'message'] },
       { filename: 'wechat', alternatives: [], keywords: ['messaging', 'weixin', 'chat', 'china'] },
       { filename: 'line', alternatives: [], keywords: ['messaging', 'chat', 'japan'] },
       { filename: 'discord', alternatives: [], keywords: ['chat', 'gaming', 'community', 'voice'] },
+      { filename: 'slack', alternatives: [], keywords: ['messaging', 'team', 'work', 'chat', 'collaboration'] },
       { filename: 'youtube', alternatives: [], keywords: ['video', 'streaming', 'google'] },
       { filename: 'youtubeshorts', alternatives: [], keywords: ['video', 'youtube', 'shorts', 'short'] },
       { filename: 'vimeo', alternatives: [], keywords: ['video', 'streaming'] },
@@ -407,7 +412,13 @@ const builtInCategories = [
       { filename: 'applemusic', alternatives: [], keywords: ['music', 'audio', 'streaming', 'apple'] },
       { filename: 'github', alternatives: [], keywords: ['code', 'git', 'repository', 'developer', 'octocat'] },
       { filename: 'gitlab', alternatives: [], keywords: ['code', 'git', 'repository', 'developer'] },
-      { filename: 'google', alternatives: [], keywords: ['search', 'brand', 'g'] }
+      { filename: 'wordpress', alternatives: [], keywords: ['blog', 'cms', 'wp', 'website'] },
+      { filename: 'patreon', alternatives: [], keywords: ['membership', 'support', 'creator', 'donate'] },
+      { filename: 'trello', alternatives: [], keywords: ['board', 'kanban', 'project', 'tasks', 'atlassian'] },
+      { filename: 'yelp', alternatives: [], keywords: ['reviews', 'business', 'local', 'ratings'] },
+      { filename: 'google', alternatives: [], keywords: ['search', 'brand', 'g'] },
+      { filename: 'microsoft', alternatives: [], keywords: ['windows', 'office', 'tech'] },
+      { filename: 'apple', alternatives: [], keywords: ['mac', 'ios', 'iphone', 'tech', 'logo'] }
     ]
   }
 ];
