@@ -9,6 +9,26 @@
   text-transform: uppercase;
 }
 
+// Preview of the selected icon (glyph + name), centered above the picker.
+// Only rendered once an icon is chosen.
+.fs-icon-picker__value {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--fs-color-gray-700, #3c434a);
+  background: var(--fs-color-gray-100, #f0f0f1);
+  border-radius: 4px;
+
+  .fs-icon {
+    font-size: 20px;
+  }
+}
+
 .fs-icon-picker__control {
   display: flex;
   align-items: center;
@@ -16,10 +36,8 @@
 }
 
 .fs-icon-picker__trigger {
-  .fs-icon {
-    font-size: 18px;
-    margin-right: 6px;
-  }
+  flex: 1 1 auto;
+  justify-content: center;
 }
 
 .fs-icon-picker__toolbar {

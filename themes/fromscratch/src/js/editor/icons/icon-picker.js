@@ -124,18 +124,22 @@ export function IconPicker({ label, value, onChange }) {
     <div className="fs-icon-picker">
       {label ? <span className="fs-icon-picker__label">{label}</span> : null}
 
+      {selected ? (
+        <div className="fs-icon-picker__value">
+          <span className={'fs-icon -icon-' + value} aria-hidden="true" />
+          <span className="fs-icon-picker__value-name">
+            {iconName(selected.icon)}
+          </span>
+        </div>
+      ) : null}
+
       <div className="fs-icon-picker__control">
         <Button
           variant="secondary"
           className="fs-icon-picker__trigger"
           onClick={() => setIsOpen(true)}
         >
-          {value ? (
-            <span className={'fs-icon -icon-' + value} aria-hidden="true" />
-          ) : null}
-          <span>
-            {selected ? iconName(selected.icon) : t('choose', 'Choose icon')}
-          </span>
+          {t('choose', 'Choose icon')}
         </Button>
 
         {value ? (
