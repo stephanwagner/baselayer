@@ -1,4 +1,5 @@
 @use 'sass:list';
+@use 'sass:string';
 
 // Reusable SVG icon system.
 //
@@ -402,18 +403,18 @@ $fs-icon-fill: (
   @include fs-icon-mask-url('#{$fs-icon-path}/#{$name}.svg');
 }
 
-// The `::before` icon shown in front of a button label, from an explicit URL.
-@mixin fs-button-icon-before-url($url) {
+// The shared `::before` box for a button icon (spacing + mask setup, no image).
+@mixin fs-button-icon-base {
   content: '';
   margin-right: 8px;
   vertical-align: -0.15em;
   @include fs-icon-box;
-  @include fs-icon-mask-url($url);
 }
 
-// The `::before` icon shown in front of a button label (default icon folder).
-@mixin fs-button-icon-before($name) {
-  @include fs-button-icon-before-url('#{$fs-icon-path}/#{$name}.svg');
+// The `::before` icon shown in front of a button label, from an explicit URL.
+@mixin fs-button-icon-before-url($url) {
+  @include fs-button-icon-base;
+  @include fs-icon-mask-url($url);
 }
 
 // Emit both the standalone (.fs-icon) and button (::before) rules for a single
@@ -429,17 +430,44 @@ $fs-icon-fill: (
   }
 }
 
-// Icon-name class variants (`.-icon-<name>` / `.-icon-<name>-fill`).
+// Icon-name class variants for buttons (`.-icon-<name>` / `.-icon-<name>-fill`).
+//
+// The shared pseudo-element box (size, spacing, mask setup) is emitted ONCE for
+// every icon class via :where(); only the per-icon mask image URL is repeated.
+// The `-icon-right` position modifier is deliberately left out of the box
+// selector, so a right-positioned button without an icon never shows an empty
+// box (a `::before` with no `content` is not generated).
 @mixin fs-button-icons {
+  // Collect every icon class (outline + fill) for the shared box selector.
+  $classes: ();
+
+  @each $name in $fs-icon-names {
+    $classes: list.append($classes, string.unquote('.-icon-#{$name}'), $separator: comma);
+
+    @if list.index($fs-icon-fill, $name) {
+      $classes: list.append(
+        $classes,
+        string.unquote('.-icon-#{$name}-fill'),
+        $separator: comma
+      );
+    }
+  }
+
+  // Shared box — a single declaration block shared by all icon buttons.
+  .wp-block-button:where(#{$classes}) .wp-block-button__link::before {
+    @include fs-button-icon-base;
+  }
+
   .wp-block-button {
+    // Per-icon mask image only.
     @each $name in $fs-icon-names {
       &.-icon-#{$name} .wp-block-button__link::before {
-        @include fs-button-icon-before($name);
+        @include fs-icon-mask($name);
       }
 
       @if list.index($fs-icon-fill, $name) {
         &.-icon-#{$name}-fill .wp-block-button__link::before {
-          @include fs-button-icon-before('#{$name}-fill');
+          @include fs-icon-mask('#{$name}-fill');
         }
       }
     }
