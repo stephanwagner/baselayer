@@ -153,6 +153,7 @@ function fs_icon_labels(): array
 		'smiley-sad'             => _x('Sad face', 'icon name', 'fromscratch-icons'),
 		'share'                  => _x('Share', 'icon name', 'fromscratch-icons'),
 		'share-social'           => _x('Share (social)', 'icon name', 'fromscratch-icons'),
+		'rss'                    => _x('RSS', 'icon name', 'fromscratch-icons'),
 		'flag'                   => _x('Flag', 'icon name', 'fromscratch-icons'),
 		'bookmark'               => _x('Bookmark', 'icon name', 'fromscratch-icons'),
 
@@ -224,6 +225,13 @@ function fs_icon_labels(): array
 		'currency-pound'         => _x('Pound', 'icon name', 'fromscratch-icons'),
 		'currency-yen'           => _x('Yen', 'icon name', 'fromscratch-icons'),
 		'sell'                   => _x('Sell', 'icon name', 'fromscratch-icons'),
+		// Payment brands (proper nouns; not translated).
+		'visa'                   => _x('Visa', 'icon name', 'fromscratch-icons'),
+		'mastercard'             => _x('Mastercard', 'icon name', 'fromscratch-icons'),
+		'paypal'                 => _x('PayPal', 'icon name', 'fromscratch-icons'),
+		'applepay'               => _x('Apple Pay', 'icon name', 'fromscratch-icons'),
+		'googlepay'              => _x('Google Pay', 'icon name', 'fromscratch-icons'),
+		'klarna'                 => _x('Klarna', 'icon name', 'fromscratch-icons'),
 
 		// People & accounts.
 		'account'                => _x('Account', 'icon name', 'fromscratch-icons'),
@@ -319,6 +327,42 @@ function fs_icon_labels(): array
 		'label'                  => _x('Label', 'icon name', 'fromscratch-icons'),
 		'pets'                   => _x('Pets', 'icon name', 'fromscratch-icons'),
 		'construction'           => _x('Construction', 'icon name', 'fromscratch-icons'),
+
+		// Brands (proper nouns; source strings are the brand names and are not
+		// translated — the German .mo intentionally has no entries for these, so
+		// gettext falls back to the English name in every locale).
+		'facebook'               => _x('Facebook', 'icon name', 'fromscratch-icons'),
+		'instagram'              => _x('Instagram', 'icon name', 'fromscratch-icons'),
+		'x'                      => _x('X (Twitter)', 'icon name', 'fromscratch-icons'),
+		'threads'                => _x('Threads', 'icon name', 'fromscratch-icons'),
+		'mastodon'               => _x('Mastodon', 'icon name', 'fromscratch-icons'),
+		'bluesky'                => _x('Bluesky', 'icon name', 'fromscratch-icons'),
+		'pinterest'              => _x('Pinterest', 'icon name', 'fromscratch-icons'),
+		'reddit'                 => _x('Reddit', 'icon name', 'fromscratch-icons'),
+		'tumblr'                 => _x('Tumblr', 'icon name', 'fromscratch-icons'),
+		'snapchat'               => _x('Snapchat', 'icon name', 'fromscratch-icons'),
+		'tiktok'                 => _x('TikTok', 'icon name', 'fromscratch-icons'),
+		'xing'                   => _x('Xing', 'icon name', 'fromscratch-icons'),
+		'behance'                => _x('Behance', 'icon name', 'fromscratch-icons'),
+		'dribbble'               => _x('Dribbble', 'icon name', 'fromscratch-icons'),
+		'whatsapp'               => _x('WhatsApp', 'icon name', 'fromscratch-icons'),
+		'telegram'               => _x('Telegram', 'icon name', 'fromscratch-icons'),
+		'signal'                 => _x('Signal', 'icon name', 'fromscratch-icons'),
+		'imessage'               => _x('iMessage', 'icon name', 'fromscratch-icons'),
+		'wechat'                 => _x('WeChat', 'icon name', 'fromscratch-icons'),
+		'line'                   => _x('LINE', 'icon name', 'fromscratch-icons'),
+		'discord'                => _x('Discord', 'icon name', 'fromscratch-icons'),
+		'youtube'                => _x('YouTube', 'icon name', 'fromscratch-icons'),
+		'youtubeshorts'          => _x('YouTube Shorts', 'icon name', 'fromscratch-icons'),
+		'vimeo'                  => _x('Vimeo', 'icon name', 'fromscratch-icons'),
+		'twitch'                 => _x('Twitch', 'icon name', 'fromscratch-icons'),
+		'spotify'                => _x('Spotify', 'icon name', 'fromscratch-icons'),
+		'soundcloud'             => _x('SoundCloud', 'icon name', 'fromscratch-icons'),
+		'applemusic'             => _x('Apple Music', 'icon name', 'fromscratch-icons'),
+		'github'                 => _x('GitHub', 'icon name', 'fromscratch-icons'),
+		'gitlab'                 => _x('GitLab', 'icon name', 'fromscratch-icons'),
+		'devdotto'               => _x('dev.to', 'icon name', 'fromscratch-icons'),
+		'google'                 => _x('Google', 'icon name', 'fromscratch-icons'),
 	];
 }
 
@@ -346,6 +390,7 @@ function fs_icon_category_labels(): array
 		'controls'      => _x('Controls & settings', 'icon category', 'fromscratch-icons'),
 		'status'        => _x('Status & time', 'icon category', 'fromscratch-icons'),
 		'misc'          => _x('Symbols & misc', 'icon category', 'fromscratch-icons'),
+		'brands'        => _x('Brands', 'icon category', 'fromscratch-icons'),
 	];
 }
 

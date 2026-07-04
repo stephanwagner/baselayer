@@ -79,6 +79,10 @@ msgctxt "icon category"
 msgid "Symbols & misc"
 msgstr "Symbole & Sonstiges"
 
+msgctxt "icon category"
+msgid "Brands"
+msgstr "Marken"
+
 # Icon names — Navigation
 
 msgctxt "icon name"

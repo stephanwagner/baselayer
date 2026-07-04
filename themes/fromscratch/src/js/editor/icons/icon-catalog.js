@@ -140,7 +140,8 @@ const builtInCategories = [
       { filename: 'smiley-neutral', alternatives: ['fill'], keywords: ['emoji', 'meh', 'mood'] },
       { filename: 'smiley-sad', alternatives: ['fill'], keywords: ['emoji', 'frown', 'negative', 'mood'] },
       { filename: 'share', alternatives: [], keywords: ['network', 'nodes', 'send'] },
-      { filename: 'share-social', alternatives: [], keywords: ['social', 'network', 'send'] },
+      { filename: 'share-social', alternatives: [], keywords: ['social', 'network', 'send'] },,
+      { filename: 'rss', alternatives: [], keywords: ['feed', 'subscribe', 'syndication', 'blog'] }
       { filename: 'flag', alternatives: ['fill'], keywords: ['report', 'mark', 'banner'] },
       { filename: 'bookmark', alternatives: ['fill'], keywords: ['save', 'favorite', 'mark'] }
     ]
@@ -219,6 +220,12 @@ const builtInCategories = [
       { filename: 'shopping-basket', alternatives: ['fill'], keywords: ['basket', 'buy', 'cart'] },
       { filename: 'credit-card', alternatives: ['fill'], keywords: ['payment', 'card', 'pay'] },
       { filename: 'payments', alternatives: ['fill'], keywords: ['money', 'pay', 'cash', 'finance'] },
+      { filename: 'visa', alternatives: [], keywords: ['payment', 'card', 'credit card', 'brand'] },
+      { filename: 'mastercard', alternatives: [], keywords: ['payment', 'card', 'credit card', 'brand'] },
+      { filename: 'paypal', alternatives: [], keywords: ['payment', 'pay', 'wallet', 'brand'] },
+      { filename: 'applepay', alternatives: [], keywords: ['payment', 'apple', 'pay', 'wallet', 'brand'] },
+      { filename: 'googlepay', alternatives: [], keywords: ['payment', 'google', 'pay', 'wallet', 'brand'] },
+      { filename: 'klarna', alternatives: [], keywords: ['payment', 'pay', 'bnpl', 'buy now pay later', 'brand'] },
       { filename: 'currency-dollar', alternatives: [], keywords: ['money', 'usd', 'price'] },
       { filename: 'currency-euro', alternatives: [], keywords: ['money', 'eur', 'price'] },
       { filename: 'currency-pound', alternatives: [], keywords: ['money', 'gbp', 'price'] },
@@ -341,6 +348,43 @@ const builtInCategories = [
       { filename: 'label', alternatives: ['fill'], keywords: ['tag', 'badge', 'category'] },
       { filename: 'pets', alternatives: [], keywords: ['paw', 'animal', 'dog', 'cat', 'pet'] },
       { filename: 'construction', alternatives: [], keywords: ['maintenance', 'work', 'build', 'tools'] }
+    ]
+  },
+  {
+    slug: 'brands',
+    icons: [
+      { filename: 'facebook', alternatives: [], keywords: ['social', 'meta', 'fb'] },
+      { filename: 'instagram', alternatives: [], keywords: ['social', 'meta', 'ig', 'photos'] },
+      { filename: 'x', alternatives: [], keywords: ['twitter', 'tweet', 'social'] },
+      { filename: 'threads', alternatives: [], keywords: ['social', 'meta', 'instagram'] },
+      { filename: 'mastodon', alternatives: [], keywords: ['social', 'fediverse', 'toot'] },
+      { filename: 'bluesky', alternatives: [], keywords: ['social', 'bsky', 'butterfly'] },
+      { filename: 'pinterest', alternatives: [], keywords: ['social', 'pin', 'board'] },
+      { filename: 'reddit', alternatives: [], keywords: ['social', 'forum', 'community'] },
+      { filename: 'tumblr', alternatives: [], keywords: ['social', 'blog'] },
+      { filename: 'snapchat', alternatives: [], keywords: ['social', 'snap', 'ghost'] },
+      { filename: 'tiktok', alternatives: [], keywords: ['social', 'video', 'short'] },
+      { filename: 'xing', alternatives: [], keywords: ['social', 'jobs', 'network', 'professional', 'business'] },
+      { filename: 'behance', alternatives: [], keywords: ['portfolio', 'design', 'creative', 'adobe'] },
+      { filename: 'dribbble', alternatives: [], keywords: ['portfolio', 'design', 'creative', 'shots'] },
+      { filename: 'whatsapp', alternatives: [], keywords: ['messaging', 'chat', 'meta', 'message'] },
+      { filename: 'telegram', alternatives: [], keywords: ['messaging', 'chat', 'message'] },
+      { filename: 'signal', alternatives: [], keywords: ['messaging', 'chat', 'private', 'message'] },
+      { filename: 'imessage', alternatives: [], keywords: ['messaging', 'messages', 'apple', 'chat'] },
+      { filename: 'wechat', alternatives: [], keywords: ['messaging', 'weixin', 'chat', 'china'] },
+      { filename: 'line', alternatives: [], keywords: ['messaging', 'chat', 'japan'] },
+      { filename: 'discord', alternatives: [], keywords: ['chat', 'gaming', 'community', 'voice'] },
+      { filename: 'youtube', alternatives: [], keywords: ['video', 'streaming', 'google'] },
+      { filename: 'youtubeshorts', alternatives: [], keywords: ['video', 'youtube', 'shorts', 'short'] },
+      { filename: 'vimeo', alternatives: [], keywords: ['video', 'streaming'] },
+      { filename: 'twitch', alternatives: [], keywords: ['video', 'streaming', 'gaming', 'live'] },
+      { filename: 'spotify', alternatives: [], keywords: ['music', 'audio', 'streaming'] },
+      { filename: 'soundcloud', alternatives: [], keywords: ['music', 'audio', 'streaming'] },
+      { filename: 'applemusic', alternatives: [], keywords: ['music', 'audio', 'streaming', 'apple'] },
+      { filename: 'github', alternatives: [], keywords: ['code', 'git', 'repository', 'developer', 'octocat'] },
+      { filename: 'gitlab', alternatives: [], keywords: ['code', 'git', 'repository', 'developer'] },
+      { filename: 'devdotto', alternatives: [], keywords: ['dev.to', 'blog', 'developer', 'community'] },
+      { filename: 'google', alternatives: [], keywords: ['search', 'brand', 'g'] }
     ]
   }
 ];
