@@ -3,6 +3,8 @@ import { IconPicker } from './icons/icon-picker';
 
 const { InspectorControls, useBlockProps } = wp.blockEditor;
 const { PanelBody, ToggleControl, SelectControl } = wp.components;
+const ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
+const ToggleGroupControlOption = wp.components.__experimentalToggleGroupControlOption;
 const { createHigherOrderComponent } = wp.compose;
 const { Fragment } = wp.element;
 
@@ -86,6 +88,36 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                         }
                       />
                     );
+                  } else if (option.type === 'button-group') {
+                    if (ToggleGroupControl && ToggleGroupControlOption) {
+                      return (
+                        <ToggleGroupControl
+                          key={option.attributeName}
+                          label={option.label}
+                          value={attributes[option.attributeName]}
+                          isBlock
+                          onChange={(newValue) => setAttributes({ [option.attributeName]: newValue })}
+                          __nextHasNoMarginBottom
+                        >
+                          {option.options.map((opt) => (
+                            <ToggleGroupControlOption
+                              key={opt.value || 'default'}
+                              value={opt.value}
+                              label={opt.label}
+                            />
+                          ))}
+                        </ToggleGroupControl>
+                      );
+                    }
+                    return (
+                      <SelectControl
+                        key={option.attributeName}
+                        label={option.label}
+                        value={attributes[option.attributeName]}
+                        options={option.options}
+                        onChange={(newValue) => setAttributes({ [option.attributeName]: newValue })}
+                      />
+                    );
                   }
                   return null;
                 })}
@@ -116,7 +148,7 @@ const applyClasses = (BlockListBlock) => {
         if (option.type === 'boolean' && attributes[option.attributeName]) {
           classNames += ` ${option.className}`;
         } else if (
-          (option.type === 'select' || option.type === 'icon') &&
+          (option.type === 'select' || option.type === 'icon' || option.type === 'button-group') &&
           attributes[option.attributeName]
         ) {
           classNames += ` ${attributes[option.attributeName]}`;
@@ -147,7 +179,7 @@ const saveClasses = (extraProps, blockType, attributes) => {
       if (option.type === 'boolean' && attributes[option.attributeName]) {
         classNames += ` ${option.className}`;
       } else if (
-        (option.type === 'select' || option.type === 'icon') &&
+        (option.type === 'select' || option.type === 'icon' || option.type === 'button-group') &&
         attributes[option.attributeName]
       ) {
         classNames += ` ${attributes[option.attributeName]}`;

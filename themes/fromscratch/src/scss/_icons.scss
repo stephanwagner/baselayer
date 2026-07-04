@@ -187,6 +187,7 @@ $fs-icon-names: (
   sort-by-alpha,
   star,
   star-half,
+  star-filled,
   stars,
   subdirectory-arrow,
   swap-horizontal,
@@ -401,6 +402,18 @@ $fs-icon-fill: (
         &.-icon-#{$name}-fill .wp-block-button__link::before {
           @include fs-button-icon-before('#{$name}-fill');
         }
+      }
+    }
+
+    // Icon on the right of the label (button-group "Icon Position" option).
+    &.-icon-right .wp-block-button__link {
+      display: inline-flex;
+      align-items: center;
+
+      &::before {
+        order: 1;
+        margin-right: 0;
+        margin-left: 8px;
       }
     }
   }

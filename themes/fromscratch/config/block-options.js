@@ -267,6 +267,16 @@ export const blockOptions = [
         label: 'Icon',
         default: '',
         attributeName: 'buttonIcon'
+      },
+      {
+        type: 'button-group',
+        label: 'Icon Position',
+        default: '',
+        attributeName: 'buttonIconPosition',
+        options: [
+          { label: 'Links', value: '' },
+          { label: 'Rechts', value: '-icon-right' }
+        ]
       }
     ]
   },

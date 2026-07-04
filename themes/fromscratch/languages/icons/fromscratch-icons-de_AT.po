@@ -382,6 +382,10 @@ msgid "Star (half)"
 msgstr "Stern (halb)"
 
 msgctxt "icon name"
+msgid "Star (filled)"
+msgstr "Stern (gefüllt)"
+
+msgctxt "icon name"
 msgid "Stars"
 msgstr "Sterne"
 
@@ -748,8 +752,12 @@ msgid "Pointer"
 msgstr "Zeiger"
 
 msgctxt "icon name"
-msgid "Drag"
-msgstr "Ziehen"
+msgid "Drag indicator"
+msgstr "Ziehpunkte"
+
+msgctxt "icon name"
+msgid "Drag handle"
+msgstr "Ziehgriff"
 
 msgctxt "icon name"
 msgid "Barcode"

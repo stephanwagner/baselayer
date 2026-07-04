@@ -382,6 +382,10 @@ msgid "Star (half)"
 msgstr "Stern (halb)"
 
 msgctxt "icon name"
+msgid "Star (filled)"
+msgstr "Stern (gefüllt)"
+
+msgctxt "icon name"
 msgid "Stars"
 msgstr "Sterne"
 

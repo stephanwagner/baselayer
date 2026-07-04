@@ -110,8 +110,9 @@ export const iconCategories = [
     slug: 'social',
     icons: [
       { filename: 'heart', alternatives: ['fill'], keywords: ['like', 'love', 'favorite'] },
-      { filename: 'star', alternatives: ['fill'], keywords: ['favorite', 'rating', 'bookmark'] },
+      { filename: 'star', alternatives: [], keywords: ['favorite', 'rating', 'bookmark'] },
       { filename: 'star-half', alternatives: [], keywords: ['rating', 'half', 'review'] },
+      { filename: 'star-filled', alternatives: [], keywords: ['rating', 'filled', 'review'] },
       { filename: 'stars', alternatives: ['fill'], keywords: ['rating', 'favorite', 'sparkle', 'review'] },
       { filename: 'thumb-up', alternatives: ['fill'], keywords: ['like', 'approve', 'good', 'vote'] },
       { filename: 'thumb-down', alternatives: ['fill'], keywords: ['dislike', 'disapprove', 'bad', 'vote'] },

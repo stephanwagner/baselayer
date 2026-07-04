@@ -126,6 +126,7 @@ function fs_icon_labels(): array
 		'heart'                  => _x('Heart', 'icon name', 'fromscratch-icons'),
 		'star'                   => _x('Star', 'icon name', 'fromscratch-icons'),
 		'star-half'              => _x('Star (half)', 'icon name', 'fromscratch-icons'),
+		'star-filled'            => _x('Star (filled)', 'icon name', 'fromscratch-icons'),
 		'stars'                  => _x('Stars', 'icon name', 'fromscratch-icons'),
 		'thumb-up'               => _x('Thumbs up', 'icon name', 'fromscratch-icons'),
 		'thumb-down'             => _x('Thumbs down', 'icon name', 'fromscratch-icons'),
