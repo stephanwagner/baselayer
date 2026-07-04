@@ -49,8 +49,8 @@ const builtInCategories = [
       { filename: 'collapse', alternatives: [], keywords: ['minimize', 'shrink', 'close', 'inward', 'arrows'] },
       { filename: 'expand-content', alternatives: [], keywords: ['unfold', 'more', 'enlarge', 'open', 'arrows'] },
       { filename: 'collapse-content', alternatives: [], keywords: ['fold', 'less', 'hide', 'minimize', 'arrows'] },
-      { filename: 'open-in-new', alternatives: [], keywords: ['external', 'link', 'window', 'tab'] }
-    ]
+      { filename: 'open-in-new', alternatives: [], keywords: ['external', 'link', 'window', 'tab'] },
+    ],
   },
   {
     slug: 'actions',
@@ -85,7 +85,7 @@ const builtInCategories = [
       { filename: 'redo', alternatives: [], keywords: ['forward', 'repeat', 'arrow'] },
       { filename: 'drag', alternatives: [], keywords: ['move', 'reorder', 'handle', 'grab'] },
       { filename: 'drag-handle', alternatives: [], keywords: ['move', 'reorder', 'handle', 'grab'] },
-    ]
+    ],
   },
   {
     slug: 'editing',
@@ -109,7 +109,7 @@ const builtInCategories = [
       { filename: 'translate', alternatives: [], keywords: ['language', 'localize', 'translation'] },
       { filename: 'language', alternatives: [], keywords: ['globe', 'locale', 'translate', 'international'] },
       { filename: 'quote', alternatives: ['fill'], keywords: ['blockquote', 'citation', 'testimonial'] },
-    ]
+    ],
   },
   {
     slug: 'communication',
@@ -123,8 +123,8 @@ const builtInCategories = [
       { filename: 'email-alt', alternatives: [], keywords: ['envelope', 'message', 'contact'] },
       { filename: 'phone', alternatives: ['fill'], keywords: ['call', 'contact', 'telephone'] },
       { filename: 'send', alternatives: ['fill'], keywords: ['paper plane', 'submit', 'message'] },
-      { filename: 'megaphone', alternatives: ['fill'], keywords: ['announcement', 'marketing', 'promote', 'loud'] }
-    ]
+      { filename: 'megaphone', alternatives: ['fill'], keywords: ['announcement', 'marketing', 'promote', 'loud'] },
+    ],
   },
   {
     slug: 'social',
@@ -147,8 +147,8 @@ const builtInCategories = [
       { filename: 'share', alternatives: [], keywords: ['network', 'nodes', 'send'] },
       { filename: 'share-social', alternatives: [], keywords: ['social', 'network', 'send'] },
       { filename: 'rss', alternatives: [], keywords: ['feed', 'subscribe', 'syndication', 'blog'] },
-      { filename: 'flag', alternatives: ['fill'], keywords: ['report', 'mark', 'banner'] }
-    ]
+      { filename: 'flag', alternatives: ['fill'], keywords: ['report', 'mark', 'banner'] },
+    ],
   },
   {
     slug: 'media',
@@ -171,7 +171,7 @@ const builtInCategories = [
       { filename: 'volume-down', alternatives: ['fill'], keywords: ['sound', 'audio', 'quieter', 'speaker'] },
       { filename: 'volume-up', alternatives: ['fill'], keywords: ['sound', 'audio', 'louder', 'speaker'] },
       { filename: 'volume-off', alternatives: ['fill'], keywords: ['mute', 'silent', 'sound', 'speaker'] },
-    ]
+    ],
   },
   {
     slug: 'files',
@@ -185,8 +185,8 @@ const builtInCategories = [
       { filename: 'file-pdf', alternatives: ['fill'], keywords: ['pdf', 'document', 'acrobat', 'export'] },
       { filename: 'database', alternatives: ['fill'], keywords: ['storage', 'server', 'data', 'sql'] },
       { filename: 'cloud', alternatives: ['fill'], keywords: ['storage', 'upload', 'server'] },
-      { filename: 'backup', alternatives: ['fill'], keywords: ['restore', 'cloud', 'save', 'copy'] }
-    ]
+      { filename: 'backup', alternatives: ['fill'], keywords: ['restore', 'cloud', 'save', 'copy'] },
+    ],
   },
   {
     slug: 'data',
@@ -194,7 +194,7 @@ const builtInCategories = [
       { filename: 'chart-pie', alternatives: ['fill'], keywords: ['graph', 'statistics', 'analytics'] },
       { filename: 'chart-bar', alternatives: [], keywords: ['graph', 'statistics', 'analytics', 'columns'] },
       { filename: 'chart-bar-alt', alternatives: [], keywords: ['graph', 'statistics', 'analytics', 'columns', 'bars'] },
-      { filename: 'chart-monitoring', alternatives: [], keywords: ['monitoring', 'line', 'analytics', 'graph', 'trend', 'activity', 'dashboard'] },
+      { filename: 'chart-monitoring', alternatives: [], keywords: ['monitoring', 'line', 'analytics', 'graph', 'trend', 'activity'] },
       { filename: 'chart-data', alternatives: ['fill'], keywords: ['graph', 'analytics', 'statistics', 'report', 'insights'] },
       { filename: 'trending-up', alternatives: [], keywords: ['growth', 'increase', 'arrow', 'analytics', 'rise', 'up'] },
       { filename: 'trending-down', alternatives: [], keywords: ['decrease', 'decline', 'arrow', 'analytics', 'fall', 'down'] },
@@ -213,8 +213,8 @@ const builtInCategories = [
       { filename: 'view-grid-alt', alternatives: ['fill'], keywords: ['layout', 'tiles'] },
       { filename: 'view-list', alternatives: ['fill'], keywords: ['layout', 'rows', 'list'] },
       { filename: 'layers', alternatives: ['fill'], keywords: ['stack', 'layout', 'overlay', 'levels', 'z-index'] },
-      { filename: 'wp-block', alternatives: ['fill'], keywords: ['wordpress', 'gutenberg', 'brick'] }
-    ]
+      { filename: 'wp-block', alternatives: ['fill'], keywords: ['wordpress', 'gutenberg', 'brick'] },
+    ],
   },
   {
     slug: 'commerce',
@@ -247,8 +247,8 @@ const builtInCategories = [
       { filename: 'paypal', alternatives: [], keywords: ['payment', 'pay', 'wallet', 'brand'] },
       { filename: 'applepay', alternatives: [], keywords: ['payment', 'apple', 'pay', 'wallet', 'brand'] },
       { filename: 'googlepay', alternatives: [], keywords: ['payment', 'google', 'pay', 'wallet', 'brand'] },
-      { filename: 'klarna', alternatives: [], keywords: ['payment', 'pay', 'bnpl', 'buy now pay later', 'brand'] }
-    ]
+      { filename: 'klarna', alternatives: [], keywords: ['payment', 'pay', 'bnpl', 'buy now pay later', 'brand'] },
+    ],
   },
   {
     slug: 'people',
@@ -262,8 +262,8 @@ const builtInCategories = [
       { filename: 'gender-female', alternatives: [], keywords: ['woman', 'sex', 'symbol'] },
       { filename: 'man', alternatives: [], keywords: ['male', 'person', 'user'] },
       { filename: 'woman', alternatives: [], keywords: ['female', 'person', 'user'] },
-      { filename: 'accessibility', alternatives: [], keywords: ['a11y', 'wheelchair', 'disability', 'access'] }
-    ]
+      { filename: 'accessibility', alternatives: [], keywords: ['a11y', 'wheelchair', 'disability', 'access'] },
+    ],
   },
   {
     slug: 'places',
@@ -278,8 +278,8 @@ const builtInCategories = [
       { filename: 'bicycle', alternatives: [], keywords: ['bike', 'cycle', 'transport', 'ride'] },
       { filename: 'train', alternatives: ['fill'], keywords: ['transport', 'rail', 'metro', 'subway', 'travel'] },
       { filename: 'ship', alternatives: ['fill'], keywords: ['boat', 'transport', 'cruise', 'sea', 'ferry', 'travel'] },
-      { filename: 'plane', alternatives: [], keywords: ['airplane', 'flight', 'travel', 'fly', 'airport'] }
-    ]
+      { filename: 'plane', alternatives: [], keywords: ['airplane', 'flight', 'travel', 'fly', 'airport'] },
+    ],
   },
   {
     slug: 'devices',
@@ -298,8 +298,8 @@ const builtInCategories = [
       { filename: 'barcode-scan', alternatives: [], keywords: ['scan', 'product', 'code'] },
       { filename: 'qr-code', alternatives: [], keywords: ['qr', 'code', 'scan', 'barcode', 'link'] },
       { filename: 'qr-code-alt', alternatives: [], keywords: ['qr', 'code', 'scan', 'barcode'] },
-      { filename: 'qr-code-scan', alternatives: [], keywords: ['qr', 'code', 'scan', 'camera', 'barcode'] }
-    ]
+      { filename: 'qr-code-scan', alternatives: [], keywords: ['qr', 'code', 'scan', 'camera', 'barcode'] },
+    ],
   },
   {
     slug: 'security',
@@ -314,8 +314,8 @@ const builtInCategories = [
       { filename: 'shield-check', alternatives: ['fill'], keywords: ['security', 'verified', 'protected', 'safe'] },
       { filename: 'shield-lock', alternatives: ['fill'], keywords: ['security', 'protected', 'private'] },
       { filename: 'shield-security', alternatives: [], keywords: ['protection', 'guard', 'safe'] },
-      { filename: 'verified', alternatives: ['fill'], keywords: ['check', 'badge', 'trusted', 'approved'] }
-    ]
+      { filename: 'verified', alternatives: ['fill'], keywords: ['check', 'badge', 'trusted', 'approved'] },
+    ],
   },
   {
     slug: 'controls',
@@ -337,8 +337,8 @@ const builtInCategories = [
       { filename: 'visibility', alternatives: ['fill'], keywords: ['eye', 'show', 'view', 'visible'] },
       { filename: 'visibility-off', alternatives: ['fill'], keywords: ['eye', 'hide', 'hidden', 'invisible', 'private', 'password'] },
       { filename: 'mode-dark', alternatives: ['fill'], keywords: ['night', 'theme', 'moon'] },
-      { filename: 'mode-light', alternatives: ['fill'], keywords: ['day', 'theme', 'sun', 'brightness'] }
-    ]
+      { filename: 'mode-light', alternatives: ['fill'], keywords: ['day', 'theme', 'sun', 'brightness'] },
+    ],
   },
   {
     slug: 'status',
@@ -352,8 +352,8 @@ const builtInCategories = [
       { filename: 'hourglass', alternatives: ['fill'], keywords: ['time', 'wait', 'loading', 'timer'] },
       { filename: 'calendar', alternatives: ['fill'], keywords: ['date', 'schedule', 'event', 'day', 'blank'] },
       { filename: 'calendar-month', alternatives: ['fill'], keywords: ['date', 'month', 'schedule', 'event'] },
-      { filename: 'calendar-text', alternatives: ['fill'], keywords: ['date', 'event', 'schedule', 'agenda'] }
-    ]
+      { filename: 'calendar-text', alternatives: ['fill'], keywords: ['date', 'event', 'schedule', 'agenda'] },
+    ],
   },
   {
     slug: 'misc',
@@ -371,8 +371,8 @@ const builtInCategories = [
       { filename: 'label', alternatives: ['fill'], keywords: ['tag', 'badge', 'category'] },
       { filename: 'pets', alternatives: [], keywords: ['paw', 'animal', 'dog', 'cat', 'pet'] },
       { filename: 'construction', alternatives: [], keywords: ['maintenance', 'work', 'build', 'tools'] },
-      { filename: 'puzzle', alternatives: ['fill'], keywords: ['extension', 'plugin', 'addon', 'integration', 'piece'] }
-    ]
+      { filename: 'puzzle', alternatives: ['fill'], keywords: ['extension', 'plugin', 'addon', 'integration', 'piece'] },
+    ],
   },
   {
     slug: 'brands',
@@ -418,26 +418,20 @@ const builtInCategories = [
       { filename: 'yelp', alternatives: [], keywords: ['reviews', 'business', 'local', 'ratings'] },
       { filename: 'google', alternatives: [], keywords: ['search', 'brand', 'g'] },
       { filename: 'microsoft', alternatives: [], keywords: ['windows', 'office', 'tech'] },
-      { filename: 'apple', alternatives: [], keywords: ['mac', 'ios', 'iphone', 'tech', 'logo'] }
-    ]
-  }
+      { filename: 'apple', alternatives: [], keywords: ['mac', 'ios', 'iphone', 'tech', 'logo'] },
+    ],
+  },
 ];
 
 // Project/customer icons (assets/icons/theme/) surface at the top of the picker.
 // The list is generated by scripts/build-icons.mjs into ./icons.generated.js.
-export const iconCategories = themeIconCategory.icons.length
-  ? [themeIconCategory, ...builtInCategories]
-  : builtInCategories;
+export const iconCategories = themeIconCategory.icons.length ? [themeIconCategory, ...builtInCategories] : builtInCategories;
 
 /** Flat list of every icon across all categories. */
-export const allIcons = iconCategories.reduce(
-  (icons, category) => icons.concat(category.icons),
-  []
-);
+export const allIcons = iconCategories.reduce((icons, category) => icons.concat(category.icons), []);
 
 /** Whether an icon offers the given variant (e.g. 'fill'). */
-export const hasVariant = (icon, variant) =>
-  !!icon && !!variant && icon.alternatives.indexOf(variant) !== -1;
+export const hasVariant = (icon, variant) => !!icon && !!variant && icon.alternatives.indexOf(variant) !== -1;
 
 /**
  * Resolve an icon to the file name for a variant. Falls back to the base
@@ -445,9 +439,7 @@ export const hasVariant = (icon, variant) =>
  * icon stays selectable regardless of the active variant.
  */
 export const resolveIconName = (icon, variant) =>
-  variant && variant !== 'outline' && hasVariant(icon, variant)
-    ? `${icon.filename}-${variant}`
-    : icon.filename;
+  variant && variant !== 'outline' && hasVariant(icon, variant) ? `${icon.filename}-${variant}` : icon.filename;
 
 /**
  * Match an icon against a lowercased search query.
@@ -460,10 +452,7 @@ export const iconMatchesQuery = (icon, query, displayName = '') => {
     return true;
   }
 
-  const haystack = [icon.filename, displayName]
-    .concat(icon.keywords)
-    .join(' ')
-    .toLowerCase();
+  const haystack = [icon.filename, displayName].concat(icon.keywords).join(' ').toLowerCase();
 
   return haystack.indexOf(query) !== -1;
 };

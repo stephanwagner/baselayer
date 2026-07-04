@@ -1,3 +1,5 @@
+@use '../variables' as *;
+
 // Reusable icon picker (block options sidebar + modal grid).
 
 .fs-icon-picker__label {
@@ -25,7 +27,7 @@
   border-radius: 4px;
 
   .fs-icon {
-    font-size: 20px;
+    font-size: 24px;
   }
 }
 
@@ -33,6 +35,7 @@
   display: flex;
   align-items: center;
   gap: 8px;
+  margin: 0 0 16px;
 }
 
 .fs-icon-picker__trigger {
@@ -93,11 +96,10 @@
   border: 1px solid var(--fs-color-gray-300, #dcdcde);
   border-radius: 6px;
   cursor: pointer;
-  transition: border-color 0.15s ease, background-color 0.15s ease,
-    color 0.15s ease;
+  transition: transition('background-color', 'border-color', 'color');
 
   .fs-icon {
-    font-size: 22px;
+    font-size: 24px;
   }
 
   &:hover {

@@ -436,7 +436,7 @@ function fs_icon_ui_strings(): array
 {
 	return [
 		'choose'  => _x('Choose icon', 'icon picker', 'fromscratch-icons'),
-		'search'  => _x('Search icons …', 'icon picker', 'fromscratch-icons'),
+		'search'  => _x('Search icons…', 'icon picker', 'fromscratch-icons'),
 		'style'   => _x('Style', 'icon picker', 'fromscratch-icons'),
 		'outline' => _x('Outline', 'icon picker', 'fromscratch-icons'),
 		'filled'  => _x('Filled', 'icon picker', 'fromscratch-icons'),

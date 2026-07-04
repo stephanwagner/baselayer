@@ -859,6 +859,27 @@
                 "step": "",
                 "prepend": "",
                 "append": "Sekunden"
+            },
+            {
+                "key": "field_6a484d7b51924",
+                "label": "Weite",
+                "name": "align-wide",
+                "aria-label": "",
+                "type": "true_false",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "An weiten Container ausrichten",
+                "default_value": 0,
+                "allow_in_bindings": 0,
+                "ui": 0,
+                "ui_on_text": "",
+                "ui_off_text": ""
             }
         ],
         "location": [
