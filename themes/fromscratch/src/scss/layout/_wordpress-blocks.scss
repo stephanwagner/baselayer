@@ -308,17 +308,17 @@
 
   .-narrow,
   .-narrow-left {
-    max-width: var(--fs-content-narrow-width);
+    max-width: var(--fs-content-width-narrow);
   }
 
   .-very-narrow,
   .-very-narrow-left {
-    max-width: var(--fs-content-very-narrow-width);
+    max-width: var(--fs-content-width-very-narrow);
   }
 
   .-extra-narrow,
   .-extra-narrow-left {
-    max-width: var(--fs-content-extra-narrow-width);
+    max-width: var(--fs-content-width-extra-narrow);
   }
 
   .-narrow,

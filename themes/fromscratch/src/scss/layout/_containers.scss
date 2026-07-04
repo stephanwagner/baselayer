@@ -3,9 +3,17 @@
 // Container
 
 .container {
+  max-width: var(--fs-content-width);
+}
+
+.container-wide {
+  max-width: var(--fs-content-width-wide);
+}
+
+.container,
+.container-wide {
   position: relative;
   margin: auto;
-  max-width: var(--fs-content-max-width);
   width: calc(100% - var(--fs-content-padding-l) - var(--fs-content-padding-l));
 
   @media (max-width: $breakpoint-m) {
@@ -30,7 +38,7 @@
     padding-right: 80px;
   }
 
-  @media (max-width: calc($content-max-width + 80px + 80px + 24px + 24px)) {
+  @media (max-width: calc($content-width + 80px + 80px + 24px + 24px)) {
     margin-left: calc(var(--fs-content-padding-l) * -1);
     margin-right: calc(var(--fs-content-padding-l) * -1);
 
@@ -40,17 +48,17 @@
     }
   }
 
-  @media (max-width: calc($content-max-width + $content-padding-l + $content-padding-l + 24px + 24px)) {
-    margin-left: calc((100vw - var(--fs-content-max-width)) / 2 / 2 * -1 - 16px);
-    margin-right: calc((100vw - var(--fs-content-max-width)) / 2 / 2 * -1 - 16px);
+  @media (max-width: calc($content-width + $content-padding-l + $content-padding-l + 24px + 24px)) {
+    margin-left: calc((100vw - var(--fs-content-width)) / 2 / 2 * -1 - 16px);
+    margin-right: calc((100vw - var(--fs-content-width)) / 2 / 2 * -1 - 16px);
 
     &.has-background {
-      padding-left: calc((100vw - var(--fs-content-max-width)) / 2 / 2 + 16px);
-      padding-right: calc((100vw - var(--fs-content-max-width)) / 2 / 2 + 16px);
+      padding-left: calc((100vw - var(--fs-content-width)) / 2 / 2 + 16px);
+      padding-right: calc((100vw - var(--fs-content-width)) / 2 / 2 + 16px);
     }
   }
 
-  @media (max-width: calc($content-max-width + $content-padding-l + $content-padding-l)) {
+  @media (max-width: calc($content-width + $content-padding-l + $content-padding-l)) {
     margin-left: calc(var(--fs-content-padding-l) / 2 * -1 - 12px);
     margin-right: calc(var(--fs-content-padding-l) / 2 * -1 - 12px);
 
@@ -92,10 +100,10 @@
 }
 
 .alignfull {
-  margin-left: calc((100vw - var(--fs-content-max-width)) * -0.5);
-  margin-right: calc((100vw - var(--fs-content-max-width)) * -0.5);
+  margin-left: calc((100vw - var(--fs-content-width)) * -0.5);
+  margin-right: calc((100vw - var(--fs-content-width)) * -0.5);
 
-  @media (max-width: calc($content-max-width + $content-padding-l + $content-padding-l)) {
+  @media (max-width: calc($content-width + $content-padding-l + $content-padding-l)) {
     margin-left: calc(var(--fs-content-padding-l) * -1);
     margin-right: calc(var(--fs-content-padding-l) * -1);
   }
@@ -116,7 +124,7 @@
   }
 
   > .wp-block-group__inner-container {
-    max-width: calc(var(--fs-content-max-width) + var(--fs-content-padding-l) + var(--fs-content-padding-l));
+    max-width: calc(var(--fs-content-width) + var(--fs-content-padding-l) + var(--fs-content-padding-l));
     padding-left: var(--fs-content-padding-l);
     padding-right: var(--fs-content-padding-l);
     margin: auto;

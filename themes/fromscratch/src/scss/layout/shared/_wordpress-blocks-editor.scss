@@ -7,17 +7,17 @@
 
   .-narrow,
   .-narrow-left {
-    max-width: min(var(--fs-content-narrow-width), 840px);
+    max-width: min(var(--fs-content-width-narrow), 840px);
   }
 
   .-very-narrow,
   .-very-narrow-left {
-    max-width: min(var(--fs-content-very-narrow-width), 840px);
+    max-width: min(var(--fs-content-width-very-narrow), 840px);
   }
 
   .-extra-narrow,
   .-extra-narrow-left {
-    max-width: min(var(--fs-content-extra-narrow-width), 840px);
+    max-width: min(var(--fs-content-width-extra-narrow), 840px);
   }
 
   // Columns

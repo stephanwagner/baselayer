@@ -11,7 +11,7 @@
 	<div class="page__wrapper">
 
 		<header class="header__wrapper">
-			<div class="header__container container">
+			<div class="header__container container-wide">
 
 				<div class="logo__container">
 					<a href="/">

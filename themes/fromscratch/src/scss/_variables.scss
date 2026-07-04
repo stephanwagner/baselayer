@@ -45,10 +45,11 @@ $line-height-l: 1.5;
 $line-height-xl: 1.4;
 
 // Content
-$content-max-width: 1200px;
-$content-narrow-width: 900px;
-$content-very-narrow-width: 600px;
-$content-extra-narrow-width: 300px;
+$content-width: 1200px;
+$content-width-wide: 1328px;
+$content-width-narrow: 900px;
+$content-width-very-narrow: 600px;
+$content-width-extra-narrow: 300px;
 
 // Breakpoints
 $breakpoint-xs: 400px;
@@ -138,10 +139,11 @@ $border-radius-large: 16px;
   --fs-link-color-hover: var(--fs-color-primary-dark);
 
   // Content
-  --fs-content-max-width: #{$content-max-width};
-  --fs-content-narrow-width: #{$content-narrow-width};
-  --fs-content-very-narrow-width: #{$content-very-narrow-width};
-  --fs-content-extra-narrow-width: #{$content-extra-narrow-width};
+  --fs-content-width: #{$content-width};
+  --fs-content-width-wide: #{$content-width-wide};
+  --fs-content-width-narrow: #{$content-width-narrow};
+  --fs-content-width-very-narrow: #{$content-width-very-narrow};
+  --fs-content-width-extra-narrow: #{$content-width-extra-narrow};
 
   // Breakpoints
   --fs-breakpoint-xs: #{$breakpoint-xs};
