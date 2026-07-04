@@ -22,6 +22,7 @@ const builtInCategories = [
     slug: 'navigation',
     icons: [
       { filename: 'home', alternatives: ['fill'], keywords: ['house', 'main', 'start'] },
+      { filename: 'menu', alternatives: [], keywords: ['hamburger', 'navigation', 'lines'] },
       { filename: 'more', alternatives: [], keywords: ['ellipsis', 'options', 'dots', 'horizontal'] },
       { filename: 'more-vertical', alternatives: [], keywords: ['ellipsis', 'options', 'kebab', 'dots'] },
       { filename: 'arrow-left', alternatives: [], keywords: ['back', 'previous', 'left'] },
@@ -30,16 +31,20 @@ const builtInCategories = [
       { filename: 'chevron-right', alternatives: [], keywords: ['next', 'forward', 'right'] },
       { filename: 'chevron-up', alternatives: [], keywords: ['up', 'collapse', 'less'] },
       { filename: 'chevron-down', alternatives: [], keywords: ['down', 'expand', 'dropdown', 'more'] },
+      { filename: 'chevron-left-large', alternatives: [], keywords: ['back', 'previous', 'left', 'big', 'bold'] },
+      { filename: 'chevron-right-large', alternatives: [], keywords: ['next', 'forward', 'right', 'big', 'bold'] },
       { filename: 'drop-up', alternatives: [], keywords: ['caret', 'up', 'collapse'] },
       { filename: 'drop-down', alternatives: [], keywords: ['caret', 'down', 'dropdown'] },
       { filename: 'subdirectory-arrow', alternatives: [], keywords: ['return', 'nested', 'enter', 'branch'] },
       { filename: 'swap-horizontal', alternatives: [], keywords: ['exchange', 'switch', 'transfer', 'arrows'] },
       { filename: 'swap-vertical', alternatives: [], keywords: ['exchange', 'switch', 'reorder', 'arrows'] },
       { filename: 'expand', alternatives: [], keywords: ['enlarge', 'maximize', 'arrows'] },
+      { filename: 'collapse', alternatives: [], keywords: ['minimize', 'shrink', 'close', 'inward', 'arrows'] },
+      { filename: 'expand-content', alternatives: [], keywords: ['unfold', 'more', 'enlarge', 'open', 'arrows'] },
+      { filename: 'collapse-content', alternatives: [], keywords: ['fold', 'less', 'hide', 'minimize', 'arrows'] },
       { filename: 'fullscreen', alternatives: [], keywords: ['enlarge', 'maximize', 'expand'] },
       { filename: 'fullscreen-exit', alternatives: [], keywords: ['minimize', 'shrink', 'collapse'] },
-      { filename: 'open-in-new', alternatives: [], keywords: ['external', 'link', 'window', 'tab'] },
-      { filename: 'menu', alternatives: [], keywords: ['hamburger', 'navigation', 'lines'] }
+      { filename: 'open-in-new', alternatives: [], keywords: ['external', 'link', 'window', 'tab'] }
     ]
   },
   {
@@ -48,6 +53,7 @@ const builtInCategories = [
       { filename: 'add', alternatives: [], keywords: ['plus', 'new', 'create'] },
       { filename: 'add-circle', alternatives: ['fill'], keywords: ['plus', 'new', 'create'] },
       { filename: 'minus', alternatives: [], keywords: ['remove', 'subtract', 'less'] },
+      { filename: 'minus-circle', alternatives: ['fill'], keywords: ['remove', 'subtract', 'delete', 'do not disturb'] },
       { filename: 'checkmark', alternatives: [], keywords: ['check', 'done', 'ok', 'tick', 'confirm'] },
       { filename: 'check-circle', alternatives: ['fill'], keywords: ['done', 'ok', 'success', 'confirm'] },
       { filename: 'close', alternatives: [], keywords: ['x', 'cancel', 'dismiss', 'remove'] },
@@ -118,6 +124,9 @@ const builtInCategories = [
       { filename: 'star-half', alternatives: [], keywords: ['rating', 'half', 'review'] },
       { filename: 'star-filled', alternatives: [], keywords: ['rating', 'filled', 'review'] },
       { filename: 'stars', alternatives: ['fill'], keywords: ['rating', 'favorite', 'sparkle', 'review'] },
+      { filename: 'star-kid', alternatives: ['fill'], keywords: ['kids', 'child', 'favorite', 'rating', 'fun'] },
+      { filename: 'star-award', alternatives: ['fill'], keywords: ['award', 'prize', 'achievement', 'badge', 'quality', 'rating'] },
+      { filename: 'trophy', alternatives: ['fill'], keywords: ['award', 'win', 'prize', 'achievement', 'cup', 'winner'] },
       { filename: 'thumb-up', alternatives: ['fill'], keywords: ['like', 'approve', 'good', 'vote'] },
       { filename: 'thumb-down', alternatives: ['fill'], keywords: ['dislike', 'disapprove', 'bad', 'vote'] },
       { filename: 'thumb-up-down', alternatives: ['fill'], keywords: ['vote', 'rating', 'feedback'] },
@@ -143,10 +152,10 @@ const builtInCategories = [
       { filename: 'play-circle', alternatives: ['fill'], keywords: ['video', 'media', 'start'] },
       { filename: 'music', alternatives: [], keywords: ['note', 'audio', 'song', 'sound'] },
       { filename: 'headphones', alternatives: ['fill'], keywords: ['audio', 'listen', 'sound', 'music'] },
+      { filename: 'volume-mute', alternatives: ['fill'], keywords: ['sound', 'silent', 'off', 'speaker'] },
       { filename: 'volume-off', alternatives: ['fill'], keywords: ['mute', 'silent', 'sound', 'speaker'] },
       { filename: 'volume-down', alternatives: ['fill'], keywords: ['sound', 'audio', 'quieter', 'speaker'] },
       { filename: 'volume-up', alternatives: ['fill'], keywords: ['sound', 'audio', 'louder', 'speaker'] },
-      { filename: 'volume-mute', alternatives: ['fill'], keywords: ['sound', 'silent', 'off', 'speaker'] },
     ]
   },
   {
@@ -236,6 +245,7 @@ const builtInCategories = [
       { filename: 'mouse', alternatives: ['fill'], keywords: ['click', 'cursor', 'device'] },
       { filename: 'touch', alternatives: ['fill'], keywords: ['tap', 'finger', 'gesture'] },
       { filename: 'click', alternatives: [], keywords: ['tap', 'cursor', 'select'] },
+      { filename: 'pointer', alternatives: ['fill'], keywords: ['cursor', 'click', 'select', 'arrow', 'mouse'] },
       { filename: 'drag', alternatives: [], keywords: ['move', 'reorder', 'handle', 'grab'] },
       { filename: 'drag-handle', alternatives: [], keywords: ['move', 'reorder', 'handle', 'grab'] },
       { filename: 'barcode', alternatives: [], keywords: ['scan', 'product', 'code'] },
@@ -290,6 +300,7 @@ const builtInCategories = [
       { filename: 'notifications', alternatives: ['fill'], keywords: ['bell', 'alert', 'alarm'] },
       { filename: 'clock', alternatives: ['fill'], keywords: ['time', 'schedule', 'hour'] },
       { filename: 'hourglass', alternatives: ['fill'], keywords: ['time', 'wait', 'loading', 'timer'] },
+      { filename: 'calendar', alternatives: ['fill'], keywords: ['date', 'schedule', 'event', 'day', 'blank'] },
       { filename: 'calendar-month', alternatives: ['fill'], keywords: ['date', 'month', 'schedule', 'event'] },
       { filename: 'calendar-text', alternatives: ['fill'], keywords: ['date', 'event', 'schedule', 'agenda'] }
     ]
@@ -305,6 +316,7 @@ const builtInCategories = [
       { filename: 'lightbulb', alternatives: ['fill'], keywords: ['idea', 'tip', 'hint', 'bright'] },
       { filename: 'palette', alternatives: ['fill'], keywords: ['color', 'design', 'art', 'theme', 'paint'] },
       { filename: 'label', alternatives: ['fill'], keywords: ['tag', 'badge', 'category'] },
+      { filename: 'pets', alternatives: [], keywords: ['paw', 'animal', 'dog', 'cat', 'pet'] },
       { filename: 'construction', alternatives: [], keywords: ['maintenance', 'work', 'build', 'tools'] }
     ]
   }

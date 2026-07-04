@@ -98,6 +98,14 @@ msgid "Chevron right"
 msgstr "Chevron rechts"
 
 msgctxt "icon name"
+msgid "Chevron left (large)"
+msgstr "Chevron links (groß)"
+
+msgctxt "icon name"
+msgid "Chevron right (large)"
+msgstr "Chevron rechts (groß)"
+
+msgctxt "icon name"
 msgid "Chevron up"
 msgstr "Chevron oben"
 
@@ -138,6 +146,18 @@ msgid "Exit fullscreen"
 msgstr "Vollbild beenden"
 
 msgctxt "icon name"
+msgid "Collapse"
+msgstr "Einklappen"
+
+msgctxt "icon name"
+msgid "Expand content"
+msgstr "Inhalt ausklappen"
+
+msgctxt "icon name"
+msgid "Collapse content"
+msgstr "Inhalt einklappen"
+
+msgctxt "icon name"
 msgid "Zoom in"
 msgstr "Vergrößern"
 
@@ -170,6 +190,10 @@ msgstr "Hinzufügen"
 msgctxt "icon name"
 msgid "Add circle"
 msgstr "Hinzufügen (Kreis)"
+
+msgctxt "icon name"
+msgid "Minus circle"
+msgstr "Minus (Kreis)"
 
 msgctxt "icon name"
 msgid "Minus"
@@ -388,6 +412,18 @@ msgstr "Stern (gefüllt)"
 msgctxt "icon name"
 msgid "Stars"
 msgstr "Sterne"
+
+msgctxt "icon name"
+msgid "Award star"
+msgstr "Auszeichnungsstern"
+
+msgctxt "icon name"
+msgid "Kids star"
+msgstr "Kinderstern"
+
+msgctxt "icon name"
+msgid "Trophy"
+msgstr "Trophäe"
 
 msgctxt "icon name"
 msgid "Thumbs up"
@@ -914,6 +950,10 @@ msgid "Hourglass"
 msgstr "Sanduhr"
 
 msgctxt "icon name"
+msgid "Calendar (blank)"
+msgstr "Kalender (leer)"
+
+msgctxt "icon name"
 msgid "Calendar"
 msgstr "Kalender"
 
@@ -946,6 +986,10 @@ msgstr "Palette"
 msgctxt "icon name"
 msgid "Label"
 msgstr "Etikett"
+
+msgctxt "icon name"
+msgid "Pets"
+msgstr "Haustiere"
 
 msgctxt "icon name"
 msgid "Construction"
