@@ -1,0 +1,172 @@
+# German (de_DE) icon picker labels for the FromScratch theme.
+# Copyright (C) 2026
+# This file is distributed under the same license as the FromScratch theme.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: FromScratch icons\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/theme/fromscratch\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: de_DE_formal\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Domain: fromscratch-icons\n"
+
+# Categories
+
+msgctxt "icon category"
+msgid "Arrows"
+msgstr "Pfeile"
+
+msgctxt "icon category"
+msgid "Actions"
+msgstr "Aktionen"
+
+msgctxt "icon category"
+msgid "Communication"
+msgstr "Kommunikation"
+
+msgctxt "icon category"
+msgid "Media"
+msgstr "Medien"
+
+msgctxt "icon category"
+msgid "General"
+msgstr "Allgemein"
+
+# Icon names
+
+msgctxt "icon name"
+msgid "Arrow left"
+msgstr "Pfeil links"
+
+msgctxt "icon name"
+msgid "Arrow right"
+msgstr "Pfeil rechts"
+
+msgctxt "icon name"
+msgid "Chevron left"
+msgstr "Chevron links"
+
+msgctxt "icon name"
+msgid "Chevron right"
+msgstr "Chevron rechts"
+
+msgctxt "icon name"
+msgid "Chevron up"
+msgstr "Chevron oben"
+
+msgctxt "icon name"
+msgid "Chevron down"
+msgstr "Chevron unten"
+
+msgctxt "icon name"
+msgid "Add"
+msgstr "Hinzufügen"
+
+msgctxt "icon name"
+msgid "Edit"
+msgstr "Bearbeiten"
+
+msgctxt "icon name"
+msgid "Delete"
+msgstr "Löschen"
+
+msgctxt "icon name"
+msgid "Download"
+msgstr "Herunterladen"
+
+msgctxt "icon name"
+msgid "Copy"
+msgstr "Kopieren"
+
+msgctxt "icon name"
+msgid "Checkmark"
+msgstr "Häkchen"
+
+msgctxt "icon name"
+msgid "Chat"
+msgstr "Chat"
+
+msgctxt "icon name"
+msgid "Email"
+msgstr "E-Mail"
+
+msgctxt "icon name"
+msgid "Megaphone"
+msgstr "Megafon"
+
+msgctxt "icon name"
+msgid "Camera"
+msgstr "Kamera"
+
+msgctxt "icon name"
+msgid "Image"
+msgstr "Bild"
+
+msgctxt "icon name"
+msgid "Article"
+msgstr "Artikel"
+
+msgctxt "icon name"
+msgid "Carousel"
+msgstr "Karussell"
+
+msgctxt "icon name"
+msgid "Bolt"
+msgstr "Blitz"
+
+msgctxt "icon name"
+msgid "Bookmark"
+msgstr "Lesezeichen"
+
+msgctxt "icon name"
+msgid "Calendar"
+msgstr "Kalender"
+
+msgctxt "icon name"
+msgid "Heart"
+msgstr "Herz"
+
+msgctxt "icon name"
+msgid "Home"
+msgstr "Startseite"
+
+msgctxt "icon name"
+msgid "Info"
+msgstr "Info"
+
+msgctxt "icon name"
+msgid "Location"
+msgstr "Standort"
+
+msgctxt "icon name"
+msgid "Link"
+msgstr "Link"
+
+# Picker UI
+
+msgctxt "icon picker"
+msgid "Choose icon"
+msgstr "Icon wählen"
+
+msgctxt "icon picker"
+msgid "Search icons …"
+msgstr "Icons durchsuchen …"
+
+msgctxt "icon picker"
+msgid "Style"
+msgstr "Stil"
+
+msgctxt "icon picker"
+msgid "Outline"
+msgstr "Umriss"
+
+msgctxt "icon picker"
+msgid "Filled"
+msgstr "Gefüllt"
+
+msgctxt "icon picker"
+msgid "Remove"
+msgstr "Entfernen"

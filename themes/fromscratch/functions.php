@@ -25,6 +25,7 @@ require_once 'inc/admin-theme.php';
 
 // Blocks
 require_once 'inc/blocks.php';
+require_once 'inc/editor-icons.php';
 
 // Theme settings
 require_once 'inc/user-rights.php';

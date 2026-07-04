@@ -10,7 +10,25 @@ const ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
 const ToggleGroupControlOption =
   wp.components.__experimentalToggleGroupControlOption;
 const { useState } = wp.element;
-const { __ } = wp.i18n;
+
+// Translated labels + UI strings provided by PHP (inc/editor-icons.php).
+const iconL10n = (typeof window !== 'undefined' && window.fromscratchIcons) || {};
+const iconLabels = iconL10n.labels || {};
+const categoryLabels = iconL10n.categories || {};
+const uiStrings = iconL10n.ui || {};
+
+// Localized UI string with an English fallback (source language).
+const t = (key, fallback) => uiStrings[key] || fallback;
+
+// Fallback when a label is missing: "calendar-month" -> "Calendar month".
+const humanize = (slug) =>
+  slug
+    .replace(/-/g, ' ')
+    .replace(/^\w/, (char) => char.toUpperCase());
+
+const iconName = (icon) => iconLabels[icon.filename] || humanize(icon.filename);
+const categoryName = (category) =>
+  categoryLabels[category.slug] || humanize(category.slug);
 
 /**
  * Reusable icon picker with an outline/filled toggle.
@@ -41,7 +59,7 @@ export function IconPicker({ label, value, onChange }) {
       return (
         <ToggleGroupControl
           className="fs-icon-picker__variant"
-          label={__('Stil', 'fromscratch')}
+          label={t('style', 'Style')}
           hideLabelFromVision
           isBlock
           value={variant}
@@ -50,11 +68,11 @@ export function IconPicker({ label, value, onChange }) {
         >
           <ToggleGroupControlOption
             value="outline"
-            label={__('Umriss', 'fromscratch')}
+            label={t('outline', 'Outline')}
           />
           <ToggleGroupControlOption
             value="fill"
-            label={__('Gefüllt', 'fromscratch')}
+            label={t('filled', 'Filled')}
           />
         </ToggleGroupControl>
       );
@@ -63,7 +81,7 @@ export function IconPicker({ label, value, onChange }) {
     return (
       <ToggleControl
         className="fs-icon-picker__variant"
-        label={__('Gefüllt', 'fromscratch')}
+        label={t('filled', 'Filled')}
         checked={variant === 'fill'}
         onChange={(next) => setVariant(next ? 'fill' : 'outline')}
         __nextHasNoMarginBottom
@@ -85,7 +103,7 @@ export function IconPicker({ label, value, onChange }) {
             <span className={'fs-icon -icon-' + value} aria-hidden="true" />
           ) : null}
           <span>
-            {selected ? selected.icon.name : __('Icon wählen', 'fromscratch')}
+            {selected ? iconName(selected.icon) : t('choose', 'Choose icon')}
           </span>
         </Button>
 
@@ -96,14 +114,14 @@ export function IconPicker({ label, value, onChange }) {
             className="fs-icon-picker__clear"
             onClick={() => onChange('')}
           >
-            {__('Entfernen', 'fromscratch')}
+            {t('remove', 'Remove')}
           </Button>
         ) : null}
       </div>
 
       {isOpen ? (
         <Modal
-          title={__('Icon wählen', 'fromscratch')}
+          title={t('choose', 'Choose icon')}
           onRequestClose={() => setIsOpen(false)}
           className="fs-icon-picker__modal"
         >
@@ -111,7 +129,7 @@ export function IconPicker({ label, value, onChange }) {
             <SearchControl
               value={search}
               onChange={setSearch}
-              placeholder={__('Icons durchsuchen …', 'fromscratch')}
+              placeholder={t('search', 'Search icons …')}
               __nextHasNoMarginBottom
             />
             {renderVariantToggle()}
@@ -120,7 +138,7 @@ export function IconPicker({ label, value, onChange }) {
           <div className="fs-icon-picker__categories">
             {iconCategories.map((category) => {
               const icons = category.icons.filter((icon) =>
-                iconMatchesQuery(icon, query)
+                iconMatchesQuery(icon, query, iconName(icon))
               );
 
               if (!icons.length) {
@@ -130,11 +148,12 @@ export function IconPicker({ label, value, onChange }) {
               return (
                 <div key={category.slug} className="fs-icon-picker__category">
                   <h3 className="fs-icon-picker__category-title">
-                    {category.label}
+                    {categoryName(category)}
                   </h3>
                   <div className="fs-icon-picker__grid">
                     {icons.map((icon) => {
                       const resolved = resolveIconName(icon, variant);
+                      const name = iconName(icon);
 
                       return (
                         <button
@@ -148,8 +167,8 @@ export function IconPicker({ label, value, onChange }) {
                             onChange(resolved);
                             setIsOpen(false);
                           }}
-                          aria-label={icon.name}
-                          title={icon.name}
+                          aria-label={name}
+                          title={name}
                         >
                           <span
                             className={'fs-icon -icon-' + resolved}

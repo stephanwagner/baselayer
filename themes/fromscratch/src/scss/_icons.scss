@@ -36,7 +36,8 @@ $fs-icon-catalog: (
 ) !default;
 
 // Icons that also ship a filled variant (<name>-fill.svg).
-// Mirror src/js/editor/icons/icon-catalog.js (fillIcons).
+// Mirror the icons whose `alternatives` include 'fill' in
+// src/js/editor/icons/icon-catalog.js.
 $fs-icon-fill: (
   edit,
   delete,
