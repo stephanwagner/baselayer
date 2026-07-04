@@ -1,3 +1,18 @@
+<div style="padding: 64px;">
+
+<div class="fs-icon -icon-bolt" style="font-size: 64px;"></div>
+
+</div>
+
+<div style="padding: 64px;">
+
+<a href="/" class="button -has-icon -icon-celebration-fill">Hello there</a>
+<br><br>
+<a href="/" class="button -has-icon -icon-celebration-fill -icon-right">Hello there</a>
+
+</div>
+
+
 <footer class="footer__wrapper">
 	<div class="footer__container container">
 		<div class="footer__text">

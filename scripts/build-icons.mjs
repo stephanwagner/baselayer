@@ -15,7 +15,7 @@ const generatedJsPath = path.join(
   themeRoot,
   'src/js/editor/icons/icons.generated.js'
 );
-const generatedScssPath = path.join(themeRoot, 'src/scss/_icons-theme.scss');
+const generatedScssPath = path.join(themeRoot, 'src/scss/icons/_icons-theme.scss');
 
 // "calendar-month" -> "Calendar month"
 const humanize = (slug) =>

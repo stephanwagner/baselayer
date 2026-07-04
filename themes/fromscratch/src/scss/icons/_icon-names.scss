@@ -1,16 +1,6 @@
-@use 'sass:list';
-
-// Reusable SVG icon system.
-//
-// Icons are rendered with `mask-image` so they inherit the current text color
-// via `background-color: currentColor`. The catalog below lists the file names
-// in assets/icons/<name>.svg and mirrors the JS catalog in
-// src/js/editor/icons/icon-catalog.js — keep both in sync when adding icons.
-
-// Path from the compiled stylesheets (assets/css/*.css) to the icon files.
-$fs-icon-path: '../icons' !default;
-
 // Every icon file name (without extension), mirroring the JS catalog.
+// src/js/editor/icons/icon-catalog.js.
+
 $fs-icon-names: (
   '123',
   abc,
@@ -333,8 +323,8 @@ $fs-icon-names: (
 ) !default;
 
 // Icons that also ship a filled variant (<name>-fill.svg).
-// Mirror the icons whose `alternatives` include 'fill' in
-// src/js/editor/icons/icon-catalog.js.
+// Mirror the icons whose `alternatives` include 'fill'
+
 $fs-icon-fill: (
   account,
   add-circle,
@@ -493,101 +483,3 @@ $fs-icon-fill: (
   warning,
   wp-block
 ) !default;
-
-// Shared box for an icon element/pseudo-element. The glyph itself comes from the
-// `--fs-icon` custom property (set by the `.-icon-<name>` class), so this box is
-// identical for every icon and every context — pick the icon with a class, size
-// it with `font-size`, color it with `currentColor`.
-@mixin fs-icon-box {
-  display: inline-block;
-  width: 1em;
-  height: 1em;
-  flex: 0 0 auto;
-  background-color: currentColor;
-  mask-image: var(--fs-icon);
-  mask-repeat: no-repeat;
-  mask-position: center;
-  mask-size: contain;
-  -webkit-mask-image: var(--fs-icon);
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-  -webkit-mask-size: contain;
-}
-
-// Set the icon variables for a catalog icon (default icon folder): the mask URL,
-// plus the `::before` content flag that "switches on" the button icon box.
-@mixin fs-icon-var($name) {
-  --fs-icon: url('#{$fs-icon-path}/#{$name}.svg');
-  --fs-icon-content: '';
-}
-
-// The shared `::before` box for a button icon. `content` is driven by
-// `--fs-icon-content`, which only the `.-icon-<name>` classes set — so a button
-// with no icon chosen (e.g. `-icon-right` alone, or a plain button) resolves
-// `content` to its initial `normal` and generates no pseudo-element at all.
-@mixin fs-button-icon-base {
-  content: var(--fs-icon-content);
-  margin-right: 8px;
-  vertical-align: -0.15em;
-  @include fs-icon-box;
-}
-
-// Register a single icon by class suffix + explicit file URL. Used by the
-// generated theme-icon partial (see scripts/build-icons.mjs). Sets the icon
-// variables so it renders on any carrier (a `.fs-icon` element, or — via
-// inheritance — a button label's `::before`, handled by the generic rule below).
-@mixin fs-icon-entry($class, $url) {
-  .-icon-#{$class} {
-    // Custom properties don't evaluate SassScript, so interpolate the URL.
-    --fs-icon: url('#{$url}');
-    --fs-icon-content: '';
-  }
-}
-
-// Button icon support (`.-icon-<name>` / `.-icon-<name>-fill`).
-//
-// A single static `::before` box is emitted for every button link; its `content`
-// is gated by `--fs-icon-content`, so the pseudo-element only materialises when
-// an icon class is present. No enumerated selector is needed — the glyph comes
-// from the inherited `--fs-icon`, and this covers theme icons for free too.
-@mixin fs-button-icons {
-  .wp-block-button .wp-block-button__link::before {
-    @include fs-button-icon-base;
-  }
-
-  // Icon on the right of the label (button-group "Icon Position" option).
-  .wp-block-button.-icon-right .wp-block-button__link {
-    display: inline-flex;
-    align-items: center;
-
-    &::before {
-      order: 1;
-      margin-right: 0;
-      margin-left: 8px;
-    }
-  }
-}
-
-// Every catalog icon class points `--fs-icon` at its file. This is the single
-// source of truth for icon URLs, emitted once and consumed by any carrier. A
-// bare `.-icon-<name>` (e.g. on a `.wp-block-button` wrapper) sets the variable;
-// custom properties inherit, so it reaches a label's `::before` too.
-@each $name in $fs-icon-names {
-  .-icon-#{$name} {
-    @include fs-icon-var($name);
-  }
-
-  @if list.index($fs-icon-fill, $name) {
-    .-icon-#{$name}-fill {
-      @include fs-icon-var('#{$name}-fill');
-    }
-  }
-}
-
-// Standalone icon carrier, reusable anywhere (picker preview, future icon block).
-// Pair it with an icon class:
-//   <span class="fs-icon -icon-bolt"></span>
-//   <span class="fs-icon -icon-bolt-fill"></span>
-.fs-icon {
-  @include fs-icon-box;
-}
