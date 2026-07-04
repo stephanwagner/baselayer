@@ -92,7 +92,6 @@ export function IconPicker({ label, value, onChange }) {
           className="fs-icon-picker__variant"
           label={t('style', 'Style')}
           hideLabelFromVision
-          isBlock
           value={variant}
           onChange={changeVariant}
           __nextHasNoMarginBottom

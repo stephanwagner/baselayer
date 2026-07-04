@@ -42,13 +42,16 @@
 
 .fs-icon-picker__toolbar {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: 12px;
   margin-bottom: 16px;
 
+  // The search field grows to fill the row; min-width: 0 lets it shrink so the
+  // variant toggle stays beside it instead of wrapping onto the next line.
   > *:first-child {
-    flex: 1 1 200px;
+    flex: 1 1 auto;
+    min-width: 0;
   }
 }
 
