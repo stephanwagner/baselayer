@@ -21,6 +21,9 @@ const builtInCategories = [
   {
     slug: 'navigation',
     icons: [
+      { filename: 'home', alternatives: ['fill'], keywords: ['house', 'main', 'start'] },
+      { filename: 'more', alternatives: [], keywords: ['ellipsis', 'options', 'dots', 'horizontal'] },
+      { filename: 'more-vertical', alternatives: [], keywords: ['ellipsis', 'options', 'kebab', 'dots'] },
       { filename: 'arrow-left', alternatives: [], keywords: ['back', 'previous', 'left'] },
       { filename: 'arrow-right', alternatives: [], keywords: ['next', 'forward', 'right'] },
       { filename: 'chevron-left', alternatives: [], keywords: ['back', 'previous', 'left'] },
@@ -35,12 +38,8 @@ const builtInCategories = [
       { filename: 'expand', alternatives: [], keywords: ['enlarge', 'maximize', 'arrows'] },
       { filename: 'fullscreen', alternatives: [], keywords: ['enlarge', 'maximize', 'expand'] },
       { filename: 'fullscreen-exit', alternatives: [], keywords: ['minimize', 'shrink', 'collapse'] },
-      { filename: 'zoom-in', alternatives: [], keywords: ['magnify', 'plus', 'enlarge'] },
-      { filename: 'zoom-out', alternatives: [], keywords: ['magnify', 'minus', 'shrink'] },
       { filename: 'open-in-new', alternatives: [], keywords: ['external', 'link', 'window', 'tab'] },
-      { filename: 'menu', alternatives: [], keywords: ['hamburger', 'navigation', 'lines'] },
-      { filename: 'more', alternatives: [], keywords: ['ellipsis', 'options', 'dots', 'horizontal'] },
-      { filename: 'more-vertical', alternatives: [], keywords: ['ellipsis', 'options', 'kebab', 'dots'] }
+      { filename: 'menu', alternatives: [], keywords: ['hamburger', 'navigation', 'lines'] }
     ]
   },
   {
@@ -59,10 +58,13 @@ const builtInCategories = [
       { filename: 'save', alternatives: ['fill'], keywords: ['disk', 'store'] },
       { filename: 'download', alternatives: [], keywords: ['save', 'export', 'arrow'] },
       { filename: 'upload', alternatives: [], keywords: ['import', 'send', 'arrow'] },
+      { filename: 'upgrade', alternatives: [], keywords: ['improve', 'level up', 'arrow'] },
       { filename: 'print', alternatives: ['fill'], keywords: ['printer'] },
       { filename: 'link', alternatives: [], keywords: ['url', 'chain', 'hyperlink'] },
       { filename: 'attachment', alternatives: [], keywords: ['paperclip', 'attach', 'file'] },
       { filename: 'search', alternatives: [], keywords: ['find', 'magnifier', 'lookup'] },
+      { filename: 'zoom-in', alternatives: [], keywords: ['magnify', 'plus', 'enlarge'] },
+      { filename: 'zoom-out', alternatives: [], keywords: ['magnify', 'minus', 'shrink'] },
       { filename: 'refresh', alternatives: [], keywords: ['reload', 'update', 'renew'] },
       { filename: 'sync', alternatives: [], keywords: ['refresh', 'update', 'reload', 'arrows'] },
       { filename: 'undo', alternatives: [], keywords: ['back', 'revert', 'arrow'] },
@@ -141,10 +143,10 @@ const builtInCategories = [
       { filename: 'play-circle', alternatives: ['fill'], keywords: ['video', 'media', 'start'] },
       { filename: 'music', alternatives: [], keywords: ['note', 'audio', 'song', 'sound'] },
       { filename: 'headphones', alternatives: ['fill'], keywords: ['audio', 'listen', 'sound', 'music'] },
-      { filename: 'volume-up', alternatives: ['fill'], keywords: ['sound', 'audio', 'louder', 'speaker'] },
+      { filename: 'volume-off', alternatives: ['fill'], keywords: ['mute', 'silent', 'sound', 'speaker'] },
       { filename: 'volume-down', alternatives: ['fill'], keywords: ['sound', 'audio', 'quieter', 'speaker'] },
+      { filename: 'volume-up', alternatives: ['fill'], keywords: ['sound', 'audio', 'louder', 'speaker'] },
       { filename: 'volume-mute', alternatives: ['fill'], keywords: ['sound', 'silent', 'off', 'speaker'] },
-      { filename: 'volume-off', alternatives: ['fill'], keywords: ['mute', 'silent', 'sound', 'speaker'] }
     ]
   },
   {
@@ -177,7 +179,8 @@ const builtInCategories = [
       { filename: 'view-comfy', alternatives: ['fill'], keywords: ['layout', 'grid', 'tiles'] },
       { filename: 'view-grid', alternatives: ['fill'], keywords: ['layout', 'tiles', 'gallery'] },
       { filename: 'view-grid-alt', alternatives: ['fill'], keywords: ['layout', 'tiles'] },
-      { filename: 'view-list', alternatives: ['fill'], keywords: ['layout', 'rows', 'list'] }
+      { filename: 'view-list', alternatives: ['fill'], keywords: ['layout', 'rows', 'list'] },
+      { filename: 'wp-block', alternatives: ['fill'], keywords: ['wordpress', 'gutenberg', 'brick'] }
     ]
   },
   {
@@ -193,10 +196,7 @@ const builtInCategories = [
       { filename: 'currency-euro', alternatives: [], keywords: ['money', 'eur', 'price'] },
       { filename: 'currency-pound', alternatives: [], keywords: ['money', 'gbp', 'price'] },
       { filename: 'currency-yen', alternatives: [], keywords: ['money', 'jpy', 'price'] },
-      { filename: 'sell', alternatives: ['fill'], keywords: ['tag', 'price', 'offer', 'sale'] },
-      { filename: 'premium', alternatives: ['fill'], keywords: ['crown', 'vip', 'upgrade', 'pro'] },
-      { filename: 'upgrade', alternatives: [], keywords: ['improve', 'level up', 'arrow'] },
-      { filename: 'diamond', alternatives: ['fill'], keywords: ['gem', 'premium', 'jewel', 'quality'] }
+      { filename: 'sell', alternatives: ['fill'], keywords: ['tag', 'price', 'offer', 'sale'] }
     ]
   },
   {
@@ -222,7 +222,6 @@ const builtInCategories = [
       { filename: 'map', alternatives: ['fill'], keywords: ['location', 'navigation', 'directions'] },
       { filename: 'compass', alternatives: ['fill'], keywords: ['navigation', 'direction', 'explore'] },
       { filename: 'globe', alternatives: [], keywords: ['world', 'earth', 'international', 'web'] },
-      { filename: 'home', alternatives: ['fill'], keywords: ['house', 'main', 'start'] },
       { filename: 'car', alternatives: ['fill'], keywords: ['vehicle', 'drive', 'transport', 'auto'] }
     ]
   },
@@ -237,7 +236,6 @@ const builtInCategories = [
       { filename: 'mouse', alternatives: ['fill'], keywords: ['click', 'cursor', 'device'] },
       { filename: 'touch', alternatives: ['fill'], keywords: ['tap', 'finger', 'gesture'] },
       { filename: 'click', alternatives: [], keywords: ['tap', 'cursor', 'select'] },
-      { filename: 'pointer', alternatives: ['fill'], keywords: ['cursor', 'arrow', 'mouse'] },
       { filename: 'drag', alternatives: [], keywords: ['move', 'reorder', 'handle', 'grab'] },
       { filename: 'drag-handle', alternatives: [], keywords: ['move', 'reorder', 'handle', 'grab'] },
       { filename: 'barcode', alternatives: [], keywords: ['scan', 'product', 'code'] },
@@ -267,17 +265,17 @@ const builtInCategories = [
       { filename: 'settings', alternatives: ['fill'], keywords: ['gear', 'cog', 'preferences', 'options'] },
       { filename: 'tune', alternatives: [], keywords: ['sliders', 'adjust', 'options'] },
       { filename: 'filter', alternatives: [], keywords: ['funnel', 'sort', 'refine'] },
+      { filename: 'filter-off', alternatives: [], keywords: ['funnel', 'clear', 'reset'] },
       { filename: 'filter-alt', alternatives: ['fill'], keywords: ['funnel', 'sort', 'refine'] },
       { filename: 'filter-alt-off', alternatives: ['fill'], keywords: ['funnel', 'clear', 'reset'] },
-      { filename: 'filter-off', alternatives: [], keywords: ['funnel', 'clear', 'reset'] },
       { filename: 'checkbox', alternatives: [], keywords: ['check', 'box', 'unchecked', 'form'] },
       { filename: 'checkbox-checked', alternatives: ['fill'], keywords: ['check', 'form', 'selected'] },
       { filename: 'checkbox-indeterminate', alternatives: ['fill'], keywords: ['check', 'partial', 'form'] },
       { filename: 'radio-button', alternatives: [], keywords: ['option', 'form', 'circle'] },
       { filename: 'radio-button-checked', alternatives: [], keywords: ['option', 'form', 'selected'] },
       { filename: 'radio-button-partial', alternatives: [], keywords: ['option', 'form', 'partial'] },
-      { filename: 'toggle-on', alternatives: ['fill'], keywords: ['switch', 'on', 'enabled'] },
       { filename: 'toggle-off', alternatives: ['fill'], keywords: ['switch', 'off', 'disabled'] },
+      { filename: 'toggle-on', alternatives: ['fill'], keywords: ['switch', 'on', 'enabled'] },
       { filename: 'visibility', alternatives: ['fill'], keywords: ['eye', 'show', 'view', 'visible'] },
       { filename: 'mode-dark', alternatives: ['fill'], keywords: ['night', 'theme', 'moon'] },
       { filename: 'mode-light', alternatives: ['fill'], keywords: ['day', 'theme', 'sun', 'brightness'] }
@@ -299,14 +297,15 @@ const builtInCategories = [
   {
     slug: 'misc',
     icons: [
-      { filename: 'bolt', alternatives: ['fill'], keywords: ['flash', 'energy', 'power', 'fast', 'lightning'] },
-      { filename: 'lightbulb', alternatives: ['fill'], keywords: ['idea', 'tip', 'hint', 'bright'] },
       { filename: 'rocket', alternatives: ['fill'], keywords: ['launch', 'startup', 'fast', 'boost'] },
       { filename: 'rocket-launch', alternatives: ['fill'], keywords: ['launch', 'startup', 'boost', 'space'] },
+      { filename: 'diamond', alternatives: ['fill'], keywords: ['gem', 'premium', 'jewel', 'quality'] },
+      { filename: 'premium', alternatives: ['fill'], keywords: ['crown', 'vip', 'upgrade', 'pro'] },
+      { filename: 'bolt', alternatives: ['fill'], keywords: ['flash', 'energy', 'power', 'fast', 'lightning'] },
+      { filename: 'lightbulb', alternatives: ['fill'], keywords: ['idea', 'tip', 'hint', 'bright'] },
       { filename: 'palette', alternatives: ['fill'], keywords: ['color', 'design', 'art', 'theme', 'paint'] },
       { filename: 'label', alternatives: ['fill'], keywords: ['tag', 'badge', 'category'] },
-      { filename: 'construction', alternatives: [], keywords: ['maintenance', 'work', 'build', 'tools'] },
-      { filename: 'wp-block', alternatives: ['fill'], keywords: ['wordpress', 'gutenberg', 'brick'] }
+      { filename: 'construction', alternatives: [], keywords: ['maintenance', 'work', 'build', 'tools'] }
     ]
   }
 ];
