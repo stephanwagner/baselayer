@@ -1,8 +1,11 @@
 @use '../variables' as *;
+@use '../icons' as *;
 
 // Buttons
 
 @mixin form {
+  @include fs-button-icons;
+
   .buttons,
   .wp-block-buttons {
     margin-top: 24px;

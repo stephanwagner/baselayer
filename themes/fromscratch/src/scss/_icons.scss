@@ -1,0 +1,127 @@
+@use 'sass:list';
+
+// Reusable SVG icon system.
+//
+// Icons are rendered with `mask-image` so they inherit the current text color
+// via `background-color: currentColor`. The catalog below maps categories to
+// file names in assets/icons/<name>.svg and mirrors the JS catalog in
+// src/js/editor/icons/icon-catalog.js — keep both in sync when adding icons.
+
+// Path from the compiled stylesheets (assets/css/*.css) to the icon files.
+$fs-icon-path: '../icons' !default;
+
+// category slug => list of icon file names (without extension)
+$fs-icon-catalog: (
+  'arrows': (
+    arrow-left,
+    arrow-right,
+    chevron-left,
+    chevron-right,
+    chevron-up,
+    chevron-down
+  ),
+  'actions': (add, edit, delete, download, copy, checkmark),
+  'communication': (chat, mail, megaphone),
+  'media': (camera, image, article, carousel),
+  'general': (
+    bolt,
+    bookmark,
+    calendar-month,
+    heart,
+    home,
+    info,
+    location,
+    link
+  )
+) !default;
+
+// Icons that also ship a filled variant (<name>-fill.svg).
+// Mirror src/js/editor/icons/icon-catalog.js (fillIcons).
+$fs-icon-fill: (
+  edit,
+  delete,
+  copy,
+  chat,
+  mail,
+  megaphone,
+  camera,
+  image,
+  article,
+  carousel,
+  bolt,
+  bookmark,
+  calendar-month,
+  heart,
+  home,
+  info,
+  location
+) !default;
+
+// Shared box + mask setup for an icon element/pseudo-element.
+@mixin fs-icon-box {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  flex: 0 0 auto;
+  background-color: currentColor;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+}
+
+// Point the mask at a specific catalog icon.
+@mixin fs-icon-mask($name) {
+  mask-image: url('#{$fs-icon-path}/#{$name}.svg');
+  -webkit-mask-image: url('#{$fs-icon-path}/#{$name}.svg');
+}
+
+// The `::before` icon shown in front of a button label.
+@mixin fs-button-icon-before($name) {
+  content: '';
+  margin-right: 8px;
+  vertical-align: -0.15em;
+  @include fs-icon-box;
+  @include fs-icon-mask($name);
+}
+
+// Icon-name class variants (`.-icon-<name>` / `.-icon-<name>-fill`).
+@mixin fs-button-icons {
+  .wp-block-button {
+    @each $category, $names in $fs-icon-catalog {
+      @each $name in $names {
+        &.-icon-#{$name} .wp-block-button__link::before {
+          @include fs-button-icon-before($name);
+        }
+
+        @if list.index($fs-icon-fill, $name) {
+          &.-icon-#{$name}-fill .wp-block-button__link::before {
+            @include fs-button-icon-before('#{$name}-fill');
+          }
+        }
+      }
+    }
+  }
+}
+
+// Standalone icon element, reusable anywhere (picker preview, future icon block).
+// Usage: <span class="fs-icon -icon-bolt"></span> / <span class="fs-icon -icon-bolt-fill">
+.fs-icon {
+  @include fs-icon-box;
+
+  @each $category, $names in $fs-icon-catalog {
+    @each $name in $names {
+      &.-icon-#{$name} {
+        @include fs-icon-mask($name);
+      }
+
+      @if list.index($fs-icon-fill, $name) {
+        &.-icon-#{$name}-fill {
+          @include fs-icon-mask('#{$name}-fill');
+        }
+      }
+    }
+  }
+}

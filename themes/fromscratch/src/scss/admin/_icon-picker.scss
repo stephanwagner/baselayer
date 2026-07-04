@@ -1,0 +1,92 @@
+// Reusable icon picker (block options sidebar + modal grid).
+
+.fs-icon-picker__label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.fs-icon-picker__control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fs-icon-picker__trigger {
+  .fs-icon {
+    font-size: 18px;
+    margin-right: 6px;
+  }
+}
+
+.fs-icon-picker__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+
+  > *:first-child {
+    flex: 1 1 200px;
+  }
+}
+
+.fs-icon-picker__variant {
+  flex: 0 0 auto;
+}
+
+.fs-icon-picker__categories {
+  margin-top: 4px;
+}
+
+.fs-icon-picker__category + .fs-icon-picker__category {
+  margin-top: 20px;
+}
+
+.fs-icon-picker__category-title {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--fs-color-gray-600, #50575e);
+}
+
+.fs-icon-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+  gap: 6px;
+}
+
+.fs-icon-picker__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  padding: 0;
+  color: var(--fs-color-gray-700, #3c434a);
+  background: #fff;
+  border: 1px solid var(--fs-color-gray-300, #dcdcde);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease,
+    color 0.15s ease;
+
+  .fs-icon {
+    font-size: 22px;
+  }
+
+  &:hover {
+    color: var(--fs-color-primary, #2271b1);
+    border-color: var(--fs-color-primary, #2271b1);
+  }
+
+  &.is-selected {
+    color: var(--fs-color-primary, #2271b1);
+    border-color: var(--fs-color-primary, #2271b1);
+    background: rgba(34, 113, 177, 0.08);
+  }
+}

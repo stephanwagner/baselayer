@@ -258,6 +258,19 @@ export const blockOptions = [
     ]
   },
 
+  // Button
+  {
+    name: 'core/button',
+    options: [
+      {
+        type: 'icon',
+        label: 'Icon',
+        default: '',
+        attributeName: 'buttonIcon'
+      }
+    ]
+  },
+
   // ACF: Slider
   {
     name: 'acf/slider',

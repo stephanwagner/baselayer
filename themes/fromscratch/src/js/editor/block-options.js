@@ -1,9 +1,21 @@
 import { blockOptions } from '../../../config/block-options';
+import { IconPicker } from './icons/icon-picker';
 
 const { InspectorControls, useBlockProps } = wp.blockEditor;
 const { PanelBody, ToggleControl, SelectControl } = wp.components;
 const { createHigherOrderComponent } = wp.compose;
 const { Fragment } = wp.element;
+
+// Prefix used when an `icon` option is stored as a class name (e.g. `-icon-bolt`).
+const ICON_CLASS_PREFIX = '-icon-';
+
+const iconPrefix = (option) => option.classPrefix || ICON_CLASS_PREFIX;
+
+// Strip the class prefix so the picker works with the raw icon name.
+const iconNameFromClass = (value, option) => {
+  const prefix = iconPrefix(option);
+  return value && value.indexOf(prefix) === 0 ? value.slice(prefix.length) : '';
+};
 
 // Add attributes to the block
 blockOptions.forEach((block) => {
@@ -60,6 +72,20 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                         onChange={(newValue) => setAttributes({ [option.attributeName]: newValue })}
                       />
                     );
+                  } else if (option.type === 'icon') {
+                    const prefix = iconPrefix(option);
+                    return (
+                      <IconPicker
+                        key={option.attributeName}
+                        label={option.label}
+                        value={iconNameFromClass(attributes[option.attributeName], option)}
+                        onChange={(name) =>
+                          setAttributes({
+                            [option.attributeName]: name ? prefix + name : '',
+                          })
+                        }
+                      />
+                    );
                   }
                   return null;
                 })}
@@ -89,7 +115,10 @@ const applyClasses = (BlockListBlock) => {
       blockConfig.options.forEach((option) => {
         if (option.type === 'boolean' && attributes[option.attributeName]) {
           classNames += ` ${option.className}`;
-        } else if (option.type === 'select' && attributes[option.attributeName]) {
+        } else if (
+          (option.type === 'select' || option.type === 'icon') &&
+          attributes[option.attributeName]
+        ) {
           classNames += ` ${attributes[option.attributeName]}`;
         }
       });
@@ -117,7 +146,10 @@ const saveClasses = (extraProps, blockType, attributes) => {
     blockConfig.options.forEach((option) => {
       if (option.type === 'boolean' && attributes[option.attributeName]) {
         classNames += ` ${option.className}`;
-      } else if (option.type === 'select' && attributes[option.attributeName]) {
+      } else if (
+        (option.type === 'select' || option.type === 'icon') &&
+        attributes[option.attributeName]
+      ) {
         classNames += ` ${attributes[option.attributeName]}`;
       }
     });
