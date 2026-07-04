@@ -354,6 +354,14 @@ msgid "Numbered list"
 msgstr "Nummerierte Liste"
 
 msgctxt "icon name"
+msgid "Letters"
+msgstr "Buchstaben"
+
+msgctxt "icon name"
+msgid "Numbers"
+msgstr "Zahlen"
+
+msgctxt "icon name"
 msgid "Image left"
 msgstr "Bild links"
 
@@ -710,6 +718,10 @@ msgid "Remove from cart"
 msgstr "Aus Warenkorb entfernen"
 
 msgctxt "icon name"
+msgid "Cart off"
+msgstr "Warenkorb aus"
+
+msgctxt "icon name"
 msgid "Shopping basket"
 msgstr "Einkaufskorb"
 
@@ -918,6 +930,18 @@ msgstr "Barcode"
 msgctxt "icon name"
 msgid "Barcode scan"
 msgstr "Barcode scannen"
+
+msgctxt "icon name"
+msgid "QR code"
+msgstr "QR-Code"
+
+msgctxt "icon name"
+msgid "QR code (alt)"
+msgstr "QR-Code (alt)"
+
+msgctxt "icon name"
+msgid "QR code scan"
+msgstr "QR-Code scannen"
 
 msgctxt "icon name"
 msgid "Power off"

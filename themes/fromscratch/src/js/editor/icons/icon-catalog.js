@@ -96,17 +96,19 @@ const builtInCategories = [
       { filename: 'document', alternatives: ['fill'], keywords: ['file', 'page', 'paper'] },
       { filename: 'document-text', alternatives: ['fill'], keywords: ['file', 'page', 'text'] },
       { filename: 'article', alternatives: ['fill'], keywords: ['post', 'document', 'news', 'text'] },
-      { filename: 'quote', alternatives: ['fill'], keywords: ['blockquote', 'citation', 'testimonial'] },
       { filename: 'clipboard', alternatives: [], keywords: ['paste', 'copy', 'board'] },
       { filename: 'list', alternatives: [], keywords: ['lines', 'items', 'menu'] },
       { filename: 'list-bullet', alternatives: [], keywords: ['unordered', 'dots', 'ul'] },
       { filename: 'list-number', alternatives: [], keywords: ['ordered', 'ol', 'numbers'] },
+      { filename: 'abc', alternatives: [], keywords: ['letters', 'alphabet', 'text', 'characters', 'spelling'] },
+      { filename: '123', alternatives: [], keywords: ['numbers', 'digits', 'numeric', 'count'] },
       { filename: 'format-image-left', alternatives: ['fill'], keywords: ['align', 'wrap', 'float', 'text'] },
       { filename: 'format-image-right', alternatives: ['fill'], keywords: ['align', 'wrap', 'float', 'text'] },
       { filename: 'sort', alternatives: [], keywords: ['order', 'arrange', 'filter'] },
       { filename: 'sort-by-alpha', alternatives: [], keywords: ['order', 'alphabetical', 'az'] },
       { filename: 'translate', alternatives: [], keywords: ['language', 'localize', 'translation'] },
-      { filename: 'language', alternatives: [], keywords: ['globe', 'locale', 'translate', 'international'] }
+      { filename: 'language', alternatives: [], keywords: ['globe', 'locale', 'translate', 'international'] },
+      { filename: 'quote', alternatives: ['fill'], keywords: ['blockquote', 'citation', 'testimonial'] },
     ]
   },
   {
@@ -138,14 +140,14 @@ const builtInCategories = [
       { filename: 'thumb-up', alternatives: ['fill'], keywords: ['like', 'approve', 'good', 'vote'] },
       { filename: 'thumb-down', alternatives: ['fill'], keywords: ['dislike', 'disapprove', 'bad', 'vote'] },
       { filename: 'thumb-up-down', alternatives: ['fill'], keywords: ['vote', 'rating', 'feedback'] },
+      { filename: 'bookmark', alternatives: ['fill'], keywords: ['save', 'favorite', 'mark'] },
       { filename: 'smiley-happy', alternatives: ['fill'], keywords: ['emoji', 'smile', 'positive', 'mood'] },
       { filename: 'smiley-neutral', alternatives: ['fill'], keywords: ['emoji', 'meh', 'mood'] },
       { filename: 'smiley-sad', alternatives: ['fill'], keywords: ['emoji', 'frown', 'negative', 'mood'] },
       { filename: 'share', alternatives: [], keywords: ['network', 'nodes', 'send'] },
       { filename: 'share-social', alternatives: [], keywords: ['social', 'network', 'send'] },
       { filename: 'rss', alternatives: [], keywords: ['feed', 'subscribe', 'syndication', 'blog'] },
-      { filename: 'flag', alternatives: ['fill'], keywords: ['report', 'mark', 'banner'] },
-      { filename: 'bookmark', alternatives: ['fill'], keywords: ['save', 'favorite', 'mark'] }
+      { filename: 'flag', alternatives: ['fill'], keywords: ['report', 'mark', 'banner'] }
     ]
   },
   {
@@ -217,12 +219,13 @@ const builtInCategories = [
     slug: 'commerce',
     icons: [
       { filename: 'shopping-cart', alternatives: ['fill'], keywords: ['cart', 'buy', 'ecommerce', 'checkout'] },
+      { filename: 'shopping-cart-off', alternatives: ['fill'], keywords: ['cart', 'disabled', 'removed', 'empty', 'unavailable', 'no'] },
       { filename: 'shopping-cart-add', alternatives: [], keywords: ['cart', 'buy', 'plus'] },
       { filename: 'shopping-cart-remove', alternatives: [], keywords: ['cart', 'minus', 'remove'] },
       { filename: 'shopping-basket', alternatives: ['fill'], keywords: ['basket', 'buy', 'cart'] },
+      { filename: 'contactless', alternatives: ['fill'], keywords: ['payment', 'tap', 'nfc', 'wireless', 'pay'] },
       { filename: 'credit-card', alternatives: ['fill'], keywords: ['payment', 'card', 'pay'] },
       { filename: 'payment-card', alternatives: ['fill'], keywords: ['payment', 'card', 'credit card', 'debit', 'pay'] },
-      { filename: 'contactless', alternatives: ['fill'], keywords: ['payment', 'tap', 'nfc', 'wireless', 'pay'] },
       { filename: 'payments', alternatives: ['fill'], keywords: ['money', 'pay', 'cash', 'finance'] },
       { filename: 'currency-dollar', alternatives: [], keywords: ['money', 'usd', 'price'] },
       { filename: 'currency-euro', alternatives: [], keywords: ['money', 'eur', 'price'] },
@@ -284,6 +287,9 @@ const builtInCategories = [
       { filename: 'touch', alternatives: ['fill'], keywords: ['tap', 'finger', 'gesture'] },
       { filename: 'click', alternatives: [], keywords: ['tap', 'cursor', 'select'] },
       { filename: 'pointer', alternatives: ['fill'], keywords: ['cursor', 'click', 'select', 'arrow', 'mouse'] },
+      { filename: 'qr-code', alternatives: [], keywords: ['qr', 'code', 'scan', 'barcode', 'link'] },
+      { filename: 'qr-code-alt', alternatives: [], keywords: ['qr', 'code', 'scan', 'barcode'] },
+      { filename: 'qr-code-scan', alternatives: [], keywords: ['qr', 'code', 'scan', 'camera', 'barcode'] },
       { filename: 'barcode', alternatives: [], keywords: ['scan', 'product', 'code'] },
       { filename: 'barcode-scan', alternatives: [], keywords: ['scan', 'product', 'code'] },
       { filename: 'power-off', alternatives: [], keywords: ['shutdown', 'standby', 'on', 'off'] }

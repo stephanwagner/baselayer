@@ -13,6 +13,8 @@ $fs-icon-path: '../icons' !default;
 
 // Every icon file name (without extension), mirroring the JS catalog.
 $fs-icon-names: (
+  '123',
+  abc,
   accessibility,
   account,
   add,
@@ -212,6 +214,9 @@ $fs-icon-names: (
   power-off,
   premium,
   print,
+  qr-code,
+  qr-code-alt,
+  qr-code-scan,
   quote,
   radio-button,
   radio-button-checked,
@@ -236,6 +241,7 @@ $fs-icon-names: (
   shopping-basket,
   shopping-cart,
   shopping-cart-add,
+  shopping-cart-off,
   shopping-cart-remove,
   signal,
   skip-next,
@@ -429,6 +435,7 @@ $fs-icon-fill: (
   shield-lock,
   shopping-basket,
   shopping-cart,
+  shopping-cart-off,
   skip-next,
   skip-prev,
   smiley-happy,
