@@ -25,20 +25,22 @@ const builtInCategories = [
       { filename: 'menu', alternatives: [], keywords: ['hamburger', 'navigation', 'lines'] },
       { filename: 'more', alternatives: [], keywords: ['ellipsis', 'options', 'dots', 'horizontal'] },
       { filename: 'more-vertical', alternatives: [], keywords: ['ellipsis', 'options', 'kebab', 'dots'] },
+      { filename: 'fullscreen', alternatives: [], keywords: ['enlarge', 'maximize', 'expand'] },
+      { filename: 'fullscreen-exit', alternatives: [], keywords: ['minimize', 'shrink', 'collapse'] },
       { filename: 'arrow-left', alternatives: [], keywords: ['back', 'previous', 'left'] },
       { filename: 'arrow-right', alternatives: [], keywords: ['next', 'forward', 'right'] },
       { filename: 'arrow-up', alternatives: [], keywords: ['up', 'upward', 'top', 'north'] },
       { filename: 'arrow-down', alternatives: [], keywords: ['down', 'downward', 'bottom', 'south'] },
-      { filename: 'arrow-outward', alternatives: [], keywords: ['external', 'outward', 'diagonal', 'northeast', 'go to'] },
-      { filename: 'arrow-range', alternatives: [], keywords: ['range', 'width', 'distance', 'measure', 'horizontal', 'span'] },
+      { filename: 'chevron-left-large', alternatives: [], keywords: ['back', 'previous', 'left', 'big', 'bold'] },
+      { filename: 'chevron-right-large', alternatives: [], keywords: ['next', 'forward', 'right', 'big', 'bold'] },
       { filename: 'chevron-left', alternatives: [], keywords: ['back', 'previous', 'left'] },
       { filename: 'chevron-right', alternatives: [], keywords: ['next', 'forward', 'right'] },
       { filename: 'chevron-up', alternatives: [], keywords: ['up', 'collapse', 'less'] },
       { filename: 'chevron-down', alternatives: [], keywords: ['down', 'expand', 'dropdown', 'more'] },
-      { filename: 'chevron-left-large', alternatives: [], keywords: ['back', 'previous', 'left', 'big', 'bold'] },
-      { filename: 'chevron-right-large', alternatives: [], keywords: ['next', 'forward', 'right', 'big', 'bold'] },
       { filename: 'drop-up', alternatives: [], keywords: ['caret', 'up', 'collapse'] },
       { filename: 'drop-down', alternatives: [], keywords: ['caret', 'down', 'dropdown'] },
+      { filename: 'arrow-outward', alternatives: [], keywords: ['external', 'outward', 'diagonal', 'northeast', 'go to'] },
+      { filename: 'arrow-range', alternatives: [], keywords: ['range', 'width', 'distance', 'measure', 'horizontal', 'span'] },
       { filename: 'subdirectory-arrow', alternatives: [], keywords: ['return', 'nested', 'enter', 'branch'] },
       { filename: 'compare', alternatives: [], keywords: ['versus', 'difference', 'split'] },
       { filename: 'swap-horizontal', alternatives: [], keywords: ['exchange', 'switch', 'transfer', 'arrows'] },
@@ -47,8 +49,6 @@ const builtInCategories = [
       { filename: 'collapse', alternatives: [], keywords: ['minimize', 'shrink', 'close', 'inward', 'arrows'] },
       { filename: 'expand-content', alternatives: [], keywords: ['unfold', 'more', 'enlarge', 'open', 'arrows'] },
       { filename: 'collapse-content', alternatives: [], keywords: ['fold', 'less', 'hide', 'minimize', 'arrows'] },
-      { filename: 'fullscreen', alternatives: [], keywords: ['enlarge', 'maximize', 'expand'] },
-      { filename: 'fullscreen-exit', alternatives: [], keywords: ['minimize', 'shrink', 'collapse'] },
       { filename: 'open-in-new', alternatives: [], keywords: ['external', 'link', 'window', 'tab'] }
     ]
   },
@@ -78,11 +78,11 @@ const builtInCategories = [
       { filename: 'search', alternatives: [], keywords: ['find', 'magnifier', 'lookup'] },
       { filename: 'zoom-in', alternatives: [], keywords: ['magnify', 'plus', 'enlarge'] },
       { filename: 'zoom-out', alternatives: [], keywords: ['magnify', 'minus', 'shrink'] },
+      { filename: 'crop', alternatives: [], keywords: ['trim', 'resize', 'image'] },
       { filename: 'refresh', alternatives: [], keywords: ['reload', 'update', 'renew'] },
       { filename: 'sync', alternatives: [], keywords: ['refresh', 'update', 'reload', 'arrows'] },
       { filename: 'undo', alternatives: [], keywords: ['back', 'revert', 'arrow'] },
       { filename: 'redo', alternatives: [], keywords: ['forward', 'repeat', 'arrow'] },
-      { filename: 'crop', alternatives: [], keywords: ['trim', 'resize', 'image'] },
       { filename: 'drag', alternatives: [], keywords: ['move', 'reorder', 'handle', 'grab'] },
       { filename: 'drag-handle', alternatives: [], keywords: ['move', 'reorder', 'handle', 'grab'] },
     ]
@@ -119,8 +119,8 @@ const builtInCategories = [
       { filename: 'chat-text', alternatives: ['fill'], keywords: ['message', 'comment', 'bubble'] },
       { filename: 'forum', alternatives: ['fill'], keywords: ['discussion', 'comments', 'community'] },
       { filename: 'mail', alternatives: ['fill'], keywords: ['envelope', 'message', 'email', 'contact'] },
-      { filename: 'email-alt', alternatives: [], keywords: ['envelope', 'message', 'contact'] },
       { filename: 'email-open', alternatives: ['fill'], keywords: ['envelope', 'read', 'message'] },
+      { filename: 'email-alt', alternatives: [], keywords: ['envelope', 'message', 'contact'] },
       { filename: 'phone', alternatives: ['fill'], keywords: ['call', 'contact', 'telephone'] },
       { filename: 'send', alternatives: ['fill'], keywords: ['paper plane', 'submit', 'message'] },
       { filename: 'megaphone', alternatives: ['fill'], keywords: ['announcement', 'marketing', 'promote', 'loud'] }
@@ -212,6 +212,7 @@ const builtInCategories = [
       { filename: 'view-grid', alternatives: ['fill'], keywords: ['layout', 'tiles', 'gallery'] },
       { filename: 'view-grid-alt', alternatives: ['fill'], keywords: ['layout', 'tiles'] },
       { filename: 'view-list', alternatives: ['fill'], keywords: ['layout', 'rows', 'list'] },
+      { filename: 'layers', alternatives: ['fill'], keywords: ['stack', 'layout', 'overlay', 'levels', 'z-index'] },
       { filename: 'wp-block', alternatives: ['fill'], keywords: ['wordpress', 'gutenberg', 'brick'] }
     ]
   },
@@ -223,10 +224,13 @@ const builtInCategories = [
       { filename: 'shopping-cart-add', alternatives: [], keywords: ['cart', 'buy', 'plus'] },
       { filename: 'shopping-cart-remove', alternatives: [], keywords: ['cart', 'minus', 'remove'] },
       { filename: 'shopping-basket', alternatives: ['fill'], keywords: ['basket', 'buy', 'cart'] },
+      { filename: 'package', alternatives: ['fill'], keywords: ['box', 'parcel', 'delivery', 'shipping', 'order'] },
       { filename: 'contactless', alternatives: ['fill'], keywords: ['payment', 'tap', 'nfc', 'wireless', 'pay'] },
       { filename: 'credit-card', alternatives: ['fill'], keywords: ['payment', 'card', 'pay'] },
       { filename: 'payment-card', alternatives: ['fill'], keywords: ['payment', 'card', 'credit card', 'debit', 'pay'] },
       { filename: 'payments', alternatives: ['fill'], keywords: ['money', 'pay', 'cash', 'finance'] },
+      { filename: 'sell', alternatives: ['fill'], keywords: ['tag', 'price', 'offer', 'sale'] },
+      { filename: 'currency-exchange', alternatives: [], keywords: ['money', 'exchange', 'convert', 'forex', 'rates'] },
       { filename: 'currency-dollar', alternatives: [], keywords: ['money', 'usd', 'price'] },
       { filename: 'currency-euro', alternatives: [], keywords: ['money', 'eur', 'price'] },
       { filename: 'currency-pound', alternatives: [], keywords: ['money', 'gbp', 'price'] },
@@ -237,8 +241,6 @@ const builtInCategories = [
       { filename: 'currency-rupee', alternatives: [], keywords: ['money', 'inr', 'rupee', 'indian', 'price'] },
       { filename: 'currency-yuan', alternatives: [], keywords: ['money', 'cny', 'yuan', 'renminbi', 'chinese', 'price'] },
       { filename: 'currency-bitcoin', alternatives: [], keywords: ['money', 'btc', 'bitcoin', 'crypto', 'cryptocurrency'] },
-      { filename: 'currency-exchange', alternatives: [], keywords: ['money', 'exchange', 'convert', 'forex', 'rates'] },
-      { filename: 'sell', alternatives: ['fill'], keywords: ['tag', 'price', 'offer', 'sale'] },
       // Payment brands (non-Material logos) sit at the end of the category.
       { filename: 'visa', alternatives: [], keywords: ['payment', 'card', 'credit card', 'brand'] },
       { filename: 'mastercard', alternatives: [], keywords: ['payment', 'card', 'credit card', 'brand'] },
@@ -272,7 +274,11 @@ const builtInCategories = [
       { filename: 'compass', alternatives: ['fill'], keywords: ['navigation', 'direction', 'explore'] },
       { filename: 'navigation', alternatives: ['fill'], keywords: ['direction', 'gps', 'near me', 'explore', 'arrow', 'maps'] },
       { filename: 'globe', alternatives: [], keywords: ['world', 'earth', 'international', 'web'] },
-      { filename: 'car', alternatives: ['fill'], keywords: ['vehicle', 'drive', 'transport', 'auto'] }
+      { filename: 'car', alternatives: ['fill'], keywords: ['vehicle', 'drive', 'transport', 'auto'] },
+      { filename: 'bicycle', alternatives: [], keywords: ['bike', 'cycle', 'transport', 'ride'] },
+      { filename: 'train', alternatives: ['fill'], keywords: ['transport', 'rail', 'metro', 'subway', 'travel'] },
+      { filename: 'ship', alternatives: ['fill'], keywords: ['boat', 'transport', 'cruise', 'sea', 'ferry', 'travel'] },
+      { filename: 'plane', alternatives: [], keywords: ['airplane', 'flight', 'travel', 'fly', 'airport'] }
     ]
   },
   {
@@ -283,16 +289,16 @@ const builtInCategories = [
       { filename: 'mobile', alternatives: ['fill'], keywords: ['phone', 'smartphone', 'device'] },
       { filename: 'mobile-alt', alternatives: ['fill'], keywords: ['phone', 'smartphone'] },
       { filename: 'tv', alternatives: ['fill'], keywords: ['television', 'screen', 'monitor', 'display'] },
+      { filename: 'power-off', alternatives: [], keywords: ['shutdown', 'standby', 'on', 'off'] },
       { filename: 'mouse', alternatives: ['fill'], keywords: ['click', 'cursor', 'device'] },
       { filename: 'touch', alternatives: ['fill'], keywords: ['tap', 'finger', 'gesture'] },
       { filename: 'click', alternatives: [], keywords: ['tap', 'cursor', 'select'] },
       { filename: 'pointer', alternatives: ['fill'], keywords: ['cursor', 'click', 'select', 'arrow', 'mouse'] },
-      { filename: 'qr-code', alternatives: [], keywords: ['qr', 'code', 'scan', 'barcode', 'link'] },
-      { filename: 'qr-code-alt', alternatives: [], keywords: ['qr', 'code', 'scan', 'barcode'] },
-      { filename: 'qr-code-scan', alternatives: [], keywords: ['qr', 'code', 'scan', 'camera', 'barcode'] },
       { filename: 'barcode', alternatives: [], keywords: ['scan', 'product', 'code'] },
       { filename: 'barcode-scan', alternatives: [], keywords: ['scan', 'product', 'code'] },
-      { filename: 'power-off', alternatives: [], keywords: ['shutdown', 'standby', 'on', 'off'] }
+      { filename: 'qr-code', alternatives: [], keywords: ['qr', 'code', 'scan', 'barcode', 'link'] },
+      { filename: 'qr-code-alt', alternatives: [], keywords: ['qr', 'code', 'scan', 'barcode'] },
+      { filename: 'qr-code-scan', alternatives: [], keywords: ['qr', 'code', 'scan', 'camera', 'barcode'] }
     ]
   },
   {
@@ -301,14 +307,14 @@ const builtInCategories = [
       { filename: 'lock', alternatives: ['fill'], keywords: ['secure', 'locked', 'private', 'password'] },
       { filename: 'lock-open', alternatives: ['fill'], keywords: ['unlocked', 'open', 'access'] },
       { filename: 'key', alternatives: ['fill'], keywords: ['password', 'access', 'login', 'unlock'] },
+      { filename: 'cookie', alternatives: ['fill'], keywords: ['consent', 'privacy', 'gdpr'] },
+      { filename: 'login', alternatives: [], keywords: ['sign in', 'enter', 'access'] },
+      { filename: 'logout', alternatives: [], keywords: ['sign out', 'exit', 'leave'] },
       { filename: 'shield', alternatives: ['fill'], keywords: ['security', 'protection', 'guard'] },
       { filename: 'shield-check', alternatives: ['fill'], keywords: ['security', 'verified', 'protected', 'safe'] },
       { filename: 'shield-lock', alternatives: ['fill'], keywords: ['security', 'protected', 'private'] },
       { filename: 'shield-security', alternatives: [], keywords: ['protection', 'guard', 'safe'] },
-      { filename: 'verified', alternatives: ['fill'], keywords: ['check', 'badge', 'trusted', 'approved'] },
-      { filename: 'login', alternatives: [], keywords: ['sign in', 'enter', 'access'] },
-      { filename: 'logout', alternatives: [], keywords: ['sign out', 'exit', 'leave'] },
-      { filename: 'cookie', alternatives: ['fill'], keywords: ['consent', 'privacy', 'gdpr'] }
+      { filename: 'verified', alternatives: ['fill'], keywords: ['check', 'badge', 'trusted', 'approved'] }
     ]
   },
   {
@@ -354,6 +360,7 @@ const builtInCategories = [
     icons: [
       { filename: 'rocket', alternatives: ['fill'], keywords: ['launch', 'startup', 'fast', 'boost'] },
       { filename: 'rocket-launch', alternatives: ['fill'], keywords: ['launch', 'startup', 'boost', 'space'] },
+      { filename: 'planet', alternatives: [], keywords: ['space', 'world', 'astronomy', 'orbit', 'saturn', 'galaxy'] },
       { filename: 'diamond', alternatives: ['fill'], keywords: ['gem', 'premium', 'jewel', 'quality'] },
       { filename: 'premium', alternatives: ['fill'], keywords: ['crown', 'vip', 'upgrade', 'pro'] },
       { filename: 'crown', alternatives: ['fill'], keywords: ['king', 'queen', 'premium', 'royal', 'vip', 'winner', 'best'] },
@@ -363,7 +370,8 @@ const builtInCategories = [
       { filename: 'palette', alternatives: ['fill'], keywords: ['color', 'design', 'art', 'theme', 'paint'] },
       { filename: 'label', alternatives: ['fill'], keywords: ['tag', 'badge', 'category'] },
       { filename: 'pets', alternatives: [], keywords: ['paw', 'animal', 'dog', 'cat', 'pet'] },
-      { filename: 'construction', alternatives: [], keywords: ['maintenance', 'work', 'build', 'tools'] }
+      { filename: 'construction', alternatives: [], keywords: ['maintenance', 'work', 'build', 'tools'] },
+      { filename: 'puzzle', alternatives: ['fill'], keywords: ['extension', 'plugin', 'addon', 'integration', 'piece'] }
     ]
   },
   {
@@ -399,7 +407,6 @@ const builtInCategories = [
       { filename: 'applemusic', alternatives: [], keywords: ['music', 'audio', 'streaming', 'apple'] },
       { filename: 'github', alternatives: [], keywords: ['code', 'git', 'repository', 'developer', 'octocat'] },
       { filename: 'gitlab', alternatives: [], keywords: ['code', 'git', 'repository', 'developer'] },
-      { filename: 'devdotto', alternatives: [], keywords: ['dev.to', 'blog', 'developer', 'community'] },
       { filename: 'google', alternatives: [], keywords: ['search', 'brand', 'g'] }
     ]
   }

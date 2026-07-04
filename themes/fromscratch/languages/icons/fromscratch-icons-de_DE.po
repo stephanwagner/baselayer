@@ -703,6 +703,10 @@ msgctxt "icon name"
 msgid "List view"
 msgstr "Listenansicht"
 
+msgctxt "icon name"
+msgid "Layers"
+msgstr "Ebenen"
+
 # Icon names — Commerce & finance
 
 msgctxt "icon name"
@@ -724,6 +728,10 @@ msgstr "Warenkorb aus"
 msgctxt "icon name"
 msgid "Shopping basket"
 msgstr "Einkaufskorb"
+
+msgctxt "icon name"
+msgid "Package"
+msgstr "Paket"
 
 msgctxt "icon name"
 msgid "Credit card"
@@ -876,6 +884,22 @@ msgstr "Startseite"
 msgctxt "icon name"
 msgid "Car"
 msgstr "Auto"
+
+msgctxt "icon name"
+msgid "Bicycle"
+msgstr "Fahrrad"
+
+msgctxt "icon name"
+msgid "Train"
+msgstr "Zug"
+
+msgctxt "icon name"
+msgid "Ship"
+msgstr "Schiff"
+
+msgctxt "icon name"
+msgid "Airplane"
+msgstr "Flugzeug"
 
 # Icon names — Devices & interaction
 
@@ -1136,6 +1160,10 @@ msgid "Rocket launch"
 msgstr "Raketenstart"
 
 msgctxt "icon name"
+msgid "Planet"
+msgstr "Planet"
+
+msgctxt "icon name"
 msgid "Palette"
 msgstr "Palette"
 
@@ -1150,6 +1178,10 @@ msgstr "Haustiere"
 msgctxt "icon name"
 msgid "Construction"
 msgstr "Baustelle"
+
+msgctxt "icon name"
+msgid "Puzzle"
+msgstr "Puzzle"
 
 msgctxt "icon name"
 msgid "WordPress block"
