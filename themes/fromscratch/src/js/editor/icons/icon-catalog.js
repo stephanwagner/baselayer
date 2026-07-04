@@ -3,181 +3,307 @@
  *
  * Each icon is an object:
  *   {
- *     filename: 'heart',            // assets/icons/<filename>.svg (base/outline)
- *     alternatives: ['fill'],       // extra variants: assets/icons/<filename>-<alt>.svg
- *     keywords: ['favorit', 'like'] // static, multilingual search synonyms
+ *     filename: 'heart',        // assets/icons/<filename>.svg (base/outline)
+ *     alternatives: ['fill'],   // extra variants: assets/icons/<filename>-<alt>.svg
+ *     keywords: ['like', 'love']// English-only search synonyms
  *   }
  *
  * Human-readable names (per icon) and category labels are translatable and are
  * NOT stored here — they come from PHP via `window.fromscratchIcons`
- * (text domain: fromscratch-icons, see inc/editor-icons.php). Keeping them in
- * PHP routes them through the theme's gettext pipeline without bloating the
- * main .mo.
+ * (text domain: fromscratch-icons, see inc/editor-icons.php).
  *
  * The generated class names use the filename (`-icon-heart`, `-icon-heart-fill`)
  * and must stay in sync with the SCSS catalog in src/scss/_icons.scss.
- *
- * Only a subset is listed for now; more can be added per category later.
  */
 export const iconCategories = [
   {
-    slug: 'arrows',
+    slug: 'navigation',
     icons: [
-      {
-        filename: 'arrow-left',
-        alternatives: [],
-        keywords: ['zurück', 'back', 'previous', 'links', 'left']
-      },
-      {
-        filename: 'arrow-right',
-        alternatives: [],
-        keywords: ['weiter', 'next', 'forward', 'rechts', 'right']
-      },
-      {
-        filename: 'chevron-left',
-        alternatives: [],
-        keywords: ['zurück', 'back', 'previous', 'pfeil', 'links']
-      },
-      {
-        filename: 'chevron-right',
-        alternatives: [],
-        keywords: ['weiter', 'next', 'forward', 'pfeil', 'rechts']
-      },
-      {
-        filename: 'chevron-up',
-        alternatives: [],
-        keywords: ['nach oben', 'up', 'pfeil', 'oben']
-      },
-      {
-        filename: 'chevron-down',
-        alternatives: [],
-        keywords: ['nach unten', 'down', 'pfeil', 'unten', 'dropdown']
-      }
+      { filename: 'arrow-left', alternatives: [], keywords: ['back', 'previous', 'left'] },
+      { filename: 'arrow-right', alternatives: [], keywords: ['next', 'forward', 'right'] },
+      { filename: 'chevron-left', alternatives: [], keywords: ['back', 'previous', 'left'] },
+      { filename: 'chevron-right', alternatives: [], keywords: ['next', 'forward', 'right'] },
+      { filename: 'chevron-up', alternatives: [], keywords: ['up', 'collapse', 'less'] },
+      { filename: 'chevron-down', alternatives: [], keywords: ['down', 'expand', 'dropdown', 'more'] },
+      { filename: 'drop-up', alternatives: [], keywords: ['caret', 'up', 'collapse'] },
+      { filename: 'drop-down', alternatives: [], keywords: ['caret', 'down', 'dropdown'] },
+      { filename: 'subdirectory-arrow', alternatives: [], keywords: ['return', 'nested', 'enter', 'branch'] },
+      { filename: 'swap-horizontal', alternatives: [], keywords: ['exchange', 'switch', 'transfer', 'arrows'] },
+      { filename: 'swap-vertical', alternatives: [], keywords: ['exchange', 'switch', 'reorder', 'arrows'] },
+      { filename: 'expand', alternatives: [], keywords: ['enlarge', 'maximize', 'arrows'] },
+      { filename: 'fullscreen', alternatives: [], keywords: ['enlarge', 'maximize', 'expand'] },
+      { filename: 'fullscreen-exit', alternatives: [], keywords: ['minimize', 'shrink', 'collapse'] },
+      { filename: 'zoom-in', alternatives: [], keywords: ['magnify', 'plus', 'enlarge'] },
+      { filename: 'zoom-out', alternatives: [], keywords: ['magnify', 'minus', 'shrink'] },
+      { filename: 'open-in-new', alternatives: [], keywords: ['external', 'link', 'window', 'tab'] },
+      { filename: 'menu', alternatives: [], keywords: ['hamburger', 'navigation', 'lines'] },
+      { filename: 'more', alternatives: [], keywords: ['ellipsis', 'options', 'dots', 'horizontal'] },
+      { filename: 'more-vertical', alternatives: [], keywords: ['ellipsis', 'options', 'kebab', 'dots'] }
     ]
   },
   {
     slug: 'actions',
     icons: [
-      {
-        filename: 'add',
-        alternatives: [],
-        keywords: ['plus', 'neu', 'new', 'erstellen', 'add']
-      },
-      {
-        filename: 'edit',
-        alternatives: ['fill'],
-        keywords: ['stift', 'pen', 'pencil', 'ändern', 'edit']
-      },
-      {
-        filename: 'delete',
-        alternatives: ['fill'],
-        keywords: ['mülleimer', 'trash', 'entfernen', 'remove', 'papierkorb']
-      },
-      {
-        filename: 'download',
-        alternatives: [],
-        keywords: ['download', 'speichern', 'save', 'pfeil']
-      },
-      {
-        filename: 'copy',
-        alternatives: ['fill'],
-        keywords: ['duplizieren', 'duplicate', 'clipboard', 'copy']
-      },
-      {
-        filename: 'checkmark',
-        alternatives: [],
-        keywords: ['check', 'ok', 'erledigt', 'done', 'bestätigen', 'haken']
-      }
+      { filename: 'add', alternatives: [], keywords: ['plus', 'new', 'create'] },
+      { filename: 'add-circle', alternatives: ['fill'], keywords: ['plus', 'new', 'create'] },
+      { filename: 'minus', alternatives: [], keywords: ['remove', 'subtract', 'less'] },
+      { filename: 'checkmark', alternatives: [], keywords: ['check', 'done', 'ok', 'tick', 'confirm'] },
+      { filename: 'check-circle', alternatives: ['fill'], keywords: ['done', 'ok', 'success', 'confirm'] },
+      { filename: 'close', alternatives: [], keywords: ['x', 'cancel', 'dismiss', 'remove'] },
+      { filename: 'cancel', alternatives: ['fill'], keywords: ['close', 'x', 'dismiss', 'stop'] },
+      { filename: 'block', alternatives: ['fill'], keywords: ['forbidden', 'ban', 'disable', 'no'] },
+      { filename: 'delete', alternatives: ['fill'], keywords: ['trash', 'remove', 'bin'] },
+      { filename: 'copy', alternatives: ['fill'], keywords: ['duplicate', 'clipboard'] },
+      { filename: 'save', alternatives: ['fill'], keywords: ['disk', 'store'] },
+      { filename: 'download', alternatives: [], keywords: ['save', 'export', 'arrow'] },
+      { filename: 'upload', alternatives: [], keywords: ['import', 'send', 'arrow'] },
+      { filename: 'print', alternatives: ['fill'], keywords: ['printer'] },
+      { filename: 'link', alternatives: [], keywords: ['url', 'chain', 'hyperlink'] },
+      { filename: 'attachment', alternatives: [], keywords: ['paperclip', 'attach', 'file'] },
+      { filename: 'search', alternatives: [], keywords: ['find', 'magnifier', 'lookup'] },
+      { filename: 'refresh', alternatives: [], keywords: ['reload', 'update', 'renew'] },
+      { filename: 'sync', alternatives: [], keywords: ['refresh', 'update', 'reload', 'arrows'] },
+      { filename: 'undo', alternatives: [], keywords: ['back', 'revert', 'arrow'] },
+      { filename: 'redo', alternatives: [], keywords: ['forward', 'repeat', 'arrow'] },
+      { filename: 'crop', alternatives: [], keywords: ['trim', 'resize', 'image'] },
+      { filename: 'compare', alternatives: [], keywords: ['versus', 'difference', 'split'] }
+    ]
+  },
+  {
+    slug: 'editing',
+    icons: [
+      { filename: 'edit', alternatives: ['fill'], keywords: ['pencil', 'pen', 'modify', 'change'] },
+      { filename: 'edit-text', alternatives: ['fill'], keywords: ['pencil', 'write', 'modify'] },
+      { filename: 'edit-document', alternatives: ['fill'], keywords: ['pencil', 'write', 'file'] },
+      { filename: 'document', alternatives: ['fill'], keywords: ['file', 'page', 'paper'] },
+      { filename: 'document-text', alternatives: ['fill'], keywords: ['file', 'page', 'text'] },
+      { filename: 'article', alternatives: ['fill'], keywords: ['post', 'document', 'news', 'text'] },
+      { filename: 'quote', alternatives: ['fill'], keywords: ['blockquote', 'citation', 'testimonial'] },
+      { filename: 'clipboard', alternatives: [], keywords: ['paste', 'copy', 'board'] },
+      { filename: 'list', alternatives: [], keywords: ['lines', 'items', 'menu'] },
+      { filename: 'list-bullet', alternatives: [], keywords: ['unordered', 'dots', 'ul'] },
+      { filename: 'list-number', alternatives: [], keywords: ['ordered', 'ol', 'numbers'] },
+      { filename: 'format-image-left', alternatives: ['fill'], keywords: ['align', 'wrap', 'float', 'text'] },
+      { filename: 'format-image-right', alternatives: ['fill'], keywords: ['align', 'wrap', 'float', 'text'] },
+      { filename: 'sort', alternatives: [], keywords: ['order', 'arrange', 'filter'] },
+      { filename: 'sort-by-alpha', alternatives: [], keywords: ['order', 'alphabetical', 'az'] },
+      { filename: 'translate', alternatives: [], keywords: ['language', 'localize', 'translation'] },
+      { filename: 'language', alternatives: [], keywords: ['globe', 'locale', 'translate', 'international'] }
     ]
   },
   {
     slug: 'communication',
     icons: [
-      {
-        filename: 'chat',
-        alternatives: ['fill'],
-        keywords: ['nachricht', 'message', 'sprechblase', 'kommentar', 'bubble']
-      },
-      {
-        filename: 'mail',
-        alternatives: ['fill'],
-        keywords: ['email', 'brief', 'envelope', 'kontakt', 'nachricht']
-      },
-      {
-        filename: 'megaphone',
-        alternatives: ['fill'],
-        keywords: ['ankündigung', 'announcement', 'marketing', 'werbung', 'laut']
-      }
+      { filename: 'chat', alternatives: ['fill'], keywords: ['message', 'bubble', 'comment', 'talk'] },
+      { filename: 'chat-dots', alternatives: ['fill'], keywords: ['message', 'typing', 'bubble'] },
+      { filename: 'chat-text', alternatives: ['fill'], keywords: ['message', 'comment', 'bubble'] },
+      { filename: 'forum', alternatives: ['fill'], keywords: ['discussion', 'comments', 'community'] },
+      { filename: 'mail', alternatives: ['fill'], keywords: ['envelope', 'message', 'email', 'contact'] },
+      { filename: 'email-alt', alternatives: [], keywords: ['envelope', 'message', 'contact'] },
+      { filename: 'email-open', alternatives: ['fill'], keywords: ['envelope', 'read', 'message'] },
+      { filename: 'phone', alternatives: ['fill'], keywords: ['call', 'contact', 'telephone'] },
+      { filename: 'send', alternatives: ['fill'], keywords: ['paper plane', 'submit', 'message'] },
+      { filename: 'megaphone', alternatives: ['fill'], keywords: ['announcement', 'marketing', 'promote', 'loud'] }
+    ]
+  },
+  {
+    slug: 'social',
+    icons: [
+      { filename: 'heart', alternatives: ['fill'], keywords: ['like', 'love', 'favorite'] },
+      { filename: 'star', alternatives: ['fill'], keywords: ['favorite', 'rating', 'bookmark'] },
+      { filename: 'star-half', alternatives: [], keywords: ['rating', 'half', 'review'] },
+      { filename: 'stars', alternatives: ['fill'], keywords: ['rating', 'favorite', 'sparkle', 'review'] },
+      { filename: 'thumb-up', alternatives: ['fill'], keywords: ['like', 'approve', 'good', 'vote'] },
+      { filename: 'thumb-down', alternatives: ['fill'], keywords: ['dislike', 'disapprove', 'bad', 'vote'] },
+      { filename: 'thumb-up-down', alternatives: ['fill'], keywords: ['vote', 'rating', 'feedback'] },
+      { filename: 'smiley-happy', alternatives: ['fill'], keywords: ['emoji', 'smile', 'positive', 'mood'] },
+      { filename: 'smiley-neutral', alternatives: ['fill'], keywords: ['emoji', 'meh', 'mood'] },
+      { filename: 'smiley-sad', alternatives: ['fill'], keywords: ['emoji', 'frown', 'negative', 'mood'] },
+      { filename: 'share', alternatives: [], keywords: ['network', 'nodes', 'send'] },
+      { filename: 'share-social', alternatives: [], keywords: ['social', 'network', 'send'] },
+      { filename: 'flag', alternatives: ['fill'], keywords: ['report', 'mark', 'banner'] },
+      { filename: 'bookmark', alternatives: ['fill'], keywords: ['save', 'favorite', 'mark'] }
     ]
   },
   {
     slug: 'media',
     icons: [
-      {
-        filename: 'camera',
-        alternatives: ['fill'],
-        keywords: ['foto', 'photo', 'bild', 'picture']
-      },
-      {
-        filename: 'image',
-        alternatives: ['fill'],
-        keywords: ['foto', 'photo', 'picture', 'grafik']
-      },
-      {
-        filename: 'article',
-        alternatives: ['fill'],
-        keywords: ['dokument', 'text', 'seite', 'page', 'beitrag']
-      },
-      {
-        filename: 'carousel',
-        alternatives: ['fill'],
-        keywords: ['slider', 'galerie', 'gallery', 'slideshow']
-      }
+      { filename: 'image', alternatives: ['fill'], keywords: ['photo', 'picture', 'graphic'] },
+      { filename: 'images', alternatives: ['fill'], keywords: ['photos', 'gallery', 'pictures'] },
+      { filename: 'camera', alternatives: ['fill'], keywords: ['photo', 'capture', 'picture'] },
+      { filename: 'videocam', alternatives: ['fill'], keywords: ['video', 'record', 'film'] },
+      { filename: 'carousel', alternatives: ['fill'], keywords: ['slider', 'gallery', 'slideshow'] },
+      { filename: 'play', alternatives: ['fill'], keywords: ['start', 'video', 'media'] },
+      { filename: 'play-box', alternatives: ['fill'], keywords: ['video', 'media', 'start'] },
+      { filename: 'play-circle', alternatives: ['fill'], keywords: ['video', 'media', 'start'] },
+      { filename: 'music', alternatives: [], keywords: ['note', 'audio', 'song', 'sound'] },
+      { filename: 'headphones', alternatives: ['fill'], keywords: ['audio', 'listen', 'sound', 'music'] },
+      { filename: 'volume-up', alternatives: ['fill'], keywords: ['sound', 'audio', 'louder', 'speaker'] },
+      { filename: 'volume-down', alternatives: ['fill'], keywords: ['sound', 'audio', 'quieter', 'speaker'] },
+      { filename: 'volume-mute', alternatives: ['fill'], keywords: ['sound', 'silent', 'off', 'speaker'] },
+      { filename: 'volume-off', alternatives: ['fill'], keywords: ['mute', 'silent', 'sound', 'speaker'] }
     ]
   },
   {
-    slug: 'general',
+    slug: 'files',
     icons: [
-      {
-        filename: 'bolt',
-        alternatives: ['fill'],
-        keywords: ['energie', 'power', 'schnell', 'fast', 'flash', 'strom']
-      },
-      {
-        filename: 'bookmark',
-        alternatives: ['fill'],
-        keywords: ['merken', 'save', 'favorit', 'bookmark']
-      },
-      {
-        filename: 'calendar-month',
-        alternatives: ['fill'],
-        keywords: ['datum', 'date', 'termin', 'monat', 'month', 'calendar']
-      },
-      {
-        filename: 'heart',
-        alternatives: ['fill'],
-        keywords: ['favorit', 'like', 'love', 'liebe', 'gefällt']
-      },
-      {
-        filename: 'home',
-        alternatives: ['fill'],
-        keywords: ['haus', 'house', 'home', 'start', 'zuhause']
-      },
-      {
-        filename: 'info',
-        alternatives: ['fill'],
-        keywords: ['information', 'hilfe', 'help', 'details']
-      },
-      {
-        filename: 'location',
-        alternatives: ['fill'],
-        keywords: ['ort', 'pin', 'map', 'karte', 'adresse', 'position']
-      },
-      {
-        filename: 'link',
-        alternatives: [],
-        keywords: ['verknüpfung', 'url', 'kette', 'chain', 'verlinken']
-      }
+      { filename: 'folder', alternatives: ['fill'], keywords: ['directory', 'files'] },
+      { filename: 'folder-open', alternatives: ['fill'], keywords: ['directory', 'files', 'open'] },
+      { filename: 'folder-zip', alternatives: ['fill'], keywords: ['archive', 'compressed', 'zip'] },
+      { filename: 'file-audio', alternatives: ['fill'], keywords: ['sound', 'music', 'mp3'] },
+      { filename: 'file-video', alternatives: ['fill'], keywords: ['movie', 'film', 'mp4'] },
+      { filename: 'database', alternatives: ['fill'], keywords: ['storage', 'server', 'data', 'sql'] },
+      { filename: 'cloud', alternatives: ['fill'], keywords: ['storage', 'upload', 'server'] },
+      { filename: 'backup', alternatives: ['fill'], keywords: ['restore', 'cloud', 'save', 'copy'] }
+    ]
+  },
+  {
+    slug: 'data',
+    icons: [
+      { filename: 'chart-bar', alternatives: [], keywords: ['graph', 'statistics', 'analytics', 'columns'] },
+      { filename: 'chart-pie', alternatives: ['fill'], keywords: ['graph', 'statistics', 'analytics'] },
+      { filename: 'dashboard', alternatives: ['fill'], keywords: ['gauge', 'overview', 'panel', 'speedometer'] },
+      { filename: 'dashboard-alt', alternatives: ['fill'], keywords: ['overview', 'panel', 'widgets'] },
+      { filename: 'data-table', alternatives: ['fill'], keywords: ['grid', 'rows', 'spreadsheet'] },
+      { filename: 'table', alternatives: ['fill'], keywords: ['grid', 'rows', 'columns', 'spreadsheet'] },
+      { filename: 'grid', alternatives: ['fill'], keywords: ['layout', 'tiles', 'gallery'] },
+      { filename: 'grid-3x3', alternatives: [], keywords: ['layout', 'tiles', 'gallery'] },
+      { filename: 'grid-4x4', alternatives: [], keywords: ['layout', 'tiles', 'gallery'] },
+      { filename: 'list-box', alternatives: ['fill'], keywords: ['list', 'panel', 'items'] },
+      { filename: 'view-column', alternatives: ['fill'], keywords: ['layout', 'columns'] },
+      { filename: 'view-comfy', alternatives: ['fill'], keywords: ['layout', 'grid', 'tiles'] },
+      { filename: 'view-grid', alternatives: ['fill'], keywords: ['layout', 'tiles', 'gallery'] },
+      { filename: 'view-grid-alt', alternatives: ['fill'], keywords: ['layout', 'tiles'] },
+      { filename: 'view-list', alternatives: ['fill'], keywords: ['layout', 'rows', 'list'] }
+    ]
+  },
+  {
+    slug: 'commerce',
+    icons: [
+      { filename: 'shopping-cart', alternatives: ['fill'], keywords: ['cart', 'buy', 'ecommerce', 'checkout'] },
+      { filename: 'shopping-cart-add', alternatives: [], keywords: ['cart', 'buy', 'plus'] },
+      { filename: 'shopping-cart-remove', alternatives: [], keywords: ['cart', 'minus', 'remove'] },
+      { filename: 'shopping-basket', alternatives: ['fill'], keywords: ['basket', 'buy', 'cart'] },
+      { filename: 'credit-card', alternatives: ['fill'], keywords: ['payment', 'card', 'pay'] },
+      { filename: 'payments', alternatives: ['fill'], keywords: ['money', 'pay', 'cash', 'finance'] },
+      { filename: 'currency-dollar', alternatives: [], keywords: ['money', 'usd', 'price'] },
+      { filename: 'currency-euro', alternatives: [], keywords: ['money', 'eur', 'price'] },
+      { filename: 'currency-pound', alternatives: [], keywords: ['money', 'gbp', 'price'] },
+      { filename: 'currency-yen', alternatives: [], keywords: ['money', 'jpy', 'price'] },
+      { filename: 'sell', alternatives: ['fill'], keywords: ['tag', 'price', 'offer', 'sale'] },
+      { filename: 'premium', alternatives: ['fill'], keywords: ['crown', 'vip', 'upgrade', 'pro'] },
+      { filename: 'upgrade', alternatives: [], keywords: ['improve', 'level up', 'arrow'] },
+      { filename: 'diamond', alternatives: ['fill'], keywords: ['gem', 'premium', 'jewel', 'quality'] }
+    ]
+  },
+  {
+    slug: 'people',
+    icons: [
+      { filename: 'account', alternatives: ['fill'], keywords: ['user', 'profile', 'person'] },
+      { filename: 'person', alternatives: ['fill'], keywords: ['user', 'profile', 'account'] },
+      { filename: 'group', alternatives: ['fill'], keywords: ['team', 'people', 'users'] },
+      { filename: 'face', alternatives: ['fill'], keywords: ['user', 'avatar', 'profile'] },
+      { filename: 'id-card', alternatives: ['fill'], keywords: ['identity', 'badge', 'profile'] },
+      { filename: 'gender-male', alternatives: [], keywords: ['man', 'sex', 'symbol'] },
+      { filename: 'gender-female', alternatives: [], keywords: ['woman', 'sex', 'symbol'] },
+      { filename: 'man', alternatives: [], keywords: ['male', 'person', 'user'] },
+      { filename: 'woman', alternatives: [], keywords: ['female', 'person', 'user'] },
+      { filename: 'accessibility', alternatives: [], keywords: ['a11y', 'wheelchair', 'disability', 'access'] }
+    ]
+  },
+  {
+    slug: 'places',
+    icons: [
+      { filename: 'location', alternatives: ['fill'], keywords: ['pin', 'map', 'marker', 'place', 'gps'] },
+      { filename: 'pin-drop', alternatives: ['fill'], keywords: ['location', 'marker', 'map', 'place'] },
+      { filename: 'map', alternatives: ['fill'], keywords: ['location', 'navigation', 'directions'] },
+      { filename: 'compass', alternatives: ['fill'], keywords: ['navigation', 'direction', 'explore'] },
+      { filename: 'globe', alternatives: [], keywords: ['world', 'earth', 'international', 'web'] },
+      { filename: 'home', alternatives: ['fill'], keywords: ['house', 'main', 'start'] },
+      { filename: 'car', alternatives: ['fill'], keywords: ['vehicle', 'drive', 'transport', 'auto'] }
+    ]
+  },
+  {
+    slug: 'devices',
+    icons: [
+      { filename: 'laptop', alternatives: ['fill'], keywords: ['computer', 'notebook', 'device'] },
+      { filename: 'laptop-alt', alternatives: ['fill'], keywords: ['computer', 'notebook'] },
+      { filename: 'mobile', alternatives: ['fill'], keywords: ['phone', 'smartphone', 'device'] },
+      { filename: 'mobile-alt', alternatives: ['fill'], keywords: ['phone', 'smartphone'] },
+      { filename: 'tv', alternatives: ['fill'], keywords: ['television', 'screen', 'monitor', 'display'] },
+      { filename: 'mouse', alternatives: ['fill'], keywords: ['click', 'cursor', 'device'] },
+      { filename: 'touch', alternatives: ['fill'], keywords: ['tap', 'finger', 'gesture'] },
+      { filename: 'click', alternatives: [], keywords: ['tap', 'cursor', 'select'] },
+      { filename: 'pointer', alternatives: ['fill'], keywords: ['cursor', 'arrow', 'mouse'] },
+      { filename: 'drag', alternatives: [], keywords: ['move', 'reorder', 'handle', 'grab'] },
+      { filename: 'drag-handle', alternatives: [], keywords: ['move', 'reorder', 'handle', 'grab'] },
+      { filename: 'barcode', alternatives: [], keywords: ['scan', 'product', 'code'] },
+      { filename: 'barcode-scan', alternatives: [], keywords: ['scan', 'product', 'code'] },
+      { filename: 'power-off', alternatives: [], keywords: ['shutdown', 'standby', 'on', 'off'] }
+    ]
+  },
+  {
+    slug: 'security',
+    icons: [
+      { filename: 'lock', alternatives: ['fill'], keywords: ['secure', 'locked', 'private', 'password'] },
+      { filename: 'lock-open', alternatives: ['fill'], keywords: ['unlocked', 'open', 'access'] },
+      { filename: 'key', alternatives: ['fill'], keywords: ['password', 'access', 'login', 'unlock'] },
+      { filename: 'shield', alternatives: ['fill'], keywords: ['security', 'protection', 'guard'] },
+      { filename: 'shield-check', alternatives: ['fill'], keywords: ['security', 'verified', 'protected', 'safe'] },
+      { filename: 'shield-lock', alternatives: ['fill'], keywords: ['security', 'protected', 'private'] },
+      { filename: 'shield-security', alternatives: [], keywords: ['protection', 'guard', 'safe'] },
+      { filename: 'verified', alternatives: ['fill'], keywords: ['check', 'badge', 'trusted', 'approved'] },
+      { filename: 'login', alternatives: [], keywords: ['sign in', 'enter', 'access'] },
+      { filename: 'logout', alternatives: [], keywords: ['sign out', 'exit', 'leave'] },
+      { filename: 'cookie', alternatives: ['fill'], keywords: ['consent', 'privacy', 'gdpr'] }
+    ]
+  },
+  {
+    slug: 'controls',
+    icons: [
+      { filename: 'settings', alternatives: ['fill'], keywords: ['gear', 'cog', 'preferences', 'options'] },
+      { filename: 'tune', alternatives: [], keywords: ['sliders', 'adjust', 'options'] },
+      { filename: 'filter', alternatives: [], keywords: ['funnel', 'sort', 'refine'] },
+      { filename: 'filter-alt', alternatives: ['fill'], keywords: ['funnel', 'sort', 'refine'] },
+      { filename: 'filter-alt-off', alternatives: ['fill'], keywords: ['funnel', 'clear', 'reset'] },
+      { filename: 'filter-off', alternatives: [], keywords: ['funnel', 'clear', 'reset'] },
+      { filename: 'checkbox', alternatives: [], keywords: ['check', 'box', 'unchecked', 'form'] },
+      { filename: 'checkbox-checked', alternatives: ['fill'], keywords: ['check', 'form', 'selected'] },
+      { filename: 'checkbox-indeterminate', alternatives: ['fill'], keywords: ['check', 'partial', 'form'] },
+      { filename: 'radio-button', alternatives: [], keywords: ['option', 'form', 'circle'] },
+      { filename: 'radio-button-checked', alternatives: [], keywords: ['option', 'form', 'selected'] },
+      { filename: 'radio-button-partial', alternatives: [], keywords: ['option', 'form', 'partial'] },
+      { filename: 'toggle-on', alternatives: ['fill'], keywords: ['switch', 'on', 'enabled'] },
+      { filename: 'toggle-off', alternatives: ['fill'], keywords: ['switch', 'off', 'disabled'] },
+      { filename: 'visibility', alternatives: ['fill'], keywords: ['eye', 'show', 'view', 'visible'] },
+      { filename: 'mode-dark', alternatives: ['fill'], keywords: ['night', 'theme', 'moon'] },
+      { filename: 'mode-light', alternatives: ['fill'], keywords: ['day', 'theme', 'sun', 'brightness'] }
+    ]
+  },
+  {
+    slug: 'status',
+    icons: [
+      { filename: 'info', alternatives: ['fill'], keywords: ['information', 'help', 'details', 'about'] },
+      { filename: 'help', alternatives: ['fill'], keywords: ['question', 'support', 'faq'] },
+      { filename: 'warning', alternatives: ['fill'], keywords: ['alert', 'caution', 'attention', 'error'] },
+      { filename: 'notifications', alternatives: ['fill'], keywords: ['bell', 'alert', 'alarm'] },
+      { filename: 'clock', alternatives: ['fill'], keywords: ['time', 'schedule', 'hour'] },
+      { filename: 'hourglass', alternatives: ['fill'], keywords: ['time', 'wait', 'loading', 'timer'] },
+      { filename: 'calendar-month', alternatives: ['fill'], keywords: ['date', 'month', 'schedule', 'event'] },
+      { filename: 'calendar-text', alternatives: ['fill'], keywords: ['date', 'event', 'schedule', 'agenda'] }
+    ]
+  },
+  {
+    slug: 'misc',
+    icons: [
+      { filename: 'bolt', alternatives: ['fill'], keywords: ['flash', 'energy', 'power', 'fast', 'lightning'] },
+      { filename: 'lightbulb', alternatives: ['fill'], keywords: ['idea', 'tip', 'hint', 'bright'] },
+      { filename: 'rocket', alternatives: ['fill'], keywords: ['launch', 'startup', 'fast', 'boost'] },
+      { filename: 'rocket-launch', alternatives: ['fill'], keywords: ['launch', 'startup', 'boost', 'space'] },
+      { filename: 'palette', alternatives: ['fill'], keywords: ['color', 'design', 'art', 'theme', 'paint'] },
+      { filename: 'label', alternatives: ['fill'], keywords: ['tag', 'badge', 'category'] },
+      { filename: 'construction', alternatives: [], keywords: ['maintenance', 'work', 'build', 'tools'] },
+      { filename: 'wp-block', alternatives: ['fill'], keywords: ['wordpress', 'gutenberg', 'brick'] }
     ]
   }
 ];
