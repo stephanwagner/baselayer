@@ -1,4 +1,9 @@
-import { iconCategories, hasFill } from './icon-catalog';
+import {
+  iconCategories,
+  resolveIconName,
+  iconMatchesQuery,
+  findIconByValue
+} from './icon-catalog';
 
 const { Button, Modal, SearchControl, ToggleControl } = wp.components;
 const ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
@@ -7,35 +12,29 @@ const ToggleGroupControlOption =
 const { useState } = wp.element;
 const { __ } = wp.i18n;
 
-const isFillValue = (value) =>
-  typeof value === 'string' && value.slice(-5) === '-fill';
-
 /**
  * Reusable icon picker with an outline/filled toggle.
  *
- * The value is the resolved icon name (e.g. `heart`, `heart-fill`, `arrow-left`)
- * or an empty string. The filled toggle is global for the modal: filled icons
- * switch to their `-fill` variant, while icons without one stay outline so they
- * remain selectable.
+ * The value is the resolved icon file name (e.g. `heart`, `heart-fill`,
+ * `arrow-left`) or an empty string. The filled toggle is global for the modal:
+ * icons that declare a `fill` alternative switch to it, while icons without one
+ * stay outline so they remain visible and selectable.
  *
  * @param {Object}   props
  * @param {string}   [props.label]  Optional field label.
- * @param {string}   props.value    Selected icon name, or '' when none.
- * @param {Function} props.onChange Receives the resolved icon name (or '').
+ * @param {string}   props.value    Selected icon file name, or '' when none.
+ * @param {Function} props.onChange Receives the resolved icon file name (or '').
  */
 export function IconPicker({ label, value, onChange }) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [variant, setVariant] = useState(
-    isFillValue(value) ? 'fill' : 'outline'
-  );
+  const [variant, setVariant] = useState(() => {
+    const selected = findIconByValue(value);
+    return selected ? selected.variant : 'outline';
+  });
 
   const query = search.trim().toLowerCase();
-  const filled = variant === 'fill';
-
-  // Resolve a base icon name to the variant to show/store. Icons without a
-  // filled version fall back to their outline so they stay visible when filled.
-  const resolve = (name) => (filled && hasFill(name) ? name + '-fill' : name);
+  const selected = findIconByValue(value);
 
   const renderVariantToggle = () => {
     if (ToggleGroupControl && ToggleGroupControlOption) {
@@ -65,7 +64,7 @@ export function IconPicker({ label, value, onChange }) {
       <ToggleControl
         className="fs-icon-picker__variant"
         label={__('Gefüllt', 'fromscratch')}
-        checked={filled}
+        checked={variant === 'fill'}
         onChange={(next) => setVariant(next ? 'fill' : 'outline')}
         __nextHasNoMarginBottom
       />
@@ -85,7 +84,9 @@ export function IconPicker({ label, value, onChange }) {
           {value ? (
             <span className={'fs-icon -icon-' + value} aria-hidden="true" />
           ) : null}
-          <span>{value || __('Icon wählen', 'fromscratch')}</span>
+          <span>
+            {selected ? selected.icon.name : __('Icon wählen', 'fromscratch')}
+          </span>
         </Button>
 
         {value ? (
@@ -118,9 +119,9 @@ export function IconPicker({ label, value, onChange }) {
 
           <div className="fs-icon-picker__categories">
             {iconCategories.map((category) => {
-              const icons = query
-                ? category.icons.filter((name) => name.includes(query))
-                : category.icons;
+              const icons = category.icons.filter((icon) =>
+                iconMatchesQuery(icon, query)
+              );
 
               if (!icons.length) {
                 return null;
@@ -132,12 +133,12 @@ export function IconPicker({ label, value, onChange }) {
                     {category.label}
                   </h3>
                   <div className="fs-icon-picker__grid">
-                    {icons.map((name) => {
-                      const resolved = resolve(name);
+                    {icons.map((icon) => {
+                      const resolved = resolveIconName(icon, variant);
 
                       return (
                         <button
-                          key={name}
+                          key={icon.filename}
                           type="button"
                           className={
                             'fs-icon-picker__item' +
@@ -147,8 +148,8 @@ export function IconPicker({ label, value, onChange }) {
                             onChange(resolved);
                             setIsOpen(false);
                           }}
-                          aria-label={name}
-                          title={name}
+                          aria-label={icon.name}
+                          title={icon.name}
                         >
                           <span
                             className={'fs-icon -icon-' + resolved}
