@@ -30,6 +30,27 @@ const iconName = (icon) => iconLabels[icon.filename] || humanize(icon.filename);
 const categoryName = (category) =>
   categoryLabels[category.slug] || humanize(category.slug);
 
+// Remember the outline/filled preference across pickers and sessions.
+const VARIANT_STORAGE_KEY = 'fromscratchIconVariant';
+
+const readStoredVariant = () => {
+  try {
+    return window.localStorage.getItem(VARIANT_STORAGE_KEY) === 'fill'
+      ? 'fill'
+      : 'outline';
+  } catch (e) {
+    return 'outline';
+  }
+};
+
+const writeStoredVariant = (variant) => {
+  try {
+    window.localStorage.setItem(VARIANT_STORAGE_KEY, variant);
+  } catch (e) {
+    // Storage may be unavailable (private mode / disabled) — ignore.
+  }
+};
+
 /**
  * Reusable icon picker with an outline/filled toggle.
  *
@@ -48,11 +69,18 @@ export function IconPicker({ label, value, onChange }) {
   const [search, setSearch] = useState('');
   const [variant, setVariant] = useState(() => {
     const selected = findIconByValue(value);
-    return selected ? selected.variant : 'outline';
+    // Match the current icon when editing; otherwise use the saved preference.
+    return selected ? selected.variant : readStoredVariant();
   });
 
   const query = search.trim().toLowerCase();
   const selected = findIconByValue(value);
+
+  // Update the toggle and persist the choice for next time.
+  const changeVariant = (next) => {
+    setVariant(next);
+    writeStoredVariant(next);
+  };
 
   const renderVariantToggle = () => {
     if (ToggleGroupControl && ToggleGroupControlOption) {
@@ -63,7 +91,7 @@ export function IconPicker({ label, value, onChange }) {
           hideLabelFromVision
           isBlock
           value={variant}
-          onChange={setVariant}
+          onChange={changeVariant}
           __nextHasNoMarginBottom
         >
           <ToggleGroupControlOption
@@ -83,7 +111,7 @@ export function IconPicker({ label, value, onChange }) {
         className="fs-icon-picker__variant"
         label={t('filled', 'Filled')}
         checked={variant === 'fill'}
-        onChange={(next) => setVariant(next ? 'fill' : 'outline')}
+        onChange={(next) => changeVariant(next ? 'fill' : 'outline')}
         __nextHasNoMarginBottom
       />
     );
