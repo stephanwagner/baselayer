@@ -718,6 +718,14 @@ msgid "Credit card"
 msgstr "Kreditkarte"
 
 msgctxt "icon name"
+msgid "Payment card"
+msgstr "Zahlungskarte"
+
+msgctxt "icon name"
+msgid "Contactless"
+msgstr "Kontaktlos"
+
+msgctxt "icon name"
 msgid "Payments"
 msgstr "Zahlungen"
 
@@ -736,6 +744,34 @@ msgstr "Pfund"
 msgctxt "icon name"
 msgid "Yen"
 msgstr "Yen"
+
+msgctxt "icon name"
+msgid "Franc"
+msgstr "Franc"
+
+msgctxt "icon name"
+msgid "Lira"
+msgstr "Lira"
+
+msgctxt "icon name"
+msgid "Ruble"
+msgstr "Rubel"
+
+msgctxt "icon name"
+msgid "Rupee"
+msgstr "Rupie"
+
+msgctxt "icon name"
+msgid "Yuan"
+msgstr "Yuan"
+
+msgctxt "icon name"
+msgid "Bitcoin"
+msgstr "Bitcoin"
+
+msgctxt "icon name"
+msgid "Currency exchange"
+msgstr "Währungsumtausch"
 
 msgctxt "icon name"
 msgid "Sell"

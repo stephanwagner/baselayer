@@ -40,6 +40,7 @@ const builtInCategories = [
       { filename: 'drop-up', alternatives: [], keywords: ['caret', 'up', 'collapse'] },
       { filename: 'drop-down', alternatives: [], keywords: ['caret', 'down', 'dropdown'] },
       { filename: 'subdirectory-arrow', alternatives: [], keywords: ['return', 'nested', 'enter', 'branch'] },
+      { filename: 'compare', alternatives: [], keywords: ['versus', 'difference', 'split'] },
       { filename: 'swap-horizontal', alternatives: [], keywords: ['exchange', 'switch', 'transfer', 'arrows'] },
       { filename: 'swap-vertical', alternatives: [], keywords: ['exchange', 'switch', 'reorder', 'arrows'] },
       { filename: 'expand', alternatives: [], keywords: ['enlarge', 'maximize', 'arrows'] },
@@ -82,7 +83,8 @@ const builtInCategories = [
       { filename: 'undo', alternatives: [], keywords: ['back', 'revert', 'arrow'] },
       { filename: 'redo', alternatives: [], keywords: ['forward', 'repeat', 'arrow'] },
       { filename: 'crop', alternatives: [], keywords: ['trim', 'resize', 'image'] },
-      { filename: 'compare', alternatives: [], keywords: ['versus', 'difference', 'split'] }
+      { filename: 'drag', alternatives: [], keywords: ['move', 'reorder', 'handle', 'grab'] },
+      { filename: 'drag-handle', alternatives: [], keywords: ['move', 'reorder', 'handle', 'grab'] },
     ]
   },
   {
@@ -140,8 +142,8 @@ const builtInCategories = [
       { filename: 'smiley-neutral', alternatives: ['fill'], keywords: ['emoji', 'meh', 'mood'] },
       { filename: 'smiley-sad', alternatives: ['fill'], keywords: ['emoji', 'frown', 'negative', 'mood'] },
       { filename: 'share', alternatives: [], keywords: ['network', 'nodes', 'send'] },
-      { filename: 'share-social', alternatives: [], keywords: ['social', 'network', 'send'] },,
-      { filename: 'rss', alternatives: [], keywords: ['feed', 'subscribe', 'syndication', 'blog'] }
+      { filename: 'share-social', alternatives: [], keywords: ['social', 'network', 'send'] },
+      { filename: 'rss', alternatives: [], keywords: ['feed', 'subscribe', 'syndication', 'blog'] },
       { filename: 'flag', alternatives: ['fill'], keywords: ['report', 'mark', 'banner'] },
       { filename: 'bookmark', alternatives: ['fill'], keywords: ['save', 'favorite', 'mark'] }
     ]
@@ -155,8 +157,8 @@ const builtInCategories = [
       { filename: 'videocam', alternatives: ['fill'], keywords: ['video', 'record', 'film'] },
       { filename: 'carousel', alternatives: ['fill'], keywords: ['slider', 'gallery', 'slideshow'] },
       { filename: 'play', alternatives: ['fill'], keywords: ['start', 'video', 'media'] },
-      { filename: 'play-box', alternatives: ['fill'], keywords: ['video', 'media', 'start'] },
       { filename: 'play-circle', alternatives: ['fill'], keywords: ['video', 'media', 'start'] },
+      { filename: 'play-box', alternatives: ['fill'], keywords: ['video', 'media', 'start'] },
       { filename: 'pause', alternatives: ['fill'], keywords: ['media', 'player', 'controls', 'stop'] },
       { filename: 'stop', alternatives: ['fill'], keywords: ['media', 'player', 'controls', 'square', 'end'] },
       { filename: 'skip-next', alternatives: ['fill'], keywords: ['next', 'forward', 'media', 'player', 'track', 'controls'] },
@@ -164,9 +166,9 @@ const builtInCategories = [
       { filename: 'music', alternatives: [], keywords: ['note', 'audio', 'song', 'sound'] },
       { filename: 'headphones', alternatives: ['fill'], keywords: ['audio', 'listen', 'sound', 'music'] },
       { filename: 'volume-mute', alternatives: ['fill'], keywords: ['sound', 'silent', 'off', 'speaker'] },
-      { filename: 'volume-off', alternatives: ['fill'], keywords: ['mute', 'silent', 'sound', 'speaker'] },
       { filename: 'volume-down', alternatives: ['fill'], keywords: ['sound', 'audio', 'quieter', 'speaker'] },
       { filename: 'volume-up', alternatives: ['fill'], keywords: ['sound', 'audio', 'louder', 'speaker'] },
+      { filename: 'volume-off', alternatives: ['fill'], keywords: ['mute', 'silent', 'sound', 'speaker'] },
     ]
   },
   {
@@ -219,18 +221,28 @@ const builtInCategories = [
       { filename: 'shopping-cart-remove', alternatives: [], keywords: ['cart', 'minus', 'remove'] },
       { filename: 'shopping-basket', alternatives: ['fill'], keywords: ['basket', 'buy', 'cart'] },
       { filename: 'credit-card', alternatives: ['fill'], keywords: ['payment', 'card', 'pay'] },
+      { filename: 'payment-card', alternatives: ['fill'], keywords: ['payment', 'card', 'credit card', 'debit', 'pay'] },
+      { filename: 'contactless', alternatives: ['fill'], keywords: ['payment', 'tap', 'nfc', 'wireless', 'pay'] },
       { filename: 'payments', alternatives: ['fill'], keywords: ['money', 'pay', 'cash', 'finance'] },
+      { filename: 'currency-dollar', alternatives: [], keywords: ['money', 'usd', 'price'] },
+      { filename: 'currency-euro', alternatives: [], keywords: ['money', 'eur', 'price'] },
+      { filename: 'currency-pound', alternatives: [], keywords: ['money', 'gbp', 'price'] },
+      { filename: 'currency-yen', alternatives: [], keywords: ['money', 'jpy', 'price'] },
+      { filename: 'currency-franc', alternatives: [], keywords: ['money', 'chf', 'franc', 'swiss', 'price'] },
+      { filename: 'currency-lira', alternatives: [], keywords: ['money', 'try', 'lira', 'turkish', 'price'] },
+      { filename: 'currency-ruble', alternatives: [], keywords: ['money', 'rub', 'ruble', 'russian', 'price'] },
+      { filename: 'currency-rupee', alternatives: [], keywords: ['money', 'inr', 'rupee', 'indian', 'price'] },
+      { filename: 'currency-yuan', alternatives: [], keywords: ['money', 'cny', 'yuan', 'renminbi', 'chinese', 'price'] },
+      { filename: 'currency-bitcoin', alternatives: [], keywords: ['money', 'btc', 'bitcoin', 'crypto', 'cryptocurrency'] },
+      { filename: 'currency-exchange', alternatives: [], keywords: ['money', 'exchange', 'convert', 'forex', 'rates'] },
+      { filename: 'sell', alternatives: ['fill'], keywords: ['tag', 'price', 'offer', 'sale'] },
+      // Payment brands (non-Material logos) sit at the end of the category.
       { filename: 'visa', alternatives: [], keywords: ['payment', 'card', 'credit card', 'brand'] },
       { filename: 'mastercard', alternatives: [], keywords: ['payment', 'card', 'credit card', 'brand'] },
       { filename: 'paypal', alternatives: [], keywords: ['payment', 'pay', 'wallet', 'brand'] },
       { filename: 'applepay', alternatives: [], keywords: ['payment', 'apple', 'pay', 'wallet', 'brand'] },
       { filename: 'googlepay', alternatives: [], keywords: ['payment', 'google', 'pay', 'wallet', 'brand'] },
-      { filename: 'klarna', alternatives: [], keywords: ['payment', 'pay', 'bnpl', 'buy now pay later', 'brand'] },
-      { filename: 'currency-dollar', alternatives: [], keywords: ['money', 'usd', 'price'] },
-      { filename: 'currency-euro', alternatives: [], keywords: ['money', 'eur', 'price'] },
-      { filename: 'currency-pound', alternatives: [], keywords: ['money', 'gbp', 'price'] },
-      { filename: 'currency-yen', alternatives: [], keywords: ['money', 'jpy', 'price'] },
-      { filename: 'sell', alternatives: ['fill'], keywords: ['tag', 'price', 'offer', 'sale'] }
+      { filename: 'klarna', alternatives: [], keywords: ['payment', 'pay', 'bnpl', 'buy now pay later', 'brand'] }
     ]
   },
   {
@@ -272,8 +284,6 @@ const builtInCategories = [
       { filename: 'touch', alternatives: ['fill'], keywords: ['tap', 'finger', 'gesture'] },
       { filename: 'click', alternatives: [], keywords: ['tap', 'cursor', 'select'] },
       { filename: 'pointer', alternatives: ['fill'], keywords: ['cursor', 'click', 'select', 'arrow', 'mouse'] },
-      { filename: 'drag', alternatives: [], keywords: ['move', 'reorder', 'handle', 'grab'] },
-      { filename: 'drag-handle', alternatives: [], keywords: ['move', 'reorder', 'handle', 'grab'] },
       { filename: 'barcode', alternatives: [], keywords: ['scan', 'product', 'code'] },
       { filename: 'barcode-scan', alternatives: [], keywords: ['scan', 'product', 'code'] },
       { filename: 'power-off', alternatives: [], keywords: ['shutdown', 'standby', 'on', 'off'] }
