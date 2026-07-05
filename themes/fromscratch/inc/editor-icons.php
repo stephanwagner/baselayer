@@ -355,6 +355,7 @@ function fs_icon_labels(): array
 		'gavel'                    => _x('Gavel', 'icon name', 'fromscratch-icons'),
 		'balance'                  => _x('Balance', 'icon name', 'fromscratch-icons'),
 		'license'                  => _x('License', 'icon name', 'fromscratch-icons'),
+		'unlicense'                => _x('Unlicensed', 'icon name', 'fromscratch-icons'),
 		'copyright'                => _x('Copyright', 'icon name', 'fromscratch-icons'),
 		// Payment brands (proper nouns; not translated).
 		'visa'                   => _x('Visa', 'icon name', 'fromscratch-icons'),
@@ -584,6 +585,8 @@ function fs_icon_labels(): array
 		'hockey'                   => _x('Hockey', 'icon name', 'fromscratch-icons'),
 		'fitness'                  => _x('Fitness', 'icon name', 'fromscratch-icons'),
 		'whistle'                  => _x('Whistle', 'icon name', 'fromscratch-icons'),
+		'medal'                    => _x('Medal', 'icon name', 'fromscratch-icons'),
+		'medals'                   => _x('Medals', 'icon name', 'fromscratch-icons'),
 
 		// Health & medical.
 		'health-cross'           => _x('Health', 'icon name', 'fromscratch-icons'),
@@ -640,11 +643,11 @@ function fs_icon_labels(): array
 		'engineering'            => _x('Engineering', 'icon name', 'fromscratch-icons'),
 		'deployed'               => _x('Deployed', 'icon name', 'fromscratch-icons'),
 		'editor-choice'          => _x("Editor's choice", 'icon name', 'fromscratch-icons'),
+		'star-shine'             => _x('Star shine', 'icon name', 'fromscratch-icons'),
 		'rocket'                 => _x('Rocket', 'icon name', 'fromscratch-icons'),
 		'rocket-launch'          => _x('Rocket launch', 'icon name', 'fromscratch-icons'),
 		'planet'                 => _x('Planet', 'icon name', 'fromscratch-icons'),
 		'diamond'                => _x('Diamond', 'icon name', 'fromscratch-icons'),
-		'premium'                => _x('Premium', 'icon name', 'fromscratch-icons'),
 		'crown'                  => _x('Crown', 'icon name', 'fromscratch-icons'),
 		'school'                 => _x('School', 'icon name', 'fromscratch-icons'),
 		'interests'              => _x('Interests', 'icon name', 'fromscratch-icons'),

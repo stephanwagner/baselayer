@@ -211,7 +211,7 @@ function fs_render_developer_cheatsheet(): void
 				}
 
 				$icon_ui_strings = function_exists('fs_icon_ui_strings') ? fs_icon_ui_strings() : [];
-				$button_icon = 'premium-fill';
+				$button_icon = 'medal-fill';
 				$button_icon_class = '-icon-' . $button_icon;
 				$button_code = '<button type="button" class="button -has-icon ' . $button_icon_class . '">Button</button>';
 				$inline_before_icon = 'open-in-new';

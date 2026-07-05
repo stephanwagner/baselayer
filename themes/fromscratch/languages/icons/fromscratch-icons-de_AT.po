@@ -830,8 +830,12 @@ msgid "Sell tag"
 msgstr "Preisschild"
 
 msgctxt "icon name"
-msgid "Premium"
-msgstr "Premium"
+msgid "Medal"
+msgstr "Medaille"
+
+msgctxt "icon name"
+msgid "Medals"
+msgstr "Medaillen"
 
 msgctxt "icon name"
 msgid "Upgrade"
@@ -1645,6 +1649,11 @@ msgstr "Kiefer"
 msgctxt "icon name"
 msgid "Editor's choice"
 msgstr "Redaktionstipp"
+
+msgctxt "icon name"
+msgid "Star shine"
+msgstr "Strahlender Stern"
+
 msgctxt "icon name"
 msgid "Shirt"
 msgstr "Hemd"
@@ -1806,6 +1815,11 @@ msgstr "Richterhammer"
 msgctxt "icon name"
 msgid "License"
 msgstr "Lizenz"
+
+msgctxt "icon name"
+msgid "Unlicensed"
+msgstr "Ohne Lizenz"
+
 msgctxt "icon name"
 msgid "Balance"
 msgstr "Waage"
