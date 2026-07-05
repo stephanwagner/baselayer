@@ -478,11 +478,11 @@ function fs_icon_labels(): array
 		'fingerprint'              => _x('Fingerprint', 'icon name', 'fromscratch-icons'),
 		'password'                 => _x('Password', 'icon name', 'fromscratch-icons'),
 		'shield-info'              => _x('Shield info', 'icon name', 'fromscratch-icons'),
-		'shield-health'            => _x('Shield health', 'icon name', 'fromscratch-icons'),
 
 		// Controls & settings.
 		'settings'               => _x('Settings', 'icon name', 'fromscratch-icons'),
 		'tune'                   => _x('Tune', 'icon name', 'fromscratch-icons'),
+		'tune-alt'               => _x('Tune (alt)', 'icon name', 'fromscratch-icons'),
 		'build'                  => _x('Build', 'icon name', 'fromscratch-icons'),
 		'sort'                   => _x('Sort', 'icon name', 'fromscratch-icons'),
 		'sort-by-alpha'          => _x('Sort alphabetically', 'icon name', 'fromscratch-icons'),
@@ -533,6 +533,7 @@ function fs_icon_labels(): array
 		'sunny'                  => _x('Sunny', 'icon name', 'fromscratch-icons'),
 		'rain'                   => _x('Rain', 'icon name', 'fromscratch-icons'),
 		'thunderstorm'           => _x('Thunderstorm', 'icon name', 'fromscratch-icons'),
+		'snowy'                  => _x('Snowy', 'icon name', 'fromscratch-icons'),
 		'snowflake'              => _x('Snowflake', 'icon name', 'fromscratch-icons'),
 		'mixed-weather'          => _x('Mixed weather', 'icon name', 'fromscratch-icons'),
 		'partly-cloudy'          => _x('Partly cloudy', 'icon name', 'fromscratch-icons'),
@@ -590,20 +591,21 @@ function fs_icon_labels(): array
 
 		// Health & medical.
 		'health-cross'           => _x('Health', 'icon name', 'fromscratch-icons'),
-		'medical-mask'           => _x('Medical mask', 'icon name', 'fromscratch-icons'),
+		'shield-health'            => _x('Shield health', 'icon name', 'fromscratch-icons'),
 		'medical-services'       => _x('Medical services', 'icon name', 'fromscratch-icons'),
-		'labs'                   => _x('Labs', 'icon name', 'fromscratch-icons'),
-		'science'                => _x('Science', 'icon name', 'fromscratch-icons'),
-		'allergies'                => _x('Allergies', 'icon name', 'fromscratch-icons'),
-		'cardiology'               => _x('Cardiology', 'icon name', 'fromscratch-icons'),
-		'dna'                      => _x('DNA', 'icon name', 'fromscratch-icons'),
-		'fluid'                    => _x('Fluid', 'icon name', 'fromscratch-icons'),
-		'fluid-syringe'            => _x('Syringe', 'icon name', 'fromscratch-icons'),
 		'healing'                  => _x('Healing', 'icon name', 'fromscratch-icons'),
+		'vital-signs'              => _x('Vital signs', 'icon name', 'fromscratch-icons'),
+		'medical-mask'           => _x('Medical mask', 'icon name', 'fromscratch-icons'),
 		'medical-mask-alt'         => _x('Medical mask (alt)', 'icon name', 'fromscratch-icons'),
 		'pill'                     => _x('Pill', 'icon name', 'fromscratch-icons'),
-		'vital-signs'              => _x('Vital signs', 'icon name', 'fromscratch-icons'),
+		'fluid'                    => _x('Fluid', 'icon name', 'fromscratch-icons'),
+		'fluid-syringe'            => _x('Syringe', 'icon name', 'fromscratch-icons'),
+		'cardiology'               => _x('Cardiology', 'icon name', 'fromscratch-icons'),
+		'allergies'                => _x('Allergies', 'icon name', 'fromscratch-icons'),
 		'virus'                    => _x('Virus', 'icon name', 'fromscratch-icons'),
+		'labs'                   => _x('Labs', 'icon name', 'fromscratch-icons'),
+		'science'                => _x('Science', 'icon name', 'fromscratch-icons'),
+		'dna'                      => _x('DNA', 'icon name', 'fromscratch-icons'),
 
 		// Nature & environment.
 		'forest'                 => _x('Forest', 'icon name', 'fromscratch-icons'),
@@ -620,6 +622,7 @@ function fs_icon_labels(): array
 		'pet-supplies'           => _x('Pet supplies', 'icon name', 'fromscratch-icons'),
 		'owl'                    => _x('Owl', 'icon name', 'fromscratch-icons'),
 		'bird'                   => _x('Bird', 'icon name', 'fromscratch-icons'),
+		'bug'                      => _x('Bug', 'icon name', 'fromscratch-icons'),
 		'mountain'               => _x('Mountain', 'icon name', 'fromscratch-icons'),
 		'landscape-alt'          => _x('Scenery', 'icon name', 'fromscratch-icons'),
 		'beach'                  => _x('Beach', 'icon name', 'fromscratch-icons'),
@@ -664,7 +667,6 @@ function fs_icon_labels(): array
 		'work'                   => _x('Work', 'icon name', 'fromscratch-icons'),
 		'ticket-alt'             => _x('Ticket (alt)', 'icon name', 'fromscratch-icons'),
 
-		'bug'                      => _x('Bug', 'icon name', 'fromscratch-icons'),
 		'fire-extinguisher'        => _x('Fire extinguisher', 'icon name', 'fromscratch-icons'),
 		'fire-hydrant'             => _x('Fire hydrant', 'icon name', 'fromscratch-icons'),
 		// Brands (proper nouns; source strings are the brand names and are not
