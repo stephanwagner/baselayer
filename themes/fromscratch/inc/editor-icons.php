@@ -86,6 +86,9 @@ function fs_icon_labels(): array
 		'drop-right'             => _x('Drop right', 'icon name', 'fromscratch-icons'),
 		'dropdown'               => _x('Dropdown', 'icon name', 'fromscratch-icons'),
 		'signpost'               => _x('Signpost', 'icon name', 'fromscratch-icons'),
+		'zoom-in-map'              => _x('Zoom in map', 'icon name', 'fromscratch-icons'),
+		'zoom-out-map'             => _x('Zoom out map', 'icon name', 'fromscratch-icons'),
+		'browse'                   => _x('Browse', 'icon name', 'fromscratch-icons'),
 
 		// Actions.
 		'add'                    => _x('Add', 'icon name', 'fromscratch-icons'),
@@ -120,6 +123,14 @@ function fs_icon_labels(): array
 		'redo'                   => _x('Redo', 'icon name', 'fromscratch-icons'),
 		'drag'                   => _x('Drag indicator', 'icon name', 'fromscratch-icons'),
 		'drag-handle'            => _x('Drag handle', 'icon name', 'fromscratch-icons'),
+		'compare-text'             => _x('Compare text', 'icon name', 'fromscratch-icons'),
+		'contract-sign'            => _x('Sign contract', 'icon name', 'fromscratch-icons'),
+		'resize'                   => _x('Resize', 'icon name', 'fromscratch-icons'),
+		'split'                    => _x('Split', 'icon name', 'fromscratch-icons'),
+		'swipe-left-right'         => _x('Swipe left/right', 'icon name', 'fromscratch-icons'),
+		'swipe-up-down'            => _x('Swipe up/down', 'icon name', 'fromscratch-icons'),
+		'content-cut'              => _x('Cut', 'icon name', 'fromscratch-icons'),
+		'signature'                => _x('Signature', 'icon name', 'fromscratch-icons'),
 
 		// Editing & text.
 		'edit'                   => _x('Edit', 'icon name', 'fromscratch-icons'),
@@ -154,6 +165,7 @@ function fs_icon_labels(): array
 		'book-open'              => _x('Book open', 'icon name', 'fromscratch-icons'),
 		'stories'                => _x('Stories', 'icon name', 'fromscratch-icons'),
 		'edit-square'            => _x('Edit square', 'icon name', 'fromscratch-icons'),
+		'menu-book'                => _x('Menu book', 'icon name', 'fromscratch-icons'),
 
 		// Communication.
 		'chat'                   => _x('Chat', 'icon name', 'fromscratch-icons'),
@@ -166,6 +178,7 @@ function fs_icon_labels(): array
 		'phone'                  => _x('Phone', 'icon name', 'fromscratch-icons'),
 		'send'                   => _x('Send', 'icon name', 'fromscratch-icons'),
 		'megaphone'              => _x('Megaphone', 'icon name', 'fromscratch-icons'),
+		'chat-dashed'              => _x('Chat (dashed)', 'icon name', 'fromscratch-icons'),
 
 		// Social & feedback.
 		'heart'                  => _x('Heart', 'icon name', 'fromscratch-icons'),
@@ -191,6 +204,7 @@ function fs_icon_labels(): array
 		'bookmark-heart'         => _x('Bookmark heart', 'icon name', 'fromscratch-icons'),
 		'bookmark-stacks'        => _x('Bookmark stacks', 'icon name', 'fromscratch-icons'),
 		'badge'                  => _x('Badge', 'icon name', 'fromscratch-icons'),
+		'smiley'                   => _x('Smiley', 'icon name', 'fromscratch-icons'),
 
 		// Media.
 		'image'                  => _x('Image', 'icon name', 'fromscratch-icons'),
@@ -217,6 +231,8 @@ function fs_icon_labels(): array
 		'volume-down'            => _x('Volume down', 'icon name', 'fromscratch-icons'),
 		'volume-up'              => _x('Volume up', 'icon name', 'fromscratch-icons'),
 		'volume-off'             => _x('Volume off', 'icon name', 'fromscratch-icons'),
+		'image-broken'             => _x('Broken image', 'icon name', 'fromscratch-icons'),
+		'colors'                   => _x('Colors', 'icon name', 'fromscratch-icons'),
 
 		// Files & storage.
 		'folder'                 => _x('Folder', 'icon name', 'fromscratch-icons'),
@@ -229,6 +245,8 @@ function fs_icon_labels(): array
 		'database'               => _x('Database', 'icon name', 'fromscratch-icons'),
 		'cloud'                  => _x('Cloud', 'icon name', 'fromscratch-icons'),
 		'backup'                 => _x('Backup', 'icon name', 'fromscratch-icons'),
+		'archive'                  => _x('Archive', 'icon name', 'fromscratch-icons'),
+		'folder-copy'              => _x('Copy folder', 'icon name', 'fromscratch-icons'),
 
 		// Analytics & data.
 		'chart-pie'              => _x('Pie chart', 'icon name', 'fromscratch-icons'),
@@ -243,6 +261,13 @@ function fs_icon_labels(): array
 		'dashboard-alt'          => _x('Dashboard (alt)', 'icon name', 'fromscratch-icons'),
 		'data-table'             => _x('Data table', 'icon name', 'fromscratch-icons'),
 		'table'                  => _x('Table', 'icon name', 'fromscratch-icons'),
+		'analytics'                => _x('Analytics', 'icon name', 'fromscratch-icons'),
+		'chart-area'               => _x('Area chart', 'icon name', 'fromscratch-icons'),
+		'chart-bubble'             => _x('Bubble chart', 'icon name', 'fromscratch-icons'),
+		'chart-line'               => _x('Line chart', 'icon name', 'fromscratch-icons'),
+		'chart-line-alt'           => _x('Line chart (alt)', 'icon name', 'fromscratch-icons'),
+		'leaderboard'              => _x('Leaderboard', 'icon name', 'fromscratch-icons'),
+		'scoreboard'               => _x('Scoreboard', 'icon name', 'fromscratch-icons'),
 
 		// Layout & blocks.
 		'grid'                   => _x('Grid', 'icon name', 'fromscratch-icons'),
@@ -262,6 +287,9 @@ function fs_icon_labels(): array
 		'widgets'                => _x('Widgets', 'icon name', 'fromscratch-icons'),
 		'cards'                  => _x('Cards', 'icon name', 'fromscratch-icons'),
 		'stacks'                 => _x('Stacks', 'icon name', 'fromscratch-icons'),
+		'aspect-ratio'             => _x('Aspect ratio', 'icon name', 'fromscratch-icons'),
+		'toolbar'                  => _x('Toolbar', 'icon name', 'fromscratch-icons'),
+		'call-to-action'           => _x('Call to action', 'icon name', 'fromscratch-icons'),
 
 		// Commerce & finance.
 		'shopping-cart'          => _x('Shopping cart', 'icon name', 'fromscratch-icons'),
@@ -288,6 +316,19 @@ function fs_icon_labels(): array
 		'currency-bitcoin'       => _x('Bitcoin', 'icon name', 'fromscratch-icons'),
 		'bank'                   => _x('Bank', 'icon name', 'fromscratch-icons'),
 		'wallet'                 => _x('Wallet', 'icon name', 'fromscratch-icons'),
+		'contract'                 => _x('Contract', 'icon name', 'fromscratch-icons'),
+		'atm'                      => _x('ATM', 'icon name', 'fromscratch-icons'),
+		'dollar-circle'            => _x('Dollar circle', 'icon name', 'fromscratch-icons'),
+		'finance-chip'             => _x('Finance chip', 'icon name', 'fromscratch-icons'),
+		'money-bag'                => _x('Money bag', 'icon name', 'fromscratch-icons'),
+		'savings'                  => _x('Savings', 'icon name', 'fromscratch-icons'),
+		'shopping-bag'             => _x('Shopping bag', 'icon name', 'fromscratch-icons'),
+		'universal-currency'       => _x('Universal currency', 'icon name', 'fromscratch-icons'),
+		'wallet-alt'               => _x('Wallet (alt)', 'icon name', 'fromscratch-icons'),
+		'handshake'                => _x('Handshake', 'icon name', 'fromscratch-icons'),
+		'gavel'                    => _x('Gavel', 'icon name', 'fromscratch-icons'),
+		'license'                  => _x('License', 'icon name', 'fromscratch-icons'),
+		'balance'                  => _x('Balance', 'icon name', 'fromscratch-icons'),
 		'receipt'                => _x('Receipt', 'icon name', 'fromscratch-icons'),
 		// Payment brands (proper nouns; not translated).
 		'visa'                   => _x('Visa', 'icon name', 'fromscratch-icons'),
@@ -311,6 +352,9 @@ function fs_icon_labels(): array
 		'pregnant-woman'         => _x('Pregnant woman', 'icon name', 'fromscratch-icons'),
 		'accessibility'          => _x('Accessibility', 'icon name', 'fromscratch-icons'),
 		'accessibility-alt'      => _x('Accessibility (alt)', 'icon name', 'fromscratch-icons'),
+		'account-box'              => _x('Account box', 'icon name', 'fromscratch-icons'),
+		'passport'                 => _x('Passport', 'icon name', 'fromscratch-icons'),
+		'sign-language'            => _x('Sign language', 'icon name', 'fromscratch-icons'),
 
 		// Maps & places.
 		'location'               => _x('Location', 'icon name', 'fromscratch-icons'),
@@ -338,6 +382,11 @@ function fs_icon_labels(): array
 		'plane'                  => _x('Airplane', 'icon name', 'fromscratch-icons'),
 		'parking'                => _x('Parking', 'icon name', 'fromscratch-icons'),
 		'recenter'               => _x('Recenter', 'icon name', 'fromscratch-icons'),
+		'anchor'                   => _x('Anchor', 'icon name', 'fromscratch-icons'),
+		'map-search'               => _x('Map search', 'icon name', 'fromscratch-icons'),
+		'globe-america'            => _x('Globe (Americas)', 'icon name', 'fromscratch-icons'),
+		'globe-asia'               => _x('Globe (Asia)', 'icon name', 'fromscratch-icons'),
+		'motorcycle'               => _x('Motorcycle', 'icon name', 'fromscratch-icons'),
 
 		// Devices & interaction.
 		'laptop'                 => _x('Laptop', 'icon name', 'fromscratch-icons'),
@@ -357,6 +406,19 @@ function fs_icon_labels(): array
 		'qr-code'                => _x('QR code', 'icon name', 'fromscratch-icons'),
 		'qr-code-alt'            => _x('QR code (alt)', 'icon name', 'fromscratch-icons'),
 		'qr-code-scan'           => _x('QR code scan', 'icon name', 'fromscratch-icons'),
+		'monitor'                  => _x('Monitor', 'icon name', 'fromscratch-icons'),
+		'keyboard'                 => _x('Keyboard', 'icon name', 'fromscratch-icons'),
+		'keyboard-capslock'        => _x('Caps lock', 'icon name', 'fromscratch-icons'),
+		'trackpad-input'           => _x('Trackpad', 'icon name', 'fromscratch-icons'),
+		'head-mounted-device'      => _x('Head-mounted device', 'icon name', 'fromscratch-icons'),
+		'headset'                  => _x('Headset', 'icon name', 'fromscratch-icons'),
+		'mobile-rotate'            => _x('Rotate mobile', 'icon name', 'fromscratch-icons'),
+		'wifi'                     => _x('Wi‑Fi', 'icon name', 'fromscratch-icons'),
+		'power'                    => _x('Power', 'icon name', 'fromscratch-icons'),
+		'power-off-circle'         => _x('Power off circle', 'icon name', 'fromscratch-icons'),
+		'dns'                      => _x('DNS', 'icon name', 'fromscratch-icons'),
+		'videogame'                => _x('Videogame', 'icon name', 'fromscratch-icons'),
+		'joystick'                 => _x('Joystick', 'icon name', 'fromscratch-icons'),
 
 		// Security & privacy.
 		'lock'                   => _x('Lock', 'icon name', 'fromscratch-icons'),
@@ -375,6 +437,11 @@ function fs_icon_labels(): array
 		'emergency'              => _x('Emergency', 'icon name', 'fromscratch-icons'),
 		'alarm'                  => _x('Alarm', 'icon name', 'fromscratch-icons'),
 		'verified'               => _x('Verified', 'icon name', 'fromscratch-icons'),
+		'cookie-off'               => _x('Cookie off', 'icon name', 'fromscratch-icons'),
+		'fingerprint'              => _x('Fingerprint', 'icon name', 'fromscratch-icons'),
+		'password'                 => _x('Password', 'icon name', 'fromscratch-icons'),
+		'shield-info'              => _x('Shield info', 'icon name', 'fromscratch-icons'),
+		'shield-health'            => _x('Shield health', 'icon name', 'fromscratch-icons'),
 
 		// Controls & settings.
 		'settings'               => _x('Settings', 'icon name', 'fromscratch-icons'),
@@ -410,12 +477,15 @@ function fs_icon_labels(): array
 		'notifications-circle'   => _x('Notifications circle', 'icon name', 'fromscratch-icons'),
 		'clock'                  => _x('Clock', 'icon name', 'fromscratch-icons'),
 		'clock-alt'              => _x('Clock (alt)', 'icon name', 'fromscratch-icons'),
-		'watch'                  => _x('Watch', 'icon name', 'fromscratch-icons'),
+		'watch-alt'                  => _x('Watch', 'icon name', 'fromscratch-icons'),
 		'history'                => _x('History', 'icon name', 'fromscratch-icons'),
 		'hourglass'              => _x('Hourglass', 'icon name', 'fromscratch-icons'),
 		'calendar'               => _x('Calendar (blank)', 'icon name', 'fromscratch-icons'),
 		'calendar-month'         => _x('Calendar', 'icon name', 'fromscratch-icons'),
 		'calendar-text'          => _x('Calendar (text)', 'icon name', 'fromscratch-icons'),
+		'timer'                    => _x('Timer', 'icon name', 'fromscratch-icons'),
+		'speed-high'               => _x('High speed', 'icon name', 'fromscratch-icons'),
+		'speed-low'                => _x('Low speed', 'icon name', 'fromscratch-icons'),
 
 		// Weather.
 		'sunny'                  => _x('Sunny', 'icon name', 'fromscratch-icons'),
@@ -426,6 +496,10 @@ function fs_icon_labels(): array
 		'partly-cloudy'          => _x('Partly cloudy', 'icon name', 'fromscratch-icons'),
 		'cold'                   => _x('Cold', 'icon name', 'fromscratch-icons'),
 		'heat'                   => _x('Heat', 'icon name', 'fromscratch-icons'),
+		'thermometer'              => _x('Thermometer', 'icon name', 'fromscratch-icons'),
+		'thermometer-alt'          => _x('Thermometer (alt)', 'icon name', 'fromscratch-icons'),
+		'foggy'                    => _x('Foggy', 'icon name', 'fromscratch-icons'),
+		'wind'                     => _x('Wind', 'icon name', 'fromscratch-icons'),
 
 		// Food & drink.
 		'beer'                   => _x('Beer', 'icon name', 'fromscratch-icons'),
@@ -440,6 +514,12 @@ function fs_icon_labels(): array
 		'icecream'               => _x('Ice cream', 'icon name', 'fromscratch-icons'),
 		'liquor'                 => _x('Liquor', 'icon name', 'fromscratch-icons'),
 		'nutrition'              => _x('Nutrition', 'icon name', 'fromscratch-icons'),
+		'bakery'                   => _x('Bakery', 'icon name', 'fromscratch-icons'),
+		'cake'                     => _x('Cake', 'icon name', 'fromscratch-icons'),
+		'fast-food'                => _x('Fast food', 'icon name', 'fromscratch-icons'),
+		'fork-knife'               => _x('Fork and knife', 'icon name', 'fromscratch-icons'),
+		'pizza'                    => _x('Pizza', 'icon name', 'fromscratch-icons'),
+		'water-bottle'             => _x('Water bottle', 'icon name', 'fromscratch-icons'),
 
 		// Sports & fitness.
 		'esports'                => _x('Esports', 'icon name', 'fromscratch-icons'),
@@ -451,6 +531,14 @@ function fs_icon_labels(): array
 		'tennis'                 => _x('Tennis', 'icon name', 'fromscratch-icons'),
 		'volleyball'             => _x('Volleyball', 'icon name', 'fromscratch-icons'),
 		'target'                 => _x('Target', 'icon name', 'fromscratch-icons'),
+		'american-football'        => _x('American football', 'icon name', 'fromscratch-icons'),
+		'baseball'                 => _x('Baseball', 'icon name', 'fromscratch-icons'),
+		'basketball'               => _x('Basketball', 'icon name', 'fromscratch-icons'),
+		'cricket'                  => _x('Cricket', 'icon name', 'fromscratch-icons'),
+		'golf'                     => _x('Golf', 'icon name', 'fromscratch-icons'),
+		'hockey'                   => _x('Hockey', 'icon name', 'fromscratch-icons'),
+		'fitness'                  => _x('Fitness', 'icon name', 'fromscratch-icons'),
+		'whistle'                  => _x('Whistle', 'icon name', 'fromscratch-icons'),
 
 		// Health & medical.
 		'health-cross'           => _x('Health', 'icon name', 'fromscratch-icons'),
@@ -458,6 +546,16 @@ function fs_icon_labels(): array
 		'medical-services'       => _x('Medical services', 'icon name', 'fromscratch-icons'),
 		'labs'                   => _x('Labs', 'icon name', 'fromscratch-icons'),
 		'science'                => _x('Science', 'icon name', 'fromscratch-icons'),
+		'allergies'                => _x('Allergies', 'icon name', 'fromscratch-icons'),
+		'cardiology'               => _x('Cardiology', 'icon name', 'fromscratch-icons'),
+		'dna'                      => _x('DNA', 'icon name', 'fromscratch-icons'),
+		'fluid'                    => _x('Fluid', 'icon name', 'fromscratch-icons'),
+		'fluid-syringe'            => _x('Syringe', 'icon name', 'fromscratch-icons'),
+		'healing'                  => _x('Healing', 'icon name', 'fromscratch-icons'),
+		'medical-mask-alt'         => _x('Medical mask (alt)', 'icon name', 'fromscratch-icons'),
+		'pill'                     => _x('Pill', 'icon name', 'fromscratch-icons'),
+		'vital-signs'              => _x('Vital signs', 'icon name', 'fromscratch-icons'),
+		'virus'                    => _x('Virus', 'icon name', 'fromscratch-icons'),
 
 		// Nature & lifestyle.
 		'rocket'                 => _x('Rocket', 'icon name', 'fromscratch-icons'),
@@ -485,6 +583,9 @@ function fs_icon_labels(): array
 		'castle'                 => _x('Castle', 'icon name', 'fromscratch-icons'),
 		'shirt'                  => _x('Shirt', 'icon name', 'fromscratch-icons'),
 		'eyeglasses'             => _x('Eyeglasses', 'icon name', 'fromscratch-icons'),
+		'suitcase'                 => _x('Suitcase', 'icon name', 'fromscratch-icons'),
+		'work'                     => _x('Work', 'icon name', 'fromscratch-icons'),
+		'ticket-alt'               => _x('Ticket (alt)', 'icon name', 'fromscratch-icons'),
 
 		// Symbols & misc.
 		'bolt'                   => _x('Bolt', 'icon name', 'fromscratch-icons'),
@@ -505,6 +606,10 @@ function fs_icon_labels(): array
 		'interests'              => _x('Interests', 'icon name', 'fromscratch-icons'),
 		'puzzle'                 => _x('Puzzle', 'icon name', 'fromscratch-icons'),
 
+		'bug'                      => _x('Bug', 'icon name', 'fromscratch-icons'),
+		'copyright'                => _x('Copyright', 'icon name', 'fromscratch-icons'),
+		'fire-extinguisher'        => _x('Fire extinguisher', 'icon name', 'fromscratch-icons'),
+		'fire-hydrant'             => _x('Fire hydrant', 'icon name', 'fromscratch-icons'),
 		// Brands (proper nouns; source strings are the brand names and are not
 		// translated — the German .mo intentionally has no entries for these, so
 		// gettext falls back to the English name in every locale).
