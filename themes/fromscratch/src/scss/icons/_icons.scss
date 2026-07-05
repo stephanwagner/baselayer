@@ -51,18 +51,20 @@ $fs-icon-path: '../icons' !default;
 }
 
 // Icon as pseudo-element
-.-icon-before {
-  &::before {
-    @include fs-icon;
-    display: inline-block;
-    content: '';
-  }
+
+.-icon-before::before,
+.-icon-after::after {
+  @include fs-icon;
+  display: inline-block;
+  content: '';
+  font-size: 1.25em;
+  vertical-align: -0.225em;
 }
 
-.-icon-after {
-  &::after {
-    @include fs-icon;
-    display: inline-block;
-    content: '';
-  }
+.-icon-before::before {
+  margin-inline-end: 0.25em;
+}
+
+.-icon-after::after {
+  margin-inline-start: 0.25em;
 }
