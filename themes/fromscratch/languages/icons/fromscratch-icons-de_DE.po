@@ -944,6 +944,10 @@ msgstr "Hotel"
 # Icon names — Devices & interaction
 
 msgctxt "icon name"
+msgid "Devices"
+msgstr "Geräte"
+
+msgctxt "icon name"
 msgid "Laptop"
 msgstr "Laptop"
 
@@ -974,6 +978,10 @@ msgstr "Akku halb voll"
 msgctxt "icon name"
 msgid "Battery low"
 msgstr "Akku schwach"
+
+msgctxt "icon name"
+msgid "Radio"
+msgstr "Radio"
 
 msgctxt "icon name"
 msgid "TV"
@@ -1250,156 +1258,207 @@ msgstr "WordPress-Block"
 msgctxt "icon name"
 msgid "Accessibility (alt)"
 msgstr "Barrierefreiheit (alternativ)"
+
 msgctxt "icon name"
 msgid "Arrow down (alt)"
 msgstr "Pfeil nach unten (alternativ)"
+
 msgctxt "icon name"
 msgid "Arrow left (alt)"
 msgstr "Pfeil links (alternativ)"
+
 msgctxt "icon name"
 msgid "Arrow line end"
 msgstr "Pfeillinie Ende"
+
 msgctxt "icon name"
 msgid "Arrow line start"
 msgstr "Pfeillinie Start"
+
 msgctxt "icon name"
 msgid "Arrow right (alt)"
 msgstr "Pfeil rechts (alternativ)"
+
 msgctxt "icon name"
 msgid "Arrow up (alt)"
 msgstr "Pfeil hoch (alternativ)"
+
 msgctxt "icon name"
 msgid "Shape up"
 msgstr "Form nach oben"
+
 msgctxt "icon name"
 msgid "Book"
 msgstr "Buch"
+
 msgctxt "icon name"
 msgid "Book open"
 msgstr "Offenes Buch"
+
 msgctxt "icon name"
 msgid "Bookmark heart"
 msgstr "Lesezeichen Herz"
+
 msgctxt "icon name"
 msgid "Bookmark stacks"
 msgstr "Lesezeichen-Stapel"
+
 msgctxt "icon name"
 msgid "Brick"
 msgstr "Baustein"
+
 msgctxt "icon name"
 msgid "Build"
 msgstr "Bauen"
+
 msgctxt "icon name"
 msgid "Cards"
 msgstr "Karten"
+
 msgctxt "icon name"
 msgid "Castle"
 msgstr "Schloss"
+
 msgctxt "icon name"
 msgid "Category"
 msgstr "Kategorie"
+
 msgctxt "icon name"
 msgid "Code"
 msgstr "Code"
+
 msgctxt "icon name"
 msgid "Code block"
 msgstr "Codeblock"
+
 msgctxt "icon name"
 msgid "Code slash"
 msgstr "Code Schrägstrich"
+
 msgctxt "icon name"
 msgid "Deployed"
 msgstr "Deployed"
+
 msgctxt "icon name"
 msgid "Document person"
 msgstr "Dokument Person"
+
 msgctxt "icon name"
 msgid "Document scan"
 msgstr "Dokument scannen"
+
 msgctxt "icon name"
 msgid "Drop left"
 msgstr "Caret links"
+
 msgctxt "icon name"
 msgid "Drop right"
 msgstr "Caret rechts"
+
 msgctxt "icon name"
 msgid "Dropdown"
 msgstr "Dropdown"
+
 msgctxt "icon name"
 msgid "Edit square"
 msgstr "Bearbeiten Quadrat"
+
 msgctxt "icon name"
 msgid "Flag (alt)"
 msgstr "Flagge (alternativ)"
+
 msgctxt "icon name"
 msgid "Flower"
 msgstr "Blume"
+
 msgctxt "icon name"
 msgid "Flower (alt)"
 msgstr "Blume (alternativ)"
+
 msgctxt "icon name"
 msgid "Hide"
 msgstr "Ausblenden"
+
 msgctxt "icon name"
 msgid "Info (alt)"
 msgstr "Info (alternativ)"
+
 msgctxt "icon name"
 msgid "Interests"
 msgstr "Interessen"
+
 msgctxt "icon name"
 msgid "Add location"
 msgstr "Ort hinzufügen"
+
 msgctxt "icon name"
 msgid "Location heart"
 msgstr "Ort Herz"
+
 msgctxt "icon name"
 msgid "My location"
 msgstr "Mein Standort"
+
 msgctxt "icon name"
 msgid "Nearby"
 msgstr "In der Nähe"
+
 msgctxt "icon name"
 msgid "Unread notification"
 msgstr "Ungelesene Benachrichtigung"
+
 msgctxt "icon name"
 msgid "Notifications circle"
 msgstr "Benachrichtigungen Kreis"
+
 msgctxt "icon name"
 msgid "Open in new (down)"
 msgstr "In neuem Tab (unten)"
+
 msgctxt "icon name"
 msgid "Paragraph"
 msgstr "Absatz"
+
 msgctxt "icon name"
 msgid "Pin circle"
 msgstr "Pin Kreis"
+
 msgctxt "icon name"
 msgid "Pin off"
 msgstr "Pin aus"
+
 msgctxt "icon name"
 msgid "School"
 msgstr "Schule"
+
 msgctxt "icon name"
 msgid "Science"
 msgstr "Wissenschaft"
+
 msgctxt "icon name"
 msgid "Signpost"
 msgstr "Wegweiser"
+
 msgctxt "icon name"
 msgid "Stacks"
 msgstr "Stapel"
+
 msgctxt "icon name"
 msgid "Stories"
 msgstr "Stories"
+
 msgctxt "icon name"
 msgid "Ticket"
 msgstr "Ticket"
+
 msgctxt "icon name"
 msgid "Two pager"
 msgstr "Zweiseiter"
+
 msgctxt "icon name"
 msgid "Walk"
 msgstr "Zu Fuß"
+
 msgctxt "icon name"
 msgid "Widgets"
 msgstr "Widgets"
@@ -1407,51 +1466,67 @@ msgstr "Widgets"
 msgctxt "icon name"
 msgid "Alarm"
 msgstr "Wecker"
+
 msgctxt "icon name"
 msgid "Beach"
 msgstr "Strand"
+
 msgctxt "icon name"
 msgid "Bomb"
 msgstr "Bombe"
+
 msgctxt "icon name"
 msgid "Camping"
 msgstr "Camping"
+
 msgctxt "icon name"
 msgid "CCTV"
 msgstr "Überwachungskamera"
+
 msgctxt "icon name"
 msgid "Clock (alt)"
 msgstr "Uhr (alternativ)"
+
 msgctxt "icon name"
 msgid "Cold"
 msgstr "Kalt"
+
 msgctxt "icon name"
 msgid "Colorize"
 msgstr "Einfärben"
+
 msgctxt "icon name"
 msgid "Dog"
 msgstr "Hund"
+
 msgctxt "icon name"
 msgid "Drop"
 msgstr "Tropfen"
+
 msgctxt "icon name"
 msgid "Emergency"
 msgstr "Notfall"
+
 msgctxt "icon name"
 msgid "Footprint"
 msgstr "Fußabdruck"
+
 msgctxt "icon name"
 msgid "Heat"
 msgstr "Hitze"
+
 msgctxt "icon name"
 msgid "History"
 msgstr "Verlauf"
+
 msgctxt "icon name"
 msgid "Mask"
 msgstr "Maske"
+
 msgctxt "icon name"
 msgid "Mixed weather"
 msgstr "Gemischtes Wetter"
+
 msgctxt "icon name"
 msgid "Mountain"
 msgstr "Berg"
@@ -1471,30 +1546,39 @@ msgstr "Vogel"
 msgctxt "icon name"
 msgid "Pet supplies"
 msgstr "Tierbedarf"
+
 msgctxt "icon name"
 msgid "Rain"
 msgstr "Regen"
+
 msgctxt "icon name"
 msgid "Shield star"
 msgstr "Schild Stern"
+
 msgctxt "icon name"
 msgid "Siren"
 msgstr "Sirene"
+
 msgctxt "icon name"
 msgid "Skull"
 msgstr "Totenkopf"
+
 msgctxt "icon name"
 msgid "Snowflake"
 msgstr "Schneeflocke"
+
 msgctxt "icon name"
 msgid "Snowy"
 msgstr "Schneefall"
+
 msgctxt "icon name"
 msgid "Sunny"
 msgstr "Sonnig"
+
 msgctxt "icon name"
 msgid "Thunderstorm"
 msgstr "Gewitter"
+
 msgctxt "icon name"
 msgid "Water"
 msgstr "Wasser"
@@ -1502,54 +1586,71 @@ msgstr "Wasser"
 msgctxt "icon name"
 msgid "Delete forever"
 msgstr "Endgültig löschen"
+
 msgctxt "icon name"
 msgid "Restore"
 msgstr "Wiederherstellen"
+
 msgctxt "icon name"
 msgid "Text"
 msgstr "Text"
+
 msgctxt "icon name"
 msgid "Symbols"
 msgstr "Symbole"
+
 msgctxt "icon name"
 msgid "Bank"
 msgstr "Bank"
+
 msgctxt "icon name"
 msgid "Wallet"
 msgstr "Geldbörse"
+
 msgctxt "icon name"
 msgid "Receipt"
 msgstr "Beleg"
+
 msgctxt "icon name"
 msgid "Moon"
 msgstr "Mond"
+
 msgctxt "icon name"
 msgid "Moon and stars"
 msgstr "Mond und Sterne"
+
 msgctxt "icon name"
 msgid "Beer"
 msgstr "Bier"
+
 msgctxt "icon name"
 msgid "Cocktail"
 msgstr "Cocktail"
+
 msgctxt "icon name"
 msgid "Chess"
 msgstr "Schach"
+
 msgctxt "icon name"
 msgid "Recycling"
 msgstr "Recycling"
+
 msgctxt "icon name"
 msgid "Eyeglasses"
 msgstr "Brille"
+
 msgctxt "icon name"
 msgid "Labs"
 msgstr "Labor"
+
 msgctxt "icon name"
 msgid "Health"
 msgstr "Gesundheit"
+
 msgctxt "icon name"
 msgid "Health cross"
 msgstr "Gesundheitskreuz"
+
 msgctxt "icon name"
 msgid "Restroom"
 msgstr "Toilette"
@@ -1557,102 +1658,135 @@ msgstr "Toilette"
 msgctxt "icon name"
 msgid "Movie"
 msgstr "Film"
+
 msgctxt "icon name"
 msgid "Split scene"
 msgstr "Geteilte Szene"
+
 msgctxt "icon name"
 msgid "Pan zoom"
 msgstr "Schwenken zoomen"
+
 msgctxt "icon name"
 msgid "Music note"
 msgstr "Musiknote"
+
 msgctxt "icon name"
 msgid "Music note (alt)"
 msgstr "Musiknote (alternativ)"
+
 msgctxt "icon name"
 msgid "Parking"
 msgstr "Parken"
+
 msgctxt "icon name"
 msgid "Recenter"
 msgstr "Neu zentrieren"
+
 msgctxt "icon name"
 msgid "Click action"
 msgstr "Klick Aktion"
+
 msgctxt "icon name"
 msgid "Click left"
 msgstr "Linksklick"
+
 msgctxt "icon name"
 msgid "Click right"
 msgstr "Rechtsklick"
+
 msgctxt "icon name"
 msgid "Burger"
 msgstr "Burger"
+
 msgctxt "icon name"
 msgid "Chef hat"
 msgstr "Kochmütze"
+
 msgctxt "icon name"
 msgid "Coffee"
 msgstr "Kaffee"
+
 msgctxt "icon name"
 msgid "Tea"
 msgstr "Tee"
+
 msgctxt "icon name"
 msgid "Dining"
 msgstr "Gastronomie"
+
 msgctxt "icon name"
 msgid "Fork and spoon"
 msgstr "Gabel und Löffel"
+
 msgctxt "icon name"
 msgid "Glass"
 msgstr "Glas"
+
 msgctxt "icon name"
 msgid "Ice cream"
 msgstr "Eis"
+
 msgctxt "icon name"
 msgid "Liquor"
 msgstr "Spirituosen"
+
 msgctxt "icon name"
 msgid "Nutrition"
 msgstr "Ernährung"
+
 msgctxt "icon name"
 msgid "Esports"
 msgstr "Esports"
+
 msgctxt "icon name"
 msgid "Exercise"
 msgstr "Training"
+
 msgctxt "icon name"
 msgid "Football"
 msgstr "Fußball"
+
 msgctxt "icon name"
 msgid "Motorsports"
 msgstr "Motorsport"
+
 msgctxt "icon name"
 msgid "Swimming"
 msgstr "Schwimmen"
+
 msgctxt "icon name"
 msgid "Stadium"
 msgstr "Stadion"
+
 msgctxt "icon name"
 msgid "Tennis"
 msgstr "Tennis"
+
 msgctxt "icon name"
 msgid "Volleyball"
 msgstr "Volleyball"
+
 msgctxt "icon name"
 msgid "Target"
 msgstr "Ziel"
+
 msgctxt "icon name"
 msgid "Forest"
 msgstr "Wald"
+
 msgctxt "icon name"
 msgid "Nature"
 msgstr "Natur"
+
 msgctxt "icon name"
 msgid "Nature people"
 msgstr "Natur Menschen"
+
 msgctxt "icon name"
 msgid "Pine tree"
 msgstr "Kiefer"
+
 msgctxt "icon name"
 msgid "Editor's choice"
 msgstr "Redaktionstipp"
@@ -1668,9 +1802,11 @@ msgstr "Hemd"
 msgctxt "icon name"
 msgid "ID badge"
 msgstr "Namensbadge"
+
 msgctxt "icon name"
 msgid "Landscape"
 msgstr "Landschaft"
+
 msgctxt "icon name"
 msgid "Face (alt)"
 msgstr "Gesicht (alternativ)"
@@ -1678,12 +1814,15 @@ msgstr "Gesicht (alternativ)"
 msgctxt "icon name"
 msgid "Face (female)"
 msgstr "Weibliches Gesicht"
+
 msgctxt "icon name"
 msgid "Pregnant woman"
 msgstr "Schwangere"
+
 msgctxt "icon name"
 msgid "Watch"
 msgstr "Uhr"
+
 msgctxt "icon name"
 msgid "Partly cloudy"
 msgstr "Teilweise bewölkt"
@@ -1695,9 +1834,11 @@ msgstr "Nachts teils bewölkt"
 msgctxt "icon name"
 msgid "Sticker"
 msgstr "Aufkleber"
+
 msgctxt "icon name"
 msgid "Medical mask"
 msgstr "Medizinische Maske"
+
 msgctxt "icon name"
 msgid "Medical services"
 msgstr "Medizinische Versorgung"
@@ -1705,120 +1846,159 @@ msgstr "Medizinische Versorgung"
 msgctxt "icon name"
 msgid "Zoom in map"
 msgstr "Karte vergrößern"
+
 msgctxt "icon name"
 msgid "Zoom out map"
 msgstr "Karte verkleinern"
+
 msgctxt "icon name"
 msgid "Content grid"
 msgstr "Inhaltsraster"
+
 msgctxt "icon name"
 msgid "Anchor"
 msgstr "Anker"
+
 msgctxt "icon name"
 msgid "Compare text"
 msgstr "Text vergleichen"
+
 msgctxt "icon name"
 msgid "Contract"
 msgstr "Vertrag"
+
 msgctxt "icon name"
 msgid "Sign contract"
 msgstr "Vertrag unterschreiben"
+
 msgctxt "icon name"
 msgid "Resize"
 msgstr "Größe ändern"
+
 msgctxt "icon name"
 msgid "Split"
 msgstr "Teilen"
+
 msgctxt "icon name"
 msgid "Swipe left/right"
 msgstr "Wischen links/rechts"
+
 msgctxt "icon name"
 msgid "Swipe up/down"
 msgstr "Wischen hoch/runter"
+
 msgctxt "icon name"
 msgid "Cut"
 msgstr "Ausschneiden"
+
 msgctxt "icon name"
 msgid "Signature"
 msgstr "Unterschrift"
+
 msgctxt "icon name"
 msgid "Menu book"
 msgstr "Menübuch"
+
 msgctxt "icon name"
 msgid "Chat (dashed)"
 msgstr "Chat (gestrichelt)"
+
 msgctxt "icon name"
 msgid "Smiley"
 msgstr "Smiley"
+
 msgctxt "icon name"
 msgid "Broken image"
 msgstr "Defektes Bild"
+
 msgctxt "icon name"
 msgid "Colors"
 msgstr "Farben"
+
 msgctxt "icon name"
 msgid "Archive"
 msgstr "Archiv"
+
 msgctxt "icon name"
 msgid "Copy folder"
 msgstr "Ordner kopieren"
+
 msgctxt "icon name"
 msgid "Analytics"
 msgstr "Analysen"
+
 msgctxt "icon name"
 msgid "Area chart"
 msgstr "Flächendiagramm"
+
 msgctxt "icon name"
 msgid "Bubble chart"
 msgstr "Blasendiagramm"
+
 msgctxt "icon name"
 msgid "Line chart (alt)"
 msgstr "Liniendiagramm (alternativ)"
+
 msgctxt "icon name"
 msgid "Leaderboard"
 msgstr "Bestenliste"
+
 msgctxt "icon name"
 msgid "Scoreboard"
 msgstr "Anzeigetafel"
+
 msgctxt "icon name"
 msgid "Aspect ratio"
 msgstr "Seitenverhältnis"
+
 msgctxt "icon name"
 msgid "Toolbar"
 msgstr "Symbolleiste"
+
 msgctxt "icon name"
 msgid "Call to action"
 msgstr "Handlungsaufforderung"
+
 msgctxt "icon name"
 msgid "ATM"
 msgstr "Geldautomat"
+
 msgctxt "icon name"
 msgid "Dollar circle"
 msgstr "Dollar-Kreis"
+
 msgctxt "icon name"
 msgid "Finance chip"
 msgstr "Finanz-Chip"
+
 msgctxt "icon name"
 msgid "Money bag"
 msgstr "Geldbeutel"
+
 msgctxt "icon name"
 msgid "Savings"
 msgstr "Ersparnisse"
+
 msgctxt "icon name"
 msgid "Shopping bag"
 msgstr "Einkaufstasche"
+
 msgctxt "icon name"
 msgid "Universal currency"
 msgstr "Universelle Währung"
+
 msgctxt "icon name"
 msgid "Wallet (alt)"
 msgstr "Geldbörse (alternativ)"
+
 msgctxt "icon name"
 msgid "Handshake"
 msgstr "Handschlag"
+
 msgctxt "icon name"
 msgid "Gavel"
 msgstr "Richterhammer"
+
 msgctxt "icon name"
 msgid "License"
 msgstr "Lizenz"
@@ -1830,42 +2010,55 @@ msgstr "Ohne Lizenz"
 msgctxt "icon name"
 msgid "Balance"
 msgstr "Waage"
+
 msgctxt "icon name"
 msgid "Account box"
 msgstr "Kontobox"
+
 msgctxt "icon name"
 msgid "Passport"
 msgstr "Reisepass"
+
 msgctxt "icon name"
 msgid "Sign language"
 msgstr "Gebärdensprache"
+
 msgctxt "icon name"
 msgid "Map search"
 msgstr "Kartensuche"
+
 msgctxt "icon name"
 msgid "Globe (Americas)"
 msgstr "Globus (Amerika)"
+
 msgctxt "icon name"
 msgid "Globe (Asia)"
 msgstr "Globus (Asien)"
+
 msgctxt "icon name"
 msgid "Motorcycle"
 msgstr "Motorrad"
+
 msgctxt "icon name"
 msgid "Monitor"
 msgstr "Monitor"
+
 msgctxt "icon name"
 msgid "Keyboard"
 msgstr "Tastatur"
+
 msgctxt "icon name"
 msgid "Caps lock"
 msgstr "Feststelltaste"
+
 msgctxt "icon name"
 msgid "Trackpad"
 msgstr "Trackpad"
+
 msgctxt "icon name"
 msgid "Head-mounted device"
 msgstr "Kopfmontiertes Gerät"
+
 msgctxt "icon name"
 msgid "Headset"
 msgstr "Headset"
@@ -1885,141 +2078,187 @@ msgstr "Strom getrennt"
 msgctxt "icon name"
 msgid "Power off circle"
 msgstr "Ausschalten (Kreis)"
+
 msgctxt "icon name"
 msgid "DNS"
 msgstr "DNS"
+
 msgctxt "icon name"
 msgid "Videogame"
 msgstr "Videospiel"
+
 msgctxt "icon name"
 msgid "Joystick"
 msgstr "Joystick"
+
 msgctxt "icon name"
 msgid "Cookie off"
 msgstr "Cookie aus"
+
 msgctxt "icon name"
 msgid "Fingerprint"
 msgstr "Fingerabdruck"
+
 msgctxt "icon name"
 msgid "Password"
 msgstr "Passwort"
+
 msgctxt "icon name"
 msgid "Shield info"
 msgstr "Schild Info"
+
 msgctxt "icon name"
 msgid "Shield health"
 msgstr "Schild Gesundheit"
+
 msgctxt "icon name"
 msgid "Timer"
 msgstr "Timer"
+
 msgctxt "icon name"
 msgid "High speed"
 msgstr "Hohe Geschwindigkeit"
+
 msgctxt "icon name"
 msgid "Low speed"
 msgstr "Niedrige Geschwindigkeit"
+
 msgctxt "icon name"
 msgid "Thermometer"
 msgstr "Thermometer"
+
 msgctxt "icon name"
 msgid "Thermometer (alt)"
 msgstr "Thermometer (alternativ)"
+
 msgctxt "icon name"
 msgid "Foggy"
 msgstr "Neblig"
+
 msgctxt "icon name"
 msgid "Wind"
 msgstr "Wind"
+
 msgctxt "icon name"
 msgid "Bakery"
 msgstr "Bäckerei"
+
 msgctxt "icon name"
 msgid "Cake"
 msgstr "Kuchen"
+
 msgctxt "icon name"
 msgid "Fast food"
 msgstr "Fast Food"
+
 msgctxt "icon name"
 msgid "Fork and knife"
 msgstr "Messer und Gabel"
+
 msgctxt "icon name"
 msgid "Pizza"
 msgstr "Pizza"
+
 msgctxt "icon name"
 msgid "Water bottle"
 msgstr "Wasserflasche"
+
 msgctxt "icon name"
 msgid "American football"
 msgstr "American Football"
+
 msgctxt "icon name"
 msgid "Baseball"
 msgstr "Baseball"
+
 msgctxt "icon name"
 msgid "Basketball"
 msgstr "Basketball"
+
 msgctxt "icon name"
 msgid "Cricket"
 msgstr "Cricket"
+
 msgctxt "icon name"
 msgid "Golf"
 msgstr "Golf"
+
 msgctxt "icon name"
 msgid "Hockey"
 msgstr "Hockey"
+
 msgctxt "icon name"
 msgid "Fitness"
 msgstr "Fitness"
+
 msgctxt "icon name"
 msgid "Whistle"
 msgstr "Pfeife"
+
 msgctxt "icon name"
 msgid "Allergies"
 msgstr "Allergien"
+
 msgctxt "icon name"
 msgid "Cardiology"
 msgstr "Kardiologie"
+
 msgctxt "icon name"
 msgid "DNA"
 msgstr "DNA"
+
 msgctxt "icon name"
 msgid "Fluid"
 msgstr "Flüssigkeit"
+
 msgctxt "icon name"
 msgid "Syringe"
 msgstr "Spritze"
+
 msgctxt "icon name"
 msgid "Healing"
 msgstr "Heilung"
+
 msgctxt "icon name"
 msgid "Medical mask (alt)"
 msgstr "Medizinische Maske (alternativ)"
+
 msgctxt "icon name"
 msgid "Pill"
 msgstr "Pille"
+
 msgctxt "icon name"
 msgid "Vital signs"
 msgstr "Vitalzeichen"
+
 msgctxt "icon name"
 msgid "Virus"
 msgstr "Virus"
+
 msgctxt "icon name"
 msgid "Suitcase"
 msgstr "Koffer"
+
 msgctxt "icon name"
 msgid "Work"
 msgstr "Arbeit"
+
 msgctxt "icon name"
 msgid "Ticket (alt)"
 msgstr "Ticket (alternativ)"
+
 msgctxt "icon name"
 msgid "Bug"
 msgstr "Fehler"
+
 msgctxt "icon name"
 msgid "Copyright"
 msgstr "Urheberrecht"
+
 msgctxt "icon name"
 msgid "Fire extinguisher"
 msgstr "Feuerlöscher"
+
 msgctxt "icon name"
 msgid "Fire hydrant"
 msgstr "Hydrant"
@@ -2027,12 +2266,15 @@ msgstr "Hydrant"
 msgctxt "icon name"
 msgid "Traffic"
 msgstr "Verkehr"
+
 msgctxt "icon name"
 msgid "Factory"
 msgstr "Fabrik"
+
 msgctxt "icon name"
 msgid "Manufacturing"
 msgstr "Fertigung"
+
 msgctxt "icon name"
 msgid "Engineering"
 msgstr "Technik"
@@ -2044,9 +2286,11 @@ msgstr "Spielzeug"
 
 msgid "Chat edit"
 msgstr "Chat bearbeiten"
+
 msgctxt "icon name"
 msgid "Cheer"
 msgstr "Jubel"
+
 msgctxt "icon name"
 msgid "Magic wand"
 msgstr "Zauberstab"
@@ -2176,10 +2420,6 @@ msgstr "Uhr (alternativ)"
 msgctxt "icon name"
 msgid "Shape up stack"
 msgstr "Form nach oben (Stapel)"
-
-msgctxt "icon name"
-msgid "Shape up stack (2)"
-msgstr "Form nach oben (Stapel 2)"
 
 msgctxt "icon name"
 msgid "Checkbook"
