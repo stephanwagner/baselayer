@@ -28,6 +28,10 @@ msgid "Editing & text"
 msgstr "Bearbeiten & Text"
 
 msgctxt "icon category"
+msgid "Rich text"
+msgstr "Rich-Text"
+
+msgctxt "icon category"
 msgid "Communication"
 msgstr "Kommunikation"
 
@@ -468,6 +472,10 @@ msgstr "Stern (halb)"
 msgctxt "icon name"
 msgid "Star (filled)"
 msgstr "Stern (gefüllt)"
+
+msgctxt "icon name"
+msgid "Stars sparkle"
+msgstr "Funkelsterne"
 
 msgctxt "icon name"
 msgid "Stars"
@@ -1211,7 +1219,6 @@ msgctxt "icon name"
 msgid "WordPress block"
 msgstr "WordPress-Block"
 
-
 msgctxt "icon name"
 msgid "Accessibility (alt)"
 msgstr "Barrierefreiheit (alt)"
@@ -1369,7 +1376,6 @@ msgctxt "icon name"
 msgid "Widgets"
 msgstr "Widgets"
 
-
 msgctxt "icon name"
 msgid "Alarm"
 msgstr "Wecker"
@@ -1452,7 +1458,6 @@ msgctxt "icon name"
 msgid "Water"
 msgstr "Wasser"
 
-
 msgctxt "icon name"
 msgid "Delete forever"
 msgstr "Endgültig löschen"
@@ -1507,7 +1512,6 @@ msgstr "Gesundheitskreuz"
 msgctxt "icon name"
 msgid "Restroom"
 msgstr "Toilette"
-
 
 msgctxt "icon name"
 msgid "Movie"
@@ -1615,7 +1619,6 @@ msgctxt "icon name"
 msgid "Shirt"
 msgstr "Hemd"
 
-
 msgctxt "icon name"
 msgid "Badge"
 msgstr "Abzeichen"
@@ -1644,7 +1647,6 @@ msgctxt "icon name"
 msgid "Medical services"
 msgstr "Medizinische Versorgung"
 
-
 msgctxt "icon name"
 msgid "Zoom in map"
 msgstr "Karte vergrößern"
@@ -1652,8 +1654,8 @@ msgctxt "icon name"
 msgid "Zoom out map"
 msgstr "Karte verkleinern"
 msgctxt "icon name"
-msgid "Browse"
-msgstr "Durchsuchen"
+msgid "Content grid"
+msgstr "Inhaltsraster"
 msgctxt "icon name"
 msgid "Anchor"
 msgstr "Anker"
@@ -1958,7 +1960,6 @@ msgctxt "icon name"
 msgid "Fire hydrant"
 msgstr "Hydrant"
 
-
 msgctxt "icon name"
 msgid "Traffic"
 msgstr "Verkehr"
@@ -1971,6 +1972,20 @@ msgstr "Fertigung"
 msgctxt "icon name"
 msgid "Engineering"
 msgstr "Technik"
+
+msgctxt "icon name"
+msgid "Toys"
+msgstr "Spielzeug"
+
+
+msgid "Chat edit"
+msgstr "Chat bearbeiten"
+msgctxt "icon name"
+msgid "Cheer"
+msgstr "Jubel"
+msgctxt "icon name"
+msgid "Magic wand"
+msgstr "Zauberstab"
 
 # Picker UI
 
@@ -1997,3 +2012,91 @@ msgstr "Gefüllt"
 msgctxt "icon picker"
 msgid "Remove"
 msgstr "Entfernen"
+
+msgctxt "icon name"
+msgid "Text format"
+msgstr "Textformat"
+
+msgctxt "icon name"
+msgid "Bold"
+msgstr "Fett"
+
+msgctxt "icon name"
+msgid "Italic"
+msgstr "Kursiv"
+
+msgctxt "icon name"
+msgid "Underline"
+msgstr "Unterstrichen"
+
+msgctxt "icon name"
+msgid "Strikethrough"
+msgstr "Durchgestrichen"
+
+msgctxt "icon name"
+msgid "Align left"
+msgstr "Links ausrichten"
+
+msgctxt "icon name"
+msgid "Align center"
+msgstr "Zentrieren"
+
+msgctxt "icon name"
+msgid "Align right"
+msgstr "Rechts ausrichten"
+
+msgctxt "icon name"
+msgid "Justify"
+msgstr "Blocksatz"
+
+msgctxt "icon name"
+msgid "Checklist"
+msgstr "Checkliste"
+
+msgctxt "icon name"
+msgid "Decrease indent"
+msgstr "Einzug verkleinern"
+
+msgctxt "icon name"
+msgid "Increase indent"
+msgstr "Einzug vergrößern"
+
+msgctxt "icon name"
+msgid "Line spacing"
+msgstr "Zeilenabstand"
+
+msgctxt "icon name"
+msgid "Letter spacing"
+msgstr "Zeichenabstand"
+
+msgctxt "icon name"
+msgid "Font size"
+msgstr "Schriftgröße"
+
+msgctxt "icon name"
+msgid "Text color"
+msgstr "Textfarbe"
+
+msgctxt "icon name"
+msgid "Highlight color"
+msgstr "Hervorhebungsfarbe"
+
+msgctxt "icon name"
+msgid "Border color"
+msgstr "Rahmenfarbe"
+
+msgctxt "icon name"
+msgid "Clear formatting"
+msgstr "Formatierung löschen"
+
+msgctxt "icon name"
+msgid "Unlink"
+msgstr "Link entfernen"
+
+msgctxt "icon name"
+msgid "Image inline"
+msgstr "Bild inline"
+
+msgctxt "icon name"
+msgid "Clear all"
+msgstr "Alles löschen"
