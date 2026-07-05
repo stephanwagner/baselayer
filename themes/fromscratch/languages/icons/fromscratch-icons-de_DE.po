@@ -1958,6 +1958,20 @@ msgctxt "icon name"
 msgid "Fire hydrant"
 msgstr "Hydrant"
 
+
+msgctxt "icon name"
+msgid "Traffic"
+msgstr "Verkehr"
+msgctxt "icon name"
+msgid "Factory"
+msgstr "Fabrik"
+msgctxt "icon name"
+msgid "Manufacturing"
+msgstr "Fertigung"
+msgctxt "icon name"
+msgid "Engineering"
+msgstr "Technik"
+
 # Picker UI
 
 msgctxt "icon picker"
