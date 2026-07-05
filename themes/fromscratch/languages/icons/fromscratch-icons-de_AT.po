@@ -44,8 +44,12 @@ msgid "Files & storage"
 msgstr "Dateien & Speicher"
 
 msgctxt "icon category"
-msgid "Data & layout"
-msgstr "Daten & Layout"
+msgid "Analytics & data"
+msgstr "Analysen & Daten"
+
+msgctxt "icon category"
+msgid "Layout & blocks"
+msgstr "Layout & Blöcke"
 
 msgctxt "icon category"
 msgid "Commerce & finance"
@@ -74,6 +78,26 @@ msgstr "Steuerung & Einstellungen"
 msgctxt "icon category"
 msgid "Status & time"
 msgstr "Status & Zeit"
+
+msgctxt "icon category"
+msgid "Weather"
+msgstr "Wetter"
+
+msgctxt "icon category"
+msgid "Food & drink"
+msgstr "Essen & Trinken"
+
+msgctxt "icon category"
+msgid "Sports & fitness"
+msgstr "Sport & Fitness"
+
+msgctxt "icon category"
+msgid "Health & medical"
+msgstr "Gesundheit & Medizin"
+
+msgctxt "icon category"
+msgid "Nature & lifestyle"
+msgstr "Natur & Lifestyle"
 
 msgctxt "icon category"
 msgid "Symbols & misc"
