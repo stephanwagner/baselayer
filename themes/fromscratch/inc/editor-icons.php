@@ -252,7 +252,6 @@ function fs_icon_labels(): array
 		'skip-prev'              => _x('Skip previous', 'icon name', 'fromscratch-icons'),
 		'music'                  => _x('Music', 'icon name', 'fromscratch-icons'),
 		'music-note'             => _x('Music note', 'icon name', 'fromscratch-icons'),
-		'music-note-alt'         => _x('Music note (alt)', 'icon name', 'fromscratch-icons'),
 		'headphones'             => _x('Headphones', 'icon name', 'fromscratch-icons'),
 		'volume-mute'            => _x('Volume mute', 'icon name', 'fromscratch-icons'),
 		'volume-down'            => _x('Volume down', 'icon name', 'fromscratch-icons'),
