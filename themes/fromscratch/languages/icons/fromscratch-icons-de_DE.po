@@ -100,8 +100,8 @@ msgid "Health & medical"
 msgstr "Gesundheit & Medizin"
 
 msgctxt "icon category"
-msgid "Nature & lifestyle"
-msgstr "Natur & Lifestyle"
+msgid "Nature & environment"
+msgstr "Natur & Umwelt"
 
 msgctxt "icon category"
 msgid "Symbols & misc"
@@ -933,6 +933,10 @@ msgctxt "icon name"
 msgid "Airplane"
 msgstr "Flugzeug"
 
+msgctxt "icon name"
+msgid "Hotel"
+msgstr "Hotel"
+
 # Icon names — Devices & interaction
 
 msgctxt "icon name"
@@ -1443,9 +1447,19 @@ msgstr "Gemischtes Wetter"
 msgctxt "icon name"
 msgid "Mountain"
 msgstr "Berg"
+
+msgctxt "icon name"
+msgid "Scenery"
+msgstr "Naturlandschaft"
+
 msgctxt "icon name"
 msgid "Owl"
 msgstr "Eule"
+
+msgctxt "icon name"
+msgid "Bird"
+msgstr "Vogel"
+
 msgctxt "icon name"
 msgid "Pet supplies"
 msgstr "Tierbedarf"
@@ -1657,6 +1671,11 @@ msgstr "Uhr"
 msgctxt "icon name"
 msgid "Partly cloudy"
 msgstr "Teilweise bewölkt"
+
+msgctxt "icon name"
+msgid "Partly cloudy night"
+msgstr "Nachts teils bewölkt"
+
 msgctxt "icon name"
 msgid "Sticker"
 msgstr "Aufkleber"
