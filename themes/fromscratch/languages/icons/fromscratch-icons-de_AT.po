@@ -980,6 +980,10 @@ msgid "Battery low"
 msgstr "Akku schwach"
 
 msgctxt "icon name"
+msgid "Radio"
+msgstr "Radio"
+
+msgctxt "icon name"
 msgid "TV"
 msgstr "Fernseher"
 

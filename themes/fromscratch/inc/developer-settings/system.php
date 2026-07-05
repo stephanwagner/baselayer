@@ -517,7 +517,7 @@ function fs_developer_render_system_info_panel(): void
 	if (!$object_cache_active) {
 		$object_cache_warning = $redis_enabled && $is_redis_installed
 			? __('Redis is installed, but object cache is not active. Enable Redis object caching.', 'fromscratch')
-			: __('No persistent object cache detected. Consider enabling an object cache for better performance.', 'fromscratch');
+			: __('No object cache detected. Consider enabling an object cache for better performance.', 'fromscratch');
 	}
 
 	$object_cache_row_value = $object_cache_active ? $fs_system_status(true, esc_html__('Active', 'fromscratch')) : $fs_system_status(false, esc_html__('Inactive', 'fromscratch'));
