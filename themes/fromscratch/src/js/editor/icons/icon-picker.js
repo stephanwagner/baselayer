@@ -1,9 +1,10 @@
 import { iconCategories, resolveIconName, iconMatchesQuery, findIconByValue } from './icon-catalog';
+import { readStoredVariant, writeStoredVariant, resolvePickerVariant } from './icon-variant';
 
 const { Button, Modal, SearchControl, ToggleControl } = wp.components;
 const ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
 const ToggleGroupControlOption = wp.components.__experimentalToggleGroupControlOption;
-const { useState } = wp.element;
+const { useState, useEffect } = wp.element;
 
 // Translated labels + UI strings provided by PHP (inc/editor-icons.php).
 const iconL10n = (typeof window !== 'undefined' && window.fromscratchIcons) || {};
@@ -22,25 +23,6 @@ const humanize = (slug) => slug.replace(/-/g, ' ').replace(/^\w/, (char) => char
 const iconName = (icon) => icon.label || iconLabels[icon.filename] || humanize(icon.filename);
 const categoryName = (category) => category.label || categoryLabels[category.slug] || humanize(category.slug);
 
-// Remember the outline/filled preference across pickers and sessions.
-const VARIANT_STORAGE_KEY = 'fromscratchIconVariant';
-
-const readStoredVariant = () => {
-  try {
-    return window.localStorage.getItem(VARIANT_STORAGE_KEY) === 'fill' ? 'fill' : 'outline';
-  } catch (e) {
-    return 'outline';
-  }
-};
-
-const writeStoredVariant = (variant) => {
-  try {
-    window.localStorage.setItem(VARIANT_STORAGE_KEY, variant);
-  } catch (e) {
-    // Storage may be unavailable (private mode / disabled) — ignore.
-  }
-};
-
 /**
  * Reusable icon picker with an outline/filled toggle.
  *
@@ -57,11 +39,13 @@ const writeStoredVariant = (variant) => {
 export function IconPicker({ label, value, onChange }) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [variant, setVariant] = useState(() => {
-    const selected = findIconByValue(value);
-    // Match the current icon when editing; otherwise use the saved preference.
-    return selected ? selected.variant : readStoredVariant();
-  });
+  const [variant, setVariant] = useState(() => resolvePickerVariant(value));
+
+  useEffect(() => {
+    if (isOpen) {
+      setVariant(resolvePickerVariant(value));
+    }
+  }, [isOpen, value]);
 
   const query = search.trim().toLowerCase();
   const selected = findIconByValue(value);

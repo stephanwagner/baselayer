@@ -544,7 +544,7 @@ function fs_developer_render_system_info_panel(): void
 	?>
 	<div class="fs-page-settings-form" style="margin-bottom: 24px;">
 		<h2 class="title" style="margin-top: 0;"><?= esc_html__('System info', 'fromscratch') ?></h2>
-		<table class="widefat striped fs-system-info-table" role="presentation">
+		<table class="widefat -large-padding striped fs-system-info-table" role="presentation">
 			<tbody>
 				<tr>
 					<th scope="row"><?= esc_html__('PHP version', 'fromscratch') ?></th>

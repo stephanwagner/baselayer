@@ -63,6 +63,17 @@ h2.title + p.description {
 table.widefat {
   border-radius: 6px;
   overflow: hidden;
+
+  &.-large-padding {
+    td,
+    th {
+      padding: 12px 16px;
+
+      &:not(:first-child) {
+        padding-left: 0;
+      }
+    }
+  }
 }
 
 // CPT list with manual order: popover must not be clipped by table overflow.

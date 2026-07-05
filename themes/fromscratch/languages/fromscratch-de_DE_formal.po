@@ -200,6 +200,12 @@ msgstr "Neue Kategorie hinzufügen"
 msgid "New category name"
 msgstr "Neuer Kategoriename"
 
+msgid "Left"
+msgstr "Links"
+
+msgid "Right"
+msgstr "Rechts"
+
 # Templates
 
 msgid "Posts pagination"
@@ -222,6 +228,9 @@ msgstr "Keine Termine gefunden."
 
 msgid "Read more"
 msgstr "Mehr lesen"
+
+msgid "Open link"
+msgstr "Link öffnen"
 
 msgid "Excerpt"
 msgstr "Auszug"
@@ -1012,8 +1021,14 @@ msgstr "Sprachumschalter"
 msgid "Copy"
 msgstr "Kopieren"
 
+msgid "Copy code"
+msgstr "Code kopieren"
+
 msgid "Copied"
 msgstr "Kopiert"
+
+msgid "Choose icon"
+msgstr "Icon wählen"
 
 msgid "To display a language switcher in your theme, use the shortcode [fs_language_switcher]."
 msgstr "Um einen Sprachumschalter im Theme anzuzeigen, verwende den Shortcode [fs_language_switcher]."
@@ -1317,8 +1332,8 @@ msgstr "Unbekannt, siehe PHP-Info"
 msgid "Redis is installed, but object cache is not active. Enable Redis object caching."
 msgstr "Redis ist installiert, aber der Objekt-Cache ist nicht aktiv. Aktiviere Redis-Objektcaching."
 
-msgid "No persistent object cache detected. Consider enabling an object cache for better performance."
-msgstr "Kein persistenter Objekt-Cache erkannt. Aktivieren Sie einen Objekt-Cache für eine bessere Performance."
+msgid "No object cache detected. Consider enabling an object cache for better performance."
+msgstr "Kein Objekt-Cache erkannt. Aktiviere einen Objekt-Cache für eine bessere Performance."
 
 msgid "Redis object cache is active but safeguard is not installed. Install the safeguard to prevent outages when Redis is unavailable."
 msgstr "Der Redis-Objekt-Cache ist aktiv, aber der Schutz ist nicht installiert. Installiere den Schutz, um Ausfälle zu verhindern, wenn Redis nicht verfügbar ist."
@@ -2266,6 +2281,44 @@ msgstr "Suche abbrechen"
 
 msgid "Breadcrumb"
 msgstr "Breadcrumb"
+
+# Icons
+
+msgid "Icons"
+msgstr "Icons"
+
+msgid "You can add icons by combining an icon class (e.g. <code class=\"fs-code-small\">-icon-bolt</code>) with one of the patterns below. Icons render as CSS masks from <code class=\"fs-code-small\">assets/icons/</code>; size and color inherit from <code class=\"fs-code-small\">font-size</code> and <code class=\"fs-code-small\">currentColor</code>."
+msgstr "Sie können Icons hinzufügen, indem Sie eine Icon-Klasse (z. B. <code class=\"fs-code-small\">-icon-bolt</code>) mit einem der Muster unten kombinieren. Icons werden als CSS-Masken aus <code class=\"fs-code-small\">assets/icons/</code> gerendert; Größe und Farbe erben von <code class=\"fs-code-small\">font-size</code> und <code class=\"fs-code-small\">currentColor</code>."
+
+msgid "Buttons"
+msgstr "Buttons"
+
+msgid "Add <code class=\"fs-code-small\">-has-icon</code> and an icon class to the button. Use <code class=\"fs-code-small\">-icon-right</code> to place the icon after the label."
+msgstr "Fügen Sie <code class=\"fs-code-small\">-has-icon</code> und eine Icon-Klasse zur Schaltfläche hinzu. Mit <code class=\"fs-code-small\">-icon-right</code> platzieren Sie das Icon nach dem Label."
+
+msgid "Element"
+msgstr "Element"
+
+msgid "Button"
+msgstr "Button"
+
+msgid "Link"
+msgstr "Link"
+
+msgid "Icon position"
+msgstr "Icon-Position"
+
+msgid "Before or after text"
+msgstr "Vor oder nach Text"
+
+msgid "Add <code class=\"fs-code-small\">-icon-before</code> or <code class=\"fs-code-small\">-icon-after</code> with an icon class on the same element."
+msgstr "Fügen Sie <code class=\"fs-code-small\">-icon-before</code> oder <code class=\"fs-code-small\">-icon-after</code> zusammen mit einer Icon-Klasse auf demselben Element hinzu."
+
+msgid "Standalone icon"
+msgstr "Eigenständiges Icon"
+
+msgid "Add class <code class=\"fs-code-small\">fs-icon</code> and an icon class to render the icon standalone."
+msgstr "Fügen Sie die Klasse <code class=\"fs-code-small\">fs-icon</code> und eine Icon-Klasse hinzu, um das Icon eigenständig darzustellen."
 
 # Editor
 

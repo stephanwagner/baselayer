@@ -5,8 +5,8 @@ import {
   iconCategories,
   resolveIconName,
   iconMatchesQuery,
-  findIconByValue,
 } from '../../editor/icons/icon-catalog';
+import { readStoredVariant, writeStoredVariant, resolvePickerVariant } from '../../editor/icons/icon-variant';
 
 const iconL10n = () => (typeof window !== 'undefined' && window.fromscratchIcons) || {};
 
@@ -32,34 +32,33 @@ const iconName = (icon, labels) => icon.label || labels[icon.filename] || humani
 
 const categoryName = (category, labels) => category.label || labels[category.slug] || humanize(category.slug);
 
-const VARIANT_STORAGE_KEY = 'fromscratchIconVariant';
+const buildIconCode = (value) => `<div class="fs-icon -icon-${value}"></div>`;
 
-const readStoredVariant = () => {
-  try {
-    return window.localStorage.getItem(VARIANT_STORAGE_KEY) === 'fill' ? 'fill' : 'outline';
-  } catch {
-    return 'outline';
-  }
+const buildInlineCode = (value, placement, label) => {
+  const carrier = placement === 'after' ? '-icon-after' : '-icon-before';
+
+  return `<span class="${carrier} -icon-${value}">${label}</span>`;
 };
 
-const writeStoredVariant = (variant) => {
-  try {
-    window.localStorage.setItem(VARIANT_STORAGE_KEY, variant);
-  } catch {
-    // Storage may be unavailable — ignore.
-  }
+const inlinePreviewClasses = (value, placement) => {
+  const carrier = placement === 'after' ? '-icon-after' : '-icon-before';
+
+  return `${carrier} -icon-${value}`;
 };
 
-const buildIconCode = (value) => `<div class="fs-icon -icon-${value}" style="font-size: 64px;"></div>`;
-
-const buildButtonCode = (value, position) => {
+const buildButtonCode = (value, position, element = 'button') => {
   const iconClass = `-icon-${value}`;
-  const classes =
-    position === 'right'
-      ? `button -has-icon ${iconClass} -icon-right`
-      : `button -has-icon ${iconClass}`;
+  let classes = `button -has-icon ${iconClass}`;
 
-  return `<a href="/" class="${classes}">Button</a>`;
+  if (position === 'right') {
+    classes += ' -icon-right';
+  }
+
+  if (element === 'link') {
+    return `<a href="/" class="${classes}">Link</a>`;
+  }
+
+  return `<button type="button" class="${classes}">Button</button>`;
 };
 
 const buttonPreviewClasses = (value, position) => {
@@ -209,8 +208,7 @@ function createIconPickerModal() {
     onSelect = selectHandler;
     focusTarget = returnFocus || null;
 
-    const selected = findIconByValue(value);
-    variant = selected ? selected.variant : readStoredVariant();
+    variant = resolvePickerVariant(value);
     search = '';
 
     modal.querySelector('[data-fs-dev-icon-modal-search]').value = '';
@@ -292,8 +290,7 @@ function initIconsDemo(root = document) {
   const updateDemo = (nextValue) => {
     value = nextValue;
     preview.className = `fs-icon -icon-${value}`;
-    preview.style.fontSize = '64px';
-    codeEl.value = buildIconCode(value);
+    codeEl.textContent = buildIconCode(value);
     demo.setAttribute('data-fs-icons-demo-value', value);
   };
 
@@ -303,6 +300,37 @@ function initIconsDemo(root = document) {
   });
 
   updateDemo(value);
+}
+
+function initInlineIconsDemo(root = document) {
+  root.querySelectorAll('[data-fs-icons-inline-demo]').forEach((demo) => {
+    const preview = demo.querySelector('[data-fs-icons-inline-preview]');
+    const codeEl = demo.querySelector('[data-fs-icons-inline-code]');
+
+    if (!preview || !codeEl) {
+      return;
+    }
+
+    let value = demo.getAttribute('data-fs-icons-demo-value') || '';
+    const placement = demo.getAttribute('data-fs-icons-inline-placement') || 'before';
+    const label = preview.textContent.trim();
+
+    const updateDemo = () => {
+      demo.setAttribute('data-fs-icons-demo-value', value);
+      preview.className = inlinePreviewClasses(value, placement);
+      codeEl.textContent = buildInlineCode(value, placement, label);
+    };
+
+    bindChooseIcon(demo, {
+      getValue: () => value,
+      setValue: (nextValue) => {
+        value = nextValue;
+        updateDemo();
+      },
+    });
+
+    updateDemo();
+  });
 }
 
 function initButtonIconsDemo(root = document) {
@@ -312,40 +340,65 @@ function initButtonIconsDemo(root = document) {
     return;
   }
 
-  const previews = demo.querySelectorAll('[data-fs-icons-button-preview]');
-  const codeEls = demo.querySelectorAll('[data-fs-icons-button-code]');
+  const preview = demo.querySelector('[data-fs-icons-button-preview]');
+  const codeEl = demo.querySelector('[data-fs-icons-button-code]');
+  const positionButtons = demo.querySelectorAll('[data-fs-icons-position-toggle]');
+  const elementButtons = demo.querySelectorAll('[data-fs-icons-element-toggle]');
 
-  if (!previews.length || !codeEls.length) {
+  if (!preview || !codeEl) {
     return;
   }
 
   let value = demo.getAttribute('data-fs-icons-demo-value') || '';
+  let position = demo.getAttribute('data-fs-icons-button-position') || 'left';
+  let element = demo.getAttribute('data-fs-icons-button-element') || 'button';
 
-  const updateDemo = (nextValue) => {
-    value = nextValue;
-    demo.setAttribute('data-fs-icons-demo-value', value);
-
-    previews.forEach((preview) => {
-      const position = preview.getAttribute('data-fs-icons-button-position') || 'left';
-      preview.className = buttonPreviewClasses(value, position);
-    });
-
-    codeEls.forEach((codeEl) => {
-      const position = codeEl.getAttribute('data-fs-icons-button-code') || 'left';
-      codeEl.value = buildButtonCode(value, position);
+  const syncToggleGroup = (buttons, activeValue, attr) => {
+    buttons.forEach((button) => {
+      const isActive = button.getAttribute(attr) === activeValue;
+      button.classList.toggle('is-active', isActive);
+      button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
     });
   };
 
-  bindChooseIcon(demo, {
-    getValue: () => value,
-    setValue: updateDemo,
+  const updateDemo = () => {
+    demo.setAttribute('data-fs-icons-demo-value', value);
+    demo.setAttribute('data-fs-icons-button-position', position);
+    demo.setAttribute('data-fs-icons-button-element', element);
+    preview.className = buttonPreviewClasses(value, position);
+    codeEl.textContent = buildButtonCode(value, position, element);
+    syncToggleGroup(positionButtons, position, 'data-fs-icons-position-toggle');
+    syncToggleGroup(elementButtons, element, 'data-fs-icons-element-toggle');
+  };
+
+  positionButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      position = button.getAttribute('data-fs-icons-position-toggle') || 'left';
+      updateDemo();
+    });
   });
 
-  updateDemo(value);
+  elementButtons.forEach((button) => {
+    button.addEventListener('click', () => {
+      element = button.getAttribute('data-fs-icons-element-toggle') || 'button';
+      updateDemo();
+    });
+  });
+
+  bindChooseIcon(demo, {
+    getValue: () => value,
+    setValue: (nextValue) => {
+      value = nextValue;
+      updateDemo();
+    },
+  });
+
+  updateDemo();
 }
 
 function initDeveloperIcons(root = document) {
   initButtonIconsDemo(root);
+  initInlineIconsDemo(root);
   initIconsDemo(root);
 }
 

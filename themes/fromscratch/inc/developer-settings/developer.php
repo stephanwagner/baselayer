@@ -51,7 +51,7 @@ function fs_render_developer_cheatsheet(): void
 			<h2 class="title" style="margin-top: 0;"><?= esc_html__('Configs', 'fromscratch') ?></h2>
 			<p class="description"><?= esc_html__('Optional defines in wp-config.php for local development and testing.', 'fromscratch') ?></p>
 
-			<table class="widefat striped helpers-table__table">
+			<table class="widefat -large-padding striped helpers-table__table">
 				<tbody>
 					<tr>
 						<td>
@@ -70,7 +70,7 @@ function fs_render_developer_cheatsheet(): void
 			<h2 class="title" style="margin-top: 0;"><?= esc_html__('Helpers', 'fromscratch') ?></h2>
 			<p class="description"><?= esc_html__('Common helper functions and utilities for templates, theme code, and frontend scripts.', 'fromscratch') ?></p>
 
-			<table class="widefat striped helpers-table__table">
+			<table class="widefat -large-padding 	striped helpers-table__table">
 				<tbody>
 					<tr>
 						<td>
@@ -197,101 +197,184 @@ function fs_render_developer_cheatsheet(): void
 			<hr style="margin: 28px 0;">
 
 			<h2 class="title" style="margin-top: 0;"><?= esc_html__('Icons', 'fromscratch') ?></h2>
-			<p class="description"><?= esc_html__('You can add icons by combining an icon class (e.g. -icon-bolt) with a carrier pattern below. Icons render as CSS masks from assets/icons/; size and color inherit from font-size and currentColor.', 'fromscratch') ?></p>
-
-			<?php
-			if (function_exists('fs_load_icons_textdomain')) {
-				fs_load_icons_textdomain();
-			}
-
-			$icon_ui_strings = function_exists('fs_icon_ui_strings') ? fs_icon_ui_strings() : [];
-			$button_icon = 'celebration-fill';
-			$button_icon_class = '-icon-' . $button_icon;
-			$button_left_code = '<a href="/" class="button -has-icon ' . $button_icon_class . '">Button</a>';
-			$button_right_code = '<a href="/" class="button -has-icon ' . $button_icon_class . ' -icon-right">Button</a>';
-			$demo_icon = 'bolt';
-			$demo_icon_class = '-icon-' . $demo_icon;
-			$demo_icon_code = '<div class="fs-icon ' . $demo_icon_class . '" style="font-size: 64px;"></div>';
-			?>
-
-			<h3 class="helpers-icons__subtitle"><?= esc_html__('Buttons', 'fromscratch') ?></h3>
 			<p class="description"><?= wp_kses(
-				__('Add <code>-has-icon</code> and an icon class to the button. Use <code>-icon-right</code> to place the icon after the label.', 'fromscratch'),
-				['code' => []]
+				__('You can add icons by combining an icon class (e.g. <code class="fs-code-small">-icon-bolt</code>) with one of the patterns below. Icons render as CSS masks from <code class="fs-code-small">assets/icons/</code>; size and color inherit from <code class="fs-code-small">font-size</code> and <code class="fs-code-small">currentColor</code>.', 'fromscratch'),
+				['code' => ['class' => true]]
 			) ?></p>
 
-			<div
-				class="helpers-icons-demo helpers-icons-buttons-demo"
-				data-fs-icons-buttons-demo
-				data-fs-icons-demo-value="<?= esc_attr($button_icon) ?>"
-				data-fs-icons-ui="<?= esc_attr(wp_json_encode($icon_ui_strings)) ?>"
-			>
-				<div class="helpers-icons-demo__toolbar helpers-icons-demo__toolbar--compact">
-					<button type="button" class="button" data-fs-icons-demo-choose>
-						<?= esc_html__('Choose icon', 'fromscratch') ?>
-					</button>
-				</div>
-				<div class="helpers-icons-demo__row">
-					<a href="#" class="button -has-icon <?= esc_attr($button_icon_class) ?>" data-fs-icons-button-preview data-fs-icons-button-position="left" onclick="return false;"><?= esc_html__('Button', 'fromscratch') ?></a>
-					<label class="screen-reader-text" for="fs-icons-button-left-code"><?= esc_html__('Button code (icon left)', 'fromscratch') ?></label>
-					<textarea id="fs-icons-button-left-code" class="helpers-icons-demo__textarea helpers-icons-demo__textarea--inline" rows="1" readonly data-fs-icons-button-code="left"><?= esc_textarea($button_left_code) ?></textarea>
-					<button
-						type="button"
-						class="button"
-						data-fs-copy-from-source="fs-icons-button-left-code"
-						data-fs-copy-feedback-text="<?= esc_attr__('Copied', 'fromscratch') ?>"
-					>
-						<?= esc_html__('Copy code', 'fromscratch') ?>
-					</button>
-				</div>
-				<div class="helpers-icons-demo__row">
-					<a href="#" class="button -has-icon <?= esc_attr($button_icon_class) ?> -icon-right" data-fs-icons-button-preview data-fs-icons-button-position="right" onclick="return false;"><?= esc_html__('Button', 'fromscratch') ?></a>
-					<label class="screen-reader-text" for="fs-icons-button-right-code"><?= esc_html__('Button code (icon right)', 'fromscratch') ?></label>
-					<textarea id="fs-icons-button-right-code" class="helpers-icons-demo__textarea helpers-icons-demo__textarea--inline" rows="1" readonly data-fs-icons-button-code="right"><?= esc_textarea($button_right_code) ?></textarea>
-					<button
-						type="button"
-						class="button"
-						data-fs-copy-from-source="fs-icons-button-right-code"
-						data-fs-copy-feedback-text="<?= esc_attr__('Copied', 'fromscratch') ?>"
-					>
-						<?= esc_html__('Copy code', 'fromscratch') ?>
-					</button>
-				</div>
-			</div>
+			<div class="fs-admin-group -has-margin">
+				<?php
+				if (function_exists('fs_load_icons_textdomain')) {
+					fs_load_icons_textdomain();
+				}
 
-			<h3 class="helpers-icons__subtitle"><?= esc_html__('Before or after text', 'fromscratch') ?></h3>
-			<p class="description"><?= esc_html__('Add -icon-before or -icon-after with an icon class on the same element.', 'fromscratch') ?></p>
-			<p>
-				<code class="fs-code-small helpers-icons__example-code">&lt;span class="-icon-before -icon-external-link"&gt;Open link&lt;/span&gt;</code>
-			</p>
+				$icon_ui_strings = function_exists('fs_icon_ui_strings') ? fs_icon_ui_strings() : [];
+				$button_icon = 'premium-fill';
+				$button_icon_class = '-icon-' . $button_icon;
+				$button_code = '<button type="button" class="button -has-icon ' . $button_icon_class . '">Button</button>';
+				$inline_before_icon = 'open-in-new';
+				$inline_before_icon_class = '-icon-' . $inline_before_icon;
+				$inline_before_label = __('Open link', 'fromscratch');
+				$inline_before_code = '<span class="-icon-before ' . $inline_before_icon_class . '">' . $inline_before_label . '</span>';
+				$inline_after_icon = 'arrow-right';
+				$inline_after_icon_class = '-icon-' . $inline_after_icon;
+				$inline_after_label = __('Read more', 'fromscratch');
+				$inline_after_code = '<span class="-icon-after ' . $inline_after_icon_class . '">' . $inline_after_label . '</span>';
+				$demo_icon = 'rocket-launch-fill';
+				$demo_icon_class = '-icon-' . $demo_icon;
+				$demo_icon_code = '<div class="fs-icon ' . $demo_icon_class . '"></div>';
+				?>
 
-			<h3 class="helpers-icons__subtitle"><?= esc_html__('Standalone icon', 'fromscratch') ?></h3>
-			<p class="description"><?= esc_html__('Add .fs-icon and an icon class when the icon is not paired with label text.', 'fromscratch') ?></p>
+				<h3 class="helpers-icons__subtitle"><?= esc_html__('Buttons', 'fromscratch') ?></h3>
+				<p class="description"><?= wp_kses(
+											__('Add <code class="fs-code-small">-has-icon</code> and an icon class to the button. Use <code class="fs-code-small">-icon-right</code> to place the icon after the label.', 'fromscratch'),
+											['code' => ['class' => true]]
+										) ?></p>
 
-			<div
-				class="helpers-icons-demo"
-				data-fs-icons-demo
-				data-fs-icons-demo-value="<?= esc_attr($demo_icon) ?>"
-				data-fs-icons-ui="<?= esc_attr(wp_json_encode($icon_ui_strings)) ?>"
-			>
-				<div class="helpers-icons-demo__toolbar">
-					<div class="helpers-icons-demo__preview" aria-hidden="true">
-						<span class="fs-icon <?= esc_attr($demo_icon_class) ?>" style="font-size: 64px;" data-fs-icons-demo-preview></span>
+				<div
+					class="helpers-icons-demo helpers-icons-buttons-demo"
+					data-fs-icons-buttons-demo
+					data-fs-icons-demo-value="<?= esc_attr($button_icon) ?>"
+					data-fs-icons-button-position="left"
+					data-fs-icons-button-element="button"
+					data-fs-icons-ui="<?= esc_attr(wp_json_encode($icon_ui_strings)) ?>">
+					<div class="helpers-icons-demo__toolbar helpers-icons-demo__toolbar--buttons">
+						<button type="button" class="button button-small" data-fs-icons-demo-choose>
+							<?= esc_html__('Choose icon', 'fromscratch') ?>
+						</button>
+						<div class="helpers-icons-demo__toolbar-actions">
+							<div class="helpers-icons-demo__toggle" role="group" aria-label="<?= esc_attr__('Element', 'fromscratch') ?>">
+								<button type="button" class="button button-secondary button-small is-active" data-fs-icons-element-toggle="button" aria-pressed="true">
+									<?= esc_html__('Button', 'fromscratch') ?>
+								</button>
+								<button type="button" class="button button-secondary button-small" data-fs-icons-element-toggle="link" aria-pressed="false">
+									<?= esc_html__('Link', 'fromscratch') ?>
+								</button>
+							</div>
+							<div class="helpers-icons-demo__toggle" role="group" aria-label="<?= esc_attr__('Icon position', 'fromscratch') ?>">
+								<button type="button" class="button button-secondary button-small is-active" data-fs-icons-position-toggle="left" aria-pressed="true">
+									<?= esc_html__('Left', 'fromscratch') ?>
+								</button>
+								<button type="button" class="button button-secondary button-small" data-fs-icons-position-toggle="right" aria-pressed="false">
+									<?= esc_html__('Right', 'fromscratch') ?>
+								</button>
+							</div>
+							<button
+								type="button"
+								class="button button-small"
+								data-fs-copy-from-source="fs-icons-button-code"
+								data-fs-copy-feedback-text="<?= esc_attr__('Copied', 'fromscratch') ?>">
+								<?= esc_html__('Copy code', 'fromscratch') ?>
+							</button>
+						</div>
 					</div>
-					<button type="button" class="button" data-fs-icons-demo-choose>
-						<?= esc_html__('Choose icon', 'fromscratch') ?>
-					</button>
-					<button
-						type="button"
-						class="button"
-						data-fs-copy-from-source="fs-icons-demo-code"
-						data-fs-copy-feedback-text="<?= esc_attr__('Copied', 'fromscratch') ?>"
-					>
-						<?= esc_html__('Copy code', 'fromscratch') ?>
-					</button>
+					<div class="helpers-icons-demo__panel">
+						<div class="helpers-icons-demo__preview helpers-icons-demo__preview--button">
+							<a href="#" class="button -has-icon <?= esc_attr($button_icon_class) ?>" data-fs-icons-button-preview onclick="return false;" style="background: #fff;"><?= esc_html__('Button', 'fromscratch') ?></a>
+						</div>
+						<pre class="helpers-icons-demo__code"><code id="fs-icons-button-code" class="fs-code-small helpers-icons-demo__code-text" data-fs-icons-button-code><?= esc_html($button_code) ?></code></pre>
+					</div>
 				</div>
-				<label class="screen-reader-text" for="fs-icons-demo-code"><?= esc_html__('Icon code', 'fromscratch') ?></label>
-				<textarea id="fs-icons-demo-code" class="helpers-icons-demo__textarea" rows="2" readonly data-fs-icons-demo-code><?= esc_textarea($demo_icon_code) ?></textarea>
+
+				<hr style="margin: 28px 0 24px;">
+
+				<h3 class="helpers-icons__subtitle" style="margin-top: 0;"><?= esc_html__('Before or after text', 'fromscratch') ?></h3>
+				<p class="description"><?= wp_kses(
+					__('Add <code class="fs-code-small">-icon-before</code> or <code class="fs-code-small">-icon-after</code> with an icon class on the same element.', 'fromscratch'),
+					['code' => ['class' => true]]
+				) ?></p>
+
+				<div class="helpers-icons-inline-demo">
+					<div
+						class="helpers-icons-inline-demo__item helpers-icons-demo"
+						data-fs-icons-inline-demo
+						data-fs-icons-demo-value="<?= esc_attr($inline_before_icon) ?>"
+						data-fs-icons-inline-placement="before"
+						data-fs-icons-ui="<?= esc_attr(wp_json_encode($icon_ui_strings)) ?>">
+						<div class="helpers-icons-demo__toolbar helpers-icons-demo__toolbar--buttons">
+							<button type="button" class="button button-small" data-fs-icons-demo-choose>
+								<?= esc_html__('Choose icon', 'fromscratch') ?>
+							</button>
+							<div class="helpers-icons-demo__toolbar-actions">
+								<button
+									type="button"
+									class="button button-small"
+									data-fs-copy-from-source="fs-icons-inline-before-code"
+									data-fs-copy-feedback-text="<?= esc_attr__('Copied', 'fromscratch') ?>">
+									<?= esc_html__('Copy code', 'fromscratch') ?>
+								</button>
+							</div>
+						</div>
+						<div class="helpers-icons-demo__panel">
+							<div class="helpers-icons-demo__preview helpers-icons-demo__preview--inline">
+								<span class="-icon-before <?= esc_attr($inline_before_icon_class) ?>" data-fs-icons-inline-preview><?= esc_html($inline_before_label) ?></span>
+							</div>
+							<pre class="helpers-icons-demo__code"><code id="fs-icons-inline-before-code" class="fs-code-small helpers-icons-demo__code-text" data-fs-icons-inline-code><?= esc_html($inline_before_code) ?></code></pre>
+						</div>
+					</div>
+					<div
+						class="helpers-icons-inline-demo__item helpers-icons-demo"
+						data-fs-icons-inline-demo
+						data-fs-icons-demo-value="<?= esc_attr($inline_after_icon) ?>"
+						data-fs-icons-inline-placement="after"
+						data-fs-icons-ui="<?= esc_attr(wp_json_encode($icon_ui_strings)) ?>">
+						<div class="helpers-icons-demo__toolbar helpers-icons-demo__toolbar--buttons">
+							<button type="button" class="button button-small" data-fs-icons-demo-choose>
+								<?= esc_html__('Choose icon', 'fromscratch') ?>
+							</button>
+							<div class="helpers-icons-demo__toolbar-actions">
+								<button
+									type="button"
+									class="button button-small"
+									data-fs-copy-from-source="fs-icons-inline-after-code"
+									data-fs-copy-feedback-text="<?= esc_attr__('Copied', 'fromscratch') ?>">
+									<?= esc_html__('Copy code', 'fromscratch') ?>
+								</button>
+							</div>
+						</div>
+						<div class="helpers-icons-demo__panel">
+							<div class="helpers-icons-demo__preview helpers-icons-demo__preview--inline">
+								<span class="-icon-after <?= esc_attr($inline_after_icon_class) ?>" data-fs-icons-inline-preview><?= esc_html($inline_after_label) ?></span>
+							</div>
+							<pre class="helpers-icons-demo__code"><code id="fs-icons-inline-after-code" class="fs-code-small helpers-icons-demo__code-text" data-fs-icons-inline-code><?= esc_html($inline_after_code) ?></code></pre>
+						</div>
+					</div>
+				</div>
+
+				<hr style="margin: 28px 0 24px;">
+
+				<h3 class="helpers-icons__subtitle"><?= esc_html__('Standalone icon', 'fromscratch') ?></h3>
+				<p class="description"><?= wp_kses(
+					__('Add class <code class="fs-code-small">fs-icon</code> and an icon class to render the icon standalone.', 'fromscratch'),
+					['code' => ['class' => true]]
+				) ?></p>
+
+				<div
+					class="helpers-icons-demo helpers-icons-standalone-demo"
+					data-fs-icons-demo
+					data-fs-icons-demo-value="<?= esc_attr($demo_icon) ?>"
+					data-fs-icons-ui="<?= esc_attr(wp_json_encode($icon_ui_strings)) ?>">
+					<div class="helpers-icons-demo__toolbar helpers-icons-demo__toolbar--buttons">
+						<button type="button" class="button button-small" data-fs-icons-demo-choose>
+							<?= esc_html__('Choose icon', 'fromscratch') ?>
+						</button>
+						<div class="helpers-icons-demo__toolbar-actions">
+							<button
+								type="button"
+								class="button button-small"
+								data-fs-copy-from-source="fs-icons-demo-code"
+								data-fs-copy-feedback-text="<?= esc_attr__('Copied', 'fromscratch') ?>">
+								<?= esc_html__('Copy code', 'fromscratch') ?>
+							</button>
+						</div>
+					</div>
+					<div class="helpers-icons-demo__panel">
+						<div class="helpers-icons-demo__preview helpers-icons-demo__preview--standalone" aria-hidden="true">
+							<span class="fs-icon <?= esc_attr($demo_icon_class) ?>" data-fs-icons-demo-preview></span>
+						</div>
+						<pre class="helpers-icons-demo__code"><code id="fs-icons-demo-code" class="fs-code-small helpers-icons-demo__code-text" data-fs-icons-demo-code><?= esc_html($demo_icon_code) ?></code></pre>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>
