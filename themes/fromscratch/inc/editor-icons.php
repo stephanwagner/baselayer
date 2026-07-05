@@ -78,10 +78,11 @@ function fs_icon_labels(): array
 		'arrow-left-alt'         => _x('Arrow left (alt)', 'icon name', 'fromscratch-icons'),
 		'arrow-right-alt'        => _x('Arrow right (alt)', 'icon name', 'fromscratch-icons'),
 		'arrow-up-alt'           => _x('Arrow up (alt)', 'icon name', 'fromscratch-icons'),
-		'arrow-up-thick'         => _x('Arrow up (thick)', 'icon name', 'fromscratch-icons'),
+		'shape-up'               => _x('Shape up', 'icon name', 'fromscratch-icons'),
+		'shape-up-stack'         => _x('Shape up stack', 'icon name', 'fromscratch-icons'),
 		'arrow-line-start'       => _x('Arrow line start', 'icon name', 'fromscratch-icons'),
 		'arrow-line-end'         => _x('Arrow line end', 'icon name', 'fromscratch-icons'),
-		'arrow-down-down'        => _x('Arrow down (double)', 'icon name', 'fromscratch-icons'),
+		'arrow-down-alt'         => _x('Arrow down (alt)', 'icon name', 'fromscratch-icons'),
 		'drop-left'              => _x('Drop left', 'icon name', 'fromscratch-icons'),
 		'drop-right'             => _x('Drop right', 'icon name', 'fromscratch-icons'),
 		'dropdown'               => _x('Dropdown', 'icon name', 'fromscratch-icons'),
@@ -105,6 +106,7 @@ function fs_icon_labels(): array
 		'restore'                => _x('Restore', 'icon name', 'fromscratch-icons'),
 		'copy'                   => _x('Copy', 'icon name', 'fromscratch-icons'),
 		'save'                   => _x('Save', 'icon name', 'fromscratch-icons'),
+		'save-as'                => _x('Save as', 'icon name', 'fromscratch-icons'),
 		'download'               => _x('Download', 'icon name', 'fromscratch-icons'),
 		'download-alt'           => _x('Download (alt)', 'icon name', 'fromscratch-icons'),
 		'upload'                 => _x('Upload', 'icon name', 'fromscratch-icons'),
@@ -125,7 +127,6 @@ function fs_icon_labels(): array
 		'compare-text'             => _x('Compare text', 'icon name', 'fromscratch-icons'),
 		'contract-sign'            => _x('Sign contract', 'icon name', 'fromscratch-icons'),
 		'resize'                   => _x('Resize', 'icon name', 'fromscratch-icons'),
-		'split'                    => _x('Split', 'icon name', 'fromscratch-icons'),
 		'swipe-left-right'         => _x('Swipe left/right', 'icon name', 'fromscratch-icons'),
 		'swipe-up-down'            => _x('Swipe up/down', 'icon name', 'fromscratch-icons'),
 		'content-cut'              => _x('Cut', 'icon name', 'fromscratch-icons'),
@@ -229,7 +230,7 @@ function fs_icon_labels(): array
 		'flag-alt'               => _x('Flag (alt)', 'icon name', 'fromscratch-icons'),
 		'bookmark-heart'         => _x('Bookmark heart', 'icon name', 'fromscratch-icons'),
 		'bookmark-stacks'        => _x('Bookmark stacks', 'icon name', 'fromscratch-icons'),
-		'badge'                  => _x('Badge', 'icon name', 'fromscratch-icons'),
+		'badge'                  => _x('ID badge', 'icon name', 'fromscratch-icons'),
 		'smiley'                   => _x('Smiley', 'icon name', 'fromscratch-icons'),
 
 		// Media.
@@ -504,7 +505,8 @@ function fs_icon_labels(): array
 		'notifications-circle'   => _x('Notifications circle', 'icon name', 'fromscratch-icons'),
 		'clock'                  => _x('Clock', 'icon name', 'fromscratch-icons'),
 		'clock-alt'              => _x('Clock (alt)', 'icon name', 'fromscratch-icons'),
-		'watch-alt'                  => _x('Watch', 'icon name', 'fromscratch-icons'),
+		'watch'                  => _x('Watch', 'icon name', 'fromscratch-icons'),
+		'watch-alt'              => _x('Watch (alt)', 'icon name', 'fromscratch-icons'),
 		'history'                => _x('History', 'icon name', 'fromscratch-icons'),
 		'hourglass'              => _x('Hourglass', 'icon name', 'fromscratch-icons'),
 		'calendar'               => _x('Calendar (blank)', 'icon name', 'fromscratch-icons'),
@@ -699,7 +701,7 @@ function fs_icon_labels(): array
 function fs_icon_category_labels(): array
 {
 	return [
-		'navigation'    => _x('Navigation', 'icon category', 'fromscratch-icons'),
+		'navigation'    => _x('Arrows & navigation', 'icon category', 'fromscratch-icons'),
 		'actions'       => _x('Actions', 'icon category', 'fromscratch-icons'),
 		'editing'       => _x('Editing & text', 'icon category', 'fromscratch-icons'),
 		'rich-text'     => _x('Rich text', 'icon category', 'fromscratch-icons'),

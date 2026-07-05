@@ -225,7 +225,7 @@ function fs_render_developer_cheatsheet(): void
 				$demo_icon = 'rocket-launch-fill';
 				$demo_icon_class = '-icon-' . $demo_icon;
 				$demo_icon_code = '<div class="fs-icon ' . $demo_icon_class . '"></div>';
-				$svg_icon = 'planet-fill';
+				$svg_icon = 'planet'; // -fill TODO 
 				$svg_icon_path = function_exists('fs_icon_svg_asset_path')
 					? fs_icon_svg_asset_path($svg_icon)
 					: '/icons/' . $svg_icon . '.svg';
