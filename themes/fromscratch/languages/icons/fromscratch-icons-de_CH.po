@@ -56,8 +56,8 @@ msgid "Layout & blocks"
 msgstr "Layout & Blöcke"
 
 msgctxt "icon category"
-msgid "Commerce & finance"
-msgstr "Handel & Finanzen"
+msgid "Commerce, finance & legal"
+msgstr "Handel, Finanzen & Recht"
 
 msgctxt "icon category"
 msgid "People & accounts"
@@ -739,7 +739,7 @@ msgctxt "icon name"
 msgid "Layers"
 msgstr "Ebenen"
 
-# Icon names — Commerce & finance
+# Icon names — Commerce, finance & legal
 
 msgctxt "icon name"
 msgid "Shopping cart"
@@ -826,8 +826,8 @@ msgid "Currency exchange"
 msgstr "Währungsumtausch"
 
 msgctxt "icon name"
-msgid "Sell"
-msgstr "Verkaufen"
+msgid "Sell tag"
+msgstr "Preisschild"
 
 msgctxt "icon name"
 msgid "Premium"
@@ -950,6 +950,22 @@ msgstr "Smartphone"
 msgctxt "icon name"
 msgid "Mobile (alt)"
 msgstr "Smartphone (alternativ)"
+
+msgctxt "icon name"
+msgid "Rotate mobile"
+msgstr "Handy drehen"
+
+msgctxt "icon name"
+msgid "Battery full"
+msgstr "Akku voll"
+
+msgctxt "icon name"
+msgid "Battery half"
+msgstr "Akku halb voll"
+
+msgctxt "icon name"
+msgid "Battery low"
+msgstr "Akku schwach"
 
 msgctxt "icon name"
 msgid "TV"
@@ -1628,6 +1644,10 @@ msgstr "Landschaft"
 msgctxt "icon name"
 msgid "Face (alt)"
 msgstr "Gesicht (alternativ)"
+
+msgctxt "icon name"
+msgid "Face (female)"
+msgstr "Weibliches Gesicht"
 msgctxt "icon name"
 msgid "Pregnant woman"
 msgstr "Schwangere"
@@ -1809,15 +1829,19 @@ msgstr "Kopfmontiertes Gerät"
 msgctxt "icon name"
 msgid "Headset"
 msgstr "Headset"
-msgctxt "icon name"
-msgid "Rotate mobile"
-msgstr "Handy drehen"
+
 msgctxt "icon name"
 msgid "Wi‑Fi"
 msgstr "WLAN"
+
 msgctxt "icon name"
 msgid "Power"
 msgstr "Strom"
+
+msgctxt "icon name"
+msgid "Power unplugged"
+msgstr "Strom getrennt"
+
 msgctxt "icon name"
 msgid "Power off circle"
 msgstr "Ausschalten (Kreis)"
@@ -2116,3 +2140,23 @@ msgstr "Form nach oben (Stapel)"
 msgctxt "icon name"
 msgid "Shape up stack (2)"
 msgstr "Form nach oben (Stapel 2)"
+
+msgctxt "icon name"
+msgid "Checkbook"
+msgstr "Scheckbuch"
+
+msgctxt "icon name"
+msgid "Wine"
+msgstr "Wein"
+
+msgctxt "icon name"
+msgid "Water glass"
+msgstr "Wasserglas"
+
+msgctxt "icon name"
+msgid "No drinks"
+msgstr "Keine Getränke"
+
+msgctxt "icon name"
+msgid "Sailing"
+msgstr "Segeln"
