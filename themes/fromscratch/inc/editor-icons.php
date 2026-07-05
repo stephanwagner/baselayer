@@ -266,7 +266,7 @@ function fs_icon_labels(): array
 		'pin-drop'               => _x('Pin', 'icon name', 'fromscratch-icons'),
 		'map'                    => _x('Map', 'icon name', 'fromscratch-icons'),
 		'compass'                => _x('Compass', 'icon name', 'fromscratch-icons'),
-		'navigation'             => _x('Navigation', 'icon name', 'fromscratch-icons'),
+		'navigation-circle'      => _x('Navigation', 'icon name', 'fromscratch-icons'),
 		'globe'                  => _x('Globe', 'icon name', 'fromscratch-icons'),
 		'car'                    => _x('Car', 'icon name', 'fromscratch-icons'),
 		'bicycle'                => _x('Bicycle', 'icon name', 'fromscratch-icons'),

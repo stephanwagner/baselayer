@@ -272,7 +272,7 @@ const builtInCategories = [
       { filename: 'pin-drop', alternatives: ['fill'], keywords: ['location', 'marker', 'map', 'place'] },
       { filename: 'map', alternatives: ['fill'], keywords: ['location', 'navigation', 'directions'] },
       { filename: 'compass', alternatives: ['fill'], keywords: ['navigation', 'direction', 'explore'] },
-      { filename: 'navigation', alternatives: ['fill'], keywords: ['direction', 'gps', 'near me', 'explore', 'arrow', 'maps'] },
+      { filename: 'navigation-circle', alternatives: ['fill'], keywords: ['direction', 'gps', 'near me', 'explore', 'arrow', 'maps'] },
       { filename: 'globe', alternatives: [], keywords: ['world', 'earth', 'international', 'web'] },
       { filename: 'car', alternatives: ['fill'], keywords: ['vehicle', 'drive', 'transport', 'auto'] },
       { filename: 'bicycle', alternatives: [], keywords: ['bike', 'cycle', 'transport', 'ride'] },
