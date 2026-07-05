@@ -46,6 +46,38 @@ const inlinePreviewClasses = (value, placement) => {
   return `${carrier} -icon-${value}`;
 };
 
+const iconSvgFile = (name) => {
+  if (name === 'theme-logo') {
+    return 'theme/logo.svg';
+  }
+
+  return `${name}.svg`;
+};
+
+const iconSvgAssetPath = (name) => {
+  if (name === 'theme-logo') {
+    return '/icons/theme/logo.svg';
+  }
+
+  return `/icons/${name}.svg`;
+};
+
+const escapeAttr = (value) => String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+
+const applySvgAttributes = (svg, attributes = {}) => {
+  if (!svg || !Object.keys(attributes).length) {
+    return svg;
+  }
+
+  const attrHtml = Object.entries(attributes)
+    .map(([name, value]) => ` ${name}="${escapeAttr(value)}"`)
+    .join('');
+
+  return svg.replace(/<svg\b([^>]*)>/i, `<svg$1${attrHtml}>`);
+};
+
+const buildSvgPhpCode = (value) => `fs_svg_code('${iconSvgAssetPath(value)}', ['class' => 'my-class']);`;
+
 const buildButtonCode = (value, position, element = 'button') => {
   const iconClass = `-icon-${value}`;
   let classes = `button -has-icon ${iconClass}`;
@@ -396,10 +428,62 @@ function initButtonIconsDemo(root = document) {
   updateDemo();
 }
 
+function initSvgIconsDemo(root = document) {
+  const demo = root.querySelector('[data-fs-icons-svg-demo]');
+
+  if (!demo) {
+    return;
+  }
+
+  const preview = demo.querySelector('[data-fs-icons-svg-preview]');
+  const phpCodeEl = demo.querySelector('[data-fs-icons-svg-php-code]');
+  const markupCodeEl = demo.querySelector('[data-fs-icons-svg-markup-code]');
+  const baseUrl = demo.getAttribute('data-fs-icons-svg-base') || '';
+
+  if (!preview || !phpCodeEl || !markupCodeEl) {
+    return;
+  }
+
+  let value = demo.getAttribute('data-fs-icons-demo-value') || '';
+  const svgAttributes = { class: 'my-class' };
+
+  const updateDemo = async (nextValue) => {
+    value = nextValue;
+    demo.setAttribute('data-fs-icons-demo-value', value);
+    phpCodeEl.textContent = buildSvgPhpCode(value);
+
+    let rawSvg = '';
+
+    try {
+      const response = await fetch(`${baseUrl}${iconSvgFile(value)}`);
+
+      if (response.ok) {
+        rawSvg = await response.text();
+      }
+    } catch {
+      rawSvg = '';
+    }
+
+    if (!rawSvg) {
+      return;
+    }
+
+    const markup = applySvgAttributes(rawSvg, svgAttributes);
+    preview.innerHTML = markup;
+    markupCodeEl.textContent = markup;
+  };
+
+  bindChooseIcon(demo, {
+    getValue: () => value,
+    setValue: updateDemo,
+  });
+}
+
 function initDeveloperIcons(root = document) {
   initButtonIconsDemo(root);
   initInlineIconsDemo(root);
   initIconsDemo(root);
+  initSvgIconsDemo(root);
 }
 
 document.addEventListener('DOMContentLoaded', () => {

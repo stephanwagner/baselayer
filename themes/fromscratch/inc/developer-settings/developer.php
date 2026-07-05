@@ -223,6 +223,12 @@ function fs_render_developer_cheatsheet(): void
 				$demo_icon = 'rocket-launch-fill';
 				$demo_icon_class = '-icon-' . $demo_icon;
 				$demo_icon_code = '<div class="fs-icon ' . $demo_icon_class . '"></div>';
+				$svg_icon = 'planet';
+				$svg_icon_path = function_exists('fs_icon_svg_asset_path')
+					? fs_icon_svg_asset_path($svg_icon)
+					: '/icons/' . $svg_icon . '.svg';
+				$svg_php_code = "fs_svg_code('" . $svg_icon_path . "', ['class' => 'my-class']);";
+				$svg_markup = fs_svg_code($svg_icon_path, ['class' => 'my-class']);
 				?>
 
 				<h3 class="helpers-icons__subtitle"><?= esc_html__('Buttons', 'fromscratch') ?></h3>
@@ -373,6 +379,58 @@ function fs_render_developer_cheatsheet(): void
 							<span class="fs-icon <?= esc_attr($demo_icon_class) ?>" data-fs-icons-demo-preview></span>
 						</div>
 						<pre class="helpers-icons-demo__code"><code id="fs-icons-demo-code" class="fs-code-small helpers-icons-demo__code-text" data-fs-icons-demo-code><?= esc_html($demo_icon_code) ?></code></pre>
+					</div>
+				</div>
+
+				<hr style="margin: 28px 0 24px;">
+
+				<h3 class="helpers-icons__subtitle"><?= esc_html__('Icon SVG code', 'fromscratch') ?></h3>
+				<p class="description"><?= wp_kses(
+					__('Use <code class="fs-code-small">fs_svg_code()</code> with an icon path under <code class="fs-code-small">/icons/</code> to output inline SVG markup in templates.', 'fromscratch'),
+					['code' => ['class' => true]]
+				) ?></p>
+				<p class="description"><?= wp_kses(
+					sprintf(
+						/* translators: %s: linked label for the Material Symbols icon library */
+						__('You can find more icons in the %s.', 'fromscratch'),
+						'<a href="' . esc_url('https://fonts.google.com/icons?icon.style=Rounded&icon.size=24&icon.color=%23e3e3e3') . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Material Symbols library', 'fromscratch') . '</a>'
+					),
+					['a' => ['href' => true, 'target' => true, 'rel' => true]]
+				) ?></p>
+
+				<div
+					class="helpers-icons-demo helpers-icons-svg-demo"
+					data-fs-icons-svg-demo
+					data-fs-icons-demo-value="<?= esc_attr($svg_icon) ?>"
+					data-fs-icons-svg-base="<?= esc_url(get_template_directory_uri() . '/assets/icons/') ?>"
+					data-fs-icons-ui="<?= esc_attr(wp_json_encode($icon_ui_strings)) ?>">
+					<div class="helpers-icons-demo__toolbar helpers-icons-demo__toolbar--buttons">
+						<button type="button" class="button button-small" data-fs-icons-demo-choose>
+							<?= esc_html__('Choose icon', 'fromscratch') ?>
+						</button>
+						<div class="helpers-icons-demo__toolbar-actions">
+							<button
+								type="button"
+								class="button button-small"
+								data-fs-copy-from-source="fs-icons-svg-php-code"
+								data-fs-copy-feedback-text="<?= esc_attr__('Copied', 'fromscratch') ?>">
+								<?= esc_html__('Copy PHP code', 'fromscratch') ?>
+							</button>
+							<button
+								type="button"
+								class="button button-small"
+								data-fs-copy-from-source="fs-icons-svg-markup-code"
+								data-fs-copy-feedback-text="<?= esc_attr__('Copied', 'fromscratch') ?>">
+								<?= esc_html__('Copy SVG', 'fromscratch') ?>
+							</button>
+						</div>
+					</div>
+					<div class="helpers-icons-demo__panel">
+						<div class="helpers-icons-demo__preview helpers-icons-demo__preview--svg" data-fs-icons-svg-preview><?= $svg_markup ?></div>
+						<div class="helpers-icons-demo__codes">
+							<pre class="helpers-icons-demo__code"><code id="fs-icons-svg-php-code" class="fs-code-small helpers-icons-demo__code-text" data-fs-icons-svg-php-code><?= esc_html($svg_php_code) ?></code></pre>
+							<pre class="helpers-icons-demo__code helpers-icons-demo__code--svg"><code id="fs-icons-svg-markup-code" class="fs-code-small helpers-icons-demo__code-text" data-fs-icons-svg-markup-code><?= esc_html($svg_markup) ?></code></pre>
+						</div>
 					</div>
 				</div>
 			</div>

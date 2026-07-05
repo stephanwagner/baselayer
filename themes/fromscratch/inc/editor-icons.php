@@ -478,6 +478,20 @@ function fs_icon_fill_names(): array
 }
 
 /**
+ * Asset path for fs_svg_code() from an icon catalog name.
+ *
+ * @param string $icon_name Icon filename without extension (e.g. bolt, theme-logo).
+ */
+function fs_icon_svg_asset_path(string $icon_name): string
+{
+	if ($icon_name === 'theme-logo') {
+		return '/icons/theme/logo.svg';
+	}
+
+	return '/icons/' . $icon_name . '.svg';
+}
+
+/**
  * Icon catalog entries for admin UI (developer cheatsheet icon demo).
  *
  * @return array<int, array{name: string, label: string, hasFill: bool}>

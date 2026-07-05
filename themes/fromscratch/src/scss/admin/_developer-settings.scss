@@ -325,6 +325,37 @@
   }
 }
 
+.helpers-icons-svg-demo {
+  .helpers-icons-demo__preview--svg {
+    align-items: center;
+    display: flex;
+    flex: 0 0 auto;
+    height: auto;
+    min-width: 96px;
+    padding: 16px;
+
+    svg {
+      display: block;
+      height: 64px;
+      width: 64px;
+    }
+  }
+
+  .helpers-icons-demo__codes {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .helpers-icons-demo__code--svg {
+    margin: 0;
+    max-height: 52px;
+    display: block;
+    overflow: auto;
+  }
+}
+
 .helpers-icons-buttons-demo {
   .helpers-icons-demo__preview--button {
     align-items: center;

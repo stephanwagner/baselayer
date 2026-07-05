@@ -2320,6 +2320,24 @@ msgstr "Eigenständiges Icon"
 msgid "Add class <code class=\"fs-code-small\">fs-icon</code> and an icon class to render the icon standalone."
 msgstr "Fügen Sie die Klasse <code class=\"fs-code-small\">fs-icon</code> und eine Icon-Klasse hinzu, um das Icon eigenständig darzustellen."
 
+msgid "Icon SVG code"
+msgstr "Icon-SVG-Code"
+
+msgid "Use <code class=\"fs-code-small\">fs_svg_code()</code> with an icon path under <code class=\"fs-code-small\">/icons/</code> to output inline SVG markup in templates."
+msgstr "Verwenden Sie <code class=\"fs-code-small\">fs_svg_code()</code> mit einem Icon-Pfad unter <code class=\"fs-code-small\">/icons/</code>, um Inline-SVG-Markup in Templates auszugeben."
+
+msgid "Copy PHP code"
+msgstr "PHP-Code kopieren"
+
+msgid "Copy SVG"
+msgstr "SVG kopieren"
+
+msgid "You can find more icons in the %s."
+msgstr "Weitere Icons finden Sie in der %s."
+
+msgid "Material Symbols library"
+msgstr "Material-Symbols-Bibliothek"
+
 # Editor
 
 msgid "Show page title"
