@@ -155,6 +155,23 @@ function fs_render_developer_features(): void
 
 				<table class="form-table" role="presentation">
 					<tr>
+						<th scope="row" class="form-table-checkbox-label"><?= esc_html__('Breadcrumbs', 'fromscratch') ?></th>
+						<td>
+							<input type="hidden" name="fromscratch_features[enable_breadcrumbs]" value="0">
+							<label><input type="checkbox" name="fromscratch_features[enable_breadcrumbs]" value="1" <?= checked($feat('enable_breadcrumbs'), 1, false) ?>> <?= esc_html__('Enable breadcrumbs', 'fromscratch') ?></label>
+							<p class="description fs-indent-checkbox"><?= esc_html__('Shows breadcrumb navigation on pages, posts, archives, and search.', 'fromscratch') ?></p>
+							<p class="description fs-indent-checkbox"><?= wp_kses(
+								__('Needs <code class="fs-code-small">fs_breadcrumbs()</code> in templates to show.', 'fromscratch'),
+								['code' => ['class' => true]]
+							) ?></p>
+						</td>
+					</tr>
+				</table>
+
+				<hr>
+
+				<table class="form-table" role="presentation">
+					<tr>
 						<th scope="row" class="form-table-checkbox-label"><?= esc_html__('Languages', 'fromscratch') ?></th>
 						<td>
 							<input type="hidden" name="fromscratch_features[enable_languages]" value="0">

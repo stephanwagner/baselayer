@@ -155,6 +155,7 @@ function fs_render_developer_cheatsheet(): void
 							<code class="fs-code-small"><?= esc_html("fs_content('hero_title', 'Default headline');") ?></code>
 						</td>
 					</tr>
+					<?php if (function_exists('fs_theme_feature_enabled') && fs_theme_feature_enabled('breadcrumbs')) : ?>
 					<tr>
 						<td>
 							<strong><?= esc_html__('Breadcrumbs', 'fromscratch') ?></strong><br>
@@ -172,6 +173,7 @@ function fs_render_developer_cheatsheet(): void
 ]);') ?></code>
 						</td>
 					</tr>
+					<?php endif; ?>
 					<tr>
 						<td>
 							<strong><?= esc_html__('Modal', 'fromscratch') ?></strong><br>

@@ -922,6 +922,15 @@ msgstr "SEO-Bereich aktivieren"
 msgid "Adds a section to pages and posts to enter SEO info."
 msgstr "Fügt Seiten und Beiträgen einen Bereich zum Eintragen von SEO-Infos hinzu."
 
+msgid "Enable breadcrumbs"
+msgstr "Breadcrumbs aktivieren"
+
+msgid "Shows breadcrumb navigation on pages, posts, archives, and search."
+msgstr "Zeigt Breadcrumb-Navigation auf Seiten, Beiträgen, Archiven und der Suche."
+
+msgid "Needs <code class=\"fs-code-small\">fs_breadcrumbs()</code> in templates to show."
+msgstr "Benötigt <code class=\"fs-code-small\">fs_breadcrumbs()</code> in Templates um angezeigt zu werden."
+
 msgid "Languages"
 msgstr "Sprachen"
 

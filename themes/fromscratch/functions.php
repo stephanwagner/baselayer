@@ -46,7 +46,6 @@ if (is_admin()) {
 
 // Helpers
 require_once 'inc/helpers/page-blocker.php';
-require_once 'inc/helpers/breadcrumbs.php';
 require_once 'inc/helpers/templates.php';
 
 // Features
@@ -81,6 +80,9 @@ if (fs_theme_feature_enabled('duplicate_post')) {
 if (fs_theme_feature_enabled('seo')) {
 	require_once 'inc/seo.php';
 }
+if (fs_theme_feature_enabled('breadcrumbs')) {
+	require_once 'inc/helpers/breadcrumbs.php';
+}
 if (fs_theme_feature_enabled('post_expirator')) {
 	require_once 'inc/post-expirator.php';
 }
@@ -101,6 +103,13 @@ if (fs_theme_feature_enabled('webp')) {
 }
 if (fs_theme_feature_enabled('media_folders')) {
 	require_once 'inc/media-library-folders.php';
+}
+
+if (!function_exists('fs_breadcrumbs')) {
+	function fs_breadcrumbs(array $args = []): string
+	{
+		return '';
+	}
 }
 
 // ACF

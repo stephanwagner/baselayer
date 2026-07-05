@@ -922,6 +922,15 @@ msgstr "SEO-Bereich aktivieren"
 msgid "Adds a section to pages and posts to enter SEO info."
 msgstr "Fügt Seiten und Beiträgen einen Bereich zum Eintragen von SEO-Infos hinzu."
 
+msgid "Enable breadcrumbs"
+msgstr "Breadcrumbs aktivieren"
+
+msgid "Shows breadcrumb navigation on pages, posts, archives, and search."
+msgstr "Zeigt Breadcrumb-Navigation auf Seiten, Beiträgen, Archiven und der Suche."
+
+msgid "Needs <code class=\"fs-code-small\">fs_breadcrumbs()</code> in templates to show."
+msgstr "Benötigt <code class=\"fs-code-small\">fs_breadcrumbs()</code> in Templates um angezeigt zu werden."
+
 msgid "Languages"
 msgstr "Sprachen"
 
@@ -2288,13 +2297,13 @@ msgid "Icons"
 msgstr "Icons"
 
 msgid "You can add icons by combining an icon class (e.g. <code class=\"fs-code-small\">-icon-bolt</code>) with one of the patterns below. Icons render as CSS masks from <code class=\"fs-code-small\">assets/icons/</code>; size and color inherit from <code class=\"fs-code-small\">font-size</code> and <code class=\"fs-code-small\">currentColor</code>."
-msgstr "Sie können Icons hinzufügen, indem Sie eine Icon-Klasse (z. B. <code class=\"fs-code-small\">-icon-bolt</code>) mit einem der Muster unten kombinieren. Icons werden als CSS-Masken aus <code class=\"fs-code-small\">assets/icons/</code> gerendert; Größe und Farbe erben von <code class=\"fs-code-small\">font-size</code> und <code class=\"fs-code-small\">currentColor</code>."
+msgstr "Du kannst Icons hinzufügen, indem du eine Icon-Klasse (z. B. <code class=\"fs-code-small\">-icon-bolt</code>) mit einem der Muster unten kombinierst. Icons werden als CSS-Masken aus <code class=\"fs-code-small\">assets/icons/</code> gerendert; Größe und Farbe erben von <code class=\"fs-code-small\">font-size</code> und <code class=\"fs-code-small\">currentColor</code>."
 
 msgid "Buttons"
 msgstr "Buttons"
 
 msgid "Add <code class=\"fs-code-small\">-has-icon</code> and an icon class to the button. Use <code class=\"fs-code-small\">-icon-right</code> to place the icon after the label."
-msgstr "Fügen Sie <code class=\"fs-code-small\">-has-icon</code> und eine Icon-Klasse zur Schaltfläche hinzu. Mit <code class=\"fs-code-small\">-icon-right</code> platzieren Sie das Icon nach dem Label."
+msgstr "Füge <code class=\"fs-code-small\">-has-icon</code> und eine Icon-Klasse zur Schaltfläche hinzu. Mit <code class=\"fs-code-small\">-icon-right</code> platzierst du das Icon nach dem Label."
 
 msgid "Element"
 msgstr "Element"
@@ -2312,19 +2321,19 @@ msgid "Before or after text"
 msgstr "Vor oder nach Text"
 
 msgid "Add <code class=\"fs-code-small\">-icon-before</code> or <code class=\"fs-code-small\">-icon-after</code> with an icon class on the same element."
-msgstr "Fügen Sie <code class=\"fs-code-small\">-icon-before</code> oder <code class=\"fs-code-small\">-icon-after</code> zusammen mit einer Icon-Klasse auf demselben Element hinzu."
+msgstr "Füge <code class=\"fs-code-small\">-icon-before</code> oder <code class=\"fs-code-small\">-icon-after</code> zusammen mit einer Icon-Klasse auf demselben Element hinzu."
 
 msgid "Standalone icon"
 msgstr "Eigenständiges Icon"
 
 msgid "Add class <code class=\"fs-code-small\">fs-icon</code> and an icon class to render the icon standalone."
-msgstr "Fügen Sie die Klasse <code class=\"fs-code-small\">fs-icon</code> und eine Icon-Klasse hinzu, um das Icon eigenständig darzustellen."
+msgstr "Füge die Klasse <code class=\"fs-code-small\">fs-icon</code> und eine Icon-Klasse hinzu, um das Icon eigenständig darzustellen."
 
 msgid "Icon SVG code"
 msgstr "Icon-SVG-Code"
 
 msgid "Use <code class=\"fs-code-small\">fs_svg_code()</code> with an icon path under <code class=\"fs-code-small\">/icons/</code> to output inline SVG markup in templates."
-msgstr "Verwenden Sie <code class=\"fs-code-small\">fs_svg_code()</code> mit einem Icon-Pfad unter <code class=\"fs-code-small\">/icons/</code>, um Inline-SVG-Markup in Templates auszugeben."
+msgstr "Verwende <code class=\"fs-code-small\">fs_svg_code()</code> mit einem Icon-Pfad unter <code class=\"fs-code-small\">/icons/</code>, um Inline-SVG-Markup in Templates auszugeben."
 
 msgid "Copy PHP code"
 msgstr "PHP-Code kopieren"
@@ -2333,7 +2342,7 @@ msgid "Copy SVG"
 msgstr "SVG kopieren"
 
 msgid "You can find more icons in the %s."
-msgstr "Weitere Icons finden Sie in der %s."
+msgstr "Weitere Icons findest du in der %s."
 
 msgid "Material Symbols library"
 msgstr "Material-Symbols-Bibliothek"
