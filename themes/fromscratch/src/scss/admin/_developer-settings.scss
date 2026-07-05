@@ -1,4 +1,5 @@
 @use '../variables' as *;
+@use '../icons/icons' as *;
 
 // System info
 
@@ -161,5 +162,223 @@
 
   &:first-child {
     margin-top: 0;
+  }
+}
+
+// Icons cheatsheet (Developer tab)
+
+.helpers-icons__subtitle {
+  font-size: 14px;
+  margin: 20px 0 8px;
+}
+
+.helpers-icons__example-code {
+  display: inline-block;
+}
+
+.helpers-icons-demo {
+  margin-top: 16px;
+  max-width: 720px;
+}
+
+.helpers-icons-demo__toolbar {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 12px;
+
+  &--compact {
+    margin-bottom: 10px;
+  }
+}
+
+.helpers-icons-demo__row {
+  align-items: center;
+  display: grid;
+  gap: 12px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  margin-bottom: 12px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.helpers-icons-buttons-demo {
+  .helpers-icons-demo__row {
+    max-width: 100%;
+  }
+
+  .button.-has-icon {
+    position: relative;
+    text-align: left;
+
+    &::before {
+      @include fs-icon;
+      content: '';
+      height: 24px;
+      line-height: 0;
+      position: absolute;
+      top: 7px;
+      width: 24px;
+    }
+  }
+
+  .button.-has-icon:not(.-icon-right) {
+    padding-left: 42px;
+
+    &::before {
+      left: 12px;
+    }
+  }
+
+  .button.-has-icon.-icon-right {
+    padding-right: 42px;
+
+    &::before {
+      right: 12px;
+    }
+  }
+}
+
+.helpers-icons-demo__preview {
+  align-items: center;
+  background: #f6f7f7;
+  border: 1px solid #dcdcde;
+  border-radius: 4px;
+  color: #1d2327;
+  display: flex;
+  flex: 0 0 96px;
+  height: 96px;
+  justify-content: center;
+}
+
+.helpers-icons-demo__textarea {
+  display: block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 0;
+  min-height: 56px;
+  resize: vertical;
+  width: 100%;
+
+  &--inline {
+    min-height: 0;
+  }
+}
+
+// Vanilla icon picker modal (Developer cheatsheet).
+
+body.fs-dev-icon-modal-open {
+  overflow: hidden;
+}
+
+.fs-dev-icon-modal {
+  inset: 0;
+  position: fixed;
+  z-index: 100000;
+}
+
+.fs-dev-icon-modal__backdrop {
+  background: rgba(0, 0, 0, 0.55);
+  inset: 0;
+  position: absolute;
+}
+
+.fs-dev-icon-modal__panel {
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  left: 50%;
+  max-height: calc(100vh - 64px);
+  max-width: 658px;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(100% - 32px);
+}
+
+.fs-dev-icon-modal__header {
+  align-items: center;
+  border-bottom: 1px solid #dcdcde;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 16px 20px;
+}
+
+.fs-dev-icon-modal__title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.fs-dev-icon-modal__close {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: #50575e;
+  cursor: pointer;
+  display: inline-flex;
+  height: 32px;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  width: 32px;
+
+  &:hover,
+  &:focus {
+    color: #1d2327;
+  }
+
+  .dashicons {
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+  }
+}
+
+.fs-dev-icon-modal__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+  padding: 16px 20px 20px;
+}
+
+.fs-dev-icon-modal__search {
+  margin: 0;
+  width: 100%;
+}
+
+.fs-dev-icon-modal__variant {
+  display: inline-flex;
+  gap: 0;
+
+  .button {
+    border-radius: 0;
+    margin: 0;
+
+    &:first-child {
+      border-bottom-right-radius: 0;
+      border-top-right-radius: 0;
+    }
+
+    &:last-child {
+      border-bottom-left-radius: 0;
+      border-left: 0;
+      border-top-left-radius: 0;
+    }
+
+    &.is-active {
+      background: #2271b1;
+      border-color: #2271b1;
+      color: #fff;
+    }
   }
 }

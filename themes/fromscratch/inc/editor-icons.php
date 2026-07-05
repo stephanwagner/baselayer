@@ -441,7 +441,71 @@ function fs_icon_ui_strings(): array
 		'outline' => _x('Outline', 'icon picker', 'fromscratch-icons'),
 		'filled'  => _x('Filled', 'icon picker', 'fromscratch-icons'),
 		'remove'  => _x('Remove', 'icon picker', 'fromscratch-icons'),
+		'close'   => _x('Close', 'icon picker', 'fromscratch-icons'),
 	];
+}
+
+/**
+ * Icon file names that ship with a filled variant (parsed from _icon-names.scss).
+ *
+ * @return string[]
+ */
+function fs_icon_fill_names(): array
+{
+	static $cache = null;
+
+	if ($cache !== null) {
+		return $cache;
+	}
+
+	$path = get_template_directory() . '/src/scss/icons/_icon-names.scss';
+
+	if (!is_readable($path)) {
+		return $cache = [];
+	}
+
+	$content = (string) file_get_contents($path);
+
+	if (!preg_match('/\$fs-icon-fill:\s*\((.*?)\);/s', $content, $matches)) {
+		return $cache = [];
+	}
+
+	preg_match_all('/[\'"]?([a-z0-9-]+)[\'"]?/i', $matches[1], $names);
+
+	$cache = array_values(array_unique(array_filter($names[1] ?? [])));
+
+	return $cache;
+}
+
+/**
+ * Icon catalog entries for admin UI (developer cheatsheet icon demo).
+ *
+ * @return array<int, array{name: string, label: string, hasFill: bool}>
+ */
+function fs_icon_admin_catalog(): array
+{
+	fs_load_icons_textdomain();
+
+	$labels = fs_icon_labels();
+	$fill = array_flip(fs_icon_fill_names());
+	$catalog = [];
+
+	foreach ($labels as $name => $label) {
+		$catalog[] = [
+			'name'    => $name,
+			'label'   => $label,
+			'hasFill' => isset($fill[$name]),
+		];
+	}
+
+	usort(
+		$catalog,
+		static function (array $a, array $b): int {
+			return strcasecmp($a['label'], $b['label']);
+		}
+	);
+
+	return $catalog;
 }
 
 /**
@@ -462,3 +526,29 @@ function fs_editor_icons_localize(): void
 	]);
 }
 add_action('enqueue_block_editor_assets', 'fs_editor_icons_localize', 11);
+
+/**
+ * Expose translated icon labels + UI strings to admin.js on the Developer cheatsheet.
+ *
+ * @param string $hook_suffix Current admin page hook suffix.
+ * @return void
+ */
+function fs_admin_icons_localize(string $hook_suffix): void
+{
+	unset($hook_suffix);
+
+	$page = isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
+
+	if ($page !== 'fs-developer-system') {
+		return;
+	}
+
+	fs_load_icons_textdomain();
+
+	wp_localize_script('main-admin-scripts', 'fromscratchIcons', [
+		'labels'     => fs_icon_labels(),
+		'categories' => fs_icon_category_labels(),
+		'ui'         => fs_icon_ui_strings(),
+	]);
+}
+add_action('admin_enqueue_scripts', 'fs_admin_icons_localize', 11);

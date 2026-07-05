@@ -45,7 +45,24 @@ $fs-icon-path: '../icons' !default;
   }
 }
 
-// Standalone icon carrier
+// Standalone icon
 .fs-icon {
   @include fs-icon;
+}
+
+// Icon as pseudo-element
+.-icon-before {
+  &::before {
+    @include fs-icon;
+    display: inline-block;
+    content: '';
+  }
+}
+
+.-icon-after {
+  &::after {
+    @include fs-icon;
+    display: inline-block;
+    content: '';
+  }
 }

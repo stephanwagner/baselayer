@@ -1194,8 +1194,8 @@ msgid "Choose icon"
 msgstr "Icon wählen"
 
 msgctxt "icon picker"
-msgid "Search icons …"
-msgstr "Icons durchsuchen …"
+msgid "Search icons…"
+msgstr "Icons durchsuchen…"
 
 msgctxt "icon picker"
 msgid "Style"
