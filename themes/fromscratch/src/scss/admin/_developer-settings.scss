@@ -502,8 +502,12 @@ body.fs-dev-icon-modal-open {
 .fs-dev-icon-modal__body {
   flex: 1 1 auto;
   min-height: 0;
-  overflow: auto;
+  overflow: hidden;
   padding: 16px 20px 20px;
+
+  &.fs-icon-picker__panel {
+    height: min(480px, calc(100vh - 156px));
+  }
 }
 
 .fs-dev-icon-modal__search {

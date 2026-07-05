@@ -109,12 +109,13 @@ export function IconPicker({ label, value, onChange }) {
 
       {isOpen ? (
         <Modal title={t('choose', 'Choose icon')} onRequestClose={() => setIsOpen(false)} className="fs-icon-picker__modal">
-          <div className="fs-icon-picker__toolbar">
-            <SearchControl value={search} onChange={setSearch} placeholder={t('search', 'Search icons…')} __nextHasNoMarginBottom />
-            {renderVariantToggle()}
-          </div>
+          <div className="fs-icon-picker__panel">
+            <div className="fs-icon-picker__toolbar">
+              <SearchControl value={search} onChange={setSearch} placeholder={t('search', 'Search icons…')} __nextHasNoMarginBottom />
+              {renderVariantToggle()}
+            </div>
 
-          <div className="fs-icon-picker__categories">
+            <div className="fs-icon-picker__categories">
             {iconCategories.map((category) => {
               const icons = category.icons.filter((icon) => iconMatchesQuery(icon, query, iconName(icon)));
 
@@ -150,6 +151,7 @@ export function IconPicker({ label, value, onChange }) {
                 </div>
               );
             })}
+            </div>
           </div>
         </Modal>
       ) : null}

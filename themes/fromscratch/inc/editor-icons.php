@@ -453,8 +453,7 @@ function fs_icon_labels(): array
 		'target'                 => _x('Target', 'icon name', 'fromscratch-icons'),
 
 		// Health & medical.
-		'health'                 => _x('Health', 'icon name', 'fromscratch-icons'),
-		'health-cross'           => _x('Health cross', 'icon name', 'fromscratch-icons'),
+		'health-cross'           => _x('Health', 'icon name', 'fromscratch-icons'),
 		'medical-mask'           => _x('Medical mask', 'icon name', 'fromscratch-icons'),
 		'medical-services'       => _x('Medical services', 'icon name', 'fromscratch-icons'),
 		'labs'                   => _x('Labs', 'icon name', 'fromscratch-icons'),

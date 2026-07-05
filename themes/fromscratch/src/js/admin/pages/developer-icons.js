@@ -122,7 +122,7 @@ function createModal(uiStrings) {
           <span class="dashicons dashicons-no-alt" aria-hidden="true"></span>
         </button>
       </header>
-      <div class="fs-dev-icon-modal__body">
+      <div class="fs-dev-icon-modal__body fs-icon-picker__panel">
         <div class="fs-icon-picker__toolbar">
           <input type="search" class="fs-dev-icon-modal__search" data-fs-dev-icon-modal-search placeholder="${t('search', 'Search icons…')}" autocomplete="off">
           <div class="fs-icon-picker__variant fs-dev-icon-modal__variant" role="group" aria-label="${t('style', 'Style')}">

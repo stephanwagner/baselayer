@@ -124,7 +124,7 @@ const builtInCategories = [
       { filename: 'language', alternatives: [], keywords: ['globe', 'locale', 'translate', 'international'] },
       { filename: 'quote', alternatives: ['fill'], keywords: ['blockquote', 'citation', 'testimonial'] },
       { filename: 'code', alternatives: [], keywords: ['code', 'developer', 'markup'] },
-      { filename: 'code-block', alternatives: [], keywords: ['code', 'block', 'snippet', 'gutenberg'] },
+      { filename: 'code-block', alternatives: ['fill'], keywords: ['code', 'block', 'snippet', 'gutenberg'] },
       { filename: 'code-slash', alternatives: [], keywords: ['code', 'developer', 'slash', 'programming'] },
       { filename: 'paragraph', alternatives: [], keywords: ['text', 'block', 'typography', 'content'] },
       { filename: 'text', alternatives: [], keywords: ['text', 'typography', 'letter', 'font', 'content'] },
@@ -172,7 +172,7 @@ const builtInCategories = [
       { filename: 'smiley-neutral', alternatives: ['fill'], keywords: ['emoji', 'meh', 'mood'] },
       { filename: 'smiley-sad', alternatives: ['fill'], keywords: ['emoji', 'frown', 'negative', 'mood'] },
       { filename: 'share', alternatives: [], keywords: ['network', 'nodes', 'send'] },
-      { filename: 'share-social', alternatives: [], keywords: ['social', 'network', 'send'] },
+      { filename: 'share-social', alternatives: ['fill'], keywords: ['social', 'network', 'send'] },
       { filename: 'rss', alternatives: [], keywords: ['feed', 'subscribe', 'syndication', 'blog'] },
       { filename: 'flag', alternatives: ['fill'], keywords: ['report', 'mark', 'banner'] },
       { filename: 'flag-alt', alternatives: ['fill'], keywords: ['flag', 'report', 'banner', 'alt'] },
@@ -337,7 +337,7 @@ const builtInCategories = [
       { filename: 'walk', alternatives: [], keywords: ['pedestrian', 'walking', 'steps', 'directions'] },
       { filename: 'mountain', alternatives: ['fill'], keywords: ['mountain', 'hiking', 'nature', 'peak', 'outdoors'] },
       { filename: 'beach', alternatives: ['fill'], keywords: ['beach', 'sea', 'vacation', 'sand', 'coast'] },
-      { filename: 'camping', alternatives: [], keywords: ['camp', 'tent', 'outdoors', 'nature', 'hiking'] },
+      { filename: 'camping', alternatives: ['fill'], keywords: ['camp', 'tent', 'outdoors', 'nature', 'hiking'] },
       { filename: 'footprint', alternatives: ['fill'], keywords: ['footprint', 'track', 'trail', 'walk', 'steps'] },
       { filename: 'globe', alternatives: [], keywords: ['world', 'earth', 'international', 'web'] },
       { filename: 'car', alternatives: ['fill'], keywords: ['vehicle', 'drive', 'transport', 'auto'] },
@@ -450,7 +450,7 @@ const builtInCategories = [
       { filename: 'mixed-weather', alternatives: ['fill'], keywords: ['weather', 'partly cloudy', 'forecast', 'cloud', 'sun'] },
       { filename: 'partly-cloudy', alternatives: ['fill'], keywords: ['weather', 'cloud', 'sun', 'partly cloudy', 'forecast'] },
       { filename: 'cold', alternatives: [], keywords: ['cold', 'temperature', 'freeze', 'weather', 'winter'] },
-      { filename: 'heat', alternatives: [], keywords: ['hot', 'temperature', 'heat', 'weather', 'summer'] },
+      { filename: 'heat', alternatives: ['fill'], keywords: ['hot', 'temperature', 'heat', 'weather', 'summer'] },
     ],
   },
   {
@@ -458,7 +458,7 @@ const builtInCategories = [
     icons: [
       { filename: 'beer', alternatives: ['fill'], keywords: ['beer', 'drink', 'alcohol', 'bar', 'pub'] },
       { filename: 'cocktail', alternatives: ['fill'], keywords: ['cocktail', 'drink', 'alcohol', 'glass', 'bar'] },
-      { filename: 'burger', alternatives: [], keywords: ['burger', 'food', 'fast food', 'hamburger', 'meal'] },
+      { filename: 'burger', alternatives: ['fill'], keywords: ['burger', 'food', 'fast food', 'hamburger', 'meal'] },
       { filename: 'chef-hat', alternatives: ['fill'], keywords: ['chef', 'cook', 'kitchen', 'restaurant', 'hat'] },
       { filename: 'coffee', alternatives: ['fill'], keywords: ['coffee', 'drink', 'cafe', 'cup', 'espresso'] },
       { filename: 'tea', alternatives: ['fill'], keywords: ['tea', 'drink', 'cup', 'hot', 'cafe'] },
@@ -467,7 +467,7 @@ const builtInCategories = [
       { filename: 'glass', alternatives: ['fill'], keywords: ['glass', 'drink', 'cup', 'beverage'] },
       { filename: 'icecream', alternatives: ['fill'], keywords: ['ice cream', 'dessert', 'sweet', 'food'] },
       { filename: 'liquor', alternatives: ['fill'], keywords: ['liquor', 'alcohol', 'bottle', 'drink', 'spirits'] },
-      { filename: 'nutrition', alternatives: [], keywords: ['nutrition', 'food', 'diet', 'health', 'apple'] },
+      { filename: 'nutrition', alternatives: ['fill'], keywords: ['nutrition', 'food', 'diet', 'health', 'apple'] },
     ],
   },
   {
@@ -487,8 +487,7 @@ const builtInCategories = [
   {
     slug: 'health-medical',
     icons: [
-      { filename: 'health', alternatives: [], keywords: ['health', 'medical', 'wellness', 'care', 'heart'] },
-      { filename: 'health-cross', alternatives: [], keywords: ['health', 'medical', 'cross', 'hospital', 'first aid'] },
+      { filename: 'health-cross', alternatives: ['fill'], keywords: ['health', 'medical', 'wellness', 'care', 'heart'] },
       { filename: 'medical-mask', alternatives: ['fill'], keywords: ['medical', 'mask', 'face', 'health', 'protection'] },
       { filename: 'medical-services', alternatives: ['fill'], keywords: ['medical', 'health', 'hospital', 'services', 'care'] },
       { filename: 'labs', alternatives: ['fill'], keywords: ['lab', 'science', 'experiment', 'test tube', 'research'] },
@@ -500,7 +499,7 @@ const builtInCategories = [
     icons: [
       { filename: 'rocket', alternatives: ['fill'], keywords: ['launch', 'startup', 'fast', 'boost'] },
       { filename: 'rocket-launch', alternatives: ['fill'], keywords: ['launch', 'startup', 'boost', 'space'] },
-      { filename: 'planet', alternatives: [], keywords: ['space', 'world', 'astronomy', 'orbit', 'saturn', 'galaxy'] },
+      { filename: 'planet', alternatives: ['fill'], keywords: ['space', 'world', 'astronomy', 'orbit', 'saturn', 'galaxy'] },
       { filename: 'diamond', alternatives: ['fill'], keywords: ['gem', 'premium', 'jewel', 'quality'] },
       { filename: 'premium', alternatives: ['fill'], keywords: ['crown', 'vip', 'upgrade', 'pro'] },
       { filename: 'crown', alternatives: ['fill'], keywords: ['king', 'queen', 'premium', 'royal', 'vip', 'winner', 'best'] },

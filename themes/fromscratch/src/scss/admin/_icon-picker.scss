@@ -2,8 +2,23 @@
 
 // Reusable icon picker (block options sidebar + modal grid).
 
+$fs-icon-picker-height: 480px;
+
 .fs-icon-picker__modal {
   width: 666px;
+
+  .components-modal__content {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+}
+
+.fs-icon-picker__panel {
+  display: flex;
+  flex-direction: column;
+  height: min($fs-icon-picker-height, calc(100vh - 160px));
+  min-height: 0;
 }
 
 .fs-icon-picker__label {
@@ -48,11 +63,18 @@
 }
 
 .fs-icon-picker__toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
   display: flex;
+  flex: 0 0 auto;
   flex-wrap: nowrap;
   align-items: center;
   gap: 12px;
-  margin-bottom: 16px;
+  margin-bottom: 0;
+  padding-bottom: 16px;
+  background: #fff;
+  border-bottom: 1px solid var(--fs-color-gray-100, #f0f0f1);
 
   // The search field grows to fill the row; min-width: 0 lets it shrink so the
   // variant toggle stays beside it instead of wrapping onto the next line.
@@ -67,7 +89,12 @@
 }
 
 .fs-icon-picker__categories {
-  margin-top: 4px;
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-top: 0;
+  padding-top: 16px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .fs-icon-picker__category + .fs-icon-picker__category {
