@@ -1,4 +1,5 @@
 import './block-options';
+import './acf-inner-blocks-toolbar';
 import './expirator';
 import './events';
 import './page-show-title';

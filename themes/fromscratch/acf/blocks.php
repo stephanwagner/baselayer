@@ -64,6 +64,11 @@ return [
 		'supports' => [
 			'align' => ['wide', 'full'],
 		],
+		'innerBlocksToolbar' => [
+			'insertBlock' => 'acf/slider-slide',
+			'label' => 'Slide hinzufügen',
+			'text' => '+ Slide',
+		],
 	],
 	[
 		'name' => 'slider-slide',

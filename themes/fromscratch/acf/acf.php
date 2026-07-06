@@ -290,3 +290,68 @@ add_filter('allowed_block_types_all', function ($allowed_blocks, $editor_context
 
 	return array_values(array_diff($allowed_blocks, $blocked));
 }, 10, 2);
+
+/**
+ * ACF blocks with an inner-blocks toolbar insert action (see acf/blocks.php).
+ *
+ * @return array<string, array{insertBlock: string, label: string, text: string}>
+ */
+function fs_acf_inner_blocks_toolbar_config(): array
+{
+	global $configBlocks;
+
+	$config = [];
+
+	if (empty($configBlocks) || !is_array($configBlocks)) {
+		return $config;
+	}
+
+	foreach ($configBlocks as $acfBlock) {
+		if (empty($acfBlock['innerBlocksToolbar']) || !is_array($acfBlock['innerBlocksToolbar'])) {
+			continue;
+		}
+
+		$toolbar = $acfBlock['innerBlocksToolbar'];
+		$insertBlock = isset($toolbar['insertBlock']) ? (string) $toolbar['insertBlock'] : '';
+
+		if ($insertBlock === '') {
+			continue;
+		}
+
+		$name = isset($acfBlock['name']) ? (string) $acfBlock['name'] : '';
+
+		if ($name === '') {
+			continue;
+		}
+
+		$label = isset($toolbar['label']) ? (string) $toolbar['label'] : __('Add', 'fromscratch');
+		$text = isset($toolbar['text']) ? (string) $toolbar['text'] : $label;
+
+		$config['acf/' . $name] = [
+			'insertBlock' => $insertBlock,
+			'label'       => $label,
+			'text'        => $text,
+		];
+	}
+
+	return $config;
+}
+
+/**
+ * Expose inner-blocks toolbar config to the block editor.
+ *
+ * @return void
+ */
+function fs_acf_inner_blocks_toolbar_localize(): void
+{
+	if (!wp_script_is('fromscratch-editor', 'registered')) {
+		return;
+	}
+
+	wp_localize_script(
+		'fromscratch-editor',
+		'fromscratchAcfInnerBlocksToolbar',
+		fs_acf_inner_blocks_toolbar_config()
+	);
+}
+add_action('enqueue_block_editor_assets', 'fs_acf_inner_blocks_toolbar_localize', 11);
