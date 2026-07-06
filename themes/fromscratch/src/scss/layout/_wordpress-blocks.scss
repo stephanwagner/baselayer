@@ -311,17 +311,20 @@
   // Content widths
 
   .-narrow,
-  .-narrow-left {
+  .-narrow-left,
+  .-narrow-right {
     max-width: var(--fs-content-width-narrow);
   }
 
   .-very-narrow,
-  .-very-narrow-left {
+  .-very-narrow-left,
+  .-very-narrow-right {
     max-width: var(--fs-content-width-very-narrow);
   }
 
   .-extra-narrow,
-  .-extra-narrow-left {
+  .-extra-narrow-left,
+  .-extra-narrow-right {
     max-width: var(--fs-content-width-extra-narrow);
   }
 
@@ -330,6 +333,13 @@
   .-extra-narrow {
     margin-left: auto;
     margin-right: auto;
+  }
+
+  .-narrow-right,
+  .-very-narrow-right,
+  .-extra-narrow-right {
+    margin-left: auto;
+    margin-right: 0;
   }
 
   // Content margin top and bottom

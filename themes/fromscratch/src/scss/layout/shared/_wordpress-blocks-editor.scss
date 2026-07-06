@@ -6,17 +6,20 @@
   // Content widths
 
   .-narrow,
-  .-narrow-left {
+  .-narrow-left,
+  .-narrow-right {
     max-width: min(var(--fs-content-width-narrow), 840px);
   }
 
   .-very-narrow,
-  .-very-narrow-left {
+  .-very-narrow-left,
+  .-very-narrow-right {
     max-width: min(var(--fs-content-width-very-narrow), 840px);
   }
 
   .-extra-narrow,
-  .-extra-narrow-left {
+  .-extra-narrow-left,
+  .-extra-narrow-right {
     max-width: min(var(--fs-content-width-extra-narrow), 840px);
   }
 

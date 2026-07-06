@@ -1,6 +1,7 @@
 import { blockOptions } from '../../../config/block-options';
 import { IconPicker } from './icons/icon-picker';
 import { ContentMarginControl } from './content-margin-control';
+import { LimitWidthControl } from './limit-width-control';
 import { BlockOptionToggleGroupOption } from './block-option-toggle-group-option';
 import {
   ALL_CONTENT_MARGIN_CLASSES,
@@ -8,6 +9,12 @@ import {
   contentMarginClassesFromAttributes,
   migrateLegacyContentMarginAttributes,
 } from './content-margin-utils';
+import {
+  ALL_LIMIT_WIDTH_CLASSES,
+  limitWidthAttributeKeys,
+  limitWidthClassesFromAttributes,
+  migrateLegacyLimitWidthAttributes,
+} from './limit-width-utils';
 
 const { InspectorControls } = wp.blockEditor;
 const { PanelBody, ToggleControl, SelectControl } = wp.components;
@@ -59,9 +66,12 @@ const isIconGlyphClass = (className, blockConfig) => {
 const contentMarginOptions = (blockConfig) =>
   blockConfig.options.filter((option) => option.type === 'content-margin');
 
+const limitWidthOptions = (blockConfig) =>
+  blockConfig.options.filter((option) => option.type === 'limit-width');
+
 // Static class names managed by block options (boolean / select / button-group values).
 const managedStaticClasses = (blockConfig) => {
-  const classes = new Set([HAS_ICON_CLASS, ...ALL_CONTENT_MARGIN_CLASSES]);
+  const classes = new Set([HAS_ICON_CLASS, ...ALL_CONTENT_MARGIN_CLASSES, ...ALL_LIMIT_WIDTH_CLASSES]);
 
   blockConfig.options.forEach((option) => {
     if (option.type === 'boolean' && option.className) {
@@ -91,6 +101,8 @@ const collectOptionClasses = (blockConfig, attributes) => {
   blockConfig.options.forEach((option) => {
     if (option.type === 'content-margin') {
       classes.push(...contentMarginClassesFromAttributes(option, attributes));
+    } else if (option.type === 'limit-width') {
+      classes.push(...limitWidthClassesFromAttributes(option, attributes));
     } else if (option.type === 'boolean' && attributes[option.attributeName]) {
       classes.push(option.className);
     } else if (option.type === 'icon' && attributes[option.attributeName]) {
@@ -136,6 +148,10 @@ const blockOptionAttributeKeys = (blockConfig) =>
       return [...contentMarginAttributeKeys(option), 'contentMargin', 'contentMarginAdjust'];
     }
 
+    if (option.type === 'limit-width') {
+      return [...limitWidthAttributeKeys(option), 'limitWidth'];
+    }
+
     return [option.attributeName];
   });
 
@@ -155,6 +171,17 @@ blockOptions.forEach((block) => {
             [linked]: { type: 'boolean', default: true },
             contentMargin: { type: 'string', default: '' },
             contentMarginAdjust: { type: 'string', default: '' },
+          };
+          return;
+        }
+
+        if (option.type === 'limit-width') {
+          const { size, align } = option.attributeNames;
+          settings.attributes = {
+            ...settings.attributes,
+            [size]: { type: 'string', default: '' },
+            [align]: { type: 'string', default: option.defaultAlign ?? 'center' },
+            limitWidth: { type: 'string', default: '' },
           };
           return;
         }
@@ -223,6 +250,38 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
       attributes.className,
     ]);
 
+    // Migrate legacy limit-width select / className into split attributes once.
+    useEffect(() => {
+      if (!blockConfig) {
+        return;
+      }
+
+      const widthOptions = limitWidthOptions(blockConfig);
+      if (!widthOptions.length) {
+        return;
+      }
+
+      let updates = {};
+      widthOptions.forEach((option) => {
+        const migrated = migrateLegacyLimitWidthAttributes(
+          { ...attributes, ...updates },
+          option
+        );
+        if (migrated) {
+          updates = { ...updates, ...migrated };
+        }
+      });
+
+      if (Object.keys(updates).length) {
+        setOptionAttributes(updates);
+      }
+    }, [
+      blockConfig?.name,
+      props.clientId,
+      attributes.limitWidth,
+      attributes.className,
+    ]);
+
     // Backfill `className` when option attributes and wrapper classes drift (e.g. after adding `-has-icon`).
     useEffect(() => {
       if (!blockConfig) {
@@ -248,6 +307,17 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                     return (
                       <ContentMarginControl
                         key="content-margin"
+                        option={option}
+                        attributes={attributes}
+                        onChange={setOptionAttributes}
+                      />
+                    );
+                  }
+
+                  if (option.type === 'limit-width') {
+                    return (
+                      <LimitWidthControl
+                        key="limit-width"
                         option={option}
                         attributes={attributes}
                         onChange={setOptionAttributes}
@@ -306,6 +376,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                               value={opt.value}
                               label={opt.label}
                               icon={opt.icon}
+                              iconLabel={option.iconLabel}
                             />
                           ))}
                         </ToggleGroupControl>

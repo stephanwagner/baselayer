@@ -20,12 +20,11 @@ function getContentMarginControl(defaultClass = '') {
 }
 
 /**
- * Get text wrap options
- * @returns
+ * Text wrap button group.
  */
 function getTextWrapOptions() {
   return {
-    type: 'select',
+    type: 'button-group',
     label: 'Text Wrap',
     default: '',
     attributeName: 'textWrap',
@@ -38,24 +37,18 @@ function getTextWrapOptions() {
 }
 
 /**
- * Get limit width options
- * @returns
+ * Linked width size + alignment control for limited content width.
  */
-function getLimitWidthOptions() {
+function getLimitWidthControl() {
   return {
-    type: 'select',
+    type: 'limit-width',
     label: 'Weite limitieren',
-    default: '',
-    attributeName: 'limitWidth',
-    options: [
-      { label: 'Ohne', value: '' },
-      { label: 'Eng', value: '-narrow' },
-      { label: 'Sehr Eng', value: '-very-narrow' },
-      { label: 'Extra Eng', value: '-extra-narrow' },
-      { label: 'Eng (links orientiert)', value: '-narrow-left' },
-      { label: 'Sehr Eng (links orientiert)', value: '-very-narrow-left' },
-      { label: 'Extra Eng (links orientiert)', value: '-extra-narrow-left' }
-    ]
+    defaultSize: '',
+    defaultAlign: 'center',
+    attributeNames: {
+      size: 'limitWidthSize',
+      align: 'limitWidthAlign',
+    },
   };
 }
 
@@ -136,7 +129,7 @@ export const blockOptions = [
           { label: 'H6', value: 'h6' }
         ]
       },
-      getLimitWidthOptions(),
+      getLimitWidthControl(),
       getTextWrapOptions()
     ]
   },
@@ -145,7 +138,7 @@ export const blockOptions = [
   {
     name: 'core/paragraph',
     options: [
-      getLimitWidthOptions(),
+      getLimitWidthControl(),
       getTextWrapOptions()
     ]
   },
@@ -199,7 +192,7 @@ export const blockOptions = [
     name: 'core/group',
     options: [
       getContentMarginControl('-content-margin-m'),
-      getLimitWidthOptions()
+      getLimitWidthControl()
     ]
   },
 

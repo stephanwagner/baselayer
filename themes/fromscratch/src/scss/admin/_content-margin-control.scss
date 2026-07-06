@@ -60,4 +60,30 @@
       height: 18px;
     }
   }
+
+  .fs-toggle-group-option--icon-label.components-toggle-group-control-option-base {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-width: 0;
+    padding-left: 10px;
+    padding-right: 10px;
+
+    .fs-icon {
+      flex: 0 0 auto;
+      width: 16px;
+      height: 16px;
+    }
+
+    .fs-toggle-group-option__label {
+      font-size: 12px;
+      line-height: 1.2;
+    }
+  }
+
+  // Hide duplicate visible label text WordPress may still output for icon+label options.
+  .fs-toggle-group-option--icon-label.components-toggle-group-control-option-base > :not(.fs-icon):not(.fs-toggle-group-option__label) {
+    display: none !important;
+  }
 }
