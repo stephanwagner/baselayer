@@ -541,3 +541,86 @@ body.fs-dev-icon-modal-open {
     }
   }
 }
+
+// Developer → Blocks settings
+
+.fs-block-settings__search-wrap {
+  margin: 0 0 16px;
+  max-width: 320px;
+}
+
+.fs-block-settings__table {
+  margin-top: 8px;
+  width: 100%;
+}
+
+.fs-block-settings__col-icon {
+  width: 36px;
+  text-align: center;
+  vertical-align: middle;
+
+  .dashicons {
+    color: #50575e;
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+  }
+}
+
+.fs-block-settings__col-name {
+  min-width: 220px;
+}
+
+.fs-block-settings__col-flag {
+  text-align: center;
+  width: 88px;
+}
+
+.fs-block-settings__slug {
+  color: #646970;
+  display: block;
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.fs-block-settings__locked-hint {
+  color: #646970;
+  display: inline-block;
+  font-size: 11px;
+  font-style: italic;
+  margin-left: 8px;
+}
+
+.fs-block-settings__dash {
+  color: #c3c4c7;
+}
+
+.fs-block-settings-row--locked {
+  opacity: 0.72;
+}
+
+.fs-block-settings__icon--svg img {
+  display: block;
+  height: 20px;
+  width: 20px;
+}
+
+// Block editor inserter toggle
+
+.fs-inserter-toggle-host {
+  background: #fff;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 8px 12px;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+
+.editor-inserter-sidebar .fs-inserter-toggle-host {
+  padding: 12px 16px;
+}
+
+.fs-inserter-toggle__button {
+  justify-content: center;
+  width: 100%;
+}

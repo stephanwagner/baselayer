@@ -406,6 +406,12 @@ add_action('admin_init', function () {
 		'type' => 'array',
 		'sanitize_callback' => 'fs_sanitize_admin_access',
 	]);
+	if (defined('FS_BLOCK_SETTINGS_OPTION')) {
+		register_setting(FS_THEME_OPTION_GROUP_DEVELOPER, FS_BLOCK_SETTINGS_OPTION, [
+			'type' => 'array',
+			'sanitize_callback' => 'fs_sanitize_block_settings',
+		]);
+	}
 }, 5);
 
 add_action('admin_init', function () {

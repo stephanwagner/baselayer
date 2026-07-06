@@ -12,6 +12,7 @@ const FS_DEVELOPER_TABS_BASE = [
 	'system'   => ['label' => 'Settings'],
 	'tools'    => ['label' => 'Tools'],
 	'features' => ['label' => 'Features'],
+	'blocks'   => ['label' => 'Blocks'],
 	'access'   => ['label' => 'Benutzerrechte'],
 	'security' => ['label' => 'Sicherheit'],
 ];
@@ -226,6 +227,7 @@ require_once $fs_developer_settings_dir . 'email.php';
 require_once $fs_developer_settings_dir . 'system.php';
 require_once $fs_developer_settings_dir . 'tools.php';
 require_once $fs_developer_settings_dir . 'features.php';
+require_once $fs_developer_settings_dir . 'blocks.php';
 require_once $fs_developer_settings_dir . 'access.php';
 require_once $fs_developer_settings_dir . 'security.php';
 require_once $fs_developer_settings_dir . 'performance.php';

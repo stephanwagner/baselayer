@@ -271,26 +271,6 @@ add_filter('acf/settings/show_admin', function ($show) {
 	return fs_is_developer_user((int) get_current_user_id());
 });
 
-// Remove core blocks
-add_filter('allowed_block_types_all', function ($allowed_blocks, $editor_context) {
-
-	$blocked = [
-		'core/accordion',
-		'core/accordion-item',
-		'core/accordion-heading',
-		'core/accordion-panel',
-		'core/icon',
-	];
-
-	// If WP already passed all registered blocks as true
-	if ($allowed_blocks === true) {
-		$allowed_blocks = WP_Block_Type_Registry::get_instance()->get_all_registered();
-		$allowed_blocks = array_keys($allowed_blocks);
-	}
-
-	return array_values(array_diff($allowed_blocks, $blocked));
-}, 10, 2);
-
 /**
  * ACF blocks with an inner-blocks toolbar insert action (see acf/blocks.php).
  *

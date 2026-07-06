@@ -318,6 +318,7 @@ function fs_editor_scripts(): void
 			'wp-core-data',
 			'wp-i18n',
 			'wp-date',
+			'wp-preferences',
 		],
 		fs_asset_hash($file),
 		true
@@ -327,5 +328,13 @@ function fs_editor_scripts(): void
 		'post_expirator' => function_exists('fs_theme_feature_enabled') && fs_theme_feature_enabled('post_expirator'),
 		'languages' => function_exists('fs_uses_content_languages') && fs_uses_content_languages(),
 	]);
+
+	if (function_exists('fs_block_settings_editor_config')) {
+		wp_localize_script(
+			'fromscratch-editor',
+			'fromscratchBlockSettings',
+			fs_block_settings_editor_config()
+		);
+	}
 }
 add_action('enqueue_block_editor_assets', 'fs_editor_scripts');

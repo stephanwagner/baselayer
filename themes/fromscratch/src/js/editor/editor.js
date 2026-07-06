@@ -1,4 +1,5 @@
 import './block-options';
+import './block-inserter-settings';
 import './acf-inner-blocks-toolbar';
 import './expirator';
 import './events';
