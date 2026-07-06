@@ -308,6 +308,10 @@ msgid "Attachment"
 msgstr "Anhang"
 
 msgctxt "icon name"
+msgid "Attachment (alt)"
+msgstr "Anhang (alternativ)"
+
+msgctxt "icon name"
 msgid "Search"
 msgstr "Suche"
 
@@ -436,12 +440,24 @@ msgid "Forum"
 msgstr "Forum"
 
 msgctxt "icon name"
+msgid "Comic bubble"
+msgstr "Comic-Sprechblase"
+
+msgctxt "icon name"
 msgid "Email"
 msgstr "E-Mail"
 
 msgctxt "icon name"
 msgid "Email (alt)"
 msgstr "E-Mail (alternativ)"
+
+msgctxt "icon name"
+msgid "Stacked email"
+msgstr "Gestapelte E-Mails"
+
+msgctxt "icon name"
+msgid "Unread email"
+msgstr "Ungelesene E-Mail"
 
 msgctxt "icon name"
 msgid "Open email"
@@ -2176,6 +2192,10 @@ msgid "American football"
 msgstr "American Football"
 
 msgctxt "icon name"
+msgid "Badminton"
+msgstr "Badminton"
+
+msgctxt "icon name"
 msgid "Baseball"
 msgstr "Baseball"
 
@@ -2188,16 +2208,16 @@ msgid "Cricket"
 msgstr "Cricket"
 
 msgctxt "icon name"
+msgid "Rugby"
+msgstr "Rugby"
+
+msgctxt "icon name"
 msgid "Golf"
 msgstr "Golf"
 
 msgctxt "icon name"
 msgid "Hockey"
 msgstr "Hockey"
-
-msgctxt "icon name"
-msgid "Fitness"
-msgstr "Fitness"
 
 msgctxt "icon name"
 msgid "Whistle"
@@ -2972,6 +2992,10 @@ msgstr "Großschreibung"
 msgctxt "icon name"
 msgid "Tooltip"
 msgstr "Kurzinfo"
+
+msgctxt "icon name"
+msgid "Tooltip (alt)"
+msgstr "Kurzinfo (alternativ)"
 
 msgctxt "icon name"
 msgid "Trello"

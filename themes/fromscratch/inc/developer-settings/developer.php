@@ -211,7 +211,7 @@ function fs_render_developer_cheatsheet(): void
 				}
 
 				$icon_ui_strings = function_exists('fs_icon_ui_strings') ? fs_icon_ui_strings() : [];
-				$button_icon = 'medal-fill';
+				$button_icon = 'medal';
 				$button_icon_class = '-icon-' . $button_icon;
 				$button_code = '<button type="button" class="button -has-icon ' . $button_icon_class . '">Button</button>';
 				$inline_before_icon = 'open-in-new';
@@ -222,10 +222,10 @@ function fs_render_developer_cheatsheet(): void
 				$inline_after_icon_class = '-icon-' . $inline_after_icon;
 				$inline_after_label = __('Read more', 'fromscratch');
 				$inline_after_code = '<span class="-icon-after ' . $inline_after_icon_class . '">' . $inline_after_label . '</span>';
-				$demo_icon = 'rocket-launch-fill';
+				$demo_icon = 'rocket-launch';
 				$demo_icon_class = '-icon-' . $demo_icon;
 				$demo_icon_code = '<div class="fs-icon ' . $demo_icon_class . '"></div>';
-				$svg_icon = 'planet-fill';
+				$svg_icon = 'planet';
 				$svg_icon_path = function_exists('fs_icon_svg_asset_path')
 					? fs_icon_svg_asset_path($svg_icon)
 					: '/icons/' . $svg_icon . '.svg';
