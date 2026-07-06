@@ -115,19 +115,19 @@ export const blockOptions = [
     name: 'core/heading',
     options: [
       {
-        type: 'select',
+        type: 'button-group',
         label: 'Anzeigen als',
         default: '',
         attributeName: 'headingShowAs',
         options: [
-          { label: 'Standard', value: '' },
+          { icon: 'block', label: 'Standard', value: '' },
           { label: 'H1', value: 'h1' },
           { label: 'H2', value: 'h2' },
           { label: 'H3', value: 'h3' },
           { label: 'H4', value: 'h4' },
           { label: 'H5', value: 'h5' },
-          { label: 'H6', value: 'h6' }
-        ]
+          { label: 'H6', value: 'h6' },
+        ],
       },
       getLimitWidthControl(),
       getTextWrapOptions()

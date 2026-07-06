@@ -12,6 +12,22 @@
   -webkit-font-smoothing: antialiased;
 }
 
+// Panel components
+
+.components-base-control {
+  .fs-icon {
+    font-size: 18px;
+  }
+}
+
+// Limit width
+
+.fs-limit-width__row {
+  .components-base-control {
+    margin-bottom: 0;
+  }
+}
+
 // SEO panel
 
 div.fromscratch-seo-panel {
