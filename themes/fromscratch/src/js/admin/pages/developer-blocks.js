@@ -1,5 +1,5 @@
 /**
- * Developer → Blocks settings: search filter and dependent checkbox states.
+ * Theme settings → Blocks: search filter and dependent checkbox states.
  */
 function initBlockSettingsPage() {
   const form = document.getElementById('fs-block-settings-form');

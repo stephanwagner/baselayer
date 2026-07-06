@@ -167,3 +167,66 @@ body.fs-css-vars-overview-modal-active {
   margin: 16px 0 0;
   padding: 0;
 }
+
+// Theme settings → Blocks
+
+.fs-block-settings__search-wrap {
+  margin: 0 0 16px;
+  max-width: 320px;
+}
+
+.fs-block-settings__table {
+  margin-top: 8px;
+  width: 100%;
+}
+
+.fs-block-settings__col-icon {
+  width: 36px;
+  text-align: center;
+  vertical-align: middle;
+
+  .dashicons {
+    color: #50575e;
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+  }
+}
+
+.fs-block-settings__col-name {
+  min-width: 220px;
+}
+
+.fs-block-settings__col-flag {
+  text-align: center;
+  width: 88px;
+}
+
+.fs-block-settings__slug {
+  color: #646970;
+  display: block;
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+.fs-block-settings__locked-hint {
+  color: #646970;
+  display: inline-block;
+  font-size: 11px;
+  font-style: italic;
+  margin-left: 8px;
+}
+
+.fs-block-settings__dash {
+  color: #c3c4c7;
+}
+
+.fs-block-settings-row--locked {
+  opacity: 0.72;
+}
+
+.fs-block-settings__icon--svg img {
+  display: block;
+  height: 20px;
+  width: 20px;
+}

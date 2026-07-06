@@ -81,6 +81,7 @@ function fs_render_developer_access(): void
 		['title' => __('Theme settings', 'fromscratch'), 'items' => [
 			'theme_settings_general' => __('Theme', 'fromscratch'),
 			'theme_settings_texts' => __('Content', 'fromscratch'),
+			'theme_settings_blocks' => __('Blocks', 'fromscratch'),
 			'theme_settings_css' => __('CSS', 'fromscratch'),
 			'theme_settings_redirects' => __('Redirects', 'fromscratch'),
 		]],

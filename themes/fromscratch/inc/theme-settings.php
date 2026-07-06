@@ -11,6 +11,7 @@ defined('ABSPATH') || exit;
 const FS_THEME_SETTINGS_TABS = [
 	'theme'     => ['label' => 'Theme', 'developer_only' => false],
 	'content'   => ['label' => 'Content', 'developer_only' => false],
+	'blocks'    => ['label' => 'Blocks', 'developer_only' => false],
 	'css'       => ['label' => 'CSS', 'developer_only' => false],
 	'redirects' => ['label' => 'Redirects', 'developer_only' => false],
 ];
@@ -24,6 +25,7 @@ const FS_THEME_SETTINGS_TAB_QUERY_VAR = 'fs_tab';
 const FS_THEME_SETTINGS_TAB_ACCESS = [
 	'theme'     => 'theme_settings_general',
 	'content'   => 'theme_settings_texts',
+	'blocks'    => 'theme_settings_blocks',
 	'css'       => 'theme_settings_css',
 	'redirects' => 'theme_settings_redirects',
 ];
@@ -397,6 +399,7 @@ const FS_THEME_OPTION_GROUP_TEXTE = 'fs_theme_texte';
 const FS_THEME_OPTION_GROUP_CSS = 'fs_theme_css';
 const FS_THEME_OPTION_GROUP_SECURITY = 'fs_theme_security';
 const FS_THEME_OPTION_GROUP_REDIRECTS = 'fs_theme_redirects';
+const FS_THEME_OPTION_GROUP_BLOCKS = 'fs_theme_blocks';
 const FS_THEME_OPTION_GROUP_DEVELOPER = 'fs_theme_developer';
 const FS_THEME_OPTION_GROUP_DEVELOPER_GENERAL = 'fs_theme_developer_general';
 const FS_THEME_OPTION_GROUP_LANGUAGES = 'fs_theme_languages';
@@ -407,7 +410,7 @@ add_action('admin_init', function () {
 		'sanitize_callback' => 'fs_sanitize_admin_access',
 	]);
 	if (defined('FS_BLOCK_SETTINGS_OPTION')) {
-		register_setting(FS_THEME_OPTION_GROUP_DEVELOPER, FS_BLOCK_SETTINGS_OPTION, [
+		register_setting(FS_THEME_OPTION_GROUP_BLOCKS, FS_BLOCK_SETTINGS_OPTION, [
 			'type' => 'array',
 			'sanitize_callback' => 'fs_sanitize_block_settings',
 		]);
@@ -596,6 +599,8 @@ add_action('admin_init', function () {
 		'sanitize_callback' => 'fs_sanitize_redirects',
 	]);
 }, 5);
+
+require_once __DIR__ . '/theme-settings/block-settings.php';
 
 add_action('admin_init', function () {
 	register_setting(FS_THEME_OPTION_GROUP_LANGUAGES, 'fs_theme_languages', [
@@ -1021,12 +1026,16 @@ function theme_settings_page(): void
 	if ($general_saved !== false) {
 		delete_transient('fromscratch_general_saved');
 	}
+	$blocks_saved = get_transient('fromscratch_blocks_saved');
+	if ($blocks_saved !== false) {
+		delete_transient('fromscratch_blocks_saved');
+	}
 ?>
 	<div class="wrap">
 		<h1><?= esc_html(fs_theme_settings_admin_title($tab)) ?></h1>
 		<?php
 		$notices = [];
-		if ($redirects_saved !== false || $css_saved !== false || $general_saved !== false) {
+		if ($redirects_saved !== false || $css_saved !== false || $general_saved !== false || $blocks_saved !== false) {
 			$notices[] = ['type' => 'success', 'message' => __('Settings saved.', 'fromscratch')];
 		}
 		if ($redirects_htaccess_error === 'writable') {
@@ -1530,6 +1539,8 @@ function theme_settings_page(): void
 					}
 				})();
 			</script>
+		<?php elseif ($tab === 'blocks') : ?>
+			<?php fs_render_theme_settings_blocks_tab(); ?>
 		<?php elseif ($tab === 'redirects') : ?>
 			<?php
 			$redirects_raw = get_option('fs_redirects', []);
