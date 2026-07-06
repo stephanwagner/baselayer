@@ -17,6 +17,16 @@ const bundles = [
       jsxFragment: 'wp.element.Fragment'
     }
   },
+  {
+    input: `${themeDir}/src/js/admin/block-settings.js`,
+    name: 'block-settings',
+    jsx: {
+      loader: { '.js': 'jsx' },
+      jsx: 'transform',
+      jsxFactory: 'wp.element.createElement',
+      jsxFragment: 'wp.element.Fragment'
+    }
+  },
   { input: `${themeDir}/src/js/service-worker/index.js`, name: 'service-worker' }
 ];
 

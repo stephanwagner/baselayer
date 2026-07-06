@@ -301,9 +301,12 @@ body.fs-css-vars-overview-modal-active {
 }
 
 .fs-block-card__allowed {
+  background: none;
+  border: 0;
   cursor: pointer;
   flex-shrink: 0;
   margin: 0;
+  padding: 0;
 }
 
 .fs-block-card__allowed-btn {

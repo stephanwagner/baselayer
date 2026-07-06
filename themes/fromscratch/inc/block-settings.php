@@ -333,6 +333,187 @@ function fs_block_settings_system_blocks(): array
 }
 
 /**
+ * Map of ACF block names to icon markup from acf/blocks.php.
+ *
+ * @return array<string, string>
+ */
+function fs_block_settings_admin_icon_map(): array
+{
+	static $map = null;
+
+	if ($map !== null) {
+		return $map;
+	}
+
+	$map = [];
+	$path = get_template_directory() . '/acf/blocks.php';
+
+	if (!is_readable($path)) {
+		return $map;
+	}
+
+	$blocks = include $path;
+	if (!is_array($blocks)) {
+		return $map;
+	}
+
+	foreach ($blocks as $block) {
+		if (!is_array($block) || empty($block['name']) || empty($block['icon']) || !is_string($block['icon'])) {
+			continue;
+		}
+
+		$name = (string) $block['name'];
+		if (!str_starts_with($name, 'acf/')) {
+			$name = 'acf/' . $name;
+		}
+
+		$map[$name] = $block['icon'];
+	}
+
+	return $map;
+}
+
+/**
+ * Resolve the icon markup for a block in the admin UI.
+ *
+ * @param mixed $registry_icon
+ */
+function fs_block_settings_admin_resolve_icon(string $block_name, $registry_icon): ?string
+{
+	$acf_icons = fs_block_settings_admin_icon_map();
+	if (isset($acf_icons[$block_name])) {
+		return $acf_icons[$block_name];
+	}
+
+	return fs_block_settings_admin_export_icon($registry_icon);
+}
+
+/**
+ * Export a block icon for the admin React app (dashicon slug or inline SVG).
+ *
+ * @param mixed $icon
+ */
+function fs_block_settings_admin_export_icon($icon): ?string
+{
+	if (!is_string($icon) || $icon === '') {
+		return null;
+	}
+
+	return $icon;
+}
+
+/**
+ * Admin UI config for the React block settings app.
+ *
+ * @return array<string, mixed>
+ */
+function fs_block_settings_admin_config(): array
+{
+	$settings = [];
+
+	foreach (fs_block_settings_get_all() as $name => $flags) {
+		$settings[$name] = [
+			'allowed'         => !empty($flags['allowed']),
+			'hidden'          => !empty($flags['hidden']),
+			'favorite'        => !empty($flags['favorite']),
+			'hardDisallowed'  => !empty($flags['hardDisallowed']),
+		];
+	}
+
+	$category_labels = [];
+	foreach (array_keys(fs_block_settings_registry_by_category()) as $category) {
+		$category_labels[$category] = fs_block_settings_category_label($category);
+	}
+
+	$hard_disallowed = fs_block_settings_hard_disallowed();
+
+	$configurable_groups = [];
+	foreach (fs_block_settings_registry_configurable_by_category() as $category => $blocks) {
+		$configurable_groups[] = [
+			'category' => $category,
+			'label'    => fs_block_settings_category_label($category),
+			'blocks'   => array_values(array_map(static function (array $block): array {
+				return [
+					'name'  => $block['name'],
+					'title' => (string) $block['title'],
+					'icon'  => fs_block_settings_admin_resolve_icon($block['name'], $block['icon'] ?? null),
+				];
+			}, $blocks)),
+		];
+	}
+
+	$system_blocks = array_values(array_map(static function (array $block): array {
+		return [
+			'name'     => $block['name'],
+			'title'    => (string) $block['title'],
+			'category' => $block['category'] ?? 'uncategorized',
+			'icon'     => fs_block_settings_admin_resolve_icon($block['name'], $block['icon'] ?? null),
+		];
+	}, fs_block_settings_system_blocks()));
+
+	return [
+		'settings'            => $settings,
+		'hardDisallowed'      => $hard_disallowed,
+		'categoryLabels'      => $category_labels,
+		'configurableGroups'  => $configurable_groups,
+		'systemBlocks'        => $system_blocks,
+		'i18n'                => [
+			'intro'                   => __('Control which blocks are available in the page editor inserter (+).', 'fromscratch'),
+			'searchPlaceholder'       => __('Search blocks…', 'fromscratch'),
+			'hidden'                  => __('Hidden', 'fromscratch'),
+			'favorites'               => __('Favorites', 'fromscratch'),
+			'allowedInInserter'       => __('Allowed in inserter', 'fromscratch'),
+			'inserterVisibility'      => __('Inserter visibility', 'fromscratch'),
+			'hiddenBySystem'          => __('Hidden by system', 'fromscratch'),
+			'systemBlocksToggle'      => _n('%d block hidden by system', '%d blocks hidden by system', count($hard_disallowed), 'fromscratch'),
+			'systemBlocksDescription' => __('These blocks are disabled in code and cannot be enabled here.', 'fromscratch'),
+			'save'                    => __('Save Changes', 'fromscratch'),
+		],
+	];
+}
+
+/**
+ * Parse posted block settings from the admin React app.
+ *
+ * @return array<string, array<string, int>>
+ */
+function fs_block_settings_parse_posted_settings(): array
+{
+	if (!empty($_POST['fromscratch_block_settings_json'])) {
+		$decoded = json_decode(wp_unslash((string) $_POST['fromscratch_block_settings_json']), true);
+		if (is_array($decoded)) {
+			$out = [];
+			foreach ($decoded as $block_name => $flags) {
+				if (!is_string($block_name) || !is_array($flags)) {
+					continue;
+				}
+				$out[$block_name] = [
+					'allowed'  => !empty($flags['allowed']) ? 1 : 0,
+					'hidden'   => !empty($flags['hidden']) ? 1 : 0,
+					'favorite' => !empty($flags['favorite']) ? 1 : 0,
+				];
+			}
+
+			return $out;
+		}
+	}
+
+	$posted = isset($_POST['fromscratch_block_settings']) && is_array($_POST['fromscratch_block_settings'])
+		? wp_unslash($_POST['fromscratch_block_settings'])
+		: [];
+
+	$out = [];
+	foreach ($posted as $block_name => $flags) {
+		if (!is_string($block_name) || !is_array($flags)) {
+			continue;
+		}
+		$out[$block_name] = $flags;
+	}
+
+	return $out;
+}
+
+/**
  * Human-readable block category label.
  */
 function fs_block_settings_category_label(string $slug): string
@@ -353,165 +534,6 @@ function fs_block_settings_category_label(string $slug): string
 	}
 
 	return ucwords(str_replace(['-', '_'], ' ', $slug));
-}
-
-/**
- * Sanitize inline SVG for block icon output.
- */
-function fs_block_settings_sanitize_icon_svg(string $svg): string
-{
-	if (function_exists('fs_svg_sanitize')) {
-		return fs_svg_sanitize($svg);
-	}
-
-	$allowed = [
-		'svg' => [
-			'xmlns' => true,
-			'viewbox' => true,
-			'viewBox' => true,
-			'width' => true,
-			'height' => true,
-			'fill' => true,
-			'class' => true,
-			'aria-hidden' => true,
-			'role' => true,
-		],
-		'path' => [
-			'd' => true,
-			'fill' => true,
-			'stroke' => true,
-			'fill-rule' => true,
-			'clip-rule' => true,
-		],
-		'g' => [
-			'fill' => true,
-			'stroke' => true,
-			'transform' => true,
-		],
-		'rect' => [
-			'x' => true,
-			'y' => true,
-			'width' => true,
-			'height' => true,
-			'fill' => true,
-			'rx' => true,
-		],
-		'circle' => [
-			'cx' => true,
-			'cy' => true,
-			'r' => true,
-			'fill' => true,
-		],
-	];
-
-	return wp_kses($svg, $allowed);
-}
-
-/**
- * Inner HTML for a block type icon (dashicon, inline SVG, or image).
- */
-function fs_block_settings_icon_inner_html($icon): string
-{
-	if (is_string($icon)) {
-		$trimmed = trim($icon);
-		if ($trimmed === '') {
-			return '';
-		}
-
-		if (str_starts_with($trimmed, '<svg')) {
-			$svg = fs_block_settings_sanitize_icon_svg($trimmed);
-
-			return $svg !== '' ? $svg : '';
-		}
-
-		if (str_starts_with($trimmed, 'data:image/')) {
-			return '<img src="' . esc_url($trimmed) . '" alt="" width="20" height="20" decoding="async" />';
-		}
-
-		$slug = str_starts_with($trimmed, 'dashicons-') ? $trimmed : 'dashicons-' . $trimmed;
-
-		return '<span class="dashicons ' . esc_attr($slug) . '" aria-hidden="true"></span>';
-	}
-
-	if (!is_array($icon)) {
-		return '';
-	}
-
-	if (!empty($icon['src']) && is_string($icon['src'])) {
-		return '<img src="' . esc_url($icon['src']) . '" alt="" width="20" height="20" decoding="async" />';
-	}
-
-	if (!empty($icon['foreground'])) {
-		if (is_string($icon['foreground'])) {
-			$foreground = trim($icon['foreground']);
-			if (str_starts_with($foreground, '<svg')) {
-				$svg = fs_block_settings_sanitize_icon_svg($foreground);
-
-				return $svg !== '' ? $svg : '';
-			}
-			if (str_starts_with($foreground, 'data:image/')) {
-				return '<img src="' . esc_url($foreground) . '" alt="" width="20" height="20" decoding="async" />';
-			}
-		}
-
-		if (is_array($icon['foreground']) && !empty($icon['foreground']['src']) && is_string($icon['foreground']['src'])) {
-			return '<img src="' . esc_url($icon['foreground']['src']) . '" alt="" width="20" height="20" decoding="async" />';
-		}
-	}
-
-	return '';
-}
-
-/**
- * Icon filename slug (without .svg) for a block name.
- */
-function fs_block_settings_icon_slug(string $block_name): ?string
-{
-	static $overrides = null;
-
-	if ($overrides === null) {
-		$path = get_template_directory() . '/config/core-block-icons.php';
-		$loaded = is_readable($path) ? include $path : [];
-		$overrides = is_array($loaded) ? $loaded : [];
-	}
-
-	if (isset($overrides[$block_name]) && is_string($overrides[$block_name]) && $overrides[$block_name] !== '') {
-		return $overrides[$block_name];
-	}
-
-	if (str_starts_with($block_name, 'core/')) {
-		$slug = substr($block_name, 5);
-
-		return $slug !== '' ? $slug : null;
-	}
-
-	return null;
-}
-
-/**
- * Base URL for bundled @wordpress/icons SVG assets.
- */
-function fs_block_settings_icons_base_url(): string
-{
-	return trailingslashit(get_template_directory_uri()) . 'assets/block-icons/';
-}
-
-/**
- * Resolve icon markup for a block type.
- */
-function fs_block_settings_render_icon_html($icon, string $block_name = ''): string
-{
-	$inner = fs_block_settings_icon_inner_html($icon);
-
-	if ($inner !== '') {
-		return '<span class="fs-block-settings__icon" aria-hidden="true">' . $inner . '</span>';
-	}
-
-	if ($block_name !== '' && fs_block_settings_icon_slug($block_name) !== null) {
-		return '<span class="fs-block-settings__icon" data-fs-block-settings-icon data-block-name="' . esc_attr($block_name) . '" aria-hidden="true"></span>';
-	}
-
-	return '<span class="fs-block-settings__icon" aria-hidden="true"><span class="dashicons dashicons-block-default" aria-hidden="true"></span></span>';
 }
 
 /**
