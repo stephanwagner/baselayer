@@ -77,13 +77,13 @@ export const blockOptions = [
       },
       {
         type: 'select',
-        label: 'Design',
+        label: 'Bild-Text-Layout',
         default: '',
-        attributeName: 'design',
+        attributeName: 'imageTextLayout',
         options: [
-          { label: 'Standard', value: '' },
-          { label: 'Bild links, Text rechts', value: '-image-left-text-right' },
-          { label: 'Bild rechts, Text links', value: '-image-right-text-left' }
+          { label: 'Ohne', value: '' },
+          { label: 'Bild links, Text zentriert', value: '-image-left-text-right' },
+          { label: 'Bild rechts, Text zentriert', value: '-image-right-text-left' }
         ]
       },
       {

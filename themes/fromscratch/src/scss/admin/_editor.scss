@@ -28,6 +28,16 @@
   }
 }
 
+// Columns image left / right
+
+.wp-block-columns.-image-right-text-left,
+.wp-block-columns.-image-left-text-right {
+  .wp-block {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
 // SEO panel
 
 div.fromscratch-seo-panel {
