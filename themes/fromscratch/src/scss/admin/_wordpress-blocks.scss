@@ -1,0 +1,11 @@
+@use '../variables' as *;
+
+.editor-styles-wrapper {
+  // Narrow size
+
+  .-narrow,
+  .-narrow-left,
+  .-narrow-right {
+    background: red !important;
+  }
+}

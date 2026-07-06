@@ -382,6 +382,10 @@ msgid "Numbered list"
 msgstr "Nummerierte Liste"
 
 msgctxt "icon name"
+msgid "Numbered list (RTL)"
+msgstr "Nummerierte Liste (RTL)"
+
+msgctxt "icon name"
 msgid "Letters"
 msgstr "Buchstaben"
 
@@ -390,12 +394,12 @@ msgid "Numbers"
 msgstr "Zahlen"
 
 msgctxt "icon name"
-msgid "Image left"
-msgstr "Bild links"
+msgid "Image left, text"
+msgstr "Bild links, Text"
 
 msgctxt "icon name"
-msgid "Image right"
-msgstr "Bild rechts"
+msgid "Image right, text"
+msgstr "Bild rechts, Text"
 
 msgctxt "icon name"
 msgid "Sort"
@@ -2398,12 +2402,16 @@ msgid "Clear formatting"
 msgstr "Formatierung löschen"
 
 msgctxt "icon name"
+msgid "Clear format"
+msgstr "Format löschen"
+
+msgctxt "icon name"
 msgid "Unlink"
 msgstr "Link entfernen"
 
 msgctxt "icon name"
-msgid "Image inline"
-msgstr "Bild inline"
+msgid "Image center, text"
+msgstr "Bild mittig, Text"
 
 msgctxt "icon name"
 msgid "Clear all"
@@ -2440,3 +2448,160 @@ msgstr "Keine Getränke"
 msgctxt "icon name"
 msgid "Sailing"
 msgstr "Segeln"
+
+msgctxt "icon name"
+msgid "Add column left"
+msgstr "Spalte links einfügen"
+
+msgctxt "icon name"
+msgid "Add column right"
+msgstr "Spalte rechts einfügen"
+
+msgctxt "icon name"
+msgid "Add row above"
+msgstr "Zeile oben einfügen"
+
+msgctxt "icon name"
+msgid "Add row below"
+msgstr "Zeile unten einfügen"
+
+msgctxt "icon name"
+msgid "Align horizontal center"
+msgstr "Horizontal zentrieren"
+
+msgctxt "icon name"
+msgid "Align horizontal left"
+msgstr "Horizontal links ausrichten"
+
+msgctxt "icon name"
+msgid "Align horizontal right"
+msgstr "Horizontal rechts ausrichten"
+
+msgctxt "icon name"
+msgid "Asterisk"
+msgstr "Sternchen"
+
+msgctxt "icon name"
+msgid "Brand family"
+msgstr "Markenfamilie"
+
+msgctxt "icon name"
+msgid "Checklist (RTL)"
+msgstr "Checkliste (RTL)"
+
+msgctxt "icon name"
+msgid "Combine columns"
+msgstr "Spalten zusammenführen"
+
+msgctxt "icon name"
+msgid "Combine rows"
+msgstr "Zeilen zusammenführen"
+
+msgctxt "icon name"
+msgid "Decrease text size"
+msgstr "Text verkleinern"
+
+msgctxt "icon name"
+msgid "Edit table"
+msgstr "Tabelle bearbeiten"
+
+msgctxt "icon name"
+msgid "Image left"
+msgstr "Bild links"
+
+msgctxt "icon name"
+msgid "Image right"
+msgstr "Bild rechts"
+
+msgctxt "icon name"
+msgid "Inbox"
+msgstr "Posteingang"
+
+msgctxt "icon name"
+msgid "Inbox text"
+msgstr "Posteingang Text"
+
+msgctxt "icon name"
+msgid "Increase text size"
+msgstr "Text vergrößern"
+
+msgctxt "icon name"
+msgid "Lists"
+msgstr "Listen"
+
+msgctxt "icon name"
+msgid "Paintbrush"
+msgstr "Pinsel"
+
+msgctxt "icon name"
+msgid "Paintbrush off"
+msgstr "Pinsel aus"
+
+msgctxt "icon name"
+msgid "Short text"
+msgstr "Kurzer Text"
+
+msgctxt "icon name"
+msgid "Stacked chart"
+msgstr "Gestapeltes Diagramm"
+
+msgctxt "icon name"
+msgid "Table chart"
+msgstr "Tabellenlayout"
+
+msgctxt "icon name"
+msgid "Text snippet"
+msgstr "Textausschnitt"
+
+msgctxt "icon name"
+msgid "Voicemail"
+msgstr "Mailbox"
+
+msgctxt "icon name"
+msgid "Web stories"
+msgstr "Web Stories"
+
+msgctxt "icon name"
+msgid "Arrows input"
+msgstr "Pfeile rein"
+
+msgctxt "icon name"
+msgid "Arrows output"
+msgstr "Pfeile raus"
+
+msgctxt "icon name"
+msgid "Foldable device"
+msgstr "Faltgerät"
+
+msgctxt "icon name"
+msgid "Horizontal align center"
+msgstr "Horizontal zentrieren"
+
+msgctxt "icon name"
+msgid "Pinch zoom in"
+msgstr "Zoom zusammenziehen"
+
+msgctxt "icon name"
+msgid "Pinch zoom out"
+msgstr "Zoom auseinanderziehen"
+
+msgctxt "icon name"
+msgid "Tablet"
+msgstr "Tablet"
+
+msgctxt "icon name"
+msgid "Vertical align center"
+msgstr "Vertikal zentrieren"
+
+msgctxt "icon name"
+msgid "Wearables"
+msgstr "Wearables"
+
+msgctxt "icon name"
+msgid "Line height"
+msgstr "Zeilenhöhe"
+
+msgctxt "icon name"
+msgid "Highlight"
+msgstr "Markierung"
+
