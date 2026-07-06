@@ -4,6 +4,7 @@ import {
   storedMarginSize,
 } from './content-margin-utils';
 import { BlockOptionToggleGroupOption } from './block-option-toggle-group-option';
+import { BlockOptionDescription } from './block-option-help';
 
 const { Button } = wp.components;
 const ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
@@ -122,6 +123,7 @@ export function ContentMarginControl({ option, attributes, onChange }) {
             {renderSizeControl('Unten', displayBottom, setBottom, resetBottom)}
           </>
         )}
+      <BlockOptionDescription description={option.description} />
     </div>
   );
 }

@@ -53,7 +53,10 @@ function getLimitWidthControl() {
 }
 
 /**
- * Apply block options
+ * Apply block options.
+ *
+ * Boolean: `label` = optional row label; `toggleLabel` = text on the switch.
+ * All types: optional `description` = help text below the control.
  */
 export const blockOptions = [
   // Columns
@@ -78,17 +81,19 @@ export const blockOptions = [
       {
         type: 'select',
         label: 'Bild-Text-Layout',
+        description: 'Richtet Bild- und Textspalte als zusammengehöriges Layout aus.',
         default: '',
         attributeName: 'imageTextLayout',
         options: [
           { label: 'Ohne', value: '' },
-          { label: 'Bild links, Text zentriert', value: '-image-left-text-right' },
-          { label: 'Bild rechts, Text zentriert', value: '-image-right-text-left' }
+          { label: 'Bild links, Text rechts', value: '-image-left-text-right' },
+          { label: 'Bild rechts, Text links', value: '-image-right-text-left' }
         ]
       },
       {
         type: 'boolean',
-        label: 'Spalten wenn gestapelt umkehren',
+        label: 'Mobile anordnung',
+        toggleLabel: 'Spalten wenn gestapelt umkehren',
         default: false,
         attributeName: 'columnReverseOrderOnMobile',
         className: '-reverse-order-on-mobile'
@@ -102,7 +107,7 @@ export const blockOptions = [
     options: [
       {
         type: 'boolean',
-        label: 'Inhalt vertikal zentrieren',
+        toggleLabel: 'Inhalt vertikal zentrieren',
         default: false,
         attributeName: 'columnCenterContent',
         className: '-center-content'
@@ -150,14 +155,14 @@ export const blockOptions = [
       getContentMarginControl(),
       {
         type: 'boolean',
-        label: 'Ohne Bildtext',
+        toggleLabel: 'Ohne Bildtext',
         default: false,
         attributeName: 'noImageLabel',
         className: '-no-image-caption'
       },
       {
         type: 'boolean',
-        label: 'Bild bei Klick vergrößern',
+        toggleLabel: 'Bild bei Klick vergrößern',
         default: false,
         attributeName: 'hasLightbox',
         className: '-has-lightbox'
@@ -172,14 +177,14 @@ export const blockOptions = [
       getContentMarginControl(),
       {
         type: 'boolean',
-        label: 'Ohne Bildtexte',
+        toggleLabel: 'Ohne Bildtexte',
         default: false,
         attributeName: 'noImageLabels',
         className: '-no-image-captions'
       },
       {
         type: 'boolean',
-        label: 'Bilder bei Klick vergrößern',
+        toggleLabel: 'Bilder bei Klick vergrößern',
         default: true,
         attributeName: 'hasLightbox',
         className: '-has-lightbox'

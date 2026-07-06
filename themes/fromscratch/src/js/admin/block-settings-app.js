@@ -60,11 +60,7 @@ function renderBlockIcon(icon) {
 function BlockTypeIcon({ blockName, serverIcon = null }) {
   const icon = useBlockIcon(blockName, serverIcon);
 
-  return el(
-    'span',
-    { className: 'fs-block-settings__icon' },
-    renderBlockIcon(icon),
-  );
+  return el('span', { className: 'fs-block-settings__icon' }, renderBlockIcon(icon));
 }
 
 function getInitialSettings() {
@@ -88,7 +84,7 @@ function BlockCard({ block, flags, onChange }) {
   const config = getConfig();
   const i18n = config.i18n || {};
   const allowed = Boolean(flags.allowed);
-  const mode = flags.hidden ? 'hidden' : (flags.favorite ? 'favorite' : '');
+  const mode = flags.hidden ? 'hidden' : flags.favorite ? 'favorite' : '';
 
   const setMode = (nextMode) => {
     if (!allowed) {
@@ -290,19 +286,21 @@ function FilterGroup({ label, value, options, onChange }) {
       role: 'group',
       'aria-label': label,
     },
-    options.map((option) => el(
-      'button',
-      {
-        key: option.value,
-        type: 'button',
-        className: `fs-block-settings__filter-btn${value === option.value ? ' is-active' : ''}`,
-        'aria-pressed': value === option.value ? 'true' : 'false',
-        title: option.label,
-        onClick: () => onChange(option.value),
-      },
-      renderDashicon(option.icon),
-      el('span', { className: 'screen-reader-text' }, option.label),
-    )),
+    options.map((option) =>
+      el(
+        'button',
+        {
+          key: option.value,
+          type: 'button',
+          className: `fs-block-settings__filter-btn${value === option.value ? ' is-active' : ''}`,
+          'aria-pressed': value === option.value ? 'true' : 'false',
+          title: option.label,
+          onClick: () => onChange(option.value),
+        },
+        renderDashicon(option.icon),
+        el('span', { className: 'screen-reader-text' }, option.label),
+      ),
+    ),
   );
 }
 
@@ -333,33 +331,39 @@ function BlockSettingsApp() {
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [systemOpen, setSystemOpen] = useState(false);
 
-  const allowedFilterOptions = useMemo(() => ([
-    { value: 'all', label: i18n.filterAll || __('All', 'fromscratch'), icon: 'dashicons-filter' },
-    { value: 'active', label: i18n.filterActive || __('Active', 'fromscratch'), icon: 'dashicons-yes-alt' },
-    { value: 'inactive', label: i18n.filterInactive || __('Inactive', 'fromscratch'), icon: 'dashicons-no-alt' },
-  ]), [i18n]);
+  const allowedFilterOptions = useMemo(
+    () => [
+      { value: 'all', label: i18n.filterAll || __('All', 'fromscratch'), icon: 'dashicons-filter' },
+      { value: 'active', label: i18n.filterActive || __('Active', 'fromscratch'), icon: 'dashicons-yes-alt' },
+      { value: 'inactive', label: i18n.filterInactive || __('Inactive', 'fromscratch'), icon: 'dashicons-no-alt' },
+    ],
+    [i18n],
+  );
 
-  const hiddenFilterOptions = useMemo(() => ([
-    { value: 'all', label: i18n.filterAll || __('All', 'fromscratch'), icon: 'dashicons-filter' },
-    { value: 'hidden', label: i18n.hidden || __('Hidden', 'fromscratch'), icon: 'dashicons-hidden' },
-    { value: 'not-hidden', label: i18n.filterNotHidden || __('Not hidden', 'fromscratch'), icon: 'dashicons-visibility' },
-  ]), [i18n]);
+  const hiddenFilterOptions = useMemo(
+    () => [
+      { value: 'all', label: i18n.filterAll || __('All', 'fromscratch'), icon: 'dashicons-filter' },
+      { value: 'hidden', label: i18n.hidden || __('Hidden', 'fromscratch'), icon: 'dashicons-hidden' },
+      { value: 'not-hidden', label: i18n.filterNotHidden || __('Not hidden', 'fromscratch'), icon: 'dashicons-visibility' },
+    ],
+    [i18n],
+  );
 
-  const favoriteFilterOptions = useMemo(() => ([
-    { value: 'all', label: i18n.filterAll || __('All', 'fromscratch'), icon: 'dashicons-filter' },
-    { value: 'favorite', label: i18n.favorites || __('Favorites', 'fromscratch'), icon: 'dashicons-star-filled' },
-    { value: 'not-favorite', label: i18n.filterNotFavorite || __('Not favorite', 'fromscratch'), icon: 'dashicons-star-empty' },
-  ]), [i18n]);
+  const favoriteFilterOptions = useMemo(
+    () => [
+      { value: 'all', label: i18n.filterAll || __('All', 'fromscratch'), icon: 'dashicons-filter' },
+      { value: 'favorite', label: i18n.favorites || __('Favorites', 'fromscratch'), icon: 'dashicons-star-filled' },
+      { value: 'not-favorite', label: i18n.filterNotFavorite || __('Not favorite', 'fromscratch'), icon: 'dashicons-star-empty' },
+    ],
+    [i18n],
+  );
 
   const configurableGroups = useMemo(
     () => filterGroups(config.configurableGroups || [], search, settings, filters),
     [config.configurableGroups, search, settings, filters],
   );
 
-  const systemBlocks = useMemo(
-    () => filterSystemBlocks(config.systemBlocks || [], search),
-    [config.systemBlocks, search],
-  );
+  const systemBlocks = useMemo(() => filterSystemBlocks(config.systemBlocks || [], search), [config.systemBlocks, search]);
 
   const hasVisibleBlocks = configurableGroups.some((group) => group.blocks.length > 0);
 
@@ -434,54 +438,60 @@ function BlockSettingsApp() {
         }),
       ),
     ),
-    !hasVisibleBlocks && el('p', { className: 'fs-block-settings__empty' }, i18n.noResults || __('No blocks match the current search or filters.', 'fromscratch')),
-    configurableGroups.map((group) => el(
-      'section',
-      { key: group.category, className: 'fs-block-settings__group' },
-      el('h3', { className: 'fs-block-settings__category' }, group.label),
+    !hasVisibleBlocks &&
+      el('p', { className: 'fs-block-settings__empty' }, i18n.noResults || __('No blocks match the current search or filters.', 'fromscratch')),
+    configurableGroups.map((group) =>
       el(
-        'div',
-        { className: 'fs-block-settings__grid' },
-        group.blocks.map((block) => {
-          const flags = settings[block.name] || { allowed: true, hidden: false, favorite: false };
-          return el(BlockCard, {
-            key: block.name,
-            block,
-            flags,
-            onChange: (nextFlags) => updateBlock(block.name, nextFlags),
-          });
-        }),
-      ),
-    )),
-    systemBlocks.length > 0 && el(
-      'div',
-      { className: 'fs-block-settings__system' },
-      el(
-        'button',
-        {
-          type: 'button',
-          className: `button button-secondary fs-block-settings__system-toggle${systemOpen ? ' is-open' : ''}`,
-          'aria-expanded': systemOpen ? 'true' : 'false',
-          'aria-controls': 'fs-block-settings-system-panel',
-          onClick: () => setSystemOpen((open) => !open),
-        },
-        sprintf(
-          i18n.systemBlocksToggle || _n('%d block hidden by system', '%d blocks hidden by system', systemBlocks.length, 'fromscratch'),
-          systemBlocks.length,
-        ),
-      ),
-      systemOpen && el(
-        'div',
-        { id: 'fs-block-settings-system-panel', className: 'fs-block-settings__system-panel' },
-        el('p', { className: 'description' }, i18n.systemBlocksDescription || ''),
-        el(SystemBlocksHelp, { help: config.systemBlocksHelp, i18n }),
+        'section',
+        { key: group.category, className: 'fs-block-settings__group' },
+        el('h3', { className: 'fs-block-settings__category' }, group.label),
         el(
           'div',
-          { className: 'fs-block-settings__system-grid' },
-          systemBlocks.map((block) => el(SystemBlockCard, { key: block.name, block })),
+          { className: 'fs-block-settings__grid' },
+          group.blocks.map((block) => {
+            const flags = settings[block.name] || { allowed: true, hidden: false, favorite: false };
+            return el(BlockCard, {
+              key: block.name,
+              block,
+              flags,
+              onChange: (nextFlags) => updateBlock(block.name, nextFlags),
+            });
+          }),
         ),
       ),
     ),
+    systemBlocks.length > 0 &&
+      el(
+        'div',
+        { className: 'fs-block-settings__system' },
+        el(
+          'button',
+          {
+            type: 'button',
+            className: `button button-secondary fs-block-settings__system-toggle${systemOpen ? ' is-open' : ''}`,
+            style: { marginBottom: 0 },
+            'aria-expanded': systemOpen ? 'true' : 'false',
+            'aria-controls': 'fs-block-settings-system-panel',
+            onClick: () => setSystemOpen((open) => !open),
+          },
+          sprintf(
+            i18n.systemBlocksToggle || _n('%d block hidden by system', '%d blocks hidden by system', systemBlocks.length, 'fromscratch'),
+            systemBlocks.length,
+          ),
+        ),
+        systemOpen &&
+          el(
+            'div',
+            { id: 'fs-block-settings-system-panel', className: 'fs-block-settings__system-panel' },
+            el('p', { className: 'description' }, i18n.systemBlocksDescription || ''),
+            el(SystemBlocksHelp, { help: config.systemBlocksHelp, i18n }),
+            el(
+              'div',
+              { className: 'fs-block-settings__system-grid', style: { marginTop: 16 } },
+              systemBlocks.map((block) => el(SystemBlockCard, { key: block.name, block })),
+            ),
+          ),
+      ),
     el(
       'div',
       { className: 'fs-submit-row' },

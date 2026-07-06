@@ -5,6 +5,7 @@ import {
   storedLimitWidthSize,
 } from './limit-width-utils';
 import { BlockOptionToggleGroupOption } from './block-option-toggle-group-option';
+import { BlockOptionDescription } from './block-option-help';
 
 const ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
 
@@ -84,6 +85,7 @@ export function LimitWidthControl({ option, attributes, onChange }) {
           </ToggleGroupControl>
         </div>
       </div>
+      <BlockOptionDescription description={option.description} />
     </div>
   );
 }

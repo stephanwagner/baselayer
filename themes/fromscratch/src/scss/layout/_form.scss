@@ -60,10 +60,6 @@
       transition: transition('background-color', 'border-color', 'color');
     }
 
-    @media (max-width: $breakpoint-s) {
-      padding: 6px 16px;
-    }
-
     &.-outline,
     .wp-block-button.is-style-outline & {
       background: transparent;

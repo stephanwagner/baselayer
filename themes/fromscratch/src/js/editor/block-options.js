@@ -3,6 +3,7 @@ import { IconPicker } from './icons/icon-picker';
 import { ContentMarginControl } from './content-margin-control';
 import { LimitWidthControl } from './limit-width-control';
 import { BlockOptionToggleGroupOption } from './block-option-toggle-group-option';
+import { BlockOptionDescription, optionHelpProps } from './block-option-help';
 import {
   ALL_CONTENT_MARGIN_CLASSES,
   contentMarginAttributeKeys,
@@ -34,6 +35,26 @@ const iconPrefix = (option) => option.classPrefix || ICON_CLASS_PREFIX;
 const iconNameFromClass = (value, option) => {
   const prefix = iconPrefix(option);
   return value && value.indexOf(prefix) === 0 ? value.slice(prefix.length) : '';
+};
+
+/**
+ * Boolean option labels: `label` = optional row label; `toggleLabel` = text on the switch.
+ * Legacy: if only `label` is set, it is used as the toggle label (no row label).
+ */
+const getBooleanOptionLabels = (option) => {
+  const hasToggleLabel = Object.prototype.hasOwnProperty.call(option, 'toggleLabel');
+
+  if (hasToggleLabel) {
+    return {
+      rowLabel: option.label || '',
+      toggleLabel: option.toggleLabel || '',
+    };
+  }
+
+  return {
+    rowLabel: '',
+    toggleLabel: option.label || '',
+  };
 };
 
 // Position modifiers (e.g. `-icon-right`) share the icon prefix but are not glyph classes.
@@ -326,13 +347,19 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                   }
 
                   if (option.type === 'boolean') {
+                    const { rowLabel, toggleLabel } = getBooleanOptionLabels(option);
+
                     return (
-                      <ToggleControl
-                        key={option.attributeName}
-                        label={option.label}
-                        checked={attributes[option.attributeName]}
-                        onChange={(newValue) => setOptionAttributes({ [option.attributeName]: newValue })}
-                      />
+                      <div key={option.attributeName} className="fs-block-option-boolean">
+                        {rowLabel ? <span className="fs-block-option__label">{rowLabel}</span> : null}
+                        <ToggleControl
+                          label={toggleLabel}
+                          checked={attributes[option.attributeName]}
+                          onChange={(newValue) => setOptionAttributes({ [option.attributeName]: newValue })}
+                          __nextHasNoMarginBottom
+                          {...optionHelpProps(option)}
+                        />
+                      </div>
                     );
                   } else if (option.type === 'select') {
                     return (
@@ -342,6 +369,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                         value={attributes[option.attributeName]}
                         options={option.options}
                         onChange={(newValue) => setOptionAttributes({ [option.attributeName]: newValue })}
+                        {...optionHelpProps(option)}
                       />
                     );
                   } else if (option.type === 'icon') {
@@ -350,6 +378,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                       <IconPicker
                         key={option.attributeName}
                         label={option.label}
+                        description={option.description}
                         value={iconNameFromClass(attributes[option.attributeName], option)}
                         onChange={(name) =>
                           setOptionAttributes({
@@ -369,6 +398,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                           isBlock
                           onChange={(newValue) => setOptionAttributes({ [option.attributeName]: newValue })}
                           __nextHasNoMarginBottom
+                          {...optionHelpProps(option)}
                         >
                           {option.options.map((opt) => (
                             <BlockOptionToggleGroupOption
@@ -390,6 +420,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                         value={attributes[option.attributeName]}
                         options={option.options}
                         onChange={(newValue) => setOptionAttributes({ [option.attributeName]: newValue })}
+                        {...optionHelpProps(option)}
                       />
                     );
                   }

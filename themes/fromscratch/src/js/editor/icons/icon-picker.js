@@ -1,5 +1,6 @@
 import { iconCategories, resolveIconName, iconMatchesQuery, findIconByValue } from './icon-catalog';
 import { readStoredVariant, writeStoredVariant, resolvePickerVariant } from './icon-variant';
+import { BlockOptionDescription } from '../block-option-help';
 
 const { Button, Modal, SearchControl, ToggleControl } = wp.components;
 const ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
@@ -33,10 +34,11 @@ const categoryName = (category) => category.label || categoryLabels[category.slu
  *
  * @param {Object}   props
  * @param {string}   [props.label]  Optional field label.
+ * @param {string}   [props.description] Optional help text below the control.
  * @param {string}   props.value    Selected icon file name, or '' when none.
  * @param {Function} props.onChange Receives the resolved icon file name (or '').
  */
-export function IconPicker({ label, value, onChange }) {
+export function IconPicker({ label, description, value, onChange }) {
   const [isOpen, setIsOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [variant, setVariant] = useState(() => resolvePickerVariant(value));
@@ -106,6 +108,8 @@ export function IconPicker({ label, value, onChange }) {
           </Button>
         ) : null}
       </div>
+
+      <BlockOptionDescription description={description} />
 
       {isOpen ? (
         <Modal title={t('choose', 'Choose icon')} onRequestClose={() => setIsOpen(false)} className="fs-icon-picker__modal">
