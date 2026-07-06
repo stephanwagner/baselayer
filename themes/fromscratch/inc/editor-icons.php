@@ -476,6 +476,7 @@ function fs_icon_labels(): array
 		'power-off'              => _x('Power off', 'icon name', 'fromscratch-icons'),
 		'power-off-circle'         => _x('Power off circle', 'icon name', 'fromscratch-icons'),
 		'mouse'                  => _x('Mouse', 'icon name', 'fromscratch-icons'),
+		'pointer'                => _x('Pointer', 'icon name', 'fromscratch-icons'),
 		'touch'                  => _x('Touch', 'icon name', 'fromscratch-icons'),
 		'click'                  => _x('Click', 'icon name', 'fromscratch-icons'),
 		'click-action'           => _x('Click action', 'icon name', 'fromscratch-icons'),
