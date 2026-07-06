@@ -622,5 +622,65 @@
     "newNameDe": "Standort",
     "oldKeywords": "pin, map, marker, place, gps",
     "newKeywords": "pin, map, marker, place, gps"
+  },
+  {
+    "from": "location-pin",
+    "to": "map-pin",
+    "oldFile": "location-pin.svg",
+    "newFile": "map-pin.svg",
+    "oldNameEn": "Location",
+    "newNameEn": "Location",
+    "oldNameDe": "Standort",
+    "newNameDe": "Standort",
+    "oldKeywords": "pin, map, marker, place, gps",
+    "newKeywords": "pin, map, marker, place, gps"
+  },
+  {
+    "from": "pin-drop",
+    "to": "map-pin-drop",
+    "oldFile": "pin-drop.svg",
+    "newFile": "map-pin-drop.svg",
+    "oldNameEn": "Pin",
+    "newNameEn": "Pin",
+    "oldNameDe": "Pin",
+    "newNameDe": "Pin",
+    "oldKeywords": "location, marker, map, place",
+    "newKeywords": "location, marker, map, place"
+  },
+  {
+    "from": "pin-circle",
+    "to": "map-pin-circle",
+    "oldFile": "pin-circle.svg",
+    "newFile": "map-pin-circle.svg",
+    "oldNameEn": "Pin circle",
+    "newNameEn": "Pin circle",
+    "oldNameDe": "Pin Kreis",
+    "newNameDe": "Pin Kreis",
+    "oldKeywords": "pin, location, circle, marker",
+    "newKeywords": "pin, location, circle, marker"
+  },
+  {
+    "from": "location-add",
+    "to": "map-pin-add",
+    "oldFile": "location-add.svg",
+    "newFile": "map-pin-add.svg",
+    "oldNameEn": "Add location",
+    "newNameEn": "Add location",
+    "oldNameDe": "Ort hinzufügen",
+    "newNameDe": "Ort hinzufügen",
+    "oldKeywords": "add, location, pin, place, map",
+    "newKeywords": "add, location, pin, place, map"
+  },
+  {
+    "from": "location-heart",
+    "to": "map-pin-heart",
+    "oldFile": "location-heart.svg",
+    "newFile": "map-pin-heart.svg",
+    "oldNameEn": "Location heart",
+    "newNameEn": "Location heart",
+    "oldNameDe": "Ort Herz",
+    "newNameDe": "Ort Herz",
+    "oldKeywords": "favorite, location, place, saved",
+    "newKeywords": "favorite, location, place, saved"
   }
 ]
