@@ -98,7 +98,7 @@ function fs_render_developer_cheatsheet(): void
 						<td>
 							<code class="fs-code-small"><?= esc_html("fs_svg_code('/img/icon.svg', ['class' => 'my-class']);") ?></code>
 							<div class="helpers-table__preview-code">
-								<span class="helpers-table__preview-pointer">→</span> <code class="fs-code-text fs-code-small">&lt;svg class="my-class" ...&gt;...&lt;/svg&gt;</code>
+								<span class="helpers-table__preview-pointer">→</span> <code class="fs-code-text fs-code-small">&lt;svg ...&gt;...&lt;/svg&gt;</code>
 							</div>
 						</td>
 					</tr>
@@ -230,7 +230,7 @@ function fs_render_developer_cheatsheet(): void
 					? fs_icon_svg_asset_path($svg_icon)
 					: '/icons/' . $svg_icon . '.svg';
 				$svg_php_code = "fs_svg_code('" . $svg_icon_path . "', ['class' => 'my-class']);";
-				$svg_markup = fs_svg_code($svg_icon_path, ['class' => 'my-class']);
+				$svg_markup = fs_svg_code($svg_icon_path);
 				?>
 
 				<h3 class="helpers-icons__subtitle"><?= esc_html__('Buttons', 'fromscratch') ?></h3>

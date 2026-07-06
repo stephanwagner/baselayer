@@ -62,20 +62,6 @@ const iconSvgAssetPath = (name) => {
   return `/icons/${name}.svg`;
 };
 
-const escapeAttr = (value) => String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;');
-
-const applySvgAttributes = (svg, attributes = {}) => {
-  if (!svg || !Object.keys(attributes).length) {
-    return svg;
-  }
-
-  const attrHtml = Object.entries(attributes)
-    .map(([name, value]) => ` ${name}="${escapeAttr(value)}"`)
-    .join('');
-
-  return svg.replace(/<svg\b([^>]*)>/i, `<svg$1${attrHtml}>`);
-};
-
 const buildSvgPhpCode = (value) => `fs_svg_code('${iconSvgAssetPath(value)}', ['class' => 'my-class']);`;
 
 const buildButtonCode = (value, position, element = 'button') => {
@@ -445,7 +431,6 @@ function initSvgIconsDemo(root = document) {
   }
 
   let value = demo.getAttribute('data-fs-icons-demo-value') || '';
-  const svgAttributes = { class: 'my-class' };
 
   const updateDemo = async (nextValue) => {
     value = nextValue;
@@ -468,9 +453,8 @@ function initSvgIconsDemo(root = document) {
       return;
     }
 
-    const markup = applySvgAttributes(rawSvg, svgAttributes);
-    preview.innerHTML = markup;
-    markupCodeEl.textContent = markup;
+    preview.innerHTML = rawSvg;
+    markupCodeEl.textContent = rawSvg;
   };
 
   bindChooseIcon(demo, {

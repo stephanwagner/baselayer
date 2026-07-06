@@ -66,11 +66,10 @@ const withAcfInnerBlocksToolbar = createHigherOrderComponent((BlockEdit) => {
         {isSelected && (
           <BlockControls group="other">
             <ToolbarButton
+              icon="plus-alt2"
               label={config.label}
               onClick={() => insertInnerBlock(context)}
-            >
-              {config.text}
-            </ToolbarButton>
+            />
           </BlockControls>
         )}
         <BlockEdit {...props} />
