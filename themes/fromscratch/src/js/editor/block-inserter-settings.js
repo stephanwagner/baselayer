@@ -28,6 +28,17 @@ function getI18n() {
   return getBlockInserterConfig().i18n || {};
 }
 
+function initEditorPreferenceDefaults() {
+  const preferences = wp.data?.dispatch?.('core/preferences');
+  if (!preferences || typeof preferences.setDefaults !== 'function') {
+    return;
+  }
+
+  preferences.setDefaults('core', {
+    mostUsedBlocks: true,
+  });
+}
+
 const hiddenBlockSnapshots = new Map();
 let showHiddenInserterBlocks = false;
 let toggleRoot = null;
@@ -273,6 +284,7 @@ wp.hooks.addFilter('blocks.registerBlockType', 'fromscratch/block-hidden-default
 });
 
 function initBlockInserterSettings() {
+  initEditorPreferenceDefaults();
   applyFavoriteCategories();
 
   const hiddenBlocks = getHiddenBlocks();
