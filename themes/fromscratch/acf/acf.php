@@ -147,16 +147,23 @@ function fs_acf_block_apply_option_classes(array $block): array
 /**
  * Inserter preview example for an ACF block (WordPress `example` property).
  *
- * Uses explicit `example` from blocks.php, or a static preview image via `preview`
- * or acf/blocks/{name}/preview.{jpg,jpeg,png,webp}.
+ * Uses acf/blocks/{name}/preview.php (field values), or a static preview image via
+ * `preview` in blocks.php or acf/blocks/{name}/preview.{jpg,jpeg,png,webp}.
+ *
+ * preview.php — field values; repeaters as nested row arrays:
+ *   return [ 'id' => 'my-section' ];
+ *   return [ 'items' => [ ['number' => 120, 'label' => '…'], … ] ];
  *
  * @param array<string, mixed> $acfBlock
  * @return array<string, mixed>|null
  */
 function fs_acf_block_inserter_example(array $acfBlock): ?array
 {
-	if (!empty($acfBlock['example']) && is_array($acfBlock['example'])) {
-		return $acfBlock['example'];
+	$name = isset($acfBlock['name']) && is_string($acfBlock['name']) ? $acfBlock['name'] : '';
+
+	$preview_data = $name !== '' ? fs_acf_block_preview_data($name) : null;
+	if ($preview_data !== null) {
+		return fs_acf_block_normalize_example($preview_data, $name);
 	}
 
 	$preview_uri = fs_acf_block_preview_image_uri($acfBlock);
@@ -172,6 +179,27 @@ function fs_acf_block_inserter_example(array $acfBlock): ?array
 			],
 		],
 	];
+}
+
+/**
+ * Inserter preview field values from acf/blocks/{name}/preview.php.
+ *
+ * @return array<string, mixed>|null
+ */
+function fs_acf_block_preview_data(string $block_name): ?array
+{
+	if ($block_name === '') {
+		return null;
+	}
+
+	$path = get_theme_file_path("/acf/blocks/{$block_name}/preview.php");
+	if (!is_readable($path)) {
+		return null;
+	}
+
+	$data = include $path;
+
+	return is_array($data) ? $data : null;
 }
 
 /**
@@ -203,6 +231,200 @@ function fs_acf_block_preview_image_uri(array $acfBlock): ?string
 	}
 
 	return null;
+}
+
+/**
+ * Normalize block example config to WordPress/ACF inserter format.
+ *
+ * @param array<string, mixed> $example
+ * @return array<string, mixed>
+ */
+function fs_acf_block_normalize_example(array $example, string $block_name): array
+{
+	if (!isset($example['attributes'])) {
+		$data = $block_name !== ''
+			? fs_acf_block_example_data_expand($block_name, $example)
+			: $example;
+
+		return [
+			'attributes' => [
+				'mode' => 'preview',
+				'data' => $data,
+			],
+		];
+	}
+
+	if (
+		$block_name !== ''
+		&& isset($example['attributes']['data'])
+		&& is_array($example['attributes']['data'])
+	) {
+		$example['attributes']['data'] = fs_acf_block_example_data_expand(
+			$block_name,
+			$example['attributes']['data']
+		);
+	}
+
+	return $example;
+}
+
+/**
+ * Expand human-friendly example values into ACF block attribute data.
+ *
+ * @param array<string, mixed> $data
+ * @return array<string, mixed>
+ */
+function fs_acf_block_example_data_expand(string $block_name, array $data): array
+{
+	$field_map = fs_acf_block_field_map($block_name);
+	if ($field_map === []) {
+		return $data;
+	}
+
+	$expanded = [];
+
+	foreach ($data as $name => $value) {
+		if (!is_string($name) || $name === '' || str_starts_with($name, '_')) {
+			$expanded[$name] = $value;
+			continue;
+		}
+
+		$field = $field_map[$name] ?? null;
+
+		if (
+			is_array($field)
+			&& ($field['type'] ?? '') === 'repeater'
+			&& is_array($value)
+			&& fs_acf_is_list_array($value)
+		) {
+			$expanded = array_merge($expanded, fs_acf_expand_repeater_example($name, $field, $value));
+			continue;
+		}
+
+		$expanded[$name] = $value;
+
+		if (is_array($field) && !empty($field['key']) && is_string($field['key'])) {
+			$expanded['_' . $name] = $field['key'];
+		}
+	}
+
+	return $expanded;
+}
+
+/**
+ * ACF fields for a block, keyed by field name.
+ *
+ * @return array<string, array<string, mixed>>
+ */
+function fs_acf_block_field_map(string $block_name): array
+{
+	static $cache = [];
+
+	if (isset($cache[$block_name])) {
+		return $cache[$block_name];
+	}
+
+	$cache[$block_name] = [];
+
+	if ($block_name === '' || !function_exists('acf_get_field_groups') || !function_exists('acf_get_fields')) {
+		return $cache[$block_name];
+	}
+
+	$groups = acf_get_field_groups(['block' => 'acf/' . $block_name]);
+	if (!is_array($groups)) {
+		return $cache[$block_name];
+	}
+
+	foreach ($groups as $group) {
+		if (!is_array($group)) {
+			continue;
+		}
+
+		$group_key = isset($group['key']) && is_string($group['key']) ? $group['key'] : '';
+		if ($group_key === '') {
+			continue;
+		}
+
+		$fields = acf_get_fields($group_key);
+		if (!is_array($fields)) {
+			continue;
+		}
+
+		foreach ($fields as $field) {
+			if (!is_array($field)) {
+				continue;
+			}
+
+			$name = isset($field['name']) && is_string($field['name']) ? $field['name'] : '';
+			if ($name !== '') {
+				$cache[$block_name][$name] = $field;
+			}
+		}
+	}
+
+	return $cache[$block_name];
+}
+
+/**
+ * @param array<int, mixed> $array
+ */
+function fs_acf_is_list_array(array $array): bool
+{
+	return $array === [] || array_keys($array) === range(0, count($array) - 1);
+}
+
+/**
+ * @param array<string, mixed> $field
+ * @param array<int, array<string, mixed>> $rows
+ * @return array<string, mixed>
+ */
+function fs_acf_expand_repeater_example(string $name, array $field, array $rows): array
+{
+	$out = [
+		$name => count($rows),
+	];
+
+	if (!empty($field['key']) && is_string($field['key'])) {
+		$out['_' . $name] = $field['key'];
+	}
+
+	$sub_map = [];
+	$sub_fields = $field['sub_fields'] ?? [];
+
+	if (is_array($sub_fields)) {
+		foreach ($sub_fields as $sub_field) {
+			if (!is_array($sub_field)) {
+				continue;
+			}
+
+			$sub_name = isset($sub_field['name']) && is_string($sub_field['name']) ? $sub_field['name'] : '';
+			if ($sub_name !== '') {
+				$sub_map[$sub_name] = $sub_field;
+			}
+		}
+	}
+
+	foreach ($rows as $index => $row) {
+		if (!is_array($row)) {
+			continue;
+		}
+
+		foreach ($row as $sub_name => $sub_value) {
+			if (!is_string($sub_name) || $sub_name === '') {
+				continue;
+			}
+
+			$key = $name . '_' . $index . '_' . $sub_name;
+			$out[$key] = $sub_value;
+
+			$sub_field = $sub_map[$sub_name] ?? null;
+			if (is_array($sub_field) && !empty($sub_field['key']) && is_string($sub_field['key'])) {
+				$out['_' . $key] = $sub_field['key'];
+			}
+		}
+	}
+
+	return $out;
 }
 
 // Render callback for ACF blocks
