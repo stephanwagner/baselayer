@@ -208,6 +208,37 @@ function SystemBlockCard({ block }) {
   );
 }
 
+function SystemBlocksHelp({ help, i18n }) {
+  if (!help || !help.type) {
+    return null;
+  }
+
+  if (help.type === 'developer') {
+    return el(
+      'p',
+      { className: 'description' },
+      i18n.systemBlocksHelpDeveloperBefore || __('To change this list, edit', 'fromscratch'),
+      ' ',
+      el('code', null, help.configPath || 'config/block-settings.php'),
+      ' (',
+      el('code', null, help.configKey || 'hardDisallowed'),
+      ') ',
+      i18n.systemBlocksHelpDeveloperAfter || __('in the theme.', 'fromscratch'),
+    );
+  }
+
+  if (help.type === 'admin') {
+    return el(
+      'p',
+      { className: 'description' },
+      i18n.systemBlocksHelpAdmin || __('You can ask a developer to unlock these blocks:', 'fromscratch'),
+      help.email ? [' ', el('a', { key: 'email', href: `mailto:${help.email}` }, help.email)] : null,
+    );
+  }
+
+  return null;
+}
+
 function matchesSearch(block, search) {
   const needle = search.trim().toLowerCase();
   if (needle === '') {
@@ -443,6 +474,7 @@ function BlockSettingsApp() {
         'div',
         { id: 'fs-block-settings-system-panel', className: 'fs-block-settings__system-panel' },
         el('p', { className: 'description' }, i18n.systemBlocksDescription || ''),
+        el(SystemBlocksHelp, { help: config.systemBlocksHelp, i18n }),
         el(
           'div',
           { className: 'fs-block-settings__system-grid' },

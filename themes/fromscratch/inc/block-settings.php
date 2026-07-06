@@ -359,6 +359,38 @@ function fs_block_settings_system_blocks(): array
 }
 
 /**
+ * Contextual help for the system-locked blocks panel (admin vs developer).
+ *
+ * @return array<string, string>|null
+ */
+function fs_block_settings_system_blocks_help(): ?array
+{
+	if (fs_block_settings_hard_disallowed() === []) {
+		return null;
+	}
+
+	$is_developer = function_exists('fs_is_developer_user') && fs_is_developer_user((int) get_current_user_id());
+
+	if ($is_developer) {
+		return [
+			'type'       => 'developer',
+			'configPath' => 'config/block-settings.php',
+			'configKey'  => 'hardDisallowed',
+		];
+	}
+
+	$email = function_exists('fs_developer_email') ? fs_developer_email() : '';
+	if ($email !== '' && !is_email($email)) {
+		$email = '';
+	}
+
+	return [
+		'type'  => 'admin',
+		'email' => $email,
+	];
+}
+
+/**
  * Map of ACF block names to icon markup from acf/blocks.php.
  *
  * @return array<string, string>
@@ -483,6 +515,7 @@ function fs_block_settings_admin_config(): array
 		'categoryLabels'      => $category_labels,
 		'configurableGroups'  => $configurable_groups,
 		'systemBlocks'        => $system_blocks,
+		'systemBlocksHelp'    => fs_block_settings_system_blocks_help(),
 		'i18n'                => [
 			'intro'                   => __('Control which blocks are available in the page editor inserter (+).', 'fromscratch'),
 			'searchPlaceholder'       => __('Search blocks…', 'fromscratch'),
@@ -493,6 +526,9 @@ function fs_block_settings_admin_config(): array
 			'hiddenBySystem'          => __('Hidden by system', 'fromscratch'),
 			'systemBlocksToggle'      => _n('%d block hidden by system', '%d blocks hidden by system', count($hard_disallowed), 'fromscratch'),
 			'systemBlocksDescription' => __('These blocks are disabled in code and cannot be enabled here.', 'fromscratch'),
+			'systemBlocksHelpAdmin'   => __('You can ask a developer to unlock these blocks:', 'fromscratch'),
+			'systemBlocksHelpDeveloperBefore' => __('To change this list, edit', 'fromscratch'),
+			'systemBlocksHelpDeveloperAfter'  => __('in the theme.', 'fromscratch'),
 			'save'                    => __('Save Changes', 'fromscratch'),
 			'filterAllowed'           => __('Allowed in inserter', 'fromscratch'),
 			'filterHidden'            => __('Inserter visibility', 'fromscratch'),
