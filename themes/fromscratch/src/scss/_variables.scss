@@ -1,3 +1,9 @@
+/**
+ * Variables
+ * 
+ * Sync variables with configs in config/theme-design.php
+ */
+
 @use 'sass:list';
 @use 'sass:color';
 
@@ -44,21 +50,6 @@ $line-height-m: 1.5;
 $line-height-l: 1.5;
 $line-height-xl: 1.4;
 
-// Content
-$content-width: 1200px;
-$content-width-wide: 1328px;
-$content-width-narrow: 900px;
-$content-width-very-narrow: 600px;
-$content-width-extra-narrow: 300px;
-
-// Breakpoints
-$breakpoint-xs: 400px;
-$breakpoint-s: 600px;
-$breakpoint-m: 900px;
-$breakpoint-l: 1200px;
-$breakpoint-xl: 1400px;
-$breakpoint-mobile: 900px;
-
 // Padding
 $content-padding-xs: 24px;
 $content-padding-s: 32px;
@@ -72,6 +63,21 @@ $content-margin-s: 32px;
 $content-margin-m: 48px;
 $content-margin-l: 64px;
 $content-margin-xl: 96px;
+
+// Content
+$content-width: 1200px;
+$content-width-wide: $content-width + ($content-padding-l * 2);
+$content-width-narrow: 900px;
+$content-width-very-narrow: 600px;
+$content-width-extra-narrow: 300px;
+
+// Breakpoints
+$breakpoint-xs: 400px;
+$breakpoint-s: 600px;
+$breakpoint-m: 900px;
+$breakpoint-l: 1200px;
+$breakpoint-xl: 1400px;
+$breakpoint-mobile: 900px;
 
 // Header
 $header-height: 96px;
@@ -90,6 +96,13 @@ $transition-speed-slow: 360ms;
 $border-radius: 8px;
 $border-radius-small: 4px;
 $border-radius-large: 16px;
+
+// Block editor content widths
+$editor-content-width: 960px;
+$editor-content-width-wide: $editor-content-width + ($content-padding-l * 2);
+$editor-content-width-padding: 16px;
+$editor-content-width-outer: $editor-content-width + $editor-content-width-padding;
+$editor-content-width-outer-min: $editor-content-width-outer + 1px;
 
 // Variables
 :root {
@@ -138,6 +151,20 @@ $border-radius-large: 16px;
   --fs-link-color: var(--fs-color-primary);
   --fs-link-color-hover: var(--fs-color-primary-dark);
 
+  // Padding
+  --fs-content-padding-xs: #{$content-padding-xs};
+  --fs-content-padding-m: #{$content-padding-m};
+  --fs-content-padding-s: #{$content-padding-s};
+  --fs-content-padding-l: #{$content-padding-l};
+  --fs-content-padding-xl: #{$content-padding-xl};
+
+  // Margins
+  --fs-content-margin-xs: #{$content-margin-xs};
+  --fs-content-margin-s: #{$content-margin-s};
+  --fs-content-margin-m: #{$content-margin-m};
+  --fs-content-margin-l: #{$content-margin-l};
+  --fs-content-margin-xl: #{$content-margin-xl};
+
   // Content
   --fs-content-width: #{$content-width};
   --fs-content-width-wide: #{$content-width-wide};
@@ -152,20 +179,6 @@ $border-radius-large: 16px;
   --fs-breakpoint-l: #{$breakpoint-l};
   --fs-breakpoint-xl: #{$breakpoint-xl};
   --fs-breakpoint-mobile: #{$breakpoint-mobile};
-
-  // Padding
-  --fs-content-padding-xs: #{$content-padding-xs};
-  --fs-content-padding-m: #{$content-padding-m};
-  --fs-content-padding-s: #{$content-padding-s};
-  --fs-content-padding-l: #{$content-padding-l};
-  --fs-content-padding-xl: #{$content-padding-xl};
-
-  // Margins
-  --fs-content-margin-xs: #{$content-margin-xs};
-  --fs-content-margin-s: #{$content-margin-s};
-  --fs-content-margin-m: #{$content-margin-m};
-  --fs-content-margin-l: #{$content-margin-l};
-  --fs-content-margin-xl: #{$content-margin-xl};
 
   // Header
   --fs-header-height: #{$header-height};
@@ -184,6 +197,11 @@ $border-radius-large: 16px;
   --fs-border-radius: #{$border-radius};
   --fs-border-radius-small: #{$border-radius-small};
   --fs-border-radius-large: #{$border-radius-large};
+
+  // Editor content
+  --fs-editor-content-width: #{$editor-content-width};
+  --fs-editor-content-width-wide: #{$editor-content-width-wide};
+  --fs-editor-content-width-outer: #{$editor-content-width-outer};
 }
 
 // Colors

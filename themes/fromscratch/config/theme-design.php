@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Design tokens merged into theme config (fs_config()). Used for the block editor palette / gradients / font sizes (see inc/theme-setup.php).
+ * Design tokens merged into theme config (fs_config()). Synced to theme.json via inc/theme-setup.php.
  */
 return [
 	// Colors
@@ -22,6 +22,14 @@ return [
 		['slug' => 'gray-100', 'color' => '#f6f6f6', 'name' => 'Gray 100'],
 	],
 
+	// Color picker (theme.json settings.color — hides WordPress “Standard” presets when false)
+	'color_options' => [
+		'default_palette'   => false,
+		'default_gradients' => false,
+		'default_duotone'   => false,
+		'custom'            => true,
+	],
+
 	// Gradients
 	'gradients' => [
 		[
@@ -37,5 +45,11 @@ return [
 		['name' => 'Normal', 'shortName' => 'M', 'size' => '16px', 'slug' => 'm'],
 		['name' => 'Large', 'shortName' => 'L', 'size' => '18px', 'slug' => 'l'],
 		['name' => 'Extra large', 'shortName' => 'XL', 'size' => '22px', 'slug' => 'xl'],
+	],
+
+	// Block editor layout
+	'layout' => [
+		'editor_content_width' => 960,
+		'wide_bleed'           => 64,
 	],
 ];

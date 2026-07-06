@@ -99,9 +99,9 @@ add_filter('image_size_names_choose', function (array $sizes): array {
 });
 add_filter('intermediate_image_sizes_advanced', function ($sizes) {
 	unset($sizes['medium_large']);
-    unset($sizes['1536x1536']);
-    unset($sizes['2048x2048']);
-    return $sizes;
+	unset($sizes['1536x1536']);
+	unset($sizes['2048x2048']);
+	return $sizes;
 });
 
 /**
@@ -187,16 +187,28 @@ function fs_excerpt_more(): string
 add_filter('excerpt_more', 'fs_excerpt_more');
 
 /**
- * Add custom colors and sizes
+ * Sync config/theme-design.php into theme.json (colors, typography, layout).
  */
-add_filter('wp_theme_json_data_default', function ($theme_json) {
+add_filter('wp_theme_json_data_theme', function ($theme_json) {
 	$data = $theme_json->get_data();
 
 	$data['settings']['color']['palette'] = fs_config('colors');
 	$data['settings']['color']['gradients'] = fs_config('gradients');
-	$data['settings']['typography']['fontSizes'] = fs_config('font_sizes');
-	// $data['settings']['spacing']['spacingSizes'] = [];
-	// $data['settings']['shadow']['presets'] = [];
 
-	return new WP_Theme_JSON_Data($data, 'default');
+	if (function_exists('fs_theme_json_color_settings')) {
+		foreach (fs_theme_json_color_settings() as $key => $value) {
+			$data['settings']['color'][$key] = $value;
+		}
+	}
+
+	$data['settings']['typography']['fontSizes'] = fs_config('font_sizes');
+
+	$layout_sizes = function_exists('fs_theme_json_layout_sizes')
+		? fs_theme_json_layout_sizes()
+		: ['contentSize' => '840px', 'wideSize' => '968px'];
+
+	$data['settings']['layout']['contentSize'] = $layout_sizes['contentSize'];
+	$data['settings']['layout']['wideSize'] = $layout_sizes['wideSize'];
+
+	return new WP_Theme_JSON_Data($data, 'theme');
 });

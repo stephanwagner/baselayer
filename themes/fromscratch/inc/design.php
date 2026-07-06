@@ -4,7 +4,7 @@ defined('ABSPATH') || exit;
 
 /**
  * SCSS read-only preview for Settings → Theme → CSS, and custom CSS from that tab on the front end.
- * Color/gradient/font-size tokens live in config/theme-design.php for the block editor (see theme-setup.php), not for PHP :root output.
+ * Color/gradient/font-size/layout tokens live in config/theme-design.php (see theme-setup.php), not for PHP :root output.
  */
 
 /**
@@ -125,6 +125,59 @@ function fs_scss_line_comments_to_css_block(string $scss): string
 		$i++;
 	}
 	return $out;
+}
+
+/**
+ * Block editor layout sizes for theme.json from config/theme-design.php.
+ *
+ * @return array{contentSize: string, wideSize: string}
+ */
+function fs_theme_json_layout_sizes(): array
+{
+	$layout = fs_config('layout');
+	if (!is_array($layout)) {
+		$layout = [];
+	}
+
+	$content = (int) ($layout['editor_content_width'] ?? 840);
+	$bleed = (int) ($layout['wide_bleed'] ?? 64);
+
+	if ($content <= 0) {
+		$content = 840;
+	}
+	if ($bleed < 0) {
+		$bleed = 64;
+	}
+
+	$wide = $content + ($bleed * 2);
+	if ($wide <= $content) {
+		$wide = $content + ($bleed * 2);
+	}
+
+	return [
+		'contentSize' => $content . 'px',
+		'wideSize'    => $wide . 'px',
+	];
+}
+
+/**
+ * Block editor color picker settings for theme.json from config/theme-design.php.
+ *
+ * @return array<string, bool>
+ */
+function fs_theme_json_color_settings(): array
+{
+	$options = fs_config('color_options');
+	if (!is_array($options)) {
+		$options = [];
+	}
+
+	return [
+		'defaultPalette'   => array_key_exists('default_palette', $options) ? (bool) $options['default_palette'] : false,
+		'defaultGradients' => array_key_exists('default_gradients', $options) ? (bool) $options['default_gradients'] : false,
+		'defaultDuotone'   => array_key_exists('default_duotone', $options) ? (bool) $options['default_duotone'] : false,
+		'custom'           => array_key_exists('custom', $options) ? (bool) $options['custom'] : true,
+	];
 }
 
 /**

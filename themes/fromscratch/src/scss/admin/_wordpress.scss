@@ -317,7 +317,7 @@ code {
 // Horizontal line
 
 hr.wp-block-separator.block-editor-block-list__block {
-  max-width: 840px !important;
+  max-width: var(--fs-editor-content-width) !important;
 }
 
 // CSS editor
