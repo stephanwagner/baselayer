@@ -48,18 +48,106 @@ add_action('admin_init', function () {
 	exit;
 }, 1);
 
+/**
+ * @param array<string, mixed> $block
+ */
+function fs_render_theme_settings_block_card(array $block): void
+{
+	$name = (string) $block['name'];
+	$allowed = !empty($block['allowed']);
+	$hidden = !empty($block['hidden']);
+	$favorite = !empty($block['favorite']);
+	$search_label = strtolower((string) $block['title'] . ' ' . $name);
+	$mode = $hidden ? 'hidden' : ($favorite ? 'favorite' : '');
+	?>
+	<article
+		class="fs-block-card<?= $allowed ? ' is-allowed' : ' is-disallowed' ?>"
+		data-fs-block-settings-card
+		data-search="<?= esc_attr($search_label) ?>"
+		data-fs-block-default-allowed="1"
+		data-fs-block-default-hidden="0"
+		data-fs-block-default-favorite="0"
+	>
+		<div class="fs-block-card__top">
+			<div class="fs-block-card__identity">
+				<div class="fs-block-card__block-icon" aria-hidden="true">
+					<?= fs_block_settings_render_icon_html($block['icon']) ?>
+				</div>
+				<div class="fs-block-card__meta">
+					<h4 class="fs-block-card__title"><?= esc_html((string) $block['title']) ?></h4>
+					<code class="fs-block-card__slug"><?= esc_html($name) ?></code>
+				</div>
+			</div>
+			<label class="fs-block-card__allowed" title="<?= esc_attr__('Allowed in inserter', 'fromscratch') ?>">
+				<input type="hidden" name="fromscratch_block_settings[<?= esc_attr($name) ?>][allowed]" value="0">
+				<input
+					type="checkbox"
+					class="screen-reader-text"
+					name="fromscratch_block_settings[<?= esc_attr($name) ?>][allowed]"
+					value="1"
+					<?= checked($allowed, true, false) ?>
+					data-fs-block-settings-allowed
+				>
+				<span class="fs-block-card__allowed-btn" aria-hidden="true">
+					<span class="fs-block-card__allowed-icon fs-block-card__allowed-icon--on dashicons dashicons-yes" aria-hidden="true"></span>
+					<span class="fs-block-card__allowed-icon fs-block-card__allowed-icon--off dashicons dashicons-no-alt" aria-hidden="true"></span>
+				</span>
+				<span class="screen-reader-text"><?= esc_html__('Allowed in inserter', 'fromscratch') ?></span>
+			</label>
+		</div>
+
+		<div
+			class="fs-block-card__modes"
+			role="group"
+			aria-label="<?= esc_attr__('Inserter visibility', 'fromscratch') ?>"
+			data-fs-block-settings-modes
+		>
+			<button
+				type="button"
+				class="fs-block-card__mode<?= $mode === 'hidden' ? ' is-active' : '' ?>"
+				data-fs-block-settings-mode="hidden"
+				aria-pressed="<?= $mode === 'hidden' ? 'true' : 'false' ?>"
+			>
+				<span class="dashicons dashicons-hidden" aria-hidden="true"></span>
+				<span><?= esc_html__('Hidden', 'fromscratch') ?></span>
+			</button>
+			<button
+				type="button"
+				class="fs-block-card__mode<?= $mode === 'favorite' ? ' is-active' : '' ?>"
+				data-fs-block-settings-mode="favorite"
+				aria-pressed="<?= $mode === 'favorite' ? 'true' : 'false' ?>"
+			>
+				<span class="dashicons dashicons-star-filled" aria-hidden="true"></span>
+				<span><?= esc_html__('Favorites', 'fromscratch') ?></span>
+			</button>
+		</div>
+
+		<input type="hidden" name="fromscratch_block_settings[<?= esc_attr($name) ?>][hidden]" value="<?= $hidden ? '1' : '0' ?>" data-fs-block-settings-hidden>
+		<input type="hidden" name="fromscratch_block_settings[<?= esc_attr($name) ?>][favorite]" value="<?= $favorite ? '1' : '0' ?>" data-fs-block-settings-favorite>
+
+		<button type="button" class="fs-block-card__reset" data-fs-block-settings-reset>
+			<?= esc_html__('Reset', 'fromscratch') ?>
+		</button>
+	</article>
+	<?php
+}
+
 function fs_render_theme_settings_blocks_tab(): void
 {
-	$groups = function_exists('fs_block_settings_registry_by_category')
-		? fs_block_settings_registry_by_category()
+	$groups = function_exists('fs_block_settings_registry_configurable_by_category')
+		? fs_block_settings_registry_configurable_by_category()
 		: [];
+	$system_blocks = function_exists('fs_block_settings_system_blocks')
+		? fs_block_settings_system_blocks()
+		: [];
+	$system_count = count($system_blocks);
 	?>
 	<form method="post" action="<?= esc_url(fs_theme_settings_url_with_tab('blocks')) ?>" class="fs-page-settings-form" id="fs-block-settings-form">
 		<?php wp_nonce_field('fromscratch_save_block_settings'); ?>
 		<input type="hidden" name="fromscratch_save_block_settings" value="1">
 		<h2 class="title"><?= esc_html__('Blocks', 'fromscratch') ?></h2>
-		<p class="description" style="margin-bottom: 16px;">
-			<?= esc_html__('Control which blocks are available in the page editor inserter (+). Hard-disallowed blocks are locked in code and cannot be enabled here.', 'fromscratch') ?>
+		<p class="description fs-block-settings__intro">
+			<?= esc_html__('Control which blocks are available in the page editor inserter (+).', 'fromscratch') ?>
 		</p>
 
 		<p class="fs-block-settings__search-wrap">
@@ -74,94 +162,56 @@ function fs_render_theme_settings_blocks_tab(): void
 		</p>
 
 		<?php foreach ($groups as $category => $blocks) : ?>
-			<div class="fs-admin-group -has-margin fs-block-settings__group" data-fs-block-settings-group>
-				<h3 class="title"><?= esc_html(fs_block_settings_category_label($category)) ?></h3>
-				<table class="widefat striped fs-table-small-gaps fs-block-settings__table" role="presentation">
-					<thead>
-						<tr>
-							<th scope="col" class="fs-block-settings__col-icon" aria-hidden="true"></th>
-							<th scope="col" class="fs-block-settings__col-name"><?= esc_html__('Name', 'fromscratch') ?></th>
-							<th scope="col" class="fs-block-settings__col-flag"><?= esc_html__('Allowed', 'fromscratch') ?></th>
-							<th scope="col" class="fs-block-settings__col-flag"><?= esc_html__('Hidden', 'fromscratch') ?></th>
-							<th scope="col" class="fs-block-settings__col-flag"><?= esc_html__('Favorite', 'fromscratch') ?></th>
-						</tr>
-					</thead>
-					<tbody>
-						<?php foreach ($blocks as $block) :
-							$name = (string) $block['name'];
-							$locked = !empty($block['hardDisallowed']);
-							$allowed = !empty($block['allowed']);
-							$hidden = !empty($block['hidden']);
-							$favorite = !empty($block['favorite']);
-							$row_class = $locked ? 'fs-block-settings-row--locked' : '';
-							$search_label = strtolower((string) $block['title'] . ' ' . $name);
-						?>
-							<tr class="<?= esc_attr($row_class) ?>" data-fs-block-settings-row data-search="<?= esc_attr($search_label) ?>">
-								<td class="fs-block-settings__col-icon">
-									<?= fs_block_settings_render_icon_html($block['icon']) ?>
-								</td>
-								<td class="fs-block-settings__col-name row-title">
-									<?= esc_html((string) $block['title']) ?>
-									<?php if ($locked) : ?>
-										<span class="fs-block-settings__locked-hint"><?= esc_html__('Locked in code', 'fromscratch') ?></span>
-									<?php endif; ?>
-									<code class="fs-block-settings__slug"><?= esc_html($name) ?></code>
-								</td>
-								<td class="fs-block-settings__col-flag">
-									<?php if ($locked) : ?>
-										<input type="hidden" name="fromscratch_block_settings[<?= esc_attr($name) ?>][allowed]" value="0">
-										<input type="checkbox" disabled <?= checked($allowed, true, false) ?>>
-									<?php else : ?>
-										<input type="hidden" name="fromscratch_block_settings[<?= esc_attr($name) ?>][allowed]" value="0">
-										<label>
-											<input
-												type="checkbox"
-												name="fromscratch_block_settings[<?= esc_attr($name) ?>][allowed]"
-												value="1"
-												<?= checked($allowed, true, false) ?>
-												data-fs-block-settings-allowed
-											>
-										</label>
-									<?php endif; ?>
-								</td>
-								<td class="fs-block-settings__col-flag">
-									<?php if ($locked || !$allowed) : ?>
-										<span class="fs-block-settings__dash" aria-hidden="true">—</span>
-									<?php else : ?>
-										<input type="hidden" name="fromscratch_block_settings[<?= esc_attr($name) ?>][hidden]" value="0">
-										<label>
-											<input
-												type="checkbox"
-												name="fromscratch_block_settings[<?= esc_attr($name) ?>][hidden]"
-												value="1"
-												<?= checked($hidden, true, false) ?>
-												data-fs-block-settings-hidden
-											>
-										</label>
-									<?php endif; ?>
-								</td>
-								<td class="fs-block-settings__col-flag">
-									<?php if ($locked || !$allowed || $hidden) : ?>
-										<span class="fs-block-settings__dash" aria-hidden="true">—</span>
-									<?php else : ?>
-										<input type="hidden" name="fromscratch_block_settings[<?= esc_attr($name) ?>][favorite]" value="0">
-										<label>
-											<input
-												type="checkbox"
-												name="fromscratch_block_settings[<?= esc_attr($name) ?>][favorite]"
-												value="1"
-												<?= checked($favorite, true, false) ?>
-												data-fs-block-settings-favorite
-											>
-										</label>
-									<?php endif; ?>
-								</td>
-							</tr>
-						<?php endforeach; ?>
-					</tbody>
-				</table>
-			</div>
+			<section class="fs-block-settings__group" data-fs-block-settings-group>
+				<h3 class="fs-block-settings__category"><?= esc_html(fs_block_settings_category_label($category)) ?></h3>
+				<div class="fs-block-settings__grid">
+					<?php foreach ($blocks as $block) :
+						fs_render_theme_settings_block_card($block);
+					endforeach; ?>
+				</div>
+			</section>
 		<?php endforeach; ?>
+
+		<?php if ($system_count > 0) : ?>
+			<div class="fs-block-settings__system">
+				<button
+					type="button"
+					class="button button-secondary fs-block-settings__system-toggle"
+					data-fs-block-settings-system-toggle
+					aria-expanded="false"
+					aria-controls="fs-block-settings-system-panel"
+				>
+					<?= esc_html(sprintf(
+						/* translators: %d: number of blocks hidden by the theme */
+						_n('%d block hidden by system', '%d blocks hidden by system', $system_count, 'fromscratch'),
+						$system_count
+					)) ?>
+				</button>
+				<div id="fs-block-settings-system-panel" class="fs-block-settings__system-panel" hidden data-fs-block-settings-system-panel>
+					<p class="description">
+						<?= esc_html__('These blocks are disabled in code and cannot be enabled here.', 'fromscratch') ?>
+					</p>
+					<div class="fs-block-settings__system-grid">
+						<?php foreach ($system_blocks as $block) : ?>
+							<article class="fs-block-card fs-block-card--system">
+								<div class="fs-block-card__top">
+									<div class="fs-block-card__identity">
+										<div class="fs-block-card__block-icon" aria-hidden="true">
+											<?= fs_block_settings_render_icon_html($block['icon']) ?>
+										</div>
+										<div class="fs-block-card__meta">
+											<h4 class="fs-block-card__title"><?= esc_html((string) $block['title']) ?></h4>
+											<code class="fs-block-card__slug"><?= esc_html((string) $block['name']) ?></code>
+											<p class="fs-block-card__system-note"><?= esc_html__('Hidden by system', 'fromscratch') ?></p>
+										</div>
+									</div>
+								</div>
+							</article>
+						<?php endforeach; ?>
+					</div>
+				</div>
+			</div>
+		<?php endif; ?>
 
 		<div class="fs-submit-row">
 			<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>

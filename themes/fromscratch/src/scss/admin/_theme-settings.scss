@@ -170,20 +170,77 @@ body.fs-css-vars-overview-modal-active {
 
 // Theme settings → Blocks
 
+.fs-block-settings__intro {
+  margin-bottom: 16px;
+}
+
 .fs-block-settings__search-wrap {
-  margin: 0 0 16px;
+  margin: 0 0 20px;
   max-width: 320px;
 }
 
-.fs-block-settings__table {
-  margin-top: 8px;
-  width: 100%;
+.fs-block-settings__group {
+  margin: 24px 0 0;
 }
 
-.fs-block-settings__col-icon {
-  width: 36px;
-  text-align: center;
-  vertical-align: middle;
+.fs-block-settings__category {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  margin: 0 0 10px;
+  text-transform: uppercase;
+}
+
+.fs-block-settings__grid,
+.fs-block-settings__system-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(196px, 1fr));
+}
+
+.fs-block-card {
+  background: #fff;
+  border: 1px solid #dcdcde;
+  border-radius: 6px;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+  padding: 12px;
+  transition: opacity 0.15s ease;
+
+  &.is-disallowed {
+    opacity: 0.55;
+
+    .fs-block-card__modes,
+    .fs-block-card__reset {
+      pointer-events: none;
+    }
+  }
+
+  &--system {
+    opacity: 0.85;
+  }
+}
+
+.fs-block-card__top {
+  align-items: flex-start;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+}
+
+.fs-block-card__identity {
+  align-items: flex-start;
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+}
+
+.fs-block-card__block-icon {
+  flex-shrink: 0;
+  line-height: 1;
 
   .dashicons {
     color: #50575e;
@@ -193,36 +250,164 @@ body.fs-css-vars-overview-modal-active {
   }
 }
 
-.fs-block-settings__col-name {
-  min-width: 220px;
+.fs-block-card__meta {
+  min-width: 0;
 }
 
-.fs-block-settings__col-flag {
-  text-align: center;
-  width: 88px;
+.fs-block-card__title {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.3;
+  margin: 0;
 }
 
-.fs-block-settings__slug {
+.fs-block-card__slug {
   color: #646970;
   display: block;
-  font-size: 11px;
+  font-size: 10px;
   margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.fs-block-settings__locked-hint {
+.fs-block-card__system-note {
   color: #646970;
-  display: inline-block;
   font-size: 11px;
   font-style: italic;
-  margin-left: 8px;
+  margin: 4px 0 0;
 }
 
-.fs-block-settings__dash {
-  color: #c3c4c7;
+.fs-block-card__allowed {
+  cursor: pointer;
+  flex-shrink: 0;
+  margin: 0;
 }
 
-.fs-block-settings-row--locked {
-  opacity: 0.72;
+.fs-block-card__allowed-btn {
+  align-items: center;
+  background: #f0f6fc;
+  border: 1px solid #72aee6;
+  border-radius: 4px;
+  color: #2271b1;
+  display: inline-flex;
+  height: 30px;
+  justify-content: center;
+  width: 30px;
+}
+
+.fs-block-card__allowed-icon {
+  font-size: 18px;
+  height: 18px;
+  width: 18px;
+}
+
+.fs-block-card__allowed-icon--off {
+  display: none;
+}
+
+.fs-block-card.is-disallowed .fs-block-card__allowed-btn {
+  background: #f6f7f7;
+  border-color: #c3c4c7;
+  color: #a7aaad;
+}
+
+.fs-block-card.is-disallowed .fs-block-card__allowed-icon--on {
+  display: none;
+}
+
+.fs-block-card.is-disallowed .fs-block-card__allowed-icon--off {
+  display: inline-block;
+}
+
+.fs-block-card__modes {
+  background: #f6f7f7;
+  border: 1px solid #dcdcde;
+  border-radius: 4px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  overflow: hidden;
+
+  &.is-disabled {
+    opacity: 0.45;
+  }
+}
+
+.fs-block-card__mode {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: #50575e;
+  cursor: pointer;
+  display: inline-flex;
+  font-size: 11px;
+  gap: 4px;
+  justify-content: center;
+  line-height: 1.2;
+  min-height: 30px;
+  padding: 4px 6px;
+
+  .dashicons {
+    font-size: 16px;
+    height: 16px;
+    width: 16px;
+  }
+
+  &:hover:not(:disabled) {
+    background: #fff;
+    color: #1d2327;
+  }
+
+  &.is-active {
+    background: #fff;
+    box-shadow: inset 0 0 0 1px #2271b1;
+    color: #2271b1;
+    font-weight: 600;
+  }
+
+  &:disabled {
+    cursor: default;
+  }
+
+  & + & {
+    border-left: 1px solid #dcdcde;
+  }
+}
+
+.fs-block-card__reset {
+  align-self: flex-start;
+  background: none;
+  border: 0;
+  color: #646970;
+  cursor: pointer;
+  font-size: 11px;
+  margin: 0;
+  padding: 0;
+  text-decoration: underline;
+
+  &:hover:not(:disabled) {
+    color: #2271b1;
+  }
+
+  &:disabled {
+    cursor: default;
+    opacity: 0.5;
+    text-decoration: none;
+  }
+}
+
+.fs-block-settings__system {
+  border-top: 1px solid #dcdcde;
+  margin-top: 28px;
+  padding-top: 20px;
+}
+
+.fs-block-settings__system-toggle.is-open {
+  margin-bottom: 12px;
+}
+
+.fs-block-settings__system-panel {
+  margin-top: 12px;
 }
 
 .fs-block-settings__icon--svg img {

@@ -5,7 +5,7 @@ defined('ABSPATH') || exit;
 /**
  * Block inserter settings (code-only).
  *
- * hardDisallowed — blocks that cannot be enabled via Developer → Blocks UI.
+ * hardDisallowed — blocks that cannot be enabled via Theme settings → Blocks.
  */
 return [
 	'hardDisallowed' => [

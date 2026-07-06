@@ -286,6 +286,53 @@ function fs_block_settings_registry_by_category(): array
 }
 
 /**
+ * Registry rows grouped by category, excluding hard-disallowed blocks.
+ *
+ * @return array<string, array<int, array<string, mixed>>>
+ */
+function fs_block_settings_registry_configurable_by_category(): array
+{
+	$groups = fs_block_settings_registry_by_category();
+	$out = [];
+
+	foreach ($groups as $category => $blocks) {
+		$configurable = array_values(array_filter($blocks, static function ($block) {
+			return empty($block['hardDisallowed']);
+		}));
+
+		if ($configurable !== []) {
+			$out[$category] = $configurable;
+		}
+	}
+
+	return $out;
+}
+
+/**
+ * Hard-disallowed blocks for the read-only system list.
+ *
+ * @return array<int, array<string, mixed>>
+ */
+function fs_block_settings_system_blocks(): array
+{
+	$blocks = [];
+
+	foreach (fs_block_settings_registry_by_category() as $category => $rows) {
+		foreach ($rows as $block) {
+			if (empty($block['hardDisallowed'])) {
+				continue;
+			}
+
+			$blocks[] = array_merge($block, [
+				'category' => $category,
+			]);
+		}
+	}
+
+	return $blocks;
+}
+
+/**
  * Human-readable block category label.
  */
 function fs_block_settings_category_label(string $slug): string
