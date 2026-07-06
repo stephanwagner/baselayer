@@ -171,6 +171,8 @@ function fs_icon_labels(): array
 		'align-horizontal-left'  => _x('Align horizontal left', 'icon name', 'fromscratch-icons'),
 		'align-horizontal-center' => _x('Align horizontal center', 'icon name', 'fromscratch-icons'),
 		'align-horizontal-right' => _x('Align horizontal right', 'icon name', 'fromscratch-icons'),
+		'horizontal-align-left'  => _x('Horizontal align left', 'icon name', 'fromscratch-icons'),
+		'horizontal-align-right' => _x('Horizontal align right', 'icon name', 'fromscratch-icons'),
 		'horizontal-align-center' => _x('Horizontal align center', 'icon name', 'fromscratch-icons'),
 		'vertical-align-center'  => _x('Vertical align center', 'icon name', 'fromscratch-icons'),
 		'list-bulleted'          => _x('Bulleted list', 'icon name', 'fromscratch-icons'),
