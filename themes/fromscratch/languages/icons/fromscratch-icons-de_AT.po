@@ -860,6 +860,10 @@ msgid "Face"
 msgstr "Gesicht"
 
 msgctxt "icon name"
+msgid "Face male"
+msgstr "Gesicht (männlich)"
+
+msgctxt "icon name"
 msgid "ID card"
 msgstr "Ausweis"
 
@@ -882,6 +886,10 @@ msgstr "Frau"
 msgctxt "icon name"
 msgid "Accessibility"
 msgstr "Barrierefreiheit"
+
+msgctxt "icon name"
+msgid "Wheelchair"
+msgstr "Rollstuhl"
 
 # Icon names — Maps & places
 
@@ -1468,6 +1476,10 @@ msgid "Theater"
 msgstr "Theater"
 
 msgctxt "icon name"
+msgid "Mask"
+msgstr "Maske"
+
+msgctxt "icon name"
 msgid "Mixed weather"
 msgstr "Gemischtes Wetter"
 
@@ -1590,10 +1602,6 @@ msgstr "Labor"
 msgctxt "icon name"
 msgid "Health"
 msgstr "Gesundheit"
-
-msgctxt "icon name"
-msgid "Health cross"
-msgstr "Gesundheitskreuz"
 
 msgctxt "icon name"
 msgid "Restroom"
@@ -1802,10 +1810,6 @@ msgstr "Vertrag unterschreiben"
 msgctxt "icon name"
 msgid "Resize"
 msgstr "Größe ändern"
-
-msgctxt "icon name"
-msgid "Split"
-msgstr "Teilen"
 
 msgctxt "icon name"
 msgid "Swipe left/right"
