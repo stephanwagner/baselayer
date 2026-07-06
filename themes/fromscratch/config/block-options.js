@@ -69,16 +69,17 @@ export const blockOptions = [
     options: [
       getContentMarginControl('-content-margin-m'),
       {
-        type: 'select',
+        type: 'button-group',
         label: 'Spaltenabstand',
         default: '-column-gap-m',
         attributeName: 'columnGap',
         options: [
-          { label: 'Sehr klein', value: '-column-gap-xs' },
-          { label: 'Klein', value: '-column-gap-s' },
-          { label: 'Normal', value: '-column-gap-m' },
-          { label: 'Groß', value: '-column-gap-l' },
-          { label: 'Sehr groß', value: '-column-gap-xl' }
+          { icon: 'block', label: 'Ohne', value: '-column-gap-none' },
+          { label: 'XS', value: '-column-gap-xs' },
+          { label: 'S', value: '-column-gap-s' },
+          { label: 'M', value: '-column-gap-m' },
+          { label: 'L', value: '-column-gap-l' },
+          { label: 'XL', value: '-column-gap-xl' }
         ]
       },
       {

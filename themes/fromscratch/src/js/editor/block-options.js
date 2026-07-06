@@ -1,6 +1,7 @@
 import { blockOptions } from '../../../config/block-options';
 import { IconPicker } from './icons/icon-picker';
 import { ContentMarginControl } from './content-margin-control';
+import { BlockOptionToggleGroupOption } from './block-option-toggle-group-option';
 import {
   ALL_CONTENT_MARGIN_CLASSES,
   contentMarginAttributeKeys,
@@ -11,7 +12,6 @@ import {
 const { InspectorControls } = wp.blockEditor;
 const { PanelBody, ToggleControl, SelectControl } = wp.components;
 const ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
-const ToggleGroupControlOption = wp.components.__experimentalToggleGroupControlOption;
 const { createHigherOrderComponent } = wp.compose;
 const { Fragment, useEffect } = wp.element;
 
@@ -289,10 +289,11 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                       />
                     );
                   } else if (option.type === 'button-group') {
-                    if (ToggleGroupControl && ToggleGroupControlOption) {
+                    if (ToggleGroupControl) {
                       return (
                         <ToggleGroupControl
                           key={option.attributeName}
+                          className="fs-block-option-button-group"
                           label={option.label}
                           value={attributes[option.attributeName]}
                           isBlock
@@ -300,10 +301,11 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                           __nextHasNoMarginBottom
                         >
                           {option.options.map((opt) => (
-                            <ToggleGroupControlOption
+                            <BlockOptionToggleGroupOption
                               key={opt.value || 'default'}
                               value={opt.value}
                               label={opt.label}
+                              icon={opt.icon}
                             />
                           ))}
                         </ToggleGroupControl>

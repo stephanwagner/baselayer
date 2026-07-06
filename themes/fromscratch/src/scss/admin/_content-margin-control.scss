@@ -52,3 +52,12 @@
 .fs-content-margin__action--relink {
   margin-bottom: 4px;
 }
+
+.fs-block-option-button-group {
+  .components-toggle-group-control-option-icon {
+    .fs-icon {
+      width: 18px;
+      height: 18px;
+    }
+  }
+}

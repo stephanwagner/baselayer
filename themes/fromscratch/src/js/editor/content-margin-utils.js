@@ -1,6 +1,6 @@
 /** Size tokens that map to existing `-content-margin-*` utility classes. */
 export const CONTENT_MARGIN_SIZES = [
-  { value: 'none', label: '0' },
+  { value: 'none', label: 'Ohne', icon: 'block' },
   { value: 'xs', label: 'XS' },
   { value: 's', label: 'S' },
   { value: 'm', label: 'M' },

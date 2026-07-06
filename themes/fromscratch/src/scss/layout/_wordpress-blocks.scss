@@ -107,6 +107,10 @@
       gap: 24px;
     }
 
+    &.-column-gap-none {
+      gap: 0;
+    }
+
     &.-column-gap-xs {
       gap: 16px;
     }

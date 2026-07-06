@@ -3,10 +3,10 @@ import {
   displayMarginSize,
   storedMarginSize,
 } from './content-margin-utils';
+import { BlockOptionToggleGroupOption } from './block-option-toggle-group-option';
 
 const { Button } = wp.components;
 const ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
-const ToggleGroupControlOption = wp.components.__experimentalToggleGroupControlOption;
 
 /**
  * Linked top/bottom content margin picker for block options.
@@ -67,9 +67,9 @@ export function ContentMarginControl({ option, attributes, onChange }) {
   };
 
   const renderSizeControl = (sideLabel, value, onSelect, onReset) => {
-    const control = ToggleGroupControl && ToggleGroupControlOption ? (
+    const control = ToggleGroupControl ? (
       <ToggleGroupControl
-        className="fs-content-margin__sizes"
+        className="fs-content-margin__sizes fs-block-option-button-group"
         label={sideLabel}
         hideLabelFromVision
         value={value}
@@ -78,7 +78,12 @@ export function ContentMarginControl({ option, attributes, onChange }) {
         __nextHasNoMarginBottom
       >
         {CONTENT_MARGIN_SIZES.map((size) => (
-          <ToggleGroupControlOption key={size.value} value={size.value} label={size.label} />
+          <BlockOptionToggleGroupOption
+            key={size.value}
+            value={size.value}
+            label={size.label}
+            icon={size.icon}
+          />
         ))}
       </ToggleGroupControl>
     ) : null;
