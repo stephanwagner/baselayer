@@ -14,7 +14,7 @@ function fs_acf_init_core()
 	global $configBlocks;
 	if (!empty($configBlocks) && function_exists('acf_register_block') && function_exists('acf_add_local_field_group')) {
 		foreach ($configBlocks as $acfBlock) {
-			acf_register_block([
+			$registration = [
 				'name' => $acfBlock['name'],
 				'title' => $acfBlock['title'],
 				'description' => $acfBlock['description'] ?? '',
@@ -29,7 +29,14 @@ function fs_acf_init_core()
 				'parent' => !empty($acfBlock['parent']) ? $acfBlock['parent'] : null,
 				'api_version' => 3,
 				'acf_block_version' => 3,
-			]);
+			];
+
+			$example = fs_acf_block_inserter_example($acfBlock);
+			if ($example !== null) {
+				$registration['example'] = $example;
+			}
+
+			acf_register_block($registration);
 		}
 	}
 }
@@ -137,9 +144,78 @@ function fs_acf_block_apply_option_classes(array $block): array
 	return $block;
 }
 
+/**
+ * Inserter preview example for an ACF block (WordPress `example` property).
+ *
+ * Uses explicit `example` from blocks.php, or a static preview image via `preview`
+ * or acf/blocks/{name}/preview.{jpg,jpeg,png,webp}.
+ *
+ * @param array<string, mixed> $acfBlock
+ * @return array<string, mixed>|null
+ */
+function fs_acf_block_inserter_example(array $acfBlock): ?array
+{
+	if (!empty($acfBlock['example']) && is_array($acfBlock['example'])) {
+		return $acfBlock['example'];
+	}
+
+	$preview_uri = fs_acf_block_preview_image_uri($acfBlock);
+	if ($preview_uri === null) {
+		return null;
+	}
+
+	return [
+		'attributes' => [
+			'mode' => 'preview',
+			'data' => [
+				'_preview_image' => $preview_uri,
+			],
+		],
+	];
+}
+
+/**
+ * Public URI for a block inserter preview image, if configured or on disk.
+ *
+ * @param array<string, mixed> $acfBlock
+ */
+function fs_acf_block_preview_image_uri(array $acfBlock): ?string
+{
+	$name = isset($acfBlock['name']) && is_string($acfBlock['name']) ? $acfBlock['name'] : '';
+	if ($name === '') {
+		return null;
+	}
+
+	if (!empty($acfBlock['preview']) && is_string($acfBlock['preview'])) {
+		$relative = ltrim($acfBlock['preview'], '/');
+		$path = get_theme_file_path('/acf/' . $relative);
+		if (is_readable($path)) {
+			return get_theme_file_uri('/acf/' . $relative);
+		}
+	}
+
+	foreach (['jpg', 'jpeg', 'png', 'webp'] as $extension) {
+		$relative = "blocks/{$name}/preview.{$extension}";
+		$path = get_theme_file_path('/acf/' . $relative);
+		if (is_readable($path)) {
+			return get_theme_file_uri('/acf/' . $relative);
+		}
+	}
+
+	return null;
+}
+
 // Render callback for ACF blocks
 function fs_acf_block_render_callback($block)
 {
+	if (!empty($block['data']['_preview_image']) && is_string($block['data']['_preview_image'])) {
+		printf(
+			'<img src="%s" alt="" class="acf-block-inserter-preview" style="width:100%%;height:auto;display:block;" />',
+			esc_url($block['data']['_preview_image'])
+		);
+		return;
+	}
+
 	$block = fs_acf_block_apply_option_classes($block);
 
 	$slug = str_replace('acf/', '', $block['name']);
