@@ -453,7 +453,7 @@ const builtInCategories = [
       { filename: 'compass', alternatives: ['fill'], keywords: ['navigation', 'direction', 'explore'] },
       { filename: 'navigation', alternatives: ['fill'], keywords: ['direction', 'gps', 'near me', 'explore', 'arrow', 'maps'] },
       { filename: 'navigation-alt-me', alternatives: ['fill'], keywords: ['my location', 'gps', 'me', 'position'] },
-      { filename: 'nearby', alternatives: ['fill'], keywords: ['near me', 'local', 'around', 'location'] },
+      { filename: 'nearby', alternatives: [], keywords: ['near me', 'local', 'around', 'location'] },
       { filename: 'recenter', alternatives: [], keywords: ['recenter', 'map', 'center', 'refocus', 'location'] },
       { filename: 'signpost', alternatives: ['fill'], keywords: ['direction', 'guide', 'wayfinding', 'route'] },
       { filename: 'globe', alternatives: [], keywords: ['world', 'earth', 'international', 'web'] },
@@ -602,11 +602,7 @@ const builtInCategories = [
       { filename: 'thunderstorm', alternatives: ['fill'], keywords: ['storm', 'lightning', 'weather', 'thunder', 'rain'] },
       { filename: 'snowy', alternatives: ['fill'], keywords: ['snow', 'snowy', 'weather', 'winter', 'cloud', 'cold'] },
       { filename: 'foggy', alternatives: ['fill'], keywords: ['fog', 'foggy', 'weather', 'mist'] },
-      {
-        filename: 'partly-cloudy-night',
-        alternatives: ['fill'],
-        keywords: ['weather', 'cloud', 'moon', 'night', 'partly cloudy', 'forecast'],
-      },
+      { filename: 'partly-cloudy-night', alternatives: ['fill'], keywords: ['weather', 'cloud', 'moon', 'night', 'partly cloudy', 'forecast'] },
       { filename: 'moon', alternatives: ['fill'], keywords: ['moon', 'night', 'dark', 'theme', 'sleep'] },
       { filename: 'moon-stars', alternatives: ['fill'], keywords: ['moon', 'stars', 'night', 'sky', 'sleep'] },
       { filename: 'wind', alternatives: [], keywords: ['wind', 'weather', 'breeze', 'air'] },
@@ -693,7 +689,7 @@ const builtInCategories = [
     ],
   },
   {
-    slug: 'nature-lifestyle',
+    slug: 'nature',
     icons: [
       { filename: 'forest', alternatives: ['fill'], keywords: ['forest', 'trees', 'nature', 'woods', 'park'] },
       { filename: 'pine-tree', alternatives: ['fill'], keywords: ['pine', 'tree', 'forest', 'nature', 'evergreen'] },

@@ -789,7 +789,7 @@ function fs_icon_category_labels(): array
 		'food-drink'    => _x('Food & drink', 'icon category', 'fromscratch-icons'),
 		'sports-fitness' => _x('Sports & fitness', 'icon category', 'fromscratch-icons'),
 		'health-medical' => _x('Health & medical', 'icon category', 'fromscratch-icons'),
-		'nature-lifestyle' => _x('Nature & environment', 'icon category', 'fromscratch-icons'),
+		'nature' => _x('Nature & environment', 'icon category', 'fromscratch-icons'),
 		'misc'          => _x('Symbols & misc', 'icon category', 'fromscratch-icons'),
 		'brands'        => _x('Brands', 'icon category', 'fromscratch-icons'),
 	];
