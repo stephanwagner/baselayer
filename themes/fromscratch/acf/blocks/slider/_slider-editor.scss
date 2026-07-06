@@ -29,8 +29,12 @@
 // Slider styles for editor
 
 .editor-styles-wrapper {
-  .slider__wrapper .acf-innerblocks-container {
-    display: block;
+  .slider__wrapper {
+    min-height: calc(34px + 8px + 8px);
+
+    .acf-innerblocks-container {
+      display: block;
+    }
   }
 
   .slider__navigation {
@@ -54,7 +58,8 @@
     padding: 4px 8px;
     background: #fff;
     border-radius: 4px;
-    box-shadow: 0 0 0 2px rgba(#fff, 0.25);
+    border: 1px solid #c3c4c7;
+    box-shadow: 0 0 0 2px rgba(#fff, 0.2);
     pointer-events: auto;
     cursor: pointer;
     user-select: none;
@@ -88,44 +93,58 @@
   }
 
   .slider__wrapper .block-list-appender {
-    grid-column: 1 / -1;
-    width: 100%;
+    display: none;
+    position: absolute;
+    bottom: 8px;
+    left: 8px;
+    z-index: 4;
+    grid-column: unset;
+    width: auto;
     margin: 0;
     pointer-events: auto;
 
     .block-editor-button-block-appender {
-      display: flex;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      gap: 8px;
-      width: 100%;
-      min-height: 44px;
-      padding: 8px 16px;
-      border: 1px dashed $color-gray-400;
+      gap: 4px;
+      width: auto;
+      min-height: 0;
+      padding: 8px 16px 8px 10px;
+      border: none;
       border-radius: 4px;
-      background: $color-gray-100;
-      color: $color-gray-600;
-      box-shadow: none;
-      transition: transition('border-color', 'background-color', 'color');
+      background: $color-black;
+      color: $color-white;
+      box-shadow: 0 0 0 2px rgba(#fff, 0.2);
+      transition: transition('background-color', 'box-shadow', 'transform');
 
       &:hover {
-        border-color: $color-primary;
-        background: rgba($color-primary, 0.06);
-        color: $color-primary;
+        background: $color-off-black;
+        color: $color-white;
+      }
+
+      &:active {
+        transform: translateY(1px);
       }
 
       svg {
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
+        fill: currentColor;
       }
 
       &::after {
-        content: 'Add slide';
-        font-size: 13px;
-        font-weight: 500;
+        content: 'Slide';
+        font-size: 14px;
+        font-weight: 600;
         line-height: 1.2;
       }
     }
+  }
+
+  .block-editor-block-list__block.is-selected .slider__wrapper .block-list-appender,
+  .block-editor-block-list__block:has(.is-selected) .slider__wrapper .block-list-appender {
+    display: block;
   }
 
   // Hide extra slides when collapsed

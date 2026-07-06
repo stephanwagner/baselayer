@@ -25,6 +25,16 @@
   line-height: 1.4;
 }
 
+.fs-content-margin__reset.components-button.is-link {
+  height: auto;
+  margin: 0;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-decoration: none;
+}
+
 .fs-content-margin__sizes.components-toggle-group-control {
   width: 100%;
 }

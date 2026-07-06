@@ -92,7 +92,7 @@ export function ContentMarginControl({ option, attributes, onChange }) {
       <div className="fs-content-margin__field">
         <div className="fs-content-margin__header">
           <span className="fs-content-margin__side-label">{sideLabel}</span>
-          <Button variant="tertiary" size="compact" onClick={onReset}>
+          <Button variant="link" className="fs-content-margin__reset" onClick={onReset}>
             Reset
           </Button>
         </div>
