@@ -30,10 +30,25 @@
 
 .editor-styles-wrapper {
   .slider__wrapper {
+    position: relative;
+    overflow: visible;
     min-height: calc(34px + 8px + 8px);
+
+    &:not(:has(.wp-block-acf-slider-slide)) {
+      min-height: calc(30px + 8px + 8px);
+    }
 
     .acf-innerblocks-container {
       display: block;
+    }
+
+    // Anchor absolute children to .slider__wrapper, not inner blocks layout.
+    .slider__container,
+    .slider__slides,
+    .swiper,
+    .acf-innerblocks-container,
+    .block-editor-block-list__layout {
+      position: static;
     }
   }
 
@@ -92,9 +107,13 @@
     color: #1d2327;
   }
 
+  // Add slide button
+
   .slider__wrapper .block-list-appender {
     display: none;
     position: absolute;
+    top: auto;
+    right: auto;
     bottom: 8px;
     left: 8px;
     z-index: 4;
@@ -104,23 +123,25 @@
     pointer-events: auto;
 
     .block-editor-button-block-appender {
-      display: inline-flex;
+      display: flex;
       align-items: center;
       justify-content: center;
       gap: 4px;
       width: auto;
       min-height: 0;
-      padding: 8px 16px 8px 10px;
+      padding: 8px 16px 8px 10px !important;
+      font-size: 14px;
+      height: 30px;
       border: none;
       border-radius: 4px;
-      background: $color-black;
-      color: $color-white;
+      background: #000;
+      color: #fff;
       box-shadow: 0 0 0 2px rgba(#fff, 0.2);
       transition: transition('background-color', 'box-shadow', 'transform');
 
       &:hover {
-        background: $color-off-black;
-        color: $color-white;
+        background: #1d2327;
+        color: #fff;
       }
 
       &:active {
@@ -144,7 +165,7 @@
 
   .block-editor-block-list__block.is-selected .slider__wrapper .block-list-appender,
   .block-editor-block-list__block:has(.is-selected) .slider__wrapper .block-list-appender {
-    display: block;
+    display: block !important;
   }
 
   // Hide extra slides when collapsed
