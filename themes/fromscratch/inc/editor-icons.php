@@ -783,6 +783,7 @@ function fs_icon_labels(): array
 		'line-end-arrow'         => _x('Line end arrow', 'icon name', 'fromscratch-icons'),
 		'line-start-arrow'       => _x('Line start arrow', 'icon name', 'fromscratch-icons'),
 		'menu-open'              => _x('Menu open', 'icon name', 'fromscratch-icons'),
+		'read-more'              => _x('Read more', 'icon name', 'fromscratch-icons'),
 		'mic'                    => _x('Mic', 'icon name', 'fromscratch-icons'),
 		'mic-off'                => _x('Mic off', 'icon name', 'fromscratch-icons'),
 		'military-medal'         => _x('Military medal', 'icon name', 'fromscratch-icons'),
