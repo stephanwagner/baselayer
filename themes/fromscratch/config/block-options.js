@@ -1,55 +1,21 @@
 /**
- * Get content margin options
- * @param {*} defaultValue
- * @returns
+ * Linked top/bottom content margin control.
+ *
+ * @param {string} defaultClass Combined default class, e.g. `-content-margin-m` or ''.
  */
-function getContentMarginOptions(defaultValue = '') {
-  return {
-    type: 'select',
-    label: 'Abstand oben und unten',
-    default: defaultValue,
-    attributeName: 'contentMargin',
-    options: [
-      { label: 'Standard', value: '' },
-      { label: 'Ohne', value: '-content-margin-none' },
-      { label: 'Sehr Klein', value: '-content-margin-xs' },
-      { label: 'Klein', value: '-content-margin-s' },
-      { label: 'Mittel', value: '-content-margin-m' },
-      { label: 'Groß', value: '-content-margin-l' },
-      { label: 'Sehr groß', value: '-content-margin-xl' }
-    ]
-  };
-}
+function getContentMarginControl(defaultClass = '') {
+  const match = (defaultClass || '').match(/^-content-margin-(none|xs|s|m|l|xl)$/);
+  const defaultSize = match ? match[1] : '';
 
-/**
- * Get content margin adjust options
- * @param {*} defaultValue
- * @returns
- */
-function getContentMarginAdjustOptions(defaultValue = '') {
   return {
-    type: 'select',
-    label: 'Abstand anpassen',
-    default: defaultValue,
-    attributeName: 'contentMarginAdjust',
-    options: [
-      { label: 'Standard', value: '' },
-      { label: 'Abstand oben: Ohne', value: '-content-margin-top-none' },
-      { label: 'Abstand oben: Sehr Klein', value: '-content-margin-top-xs' },
-      { label: 'Abstand oben: Klein', value: '-content-margin-top-s' },
-      { label: 'Abstand oben: Mittel', value: '-content-margin-top-m' },
-      { label: 'Abstand oben: Groß', value: '-content-margin-top-l' },
-      { label: 'Abstand oben: Sehr groß', value: '-content-margin-top-xl' },
-      { label: 'Abstand unten: Ohne', value: '-content-margin-bottom-none' },
-      {
-        label: 'Abstand unten: Sehr Klein',
-        value: '-content-margin-bottom-xs'
-      },
-      { label: 'Abstand unten: Klein', value: '-content-margin-bottom-s' },
-      { label: 'Abstand unten: Mittel', value: '-content-margin-bottom-m' },
-      { label: 'Abstand unten: Groß', value: '-content-margin-bottom-l' },
-      { label: 'Abstand unten: Sehr groß', value: '-content-margin-bottom-xl' }
-    ]
+    type: 'content-margin',
+    label: 'Abstände',
+    defaultSize,
+    attributeNames: {
+      top: 'contentMarginTop',
+      bottom: 'contentMarginBottom',
+      linked: 'contentMarginLinked',
+    },
   };
 }
 
@@ -101,8 +67,7 @@ export const blockOptions = [
   {
     name: 'core/columns',
     options: [
-      getContentMarginOptions('-content-margin-m'),
-      getContentMarginAdjustOptions(),
+      getContentMarginControl('-content-margin-m'),
       {
         type: 'select',
         label: 'Spaltenabstand',
@@ -188,8 +153,7 @@ export const blockOptions = [
   {
     name: 'core/image',
     options: [
-      getContentMarginOptions(),
-      getContentMarginAdjustOptions(),
+      getContentMarginControl(),
       {
         type: 'boolean',
         label: 'Ohne Bildtext',
@@ -211,8 +175,7 @@ export const blockOptions = [
   {
     name: 'core/gallery',
     options: [
-      getContentMarginOptions(),
-      getContentMarginAdjustOptions(),
+      getContentMarginControl(),
       {
         type: 'boolean',
         label: 'Ohne Bildtexte',
@@ -234,8 +197,7 @@ export const blockOptions = [
   {
     name: 'core/group',
     options: [
-      getContentMarginOptions('-content-margin-m'),
-      getContentMarginAdjustOptions(),
+      getContentMarginControl('-content-margin-m'),
       getLimitWidthOptions()
     ]
   },
@@ -244,8 +206,7 @@ export const blockOptions = [
   {
     name: 'core/separator',
     options: [
-      getContentMarginOptions('-content-margin-m'),
-      getContentMarginAdjustOptions()
+      getContentMarginControl('-content-margin-m')
     ]
   },
 
@@ -253,8 +214,7 @@ export const blockOptions = [
   {
     name: 'core/cover',
     options: [
-      getContentMarginOptions('-content-margin-m'),
-      getContentMarginAdjustOptions()
+      getContentMarginControl('-content-margin-m')
     ]
   },
 
@@ -285,8 +245,7 @@ export const blockOptions = [
   {
     name: 'acf/slider',
     options: [
-      getContentMarginOptions('-content-margin-m'),
-      getContentMarginAdjustOptions()
+      getContentMarginControl('-content-margin-m')
     ]
   }
 ];

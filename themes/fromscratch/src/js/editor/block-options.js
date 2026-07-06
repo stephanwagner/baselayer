@@ -1,5 +1,12 @@
 import { blockOptions } from '../../../config/block-options';
 import { IconPicker } from './icons/icon-picker';
+import { ContentMarginControl } from './content-margin-control';
+import {
+  ALL_CONTENT_MARGIN_CLASSES,
+  contentMarginAttributeKeys,
+  contentMarginClassesFromAttributes,
+  migrateLegacyContentMarginAttributes,
+} from './content-margin-utils';
 
 const { InspectorControls } = wp.blockEditor;
 const { PanelBody, ToggleControl, SelectControl } = wp.components;
@@ -49,9 +56,12 @@ const isIconGlyphClass = (className, blockConfig) => {
   return !iconPositionClasses(blockConfig).has(className);
 };
 
+const contentMarginOptions = (blockConfig) =>
+  blockConfig.options.filter((option) => option.type === 'content-margin');
+
 // Static class names managed by block options (boolean / select / button-group values).
 const managedStaticClasses = (blockConfig) => {
-  const classes = new Set([HAS_ICON_CLASS]);
+  const classes = new Set([HAS_ICON_CLASS, ...ALL_CONTENT_MARGIN_CLASSES]);
 
   blockConfig.options.forEach((option) => {
     if (option.type === 'boolean' && option.className) {
@@ -79,7 +89,9 @@ const collectOptionClasses = (blockConfig, attributes) => {
   const classes = [];
 
   blockConfig.options.forEach((option) => {
-    if (option.type === 'boolean' && attributes[option.attributeName]) {
+    if (option.type === 'content-margin') {
+      classes.push(...contentMarginClassesFromAttributes(option, attributes));
+    } else if (option.type === 'boolean' && attributes[option.attributeName]) {
       classes.push(option.className);
     } else if (option.type === 'icon' && attributes[option.attributeName]) {
       classes.push(attributes[option.attributeName]);
@@ -118,6 +130,15 @@ const syncClassNameFromOptions = (attributes, blockConfig) => {
   return dedupeClasses([base, ...optionClasses].filter(Boolean).join(' '));
 };
 
+const blockOptionAttributeKeys = (blockConfig) =>
+  blockConfig.options.flatMap((option) => {
+    if (option.type === 'content-margin') {
+      return [...contentMarginAttributeKeys(option), 'contentMargin', 'contentMarginAdjust'];
+    }
+
+    return [option.attributeName];
+  });
+
 // Add attributes to the block
 blockOptions.forEach((block) => {
   const blockSlug = getBlockSlug(block.name);
@@ -125,6 +146,19 @@ blockOptions.forEach((block) => {
   wp.hooks.addFilter('blocks.registerBlockType', 'custom-block-options/block-' + blockSlug, (settings, name) => {
     if (name === block.name) {
       block.options.forEach((option) => {
+        if (option.type === 'content-margin') {
+          const { top, bottom, linked } = option.attributeNames;
+          settings.attributes = {
+            ...settings.attributes,
+            [top]: { type: 'string', default: '' },
+            [bottom]: { type: 'string', default: '' },
+            [linked]: { type: 'boolean', default: true },
+            contentMargin: { type: 'string', default: '' },
+            contentMarginAdjust: { type: 'string', default: '' },
+          };
+          return;
+        }
+
         settings.attributes = {
           ...settings.attributes,
           [option.attributeName]: {
@@ -156,6 +190,39 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
       });
     };
 
+    // Migrate legacy margin selects / className into the new attributes once.
+    useEffect(() => {
+      if (!blockConfig) {
+        return;
+      }
+
+      const marginOptions = contentMarginOptions(blockConfig);
+      if (!marginOptions.length) {
+        return;
+      }
+
+      let updates = {};
+      marginOptions.forEach((option) => {
+        const migrated = migrateLegacyContentMarginAttributes(
+          { ...attributes, ...updates },
+          option
+        );
+        if (migrated) {
+          updates = { ...updates, ...migrated };
+        }
+      });
+
+      if (Object.keys(updates).length) {
+        setOptionAttributes(updates);
+      }
+    }, [
+      blockConfig?.name,
+      props.clientId,
+      attributes.contentMargin,
+      attributes.contentMarginAdjust,
+      attributes.className,
+    ]);
+
     // Backfill `className` when option attributes and wrapper classes drift (e.g. after adding `-has-icon`).
     useEffect(() => {
       if (!blockConfig) {
@@ -167,7 +234,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
       if (className !== (attributes.className || '')) {
         setAttributes({ className });
       }
-    }, blockConfig ? blockConfig.options.map((option) => attributes[option.attributeName]) : []);
+    }, blockConfig ? blockOptionAttributeKeys(blockConfig).map((key) => attributes[key]) : []);
 
     if (blockConfig) {
       return (
@@ -177,6 +244,17 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
             <InspectorControls>
               <PanelBody title="Block Einstellungen">
                 {blockConfig.options.map((option) => {
+                  if (option.type === 'content-margin') {
+                    return (
+                      <ContentMarginControl
+                        key="content-margin"
+                        option={option}
+                        attributes={attributes}
+                        onChange={setOptionAttributes}
+                      />
+                    );
+                  }
+
                   if (option.type === 'boolean') {
                     return (
                       <ToggleControl

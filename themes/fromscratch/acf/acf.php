@@ -3,6 +3,8 @@
 // Import block filters
 include __DIR__ . '/block-filters.php';
 
+require_once get_template_directory() . '/inc/block-options-content-margin.php';
+
 // Import blocks
 $configBlocks = include __DIR__ . '/blocks.php';
 
@@ -77,6 +79,12 @@ function fs_block_option_classes(array $block): array
 		}
 
 		$type = isset($option['type']) && is_string($option['type']) ? $option['type'] : '';
+
+		if ($type === 'content-margin') {
+			$classes = array_merge($classes, fs_content_margin_classes_from_attributes($option, $block));
+			continue;
+		}
+
 		$attribute_name = isset($option['attributeName']) && is_string($option['attributeName'])
 			? $option['attributeName']
 			: '';
