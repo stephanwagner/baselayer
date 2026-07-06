@@ -1256,6 +1256,10 @@ msgid "Puzzle"
 msgstr "Puzzle"
 
 msgctxt "icon name"
+msgid "Puzzle (alt)"
+msgstr "Puzzle (alternativ)"
+
+msgctxt "icon name"
 msgid "WordPress block"
 msgstr "WordPress-Block"
 
@@ -1410,10 +1414,6 @@ msgstr "In der Nähe"
 msgctxt "icon name"
 msgid "Unread notification"
 msgstr "Ungelesene Benachrichtigung"
-
-msgctxt "icon name"
-msgid "Notifications circle"
-msgstr "Benachrichtigungen Kreis"
 
 msgctxt "icon name"
 msgid "Open in new (down)"
@@ -1604,6 +1604,10 @@ msgid "Symbols"
 msgstr "Symbole"
 
 msgctxt "icon name"
+msgid "Sum symbol"
+msgstr "Summenzeichen"
+
+msgctxt "icon name"
 msgid "Bank"
 msgstr "Bank"
 
@@ -1662,10 +1666,6 @@ msgstr "Toilette"
 msgctxt "icon name"
 msgid "Movie"
 msgstr "Film"
-
-msgctxt "icon name"
-msgid "Split scene"
-msgstr "Geteilte Szene"
 
 msgctxt "icon name"
 msgid "Pan zoom"
@@ -2144,6 +2144,10 @@ msgid "Wind"
 msgstr "Wind"
 
 msgctxt "icon name"
+msgid "Fan"
+msgstr "Ventilator"
+
+msgctxt "icon name"
 msgid "Bakery"
 msgstr "Bäckerei"
 
@@ -2244,10 +2248,6 @@ msgid "Suitcase"
 msgstr "Koffer"
 
 msgctxt "icon name"
-msgid "Work"
-msgstr "Arbeit"
-
-msgctxt "icon name"
 msgid "Ticket (alt)"
 msgstr "Ticket (alternativ)"
 
@@ -2294,6 +2294,10 @@ msgstr "Chat bearbeiten"
 msgctxt "icon name"
 msgid "Cheer"
 msgstr "Jubel"
+
+msgctxt "icon name"
+msgid "Magic wand shine"
+msgstr "Zauberstab (glänzend)"
 
 msgctxt "icon name"
 msgid "Magic wand"
@@ -2605,3 +2609,458 @@ msgctxt "icon name"
 msgid "Highlight"
 msgstr "Markierung"
 
+msgctxt "icon category"
+msgid "Theme"
+msgstr "Theme"
+
+msgctxt "icon name"
+msgid "Agender"
+msgstr "Agender"
+
+msgctxt "icon name"
+msgid "Airlines"
+msgstr "Fluggesellschaft"
+
+msgctxt "icon name"
+msgid "Apple"
+msgstr "Apple"
+
+msgctxt "icon name"
+msgid "Apple Music"
+msgstr "Apple Music"
+
+msgctxt "icon name"
+msgid "Apple Pay"
+msgstr "Apple Pay"
+
+msgctxt "icon name"
+msgid "Arrow downwards"
+msgstr "Pfeil nach unten"
+
+msgctxt "icon name"
+msgid "Arrow menu close"
+msgstr "Menü schließen"
+
+msgctxt "icon name"
+msgid "Arrow menu open"
+msgstr "Menü öffnen"
+
+msgctxt "icon name"
+msgid "Arrows outward"
+msgstr "Pfeile nach außen"
+
+msgctxt "icon name"
+msgid "Behance"
+msgstr "Behance"
+
+msgctxt "icon name"
+msgid "Bluesky"
+msgstr "Bluesky"
+
+msgctxt "icon name"
+msgid "Bus"
+msgstr "Bus"
+
+msgctxt "icon name"
+msgid "Compress"
+msgstr "Komprimieren"
+
+msgctxt "icon name"
+msgid "Discord"
+msgstr "Discord"
+
+msgctxt "icon name"
+msgid "Dribbble"
+msgstr "Dribbble"
+
+msgctxt "icon name"
+msgid "Eco"
+msgstr "Eco"
+
+msgctxt "icon name"
+msgid "Edit off"
+msgstr "Bearbeiten deaktiviert"
+
+msgctxt "icon name"
+msgid "Facebook"
+msgstr "Facebook"
+
+msgctxt "icon name"
+msgid "Family star"
+msgstr "Familie & Stern"
+
+msgctxt "icon name"
+msgid "Fast forward"
+msgstr "Vorspulen"
+
+msgctxt "icon name"
+msgid "Fast rewind"
+msgstr "Zurückspulen"
+
+msgctxt "icon name"
+msgid "First page"
+msgstr "Erste Seite"
+
+msgctxt "icon name"
+msgid "Fit page"
+msgstr "Seite anpassen"
+
+msgctxt "icon name"
+msgid "Folder edit"
+msgstr "Ordner bearbeiten"
+
+msgctxt "icon name"
+msgid "GitHub"
+msgstr "GitHub"
+
+msgctxt "icon name"
+msgid "GitLab"
+msgstr "GitLab"
+
+msgctxt "icon name"
+msgid "Google"
+msgstr "Google"
+
+msgctxt "icon name"
+msgid "Google Pay"
+msgstr "Google Pay"
+
+msgctxt "icon name"
+msgid "Groups"
+msgstr "Gruppen"
+
+msgctxt "icon name"
+msgid "Horizontal align right"
+msgstr "Horizontal rechts ausrichten"
+
+msgctxt "icon name"
+msgid "iMessage"
+msgstr "iMessage"
+
+msgctxt "icon name"
+msgid "Instagram"
+msgstr "Instagram"
+
+msgctxt "icon name"
+msgid "Klarna"
+msgstr "Klarna"
+
+msgctxt "icon name"
+msgid "Last page"
+msgstr "Letzte Seite"
+
+msgctxt "icon name"
+msgid "LINE"
+msgstr "LINE"
+
+msgctxt "icon name"
+msgid "Line end arrow"
+msgstr "Pfeil Zeilenende"
+
+msgctxt "icon name"
+msgid "Line start arrow"
+msgstr "Pfeil Zeilenanfang"
+
+msgctxt "icon name"
+msgid "LinkedIn"
+msgstr "LinkedIn"
+
+msgctxt "icon name"
+msgid "Logo"
+msgstr "Logo"
+
+msgctxt "icon name"
+msgid "Mastercard"
+msgstr "Mastercard"
+
+msgctxt "icon name"
+msgid "Mastodon"
+msgstr "Mastodon"
+
+msgctxt "icon name"
+msgid "Medium"
+msgstr "Medium"
+
+msgctxt "icon name"
+msgid "Menu open"
+msgstr "Menü öffnen"
+
+msgctxt "icon name"
+msgid "Messenger"
+msgstr "Messenger"
+
+msgctxt "icon name"
+msgid "Mic"
+msgstr "Mikrofon"
+
+msgctxt "icon name"
+msgid "Mic off"
+msgstr "Mikrofon aus"
+
+msgctxt "icon name"
+msgid "Microsoft"
+msgstr "Microsoft"
+
+msgctxt "icon name"
+msgid "Military medal"
+msgstr "Militärmedaille"
+
+msgctxt "icon name"
+msgid "Mobile vibrate"
+msgstr "Mobilgerät vibrieren"
+
+msgctxt "icon name"
+msgid "Monitor heart"
+msgstr "Monitor mit Herz"
+
+msgctxt "icon name"
+msgid "News article"
+msgstr "Nachrichtenartikel"
+
+msgctxt "icon name"
+msgid "Note"
+msgstr "Notiz"
+
+msgctxt "icon name"
+msgid "Note stack"
+msgstr "Notizstapel"
+
+msgctxt "icon name"
+msgid "Odometer"
+msgstr "Kilometerzähler"
+
+msgctxt "icon name"
+msgid "Pan"
+msgstr "Schwenken"
+
+msgctxt "icon name"
+msgid "Patreon"
+msgstr "Patreon"
+
+msgctxt "icon name"
+msgid "Pause circle"
+msgstr "Pause (Kreis)"
+
+msgctxt "icon name"
+msgid "PayPal"
+msgstr "PayPal"
+
+msgctxt "icon name"
+msgid "Pinterest"
+msgstr "Pinterest"
+
+msgctxt "icon name"
+msgid "Present"
+msgstr "Geschenk"
+
+msgctxt "icon name"
+msgid "Reddit"
+msgstr "Reddit"
+
+msgctxt "icon name"
+msgid "Repeat"
+msgstr "Wiederholen"
+
+msgctxt "icon name"
+msgid "Replay"
+msgstr "Erneut abspielen"
+
+msgctxt "icon name"
+msgid "RSS"
+msgstr "RSS"
+
+msgctxt "icon name"
+msgid "Scanner"
+msgstr "Scanner"
+
+msgctxt "icon name"
+msgid "Shuffle"
+msgstr "Zufallswiedergabe"
+
+msgctxt "icon name"
+msgid "Sick"
+msgstr "Krank"
+
+msgctxt "icon name"
+msgid "Signal"
+msgstr "Signal"
+
+msgctxt "icon name"
+msgid "Slab serif"
+msgstr "Slab Serif"
+
+msgctxt "icon name"
+msgid "Slack"
+msgstr "Slack"
+
+msgctxt "icon name"
+msgid "Smart toy"
+msgstr "Smart Toy"
+
+msgctxt "icon name"
+msgid "Toy fan"
+msgstr "Spielzeug-Ventilator"
+
+msgctxt "icon name"
+msgid "Snapchat"
+msgstr "Snapchat"
+
+msgctxt "icon name"
+msgid "SoundCloud"
+msgstr "SoundCloud"
+
+msgctxt "icon name"
+msgid "Special character"
+msgstr "Sonderzeichen"
+
+msgctxt "icon name"
+msgid "Sports flag"
+msgstr "Sportflagge"
+
+msgctxt "icon name"
+msgid "Spotify"
+msgstr "Spotify"
+
+msgctxt "icon name"
+msgid "Step"
+msgstr "Stufe"
+
+msgctxt "icon name"
+msgid "Stop circle"
+msgstr "Stopp (Kreis)"
+
+msgctxt "icon name"
+msgid "Strategy"
+msgstr "Strategie"
+
+msgctxt "icon name"
+msgid "Subtitles"
+msgstr "Untertitel"
+
+msgctxt "icon name"
+msgid "Switch left"
+msgstr "Wechseln links"
+
+msgctxt "icon name"
+msgid "Switch right"
+msgstr "Wechseln rechts"
+
+msgctxt "icon name"
+msgid "Swords"
+msgstr "Schwerter"
+
+msgctxt "icon name"
+msgid "Telegram"
+msgstr "Telegram"
+
+msgctxt "icon name"
+msgid "Threads"
+msgstr "Threads"
+
+msgctxt "icon name"
+msgid "TikTok"
+msgstr "TikTok"
+
+msgctxt "icon name"
+msgid "Title case"
+msgstr "Großschreibung"
+
+msgctxt "icon name"
+msgid "Tooltip"
+msgstr "Kurzinfo"
+
+msgctxt "icon name"
+msgid "Trello"
+msgstr "Trello"
+
+msgctxt "icon name"
+msgid "Tumblr"
+msgstr "Tumblr"
+
+msgctxt "icon name"
+msgid "TV remote"
+msgstr "TV-Fernbedienung"
+
+msgctxt "icon name"
+msgid "Twitch"
+msgstr "Twitch"
+
+msgctxt "icon name"
+msgid "Two-wheeler"
+msgstr "Zweirad"
+
+msgctxt "icon name"
+msgid "Vaccines"
+msgstr "Impfstoffe"
+
+msgctxt "icon name"
+msgid "Vimeo"
+msgstr "Vimeo"
+
+msgctxt "icon name"
+msgid "Visa"
+msgstr "Visa"
+
+msgctxt "icon name"
+msgid "WeChat"
+msgstr "WeChat"
+
+msgctxt "icon name"
+msgid "Weibo"
+msgstr "Weibo"
+
+msgctxt "icon name"
+msgid "WhatsApp"
+msgstr "WhatsApp"
+
+msgctxt "icon name"
+msgid "WordPress"
+msgstr "WordPress"
+
+msgctxt "icon name"
+msgid "X (Twitter)"
+msgstr "X (Twitter)"
+
+msgctxt "icon name"
+msgid "Xing"
+msgstr "Xing"
+
+msgctxt "icon name"
+msgid "Yelp"
+msgstr "Yelp"
+
+msgctxt "icon name"
+msgid "YouTube"
+msgstr "YouTube"
+
+msgctxt "icon name"
+msgid "YouTube Shorts"
+msgstr "YouTube Shorts"
+
+msgctxt "icon name"
+msgid "Chat edit"
+msgstr "Chat bearbeiten"
+
+msgctxt "icon name"
+msgid "Horizontal align left"
+msgstr "Horizontal links ausrichten"
+
+msgctxt "icon name"
+msgid "Style"
+msgstr "Stil"
+
+msgctxt "icon name"
+msgid "Arrow split"
+msgstr "Pfeil teilen"
+
+msgctxt "icon name"
+msgid "Arrow split up"
+msgstr "Pfeil teilen (oben)"
+
+msgctxt "icon name"
+msgid "Split scene"
+msgstr "Geteilte Szene"
+
+msgctxt "icon name"
+msgid "Split scene top"
+msgstr "Geteilte Szene (oben)"
