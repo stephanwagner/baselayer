@@ -147,7 +147,7 @@ msgid "Save"
 msgstr "Speichern"
 
 msgid "Save Changes"
-msgstr "Änderungen sepeichern.."
+msgstr "Änderungen speichern"
 
 msgid "Error"
 msgstr "Fehler"

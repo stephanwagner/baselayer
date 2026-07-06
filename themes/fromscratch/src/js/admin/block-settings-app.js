@@ -208,45 +208,129 @@ function SystemBlockCard({ block }) {
   );
 }
 
-function filterGroups(groups, search) {
+function matchesSearch(block, search) {
   const needle = search.trim().toLowerCase();
   if (needle === '') {
-    return groups;
+    return true;
   }
 
+  return `${block.title} ${block.name}`.toLowerCase().includes(needle);
+}
+
+function matchesFilters(blockName, settings, filters) {
+  const flags = settings[blockName] || { allowed: true, hidden: false, favorite: false };
+
+  if (filters.allowed === 'active' && !flags.allowed) {
+    return false;
+  }
+
+  if (filters.allowed === 'inactive' && flags.allowed) {
+    return false;
+  }
+
+  if (filters.hidden === 'hidden' && !(flags.allowed && flags.hidden)) {
+    return false;
+  }
+
+  if (filters.hidden === 'not-hidden' && flags.hidden) {
+    return false;
+  }
+
+  if (filters.favorite === 'favorite' && !(flags.allowed && !flags.hidden && flags.favorite)) {
+    return false;
+  }
+
+  if (filters.favorite === 'not-favorite' && flags.favorite) {
+    return false;
+  }
+
+  return true;
+}
+
+function renderDashicon(icon) {
+  return el('span', { className: `dashicons ${icon}`, 'aria-hidden': 'true' });
+}
+
+function FilterGroup({ label, value, options, onChange }) {
+  return el(
+    'div',
+    {
+      className: 'fs-block-settings__filter',
+      role: 'group',
+      'aria-label': label,
+    },
+    options.map((option) => el(
+      'button',
+      {
+        key: option.value,
+        type: 'button',
+        className: `fs-block-settings__filter-btn${value === option.value ? ' is-active' : ''}`,
+        'aria-pressed': value === option.value ? 'true' : 'false',
+        title: option.label,
+        onClick: () => onChange(option.value),
+      },
+      renderDashicon(option.icon),
+      el('span', { className: 'screen-reader-text' }, option.label),
+    )),
+  );
+}
+
+function filterGroups(groups, search, settings, filters) {
   return groups
     .map((group) => ({
       ...group,
-      blocks: group.blocks.filter((block) => `${block.title} ${block.name}`.toLowerCase().includes(needle)),
+      blocks: group.blocks.filter((block) => matchesSearch(block, search) && matchesFilters(block.name, settings, filters)),
     }))
     .filter((group) => group.blocks.length > 0);
 }
 
 function filterSystemBlocks(blocks, search) {
-  const needle = search.trim().toLowerCase();
-  if (needle === '') {
-    return blocks;
-  }
-
-  return blocks.filter((block) => `${block.title} ${block.name}`.toLowerCase().includes(needle));
+  return blocks.filter((block) => matchesSearch(block, search));
 }
+
+const DEFAULT_FILTERS = {
+  allowed: 'all',
+  hidden: 'all',
+  favorite: 'all',
+};
 
 function BlockSettingsApp() {
   const config = getConfig();
   const i18n = config.i18n || {};
   const [settings, setSettings] = useState(getInitialSettings);
   const [search, setSearch] = useState('');
+  const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [systemOpen, setSystemOpen] = useState(false);
 
+  const allowedFilterOptions = useMemo(() => ([
+    { value: 'all', label: i18n.filterAll || __('All', 'fromscratch'), icon: 'dashicons-filter' },
+    { value: 'active', label: i18n.filterActive || __('Active', 'fromscratch'), icon: 'dashicons-yes-alt' },
+    { value: 'inactive', label: i18n.filterInactive || __('Inactive', 'fromscratch'), icon: 'dashicons-no-alt' },
+  ]), [i18n]);
+
+  const hiddenFilterOptions = useMemo(() => ([
+    { value: 'all', label: i18n.filterAll || __('All', 'fromscratch'), icon: 'dashicons-filter' },
+    { value: 'hidden', label: i18n.hidden || __('Hidden', 'fromscratch'), icon: 'dashicons-hidden' },
+    { value: 'not-hidden', label: i18n.filterNotHidden || __('Not hidden', 'fromscratch'), icon: 'dashicons-visibility' },
+  ]), [i18n]);
+
+  const favoriteFilterOptions = useMemo(() => ([
+    { value: 'all', label: i18n.filterAll || __('All', 'fromscratch'), icon: 'dashicons-filter' },
+    { value: 'favorite', label: i18n.favorites || __('Favorites', 'fromscratch'), icon: 'dashicons-star-filled' },
+    { value: 'not-favorite', label: i18n.filterNotFavorite || __('Not favorite', 'fromscratch'), icon: 'dashicons-star-empty' },
+  ]), [i18n]);
+
   const configurableGroups = useMemo(
-    () => filterGroups(config.configurableGroups || [], search),
-    [config.configurableGroups, search],
+    () => filterGroups(config.configurableGroups || [], search, settings, filters),
+    [config.configurableGroups, search, settings, filters],
   );
 
   const systemBlocks = useMemo(
     () => filterSystemBlocks(config.systemBlocks || [], search),
     [config.systemBlocks, search],
   );
+
+  const hasVisibleBlocks = configurableGroups.some((group) => group.blocks.length > 0);
 
   const updateBlock = (name, nextFlags) => {
     setSettings((current) => ({
@@ -276,18 +360,50 @@ function BlockSettingsApp() {
     el('h2', { className: 'title' }, __('Blocks', 'fromscratch')),
     el('p', { className: 'description fs-block-settings__intro' }, i18n.intro || ''),
     el(
-      'p',
-      { className: 'fs-block-settings__search-wrap' },
-      el('label', { className: 'screen-reader-text', htmlFor: 'fs-block-settings-search' }, i18n.searchPlaceholder || ''),
-      el('input', {
-        type: 'search',
-        id: 'fs-block-settings-search',
-        className: 'regular-text',
-        placeholder: i18n.searchPlaceholder || '',
-        value: search,
-        onInput: (event) => setSearch(event.target.value),
-      }),
+      'div',
+      { className: 'fs-block-settings__toolbar' },
+      el(
+        'div',
+        { className: 'fs-block-settings__filters-row' },
+        el('span', { className: 'fs-block-settings__filters-label' }, i18n.filtersLabel || __('Filters:', 'fromscratch')),
+        el(
+          'div',
+          { className: 'fs-block-settings__filters' },
+          el(FilterGroup, {
+            label: i18n.filterAllowed || __('Allowed in inserter', 'fromscratch'),
+            value: filters.allowed,
+            options: allowedFilterOptions,
+            onChange: (value) => setFilters((current) => ({ ...current, allowed: value })),
+          }),
+          el(FilterGroup, {
+            label: i18n.filterHidden || __('Inserter visibility', 'fromscratch'),
+            value: filters.hidden,
+            options: hiddenFilterOptions,
+            onChange: (value) => setFilters((current) => ({ ...current, hidden: value })),
+          }),
+          el(FilterGroup, {
+            label: i18n.filterFavorite || __('Favorites', 'fromscratch'),
+            value: filters.favorite,
+            options: favoriteFilterOptions,
+            onChange: (value) => setFilters((current) => ({ ...current, favorite: value })),
+          }),
+        ),
+      ),
+      el(
+        'p',
+        { className: 'fs-block-settings__search-wrap' },
+        el('label', { className: 'screen-reader-text', htmlFor: 'fs-block-settings-search' }, i18n.searchPlaceholder || ''),
+        el('input', {
+          type: 'search',
+          id: 'fs-block-settings-search',
+          className: 'regular-text',
+          placeholder: i18n.searchPlaceholder || '',
+          value: search,
+          onInput: (event) => setSearch(event.target.value),
+        }),
+      ),
     ),
+    !hasVisibleBlocks && el('p', { className: 'fs-block-settings__empty' }, i18n.noResults || __('No blocks match the current search or filters.', 'fromscratch')),
     configurableGroups.map((group) => el(
       'section',
       { key: group.category, className: 'fs-block-settings__group' },

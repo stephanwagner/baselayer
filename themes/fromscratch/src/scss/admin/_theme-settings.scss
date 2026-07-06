@@ -174,9 +174,99 @@ body.fs-css-vars-overview-modal-active {
   margin-bottom: 16px;
 }
 
-.fs-block-settings__search-wrap {
+.fs-block-settings__toolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   margin: 0 0 20px;
-  max-width: 320px;
+}
+
+.fs-block-settings__filters-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+}
+
+.fs-block-settings__filters-label {
+  color: #1d2327;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.fs-block-settings__search-wrap {
+  margin: 0;
+  width: 100%;
+
+  .regular-text {
+    box-sizing: border-box;
+    width: 100%;
+  }
+}
+
+.fs-block-settings__filters {
+  display: flex;
+  flex: 1 1 auto;
+  flex-wrap: wrap;
+  gap: 10px 16px;
+}
+
+.fs-block-settings__filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+}
+
+.fs-block-settings__filter-btn {
+  align-items: center;
+  background: #f6f7f7;
+  border: 1px solid #c3c4c7;
+  color: #2c3338;
+  cursor: pointer;
+  display: inline-flex;
+  height: 34px;
+  justify-content: center;
+  line-height: 1;
+  margin: 0 0 0 -1px;
+  padding: 0;
+  position: relative;
+  width: 34px;
+
+  .dashicons {
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+  }
+
+  &:first-child {
+    border-bottom-left-radius: 4px;
+    border-top-left-radius: 4px;
+    margin-left: 0;
+  }
+
+  &:last-child {
+    border-bottom-right-radius: 4px;
+    border-top-right-radius: 4px;
+  }
+
+  &:hover {
+    background: #f0f0f1;
+    color: #1d2327;
+    z-index: 1;
+  }
+
+  &.is-active {
+    background: #2271b1;
+    border-color: #2271b1;
+    color: #fff;
+    z-index: 2;
+  }
+}
+
+.fs-block-settings__empty {
+  color: #646970;
+  font-style: italic;
+  margin: 8px 0 0;
 }
 
 .fs-block-settings__group {

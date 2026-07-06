@@ -49,18 +49,44 @@ function fs_block_settings_is_hard_disallowed(string $block_name): bool
 }
 
 /**
- * Default flags for a block.
+ * Default flags for a block (from config/block-settings.php).
  *
  * @return array{allowed: int, hidden: int, favorite: int}
  */
 function fs_block_settings_default_flags(string $block_name): array
 {
-	$allowed = fs_block_settings_is_hard_disallowed($block_name) ? 0 : 1;
+	if (fs_block_settings_is_hard_disallowed($block_name)) {
+		return [
+			'allowed'  => 0,
+			'hidden'   => 0,
+			'favorite' => 0,
+		];
+	}
+
+	$global = fs_config_block_settings('default');
+	if (!is_array($global)) {
+		$global = [];
+	}
+
+	$blocks = fs_config_block_settings('blocks');
+	$per_block = is_array($blocks) && isset($blocks[$block_name]) && is_array($blocks[$block_name])
+		? $blocks[$block_name]
+		: [];
+
+	$merged = array_merge([
+		'allowed'  => true,
+		'hidden'   => false,
+		'favorite' => false,
+	], $global, $per_block);
+
+	$allowed = !empty($merged['allowed']) ? 1 : 0;
+	$hidden = $allowed && !empty($merged['hidden']) ? 1 : 0;
+	$favorite = $allowed && !$hidden && !empty($merged['favorite']) ? 1 : 0;
 
 	return [
 		'allowed'  => $allowed,
-		'hidden'   => 0,
-		'favorite' => 0,
+		'hidden'   => $hidden,
+		'favorite' => $favorite,
 	];
 }
 
@@ -468,6 +494,16 @@ function fs_block_settings_admin_config(): array
 			'systemBlocksToggle'      => _n('%d block hidden by system', '%d blocks hidden by system', count($hard_disallowed), 'fromscratch'),
 			'systemBlocksDescription' => __('These blocks are disabled in code and cannot be enabled here.', 'fromscratch'),
 			'save'                    => __('Save Changes', 'fromscratch'),
+			'filterAllowed'           => __('Allowed in inserter', 'fromscratch'),
+			'filterHidden'            => __('Inserter visibility', 'fromscratch'),
+			'filterFavorite'          => __('Favorites', 'fromscratch'),
+			'filterAll'               => __('All', 'fromscratch'),
+			'filtersLabel'            => __('Filters:', 'fromscratch'),
+			'filterActive'            => __('Active', 'fromscratch'),
+			'filterInactive'          => __('Inactive', 'fromscratch'),
+			'filterNotHidden'         => __('Not hidden', 'fromscratch'),
+			'filterNotFavorite'       => __('Not favorite', 'fromscratch'),
+			'noResults'               => __('No blocks match the current search or filters.', 'fromscratch'),
 		],
 	];
 }
