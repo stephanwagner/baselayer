@@ -100,9 +100,8 @@ $border-radius-large: 16px;
 // Block editor content widths
 $editor-content-width: 960px;
 $editor-content-width-wide: $editor-content-width + ($content-padding-l * 2);
-$editor-content-width-padding: 16px;
-$editor-content-width-outer: $editor-content-width + $editor-content-width-padding;
-$editor-content-width-outer-min: $editor-content-width-outer + 1px;
+$editor-content-width-padding: 24px;
+$editor-content-width-outer: $editor-content-width + ($editor-content-width-padding * 2);
 
 // Variables
 :root {
@@ -257,6 +256,7 @@ $fontSizes: (
 }
 
 // Line clamp helper
+
 @mixin line-clamp($lines) {
   display: -webkit-box;
   line-clamp: $lines;

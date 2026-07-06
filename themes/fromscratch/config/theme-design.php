@@ -51,5 +51,6 @@ return [
 	'layout' => [
 		'editor_content_width' => 960,
 		'wide_bleed'           => 64,
+		'editor_padding_x'     => 24,
 	],
 ];

@@ -161,6 +161,36 @@ function fs_theme_json_layout_sizes(): array
 }
 
 /**
+ * Root horizontal padding for theme.json (editor + alignfull-aware layout).
+ *
+ * @return array{useRootPaddingAwareAlignments: bool, padding: array{top: string, bottom: string, left: string, right: string}}
+ */
+function fs_theme_json_root_spacing(): array
+{
+	$layout = fs_config('layout');
+	if (!is_array($layout)) {
+		$layout = [];
+	}
+
+	$padding_x = (int) ($layout['editor_padding_x'] ?? 24);
+	if ($padding_x < 0) {
+		$padding_x = 24;
+	}
+
+	$px = $padding_x . 'px';
+
+	return [
+		'useRootPaddingAwareAlignments' => true,
+		'padding'                       => [
+			'top'    => '0',
+			'bottom' => '0',
+			'left'   => $px,
+			'right'  => $px,
+		],
+	];
+}
+
+/**
  * Block editor color picker settings for theme.json from config/theme-design.php.
  *
  * @return array<string, bool>

@@ -41,11 +41,11 @@
     .-extra-narrow-left {
       border-right: 1px dashed #ceced0;
       padding-right: 4px;
-      margin-left: 0 !important;
       margin-right: auto !important;
+      margin-left: calc((100vw - var(--fs-editor-content-width-outer)) / 2) !important;
 
-      @media (min-width: $editor-content-width-outer-min) {
-        margin-left: calc((100vw - var(--fs-editor-content-width-outer)) / 2) !important;
+      @media (max-width: $editor-content-width-outer) {
+        margin-left: 0 !important;
       }
     }
 
@@ -55,10 +55,10 @@
       border-left: 1px dashed #ceced0;
       padding-left: 4px;
       margin-left: auto !important;
-      margin-right: 0 !important;
+      margin-right: calc((100vw - var(--fs-editor-content-width-outer)) / 2) !important;
 
-      @media (min-width: $editor-content-width-outer-min) {
-        margin-right: calc((100vw - var(--fs-editor-content-width-outer)) / 2) !important;
+      @media (max-width: $editor-content-width-outer) {
+        margin-right: 0 !important;
       }
     }
   }

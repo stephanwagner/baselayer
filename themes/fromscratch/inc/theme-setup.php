@@ -210,5 +210,11 @@ add_filter('wp_theme_json_data_theme', function ($theme_json) {
 	$data['settings']['layout']['contentSize'] = $layout_sizes['contentSize'];
 	$data['settings']['layout']['wideSize'] = $layout_sizes['wideSize'];
 
+	if (function_exists('fs_theme_json_root_spacing')) {
+		$root_spacing = fs_theme_json_root_spacing();
+		$data['settings']['useRootPaddingAwareAlignments'] = $root_spacing['useRootPaddingAwareAlignments'];
+		$data['styles']['spacing']['padding'] = $root_spacing['padding'];
+	}
+
 	return new WP_Theme_JSON_Data($data, 'theme');
 });
