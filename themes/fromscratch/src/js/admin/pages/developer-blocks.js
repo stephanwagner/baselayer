@@ -1,11 +1,70 @@
 /**
- * Theme settings → Blocks: card interactions, search, and system list toggle.
+ * Theme settings → Blocks: icons, card interactions, search, system list.
  */
+
+const blockSettingsAdmin = () => (typeof window !== 'undefined' && window.fromscratchBlockSettingsAdmin) || {};
+
+const iconSlugForBlock = (blockName) => {
+  const config = blockSettingsAdmin();
+  const map = config.iconMap || {};
+
+  if (map[blockName]) {
+    return map[blockName];
+  }
+
+  if (blockName.startsWith('core/')) {
+    return blockName.slice(5);
+  }
+
+  return null;
+};
+
+const renderBlockSettingsIcons = () => {
+  const config = blockSettingsAdmin();
+  const iconsUrl = config.iconsUrl || '';
+  const fallback = config.fallbackIcon || 'block-default';
+
+  if (!iconsUrl) {
+    return;
+  }
+
+  document.querySelectorAll('[data-fs-block-settings-icon]').forEach((el) => {
+    const blockName = el.getAttribute('data-block-name');
+    if (!blockName || el.dataset.fsBlockIconRendered === '1') {
+      return;
+    }
+
+    const slug = iconSlugForBlock(blockName);
+    if (!slug) {
+      return;
+    }
+
+    const img = document.createElement('img');
+    img.width = 20;
+    img.height = 20;
+    img.alt = '';
+    img.decoding = 'async';
+    img.src = `${iconsUrl}${slug}.svg`;
+    img.addEventListener('error', () => {
+      if (img.dataset.fsFallbackTried === '1') {
+        return;
+      }
+      img.dataset.fsFallbackTried = '1';
+      img.src = `${iconsUrl}${fallback}.svg`;
+    }, { once: true });
+
+    el.replaceChildren(img);
+    el.dataset.fsBlockIconRendered = '1';
+  });
+};
+
 function initBlockSettingsPage() {
   const form = document.getElementById('fs-block-settings-form');
   if (!form) {
     return;
   }
+
+  renderBlockSettingsIcons();
 
   const searchInput = form.querySelector('[data-fs-block-settings-search]');
   const cards = [...form.querySelectorAll('[data-fs-block-settings-card]')];
@@ -52,7 +111,6 @@ function initBlockSettingsPage() {
   const syncCardState = (card) => {
     const allowed = getAllowedInput(card);
     const modes = card.querySelector('[data-fs-block-settings-modes]');
-    const reset = card.querySelector('[data-fs-block-settings-reset]');
 
     if (!(allowed instanceof HTMLInputElement)) {
       return;
@@ -69,24 +127,9 @@ function initBlockSettingsPage() {
       });
     }
 
-    if (reset instanceof HTMLButtonElement) {
-      reset.disabled = !isAllowed;
-    }
-
     if (!isAllowed) {
       setMode(card, '');
     }
-  };
-
-  const resetCard = (card) => {
-    const allowed = getAllowedInput(card);
-    if (!(allowed instanceof HTMLInputElement)) {
-      return;
-    }
-
-    allowed.checked = card.getAttribute('data-fs-block-default-allowed') === '1';
-    setMode(card, '');
-    syncCardState(card);
   };
 
   cards.forEach((card) => {
@@ -108,11 +151,6 @@ function initBlockSettingsPage() {
         setMode(card, current === mode ? '' : mode);
       });
     });
-
-    const reset = card.querySelector('[data-fs-block-settings-reset]');
-    if (reset instanceof HTMLButtonElement) {
-      reset.addEventListener('click', () => resetCard(card));
-    }
   });
 
   const filterCards = (query) => {

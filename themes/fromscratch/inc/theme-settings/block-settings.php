@@ -48,6 +48,31 @@ add_action('admin_init', function () {
 	exit;
 }, 1);
 
+add_action('admin_enqueue_scripts', function () {
+	if (!function_exists('fs_theme_settings_request_tab_slug') || fs_theme_settings_request_tab_slug() !== 'blocks') {
+		return;
+	}
+
+	if (!isset($_GET['page']) || $_GET['page'] !== 'fs-theme-settings') {
+		return;
+	}
+
+	$icon_map = [];
+	$path = get_template_directory() . '/config/core-block-icons.php';
+	if (is_readable($path)) {
+		$loaded = include $path;
+		if (is_array($loaded)) {
+			$icon_map = $loaded;
+		}
+	}
+
+	wp_localize_script('main-admin-scripts', 'fromscratchBlockSettingsAdmin', [
+		'iconsUrl' => function_exists('fs_block_settings_icons_base_url') ? fs_block_settings_icons_base_url() : '',
+		'iconMap'  => $icon_map,
+		'fallbackIcon' => 'block-default',
+	]);
+}, 20);
+
 /**
  * @param array<string, mixed> $block
  */
@@ -64,15 +89,9 @@ function fs_render_theme_settings_block_card(array $block): void
 		class="fs-block-card<?= $allowed ? ' is-allowed' : ' is-disallowed' ?>"
 		data-fs-block-settings-card
 		data-search="<?= esc_attr($search_label) ?>"
-		data-fs-block-default-allowed="1"
-		data-fs-block-default-hidden="0"
-		data-fs-block-default-favorite="0"
 	>
 		<div class="fs-block-card__top">
 			<div class="fs-block-card__identity">
-				<div class="fs-block-card__block-icon" aria-hidden="true">
-					<?= fs_block_settings_render_icon_html($block['icon']) ?>
-				</div>
 				<div class="fs-block-card__meta">
 					<h4 class="fs-block-card__title"><?= esc_html((string) $block['title']) ?></h4>
 					<code class="fs-block-card__slug"><?= esc_html($name) ?></code>
@@ -89,8 +108,8 @@ function fs_render_theme_settings_block_card(array $block): void
 					data-fs-block-settings-allowed
 				>
 				<span class="fs-block-card__allowed-btn" aria-hidden="true">
-					<span class="fs-block-card__allowed-icon fs-block-card__allowed-icon--on dashicons dashicons-yes" aria-hidden="true"></span>
-					<span class="fs-block-card__allowed-icon fs-block-card__allowed-icon--off dashicons dashicons-no-alt" aria-hidden="true"></span>
+					<?= fs_block_settings_render_icon_html($block['icon'], $name) ?>
+					<span class="fs-block-card__allowed-slash" aria-hidden="true"></span>
 				</span>
 				<span class="screen-reader-text"><?= esc_html__('Allowed in inserter', 'fromscratch') ?></span>
 			</label>
@@ -124,10 +143,6 @@ function fs_render_theme_settings_block_card(array $block): void
 
 		<input type="hidden" name="fromscratch_block_settings[<?= esc_attr($name) ?>][hidden]" value="<?= $hidden ? '1' : '0' ?>" data-fs-block-settings-hidden>
 		<input type="hidden" name="fromscratch_block_settings[<?= esc_attr($name) ?>][favorite]" value="<?= $favorite ? '1' : '0' ?>" data-fs-block-settings-favorite>
-
-		<button type="button" class="fs-block-card__reset" data-fs-block-settings-reset>
-			<?= esc_html__('Reset', 'fromscratch') ?>
-		</button>
 	</article>
 	<?php
 }
@@ -196,9 +211,7 @@ function fs_render_theme_settings_blocks_tab(): void
 							<article class="fs-block-card fs-block-card--system">
 								<div class="fs-block-card__top">
 									<div class="fs-block-card__identity">
-										<div class="fs-block-card__block-icon" aria-hidden="true">
-											<?= fs_block_settings_render_icon_html($block['icon']) ?>
-										</div>
+										<?= fs_block_settings_render_icon_html($block['icon'], (string) $block['name']) ?>
 										<div class="fs-block-card__meta">
 											<h4 class="fs-block-card__title"><?= esc_html((string) $block['title']) ?></h4>
 											<code class="fs-block-card__slug"><?= esc_html((string) $block['name']) ?></code>

@@ -356,23 +356,162 @@ function fs_block_settings_category_label(string $slug): string
 }
 
 /**
- * Render block type icon HTML for admin tables.
+ * Sanitize inline SVG for block icon output.
  */
-function fs_block_settings_render_icon_html($icon): string
+function fs_block_settings_sanitize_icon_svg(string $svg): string
 {
-	if (is_string($icon) && $icon !== '') {
-		if (str_starts_with($icon, 'dashicons-')) {
-			return '<span class="dashicons ' . esc_attr($icon) . '" aria-hidden="true"></span>';
+	if (function_exists('fs_svg_sanitize')) {
+		return fs_svg_sanitize($svg);
+	}
+
+	$allowed = [
+		'svg' => [
+			'xmlns' => true,
+			'viewbox' => true,
+			'viewBox' => true,
+			'width' => true,
+			'height' => true,
+			'fill' => true,
+			'class' => true,
+			'aria-hidden' => true,
+			'role' => true,
+		],
+		'path' => [
+			'd' => true,
+			'fill' => true,
+			'stroke' => true,
+			'fill-rule' => true,
+			'clip-rule' => true,
+		],
+		'g' => [
+			'fill' => true,
+			'stroke' => true,
+			'transform' => true,
+		],
+		'rect' => [
+			'x' => true,
+			'y' => true,
+			'width' => true,
+			'height' => true,
+			'fill' => true,
+			'rx' => true,
+		],
+		'circle' => [
+			'cx' => true,
+			'cy' => true,
+			'r' => true,
+			'fill' => true,
+		],
+	];
+
+	return wp_kses($svg, $allowed);
+}
+
+/**
+ * Inner HTML for a block type icon (dashicon, inline SVG, or image).
+ */
+function fs_block_settings_icon_inner_html($icon): string
+{
+	if (is_string($icon)) {
+		$trimmed = trim($icon);
+		if ($trimmed === '') {
+			return '';
 		}
 
-		return '<span class="dashicons dashicons-block-default" aria-hidden="true"></span>';
+		if (str_starts_with($trimmed, '<svg')) {
+			$svg = fs_block_settings_sanitize_icon_svg($trimmed);
+
+			return $svg !== '' ? $svg : '';
+		}
+
+		if (str_starts_with($trimmed, 'data:image/')) {
+			return '<img src="' . esc_url($trimmed) . '" alt="" width="20" height="20" decoding="async" />';
+		}
+
+		$slug = str_starts_with($trimmed, 'dashicons-') ? $trimmed : 'dashicons-' . $trimmed;
+
+		return '<span class="dashicons ' . esc_attr($slug) . '" aria-hidden="true"></span>';
 	}
 
-	if (is_array($icon) && !empty($icon['src'])) {
-		return '<span class="fs-block-settings__icon fs-block-settings__icon--svg" aria-hidden="true"><img src="' . esc_url((string) $icon['src']) . '" alt="" width="20" height="20" /></span>';
+	if (!is_array($icon)) {
+		return '';
 	}
 
-	return '<span class="dashicons dashicons-block-default" aria-hidden="true"></span>';
+	if (!empty($icon['src']) && is_string($icon['src'])) {
+		return '<img src="' . esc_url($icon['src']) . '" alt="" width="20" height="20" decoding="async" />';
+	}
+
+	if (!empty($icon['foreground'])) {
+		if (is_string($icon['foreground'])) {
+			$foreground = trim($icon['foreground']);
+			if (str_starts_with($foreground, '<svg')) {
+				$svg = fs_block_settings_sanitize_icon_svg($foreground);
+
+				return $svg !== '' ? $svg : '';
+			}
+			if (str_starts_with($foreground, 'data:image/')) {
+				return '<img src="' . esc_url($foreground) . '" alt="" width="20" height="20" decoding="async" />';
+			}
+		}
+
+		if (is_array($icon['foreground']) && !empty($icon['foreground']['src']) && is_string($icon['foreground']['src'])) {
+			return '<img src="' . esc_url($icon['foreground']['src']) . '" alt="" width="20" height="20" decoding="async" />';
+		}
+	}
+
+	return '';
+}
+
+/**
+ * Icon filename slug (without .svg) for a block name.
+ */
+function fs_block_settings_icon_slug(string $block_name): ?string
+{
+	static $overrides = null;
+
+	if ($overrides === null) {
+		$path = get_template_directory() . '/config/core-block-icons.php';
+		$loaded = is_readable($path) ? include $path : [];
+		$overrides = is_array($loaded) ? $loaded : [];
+	}
+
+	if (isset($overrides[$block_name]) && is_string($overrides[$block_name]) && $overrides[$block_name] !== '') {
+		return $overrides[$block_name];
+	}
+
+	if (str_starts_with($block_name, 'core/')) {
+		$slug = substr($block_name, 5);
+
+		return $slug !== '' ? $slug : null;
+	}
+
+	return null;
+}
+
+/**
+ * Base URL for bundled @wordpress/icons SVG assets.
+ */
+function fs_block_settings_icons_base_url(): string
+{
+	return trailingslashit(get_template_directory_uri()) . 'assets/block-icons/';
+}
+
+/**
+ * Resolve icon markup for a block type.
+ */
+function fs_block_settings_render_icon_html($icon, string $block_name = ''): string
+{
+	$inner = fs_block_settings_icon_inner_html($icon);
+
+	if ($inner !== '') {
+		return '<span class="fs-block-settings__icon" aria-hidden="true">' . $inner . '</span>';
+	}
+
+	if ($block_name !== '' && fs_block_settings_icon_slug($block_name) !== null) {
+		return '<span class="fs-block-settings__icon" data-fs-block-settings-icon data-block-name="' . esc_attr($block_name) . '" aria-hidden="true"></span>';
+	}
+
+	return '<span class="fs-block-settings__icon" aria-hidden="true"><span class="dashicons dashicons-block-default" aria-hidden="true"></span></span>';
 }
 
 /**

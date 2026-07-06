@@ -213,8 +213,7 @@ body.fs-css-vars-overview-modal-active {
   &.is-disallowed {
     opacity: 0.55;
 
-    .fs-block-card__modes,
-    .fs-block-card__reset {
+    .fs-block-card__modes {
       pointer-events: none;
     }
   }
@@ -234,16 +233,39 @@ body.fs-css-vars-overview-modal-active {
 .fs-block-card__identity {
   align-items: flex-start;
   display: flex;
+  flex: 1;
   gap: 8px;
   min-width: 0;
 }
 
-.fs-block-card__block-icon {
-  flex-shrink: 0;
-  line-height: 1;
+.fs-block-settings__icon {
+  align-items: center;
+  display: inline-flex;
+  height: 20px;
+  justify-content: center;
+  width: 20px;
+
+  svg {
+    display: block;
+    fill: currentColor;
+    height: 20px;
+    width: 20px;
+  }
+
+  .components-icon {
+    height: 20px;
+    width: 20px;
+  }
+
+  img {
+    display: block;
+    height: 20px;
+    object-fit: contain;
+    width: 20px;
+  }
 
   .dashicons {
-    color: #50575e;
+    color: currentColor;
     font-size: 20px;
     height: 20px;
     width: 20px;
@@ -291,19 +313,11 @@ body.fs-css-vars-overview-modal-active {
   border-radius: 4px;
   color: #2271b1;
   display: inline-flex;
-  height: 30px;
+  height: 34px;
   justify-content: center;
-  width: 30px;
-}
-
-.fs-block-card__allowed-icon {
-  font-size: 18px;
-  height: 18px;
-  width: 18px;
-}
-
-.fs-block-card__allowed-icon--off {
-  display: none;
+  overflow: hidden;
+  position: relative;
+  width: 34px;
 }
 
 .fs-block-card.is-disallowed .fs-block-card__allowed-btn {
@@ -312,12 +326,27 @@ body.fs-css-vars-overview-modal-active {
   color: #a7aaad;
 }
 
-.fs-block-card.is-disallowed .fs-block-card__allowed-icon--on {
+.fs-block-card__allowed-slash {
+  background: rgba(255, 255, 255, 0.55);
   display: none;
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+
+  &::after {
+    background: #a7aaad;
+    content: '';
+    height: 120%;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%) rotate(45deg);
+    width: 2px;
+  }
 }
 
-.fs-block-card.is-disallowed .fs-block-card__allowed-icon--off {
-  display: inline-block;
+.fs-block-card.is-disallowed .fs-block-card__allowed-slash {
+  display: block;
 }
 
 .fs-block-card__modes {
@@ -374,28 +403,6 @@ body.fs-css-vars-overview-modal-active {
   }
 }
 
-.fs-block-card__reset {
-  align-self: flex-start;
-  background: none;
-  border: 0;
-  color: #646970;
-  cursor: pointer;
-  font-size: 11px;
-  margin: 0;
-  padding: 0;
-  text-decoration: underline;
-
-  &:hover:not(:disabled) {
-    color: #2271b1;
-  }
-
-  &:disabled {
-    cursor: default;
-    opacity: 0.5;
-    text-decoration: none;
-  }
-}
-
 .fs-block-settings__system {
   border-top: 1px solid #dcdcde;
   margin-top: 28px;
@@ -410,8 +417,12 @@ body.fs-css-vars-overview-modal-active {
   margin-top: 12px;
 }
 
-.fs-block-settings__icon--svg img {
-  display: block;
-  height: 20px;
-  width: 20px;
+.fs-block-card--system .fs-block-card__identity {
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.fs-block-card--system .fs-block-settings__icon {
+  flex-shrink: 0;
+  margin-top: 1px;
 }
