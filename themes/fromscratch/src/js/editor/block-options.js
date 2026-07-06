@@ -377,6 +377,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                               label={opt.label}
                               icon={opt.icon}
                               iconLabel={option.iconLabel}
+                              iconPosition={opt.iconPosition}
                             />
                           ))}
                         </ToggleGroupControl>

@@ -79,21 +79,16 @@
     min-width: 0;
     padding-left: 10px;
     padding-right: 10px;
+    font-size: 12px;
+    line-height: 1.2;
 
-    .fs-icon {
+    &::before,
+    &::after {
       flex: 0 0 auto;
-      width: 16px;
-      height: 16px;
+      width: 18px;
+      height: 18px;
+      font-size: 18px;
+      margin: 0;
     }
-
-    .fs-toggle-group-option__label {
-      font-size: 12px;
-      line-height: 1.2;
-    }
-  }
-
-  // Hide duplicate visible label text WordPress may still output for icon+label options.
-  .fs-toggle-group-option--icon-label.components-toggle-group-control-option-base > :not(.fs-icon):not(.fs-toggle-group-option__label) {
-    display: none !important;
   }
 }

@@ -227,9 +227,10 @@ export const blockOptions = [
         label: 'Icon Position',
         default: '',
         attributeName: 'buttonIconPosition',
+        iconLabel: true,
         options: [
-          { label: 'Links', value: '' },
-          { label: 'Rechts', value: '-icon-right' }
+          { icon: 'horizontal-align-left', label: 'Links', value: '' },
+          { icon: 'horizontal-align-right', label: 'Rechts', value: '-icon-right', iconPosition: 'after' }
         ]
       }
     ]

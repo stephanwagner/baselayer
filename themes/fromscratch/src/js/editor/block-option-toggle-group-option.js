@@ -21,19 +21,19 @@ function getThemeIconComponent(iconName) {
  * @param {string} props.label
  * @param {string} [props.icon] Icon file name without prefix (e.g. `block`).
  * @param {boolean} [props.iconLabel] Show icon and visible label together.
+ * @param {'before'|'after'} [props.iconPosition] Place icon before or after the label.
  */
-export function BlockOptionToggleGroupOption({ value, label, icon, iconLabel }) {
+export function BlockOptionToggleGroupOption({ value, label, icon, iconLabel, iconPosition = 'before' }) {
   if (icon && iconLabel && ToggleGroupControlOption) {
+    const iconPlacement = iconPosition === 'after' ? '-icon-after' : '-icon-before';
+
     return (
       <ToggleGroupControlOption
         value={value}
         label={label}
         showTooltip
-        className="fs-toggle-group-option--icon-label"
-      >
-        <span className={'fs-icon -icon-' + icon} aria-hidden="true" />
-        <span className="fs-toggle-group-option__label">{label}</span>
-      </ToggleGroupControlOption>
+        className={'fs-toggle-group-option--icon-label ' + iconPlacement + ' -icon-' + icon}
+      />
     );
   }
 
