@@ -69,6 +69,39 @@ const getBooleanOptionLabels = (option) => {
   };
 };
 
+const getBlockOptionKey = (option, index) => {
+  if (option.type === 'content-margin') {
+    return 'content-margin-' + index;
+  }
+
+  if (option.type === 'limit-width') {
+    return 'limit-width-' + index;
+  }
+
+  return option.attributeName || 'block-option-' + index;
+};
+
+const getBlockOptionWrapperClass = (option, index) => {
+  const classes = ['fs-block-option'];
+
+  if (option.type === 'boolean') {
+    classes.push('fs-block-option-boolean');
+  }
+
+  if (index > 0 && !option.noSeparator) {
+    classes.push('fs-block-option--separated');
+  }
+
+  return classes.join(' ');
+};
+
+const BlockOptionWrapper = ({ option, index, children }) =>
+  wp.element.createElement(
+    'div',
+    { className: getBlockOptionWrapperClass(option, index) },
+    children
+  );
+
 // Position modifiers (e.g. `-icon-right`) share the icon prefix but are not glyph classes.
 const iconPositionClasses = (blockConfig) => {
   const classes = new Set();
@@ -421,42 +454,45 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
           {isSelected && (
             <InspectorControls>
               <PanelBody title="Block Einstellungen">
-                {blockConfig.options.map((option) => {
+                {blockConfig.options.map((option, index) => {
                   if (option.type === 'content-margin') {
                     return (
-                      <ContentMarginControl
-                        key="content-margin"
-                        option={option}
-                        attributes={attributes}
-                        onChange={setOptionAttributes}
-                      />
+                      <BlockOptionWrapper key={getBlockOptionKey(option, index)} option={option} index={index}>
+                        <ContentMarginControl
+                          option={option}
+                          attributes={attributes}
+                          onChange={setOptionAttributes}
+                        />
+                      </BlockOptionWrapper>
                     );
                   }
 
                   if (option.type === 'limit-width') {
                     return (
-                      <LimitWidthControl
-                        key="limit-width"
-                        option={option}
-                        attributes={attributes}
-                        onChange={setOptionAttributes}
-                      />
+                      <BlockOptionWrapper key={getBlockOptionKey(option, index)} option={option} index={index}>
+                        <LimitWidthControl
+                          option={option}
+                          attributes={attributes}
+                          onChange={setOptionAttributes}
+                        />
+                      </BlockOptionWrapper>
                     );
                   }
 
                   if (option.type === 'spacer-responsive-height') {
                     return (
-                      <SpacerResponsiveHeightControl
-                        key={option.attributeName}
-                        option={option}
-                        attributes={attributes}
-                        onChange={(updates) => {
-                          if (updates.height === undefined && updates[option.attributeName]) {
-                            skipHeightResetRef.current = true;
-                          }
-                          setOptionAttributes(updates);
-                        }}
-                      />
+                      <BlockOptionWrapper key={getBlockOptionKey(option, index)} option={option} index={index}>
+                        <SpacerResponsiveHeightControl
+                          option={option}
+                          attributes={attributes}
+                          onChange={(updates) => {
+                            if (updates.height === undefined && updates[option.attributeName]) {
+                              skipHeightResetRef.current = true;
+                            }
+                            setOptionAttributes(updates);
+                          }}
+                        />
+                      </BlockOptionWrapper>
                     );
                   }
 
@@ -464,7 +500,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                     const { rowLabel, toggleLabel } = getBooleanOptionLabels(option);
 
                     return (
-                      <div key={option.attributeName} className="fs-block-option-boolean">
+                      <BlockOptionWrapper key={getBlockOptionKey(option, index)} option={option} index={index}>
                         {rowLabel ? <span className="fs-block-option__label">{rowLabel}</span> : null}
                         <ToggleControl
                           label={toggleLabel}
@@ -473,69 +509,73 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                           __nextHasNoMarginBottom
                           {...optionHelpProps(option)}
                         />
-                      </div>
+                      </BlockOptionWrapper>
                     );
                   } else if (option.type === 'select') {
                     return (
-                      <SelectControl
-                        key={option.attributeName}
-                        label={option.label}
-                        value={attributes[option.attributeName]}
-                        options={option.options}
-                        onChange={(newValue) => setOptionAttributes({ [option.attributeName]: newValue })}
-                        {...optionHelpProps(option)}
-                      />
+                      <BlockOptionWrapper key={getBlockOptionKey(option, index)} option={option} index={index}>
+                        <SelectControl
+                          label={option.label}
+                          value={attributes[option.attributeName]}
+                          options={option.options}
+                          onChange={(newValue) => setOptionAttributes({ [option.attributeName]: newValue })}
+                          {...optionHelpProps(option)}
+                        />
+                      </BlockOptionWrapper>
                     );
                   } else if (option.type === 'icon') {
                     const prefix = iconPrefix(option);
                     return (
-                      <IconPicker
-                        key={option.attributeName}
-                        label={option.label}
-                        description={option.description}
-                        value={iconNameFromClass(attributes[option.attributeName], option)}
-                        onChange={(name) =>
-                          setOptionAttributes({
-                            [option.attributeName]: name ? prefix + name : '',
-                          })
-                        }
-                      />
+                      <BlockOptionWrapper key={getBlockOptionKey(option, index)} option={option} index={index}>
+                        <IconPicker
+                          label={option.label}
+                          description={option.description}
+                          value={iconNameFromClass(attributes[option.attributeName], option)}
+                          onChange={(name) =>
+                            setOptionAttributes({
+                              [option.attributeName]: name ? prefix + name : '',
+                            })
+                          }
+                        />
+                      </BlockOptionWrapper>
                     );
                   } else if (option.type === 'button-group') {
                     if (ToggleGroupControl) {
                       return (
-                        <ToggleGroupControl
-                          key={option.attributeName}
-                          className="fs-block-option-button-group"
-                          label={option.label}
-                          value={attributes[option.attributeName] ?? option.default ?? ''}
-                          isBlock
-                          onChange={(newValue) => setOptionAttributes({ [option.attributeName]: newValue })}
-                          __nextHasNoMarginBottom
-                          {...optionHelpProps(option)}
-                        >
-                          {option.options.map((opt) => (
-                            <BlockOptionToggleGroupOption
-                              key={opt.value || 'default'}
-                              value={opt.value}
-                              label={opt.label}
-                              icon={opt.icon}
-                              iconLabel={option.iconLabel}
-                              iconPosition={opt.iconPosition}
-                            />
-                          ))}
-                        </ToggleGroupControl>
+                        <BlockOptionWrapper key={getBlockOptionKey(option, index)} option={option} index={index}>
+                          <ToggleGroupControl
+                            className="fs-block-option-button-group"
+                            label={option.label}
+                            value={attributes[option.attributeName] ?? option.default ?? ''}
+                            isBlock
+                            onChange={(newValue) => setOptionAttributes({ [option.attributeName]: newValue })}
+                            __nextHasNoMarginBottom
+                            {...optionHelpProps(option)}
+                          >
+                            {option.options.map((opt) => (
+                              <BlockOptionToggleGroupOption
+                                key={opt.value || 'default'}
+                                value={opt.value}
+                                label={opt.label}
+                                icon={opt.icon}
+                                iconLabel={option.iconLabel}
+                                iconPosition={opt.iconPosition}
+                              />
+                            ))}
+                          </ToggleGroupControl>
+                        </BlockOptionWrapper>
                       );
                     }
                     return (
-                      <SelectControl
-                        key={option.attributeName}
-                        label={option.label}
-                        value={attributes[option.attributeName]}
-                        options={option.options}
-                        onChange={(newValue) => setOptionAttributes({ [option.attributeName]: newValue })}
-                        {...optionHelpProps(option)}
-                      />
+                      <BlockOptionWrapper key={getBlockOptionKey(option, index)} option={option} index={index}>
+                        <SelectControl
+                          label={option.label}
+                          value={attributes[option.attributeName]}
+                          options={option.options}
+                          onChange={(newValue) => setOptionAttributes({ [option.attributeName]: newValue })}
+                          {...optionHelpProps(option)}
+                        />
+                      </BlockOptionWrapper>
                     );
                   }
                   return null;

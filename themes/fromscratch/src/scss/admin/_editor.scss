@@ -14,10 +14,21 @@
 
 // Panel components
 
-.fs-block-option-boolean {
+.fs-block-option {
   margin-bottom: 16px;
 
   &:last-child {
+    margin-bottom: 0;
+  }
+
+  &--separated {
+    border-top: 1px solid #dcdcde;
+    padding-top: 16px;
+  }
+}
+
+.fs-block-option-boolean {
+  .components-base-control {
     margin-bottom: 0;
   }
 }

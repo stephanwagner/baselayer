@@ -71,6 +71,7 @@ function getLimitWidthControl() {
  *
  * Boolean: `label` = optional row label; `toggleLabel` = text on the switch.
  * All types: optional `description` = help text below the control.
+ * All types: optional `noSeparator` = skip border-top when this option follows another block option.
  */
 export const blockOptions = [
   // Columns
@@ -173,6 +174,7 @@ export const blockOptions = [
       {
         type: 'boolean',
         toggleLabel: 'Bild bei Klick vergrößern',
+        noSeparator: true,
         default: false,
         attributeName: 'hasLightbox',
         className: '-has-lightbox',
@@ -195,6 +197,7 @@ export const blockOptions = [
       {
         type: 'boolean',
         toggleLabel: 'Bilder bei Klick vergrößern',
+        noSeparator: true,
         default: true,
         attributeName: 'hasLightbox',
         className: '-has-lightbox',
