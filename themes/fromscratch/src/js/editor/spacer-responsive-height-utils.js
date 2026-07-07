@@ -50,7 +50,7 @@ export const spacerResponsiveHeightClassesFromAttributes = (option, attributes) 
 
 export const spacerResponsiveHeightAttributeKey = (option) => option.attributeName;
 
-/** Help text preview for the selected responsive size, e.g. `M: 48px → 24px`. */
+/** Inline preview for the selected responsive size, e.g. `48px → 24px`. */
 export const spacerResponsiveHeightPreviewText = (displayValue) => {
   if (!displayValue || displayValue === 'unset') {
     return '';
@@ -62,5 +62,5 @@ export const spacerResponsiveHeightPreviewText = (displayValue) => {
     return '';
   }
 
-  return `${displayValue.toUpperCase()}: ${preview.base}px → ${preview.min}px`;
+  return `${preview.base}px → ${preview.min}px`;
 };

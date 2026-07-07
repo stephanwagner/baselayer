@@ -34,7 +34,14 @@ export function SpacerResponsiveHeightControl({ option, attributes, onChange }) 
 
   return (
     <div className="fs-spacer-responsive-height">
-      {option.label ? <span className="fs-spacer-responsive-height__label">{option.label}</span> : null}
+      {option.label ? (
+        <div className="fs-spacer-responsive-height__header">
+          <span className="fs-spacer-responsive-height__label">{option.label}</span>
+          {previewText ? (
+            <span className="fs-spacer-responsive-height__preview">{previewText}</span>
+          ) : null}
+        </div>
+      ) : null}
 
       <ToggleGroupControl
         className="fs-spacer-responsive-height__sizes fs-block-option-button-group"
@@ -55,7 +62,6 @@ export function SpacerResponsiveHeightControl({ option, attributes, onChange }) 
       </ToggleGroupControl>
 
       <BlockOptionDescription description={option.description} />
-      <BlockOptionDescription description={previewText} />
     </div>
   );
 }
