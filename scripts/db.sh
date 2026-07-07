@@ -6,9 +6,11 @@
 #   ./scripts/db.sh export
 #   ./scripts/db.sh import db/export-2026-01-01_12-00-00.sql
 #   ./scripts/db.sh import latest
+#   ./scripts/db.sh import          # interactive picker from db/
 #
 # Database credentials are read from wordpress/wp-config.php.
 # Exports are saved to db/ (gitignored).
+# Before import, the current database is always backed up to db/bak/ (zipped when possible).
 
 set -euo pipefail
 
@@ -22,6 +24,7 @@ CROSS="✖"
 
 ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 BACKUP_FOLDER="$ROOT/db"
+PRE_IMPORT_BACKUP_FOLDER="$ROOT/db/bak"
 WP_CONFIG="$ROOT/wordpress/wp-config.php"
 
 MYSQL="${MYSQL:-mysql}"
@@ -105,6 +108,34 @@ export_db() {
   fi
 }
 
+backup_current_db() {
+  local timestamp sql_file zip_file
+
+  mkdir -p "$PRE_IMPORT_BACKUP_FOLDER"
+  timestamp="$(date +%Y-%m-%d_%H-%M-%S)"
+  sql_file="$PRE_IMPORT_BACKUP_FOLDER/${timestamp}.sql"
+  zip_file="$PRE_IMPORT_BACKUP_FOLDER/${timestamp}.zip"
+
+  echo -e "${YELLOW}Backing up current ${DB_NAME} to db/bak/...${RESET}"
+
+  if ! "$MYSQLDUMP" "${mysqldump_args[@]}" "$DB_NAME" > "$sql_file"; then
+    echo -e "${RED}${CROSS} Pre-import backup failed. Import cancelled.${RESET}"
+    rm -f "$sql_file"
+    exit 1
+  fi
+
+  if command -v zip >/dev/null 2>&1; then
+    if (cd "$PRE_IMPORT_BACKUP_FOLDER" && zip -q -9 "${timestamp}.zip" "${timestamp}.sql"); then
+      rm -f "$sql_file"
+      echo -e "${GREEN}${CHECK} Pre-import backup saved: $zip_file${RESET}"
+    else
+      echo -e "${YELLOW}Could not create zip; kept SQL backup: $sql_file${RESET}"
+    fi
+  else
+    echo -e "${YELLOW}zip not found; kept SQL backup: $sql_file${RESET}"
+  fi
+}
+
 resolve_import_file() {
   local input="$1"
 
@@ -121,14 +152,63 @@ resolve_import_file() {
   printf '%s' "$input"
 }
 
-import_db() {
-  if [ -z "$FILE" ]; then
-    echo -e "${RED}Please provide a backup file.${RESET}"
-    echo "Usage: ./scripts/db.sh import backup.sql"
-    exit 1
+choose_import_file() {
+  local -a files=()
+  local file
+
+  while IFS= read -r file; do
+    [ -n "$file" ] && files+=("$file")
+  done < <(ls -t "$BACKUP_FOLDER"/*.sql 2>/dev/null || true)
+
+  if [ ${#files[@]} -eq 0 ]; then
+    echo -e "${RED}${CROSS} No backup files found in $BACKUP_FOLDER${RESET}" >&2
+    return 1
   fi
 
-  FILE="$(resolve_import_file "$FILE")"
+  echo -e "${YELLOW}Available backups in db/:${RESET}" >&2
+  echo >&2
+
+  local i choice name size modified
+  for i in "${!files[@]}"; do
+    file="${files[$i]}"
+    name="$(basename "$file")"
+    size="$(du -h "$file" | awk '{print $1}')"
+    modified="$(date -r "$file" '+%Y-%m-%d %H:%M')"
+    printf '  %2d) %-40s %6s  %s\n' "$((i + 1))" "$name" "$size" "$modified" >&2
+  done
+  echo "   0) Cancel" >&2
+  echo >&2
+
+  while true; do
+    read -r -p "Enter number [1-${#files[@]}]: " choice
+
+    if [ "$choice" = "0" ] || [ "$choice" = "q" ] || [ "$choice" = "Q" ]; then
+      echo "Cancelled." >&2
+      return 2
+    fi
+
+    if [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le ${#files[@]} ]; then
+      FILE="${files[$((choice - 1))]}"
+      return 0
+    fi
+
+    echo -e "${RED}Invalid choice. Enter a number between 1 and ${#files[@]}, or 0 to cancel.${RESET}" >&2
+  done
+}
+
+import_db() {
+  if [ -z "$FILE" ]; then
+    if choose_import_file; then
+      :
+    else
+      case $? in
+        2) exit 0 ;;
+        *) exit 1 ;;
+      esac
+    fi
+  else
+    FILE="$(resolve_import_file "$FILE")"
+  fi
 
   if [ -z "$FILE" ] || [ ! -f "$FILE" ]; then
     echo -e "${RED}${CROSS} Backup file not found.${RESET}"
@@ -136,12 +216,15 @@ import_db() {
   fi
 
   echo -e "${YELLOW}This will OVERWRITE database: $DB_NAME${RESET}"
+  echo -e "${YELLOW}A backup of the current database will be saved to db/bak/ first.${RESET}"
   read -r -p "Type 'yes' to continue: " confirm
 
   if [ "$confirm" != "yes" ]; then
     echo "Cancelled."
     exit 0
   fi
+
+  backup_current_db
 
   echo -e "${YELLOW}Importing $FILE...${RESET}"
 
@@ -166,6 +249,7 @@ case "$COMMAND" in
     echo "  ./scripts/db.sh export"
     echo "  ./scripts/db.sh import backup.sql"
     echo "  ./scripts/db.sh import latest"
+    echo "  ./scripts/db.sh import"
     exit 1
     ;;
 esac
