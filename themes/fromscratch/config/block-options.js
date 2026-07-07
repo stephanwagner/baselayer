@@ -72,7 +72,7 @@ export const blockOptions = [
         default: '-column-gap-m',
         attributeName: 'columnGap',
         options: [
-          { icon: 'block', label: 'Ohne', value: '-column-gap-none' },
+          { label: '0', value: '-column-gap-none' },
           { label: 'XS', value: '-column-gap-xs' },
           { label: 'S', value: '-column-gap-s' },
           { label: 'M', value: '-column-gap-m' },
@@ -81,16 +81,13 @@ export const blockOptions = [
         ],
       },
       {
-        type: 'select',
+        type: 'boolean',
         label: 'Bild-Text-Layout',
-        description: 'Richtet Bild- und Textspalte als zusammengehöriges Layout aus.',
-        default: '',
-        attributeName: 'imageTextLayout',
-        options: [
-          { label: 'Ohne', value: '' },
-          { label: 'Bild links, Text rechts', value: '-image-left-text-right' },
-          { label: 'Bild rechts, Text links', value: '-image-right-text-left' },
-        ],
+        toggleLabel: 'Text harmonisch ausrichten',
+        description: 'Richtet die Textspalte bei kurzen Inhalten mittig zum Bild aus.',
+        default: false,
+        attributeName: 'harmonizeImageText',
+        className: '-image-text-layout',
       },
       {
         type: 'boolean',

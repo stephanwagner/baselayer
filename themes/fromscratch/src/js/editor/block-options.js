@@ -29,6 +29,12 @@ const ICON_CLASS_PREFIX = '-icon-';
 // Marker class added whenever an icon option has a value (target any icon button in CSS).
 const HAS_ICON_CLASS = '-has-icon';
 
+// Legacy Bild-Text-Layout classes (removed; stripped on sync / migration).
+const LEGACY_IMAGE_TEXT_LAYOUT_CLASSES = [
+  '-image-left-text-right',
+  '-image-right-text-left',
+];
+
 const iconPrefix = (option) => option.classPrefix || ICON_CLASS_PREFIX;
 
 // Strip the class prefix so the picker works with the raw icon name.
@@ -90,9 +96,32 @@ const contentMarginOptions = (blockConfig) =>
 const limitWidthOptions = (blockConfig) =>
   blockConfig.options.filter((option) => option.type === 'limit-width');
 
+/** Migrate legacy image-text layout select / className to harmonizeImageText boolean. */
+const migrateLegacyImageTextLayoutAttributes = (attributes) => {
+  const classNames = (attributes.className || '').split(/\s+/).filter(Boolean);
+  const hasLegacyClass = LEGACY_IMAGE_TEXT_LAYOUT_CLASSES.some((legacyClass) =>
+    classNames.includes(legacyClass)
+  );
+  const hasLegacyAttribute = Boolean(attributes.imageTextLayout);
+
+  if (!hasLegacyClass && !hasLegacyAttribute) {
+    return null;
+  }
+
+  return {
+    harmonizeImageText: true,
+    imageTextLayout: '',
+  };
+};
+
 // Static class names managed by block options (boolean / select / button-group values).
 const managedStaticClasses = (blockConfig) => {
-  const classes = new Set([HAS_ICON_CLASS, ...ALL_CONTENT_MARGIN_CLASSES, ...ALL_LIMIT_WIDTH_CLASSES]);
+  const classes = new Set([
+    HAS_ICON_CLASS,
+    ...ALL_CONTENT_MARGIN_CLASSES,
+    ...ALL_LIMIT_WIDTH_CLASSES,
+    ...LEGACY_IMAGE_TEXT_LAYOUT_CLASSES,
+  ]);
 
   blockConfig.options.forEach((option) => {
     if (option.type === 'boolean' && option.className) {
@@ -304,6 +333,24 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
       attributes.className,
     ]);
 
+    // Migrate legacy Bild-Text-Layout select / className into harmonizeImageText boolean once.
+    useEffect(() => {
+      if (!blockConfig || blockConfig.name !== 'core/columns') {
+        return;
+      }
+
+      const migrated = migrateLegacyImageTextLayoutAttributes(attributes);
+      if (migrated) {
+        setOptionAttributes(migrated);
+      }
+    }, [
+      blockConfig?.name,
+      props.clientId,
+      attributes.imageTextLayout,
+      attributes.className,
+      attributes.harmonizeImageText,
+    ]);
+
     // Backfill `className` when option attributes and wrapper classes drift (e.g. after adding `-has-icon`).
     useEffect(() => {
       if (!blockConfig) {
@@ -395,7 +442,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                           key={option.attributeName}
                           className="fs-block-option-button-group"
                           label={option.label}
-                          value={attributes[option.attributeName]}
+                          value={attributes[option.attributeName] ?? option.default ?? ''}
                           isBlock
                           onChange={(newValue) => setOptionAttributes({ [option.attributeName]: newValue })}
                           __nextHasNoMarginBottom

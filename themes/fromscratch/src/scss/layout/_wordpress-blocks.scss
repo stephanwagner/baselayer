@@ -157,27 +157,15 @@
 
     // Columns: Bild-Text-Layout
 
-    &.-image-left-text-right {
-      .wp-block-column:first-child {
+    &.-image-text-layout {
+      > .wp-block-column:has(.wp-block-image) {
         align-self: flex-start;
       }
 
-      .wp-block-column:last-child {
+      > .wp-block-column:not(:has(.wp-block-image)) {
         display: flex;
         flex-direction: column;
         justify-content: center;
-      }
-    }
-
-    &.-image-right-text-left {
-      .wp-block-column:first-child {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-      }
-
-      .wp-block-column:last-child {
-        align-self: flex-start;
       }
     }
 
