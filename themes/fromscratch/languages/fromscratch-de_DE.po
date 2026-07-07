@@ -2534,11 +2534,8 @@ msgstr "Wiederverwendbare Blöcke"
 msgid "Uncategorized"
 msgstr "Nicht kategorisiert"
 
-msgid "Show all blocks"
-msgstr "Alle Blöcke anzeigen"
-
-msgid "Show fewer blocks"
-msgstr "Weniger Blöcke anzeigen"
+msgid "All blocks"
+msgstr "Alle Blöcke"
 
 msgid "Hidden blocks"
 msgstr "Ausgeblendete Blöcke"

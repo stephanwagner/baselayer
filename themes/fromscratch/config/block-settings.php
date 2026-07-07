@@ -151,10 +151,22 @@ return [
 		'core/math' => [
 			'hidden'  => true,
 		],
+		'core/shortcode' => [
+			'hidden'  => true,
+		],
+		'core/html' => [
+			'hidden'  => true,
+		],
+		'acf/map' => [
+			'hidden'  => true,
+		],
+		'acf/map-dsgvo' => [
+			'hidden'  => true,
+		],
 
 		// Not allowed
 		'core/details' => [
-			'hidden'  => true,
+			'allowed'  => true,
 		],
 		'core/preformatted' => [
 			'allowed'  => false,

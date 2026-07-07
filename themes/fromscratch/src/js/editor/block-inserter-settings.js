@@ -106,20 +106,12 @@ function isInserterOpenedFromStore(select) {
   return false;
 }
 
-function findInserterMountPoint() {
-  const search = document.querySelector('.block-editor-inserter__search');
-  if (search && search.parentElement) {
-    return search.parentElement;
-  }
+const TOGGLE_MOUNT_CLASS = 'fs-inserter-has-toggle';
 
+function findInserterSearchRoot() {
   const selectors = [
-    '.editor-inserter-sidebar__content',
-    '.editor-inserter-sidebar',
-    '.block-editor-inserter__menu',
-    '.block-editor-inserter__main-area',
-    '.block-editor-tabbed-sidebar',
-    '.interface-interface-skeleton__secondary-sidebar',
-    '.block-editor-inserter__popover .components-popover__content',
+    '.block-editor-inserter__search',
+    '.editor-inserter-sidebar .block-editor-inserter__search',
   ];
 
   for (let i = 0; i < selectors.length; i += 1) {
@@ -130,6 +122,29 @@ function findInserterMountPoint() {
   }
 
   return null;
+}
+
+function findInserterSearchControl(searchRoot) {
+  if (!searchRoot) {
+    return null;
+  }
+
+  for (let i = 0; i < searchRoot.children.length; i += 1) {
+    const child = searchRoot.children[i];
+    if (child.classList.contains('fs-inserter-toggle-host')) {
+      continue;
+    }
+
+    if (child.querySelector('input[type="search"], input[type="text"]')) {
+      return child;
+    }
+  }
+
+  return (
+    searchRoot.querySelector('.components-base-control.components-input-control')
+    || searchRoot.querySelector('.components-search-control')
+    || searchRoot.querySelector('.components-base-control')
+  );
 }
 
 function destroyToggleUi() {
@@ -145,20 +160,34 @@ function destroyToggleUi() {
     toggleHost = null;
   }
 
-  toggleMountPoint = null;
+  if (toggleMountPoint) {
+    toggleMountPoint.classList.remove(TOGGLE_MOUNT_CLASS);
+    toggleMountPoint.classList.remove('fs-inserter-search-row');
+    toggleMountPoint = null;
+  }
 }
 
-function ensureToggleHost(mountPoint) {
-  if (toggleHost && toggleMountPoint === mountPoint) {
+function ensureToggleHost(searchRoot) {
+  const searchControl = findInserterSearchControl(searchRoot);
+  if (!searchControl) {
+    return null;
+  }
+
+  searchRoot.classList.add(TOGGLE_MOUNT_CLASS);
+
+  if (toggleHost && toggleMountPoint === searchRoot && toggleHost.parentElement === searchRoot) {
+    if (searchControl.nextElementSibling !== toggleHost) {
+      searchControl.insertAdjacentElement('afterend', toggleHost);
+    }
     return toggleHost;
   }
 
   destroyToggleUi();
 
-  toggleMountPoint = mountPoint;
+  toggleMountPoint = searchRoot;
   toggleHost = document.createElement('div');
   toggleHost.className = 'fs-inserter-toggle-host';
-  mountPoint.insertBefore(toggleHost, mountPoint.firstChild);
+  searchControl.insertAdjacentElement('afterend', toggleHost);
 
   return toggleHost;
 }
@@ -167,6 +196,7 @@ function InserterToggleControl() {
   const preferencesScope = getPreferencesScope();
   const preferencesKey = getPreferencesKey();
   const i18n = getI18n();
+  const label = i18n.showAllBlocks || 'All blocks';
 
   const showHidden = useSelect(
     (select) => select('core/preferences').get(preferencesScope, preferencesKey) ?? false,
@@ -193,9 +223,14 @@ function InserterToggleControl() {
           applyHiddenInserterState(next);
         },
         className: 'fs-inserter-toggle__button',
+        'aria-pressed': showHidden,
       },
-      showHidden ? i18n.hideHiddenBlocks || 'Show fewer blocks' : i18n.showHiddenBlocks || 'Show all blocks'
-    )
+      el('span', {
+        className: 'fs-icon -icon-' + (showHidden ? 'checkbox-checked' : 'checkbox'),
+        'aria-hidden': 'true',
+      }),
+      el('span', { className: 'fs-inserter-toggle__label' }, label),
+    ),
   );
 }
 
@@ -231,13 +266,18 @@ function syncToggleUi() {
     return;
   }
 
-  const mountPoint = findInserterMountPoint();
-  if (!mountPoint) {
+  const searchRoot = findInserterSearchRoot();
+  if (!searchRoot) {
     destroyToggleUi();
     return;
   }
 
-  ensureToggleHost(mountPoint);
+  const host = ensureToggleHost(searchRoot);
+  if (!host) {
+    destroyToggleUi();
+    return;
+  }
+
   renderToggleUi();
 }
 

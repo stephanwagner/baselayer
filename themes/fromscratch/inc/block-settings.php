@@ -1171,10 +1171,8 @@ function fs_block_settings_editor_config(): array
 		'preferencesScope' => 'fromscratch',
 		'preferencesKey' => 'showHiddenBlocks',
 		'i18n'            => [
-			'showHiddenBlocks'  => __('Show all blocks', 'fromscratch'),
-			'hideHiddenBlocks'  => __('Show fewer blocks', 'fromscratch'),
+			'showAllBlocks'     => __('All blocks', 'fromscratch'),
 			'hiddenBlocksPanel' => __('Hidden blocks', 'fromscratch'),
-			'favoritesCategory' => __('Favorites', 'fromscratch'),
 		],
 	];
 }
