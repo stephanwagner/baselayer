@@ -8,15 +8,6 @@ export const SPACER_RESPONSIVE_HEIGHT_SIZES = [
   { value: 'xl', label: 'XL' },
 ];
 
-/** Desktop and smallest breakpoint heights (px). Keep in sync with `_variables.scss` content margins. */
-export const SPACER_RESPONSIVE_HEIGHT_PREVIEWS = {
-  xs: { base: 24, min: 24 },
-  s: { base: 32, min: 24 },
-  m: { base: 48, min: 24 },
-  l: { base: 64, min: 32 },
-  xl: { base: 96, min: 32 },
-};
-
 const CLASS_PREFIX = '-spacer-height-';
 
 /** Every class name this control may add or replace. */
@@ -49,18 +40,3 @@ export const spacerResponsiveHeightClassesFromAttributes = (option, attributes) 
 };
 
 export const spacerResponsiveHeightAttributeKey = (option) => option.attributeName;
-
-/** Inline preview for the selected responsive size, e.g. `48px → 24px`. */
-export const spacerResponsiveHeightPreviewText = (displayValue) => {
-  if (!displayValue || displayValue === 'unset') {
-    return '';
-  }
-
-  const preview = SPACER_RESPONSIVE_HEIGHT_PREVIEWS[displayValue];
-
-  if (!preview) {
-    return '';
-  }
-
-  return `${preview.base}px → ${preview.min}px`;
-};

@@ -1,7 +1,6 @@
 import {
   SPACER_RESPONSIVE_HEIGHT_SIZES,
   displaySpacerResponsiveHeight,
-  spacerResponsiveHeightPreviewText,
   storedSpacerResponsiveHeight,
 } from './spacer-responsive-height-utils';
 import { BlockOptionToggleGroupOption } from './block-option-toggle-group-option';
@@ -15,7 +14,6 @@ const ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
 export function SpacerResponsiveHeightControl({ option, attributes, onChange }) {
   const stored = attributes[option.attributeName] ?? '';
   const displayValue = displaySpacerResponsiveHeight(stored);
-  const previewText = spacerResponsiveHeightPreviewText(displayValue);
 
   const setSize = (pickedSize) => {
     const className = storedSpacerResponsiveHeight(pickedSize);
@@ -34,14 +32,7 @@ export function SpacerResponsiveHeightControl({ option, attributes, onChange }) 
 
   return (
     <div className="fs-spacer-responsive-height">
-      {option.label ? (
-        <div className="fs-spacer-responsive-height__header">
-          <span className="fs-spacer-responsive-height__label">{option.label}</span>
-          {previewText ? (
-            <span className="fs-spacer-responsive-height__preview">{previewText}</span>
-          ) : null}
-        </div>
-      ) : null}
+      {option.label ? <span className="fs-spacer-responsive-height__label">{option.label}</span> : null}
 
       <ToggleGroupControl
         className="fs-spacer-responsive-height__sizes fs-block-option-button-group"
