@@ -227,7 +227,14 @@ function BlockCard({ block, flags, onChange }) {
   return el(
     'article',
     {
-      className: `fs-block-card${allowed ? ' is-allowed' : ' is-disallowed'}`,
+      className: [
+        'fs-block-card',
+        allowed ? 'is-allowed' : 'is-disallowed',
+        allowed && mode === 'hidden' ? 'is-mode-hidden' : '',
+        allowed && mode === 'favorite' ? 'is-mode-favorite' : '',
+      ]
+        .filter(Boolean)
+        .join(' '),
     },
     el(
       'div',
@@ -271,7 +278,7 @@ function BlockCard({ block, flags, onChange }) {
         'button',
         {
           type: 'button',
-          className: `fs-block-card__mode${mode === 'hidden' ? ' is-active' : ''}`,
+          className: `fs-block-card__mode fs-block-card__mode--hidden${mode === 'hidden' ? ' is-active' : ''}`,
           'aria-pressed': mode === 'hidden' ? 'true' : 'false',
           disabled: !allowed,
           onClick: () => setMode(mode === 'hidden' ? '' : 'hidden'),
@@ -283,7 +290,7 @@ function BlockCard({ block, flags, onChange }) {
         'button',
         {
           type: 'button',
-          className: `fs-block-card__mode${mode === 'favorite' ? ' is-active' : ''}`,
+          className: `fs-block-card__mode fs-block-card__mode--favorite${mode === 'favorite' ? ' is-active' : ''}`,
           'aria-pressed': mode === 'favorite' ? 'true' : 'false',
           disabled: !allowed,
           onClick: () => setMode(mode === 'favorite' ? '' : 'favorite'),
@@ -437,13 +444,13 @@ function FilterGroup({ label, value, options, onChange }) {
         {
           key: option.value,
           type: 'button',
-          className: `fs-block-settings__filter-btn${value === option.value ? ' is-active' : ''}`,
+          className: `fs-block-settings__filter-icon${value === option.value ? ' is-active' : ''}`,
           'aria-pressed': value === option.value ? 'true' : 'false',
-          title: option.label,
+          'aria-label': option.label,
           onClick: () => onChange(option.value),
         },
         renderDashicon(option.icon),
-        el('span', { className: 'screen-reader-text' }, option.label),
+        el('span', { className: 'fs-block-settings__filter-tip', 'aria-hidden': 'true' }, option.label),
       ),
     ),
   );
@@ -717,8 +724,20 @@ function BlockSettingsApp() {
       { className: 'fs-block-settings__toolbar' },
       el(
         'div',
-        { className: 'fs-block-settings__filters-row' },
-        el('span', { className: 'fs-block-settings__filters-label' }, i18n.filtersLabel || __('Filters:', 'fromscratch')),
+        { className: 'fs-block-settings__toolbar-row' },
+        el(
+          'p',
+          { className: 'fs-block-settings__search-wrap' },
+          el('label', { className: 'screen-reader-text', htmlFor: 'fs-block-settings-search' }, i18n.searchPlaceholder || ''),
+          el('input', {
+            type: 'search',
+            id: 'fs-block-settings-search',
+            className: 'regular-text',
+            placeholder: i18n.searchPlaceholder || '',
+            value: search,
+            onInput: (event) => setSearch(event.target.value),
+          }),
+        ),
         el(
           'div',
           { className: 'fs-block-settings__filters' },
@@ -741,19 +760,6 @@ function BlockSettingsApp() {
             onChange: (value) => setFilters((current) => ({ ...current, favorite: value })),
           }),
         ),
-      ),
-      el(
-        'p',
-        { className: 'fs-block-settings__search-wrap' },
-        el('label', { className: 'screen-reader-text', htmlFor: 'fs-block-settings-search' }, i18n.searchPlaceholder || ''),
-        el('input', {
-          type: 'search',
-          id: 'fs-block-settings-search',
-          className: 'regular-text',
-          placeholder: i18n.searchPlaceholder || '',
-          value: search,
-          onInput: (event) => setSearch(event.target.value),
-        }),
       ),
     ),
     !hasVisibleBlocks &&
