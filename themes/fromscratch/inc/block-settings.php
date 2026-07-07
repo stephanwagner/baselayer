@@ -1052,6 +1052,7 @@ function fs_block_settings_admin_config(): array
 		'blockVariationAllowGenericInserter' => $block_variation_export['allowGenericInserter'],
 		'blockVariationHardDisallowed' => $block_variation_export['hardDisallowed'],
 		'i18n'                => [
+			'pageTitle'               => __('Blocks', 'fromscratch'),
 			'intro'                   => __('Control which blocks are available in the page editor inserter.', 'fromscratch'),
 			'searchPlaceholder'       => __('Search blocks…', 'fromscratch'),
 			'hidden'                  => __('Hidden', 'fromscratch'),
@@ -1064,8 +1065,7 @@ function fs_block_settings_admin_config(): array
 			'systemBlocksToggle'      => _n('%d block hidden by system', '%d blocks hidden by system', count($hard_disallowed), 'fromscratch'),
 			'systemBlocksDescription' => __('These blocks and block variations are disabled in code and cannot be enabled here.', 'fromscratch'),
 			'systemBlocksHelpAdmin'   => __('You can ask a developer to unlock these blocks:', 'fromscratch'),
-			'systemBlocksHelpDeveloperBefore' => __('To change this list, edit', 'fromscratch'),
-			'systemBlocksHelpDeveloperAfter'  => __('in the theme.', 'fromscratch'),
+			'systemBlocksHelpDeveloper' => __('To change this list, edit <filepath/> (<configkey/>) in the theme.', 'fromscratch'),
 			'save'                    => __('Save Changes', 'fromscratch'),
 			'filterAllowed'           => __('Allowed in inserter', 'fromscratch'),
 			'filterHidden'            => __('Inserter visibility', 'fromscratch'),

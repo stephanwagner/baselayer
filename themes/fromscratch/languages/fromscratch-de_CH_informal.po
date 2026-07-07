@@ -207,7 +207,7 @@ msgid "Right"
 msgstr "Rechts"
 
 msgid "Favorite"
-msgstr "Favorite"
+msgstr "Favorit"
 
 msgid "Favorites"
 msgstr "Favoriten"
@@ -2451,6 +2451,97 @@ msgid "Footer navigation"
 msgstr "Fußnavigation"
 
 # Blocks
+
+msgid "Blocks"
+msgstr "Blöcke"
+
+msgid "Control which blocks are available in the page editor inserter."
+msgstr "Legen Sie fest, welche Blöcke im Seiten-Editor-Inserter verfügbar sind."
+
+msgid "Search blocks…"
+msgstr "Blöcke suchen…"
+
+msgid "Hidden"
+msgstr "Versteckt"
+
+msgid "Allowed in inserter"
+msgstr "Im Inserter erlaubt"
+
+msgid "Inserter visibility"
+msgstr "Sichtbarkeit im Inserter"
+
+msgid "Hidden by system"
+msgstr "Vom System ausgeblendet"
+
+msgid "%d item hidden by system"
+msgid_plural "%d items hidden by system"
+msgstr[0] "%d Element vom System ausgeblendet"
+msgstr[1] "%d Elemente vom System ausgeblendet"
+
+msgid "%d block hidden by system"
+msgid_plural "%d blocks hidden by system"
+msgstr[0] "%d Block vom System ausgeblendet"
+msgstr[1] "%d Blöcke vom System ausgeblendet"
+
+msgid "These blocks and block variations are disabled in code and cannot be enabled here."
+msgstr "Diese Blöcke und Block-Variationen sind im Code deaktiviert und können hier nicht aktiviert werden."
+
+msgid "You can ask a developer to unlock these blocks:"
+msgstr "Sie können einen Entwickler bitten, diese Blöcke freizuschalten:"
+
+msgid "To change this list, edit <filepath/> (<configkey/>) in the theme."
+msgstr "Um diese Liste zu ändern, bearbeite <filepath/> (<configkey/>) im Theme."
+
+msgid "Filters:"
+msgstr "Filter:"
+
+msgid "All"
+msgstr "Alle"
+
+msgid "Not hidden"
+msgstr "Nicht ausgeblendet"
+
+msgid "Not favorite"
+msgstr "Kein Favorit"
+
+msgid "No blocks match the current search or filters."
+msgstr "Keine Blöcke entsprechen der aktuellen Suche oder den Filtern."
+
+msgid "Variation of"
+msgstr "Variation von"
+
+msgid "Enable the parent block to manage this variation."
+msgstr "Aktivieren Sie den übergeordneten Block, um diese Variation zu verwalten."
+
+msgid "Variation hidden by system"
+msgstr "Variation vom System ausgeblendet"
+
+msgid "Text"
+msgstr "Text"
+
+msgid "Design"
+msgstr "Design"
+
+msgid "Widgets"
+msgstr "Widgets"
+
+msgid "Embeds"
+msgstr "Einbettungen"
+
+msgid "Reusable blocks"
+msgstr "Wiederverwendbare Blöcke"
+
+msgid "Uncategorized"
+msgstr "Nicht kategorisiert"
+
+msgid "Show all blocks"
+msgstr "Alle Blöcke anzeigen"
+
+msgid "Show fewer blocks"
+msgstr "Weniger Blöcke anzeigen"
+
+msgid "Hidden blocks"
+msgstr "Ausgeblendete Blöcke"
 
 msgid "Next slide"
 msgstr "Nächste Folie"

@@ -1,4 +1,4 @@
-const { createElement: el, useState, useEffect, useMemo, Fragment } = wp.element;
+const { createElement: el, useState, useEffect, useMemo, Fragment, createInterpolateElement } = wp.element;
 const { getBlockType } = wp.blocks;
 const { __, sprintf } = wp.i18n;
 
@@ -365,13 +365,14 @@ function SystemBlocksHelp({ help, i18n }) {
     return el(
       'p',
       { className: 'description' },
-      i18n.systemBlocksHelpDeveloperBefore || __('To change this list, edit', 'fromscratch'),
-      ' ',
-      el('code', null, help.configPath || 'config/block-settings.php'),
-      ' (',
-      el('code', null, help.configKey || 'hardDisallowed'),
-      ') ',
-      i18n.systemBlocksHelpDeveloperAfter || __('in the theme.', 'fromscratch'),
+      createInterpolateElement(
+        i18n.systemBlocksHelpDeveloper
+          || __('To change this list, edit <filepath/> (<configkey/>) in the theme.', 'fromscratch'),
+        {
+          filepath: el('code', null, help.configPath || 'config/block-settings.php'),
+          configkey: el('code', null, help.configKey || 'hardDisallowed'),
+        },
+      ),
     );
   }
 
@@ -717,7 +718,7 @@ function BlockSettingsApp() {
   return el(
     Fragment,
     null,
-    el('h2', { className: 'title' }, __('Blocks', 'fromscratch')),
+    el('h2', { className: 'title' }, i18n.pageTitle || ''),
     el('p', { className: 'description fs-block-settings__intro' }, i18n.intro || ''),
     el(
       'div',

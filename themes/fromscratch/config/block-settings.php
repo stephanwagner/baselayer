@@ -148,17 +148,14 @@ return [
 		],
 
 		// Allowed but hidden
-		'core/details' => [
-			'hidden'  => true,
-		],
 		'core/math' => [
-			'hidden'  => true,
-		],
-		'core/more' => [
 			'hidden'  => true,
 		],
 
 		// Not allowed
+		'core/details' => [
+			'hidden'  => true,
+		],
 		'core/preformatted' => [
 			'allowed'  => false,
 		],

@@ -127,6 +127,12 @@ add_action('admin_enqueue_scripts', function ($hook_suffix) {
 			fs_block_settings_admin_config()
 		);
 	}
+
+	wp_set_script_translations(
+		'fromscratch-block-settings',
+		'fromscratch',
+		get_template_directory() . '/languages'
+	);
 }, 11);
 
 function fs_render_theme_settings_blocks_tab(): void
