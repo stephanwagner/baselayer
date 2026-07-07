@@ -206,6 +206,12 @@ msgstr "Links"
 msgid "Right"
 msgstr "Rechts"
 
+msgid "Favorite"
+msgstr "Favorite"
+
+msgid "Favorites"
+msgstr "Favoriten"
+
 # Templates
 
 msgid "Posts pagination"

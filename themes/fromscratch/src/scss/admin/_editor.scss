@@ -45,6 +45,15 @@
   }
 }
 
+// Block inserter
+
+.block-editor-inserter__panel-header {
+  .dashicons-star-filled {
+    font-size: 16px;
+    transform: translateY(1px);
+  }
+}
+
 // Columns image left / right
 
 .wp-block-columns.-image-right-text-left,
