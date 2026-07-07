@@ -143,34 +143,11 @@ function getInitialVariationSettings(variationRegistry) {
   return out;
 }
 
-function VariationCard({ blockName, variation, allowed, parentAllowed, hardDisallowed, onChange }) {
+function VariationCard({ blockName, variation, allowed, parentAllowed, onChange }) {
   const config = getConfig();
   const i18n = config.i18n || {};
   const title = variation.title || variation.name;
   const slug = variation.name;
-
-  if (hardDisallowed) {
-    return el(
-      'article',
-      { className: 'fs-block-card fs-block-card--variation fs-block-card--system' },
-      el(
-        'div',
-        { className: 'fs-block-card__top' },
-        el(
-          'div',
-          { className: 'fs-block-card__identity' },
-          el('span', { className: 'fs-block-settings__icon' }, renderBlockIcon(variation.icon)),
-          el(
-            'div',
-            { className: 'fs-block-card__meta' },
-            el('h4', { className: 'fs-block-card__title' }, title),
-            el('code', { className: 'fs-block-card__slug' }, `${blockName}/${slug}`),
-            el('p', { className: 'fs-block-card__system-note' }, i18n.hiddenBySystem || ''),
-          ),
-        ),
-      ),
-    );
-  }
 
   const interactive = Boolean(parentAllowed);
 
@@ -344,6 +321,34 @@ function SystemBlockCard({ block }) {
   );
 }
 
+function SystemVariationCard({ blockName, variation }) {
+  const config = getConfig();
+  const i18n = config.i18n || {};
+  const title = variation.title || variation.name;
+  const slug = variation.name;
+
+  return el(
+    'article',
+    { className: 'fs-block-card fs-block-card--variation fs-block-card--system' },
+    el(
+      'div',
+      { className: 'fs-block-card__top' },
+      el(
+        'div',
+        { className: 'fs-block-card__identity' },
+        el('span', { className: 'fs-block-settings__icon' }, renderBlockIcon(variation.icon)),
+        el(
+          'div',
+          { className: 'fs-block-card__meta' },
+          el('h4', { className: 'fs-block-card__title' }, title),
+          el('code', { className: 'fs-block-card__slug' }, `${blockName}/${slug}`),
+          el('p', { className: 'fs-block-card__system-note' }, i18n.hiddenBySystem || ''),
+        ),
+      ),
+    ),
+  );
+}
+
 function SystemBlocksHelp({ help, i18n }) {
   if (!help || !help.type) {
     return null;
@@ -493,6 +498,10 @@ function buildCategoryItems(group, variationRegistry) {
     }
 
     (variationRegistry[block.name] || []).forEach((variation) => {
+      if (isVariationHardDisallowed(block.name, variation.name)) {
+        return;
+      }
+
       items.push({
         kind: 'variation',
         blockName: block.name,
@@ -528,6 +537,38 @@ function filterGroups(groups, search, settings, filters, variationRegistry, vari
 
 function filterSystemBlocks(blocks, search) {
   return blocks.filter((block) => matchesSearch(block, search));
+}
+
+function buildSystemVariations(variationRegistry, search) {
+  const items = [];
+  const hardDisallowedByBlock = getConfig().blockVariationHardDisallowed || {};
+
+  getConfiguredVariationBlocks().forEach((blockName) => {
+    const slugs = Array.isArray(hardDisallowedByBlock[blockName]) ? hardDisallowedByBlock[blockName] : [];
+    if (slugs.length === 0) {
+      return;
+    }
+
+    const variationsBySlug = {};
+    (variationRegistry[blockName] || []).forEach((variation) => {
+      variationsBySlug[variation.name] = variation;
+    });
+
+    slugs.forEach((slug) => {
+      const variation = variationsBySlug[slug] || { name: slug, title: slug };
+      if (!matchesVariationSearch(blockName, variation, search)) {
+        return;
+      }
+
+      items.push({ blockName, variation });
+    });
+  });
+
+  return items.sort((a, b) => {
+    const titleA = (a.variation.title || a.variation.name || '').toString();
+    const titleB = (b.variation.title || b.variation.name || '').toString();
+    return titleA.localeCompare(titleB, undefined, { sensitivity: 'base' });
+  });
 }
 
 const DEFAULT_FILTERS = {
@@ -631,6 +672,13 @@ function BlockSettingsApp() {
 
   const systemBlocks = useMemo(() => filterSystemBlocks(config.systemBlocks || [], search), [config.systemBlocks, search]);
 
+  const systemVariations = useMemo(
+    () => buildSystemVariations(variationRegistry, search),
+    [variationRegistry, search],
+  );
+
+  const systemItemCount = systemBlocks.length + systemVariations.length;
+
   const hasVisibleBlocks = configurableGroups.some((group) => group.items.length > 0);
 
   const updateBlock = (name, nextFlags) => {
@@ -731,7 +779,6 @@ function BlockSettingsApp() {
 
             const slug = item.variation.name;
             const parentAllowed = Boolean((settings[item.blockName] || { allowed: true }).allowed);
-            const hardDisallowed = isVariationHardDisallowed(item.blockName, slug);
             const flags = (variationSettings[item.blockName] || {})[slug] || { allowed: false };
 
             return el(VariationCard, {
@@ -740,7 +787,6 @@ function BlockSettingsApp() {
               variation: item.variation,
               allowed: Boolean(flags.allowed),
               parentAllowed,
-              hardDisallowed,
               onChange: (nextFlags) =>
                 setVariationSettings((current) => ({
                   ...current,
@@ -754,7 +800,7 @@ function BlockSettingsApp() {
         ),
       ),
     ),
-    systemBlocks.length > 0 &&
+    systemItemCount > 0 &&
       el(
         'div',
         { className: 'fs-block-settings__system' },
@@ -769,8 +815,8 @@ function BlockSettingsApp() {
             onClick: () => setSystemOpen((open) => !open),
           },
           sprintf(
-            i18n.systemBlocksToggle || _n('%d block hidden by system', '%d blocks hidden by system', systemBlocks.length, 'fromscratch'),
-            systemBlocks.length,
+            i18n.systemItemsToggle || i18n.systemBlocksToggle || _n('%d hidden by system', '%d hidden by system', systemItemCount, 'fromscratch'),
+            systemItemCount,
           ),
         ),
         systemOpen &&
@@ -779,10 +825,18 @@ function BlockSettingsApp() {
             { id: 'fs-block-settings-system-panel', className: 'fs-block-settings__system-panel' },
             el('p', { className: 'description' }, i18n.systemBlocksDescription || ''),
             el(SystemBlocksHelp, { help: config.systemBlocksHelp, i18n }),
+            el(SystemBlocksHelp, { help: config.blockVariationSystemHelp, i18n }),
             el(
               'div',
               { className: 'fs-block-settings__system-grid', style: { marginTop: 16 } },
               systemBlocks.map((block) => el(SystemBlockCard, { key: block.name, block })),
+              systemVariations.map(({ blockName, variation }) =>
+                el(SystemVariationCard, {
+                  key: `${blockName}/${variation.name}`,
+                  blockName,
+                  variation,
+                }),
+              ),
             ),
           ),
       ),

@@ -999,6 +999,12 @@ function fs_block_settings_admin_config(): array
 
 	$block_variation_export = fs_block_variation_admin_export();
 
+	$variation_hard_count = 0;
+	foreach (fs_block_variation_configured_blocks() as $block_name) {
+		$variation_hard_count += count(fs_block_variation_hard_disallowed($block_name));
+	}
+	$system_item_count = count($hard_disallowed) + $variation_hard_count;
+
 	return [
 		'settings'            => $settings,
 		'hardDisallowed'      => $hard_disallowed,
@@ -1021,8 +1027,9 @@ function fs_block_settings_admin_config(): array
 			'allowedInInserter'       => __('Allowed in inserter', 'fromscratch'),
 			'inserterVisibility'      => __('Inserter visibility', 'fromscratch'),
 			'hiddenBySystem'          => __('Hidden by system', 'fromscratch'),
+			'systemItemsToggle'       => _n('%d item hidden by system', '%d items hidden by system', max(1, $system_item_count), 'fromscratch'),
 			'systemBlocksToggle'      => _n('%d block hidden by system', '%d blocks hidden by system', count($hard_disallowed), 'fromscratch'),
-			'systemBlocksDescription' => __('These blocks are disabled in code and cannot be enabled here.', 'fromscratch'),
+			'systemBlocksDescription' => __('These blocks and block variations are disabled in code and cannot be enabled here.', 'fromscratch'),
 			'systemBlocksHelpAdmin'   => __('You can ask a developer to unlock these blocks:', 'fromscratch'),
 			'systemBlocksHelpDeveloperBefore' => __('To change this list, edit', 'fromscratch'),
 			'systemBlocksHelpDeveloperAfter'  => __('in the theme.', 'fromscratch'),
