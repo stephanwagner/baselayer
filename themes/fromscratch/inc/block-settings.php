@@ -513,47 +513,6 @@ function fs_embed_variation_settings_parse_posted_settings(): array
 }
 
 /**
- * Contextual help for hard-disallowed block variations (admin vs developer).
- *
- * @return array<string, string>|null
- */
-function fs_block_variation_system_help(): ?array
-{
-	$has_hard_disallowed = false;
-
-	foreach (fs_block_variation_configured_blocks() as $block_name) {
-		if (fs_block_variation_hard_disallowed($block_name) !== []) {
-			$has_hard_disallowed = true;
-			break;
-		}
-	}
-
-	if (!$has_hard_disallowed) {
-		return null;
-	}
-
-	$is_developer = function_exists('fs_is_developer_user') && fs_is_developer_user((int) get_current_user_id());
-
-	if ($is_developer) {
-		return [
-			'type'       => 'developer',
-			'configPath' => 'config/block-settings.php',
-			'configKey'  => 'blockVariations.*.hardDisallowed',
-		];
-	}
-
-	$email = function_exists('fs_developer_email') ? fs_developer_email() : '';
-	if ($email !== '' && !is_email($email)) {
-		$email = '';
-	}
-
-	return [
-		'type'  => 'admin',
-		'email' => $email,
-	];
-}
-
-/**
  * Export block variation settings for JS config.
  *
  * @return array<string, mixed>
@@ -1018,11 +977,11 @@ function fs_block_settings_admin_config(): array
 		'blockVariationDefaultAllowed' => $block_variation_export['defaultAllowed'],
 		'blockVariationAllowGenericInserter' => $block_variation_export['allowGenericInserter'],
 		'blockVariationHardDisallowed' => $block_variation_export['hardDisallowed'],
-		'blockVariationSystemHelp'    => fs_block_variation_system_help(),
 		'i18n'                => [
-			'intro'                   => __('Control which blocks are available in the page editor inserter (+).', 'fromscratch'),
+			'intro'                   => __('Control which blocks are available in the page editor inserter.', 'fromscratch'),
 			'searchPlaceholder'       => __('Search blocks…', 'fromscratch'),
 			'hidden'                  => __('Hidden', 'fromscratch'),
+			'favorite'               => __('Favorite', 'fromscratch'),
 			'favorites'               => __('Favorites', 'fromscratch'),
 			'allowedInInserter'       => __('Allowed in inserter', 'fromscratch'),
 			'inserterVisibility'      => __('Inserter visibility', 'fromscratch'),

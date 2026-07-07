@@ -296,7 +296,7 @@ function BlockCard({ block, flags, onChange }) {
           onClick: () => setMode(mode === 'favorite' ? '' : 'favorite'),
         },
         el('span', { className: 'dashicons dashicons-star-filled', 'aria-hidden': 'true' }),
-        el('span', null, i18n.favorites || __('Favorites', 'fromscratch')),
+        el('span', null, i18n.favorite || __('Favorite', 'fromscratch')),
       ),
     ),
   );
@@ -831,7 +831,6 @@ function BlockSettingsApp() {
             { id: 'fs-block-settings-system-panel', className: 'fs-block-settings__system-panel' },
             el('p', { className: 'description' }, i18n.systemBlocksDescription || ''),
             el(SystemBlocksHelp, { help: config.systemBlocksHelp, i18n }),
-            el(SystemBlocksHelp, { help: config.blockVariationSystemHelp, i18n }),
             el(
               'div',
               { className: 'fs-block-settings__system-grid', style: { marginTop: 16 } },
