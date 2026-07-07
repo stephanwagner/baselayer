@@ -1,6 +1,7 @@
 import {
-  CONTENT_MARGIN_SIZES,
+  contentMarginSizesForOption,
   displayMarginSize,
+  resetMarginSize,
   storedMarginSize,
 } from './content-margin-utils';
 import { BlockOptionToggleGroupOption } from './block-option-toggle-group-option';
@@ -15,15 +16,17 @@ const ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
 export function ContentMarginControl({ option, attributes, onChange }) {
   const { top, bottom, linked } = option.attributeNames;
   const defaultSize = option.defaultSize ?? '';
+  const allowUnset = option.allowUnset === true;
+  const sizes = contentMarginSizesForOption(option);
   const isLinked = attributes[linked] !== false;
   const topValue = attributes[top] ?? '';
   const bottomValue = attributes[bottom] ?? '';
 
-  const displayTop = displayMarginSize(topValue, defaultSize);
-  const displayBottom = displayMarginSize(bottomValue, defaultSize);
+  const displayTop = displayMarginSize(topValue, allowUnset);
+  const displayBottom = displayMarginSize(bottomValue, allowUnset);
 
   const setTop = (pickedSize) => {
-    const stored = storedMarginSize(pickedSize, defaultSize);
+    const stored = storedMarginSize(pickedSize);
 
     if (isLinked) {
       onChange({
@@ -37,20 +40,22 @@ export function ContentMarginControl({ option, attributes, onChange }) {
   };
 
   const setBottom = (pickedSize) => {
-    onChange({ [bottom]: storedMarginSize(pickedSize, defaultSize) });
+    onChange({ [bottom]: storedMarginSize(pickedSize) });
   };
 
   const resetTop = () => {
+    const stored = resetMarginSize(defaultSize);
+
     if (isLinked) {
-      onChange({ [top]: '', [bottom]: '' });
+      onChange({ [top]: stored, [bottom]: stored });
       return;
     }
 
-    onChange({ [top]: '' });
+    onChange({ [top]: stored });
   };
 
   const resetBottom = () => {
-    onChange({ [bottom]: '' });
+    onChange({ [bottom]: resetMarginSize(defaultSize) });
   };
 
   const revealBottom = () => {
@@ -78,7 +83,7 @@ export function ContentMarginControl({ option, attributes, onChange }) {
         onChange={onSelect}
         __nextHasNoMarginBottom
       >
-        {CONTENT_MARGIN_SIZES.map((size) => (
+        {sizes.map((size) => (
           <BlockOptionToggleGroupOption
             key={size.value}
             value={size.value}

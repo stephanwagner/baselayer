@@ -4,21 +4,14 @@
  * @param {string} defaultClass Combined default class, e.g. `m` or ''.
  */
 function getContentMarginControl(defaultClass = '') {
-  console.log(defaultClass);
-
-
   const match = (defaultClass || '').match(/^(none|xs|s|m|l|xl)$/);
-  
-  console.log(match);
-
-  const defaultSize = match ? '-content-margin-' + match[1] : '';
-
-  console.log(defaultSize);
+  const defaultSize = match ? match[1] : '';
 
   return {
     type: 'content-margin',
     label: 'Abstände',
     defaultSize,
+    allowUnset: defaultSize === '',
     attributeNames: {
       top: 'contentMarginTop',
       bottom: 'contentMarginBottom',

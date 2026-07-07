@@ -13,9 +13,13 @@
 
 .fs-limit-width__row {
   display: flex;
-  flex-wrap: wrap;
   align-items: stretch;
   gap: 8px;
+  flex: 1;
+  
+  > :first-child {
+    flex: 1;
+  }
 }
 
 .fs-limit-width__sizes.components-toggle-group-control {

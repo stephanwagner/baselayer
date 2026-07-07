@@ -38,11 +38,6 @@ function fs_content_margin_parse_side_class(string $class_name): ?array
 	];
 }
 
-function fs_content_margin_resolve_size(string $size, string $default_size): string
-{
-	return $size === '' ? $default_size : $size;
-}
-
 /**
  * @param array<string, mixed> $option
  * @param array<string, mixed> $block
@@ -56,10 +51,6 @@ function fs_content_margin_classes_from_attributes(array $option, array $block):
 	$top_key = isset($names['top']) && is_string($names['top']) ? $names['top'] : 'contentMarginTop';
 	$bottom_key = isset($names['bottom']) && is_string($names['bottom']) ? $names['bottom'] : 'contentMarginBottom';
 	$linked_key = isset($names['linked']) && is_string($names['linked']) ? $names['linked'] : 'contentMarginLinked';
-
-	$default_size = isset($option['defaultSize']) && is_string($option['defaultSize'])
-		? $option['defaultSize']
-		: '';
 
 	$top_size = isset($block[$top_key]) && is_string($block[$top_key]) ? $block[$top_key] : '';
 	$bottom_size = isset($block[$bottom_key]) && is_string($block[$bottom_key]) ? $block[$bottom_key] : '';
@@ -88,20 +79,17 @@ function fs_content_margin_classes_from_attributes(array $option, array $block):
 	}
 
 	if ($is_linked) {
-		$size = fs_content_margin_resolve_size($top_size, $default_size);
-		return $size !== '' ? ['-content-margin-' . $size] : [];
+		return $top_size !== '' ? ['-content-margin-' . $top_size] : [];
 	}
 
 	$classes = [];
-	$resolved_top = fs_content_margin_resolve_size($top_size, $default_size);
-	$resolved_bottom = fs_content_margin_resolve_size($bottom_size, $default_size);
 
-	if ($resolved_top !== '') {
-		$classes[] = '-content-margin-top-' . $resolved_top;
+	if ($top_size !== '') {
+		$classes[] = '-content-margin-top-' . $top_size;
 	}
 
-	if ($resolved_bottom !== '') {
-		$classes[] = '-content-margin-bottom-' . $resolved_bottom;
+	if ($bottom_size !== '') {
+		$classes[] = '-content-margin-bottom-' . $bottom_size;
 	}
 
 	return $classes;

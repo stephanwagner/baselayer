@@ -185,10 +185,11 @@ blockOptions.forEach((block) => {
       block.options.forEach((option) => {
         if (option.type === 'content-margin') {
           const { top, bottom, linked } = option.attributeNames;
+          const defaultSize = option.defaultSize ?? '';
           settings.attributes = {
             ...settings.attributes,
-            [top]: { type: 'string', default: '' },
-            [bottom]: { type: 'string', default: '' },
+            [top]: { type: 'string', default: defaultSize },
+            [bottom]: { type: 'string', default: defaultSize },
             [linked]: { type: 'boolean', default: true },
             contentMargin: { type: 'string', default: '' },
             contentMarginAdjust: { type: 'string', default: '' },

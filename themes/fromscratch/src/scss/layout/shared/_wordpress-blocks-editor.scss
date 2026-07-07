@@ -28,21 +28,27 @@
     .-narrow,
     .-very-narrow,
     .-extra-narrow {
-      border-right: 1px dashed #ceced0;
-      border-left: 1px dashed #ceced0;
-      padding-right: 4px;
-      padding-left: 4px;
+      border-right: 1px dashed rgba(#000, 0.2);
+      border-left: 1px dashed rgba(#000, 0.2);
       margin-left: auto;
       margin-right: auto;
+
+      &:not(.has-background) {
+        padding-right: 4px;
+        padding-left: 4px;
+      }
     }
 
     .-narrow-left,
     .-very-narrow-left,
     .-extra-narrow-left {
-      border-right: 1px dashed #ceced0;
-      padding-right: 4px;
+      border-right: 1px dashed rgba(#000, 0.2);
       margin-right: auto !important;
       margin-left: calc((100vw - var(--fs-editor-content-width-outer)) / 2) !important;
+
+      &:not(.has-background) {
+        padding-right: 4px;
+      }
 
       @media (max-width: $editor-content-width-outer) {
         margin-left: 0 !important;
@@ -52,10 +58,13 @@
     .-narrow-right,
     .-very-narrow-right,
     .-extra-narrow-right {
-      border-left: 1px dashed #ceced0;
-      padding-left: 4px;
+      border-left: 1px dashed rgba(#000, 0.2);
       margin-left: auto !important;
       margin-right: calc((100vw - var(--fs-editor-content-width-outer)) / 2) !important;
+
+      &:not(.has-background) {
+        padding-left: 4px;
+      }
 
       @media (max-width: $editor-content-width-outer) {
         margin-right: 0 !important;

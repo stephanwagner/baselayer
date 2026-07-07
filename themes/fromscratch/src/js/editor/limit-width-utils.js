@@ -1,6 +1,6 @@
 /** Width size tokens mapped to existing `-narrow*` utility classes. */
 export const LIMIT_WIDTH_SIZES = [
-  { value: 'none', label: 'Ohne', icon: 'block' },
+  { value: 'unset', label: '—' },
   { value: 's', label: 'S' },
   { value: 'm', label: 'M' },
   { value: 'l', label: 'L' },
@@ -34,7 +34,7 @@ const LEGACY_LIMIT_WIDTH_BY_CLASS = {
 };
 
 const CLASS_BY_SIZE_AND_ALIGN = LIMIT_WIDTH_SIZES.reduce((map, { value: size }) => {
-  if (size === 'none') {
+  if (size === 'unset') {
     return map;
   }
 
@@ -89,10 +89,10 @@ export const parseLimitWidthStateFromClassName = (className) => {
 };
 
 /** UI value for the stored size attribute. */
-export const displayLimitWidthSize = (storedSize) => (storedSize ? storedSize : 'none');
+export const displayLimitWidthSize = (storedSize) => (storedSize === '' ? 'unset' : storedSize);
 
 /** Stored attribute value for a picked UI size. */
-export const storedLimitWidthSize = (pickedSize) => (pickedSize === 'none' ? '' : pickedSize);
+export const storedLimitWidthSize = (pickedSize) => (pickedSize === 'unset' ? '' : pickedSize);
 
 /** Class names implied by current limit-width attributes. */
 export const limitWidthClassesFromAttributes = (option, attributes) => {

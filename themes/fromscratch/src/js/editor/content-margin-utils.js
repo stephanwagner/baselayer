@@ -1,6 +1,7 @@
-/** Size tokens that map to existing `-content-margin-*` utility classes. */
+/** Size tokens for the content margin toggle (unset has no CSS class). */
 export const CONTENT_MARGIN_SIZES = [
-  { value: 'none', label: 'Ohne', icon: 'block' },
+  { value: 'unset', label: '—' },
+  { value: 'none', label: '0' },
   { value: 'xs', label: 'XS' },
   { value: 's', label: 'S' },
   { value: 'm', label: 'M' },
@@ -8,8 +9,19 @@ export const CONTENT_MARGIN_SIZES = [
   { value: 'xl', label: 'XL' },
 ];
 
+/** Toggle options for a content-margin control (`—` only when unset is allowed). */
+export const contentMarginSizesForOption = (option) => {
+  const allowUnset = option.allowUnset === true;
+
+  return allowUnset
+    ? CONTENT_MARGIN_SIZES
+    : CONTENT_MARGIN_SIZES.filter((size) => size.value !== 'unset');
+};
+
+const CONTENT_MARGIN_CLASS_TOKENS = ['none', 'xs', 's', 'm', 'l', 'xl'];
+
 /** Every class name this control may add or replace. */
-export const ALL_CONTENT_MARGIN_CLASSES = CONTENT_MARGIN_SIZES.flatMap(({ value }) => [
+export const ALL_CONTENT_MARGIN_CLASSES = CONTENT_MARGIN_CLASS_TOKENS.flatMap((value) => [
   `-content-margin-${value}`,
   `-content-margin-top-${value}`,
   `-content-margin-bottom-${value}`,
@@ -69,44 +81,46 @@ export const parseMarginStateFromClassName = (className) => {
   return { top, bottom, linked };
 };
 
-const resolveStoredSize = (size, defaultSize) => (size === '' ? defaultSize : size);
-
 const classForSize = (prefix, size) => (size ? `${prefix}${size}` : '');
 
 /** Build CSS classes from the three margin attributes. */
 export const contentMarginClassesFromAttributes = (option, attributes) => {
   const { top, bottom, linked } = option.attributeNames;
-  const defaultSize = option.defaultSize ?? '';
   const isLinked = attributes[linked] !== false;
   const topSize = attributes[top] ?? '';
   const bottomSize = attributes[bottom] ?? '';
 
   if (isLinked) {
-    const size = resolveStoredSize(topSize, defaultSize);
-    return size ? [classForSize('-content-margin-', size)] : [];
+    return topSize ? [classForSize('-content-margin-', topSize)] : [];
   }
 
   const classes = [];
-  const resolvedTop = resolveStoredSize(topSize, defaultSize);
-  const resolvedBottom = resolveStoredSize(bottomSize, defaultSize);
 
-  if (resolvedTop) {
-    classes.push(classForSize('-content-margin-top-', resolvedTop));
+  if (topSize) {
+    classes.push(classForSize('-content-margin-top-', topSize));
   }
 
-  if (resolvedBottom) {
-    classes.push(classForSize('-content-margin-bottom-', resolvedBottom));
+  if (bottomSize) {
+    classes.push(classForSize('-content-margin-bottom-', bottomSize));
   }
 
   return classes;
 };
 
-/** UI / ToggleGroupControl value for a stored attribute + block default. */
-export const displayMarginSize = (storedSize, defaultSize) => storedSize || defaultSize || '';
+/** UI value for a stored attribute (`''` → unset / — when allowed). */
+export const displayMarginSize = (storedSize, allowUnset = false) => {
+  if (storedSize === '') {
+    return allowUnset ? 'unset' : '';
+  }
 
-/** Persisted attribute value from a picked size + block default. */
-export const storedMarginSize = (pickedSize, defaultSize) =>
-  pickedSize === defaultSize ? '' : pickedSize;
+  return storedSize;
+};
+
+/** Persisted attribute value from a picked toggle value. */
+export const storedMarginSize = (pickedSize) => (pickedSize === 'unset' ? '' : pickedSize);
+
+/** Value applied by Reset: block default, or unset when no default is configured. */
+export const resetMarginSize = (defaultSize) => defaultSize || '';
 
 /** Parse a default combined class into a size token. */
 export const parseDefaultSize = (defaultClass) => parseCombinedMarginClass(defaultClass || '');
