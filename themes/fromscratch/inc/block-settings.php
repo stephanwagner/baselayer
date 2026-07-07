@@ -3,6 +3,8 @@
 defined('ABSPATH') || exit;
 
 const FS_BLOCK_SETTINGS_OPTION = 'fromscratch_block_settings';
+const FS_BLOCK_VARIATION_SETTINGS_OPTION = 'fromscratch_block_variation_settings';
+const FS_EMBED_VARIATION_SETTINGS_OPTION = 'fromscratch_embed_variation_settings';
 const FS_BLOCK_SETTINGS_FAVORITES_CATEGORY = 'fromscratch-favorites';
 
 /**
@@ -139,6 +141,490 @@ function fs_sanitize_block_settings($value): array
 	}
 
 	return $out;
+}
+
+/**
+ * Block names that have configurable inserter variations (from config).
+ *
+ * @return string[]
+ */
+function fs_block_variation_configured_blocks(): array
+{
+	$config = fs_config_block_settings('blockVariations');
+	if (is_array($config) && $config !== []) {
+		return array_values(array_filter(array_map('strval', array_keys($config))));
+	}
+
+	if (fs_config_block_settings('embedVariations') !== null) {
+		return ['core/embed'];
+	}
+
+	return [];
+}
+
+/**
+ * Per-block variation config from block-settings.php.
+ *
+ * @return array<string, mixed>
+ */
+function fs_block_variation_block_config(string $block_name): array
+{
+	$config = fs_config_block_settings('blockVariations');
+	if (is_array($config) && isset($config[$block_name]) && is_array($config[$block_name])) {
+		return $config[$block_name];
+	}
+
+	if ($block_name === 'core/embed') {
+		$legacy = fs_config_block_settings('embedVariations');
+		return is_array($legacy) ? $legacy : [];
+	}
+
+	return [];
+}
+
+/**
+ * Variation slugs hard-disallowed for a block (code-only, not overridable in UI).
+ *
+ * @return string[]
+ */
+function fs_block_variation_hard_disallowed(string $block_name): array
+{
+	$config = fs_block_variation_block_config($block_name);
+	if (!is_array($config) || empty($config['hardDisallowed']) || !is_array($config['hardDisallowed'])) {
+		return [];
+	}
+
+	return array_values(array_filter(array_map('strval', $config['hardDisallowed'])));
+}
+
+/**
+ * Whether a block variation is hard-disallowed in code.
+ */
+function fs_block_variation_is_hard_disallowed(string $block_name, string $slug): bool
+{
+	return in_array($slug, fs_block_variation_hard_disallowed($block_name), true);
+}
+
+/**
+ * Whether a parent block is allowed in the editor.
+ */
+function fs_block_settings_is_block_allowed(string $block_name): bool
+{
+	$settings = fs_block_settings_get_all();
+
+	return !empty($settings[$block_name]['allowed']);
+}
+
+/**
+ * Default allowed flag for a block variation slug (from config).
+ *
+ * @return array{allowed: int}
+ */
+function fs_block_variation_default_flags(string $block_name, string $slug): array
+{
+	if (fs_block_variation_is_hard_disallowed($block_name, $slug)) {
+		return [
+			'allowed' => 0,
+		];
+	}
+
+	$config = fs_block_variation_block_config($block_name);
+	$global = isset($config['default']) && is_array($config['default']) ? $config['default'] : [];
+	$variations = isset($config['variations']) && is_array($config['variations']) ? $config['variations'] : [];
+	$per_variation = isset($variations[$slug]) && is_array($variations[$slug]) ? $variations[$slug] : [];
+
+	$merged = array_merge([
+		'allowed' => true,
+	], $global, $per_variation);
+
+	return [
+		'allowed' => !empty($merged['allowed']) ? 1 : 0,
+	];
+}
+
+/**
+ * Whether the generic inserter item for a block should show (non-variation parent tile).
+ * False when blockVariations config exists — only named variations are used.
+ */
+function fs_block_variation_allow_generic_inserter(string $block_name): bool
+{
+	return !in_array($block_name, fs_block_variation_configured_blocks(), true);
+}
+
+/**
+ * All variation slugs known from config defaults for a block.
+ *
+ * @return string[]
+ */
+function fs_block_variation_config_slugs(string $block_name): array
+{
+	$config = fs_block_variation_block_config($block_name);
+	if (!is_array($config) || empty($config['variations']) || !is_array($config['variations'])) {
+		return [];
+	}
+
+	return array_values(array_filter(array_map('strval', array_keys($config['variations']))));
+}
+
+/**
+ * Stored block variation settings (with legacy embed option migration).
+ *
+ * @return array<string, array<string, array{allowed: int}>>
+ */
+function fs_block_variation_settings_get_stored(): array
+{
+	static $cached = null;
+
+	if ($cached !== null) {
+		return $cached;
+	}
+
+	$stored = get_option(FS_BLOCK_VARIATION_SETTINGS_OPTION, []);
+	if (!is_array($stored)) {
+		$stored = [];
+	}
+
+	if ($stored === []) {
+		$legacy = get_option(FS_EMBED_VARIATION_SETTINGS_OPTION, []);
+		if (is_array($legacy) && $legacy !== []) {
+			$stored = ['core/embed' => $legacy];
+		}
+	}
+
+	$cached = $stored;
+
+	return $cached;
+}
+
+/**
+ * Merged variation settings for one block (config defaults + database).
+ *
+ * @return array<string, array{allowed: int}>
+ */
+function fs_block_variation_settings_get_for_block(string $block_name): array
+{
+	$stored = fs_block_variation_settings_get_stored();
+	$block_stored = isset($stored[$block_name]) && is_array($stored[$block_name]) ? $stored[$block_name] : [];
+	$slugs = array_unique(array_merge(fs_block_variation_config_slugs($block_name), array_keys($block_stored)));
+	$out = [];
+
+	foreach ($slugs as $slug) {
+		if (!is_string($slug) || $slug === '') {
+			continue;
+		}
+
+		$defaults = fs_block_variation_default_flags($block_name, $slug);
+		$saved = isset($block_stored[$slug]) && is_array($block_stored[$slug]) ? $block_stored[$slug] : [];
+		$flags = array_merge($defaults, $saved);
+
+		if (fs_block_variation_is_hard_disallowed($block_name, $slug)) {
+			$flags['allowed'] = 0;
+		}
+
+		$out[$slug] = [
+			'allowed' => !empty($flags['allowed']) ? 1 : 0,
+			'hardDisallowed' => fs_block_variation_is_hard_disallowed($block_name, $slug),
+		];
+	}
+
+	ksort($out);
+
+	return $out;
+}
+
+/**
+ * Merged variation settings for all configured blocks.
+ *
+ * @return array<string, array<string, array{allowed: int}>>
+ */
+function fs_block_variation_settings_get_all(): array
+{
+	$out = [];
+
+	foreach (fs_block_variation_configured_blocks() as $block_name) {
+		$out[$block_name] = fs_block_variation_settings_get_for_block($block_name);
+	}
+
+	return $out;
+}
+
+/**
+ * Whether core/embed is allowed in the editor.
+ */
+function fs_block_settings_is_embed_allowed(): bool
+{
+	return fs_block_settings_is_block_allowed('core/embed');
+}
+
+/**
+ * @deprecated Use fs_block_variation_default_flags('core/embed', $slug).
+ * @return array{allowed: int}
+ */
+function fs_embed_variation_default_flags(string $slug): array
+{
+	return fs_block_variation_default_flags('core/embed', $slug);
+}
+
+/**
+ * @deprecated Use fs_block_variation_allow_generic_inserter('core/embed').
+ */
+function fs_embed_variation_allow_generic_embed(): bool
+{
+	return fs_block_variation_allow_generic_inserter('core/embed');
+}
+
+/**
+ * @deprecated Use fs_block_variation_settings_get_for_block('core/embed').
+ * @return array<string, array{allowed: int}>
+ */
+function fs_embed_variation_settings_get_all(): array
+{
+	return fs_block_variation_settings_get_for_block('core/embed');
+}
+
+/**
+ * Sanitize stored block variation settings.
+ *
+ * @param mixed $value
+ * @return array<string, array<string, array{allowed: int}>>
+ */
+function fs_sanitize_block_variation_settings($value): array
+{
+	if (!is_array($value)) {
+		return [];
+	}
+
+	$out = [];
+
+	foreach ($value as $block_name => $variations) {
+		if (!is_string($block_name) || $block_name === '' || !is_array($variations)) {
+			continue;
+		}
+
+		if (!in_array($block_name, fs_block_variation_configured_blocks(), true)) {
+			continue;
+		}
+
+		$out[$block_name] = [];
+
+		foreach ($variations as $slug => $flags) {
+			if (!is_string($slug) || $slug === '' || !is_array($flags)) {
+				continue;
+			}
+
+			$out[$block_name][$slug] = [
+				'allowed' => fs_block_variation_is_hard_disallowed($block_name, $slug) ? 0 : (!empty($flags['allowed']) ? 1 : 0),
+			];
+		}
+	}
+
+	return $out;
+}
+
+/**
+ * @deprecated Use fs_sanitize_block_variation_settings().
+ * @param mixed $value
+ * @return array<string, array{allowed: int}>
+ */
+function fs_sanitize_embed_variation_settings($value): array
+{
+	if (!is_array($value)) {
+		return [];
+	}
+
+	$out = [];
+
+	foreach ($value as $slug => $flags) {
+		if (!is_string($slug) || $slug === '' || !is_array($flags)) {
+			continue;
+		}
+
+		$out[$slug] = [
+			'allowed' => !empty($flags['allowed']) ? 1 : 0,
+		];
+	}
+
+	return $out;
+}
+
+/**
+ * Parse posted block variation settings from the admin React app.
+ *
+ * @return array<string, array<string, array{allowed: int}>>
+ */
+function fs_block_variation_settings_parse_posted_settings(): array
+{
+	$raw = null;
+
+	if (!empty($_POST['fromscratch_block_variations_json'])) {
+		$raw = wp_unslash((string) $_POST['fromscratch_block_variations_json']);
+	} elseif (!empty($_POST['fromscratch_embed_variations_json'])) {
+		$raw = wp_unslash((string) $_POST['fromscratch_embed_variations_json']);
+	}
+
+	if ($raw === null) {
+		return [];
+	}
+
+	$decoded = json_decode($raw, true);
+	if (!is_array($decoded)) {
+		return [];
+	}
+
+	$first_key = array_key_first($decoded);
+	if (is_string($first_key) && isset($decoded[$first_key]) && is_array($decoded[$first_key]) && array_key_exists('allowed', $decoded[$first_key])) {
+		return ['core/embed' => fs_sanitize_embed_variation_settings($decoded)];
+	}
+
+	$out = [];
+
+	foreach ($decoded as $block_name => $variations) {
+		if (!is_string($block_name) || $block_name === '' || !is_array($variations)) {
+			continue;
+		}
+
+		$out[$block_name] = [];
+
+		foreach ($variations as $slug => $flags) {
+			if (!is_string($slug) || $slug === '' || !is_array($flags)) {
+				continue;
+			}
+
+			$out[$block_name][$slug] = [
+				'allowed' => fs_block_variation_is_hard_disallowed($block_name, $slug) ? 0 : (!empty($flags['allowed']) ? 1 : 0),
+			];
+		}
+	}
+
+	return $out;
+}
+
+/**
+ * @deprecated Use fs_block_variation_settings_parse_posted_settings().
+ * @return array<string, array{allowed: int}>
+ */
+function fs_embed_variation_settings_parse_posted_settings(): array
+{
+	$parsed = fs_block_variation_settings_parse_posted_settings();
+
+	return $parsed['core/embed'] ?? [];
+}
+
+/**
+ * Contextual help for hard-disallowed block variations (admin vs developer).
+ *
+ * @return array<string, string>|null
+ */
+function fs_block_variation_system_help(): ?array
+{
+	$has_hard_disallowed = false;
+
+	foreach (fs_block_variation_configured_blocks() as $block_name) {
+		if (fs_block_variation_hard_disallowed($block_name) !== []) {
+			$has_hard_disallowed = true;
+			break;
+		}
+	}
+
+	if (!$has_hard_disallowed) {
+		return null;
+	}
+
+	$is_developer = function_exists('fs_is_developer_user') && fs_is_developer_user((int) get_current_user_id());
+
+	if ($is_developer) {
+		return [
+			'type'       => 'developer',
+			'configPath' => 'config/block-settings.php',
+			'configKey'  => 'blockVariations.*.hardDisallowed',
+		];
+	}
+
+	$email = function_exists('fs_developer_email') ? fs_developer_email() : '';
+	if ($email !== '' && !is_email($email)) {
+		$email = '';
+	}
+
+	return [
+		'type'  => 'admin',
+		'email' => $email,
+	];
+}
+
+/**
+ * Export block variation settings for JS config.
+ *
+ * @return array<string, mixed>
+ */
+function fs_block_variation_admin_export(): array
+{
+	$settings = [];
+	$defaults = [];
+	$default_allowed = [];
+	$allow_generic_inserter = [];
+	$hard_disallowed = [];
+
+	foreach (fs_block_variation_configured_blocks() as $block_name) {
+		$config = fs_block_variation_block_config($block_name);
+		$global = isset($config['default']) && is_array($config['default']) ? $config['default'] : [];
+		$default_allowed[$block_name] = !empty($global['allowed']);
+		$allow_generic_inserter[$block_name] = fs_block_variation_allow_generic_inserter($block_name);
+		$hard_disallowed[$block_name] = fs_block_variation_hard_disallowed($block_name);
+
+		$settings[$block_name] = [];
+		foreach (fs_block_variation_settings_get_for_block($block_name) as $slug => $flags) {
+			$settings[$block_name][$slug] = [
+				'allowed' => !empty($flags['allowed']),
+				'hardDisallowed' => !empty($flags['hardDisallowed']),
+			];
+		}
+
+		$defaults[$block_name] = [];
+		foreach (fs_block_variation_config_slugs($block_name) as $slug) {
+			$defaults[$block_name][$slug] = [
+				'allowed' => !empty(fs_block_variation_default_flags($block_name, $slug)['allowed']),
+			];
+		}
+	}
+
+	return [
+		'blocks'               => fs_block_variation_configured_blocks(),
+		'settings'             => $settings,
+		'defaults'             => $defaults,
+		'defaultAllowed'       => $default_allowed,
+		'allowGenericInserter' => $allow_generic_inserter,
+		'hardDisallowed'       => $hard_disallowed,
+	];
+}
+
+/**
+ * Export block variation settings for the block editor.
+ *
+ * @return array<string, mixed>
+ */
+function fs_block_variation_editor_export(): array
+{
+	$export = fs_block_variation_admin_export();
+	$settings = [];
+	$block_allowed = [];
+
+	foreach ($export['blocks'] as $block_name) {
+		$block_allowed[$block_name] = fs_block_settings_is_block_allowed($block_name);
+		$settings[$block_name] = [];
+
+		foreach ($export['settings'][$block_name] ?? [] as $slug => $flags) {
+			$settings[$block_name][$slug] = !empty($flags['allowed']);
+		}
+	}
+
+	return [
+		'blocks'                 => $export['blocks'],
+		'settings'               => $settings,
+		'defaultAllowed'         => $export['defaultAllowed'],
+		'allowGenericInserter'   => $export['allowGenericInserter'],
+		'hardDisallowed'         => $export['hardDisallowed'],
+		'blockAllowed'           => $block_allowed,
+	];
 }
 
 /**
@@ -509,6 +995,8 @@ function fs_block_settings_admin_config(): array
 		];
 	}, fs_block_settings_system_blocks()));
 
+	$block_variation_export = fs_block_variation_admin_export();
+
 	return [
 		'settings'            => $settings,
 		'hardDisallowed'      => $hard_disallowed,
@@ -516,6 +1004,13 @@ function fs_block_settings_admin_config(): array
 		'configurableGroups'  => $configurable_groups,
 		'systemBlocks'        => $system_blocks,
 		'systemBlocksHelp'    => fs_block_settings_system_blocks_help(),
+		'blockVariationBlocks' => $block_variation_export['blocks'],
+		'blockVariationSettings' => $block_variation_export['settings'],
+		'blockVariationDefaults' => $block_variation_export['defaults'],
+		'blockVariationDefaultAllowed' => $block_variation_export['defaultAllowed'],
+		'blockVariationAllowGenericInserter' => $block_variation_export['allowGenericInserter'],
+		'blockVariationHardDisallowed' => $block_variation_export['hardDisallowed'],
+		'blockVariationSystemHelp'    => fs_block_variation_system_help(),
 		'i18n'                => [
 			'intro'                   => __('Control which blocks are available in the page editor inserter (+).', 'fromscratch'),
 			'searchPlaceholder'       => __('Search blocks…', 'fromscratch'),
@@ -540,6 +1035,9 @@ function fs_block_settings_admin_config(): array
 			'filterNotHidden'         => __('Not hidden', 'fromscratch'),
 			'filterNotFavorite'       => __('Not favorite', 'fromscratch'),
 			'noResults'               => __('No blocks match the current search or filters.', 'fromscratch'),
+			'variationOf'             => __('Variation of', 'fromscratch'),
+			'parentBlockDisabled'     => __('Enable the parent block to manage this variation.', 'fromscratch'),
+			'variationHiddenBySystem' => __('Variation hidden by system', 'fromscratch'),
 		],
 	];
 }
@@ -615,10 +1113,18 @@ function fs_block_settings_category_label(string $slug): string
  */
 function fs_block_settings_editor_config(): array
 {
+	$block_variation_export = fs_block_variation_editor_export();
+
 	return [
 		'hidden'          => fs_block_settings_hidden_names(),
 		'favorites'       => fs_block_settings_favorite_names(),
 		'hardDisallowed'  => fs_block_settings_hard_disallowed(),
+		'blockVariationBlocks' => $block_variation_export['blocks'],
+		'blockVariationSettings' => $block_variation_export['settings'],
+		'blockVariationDefaultAllowed' => $block_variation_export['defaultAllowed'],
+		'blockVariationAllowGenericInserter' => $block_variation_export['allowGenericInserter'],
+		'blockVariationHardDisallowed' => $block_variation_export['hardDisallowed'],
+		'blockVariationBlockAllowed' => $block_variation_export['blockAllowed'],
 		'favoritesCategory' => FS_BLOCK_SETTINGS_FAVORITES_CATEGORY,
 		'preferencesScope' => 'fromscratch',
 		'preferencesKey' => 'showHiddenBlocks',

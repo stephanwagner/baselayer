@@ -80,6 +80,146 @@ function getInitialSettings() {
   return out;
 }
 
+function getBlockVariationsForBlock(blockName) {
+  if (!wp.blocks || typeof wp.blocks.getBlockVariations !== 'function') {
+    return [];
+  }
+
+  const variations = wp.blocks.getBlockVariations(blockName) || [];
+
+  return [...variations]
+    .filter((variation) => Boolean(variation.name))
+    .sort((a, b) => {
+      const titleA = (a.title || a.name || '').toString();
+      const titleB = (b.title || b.name || '').toString();
+      return titleA.localeCompare(titleB, undefined, { sensitivity: 'base' });
+    });
+}
+
+function getConfiguredVariationBlocks() {
+  const config = getConfig();
+  return Array.isArray(config.blockVariationBlocks) ? config.blockVariationBlocks : [];
+}
+
+function isVariationHardDisallowed(blockName, slug) {
+  const list = getConfig().blockVariationHardDisallowed?.[blockName] || [];
+  return Array.isArray(list) && list.includes(slug);
+}
+
+function resolveVariationAllowed(blockName, slug, settings, config) {
+  if (isVariationHardDisallowed(blockName, slug)) {
+    return false;
+  }
+
+  const blockSettings = settings[blockName] || {};
+  if (Object.prototype.hasOwnProperty.call(blockSettings, slug)) {
+    return Boolean(blockSettings[slug]?.allowed);
+  }
+
+  const defaults = config.blockVariationDefaults?.[blockName] || {};
+  if (Object.prototype.hasOwnProperty.call(defaults, slug)) {
+    return Boolean(defaults[slug]?.allowed);
+  }
+
+  const defaultAllowed = config.blockVariationDefaultAllowed?.[blockName];
+  return defaultAllowed !== undefined ? Boolean(defaultAllowed) : true;
+}
+
+function getInitialVariationSettings(variationRegistry) {
+  const config = getConfig();
+  const saved = config.blockVariationSettings || {};
+  const out = {};
+
+  getConfiguredVariationBlocks().forEach((blockName) => {
+    out[blockName] = {};
+    (variationRegistry[blockName] || []).forEach((variation) => {
+      const slug = variation.name;
+      out[blockName][slug] = {
+        allowed: resolveVariationAllowed(blockName, slug, saved, config),
+      };
+    });
+  });
+
+  return out;
+}
+
+function VariationCard({ blockName, variation, allowed, parentAllowed, hardDisallowed, onChange }) {
+  const config = getConfig();
+  const i18n = config.i18n || {};
+  const title = variation.title || variation.name;
+  const slug = variation.name;
+
+  if (hardDisallowed) {
+    return el(
+      'article',
+      { className: 'fs-block-card fs-block-card--variation fs-block-card--system' },
+      el(
+        'div',
+        { className: 'fs-block-card__top' },
+        el(
+          'div',
+          { className: 'fs-block-card__identity' },
+          el('span', { className: 'fs-block-settings__icon' }, renderBlockIcon(variation.icon)),
+          el(
+            'div',
+            { className: 'fs-block-card__meta' },
+            el('h4', { className: 'fs-block-card__title' }, title),
+            el('code', { className: 'fs-block-card__slug' }, `${blockName}/${slug}`),
+            el('p', { className: 'fs-block-card__system-note' }, i18n.hiddenBySystem || ''),
+          ),
+        ),
+      ),
+    );
+  }
+
+  const interactive = Boolean(parentAllowed);
+
+  return el(
+    'article',
+    {
+      className: `fs-block-card fs-block-card--variation${allowed && parentAllowed ? ' is-allowed' : ' is-disallowed'}${parentAllowed ? '' : ' is-parent-disabled'}`,
+    },
+    el(
+      'div',
+      { className: 'fs-block-card__top' },
+      el(
+        'div',
+        { className: 'fs-block-card__identity' },
+        el('span', { className: 'fs-block-settings__icon' }, renderBlockIcon(variation.icon)),
+        el(
+          'div',
+          { className: 'fs-block-card__meta' },
+          el('h4', { className: 'fs-block-card__title' }, title),
+          el('code', { className: 'fs-block-card__slug' }, `${blockName}/${slug}`),
+        ),
+      ),
+      el(
+        'button',
+        {
+          type: 'button',
+          className: 'fs-block-card__allowed',
+          title: interactive ? i18n.allowedInInserter || '' : i18n.parentBlockDisabled || '',
+          'aria-pressed': allowed && parentAllowed ? 'true' : 'false',
+          disabled: !interactive,
+          onClick: () => {
+            if (!interactive) {
+              return;
+            }
+            onChange({ allowed: !allowed });
+          },
+        },
+        el(
+          'span',
+          { className: 'fs-block-card__allowed-btn', 'aria-hidden': 'true' },
+          el('span', { className: 'dashicons dashicons-randomize', 'aria-hidden': 'true' }),
+          el('span', { className: 'fs-block-card__allowed-slash', 'aria-hidden': 'true' }),
+        ),
+        el('span', { className: 'screen-reader-text' }, i18n.allowedInInserter || ''),
+      ),
+    ),
+  );
+}
+
 function BlockCard({ block, flags, onChange }) {
   const config = getConfig();
   const i18n = config.i18n || {};
@@ -304,13 +444,86 @@ function FilterGroup({ label, value, options, onChange }) {
   );
 }
 
-function filterGroups(groups, search, settings, filters) {
+function matchesVariationSearch(blockName, variation, search) {
+  const needle = search.trim().toLowerCase();
+  if (needle === '') {
+    return true;
+  }
+
+  const haystack = `${variation.title || ''} ${variation.name || ''} ${blockName}`.toLowerCase();
+  return haystack.includes(needle);
+}
+
+function getEffectiveVariationAllowed(blockName, slug, settings, variationSettings) {
+  if (isVariationHardDisallowed(blockName, slug)) {
+    return false;
+  }
+
+  const parentAllowed = Boolean((settings[blockName] || { allowed: true }).allowed);
+  const variationAllowed = Boolean((variationSettings[blockName] || {})[slug]?.allowed);
+  return parentAllowed && variationAllowed;
+}
+
+function matchesVariationFilters(blockName, slug, settings, variationSettings, filters) {
+  const effectiveAllowed = getEffectiveVariationAllowed(blockName, slug, settings, variationSettings);
+
+  if (filters.allowed === 'active' && !effectiveAllowed) {
+    return false;
+  }
+
+  if (filters.allowed === 'inactive' && effectiveAllowed) {
+    return false;
+  }
+
+  if (filters.hidden !== 'all' || filters.favorite !== 'all') {
+    return false;
+  }
+
+  return true;
+}
+
+function buildCategoryItems(group, variationRegistry) {
+  const items = [];
+
+  group.blocks.forEach((block) => {
+    items.push({ kind: 'block', block });
+
+    if (!getConfiguredVariationBlocks().includes(block.name)) {
+      return;
+    }
+
+    (variationRegistry[block.name] || []).forEach((variation) => {
+      items.push({
+        kind: 'variation',
+        blockName: block.name,
+        variation,
+      });
+    });
+  });
+
+  return items;
+}
+
+function filterCategoryItems(items, search, settings, variationSettings, filters) {
+  return items.filter((item) => {
+    if (item.kind === 'block') {
+      return matchesSearch(item.block, search) && matchesFilters(item.block.name, settings, filters);
+    }
+
+    return (
+      matchesVariationSearch(item.blockName, item.variation, search) &&
+      matchesVariationFilters(item.blockName, item.variation.name, settings, variationSettings, filters)
+    );
+  });
+}
+
+function filterGroups(groups, search, settings, filters, variationRegistry, variationSettings) {
   return groups
     .map((group) => ({
       ...group,
-      blocks: group.blocks.filter((block) => matchesSearch(block, search) && matchesFilters(block.name, settings, filters)),
+      items: filterCategoryItems(buildCategoryItems(group, variationRegistry), search, settings, variationSettings, filters),
     }))
-    .filter((group) => group.blocks.length > 0);
+    .filter((group) => group.items.length > 0);
 }
 
 function filterSystemBlocks(blocks, search) {
@@ -327,9 +540,62 @@ function BlockSettingsApp() {
   const config = getConfig();
   const i18n = config.i18n || {};
   const [settings, setSettings] = useState(getInitialSettings);
+  const [variationRegistry, setVariationRegistry] = useState(() => {
+    const registry = {};
+    getConfiguredVariationBlocks().forEach((blockName) => {
+      registry[blockName] = getBlockVariationsForBlock(blockName);
+    });
+    return registry;
+  });
+  const [variationSettings, setVariationSettings] = useState(() => getInitialVariationSettings(variationRegistry));
   const [search, setSearch] = useState('');
   const [filters, setFilters] = useState(DEFAULT_FILTERS);
   const [systemOpen, setSystemOpen] = useState(false);
+
+  useEffect(() => {
+    const sync = () => {
+      const next = {};
+      getConfiguredVariationBlocks().forEach((blockName) => {
+        next[blockName] = getBlockVariationsForBlock(blockName);
+      });
+      setVariationRegistry(next);
+    };
+
+    sync();
+
+    if (!wp.data || typeof wp.data.subscribe !== 'function') {
+      return undefined;
+    }
+
+    return wp.data.subscribe(sync);
+  }, []);
+
+  useEffect(() => {
+    setVariationSettings((current) => {
+      const next = { ...current };
+      let changed = false;
+
+      getConfiguredVariationBlocks().forEach((blockName) => {
+        if (!next[blockName]) {
+          next[blockName] = {};
+        }
+
+        (variationRegistry[blockName] || []).forEach((variation) => {
+          const slug = variation.name;
+          if (!slug || Object.prototype.hasOwnProperty.call(next[blockName], slug)) {
+            return;
+          }
+
+          next[blockName][slug] = {
+            allowed: resolveVariationAllowed(blockName, slug, config.blockVariationSettings || {}, config),
+          };
+          changed = true;
+        });
+      });
+
+      return changed ? next : current;
+    });
+  }, [variationRegistry, config.blockVariationSettings]);
 
   const allowedFilterOptions = useMemo(
     () => [
@@ -359,13 +625,13 @@ function BlockSettingsApp() {
   );
 
   const configurableGroups = useMemo(
-    () => filterGroups(config.configurableGroups || [], search, settings, filters),
-    [config.configurableGroups, search, settings, filters],
+    () => filterGroups(config.configurableGroups || [], search, settings, filters, variationRegistry, variationSettings),
+    [config.configurableGroups, search, settings, filters, variationRegistry, variationSettings],
   );
 
   const systemBlocks = useMemo(() => filterSystemBlocks(config.systemBlocks || [], search), [config.systemBlocks, search]);
 
-  const hasVisibleBlocks = configurableGroups.some((group) => group.blocks.length > 0);
+  const hasVisibleBlocks = configurableGroups.some((group) => group.items.length > 0);
 
   const updateBlock = (name, nextFlags) => {
     setSettings((current) => ({
@@ -377,17 +643,21 @@ function BlockSettingsApp() {
   useEffect(() => {
     const form = document.getElementById('fs-block-settings-form');
     const jsonField = document.getElementById('fs-block-settings-json');
+    const variationJsonField = document.getElementById('fs-block-variations-json');
     if (!(form instanceof HTMLFormElement) || !(jsonField instanceof HTMLInputElement)) {
       return undefined;
     }
 
     const onSubmit = () => {
       jsonField.value = JSON.stringify(settings);
+      if (variationJsonField instanceof HTMLInputElement) {
+        variationJsonField.value = JSON.stringify(variationSettings);
+      }
     };
 
     form.addEventListener('submit', onSubmit);
     return () => form.removeEventListener('submit', onSubmit);
-  }, [settings]);
+  }, [settings, variationSettings]);
 
   return el(
     Fragment,
@@ -448,13 +718,37 @@ function BlockSettingsApp() {
         el(
           'div',
           { className: 'fs-block-settings__grid' },
-          group.blocks.map((block) => {
-            const flags = settings[block.name] || { allowed: true, hidden: false, favorite: false };
-            return el(BlockCard, {
-              key: block.name,
-              block,
-              flags,
-              onChange: (nextFlags) => updateBlock(block.name, nextFlags),
+          group.items.map((item) => {
+            if (item.kind === 'block') {
+              const flags = settings[item.block.name] || { allowed: true, hidden: false, favorite: false };
+              return el(BlockCard, {
+                key: item.block.name,
+                block: item.block,
+                flags,
+                onChange: (nextFlags) => updateBlock(item.block.name, nextFlags),
+              });
+            }
+
+            const slug = item.variation.name;
+            const parentAllowed = Boolean((settings[item.blockName] || { allowed: true }).allowed);
+            const hardDisallowed = isVariationHardDisallowed(item.blockName, slug);
+            const flags = (variationSettings[item.blockName] || {})[slug] || { allowed: false };
+
+            return el(VariationCard, {
+              key: `${item.blockName}/${slug}`,
+              blockName: item.blockName,
+              variation: item.variation,
+              allowed: Boolean(flags.allowed),
+              parentAllowed,
+              hardDisallowed,
+              onChange: (nextFlags) =>
+                setVariationSettings((current) => ({
+                  ...current,
+                  [item.blockName]: {
+                    ...(current[item.blockName] || {}),
+                    [slug]: nextFlags,
+                  },
+                })),
             });
           }),
         ),

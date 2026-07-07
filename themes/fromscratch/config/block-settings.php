@@ -14,6 +14,13 @@ defined('ABSPATH') || exit;
  *
  * Each block entry supports: allowed, hidden, favorite (all booleans).
  * `hidden` and `favorite` only apply when `allowed` is true.
+ *
+ * blockVariations — per-variation defaults for blocks that have inserter variations
+ * (e.g. core/embed providers, core/group layouts). Keys are parent block names.
+ * Shown in Settings → Theme → Blocks within each category, under the parent block.
+ * `default` / `variations` — allowed flags per variation slug.
+ * `hardDisallowed` — variation slugs that cannot be enabled via Settings → Theme → Blocks.
+ * To disable a parent block entirely (and all its variations), use `blocks`.
  */
 return [
 	// Default block settings
@@ -106,6 +113,8 @@ return [
 		'core/pattern',
 		'core/legacy-widget',
 		'core/widget-group',
+		'core/text-columns',
+		'core/navigation-overlay-close',
 
 	],
 
@@ -126,12 +135,18 @@ return [
 		'core/buttons' => [
 			'favorite' => true,
 		],
+		'core/embed' => [
+			'allowed' => true,
+		],
 
 		// Allowed but hidden
 		'core/details' => [
 			'hidden'  => true,
 		],
 		'core/math' => [
+			'hidden'  => true,
+		],
+		'core/more' => [
 			'hidden'  => true,
 		],
 
@@ -149,5 +164,59 @@ return [
 			'allowed'  => false,
 		],
 
+	],
+
+	// Block inserter variations (shown in category grids alongside their parent block).
+	'blockVariations' => [
+		'core/embed' => [
+			'hardDisallowed' => [
+				'amazon-kindle',
+				'animoto',
+				'bluesky',
+				'cloudup',
+				'collegehumor',
+				'crowdsignal',
+				'dailymotion',
+				'flickr',
+				'imgur',
+				'issuu',
+				'kickstarter',
+				'mixcloud',
+				'pocket-casts',
+				'reverbnation',
+				'scribd',
+				'smugmug',
+				'speaker-deck',
+				'ted',
+				'tumblr',
+				'videopress',
+				'wolfram-cloud',
+				'wordpress-tv',
+			],
+			'default' => [
+				'allowed' => false,
+			],
+			'variations' => [
+				'youtube' => [
+					'allowed' => true,
+				],
+			],
+		],
+		'core/group' => [
+			'default' => [
+				'allowed' => true,
+			],
+			'variations' => [
+				'group-grid' => [
+					'allowed' => false,
+				],
+				'group-stack' => [
+					'allowed' => false,
+				],
+				'group-row' => [
+					'allowed' => false,
+				],
+			],
+		],
 	],
 ];

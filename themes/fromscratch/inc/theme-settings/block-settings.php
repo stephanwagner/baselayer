@@ -41,6 +41,13 @@ add_action('admin_init', function () {
 	}
 
 	update_option(FS_BLOCK_SETTINGS_OPTION, $sanitized);
+
+	if (function_exists('fs_block_variation_settings_parse_posted_settings') && function_exists('fs_sanitize_block_variation_settings')) {
+		$variation_posted = fs_block_variation_settings_parse_posted_settings();
+		$variation_sanitized = fs_sanitize_block_variation_settings($variation_posted);
+		update_option(FS_BLOCK_VARIATION_SETTINGS_OPTION, $variation_sanitized);
+	}
+
 	set_transient('fromscratch_blocks_saved', '1', 30);
 	wp_safe_redirect(fs_theme_settings_url_with_tab('blocks'));
 	exit;
@@ -129,6 +136,7 @@ function fs_render_theme_settings_blocks_tab(): void
 		<?php wp_nonce_field('fromscratch_save_block_settings'); ?>
 		<input type="hidden" name="fromscratch_save_block_settings" value="1">
 		<input type="hidden" name="fromscratch_block_settings_json" id="fs-block-settings-json" value="">
+		<input type="hidden" name="fromscratch_block_variations_json" id="fs-block-variations-json" value="">
 		<div id="fs-block-settings-app"></div>
 	</form>
 	<?php

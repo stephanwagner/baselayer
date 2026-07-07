@@ -1,5 +1,6 @@
 import './block-options';
 import './block-inserter-settings';
+import './embed-variations';
 import './acf-inner-blocks-toolbar';
 import './expirator';
 import './events';
