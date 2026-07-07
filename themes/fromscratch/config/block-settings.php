@@ -21,6 +21,7 @@ defined('ABSPATH') || exit;
  * `default` / `variations` — allowed flags per variation slug.
  * `hardDisallowed` — variation slugs that cannot be enabled via Settings → Theme → Blocks.
  * To disable a parent block entirely (and all its variations), use `blocks`.
+ * The generic Embed block stays available when the parent is allowed; only variation slugs are curated here.
  */
 return [
 	// Default block settings
@@ -108,7 +109,7 @@ return [
 		'core/post-time-to-read',
 
 		// Other
-		'core/avatar', // Prefer core/image instead
+		'core/avatar',
 		'core/query-total',
 		'core/pattern',
 		'core/legacy-widget',

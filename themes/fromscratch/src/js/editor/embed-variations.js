@@ -49,21 +49,6 @@ function applyBlockVariationSettings() {
         wp.blocks.unregisterBlockVariation(blockName, slug);
       }
     });
-
-    // blockVariations config means only named variations — hide generic parent tile.
-    const blockType = wp.blocks.getBlockType(blockName);
-    if (!blockType) {
-      return;
-    }
-
-    wp.blocks.unregisterBlockType(blockName);
-    wp.blocks.registerBlockType(blockName, {
-      ...blockType,
-      supports: {
-        ...blockType.supports,
-        inserter: false,
-      },
-    });
   });
 }
 

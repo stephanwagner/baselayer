@@ -244,11 +244,13 @@ function fs_block_variation_default_flags(string $block_name, string $slug): arr
 
 /**
  * Whether the generic inserter item for a block should show (non-variation parent tile).
- * False when blockVariations config exists — only named variations are used.
+ * Variation curation does not hide the parent block — use `blocks` to disable entirely.
  */
 function fs_block_variation_allow_generic_inserter(string $block_name): bool
 {
-	return !in_array($block_name, fs_block_variation_configured_blocks(), true);
+	unset($block_name);
+
+	return true;
 }
 
 /**
