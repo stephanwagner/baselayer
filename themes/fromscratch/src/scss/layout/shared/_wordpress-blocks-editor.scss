@@ -80,4 +80,11 @@
       margin-right: unset;
     }
   }
+
+  // Spacer
+
+  .wp-block-spacer {
+    border: 1px dashed rgba(#000, 0.2);
+    border-radius: 4px;
+  }
 }

@@ -38,6 +38,19 @@ function getTextWrapOptions() {
 }
 
 /**
+ * Responsive spacer height (scales down on smaller breakpoints).
+ */
+function getSpacerResponsiveHeightControl() {
+  return {
+    type: 'spacer-responsive-height',
+    label: 'Responsive Höhe',
+    description: 'Reduziert den Abstand auf kleineren Bildschirmen automatisch.',
+    default: '',
+    attributeName: 'spacerResponsiveHeight',
+  };
+}
+
+/**
  * Linked width size + alignment control for limited content width.
  */
 function getLimitWidthControl() {
@@ -199,6 +212,12 @@ export const blockOptions = [
   {
     name: 'core/separator',
     options: [getContentMarginControl('m')],
+  },
+
+  // Spacer
+  {
+    name: 'core/spacer',
+    options: [getSpacerResponsiveHeightControl()],
   },
 
   // Cover

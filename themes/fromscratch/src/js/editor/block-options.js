@@ -2,6 +2,7 @@ import { blockOptions } from '../../../config/block-options';
 import { IconPicker } from './icons/icon-picker';
 import { ContentMarginControl } from './content-margin-control';
 import { LimitWidthControl } from './limit-width-control';
+import { SpacerResponsiveHeightControl } from './spacer-responsive-height-control';
 import { BlockOptionToggleGroupOption } from './block-option-toggle-group-option';
 import { BlockOptionDescription, optionHelpProps } from './block-option-help';
 import {
@@ -16,12 +17,17 @@ import {
   limitWidthClassesFromAttributes,
   migrateLegacyLimitWidthAttributes,
 } from './limit-width-utils';
+import {
+  ALL_SPACER_RESPONSIVE_HEIGHT_CLASSES,
+  spacerResponsiveHeightAttributeKey,
+  spacerResponsiveHeightClassesFromAttributes,
+} from './spacer-responsive-height-utils';
 
 const { InspectorControls } = wp.blockEditor;
 const { PanelBody, ToggleControl, SelectControl } = wp.components;
 const ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
 const { createHigherOrderComponent } = wp.compose;
-const { Fragment, useEffect } = wp.element;
+const { Fragment, useEffect, useRef } = wp.element;
 
 // Prefix used when an `icon` option is stored as a class name (e.g. `-icon-bolt`).
 const ICON_CLASS_PREFIX = '-icon-';
@@ -120,6 +126,7 @@ const managedStaticClasses = (blockConfig) => {
     HAS_ICON_CLASS,
     ...ALL_CONTENT_MARGIN_CLASSES,
     ...ALL_LIMIT_WIDTH_CLASSES,
+    ...ALL_SPACER_RESPONSIVE_HEIGHT_CLASSES,
     ...LEGACY_IMAGE_TEXT_LAYOUT_CLASSES,
   ]);
 
@@ -153,6 +160,8 @@ const collectOptionClasses = (blockConfig, attributes) => {
       classes.push(...contentMarginClassesFromAttributes(option, attributes));
     } else if (option.type === 'limit-width') {
       classes.push(...limitWidthClassesFromAttributes(option, attributes));
+    } else if (option.type === 'spacer-responsive-height') {
+      classes.push(...spacerResponsiveHeightClassesFromAttributes(option, attributes));
     } else if (option.type === 'boolean' && attributes[option.attributeName]) {
       classes.push(option.className);
     } else if (option.type === 'icon' && attributes[option.attributeName]) {
@@ -202,6 +211,10 @@ const blockOptionAttributeKeys = (blockConfig) =>
       return [...limitWidthAttributeKeys(option), 'limitWidth'];
     }
 
+    if (option.type === 'spacer-responsive-height') {
+      return [spacerResponsiveHeightAttributeKey(option), 'height'];
+    }
+
     return [option.attributeName];
   });
 
@@ -237,6 +250,14 @@ blockOptions.forEach((block) => {
           return;
         }
 
+        if (option.type === 'spacer-responsive-height') {
+          settings.attributes = {
+            ...settings.attributes,
+            [option.attributeName]: { type: 'string', default: option.default ?? '' },
+          };
+          return;
+        }
+
         settings.attributes = {
           ...settings.attributes,
           [option.attributeName]: {
@@ -257,6 +278,9 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
 
     // Find the block configuration based on the block name
     const blockConfig = blockOptions.find((block) => block.name === props.name);
+
+    const skipHeightResetRef = useRef(false);
+    const prevHeightRef = useRef(attributes.height);
 
     const setOptionAttributes = (updates) => {
       const nextAttributes = { ...attributes, ...updates };
@@ -351,6 +375,32 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
       attributes.harmonizeImageText,
     ]);
 
+    // Spacer: reset responsive preset when the user edits static height.
+    useEffect(() => {
+      if (props.name !== 'core/spacer' || !blockConfig) {
+        return;
+      }
+
+      const responsive = attributes.spacerResponsiveHeight;
+      const currentHeight = attributes.height;
+
+      if (skipHeightResetRef.current) {
+        skipHeightResetRef.current = false;
+        prevHeightRef.current = currentHeight;
+        return;
+      }
+
+      if (currentHeight === prevHeightRef.current) {
+        return;
+      }
+
+      prevHeightRef.current = currentHeight;
+
+      if (responsive && currentHeight) {
+        setOptionAttributes({ spacerResponsiveHeight: '' });
+      }
+    }, [props.name, attributes.height, attributes.spacerResponsiveHeight]);
+
     // Backfill `className` when option attributes and wrapper classes drift (e.g. after adding `-has-icon`).
     useEffect(() => {
       if (!blockConfig) {
@@ -390,6 +440,22 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                         option={option}
                         attributes={attributes}
                         onChange={setOptionAttributes}
+                      />
+                    );
+                  }
+
+                  if (option.type === 'spacer-responsive-height') {
+                    return (
+                      <SpacerResponsiveHeightControl
+                        key={option.attributeName}
+                        option={option}
+                        attributes={attributes}
+                        onChange={(updates) => {
+                          if (updates.height === undefined && updates[option.attributeName]) {
+                            skipHeightResetRef.current = true;
+                          }
+                          setOptionAttributes(updates);
+                        }}
                       />
                     );
                   }

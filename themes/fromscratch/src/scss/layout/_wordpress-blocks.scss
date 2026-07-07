@@ -35,6 +35,18 @@
   }
 }
 
+// Spacer responsive height mixin
+
+@mixin spacer-responsive-height($height, $responsive: ()) {
+  height: $height !important;
+
+  @each $breakpoint, $value in $responsive {
+    @media (max-width: $breakpoint) {
+      height: $value !important;
+    }
+  }
+}
+
 // WordPress blocks mixin
 
 @mixin wordpress-blocks {
@@ -546,6 +558,54 @@
         ),
       )
     );
+  }
+
+  // Spacer responsive height
+
+  .wp-block-spacer {
+    &.-spacer-height-xs {
+      @include spacer-responsive-height(var(--fs-content-margin-xs));
+    }
+
+    &.-spacer-height-s {
+      @include spacer-responsive-height(
+        var(--fs-content-margin-s),
+        (
+          $breakpoint-xs: var(--fs-content-margin-xs),
+        )
+      );
+    }
+
+    &.-spacer-height-m {
+      @include spacer-responsive-height(
+        var(--fs-content-margin-m),
+        (
+          $breakpoint-s: var(--fs-content-margin-s),
+          $breakpoint-xs: var(--fs-content-margin-xs),
+        )
+      );
+    }
+
+    &.-spacer-height-l {
+      @include spacer-responsive-height(
+        var(--fs-content-margin-l),
+        (
+          $breakpoint-m: var(--fs-content-margin-m),
+          $breakpoint-s: var(--fs-content-margin-s),
+        )
+      );
+    }
+
+    &.-spacer-height-xl {
+      @include spacer-responsive-height(
+        var(--fs-content-margin-xl),
+        (
+          $breakpoint-l: var(--fs-content-margin-l),
+          $breakpoint-m: var(--fs-content-margin-m),
+          $breakpoint-s: var(--fs-content-margin-s),
+        )
+      );
+    }
   }
 
   // Text-wrap
