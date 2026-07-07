@@ -362,7 +362,7 @@ add_action('admin_enqueue_scripts', function ($hook_suffix) {
 	wp_add_inline_script(
 		'code-editor',
 		sprintf(
-			'jQuery(function() { if (wp.codeEditor && document.getElementById("fs-css-vars-overview-code")) { wp.codeEditor.initialize("fs-css-vars-overview-code", %s); } });',
+			'window.fsCssVarsOverviewEditorSettings = %s;',
 			wp_json_encode($overview_settings)
 		)
 	);
@@ -1680,7 +1680,9 @@ function theme_settings_page(): void
 				</div>
 			</form>
 			<?php
-			$fs_variables_root_preview = function_exists('fs_variables_scss_root_block') ? fs_variables_scss_root_block() : '';
+			$fs_variables_root_preview = function_exists('fs_variables_compiled_root_block')
+				? fs_variables_compiled_root_block()
+				: (function_exists('fs_variables_scss_root_block') ? fs_variables_scss_root_block() : '');
 			?>
 			<div id="fs-css-vars-overview-modal" class="fs-css-vars-overview-modal" aria-hidden="true">
 				<div class="fs-css-vars-overview-backdrop" data-fs-css-vars-overview-close tabindex="-1"></div>
@@ -1691,7 +1693,7 @@ function theme_settings_page(): void
 							<textarea id="fs-css-vars-overview-code" readonly rows="14" class="large-text code" autocomplete="off"><?= esc_textarea($fs_variables_root_preview) ?></textarea>
 						</div>
 					<?php else : ?>
-						<p class="fs-css-vars-overview-empty"><?= esc_html__('Could not read the :root block from _variables.scss.', 'fromscratch') ?></p>
+						<p class="fs-css-vars-overview-empty"><?= esc_html__('Could not read CSS variables from the loaded theme styles.', 'fromscratch') ?></p>
 					<?php endif; ?>
 					<p class="fs-css-vars-overview-actions">
 						<button type="button" class="button button-primary" data-fs-css-vars-overview-close><?= esc_html__('Close', 'fromscratch') ?></button>
@@ -1702,8 +1704,27 @@ function theme_settings_page(): void
 				(function() {
 					var modal = document.getElementById('fs-css-vars-overview-modal');
 					var openBtn = document.getElementById('fs-css-vars-overview-open');
-					if (!modal || !openBtn) return;
+					var textarea = document.getElementById('fs-css-vars-overview-code');
+					if (!modal || !openBtn || !textarea) return;
 					var dialog = modal.querySelector('.fs-css-vars-overview-dialog');
+					var overviewEditor = null;
+
+					function ensureVariablesOverviewEditor() {
+						if (overviewEditor && overviewEditor.codemirror) {
+							overviewEditor.codemirror.refresh();
+							return;
+						}
+						if (!window.wp || !window.wp.codeEditor || !window.fsCssVarsOverviewEditorSettings) {
+							return;
+						}
+						overviewEditor = window.wp.codeEditor.initialize('fs-css-vars-overview-code', window.fsCssVarsOverviewEditorSettings);
+						if (overviewEditor && overviewEditor.codemirror) {
+							window.setTimeout(function() {
+								overviewEditor.codemirror.refresh();
+							}, 0);
+						}
+					}
+
 					function openModal() {
 						modal.classList.add('is-open');
 						modal.setAttribute('aria-hidden', 'false');
@@ -1711,12 +1732,12 @@ function theme_settings_page(): void
 						if (dialog) {
 							dialog.focus();
 						}
-						window.setTimeout(function() {
-							var cmEl = modal.querySelector('.fs-css-vars-overview-editor-wrap .CodeMirror');
-							if (cmEl && cmEl.CodeMirror) {
-								cmEl.CodeMirror.refresh();
-							}
-						}, 100);
+						ensureVariablesOverviewEditor();
+						if (overviewEditor && overviewEditor.codemirror) {
+							window.setTimeout(function() {
+								overviewEditor.codemirror.refresh();
+							}, 100);
+						}
 					}
 					function closeModal() {
 						modal.classList.remove('is-open');

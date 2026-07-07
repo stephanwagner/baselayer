@@ -234,6 +234,36 @@ function fs_variables_scss_root_block(): string
 }
 
 /**
+ * Resolved `:root { … }` block from compiled admin CSS (fallback when live collection is unavailable).
+ *
+ * @return string
+ */
+function fs_variables_compiled_root_block(): string
+{
+	$min = function_exists('fs_is_debug') && fs_is_debug() ? '' : '.min';
+	$candidates = [
+		get_template_directory() . '/assets/css/admin' . $min . '.css',
+		get_template_directory() . '/assets/css/admin.css',
+	];
+
+	foreach ($candidates as $path) {
+		if (!is_readable($path)) {
+			continue;
+		}
+		$raw = file_get_contents($path);
+		if (!is_string($raw) || $raw === '') {
+			continue;
+		}
+		$block = fs_extract_scss_root_block($raw);
+		if (is_string($block) && $block !== '') {
+			return trim($block);
+		}
+	}
+
+	return '';
+}
+
+/**
  * Output custom CSS from Settings → Theme → CSS (compiled theme CSS remains in assets from SCSS).
  */
 function fs_output_custom_css(): void

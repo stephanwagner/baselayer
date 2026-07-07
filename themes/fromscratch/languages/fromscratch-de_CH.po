@@ -339,8 +339,8 @@ msgstr "Variablenübersicht"
 msgid "CSS variables"
 msgstr "CSS-Variablen"
 
-msgid "Could not read the :root block from _variables.scss."
-msgstr "Der :root-Block aus _variables.scss konnte nicht gelesen werden."
+msgid "Could not read CSS variables from the loaded theme styles."
+msgstr "CSS-Variablen konnten aus den geladenen Theme-Styles nicht gelesen werden."
 
 msgid "Copy option name"
 msgstr "Optionsnamen kopieren"
