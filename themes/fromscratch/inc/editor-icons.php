@@ -875,11 +875,8 @@ function fs_icon_category_labels(): array
 function fs_icon_ui_strings(): array
 {
 	return [
-		'choose'       => _x('Choose icon', 'icon picker', 'fromscratch-icons'),
-		'chooseLine1'  => _x('Choose', 'inline icon placeholder', 'fromscratch-icons'),
-		'chooseLine2'  => _x('an', 'inline icon placeholder', 'fromscratch-icons'),
-		'chooseLine3'  => _x('Icon', 'inline icon placeholder', 'fromscratch-icons'),
-		'change'       => _x('Change icon', 'inline icon control', 'fromscratch-icons'),
+		'choose'  => _x('Choose icon', 'icon picker', 'fromscratch-icons'),
+		'change'  => _x('Change icon', 'inline icon control', 'fromscratch-icons'),
 		'search'       => _x('Search icons…', 'icon picker', 'fromscratch-icons'),
 		'style'   => _x('Style', 'icon picker', 'fromscratch-icons'),
 		'outline' => _x('Outline', 'icon picker', 'fromscratch-icons'),

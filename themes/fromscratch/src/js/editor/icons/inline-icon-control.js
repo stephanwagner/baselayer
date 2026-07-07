@@ -1,6 +1,5 @@
 import { openIconPicker } from './icon-picker-service';
 
-const { Button } = wp.components;
 const { useRef } = wp.element;
 
 const iconL10n = (typeof window !== 'undefined' && window.fromscratchIcons) || {};
@@ -39,11 +38,7 @@ export function InlineIconControl({ value, onChange, isActive = false }) {
           aria-label={t('choose', 'Choose icon')}
         >
           <span className="fs-inline-icon-control__placeholder-glyph" aria-hidden="true" />
-          <span className="fs-inline-icon-control__placeholder-label">
-            <span>{t('chooseLine1', 'Choose')}</span>
-            <span>{t('chooseLine2', 'an')}</span>
-            <span>{t('chooseLine3', 'Icon')}</span>
-          </span>
+          <span className="fs-inline-icon-control__placeholder-label">{t('choose', 'Choose icon')}</span>
         </button>
       </div>
     );
@@ -55,21 +50,23 @@ export function InlineIconControl({ value, onChange, isActive = false }) {
         <span className={'fs-icon -icon-' + value} aria-hidden="true" />
 
         <div className="fs-inline-icon-control__actions">
-          <Button
+          <button
             ref={editRef}
-            icon="edit"
-            label={t('change', 'Change icon')}
-            showTooltip={false}
+            type="button"
             className="fs-inline-icon-control__action"
+            aria-label={t('change', 'Change icon')}
             onClick={() => openPicker(editRef.current)}
-          />
-          <Button
-            icon="no-alt"
-            label={t('remove', 'Remove')}
-            showTooltip={false}
+          >
+            <span className="fs-icon -icon-edit" aria-hidden="true" />
+          </button>
+          <button
+            type="button"
             className="fs-inline-icon-control__action is-destructive"
+            aria-label={t('remove', 'Remove')}
             onClick={() => onChange('')}
-          />
+          >
+            <span className="fs-icon -icon-close" aria-hidden="true" />
+          </button>
         </div>
       </div>
     </div>

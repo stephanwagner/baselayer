@@ -60,12 +60,6 @@
       transition: transition('background-color', 'border-color', 'color');
     }
 
-    &.-outline,
-    .wp-block-button.is-style-outline & {
-      background: transparent;
-      color: var(--fs-color-primary);
-    }
-
     &.-small,
     &.has-s-font-size {
       padding: 3px 14px;
@@ -101,6 +95,12 @@
       background: #eee !important;
       box-shadow: none !important;
     }
+  }
+
+  .button.-outline,
+  .wp-block-button.is-style-outline .wp-block-button__link {
+    background: transparent;
+    color: var(--fs-color-primary);
   }
 
   .button.-has-icon,
@@ -173,7 +173,7 @@
 
     &.-extra-large,
     &.has-xl-font-size {
-      padding-left: 50px;
+      padding-left: 52px;
 
       &::before {
         left: 16px;
@@ -209,7 +209,7 @@
 
     &.-extra-large,
     &.has-xl-font-size {
-      padding-right: 50px;
+      padding-right: 52px;
 
       &::before {
         right: 16px;
@@ -218,7 +218,7 @@
   }
 
   // Select fields
-  
+
   .select-container {
     position: relative;
     display: block;
