@@ -1,11 +1,19 @@
 /**
  * Linked top/bottom content margin control.
  *
- * @param {string} defaultClass Combined default class, e.g. `-content-margin-m` or ''.
+ * @param {string} defaultClass Combined default class, e.g. `m` or ''.
  */
 function getContentMarginControl(defaultClass = '') {
-  const match = (defaultClass || '').match(/^-content-margin-(none|xs|s|m|l|xl)$/);
-  const defaultSize = match ? match[1] : '';
+  console.log(defaultClass);
+
+
+  const match = (defaultClass || '').match(/^(none|xs|s|m|l|xl)$/);
+  
+  console.log(match);
+
+  const defaultSize = match ? '-content-margin-' + match[1] : '';
+
+  console.log(defaultSize);
 
   return {
     type: 'content-margin',
@@ -31,8 +39,8 @@ function getTextWrapOptions() {
     options: [
       { label: 'Standard', value: '' },
       { label: 'Balanced', value: 'text-wrap-balance' },
-      { label: 'Pretty', value: 'text-wrap-pretty' }
-    ]
+      { label: 'Pretty', value: 'text-wrap-pretty' },
+    ],
   };
 }
 
@@ -63,7 +71,8 @@ export const blockOptions = [
   {
     name: 'core/columns',
     options: [
-      getContentMarginControl('-content-margin-m'),
+      getContentMarginControl('m'),
+      getLimitWidthControl(),
       {
         type: 'button-group',
         label: 'Spaltenabstand',
@@ -75,8 +84,8 @@ export const blockOptions = [
           { label: 'S', value: '-column-gap-s' },
           { label: 'M', value: '-column-gap-m' },
           { label: 'L', value: '-column-gap-l' },
-          { label: 'XL', value: '-column-gap-xl' }
-        ]
+          { label: 'XL', value: '-column-gap-xl' },
+        ],
       },
       {
         type: 'select',
@@ -87,8 +96,8 @@ export const blockOptions = [
         options: [
           { label: 'Ohne', value: '' },
           { label: 'Bild links, Text rechts', value: '-image-left-text-right' },
-          { label: 'Bild rechts, Text links', value: '-image-right-text-left' }
-        ]
+          { label: 'Bild rechts, Text links', value: '-image-right-text-left' },
+        ],
       },
       {
         type: 'boolean',
@@ -96,9 +105,9 @@ export const blockOptions = [
         toggleLabel: 'Spalten wenn gestapelt umkehren',
         default: false,
         attributeName: 'columnReverseOrderOnMobile',
-        className: '-reverse-order-on-mobile'
-      }
-    ]
+        className: '-reverse-order-on-mobile',
+      },
+    ],
   },
 
   // Column
@@ -110,9 +119,9 @@ export const blockOptions = [
         toggleLabel: 'Inhalt vertikal zentrieren',
         default: false,
         attributeName: 'columnCenterContent',
-        className: '-center-content'
-      }
-    ]
+        className: '-center-content',
+      },
+    ],
   },
 
   // Heading
@@ -134,18 +143,16 @@ export const blockOptions = [
           { label: 'H6', value: 'h6' },
         ],
       },
+      getContentMarginControl(),
       getLimitWidthControl(),
-      getTextWrapOptions()
-    ]
+      getTextWrapOptions(),
+    ],
   },
 
   // Paragraph
   {
     name: 'core/paragraph',
-    options: [
-      getLimitWidthControl(),
-      getTextWrapOptions()
-    ]
+    options: [getContentMarginControl(), getLimitWidthControl(), getTextWrapOptions()],
   },
 
   // Image
@@ -158,16 +165,16 @@ export const blockOptions = [
         toggleLabel: 'Ohne Bildtext',
         default: false,
         attributeName: 'noImageLabel',
-        className: '-no-image-caption'
+        className: '-no-image-caption',
       },
       {
         type: 'boolean',
         toggleLabel: 'Bild bei Klick vergrößern',
         default: false,
         attributeName: 'hasLightbox',
-        className: '-has-lightbox'
-      }
-    ]
+        className: '-has-lightbox',
+      },
+    ],
   },
 
   // Gallery
@@ -180,41 +187,40 @@ export const blockOptions = [
         toggleLabel: 'Ohne Bildtexte',
         default: false,
         attributeName: 'noImageLabels',
-        className: '-no-image-captions'
+        className: '-no-image-captions',
       },
       {
         type: 'boolean',
         toggleLabel: 'Bilder bei Klick vergrößern',
         default: true,
         attributeName: 'hasLightbox',
-        className: '-has-lightbox'
-      }
-    ]
+        className: '-has-lightbox',
+      },
+    ],
   },
 
   // Group
   {
     name: 'core/group',
-    options: [
-      getContentMarginControl('-content-margin-m'),
-      getLimitWidthControl()
-    ]
+    options: [getContentMarginControl('m'), getLimitWidthControl()],
   },
 
   // Separator
   {
     name: 'core/separator',
-    options: [
-      getContentMarginControl('-content-margin-m')
-    ]
+    options: [getContentMarginControl('m')],
   },
 
   // Cover
   {
     name: 'core/cover',
-    options: [
-      getContentMarginControl('-content-margin-m')
-    ]
+    options: [getContentMarginControl('m')],
+  },
+
+  // Buttons
+  {
+    name: 'core/buttons',
+    options: [getContentMarginControl()],
   },
 
   // Button
@@ -225,7 +231,7 @@ export const blockOptions = [
         type: 'icon',
         label: 'Icon',
         default: '',
-        attributeName: 'buttonIcon'
+        attributeName: 'buttonIcon',
       },
       {
         type: 'button-group',
@@ -235,17 +241,17 @@ export const blockOptions = [
         iconLabel: true,
         options: [
           { icon: 'horizontal-align-left', label: 'Links', value: '' },
-          { icon: 'horizontal-align-right', label: 'Rechts', value: '-icon-right', iconPosition: 'after' }
-        ]
-      }
-    ]
+          { icon: 'horizontal-align-right', label: 'Rechts', value: '-icon-right', iconPosition: 'after' },
+        ],
+      },
+    ],
   },
 
   // ACF: Slider
   {
     name: 'acf/slider',
-    options: [
-      getContentMarginControl('-content-margin-m')
-    ]
-  }
+    options: [getContentMarginControl('m')],
+  },
 ];
+
+// TODO acf map / icon / icon-text
