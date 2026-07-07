@@ -312,7 +312,7 @@ function initBlockInserterSettings() {
     const { registerPlugin } = wp.plugins;
 
     if (PluginDocumentSettingPanel && registerPlugin) {
-      registerPlugin('fromscratch/hidden-blocks-panel', {
+      registerPlugin('fromscratch-hidden-blocks-panel', {
         render: function HiddenBlocksPanel() {
           return el(
             PluginDocumentSettingPanel,

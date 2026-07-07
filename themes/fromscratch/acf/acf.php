@@ -440,48 +440,80 @@ function fs_acf_block_render_callback($block)
 
 	$block = fs_acf_block_apply_option_classes($block);
 
+	if (
+		function_exists('acf_setup_meta')
+		&& !empty($block['data'])
+		&& is_array($block['data'])
+		&& !empty($block['id'])
+		&& is_string($block['id'])
+	) {
+		acf_setup_meta($block['data'], $block['id'], true);
+	}
+
 	$slug = str_replace('acf/', '', $block['name']);
 	if (file_exists(get_theme_file_path("/acf/blocks/{$slug}/{$slug}.php"))) {
 		include(get_theme_file_path("/acf/blocks/{$slug}/{$slug}.php"));
 	}
+
+	if (function_exists('acf_reset_meta') && !empty($block['id']) && is_string($block['id'])) {
+		acf_reset_meta($block['id']);
+	}
 }
 
 /**
- * Read an ACF block field on the front end (get_field + block JSON data).
+ * Block attribute data from an ACF block render context.
  *
- * @param array<string, mixed> $block ACF block array from the render callback.
- * @return mixed|null Field value, or null when unset.
+ * @param array<string, mixed> $block
+ * @return array<string, mixed>
  */
-function fs_acf_block_field(array $block, string $field_name)
+function fs_acf_block_data(array $block): array
+{
+	if (!empty($block['data']) && is_array($block['data'])) {
+		return $block['data'];
+	}
+
+	if (
+		!empty($block['attributes'])
+		&& is_array($block['attributes'])
+		&& !empty($block['attributes']['data'])
+		&& is_array($block['attributes']['data'])
+	) {
+		return $block['attributes']['data'];
+	}
+
+	return [];
+}
+
+/**
+ * Read a raw field value from block data (editor + front end).
+ *
+ * @param array<string, mixed> $block
+ * @return mixed|null
+ */
+function fs_acf_block_raw_field_value(array $block, string $field_name)
 {
 	if ($field_name === '') {
 		return null;
 	}
 
-	$value = get_field($field_name);
-	if ($value !== null && $value !== false && $value !== '') {
-		return $value;
-	}
-
-	if (empty($block['data']) || !is_array($block['data'])) {
+	$data = fs_acf_block_data($block);
+	if ($data === []) {
 		return null;
 	}
 
-	$data = $block['data'];
 	$underscore = str_replace('-', '_', $field_name);
-
 	$ref_keys = ['_' . $field_name];
 	if ($underscore !== $field_name) {
 		$ref_keys[] = '_' . $underscore;
 	}
 
 	foreach ($ref_keys as $ref_key) {
-		if (!array_key_exists($ref_key, $data) || !is_string($data[$ref_key]) || $data[$ref_key] === '') {
+		if (!array_key_exists($ref_key, $data)) {
 			continue;
 		}
 
 		$field_key = $data[$ref_key];
-		if (!array_key_exists($field_key, $data)) {
+		if (!is_string($field_key) || $field_key === '' || !array_key_exists($field_key, $data)) {
 			continue;
 		}
 
@@ -491,15 +523,12 @@ function fs_acf_block_field(array $block, string $field_name)
 		}
 	}
 
-	if (array_key_exists($field_name, $data)) {
-		$raw = $data[$field_name];
-		if ($raw !== null && $raw !== false && $raw !== '') {
-			return $raw;
+	foreach ([$field_name, $underscore] as $name) {
+		if (!array_key_exists($name, $data)) {
+			continue;
 		}
-	}
 
-	if ($underscore !== $field_name && array_key_exists($underscore, $data)) {
-		$raw = $data[$underscore];
+		$raw = $data[$name];
 		if ($raw !== null && $raw !== false && $raw !== '') {
 			return $raw;
 		}
@@ -524,6 +553,78 @@ function fs_acf_block_field(array $block, string $field_name)
 	}
 
 	return null;
+}
+
+/**
+ * Read an ACF block field on the front end (get_field + block JSON data).
+ *
+ * @param array<string, mixed> $block ACF block array from the render callback.
+ * @return mixed|null Field value, or null when unset.
+ */
+function fs_acf_block_field(array $block, string $field_name)
+{
+	if ($field_name === '') {
+		return null;
+	}
+
+	$raw = fs_acf_block_raw_field_value($block, $field_name);
+	if ($raw !== null && $raw !== false && $raw !== '') {
+		return $raw;
+	}
+
+	$value = get_field($field_name);
+	if ($value !== null && $value !== false && $value !== '') {
+		return $value;
+	}
+
+	return null;
+}
+
+/**
+ * Icon slug from a block's `iconSlug` attribute.
+ *
+ * @param array<string, mixed> $block
+ */
+function fs_acf_block_icon_slug(array $block): string
+{
+	if (empty($block['iconSlug'])) {
+		return '';
+	}
+
+	return fs_sanitize_icon_slug($block['iconSlug']);
+}
+
+/**
+ * Render a theme icon span for an ACF block.
+ *
+ * @param array<string, mixed> $block
+ * @param array<string, scalar|null> $attrs
+ */
+function fs_acf_block_icon_markup(array $block, array $attrs = []): string
+{
+	$slug = fs_acf_block_icon_slug($block);
+	if ($slug === '') {
+		return '';
+	}
+
+	$classes = ['fs-icon', '-icon-' . $slug];
+	if (!empty($attrs['class']) && is_string($attrs['class'])) {
+		$classes[] = $attrs['class'];
+	}
+
+	unset($attrs['class']);
+
+	$attr_parts = ['class="' . esc_attr(implode(' ', $classes)) . '"', 'aria-hidden="true"'];
+
+	foreach ($attrs as $key => $value) {
+		if (!is_string($key) || $key === '' || $value === null || $value === false) {
+			continue;
+		}
+
+		$attr_parts[] = esc_attr($key) . '="' . esc_attr((string) $value) . '"';
+	}
+
+	return '<span ' . implode(' ', $attr_parts) . '></span>';
 }
 
 /**

@@ -875,8 +875,12 @@ function fs_icon_category_labels(): array
 function fs_icon_ui_strings(): array
 {
 	return [
-		'choose'  => _x('Choose icon', 'icon picker', 'fromscratch-icons'),
-		'search'  => _x('Search icons…', 'icon picker', 'fromscratch-icons'),
+		'choose'       => _x('Choose icon', 'icon picker', 'fromscratch-icons'),
+		'chooseLine1'  => _x('Choose', 'inline icon placeholder', 'fromscratch-icons'),
+		'chooseLine2'  => _x('an', 'inline icon placeholder', 'fromscratch-icons'),
+		'chooseLine3'  => _x('Icon', 'inline icon placeholder', 'fromscratch-icons'),
+		'change'       => _x('Change icon', 'inline icon control', 'fromscratch-icons'),
+		'search'       => _x('Search icons…', 'icon picker', 'fromscratch-icons'),
 		'style'   => _x('Style', 'icon picker', 'fromscratch-icons'),
 		'outline' => _x('Outline', 'icon picker', 'fromscratch-icons'),
 		'filled'  => _x('Filled', 'icon picker', 'fromscratch-icons'),
@@ -915,6 +919,29 @@ function fs_icon_fill_names(): array
 	$cache = array_values(array_unique(array_filter($names[1] ?? [])));
 
 	return $cache;
+}
+
+/**
+ * Sanitize a theme icon slug stored in block/field data.
+ *
+ * @param mixed $value Raw icon slug (e.g. heart, heart-fill, theme-logo).
+ */
+function fs_sanitize_icon_slug($value): string
+{
+	if (!is_string($value)) {
+		return '';
+	}
+
+	$value = strtolower(trim($value));
+	if ($value === '') {
+		return '';
+	}
+
+	if (!preg_match('/^[a-z0-9][a-z0-9-]*$/', $value)) {
+		return '';
+	}
+
+	return $value;
 }
 
 /**

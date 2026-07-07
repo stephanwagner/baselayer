@@ -1,5 +1,8 @@
 <?php
 
 return [
-	// TODO
+	'attributes' => [
+		'mode' => 'preview',
+		'iconSlug' => 'heart',
+	],
 ];

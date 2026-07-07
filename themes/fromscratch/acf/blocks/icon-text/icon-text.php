@@ -16,6 +16,8 @@ if (!empty($block['className'])) {
 	$classNames[] = $block['className'];
 }
 
+$iconMarkup = fs_acf_block_icon_markup($block);
+
 // Add wrapper class
 $classNames[] = 'icon-text__wrapper';
 ?>
@@ -24,9 +26,11 @@ $classNames[] = 'icon-text__wrapper';
 	<div class="icon-text__container">
 		<div class="icon-text__content">
 			<div class="icon-text__icon">
-				<div class="icon-text__icon">
-					TODO ICON
-				</div>
+				<?php if ($iconMarkup !== ''): ?>
+					<?= $iconMarkup ?>
+				<?php else: ?>
+					<span class="icon-text__placeholder"><?= esc_html__('Choose an icon', 'fromscratch') ?></span>
+				<?php endif; ?>
 			</div>
 			<div class="icon-text__text">
 				<InnerBlocks />

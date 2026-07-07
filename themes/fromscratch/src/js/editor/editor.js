@@ -2,6 +2,7 @@ import './block-options';
 import './block-inserter-settings';
 import './embed-variations';
 import './acf-inner-blocks-toolbar';
+import './icon-blocks/icon-blocks';
 import './expirator';
 import './events';
 import './page-show-title';

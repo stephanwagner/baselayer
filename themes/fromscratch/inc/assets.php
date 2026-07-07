@@ -306,7 +306,7 @@ function fs_editor_scripts(): void
 	wp_enqueue_script(
 		'fromscratch-editor',
 		get_template_directory_uri() . $file,
-		[
+		array_values(array_filter([
 			'wp-plugins',
 			'wp-edit-post',
 			'wp-editor',
@@ -319,7 +319,8 @@ function fs_editor_scripts(): void
 			'wp-i18n',
 			'wp-date',
 			'wp-preferences',
-		],
+			wp_script_is('acf-input', 'registered') ? 'acf-input' : null,
+		])),
 		fs_asset_hash($file),
 		true
 	);
