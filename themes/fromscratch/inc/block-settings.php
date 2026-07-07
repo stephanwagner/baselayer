@@ -116,7 +116,7 @@ function fs_sanitize_block_settings($value): array
 			continue;
 		}
 
-		if (fs_block_settings_is_child_only($block_name)) {
+		if (!fs_block_settings_is_manageable_block($block_name)) {
 			continue;
 		}
 
@@ -589,19 +589,63 @@ function fs_block_variation_editor_export(): array
 }
 
 /**
- * Whether a block is only insertable inside a parent (not top-level inserter).
+ * Parent and ancestor block names a block may be inserted into.
+ *
+ * @return string[]
  */
-function fs_block_settings_is_child_only(string $block_name): bool
+function fs_block_settings_block_parent_names(string $block_name): array
 {
 	$registry = WP_Block_Type_Registry::get_instance();
 	if (!$registry->is_registered($block_name)) {
-		return false;
+		return [];
 	}
 
 	$block = $registry->get_registered($block_name);
-	$parent = isset($block->parent) ? $block->parent : null;
+	$parents = [];
 
-	return is_array($parent) && $parent !== [];
+	if (isset($block->parent) && is_array($block->parent)) {
+		$parents = array_merge($parents, $block->parent);
+	}
+
+	if (isset($block->ancestor) && is_array($block->ancestor)) {
+		$parents = array_merge($parents, $block->ancestor);
+	}
+
+	return array_values(array_unique(array_filter(array_map('strval', $parents))));
+}
+
+/**
+ * Root-level child block (parent is only core/post-content, e.g. Page Break).
+ */
+function fs_block_settings_is_root_only_child_block(string $block_name): bool
+{
+	return fs_block_settings_block_parent_names($block_name) === ['core/post-content'];
+}
+
+/**
+ * Nested child block (column, list-item, accordion-item, …) — not manageable in Theme → Blocks.
+ */
+function fs_block_settings_is_internal_child_block(string $block_name): bool
+{
+	$parents = fs_block_settings_block_parent_names($block_name);
+
+	return $parents !== [] && !fs_block_settings_is_root_only_child_block($block_name);
+}
+
+/**
+ * Whether a block can appear in Theme → Blocks (top-level or root-only child).
+ */
+function fs_block_settings_is_manageable_block(string $block_name): bool
+{
+	return !fs_block_settings_is_internal_child_block($block_name);
+}
+
+/**
+ * Whether a block is only insertable inside a parent (legacy helper).
+ */
+function fs_block_settings_is_child_only(string $block_name): bool
+{
+	return fs_block_settings_block_parent_names($block_name) !== [];
 }
 
 /**
@@ -620,7 +664,7 @@ function fs_block_settings_get_all(): array
 	$out = [];
 
 	foreach ($registry->get_all_registered() as $block_name => $block) {
-		if (fs_block_settings_is_child_only($block_name)) {
+		if (!fs_block_settings_is_manageable_block($block_name)) {
 			continue;
 		}
 
@@ -669,7 +713,24 @@ function fs_block_settings_disallowed_names(): array
 		}
 	}
 
-	return $names;
+	$hard = fs_block_settings_hard_disallowed();
+	$names = array_merge($names, $hard);
+
+	$registry = WP_Block_Type_Registry::get_instance();
+	foreach ($registry->get_all_registered() as $block_name => $block) {
+		unset($block);
+
+		$parents = fs_block_settings_block_parent_names($block_name);
+		if ($parents === []) {
+			continue;
+		}
+
+		if (array_intersect($parents, $hard) !== []) {
+			$names[] = $block_name;
+		}
+	}
+
+	return array_values(array_unique($names));
 }
 
 /**
@@ -720,7 +781,7 @@ function fs_block_settings_registry_by_category(): array
 	$groups = [];
 
 	foreach ($registry->get_all_registered() as $block_name => $block) {
-		if (fs_block_settings_is_child_only($block_name)) {
+		if (!fs_block_settings_is_manageable_block($block_name)) {
 			continue;
 		}
 
@@ -788,19 +849,32 @@ function fs_block_settings_registry_configurable_by_category(): array
  */
 function fs_block_settings_system_blocks(): array
 {
+	$registry = WP_Block_Type_Registry::get_instance();
 	$blocks = [];
 
-	foreach (fs_block_settings_registry_by_category() as $category => $rows) {
-		foreach ($rows as $block) {
-			if (empty($block['hardDisallowed'])) {
-				continue;
-			}
-
-			$blocks[] = array_merge($block, [
-				'category' => $category,
-			]);
+	foreach (fs_block_settings_hard_disallowed() as $block_name) {
+		if (!$registry->is_registered($block_name)) {
+			continue;
 		}
+
+		$block = $registry->get_registered($block_name);
+		$category = is_string($block->category) && $block->category !== '' ? $block->category : 'uncategorized';
+
+		$blocks[] = [
+			'name'           => $block_name,
+			'title'          => $block->title,
+			'icon'           => $block->icon,
+			'category'       => $category,
+			'allowed'        => false,
+			'hidden'         => false,
+			'favorite'       => false,
+			'hardDisallowed' => true,
+		];
 	}
+
+	usort($blocks, static function (array $a, array $b): int {
+		return strcasecmp((string) $a['title'], (string) $b['title']);
+	});
 
 	return $blocks;
 }

@@ -6,6 +6,8 @@ defined('ABSPATH') || exit;
  * Block inserter settings (code-only).
  *
  * hardDisallowed — blocks that cannot be enabled via Settings → Theme → Blocks.
+ * Also applies to child blocks whose parent/ancestor is hard-disallowed (cascade).
+ * Embed variations are separate (blockVariations) and are not affected by cascade.
  *
  * default — fallback flags for blocks without a per-block entry in `blocks`.
  * blocks  — per-block defaults (used when nothing is saved in the database yet,
@@ -14,6 +16,10 @@ defined('ABSPATH') || exit;
  *
  * Each block entry supports: allowed, hidden, favorite (all booleans).
  * `hidden` and `favorite` only apply when `allowed` is true.
+ *
+ * Root-only child blocks (parent: core/post-content only, e.g. Page Break) appear in
+ * Theme → Blocks when not hard-disallowed. Internal children (column, list-item, …)
+ * are not shown in the UI but are blocked when their parent is hard-disallowed.
  *
  * blockVariations — per-variation defaults for blocks that have inserter variations
  * (e.g. core/embed providers, core/group layouts). Keys are parent block names.
@@ -115,8 +121,9 @@ return [
 		'core/legacy-widget',
 		'core/widget-group',
 		'core/text-columns',
+		'core/more',
+		'core/nextpage',
 		'core/navigation-overlay-close',
-
 	],
 
 	'blocks' => [
