@@ -51,14 +51,14 @@ function fs_render_developer_cheatsheet(): void
 			<h2 class="title" style="margin-top: 0;"><?= esc_html__('Configs', 'fromscratch') ?></h2>
 			<p class="description"><?= esc_html__('Optional defines in wp-config.php for local development and testing.', 'fromscratch') ?></p>
 
-			<table class="widefat -large-padding striped helpers-table__table">
+			<table class="widefat -large-padding striped helpers-table__table -columns-2">
 				<tbody>
 					<tr>
 						<td>
 							<strong><?= esc_html__('Simulate client IP', 'fromscratch') ?></strong><br>
 							<span class="description"><?= esc_html__('Overrides the client IP with a fixed IP address. Active only when WP_DEBUG is true.', 'fromscratch') ?></span>
 						</td>
-						<td style="width: 100%;">
+						<td>
 							<code class="fs-code-small">define('FS_SIMULATE_CLIENT_IP', '127.0.0.22');</code>
 						</td>
 					</tr>
@@ -70,7 +70,7 @@ function fs_render_developer_cheatsheet(): void
 			<h2 class="title" style="margin-top: 0;"><?= esc_html__('Helpers', 'fromscratch') ?></h2>
 			<p class="description"><?= esc_html__('Common helper functions and utilities for templates, theme code, and frontend scripts.', 'fromscratch') ?></p>
 
-			<table class="widefat -large-padding 	striped helpers-table__table">
+			<table class="widefat -large-padding striped helpers-table__table">
 				<tbody>
 					<tr>
 						<td>

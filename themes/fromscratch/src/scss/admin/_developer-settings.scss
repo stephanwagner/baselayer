@@ -139,16 +139,18 @@
     }
   }
 
-  td:nth-child(2) {
-    width: 80px;
-    white-space: nowrap;
+  &:not(.-columns-2) {
+    td:nth-child(2) {
+      width: 80px;
+      white-space: nowrap;
 
-    code {
-      color: #50575e;
-    }
+      code {
+        color: #50575e;
+      }
 
-    @media (max-width: 600px) {
-      display: none;
+      @media (max-width: 600px) {
+        display: none;
+      }
     }
   }
 }
