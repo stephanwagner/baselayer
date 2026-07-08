@@ -28,7 +28,7 @@
 <!-- /wp:button -->
 
 <!-- wp:button {"className":"is-style-outline -small","buttonSize":"-small"} -->
-<div class="wp-block-button is-style-outline -small"><a class="wp-block-button__link wp-element-button" href="#image">Image</a></div>
+<div class="wp-block-button is-style-outline -small"><a class="wp-block-button__link wp-element-button" href="#media">Media</a></div>
 <!-- /wp:button -->
 
 <!-- wp:button {"className":"is-style-outline -small","buttonSize":"-small"} -->
@@ -239,11 +239,11 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The Columns block splits content into side-by-side layouts, such as image left and text right. Turn on the image-text option to align the text column vertically with the image. Column spacing can be adjusted in the block settings, and the order can be reversed on mobile.</p>
+<p>The Columns block splits content into side-by-side layouts, such as image or video left and text right. Turn on the Media Text Layout option to align the text column vertically with the media. Column spacing can be adjusted in the block settings, and the order can be reversed on mobile.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:columns {"className":"-content-margin-m -column-gap-s -image-text-layout","columnGap":"-column-gap-s","harmonizeImageText":true} -->
-<div class="wp-block-columns -content-margin-m -column-gap-s -image-text-layout"><!-- wp:column -->
+<!-- wp:columns {"className":"-content-margin-m -column-gap-s -media-text-layout","columnGap":"-column-gap-s","harmonizeImageText":true} -->
+<div class="wp-block-columns -content-margin-m -column-gap-s -media-text-layout"><!-- wp:column -->
 <div class="wp-block-column"><!-- wp:image {"id":{{media:sample-image-1:id}},"sizeSlug":"large","linkDestination":"none"} -->
 <figure class="wp-block-image size-large"><img src="{{media:sample-image-1:url}}" alt="" class="wp-image-{{media:sample-image-1:id}}"/><figcaption class="wp-element-caption">Sunset over a rolling hill</figcaption></figure>
 <!-- /wp:image --></div>
@@ -255,13 +255,13 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Content in this column can be centered vertically next to an image, so text and visual align cleanly even when heights differ.</p>
+<p>Content in this column can be centered vertically next to an image or video, so text and visual align cleanly even when heights differ.</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:column --></div>
 <!-- /wp:columns -->
 
-<!-- wp:columns {"className":"-content-margin-s -column-gap-m -image-text-layout -reverse-order-on-mobile","contentMarginTop":"s","contentMarginBottom":"s","harmonizeImageText":true,"columnReverseOrderOnMobile":true} -->
-<div class="wp-block-columns -content-margin-s -column-gap-m -image-text-layout -reverse-order-on-mobile"><!-- wp:column -->
+<!-- wp:columns {"className":"-content-margin-s -column-gap-m -media-text-layout -reverse-order-on-mobile","contentMarginTop":"s","contentMarginBottom":"s","harmonizeImageText":true,"columnReverseOrderOnMobile":true} -->
+<div class="wp-block-columns -content-margin-s -column-gap-m -media-text-layout -reverse-order-on-mobile"><!-- wp:column -->
 <div class="wp-block-column"><!-- wp:heading {"level":3} -->
 <h3 class="wp-block-heading">More room for content</h3>
 <!-- /wp:heading -->
@@ -275,11 +275,11 @@
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p><mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-gray-500-color">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut rhoncus turpis a eros blandit malesuada. Maecenas hendrerit auctor odio, eget volutpat sapien feugiat in. Nulla sed dapibus arcu. Praesent efficitur est dolor, sit amet viverra lacus rhoncus eget. Cras maximus tellus nulla, id gravida turpis eleifend non.</mark></p>
+<p><mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-gray-500-color">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla gravida faucibus dolor, et placerat justo sagittis vitae. Nullam mollis lectus ex, non volutpat ex volutpat non. Nam non turpis erat. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Vestibulum tincidunt tellus velit, pharetra faucibus nunc ultrices id. In hac habitasse platea dictumst. Cras accumsan tincidunt lorem vulputate posuere. Etiam aliquet laoreet nisi sed lobortis. Sed sed nibh nulla.</mark></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
-<p><mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-gray-500-color">Vivamus nisl neque, pellentesque id venenatis id, faucibus in tortor. Donec nec orci id quam pretium euismod. Ut ac suscipit arcu, id vulputate nisl. Vestibulum viverra, felis at hendrerit ultricies, ex lorem placerat libero, a mollis ex urna in neque.</mark></p>
+<p><mark style="background-color:rgba(0, 0, 0, 0)" class="has-inline-color has-gray-500-color">Fusce sem mauris, lacinia vel odio quis, condimentum elementum dolor. Nulla accumsan vitae ipsum in semper. Nunc faucibus aliquam velit id condimentum. Praesent at varius turpis. Proin sed interdum ligula. Nullam vitae gravida sapien, ac dapibus tellus. Ut aliquet mi nunc, sit amet ultrices turpis vehicula at. Phasellus luctus lorem venenatis, dictum sem vitae, vulputate augue.</mark></p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:column -->
 
@@ -388,19 +388,41 @@
 <hr class="wp-block-separator has-alpha-channel-opacity -content-margin-m"/>
 <!-- /wp:separator -->
 
-<!-- wp:acf/anchor {"name":"acf/anchor","data":{"id":"image","_id":"field_6a003d7571e96","offset":"0","_offset":"field_6a003e0271e97"},"mode":"preview"} /-->
+<!-- wp:acf/anchor {"name":"acf/anchor","data":{"id":"media","_id":"field_6a003d7571e96","offset":"0","_offset":"field_6a003e0271e97"},"mode":"preview"} /-->
 
 <!-- wp:heading -->
-<h2 class="wp-block-heading">Image</h2>
+<h2 class="wp-block-heading">Media</h2>
+<!-- /wp:heading -->
+
+<!-- wp:columns {"className":"-content-margin-s -column-gap-m","contentMarginTop":"s","contentMarginBottom":"s"} -->
+<div class="wp-block-columns -content-margin-s -column-gap-m"><!-- wp:column -->
+<div class="wp-block-column"><!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading">Image</h4>
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Image blocks support optional captions and can be opened in a lightbox on click. Captions can be hidden for a cleaner look when the image should speak for itself.</p>
+<p>Image blocks support optional captions and can be opened in a lightbox on click. Captions can be hidden for a cleaner look.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:image {"id":{{media:sample-image-3:id}},"width":"400px","aspectRatio":"1.5","scale":"cover","sizeSlug":"large","linkDestination":"none","className":"-content-margin-top-s -has-lightbox","contentMarginTop":"s","contentMarginLinked":false,"hasLightbox":true} -->
-<figure class="wp-block-image size-large is-resized -content-margin-top-s -has-lightbox"><img src="{{media:sample-image-3:url}}" alt="" class="wp-image-{{media:sample-image-3:id}}" style="aspect-ratio:1.5;object-fit:cover;width:400px"/><figcaption class="wp-element-caption">A calm lake bathed in autumn sunlight</figcaption></figure>
-<!-- /wp:image -->
+<!-- wp:image {"id":{{media:sample-image-3:id}},"aspectRatio":"16/9","scale":"cover","sizeSlug":"large","linkDestination":"none","className":"-has-lightbox","contentMarginTop":"s","contentMarginLinked":false,"hasLightbox":true} -->
+<figure class="wp-block-image size-large is-resized -has-lightbox"><img src="{{media:sample-image-3:url}}" alt="" class="wp-image-{{media:sample-image-3:id}}" style="aspect-ratio:16/9;object-fit:cover"/><figcaption class="wp-element-caption">A calm lake bathed in autumn sunlight</figcaption></figure>
+<!-- /wp:image --></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"><!-- wp:heading {"level":4} -->
+<h4 class="wp-block-heading">Video</h4>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Video blocks use the standard HTML5 player. Poster image, autoplay, and loop can be configured in the block settings.</p>
+<!-- /wp:paragraph -->
+     
+<!-- wp:video {"id":{{media:sample-video-1:id}}} -->
+<figure class="wp-block-video"><video controls src="{{media:sample-video-1:url}}"></video><figcaption class="wp-element-caption">A short sample video for testing and placeholder content</figcaption></figure>
+<!-- /wp:video --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->
 
 <!-- wp:separator {"className":"-content-margin-m"} -->
 <hr class="wp-block-separator has-alpha-channel-opacity -content-margin-m"/>
@@ -544,5 +566,4 @@
 
 <!-- wp:paragraph -->
 <p>TODO: Article List</p>
-<p>TODO: Video</p>
 <!-- /wp:paragraph -->

@@ -96,12 +96,12 @@ export const blockOptions = [
       },
       {
         type: 'boolean',
-        label: 'Bild-Text-Layout',
+        label: 'Media-Text Layout',
         toggleLabel: 'Text harmonisch ausrichten',
-        description: 'Richtet die Textspalte bei kurzen Inhalten mittig zum Bild aus.',
+        description: 'Richtet die Textspalte mittig zum Bild oder Video aus.',
         default: false,
         attributeName: 'harmonizeImageText',
-        className: '-image-text-layout',
+        className: '-media-text-layout',
       },
       {
         type: 'boolean',
@@ -165,6 +165,20 @@ export const blockOptions = [
     options: [
       getContentMarginControl(),
       {
+        type: 'button-group',
+        label: 'Bildausschnitt',
+        description: 'Legt fest, welcher Teil des Bildes sichtbar bleibt, wenn es nicht vollständig angezeigt werden kann.',
+        default: '',
+        attributeName: 'imageObjectPosition',
+        options: [
+          { icon: 'select-all', label: 'Mitte', value: '' },
+          { icon: 'move-selection-left', label: 'Links', value: '-object-position-left' },
+          { icon: 'move-selection-right', label: 'Rechts', value: '-object-position-right' },
+          { icon: 'move-selection-up', label: 'Oben', value: '-object-position-top' },
+          { icon: 'move-selection-down', label: 'Unten', value: '-object-position-bottom' },
+        ],
+      },
+      {
         type: 'boolean',
         toggleLabel: 'Ohne Bildtext',
         default: false,
@@ -180,6 +194,12 @@ export const blockOptions = [
         className: '-has-lightbox',
       },
     ],
+  },
+
+  // Video
+  {
+    name: 'core/video',
+    options: [getContentMarginControl()],
   },
 
   // Gallery

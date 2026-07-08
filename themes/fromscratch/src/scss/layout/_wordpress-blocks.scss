@@ -167,14 +167,16 @@
       }
     }
 
-    // Columns: Bild-Text-Layout
+    // Columns: Media Text Layout
 
+    &.-media-text-layout,
     &.-image-text-layout {
-      > .wp-block-column:has(.wp-block-image) {
+      > .wp-block-column:has(.wp-block-image),
+      > .wp-block-column:has(.wp-block-video) {
         align-self: flex-start;
       }
 
-      > .wp-block-column:not(:has(.wp-block-image)) {
+      > .wp-block-column:not(:has(.wp-block-image)):not(:has(.wp-block-video)) {
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -219,9 +221,11 @@
     padding: 0;
   }
 
-  .wp-block-image {
+  .wp-block-image,
+  .wp-block-video {
     margin-top: 24px;
     margin-bottom: 24px;
+    line-height: 0;
 
     &:first-child {
       margin-top: 0;
@@ -234,15 +238,12 @@
     @media (max-width: $breakpoint-s) {
       margin-top: 16px;
       margin-bottom: 16px;
-
-      &:first-child {
-        margin-top: 0;
-      }
     }
 
     &.alignleft {
       margin-left: 0;
       margin-right: auto;
+      float: none;
     }
 
     &.aligncenter {
@@ -253,8 +254,18 @@
     &.alignright {
       margin-left: auto;
       margin-right: 0;
+      float: none;
     }
 
+    .wp-element-caption {
+      margin: 4px 0 0;
+      font-size: var(--fs-font-size-s);
+      line-height: var(--fs-line-height-s);
+      color: var(--fs-color-gray-600);
+    }
+  }
+
+  .wp-block-image {
     img {
       border-radius: var(--fs-border-radius-m);
     }
@@ -282,17 +293,32 @@
       }
     }
 
-    .wp-element-caption {
-      margin: 4px 0 0;
-      font-size: var(--fs-font-size-s);
-      line-height: var(--fs-line-height-s);
-      color: var(--fs-color-gray-600);
-    }
-
     &.-no-image-caption {
       .wp-element-caption {
         display: none;
       }
+    }
+
+    &.-object-position-left img {
+      object-position: left center;
+    }
+
+    &.-object-position-right img {
+      object-position: right center;
+    }
+
+    &.-object-position-top img {
+      object-position: center top;
+    }
+
+    &.-object-position-bottom img {
+      object-position: center bottom;
+    }
+  }
+
+  .wp-block-video {
+    video {
+      border-radius: var(--fs-border-radius-m);
     }
   }
 
@@ -302,6 +328,18 @@
     figure.wp-block-image {
       figcaption.wp-element-caption {
         padding: 16px 12px 8px;
+        pointer-events: none;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: var(--fs-font-size-s);
+        line-height: var(--fs-line-height-s);
+
+        @media (max-width: $breakpoint-s) {
+          padding: 12px 8px 8px;
+          font-size: 13px;
+          line-height: 1.4;
+        }
       }
 
       figcaption.wp-element-caption,

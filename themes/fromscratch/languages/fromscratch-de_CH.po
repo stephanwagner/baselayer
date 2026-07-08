@@ -2396,8 +2396,11 @@ msgstr "Untermenü für %s umschalten"
 
 # Users & roles
 
-msgid "At least one user must have developer rights. Add another developer before removing yours."
-msgstr "Mindestens ein Benutzer muss Entwicklerrechte haben. Lege zuerst einen weiteren Entwickler an, bevor du deine entfernst."
+msgid "At least one user must have developer rights. Either check \"Has developer rights\" for the current user or add another user and check it there."
+msgstr "Mindestens ein Benutzer muss Entwicklerrechte besitzen. Aktivieren Sie entweder „Hat Entwicklerrechte“ für den aktuellen Benutzer oder fügen Sie einen weiteren Benutzer hinzu und aktivieren Sie die Option dort."
+
+msgid "To add another user, please fill in username, email, and password."
+msgstr "Um einen weiteren Benutzer hinzuzufügen, bitte Benutzername, E-Mail-Adresse und Passwort ausfüllen."
 
 msgid "Developer rights"
 msgstr "Entwicklerrechte"

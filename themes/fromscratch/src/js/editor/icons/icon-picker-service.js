@@ -40,6 +40,7 @@ function createModal() {
             <button type="button" class="button button-secondary" data-fs-icon-picker-variant="fill">${t('filled', 'Filled')}</button>
           </div>
         </div>
+        <nav class="fs-icon-picker__nav" data-fs-icon-picker-nav aria-label="${t('categories', 'Categories')}"></nav>
         <div class="fs-icon-picker__categories" data-fs-icon-picker-categories></div>
       </div>
     </div>
@@ -78,8 +79,10 @@ function createIconPickerService() {
     const categories = categoryLabels();
     const query = search.trim().toLowerCase();
     const categoriesEl = modal.querySelector('[data-fs-icon-picker-categories]');
+    const navEl = modal.querySelector('[data-fs-icon-picker-nav]');
 
     categoriesEl.innerHTML = '';
+    navEl.innerHTML = '';
 
     iconCategories.forEach((category) => {
       const icons = category.icons.filter((icon) => iconMatchesQuery(icon, query, iconName(icon, labels)));
@@ -91,10 +94,21 @@ function createIconPickerService() {
       const section = document.createElement('div');
       section.className = 'fs-icon-picker__category';
 
+      const label = categoryName(category, categories);
+
       const title = document.createElement('h3');
       title.className = 'fs-icon-picker__category-title';
-      title.textContent = categoryName(category, categories);
+      title.textContent = label;
       section.appendChild(title);
+
+      const navButton = document.createElement('button');
+      navButton.type = 'button';
+      navButton.className = 'fs-icon-picker__nav-item';
+      navButton.textContent = label;
+      navButton.addEventListener('click', () => {
+        categoriesEl.scrollTo({ top: section.offsetTop, behavior: 'smooth' });
+      });
+      navEl.appendChild(navButton);
 
       const grid = document.createElement('div');
       grid.className = 'fs-icon-picker__grid';
@@ -130,6 +144,8 @@ function createIconPickerService() {
       section.appendChild(grid);
       categoriesEl.appendChild(section);
     });
+
+    navEl.hidden = navEl.children.length < 2;
   };
 
   const close = () => {

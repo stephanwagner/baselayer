@@ -121,7 +121,7 @@ function fs_install_media_manifest(): array
 		'sample-image-1' => [
 			'file'    => $base . '/sample-image-1.webp',
 			'title'   => 'Sunlit Landscape',
-			'caption' => 'Sunset over a rolling hill',
+			'caption' => 'Evening glow across the hills',
 		],
 		'sample-image-2' => [
 			'file'    => $base . '/sample-image-2.webp',
@@ -136,12 +136,12 @@ function fs_install_media_manifest(): array
 		'sample-image-4' => [
 			'file'    => $base . '/sample-image-4.webp',
 			'title'   => 'Wide Vista',
-			'caption' => 'A quiet lake beneath a small mountain range',
+			'caption' => 'Lake at the foot of a small mountain range',
 		],
 		'sample-image-5' => [
 			'file'    => $base . '/sample-image-5.webp',
 			'title'   => 'Standing Tall',
-			'caption' => 'A tall mountain peak wrapped in drifting fog',
+			'caption' => 'Last light on the peaks above the forest',
 		],
 		'sample-video-1' => [
 			'file'    => $base . '/sample-video-1.mp4',

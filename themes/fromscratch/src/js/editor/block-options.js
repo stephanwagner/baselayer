@@ -38,10 +38,11 @@ const HAS_ICON_CLASS = '-has-icon';
 // Auto-applied when a button has an icon but no label text.
 const ICON_ONLY_CLASS = '-icon-only';
 
-// Legacy Bild-Text-Layout classes (removed; stripped on sync / migration).
+// Legacy media-text layout classes (removed; stripped on sync / migration).
 const LEGACY_IMAGE_TEXT_LAYOUT_CLASSES = [
   '-image-left-text-right',
   '-image-right-text-left',
+  '-image-text-layout',
 ];
 
 const iconPrefix = (option) => option.classPrefix || ICON_CLASS_PREFIX;
@@ -138,7 +139,7 @@ const contentMarginOptions = (blockConfig) =>
 const limitWidthOptions = (blockConfig) =>
   blockConfig.options.filter((option) => option.type === 'limit-width');
 
-/** Migrate legacy image-text layout select / className to harmonizeImageText boolean. */
+/** Migrate legacy media-text layout select / className to harmonizeImageText boolean. */
 const migrateLegacyImageTextLayoutAttributes = (attributes) => {
   const classNames = (attributes.className || '').split(/\s+/).filter(Boolean);
   const hasLegacyClass = LEGACY_IMAGE_TEXT_LAYOUT_CLASSES.some((legacyClass) =>
@@ -476,7 +477,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
       attributes.className,
     ]);
 
-    // Migrate legacy Bild-Text-Layout select / className into harmonizeImageText boolean once.
+    // Migrate legacy media-text layout select / className into harmonizeImageText boolean once.
     useEffect(() => {
       if (!blockConfig || blockConfig.name !== 'core/columns') {
         return;

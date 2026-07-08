@@ -112,6 +112,8 @@ const builtInCategories = [
       { filename: 'signature', alternatives: [], keywords: ['signature', 'sign', 'autograph', 'handwriting'] },
       { filename: 'crop', alternatives: [], keywords: ['trim', 'resize', 'image'] },
       { filename: 'resize', alternatives: [], keywords: ['resize', 'scale', 'dimensions', 'transform'] },
+      { filename: 'select', alternatives: [], keywords: ['select', 'selection', 'cursor', 'pointer', 'area'] },
+      { filename: 'select-all', alternatives: [], keywords: ['select all', 'selection', 'full', 'entire', 'area'] },
       { filename: 'refresh', alternatives: [], keywords: ['reload', 'update', 'renew'] },
       { filename: 'sync', alternatives: [], keywords: ['refresh', 'update', 'reload', 'arrows'] },
       { filename: 'undo', alternatives: [], keywords: ['back', 'revert', 'arrow'] },
@@ -261,6 +263,7 @@ const builtInCategories = [
       { filename: 'attachment-alt', alternatives: [], keywords: ['attachment', 'paperclip', 'attach', 'file', 'alt'] },
       { filename: 'at-character', alternatives: [], keywords: ['envelope', 'message', 'contact'] },
       { filename: 'wifi', alternatives: [], keywords: ['wifi', 'wireless', 'network', 'internet'] },
+      { filename: 'wifi-off', alternatives: [], keywords: ['wifi', 'off', 'wireless', 'network', 'disconnected', 'no internet', 'offline'] },
     ],
   },
   {
@@ -410,6 +413,10 @@ const builtInCategories = [
       { filename: 'add-column-right', alternatives: ['fill'], keywords: ['table', 'column', 'add', 'insert', 'right'] },
       { filename: 'add-row-above', alternatives: ['fill'], keywords: ['table', 'row', 'add', 'insert', 'above'] },
       { filename: 'add-row-below', alternatives: ['fill'], keywords: ['table', 'row', 'add', 'insert', 'below'] },
+      { filename: 'move-selection-left', alternatives: ['fill'], keywords: ['move', 'selection', 'left', 'arrow', 'shift', 'reorder'] },
+      { filename: 'move-selection-right', alternatives: ['fill'], keywords: ['move', 'selection', 'right', 'arrow', 'shift', 'reorder'] },
+      { filename: 'move-selection-up', alternatives: ['fill'], keywords: ['move', 'selection', 'up', 'arrow', 'shift', 'reorder'] },
+      { filename: 'move-selection-down', alternatives: ['fill'], keywords: ['move', 'selection', 'down', 'arrow', 'shift', 'reorder'] },
     ],
   },
   {

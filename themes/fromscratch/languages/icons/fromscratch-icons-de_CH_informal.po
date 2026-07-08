@@ -304,6 +304,14 @@ msgid "Search"
 msgstr "Suche"
 
 msgctxt "icon name"
+msgid "Select"
+msgstr "Auswählen"
+
+msgctxt "icon name"
+msgid "Select all"
+msgstr "Alles auswählen"
+
+msgctxt "icon name"
 msgid "Refresh"
 msgstr "Aktualisieren"
 
@@ -1996,6 +2004,26 @@ msgid "Wi‑Fi"
 msgstr "WLAN"
 
 msgctxt "icon name"
+msgid "Wi‑Fi off"
+msgstr "WLAN aus"
+
+msgctxt "icon name"
+msgid "Move selection up"
+msgstr "Auswahl nach oben verschieben"
+
+msgctxt "icon name"
+msgid "Move selection down"
+msgstr "Auswahl nach unten verschieben"
+
+msgctxt "icon name"
+msgid "Move selection left"
+msgstr "Auswahl nach links verschieben"
+
+msgctxt "icon name"
+msgid "Move selection right"
+msgstr "Auswahl nach rechts verschieben"
+
+msgctxt "icon name"
 msgid "Power"
 msgstr "Strom"
 
@@ -2243,6 +2271,10 @@ msgstr "Gefüllt"
 msgctxt "icon picker"
 msgid "Remove"
 msgstr "Entfernen"
+
+msgctxt "icon picker"
+msgid "Categories"
+msgstr "Kategorien"
 
 msgctxt "icon name"
 msgid "Text format"
