@@ -240,6 +240,18 @@ export const blockOptions = [
     name: 'core/button',
     options: [
       {
+        type: 'button-group',
+        label: 'Größe',
+        default: '',
+        attributeName: 'buttonSize',
+        options: [
+          { label: 'S', value: '-small' },
+          { label: 'M', value: '' },
+          { label: 'L', value: '-large' },
+          { label: 'XL', value: '-extra-large' },
+        ],
+      },
+      {
         type: 'icon',
         label: 'Icon',
         default: '',
@@ -248,6 +260,7 @@ export const blockOptions = [
       {
         type: 'button-group',
         label: 'Icon Position',
+        noSeparator: true,
         default: '',
         attributeName: 'buttonIconPosition',
         iconLabel: true,

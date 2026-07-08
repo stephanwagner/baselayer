@@ -35,6 +35,9 @@ const ICON_CLASS_PREFIX = '-icon-';
 // Marker class added whenever an icon option has a value (target any icon button in CSS).
 const HAS_ICON_CLASS = '-has-icon';
 
+// Auto-applied when a button has an icon but no label text.
+const ICON_ONLY_CLASS = '-icon-only';
+
 // Legacy Bild-Text-Layout classes (removed; stripped on sync / migration).
 const LEGACY_IMAGE_TEXT_LAYOUT_CLASSES = [
   '-image-left-text-right',
@@ -153,10 +156,74 @@ const migrateLegacyImageTextLayoutAttributes = (attributes) => {
   };
 };
 
+const FONT_SIZE_TO_BUTTON_SIZE = {
+  s: '-small',
+  small: '-small',
+  m: '',
+  medium: '',
+  l: '-large',
+  large: '-large',
+  xl: '-extra-large',
+  'x-large': '-extra-large',
+};
+
+// Placeholder label so core/button save() outputs markup for icon-only buttons (WP skips empty text).
+const BUTTON_ICON_ONLY_PLACEHOLDER = '\u200B';
+
+const stripButtonPlaceholderText = (text) => (text || '').replace(/\u200B/g, '').trim();
+
+const isButtonIconOnly = (attributes) =>
+  Boolean(attributes.buttonIcon) && stripButtonPlaceholderText(attributes.text) === '';
+
+/** Keep icon-only buttons saveable: inject or remove the zero-width space placeholder. */
+const syncButtonIconOnlyPlaceholderText = (attributes) => {
+  const hasIcon = Boolean(attributes.buttonIcon);
+  const text = attributes.text ?? '';
+  const stripped = stripButtonPlaceholderText(text);
+
+  if (hasIcon && stripped === '') {
+    return text === BUTTON_ICON_ONLY_PLACEHOLDER ? null : { text: BUTTON_ICON_ONLY_PLACEHOLDER };
+  }
+
+  if (!hasIcon && text.includes('\u200B') && stripped === '') {
+    return { text: '' };
+  }
+
+  return null;
+};
+
+/** Migrate legacy WP font-size presets into the theme buttonSize option. */
+const migrateLegacyButtonFontSizeAttributes = (attributes) => {
+  const updates = {};
+  const hasButtonSize = Boolean(attributes.buttonSize);
+
+  if (!hasButtonSize && attributes.fontSize) {
+    updates.buttonSize = FONT_SIZE_TO_BUTTON_SIZE[attributes.fontSize] ?? '';
+  }
+
+  if (attributes.fontSize !== undefined && attributes.fontSize !== null && attributes.fontSize !== '') {
+    updates.fontSize = undefined;
+  }
+
+  const typography = attributes.style?.typography;
+  if (typography?.fontSize !== undefined) {
+    updates.style = {
+      ...attributes.style,
+      typography: {
+        ...typography,
+        fontSize: undefined,
+      },
+    };
+  }
+
+  return Object.keys(updates).length ? updates : null;
+};
+
 // Static class names managed by block options (boolean / select / button-group values).
 const managedStaticClasses = (blockConfig) => {
   const classes = new Set([
     HAS_ICON_CLASS,
+    ICON_ONLY_CLASS,
     ...ALL_CONTENT_MARGIN_CLASSES,
     ...ALL_LIMIT_WIDTH_CLASSES,
     ...ALL_SPACER_RESPONSIVE_HEIGHT_CLASSES,
@@ -204,10 +271,19 @@ const collectOptionClasses = (blockConfig, attributes) => {
       (option.type === 'select' || option.type === 'button-group') &&
       attributes[option.attributeName]
     ) {
+      if (
+        blockConfig.name === 'core/button' &&
+        option.attributeName === 'buttonIconPosition' &&
+        isButtonIconOnly(attributes)
+      ) {
+        return;
+      }
+
       classes.push(attributes[option.attributeName]);
     }
   });
 
+  // `-icon-only` is applied on the front end only (render_block); not in the editor canvas.
   return classes;
 };
 
@@ -250,6 +326,16 @@ const blockOptionAttributeKeys = (blockConfig) =>
 
     return [option.attributeName];
   });
+
+const blockOptionSyncDeps = (blockConfig, attributes) => {
+  const keys = blockOptionAttributeKeys(blockConfig);
+
+  if (blockConfig.name === 'core/button') {
+    keys.push('text');
+  }
+
+  return keys.map((key) => attributes[key]);
+};
 
 // Add attributes to the block
 blockOptions.forEach((block) => {
@@ -408,6 +494,36 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
       attributes.harmonizeImageText,
     ]);
 
+    // Migrate legacy WP font-size on buttons into buttonSize once.
+    useEffect(() => {
+      if (blockConfig?.name !== 'core/button') {
+        return;
+      }
+
+      const migrated = migrateLegacyButtonFontSizeAttributes(attributes);
+      if (migrated) {
+        setOptionAttributes(migrated);
+      }
+    }, [
+      blockConfig?.name,
+      props.clientId,
+      attributes.fontSize,
+      attributes.buttonSize,
+      attributes.style,
+    ]);
+
+    // Icon-only buttons: WP does not save/render empty text — use a zero-width space placeholder.
+    useEffect(() => {
+      if (blockConfig?.name !== 'core/button') {
+        return;
+      }
+
+      const synced = syncButtonIconOnlyPlaceholderText(attributes);
+      if (synced) {
+        setAttributes(synced);
+      }
+    }, [blockConfig?.name, props.clientId, attributes.buttonIcon, attributes.text]);
+
     // Spacer: reset responsive preset when the user edits static height.
     useEffect(() => {
       if (props.name !== 'core/spacer' || !blockConfig) {
@@ -445,7 +561,9 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
       if (className !== (attributes.className || '')) {
         setAttributes({ className });
       }
-    }, blockConfig ? blockOptionAttributeKeys(blockConfig).map((key) => attributes[key]) : []);
+    }, blockConfig ? blockOptionSyncDeps(blockConfig, attributes) : []);
+
+    const buttonIconOnly = blockConfig?.name === 'core/button' && isButtonIconOnly(attributes);
 
     if (blockConfig) {
       return (
@@ -455,6 +573,14 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
             <InspectorControls>
               <PanelBody title="Block Einstellungen">
                 {blockConfig.options.map((option, index) => {
+                  if (
+                    buttonIconOnly &&
+                    option.type === 'button-group' &&
+                    option.attributeName === 'buttonIconPosition'
+                  ) {
+                    return null;
+                  }
+
                   if (option.type === 'content-margin') {
                     return (
                       <BlockOptionWrapper key={getBlockOptionKey(option, index)} option={option} index={index}>

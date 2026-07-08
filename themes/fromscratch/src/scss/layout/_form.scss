@@ -1,6 +1,51 @@
 @use '../variables' as *;
 @use '../icons/icons' as *;
 
+@mixin button-link-size-small {
+  padding: 3px 14px;
+  font-size: var(--fs-font-size-s) !important;
+  border-radius: 17px;
+}
+
+@mixin button-link-size-large {
+  padding: 9px 22px;
+  font-size: var(--fs-font-size-m) !important;
+  border-radius: 23px;
+}
+
+@mixin button-link-size-extra-large {
+  padding: 11px 26px;
+  font-size: var(--fs-font-size-l) !important;
+  border-radius: 25px;
+}
+
+@mixin button-icon-only-link($padding, $icon-size) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: $icon-size + ($padding * 2);
+  height: $icon-size + ($padding * 2);
+  min-width: $icon-size + ($padding * 2);
+  min-height: $icon-size + ($padding * 2);
+  padding: 0 !important;
+  overflow: visible;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  text-align: center;
+
+  &::before {
+    position: static;
+    left: auto;
+    right: auto;
+    top: auto;
+    transform: none;
+    width: $icon-size;
+    height: $icon-size;
+    flex-shrink: 0;
+  }
+}
+
 @mixin form {
   // Buttons
 
@@ -62,23 +107,17 @@
 
     &.-small,
     &.has-s-font-size {
-      padding: 3px 14px;
-      font-size: var(--fs-font-size-s) !important;
-      border-radius: 17px;
+      @include button-link-size-small;
     }
 
     &.-large,
     &.has-l-font-size {
-      padding: 9px 22px;
-      font-size: var(--fs-font-size-m) !important;
-      border-radius: 23px;
+      @include button-link-size-large;
     }
 
-    &.-exra-large,
+    &.-extra-large,
     &.has-xl-font-size {
-      padding: 11px 26px;
-      font-size: var(--fs-font-size-l) !important;
-      border-radius: 25px;
+      @include button-link-size-extra-large;
     }
 
     &:hover,
@@ -95,6 +134,18 @@
       background: #eee !important;
       box-shadow: none !important;
     }
+  }
+
+  .wp-block-button.-small .wp-block-button__link {
+    @include button-link-size-small;
+  }
+
+  .wp-block-button.-large .wp-block-button__link {
+    @include button-link-size-large;
+  }
+
+  .wp-block-button.-extra-large .wp-block-button__link {
+    @include button-link-size-extra-large;
   }
 
   .button.-outline,
@@ -117,8 +168,7 @@
       height: 24px;
     }
 
-    &.-small,
-    &.has-s-font-size {
+    &.-small {
       &::before {
         top: 6px;
         width: 18px;
@@ -126,8 +176,7 @@
       }
     }
 
-    &.-large,
-    &.has-l-font-size {
+    &.-large {
       &::before {
         top: 9px;
         width: 24px;
@@ -135,8 +184,7 @@
       }
     }
 
-    &.-extra-large,
-    &.has-xl-font-size {
+    &.-extra-large {
       &::before {
         top: 9px;
         width: 28px;
@@ -153,8 +201,7 @@
       left: 12px;
     }
 
-    &.-small,
-    &.has-s-font-size {
+    &.-small {
       padding-left: 32px;
 
       &::before {
@@ -162,8 +209,7 @@
       }
     }
 
-    &.-large,
-    &.has-l-font-size {
+    &.-large {
       padding-left: 44px;
 
       &::before {
@@ -171,12 +217,11 @@
       }
     }
 
-    &.-extra-large,
-    &.has-xl-font-size {
-      padding-left: 52px;
+    &.-extra-large {
+      padding-left: 50px;
 
       &::before {
-        left: 16px;
+        left: 14px;
       }
     }
   }
@@ -189,8 +234,7 @@
       right: 12px;
     }
 
-    &.-small,
-    &.has-s-font-size {
+    &.-small {
       padding-right: 32px;
 
       &::before {
@@ -198,8 +242,7 @@
       }
     }
 
-    &.-large,
-    &.has-l-font-size {
+    &.-large {
       padding-right: 44px;
 
       &::before {
@@ -207,13 +250,107 @@
       }
     }
 
-    &.-extra-large,
-    &.has-xl-font-size {
-      padding-right: 52px;
+    &.-extra-large {
+      padding-right: 50px;
 
       &::before {
-        right: 16px;
+        right: 14px;
       }
+    }
+  }
+
+  .button.-has-icon.-icon-only,
+  .wp-block-button.-has-icon.-icon-only .wp-block-button__link {
+    @include button-icon-only-link(7px, 24px);
+
+    &.-small {
+      @include button-icon-only-link(3px, 18px);
+    }
+
+    &.-large {
+      @include button-icon-only-link(9px, 24px);
+    }
+
+    &.-extra-large {
+      @include button-icon-only-link(11px, 28px);
+    }
+  }
+
+  .wp-block-button.-has-icon.-icon-only.-small .wp-block-button__link {
+    @include button-icon-only-link(3px, 18px);
+  }
+
+  .wp-block-button.-has-icon.-icon-only.-large .wp-block-button__link {
+    @include button-icon-only-link(9px, 24px);
+  }
+
+  .wp-block-button.-has-icon.-icon-only.-extra-large .wp-block-button__link {
+    @include button-icon-only-link(11px, 28px);
+  }
+
+  .wp-block-button.-has-icon.-small:not(.-icon-only) .wp-block-button__link::before {
+    top: 6px;
+    width: 18px;
+    height: 18px;
+  }
+
+  .wp-block-button.-has-icon.-large:not(.-icon-only) .wp-block-button__link::before {
+    top: 9px;
+    width: 24px;
+    height: 24px;
+  }
+
+  .wp-block-button.-has-icon.-extra-large:not(.-icon-only) .wp-block-button__link::before {
+    top: 9px;
+    width: 28px;
+    height: 28px;
+  }
+
+  .wp-block-button.-has-icon:not(.-icon-right):not(.-icon-only).-small .wp-block-button__link {
+    padding-left: 32px;
+
+    &::before {
+      left: 9px;
+    }
+  }
+
+  .wp-block-button.-has-icon:not(.-icon-right):not(.-icon-only).-large .wp-block-button__link {
+    padding-left: 44px;
+
+    &::before {
+      left: 14px;
+    }
+  }
+
+  .wp-block-button.-has-icon:not(.-icon-right):not(.-icon-only).-extra-large .wp-block-button__link {
+    padding-left: 50px;
+
+    &::before {
+      left: 14px;
+    }
+  }
+
+  .wp-block-button.-has-icon.-icon-right:not(.-icon-only).-small .wp-block-button__link {
+    padding-right: 32px;
+
+    &::before {
+      right: 9px;
+    }
+  }
+
+  .wp-block-button.-has-icon.-icon-right:not(.-icon-only).-large .wp-block-button__link {
+    padding-right: 44px;
+
+    &::before {
+      right: 14px;
+    }
+  }
+
+  .wp-block-button.-has-icon.-icon-right:not(.-icon-only).-extra-large .wp-block-button__link {
+    padding-right: 50px;
+
+    &::before {
+      right: 14px;
     }
   }
 

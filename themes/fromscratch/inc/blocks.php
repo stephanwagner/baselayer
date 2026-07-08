@@ -29,6 +29,85 @@ add_filter('register_block_type_args', function ($args, $block_type) {
                 $args['supports'][$key]['radius'] = false;
             }
         }
+
+        if (! isset($args['supports']['typography'])) {
+            $args['supports']['typography'] = [];
+        }
+        $args['supports']['typography']['fontSize'] = false;
     }
     return $args;
 }, 10, 2);
+
+/**
+ * Icon-only buttons: add front-end class and ensure link markup is non-empty.
+ */
+add_filter('render_block', function ($content, $block) {
+    if (($block['blockName'] ?? '') !== 'core/button') {
+        return $content;
+    }
+
+    if ($content === '') {
+        return $content;
+    }
+
+    $attrs = $block['attrs'] ?? [];
+    $button_icon = $attrs['buttonIcon'] ?? '';
+
+    $visible_text = fs_button_visible_label($attrs['text'] ?? '');
+
+    if ($visible_text === '' && preg_match('/<a\b[^>]*\bwp-block-button__link\b[^>]*>(.*?)<\/a>/s', $content, $matches)) {
+        $visible_text = fs_button_visible_label($matches[1]);
+    }
+
+    $has_icon = $button_icon !== '' || strpos($content, '-has-icon') !== false;
+
+    if (! $has_icon) {
+        return $content;
+    }
+
+    if ($visible_text !== '') {
+        return $content;
+    }
+
+    if ($button_icon !== '' && strpos($content, '-has-icon') === false) {
+        $extra_classes = '-has-icon ' . $button_icon;
+        $content = preg_replace(
+            '/(class="[^"]*\bwp-block-button\b[^"]*)"/',
+            '$1 ' . $extra_classes . '"',
+            $content,
+            1
+        );
+    }
+
+    if (strpos($content, '-icon-only') === false) {
+        $content = preg_replace(
+            '/(class="[^"]*\bwp-block-button\b[^"]*)"/',
+            '$1 -icon-only"',
+            $content,
+            1
+        );
+    }
+
+    // Empty anchors collapse in some cases; zero-width space keeps the link in the layout tree.
+    if (preg_match('/<a\b[^>]*\bwp-block-button__link\b[^>]*>\s*<\/a>/', $content)) {
+        $content = preg_replace(
+            '/(<a\b[^>]*\bwp-block-button__link\b[^>]*>)\s*(<\/a>)/',
+            '$1&#8203;$2',
+            $content,
+            1
+        );
+    }
+
+    return $content;
+}, 10, 2);
+
+/**
+ * Strip icon-only placeholder characters from button label text.
+ */
+function fs_button_visible_label(string $text): string
+{
+    $text = strip_tags($text);
+    $text = str_replace(["\xE2\x80\x8B", '&#8203;'], '', $text);
+
+    return trim($text);
+}

@@ -235,7 +235,7 @@ function fs_render_developer_cheatsheet(): void
 
 				<h3 class="helpers-icons__subtitle"><?= esc_html__('Buttons', 'fromscratch') ?></h3>
 				<p class="description"><?= wp_kses(
-											__('Add <code class="fs-code-small">-has-icon</code> and an icon class to the button. Use <code class="fs-code-small">-icon-right</code> to place the icon after the label.', 'fromscratch'),
+											__('Add <code class="fs-code-small">-has-icon</code> and an icon class to the button. Use <code class="fs-code-small">-icon-right</code> to place the icon after the label. With no label text, add <code class="fs-code-small">-icon-only</code> for a square icon button (applied automatically in the block editor).', 'fromscratch'),
 											['code' => ['class' => true]]
 										) ?></p>
 
