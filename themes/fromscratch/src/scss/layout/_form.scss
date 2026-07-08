@@ -19,15 +19,15 @@
   border-radius: 25px;
 }
 
-@mixin button-icon-only-link($padding, $icon-size) {
+@mixin button-icon-only-link($icon-size, $button-size) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  width: $icon-size + ($padding * 2);
-  height: $icon-size + ($padding * 2);
-  min-width: $icon-size + ($padding * 2);
-  min-height: $icon-size + ($padding * 2);
+  width: $button-size;
+  height: $button-size;
+  min-width: $button-size;
+  min-height: $button-size;
   padding: 0 !important;
   overflow: visible;
   font-size: 0 !important;
@@ -261,31 +261,31 @@
 
   .button.-has-icon.-icon-only,
   .wp-block-button.-has-icon.-icon-only .wp-block-button__link {
-    @include button-icon-only-link(7px, 24px);
+    @include button-icon-only-link(24px, 42px);
 
     &.-small {
-      @include button-icon-only-link(3px, 18px);
+      @include button-icon-only-link(18px, 34px);
     }
 
     &.-large {
-      @include button-icon-only-link(9px, 24px);
+      @include button-icon-only-link(24px, 46px);
     }
 
     &.-extra-large {
-      @include button-icon-only-link(11px, 28px);
+      @include button-icon-only-link(28px, 50px);
     }
   }
 
   .wp-block-button.-has-icon.-icon-only.-small .wp-block-button__link {
-    @include button-icon-only-link(3px, 18px);
+    @include button-icon-only-link(18px, 34px);
   }
 
   .wp-block-button.-has-icon.-icon-only.-large .wp-block-button__link {
-    @include button-icon-only-link(9px, 24px);
+    @include button-icon-only-link(24px, 46px);
   }
 
   .wp-block-button.-has-icon.-icon-only.-extra-large .wp-block-button__link {
-    @include button-icon-only-link(11px, 28px);
+    @include button-icon-only-link(28px, 50px);
   }
 
   .wp-block-button.-has-icon.-small:not(.-icon-only) .wp-block-button__link::before {
