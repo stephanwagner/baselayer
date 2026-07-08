@@ -46,4 +46,11 @@
       line-height: $line-height;
     }
   }
+
+  // Fix WordPress styles
+
+  .is-layout-constrained > * {
+    max-width: none;
+    margin-inline: 0 !important;
+  }
 }

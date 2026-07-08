@@ -3,6 +3,7 @@
 defined('ABSPATH') || exit;
 
 require_once __DIR__ . '/install-system.php';
+require_once __DIR__ . '/install-content.php';
 
 /** Written to style.css when Author / Author URI are left empty at install (matches shipped theme header). */
 const FS_INSTALL_DEFAULT_THEME_AUTHOR = 'Stephan Wagner';
@@ -179,17 +180,8 @@ function fs_render_installer(): void
         delete_transient('fromscratch_install_validation_errors');
         echo '<div class="notice notice-error fs-notice-error"><p><strong>' . esc_html__('The following errors occurred during initialization:', 'fromscratch') . '</strong></p><ul>';
         foreach ($install_errors as $item) {
-          if (is_array($item) && isset($item[0], $item[1]) && $item[0] === 'page_title_slug') {
-            $page_labels = [
-              'homepage' => __('Homepage', 'fromscratch'),
-              'contact' => __('Contact', 'fromscratch'),
-              'imprint' => __('Imprint', 'fromscratch'),
-              'privacy' => __('Privacy', 'fromscratch'),
-            ];
-            $label = $page_labels[$item[1]] ?? $item[1];
-            echo '<li>' . esc_html(sprintf(__('Please enter a title and slug for the %s page.', 'fromscratch'), $label)) . '</li>';
-          } else {
-            echo '<li>' . esc_html(__($item, 'fromscratch')) . '</li>';
+          if (is_string($item)) {
+            echo '<li>' . esc_html__($item, 'fromscratch') . '</li>';
           }
         }
         echo '</ul></div>';
@@ -245,7 +237,7 @@ function fs_render_installer(): void
               </label>
             </th>
             <td>
-              <input type="text" name="theme[slug]" value="<?= esc_attr($fs_install_val(['theme', 'slug'], sanitize_title(get_bloginfo('name')))) ?>" class="regular-text">
+              <input type="text" name="theme[slug]" value="<?= esc_attr($fs_install_val(['theme', 'slug'], sanitize_title(get_bloginfo('name')))) ?>" class="regular-text" readonly>
               <p class="description"><?= esc_html__('Use only lowercase letters, numbers and hyphens.', 'fromscratch') ?></p>
             </td>
           </tr>
@@ -399,155 +391,12 @@ function fs_render_installer(): void
 
         <hr>
 
-        <h2><?= esc_html__('Content', 'fromscratch') ?></h2>
+        <h2><?= esc_html__('Administrator email', 'fromscratch') ?></h2>
 
-        <table class="form-table" role="presentation">
-          <tr>
-            <th scope="row"><?= esc_html__('Pages', 'fromscratch') ?></th>
-            <td>
-              <p style="margin-top: 0;">
-                <label>
-                  <input type="checkbox" name="install[pages]" value="1" <?= !empty($fs_install_val(['install', 'pages'], true)) ? ' checked' : '' ?> data-fs-checkbox-toggle="pages">
-                  <?= esc_html__('Create pages', 'fromscratch') ?>
-                </label>
-              </p>
-              <p class="description"><?= esc_html__('Pages will only be created if they don\'t exist yet.', 'fromscratch') ?></p>
-              <div data-fs-checkbox-toggle-content="pages" style="margin-top: 8px;">
-                <table class="widefat striped fs-table-in-form">
-                  <thead>
-                    <tr>
-                      <th></th>
-                      <th><?= esc_html__('Page', 'fromscratch') ?></th>
-                      <th><?= esc_html__('Title', 'fromscratch') ?></th>
-                      <th><?= esc_html__('Slug', 'fromscratch') ?></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-
-                    <tr>
-                      <td style="vertical-align: middle;">
-                        <input type="hidden" name="pages[homepage][add]" value="1">
-                        <input type="checkbox" checked disabled aria-label="<?= esc_attr__('Add page', 'fromscratch') ?>">
-                      </td>
-                      <td><strong><?= esc_html__('Homepage', 'fromscratch') ?></strong></td>
-                      <td>
-                        <input
-                          type="text"
-                          name="pages[homepage][title]"
-                          value="<?= esc_attr($fs_install_val(['pages', 'homepage', 'title'], __('Homepage', 'fromscratch'))) ?>"
-                          class="regular-text" style="width: 180px">
-                      </td>
-                      <td>
-                        <input
-                          type="text"
-                          name="pages[homepage][slug]"
-                          value="<?= esc_attr($fs_install_val(['pages', 'homepage', 'slug'], __('homepage', 'fromscratch'))) ?>"
-                          class="regular-text" style="width: 180px">
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td style="vertical-align: middle;">
-                        <input type="hidden" name="pages[contact][add]" value="1">
-                        <input type="checkbox" checked disabled aria-label="<?= esc_attr__('Add page', 'fromscratch') ?>">
-                      </td>
-                      <td><strong><?= esc_html__('Contact', 'fromscratch') ?></strong></td>
-                      <td>
-                        <input
-                          type="text"
-                          name="pages[contact][title]"
-                          value="<?= esc_attr($fs_install_val(['pages', 'contact', 'title'], __('Contact', 'fromscratch'))) ?>"
-                          class="regular-text" style="width: 180px">
-                      </td>
-                      <td>
-                        <input
-                          type="text"
-                          name="pages[contact][slug]"
-                          value="<?= esc_attr($fs_install_val(['pages', 'contact', 'slug'], __('contact', 'fromscratch'))) ?>"
-                          class="regular-text" style="width: 180px">
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td style="vertical-align: middle;">
-                        <label class="screen-reader-text"><?= esc_html(sprintf(__('Add %s page', 'fromscratch'), __('Imprint', 'fromscratch'))) ?></label>
-                        <input type="checkbox" name="pages[imprint][add]" value="1" <?= !empty($fs_install_val(['pages', 'imprint', 'add'], true)) ? ' checked' : '' ?>>
-                      </td>
-                      <td><strong><?= esc_html__('Imprint', 'fromscratch') ?></strong></td>
-                      <td>
-                        <input
-                          type="text"
-                          name="pages[imprint][title]"
-                          value="<?= esc_attr($fs_install_val(['pages', 'imprint', 'title'], __('Imprint', 'fromscratch'))) ?>"
-                          class="regular-text" style="width: 180px">
-                      </td>
-                      <td>
-                        <input
-                          type="text"
-                          name="pages[imprint][slug]"
-                          value="<?= esc_attr($fs_install_val(['pages', 'imprint', 'slug'], __('imprint', 'fromscratch'))) ?>"
-                          class="regular-text" style="width: 180px">
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td style="vertical-align: middle;">
-                        <input type="hidden" name="pages[privacy][add]" value="1">
-                        <input type="checkbox" checked disabled aria-label="<?= esc_attr__('Add page', 'fromscratch') ?>">
-                      </td>
-                      <td><strong><?= esc_html__('Privacy', 'fromscratch') ?></strong></td>
-                      <td>
-                        <input
-                          type="text"
-                          name="pages[privacy][title]"
-                          value="<?= esc_attr($fs_install_val(['pages', 'privacy', 'title'], __('Privacy', 'fromscratch'))) ?>"
-                          class="regular-text" style="width: 180px">
-                      </td>
-                      <td>
-                        <input
-                          type="text"
-                          name="pages[privacy][slug]"
-                          value="<?= esc_attr($fs_install_val(['pages', 'privacy', 'slug'], __('privacy', 'fromscratch'))) ?>"
-                          class="regular-text" style="width: 180px">
-                      </td>
-                    </tr>
-
-                  </tbody>
-                </table>
-              </div>
-            </td>
-          </tr>
-
-          <tr>
-            <th scope="row"><?= esc_html__('Menus', 'fromscratch') ?></th>
-            <td>
-              <p style="margin-top: 0;">
-                <label>
-                  <input type="checkbox" name="install[menus]" value="1" <?= !empty($fs_install_val(['install', 'menus'], true)) ? ' checked' : '' ?>>
-                  <?= esc_html__('Assign created pages to menus', 'fromscratch') ?>
-                </label>
-              </p>
-              <p class="description"><?= esc_html__('Adds the pages to the configured menu locations.', 'fromscratch') ?></p>
-            </td>
-          </tr>
-
-        </table>
-
-        <hr>
-
-        <h2><?= esc_html__('Site', 'fromscratch') ?></h2>
-
-        <table class="form-table" role="presentation">
-          <tr>
-            <th scope="row">
-              <label for="site_admin_email"><?= esc_html__('Administrator email', 'fromscratch') ?></label>
-            </th>
-            <td>
-              <input type="email" name="site[admin_email]" id="site_admin_email" value="<?= esc_attr($fs_install_val(['site', 'admin_email'], get_option('admin_email'))) ?>" class="regular-text">
-              <p class="description"><?= esc_html__('Used for system notifications, updates, and critical error recovery.', 'fromscratch') ?></p>
-            </td>
-          </tr>
-        </table>
+        <div style="margin-bottom: 16px;">
+          <p class="description" style="margin-bottom: 12px;"><?= esc_html__('Used for system notifications, updates, and critical error reporting.', 'fromscratch') ?></p>
+          <input type="email" name="site[admin_email]" id="site_admin_email" value="<?= esc_attr($fs_install_val(['site', 'admin_email'], get_option('admin_email'))) ?>" class="regular-text">
+        </div>
 
         <hr>
 
@@ -651,10 +500,10 @@ if (isset($_POST['fromscratch_run_install'])) {
 }
 
 /**
- * Validate install form. Returns array of error items (string msgid or array for page_title_slug); empty array means valid.
+ * Validate install form. Returns array of error message strings; empty array means valid.
  * Strings are translated when displayed on the install page.
  *
- * @return array<int, string|array{0: 'page_title_slug', 1: string}>
+ * @return array<int, string>
  */
 function fromscratch_validate_install(): array
 {
@@ -712,22 +561,6 @@ function fromscratch_validate_install(): array
     $errors[] = 'Please enter a valid email address for the current user.';
   }
 
-  // Pages: when "Create pages" is checked, all page titles and slugs are required
-  $install_pages = !empty($_POST['install']['pages']);
-  if ($install_pages) {
-    $pages_required = ['homepage', 'contact', 'privacy'];
-    if (!empty($_POST['pages']['imprint']['add'])) {
-      $pages_required[] = 'imprint';
-    }
-    foreach ($pages_required as $key) {
-      $title = trim((string) ($_POST['pages'][$key]['title'] ?? ''));
-      $slug = trim((string) ($_POST['pages'][$key]['slug'] ?? ''));
-      if ($title === '' || $slug === '') {
-        $errors[] = ['page_title_slug', $key];
-      }
-    }
-  }
-
   // New user: if any field is filled, all three required; email valid; password min length
   if ($new_username !== '' || $new_email !== '' || $new_pass !== '') {
     if ($new_username === '' || $new_email === '' || $new_pass === '') {
@@ -758,7 +591,7 @@ function fromscratch_validate_install(): array
 /**
  * Set validation errors and submitted form data, then redirect to install page. Never returns.
  *
- * @param array<int, string|array{0: 'page_title_slug', 1: string}> $errors
+ * @param array<int, string> $errors
  */
 function fromscratch_install_redirect_with_errors(array $errors): void
 {
@@ -778,8 +611,6 @@ function fromscratch_install_redirect_with_errors(array $errors): void
       'media' => !empty($_POST['install']['media']),
       'permalinks' => !empty($_POST['install']['permalinks']),
       'htaccess' => !empty($_POST['install']['htaccess']),
-      'pages' => !empty($_POST['install']['pages']),
-      'menus' => !empty($_POST['install']['menus']),
     ],
     'developer' => [
       'current_user' => [
@@ -793,19 +624,8 @@ function fromscratch_install_redirect_with_errors(array $errors): void
         'login_after_setup' => !empty($_POST['developer']['new_user']['login_after_setup']),
       ],
     ],
-    'pages' => [],
     'media' => [],
   ];
-  $pages = $_POST['pages'] ?? [];
-  foreach (['homepage', 'contact', 'imprint', 'privacy'] as $key) {
-    if (isset($pages[$key]) && is_array($pages[$key])) {
-      $submitted['pages'][$key] = [
-        'title' => sanitize_text_field($pages[$key]['title'] ?? ''),
-        'slug' => sanitize_text_field($pages[$key]['slug'] ?? ''),
-        'add' => !empty($pages[$key]['add']),
-      ];
-    }
-  }
   $media = $_POST['media'] ?? [];
   foreach (['thumbnail', 'small', 'medium', 'large'] as $slug) {
     if (isset($media[$slug]) && is_array($media[$slug])) {
@@ -1020,186 +840,9 @@ Tags:
   }
 
   /**
-   * Required pages
+   * Standard pages and menus (always).
    */
-  $installPages = !empty($_POST['install']['pages']);
-
-  if ($installPages) {
-
-    // Delete "Sample Page"
-    $sample_page = get_page_by_path('sample-page', OBJECT, 'page');
-    if ($sample_page) {
-      wp_delete_post($sample_page->ID, true);
-    }
-
-    // Delete "Hello World!" post
-    $hello_post = get_page_by_path('hello-world', OBJECT, 'post');
-    if ($hello_post) {
-      wp_delete_post($hello_post->ID, true);
-    }
-
-    // Delete comments
-    $comments = get_comments([
-      'number' => -1,
-    ]);
-
-    foreach ($comments as $comment) {
-      wp_delete_comment($comment->comment_ID, true);
-    }
-
-    // Add pages (imprint only if checkbox checked; others always added via hidden input)
-    $pages = $_POST['pages'] ?? [];
-
-    // Drop WordPress default privacy page when the installer creates/uses its own.
-    if (!empty($pages['privacy']['add'])) {
-      $install_privacy_slug = sanitize_title((string) ($pages['privacy']['slug'] ?? 'privacy'));
-      $install_privacy_page = $install_privacy_slug !== ''
-        ? get_page_by_path($install_privacy_slug, OBJECT, 'page')
-        : null;
-      $wp_privacy_id = (int) get_option('wp_page_for_privacy_policy');
-
-      if ($wp_privacy_id > 0) {
-        $is_install_page = $install_privacy_page && (int) $install_privacy_page->ID === $wp_privacy_id;
-        if (!$is_install_page) {
-          wp_delete_post($wp_privacy_id, true);
-          update_option('wp_page_for_privacy_policy', 0);
-        }
-      }
-    }
-
-    foreach ($pages as $page_id => $page) {
-      $add_page = !empty($page['add']);
-      if (!$add_page) {
-        continue;
-      }
-
-      $page_obj = get_page_by_path($page['slug']);
-
-      if (!$page_obj) {
-        $page_content = <<<HTML
-        <!-- wp:heading {\"level\":1} -->
-        <h1>{$page['title']}</h1>
-        <!-- /wp:heading -->
-
-        <!-- wp:paragraph -->
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-        <!-- /wp:paragraph -->
-        HTML;
-
-        if ($page_id === 'homepage') {
-          $page_content = <<<HTML
-          <!-- wp:heading {\"level\":1} -->
-          <h1>Welcome to FromScratch</h1>
-          <!-- /wp:heading -->
-
-          <!-- wp:paragraph -->
-          <p>This page was created by the FromScratch installer and contains example blocks.</p>
-          <!-- /wp:paragraph -->
-          HTML;
-        }
-
-        $page_post_id = wp_insert_post([
-          'post_type'   => 'page',
-          'post_status' => 'publish',
-          'post_title'  => $page['title'],
-          'post_name'   => $page['slug'],
-          'post_content' => $page_content,
-        ]);
-      }
-
-      $resolved_page_id = $page_obj ? (int) $page_obj->ID : (int) ($page_post_id ?? 0);
-
-      if ($page_id === 'homepage' && $resolved_page_id > 0) {
-        update_option('show_on_front', 'page');
-        update_option('page_on_front', $resolved_page_id);
-        update_option('page_for_posts', 0);
-      }
-
-      if ($page_id === 'privacy' && $resolved_page_id > 0) {
-        update_option('wp_page_for_privacy_policy', $resolved_page_id);
-      }
-    }
-  }
-
-  /**
-   * Menus
-   */
-  $installMenus = !empty($_POST['install']['menus']);
-
-  if ($installMenus) {
-    $menuItems = [
-      'slider' => [
-        'title' => __('Slider', 'fromscratch'),
-        'menu' => 'main_menu',
-        'link' => '/#slider'
-      ],
-      'contact' => [
-        'title' => __('Contact', 'fromscratch'),
-        'menu' => 'main_menu',
-        'options' => [
-          'highlight' => true,
-        ],
-      ],
-    ];
-    if (!empty($_POST['pages']['imprint']['add'])) {
-      $menuItems['imprint'] = [
-        'title' => __('Imprint', 'fromscratch'),
-        'menu' => 'footer_menu'
-      ];
-    }
-    $menuItems['privacy'] = [
-      'title' => __('Privacy', 'fromscratch'),
-      'menu' => 'footer_menu'
-    ];
-
-
-    foreach ($menuItems as $slug => $config) {
-
-      $menu_id = fs_get_or_create_menu_id($config['menu']);
-      if (!$menu_id) {
-        continue;
-      }
-
-      // Custom link
-      if (!empty($config['link'])) {
-
-        $item_id = wp_update_nav_menu_item($menu_id, 0, [
-          'menu-item-title'  => $config['title'],
-          'menu-item-url'    => $config['link'],
-          'menu-item-status' => 'publish',
-          'menu-item-type'   => 'custom',
-        ]);
-
-        // Page link
-      } else {
-
-        $page_id = fs_get_page_id_by_slug($slug);
-        if (!$page_id) {
-          continue;
-        }
-
-        $item_id = wp_update_nav_menu_item($menu_id, 0, [
-          'menu-item-object-id' => $page_id,
-          'menu-item-object'    => 'page',
-          'menu-item-type'      => 'post_type',
-          'menu-item-status'    => 'publish',
-        ]);
-      }
-
-      // Menu item options from theme config (e.g. highlight link).
-      if (!empty($config['options']) && is_array($config['options']) && $item_id) {
-        foreach ($config['options'] as $option_id => $enabled) {
-          if (!$enabled || !is_string($option_id) || $option_id === '') {
-            continue;
-          }
-          if (!function_exists('fs_menu_item_option_meta_key')) {
-            continue;
-          }
-          update_post_meta($item_id, fs_menu_item_option_meta_key($option_id), '1');
-        }
-      }
-    }
-  }
+  fs_install_seed_content();
 
   /**
    * Features: merge central defaults with existing.
@@ -1272,18 +915,6 @@ function fs_get_or_create_menu_id(string $menu_slug): int
   fs_assign_menu_to_location($menu_slug, $menu_id);
 
   return (int) $menu_id;
-}
-
-/**
- * Get page ID by post slug (path).
- *
- * @param string $slug Page slug (path).
- * @return int|null Page ID or null if not found.
- */
-function fs_get_page_id_by_slug(string $slug): ?int
-{
-  $page = get_page_by_path($slug);
-  return $page ? (int) $page->ID : null;
 }
 
 /**
