@@ -1120,7 +1120,7 @@ add_action('admin_head', function (): void {
 	if ($post_type === '' || !fs_cpt_is_ordered($post_type)) {
 		return;
 	}
-	// TODO in scss
+	
 	echo '<style>
 	.fs-cpt-reorder-list table.wp-list-table.widefat,
 	.fs-cpt-reorder-list table.wp-list-table.widefat tbody,
@@ -1154,7 +1154,6 @@ add_action('admin_footer', function (): void {
 	$has_explicit_orderby = !empty($_GET['orderby']);
 	$default_dir = strtoupper((string) ($_GET['order'] ?? 'ASC')) === 'DESC' ? 'DESC' : 'ASC';
 	
-	// TODO in js
 	echo '<script>
 	(function(){
 		var defaultOrderActive = ' . ($has_explicit_orderby ? 'false' : 'true') . ';

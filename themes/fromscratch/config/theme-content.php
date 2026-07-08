@@ -163,7 +163,6 @@ return [
 								'type' => 'image',
 								'description' => 'Select an image from the media library.',
 							],
-							// TODO: Document (maybe use a template for the selector field)
 						],
 					],
 					[

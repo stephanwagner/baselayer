@@ -2,7 +2,7 @@
 
 return [
 	'attributes' => [
-		'mode' => 'preview',
+		'mode'     => 'preview',
 		'iconSlug' => 'heart',
 	],
 ];

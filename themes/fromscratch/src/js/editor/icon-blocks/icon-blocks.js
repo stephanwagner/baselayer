@@ -1,8 +1,18 @@
 import { InlineIconControl } from '../icons/inline-icon-control';
 
 const { useBlockProps, InnerBlocks } = wp.blockEditor;
+const { __ } = wp.i18n;
 
 const ICON_SLUG_ATTRIBUTE = 'iconSlug';
+
+const ICON_TEXT_INNER_TEMPLATE = [
+  [
+    'core/paragraph',
+    {
+      content: __('Begleitender Text neben dem Icon.', 'fromscratch'),
+    },
+  ],
+];
 
 const ICON_BLOCKS = {
   'acf/icon': IconBlockEdit,
@@ -11,6 +21,7 @@ const ICON_BLOCKS = {
 
 function IconBlockEdit({ attributes, setAttributes, isSelected }) {
   const iconSlug = attributes[ICON_SLUG_ATTRIBUTE] || '';
+  const hasIcon = Boolean(iconSlug);
   const blockProps = useBlockProps({
     className: ['icon__wrapper', 'fs-wp-block', attributes.className].filter(Boolean).join(' '),
   });
@@ -19,7 +30,7 @@ function IconBlockEdit({ attributes, setAttributes, isSelected }) {
     <div {...blockProps}>
       <div className="icon__container">
         <div className="icon__content">
-          <div className="icon__icon">
+          <div className={'icon__icon' + (hasIcon ? ' -has-icon' : '')}>
             <InlineIconControl
               value={iconSlug}
               isActive={isSelected}
@@ -53,6 +64,8 @@ function IconTextBlockEdit({ attributes, setAttributes, isSelected }) {
           <div className="icon-text__text-container">
             <div className="icon-text__text">
               <InnerBlocks
+                template={ICON_TEXT_INNER_TEMPLATE}
+                templateLock={false}
                 renderAppender={isSelected ? InnerBlocks.ButtonBlockAppender : InnerBlocks.DefaultBlockAppender}
               />
             </div>

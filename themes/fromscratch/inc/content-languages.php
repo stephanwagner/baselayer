@@ -1728,7 +1728,6 @@ add_action('template_redirect', function (): void {
 		return;
 	}
 
-	// TODO function that checks if any page is a frontpage
 	$front_id = (int) get_option('page_on_front');
 	$post_group  = (int) get_post_meta($post->ID, FS_TRANSLATION_GROUP_META, true) ?: $post->ID;
 	$front_group = (int) get_post_meta($front_id, FS_TRANSLATION_GROUP_META, true) ?: $front_id;

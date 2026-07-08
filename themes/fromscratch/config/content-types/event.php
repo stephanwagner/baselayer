@@ -1,6 +1,11 @@
 <?php
 
-// TODO add comments
+/**
+ * Events CPT.
+ *
+ * `'type' => 'event'` enables start/end date (+ optional time) fields per post.
+ * Edited in the block editor sidebar panel "Event" — not in this config file.
+ */
 
 return [
 	'event' => [
@@ -47,11 +52,6 @@ return [
 				'heading' => 'Events',
 				'empty' => 'No events found.',
 			],
-		],
-
-		'query' => [
-			'orderby' => 'date',
-			'order' => 'DESC',
 		],
 
 		'admin' => [
