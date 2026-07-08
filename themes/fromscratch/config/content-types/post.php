@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * Blog posts
+ * 
+ * Built-in WordPress posts (`post`) — not a custom CPT.
+ * This file customizes labels, archive, and taxonomies for the default blog post type.
+ */
+
 return [
 	'post' => [
 		'enabled' => true,

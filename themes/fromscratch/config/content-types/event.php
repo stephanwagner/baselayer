@@ -1,10 +1,10 @@
 <?php
 
 /**
- * Events CPT.
+ * Events CPT
  *
- * `'type' => 'event'` enables start/end date (+ optional time) fields per post.
- * Edited in the block editor sidebar panel "Event" — not in this config file.
+ * 'type' => 'event' enables start/end date (+ optional time) fields per post.
+ * Edited in the block editor sidebar panel "Event".
  */
 
 return [

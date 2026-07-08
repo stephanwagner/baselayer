@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Projects CPT
+ * 
+ * 'type' => 'default' enables the default post type features.
+ */
+
 return [
 	'project' => [
 		'enabled' => true,
