@@ -313,6 +313,7 @@ function fs_editor_scripts(): void
 			'wp-element',
 			'wp-block-editor',
 			'wp-blocks',
+			'wp-rich-text',
 			'wp-components',
 			'wp-data',
 			'wp-core-data',
