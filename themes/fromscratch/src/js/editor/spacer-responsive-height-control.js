@@ -23,7 +23,7 @@ export function SpacerResponsiveHeightControl({ option, attributes, onChange }) 
       return;
     }
 
-    onChange({ [option.attributeName]: className, height: undefined });
+    onChange({ [option.attributeName]: className });
   };
 
   if (!ToggleGroupControl) {

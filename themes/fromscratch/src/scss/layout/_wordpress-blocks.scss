@@ -574,6 +574,12 @@
   // Spacer responsive height
 
   .wp-block-spacer {
+    &.-is-demo {
+      background-color: var(--fs-color-gray-200);
+      border: 1px dashed var(--fs-color-gray-400);
+      border-radius: var(--fs-border-radius-m);
+    }
+
     &.-spacer-height-xs {
       @include spacer-responsive-height(var(--fs-content-margin-xs));
     }

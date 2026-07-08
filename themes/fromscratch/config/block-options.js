@@ -186,7 +186,7 @@ export const blockOptions = [
   {
     name: 'core/gallery',
     options: [
-      getContentMarginControl(),
+      getContentMarginControl('m'),
       {
         type: 'boolean',
         toggleLabel: 'Ohne Bildtexte',
