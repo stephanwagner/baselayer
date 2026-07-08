@@ -1244,8 +1244,8 @@ msgid "Puzzle"
 msgstr "Puzzle"
 
 msgctxt "icon name"
-msgid "WordPress block"
-msgstr "WordPress-Block"
+msgid "Layout section"
+msgstr "Layout-Abschnitt"
 
 msgctxt "icon name"
 msgid "Arrow line end"
@@ -2471,6 +2471,10 @@ msgstr "Mailbox"
 msgctxt "icon name"
 msgid "Web stories"
 msgstr "Web Stories"
+
+msgctxt "icon name"
+msgid "Web stories stack"
+msgstr "Web Stories Stapel"
 
 msgctxt "icon name"
 msgid "Arrows input"

@@ -157,8 +157,8 @@ function fs_icon_labels(): array
 		'two-pager'              => _x('Two pager', 'icon name', 'fromscratch-icons'),
 		'book'                   => _x('Book', 'icon name', 'fromscratch-icons'),
 		'book-open'              => _x('Book open', 'icon name', 'fromscratch-icons'),
-		'stories'                => _x('Stories', 'icon name', 'fromscratch-icons'),
 		'web-stories'            => _x('Web stories', 'icon name', 'fromscratch-icons'),
+		'web-stories-stack'      => _x('Web stories stack', 'icon name', 'fromscratch-icons'),
 		'edit-square'            => _x('Edit square', 'icon name', 'fromscratch-icons'),
 		'menu-book'                => _x('Menu book', 'icon name', 'fromscratch-icons'),
 
@@ -348,7 +348,7 @@ function fs_icon_labels(): array
 		'view-grid-alt'          => _x('Grid view', 'icon name', 'fromscratch-icons'),
 		'view-list'              => _x('List view', 'icon name', 'fromscratch-icons'),
 		'layers'                 => _x('Layers', 'icon name', 'fromscratch-icons'),
-		'wp-block'               => _x('WordPress block', 'icon name', 'fromscratch-icons'),
+		'layout-section'         => _x('Layout section', 'icon name', 'fromscratch-icons'),
 		'category'               => _x('Category', 'icon name', 'fromscratch-icons'),
 		'style'                  => _x('Style', 'icon name', 'fromscratch-icons'),
 		'brick'                  => _x('Brick', 'icon name', 'fromscratch-icons'),
