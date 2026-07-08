@@ -41,13 +41,17 @@
 }
 
 .icon__icon {
-  background: var(--fs-color-gray-200);
   border-radius: var(--fs-border-radius-m);
   width: 72px;
   height: 72px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+
+  &.-has-icon {
+    background: var(--fs-color-gray-200);
+  }
 
   @media (max-width: $breakpoint-s) {
     width: 64px;

@@ -290,6 +290,26 @@ export const blockOptions = [
     ],
   },
 
+  // ACF: Icon mit Text
+  {
+    name: 'acf/icon-text',
+    options: [
+      {
+        type: 'button-group',
+        label: 'Position',
+        default: '',
+        attributeName: 'iconTextPosition',
+        options: [
+          { icon: 'image-left-text', label: 'Links neben Text', value: '' },
+          { icon: 'image-right-text', label: 'Rechts neben Text', value: '-icon-text-align-right' },
+          { icon: 'image-left', label: 'Links', value: '-icon-align-left' },
+          { icon: 'image-center', label: 'Zentriert', value: '-icon-align-center' },
+          { icon: 'image-right', label: 'Rechts', value: '-icon-align-right' },
+        ],
+      },
+    ],
+  },
+
   // ACF: Slider
   {
     name: 'acf/slider',

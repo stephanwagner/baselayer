@@ -14,6 +14,13 @@ return [
 			'default'       => '',
 		],
 	],
+	'acf/icon-text' => [
+		[
+			'type'          => 'button-group',
+			'attributeName' => 'iconTextPosition',
+			'default'       => '',
+		],
+	],
 	'acf/slider' => [
 		[
 			'type'            => 'content-margin',

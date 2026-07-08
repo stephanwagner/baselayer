@@ -37,22 +37,25 @@ function IconTextBlockEdit({ attributes, setAttributes, isSelected }) {
   const blockProps = useBlockProps({
     className: ['icon-text__wrapper', 'fs-wp-block', attributes.className].filter(Boolean).join(' '),
   });
+  const hasIcon = Boolean(iconSlug);
 
   return (
     <div {...blockProps}>
       <div className="icon-text__container">
         <div className="icon-text__content">
-          <div className="icon-text__icon">
+          <div className={'icon-text__icon icon__icon' + (hasIcon ? ' -has-icon' : '')}>
             <InlineIconControl
               value={iconSlug}
               isActive={isSelected}
               onChange={(next) => setAttributes({ [ICON_SLUG_ATTRIBUTE]: next })}
             />
           </div>
-          <div className="icon-text__text">
-            <InnerBlocks
-              renderAppender={isSelected ? InnerBlocks.ButtonBlockAppender : InnerBlocks.DefaultBlockAppender}
-            />
+          <div className="icon-text__text-container">
+            <div className="icon-text__text">
+              <InnerBlocks
+                renderAppender={isSelected ? InnerBlocks.ButtonBlockAppender : InnerBlocks.DefaultBlockAppender}
+              />
+            </div>
           </div>
         </div>
       </div>

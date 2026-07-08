@@ -25,7 +25,7 @@ if ($iconMarkup || is_admin()) {
 ?>
 	<div class="<?= implode(' ', $classNames) ?>">
 		<div class="icon__container">
-			<div class="icon__icon">
+			<div class="icon__icon -has-icon">
 				<?php if ($iconMarkup) { ?>
 					<?= $iconMarkup ?>
 				<?php } ?>

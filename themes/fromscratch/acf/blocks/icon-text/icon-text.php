@@ -25,15 +25,15 @@ $classNames[] = 'icon-text__wrapper';
 <div class="<?= implode(' ', $classNames) ?>">
 	<div class="icon-text__container">
 		<div class="icon-text__content">
-			<div class="icon-text__icon">
-				<?php if ($iconMarkup !== ''): ?>
+			<div class="icon-text__icon icon__icon<?= $iconMarkup ? ' -has-icon' : '' ?>">
+				<?php if ($iconMarkup) { ?>
 					<?= $iconMarkup ?>
-				<?php else: ?>
-					<span class="icon-text__placeholder"><?= esc_html__('Choose an icon', 'fromscratch') ?></span>
-				<?php endif; ?>
+				<?php } ?>
 			</div>
-			<div class="icon-text__text">
-				<InnerBlocks />
+			<div class="icon-text__text-container">
+				<div class="icon-text__text">
+					<InnerBlocks />
+				</div>
 			</div>
 		</div>
 	</div>

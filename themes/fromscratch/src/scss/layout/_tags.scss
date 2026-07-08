@@ -153,7 +153,22 @@
   h2.h5,
   h3.h5,
   h4.h5,
-  h6.h5,
+  h6.h5 {
+    font-size: var(--fs-large-font-size);
+    line-height: var(--fs-large-line-height);
+    font-weight: 600;
+    margin-top: 16px;
+    margin-bottom: 6px;
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
   h6,
   .h6,
   h1.h6,
@@ -164,7 +179,16 @@
     font-size: var(--fs-default-font-size);
     line-height: var(--fs-default-line-height);
     font-weight: 600;
-    margin-bottom: 6px;
+    margin-top: 16px;
+    margin-bottom: 4px;
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 
   // Horizontal line

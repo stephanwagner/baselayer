@@ -1,1 +1,76 @@
 @use '../../../src/scss/variables' as *;
+
+.icon-text__wrapper {
+  margin-top: 24px;
+  margin-bottom: 24px;
+
+  &:first-child {
+    margin-top: 0;
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: $breakpoint-s) {
+    margin-top: 16px;
+    margin-bottom: 16px;
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.icon-text__content {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+
+  .icon-text__wrapper.-icon-align-left &,
+  .icon-text__wrapper.-icon-align-center &,
+  .icon-text__wrapper.-icon-align-right & {
+    display: block;
+  }
+
+  @media (max-width: $breakpoint-s) {
+    gap: 16px;
+  }
+
+  .icon-text__wrapper.-icon-text-align-right & {
+    flex-direction: row-reverse;
+  }
+}
+
+.icon-text__icon {
+  .icon-text__wrapper.-icon-align-left &,
+  .icon-text__wrapper.-icon-align-center &,
+  .icon-text__wrapper.-icon-align-right & {
+    margin-bottom: 16px;
+  }
+
+  .icon-text__wrapper.-icon-align-left & {
+    margin-left: 0;
+    margin-right: auto;
+  }
+
+  .icon-text__wrapper.-icon-align-center & {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .icon-text__wrapper.-icon-align-right & {
+    margin-left: auto;
+    margin-right: 0;
+  }
+}
+
+.icon-text__text-container {
+  flex: 1;
+  min-width: 0;
+  align-self: center;
+}
