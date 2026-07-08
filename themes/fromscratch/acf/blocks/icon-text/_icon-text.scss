@@ -1,14 +1,1 @@
 @use '../../../src/scss/variables' as *;
-
-.icon-text__icon {
-  .fs-icon {
-    display: inline-block;
-    font-size: 2rem; // TODO
-  }
-}
-
-.icon-text__placeholder {
-  color: #646970;
-  font-size: 13px;
-  font-style: italic;
-}

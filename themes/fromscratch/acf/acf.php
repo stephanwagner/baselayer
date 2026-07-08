@@ -114,8 +114,11 @@ function fs_block_option_classes(array $block): array
 			continue;
 		}
 
-		if ($type === 'select' && is_string($value) && $value !== '') {
-			$classes[] = $value;
+		if ($type === 'select' || $type === 'button-group') {
+			if (is_string($value) && $value !== '') {
+				$classes[] = $value;
+			}
+			continue;
 		}
 	}
 

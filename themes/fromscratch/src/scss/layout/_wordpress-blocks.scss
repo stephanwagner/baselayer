@@ -70,10 +70,10 @@
       }
 
       &:not(.alignfull) {
-        border-radius: var(--fs-border-radius);
+        border-radius: var(--fs-border-radius-m);
 
         @media (max-width: $breakpoint-xs) {
-          border-radius: var(--fs-border-radius);
+          border-radius: var(--fs-border-radius-m);
         }
       }
 
@@ -194,7 +194,7 @@
 
   .wp-block-column {
     &.has-background {
-      border-radius: var(--fs-border-radius);
+      border-radius: var(--fs-border-radius-m);
       padding: 32px;
 
       @media (max-width: $breakpoint-s) {
@@ -260,12 +260,12 @@
     }
 
     img {
-      border-radius: var(--fs-border-radius);
+      border-radius: var(--fs-border-radius-m);
     }
 
     &.is-style-framed {
       img {
-        border-radius: var(--fs-border-radius);
+        border-radius: var(--fs-border-radius-m);
         border: 1px solid rgba(0, 0, 0, 0.15);
 
         @media (min-resolution: 1.9dppx) {
@@ -310,7 +310,7 @@
 
       figcaption.wp-element-caption,
       &:has(figcaption)::before {
-        border-radius: 0 0 var(--fs-border-radius) var(--fs-border-radius);
+        border-radius: 0 0 var(--fs-border-radius-m) var(--fs-border-radius-m);
       }
     }
 

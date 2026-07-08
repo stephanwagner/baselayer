@@ -8,7 +8,7 @@
   position: absolute;
   top: calc(100% + 16px);
   background: #fff;
-  border-radius: var(--fs-border-radius);
+  border-radius: var(--fs-border-radius-m);
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
   transform: translateY(6px);
   min-width: 220px;
@@ -54,7 +54,7 @@
   > a,
   > button.fs-lang-item {
     background: transparent;
-    border-radius: calc(var(--fs-border-radius) - 3px);
+    border-radius: calc(var(--fs-border-radius-m) - 3px);
     color: var(--fs-default-text-color);
     padding: 8px 12px;
     transition: transition('background-color');
@@ -70,7 +70,7 @@
   &.menu-item-has-children {
     > .menu-item__inner {
       align-items: center;
-      border-radius: var(--fs-border-radius);
+      border-radius: var(--fs-border-radius-m);
       display: flex;
       padding-right: 4px;
       transition: transition('background-color');
@@ -92,7 +92,7 @@
 
       > .sub-menu-toggle {
         align-self: stretch;
-        border-radius: var(--fs-border-radius-small);
+        border-radius: var(--fs-border-radius-m);
         flex-shrink: 0;
         height: auto;
         margin: 4px 0;
@@ -146,7 +146,7 @@
     margin: 0;
     height: calc(100vh - var(--fs-header-height) - 8px - 8px);
     padding: 24px var(--fs-content-padding-l) 24px 32px;
-    border-radius: var(--fs-border-radius-large);
+    border-radius: var(--fs-border-radius-m);
     pointer-events: none;
     visibility: hidden;
     opacity: 0;

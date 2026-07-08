@@ -7,6 +7,13 @@
  * @return array<string, array<int, array<string, mixed>>>
  */
 return [
+	'acf/icon' => [
+		[
+			'type'          => 'button-group',
+			'attributeName' => 'iconAlign',
+			'default'       => '',
+		],
+	],
 	'acf/slider' => [
 		[
 			'type'            => 'content-margin',

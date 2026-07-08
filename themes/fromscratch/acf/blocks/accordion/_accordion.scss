@@ -22,7 +22,7 @@
 }
 
 .accordion__container {
-  border-radius: var(--fs-border-radius);
+  border-radius: var(--fs-border-radius-m);
   background-color: var(--fs-color-gray-200);
 }
 
@@ -33,7 +33,7 @@
   gap: 16px;
   padding: 0 16px 0 24px;
   transition: transition('background-color');
-  border-radius: var(--fs-border-radius);
+  border-radius: var(--fs-border-radius-m);
   cursor: pointer;
 
   @media (max-width: $breakpoint-s) {

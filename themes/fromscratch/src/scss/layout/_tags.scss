@@ -38,7 +38,7 @@
 
     &.has-background {
       padding: 20px 24px;
-      border-radius: var(--fs-border-radius);
+      border-radius: var(--fs-border-radius-m);
 
       @media (max-width: $breakpoint-s) {
         padding: 12px 16px;

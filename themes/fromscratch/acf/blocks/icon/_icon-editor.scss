@@ -1,5 +1,18 @@
-.icon__icon {
-  .fs-inline-icon-control__selected .fs-icon {
-    font-size: 2rem;
+@use '../../../src/scss/variables' as *;
+
+.icon__wrapper {
+  display: flex;
+  justify-content: center;
+
+  &.-icon-align-left {
+    justify-content: flex-start;
   }
+
+  &.-icon-align-right {
+    justify-content: flex-end;
+  }
+}
+
+.icon__icon {
+  
 }

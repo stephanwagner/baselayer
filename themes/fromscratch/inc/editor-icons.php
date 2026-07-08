@@ -205,6 +205,7 @@ function fs_icon_labels(): array
 		'link-off'               => _x('Unlink', 'icon name', 'fromscratch-icons'),
 		'image-left-text'          => _x('Image left, text', 'icon name', 'fromscratch-icons'),
 		'image-right-text'         => _x('Image right, text', 'icon name', 'fromscratch-icons'),
+		'image-center'             => _x('Image center', 'icon name', 'fromscratch-icons'),
 		'image-center-text'        => _x('Image center, text', 'icon name', 'fromscratch-icons'),
 		'quote'                  => _x('Quote', 'icon name', 'fromscratch-icons'),
 		'paragraph'              => _x('Paragraph', 'icon name', 'fromscratch-icons'),

@@ -2329,6 +2329,10 @@ msgid "Unlink"
 msgstr "Link entfernen"
 
 msgctxt "icon name"
+msgid "Image center"
+msgstr "Bild zentriert"
+
+msgctxt "icon name"
 msgid "Image center, text"
 msgstr "Bild mittig, Text"
 

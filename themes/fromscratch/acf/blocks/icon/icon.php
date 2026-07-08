@@ -20,18 +20,18 @@ $iconMarkup = fs_acf_block_icon_markup($block);
 
 // Add wrapper class
 $classNames[] = 'icon__wrapper';
-?>
 
-<div class="<?= implode(' ', $classNames) ?>">
-	<div class="icon__container">
-		<div class="icon__content">
+if ($iconMarkup || is_admin()) {
+?>
+	<div class="<?= implode(' ', $classNames) ?>">
+		<div class="icon__container">
 			<div class="icon__icon">
-				<?php if ($iconMarkup !== ''): ?>
+				<?php if ($iconMarkup) { ?>
 					<?= $iconMarkup ?>
-				<?php else: ?>
-					<span class="icon__placeholder"><?= esc_html__('Choose an icon', 'fromscratch') ?></span>
-				<?php endif; ?>
+				<?php } ?>
 			</div>
 		</div>
 	</div>
-</div>
+<?php
+}
+?>

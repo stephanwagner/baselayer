@@ -223,6 +223,7 @@ const builtInCategories = [
       { filename: 'format-size', alternatives: ['fill'], keywords: ['font', 'size', 'text', 'typography'] },
       { filename: 'titlecase', alternatives: [], keywords: ['title case', 'capitalization', 'text', 'typography', 'format'] },
       { filename: 'image-left', alternatives: ['fill'], keywords: ['image', 'left', 'align', 'position'] },
+      { filename: 'image-center', alternatives: ['fill'], keywords: ['image', 'center', 'align', 'position'] },
       { filename: 'image-right', alternatives: ['fill'], keywords: ['image', 'right', 'align', 'position'] },
       { filename: 'image-left-text', alternatives: ['fill'], keywords: ['align', 'wrap', 'float', 'text', 'image', 'left'] },
       { filename: 'image-right-text', alternatives: ['fill'], keywords: ['align', 'wrap', 'float', 'text', 'image', 'right'] },

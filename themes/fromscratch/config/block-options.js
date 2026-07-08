@@ -272,11 +272,27 @@ export const blockOptions = [
     ],
   },
 
+  // ACF: Icon
+  {
+    name: 'acf/icon',
+    options: [
+      {
+        type: 'button-group',
+        label: 'Ausrichtung',
+        default: '',
+        attributeName: 'iconAlign',
+        options: [
+          { icon: 'image-left', label: 'Links', value: '-icon-align-left' },
+          { icon: 'image-center', label: 'Zentriert', value: '' },
+          { icon: 'image-right', label: 'Rechts', value: '-icon-align-right' },
+        ],
+      },
+    ],
+  },
+
   // ACF: Slider
   {
     name: 'acf/slider',
     options: [getContentMarginControl('m')],
   },
 ];
-
-// TODO acf map / icon / icon-text

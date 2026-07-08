@@ -37,7 +37,6 @@ export function InlineIconControl({ value, onChange, isActive = false }) {
           onClick={() => openPicker(placeholderRef.current)}
           aria-label={t('choose', 'Choose icon')}
         >
-          <span className="fs-inline-icon-control__placeholder-glyph" aria-hidden="true" />
           <span className="fs-inline-icon-control__placeholder-label">{t('choose', 'Choose icon')}</span>
         </button>
       </div>

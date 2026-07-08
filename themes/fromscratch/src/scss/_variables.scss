@@ -93,9 +93,9 @@ $transition-speed: 240ms;
 $transition-speed-slow: 360ms;
 
 // Border radius
-$border-radius: 8px;
-$border-radius-small: 4px;
-$border-radius-large: 16px;
+$border-radius-s: 4px;
+$border-radius-m: 8px;
+$border-radius-l: 16px;
 
 // Block editor content widths
 $editor-content-width: 960px;
@@ -193,9 +193,9 @@ $editor-content-width-outer: $editor-content-width + ($editor-content-width-padd
   --fs-transition-speed-slow: #{$transition-speed-slow};
 
   // Border radius
-  --fs-border-radius: #{$border-radius};
-  --fs-border-radius-small: #{$border-radius-small};
-  --fs-border-radius-large: #{$border-radius-large};
+  --fs-border-radius-m-small: #{$border-radius-s};
+  --fs-border-radius-m: #{$border-radius-m};
+  --fs-border-radius-m-large: #{$border-radius-l};
 
   // Editor content
   --fs-editor-content-width: #{$editor-content-width};
