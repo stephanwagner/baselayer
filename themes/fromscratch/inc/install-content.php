@@ -108,7 +108,10 @@ function fs_install_delete_default_wp_pages(): void
  * {{media:sample-image-1:id}}
  * {{media:sample-image-1:url}}
  *
- * @return array<string, array{file: string, title: string, description: string}>
+ * The `caption` is stored as the attachment caption (post_excerpt), which shows
+ * as the image undertitle in galleries and captioned image blocks.
+ *
+ * @return array<string, array{file: string, title: string, caption: string}>
  */
 function fs_install_media_manifest(): array
 {
@@ -116,29 +119,34 @@ function fs_install_media_manifest(): array
 
 	return [
 		'sample-image-1' => [
-			'file'        => $base . '/sample-image-1.webp',
-			'title'       => 'Sunlit Landscape',
-			'description' => 'A wide landscape sample image included with FromScratch, ideal for hero sections and full-width layouts.',
+			'file'    => $base . '/sample-image-1.webp',
+			'title'   => 'Sunlit Landscape',
+			'caption' => 'Sunset over a rolling hill',
 		],
 		'sample-image-2' => [
-			'file'        => $base . '/sample-image-2.webp',
-			'title'       => 'Open Horizon',
-			'description' => 'A landscape sample image for use in columns, sliders, and text-with-image sections.',
+			'file'    => $base . '/sample-image-2.webp',
+			'title'   => 'Open Horizon',
+			'caption' => 'Mountain scenery framed by green trees',
 		],
 		'sample-image-3' => [
-			'file'        => $base . '/sample-image-3.webp',
-			'title'       => 'Quiet Scenery',
-			'description' => 'A versatile landscape sample image for galleries and card layouts.',
+			'file'    => $base . '/sample-image-3.webp',
+			'title'   => 'Quiet Scenery',
+			'caption' => 'A calm lake bathed in autumn sunlight',
 		],
 		'sample-image-4' => [
-			'file'        => $base . '/sample-image-4.webp',
-			'title'       => 'Standing Tall',
-			'description' => 'A portrait sample image well suited to column layouts and mobile-first designs.',
+			'file'    => $base . '/sample-image-4.webp',
+			'title'   => 'Wide Vista',
+			'caption' => 'A quiet lake beneath a small mountain range',
+		],
+		'sample-image-5' => [
+			'file'    => $base . '/sample-image-5.webp',
+			'title'   => 'Standing Tall',
+			'caption' => 'A tall mountain peak wrapped in drifting fog',
 		],
 		'sample-video-1' => [
-			'file'        => $base . '/sample-video-1.mp4',
-			'title'       => 'Sample Motion Clip',
-			'description' => 'A short sample video included with FromScratch for testing the slider video slide and media embeds.',
+			'file'    => $base . '/sample-video-1.mp4',
+			'title'   => 'Sample Motion Clip',
+			'caption' => 'A short sample video for testing and placeholder content',
 		],
 	];
 }
@@ -171,7 +179,7 @@ function fs_install_find_media_by_key(string $key): int
 /**
  * Copy a bundled file into uploads and register it as an attachment.
  *
- * @param array{file: string, title: string, description: string} $item
+ * @param array{file: string, title: string, caption: string} $item
  */
 function fs_install_import_media_file(string $key, array $item): int
 {
@@ -185,6 +193,9 @@ function fs_install_import_media_file(string $key, array $item): int
 	}
 	if (!function_exists('wp_generate_attachment_metadata')) {
 		require_once ABSPATH . 'wp-admin/includes/image.php';
+	}
+	if (!function_exists('wp_read_video_metadata')) {
+		require_once ABSPATH . 'wp-admin/includes/media.php';
 	}
 
 	$upload_dir = wp_upload_dir();
@@ -204,7 +215,7 @@ function fs_install_import_media_file(string $key, array $item): int
 	$attachment_id = wp_insert_attachment([
 		'post_mime_type' => $filetype['type'] ?? '',
 		'post_title'     => $item['title'],
-		'post_content'   => $item['description'],
+		'post_excerpt'   => $item['caption'],
 		'post_status'    => 'inherit',
 	], $destination);
 
