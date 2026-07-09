@@ -103,6 +103,12 @@
     }
   }
 
+  // Cover
+
+  .wp-block-cover {
+    border-radius: var(--fs-border-radius-m);
+  }
+
   // Columns
 
   .wp-block-columns {

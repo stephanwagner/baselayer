@@ -8,6 +8,16 @@
           "allowEditing": false
         }
       },
+      "core/cover": {
+        "layout": {
+          "allowEditing": false
+        },
+        "dimensions": {
+          "aspectRatio": false,
+          "minHeight": false
+        },
+        "shadow": false
+      },
       "core/button": {
         "typography": {
           "fontSize": false

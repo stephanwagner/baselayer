@@ -1,5 +1,17 @@
 <?php
 
+defined('ABSPATH') || exit;
+
+/**
+ * Blocks that should never use WordPress constrained layout (is-layout-constrained).
+ *
+ * @return list<string>
+ */
+function fs_blocks_without_constrained_layout(): array
+{
+    return ['core/group', 'core/cover', 'core/column'];
+}
+
 // Images
 
 add_action('init', function () {
@@ -64,6 +76,66 @@ add_filter('block_type_metadata', function (array $metadata): array {
 
     return $metadata;
 }, 10, 1);
+
+/**
+ * Disable layout support on blocks that use theme width controls instead.
+ */
+add_filter('block_type_metadata', function (array $metadata): array {
+    if (!in_array($metadata['name'] ?? '', fs_blocks_without_constrained_layout(), true)) {
+        return $metadata;
+    }
+
+    unset($metadata['supports']['layout']);
+
+    return $metadata;
+}, 10, 1);
+
+/**
+ * Disable layout-adjacent inspector panels on the cover block.
+ */
+add_filter('block_type_metadata', function (array $metadata): array {
+    if (($metadata['name'] ?? '') !== 'core/cover') {
+        return $metadata;
+    }
+
+    $metadata['supports']['shadow'] = false;
+
+    if (isset($metadata['supports']['dimensions'])) {
+        $metadata['supports']['dimensions'] = false;
+    }
+
+    return $metadata;
+}, 10, 1);
+
+/**
+ * Strip saved layout attributes before render.
+ */
+add_filter('render_block_data', function (array $block): array {
+    if (!in_array($block['blockName'] ?? '', fs_blocks_without_constrained_layout(), true)) {
+        return $block;
+    }
+
+    if (isset($block['attrs']['layout'])) {
+        unset($block['attrs']['layout']);
+    }
+
+    return $block;
+}, 10, 1);
+
+/**
+ * Remove is-layout-constrained from rendered markup if it still appears.
+ */
+add_filter('render_block', function (string $content, array $block): string {
+    if (!in_array($block['blockName'] ?? '', fs_blocks_without_constrained_layout(), true)) {
+        return $content;
+    }
+
+    if (strpos($content, 'is-layout-constrained') === false) {
+        return $content;
+    }
+
+    return preg_replace('/\s*is-layout-constrained\b/', '', $content) ?? $content;
+}, 10, 2);
 
 /**
  * Icon-only buttons: add front-end class and ensure link markup is non-empty.

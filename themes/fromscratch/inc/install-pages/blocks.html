@@ -20,6 +20,10 @@
 <!-- /wp:button -->
 
 <!-- wp:button {"className":"is-style-outline -small","buttonSize":"-small"} -->
+<div class="wp-block-button is-style-outline -small"><a class="wp-block-button__link wp-element-button" href="#cover">Cover</a></div>
+<!-- /wp:button -->
+
+<!-- wp:button {"className":"is-style-outline -small","buttonSize":"-small"} -->
 <div class="wp-block-button is-style-outline -small"><a class="wp-block-button__link wp-element-button" href="#column">Column</a></div>
 <!-- /wp:button -->
 
@@ -226,11 +230,39 @@
 <p>Groups combine blocks into a single section. Add a background to get automatic inner padding and keep the content spaced from the edges.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:group {"className":"-content-margin-s","backgroundColor":"gray-200","layout":{"type":"constrained"},"contentMarginTop":"s","contentMarginBottom":"s"} -->
+<!-- wp:group {"className":"-content-margin-s","backgroundColor":"gray-200","contentMarginTop":"s","contentMarginBottom":"s"} -->
 <div class="wp-block-group -content-margin-s has-gray-200-background-color has-background"><!-- wp:paragraph -->
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut rhoncus turpis a eros blandit malesuada. Maecenas hendrerit auctor odio, eget volutpat sapien feugiat in. Nulla sed dapibus arcu.</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->
+
+<!-- wp:separator {"className":"-content-margin-m"} -->
+<hr class="wp-block-separator has-alpha-channel-opacity -content-margin-m"/>
+<!-- /wp:separator -->
+
+<!-- wp:acf/anchor {"name":"acf/anchor","data":{"id":"cover","_id":"field_6a003d7571e96","offset":"0","_offset":"field_6a003e0271e97"},"mode":"preview"} /-->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Cover</h2>
+<!-- /wp:heading -->
+
+<!-- wp:cover {"overlayColor":"black","isUserOverlayColor":true,"className":"-content-margin-s","contentMarginTop":"s","contentMarginBottom":"s"} -->
+<div class="wp-block-cover -content-margin-s"><span aria-hidden="true" class="wp-block-cover__background has-black-background-color has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:acf/icon {"name":"acf/icon","mode":"preview","iconSlug":"lightbulb"} /-->
+
+<!-- wp:paragraph {"placeholder":"Titel eingeben …","style":{"typography":{"textAlign":"center"}},"fontSize":"large"} -->
+<p class="has-text-align-center has-large-font-size">Bring Your Ideas to Life</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph {"className":"-very-narrow text-wrap-pretty","style":{"typography":{"textAlign":"center"}},"limitWidthSize":"m","textWrap":"text-wrap-pretty"} -->
+<p class="has-text-align-center -very-narrow text-wrap-pretty">Create eye-catching hero sections with background images, colors, or videos. Add any blocks on top to build engaging introductions, calls to action, or featured content.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:buttons {"layout":{"type":"flex","justifyContent":"center"}} -->
+<div class="wp-block-buttons"><!-- wp:button -->
+<div class="wp-block-button"><a class="wp-block-button__link wp-element-button">Learn more</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons --></div></div>
+<!-- /wp:cover -->
 
 <!-- wp:separator {"className":"-content-margin-m"} -->
 <hr class="wp-block-separator has-alpha-channel-opacity -content-margin-m"/>
@@ -408,7 +440,7 @@
 <p>Image blocks support optional captions and can be opened in a lightbox on click. Captions can be hidden for a cleaner look.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:image {"id":{{media:sample-image-3:id}},"aspectRatio":"16/9","scale":"cover","sizeSlug":"large","linkDestination":"none","className":"-has-lightbox","contentMarginTop":"s","contentMarginLinked":false,"hasLightbox":true} -->
+<!-- wp:image {"id":{{media:sample-image-3:id}},"aspectRatio":"16/9","scale":"cover","sizeSlug":"large","linkDestination":"none","className":"-has-lightbox","contentMarginLinked":false,"hasLightbox":true} -->
 <figure class="wp-block-image size-large is-resized -has-lightbox"><img src="{{media:sample-image-3:url}}" alt="" class="wp-image-{{media:sample-image-3:id}}" style="aspect-ratio:16/9;object-fit:cover"/><figcaption class="wp-element-caption">A calm lake bathed in autumn sunlight</figcaption></figure>
 <!-- /wp:image --></div>
 <!-- /wp:column -->
@@ -602,7 +634,7 @@
 <p class="-content-margin-top-none -content-margin-bottom-s -extra-narrow-left">This paragraph uses a limited width aligned to the left.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:group {"className":"-content-margin-m -very-narrow","backgroundColor":"gray-200","layout":{"type":"constrained"},"limitWidthSize":"m"} -->
+<!-- wp:group {"className":"-content-margin-m -very-narrow","backgroundColor":"gray-200","limitWidthSize":"m"} -->
 <div class="wp-block-group -content-margin-m -very-narrow has-gray-200-background-color has-background"><!-- wp:paragraph -->
 <p>This group sits between the left and right examples and can use a background to stand out from the surrounding content.</p>
 <!-- /wp:paragraph --></div>
@@ -645,7 +677,7 @@
 <p>TODO: Map</p>
 <!-- /wp:paragraph -->
 <!-- wp:paragraph -->
-<p>TODO: Cover</p>
+<p>TODO: Cover / Group: Paddings</p>
 <!-- /wp:paragraph -->
 <!-- wp:paragraph -->
 <p>TODO: Quote</p>
