@@ -1937,7 +1937,7 @@ function display_custom_info_fields(): void
 		foreach ($tab['sections'] as $section) {
 			$section_title = $section['title'] ?? $section['id'] ?? '';
 			$content_page = FS_THEME_CONTENT_OPTION_PREFIX . $tab['id'] . '_' . $section['id'];
-			add_settings_section('section', $section_title, null, $content_page);
+			add_settings_section('section', _x($section_title, 'Content variables', 'fromscratch'), null, $content_page);
 			foreach ($section['variables'] as $variable) {
 				$variableId = FS_THEME_CONTENT_OPTION_PREFIX . $tab['id'] . '_' . $section['id'] . '_' . $variable['id'];
 				$variable_title = $variable['title'] ?? $variable['id'] ?? '';
