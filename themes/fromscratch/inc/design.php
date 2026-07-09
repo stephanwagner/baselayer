@@ -211,6 +211,24 @@ function fs_theme_json_color_settings(): array
 }
 
 /**
+ * Block editor typography settings for theme.json from config/theme-design.php.
+ *
+ * @return array<string, bool>
+ */
+function fs_theme_json_typography_settings(): array
+{
+	$options = fs_config('typography_options');
+	if (!is_array($options)) {
+		$options = [];
+	}
+
+	return [
+		'defaultFontSizes' => array_key_exists('default_font_sizes', $options) ? (bool) $options['default_font_sizes'] : false,
+		'dropCap'          => array_key_exists('drop_cap', $options) ? (bool) $options['drop_cap'] : false,
+	];
+}
+
+/**
  * Contents of `src/scss/_variables.scss` — the `:root { … }` block only (readonly overview in Theme → CSS admin).
  *
  * @return string

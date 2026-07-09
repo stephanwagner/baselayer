@@ -30,6 +30,13 @@ return [
 		'custom'            => true,
 	],
 
+	// Typography (theme.json settings.typography — hides WordPress default size presets when false)
+	'typography_options' => [
+		'default_font_sizes' => false,
+		'drop_cap'           => false,
+		'fit_text'           => false,
+	],
+
 	// Gradients
 	'gradients' => [
 		[

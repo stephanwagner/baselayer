@@ -39,6 +39,33 @@ add_filter('register_block_type_args', function ($args, $block_type) {
 }, 10, 2);
 
 /**
+ * Disable fit text on text blocks (not configurable via theme.json).
+ */
+add_filter('block_type_metadata', function (array $metadata): array {
+    if (!function_exists('fs_config')) {
+        return $metadata;
+    }
+
+    $options = fs_config('typography_options');
+    if (!is_array($options) || !array_key_exists('fit_text', $options) || $options['fit_text']) {
+        return $metadata;
+    }
+
+    $blocks = ['core/paragraph', 'core/heading'];
+    if (!in_array($metadata['name'] ?? '', $blocks, true)) {
+        return $metadata;
+    }
+
+    if (!isset($metadata['supports']['typography']) || !is_array($metadata['supports']['typography'])) {
+        $metadata['supports']['typography'] = [];
+    }
+
+    $metadata['supports']['typography']['fitText'] = false;
+
+    return $metadata;
+}, 10, 1);
+
+/**
  * Icon-only buttons: add front-end class and ensure link markup is non-empty.
  */
 add_filter('render_block', function ($content, $block) {

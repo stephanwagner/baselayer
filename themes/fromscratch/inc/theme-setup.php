@@ -203,6 +203,12 @@ add_filter('wp_theme_json_data_theme', function ($theme_json) {
 
 	$data['settings']['typography']['fontSizes'] = fs_config('font_sizes');
 
+	if (function_exists('fs_theme_json_typography_settings')) {
+		foreach (fs_theme_json_typography_settings() as $key => $value) {
+			$data['settings']['typography'][$key] = $value;
+		}
+	}
+
 	$layout_sizes = function_exists('fs_theme_json_layout_sizes')
 		? fs_theme_json_layout_sizes()
 		: ['contentSize' => '840px', 'wideSize' => '968px'];

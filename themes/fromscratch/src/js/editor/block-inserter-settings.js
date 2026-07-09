@@ -109,19 +109,41 @@ function isInserterOpenedFromStore(select) {
 const TOGGLE_MOUNT_CLASS = 'fs-inserter-has-toggle';
 
 function findInserterSearchRoot() {
+  const inserterRoot = document.querySelector(
+    '.editor-inserter-sidebar, .block-editor-inserter__menu'
+  );
+
+  if (!inserterRoot || !isBlocksInserterTabActive(inserterRoot)) {
+    return null;
+  }
+
   const selectors = [
     '.block-editor-inserter__search',
     '.editor-inserter-sidebar .block-editor-inserter__search',
   ];
 
   for (let i = 0; i < selectors.length; i += 1) {
-    const node = document.querySelector(selectors[i]);
+    const node = inserterRoot.querySelector(selectors[i]);
     if (node) {
       return node;
     }
   }
 
   return null;
+}
+
+function isBlocksInserterTabActive(inserterRoot) {
+  const selectedTab = inserterRoot.querySelector('[role="tab"][aria-selected="true"]');
+  if (!selectedTab) {
+    return true;
+  }
+
+  const tabId = selectedTab.getAttribute('id') || '';
+  const tabLabel = (selectedTab.textContent || '').trim().toLowerCase();
+
+  return tabId.includes('blocks')
+    || tabLabel === 'blocks'
+    || tabLabel === 'blöcke';
 }
 
 function findInserterSearchControl(searchRoot) {
@@ -347,25 +369,6 @@ function initBlockInserterSettings() {
     const preferencesKey = getPreferencesKey();
     const initialShow = wp.data.select('core/preferences').get(preferencesScope, preferencesKey);
     applyHiddenInserterState(Boolean(initialShow));
-
-    const PluginDocumentSettingPanel = wp.editor && wp.editor.PluginDocumentSettingPanel;
-    const { registerPlugin } = wp.plugins;
-
-    if (PluginDocumentSettingPanel && registerPlugin) {
-      registerPlugin('fromscratch-hidden-blocks-panel', {
-        render: function HiddenBlocksPanel() {
-          return el(
-            PluginDocumentSettingPanel,
-            {
-              name: 'fromscratch-hidden-blocks',
-              title: getI18n().hiddenBlocksPanel || 'Hidden blocks',
-              className: 'fromscratch-hidden-blocks-panel',
-            },
-            el(InserterToggleControl)
-          );
-        },
-      });
-    }
 
     let frame = 0;
     const scheduleSync = () => {
