@@ -8,7 +8,12 @@ if ($('[data-anchor-id]').length) {
     const link = $(item);
     const href = link.attr('href');
     const hrefSplit = href.split('#');
-    const anchorEl = $('[data-anchor-id="' + hrefSplit[hrefSplit.length - 1] + '"]');
+    const hashId = hrefSplit[hrefSplit.length - 1];
+    const accordionWrapper = $('.accordion__wrapper[data-accordion-id="' + hashId + '"]').first();
+    if (accordionWrapper.length) {
+      return;
+    }
+    const anchorEl = $('[data-anchor-id="' + hashId + '"]');
     if (anchorEl.length) {
       link.on('click', function () {
         closeMenu();
@@ -49,9 +54,12 @@ checkActiveNav();
 const windowHash = window.location.hash;
 if (windowHash) {
   const hashId = windowHash.replace('#', '');
-  const anchorEl = $('[data-anchor-id="' + hashId + '"]');
-  if (anchorEl.length) {
-    scrollToAnchor(anchorEl);
+  const accordionWrapper = $('.accordion__wrapper[data-accordion-id="' + hashId + '"]').first();
+  if (!accordionWrapper.length) {
+    const anchorEl = $('[data-anchor-id="' + hashId + '"]');
+    if (anchorEl.length) {
+      scrollToAnchor(anchorEl);
+    }
   }
 }
 

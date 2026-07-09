@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import { scrollToElement, getOffset } from '../../../src/js/utils/scroll-to-element';
+import { closeMenu } from '../../../src/js/main/menu';
 import config from '../../../src/js/config';
 
 /**
@@ -15,6 +16,58 @@ $('.accordion__header').on('click keydown', function (e) {
     closeAccordion(wrapper);
     return;
   }
+  openAccordionWithNeighbours(wrapper);
+});
+
+/**
+ * Open accordion via hash/link navigation, then scroll once
+ * @param {jQuery} accordionWrapper
+ */
+function navigateToAccordion(accordionWrapper) {
+  if (!accordionWrapper.length) {
+    return;
+  }
+  openAccordionWithNeighbours($(accordionWrapper), { scrollAfterOpen: true });
+}
+
+/**
+ * Scroll to accordion by hash
+ * @param {string} hash
+ */
+function scrollToAccordionByHash(hash) {
+  if (!hash) {
+    return;
+  }
+  const hashId = hash.replace('#', '');
+  const accordionWrapper = $('.accordion__wrapper[data-accordion-id="' + hashId + '"]').first();
+  navigateToAccordion(accordionWrapper);
+}
+
+if ($('.accordion__wrapper[data-accordion-id]').length) {
+  $('a[href*="#"]').each(function (index, item) {
+    const link = $(item);
+    const href = link.attr('href');
+    const hrefSplit = href.split('#');
+    const accordionWrapper = $('.accordion__wrapper[data-accordion-id="' + hrefSplit[hrefSplit.length - 1] + '"]').first();
+    if (accordionWrapper.length) {
+      link.on('click', function () {
+        closeMenu();
+        navigateToAccordion(accordionWrapper);
+      });
+    }
+  });
+}
+
+window.addEventListener('load', () => {
+  scrollToAccordionByHash(window.location.hash);
+});
+
+/**
+ * Open an accordion and close neighbouring accordions when configured
+ * @param {jQuery} wrapper
+ * @param {object} options
+ */
+function openAccordionWithNeighbours(wrapper, options = {}) {
   if (wrapper.attr('data-close-neighbouring-accordions') === 'true') {
     let wrapperSiblings = $();
     wrapperSiblings = wrapperSiblings.add(wrapper.prevUntil(':not(.accordion__wrapper)'));
@@ -23,36 +76,33 @@ $('.accordion__header').on('click keydown', function (e) {
       closeAccordion($(item));
     });
   }
-  openAccordion(wrapper);
-});
-
-/**
- * Automatic scroll to accordion
- */
-const windowHash = window.location.hash;
-if (windowHash) {
-  const hashId = windowHash.replace('#', '');
-  const accordionWrapper = $('.accordion__wrapper[data-accordion-id="' + hashId + '"]').first();
-
-  if (accordionWrapper.length) {
-    scrollToElement($(accordionWrapper)[0], getOffset(), function () {
-      openAccordion($(accordionWrapper));
-    });
-  }
+  openAccordion(wrapper, options);
 }
 
 /**
  * Open an accordion
- * @param {*} wrapper 
+ * @param {jQuery} wrapper
+ * @param {object} options
  */
-function openAccordion(wrapper) {
+function openAccordion(wrapper, options = {}) {
+  const scrollAfterOpen = options.scrollAfterOpen === true;
+
+  if (wrapper.hasClass('accordion-open')) {
+    if (scrollAfterOpen || wrapper.attr('data-scroll-to-accordion-top') === 'true') {
+      scrollToElement($(wrapper)[0], getOffset());
+    }
+    return;
+  }
+
   wrapper.addClass('accordion-open');
   wrapper.attr('aria-expanded', 'true');
   wrapper.find('.accordion__content').slideDown({
     duration: config.transitionSpeed,
     queue: false,
     complete: function () {
-      if (wrapper.attr('data-scroll-to-accordion-top') === 'true') {
+      if (scrollAfterOpen) {
+        scrollToElement($(wrapper)[0], getOffset());
+      } else if (wrapper.attr('data-scroll-to-accordion-top') === 'true') {
         scrollToElement($(wrapper)[0], getOffset());
       }
     },
@@ -61,7 +111,7 @@ function openAccordion(wrapper) {
 
 /**
  * Close an accordion
- * @param {*} wrapper 
+ * @param {jQuery} wrapper
  */
 function closeAccordion(wrapper) {
   wrapper.removeClass('accordion-open');
