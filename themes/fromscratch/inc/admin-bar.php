@@ -49,6 +49,8 @@ add_action('admin_bar_menu', function (\WP_Admin_Bar $wp_admin_bar): void {
 		return;
 	}
 
+	$wp_admin_bar->remove_node('customize');
+
 	$node = $wp_admin_bar->get_node('site-name');
 	if (!$node) {
 		return;
