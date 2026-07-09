@@ -36,6 +36,11 @@
   border-radius: var(--fs-border-radius-m);
   cursor: pointer;
 
+  &:hover,
+  .accordion__wrapper.accordion-open & {
+    background-color: var(--fs-color-gray-300);
+  }
+
   @media (max-width: $breakpoint-s) {
     padding-left: 16px;
     padding-right: 8px;
@@ -49,10 +54,6 @@
   font-size: var(--fs-font-size-m);
   line-height: 24px;
   transition: transition('color');
-
-  .accordion__header:hover & {
-    color: var(--fs-color-primary);
-  }
 
   @media (max-width: $breakpoint-xs) {
     font-weight: 400;
@@ -77,10 +78,6 @@
     transition: transition('transform', 'fill');
     width: 100%;
     height: 100%;
-
-    .accordion__header:hover & {
-      color: var(--fs-color-primary);
-    }
 
     .accordion__wrapper.accordion-open & {
       transform: scaleY(-1);
