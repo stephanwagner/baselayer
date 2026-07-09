@@ -387,6 +387,13 @@ add_action('load-nav-menus.php', function () {
 });
 
 /**
+ * Default role when creating a new user (Add User screen). The Settings field is hidden in admin.
+ */
+add_filter('pre_option_default_role', static function ($pre) {
+  return 'editor';
+});
+
+/**
  * On Settings → General, hide specific rows for non-developers (e.g. WordPress Address URL).
  * Also prevent saving those options so they cannot be changed via tampered requests.
  */

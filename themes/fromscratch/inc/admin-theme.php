@@ -44,21 +44,11 @@ add_filter('get_user_option_admin_color', static function ($color): string {
 }, 5);
 
 /**
- * On theme switch: adopt FromScratch if the account still uses a stock WordPress scheme.
- * Does not override a scheme the user picked in Profile.
+ * New users: assign the FromScratch admin color scheme.
  */
-add_action('after_switch_theme', static function (): void {
-	$wp_defaults = ['fresh', 'light', 'blue', 'coffee', 'ectoplasm', 'midnight', 'ocean', 'sunrise'];
-	$user_id = get_current_user_id();
-	if ($user_id <= 0) {
-		return;
-	}
-
-	$color = get_user_meta($user_id, 'admin_color', true);
-	if ($color === '' || !is_string($color) || in_array($color, $wp_defaults, true)) {
-		update_user_meta($user_id, 'admin_color', 'fromscratch');
-	}
-});
+add_action('user_register', static function (int $user_id): void {
+	update_user_meta($user_id, 'admin_color', 'fromscratch');
+}, 10, 1);
 
 /**
  * Skip the wp-admin color scheme on the public site (core would leak global link/menu styles).

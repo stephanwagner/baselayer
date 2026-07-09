@@ -878,7 +878,15 @@ Tags:
   /**
    * Save install complete
    */
+  update_option('default_role', 'editor');
   update_option('fromscratch_install_success', true);
+
+  if ($current_id) {
+    update_user_meta($current_id, 'admin_color', 'fromscratch');
+  }
+  if ($new_developer_user_id > 0) {
+    update_user_meta($new_developer_user_id, 'admin_color', 'fromscratch');
+  }
 
   /**
    * Redirect
