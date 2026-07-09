@@ -1,5 +1,16 @@
 @use '../../../src/scss/variables' as *;
 
+.editor-styles-wrapper {
+  .wp-block-acf-accordion {
+    margin-top: 24px;
+    margin-bottom: 24px;
+
+    + .wp-block-acf-accordion {
+      margin-top: -8px;
+    }
+  }
+}
+
 .editor-styles-wrapper .accordion__wrapper.accordion-open,
 .editor-styles-wrapper .wp-block.is-selected,
 .editor-styles-wrapper .wp-block.has-child-selected {

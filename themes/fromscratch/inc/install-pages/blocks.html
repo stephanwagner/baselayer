@@ -528,9 +528,61 @@
 <p>The accordion block creates a collapsible content section that can be expanded or collapsed to show or hide its content. It supports inner blocks, so you can add any combination of blocks inside.</p>
 <!-- /wp:paragraph -->
 
+<!-- wp:acf/accordion {"name":"acf/accordion","data":{"title":"Already open","_title":"field_69fdc7ed16e20","id":"","_id":"field_6a001639da30e","accordion_is_open":"1","_accordion_is_open":"field_6a0010af6f9b5","close_neighbouring_accordions":"1","_close_neighbouring_accordions":"field_69fdc85516e22","scroll_to_accordion_top":"1","_scroll_to_accordion_top":"field_69fdc92616e23"},"mode":"preview"} -->
+<!-- wp:paragraph -->
+<p>This accordion is open by default to showcase one of the available options.</p>
+<!-- /wp:paragraph -->
 
+<!-- wp:paragraph -->
+<p>All accordion settings are optional. You can:</p>
+<!-- /wp:paragraph -->
 
-<!-- wp:acf/accordion {"name":"acf/accordion","mode":"preview"} /-->
+<!-- wp:list -->
+<ul class="wp-block-list"><!-- wp:list-item -->
+<li>Open an accordion by default</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Scroll it into view when opened</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Close other accordions automatically</li>
+<!-- /wp:list-item -->
+
+<!-- wp:list-item -->
+<li>Link directly to an accordion using its anchor ID</li>
+<!-- /wp:list-item --></ul>
+<!-- /wp:list -->
+
+<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button {"className":"-icon-vertical-align-bottom -has-icon","buttonIcon":"-icon-vertical-align-bottom"} -->
+<div class="wp-block-button -icon-vertical-align-bottom -has-icon"><a class="wp-block-button__link wp-element-button" href="#my-accordion">Open second accordion</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->
+<!-- /wp:acf/accordion -->
+
+<!-- wp:acf/accordion {"name":"acf/accordion","data":{"title":"Another accordion","_title":"field_69fdc7ed16e20","id":"my-accordion","_id":"field_6a001639da30e","accordion_is_open":"0","_accordion_is_open":"field_6a0010af6f9b5","close_neighbouring_accordions":"1","_close_neighbouring_accordions":"field_69fdc85516e22","scroll_to_accordion_top":"1","_scroll_to_accordion_top":"field_69fdc92616e23"},"mode":"preview"} -->
+<!-- wp:paragraph -->
+<p>This accordion has the anchor ID <code>my-accordion</code>.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Open this page with the URL ending in <code>#my-accordion</code> to automatically scroll to and expand this section.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button {"className":"-icon-open-in-new -has-icon","buttonIcon":"-icon-open-in-new"} -->
+<div class="wp-block-button -icon-open-in-new -has-icon"><a class="wp-block-button__link wp-element-button" href="#my-accordion" target="_blank" rel="noreferrer noopener">Open this accordion in a new window</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->
+<!-- /wp:acf/accordion -->
+
+<!-- wp:acf/accordion {"name":"acf/accordion","data":{"title":"Lorem ipsum dolor sit amet, consectetur adipiscing elit","_title":"field_69fdc7ed16e20","id":"","_id":"field_6a001639da30e","accordion_is_open":"0","_accordion_is_open":"field_6a0010af6f9b5","close_neighbouring_accordions":"1","_close_neighbouring_accordions":"field_69fdc85516e22","scroll_to_accordion_top":"1","_scroll_to_accordion_top":"field_69fdc92616e23"},"mode":"preview"} -->
+<!-- wp:paragraph -->
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque sed bibendum mauris. Fusce elementum lorem et odio suscipit pretium. Aliquam vestibulum elementum fermentum. Praesent ut cursus odio. Ut elementum ipsum at vestibulum fringilla. Proin laoreet sem et vestibulum tempor. Quisque in pretium mauris. Nunc consequat eu purus sit amet posuere. Quisque mauris urna, tincidunt nec metus ultrices, mattis volutpat mi. Morbi tincidunt eu tortor ut sollicitudin. Sed vulputate lacus in varius sodales.</p>
+<!-- /wp:paragraph -->
+<!-- /wp:acf/accordion -->
 
 <!-- wp:separator {"className":"-content-margin-m"} -->
 <hr class="wp-block-separator has-alpha-channel-opacity -content-margin-m"/>
@@ -603,4 +655,7 @@
 <!-- /wp:paragraph -->
 <!-- wp:paragraph -->
 <p>TODO: WP image text</p>
+<!-- /wp:paragraph -->
+<!-- wp:paragraph -->
+<p>TODO: Anchor</p>
 <!-- /wp:paragraph -->
