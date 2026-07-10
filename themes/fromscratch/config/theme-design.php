@@ -8,7 +8,7 @@ return [
 	'colors' => [
 		// Primary colors
 		['slug' => 'primary', 'color' => '#4080ff', 'name' => 'Primary color'],
-		['slug' => 'secondary', 'color' => '#00ddff', 'name' => 'Secondary color'],
+		['slug' => 'secondary', 'color' => '#00aaff', 'name' => 'Secondary color'],
 
 		// Grayscale
 		['slug' => 'white', 'color' => '#fff', 'name' => 'White'],
@@ -42,7 +42,7 @@ return [
 		[
 			'slug' => 'primary',
 			'name' => 'Primary gradient',
-			'gradient' => 'linear-gradient(to right, #4080ff, #00ddff)',
+			'gradient' => 'linear-gradient(to right, #4080ff, #00aaff)',
 		],
 	],
 
