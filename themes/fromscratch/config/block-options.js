@@ -135,9 +135,9 @@ export const blockOptions = [
         options: [
           { label: '—', value: '' },
           { label: 'Nie', value: '-columns-stack-never' },
-          { label: 'Früh', value: '-columns-stack-early', title: '1200px' },
-          { label: 'Mittel', value: '-columns-stack-medium', title: '900px' },
-          { label: 'Spät', value: '-columns-stack-late', title: '600px' },
+          { label: 'Früh', value: '-columns-stack-early' },
+          { label: 'Mittel', value: '-columns-stack-medium' },
+          { label: 'Spät', value: '-columns-stack-late' },
         ],
       },
       {
