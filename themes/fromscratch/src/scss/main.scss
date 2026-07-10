@@ -34,9 +34,8 @@
 @forward 'layout/app';
 @forward 'layout/containers';
 
-// Shared
+// Tags
 @forward 'layout/shared/tags';
-@forward 'layout/shared/wordpress-blocks';
 
 // Layout
 @forward 'layout/header';
@@ -53,6 +52,9 @@
 
 // Blocks
 @forward '../../acf/blocks/blocks';
+
+// Block adjustments
+@forward 'layout/shared/wordpress-blocks';
 
 // Print
 @forward 'lib/print';

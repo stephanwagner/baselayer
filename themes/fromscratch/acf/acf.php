@@ -3,8 +3,6 @@
 // Import block filters
 include __DIR__ . '/block-filters.php';
 
-require_once get_template_directory() . '/inc/block-options-content-margin.php';
-
 // Import blocks
 $configBlocks = include __DIR__ . '/blocks.php';
 
@@ -41,111 +39,6 @@ function fs_acf_init_core()
 	}
 }
 add_action('acf/init', 'fs_acf_init_core');
-
-/**
- * Block option config for ACF blocks (mirrors config/block-options.js).
- *
- * @return array<string, array<int, array<string, mixed>>>
- */
-function fs_block_options_config(): array
-{
-	static $config = null;
-
-	if ($config === null) {
-		$path = get_template_directory() . '/config/block-options.php';
-		$loaded = is_readable($path) ? include $path : [];
-		$config = is_array($loaded) ? $loaded : [];
-	}
-
-	return $config;
-}
-
-/**
- * CSS classes from custom block options stored in block attributes.
- *
- * @param array<string, mixed> $block
- * @return array<int, string>
- */
-function fs_block_option_classes(array $block): array
-{
-	$block_name = isset($block['name']) && is_string($block['name']) ? $block['name'] : '';
-	if ($block_name === '') {
-		return [];
-	}
-
-	$options = fs_block_options_config()[$block_name] ?? [];
-	if ($options === []) {
-		return [];
-	}
-
-	$classes = [];
-
-	foreach ($options as $option) {
-		if (!is_array($option)) {
-			continue;
-		}
-
-		$type = isset($option['type']) && is_string($option['type']) ? $option['type'] : '';
-
-		if ($type === 'content-margin') {
-			$classes = array_merge($classes, fs_content_margin_classes_from_attributes($option, $block));
-			continue;
-		}
-
-		$attribute_name = isset($option['attributeName']) && is_string($option['attributeName'])
-			? $option['attributeName']
-			: '';
-
-		if ($attribute_name === '') {
-			continue;
-		}
-
-		$value = $block[$attribute_name] ?? ($option['default'] ?? null);
-
-		if ($type === 'boolean') {
-			if ($value) {
-				$class_name = isset($option['className']) && is_string($option['className'])
-					? $option['className']
-					: '';
-				if ($class_name !== '') {
-					$classes[] = $class_name;
-				}
-			}
-			continue;
-		}
-
-		if ($type === 'select' || $type === 'button-group') {
-			if (is_string($value) && $value !== '') {
-				$classes[] = $value;
-			}
-			continue;
-		}
-	}
-
-	return $classes;
-}
-
-/**
- * Merge block option classes into the block className before template render.
- *
- * @param array<string, mixed> $block
- * @return array<string, mixed>
- */
-function fs_acf_block_apply_option_classes(array $block): array
-{
-	$option_classes = fs_block_option_classes($block);
-	if ($option_classes === []) {
-		return $block;
-	}
-
-	$existing = isset($block['className']) && is_string($block['className'])
-		? trim($block['className'])
-		: '';
-
-	$block['className'] = trim($existing . ' ' . implode(' ', $option_classes));
-
-	return $block;
-}
 
 /**
  * Inserter preview example for an ACF block (WordPress `example` property).
@@ -440,8 +333,6 @@ function fs_acf_block_render_callback($block)
 		);
 		return;
 	}
-
-	$block = fs_acf_block_apply_option_classes($block);
 
 	if (
 		function_exists('acf_setup_meta')

@@ -338,6 +338,7 @@ export const blockOptions = [
           { icon: 'image-right', label: 'Rechts', value: '-icon-align-right' },
         ],
       },
+      getContentMarginControl(),
     ],
   },
 
@@ -358,6 +359,7 @@ export const blockOptions = [
           { icon: 'image-right', label: 'Rechts', value: '-icon-align-right' },
         ],
       },
+      getContentMarginControl(),
     ],
   },
 
