@@ -166,12 +166,9 @@ return [
 
 		// Not allowed
 		'core/details' => [
-			'allowed'  => true,
-		],
-		'core/preformatted' => [
 			'allowed'  => false,
 		],
-		'core/pullquote' => [
+		'core/preformatted' => [
 			'allowed'  => false,
 		],
 		'core/verse' => [
