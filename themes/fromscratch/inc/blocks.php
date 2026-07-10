@@ -85,6 +85,44 @@ add_filter('block_type_metadata', function (array $metadata): array {
 }, 10, 1);
 
 /**
+ * Convert constrained group layout to default before render.
+ * Clearing layout lets core fall back to constrained when the theme defines contentSize.
+ */
+add_filter('render_block_data', function (array $block): array {
+    if (($block['blockName'] ?? '') !== 'core/group') {
+        return $block;
+    }
+
+    $layout = $block['attrs']['layout'] ?? null;
+    if (is_array($layout) && ($layout['type'] ?? '') === 'constrained') {
+        $block['attrs']['layout'] = ['type' => 'default'];
+    }
+
+    return $block;
+}, 10, 1);
+
+/**
+ * Safety net: strip constrained layout classes from group markup if they still appear.
+ */
+add_filter('render_block', function (string $content, array $block): string {
+    if (($block['blockName'] ?? '') !== 'core/group' || $content === '') {
+        return $content;
+    }
+
+    if (
+        strpos($content, 'is-layout-constrained') === false
+        && strpos($content, 'wp-block-group-is-layout-constrained') === false
+    ) {
+        return $content;
+    }
+
+    $content = preg_replace('/\s*wp-block-group-is-layout-constrained\b/', '', $content) ?? $content;
+    $content = preg_replace('/\s*is-layout-constrained\b/', '', $content) ?? $content;
+
+    return $content;
+}, 10, 2);
+
+/**
  * Icon-only buttons: add front-end class and ensure link markup is non-empty.
  */
 add_filter('render_block', function ($content, $block) {
