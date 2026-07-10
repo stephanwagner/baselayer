@@ -268,12 +268,12 @@
             },
             {
                 "key": "field_6357b01fe3b85",
-                "label": "Hintergrund wenn Karte nicht geladen ist",
+                "label": "Hintergrund vor Kartenfreigabe",
                 "name": "image",
                 "aria-label": "",
                 "type": "image",
                 "instructions": "",
-                "required": 1,
+                "required": 0,
                 "conditional_logic": 0,
                 "wrapper": {
                     "width": "",
@@ -289,6 +289,7 @@
                 "max_height": "",
                 "max_size": "",
                 "mime_types": "",
+                "allow_in_bindings": 1,
                 "preview_size": "thumbnail"
             }
         ],
