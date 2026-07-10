@@ -133,6 +133,36 @@ function fs_page_should_show_title(int $post_id): bool
 }
 
 /**
+ * Mark the block editor admin body when the page title is hidden (for canvas styling).
+ */
+add_filter('admin_body_class', function (string $classes): string {
+	if (!function_exists('get_current_screen')) {
+		return $classes;
+	}
+
+	$screen = get_current_screen();
+	if (!$screen instanceof WP_Screen || !$screen->is_block_editor()) {
+		return $classes;
+	}
+
+	$post_id = isset($_GET['post']) ? (int) $_GET['post'] : 0;
+	if ($post_id <= 0) {
+		return $classes;
+	}
+
+	$type = get_post_type($post_id);
+	if (!$type || !fs_post_type_has_page_title_toggle($type)) {
+		return $classes;
+	}
+
+	if (fs_page_should_show_title($post_id)) {
+		return $classes;
+	}
+
+	return $classes . ' fs-page-title-hidden';
+});
+
+/**
  * Strings for the block editor (Summary sidebar).
  *
  * @return void
