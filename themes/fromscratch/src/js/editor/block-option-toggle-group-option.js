@@ -22,8 +22,18 @@ function getThemeIconComponent(iconName) {
  * @param {string} [props.icon] Icon file name without prefix (e.g. `block`).
  * @param {boolean} [props.iconLabel] Show icon and visible label together.
  * @param {'before'|'after'} [props.iconPosition] Place icon before or after the label.
+ * @param {string} [props.title] Tooltip / accessible name override.
  */
-export function BlockOptionToggleGroupOption({ value, label, icon, iconLabel, iconPosition = 'before' }) {
+export function BlockOptionToggleGroupOption({
+  value,
+  label,
+  icon,
+  iconLabel,
+  iconPosition = 'before',
+  title,
+}) {
+  const tooltip = title || label;
+
   if (icon && iconLabel && ToggleGroupControlOption) {
     const iconPlacement = iconPosition === 'after' ? '-icon-after' : '-icon-before';
 
@@ -32,6 +42,7 @@ export function BlockOptionToggleGroupOption({ value, label, icon, iconLabel, ic
         value={value}
         label={label}
         showTooltip
+        aria-label={tooltip}
         className={'fs-toggle-group-option--icon-label ' + iconPlacement + ' -icon-' + icon}
       />
     );
@@ -41,7 +52,7 @@ export function BlockOptionToggleGroupOption({ value, label, icon, iconLabel, ic
     return (
       <ToggleGroupControlOptionIcon
         value={value}
-        label={label}
+        label={tooltip}
         icon={getThemeIconComponent(icon)}
       />
     );
@@ -55,8 +66,8 @@ export function BlockOptionToggleGroupOption({ value, label, icon, iconLabel, ic
     <ToggleGroupControlOption
       value={value}
       label={icon ? '—' : label}
-      showTooltip={Boolean(icon)}
-      aria-label={icon ? label : undefined}
+      showTooltip={Boolean(icon || title)}
+      aria-label={icon || title ? tooltip : undefined}
     />
   );
 }

@@ -169,6 +169,170 @@
       }
     }
 
+    // Columns: stack breakpoint
+    // — = WP default (~782px); Früh / Mittel / Spät override by column count.
+    // Nie = never stack. All other modes force single column at $breakpoint-xs (400px).
+
+    &:not(.-columns-stack-never) {
+      @media (max-width: $breakpoint-xs) {
+        flex-wrap: wrap !important;
+
+        > .wp-block-column {
+          flex-basis: 100% !important;
+        }
+      }
+    }
+
+    &.-columns-stack-never {
+      flex-wrap: nowrap !important;
+
+      > .wp-block-column {
+        flex-basis: 0 !important;
+        flex-grow: 1;
+      }
+    }
+
+    // Exactly 2 columns → full stack at one breakpoint
+    &:has(> .wp-block-column:nth-child(2):last-child) {
+      &.-columns-stack-early {
+        @media (max-width: $breakpoint-l) {
+          flex-wrap: wrap !important;
+
+          > .wp-block-column {
+            flex-basis: 100% !important;
+          }
+        }
+      }
+
+      &.-columns-stack-medium {
+        @media (max-width: $breakpoint-m) {
+          flex-wrap: wrap !important;
+
+          > .wp-block-column {
+            flex-basis: 100% !important;
+          }
+        }
+      }
+
+      &.-columns-stack-late {
+        @media (min-width: #{$breakpoint-s + 1}) {
+          flex-wrap: nowrap !important;
+
+          > .wp-block-column {
+            flex-basis: 0 !important;
+            flex-grow: 1;
+          }
+        }
+
+        @media (max-width: $breakpoint-s) {
+          flex-wrap: wrap !important;
+
+          > .wp-block-column {
+            flex-basis: 100% !important;
+          }
+        }
+      }
+    }
+
+    // Exactly 3 columns → full stack at one breakpoint
+    &:has(> .wp-block-column:nth-child(3):last-child) {
+      &.-columns-stack-early {
+        @media (max-width: $breakpoint-l) {
+          flex-wrap: wrap !important;
+
+          > .wp-block-column {
+            flex-basis: 100% !important;
+          }
+        }
+      }
+
+      &.-columns-stack-medium {
+        @media (max-width: $breakpoint-m) {
+          flex-wrap: wrap !important;
+
+          > .wp-block-column {
+            flex-basis: 100% !important;
+          }
+        }
+      }
+
+      &.-columns-stack-late {
+        @media (min-width: #{$breakpoint-s + 1}) {
+          flex-wrap: nowrap !important;
+
+          > .wp-block-column {
+            flex-basis: 0 !important;
+            flex-grow: 1;
+          }
+        }
+
+        @media (max-width: $breakpoint-s) {
+          flex-wrap: wrap !important;
+
+          > .wp-block-column {
+            flex-basis: 100% !important;
+          }
+        }
+      }
+    }
+
+    // 4+ columns → 2-per-row mid step, then full stack (6 → 2|2|2, etc.)
+    &:has(> .wp-block-column:nth-child(4)) {
+      &.-columns-stack-early {
+        @media (max-width: $breakpoint-l) {
+          flex-wrap: wrap !important;
+
+          > .wp-block-column {
+            flex-basis: 40% !important;
+            flex-grow: 1;
+          }
+        }
+
+        @media (max-width: $breakpoint-m) {
+          > .wp-block-column {
+            flex-basis: 100% !important;
+          }
+        }
+      }
+
+      &.-columns-stack-medium {
+        @media (max-width: $breakpoint-m) {
+          flex-wrap: wrap !important;
+
+          > .wp-block-column {
+            flex-basis: 40% !important;
+            flex-grow: 1;
+          }
+        }
+
+        @media (max-width: $breakpoint-s) {
+          > .wp-block-column {
+            flex-basis: 100% !important;
+          }
+        }
+      }
+
+      &.-columns-stack-late {
+        @media (min-width: #{$breakpoint-s + 1}) {
+          flex-wrap: nowrap !important;
+
+          > .wp-block-column {
+            flex-basis: 0 !important;
+            flex-grow: 1;
+          }
+        }
+
+        @media (max-width: $breakpoint-s) {
+          flex-wrap: wrap !important;
+
+          > .wp-block-column {
+            flex-basis: 40% !important;
+            flex-grow: 1;
+          }
+        }
+      }
+    }
+
     // Columns: Media Text Layout
 
     &.-media-text-layout,
