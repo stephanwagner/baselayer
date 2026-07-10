@@ -188,6 +188,34 @@
     }
   }
 
+  .button.-white,
+  .wp-block-button.-white .wp-block-button__link {
+    background: var(--fs-button-white-background-color);
+    border-color: var(--fs-button-white-background-color);
+    color: var(--fs-button-white-color);
+
+    &:hover,
+    .-button-trigger:hover & {
+      background: var(--fs-button-white-background-color-hover);
+      border-color: var(--fs-button-white-background-color-hover);
+      color: var(--fs-button-white-color-hover);
+    }
+  }
+
+  .button.-white.-outline,
+  .wp-block-button.-white.is-style-outline .wp-block-button__link {
+    background: transparent;
+    border-color: var(--fs-color-white);
+    color: var(--fs-color-white);
+
+    &:hover,
+    .-button-trigger:hover & {
+      background: var(--fs-button-white-background-color);
+      border-color: var(--fs-button-white-background-color);
+      color: var(--fs-button-white-color);
+    }
+  }
+
   .button.-has-icon,
   .wp-block-button.-has-icon .wp-block-button__link {
     text-align: left;

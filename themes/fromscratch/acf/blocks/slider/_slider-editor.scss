@@ -4,7 +4,7 @@
 
 @mixin slider-editor-innerblocks-wrap($max-slides-per-view: 12) {
   @for $n from 1 through $max-slides-per-view {
-    .slider__wrapper[data-slider-slides-per-view='#{$n}'] .acf-innerblocks-container {
+    .slider__wrapper[data-slider-slides-per-view='#{$n}'] .swiper > .acf-innerblocks-container {
       display: grid;
       grid-template-columns: repeat(#{$n}, minmax(0, 1fr));
 
@@ -20,7 +20,7 @@
 
 @mixin slider-editor-hide-extra-slides($max-slides-per-view: 12) {
   @for $n from 1 through $max-slides-per-view {
-    .slider__wrapper[data-slider-slides-per-view='#{$n}'] .acf-innerblocks-container > .wp-block-acf-slider-slide:nth-child(n + #{$n + 1}) {
+    .slider__wrapper[data-slider-slides-per-view='#{$n}'] .swiper > .acf-innerblocks-container > .wp-block-acf-slider-slide:nth-child(n + #{$n + 1}) {
       display: none;
     }
   }
@@ -38,7 +38,7 @@
       min-height: calc(30px + 8px + 8px);
     }
 
-    .acf-innerblocks-container {
+    .swiper > .acf-innerblocks-container {
       display: block;
     }
 
@@ -46,8 +46,8 @@
     .slider__container,
     .slider__slides,
     .swiper,
-    .acf-innerblocks-container,
-    .block-editor-block-list__layout {
+    .swiper > .acf-innerblocks-container,
+    .swiper > .acf-innerblocks-container > .block-editor-block-list__layout {
       position: static;
     }
   }
@@ -56,7 +56,7 @@
     display: none !important;
   }
 
-  .slider__wrapper .acf-innerblocks-container {
+  .slider__wrapper .swiper > .acf-innerblocks-container {
     gap: var(--slider-editor-slide-gap, 16px);
   }
 
@@ -109,7 +109,7 @@
 
   // Add slide button
 
-  .slider__wrapper .block-list-appender {
+  .slider__wrapper .swiper > .acf-innerblocks-container > .block-list-appender {
     display: none;
     position: absolute;
     top: auto;
@@ -163,8 +163,8 @@
     }
   }
 
-  .block-editor-block-list__block.is-selected .slider__wrapper .block-list-appender,
-  .block-editor-block-list__block:has(.is-selected) .slider__wrapper .block-list-appender {
+  .block-editor-block-list__block.is-selected .slider__wrapper .swiper > .acf-innerblocks-container > .block-list-appender,
+  .block-editor-block-list__block:has(.is-selected) .slider__wrapper .swiper > .acf-innerblocks-container > .block-list-appender {
     display: block !important;
   }
 
@@ -175,7 +175,7 @@
 
   .block-editor-block-list__block.is-selected .slider__wrapper,
   .block-editor-block-list__block:has(.is-selected) .slider__wrapper {
-    .acf-innerblocks-container {
+    .swiper > .acf-innerblocks-container {
       gap: max(8px, var(--slider-editor-slide-gap, 16px));
     }
 

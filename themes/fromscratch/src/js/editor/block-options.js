@@ -1,4 +1,4 @@
-import { blockOptions, getHideBlockControl, getAlignWideContainerControl } from '../../../config/block-options';
+import { blockOptions, getHideBlockControl } from '../../../config/block-options';
 import { IconPicker } from './icons/icon-picker';
 import { ContentMarginControl } from './content-margin-control';
 import { ContentPaddingControl } from './content-padding-control';
@@ -40,14 +40,13 @@ const HIDE_BLOCK_OPTION = getHideBlockControl();
 const HIDE_BLOCK_CLASS = HIDE_BLOCK_OPTION.className;
 const HIDE_BLOCK_ATTRIBUTE = HIDE_BLOCK_OPTION.attributeName;
 
-const ALIGN_WIDE_CONTAINER_OPTION = getAlignWideContainerControl();
+/** Class applied by getAlignWideContainerControl() — kept managed so leftovers are stripped. */
 const ALIGN_WIDE_CONTAINER_CLASS = 'container-wide';
-const ALIGN_WIDE_CONTAINER_ATTRIBUTE = ALIGN_WIDE_CONTAINER_OPTION.attributeName;
 
 /** Merge global options ahead of block-specific options. */
 const effectiveBlockConfig = (name, blockConfig) => ({
   name: blockConfig?.name || name,
-  options: [HIDE_BLOCK_OPTION, ALIGN_WIDE_CONTAINER_OPTION, ...(blockConfig?.options || [])],
+  options: [HIDE_BLOCK_OPTION, ...(blockConfig?.options || [])],
 });
 
 // Prefix used when an `icon` option is stored as a class name (e.g. `-icon-bolt`).
@@ -375,17 +374,13 @@ const blockOptionSyncDeps = (blockConfig, attributes) => {
   return keys.map((key) => attributes[key]);
 };
 
-// Global hide + wide-container attributes on every block type.
+// Global hide attribute on every block type.
 wp.hooks.addFilter('blocks.registerBlockType', 'fromscratch/global-block-options/attributes', (settings) => {
   settings.attributes = {
     ...settings.attributes,
     [HIDE_BLOCK_ATTRIBUTE]: {
       type: 'boolean',
       default: HIDE_BLOCK_OPTION.default,
-    },
-    [ALIGN_WIDE_CONTAINER_ATTRIBUTE]: {
-      type: 'string',
-      default: ALIGN_WIDE_CONTAINER_OPTION.default,
     },
   };
 

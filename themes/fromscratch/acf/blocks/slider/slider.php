@@ -28,10 +28,14 @@ $loop = get_field('loop') ?? false;
 $autoplay = get_field('autoplay') ?? false;
 $autoplayDelay = get_field('autoplay-delay') ?? 6;
 $pagination = get_field('pagination') ?? false;
+$dynamicBullets = get_field('dynamic-bullets') ?? false;
 $navigation = get_field('navigation') ?? false;
 $ratio = get_field('ratio') ?? '3-2';
 $ratioX = get_field('ratio-x') ?? 3;
 $ratioY = get_field('ratio-y') ?? 2;
+$hasCallToAction = get_field('has-call-to-action') ?? false;
+$callToActionAlign = get_field('call-to-action-align') ?? 'left';
+
 
 // Ratio
 $paddingTop = 100;
@@ -62,7 +66,9 @@ $spaceBetween = max(0, (int) $spaceBetween);
 	data-slider-autoplay-delay="<?= $autoplayDelay ?>"
 	data-slider-pagination="<?= $pagination ? 'true' : 'false' ?>"
 	data-slider-navigation="<?= $navigation ? 'true' : 'false' ?>"
-	data-slider-dynamic-bullets="true">
+	data-slider-dynamic-bullets="<?= $dynamicBullets ? 'true' : 'false' ?>"
+	data-slider-has-call-to-action="<?= $hasCallToAction ? 'true' : 'false' ?>"
+	data-slider-call-to-action-align="<?= $callToActionAlign ?>">
 	<?php if (is_admin()) { ?>
 		<div class="slider__editor-badge" aria-hidden="true">
 			<span class="slider__editor-badge-icon">

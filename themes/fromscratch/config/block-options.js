@@ -97,7 +97,7 @@ export function getHideBlockControl() {
 
 /**
  * Expand block to the wide container width via negative margins.
- * Injected globally in block-options.js — do not add getAlignWideContainerControl() per block.
+ * Add via getAlignWideContainerControl() on blocks that should offer Inhaltsbreite.
  */
 export function getAlignWideContainerControl() {
   return {
@@ -119,8 +119,8 @@ export function getAlignWideContainerControl() {
  * All types: optional `description` = help text below the control.
  * All types: optional `noSeparator` = skip border-top when this option follows another block option.
  *
- * Ausblenden and Inhaltsbreite are injected for every block in the editor —
- * do not add getHideBlockControl() or getAlignWideContainerControl() here.
+ * Ausblenden is injected for every block in the editor —
+ * do not add getHideBlockControl() here.
  */
 export const blockOptions = [
   // Columns
@@ -181,6 +181,7 @@ export const blockOptions = [
   {
     name: 'core/column',
     options: [
+      getAlignWideContainerControl(),
       {
         type: 'boolean',
         toggleLabel: 'Inhalt vertikal zentrieren',
@@ -226,6 +227,7 @@ export const blockOptions = [
   {
     name: 'core/image',
     options: [
+      getAlignWideContainerControl(),
       getContentMarginControl(),
       {
         type: 'button-group',
@@ -301,7 +303,12 @@ export const blockOptions = [
   // Group
   {
     name: 'core/group',
-    options: [getContentMarginControl('m'), getContentPaddingControl('m'), getLimitWidthControl()],
+    options: [
+      getAlignWideContainerControl(),
+      getContentMarginControl('m'),
+      getContentPaddingControl('m'),
+      getLimitWidthControl(),
+    ],
   },
 
   // Quote
@@ -313,7 +320,11 @@ export const blockOptions = [
   // Pullquote
   {
     name: 'core/pullquote',
-    options: [getContentMarginControl('m'), getContentPaddingControl('l')],
+    options: [
+      getAlignWideContainerControl(),
+      getContentMarginControl('m'),
+      getContentPaddingControl('l'),
+    ],
   },
 
   // Separator
@@ -331,7 +342,11 @@ export const blockOptions = [
   // Cover
   {
     name: 'core/cover',
-    options: [getContentMarginControl('m'), getContentPaddingControl('xl')],
+    options: [
+      getAlignWideContainerControl(),
+      getContentMarginControl('m'),
+      getContentPaddingControl('xl'),
+    ],
   },
 
   // Buttons
@@ -347,12 +362,13 @@ export const blockOptions = [
       {
         type: 'button-group',
         label: 'Variante',
-        description: 'Primär- oder Sekundärfarbe für den Button.',
+        description: '',
         default: '',
         attributeName: 'buttonVariant',
         options: [
           { label: 'Primär', value: '' },
           { label: 'Sekundär', value: '-secondary' },
+          { label: 'Weiss', value: '-white' },
         ],
       },
       {
@@ -431,12 +447,18 @@ export const blockOptions = [
   // ACF: Slider
   {
     name: 'acf/slider',
-    options: [getContentMarginControl('m')],
+    options: [getAlignWideContainerControl(), getContentMarginControl('m')],
   },
 
   // ACF: Map
   {
     name: 'acf/map',
-    options: [getContentMarginControl('m')],
+    options: [getAlignWideContainerControl(), getContentMarginControl('m')],
+  },
+
+  // ACF: Article List
+  {
+    name: 'acf/article-list',
+    options: [getAlignWideContainerControl()],
   },
 ];

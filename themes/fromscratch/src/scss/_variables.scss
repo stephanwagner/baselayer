@@ -165,6 +165,10 @@ $editor-content-width-padding: 24px;
   --fs-button-secondary-color-hover: #fff;
   --fs-button-secondary-background-color: var(--fs-color-secondary);
   --fs-button-secondary-background-color-hover: var(--fs-color-secondary-dark);
+  --fs-button-white-color: var(--fs-default-text-color);
+  --fs-button-white-color-hover: var(--fs-default-text-color);
+  --fs-button-white-background-color: var(--fs-color-white);
+  --fs-button-white-background-color-hover: var(--fs-color-gray-200);
 
   // Padding
   --fs-content-padding-xs: #{$content-padding-xs};

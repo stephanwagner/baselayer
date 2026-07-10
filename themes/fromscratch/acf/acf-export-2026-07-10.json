@@ -789,6 +789,27 @@
                 "ui_off_text": ""
             },
             {
+                "key": "field_6a50d9549b35c",
+                "label": "",
+                "name": "dynamic-bullets",
+                "aria-label": "",
+                "type": "true_false",
+                "instructions": "Zeigt nur die Seitenpunkte in der Nähe des aktuellen Slides an.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "Dynamische Seitenpunkte",
+                "default_value": 0,
+                "allow_in_bindings": 0,
+                "ui": 0,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
                 "key": "field_6a005d8a298d7",
                 "label": "",
                 "name": "loop",
@@ -860,6 +881,60 @@
                 "step": "",
                 "prepend": "",
                 "append": "Sekunden"
+            },
+            {
+                "key": "field_6a50e6118a219",
+                "label": "",
+                "name": "has-call-to-action",
+                "aria-label": "",
+                "type": "true_false",
+                "instructions": "Ermöglicht Überschrift, Text und Buttons in allen Slides.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "Slide-Inhalt",
+                "default_value": 0,
+                "allow_in_bindings": 0,
+                "ui": 0,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_6a50e6388a21a",
+                "label": "Slide-Inhalt Ausrichtung",
+                "name": "call-to-action-align",
+                "aria-label": "",
+                "type": "button_group",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_6a50e6118a219",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "left": "Links",
+                    "center": "Mittig",
+                    "right": "Rechts"
+                },
+                "default_value": "left",
+                "return_format": "value",
+                "allow_null": 0,
+                "allow_in_bindings": 0,
+                "layout": "horizontal"
             }
         ],
         "location": [
