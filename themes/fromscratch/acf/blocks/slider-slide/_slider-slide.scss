@@ -12,7 +12,7 @@
   position: relative;
   overflow: hidden;
 
-  .slider-slide__wrapper[data-slider-slides-per-view='1']:not(.alignfull) & {
+  .slider-slide__wrapper:not(.alignfull) & {
     border-radius: var(--fs-border-radius-m);
   }
 

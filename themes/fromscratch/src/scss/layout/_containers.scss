@@ -52,18 +52,45 @@ $content-wide-width: $content-width + ($content-container-wide-bleed * 2);
   margin-left: calc(var(--fs-alignwide-bleed) * -1);
   margin-right: calc(var(--fs-alignwide-bleed) * -1);
 
-  &.has-background {
-    padding-left: var(--fs-alignwide-bleed);
-    padding-right: var(--fs-alignwide-bleed);
+  @media (max-width: $breakpoint-xl) {
+    margin-left: calc(var(--fs-content-padding-l) * -0.5);
+    margin-right: calc(var(--fs-content-padding-l) * -0.5);
   }
 
-  @media (max-width: calc(#{$content-width} + #{$content-alignwide-bleed} + #{$content-alignwide-bleed} + 24px + 24px)) {
-    margin-left: 0;
-    margin-right: 0;
+  @media (max-width: $breakpoint-m) {
+    margin-left: calc(var(--fs-content-padding-m) * -0.5);
+    margin-right: calc(var(--fs-content-padding-m) * -0.5);
+  }
 
+  @media (max-width: $breakpoint-s) {
+    margin-left: calc(var(--fs-content-padding-s) * -0.5);
+    margin-right: calc(var(--fs-content-padding-s) * -0.5);
+  }
+
+  @media (max-width: $breakpoint-xs) {
+    margin-left: calc(var(--fs-content-padding-xs) * -0.5);
+    margin-right: calc(var(--fs-content-padding-xs) * -0.5);
+  }
+
+  &.has-background {
     &.has-background {
-      padding-left: 0;
-      padding-right: 0;
+      padding-left: var(--fs-alignwide-bleed);
+      padding-right: var(--fs-alignwide-bleed);
+
+      @media (max-width: $breakpoint-xl) {
+        padding-left: calc(var(--fs-content-padding-l) * 0.5);
+        padding-right: calc(var(--fs-content-padding-l) * 0.5);
+      }
+    
+      @media (max-width: $breakpoint-m) {
+        padding-left: calc(var(--fs-content-padding-m) * 0.5);
+        padding-right: calc(var(--fs-content-padding-m) * 0.5);
+      }
+    
+      @media (max-width: $breakpoint-s) {
+        padding-left: calc(var(--fs-content-padding-s) * 0.5);
+        padding-right: calc(var(--fs-content-padding-s) * 0.5);
+      }
     }
   }
 }
@@ -75,11 +102,6 @@ $content-wide-width: $content-width + ($content-container-wide-bleed * 2);
   @media (max-width: calc(#{$content-width} + #{$content-padding-l} + #{$content-padding-l})) {
     margin-left: calc(var(--fs-content-padding-l) * -1);
     margin-right: calc(var(--fs-content-padding-l) * -1);
-  }
-
-  @media (max-width: $breakpoint-m) {
-    margin-left: calc(var(--fs-content-padding-m) * -1);
-    margin-right: calc(var(--fs-content-padding-m) * -1);
   }
 
   @media (max-width: $breakpoint-m) {

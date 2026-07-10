@@ -331,7 +331,7 @@ export const blockOptions = [
   // Cover
   {
     name: 'core/cover',
-    options: [getContentMarginControl('m'), getContentPaddingControl('m')],
+    options: [getContentMarginControl('m'), getContentPaddingControl('xl')],
   },
 
   // Buttons
