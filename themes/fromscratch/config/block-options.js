@@ -82,11 +82,27 @@ function getLimitWidthControl() {
 }
 
 /**
+ * Hide block on the frontend (class on wrapper). Injected globally in block-options.js.
+ */
+export function getHideBlockControl() {
+  return {
+    type: 'boolean',
+    label: 'Sichtbarkeit',
+    toggleLabel: 'Ausblenden',
+    default: false,
+    attributeName: 'hideBlock',
+    className: '-block-is-hidden',
+  };
+}
+
+/**
  * Apply block options.
  *
  * Boolean: `label` = optional row label; `toggleLabel` = text on the switch.
  * All types: optional `description` = help text below the control.
  * All types: optional `noSeparator` = skip border-top when this option follows another block option.
+ *
+ * Ausblenden is injected for every block in the editor — do not add getHideBlockControl() here.
  */
 export const blockOptions = [
   // Columns

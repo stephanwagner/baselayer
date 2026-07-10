@@ -1,3 +1,8 @@
 @use '../wordpress-blocks' as *;
 
 @include wordpress-blocks();
+
+// Hidden blocks (editor toggle — grayed out in the editor, see _editor.scss)
+:not(.editor-styles-wrapper) .-block-is-hidden {
+  display: none !important;
+}

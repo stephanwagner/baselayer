@@ -12,6 +12,15 @@
   -webkit-font-smoothing: antialiased;
 }
 
+// Hidden blocks: stay visible but grayed out in the canvas
+.editor-styles-wrapper .-block-is-hidden,
+.block-editor-block-list__block .-block-is-hidden,
+.block-editor-block-list__block.-block-is-hidden {
+  opacity: 0.35;
+  filter: grayscale(0.65);
+  outline: 1px dashed #666;
+}
+
 // Panel components
 
 .fs-block-option {
