@@ -50,6 +50,10 @@
 
   @each $breakpoint, $values in $responsive {
     @media (max-width: $breakpoint) {
+      @if map.has-key($values, x) {
+        padding-left: map.get($values, x);
+        padding-right: map.get($values, x);
+      }
       @if map.has-key($values, y) {
         padding-top: map.get($values, y);
         padding-bottom: map.get($values, y);
@@ -797,18 +801,19 @@
 
   .-content-padding-xs {
     @include content-padding-targets {
-      @include block-content-padding(var(--fs-content-margin-xs), var(--fs-content-padding-xs));
+      @include block-content-padding(var(--fs-content-padding-xs), var(--fs-content-padding-xs));
     }
   }
 
   .-content-padding-s {
     @include content-padding-targets {
       @include block-content-padding(
-        var(--fs-content-margin-s),
+        var(--fs-content-padding-s),
         var(--fs-content-padding-s),
         (
           $breakpoint-xs: (
-            y: var(--fs-content-margin-xs),
+            x: var(--fs-content-padding-xs),
+            y: var(--fs-content-padding-xs),
           ),
         )
       );
@@ -818,14 +823,16 @@
   .-content-padding-m {
     @include content-padding-targets {
       @include block-content-padding(
-        var(--fs-content-margin-m),
+        var(--fs-content-padding-m),
         var(--fs-content-padding-m),
         (
           $breakpoint-s: (
-            y: var(--fs-content-margin-s),
+            x: var(--fs-content-padding-s),
+            y: var(--fs-content-padding-s),
           ),
           $breakpoint-xs: (
-            y: var(--fs-content-margin-xs),
+            x: var(--fs-content-padding-xs),
+            y: var(--fs-content-padding-xs),
           ),
         )
       );
@@ -835,14 +842,20 @@
   .-content-padding-l {
     @include content-padding-targets {
       @include block-content-padding(
-        var(--fs-content-margin-l),
+        var(--fs-content-padding-l),
         var(--fs-content-padding-l),
         (
           $breakpoint-m: (
-            y: var(--fs-content-margin-m),
+            x: var(--fs-content-padding-m),
+            y: var(--fs-content-padding-m),
           ),
           $breakpoint-s: (
-            y: var(--fs-content-margin-s),
+            x: var(--fs-content-padding-s),
+            y: var(--fs-content-padding-s),
+          ),
+          $breakpoint-xs: (
+            x: var(--fs-content-padding-xs),
+            y: var(--fs-content-padding-xs),
           ),
         )
       );
@@ -852,17 +865,24 @@
   .-content-padding-xl {
     @include content-padding-targets {
       @include block-content-padding(
-        var(--fs-content-margin-xl),
+        var(--fs-content-padding-xl),
         var(--fs-content-padding-xl),
         (
           $breakpoint-l: (
-            y: var(--fs-content-margin-l),
+            x: var(--fs-content-padding-m),
+            y: var(--fs-content-padding-l),
           ),
           $breakpoint-m: (
-            y: var(--fs-content-margin-m),
+            x: var(--fs-content-padding-m),
+            y: var(--fs-content-padding-m),
           ),
           $breakpoint-s: (
-            y: var(--fs-content-margin-s),
+            x: var(--fs-content-padding-s),
+            y: var(--fs-content-padding-s),
+          ),
+          $breakpoint-xs: (
+            x: var(--fs-content-padding-xs),
+            y: var(--fs-content-padding-xs),
           ),
         )
       );

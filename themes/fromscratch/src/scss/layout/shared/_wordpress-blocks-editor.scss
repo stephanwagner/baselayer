@@ -1,12 +1,19 @@
 @use '../../variables' as *;
 @use '../wordpress-blocks' as *;
 
+$editor-content-width-outer: $editor-content-width + ($editor-content-width-padding * 2);
+
 .editor-styles-wrapper {
   @include wordpress-blocks();
 
   // Content widths
 
   .block-editor-block-list__layout.is-root-container {
+    // Inhaltsbreite → Erweitert: same width as WP alignwide
+    > .container-wide {
+      max-width: var(--wp--style--global--wide-size);
+    }
+
     .-narrow,
     .-narrow-left,
     .-narrow-right {
@@ -44,7 +51,7 @@
     .-extra-narrow-left {
       border-right: 1px dashed rgba(#000, 0.2);
       margin-right: auto !important;
-      margin-left: calc((100vw - var(--fs-editor-content-width-outer)) / 2) !important;
+      margin-left: calc((100vw - $editor-content-width-outer) / 2) !important;
 
       &:not(.has-background) {
         padding-right: 4px;
@@ -60,7 +67,7 @@
     .-extra-narrow-right {
       border-left: 1px dashed rgba(#000, 0.2);
       margin-left: auto !important;
-      margin-right: calc((100vw - var(--fs-editor-content-width-outer)) / 2) !important;
+      margin-right: calc((100vw - $editor-content-width-outer) / 2) !important;
 
       &:not(.has-background) {
         padding-left: 4px;

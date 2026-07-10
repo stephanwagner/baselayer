@@ -96,13 +96,31 @@ export function getHideBlockControl() {
 }
 
 /**
+ * Expand block to the wide container width via negative margins.
+ * Injected globally in block-options.js — do not add getAlignWideContainerControl() per block.
+ */
+export function getAlignWideContainerControl() {
+  return {
+    type: 'button-group',
+    label: 'Inhaltsbreite',
+    default: '',
+    attributeName: 'alignWideContainer',
+    options: [
+      { label: 'Standard', value: '' },
+      { label: 'Erweitert', value: 'container-wide' },
+    ],
+  };
+}
+
+/**
  * Apply block options.
  *
  * Boolean: `label` = optional row label; `toggleLabel` = text on the switch.
  * All types: optional `description` = help text below the control.
  * All types: optional `noSeparator` = skip border-top when this option follows another block option.
  *
- * Ausblenden is injected for every block in the editor — do not add getHideBlockControl() here.
+ * Ausblenden and Inhaltsbreite are injected for every block in the editor —
+ * do not add getHideBlockControl() or getAlignWideContainerControl() here.
  */
 export const blockOptions = [
   // Columns

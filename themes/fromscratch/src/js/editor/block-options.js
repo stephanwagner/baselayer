@@ -1,4 +1,4 @@
-import { blockOptions, getHideBlockControl } from '../../../config/block-options';
+import { blockOptions, getHideBlockControl, getAlignWideContainerControl } from '../../../config/block-options';
 import { IconPicker } from './icons/icon-picker';
 import { ContentMarginControl } from './content-margin-control';
 import { ContentPaddingControl } from './content-padding-control';
@@ -40,10 +40,14 @@ const HIDE_BLOCK_OPTION = getHideBlockControl();
 const HIDE_BLOCK_CLASS = HIDE_BLOCK_OPTION.className;
 const HIDE_BLOCK_ATTRIBUTE = HIDE_BLOCK_OPTION.attributeName;
 
-/** Merge global hide toggle ahead of block-specific options. */
+const ALIGN_WIDE_CONTAINER_OPTION = getAlignWideContainerControl();
+const ALIGN_WIDE_CONTAINER_CLASS = 'container-wide';
+const ALIGN_WIDE_CONTAINER_ATTRIBUTE = ALIGN_WIDE_CONTAINER_OPTION.attributeName;
+
+/** Merge global options ahead of block-specific options. */
 const effectiveBlockConfig = (name, blockConfig) => ({
   name: blockConfig?.name || name,
-  options: [HIDE_BLOCK_OPTION, ...(blockConfig?.options || [])],
+  options: [HIDE_BLOCK_OPTION, ALIGN_WIDE_CONTAINER_OPTION, ...(blockConfig?.options || [])],
 });
 
 // Prefix used when an `icon` option is stored as a class name (e.g. `-icon-bolt`).
@@ -250,6 +254,7 @@ const managedStaticClasses = (blockConfig) => {
     HAS_ICON_CLASS,
     ICON_ONLY_CLASS,
     HIDE_BLOCK_CLASS,
+    ALIGN_WIDE_CONTAINER_CLASS,
     ...ALL_CONTENT_MARGIN_CLASSES,
     ...ALL_CONTENT_PADDING_CLASSES,
     ...ALL_LIMIT_WIDTH_CLASSES,
@@ -370,13 +375,17 @@ const blockOptionSyncDeps = (blockConfig, attributes) => {
   return keys.map((key) => attributes[key]);
 };
 
-// Global hide attribute on every block type.
-wp.hooks.addFilter('blocks.registerBlockType', 'fromscratch/hide-block/attribute', (settings) => {
+// Global hide + wide-container attributes on every block type.
+wp.hooks.addFilter('blocks.registerBlockType', 'fromscratch/global-block-options/attributes', (settings) => {
   settings.attributes = {
     ...settings.attributes,
     [HIDE_BLOCK_ATTRIBUTE]: {
       type: 'boolean',
       default: HIDE_BLOCK_OPTION.default,
+    },
+    [ALIGN_WIDE_CONTAINER_ATTRIBUTE]: {
+      type: 'string',
+      default: ALIGN_WIDE_CONTAINER_OPTION.default,
     },
   };
 

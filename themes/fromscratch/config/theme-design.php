@@ -57,7 +57,7 @@ return [
 	// Block editor layout
 	'layout' => [
 		'editor_content_width' => 960,
-		'wide_bleed'           => 64,
+		'wide_bleed'           => 32,
 		'editor_padding_x'     => 24,
 	],
 ];

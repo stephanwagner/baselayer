@@ -32,16 +32,6 @@ $navigation = get_field('navigation') ?? false;
 $ratio = get_field('ratio') ?? '3-2';
 $ratioX = get_field('ratio-x') ?? 3;
 $ratioY = get_field('ratio-y') ?? 2;
-$alignWide = get_field('align-wide') ?? false;
-
-// Align
-if ($alignWide) {
-	$classNames[] = '-has-align-wide';
-}
-
-if ($alignWide && (empty($block['align']) || $block['align'] != 'full')) {
-	$classNames[] = 'alignfull';
-}
 
 // Ratio
 $paddingTop = 100;
@@ -83,7 +73,7 @@ $spaceBetween = max(0, (int) $spaceBetween);
 			<span class="slider__editor-badge-label"><?= esc_html__('Slider', 'fromscratch') ?></span>
 		</div>
 	<?php } ?>
-	<div class="slider__container<?= $alignWide ? ' container-wide' : '' ?>">
+	<div class="slider__container">
 		<div class="slider__slides">
 			<div class="swiper">
 				<InnerBlocks allowedBlocks="<?= esc_attr(wp_json_encode(['acf/slider-slide'])) ?>" />

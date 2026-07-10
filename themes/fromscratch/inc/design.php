@@ -140,13 +140,13 @@ function fs_theme_json_layout_sizes(): array
 	}
 
 	$content = (int) ($layout['editor_content_width'] ?? 840);
-	$bleed = (int) ($layout['wide_bleed'] ?? 64);
+	$bleed = (int) ($layout['wide_bleed'] ?? 32);
 
 	if ($content <= 0) {
 		$content = 840;
 	}
 	if ($bleed < 0) {
-		$bleed = 64;
+		$bleed = 32;
 	}
 
 	$wide = $content + ($bleed * 2);

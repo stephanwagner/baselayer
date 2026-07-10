@@ -29,8 +29,6 @@
 }
 
 .header__container {
-  display: flex;
-  align-items: center;
   height: var(--fs-header-height);
 
   body.-transition-init & {
@@ -48,6 +46,12 @@
       height: var(--fs-header-height-mobile-scrolled);
     }
   }
+}
+
+.header__aligner {
+  display: flex;
+  align-items: center;
+  height: 100%;
 }
 
 .logo__container {

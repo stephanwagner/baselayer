@@ -53,10 +53,10 @@ $line-height-l: 1.5;
 $line-height-xl: 1.4;
 
 // Padding
-$content-padding-xs: 24px;
-$content-padding-s: 32px;
-$content-padding-m: 48px;
-$content-padding-l: 64px;
+$content-padding-xs: 16px;
+$content-padding-s: 24px;
+$content-padding-m: 32px;
+$content-padding-l: 48px;
 $content-padding-xl: 64px;
 
 // Margins
@@ -68,10 +68,13 @@ $content-margin-xl: 96px;
 
 // Content
 $content-width: 1200px;
-$content-width-wide: $content-width + ($content-padding-l * 2);
 $content-width-narrow: 900px;
 $content-width-very-narrow: 600px;
 $content-width-extra-narrow: 300px;
+
+// Content bleeds
+$content-container-wide-bleed: $content-padding-xl;
+$content-alignwide-bleed: $content-padding-m;
 
 // Breakpoints
 $breakpoint-xs: 400px;
@@ -101,9 +104,7 @@ $border-radius-l: 16px;
 
 // Block editor content widths
 $editor-content-width: 960px;
-$editor-content-width-wide: $editor-content-width + ($content-padding-l * 2);
 $editor-content-width-padding: 24px;
-$editor-content-width-outer: $editor-content-width + ($editor-content-width-padding * 2);
 
 // Variables
 :root {
@@ -181,10 +182,13 @@ $editor-content-width-outer: $editor-content-width + ($editor-content-width-padd
 
   // Content
   --fs-content-width: #{$content-width};
-  --fs-content-width-wide: #{$content-width-wide};
   --fs-content-width-narrow: #{$content-width-narrow};
   --fs-content-width-very-narrow: #{$content-width-very-narrow};
   --fs-content-width-extra-narrow: #{$content-width-extra-narrow};
+
+  // Content bleeds
+  --fs-container-wide-bleed: #{$content-container-wide-bleed};
+  --fs-alignwide-bleed: #{$content-alignwide-bleed};
 
   // Breakpoints
   --fs-breakpoint-xs: #{$breakpoint-xs};
@@ -211,11 +215,6 @@ $editor-content-width-outer: $editor-content-width + ($editor-content-width-padd
   --fs-border-radius-s: #{$border-radius-s};
   --fs-border-radius-m: #{$border-radius-m};
   --fs-border-radius-l: #{$border-radius-l};
-
-  // Editor content
-  --fs-editor-content-width: #{$editor-content-width};
-  --fs-editor-content-width-wide: #{$editor-content-width-wide};
-  --fs-editor-content-width-outer: #{$editor-content-width-outer};
 }
 
 // Colors
