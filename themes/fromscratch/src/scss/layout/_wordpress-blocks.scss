@@ -306,11 +306,57 @@
       }
     }
 
-    // Columns: Reverse on mobile
+    // Columns: Reverse when fully stacked (matches Umbruch; Nie = never)
 
     &.-reverse-order-on-mobile {
-      @media (max-width: 782px) {
-        flex-direction: column-reverse;
+      // WordPress default stack
+      &:not(.-columns-stack-never):not(.-columns-stack-early):not(.-columns-stack-medium):not(.-columns-stack-late) {
+        @media (max-width: 782px) {
+          flex-direction: column-reverse;
+        }
+      }
+
+      // 2 or 3 columns: reverse at the same breakpoint as full stack
+      &:has(> .wp-block-column:nth-child(2):last-child),
+      &:has(> .wp-block-column:nth-child(3):last-child) {
+        &.-columns-stack-early {
+          @media (max-width: $breakpoint-l) {
+            flex-direction: column-reverse;
+          }
+        }
+
+        &.-columns-stack-medium {
+          @media (max-width: $breakpoint-m) {
+            flex-direction: column-reverse;
+          }
+        }
+
+        &.-columns-stack-late {
+          @media (max-width: $breakpoint-s) {
+            flex-direction: column-reverse;
+          }
+        }
+      }
+
+      // 4+: reverse only when fully stacked (after the 2-per-row mid step)
+      &:has(> .wp-block-column:nth-child(4)) {
+        &.-columns-stack-early {
+          @media (max-width: $breakpoint-m) {
+            flex-direction: column-reverse;
+          }
+        }
+
+        &.-columns-stack-medium {
+          @media (max-width: $breakpoint-s) {
+            flex-direction: column-reverse;
+          }
+        }
+
+        &.-columns-stack-late {
+          @media (max-width: $breakpoint-xs) {
+            flex-direction: column-reverse;
+          }
+        }
       }
     }
   }
