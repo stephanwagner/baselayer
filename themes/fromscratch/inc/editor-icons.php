@@ -893,7 +893,6 @@ function fs_icon_ui_strings(): array
 		'filled'     => _x('Filled', 'icon picker', 'fromscratch-icons'),
 		'remove'     => _x('Remove', 'icon picker', 'fromscratch-icons'),
 		'close'      => _x('Close', 'icon picker', 'fromscratch-icons'),
-		'categories' => _x('Categories', 'icon picker', 'fromscratch-icons'),
 	];
 }
 

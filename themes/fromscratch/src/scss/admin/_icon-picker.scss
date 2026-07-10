@@ -203,49 +203,6 @@ input[type='search'].fs-icon-picker-modal__search {
   flex: 0 0 auto;
 }
 
-// Sticky category navigation: horizontally scrollable pills that jump to a
-// category section in the grid below. Rebuilt with the grid on search/filter.
-.fs-icon-picker__nav {
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  display: flex;
-  flex: 0 0 auto;
-  flex-wrap: nowrap;
-  gap: 6px;
-  margin: 0 -20px;
-  padding: 8px 20px;
-  background: #fff;
-  border-bottom: 1px solid #dcdcde;
-  overflow-x: auto;
-  overscroll-behavior-x: contain;
-  scrollbar-width: thin;
-
-  &[hidden] {
-    display: none;
-  }
-}
-
-.fs-icon-picker__nav-item {
-  flex: 0 0 auto;
-  padding: 4px 12px;
-  font-size: 12px;
-  line-height: 18px;
-  white-space: nowrap;
-  color: var(--fs-color-gray-700, #3c434a);
-  background: var(--fs-color-gray-100, #f0f0f1);
-  border: 1px solid transparent;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: transition('background-color', 'border-color', 'color');
-
-  &:hover,
-  &:focus {
-    color: var(--fs-color-primary, #2271b1);
-    border-color: var(--fs-color-primary, #2271b1);
-  }
-}
-
 .fs-icon-picker__categories {
   position: relative;
   flex: 1 1 auto;
