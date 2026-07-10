@@ -99,6 +99,21 @@ function fs_install_delete_default_wp_pages(): void
 }
 
 /**
+ * Find the default Sample Page WordPress creates on install (kept for the main menu).
+ */
+function fs_install_find_sample_page(): int
+{
+	foreach (['sample-page', 'beispiel-seite'] as $slug) {
+		$page = get_page_by_path($slug, OBJECT, 'page');
+		if ($page instanceof WP_Post) {
+			return (int) $page->ID;
+		}
+	}
+
+	return 0;
+}
+
+/**
  * Sample media bundled with the theme for install seeding.
  *
  * Array keys double as tokens for install-pages/*.html:
@@ -440,6 +455,11 @@ function fs_install_assign_menus(array $page_ids): void
 			'options' => [],
 		],
 		[
+			'key'     => 'sample',
+			'menu'    => 'main_menu',
+			'options' => [],
+		],
+		[
 			'key'     => 'blocks',
 			'menu'    => 'main_menu',
 			'options' => [],
@@ -513,6 +533,12 @@ function fs_install_seed_content(): array
 
 	$media = fs_install_import_media();
 	$page_ids = fs_install_create_pages($media);
+
+	$sample_id = fs_install_find_sample_page();
+	if ($sample_id > 0) {
+		$page_ids['sample'] = $sample_id;
+	}
+
 	fs_install_assign_menus($page_ids);
 
 	return $page_ids;
