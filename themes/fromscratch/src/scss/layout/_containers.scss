@@ -72,9 +72,14 @@ $content-wide-width: $content-width + ($content-container-wide-bleed * 2);
   margin-left: calc((100vw - var(--fs-content-width)) * -0.5);
   margin-right: calc((100vw - var(--fs-content-width)) * -0.5);
 
-  @media (max-width: calc(#{$content-width} + #{$content-container-wide-bleed} + #{$content-container-wide-bleed})) {
+  @media (max-width: calc(#{$content-width} + #{$content-padding-l} + #{$content-padding-l})) {
     margin-left: calc(var(--fs-content-padding-l) * -1);
     margin-right: calc(var(--fs-content-padding-l) * -1);
+  }
+
+  @media (max-width: $breakpoint-m) {
+    margin-left: calc(var(--fs-content-padding-m) * -1);
+    margin-right: calc(var(--fs-content-padding-m) * -1);
   }
 
   @media (max-width: $breakpoint-m) {
@@ -92,25 +97,30 @@ $content-wide-width: $content-width + ($content-container-wide-bleed * 2);
     margin-right: calc(var(--fs-content-padding-xs) * -1);
   }
 
-  > .wp-block-group__inner-container {
-    max-width: calc(var(--fs-content-width) + var(--fs-content-padding-l) + var(--fs-content-padding-l));
-    padding-left: var(--fs-content-padding-l);
-    padding-right: var(--fs-content-padding-l);
-    margin: auto;
+  &.has-background {
+    &.has-background {
+      padding-left: calc((100vw - var(--fs-content-width)) * 0.5);
+      padding-right: calc((100vw - var(--fs-content-width)) * 0.5);
 
-    @media (max-width: $breakpoint-m) {
-      padding-left: var(--fs-content-padding-m);
-      padding-right: var(--fs-content-padding-m);
-    }
+      @media (max-width: calc(#{$content-width} + #{$content-padding-l} + #{$content-padding-l})) {
+        padding-left: calc(var(--fs-content-padding-l));
+        padding-right: calc(var(--fs-content-padding-l));
+      }
 
-    @media (max-width: $breakpoint-s) {
-      padding-left: var(--fs-content-padding-s);
-      padding-right: var(--fs-content-padding-s);
-    }
+      @media (max-width: $breakpoint-m) {
+        padding-left: calc(var(--fs-content-padding-m));
+        padding-right: calc(var(--fs-content-padding-m));
+      }
 
-    @media (max-width: $breakpoint-xs) {
-      padding-left: var(--fs-content-padding-xs);
-      padding-right: var(--fs-content-padding-xs);
+      @media (max-width: $breakpoint-s) {
+        padding-left: calc(var(--fs-content-padding-s));
+        padding-right: calc(var(--fs-content-padding-s));
+      }
+
+      @media (max-width: $breakpoint-xs) {
+        padding-left: calc(var(--fs-content-padding-xs));
+        padding-right: calc(var(--fs-content-padding-xs));
+      }
     }
   }
 }
