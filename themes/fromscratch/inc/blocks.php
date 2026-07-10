@@ -71,7 +71,7 @@ add_filter('block_type_metadata', function (array $metadata): array {
  * Limit video and image alignment to wide, full, and center.
  */
 add_filter('block_type_metadata', function (array $metadata): array {
-    if (!in_array($metadata['name'] ?? '', ['core/video', 'core/image'], true)) {
+    if (!in_array($metadata['name'] ?? '', ['core/video', 'core/image', 'core/cover', 'core/pullquote'], true)) {
         return $metadata;
     }
 

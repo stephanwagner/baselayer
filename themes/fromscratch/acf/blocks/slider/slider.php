@@ -29,9 +29,9 @@ $autoplay = get_field('autoplay') ?? false;
 $autoplayDelay = get_field('autoplay-delay') ?? 6;
 $pagination = get_field('pagination') ?? false;
 $navigation = get_field('navigation') ?? false;
-$ratio = get_field('ratio');
-$ratioX = get_field('ratio-x');
-$ratioY = get_field('ratio-y');
+$ratio = get_field('ratio') ?? '3-2';
+$ratioX = get_field('ratio-x') ?? 3;
+$ratioY = get_field('ratio-y') ?? 2;
 $alignWide = get_field('align-wide') ?? false;
 
 // Align

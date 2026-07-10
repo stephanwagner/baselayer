@@ -106,7 +106,9 @@
   // Cover
 
   .wp-block-cover {
-    border-radius: var(--fs-border-radius-m);
+    &:not(.alignfull) {
+      border-radius: var(--fs-border-radius-m);
+    }
   }
 
   // Columns
@@ -956,7 +958,10 @@
 
   .wp-block-pullquote {
     position: relative;
-    border-radius: var(--fs-border-radius-m);
+
+    &:not(.alignfull) {
+      border-radius: var(--fs-border-radius-m);
+    }
 
     blockquote {
       > p {
