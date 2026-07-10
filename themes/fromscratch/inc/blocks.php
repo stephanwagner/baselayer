@@ -98,11 +98,10 @@ add_filter('block_type_metadata', function (array $metadata): array {
 }, 10, 1);
 
 /**
- * Convert constrained group layout to default before render.
- * Clearing layout lets core fall back to constrained when the theme defines contentSize.
+ * Convert constrained group/cover layout to default before render.
  */
 add_filter('render_block_data', function (array $block): array {
-    if (($block['blockName'] ?? '') !== 'core/group') {
+    if (!in_array($block['blockName'] ?? '', ['core/group', 'core/cover'], true)) {
         return $block;
     }
 
@@ -115,21 +114,23 @@ add_filter('render_block_data', function (array $block): array {
 }, 10, 1);
 
 /**
- * Safety net: strip constrained layout classes from group markup if they still appear.
+ * Safety net: strip constrained layout classes from group/cover markup if they still appear.
  */
 add_filter('render_block', function (string $content, array $block): string {
-    if (($block['blockName'] ?? '') !== 'core/group' || $content === '') {
+    if (!in_array($block['blockName'] ?? '', ['core/group', 'core/cover'], true) || $content === '') {
         return $content;
     }
 
     if (
         strpos($content, 'is-layout-constrained') === false
         && strpos($content, 'wp-block-group-is-layout-constrained') === false
+        && strpos($content, 'wp-block-cover-is-layout-constrained') === false
     ) {
         return $content;
     }
 
     $content = preg_replace('/\s*wp-block-group-is-layout-constrained\b/', '', $content) ?? $content;
+    $content = preg_replace('/\s*wp-block-cover-is-layout-constrained\b/', '', $content) ?? $content;
     $content = preg_replace('/\s*is-layout-constrained\b/', '', $content) ?? $content;
 
     return $content;
