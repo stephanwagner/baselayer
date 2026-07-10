@@ -84,14 +84,15 @@ body.fs-icon-picker-modal-open {
   padding: 0 20px;
 
   &.fs-icon-picker__panel {
-    height: min($fs-icon-picker-height, calc(100vh - 150px));
+    height: min($fs-icon-picker-height, calc(100vh - 163px));
   }
 }
 
-.fs-icon-picker-modal__search {
+input[type='search'].fs-icon-picker-modal__search {
   margin: 0;
   width: 100%;
   height: 36px;
+  min-height: 36px;
 }
 
 .fs-icon-picker-modal__variant {
@@ -103,6 +104,7 @@ body.fs-icon-picker-modal-open {
     border-radius: 0;
     display: inline-flex;
     height: 36px;
+    min-height: 36px;
     margin: 0;
 
     &:first-child {
@@ -128,7 +130,7 @@ body.fs-icon-picker-modal-open {
 .fs-icon-picker__panel {
   display: flex;
   flex-direction: column;
-  height: min($fs-icon-picker-height, calc(100vh - 160px));
+  height: min($fs-icon-picker-height, calc(100vh - 163px));
   min-height: 0;
 }
 
@@ -183,7 +185,7 @@ body.fs-icon-picker-modal-open {
   align-items: center;
   gap: 12px;
   margin-bottom: 0;
-  padding: 12px 20px;
+  padding: 8px 20px;
   background: #fff;
   border-bottom: 1px solid #dcdcde;
   margin: 0 -20px;
@@ -212,7 +214,7 @@ body.fs-icon-picker-modal-open {
   flex-wrap: nowrap;
   gap: 6px;
   margin: 0 -20px;
-  padding: 10px 20px;
+  padding: 8px 20px;
   background: #fff;
   border-bottom: 1px solid #dcdcde;
   overflow-x: auto;
@@ -228,7 +230,7 @@ body.fs-icon-picker-modal-open {
   flex: 0 0 auto;
   padding: 4px 12px;
   font-size: 12px;
-  line-height: 1.4;
+  line-height: 18px;
   white-space: nowrap;
   color: var(--fs-color-gray-700, #3c434a);
   background: var(--fs-color-gray-100, #f0f0f1);
