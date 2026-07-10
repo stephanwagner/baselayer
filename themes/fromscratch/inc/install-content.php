@@ -140,7 +140,7 @@ function fs_install_media_manifest(): array
 		],
 		'sample-image-5' => [
 			'file'    => $base . '/sample-image-5.webp',
-			'title'   => 'Standing Tall',
+			'title'   => 'Autumn Forest',
 			'caption' => 'Last light on the peaks above the forest',
 		],
 		'sample-video-1' => [

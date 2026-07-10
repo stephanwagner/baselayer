@@ -225,7 +225,7 @@ export const blockOptions = [
       },
       {
         type: 'boolean',
-        toggleLabel: 'Ohne Bildtext',
+        toggleLabel: 'Ohne Untertitel',
         default: false,
         attributeName: 'noImageLabel',
         className: '-no-image-caption',
@@ -244,7 +244,17 @@ export const blockOptions = [
   // Video
   {
     name: 'core/video',
-    options: [getContentMarginControl()],
+    options: [
+      getContentMarginControl(),
+      {
+        type: 'boolean',
+        toggleLabel: 'Ohne Untertitel',
+        noSeparator: true,
+        default: false,
+        attributeName: 'noImageLabel',
+        className: '-no-image-caption',
+      },
+    ],
   },
 
   // Gallery
@@ -254,7 +264,7 @@ export const blockOptions = [
       getContentMarginControl('m'),
       {
         type: 'boolean',
-        toggleLabel: 'Ohne Bildtexte',
+        toggleLabel: 'Ohne Untertitel',
         default: false,
         attributeName: 'noImageLabels',
         className: '-no-image-captions',

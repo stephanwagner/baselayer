@@ -68,6 +68,19 @@ add_filter('block_type_metadata', function (array $metadata): array {
 }, 10, 1);
 
 /**
+ * Limit video and image alignment to wide, full, and center.
+ */
+add_filter('block_type_metadata', function (array $metadata): array {
+    if (!in_array($metadata['name'] ?? '', ['core/video', 'core/image'], true)) {
+        return $metadata;
+    }
+
+    $metadata['supports']['align'] = ['wide', 'full', 'center'];
+
+    return $metadata;
+}, 10, 1);
+
+/**
  * Disable layout-adjacent inspector panels on the cover block.
  */
 add_filter('block_type_metadata', function (array $metadata): array {
