@@ -1,0 +1,32 @@
+.fs-content-padding {
+  margin-bottom: 0;
+}
+
+.fs-content-padding__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.fs-content-padding__label {
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.fs-content-padding__reset.components-button.is-link {
+  height: auto;
+  margin: 0;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-decoration: none;
+}
+
+.fs-content-padding__sizes.components-toggle-group-control {
+  width: 100%;
+}

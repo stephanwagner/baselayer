@@ -21,6 +21,21 @@ function getContentMarginControl(defaultClass = '') {
 }
 
 /**
+ * Uniform content padding control (group and cover).
+ *
+ * @param {string} defaultSize Default size token, e.g. `m`.
+ */
+function getContentPaddingControl(defaultSize = 'm') {
+  return {
+    type: 'content-padding',
+    label: 'Innenabstand',
+    defaultSize,
+    allowUnset: false,
+    attributeName: 'contentPadding',
+  };
+}
+
+/**
  * Text wrap button group.
  */
 function getTextWrapOptions() {
@@ -228,7 +243,7 @@ export const blockOptions = [
   // Group
   {
     name: 'core/group',
-    options: [getContentMarginControl('m'), getLimitWidthControl()],
+    options: [getContentMarginControl('m'), getContentPaddingControl('m'), getLimitWidthControl()],
   },
 
   // Separator
@@ -246,7 +261,7 @@ export const blockOptions = [
   // Cover
   {
     name: 'core/cover',
-    options: [getContentMarginControl('m')],
+    options: [getContentMarginControl('m'), getContentPaddingControl('m')],
   },
 
   // Buttons

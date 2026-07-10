@@ -35,6 +35,39 @@
   }
 }
 
+// Content padding mixin
+
+@mixin block-content-padding($y: null, $x: null, $responsive: ()) {
+  @if $x !=null {
+    padding-left: $x;
+    padding-right: $x;
+  }
+
+  @if $y !=null {
+    padding-top: $y;
+    padding-bottom: $y;
+  }
+
+  @each $breakpoint, $values in $responsive {
+    @media (max-width: $breakpoint) {
+      @if map.has-key($values, y) {
+        padding-top: map.get($values, y);
+        padding-bottom: map.get($values, y);
+      }
+    }
+  }
+}
+
+@mixin content-padding-targets {
+  &.wp-block-group {
+    @content;
+  }
+
+  &.wp-block-cover .wp-block-cover__inner-container {
+    @content;
+  }
+}
+
 // Spacer responsive height mixin
 
 @mixin spacer-responsive-height($height, $responsive: ()) {
@@ -56,48 +89,11 @@
     position: relative;
 
     &.has-background {
-      padding-top: 40px;
-      padding-bottom: 40px;
-
-      @media (max-width: $breakpoint-m) {
-        padding-top: 28px;
-        padding-bottom: 28px;
-      }
-
-      @media (max-width: $breakpoint-xs) {
-        padding-top: 12px;
-        padding-bottom: 12px;
-      }
-
       &:not(.alignfull) {
         border-radius: var(--fs-border-radius-m);
 
         @media (max-width: $breakpoint-xs) {
           border-radius: var(--fs-border-radius-m);
-        }
-      }
-
-      &:not(.alignfull):not(.alignwide) {
-        padding-left: 48px;
-        padding-right: 48px;
-
-        @media (max-width: $breakpoint-m) {
-          padding-left: 32px;
-          padding-right: 32px;
-        }
-
-        @media (max-width: $breakpoint-s) {
-          padding-left: 24px;
-          padding-right: 24px;
-          padding-top: 16px;
-          padding-bottom: 16px;
-        }
-
-        @media (max-width: $breakpoint-xs) {
-          padding-left: 16px;
-          padding-right: 16px;
-          padding-top: 12px;
-          padding-bottom: 12px;
         }
       }
     }
@@ -613,6 +609,91 @@
         ),
       )
     );
+  }
+
+  // Content padding (group wrapper / cover inner container)
+
+  .-content-padding-none {
+    @include content-padding-targets {
+      @include block-content-padding(0, 0);
+    }
+  }
+
+  .-content-padding-xs {
+    @include content-padding-targets {
+      @include block-content-padding(
+        var(--fs-content-margin-xs),
+        var(--fs-content-padding-xs)
+      );
+    }
+  }
+
+  .-content-padding-s {
+    @include content-padding-targets {
+      @include block-content-padding(
+        var(--fs-content-margin-s),
+        var(--fs-content-padding-s),
+        (
+          $breakpoint-xs: (
+            y: var(--fs-content-margin-xs),
+          ),
+        )
+      );
+    }
+  }
+
+  .-content-padding-m {
+    @include content-padding-targets {
+      @include block-content-padding(
+        var(--fs-content-margin-m),
+        var(--fs-content-padding-m),
+        (
+          $breakpoint-s: (
+            y: var(--fs-content-margin-s),
+          ),
+          $breakpoint-xs: (
+            y: var(--fs-content-margin-xs),
+          ),
+        )
+      );
+    }
+  }
+
+  .-content-padding-l {
+    @include content-padding-targets {
+      @include block-content-padding(
+        var(--fs-content-margin-l),
+        var(--fs-content-padding-l),
+        (
+          $breakpoint-m: (
+            y: var(--fs-content-margin-m),
+          ),
+          $breakpoint-s: (
+            y: var(--fs-content-margin-s),
+          ),
+        )
+      );
+    }
+  }
+
+  .-content-padding-xl {
+    @include content-padding-targets {
+      @include block-content-padding(
+        var(--fs-content-margin-xl),
+        var(--fs-content-padding-xl),
+        (
+          $breakpoint-l: (
+            y: var(--fs-content-margin-l),
+          ),
+          $breakpoint-m: (
+            y: var(--fs-content-margin-m),
+          ),
+          $breakpoint-s: (
+            y: var(--fs-content-margin-s),
+          ),
+        )
+      );
+    }
   }
 
   // Spacer responsive height

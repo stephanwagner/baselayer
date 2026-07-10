@@ -1,6 +1,7 @@
 import { blockOptions } from '../../../config/block-options';
 import { IconPicker } from './icons/icon-picker';
 import { ContentMarginControl } from './content-margin-control';
+import { ContentPaddingControl } from './content-padding-control';
 import { LimitWidthControl } from './limit-width-control';
 import { SpacerResponsiveHeightControl } from './spacer-responsive-height-control';
 import { BlockOptionToggleGroupOption } from './block-option-toggle-group-option';
@@ -11,6 +12,12 @@ import {
   contentMarginClassesFromAttributes,
   migrateLegacyContentMarginAttributes,
 } from './content-margin-utils';
+import {
+  ALL_CONTENT_PADDING_CLASSES,
+  contentPaddingAttributeKeys,
+  contentPaddingClassesFromAttributes,
+  migrateLegacyContentPaddingAttributes,
+} from './content-padding-utils';
 import {
   ALL_LIMIT_WIDTH_CLASSES,
   limitWidthAttributeKeys,
@@ -78,6 +85,10 @@ const getBlockOptionKey = (option, index) => {
     return 'content-margin-' + index;
   }
 
+  if (option.type === 'content-padding') {
+    return 'content-padding-' + index;
+  }
+
   if (option.type === 'limit-width') {
     return 'limit-width-' + index;
   }
@@ -135,6 +146,9 @@ const isIconGlyphClass = (className, blockConfig) => {
 
 const contentMarginOptions = (blockConfig) =>
   blockConfig.options.filter((option) => option.type === 'content-margin');
+
+const contentPaddingOptions = (blockConfig) =>
+  blockConfig.options.filter((option) => option.type === 'content-padding');
 
 const limitWidthOptions = (blockConfig) =>
   blockConfig.options.filter((option) => option.type === 'limit-width');
@@ -226,6 +240,7 @@ const managedStaticClasses = (blockConfig) => {
     HAS_ICON_CLASS,
     ICON_ONLY_CLASS,
     ...ALL_CONTENT_MARGIN_CLASSES,
+    ...ALL_CONTENT_PADDING_CLASSES,
     ...ALL_LIMIT_WIDTH_CLASSES,
     ...ALL_SPACER_RESPONSIVE_HEIGHT_CLASSES,
     ...LEGACY_IMAGE_TEXT_LAYOUT_CLASSES,
@@ -259,6 +274,8 @@ const collectOptionClasses = (blockConfig, attributes) => {
   blockConfig.options.forEach((option) => {
     if (option.type === 'content-margin') {
       classes.push(...contentMarginClassesFromAttributes(option, attributes));
+    } else if (option.type === 'content-padding') {
+      classes.push(...contentPaddingClassesFromAttributes(option, attributes));
     } else if (option.type === 'limit-width') {
       classes.push(...limitWidthClassesFromAttributes(option, attributes));
     } else if (option.type === 'spacer-responsive-height') {
@@ -317,6 +334,10 @@ const blockOptionAttributeKeys = (blockConfig) =>
       return [...contentMarginAttributeKeys(option), 'contentMargin', 'contentMarginAdjust'];
     }
 
+    if (option.type === 'content-padding') {
+      return contentPaddingAttributeKeys(option);
+    }
+
     if (option.type === 'limit-width') {
       return [...limitWidthAttributeKeys(option), 'limitWidth'];
     }
@@ -355,6 +376,15 @@ blockOptions.forEach((block) => {
             [linked]: { type: 'boolean', default: true },
             contentMargin: { type: 'string', default: '' },
             contentMarginAdjust: { type: 'string', default: '' },
+          };
+          return;
+        }
+
+        if (option.type === 'content-padding') {
+          const attributeName = option.attributeName || 'contentPadding';
+          settings.attributes = {
+            ...settings.attributes,
+            [attributeName]: { type: 'string', default: option.defaultSize ?? 'm' },
           };
           return;
         }
@@ -403,6 +433,11 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
     const prevHeightRef = useRef(attributes.height);
 
     const setOptionAttributes = (updates) => {
+      if (!blockConfig) {
+        setAttributes(updates);
+        return;
+      }
+
       const nextAttributes = { ...attributes, ...updates };
       const className = syncClassNameFromOptions(nextAttributes, blockConfig);
 
@@ -444,6 +479,33 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
       attributes.contentMarginAdjust,
       attributes.className,
     ]);
+
+    // Migrate legacy padding className into content padding attributes once.
+    useEffect(() => {
+      if (!blockConfig) {
+        return;
+      }
+
+      const paddingOptions = contentPaddingOptions(blockConfig);
+      if (!paddingOptions.length) {
+        return;
+      }
+
+      let updates = {};
+      paddingOptions.forEach((option) => {
+        const migrated = migrateLegacyContentPaddingAttributes(
+          { ...attributes, ...updates },
+          option
+        );
+        if (migrated) {
+          updates = { ...updates, ...migrated };
+        }
+      });
+
+      if (Object.keys(updates).length) {
+        setOptionAttributes(updates);
+      }
+    }, [blockConfig?.name, props.clientId, attributes.contentPadding, attributes.className]);
 
     // Migrate legacy limit-width select / className into split attributes once.
     useEffect(() => {
@@ -586,6 +648,18 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                     return (
                       <BlockOptionWrapper key={getBlockOptionKey(option, index)} option={option} index={index}>
                         <ContentMarginControl
+                          option={option}
+                          attributes={attributes}
+                          onChange={setOptionAttributes}
+                        />
+                      </BlockOptionWrapper>
+                    );
+                  }
+
+                  if (option.type === 'content-padding') {
+                    return (
+                      <BlockOptionWrapper key={getBlockOptionKey(option, index)} option={option} index={index}>
+                        <ContentPaddingControl
                           option={option}
                           attributes={attributes}
                           onChange={setOptionAttributes}

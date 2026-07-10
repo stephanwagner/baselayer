@@ -48,6 +48,10 @@
 <!-- /wp:button -->
 
 <!-- wp:button {"className":"is-style-outline -small","buttonSize":"-small"} -->
+<div class="wp-block-button is-style-outline -small"><a class="wp-block-button__link wp-element-button" href="#quote">Quote</a></div>
+<!-- /wp:button -->
+
+<!-- wp:button {"className":"is-style-outline -small","buttonSize":"-small"} -->
 <div class="wp-block-button is-style-outline -small"><a class="wp-block-button__link wp-element-button" href="#limit-width">Limit width</a></div>
 <!-- /wp:button -->
 
@@ -227,11 +231,11 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>Groups combine blocks into a single section. Add a background to get automatic inner padding and keep the content spaced from the edges.</p>
+<p>Groups combine blocks into a single section. Use <strong>Innenabstand</strong> in block settings to control inner padding; backgrounds keep rounded corners on non-full-width groups.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:group {"className":"-content-margin-s","backgroundColor":"gray-200","contentMarginTop":"s","contentMarginBottom":"s"} -->
-<div class="wp-block-group -content-margin-s has-gray-200-background-color has-background"><!-- wp:paragraph -->
+<!-- wp:group {"className":"-content-margin-s -content-padding-m","backgroundColor":"gray-200","contentMarginTop":"s","contentMarginBottom":"s","contentPadding":"m"} -->
+<div class="wp-block-group -content-margin-s -content-padding-m has-gray-200-background-color has-background"><!-- wp:paragraph -->
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut rhoncus turpis a eros blandit malesuada. Maecenas hendrerit auctor odio, eget volutpat sapien feugiat in. Nulla sed dapibus arcu.</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->
@@ -246,8 +250,8 @@
 <h2 class="wp-block-heading">Cover</h2>
 <!-- /wp:heading -->
 
-<!-- wp:cover {"overlayColor":"black","isUserOverlayColor":true,"className":"-content-margin-s","contentMarginTop":"s","contentMarginBottom":"s"} -->
-<div class="wp-block-cover -content-margin-s"><span aria-hidden="true" class="wp-block-cover__background has-black-background-color has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:acf/icon {"name":"acf/icon","mode":"preview","iconSlug":"lightbulb"} /-->
+<!-- wp:cover {"overlayColor":"black","isUserOverlayColor":true,"className":"-content-margin-s -content-padding-m","contentMarginTop":"s","contentMarginBottom":"s","contentPadding":"m"} -->
+<div class="wp-block-cover -content-margin-s -content-padding-m"><span aria-hidden="true" class="wp-block-cover__background has-black-background-color has-background-dim-100 has-background-dim"></span><div class="wp-block-cover__inner-container"><!-- wp:acf/icon {"name":"acf/icon","mode":"preview","iconSlug":"lightbulb"} /-->
 
 <!-- wp:paragraph {"placeholder":"Titel eingeben …","style":{"typography":{"textAlign":"center"}},"fontSize":"large"} -->
 <p class="has-text-align-center has-large-font-size">Bring Your Ideas to Life</p>
@@ -616,6 +620,18 @@
 <!-- /wp:paragraph -->
 <!-- /wp:acf/accordion -->
 
+<!-- wp:acf/anchor {"name":"acf/quote","data":{"id":"spacer","_id":"field_6a003d7571e96","offset":"0","_offset":"field_6a003e0271e97"},"mode":"preview"} /-->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Quote</h2>
+<!-- /wp:heading -->
+
+<!-- wp:separator {"className":"-content-margin-m"} -->
+<hr class="wp-block-separator has-alpha-channel-opacity -content-margin-m"/>
+<!-- /wp:separator -->
+
+
+
 <!-- wp:separator {"className":"-content-margin-m"} -->
 <hr class="wp-block-separator has-alpha-channel-opacity -content-margin-m"/>
 <!-- /wp:separator -->
@@ -634,8 +650,8 @@
 <p class="-content-margin-top-none -content-margin-bottom-s -extra-narrow-left">This paragraph uses a limited width aligned to the left.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:group {"className":"-content-margin-m -very-narrow","backgroundColor":"gray-200","limitWidthSize":"m"} -->
-<div class="wp-block-group -content-margin-m -very-narrow has-gray-200-background-color has-background"><!-- wp:paragraph -->
+<!-- wp:group {"className":"-content-margin-m -content-padding-m -very-narrow","backgroundColor":"gray-200","contentMarginTop":"m","contentMarginBottom":"m","contentPadding":"m","limitWidthSize":"m"} -->
+<div class="wp-block-group -content-margin-m -content-padding-m -very-narrow has-gray-200-background-color has-background"><!-- wp:paragraph -->
 <p>This group sits between the left and right examples and can use a background to stand out from the surrounding content.</p>
 <!-- /wp:paragraph --></div>
 <!-- /wp:group -->
@@ -677,7 +693,7 @@
 <p>TODO: Map</p>
 <!-- /wp:paragraph -->
 <!-- wp:paragraph -->
-<p>TODO: Cover / Group: Paddings</p>
+<p>TODO: Cover / Group: Test paddings</p>
 <!-- /wp:paragraph -->
 <!-- wp:paragraph -->
 <p>TODO: Quote</p>
