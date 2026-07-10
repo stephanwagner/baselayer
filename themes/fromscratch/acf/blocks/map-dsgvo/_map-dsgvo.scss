@@ -1,11 +1,36 @@
 @use '../../../src/scss/variables' as *;
 
+.map-dsgvo__wrapper {
+  p {
+    margin-bottom: 8px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
 .map-dsgvo__container {
   position: relative;
 }
 
 .map-dsgvo__title {
   font-weight: 600;
+  margin: 0 0 8px;
+}
+
+.map-dsgvo__text {
+  margin-bottom: 16px;
+
+  a {
+    color: var(--fs-default-text-color);
+    text-decoration: underline;
+
+    &:hover {
+      color: var(--fs-default-text-color);
+      text-decoration: underline;
+    }
+  }
 }
 
 .map-dsgvo__link {

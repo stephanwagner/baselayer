@@ -120,3 +120,67 @@ function fs_get_nginx_config(): string
 	}
 	return trim(file_get_contents($template));
 }
+
+/**
+ * Find the ACF Pro plugin basename if it is installed (active or not).
+ *
+ * @return string Plugin basename (e.g. advanced-custom-fields-pro/acf.php) or empty string.
+ */
+function fs_find_acf_pro_plugin(): string
+{
+	if (!function_exists('get_plugins')) {
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	}
+
+	$known = [
+		'advanced-custom-fields-pro/acf.php',
+		'acf-pro/acf.php',
+	];
+
+	foreach ($known as $basename) {
+		if (file_exists(WP_PLUGIN_DIR . '/' . $basename)) {
+			return $basename;
+		}
+	}
+
+	foreach (get_plugins() as $basename => $plugin) {
+		$name = (string) ($plugin['Name'] ?? '');
+		if (
+			stripos($name, 'Advanced Custom Fields PRO') !== false
+			|| stripos($name, 'Advanced Custom Fields Pro') !== false
+		) {
+			return $basename;
+		}
+	}
+
+	return '';
+}
+
+/**
+ * Activate ACF Pro when it is installed but inactive.
+ *
+ * @return bool True if already active or newly activated; false if missing or activation failed.
+ */
+function fs_install_activate_acf_pro(): bool
+{
+	if (!current_user_can('activate_plugins')) {
+		return false;
+	}
+
+	if (!function_exists('is_plugin_active')) {
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	}
+
+	$plugin = fs_find_acf_pro_plugin();
+	if ($plugin === '') {
+		return false;
+	}
+
+	if (is_plugin_active($plugin)) {
+		return true;
+	}
+
+	$result = activate_plugin($plugin, '', false, false);
+
+	return !is_wp_error($result);
+}

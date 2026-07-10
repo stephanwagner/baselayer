@@ -105,7 +105,7 @@ add_action('admin_menu', function () {
 }, 10);
 
 add_action('admin_menu', function () {
-  if (!fs_setup_completed()) {
+  if (!fs_setup_completed() || isset($_GET['fromscratch_success'])) {
     return;
   }
   remove_submenu_page('themes.php', 'fromscratch-install');
@@ -838,6 +838,11 @@ Tags:
   if ($installHtaccess) {
     fs_write_htaccess();
   }
+
+  /**
+   * Activate ACF Pro when present but inactive.
+   */
+  fs_install_activate_acf_pro();
 
   /**
    * Standard pages and menus (always).

@@ -63,6 +63,10 @@
     @content;
   }
 
+  &.wp-block-pullquote {
+    @content;
+  }
+
   &.wp-block-cover .wp-block-cover__inner-container {
     @content;
   }
@@ -922,5 +926,50 @@
 
   .text-wrap-pretty {
     text-wrap: pretty;
+  }
+
+  // Quotes
+
+  .wp-block-quote {
+    position: relative;
+    padding: 8px 0 8px calc(24px + 3px);
+    margin-left: 0;
+
+    @media (max-width: $breakpoint-s) {
+      padding: 4px 0 4px calc(16px + 3px);
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 3px;
+      border-radius: 3px;
+      background-color: var(--fs-color-gray-300);
+    }
+  }
+
+  .wp-block-pullquote {
+    position: relative;
+    border-radius: var(--fs-border-radius-m);
+
+    blockquote {
+      > p {
+        font-size: var(--fs-font-size-xl);
+        line-height: var(--fs-line-height-xl);
+        margin: 0;
+        text-wrap: pretty;
+      }
+
+      > cite {
+        font-size: var(--fs-font-size-m);
+        line-height: var(--fs-line-height-m);
+        color: var(--fs-color-gray-600);
+        font-style: italic;
+        margin: 16px 0 0;
+      }
+    }
   }
 }

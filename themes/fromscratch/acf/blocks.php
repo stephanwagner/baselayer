@@ -43,7 +43,7 @@ return [
 	[
 		'name' => 'map',
 		'title' => 'Anfahrts-Karte',
-		'description' => 'Eingebettete Google-Maps-Karte mit Adresse oder Koordinaten.',
+		'description' => 'Google-Maps-Karte per Adresse oder Koordinaten. Vor dem Laden erscheint ein Einwilligungshinweis; die Karte wird erst nach Zustimmung eingebunden.',
 		'icon' => '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor" style="display: block"><path d="M576.69-149.77 360-225.54l-171.03 66.17q-9.2 3.68-17.79 2.32-8.58-1.36-15.81-5.89-7.23-4.53-11.3-12.24-4.07-7.7-4.07-17.67v-523.94q0-12.15 6.35-21.48 6.34-9.34 17.81-13.57l172.15-58.39q5.47-2 11.39-3 5.92-1 12.3-1 6.38 0 12.3 1 5.92 1 11.39 3L600-734.46l171.03-66.17q9.2-3.68 17.79-2.32 8.58 1.36 15.81 5.89 7.23 4.53 11.3 12.24 4.07 7.7 4.07 17.67v525.66q0 12.18-6.92 21.41-6.93 9.23-18.77 13.46l-171 57.23q-5.62 2-11.38 2.81-5.76.81-11.96.81-6.2 0-11.93-1-5.73-1-11.35-3ZM570-214.92v-468l-180-62.93v468l180 62.93Zm60 0L760-258v-474l-130 49.08v468ZM200-228l130-49.85v-468L200-702v474Zm430-454.92v468-468Zm-300-62.93v468-468Z"/></svg>',
 		'keywords' => ['Anfahrt', 'Karte', 'Map', 'Google'],
 		'supports' => [
@@ -53,7 +53,7 @@ return [
 	[
 		'name' => 'map-dsgvo',
 		'title' => 'Anfahrts-Karte: DSGVO',
-		'description' => 'Zur Anfahrts-Karte: Besucher können die Google-Maps-Einwilligung erteilen oder widerrufen.',
+		'description' => 'Ermöglicht Besuchern, die Google-Maps-Einwilligung zu erteilen oder zu widerrufen – unabhängig von der Karte, z. B. auf der Datenschutzseite.',
 		'icon' => '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor" style="display: block"><path d="M501.38-304q8.62-8.62 8.62-21.39v-173.07q0-12.77-8.62-21.39-8.61-8.61-21.38-8.61t-21.38 8.61q-8.62 8.62-8.62 21.39v173.07q0 12.77 8.62 21.39 8.61 8.61 21.38 8.61t21.38-8.61Zm1.54-305.38q9.39-9.39 9.39-22.93t-9.39-22.92q-9.38-9.38-22.92-9.38-13.54 0-22.92 9.38-9.39 9.38-9.39 22.92 0 13.54 9.39 22.93Q466.46-600 480-600q13.54 0 22.92-9.38Zm-35.15 503.22q-6-1-11.62-3-126.53-45-201.34-159.57Q180-383.31 180-516v-180.15q0-22.7 13.16-40.96 13.15-18.27 33.84-26.5l227.69-85q12.85-4.62 25.31-4.62 12.46 0 25.31 4.62l227.69 85q20.69 8.23 33.84 26.5Q780-718.85 780-696.15V-516q0 132.69-74.81 247.27-74.81 114.57-201.34 159.57-5.62 2-11.62 3-6 1-12.23 1t-12.23-1ZM480-164q104-33 172-132t68-220v-180.54q0-3.84-2.12-6.92-2.11-3.08-5.96-4.62l-227.69-85q-1.92-.77-4.23-.77-2.31 0-4.23.77l-227.69 85q-3.85 1.54-5.96 4.62-2.12 3.08-2.12 6.92V-516q0 121 68 220t172 132Zm0-315.23Z"/></svg>',
 		'keywords' => ['Anfahrt', 'Karte', 'Map', 'Google', 'DSGVO', 'Datenschutz', 'Privacy'],
 	],

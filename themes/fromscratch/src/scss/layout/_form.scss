@@ -82,15 +82,15 @@
     position: relative;
     display: inline-block;
     border: 0;
-    color: #fff;
+    color: var(--fs-button-primary-color);
     font-size: var(--fs-font-size-m);
     line-height: 24px;
     border-radius: 21px;
     padding: 7px 20px;
     overflow: hidden;
     text-align: center;
-    background: var(--fs-color-primary);
-    border: 2px solid var(--fs-color-primary);
+    background: var(--fs-button-primary-background-color);
+    border: 2px solid var(--fs-button-primary-background-color);
     font-weight: 600;
     height: auto;
     text-decoration: none !important;
@@ -123,9 +123,9 @@
     &:hover,
     .-button-trigger:hover & {
       text-decoration: none !important;
-      background: var(--fs-color-primary-dark);
-      border-color: var(--fs-color-primary-dark);
-      color: #fff;
+      background: var(--fs-button-primary-background-color-hover);
+      border-color: var(--fs-button-primary-background-color-hover);
+      color: var(--fs-button-primary-color-hover);
     }
 
     &[disabled] {
@@ -151,7 +151,41 @@
   .button.-outline,
   .wp-block-button.is-style-outline .wp-block-button__link {
     background: transparent;
-    color: var(--fs-color-primary);
+    color: var(--fs-button-primary-background-color);
+
+    &:hover,
+    .-button-trigger:hover & {
+      background: var(--fs-button-primary-background-color);
+      border-color: var(--fs-button-primary-background-color);
+      color: var(--fs-button-primary-color);
+    }
+  }
+
+  .button.-secondary,
+  .wp-block-button.-secondary .wp-block-button__link {
+    background: var(--fs-button-secondary-background-color);
+    border-color: var(--fs-button-secondary-background-color);
+    color: var(--fs-button-secondary-color);
+
+    &:hover,
+    .-button-trigger:hover & {
+      background: var(--fs-button-secondary-background-color-hover);
+      border-color: var(--fs-button-secondary-background-color-hover);
+      color: var(--fs-button-secondary-color-hover);
+    }
+  }
+
+  .button.-secondary.-outline,
+  .wp-block-button.-secondary.is-style-outline .wp-block-button__link {
+    background: transparent;
+    color: var(--fs-button-secondary-background-color);
+
+    &:hover,
+    .-button-trigger:hover & {
+      background: var(--fs-button-secondary-background-color);
+      border-color: var(--fs-button-secondary-background-color);
+      color: var(--fs-button-secondary-color);
+    }
   }
 
   .button.-has-icon,

@@ -59,10 +59,12 @@ window.removeGoogleMapsAccepted = removeGoogleMapsAccepted;
 function createGoogleMapsEmbed(type, lat, lng, address, zoom = 14) {
   let url;
 
-  if (type == 'address') {
+  if (type == 'address' && address) {
     address = encodeURIComponent(address);
     url = `https://www.google.com/maps?q=${address}&z=${zoom}&output=embed`;
   } else {
+    lat = lat || 51.477928;
+    lng = lng || -0.001545;
     url = `https://www.google.com/maps?q=${lat},${lng}&z=${zoom}&output=embed`;
   }
 

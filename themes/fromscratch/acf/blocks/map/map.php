@@ -19,9 +19,6 @@ if (!empty($block['className'])) {
 // Add wrapper class
 $classNames[] = 'map__wrapper';
 
-// Add margin class
-$classNames[] = '-content-margin-m';
-
 // Fields
 $type = get_field('type');
 $address = get_field('address');
@@ -34,10 +31,13 @@ if ($address) {
 }
 
 // Images
+$imageSrc = '';
 $image = get_field('image');
 if ($image) {
-	$imageId = $image['id'];
-	$imageSrc = wp_get_attachment_image_url($imageId, 'full');
+	$imageSrc = wp_get_attachment_image_url($image['id'], 'full') ?: '';
+}
+if ($imageSrc === '') {
+	$imageSrc = fs_acf_block_preview_image_uri(['name' => 'map']) ?? '';
 }
 ?>
 

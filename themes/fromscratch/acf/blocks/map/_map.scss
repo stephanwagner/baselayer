@@ -11,7 +11,7 @@
   overflow: hidden;
 
   &::before {
-    content: "";
+    content: '';
     display: block;
     padding-top: 33%;
     position: relative;
@@ -28,12 +28,18 @@
   left: 0;
   right: 0;
   bottom: 0;
+
+  .map__wrapper:not(.alignfull) & {
+    border-radius: var(--fs-border-radius-m);
+    overflow: hidden;
+  }
 }
 
 .map__notice-container {
   justify-content: center;
   align-items: center;
   background: no-repeat center center / cover;
+  border: 2px solid var(--fs-color-gray-200);
 
   &.-active {
     display: flex;
@@ -44,7 +50,7 @@
   }
 
   &::before {
-    content: "";
+    content: '';
     position: absolute;
     z-index: 1;
     top: 0;

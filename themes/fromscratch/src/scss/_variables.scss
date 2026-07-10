@@ -12,9 +12,11 @@ $theme-path: '/wp-content/themes/fromscratch';
 
 // Colors
 $color-primary: #4080ff;
-$color-primary-dark: #{color.adjust($color-primary, $lightness: -10%)};
-$color-primary-light: #{color.adjust($color-primary, $lightness: 10%)};
+$color-primary-dark: #{color.adjust($color-primary, $lightness: -8%)};
+$color-primary-light: #{color.adjust($color-primary, $lightness: 8%)};
 $color-secondary: #00ddff;
+$color-secondary-dark: #{color.adjust($color-secondary, $lightness: -8%)};
+$color-secondary-light: #{color.adjust($color-secondary, $lightness: 8%)};
 
 // Grayscale
 $color-white: #fff;
@@ -110,6 +112,8 @@ $editor-content-width-outer: $editor-content-width + ($editor-content-width-padd
   --fs-color-primary-dark: #{$color-primary-dark};
   --fs-color-primary-light: #{$color-primary-light};
   --fs-color-secondary: #{$color-secondary};
+  --fs-color-secondary-dark: #{$color-secondary-dark};
+  --fs-color-secondary-light: #{$color-secondary-light};
 
   // Grayscale
   --fs-color-white: #{$color-white};
@@ -145,10 +149,21 @@ $editor-content-width-outer: $editor-content-width + ($editor-content-width-padd
   // Text
   --fs-primary-font-family: #{$primary-font-family};
   --fs-default-text-color: var(--fs-color-off-black);
+  --fs-gray-text-color: var(--fs-color-gray-500);
   --fs-default-font-size: var(--fs-font-size-m);
   --fs-default-line-height: var(--fs-line-height-m);
   --fs-link-color: var(--fs-color-primary);
   --fs-link-color-hover: var(--fs-color-primary-dark);
+
+  // Buttons
+  --fs-button-primary-color: #fff;
+  --fs-button-primary-color-hover: #fff;
+  --fs-button-primary-background-color: var(--fs-color-primary);
+  --fs-button-primary-background-color-hover: var(--fs-color-primary-dark);
+  --fs-button-secondary-color: #fff;
+  --fs-button-secondary-color-hover: #fff;
+  --fs-button-secondary-background-color: var(--fs-color-secondary);
+  --fs-button-secondary-background-color-hover: var(--fs-color-secondary-dark);
 
   // Padding
   --fs-content-padding-xs: #{$content-padding-xs};
@@ -193,9 +208,9 @@ $editor-content-width-outer: $editor-content-width + ($editor-content-width-padd
   --fs-transition-speed-slow: #{$transition-speed-slow};
 
   // Border radius
-  --fs-border-radius-m-small: #{$border-radius-s};
+  --fs-border-radius-s: #{$border-radius-s};
   --fs-border-radius-m: #{$border-radius-m};
-  --fs-border-radius-m-large: #{$border-radius-l};
+  --fs-border-radius-l: #{$border-radius-l};
 
   // Editor content
   --fs-editor-content-width: #{$editor-content-width};

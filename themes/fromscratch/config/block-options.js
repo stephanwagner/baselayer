@@ -21,7 +21,7 @@ function getContentMarginControl(defaultClass = '') {
 }
 
 /**
- * Uniform content padding control (group and cover).
+ * Uniform content padding control (group, cover, pullquote).
  *
  * @param {string} defaultSize Default size token, e.g. `m`.
  */
@@ -128,8 +128,7 @@ export const blockOptions = [
       {
         type: 'button-group',
         label: 'Umbruch',
-        description:
-          'Legt fest, ab welcher Bildschirmbreite die Spalten gestapelt werden.',
+        description: 'Legt fest, ab welcher Bildschirmbreite die Spalten gestapelt werden.',
         default: '',
         attributeName: 'columnsStackBreakpoint',
         options: [
@@ -184,7 +183,7 @@ export const blockOptions = [
         default: '',
         attributeName: 'headingShowAs',
         options: [
-          { icon: 'block', label: 'Standard', value: '' },
+          { label: '—', value: '' },
           { label: 'H1', value: 'h1' },
           { label: 'H2', value: 'h2' },
           { label: 'H3', value: 'h3' },
@@ -277,6 +276,18 @@ export const blockOptions = [
     options: [getContentMarginControl('m'), getContentPaddingControl('m'), getLimitWidthControl()],
   },
 
+  // Quote
+  {
+    name: 'core/quote',
+    options: [getContentMarginControl()],
+  },
+
+  // Pullquote
+  {
+    name: 'core/pullquote',
+    options: [getContentMarginControl('m'), getContentPaddingControl('l')],
+  },
+
   // Separator
   {
     name: 'core/separator',
@@ -305,6 +316,17 @@ export const blockOptions = [
   {
     name: 'core/button',
     options: [
+      {
+        type: 'button-group',
+        label: 'Variante',
+        description: 'Primär- oder Sekundärfarbe für den Button.',
+        default: '',
+        attributeName: 'buttonVariant',
+        options: [
+          { label: 'Primär', value: '' },
+          { label: 'Sekundär', value: '-secondary' },
+        ],
+      },
       {
         type: 'button-group',
         label: 'Größe',
@@ -381,6 +403,12 @@ export const blockOptions = [
   // ACF: Slider
   {
     name: 'acf/slider',
+    options: [getContentMarginControl('m')],
+  },
+
+  // ACF: Map
+  {
+    name: 'acf/map',
     options: [getContentMarginControl('m')],
   },
 ];

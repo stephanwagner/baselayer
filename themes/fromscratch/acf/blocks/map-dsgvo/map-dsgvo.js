@@ -6,16 +6,21 @@ import { isGoogleMapsAccepted, setGoogleMapsAccepted, removeGoogleMapsAccepted }
  */
 function initGoogleMapsConsentBlock() {
   if ($('[data-google-maps-dsgvo-container]').length) {
-    const hasAcceptedTitle = 'Sie haben zugestimmt, dass Daten an Google gesendet werden, um Google Maps anzuzeigen.';
-    const hasNotAcceptedTitle =
-      'Sie haben nicht zugestimmt, dass Daten an Google gesendet werden, um Google Maps anzuzeigen.';
+    const hasAcceptedTitle = 'Sie haben der Verbindung zu Google Maps zugestimmt.';
+    const hasNotAcceptedTitle = 'Sie haben der Verbindung zu Google Maps derzeit nicht zugestimmt.';
 
-    const hasAcceptedText =
-      'Wenn Sie auf "Verbindung zu Google Maps trennen" klicken, wird die Verbindung zu Google Maps getrennt und es werden keine Daten mehr an Google übertragen.';
-    const hasNotAcceptedText =
-      'Wenn Sie auf "Verbindung zu Google Maps erlauben" klicken, wird eine Verbindung zu Google hergestellt, um Google Maps auf der Seite anzuzeigen. Dabei werden Daten an Google übertragen. Weitere Informationen finden Sie auf dieser Seite sowie in der <a href="https://policies.google.com/privacy?hl=de" target="_blank">Datenschutzerklärung von Google</a>.';
+    const hasNotAcceptedTextP1 =
+      'Wenn Sie Ihre Zustimmung erteilen, kann Google Maps auf dieser Website geladen werden. ' +
+      'Dabei wird eine Verbindung zu Google hergestellt und es können personenbezogene Daten (z. B. Ihre IP-Adresse) an Google übertragen werden.';
+    const hasNotAcceptedTextP2 =
+      'Weitere Informationen finden Sie in unserer Datenschutzerklärung' +
+      'sowie in der <a href="https://policies.google.com/privacy?hl=de" target="_blank">Datenschutzerklärung von Google.</a>';
+    const hasNotAcceptedText = '<p>' + hasNotAcceptedTextP1 + '</p><p>' + hasNotAcceptedTextP2 + '</p>';
 
-    const hasAcceptedButtonText = 'Verbindung zu Google Maps trennen';
+    const hasAcceptedTextP1 = 'Sie können Ihre Zustimmung jederzeit widerrufen. Nach dem Widerruf wird Google Maps auf dieser Website nicht mehr geladen.';
+    const hasAcceptedText = '<p>' + hasAcceptedTextP1 + '</p>';
+
+    const hasAcceptedButtonText = 'Verbindung zu Google Maps widerrufen';
     const hasNotAcceptedButtonText = 'Verbindung zu Google Maps erlauben';
 
     let html = '';
@@ -28,9 +33,9 @@ function initGoogleMapsConsentBlock() {
     html += '</div>';
 
     html += '<div class="map-dsgvo__link-container">';
-    html += '  <span class="map-dsgvo__link" tabindex="0">';
+    html += '  <div class="map-dsgvo__link button -outline -small" tabindex="0">';
     html += isGoogleMapsAccepted() ? hasAcceptedButtonText : hasNotAcceptedButtonText;
-    html += '  </span>';
+    html += '  </div>';
     html += '</div>';
 
     $('[data-google-maps-dsgvo-container]').html(html);
