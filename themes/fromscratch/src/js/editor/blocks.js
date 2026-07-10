@@ -1,3 +1,20 @@
+wp.hooks.addFilter('blocks.registerBlockType', 'fromscratch/pullquote-default-background', (settings, name) => {
+  if (name !== 'core/pullquote') {
+    return settings;
+  }
+
+  settings.attributes = {
+    ...settings.attributes,
+    backgroundColor: {
+      ...(settings.attributes?.backgroundColor || {}),
+      type: 'string',
+      default: 'gray-200',
+    },
+  };
+
+  return settings;
+});
+
 wp.domReady(() => {
   // Image
   wp.blocks.unregisterBlockStyle('core/image', 'rounded');
