@@ -1,0 +1,16 @@
+{
+  "slug": "theme",
+  "label": "Theme",
+  "icons": [
+    {
+      "filename": "theme-logo",
+      "label": "Logo",
+      "keywords": [
+        "brand",
+        "marke",
+        "signet"
+      ],
+      "alternatives": []
+    }
+  ]
+}

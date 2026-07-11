@@ -959,7 +959,7 @@ function fs_sanitize_icon_slug($value): string
 function fs_icon_svg_asset_path(string $icon_name): string
 {
 	if ($icon_name === 'theme-logo') {
-		return '/icons/theme/logo.svg';
+		return '/icons-theme/logo.svg';
 	}
 
 	return '/icons/' . $icon_name . '.svg';
@@ -997,6 +997,96 @@ function fs_icon_admin_catalog(): array
 }
 
 /**
+ * Theme icon category for the active stylesheet (child), from icons.generated.json.
+ *
+ * @return array{slug: string, label: string, icons: list<array<string, mixed>>}|null
+ *         Category data when a child theme is active; null when using the parent only.
+ */
+function fs_stylesheet_theme_icon_category(): ?array
+{
+	if (!is_child_theme()) {
+		return null;
+	}
+
+	$path = trailingslashit(get_stylesheet_directory()) . 'assets/icons.generated.json';
+	if (!is_readable($path)) {
+		return [
+			'slug' => 'theme',
+			'label' => 'Theme',
+			'icons' => [],
+		];
+	}
+
+	$raw = file_get_contents($path);
+	if ($raw === false || $raw === '') {
+		return [
+			'slug' => 'theme',
+			'label' => 'Theme',
+			'icons' => [],
+		];
+	}
+
+	$data = json_decode($raw, true);
+	if (!is_array($data)) {
+		return [
+			'slug' => 'theme',
+			'label' => 'Theme',
+			'icons' => [],
+		];
+	}
+
+	$icons = [];
+	if (!empty($data['icons']) && is_array($data['icons'])) {
+		foreach ($data['icons'] as $icon) {
+			if (!is_array($icon) || empty($icon['filename'])) {
+				continue;
+			}
+			$icons[] = [
+				'filename' => (string) $icon['filename'],
+				'label' => isset($icon['label']) ? (string) $icon['label'] : '',
+				'keywords' => isset($icon['keywords']) && is_array($icon['keywords'])
+					? array_values(array_map('strval', $icon['keywords']))
+					: [],
+				'alternatives' => isset($icon['alternatives']) && is_array($icon['alternatives'])
+					? array_values(array_map('strval', $icon['alternatives']))
+					: [],
+			];
+		}
+	}
+
+	return [
+		'slug' => isset($data['slug']) && is_string($data['slug']) && $data['slug'] !== ''
+			? $data['slug']
+			: 'theme',
+		'label' => isset($data['label']) && is_string($data['label']) && $data['label'] !== ''
+			? $data['label']
+			: 'Theme',
+		'icons' => $icons,
+	];
+}
+
+/**
+ * Shared fromscratchIcons localize payload for editor + admin.
+ *
+ * @return array<string, mixed>
+ */
+function fs_icons_localize_payload(): array
+{
+	$payload = [
+		'labels'     => fs_icon_labels(),
+		'categories' => fs_icon_category_labels(),
+		'ui'         => fs_icon_ui_strings(),
+	];
+
+	$theme_category = fs_stylesheet_theme_icon_category();
+	if ($theme_category !== null) {
+		$payload['themeCategory'] = $theme_category;
+	}
+
+	return $payload;
+}
+
+/**
  * Expose translated icon labels + UI strings to the editor script (editor.js).
  *
  * Runs after fs_editor_scripts() (priority 10) has registered the handle.
@@ -1007,11 +1097,7 @@ function fs_editor_icons_localize(): void
 {
 	fs_load_icons_textdomain();
 
-	wp_localize_script('fromscratch-editor', 'fromscratchIcons', [
-		'labels'     => fs_icon_labels(),
-		'categories' => fs_icon_category_labels(),
-		'ui'         => fs_icon_ui_strings(),
-	]);
+	wp_localize_script('fromscratch-editor', 'fromscratchIcons', fs_icons_localize_payload());
 }
 add_action('enqueue_block_editor_assets', 'fs_editor_icons_localize', 11);
 
@@ -1033,10 +1119,6 @@ function fs_admin_icons_localize(string $hook_suffix): void
 
 	fs_load_icons_textdomain();
 
-	wp_localize_script('main-admin-scripts', 'fromscratchIcons', [
-		'labels'     => fs_icon_labels(),
-		'categories' => fs_icon_category_labels(),
-		'ui'         => fs_icon_ui_strings(),
-	]);
+	wp_localize_script('main-admin-scripts', 'fromscratchIcons', fs_icons_localize_payload());
 }
 add_action('admin_enqueue_scripts', 'fs_admin_icons_localize', 11);

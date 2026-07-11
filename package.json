@@ -5,8 +5,7 @@
   "homepage": "https://github.com/StephanWagner/fromscratch",
   "type": "module",
   "scripts": {
-    "watch": "npm run build:icons && concurrently \"npm run watch:icons\" \"npm run watch:js\" \"npm run watch:css\"",
-    "watch:icons": "chokidar \"themes/fromscratch/assets/icons/theme/**/*.svg\" \"themes/fromscratch/config/icons.js\" -c \"npm run build:icons\"",
+    "watch": "concurrently \"npm run watch:js\" \"npm run watch:css\"",
     "watch:js": "node scripts/build-js.mjs --watch",
     "watch:css": "node scripts/build-css.mjs --watch",
     "build": "npm run build:icons && npm run build:js && npm run build:css",

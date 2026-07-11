@@ -212,6 +212,8 @@ function fs_enqueue_child_theme_assets(): void
 		);
 	}
 
+	fs_enqueue_child_theme_icons_style(['fromscratch-styles', 'child-main-styles']);
+
 	$js_rel = 'assets/js/main' . $min . '.js';
 	$js_fallback = 'assets/js/main.js';
 	$js_file = is_readable($base . $js_rel) ? $js_rel : (is_readable($base . $js_fallback) ? $js_fallback : '');
@@ -227,6 +229,49 @@ function fs_enqueue_child_theme_assets(): void
 	}
 }
 add_action('wp_enqueue_scripts', 'fs_enqueue_child_theme_assets', 20);
+
+/**
+ * Enqueue child theme icon mask CSS when present (front, editor, admin).
+ *
+ * @param string[] $deps Style handle dependencies.
+ */
+function fs_enqueue_child_theme_icons_style(array $deps = []): void
+{
+	if (!is_child_theme()) {
+		return;
+	}
+
+	$base = trailingslashit(get_stylesheet_directory());
+	$rel = 'assets/css/icons.css';
+	if (!is_readable($base . $rel)) {
+		return;
+	}
+
+	wp_enqueue_style(
+		'child-theme-icons',
+		trailingslashit(get_stylesheet_directory_uri()) . $rel,
+		$deps,
+		(string) filemtime($base . $rel)
+	);
+}
+
+/**
+ * Load child theme icon masks in the block editor (picker previews).
+ */
+function fs_enqueue_child_theme_icons_editor(): void
+{
+	fs_enqueue_child_theme_icons_style(['main-admin-styles']);
+}
+add_action('enqueue_block_editor_assets', 'fs_enqueue_child_theme_icons_editor', 20);
+
+/**
+ * Load child theme icon masks in wp-admin (developer icons cheatsheet, etc.).
+ */
+function fs_enqueue_child_theme_icons_admin(): void
+{
+	fs_enqueue_child_theme_icons_style(['main-admin-styles']);
+}
+add_action('admin_enqueue_scripts', 'fs_enqueue_child_theme_icons_admin', 20);
 
 /**
  * Enqueue theme admin.css (same bundle as wp-admin).

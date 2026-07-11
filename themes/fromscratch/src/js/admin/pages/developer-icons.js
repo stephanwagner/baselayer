@@ -56,7 +56,7 @@ const iconSvgFile = (name) => {
 
 const iconSvgAssetPath = (name) => {
   if (name === 'theme-logo') {
-    return '/icons/theme/logo.svg';
+    return '/icons-theme/logo.svg';
   }
 
   return `/icons/${name}.svg`;

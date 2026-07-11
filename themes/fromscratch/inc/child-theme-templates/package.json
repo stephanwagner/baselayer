@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "npm run build:js && npm run build:css",
+    "build": "npm run build:icons && npm run build:js && npm run build:css",
+    "build:icons": "node scripts/build-icons.mjs",
     "build:js": "node scripts/build-js.mjs",
     "build:css": "node scripts/build-css.mjs",
     "watch": "concurrently \"npm run watch:js\" \"npm run watch:css\"",

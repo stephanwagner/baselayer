@@ -7,13 +7,12 @@
  * back to a humanized file name.
  *
  * Then run `npm run build` (or just `npm run build:icons`) to regenerate:
- *   - src/js/editor/icons/icons.generated.js → the icon-picker list
- *   - src/scss/icons/_icons-theme.scss       → the mask CSS
+ *   - assets/css/icons.css
+ *   - assets/icons.generated.json
  *
  * Theme icons show up at the TOP of the icon picker under their own category
- * and are usable anywhere via `-icon-theme-<name>` (e.g. `-icon-theme-logo`,
- * `-icon-theme-logo-fill`). Run `npm run build` (or `npm run build:icons`) after
- * adding or changing SVGs.
+ * and are usable anywhere via `-icon-theme-<name>` (e.g. `-icon-theme-logo`).
+ * Run `npm run build` (or `npm run build:icons`) after adding or changing SVGs.
  *
  * NOTE: icons render as a single-color mask (they inherit `currentColor`), so
  * multi-color artwork will appear as a monochrome silhouette.

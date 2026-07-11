@@ -9,11 +9,23 @@ Child theme of **FromScratch**. Parent updates leave this folder alone.
 
 ```bash
 npm install
-npm run build    # one-shot: expanded + minified
-npm run watch    # rebuild on change (development outputs)
+npm run build    # icons + JS + CSS
+npm run watch    # rebuild on change
 ```
 
-Built files land in `assets/css/main.css` and `assets/js/main.js` and load after the parent theme assets.
+Built files land in `assets/css/main.css`, `assets/js/main.js`, `assets/css/icons.css`, and `assets/icons.generated.json`.
+
+## Icons
+
+Drop SVGs into `assets/icons-theme/` (optional `name-fill.svg` for a filled variant). Optional labels/keywords in `config/icons.js`. Then `npm run build` (or `npm run build:icons`).
+
+Use as:
+
+```html
+<div class="fs-icon -icon-theme-logo"></div>
+```
+
+They also appear under **Theme** in the icon picker. An example `logo.svg` is included.
 
 ## Config / templates
 

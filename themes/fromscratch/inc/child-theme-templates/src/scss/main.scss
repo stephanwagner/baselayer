@@ -1,8 +1,27 @@
-// Child theme styles — compiled to assets/css/main.css (loads after parent).
-//
-// From this theme folder:
-//   npm install
-//   npm run build    # or: npm run watch
-//
-// Optional: pull parent Sass variables (path is relative to this file):
-// @use '../../../fromscratch/src/scss/variables' as *;
+@use 'sass:color';
+
+/**
+ * Child theme styles — compiled to assets/css/main.css (loads after parent).
+ *
+ * Install assets from the theme folder:
+ *   npm install
+ *
+ * Build the minified version:
+ *   npm run build
+ *
+ * Watch for changes and build automatically:
+ *   npm run watch
+ */
+
+// Import parent theme variables
+
+@use '../../../fromscratch/src/scss/variables' as fs;
+
+// You can override parent theme styles here by adding your own SCSS code below
+
+:root {
+  --fs-color-primary: #4080ff;
+  --fs-color-primary-dark: #{color.adjust(#4080ff, $lightness: -8%)};
+  --fs-color-secondary: #00aaff;
+  --fs-color-secondary-dark: #{color.adjust(#00aaff, $lightness: -8%)};
+}
