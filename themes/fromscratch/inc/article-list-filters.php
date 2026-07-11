@@ -7,6 +7,60 @@ defined('ABSPATH') || exit;
  */
 
 /**
+ * Post types the article-list block may query (theme types minus page).
+ *
+ * @return list<string>
+ */
+function fs_article_list_available_post_types(): array
+{
+	$types = function_exists('fs_theme_post_types') ? fs_theme_post_types() : [];
+	$out = [];
+
+	foreach ($types as $slug) {
+		if (!is_string($slug) || $slug === '' || $slug === 'page') {
+			continue;
+		}
+		if (!post_type_exists($slug)) {
+			continue;
+		}
+		$out[] = $slug;
+	}
+
+	return array_values(array_unique($out));
+}
+
+/**
+ * Whether a post type is available for article-list blocks.
+ */
+function fs_article_list_post_type_is_available(string $post_type): bool
+{
+	return $post_type !== '' && in_array($post_type, fs_article_list_available_post_types(), true);
+}
+
+/**
+ * Resolve a block post_type value to an available type, or '' when none apply.
+ *
+ * Explicit but disabled types (e.g. `post` with `enabled` => false) return '' so the block stays hidden.
+ */
+function fs_article_list_resolve_post_type($post_type): string
+{
+	$available = fs_article_list_available_post_types();
+	if ($available === []) {
+		return '';
+	}
+
+	if (is_string($post_type) && $post_type !== '') {
+		return in_array($post_type, $available, true) ? $post_type : '';
+	}
+
+	if (in_array('post', $available, true)) {
+		return 'post';
+	}
+
+	return $available[0];
+}
+
+/**
  * HTML id for an ACF article-list block instance.
  *
  * @param array<string, mixed> $block ACF block array.
@@ -194,15 +248,15 @@ function fs_article_list_filter_term_id_from_request(string $taxonomy, string $c
  */
 function fs_article_list_block_query_limit(array $block): array
 {
-	$has_limit = fs_acf_block_field($block, 'has-limit');
-	$limit_type = fs_acf_block_field_choice_value(fs_acf_block_field($block, 'limit-type'));
+	$has_limit = fs_acf_block_field($block, 'has_limit');
+	$limit_type = fs_acf_block_field_choice_value(fs_acf_block_field($block, 'limit_type'));
 	$limit = fs_acf_block_field($block, 'limit');
 
 	$posts_per_page = -1;
 	$paged = 1;
 	$uses_pagination = false;
 
-	// Backward compatible: if `has-limit` is true and `limit` is set but `limit-type`
+	// Backward compatible: if `has_limit` is true and `limit` is set but `limit_type`
 	// is missing (older field group), treat it as pagination.
 	$has_limit_bool = filter_var($has_limit, FILTER_VALIDATE_BOOLEAN) || $has_limit === '1' || $has_limit === 1;
 	if (!$has_limit_bool) {
@@ -217,15 +271,16 @@ function fs_article_list_block_query_limit(array $block): array
 		$limit_type = 'pagination';
 	}
 
-	if ($limit_type !== 'pagination') {
+	$posts_per_page = is_numeric($limit) ? (int) $limit : 0;
+
+	if ($limit_type === 'limit') {
 		return [
-			'posts_per_page'  => $posts_per_page,
-			'paged'           => $paged,
-			'uses_pagination' => $uses_pagination,
+			'posts_per_page'  => $posts_per_page > 0 ? $posts_per_page : -1,
+			'paged'           => 1,
+			'uses_pagination' => false,
 		];
 	}
 
-	$posts_per_page = is_numeric($limit) ? (int) $limit : 0;
 	$uses_pagination = true;
 	$paged = max(1, (int) get_query_var('paged'), (int) get_query_var('page'));
 
@@ -237,7 +292,7 @@ function fs_article_list_block_query_limit(array $block): array
 }
 
 /**
- * Resolve the block editor `post-taxonomy` field to a term (manually populated select).
+ * Resolve the block editor `post_taxonomy` field to a term (manually populated select).
  *
  * @return array{term_id: int, taxonomy: string}|null
  */

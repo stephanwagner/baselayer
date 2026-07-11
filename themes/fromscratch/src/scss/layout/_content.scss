@@ -7,13 +7,18 @@
   color: var(--fs-link-color);
   transition: transition('color');
   text-decoration: none;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 4px;
   white-space: nowrap;
 
   @media print {
     display: none;
+  }
+
+  &.-icon-after::after {
+    margin-inline-start: 4px;
+    transition: transition('transform');
+    transform: translateX(0);
   }
 }
 
@@ -32,25 +37,9 @@
 .read-more-link-trigger:focus .read-more-link {
   text-decoration: none;
   color: var(--fs-link-color-hover);
-}
 
-.read-more-link__icon {
-  width: 20px;
-  height: 20px;
-  transition: transition('transform');
-  transform: translateX(0);
-  pointer-events: none;
-
-  .read-more-link:hover &,
-  .read-more-link-trigger:hover &,
-  .read-more-link:focus &,
-  .read-more-link-trigger:focus & {
+  &.-icon-after::after {
     transform: translateX(3px);
-  }
-
-  svg {
-    width: 100%;
-    height: 100%;
   }
 }
 

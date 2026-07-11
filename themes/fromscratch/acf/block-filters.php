@@ -4,24 +4,27 @@
 
 global $fs_selected_article_list_post_type;
 
-add_filter('acf/load_field/name=post-type', function ($field) {
-
-    $post_types = get_post_types([
-        'public' => true,
-    ], 'objects');
-
-    unset($post_types['page']);
-    unset($post_types['attachment']);
+add_filter('acf/load_field/name=post_type', function ($field) {
 
     $field['choices'] = [];
 
-    foreach ($post_types as $post_type) {
+    $slugs = function_exists('fs_article_list_available_post_types')
+        ? fs_article_list_available_post_types()
+        : [];
+
+    foreach ($slugs as $slug) {
+        $post_type = get_post_type_object($slug);
+        if (!$post_type instanceof WP_Post_Type) {
+            continue;
+        }
+
         $field['choices'][$post_type->name] = $post_type->labels->name;
     }
+
     return $field;
 });
 
-add_filter('acf/prepare_field/name=post-type', function ($field) {
+add_filter('acf/prepare_field/name=post_type', function ($field) {
 
     global $fs_selected_article_list_post_type;
 
@@ -41,24 +44,29 @@ add_filter('acf/prepare_field/name=post-type', function ($field) {
 
 // Field post taxonomy
 
-add_filter('acf/prepare_field/name=post-taxonomy', function ($field) {
+add_filter('acf/prepare_field/name=post_taxonomy', function ($field) {
 
     global $fs_selected_article_list_post_type;
 
     if (!$fs_selected_article_list_post_type) {
-        return $field;
+        return false;
     }
 
     $taxonomy = fs_cpt_filter_taxonomy($fs_selected_article_list_post_type);
 
     if ($taxonomy === '') {
-        return $field;
+        return false;
     }
 
     $terms = get_terms([
         'taxonomy'   => $taxonomy,
         'hide_empty' => false,
     ]);
+
+    if (is_wp_error($terms) || $terms === []) {
+        $field['choices'] = [];
+        return $field;
+    }
 
     $field['choices'] = [];
 

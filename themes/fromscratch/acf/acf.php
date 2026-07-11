@@ -465,50 +465,32 @@ function fs_acf_block_raw_field_value(array $block, string $field_name)
 		return null;
 	}
 
-	$underscore = str_replace('-', '_', $field_name);
-	$ref_keys = ['_' . $field_name];
-	if ($underscore !== $field_name) {
-		$ref_keys[] = '_' . $underscore;
-	}
-
-	foreach ($ref_keys as $ref_key) {
-		if (!array_key_exists($ref_key, $data)) {
-			continue;
-		}
-
+	$ref_key = '_' . $field_name;
+	if (array_key_exists($ref_key, $data)) {
 		$field_key = $data[$ref_key];
-		if (!is_string($field_key) || $field_key === '' || !array_key_exists($field_key, $data)) {
-			continue;
-		}
-
-		$raw = $data[$field_key];
-		if ($raw !== null && $raw !== false && $raw !== '') {
-			return $raw;
+		if (is_string($field_key) && $field_key !== '' && array_key_exists($field_key, $data)) {
+			$raw = $data[$field_key];
+			if ($raw !== null && $raw !== false && $raw !== '') {
+				return $raw;
+			}
 		}
 	}
 
-	foreach ([$field_name, $underscore] as $name) {
-		if (!array_key_exists($name, $data)) {
-			continue;
-		}
-
-		$raw = $data[$name];
+	if (array_key_exists($field_name, $data)) {
+		$raw = $data[$field_name];
 		if ($raw !== null && $raw !== false && $raw !== '') {
 			return $raw;
 		}
 	}
 
 	if (function_exists('acf_get_field')) {
-		foreach (array_unique([$field_name, $underscore]) as $name) {
-			$acf_field = acf_get_field($name);
-			if (!is_array($acf_field) || empty($acf_field['key']) || !is_string($acf_field['key'])) {
-				continue;
-			}
-
-			if (!array_key_exists($acf_field['key'], $data)) {
-				continue;
-			}
-
+		$acf_field = acf_get_field($field_name);
+		if (
+			is_array($acf_field)
+			&& !empty($acf_field['key'])
+			&& is_string($acf_field['key'])
+			&& array_key_exists($acf_field['key'], $data)
+		) {
 			$raw = $data[$acf_field['key']];
 			if ($raw !== null && $raw !== false && $raw !== '') {
 				return $raw;

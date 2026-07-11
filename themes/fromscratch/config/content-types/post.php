@@ -31,7 +31,7 @@ return [
 
 		'archive' => [
 			'enabled' => true,
-			'slug' => 'my-blogs',
+			'slug' => 'blog',
 			'design' => 'list', // list | grid
 			'category_filter' => true,
 			'texts' => [

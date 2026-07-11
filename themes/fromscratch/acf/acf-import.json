@@ -413,6 +413,278 @@
         "ai_description": ""
     },
     {
+        "key": "group_6a5c8f1a2b3c4",
+        "title": "Artikel-Liste",
+        "fields": [
+            {
+                "key": "field_6a5c8f1a2b3c5",
+                "label": "Inhaltstyp",
+                "name": "post_type",
+                "aria-label": "",
+                "type": "select",
+                "instructions": "Nach Änderung speichern die Seite neu laden, damit die Kategorie-Auswahl aktualisiert wird.",
+                "required": 1,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "post": "Beiträge",
+                    "event": "Veranstaltungen",
+                    "example": "Projekte"
+                },
+                "default_value": "post",
+                "return_format": "value",
+                "multiple": 0,
+                "allow_null": 0,
+                "allow_in_bindings": 0,
+                "ui": 0,
+                "ajax": 0,
+                "placeholder": "",
+                "create_options": 0,
+                "save_options": 0
+            },
+            {
+                "key": "field_6a5c8f1a2b3c6",
+                "label": "Kategorie",
+                "name": "post_taxonomy",
+                "aria-label": "",
+                "type": "select",
+                "instructions": "Filtert die Liste nach einer Kategorie.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": [],
+                "default_value": false,
+                "return_format": "value",
+                "multiple": 0,
+                "allow_null": 1,
+                "allow_in_bindings": 0,
+                "ui": 0,
+                "ajax": 0,
+                "placeholder": "",
+                "create_options": 0,
+                "save_options": 0
+            },
+            {
+                "key": "field_6a5c8f1a2b3c7",
+                "label": "",
+                "name": "has_category_filters",
+                "aria-label": "",
+                "type": "true_false",
+                "instructions": "Zeigt Filter für Kategorien oberhalb der Liste an.",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "Kategorie-Filter anzeigen",
+                "default_value": 0,
+                "allow_in_bindings": 0,
+                "ui": 0,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_6a5c8f1a2b3c8",
+                "label": "",
+                "name": "has_limit",
+                "aria-label": "",
+                "type": "true_false",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "Anzahl begrenzen",
+                "default_value": 0,
+                "allow_in_bindings": 0,
+                "ui": 0,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_6a5c8f1a2b3c9",
+                "label": "Limit-Typ",
+                "name": "limit_type",
+                "aria-label": "",
+                "type": "button_group",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_6a5c8f1a2b3c8",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "50",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "pagination": "Pagination",
+                    "limit": "Feste Anzahl"
+                },
+                "default_value": "pagination",
+                "return_format": "value",
+                "allow_null": 0,
+                "allow_in_bindings": 0,
+                "layout": "horizontal"
+            },
+            {
+                "key": "field_6a5c8f1a2b3ca",
+                "label": "Anzahl",
+                "name": "limit",
+                "aria-label": "",
+                "type": "number",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_6a5c8f1a2b3c8",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "50",
+                    "class": "",
+                    "id": ""
+                },
+                "default_value": 10,
+                "min": 1,
+                "max": "",
+                "allow_in_bindings": 0,
+                "placeholder": "",
+                "step": 1,
+                "prepend": "",
+                "append": ""
+            },
+            {
+                "key": "field_6a5c8f1a2b3cb",
+                "label": "Sortierung",
+                "name": "order_by",
+                "aria-label": "",
+                "type": "select",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "50",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "date": "Datum",
+                    "title": "Titel",
+                    "menu_order": "Reihenfolge",
+                    "modified": "Zuletzt geändert"
+                },
+                "default_value": "date",
+                "return_format": "value",
+                "multiple": 0,
+                "allow_null": 0,
+                "allow_in_bindings": 0,
+                "ui": 0,
+                "ajax": 0,
+                "placeholder": "",
+                "create_options": 0,
+                "save_options": 0
+            },
+            {
+                "key": "field_6a5c8f1a2b3cc",
+                "label": "Richtung",
+                "name": "order_direction",
+                "aria-label": "",
+                "type": "select",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "50",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "DESC": "Absteigend",
+                    "ASC": "Aufsteigend"
+                },
+                "default_value": "DESC",
+                "return_format": "value",
+                "multiple": 0,
+                "allow_null": 0,
+                "allow_in_bindings": 0,
+                "ui": 0,
+                "ajax": 0,
+                "placeholder": "",
+                "create_options": 0,
+                "save_options": 0
+            },
+            {
+                "key": "field_6a5c8f1a2b3cd",
+                "label": "Design",
+                "name": "design",
+                "aria-label": "",
+                "type": "button_group",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "choices": {
+                    "list": "Liste",
+                    "grid": "Raster"
+                },
+                "default_value": "list",
+                "return_format": "value",
+                "allow_null": 0,
+                "allow_in_bindings": 0,
+                "layout": "horizontal"
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "block",
+                    "operator": "==",
+                    "value": "acf\/article-list"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": "",
+        "show_in_rest": 0,
+        "display_title": "",
+        "allow_ai_access": false,
+        "ai_description": ""
+    },
+    {
         "key": "group_6a018b31a4239",
         "title": "Kennzahlen",
         "fields": [

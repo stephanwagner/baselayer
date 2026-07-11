@@ -475,6 +475,6 @@ export const blockOptions = [
   // ACF: Article List
   {
     name: 'acf/article-list',
-    options: [getAlignWideContainerControl()],
+    options: [getAlignWideContainerControl(), getContentMarginControl('m')],
   },
 ];

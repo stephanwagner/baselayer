@@ -15,21 +15,22 @@ if (!empty($block['className'])) {
 $classNames[] = 'article-list__wrapper';
 $classNames[] = '-block';
 
-// Add margin class
-$classNames[] = '-content-margin-m';
-
 // Fields (block JSON data fallback — get_field alone can miss saved block attrs)
-$postType = fs_acf_block_field($block, 'post-type');
-$postTaxonomy = fs_acf_block_field($block, 'post-taxonomy');
-$hasCategoryFilters = (bool) fs_acf_block_field($block, 'has-category-filters');
+$postType = fs_article_list_resolve_post_type(fs_acf_block_field($block, 'post_type'));
+$postTaxonomy = fs_acf_block_field($block, 'post_taxonomy');
+$hasCategoryFilters = (bool) fs_acf_block_field($block, 'has_category_filters');
 $queryLimit = fs_article_list_block_query_limit($block);
 $usesPagination = $queryLimit['uses_pagination'];
-$sortBy = fs_acf_block_field($block, 'sort-by');
-$sortDirection = fs_acf_block_field($block, 'sort-direction');
-$design = fs_acf_block_field($block, 'design');
+$orderBy = fs_acf_block_field_choice_value(fs_acf_block_field($block, 'order_by')) ?: 'date';
+$orderDirection = strtoupper(fs_acf_block_field_choice_value(fs_acf_block_field($block, 'order_direction')) ?: 'DESC');
+$design = fs_acf_block_field_choice_value(fs_acf_block_field($block, 'design')) ?: 'list';
 
-if (!is_string($postType) || $postType === '') {
+if ($postType === '') {
     return;
+}
+
+if (!in_array($orderDirection, ['ASC', 'DESC'], true)) {
+    $orderDirection = 'DESC';
 }
 
 $postTaxonomyTerm = fs_article_list_post_taxonomy_term($postType, $postTaxonomy);
@@ -56,8 +57,8 @@ $paged = $queryLimit['paged'];
 $queryArgs = [
     'post_type'      => $postType,
     'posts_per_page' => $postsPerPage,
-    'orderby'        => $sortBy,
-    'order'          => $sortDirection,
+    'orderby'        => $orderBy,
+    'order'          => $orderDirection,
     'paged'          => $paged,
 ];
 

@@ -5,23 +5,27 @@ defined('ABSPATH') || exit;
 $url = isset($url) ? (string) $url : '';
 $label = isset($label) && is_string($label) ? $label : __('Read more', 'fromscratch');
 $class = isset($class) && is_string($class) ? $class : '';
-$link_tag = isset($link_tag) && in_array($link_tag, ['a', 'button', 'div', 'span']) ? $link_tag : (!empty($url) ? 'a' : 'span');
+$link_tag = isset($link_tag) && in_array($link_tag, ['a', 'button', 'div', 'span'], true)
+	? $link_tag
+	: ($url !== '' ? 'a' : 'span');
+
+$icon = isset($icon) && is_string($icon) ? $icon : 'arrow-right';
+$icon = function_exists('fs_sanitize_icon_slug') ? fs_sanitize_icon_slug($icon) : sanitize_key($icon);
+
+if ($icon === '') {
+	$icon = 'arrow-right';
+}
+
+$classes = ['read-more-link', '-icon-after', '-icon-' . $icon];
+if ($class !== '') {
+	$classes[] = $class;
+}
 ?>
 <<?= $link_tag ?>
-	class="read-more-link <?= esc_attr($class) ?>"
+	class="<?= esc_attr(implode(' ', $classes)) ?>"
 	<?php if ($url !== '') { ?>
-		href="<?= esc_url($url) ?>"
-		<?php if (!empty($target)) { ?>
-			target="<?= esc_attr($target) ?>"
-		<?php } ?>
+	href="<?= esc_url($url) ?>"
+	<?php if (!empty($target)) { ?>
+	target="<?= esc_attr($target) ?>"
 	<?php } ?>
->
-	<span class="read-more-link__text">
-		<?= esc_html($label); ?>
-	</span>
-	<span class="read-more-link__icon" aria-hidden="true">
-		<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 -960 960 960" fill="currentColor">
-			<path d="M664.46-450H210q-12.77 0-21.38-8.62Q180-467.23 180-480t8.62-21.38Q197.23-510 210-510h454.46L532.77-641.69q-8.92-8.93-8.81-20.89.12-11.96 8.81-21.27 9.31-9.3 21.38-9.61 12.08-.31 21.39 9l179.15 179.15q5.62 5.62 7.92 11.85 2.31 6.23 2.31 13.46t-2.31 13.46q-2.3 6.23-7.92 11.85L575.54-275.54q-8.93 8.92-21.19 8.81-12.27-.12-21.58-9.42-8.69-9.31-9-21.08-.31-11.77 9-21.08L664.46-450Z"></path>
-		</svg>
-	</span>
-</<?= $link_tag ?>>
+	<?php } ?>><?= esc_html($label) ?></<?= $link_tag ?>>
