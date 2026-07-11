@@ -1767,7 +1767,7 @@ msgid "Replace"
 msgstr "Ersetzen"
 
 msgid "To set an OG image, you need permission to upload media."
-msgstr "Um ein OG-Bild festzulegen, benötigen Sie die Berechtigung, Medien hochzuladen."
+msgstr "Um ein OG-Bild festzulegen, benötigst du die Berechtigung, Medien hochzuladen."
 
 msgid "No index"
 msgstr "Nicht indexieren"
@@ -2445,7 +2445,7 @@ msgstr "Untermenü für %s umschalten"
 # Users & roles
 
 msgid "At least one user must have developer rights. Either check \"Has developer rights\" for the current user or add another user and check it there."
-msgstr "Mindestens ein Benutzer muss Entwicklerrechte besitzen. Aktivieren Sie entweder „Hat Entwicklerrechte“ für den aktuellen Benutzer oder fügen Sie einen weiteren Benutzer hinzu und aktivieren Sie die Option dort."
+msgstr "Mindestens ein Benutzer muss Entwicklerrechte besitzen. Aktiviere entweder „Hat Entwicklerrechte“ für den aktuellen Benutzer oder füge einen weiteren Benutzer hinzu und aktiviere die Option dort."
 
 msgid "To add another user, please fill in username, email, and password."
 msgstr "Um einen weiteren Benutzer hinzuzufügen, bitte Benutzername, E-Mail-Adresse und Passwort ausfüllen."
@@ -2507,7 +2507,7 @@ msgid "Blocks"
 msgstr "Blöcke"
 
 msgid "Control which blocks are available in the page editor inserter."
-msgstr "Legen Sie fest, welche Blöcke im Seiten-Editor-Inserter verfügbar sind."
+msgstr "Lege fest, welche Blöcke im Seiten-Editor-Inserter verfügbar sind."
 
 msgid "Search blocks…"
 msgstr "Blöcke suchen…"
@@ -2562,7 +2562,7 @@ msgid "Variation of"
 msgstr "Variation von"
 
 msgid "Enable the parent block to manage this variation."
-msgstr "Aktivieren Sie den übergeordneten Block, um diese Variation zu verwalten."
+msgstr "Aktiviere den übergeordneten Block, um diese Variation zu verwalten."
 
 msgid "Variation hidden by system"
 msgstr "Variation vom System ausgeblendet"

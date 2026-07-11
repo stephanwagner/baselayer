@@ -417,6 +417,165 @@
     }
   }
 
+  // Link-style button
+  .button.-is-link,
+  .wp-block-button.-is-link .wp-block-button__link {
+    background: transparent !important;
+    border-color: transparent !important;
+    border-width: 0;
+    border-radius: 0;
+    padding: 0 !important;
+    color: var(--fs-link-color);
+    font-size: var(--fs-font-size-m) !important;
+    font-weight: 600;
+    line-height: 1.4;
+    overflow: visible;
+    text-decoration: none !important;
+
+    &:hover,
+    .-button-trigger:hover & {
+      background: transparent !important;
+      border-color: transparent !important;
+      color: var(--fs-link-color-hover);
+    }
+  }
+
+  .button.-is-link.-small,
+  .wp-block-button.-is-link.-small .wp-block-button__link {
+    font-size: var(--fs-font-size-s) !important;
+    padding: 0 !important;
+    border-radius: 0;
+  }
+
+  .button.-is-link.-large,
+  .wp-block-button.-is-link.-large .wp-block-button__link {
+    font-size: var(--fs-font-size-l) !important;
+    padding: 0 !important;
+    border-radius: 0;
+  }
+
+  .button.-is-link.-extra-large,
+  .wp-block-button.-is-link.-extra-large .wp-block-button__link {
+    font-size: var(--fs-font-size-xl) !important;
+    padding: 0 !important;
+    border-radius: 0;
+  }
+
+  .button.-is-link.-secondary,
+  .wp-block-button.-is-link.-secondary .wp-block-button__link {
+    color: var(--fs-button-secondary-background-color);
+
+    &:hover,
+    .-button-trigger:hover & {
+      color: var(--fs-button-secondary-background-color-hover);
+    }
+  }
+
+  .button.-is-link.-white,
+  .wp-block-button.-is-link.-white .wp-block-button__link {
+    color: var(--fs-color-white);
+
+    &:hover,
+    .-button-trigger:hover & {
+      color: var(--fs-color-white);
+      opacity: 0.85;
+    }
+  }
+
+  // Link-style icons: same optical sizing as .-icon-before / .-icon-after (inline with text)
+  .button.-is-link.-has-icon,
+  .wp-block-button.-is-link.-has-icon .wp-block-button__link {
+    display: inline;
+    text-align: left;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+
+    &::before,
+    &::after {
+      @include fs-icon;
+      display: inline-block;
+      position: static;
+      top: auto;
+      left: auto;
+      right: auto;
+      transform: none;
+      width: 1em !important;
+      height: 1em !important;
+      font-size: 1.25em !important;
+      vertical-align: -0.225em !important;
+    }
+
+    &::before {
+      content: '';
+      margin-inline-end: 0.25em;
+    }
+
+    &::after {
+      content: none;
+      margin-inline-start: 0;
+    }
+  }
+
+  .button.-is-link.-has-icon.-icon-right,
+  .wp-block-button.-is-link.-has-icon.-icon-right .wp-block-button__link {
+    &::before {
+      content: none;
+      display: none;
+      margin-inline-end: 0;
+    }
+
+    &::after {
+      content: '';
+      display: inline-block;
+      margin-inline-start: 0.25em;
+    }
+  }
+
+  .button.-is-link.-has-icon.-icon-only,
+  .wp-block-button.-is-link.-has-icon.-icon-only .wp-block-button__link {
+    display: inline;
+    width: auto;
+    height: auto;
+    min-width: 0;
+    min-height: 0;
+    font-size: var(--fs-font-size-m) !important;
+    line-height: 1 !important;
+    padding: 0 !important;
+
+    &::before {
+      margin-inline-end: 0;
+    }
+  }
+
+  .button.-is-link.-has-icon.-icon-only.-small,
+  .wp-block-button.-is-link.-has-icon.-icon-only.-small .wp-block-button__link {
+    font-size: var(--fs-font-size-s) !important;
+  }
+
+  .button.-is-link.-has-icon.-icon-only.-large,
+  .wp-block-button.-is-link.-has-icon.-icon-only.-large .wp-block-button__link {
+    font-size: var(--fs-font-size-l) !important;
+  }
+
+  .button.-is-link.-has-icon.-icon-only.-extra-large,
+  .wp-block-button.-is-link.-has-icon.-icon-only.-extra-large .wp-block-button__link {
+    font-size: var(--fs-font-size-xl) !important;
+  }
+
+  .button.-is-link.-has-icon.-icon-only.-icon-right,
+  .wp-block-button.-is-link.-has-icon.-icon-only.-icon-right .wp-block-button__link {
+    &::before {
+      content: none;
+      display: none;
+    }
+
+    &::after {
+      content: '';
+      display: inline-block;
+      margin-inline-start: 0;
+    }
+  }
+
   // Select fields
 
   .select-container {

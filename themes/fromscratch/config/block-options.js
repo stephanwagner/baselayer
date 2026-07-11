@@ -367,6 +367,15 @@ export const blockOptions = [
     name: 'core/button',
     options: [
       {
+        type: 'boolean',
+        label: 'Darstellung',
+        toggleLabel: 'Als Link anzeigen',
+        description: '',
+        default: false,
+        attributeName: 'buttonIsLink',
+        className: '-is-link',
+      },
+      {
         type: 'button-group',
         label: 'Variante',
         description: '',
