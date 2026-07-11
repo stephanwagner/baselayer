@@ -19,7 +19,7 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
+  overflow-x: clip;
 
   .logged-in.admin-bar & {
     min-height: calc(100vh - 32px);
