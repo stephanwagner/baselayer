@@ -2,16 +2,16 @@
  * Theme (project/customer) icons.
  *
  * Drop SVGs into assets/icons-theme/ — optionally with a filled variant using
- * the `-fill` suffix (e.g. `logo.svg` + `logo-fill.svg`). You may add a display
- * label and English search keywords per file below; both are optional and fall
- * back to a humanized file name.
+ * the `-fill` suffix (e.g. `logo-child.svg` + `logo-child-fill.svg`). You may
+ * add a display label and English search keywords per file below; both are
+ * optional and fall back to a humanized file name.
  *
  * Then run `npm run build` (or just `npm run build:icons`) to regenerate:
  *   - assets/css/icons.css
  *   - assets/icons.generated.json
  *
  * Theme icons show up at the TOP of the icon picker under their own category
- * and are usable anywhere via `-icon-theme-<name>` (e.g. `-icon-theme-logo`).
+ * and are usable anywhere via `-icon-theme-<name>` (e.g. `-icon-theme-logo-child`).
  * Run `npm run build` (or `npm run build:icons`) after adding or changing SVGs.
  *
  * NOTE: icons render as a single-color mask (they inherit `currentColor`), so
@@ -26,6 +26,6 @@ export const themeIcons = {
 
   // Optional per-file metadata, keyed by the base file name (without .svg / -fill).
   meta: {
-    logo: { label: 'Logo', keywords: ['brand', 'marke', 'signet'] }
+    'logo-child': { label: 'Logo Child Theme', keywords: ['brand', 'marke', 'signet', 'child'] }
   }
 };

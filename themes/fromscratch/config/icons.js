@@ -8,7 +8,7 @@
  *
  * Then run `npm run build` (or just `npm run build:icons`) to regenerate:
  *   - src/js/editor/icons/icons.generated.js → the icon-picker list
- *   - src/scss/icons/_icons-theme.scss       → the mask CSS
+ *   - assets/css/icons.css                   → the mask CSS
  *
  * Theme icons show up at the TOP of the icon picker under their own category
  * and are usable anywhere via `-icon-theme-<name>` (e.g. `-icon-theme-logo`,

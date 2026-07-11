@@ -3,12 +3,13 @@
   "label": "Theme",
   "icons": [
     {
-      "filename": "theme-logo",
-      "label": "Logo",
+      "filename": "theme-logo-child",
+      "label": "Logo Child Theme",
       "keywords": [
         "brand",
         "marke",
-        "signet"
+        "signet",
+        "child"
       ],
       "alternatives": []
     }

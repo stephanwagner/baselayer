@@ -212,8 +212,6 @@ function fs_enqueue_child_theme_assets(): void
 		);
 	}
 
-	fs_enqueue_child_theme_icons_style(['fromscratch-styles', 'child-main-styles']);
-
 	$js_rel = 'assets/js/main' . $min . '.js';
 	$js_fallback = 'assets/js/main.js';
 	$js_file = is_readable($base . $js_rel) ? $js_rel : (is_readable($base . $js_fallback) ? $js_fallback : '');
@@ -231,47 +229,91 @@ function fs_enqueue_child_theme_assets(): void
 add_action('wp_enqueue_scripts', 'fs_enqueue_child_theme_assets', 20);
 
 /**
- * Enqueue child theme icon mask CSS when present (front, editor, admin).
+ * Enqueue theme icon mask CSS (child assets/css/icons.css when present, else parent).
+ *
+ * Relative url() values are rewritten to absolute theme URIs so browsers resolve
+ * them correctly when mask-image uses var(--fs-icon) from the parent stylesheet.
  *
  * @param string[] $deps Style handle dependencies.
  */
-function fs_enqueue_child_theme_icons_style(array $deps = []): void
+function fs_enqueue_theme_icons_style(array $deps = []): void
 {
-	if (!is_child_theme()) {
-		return;
-	}
-
-	$base = trailingslashit(get_stylesheet_directory());
 	$rel = 'assets/css/icons.css';
-	if (!is_readable($base . $rel)) {
+	$path = '';
+	$uri_base = '';
+
+	if (is_child_theme()) {
+		$child_base = trailingslashit(get_stylesheet_directory());
+		if (is_readable($child_base . $rel)) {
+			$path = $child_base . $rel;
+			$uri_base = trailingslashit(get_stylesheet_directory_uri());
+		}
+	}
+
+	if ($path === '') {
+		$parent_base = trailingslashit(get_template_directory());
+		if (!is_readable($parent_base . $rel)) {
+			return;
+		}
+		$path = $parent_base . $rel;
+		$uri_base = trailingslashit(get_template_directory_uri());
+	}
+
+	$css = file_get_contents($path);
+	if ($css === false || $css === '') {
 		return;
 	}
 
-	wp_enqueue_style(
-		'child-theme-icons',
-		trailingslashit(get_stylesheet_directory_uri()) . $rel,
-		$deps,
-		(string) filemtime($base . $rel)
+	$icons_uri = $uri_base . 'assets/icons-theme/';
+	$css = (string) preg_replace(
+		'#url\(\s*([\'"]?)\.\./icons-theme/#',
+		'url($1' . $icons_uri,
+		$css
 	);
+
+	wp_register_style('theme-icons', false, $deps, (string) filemtime($path));
+	wp_enqueue_style('theme-icons');
+	wp_add_inline_style('theme-icons', $css);
 }
 
 /**
- * Load child theme icon masks in the block editor (picker previews).
+ * Theme icons on the front end (after parent styles).
  */
-function fs_enqueue_child_theme_icons_editor(): void
+function fs_enqueue_theme_icons_front(): void
 {
-	fs_enqueue_child_theme_icons_style(['main-admin-styles']);
+	fs_enqueue_theme_icons_style(['fromscratch-styles']);
 }
-add_action('enqueue_block_editor_assets', 'fs_enqueue_child_theme_icons_editor', 20);
+add_action('wp_enqueue_scripts', 'fs_enqueue_theme_icons_front', 25);
 
 /**
- * Load child theme icon masks in wp-admin (developer icons cheatsheet, etc.).
+ * Theme icons in wp-admin (developer cheatsheet, etc.).
  */
-function fs_enqueue_child_theme_icons_admin(): void
+function fs_enqueue_theme_icons_admin(): void
 {
-	fs_enqueue_child_theme_icons_style(['main-admin-styles']);
+	fs_enqueue_theme_icons_style(['main-admin-styles']);
 }
-add_action('admin_enqueue_scripts', 'fs_enqueue_child_theme_icons_admin', 20);
+add_action('admin_enqueue_scripts', 'fs_enqueue_theme_icons_admin', 20);
+
+/**
+ * Theme icons for the block editor canvas / shared block assets.
+ */
+function fs_enqueue_theme_icons_block_assets(): void
+{
+	if (!is_admin()) {
+		return;
+	}
+	fs_enqueue_theme_icons_style(['main-admin-styles']);
+}
+add_action('enqueue_block_assets', 'fs_enqueue_theme_icons_block_assets', 5);
+
+/**
+ * Theme icons in the block editor chrome (icon picker).
+ */
+function fs_enqueue_theme_icons_editor(): void
+{
+	fs_enqueue_theme_icons_style(['main-admin-styles']);
+}
+add_action('enqueue_block_editor_assets', 'fs_enqueue_theme_icons_editor', 20);
 
 /**
  * Enqueue theme admin.css (same bundle as wp-admin).

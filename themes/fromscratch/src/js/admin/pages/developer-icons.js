@@ -47,16 +47,16 @@ const inlinePreviewClasses = (value, placement) => {
 };
 
 const iconSvgFile = (name) => {
-  if (name === 'theme-logo') {
-    return 'theme/logo.svg';
+  if (name.startsWith('theme-')) {
+    return `theme/${name.slice('theme-'.length)}.svg`;
   }
 
   return `${name}.svg`;
 };
 
 const iconSvgAssetPath = (name) => {
-  if (name === 'theme-logo') {
-    return '/icons-theme/logo.svg';
+  if (name.startsWith('theme-')) {
+    return `/icons-theme/${name.slice('theme-'.length)}.svg`;
   }
 
   return `/icons/${name}.svg`;

@@ -958,8 +958,8 @@ function fs_sanitize_icon_slug($value): string
  */
 function fs_icon_svg_asset_path(string $icon_name): string
 {
-	if ($icon_name === 'theme-logo') {
-		return '/icons-theme/logo.svg';
+	if (str_starts_with($icon_name, 'theme-')) {
+		return '/icons-theme/' . substr($icon_name, strlen('theme-')) . '.svg';
 	}
 
 	return '/icons/' . $icon_name . '.svg';

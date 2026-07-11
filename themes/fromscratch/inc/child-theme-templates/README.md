@@ -22,10 +22,10 @@ Drop SVGs into `assets/icons-theme/` (optional `name-fill.svg` for a filled vari
 Use as:
 
 ```html
-<div class="fs-icon -icon-theme-logo"></div>
+<div class="fs-icon -icon-theme-logo-child"></div>
 ```
 
-They also appear under **Theme** in the icon picker. An example `logo.svg` is included.
+They also appear under **Theme** in the icon picker. An example `logo-child.svg` is included.
 
 ## Config / templates
 
