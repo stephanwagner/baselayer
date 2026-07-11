@@ -1,3 +1,6 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
 .fs-limit-width {
   margin-bottom: 0;
 }

@@ -1,4 +1,5 @@
 @use '../variables' as *;
+@use '../mixins' as *;
 
 .article-list__wrapper {
   scroll-margin-top: var(--fs-header-height-scrolled, #{$header-height-scrolled});

@@ -1,4 +1,5 @@
 @use '../variables' as *;
+@use '../mixins' as *;
 
 // Google Translate skips nodes with class "notranslate" or attribute translate="no"
 

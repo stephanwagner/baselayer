@@ -1,0 +1,30 @@
+@use 'sass:list';
+
+// Transition helpers
+
+@function transition($properties...) {
+    $out: ();
+    @each $p in $properties {
+      $out: list.append($out, #{$p} var(--fs-transition-speed), comma);
+    }
+    @return $out;
+  }
+  
+  @function transition-slow($properties...) {
+    $out: ();
+    @each $p in $properties {
+      $out: list.append($out, #{$p} var(--fs-transition-speed-slow), comma);
+    }
+    @return $out;
+  }
+  
+  // Line clamp helper
+  
+  @mixin line-clamp($lines) {
+    display: -webkit-box;
+    line-clamp: $lines;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  

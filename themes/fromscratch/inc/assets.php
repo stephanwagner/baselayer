@@ -53,7 +53,7 @@ function fs_asset_path(string $path): string
  * Assets live under assets/ (css, js, img). Path is relative to theme root; e.g. '/img/logo.png' → assets/img/logo.png.
  * Prefers the active child theme file when present.
  *
- * @param string $path Path relative to theme root, e.g. '/img/logo.png' or '/css/main.css'.
+ * @param string $path Path relative to theme root, e.g. '/img/logo.png' or '/css/fromscratch.css'.
  * @return string Escaped URL safe for HTML output.
  */
 function fs_asset_url(string $path): string
@@ -144,9 +144,9 @@ function fs_img($image, $size = 'medium', array $args = []): string
 }
 
 /**
- * Get the hash for assets (file modification time). Path is under assets/ (e.g. /assets/css/main.css or /css/main.css).
+ * Get the hash for assets (file modification time). Path is under assets/ (e.g. /assets/css/fromscratch.css or /css/fromscratch.css).
  *
- * @param string $file Path relative to theme root, e.g. '/assets/css/main.css'.
+ * @param string $file Path relative to theme root, e.g. '/assets/css/fromscratch.css'.
  * @return string Hash/version string for enqueue versioning.
  */
 function fs_asset_hash(string $file): string
@@ -167,7 +167,7 @@ function fs_asset_hash(string $file): string
 }
 
 /**
- * Enqueue front-end stylesheets (main.css).
+ * Enqueue front-end stylesheets (fromscratch.css).
  *
  * @return void
  */
@@ -175,10 +175,10 @@ function fs_styles(): void
 {
 	$min = fs_is_debug() ? '' : '.min';
 
-	$file = '/assets/css/main' . $min . '.css';
+	$file = '/assets/css/fromscratch' . $min . '.css';
 
 	wp_enqueue_style(
-		'main-styles',
+		'fromscratch-styles',
 		get_template_directory_uri() . $file,
 		[],
 		fs_asset_hash($file),
@@ -207,7 +207,7 @@ function fs_enqueue_child_theme_assets(): void
 		wp_enqueue_style(
 			'child-main-styles',
 			$base_uri . $css_file,
-			['main-styles'],
+			['fromscratch-styles'],
 			(string) filemtime($base . $css_file)
 		);
 	}
@@ -220,7 +220,7 @@ function fs_enqueue_child_theme_assets(): void
 		wp_enqueue_script(
 			'child-main-scripts',
 			$base_uri . $js_file,
-			['main-scripts'],
+			['fromscratch-scripts'],
 			(string) filemtime($base . $js_file),
 			true
 		);
@@ -312,7 +312,7 @@ add_action('wp_enqueue_scripts', 'fs_admin_bar_styles', 20);
 add_action('admin_enqueue_scripts', 'fs_admin_bar_styles', 20);
 
 /**
- * Enqueue front-end scripts (main.js).
+ * Enqueue front-end scripts (fromscratch.js).
  *
  * @return void
  */
@@ -320,10 +320,10 @@ function fs_scripts(): void
 {
 	$min = fs_is_debug() ? '' : '.min';
 
-	$file = '/assets/js/main' . $min . '.js';
+	$file = '/assets/js/fromscratch' . $min . '.js';
 
 	wp_enqueue_script(
-		'main-scripts',
+		'fromscratch-scripts',
 		get_template_directory_uri() . $file,
 		[],
 		fs_asset_hash($file),
@@ -338,7 +338,7 @@ function fs_scripts(): void
 				$lang_codes[] = (string) $lang['id'];
 			}
 		}
-		wp_localize_script('main-scripts', 'fsGoogleTranslate', [
+		wp_localize_script('fromscratch-scripts', 'fsGoogleTranslate', [
 			'pageLang' => function_exists('fs_get_default_language') ? fs_get_default_language() : '',
 			'languages' => $lang_codes,
 			'triggerLabel' => __('Select language, current: %s', 'fromscratch'),

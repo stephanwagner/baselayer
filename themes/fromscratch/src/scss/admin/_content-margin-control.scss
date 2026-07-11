@@ -1,3 +1,6 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
 .fs-content-margin {
   margin-bottom: 0;
 }

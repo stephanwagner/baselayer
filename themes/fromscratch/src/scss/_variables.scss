@@ -4,7 +4,6 @@
  * Sync variables with configs in config/theme-design.php
  */
 
-@use 'sass:list';
 @use 'sass:color';
 
 // Paths
@@ -13,10 +12,8 @@ $theme-path: '/wp-content/themes/fromscratch';
 // Colors
 $color-primary: #4080ff;
 $color-primary-dark: #{color.adjust($color-primary, $lightness: -8%)};
-$color-primary-light: #{color.adjust($color-primary, $lightness: 8%)};
 $color-secondary: #00aaff;
 $color-secondary-dark: #{color.adjust($color-secondary, $lightness: -8%)};
-$color-secondary-light: #{color.adjust($color-secondary, $lightness: 8%)};
 
 // Grayscale
 $color-white: #fff;
@@ -33,9 +30,6 @@ $color-gray-100: #f6f6f6;
 $color-error: #f33;
 $color-warning: #fc0;
 $color-success: #5d5;
-
-// Gradients
-$gradient-primary: linear-gradient(to right, $color-primary, $color-secondary);
 
 // Font families
 $primary-font-family: 'Nunito Sans', sans-serif;
@@ -111,10 +105,8 @@ $editor-content-width-padding: 24px;
   // Colors
   --fs-color-primary: #{$color-primary};
   --fs-color-primary-dark: #{$color-primary-dark};
-  --fs-color-primary-light: #{$color-primary-light};
   --fs-color-secondary: #{$color-secondary};
   --fs-color-secondary-dark: #{$color-secondary-dark};
-  --fs-color-secondary-light: #{$color-secondary-light};
 
   // Grayscale
   --fs-color-white: #{$color-white};
@@ -133,7 +125,7 @@ $editor-content-width-padding: 24px;
   --fs-color-success: #{$color-success};
 
   // Gradients
-  --fs-gradient-primary: #{$gradient-primary};
+  --fs-gradient-primary: linear-gradient(to right, var(--fs-color-primary), var(--fs-color-secondary));
 
   // Font sizes
   --fs-font-size-s: #{$font-size-s};
@@ -219,66 +211,4 @@ $editor-content-width-padding: 24px;
   --fs-border-radius-s: #{$border-radius-s};
   --fs-border-radius-m: #{$border-radius-m};
   --fs-border-radius-l: #{$border-radius-l};
-}
-
-// Colors
-$colors: (
-  // Primary colors
-  'primary' var(--fs-color-primary),
-  'secondary' var(--fs-color-secondary),
-  // Grayscale
-  'white' var(--fs-color-white),
-  'black' var(--fs-color-black),
-  'off-black' var(--fs-color-off-black),
-  'gray-100' var(--fs-color-gray-100),
-  'gray-200' var(--fs-color-gray-200),
-  'gray-300' var(--fs-color-gray-300),
-  'gray-400' var(--fs-color-gray-400),
-  'gray-500' var(--fs-color-gray-500),
-  'gray-600' var(--fs-color-gray-600),
-  // Status colors
-  'error' var(--fs-color-error),
-  'warning' var(--fs-color-warning),
-  'success' var(--fs-color-success)
-);
-
-// Gradients
-$gradients: (
-  'primary': var(--fs-gradient-primary),
-);
-
-// Font sizes
-$fontSizes: (
-  's' var(--fs-font-size-s) var(--fs-line-height-s),
-  'm' var(--fs-font-size-m) var(--fs-line-height-m),
-  'l' var(--fs-font-size-l) var(--fs-line-height-l),
-  'xl' var(--fs-font-size-xl) var(--fs-line-height-xl)
-);
-
-// Transition helpers
-
-@function transition($properties...) {
-  $out: ();
-  @each $p in $properties {
-    $out: list.append($out, #{$p} var(--fs-transition-speed), comma);
-  }
-  @return $out;
-}
-
-@function transition-slow($properties...) {
-  $out: ();
-  @each $p in $properties {
-    $out: list.append($out, #{$p} var(--fs-transition-speed-slow), comma);
-  }
-  @return $out;
-}
-
-// Line clamp helper
-
-@mixin line-clamp($lines) {
-  display: -webkit-box;
-  line-clamp: $lines;
-  -webkit-line-clamp: $lines;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
 }

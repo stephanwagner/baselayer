@@ -3,7 +3,7 @@
 defined('ABSPATH') || exit;
 
 /**
- * Front-end service worker: registration data for main.js + PHP route for the worker script.
+ * Front-end service worker: registration data for fromscratch.js + PHP route for the worker script.
  *
  * Worker implementation: src/js/service-worker/index.js (+ modules). Built: assets/js/service-worker(.min).js.
  * Offline shells: assets/html/offline.html (en) and offline-de.html (de); PHP injects them into the worker response
@@ -149,11 +149,11 @@ add_action('wp_enqueue_scripts', function (): void {
 	if (wp_installing()) {
 		return;
 	}
-	if (!wp_script_is('main-scripts', 'enqueued')) {
+	if (!wp_script_is('fromscratch-scripts', 'enqueued')) {
 		return;
 	}
 
-	wp_localize_script('main-scripts', 'fromscratchServiceWorker', [
+	wp_localize_script('fromscratch-scripts', 'fromscratchServiceWorker', [
 		'url' => fs_service_worker_script_url(),
 		'scope' => fs_service_worker_scope(),
 	]);

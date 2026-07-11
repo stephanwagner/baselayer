@@ -12,7 +12,7 @@ const sassBin = path.join(root, 'node_modules/.bin/sass');
 const chokidarBin = path.join(root, 'node_modules/.bin/chokidar');
 
 const entries = [
-  { src: `${themeDir}/src/scss/main.scss`, name: 'main' },
+  { src: `${themeDir}/src/scss/main.scss`, name: 'fromscratch' },
   { src: `${themeDir}/src/scss/admin.scss`, name: 'admin' },
   { src: `${themeDir}/src/scss/admin-bar.scss`, name: 'admin-bar' }
 ];

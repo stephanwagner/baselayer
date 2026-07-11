@@ -1,4 +1,39 @@
 @use '../variables' as *;
+@use '../mixins' as *;
+
+// Colors
+$colors: (
+  // Primary colors
+  'primary' var(--fs-color-primary),
+  'secondary' var(--fs-color-secondary),
+  // Grayscale
+  'white' var(--fs-color-white),
+  'black' var(--fs-color-black),
+  'off-black' var(--fs-color-off-black),
+  'gray-100' var(--fs-color-gray-100),
+  'gray-200' var(--fs-color-gray-200),
+  'gray-300' var(--fs-color-gray-300),
+  'gray-400' var(--fs-color-gray-400),
+  'gray-500' var(--fs-color-gray-500),
+  'gray-600' var(--fs-color-gray-600),
+  // Status colors
+  'error' var(--fs-color-error),
+  'warning' var(--fs-color-warning),
+  'success' var(--fs-color-success)
+);
+
+// Gradients
+$gradients: (
+  'primary': var(--fs-gradient-primary),
+);
+
+// Font sizes
+$fontSizes: (
+  's' var(--fs-font-size-s) var(--fs-line-height-s),
+  'm' var(--fs-font-size-m) var(--fs-line-height-m),
+  'l' var(--fs-font-size-l) var(--fs-line-height-l),
+  'xl' var(--fs-font-size-xl) var(--fs-line-height-xl)
+);
 
 @mixin wordpress {
   // Admin bar
