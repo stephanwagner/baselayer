@@ -536,11 +536,26 @@ msgstr "Bitte gib einen Titel und einen Slug für die Seite %s ein."
 msgid "This theme requires a one-time initialization to activate core functionality and ensure a clean development foundation."
 msgstr "Dieses Theme erfordert eine einmalige Initialisierung, um Kernfunktionen zu aktivieren und eine saubere Entwicklungsbasis sicherzustellen."
 
+msgid "Child theme"
+msgstr "Child Theme"
+
+msgid "Create child theme"
+msgstr "Child Theme erstellen"
+
+msgid "Recommended"
+msgstr "Empfohlen"
+
+msgid "Creates a project-specific child theme. FromScratch remains installed for updates, while your custom styles, scripts, and templates live in the child theme."
+msgstr "Erstellt ein projektspezifisches Child Theme. FromScratch bleibt für Updates installiert, während eigene Styles, Skripte und Templates im Child Theme liegen."
+
+msgid "Active child theme: %s. Parent FromScratch stays installed for updates."
+msgstr "Aktives Child Theme: %s. Das Parent-Theme FromScratch bleibt für Updates installiert."
+
 msgid "Theme name"
 msgstr "Theme Name"
 
-msgid "Theme folder"
-msgstr "Theme Ordner"
+msgid "Theme slug"
+msgstr "Theme Slug"
 
 msgid "Use only lowercase letters, numbers and hyphens."
 msgstr "Nur Kleinbuchstaben, Zahlen und Bindestriche verwenden."
@@ -554,8 +569,38 @@ msgstr "Theme der Webseite %s."
 msgid "Theme Author"
 msgstr "Theme Autor"
 
-msgid "Theme Author URI"
-msgstr "Theme Autor URI"
+msgid "Author URL"
+msgstr "Autor URL"
+
+msgid "Theme name is required."
+msgstr "Theme Name ist erforderlich."
+
+msgid "Theme slug is required."
+msgstr "Theme Slug ist erforderlich."
+
+msgid "Theme slug may only contain lowercase letters (a-z), numbers (0-9), and hyphens, and must start with a letter."
+msgstr "Theme Slug darf nur Kleinbuchstaben (a–z), Zahlen (0–9) und Bindestriche enthalten und muss mit einem Buchstaben beginnen."
+
+msgid "Invalid child theme slug."
+msgstr "Ungültiger Child Theme Slug."
+
+msgid "Child theme templates are missing from the parent theme."
+msgstr "Child Theme Vorlagen fehlen im Parent-Theme."
+
+msgid "A theme or folder with that name already exists. Choose a different theme slug."
+msgstr "Ein Theme oder Ordner mit diesem Namen existiert bereits. Bitte einen anderen Theme Slug wählen."
+
+msgid "Could not create the child theme folder."
+msgstr "Child Theme Ordner konnte nicht erstellt werden."
+
+msgid "Could not create child theme directories."
+msgstr "Child Theme Verzeichnisse konnten nicht erstellt werden."
+
+msgid "Could not read child theme template files."
+msgstr "Child Theme Vorlagendateien konnten nicht gelesen werden."
+
+msgid "Could not write child theme files."
+msgstr "Child Theme Dateien konnten nicht geschrieben werden."
 
 msgid "Media sizes"
 msgstr "Mediengrößen"

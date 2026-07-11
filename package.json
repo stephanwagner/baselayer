@@ -10,6 +10,7 @@
     "watch:js": "node scripts/build-js.mjs --watch",
     "watch:css": "node scripts/build-css.mjs --watch",
     "build": "npm run build:icons && npm run build:js && npm run build:css",
+    "build:child": "node scripts/build-child.mjs",
     "build:icons": "node scripts/build-icons.mjs",
     "build:js": "node scripts/build-js.mjs",
     "build:css": "node scripts/build-css.mjs",

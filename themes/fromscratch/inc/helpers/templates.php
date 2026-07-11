@@ -4,8 +4,9 @@ defined('ABSPATH') || exit;
 
 /**
  * Load a PHP template from the theme `templates/` directory with scoped variables.
+ * Child theme templates override the parent when present.
  *
- * @param string $template Relative path under `templates/`, e.g. `pagination.php` or `article-preview.php`.
+ * @param string $template Relative path under `templates/`, e.g. `pagination` or `article-preview`.
  * @param array<string, mixed> $data Variables extracted into the template scope (EXTR_SKIP).
  */
 function fs_render_template(string $template, array $data = []): void
@@ -16,22 +17,48 @@ function fs_render_template(string $template, array $data = []): void
 		return;
 	}
 
-	$base = trailingslashit(get_template_directory()) . 'templates/';
-	$path = $base . $template . '.php';
+	$relative = 'templates/' . $template . '.php';
+	$candidates = [];
 
-	if (!is_file($path) || !is_readable($path)) {
-		return;
+	if (is_child_theme()) {
+		$candidates[] = [
+			'path' => trailingslashit(get_stylesheet_directory()) . $relative,
+			'base' => trailingslashit(get_stylesheet_directory()) . 'templates/',
+		];
 	}
 
-	$real_base = realpath($base);
-	$real_file = realpath($path);
-	if ($real_base === false || $real_file === false) {
-		return;
+	$candidates[] = [
+		'path' => trailingslashit(get_template_directory()) . $relative,
+		'base' => trailingslashit(get_template_directory()) . 'templates/',
+	];
+
+	$path = null;
+
+	foreach ($candidates as $candidate) {
+		$file = $candidate['path'];
+		$base = $candidate['base'];
+
+		if (!is_file($file) || !is_readable($file)) {
+			continue;
+		}
+
+		$real_base = realpath($base);
+		$real_file = realpath($file);
+		if ($real_base === false || $real_file === false) {
+			continue;
+		}
+
+		$real_base = wp_normalize_path($real_base) . '/';
+		$real_file = wp_normalize_path($real_file);
+		if (!str_starts_with($real_file, $real_base)) {
+			continue;
+		}
+
+		$path = $file;
+		break;
 	}
 
-	$real_base = wp_normalize_path($real_base) . '/';
-	$real_file = wp_normalize_path($real_file);
-	if (!str_starts_with($real_file, $real_base)) {
+	if ($path === null) {
 		return;
 	}
 

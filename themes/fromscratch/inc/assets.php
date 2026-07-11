@@ -18,24 +18,63 @@ function fs_asset_version(): string
 }
 
 /**
+ * Normalize a theme asset path to live under assets/.
+ *
+ * @param string $path Path relative to theme root, e.g. '/img/logo.png' or 'assets/img/logo.png'.
+ */
+function fs_normalize_asset_path(string $path): string
+{
+	$path = ltrim($path, '/');
+	if ($path !== '' && strpos($path, 'assets/') !== 0) {
+		$path = 'assets/' . $path;
+	}
+	return $path;
+}
+
+/**
+ * Absolute filesystem path for a theme asset, preferring the child theme when the file exists there.
+ */
+function fs_asset_path(string $path): string
+{
+	$path = fs_normalize_asset_path($path);
+
+	if (is_child_theme()) {
+		$child = trailingslashit(get_stylesheet_directory()) . $path;
+		if (is_file($child)) {
+			return $child;
+		}
+	}
+
+	return trailingslashit(get_template_directory()) . $path;
+}
+
+/**
  * URL for a static theme asset with cache-busting version (Theme settings → Developer).
  * Assets live under assets/ (css, js, img). Path is relative to theme root; e.g. '/img/logo.png' → assets/img/logo.png.
+ * Prefers the active child theme file when present.
  *
  * @param string $path Path relative to theme root, e.g. '/img/logo.png' or '/css/main.css'.
  * @return string Escaped URL safe for HTML output.
  */
 function fs_asset_url(string $path): string
 {
-	$path = ltrim($path, '/');
-	if ($path !== '' && strpos($path, 'assets/') !== 0) {
-		$path = 'assets/' . $path;
+	$path = fs_normalize_asset_path($path);
+	$base_uri = get_template_directory_uri();
+
+	if (is_child_theme()) {
+		$child = trailingslashit(get_stylesheet_directory()) . $path;
+		if (is_file($child)) {
+			$base_uri = get_stylesheet_directory_uri();
+		}
 	}
-	$url = get_template_directory_uri() . '/' . $path . '?ver=' . fs_asset_version();
+
+	$url = $base_uri . '/' . $path . '?ver=' . fs_asset_version();
 	return esc_url($url);
 }
 
 /**
  * Read SVG code from theme assets (e.g. /img/logo.svg).
+ * Prefers the active child theme file when present.
  *
  * @param string $path Path relative to theme root or assets/, e.g. '/img/logo.svg'.
  * @param array<string,string> $attributes Optional attributes added to the root <svg> element.
@@ -43,11 +82,7 @@ function fs_asset_url(string $path): string
  */
 function fs_svg_code(string $path, array $attributes = []): string
 {
-	$path = ltrim($path, '/');
-	if ($path !== '' && strpos($path, 'assets/') !== 0) {
-		$path = 'assets/' . $path;
-	}
-	$full = get_template_directory() . '/' . $path;
+	$full = fs_asset_path($path);
 	if (!is_file($full)) {
 		return '';
 	}
@@ -150,6 +185,48 @@ function fs_styles(): void
 	);
 }
 add_action('wp_enqueue_scripts', 'fs_styles');
+
+/**
+ * Enqueue child theme front-end assets after parent (when built files exist).
+ */
+function fs_enqueue_child_theme_assets(): void
+{
+	if (!is_child_theme()) {
+		return;
+	}
+
+	$min = fs_is_debug() ? '' : '.min';
+	$base = trailingslashit(get_stylesheet_directory());
+	$base_uri = trailingslashit(get_stylesheet_directory_uri());
+
+	$css_rel = 'assets/css/main' . $min . '.css';
+	$css_fallback = 'assets/css/main.css';
+	$css_file = is_readable($base . $css_rel) ? $css_rel : (is_readable($base . $css_fallback) ? $css_fallback : '');
+
+	if ($css_file !== '') {
+		wp_enqueue_style(
+			'child-main-styles',
+			$base_uri . $css_file,
+			['main-styles'],
+			(string) filemtime($base . $css_file)
+		);
+	}
+
+	$js_rel = 'assets/js/main' . $min . '.js';
+	$js_fallback = 'assets/js/main.js';
+	$js_file = is_readable($base . $js_rel) ? $js_rel : (is_readable($base . $js_fallback) ? $js_fallback : '');
+
+	if ($js_file !== '') {
+		wp_enqueue_script(
+			'child-main-scripts',
+			$base_uri . $js_file,
+			['main-scripts'],
+			(string) filemtime($base . $js_file),
+			true
+		);
+	}
+}
+add_action('wp_enqueue_scripts', 'fs_enqueue_child_theme_assets', 20);
 
 /**
  * Enqueue theme admin.css (same bundle as wp-admin).

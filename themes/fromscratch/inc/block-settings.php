@@ -18,7 +18,9 @@ function fs_config_block_settings(?string $key = null)
 	static $config = null;
 
 	if ($config === null) {
-		$config = include get_template_directory() . '/config/block-settings.php';
+		$config = function_exists('fs_load_theme_config_file')
+			? fs_load_theme_config_file('config/block-settings.php')
+			: [];
 		if (!is_array($config)) {
 			$config = [];
 		}

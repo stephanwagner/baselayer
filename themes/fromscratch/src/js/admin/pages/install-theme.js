@@ -2,6 +2,7 @@
  * Developer section on the FromScratch install page:
  * - When only the new user has developer rights: force "Log in as this user" checked (readonly, value still sent).
  * - When only the current user has developer rights: uncheck "Log in as this user".
+ * - Sync theme name into the description on blur (FromScratch / previous name → new name).
  * Runs once on DOMContentLoaded.
  */
 
@@ -54,4 +55,62 @@ function initDeveloperInstaller() {
   syncLoginAfterSetup();
 }
 
-document.addEventListener('DOMContentLoaded', initDeveloperInstaller);
+/**
+ * Keep theme description in sync with theme name on blur.
+ * Replaces "FromScratch" or the previously synced name so typo fixes update too.
+ */
+function initThemeNameDescriptionSync() {
+  const form = document.querySelector('form[data-fs-install-form]');
+  if (!form) {
+    return;
+  }
+
+  const nameInput = form.querySelector('input[name="theme[name]"]');
+  const descriptionInput = form.querySelector('input[name="theme[description]"]');
+  if (!nameInput || !descriptionInput) {
+    return;
+  }
+
+  let syncedName = nameInput.value.trim();
+
+  function escapeRegExp(value) {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+
+  function replaceAll(haystack, needle, replacement) {
+    if (!needle) {
+      return haystack;
+    }
+    return haystack.replace(new RegExp(escapeRegExp(needle), 'g'), replacement);
+  }
+
+  nameInput.addEventListener('blur', () => {
+    const nextName = nameInput.value.trim();
+    if (!nextName) {
+      return;
+    }
+
+    let description = descriptionInput.value;
+    const before = description;
+
+    if (syncedName && syncedName !== nextName && description.includes(syncedName)) {
+      description = replaceAll(description, syncedName, nextName);
+    }
+
+    if (description.includes('FromScratch') && nextName !== 'FromScratch') {
+      description = replaceAll(description, 'FromScratch', nextName);
+    }
+
+    if (description !== before) {
+      descriptionInput.value = description;
+    }
+
+    syncedName = nextName;
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initDeveloperInstaller();
+  initThemeNameDescriptionSync();
+});
+

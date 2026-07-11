@@ -8,6 +8,76 @@ if (!defined('FS_THEME_CONTENT_OPTION_PREFIX')) {
 }
 
 /**
+ * Whether an array is a list (0..n keys) rather than an associative map.
+ */
+function fs_config_is_list(array $value): bool
+{
+	if ($value === []) {
+		return true;
+	}
+
+	return array_keys($value) === range(0, count($value) - 1);
+}
+
+/**
+ * Deep-merge config arrays; associative keys recurse, list values are replaced by the overlay.
+ *
+ * @param array<string|int, mixed> $base
+ * @param array<string|int, mixed> $overlay
+ * @return array<string|int, mixed>
+ */
+function fs_config_merge_deep(array $base, array $overlay): array
+{
+	foreach ($overlay as $key => $value) {
+		if (
+			is_array($value)
+			&& isset($base[$key])
+			&& is_array($base[$key])
+			&& !fs_config_is_list($base[$key])
+			&& !fs_config_is_list($value)
+		) {
+			$base[$key] = fs_config_merge_deep($base[$key], $value);
+			continue;
+		}
+
+		$base[$key] = $value;
+	}
+
+	return $base;
+}
+
+/**
+ * Load a PHP config file from the parent theme, then merge a same-path child override if present.
+ *
+ * @return array<string|int, mixed>
+ */
+function fs_load_theme_config_file(string $relative): array
+{
+	$relative = ltrim(str_replace('\\', '/', $relative), '/');
+	$parent_path = trailingslashit(get_template_directory()) . $relative;
+	$config = [];
+
+	if (is_readable($parent_path)) {
+		$loaded = include $parent_path;
+		if (is_array($loaded)) {
+			$config = $loaded;
+		}
+	}
+
+	if (is_child_theme()) {
+		$child_path = trailingslashit(get_stylesheet_directory()) . $relative;
+		if ($child_path !== $parent_path && is_readable($child_path)) {
+			$child = include $child_path;
+			if (is_array($child)) {
+				$config = fs_config_merge_deep($config, $child);
+			}
+		}
+	}
+
+	return $config;
+}
+
+/**
  * Get theme config: config/theme.php merged with config/theme-design.php.
  *
  * @param string|null $key Optional. Dot path, e.g. 'menus', 'colors'.
@@ -17,8 +87,8 @@ function fs_config(?string $key = null)
 {
 	static $config = null;
 	if ($config === null) {
-		$base = include get_template_directory() . '/config/theme.php';
-		$design = include get_template_directory() . '/config/theme-design.php';
+		$base = fs_load_theme_config_file('config/theme.php');
+		$design = fs_load_theme_config_file('config/theme-design.php');
 		$config = array_merge($base, $design);
 	}
 	return fs_config_resolve($config, $key);
@@ -34,13 +104,13 @@ function fs_config_settings(?string $key = null)
 {
 	static $config = null;
 	if ($config === null) {
-		$config = include get_template_directory() . '/config/theme-content.php';
+		$config = fs_load_theme_config_file('config/theme-content.php');
 	}
 	return fs_config_resolve($config, $key);
 }
 
 /**
- * Load content type definitions from config/content-types/*.php.
+ * Load content type definitions from config/content-types/*.php (parent, then child overrides).
  *
  * Each file returns `[ 'slug' => [ ... ] ]`. Slug must match the filename.
  *
@@ -54,24 +124,37 @@ function fs_get_content_types(): array
 	}
 
 	$types = [];
-	$dir = get_template_directory() . '/config/content-types';
-	$files = glob($dir . '/*.php') ?: [];
+	$dirs = [get_template_directory() . '/config/content-types'];
+	if (is_child_theme()) {
+		$dirs[] = get_stylesheet_directory() . '/config/content-types';
+	}
 
-	foreach ($files as $file) {
-		$loaded = require $file;
-		if (!is_array($loaded)) {
+	foreach ($dirs as $dir) {
+		if (!is_dir($dir)) {
 			continue;
 		}
 
-		$basename = basename($file, '.php');
-		if (isset($loaded[$basename]) && is_array($loaded[$basename])) {
-			$types[$basename] = $loaded[$basename];
-			continue;
-		}
+		$files = glob($dir . '/*.php') ?: [];
+		foreach ($files as $file) {
+			$loaded = require $file;
+			if (!is_array($loaded)) {
+				continue;
+			}
 
-		foreach ($loaded as $slug => $def) {
-			if (is_string($slug) && is_array($def)) {
-				$types[$slug] = $def;
+			$basename = basename($file, '.php');
+			if (isset($loaded[$basename]) && is_array($loaded[$basename])) {
+				$types[$basename] = isset($types[$basename]) && is_array($types[$basename])
+					? fs_config_merge_deep($types[$basename], $loaded[$basename])
+					: $loaded[$basename];
+				continue;
+			}
+
+			foreach ($loaded as $slug => $def) {
+				if (is_string($slug) && is_array($def)) {
+					$types[$slug] = isset($types[$slug]) && is_array($types[$slug])
+						? fs_config_merge_deep($types[$slug], $def)
+						: $def;
+				}
 			}
 		}
 	}

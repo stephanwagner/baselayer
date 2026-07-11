@@ -4,10 +4,7 @@ defined('ABSPATH') || exit;
 
 require_once __DIR__ . '/install-system.php';
 require_once __DIR__ . '/install-content.php';
-
-/** Written to style.css when Author / Author URI are left empty at install (matches shipped theme header). */
-const FS_INSTALL_DEFAULT_THEME_AUTHOR = 'Stephan Wagner';
-const FS_INSTALL_DEFAULT_THEME_AUTHOR_URI = 'https://bytesandstripes.com';
+require_once __DIR__ . '/install-child-theme.php';
 
 /**
  * Redirect to install page only when setup is not completed and user tries to access Theme settings, Tools, Users, or their subpages.
@@ -52,13 +49,13 @@ add_action('admin_init', function () {
 }, 5);
 
 /**
- * After switching to this theme, schedule a redirect to the installer.
+ * After switching to FromScratch (parent or child), schedule a redirect to the installer.
  */
 add_action('after_switch_theme', function () {
   if (fs_setup_completed()) {
     return;
   }
-  if (get_stylesheet() !== 'fromscratch') {
+  if (get_template() !== 'fromscratch') {
     return;
   }
   set_transient('fromscratch_redirect_to_installer', '1', 60);
@@ -152,7 +149,16 @@ function fs_render_installer(): void
     <?php if (fs_setup_completed()) { ?>
 
       <div class="notice notice-success">
-        <p><?= esc_html__('FromScratch is installed.', 'fromscratch') ?></p>
+        <p><strong><?= esc_html__('FromScratch is installed.', 'fromscratch') ?></strong></p>
+        <?php if (is_child_theme()) { ?>
+          <p><?= esc_html(
+            sprintf(
+              /* translators: %s: child theme slug */
+              __('Active child theme: %s. Parent FromScratch stays installed for updates.', 'fromscratch'),
+              get_stylesheet()
+            )
+          ) ?></p>
+        <?php } ?>
         <p><?= wp_kses(
               sprintf(
                 /* translators: %s: link to Theme settings page */
@@ -221,53 +227,72 @@ function fs_render_installer(): void
 
         <table class="form-table" role="presentation">
           <tr>
-            <th scope="row">
+            <th scope="row"><?= esc_html__('Child theme', 'fromscratch') ?></th>
+            <td>
               <label>
-                <?= esc_html__('Theme name', 'fromscratch') ?>
+                <input type="checkbox" name="install[create_child_theme]" value="1" <?= !empty($fs_install_val(['install', 'create_child_theme'], true)) ? ' checked' : '' ?> data-fs-checkbox-toggle="create-child-theme">
+                <?= esc_html__('Create child theme', 'fromscratch') ?>
+                <span class="fs-install-recommended" style="display:inline-block;margin-left:6px;padding:1px 7px;border-radius:3px;background:#2271b1;color:#fff;font-size:11px;font-weight:600;line-height:1.7;vertical-align:1px;"><?= esc_html__('Recommended', 'fromscratch') ?></span>
               </label>
-            </th>
-            <td>
-              <input type="text" name="theme[name]" value="<?= esc_attr($fs_install_val(['theme', 'name'], get_bloginfo('name'))) ?>" class="regular-text">
-            </td>
-          </tr>
-          <tr>
-            <th scope="row">
-              <label>
-                <?= esc_html__('Theme folder', 'fromscratch') ?>
-              </label>
-            </th>
-            <td>
-              <input type="text" name="theme[slug]" value="<?= esc_attr($fs_install_val(['theme', 'slug'], sanitize_title(get_bloginfo('name')))) ?>" class="regular-text" readonly>
-              <p class="description"><?= esc_html__('Use only lowercase letters, numbers and hyphens.', 'fromscratch') ?></p>
-            </td>
-          </tr>
-          <tr>
-            <th scope="row">
-              <label>
-                <?= esc_html__('Theme description', 'fromscratch') ?>
-              </label>
-            </th>
-            <td>
-              <input type="text" name="theme[description]" value="<?= esc_attr($fs_install_val(['theme', 'description'], sprintf(__('Theme of the webpage %s.', 'fromscratch'), get_bloginfo('name')))) ?>" class="regular-text">
-            </td>
-          </tr>
-          <tr>
-            <th scope="row">
-              <label for="theme_author"><?= esc_html__('Theme Author', 'fromscratch') ?></label>
-            </th>
-            <td>
-              <input type="text" name="theme[author]" id="theme_author" value="<?= esc_attr($fs_install_val(['theme', 'author'], FS_INSTALL_DEFAULT_THEME_AUTHOR)) ?>" class="regular-text">
-            </td>
-          </tr>
-          <tr>
-            <th scope="row">
-              <label for="theme_author_uri"><?= esc_html__('Theme Author URI', 'fromscratch') ?></label>
-            </th>
-            <td>
-              <input type="text" name="theme[author_uri]" id="theme_author_uri" value="<?= esc_attr($fs_install_val(['theme', 'author_uri'], FS_INSTALL_DEFAULT_THEME_AUTHOR_URI)) ?>" class="regular-text">
+              <p class="description"><?= esc_html__('Creates a project-specific child theme. FromScratch remains installed for updates, while your custom styles, scripts, and templates live in the child theme.', 'fromscratch') ?></p>
             </td>
           </tr>
         </table>
+
+        <div data-fs-checkbox-toggle-content="create-child-theme">
+          <table class="form-table" role="presentation">
+            <tr>
+              <th scope="row">
+                <label>
+                  <?= esc_html__('Theme name', 'fromscratch') ?>
+                </label>
+              </th>
+              <td>
+                <input type="text" name="theme[name]" value="<?= esc_attr($fs_install_val(['theme', 'name'], get_bloginfo('name'))) ?>" class="regular-text">
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">
+                <label>
+                  <?= esc_html__('Theme slug', 'fromscratch') ?>
+                </label>
+              </th>
+              <td>
+                <?php
+                $default_theme_slug = fs_install_sanitize_theme_slug(get_bloginfo('name'));
+                ?>
+                <input type="text" name="theme[slug]" value="<?= esc_attr($fs_install_val(['theme', 'slug'], $default_theme_slug)) ?>" class="regular-text">
+                <p class="description"><?= esc_html__('Use only lowercase letters, numbers and hyphens.', 'fromscratch') ?></p>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">
+                <label>
+                  <?= esc_html__('Theme description', 'fromscratch') ?>
+                </label>
+              </th>
+              <td>
+                <input type="text" name="theme[description]" value="<?= esc_attr($fs_install_val(['theme', 'description'], sprintf(__('Theme of the webpage %s.', 'fromscratch'), get_bloginfo('name')))) ?>" class="regular-text">
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">
+                <label for="theme_author"><?= esc_html__('Theme Author', 'fromscratch') ?></label>
+              </th>
+              <td>
+                <input type="text" name="theme[author]" id="theme_author" value="<?= esc_attr($fs_install_val(['theme', 'author'], '')) ?>" class="regular-text">
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">
+                <label for="theme_author_uri"><?= esc_html__('Author URL', 'fromscratch') ?></label>
+              </th>
+              <td>
+                <input type="text" name="theme[author_uri]" id="theme_author_uri" value="<?= esc_attr($fs_install_val(['theme', 'author_uri'], '')) ?>" class="regular-text">
+              </td>
+            </tr>
+          </table>
+        </div>
 
         <hr>
 
@@ -522,24 +547,26 @@ function fromscratch_validate_install(): array
     $errors[] = 'At least one user must have developer rights. Either check "Has developer rights" for the current user or add another user and check it there.';
   }
 
-  // Theme name: required
+  // Theme name / slug: required when creating a child theme
+  $create_child = !empty($_POST['install']['create_child_theme']);
   $theme_name = trim((string) ($_POST['theme']['name'] ?? ''));
-  if ($theme_name === '') {
-    $errors[] = 'Theme name is required.';
-  }
+  $theme_slug_normalized = fs_install_sanitize_theme_slug((string) ($_POST['theme']['slug'] ?? ''));
 
-  // Theme slug: only a-z, 0-9, hyphens; required
-  $theme_slug_raw = trim((string) ($_POST['theme']['slug'] ?? ''));
-  $theme_slug_normalized = strtolower($theme_slug_raw);
-  if ($theme_slug_normalized === '') {
-    $errors[] = 'Theme folder is required.';
-  } elseif (!preg_match('/^[a-z][a-z0-9-]*$/', $theme_slug_normalized)) {
-    $errors[] = 'Theme folder may only contain lowercase letters (a-z), numbers (0-9), and hyphens, and must start with a letter.';
-  } else {
-    $themes_dir = WP_CONTENT_DIR . '/themes';
-    $target_dir = $themes_dir . '/' . $theme_slug_normalized;
-    if ($theme_slug_normalized !== 'fromscratch' && is_dir($target_dir)) {
-      $errors[] = 'A theme or folder with that name already exists. Choose a different theme folder.';
+  if ($create_child) {
+    if ($theme_name === '') {
+      $errors[] = 'Theme name is required.';
+    }
+
+    if ($theme_slug_normalized === '') {
+      $errors[] = 'Theme slug is required.';
+    } elseif (!preg_match('/^[a-z][a-z0-9-]*$/', $theme_slug_normalized)) {
+      $errors[] = 'Theme slug may only contain lowercase letters (a-z), numbers (0-9), and hyphens, and must start with a letter.';
+    } else {
+      $themes_dir = WP_CONTENT_DIR . '/themes';
+      $target_dir = $themes_dir . '/' . $theme_slug_normalized;
+      if (is_dir($target_dir)) {
+        $errors[] = 'A theme or folder with that name already exists. Choose a different theme slug.';
+      }
     }
   }
 
@@ -608,6 +635,7 @@ function fromscratch_install_redirect_with_errors(array $errors): void
       'admin_email' => sanitize_text_field($_POST['site']['admin_email'] ?? ''),
     ],
     'install' => [
+      'create_child_theme' => !empty($_POST['install']['create_child_theme']),
       'media' => !empty($_POST['install']['media']),
       'permalinks' => !empty($_POST['install']['permalinks']),
       'htaccess' => !empty($_POST['install']['htaccess']),
@@ -752,32 +780,21 @@ function fromscratch_run_install(): void
   $theme_desc = sanitize_text_field($_POST['theme']['description'] ?? '');
   $theme_author = sanitize_text_field($_POST['theme']['author'] ?? '');
   $theme_author_uri = esc_url_raw($_POST['theme']['author_uri'] ?? '');
-  if ($theme_author === '') {
-    $theme_author = FS_INSTALL_DEFAULT_THEME_AUTHOR;
-  }
-  if ($theme_author_uri === '') {
-    $theme_author_uri = FS_INSTALL_DEFAULT_THEME_AUTHOR_URI;
-  }
+  $theme_slug = fs_install_sanitize_theme_slug((string) ($_POST['theme']['slug'] ?? ''));
 
   /**
-   * Theme infos (style.css header)
+   * Features: merge central defaults with existing.
    */
-  $style_css = '/*
-Theme Name: ' . $theme_name . '
-Author: ' . $theme_author . '
-Author URI: ' . $theme_author_uri . '
-Description: ' . $theme_desc . '
-Version: 1.0.0
-License: Private
-License URI: 
-Text Domain: fromscratch
-Domain Path: /languages
-Tags: 
-*/
-';
+  $defaults = function_exists('fs_theme_feature_defaults') ? fs_theme_feature_defaults() : [];
+  $features = get_option('fromscratch_features', []);
+  if (!is_array($features)) {
+    $features = [];
+  }
+  $features = array_merge($defaults, $features);
+  update_option('fromscratch_features', $features);
 
-  $style_file = get_stylesheet_directory() . '/style.css';
-  file_put_contents($style_file, $style_css);
+  $profile_picture_default = defined('FS_PROFILE_PICTURE_MODE_DEFAULT') ? FS_PROFILE_PICTURE_MODE_DEFAULT : 'upload';
+  update_option('fromscratch_profile_picture_mode', $profile_picture_default);
 
   /**
    * Media sizes (built-in only; set during install). Extra sizes are edited on Settings → Media.
@@ -849,48 +866,37 @@ Tags:
    */
   fs_install_seed_content();
 
-  /**
-   * Features: merge central defaults with existing.
-   */
-  $defaults = function_exists('fs_theme_feature_defaults') ? fs_theme_feature_defaults() : [];
-  $features = get_option('fromscratch_features', []);
-  if (!is_array($features)) {
-    $features = [];
-  }
-  $features = array_merge($defaults, $features);
-  update_option('fromscratch_features', $features);
-
-  $profile_picture_default = defined('FS_PROFILE_PICTURE_MODE_DEFAULT') ? FS_PROFILE_PICTURE_MODE_DEFAULT : 'upload';
-  update_option('fromscratch_profile_picture_mode', $profile_picture_default);
-
-  /**
-   * Rename theme
-   */
-  $themes_dir = WP_CONTENT_DIR . '/themes';
-
-  $old_slug = 'fromscratch';
-  $new_slug = sanitize_title($_POST['theme']['slug']);
-
-  $old_dir = $themes_dir . '/' . $old_slug;
-  $new_dir = $themes_dir . '/' . $new_slug;
-
-  // Rename at the VERY END (validated: slug is a-z0-9-, target dir does not exist or is current)
-  if (is_dir($old_dir) && $old_slug !== $new_slug && !is_dir($new_dir)) {
-    rename($old_dir, $new_dir);
-    switch_theme($new_slug);
-  }
-
-  /**
-   * Save install complete
-   */
   update_option('default_role', 'editor');
-  update_option('fromscratch_install_success', true);
 
   if ($current_id) {
     update_user_meta($current_id, 'admin_color', 'fromscratch');
   }
   if ($new_developer_user_id > 0) {
     update_user_meta($new_developer_user_id, 'admin_color', 'fromscratch');
+  }
+
+  /**
+   * Create child theme before marking setup complete (parent folder stays fromscratch).
+   */
+  $child_slug = null;
+  if (fs_install_should_create_child_theme()) {
+    $child_slug = fs_install_create_child_theme([
+      'name' => $theme_name,
+      'slug' => $theme_slug,
+      'description' => $theme_desc,
+      'author' => $theme_author,
+      'author_uri' => $theme_author_uri,
+    ]);
+
+    if (is_wp_error($child_slug)) {
+      fromscratch_install_redirect_with_errors([$child_slug->get_error_message()]);
+    }
+  }
+
+  update_option('fromscratch_install_success', true);
+
+  if (is_string($child_slug) && $child_slug !== '') {
+    switch_theme($child_slug);
   }
 
   /**
