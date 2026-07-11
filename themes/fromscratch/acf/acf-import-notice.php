@@ -259,7 +259,7 @@ function fs_acf_import_admin_notice(): void
 		<p>
 			<?= esc_html__('ACF Pro is active, but the theme’s block and website field groups are not imported yet. Import them now, or skip if you manage fields yourself.', 'fromscratch') ?>
 		</p>
-		<p>
+		<p style="margin-top: 12px;">
 			<a href="<?= esc_url($import_url) ?>" class="button button-primary"><?= esc_html__('Import field groups', 'fromscratch') ?></a>
 			<a href="<?= esc_url($skip_url) ?>" class="button"><?= esc_html__('Skip', 'fromscratch') ?></a>
 		</p>

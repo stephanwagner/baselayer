@@ -124,7 +124,7 @@ add_action('admin_notices', function () {
   echo '<div class="notice notice-warning">';
   echo '<p><strong>' . esc_html__('FromScratch isn\'t set up yet.', 'fromscratch') . '</strong></p>';
   echo '<p>' . esc_html__('A one-time initialization is required to configure core options and activate essential system features.', 'fromscratch') . '</p>';
-  echo '<p>';
+  echo '<p style="margin-top: 12px;">';
   echo '<a href="' . esc_url(admin_url('themes.php?page=fromscratch-install')) . '" class="button button-primary">' . esc_html__('Go to installer', 'fromscratch') . '</a>';
   echo '</p>';
   echo '</div>';
