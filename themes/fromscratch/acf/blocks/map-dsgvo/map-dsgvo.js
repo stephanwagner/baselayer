@@ -13,8 +13,8 @@ function initGoogleMapsConsentBlock() {
       'Wenn Sie Ihre Zustimmung erteilen, kann Google Maps auf dieser Website geladen werden. ' +
       'Dabei wird eine Verbindung zu Google hergestellt und es können personenbezogene Daten (z. B. Ihre IP-Adresse) an Google übertragen werden.';
     const hasNotAcceptedTextP2 =
-      'Weitere Informationen finden Sie in unserer Datenschutzerklärung' +
-      'sowie in der <a href="https://policies.google.com/privacy?hl=de" target="_blank">Datenschutzerklärung von Google.</a>';
+      'Weitere Informationen finden Sie in unserer Datenschutzerklärung ' +
+      'sowie in der <a href="https://policies.google.com/privacy?hl=de" target="_blank">Datenschutzerklärung von Google</a>.';
     const hasNotAcceptedText = '<p>' + hasNotAcceptedTextP1 + '</p><p>' + hasNotAcceptedTextP2 + '</p>';
 
     const hasAcceptedTextP1 = 'Sie können Ihre Zustimmung jederzeit widerrufen. Nach dem Widerruf wird Google Maps auf dieser Website nicht mehr geladen.';
