@@ -29,5 +29,5 @@ They also appear under **Theme** in the icon picker. An example `logo-child.svg`
 
 ## Config / templates
 
-- Optional overrides: `config/theme-design.php`, `config/theme.php`, …
+- Config stubs in `config/` (`theme.php`, `design.php`, `block-settings.php`, …) merge over the parent — see `config/README.md`
 - Optional templates: `templates/…` (same paths as the parent)

@@ -1,4 +1,11 @@
 /**
+ * Block options configuration.
+ *
+ * Editor sidebar controls for core and custom blocks (margins, padding, width, …).
+ * Bundled into the parent editor script at build time.
+ */
+
+/**
  * Linked top/bottom content margin control.
  *
  * @param {string} defaultClass Combined default class, e.g. `m` or ''.

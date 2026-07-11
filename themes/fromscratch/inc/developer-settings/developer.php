@@ -133,7 +133,7 @@ function fs_render_developer_cheatsheet(): void
 					<tr>
 						<td>
 							<strong><?= esc_html__('Config Variable', 'fromscratch') ?></strong><br>
-							<span class="description"><?= esc_html__('Reads values from config/theme.php and config/theme-design.php via optional dot-path keys.', 'fromscratch') ?></span>
+							<span class="description"><?= esc_html__('Reads values from config/theme.php and config/design.php via optional dot-path keys.', 'fromscratch') ?></span>
 						</td>
 						<td>
 							<code class="fs-code-text fs-code-small">PHP</code>
@@ -141,18 +141,6 @@ function fs_render_developer_cheatsheet(): void
 						<td>
 							<code class="fs-code-small"><?= esc_html("fs_config('headers.Cache-Control');") ?></code><br>
 							<code class="fs-code-small"><?= esc_html("fs_config_cpt('project');") ?></code>
-						</td>
-					</tr>
-					<tr>
-						<td>
-							<strong><?= esc_html__('Content Variable', 'fromscratch') ?></strong><br>
-							<span class="description"><?= esc_html__('Reads saved Theme Content option values with an optional fallback default.', 'fromscratch') ?></span>
-						</td>
-						<td>
-							<code class="fs-code-text fs-code-small">PHP</code>
-						</td>
-						<td>
-							<code class="fs-code-small"><?= esc_html("fs_content('hero_title', 'Default headline');") ?></code>
 						</td>
 					</tr>
 					<?php if (function_exists('fs_theme_feature_enabled') && fs_theme_feature_enabled('breadcrumbs')) : ?>

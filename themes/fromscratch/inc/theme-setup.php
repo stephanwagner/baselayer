@@ -187,7 +187,7 @@ function fs_excerpt_more(): string
 add_filter('excerpt_more', 'fs_excerpt_more');
 
 /**
- * Sync config/theme-design.php into theme.json (colors, typography, layout).
+ * Sync config/design.php into theme.json (colors, typography, layout).
  */
 add_filter('wp_theme_json_data_theme', function ($theme_json) {
 	$data = $theme_json->get_data();

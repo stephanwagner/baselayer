@@ -2,11 +2,6 @@
 
 defined('ABSPATH') || exit;
 
-/** Option name prefix for Content tab fields (Settings → Theme → Content). Format: {prefix}{section_id}_{variable_id}. */
-if (!defined('FS_THEME_CONTENT_OPTION_PREFIX')) {
-	define('FS_THEME_CONTENT_OPTION_PREFIX', 'theme_content_');
-}
-
 /**
  * Whether an array is a list (0..n keys) rather than an associative map.
  */
@@ -78,7 +73,7 @@ function fs_load_theme_config_file(string $relative): array
 }
 
 /**
- * Get theme config: config/theme.php merged with config/theme-design.php.
+ * Get theme config: config/theme.php merged with config/design.php.
  *
  * @param string|null $key Optional. Dot path, e.g. 'menus', 'colors'.
  * @return array|mixed Full config if $key is null, else value at $key.
@@ -88,23 +83,8 @@ function fs_config(?string $key = null)
 	static $config = null;
 	if ($config === null) {
 		$base = fs_load_theme_config_file('config/theme.php');
-		$design = fs_load_theme_config_file('config/theme-design.php');
+		$design = fs_load_theme_config_file('config/design.php');
 		$config = array_merge($base, $design);
-	}
-	return fs_config_resolve($config, $key);
-}
-
-/**
- * Get theme settings: Content (config/theme-content.php). Used for Settings → Theme → Content.
- *
- * @param string|null $key Optional. Dot path, e.g. 'content.tabs', 'languages'.
- * @return array|mixed Full config if $key is null, else value at $key.
- */
-function fs_config_settings(?string $key = null)
-{
-	static $config = null;
-	if ($config === null) {
-		$config = fs_load_theme_config_file('config/theme-content.php');
 	}
 	return fs_config_resolve($config, $key);
 }

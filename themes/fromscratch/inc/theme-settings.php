@@ -10,7 +10,6 @@ defined('ABSPATH') || exit;
 /** Tab definitions: slug => [ 'label' => string, 'developer_only' => bool ] */
 const FS_THEME_SETTINGS_TABS = [
 	'theme'     => ['label' => 'Theme', 'developer_only' => false],
-	'content'   => ['label' => 'Content', 'developer_only' => false],
 	'blocks'    => ['label' => 'Blocks', 'developer_only' => false],
 	'css'       => ['label' => 'CSS', 'developer_only' => false],
 	'redirects' => ['label' => 'Redirects', 'developer_only' => false],
@@ -24,7 +23,6 @@ const FS_THEME_SETTINGS_TAB_QUERY_VAR = 'fs_tab';
 /** Tab slug => User rights key (Developer → User rights). */
 const FS_THEME_SETTINGS_TAB_ACCESS = [
 	'theme'     => 'theme_settings_general',
-	'content'   => 'theme_settings_texts',
 	'blocks'    => 'theme_settings_blocks',
 	'css'       => 'theme_settings_css',
 	'redirects' => 'theme_settings_redirects',
@@ -43,7 +41,7 @@ function fs_theme_settings_request_tab_slug(): string
 }
 
 /**
- * URL to Theme settings with a given sub-tab (e.g. theme, content, css, redirects).
+ * URL to Theme settings with a given sub-tab (e.g. theme, css, redirects).
  */
 function fs_theme_settings_url_with_tab(string $slug): string
 {
@@ -302,27 +300,13 @@ add_action('admin_init', function () {
 	exit;
 }, 2);
 
-// AJAX: toggle "Show developer options" on Content tab (saved per user).
-add_action('wp_ajax_fromscratch_toggle_content_developer_options', function () {
-	if (!isset($_POST['nonce']) || !wp_verify_nonce($_POST['nonce'], 'fromscratch_toggle_content_developer_options')) {
-		wp_send_json_error(['message' => 'Invalid nonce']);
-	}
-	if (!current_user_can('manage_options') || !function_exists('fs_is_developer_user') || !fs_is_developer_user((int) get_current_user_id())) {
-		wp_send_json_error(['message' => 'Forbidden']);
-	}
-	$visible = isset($_POST['visible']) && $_POST['visible'] === '1';
-	update_user_meta(get_current_user_id(), 'fromscratch_show_content_developer_options', $visible ? '1' : '0');
-	wp_send_json_success(['visible' => $visible]);
-});
-
-// Ensure media modal is available on Theme sub-tab (client logo, OG image) and Content tab (image fields).
+// Ensure media modal is available on Theme sub-tab (client logo, OG image).
 add_action('admin_enqueue_scripts', function ($hook_suffix) {
 	if ($hook_suffix !== 'settings_page_fs-theme-settings') {
 		return;
 	}
 	$can_theme = current_user_can('manage_options') && (!function_exists('fs_admin_can_access') || fs_admin_can_access('theme_settings_general'));
-	$can_content_tab = current_user_can('manage_options') && (!function_exists('fs_admin_can_access') || fs_admin_can_access('theme_settings_texts'));
-	if (!$can_theme && !$can_content_tab) {
+	if (!$can_theme) {
 		return;
 	}
 	wp_enqueue_media();
@@ -395,7 +379,6 @@ add_action('load-settings_page_fs-theme-settings', function () {
 
 const FS_THEME_OPTION_GROUP_GENERAL = 'fs_theme_general';
 const FS_THEME_OPTION_GROUP_FEATURES = 'fs_theme_features';
-const FS_THEME_OPTION_GROUP_TEXTE = 'fs_theme_texte';
 const FS_THEME_OPTION_GROUP_CSS = 'fs_theme_css';
 const FS_THEME_OPTION_GROUP_SECURITY = 'fs_theme_security';
 const FS_THEME_OPTION_GROUP_REDIRECTS = 'fs_theme_redirects';
@@ -1310,235 +1293,6 @@ function theme_settings_page(): void
 				<?php wp_nonce_field('fromscratch_send_weekly_report_to_developer'); ?>
 				<input type="hidden" name="fromscratch_send_weekly_report_to_developer" value="1">
 			</form>
-		<?php elseif ($tab === 'content') : ?>
-			<form method="post" action="options.php" class="fs-page-settings-form" id="fs-content-form">
-				<?php
-				$content_tabs = fs_config_settings('content.tabs');
-				$content_tabs = is_array($content_tabs) ? $content_tabs : [];
-				$content_developer_options_visible = function_exists('fs_is_developer_user') && fs_is_developer_user((int) get_current_user_id()) && (string) get_user_meta(get_current_user_id(), 'fromscratch_show_content_developer_options', true) === '1';
-				$content_languages = function_exists('fs_get_content_languages') ? fs_get_content_languages() : [];
-				$content_default_lang = function_exists('fs_get_default_language') ? fs_get_default_language() : '';
-				if ($content_default_lang === '' && !empty($content_languages)) {
-					$content_default_lang = (string) ($content_languages[0]['id'] ?? '');
-				}
-				$show_lang_switcher = count($content_languages) >= 2
-					&& function_exists('fs_uses_content_languages')
-					&& fs_uses_content_languages();
-				?>
-				<h2><?= esc_html__('Global Content', 'fromscratch') ?></h2>
-				<p class="description">
-					<?= esc_html__('Define content that is used across the website.', 'fromscratch') ?>
-				</p>
-				<p class="description">
-					<?= esc_html__('Updating these values will automatically update them wherever they are used.', 'fromscratch') ?>
-				</p>
-
-				<hr>
-
-				<?php settings_fields(FS_THEME_OPTION_GROUP_TEXTE); ?>
-
-				<div class="fs-tabs" data-fs-tabs>
-					<nav class="fs-tabs-nav" data-fs-tabs-nav role="tablist">
-						<?php foreach ($content_tabs as $i => $ct) : ?>
-							<button type="button" class="button fs-tabs-btn fs-button-can-toggle <?= ($i === 0) ? 'active' : '' ?>" role="tab" aria-selected="<?= ($i === 0) ? 'true' : 'false' ?>" aria-controls="fs-content-panel-<?= esc_attr($ct['id']) ?>" data-fs-tabs-btn data-tab="<?= esc_attr($ct['id']) ?>"><?= esc_html_x($ct['title'] ?? $ct['id'], 'Content variables', 'fromscratch') ?></button>
-						<?php endforeach; ?>
-					</nav>
-					<div class="fs-tabs-panels" data-fs-tabs-panels>
-						<?php if ($show_lang_switcher) : ?>
-							<div class="fs-content-lang-switcher" data-fs-content-lang-switcher data-fs-content-lang-default="<?= esc_attr($content_default_lang) ?>">
-								<?php foreach ($content_languages as $lang) :
-									$lang_id = isset($lang['id']) ? (string) $lang['id'] : '';
-									$lang_label = function_exists('fs_content_language_label') ? fs_content_language_label($lang, 'native') : $lang_id;
-									$is_default = $lang_id === $content_default_lang;
-								?>
-									<button type="button" class="button fs-content-lang-btn fs-button-can-toggle <?= $is_default ? 'active' : '' ?>" data-fs-content-lang-btn data-fs-content-lang="<?= esc_attr($lang_id) ?>"><?= esc_html($lang_label) ?></button>
-								<?php endforeach; ?>
-							</div>
-						<?php endif; ?>
-						<?php foreach ($content_tabs as $i => $ct) : ?>
-							<div id="fs-content-panel-<?= esc_attr($ct['id']) ?>" class="fs-tabs-panel <?= $i === 0 ? 'fs-tabs-panel--active' : '' ?>" data-fs-tabs-panel role="tabpanel" data-tab="<?= esc_attr($ct['id']) ?>" <?= $i === 0 ? 'data-fs-tabs-panel-active="1"' : '' ?>>
-								<?php
-								if (!empty($ct['sections']) && is_array($ct['sections'])) {
-									foreach ($ct['sections'] as $index => $section) {
-										if ($index > 0) {
-											echo '<hr>';
-										}
-										do_settings_sections(FS_THEME_CONTENT_OPTION_PREFIX . $ct['id'] . '_' . $section['id']);
-									}
-								}
-								?>
-							</div>
-						<?php endforeach; ?>
-					</div>
-				</div>
-
-				<hr>
-
-				<div class="fs-submit-row" style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
-					<button type="submit" name="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
-
-					<?php if (function_exists('fs_is_developer_user') && fs_is_developer_user((int) get_current_user_id())) : ?>
-						<button type="button"
-							class="button"
-							id="fs-content-developer-options-toggle"
-							data-fs-content-developer-options-visible="<?= $content_developer_options_visible ? '1' : '0' ?>"
-							data-nonce="<?= esc_attr(wp_create_nonce('fromscratch_toggle_content_developer_options')) ?>">
-							<?= $content_developer_options_visible
-								? esc_html__('Hide developer options', 'fromscratch')
-								: esc_html__('Show developer options', 'fromscratch') ?>
-						</button>
-					<?php endif; ?>
-				</div>
-			</form>
-			<script>
-				(function() {
-					var btn = document.getElementById('fs-content-developer-options-toggle');
-					if (!btn) return;
-					btn.addEventListener('click', function() {
-						var visible = btn.getAttribute('data-fs-content-developer-options-visible') === '1';
-						var newVisible = !visible;
-						var formData = new FormData();
-						formData.append('action', 'fromscratch_toggle_content_developer_options');
-						formData.append('nonce', btn.getAttribute('data-nonce'));
-						formData.append('visible', newVisible ? '1' : '0');
-						fetch(typeof ajaxurl !== 'undefined' ? ajaxurl : '<?= esc_url(admin_url('admin-ajax.php')) ?>', {
-								method: 'POST',
-								body: formData,
-								credentials: 'same-origin'
-							})
-							.then(function(r) {
-								return r.json();
-							})
-							.then(function(data) {
-								if (data.success) {
-									btn.setAttribute('data-fs-content-developer-options-visible', newVisible ? '1' : '0');
-									btn.textContent = newVisible ? '<?= esc_js(__('Hide developer options', 'fromscratch')) ?>' : '<?= esc_js(__('Show developer options', 'fromscratch')) ?>';
-									document.querySelectorAll('[data-fs-content-developer-options-container]').forEach(function(el) {
-										el.classList.toggle('fs-content-developer-options-hidden', !newVisible);
-									});
-								}
-							});
-					});
-				})();
-			</script>
-			<script>
-				(function() {
-					function run() {
-						var form = document.getElementById('fs-content-form');
-						if (!form) return;
-						var globalSwitcher = document.querySelector('[data-fs-content-lang-switcher]');
-						var fieldGroups = form.querySelectorAll('[data-fs-content-field-group]');
-						if (!fieldGroups.length && !globalSwitcher) return;
-
-						var globalLang = '';
-						var rowOverrides = {};
-
-						function allLangContainers() {
-							return form.querySelectorAll('.fs-content-lang-container[data-fs-content-lang]');
-						}
-
-						function pickInitialLang(requested) {
-							var ids = {};
-							allLangContainers().forEach(function(c) {
-								var lid = c.getAttribute('data-fs-content-lang');
-								if (lid) ids[lid] = true;
-							});
-							if (requested && ids[requested]) return requested;
-							if (globalSwitcher) {
-								var btns = globalSwitcher.querySelectorAll('[data-fs-content-lang-btn]');
-								for (var j = 0; j < btns.length; j++) {
-									var bid = btns[j].getAttribute('data-fs-content-lang');
-									if (bid && ids[bid]) return bid;
-								}
-							}
-							var first = form.querySelector('.fs-content-lang-container[data-fs-content-lang]');
-							return first ? (first.getAttribute('data-fs-content-lang') || '') : '';
-						}
-
-						function effectiveLangForGroup(groupId) {
-							return rowOverrides[groupId] || globalLang;
-						}
-
-						function applyVisibility() {
-							fieldGroups.forEach(function(groupEl) {
-								var groupId = groupEl.getAttribute('data-fs-content-field-group') || '';
-								var lang = effectiveLangForGroup(groupId);
-								groupEl.querySelectorAll('.fs-content-lang-container[data-fs-content-lang]').forEach(function(container) {
-									var containerLang = container.getAttribute('data-fs-content-lang');
-									container.style.display = containerLang === lang ? '' : 'none';
-								});
-								var tr = groupEl.closest('tr');
-								if (tr) {
-									var rsw = tr.querySelector('[data-fs-content-field-lang-switcher]');
-									if (rsw) {
-										rsw.querySelectorAll('[data-fs-content-field-lang-btn]').forEach(function(b) {
-											b.classList.toggle('active', b.getAttribute('data-fs-content-lang') === lang);
-										});
-									}
-								}
-							});
-							if (!fieldGroups.length && globalSwitcher) {
-								var lid = globalLang;
-								allLangContainers().forEach(function(container) {
-									var containerLang = container.getAttribute('data-fs-content-lang');
-									var show = containerLang === lid;
-									var tr = container.closest('tr');
-									if (tr) tr.style.display = show ? '' : 'none';
-									else container.style.display = show ? '' : 'none';
-								});
-							}
-						}
-
-						function setGlobalLang(langId) {
-							rowOverrides = {};
-							globalLang = langId;
-							if (globalSwitcher) {
-								globalSwitcher.querySelectorAll('[data-fs-content-lang-btn]').forEach(function(b) {
-									b.classList.toggle('active', b.getAttribute('data-fs-content-lang') === langId);
-								});
-							}
-							applyVisibility();
-						}
-
-						function setRowOverride(groupId, langId) {
-							rowOverrides[groupId] = langId;
-							applyVisibility();
-						}
-
-						var requestedDefault = globalSwitcher ? (globalSwitcher.getAttribute('data-fs-content-lang-default') || '') : '';
-						globalLang = pickInitialLang(requestedDefault);
-						if (globalSwitcher) {
-							globalSwitcher.querySelectorAll('[data-fs-content-lang-btn]').forEach(function(b) {
-								b.classList.toggle('active', b.getAttribute('data-fs-content-lang') === globalLang);
-							});
-						}
-						applyVisibility();
-
-						document.addEventListener('click', function onContentLangClick(e) {
-							var gBtn = e.target.closest('[data-fs-content-lang-switcher] [data-fs-content-lang-btn]');
-							if (gBtn && globalSwitcher && globalSwitcher.contains(gBtn)) {
-								e.preventDefault();
-								setGlobalLang(gBtn.getAttribute('data-fs-content-lang') || '');
-								return;
-							}
-							var rBtn = e.target.closest('[data-fs-content-field-lang-btn]');
-							if (!rBtn || !form.contains(rBtn)) return;
-							var rowSw = rBtn.closest('[data-fs-content-field-lang-switcher]');
-							if (!rowSw) return;
-							e.preventDefault();
-							var tr = rowSw.closest('tr');
-							var groupEl = tr && tr.querySelector('[data-fs-content-field-group]');
-							if (!groupEl) return;
-							setRowOverride(groupEl.getAttribute('data-fs-content-field-group') || '', rBtn.getAttribute('data-fs-content-lang') || '');
-						}, true);
-					}
-					if (document.readyState === 'loading') {
-						document.addEventListener('DOMContentLoaded', run);
-					} else {
-						run();
-					}
-				})();
-			</script>
 		<?php elseif ($tab === 'blocks') : ?>
 			<?php fs_render_theme_settings_blocks_tab(); ?>
 		<?php elseif ($tab === 'redirects') : ?>
@@ -1764,260 +1518,6 @@ function theme_settings_page(): void
 <?php
 }
 
-/**
- * Base content option id (without language suffix) for display and fs_content_option snippet.
- * When variableId is language-specific (e.g. fs_content_general_company_name_en), returns the base id; otherwise returns variableId.
- */
-function fs_content_base_option_id(string $variableId): string
-{
-	if (!function_exists('fs_get_content_languages')) {
-		return $variableId;
-	}
-	$languages = fs_get_content_languages();
-	foreach ($languages as $lang) {
-		$lid = isset($lang['id']) ? (string) $lang['id'] : '';
-		if ($lid === '') {
-			continue;
-		}
-		$suffix = '_' . $lid;
-		if (str_ends_with($variableId, $suffix)) {
-			return substr($variableId, 0, -strlen($suffix));
-		}
-	}
-	return $variableId;
-}
-
-/**
- * Output option name row (for developers only): copy option name, copy snippet (fs_content or get_option), monospace option id.
- * Shows the actual option key for this row (including _lang suffix when applicable) so it matches the field above.
- * The snippet still uses the base id with fs_content() for correct theme API usage.
- */
-function fs_content_field_option_name_row(string $variableId, array $variable = []): void
-{
-	if (!function_exists('fs_is_developer_user') || !fs_is_developer_user((int) get_current_user_id())) {
-		return;
-	}
-	$show = (string) get_user_meta(get_current_user_id(), 'fromscratch_show_content_developer_options', true) === '1';
-	$base_id = fs_content_base_option_id($variableId);
-	$type = $variable['type'] ?? 'textfield';
-	$default = ($type === 'multiselect') ? '[]' : (($type === 'image') ? '0' : "''");
-	$snippet = "fs_content('" . $base_id . "', " . $default . ")";
-	$display_id = $variableId;
-	$id_attr = 'fs-opt-' . preg_replace('/[^a-zA-Z0-9_-]/', '-', $variableId);
-	$id_snippet_attr = 'fs-opt-snippet-' . preg_replace('/[^a-zA-Z0-9_-]/', '-', $variableId);
-	$hidden_class = $show ? '' : ' fs-content-developer-options-hidden';
-?>
-	<div class="fs-content-developer-options-container<?= esc_attr($hidden_class) ?>" data-fs-content-developer-options-container>
-		<div class="fs-content-developer-options">
-			<button type="button" class="button fs-content-developer-options-button" data-fs-copy-from-source="<?= esc_attr($id_attr) ?>" title="<?= esc_attr__('Copy option name', 'fromscratch') ?>">
-				<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
-					<path d="M360-240q-33 0-56.5-23.5T280-320v-480q0-33 23.5-56.5T360-880h360q33 0 56.5 23.5T800-800v480q0 33-23.5 56.5T720-240H360ZM200-80q-33 0-56.5-23.5T120-160v-520q0-17 11.5-28.5T160-720q17 0 28.5 11.5T200-680v520h400q17 0 28.5 11.5T640-120q0 17-11.5 28.5T600-80H200Z" />
-				</svg>
-			</button>
-			<button type="button" class="button fs-content-developer-options-button" data-fs-copy-from-source="<?= esc_attr($id_snippet_attr) ?>" title="<?= esc_attr__('Copy snippet', 'fromscratch') ?>">
-				<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
-					<path d="m353-480 59-59q12-12 12-28t-12-28q-12-12-28.5-12T355-595l-87 87q-6 6-8.5 13t-2.5 15q0 8 2.5 15t8.5 13l87 87q12 12 28.5 12t28.5-12q12-12 12-28t-12-28l-59-59Zm254 0-59 59q-12 12-12 28t12 28q12 12 28.5 12t28.5-12l87-87q6-6 8.5-13t2.5-15q0-8-2.5-15t-8.5-13l-87-87q-6-6-13.5-9t-15-3q-7.5 0-15 3t-13.5 9q-12 12-12 28t12 28l59 59ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Z" />
-				</svg>
-			</button>
-			<code id="<?= esc_attr($id_attr) ?>" class="fs-code-small fs-content-developer-options-code"><?= esc_html($display_id) ?></code>
-			<span id="<?= esc_attr($id_snippet_attr) ?>" style="display: none;"><?= esc_html($snippet) ?></span>
-		</div>
-	</div>
-<?php
-}
-
-function display_custom_info_field($variable, $variableId, $languageId = null): void
-{
-	if ($languageId) {
-		echo '<div class="fs-content-lang-container -lang-' . esc_attr($languageId) . '" data-fs-content-lang="' . esc_attr($languageId) . '">';
-	}
-	$value = get_option($variableId, '');
-	$type = $variable['type'] ?? 'textfield';
-	echo '<div class="fs-content-field-wrap">';
-	switch ($type) {
-		case 'textfield':
-			$tw = isset($variable['width']) ? (int) $variable['width'] : 0;
-			$tw_style = $tw > 0 ? 'width: 100%; max-width: ' . $tw . 'px' : 'width: 100%';
-			echo '<input class="settings-page-textfield" type="text" name="' . esc_attr($variableId) . '" value="' . esc_attr($value) . '" style="' . $tw_style . '"' . (isset($variable['placeholder']) ? ' placeholder="' . esc_attr($variable['placeholder']) . '"' : '') . '>';
-			break;
-		case 'textarea':
-			$taw = isset($variable['width']) ? (int) $variable['width'] : 0;
-			$taw_style = $taw > 0 ? 'width: 100%; max-width: ' . $taw . 'px;' : 'width: 100%;';
-			$taw_style .= ' display: block;';
-			$textarea_placeholder = isset($variable['placeholder']) ? ' placeholder="' . esc_attr($variable['placeholder']) . '"' : '';
-			echo '<textarea class="settings-page-textfield" name="' . esc_attr($variableId) . '" rows="' . (int) ($variable['rows'] ?? 4) . '" style="' . $taw_style . '"' . $textarea_placeholder . '>' . esc_textarea($value) . '</textarea>';
-			break;
-		case 'select':
-			$options = $variable['options'] ?? [];
-			$sw = isset($variable['width']) ? (int) $variable['width'] : 0;
-			$sw_style = $sw > 0 ? 'width: 100%; max-width: ' . $sw . 'px' : 'min-width: 200px;';
-			echo '<select name="' . esc_attr($variableId) . '" class="settings-page-select" style="' . $sw_style . '">';
-			if (!empty($variable['placeholder'])) {
-				echo '<option value="">' . esc_html($variable['placeholder']) . '</option>';
-			}
-			foreach ($options as $opt_value => $opt_label) {
-				if (is_int($opt_value) && is_array($opt_label)) {
-					$opt_value = $opt_label['value'] ?? '';
-					$opt_label = $opt_label['label'] ?? $opt_value;
-				}
-				echo '<option value="' . esc_attr($opt_value) . '"' . selected($value, (string) $opt_value, false) . '>' . esc_html($opt_label) . '</option>';
-			}
-			echo '</select>';
-			break;
-		case 'toggle':
-			$checked = ($value === '1' || $value === 'on' || $value === true);
-			echo '<label class="fs-content-toggle-wrap">';
-			echo '<input type="hidden" name="' . esc_attr($variableId) . '" value="0">';
-			echo '<input type="checkbox" name="' . esc_attr($variableId) . '" value="1" class="settings-page-toggle"' . ($checked ? ' checked' : '') . '>';
-			echo '<span class="fs-content-toggle-label">' . esc_html(!empty($variable['label']) ? $variable['label'] : __('On', 'fromscratch')) . '</span>';
-			echo '</label>';
-			break;
-		case 'multiselect':
-			$options = $variable['options'] ?? [];
-			$selected = is_array($value) ? $value : (array) json_decode((string) $value, true);
-			$selected = array_map('strval', $selected);
-			echo '<div class="fs-content-multiselect">';
-			echo '<input type="hidden" name="' . esc_attr($variableId) . '[]" value="">';
-			foreach ($options as $opt_value => $opt_label) {
-				if (is_int($opt_value) && is_array($opt_label)) {
-					$opt_value = $opt_label['value'] ?? '';
-					$opt_label = $opt_label['label'] ?? $opt_value;
-				}
-				$opt_value = (string) $opt_value;
-				$checked = in_array($opt_value, $selected, true);
-				$cb_id = esc_attr($variableId . '_' . preg_replace('/[^a-z0-9_-]/i', '_', $opt_value));
-				echo '<label>';
-				echo '<input type="checkbox" name="' . esc_attr($variableId) . '[]" id="' . $cb_id . '" value="' . esc_attr($opt_value) . '"' . ($checked ? ' checked' : '') . '>';
-				echo '<span>' . esc_html($opt_label) . '</span>';
-				echo '</label>';
-			}
-			echo '</div>';
-			break;
-		case 'image':
-			$img_id = (int) $value;
-			$img_url = $img_id > 0 ? wp_get_attachment_image_url($img_id, 'medium') : '';
-			echo '<div class="fs-image-picker" data-fs-image-picker>';
-			echo '<input type="hidden" name="' . esc_attr($variableId) . '" id="' . esc_attr($variableId) . '" value="' . esc_attr($img_id > 0 ? $img_id : '0') . '" data-fs-image-picker-input>';
-			echo '<div class="fs-image-picker-preview" data-fs-image-picker-preview>';
-			if ($img_url) {
-				echo '<img src="' . esc_url($img_url) . '" alt="">';
-			}
-			echo '</div>';
-			echo '<p><button type="button" class="button" data-fs-image-picker-select>' . esc_html__('Select image', 'fromscratch') . '</button> ';
-			echo '<button type="button" class="button" data-fs-image-picker-remove' . ($img_id <= 0 ? ' style="display:none;"' : '') . '>' . esc_html__('Remove', 'fromscratch') . '</button></p>';
-			echo '</div>';
-			break;
-		default:
-			$defw = isset($variable['width']) ? (int) $variable['width'] : 0;
-			$defw_style = $defw > 0 ? 'width: ' . $defw . 'px' : 'width: 100%';
-			$def_placeholder = isset($variable['placeholder']) ? ' placeholder="' . esc_attr($variable['placeholder']) . '"' : '';
-			echo '<input class="settings-page-textfield" type="text" name="' . esc_attr($variableId) . '" value="' . esc_attr($value) . '" style="' . $defw_style . '"' . $def_placeholder . '>';
-			break;
-	}
-	echo '</div>';
-	if (!empty($variable['description'])) {
-		echo '<p class="description">' . esc_html($variable['description']) . '</p>';
-	}
-	fs_content_field_option_name_row($variableId, $variable);
-	if ($languageId) {
-		echo '</div>';
-	}
-}
-
-function display_custom_info_fields(): void
-{
-	$tabs = fs_config_settings('content.tabs');
-	if (!is_array($tabs)) {
-		return;
-	}
-	foreach ($tabs as $tab) {
-		if (empty($tab['sections']) || !is_array($tab['sections'])) {
-			continue;
-		}
-		foreach ($tab['sections'] as $section) {
-			$section_title = $section['title'] ?? $section['id'] ?? '';
-			$content_page = FS_THEME_CONTENT_OPTION_PREFIX . $tab['id'] . '_' . $section['id'];
-			add_settings_section('section', _x($section_title, 'Content variables', 'fromscratch'), null, $content_page);
-			foreach ($section['variables'] as $variable) {
-				$variableId = FS_THEME_CONTENT_OPTION_PREFIX . $tab['id'] . '_' . $section['id'] . '_' . $variable['id'];
-				$variable_title = $variable['title'] ?? $variable['id'] ?? '';
-				$variable_label = esc_html_x($variable_title, 'Content variables', 'fromscratch');
-				$is_multiselect = isset($variable['type']) && $variable['type'] === 'multiselect';
-				$register_args = [];
-				if ($is_multiselect && !empty($variable['options'])) {
-					$allowed = [];
-					foreach ($variable['options'] as $k => $v) {
-						$allowed[] = is_int($k) && is_array($v) ? (string) ($v['value'] ?? '') : (string) $k;
-					}
-					$allowed = array_filter($allowed);
-					$register_args['sanitize_callback'] = function ($input) use ($allowed) {
-						if (!is_array($input)) {
-							return [];
-						}
-						return array_values(array_intersect(array_map('strval', $input), $allowed));
-					};
-				}
-				if (!empty($variable['translate'])) {
-					$content_langs = fs_get_content_languages();
-					if (!empty($content_langs)) {
-						$field_id_bundle = $variableId . '__fs_i18n_row';
-						$title_markup = '<span class="fs-content-field-label">' . $variable_label . '</span>';
-						if (count($content_langs) >= 2) {
-							$title_markup .= '<div class="fs-content-field-lang-switcher" data-fs-content-field-lang-switcher role="group" aria-label="' . esc_attr__('Language for this field', 'fromscratch') . '">';
-							foreach ($content_langs as $language) {
-								$lid = isset($language['id']) ? (string) $language['id'] : '';
-								if ($lid === '') {
-									continue;
-								}
-								$short = strtoupper(explode('_', $lid, 2)[0]);
-								$title_markup .= '<button type="button" class="button fs-content-field-lang-btn fs-button-can-toggle button-small" data-fs-content-field-lang-btn data-fs-content-lang="' . esc_attr($lid) . '">' . esc_html($short) . '</button>';
-							}
-							$title_markup .= '</div>';
-						}
-						add_settings_field(
-							$field_id_bundle,
-							$title_markup,
-							static function () use ($variable, $variableId, $content_langs): void {
-								echo '<div class="fs-content-field-lang-fields" data-fs-content-field-group="' . esc_attr($variableId) . '">';
-								foreach ($content_langs as $language) {
-									$lid = isset($language['id']) ? (string) $language['id'] : '';
-									if ($lid === '') {
-										continue;
-									}
-									$variableIdLang = $variableId . '_' . $lid;
-									display_custom_info_field($variable, $variableIdLang, $lid);
-								}
-								echo '</div>';
-							},
-							$content_page,
-							'section',
-							['class' => '-is-translatable']
-						);
-						foreach ($content_langs as $language) {
-							$lid = isset($language['id']) ? (string) $language['id'] : '';
-							if ($lid === '') {
-								continue;
-							}
-							$variableIdLang = $variableId . '_' . $lid;
-							register_setting(FS_THEME_OPTION_GROUP_TEXTE, $variableIdLang, $register_args);
-						}
-					} else {
-						add_settings_field($variableId, $variable_label, function () use ($variable, $variableId) {
-							display_custom_info_field($variable, $variableId);
-						}, $content_page, 'section');
-						register_setting(FS_THEME_OPTION_GROUP_TEXTE, $variableId, $register_args);
-					}
-				} else {
-					add_settings_field($variableId, $variable_label, function () use ($variable, $variableId) {
-						display_custom_info_field($variable, $variableId);
-					}, $content_page, 'section');
-					register_setting(FS_THEME_OPTION_GROUP_TEXTE, $variableId, $register_args);
-				}
-			}
-		}
-	}
-}
-add_action('admin_init', 'display_custom_info_fields');
 
 /**
  * Whether the current user has access to at least one Theme settings tab (for menu visibility).

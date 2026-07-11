@@ -787,8 +787,8 @@ msgstr "Erzeugt ein WordPress-Image-Tag oder URL mit einem Platzhalter Fallback.
 msgid "Config Variable"
 msgstr "Config-Variable"
 
-msgid "Reads values from config/theme.php and config/theme-design.php via optional dot-path keys."
-msgstr "Liest Werte aus config/theme.php und config/theme-design.php über optionale Dot-Path-Keys."
+msgid "Reads values from config/theme.php and config/design.php via optional dot-path keys."
+msgstr "Liest Werte aus config/theme.php und config/design.php über optionale Dot-Path-Keys."
 
 msgid "Content Variable"
 msgstr "Inhalt-Variable"

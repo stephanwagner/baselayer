@@ -3,7 +3,10 @@
 defined('ABSPATH') || exit;
 
 /**
- * Block inserter settings (code-only).
+ * Block settings configuration.
+ *
+ * Inserter defaults for allowed, hidden and favorite blocks, plus hard-disallowed
+ * blocks and embed/group variations. Used by Settings → Theme → Blocks.
  *
  * hardDisallowed — blocks that cannot be enabled via Settings → Theme → Blocks.
  * Also applies to child blocks whose parent/ancestor is hard-disallowed (cascade).

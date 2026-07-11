@@ -1,8 +1,10 @@
 <?php
 
 /**
- * Theme config: menus, meta, colors, design, image sizes, security, headers.
- * Edit this file to customize the theme. Design overrides can also be set in Settings → Theme → Design.
+ * Theme configuration.
+ *
+ * Menus, meta, image sizes, comments, security, headers and related options.
+ * Design tokens live in config/design.php.
  */
 return [
 	/**

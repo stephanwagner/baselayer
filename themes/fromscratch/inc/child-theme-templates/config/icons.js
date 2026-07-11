@@ -1,9 +1,13 @@
 /**
- * Theme (project/customer) icons.
+ * Icons configuration.
  *
- * Drop SVGs into assets/icons/ — optionally with a filled variant using
- * the `-fill` suffix (e.g. `logo-child.svg` + `logo-child-fill.svg`). You may
- * add a display label and English search keywords per file below; both are
+ * Theme (project/customer) icons for the icon picker and `-icon-theme-*` classes.
+ *
+ * Parent defaults (parent theme icons):
+ *   fromscratch/config/icons.js
+ *
+ * Drop SVGs into `assets/icons/`.
+ * You may add a display label and English search keywords per file below; both are
  * optional and fall back to a humanized file name.
  *
  * Then run `npm run build` (or just `npm run build:icons`) to regenerate:

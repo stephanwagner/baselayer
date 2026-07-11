@@ -1,10 +1,24 @@
 <footer class="footer__wrapper">
 	<div class="footer__container container">
 		<div class="footer__text">
-			<b><?= fs_content('theme_content_general_company_name') ?></b><br>
-			<?= nl2br(fs_content('theme_content_general_company_address')) ?><br>
-			<a href="tel:<?= fs_content('theme_content_general_company_phone') ?>"><?= fs_content('theme_content_general_company_phone') ?></a><br>
-			<a href="mailto:<?= fs_content('theme_content_general_company_email') ?>"><?= fs_content('theme_content_general_company_email') ?></a>
+			<?php
+			$company_name = function_exists('get_field') ? (string) get_field('company_name', 'option') : '';
+			$company_address = function_exists('get_field') ? (string) get_field('company_address', 'option') : '';
+			$company_phone = function_exists('get_field') ? (string) get_field('company_phone', 'option') : '';
+			$company_email = function_exists('get_field') ? (string) get_field('company_email', 'option') : '';
+			?>
+			<?php if ($company_name !== '') : ?>
+				<b><?= esc_html($company_name) ?></b><br>
+			<?php endif; ?>
+			<?php if ($company_address !== '') : ?>
+				<?= nl2br(esc_html($company_address)) ?><br>
+			<?php endif; ?>
+			<?php if ($company_phone !== '') : ?>
+				<a href="tel:<?= esc_attr(preg_replace('/\s+/', '', $company_phone)) ?>"><?= esc_html($company_phone) ?></a><br>
+			<?php endif; ?>
+			<?php if ($company_email !== '') : ?>
+				<a href="mailto:<?= esc_attr($company_email) ?>"><?= esc_html($company_email) ?></a>
+			<?php endif; ?>
 		</div>
 		<div class="footer-menu__wrapper">
 			<?php fs_nav_menu([

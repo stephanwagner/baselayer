@@ -1,7 +1,10 @@
 <?php
 
 /**
- * Design tokens merged into theme config (fs_config()). Synced to theme.json via inc/theme-setup.php.
+ * Design configuration.
+ *
+ * Colors, typography, gradients and layout tokens.
+ * Synced to theme.json and available in the Theme → Design settings.
  */
 return [
 	// Colors

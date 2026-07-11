@@ -4,7 +4,7 @@ defined('ABSPATH') || exit;
 
 /**
  * SCSS read-only preview for Settings → Theme → CSS, and custom CSS from that tab on the front end.
- * Color/gradient/font-size/layout tokens live in config/theme-design.php (see theme-setup.php), not for PHP :root output.
+ * Color/gradient/font-size/layout tokens live in config/design.php (see theme-setup.php), not for PHP :root output.
  */
 
 /**
@@ -128,7 +128,7 @@ function fs_scss_line_comments_to_css_block(string $scss): string
 }
 
 /**
- * Block editor layout sizes for theme.json from config/theme-design.php.
+ * Block editor layout sizes for theme.json from config/design.php.
  *
  * @return array{contentSize: string, wideSize: string}
  */
@@ -191,7 +191,7 @@ function fs_theme_json_root_spacing(): array
 }
 
 /**
- * Block editor color picker settings for theme.json from config/theme-design.php.
+ * Block editor color picker settings for theme.json from config/design.php.
  *
  * @return array<string, bool>
  */
@@ -211,7 +211,7 @@ function fs_theme_json_color_settings(): array
 }
 
 /**
- * Block editor typography settings for theme.json from config/theme-design.php.
+ * Block editor typography settings for theme.json from config/design.php.
  *
  * @return array<string, bool>
  */

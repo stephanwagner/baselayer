@@ -1,5 +1,7 @@
 /**
- * Theme (project/customer) icons.
+ * Icons configuration.
+ *
+ * Theme (project/customer) icons for the icon picker and `-icon-theme-*` classes.
  *
  * Drop SVGs into assets/icons-theme/ — optionally with a filled variant using
  * the `-fill` suffix (e.g. `logo.svg` + `logo-fill.svg`). You may add a display
@@ -23,7 +25,10 @@ export const themeIcons = {
   prefix: 'theme',
 
   // Category shown (at the top) in the icon picker.
-  category: { slug: 'theme', label: 'Theme' },
+  category: { 
+    slug: 'theme',
+    label: 'Theme'
+  },
 
   // Optional per-file metadata, keyed by the base file name (without .svg / -fill).
   meta: {
