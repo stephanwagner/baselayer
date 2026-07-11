@@ -1158,8 +1158,8 @@
             },
             {
                 "key": "field_609fb82dcfbfb",
-                "label": "E-Mail Adresse",
-                "name": "theme_mail",
+                "label": "E-Mail-Adresse",
+                "name": "theme_email",
                 "aria-label": "",
                 "type": "text",
                 "instructions": "",
@@ -1172,9 +1172,384 @@
                 },
                 "default_value": "",
                 "maxlength": "",
+                "allow_in_bindings": 1,
                 "placeholder": "",
                 "prepend": "",
                 "append": ""
+            },
+            {
+                "key": "field_6a521af2243d9",
+                "label": "Suchmaschinen",
+                "name": "",
+                "aria-label": "",
+                "type": "tab",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "placement": "left",
+                "endpoint": 0,
+                "selected": 0
+            },
+            {
+                "key": "field_6a521b37243da",
+                "label": "",
+                "name": "",
+                "aria-label": "",
+                "type": "message",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "Hier kannst du strukturierte Daten für deine Website hinterlegen. Diese Informationen helfen Suchmaschinen, dein Unternehmen und deine Inhalte besser zu verstehen und können die Darstellung in den Suchergebnissen verbessern.",
+                "new_lines": "wpautop",
+                "esc_html": 0
+            },
+            {
+                "key": "field_6a521bb0eea4b",
+                "label": "Aktivieren",
+                "name": "has_schema",
+                "aria-label": "",
+                "type": "true_false",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "Schema.org verwenden",
+                "default_value": 0,
+                "allow_in_bindings": 0,
+                "ui": 0,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_6a521ec9720e6",
+                "label": "Schema-Daten",
+                "name": "schema",
+                "aria-label": "",
+                "type": "group",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_6a521bb0eea4b",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "layout": "block",
+                "sub_fields": [
+                    {
+                        "key": "field_6a521ef5e58a2",
+                        "label": "Typ",
+                        "name": "type",
+                        "aria-label": "",
+                        "type": "select",
+                        "instructions": "Wähle den Schema.org-Typ, der deine Website oder Organisation am besten beschreibt.",
+                        "required": 1,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "choices": {
+                            "LocalBusiness": "Lokales Unternehmen",
+                            "Organization": "Organisation",
+                            "Corporation": "Unternehmen",
+                            "ProfessionalService": "Dienstleister",
+                            "Store": "Geschäft",
+                            "Restaurant": "Restaurant",
+                            "EducationalOrganization": "Bildungseinrichtung",
+                            "NonprofitOrganization": "Gemeinnützige Organisation",
+                            "Person": "Person"
+                        },
+                        "default_value": "LocalBusiness",
+                        "return_format": "value",
+                        "multiple": 0,
+                        "allow_null": 0,
+                        "allow_in_bindings": 0,
+                        "ui": 0,
+                        "ajax": 0,
+                        "placeholder": "",
+                        "create_options": 0,
+                        "save_options": 0
+                    },
+                    {
+                        "key": "field_6a521f77e58a3",
+                        "label": "Organisationsname",
+                        "name": "organization_name",
+                        "aria-label": "",
+                        "type": "text",
+                        "instructions": "Der offizielle Name deiner Organisation oder deines Unternehmens.",
+                        "required": 1,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "maxlength": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": ""
+                    },
+                    {
+                        "key": "field_6a521f92e58a4",
+                        "label": "Beschreibung",
+                        "name": "description",
+                        "aria-label": "",
+                        "type": "textarea",
+                        "instructions": "Eine kurze Beschreibung deiner Organisation. Empfohlen sind 120–160 Zeichen.",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "maxlength": "",
+                        "allow_in_bindings": 0,
+                        "rows": "",
+                        "placeholder": "",
+                        "new_lines": ""
+                    },
+                    {
+                        "key": "field_6a521fb9e58a5",
+                        "label": "Logo",
+                        "name": "logo",
+                        "aria-label": "",
+                        "type": "image",
+                        "instructions": "Das Hauptlogo deiner Organisation. Idealerweise als SVG oder hochauflösendes PNG.",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "return_format": "array",
+                        "library": "all",
+                        "min_width": "",
+                        "min_height": "",
+                        "min_size": "",
+                        "max_width": "",
+                        "max_height": "",
+                        "max_size": "",
+                        "mime_types": "",
+                        "allow_in_bindings": 0,
+                        "preview_size": "thumbnail"
+                    },
+                    {
+                        "key": "field_6a522033e58a6",
+                        "label": "Telefonnummer",
+                        "name": "phone",
+                        "aria-label": "",
+                        "type": "text",
+                        "instructions": "Die zentrale Telefonnummer, möglichst im internationalen Format (z. B. +49 821 123456).",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "maxlength": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": ""
+                    },
+                    {
+                        "key": "field_6a522041e58a7",
+                        "label": "E-Mail-Adresse",
+                        "name": "email",
+                        "aria-label": "",
+                        "type": "text",
+                        "instructions": "Die zentrale Kontakt-E-Mail-Adresse.",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "maxlength": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": ""
+                    },
+                    {
+                        "key": "field_6a52209de58a8",
+                        "label": "Website",
+                        "name": "website",
+                        "aria-label": "",
+                        "type": "url",
+                        "instructions": "Die kanonische URL der Website. Leer lassen, um automatisch die Website-Adresse zu verwenden.",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": ""
+                    },
+                    {
+                        "key": "field_6a5220b0e58a9",
+                        "label": "Straße",
+                        "name": "street",
+                        "aria-label": "",
+                        "type": "text",
+                        "instructions": "Straßenname und Hausnummer.",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "maxlength": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": ""
+                    },
+                    {
+                        "key": "field_6a5220c3e58aa",
+                        "label": "Postleitzahl",
+                        "name": "zip",
+                        "aria-label": "",
+                        "type": "text",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "25",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "maxlength": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": ""
+                    },
+                    {
+                        "key": "field_6a5220d2e58ab",
+                        "label": "Ort",
+                        "name": "city",
+                        "aria-label": "",
+                        "type": "text",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "75",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "maxlength": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": ""
+                    },
+                    {
+                        "key": "field_6a5220ebe58ac",
+                        "label": "Land",
+                        "name": "country",
+                        "aria-label": "",
+                        "type": "text",
+                        "instructions": "Ländername oder ISO-3166-1-Alpha-2-Code (z. B. Deutschland oder DE).",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "maxlength": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": ""
+                    },
+                    {
+                        "key": "field_6a522101e58ad",
+                        "label": "Social-Media-Profile",
+                        "name": "social_profiles",
+                        "aria-label": "",
+                        "type": "repeater",
+                        "instructions": "Füge Links zu offiziellen Social-Media- oder öffentlichen Profilen hinzu.",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "layout": "table",
+                        "pagination": 0,
+                        "min": 0,
+                        "max": 0,
+                        "collapsed": "",
+                        "button_label": "Add Row",
+                        "rows_per_page": 20,
+                        "sub_fields": [
+                            {
+                                "key": "field_6a522127e58ae",
+                                "label": "url",
+                                "name": "url",
+                                "aria-label": "",
+                                "type": "url",
+                                "instructions": "",
+                                "required": 0,
+                                "conditional_logic": 0,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "default_value": "",
+                                "allow_in_bindings": 0,
+                                "placeholder": "",
+                                "parent_repeater": "field_6a522101e58ad"
+                            }
+                        ]
+                    }
+                ]
             }
         ],
         "location": [

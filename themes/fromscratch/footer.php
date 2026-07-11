@@ -5,7 +5,7 @@
 			$company_name = function_exists('get_field') ? (string) get_field('theme_company', 'option') : '';
 			$company_address = function_exists('get_field') ? (string) get_field('theme_address', 'option') : '';
 			$company_phone = function_exists('get_field') ? (string) get_field('theme_phone', 'option') : '';
-			$company_email = function_exists('get_field') ? (string) get_field('theme_mail', 'option') : '';
+			$company_email = function_exists('get_field') ? (string) get_field('theme_email', 'option') : '';
 			?>
 			<?php if ($company_name !== '') : ?>
 				<b><?= esc_html($company_name) ?></b><br>
