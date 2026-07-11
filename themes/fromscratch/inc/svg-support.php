@@ -83,6 +83,269 @@ add_filter('wp_handle_upload_prefilter', function ($file) {
 });
 
 /**
+ * CSS properties we expand into SVG presentation attributes (best-effort).
+ *
+ * @return array<string, string> CSS property (lowercase) => SVG attribute name
+ */
+function fs_svg_style_to_attribute_map(): array
+{
+	return [
+		'fill' => 'fill',
+		'fill-opacity' => 'fill-opacity',
+		'fill-rule' => 'fill-rule',
+		'stroke' => 'stroke',
+		'stroke-opacity' => 'stroke-opacity',
+		'stroke-width' => 'stroke-width',
+		'stroke-linecap' => 'stroke-linecap',
+		'stroke-linejoin' => 'stroke-linejoin',
+		'stroke-miterlimit' => 'stroke-miterlimit',
+		'stroke-dasharray' => 'stroke-dasharray',
+		'stroke-dashoffset' => 'stroke-dashoffset',
+		'opacity' => 'opacity',
+		'stop-color' => 'stop-color',
+		'stop-opacity' => 'stop-opacity',
+		'font-size' => 'font-size',
+		'font-family' => 'font-family',
+		'font-weight' => 'font-weight',
+		'text-anchor' => 'text-anchor',
+	];
+}
+
+/**
+ * Whether a CSS value is safe to copy onto an SVG presentation attribute.
+ */
+function fs_svg_is_safe_style_value(string $property, string $value): bool
+{
+	$value = trim($value);
+	if ($value === '' || strlen($value) > 200) {
+		return false;
+	}
+
+	// No expressions, imports, or quoting tricks.
+	if (preg_match('/[<>{}]|expression\s*\(|@import|javascript:/i', $value)) {
+		return false;
+	}
+
+	// External / data URLs disallowed; fragment urls (#id) OK for gradients.
+	if (preg_match('/url\s*\(\s*(?!#)[^)]+\)/i', $value)) {
+		return false;
+	}
+
+	$keywords = ['none', 'currentcolor', 'transparent', 'inherit'];
+	$lower = strtolower($value);
+	if (in_array($lower, $keywords, true)) {
+		return true;
+	}
+
+	switch ($property) {
+		case 'fill':
+		case 'stroke':
+		case 'stop-color':
+			return (bool) preg_match(
+				'/^(?:#[0-9a-f]{3,8}|rgb\(\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+\s*\)|rgba\(\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+\s*,\s*[\d.]+\s*\)|hsl\(\s*[\d.]+\s*,\s*[\d.]+%\s*,\s*[\d.]+%\s*\)|url\(\s*#[A-Za-z][\w:.-]*\s*\))$/i',
+				$value
+			);
+
+		case 'fill-opacity':
+		case 'stroke-opacity':
+		case 'stop-opacity':
+		case 'opacity':
+			return (bool) preg_match('/^(?:0|1|0?\.\d+|\d{1,3}%)$/', $value);
+
+		case 'stroke-width':
+		case 'stroke-miterlimit':
+		case 'stroke-dashoffset':
+		case 'font-size':
+			return (bool) preg_match('/^[\d.]+(?:px|pt|em|ex|%)?$/i', $value);
+
+		case 'stroke-dasharray':
+			return (bool) preg_match('/^(?:none|[\d.]+(?:px|pt|em|ex|%)?(?:\s*,\s*[\d.]+(?:px|pt|em|ex|%)?)*)$/i', $value);
+
+		case 'fill-rule':
+			return in_array($lower, ['nonzero', 'evenodd'], true);
+
+		case 'stroke-linecap':
+			return in_array($lower, ['butt', 'round', 'square'], true);
+
+		case 'stroke-linejoin':
+			return in_array($lower, ['miter', 'round', 'bevel'], true);
+
+		case 'text-anchor':
+			return in_array($lower, ['start', 'middle', 'end'], true);
+
+		case 'font-weight':
+			return (bool) preg_match('/^(?:normal|bold|bolder|lighter|[1-9]00)$/i', $value);
+
+		case 'font-family':
+			// Simple family list without quotes/urls.
+			return (bool) preg_match('/^[A-Za-z][\w\s,-]*$/', $value);
+
+		default:
+			return false;
+	}
+}
+
+/**
+ * Parse simple `.class { prop: value; }` rules from SVG stylesheet text.
+ *
+ * Ignores nested selectors, @rules, tag/id selectors, and unknown properties.
+ *
+ * @return list<array{classes: list<string>, declarations: array<string, string>}>
+ */
+function fs_svg_parse_simple_class_rules(string $css): array
+{
+	$css = preg_replace('/\/\*.*?\*\//s', '', $css) ?? $css;
+	// Drop @rules blocks / lines we cannot handle.
+	$css = preg_replace('/@[^{;]+;/', '', $css) ?? $css;
+	$css = preg_replace('/@[^{]+\{[^{}]*\}/', '', $css) ?? $css;
+
+	$rules = [];
+	if (!preg_match_all('/([^{}]+)\{([^{}]*)\}/', $css, $matches, PREG_SET_ORDER)) {
+		return $rules;
+	}
+
+	$map = fs_svg_style_to_attribute_map();
+
+	foreach ($matches as $match) {
+		$selector = trim($match[1]);
+		$body = trim($match[2]);
+		if ($selector === '' || $body === '') {
+			continue;
+		}
+
+		// Only plain class selectors: .a or .a.b (no combinators, tags, ids, pseudos).
+		if (!preg_match('/^\.(?:[A-Za-z_][\w-]*)(?:\.[A-Za-z_][\w-]*)*$/', $selector)) {
+			continue;
+		}
+
+		$classes = [];
+		foreach (explode('.', ltrim($selector, '.')) as $class) {
+			$class = trim($class);
+			if ($class !== '') {
+				$classes[] = $class;
+			}
+		}
+		if ($classes === []) {
+			continue;
+		}
+
+		$declarations = [];
+		foreach (explode(';', $body) as $chunk) {
+			$chunk = trim($chunk);
+			if ($chunk === '' || strpos($chunk, ':') === false) {
+				continue;
+			}
+			[$prop, $value] = array_map('trim', explode(':', $chunk, 2));
+			$prop = strtolower($prop);
+			if (!isset($map[$prop])) {
+				continue;
+			}
+			if (!fs_svg_is_safe_style_value($prop, $value)) {
+				continue;
+			}
+			$declarations[$map[$prop]] = $value;
+		}
+
+		if ($declarations !== []) {
+			$rules[] = [
+				'classes' => $classes,
+				'declarations' => $declarations,
+			];
+		}
+	}
+
+	return $rules;
+}
+
+/**
+ * Expand simple class-based <style> rules into presentation attributes, then drop <style>.
+ *
+ * Best-effort for Illustrator/Figma-style SVGs; complex CSS is ignored (styles still removed by sanitize).
+ *
+ * @param string $svg Raw SVG markup.
+ * @return string SVG with attributes applied where possible (unchanged markup on parse failure).
+ */
+function fs_svg_expand_style_classes(string $svg): string
+{
+	if ($svg === '' || stripos($svg, '<style') === false) {
+		return $svg;
+	}
+
+	libxml_use_internal_errors(true);
+
+	$dom = new DOMDocument();
+	if (!$dom->loadXML($svg, LIBXML_NONET | LIBXML_COMPACT)) {
+		return $svg;
+	}
+
+	$root = $dom->documentElement;
+	if (!$root || strtolower($root->tagName) !== 'svg') {
+		return $svg;
+	}
+
+	$xpath = new DOMXPath($dom);
+	$style_nodes = [];
+	foreach ($xpath->query('//*[local-name()="style"]') as $node) {
+		if ($node instanceof DOMElement) {
+			$style_nodes[] = $node;
+		}
+	}
+
+	if ($style_nodes === []) {
+		return $svg;
+	}
+
+	$css = '';
+	foreach ($style_nodes as $style_node) {
+		$css .= $style_node->textContent . "\n";
+	}
+
+	$rules = fs_svg_parse_simple_class_rules($css);
+	if ($rules !== []) {
+		foreach ($xpath->query('//*[@class]') as $el) {
+			if (!($el instanceof DOMElement)) {
+				continue;
+			}
+			$class_attr = trim($el->getAttribute('class'));
+			if ($class_attr === '') {
+				continue;
+			}
+			$el_classes = preg_split('/\s+/', $class_attr) ?: [];
+			$el_class_set = array_fill_keys($el_classes, true);
+
+			foreach ($rules as $rule) {
+				$matches = true;
+				foreach ($rule['classes'] as $needed) {
+					if (!isset($el_class_set[$needed])) {
+						$matches = false;
+						break;
+					}
+				}
+				if (!$matches) {
+					continue;
+				}
+				foreach ($rule['declarations'] as $attr => $value) {
+					// Do not override existing presentation attributes on the element.
+					if ($el->hasAttribute($attr)) {
+						continue;
+					}
+					$el->setAttribute($attr, $value);
+				}
+			}
+		}
+	}
+
+	foreach ($style_nodes as $style_node) {
+		if ($style_node->parentNode) {
+			$style_node->parentNode->removeChild($style_node);
+		}
+	}
+
+	$out = $dom->saveXML($dom->documentElement);
+	return is_string($out) ? $out : $svg;
+}
+
+/**
  * Sanitize SVG markup: strip scripts, event handlers, and disallowed elements/attributes.
  *
  * @param string $svg Raw SVG string (e.g. file contents).
@@ -96,6 +359,9 @@ function fs_svg_sanitize(string $svg): string
 	$svg = preg_replace('/<\?xml.*?\?>/i', '', $svg);
 	$svg = preg_replace('/<!DOCTYPE.*?>/i', '', $svg);
 	$svg = preg_replace('/<!--.*?-->/s', '', $svg);
+
+	// Expand simple class styles to attributes before <style> is stripped.
+	$svg = fs_svg_expand_style_classes($svg);
 
 	$dom = new DOMDocument();
 	if (!$dom->loadXML($svg, LIBXML_NONET | LIBXML_COMPACT)) {
