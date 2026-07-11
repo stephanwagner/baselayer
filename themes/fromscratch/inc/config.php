@@ -90,7 +90,10 @@ function fs_config(?string $key = null)
 }
 
 /**
- * Load content type definitions from config/content-types/*.php (parent, then child overrides).
+ * Load content type definitions from config/content-types/*.php.
+ *
+ * Parent theme only: loads from the parent theme.
+ * Child theme active: loads only from the child (no parent fallback or merge).
  *
  * Each file returns `[ 'slug' => [ ... ] ]`. Slug must match the filename.
  *
@@ -104,10 +107,9 @@ function fs_get_content_types(): array
 	}
 
 	$types = [];
-	$dirs = [get_template_directory() . '/config/content-types'];
-	if (is_child_theme()) {
-		$dirs[] = get_stylesheet_directory() . '/config/content-types';
-	}
+	$dirs = is_child_theme()
+		? [get_stylesheet_directory() . '/config/content-types']
+		: [get_template_directory() . '/config/content-types'];
 
 	foreach ($dirs as $dir) {
 		if (!is_dir($dir)) {
@@ -123,17 +125,13 @@ function fs_get_content_types(): array
 
 			$basename = basename($file, '.php');
 			if (isset($loaded[$basename]) && is_array($loaded[$basename])) {
-				$types[$basename] = isset($types[$basename]) && is_array($types[$basename])
-					? fs_config_merge_deep($types[$basename], $loaded[$basename])
-					: $loaded[$basename];
+				$types[$basename] = $loaded[$basename];
 				continue;
 			}
 
 			foreach ($loaded as $slug => $def) {
 				if (is_string($slug) && is_array($def)) {
-					$types[$slug] = isset($types[$slug]) && is_array($types[$slug])
-						? fs_config_merge_deep($types[$slug], $def)
-						: $def;
+					$types[$slug] = $def;
 				}
 			}
 		}

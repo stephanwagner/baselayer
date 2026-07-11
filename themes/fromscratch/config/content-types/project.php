@@ -1,14 +1,15 @@
 <?php
 
 /**
- * Projects CPT
+ * Example CPT
  * 
  * 'type' => 'default' enables the default post type features.
  */
 
 return [
-	'project' => [
+	'example' => [
 		'enabled' => true,
+
 		'type' => 'default',
 		'public' => true,
 		'hierarchical' => true,

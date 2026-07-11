@@ -10,3 +10,9 @@ Shipped stubs (edit as needed):
 - `block-settings.php` — Theme → Blocks defaults
 - `block-options.js` — placeholder only (editor options stay parent-bundled)
 - `icons.js` — child theme icons build metadata
+
+## Content types
+
+`content-types/` is copied from the parent on install (`fromscratch/config/content-types/`).
+When a child theme is active, only these files are loaded — there is no parent fallback.
+Delete a file here to disable that CPT for the child.

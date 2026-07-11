@@ -10,6 +10,7 @@
 return [
 	'event' => [
 		'enabled' => true,
+
 		'type' => 'event',
 		'public' => true,
 		'hierarchical' => true,

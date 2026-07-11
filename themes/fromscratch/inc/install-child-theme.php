@@ -82,7 +82,40 @@ function fs_install_create_child_theme(array $theme)
 		return $copied;
 	}
 
+	$content_types = fs_install_copy_child_content_types($child_dir);
+	if (is_wp_error($content_types)) {
+		return $content_types;
+	}
+
 	return $slug;
+}
+
+/**
+ * Copy parent config/content-types/*.php into the new child theme.
+ *
+ * @return true|WP_Error
+ */
+function fs_install_copy_child_content_types(string $child_dir)
+{
+	$source_dir = dirname(__DIR__) . '/config/content-types';
+	if (!is_dir($source_dir)) {
+		return new WP_Error('fs_child_content_types', __('Parent content-types config is missing.', 'fromscratch'));
+	}
+
+	$dest_dir = trailingslashit($child_dir) . 'config/content-types';
+	if (!is_dir($dest_dir) && !wp_mkdir_p($dest_dir)) {
+		return new WP_Error('fs_child_mkdir', __('Could not create child theme directories.', 'fromscratch'));
+	}
+
+	$files = glob($source_dir . '/*.php') ?: [];
+	foreach ($files as $file) {
+		$target = $dest_dir . '/' . basename($file);
+		if (!copy($file, $target)) {
+			return new WP_Error('fs_child_write', __('Could not write child theme files.', 'fromscratch'));
+		}
+	}
+
+	return true;
 }
 
 /**
