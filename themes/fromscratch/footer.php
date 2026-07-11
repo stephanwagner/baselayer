@@ -22,9 +22,11 @@
 				<a href="mailto:<?= esc_attr($company_email) ?>"><?= esc_html($company_email) ?></a>
 			<?php endif; ?>
 			<?php
-			if (function_exists('fs_render_social_media_links')) {
-				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- attrs escaped; SVG sanitized via fs_svg_sanitize()
-				echo fs_render_social_media_links();
+			if (function_exists('fs_get_social_media_links') && function_exists('fs_render_template')) {
+				$social_links = fs_get_social_media_links();
+				if ($social_links !== []) {
+					fs_render_template('social-media-links', ['links' => $social_links]);
+				}
 			}
 			?>
 		</div>

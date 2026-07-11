@@ -2501,6 +2501,12 @@ msgstr "Hauptnavigation"
 msgid "Footer navigation"
 msgstr "Fußnavigation"
 
+msgid "Social media"
+msgstr "Social Media"
+
+msgid "Link to %s"
+msgstr "Link zu %s"
+
 # Blocks
 
 msgid "Blocks"
