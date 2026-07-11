@@ -15,8 +15,15 @@
 				<div class="header__aligner container-wide">
 
 					<div class="logo__container">
-						<a href="/">
-							<img src="<?= fs_asset_url('/img/logo.svg'); ?>" alt="" class="logo__image" aria-hidden="true">
+						<a href="<?= esc_url(home_url('/')) ?>">
+							<?php
+							$logo_id = (int) get_theme_mod('custom_logo');
+							$logo_url = $logo_id > 0 ? wp_get_attachment_image_url($logo_id, 'full') : '';
+							if (!$logo_url) {
+								$logo_url = fs_asset_url('/img/logo.svg');
+							}
+							?>
+							<img src="<?= esc_url($logo_url) ?>" alt="" class="logo__image" aria-hidden="true">
 						</a>
 					</div>
 

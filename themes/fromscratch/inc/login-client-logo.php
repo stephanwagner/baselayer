@@ -14,10 +14,10 @@ add_filter('login_headertext', function () {
 }, 10);
 
 /**
- * Show client logo on the WordPress login page when set in Theme settings → General.
+ * Show the site logo (custom_logo) on the WordPress login page when set.
  */
 add_action('login_head', function () {
-	$logo_id = (int) get_option('fromscratch_client_logo', 0);
+	$logo_id = (int) get_theme_mod('custom_logo');
 	if ($logo_id <= 0) {
 		return;
 	}

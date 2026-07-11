@@ -246,8 +246,8 @@ msgstr "Auszug"
 
 # Theme settings
 
-msgid "Client logo"
-msgstr "Kundenlogo"
+msgid "Site logo"
+msgstr "Website-Logo"
 
 msgid "Fallback OG image"
 msgstr "Fallback-OG-Bild"
@@ -267,8 +267,8 @@ msgstr "Auszug „Weiterlesen“-Text"
 msgid "Text shown after the excerpt when it is truncated (e.g. …). Leave blank for none."
 msgstr "Text, der nach dem Auszug angezeigt wird, wenn er gekürzt wurde (z. B. …). Leer lassen für keinen."
 
-msgid "Shown on the login page instead of the WordPress logo. Also used for branding in emails."
-msgstr "Wird auf der Anmeldeseite anstelle des WordPress-Logos angezeigt. Wird auch für das Branding in E-Mails verwendet."
+msgid "Shown on the login page instead of the WordPress logo. Also used as the schema.org logo fallback when no schema logo is set."
+msgstr "Wird auf der Anmeldeseite anstelle des WordPress-Logos angezeigt. Dient auch als schema.org-Logo-Fallback, wenn kein Schema-Logo gesetzt ist."
 
 msgid "Used as the social preview image (og:image) when a page or post has no SEO image and no featured image."
 msgstr "Wird als Vorschaubild für soziale Medien (og:image) genutzt, wenn eine Seite oder ein Beitrag kein SEO-Bild und kein Beitragsbild hat."

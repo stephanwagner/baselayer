@@ -196,7 +196,6 @@ function fs_theme_settings_save_general_options_from_post(): void
 		'posts_per_page' => 'fs_sanitize_posts_per_page',
 		'fromscratch_excerpt_length' => 'fs_sanitize_excerpt_length',
 		'fromscratch_excerpt_more' => 'sanitize_text_field',
-		'fromscratch_client_logo' => 'fs_sanitize_client_logo',
 		'fromscratch_og_image_fallback' => 'fs_sanitize_og_image_fallback',
 		'fromscratch_feature_image_fallback' => 'fs_sanitize_og_image_fallback',
 		'show_on_front' => 'fs_sanitize_show_on_front',
@@ -214,6 +213,15 @@ function fs_theme_settings_save_general_options_from_post(): void
 			$value = call_user_func($sanitize, $raw);
 		}
 		update_option($name, $value);
+	}
+
+	if (array_key_exists('custom_logo', $_POST)) {
+		$logo_id = fs_sanitize_custom_logo(wp_unslash($_POST['custom_logo']));
+		if ($logo_id > 0) {
+			set_theme_mod('custom_logo', $logo_id);
+		} else {
+			remove_theme_mod('custom_logo');
+		}
 	}
 
 	$front_id = (int) get_option('page_on_front');
@@ -504,10 +512,6 @@ add_action('admin_init', function () {
 		'type' => 'integer',
 		'sanitize_callback' => 'fs_sanitize_posts_per_page',
 	]);
-	register_setting(FS_THEME_OPTION_GROUP_GENERAL, 'fromscratch_client_logo', [
-		'type' => 'integer',
-		'sanitize_callback' => 'fs_sanitize_client_logo',
-	]);
 	register_setting(FS_THEME_OPTION_GROUP_GENERAL, 'fromscratch_og_image_fallback', [
 		'type' => 'integer',
 		'sanitize_callback' => 'fs_sanitize_og_image_fallback',
@@ -716,7 +720,7 @@ function fs_sanitize_homepage_page_id($value): int
 	return ($post && $post->post_type === 'page') ? $id : 0;
 }
 
-function fs_sanitize_client_logo($value): int
+function fs_sanitize_custom_logo($value): int
 {
 	$id = absint($value);
 	if ($id <= 0) {
@@ -1050,8 +1054,8 @@ function theme_settings_page(): void
 
 		<?php if ($tab === 'theme') : ?>
 			<?php
-			$client_logo_id = (int) get_option('fromscratch_client_logo', 0);
-			$client_logo_url = $client_logo_id > 0 ? wp_get_attachment_image_url($client_logo_id, 'medium') : '';
+			$custom_logo_id = (int) get_theme_mod('custom_logo');
+			$custom_logo_url = $custom_logo_id > 0 ? wp_get_attachment_image_url($custom_logo_id, 'medium') : '';
 			$og_fallback_id = (int) get_option('fromscratch_og_image_fallback', 0);
 			$og_fallback_url = $og_fallback_id > 0 ? wp_get_attachment_image_url($og_fallback_id, 'medium') : '';
 			$feature_image_fallback_id = (int) get_option('fromscratch_feature_image_fallback', 0);
@@ -1229,19 +1233,19 @@ function theme_settings_page(): void
 
 				<hr>
 
-				<h2 class="title"><?= esc_html__('Client logo', 'fromscratch') ?></h2>
-				<p class="description" style="margin-bottom: 12px;"><?= esc_html__('Shown on the login page instead of the WordPress logo. Also used for branding in emails.', 'fromscratch') ?></p>
+				<h2 class="title"><?= esc_html__('Site logo', 'fromscratch') ?></h2>
+				<p class="description" style="margin-bottom: 12px;"><?= esc_html__('Shown on the login page instead of the WordPress logo. Also used as the schema.org logo fallback when no schema logo is set.', 'fromscratch') ?></p>
 				
 				<div class="fs-image-picker" style="margin-top: 16px;" data-fs-image-picker>
-					<input type="hidden" name="fromscratch_client_logo" id="fromscratch_client_logo" value="<?= esc_attr($client_logo_id) ?>" data-fs-image-picker-input>
+					<input type="hidden" name="custom_logo" id="custom_logo" value="<?= esc_attr($custom_logo_id) ?>" data-fs-image-picker-input>
 					<div class="fs-image-picker-preview" data-fs-image-picker-preview>
-						<?php if ($client_logo_url) : ?>
-							<img src="<?= esc_url($client_logo_url) ?>" alt="">
+						<?php if ($custom_logo_url) : ?>
+							<img src="<?= esc_url($custom_logo_url) ?>" alt="">
 						<?php endif; ?>
 					</div>
 					<p style="margin-bottom: 0;">
 						<button type="button" class="button" data-fs-image-picker-select><?= esc_html__('Select image', 'fromscratch') ?></button>
-						<button type="button" class="button" data-fs-image-picker-remove<?= $client_logo_id <= 0 ? ' style="display:none;"' : '' ?>><?= esc_html__('Remove', 'fromscratch') ?></button>
+						<button type="button" class="button" data-fs-image-picker-remove<?= $custom_logo_id <= 0 ? ' style="display:none;"' : '' ?>><?= esc_html__('Remove', 'fromscratch') ?></button>
 					</p>
 				</div>
 

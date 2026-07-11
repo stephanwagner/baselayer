@@ -81,6 +81,8 @@ if (fs_theme_feature_enabled('duplicate_post')) {
 if (fs_theme_feature_enabled('seo')) {
 	require_once 'inc/seo.php';
 }
+
+require_once 'inc/schema.php';
 if (fs_theme_feature_enabled('breadcrumbs')) {
 	require_once 'inc/helpers/breadcrumbs.php';
 }

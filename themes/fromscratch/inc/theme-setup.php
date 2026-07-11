@@ -83,6 +83,20 @@ function fs_add_post_thumbnails(): void
 add_action('after_setup_theme', 'fs_add_post_thumbnails');
 
 /**
+ * Site logo (Customizer / Theme settings → custom_logo).
+ */
+function fs_add_custom_logo(): void
+{
+	add_theme_support('custom-logo', [
+		'height' => 120,
+		'width' => 320,
+		'flex-height' => true,
+		'flex-width' => true,
+	]);
+}
+add_action('after_setup_theme', 'fs_add_custom_logo');
+
+/**
  * Setup image sizes
  * 
  * - Disable image threshold if set so in config theme.php
