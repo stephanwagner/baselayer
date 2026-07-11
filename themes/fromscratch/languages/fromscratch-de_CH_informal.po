@@ -2596,3 +2596,35 @@ msgstr "Nächste Folie"
 
 msgid "Previous slide"
 msgstr "Vorherige Folie"
+
+# ACF field group import notice
+
+msgid "ACF Pro is required to import field groups."
+msgstr "ACF Pro ist erforderlich, um Feldgruppen zu importieren."
+
+msgid "Could not read the ACF import file."
+msgstr "Die ACF-Importdatei konnte nicht gelesen werden."
+
+msgid "Failed to import field group “%s”."
+msgstr "Feldgruppe „%s“ konnte nicht importiert werden."
+
+msgid "ACF field group import skipped. You can import manually via ACF → Tools."
+msgstr "Import der ACF-Feldgruppen übersprungen. Du kannst sie manuell unter ACF → Werkzeuge importieren."
+
+msgid "Imported %d ACF field group."
+msgid_plural "Imported %d ACF field groups."
+msgstr[0] "%d ACF-Feldgruppe importiert."
+msgstr[1] "%d ACF-Feldgruppen importiert."
+
+msgid "FromScratch ACF field groups"
+msgstr "FromScratch ACF-Feldgruppen"
+
+msgid "ACF Pro is active, but the theme’s block and website field groups are not imported yet. Import them now, or skip if you manage fields yourself."
+msgstr "ACF Pro ist aktiv, aber die Block- und Website-Feldgruppen des Themes sind noch nicht importiert. Importiere sie jetzt, oder überspringe dies, wenn du Felder selbst verwaltest."
+
+msgid "Import field groups"
+msgstr "Feldgruppen importieren"
+
+msgid "Skip"
+msgstr "Überspringen"
+

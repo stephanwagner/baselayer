@@ -115,3 +115,4 @@ if (!function_exists('fs_breadcrumbs')) {
 
 // ACF
 require_once 'acf/acf.php';
+require_once 'acf/acf-import-notice.php';
