@@ -187,46 +187,111 @@ function fs_styles(): void
 add_action('wp_enqueue_scripts', 'fs_styles');
 
 /**
- * Enqueue child theme front-end assets after parent (when built files exist).
+ * Resolve a built child theme asset (CSS or JS) when present.
+ *
+ * Prefers `.min` when not in debug, falls back to the unminified file.
+ *
+ * @param 'css'|'js' $kind
+ * @return array{rel: string, path: string, uri: string, ver: string}|null
  */
-function fs_enqueue_child_theme_assets(): void
+function fs_child_theme_built_asset(string $kind): ?array
 {
-	if (!is_child_theme()) {
-		return;
+	if (!is_child_theme() || ($kind !== 'css' && $kind !== 'js')) {
+		return null;
 	}
 
 	$min = fs_is_debug() ? '' : '.min';
 	$base = trailingslashit(get_stylesheet_directory());
 	$base_uri = trailingslashit(get_stylesheet_directory_uri());
+	$dir = $kind === 'css' ? 'assets/css' : 'assets/js';
+	$rel = $dir . '/main' . $min . '.' . $kind;
+	$fallback = $dir . '/main.' . $kind;
+	$file = is_readable($base . $rel) ? $rel : (is_readable($base . $fallback) ? $fallback : '');
 
-	$css_rel = 'assets/css/main' . $min . '.css';
-	$css_fallback = 'assets/css/main.css';
-	$css_file = is_readable($base . $css_rel) ? $css_rel : (is_readable($base . $css_fallback) ? $css_fallback : '');
+	if ($file === '') {
+		return null;
+	}
 
-	if ($css_file !== '') {
+	return [
+		'rel' => $file,
+		'path' => $base . $file,
+		'uri' => $base_uri . $file,
+		'ver' => (string) filemtime($base . $file),
+	];
+}
+
+/**
+ * Enqueue child theme front-end assets after parent (when built files exist).
+ */
+function fs_enqueue_child_theme_assets(): void
+{
+	$css = fs_child_theme_built_asset('css');
+	if ($css !== null) {
 		wp_enqueue_style(
 			'child-main-styles',
-			$base_uri . $css_file,
+			$css['uri'],
 			['fromscratch-styles'],
-			(string) filemtime($base . $css_file)
+			$css['ver']
 		);
 	}
 
-	$js_rel = 'assets/js/main' . $min . '.js';
-	$js_fallback = 'assets/js/main.js';
-	$js_file = is_readable($base . $js_rel) ? $js_rel : (is_readable($base . $js_fallback) ? $js_fallback : '');
-
-	if ($js_file !== '') {
+	$js = fs_child_theme_built_asset('js');
+	if ($js !== null) {
 		wp_enqueue_script(
 			'child-main-scripts',
-			$base_uri . $js_file,
+			$js['uri'],
 			['fromscratch-scripts'],
-			(string) filemtime($base . $js_file),
+			$js['ver'],
 			true
 		);
 	}
 }
 add_action('wp_enqueue_scripts', 'fs_enqueue_child_theme_assets', 20);
+
+/**
+ * Load child main.css in the block editor canvas (same path as admin.css).
+ *
+ * Child block styles compile into main.css; without this they only appear on the front.
+ */
+function fs_enqueue_child_theme_block_assets(): void
+{
+	if (!is_admin() || !fs_admin_is_block_editor_screen()) {
+		return;
+	}
+
+	$css = fs_child_theme_built_asset('css');
+	if ($css === null) {
+		return;
+	}
+
+	wp_enqueue_style(
+		'child-main-styles',
+		$css['uri'],
+		['main-admin-styles'],
+		$css['ver']
+	);
+}
+add_action('enqueue_block_assets', 'fs_enqueue_child_theme_block_assets', 20);
+
+/**
+ * Load child main.js in the block editor (ACF block scripts bundled there).
+ */
+function fs_enqueue_child_theme_editor_scripts(): void
+{
+	$js = fs_child_theme_built_asset('js');
+	if ($js === null) {
+		return;
+	}
+
+	wp_enqueue_script(
+		'child-main-scripts',
+		$js['uri'],
+		[],
+		$js['ver'],
+		true
+	);
+}
+add_action('enqueue_block_editor_assets', 'fs_enqueue_child_theme_editor_scripts', 20);
 
 /**
  * Enqueue theme icon mask CSS (child assets/css/icons.css when present, else parent).

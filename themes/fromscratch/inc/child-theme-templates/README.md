@@ -2,10 +2,9 @@
 
 Child theme of **FromScratch**. Parent updates leave this folder alone.
 
-## Develop
+## First run
 
-1. Edit `src/scss/main.scss` and `src/js/main.js`.
-2. From this theme folder:
+From this theme folder:
 
 ```bash
 npm install
@@ -14,6 +13,8 @@ npm run watch    # rebuild on change
 ```
 
 Built files land in `assets/css/main.css`, `assets/js/main.js`, `assets/css/icons.css`, and `assets/icons.generated.json`.
+
+Edit `src/scss/main.scss` and `src/js/main.js` (and files they import). After build, child CSS/JS load on the front **and** in the block editor.
 
 ## Icons
 
@@ -30,5 +31,16 @@ They also appear under **Theme** in the icon picker. An example `logo-child.svg`
 ## Config / templates
 
 - Config stubs in `config/` (`theme.php`, `design.php`, `block-settings.php`, …) merge over the parent — see `config/README.md`
-- ACF blocks: `acf/blocks.php` merges over the parent by block `name`. Example block: `acf/blocks/my-block/` (PHP + SCSS + JS). Aggregators: `_blocks.scss`, `blocks.js`, `_blocks-editor.scss` — wired from `src/`
-- Optional templates: `templates/…` (same paths as the parent)
+- **Content types:** `config/content-types/` is copied from the parent on install. With a child active, **only** those files are loaded (no parent fallback). An empty or missing folder means no CPTs.
+- **`config/block-options.js`:** placeholder only — editor block options stay parent-bundled
+- Optional templates: `templates/…` (same paths as the parent; child wins)
+
+## Add an ACF block
+
+1. Register (or override) the block in `acf/blocks.php` (merged with parent by `name`)
+2. Add `acf/blocks/{name}/{name}.php` (markup; child path wins via `get_theme_file_path`)
+3. Add styles/scripts under `acf/blocks/{name}/`, then `@forward` / `import` them in `_blocks.scss`, `_blocks-editor.scss`, and `blocks.js`
+4. Create the block’s fields in **ACF** (WP admin) — field groups are not synced from theme files
+5. `npm run build`
+
+See the commented `my-block` example under `acf/blocks/` for the file layout.
