@@ -23,6 +23,7 @@ function resolveBin(name) {
 }
 
 const sassBin = resolveBin('sass');
+const chokidarBin = resolveBin('chokidar');
 
 const entries = [{ src: path.join(themeDir, 'src/scss/main.scss'), name: 'main' }];
 
@@ -97,14 +98,26 @@ function watch() {
   fs.mkdirSync(path.join(themeDir, 'assets/css'), { recursive: true });
   console.log('Watching CSS...');
 
-  const child = spawnWatch(sassBin, [
-    ...sassPairs(false),
-    '--watch',
-    '--poll',
-    '--source-map'
-  ]);
+  const children = [
+    spawnWatch(sassBin, [
+      ...sassPairs(false),
+      '--watch',
+      '--poll',
+      '--source-map'
+    ]),
+    spawnWatch(chokidarBin, [
+      path.join(themeDir, 'acf/blocks/**/*.scss'),
+      '-c',
+      'node scripts/bump-scss-entries.mjs'
+    ])
+  ];
 
-  const shutdown = () => child.kill();
+  const shutdown = () => {
+    for (const child of children) {
+      child.kill();
+    }
+  };
+
   process.on('SIGINT', shutdown);
   process.on('SIGTERM', shutdown);
 }

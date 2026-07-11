@@ -1,7 +1,9 @@
-@use '../../../../../../fromscratch/src/scss/variables' as *;
+@use '../../../src/scss/variables' as *;
 
 .my-block__wrapper {
+  margin: 24px 0;
   padding: 24px;
+  background-color: var(--fs-color-gray-100);
   border: 1px solid var(--fs-color-gray-300);
   border-radius: var(--fs-border-radius-m);
 }

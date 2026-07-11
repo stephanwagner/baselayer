@@ -1,5 +1,3 @@
-@use 'sass:color';
-
 /**
  * Child theme styles — compiled to assets/css/main.css (loads after parent).
  *
@@ -13,19 +11,9 @@
  *   npm run watch
  */
 
-// Import parent theme variables
+// Variables
+@forward 'variables';
 
-@use '../../../fromscratch/src/scss/variables' as fs;
-
-// ACF blocks (front + editor stubs — see acf/blocks/)
+// ACF blocks
 @forward '../../acf/blocks/blocks';
 @forward '../../acf/blocks/blocks-editor';
-
-// You can override parent theme styles here by adding your own SCSS code below
-
-:root {
-  --fs-color-primary: #4080ff;
-  --fs-color-primary-dark: #{color.adjust(#4080ff, $lightness: -8%)};
-  --fs-color-secondary: #00aaff;
-  --fs-color-secondary-dark: #{color.adjust(#00aaff, $lightness: -8%)};
-}

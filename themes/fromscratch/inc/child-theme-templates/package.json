@@ -12,6 +12,7 @@
     "watch:css": "node scripts/build-css.mjs --watch"
   },
   "devDependencies": {
+    "chokidar-cli": "^3.0.0",
     "concurrently": "^10.0.3",
     "esbuild": "^0.28.1",
     "sass": "^1.101.0"
