@@ -383,7 +383,7 @@ function fs_render_developer_cheatsheet(): void
 					sprintf(
 						/* translators: %s: linked label for the Material Symbols icon library */
 						__('You can find more icons in the %s.', 'fromscratch'),
-						'<a href="' . esc_url('https://fonts.google.com/icons?icon.style=Rounded&icon.size=24&icon.color=%23e3e3e3') . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Material Symbols library', 'fromscratch') . '</a>'
+						'<a href="' . esc_url('https://fonts.google.com/icons?icon.style=Rounded') . '" target="_blank" rel="noopener noreferrer">' . esc_html__('Material Symbols library', 'fromscratch') . '</a>'
 					),
 					['a' => ['href' => true, 'target' => true, 'rel' => true]]
 				) ?></p>

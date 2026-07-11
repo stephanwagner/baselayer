@@ -2,7 +2,7 @@
 
 // Dashicons: https://icon-sets.iconify.design/dashicons
 //
-// Material Symbols: https://fonts.google.com/icons?icon.style=Rounded&icon.size=24&icon.color=%23ffffff&selected=Material+Symbols+Rounded:menu:FILL@0;wght@300;GRAD@0;opsz@24
+// Material Symbols: https://fonts.google.com/icons?icon.style=Rounded
 //
 // Per block: name, title, icon, keywords (required).
 // Optional: description (block inserter help text), preview (image path under acf/),
