@@ -560,7 +560,7 @@
             {
                 "key": "field_6a00505593014",
                 "label": "Sichtbare Slides",
-                "name": "slides-per-view",
+                "name": "slides_per_view",
                 "aria-label": "",
                 "type": "number",
                 "instructions": "",
@@ -583,7 +583,7 @@
             {
                 "key": "field_6a00525f93015",
                 "label": "Slides pro Scroll",
-                "name": "slides-per-group",
+                "name": "slides_per_group",
                 "aria-label": "",
                 "type": "number",
                 "instructions": "",
@@ -606,7 +606,7 @@
             {
                 "key": "field_6a006eb8498a0",
                 "label": "Abstand zwischen Slides",
-                "name": "space-between",
+                "name": "space_between",
                 "aria-label": "",
                 "type": "number",
                 "instructions": "",
@@ -663,7 +663,7 @@
             {
                 "key": "field_6a0062a6fcb50",
                 "label": "Weite",
-                "name": "ratio-x",
+                "name": "ratio_x",
                 "aria-label": "",
                 "type": "number",
                 "instructions": "",
@@ -694,7 +694,7 @@
             {
                 "key": "field_6a0062f4fcb51",
                 "label": "Höhe",
-                "name": "ratio-y",
+                "name": "ratio_y",
                 "aria-label": "",
                 "type": "number",
                 "instructions": "",
@@ -791,7 +791,7 @@
             {
                 "key": "field_6a50d9549b35c",
                 "label": "",
-                "name": "dynamic-bullets",
+                "name": "dynamic_bullets",
                 "aria-label": "",
                 "type": "true_false",
                 "instructions": "Zeigt nur die Seitenpunkte in der Nähe des aktuellen Slides an.",
@@ -854,7 +854,7 @@
             {
                 "key": "field_6a005e887362c",
                 "label": "Autoplay-Dauer",
-                "name": "autoplay-delay",
+                "name": "autoplay_delay",
                 "aria-label": "",
                 "type": "number",
                 "instructions": "Zeit zwischen den automatischen Slide-Wechseln in Sekunden.",
@@ -885,7 +885,7 @@
             {
                 "key": "field_6a50e6118a219",
                 "label": "",
-                "name": "has-call-to-action",
+                "name": "has_call_to_action",
                 "aria-label": "",
                 "type": "true_false",
                 "instructions": "Ermöglicht Überschrift, Text und Buttons in allen Slides.",
@@ -906,7 +906,7 @@
             {
                 "key": "field_6a50e6388a21a",
                 "label": "Slide-Inhalt Ausrichtung",
-                "name": "call-to-action-align",
+                "name": "call_to_action_align",
                 "aria-label": "",
                 "type": "button_group",
                 "instructions": "",

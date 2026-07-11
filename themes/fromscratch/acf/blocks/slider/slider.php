@@ -20,21 +20,21 @@ if (!empty($block['className'])) {
 $classNames[] = 'slider__wrapper';
 
 // Fields
-$slidesPerView = get_field('slides-per-view') ?? 1;
-$slidesPerGroup = get_field('slides-per-group') ?? 1;
+$slidesPerView = get_field('slides_per_view') ?? 1;
+$slidesPerGroup = get_field('slides_per_group') ?? 1;
 $animation = get_field('animation') ?? 'slide';
-$spaceBetween = get_field('space-between') ?? 16;
+$spaceBetween = get_field('space_between') ?? 16;
 $loop = get_field('loop') ?? false;
 $autoplay = get_field('autoplay') ?? false;
-$autoplayDelay = get_field('autoplay-delay') ?? 6;
+$autoplayDelay = get_field('autoplay_delay') ?? 6;
 $pagination = get_field('pagination') ?? false;
-$dynamicBullets = get_field('dynamic-bullets') ?? false;
+$dynamicBullets = get_field('dynamic_bullets') ?? false;
 $navigation = get_field('navigation') ?? false;
 $ratio = get_field('ratio') ?? '3-2';
-$ratioX = get_field('ratio-x') ?? 3;
-$ratioY = get_field('ratio-y') ?? 2;
-$hasCallToAction = get_field('has-call-to-action') ?? false;
-$callToActionAlign = get_field('call-to-action-align') ?? 'left';
+$ratioX = get_field('ratio_x') ?? 3;
+$ratioY = get_field('ratio_y') ?? 2;
+$hasCallToAction = get_field('has_call_to_action') ?? false;
+$callToActionAlign = get_field('call_to_action_align') ?? 'left';
 
 
 // Ratio
