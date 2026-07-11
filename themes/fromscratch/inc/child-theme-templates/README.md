@@ -1,6 +1,6 @@
 # {{name}}
 
-Child theme of **FromScratch**. Parent updates leave this folder alone.
+Child theme of **FromScratch**.
 
 ## First run
 
@@ -14,11 +14,11 @@ npm run watch    # rebuild on change
 
 Built files land in `assets/css/main.css`, `assets/js/main.js`, `assets/css/icons.css`, and `assets/icons.generated.json`.
 
-Edit `src/scss/main.scss` and `src/js/main.js` (and files they import). After build, child CSS/JS load on the front **and** in the block editor.
+Edit `src/scss/main.scss` and `src/js/main.js`. After build, child CSS/JS load on the front **and** in the block editor.
 
 ## Icons
 
-Drop SVGs into `assets/icons/` (optional `name-fill.svg` for a filled variant). Optional labels/keywords in `config/icons.js`. Then `npm run build` (or `npm run build:icons`).
+Drop SVGs into `assets/icons/`. Optional labels/keywords in `config/icons.js`. Then `npm run build` (or `npm run build:icons`).
 
 Use as:
 
@@ -38,7 +38,7 @@ They also appear under **Theme** in the icon picker. An example `logo-child.svg`
 ## Add an ACF block
 
 1. Register (or override) the block in `acf/blocks.php` (merged with parent by `name`)
-2. Add `acf/blocks/{name}/{name}.php` (markup; child path wins via `get_theme_file_path`)
+2. Add `acf/blocks/{name}/{name}.php`
 3. Add styles/scripts under `acf/blocks/{name}/`, then `@forward` / `import` them in `_blocks.scss`, `_blocks-editor.scss`, and `blocks.js`
 4. Create the block’s fields in **ACF** (WP admin) — field groups are not synced from theme files
 5. `npm run build`
