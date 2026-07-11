@@ -8,8 +8,8 @@ $color-secondary-dark: #{color.adjust($color-secondary, $lightness: -8%)};
 
 // Variables
 :root {
-  --fs-color-primary: $color-primary;
-  --fs-color-primary-dark: $color-primary-dark;
-  --fs-color-secondary: $color-secondary;
-  --fs-color-secondary-dark: $color-secondary-dark;
+  --fs-color-primary: #{$color-primary};
+  --fs-color-primary-dark: #{$color-primary-dark};
+  --fs-color-secondary: #{$color-secondary};
+  --fs-color-secondary-dark: #{$color-secondary-dark};
 }
