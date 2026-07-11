@@ -1,7 +1,7 @@
 /**
  * Theme (project/customer) icons.
  *
- * Drop SVGs into assets/icons-theme/ — optionally with a filled variant using
+ * Drop SVGs into assets/icons/ — optionally with a filled variant using
  * the `-fill` suffix (e.g. `logo-child.svg` + `logo-child-fill.svg`). You may
  * add a display label and English search keywords per file below; both are
  * optional and fall back to a humanized file name.
@@ -18,7 +18,7 @@
  * multi-color artwork will appear as a monochrome silhouette.
  */
 export const themeIcons = {
-  // Class / picker prefix (`-icon-theme-<name>`). Files live in assets/icons-theme/.
+  // Class / picker prefix (`-icon-theme-<name>`). Files live in assets/icons/.
   prefix: 'theme',
 
   // Category shown (at the top) in the icon picker.

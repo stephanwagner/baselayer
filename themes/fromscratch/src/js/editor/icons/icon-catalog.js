@@ -882,7 +882,7 @@ const builtInCategories = [
   },
 ];
 
-// Project/customer icons (assets/icons-theme/) surface at the top of the picker.
+// Project/customer icons (parent: assets/icons-theme/, child: assets/icons/) surface at the top of the picker.
 // Parent builds write ./icons.generated.js; an active child theme supplies
 // window.fromscratchIcons.themeCategory from assets/icons.generated.json instead.
 const iconL10n = (typeof window !== 'undefined' && window.fromscratchIcons) || {};

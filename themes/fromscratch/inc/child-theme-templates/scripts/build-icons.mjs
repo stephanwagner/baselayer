@@ -5,7 +5,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const themeRoot = path.join(__dirname, '..');
 
-const ICONS_DIR = 'icons-theme';
+const ICONS_DIR = 'icons';
 const configPath = path.join(themeRoot, 'config/icons.js');
 const iconsAbs = path.join(themeRoot, 'assets', ICONS_DIR);
 const cssOutPath = path.join(themeRoot, 'assets/css/icons.css');

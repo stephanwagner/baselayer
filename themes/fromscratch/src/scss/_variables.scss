@@ -211,4 +211,8 @@ $editor-content-width-padding: 24px;
   --fs-border-radius-s: #{$border-radius-s};
   --fs-border-radius-m: #{$border-radius-m};
   --fs-border-radius-l: #{$border-radius-l};
+
+  // Editor
+  --fs-editor-content-width: #{$editor-content-width};
+  --fs-editor-content-width-padding: #{$editor-content-width-padding};
 }

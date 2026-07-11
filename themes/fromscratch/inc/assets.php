@@ -264,10 +264,11 @@ function fs_enqueue_theme_icons_style(array $deps = []): void
 		return;
 	}
 
-	$icons_uri = $uri_base . 'assets/icons-theme/';
-	$css = (string) preg_replace(
-		'#url\(\s*([\'"]?)\.\./icons-theme/#',
-		'url($1' . $icons_uri,
+	$css = (string) preg_replace_callback(
+		'#url\(\s*([\'"]?)\.\./([^/\'")\s]+)/#',
+		static function (array $matches) use ($uri_base): string {
+			return 'url(' . $matches[1] . $uri_base . 'assets/' . $matches[2] . '/';
+		},
 		$css
 	);
 

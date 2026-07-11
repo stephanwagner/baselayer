@@ -17,7 +17,7 @@ Built files land in `assets/css/main.css`, `assets/js/main.js`, `assets/css/icon
 
 ## Icons
 
-Drop SVGs into `assets/icons-theme/` (optional `name-fill.svg` for a filled variant). Optional labels/keywords in `config/icons.js`. Then `npm run build` (or `npm run build:icons`).
+Drop SVGs into `assets/icons/` (optional `name-fill.svg` for a filled variant). Optional labels/keywords in `config/icons.js`. Then `npm run build` (or `npm run build:icons`).
 
 Use as:
 

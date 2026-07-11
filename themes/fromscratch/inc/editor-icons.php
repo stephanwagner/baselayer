@@ -959,7 +959,16 @@ function fs_sanitize_icon_slug($value): string
 function fs_icon_svg_asset_path(string $icon_name): string
 {
 	if (str_starts_with($icon_name, 'theme-')) {
-		return '/icons-theme/' . substr($icon_name, strlen('theme-')) . '.svg';
+		$file = substr($icon_name, strlen('theme-')) . '.svg';
+
+		if (is_child_theme()) {
+			$child = trailingslashit(get_stylesheet_directory()) . 'assets/icons/' . $file;
+			if (is_file($child)) {
+				return '/icons/' . $file;
+			}
+		}
+
+		return '/icons-theme/' . $file;
 	}
 
 	return '/icons/' . $icon_name . '.svg';
@@ -1081,6 +1090,16 @@ function fs_icons_localize_payload(): array
 	$theme_category = fs_stylesheet_theme_icon_category();
 	if ($theme_category !== null) {
 		$payload['themeCategory'] = $theme_category;
+	}
+
+	// Child theme icons live in assets/icons/; parent project icons in assets/icons-theme/.
+	if (
+		is_child_theme()
+		&& is_dir(trailingslashit(get_stylesheet_directory()) . 'assets/icons')
+	) {
+		$payload['themeIconsBase'] = trailingslashit(get_stylesheet_directory_uri()) . 'assets/icons/';
+	} else {
+		$payload['themeIconsBase'] = trailingslashit(get_template_directory_uri()) . 'assets/icons-theme/';
 	}
 
 	return $payload;

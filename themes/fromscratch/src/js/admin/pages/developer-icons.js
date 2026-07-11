@@ -48,7 +48,7 @@ const inlinePreviewClasses = (value, placement) => {
 
 const iconSvgFile = (name) => {
   if (name.startsWith('theme-')) {
-    return `theme/${name.slice('theme-'.length)}.svg`;
+    return `../icons-theme/${name.slice('theme-'.length)}.svg`;
   }
 
   return `${name}.svg`;
@@ -56,10 +56,28 @@ const iconSvgFile = (name) => {
 
 const iconSvgAssetPath = (name) => {
   if (name.startsWith('theme-')) {
-    return `/icons-theme/${name.slice('theme-'.length)}.svg`;
+    const base = name.slice('theme-'.length);
+    const themeBase = iconL10n().themeIconsBase || '';
+
+    if (themeBase.includes('/assets/icons/') && !themeBase.includes('/assets/icons-theme/')) {
+      return `/icons/${base}.svg`;
+    }
+
+    return `/icons-theme/${base}.svg`;
   }
 
   return `/icons/${name}.svg`;
+};
+
+const themeIconFetchUrl = (name, iconsBaseUrl) => {
+  if (name.startsWith('theme-')) {
+    const themeBase = iconL10n().themeIconsBase;
+    if (themeBase) {
+      return `${themeBase}${name.slice('theme-'.length)}.svg`;
+    }
+  }
+
+  return `${iconsBaseUrl}${iconSvgFile(name)}`;
 };
 
 const buildSvgPhpCode = (value) => `fs_svg_code('${iconSvgAssetPath(value)}', ['class' => 'my-class']);`;
@@ -440,7 +458,7 @@ function initSvgIconsDemo(root = document) {
     let rawSvg = '';
 
     try {
-      const response = await fetch(`${baseUrl}${iconSvgFile(value)}`);
+      const response = await fetch(themeIconFetchUrl(value, baseUrl));
 
       if (response.ok) {
         rawSvg = await response.text();
