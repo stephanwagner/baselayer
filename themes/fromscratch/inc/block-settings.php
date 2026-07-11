@@ -927,16 +927,7 @@ function fs_block_settings_admin_icon_map(): array
 	}
 
 	$map = [];
-	$path = get_template_directory() . '/acf/blocks.php';
-
-	if (!is_readable($path)) {
-		return $map;
-	}
-
-	$blocks = include $path;
-	if (!is_array($blocks)) {
-		return $map;
-	}
+	$blocks = function_exists('fs_get_acf_blocks') ? fs_get_acf_blocks() : [];
 
 	foreach ($blocks as $block) {
 		if (!is_array($block) || empty($block['name']) || empty($block['icon']) || !is_string($block['icon'])) {

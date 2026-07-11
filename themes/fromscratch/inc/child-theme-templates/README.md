@@ -30,4 +30,5 @@ They also appear under **Theme** in the icon picker. An example `logo-child.svg`
 ## Config / templates
 
 - Config stubs in `config/` (`theme.php`, `design.php`, `block-settings.php`, …) merge over the parent — see `config/README.md`
+- ACF blocks: `acf/blocks.php` merges over the parent by block `name` (commented example inside). Override markup with `acf/blocks/{name}/{name}.php` (child wins via `get_theme_file_path`)
 - Optional templates: `templates/…` (same paths as the parent)

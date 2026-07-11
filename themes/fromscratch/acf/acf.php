@@ -3,8 +3,78 @@
 // Import block filters
 include __DIR__ . '/block-filters.php';
 
-// Import blocks
-$configBlocks = include __DIR__ . '/blocks.php';
+/**
+ * Load a blocks.php file if readable.
+ *
+ * @return list<array<string, mixed>>
+ */
+function fs_load_acf_blocks_file(string $path): array
+{
+	if (!is_readable($path)) {
+		return [];
+	}
+
+	$loaded = include $path;
+	return is_array($loaded) ? $loaded : [];
+}
+
+/**
+ * ACF block catalog from acf/blocks.php (parent + child merge by name).
+ *
+ * Child entries with the same `name` deep-merge over the parent (list values replace).
+ * New child names are appended. Render templates stay at acf/blocks/{name}/{name}.php
+ * and resolve via get_theme_file_path() (child wins).
+ *
+ * @return list<array<string, mixed>>
+ */
+function fs_get_acf_blocks(): array
+{
+	static $blocks = null;
+	if ($blocks !== null) {
+		return $blocks;
+	}
+
+	$parent_path = get_template_directory() . '/acf/blocks.php';
+	$by_name = [];
+	$order = [];
+
+	foreach (fs_load_acf_blocks_file($parent_path) as $block) {
+		if (!is_array($block) || empty($block['name']) || !is_string($block['name'])) {
+			continue;
+		}
+		$name = $block['name'];
+		$by_name[$name] = $block;
+		$order[] = $name;
+	}
+
+	if (is_child_theme()) {
+		$child_path = get_stylesheet_directory() . '/acf/blocks.php';
+		if ($child_path !== $parent_path) {
+			foreach (fs_load_acf_blocks_file($child_path) as $block) {
+				if (!is_array($block) || empty($block['name']) || !is_string($block['name'])) {
+					continue;
+				}
+				$name = $block['name'];
+				if (isset($by_name[$name])) {
+					$by_name[$name] = fs_config_merge_deep($by_name[$name], $block);
+				} else {
+					$by_name[$name] = $block;
+					$order[] = $name;
+				}
+			}
+		}
+	}
+
+	$blocks = [];
+	foreach ($order as $name) {
+		$blocks[] = $by_name[$name];
+	}
+
+	return $blocks;
+}
+
+// Import blocks (parent + child merge)
+$configBlocks = fs_get_acf_blocks();
 
 // Register ACF blocks
 function fs_acf_init_core()

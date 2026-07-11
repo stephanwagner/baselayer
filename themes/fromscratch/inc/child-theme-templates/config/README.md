@@ -16,3 +16,8 @@ Shipped stubs (edit as needed):
 `content-types/` is copied from the parent on install (`fromscratch/config/content-types/`).
 When a child theme is active, only these files are loaded — there is no parent fallback.
 Delete a file here to disable that CPT for the child.
+
+## ACF blocks
+
+Block registration lives under `acf/blocks.php` (not in this folder). See that stub for
+merge-by-name rules and how to override render templates.
