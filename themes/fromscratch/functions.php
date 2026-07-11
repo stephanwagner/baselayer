@@ -83,6 +83,9 @@ if (fs_theme_feature_enabled('seo')) {
 }
 
 require_once 'inc/schema.php';
+
+require_once 'inc/social-media.php';
+
 if (fs_theme_feature_enabled('breadcrumbs')) {
 	require_once 'inc/helpers/breadcrumbs.php';
 }

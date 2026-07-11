@@ -1096,8 +1096,8 @@
                 "selected": 0
             },
             {
-                "key": "field_6a5c01a000001",
-                "label": "Firma",
+                "key": "field_6a523506a1f97",
+                "label": "Firmenangaben",
                 "name": "company",
                 "aria-label": "",
                 "type": "group",
@@ -1113,7 +1113,7 @@
                 "sub_fields": [
                     {
                         "key": "field_609fb7e0cfbf8",
-                        "label": "Name",
+                        "label": "Firmenname",
                         "name": "name",
                         "aria-label": "",
                         "type": "text",
@@ -1126,10 +1126,11 @@
                             "id": ""
                         },
                         "default_value": "",
+                        "maxlength": "",
+                        "allow_in_bindings": 1,
                         "placeholder": "",
                         "prepend": "",
-                        "append": "",
-                        "maxlength": ""
+                        "append": ""
                     },
                     {
                         "key": "field_609fb7f8cfbf9",
@@ -1167,10 +1168,11 @@
                             "id": ""
                         },
                         "default_value": "",
+                        "maxlength": "",
+                        "allow_in_bindings": 1,
                         "placeholder": "",
                         "prepend": "",
-                        "append": "",
-                        "maxlength": ""
+                        "append": ""
                     },
                     {
                         "key": "field_609fb82dcfbfb",
@@ -1192,6 +1194,476 @@
                         "placeholder": "",
                         "prepend": "",
                         "append": ""
+                    }
+                ]
+            },
+            {
+                "key": "field_6a523773a743c",
+                "label": "Social-Media",
+                "name": "",
+                "aria-label": "",
+                "type": "tab",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "placement": "left",
+                "endpoint": 0,
+                "selected": 0
+            },
+            {
+                "key": "field_6a5235aaa1f98",
+                "label": "Social-Media Kanäle",
+                "name": "social_media",
+                "aria-label": "",
+                "type": "group",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "layout": "block",
+                "sub_fields": [
+                    {
+                        "key": "field_6a5235faa1f99",
+                        "label": "Kanal",
+                        "name": "channel_1",
+                        "aria-label": "",
+                        "type": "select",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "20",
+                            "class": "",
+                            "id": ""
+                        },
+                        "choices": {
+                            "facebook": "Facebook",
+                            "instagram": "Instagram",
+                            "youtube": "YouTube",
+                            "linkedin": "LinkedIn",
+                            "x": "X (Twitter)",
+                            "tiktok": "TikTok"
+                        },
+                        "default_value": "facebook",
+                        "return_format": "value",
+                        "multiple": 0,
+                        "allow_null": 0,
+                        "allow_in_bindings": 0,
+                        "ui": 0,
+                        "ajax": 0,
+                        "placeholder": "",
+                        "create_options": 0,
+                        "save_options": 0
+                    },
+                    {
+                        "key": "field_6a523681a1f9a",
+                        "label": "URL",
+                        "name": "url_1",
+                        "aria-label": "",
+                        "type": "url",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "80",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": ""
+                    },
+                    {
+                        "key": "field_6a5236e8a1f9b",
+                        "label": "Kanal",
+                        "name": "channel_2",
+                        "aria-label": "",
+                        "type": "select",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "20",
+                            "class": "",
+                            "id": ""
+                        },
+                        "choices": {
+                            "facebook": "Facebook",
+                            "instagram": "Instagram",
+                            "youtube": "YouTube",
+                            "linkedin": "LinkedIn",
+                            "x": "X (Twitter)",
+                            "tiktok": "TikTok"
+                        },
+                        "default_value": "instagram",
+                        "return_format": "value",
+                        "multiple": 0,
+                        "allow_null": 0,
+                        "allow_in_bindings": 0,
+                        "ui": 0,
+                        "ajax": 0,
+                        "placeholder": "",
+                        "create_options": 0,
+                        "save_options": 0
+                    },
+                    {
+                        "key": "field_6a5236eca1f9c",
+                        "label": "URL",
+                        "name": "url_2",
+                        "aria-label": "",
+                        "type": "url",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "80",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": ""
+                    },
+                    {
+                        "key": "field_6a52379ba743d",
+                        "label": "Kanal",
+                        "name": "channel_3",
+                        "aria-label": "",
+                        "type": "select",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "20",
+                            "class": "",
+                            "id": ""
+                        },
+                        "choices": {
+                            "facebook": "Facebook",
+                            "instagram": "Instagram",
+                            "youtube": "YouTube",
+                            "linkedin": "LinkedIn",
+                            "x": "X (Twitter)",
+                            "tiktok": "TikTok"
+                        },
+                        "default_value": "youtube",
+                        "return_format": "value",
+                        "multiple": 0,
+                        "allow_null": 0,
+                        "allow_in_bindings": 0,
+                        "ui": 0,
+                        "ajax": 0,
+                        "placeholder": "",
+                        "create_options": 0,
+                        "save_options": 0
+                    },
+                    {
+                        "key": "field_6a52379fa743e",
+                        "label": "URL",
+                        "name": "url_3",
+                        "aria-label": "",
+                        "type": "url",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "80",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": ""
+                    },
+                    {
+                        "key": "field_6a5237b1a7440",
+                        "label": "Kanal",
+                        "name": "channel_4",
+                        "aria-label": "",
+                        "type": "select",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "20",
+                            "class": "",
+                            "id": ""
+                        },
+                        "choices": {
+                            "facebook": "Facebook",
+                            "instagram": "Instagram",
+                            "youtube": "YouTube",
+                            "linkedin": "LinkedIn",
+                            "x": "X (Twitter)",
+                            "tiktok": "TikTok"
+                        },
+                        "default_value": "linkedin",
+                        "return_format": "value",
+                        "multiple": 0,
+                        "allow_null": 0,
+                        "allow_in_bindings": 0,
+                        "ui": 0,
+                        "ajax": 0,
+                        "placeholder": "",
+                        "create_options": 0,
+                        "save_options": 0
+                    },
+                    {
+                        "key": "field_6a5237ada743f",
+                        "label": "URL",
+                        "name": "url_4",
+                        "aria-label": "",
+                        "type": "url",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "80",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": ""
+                    },
+                    {
+                        "key": "field_6a5237c6a7442",
+                        "label": "Kanal",
+                        "name": "channel_5",
+                        "aria-label": "",
+                        "type": "select",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "20",
+                            "class": "",
+                            "id": ""
+                        },
+                        "choices": {
+                            "facebook": "Facebook",
+                            "instagram": "Instagram",
+                            "youtube": "YouTube",
+                            "linkedin": "LinkedIn",
+                            "x": "X (Twitter)",
+                            "tiktok": "TikTok"
+                        },
+                        "default_value": "x",
+                        "return_format": "value",
+                        "multiple": 0,
+                        "allow_null": 0,
+                        "allow_in_bindings": 0,
+                        "ui": 0,
+                        "ajax": 0,
+                        "placeholder": "",
+                        "create_options": 0,
+                        "save_options": 0
+                    },
+                    {
+                        "key": "field_6a5237c4a7441",
+                        "label": "URL",
+                        "name": "url_5",
+                        "aria-label": "",
+                        "type": "url",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "80",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": ""
+                    },
+                    {
+                        "key": "field_6a5238aeec767",
+                        "label": "Kanal",
+                        "name": "channel_6",
+                        "aria-label": "",
+                        "type": "select",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "20",
+                            "class": "",
+                            "id": ""
+                        },
+                        "choices": {
+                            "facebook": "Facebook",
+                            "instagram": "Instagram",
+                            "youtube": "YouTube",
+                            "linkedin": "LinkedIn",
+                            "x": "X (Twitter)",
+                            "tiktok": "TikTok"
+                        },
+                        "default_value": "tiktok",
+                        "return_format": "value",
+                        "multiple": 0,
+                        "allow_null": 0,
+                        "allow_in_bindings": 0,
+                        "ui": 0,
+                        "ajax": 0,
+                        "placeholder": "",
+                        "create_options": 0,
+                        "save_options": 0
+                    },
+                    {
+                        "key": "field_6a5238adec766",
+                        "label": "URL",
+                        "name": "url_6",
+                        "aria-label": "",
+                        "type": "url",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "80",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": ""
+                    }
+                ]
+            },
+            {
+                "key": "field_6a52392e730f7",
+                "label": "Weitere Kanäle",
+                "name": "custom_channels",
+                "aria-label": "",
+                "type": "repeater",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "layout": "block",
+                "pagination": 0,
+                "min": 0,
+                "max": 0,
+                "collapsed": "",
+                "button_label": "Add Row",
+                "rows_per_page": 20,
+                "sub_fields": [
+                    {
+                        "key": "field_6a5239b6730f9",
+                        "label": "Icon-Typ",
+                        "name": "icon_type",
+                        "aria-label": "",
+                        "type": "button_group",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "33",
+                            "class": "",
+                            "id": ""
+                        },
+                        "choices": {
+                            "classname": "Klassenname",
+                            "code": "SVG-Code"
+                        },
+                        "default_value": "classname",
+                        "return_format": "value",
+                        "allow_null": 0,
+                        "allow_in_bindings": 0,
+                        "layout": "horizontal",
+                        "parent_repeater": "field_6a52392e730f7"
+                    },
+                    {
+                        "key": "field_6a523983730f8",
+                        "label": "URL",
+                        "name": "url",
+                        "aria-label": "",
+                        "type": "url",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "67",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": "",
+                        "parent_repeater": "field_6a52392e730f7"
+                    },
+                    {
+                        "key": "field_6a523ace730fb",
+                        "label": "Klassenname",
+                        "name": "classname",
+                        "aria-label": "",
+                        "type": "text",
+                        "instructions": "Gib die Icon-Klasse im Format <code>-icon-name<\/code> ein. Icons und Klassen kannst du in den <a href=\"\/wp-admin\/options-general.php?page=fs-developer-system\">Developer-Einstellungen<\/a> finden und kopieren.",
+                        "required": 0,
+                        "conditional_logic": [
+                            [
+                                {
+                                    "field": "field_6a5239b6730f9",
+                                    "operator": "==",
+                                    "value": "classname"
+                                }
+                            ]
+                        ],
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "maxlength": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": "",
+                        "parent_repeater": "field_6a52392e730f7"
+                    },
+                    {
+                        "key": "field_6a523b09730fc",
+                        "label": "SVG-Code eingeben",
+                        "name": "svg_code",
+                        "aria-label": "",
+                        "type": "textarea",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": [
+                            [
+                                {
+                                    "field": "field_6a5239b6730f9",
+                                    "operator": "==",
+                                    "value": "code"
+                                }
+                            ]
+                        ],
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "maxlength": "",
+                        "allow_in_bindings": 0,
+                        "rows": 6,
+                        "placeholder": "",
+                        "new_lines": "",
+                        "parent_repeater": "field_6a52392e730f7"
                     }
                 ]
             },
@@ -1350,7 +1822,7 @@
                         "default_value": "",
                         "maxlength": "",
                         "allow_in_bindings": 0,
-                        "rows": "",
+                        "rows": 4,
                         "placeholder": "",
                         "new_lines": ""
                     },
@@ -1428,7 +1900,7 @@
                         "name": "website",
                         "aria-label": "",
                         "type": "url",
-                        "instructions": "Die kanonische URL der Website. Leer lassen, um automatisch die Website-Adresse zu verwenden.",
+                        "instructions": "Die URL der Website. Leer lassen, um automatisch die Website-Adresse zu verwenden.",
                         "required": 0,
                         "conditional_logic": 0,
                         "wrapper": {

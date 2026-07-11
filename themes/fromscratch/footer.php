@@ -21,6 +21,12 @@
 			<?php if ($company_email !== '') : ?>
 				<a href="mailto:<?= esc_attr($company_email) ?>"><?= esc_html($company_email) ?></a>
 			<?php endif; ?>
+			<?php
+			if (function_exists('fs_render_social_media_links')) {
+				// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- attrs escaped; SVG sanitized via fs_svg_sanitize()
+				echo fs_render_social_media_links();
+			}
+			?>
 		</div>
 		<div class="footer-menu__wrapper">
 			<?php fs_nav_menu([
