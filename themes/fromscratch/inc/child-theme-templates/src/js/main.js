@@ -11,4 +11,6 @@
  *   npm run watch
  */
 
+import '../../acf/blocks/blocks.js';
+
 console.log('FromScratch Child Theme JavaScript loaded.');

@@ -11,7 +11,7 @@ if (!empty($block['align'])) {
     $classNames[] = 'align' . $block['align'];
 }
 
-// Add class provided via class_field in WP Backend
+// Add class provided via class_field in WP backend
 if (!empty($block['className'])) {
     $classNames[] = $block['className'];
 }

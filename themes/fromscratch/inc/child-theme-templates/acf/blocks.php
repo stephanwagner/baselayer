@@ -9,12 +9,14 @@
  * Merged by block `name` (child wins on shared keys; list values like keywords
  * replace wholesale). New names are registered as additional blocks.
  *
- * Render markup (optional override):
+ * Render markup:
  *   acf/blocks/{name}/{name}.php  — resolved via get_theme_file_path() (child first)
+ * Styles / scripts:
+ *   acf/blocks/_blocks.scss, blocks.js, _blocks-editor.scss (imported from src/)
  * Inserter preview:
  *   acf/blocks/{name}/preview.php or preview.jpg|png|webp
  *
- * Only add entries you want to override or register. Leave empty to use parent as-is.
+ * `my-block` below is a starter example — remove or rename it for real projects.
  */
 
 return [
@@ -32,5 +34,4 @@ return [
 		// 'parent' => ['acf/parent-block'],
 	],
 	*/
-
 ];

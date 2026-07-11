@@ -1,0 +1,11 @@
+@use '../../../src/scss/variables' as *;
+
+/**
+ * Editor-only tweaks for My Block (loaded via acf/blocks/_blocks-editor.scss).
+ */
+
+.editor-styles-wrapper {
+  .my-block__wrapper {
+    // Add your editor-only styles here
+  }
+}

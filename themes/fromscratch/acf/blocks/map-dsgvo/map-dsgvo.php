@@ -6,7 +6,7 @@ $classNames = ['fs-wp-block'];
 // ID for specific styling
 $classNames[] = $block['id'];
 
-// Add class provided via class_field in WP Backend
+// Add class provided via class_field in WP backend
 if (!empty($block['className'])) {
     $classNames[] = $block['className'];
 }
