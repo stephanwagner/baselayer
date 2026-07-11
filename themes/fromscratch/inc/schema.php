@@ -62,7 +62,11 @@ function fs_schema_get_data(): ?array
 	}
 
 	$type = trim((string) ($schema['type'] ?? ''));
-	$name = trim((string) ($schema['organization_name'] ?? $schema['name'] ?? ''));
+	$name = trim((string) ($schema['organization_name'] ?? ''));
+	if ($name === '') {
+		$company = get_field('company', 'option');
+		$name = is_array($company) ? trim((string) ($company['name'] ?? '')) : '';
+	}
 
 	if ($type === '' || $name === '') {
 		return null;

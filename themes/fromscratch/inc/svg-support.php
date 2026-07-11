@@ -159,7 +159,8 @@ function fs_svg_is_safe_style_value(string $property, string $value): bool
 			return (bool) preg_match('/^[\d.]+(?:px|pt|em|ex|%)?$/i', $value);
 
 		case 'stroke-dasharray':
-			return (bool) preg_match('/^(?:none|[\d.]+(?:px|pt|em|ex|%)?(?:\s*,\s*[\d.]+(?:px|pt|em|ex|%)?)*)$/i', $value);
+			// SVG/CSS allow space- or comma-separated lengths (e.g. "10 6" or "10, 6").
+			return (bool) preg_match('/^(?:none|[\d.]+(?:px|pt|em|ex|%)?(?:(?:\s*,\s*|\s+)[\d.]+(?:px|pt|em|ex|%)?)*)$/i', $value);
 
 		case 'fill-rule':
 			return in_array($lower, ['nonzero', 'evenodd'], true);

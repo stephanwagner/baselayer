@@ -1096,11 +1096,11 @@
                 "selected": 0
             },
             {
-                "key": "field_609fb7e0cfbf8",
+                "key": "field_6a5c01a000001",
                 "label": "Firma",
-                "name": "theme_company",
+                "name": "company",
                 "aria-label": "",
-                "type": "text",
+                "type": "group",
                 "instructions": "",
                 "required": 0,
                 "conditional_logic": 0,
@@ -1109,73 +1109,91 @@
                     "class": "",
                     "id": ""
                 },
-                "default_value": "",
-                "placeholder": "",
-                "prepend": "",
-                "append": "",
-                "maxlength": ""
-            },
-            {
-                "key": "field_609fb7f8cfbf9",
-                "label": "Adresse",
-                "name": "theme_address",
-                "aria-label": "",
-                "type": "textarea",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "maxlength": "",
-                "allow_in_bindings": 1,
-                "rows": 3,
-                "placeholder": "",
-                "new_lines": ""
-            },
-            {
-                "key": "field_609fb81ccfbfa",
-                "label": "Telefon",
-                "name": "theme_phone",
-                "aria-label": "",
-                "type": "text",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "placeholder": "",
-                "prepend": "",
-                "append": "",
-                "maxlength": ""
-            },
-            {
-                "key": "field_609fb82dcfbfb",
-                "label": "E-Mail-Adresse",
-                "name": "theme_email",
-                "aria-label": "",
-                "type": "text",
-                "instructions": "",
-                "required": 0,
-                "conditional_logic": 0,
-                "wrapper": {
-                    "width": "",
-                    "class": "",
-                    "id": ""
-                },
-                "default_value": "",
-                "maxlength": "",
-                "allow_in_bindings": 1,
-                "placeholder": "",
-                "prepend": "",
-                "append": ""
+                "layout": "block",
+                "sub_fields": [
+                    {
+                        "key": "field_609fb7e0cfbf8",
+                        "label": "Name",
+                        "name": "name",
+                        "aria-label": "",
+                        "type": "text",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": "",
+                        "maxlength": ""
+                    },
+                    {
+                        "key": "field_609fb7f8cfbf9",
+                        "label": "Adresse",
+                        "name": "address",
+                        "aria-label": "",
+                        "type": "textarea",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "maxlength": "",
+                        "allow_in_bindings": 1,
+                        "rows": 3,
+                        "placeholder": "",
+                        "new_lines": ""
+                    },
+                    {
+                        "key": "field_609fb81ccfbfa",
+                        "label": "Telefon",
+                        "name": "phone",
+                        "aria-label": "",
+                        "type": "text",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": "",
+                        "maxlength": ""
+                    },
+                    {
+                        "key": "field_609fb82dcfbfb",
+                        "label": "E-Mail-Adresse",
+                        "name": "email",
+                        "aria-label": "",
+                        "type": "text",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "maxlength": "",
+                        "allow_in_bindings": 1,
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": ""
+                    }
+                ]
             },
             {
                 "key": "field_6a521af2243d9",

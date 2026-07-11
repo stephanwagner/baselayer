@@ -2,10 +2,12 @@
 	<div class="footer__container container">
 		<div class="footer__text">
 			<?php
-			$company_name = function_exists('get_field') ? (string) get_field('theme_company', 'option') : '';
-			$company_address = function_exists('get_field') ? (string) get_field('theme_address', 'option') : '';
-			$company_phone = function_exists('get_field') ? (string) get_field('theme_phone', 'option') : '';
-			$company_email = function_exists('get_field') ? (string) get_field('theme_email', 'option') : '';
+			$company = function_exists('get_field') ? get_field('company', 'option') : null;
+			$company = is_array($company) ? $company : [];
+			$company_name = (string) ($company['name'] ?? '');
+			$company_address = (string) ($company['address'] ?? '');
+			$company_phone = (string) ($company['phone'] ?? '');
+			$company_email = (string) ($company['email'] ?? '');
 			?>
 			<?php if ($company_name !== '') : ?>
 				<b><?= esc_html($company_name) ?></b><br>
