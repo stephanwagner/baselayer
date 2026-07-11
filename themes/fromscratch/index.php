@@ -1,6 +1,6 @@
 <?php get_header(); ?>
 
-<div class="content__wrapper">
+<main class="content__wrapper">
 	<div class="content__container container">
 
 		<?php
@@ -12,6 +12,6 @@
 		}
 		?>
 	</div>
-</div>
+</main>
 
 <?php get_footer(); ?>

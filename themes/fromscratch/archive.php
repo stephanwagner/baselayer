@@ -14,7 +14,7 @@ $archive_heading = fs_archive_heading();
 $archive_type = fs_archive_cpt_type();
 ?>
 
-<div class="content__wrapper">
+<main class="content__wrapper">
 	<div class="content__container container">
 
 		<?= fs_breadcrumbs() ?>
@@ -75,6 +75,6 @@ $archive_type = fs_archive_cpt_type();
 		</div>
 
 	</div>
-</div>
+</main>
 
 <?php get_footer(); ?>

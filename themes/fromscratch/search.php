@@ -7,7 +7,7 @@ get_header();
 $s = trim((string) get_search_query());
 ?>
 
-<div class="content__wrapper">
+<main class="content__wrapper">
 	<div class="content__container container">
 
 		<?php echo fs_breadcrumbs(); ?>
@@ -57,6 +57,6 @@ $s = trim((string) get_search_query());
 		</div>
 
 	</div>
-</div>
+</main>
 
 <?php get_footer(); ?>
