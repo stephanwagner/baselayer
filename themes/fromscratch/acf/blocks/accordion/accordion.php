@@ -25,6 +25,8 @@ $id = get_field('id');
 $closeNeighbouringAccordions = get_field('close_neighbouring_accordions');
 $scrollToAccordionTop = get_field('scroll_to_accordion_top');
 $isOpen = get_field('accordion_is_open');
+$advancedSettings = get_field('advanced_settings');
+$addToFaqSchema = !empty(get_field('has_advanced_settings')) && !empty($advancedSettings['add_to_faq_schema']);
 
 if (!empty($isOpen)) {
 	$classNames[] = 'accordion-open';
@@ -74,3 +76,12 @@ $accordionId = $id ? $id : 'accordion-' . $globalAccordionId;
 		</div>
 	</div>
 </div>
+
+<?php
+// Add to FAQ schema
+if ($addToFaqSchema && function_exists('fs_schema_faq_collect')) {
+	fs_schema_faq_collect(
+		is_string($title) ? $title : '',
+		is_string($content) ? $content : ''
+	);
+}

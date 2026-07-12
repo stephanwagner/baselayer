@@ -394,7 +394,7 @@ function fs_acf_expand_repeater_example(string $name, array $field, array $rows)
 }
 
 // Render callback for ACF blocks
-function fs_acf_block_render_callback($block)
+function fs_acf_block_render_callback($block, $content = '', $is_preview = false, $post_id = 0, $wp_block = null, $context = false)
 {
 	if (!empty($block['data']['_preview_image']) && is_string($block['data']['_preview_image'])) {
 		printf(
@@ -416,6 +416,7 @@ function fs_acf_block_render_callback($block)
 
 	$slug = str_replace('acf/', '', $block['name']);
 	if (file_exists(get_theme_file_path("/acf/blocks/{$slug}/{$slug}.php"))) {
+		// $block, $content, $is_preview, $post_id, $wp_block, $context available to the template.
 		include(get_theme_file_path("/acf/blocks/{$slug}/{$slug}.php"));
 	}
 

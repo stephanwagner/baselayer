@@ -59,7 +59,7 @@
                     "class": "",
                     "id": ""
                 },
-                "message": "Accordion ist geöffnet",
+                "message": "Standardmäßig geöffnet",
                 "default_value": 0,
                 "allow_in_bindings": 0,
                 "ui": 0,
@@ -107,6 +107,74 @@
                 "ui": 0,
                 "ui_on_text": "",
                 "ui_off_text": ""
+            },
+            {
+                "key": "field_375ace6bf7a8",
+                "label": "",
+                "name": "has_advanced_settings",
+                "aria-label": "",
+                "type": "true_false",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "Weitere Einstellungen",
+                "default_value": 0,
+                "allow_in_bindings": 0,
+                "ui": 0,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_36fa99c76395",
+                "label": "",
+                "name": "advanced_settings",
+                "aria-label": "",
+                "type": "group",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_375ace6bf7a8",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "layout": "block",
+                "sub_fields": [
+                    {
+                        "key": "field_7a08f42ea33a",
+                        "label": "",
+                        "name": "add_to_faq_schema",
+                        "aria-label": "",
+                        "type": "true_false",
+                        "instructions": "Verwendet den Inhalt dieses Akkordeons als Frage und Antwort für strukturierte FAQ-Daten. Nur für echte FAQs verwenden.",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "message": "Zum FAQ-Schema hinzufügen",
+                        "default_value": 0,
+                        "allow_in_bindings": 0,
+                        "ui": 0,
+                        "ui_on_text": "",
+                        "ui_off_text": ""
+                    }
+                ]
             }
         ],
         "location": [
