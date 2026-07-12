@@ -19,21 +19,21 @@ function fs_schema_site_logo_url(): string
 /**
  * Resolve an ACF image field value to a full URL.
  *
- * @param mixed $logo ACF image array, attachment ID, or URL string.
+ * @param mixed $image ACF image array, attachment ID, or URL string.
  */
-function fs_schema_resolve_logo_url($logo): string
+function fs_schema_resolve_image_url($image): string
 {
-	if (is_array($logo) && !empty($logo['url']) && is_string($logo['url'])) {
-		return $logo['url'];
+	if (is_array($image) && !empty($image['url']) && is_string($image['url'])) {
+		return $image['url'];
 	}
 
-	if (is_numeric($logo)) {
-		$url = wp_get_attachment_image_url((int) $logo, 'full');
+	if (is_numeric($image)) {
+		$url = wp_get_attachment_image_url((int) $image, 'full');
 		return is_string($url) ? $url : '';
 	}
 
-	if (is_string($logo) && $logo !== '') {
-		return $logo;
+	if (is_string($image) && $image !== '') {
+		return $image;
 	}
 
 	return '';
@@ -91,12 +91,17 @@ function fs_schema_get_data(): ?array
 	$website = trim((string) ($schema['website'] ?? ''));
 	$data['url'] = $website !== '' ? $website : home_url('/');
 
-	$logo = fs_schema_resolve_logo_url($schema['logo'] ?? null);
+	$logo = fs_schema_resolve_image_url($schema['logo'] ?? null);
 	if ($logo === '') {
 		$logo = fs_schema_site_logo_url();
 	}
 	if ($logo !== '') {
 		$data['logo'] = $logo;
+	}
+
+	$image = fs_schema_resolve_image_url($schema['image'] ?? null);
+	if ($image !== '') {
+		$data['image'] = $image;
 	}
 
 	$phone = trim((string) ($schema['phone'] ?? ''));

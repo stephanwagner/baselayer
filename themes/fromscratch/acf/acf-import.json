@@ -2099,7 +2099,7 @@
                         "name": "type",
                         "aria-label": "",
                         "type": "select",
-                        "instructions": "Wähle den Schema.org-Typ, der deine Website oder Organisation am besten beschreibt.",
+                        "instructions": "Wähle den Schema.org-Typ, der die Website oder Organisation am besten beschreibt.",
                         "required": 1,
                         "conditional_logic": 0,
                         "wrapper": {
@@ -2131,11 +2131,11 @@
                     },
                     {
                         "key": "field_6a521f77e58a3",
-                        "label": "Organisationsname",
+                        "label": "Name des Unternehmens",
                         "name": "organization_name",
                         "aria-label": "",
                         "type": "text",
-                        "instructions": "Der offizielle Name deiner Organisation oder deines Unternehmens.",
+                        "instructions": "Der offizielle Name des Unternehmens oder der Organisation.",
                         "required": 1,
                         "conditional_logic": 0,
                         "wrapper": {
@@ -2156,7 +2156,7 @@
                         "name": "description",
                         "aria-label": "",
                         "type": "textarea",
-                        "instructions": "Eine kurze Beschreibung deiner Organisation. Empfohlen sind 120–160 Zeichen.",
+                        "instructions": "Eine kurze Beschreibung des Unternehmens. Empfohlen sind 120–160 Zeichen.",
                         "required": 0,
                         "conditional_logic": 0,
                         "wrapper": {
@@ -2177,7 +2177,33 @@
                         "name": "logo",
                         "aria-label": "",
                         "type": "image",
-                        "instructions": "Das Hauptlogo deiner Organisation. Idealerweise als SVG oder hochauflösendes PNG.",
+                        "instructions": "Das Hauptlogo des Unternehmens. Idealerweise als SVG oder hochauflösendes PNG.",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "return_format": "array",
+                        "library": "all",
+                        "min_width": "",
+                        "min_height": "",
+                        "min_size": "",
+                        "max_width": "",
+                        "max_height": "",
+                        "max_size": "",
+                        "mime_types": "",
+                        "allow_in_bindings": 0,
+                        "preview_size": "thumbnail"
+                    },
+                    {
+                        "key": "field_6a53201e7cc8c",
+                        "label": "Bild",
+                        "name": "image",
+                        "aria-label": "",
+                        "type": "image",
+                        "instructions": "Ein repräsentatives Bild des Unternehmens, z. B. vom Büro, Geschäft oder Team.",
                         "required": 0,
                         "conditional_logic": 0,
                         "wrapper": {
