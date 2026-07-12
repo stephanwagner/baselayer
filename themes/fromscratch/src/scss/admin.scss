@@ -10,6 +10,9 @@
 // Wordpress
 @forward 'admin/wordpress';
 
+// ACF
+@forward 'admin/acf';
+
 // Forms
 @forward 'admin/form';
 
