@@ -300,3 +300,9 @@ div.fromscratch-seo-panel {
 .fs-event-include-times__control {
   margin: 0 !important;
 }
+
+// Pagination
+
+.pagination__link {
+  pointer-events: none;
+}
