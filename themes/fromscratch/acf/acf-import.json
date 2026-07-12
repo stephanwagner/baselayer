@@ -432,7 +432,8 @@
                 },
                 "choices": {
                     "post": "Beiträge",
-                    "event": "Veranstaltungen"
+                    "event": "Veranstaltungen",
+                    "projects": "Projekte"
                 },
                 "default_value": "post",
                 "return_format": "value",
@@ -743,7 +744,7 @@
                         "label": "Beschriftung",
                         "name": "label",
                         "aria-label": "",
-                        "type": "text",
+                        "type": "textarea",
                         "instructions": "Text unter der Zahl.",
                         "required": 0,
                         "conditional_logic": 0,
@@ -755,9 +756,9 @@
                         "default_value": "",
                         "maxlength": "",
                         "allow_in_bindings": 0,
+                        "rows": 2,
                         "placeholder": "",
-                        "prepend": "",
-                        "append": "",
+                        "new_lines": "br",
                         "parent_repeater": "field_6a018b316fa25"
                     },
                     {

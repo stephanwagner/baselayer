@@ -46,14 +46,14 @@
 
 .number-ticker__prefix {
   font-size: 32px;
-  transform: translateY(-3px);
+  transform: translateY(-6px);
   margin-right: 4px;
 }
 
 .number-ticker__suffix {
   font-size: 38px;
   align-self: center;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 .number-ticker__label {
@@ -62,4 +62,8 @@
   border-top: 1px solid var(--fs-color-gray-300);
   padding: 16px 12px 0;
   margin: 16px 0 0;
+
+  @media (min-resolution: 1.9dppx) {
+    border-width: 1.5px;
+  }
 }

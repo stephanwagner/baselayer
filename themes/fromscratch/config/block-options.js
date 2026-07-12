@@ -477,4 +477,10 @@ export const blockOptions = [
     name: 'acf/article-list',
     options: [getAlignWideContainerControl(), getContentMarginControl('m')],
   },
+
+  // ACF: Number Ticker
+  {
+    name: 'acf/number-ticker',
+    options: [getAlignWideContainerControl(), getContentMarginControl('m')],
+  },
 ];
