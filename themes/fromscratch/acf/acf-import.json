@@ -432,8 +432,7 @@
                 },
                 "choices": {
                     "post": "Beiträge",
-                    "event": "Veranstaltungen",
-                    "example": "Projekte"
+                    "event": "Veranstaltungen"
                 },
                 "default_value": "post",
                 "return_format": "value",
@@ -519,7 +518,7 @@
                 "label": "Limit-Typ",
                 "name": "limit_type",
                 "aria-label": "",
-                "type": "button_group",
+                "type": "select",
                 "instructions": "",
                 "required": 0,
                 "conditional_logic": [
@@ -542,9 +541,14 @@
                 },
                 "default_value": "pagination",
                 "return_format": "value",
+                "multiple": 0,
                 "allow_null": 0,
                 "allow_in_bindings": 0,
-                "layout": "horizontal"
+                "ui": 0,
+                "ajax": 0,
+                "placeholder": "",
+                "create_options": 0,
+                "save_options": 0
             },
             {
                 "key": "field_6a5c8f1a2b3ca",

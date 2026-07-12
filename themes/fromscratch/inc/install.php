@@ -424,10 +424,10 @@ function fs_render_installer(): void
         $content_post = !empty($fs_install_val(['install', 'content', 'post'], true));
         $content_projects = !empty($fs_install_val(['install', 'content', 'projects'], true));
         $content_event = !empty($fs_install_val(['install', 'content', 'event'], true));
-        // Default example content on — matches a typical first install.
+        // Blog examples on by default; projects/events examples off.
         $content_post_examples = !empty($fs_install_val(['install', 'content', 'post_examples'], true));
-        $content_projects_examples = !empty($fs_install_val(['install', 'content', 'projects_examples'], true));
-        $content_event_examples = !empty($fs_install_val(['install', 'content', 'event_examples'], true));
+        $content_projects_examples = !empty($fs_install_val(['install', 'content', 'projects_examples'], false));
+        $content_event_examples = !empty($fs_install_val(['install', 'content', 'event_examples'], false));
         ?>
 
         <table class="form-table" role="presentation">

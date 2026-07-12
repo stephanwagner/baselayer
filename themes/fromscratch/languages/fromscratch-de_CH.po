@@ -677,6 +677,54 @@ msgstr "Erstellte Seiten in Menüs eintragen"
 msgid "Adds the pages to the configured menu locations."
 msgstr "Fügt die Seiten den konfigurierten Menü-Positionen hinzu."
 
+msgid "Choose which content types to use. Their config files are always installed, so you can also switch them on later."
+msgstr "Wähle aus, welche Inhaltstypen du nutzen möchtest. Die Konfigurationsdateien werden immer installiert, sodass du sie auch später noch aktivieren kannst."
+
+msgid "Blog posts"
+msgstr "Blogbeiträge"
+
+msgid "Enable blog posts"
+msgstr "Blogbeiträge aktivieren"
+
+msgid "WordPress’s built-in posts – ideal for news, articles, or a classic blog archive."
+msgstr "Die integrierten WordPress-Beiträge – ideal für Neuigkeiten, Artikel oder ein klassisches Blog-Archiv."
+
+msgid "Create example posts"
+msgstr "Beispielbeiträge erstellen"
+
+msgid "Enable custom post type: Projects"
+msgstr "Custom Post Type aktivieren: Projekte"
+
+msgid "A flexible custom post type you can rename and reshape – for portfolios, case studies, or similar listings."
+msgstr "Ein flexibler Custom Post Type, den du umbenennen und anpassen kannst – für Portfolios, Fallstudien oder ähnliche Auflistungen."
+
+msgid "Enable custom post type: Events"
+msgstr "Custom Post Type aktivieren: Veranstaltungen"
+
+msgid "Items with start and end dates, ordered by date on archives – suited to happenings, workshops, or schedules."
+msgstr "Einträge mit Start- und Enddatum, im Archiv nach Datum sortiert – geeignet für Events, Workshops oder Termine."
+
+msgid "Advanced Custom Fields"
+msgstr "Advanced Custom Fields"
+
+msgid "This theme relies heavily on ACF Pro for custom fields, blocks, and flexible content. A valid license keeps updates and Pro features available."
+msgstr "Dieses Theme baut stark auf ACF Pro für eigene Felder, Blöcke und flexible Inhalte. Mit einer gültigen Lizenz bleiben Updates und Pro-Funktionen verfügbar."
+
+msgid "ACF Pro license key"
+msgstr "ACF-Pro-Lizenzschlüssel"
+
+msgid "An ACF Pro license key is already defined in the configuration."
+msgstr "Ein ACF-Pro-Lizenzschlüssel ist bereits in der Konfiguration hinterlegt."
+
+msgid "Optional. If entered and not already present, it will be added to wp-config.php."
+msgstr "Optional. Wenn du einen Schlüssel eingibst und er noch nicht vorhanden ist, wird er in die wp-config.php geschrieben."
+
+msgid "Could not write the ACF Pro license to wp-config.php (file missing or not writable)."
+msgstr "Die ACF-Pro-Lizenz konnte nicht in die wp-config.php geschrieben werden (Datei fehlt oder ist nicht beschreibbar)."
+
+msgid "Failed to write the ACF Pro license to wp-config.php."
+msgstr "Die ACF-Pro-Lizenz konnte nicht in die wp-config.php geschrieben werden."
+
 msgid "Administrator email"
 msgstr "Administrator-E-Mail"
 
