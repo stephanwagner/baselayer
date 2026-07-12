@@ -69,12 +69,16 @@ function fs_install_create_child_theme(array $theme)
 		return new WP_Error('fs_child_mkdir', __('Could not create the child theme folder.', 'fromscratch'));
 	}
 
+	$content_path = (string) (wp_parse_url(content_url(), PHP_URL_PATH) ?: '/wp-content');
+	$content_path = untrailingslashit($content_path);
+
 	$tokens = [
 		'{{name}}' => $name,
 		'{{slug}}' => $slug,
 		'{{description}}' => $description,
 		'{{author}}' => $author,
 		'{{author_uri}}' => $author_uri,
+		'{{child_theme_path}}' => $content_path . '/themes/' . $slug,
 	];
 
 	$copied = fs_install_copy_child_theme_templates($templates_dir, $child_dir, $tokens);

@@ -677,8 +677,8 @@ msgstr "Erstellte Seiten in Menüs eintragen"
 msgid "Adds the pages to the configured menu locations."
 msgstr "Fügt die Seiten den konfigurierten Menü-Positionen hinzu."
 
-msgid "Choose which content types to use. Their config files are always installed, so you can also switch them on later."
-msgstr "Wähle aus, welche Inhaltstypen du nutzen möchtest. Die Konfigurationsdateien werden immer installiert, sodass du sie auch später noch aktivieren kannst."
+msgid "Choose which content types to use. Their config files are always installed, so you can also switch them on or off later."
+msgstr "Wähle aus, welche Inhaltstypen du nutzen möchtest. Die Konfigurationsdateien werden immer installiert, sodass du sie auch später noch aktivieren oder deaktivieren kannst."
 
 msgid "Blog posts"
 msgstr "Blogbeiträge"

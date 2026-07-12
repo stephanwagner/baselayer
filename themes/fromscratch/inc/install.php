@@ -418,7 +418,7 @@ function fs_render_installer(): void
 
         <h2><?= esc_html__('Content', 'fromscratch') ?></h2>
 
-        <p class="description"><?= esc_html__('Choose which content types to use. Their config files are always installed, so you can also switch them on later.', 'fromscratch') ?></p>
+        <p class="description"><?= esc_html__('Choose which content types to use. Their config files are always installed, so you can also switch them on or off later.', 'fromscratch') ?></p>
 
         <?php
         $content_post = !empty($fs_install_val(['install', 'content', 'post'], true));

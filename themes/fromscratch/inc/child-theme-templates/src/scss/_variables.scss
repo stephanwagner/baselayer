@@ -1,5 +1,8 @@
 @use 'sass:color';
 
+// Paths
+$child-theme-path: '{{child_theme_path}}';
+
 // Colors
 $color-primary: #4080ff;
 $color-primary-dark: #{color.adjust($color-primary, $lightness: -8%)};
