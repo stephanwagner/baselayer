@@ -274,6 +274,26 @@ function fs_render_developer_features(): void
 
 			</div>
 
+			<h3 style="margin-top: 32px;"><?= esc_html__('Blocks', 'fromscratch') ?></h3>
+
+			<div class="fs-feature-group">
+
+				<table class="form-table" role="presentation">
+					<tr>
+						<th scope="row" class="form-table-checkbox-label">
+							<?= esc_html__('Block Creator', 'fromscratch') ?>
+							<span class="fs-feature-beta"><?= esc_html__('Beta', 'fromscratch') ?></span>
+						</th>
+						<td>
+							<input type="hidden" name="fromscratch_features[enable_block_creator]" value="0">
+							<label><input type="checkbox" name="fromscratch_features[enable_block_creator]" value="1" <?= checked($feat('enable_block_creator'), 1, false) ?>> <?= esc_html__('Enable Block Creator UI', 'fromscratch') ?></label>
+							<p class="description fs-indent-checkbox"><?= esc_html__('Adds an admin UI to overlay block-option presets and assignments. File config (config/block-options.php) remains the baseline.', 'fromscratch') ?></p>
+						</td>
+					</tr>
+				</table>
+
+			</div>
+
 			<h3 style="margin-top: 32px;"><?= esc_html__('Analytics', 'fromscratch') ?></h3>
 
 			<div class="fs-feature-group">

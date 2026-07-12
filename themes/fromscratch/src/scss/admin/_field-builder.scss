@@ -1,0 +1,168 @@
+.fs-field-builder-ui-dev {
+  max-width: 880px;
+  margin-top: 16px;
+
+  &__mount {
+    margin-bottom: 16px;
+  }
+
+  &__actions {
+    margin: 16px 0 8px;
+  }
+
+  &__output {
+    font-family: Menlo, Consolas, monaco, monospace;
+    font-size: 12px;
+    line-height: 1.45;
+  }
+}
+
+.fs-field-builder {
+  background: #fff;
+  border: 1px solid #c3c4c7;
+  border-radius: 6px;
+  padding: 12px 14px 14px;
+
+  &__empty {
+    margin: 8px 0 12px;
+  }
+
+  &__list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+
+  &__add {
+    margin-top: 4px;
+  }
+
+  &__field {
+    border: 1px solid #dcdcde;
+    border-radius: 4px;
+    background: #f6f7f7;
+  }
+
+  &__field-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: #fff;
+    border-radius: 4px;
+  }
+
+  &__field-toggle {
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    padding: 0 4px;
+    line-height: 1;
+    color: #1d2327;
+  }
+
+  &__field-title-preview {
+    font-weight: 600;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__field-type-preview {
+    color: #646970;
+    font-size: 12px;
+  }
+
+  &__field-handle {
+    cursor: grab;
+    color: #8c8f94;
+    user-select: none;
+    letter-spacing: -2px;
+    padding: 0 4px;
+  }
+
+  &__field-delete {
+    margin-left: 4px;
+  }
+
+  &__field-body {
+    padding: 0;
+    border-top: 1px solid #dcdcde;
+    background: #fff;
+  }
+
+  &__tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid #dcdcde;
+    padding: 0 4px;
+    background: #f6f7f7;
+  }
+
+  &__tab {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    padding: 10px 12px;
+    cursor: pointer;
+    color: #50575e;
+    font-size: 13px;
+    font-weight: 500;
+
+    &:hover {
+      color: #1d2327;
+    }
+
+    &.is-active {
+      color: #1d2327;
+      border-bottom-color: #2271b1;
+    }
+  }
+
+  &__tab-panels {
+    padding: 12px 14px 14px;
+  }
+
+  &__tab-panel {
+    &:not(.is-active) {
+      display: none;
+    }
+  }
+
+  &__form-row {
+    margin-bottom: 10px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__form-label {
+    display: block;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  &__type-options {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #f0f0f1;
+  }
+
+  &__width-custom-wrap {
+    margin: -4px 0 10px;
+  }
+
+  &__checkbox-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  &__field.is-open .fs-field-builder__field-header {
+    border-radius: 4px 4px 0 0;
+  }
+}

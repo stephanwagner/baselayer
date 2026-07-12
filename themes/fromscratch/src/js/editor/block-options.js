@@ -1,4 +1,3 @@
-import { blockOptions, getHideBlockControl } from '../../../config/block-options';
 import { IconPicker } from './icons/icon-picker';
 import { ContentMarginControl } from './content-margin-control';
 import { ContentPaddingControl } from './content-padding-control';
@@ -36,7 +35,20 @@ const ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
 const { createHigherOrderComponent } = wp.compose;
 const { Fragment, useEffect, useRef } = wp.element;
 
-const HIDE_BLOCK_OPTION = getHideBlockControl();
+/** Resolved from PHP (config/block-options.php + optional Block Creator UI overlay). */
+const blockOptions = Array.isArray(window.fromscratchBlockOptions)
+  ? window.fromscratchBlockOptions
+  : [];
+
+/** Ausblenden — injected for every block; not part of the PHP catalog. */
+const HIDE_BLOCK_OPTION = {
+  type: 'boolean',
+  label: 'Sichtbarkeit',
+  toggleLabel: 'Ausblenden',
+  default: false,
+  attributeName: 'hideBlock',
+  className: '-block-is-hidden',
+};
 const HIDE_BLOCK_CLASS = HIDE_BLOCK_OPTION.className;
 const HIDE_BLOCK_ATTRIBUTE = HIDE_BLOCK_OPTION.attributeName;
 

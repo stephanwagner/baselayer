@@ -46,6 +46,7 @@
 @forward 'admin/redis';
 @forward 'admin/analytics';
 @forward 'admin/media-library';
+@forward 'admin/field-builder';
 
 // Blocks
 @forward '../../acf/blocks/blocks';

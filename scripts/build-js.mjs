@@ -17,8 +17,7 @@ const bundles = [
       jsxFragment: 'wp.element.Fragment'
     }
   },
-  {
-    input: `${themeDir}/src/js/admin/block-settings.js`,
+  { input: `${themeDir}/src/js/admin/block-settings.js`,
     name: 'block-settings',
     jsx: {
       loader: { '.js': 'jsx' },
@@ -27,6 +26,8 @@ const bundles = [
       jsxFragment: 'wp.element.Fragment'
     }
   },
+  { input: `${themeDir}/src/js/admin/field-builder/admin-pages.js`, name: 'field-builder-admin' },
+  { input: `${themeDir}/src/js/editor/creator-blocks.js`, name: 'creator-blocks' },
   { input: `${themeDir}/src/js/service-worker/index.js`, name: 'service-worker' }
 ];
 

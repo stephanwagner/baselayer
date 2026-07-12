@@ -23,6 +23,7 @@ function fs_theme_feature_defaults(): array
 		'enable_webp_convert_original' => 0,
 		'enable_media_folders'      => 1,
 		'enable_matomo'             => 0,
+		'enable_block_creator'      => 0,
 	];
 }
 
@@ -33,7 +34,7 @@ function fs_theme_feature_defaults(): array
  */
 function fs_theme_feature_default_off_when_missing(): array
 {
-	return ['enable_languages', 'enable_webp', 'enable_webp_convert_original', 'enable_matomo'];
+	return ['enable_languages', 'enable_webp', 'enable_webp_convert_original', 'enable_matomo', 'enable_block_creator'];
 }
 
 /**
@@ -55,6 +56,7 @@ function fs_theme_feature_option_keys_map(): array
 		'webp_convert_original'   => 'enable_webp_convert_original',
 		'media_folders'           => 'enable_media_folders',
 		'matomo'                  => 'enable_matomo',
+		'block_creator'           => 'enable_block_creator',
 	];
 }
 

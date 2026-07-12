@@ -32,7 +32,7 @@ They also appear under **Theme** in the icon picker. An example `logo-child.svg`
 
 - Config stubs in `config/` (`theme.php`, `design.php`, `block-settings.php`, …) merge over the parent — see `config/README.md`
 - **Content types:** `config/content-types/` is copied from the parent on install. With a child active, **only** those files are loaded (no parent fallback). An empty or missing folder means no CPTs.
-- **`config/block-options.js`:** placeholder only — editor block options stay parent-bundled
+- **`config/block-options.php`:** presets and assignments for editor sidebar options (merged over parent). Optional Block Creator UI (Developer → Features) can add an overlay without editing files.
 - Optional templates: `templates/…` (same paths as the parent; child wins)
 
 ## Add an ACF block
