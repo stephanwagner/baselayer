@@ -568,7 +568,7 @@
                     "class": "",
                     "id": ""
                 },
-                "default_value": 10,
+                "default_value": 20,
                 "min": 1,
                 "max": "",
                 "allow_in_bindings": 0,
