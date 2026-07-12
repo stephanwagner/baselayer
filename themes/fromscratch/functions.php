@@ -35,12 +35,8 @@ require_once 'inc/theme-settings.php';
 require_once 'inc/admin-notice.php';
 require_once 'inc/developer-settings.php';
 
-// Admin-only
+// Admin-only (dashboard / media sizes). Install wizard is loaded after CPTs below.
 if (is_admin()) {
-	// Install wizard
-	if (!fs_setup_completed() || isset($_GET['fromscratch_success'])) {
-		require_once 'inc/install.php';
-	}
 	require_once 'inc/dashboard.php';
 	require_once 'inc/media-sizes.php';
 }
@@ -59,6 +55,12 @@ require_once 'inc/article-list-filters.php';
 require_once 'inc/events.php';
 require_once 'inc/exclude-from-search.php';
 require_once 'inc/page-editor-options.php';
+
+// Install wizard: must load after custom-post-types.php so CPT registration
+// exists when the installer seeds projects/events on form POST.
+if (is_admin() && (!fs_setup_completed() || isset($_GET['fromscratch_success']))) {
+	require_once 'inc/install.php';
+}
 
 // Mail, Matomo
 require_once 'inc/mail.php';

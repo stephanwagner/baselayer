@@ -46,7 +46,7 @@ return [
 		'archive' => [
 			'enabled' => true,
 			'slug' => 'projects',
-			'design' => 'list', // list | grid
+			'design' => 'grid', // list | grid
 			'category_filter' => true,
 			'texts' => [
 				'heading' => 'Projects',

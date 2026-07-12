@@ -76,16 +76,33 @@ add_filter('nav_menu_css_class', function (array $classes, $item, $args, $depth)
 
 /**
  * Use archive menu label from config for post type archive nav items (not “Veranstaltung-Archive”).
+ * Also applies to custom links that point at a content-type archive URL.
  */
 add_filter('nav_menu_item_title', function (string $title, $item, $args, $depth): string {
 	unset($args, $depth);
 
-	if (is_admin() || !isset($item->type, $item->object) || $item->type !== 'post_type_archive') {
+	if (is_admin() || !isset($item->type) || !function_exists('fs_cpt_archive_menu_label')) {
 		return $title;
 	}
 
-	$post_type = is_string($item->object) ? $item->object : '';
-	if ($post_type === '' || !function_exists('fs_cpt_archive_menu_label')) {
+	$post_type = '';
+	if ($item->type === 'post_type_archive' && isset($item->object) && is_string($item->object)) {
+		$post_type = $item->object;
+	} elseif ($item->type === 'custom' && !empty($item->url) && function_exists('fs_get_content_types')) {
+		foreach (array_keys(fs_get_content_types()) as $candidate) {
+			if (!is_string($candidate) || $candidate === '') {
+				continue;
+			}
+			if (function_exists('fs_menu_item_matches_post_type_archive')
+				&& fs_menu_item_matches_post_type_archive($item, $candidate)
+			) {
+				$post_type = $candidate;
+				break;
+			}
+		}
+	}
+
+	if ($post_type === '') {
 		return $title;
 	}
 

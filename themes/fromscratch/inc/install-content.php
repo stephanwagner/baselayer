@@ -417,6 +417,8 @@ function fs_install_create_pages(array $media = []): array
 		update_option('page_for_posts', 0);
 	}
 
+	update_option('posts_per_page', 20);
+
 	if (!empty($page_ids['privacy'])) {
 		update_option('wp_page_for_privacy_policy', (int) $page_ids['privacy']);
 	}
@@ -442,87 +444,251 @@ function fs_install_reset_menu(int $menu_id): void
 }
 
 /**
- * Build main and footer menus from page IDs.
+ * Apply menu item options (e.g. highlight) to a nav menu item.
  *
- * @param array<string, int> $page_ids Keys from fs_install_create_pages().
+ * @param array<string, bool> $options
  */
-function fs_install_assign_menus(array $page_ids): void
+function fs_install_apply_menu_item_options(int $item_id, array $options): void
 {
-	$menu_plan = [
-		[
-			'key'     => 'homepage',
-			'menu'    => 'main_menu',
-			'options' => [],
-		],
-		[
-			'key'     => 'sample',
-			'menu'    => 'main_menu',
-			'options' => [],
-		],
-		[
-			'key'     => 'blocks',
-			'menu'    => 'main_menu',
-			'options' => [],
-		],
-		[
-			'key'     => 'contact',
-			'menu'    => 'main_menu',
-			'options' => ['highlight' => true],
-		],
-		[
-			'key'     => 'imprint',
-			'menu'    => 'footer_menu',
-			'options' => [],
-		],
-		[
-			'key'     => 'privacy',
-			'menu'    => 'footer_menu',
-			'options' => [],
-		],
+	if ($item_id <= 0 || $options === [] || !function_exists('fs_menu_item_option_meta_key')) {
+		return;
+	}
+
+	foreach ($options as $option_id => $enabled) {
+		if (!$enabled || !is_string($option_id) || $option_id === '') {
+			continue;
+		}
+		update_post_meta($item_id, fs_menu_item_option_meta_key($option_id), '1');
+	}
+}
+
+/**
+ * Add a page link to a nav menu.
+ *
+ * @param array<string, bool> $options
+ */
+function fs_install_add_menu_page_item(int $menu_id, int $page_id, array $options = []): void
+{
+	if ($menu_id <= 0 || $page_id <= 0) {
+		return;
+	}
+
+	$item_id = wp_update_nav_menu_item($menu_id, 0, [
+		'menu-item-object-id' => $page_id,
+		'menu-item-object'    => 'page',
+		'menu-item-type'      => 'post_type',
+		'menu-item-status'    => 'publish',
+	]);
+
+	if (!$item_id || is_wp_error($item_id)) {
+		return;
+	}
+
+	fs_install_apply_menu_item_options((int) $item_id, $options);
+}
+
+/**
+ * Default archive URL slugs when config is unavailable mid-install.
+ *
+ * @return array<string, string>
+ */
+function fs_install_archive_slug_defaults(): array
+{
+	return [
+		'post'     => 'blog',
+		'projects' => 'projects',
+		'event'    => 'events',
+	];
+}
+
+/**
+ * Resolve an archive URL for install menus (config-first, works before CPT objects settle).
+ *
+ * @param bool $trusted When true (installer checkbox enabled), never skip for config lag; use defaults.
+ */
+function fs_install_archive_url(string $post_type, bool $trusted = false): string
+{
+	if ($post_type === '') {
+		return '';
+	}
+
+	$defaults = fs_install_archive_slug_defaults();
+	$enabled = function_exists('fs_content_type_enabled') && fs_content_type_enabled($post_type);
+
+	if (!$trusted && !$enabled) {
+		return '';
+	}
+
+	$slug = '';
+
+	// Prefer live post archive helper when it already resolves.
+	if ($post_type === 'post' && function_exists('fs_post_archive_slug')) {
+		$slug = fs_post_archive_slug();
+	}
+
+	if ($slug === '' && function_exists('fs_content_type_archive')) {
+		$archive = fs_content_type_archive($post_type);
+		if (isset($archive['slug']) && is_string($archive['slug']) && $archive['slug'] !== '') {
+			$slug = sanitize_title($archive['slug']);
+		}
+	}
+
+	if ($slug === '' && isset($defaults[$post_type])) {
+		$slug = $defaults[$post_type];
+	}
+
+	if ($slug === '') {
+		$slug = sanitize_title($post_type);
+	}
+
+	if ($slug === '') {
+		return '';
+	}
+
+	// Prefer get_post_type_archive_link when the type is registered.
+	$link = get_post_type_archive_link($post_type);
+	if (is_string($link) && $link !== '') {
+		// For built-in posts, core may return home; only keep it when it matches our archive slug.
+		if ($post_type !== 'post') {
+			return $link;
+		}
+		$path = (string) (wp_parse_url($link, PHP_URL_PATH) ?? '');
+		if ($path !== '' && trim($path, '/') === $slug) {
+			return $link;
+		}
+	}
+
+	return home_url(user_trailingslashit($slug, 'post_type_archive'));
+}
+
+/**
+ * Resolve archive menu title for install.
+ */
+function fs_install_archive_title(string $post_type): string
+{
+	$title = function_exists('fs_cpt_archive_menu_label')
+		? fs_cpt_archive_menu_label($post_type)
+		: '';
+	if ($title !== '') {
+		return $title;
+	}
+
+	if (function_exists('fs_content_type_archive')) {
+		$archive = fs_content_type_archive($post_type);
+		$texts = isset($archive['texts']) && is_array($archive['texts']) ? $archive['texts'] : [];
+		if (isset($texts['heading']) && is_string($texts['heading']) && $texts['heading'] !== '') {
+			return $texts['heading'];
+		}
+	}
+
+	$obj = get_post_type_object($post_type);
+	if ($obj instanceof \WP_Post_Type && isset($obj->labels->name) && is_string($obj->labels->name) && $obj->labels->name !== '') {
+		return $obj->labels->name;
+	}
+
+	$fallback = [
+		'post'     => 'Blog',
+		'projects' => 'Projects',
+		'event'    => 'Events',
 	];
 
-	$reset_menus = [];
+	return $fallback[$post_type] ?? ucfirst($post_type);
+}
 
-	foreach ($menu_plan as $item) {
-		$key = $item['key'];
-		if (empty($page_ids[$key])) {
-			continue;
+/**
+ * Add a post type archive link to a nav menu.
+ *
+ * Uses a custom link: built-in `post` is unreliable as `post_type_archive`.
+ *
+ * @param bool $trusted Installer enabled this type; use defaults if config lags.
+ */
+function fs_install_add_menu_archive_item(int $menu_id, string $post_type, bool $trusted = false): void
+{
+	if ($menu_id <= 0 || $post_type === '') {
+		return;
+	}
+
+	$url = fs_install_archive_url($post_type, $trusted);
+	if ($url === '') {
+		return;
+	}
+
+	$title = fs_install_archive_title($post_type);
+
+	$item_id = wp_update_nav_menu_item($menu_id, 0, [
+		'menu-item-type'   => 'custom',
+		'menu-item-title'  => $title,
+		'menu-item-url'    => $url,
+		'menu-item-status' => 'publish',
+	]);
+
+	if (!$item_id || is_wp_error($item_id)) {
+		return;
+	}
+}
+
+/**
+ * Build main and footer menus from page IDs and enabled content types.
+ *
+ * When any of Blog / Projects / Events are enabled, homepage and sample page
+ * are omitted from the main menu and replaced with archive links.
+ *
+ * @param array<string, int> $page_ids Keys from fs_install_create_pages().
+ * @param array{post?: bool, projects?: bool, event?: bool} $content_flags
+ */
+function fs_install_assign_menus(array $page_ids, array $content_flags = []): void
+{
+	$archive_types = [];
+	foreach (['post', 'projects', 'event'] as $post_type) {
+		if (!empty($content_flags[$post_type])) {
+			$archive_types[] = $post_type;
 		}
+	}
 
-		$menu_id = fs_get_or_create_menu_id($item['menu']);
-		if (!$menu_id) {
-			continue;
-		}
+	$use_archives = $archive_types !== [];
 
-		if (!isset($reset_menus[$menu_id])) {
-			fs_install_reset_menu($menu_id);
-			$reset_menus[$menu_id] = true;
-		}
+	$main_menu_id = fs_get_or_create_menu_id('main_menu');
+	$footer_menu_id = fs_get_or_create_menu_id('footer_menu');
 
-		$item_id = wp_update_nav_menu_item($menu_id, 0, [
-			'menu-item-object-id' => (int) $page_ids[$key],
-			'menu-item-object'    => 'page',
-			'menu-item-type'      => 'post_type',
-			'menu-item-status'    => 'publish',
-		]);
+	if ($main_menu_id) {
+		fs_install_reset_menu($main_menu_id);
 
-		if (!$item_id || is_wp_error($item_id)) {
-			continue;
-		}
-
-		if (!empty($item['options']) && is_array($item['options']) && function_exists('fs_menu_item_option_meta_key')) {
-			foreach ($item['options'] as $option_id => $enabled) {
-				if (!$enabled || !is_string($option_id) || $option_id === '') {
-					continue;
-				}
-				update_post_meta((int) $item_id, fs_menu_item_option_meta_key($option_id), '1');
+		if ($use_archives) {
+			foreach ($archive_types as $post_type) {
+				fs_install_add_menu_archive_item($main_menu_id, $post_type, true);
 			}
+		} else {
+			if (!empty($page_ids['homepage'])) {
+				fs_install_add_menu_page_item($main_menu_id, (int) $page_ids['homepage']);
+			}
+			if (!empty($page_ids['sample'])) {
+				fs_install_add_menu_page_item($main_menu_id, (int) $page_ids['sample']);
+			}
+		}
+
+		if (!empty($page_ids['blocks'])) {
+			fs_install_add_menu_page_item($main_menu_id, (int) $page_ids['blocks']);
+		}
+		if (!empty($page_ids['contact'])) {
+			fs_install_add_menu_page_item($main_menu_id, (int) $page_ids['contact'], ['highlight' => true]);
+		}
+	}
+
+	if ($footer_menu_id) {
+		fs_install_reset_menu($footer_menu_id);
+
+		if (!empty($page_ids['imprint'])) {
+			fs_install_add_menu_page_item($footer_menu_id, (int) $page_ids['imprint']);
+		}
+		if (!empty($page_ids['privacy'])) {
+			fs_install_add_menu_page_item($footer_menu_id, (int) $page_ids['privacy']);
 		}
 	}
 }
 
 /**
- * Seed standard pages, reading options, and menus during install.
+ * Seed standard pages and reading options during install.
+ * Menus are assigned later via {@see fs_install_assign_menus()} after CPTs are registered.
  *
  * @return array<string, int> Page IDs keyed by manifest key.
  */
@@ -539,15 +705,13 @@ function fs_install_seed_content(): array
 		$page_ids['sample'] = $sample_id;
 	}
 
-	fs_install_assign_menus($page_ids);
-
 	return $page_ids;
 }
 
 /**
  * Content-type install flags from the installer form.
  *
- * @return array{post: bool, example: bool, event: bool, post_examples: bool, example_examples: bool, event_examples: bool}
+ * @return array{post: bool, projects: bool, event: bool, post_examples: bool, projects_examples: bool, event_examples: bool}
  */
 function fs_install_content_flags_from_request(): array
 {
@@ -556,16 +720,16 @@ function fs_install_content_flags_from_request(): array
 		: [];
 
 	$post = !empty($content['post']);
-	$example = !empty($content['example']);
+	$projects = !empty($content['projects']);
 	$event = !empty($content['event']);
 
 	return [
-		'post'             => $post,
-		'example'          => $example,
-		'event'            => $event,
-		'post_examples'    => $post && !empty($content['post_examples']),
-		'example_examples' => $example && !empty($content['example_examples']),
-		'event_examples'   => $event && !empty($content['event_examples']),
+		'post'              => $post,
+		'projects'          => $projects,
+		'event'             => $event,
+		'post_examples'     => $post && !empty($content['post_examples']),
+		'projects_examples' => $projects && !empty($content['projects_examples']),
+		'event_examples'    => $event && !empty($content['event_examples']),
 	];
 }
 
@@ -577,16 +741,66 @@ function fs_install_content_flags_from_request(): array
 function fs_install_content_type_file_map(): array
 {
 	return [
-		'post'    => 'post.php',
-		'example' => 'project.php',
-		'event'   => 'event.php',
+		'post'     => 'post.php',
+		'projects' => 'project.php',
+		'event'    => 'event.php',
 	];
+}
+
+/**
+ * Absolute path to a theme’s config/content-types directory.
+ */
+function fs_install_content_types_dir_for_theme(string $theme_slug = ''): string
+{
+	if ($theme_slug === '') {
+		$theme_slug = get_stylesheet();
+	}
+
+	$root = function_exists('get_theme_root')
+		? trailingslashit((string) get_theme_root($theme_slug))
+		: trailingslashit(WP_CONTENT_DIR) . 'themes/';
+
+	return $root . $theme_slug . '/config/content-types';
+}
+
+/**
+ * Reset content-type cache and register CPTs / taxonomies / event hooks for this request.
+ * Safe to call after switch_theme() during install.
+ */
+function fs_install_bootstrap_content_types(): void
+{
+	if (function_exists('fs_reset_content_types_cache')) {
+		fs_reset_content_types_cache();
+	}
+	if (function_exists('fs_register_cpts')) {
+		fs_register_cpts();
+	}
+	if (function_exists('fs_register_cpt_taxonomies')) {
+		fs_register_cpt_taxonomies();
+	}
+	if (function_exists('fs_event_register_post_type_hooks')) {
+		fs_event_register_post_type_hooks();
+	}
+	if (function_exists('fs_post_apply_labels_from_config')) {
+		fs_post_apply_labels_from_config();
+	}
+	if (function_exists('fs_post_archive_register_rewrites')) {
+		fs_post_archive_register_rewrites();
+	}
+
+	if (function_exists('fs_post_archive_slug')) {
+		$post_archive_slug = fs_post_archive_slug();
+		$post_type_obj = get_post_type_object('post');
+		if ($post_archive_slug !== '' && $post_type_obj instanceof \WP_Post_Type) {
+			$post_type_obj->has_archive = $post_archive_slug;
+		}
+	}
 }
 
 /**
  * Set `enabled` in content-type PHP files under $dir.
  *
- * @param array<string, bool> $enabled_by_slug Keys: post, example, event.
+ * @param array<string, bool> $enabled_by_slug Keys: post, projects, event.
  */
 function fs_install_apply_content_type_enabled(string $dir, array $enabled_by_slug): void
 {
@@ -617,6 +831,10 @@ function fs_install_apply_content_type_enabled(string $dir, array $enabled_by_sl
 		}
 
 		file_put_contents($path, $updated);
+
+		if (function_exists('opcache_invalidate')) {
+			opcache_invalidate($path, true);
+		}
 	}
 }
 
@@ -807,7 +1025,7 @@ function fs_install_seed_samples_for_type(string $post_type, array $media): arra
 /**
  * Seed example posts / CPT items based on installer Content checkboxes.
  *
- * @param array{post?: bool, example?: bool, event?: bool, post_examples?: bool, example_examples?: bool, event_examples?: bool} $flags
+ * @param array{post?: bool, projects?: bool, event?: bool, post_examples?: bool, projects_examples?: bool, event_examples?: bool} $flags
  * @return array<string, list<int>>
  */
 function fs_install_seed_content_type_examples(array $flags): array
@@ -816,9 +1034,9 @@ function fs_install_seed_content_type_examples(array $flags): array
 	$result = [];
 
 	$map = [
-		'post'    => !empty($flags['post']) && !empty($flags['post_examples']),
-		'example' => !empty($flags['example']) && !empty($flags['example_examples']),
-		'event'   => !empty($flags['event']) && !empty($flags['event_examples']),
+		'post'     => !empty($flags['post']) && !empty($flags['post_examples']),
+		'projects' => !empty($flags['projects']) && !empty($flags['projects_examples']),
+		'event'    => !empty($flags['event']) && !empty($flags['event_examples']),
 	];
 
 	foreach ($map as $post_type => $should_seed) {

@@ -233,7 +233,7 @@ msgid "No projects found."
 msgstr "Keine Projekte gefunden."
 
 msgid "No events found."
-msgstr "Keine Termine gefunden."
+msgstr "Keine Veranstaltungen gefunden."
 
 msgid "Read more"
 msgstr "Mehr lesen"

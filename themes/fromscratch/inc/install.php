@@ -422,11 +422,12 @@ function fs_render_installer(): void
 
         <?php
         $content_post = !empty($fs_install_val(['install', 'content', 'post'], true));
-        $content_example = !empty($fs_install_val(['install', 'content', 'example'], true));
+        $content_projects = !empty($fs_install_val(['install', 'content', 'projects'], true));
         $content_event = !empty($fs_install_val(['install', 'content', 'event'], true));
-        $content_post_examples = !empty($fs_install_val(['install', 'content', 'post_examples'], false));
-        $content_example_examples = !empty($fs_install_val(['install', 'content', 'example_examples'], false));
-        $content_event_examples = !empty($fs_install_val(['install', 'content', 'event_examples'], false));
+        // Default example content on — matches a typical first install.
+        $content_post_examples = !empty($fs_install_val(['install', 'content', 'post_examples'], true));
+        $content_projects_examples = !empty($fs_install_val(['install', 'content', 'projects_examples'], true));
+        $content_event_examples = !empty($fs_install_val(['install', 'content', 'event_examples'], true));
         ?>
 
         <table class="form-table" role="presentation">
@@ -455,19 +456,19 @@ function fs_render_installer(): void
             <td>
               <fieldset>
                 <label>
-                  <input type="checkbox" name="install[content][example]" value="1" <?= $content_example ? ' checked' : '' ?> data-fs-checkbox-toggle="content-example">
+                  <input type="checkbox" name="install[content][projects]" value="1" <?= $content_projects ? ' checked' : '' ?> data-fs-checkbox-toggle="content-projects">
                   <?= esc_html__('Enable custom post type: Projects', 'fromscratch') ?>
                 </label>
                 <div class="fs-indent-checkbox">
                   <p class="description" style="margin-top: 0;"><?= esc_html__('A flexible custom post type you can rename and reshape – for portfolios, case studies, or similar listings.', 'fromscratch') ?></p>
-                  <div data-fs-checkbox-toggle-content="content-example">
+                  <div data-fs-checkbox-toggle-content="content-projects">
                     <label>
-                      <input type="checkbox" name="install[content][example_examples]" value="1" <?= $content_example_examples ? ' checked' : '' ?>>
+                      <input type="checkbox" name="install[content][projects_examples]" value="1" <?= $content_projects_examples ? ' checked' : '' ?>>
                       <?= esc_html__('Create example posts', 'fromscratch') ?>
                     </label>
                   </div>
-                </fieldset>
-              </div>
+                </div>
+              </fieldset>
             </td>
           </tr>
           <tr>
@@ -486,8 +487,33 @@ function fs_render_installer(): void
                       <?= esc_html__('Create example posts', 'fromscratch') ?>
                     </label>
                   </div>
-                </fieldset>
-              </div>
+                </div>
+              </fieldset>
+            </td>
+          </tr>
+        </table>
+
+        <hr>
+
+        <h2><?= esc_html__('Advanced Custom Fields', 'fromscratch') ?></h2>
+
+        <p class="description"><?= esc_html__('This theme relies heavily on ACF Pro for custom fields, blocks, and flexible content. A valid license keeps updates and Pro features available.', 'fromscratch') ?></p>
+
+        <?php
+        $acf_license_defined = fs_install_acf_pro_license_is_defined();
+        $acf_license_submitted = (string) $fs_install_val(['install', 'acf_pro_key'], '');
+        ?>
+
+        <table class="form-table" role="presentation">
+          <tr>
+            <th scope="row"><label for="install_acf_pro_key"><?= esc_html__('ACF Pro license key', 'fromscratch') ?></label></th>
+            <td>
+              <?php if ($acf_license_defined) : ?>
+                <p class="description" style="margin-top: 0;"><?= esc_html__('An ACF Pro license key is already defined in the configuration.', 'fromscratch') ?></p>
+              <?php else : ?>
+                <input type="text" name="install[acf_pro_key]" id="install_acf_pro_key" value="<?= esc_attr($acf_license_submitted) ?>" class="large-text code fs-code-small" autocomplete="off" spellcheck="false" style="max-width: 600px;">
+                <p class="description"><?= esc_html__('Optional. If entered and not already present, it will be added to wp-config.php.', 'fromscratch') ?></p>
+              <?php endif; ?>
             </td>
           </tr>
         </table>
@@ -592,15 +618,19 @@ function fs_render_installer(): void
 }
 
 /**
- * Run FromScratch installation
+ * Run FromScratch installation on admin_init (after init), not while functions.php loads.
  */
-if (isset($_POST['fromscratch_run_install'])) {
-  check_admin_referer('fromscratch_install');
+add_action('admin_init', function (): void {
+	if (!isset($_POST['fromscratch_run_install'])) {
+		return;
+	}
+	if (!current_user_can('manage_options')) {
+		return;
+	}
 
-  fromscratch_run_install();
-
-  echo '<div class="notice notice-success"><p>FromScratch installation completed.</p></div>';
-}
+	check_admin_referer('fromscratch_install');
+	fromscratch_run_install();
+}, 20);
 
 /**
  * Validate install form. Returns array of error message strings; empty array means valid.
@@ -717,12 +747,13 @@ function fromscratch_install_redirect_with_errors(array $errors): void
       'media' => !empty($_POST['install']['media']),
       'permalinks' => !empty($_POST['install']['permalinks']),
       'htaccess' => !empty($_POST['install']['htaccess']),
+      'acf_pro_key' => fs_install_sanitize_acf_pro_license((string) ($_POST['install']['acf_pro_key'] ?? '')),
       'content' => [
         'post' => !empty($_POST['install']['content']['post']),
-        'example' => !empty($_POST['install']['content']['example']),
+        'projects' => !empty($_POST['install']['content']['projects']),
         'event' => !empty($_POST['install']['content']['event']),
         'post_examples' => !empty($_POST['install']['content']['post_examples']),
-        'example_examples' => !empty($_POST['install']['content']['example_examples']),
+        'projects_examples' => !empty($_POST['install']['content']['projects_examples']),
         'event_examples' => !empty($_POST['install']['content']['event_examples']),
       ],
     ],
@@ -943,14 +974,24 @@ function fromscratch_run_install(): void
   }
 
   /**
+   * ACF Pro license in wp-config.php (when provided and not already defined).
+   */
+  $acf_license_result = fs_install_write_acf_pro_license(
+    (string) ($_POST['install']['acf_pro_key'] ?? '')
+  );
+  if (is_wp_error($acf_license_result)) {
+    fromscratch_install_redirect_with_errors([$acf_license_result->get_error_message()]);
+  }
+
+  /**
    * Activate ACF Pro when present but inactive.
    */
   fs_install_activate_acf_pro();
 
   /**
-   * Standard pages and menus (always).
+   * Standard pages (always). Menus are assigned after content types are registered.
    */
-  fs_install_seed_content();
+  $page_ids = fs_install_seed_content();
 
   update_option('default_role', 'editor');
 
@@ -965,7 +1006,7 @@ function fromscratch_run_install(): void
    * Content types: copy with child theme (or patch parent), set enabled flags, seed examples.
    */
   $content_flags = fs_install_content_flags_from_request();
-  $content_types_dir = get_template_directory() . '/config/content-types';
+  $content_types_dir = fs_install_content_types_dir_for_theme(get_template());
 
   /**
    * Create child theme before marking setup complete (parent folder stays fromscratch).
@@ -985,14 +1026,14 @@ function fromscratch_run_install(): void
     }
 
     if (is_string($child_slug) && $child_slug !== '') {
-      $content_types_dir = WP_CONTENT_DIR . '/themes/' . $child_slug . '/config/content-types';
+      $content_types_dir = fs_install_content_types_dir_for_theme($child_slug);
     }
   }
 
   fs_install_apply_content_type_enabled($content_types_dir, [
-    'post'    => !empty($content_flags['post']),
-    'example' => !empty($content_flags['example']),
-    'event'   => !empty($content_flags['event']),
+    'post'     => !empty($content_flags['post']),
+    'projects' => !empty($content_flags['projects']),
+    'event'    => !empty($content_flags['event']),
   ]);
 
   update_option('fromscratch_install_success', true);
@@ -1001,21 +1042,11 @@ function fromscratch_run_install(): void
     switch_theme($child_slug);
   }
 
-  if (function_exists('fs_reset_content_types_cache')) {
-    fs_reset_content_types_cache();
-  }
-  if (function_exists('fs_register_cpts')) {
-    fs_register_cpts();
-  }
-  if (function_exists('fs_register_cpt_taxonomies')) {
-    fs_register_cpt_taxonomies();
-  }
-  if (function_exists('fs_event_register_post_type_hooks')) {
-    fs_event_register_post_type_hooks();
-  }
-
+  // Theme switch mid-request: re-register CPTs from the active theme before menus/seed.
+  fs_install_bootstrap_content_types();
   flush_rewrite_rules(false);
 
+  fs_install_assign_menus($page_ids, $content_flags);
   fs_install_seed_content_type_examples($content_flags);
 
   /**
@@ -1045,7 +1076,11 @@ function fs_get_or_create_menu_id(string $menu_slug): int
   $menu = wp_get_nav_menu_object($menu_name);
 
   if ($menu) {
-    return (int) $menu->term_id;
+    $menu_id = (int) $menu->term_id;
+    // Theme switch clears nav_menu_locations for the new theme; always re-assign.
+    fs_assign_menu_to_location($menu_slug, $menu_id);
+
+    return $menu_id;
   }
 
   // Create menu with name

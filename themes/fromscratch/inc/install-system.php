@@ -122,6 +122,109 @@ function fs_get_nginx_config(): string
 }
 
 /**
+ * Path to wp-config.php (ABSPATH or one level above).
+ */
+function fs_install_wp_config_path(): string
+{
+	$path = trailingslashit(ABSPATH) . 'wp-config.php';
+	if (is_file($path)) {
+		return $path;
+	}
+
+	$parent = trailingslashit(dirname(ABSPATH)) . 'wp-config.php';
+	if (is_file($parent) && !is_file(trailingslashit(dirname(ABSPATH)) . 'wp-settings.php')) {
+		return $parent;
+	}
+
+	return $path;
+}
+
+/**
+ * Whether ACF_PRO_LICENSE is already defined in PHP or present in wp-config.php.
+ */
+function fs_install_acf_pro_license_is_defined(): bool
+{
+	if (defined('ACF_PRO_LICENSE')) {
+		return true;
+	}
+
+	$path = fs_install_wp_config_path();
+	if (!is_file($path) || !is_readable($path)) {
+		return false;
+	}
+
+	$contents = file_get_contents($path);
+	if (!is_string($contents) || $contents === '') {
+		return false;
+	}
+
+	return (bool) preg_match("/define\s*\(\s*['\"]ACF_PRO_LICENSE['\"]/", $contents);
+}
+
+/**
+ * Sanitize an ACF Pro license key from installer input.
+ */
+function fs_install_sanitize_acf_pro_license(string $key): string
+{
+	$key = trim(wp_unslash($key));
+	$key = preg_replace('/\s+/', '', $key) ?? '';
+
+	return $key;
+}
+
+/**
+ * Add ACF_PRO_LICENSE to wp-config.php when missing and a key was provided.
+ *
+ * @return true|WP_Error True when written or skipped (already defined / empty key); WP_Error on failure.
+ */
+function fs_install_write_acf_pro_license(string $key)
+{
+	$key = fs_install_sanitize_acf_pro_license($key);
+	if ($key === '') {
+		return true;
+	}
+
+	if (fs_install_acf_pro_license_is_defined()) {
+		return true;
+	}
+
+	$path = fs_install_wp_config_path();
+	if (!is_file($path) || !is_readable($path) || !is_writable($path)) {
+		return new WP_Error(
+			'fs_acf_wp_config',
+			__('Could not write the ACF Pro license to wp-config.php (file missing or not writable).', 'fromscratch')
+		);
+	}
+
+	$contents = file_get_contents($path);
+	if (!is_string($contents)) {
+		return new WP_Error(
+			'fs_acf_wp_config',
+			__('Failed to read wp-config.php.', 'fromscratch')
+		);
+	}
+
+	$block = "// FromScratch: ACF Pro license\n"
+		. 'define( \'ACF_PRO_LICENSE\', ' . var_export($key, true) . " );\n\n";
+
+	$needle = "/* That's all, stop editing! Happy publishing. */";
+	if (strpos($contents, $needle) !== false) {
+		$contents = str_replace($needle, $block . $needle, $contents);
+	} else {
+		$contents .= "\n" . $block;
+	}
+
+	if (file_put_contents($path, $contents) === false) {
+		return new WP_Error(
+			'fs_acf_wp_config',
+			__('Failed to write the ACF Pro license to wp-config.php.', 'fromscratch')
+		);
+	}
+
+	return true;
+}
+
+/**
  * Find the ACF Pro plugin basename if it is installed (active or not).
  *
  * @return string Plugin basename (e.g. advanced-custom-fields-pro/acf.php) or empty string.
