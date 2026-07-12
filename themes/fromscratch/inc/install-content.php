@@ -543,3 +543,290 @@ function fs_install_seed_content(): array
 
 	return $page_ids;
 }
+
+/**
+ * Content-type install flags from the installer form.
+ *
+ * @return array{post: bool, example: bool, event: bool, post_examples: bool, example_examples: bool, event_examples: bool}
+ */
+function fs_install_content_flags_from_request(): array
+{
+	$content = isset($_POST['install']['content']) && is_array($_POST['install']['content'])
+		? $_POST['install']['content']
+		: [];
+
+	$post = !empty($content['post']);
+	$example = !empty($content['example']);
+	$event = !empty($content['event']);
+
+	return [
+		'post'             => $post,
+		'example'          => $example,
+		'event'            => $event,
+		'post_examples'    => $post && !empty($content['post_examples']),
+		'example_examples' => $example && !empty($content['example_examples']),
+		'event_examples'   => $event && !empty($content['event_examples']),
+	];
+}
+
+/**
+ * Map CPT / post slug → content-types filename.
+ *
+ * @return array<string, string>
+ */
+function fs_install_content_type_file_map(): array
+{
+	return [
+		'post'    => 'post.php',
+		'example' => 'project.php',
+		'event'   => 'event.php',
+	];
+}
+
+/**
+ * Set `enabled` in content-type PHP files under $dir.
+ *
+ * @param array<string, bool> $enabled_by_slug Keys: post, example, event.
+ */
+function fs_install_apply_content_type_enabled(string $dir, array $enabled_by_slug): void
+{
+	$dir = trailingslashit($dir);
+	$map = fs_install_content_type_file_map();
+
+	foreach ($map as $slug => $filename) {
+		$path = $dir . $filename;
+		if (!is_readable($path) || !is_writable($path)) {
+			continue;
+		}
+
+		$enabled = !empty($enabled_by_slug[$slug]);
+		$raw = file_get_contents($path);
+		if ($raw === false || $raw === '') {
+			continue;
+		}
+
+		$updated = preg_replace(
+			"/('enabled'\\s*=>\\s*)(true|false)/",
+			'${1}' . ($enabled ? 'true' : 'false'),
+			$raw,
+			1
+		);
+
+		if (!is_string($updated) || $updated === '') {
+			continue;
+		}
+
+		file_put_contents($path, $updated);
+	}
+}
+
+/**
+ * Sample title/body list for demo posts.
+ *
+ * @return list<array{title: string, content: string, excerpt: string}>
+ */
+function fs_install_sample_texts(): array
+{
+	$path = __DIR__ . '/install-sample-texts.php';
+	if (!is_readable($path)) {
+		return [];
+	}
+
+	$items = require $path;
+
+	return is_array($items) ? array_values($items) : [];
+}
+
+/**
+ * Block editor markup for a sample post body.
+ */
+function fs_install_sample_post_content(string $content): string
+{
+	$paragraphs = preg_split("/\n\n+/", trim($content)) ?: [];
+	$blocks = [];
+
+	foreach ($paragraphs as $paragraph) {
+		$paragraph = trim($paragraph);
+		if ($paragraph === '') {
+			continue;
+		}
+		$text = esc_html($paragraph);
+		$blocks[] = "<!-- wp:paragraph -->\n<p>{$text}</p>\n<!-- /wp:paragraph -->";
+	}
+
+	return implode("\n\n", $blocks);
+}
+
+/**
+ * Event date pairs for the six sample events (Y-m-d, optional H:i times).
+ *
+ * @return list<array{start: string, end: string, start_time?: string, end_time?: string}>
+ */
+function fs_install_sample_event_dates(): array
+{
+	$today = new DateTimeImmutable('today', wp_timezone());
+
+	return [
+		// Fully past.
+		[
+			'start' => $today->modify('-10 days')->format('Y-m-d'),
+			'end'   => $today->modify('-3 days')->format('Y-m-d'),
+		],
+		// Started yesterday, ends in a few days.
+		[
+			'start' => $today->modify('-1 day')->format('Y-m-d'),
+			'end'   => $today->modify('+5 days')->format('Y-m-d'),
+		],
+		// Near future (same day with times).
+		[
+			'start'      => $today->modify('+3 days')->format('Y-m-d'),
+			'end'        => $today->modify('+3 days')->format('Y-m-d'),
+			'start_time' => '09:30',
+			'end_time'   => '12:00',
+		],
+		// A couple of weeks out (multi-day with times).
+		[
+			'start'      => $today->modify('+14 days')->format('Y-m-d'),
+			'end'        => $today->modify('+15 days')->format('Y-m-d'),
+			'start_time' => '14:00',
+			'end_time'   => '17:30',
+		],
+		// About a month out.
+		[
+			'start' => $today->modify('+30 days')->format('Y-m-d'),
+			'end'   => $today->modify('+32 days')->format('Y-m-d'),
+		],
+		// Far future (~3 months).
+		[
+			'start' => $today->modify('+90 days')->format('Y-m-d'),
+			'end'   => $today->modify('+90 days')->format('Y-m-d'),
+		],
+	];
+}
+
+/**
+ * Whether a sample post for this type/index already exists.
+ */
+function fs_install_sample_post_exists(string $post_type, int $index): bool
+{
+	$q = new WP_Query([
+		'post_type'      => $post_type,
+		'post_status'    => 'any',
+		'posts_per_page' => 1,
+		'fields'         => 'ids',
+		'meta_query'     => [
+			[
+				'key'   => '_fs_install_sample',
+				'value' => $post_type . ':' . $index,
+			],
+		],
+		'no_found_rows'  => true,
+	]);
+
+	return $q->have_posts();
+}
+
+/**
+ * Create up to six sample items for an enabled content type.
+ *
+ * @param array<string, array{id: int, url: string}> $media
+ * @return list<int> Created post IDs.
+ */
+function fs_install_seed_samples_for_type(string $post_type, array $media): array
+{
+	if ($post_type === '' || ($post_type !== 'post' && !post_type_exists($post_type))) {
+		return [];
+	}
+
+	$texts = fs_install_sample_texts();
+	if ($texts === []) {
+		return [];
+	}
+
+	$image_keys = [
+		'sample-image-1',
+		'sample-image-2',
+		'sample-image-3',
+		'sample-image-4',
+		'sample-image-5',
+	];
+	$event_dates = $post_type === 'event' ? fs_install_sample_event_dates() : [];
+	$created = [];
+
+	foreach ($texts as $index => $item) {
+		if (!is_array($item) || fs_install_sample_post_exists($post_type, $index)) {
+			continue;
+		}
+
+		$title = isset($item['title']) && is_string($item['title']) ? $item['title'] : '';
+		$body = isset($item['content']) && is_string($item['content']) ? $item['content'] : '';
+		$excerpt = isset($item['excerpt']) && is_string($item['excerpt']) ? $item['excerpt'] : '';
+		if ($title === '') {
+			continue;
+		}
+
+		$post_id = wp_insert_post([
+			'post_type'    => $post_type,
+			'post_status'  => 'publish',
+			'post_title'   => $title,
+			'post_content' => fs_install_sample_post_content($body),
+			'post_excerpt' => $excerpt,
+		], true);
+
+		if (is_wp_error($post_id) || $post_id <= 0) {
+			continue;
+		}
+
+		update_post_meta((int) $post_id, '_fs_install_sample', $post_type . ':' . $index);
+
+		if (isset($image_keys[$index], $media[$image_keys[$index]]['id'])) {
+			set_post_thumbnail((int) $post_id, (int) $media[$image_keys[$index]]['id']);
+		}
+
+		if ($post_type === 'event' && isset($event_dates[$index])) {
+			$schedule = $event_dates[$index];
+			update_post_meta((int) $post_id, FS_EVENT_META_START_DATE, $schedule['start']);
+			update_post_meta((int) $post_id, FS_EVENT_META_END_DATE, $schedule['end']);
+			if (!empty($schedule['start_time'])) {
+				update_post_meta((int) $post_id, FS_EVENT_META_START_TIME, $schedule['start_time']);
+			}
+			if (!empty($schedule['end_time'])) {
+				update_post_meta((int) $post_id, FS_EVENT_META_END_TIME, $schedule['end_time']);
+			}
+			if (function_exists('fs_event_save_timestamps')) {
+				fs_event_save_timestamps((int) $post_id);
+			}
+		}
+
+		$created[] = (int) $post_id;
+	}
+
+	return $created;
+}
+
+/**
+ * Seed example posts / CPT items based on installer Content checkboxes.
+ *
+ * @param array{post?: bool, example?: bool, event?: bool, post_examples?: bool, example_examples?: bool, event_examples?: bool} $flags
+ * @return array<string, list<int>>
+ */
+function fs_install_seed_content_type_examples(array $flags): array
+{
+	$media = fs_install_import_media();
+	$result = [];
+
+	$map = [
+		'post'    => !empty($flags['post']) && !empty($flags['post_examples']),
+		'example' => !empty($flags['example']) && !empty($flags['example_examples']),
+		'event'   => !empty($flags['event']) && !empty($flags['event_examples']),
+	];
+
+	foreach ($map as $post_type => $should_seed) {
+		if (!$should_seed) {
+			continue;
+		}
+		$result[$post_type] = fs_install_seed_samples_for_type($post_type, $media);
+	}
+
+	return $result;
+}

@@ -35,6 +35,11 @@ a:active {
   background: var(--wp-admin-theme-color);
 }
 
+#collapse-button:focus,
+#collapse-button:hover {
+  color: var(--wp-admin-theme-color-lighter-30);
+}
+
 #adminmenu .wp-has-current-submenu .wp-submenu a:focus,
 #adminmenu .wp-has-current-submenu .wp-submenu a:hover,
 #adminmenu .wp-has-current-submenu.opensub .wp-submenu a:focus,

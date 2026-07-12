@@ -99,11 +99,37 @@ function fs_config(?string $key = null)
  *
  * @return array<string, array<string, mixed>>
  */
-function fs_get_content_types(): array
+/**
+ * Shared content-types cache (null = unloaded).
+ *
+ * @param array<string, array<string, mixed>>|null|false $set Pass array to store, null to read, false to clear.
+ * @return array<string, array<string, mixed>>|null
+ */
+function fs_content_types_cache($set = null): ?array
 {
 	static $types = null;
-	if ($types !== null) {
+
+	if ($set === false) {
+		$types = null;
+		return null;
+	}
+
+	if (is_array($set)) {
+		$types = $set;
 		return $types;
+	}
+
+	return $types;
+}
+
+/**
+ * @return array<string, array<string, mixed>>
+ */
+function fs_get_content_types(): array
+{
+	$cached = fs_content_types_cache();
+	if ($cached !== null) {
+		return $cached;
 	}
 
 	$types = [];
@@ -137,7 +163,17 @@ function fs_get_content_types(): array
 		}
 	}
 
+	fs_content_types_cache($types);
+
 	return $types;
+}
+
+/**
+ * Clear the cached content-types map (e.g. after install rewrites config files / switches theme).
+ */
+function fs_reset_content_types_cache(): void
+{
+	fs_content_types_cache(false);
 }
 
 /**

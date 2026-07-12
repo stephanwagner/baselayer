@@ -416,6 +416,84 @@ function fs_render_installer(): void
 
         <hr>
 
+        <h2><?= esc_html__('Content', 'fromscratch') ?></h2>
+
+        <p class="description"><?= esc_html__('Choose which content types to use. Their config files are always installed, so you can also switch them on later.', 'fromscratch') ?></p>
+
+        <?php
+        $content_post = !empty($fs_install_val(['install', 'content', 'post'], true));
+        $content_example = !empty($fs_install_val(['install', 'content', 'example'], true));
+        $content_event = !empty($fs_install_val(['install', 'content', 'event'], true));
+        $content_post_examples = !empty($fs_install_val(['install', 'content', 'post_examples'], false));
+        $content_example_examples = !empty($fs_install_val(['install', 'content', 'example_examples'], false));
+        $content_event_examples = !empty($fs_install_val(['install', 'content', 'event_examples'], false));
+        ?>
+
+        <table class="form-table" role="presentation">
+          <tr>
+            <th scope="row"><?= esc_html__('Blog posts', 'fromscratch') ?></th>
+            <td>
+              <fieldset>
+                <label>
+                  <input type="checkbox" name="install[content][post]" value="1" <?= $content_post ? ' checked' : '' ?> data-fs-checkbox-toggle="content-post">
+                  <?= esc_html__('Enable blog posts', 'fromscratch') ?>
+                </label>
+                <div class="fs-indent-checkbox">
+                  <p class="description" style="margin-top: 0;"><?= esc_html__('WordPress’s built-in posts – ideal for news, articles, or a classic blog archive.', 'fromscratch') ?></p>
+                  <div data-fs-checkbox-toggle-content="content-post">
+                    <label>
+                      <input type="checkbox" name="install[content][post_examples]" value="1" <?= $content_post_examples ? ' checked' : '' ?>>
+                      <?= esc_html__('Create example posts', 'fromscratch') ?>
+                    </label>
+                  </div>
+                </div>
+              </fieldset>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row"><?= esc_html__('Projects', 'fromscratch') ?></th>
+            <td>
+              <fieldset>
+                <label>
+                  <input type="checkbox" name="install[content][example]" value="1" <?= $content_example ? ' checked' : '' ?> data-fs-checkbox-toggle="content-example">
+                  <?= esc_html__('Enable custom post type: Projects', 'fromscratch') ?>
+                </label>
+                <div class="fs-indent-checkbox">
+                  <p class="description" style="margin-top: 0;"><?= esc_html__('A flexible custom post type you can rename and reshape – for portfolios, case studies, or similar listings.', 'fromscratch') ?></p>
+                  <div data-fs-checkbox-toggle-content="content-example">
+                    <label>
+                      <input type="checkbox" name="install[content][example_examples]" value="1" <?= $content_example_examples ? ' checked' : '' ?>>
+                      <?= esc_html__('Create example posts', 'fromscratch') ?>
+                    </label>
+                  </div>
+                </fieldset>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <th scope="row"><?= esc_html__('Events', 'fromscratch') ?></th>
+            <td>
+              <fieldset>
+                <label>
+                  <input type="checkbox" name="install[content][event]" value="1" <?= $content_event ? ' checked' : '' ?> data-fs-checkbox-toggle="content-event">
+                  <?= esc_html__('Enable custom post type: Events', 'fromscratch') ?>
+                </label>
+                <div class="fs-indent-checkbox">
+                  <p class="description" style="margin-top: 0;"><?= esc_html__('Items with start and end dates, ordered by date on archives – suited to happenings, workshops, or schedules.', 'fromscratch') ?></p>
+                  <div data-fs-checkbox-toggle-content="content-event">
+                    <label>
+                      <input type="checkbox" name="install[content][event_examples]" value="1" <?= $content_event_examples ? ' checked' : '' ?>>
+                      <?= esc_html__('Create example posts', 'fromscratch') ?>
+                    </label>
+                  </div>
+                </fieldset>
+              </div>
+            </td>
+          </tr>
+        </table>
+
+        <hr>
+
         <h2><?= esc_html__('Administrator email', 'fromscratch') ?></h2>
 
         <div style="margin-bottom: 16px;">
@@ -639,6 +717,14 @@ function fromscratch_install_redirect_with_errors(array $errors): void
       'media' => !empty($_POST['install']['media']),
       'permalinks' => !empty($_POST['install']['permalinks']),
       'htaccess' => !empty($_POST['install']['htaccess']),
+      'content' => [
+        'post' => !empty($_POST['install']['content']['post']),
+        'example' => !empty($_POST['install']['content']['example']),
+        'event' => !empty($_POST['install']['content']['event']),
+        'post_examples' => !empty($_POST['install']['content']['post_examples']),
+        'example_examples' => !empty($_POST['install']['content']['example_examples']),
+        'event_examples' => !empty($_POST['install']['content']['event_examples']),
+      ],
     ],
     'developer' => [
       'current_user' => [
@@ -876,6 +962,12 @@ function fromscratch_run_install(): void
   }
 
   /**
+   * Content types: copy with child theme (or patch parent), set enabled flags, seed examples.
+   */
+  $content_flags = fs_install_content_flags_from_request();
+  $content_types_dir = get_template_directory() . '/config/content-types';
+
+  /**
    * Create child theme before marking setup complete (parent folder stays fromscratch).
    */
   $child_slug = null;
@@ -891,13 +983,40 @@ function fromscratch_run_install(): void
     if (is_wp_error($child_slug)) {
       fromscratch_install_redirect_with_errors([$child_slug->get_error_message()]);
     }
+
+    if (is_string($child_slug) && $child_slug !== '') {
+      $content_types_dir = WP_CONTENT_DIR . '/themes/' . $child_slug . '/config/content-types';
+    }
   }
+
+  fs_install_apply_content_type_enabled($content_types_dir, [
+    'post'    => !empty($content_flags['post']),
+    'example' => !empty($content_flags['example']),
+    'event'   => !empty($content_flags['event']),
+  ]);
 
   update_option('fromscratch_install_success', true);
 
   if (is_string($child_slug) && $child_slug !== '') {
     switch_theme($child_slug);
   }
+
+  if (function_exists('fs_reset_content_types_cache')) {
+    fs_reset_content_types_cache();
+  }
+  if (function_exists('fs_register_cpts')) {
+    fs_register_cpts();
+  }
+  if (function_exists('fs_register_cpt_taxonomies')) {
+    fs_register_cpt_taxonomies();
+  }
+  if (function_exists('fs_event_register_post_type_hooks')) {
+    fs_event_register_post_type_hooks();
+  }
+
+  flush_rewrite_rules(false);
+
+  fs_install_seed_content_type_examples($content_flags);
 
   /**
    * Redirect

@@ -7,7 +7,7 @@
  */
 
 return [
-	'example' => [
+	'projects' => [
 		'enabled' => true,
 
 		'type' => 'default',
