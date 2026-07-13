@@ -1,4 +1,4 @@
-const theme = 'fromscratch';
+const theme = 'baselayer';
 
 module.exports = {
   theme,

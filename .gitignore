@@ -1,6 +1,6 @@
 # Themes
 /themes/*
-!/themes/fromscratch
+!/themes/baselayer
 
 # DB exports
 /db

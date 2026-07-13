@@ -1,0 +1,109 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// Toggle display
+
+.bl-hidden {
+  display: none !important;
+}
+
+// Tabs
+
+.bl-tabs {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 24px;
+
+  @media (max-width: 782px) {
+    flex-direction: column;
+  }
+}
+
+.bl-tabs-nav {
+  flex-shrink: 0;
+  width: calc(210px + 10px - 12px - 12px);
+}
+
+.bl-tabs-nav button.bl-tabs-btn {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin-bottom: 4px;
+  text-align: left;
+
+  &.has-icon {
+    padding-left: calc(3px + 22px + 8px);
+  }
+}
+
+.bl-tab-button-icon {
+  width: 22px;
+  height: 22px;
+  border-radius: 3px;
+  position: absolute;
+  top: 50%;
+  left: 3px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #2271b1;
+
+  svg {
+    display: block;
+    width: 18px;
+    height: 18px;
+  }
+
+  .bl-tabs-btn.active & {
+    background: #fff;
+  }
+}
+
+.bl-tabs-nav button.bl-tabs-btn.active,
+.bl-tabs-nav button.bl-tabs-btn.active:hover,
+.bl-tabs-nav button.bl-tabs-btn.active:focus {
+  padding-right: calc(24px + 4px);
+
+  &::after {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 24px;
+    background: no-repeat center center / 24px;
+    background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjRweCIgdmlld0JveD0iMCAtOTYwIDk2MCA5NjAiIHdpZHRoPSIyNHB4IiBmaWxsPSIjZmZmIj48cGF0aCBkPSJNNTA0LTQ4MCAzNDgtNjM2cS0xMS0xMS0xMS0yOHQxMS0yOHExMS0xMSAyOC0xMXQyOCAxMWwxODQgMTg0cTYgNiA4LjUgMTN0Mi41IDE1cTAgOC0yLjUgMTV0LTguNSAxM0w0MDQtMjY4cS0xMSAxMS0yOCAxMXQtMjgtMTFxLTExLTExLTExLTI4dDExLTI4bDE1Ni0xNTZaIi8+PC9zdmc+');
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+}
+
+.bl-tabs-panels {
+  flex: 1;
+
+  .form-table {
+    table-layout: fixed;
+  }
+}
+
+.bl-tabs-panel {
+  &:not(.bl-tabs-panel--active) {
+    display: none;
+  }
+
+  h2:first-child {
+    margin-top: 0;
+  }
+}
+
+// Copy
+
+[data-fs-copy-from-source] {
+  transition: transform 180ms;
+
+  &.bl-copied {
+    transform: scale(1.08);
+  }
+}

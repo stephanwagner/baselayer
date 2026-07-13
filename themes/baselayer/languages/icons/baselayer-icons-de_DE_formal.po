@@ -1,0 +1,3017 @@
+# German (de_DE) icon picker labels for the FromScratch theme.
+# Copyright (C) 2026
+# This file is distributed under the same license as the FromScratch theme.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: FromScratch icons\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/theme/baselayer\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: de_DE_formal\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Domain: baselayer-icons\n"
+
+# Categories
+
+msgctxt "icon category"
+msgid "Arrows & navigation"
+msgstr "Pfeile & Navigation"
+
+msgctxt "icon category"
+msgid "Actions"
+msgstr "Aktionen"
+
+msgctxt "icon category"
+msgid "Editing & text"
+msgstr "Bearbeiten & Text"
+
+msgctxt "icon category"
+msgid "Rich text"
+msgstr "Rich-Text"
+
+msgctxt "icon category"
+msgid "Communication"
+msgstr "Kommunikation"
+
+msgctxt "icon category"
+msgid "Social & feedback"
+msgstr "Social & Feedback"
+
+msgctxt "icon category"
+msgid "Media"
+msgstr "Medien"
+
+msgctxt "icon category"
+msgid "Files & storage"
+msgstr "Dateien & Speicher"
+
+msgctxt "icon category"
+msgid "Analytics & data"
+msgstr "Analysen & Daten"
+
+msgctxt "icon category"
+msgid "Layout & blocks"
+msgstr "Layout & Blöcke"
+
+msgctxt "icon category"
+msgid "Commerce, finance & legal"
+msgstr "Handel, Finanzen & Recht"
+
+msgctxt "icon category"
+msgid "People & accounts"
+msgstr "Personen & Konten"
+
+msgctxt "icon category"
+msgid "Maps & places"
+msgstr "Karten & Orte"
+
+msgctxt "icon category"
+msgid "Devices & interaction"
+msgstr "Geräte & Interaktion"
+
+msgctxt "icon category"
+msgid "Security & privacy"
+msgstr "Sicherheit & Datenschutz"
+
+msgctxt "icon category"
+msgid "Controls & settings"
+msgstr "Steuerung & Einstellungen"
+
+msgctxt "icon category"
+msgid "Status & time"
+msgstr "Status & Zeit"
+
+msgctxt "icon category"
+msgid "Weather"
+msgstr "Wetter"
+
+msgctxt "icon category"
+msgid "Food & drink"
+msgstr "Essen & Trinken"
+
+msgctxt "icon category"
+msgid "Sports & fitness"
+msgstr "Sport & Fitness"
+
+msgctxt "icon category"
+msgid "Health & medical"
+msgstr "Gesundheit & Medizin"
+
+msgctxt "icon category"
+msgid "Nature & environment"
+msgstr "Natur & Umwelt"
+
+msgctxt "icon category"
+msgid "Symbols & misc"
+msgstr "Symbole & Sonstiges"
+
+msgctxt "icon category"
+msgid "Brands"
+msgstr "Marken"
+
+# Icon names — Navigation
+
+msgctxt "icon name"
+msgid "Arrow left"
+msgstr "Pfeil links"
+
+msgctxt "icon name"
+msgid "Arrow right"
+msgstr "Pfeil rechts"
+
+msgctxt "icon name"
+msgid "Arrow up"
+msgstr "Pfeil nach oben"
+
+msgctxt "icon name"
+msgid "Arrow down"
+msgstr "Pfeil nach unten"
+
+msgctxt "icon name"
+msgid "Arrow outward"
+msgstr "Pfeil nach außen"
+
+msgctxt "icon name"
+msgid "Arrow range"
+msgstr "Bereichspfeil"
+
+msgctxt "icon name"
+msgid "Chevron left"
+msgstr "Chevron links"
+
+msgctxt "icon name"
+msgid "Chevron right"
+msgstr "Chevron rechts"
+
+msgctxt "icon name"
+msgid "Chevron left (large)"
+msgstr "Chevron links (groß)"
+
+msgctxt "icon name"
+msgid "Chevron right (large)"
+msgstr "Chevron rechts (groß)"
+
+msgctxt "icon name"
+msgid "Chevron up"
+msgstr "Chevron oben"
+
+msgctxt "icon name"
+msgid "Chevron down"
+msgstr "Chevron unten"
+
+msgctxt "icon name"
+msgid "Drop up"
+msgstr "Ausklappen nach oben"
+
+msgctxt "icon name"
+msgid "Drop down"
+msgstr "Ausklappen nach unten"
+
+msgctxt "icon name"
+msgid "Subdirectory arrow"
+msgstr "Unterverzeichnis-Pfeil"
+
+msgctxt "icon name"
+msgid "Swap horizontal"
+msgstr "Horizontal tauschen"
+
+msgctxt "icon name"
+msgid "Swap vertical"
+msgstr "Vertikal tauschen"
+
+msgctxt "icon name"
+msgid "Expand"
+msgstr "Erweitern"
+
+msgctxt "icon name"
+msgid "Fullscreen"
+msgstr "Vollbild"
+
+msgctxt "icon name"
+msgid "Exit fullscreen"
+msgstr "Vollbild beenden"
+
+msgctxt "icon name"
+msgid "Collapse"
+msgstr "Einklappen"
+
+msgctxt "icon name"
+msgid "Expand content"
+msgstr "Inhalt ausklappen"
+
+msgctxt "icon name"
+msgid "Collapse content"
+msgstr "Inhalt einklappen"
+
+msgctxt "icon name"
+msgid "Zoom in"
+msgstr "Vergrößern"
+
+msgctxt "icon name"
+msgid "Zoom out"
+msgstr "Verkleinern"
+
+msgctxt "icon name"
+msgid "Open in new"
+msgstr "In neuem Tab öffnen"
+
+msgctxt "icon name"
+msgid "Menu"
+msgstr "Menü"
+
+msgctxt "icon name"
+msgid "More"
+msgstr "Mehr"
+
+msgctxt "icon name"
+msgid "More (vertical)"
+msgstr "Mehr (vertikal)"
+
+# Icon names — Actions
+
+msgctxt "icon name"
+msgid "Add"
+msgstr "Hinzufügen"
+
+msgctxt "icon name"
+msgid "Add circle"
+msgstr "Hinzufügen (Kreis)"
+
+msgctxt "icon name"
+msgid "Minus circle"
+msgstr "Minus (Kreis)"
+
+msgctxt "icon name"
+msgid "Minus"
+msgstr "Minus"
+
+msgctxt "icon name"
+msgid "Checkmark"
+msgstr "Häkchen"
+
+msgctxt "icon name"
+msgid "Check circle"
+msgstr "Häkchen (Kreis)"
+
+msgctxt "icon name"
+msgid "Close"
+msgstr "Schließen"
+
+msgctxt "icon name"
+msgid "Cancel"
+msgstr "Abbrechen"
+
+msgctxt "icon name"
+msgid "Block"
+msgstr "Blockieren"
+
+msgctxt "icon name"
+msgid "Delete"
+msgstr "Löschen"
+
+msgctxt "icon name"
+msgid "Copy"
+msgstr "Kopieren"
+
+msgctxt "icon name"
+msgid "Save"
+msgstr "Speichern"
+
+msgctxt "icon name"
+msgid "Download"
+msgstr "Herunterladen"
+
+msgctxt "icon name"
+msgid "Upload"
+msgstr "Hochladen"
+
+msgctxt "icon name"
+msgid "Print"
+msgstr "Drucken"
+
+msgctxt "icon name"
+msgid "Link"
+msgstr "Link"
+
+msgctxt "icon name"
+msgid "Attachment"
+msgstr "Anhang"
+
+msgctxt "icon name"
+msgid "Search"
+msgstr "Suche"
+
+msgctxt "icon name"
+msgid "Select"
+msgstr "Auswählen"
+
+msgctxt "icon name"
+msgid "Select all"
+msgstr "Alles auswählen"
+
+msgctxt "icon name"
+msgid "Refresh"
+msgstr "Aktualisieren"
+
+msgctxt "icon name"
+msgid "Sync"
+msgstr "Synchronisieren"
+
+msgctxt "icon name"
+msgid "Undo"
+msgstr "Rückgängig"
+
+msgctxt "icon name"
+msgid "Redo"
+msgstr "Wiederholen"
+
+msgctxt "icon name"
+msgid "Crop"
+msgstr "Zuschneiden"
+
+msgctxt "icon name"
+msgid "Compare"
+msgstr "Vergleichen"
+
+# Icon names — Editing & text
+
+msgctxt "icon name"
+msgid "Edit"
+msgstr "Bearbeiten"
+
+msgctxt "icon name"
+msgid "Edit text"
+msgstr "Text bearbeiten"
+
+msgctxt "icon name"
+msgid "Edit document"
+msgstr "Dokument bearbeiten"
+
+msgctxt "icon name"
+msgid "Document"
+msgstr "Dokument"
+
+msgctxt "icon name"
+msgid "Text document"
+msgstr "Textdokument"
+
+msgctxt "icon name"
+msgid "Article"
+msgstr "Artikel"
+
+msgctxt "icon name"
+msgid "Quote"
+msgstr "Zitat"
+
+msgctxt "icon name"
+msgid "Clipboard"
+msgstr "Zwischenablage"
+
+msgctxt "icon name"
+msgid "List"
+msgstr "Liste"
+
+msgctxt "icon name"
+msgid "Bulleted list"
+msgstr "Aufzählungsliste"
+
+msgctxt "icon name"
+msgid "Numbered list"
+msgstr "Nummerierte Liste"
+
+msgctxt "icon name"
+msgid "Numbered list (RTL)"
+msgstr "Nummerierte Liste (RTL)"
+
+msgctxt "icon name"
+msgid "Letters"
+msgstr "Buchstaben"
+
+msgctxt "icon name"
+msgid "Numbers"
+msgstr "Zahlen"
+
+msgctxt "icon name"
+msgid "Image left, text"
+msgstr "Bild links, Text"
+
+msgctxt "icon name"
+msgid "Image right, text"
+msgstr "Bild rechts, Text"
+
+msgctxt "icon name"
+msgid "Sort"
+msgstr "Sortieren"
+
+msgctxt "icon name"
+msgid "Sort alphabetically"
+msgstr "Alphabetisch sortieren"
+
+msgctxt "icon name"
+msgid "Translate"
+msgstr "Übersetzen"
+
+msgctxt "icon name"
+msgid "Language"
+msgstr "Sprache"
+
+# Icon names — Communication
+
+msgctxt "icon name"
+msgid "Chat"
+msgstr "Chat"
+
+msgctxt "icon name"
+msgid "Chat (dots)"
+msgstr "Chat (Punkte)"
+
+msgctxt "icon name"
+msgid "Chat (text)"
+msgstr "Chat (Text)"
+
+msgctxt "icon name"
+msgid "Forum"
+msgstr "Forum"
+
+msgctxt "icon name"
+msgid "Comic bubble"
+msgstr "Comic-Sprechblase"
+
+msgctxt "icon name"
+msgid "Email"
+msgstr "E-Mail"
+
+msgctxt "icon name"
+msgid "At character"
+msgstr "@-Zeichen"
+
+msgctxt "icon name"
+msgid "Stacked email"
+msgstr "Gestapelte E-Mails"
+
+msgctxt "icon name"
+msgid "Unread email"
+msgstr "Ungelesene E-Mail"
+
+msgctxt "icon name"
+msgid "Open email"
+msgstr "E-Mail geöffnet"
+
+msgctxt "icon name"
+msgid "Phone"
+msgstr "Telefon"
+
+msgctxt "icon name"
+msgid "Send"
+msgstr "Senden"
+
+msgctxt "icon name"
+msgid "Megaphone"
+msgstr "Megafon"
+
+# Icon names — Social & feedback
+
+msgctxt "icon name"
+msgid "Heart"
+msgstr "Herz"
+
+msgctxt "icon name"
+msgid "Star"
+msgstr "Stern"
+
+msgctxt "icon name"
+msgid "Star (half)"
+msgstr "Stern (halb)"
+
+msgctxt "icon name"
+msgid "Star (filled)"
+msgstr "Stern (gefüllt)"
+
+msgctxt "icon name"
+msgid "Stars sparkle"
+msgstr "Funkelsterne"
+
+msgctxt "icon name"
+msgid "Stars"
+msgstr "Sterne"
+
+msgctxt "icon name"
+msgid "Award star"
+msgstr "Auszeichnungsstern"
+
+msgctxt "icon name"
+msgid "Kids star"
+msgstr "Kinderstern"
+
+msgctxt "icon name"
+msgid "Trophy"
+msgstr "Trophäe"
+
+msgctxt "icon name"
+msgid "Thumbs up"
+msgstr "Daumen hoch"
+
+msgctxt "icon name"
+msgid "Thumbs down"
+msgstr "Daumen runter"
+
+msgctxt "icon name"
+msgid "Thumbs up/down"
+msgstr "Daumen hoch/runter"
+
+msgctxt "icon name"
+msgid "Happy face"
+msgstr "Fröhliches Gesicht"
+
+msgctxt "icon name"
+msgid "Neutral face"
+msgstr "Neutrales Gesicht"
+
+msgctxt "icon name"
+msgid "Sad face"
+msgstr "Trauriges Gesicht"
+
+msgctxt "icon name"
+msgid "Share"
+msgstr "Teilen"
+
+msgctxt "icon name"
+msgid "Share (social)"
+msgstr "Teilen (Social)"
+
+msgctxt "icon name"
+msgid "Flag"
+msgstr "Flagge"
+
+msgctxt "icon name"
+msgid "Bookmark"
+msgstr "Lesezeichen"
+
+# Icon names — Media
+
+msgctxt "icon name"
+msgid "Image"
+msgstr "Bild"
+
+msgctxt "icon name"
+msgid "Images"
+msgstr "Bilder"
+
+msgctxt "icon name"
+msgid "Camera"
+msgstr "Kamera"
+
+msgctxt "icon name"
+msgid "Video camera"
+msgstr "Videokamera"
+
+msgctxt "icon name"
+msgid "Carousel"
+msgstr "Karussell"
+
+msgctxt "icon name"
+msgid "Play"
+msgstr "Abspielen"
+
+msgctxt "icon name"
+msgid "Play (box)"
+msgstr "Abspielen (Box)"
+
+msgctxt "icon name"
+msgid "Play (circle)"
+msgstr "Abspielen (Kreis)"
+
+msgctxt "icon name"
+msgid "Pause"
+msgstr "Pause"
+
+msgctxt "icon name"
+msgid "Stop"
+msgstr "Stopp"
+
+msgctxt "icon name"
+msgid "Skip next"
+msgstr "Nächster Titel"
+
+msgctxt "icon name"
+msgid "Skip previous"
+msgstr "Vorheriger Titel"
+
+msgctxt "icon name"
+msgid "Music"
+msgstr "Musik"
+
+msgctxt "icon name"
+msgid "Headphones"
+msgstr "Kopfhörer"
+
+msgctxt "icon name"
+msgid "Volume up"
+msgstr "Lautstärke hoch"
+
+msgctxt "icon name"
+msgid "Volume down"
+msgstr "Lautstärke runter"
+
+msgctxt "icon name"
+msgid "Volume mute"
+msgstr "Stummschalten"
+
+msgctxt "icon name"
+msgid "Volume off"
+msgstr "Ton aus"
+
+# Icon names — Files & storage
+
+msgctxt "icon name"
+msgid "Folder"
+msgstr "Ordner"
+
+msgctxt "icon name"
+msgid "Open folder"
+msgstr "Ordner geöffnet"
+
+msgctxt "icon name"
+msgid "Zip folder"
+msgstr "ZIP-Ordner"
+
+msgctxt "icon name"
+msgid "Audio file"
+msgstr "Audiodatei"
+
+msgctxt "icon name"
+msgid "Video file"
+msgstr "Videodatei"
+
+msgctxt "icon name"
+msgid "PDF file"
+msgstr "PDF-Datei"
+
+msgctxt "icon name"
+msgid "File attachment"
+msgstr "Dateianhang"
+
+msgctxt "icon name"
+msgid "Database"
+msgstr "Datenbank"
+
+msgctxt "icon name"
+msgid "Cloud"
+msgstr "Cloud"
+
+msgctxt "icon name"
+msgid "Backup"
+msgstr "Backup"
+
+# Icon names — Data & layout
+
+msgctxt "icon name"
+msgid "Bar chart"
+msgstr "Balkendiagramm"
+
+msgctxt "icon name"
+msgid "Data chart"
+msgstr "Datendiagramm"
+
+msgctxt "icon name"
+msgid "Chart line bar"
+msgstr "Linien-Balkendiagramm"
+
+msgctxt "icon name"
+msgid "Trending up"
+msgstr "Aufwärtstrend"
+
+msgctxt "icon name"
+msgid "Trending down"
+msgstr "Abwärtstrend"
+
+msgctxt "icon name"
+msgid "Timeline"
+msgstr "Zeitleiste"
+
+msgctxt "icon name"
+msgid "Pie chart"
+msgstr "Kreisdiagramm"
+
+msgctxt "icon name"
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgctxt "icon name"
+msgid "Data table"
+msgstr "Datentabelle"
+
+msgctxt "icon name"
+msgid "Table"
+msgstr "Tabelle"
+
+msgctxt "icon name"
+msgid "Grid"
+msgstr "Raster"
+
+msgctxt "icon name"
+msgid "Grid 3×3"
+msgstr "Raster 3×3"
+
+msgctxt "icon name"
+msgid "Grid 4×4"
+msgstr "Raster 4×4"
+
+msgctxt "icon name"
+msgid "List box"
+msgstr "Listenfeld"
+
+msgctxt "icon name"
+msgid "Column view"
+msgstr "Spaltenansicht"
+
+msgctxt "icon name"
+msgid "Comfy view"
+msgstr "Komfortansicht"
+
+msgctxt "icon name"
+msgid "Grid view"
+msgstr "Rasteransicht"
+
+msgctxt "icon name"
+msgid "List view"
+msgstr "Listenansicht"
+
+msgctxt "icon name"
+msgid "Layers"
+msgstr "Ebenen"
+
+# Icon names — Commerce, finance & legal
+
+msgctxt "icon name"
+msgid "Shopping cart"
+msgstr "Warenkorb"
+
+msgctxt "icon name"
+msgid "Add to cart"
+msgstr "Zum Warenkorb hinzufügen"
+
+msgctxt "icon name"
+msgid "Remove from cart"
+msgstr "Aus Warenkorb entfernen"
+
+msgctxt "icon name"
+msgid "Cart off"
+msgstr "Warenkorb aus"
+
+msgctxt "icon name"
+msgid "Shopping basket"
+msgstr "Einkaufskorb"
+
+msgctxt "icon name"
+msgid "Package"
+msgstr "Paket"
+
+msgctxt "icon name"
+msgid "Credit card"
+msgstr "Kreditkarte"
+
+msgctxt "icon name"
+msgid "Payment card"
+msgstr "Zahlungskarte"
+
+msgctxt "icon name"
+msgid "Contactless"
+msgstr "Kontaktlos"
+
+msgctxt "icon name"
+msgid "Payments"
+msgstr "Zahlungen"
+
+msgctxt "icon name"
+msgid "Dollar"
+msgstr "Dollar"
+
+msgctxt "icon name"
+msgid "Euro"
+msgstr "Euro"
+
+msgctxt "icon name"
+msgid "Pound"
+msgstr "Pfund"
+
+msgctxt "icon name"
+msgid "Yen"
+msgstr "Yen"
+
+msgctxt "icon name"
+msgid "Franc"
+msgstr "Franc"
+
+msgctxt "icon name"
+msgid "Lira"
+msgstr "Lira"
+
+msgctxt "icon name"
+msgid "Ruble"
+msgstr "Rubel"
+
+msgctxt "icon name"
+msgid "Rupee"
+msgstr "Rupie"
+
+msgctxt "icon name"
+msgid "Yuan"
+msgstr "Yuan"
+
+msgctxt "icon name"
+msgid "Bitcoin"
+msgstr "Bitcoin"
+
+msgctxt "icon name"
+msgid "Currency exchange"
+msgstr "Währungsumtausch"
+
+msgctxt "icon name"
+msgid "Sell tag"
+msgstr "Preisschild"
+
+msgctxt "icon name"
+msgid "Medal"
+msgstr "Medaille"
+
+msgctxt "icon name"
+msgid "Medals"
+msgstr "Medaillen"
+
+msgctxt "icon name"
+msgid "Upgrade"
+msgstr "Upgrade"
+
+msgctxt "icon name"
+msgid "Diamond"
+msgstr "Diamant"
+
+# Icon names — People & accounts
+
+msgctxt "icon name"
+msgid "Account circle"
+msgstr "Konto"
+
+msgctxt "icon name"
+msgid "Account"
+msgstr "Person"
+
+msgctxt "icon name"
+msgid "Group"
+msgstr "Gruppe"
+
+msgctxt "icon name"
+msgid "Face"
+msgstr "Gesicht"
+
+msgctxt "icon name"
+msgid "Face male"
+msgstr "Gesicht (männlich)"
+
+msgctxt "icon name"
+msgid "ID card"
+msgstr "Ausweis"
+
+msgctxt "icon name"
+msgid "Male"
+msgstr "Männlich"
+
+msgctxt "icon name"
+msgid "Female"
+msgstr "Weiblich"
+
+msgctxt "icon name"
+msgid "Man"
+msgstr "Mann"
+
+msgctxt "icon name"
+msgid "Woman"
+msgstr "Frau"
+
+msgctxt "icon name"
+msgid "Accessibility"
+msgstr "Barrierefreiheit"
+
+msgctxt "icon name"
+msgid "Wheelchair"
+msgstr "Rollstuhl"
+
+# Icon names — Maps & places
+
+msgctxt "icon name"
+msgid "Location"
+msgstr "Standort"
+
+msgctxt "icon name"
+msgid "Locate"
+msgstr "Orten"
+
+msgctxt "icon name"
+msgid "Locate off"
+msgstr "Orten aus"
+
+msgctxt "icon name"
+msgid "Pin"
+msgstr "Pin"
+
+msgctxt "icon name"
+msgid "Map"
+msgstr "Karte"
+
+msgctxt "icon name"
+msgid "Compass"
+msgstr "Kompass"
+
+msgctxt "icon name"
+msgid "Navigation"
+msgstr "Navigation"
+
+msgctxt "icon name"
+msgid "Globe"
+msgstr "Globus"
+
+msgctxt "icon name"
+msgid "Home"
+msgstr "Startseite"
+
+msgctxt "icon name"
+msgid "Car"
+msgstr "Auto"
+
+msgctxt "icon name"
+msgid "Bicycle"
+msgstr "Fahrrad"
+
+msgctxt "icon name"
+msgid "Train"
+msgstr "Zug"
+
+msgctxt "icon name"
+msgid "Ship"
+msgstr "Schiff"
+
+msgctxt "icon name"
+msgid "Airplane"
+msgstr "Flugzeug"
+
+msgctxt "icon name"
+msgid "Hotel"
+msgstr "Hotel"
+
+# Icon names — Devices & interaction
+
+msgctxt "icon name"
+msgid "Devices"
+msgstr "Geräte"
+
+msgctxt "icon name"
+msgid "Laptop"
+msgstr "Laptop"
+
+msgctxt "icon name"
+msgid "Mobile"
+msgstr "Smartphone"
+
+msgctxt "icon name"
+msgid "Rotate mobile"
+msgstr "Handy drehen"
+
+msgctxt "icon name"
+msgid "Battery full"
+msgstr "Akku voll"
+
+msgctxt "icon name"
+msgid "Battery half"
+msgstr "Akku halb voll"
+
+msgctxt "icon name"
+msgid "Battery low"
+msgstr "Akku schwach"
+
+msgctxt "icon name"
+msgid "Radio"
+msgstr "Radio"
+
+msgctxt "icon name"
+msgid "TV"
+msgstr "Fernseher"
+
+msgctxt "icon name"
+msgid "Mouse"
+msgstr "Maus"
+
+msgctxt "icon name"
+msgid "Touch"
+msgstr "Touch"
+
+msgctxt "icon name"
+msgid "Click"
+msgstr "Klick"
+
+msgctxt "icon name"
+msgid "Pointer"
+msgstr "Zeiger"
+
+msgctxt "icon name"
+msgid "Drag indicator"
+msgstr "Ziehpunkte"
+
+msgctxt "icon name"
+msgid "Drag handle"
+msgstr "Ziehgriff"
+
+msgctxt "icon name"
+msgid "Barcode"
+msgstr "Barcode"
+
+msgctxt "icon name"
+msgid "Barcode scan"
+msgstr "Barcode scannen"
+
+msgctxt "icon name"
+msgid "QR code"
+msgstr "QR-Code"
+
+msgctxt "icon name"
+msgid "QR code scan"
+msgstr "QR-Code scannen"
+
+msgctxt "icon name"
+msgid "Power off"
+msgstr "Ausschalten"
+
+# Icon names — Security & privacy
+
+msgctxt "icon name"
+msgid "Lock"
+msgstr "Schloss"
+
+msgctxt "icon name"
+msgid "Unlock"
+msgstr "Schloss offen"
+
+msgctxt "icon name"
+msgid "Key"
+msgstr "Schlüssel"
+
+msgctxt "icon name"
+msgid "Shield"
+msgstr "Schild"
+
+msgctxt "icon name"
+msgid "Shield check"
+msgstr "Schild mit Häkchen"
+
+msgctxt "icon name"
+msgid "Shield lock"
+msgstr "Schild mit Schloss"
+
+msgctxt "icon name"
+msgid "Security shield"
+msgstr "Sicherheitsschild"
+
+msgctxt "icon name"
+msgid "Verified"
+msgstr "Verifiziert"
+
+msgctxt "icon name"
+msgid "Login"
+msgstr "Anmelden"
+
+msgctxt "icon name"
+msgid "Logout"
+msgstr "Abmelden"
+
+msgctxt "icon name"
+msgid "Cookie"
+msgstr "Cookie"
+
+# Icon names — Controls & settings
+
+msgctxt "icon name"
+msgid "Settings"
+msgstr "Einstellungen"
+
+msgctxt "icon name"
+msgid "Tune"
+msgstr "Anpassen"
+
+msgctxt "icon name"
+msgid "Filter"
+msgstr "Filter"
+
+msgctxt "icon name"
+msgid "Filter off"
+msgstr "Filter aus"
+
+msgctxt "icon name"
+msgid "Checkbox"
+msgstr "Kontrollkästchen"
+
+msgctxt "icon name"
+msgid "Checkbox checked"
+msgstr "Kontrollkästchen aktiviert"
+
+msgctxt "icon name"
+msgid "Checkbox indeterminate"
+msgstr "Kontrollkästchen unbestimmt"
+
+msgctxt "icon name"
+msgid "Radio button"
+msgstr "Optionsfeld"
+
+msgctxt "icon name"
+msgid "Radio button checked"
+msgstr "Optionsfeld aktiviert"
+
+msgctxt "icon name"
+msgid "Radio button partial"
+msgstr "Optionsfeld teilweise"
+
+msgctxt "icon name"
+msgid "Toggle on"
+msgstr "Schalter an"
+
+msgctxt "icon name"
+msgid "Toggle off"
+msgstr "Schalter aus"
+
+msgctxt "icon name"
+msgid "Visibility"
+msgstr "Sichtbarkeit"
+
+msgctxt "icon name"
+msgid "Visibility off"
+msgstr "Sichtbarkeit aus"
+
+msgctxt "icon name"
+msgid "Dark mode"
+msgstr "Dunkelmodus"
+
+msgctxt "icon name"
+msgid "Light mode"
+msgstr "Hellmodus"
+
+# Icon names — Status & time
+
+msgctxt "icon name"
+msgid "Info"
+msgstr "Info"
+
+msgctxt "icon name"
+msgid "Help"
+msgstr "Hilfe"
+
+msgctxt "icon name"
+msgid "Warning"
+msgstr "Warnung"
+
+msgctxt "icon name"
+msgid "Error"
+msgstr "Fehler"
+
+msgctxt "icon name"
+msgid "Notifications"
+msgstr "Benachrichtigungen"
+
+msgctxt "icon name"
+msgid "Clock"
+msgstr "Uhr"
+
+msgctxt "icon name"
+msgid "Hourglass"
+msgstr "Sanduhr"
+
+msgctxt "icon name"
+msgid "Calendar (blank)"
+msgstr "Kalender (leer)"
+
+msgctxt "icon name"
+msgid "Calendar"
+msgstr "Kalender"
+
+msgctxt "icon name"
+msgid "Calendar (text)"
+msgstr "Kalender (Text)"
+
+# Icon names — Symbols & misc
+
+msgctxt "icon name"
+msgid "Crown"
+msgstr "Krone"
+
+msgctxt "icon name"
+msgid "Celebration"
+msgstr "Feier"
+
+msgctxt "icon name"
+msgid "Bolt"
+msgstr "Blitz"
+
+msgctxt "icon name"
+msgid "Lightbulb"
+msgstr "Glühbirne"
+
+msgctxt "icon name"
+msgid "Rocket"
+msgstr "Rakete"
+
+msgctxt "icon name"
+msgid "Rocket launch"
+msgstr "Raketenstart"
+
+msgctxt "icon name"
+msgid "Planet"
+msgstr "Planet"
+
+msgctxt "icon name"
+msgid "Palette"
+msgstr "Palette"
+
+msgctxt "icon name"
+msgid "Label"
+msgstr "Etikett"
+
+msgctxt "icon name"
+msgid "Paw"
+msgstr "Pfote"
+
+msgctxt "icon name"
+msgid "Construction"
+msgstr "Baustelle"
+
+msgctxt "icon name"
+msgid "Extensions"
+msgstr "Erweiterungen"
+
+msgctxt "icon name"
+msgid "Puzzle"
+msgstr "Puzzle"
+
+msgctxt "icon name"
+msgid "Layout section"
+msgstr "Layout-Abschnitt"
+
+msgctxt "icon name"
+msgid "Arrow line end"
+msgstr "Pfeillinie Ende"
+
+msgctxt "icon name"
+msgid "Arrow line start"
+msgstr "Pfeillinie Start"
+
+msgctxt "icon name"
+msgid "Shape up"
+msgstr "Form nach oben"
+
+msgctxt "icon name"
+msgid "Book"
+msgstr "Buch"
+
+msgctxt "icon name"
+msgid "Book open"
+msgstr "Offenes Buch"
+
+msgctxt "icon name"
+msgid "Bookmark heart"
+msgstr "Lesezeichen Herz"
+
+msgctxt "icon name"
+msgid "Bookmark stacks"
+msgstr "Lesezeichen-Stapel"
+
+msgctxt "icon name"
+msgid "Brick"
+msgstr "Baustein"
+
+msgctxt "icon name"
+msgid "Wrench"
+msgstr "Bauen"
+
+msgctxt "icon name"
+msgid "Cards"
+msgstr "Karten"
+
+msgctxt "icon name"
+msgid "Castle"
+msgstr "Schloss"
+
+msgctxt "icon name"
+msgid "Category"
+msgstr "Kategorie"
+
+msgctxt "icon name"
+msgid "Code"
+msgstr "Code"
+
+msgctxt "icon name"
+msgid "Code block"
+msgstr "Codeblock"
+
+msgctxt "icon name"
+msgid "Code slash"
+msgstr "Code Schrägstrich"
+
+msgctxt "icon name"
+msgid "Box"
+msgstr "Box"
+
+msgctxt "icon name"
+msgid "Document person"
+msgstr "Dokument Person"
+
+msgctxt "icon name"
+msgid "Document scan"
+msgstr "Dokument scannen"
+
+msgctxt "icon name"
+msgid "Drop left"
+msgstr "Caret links"
+
+msgctxt "icon name"
+msgid "Drop right"
+msgstr "Caret rechts"
+
+msgctxt "icon name"
+msgid "Dropdown"
+msgstr "Dropdown"
+
+msgctxt "icon name"
+msgid "Edit square"
+msgstr "Bearbeiten Quadrat"
+
+msgctxt "icon name"
+msgid "Flower"
+msgstr "Blume"
+
+msgctxt "icon name"
+msgid "Hide"
+msgstr "Ausblenden"
+
+msgctxt "icon name"
+msgid "Interests"
+msgstr "Interessen"
+
+msgctxt "icon name"
+msgid "Add location"
+msgstr "Ort hinzufügen"
+
+msgctxt "icon name"
+msgid "Location heart"
+msgstr "Ort Herz"
+
+msgctxt "icon name"
+msgid "My location"
+msgstr "Mein Standort"
+
+msgctxt "icon name"
+msgid "Nearby"
+msgstr "In der Nähe"
+
+msgctxt "icon name"
+msgid "Unread notification"
+msgstr "Ungelesene Benachrichtigung"
+
+msgctxt "icon name"
+msgid "Open in new (down)"
+msgstr "In neuem Tab (unten)"
+
+msgctxt "icon name"
+msgid "Paragraph"
+msgstr "Absatz"
+
+msgctxt "icon name"
+msgid "Pin circle"
+msgstr "Pin Kreis"
+
+msgctxt "icon name"
+msgid "Pin off"
+msgstr "Pin aus"
+
+msgctxt "icon name"
+msgid "School"
+msgstr "Schule"
+
+msgctxt "icon name"
+msgid "Science"
+msgstr "Wissenschaft"
+
+msgctxt "icon name"
+msgid "Signpost"
+msgstr "Wegweiser"
+
+msgctxt "icon name"
+msgid "Stacks"
+msgstr "Stapel"
+
+msgctxt "icon name"
+msgid "Stories"
+msgstr "Stories"
+
+msgctxt "icon name"
+msgid "Ticket"
+msgstr "Ticket"
+
+msgctxt "icon name"
+msgid "Two pager"
+msgstr "Zweiseiter"
+
+msgctxt "icon name"
+msgid "Walk"
+msgstr "Zu Fuß"
+
+msgctxt "icon name"
+msgid "Widgets"
+msgstr "Widgets"
+
+msgctxt "icon name"
+msgid "Alarm"
+msgstr "Wecker"
+
+msgctxt "icon name"
+msgid "Umbrella"
+msgstr "Strand"
+
+msgctxt "icon name"
+msgid "Bomb"
+msgstr "Bombe"
+
+msgctxt "icon name"
+msgid "Camping"
+msgstr "Camping"
+
+msgctxt "icon name"
+msgid "CCTV"
+msgstr "Überwachungskamera"
+
+msgctxt "icon name"
+msgid "Cold"
+msgstr "Kalt"
+
+msgctxt "icon name"
+msgid "Colorize"
+msgstr "Einfärben"
+
+msgctxt "icon name"
+msgid "Dog"
+msgstr "Hund"
+
+msgctxt "icon name"
+msgid "Drop"
+msgstr "Tropfen"
+
+msgctxt "icon name"
+msgid "Emergency"
+msgstr "Notfall"
+
+msgctxt "icon name"
+msgid "Footprint"
+msgstr "Fußabdruck"
+
+msgctxt "icon name"
+msgid "Heat"
+msgstr "Hitze"
+
+msgctxt "icon name"
+msgid "History"
+msgstr "Verlauf"
+
+msgctxt "icon name"
+msgid "Theater"
+msgstr "Theater"
+
+msgctxt "icon name"
+msgid "Mask"
+msgstr "Maske"
+
+msgctxt "icon name"
+msgid "Mixed weather"
+msgstr "Gemischtes Wetter"
+
+msgctxt "icon name"
+msgid "Mountain"
+msgstr "Berg"
+
+msgctxt "icon name"
+msgid "Owl"
+msgstr "Eule"
+
+msgctxt "icon name"
+msgid "Bird"
+msgstr "Vogel"
+
+msgctxt "icon name"
+msgid "Bone"
+msgstr "Knochen"
+
+msgctxt "icon name"
+msgid "Rain"
+msgstr "Regen"
+
+msgctxt "icon name"
+msgid "Shield star"
+msgstr "Schild Stern"
+
+msgctxt "icon name"
+msgid "Siren"
+msgstr "Sirene"
+
+msgctxt "icon name"
+msgid "Skull"
+msgstr "Totenkopf"
+
+msgctxt "icon name"
+msgid "Snowflake"
+msgstr "Schneeflocke"
+
+msgctxt "icon name"
+msgid "Snowy"
+msgstr "Schneefall"
+
+msgctxt "icon name"
+msgid "Sunny"
+msgstr "Sonnig"
+
+msgctxt "icon name"
+msgid "Thunderstorm"
+msgstr "Gewitter"
+
+msgctxt "icon name"
+msgid "Water"
+msgstr "Wasser"
+
+msgctxt "icon name"
+msgid "Delete forever"
+msgstr "Endgültig löschen"
+
+msgctxt "icon name"
+msgid "Restore"
+msgstr "Wiederherstellen"
+
+msgctxt "icon name"
+msgid "Text"
+msgstr "Text"
+
+msgctxt "icon name"
+msgid "Symbols"
+msgstr "Symbole"
+
+msgctxt "icon name"
+msgid "Sum symbol"
+msgstr "Summenzeichen"
+
+msgctxt "icon name"
+msgid "Bank"
+msgstr "Bank"
+
+msgctxt "icon name"
+msgid "Wallet"
+msgstr "Geldbörse"
+
+msgctxt "icon name"
+msgid "Receipt"
+msgstr "Beleg"
+
+msgctxt "icon name"
+msgid "Moon"
+msgstr "Mond"
+
+msgctxt "icon name"
+msgid "Moon and stars"
+msgstr "Mond und Sterne"
+
+msgctxt "icon name"
+msgid "Beer"
+msgstr "Bier"
+
+msgctxt "icon name"
+msgid "Cocktail"
+msgstr "Cocktail"
+
+msgctxt "icon name"
+msgid "Chess"
+msgstr "Schach"
+
+msgctxt "icon name"
+msgid "Recycling"
+msgstr "Recycling"
+
+msgctxt "icon name"
+msgid "Glasses"
+msgstr "Brille"
+
+msgctxt "icon name"
+msgid "Labs"
+msgstr "Labor"
+
+msgctxt "icon name"
+msgid "Health"
+msgstr "Gesundheit"
+
+msgctxt "icon name"
+msgid "Restroom"
+msgstr "Toilette"
+
+msgctxt "icon name"
+msgid "Movie"
+msgstr "Film"
+
+msgctxt "icon name"
+msgid "Pan zoom"
+msgstr "Schwenken zoomen"
+
+msgctxt "icon name"
+msgid "Music note"
+msgstr "Musiknote"
+
+msgctxt "icon name"
+msgid "Parking"
+msgstr "Parken"
+
+msgctxt "icon name"
+msgid "Recenter"
+msgstr "Neu zentrieren"
+
+msgctxt "icon name"
+msgid "Click left"
+msgstr "Linksklick"
+
+msgctxt "icon name"
+msgid "Click right"
+msgstr "Rechtsklick"
+
+msgctxt "icon name"
+msgid "Burger"
+msgstr "Burger"
+
+msgctxt "icon name"
+msgid "Chef hat"
+msgstr "Kochmütze"
+
+msgctxt "icon name"
+msgid "Coffee"
+msgstr "Kaffee"
+
+msgctxt "icon name"
+msgid "Tea"
+msgstr "Tee"
+
+msgctxt "icon name"
+msgid "Dining"
+msgstr "Gastronomie"
+
+msgctxt "icon name"
+msgid "Fork and spoon"
+msgstr "Gabel und Löffel"
+
+msgctxt "icon name"
+msgid "Glass"
+msgstr "Glas"
+
+msgctxt "icon name"
+msgid "Ice cream"
+msgstr "Eis"
+
+msgctxt "icon name"
+msgid "Liquor"
+msgstr "Spirituosen"
+
+msgctxt "icon name"
+msgid "Nutrition"
+msgstr "Ernährung"
+
+msgctxt "icon name"
+msgid "Game controller"
+msgstr "Esports"
+
+msgctxt "icon name"
+msgid "Exercise"
+msgstr "Training"
+
+msgctxt "icon name"
+msgid "Football"
+msgstr "Fußball"
+
+msgctxt "icon name"
+msgid "Motorsports"
+msgstr "Motorsport"
+
+msgctxt "icon name"
+msgid "Swimming"
+msgstr "Schwimmen"
+
+msgctxt "icon name"
+msgid "Stadium"
+msgstr "Stadion"
+
+msgctxt "icon name"
+msgid "Tennis"
+msgstr "Tennis"
+
+msgctxt "icon name"
+msgid "Volleyball"
+msgstr "Volleyball"
+
+msgctxt "icon name"
+msgid "Target"
+msgstr "Ziel"
+
+msgctxt "icon name"
+msgid "Forest"
+msgstr "Wald"
+
+msgctxt "icon name"
+msgid "Nature"
+msgstr "Natur"
+
+msgctxt "icon name"
+msgid "Nature people"
+msgstr "Natur Menschen"
+
+msgctxt "icon name"
+msgid "Pine tree"
+msgstr "Kiefer"
+
+msgctxt "icon name"
+msgid "Editor's choice"
+msgstr "Redaktionstipp"
+
+msgctxt "icon name"
+msgid "Star shine"
+msgstr "Strahlender Stern"
+
+msgctxt "icon name"
+msgid "Shirt"
+msgstr "Hemd"
+
+msgctxt "icon name"
+msgid "ID badge"
+msgstr "Namensbadge"
+
+msgctxt "icon name"
+msgid "Landscape"
+msgstr "Landschaft"
+
+msgctxt "icon name"
+msgid "Face (female)"
+msgstr "Weibliches Gesicht"
+
+msgctxt "icon name"
+msgid "Pregnant woman"
+msgstr "Schwangere"
+
+msgctxt "icon name"
+msgid "Watch"
+msgstr "Uhr"
+
+msgctxt "icon name"
+msgid "Partly cloudy"
+msgstr "Teilweise bewölkt"
+
+msgctxt "icon name"
+msgid "Partly cloudy night"
+msgstr "Nachts teils bewölkt"
+
+msgctxt "icon name"
+msgid "Sticker"
+msgstr "Aufkleber"
+
+msgctxt "icon name"
+msgid "Medical mask"
+msgstr "Medizinische Maske"
+
+msgctxt "icon name"
+msgid "Medical services"
+msgstr "Medizinische Versorgung"
+
+msgctxt "icon name"
+msgid "Zoom in map"
+msgstr "Karte vergrößern"
+
+msgctxt "icon name"
+msgid "Zoom out map"
+msgstr "Karte verkleinern"
+
+msgctxt "icon name"
+msgid "Content grid"
+msgstr "Inhaltsraster"
+
+msgctxt "icon name"
+msgid "Anchor"
+msgstr "Anker"
+
+msgctxt "icon name"
+msgid "Compare text"
+msgstr "Text vergleichen"
+
+msgctxt "icon name"
+msgid "Contract"
+msgstr "Vertrag"
+
+msgctxt "icon name"
+msgid "Sign contract"
+msgstr "Vertrag unterschreiben"
+
+msgctxt "icon name"
+msgid "Resize"
+msgstr "Größe ändern"
+
+msgctxt "icon name"
+msgid "Swipe left/right"
+msgstr "Wischen links/rechts"
+
+msgctxt "icon name"
+msgid "Swipe up/down"
+msgstr "Wischen hoch/runter"
+
+msgctxt "icon name"
+msgid "Cut"
+msgstr "Ausschneiden"
+
+msgctxt "icon name"
+msgid "Signature"
+msgstr "Unterschrift"
+
+msgctxt "icon name"
+msgid "Menu book"
+msgstr "Menübuch"
+
+msgctxt "icon name"
+msgid "Chat (dashed)"
+msgstr "Chat (gestrichelt)"
+
+msgctxt "icon name"
+msgid "Smiley"
+msgstr "Smiley"
+
+msgctxt "icon name"
+msgid "Broken image"
+msgstr "Defektes Bild"
+
+msgctxt "icon name"
+msgid "Colors"
+msgstr "Farben"
+
+msgctxt "icon name"
+msgid "Archive"
+msgstr "Archiv"
+
+msgctxt "icon name"
+msgid "Copy folder"
+msgstr "Ordner kopieren"
+
+msgctxt "icon name"
+msgid "Analytics"
+msgstr "Analysen"
+
+msgctxt "icon name"
+msgid "Area chart"
+msgstr "Flächendiagramm"
+
+msgctxt "icon name"
+msgid "Bubble chart"
+msgstr "Blasendiagramm"
+
+msgctxt "icon name"
+msgid "Line chart"
+msgstr "Liniendiagramm"
+
+msgctxt "icon name"
+msgid "Leaderboard"
+msgstr "Bestenliste"
+
+msgctxt "icon name"
+msgid "Scoreboard"
+msgstr "Anzeigetafel"
+
+msgctxt "icon name"
+msgid "Aspect ratio"
+msgstr "Seitenverhältnis"
+
+msgctxt "icon name"
+msgid "Toolbar"
+msgstr "Symbolleiste"
+
+msgctxt "icon name"
+msgid "Call to action"
+msgstr "Handlungsaufforderung"
+
+msgctxt "icon name"
+msgid "ATM"
+msgstr "Geldautomat"
+
+msgctxt "icon name"
+msgid "Dollar circle"
+msgstr "Dollar-Kreis"
+
+msgctxt "icon name"
+msgid "Finance chip"
+msgstr "Finanz-Chip"
+
+msgctxt "icon name"
+msgid "Money bag"
+msgstr "Geldbeutel"
+
+msgctxt "icon name"
+msgid "Savings"
+msgstr "Ersparnisse"
+
+msgctxt "icon name"
+msgid "Shopping bag"
+msgstr "Einkaufstasche"
+
+msgctxt "icon name"
+msgid "Universal currency"
+msgstr "Universelle Währung"
+
+msgctxt "icon name"
+msgid "Handshake"
+msgstr "Handschlag"
+
+msgctxt "icon name"
+msgid "Gavel"
+msgstr "Richterhammer"
+
+msgctxt "icon name"
+msgid "License"
+msgstr "Lizenz"
+
+msgctxt "icon name"
+msgid "Unlicensed"
+msgstr "Ohne Lizenz"
+
+msgctxt "icon name"
+msgid "Balance"
+msgstr "Waage"
+
+msgctxt "icon name"
+msgid "Account box"
+msgstr "Kontobox"
+
+msgctxt "icon name"
+msgid "Passport"
+msgstr "Reisepass"
+
+msgctxt "icon name"
+msgid "Sign language"
+msgstr "Gebärdensprache"
+
+msgctxt "icon name"
+msgid "Map search"
+msgstr "Kartensuche"
+
+msgctxt "icon name"
+msgid "Globe (Americas)"
+msgstr "Globus (Amerika)"
+
+msgctxt "icon name"
+msgid "Globe (Asia)"
+msgstr "Globus (Asien)"
+
+msgctxt "icon name"
+msgid "Moped"
+msgstr "Moped"
+
+msgctxt "icon name"
+msgid "Monitor"
+msgstr "Monitor"
+
+msgctxt "icon name"
+msgid "Keyboard"
+msgstr "Tastatur"
+
+msgctxt "icon name"
+msgid "Caps lock"
+msgstr "Feststelltaste"
+
+msgctxt "icon name"
+msgid "Trackpad"
+msgstr "Trackpad"
+
+msgctxt "icon name"
+msgid "VR headset"
+msgstr "Kopfmontiertes Gerät"
+
+msgctxt "icon name"
+msgid "Headset"
+msgstr "Headset"
+
+msgctxt "icon name"
+msgid "Wi‑Fi"
+msgstr "WLAN"
+
+msgctxt "icon name"
+msgid "Wi‑Fi off"
+msgstr "WLAN aus"
+
+msgctxt "icon name"
+msgid "Move selection up"
+msgstr "Auswahl nach oben verschieben"
+
+msgctxt "icon name"
+msgid "Move selection down"
+msgstr "Auswahl nach unten verschieben"
+
+msgctxt "icon name"
+msgid "Move selection left"
+msgstr "Auswahl nach links verschieben"
+
+msgctxt "icon name"
+msgid "Move selection right"
+msgstr "Auswahl nach rechts verschieben"
+
+msgctxt "icon name"
+msgid "Power"
+msgstr "Strom"
+
+msgctxt "icon name"
+msgid "Power unplugged"
+msgstr "Strom getrennt"
+
+msgctxt "icon name"
+msgid "Power off circle"
+msgstr "Ausschalten (Kreis)"
+
+msgctxt "icon name"
+msgid "DNS"
+msgstr "DNS"
+
+msgctxt "icon name"
+msgid "Videogame"
+msgstr "Videospiel"
+
+msgctxt "icon name"
+msgid "Joystick"
+msgstr "Joystick"
+
+msgctxt "icon name"
+msgid "Cookie off"
+msgstr "Cookie aus"
+
+msgctxt "icon name"
+msgid "Fingerprint"
+msgstr "Fingerabdruck"
+
+msgctxt "icon name"
+msgid "Password"
+msgstr "Passwort"
+
+msgctxt "icon name"
+msgid "Shield info"
+msgstr "Schild Info"
+
+msgctxt "icon name"
+msgid "Shield health"
+msgstr "Schild Gesundheit"
+
+msgctxt "icon name"
+msgid "Timer"
+msgstr "Timer"
+
+msgctxt "icon name"
+msgid "High speed"
+msgstr "Hohe Geschwindigkeit"
+
+msgctxt "icon name"
+msgid "Low speed"
+msgstr "Niedrige Geschwindigkeit"
+
+msgctxt "icon name"
+msgid "Thermometer"
+msgstr "Thermometer"
+
+msgctxt "icon name"
+msgid "Foggy"
+msgstr "Neblig"
+
+msgctxt "icon name"
+msgid "Wind"
+msgstr "Wind"
+
+msgctxt "icon name"
+msgid "Fan"
+msgstr "Ventilator"
+
+msgctxt "icon name"
+msgid "Bakery"
+msgstr "Bäckerei"
+
+msgctxt "icon name"
+msgid "Cake"
+msgstr "Kuchen"
+
+msgctxt "icon name"
+msgid "Fast food"
+msgstr "Fast Food"
+
+msgctxt "icon name"
+msgid "Fork and knife"
+msgstr "Messer und Gabel"
+
+msgctxt "icon name"
+msgid "Pizza"
+msgstr "Pizza"
+
+msgctxt "icon name"
+msgid "Water bottle"
+msgstr "Wasserflasche"
+
+msgctxt "icon name"
+msgid "American football"
+msgstr "American Football"
+
+msgctxt "icon name"
+msgid "Badminton"
+msgstr "Badminton"
+
+msgctxt "icon name"
+msgid "Baseball"
+msgstr "Baseball"
+
+msgctxt "icon name"
+msgid "Basketball"
+msgstr "Basketball"
+
+msgctxt "icon name"
+msgid "Cricket"
+msgstr "Cricket"
+
+msgctxt "icon name"
+msgid "Rugby"
+msgstr "Rugby"
+
+msgctxt "icon name"
+msgid "Golf"
+msgstr "Golf"
+
+msgctxt "icon name"
+msgid "Hockey"
+msgstr "Hockey"
+
+msgctxt "icon name"
+msgid "Whistle"
+msgstr "Pfeife"
+
+msgctxt "icon name"
+msgid "Allergies"
+msgstr "Allergien"
+
+msgctxt "icon name"
+msgid "Cardiology"
+msgstr "Kardiologie"
+
+msgctxt "icon name"
+msgid "DNA"
+msgstr "DNA"
+
+msgctxt "icon name"
+msgid "Fluid"
+msgstr "Flüssigkeit"
+
+msgctxt "icon name"
+msgid "Syringe"
+msgstr "Spritze"
+
+msgctxt "icon name"
+msgid "Healing"
+msgstr "Heilung"
+
+msgctxt "icon name"
+msgid "Pill"
+msgstr "Pille"
+
+msgctxt "icon name"
+msgid "Vital signs"
+msgstr "Vitalzeichen"
+
+msgctxt "icon name"
+msgid "Virus"
+msgstr "Virus"
+
+msgctxt "icon name"
+msgid "Suitcase"
+msgstr "Koffer"
+
+msgctxt "icon name"
+msgid "Bug"
+msgstr "Käfer"
+
+msgctxt "icon name"
+msgid "Copyright"
+msgstr "Urheberrecht"
+
+msgctxt "icon name"
+msgid "Fire extinguisher"
+msgstr "Feuerlöscher"
+
+msgctxt "icon name"
+msgid "Fire hydrant"
+msgstr "Hydrant"
+
+msgctxt "icon name"
+msgid "Traffic light"
+msgstr "Ampel"
+
+msgctxt "icon name"
+msgid "Factory"
+msgstr "Fabrik"
+
+msgctxt "icon name"
+msgid "Cogwheels"
+msgstr "Zahnräder"
+
+msgctxt "icon name"
+msgid "Engineering"
+msgstr "Technik"
+
+msgctxt "icon name"
+msgid "Toy"
+msgstr "Spielzeug"
+
+msgid "Chat edit"
+msgstr "Chat bearbeiten"
+
+msgctxt "icon name"
+msgid "Cheer"
+msgstr "Jubel"
+
+msgctxt "icon name"
+msgid "Magic wand shine"
+msgstr "Zauberstab (glänzend)"
+
+msgctxt "icon name"
+msgid "Magic wand"
+msgstr "Zauberstab"
+
+# Picker UI
+
+msgctxt "icon picker"
+msgid "Choose icon"
+msgstr "Icon wählen"
+
+msgctxt "icon picker"
+msgid "Search icons…"
+msgstr "Icons durchsuchen…"
+
+msgctxt "icon picker"
+msgid "Style"
+msgstr "Stil"
+
+msgctxt "icon picker"
+msgid "Outline"
+msgstr "Umriss"
+
+msgctxt "icon picker"
+msgid "Filled"
+msgstr "Gefüllt"
+
+msgctxt "icon picker"
+msgid "Remove"
+msgstr "Entfernen"
+
+msgctxt "icon picker"
+msgid "Categories"
+msgstr "Kategorien"
+
+msgctxt "icon name"
+msgid "Text format"
+msgstr "Textformat"
+
+msgctxt "icon name"
+msgid "Bold"
+msgstr "Fett"
+
+msgctxt "icon name"
+msgid "Italic"
+msgstr "Kursiv"
+
+msgctxt "icon name"
+msgid "Underline"
+msgstr "Unterstrichen"
+
+msgctxt "icon name"
+msgid "Strikethrough"
+msgstr "Durchgestrichen"
+
+msgctxt "icon name"
+msgid "Align left"
+msgstr "Links ausrichten"
+
+msgctxt "icon name"
+msgid "Align center"
+msgstr "Zentrieren"
+
+msgctxt "icon name"
+msgid "Align right"
+msgstr "Rechts ausrichten"
+
+msgctxt "icon name"
+msgid "Justify"
+msgstr "Blocksatz"
+
+msgctxt "icon name"
+msgid "Checklist"
+msgstr "Checkliste"
+
+msgctxt "icon name"
+msgid "Decrease indent"
+msgstr "Einzug verkleinern"
+
+msgctxt "icon name"
+msgid "Increase indent"
+msgstr "Einzug vergrößern"
+
+msgctxt "icon name"
+msgid "Line spacing"
+msgstr "Zeilenabstand"
+
+msgctxt "icon name"
+msgid "Letter spacing"
+msgstr "Zeichenabstand"
+
+msgctxt "icon name"
+msgid "Font size"
+msgstr "Schriftgröße"
+
+msgctxt "icon name"
+msgid "Text color"
+msgstr "Textfarbe"
+
+msgctxt "icon name"
+msgid "Highlight color"
+msgstr "Hervorhebungsfarbe"
+
+msgctxt "icon name"
+msgid "Border color"
+msgstr "Rahmenfarbe"
+
+msgctxt "icon name"
+msgid "Clear formatting"
+msgstr "Formatierung löschen"
+
+msgctxt "icon name"
+msgid "Clear format"
+msgstr "Format löschen"
+
+msgctxt "icon name"
+msgid "Unlink"
+msgstr "Link entfernen"
+
+msgctxt "icon name"
+msgid "Image center"
+msgstr "Bild zentriert"
+
+msgctxt "icon name"
+msgid "Image center, text"
+msgstr "Bild mittig, Text"
+
+msgctxt "icon name"
+msgid "Clear all"
+msgstr "Alles löschen"
+
+msgctxt "icon name"
+msgid "Save as"
+msgstr "Speichern unter"
+
+msgctxt "icon name"
+msgid "Shape up stack"
+msgstr "Form nach oben (Stapel)"
+
+msgctxt "icon name"
+msgid "Checkbook"
+msgstr "Scheckbuch"
+
+msgctxt "icon name"
+msgid "Wine"
+msgstr "Wein"
+
+msgctxt "icon name"
+msgid "Water glass"
+msgstr "Wasserglas"
+
+msgctxt "icon name"
+msgid "No drinks"
+msgstr "Keine Getränke"
+
+msgctxt "icon name"
+msgid "Sailing"
+msgstr "Segeln"
+
+msgctxt "icon name"
+msgid "Add column left"
+msgstr "Spalte links einfügen"
+
+msgctxt "icon name"
+msgid "Add column right"
+msgstr "Spalte rechts einfügen"
+
+msgctxt "icon name"
+msgid "Add row above"
+msgstr "Zeile oben einfügen"
+
+msgctxt "icon name"
+msgid "Add row below"
+msgstr "Zeile unten einfügen"
+
+msgctxt "icon name"
+msgid "Align horizontal center"
+msgstr "Horizontal zentrieren"
+
+msgctxt "icon name"
+msgid "Align horizontal left"
+msgstr "Horizontal links ausrichten"
+
+msgctxt "icon name"
+msgid "Align horizontal right"
+msgstr "Horizontal rechts ausrichten"
+
+msgctxt "icon name"
+msgid "Asterisk"
+msgstr "Sternchen"
+
+msgctxt "icon name"
+msgid "Brand family"
+msgstr "Markenfamilie"
+
+msgctxt "icon name"
+msgid "Checklist (RTL)"
+msgstr "Checkliste (RTL)"
+
+msgctxt "icon name"
+msgid "Combine columns"
+msgstr "Spalten zusammenführen"
+
+msgctxt "icon name"
+msgid "Combine rows"
+msgstr "Zeilen zusammenführen"
+
+msgctxt "icon name"
+msgid "Decrease text size"
+msgstr "Text verkleinern"
+
+msgctxt "icon name"
+msgid "Edit table"
+msgstr "Tabelle bearbeiten"
+
+msgctxt "icon name"
+msgid "Image left"
+msgstr "Bild links"
+
+msgctxt "icon name"
+msgid "Image right"
+msgstr "Bild rechts"
+
+msgctxt "icon name"
+msgid "Inbox"
+msgstr "Posteingang"
+
+msgctxt "icon name"
+msgid "Inbox text"
+msgstr "Posteingang Text"
+
+msgctxt "icon name"
+msgid "Increase text size"
+msgstr "Text vergrößern"
+
+msgctxt "icon name"
+msgid "Paintbrush"
+msgstr "Pinsel"
+
+msgctxt "icon name"
+msgid "Paintbrush off"
+msgstr "Pinsel aus"
+
+msgctxt "icon name"
+msgid "Short text"
+msgstr "Kurzer Text"
+
+msgctxt "icon name"
+msgid "Stacked chart"
+msgstr "Gestapeltes Diagramm"
+
+msgctxt "icon name"
+msgid "Table chart"
+msgstr "Tabellenlayout"
+
+msgctxt "icon name"
+msgid "Text snippet"
+msgstr "Textausschnitt"
+
+msgctxt "icon name"
+msgid "Voicemail"
+msgstr "Mailbox"
+
+msgctxt "icon name"
+msgid "Web stories"
+msgstr "Web Stories"
+
+msgctxt "icon name"
+msgid "Web stories stack"
+msgstr "Web Stories Stapel"
+
+msgctxt "icon name"
+msgid "Arrows input"
+msgstr "Pfeile rein"
+
+msgctxt "icon name"
+msgid "Arrows output"
+msgstr "Pfeile raus"
+
+msgctxt "icon name"
+msgid "Foldable device"
+msgstr "Faltgerät"
+
+msgctxt "icon name"
+msgid "Horizontal align center"
+msgstr "Horizontal zentrieren"
+
+msgctxt "icon name"
+msgid "Pinch zoom in"
+msgstr "Zoom zusammenziehen"
+
+msgctxt "icon name"
+msgid "Pinch zoom out"
+msgstr "Zoom auseinanderziehen"
+
+msgctxt "icon name"
+msgid "Tablet"
+msgstr "Tablet"
+
+msgctxt "icon name"
+msgid "Vertical align center"
+msgstr "Vertikal zentrieren"
+
+msgctxt "icon name"
+msgid "Wearables"
+msgstr "Wearables"
+
+msgctxt "icon name"
+msgid "Arrow up down"
+msgstr "Pfeil hoch runter"
+
+msgctxt "icon name"
+msgid "Highlight"
+msgstr "Markierung"
+
+msgctxt "icon category"
+msgid "Theme"
+msgstr "Theme"
+
+msgctxt "icon name"
+msgid "Agender"
+msgstr "Agender"
+
+msgctxt "icon name"
+msgid "Airlines"
+msgstr "Fluggesellschaft"
+
+msgctxt "icon name"
+msgid "Apple"
+msgstr "Apple"
+
+msgctxt "icon name"
+msgid "Apple Music"
+msgstr "Apple Music"
+
+msgctxt "icon name"
+msgid "Apple Pay"
+msgstr "Apple Pay"
+
+msgctxt "icon name"
+msgid "Arrow downwards"
+msgstr "Pfeil nach unten"
+
+msgctxt "icon name"
+msgid "Arrow menu close"
+msgstr "Menü schließen"
+
+msgctxt "icon name"
+msgid "Arrow menu open"
+msgstr "Menü öffnen"
+
+msgctxt "icon name"
+msgid "Arrows outward"
+msgstr "Pfeile nach außen"
+
+msgctxt "icon name"
+msgid "Behance"
+msgstr "Behance"
+
+msgctxt "icon name"
+msgid "Bluesky"
+msgstr "Bluesky"
+
+msgctxt "icon name"
+msgid "Bus"
+msgstr "Bus"
+
+msgctxt "icon name"
+msgid "Compress"
+msgstr "Komprimieren"
+
+msgctxt "icon name"
+msgid "Discord"
+msgstr "Discord"
+
+msgctxt "icon name"
+msgid "Dribbble"
+msgstr "Dribbble"
+
+msgctxt "icon name"
+msgid "Eco"
+msgstr "Eco"
+
+msgctxt "icon name"
+msgid "Edit off"
+msgstr "Bearbeiten deaktiviert"
+
+msgctxt "icon name"
+msgid "Facebook"
+msgstr "Facebook"
+
+msgctxt "icon name"
+msgid "Family star"
+msgstr "Familie & Stern"
+
+msgctxt "icon name"
+msgid "Fast forward"
+msgstr "Vorspulen"
+
+msgctxt "icon name"
+msgid "Fast rewind"
+msgstr "Zurückspulen"
+
+msgctxt "icon name"
+msgid "First page"
+msgstr "Erste Seite"
+
+msgctxt "icon name"
+msgid "Fit page"
+msgstr "Seite anpassen"
+
+msgctxt "icon name"
+msgid "Folder edit"
+msgstr "Ordner bearbeiten"
+
+msgctxt "icon name"
+msgid "GitHub"
+msgstr "GitHub"
+
+msgctxt "icon name"
+msgid "GitLab"
+msgstr "GitLab"
+
+msgctxt "icon name"
+msgid "Google"
+msgstr "Google"
+
+msgctxt "icon name"
+msgid "Google Pay"
+msgstr "Google Pay"
+
+msgctxt "icon name"
+msgid "Groups"
+msgstr "Gruppen"
+
+msgctxt "icon name"
+msgid "Horizontal align right"
+msgstr "Horizontal rechts ausrichten"
+
+msgctxt "icon name"
+msgid "iMessage"
+msgstr "iMessage"
+
+msgctxt "icon name"
+msgid "Instagram"
+msgstr "Instagram"
+
+msgctxt "icon name"
+msgid "Klarna"
+msgstr "Klarna"
+
+msgctxt "icon name"
+msgid "Last page"
+msgstr "Letzte Seite"
+
+msgctxt "icon name"
+msgid "LINE"
+msgstr "LINE"
+
+msgctxt "icon name"
+msgid "Line end arrow"
+msgstr "Pfeil Zeilenende"
+
+msgctxt "icon name"
+msgid "Line start arrow"
+msgstr "Pfeil Zeilenanfang"
+
+msgctxt "icon name"
+msgid "LinkedIn"
+msgstr "LinkedIn"
+
+msgctxt "icon name"
+msgid "Logo"
+msgstr "Logo"
+
+msgctxt "icon name"
+msgid "Mastercard"
+msgstr "Mastercard"
+
+msgctxt "icon name"
+msgid "Mastodon"
+msgstr "Mastodon"
+
+msgctxt "icon name"
+msgid "Medium"
+msgstr "Medium"
+
+msgctxt "icon name"
+msgid "Menu open"
+msgstr "Menü öffnen"
+
+msgctxt "icon name"
+msgid "Read more"
+msgstr "Mehr lesen"
+
+msgctxt "icon name"
+msgid "Messenger"
+msgstr "Messenger"
+
+msgctxt "icon name"
+msgid "Mic"
+msgstr "Mikrofon"
+
+msgctxt "icon name"
+msgid "Mic off"
+msgstr "Mikrofon aus"
+
+msgctxt "icon name"
+msgid "Microsoft"
+msgstr "Microsoft"
+
+msgctxt "icon name"
+msgid "Military medal"
+msgstr "Militärmedaille"
+
+msgctxt "icon name"
+msgid "Mobile vibrate"
+msgstr "Mobilgerät vibrieren"
+
+msgctxt "icon name"
+msgid "Monitor heart"
+msgstr "Monitor mit Herz"
+
+msgctxt "icon name"
+msgid "News article"
+msgstr "Nachrichtenartikel"
+
+msgctxt "icon name"
+msgid "Note"
+msgstr "Notiz"
+
+msgctxt "icon name"
+msgid "Note stack"
+msgstr "Notizstapel"
+
+msgctxt "icon name"
+msgid "Odometer"
+msgstr "Kilometerzähler"
+
+msgctxt "icon name"
+msgid "Pan"
+msgstr "Verschieben"
+
+msgctxt "icon name"
+msgid "Patreon"
+msgstr "Patreon"
+
+msgctxt "icon name"
+msgid "Pause circle"
+msgstr "Pause (Kreis)"
+
+msgctxt "icon name"
+msgid "PayPal"
+msgstr "PayPal"
+
+msgctxt "icon name"
+msgid "Pinterest"
+msgstr "Pinterest"
+
+msgctxt "icon name"
+msgid "Present"
+msgstr "Geschenk"
+
+msgctxt "icon name"
+msgid "Reddit"
+msgstr "Reddit"
+
+msgctxt "icon name"
+msgid "Repeat"
+msgstr "Wiederholen"
+
+msgctxt "icon name"
+msgid "Replay"
+msgstr "Erneut abspielen"
+
+msgctxt "icon name"
+msgid "RSS"
+msgstr "RSS"
+
+msgctxt "icon name"
+msgid "Scanner"
+msgstr "Scanner"
+
+msgctxt "icon name"
+msgid "Shuffle"
+msgstr "Zufallswiedergabe"
+
+msgctxt "icon name"
+msgid "Sick"
+msgstr "Krank"
+
+msgctxt "icon name"
+msgid "Signal"
+msgstr "Signal"
+
+msgctxt "icon name"
+msgid "Slab serif"
+msgstr "Slab Serif"
+
+msgctxt "icon name"
+msgid "Slack"
+msgstr "Slack"
+
+msgctxt "icon name"
+msgid "Smart toy"
+msgstr "Smart Toy"
+
+msgctxt "icon name"
+msgid "Toy fan"
+msgstr "Spielzeug-Ventilator"
+
+msgctxt "icon name"
+msgid "Snapchat"
+msgstr "Snapchat"
+
+msgctxt "icon name"
+msgid "SoundCloud"
+msgstr "SoundCloud"
+
+msgctxt "icon name"
+msgid "Special character"
+msgstr "Sonderzeichen"
+
+msgctxt "icon name"
+msgid "Sports flag"
+msgstr "Sportflagge"
+
+msgctxt "icon name"
+msgid "Spotify"
+msgstr "Spotify"
+
+msgctxt "icon name"
+msgid "Step"
+msgstr "Stufe"
+
+msgctxt "icon name"
+msgid "Stop circle"
+msgstr "Stopp (Kreis)"
+
+msgctxt "icon name"
+msgid "Strategy"
+msgstr "Strategie"
+
+msgctxt "icon name"
+msgid "Subtitles"
+msgstr "Untertitel"
+
+msgctxt "icon name"
+msgid "Switch left"
+msgstr "Wechseln links"
+
+msgctxt "icon name"
+msgid "Switch right"
+msgstr "Wechseln rechts"
+
+msgctxt "icon name"
+msgid "Swords"
+msgstr "Schwerter"
+
+msgctxt "icon name"
+msgid "Telegram"
+msgstr "Telegram"
+
+msgctxt "icon name"
+msgid "Threads"
+msgstr "Threads"
+
+msgctxt "icon name"
+msgid "TikTok"
+msgstr "TikTok"
+
+msgctxt "icon name"
+msgid "Title case"
+msgstr "Großschreibung"
+
+msgctxt "icon name"
+msgid "Tooltip"
+msgstr "Tooltip"
+
+msgctxt "icon name"
+msgid "Trello"
+msgstr "Trello"
+
+msgctxt "icon name"
+msgid "Tumblr"
+msgstr "Tumblr"
+
+msgctxt "icon name"
+msgid "TV remote"
+msgstr "TV-Fernbedienung"
+
+msgctxt "icon name"
+msgid "Twitch"
+msgstr "Twitch"
+
+msgctxt "icon name"
+msgid "Motorbike"
+msgstr "Motorrad"
+
+msgctxt "icon name"
+msgid "Vaccines"
+msgstr "Impfstoffe"
+
+msgctxt "icon name"
+msgid "Vimeo"
+msgstr "Vimeo"
+
+msgctxt "icon name"
+msgid "Visa"
+msgstr "Visa"
+
+msgctxt "icon name"
+msgid "WeChat"
+msgstr "WeChat"
+
+msgctxt "icon name"
+msgid "Weibo"
+msgstr "Weibo"
+
+msgctxt "icon name"
+msgid "WhatsApp"
+msgstr "WhatsApp"
+
+msgctxt "icon name"
+msgid "WordPress"
+msgstr "WordPress"
+
+msgctxt "icon name"
+msgid "X (Twitter)"
+msgstr "X (Twitter)"
+
+msgctxt "icon name"
+msgid "Xing"
+msgstr "Xing"
+
+msgctxt "icon name"
+msgid "Yelp"
+msgstr "Yelp"
+
+msgctxt "icon name"
+msgid "YouTube"
+msgstr "YouTube"
+
+msgctxt "icon name"
+msgid "YouTube Shorts"
+msgstr "YouTube Shorts"
+
+msgctxt "icon name"
+msgid "Chat edit"
+msgstr "Chat bearbeiten"
+
+msgctxt "icon name"
+msgid "Horizontal align left"
+msgstr "Horizontal links ausrichten"
+
+msgctxt "icon name"
+msgid "Style"
+msgstr "Stil"
+
+msgctxt "icon name"
+msgid "Arrow split"
+msgstr "Pfeil teilen"
+
+msgctxt "icon name"
+msgid "Arrow split up"
+msgstr "Pfeil teilen (oben)"
+
+msgctxt "icon name"
+msgid "Split scene"
+msgstr "Geteilte Szene"
+
+msgctxt "icon name"
+msgid "Split scene top"
+msgstr "Geteilte Szene (oben)"

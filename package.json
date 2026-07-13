@@ -1,8 +1,8 @@
 {
-  "name": "fromscratch",
+  "name": "baselayer",
   "description": "",
   "private": false,
-  "homepage": "https://github.com/StephanWagner/fromscratch",
+  "homepage": "https://github.com/StephanWagner/baselayer",
   "type": "module",
   "scripts": {
     "watch": "concurrently \"npm run watch:js\" \"npm run watch:css\"",
@@ -14,7 +14,7 @@
     "build:js": "node scripts/build-js.mjs",
     "build:css": "node scripts/build-css.mjs",
     "build:language-flags": "node scripts/build-language-flags.cjs",
-    "format": "prettier \"theme/fromscratch/src\" --write"
+    "format": "prettier \"theme/baselayer/src\" --write"
   },
   "dependencies": {
     "chart.js": "^4.5.1",

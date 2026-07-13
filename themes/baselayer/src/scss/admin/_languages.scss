@@ -1,0 +1,32 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// Page list table
+
+.fixed .column-bl_language {
+  width: 10%;
+  max-width: 120px;
+}
+
+.bl-list-translation-row .column-title {
+  padding-left: 20px;
+
+  .row-title {
+    &::before {
+      content: '→ ';
+    }
+  }
+}
+
+// Page list filters
+
+.subsubsub {
+  .bl_language {
+    display: block;
+    margin: 4px 0 8px;
+  }
+}
+
+.bl-language-filters {
+  display: block;
+}

@@ -3,10 +3,10 @@
 # Delete all .DS_Store files recursively
 find . -name ".DS_Store" -exec rm -f {} \;
 
-LANGUAGE_DIR="./themes/fromscratch/languages"
+LANGUAGE_DIR="./themes/baselayer/languages"
 
 # Replicate a de_DE .po to all German variants (same translations, new header).
-# $1 = path to the de_DE .po, $2 = file name prefix (e.g. fromscratch, fromscratch-icons)
+# $1 = path to the de_DE .po, $2 = file name prefix (e.g. baselayer, baselayer-icons)
 replicate_de_variants() {
     local base="$1"
     local prefix="$2"
@@ -25,8 +25,8 @@ replicate_de_variants() {
 }
 
 # All German variants use the same translations as de_DE
-replicate_de_variants "$LANGUAGE_DIR/fromscratch-de_DE.po" "fromscratch"
-replicate_de_variants "$LANGUAGE_DIR/icons/fromscratch-icons-de_DE.po" "fromscratch-icons"
+replicate_de_variants "$LANGUAGE_DIR/baselayer-de_DE.po" "baselayer"
+replicate_de_variants "$LANGUAGE_DIR/icons/baselayer-icons-de_DE.po" "baselayer-icons"
 
 # Compile every .po (main + icons + variants) into a .mo alongside it
 find "$LANGUAGE_DIR" -type f -name "*.po" | while read -r po; do

@@ -24,10 +24,10 @@ return [
 
     'environments' => [
         'production' => [
-            'deploy_path' => '/var/www/vhosts/__HOST__/httpdocs/fromscratch/production/theme',
+            'deploy_path' => '/var/www/vhosts/__HOST__/httpdocs/baselayer/production/theme',
         ],
         'staging' => [
-            'deploy_path' => '/var/www/vhosts/__HOST__/httpdocs/fromscratch/staging/theme',
+            'deploy_path' => '/var/www/vhosts/__HOST__/httpdocs/baselayer/staging/theme',
         ],
     ],
 
@@ -38,16 +38,16 @@ return [
      */
 
     // The WordPress theme folder name
-    'theme_slug' => 'fromscratch',
+    'theme_slug' => 'baselayer',
 
     // The WordPress theme path in current deploy release
-    'theme_path' => '{{deploy_path}}/current/theme/fromscratch',
+    'theme_path' => '{{deploy_path}}/current/theme/baselayer',
 
     // The path to the root of the WordPress installation
     'wp_path' => '{{deploy_path}}/../wordpress',
 
     // Where to save the WP CLI binary
-    'wp_cli_path' => '/var/www/vhosts/fromscratch/httpdocs/fromscratch/shared/wp',
+    'wp_cli_path' => '/var/www/vhosts/baselayer/httpdocs/baselayer/shared/wp',
 
     /**
      * Release config

@@ -1,0 +1,62 @@
+<?php
+
+defined('ABSPATH') || exit;
+
+get_header();
+
+$s = trim((string) get_search_query());
+?>
+
+<main class="content__wrapper">
+	<div class="content__container container">
+
+		<?php echo bl_breadcrumbs(); ?>
+
+		<div class="content__content">
+
+			<h1><?= esc_html(__('Search results', 'baselayer')) ?></h1>
+
+			<div class="search__page-form">
+				<?php bl_the_search_form(['id' => 'fs-search-page']); ?>
+			</div>
+
+			<?php if ($s === '' || !get_search_query()) : ?>
+				<div class="search__empty"><?php esc_html_e('Please enter a search term.', 'baselayer'); ?></div>
+			<?php elseif (have_posts()) : ?>
+				<div class="search__amount">
+					<?php
+					global $wp_query;
+					$count = (int) $wp_query->found_posts;
+					echo esc_html(
+						sprintf(
+							/* translators: 1: number of results, 2: search term */
+							_n(
+								'%1$d result for "%2$s".',
+								'%1$d results for "%2$s".',
+								$count,
+								'baselayer'
+							),
+							$count,
+							$s
+						)
+					);
+					?>
+				</div>
+				<div class="archive__list">
+					<?php
+					while (have_posts()) {
+						the_post();
+						bl_render_template('article-preview');
+					}
+					?>
+				</div>
+				<?php bl_render_template('pagination'); ?>
+			<?php else : ?>
+				<div class="search__empty"><?php echo esc_html(sprintf(__('No results found for "%s".', 'baselayer'), $s)); ?></div>
+			<?php endif; ?>
+		</div>
+
+	</div>
+</main>
+
+<?php get_footer(); ?>

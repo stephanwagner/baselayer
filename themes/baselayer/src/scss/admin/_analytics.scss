@@ -1,0 +1,226 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.bl-chart-container,
+.bl-chart-wrapper-flex,
+.bl-analytics-summary-notice {
+  max-width: 860px;
+  box-sizing: border-box;
+}
+
+.bl-analytics-summary-notice {
+  a {
+    text-decoration: none;
+  }
+}
+
+.bl-analytics-page .bl-analytics-summary-notice.notice.inline {
+  margin: 12px 0 14px;
+  padding: 10px 12px;
+}
+
+.bl-analytics-summary-since {
+  margin-top: 4px;
+  font-size: 13px;
+  font-weight: 400;
+  color: #646970;
+}
+
+.bl-chart-container {
+  position: relative;
+  background: #fff;
+  border: 1px solid #c3c4c7;
+  border-radius: 6px;
+  padding: 16px;
+  word-break: break-word;
+
+  canvas {
+    display: block;
+  }
+}
+
+.bl-chart-container--table {
+  margin-top: 12px;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+}
+
+.bl-analytics-page h2 {
+  font-weight: 600;
+}
+
+.bl-analytics-page .bl-stats-table.widefat th.bl-stats-metric,
+.bl-analytics-page .bl-stats-table.widefat td.bl-stats-metric {
+  width: 180px;
+  text-align: right;
+  box-sizing: border-box;
+}
+
+@media (max-width: 900px) {
+  .bl-analytics-page .bl-stats-table.widefat th.bl-stats-metric,
+  .bl-analytics-page .bl-stats-table.widefat td.bl-stats-metric {
+    width: auto;
+  }
+}
+
+/* Top pages: hits column ≈ bar track (100px) + cell padding — not full 180px metric width */
+.bl-analytics-page .bl-top-pages-table.widefat th.bl-stats-metric--pageviews,
+.bl-analytics-page .bl-top-pages-table.widefat td.bl-stats-metric--pageviews {
+  width: calc(100px + 1.5rem);
+  max-width: calc(100px + 1.5rem);
+}
+
+.bl-analytics-page .bl-stats-table.widefat thead th.bl-stats-metric {
+  font-weight: 600;
+}
+
+.bl-analytics-page .bl-stats-table.widefat thead th:first-child {
+  font-weight: 600 !important;
+}
+
+.bl-analytics-page .bl-stats-table.widefat tbody td {
+  vertical-align: middle;
+}
+
+.bl-analytics-page .bl-stats-table.widefat tbody td:first-child {
+  font-weight: 600;
+}
+
+.bl-stats-metric__value {
+  display: block;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.bl-stats-metric__bar {
+  display: block;
+  max-width: 100px;
+  margin-top: 5px;
+  margin-left: auto;
+}
+
+.bl-stats-metric__track {
+  display: block;
+  height: 6px;
+  background: #e8e8ea;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.bl-stats-metric__fill {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  min-width: 0;
+}
+
+.bl-week-range {
+  color: #646970;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.bl-stats-period-current {
+  margin-left: 4px;
+  color: #646970;
+  font-size: 12px;
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+.bl-chart-wrapper-flex {
+  display: flex;
+  gap: 24px;
+  margin-top: 32px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+  }
+}
+
+.bl-chart-container-flex {
+  width: calc(50% - 12px);
+
+  @media (max-width: 600px) {
+    width: 100%;
+  }
+}
+
+.bl-visits-summary-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bl-visits-summary-list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 4px 16px;
+  padding: 12px 0;
+  border-top: 1px solid #e8e8ea;
+  margin: 0;
+  line-height: 18px;
+
+  &:first-child {
+    padding-top: 0;
+    border-top: none;
+  }
+
+  &:last-child {
+    padding-bottom: 0;
+  }
+}
+
+.bl-visits-summary-list__label {
+  font-weight: 600;
+  color: #1d2327;
+}
+
+.bl-visits-summary-list__value {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1d2327;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.bl-top-pages-table {
+  table-layout: fixed;
+}
+
+.bl-top-pages-table__rank {
+  width: 2.75rem;
+  text-align: center !important;
+  font-weight: 600;
+}
+
+.bl-analytics-page .bl-top-pages-table.widefat thead th.bl-top-pages-table__page {
+  font-weight: 600 !important;
+}
+
+.bl-top-pages-table .bl-top-pages-table__page {
+  text-align: left !important;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  a,
+  span {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.bl-top-pages-empty {
+  margin: 0;
+  color: #646970;
+}

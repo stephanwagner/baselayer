@@ -1,0 +1,79 @@
+@use '../../../src/scss/variables' as *;
+@use '../../../src/scss/mixins' as *;
+
+.icon__wrapper {
+  margin-top: 24px;
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: center;
+
+  &.-icon-align-left {
+    justify-content: flex-start;
+  }
+
+  &.-icon-align-right {
+    justify-content: flex-end;
+  }
+
+  &:first-child {
+    margin-top: 0;
+  }
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: $breakpoint-s) {
+    margin-top: 16px;
+    margin-bottom: 16px;
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .bl-icon {
+      font-size: 32px;
+    }
+  }
+}
+
+.icon__icon {
+  border-radius: var(--fs-border-radius-m);
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--fs-default-text-color);
+
+  &.-has-icon {
+    background: var(--fs-color-gray-200);
+  }
+
+  @media (max-width: $breakpoint-s) {
+    width: 64px;
+    height: 64px;
+  }
+
+  @media (max-width: $breakpoint-xs) {
+    width: 48px;
+    height: 48px;
+  }
+
+  .bl-icon {
+    font-size: 48px;
+
+    @media (max-width: $breakpoint-s) {
+      font-size: 40px;
+    }
+
+    @media (max-width: $breakpoint-xs) {
+      font-size: 32px;
+    }
+  }
+}

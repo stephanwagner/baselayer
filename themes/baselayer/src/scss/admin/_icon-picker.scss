@@ -1,0 +1,263 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// Reusable icon picker (block options sidebar + modal grid).
+
+$fs-icon-picker-height: 504px;
+
+body.bl-icon-picker-modal-open {
+  overflow: hidden;
+}
+
+.bl-icon-picker-modal {
+  inset: 0;
+  position: fixed;
+  z-index: 100000;
+}
+
+.bl-icon-picker-modal__backdrop {
+  background: rgba(0, 0, 0, 0.35);
+  inset: 0;
+  position: absolute;
+}
+
+.bl-icon-picker-modal__panel {
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  left: 50%;
+  max-height: calc(100vh - 64px);
+  max-width: 658px;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(100% - 32px);
+}
+
+.bl-icon-picker-modal__header {
+  align-items: center;
+  border-bottom: 1px solid #dcdcde;
+  display: flex;
+  flex: 0 0 auto;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 16px 20px;
+}
+
+.bl-icon-picker-modal__title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.bl-icon-picker-modal__close {
+  align-items: center;
+  background: transparent;
+  border: 0;
+  color: #50575e;
+  cursor: pointer;
+  display: inline-flex;
+  height: 32px;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  width: 32px;
+
+  &:hover,
+  &:focus {
+    color: #1d2327;
+  }
+
+  .dashicons {
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+  }
+}
+
+.bl-icon-picker-modal__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  padding: 0 20px;
+
+  &.bl-icon-picker__panel {
+    height: min($fs-icon-picker-height, calc(100vh - 163px));
+  }
+}
+
+input[type='search'].bl-icon-picker-modal__search {
+  margin: 0;
+  width: 100%;
+  height: 36px;
+  min-height: 36px;
+}
+
+.bl-icon-picker-modal__variant {
+  display: inline-flex;
+  gap: 0;
+
+  .button {
+    align-items: center;
+    border-radius: 0;
+    display: inline-flex;
+    height: 36px;
+    min-height: 36px;
+    margin: 0;
+
+    &:first-child {
+      border-bottom-right-radius: 0;
+      border-top-right-radius: 0;
+    }
+
+    &:last-child {
+      border-bottom-left-radius: 0;
+      border-top-left-radius: 0;
+      margin-left: -1px;
+    }
+
+    &.is-active {
+      background: #2271b1;
+      border-color: #2271b1;
+      color: #fff;
+      z-index: 1;
+    }
+  }
+}
+
+.bl-icon-picker__panel {
+  display: flex;
+  flex-direction: column;
+  height: min($fs-icon-picker-height, calc(100vh - 163px));
+  min-height: 0;
+}
+
+.bl-icon-picker__label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+// Preview of the selected icon (glyph + name), centered above the picker.
+// Only rendered once an icon is chosen.
+.bl-icon-picker__value {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--fs-color-gray-700, #3c434a);
+  background: var(--fs-color-gray-100, #f0f0f1);
+  border-radius: 4px;
+
+  .bl-icon {
+    font-size: 24px;
+  }
+}
+
+.bl-icon-picker__control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 16px;
+}
+
+.bl-icon-picker__trigger {
+  flex: 1 1 auto;
+  justify-content: center;
+}
+
+.bl-icon-picker__toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 0;
+  padding: 8px 20px;
+  background: #fff;
+  border-bottom: 1px solid #dcdcde;
+  margin: 0 -20px;
+  background: #f6f7f7;
+
+  // The search field grows to fill the row; min-width: 0 lets it shrink so the
+  // variant toggle stays beside it instead of wrapping onto the next line.
+  > *:first-child {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+
+.bl-icon-picker__variant {
+  flex: 0 0 auto;
+}
+
+.bl-icon-picker__categories {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 0 -20px;
+  padding: 16px 20px 20px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.bl-icon-picker__category + .bl-icon-picker__category {
+  margin-top: 20px;
+}
+
+.bl-icon-picker__category-title {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  color: var(--fs-color-gray-600, #50575e);
+}
+
+.bl-icon-picker__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(46px, 1fr));
+  gap: 6px;
+}
+
+.bl-icon-picker__item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  padding: 0;
+  color: var(--fs-color-gray-700, #3c434a);
+  background: #fff;
+  border: 1px solid var(--fs-color-gray-300, #dcdcde);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: transition('background-color', 'border-color', 'color');
+
+  .bl-icon {
+    font-size: 24px;
+  }
+
+  &:hover {
+    color: var(--fs-color-primary, #2271b1);
+    border-color: var(--fs-color-primary, #2271b1);
+  }
+
+  &.is-selected {
+    color: var(--fs-color-primary, #2271b1);
+    border-color: var(--fs-color-primary, #2271b1);
+    background: rgba(34, 113, 177, 0.08);
+  }
+}

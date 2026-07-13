@@ -1,0 +1,112 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// Form
+
+.bl-page-settings-form {
+  margin: 20px 0 0;
+
+  hr {
+    margin: 24px 0;
+  }
+}
+
+hr.bl-page-settings-divider {
+  margin: 24px 0;
+}
+
+.bl-form-row {
+  margin-bottom: 20px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.bl-submit-row {
+  margin-top: 20px;
+}
+
+// Table
+
+th.form-table-checkbox-label {
+  padding-top: 15px;
+}
+
+// Buttons
+
+.button.bl-button-can-toggle {
+  &.active,
+  &.active:hover,
+  &.active:focus {
+    background: #2271b1;
+    border-color: #2271b1;
+    color: #fff;
+    box-shadow: none;
+    outline: none;
+  }
+}
+
+button.is-link {
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  color: #2271b1;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:hover,
+  &:focus {
+    text-decoration: none;
+    color: #0056b3;
+  }
+}
+
+// Labels
+
+.bl-input-label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+// Textarea
+
+textarea.regular-text {
+  display: block;
+}
+
+// Checkboxes
+
+.bl-indent-checkbox {
+  padding-left: 24px;
+}
+
+input[type='checkbox'][data-fs-forced='1'] {
+  cursor: not-allowed;
+  opacity: 0.35;
+}
+
+// Image picker
+
+.bl-image-picker {
+  img {
+    display: block;
+    max-width: 240px;
+    height: auto;
+    border-radius: 4px;
+    background: #fff;
+  }
+
+  img[src$='.svg'],
+  img[src*='.svg?'] {
+    border-radius: 0;
+    background: none;
+  }
+}
+
+.bl-image-picker-preview {
+  margin-bottom: 8px;
+}

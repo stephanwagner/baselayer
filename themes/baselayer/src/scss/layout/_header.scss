@@ -1,0 +1,147 @@
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// Header
+
+.header__wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: var(--fs-color-gray-200);
+
+  // Adjust when wordpress admin bar is present
+  .logged-in.admin-bar & {
+    top: 32px;
+
+    @media (max-width: 782px) {
+      top: 46px;
+    }
+  }
+}
+
+.header__placeholder {
+  height: var(--fs-header-height);
+
+  @media (max-width: $breakpoint-mobile) {
+    height: var(--fs-header-height-mobile);
+  }
+}
+
+.header__container {
+  height: var(--fs-header-height);
+
+  body.-transition-init & {
+    transition: transition('height');
+  }
+
+  body.-scrolled & {
+    height: var(--fs-header-height-scrolled);
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    height: var(--fs-header-height-mobile);
+
+    body.-scrolled & {
+      height: var(--fs-header-height-mobile-scrolled);
+    }
+  }
+}
+
+.header__aligner {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+.logo__container {
+  line-height: 0;
+  margin: 0 auto 0 0;
+
+  a {
+    display: block;
+  }
+}
+
+.logo__image {
+  height: 40px;
+  width: auto;
+
+  body.-transition-init & {
+    transition: transition('height');
+  }
+
+  body.-scrolled & {
+    height: 32px;
+  }
+
+  @media (max-width: $breakpoint-mobile) {
+    height: 32px;
+  }
+}
+
+.bl-language-switcher {
+  margin: 0 0 0 24px;
+  position: relative;
+  z-index: 2;
+}
+
+.bl-language-switcher__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.bl-language-switcher__item {
+  position: relative;
+  margin: 0;
+  padding: 0;
+  line-height: 24px;
+}
+
+.bl-language-switcher__item.-submenu-open > .sub-menu-toggle svg {
+  transform: scaleY(-1);
+}
+
+.sub-menu-toggle.bl-language-switcher__trigger {
+  align-items: center;
+  gap: 0;
+  justify-content: center;
+  width: auto;
+  min-width: 24px;
+  width: auto;
+
+  svg {
+    flex-shrink: 0;
+  }
+}
+
+.bl-lang-item__flag,
+.bl-language-switcher__current-flag {
+  display: block;
+  flex-shrink: 0;
+  height: 20px;
+  width: 20px;
+  border: 1px solid var(--fs-color-gray-300);
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.bl-lang-item {
+  align-items: center;
+  display: flex;
+  font: inherit;
+  gap: 8px;
+  line-height: 1.2;
+  text-decoration: none;
+
+  &.bl-lang-disabled {
+    cursor: default;
+    opacity: 0.45;
+  }
+}
+
+.bl-lang-item__label {
+  white-space: nowrap;
+}

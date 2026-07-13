@@ -5,7 +5,7 @@ const require = createRequire(import.meta.url);
 const { themeDir } = require('./config.cjs');
 
 const bundles = [
-  { input: `${themeDir}/src/js/main/main.js`, name: 'fromscratch' },
+  { input: `${themeDir}/src/js/main/main.js`, name: 'baselayer' },
   { input: `${themeDir}/src/js/admin/admin.js`, name: 'admin' },
   {
     input: `${themeDir}/src/js/editor/editor.js`,
