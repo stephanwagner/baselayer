@@ -9,7 +9,7 @@ function bl_breadcrumbs(array $args = []): string
 
     $args = wp_parse_args($args, $defaults);
 
-    // `separator_html` is the separator content only; output between items as `<li class="fs-breadcrumbs__separator">`.
+    // `separator_html` is the separator content only; output between items as `<li class="bl-breadcrumbs__separator">`.
     if (! array_key_exists('separator_html', $args)) {
         $args['separator_html'] = esc_html($args['separator']);
     }
@@ -158,26 +158,26 @@ function bl_breadcrumbs(array $args = []): string
     // Build HTML
     $nav_label = esc_attr__('Breadcrumb', 'baselayer');
 
-    $html = '<nav class="fs-breadcrumbs__container" aria-label="' . $nav_label . '">';
-    $html .= '<ol class="fs-breadcrumbs__list">';
+    $html = '<nav class="bl-breadcrumbs__container" aria-label="' . $nav_label . '">';
+    $html .= '<ol class="bl-breadcrumbs__list">';
 
     $last_index = count($items) - 1;
 
     foreach ($items as $index => $item) {
-        $html .= '<li class="fs-breadcrumbs__item">';
+        $html .= '<li class="bl-breadcrumbs__item">';
 
         if ($item['url']) {
-            $html .= '<a class="fs-breadcrumbs__item-link" href="' . esc_url($item['url']) . '">'
+            $html .= '<a class="bl-breadcrumbs__item-link" href="' . esc_url($item['url']) . '">'
                 . esc_html($item['label']) . '</a>';
         } else {
             $current = ($index === $last_index) ? ' aria-current="page"' : '';
-            $html .= '<span class="fs-breadcrumbs__item-label"' . $current . '>' . esc_html($item['label']) . '</span>';
+            $html .= '<span class="bl-breadcrumbs__item-label"' . $current . '>' . esc_html($item['label']) . '</span>';
         }
 
         $html .= '</li>';
 
         if ($index < $last_index) {
-            $html .= '<li class="fs-breadcrumbs__separator" aria-hidden="true">'
+            $html .= '<li class="bl-breadcrumbs__separator" aria-hidden="true">'
                 . $args['separator_html']
                 . '</li>';
         }

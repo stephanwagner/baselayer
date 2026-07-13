@@ -122,14 +122,14 @@ const getBlockOptionKey = (option, index) => {
 };
 
 const getBlockOptionWrapperClass = (option, index) => {
-  const classes = ['fs-block-option'];
+  const classes = ['bl-block-option'];
 
   if (option.type === 'boolean') {
-    classes.push('fs-block-option-boolean');
+    classes.push('bl-block-option-boolean');
   }
 
   if (index > 0 && !option.noSeparator) {
-    classes.push('fs-block-option--separated');
+    classes.push('bl-block-option--separated');
   }
 
   return classes.join(' ');
@@ -733,7 +733,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
 
                   return (
                     <BlockOptionWrapper key={getBlockOptionKey(option, index)} option={option} index={index}>
-                      {rowLabel ? <span className="fs-block-option__label">{rowLabel}</span> : null}
+                      {rowLabel ? <span className="bl-block-option__label">{rowLabel}</span> : null}
                       <ToggleControl
                         label={toggleLabel}
                         checked={attributes[option.attributeName]}
@@ -776,7 +776,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                     return (
                       <BlockOptionWrapper key={getBlockOptionKey(option, index)} option={option} index={index}>
                         <ToggleGroupControl
-                          className="fs-block-option-button-group"
+                          className="bl-block-option-button-group"
                           label={option.label}
                           value={attributes[option.attributeName] ?? option.default ?? ''}
                           isBlock

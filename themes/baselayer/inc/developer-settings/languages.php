@@ -62,14 +62,14 @@ add_action('admin_init', function () use ($bl_developer_page_slug) {
 	}
 	if (!empty($duplicate_codes)) {
 		set_transient('baselayer_languages_duplicate_codes', $duplicate_codes, 60);
-		wp_safe_redirect(admin_url('options-general.php?page=fs-developer-languages'));
+		wp_safe_redirect(admin_url('options-general.php?page=bl-developer-languages'));
 		exit;
 	}
 	$sanitized = function_exists('bl_sanitize_theme_languages') ? bl_sanitize_theme_languages($value) : ['list' => [], 'default' => '', 'use_url_prefix' => true, 'prefix_default' => false, 'no_translation' => 'disabled'];
 	update_option('bl_theme_languages', $sanitized);
 	flush_rewrite_rules(true);
 	set_transient('baselayer_languages_saved', '1', 30);
-	wp_safe_redirect(admin_url('options-general.php?page=fs-developer-languages'));
+	wp_safe_redirect(admin_url('options-general.php?page=bl-developer-languages'));
 	exit;
 }, 1);
 
@@ -119,7 +119,7 @@ function bl_render_developer_languages(): void
 
 		<h2 class="title"><?= esc_html__('Languages', 'baselayer') ?></h2>
 		<p class="description"><?= esc_html__('Configure the languages available for your content and manage how they are used across the site.', 'baselayer') ?></p>
-		<form method="post" action="" class="fs-page-settings-form" id="fs-languages-form">
+		<form method="post" action="" class="bl-page-settings-form" id="bl-languages-form">
 			<?php settings_fields(BL_THEME_OPTION_GROUP_LANGUAGES); ?>
 			<table class="form-table" role="presentation">
 				<tr>
@@ -143,11 +143,11 @@ function bl_render_developer_languages(): void
 					<td>
 						<input type="hidden" name="bl_theme_languages[use_url_prefix]" value="0">
 						<label><input type="checkbox" name="bl_theme_languages[use_url_prefix]" id="bl_use_url_prefix" value="1" <?= checked($lang_use_url_prefix, true, false) ?>> <?= esc_html__('Use language prefix in URL', 'baselayer') ?></label>
-						<p class="description fs-indent-checkbox"><?= esc_html__('Adds a language prefix to URLs (e.g. /de/ueber-uns).', 'baselayer') ?></p>
-						<div id="fs-prefix-default-wrap" class="fs-url-prefix-sub" style="margin-top: 12px; <?= $lang_use_url_prefix ? '' : 'display:none;' ?>">
+						<p class="description bl-indent-checkbox"><?= esc_html__('Adds a language prefix to URLs (e.g. /de/ueber-uns).', 'baselayer') ?></p>
+						<div id="bl-prefix-default-wrap" class="bl-url-prefix-sub" style="margin-top: 12px; <?= $lang_use_url_prefix ? '' : 'display:none;' ?>">
 							<input type="hidden" name="bl_theme_languages[prefix_default]" value="0">
 							<label><input type="checkbox" name="bl_theme_languages[prefix_default]" id="bl_prefix_default" value="1" <?= checked($lang_prefix_default, true, false) ?>> <?= esc_html__('Prefix default language in URL', 'baselayer') ?></label>
-							<p class="description fs-indent-checkbox"><?= esc_html__('Controls whether the default language also uses a URL prefix.', 'baselayer') ?></p>
+							<p class="description bl-indent-checkbox"><?= esc_html__('Controls whether the default language also uses a URL prefix.', 'baselayer') ?></p>
 						</div>
 					</td>
 				</tr>
@@ -156,8 +156,8 @@ function bl_render_developer_languages(): void
 					<td>
 						<div style="margin-bottom: 24px;">
 							<div style="display: flex; align-items: center; gap: 8px">
-								<input type="text" id="fs-language-toggler-shortcode" readonly class="regular-text code fs-code-small" value="[bl_language_switcher]" />
-								<button type="button" class="button" data-fs-copy-from-source="fs-language-toggler-shortcode" data-fs-copy-feedback-text="<?= esc_attr__('Copied', 'baselayer') ?>"><?= esc_html__('Copy', 'baselayer') ?></button>
+								<input type="text" id="bl-language-toggler-shortcode" readonly class="regular-text code bl-code-small" value="[bl_language_switcher]" />
+								<button type="button" class="button" data-bl-copy-from-source="bl-language-toggler-shortcode" data-bl-copy-feedback-text="<?= esc_attr__('Copied', 'baselayer') ?>"><?= esc_html__('Copy', 'baselayer') ?></button>
 							</div>
 							<p class="description"><?= esc_html__('To display a language switcher in your theme, use the shortcode [bl_language_switcher].', 'baselayer') ?></p>
 						</div>
@@ -174,8 +174,8 @@ function bl_render_developer_languages(): void
 					<th scope="row"><?= esc_html__('Language switcher', 'baselayer') ?></th>
 					<td>
 						<div style="display: flex; align-items: center; gap: 8px">
-							<input type="text" id="fs-language-toggler-shortcode" readonly class="regular-text code fs-code-small" value="[bl_language_switcher]" />
-							<button type="button" class="button" data-fs-copy-from-source="fs-language-toggler-shortcode" data-fs-copy-feedback-text="<?= esc_attr__('Copied', 'baselayer') ?>"><?= esc_html__('Copy', 'baselayer') ?></button>
+							<input type="text" id="bl-language-toggler-shortcode" readonly class="regular-text code bl-code-small" value="[bl_language_switcher]" />
+							<button type="button" class="button" data-bl-copy-from-source="bl-language-toggler-shortcode" data-bl-copy-feedback-text="<?= esc_attr__('Copied', 'baselayer') ?>"><?= esc_html__('Copy', 'baselayer') ?></button>
 						</div>
 						<p class="description"><?= esc_html__('To display a language switcher in your theme, use the shortcode [bl_language_switcher].', 'baselayer') ?></p>
 					</td>
@@ -195,9 +195,9 @@ function bl_render_developer_languages(): void
 				);
 			?></p>
 			<?php if ($iso639_catalog !== []) : ?>
-				<div class="fs-language-quick-add">
-					<label for="fs-language-catalog-select" class="screen-reader-text"><?= esc_html__('Add language from catalog', 'baselayer') ?></label>
-					<select id="fs-language-catalog-select" class="regular-text">
+				<div class="bl-language-quick-add">
+					<label for="bl-language-catalog-select" class="screen-reader-text"><?= esc_html__('Add language from catalog', 'baselayer') ?></label>
+					<select id="bl-language-catalog-select" class="regular-text">
 						<option value=""><?= esc_html__('Select a language…', 'baselayer') ?></option>
 						<?php foreach ($iso639_catalog as $entry) : ?>
 							<option value="<?= esc_attr($entry['id']) ?>">
@@ -205,57 +205,57 @@ function bl_render_developer_languages(): void
 							</option>
 						<?php endforeach; ?>
 					</select>
-					<button type="button" class="button" id="fs-add-language-from-catalog"><?= esc_html__('Add selected', 'baselayer') ?></button>
-					<span class="fs-language-quick-add__sep" aria-hidden="true">|</span>
-					<button type="button" class="button" id="fs-add-language"><?= esc_html__('Add empty row', 'baselayer') ?></button>
+					<button type="button" class="button" id="bl-add-language-from-catalog"><?= esc_html__('Add selected', 'baselayer') ?></button>
+					<span class="bl-language-quick-add__sep" aria-hidden="true">|</span>
+					<button type="button" class="button" id="bl-add-language"><?= esc_html__('Add empty row', 'baselayer') ?></button>
 				</div>
 			<?php else : ?>
 				<p style="margin-top: 12px;">
-					<button type="button" class="button" id="fs-add-language"><?= esc_html__('Add language', 'baselayer') ?></button>
+					<button type="button" class="button" id="bl-add-language"><?= esc_html__('Add language', 'baselayer') ?></button>
 				</p>
 			<?php endif; ?>
 			<?php $lang_count = count($lang_list);
 			$show_reorder = $lang_count >= 3; ?>
-			<table class="widefat striped fs-languages-table fs-table-small-gaps <?= $show_reorder ? '' : 'fs-hide-reorder' ?>" id="fs-languages-table" style="width: auto; margin-top: 16px;">
+			<table class="widefat striped bl-languages-table bl-table-small-gaps <?= $show_reorder ? '' : 'bl-hide-reorder' ?>" id="bl-languages-table" style="width: auto; margin-top: 16px;">
 				<thead>
 					<tr>
-						<th class="fs-language-flag-th" style="width: 44px;"><?= esc_html__('Flag', 'baselayer') ?></th>
+						<th class="bl-language-flag-th" style="width: 44px;"><?= esc_html__('Flag', 'baselayer') ?></th>
 						<th><?= esc_html__('Code', 'baselayer') ?></th>
 						<th><?= esc_html__('Name', 'baselayer') ?></th>
 						<th><?= esc_html__('Native name', 'baselayer') ?></th>
-						<th class="fs-reorder-th" style="width: 70px;"><?= esc_html__('Order', 'baselayer') ?></th>
+						<th class="bl-reorder-th" style="width: 70px;"><?= esc_html__('Order', 'baselayer') ?></th>
 						<th></th>
 					</tr>
 				</thead>
-				<tbody id="fs-languages-tbody">
+				<tbody id="bl-languages-tbody">
 					<?php foreach ($lang_list as $i => $l) : ?>
-						<tr class="fs-language-row" data-row-index="<?= (int) $i ?>">
-							<?= function_exists('bl_language_flag_admin_cell') ? bl_language_flag_admin_cell((string) ($l['id'] ?? '')) : '<td class="fs-language-flag-cell"></td>' ?>
-							<td><input type="text" name="bl_theme_languages[list][<?= (int) $i ?>][id]" value="<?= esc_attr($l['id']) ?>" class="small-text fs-language-code-input" placeholder="en" maxlength="20" required></td>
+						<tr class="bl-language-row" data-row-index="<?= (int) $i ?>">
+							<?= function_exists('bl_language_flag_admin_cell') ? bl_language_flag_admin_cell((string) ($l['id'] ?? '')) : '<td class="bl-language-flag-cell"></td>' ?>
+							<td><input type="text" name="bl_theme_languages[list][<?= (int) $i ?>][id]" value="<?= esc_attr($l['id']) ?>" class="small-text bl-language-code-input" placeholder="en" maxlength="20" required></td>
 							<td><input type="text" name="bl_theme_languages[list][<?= (int) $i ?>][name]" value="<?= esc_attr($l['name'] ?? '') ?>" class="regular-text" required style="width: 160px;"></td>
 							<td><input type="text" name="bl_theme_languages[list][<?= (int) $i ?>][nameNative]" value="<?= esc_attr($l['nameNative'] ?? '') ?>" class="regular-text" required style="width: 160px;"></td>
-							<td class="fs-reorder-cell" style="vertical-align: middle;">
+							<td class="bl-reorder-cell" style="vertical-align: middle;">
 								<?php if ($i === 0) : ?>
-									<span class="fs-default-badge" style="color: #646970; font-size: 12px;"><?= esc_html__('Default', 'baselayer') ?></span>
+									<span class="bl-default-badge" style="color: #646970; font-size: 12px;"><?= esc_html__('Default', 'baselayer') ?></span>
 								<?php else : ?>
-									<button type="button" class="button button-small fs-move-up" aria-label="<?= esc_attr__('Move up', 'baselayer') ?>" title="<?= esc_attr__('Move up', 'baselayer') ?>" <?= $i === 1 ? ' disabled' : '' ?>>↑</button>
-									<button type="button" class="button button-small fs-move-down" aria-label="<?= esc_attr__('Move down', 'baselayer') ?>" title="<?= esc_attr__('Move down', 'baselayer') ?>" <?= $i === $lang_count - 1 ? ' disabled' : '' ?>>↓</button>
+									<button type="button" class="button button-small bl-move-up" aria-label="<?= esc_attr__('Move up', 'baselayer') ?>" title="<?= esc_attr__('Move up', 'baselayer') ?>" <?= $i === 1 ? ' disabled' : '' ?>>↑</button>
+									<button type="button" class="button button-small bl-move-down" aria-label="<?= esc_attr__('Move down', 'baselayer') ?>" title="<?= esc_attr__('Move down', 'baselayer') ?>" <?= $i === $lang_count - 1 ? ' disabled' : '' ?>>↓</button>
 								<?php endif; ?>
 							</td>
-							<td style="vertical-align: middle;"><button type="button" class="button button-small fs-remove-language" aria-label="<?= esc_attr__('Remove', 'baselayer') ?>"><?= esc_html__('Remove', 'baselayer') ?></button></td>
+							<td style="vertical-align: middle;"><button type="button" class="button button-small bl-remove-language" aria-label="<?= esc_attr__('Remove', 'baselayer') ?>"><?= esc_html__('Remove', 'baselayer') ?></button></td>
 						</tr>
 					<?php endforeach; ?>
 				</tbody>
 			</table>
 			<script>
 				(function() {
-					var form = document.getElementById('fs-languages-form');
-					var tbody = document.getElementById('fs-languages-tbody');
-					var addBtn = document.getElementById('fs-add-language');
-					var addFromCatalogBtn = document.getElementById('fs-add-language-from-catalog');
-					var catalogSelect = document.getElementById('fs-language-catalog-select');
+					var form = document.getElementById('bl-languages-form');
+					var tbody = document.getElementById('bl-languages-tbody');
+					var addBtn = document.getElementById('bl-add-language');
+					var addFromCatalogBtn = document.getElementById('bl-add-language-from-catalog');
+					var catalogSelect = document.getElementById('bl-language-catalog-select');
 					var usePrefix = document.getElementById('bl_use_url_prefix');
-					var prefixWrap = document.getElementById('fs-prefix-default-wrap');
+					var prefixWrap = document.getElementById('bl-prefix-default-wrap');
 					var prefixDefault = document.getElementById('bl_prefix_default');
 					var flagBaseUrl = <?= wp_json_encode(trailingslashit(get_template_directory_uri() . '/assets/flags/iso-639')) ?>;
 					var flagAssetVer = <?= wp_json_encode(function_exists('bl_asset_version') ? bl_asset_version() : '1') ?>;
@@ -350,17 +350,17 @@ function bl_render_developer_languages(): void
 						var nameNative = data.nameNative || '';
 						var flagUrl = flagUrlForCode(id);
 						var flagHidden = flagUrl ? '' : ' hidden';
-						return '<td class="fs-language-flag-cell"><span class="fs-language-flag-preview"><img class="fs-language-flag-preview__img" src="' + escAttr(flagUrl) + '" width="28" height="21" alt="" decoding="async"' + flagHidden + ' /></span></td>' +
-							'<td><input type="text" name="bl_theme_languages[list][' + index + '][id]" value="' + escAttr(id) + '" class="small-text fs-language-code-input" placeholder="en" maxlength="20" required></td>' +
+						return '<td class="bl-language-flag-cell"><span class="bl-language-flag-preview"><img class="bl-language-flag-preview__img" src="' + escAttr(flagUrl) + '" width="28" height="21" alt="" decoding="async"' + flagHidden + ' /></span></td>' +
+							'<td><input type="text" name="bl_theme_languages[list][' + index + '][id]" value="' + escAttr(id) + '" class="small-text bl-language-code-input" placeholder="en" maxlength="20" required></td>' +
 							'<td><input type="text" name="bl_theme_languages[list][' + index + '][name]" value="' + escAttr(name) + '" class="regular-text" required style="width: 160px;"></td>' +
 							'<td><input type="text" name="bl_theme_languages[list][' + index + '][nameNative]" value="' + escAttr(nameNative) + '" class="regular-text" required style="width: 160px;"></td>' +
-							'<td class="fs-reorder-cell" style="vertical-align: middle;"><button type="button" class="button button-small fs-move-up">↑</button> <button type="button" class="button button-small fs-move-down">↓</button></td>' +
-							'<td style="vertical-align: middle;"><button type="button" class="button button-small fs-remove-language" aria-label="' + escAttr(removeLabel) + '">' + escAttr(removeLabel) + '</button></td>';
+							'<td class="bl-reorder-cell" style="vertical-align: middle;"><button type="button" class="button button-small bl-move-up">↑</button> <button type="button" class="button button-small bl-move-down">↓</button></td>' +
+							'<td style="vertical-align: middle;"><button type="button" class="button button-small bl-remove-language" aria-label="' + escAttr(removeLabel) + '">' + escAttr(removeLabel) + '</button></td>';
 					}
 
 					function addLanguageRow(data) {
 						var tr = document.createElement('tr');
-						tr.className = 'fs-language-row';
+						tr.className = 'bl-language-row';
 						tr.innerHTML = buildRowHtml(rowIndex, data);
 						tbody.appendChild(tr);
 						bindRowFlags(tr);
@@ -387,7 +387,7 @@ function bl_render_developer_languages(): void
 					tbody.querySelectorAll('tr.bl-language-row').forEach(bindRowFlags);
 
 					tbody.addEventListener('input', function (e) {
-						if (e.target.classList.contains('fs-language-code-input')) {
+						if (e.target.classList.contains('bl-language-code-input')) {
 							updateRowFlag(e.target.closest('tr'));
 							refreshCatalogSelect();
 						}
@@ -408,25 +408,25 @@ function bl_render_developer_languages(): void
 
 					function updateReorderVisibility() {
 						var rows = tbody.querySelectorAll('tr.bl-language-row');
-						var table = document.getElementById('fs-languages-table');
+						var table = document.getElementById('bl-languages-table');
 						if (rows.length >= 3) {
-							table.classList.remove('fs-hide-reorder');
+							table.classList.remove('bl-hide-reorder');
 							rows.forEach(function(tr, i) {
 								var cell = tr.querySelector('.bl-reorder-cell');
 								if (!cell) return;
 								if (i === 0) {
-									cell.innerHTML = '<span class="fs-default-badge" style="color: #646970; font-size: 12px;"><?= esc_js(__('Default', 'baselayer')) ?></span>';
+									cell.innerHTML = '<span class="bl-default-badge" style="color: #646970; font-size: 12px;"><?= esc_js(__('Default', 'baselayer')) ?></span>';
 								} else {
 									var upLabel = '<?= esc_js(__('Move up', 'baselayer')) ?>';
 									var downLabel = '<?= esc_js(__('Move down', 'baselayer')) ?>';
 									var upDisabled = i === 1 ? ' disabled' : '';
 									var downDisabled = i === rows.length - 1 ? ' disabled' : '';
-									cell.innerHTML = '<button type="button" class="button button-small fs-move-up" aria-label="' + upLabel + '" title="' + upLabel + '"' + upDisabled + '>↑</button> ' +
-										'<button type="button" class="button button-small fs-move-down" aria-label="' + downLabel + '" title="' + downLabel + '"' + downDisabled + '>↓</button>';
+									cell.innerHTML = '<button type="button" class="button button-small bl-move-up" aria-label="' + upLabel + '" title="' + upLabel + '"' + upDisabled + '>↑</button> ' +
+										'<button type="button" class="button button-small bl-move-down" aria-label="' + downLabel + '" title="' + downLabel + '"' + downDisabled + '>↓</button>';
 								}
 							});
 						} else {
-							table.classList.add('fs-hide-reorder');
+							table.classList.add('bl-hide-reorder');
 						}
 					}
 					addBtn.addEventListener('click', function() {
@@ -458,7 +458,7 @@ function bl_render_developer_languages(): void
 
 					refreshCatalogSelect();
 					tbody.addEventListener('click', function(e) {
-						if (e.target.classList.contains('fs-remove-language')) {
+						if (e.target.classList.contains('bl-remove-language')) {
 							e.target.closest('tr').remove();
 							reindexNames();
 							return;
@@ -467,10 +467,10 @@ function bl_render_developer_languages(): void
 						if (!row) return;
 						var rows = Array.prototype.slice.call(tbody.querySelectorAll('tr.bl-language-row'));
 						var idx = rows.indexOf(row);
-						if (e.target.classList.contains('fs-move-up') && idx > 1) {
+						if (e.target.classList.contains('bl-move-up') && idx > 1) {
 							tbody.insertBefore(row, rows[idx - 1]);
 							reindexNames();
-						} else if (e.target.classList.contains('fs-move-down') && idx >= 1 && idx < rows.length - 1) {
+						} else if (e.target.classList.contains('bl-move-down') && idx >= 1 && idx < rows.length - 1) {
 							var next = rows[idx + 1];
 							tbody.insertBefore(next, row);
 							reindexNames();
@@ -478,7 +478,7 @@ function bl_render_developer_languages(): void
 					});
 				})();
 			</script>
-			<div class="fs-submit-row">
+			<div class="bl-submit-row">
 				<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
 			</div>
 		</form>

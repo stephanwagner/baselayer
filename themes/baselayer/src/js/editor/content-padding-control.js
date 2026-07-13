@@ -30,7 +30,7 @@ export function ContentPaddingControl({ option, attributes, onChange }) {
 
   const control = ToggleGroupControl ? (
     <ToggleGroupControl
-      className="fs-content-padding__sizes fs-block-option-button-group"
+      className="bl-content-padding__sizes bl-block-option-button-group"
       label={option.label || 'Innenabstand'}
       hideLabelFromVision
       value={value}
@@ -50,10 +50,10 @@ export function ContentPaddingControl({ option, attributes, onChange }) {
   ) : null;
 
   return (
-    <div className="fs-content-padding">
-      <div className="fs-content-padding__header">
-        {option.label ? <span className="fs-content-padding__label">{option.label}</span> : <span />}
-        <Button variant="link" className="fs-content-padding__reset" onClick={reset}>
+    <div className="bl-content-padding">
+      <div className="bl-content-padding__header">
+        {option.label ? <span className="bl-content-padding__label">{option.label}</span> : <span />}
+        <Button variant="link" className="bl-content-padding__reset" onClick={reset}>
           Reset
         </Button>
       </div>

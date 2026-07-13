@@ -3,7 +3,7 @@
 defined('ABSPATH') || exit;
 
 /**
- * Settings → Developer. Each section is its own page at options-general.php?page=fs-developer[-*].
+ * Settings → Developer. Each section is its own page at options-general.php?page=bl-developer[-*].
  * Requires theme-settings.php for option group constants.
  */
 
@@ -35,31 +35,31 @@ function bl_developer_settings_available_tabs(): array
 
 /**
  * Page slug for a tab.
- * Developer uses fs-developer-system; Settings (system) uses fs-developer-settings; others = fs-developer-<tab>.
+ * Developer uses bl-developer-system; Settings (system) uses bl-developer-settings; others = bl-developer-<tab>.
  */
 function bl_developer_settings_page_slug(string $tab): string
 {
 	if ($tab === 'developer') {
-		return 'fs-developer-system';
+		return 'bl-developer-system';
 	}
 	if ($tab === 'system') {
-		return 'fs-developer-settings';
+		return 'bl-developer-settings';
 	}
-	return 'fs-developer-' . $tab;
+	return 'bl-developer-' . $tab;
 }
 
-/** Current tab derived from $_GET['page'] (e.g. fs-developer-features → features). */
+/** Current tab derived from $_GET['page'] (e.g. bl-developer-features → features). */
 function bl_developer_settings_current_tab_from_page(): string
 {
 	$page = isset($_GET['page']) ? sanitize_key($_GET['page']) : '';
 	$available = array_keys(bl_developer_settings_available_tabs());
-	if ($page === 'fs-developer-system') {
+	if ($page === 'bl-developer-system') {
 		return 'developer';
 	}
-	if ($page === 'fs-developer-settings') {
+	if ($page === 'bl-developer-settings') {
 		return 'system';
 	}
-	$prefix = 'fs-developer-';
+	$prefix = 'bl-developer-';
 	if (strpos($page, $prefix) !== 0) {
 		return $available[0] ?? 'developer';
 	}
@@ -101,14 +101,14 @@ function bl_developer_settings_admin_title(string $slug): string
 	if (!function_exists('bl_admin_settings_submenu_title')) {
 		return __('Developer', 'baselayer');
 	}
-	if ($slug === 'fs-developer-system') {
+	if ($slug === 'bl-developer-system') {
 		return bl_admin_settings_submenu_title(__('Developer', 'baselayer'));
 	}
 	$tabs = bl_developer_settings_available_tabs();
-	if ($slug === 'fs-developer-settings') {
+	if ($slug === 'bl-developer-settings') {
 		$tab_key = 'system';
 	} else {
-		$tab_key = substr($slug, strlen('fs-developer-'));
+		$tab_key = substr($slug, strlen('bl-developer-'));
 	}
 	$label = isset($tabs[$tab_key]['label']) ? (string) $tabs[$tab_key]['label'] : $tab_key;
 	return bl_admin_settings_submenu_title(__('Developer', 'baselayer'), __($label, 'baselayer'));
@@ -132,7 +132,7 @@ foreach (bl_developer_settings_page_slugs() as $slug) {
 		if (function_exists('bl_is_developer_user') && bl_is_developer_user((int) get_current_user_id())) {
 			return;
 		}
-		wp_safe_redirect(admin_url('options-general.php?page=fs-theme-settings'));
+		wp_safe_redirect(admin_url('options-general.php?page=bl-theme-settings'));
 		exit;
 	}, 1);
 }
@@ -191,14 +191,14 @@ function bl_developer_settings_render_nav(): void
 		foreach ($tabs as $slug => $def) {
 			$icons = '';
 			if ($slug === 'system' && (int) get_option('blog_public', 1) === 0) {
-				$icons .= '<div class="fs-tab-icon -warning">' . $search_visibility_icon . '</div>';
+				$icons .= '<div class="bl-tab-icon -warning">' . $search_visibility_icon . '</div>';
 			}
 			if ($slug === 'security') {
 				if (get_option('baselayer_site_password_protection') === '1' && get_option('baselayer_site_password_hash', '') !== '') {
-					$icons .= '<div class="fs-tab-icon">' . $password_icon . '</div>';
+					$icons .= '<div class="bl-tab-icon">' . $password_icon . '</div>';
 				}
 				if (get_option('baselayer_maintenance_mode') === '1') {
-					$icons .= '<div class="fs-tab-icon">' . $maintenance_icon . '</div>';
+					$icons .= '<div class="bl-tab-icon">' . $maintenance_icon . '</div>';
 				}
 			}
 			$is_external = !empty($def['external_page']);
@@ -211,7 +211,7 @@ function bl_developer_settings_render_nav(): void
 			echo '<a href="' . esc_url($url) . '" class="nav-tab ' . ($is_active ? 'nav-tab-active' : '') . ($icons !== '' ? ' has-icons' : '') . '">';
 			echo '<span>' . esc_html(__($def['label'], 'baselayer')) . '</span>';
 			if ($icons !== '') {
-				echo '<span class="fs-tab-icons">' . $icons . '</span>';
+				echo '<span class="bl-tab-icons">' . $icons . '</span>';
 			}
 			echo '</a>';
 		}
@@ -283,7 +283,7 @@ add_action('load-settings_page_redis-cache', function (): void {
 		return;
 	}
 	if (!function_exists('bl_is_developer_user') || !bl_is_developer_user((int) get_current_user_id())) {
-		wp_safe_redirect(admin_url('options-general.php?page=fs-theme-settings'));
+		wp_safe_redirect(admin_url('options-general.php?page=bl-theme-settings'));
 		exit;
 	}
 }, 1);

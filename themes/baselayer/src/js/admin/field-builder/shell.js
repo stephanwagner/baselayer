@@ -13,19 +13,19 @@ export function createShell(root, options = {}) {
   const i18n = options.i18n || {};
 
   empty(root);
-  root.classList.add('fs-field-builder');
+  root.classList.add('bl-field-builder');
 
   const list = el('div', {
-    className: 'fs-field-builder__list',
+    className: 'bl-field-builder__list',
     dataset: { fsFbList: '1' },
   });
   const emptyState = el('p', {
-    className: 'fs-field-builder__empty description',
+    className: 'bl-field-builder__empty description',
     text: i18n.empty || 'No fields yet. Add a field to get started.',
   });
   const addBtn = el('button', {
     type: 'button',
-    className: 'button button-secondary fs-field-builder__add',
+    className: 'button button-secondary bl-field-builder__add',
     text: i18n.addField || 'Add field',
   });
 
@@ -34,7 +34,7 @@ export function createShell(root, options = {}) {
   root.appendChild(addBtn);
 
   const syncEmpty = () => {
-    const hasFields = list.querySelector('[data-fs-fb-field]') != null;
+    const hasFields = list.querySelector('[data-bl-fb-field]') != null;
     emptyState.hidden = hasFields;
     root.classList.toggle('has-fields', hasFields);
   };
@@ -50,8 +50,8 @@ export function createShell(root, options = {}) {
     addField({}, true);
   });
 
-  list.addEventListener('fs-fb-delete', (event) => {
-    const row = event.target.closest('[data-fs-fb-field]');
+  list.addEventListener('bl-fb-delete', (event) => {
+    const row = event.target.closest('[data-bl-fb-field]');
     if (row) {
       row.remove();
       syncEmpty();
@@ -61,7 +61,7 @@ export function createShell(root, options = {}) {
   const sortable = Sortable.create(list, {
     handle: '.bl-field-builder__field-handle',
     animation: 150,
-    draggable: '[data-fs-fb-field]',
+    draggable: '[data-bl-fb-field]',
   });
 
   (options.initialFields || []).forEach((field) => {
@@ -71,7 +71,7 @@ export function createShell(root, options = {}) {
 
   return {
     getSchema() {
-      return Array.from(list.querySelectorAll('[data-fs-fb-field]')).map((row) =>
+      return Array.from(list.querySelectorAll('[data-bl-fb-field]')).map((row) =>
         serializeFieldRow(row)
       );
     },
@@ -83,7 +83,7 @@ export function createShell(root, options = {}) {
     destroy() {
       sortable.destroy();
       empty(root);
-      root.classList.remove('fs-field-builder', 'has-fields');
+      root.classList.remove('bl-field-builder', 'has-fields');
     },
   };
 }

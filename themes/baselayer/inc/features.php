@@ -61,7 +61,7 @@ function bl_theme_feature_option_keys_map(): array
 }
 
 /**
- * Admin body classes for enabled features (prefix fs-feature-), for CSS scoping in wp-admin only.
+ * Admin body classes for enabled features (prefix bl-feature-), for CSS scoping in wp-admin only.
  *
  * @return list<string>
  */
@@ -70,7 +70,7 @@ function bl_theme_feature_body_classes(): array
 	$classes = [];
 	foreach (array_keys(bl_theme_feature_option_keys_map()) as $slug) {
 		if (bl_theme_feature_enabled($slug)) {
-			$classes[] = 'fs-feature-' . str_replace('_', '-', $slug);
+			$classes[] = 'bl-feature-' . str_replace('_', '-', $slug);
 		}
 	}
 	return $classes;

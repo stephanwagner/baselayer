@@ -11,7 +11,7 @@ $email_show_footer_html = isset($email_footer_html) && is_string($email_footer_h
 		<?php if ($email_show_footer_html) : ?>
 			<tr>
 				<td
-					class="fs-mail-weekly-report-footer-text"
+					class="bl-mail-weekly-report-footer-text"
 					style="
               padding: 16px 0 0;
               color: #8393A9;

@@ -4,7 +4,7 @@
 // Read more link
 
 .read-more-link {
-  color: var(--fs-link-color);
+  color: var(--bl-link-color);
   transition: transition('color');
   text-decoration: none;
   display: inline-flex;
@@ -36,7 +36,7 @@
 .read-more-link:focus,
 .read-more-link-trigger:focus .read-more-link {
   text-decoration: none;
-  color: var(--fs-link-color-hover);
+  color: var(--bl-link-color-hover);
 
   &.-icon-after::after {
     transform: translateX(3px);
@@ -48,7 +48,7 @@
 .event-date {
   margin: 0 0 24px;
   font-weight: 400;
-  color: var(--fs-color-gray-600);
+  color: var(--bl-color-gray-600);
 
   @media (max-width: $breakpoint-s) {
     margin-bottom: 16px;

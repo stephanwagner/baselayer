@@ -1,8 +1,8 @@
 <?php
 defined('ABSPATH') || exit;
 
-$security_page = function_exists('bl_developer_settings_page_slug') ? bl_developer_settings_page_slug('security') : 'fs-developer-security';
-$security_url = admin_url('options-general.php?page=' . $security_page . '#fs-security-failed-logins');
+$security_page = function_exists('bl_developer_settings_page_slug') ? bl_developer_settings_page_slug('security') : 'bl-developer-security';
+$security_url = admin_url('options-general.php?page=' . $security_page . '#bl-security-failed-logins');
 ?>
 <h1
 	style="
@@ -61,7 +61,7 @@ $security_url = admin_url('options-general.php?page=' . $security_page . '#fs-se
 	?>
 </p>
 
-<p class="fs-mail-weekly-report-has-link" style="margin: 0; font-size: 14px; line-height: 1.5; color: #64748b;">
+<p class="bl-mail-weekly-report-has-link" style="margin: 0; font-size: 14px; line-height: 1.5; color: #64748b;">
 	<?= esc_html__('Sent to:', 'baselayer') ?> <?= esc_html($to_email) ?><br>
 	<?= esc_html__('Sent at:', 'baselayer') ?> <?= esc_html($sent_at) ?>
 </p>

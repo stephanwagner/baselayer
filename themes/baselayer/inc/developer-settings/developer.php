@@ -44,9 +44,9 @@ function bl_render_developer_cheatsheet(): void
 			bl_developer_render_system_info_panel();
 		}
 		?>
-		<hr class="fs-page-settings-divider">
+		<hr class="bl-page-settings-divider">
 
-		<div class="fs-page-settings-form" style="margin-top: 0;">
+		<div class="bl-page-settings-form" style="margin-top: 0;">
 
 			<h2 class="title" style="margin-top: 0;"><?= esc_html__('Configs', 'baselayer') ?></h2>
 			<p class="description"><?= esc_html__('Optional defines in wp-config.php for local development and testing.', 'baselayer') ?></p>
@@ -59,7 +59,7 @@ function bl_render_developer_cheatsheet(): void
 							<span class="description"><?= esc_html__('Overrides the client IP with a fixed IP address. Active only when WP_DEBUG is true.', 'baselayer') ?></span>
 						</td>
 						<td>
-							<code class="fs-code-small">define('BL_SIMULATE_CLIENT_IP', '127.0.0.22');</code>
+							<code class="bl-code-small">define('BL_SIMULATE_CLIENT_IP', '127.0.0.22');</code>
 						</td>
 					</tr>
 				</tbody>
@@ -78,12 +78,12 @@ function bl_render_developer_cheatsheet(): void
 							<span class="description"><?= esc_html__('Builds versioned asset URLs from the theme assets folder.', 'baselayer') ?></span>
 						</td>
 						<td>
-							<code class="fs-code-text fs-code-small">PHP</code>
+							<code class="bl-code-text bl-code-small">PHP</code>
 						</td>
 						<td>
-							<code class="fs-code-small"><?= esc_html("bl_asset_url('/img/logo.svg');") ?></code>
+							<code class="bl-code-small"><?= esc_html("bl_asset_url('/img/logo.svg');") ?></code>
 							<div class="helpers-table__preview-code">
-								<span class="helpers-table__preview-pointer">→</span> <code class="fs-code-text fs-code-small">/assets/img/logo.svg?ver=1</code>
+								<span class="helpers-table__preview-pointer">→</span> <code class="bl-code-text bl-code-small">/assets/img/logo.svg?ver=1</code>
 							</div>
 						</td>
 					</tr>
@@ -93,12 +93,12 @@ function bl_render_developer_cheatsheet(): void
 							<span class="description"><?= esc_html__('Reads an SVG file and returns inline markup you can echo in templates.', 'baselayer') ?></span>
 						</td>
 						<td>
-							<code class="fs-code-text fs-code-small">PHP</code>
+							<code class="bl-code-text bl-code-small">PHP</code>
 						</td>
 						<td>
-							<code class="fs-code-small"><?= esc_html("bl_svg_code('/img/icon.svg', ['class' => 'my-class']);") ?></code>
+							<code class="bl-code-small"><?= esc_html("bl_svg_code('/img/icon.svg', ['class' => 'my-class']);") ?></code>
 							<div class="helpers-table__preview-code">
-								<span class="helpers-table__preview-pointer">→</span> <code class="fs-code-text fs-code-small">&lt;svg ...&gt;...&lt;/svg&gt;</code>
+								<span class="helpers-table__preview-pointer">→</span> <code class="bl-code-text bl-code-small">&lt;svg ...&gt;...&lt;/svg&gt;</code>
 							</div>
 						</td>
 					</tr>
@@ -108,12 +108,12 @@ function bl_render_developer_cheatsheet(): void
 							<span class="description"><?= esc_html__('Builds a WordPress image tag from an attachment ID (or WP_Post attachment).', 'baselayer') ?></span>
 						</td>
 						<td>
-							<code class="fs-code-text fs-code-small">PHP</code>
+							<code class="bl-code-text bl-code-small">PHP</code>
 						</td>
 						<td>
-							<code class="fs-code-small"><?= esc_html("bl_img(123, 'medium', ['class' => 'my-class', 'loading' => 'eager']);") ?></code>
+							<code class="bl-code-small"><?= esc_html("bl_img(123, 'medium', ['class' => 'my-class', 'loading' => 'eager']);") ?></code>
 							<div class="helpers-table__preview-code">
-								<span class="helpers-table__preview-pointer">→</span> <code class="fs-code-text fs-code-small">&lt;img src="..." srcset="..." class="my-class" loading="eager" ...&gt;</code>
+								<span class="helpers-table__preview-pointer">→</span> <code class="bl-code-text bl-code-small">&lt;img src="..." srcset="..." class="my-class" loading="eager" ...&gt;</code>
 							</div>
 						</td>
 					</tr>
@@ -123,11 +123,11 @@ function bl_render_developer_cheatsheet(): void
 							<span class="description"><?= esc_html__('Builds a WordPress image tag or URL with a placeholder fallback.', 'baselayer') ?></span>
 						</td>
 						<td>
-							<code class="fs-code-text fs-code-small">PHP</code>
+							<code class="bl-code-text bl-code-small">PHP</code>
 						</td>
 						<td>
-							<code class="fs-code-small"><?= esc_html("bl_image_with_placeholder(123, 'medium', ['class' => 'my-class', 'loading' => 'eager']);") ?></code><br>
-							<code class="fs-code-small"><?= esc_html("bl_image_with_placeholder_url(123, 'medium', [...]);") ?></code>
+							<code class="bl-code-small"><?= esc_html("bl_image_with_placeholder(123, 'medium', ['class' => 'my-class', 'loading' => 'eager']);") ?></code><br>
+							<code class="bl-code-small"><?= esc_html("bl_image_with_placeholder_url(123, 'medium', [...]);") ?></code>
 						</td>
 					</tr>
 					<tr>
@@ -136,11 +136,11 @@ function bl_render_developer_cheatsheet(): void
 							<span class="description"><?= esc_html__('Reads values from config/theme.php and config/design.php via optional dot-path keys.', 'baselayer') ?></span>
 						</td>
 						<td>
-							<code class="fs-code-text fs-code-small">PHP</code>
+							<code class="bl-code-text bl-code-small">PHP</code>
 						</td>
 						<td>
-							<code class="fs-code-small"><?= esc_html("bl_config('headers.Cache-Control');") ?></code><br>
-							<code class="fs-code-small"><?= esc_html("bl_config_cpt('project');") ?></code>
+							<code class="bl-code-small"><?= esc_html("bl_config('headers.Cache-Control');") ?></code><br>
+							<code class="bl-code-small"><?= esc_html("bl_config_cpt('project');") ?></code>
 						</td>
 					</tr>
 					<?php if (function_exists('bl_theme_feature_enabled') && bl_theme_feature_enabled('breadcrumbs')) : ?>
@@ -150,10 +150,10 @@ function bl_render_developer_cheatsheet(): void
 							<span class="description"><?= esc_html__('Renders a breadcrumb trail for the current page, handling pages, posts, archives, and search.', 'baselayer') ?></span>
 						</td>
 						<td>
-							<code class="fs-code-text fs-code-small">PHP</code>
+							<code class="bl-code-text bl-code-small">PHP</code>
 						</td>
 						<td>
-							<code class="fs-code-small" style="white-space: pre-wrap;"><?= esc_html('bl_breadcrumbs([
+							<code class="bl-code-small" style="white-space: pre-wrap;"><?= esc_html('bl_breadcrumbs([
   \'home_label\' => \'Home\',
   \'home_url\' => home_url(\'/\'),
   \'separator\' => \'›\',
@@ -168,17 +168,17 @@ function bl_render_developer_cheatsheet(): void
 							<span class="description"><?= esc_html__('Full-screen overlay. Match IDs between trigger and content. Content is moved into the modal on open.', 'baselayer') ?></span>
 						</td>
 						<td>
-							<code class="fs-code-text fs-code-small">JavaScript</code>
+							<code class="bl-code-text bl-code-small">JavaScript</code>
 						</td>
 						<td>
 							<div class="helpers-table__code-description"><?= esc_html__('Attach modal:', 'baselayer') ?></div>
-							<code class="fs-code-small"><?= esc_html('<button data-modal="my-modal">Open</button>') ?></code>
+							<code class="bl-code-small"><?= esc_html('<button data-modal="my-modal">Open</button>') ?></code>
 
 							<div class="helpers-table__code-description"><?= esc_html__('Open manually:', 'baselayer') ?></div>
-							<code class="fs-code-small"><?= esc_html("openModal('my-modal');") ?></code>
+							<code class="bl-code-small"><?= esc_html("openModal('my-modal');") ?></code>
 
 							<div class="helpers-table__code-description"><?= esc_html__('Add content:', 'baselayer') ?></div>
-							<code class="fs-code-small"><?= esc_html('<div data-modal-content="my-modal">…</div>') ?></code>
+							<code class="bl-code-small"><?= esc_html('<div data-modal-content="my-modal">…</div>') ?></code>
 						</td>
 					</tr>
 				</tbody>
@@ -188,11 +188,11 @@ function bl_render_developer_cheatsheet(): void
 
 			<h2 class="title" style="margin-top: 0;"><?= esc_html__('Icons', 'baselayer') ?></h2>
 			<p class="description"><?= wp_kses(
-				__('You can add icons by combining an icon class (e.g. <code class="fs-code-small">-icon-bolt</code>) with one of the patterns below. Icons render as CSS masks from <code class="fs-code-small">assets/icons/</code>; size and color inherit from <code class="fs-code-small">font-size</code> and <code class="fs-code-small">currentColor</code>.', 'baselayer'),
+				__('You can add icons by combining an icon class (e.g. <code class="bl-code-small">-icon-bolt</code>) with one of the patterns below. Icons render as CSS masks from <code class="bl-code-small">assets/icons/</code>; size and color inherit from <code class="bl-code-small">font-size</code> and <code class="bl-code-small">currentColor</code>.', 'baselayer'),
 				['code' => ['class' => true]]
 			) ?></p>
 
-			<div class="fs-admin-group -has-margin">
+			<div class="bl-admin-group -has-margin">
 				<?php
 				if (function_exists('bl_load_icons_textdomain')) {
 					bl_load_icons_textdomain();
@@ -212,7 +212,7 @@ function bl_render_developer_cheatsheet(): void
 				$inline_after_code = '<span class="-icon-after ' . $inline_after_icon_class . '">' . $inline_after_label . '</span>';
 				$demo_icon = 'rocket-launch';
 				$demo_icon_class = '-icon-' . $demo_icon;
-				$demo_icon_code = '<div class="fs-icon ' . $demo_icon_class . '"></div>';
+				$demo_icon_code = '<div class="bl-icon ' . $demo_icon_class . '"></div>';
 				$svg_icon = 'planet';
 				$svg_icon_path = function_exists('bl_icon_svg_asset_path')
 					? bl_icon_svg_asset_path($svg_icon)
@@ -223,52 +223,52 @@ function bl_render_developer_cheatsheet(): void
 
 				<h3 class="helpers-icons__subtitle"><?= esc_html__('Buttons', 'baselayer') ?></h3>
 				<p class="description"><?= wp_kses(
-											__('Add <code class="fs-code-small">-has-icon</code> and an icon class to the button. Use <code class="fs-code-small">-icon-right</code> to place the icon after the label. With no label text, add <code class="fs-code-small">-icon-only</code> for a square icon button (applied automatically in the block editor).', 'baselayer'),
+											__('Add <code class="bl-code-small">-has-icon</code> and an icon class to the button. Use <code class="bl-code-small">-icon-right</code> to place the icon after the label. With no label text, add <code class="bl-code-small">-icon-only</code> for a square icon button (applied automatically in the block editor).', 'baselayer'),
 											['code' => ['class' => true]]
 										) ?></p>
 
 				<div
 					class="helpers-icons-demo helpers-icons-buttons-demo"
-					data-fs-icons-buttons-demo
-					data-fs-icons-demo-value="<?= esc_attr($button_icon) ?>"
-					data-fs-icons-button-position="left"
-					data-fs-icons-button-element="button"
-					data-fs-icons-ui="<?= esc_attr(wp_json_encode($icon_ui_strings)) ?>">
+					data-bl-icons-buttons-demo
+					data-bl-icons-demo-value="<?= esc_attr($button_icon) ?>"
+					data-bl-icons-button-position="left"
+					data-bl-icons-button-element="button"
+					data-bl-icons-ui="<?= esc_attr(wp_json_encode($icon_ui_strings)) ?>">
 					<div class="helpers-icons-demo__toolbar helpers-icons-demo__toolbar--buttons">
-						<button type="button" class="button button-small" data-fs-icons-demo-choose>
+						<button type="button" class="button button-small" data-bl-icons-demo-choose>
 							<?= esc_html__('Choose icon', 'baselayer') ?>
 						</button>
 						<div class="helpers-icons-demo__toolbar-actions">
 							<div class="helpers-icons-demo__toggle" role="group" aria-label="<?= esc_attr__('Element', 'baselayer') ?>">
-								<button type="button" class="button button-secondary button-small is-active" data-fs-icons-element-toggle="button" aria-pressed="true">
+								<button type="button" class="button button-secondary button-small is-active" data-bl-icons-element-toggle="button" aria-pressed="true">
 									<?= esc_html__('Button', 'baselayer') ?>
 								</button>
-								<button type="button" class="button button-secondary button-small" data-fs-icons-element-toggle="link" aria-pressed="false">
+								<button type="button" class="button button-secondary button-small" data-bl-icons-element-toggle="link" aria-pressed="false">
 									<?= esc_html__('Link', 'baselayer') ?>
 								</button>
 							</div>
 							<div class="helpers-icons-demo__toggle" role="group" aria-label="<?= esc_attr__('Icon position', 'baselayer') ?>">
-								<button type="button" class="button button-secondary button-small is-active" data-fs-icons-position-toggle="left" aria-pressed="true">
+								<button type="button" class="button button-secondary button-small is-active" data-bl-icons-position-toggle="left" aria-pressed="true">
 									<?= esc_html__('Left', 'baselayer') ?>
 								</button>
-								<button type="button" class="button button-secondary button-small" data-fs-icons-position-toggle="right" aria-pressed="false">
+								<button type="button" class="button button-secondary button-small" data-bl-icons-position-toggle="right" aria-pressed="false">
 									<?= esc_html__('Right', 'baselayer') ?>
 								</button>
 							</div>
 							<button
 								type="button"
 								class="button button-small"
-								data-fs-copy-from-source="fs-icons-button-code"
-								data-fs-copy-feedback-text="<?= esc_attr__('Copied', 'baselayer') ?>">
+								data-bl-copy-from-source="bl-icons-button-code"
+								data-bl-copy-feedback-text="<?= esc_attr__('Copied', 'baselayer') ?>">
 								<?= esc_html__('Copy code', 'baselayer') ?>
 							</button>
 						</div>
 					</div>
 					<div class="helpers-icons-demo__panel">
 						<div class="helpers-icons-demo__preview helpers-icons-demo__preview--button">
-							<a href="#" class="button -has-icon <?= esc_attr($button_icon_class) ?>" data-fs-icons-button-preview onclick="return false;" style="background: #fff;"><?= esc_html__('Button', 'baselayer') ?></a>
+							<a href="#" class="button -has-icon <?= esc_attr($button_icon_class) ?>" data-bl-icons-button-preview onclick="return false;" style="background: #fff;"><?= esc_html__('Button', 'baselayer') ?></a>
 						</div>
-						<pre class="helpers-icons-demo__code"><code id="fs-icons-button-code" class="fs-code-small helpers-icons-demo__code-text" data-fs-icons-button-code><?= esc_html($button_code) ?></code></pre>
+						<pre class="helpers-icons-demo__code"><code id="bl-icons-button-code" class="bl-code-small helpers-icons-demo__code-text" data-bl-icons-button-code><?= esc_html($button_code) ?></code></pre>
 					</div>
 				</div>
 
@@ -276,63 +276,63 @@ function bl_render_developer_cheatsheet(): void
 
 				<h3 class="helpers-icons__subtitle" style="margin-top: 0;"><?= esc_html__('Before or after text', 'baselayer') ?></h3>
 				<p class="description"><?= wp_kses(
-					__('Add <code class="fs-code-small">-icon-before</code> or <code class="fs-code-small">-icon-after</code> with an icon class on the same element.', 'baselayer'),
+					__('Add <code class="bl-code-small">-icon-before</code> or <code class="bl-code-small">-icon-after</code> with an icon class on the same element.', 'baselayer'),
 					['code' => ['class' => true]]
 				) ?></p>
 
 				<div class="helpers-icons-inline-demo">
 					<div
 						class="helpers-icons-inline-demo__item helpers-icons-demo"
-						data-fs-icons-inline-demo
-						data-fs-icons-demo-value="<?= esc_attr($inline_before_icon) ?>"
-						data-fs-icons-inline-placement="before"
-						data-fs-icons-ui="<?= esc_attr(wp_json_encode($icon_ui_strings)) ?>">
+						data-bl-icons-inline-demo
+						data-bl-icons-demo-value="<?= esc_attr($inline_before_icon) ?>"
+						data-bl-icons-inline-placement="before"
+						data-bl-icons-ui="<?= esc_attr(wp_json_encode($icon_ui_strings)) ?>">
 						<div class="helpers-icons-demo__toolbar helpers-icons-demo__toolbar--buttons">
-							<button type="button" class="button button-small" data-fs-icons-demo-choose>
+							<button type="button" class="button button-small" data-bl-icons-demo-choose>
 								<?= esc_html__('Choose icon', 'baselayer') ?>
 							</button>
 							<div class="helpers-icons-demo__toolbar-actions">
 								<button
 									type="button"
 									class="button button-small"
-									data-fs-copy-from-source="fs-icons-inline-before-code"
-									data-fs-copy-feedback-text="<?= esc_attr__('Copied', 'baselayer') ?>">
+									data-bl-copy-from-source="bl-icons-inline-before-code"
+									data-bl-copy-feedback-text="<?= esc_attr__('Copied', 'baselayer') ?>">
 									<?= esc_html__('Copy code', 'baselayer') ?>
 								</button>
 							</div>
 						</div>
 						<div class="helpers-icons-demo__panel">
 							<div class="helpers-icons-demo__preview helpers-icons-demo__preview--inline">
-								<span class="-icon-before <?= esc_attr($inline_before_icon_class) ?>" data-fs-icons-inline-preview><?= esc_html($inline_before_label) ?></span>
+								<span class="-icon-before <?= esc_attr($inline_before_icon_class) ?>" data-bl-icons-inline-preview><?= esc_html($inline_before_label) ?></span>
 							</div>
-							<pre class="helpers-icons-demo__code"><code id="fs-icons-inline-before-code" class="fs-code-small helpers-icons-demo__code-text" data-fs-icons-inline-code><?= esc_html($inline_before_code) ?></code></pre>
+							<pre class="helpers-icons-demo__code"><code id="bl-icons-inline-before-code" class="bl-code-small helpers-icons-demo__code-text" data-bl-icons-inline-code><?= esc_html($inline_before_code) ?></code></pre>
 						</div>
 					</div>
 					<div
 						class="helpers-icons-inline-demo__item helpers-icons-demo"
-						data-fs-icons-inline-demo
-						data-fs-icons-demo-value="<?= esc_attr($inline_after_icon) ?>"
-						data-fs-icons-inline-placement="after"
-						data-fs-icons-ui="<?= esc_attr(wp_json_encode($icon_ui_strings)) ?>">
+						data-bl-icons-inline-demo
+						data-bl-icons-demo-value="<?= esc_attr($inline_after_icon) ?>"
+						data-bl-icons-inline-placement="after"
+						data-bl-icons-ui="<?= esc_attr(wp_json_encode($icon_ui_strings)) ?>">
 						<div class="helpers-icons-demo__toolbar helpers-icons-demo__toolbar--buttons">
-							<button type="button" class="button button-small" data-fs-icons-demo-choose>
+							<button type="button" class="button button-small" data-bl-icons-demo-choose>
 								<?= esc_html__('Choose icon', 'baselayer') ?>
 							</button>
 							<div class="helpers-icons-demo__toolbar-actions">
 								<button
 									type="button"
 									class="button button-small"
-									data-fs-copy-from-source="fs-icons-inline-after-code"
-									data-fs-copy-feedback-text="<?= esc_attr__('Copied', 'baselayer') ?>">
+									data-bl-copy-from-source="bl-icons-inline-after-code"
+									data-bl-copy-feedback-text="<?= esc_attr__('Copied', 'baselayer') ?>">
 									<?= esc_html__('Copy code', 'baselayer') ?>
 								</button>
 							</div>
 						</div>
 						<div class="helpers-icons-demo__panel">
 							<div class="helpers-icons-demo__preview helpers-icons-demo__preview--inline">
-								<span class="-icon-after <?= esc_attr($inline_after_icon_class) ?>" data-fs-icons-inline-preview><?= esc_html($inline_after_label) ?></span>
+								<span class="-icon-after <?= esc_attr($inline_after_icon_class) ?>" data-bl-icons-inline-preview><?= esc_html($inline_after_label) ?></span>
 							</div>
-							<pre class="helpers-icons-demo__code"><code id="fs-icons-inline-after-code" class="fs-code-small helpers-icons-demo__code-text" data-fs-icons-inline-code><?= esc_html($inline_after_code) ?></code></pre>
+							<pre class="helpers-icons-demo__code"><code id="bl-icons-inline-after-code" class="bl-code-small helpers-icons-demo__code-text" data-bl-icons-inline-code><?= esc_html($inline_after_code) ?></code></pre>
 						</div>
 					</div>
 				</div>
@@ -341,34 +341,34 @@ function bl_render_developer_cheatsheet(): void
 
 				<h3 class="helpers-icons__subtitle"><?= esc_html__('Standalone icon', 'baselayer') ?></h3>
 				<p class="description"><?= wp_kses(
-					__('Add class <code class="fs-code-small">fs-icon</code> and an icon class to render the icon standalone.', 'baselayer'),
+					__('Add class <code class="bl-code-small">bl-icon</code> and an icon class to render the icon standalone.', 'baselayer'),
 					['code' => ['class' => true]]
 				) ?></p>
 
 				<div
 					class="helpers-icons-demo helpers-icons-standalone-demo"
-					data-fs-icons-demo
-					data-fs-icons-demo-value="<?= esc_attr($demo_icon) ?>"
-					data-fs-icons-ui="<?= esc_attr(wp_json_encode($icon_ui_strings)) ?>">
+					data-bl-icons-demo
+					data-bl-icons-demo-value="<?= esc_attr($demo_icon) ?>"
+					data-bl-icons-ui="<?= esc_attr(wp_json_encode($icon_ui_strings)) ?>">
 					<div class="helpers-icons-demo__toolbar helpers-icons-demo__toolbar--buttons">
-						<button type="button" class="button button-small" data-fs-icons-demo-choose>
+						<button type="button" class="button button-small" data-bl-icons-demo-choose>
 							<?= esc_html__('Choose icon', 'baselayer') ?>
 						</button>
 						<div class="helpers-icons-demo__toolbar-actions">
 							<button
 								type="button"
 								class="button button-small"
-								data-fs-copy-from-source="fs-icons-demo-code"
-								data-fs-copy-feedback-text="<?= esc_attr__('Copied', 'baselayer') ?>">
+								data-bl-copy-from-source="bl-icons-demo-code"
+								data-bl-copy-feedback-text="<?= esc_attr__('Copied', 'baselayer') ?>">
 								<?= esc_html__('Copy code', 'baselayer') ?>
 							</button>
 						</div>
 					</div>
 					<div class="helpers-icons-demo__panel">
 						<div class="helpers-icons-demo__preview helpers-icons-demo__preview--standalone" aria-hidden="true">
-							<span class="fs-icon <?= esc_attr($demo_icon_class) ?>" data-fs-icons-demo-preview></span>
+							<span class="bl-icon <?= esc_attr($demo_icon_class) ?>" data-bl-icons-demo-preview></span>
 						</div>
-						<pre class="helpers-icons-demo__code"><code id="fs-icons-demo-code" class="fs-code-small helpers-icons-demo__code-text" data-fs-icons-demo-code><?= esc_html($demo_icon_code) ?></code></pre>
+						<pre class="helpers-icons-demo__code"><code id="bl-icons-demo-code" class="bl-code-small helpers-icons-demo__code-text" data-bl-icons-demo-code><?= esc_html($demo_icon_code) ?></code></pre>
 					</div>
 				</div>
 
@@ -376,7 +376,7 @@ function bl_render_developer_cheatsheet(): void
 
 				<h3 class="helpers-icons__subtitle"><?= esc_html__('Icon SVG code', 'baselayer') ?></h3>
 				<p class="description"><?= wp_kses(
-					__('Use <code class="fs-code-small">bl_svg_code()</code> with an icon path under <code class="fs-code-small">/icons/</code> to output inline SVG markup in templates.', 'baselayer'),
+					__('Use <code class="bl-code-small">bl_svg_code()</code> with an icon path under <code class="bl-code-small">/icons/</code> to output inline SVG markup in templates.', 'baselayer'),
 					['code' => ['class' => true]]
 				) ?></p>
 				<p class="description"><?= wp_kses(
@@ -390,36 +390,36 @@ function bl_render_developer_cheatsheet(): void
 
 				<div
 					class="helpers-icons-demo helpers-icons-svg-demo"
-					data-fs-icons-svg-demo
-					data-fs-icons-demo-value="<?= esc_attr($svg_icon) ?>"
-					data-fs-icons-svg-base="<?= esc_url(get_template_directory_uri() . '/assets/icons/') ?>"
-					data-fs-icons-ui="<?= esc_attr(wp_json_encode($icon_ui_strings)) ?>">
+					data-bl-icons-svg-demo
+					data-bl-icons-demo-value="<?= esc_attr($svg_icon) ?>"
+					data-bl-icons-svg-base="<?= esc_url(get_template_directory_uri() . '/assets/icons/') ?>"
+					data-bl-icons-ui="<?= esc_attr(wp_json_encode($icon_ui_strings)) ?>">
 					<div class="helpers-icons-demo__toolbar helpers-icons-demo__toolbar--buttons">
-						<button type="button" class="button button-small" data-fs-icons-demo-choose>
+						<button type="button" class="button button-small" data-bl-icons-demo-choose>
 							<?= esc_html__('Choose icon', 'baselayer') ?>
 						</button>
 						<div class="helpers-icons-demo__toolbar-actions">
 							<button
 								type="button"
 								class="button button-small"
-								data-fs-copy-from-source="fs-icons-svg-php-code"
-								data-fs-copy-feedback-text="<?= esc_attr__('Copied', 'baselayer') ?>">
+								data-bl-copy-from-source="bl-icons-svg-php-code"
+								data-bl-copy-feedback-text="<?= esc_attr__('Copied', 'baselayer') ?>">
 								<?= esc_html__('Copy PHP code', 'baselayer') ?>
 							</button>
 							<button
 								type="button"
 								class="button button-small"
-								data-fs-copy-from-source="fs-icons-svg-markup-code"
-								data-fs-copy-feedback-text="<?= esc_attr__('Copied', 'baselayer') ?>">
+								data-bl-copy-from-source="bl-icons-svg-markup-code"
+								data-bl-copy-feedback-text="<?= esc_attr__('Copied', 'baselayer') ?>">
 								<?= esc_html__('Copy SVG', 'baselayer') ?>
 							</button>
 						</div>
 					</div>
 					<div class="helpers-icons-demo__panel">
-						<div class="helpers-icons-demo__preview helpers-icons-demo__preview--svg" data-fs-icons-svg-preview><?= $svg_markup ?></div>
+						<div class="helpers-icons-demo__preview helpers-icons-demo__preview--svg" data-bl-icons-svg-preview><?= $svg_markup ?></div>
 						<div class="helpers-icons-demo__codes">
-							<pre class="helpers-icons-demo__code"><code id="fs-icons-svg-php-code" class="fs-code-small helpers-icons-demo__code-text" data-fs-icons-svg-php-code><?= esc_html($svg_php_code) ?></code></pre>
-							<pre class="helpers-icons-demo__code helpers-icons-demo__code--svg"><code id="fs-icons-svg-markup-code" class="fs-code-small helpers-icons-demo__code-text" data-fs-icons-svg-markup-code><?= esc_html($svg_markup) ?></code></pre>
+							<pre class="helpers-icons-demo__code"><code id="bl-icons-svg-php-code" class="bl-code-small helpers-icons-demo__code-text" data-bl-icons-svg-php-code><?= esc_html($svg_php_code) ?></code></pre>
+							<pre class="helpers-icons-demo__code helpers-icons-demo__code--svg"><code id="bl-icons-svg-markup-code" class="bl-code-small helpers-icons-demo__code-text" data-bl-icons-svg-markup-code><?= esc_html($svg_markup) ?></code></pre>
 						</div>
 					</div>
 				</div>

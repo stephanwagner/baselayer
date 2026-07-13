@@ -348,11 +348,11 @@ add_action('admin_menu', function (): void {
       $pick['menus'] = $item;
       continue;
     }
-    if ($slug === 'fs-theme-settings') {
+    if ($slug === 'bl-theme-settings') {
       $pick['theme'] = $item;
       continue;
     }
-    if ($slug === 'fs-developer-system') {
+    if ($slug === 'bl-developer-system') {
       $pick['developer'] = $item;
       continue;
     }

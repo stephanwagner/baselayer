@@ -129,7 +129,7 @@ $email_html_lang = isset($email_html_lang) && is_string($email_html_lang) && $em
     -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 ">
 	<table
-		class="fs-mail-weekly-report-wrapper"
+		class="bl-mail-weekly-report-wrapper"
 		role="presentation"
 		width="100%"
 		cellpadding="0"
@@ -156,4 +156,4 @@ $email_html_lang = isset($email_html_lang) && is_string($email_html_lang) && $em
 						margin: 0 auto;
 					">
 					<tr>
-						<td class="fs-mail-weekly-report-content">
+						<td class="bl-mail-weekly-report-content">

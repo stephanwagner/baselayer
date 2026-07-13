@@ -6,7 +6,7 @@ const themeIconComponents = new Map();
 function getThemeIconComponent(iconName) {
   if (!themeIconComponents.has(iconName)) {
     themeIconComponents.set(iconName, function ThemeIcon() {
-      return <span className={'fs-icon -icon-' + iconName} aria-hidden="true" />;
+      return <span className={'bl-icon -icon-' + iconName} aria-hidden="true" />;
     });
   }
 
@@ -43,7 +43,7 @@ export function BlockOptionToggleGroupOption({
         label={label}
         showTooltip
         aria-label={tooltip}
-        className={'fs-toggle-group-option--icon-label ' + iconPlacement + ' -icon-' + icon}
+        className={'bl-toggle-group-option--icon-label ' + iconPlacement + ' -icon-' + icon}
       />
     );
   }

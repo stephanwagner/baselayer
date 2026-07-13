@@ -37,7 +37,7 @@
   border: 0;
   padding: 0;
   line-height: 0;
-  color: var(--fs-color-gray-500);
+  color: var(--bl-color-gray-500);
   background: transparent;
   box-shadow: none;
   appearance: none;
@@ -58,7 +58,7 @@
   }
 
   &:hover {
-    color: var(--fs-color-primary);
+    color: var(--bl-color-primary);
   }
 }
 
@@ -85,8 +85,8 @@
 // Pagination
 
 .slider__pagination.swiper-pagination-horizontal.swiper-pagination-bullets {
-  --swiper-pagination-color: var(--fs-color-gray-500);
-  --swiper-pagination-bullet-inactive-color: var(--fs-color-gray-300);
+  --swiper-pagination-color: var(--bl-color-gray-500);
+  --swiper-pagination-bullet-inactive-color: var(--bl-color-gray-300);
   --swiper-pagination-bullet-inactive-opacity: 1;
   --swiper-pagination-bullet-opacity: 1;
   --swiper-pagination-bullet-height: 8px;

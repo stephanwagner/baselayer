@@ -106,7 +106,7 @@ function isInserterOpenedFromStore(select) {
   return false;
 }
 
-const TOGGLE_MOUNT_CLASS = 'fs-inserter-has-toggle';
+const TOGGLE_MOUNT_CLASS = 'bl-inserter-has-toggle';
 
 function findInserterSearchRoot() {
   const inserterRoot = document.querySelector(
@@ -153,7 +153,7 @@ function findInserterSearchControl(searchRoot) {
 
   for (let i = 0; i < searchRoot.children.length; i += 1) {
     const child = searchRoot.children[i];
-    if (child.classList.contains('fs-inserter-toggle-host')) {
+    if (child.classList.contains('bl-inserter-toggle-host')) {
       continue;
     }
 
@@ -184,7 +184,7 @@ function destroyToggleUi() {
 
   if (toggleMountPoint) {
     toggleMountPoint.classList.remove(TOGGLE_MOUNT_CLASS);
-    toggleMountPoint.classList.remove('fs-inserter-search-row');
+    toggleMountPoint.classList.remove('bl-inserter-search-row');
     toggleMountPoint = null;
   }
 }
@@ -208,7 +208,7 @@ function ensureToggleHost(searchRoot) {
 
   toggleMountPoint = searchRoot;
   toggleHost = document.createElement('div');
-  toggleHost.className = 'fs-inserter-toggle-host';
+  toggleHost.className = 'bl-inserter-toggle-host';
   searchControl.insertAdjacentElement('afterend', toggleHost);
 
   return toggleHost;
@@ -233,7 +233,7 @@ function InserterToggleControl() {
 
   return el(
     'div',
-    { className: 'fs-inserter-toggle' },
+    { className: 'bl-inserter-toggle' },
     el(
       Button,
       {
@@ -244,14 +244,14 @@ function InserterToggleControl() {
           set(preferencesScope, preferencesKey, next);
           applyHiddenInserterState(next);
         },
-        className: 'fs-inserter-toggle__button',
+        className: 'bl-inserter-toggle__button',
         'aria-pressed': showHidden,
       },
       el('span', {
-        className: 'fs-icon -icon-' + (showHidden ? 'checkbox-checked' : 'checkbox'),
+        className: 'bl-icon -icon-' + (showHidden ? 'checkbox-checked' : 'checkbox'),
         'aria-hidden': 'true',
       }),
-      el('span', { className: 'fs-inserter-toggle__label' }, label),
+      el('span', { className: 'bl-inserter-toggle__label' }, label),
     ),
   );
 }

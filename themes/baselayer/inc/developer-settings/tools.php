@@ -109,7 +109,7 @@ function bl_render_developer_tools(): void
 
 		<?php bl_developer_settings_render_nav(); ?>
 
-		<div class="fs-page-settings-form">
+		<div class="bl-page-settings-form">
 			<?php $asset_version = get_option('baselayer_asset_version', '1'); ?>
 			<h2 class="title"><?= esc_html__('Asset Cache', 'baselayer') ?></h2>
 			<p class="description"><?= esc_html__('Bump when static theme files using bl_asset_url have been changed so the cache of the files is updated.', 'baselayer') ?></p>
@@ -136,7 +136,7 @@ function bl_render_developer_tools(): void
 			<form method="post" action="">
 				<?php wp_nonce_field('baselayer_flush_redirect_cache'); ?>
 				<input type="hidden" name="baselayer_flush_redirect_cache" value="1">
-				<div class="fs-submit-row"><button type="submit" class="button button-primary"><?= esc_html_x('Refresh Permalink Rules', 'Button text', 'baselayer') ?></button></div>
+				<div class="bl-submit-row"><button type="submit" class="button button-primary"><?= esc_html_x('Refresh Permalink Rules', 'Button text', 'baselayer') ?></button></div>
 			</form>
 
 			<hr>
@@ -153,7 +153,7 @@ function bl_render_developer_tools(): void
 					<input type="number" name="baselayer_revisions_keep" id="baselayer_revisions_keep" value="5" min="0" max="99" step="1" class="small-text">
 					<span><?= esc_html__('revisions (0 = delete all)', 'baselayer') ?></span>
 				</div>
-				<div class="fs-submit-row"><button type="submit" class="button button-primary"><?= esc_html__('Clean revisions', 'baselayer') ?></button></div>
+				<div class="bl-submit-row"><button type="submit" class="button button-primary"><?= esc_html__('Clean revisions', 'baselayer') ?></button></div>
 			</form>
 		</div>
 	</div>

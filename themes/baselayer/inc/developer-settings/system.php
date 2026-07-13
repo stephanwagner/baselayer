@@ -386,7 +386,7 @@ function bl_developer_render_system_info_panel(): void
 		$check_icon = '<svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="currentColor"><path d="m389-369 299-299q11-11 25.5-11t25.5 11q11 11 11 25.5T739-617L415-292q-11 11-25.5 11T364-292L221-435q-11-11-11-25.5t11-25.5q11-11 25.5-11t25.5 11l117 117Z"/></svg>';
 		$cross_icon = '<svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="currentColor"><path d="M480-429 316-265q-11 11-25 10.5T266-266q-11-11-11-25.5t11-25.5l163-163-164-164q-11-11-10.5-25.5T266-695q11-11 25.5-11t25.5 11l163 164 164-164q11-11 25.5-11t25.5 11q11 11 11 25.5T695-644L531-480l164 164q11 11 11 25t-11 25q-11 11-25.5 11T644-266L480-429Z"/></svg>';
 		$label = esc_html($label);
-		return '<span class="fs-system-status-icon-wrap">' . ($check ? $check_icon : $cross_icon) . '<span class="fs-system-status-icon-label">' . $label . '</span></span>';
+		return '<span class="bl-system-status-icon-wrap">' . ($check ? $check_icon : $cross_icon) . '<span class="bl-system-status-icon-label">' . $label . '</span></span>';
 	};
 
 	$opcache_ext_loaded = extension_loaded('Zend OPcache') || extension_loaded('opcache');
@@ -431,10 +431,10 @@ function bl_developer_render_system_info_panel(): void
 		$warning_label = esc_html(__('Warning:', 'baselayer'));
 		$warning_text = esc_html($message);
 
-		return '<div class="fs-warning-wrap">'
-			. '<span class="fs-warning-label">' . $warning_label . '</span>'
+		return '<div class="bl-warning-wrap">'
+			. '<span class="bl-warning-label">' . $warning_label . '</span>'
 			. ' '
-			. '<span class="fs-warning-text">' . $warning_text . '</span>'
+			. '<span class="bl-warning-text">' . $warning_text . '</span>'
 			. '</div>';
 	};
 
@@ -542,9 +542,9 @@ function bl_developer_render_system_info_panel(): void
 
 	$dash = '&mdash;';
 	?>
-	<div class="fs-page-settings-form" style="margin-bottom: 24px;">
+	<div class="bl-page-settings-form" style="margin-bottom: 24px;">
 		<h2 class="title" style="margin-top: 0;"><?= esc_html__('System info', 'baselayer') ?></h2>
-		<table class="widefat -large-padding striped fs-system-info-table" role="presentation">
+		<table class="widefat -large-padding striped bl-system-info-table" role="presentation">
 			<tbody>
 				<tr>
 					<th scope="row"><?= esc_html__('PHP version', 'baselayer') ?></th>
@@ -724,9 +724,9 @@ function bl_render_developer_system(): void
 		}
 		?>
 
-		<hr class="fs-page-settings-divider">
+		<hr class="bl-page-settings-divider">
 
-		<div class="fs-page-settings-form" style="margin-bottom: 24px;">
+		<div class="bl-page-settings-form" style="margin-bottom: 24px;">
 
 			<form method="post" action="" style="margin-top: 12px;">
 				<?php wp_nonce_field('baselayer_perf'); ?>
@@ -746,9 +746,9 @@ function bl_render_developer_system(): void
 						<?= esc_html__('Enable performance panel for logged out users', 'baselayer') ?>
 					</label>
 				</p>
-				<div id="fs-perf-guest-ips-wrap" class="fs-perf-guest-ips-wrap fs-indent-checkbox" style="margin-top: 12px; <?= $guest_panel_on ? '' : 'display: none;' ?>">
+				<div id="bl-perf-guest-ips-wrap" class="bl-perf-guest-ips-wrap bl-indent-checkbox" style="margin-top: 12px; <?= $guest_panel_on ? '' : 'display: none;' ?>">
 					<p style="margin-bottom: 6px;">
-						<?= esc_html__('Your current IP address:', 'baselayer') ?> <code id="fs-perf-current-ip"><?= $current_ip !== '' ? esc_html($current_ip) : '&mdash;' ?></code>
+						<?= esc_html__('Your current IP address:', 'baselayer') ?> <code id="bl-perf-current-ip"><?= $current_ip !== '' ? esc_html($current_ip) : '&mdash;' ?></code>
 					</p>
 					<p style="margin-bottom: 0;">
 						<label for="baselayer_perf_panel_guest_ips"><?= esc_html__('Allowed IP addresses', 'baselayer') ?></label><br>
@@ -756,14 +756,14 @@ function bl_render_developer_system(): void
 						<span class="description" style="display: block; margin-top: 4px;"><?= esc_html__('Comma-separated. Only these IPs will see the panel when logged out.', 'baselayer') ?></span>
 					</p>
 				</div>
-				<div class="fs-submit-row">
+				<div class="bl-submit-row">
 					<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
 				</div>
 			</form>
 			<script>
 				(function() {
 					var cb = document.getElementById('baselayer_perf_panel_guest');
-					var wrap = document.getElementById('fs-perf-guest-ips-wrap');
+					var wrap = document.getElementById('bl-perf-guest-ips-wrap');
 					if (cb && wrap) {
 						cb.addEventListener('change', function() {
 							wrap.style.display = this.checked ? '' : 'none';
@@ -774,9 +774,9 @@ function bl_render_developer_system(): void
 		</div>
 
 		<?php if ($matomo_feature_enabled) : ?>
-			<hr class="fs-page-settings-divider">
+			<hr class="bl-page-settings-divider">
 
-			<form method="post" action="" class="fs-page-settings-form" id="fs-matomo-settings">
+			<form method="post" action="" class="bl-page-settings-form" id="bl-matomo-settings">
 				<?php wp_nonce_field('baselayer_system_matomo'); ?>
 				<input type="hidden" name="baselayer_save_matomo" value="1">
 				<h2 class="title"><?= esc_html__('Matomo', 'baselayer') ?></h2>
@@ -806,24 +806,24 @@ function bl_render_developer_system(): void
 					<tr>
 						<th scope="row"><label for="baselayer_matomo_custom_js"><?= esc_html__('Tracking settings', 'baselayer') ?></label></th>
 						<td>
-							<textarea name="baselayer_matomo_custom_js" id="baselayer_matomo_custom_js" rows="4" class="large-text code fs-code-small" placeholder="_paq.push(['disableCookies']);"><?= esc_textarea($matomo_custom_js_value) ?></textarea>
+							<textarea name="baselayer_matomo_custom_js" id="baselayer_matomo_custom_js" rows="4" class="large-text code bl-code-small" placeholder="_paq.push(['disableCookies']);"><?= esc_textarea($matomo_custom_js_value) ?></textarea>
 							<p class="description"><?= esc_html__('Optional additional _paq commands. One command per line.', 'baselayer') ?></p>
 						</td>
 					</tr>
 				</table>
-				<div class="fs-submit-row">
+				<div class="bl-submit-row">
 					<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
 				</div>
 			</form>
 		<?php endif; ?>
 
-		<hr class="fs-page-settings-divider">
+		<hr class="bl-page-settings-divider">
 
 		<?php
 		$profile_picture_default = defined('BL_PROFILE_PICTURE_MODE_DEFAULT') ? BL_PROFILE_PICTURE_MODE_DEFAULT : 'upload';
 		$profile_picture_mode = function_exists('bl_profile_picture_mode') ? bl_profile_picture_mode() : $profile_picture_default;
 		?>
-		<form method="post" action="" class="fs-page-settings-form" id="fs-profile-picture-mode">
+		<form method="post" action="" class="bl-page-settings-form" id="bl-profile-picture-mode">
 			<?php wp_nonce_field('baselayer_profile_picture_mode'); ?>
 			<input type="hidden" name="baselayer_save_profile_picture_mode" value="1">
 			<h2 class="title"><?= esc_html__('Profile picture', 'baselayer') ?></h2>
@@ -836,24 +836,24 @@ function bl_render_developer_system(): void
 								<input type="radio" name="baselayer_profile_picture_mode" value="upload" <?= checked($profile_picture_mode, 'upload', false) ?>>
 								<?= esc_html__('Upload image', 'baselayer') ?>
 							</label>
-							<p class="description fs-indent-checkbox"><?= esc_html__('Allows users to upload a custom picture on their profile page.', 'baselayer') ?></p>
+							<p class="description bl-indent-checkbox"><?= esc_html__('Allows users to upload a custom picture on their profile page.', 'baselayer') ?></p>
 							<label style="display: block; margin-top: 16px !important; margin-bottom: 0 !important;">
 								<input type="radio" name="baselayer_profile_picture_mode" value="gravatar" <?= checked($profile_picture_mode, 'gravatar', false) ?>>
 								<?= esc_html__('Gravatar (WordPress default)', 'baselayer') ?>
 							</label>
-							<p class="description fs-indent-checkbox"><?= esc_html__('Uses the account email and Gravatar.com, as in a standard WordPress install.', 'baselayer') ?></p>
+							<p class="description bl-indent-checkbox"><?= esc_html__('Uses the account email and Gravatar.com, as in a standard WordPress install.', 'baselayer') ?></p>
 						</fieldset>
 					</td>
 				</tr>
 			</table>
-			<div class="fs-submit-row">
+			<div class="bl-submit-row">
 				<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
 			</div>
 		</form>
 
-		<hr class="fs-page-settings-divider">
+		<hr class="bl-page-settings-divider">
 
-		<form method="post" action="" class="fs-page-settings-form" id="fs-search-visibility">
+		<form method="post" action="" class="bl-page-settings-form" id="bl-search-visibility">
 			<?php wp_nonce_field('baselayer_system_search_visibility'); ?>
 			<input type="hidden" name="baselayer_save_search_visibility" value="1">
 			<h2 class="title"><?= esc_html__('Search engine visibility', 'baselayer') ?></h2>
@@ -866,11 +866,11 @@ function bl_render_developer_system(): void
 							<input type="checkbox" name="blog_public_discourage" value="1" <?= checked((int) get_option('blog_public', 1), 0, false) ?>>
 							<?= esc_html__('Discourage search engines from indexing this site', 'baselayer') ?>
 						</label>
-						<p class="description fs-indent-checkbox"><?= esc_html__('It is up to search engines whether they follow this request.', 'baselayer') ?></p>
+						<p class="description bl-indent-checkbox"><?= esc_html__('It is up to search engines whether they follow this request.', 'baselayer') ?></p>
 					</td>
 				</tr>
 			</table>
-			<div class="fs-submit-row">
+			<div class="bl-submit-row">
 				<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
 			</div>
 		</form>

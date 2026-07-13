@@ -93,16 +93,16 @@ add_action('admin_bar_menu', function (\WP_Admin_Bar $wp_admin_bar): void {
 		&& function_exists('bl_theme_settings_has_any_access')
 		&& bl_theme_settings_has_any_access()) {
 		$wp_admin_bar->add_node([
-			'id' => 'fs-site-theme-settings',
+			'id' => 'bl-site-theme-settings',
 			'parent' => 'site-name',
 			'title' => __('Theme settings', 'baselayer'),
-			'href' => admin_url('options-general.php?page=fs-theme-settings'),
+			'href' => admin_url('options-general.php?page=bl-theme-settings'),
 		]);
 	}
 
 	if (current_user_can('edit_theme_options')) {
 		$wp_admin_bar->add_node([
-			'id' => 'fs-site-menus',
+			'id' => 'bl-site-menus',
 			'parent' => 'site-name',
 			'title' => __('Menus', 'baselayer'),
 			'href' => admin_url('nav-menus.php'),

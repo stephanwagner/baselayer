@@ -4,19 +4,19 @@
 
 @mixin button-link-size-small {
   padding: 3px 14px;
-  font-size: var(--fs-font-size-s) !important;
+  font-size: var(--bl-font-size-s) !important;
   border-radius: 17px;
 }
 
 @mixin button-link-size-large {
   padding: 9px 22px;
-  font-size: var(--fs-font-size-m) !important;
+  font-size: var(--bl-font-size-m) !important;
   border-radius: 23px;
 }
 
 @mixin button-link-size-extra-large {
   padding: 11px 26px;
-  font-size: var(--fs-font-size-l) !important;
+  font-size: var(--bl-font-size-l) !important;
   border-radius: 25px;
 }
 
@@ -83,15 +83,15 @@
     position: relative;
     display: inline-block;
     border: 0;
-    color: var(--fs-button-primary-color);
-    font-size: var(--fs-font-size-m);
+    color: var(--bl-button-primary-color);
+    font-size: var(--bl-font-size-m);
     line-height: 24px;
     border-radius: 21px;
     padding: 7px 20px;
     overflow: hidden;
     text-align: center;
-    background: var(--fs-button-primary-background-color);
-    border: 2px solid var(--fs-button-primary-background-color);
+    background: var(--bl-button-primary-background-color);
+    border: 2px solid var(--bl-button-primary-background-color);
     font-weight: 600;
     height: auto;
     text-decoration: none !important;
@@ -124,9 +124,9 @@
     &:hover,
     .-button-trigger:hover & {
       text-decoration: none !important;
-      background: var(--fs-button-primary-background-color-hover);
-      border-color: var(--fs-button-primary-background-color-hover);
-      color: var(--fs-button-primary-color-hover);
+      background: var(--bl-button-primary-background-color-hover);
+      border-color: var(--bl-button-primary-background-color-hover);
+      color: var(--bl-button-primary-color-hover);
     }
 
     &[disabled] {
@@ -152,68 +152,68 @@
   .button.-outline,
   .wp-block-button.is-style-outline .wp-block-button__link {
     background: transparent;
-    color: var(--fs-button-primary-background-color);
+    color: var(--bl-button-primary-background-color);
 
     &:hover,
     .-button-trigger:hover & {
-      background: var(--fs-button-primary-background-color);
-      border-color: var(--fs-button-primary-background-color);
-      color: var(--fs-button-primary-color);
+      background: var(--bl-button-primary-background-color);
+      border-color: var(--bl-button-primary-background-color);
+      color: var(--bl-button-primary-color);
     }
   }
 
   .button.-secondary,
   .wp-block-button.-secondary .wp-block-button__link {
-    background: var(--fs-button-secondary-background-color);
-    border-color: var(--fs-button-secondary-background-color);
-    color: var(--fs-button-secondary-color);
+    background: var(--bl-button-secondary-background-color);
+    border-color: var(--bl-button-secondary-background-color);
+    color: var(--bl-button-secondary-color);
 
     &:hover,
     .-button-trigger:hover & {
-      background: var(--fs-button-secondary-background-color-hover);
-      border-color: var(--fs-button-secondary-background-color-hover);
-      color: var(--fs-button-secondary-color-hover);
+      background: var(--bl-button-secondary-background-color-hover);
+      border-color: var(--bl-button-secondary-background-color-hover);
+      color: var(--bl-button-secondary-color-hover);
     }
   }
 
   .button.-secondary.-outline,
   .wp-block-button.-secondary.is-style-outline .wp-block-button__link {
     background: transparent;
-    color: var(--fs-button-secondary-background-color);
+    color: var(--bl-button-secondary-background-color);
 
     &:hover,
     .-button-trigger:hover & {
-      background: var(--fs-button-secondary-background-color);
-      border-color: var(--fs-button-secondary-background-color);
-      color: var(--fs-button-secondary-color);
+      background: var(--bl-button-secondary-background-color);
+      border-color: var(--bl-button-secondary-background-color);
+      color: var(--bl-button-secondary-color);
     }
   }
 
   .button.-white,
   .wp-block-button.-white .wp-block-button__link {
-    background: var(--fs-button-white-background-color);
-    border-color: var(--fs-button-white-background-color);
-    color: var(--fs-button-white-color);
+    background: var(--bl-button-white-background-color);
+    border-color: var(--bl-button-white-background-color);
+    color: var(--bl-button-white-color);
 
     &:hover,
     .-button-trigger:hover & {
-      background: var(--fs-button-white-background-color-hover);
-      border-color: var(--fs-button-white-background-color-hover);
-      color: var(--fs-button-white-color-hover);
+      background: var(--bl-button-white-background-color-hover);
+      border-color: var(--bl-button-white-background-color-hover);
+      color: var(--bl-button-white-color-hover);
     }
   }
 
   .button.-white.-outline,
   .wp-block-button.-white.is-style-outline .wp-block-button__link {
     background: transparent;
-    border-color: var(--fs-color-white);
-    color: var(--fs-color-white);
+    border-color: var(--bl-color-white);
+    color: var(--bl-color-white);
 
     &:hover,
     .-button-trigger:hover & {
-      background: var(--fs-button-white-background-color);
-      border-color: var(--fs-button-white-background-color);
-      color: var(--fs-button-white-color);
+      background: var(--bl-button-white-background-color);
+      border-color: var(--bl-button-white-background-color);
+      color: var(--bl-button-white-color);
     }
   }
 
@@ -222,7 +222,7 @@
     text-align: left;
 
     &::before {
-      @include fs-icon;
+      @include bl-icon;
       content: '';
       line-height: 0;
       position: absolute;
@@ -425,8 +425,8 @@
     border-width: 0;
     border-radius: 0;
     padding: 0 !important;
-    color: var(--fs-link-color);
-    font-size: var(--fs-font-size-m) !important;
+    color: var(--bl-link-color);
+    font-size: var(--bl-font-size-m) !important;
     font-weight: 600;
     line-height: 1.4;
     overflow: visible;
@@ -436,48 +436,48 @@
     .-button-trigger:hover & {
       background: transparent !important;
       border-color: transparent !important;
-      color: var(--fs-link-color-hover);
+      color: var(--bl-link-color-hover);
     }
   }
 
   .button.-is-link.-small,
   .wp-block-button.-is-link.-small .wp-block-button__link {
-    font-size: var(--fs-font-size-s) !important;
+    font-size: var(--bl-font-size-s) !important;
     padding: 0 !important;
     border-radius: 0;
   }
 
   .button.-is-link.-large,
   .wp-block-button.-is-link.-large .wp-block-button__link {
-    font-size: var(--fs-font-size-l) !important;
+    font-size: var(--bl-font-size-l) !important;
     padding: 0 !important;
     border-radius: 0;
   }
 
   .button.-is-link.-extra-large,
   .wp-block-button.-is-link.-extra-large .wp-block-button__link {
-    font-size: var(--fs-font-size-xl) !important;
+    font-size: var(--bl-font-size-xl) !important;
     padding: 0 !important;
     border-radius: 0;
   }
 
   .button.-is-link.-secondary,
   .wp-block-button.-is-link.-secondary .wp-block-button__link {
-    color: var(--fs-button-secondary-background-color);
+    color: var(--bl-button-secondary-background-color);
 
     &:hover,
     .-button-trigger:hover & {
-      color: var(--fs-button-secondary-background-color-hover);
+      color: var(--bl-button-secondary-background-color-hover);
     }
   }
 
   .button.-is-link.-white,
   .wp-block-button.-is-link.-white .wp-block-button__link {
-    color: var(--fs-color-white);
+    color: var(--bl-color-white);
 
     &:hover,
     .-button-trigger:hover & {
-      color: var(--fs-color-white);
+      color: var(--bl-color-white);
       opacity: 0.85;
     }
   }
@@ -492,7 +492,7 @@
 
     &::before,
     &::after {
-      @include fs-icon;
+      @include bl-icon;
       display: inline-block;
       position: static;
       top: auto;
@@ -538,7 +538,7 @@
     height: auto;
     min-width: 0;
     min-height: 0;
-    font-size: var(--fs-font-size-m) !important;
+    font-size: var(--bl-font-size-m) !important;
     line-height: 1 !important;
     padding: 0 !important;
 
@@ -549,17 +549,17 @@
 
   .button.-is-link.-has-icon.-icon-only.-small,
   .wp-block-button.-is-link.-has-icon.-icon-only.-small .wp-block-button__link {
-    font-size: var(--fs-font-size-s) !important;
+    font-size: var(--bl-font-size-s) !important;
   }
 
   .button.-is-link.-has-icon.-icon-only.-large,
   .wp-block-button.-is-link.-has-icon.-icon-only.-large .wp-block-button__link {
-    font-size: var(--fs-font-size-l) !important;
+    font-size: var(--bl-font-size-l) !important;
   }
 
   .button.-is-link.-has-icon.-icon-only.-extra-large,
   .wp-block-button.-is-link.-has-icon.-icon-only.-extra-large .wp-block-button__link {
-    font-size: var(--fs-font-size-xl) !important;
+    font-size: var(--bl-font-size-xl) !important;
   }
 
   .button.-is-link.-has-icon.-icon-only.-icon-right,
@@ -587,11 +587,11 @@
       padding: 8px 20px;
       padding-right: calc(7px + 24px + 8px);
       font: inherit;
-      font-size: var(--fs-font-size-m);
+      font-size: var(--bl-font-size-m);
       line-height: 24px;
       color: inherit;
       background-color: #fff;
-      border: 1px solid var(--fs-color-gray-300, #ccc);
+      border: 1px solid var(--bl-color-gray-300, #ccc);
       border-radius: 32px;
       appearance: none;
 

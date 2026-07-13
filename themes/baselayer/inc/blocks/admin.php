@@ -15,54 +15,54 @@ function bl_block_creator_register_admin_menu(): void
 		__('Blocks', 'baselayer'),
 		__('Blocks', 'baselayer'),
 		'manage_options',
-		'fs-blocks',
+		'bl-blocks',
 		'bl_blocks_render_library_page',
 		'dashicons-block-default',
 		81
 	);
 
 	add_submenu_page(
-		'fs-blocks',
+		'bl-blocks',
 		__('Blocks', 'baselayer'),
 		__('Blocks', 'baselayer'),
 		'manage_options',
-		'fs-blocks',
+		'bl-blocks',
 		'bl_blocks_render_library_page'
 	);
 
 	add_submenu_page(
-		'fs-blocks',
+		'bl-blocks',
 		__('Block options', 'baselayer'),
 		__('Block options', 'baselayer'),
 		'manage_options',
-		'fs-blocks-options',
+		'bl-blocks-options',
 		'bl_blocks_render_options_page'
 	);
 
 	add_submenu_page(
-		'fs-blocks',
+		'bl-blocks',
 		__('Variables', 'baselayer'),
 		__('Variables', 'baselayer'),
 		'manage_options',
-		'fs-blocks-variables',
+		'bl-blocks-variables',
 		'bl_blocks_render_variables_page'
 	);
 
 	add_submenu_page(
-		'fs-blocks',
+		'bl-blocks',
 		__('Menus', 'baselayer'),
 		__('Menus', 'baselayer'),
 		'manage_options',
-		'fs-blocks-menus',
+		'bl-blocks-menus',
 		'bl_blocks_render_menus_page'
 	);
 
 	add_submenu_page(
-		'fs-blocks',
+		'bl-blocks',
 		__('UI Dev', 'baselayer'),
 		__('UI Dev', 'baselayer'),
 		'manage_options',
-		'fs-blocks-ui-dev',
+		'bl-blocks-ui-dev',
 		'bl_blocks_render_ui_dev_page'
 	);
 }
@@ -118,7 +118,7 @@ function bl_blocks_handle_library_post(): void
 				'message' => __('Block deleted.', 'baselayer'),
 			], 30);
 		}
-		wp_safe_redirect(admin_url('admin.php?page=fs-blocks'));
+		wp_safe_redirect(admin_url('admin.php?page=bl-blocks'));
 		exit;
 	}
 
@@ -143,8 +143,8 @@ function bl_blocks_handle_library_post(): void
 				'message' => __('Name and slug are required.', 'baselayer'),
 			], 30);
 			$url = $previous !== ''
-				? admin_url('admin.php?page=fs-blocks&action=edit&block=' . rawurlencode($previous))
-				: admin_url('admin.php?page=fs-blocks&action=new');
+				? admin_url('admin.php?page=bl-blocks&action=edit&block=' . rawurlencode($previous))
+				: admin_url('admin.php?page=bl-blocks&action=new');
 			wp_safe_redirect($url);
 			exit;
 		}
@@ -161,7 +161,7 @@ function bl_blocks_handle_library_post(): void
 			'message' => $ok ? __('Block saved.', 'baselayer') : __('Could not save block.', 'baselayer'),
 		], 30);
 
-		wp_safe_redirect(admin_url('admin.php?page=fs-blocks&action=edit&block=' . rawurlencode($slug)));
+		wp_safe_redirect(admin_url('admin.php?page=bl-blocks&action=edit&block=' . rawurlencode($slug)));
 		exit;
 	}
 }
@@ -191,7 +191,7 @@ function bl_blocks_render_library_page(): void
 	?>
 	<div class="wrap">
 		<h1 class="wp-heading-inline"><?= esc_html__('Blocks', 'baselayer') ?></h1>
-		<a href="<?= esc_url(admin_url('admin.php?page=fs-blocks&action=new')) ?>" class="page-title-action"><?= esc_html__('Add New', 'baselayer') ?></a>
+		<a href="<?= esc_url(admin_url('admin.php?page=bl-blocks&action=new')) ?>" class="page-title-action"><?= esc_html__('Add New', 'baselayer') ?></a>
 		<hr class="wp-header-end">
 
 		<p class="description"><?= esc_html__('Create custom Gutenberg blocks. Proof of concept — fields are edited in the sidebar.', 'baselayer') ?></p>
@@ -219,7 +219,7 @@ function bl_blocks_render_library_page(): void
 					<?php foreach ($blocks as $block) : ?>
 						<tr>
 							<td>
-								<a href="<?= esc_url(admin_url('admin.php?page=fs-blocks&action=edit&block=' . rawurlencode($block['slug']))) ?>">
+								<a href="<?= esc_url(admin_url('admin.php?page=bl-blocks&action=edit&block=' . rawurlencode($block['slug']))) ?>">
 									<strong><?= esc_html($block['title']) ?></strong>
 								</a>
 							</td>
@@ -274,7 +274,7 @@ function bl_blocks_render_block_edit_page(string $slug): void
 	?>
 	<div class="wrap">
 		<h1><?= esc_html($is_new ? __('Add New Block', 'baselayer') : __('Edit Block', 'baselayer')) ?></h1>
-		<p><a href="<?= esc_url(admin_url('admin.php?page=fs-blocks')) ?>">&larr; <?= esc_html__('Back to Blocks', 'baselayer') ?></a></p>
+		<p><a href="<?= esc_url(admin_url('admin.php?page=bl-blocks')) ?>">&larr; <?= esc_html__('Back to Blocks', 'baselayer') ?></a></p>
 
 		<?php if (is_array($notice) && !empty($notice['message'])) : ?>
 			<div class="notice notice-<?= esc_attr((string) ($notice['type'] ?? 'success')) ?> is-dismissible">
@@ -282,24 +282,24 @@ function bl_blocks_render_block_edit_page(string $slug): void
 			</div>
 		<?php endif; ?>
 
-		<form method="post" id="fs-block-edit-form" class="fs-block-edit-form">
+		<form method="post" id="bl-block-edit-form" class="bl-block-edit-form">
 			<?php wp_nonce_field('bl_blocks_save'); ?>
 			<input type="hidden" name="bl_blocks_action" value="save">
 			<input type="hidden" name="previous_slug" value="<?= esc_attr($slug_value) ?>">
-			<input type="hidden" name="fields_json" id="fs-block-fields-json" value="<?= esc_attr($fields_json) ?>">
-			<input type="hidden" name="options_stack_json" id="fs-block-options-stack-json" value="<?= esc_attr($options_stack_json) ?>">
+			<input type="hidden" name="fields_json" id="bl-block-fields-json" value="<?= esc_attr($fields_json) ?>">
+			<input type="hidden" name="options_stack_json" id="bl-block-options-stack-json" value="<?= esc_attr($options_stack_json) ?>">
 
 			<table class="form-table" role="presentation" style="max-width: 720px;">
 				<tr>
-					<th scope="row"><label for="fs-block-title"><?= esc_html__('Name', 'baselayer') ?></label></th>
+					<th scope="row"><label for="bl-block-title"><?= esc_html__('Name', 'baselayer') ?></label></th>
 					<td>
-						<input type="text" class="regular-text" name="title" id="fs-block-title" value="<?= esc_attr($title) ?>" required>
+						<input type="text" class="regular-text" name="title" id="bl-block-title" value="<?= esc_attr($title) ?>" required>
 					</td>
 				</tr>
 				<tr>
-					<th scope="row"><label for="fs-block-slug"><?= esc_html__('Slug', 'baselayer') ?></label></th>
+					<th scope="row"><label for="bl-block-slug"><?= esc_html__('Slug', 'baselayer') ?></label></th>
 					<td>
-						<input type="text" class="regular-text" name="slug" id="fs-block-slug" value="<?= esc_attr($slug_value) ?>" required pattern="[a-z0-9_\-]+">
+						<input type="text" class="regular-text" name="slug" id="bl-block-slug" value="<?= esc_attr($slug_value) ?>" required pattern="[a-z0-9_\-]+">
 						<p class="description"><?= esc_html__('Block name will be baselayer/{slug}.', 'baselayer') ?></p>
 					</td>
 				</tr>
@@ -307,11 +307,11 @@ function bl_blocks_render_block_edit_page(string $slug): void
 
 			<h2><?= esc_html__('Fields', 'baselayer') ?></h2>
 			<p class="description"><?= esc_html__('Content controls in the block sidebar.', 'baselayer') ?></p>
-			<div id="fs-field-builder" class="fs-field-builder-ui-dev__mount" style="max-width: 880px;"></div>
+			<div id="bl-field-builder" class="bl-field-builder-ui-dev__mount" style="max-width: 880px;"></div>
 
 			<h2><?= esc_html__('Options', 'baselayer') ?></h2>
 			<p class="description"><?= esc_html__('Shared presets and custom options in one list. Drag to set order. Visibility (hide) is always available.', 'baselayer') ?></p>
-			<div id="fs-options-stack" class="fs-field-builder-ui-dev__mount" style="max-width: 880px;"></div>
+			<div id="bl-options-stack" class="bl-field-builder-ui-dev__mount" style="max-width: 880px;"></div>
 
 			<p class="submit">
 				<?php submit_button($is_new ? __('Create block', 'baselayer') : __('Save block', 'baselayer'), 'primary', 'submit', false); ?>
@@ -369,17 +369,17 @@ function bl_blocks_render_ui_dev_page(): void
 			<?= esc_html__('Work-in-progress Field builder sandbox. Use Inspect output to review the serialized schema.', 'baselayer') ?>
 		</p>
 
-		<div class="fs-field-builder-ui-dev">
-			<div id="fs-field-builder" class="fs-field-builder-ui-dev__mount"></div>
+		<div class="bl-field-builder-ui-dev">
+			<div id="bl-field-builder" class="bl-field-builder-ui-dev__mount"></div>
 
-			<p class="fs-field-builder-ui-dev__actions">
-				<button type="button" class="button button-primary" id="fs-field-builder-inspect">
+			<p class="bl-field-builder-ui-dev__actions">
+				<button type="button" class="button button-primary" id="bl-field-builder-inspect">
 					<?= esc_html__('Inspect output', 'baselayer') ?>
 				</button>
 			</p>
 
-			<label for="fs-field-builder-output" class="screen-reader-text"><?= esc_html__('Field builder output', 'baselayer') ?></label>
-			<textarea id="fs-field-builder-output" class="large-text code fs-field-builder-ui-dev__output" rows="16" readonly placeholder="<?= esc_attr__('Click Inspect output to dump the current field schema as JSON.', 'baselayer') ?>"></textarea>
+			<label for="bl-field-builder-output" class="screen-reader-text"><?= esc_html__('Field builder output', 'baselayer') ?></label>
+			<textarea id="bl-field-builder-output" class="large-text code bl-field-builder-ui-dev__output" rows="16" readonly placeholder="<?= esc_attr__('Click Inspect output to dump the current field schema as JSON.', 'baselayer') ?>"></textarea>
 		</div>
 	</div>
 	<?php
@@ -425,8 +425,8 @@ function bl_blocks_enqueue_field_builder_assets(string $hook_suffix): void
 	$page = isset($_GET['page']) ? sanitize_key((string) wp_unslash($_GET['page'])) : '';
 	$action = isset($_GET['action']) ? sanitize_key((string) wp_unslash($_GET['action'])) : '';
 
-	$is_ui_dev = $page === 'fs-blocks-ui-dev';
-	$is_block_edit = $page === 'fs-blocks' && ($action === 'new' || $action === 'edit');
+	$is_ui_dev = $page === 'bl-blocks-ui-dev';
+	$is_block_edit = $page === 'bl-blocks' && ($action === 'new' || $action === 'edit');
 	if (!$is_ui_dev && !$is_block_edit) {
 		return;
 	}

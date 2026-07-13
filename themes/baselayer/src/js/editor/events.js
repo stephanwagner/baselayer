@@ -92,13 +92,13 @@
           null,
           el(
             'label',
-            { className: 'components-base-control__label', htmlFor: 'fs-event-start-date' },
+            { className: 'components-base-control__label', htmlFor: 'bl-event-start-date' },
             L.startDateLabel || 'Start date',
           ),
           el('input', {
-            id: 'fs-event-start-date',
+            id: 'bl-event-start-date',
             type: 'date',
-            className: 'components-text-control__input fs-event-date-input fs-event-date-input--start',
+            className: 'components-text-control__input bl-event-date-input bl-event-date-input--start',
             value: startDate,
             onChange: function (e) {
               var v = e.target.value;
@@ -114,13 +114,13 @@
           null,
           el(
             'label',
-            { className: 'components-base-control__label', htmlFor: 'fs-event-end-date' },
+            { className: 'components-base-control__label', htmlFor: 'bl-event-end-date' },
             L.endDateLabel || 'End date',
           ),
           el('input', {
-            id: 'fs-event-end-date',
+            id: 'bl-event-end-date',
             type: 'date',
-            className: 'components-text-control__input fs-event-date-input fs-event-date-input--end',
+            className: 'components-text-control__input bl-event-date-input bl-event-date-input--end',
             value: endDate || startDate,
             min: startDate || undefined,
             onChange: function (e) {
@@ -130,10 +130,10 @@
         ),
         el(
           PanelRow,
-          { className: 'fs-event-include-times' },
+          { className: 'bl-event-include-times' },
           el(ToggleControl, {
             key: 'toggle',
-            className: 'fs-event-include-times__control',
+            className: 'bl-event-include-times__control',
             label: L.includeTimesLabel || 'Include times',
             checked: timesEnabled,
             onChange: function (on) {
@@ -144,16 +144,16 @@
         timesEnabled
           ? el(
               PanelRow,
-              { key: 'fs-event-start-time-row' },
+              { key: 'bl-event-start-time-row' },
               el(
                 'label',
-                { className: 'components-base-control__label', htmlFor: 'fs-event-start-time' },
+                { className: 'components-base-control__label', htmlFor: 'bl-event-start-time' },
                 L.startTimeLabel || 'Start time',
               ),
               el('input', {
-                id: 'fs-event-start-time',
+                id: 'bl-event-start-time',
                 type: 'time',
-                className: 'components-text-control__input fs-event-time-input fs-event-time-input--start',
+                className: 'components-text-control__input bl-event-time-input bl-event-time-input--start',
                 value: startTime,
                 onChange: function (e) {
                   patch({ [META_START_TIME]: e.target.value });
@@ -164,16 +164,16 @@
         timesEnabled
           ? el(
               PanelRow,
-              { key: 'fs-event-end-time-row' },
+              { key: 'bl-event-end-time-row' },
               el(
                 'label',
-                { className: 'components-base-control__label', htmlFor: 'fs-event-end-time' },
+                { className: 'components-base-control__label', htmlFor: 'bl-event-end-time' },
                 L.endTimeLabel || 'End time',
               ),
               el('input', {
-                id: 'fs-event-end-time',
+                id: 'bl-event-end-time',
                 type: 'time',
-                className: 'components-text-control__input fs-event-time-input fs-event-time-input--end',
+                className: 'components-text-control__input bl-event-time-input bl-event-time-input--end',
                 value: endTime,
                 onChange: function (e) {
                   patch({ [META_END_TIME]: e.target.value });

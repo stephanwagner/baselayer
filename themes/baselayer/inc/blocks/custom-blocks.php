@@ -544,7 +544,7 @@ function bl_block_creator_render_custom_block(array $attributes, string $content
 		: [];
 	$extra_class = trim((string) ($attributes['className'] ?? ''));
 	$wrapper_class = trim(implode(' ', array_filter([
-		'fs-creator-block',
+		'bl-creator-block',
 		$extra_class,
 		implode(' ', $option_classes),
 	])));
@@ -552,9 +552,9 @@ function bl_block_creator_render_custom_block(array $attributes, string $content
 	ob_start();
 	?>
 	<div class="<?= esc_attr($wrapper_class) ?>" data-block="<?= esc_attr($name) ?>">
-		<p class="fs-creator-block__title"><strong><?= esc_html($title) ?></strong></p>
+		<p class="bl-creator-block__title"><strong><?= esc_html($title) ?></strong></p>
 		<?php if ($def && !empty($def['fields'])) : ?>
-			<ul class="fs-creator-block__fields">
+			<ul class="bl-creator-block__fields">
 				<?php foreach ($def['fields'] as $field) :
 					$field_slug = (string) ($field['slug'] ?? '');
 					if ($field_slug === '') {
@@ -571,13 +571,13 @@ function bl_block_creator_render_custom_block(array $attributes, string $content
 					$label = (string) ($field['title'] ?? $field_slug);
 					?>
 					<li>
-						<span class="fs-creator-block__label"><?= esc_html($label) ?>:</span>
-						<span class="fs-creator-block__value"><?= esc_html($value) ?></span>
+						<span class="bl-creator-block__label"><?= esc_html($label) ?>:</span>
+						<span class="bl-creator-block__value"><?= esc_html($value) ?></span>
 					</li>
 				<?php endforeach; ?>
 			</ul>
 		<?php else : ?>
-			<p class="fs-creator-block__empty"><?= esc_html__('No fields configured.', 'baselayer') ?></p>
+			<p class="bl-creator-block__empty"><?= esc_html__('No fields configured.', 'baselayer') ?></p>
 		<?php endif; ?>
 	</div>
 	<?php

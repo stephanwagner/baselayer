@@ -665,8 +665,8 @@ add_action('admin_footer', function (): void {
 		],
 		'uploadLibraryUrl' => admin_url('upload.php'),
 		'icons' => [
-			'all' => '<span class="fs-media-folders-item-icon fs-media-folders-item-icon--all" aria-hidden="true">' . bl_media_folders_icon_svg('all') . '</span>',
-			'unassigned' => '<span class="fs-media-folders-item-icon fs-media-folders-item-icon--unassigned" aria-hidden="true">' . bl_media_folders_icon_svg('unassigned') . '</span>',
+			'all' => '<span class="bl-media-folders-item-icon bl-media-folders-item-icon--all" aria-hidden="true">' . bl_media_folders_icon_svg('all') . '</span>',
+			'unassigned' => '<span class="bl-media-folders-item-icon bl-media-folders-item-icon--unassigned" aria-hidden="true">' . bl_media_folders_icon_svg('unassigned') . '</span>',
 			'folderLeaf' => bl_media_folders_folder_icon_markup(false),
 			'folderBranch' => bl_media_folders_folder_icon_markup(true),
 		],
@@ -795,33 +795,33 @@ add_action('admin_footer', function (): void {
 					var name = fsEsc(it.name);
 					var kids = byParent[String(id)] || [];
 					var hasChildren = kids.length > 0;
-					var liClass = 'fs-media-modal-folders__tree-item fs-media-folders-tree-item';
+					var liClass = 'bl-media-modal-folders__tree-item bl-media-folders-tree-item';
 					if (hasChildren) {
-						liClass += ' fs-media-folders-tree-item--branch is-expanded';
+						liClass += ' bl-media-folders-tree-item--branch is-expanded';
 					}
 					out += '<li class="' + liClass + '"';
 					if (hasChildren) {
 						out += ' data-folder-term-id="' + id + '"';
 					}
 					out += '>';
-					out += '<div class="fs-media-modal-folders__row fs-media-folders-item fs-media-folders-link">';
+					out += '<div class="bl-media-modal-folders__row bl-media-folders-item bl-media-folders-link">';
 					var cnt = typeof it.count !== 'undefined' ? it.count : 0;
-					out += '<button type="button" class="fs-media-folder-row" data-folder-id="' + id + '">';
+					out += '<button type="button" class="bl-media-folder-row" data-folder-id="' + id + '">';
 					if (hasChildren) {
-						out += '<span class="fs-media-folders-folder-toggle" role="button" tabindex="0" aria-expanded="true" aria-label="' + fsEscAttr(L.expandCollapse || '') + '">';
+						out += '<span class="bl-media-folders-folder-toggle" role="button" tabindex="0" aria-expanded="true" aria-label="' + fsEscAttr(L.expandCollapse || '') + '">';
 						out += icons.folderBranch || '';
 						out += '</span>';
 					} else {
-						out += '<span class="fs-media-folders-folder-toggle fs-media-folders-folder-toggle--leaf" aria-hidden="true">';
+						out += '<span class="bl-media-folders-folder-toggle bl-media-folders-folder-toggle--leaf" aria-hidden="true">';
 						out += icons.folderLeaf || '';
 						out += '</span>';
 					}
 					out += '<span class="name">' + name + '</span>';
-					out += '<span class="fs-media-folders-count">' + fsModalFmtCount(cnt) + '</span>';
+					out += '<span class="bl-media-folders-count">' + fsModalFmtCount(cnt) + '</span>';
 					out += '</button>';
 					out += '</div>';
 					if (hasChildren) {
-						out += '<div class="fs-media-folders-branch"><ul class="fs-media-folders-branch-list">';
+						out += '<div class="bl-media-folders-branch"><ul class="bl-media-folders-branch-list">';
 						out += fsModalRenderFolderTree(id);
 						out += '</ul></div>';
 					}
@@ -917,14 +917,14 @@ add_action('admin_footer', function (): void {
 					if (!bar) {
 						continue;
 					}
-					if (bar.querySelector('.bl-media-folders-toggle[data-fs-toggle-context="modal"]')) {
+					if (bar.querySelector('.bl-media-folders-toggle[data-bl-toggle-context="modal"]')) {
 						continue;
 					}
 					var secondary = bar.querySelector('.media-toolbar-secondary');
 					var btn = document.createElement('button');
 					btn.type = 'button';
-					btn.className = 'button fs-media-folders-toggle';
-					btn.setAttribute('data-fs-toggle-context', 'modal');
+					btn.className = 'button bl-media-folders-toggle';
+					btn.setAttribute('data-bl-toggle-context', 'modal');
 					btn.setAttribute('aria-pressed', 'true');
 					btn.setAttribute('title', '<?= esc_js(__('Hide folders panel', 'baselayer')) ?>');
 					btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h207q16 0 30.5 6t25.5 17l57 57h320q33 0 56.5 23.5T880-640v400q0 33-23.5 56.5T800-160H160Z"/></svg>';
@@ -944,31 +944,31 @@ add_action('admin_footer', function (): void {
 				if (!browser) {
 					return;
 				}
-				if (browser.querySelector('#fs-media-modal-folders')) {
+				if (browser.querySelector('#bl-media-modal-folders')) {
 					return;
 				}
-				browser.classList.add('fs-modal-sidebar-layout');
+				browser.classList.add('bl-modal-sidebar-layout');
 				var panel = document.createElement('div');
-				panel.id = 'fs-media-modal-folders';
-				panel.className = 'fs-media-modal-folders';
-				var html = '<div class="fs-media-modal-folders__heading-row">';
-				html += '<span class="fs-media-modal-folders__heading">' + fsEsc(L.heading || 'Folders') + '</span>';
+				panel.id = 'bl-media-modal-folders';
+				panel.className = 'bl-media-modal-folders';
+				var html = '<div class="bl-media-modal-folders__heading-row">';
+				html += '<span class="bl-media-modal-folders__heading">' + fsEsc(L.heading || 'Folders') + '</span>';
 				if (uploadLibraryUrl) {
-					html += '<a class="components-button is-small is-tertiary fs-media-modal-folders__edit-library" href="' + fsEscAttr(uploadLibraryUrl) + '">' + fsEsc(L.openMediaLibrary || 'Open Media Library') + '</a>';
+					html += '<a class="components-button is-small is-tertiary bl-media-modal-folders__edit-library" href="' + fsEscAttr(uploadLibraryUrl) + '">' + fsEsc(L.openMediaLibrary || 'Open Media Library') + '</a>';
 				}
 				html += '</div>';
-				html += '<ul class="fs-media-modal-folders__list">';
-				html += '<li class="fs-media-modal-folders__item"><div class="fs-media-modal-folders__row fs-media-folders-item fs-media-folders-item--all fs-media-folders-link">';
-				html += '<button type="button" class="fs-media-folder-row fs-media-folder-row--all" data-folder-id="0" data-fs-all="1">';
+				html += '<ul class="bl-media-modal-folders__list">';
+				html += '<li class="bl-media-modal-folders__item"><div class="bl-media-modal-folders__row bl-media-folders-item bl-media-folders-item--all bl-media-folders-link">';
+				html += '<button type="button" class="bl-media-folder-row bl-media-folder-row--all" data-folder-id="0" data-bl-all="1">';
 				html += icons.all || '';
-				html += '<span class="fs-media-folders-link-label">' + fsEsc(L.allFiles || 'All files') + '</span>';
-				html += '<span class="fs-media-folders-count">' + fsModalFmtCount(counts.allFiles) + '</span>';
+				html += '<span class="bl-media-folders-link-label">' + fsEsc(L.allFiles || 'All files') + '</span>';
+				html += '<span class="bl-media-folders-count">' + fsModalFmtCount(counts.allFiles) + '</span>';
 				html += '</button></div></li>';
-				html += '<li class="fs-media-modal-folders__item"><div class="fs-media-modal-folders__row fs-media-folders-item fs-media-folders-item--unassigned fs-media-folders-link">';
-				html += '<button type="button" class="fs-media-folder-row fs-media-folder-row--unassigned" data-folder-id="0" data-fs-unassigned="1">';
+				html += '<li class="bl-media-modal-folders__item"><div class="bl-media-modal-folders__row bl-media-folders-item bl-media-folders-item--unassigned bl-media-folders-link">';
+				html += '<button type="button" class="bl-media-folder-row bl-media-folder-row--unassigned" data-folder-id="0" data-bl-unassigned="1">';
 				html += icons.unassigned || '';
 				html += '<span class="name">' + fsEsc(L.notInFolder || 'Not in a folder') + '</span>';
-				html += '<span class="fs-media-folders-count">' + fsModalFmtCount(counts.unassigned) + '</span>';
+				html += '<span class="bl-media-folders-count">' + fsModalFmtCount(counts.unassigned) + '</span>';
 				html += '</button></div></li>';
 				html += fsModalRenderFolderTree(0);
 				html += '</ul>';
@@ -987,8 +987,8 @@ add_action('admin_footer', function (): void {
 						if (!b) {
 							continue;
 						}
-						var isUn = b.getAttribute('data-fs-unassigned') === '1';
-						var isAll = b.getAttribute('data-fs-all') === '1';
+						var isUn = b.getAttribute('data-bl-unassigned') === '1';
+						var isAll = b.getAttribute('data-bl-all') === '1';
 						var bid = parseInt(b.getAttribute('data-folder-id') || '0', 10);
 						var on = false;
 						if (isUn) {
@@ -1009,7 +1009,7 @@ add_action('admin_footer', function (): void {
 						e.preventDefault();
 						e.stopPropagation();
 						var treeItem = folderToggle.closest('.bl-media-folders-tree-item');
-						if (!treeItem || !treeItem.classList.contains('fs-media-folders-tree-item--branch')) {
+						if (!treeItem || !treeItem.classList.contains('bl-media-folders-tree-item--branch')) {
 							return;
 						}
 						var expanded = treeItem.classList.toggle('is-expanded');
@@ -1025,7 +1025,7 @@ add_action('admin_footer', function (): void {
 						return;
 					}
 					e.preventDefault();
-					if (btn.getAttribute('data-fs-unassigned') === '1') {
+					if (btn.getAttribute('data-bl-unassigned') === '1') {
 						applyFolder(0, true);
 					} else {
 						var id = parseInt(btn.getAttribute('data-folder-id') || '0', 10);
@@ -1173,7 +1173,7 @@ function bl_media_folders_attachment_folder_setting_html(int $attachment_id, int
 		return '';
 	}
 
-	$id_attr = 'attachment-details-fs-media-folder-id';
+	$id_attr = 'attachment-details-bl-media-folder-id';
 	$name = 'attachments[' . $attachment_id . '][bl_media_folder_id]';
 
 	ob_start();
@@ -1307,7 +1307,7 @@ add_filter('media_row_actions', function (array $actions, WP_Post $post): array 
 	$terms = wp_get_object_terms($post->ID, BL_MEDIA_FOLDER_TAXONOMY, ['fields' => 'ids']);
 	$current_id = !is_wp_error($terms) && !empty($terms) ? (int) $terms[0] : 0;
 	$actions['bl_media_folder'] = sprintf(
-		'<a href="#" class="fs-media-assign-folder-link" data-attachment-id="%d" data-current-folder="%d">%s</a>',
+		'<a href="#" class="bl-media-assign-folder-link" data-attachment-id="%d" data-current-folder="%d">%s</a>',
 		$post->ID,
 		$current_id,
 		esc_html__('Folder', 'baselayer')
@@ -1416,7 +1416,7 @@ function bl_media_folders_icon_svg(string $variant): string
 	];
 	$d = $paths[$variant] ?? $paths['folder_leaf'];
 
-	return '<svg xmlns="http://www.w3.org/2000/svg" class="fs-media-folders-svg" width="20" height="20" viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="' . esc_attr($d) . '"/></svg>';
+	return '<svg xmlns="http://www.w3.org/2000/svg" class="bl-media-folders-svg" width="20" height="20" viewBox="0 -960 960 960" fill="currentColor" aria-hidden="true"><path d="' . esc_attr($d) . '"/></svg>';
 }
 
 /**
@@ -1425,12 +1425,12 @@ function bl_media_folders_icon_svg(string $variant): string
 function bl_media_folders_folder_icon_markup(bool $has_children): string
 {
 	if (!$has_children) {
-		return '<span class="fs-media-folders-item-icon fs-media-folders-item-icon--leaf">' . bl_media_folders_icon_svg('folder_leaf') . '</span>';
+		return '<span class="bl-media-folders-item-icon bl-media-folders-item-icon--leaf">' . bl_media_folders_icon_svg('folder_leaf') . '</span>';
 	}
 
-	return '<span class="fs-media-folders-item-icon fs-media-folders-item-icon--branch">'
-		. '<span class="fs-media-folders-item-icon-visual fs-media-folders-item-icon-visual--open">' . bl_media_folders_icon_svg('folder_open') . '</span>'
-		. '<span class="fs-media-folders-item-icon-visual fs-media-folders-item-icon-visual--closed">' . bl_media_folders_icon_svg('folder_closed') . '</span>'
+	return '<span class="bl-media-folders-item-icon bl-media-folders-item-icon--branch">'
+		. '<span class="bl-media-folders-item-icon-visual bl-media-folders-item-icon-visual--open">' . bl_media_folders_icon_svg('folder_open') . '</span>'
+		. '<span class="bl-media-folders-item-icon-visual bl-media-folders-item-icon-visual--closed">' . bl_media_folders_icon_svg('folder_closed') . '</span>'
 		. '</span>';
 }
 
@@ -1449,14 +1449,14 @@ function bl_media_folders_render_list(array $terms, array $display_counts, int $
 		$term_id = (int) $term->term_id;
 		$display_count = isset($display_counts[$term_id]) ? (int) $display_counts[$term_id] : (int) $term->count;
 		$url = add_query_arg('bl_media_folder_id', (int) $term->term_id, remove_query_arg('bl_media_folder_unassigned', $base_url));
-		$item_classes = ['fs-media-folders-item', 'fs-media-folders-link'];
+		$item_classes = ['bl-media-folders-item', 'bl-media-folders-link'];
 		if (!$unassigned_active && $term_id === $current_id) {
 			$item_classes[] = 'is-active';
 		}
 		$has_children = bl_media_folders_term_has_children($terms, $term_id);
-		$li_classes = ['fs-media-folders-tree-item'];
+		$li_classes = ['bl-media-folders-tree-item'];
 		if ($has_children) {
-			$li_classes[] = 'fs-media-folders-tree-item--branch';
+			$li_classes[] = 'bl-media-folders-tree-item--branch';
 			$li_classes[] = 'is-expanded';
 		}
 		$delete_url = add_query_arg([
@@ -1468,27 +1468,27 @@ function bl_media_folders_render_list(array $terms, array $display_counts, int $
 		$li_attr = $has_children ? ' data-folder-term-id="' . esc_attr((string) $term_id) . '"' : '';
 		echo '<li class="' . esc_attr(implode(' ', $li_classes)) . '"' . $li_attr . '>';
 		echo '<div class="' . esc_attr(implode(' ', $item_classes)) . '">';
-		echo '<a class="fs-media-folders-link fs-media-folder-row" href="' . esc_url($url) . '">';
+		echo '<a class="bl-media-folders-link bl-media-folder-row" href="' . esc_url($url) . '">';
 		if ($has_children) {
-			echo '<span class="fs-media-folders-folder-toggle" role="button" tabindex="0" aria-expanded="true" aria-label="' . esc_attr__('Expand or collapse subfolders', 'baselayer') . '">';
+			echo '<span class="bl-media-folders-folder-toggle" role="button" tabindex="0" aria-expanded="true" aria-label="' . esc_attr__('Expand or collapse subfolders', 'baselayer') . '">';
 			echo bl_media_folders_folder_icon_markup(true);
 			echo '</span>';
 		} else {
-			echo '<span class="fs-media-folders-folder-toggle fs-media-folders-folder-toggle--leaf" aria-hidden="true">';
+			echo '<span class="bl-media-folders-folder-toggle bl-media-folders-folder-toggle--leaf" aria-hidden="true">';
 			echo bl_media_folders_folder_icon_markup(false);
 			echo '</span>';
 		}
 		echo '<span class="name">' . esc_html($term->name) . '</span>';
-		echo '<span class="fs-media-folders-count">' . esc_html((string) $display_count) . '</span>';
+		echo '<span class="bl-media-folders-count">' . esc_html((string) $display_count) . '</span>';
 		echo '</a>';
-		echo '<span class="fs-media-folders-item-toolbar">';
-		echo '<button type="button" class="fs-media-folder-edit-btn" aria-label="' . esc_attr__('Rename folder', 'baselayer') . '" data-term-id="' . esc_attr((string) $term_id) . '" data-folder-name="' . esc_attr($term->name) . '"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M160-120q-17 0-28.5-11.5T120-160v-97q0-16 6-30.5t17-25.5l505-504q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L313-143q-11 11-25.5 17t-30.5 6h-97Zm544-528 56-56-56-56-56 56 56 56Z"/></svg></button>';
-		echo '<button type="button" class="fs-media-folder-delete-btn" aria-label="' . esc_attr__('Delete folder', 'baselayer') . '" data-folder-name="' . esc_attr($term->name) . '" data-folder-count="' . $display_count . '" data-delete-url="' . esc_url($delete_url) . '"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M280-120q-33 0-56.5-23.5T200-200v-520q-17 0-28.5-11.5T160-760q0-17 11.5-28.5T200-800h160q0-17 11.5-28.5T400-840h160q17 0 28.5 11.5T600-800h160q17 0 28.5 11.5T800-760q0 17-11.5 28.5T760-720v520q0 33-23.5 56.5T680-120H280Zm148.5-171.5Q440-303 440-320v-280q0-17-11.5-28.5T400-640q-17 0-28.5 11.5T360-600v280q0 17 11.5 28.5T400-280q17 0 28.5-11.5Zm160 0Q600-303 600-320v-280q0-17-11.5-28.5T560-640q-17 0-28.5 11.5T520-600v280q0 17 11.5 28.5T560-280q17 0 28.5-11.5Z"/></svg></button>';
+		echo '<span class="bl-media-folders-item-toolbar">';
+		echo '<button type="button" class="bl-media-folder-edit-btn" aria-label="' . esc_attr__('Rename folder', 'baselayer') . '" data-term-id="' . esc_attr((string) $term_id) . '" data-folder-name="' . esc_attr($term->name) . '"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M160-120q-17 0-28.5-11.5T120-160v-97q0-16 6-30.5t17-25.5l505-504q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L313-143q-11 11-25.5 17t-30.5 6h-97Zm544-528 56-56-56-56-56 56 56 56Z"/></svg></button>';
+		echo '<button type="button" class="bl-media-folder-delete-btn" aria-label="' . esc_attr__('Delete folder', 'baselayer') . '" data-folder-name="' . esc_attr($term->name) . '" data-folder-count="' . $display_count . '" data-delete-url="' . esc_url($delete_url) . '"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M280-120q-33 0-56.5-23.5T200-200v-520q-17 0-28.5-11.5T160-760q0-17 11.5-28.5T200-800h160q0-17 11.5-28.5T400-840h160q17 0 28.5 11.5T600-800h160q17 0 28.5 11.5T800-760q0 17-11.5 28.5T760-720v520q0 33-23.5 56.5T680-120H280Zm148.5-171.5Q440-303 440-320v-280q0-17-11.5-28.5T400-640q-17 0-28.5 11.5T360-600v280q0 17 11.5 28.5T400-280q17 0 28.5-11.5Zm160 0Q600-303 600-320v-280q0-17-11.5-28.5T560-640q-17 0-28.5 11.5T520-600v280q0 17 11.5 28.5T560-280q17 0 28.5-11.5Z"/></svg></button>';
 		echo '</span>';
 		echo '</div>';
 		if ($has_children) {
-			echo '<div class="fs-media-folders-branch">';
-			echo '<ul class="fs-media-folders-branch-list">';
+			echo '<div class="bl-media-folders-branch">';
+			echo '<ul class="bl-media-folders-branch-list">';
 			bl_media_folders_render_list($terms, $display_counts, $term_id, $depth + 1, $current_id, $unassigned_active, $base_url, $redirect_url);
 			echo '</ul>';
 			echo '</div>';
@@ -1697,29 +1697,29 @@ add_action('admin_footer-upload.php', function (): void {
 		}
 	}
 ?>
-	<aside id="fs-media-folders-sidebar" class="fs-media-folders-sidebar" style="display:none;">
-		<div class="fs-media-folders-header">
-			<h2 class="fs-media-folders-title" id="fs-media-folders-heading"><?= esc_html__('Folders', 'baselayer') ?></h2>
-			<div class="fs-media-folders-header-toolbar">
-				<div class="fs-media-folders-header-actions">
-					<button type="button" class="components-button is-small is-tertiary fs-media-folders-add-btn" id="fs-media-folders-add-open" aria-expanded="false" aria-haspopup="dialog" aria-controls="fs-media-folder-create-modal">
-						<div class="fs-media-folders-add-btn__icon">
+	<aside id="bl-media-folders-sidebar" class="bl-media-folders-sidebar" style="display:none;">
+		<div class="bl-media-folders-header">
+			<h2 class="bl-media-folders-title" id="bl-media-folders-heading"><?= esc_html__('Folders', 'baselayer') ?></h2>
+			<div class="bl-media-folders-header-toolbar">
+				<div class="bl-media-folders-header-actions">
+					<button type="button" class="components-button is-small is-tertiary bl-media-folders-add-btn" id="bl-media-folders-add-open" aria-expanded="false" aria-haspopup="dialog" aria-controls="bl-media-folder-create-modal">
+						<div class="bl-media-folders-add-btn__icon">
 							<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
 								<path d="M440-440H240q-17 0-28.5-11.5T200-480q0-17 11.5-28.5T240-520h200v-200q0-17 11.5-28.5T480-760q17 0 28.5 11.5T520-720v200h200q17 0 28.5 11.5T760-480q0 17-11.5 28.5T720-440H520v200q0 17-11.5 28.5T480-200q-17 0-28.5-11.5T440-240v-200Z" />
 							</svg>
 						</div>
-						<div class="fs-media-folders-add-btn__text"><?= esc_html__('New folder', 'baselayer') ?></div>
+						<div class="bl-media-folders-add-btn__text"><?= esc_html__('New folder', 'baselayer') ?></div>
 					</button>
-					<div class="fs-media-folders-header-mode-toggles">
-						<button type="button" class="components-button is-small is-tertiary fs-media-folders-edit-toggle-btn" id="fs-media-folders-edit-toggle" aria-pressed="false" aria-label="<?= esc_attr__('Show folder rename buttons', 'baselayer') ?>" title="<?= esc_attr__('Show folder rename buttons', 'baselayer') ?>">
-							<span class="fs-media-folders-edit-toggle-btn__icon" aria-hidden="true">
+					<div class="bl-media-folders-header-mode-toggles">
+						<button type="button" class="components-button is-small is-tertiary bl-media-folders-edit-toggle-btn" id="bl-media-folders-edit-toggle" aria-pressed="false" aria-label="<?= esc_attr__('Show folder rename buttons', 'baselayer') ?>" title="<?= esc_attr__('Show folder rename buttons', 'baselayer') ?>">
+							<span class="bl-media-folders-edit-toggle-btn__icon" aria-hidden="true">
 								<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
 									<path d="M160-120q-17 0-28.5-11.5T120-160v-97q0-16 6-30.5t17-25.5l505-504q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L313-143q-11 11-25.5 17t-30.5 6h-97Zm544-528 56-56-56-56-56 56 56 56Z" />
 								</svg>
 							</span>
 						</button>
-						<button type="button" class="components-button is-small is-tertiary fs-media-folders-delete-toggle-btn" id="fs-media-folders-delete-toggle" aria-pressed="false" aria-label="<?= esc_attr__('Show folder delete buttons', 'baselayer') ?>" title="<?= esc_attr__('Show folder delete buttons', 'baselayer') ?>">
-							<span class="fs-media-folders-delete-toggle-btn__icon" aria-hidden="true">
+						<button type="button" class="components-button is-small is-tertiary bl-media-folders-delete-toggle-btn" id="bl-media-folders-delete-toggle" aria-pressed="false" aria-label="<?= esc_attr__('Show folder delete buttons', 'baselayer') ?>" title="<?= esc_attr__('Show folder delete buttons', 'baselayer') ?>">
+							<span class="bl-media-folders-delete-toggle-btn__icon" aria-hidden="true">
 								<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
 									<path d="M280-120q-33 0-56.5-23.5T200-200v-520q-17 0-28.5-11.5T160-760q0-17 11.5-28.5T200-800h160q0-17 11.5-28.5T400-840h160q17 0 28.5 11.5T600-800h160q17 0 28.5 11.5T800-760q0 17-11.5 28.5T760-720v520q0 33-23.5 56.5T680-120H280Zm148.5-171.5Q440-303 440-320v-280q0-17-11.5-28.5T400-640q-17 0-28.5 11.5T360-600v280q0 17 11.5 28.5T400-280q17 0 28.5-11.5Zm160 0Q600-303 600-320v-280q0-17-11.5-28.5T560-640q-17 0-28.5 11.5T520-600v280q0 17 11.5 28.5T560-280q17 0 28.5-11.5Z" />
 								</svg>
@@ -1730,39 +1730,39 @@ add_action('admin_footer-upload.php', function (): void {
 			</div>
 		</div>
 		<?php if ($message !== '') : ?>
-			<div class="fs-media-folders-message <?= esc_attr($message_class) ?>"><?= esc_html($message) ?></div>
+			<div class="bl-media-folders-message <?= esc_attr($message_class) ?>"><?= esc_html($message) ?></div>
 		<?php endif; ?>
-		<ul class="fs-media-folders-list">
+		<ul class="bl-media-folders-list">
 			<li>
 				<?php
 				$strip_folder_q = ['bl_media_folder_id', 'bl_media_folder_unassigned', 'bl_media_folder_error', 'bl_media_folder_success'];
 				$all_files_url = remove_query_arg($strip_folder_q, $base_url);
-				$all_item_classes = ['fs-media-folders-item', 'fs-media-folders-item--all', 'fs-media-folders-link'];
+				$all_item_classes = ['bl-media-folders-item', 'bl-media-folders-item--all', 'bl-media-folders-link'];
 				if ($folder_id <= 0 && !$unassigned_active) {
 					$all_item_classes[] = 'is-active';
 				}
 				?>
 				<div class="<?= esc_attr(implode(' ', $all_item_classes)) ?>">
-					<button type="button" class="fs-media-folders-link fs-media-folders-link--all fs-media-folder-row fs-media-folder-row--all" data-fs-all-url="<?= esc_url($all_files_url) ?>">
-						<span class="fs-media-folders-item-icon fs-media-folders-item-icon--all" aria-hidden="true"><?php echo bl_media_folders_icon_svg('all'); ?></span>
-						<span class="fs-media-folders-link-label"><?= esc_html__('All files', 'baselayer') ?></span>
-						<span class="fs-media-folders-count"><?= esc_html((string) (int) $all_files_count) ?></span>
+					<button type="button" class="bl-media-folders-link bl-media-folders-link--all bl-media-folder-row bl-media-folder-row--all" data-bl-all-url="<?= esc_url($all_files_url) ?>">
+						<span class="bl-media-folders-item-icon bl-media-folders-item-icon--all" aria-hidden="true"><?php echo bl_media_folders_icon_svg('all'); ?></span>
+						<span class="bl-media-folders-link-label"><?= esc_html__('All files', 'baselayer') ?></span>
+						<span class="bl-media-folders-count"><?= esc_html((string) (int) $all_files_count) ?></span>
 					</button>
 				</div>
 			</li>
 			<li>
 				<?php
 				$unassigned_url = add_query_arg('bl_media_folder_unassigned', '1', remove_query_arg($strip_folder_q, $base_url));
-				$un_item_classes = ['fs-media-folders-item', 'fs-media-folders-item--unassigned', 'fs-media-folders-link'];
+				$un_item_classes = ['bl-media-folders-item', 'bl-media-folders-item--unassigned', 'bl-media-folders-link'];
 				if ($unassigned_active) {
 					$un_item_classes[] = 'is-active';
 				}
 				?>
 				<div class="<?= esc_attr(implode(' ', $un_item_classes)) ?>">
-					<a class="fs-media-folders-link fs-media-folder-row fs-media-folder-row--unassigned" href="<?= esc_url($unassigned_url) ?>">
-						<span class="fs-media-folders-item-icon fs-media-folders-item-icon--unassigned" aria-hidden="true"><?php echo bl_media_folders_icon_svg('unassigned'); ?></span>
+					<a class="bl-media-folders-link bl-media-folder-row bl-media-folder-row--unassigned" href="<?= esc_url($unassigned_url) ?>">
+						<span class="bl-media-folders-item-icon bl-media-folders-item-icon--unassigned" aria-hidden="true"><?php echo bl_media_folders_icon_svg('unassigned'); ?></span>
 						<span class="name"><?= esc_html__('Not in a folder', 'baselayer') ?></span>
-						<span class="fs-media-folders-count"><?= esc_html((string) (int) $unassigned_count) ?></span>
+						<span class="bl-media-folders-count"><?= esc_html((string) (int) $unassigned_count) ?></span>
 					</a>
 				</div>
 			</li>
@@ -1772,22 +1772,22 @@ add_action('admin_footer-upload.php', function (): void {
 			?>
 		</ul>
 	</aside>
-	<div id="fs-media-folder-delete-modal" class="fs-media-folder-delete-modal" aria-hidden="true">
-		<div class="fs-media-folder-delete-backdrop" data-modal-close></div>
-		<div class="fs-media-folder-delete-dialog" role="dialog" aria-modal="true" aria-labelledby="fs-media-folder-delete-title">
-			<h2 id="fs-media-folder-delete-title"><?= esc_html__('Delete folder', 'baselayer') ?></h2>
-			<p id="fs-media-folder-delete-text"></p>
-			<div class="fs-media-folder-delete-actions">
+	<div id="bl-media-folder-delete-modal" class="bl-media-folder-delete-modal" aria-hidden="true">
+		<div class="bl-media-folder-delete-backdrop" data-modal-close></div>
+		<div class="bl-media-folder-delete-dialog" role="dialog" aria-modal="true" aria-labelledby="bl-media-folder-delete-title">
+			<h2 id="bl-media-folder-delete-title"><?= esc_html__('Delete folder', 'baselayer') ?></h2>
+			<p id="bl-media-folder-delete-text"></p>
+			<div class="bl-media-folder-delete-actions">
 				<button type="button" class="button" data-modal-close><?= esc_html__('Cancel', 'baselayer') ?></button>
-				<a href="#" class="button button-primary button-link-delete" id="fs-media-folder-delete-confirm"><?= esc_html__('Delete folder', 'baselayer') ?></a>
+				<a href="#" class="button button-primary button-link-delete" id="bl-media-folder-delete-confirm"><?= esc_html__('Delete folder', 'baselayer') ?></a>
 			</div>
 		</div>
 	</div>
-	<div id="fs-media-folder-assign-modal" class="fs-media-folder-assign-modal" aria-hidden="true" data-fs-assign-nonce="<?= esc_attr(wp_create_nonce('bl_media_folder_assign')) ?>" data-fs-ajax-url="<?= esc_url(admin_url('admin-ajax.php')) ?>">
-		<div class="fs-media-folder-assign-backdrop" data-modal-close></div>
-		<div class="fs-media-folder-assign-dialog" role="dialog" aria-modal="true" aria-labelledby="fs-media-folder-assign-title" aria-describedby="fs-media-folder-assign-desc">
-			<h2 id="fs-media-folder-assign-title"><?= esc_html__('Add to folder', 'baselayer') ?></h2>
-			<p id="fs-media-folder-assign-desc" class="description"><?= esc_html__('Choose a folder for this file. You can clear the folder by selecting “No folder”.', 'baselayer') ?></p>
+	<div id="bl-media-folder-assign-modal" class="bl-media-folder-assign-modal" aria-hidden="true" data-bl-assign-nonce="<?= esc_attr(wp_create_nonce('bl_media_folder_assign')) ?>" data-bl-ajax-url="<?= esc_url(admin_url('admin-ajax.php')) ?>">
+		<div class="bl-media-folder-assign-backdrop" data-modal-close></div>
+		<div class="bl-media-folder-assign-dialog" role="dialog" aria-modal="true" aria-labelledby="bl-media-folder-assign-title" aria-describedby="bl-media-folder-assign-desc">
+			<h2 id="bl-media-folder-assign-title"><?= esc_html__('Add to folder', 'baselayer') ?></h2>
+			<p id="bl-media-folder-assign-desc" class="description"><?= esc_html__('Choose a folder for this file. You can clear the folder by selecting “No folder”.', 'baselayer') ?></p>
 			<p>
 				<label for="bl_media_assign_folder_id" class="screen-reader-text"><?= esc_html__('Folder', 'baselayer') ?></label>
 				<?php
@@ -1804,17 +1804,17 @@ add_action('admin_footer-upload.php', function (): void {
 				]);
 				?>
 			</p>
-			<div class="fs-media-folder-assign-actions">
+			<div class="bl-media-folder-assign-actions">
 				<button type="button" class="button" data-modal-close><?= esc_html__('Cancel', 'baselayer') ?></button>
-				<button type="button" class="button button-primary" id="fs-media-folder-assign-save"><?= esc_html__('Save', 'baselayer') ?></button>
+				<button type="button" class="button button-primary" id="bl-media-folder-assign-save"><?= esc_html__('Save', 'baselayer') ?></button>
 			</div>
 		</div>
 	</div>
-	<div id="fs-media-folder-create-modal" class="fs-media-folder-create-modal" aria-hidden="true">
-		<div class="fs-media-folder-create-backdrop" data-modal-close></div>
-		<div class="fs-media-folder-create-dialog" role="dialog" aria-modal="true" aria-labelledby="fs-media-folder-create-title">
-			<h2 id="fs-media-folder-create-title"><?= esc_html__('Add folder', 'baselayer') ?></h2>
-			<form method="post" action="<?= esc_url(admin_url('admin-post.php')) ?>" class="fs-media-folders-create" id="fs-media-folders-create-form">
+	<div id="bl-media-folder-create-modal" class="bl-media-folder-create-modal" aria-hidden="true">
+		<div class="bl-media-folder-create-backdrop" data-modal-close></div>
+		<div class="bl-media-folder-create-dialog" role="dialog" aria-modal="true" aria-labelledby="bl-media-folder-create-title">
+			<h2 id="bl-media-folder-create-title"><?= esc_html__('Add folder', 'baselayer') ?></h2>
+			<form method="post" action="<?= esc_url(admin_url('admin-post.php')) ?>" class="bl-media-folders-create" id="bl-media-folders-create-form">
 				<input type="hidden" name="action" value="bl_media_folder_create">
 				<input type="hidden" name="redirect_to" value="<?= esc_attr(remove_query_arg(['bl_media_folder_id', 'bl_media_folder_unassigned', 'bl_media_folder_error', 'bl_media_folder_success'], $base_url)) ?>">
 				<?php wp_nonce_field('bl_media_folder_create'); ?>
@@ -1837,18 +1837,18 @@ add_action('admin_footer-upload.php', function (): void {
 					]);
 					?>
 				</p>
-				<div class="fs-media-folder-create-actions">
+				<div class="bl-media-folder-create-actions">
 					<button type="button" class="button" data-modal-close><?= esc_html__('Cancel', 'baselayer') ?></button>
 					<button type="submit" class="button button-primary"><?= esc_html__('Create folder', 'baselayer') ?></button>
 				</div>
 			</form>
 		</div>
 	</div>
-	<div id="fs-media-folder-rename-modal" class="fs-media-folder-rename-modal" aria-hidden="true">
-		<div class="fs-media-folder-rename-backdrop" data-modal-close></div>
-		<div class="fs-media-folder-rename-dialog" role="dialog" aria-modal="true" aria-labelledby="fs-media-folder-rename-title">
-			<h2 id="fs-media-folder-rename-title"><?= esc_html__('Rename folder', 'baselayer') ?></h2>
-			<form method="post" action="<?= esc_url(admin_url('admin-post.php')) ?>" class="fs-media-folders-rename" id="fs-media-folders-rename-form">
+	<div id="bl-media-folder-rename-modal" class="bl-media-folder-rename-modal" aria-hidden="true">
+		<div class="bl-media-folder-rename-backdrop" data-modal-close></div>
+		<div class="bl-media-folder-rename-dialog" role="dialog" aria-modal="true" aria-labelledby="bl-media-folder-rename-title">
+			<h2 id="bl-media-folder-rename-title"><?= esc_html__('Rename folder', 'baselayer') ?></h2>
+			<form method="post" action="<?= esc_url(admin_url('admin-post.php')) ?>" class="bl-media-folders-rename" id="bl-media-folders-rename-form">
 				<input type="hidden" name="action" value="bl_media_folder_rename">
 				<input type="hidden" name="redirect_to" id="bl_media_folder_rename_redirect" value="<?= esc_attr(remove_query_arg(['bl_media_folder_id', 'bl_media_folder_unassigned', 'bl_media_folder_error', 'bl_media_folder_success'], $base_url)) ?>">
 				<input type="hidden" name="bl_media_folder_rename_term_id" id="bl_media_folder_rename_term_id" value="">
@@ -1857,7 +1857,7 @@ add_action('admin_footer-upload.php', function (): void {
 					<label for="bl_media_folder_rename_name" class="screen-reader-text"><?= esc_html__('Folder name', 'baselayer') ?></label>
 					<input type="text" name="bl_media_folder_rename_name" id="bl_media_folder_rename_name" class="regular-text" style="width:100%;" required autocomplete="off">
 				</p>
-				<div class="fs-media-folder-rename-actions">
+				<div class="bl-media-folder-rename-actions">
 					<button type="button" class="button" data-modal-close><?= esc_html__('Cancel', 'baselayer') ?></button>
 					<button type="submit" class="button button-primary"><?= esc_html__('Save', 'baselayer') ?></button>
 				</div>
@@ -1866,7 +1866,7 @@ add_action('admin_footer-upload.php', function (): void {
 	</div>
 	<script>
 		(function() {
-			var sidebar = document.getElementById('fs-media-folders-sidebar');
+			var sidebar = document.getElementById('bl-media-folders-sidebar');
 			var wrap = document.querySelector('#wpbody-content .wrap');
 			if (!sidebar || !wrap || wrap.dataset.fsMediaFoldersReady === '1') {
 				return;
@@ -1953,9 +1953,9 @@ add_action('admin_footer-upload.php', function (): void {
 			var headerEnd = wrap.querySelector('hr.wp-header-end');
 
 			var layout = document.createElement('div');
-			layout.className = 'fs-media-folders-layout';
+			layout.className = 'bl-media-folders-layout';
 			var content = document.createElement('div');
-			content.className = 'fs-media-folders-content';
+			content.className = 'bl-media-folders-content';
 
 			layout.appendChild(sidebar);
 			layout.appendChild(content);
@@ -2067,8 +2067,8 @@ add_action('admin_footer-upload.php', function (): void {
 
 			var toggleButton = document.createElement('button');
 			toggleButton.type = 'button';
-			toggleButton.className = 'button fs-media-folders-toggle is-active';
-			toggleButton.setAttribute('data-fs-toggle-context', 'upload');
+			toggleButton.className = 'button bl-media-folders-toggle is-active';
+			toggleButton.setAttribute('data-bl-toggle-context', 'upload');
 			toggleButton.setAttribute('aria-pressed', 'true');
 			toggleButton.setAttribute('title', '<?= esc_js(__('Hide folders panel', 'baselayer')) ?>');
 			toggleButton.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h207q16 0 30.5 6t25.5 17l57 57h320q33 0 56.5 23.5T880-640v400q0 33-23.5 56.5T800-160H160Z"/></svg>';
@@ -2170,19 +2170,19 @@ add_action('admin_footer-upload.php', function (): void {
 				setTimeout(fsMoveMediaFrameIntoFolderContent, 200);
 			}
 
-			var modal = document.getElementById('fs-media-folder-delete-modal');
-			var modalText = document.getElementById('fs-media-folder-delete-text');
-			var modalConfirm = document.getElementById('fs-media-folder-delete-confirm');
-			var assignModal = document.getElementById('fs-media-folder-assign-modal');
+			var modal = document.getElementById('bl-media-folder-delete-modal');
+			var modalText = document.getElementById('bl-media-folder-delete-text');
+			var modalConfirm = document.getElementById('bl-media-folder-delete-confirm');
+			var assignModal = document.getElementById('bl-media-folder-assign-modal');
 			var assignFolderSelect = document.getElementById('bl_media_assign_folder_id');
-			var assignSaveBtn = document.getElementById('fs-media-folder-assign-save');
+			var assignSaveBtn = document.getElementById('bl-media-folder-assign-save');
 			var assignAttachmentId = 0;
 			var assignTriggerLink = null;
-			var createModal = document.getElementById('fs-media-folder-create-modal');
-			var createOpenBtn = document.getElementById('fs-media-folders-add-open');
-			var deleteToggleBtn = document.getElementById('fs-media-folders-delete-toggle');
-			var editToggleBtn = document.getElementById('fs-media-folders-edit-toggle');
-			var renameModal = document.getElementById('fs-media-folder-rename-modal');
+			var createModal = document.getElementById('bl-media-folder-create-modal');
+			var createOpenBtn = document.getElementById('bl-media-folders-add-open');
+			var deleteToggleBtn = document.getElementById('bl-media-folders-delete-toggle');
+			var editToggleBtn = document.getElementById('bl-media-folders-edit-toggle');
+			var renameModal = document.getElementById('bl-media-folder-rename-modal');
 			var renameTermInput = document.getElementById('bl_media_folder_rename_term_id');
 			var renameNameInput = document.getElementById('bl_media_folder_rename_name');
 			var folderNameInput = document.getElementById('bl_media_folder_name');
@@ -2332,7 +2332,7 @@ add_action('admin_footer-upload.php', function (): void {
 					e.preventDefault();
 					e.stopPropagation();
 					var treeItem = folderToggle.closest('.bl-media-folders-tree-item');
-					if (!treeItem || !treeItem.classList.contains('fs-media-folders-tree-item--branch')) {
+					if (!treeItem || !treeItem.classList.contains('bl-media-folders-tree-item--branch')) {
 						return;
 					}
 					var expanded = treeItem.classList.toggle('is-expanded');
@@ -2343,10 +2343,10 @@ add_action('admin_footer-upload.php', function (): void {
 					}
 					return;
 				}
-				var allNav = e.target.closest('button.bl-media-folders-link--all[data-fs-all-url]');
+				var allNav = e.target.closest('button.bl-media-folders-link--all[data-bl-all-url]');
 				if (allNav) {
 					e.preventDefault();
-					var allUrl = allNav.getAttribute('data-fs-all-url');
+					var allUrl = allNav.getAttribute('data-bl-all-url');
 					if (allUrl) {
 						window.location.href = allUrl;
 					}
@@ -2460,8 +2460,8 @@ add_action('admin_footer-upload.php', function (): void {
 					if (!assignFolderSelect || assignAttachmentId <= 0) {
 						return;
 					}
-					var nonce = assignModal.getAttribute('data-fs-assign-nonce') || '';
-					var ajaxUrl = assignModal.getAttribute('data-fs-ajax-url') || (typeof ajaxurl !== 'undefined' ? ajaxurl : '');
+					var nonce = assignModal.getAttribute('data-bl-assign-nonce') || '';
+					var ajaxUrl = assignModal.getAttribute('data-bl-ajax-url') || (typeof ajaxurl !== 'undefined' ? ajaxurl : '');
 					if (!ajaxUrl || !nonce) {
 						return;
 					}

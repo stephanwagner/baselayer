@@ -7,7 +7,7 @@ $label = isset($label) && is_string($label) ? $label : '';
 $button = isset($button) && is_string($button) ? $button : '';
 $value = isset($value) && is_string($value) ? $value : '';
 $action = isset($action) && is_string($action) ? $action : '';
-$id = isset($id) && is_string($id) ? $id : 'fs-search';
+$id = isset($id) && is_string($id) ? $id : 'bl-search';
 $class = isset($class) && is_string($class) ? $class : '';
 $autofocus = !empty($autofocus);
 

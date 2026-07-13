@@ -1030,8 +1030,8 @@ msgstr "Breadcrumbs aktivieren"
 msgid "Shows breadcrumb navigation on pages, posts, archives, and search."
 msgstr "Zeigt Breadcrumb-Navigation auf Seiten, Beiträgen, Archiven und der Suche."
 
-msgid "Needs <code class=\"fs-code-small\">bl_breadcrumbs()</code> in templates to show."
-msgstr "Benötigt <code class=\"fs-code-small\">bl_breadcrumbs()</code> in Templates um angezeigt zu werden."
+msgid "Needs <code class=\"bl-code-small\">bl_breadcrumbs()</code> in templates to show."
+msgstr "Benötigt <code class=\"bl-code-small\">bl_breadcrumbs()</code> in Templates um angezeigt zu werden."
 
 msgid "Languages"
 msgstr "Sprachen"
@@ -1860,8 +1860,8 @@ msgstr "Wenn du diese E-Mail erhalten hast, funktionieren deine Einstellungen f�
 msgid "Your weekly<br>website report"
 msgstr "Ihr wöchentlicher<br>Website-Bericht"
 
-msgid "Visitors and page views <div class=\"fs-mail__small-mobile-inline\">of the last week</div>"
-msgstr "Besucherzahlen und Seitenaufrufe <div class=\"fs-mail__small-mobile-inline\">der letzten Woche</div>"
+msgid "Visitors and page views <div class=\"bl-mail__small-mobile-inline\">of the last week</div>"
+msgstr "Besucherzahlen und Seitenaufrufe <div class=\"bl-mail__small-mobile-inline\">der letzten Woche</div>"
 
 msgid "Unique<br>visitors"
 msgstr "Eindeutige<br>Besucher"
@@ -1872,8 +1872,8 @@ msgstr "Besuche<br>gesamt"
 msgid "Page<br>views"
 msgstr "Seiten-<br>aufrufe"
 
-msgid "Visitors and page views <div class=\"fs-mail__small-mobile-inline\">of the last 8 weeks</div>"
-msgstr "Besucherzahlen und Seitenaufrufe <div class=\"fs-mail__small-mobile-inline\">der letzten 8 Wochen</div>"
+msgid "Visitors and page views <div class=\"bl-mail__small-mobile-inline\">of the last 8 weeks</div>"
+msgstr "Besucherzahlen und Seitenaufrufe <div class=\"bl-mail__small-mobile-inline\">der letzten 8 Wochen</div>"
 
 msgid "Visitor statistics for this report are not enabled yet. A <a href=\"%s\">developer</a> can turn on analytics in <a href=\"%s\">WordPress</a> to show visiter charts and key numbers in future emails."
 msgstr "Für diesen Bericht sind noch keine Besucherstatistiken aktiviert. Ein <a href=\"%s\">Entwickler</a> kann die Statistik in <a href=\"%s\">WordPress</a> aktivieren, damit künftige E-Mails Besucherzahlen und wichtige Kennzahlen enthalten."
@@ -2398,14 +2398,14 @@ msgstr "Breadcrumb"
 msgid "Icons"
 msgstr "Icons"
 
-msgid "You can add icons by combining an icon class (e.g. <code class=\"fs-code-small\">-icon-bolt</code>) with one of the patterns below. Icons render as CSS masks from <code class=\"fs-code-small\">assets/icons/</code>; size and color inherit from <code class=\"fs-code-small\">font-size</code> and <code class=\"fs-code-small\">currentColor</code>."
-msgstr "Du kannst Icons hinzufügen, indem du eine Icon-Klasse (z. B. <code class=\"fs-code-small\">-icon-bolt</code>) mit einem der Muster unten kombinierst. Icons werden als CSS-Masken aus <code class=\"fs-code-small\">assets/icons/</code> gerendert; Größe und Farbe erben von <code class=\"fs-code-small\">font-size</code> und <code class=\"fs-code-small\">currentColor</code>."
+msgid "You can add icons by combining an icon class (e.g. <code class=\"bl-code-small\">-icon-bolt</code>) with one of the patterns below. Icons render as CSS masks from <code class=\"bl-code-small\">assets/icons/</code>; size and color inherit from <code class=\"bl-code-small\">font-size</code> and <code class=\"bl-code-small\">currentColor</code>."
+msgstr "Du kannst Icons hinzufügen, indem du eine Icon-Klasse (z. B. <code class=\"bl-code-small\">-icon-bolt</code>) mit einem der Muster unten kombinierst. Icons werden als CSS-Masken aus <code class=\"bl-code-small\">assets/icons/</code> gerendert; Größe und Farbe erben von <code class=\"bl-code-small\">font-size</code> und <code class=\"bl-code-small\">currentColor</code>."
 
 msgid "Buttons"
 msgstr "Buttons"
 
-msgid "Add <code class=\"fs-code-small\">-has-icon</code> and an icon class to the button. Use <code class=\"fs-code-small\">-icon-right</code> to place the icon after the label."
-msgstr "Füge <code class=\"fs-code-small\">-has-icon</code> und eine Icon-Klasse zur Schaltfläche hinzu. Mit <code class=\"fs-code-small\">-icon-right</code> platzierst du das Icon nach dem Label."
+msgid "Add <code class=\"bl-code-small\">-has-icon</code> and an icon class to the button. Use <code class=\"bl-code-small\">-icon-right</code> to place the icon after the label."
+msgstr "Füge <code class=\"bl-code-small\">-has-icon</code> und eine Icon-Klasse zur Schaltfläche hinzu. Mit <code class=\"bl-code-small\">-icon-right</code> platzierst du das Icon nach dem Label."
 
 msgid "Element"
 msgstr "Element"
@@ -2422,20 +2422,20 @@ msgstr "Icon-Position"
 msgid "Before or after text"
 msgstr "Vor oder nach Text"
 
-msgid "Add <code class=\"fs-code-small\">-icon-before</code> or <code class=\"fs-code-small\">-icon-after</code> with an icon class on the same element."
-msgstr "Füge <code class=\"fs-code-small\">-icon-before</code> oder <code class=\"fs-code-small\">-icon-after</code> zusammen mit einer Icon-Klasse auf demselben Element hinzu."
+msgid "Add <code class=\"bl-code-small\">-icon-before</code> or <code class=\"bl-code-small\">-icon-after</code> with an icon class on the same element."
+msgstr "Füge <code class=\"bl-code-small\">-icon-before</code> oder <code class=\"bl-code-small\">-icon-after</code> zusammen mit einer Icon-Klasse auf demselben Element hinzu."
 
 msgid "Standalone icon"
 msgstr "Eigenständiges Icon"
 
-msgid "Add class <code class=\"fs-code-small\">fs-icon</code> and an icon class to render the icon standalone."
-msgstr "Füge die Klasse <code class=\"fs-code-small\">fs-icon</code> und eine Icon-Klasse hinzu, um das Icon eigenständig darzustellen."
+msgid "Add class <code class=\"bl-code-small\">bl-icon</code> and an icon class to render the icon standalone."
+msgstr "Füge die Klasse <code class=\"bl-code-small\">bl-icon</code> und eine Icon-Klasse hinzu, um das Icon eigenständig darzustellen."
 
 msgid "Icon SVG code"
 msgstr "Icon-SVG-Code"
 
-msgid "Use <code class=\"fs-code-small\">bl_svg_code()</code> with an icon path under <code class=\"fs-code-small\">/icons/</code> to output inline SVG markup in templates."
-msgstr "Verwende <code class=\"fs-code-small\">bl_svg_code()</code> mit einem Icon-Pfad unter <code class=\"fs-code-small\">/icons/</code>, um Inline-SVG-Markup in Templates auszugeben."
+msgid "Use <code class=\"bl-code-small\">bl_svg_code()</code> with an icon path under <code class=\"bl-code-small\">/icons/</code> to output inline SVG markup in templates."
+msgstr "Verwende <code class=\"bl-code-small\">bl_svg_code()</code> mit einem Icon-Pfad unter <code class=\"bl-code-small\">/icons/</code>, um Inline-SVG-Markup in Templates auszugeben."
 
 msgid "Copy PHP code"
 msgstr "PHP-Code kopieren"

@@ -18,7 +18,7 @@ const parseUiStrings = (root) => {
   let fromDom = {};
 
   try {
-    fromDom = JSON.parse(root.getAttribute('data-fs-icons-ui') || '{}');
+    fromDom = JSON.parse(root.getAttribute('data-bl-icons-ui') || '{}');
   } catch {
     fromDom = {};
   }
@@ -32,7 +32,7 @@ const iconName = (icon, labels) => icon.label || labels[icon.filename] || humani
 
 const categoryName = (category, labels) => category.label || labels[category.slug] || humanize(category.slug);
 
-const buildIconCode = (value) => `<div class="fs-icon -icon-${value}"></div>`;
+const buildIconCode = (value) => `<div class="bl-icon -icon-${value}"></div>`;
 
 const buildInlineCode = (value, placement, label) => {
   const carrier = placement === 'after' ? '-icon-after' : '-icon-before';
@@ -111,30 +111,30 @@ function createModal(uiStrings) {
   const t = (key, fallback) => uiStrings[key] || fallback;
 
   const modal = document.createElement('div');
-  modal.className = 'fs-dev-icon-modal';
+  modal.className = 'bl-dev-icon-modal';
   modal.hidden = true;
   modal.setAttribute('role', 'dialog');
   modal.setAttribute('aria-modal', 'true');
-  modal.setAttribute('aria-labelledby', 'fs-dev-icon-modal-title');
+  modal.setAttribute('aria-labelledby', 'bl-dev-icon-modal-title');
 
   modal.innerHTML = `
-    <div class="fs-dev-icon-modal__backdrop" data-fs-dev-icon-modal-close tabindex="-1"></div>
-    <div class="fs-dev-icon-modal__panel">
-      <header class="fs-dev-icon-modal__header">
-        <h2 id="fs-dev-icon-modal-title" class="fs-dev-icon-modal__title">${t('choose', 'Choose icon')}</h2>
-        <button type="button" class="fs-dev-icon-modal__close" data-fs-dev-icon-modal-close aria-label="${t('close', 'Close')}">
+    <div class="bl-dev-icon-modal__backdrop" data-bl-dev-icon-modal-close tabindex="-1"></div>
+    <div class="bl-dev-icon-modal__panel">
+      <header class="bl-dev-icon-modal__header">
+        <h2 id="bl-dev-icon-modal-title" class="bl-dev-icon-modal__title">${t('choose', 'Choose icon')}</h2>
+        <button type="button" class="bl-dev-icon-modal__close" data-bl-dev-icon-modal-close aria-label="${t('close', 'Close')}">
           <span class="dashicons dashicons-no-alt" aria-hidden="true"></span>
         </button>
       </header>
-      <div class="fs-dev-icon-modal__body fs-icon-picker__panel">
-        <div class="fs-icon-picker__toolbar">
-          <input type="search" class="fs-dev-icon-modal__search" data-fs-dev-icon-modal-search placeholder="${t('search', 'Search icons…')}" autocomplete="off">
-          <div class="fs-icon-picker__variant fs-dev-icon-modal__variant" role="group" aria-label="${t('style', 'Style')}">
-            <button type="button" class="button button-secondary" data-fs-dev-icon-modal-variant="outline">${t('outline', 'Outline')}</button>
-            <button type="button" class="button button-secondary" data-fs-dev-icon-modal-variant="fill">${t('filled', 'Filled')}</button>
+      <div class="bl-dev-icon-modal__body bl-icon-picker__panel">
+        <div class="bl-icon-picker__toolbar">
+          <input type="search" class="bl-dev-icon-modal__search" data-bl-dev-icon-modal-search placeholder="${t('search', 'Search icons…')}" autocomplete="off">
+          <div class="bl-icon-picker__variant bl-dev-icon-modal__variant" role="group" aria-label="${t('style', 'Style')}">
+            <button type="button" class="button button-secondary" data-bl-dev-icon-modal-variant="outline">${t('outline', 'Outline')}</button>
+            <button type="button" class="button button-secondary" data-bl-dev-icon-modal-variant="fill">${t('filled', 'Filled')}</button>
           </div>
         </div>
-        <div class="fs-icon-picker__categories" data-fs-dev-icon-modal-categories></div>
+        <div class="bl-icon-picker__categories" data-bl-dev-icon-modal-categories></div>
       </div>
     </div>
   `;
@@ -162,8 +162,8 @@ function createIconPickerModal() {
   };
 
   const syncVariantButtons = () => {
-    modal.querySelectorAll('[data-fs-dev-icon-modal-variant]').forEach((button) => {
-      const isActive = button.getAttribute('data-fs-dev-icon-modal-variant') === variant;
+    modal.querySelectorAll('[data-bl-dev-icon-modal-variant]').forEach((button) => {
+      const isActive = button.getAttribute('data-bl-dev-icon-modal-variant') === variant;
       button.classList.toggle('is-active', isActive);
       button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
     });
@@ -173,7 +173,7 @@ function createIconPickerModal() {
     const labels = iconLabels();
     const categories = categoryLabels();
     const query = search.trim().toLowerCase();
-    const categoriesEl = modal.querySelector('[data-fs-dev-icon-modal-categories]');
+    const categoriesEl = modal.querySelector('[data-bl-dev-icon-modal-categories]');
 
     categoriesEl.innerHTML = '';
 
@@ -185,22 +185,22 @@ function createIconPickerModal() {
       }
 
       const section = document.createElement('div');
-      section.className = 'fs-icon-picker__category';
+      section.className = 'bl-icon-picker__category';
 
       const title = document.createElement('h3');
-      title.className = 'fs-icon-picker__category-title';
+      title.className = 'bl-icon-picker__category-title';
       title.textContent = categoryName(category, categories);
       section.appendChild(title);
 
       const grid = document.createElement('div');
-      grid.className = 'fs-icon-picker__grid';
+      grid.className = 'bl-icon-picker__grid';
 
       icons.forEach((icon) => {
         const resolved = resolveIconName(icon, variant);
         const name = iconName(icon, labels);
         const button = document.createElement('button');
         button.type = 'button';
-        button.className = 'fs-icon-picker__item';
+        button.className = 'bl-icon-picker__item';
         button.title = name;
         button.setAttribute('aria-label', name);
 
@@ -208,7 +208,7 @@ function createIconPickerModal() {
           button.classList.add('is-selected');
         }
 
-        button.innerHTML = `<span class="fs-icon -icon-${resolved}" aria-hidden="true"></span>`;
+        button.innerHTML = `<span class="bl-icon -icon-${resolved}" aria-hidden="true"></span>`;
 
         button.addEventListener('click', () => {
           value = resolved;
@@ -230,7 +230,7 @@ function createIconPickerModal() {
 
   const close = () => {
     modal.hidden = true;
-    document.body.classList.remove('fs-dev-icon-modal-open');
+    document.body.classList.remove('bl-dev-icon-modal-open');
 
     if (focusTarget) {
       focusTarget.focus();
@@ -247,28 +247,28 @@ function createIconPickerModal() {
     variant = resolvePickerVariant(value);
     search = '';
 
-    modal.querySelector('[data-fs-dev-icon-modal-search]').value = '';
+    modal.querySelector('[data-bl-dev-icon-modal-search]').value = '';
     syncVariantButtons();
     renderCategories();
 
     modal.hidden = false;
-    document.body.classList.add('fs-dev-icon-modal-open');
-    modal.querySelector('[data-fs-dev-icon-modal-search]').focus();
+    document.body.classList.add('bl-dev-icon-modal-open');
+    modal.querySelector('[data-bl-dev-icon-modal-search]').focus();
   };
 
   const bindModalEvents = () => {
-    modal.querySelectorAll('[data-fs-dev-icon-modal-close]').forEach((trigger) => {
+    modal.querySelectorAll('[data-bl-dev-icon-modal-close]').forEach((trigger) => {
       trigger.addEventListener('click', close);
     });
 
-    modal.querySelector('[data-fs-dev-icon-modal-search]').addEventListener('input', (event) => {
+    modal.querySelector('[data-bl-dev-icon-modal-search]').addEventListener('input', (event) => {
       search = event.target.value;
       renderCategories();
     });
 
-    modal.querySelectorAll('[data-fs-dev-icon-modal-variant]').forEach((button) => {
+    modal.querySelectorAll('[data-bl-dev-icon-modal-variant]').forEach((button) => {
       button.addEventListener('click', () => {
-        variant = button.getAttribute('data-fs-dev-icon-modal-variant') || 'outline';
+        variant = button.getAttribute('data-bl-dev-icon-modal-variant') || 'outline';
         writeStoredVariant(variant);
         syncVariantButtons();
         renderCategories();
@@ -289,7 +289,7 @@ function createIconPickerModal() {
 const iconPickerModal = createIconPickerModal();
 
 function bindChooseIcon(root, { getValue, setValue }) {
-  const chooseBtn = root.querySelector('[data-fs-icons-demo-choose]');
+  const chooseBtn = root.querySelector('[data-bl-icons-demo-choose]');
 
   if (!chooseBtn) {
     return;
@@ -308,26 +308,26 @@ function bindChooseIcon(root, { getValue, setValue }) {
 }
 
 function initIconsDemo(root = document) {
-  const demo = root.querySelector('[data-fs-icons-demo]');
+  const demo = root.querySelector('[data-bl-icons-demo]');
 
   if (!demo) {
     return;
   }
 
-  const preview = demo.querySelector('[data-fs-icons-demo-preview]');
-  const codeEl = demo.querySelector('[data-fs-icons-demo-code]');
+  const preview = demo.querySelector('[data-bl-icons-demo-preview]');
+  const codeEl = demo.querySelector('[data-bl-icons-demo-code]');
 
   if (!preview || !codeEl) {
     return;
   }
 
-  let value = demo.getAttribute('data-fs-icons-demo-value') || '';
+  let value = demo.getAttribute('data-bl-icons-demo-value') || '';
 
   const updateDemo = (nextValue) => {
     value = nextValue;
-    preview.className = `fs-icon -icon-${value}`;
+    preview.className = `bl-icon -icon-${value}`;
     codeEl.textContent = buildIconCode(value);
-    demo.setAttribute('data-fs-icons-demo-value', value);
+    demo.setAttribute('data-bl-icons-demo-value', value);
   };
 
   bindChooseIcon(demo, {
@@ -339,20 +339,20 @@ function initIconsDemo(root = document) {
 }
 
 function initInlineIconsDemo(root = document) {
-  root.querySelectorAll('[data-fs-icons-inline-demo]').forEach((demo) => {
-    const preview = demo.querySelector('[data-fs-icons-inline-preview]');
-    const codeEl = demo.querySelector('[data-fs-icons-inline-code]');
+  root.querySelectorAll('[data-bl-icons-inline-demo]').forEach((demo) => {
+    const preview = demo.querySelector('[data-bl-icons-inline-preview]');
+    const codeEl = demo.querySelector('[data-bl-icons-inline-code]');
 
     if (!preview || !codeEl) {
       return;
     }
 
-    let value = demo.getAttribute('data-fs-icons-demo-value') || '';
-    const placement = demo.getAttribute('data-fs-icons-inline-placement') || 'before';
+    let value = demo.getAttribute('data-bl-icons-demo-value') || '';
+    const placement = demo.getAttribute('data-bl-icons-inline-placement') || 'before';
     const label = preview.textContent.trim();
 
     const updateDemo = () => {
-      demo.setAttribute('data-fs-icons-demo-value', value);
+      demo.setAttribute('data-bl-icons-demo-value', value);
       preview.className = inlinePreviewClasses(value, placement);
       codeEl.textContent = buildInlineCode(value, placement, label);
     };
@@ -370,24 +370,24 @@ function initInlineIconsDemo(root = document) {
 }
 
 function initButtonIconsDemo(root = document) {
-  const demo = root.querySelector('[data-fs-icons-buttons-demo]');
+  const demo = root.querySelector('[data-bl-icons-buttons-demo]');
 
   if (!demo) {
     return;
   }
 
-  const preview = demo.querySelector('[data-fs-icons-button-preview]');
-  const codeEl = demo.querySelector('[data-fs-icons-button-code]');
-  const positionButtons = demo.querySelectorAll('[data-fs-icons-position-toggle]');
-  const elementButtons = demo.querySelectorAll('[data-fs-icons-element-toggle]');
+  const preview = demo.querySelector('[data-bl-icons-button-preview]');
+  const codeEl = demo.querySelector('[data-bl-icons-button-code]');
+  const positionButtons = demo.querySelectorAll('[data-bl-icons-position-toggle]');
+  const elementButtons = demo.querySelectorAll('[data-bl-icons-element-toggle]');
 
   if (!preview || !codeEl) {
     return;
   }
 
-  let value = demo.getAttribute('data-fs-icons-demo-value') || '';
-  let position = demo.getAttribute('data-fs-icons-button-position') || 'left';
-  let element = demo.getAttribute('data-fs-icons-button-element') || 'button';
+  let value = demo.getAttribute('data-bl-icons-demo-value') || '';
+  let position = demo.getAttribute('data-bl-icons-button-position') || 'left';
+  let element = demo.getAttribute('data-bl-icons-button-element') || 'button';
 
   const syncToggleGroup = (buttons, activeValue, attr) => {
     buttons.forEach((button) => {
@@ -398,25 +398,25 @@ function initButtonIconsDemo(root = document) {
   };
 
   const updateDemo = () => {
-    demo.setAttribute('data-fs-icons-demo-value', value);
-    demo.setAttribute('data-fs-icons-button-position', position);
-    demo.setAttribute('data-fs-icons-button-element', element);
+    demo.setAttribute('data-bl-icons-demo-value', value);
+    demo.setAttribute('data-bl-icons-button-position', position);
+    demo.setAttribute('data-bl-icons-button-element', element);
     preview.className = buttonPreviewClasses(value, position);
     codeEl.textContent = buildButtonCode(value, position, element);
-    syncToggleGroup(positionButtons, position, 'data-fs-icons-position-toggle');
-    syncToggleGroup(elementButtons, element, 'data-fs-icons-element-toggle');
+    syncToggleGroup(positionButtons, position, 'data-bl-icons-position-toggle');
+    syncToggleGroup(elementButtons, element, 'data-bl-icons-element-toggle');
   };
 
   positionButtons.forEach((button) => {
     button.addEventListener('click', () => {
-      position = button.getAttribute('data-fs-icons-position-toggle') || 'left';
+      position = button.getAttribute('data-bl-icons-position-toggle') || 'left';
       updateDemo();
     });
   });
 
   elementButtons.forEach((button) => {
     button.addEventListener('click', () => {
-      element = button.getAttribute('data-fs-icons-element-toggle') || 'button';
+      element = button.getAttribute('data-bl-icons-element-toggle') || 'button';
       updateDemo();
     });
   });
@@ -433,26 +433,26 @@ function initButtonIconsDemo(root = document) {
 }
 
 function initSvgIconsDemo(root = document) {
-  const demo = root.querySelector('[data-fs-icons-svg-demo]');
+  const demo = root.querySelector('[data-bl-icons-svg-demo]');
 
   if (!demo) {
     return;
   }
 
-  const preview = demo.querySelector('[data-fs-icons-svg-preview]');
-  const phpCodeEl = demo.querySelector('[data-fs-icons-svg-php-code]');
-  const markupCodeEl = demo.querySelector('[data-fs-icons-svg-markup-code]');
-  const baseUrl = demo.getAttribute('data-fs-icons-svg-base') || '';
+  const preview = demo.querySelector('[data-bl-icons-svg-preview]');
+  const phpCodeEl = demo.querySelector('[data-bl-icons-svg-php-code]');
+  const markupCodeEl = demo.querySelector('[data-bl-icons-svg-markup-code]');
+  const baseUrl = demo.getAttribute('data-bl-icons-svg-base') || '';
 
   if (!preview || !phpCodeEl || !markupCodeEl) {
     return;
   }
 
-  let value = demo.getAttribute('data-fs-icons-demo-value') || '';
+  let value = demo.getAttribute('data-bl-icons-demo-value') || '';
 
   const updateDemo = async (nextValue) => {
     value = nextValue;
-    demo.setAttribute('data-fs-icons-demo-value', value);
+    demo.setAttribute('data-bl-icons-demo-value', value);
     phpCodeEl.textContent = buildSvgPhpCode(value);
 
     let rawSvg = '';

@@ -20,12 +20,12 @@
   align-items: center;
   gap: 32px;
   text-decoration: none;
-  color: var(--fs-default-text-color);
+  color: var(--bl-default-text-color);
   border-radius: 8px;
 
   &:hover {
     text-decoration: none;
-    color: var(--fs-default-text-color);
+    color: var(--bl-default-text-color);
   }
 
   @media (max-width: $breakpoint-m) {
@@ -73,7 +73,7 @@
   height: auto;
   object-fit: cover;
   aspect-ratio: 3/2;
-  border-radius: var(--fs-border-radius-m);
+  border-radius: var(--bl-border-radius-m);
 }
 
 .article-preview__content {
@@ -92,9 +92,9 @@
 .article-preview__date {
   margin: 0 0 4px;
   font-weight: 400;
-  color: var(--fs-color-gray-600);
-  font-size: var(--fs-font-size-s);
-  line-height: var(--fs-line-height-s);
+  color: var(--bl-color-gray-600);
+  font-size: var(--bl-font-size-s);
+  line-height: var(--bl-line-height-s);
 }
 
 .article-preview__read-more-container {

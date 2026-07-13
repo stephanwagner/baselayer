@@ -62,8 +62,8 @@ export function slugify(text) {
 }
 
 export function formRow(labelText, control) {
-  return el('div', { className: 'fs-field-builder__form-row' }, [
-    el('div', { className: 'fs-field-builder__form-label', text: labelText }),
+  return el('div', { className: 'bl-field-builder__form-row' }, [
+    el('div', { className: 'bl-field-builder__form-label', text: labelText }),
     control,
   ]);
 }

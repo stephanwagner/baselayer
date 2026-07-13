@@ -1956,7 +1956,7 @@
                         "name": "classname",
                         "aria-label": "",
                         "type": "text",
-                        "instructions": "Gib die Icon-Klasse im Format <code>-icon-name<\/code> ein. Icons und Klassen kannst du in den <a href=\"\/wp-admin\/options-general.php?page=fs-developer-system\">Developer-Einstellungen<\/a> finden und kopieren.",
+                        "instructions": "Gib die Icon-Klasse im Format <code>-icon-name<\/code> ein. Icons und Klassen kannst du in den <a href=\"\/wp-admin\/options-general.php?page=bl-developer-system\">Developer-Einstellungen<\/a> finden und kopieren.",
                         "required": 0,
                         "conditional_logic": [
                             [

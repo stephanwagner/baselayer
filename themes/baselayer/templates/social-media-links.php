@@ -45,7 +45,7 @@ if ($links === []) {
 					<?php if ($svg !== '') : ?>
 						<?= $svg // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized via bl_svg_sanitize() ?>
 					<?php else : ?>
-						<span class="fs-icon <?= esc_attr($icon_class) ?>" aria-hidden="true"></span>
+						<span class="bl-icon <?= esc_attr($icon_class) ?>" aria-hidden="true"></span>
 					<?php endif; ?>
 				</a>
 			</li>

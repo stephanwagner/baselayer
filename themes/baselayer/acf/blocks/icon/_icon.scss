@@ -42,17 +42,17 @@
 }
 
 .icon__icon {
-  border-radius: var(--fs-border-radius-m);
+  border-radius: var(--bl-border-radius-m);
   width: 72px;
   height: 72px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  color: var(--fs-default-text-color);
+  color: var(--bl-default-text-color);
 
   &.-has-icon {
-    background: var(--fs-color-gray-200);
+    background: var(--bl-color-gray-200);
   }
 
   @media (max-width: $breakpoint-s) {

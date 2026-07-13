@@ -40,7 +40,7 @@ function renderBlockIcon(icon) {
   if (typeof icon === 'string' && icon !== '') {
     if (icon.trim().startsWith('<svg')) {
       return el('span', {
-        className: 'fs-block-settings__icon-svg',
+        className: 'bl-block-settings__icon-svg',
         dangerouslySetInnerHTML: { __html: icon },
         'aria-hidden': 'true',
       });
@@ -60,7 +60,7 @@ function renderBlockIcon(icon) {
 function BlockTypeIcon({ blockName, serverIcon = null }) {
   const icon = useBlockIcon(blockName, serverIcon);
 
-  return el('span', { className: 'fs-block-settings__icon' }, renderBlockIcon(icon));
+  return el('span', { className: 'bl-block-settings__icon' }, renderBlockIcon(icon));
 }
 
 function getInitialSettings() {
@@ -154,27 +154,27 @@ function VariationCard({ blockName, variation, allowed, parentAllowed, onChange 
   return el(
     'article',
     {
-      className: `fs-block-card fs-block-card--variation${allowed && parentAllowed ? ' is-allowed' : ' is-disallowed'}${parentAllowed ? '' : ' is-parent-disabled'}`,
+      className: `bl-block-card bl-block-card--variation${allowed && parentAllowed ? ' is-allowed' : ' is-disallowed'}${parentAllowed ? '' : ' is-parent-disabled'}`,
     },
     el(
       'div',
-      { className: 'fs-block-card__top' },
+      { className: 'bl-block-card__top' },
       el(
         'div',
-        { className: 'fs-block-card__identity' },
-        el('span', { className: 'fs-block-settings__icon' }, renderBlockIcon(variation.icon)),
+        { className: 'bl-block-card__identity' },
+        el('span', { className: 'bl-block-settings__icon' }, renderBlockIcon(variation.icon)),
         el(
           'div',
-          { className: 'fs-block-card__meta' },
-          el('h4', { className: 'fs-block-card__title' }, title),
-          el('code', { className: 'fs-block-card__slug' }, `${blockName}/${slug}`),
+          { className: 'bl-block-card__meta' },
+          el('h4', { className: 'bl-block-card__title' }, title),
+          el('code', { className: 'bl-block-card__slug' }, `${blockName}/${slug}`),
         ),
       ),
       el(
         'button',
         {
           type: 'button',
-          className: 'fs-block-card__allowed',
+          className: 'bl-block-card__allowed',
           title: interactive ? i18n.allowedInInserter || '' : i18n.parentBlockDisabled || '',
           'aria-pressed': allowed && parentAllowed ? 'true' : 'false',
           disabled: !interactive,
@@ -187,9 +187,9 @@ function VariationCard({ blockName, variation, allowed, parentAllowed, onChange 
         },
         el(
           'span',
-          { className: 'fs-block-card__allowed-btn', 'aria-hidden': 'true' },
+          { className: 'bl-block-card__allowed-btn', 'aria-hidden': 'true' },
           el('span', { className: 'dashicons dashicons-randomize', 'aria-hidden': 'true' }),
-          el('span', { className: 'fs-block-card__allowed-slash', 'aria-hidden': 'true' }),
+          el('span', { className: 'bl-block-card__allowed-slash', 'aria-hidden': 'true' }),
         ),
         el('span', { className: 'screen-reader-text' }, i18n.allowedInInserter || ''),
       ),
@@ -228,7 +228,7 @@ function BlockCard({ block, flags, onChange }) {
     'article',
     {
       className: [
-        'fs-block-card',
+        'bl-block-card',
         allowed ? 'is-allowed' : 'is-disallowed',
         allowed && mode === 'hidden' ? 'is-mode-hidden' : '',
         allowed && mode === 'favorite' ? 'is-mode-favorite' : '',
@@ -238,31 +238,31 @@ function BlockCard({ block, flags, onChange }) {
     },
     el(
       'div',
-      { className: 'fs-block-card__top' },
+      { className: 'bl-block-card__top' },
       el(
         'div',
-        { className: 'fs-block-card__identity' },
+        { className: 'bl-block-card__identity' },
         el(
           'div',
-          { className: 'fs-block-card__meta' },
-          el('h4', { className: 'fs-block-card__title' }, block.title),
-          el('code', { className: 'fs-block-card__slug' }, block.name),
+          { className: 'bl-block-card__meta' },
+          el('h4', { className: 'bl-block-card__title' }, block.title),
+          el('code', { className: 'bl-block-card__slug' }, block.name),
         ),
       ),
       el(
         'button',
         {
           type: 'button',
-          className: 'fs-block-card__allowed',
+          className: 'bl-block-card__allowed',
           title: i18n.allowedInInserter || '',
           'aria-pressed': allowed ? 'true' : 'false',
           onClick: toggleAllowed,
         },
         el(
           'span',
-          { className: 'fs-block-card__allowed-btn', 'aria-hidden': 'true' },
+          { className: 'bl-block-card__allowed-btn', 'aria-hidden': 'true' },
           el(BlockTypeIcon, { blockName: block.name, serverIcon: block.icon }),
-          el('span', { className: 'fs-block-card__allowed-slash', 'aria-hidden': 'true' }),
+          el('span', { className: 'bl-block-card__allowed-slash', 'aria-hidden': 'true' }),
         ),
         el('span', { className: 'screen-reader-text' }, i18n.allowedInInserter || ''),
       ),
@@ -270,7 +270,7 @@ function BlockCard({ block, flags, onChange }) {
     el(
       'div',
       {
-        className: `fs-block-card__modes${allowed ? '' : ' is-disabled'}`,
+        className: `bl-block-card__modes${allowed ? '' : ' is-disabled'}`,
         role: 'group',
         'aria-label': i18n.inserterVisibility || '',
       },
@@ -278,7 +278,7 @@ function BlockCard({ block, flags, onChange }) {
         'button',
         {
           type: 'button',
-          className: `fs-block-card__mode fs-block-card__mode--hidden${mode === 'hidden' ? ' is-active' : ''}`,
+          className: `bl-block-card__mode bl-block-card__mode--hidden${mode === 'hidden' ? ' is-active' : ''}`,
           'aria-pressed': mode === 'hidden' ? 'true' : 'false',
           disabled: !allowed,
           onClick: () => setMode(mode === 'hidden' ? '' : 'hidden'),
@@ -290,7 +290,7 @@ function BlockCard({ block, flags, onChange }) {
         'button',
         {
           type: 'button',
-          className: `fs-block-card__mode fs-block-card__mode--favorite${mode === 'favorite' ? ' is-active' : ''}`,
+          className: `bl-block-card__mode bl-block-card__mode--favorite${mode === 'favorite' ? ' is-active' : ''}`,
           'aria-pressed': mode === 'favorite' ? 'true' : 'false',
           disabled: !allowed,
           onClick: () => setMode(mode === 'favorite' ? '' : 'favorite'),
@@ -308,20 +308,20 @@ function SystemBlockCard({ block }) {
 
   return el(
     'article',
-    { className: 'fs-block-card fs-block-card--system' },
+    { className: 'bl-block-card bl-block-card--system' },
     el(
       'div',
-      { className: 'fs-block-card__top' },
+      { className: 'bl-block-card__top' },
       el(
         'div',
-        { className: 'fs-block-card__identity' },
+        { className: 'bl-block-card__identity' },
         el(BlockTypeIcon, { blockName: block.name, serverIcon: block.icon }),
         el(
           'div',
-          { className: 'fs-block-card__meta' },
-          el('h4', { className: 'fs-block-card__title' }, block.title),
-          el('code', { className: 'fs-block-card__slug' }, block.name),
-          el('p', { className: 'fs-block-card__system-note' }, i18n.hiddenBySystem || ''),
+          { className: 'bl-block-card__meta' },
+          el('h4', { className: 'bl-block-card__title' }, block.title),
+          el('code', { className: 'bl-block-card__slug' }, block.name),
+          el('p', { className: 'bl-block-card__system-note' }, i18n.hiddenBySystem || ''),
         ),
       ),
     ),
@@ -336,20 +336,20 @@ function SystemVariationCard({ blockName, variation }) {
 
   return el(
     'article',
-    { className: 'fs-block-card fs-block-card--variation fs-block-card--system' },
+    { className: 'bl-block-card bl-block-card--variation bl-block-card--system' },
     el(
       'div',
-      { className: 'fs-block-card__top' },
+      { className: 'bl-block-card__top' },
       el(
         'div',
-        { className: 'fs-block-card__identity' },
-        el('span', { className: 'fs-block-settings__icon' }, renderBlockIcon(variation.icon)),
+        { className: 'bl-block-card__identity' },
+        el('span', { className: 'bl-block-settings__icon' }, renderBlockIcon(variation.icon)),
         el(
           'div',
-          { className: 'fs-block-card__meta' },
-          el('h4', { className: 'fs-block-card__title' }, title),
-          el('code', { className: 'fs-block-card__slug' }, `${blockName}/${slug}`),
-          el('p', { className: 'fs-block-card__system-note' }, i18n.hiddenBySystem || ''),
+          { className: 'bl-block-card__meta' },
+          el('h4', { className: 'bl-block-card__title' }, title),
+          el('code', { className: 'bl-block-card__slug' }, `${blockName}/${slug}`),
+          el('p', { className: 'bl-block-card__system-note' }, i18n.hiddenBySystem || ''),
         ),
       ),
     ),
@@ -435,7 +435,7 @@ function FilterGroup({ label, value, options, onChange }) {
   return el(
     'div',
     {
-      className: 'fs-block-settings__filter',
+      className: 'bl-block-settings__filter',
       role: 'group',
       'aria-label': label,
     },
@@ -445,13 +445,13 @@ function FilterGroup({ label, value, options, onChange }) {
         {
           key: option.value,
           type: 'button',
-          className: `fs-block-settings__filter-icon${value === option.value ? ' is-active' : ''}`,
+          className: `bl-block-settings__filter-icon${value === option.value ? ' is-active' : ''}`,
           'aria-pressed': value === option.value ? 'true' : 'false',
           'aria-label': option.label,
           onClick: () => onChange(option.value),
         },
         renderDashicon(option.icon),
-        el('span', { className: 'fs-block-settings__filter-tip', 'aria-hidden': 'true' }, option.label),
+        el('span', { className: 'bl-block-settings__filter-tip', 'aria-hidden': 'true' }, option.label),
       ),
     ),
   );
@@ -697,9 +697,9 @@ function BlockSettingsApp() {
   };
 
   useEffect(() => {
-    const form = document.getElementById('fs-block-settings-form');
-    const jsonField = document.getElementById('fs-block-settings-json');
-    const variationJsonField = document.getElementById('fs-block-variations-json');
+    const form = document.getElementById('bl-block-settings-form');
+    const jsonField = document.getElementById('bl-block-settings-json');
+    const variationJsonField = document.getElementById('bl-block-variations-json');
     if (!(form instanceof HTMLFormElement) || !(jsonField instanceof HTMLInputElement)) {
       return undefined;
     }
@@ -719,20 +719,20 @@ function BlockSettingsApp() {
     Fragment,
     null,
     el('h2', { className: 'title' }, i18n.pageTitle || ''),
-    el('p', { className: 'description fs-block-settings__intro' }, i18n.intro || ''),
+    el('p', { className: 'description bl-block-settings__intro' }, i18n.intro || ''),
     el(
       'div',
-      { className: 'fs-block-settings__toolbar' },
+      { className: 'bl-block-settings__toolbar' },
       el(
         'div',
-        { className: 'fs-block-settings__toolbar-row' },
+        { className: 'bl-block-settings__toolbar-row' },
         el(
           'p',
-          { className: 'fs-block-settings__search-wrap' },
-          el('label', { className: 'screen-reader-text', htmlFor: 'fs-block-settings-search' }, i18n.searchPlaceholder || ''),
+          { className: 'bl-block-settings__search-wrap' },
+          el('label', { className: 'screen-reader-text', htmlFor: 'bl-block-settings-search' }, i18n.searchPlaceholder || ''),
           el('input', {
             type: 'search',
-            id: 'fs-block-settings-search',
+            id: 'bl-block-settings-search',
             className: 'regular-text',
             placeholder: i18n.searchPlaceholder || '',
             value: search,
@@ -741,7 +741,7 @@ function BlockSettingsApp() {
         ),
         el(
           'div',
-          { className: 'fs-block-settings__filters' },
+          { className: 'bl-block-settings__filters' },
           el(FilterGroup, {
             label: i18n.filterAllowed || __('Allowed in inserter', 'baselayer'),
             value: filters.allowed,
@@ -764,15 +764,15 @@ function BlockSettingsApp() {
       ),
     ),
     !hasVisibleBlocks &&
-      el('p', { className: 'fs-block-settings__empty' }, i18n.noResults || __('No blocks match the current search or filters.', 'baselayer')),
+      el('p', { className: 'bl-block-settings__empty' }, i18n.noResults || __('No blocks match the current search or filters.', 'baselayer')),
     configurableGroups.map((group) =>
       el(
         'section',
-        { key: group.category, className: 'fs-block-settings__group' },
-        el('h3', { className: 'fs-block-settings__category' }, group.label),
+        { key: group.category, className: 'bl-block-settings__group' },
+        el('h3', { className: 'bl-block-settings__category' }, group.label),
         el(
           'div',
-          { className: 'fs-block-settings__grid' },
+          { className: 'bl-block-settings__grid' },
           group.items.map((item) => {
             if (item.kind === 'block') {
               const flags = settings[item.block.name] || { allowed: true, hidden: false, favorite: false };
@@ -810,15 +810,15 @@ function BlockSettingsApp() {
     systemItemCount > 0 &&
       el(
         'div',
-        { className: 'fs-block-settings__system' },
+        { className: 'bl-block-settings__system' },
         el(
           'button',
           {
             type: 'button',
-            className: `button button-secondary fs-block-settings__system-toggle${systemOpen ? ' is-open' : ''}`,
+            className: `button button-secondary bl-block-settings__system-toggle${systemOpen ? ' is-open' : ''}`,
             style: { marginBottom: 0 },
             'aria-expanded': systemOpen ? 'true' : 'false',
-            'aria-controls': 'fs-block-settings-system-panel',
+            'aria-controls': 'bl-block-settings-system-panel',
             onClick: () => setSystemOpen((open) => !open),
           },
           sprintf(
@@ -829,12 +829,12 @@ function BlockSettingsApp() {
         systemOpen &&
           el(
             'div',
-            { id: 'fs-block-settings-system-panel', className: 'fs-block-settings__system-panel' },
+            { id: 'bl-block-settings-system-panel', className: 'bl-block-settings__system-panel' },
             el('p', { className: 'description' }, i18n.systemBlocksDescription || ''),
             el(SystemBlocksHelp, { help: config.systemBlocksHelp, i18n }),
             el(
               'div',
-              { className: 'fs-block-settings__system-grid', style: { marginTop: 16 } },
+              { className: 'bl-block-settings__system-grid', style: { marginTop: 16 } },
               systemBlocks.map((block) => el(SystemBlockCard, { key: block.name, block })),
               systemVariations.map(({ blockName, variation }) =>
                 el(SystemVariationCard, {
@@ -848,14 +848,14 @@ function BlockSettingsApp() {
       ),
     el(
       'div',
-      { className: 'fs-submit-row' },
+      { className: 'bl-submit-row' },
       el('button', { type: 'submit', className: 'button button-primary' }, i18n.save || __('Save Changes', 'baselayer')),
     ),
   );
 }
 
 function mountBlockSettingsApp() {
-  const rootEl = document.getElementById('fs-block-settings-app');
+  const rootEl = document.getElementById('bl-block-settings-app');
   if (!rootEl) {
     return;
   }

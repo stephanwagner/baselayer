@@ -1,9 +1,9 @@
 import { mount } from './index';
 
 function boot() {
-  const root = document.getElementById('fs-field-builder');
-  const inspectBtn = document.getElementById('fs-field-builder-inspect');
-  const output = document.getElementById('fs-field-builder-output');
+  const root = document.getElementById('bl-field-builder');
+  const inspectBtn = document.getElementById('bl-field-builder-inspect');
+  const output = document.getElementById('bl-field-builder-output');
   if (!root || !inspectBtn || !output) {
     return;
   }

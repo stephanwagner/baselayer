@@ -1,31 +1,31 @@
 /**
  * Image picker: binds "Select image" / "Remove" to the WordPress media modal.
- * Detected by structure: container [data-fs-image-picker] with
- * [data-fs-image-picker-input], [data-fs-image-picker-preview],
- * [data-fs-image-picker-select], [data-fs-image-picker-remove].
+ * Detected by structure: container [data-bl-image-picker] with
+ * [data-bl-image-picker-input], [data-bl-image-picker-preview],
+ * [data-bl-image-picker-select], [data-bl-image-picker-remove].
  * Requires wp.media (e.g. wp_enqueue_media() on the page).
  *
  * @param {HTMLElement | Document} [root=document] - Root to query within.
  */
 function initImagePicker(root = document) {
   const scope = root && root !== document ? root : document;
-  const containers = scope.querySelectorAll('[data-fs-image-picker]');
+  const containers = scope.querySelectorAll('[data-bl-image-picker]');
 
   containers.forEach((container) => {
-    if (container.hasAttribute('data-fs-image-picker-inited')) {
+    if (container.hasAttribute('data-bl-image-picker-inited')) {
       return;
     }
 
-    const inputEl = container.querySelector('[data-fs-image-picker-input]');
-    const previewEl = container.querySelector('[data-fs-image-picker-preview]');
-    const selectEl = container.querySelector('[data-fs-image-picker-select]');
-    const removeEl = container.querySelector('[data-fs-image-picker-remove]');
+    const inputEl = container.querySelector('[data-bl-image-picker-input]');
+    const previewEl = container.querySelector('[data-bl-image-picker-preview]');
+    const selectEl = container.querySelector('[data-bl-image-picker-select]');
+    const removeEl = container.querySelector('[data-bl-image-picker-remove]');
 
     if (!inputEl || !previewEl || !selectEl) {
       return;
     }
 
-    container.setAttribute('data-fs-image-picker-inited', '1');
+    container.setAttribute('data-bl-image-picker-inited', '1');
 
     let frame = null;
 

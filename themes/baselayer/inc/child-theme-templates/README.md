@@ -23,7 +23,7 @@ Drop SVGs into `assets/icons/`. Optional labels/keywords in `config/icons.js`. T
 Use as:
 
 ```html
-<div class="fs-icon -icon-theme-logo-child"></div>
+<div class="bl-icon -icon-theme-logo-child"></div>
 ```
 
 They also appear under **Theme** in the icon picker. An example `logo-child.svg` is included.

@@ -23,7 +23,7 @@ function IconBlockEdit({ attributes, setAttributes, isSelected }) {
   const iconSlug = attributes[ICON_SLUG_ATTRIBUTE] || '';
   const hasIcon = Boolean(iconSlug);
   const blockProps = useBlockProps({
-    className: ['icon__wrapper', 'fs-wp-block', attributes.className].filter(Boolean).join(' '),
+    className: ['icon__wrapper', 'bl-wp-block', attributes.className].filter(Boolean).join(' '),
   });
 
   return (
@@ -46,7 +46,7 @@ function IconBlockEdit({ attributes, setAttributes, isSelected }) {
 function IconTextBlockEdit({ attributes, setAttributes, isSelected }) {
   const iconSlug = attributes[ICON_SLUG_ATTRIBUTE] || '';
   const blockProps = useBlockProps({
-    className: ['icon-text__wrapper', 'fs-wp-block', attributes.className].filter(Boolean).join(' '),
+    className: ['icon-text__wrapper', 'bl-wp-block', attributes.className].filter(Boolean).join(' '),
   });
   const hasIcon = Boolean(iconSlug);
 

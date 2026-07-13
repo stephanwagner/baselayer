@@ -2,10 +2,10 @@
 @use '../mixins' as *;
 
 body {
-  font-family: var(--fs-primary-font-family);
-  font-size: var(--fs-default-font-size);
-  line-height: var(--fs-default-line-height);
-  color: var(--fs-default-text-color);
+  font-family: var(--bl-primary-font-family);
+  font-size: var(--bl-default-font-size);
+  line-height: var(--bl-default-line-height);
+  color: var(--bl-default-text-color);
   background: #fff;
 }
 

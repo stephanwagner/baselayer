@@ -1,7 +1,7 @@
 <?php
 
 // Class names
-$classNames = ['fs-wp-block'];
+$classNames = ['bl-wp-block'];
 
 // ID for specific styling
 $classNames[] = $block['id'];

@@ -1,7 +1,7 @@
 /**
  * Copy text from a source element to clipboard.
- * Trigger has data-fs-copy-from-source="ID" (id of the source element).
- * Optional data-fs-copy-feedback-text="Copied" (shown after copy; default "Copied").
+ * Trigger has data-bl-copy-from-source="ID" (id of the source element).
+ * Optional data-bl-copy-feedback-text="Copied" (shown after copy; default "Copied").
  * Source can be pre, textarea, input, or any element (uses textContent or value).
  *
  * @param {HTMLElement} [root=document] - Root to query within.
@@ -42,15 +42,15 @@ function copyTextToClipboard(text) {
 
 function initCopyFromSource(root = document) {
   const scope = root || document;
-  const triggers = scope.querySelectorAll('[data-fs-copy-from-source]');
+  const triggers = scope.querySelectorAll('[data-bl-copy-from-source]');
   triggers.forEach((trigger) => {
-    const sourceId = trigger.getAttribute('data-fs-copy-from-source');
+    const sourceId = trigger.getAttribute('data-bl-copy-from-source');
     if (!sourceId) return;
 
     const source = scope.querySelector(`#${CSS.escape(sourceId)}`);
     if (!source) return;
 
-    const feedbackText = trigger.getAttribute('data-fs-copy-feedback-text');
+    const feedbackText = trigger.getAttribute('data-bl-copy-feedback-text');
     const defaultLabel = trigger.textContent.trim();
 
     trigger.addEventListener('click', () => {
@@ -65,9 +65,9 @@ function initCopyFromSource(root = document) {
               trigger.textContent = defaultLabel;
             }, 2000);
           } else {
-            trigger.classList.add('fs-copied');
+            trigger.classList.add('bl-copied');
             setTimeout(() => {
-              trigger.classList.remove('fs-copied');
+              trigger.classList.remove('bl-copied');
             }, 180);
           }
         })

@@ -24,11 +24,11 @@
   margin-bottom: 16px;
 
   a {
-    color: var(--fs-default-text-color);
+    color: var(--bl-default-text-color);
     text-decoration: underline;
 
     &:hover {
-      color: var(--fs-default-text-color);
+      color: var(--bl-default-text-color);
       text-decoration: underline;
     }
   }
@@ -36,10 +36,10 @@
 
 .map-dsgvo__link {
   cursor: pointer;
-  color: var(--fs-link-color);
+  color: var(--bl-link-color);
   transition: transition('color');
 
   &:hover {
-    color: var(--fs-link-color-hover);
+    color: var(--bl-link-color-hover);
   }
 }

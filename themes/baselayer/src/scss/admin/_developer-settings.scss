@@ -85,7 +85,7 @@
   color: #c3c4c7;
 }
 
-#fs-language-catalog-select {
+#bl-language-catalog-select {
   max-width: 320px;
 }
 
@@ -386,7 +386,7 @@
     text-align: left;
 
     &::before {
-      @include fs-icon;
+      @include bl-icon;
       content: '';
       height: 24px;
       line-height: 0;

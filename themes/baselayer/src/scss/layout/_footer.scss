@@ -5,15 +5,15 @@
 
 .footer__wrapper {
   padding: 24px 0;
-  background: var(--fs-color-gray-200);
+  background: var(--bl-color-gray-200);
 }
 
 .footer__container {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  font-size: var(--fs-font-size-s);
-  line-height: var(--fs-line-height-s);
+  font-size: var(--bl-font-size-s);
+  line-height: var(--bl-line-height-s);
 
   @media (max-width: $breakpoint-s) {
     flex-direction: column;
@@ -57,13 +57,13 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--fs-color-black);
+  color: var(--bl-color-black);
   text-decoration: none;
   transition: transition(color);
 
   &:hover,
   &:focus-visible {
-    color: var(--fs-color-primary);
+    color: var(--bl-color-primary);
   }
 
   .bl-icon {
@@ -115,10 +115,10 @@
     }
 
     > a {
-      color: var(--fs-color-gray-500);
+      color: var(--bl-color-gray-500);
 
       &:hover {
-        color: var(--fs-link-color-hover);
+        color: var(--bl-link-color-hover);
       }
     }
   }

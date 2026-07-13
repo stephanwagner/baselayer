@@ -103,12 +103,12 @@ function renderCss(icons) {
 
   for (const icon of icons) {
     lines.push(
-      `.-icon-${icon.class} { --fs-icon: url('../${ICONS_DIR}/${icon.base}.svg'); }`
+      `.-icon-${icon.class} { --bl-icon: url('../${ICONS_DIR}/${icon.base}.svg'); }`
     );
 
     if (icon.hasFill) {
       lines.push(
-        `.-icon-${icon.class}-fill { --fs-icon: url('../${ICONS_DIR}/${icon.base}-fill.svg'); }`
+        `.-icon-${icon.class}-fill { --bl-icon: url('../${ICONS_DIR}/${icon.base}-fill.svg'); }`
       );
     }
   }

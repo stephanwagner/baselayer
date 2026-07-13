@@ -256,7 +256,7 @@ function bl_language_views_row(array $views): array
 	$post_type = $screen && isset($screen->post_type) ? $screen->post_type : 'post';
 	$html = bl_language_filter_links($post_type);
 	if ($html !== '') {
-		$views['bl_language'] = '<span class="fs-language-filters">' . $html . '</span>';
+		$views['bl_language'] = '<span class="bl-language-filters">' . $html . '</span>';
 	}
 	return $views;
 }
@@ -498,7 +498,7 @@ add_filter('post_class', function ($classes, $class, $post_id) {
 		return $classes;
 	}
 	if (bl_language_should_indent_in_list($post_id)) {
-		$classes[] = 'fs-list-translation-row';
+		$classes[] = 'bl-list-translation-row';
 	}
 	return $classes;
 }, 10, 3);

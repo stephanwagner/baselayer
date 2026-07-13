@@ -23,8 +23,8 @@
 }
 
 .accordion__container {
-  border-radius: var(--fs-border-radius-m);
-  background-color: var(--fs-color-gray-200);
+  border-radius: var(--bl-border-radius-m);
+  background-color: var(--bl-color-gray-200);
 }
 
 .accordion__header {
@@ -34,12 +34,12 @@
   gap: 16px;
   padding: 0 16px 0 24px;
   transition: transition('background-color');
-  border-radius: var(--fs-border-radius-m);
+  border-radius: var(--bl-border-radius-m);
   cursor: pointer;
 
   &:hover,
   .accordion__wrapper.accordion-open & {
-    background-color: var(--fs-color-gray-300);
+    background-color: var(--bl-color-gray-300);
   }
 
   @media (max-width: $breakpoint-s) {
@@ -52,7 +52,7 @@
   flex: 1;
   margin: 0;
   padding: 12px 0;
-  font-size: var(--fs-font-size-m);
+  font-size: var(--bl-font-size-m);
   line-height: 24px;
   transition: transition('color');
 
@@ -71,7 +71,7 @@
   line-height: 0;
   align-self: flex-start;
   border-radius: 50%;
-  color: var(--fs-default-text-color);
+  color: var(--bl-default-text-color);
   pointer-events: none;
 
   svg {

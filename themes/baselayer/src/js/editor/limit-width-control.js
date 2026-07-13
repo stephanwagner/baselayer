@@ -37,12 +37,12 @@ export function LimitWidthControl({ option, attributes, onChange }) {
   }
 
   return (
-    <div className="fs-limit-width">
-      {option.label ? <span className="fs-limit-width__label">{option.label}</span> : null}
+    <div className="bl-limit-width">
+      {option.label ? <span className="bl-limit-width__label">{option.label}</span> : null}
 
-      <div className="fs-limit-width__row fs-block-option-button-group">
+      <div className="bl-limit-width__row bl-block-option-button-group">
         <ToggleGroupControl
-          className="fs-limit-width__sizes"
+          className="bl-limit-width__sizes"
           label={option.label ? option.label + ' Größe' : 'Größe'}
           hideLabelFromVision
           value={displaySize}
@@ -62,11 +62,11 @@ export function LimitWidthControl({ option, attributes, onChange }) {
 
         <div
           className={
-            'fs-limit-width__align-wrap' + (hasSize ? '' : ' fs-limit-width__align-wrap--is-disabled')
+            'bl-limit-width__align-wrap' + (hasSize ? '' : ' bl-limit-width__align-wrap--is-disabled')
           }
         >
           <ToggleGroupControl
-            className="fs-limit-width__align"
+            className="bl-limit-width__align"
             label={option.label ? option.label + ' Ausrichtung' : 'Ausrichtung'}
             hideLabelFromVision
             value={storedAlign}

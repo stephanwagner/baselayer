@@ -39,7 +39,7 @@ add_action('admin_init', function () use ($bl_developer_page_slug) {
 	if (!current_user_can('manage_options') || !function_exists('bl_is_developer_user') || !bl_is_developer_user((int) get_current_user_id())) {
 		return;
 	}
-	$url = admin_url('options-general.php?page=fs-developer-security');
+	$url = admin_url('options-general.php?page=bl-developer-security');
 
 	// Password protection
 	if (!empty($_POST['baselayer_save_password']) && !empty($_POST['_wpnonce']) && wp_verify_nonce($_POST['_wpnonce'], 'baselayer_security_password')) {
@@ -154,7 +154,7 @@ function bl_render_developer_security(): void
 			</div>
 		<?php endif; ?>
 
-		<form method="post" action="" class="fs-page-settings-form">
+		<form method="post" action="" class="bl-page-settings-form">
 			<?php wp_nonce_field('baselayer_security_password'); ?>
 			<input type="hidden" name="baselayer_save_password" value="1">
 			<h2 class="title"><?= esc_html__('Password protection', 'baselayer') ?></h2>
@@ -175,10 +175,10 @@ function bl_render_developer_security(): void
 					<th scope="row"><label for="baselayer_site_password_new"><?= esc_html__('Password', 'baselayer') ?></label></th>
 					<td>
 						<input type="password" name="baselayer_site_password_new" id="baselayer_site_password_new" class="small-text" style="width: 220px;" value="<?= esc_attr(get_option('baselayer_site_password_plain', '')) ?>" autocomplete="new-password">
-						<button type="button" class="button" data-fs-copy-from-source="baselayer_site_password_new" data-fs-copy-feedback-text="<?= esc_attr__('Copied!', 'baselayer') ?>"><?= esc_html__('Copy', 'baselayer') ?></button>
+						<button type="button" class="button" data-bl-copy-from-source="baselayer_site_password_new" data-bl-copy-feedback-text="<?= esc_attr__('Copied!', 'baselayer') ?>"><?= esc_html__('Copy', 'baselayer') ?></button>
 						<div style="margin-top: 8px;">
-							<a class="fs-description-link -gray -has-icon" href="https://passwordcopy.app" target="_blank">
-								<span class="fs-description-link-icon">
+							<a class="bl-description-link -gray -has-icon" href="https://passwordcopy.app" target="_blank">
+								<span class="bl-description-link-icon">
 									<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
 										<path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h240q17 0 28.5 11.5T480-800q0 17-11.5 28.5T440-760H200v560h560v-240q0-17 11.5-28.5T800-480q17 0 28.5 11.5T840-440v240q0 33-23.5 56.5T760-120H200Zm560-584L416-360q-11 11-28 11t-28-11q-11-11-11-28t11-28l344-344H600q-17 0-28.5-11.5T560-800q0-17 11.5-28.5T600-840h200q17 0 28.5 11.5T840-800v200q0 17-11.5 28.5T800-560q-17 0-28.5-11.5T760-600v-104Z" />
 									</svg>
@@ -192,14 +192,14 @@ function bl_render_developer_security(): void
 					</td>
 				</tr>
 			</table>
-			<div class="fs-submit-row">
+			<div class="bl-submit-row">
 				<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
 			</div>
 		</form>
 
-		<hr class="fs-page-settings-divider">
+		<hr class="bl-page-settings-divider">
 
-		<form method="post" action="" class="fs-page-settings-form">
+		<form method="post" action="" class="bl-page-settings-form">
 			<?php wp_nonce_field('baselayer_security_maintenance'); ?>
 			<input type="hidden" name="baselayer_save_maintenance" value="1">
 			<h2 class="title"><?= esc_html__('Maintenance mode', 'baselayer') ?></h2>
@@ -231,14 +231,14 @@ function bl_render_developer_security(): void
 					</td>
 				</tr>
 			</table>
-			<div class="fs-submit-row">
+			<div class="bl-submit-row">
 				<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
 			</div>
 		</form>
 
 		<?php if (function_exists('bl_theme_feature_enabled') && bl_theme_feature_enabled('blocked_ips')) : ?>
-			<hr class="fs-page-settings-divider">
-			<form id="fs-security-blocked-ips" method="post" action="" class="fs-page-settings-form">
+			<hr class="bl-page-settings-divider">
+			<form id="bl-security-blocked-ips" method="post" action="" class="bl-page-settings-form">
 				<?php wp_nonce_field('baselayer_security_blocked_ips'); ?>
 				<input type="hidden" name="baselayer_save_blocked_ips" value="1">
 				<h2 class="title"><?= esc_html__('Blocked IP addresses', 'baselayer') ?></h2>
@@ -250,22 +250,22 @@ function bl_render_developer_security(): void
 				<?php if ($current_ip !== '' && filter_var($current_ip, FILTER_VALIDATE_IP)) : ?>
 					<p class="description" style="margin-top: 8px;">
 						<?= esc_html__('Your current IP address:', 'baselayer') ?>
-						<code class="fs-code-small"><?= esc_html($current_ip) ?></code>
+						<code class="bl-code-small"><?= esc_html($current_ip) ?></code>
 					</p>
 				<?php else : ?>
 					<p class="description" style="margin-top: 8px;"><?= esc_html__('Your current IP address could not be detected.', 'baselayer') ?></p>
 				<?php endif; ?>
 				<div style="display: block; margin-top: 16px; margin-bottom: -8px;">
-					<textarea name="baselayer_blocked_ips" id="baselayer_blocked_ips" rows="5" class="regular-text code fs-code-small"><?= esc_textarea(get_option('baselayer_blocked_ips', '')) ?></textarea>
+					<textarea name="baselayer_blocked_ips" id="baselayer_blocked_ips" rows="5" class="regular-text code bl-code-small"><?= esc_textarea(get_option('baselayer_blocked_ips', '')) ?></textarea>
 				</div>
-				<div class="fs-submit-row">
+				<div class="bl-submit-row">
 					<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
 				</div>
 			</form>
 
-			<hr class="fs-page-settings-divider">
+			<hr class="bl-page-settings-divider">
 
-			<h2 class="title" id="fs-security-failed-logins"><?= esc_html__('Failed login attempts', 'baselayer') ?></h2>
+			<h2 class="title" id="bl-security-failed-logins"><?= esc_html__('Failed login attempts', 'baselayer') ?></h2>
 			<p class="description"><?= esc_html__('Shows recent failed login attempts. IPs that reach the threshold (set in theme config) are temporarily blocked from the whole site.', 'baselayer') ?></p>
 			<?php
 			$failed = function_exists('bl_blocked_ips_get_failed_attempts') ? bl_blocked_ips_get_failed_attempts(true) : [];
@@ -334,7 +334,7 @@ function bl_render_developer_security(): void
 								|| (function_exists('bl_blocked_ips_is_suspicious_locked') && bl_blocked_ips_is_suspicious_locked($ip));
 						?>
 							<tr>
-								<td style="vertical-align: middle; white-space: nowrap;"><code class="fs-code-small"><?= esc_html($ip) ?></code></td>
+								<td style="vertical-align: middle; white-space: nowrap;"><code class="bl-code-small"><?= esc_html($ip) ?></code></td>
 								<td style="vertical-align: middle; white-space: nowrap;"><?= (int) $attempts ?> <?= esc_html(_n('attempt', 'attempts', $attempts, 'baselayer')) ?></td>
 								<td style="vertical-align: middle; white-space: nowrap;"><?= $last ? esc_html(sprintf(__('%s ago', 'baselayer'), human_time_diff($last, time()))) : '–' ?></td>
 								<td style="vertical-align: middle;"><?= $block_note === '–' ? '–' : esc_html($block_note) ?></td>

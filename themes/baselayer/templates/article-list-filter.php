@@ -63,7 +63,7 @@ if ($scroll_anchor !== '') {
 	$form_action_hash = '#' . $scroll_anchor;
 }
 
-$filter_id = 'fs-article-list-filter-' . sanitize_html_class($taxonomy);
+$filter_id = 'bl-article-list-filter-' . sanitize_html_class($taxonomy);
 $wrapper_classes = array_filter([
 	'article-list__filter',
 	$wrapper_class,

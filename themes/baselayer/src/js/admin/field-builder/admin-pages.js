@@ -6,11 +6,11 @@ import { mountOptionsStack } from './options-stack';
  * Blocks admin: mount Field builder + combined Options stack; sync on submit.
  */
 function bootBlocksAdmin() {
-  const fieldsRoot = document.getElementById('fs-field-builder');
-  const optionsRoot = document.getElementById('fs-options-stack');
-  const fieldsInput = document.getElementById('fs-block-fields-json');
-  const stackInput = document.getElementById('fs-block-options-stack-json');
-  const form = document.getElementById('fs-block-edit-form');
+  const fieldsRoot = document.getElementById('bl-field-builder');
+  const optionsRoot = document.getElementById('bl-options-stack');
+  const fieldsInput = document.getElementById('bl-block-fields-json');
+  const stackInput = document.getElementById('bl-block-options-stack-json');
+  const form = document.getElementById('bl-block-edit-form');
   if (!fieldsRoot || !fieldsInput || !form) {
     return;
   }
@@ -62,8 +62,8 @@ function bootBlocksAdmin() {
     }
   });
 
-  const nameInput = document.getElementById('fs-block-title');
-  const slugInput = document.getElementById('fs-block-slug');
+  const nameInput = document.getElementById('bl-block-title');
+  const slugInput = document.getElementById('bl-block-slug');
   if (nameInput && slugInput) {
     nameInput.addEventListener('input', () => {
       if (!slugInput.dataset.fsSlugTouched) {
@@ -83,9 +83,9 @@ function bootBlocksAdmin() {
  * UI Dev sandbox boot.
  */
 function bootUiDev() {
-  const root = document.getElementById('fs-field-builder');
-  const inspectBtn = document.getElementById('fs-field-builder-inspect');
-  const output = document.getElementById('fs-field-builder-output');
+  const root = document.getElementById('bl-field-builder');
+  const inspectBtn = document.getElementById('bl-field-builder-inspect');
+  const output = document.getElementById('bl-field-builder-output');
   if (!root || !inspectBtn || !output) {
     return;
   }
@@ -106,7 +106,7 @@ function bootUiDev() {
 }
 
 function boot() {
-  if (document.getElementById('fs-block-edit-form')) {
+  if (document.getElementById('bl-block-edit-form')) {
     bootBlocksAdmin();
     return;
   }

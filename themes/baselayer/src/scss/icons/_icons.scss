@@ -2,59 +2,59 @@
 @use 'icon-names' as *;
 
 // Path from the compiled stylesheets (assets/css/*.css) to the icon files.
-$fs-icon-path: '../icons' !default;
+$bl-icon-path: '../icons' !default;
 
 // Icon mixin
-@mixin fs-icon {
+@mixin bl-icon {
   display: inline-block;
   width: 1em;
   height: 1em;
   background-color: currentColor;
-  mask-image: var(--fs-icon);
+  mask-image: var(--bl-icon);
   mask-repeat: no-repeat;
   mask-position: center;
   mask-size: contain;
-  -webkit-mask-image: var(--fs-icon);
+  -webkit-mask-image: var(--bl-icon);
   -webkit-mask-repeat: no-repeat;
   -webkit-mask-position: center;
   -webkit-mask-size: contain;
 }
 
 // Set the icon variables for an icon
-@mixin fs-icon-var($name) {
-  --fs-icon: url('#{$fs-icon-path}/#{$name}.svg');
+@mixin bl-icon-var($name) {
+  --bl-icon: url('#{$bl-icon-path}/#{$name}.svg');
 }
 
 // Register a single icon by class suffix + explicit file URL
-@mixin fs-icon-entry($class, $url) {
+@mixin bl-icon-entry($class, $url) {
   .-icon-#{$class} {
-    --fs-icon: url('#{$url}');
+    --bl-icon: url('#{$url}');
   }
 }
 
-// Every icon class points `--fs-icon` at its file
-@each $name in $fs-icon-names {
+// Every icon class points `--bl-icon` at its file
+@each $name in $bl-icon-names {
   .-icon-#{$name} {
-    @include fs-icon-var($name);
+    @include bl-icon-var($name);
   }
 
-  @if list.index($fs-icon-fill, $name) {
+  @if list.index($bl-icon-fill, $name) {
     .-icon-#{$name}-fill {
-      @include fs-icon-var('#{$name}-fill');
+      @include bl-icon-var('#{$name}-fill');
     }
   }
 }
 
 // Standalone icon
 .bl-icon {
-  @include fs-icon;
+  @include bl-icon;
 }
 
 // Icon as pseudo-element
 
 .-icon-before::before,
 .-icon-after::after {
-  @include fs-icon;
+  @include bl-icon;
   display: inline-block;
   content: '';
   font-size: 1.25em;

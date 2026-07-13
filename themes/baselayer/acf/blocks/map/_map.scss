@@ -31,7 +31,7 @@
   bottom: 0;
 
   .map__wrapper:not(.alignfull) & {
-    border-radius: var(--fs-border-radius-m);
+    border-radius: var(--bl-border-radius-m);
     overflow: hidden;
   }
 }
@@ -40,7 +40,7 @@
   justify-content: center;
   align-items: center;
   background: no-repeat center center / cover;
-  border: 2px solid var(--fs-color-gray-200);
+  border: 2px solid var(--bl-color-gray-200);
 
   &.-active {
     display: flex;
@@ -82,8 +82,8 @@
   max-width: calc(100% - 32px);
   padding: 32px 24px;
   text-align: center;
-  border: 2px solid var(--fs-color-primary);
-  border-radius: var(--fs-border-radius-l);
+  border: 2px solid var(--bl-color-primary);
+  border-radius: var(--bl-border-radius-l);
 
   @media (max-width: $breakpoint-s) {
     padding: 24px 16px;
@@ -100,14 +100,14 @@
 
 .map__notice-title {
   font-weight: 600;
-  font-size: var(--fs-font-size-l);
-  line-height: var(--fs-line-height-l);
+  font-size: var(--bl-font-size-l);
+  line-height: var(--bl-line-height-l);
 }
 
 .map__notice-text {
   margin: 12px 0 24px;
-  font-size: var(--fs-font-size-s);
-  line-height: var(--fs-line-height-s);
+  font-size: var(--bl-font-size-s);
+  line-height: var(--bl-line-height-s);
   text-wrap: balance;
 
   @media (max-width: $breakpoint-s) {

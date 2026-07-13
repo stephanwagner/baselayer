@@ -100,7 +100,7 @@
         const options = Array.isArray(block.options) ? block.options : [];
         const extraClass = optionClasses(options, attributes);
         const blockProps = useBlockProps({
-          className: ['fs-creator-block-editor', extraClass].filter(Boolean).join(' '),
+          className: ['bl-creator-block-editor', extraClass].filter(Boolean).join(' '),
         });
 
         return el(
@@ -131,7 +131,7 @@
             fields.length
               ? el(
                   'ul',
-                  { className: 'fs-creator-block-editor__preview' },
+                  { className: 'bl-creator-block-editor__preview' },
                   fields.map((field) => {
                     let val = attributes[field.slug];
                     if (Array.isArray(val)) {

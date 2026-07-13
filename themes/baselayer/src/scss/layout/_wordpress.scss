@@ -4,35 +4,35 @@
 // Colors
 $colors: (
   // Primary colors
-  'primary' var(--fs-color-primary),
-  'secondary' var(--fs-color-secondary),
+  'primary' var(--bl-color-primary),
+  'secondary' var(--bl-color-secondary),
   // Grayscale
-  'white' var(--fs-color-white),
-  'black' var(--fs-color-black),
-  'off-black' var(--fs-color-off-black),
-  'gray-100' var(--fs-color-gray-100),
-  'gray-200' var(--fs-color-gray-200),
-  'gray-300' var(--fs-color-gray-300),
-  'gray-400' var(--fs-color-gray-400),
-  'gray-500' var(--fs-color-gray-500),
-  'gray-600' var(--fs-color-gray-600),
+  'white' var(--bl-color-white),
+  'black' var(--bl-color-black),
+  'off-black' var(--bl-color-off-black),
+  'gray-100' var(--bl-color-gray-100),
+  'gray-200' var(--bl-color-gray-200),
+  'gray-300' var(--bl-color-gray-300),
+  'gray-400' var(--bl-color-gray-400),
+  'gray-500' var(--bl-color-gray-500),
+  'gray-600' var(--bl-color-gray-600),
   // Status colors
-  'error' var(--fs-color-error),
-  'warning' var(--fs-color-warning),
-  'success' var(--fs-color-success)
+  'error' var(--bl-color-error),
+  'warning' var(--bl-color-warning),
+  'success' var(--bl-color-success)
 );
 
 // Gradients
 $gradients: (
-  'primary': var(--fs-gradient-primary),
+  'primary': var(--bl-gradient-primary),
 );
 
 // Font sizes
 $fontSizes: (
-  's' var(--fs-font-size-s) var(--fs-line-height-s),
-  'm' var(--fs-font-size-m) var(--fs-line-height-m),
-  'l' var(--fs-font-size-l) var(--fs-line-height-l),
-  'xl' var(--fs-font-size-xl) var(--fs-line-height-xl)
+  's' var(--bl-font-size-s) var(--bl-line-height-s),
+  'm' var(--bl-font-size-m) var(--bl-line-height-m),
+  'l' var(--bl-font-size-l) var(--bl-line-height-l),
+  'xl' var(--bl-font-size-xl) var(--bl-line-height-xl)
 );
 
 @mixin wordpress {

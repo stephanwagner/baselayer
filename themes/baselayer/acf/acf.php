@@ -554,7 +554,7 @@ function bl_acf_block_icon_markup(array $block, array $attrs = []): string
 		return '';
 	}
 
-	$classes = ['fs-icon', '-icon-' . $slug];
+	$classes = ['bl-icon', '-icon-' . $slug];
 	if (!empty($attrs['class']) && is_string($attrs['class'])) {
 		$classes[] = $attrs['class'];
 	}

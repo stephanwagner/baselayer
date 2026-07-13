@@ -19,7 +19,7 @@ defined('ABSPATH') || exit;
 	<?= esc_html__('If you received this, your mail delivery settings are working.', 'baselayer') ?>
 </p>
 
-<p class="fs-mail-weekly-report-has-link" style="margin: 0; font-size: 14px; line-height: 1.5; color: #64748b;">
+<p class="bl-mail-weekly-report-has-link" style="margin: 0; font-size: 14px; line-height: 1.5; color: #64748b;">
 	<?= esc_html__('Sent to:', 'baselayer') ?> <?= esc_html($to_email) ?><br>
 	<?= esc_html__('Sent at:', 'baselayer') ?> <?= esc_html($sent_at) ?>
 </p>

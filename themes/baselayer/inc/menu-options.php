@@ -153,11 +153,11 @@ function bl_menu_item_render_option_fields($item_id, object $item, int $depth, ?
 			continue;
 		}
 
-		$field_id = 'edit-menu-item-fs-option-' . esc_attr($option['id']) . '-' . $item_id;
-		$field_name = 'menu-item-fs-option-' . $option['id'];
+		$field_id = 'edit-menu-item-bl-option-' . esc_attr($option['id']) . '-' . $item_id;
+		$field_name = 'menu-item-bl-option-' . $option['id'];
 		$checked = bl_menu_item_option_enabled($item_id, $option);
 		?>
-		<p class="field-fs-menu-option field-fs-menu-option-<?= esc_attr($option['id']) ?> description description-wide">
+		<p class="field-bl-menu-option field-bl-menu-option-<?= esc_attr($option['id']) ?> description description-wide">
 			<label for="<?= esc_attr($field_id) ?>">
 				<input
 					type="checkbox"
@@ -186,7 +186,7 @@ function bl_menu_item_save_option_fields(int $menu_id, int $menu_item_id): void
 
 	$options = bl_theme_menu_options_for_menu_term($menu_id);
 	foreach ($options as $option) {
-		$field_name = 'menu-item-fs-option-' . $option['id'];
+		$field_name = 'menu-item-bl-option-' . $option['id'];
 		$meta_key = bl_menu_item_option_meta_key($option['id']);
 		// phpcs:ignore WordPress.Security.NonceVerification.Missing -- core menu save.
 		$enabled = isset($_POST[$field_name][$menu_item_id]) && (string) wp_unslash($_POST[$field_name][$menu_item_id]) === '1';

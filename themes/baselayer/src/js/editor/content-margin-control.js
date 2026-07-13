@@ -75,7 +75,7 @@ export function ContentMarginControl({ option, attributes, onChange }) {
   const renderSizeControl = (sideLabel, value, onSelect, onReset) => {
     const control = ToggleGroupControl ? (
       <ToggleGroupControl
-        className="fs-content-margin__sizes fs-block-option-button-group"
+        className="bl-content-margin__sizes bl-block-option-button-group"
         label={sideLabel}
         hideLabelFromVision
         value={value}
@@ -95,10 +95,10 @@ export function ContentMarginControl({ option, attributes, onChange }) {
     ) : null;
 
     return (
-      <div className="fs-content-margin__field">
-        <div className="fs-content-margin__header">
-          <span className="fs-content-margin__side-label">{sideLabel}</span>
-          <Button variant="link" className="fs-content-margin__reset" onClick={onReset}>
+      <div className="bl-content-margin__field">
+        <div className="bl-content-margin__header">
+          <span className="bl-content-margin__side-label">{sideLabel}</span>
+          <Button variant="link" className="bl-content-margin__reset" onClick={onReset}>
             Reset
           </Button>
         </div>
@@ -108,23 +108,23 @@ export function ContentMarginControl({ option, attributes, onChange }) {
   };
 
   const renderActionButton = (icon, label, onClick, className) => (
-    <Button variant="link" className={'fs-content-margin__action ' + className} onClick={onClick}>
-      <span className={'fs-icon -icon-' + icon} aria-hidden="true" />
+    <Button variant="link" className={'bl-content-margin__action ' + className} onClick={onClick}>
+      <span className={'bl-icon -icon-' + icon} aria-hidden="true" />
       {label}
     </Button>
   );
 
   return (
-    <div className="fs-content-margin">
-      {option.label ? <span className="fs-content-margin__label">{option.label}</span> : null}
+    <div className="bl-content-margin">
+      {option.label ? <span className="bl-content-margin__label">{option.label}</span> : null}
 
       {renderSizeControl(isLinked ? 'Oben und Unten' : 'Oben', displayTop, setTop, resetTop)}
 
       {isLinked
-        ? renderActionButton('link-off', 'Unten', revealBottom, 'fs-content-margin__action--reveal')
+        ? renderActionButton('link-off', 'Unten', revealBottom, 'bl-content-margin__action--reveal')
         : (
           <>
-            {renderActionButton('link', 'Verknüpfen', relink, 'fs-content-margin__action--relink')}
+            {renderActionButton('link', 'Verknüpfen', relink, 'bl-content-margin__action--relink')}
             {renderSizeControl('Unten', displayBottom, setBottom, resetBottom)}
           </>
         )}

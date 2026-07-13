@@ -503,35 +503,35 @@ function bl_dashboard_render_visits_summary_90d_box(array $s, array $visit_frequ
     $apv_new = $vf['nb_actions_per_visit_new'] ?? null;
     $apv_ret = $vf['nb_actions_per_visit_returning'] ?? null;
 ?>
-    <div class="fs-chart-container">
-        <ul class="fs-visits-summary-list">
+    <div class="bl-chart-container">
+        <ul class="bl-visits-summary-list">
             <li>
-                <span class="fs-visits-summary-list__label"><?= esc_html__('Average visit duration', 'baselayer') ?></span>
-                <span class="fs-visits-summary-list__value"><?= esc_html(bl_dashboard_format_duration_seconds($avg)) ?></span>
+                <span class="bl-visits-summary-list__label"><?= esc_html__('Average visit duration', 'baselayer') ?></span>
+                <span class="bl-visits-summary-list__value"><?= esc_html(bl_dashboard_format_duration_seconds($avg)) ?></span>
             </li>
             <li>
-                <span class="fs-visits-summary-list__label"><?= esc_html__('Bounce rate', 'baselayer') ?></span>
-                <span class="fs-visits-summary-list__value"><?= $bounce_pct === null ? '–' : esc_html(sprintf(__('%d%%', 'baselayer'), $bounce_pct)) ?></span>
+                <span class="bl-visits-summary-list__label"><?= esc_html__('Bounce rate', 'baselayer') ?></span>
+                <span class="bl-visits-summary-list__value"><?= $bounce_pct === null ? '–' : esc_html(sprintf(__('%d%%', 'baselayer'), $bounce_pct)) ?></span>
             </li>
             <li>
-                <span class="fs-visits-summary-list__label"><?= esc_html__(
+                <span class="bl-visits-summary-list__label"><?= esc_html__(
                                                                 /* translators: VisitFrequency: share of all visits (90 days) that are from returning visitors; value column shows e.g. 25%%. */
                                                                 'Returning visitors',
                                                                 'baselayer'
                                                             ) ?></span>
-                <span class="fs-visits-summary-list__value"><?= $ret_pct === null ? '–' : esc_html($ret_pct) . ' %' ?></span>
+                <span class="bl-visits-summary-list__value"><?= $ret_pct === null ? '–' : esc_html($ret_pct) . ' %' ?></span>
             </li>
             <li>
-                <span class="fs-visits-summary-list__label"><?= esc_html__('Actions per visit', 'baselayer') ?></span>
-                <span class="fs-visits-summary-list__value"><?= $apv === null ? '–' : esc_html(number_format_i18n($apv, 1)) ?></span>
+                <span class="bl-visits-summary-list__label"><?= esc_html__('Actions per visit', 'baselayer') ?></span>
+                <span class="bl-visits-summary-list__value"><?= $apv === null ? '–' : esc_html(number_format_i18n($apv, 1)) ?></span>
             </li>
             <li>
-                <span class="fs-visits-summary-list__label"><?= esc_html__('Actions per visit (new visitors)', 'baselayer') ?></span>
-                <span class="fs-visits-summary-list__value"><?= $apv_new === null ? '–' : esc_html(number_format_i18n((float) $apv_new, 1)) ?></span>
+                <span class="bl-visits-summary-list__label"><?= esc_html__('Actions per visit (new visitors)', 'baselayer') ?></span>
+                <span class="bl-visits-summary-list__value"><?= $apv_new === null ? '–' : esc_html(number_format_i18n((float) $apv_new, 1)) ?></span>
             </li>
             <li>
-                <span class="fs-visits-summary-list__label"><?= esc_html__('Actions per visit (returning visitors)', 'baselayer') ?></span>
-                <span class="fs-visits-summary-list__value"><?= $apv_ret === null ? '–' : esc_html(number_format_i18n((float) $apv_ret, 1)) ?></span>
+                <span class="bl-visits-summary-list__label"><?= esc_html__('Actions per visit (returning visitors)', 'baselayer') ?></span>
+                <span class="bl-visits-summary-list__value"><?= $apv_ret === null ? '–' : esc_html(number_format_i18n((float) $apv_ret, 1)) ?></span>
             </li>
         </ul>
     </div>
@@ -607,14 +607,14 @@ function bl_dashboard_render_top_pages_table(array $pages): void
     }
     $max_hits = bl_dashboard_top_pages_max_hits($pages);
 ?>
-    <table class="widefat striped fs-stats-table fs-top-pages-table" style="margin: 0;">
+    <table class="widefat striped bl-stats-table bl-top-pages-table" style="margin: 0;">
         <thead>
             <tr>
-                <th scope="col" class="fs-top-pages-table__rank">
+                <th scope="col" class="bl-top-pages-table__rank">
                     <span class="screen-reader-text"><?= esc_html__('Rank', 'baselayer') ?></span>
                 </th>
-                <th scope="col" class="fs-top-pages-table__page"><?= esc_html__('Page', 'baselayer') ?></th>
-                <th scope="col" class="fs-stats-metric fs-stats-metric--pageviews"><?= esc_html__('Hits', 'baselayer') ?></th>
+                <th scope="col" class="bl-top-pages-table__page"><?= esc_html__('Page', 'baselayer') ?></th>
+                <th scope="col" class="bl-stats-metric bl-stats-metric--pageviews"><?= esc_html__('Hits', 'baselayer') ?></th>
             </tr>
         </thead>
         <tbody>
@@ -629,19 +629,19 @@ function bl_dashboard_render_top_pages_table(array $pages): void
                 $w = $max_hits <= 0 ? 0 : (int) min(100, max(0, (int) round(($hits / $max_hits) * 100)));
             ?>
                 <tr>
-                    <td class="fs-top-pages-table__rank"><?= esc_html((string) $i) ?></td>
-                    <td class="fs-top-pages-table__page">
+                    <td class="bl-top-pages-table__rank"><?= esc_html((string) $i) ?></td>
+                    <td class="bl-top-pages-table__page">
                         <?php if ($url !== '') : ?>
                             <a href="<?= esc_url($url) ?>" target="_blank" rel="noopener noreferrer" title="<?= esc_attr($text) ?>"><?= esc_html($text) ?></a>
                         <?php else : ?>
                             <span title="<?= esc_attr($text) ?>"><?= esc_html($text) ?></span>
                         <?php endif; ?>
                     </td>
-                    <td class="fs-stats-metric fs-stats-metric--pageviews">
-                        <span class="fs-stats-metric__value"><?= esc_html(number_format_i18n($hits)) ?></span>
-                        <span class="fs-stats-metric__bar" aria-hidden="true">
-                            <span class="fs-stats-metric__track">
-                                <span class="fs-stats-metric__fill fs-stats-metric__fill--pageviews" style="width: <?= $w ?>%; background-color: <?= esc_attr(bl_dashboard_get_analytics_settings()['colors'][2]['fill']) ?>;"></span>
+                    <td class="bl-stats-metric bl-stats-metric--pageviews">
+                        <span class="bl-stats-metric__value"><?= esc_html(number_format_i18n($hits)) ?></span>
+                        <span class="bl-stats-metric__bar" aria-hidden="true">
+                            <span class="bl-stats-metric__track">
+                                <span class="bl-stats-metric__fill bl-stats-metric__fill--pageviews" style="width: <?= $w ?>%; background-color: <?= esc_attr(bl_dashboard_get_analytics_settings()['colors'][2]['fill']) ?>;"></span>
                             </span>
                         </span>
                     </td>
@@ -662,14 +662,14 @@ function bl_dashboard_render_top_referrers_table(array $referrers): void
     }
     $max_hits = bl_dashboard_top_pages_max_hits($referrers);
 ?>
-    <table class="widefat striped fs-stats-table fs-top-pages-table" style="margin: 0;">
+    <table class="widefat striped bl-stats-table bl-top-pages-table" style="margin: 0;">
         <thead>
             <tr>
-                <th scope="col" class="fs-top-pages-table__rank">
+                <th scope="col" class="bl-top-pages-table__rank">
                     <span class="screen-reader-text"><?= esc_html__('Rank', 'baselayer') ?></span>
                 </th>
-                <th scope="col" class="fs-top-pages-table__page"><?= esc_html__('Referrer', 'baselayer') ?></th>
-                <th scope="col" class="fs-stats-metric fs-stats-metric--pageviews"><?= esc_html__('Visits', 'baselayer') ?></th>
+                <th scope="col" class="bl-top-pages-table__page"><?= esc_html__('Referrer', 'baselayer') ?></th>
+                <th scope="col" class="bl-stats-metric bl-stats-metric--pageviews"><?= esc_html__('Visits', 'baselayer') ?></th>
             </tr>
         </thead>
         <tbody>
@@ -684,19 +684,19 @@ function bl_dashboard_render_top_referrers_table(array $referrers): void
                 $w = $max_hits <= 0 ? 0 : (int) min(100, max(0, (int) round(($hits / $max_hits) * 100)));
             ?>
                 <tr>
-                    <td class="fs-top-pages-table__rank"><?= esc_html((string) $i) ?></td>
-                    <td class="fs-top-pages-table__page">
+                    <td class="bl-top-pages-table__rank"><?= esc_html((string) $i) ?></td>
+                    <td class="bl-top-pages-table__page">
                         <?php if ($url !== '') : ?>
                             <a href="<?= esc_url($url) ?>" target="_blank" rel="noopener noreferrer" title="<?= esc_attr($text) ?>"><?= esc_html($text) ?></a>
                         <?php else : ?>
                             <span title="<?= esc_attr($text) ?>"><?= esc_html($text) ?></span>
                         <?php endif; ?>
                     </td>
-                    <td class="fs-stats-metric fs-stats-metric--pageviews">
-                        <span class="fs-stats-metric__value"><?= esc_html(number_format_i18n($hits)) ?></span>
-                        <span class="fs-stats-metric__bar" aria-hidden="true">
-                            <span class="fs-stats-metric__track">
-                                <span class="fs-stats-metric__fill fs-stats-metric__fill--pageviews" style="width: <?= $w ?>%; background-color: <?= esc_attr(bl_dashboard_get_analytics_settings()['colors'][2]['fill']) ?>;"></span>
+                    <td class="bl-stats-metric bl-stats-metric--pageviews">
+                        <span class="bl-stats-metric__value"><?= esc_html(number_format_i18n($hits)) ?></span>
+                        <span class="bl-stats-metric__bar" aria-hidden="true">
+                            <span class="bl-stats-metric__track">
+                                <span class="bl-stats-metric__fill bl-stats-metric__fill--pageviews" style="width: <?= $w ?>%; background-color: <?= esc_attr(bl_dashboard_get_analytics_settings()['colors'][2]['fill']) ?>;"></span>
                             </span>
                         </span>
                     </td>
@@ -1371,12 +1371,12 @@ function bl_dashboard_render_stats_metric_cells(array $row, array $maxima): void
         $width = (int) ($w[$k] ?? 0);
         $cls = $cell['class'];
     ?>
-        <td class="fs-stats-metric fs-stats-metric--<?= esc_attr($cls) ?>">
-            <span class="fs-stats-metric__value"><?= esc_html(number_format_i18n($val)) ?></span>
-            <span class="fs-stats-metric__bar" aria-hidden="true">
-                <span class="fs-stats-metric__track">
+        <td class="bl-stats-metric bl-stats-metric--<?= esc_attr($cls) ?>">
+            <span class="bl-stats-metric__value"><?= esc_html(number_format_i18n($val)) ?></span>
+            <span class="bl-stats-metric__bar" aria-hidden="true">
+                <span class="bl-stats-metric__track">
                     <span
-                        class="fs-stats-metric__fill fs-stats-metric__fill--<?= esc_attr($cls) ?>"
+                        class="bl-stats-metric__fill bl-stats-metric__fill--<?= esc_attr($cls) ?>"
                         style="width: <?= $width ?>%; background-color: <?= esc_attr(bl_dashboard_get_analytics_settings()['colors'][$index]['fill']) ?>;"></span>
                 </span>
             </span>
@@ -1511,7 +1511,7 @@ function bl_dashboard_line_chart_config(array $labels, array $datasets): array
 
 function bl_dashboard_stats_page_slug(): string
 {
-    return 'fs-analytics';
+    return 'bl-analytics';
 }
 
 function bl_dashboard_statistics_url(): string
@@ -1713,7 +1713,7 @@ function bl_render_dashboard_statistics_page(): void
         ? array_merge(bl_dashboard_default_visit_frequency_90d(), $series['visit_frequency_90d'])
         : bl_dashboard_default_visit_frequency_90d();
     ?>
-    <div class="wrap fs-analytics-page">
+    <div class="wrap bl-analytics-page">
         <h1><?= esc_html__('Analytics', 'baselayer') ?></h1>
         <?php
         $matomo_err = bl_dashboard_get_last_matomo_error();
@@ -1733,7 +1733,7 @@ function bl_render_dashboard_statistics_page(): void
         $alltime_visits = (int) ($alltime['nb_visits'] ?? 0);
         $since_ts = isset($alltime['since_ts']) && $alltime['since_ts'] !== null ? (int) $alltime['since_ts'] : 0;
         ?>
-        <div class="notice inline fs-analytics-summary-notice">
+        <div class="notice inline bl-analytics-summary-notice">
             <div style="margin: 0; display: flex; flex-wrap: wrap; gap: 8px;">
                 <div>
                     <strong><?= esc_html__('Total', 'baselayer') ?>:</strong>
@@ -1742,7 +1742,7 @@ function bl_render_dashboard_statistics_page(): void
                         · <a href="<?= esc_url($matomo_login_url) ?>" target="_blank" rel="noopener noreferrer"><?= esc_html__('Open Matomo', 'baselayer') ?></a>
                     <?php endif; ?>
                     <?php if ($since_ts > 0) : ?>
-                        <div class="fs-analytics-summary-since" style="margin-top: 0;">
+                        <div class="bl-analytics-summary-since" style="margin-top: 0;">
                             <?= esc_html(sprintf(
                                 /* translators: %s: first date visits are recorded from (localized) */
                                 __('Since %s', 'baselayer'),
@@ -1759,22 +1759,22 @@ function bl_render_dashboard_statistics_page(): void
 
         <h2 style="margin-top: 32px; margin-bottom: 12px;"><?= esc_html__('Daily visits and page views (last 8 days)', 'baselayer') ?></h2>
 
-        <div class="fs-chart-container">
+        <div class="bl-chart-container">
             <canvas
-                id="fs-stats-chart"
+                id="bl-stats-chart"
                 height="250"
                 data-chart="line"
                 data-chart-config="<?= esc_attr(wp_json_encode($line_chart_config)) ?>"></canvas>
         </div>
         <?php $daily_metric_maxima = bl_dashboard_stats_metric_maxima($rows); ?>
-        <div class="fs-chart-container fs-chart-container--table">
-            <table class="widefat striped fs-stats-table" style="margin: 0;">
+        <div class="bl-chart-container bl-chart-container--table">
+            <table class="widefat striped bl-stats-table" style="margin: 0;">
                 <thead>
                     <tr>
                         <th scope="col"><?= esc_html__('Date', 'baselayer') ?></th>
-                        <th scope="col" class="fs-stats-metric fs-stats-metric--unique"><?= esc_html__('Unique visitors', 'baselayer') ?></th>
-                        <th scope="col" class="fs-stats-metric fs-stats-metric--visits"><?= esc_html__('Visits', 'baselayer') ?></th>
-                        <th scope="col" class="fs-stats-metric fs-stats-metric--pageviews"><?= esc_html__('Page views', 'baselayer') ?></th>
+                        <th scope="col" class="bl-stats-metric bl-stats-metric--unique"><?= esc_html__('Unique visitors', 'baselayer') ?></th>
+                        <th scope="col" class="bl-stats-metric bl-stats-metric--visits"><?= esc_html__('Visits', 'baselayer') ?></th>
+                        <th scope="col" class="bl-stats-metric bl-stats-metric--pageviews"><?= esc_html__('Page views', 'baselayer') ?></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -1788,7 +1788,7 @@ function bl_render_dashboard_statistics_page(): void
                             <td>
                                 <?= esc_html($label) ?>
                                 <?php if ($is_today) : ?>
-                                    <span class="fs-stats-period-current"><?= esc_html__('(Today)', 'baselayer') ?></span>
+                                    <span class="bl-stats-period-current"><?= esc_html__('(Today)', 'baselayer') ?></span>
                                 <?php endif; ?>
                             </td>
                             <?php bl_dashboard_render_stats_metric_cells($r, $daily_metric_maxima); ?>
@@ -1800,22 +1800,22 @@ function bl_render_dashboard_statistics_page(): void
 
         <h2 style="margin-top: 32px; margin-bottom: 12px;"><?= esc_html__('Weekly visits and page views (last 8 weeks)', 'baselayer') ?></h2>
         <?php if (!empty($week_chart_config)) : ?>
-            <div class="fs-chart-container">
+            <div class="bl-chart-container">
                 <canvas
-                    id="fs-stats-chart-weeks"
+                    id="bl-stats-chart-weeks"
                     height="250"
                     data-chart="line"
                     data-chart-config="<?= esc_attr(wp_json_encode($week_chart_config)) ?>"></canvas>
             </div>
             <?php $weekly_metric_maxima = bl_dashboard_stats_metric_maxima($week_rows); ?>
-            <div class="fs-chart-container fs-chart-container--table">
-                <table class="widefat striped fs-stats-table" style="margin: 0;">
+            <div class="bl-chart-container bl-chart-container--table">
+                <table class="widefat striped bl-stats-table" style="margin: 0;">
                     <thead>
                         <tr>
                             <th scope="col"><?= esc_html__('Week', 'baselayer') ?></th>
-                            <th scope="col" class="fs-stats-metric fs-stats-metric--unique"><?= esc_html__('Unique visitors', 'baselayer') ?></th>
-                            <th scope="col" class="fs-stats-metric fs-stats-metric--visits"><?= esc_html__('Visits', 'baselayer') ?></th>
-                            <th scope="col" class="fs-stats-metric fs-stats-metric--pageviews"><?= esc_html__('Page views', 'baselayer') ?></th>
+                            <th scope="col" class="bl-stats-metric bl-stats-metric--unique"><?= esc_html__('Unique visitors', 'baselayer') ?></th>
+                            <th scope="col" class="bl-stats-metric bl-stats-metric--visits"><?= esc_html__('Visits', 'baselayer') ?></th>
+                            <th scope="col" class="bl-stats-metric bl-stats-metric--pageviews"><?= esc_html__('Page views', 'baselayer') ?></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1837,14 +1837,14 @@ function bl_render_dashboard_statistics_page(): void
                                     <?php if ($week_range !== '') : ?>
                                         <?= esc_html($week_label) ?>
                                         <?php if ($is_current_week) : ?>
-                                            <span class="fs-stats-period-current"><?= esc_html__('(Current)', 'baselayer') ?></span>
+                                            <span class="bl-stats-period-current"><?= esc_html__('(Current)', 'baselayer') ?></span>
                                         <?php endif; ?>
                                         <br>
-                                        <span class="fs-week-range"><?= esc_html($week_range) ?></span>
+                                        <span class="bl-week-range"><?= esc_html($week_range) ?></span>
                                     <?php else : ?>
                                         <?= esc_html($week_label) ?>
                                         <?php if ($is_current_week) : ?>
-                                            <span class="fs-stats-period-current"><?= esc_html__('(Current)', 'baselayer') ?></span>
+                                            <span class="bl-stats-period-current"><?= esc_html__('(Current)', 'baselayer') ?></span>
                                         <?php endif; ?>
                                     <?php endif; ?>
                                 </td>
@@ -1856,41 +1856,41 @@ function bl_render_dashboard_statistics_page(): void
             </div>
         <?php endif; ?>
 
-        <div class="fs-chart-wrapper-flex">
-            <div class="fs-chart-container-flex">
+        <div class="bl-chart-wrapper-flex">
+            <div class="bl-chart-container-flex">
                 <h2 style="margin-top: 0; margin-bottom: 12px;"><?= esc_html__('Devices (last 90 days)', 'baselayer') ?></h2>
-                <div class="fs-chart-container">
+                <div class="bl-chart-container">
                     <canvas
-                        id="fs-stats-chart-devices"
+                        id="bl-stats-chart-devices"
                         height="236"
                         data-chart="bar"
                         data-chart-config="<?= esc_attr(wp_json_encode($devices_chart_config)) ?>"></canvas>
                 </div>
             </div>
-            <div class="fs-chart-container-flex">
+            <div class="bl-chart-container-flex">
                 <h2 style="margin-top: 0; margin-bottom: 12px;"><?= esc_html__('Overview (last 90 days)', 'baselayer') ?></h2>
                 <?php bl_dashboard_render_visits_summary_90d_box($visits_summary_90d, $visit_frequency_90d); ?>
             </div>
         </div>
 
-        <div class="fs-chart-wrapper-flex fs-chart-wrapper-flex--pages-referrers">
-            <div class="fs-chart-container-flex">
+        <div class="bl-chart-wrapper-flex bl-chart-wrapper-flex--pages-referrers">
+            <div class="bl-chart-container-flex">
                 <h2 style="margin-top: 0; margin-bottom: 12px;"><?= esc_html__('Top 10 pages (last 90 days)', 'baselayer') ?></h2>
-                <div class="fs-chart-container fs-chart-container--table">
+                <div class="bl-chart-container bl-chart-container--table">
                     <?php if (!empty($top_pages)) : ?>
                         <?php bl_dashboard_render_top_pages_table($top_pages); ?>
                     <?php else : ?>
-                        <p class="fs-top-pages-empty"><?= esc_html__('No data available.', 'baselayer') ?></p>
+                        <p class="bl-top-pages-empty"><?= esc_html__('No data available.', 'baselayer') ?></p>
                     <?php endif; ?>
                 </div>
             </div>
-            <div class="fs-chart-container-flex">
+            <div class="bl-chart-container-flex">
                 <h2 style="margin-top: 0; margin-bottom: 12px;"><?= esc_html__('Top 10 referrers (last 90 days)', 'baselayer') ?></h2>
-                <div class="fs-chart-container fs-chart-container--table">
+                <div class="bl-chart-container bl-chart-container--table">
                     <?php if (!empty($top_referrers)) : ?>
                         <?php bl_dashboard_render_top_referrers_table($top_referrers); ?>
                     <?php else : ?>
-                        <p class="fs-top-pages-empty"><?= esc_html__('No data available.', 'baselayer') ?></p>
+                        <p class="bl-top-pages-empty"><?= esc_html__('No data available.', 'baselayer') ?></p>
                     <?php endif; ?>
                 </div>
             </div>

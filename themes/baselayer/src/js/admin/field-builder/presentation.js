@@ -37,7 +37,7 @@ export function renderPresentation(container, data = {}) {
   });
 
   const customWrap = el('div', {
-    className: 'fs-field-builder__width-custom-wrap',
+    className: 'bl-field-builder__width-custom-wrap',
     hidden: width !== 'custom' ? true : undefined,
   });
   const customInput = mark(
@@ -77,9 +77,9 @@ export function renderPresentation(container, data = {}) {
  * @returns {object|null}
  */
 export function serializePresentation(fieldRoot) {
-  const widthEl = fieldRoot.querySelector('[data-fs-fb="presentation_width"]');
-  const customEl = fieldRoot.querySelector('[data-fs-fb="presentation_width_custom"]');
-  const descEl = fieldRoot.querySelector('[data-fs-fb="presentation_description"]');
+  const widthEl = fieldRoot.querySelector('[data-bl-fb="presentation_width"]');
+  const customEl = fieldRoot.querySelector('[data-bl-fb="presentation_width_custom"]');
+  const descEl = fieldRoot.querySelector('[data-bl-fb="presentation_description"]');
   const presentation = {};
 
   const widthVal = widthEl ? widthEl.value : '';

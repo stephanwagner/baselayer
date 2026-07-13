@@ -227,11 +227,11 @@ function bl_developer_perf_scale_html(float $value, $metric_or_config, array $op
 		? sprintf(/* translators: 1: metric name, 2: value, 3: band label */__('%1$s %2$s: %3$s', 'baselayer'), $aria_metric, $value . $unit, $label)
 		: '';
 
-	$bar_style = "--fs-perf-pct: {$pct}; --fs-perf-s1: {$stops[0]}; --fs-perf-s2: {$stops[1]}; --fs-perf-s3: {$stops[2]}; --fs-perf-s4: {$stops[3]};";
-	$out = '<span class="fs-perf-scale' . ($compact ? ' fs-perf-scale--compact' : '') . '" style="' . esc_attr($bar_style) . '"' . ($aria ? ' role="img" aria-label="' . esc_attr($aria) . '"' : '') . '>';
-	$out .= '<span class="fs-perf-scale__inner">';
-	$out .= '<span class="fs-perf-scale__bar-wrap" aria-hidden="true"><span class="fs-perf-scale__bar"></span><span class="fs-perf-scale__indicator"></span></span>';
-	$out .= ' <span class="fs-perf-scale__label">' . esc_html($label) . '</span>';
+	$bar_style = "--bl-perf-pct: {$pct}; --bl-perf-s1: {$stops[0]}; --bl-perf-s2: {$stops[1]}; --bl-perf-s3: {$stops[2]}; --bl-perf-s4: {$stops[3]};";
+	$out = '<span class="bl-perf-scale' . ($compact ? ' bl-perf-scale--compact' : '') . '" style="' . esc_attr($bar_style) . '"' . ($aria ? ' role="img" aria-label="' . esc_attr($aria) . '"' : '') . '>';
+	$out .= '<span class="bl-perf-scale__inner">';
+	$out .= '<span class="bl-perf-scale__bar-wrap" aria-hidden="true"><span class="bl-perf-scale__bar"></span><span class="bl-perf-scale__indicator"></span></span>';
+	$out .= ' <span class="bl-perf-scale__label">' . esc_html($label) . '</span>';
 	$out .= '</span></span>';
 	return $out;
 }
@@ -351,13 +351,13 @@ add_action('admin_bar_menu', function ($admin_bar): void {
 		$wp_purge_url = wp_nonce_url(admin_url('admin-post.php?action=bl_purge_cache'), 'bl_purge_cache');
 		$purge_icon = '<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 100%;" width="24px" height="24px" viewBox="0 -960 960 960" fill="currentColor"><path d="M480-160q-134 0-227-93t-93-227q0-134 93-227t227-93q69 0 132 28.5T720-690v-70q0-17 11.5-28.5T760-800q17 0 28.5 11.5T800-760v200q0 17-11.5 28.5T760-520H560q-17 0-28.5-11.5T520-560q0-17 11.5-28.5T560-600h128q-32-56-87.5-88T480-720q-100 0-170 70t-70 170q0 100 70 170t170 70q68 0 124.5-34.5T692-367q8-14 22.5-19.5t29.5-.5q16 5 23 21t-1 30q-41 80-117 128t-169 48Z"/></svg>';
 		$admin_bar->add_node([
-			'id'     => 'fs-purge-cache',
+			'id'     => 'bl-purge-cache',
 			'parent' => 'top-secondary',
 			'title'  => $purge_icon,
 		]);
 		$admin_bar->add_node([
-			'parent' => 'fs-purge-cache',
-			'id'     => 'fs-purge-cache-page',
+			'parent' => 'bl-purge-cache',
+			'id'     => 'bl-purge-cache-page',
 			'title'  => __('Purge page cache', 'baselayer'),
 			'href'   => $wp_purge_url,
 		]);
@@ -373,7 +373,7 @@ add_action('admin_bar_menu', function ($admin_bar): void {
 			: '';
 	};
 	$admin_bar_row = function (string $label, string $value_text, float $value, string $metric, string $unit = '') use ($scale): string {
-		return '<span class="fs-perf-adminbar-row"><span class="fs-perf-adminbar-row__label">' . esc_html($label) . ': ' . esc_html($value_text) . '</span>' . $scale($value, $metric, $unit, $label, false) . '</span>';
+		return '<span class="bl-perf-adminbar-row"><span class="bl-perf-adminbar-row__label">' . esc_html($label) . ': ' . esc_html($value_text) . '</span>' . $scale($value, $metric, $unit, $label, false) . '</span>';
 	};
 
 	$perf_icon = '<svg xmlns="http://www.w3.org/2000/svg" style="width: 18px; height: 100%;" width="24px" height="24px" viewBox="0 -960 960 960" fill="currentColor"><path d="M245-474q26-66 62.5-127T390-716l-52-11q-20-4-39 2t-33 20L140-579q-15 15-11.5 36t23.5 29l93 40Zm588-390q-106-5-201.5 41T461-702q-48 48-84.5 104T313-480q-5 13-5 26.5t10 23.5l125 125q10 10 23.5 10t26.5-5q62-27 118-63.5T715-448q75-75 121-170.5T877-820q0-8-4-16t-10-14q-6-6-14-10t-16-4ZM556-622.5q0-33.5 23-56.5t56.5-23q33.5 0 56.5 23t23 56.5q0 33.5-23 56.5t-56.5 23q-33.5 0-56.5-23t-23-56.5ZM487-232l40 93q8 20 29 24t36-11l126-126q14-14 20-33.5t2-39.5l-10-52q-55 46-115.5 82.5T487-232Zm-325-86q35-35 85-35.5t85 34.5q35 35 35 85t-35 85q-48 48-113.5 57T87-74q9-66 18.5-131.5T162-318Z"/></svg>';
@@ -384,7 +384,7 @@ add_action('admin_bar_menu', function ($admin_bar): void {
 			'title'  => $perf_icon,
 			'href'   => admin_url('options-general.php?page=' . bl_developer_settings_page_slug('system')),
 			'meta'   => [
-				'class' => 'fs-perf-adminbar-menupop',
+				'class' => 'bl-perf-adminbar-menupop',
 			],
 		]);
 
@@ -430,7 +430,7 @@ function bl_developer_perf_pinned_panel_render(): void
 	}
 	$perf = bl_developer_perf_metrics();
 	$panel_css = '
-		.bl-perf-pinned-panel { --fs-perf-s1: 8%; --fs-perf-s2: 20%; --fs-perf-s3: 40%; --fs-perf-s4: 80%; }
+		.bl-perf-pinned-panel { --bl-perf-s1: 8%; --bl-perf-s2: 20%; --bl-perf-s3: 40%; --bl-perf-s4: 80%; }
 		.bl-perf-pinned-panel { display: none; position: fixed; bottom: 12px; left: 12px; z-index: 999999; max-width: calc(100vw - 24px); background: #fff; border: 1px solid #c3c4c7; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,.15); font-size: 12px; line-height: 1.4; overflow: hidden; }
 		.bl-perf-pinned-panel__header { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid #c3c4c7; background: #f0f0f1; }
 		.bl-perf-pinned-panel__title { font-weight: 600; font-size: 13px; }
@@ -457,8 +457,8 @@ function bl_developer_perf_pinned_panel_render(): void
 		.bl-perf-pinned-panel .bl-perf-scale__inner { display: inline-flex; align-items: center; gap: 8px; flex-wrap: nowrap; }
 		.bl-perf-pinned-panel .bl-perf-scale__label { order: 1; font-weight: 600; font-size: 11px; white-space: nowrap; }
 		.bl-perf-pinned-panel .bl-perf-scale__bar-wrap { order: 2; position: relative; display: inline-block; width: 64px; height: 10px; }
-		.bl-perf-pinned-panel .bl-perf-scale__bar { position: absolute; inset: 0; height: 6px; top: 2px; border-radius: 3px; background: linear-gradient(to right, #22c55e 0%, #22c55e var(--fs-perf-s1), #84cc16 var(--fs-perf-s1), #84cc16 var(--fs-perf-s2), #f97316 var(--fs-perf-s2), #f97316 var(--fs-perf-s3), #ef4444 var(--fs-perf-s3), #ef4444 var(--fs-perf-s4), #b91c1c var(--fs-perf-s4), #b91c1c 100%); }
-		.bl-perf-pinned-panel .bl-perf-scale__indicator { position: absolute; top: 0; bottom: 0; left: calc(var(--fs-perf-pct, 0) * 1%); transform: translateX(-50%); width: 2px; border-radius: 2px; pointer-events: none; background: #fff; border: 1px solid #000; box-sizing: content-box; }
+		.bl-perf-pinned-panel .bl-perf-scale__bar { position: absolute; inset: 0; height: 6px; top: 2px; border-radius: 3px; background: linear-gradient(to right, #22c55e 0%, #22c55e var(--bl-perf-s1), #84cc16 var(--bl-perf-s1), #84cc16 var(--bl-perf-s2), #f97316 var(--bl-perf-s2), #f97316 var(--bl-perf-s3), #ef4444 var(--bl-perf-s3), #ef4444 var(--bl-perf-s4), #b91c1c var(--bl-perf-s4), #b91c1c 100%); }
+		.bl-perf-pinned-panel .bl-perf-scale__indicator { position: absolute; top: 0; bottom: 0; left: calc(var(--bl-perf-pct, 0) * 1%); transform: translateX(-50%); width: 2px; border-radius: 2px; pointer-events: none; background: #fff; border: 1px solid #000; box-sizing: content-box; }
 		.bl-perf-pinned-panel__tab { display: none; padding: 6px 12px; background: #f0f0f1; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; }
 	';
 	$scale_config = [
@@ -481,32 +481,32 @@ function bl_developer_perf_pinned_panel_render(): void
 	];
 	$perf_data_attr = ' data-perf-time="' . esc_attr((string) $perf['time']) . '" data-perf-memory="' . esc_attr((string) $perf['memory']) . '" data-perf-queries="' . esc_attr((string) $perf['queries']) . '" data-perf-hooks="' . esc_attr((string) $perf['hooks']) . '"';
 ?>
-	<div id="fs-perf-pinned-panel" class="fs-perf-pinned-panel" <?= $perf_data_attr ?>>
-		<script type="application/json" id="fs-perf-scale-config">
+	<div id="bl-perf-pinned-panel" class="bl-perf-pinned-panel" <?= $perf_data_attr ?>>
+		<script type="application/json" id="bl-perf-scale-config">
 			<?= wp_json_encode($scale_config) ?>
 		</script>
 		<style>
 			<?= $panel_css ?>
 		</style>
-		<div class="fs-perf-pinned-panel__content">
-			<div class="fs-perf-pinned-panel__header">
-				<div class="fs-perf-pinned-panel__title"><?= esc_html__('Performance', 'baselayer') ?></div>
-				<div class="fs-perf-pinned-panel__minimize" data-fs-perf-minimize>
+		<div class="bl-perf-pinned-panel__content">
+			<div class="bl-perf-pinned-panel__header">
+				<div class="bl-perf-pinned-panel__title"><?= esc_html__('Performance', 'baselayer') ?></div>
+				<div class="bl-perf-pinned-panel__minimize" data-bl-perf-minimize>
 					<?= esc_html__('Minimize', 'baselayer') ?>
 				</div>
 			</div>
-			<div class="fs-perf-pinned-panel__body">
+			<div class="bl-perf-pinned-panel__body">
 				<?php $t = bl_developer_perf_format_time((float) $perf['time']); ?>
-				<table class="fs-perf-pinned-panel__table widefat striped" role="presentation">
+				<table class="bl-perf-pinned-panel__table widefat striped" role="presentation">
 					<thead>
 						<tr>
 							<th scope="col"></th>
 							<th scope="col"><?= esc_html__('Current', 'baselayer') ?></th>
-							<th scope="col" colspan="2" class="fs-perf-pinned-panel__th-avg">
-								<div class="fs-perf-pinned-panel__avg-header">
-									<span class="fs-perf-pinned-panel__avg-title"><?= esc_html__('Average', 'baselayer') ?></span>
-									<span id="fs-perf-pages-caption" class="fs-perf-pinned-panel__pages"></span>
-									<div class="fs-perf-clear-history" data-fs-perf-clear-history><?= esc_html(_x('Clear', 'performance panel history', 'baselayer')) ?></div>
+							<th scope="col" colspan="2" class="bl-perf-pinned-panel__th-avg">
+								<div class="bl-perf-pinned-panel__avg-header">
+									<span class="bl-perf-pinned-panel__avg-title"><?= esc_html__('Average', 'baselayer') ?></span>
+									<span id="bl-perf-pages-caption" class="bl-perf-pinned-panel__pages"></span>
+									<div class="bl-perf-clear-history" data-bl-perf-clear-history><?= esc_html(_x('Clear', 'performance panel history', 'baselayer')) ?></div>
 								</div>
 							</th>
 						</tr>
@@ -515,36 +515,36 @@ function bl_developer_perf_pinned_panel_render(): void
 						<tr>
 							<th scope="row"><?= esc_html__('Execution time', 'baselayer') ?></th>
 							<td><strong><?= esc_html($t['value']) ?> <?= esc_html($t['unit']) ?></strong></td>
-							<td id="fs-perf-avg-time" class="fs-perf-pinned-panel__avg-cell">–</td>
-							<td id="fs-perf-avg-scale-time" class="fs-perf-pinned-panel__scale-cell">–</td>
+							<td id="bl-perf-avg-time" class="bl-perf-pinned-panel__avg-cell">–</td>
+							<td id="bl-perf-avg-scale-time" class="bl-perf-pinned-panel__scale-cell">–</td>
 						</tr>
 						<tr>
 							<th scope="row"><?= esc_html__('Peak memory', 'baselayer') ?></th>
 							<td><strong><?= esc_html((string) $perf['memory']) ?> MB</strong></td>
-							<td id="fs-perf-avg-memory" class="fs-perf-pinned-panel__avg-cell">–</td>
-							<td id="fs-perf-avg-scale-memory" class="fs-perf-pinned-panel__scale-cell">–</td>
+							<td id="bl-perf-avg-memory" class="bl-perf-pinned-panel__avg-cell">–</td>
+							<td id="bl-perf-avg-scale-memory" class="bl-perf-pinned-panel__scale-cell">–</td>
 						</tr>
 						<tr>
 							<th scope="row"><?= esc_html__('DB queries', 'baselayer') ?></th>
 							<td><strong><?= esc_html((string) $perf['queries']) ?></strong></td>
-							<td id="fs-perf-avg-queries" class="fs-perf-pinned-panel__avg-cell">–</td>
-							<td id="fs-perf-avg-scale-queries" class="fs-perf-pinned-panel__scale-cell">–</td>
+							<td id="bl-perf-avg-queries" class="bl-perf-pinned-panel__avg-cell">–</td>
+							<td id="bl-perf-avg-scale-queries" class="bl-perf-pinned-panel__scale-cell">–</td>
 						</tr>
 						<tr>
 							<th scope="row"><?= esc_html__('Hooks fired', 'baselayer') ?></th>
 							<td><strong><?= esc_html((string) $perf['hooks']) ?></strong></td>
-							<td id="fs-perf-avg-hooks" class="fs-perf-pinned-panel__avg-cell">–</td>
-							<td id="fs-perf-avg-scale-hooks" class="fs-perf-pinned-panel__scale-cell">–</td>
+							<td id="bl-perf-avg-hooks" class="bl-perf-pinned-panel__avg-cell">–</td>
+							<td id="bl-perf-avg-scale-hooks" class="bl-perf-pinned-panel__scale-cell">–</td>
 						</tr>
 					</tbody>
 				</table>
 			</div>
 		</div>
-		<div class="fs-perf-pinned-panel__tab"><?= esc_html__('Performance', 'baselayer') ?></div>
+		<div class="bl-perf-pinned-panel__tab"><?= esc_html__('Performance', 'baselayer') ?></div>
 	</div>
 	<script>
 		(function() {
-			var panel = document.getElementById('fs-perf-pinned-panel');
+			var panel = document.getElementById('bl-perf-pinned-panel');
 			if (!panel) return;
 
 			var HISTORY_KEY = 'bl_perf_history';
@@ -559,7 +559,7 @@ function bl_developer_perf_pinned_panel_render(): void
 
 			var raw = null;
 			try {
-				raw = document.getElementById('fs-perf-scale-config');
+				raw = document.getElementById('bl-perf-scale-config');
 			} catch (e) {}
 			var config = raw && raw.textContent ? JSON.parse(raw.textContent) : null;
 
@@ -574,15 +574,15 @@ function bl_developer_perf_pinned_panel_render(): void
 				localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
 			} catch (e) {}
 
-			var captionEl = document.getElementById('fs-perf-pages-caption');
-			var avgTimeEl = document.getElementById('fs-perf-avg-time');
-			var avgMemoryEl = document.getElementById('fs-perf-avg-memory');
-			var avgQueriesEl = document.getElementById('fs-perf-avg-queries');
-			var avgHooksEl = document.getElementById('fs-perf-avg-hooks');
-			var avgScaleTimeEl = document.getElementById('fs-perf-avg-scale-time');
-			var avgScaleMemoryEl = document.getElementById('fs-perf-avg-scale-memory');
-			var avgScaleQueriesEl = document.getElementById('fs-perf-avg-scale-queries');
-			var avgScaleHooksEl = document.getElementById('fs-perf-avg-scale-hooks');
+			var captionEl = document.getElementById('bl-perf-pages-caption');
+			var avgTimeEl = document.getElementById('bl-perf-avg-time');
+			var avgMemoryEl = document.getElementById('bl-perf-avg-memory');
+			var avgQueriesEl = document.getElementById('bl-perf-avg-queries');
+			var avgHooksEl = document.getElementById('bl-perf-avg-hooks');
+			var avgScaleTimeEl = document.getElementById('bl-perf-avg-scale-time');
+			var avgScaleMemoryEl = document.getElementById('bl-perf-avg-scale-memory');
+			var avgScaleQueriesEl = document.getElementById('bl-perf-avg-scale-queries');
+			var avgScaleHooksEl = document.getElementById('bl-perf-avg-scale-hooks');
 			var clearBtn = panel.querySelector('.bl-perf-clear-history');
 
 			if (config) {
@@ -606,12 +606,12 @@ function bl_developer_perf_pinned_panel_render(): void
 					var s3 = max > 0 ? (b[2] / max * 100).toFixed(2) + '%' : '0%';
 					var s4 = max > 0 ? (b[3] / max * 100).toFixed(2) + '%' : '0%';
 					var label = bandLabel(value, b);
-					return '<span class="fs-perf-scale" style="--fs-perf-pct:' + pct + ';--fs-perf-s1:' + s1 + ';--fs-perf-s2:' + s2 + ';--fs-perf-s3:' + s3 + ';--fs-perf-s4:' + s4 + '">' +
-						'<span class="fs-perf-scale__inner">' +
-						'<span class="fs-perf-scale__bar-wrap">' +
-						'<span class="fs-perf-scale__bar"></span>' +
-						'<span class="fs-perf-scale__indicator"></span></span>' +
-						'<span class="fs-perf-scale__label">' + label + '</span></span></span>';
+					return '<span class="bl-perf-scale" style="--bl-perf-pct:' + pct + ';--bl-perf-s1:' + s1 + ';--bl-perf-s2:' + s2 + ';--bl-perf-s3:' + s3 + ';--bl-perf-s4:' + s4 + '">' +
+						'<span class="bl-perf-scale__inner">' +
+						'<span class="bl-perf-scale__bar-wrap">' +
+						'<span class="bl-perf-scale__bar"></span>' +
+						'<span class="bl-perf-scale__indicator"></span></span>' +
+						'<span class="bl-perf-scale__label">' + label + '</span></span></span>';
 				}
 
 				function renderAverageSection(data) {
@@ -712,7 +712,7 @@ function bl_developer_perf_pinned_panel_render(): void
 				startMinimized = sessionStorage.getItem(MINIMIZED_KEY) === '1';
 			} catch (e) {}
 			setExpanded(!startMinimized);
-			var minBtn = panel.querySelector('[data-fs-perf-minimize]');
+			var minBtn = panel.querySelector('[data-bl-perf-minimize]');
 			if (minBtn) minBtn.addEventListener('click', function() {
 				setExpanded(false);
 			});

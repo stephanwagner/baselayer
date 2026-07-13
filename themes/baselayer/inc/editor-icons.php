@@ -917,7 +917,7 @@ function bl_icon_fill_names(): array
 
 	$content = (string) file_get_contents($path);
 
-	if (!preg_match('/\$fs-icon-fill:\s*\((.*?)\);/s', $content, $matches)) {
+	if (!preg_match('/\$bl-icon-fill:\s*\((.*?)\);/s', $content, $matches)) {
 		return $cache = [];
 	}
 
@@ -1132,7 +1132,7 @@ function bl_admin_icons_localize(string $hook_suffix): void
 
 	$page = isset($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
 
-	if ($page !== 'fs-developer-system') {
+	if ($page !== 'bl-developer-system') {
 		return;
 	}
 

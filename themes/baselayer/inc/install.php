@@ -163,7 +163,7 @@ function bl_render_installer(): void
               sprintf(
                 /* translators: %s: link to Theme settings page */
                 __('You can change more settings in the <a href="%s">Theme settings</a> page.', 'baselayer'),
-                esc_url(admin_url('options-general.php?page=fs-theme-settings'))
+                esc_url(admin_url('options-general.php?page=bl-theme-settings'))
               ),
               ['a' => ['href' => true]]
             ) ?></p>
@@ -171,7 +171,7 @@ function bl_render_installer(): void
 
       <p>
         <a
-          href="<?php echo esc_url(admin_url('options-general.php?page=fs-theme-settings')); ?>"
+          href="<?php echo esc_url(admin_url('options-general.php?page=bl-theme-settings')); ?>"
           class="button button-primary"><?= esc_html__('Edit theme settings', 'baselayer') ?></a>
         <a
           href="<?php echo esc_url(admin_url()); ?>"
@@ -184,7 +184,7 @@ function bl_render_installer(): void
       $has_install_errors = is_array($install_errors) && $install_errors !== [];
       if ($has_install_errors) {
         delete_transient('baselayer_install_validation_errors');
-        echo '<div class="notice notice-error fs-notice-error"><p><strong>' . esc_html__('The following errors occurred during initialization:', 'baselayer') . '</strong></p><ul>';
+        echo '<div class="notice notice-error bl-notice-error"><p><strong>' . esc_html__('The following errors occurred during initialization:', 'baselayer') . '</strong></p><ul>';
         foreach ($install_errors as $item) {
           if (is_string($item)) {
             echo '<li>' . esc_html__($item, 'baselayer') . '</li>';
@@ -220,7 +220,7 @@ function bl_render_installer(): void
       };
       ?>
 
-      <form class="baselayer__install-form" data-fs-install-form method="post" autocomplete="off">
+      <form class="baselayer__install-form" data-bl-install-form method="post" autocomplete="off">
         <?php wp_nonce_field('baselayer_install'); ?>
 
         <h2><?= esc_html__('Theme', 'baselayer') ?></h2>
@@ -230,16 +230,16 @@ function bl_render_installer(): void
             <th scope="row"><?= esc_html__('Child theme', 'baselayer') ?></th>
             <td>
               <label>
-                <input type="checkbox" name="install[create_child_theme]" value="1" <?= !empty($bl_install_val(['install', 'create_child_theme'], true)) ? ' checked' : '' ?> data-fs-checkbox-toggle="create-child-theme">
+                <input type="checkbox" name="install[create_child_theme]" value="1" <?= !empty($bl_install_val(['install', 'create_child_theme'], true)) ? ' checked' : '' ?> data-bl-checkbox-toggle="create-child-theme">
                 <?= esc_html__('Create child theme', 'baselayer') ?>
-                <span class="fs-install-recommended" style="display:inline-block;margin-left:6px;padding:1px 7px;border-radius:3px;background:#2271b1;color:#fff;font-size:11px;font-weight:600;line-height:1.7;vertical-align:1px;"><?= esc_html__('Recommended', 'baselayer') ?></span>
+                <span class="bl-install-recommended" style="display:inline-block;margin-left:6px;padding:1px 7px;border-radius:3px;background:#2271b1;color:#fff;font-size:11px;font-weight:600;line-height:1.7;vertical-align:1px;"><?= esc_html__('Recommended', 'baselayer') ?></span>
               </label>
               <p class="description"><?= esc_html__('Creates a project-specific child theme. BaseLayer remains installed for updates, while your custom styles, scripts, and templates live in the child theme.', 'baselayer') ?></p>
             </td>
           </tr>
         </table>
 
-        <div data-fs-checkbox-toggle-content="create-child-theme">
+        <div data-bl-checkbox-toggle-content="create-child-theme">
           <table class="form-table" role="presentation">
             <tr>
               <th scope="row">
@@ -304,12 +304,12 @@ function bl_render_installer(): void
             <td>
               <p style="margin-top: 0;">
                 <label>
-                  <input type="checkbox" name="install[media]" value="1" <?= !empty($bl_install_val(['install', 'media'], true)) ? ' checked' : '' ?> data-fs-checkbox-toggle="media">
+                  <input type="checkbox" name="install[media]" value="1" <?= !empty($bl_install_val(['install', 'media'], true)) ? ' checked' : '' ?> data-bl-checkbox-toggle="media">
                   <?= esc_html__('Set media sizes', 'baselayer') ?>
                 </label>
               </p>
               <p class="description"><?= esc_html__('Stores the values in WordPress media settings.', 'baselayer') ?></p>
-              <div data-fs-checkbox-toggle-content="media" style="margin-top: 12px;">
+              <div data-bl-checkbox-toggle-content="media" style="margin-top: 12px;">
                 <?php
                 $install_media_sizes = [
                   'thumbnail' => ['name' => __('Thumbnail'), 'width' => 300, 'height' => 300],
@@ -377,11 +377,11 @@ function bl_render_installer(): void
               $htaccess_config = bl_get_htaccess_config();
               if ($htaccess_config !== '') {
               ?>
-                <details class="fs-details" style="margin-top: 8px;">
+                <details class="bl-details" style="margin-top: 8px;">
                   <summary style="cursor: pointer;"><?= esc_html__('Show config', 'baselayer') ?></summary>
                   <div style="margin-top: 8px;">
                     <p class="description" style="margin-bottom: 8px;"><?= esc_html__('Be careful when editing this. Incorrect rules can break your site or make it inaccessible.', 'baselayer') ?></p>
-                    <textarea id="fs-htaccess-config" class="large-text code" rows="27" style="width: 100%; font-size: 12px; font-family: monospace;"><?= esc_textarea($htaccess_config) ?></textarea>
+                    <textarea id="bl-htaccess-config" class="large-text code" rows="27" style="width: 100%; font-size: 12px; font-family: monospace;"><?= esc_textarea($htaccess_config) ?></textarea>
                   </div>
                 </details>
               <?php
@@ -398,12 +398,12 @@ function bl_render_installer(): void
               $nginx_config = bl_get_nginx_config();
               if ($nginx_config !== '') {
               ?>
-                <details class="fs-details" style="margin-top: 8px;">
+                <details class="bl-details" style="margin-top: 8px;">
                   <summary style="cursor: pointer;"><?= esc_html__('Show config', 'baselayer') ?></summary>
                   <div style="margin-top: 8px;">
-                    <textarea id="fs-nginx-config" class="large-text code" rows="27" readonly style="width: 100%; font-size: 12px; font-family: monospace;"><?= esc_textarea($nginx_config) ?></textarea>
+                    <textarea id="bl-nginx-config" class="large-text code" rows="27" readonly style="width: 100%; font-size: 12px; font-family: monospace;"><?= esc_textarea($nginx_config) ?></textarea>
                     <div>
-                      <button type="button" class="button button-small" data-fs-copy-from-source="fs-nginx-config" data-fs-copy-feedback-text="<?= esc_attr__('Copied', 'baselayer') ?>"><?= esc_html__('Copy', 'baselayer') ?></button>
+                      <button type="button" class="button button-small" data-bl-copy-from-source="bl-nginx-config" data-bl-copy-feedback-text="<?= esc_attr__('Copied', 'baselayer') ?>"><?= esc_html__('Copy', 'baselayer') ?></button>
                     </div>
                   </div>
                 </details>
@@ -436,12 +436,12 @@ function bl_render_installer(): void
             <td>
               <fieldset>
                 <label>
-                  <input type="checkbox" name="install[content][post]" value="1" <?= $content_post ? ' checked' : '' ?> data-fs-checkbox-toggle="content-post">
+                  <input type="checkbox" name="install[content][post]" value="1" <?= $content_post ? ' checked' : '' ?> data-bl-checkbox-toggle="content-post">
                   <?= esc_html__('Enable blog posts', 'baselayer') ?>
                 </label>
-                <div class="fs-indent-checkbox">
+                <div class="bl-indent-checkbox">
                   <p class="description" style="margin-top: 0;"><?= esc_html__('WordPress’s built-in posts – ideal for news, articles, or a classic blog archive.', 'baselayer') ?></p>
-                  <div data-fs-checkbox-toggle-content="content-post">
+                  <div data-bl-checkbox-toggle-content="content-post">
                     <label>
                       <input type="checkbox" name="install[content][post_examples]" value="1" <?= $content_post_examples ? ' checked' : '' ?>>
                       <?= esc_html__('Create example posts', 'baselayer') ?>
@@ -456,12 +456,12 @@ function bl_render_installer(): void
             <td>
               <fieldset>
                 <label>
-                  <input type="checkbox" name="install[content][projects]" value="1" <?= $content_projects ? ' checked' : '' ?> data-fs-checkbox-toggle="content-projects">
+                  <input type="checkbox" name="install[content][projects]" value="1" <?= $content_projects ? ' checked' : '' ?> data-bl-checkbox-toggle="content-projects">
                   <?= esc_html__('Enable custom post type: Projects', 'baselayer') ?>
                 </label>
-                <div class="fs-indent-checkbox">
+                <div class="bl-indent-checkbox">
                   <p class="description" style="margin-top: 0;"><?= esc_html__('A flexible custom post type you can rename and reshape – for portfolios, case studies, or similar listings.', 'baselayer') ?></p>
-                  <div data-fs-checkbox-toggle-content="content-projects">
+                  <div data-bl-checkbox-toggle-content="content-projects">
                     <label>
                       <input type="checkbox" name="install[content][projects_examples]" value="1" <?= $content_projects_examples ? ' checked' : '' ?>>
                       <?= esc_html__('Create example posts', 'baselayer') ?>
@@ -476,12 +476,12 @@ function bl_render_installer(): void
             <td>
               <fieldset>
                 <label>
-                  <input type="checkbox" name="install[content][event]" value="1" <?= $content_event ? ' checked' : '' ?> data-fs-checkbox-toggle="content-event">
+                  <input type="checkbox" name="install[content][event]" value="1" <?= $content_event ? ' checked' : '' ?> data-bl-checkbox-toggle="content-event">
                   <?= esc_html__('Enable custom post type: Events', 'baselayer') ?>
                 </label>
-                <div class="fs-indent-checkbox">
+                <div class="bl-indent-checkbox">
                   <p class="description" style="margin-top: 0;"><?= esc_html__('Items with start and end dates, ordered by date on archives – suited to happenings, workshops, or schedules.', 'baselayer') ?></p>
-                  <div data-fs-checkbox-toggle-content="content-event">
+                  <div data-bl-checkbox-toggle-content="content-event">
                     <label>
                       <input type="checkbox" name="install[content][event_examples]" value="1" <?= $content_event_examples ? ' checked' : '' ?>>
                       <?= esc_html__('Create example posts', 'baselayer') ?>
@@ -511,7 +511,7 @@ function bl_render_installer(): void
               <?php if ($acf_license_defined) : ?>
                 <p class="description" style="margin-top: 0;"><?= esc_html__('An ACF Pro license key is already defined in the configuration.', 'baselayer') ?></p>
               <?php else : ?>
-                <input type="text" name="install[acf_pro_key]" id="install_acf_pro_key" value="<?= esc_attr($acf_license_submitted) ?>" class="large-text code fs-code-small" autocomplete="off" spellcheck="false" style="max-width: 600px;">
+                <input type="text" name="install[acf_pro_key]" id="install_acf_pro_key" value="<?= esc_attr($acf_license_submitted) ?>" class="large-text code bl-code-small" autocomplete="off" spellcheck="false" style="max-width: 600px;">
                 <p class="description"><?= esc_html__('Optional. If entered and not already present, it will be added to wp-config.php.', 'baselayer') ?></p>
               <?php endif; ?>
             </td>
@@ -545,15 +545,15 @@ function bl_render_installer(): void
                 <div style="flex: 1; min-width: 280px; padding: 16px; background: #f6f7f7; border: 1px solid #c3c4c7; border-radius: 4px;">
                   <h3 style="margin: 0 0 12px 0; font-size: 14px;"><?= esc_html__('Current user', 'baselayer') ?></h3>
                   <div style="margin-bottom: 12px;">
-                    <label class="fs-input-label" for="developer_current_username"><?= esc_html__('Username', 'baselayer') ?></label>
+                    <label class="bl-input-label" for="developer_current_username"><?= esc_html__('Username', 'baselayer') ?></label>
                     <input type="text" id="developer_current_username" value="<?= esc_attr($current_user->user_login) ?>" class="regular-text" style="width: 100%;" readonly>
                   </div>
                   <div style="margin-bottom: 12px;">
-                    <label class="fs-input-label" for="developer_current_email"><?= esc_html__('Email', 'baselayer') ?></label>
+                    <label class="bl-input-label" for="developer_current_email"><?= esc_html__('Email', 'baselayer') ?></label>
                     <input type="email" name="developer[current_user][email]" id="developer_current_email" value="<?= esc_attr($bl_install_val(['developer', 'current_user', 'email'], $current_user->user_email)) ?>" class="regular-text" style="width: 100%;" autocomplete="email">
                   </div>
                   <div style="margin-bottom: 12px;">
-                    <label class="fs-input-label" for="developer_current_password"><?= esc_html__('Password', 'baselayer') ?></label>
+                    <label class="bl-input-label" for="developer_current_password"><?= esc_html__('Password', 'baselayer') ?></label>
                     <input type="password" name="developer[current_user][password]" id="developer_current_password" value="" class="regular-text" style="width: 100%;" autocomplete="off">
                     <p class="description"><?= esc_html__('Leave empty to keep current password.', 'baselayer') ?></p>
                   </div>
@@ -568,19 +568,19 @@ function bl_render_installer(): void
                 <div style="flex: 1; min-width: 280px; padding: 16px; background: #f6f7f7; border: 1px solid #c3c4c7; border-radius: 4px;">
                   <h3 style="margin: 0 0 12px 0; font-size: 14px;"><?= esc_html__('Add another admin user', 'baselayer') ?></h3>
                   <div style="margin-bottom: 12px;">
-                    <label class="fs-input-label" for="developer_new_username"><?= esc_html__('Username', 'baselayer') ?></label>
+                    <label class="bl-input-label" for="developer_new_username"><?= esc_html__('Username', 'baselayer') ?></label>
                     <input type="text" name="developer[new_user][username]" id="developer_new_username" value="<?= esc_attr($bl_install_val(['developer', 'new_user', 'username'])) ?>" class="regular-text" style="width: 100%;" autocomplete="off">
                   </div>
                   <div style="margin-bottom: 12px;">
-                    <label class="fs-input-label" for="developer_new_email"><?= esc_html__('Email', 'baselayer') ?></label>
+                    <label class="bl-input-label" for="developer_new_email"><?= esc_html__('Email', 'baselayer') ?></label>
                     <input type="email" name="developer[new_user][email]" id="developer_new_email" value="<?= esc_attr($bl_install_val(['developer', 'new_user', 'email'])) ?>" class="regular-text" style="width: 100%;" autocomplete="off">
                   </div>
                   <div style="margin-bottom: 12px;">
-                    <label class="fs-input-label" for="developer_new_password"><?= esc_html__('Password', 'baselayer') ?></label>
+                    <label class="bl-input-label" for="developer_new_password"><?= esc_html__('Password', 'baselayer') ?></label>
                     <input type="password" name="developer[new_user][password]" id="developer_new_password" value="" class="regular-text" style="width: 100%;" autocomplete="new-password">
                     <p class="description">
-                      <a class="fs-description-link -has-icon" href="https://passwordcopy.app" target="_blank" rel="noopener">
-                        <span class="fs-description-link-icon"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
+                      <a class="bl-description-link -has-icon" href="https://passwordcopy.app" target="_blank" rel="noopener">
+                        <span class="bl-description-link-icon"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">
                             <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h240q17 0 28.5 11.5T480-800q0 17-11.5 28.5T440-760H200v560h560v-240q0-17 11.5-28.5T800-480q17 0 28.5 11.5T840-440v240q0 33-23.5 56.5T760-120H200Zm560-584L416-360q-11 11-28 11t-28-11q-11-11-11-28t11-28l344-344H600q-17 0-28.5-11.5T560-800q0-17 11.5-28.5T600-840h200q17 0 28.5 11.5T840-800v200q0 17-11.5 28.5T800-560q-17 0-28.5-11.5T760-600v-104Z" />
                           </svg></span>
                         <span>passwordcopy.app</span>

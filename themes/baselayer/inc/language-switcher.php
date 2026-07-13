@@ -30,7 +30,7 @@ function bl_language_switcher_submenu_item_html(
 	bool $as_button = false
 ): string {
 	$content = bl_language_switcher_item_content($id, $label);
-	$classes = 'menu-link fs-lang-item' . ($is_active ? ' active' : '') . ($disabled ? ' fs-lang-disabled' : '');
+	$classes = 'menu-link bl-lang-item' . ($is_active ? ' active' : '') . ($disabled ? ' bl-lang-disabled' : '');
 	$aria = ' aria-current="' . ($is_active ? 'true' : 'false') . '"';
 	$data_lang = ' data-language="' . esc_attr($id) . '"';
 
@@ -85,15 +85,15 @@ function bl_language_switcher_dropdown_html(
 	ob_start();
 	?>
 	<nav
-		class="fs-language-switcher"
+		class="bl-language-switcher"
 		aria-label="<?= esc_attr__('Languages', 'baselayer') ?>"
 		<?= $google_translate ? ' data-google-translate-toggler translate="no"' : '' ?>
 	>
-		<ul class="fs-language-switcher__list">
-			<li class="menu-item menu-item-has-children menu-depth-0 fs-language-switcher__item">
+		<ul class="bl-language-switcher__list">
+			<li class="menu-item menu-item-has-children menu-depth-0 bl-language-switcher__item">
 				<button
 					type="button"
-					class="sub-menu-toggle fs-language-switcher__trigger"
+					class="sub-menu-toggle bl-language-switcher__trigger"
 					aria-expanded="false"
 					aria-controls="<?= esc_attr($submenu_id) ?>"
 					aria-label="<?= esc_attr($toggle_label) ?>"
@@ -101,7 +101,7 @@ function bl_language_switcher_dropdown_html(
 				>
 					<?php if ($flag_url !== '') : ?>
 						<img
-							class="fs-language-switcher__current-flag fs-lang-item__flag"
+							class="bl-language-switcher__current-flag bl-lang-item__flag"
 							src="<?= esc_url($flag_url) ?>"
 							alt="<?= esc_attr($flag_alt) ?>"
 							width="20"

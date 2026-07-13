@@ -96,7 +96,7 @@ if (!$has_insights && !$has_matomo) {
 				<?php foreach ($insights[$key] as $row) { ?>
 					<tr>
 						<td style="padding: 4px 6px 0 0; white-space: nowrap; color: #64748b; vertical-align: top;"><?= esc_html((string) ($row['date'] ?? '')) ?></td>
-						<td style="padding: 4px 0 0 6px; vertical-align: top;" class="fs-mail-weekly-report-has-link" width="100%">
+						<td style="padding: 4px 0 0 6px; vertical-align: top;" class="bl-mail-weekly-report-has-link" width="100%">
 							<a href="<?= esc_url((string) ($row['url'] ?? '')) ?>"><?= esc_html((string) ($row['title'] ?? '')) ?></a> <span style="color: #64748b;">(<?= esc_html((string) ($row['post_type'] ?? '')) ?>)</span>
 						</td>
 					</tr>
@@ -123,7 +123,7 @@ if (!$has_insights && !$has_matomo) {
 			max-width: 320px;
 			font-weight: 600;
 		">
-		<?= wp_kses(__('Visitors and page views <div class="fs-mail__small-mobile-inline">of the last week</div>', 'baselayer'), ['br' => [], 'div' => ['class' => []]]) ?>
+		<?= wp_kses(__('Visitors and page views <div class="bl-mail__small-mobile-inline">of the last week</div>', 'baselayer'), ['br' => [], 'div' => ['class' => []]]) ?>
 	</div>
 	<?php if (!empty($daily_chart_url)) : ?>
 		<img
@@ -150,9 +150,9 @@ if (!$has_insights && !$has_matomo) {
 		">
 		<tr>
 			<th style="border-bottom: 2px solid #e2e8f0;"></th>
-			<th class="fs-mail__table-th" style="border-bottom: 2px solid #e2e8f0; padding: 0 4px 6px; text-align: center; font-weight: bold; color: #2284e5; white-space: nowrap;"><?= wp_kses(__('Unique<br>visitors', 'baselayer'), ['br' => []]) ?></th>
-			<th class="fs-mail__table-th" style="border-bottom: 2px solid #e2e8f0; padding: 0 4px 6px; text-align: center; font-weight: bold; color: #8f70cc; white-space: nowrap;"><?= wp_kses(__('Visits<br>total', 'baselayer'), ['br' => []]) ?></th>
-			<th class="fs-mail__table-th" style="border-bottom: 2px solid #e2e8f0; padding: 0 4px 6px; text-align: center; font-weight: bold; color: #ff6673; white-space: nowrap;"><?= wp_kses(__('Page<br>views', 'baselayer'), ['br' => []]) ?></th>
+			<th class="bl-mail__table-th" style="border-bottom: 2px solid #e2e8f0; padding: 0 4px 6px; text-align: center; font-weight: bold; color: #2284e5; white-space: nowrap;"><?= wp_kses(__('Unique<br>visitors', 'baselayer'), ['br' => []]) ?></th>
+			<th class="bl-mail__table-th" style="border-bottom: 2px solid #e2e8f0; padding: 0 4px 6px; text-align: center; font-weight: bold; color: #8f70cc; white-space: nowrap;"><?= wp_kses(__('Visits<br>total', 'baselayer'), ['br' => []]) ?></th>
+			<th class="bl-mail__table-th" style="border-bottom: 2px solid #e2e8f0; padding: 0 4px 6px; text-align: center; font-weight: bold; color: #ff6673; white-space: nowrap;"><?= wp_kses(__('Page<br>views', 'baselayer'), ['br' => []]) ?></th>
 		</tr>
 		<?php foreach (($daily ?? []) as $row) : ?>
 			<?php
@@ -184,7 +184,7 @@ if (!$has_insights && !$has_matomo) {
 			text-wrap: balance;
 			font-weight: 600;
 		">
-		<?= wp_kses(__('Visitors and page views <div class="fs-mail__small-mobile-inline">of the last 8 weeks</div>', 'baselayer'), ['br' => [], 'div' => ['class' => []]]) ?>
+		<?= wp_kses(__('Visitors and page views <div class="bl-mail__small-mobile-inline">of the last 8 weeks</div>', 'baselayer'), ['br' => [], 'div' => ['class' => []]]) ?>
 	</div>
 	<?php if (!empty($weekly_chart_url)) : ?>
 		<img
@@ -212,9 +212,9 @@ if (!$has_insights && !$has_matomo) {
 		">
 		<tr>
 			<th style="border-bottom: 2px solid #e2e8f0;"></th>
-			<th class="fs-mail__table-th" style="border-bottom: 2px solid #e2e8f0; padding: 0 4px 6px; text-align: center; font-weight: 600; color: #2284e5; white-space: nowrap;"><?= wp_kses(__('Unique<br>visitors', 'baselayer'), ['br' => []]) ?></th>
-			<th class="fs-mail__table-th" style="border-bottom: 2px solid #e2e8f0; padding: 0 4px 6px; text-align: center; font-weight: 600; color: #8f70cc; white-space: nowrap;"><?= wp_kses(__('Visits<br>total', 'baselayer'), ['br' => []]) ?></th>
-			<th class="fs-mail__table-th" style="border-bottom: 2px solid #e2e8f0; padding: 0 4px 6px; text-align: center; font-weight: 600; color: #ff6673; white-space: nowrap;"><?= wp_kses(__('Page<br>views', 'baselayer'), ['br' => []]) ?></th>
+			<th class="bl-mail__table-th" style="border-bottom: 2px solid #e2e8f0; padding: 0 4px 6px; text-align: center; font-weight: 600; color: #2284e5; white-space: nowrap;"><?= wp_kses(__('Unique<br>visitors', 'baselayer'), ['br' => []]) ?></th>
+			<th class="bl-mail__table-th" style="border-bottom: 2px solid #e2e8f0; padding: 0 4px 6px; text-align: center; font-weight: 600; color: #8f70cc; white-space: nowrap;"><?= wp_kses(__('Visits<br>total', 'baselayer'), ['br' => []]) ?></th>
+			<th class="bl-mail__table-th" style="border-bottom: 2px solid #e2e8f0; padding: 0 4px 6px; text-align: center; font-weight: 600; color: #ff6673; white-space: nowrap;"><?= wp_kses(__('Page<br>views', 'baselayer'), ['br' => []]) ?></th>
 		</tr>
 		<?php foreach (($weekly ?? []) as $row) : ?>
 			<?php
@@ -236,7 +236,7 @@ if (!$has_insights && !$has_matomo) {
 <?php else : ?>
 
 	<div
-		class="fs-mail-weekly-report-has-link"
+		class="bl-mail-weekly-report-has-link"
 		style="
 			margin: 32px auto 0;
 			font-size: 16px;
@@ -277,7 +277,7 @@ if (!$has_insights && !$has_matomo) {
 			">
 			<a
 				href="<?= esc_url($stats_url) ?>"
-				class="fs-mail__button"
+				class="bl-mail__button"
 				style="
 					color: #1f2937;
 					text-decoration: none;
@@ -303,7 +303,7 @@ if (!$has_insights && !$has_matomo) {
 		">
 		<a
 			href="<?= esc_url($admin_url) ?>"
-			class="fs-mail__button"
+			class="bl-mail__button"
 			style="
 				color: #1f2937;
 				text-decoration: none;

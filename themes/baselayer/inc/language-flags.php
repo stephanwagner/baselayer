@@ -133,7 +133,7 @@ function bl_language_flag_preview_markup(string $lang_id = ''): string
 	$hidden = $url === '' ? ' hidden' : '';
 
 	return sprintf(
-		'<span class="fs-language-flag-preview"><img class="fs-language-flag-preview__img" src="%s" width="28" height="21" alt="" decoding="async"%s /></span>',
+		'<span class="bl-language-flag-preview"><img class="bl-language-flag-preview__img" src="%s" width="28" height="21" alt="" decoding="async"%s /></span>',
 		$url !== '' ? esc_url($url) : '',
 		$hidden
 	);
@@ -144,7 +144,7 @@ function bl_language_flag_preview_markup(string $lang_id = ''): string
  */
 function bl_language_flag_admin_cell(string $lang_id = ''): string
 {
-	return '<td class="fs-language-flag-cell">' . bl_language_flag_preview_markup($lang_id) . '</td>';
+	return '<td class="bl-language-flag-cell">' . bl_language_flag_preview_markup($lang_id) . '</td>';
 }
 
 /**
@@ -164,7 +164,7 @@ function bl_language_flag_img(string $lang_id, string $label): string
 	) : '';
 
 	return sprintf(
-		'<img class="fs-lang-item__flag" src="%s" alt="%s" width="20" height="15" loading="lazy" decoding="async" />',
+		'<img class="bl-lang-item__flag" src="%s" alt="%s" width="20" height="15" loading="lazy" decoding="async" />',
 		esc_url($url),
 		esc_attr($alt)
 	);
@@ -176,7 +176,7 @@ function bl_language_flag_img(string $lang_id, string $label): string
 function bl_language_switcher_item_content(string $lang_id, string $label): string
 {
 	$flag = bl_language_flag_img($lang_id, $label);
-	$text = '<span class="fs-lang-item__label">' . esc_html($label) . '</span>';
+	$text = '<span class="bl-lang-item__label">' . esc_html($label) . '</span>';
 
 	if ($flag === '') {
 		return $text;

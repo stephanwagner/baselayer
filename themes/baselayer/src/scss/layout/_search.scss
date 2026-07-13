@@ -12,9 +12,9 @@
   appearance: none;
   margin: 0;
   padding: 12px 22px;
-  font-size: var(--fs-font-size-m);
+  font-size: var(--bl-font-size-m);
   line-height: 24px;
-  border: 1px solid var(--fs-color-gray-400);
+  border: 1px solid var(--bl-color-gray-400);
   border-radius: 32px;
   background: #fff;
   color: inherit;
@@ -58,7 +58,7 @@
   box-shadow: none;
   appearance: none;
   background: transparent;
-  color: var(--fs-default-text-color);
+  color: var(--bl-default-text-color);
   transition: transition('color');
   cursor: pointer;
 
@@ -69,7 +69,7 @@
   }
 
   &:hover {
-    color: var(--fs-color-primary);
+    color: var(--bl-color-primary);
   }
 
   @media (max-width: $breakpoint-mobile) {
@@ -82,7 +82,7 @@
     &:hover {
       border-color: transparent;
       background: transparent;
-      color: var(--fs-color-primary);
+      color: var(--bl-color-primary);
     }
   }
 }
@@ -110,12 +110,12 @@
   top: calc(100% + 20px);
   transform: translateX(-50%);
   border-radius: 4px;
-  color: var(--fs-color-gray-500);
+  color: var(--bl-color-gray-500);
   cursor: pointer;
   transition: transition('color');
   font-weight: 600;
-  font-size: var(--fs-font-size-s);
-  line-height: var(--fs-line-height-s);
+  font-size: var(--bl-font-size-s);
+  line-height: var(--bl-line-height-s);
   padding: 2px 8px;
   margin: 0;
   border: 0;
@@ -140,11 +140,11 @@
 }
 
 .search__empty {
-  color: var(--fs-color-gray-600);
+  color: var(--bl-color-gray-600);
 }
 
 .search__amount {
-  color: var(--fs-color-gray-600);
+  color: var(--bl-color-gray-600);
   margin: 0 0 24px;
 
   @media (max-width: $breakpoint-s) {

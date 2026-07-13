@@ -47,7 +47,7 @@ function bl_theme_settings_url_with_tab(string $slug): string
 {
 	return add_query_arg(
 		[
-			'page' => 'fs-theme-settings',
+			'page' => 'bl-theme-settings',
 			BL_THEME_SETTINGS_TAB_QUERY_VAR => $slug,
 		],
 		admin_url('options-general.php')
@@ -62,7 +62,7 @@ function bl_theme_settings_is_settings_page_post(): bool
 	global $pagenow;
 	$page = isset($_REQUEST['page']) ? sanitize_key((string) wp_unslash($_REQUEST['page'])) : '';
 
-	return $pagenow === 'options-general.php' && $page === 'fs-theme-settings';
+	return $pagenow === 'options-general.php' && $page === 'bl-theme-settings';
 }
 
 /**
@@ -310,7 +310,7 @@ add_action('admin_init', function () {
 
 // Ensure media modal is available on Theme sub-tab (client logo, OG image).
 add_action('admin_enqueue_scripts', function ($hook_suffix) {
-	if ($hook_suffix !== 'settings_page_fs-theme-settings') {
+	if ($hook_suffix !== 'settings_page_bl-theme-settings') {
 		return;
 	}
 	$can_theme = current_user_can('manage_options') && (!function_exists('bl_admin_can_access') || bl_admin_can_access('theme_settings_general'));
@@ -322,7 +322,7 @@ add_action('admin_enqueue_scripts', function ($hook_suffix) {
 
 // Enqueue WordPress code editor (syntax highlight, lint) for CSS tab
 add_action('admin_enqueue_scripts', function ($hook_suffix) {
-	if ($hook_suffix !== 'settings_page_fs-theme-settings') {
+	if ($hook_suffix !== 'settings_page_bl-theme-settings') {
 		return;
 	}
 	$tab = bl_theme_settings_request_tab_slug();
@@ -361,7 +361,7 @@ add_action('admin_enqueue_scripts', function ($hook_suffix) {
 }, 10);
 
 // Redirect when access to requested tab is denied
-add_action('load-settings_page_fs-theme-settings', function () {
+add_action('load-settings_page_bl-theme-settings', function () {
 	if (!current_user_can('manage_options')) {
 		return;
 	}
@@ -370,7 +370,7 @@ add_action('load-settings_page_fs-theme-settings', function () {
 		return;
 	}
 	if ($requested === 'design') {
-		wp_safe_redirect(admin_url('options-general.php?page=fs-theme-settings'));
+		wp_safe_redirect(admin_url('options-general.php?page=bl-theme-settings'));
 		exit;
 	}
 	$access_key = BL_THEME_SETTINGS_TAB_ACCESS[$requested] ?? null;
@@ -379,7 +379,7 @@ add_action('load-settings_page_fs-theme-settings', function () {
 	}
 	wp_safe_redirect(
 		$requested === 'theme'
-			? admin_url('options-general.php?page=fs-theme-settings')
+			? admin_url('options-general.php?page=bl-theme-settings')
 			: bl_theme_settings_url_with_tab('theme')
 	);
 	exit;
@@ -1065,7 +1065,7 @@ function theme_settings_page(): void
 				? (string) $_weekly_sender->user_email
 				: (function_exists('bl_developer_email') ? bl_developer_email() : '');
 			?>
-			<form method="post" action="<?= esc_url(bl_theme_settings_url_with_tab('theme')) ?>" class="fs-page-settings-form">
+			<form method="post" action="<?= esc_url(bl_theme_settings_url_with_tab('theme')) ?>" class="bl-page-settings-form">
 				<?php settings_fields(BL_THEME_OPTION_GROUP_GENERAL); ?>
 				<?php
 				$bl_show_on_front = get_option('show_on_front');
@@ -1075,7 +1075,7 @@ function theme_settings_page(): void
 					<tr>
 						<th scope="row"><?= esc_html(__('Your homepage displays', 'default')) ?></th>
 						<td>
-							<fieldset class="fs-homepage-display-fieldset">
+							<fieldset class="bl-homepage-display-fieldset">
 								<legend class="screen-reader-text"><?= esc_html(__('Your homepage displays', 'default')) ?></legend>
 								<p>
 									<label>
@@ -1089,7 +1089,7 @@ function theme_settings_page(): void
 										<?= esc_html(__('A static page (select below)', 'baselayer')) ?>
 									</label>
 								</p>
-								<ul id="fs-homepage-static-fields" style="margin: 0 0 0 24px; list-style: none; padding: 0;">
+								<ul id="bl-homepage-static-fields" style="margin: 0 0 0 24px; list-style: none; padding: 0;">
 									<li style="margin-bottom: 8px;">
 										<label for="page_on_front"><?php echo esc_html(__('Homepage', 'default')); ?>:</label><br>
 										<?php
@@ -1158,7 +1158,7 @@ function theme_settings_page(): void
 					</tr>
 				</table>
 
-				<div class="fs-submit-row">
+				<div class="bl-submit-row">
 					<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
 				</div>
 
@@ -1166,7 +1166,7 @@ function theme_settings_page(): void
 					(function() {
 						function fsSyncHomepageStaticFields() {
 							var posts = document.getElementById('bl_show_on_front_posts');
-							var wrap = document.getElementById('fs-homepage-static-fields');
+							var wrap = document.getElementById('bl-homepage-static-fields');
 							if (!wrap) return;
 							var showStatic = document.getElementById('bl_show_on_front_page');
 							wrap.style.display = showStatic && showStatic.checked ? '' : 'none';
@@ -1214,12 +1214,12 @@ function theme_settings_page(): void
 									type="email"
 									name="baselayer_weekly_report_manual_recipient"
 									id="baselayer_weekly_report_manual_recipient"
-									form="fs-send-weekly-report-to-developer"
+									form="bl-send-weekly-report-to-developer"
 									value="<?= esc_attr($weekly_manual_send_default_email) ?>"
 									class="regular-text"
 									autocomplete="email"
 								>
-								<button type="submit" form="fs-send-weekly-report-to-developer" class="button"><?= esc_html__('Send report', 'baselayer') ?></button>
+								<button type="submit" form="bl-send-weekly-report-to-developer" class="button"><?= esc_html__('Send report', 'baselayer') ?></button>
 							</div>
 							<p class="description">
 								<?= esc_html__('Sends the current weekly report to provided email address.', 'baselayer') ?>
@@ -1227,7 +1227,7 @@ function theme_settings_page(): void
 						</td>
 					</tr>
 				</table>
-				<div class="fs-submit-row">
+				<div class="bl-submit-row">
 					<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
 				</div>
 
@@ -1236,16 +1236,16 @@ function theme_settings_page(): void
 				<h2 class="title"><?= esc_html__('Site logo', 'baselayer') ?></h2>
 				<p class="description" style="margin-bottom: 12px;"><?= esc_html__('Shown on the login page instead of the WordPress logo. Also used as the schema.org logo fallback when no schema logo is set.', 'baselayer') ?></p>
 				
-				<div class="fs-image-picker" style="margin-top: 16px;" data-fs-image-picker>
-					<input type="hidden" name="custom_logo" id="custom_logo" value="<?= esc_attr($custom_logo_id) ?>" data-fs-image-picker-input>
-					<div class="fs-image-picker-preview" data-fs-image-picker-preview>
+				<div class="bl-image-picker" style="margin-top: 16px;" data-bl-image-picker>
+					<input type="hidden" name="custom_logo" id="custom_logo" value="<?= esc_attr($custom_logo_id) ?>" data-bl-image-picker-input>
+					<div class="bl-image-picker-preview" data-bl-image-picker-preview>
 						<?php if ($custom_logo_url) : ?>
 							<img src="<?= esc_url($custom_logo_url) ?>" alt="">
 						<?php endif; ?>
 					</div>
 					<p style="margin-bottom: 0;">
-						<button type="button" class="button" data-fs-image-picker-select><?= esc_html__('Select image', 'baselayer') ?></button>
-						<button type="button" class="button" data-fs-image-picker-remove<?= $custom_logo_id <= 0 ? ' style="display:none;"' : '' ?>><?= esc_html__('Remove', 'baselayer') ?></button>
+						<button type="button" class="button" data-bl-image-picker-select><?= esc_html__('Select image', 'baselayer') ?></button>
+						<button type="button" class="button" data-bl-image-picker-remove<?= $custom_logo_id <= 0 ? ' style="display:none;"' : '' ?>><?= esc_html__('Remove', 'baselayer') ?></button>
 					</p>
 				</div>
 
@@ -1255,16 +1255,16 @@ function theme_settings_page(): void
 				<p class="description"><?= esc_html__('Used as the social preview image (og:image) when a page or post has no SEO image and no featured image.', 'baselayer') ?></p>
 				<p class="description" style="margin-bottom: 12px;"><?= esc_html__('Best size: 1200 × 630 px.', 'baselayer') ?></p>
 
-				<div class="fs-image-picker" style="margin-top: 16px;" data-fs-image-picker>
-					<input type="hidden" name="baselayer_og_image_fallback" id="baselayer_og_image_fallback" value="<?= esc_attr($og_fallback_id) ?>" data-fs-image-picker-input>
-					<div class="fs-image-picker-preview" data-fs-image-picker-preview>
+				<div class="bl-image-picker" style="margin-top: 16px;" data-bl-image-picker>
+					<input type="hidden" name="baselayer_og_image_fallback" id="baselayer_og_image_fallback" value="<?= esc_attr($og_fallback_id) ?>" data-bl-image-picker-input>
+					<div class="bl-image-picker-preview" data-bl-image-picker-preview>
 						<?php if ($og_fallback_url) : ?>
 							<img src="<?= esc_url($og_fallback_url) ?>" alt="" style="max-width: 240px; height: auto; display: block; border-radius: 3px;">
 						<?php endif; ?>
 					</div>
 					<p style="margin-bottom: 0;">
-						<button type="button" class="button" data-fs-image-picker-select><?= esc_html__('Select image', 'baselayer') ?></button>
-						<button type="button" class="button" data-fs-image-picker-remove<?= $og_fallback_id <= 0 ? ' style="display:none;"' : '' ?>><?= esc_html__('Remove', 'baselayer') ?></button>
+						<button type="button" class="button" data-bl-image-picker-select><?= esc_html__('Select image', 'baselayer') ?></button>
+						<button type="button" class="button" data-bl-image-picker-remove<?= $og_fallback_id <= 0 ? ' style="display:none;"' : '' ?>><?= esc_html__('Remove', 'baselayer') ?></button>
 					</p>
 				</div>
 
@@ -1274,26 +1274,26 @@ function theme_settings_page(): void
 				<p class="description"><?= esc_html__('Used as the featured image when a page or post has no featured image set.', 'baselayer') ?></p>
 				<p class="description" style="margin-bottom: 12px;"><?= esc_html__('Best size: 2400 × 2400 px.', 'baselayer') ?></p>
 
-				<div class="fs-image-picker" style="margin-top: 16px;" data-fs-image-picker>
-					<input type="hidden" name="baselayer_feature_image_fallback" id="baselayer_feature_image_fallback" value="<?= esc_attr($feature_image_fallback_id) ?>" data-fs-image-picker-input>
-					<div class="fs-image-picker-preview" data-fs-image-picker-preview>
+				<div class="bl-image-picker" style="margin-top: 16px;" data-bl-image-picker>
+					<input type="hidden" name="baselayer_feature_image_fallback" id="baselayer_feature_image_fallback" value="<?= esc_attr($feature_image_fallback_id) ?>" data-bl-image-picker-input>
+					<div class="bl-image-picker-preview" data-bl-image-picker-preview>
 						<?php if ($feature_image_fallback_url) : ?>
 							<img src="<?= esc_url($feature_image_fallback_url) ?>" alt="" style="max-width: 240px; height: auto; display: block; border-radius: 3px;">
 						<?php endif; ?>
 					</div>
 					<p style="margin-bottom: 0;">
-						<button type="button" class="button" data-fs-image-picker-select><?= esc_html__('Select image', 'baselayer') ?></button>
-						<button type="button" class="button" data-fs-image-picker-remove<?= $feature_image_fallback_id <= 0 ? ' style="display:none;"' : '' ?>><?= esc_html__('Remove', 'baselayer') ?></button>
+						<button type="button" class="button" data-bl-image-picker-select><?= esc_html__('Select image', 'baselayer') ?></button>
+						<button type="button" class="button" data-bl-image-picker-remove<?= $feature_image_fallback_id <= 0 ? ' style="display:none;"' : '' ?>><?= esc_html__('Remove', 'baselayer') ?></button>
 					</p>
 				</div>
 
 				<hr>
 
-				<div class="fs-submit-row">
+				<div class="bl-submit-row">
 					<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
 				</div>
 			</form>
-			<form method="post" action="<?= esc_url(bl_theme_settings_url_with_tab('theme')) ?>" id="fs-send-weekly-report-to-developer" style="display:none;">
+			<form method="post" action="<?= esc_url(bl_theme_settings_url_with_tab('theme')) ?>" id="bl-send-weekly-report-to-developer" style="display:none;">
 				<?php wp_nonce_field('baselayer_send_weekly_report_to_developer'); ?>
 				<input type="hidden" name="baselayer_send_weekly_report_to_developer" value="1">
 			</form>
@@ -1311,10 +1311,10 @@ function theme_settings_page(): void
 				];
 			}
 			?>
-			<form method="post" action="<?= esc_url(bl_theme_settings_url_with_tab('redirects')) ?>" class="fs-page-settings-form" id="fs-redirects-form">
+			<form method="post" action="<?= esc_url(bl_theme_settings_url_with_tab('redirects')) ?>" class="bl-page-settings-form" id="bl-redirects-form">
 				<?php wp_nonce_field('baselayer_save_redirects'); ?>
 				<input type="hidden" name="baselayer_save_redirects" value="1">
-				<input type="hidden" name="page" value="fs-theme-settings">
+				<input type="hidden" name="page" value="bl-theme-settings">
 				<input type="hidden" name="<?= esc_attr(BL_THEME_SETTINGS_TAB_QUERY_VAR) ?>" value="redirects">
 				<?php
 				$redirect_method = function_exists('bl_config_redirects') ? bl_config_redirects('method') : 'wordpress';
@@ -1336,7 +1336,7 @@ function theme_settings_page(): void
 				<p class="description"><?= esc_html__('Enter paths without the domain (e.g. /old-path).', 'baselayer') ?></p>
 				<p class="description"><?= esc_html__('The source URL represents the requested path.', 'baselayer') ?></p>
 				<p class="description" style="margin-bottom: 12px;"><?= esc_html__('The target URL can be an internal path or a full URL.', 'baselayer') ?></p>
-				<table class="wp-list-table widefat fixed striped" id="fs-redirects-table" style="width: auto;">
+				<table class="wp-list-table widefat fixed striped" id="bl-redirects-table" style="width: auto;">
 					<thead>
 						<tr>
 							<th scope="col" class="column-from" style="width: 50%;"><?= esc_html__('From URL', 'baselayer') ?></th>
@@ -1347,7 +1347,7 @@ function theme_settings_page(): void
 					</thead>
 					<tbody>
 						<?php foreach ($redirects_list as $i => $r) : ?>
-							<tr class="fs-redirect-row">
+							<tr class="bl-redirect-row">
 								<td><input type="text" name="bl_redirects[<?= (int) $i ?>][from]" value="<?= esc_attr($r['from']) ?>" class="regular-text" style="width: 100%;" placeholder="<?= esc_attr__('/old-path', 'baselayer') ?>"></td>
 								<td><input type="text" name="bl_redirects[<?= (int) $i ?>][to]" value="<?= esc_attr($r['to']) ?>" class="regular-text" style="width: 100%;" placeholder="<?= esc_attr__('/new-path', 'baselayer') ?>"></td>
 								<td>
@@ -1356,37 +1356,37 @@ function theme_settings_page(): void
 										<option value="302" <?= selected($r['code'], 302, false) ?>><?= esc_html__('302 (Temporary)', 'baselayer') ?></option>
 									</select>
 								</td>
-								<td><button type="button" class="button fs-redirect-remove"><?= esc_html__('Remove', 'baselayer') ?></button></td>
+								<td><button type="button" class="button bl-redirect-remove"><?= esc_html__('Remove', 'baselayer') ?></button></td>
 							</tr>
 						<?php endforeach; ?>
-						<tr class="fs-redirect-row fs-redirect-template" style="display: none;">
+						<tr class="bl-redirect-row bl-redirect-template" style="display: none;">
 							<td><input type="text" name="bl_redirects[__i__][from]" value="" class="regular-text" style="width: 100%;" placeholder="<?= esc_attr__('/old-path', 'baselayer') ?>" disabled></td>
 							<td><input type="text" name="bl_redirects[__i__][to]" value="" class="regular-text" style="width: 100%;" placeholder="<?= esc_attr__('/new-path', 'baselayer') ?>" disabled></td>
 							<td><select name="bl_redirects[__i__][code]" disabled>
 									<option value="301"><?= esc_html__('301 (Permanent)', 'baselayer') ?></option>
 									<option value="302"><?= esc_html__('302 (Temporary)', 'baselayer') ?></option>
 								</select></td>
-							<td><button type="button" class="button fs-redirect-remove"><?= esc_html__('Remove', 'baselayer') ?></button></td>
+							<td><button type="button" class="button bl-redirect-remove"><?= esc_html__('Remove', 'baselayer') ?></button></td>
 						</tr>
 					</tbody>
 				</table>
 				<p style="margin-top: 12px;">
-					<button type="button" class="button" id="fs-redirect-add"><?= esc_html__('Add redirect', 'baselayer') ?></button>
+					<button type="button" class="button" id="bl-redirect-add"><?= esc_html__('Add redirect', 'baselayer') ?></button>
 				</p>
-				<div class="fs-submit-row">
+				<div class="bl-submit-row">
 					<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
 				</div>
 			</form>
 			<script>
 				(function() {
-					var form = document.getElementById('fs-redirects-form');
+					var form = document.getElementById('bl-redirects-form');
 					if (!form) return;
-					var tbody = form.querySelector('#fs-redirects-table tbody');
+					var tbody = form.querySelector('#bl-redirects-table tbody');
 					var template = form.querySelector('.bl-redirect-template');
 					var index = tbody.querySelectorAll('.bl-redirect-row:not(.bl-redirect-template)').length;
-					form.querySelector('#fs-redirect-add').addEventListener('click', function() {
+					form.querySelector('#bl-redirect-add').addEventListener('click', function() {
 						var tr = template.cloneNode(true);
-						tr.classList.remove('fs-redirect-template');
+						tr.classList.remove('bl-redirect-template');
 						tr.style.display = '';
 						tr.querySelectorAll('[name]').forEach(function(inp) {
 							inp.name = inp.name.replace(/__i__/g, index);
@@ -1396,14 +1396,14 @@ function theme_settings_page(): void
 						index++;
 					});
 					tbody.addEventListener('click', function(e) {
-						if (e.target.classList.contains('fs-redirect-remove')) {
+						if (e.target.classList.contains('bl-redirect-remove')) {
 							e.target.closest('tr').remove();
 						}
 					});
 				})();
 			</script>
 		<?php elseif ($tab === 'css') : ?>
-			<form method="post" action="<?= esc_url(bl_theme_settings_url_with_tab('css')) ?>" class="fs-page-settings-form">
+			<form method="post" action="<?= esc_url(bl_theme_settings_url_with_tab('css')) ?>" class="bl-page-settings-form">
 				<?php wp_nonce_field('baselayer_save_css'); ?>
 				<input type="hidden" name="baselayer_save_css" value="1">
 				<h2 class="title"><?= esc_html__('Custom CSS', 'baselayer') ?></h2>
@@ -1414,26 +1414,26 @@ function theme_settings_page(): void
 						sprintf(
 							/* translators: %s: example CSS variable usage (wrapped in code.bl-code-small). */
 							__('All CSS variables are available, e.g. %s:', 'baselayer'),
-							'<code class="fs-code-small">' . esc_html('var(--fs-color-primary)') . '</code>'
+							'<code class="bl-code-small">' . esc_html('var(--bl-color-primary)') . '</code>'
 						),
 						[
 							'code' => ['class' => true],
 						]
 					);
 					?>
-					<button type="button" class="button-link fs-css-vars-overview-open" id="fs-css-vars-overview-open" aria-haspopup="dialog" aria-controls="fs-css-vars-overview-modal"><?= esc_html__('Variable overview', 'baselayer') ?></button>
+					<button type="button" class="button-link bl-css-vars-overview-open" id="bl-css-vars-overview-open" aria-haspopup="dialog" aria-controls="bl-css-vars-overview-modal"><?= esc_html__('Variable overview', 'baselayer') ?></button>
 				</p>
 				<table class="form-table" style="margin-top: 24px;" role="presentation">
 					<tr>
 						<td colspan="2" style="padding: 0;">
-							<div class="fs-custom-css-editor-wrap">
+							<div class="bl-custom-css-editor-wrap">
 								<label for="baselayer_custom_css" class="screen-reader-text"><?= esc_html__('Custom CSS', 'baselayer') ?></label>
 								<textarea name="baselayer_custom_css" id="baselayer_custom_css" rows="16" class="large-text code" style="width: 100%; font-family: Consolas, Monaco, monospace;"><?= esc_textarea(get_option('baselayer_custom_css', '')) ?></textarea>
 							</div>
 						</td>
 					</tr>
 				</table>
-				<div class="fs-submit-row">
+				<div class="bl-submit-row">
 					<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
 				</div>
 			</form>
@@ -1442,27 +1442,27 @@ function theme_settings_page(): void
 				? bl_variables_compiled_root_block()
 				: (function_exists('bl_variables_scss_root_block') ? bl_variables_scss_root_block() : '');
 			?>
-			<div id="fs-css-vars-overview-modal" class="fs-css-vars-overview-modal" aria-hidden="true">
-				<div class="fs-css-vars-overview-backdrop" data-fs-css-vars-overview-close tabindex="-1"></div>
-				<div class="fs-css-vars-overview-dialog" role="dialog" aria-modal="true" aria-labelledby="fs-css-vars-overview-title" tabindex="-1">
-					<h2 id="fs-css-vars-overview-title" class="fs-css-vars-overview-title"><?= esc_html__('CSS variables', 'baselayer') ?></h2>
+			<div id="bl-css-vars-overview-modal" class="bl-css-vars-overview-modal" aria-hidden="true">
+				<div class="bl-css-vars-overview-backdrop" data-bl-css-vars-overview-close tabindex="-1"></div>
+				<div class="bl-css-vars-overview-dialog" role="dialog" aria-modal="true" aria-labelledby="bl-css-vars-overview-title" tabindex="-1">
+					<h2 id="bl-css-vars-overview-title" class="bl-css-vars-overview-title"><?= esc_html__('CSS variables', 'baselayer') ?></h2>
 					<?php if ($bl_variables_root_preview !== '') : ?>
-						<div class="fs-css-vars-overview-editor-wrap">
-							<textarea id="fs-css-vars-overview-code" readonly rows="14" class="large-text code" autocomplete="off"><?= esc_textarea($bl_variables_root_preview) ?></textarea>
+						<div class="bl-css-vars-overview-editor-wrap">
+							<textarea id="bl-css-vars-overview-code" readonly rows="14" class="large-text code" autocomplete="off"><?= esc_textarea($bl_variables_root_preview) ?></textarea>
 						</div>
 					<?php else : ?>
-						<p class="fs-css-vars-overview-empty"><?= esc_html__('Could not read CSS variables from the loaded theme styles.', 'baselayer') ?></p>
+						<p class="bl-css-vars-overview-empty"><?= esc_html__('Could not read CSS variables from the loaded theme styles.', 'baselayer') ?></p>
 					<?php endif; ?>
-					<p class="fs-css-vars-overview-actions">
-						<button type="button" class="button button-primary" data-fs-css-vars-overview-close><?= esc_html__('Close', 'baselayer') ?></button>
+					<p class="bl-css-vars-overview-actions">
+						<button type="button" class="button button-primary" data-bl-css-vars-overview-close><?= esc_html__('Close', 'baselayer') ?></button>
 					</p>
 				</div>
 			</div>
 			<script>
 				(function() {
-					var modal = document.getElementById('fs-css-vars-overview-modal');
-					var openBtn = document.getElementById('fs-css-vars-overview-open');
-					var textarea = document.getElementById('fs-css-vars-overview-code');
+					var modal = document.getElementById('bl-css-vars-overview-modal');
+					var openBtn = document.getElementById('bl-css-vars-overview-open');
+					var textarea = document.getElementById('bl-css-vars-overview-code');
 					if (!modal || !openBtn || !textarea) return;
 					var dialog = modal.querySelector('.bl-css-vars-overview-dialog');
 					var overviewEditor = null;
@@ -1475,7 +1475,7 @@ function theme_settings_page(): void
 						if (!window.wp || !window.wp.codeEditor || !window.fsCssVarsOverviewEditorSettings) {
 							return;
 						}
-						overviewEditor = window.wp.codeEditor.initialize('fs-css-vars-overview-code', window.fsCssVarsOverviewEditorSettings);
+						overviewEditor = window.wp.codeEditor.initialize('bl-css-vars-overview-code', window.fsCssVarsOverviewEditorSettings);
 						if (overviewEditor && overviewEditor.codemirror) {
 							window.setTimeout(function() {
 								overviewEditor.codemirror.refresh();
@@ -1486,7 +1486,7 @@ function theme_settings_page(): void
 					function openModal() {
 						modal.classList.add('is-open');
 						modal.setAttribute('aria-hidden', 'false');
-						document.body.classList.add('fs-css-vars-overview-modal-active');
+						document.body.classList.add('bl-css-vars-overview-modal-active');
 						if (dialog) {
 							dialog.focus();
 						}
@@ -1500,14 +1500,14 @@ function theme_settings_page(): void
 					function closeModal() {
 						modal.classList.remove('is-open');
 						modal.setAttribute('aria-hidden', 'true');
-						document.body.classList.remove('fs-css-vars-overview-modal-active');
+						document.body.classList.remove('bl-css-vars-overview-modal-active');
 						openBtn.focus();
 					}
 					openBtn.addEventListener('click', function(e) {
 						e.preventDefault();
 						openModal();
 					});
-					modal.querySelectorAll('[data-fs-css-vars-overview-close]').forEach(function(el) {
+					modal.querySelectorAll('[data-bl-css-vars-overview-close]').forEach(function(el) {
 						el.addEventListener('click', closeModal);
 					});
 					document.addEventListener('keydown', function(e) {
@@ -1553,21 +1553,21 @@ function add_theme_settings_menu_item(): void
 		__('Theme settings', 'baselayer'),
 		__('Theme', 'baselayer'),
 		'manage_options',
-		'fs-theme-settings',
+		'bl-theme-settings',
 		'theme_settings_page',
 		0
 	);
 }
 add_action('admin_menu', 'add_theme_settings_menu_item', 1);
 
-add_action('load-settings_page_fs-theme-settings', static function (): void {
+add_action('load-settings_page_bl-theme-settings', static function (): void {
 	global $title;
 	$title = bl_theme_settings_admin_title(bl_theme_settings_current_tab());
 });
 
 add_filter('submenu_file', function ($submenu_file, $parent_file) {
-	if ($parent_file === 'options-general.php' && isset($_GET['page']) && $_GET['page'] === 'fs-theme-settings') {
-		return 'fs-theme-settings';
+	if ($parent_file === 'options-general.php' && isset($_GET['page']) && $_GET['page'] === 'bl-theme-settings') {
+		return 'bl-theme-settings';
 	}
 	return $submenu_file;
 }, 10, 2);

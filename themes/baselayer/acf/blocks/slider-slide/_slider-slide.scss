@@ -13,7 +13,7 @@
   overflow: hidden;
 
   .slider-slide__wrapper:not(.alignfull) & {
-    border-radius: var(--fs-border-radius-m);
+    border-radius: var(--bl-border-radius-m);
   }
 
   &::after {
@@ -25,7 +25,7 @@
   }
 
   .editor-styles-wrapper & {
-    background-color: var(--fs-color-gray-200);
+    background-color: var(--bl-color-gray-200);
   }
 }
 

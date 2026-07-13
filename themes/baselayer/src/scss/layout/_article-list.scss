@@ -2,7 +2,7 @@
 @use '../mixins' as *;
 
 .article-list__wrapper {
-  scroll-margin-top: var(--fs-header-height-scrolled, #{$header-height-scrolled});
+  scroll-margin-top: var(--bl-header-height-scrolled, #{$header-height-scrolled});
 }
 
 .article-list__title {
@@ -80,5 +80,5 @@
 }
 
 .article-list__empty {
-  color: var(--fs-color-gray-600);
+  color: var(--bl-color-gray-600);
 }

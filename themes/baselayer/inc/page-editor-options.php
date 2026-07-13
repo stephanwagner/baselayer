@@ -159,7 +159,7 @@ add_filter('admin_body_class', function (string $classes): string {
 		return $classes;
 	}
 
-	return $classes . ' fs-page-title-hidden';
+	return $classes . ' bl-page-title-hidden';
 });
 
 /**

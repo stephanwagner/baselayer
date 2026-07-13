@@ -17,7 +17,7 @@ $s = trim((string) get_search_query());
 			<h1><?= esc_html(__('Search results', 'baselayer')) ?></h1>
 
 			<div class="search__page-form">
-				<?php bl_the_search_form(['id' => 'fs-search-page']); ?>
+				<?php bl_the_search_form(['id' => 'bl-search-page']); ?>
 			</div>
 
 			<?php if ($s === '' || !get_search_query()) : ?>

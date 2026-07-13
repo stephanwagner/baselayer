@@ -5,7 +5,7 @@
 @function transition($properties...) {
     $out: ();
     @each $p in $properties {
-      $out: list.append($out, #{$p} var(--fs-transition-speed), comma);
+      $out: list.append($out, #{$p} var(--bl-transition-speed), comma);
     }
     @return $out;
   }
@@ -13,7 +13,7 @@
   @function transition-slow($properties...) {
     $out: ();
     @each $p in $properties {
-      $out: list.append($out, #{$p} var(--fs-transition-speed-slow), comma);
+      $out: list.append($out, #{$p} var(--bl-transition-speed-slow), comma);
     }
     @return $out;
   }

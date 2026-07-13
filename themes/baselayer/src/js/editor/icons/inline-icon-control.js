@@ -29,42 +29,42 @@ export function InlineIconControl({ value, onChange, isActive = false }) {
 
   if (!value) {
     return (
-      <div className={'fs-inline-icon-control' + (isActive ? ' is-active' : '')}>
+      <div className={'bl-inline-icon-control' + (isActive ? ' is-active' : '')}>
         <button
           ref={placeholderRef}
           type="button"
-          className="fs-inline-icon-control__placeholder"
+          className="bl-inline-icon-control__placeholder"
           onClick={() => openPicker(placeholderRef.current)}
           aria-label={t('choose', 'Choose icon')}
         >
-          <span className="fs-inline-icon-control__placeholder-label">{t('choose', 'Choose icon')}</span>
+          <span className="bl-inline-icon-control__placeholder-label">{t('choose', 'Choose icon')}</span>
         </button>
       </div>
     );
   }
 
   return (
-    <div className={'fs-inline-icon-control' + (isActive ? ' is-active' : '')}>
-      <div className="fs-inline-icon-control__selected">
-        <span className={'fs-icon -icon-' + value} aria-hidden="true" />
+    <div className={'bl-inline-icon-control' + (isActive ? ' is-active' : '')}>
+      <div className="bl-inline-icon-control__selected">
+        <span className={'bl-icon -icon-' + value} aria-hidden="true" />
 
-        <div className="fs-inline-icon-control__actions">
+        <div className="bl-inline-icon-control__actions">
           <button
             ref={editRef}
             type="button"
-            className="fs-inline-icon-control__action"
+            className="bl-inline-icon-control__action"
             aria-label={t('change', 'Change icon')}
             onClick={() => openPicker(editRef.current)}
           >
-            <span className="fs-icon -icon-edit" aria-hidden="true" />
+            <span className="bl-icon -icon-edit" aria-hidden="true" />
           </button>
           <button
             type="button"
-            className="fs-inline-icon-control__action is-destructive"
+            className="bl-inline-icon-control__action is-destructive"
             aria-label={t('remove', 'Remove')}
             onClick={() => onChange('')}
           >
-            <span className="fs-icon -icon-close" aria-hidden="true" />
+            <span className="bl-icon -icon-close" aria-hidden="true" />
           </button>
         </div>
       </div>

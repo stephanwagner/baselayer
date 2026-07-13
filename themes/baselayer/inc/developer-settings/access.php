@@ -47,7 +47,7 @@ add_action('admin_init', function () use ($bl_developer_page_slug) {
 	$sanitized = function_exists('bl_sanitize_admin_access') ? bl_sanitize_admin_access($value) : [];
 	update_option('baselayer_admin_access', $sanitized);
 	set_transient('baselayer_access_saved', '1', 30);
-	wp_safe_redirect(admin_url('options-general.php?page=fs-developer-access'));
+	wp_safe_redirect(admin_url('options-general.php?page=bl-developer-access'));
 	exit;
 }, 1);
 
@@ -96,7 +96,7 @@ function bl_render_developer_access(): void
 
 		<?php bl_developer_settings_render_nav(); ?>
 
-		<form method="post" action="" class="fs-page-settings-form">
+		<form method="post" action="" class="bl-page-settings-form">
 			<h2 class="title"><?= esc_html__('User rights', 'baselayer') ?></h2>
 			<p class="description" style="margin-bottom: 16px;"><?= esc_html__('Control which admin pages and Settings sections are visible to Administrators (Admin) and users with developer rights (Developer). Uncheck to hide from that role.', 'baselayer') ?></p>
 			<?php settings_fields(BL_THEME_OPTION_GROUP_DEVELOPER); ?>
@@ -104,7 +104,7 @@ function bl_render_developer_access(): void
 				<?php if ($group['title']) : ?>
 					<h3 class="title" style="margin-top: 24px; margin-bottom: 12px;"><?= esc_html($group['title']) ?></h3>
 				<?php endif; ?>
-				<table class="widefat striped fs-table-small-gaps" role="presentation" style="margin-bottom: 0; width: auto;">
+				<table class="widefat striped bl-table-small-gaps" role="presentation" style="margin-bottom: 0; width: auto;">
 					<thead>
 						<tr>
 							<th scope="col" class="row-title"><?= esc_html__('Section', 'baselayer') ?></th>
@@ -133,7 +133,7 @@ function bl_render_developer_access(): void
 					</tbody>
 				</table>
 			<?php endforeach; ?>
-			<div class="fs-submit-row">
+			<div class="bl-submit-row">
 				<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
 			</div>
 		</form>

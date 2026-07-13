@@ -22,18 +22,18 @@ export function mountOptionsStack(root, options = {}) {
 
   const i18n = options.i18n || {};
   empty(root);
-  root.classList.add('fs-field-builder', 'fs-options-stack');
+  root.classList.add('bl-field-builder', 'bl-options-stack');
 
   const list = el('div', {
-    className: 'fs-field-builder__list fs-options-stack__list',
+    className: 'bl-field-builder__list bl-options-stack__list',
   });
   const emptyState = el('p', {
-    className: 'fs-field-builder__empty description',
+    className: 'bl-field-builder__empty description',
     text: i18n.empty || 'No options yet. Add a preset or a custom option.',
   });
 
-  const addRow = el('div', { className: 'fs-options-stack__add-row' });
-  const select = el('select', { className: 'fs-options-stack__select' });
+  const addRow = el('div', { className: 'bl-options-stack__add-row' });
+  const select = el('select', { className: 'bl-options-stack__select' });
   select.appendChild(el('option', { value: '', text: '—' }));
   library.forEach((item) => {
     select.appendChild(
@@ -69,7 +69,7 @@ export function mountOptionsStack(root, options = {}) {
 
   const syncSelectOptions = () => {
     const used = new Set(
-      Array.from(list.querySelectorAll('[data-fs-op-slug]')).map((row) => row.dataset.fsOpSlug)
+      Array.from(list.querySelectorAll('[data-bl-op-slug]')).map((row) => row.dataset.fsOpSlug)
     );
     Array.from(select.options).forEach((opt) => {
       if (!opt.value) {
@@ -83,41 +83,41 @@ export function mountOptionsStack(root, options = {}) {
   };
 
   const addPreset = (slug, open = false) => {
-    if (!slug || !labelBySlug[slug] || list.querySelector(`[data-fs-op-slug="${slug}"]`)) {
+    if (!slug || !labelBySlug[slug] || list.querySelector(`[data-bl-op-slug="${slug}"]`)) {
       return null;
     }
     const row = el('div', {
-      className: 'fs-option-presets__row fs-options-stack__item',
+      className: 'bl-option-presets__row bl-options-stack__item',
       dataset: { fsOpSlug: slug },
     });
     row.appendChild(
       el('span', {
-        className: 'fs-option-presets__handle fs-field-builder__field-handle',
+        className: 'bl-option-presets__handle bl-field-builder__field-handle',
         title: 'Drag to reorder',
         text: '⋮⋮',
       })
     );
     row.appendChild(
       el('span', {
-        className: 'fs-option-presets__badge',
+        className: 'bl-option-presets__badge',
         text: i18n.presetBadge || 'Preset',
       })
     );
     row.appendChild(
       el('span', {
-        className: 'fs-option-presets__label',
+        className: 'bl-option-presets__label',
         text: labelBySlug[slug],
       })
     );
     row.appendChild(
       el('code', {
-        className: 'fs-option-presets__slug',
+        className: 'bl-option-presets__slug',
         text: slug,
       })
     );
     const removeBtn = el('button', {
       type: 'button',
-      className: 'button-link-delete fs-option-presets__remove',
+      className: 'button-link-delete bl-option-presets__remove',
       text: i18n.removePreset || 'Remove',
     });
     removeBtn.addEventListener('click', () => {
@@ -137,7 +137,7 @@ export function mountOptionsStack(root, options = {}) {
 
   const addCustom = (data = {}, open = true) => {
     const row = createFieldRow({ mode: 'options', data, open });
-    row.classList.add('fs-options-stack__item');
+    row.classList.add('bl-options-stack__item');
     list.appendChild(row);
     syncEmpty();
     return row;
@@ -155,8 +155,8 @@ export function mountOptionsStack(root, options = {}) {
     addCustom({}, true);
   });
 
-  list.addEventListener('fs-fb-delete', (event) => {
-    const row = event.target.closest('[data-fs-fb-field]');
+  list.addEventListener('bl-fb-delete', (event) => {
+    const row = event.target.closest('[data-bl-fb-field]');
     if (row) {
       row.remove();
       syncEmpty();
@@ -194,7 +194,7 @@ export function mountOptionsStack(root, options = {}) {
   return {
     getStack() {
       return Array.from(list.children)
-        .filter((row) => row.classList.contains('fs-options-stack__item'))
+        .filter((row) => row.classList.contains('bl-options-stack__item'))
         .map((row) => {
           if (row.dataset.fsOpSlug) {
             return { kind: 'preset', slug: row.dataset.fsOpSlug };

@@ -99,10 +99,10 @@
 
     &.has-background {
       &:not(.alignfull) {
-        border-radius: var(--fs-border-radius-m);
+        border-radius: var(--bl-border-radius-m);
 
         @media (max-width: $breakpoint-xs) {
-          border-radius: var(--fs-border-radius-m);
+          border-radius: var(--bl-border-radius-m);
         }
       }
     }
@@ -115,7 +115,7 @@
     min-height: 320px;
 
     &:not(.alignfull) {
-      border-radius: var(--fs-border-radius-m);
+      border-radius: var(--bl-border-radius-m);
     }
   }
 
@@ -379,7 +379,7 @@
 
   .wp-block-column {
     &.has-background {
-      border-radius: var(--fs-border-radius-m);
+      border-radius: var(--bl-border-radius-m);
       padding: 32px;
 
       @media (max-width: $breakpoint-s) {
@@ -425,9 +425,9 @@
 
     .wp-element-caption {
       margin: 4px 0 0;
-      font-size: var(--fs-font-size-s);
-      line-height: var(--fs-line-height-s);
-      color: var(--fs-color-gray-600);
+      font-size: var(--bl-font-size-s);
+      line-height: var(--bl-line-height-s);
+      color: var(--bl-color-gray-600);
     }
   }
 
@@ -439,13 +439,13 @@
 
     &:not(.alignfull) {
       img {
-        border-radius: var(--fs-border-radius-m);
+        border-radius: var(--bl-border-radius-m);
       }
     }
 
     &.is-style-framed {
       img {
-        border-radius: var(--fs-border-radius-m);
+        border-radius: var(--bl-border-radius-m);
         border: 1px solid rgba(0, 0, 0, 0.15);
 
         @media (min-resolution: 1.9dppx) {
@@ -497,7 +497,7 @@
 
     &:not(.alignfull) {
       video {
-        border-radius: var(--fs-border-radius-m);
+        border-radius: var(--bl-border-radius-m);
       }
     }
 
@@ -518,8 +518,8 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        font-size: var(--fs-font-size-s);
-        line-height: var(--fs-line-height-s);
+        font-size: var(--bl-font-size-s);
+        line-height: var(--bl-line-height-s);
 
         @media (max-width: $breakpoint-s) {
           padding: 12px 8px 8px;
@@ -530,7 +530,7 @@
 
       figcaption.wp-element-caption,
       &:has(figcaption)::before {
-        border-radius: 0 0 var(--fs-border-radius-m) var(--fs-border-radius-m);
+        border-radius: 0 0 var(--bl-border-radius-m) var(--bl-border-radius-m);
       }
     }
 
@@ -548,19 +548,19 @@
   .-narrow,
   .-narrow-left,
   .-narrow-right {
-    max-width: var(--fs-content-width-narrow);
+    max-width: var(--bl-content-width-narrow);
   }
 
   .-very-narrow,
   .-very-narrow-left,
   .-very-narrow-right {
-    max-width: var(--fs-content-width-very-narrow);
+    max-width: var(--bl-content-width-very-narrow);
   }
 
   .-extra-narrow,
   .-extra-narrow-left,
   .-extra-narrow-right {
-    max-width: var(--fs-content-width-extra-narrow);
+    max-width: var(--bl-content-width-extra-narrow);
   }
 
   .-narrow,
@@ -584,17 +584,17 @@
   }
 
   .-content-margin-xs {
-    @include content-margin(var(--fs-content-margin-xs), var(--fs-content-margin-xs));
+    @include content-margin(var(--bl-content-margin-xs), var(--bl-content-margin-xs));
   }
 
   .-content-margin-s {
     @include content-margin(
-      var(--fs-content-margin-s),
-      var(--fs-content-margin-s),
+      var(--bl-content-margin-s),
+      var(--bl-content-margin-s),
       (
         $breakpoint-xs: (
-          top: var(--fs-content-margin-xs),
-          bottom: var(--fs-content-margin-xs),
+          top: var(--bl-content-margin-xs),
+          bottom: var(--bl-content-margin-xs),
         ),
       )
     );
@@ -602,16 +602,16 @@
 
   .-content-margin-m {
     @include content-margin(
-      var(--fs-content-margin-m),
-      var(--fs-content-margin-m),
+      var(--bl-content-margin-m),
+      var(--bl-content-margin-m),
       (
         $breakpoint-s: (
-          top: var(--fs-content-margin-s),
-          bottom: var(--fs-content-margin-s),
+          top: var(--bl-content-margin-s),
+          bottom: var(--bl-content-margin-s),
         ),
         $breakpoint-xs: (
-          top: var(--fs-content-margin-xs),
-          bottom: var(--fs-content-margin-xs),
+          top: var(--bl-content-margin-xs),
+          bottom: var(--bl-content-margin-xs),
         ),
       )
     );
@@ -619,16 +619,16 @@
 
   .-content-margin-l {
     @include content-margin(
-      var(--fs-content-margin-l),
-      var(--fs-content-margin-l),
+      var(--bl-content-margin-l),
+      var(--bl-content-margin-l),
       (
         $breakpoint-m: (
-          top: var(--fs-content-margin-m),
-          bottom: var(--fs-content-margin-m),
+          top: var(--bl-content-margin-m),
+          bottom: var(--bl-content-margin-m),
         ),
         $breakpoint-s: (
-          top: var(--fs-content-margin-s),
-          bottom: var(--fs-content-margin-s),
+          top: var(--bl-content-margin-s),
+          bottom: var(--bl-content-margin-s),
         ),
       )
     );
@@ -636,20 +636,20 @@
 
   .-content-margin-xl {
     @include content-margin(
-      var(--fs-content-margin-xl),
-      var(--fs-content-margin-xl),
+      var(--bl-content-margin-xl),
+      var(--bl-content-margin-xl),
       (
         $breakpoint-l: (
-          top: var(--fs-content-margin-l),
-          bottom: var(--fs-content-margin-l),
+          top: var(--bl-content-margin-l),
+          bottom: var(--bl-content-margin-l),
         ),
         $breakpoint-m: (
-          top: var(--fs-content-margin-m),
-          bottom: var(--fs-content-margin-m),
+          top: var(--bl-content-margin-m),
+          bottom: var(--bl-content-margin-m),
         ),
         $breakpoint-s: (
-          top: var(--fs-content-margin-s),
-          bottom: var(--fs-content-margin-s),
+          top: var(--bl-content-margin-s),
+          bottom: var(--bl-content-margin-s),
         ),
       )
     );
@@ -662,16 +662,16 @@
   }
 
   .-content-margin-top-xs {
-    @include content-margin(var(--fs-content-margin-xs), null);
+    @include content-margin(var(--bl-content-margin-xs), null);
   }
 
   .-content-margin-top-s {
     @include content-margin(
-      var(--fs-content-margin-s),
+      var(--bl-content-margin-s),
       null,
       (
         $breakpoint-xs: (
-          top: var(--fs-content-margin-xs),
+          top: var(--bl-content-margin-xs),
         ),
       )
     );
@@ -679,14 +679,14 @@
 
   .-content-margin-top-m {
     @include content-margin(
-      var(--fs-content-margin-m),
+      var(--bl-content-margin-m),
       null,
       (
         $breakpoint-s: (
-          top: var(--fs-content-margin-s),
+          top: var(--bl-content-margin-s),
         ),
         $breakpoint-xs: (
-          top: var(--fs-content-margin-xs),
+          top: var(--bl-content-margin-xs),
         ),
       )
     );
@@ -694,14 +694,14 @@
 
   .-content-margin-top-l {
     @include content-margin(
-      var(--fs-content-margin-l),
+      var(--bl-content-margin-l),
       null,
       (
         $breakpoint-m: (
-          top: var(--fs-content-margin-m),
+          top: var(--bl-content-margin-m),
         ),
         $breakpoint-s: (
-          top: var(--fs-content-margin-s),
+          top: var(--bl-content-margin-s),
         ),
       )
     );
@@ -709,17 +709,17 @@
 
   .-content-margin-top-xl {
     @include content-margin(
-      var(--fs-content-margin-xl),
+      var(--bl-content-margin-xl),
       null,
       (
         $breakpoint-l: (
-          top: var(--fs-content-margin-l),
+          top: var(--bl-content-margin-l),
         ),
         $breakpoint-m: (
-          top: var(--fs-content-margin-m),
+          top: var(--bl-content-margin-m),
         ),
         $breakpoint-s: (
-          top: var(--fs-content-margin-s),
+          top: var(--bl-content-margin-s),
         ),
       )
     );
@@ -732,16 +732,16 @@
   }
 
   .-content-margin-bottom-xs {
-    @include content-margin(null, var(--fs-content-margin-xs));
+    @include content-margin(null, var(--bl-content-margin-xs));
   }
 
   .-content-margin-bottom-s {
     @include content-margin(
       null,
-      var(--fs-content-margin-s),
+      var(--bl-content-margin-s),
       (
         $breakpoint-xs: (
-          bottom: var(--fs-content-margin-xs),
+          bottom: var(--bl-content-margin-xs),
         ),
       )
     );
@@ -750,13 +750,13 @@
   .-content-margin-bottom-m {
     @include content-margin(
       null,
-      var(--fs-content-margin-m),
+      var(--bl-content-margin-m),
       (
         $breakpoint-s: (
-          bottom: var(--fs-content-margin-s),
+          bottom: var(--bl-content-margin-s),
         ),
         $breakpoint-xs: (
-          bottom: var(--fs-content-margin-xs),
+          bottom: var(--bl-content-margin-xs),
         ),
       )
     );
@@ -765,13 +765,13 @@
   .-content-margin-bottom-l {
     @include content-margin(
       null,
-      var(--fs-content-margin-l),
+      var(--bl-content-margin-l),
       (
         $breakpoint-m: (
-          bottom: var(--fs-content-margin-m),
+          bottom: var(--bl-content-margin-m),
         ),
         $breakpoint-s: (
-          bottom: var(--fs-content-margin-s),
+          bottom: var(--bl-content-margin-s),
         ),
       )
     );
@@ -780,16 +780,16 @@
   .-content-margin-bottom-xl {
     @include content-margin(
       null,
-      var(--fs-content-margin-xl),
+      var(--bl-content-margin-xl),
       (
         $breakpoint-l: (
-          bottom: var(--fs-content-margin-l),
+          bottom: var(--bl-content-margin-l),
         ),
         $breakpoint-m: (
-          bottom: var(--fs-content-margin-m),
+          bottom: var(--bl-content-margin-m),
         ),
         $breakpoint-s: (
-          bottom: var(--fs-content-margin-s),
+          bottom: var(--bl-content-margin-s),
         ),
       )
     );
@@ -805,19 +805,19 @@
 
   .-content-padding-xs {
     @include content-padding-targets {
-      @include block-content-padding(var(--fs-content-padding-xs), var(--fs-content-padding-xs));
+      @include block-content-padding(var(--bl-content-padding-xs), var(--bl-content-padding-xs));
     }
   }
 
   .-content-padding-s {
     @include content-padding-targets {
       @include block-content-padding(
-        var(--fs-content-padding-s),
-        var(--fs-content-padding-s),
+        var(--bl-content-padding-s),
+        var(--bl-content-padding-s),
         (
           $breakpoint-xs: (
-            x: var(--fs-content-padding-xs),
-            y: var(--fs-content-padding-xs),
+            x: var(--bl-content-padding-xs),
+            y: var(--bl-content-padding-xs),
           ),
         )
       );
@@ -827,16 +827,16 @@
   .-content-padding-m {
     @include content-padding-targets {
       @include block-content-padding(
-        var(--fs-content-padding-m),
-        var(--fs-content-padding-m),
+        var(--bl-content-padding-m),
+        var(--bl-content-padding-m),
         (
           $breakpoint-s: (
-            x: var(--fs-content-padding-s),
-            y: var(--fs-content-padding-s),
+            x: var(--bl-content-padding-s),
+            y: var(--bl-content-padding-s),
           ),
           $breakpoint-xs: (
-            x: var(--fs-content-padding-xs),
-            y: var(--fs-content-padding-xs),
+            x: var(--bl-content-padding-xs),
+            y: var(--bl-content-padding-xs),
           ),
         )
       );
@@ -846,20 +846,20 @@
   .-content-padding-l {
     @include content-padding-targets {
       @include block-content-padding(
-        var(--fs-content-padding-l),
-        var(--fs-content-padding-l),
+        var(--bl-content-padding-l),
+        var(--bl-content-padding-l),
         (
           $breakpoint-m: (
-            x: var(--fs-content-padding-m),
-            y: var(--fs-content-padding-m),
+            x: var(--bl-content-padding-m),
+            y: var(--bl-content-padding-m),
           ),
           $breakpoint-s: (
-            x: var(--fs-content-padding-s),
-            y: var(--fs-content-padding-s),
+            x: var(--bl-content-padding-s),
+            y: var(--bl-content-padding-s),
           ),
           $breakpoint-xs: (
-            x: var(--fs-content-padding-xs),
-            y: var(--fs-content-padding-xs),
+            x: var(--bl-content-padding-xs),
+            y: var(--bl-content-padding-xs),
           ),
         )
       );
@@ -869,24 +869,24 @@
   .-content-padding-xl {
     @include content-padding-targets {
       @include block-content-padding(
-        var(--fs-content-padding-xl),
-        var(--fs-content-padding-xl),
+        var(--bl-content-padding-xl),
+        var(--bl-content-padding-xl),
         (
           $breakpoint-l: (
-            x: var(--fs-content-padding-m),
-            y: var(--fs-content-padding-l),
+            x: var(--bl-content-padding-m),
+            y: var(--bl-content-padding-l),
           ),
           $breakpoint-m: (
-            x: var(--fs-content-padding-m),
-            y: var(--fs-content-padding-m),
+            x: var(--bl-content-padding-m),
+            y: var(--bl-content-padding-m),
           ),
           $breakpoint-s: (
-            x: var(--fs-content-padding-s),
-            y: var(--fs-content-padding-s),
+            x: var(--bl-content-padding-s),
+            y: var(--bl-content-padding-s),
           ),
           $breakpoint-xs: (
-            x: var(--fs-content-padding-xs),
-            y: var(--fs-content-padding-xs),
+            x: var(--bl-content-padding-xs),
+            y: var(--bl-content-padding-xs),
           ),
         )
       );
@@ -897,51 +897,51 @@
 
   .wp-block-spacer {
     &.-is-demo {
-      background-color: var(--fs-color-gray-200);
-      border: 1px dashed var(--fs-color-gray-400);
-      border-radius: var(--fs-border-radius-m);
+      background-color: var(--bl-color-gray-200);
+      border: 1px dashed var(--bl-color-gray-400);
+      border-radius: var(--bl-border-radius-m);
     }
 
     &.-spacer-height-xs {
-      @include spacer-responsive-height(var(--fs-content-margin-xs));
+      @include spacer-responsive-height(var(--bl-content-margin-xs));
     }
 
     &.-spacer-height-s {
       @include spacer-responsive-height(
-        var(--fs-content-margin-s),
+        var(--bl-content-margin-s),
         (
-          $breakpoint-xs: var(--fs-content-margin-xs),
+          $breakpoint-xs: var(--bl-content-margin-xs),
         )
       );
     }
 
     &.-spacer-height-m {
       @include spacer-responsive-height(
-        var(--fs-content-margin-m),
+        var(--bl-content-margin-m),
         (
-          $breakpoint-s: var(--fs-content-margin-s),
-          $breakpoint-xs: var(--fs-content-margin-xs),
+          $breakpoint-s: var(--bl-content-margin-s),
+          $breakpoint-xs: var(--bl-content-margin-xs),
         )
       );
     }
 
     &.-spacer-height-l {
       @include spacer-responsive-height(
-        var(--fs-content-margin-l),
+        var(--bl-content-margin-l),
         (
-          $breakpoint-m: var(--fs-content-margin-m),
-          $breakpoint-s: var(--fs-content-margin-s),
+          $breakpoint-m: var(--bl-content-margin-m),
+          $breakpoint-s: var(--bl-content-margin-s),
         )
       );
     }
 
     &.-spacer-height-xl {
       @include spacer-responsive-height(
-        var(--fs-content-margin-xl),
+        var(--bl-content-margin-xl),
         (
-          $breakpoint-l: var(--fs-content-margin-l),
-          $breakpoint-m: var(--fs-content-margin-m),
-          $breakpoint-s: var(--fs-content-margin-s),
+          $breakpoint-l: var(--bl-content-margin-l),
+          $breakpoint-m: var(--bl-content-margin-m),
+          $breakpoint-s: var(--bl-content-margin-s),
         )
       );
     }
@@ -976,7 +976,7 @@
       bottom: 0;
       width: 3px;
       border-radius: 3px;
-      background-color: var(--fs-color-gray-300);
+      background-color: var(--bl-color-gray-300);
     }
   }
 
@@ -984,21 +984,21 @@
     position: relative;
 
     &:not(.alignfull) {
-      border-radius: var(--fs-border-radius-m);
+      border-radius: var(--bl-border-radius-m);
     }
 
     blockquote {
       > p {
-        font-size: var(--fs-font-size-xl);
-        line-height: var(--fs-line-height-xl);
+        font-size: var(--bl-font-size-xl);
+        line-height: var(--bl-line-height-xl);
         margin: 0;
         text-wrap: pretty;
       }
 
       > cite {
-        font-size: var(--fs-font-size-m);
-        line-height: var(--fs-line-height-m);
-        color: var(--fs-color-gray-600);
+        font-size: var(--bl-font-size-m);
+        line-height: var(--bl-line-height-m);
+        color: var(--bl-color-gray-600);
         font-style: italic;
         margin: 16px 0 0;
       }

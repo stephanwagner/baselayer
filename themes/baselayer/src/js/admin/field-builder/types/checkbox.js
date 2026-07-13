@@ -27,8 +27,8 @@ export default {
 
   serialize(fieldRoot) {
     const out = {};
-    const defaultValue = fieldRoot.querySelector('[data-fs-fb="default_value"]');
-    const className = fieldRoot.querySelector('[data-fs-fb="class_name"]');
+    const defaultValue = fieldRoot.querySelector('[data-bl-fb="default_value"]');
+    const className = fieldRoot.querySelector('[data-bl-fb="class_name"]');
     if (defaultValue) {
       out.default_value = defaultValue.value === '1';
     }
@@ -39,8 +39,8 @@ export default {
   },
 
   hydrate(fieldRoot, data) {
-    const defaultValue = fieldRoot.querySelector('[data-fs-fb="default_value"]');
-    const className = fieldRoot.querySelector('[data-fs-fb="class_name"]');
+    const defaultValue = fieldRoot.querySelector('[data-bl-fb="default_value"]');
+    const className = fieldRoot.querySelector('[data-bl-fb="class_name"]');
     if (defaultValue) {
       defaultValue.value = data.default_value ? '1' : '0';
     }

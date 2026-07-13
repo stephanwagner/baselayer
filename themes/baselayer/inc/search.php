@@ -33,7 +33,7 @@ function bl_search_form(array $args = []): string
 		'button' => __('Search', 'baselayer'),
 		'value' => get_search_query(),
 		'action' => bl_search_url(),
-		'id' => 'fs-search',
+		'id' => 'bl-search',
 		'class' => '',
 		'autofocus' => false,
 	];
@@ -42,7 +42,7 @@ function bl_search_form(array $args = []): string
 	$args['value'] = is_string($args['value']) ? $args['value'] : '';
 	$args['id'] = sanitize_html_class((string) $args['id']);
 	if ($args['id'] === '') {
-		$args['id'] = 'fs-search';
+		$args['id'] = 'bl-search';
 	}
 
 	ob_start();
@@ -96,7 +96,7 @@ function bl_search_modal_markup(): void
 	<div class="search-modal__source" hidden>
 		<div data-modal-content="search">
 			<?php bl_the_search_form([
-				'id' => 'fs-search-modal',
+				'id' => 'bl-search-modal',
 				'autofocus' => true,
 				'class' => 'search-modal__form',
 			]); ?>

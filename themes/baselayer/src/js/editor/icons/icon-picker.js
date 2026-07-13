@@ -35,23 +35,23 @@ export function IconPicker({ label, description, value, onChange }) {
   };
 
   return (
-    <div className="fs-icon-picker">
-      {label ? <span className="fs-icon-picker__label">{label}</span> : null}
+    <div className="bl-icon-picker">
+      {label ? <span className="bl-icon-picker__label">{label}</span> : null}
 
       {selected ? (
-        <div className="fs-icon-picker__value">
-          <span className={'fs-icon -icon-' + value} aria-hidden="true" />
-          <span className="fs-icon-picker__value-name">{iconName(selected.icon)}</span>
+        <div className="bl-icon-picker__value">
+          <span className={'bl-icon -icon-' + value} aria-hidden="true" />
+          <span className="bl-icon-picker__value-name">{iconName(selected.icon)}</span>
         </div>
       ) : null}
 
-      <div className="fs-icon-picker__control">
-        <Button ref={triggerRef} variant="secondary" className="fs-icon-picker__trigger" onClick={openPicker}>
+      <div className="bl-icon-picker__control">
+        <Button ref={triggerRef} variant="secondary" className="bl-icon-picker__trigger" onClick={openPicker}>
           {t('choose', 'Choose icon')}
         </Button>
 
         {value ? (
-          <Button variant="tertiary" isDestructive className="fs-icon-picker__clear" onClick={() => onChange('')}>
+          <Button variant="tertiary" isDestructive className="bl-icon-picker__clear" onClick={() => onChange('')}>
             {t('remove', 'Remove')}
           </Button>
         ) : null}

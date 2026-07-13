@@ -92,8 +92,8 @@ function bl_admin_notice_print_client_assets(): void
 	$pos = bl_admin_notice_position_vars();
 	$dismiss = esc_attr__('Dismiss notice', 'baselayer');
 ?>
-	<style id="fs-admin-notice--base">
-		#fs-admin-notice-root.bl-admin-notice {
+	<style id="bl-admin-notice--base">
+		#bl-admin-notice-root.bl-admin-notice {
 			transform: translateX(64px);
 			position: fixed;
 			z-index: 100050;
@@ -102,8 +102,8 @@ function bl_admin_notice_print_client_assets(): void
 			top: <?= esc_attr($pos['top']) ?>;
 			max-width: min(460px, calc(100vw - 30px));
 			box-shadow: 0 1px 1px rgba(0, 0, 0, .04), 0 1px 3px rgba(0, 0, 0, .1);
-			border: 1px solid var(--fs-an-border, #50575e);
-			border-left: 4px solid var(--fs-an-border, #50575e);
+			border: 1px solid var(--bl-an-border, #50575e);
+			border-left: 4px solid var(--bl-an-border, #50575e);
 			border-radius: 6px;
 			background: #fff;
 			color: #1d2327;
@@ -115,38 +115,38 @@ function bl_admin_notice_print_client_assets(): void
 			will-change: transform, opacity;
 		}
 
-		#fs-admin-notice-root.bl-admin-notice.is-open {
+		#bl-admin-notice-root.bl-admin-notice.is-open {
 			transform: translateX(0);
 			opacity: 1;
 			pointer-events: auto;
 		}
 
-		#fs-admin-notice-root.bl-admin-notice.is-closed {
+		#bl-admin-notice-root.bl-admin-notice.is-closed {
 			opacity: 0 !important;
 			pointer-events: none;
 		}
 
-		#fs-admin-notice-root.bl-admin-notice--success {
-			--fs-an-border: #00a32a;
+		#bl-admin-notice-root.bl-admin-notice--success {
+			--bl-an-border: #00a32a;
 			background: #edfaef;
 		}
 
-		#fs-admin-notice-root.bl-admin-notice--error {
-			--fs-an-border: #d63638;
+		#bl-admin-notice-root.bl-admin-notice--error {
+			--bl-an-border: #d63638;
 			background: #fcf0f1;
 		}
 
-		#fs-admin-notice-root.bl-admin-notice--warning {
-			--fs-an-border: #dba617;
+		#bl-admin-notice-root.bl-admin-notice--warning {
+			--bl-an-border: #dba617;
 			background: #fcf9e8;
 		}
 
-		#fs-admin-notice-root.bl-admin-notice--info {
-			--fs-an-border: #72aee6;
+		#bl-admin-notice-root.bl-admin-notice--info {
+			--bl-an-border: #72aee6;
 			background: #f0f6fc;
 		}
 
-		#fs-admin-notice-root .bl-admin-notice__inner {
+		#bl-admin-notice-root .bl-admin-notice__inner {
 			display: flex;
 			align-items: center;
 			gap: 16px;
@@ -154,13 +154,13 @@ function bl_admin_notice_print_client_assets(): void
 			font-weight: 500;
 		}
 
-		#fs-admin-notice-root .bl-admin-notice__message {
+		#bl-admin-notice-root .bl-admin-notice__message {
 			flex: 1;
 			margin: 0;
 			padding: 0;
 		}
 
-		#fs-admin-notice-root .bl-admin-notice__dismiss {
+		#bl-admin-notice-root .bl-admin-notice__dismiss {
 			flex-shrink: 0;
 			height: 24px;
 			width: 24px;
@@ -178,19 +178,19 @@ function bl_admin_notice_print_client_assets(): void
 			align-self: flex-start;
 		}
 
-		#fs-admin-notice-root .bl-admin-notice__dismiss svg {
+		#bl-admin-notice-root .bl-admin-notice__dismiss svg {
 			display: block;
 			width: 14px;
 			height: 14px;
 		}
 
-		#fs-admin-notice-root .bl-admin-notice__dismiss:hover,
-		#fs-admin-notice-root .bl-admin-notice__dismiss:focus {
+		#bl-admin-notice-root .bl-admin-notice__dismiss:hover,
+		#bl-admin-notice-root .bl-admin-notice__dismiss:focus {
 			color: #1d2327;
 		}
 
 		@media (max-width: 782px) {
-			#fs-admin-notice-root.bl-admin-notice {
+			#bl-admin-notice-root.bl-admin-notice {
 				top: <?= esc_attr($pos['top_mobile']) ?>;
 			}
 		}
@@ -212,23 +212,23 @@ function bl_admin_notice_print_client_assets(): void
 				if (!message) {
 					return;
 				}
-				var existing = document.getElementById('fs-admin-notice-root');
+				var existing = document.getElementById('bl-admin-notice-root');
 				if (existing && existing.parentNode) {
 					existing.parentNode.removeChild(existing);
 				}
 				var root = document.createElement('div');
-				root.id = 'fs-admin-notice-root';
-				root.className = 'fs-admin-notice fs-admin-notice--' + type;
+				root.id = 'bl-admin-notice-root';
+				root.className = 'bl-admin-notice bl-admin-notice--' + type;
 				root.setAttribute('role', type === 'error' ? 'alert' : 'status');
 				root.setAttribute('aria-live', type === 'error' ? 'assertive' : 'polite');
 				var inner = document.createElement('div');
-				inner.className = 'fs-admin-notice__inner';
+				inner.className = 'bl-admin-notice__inner';
 				var p = document.createElement('p');
-				p.className = 'fs-admin-notice__message';
+				p.className = 'bl-admin-notice__message';
 				p.textContent = message;
 				var btn = document.createElement('button');
 				btn.type = 'button';
-				btn.className = 'fs-admin-notice__dismiss';
+				btn.className = 'bl-admin-notice__dismiss';
 				btn.setAttribute('aria-label', dismissLabel);
 				btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor"><path d="M480-424 284-228q-11 11-28 11t-28-11q-11-11-11-28t11-28l196-196-196-196q-11-11-11-28t11-28q11-11 28-11t28 11l196 196 196-196q11-11 28-11t28 11q11 11 11 28t-11 28L536-480l196 196q11 11 11 28t-11 28q-11 11-28 11t-28-11L480-424Z"></path></svg>';
 				inner.appendChild(p);

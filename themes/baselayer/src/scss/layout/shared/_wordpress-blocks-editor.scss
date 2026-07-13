@@ -17,19 +17,19 @@ $editor-content-width-outer: $editor-content-width + ($editor-content-width-padd
     .-narrow,
     .-narrow-left,
     .-narrow-right {
-      max-width: min(var(--fs-content-width-narrow), var(--fs-editor-content-width)) !important;
+      max-width: min(var(--bl-content-width-narrow), var(--bl-editor-content-width)) !important;
     }
 
     .-very-narrow,
     .-very-narrow-left,
     .-very-narrow-right {
-      max-width: min(var(--fs-content-width-very-narrow), var(--fs-editor-content-width)) !important;
+      max-width: min(var(--bl-content-width-very-narrow), var(--bl-editor-content-width)) !important;
     }
 
     .-extra-narrow,
     .-extra-narrow-left,
     .-extra-narrow-right {
-      max-width: min(var(--fs-content-width-extra-narrow), var(--fs-editor-content-width)) !important;
+      max-width: min(var(--bl-content-width-extra-narrow), var(--bl-editor-content-width)) !important;
     }
 
     .-narrow,

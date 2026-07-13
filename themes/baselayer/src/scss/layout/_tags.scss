@@ -14,7 +14,7 @@
   // Links
 
   a {
-    color: var(--fs-link-color);
+    color: var(--bl-link-color);
     text-decoration: none;
 
     body.-transition-init & {
@@ -23,7 +23,7 @@
 
     &:hover {
       text-decoration: none;
-      color: var(--fs-link-color-hover);
+      color: var(--bl-link-color-hover);
     }
   }
 
@@ -41,7 +41,7 @@
       padding: 20px 24px;
 
       &:not(.alignfull) {
-        border-radius: var(--fs-border-radius-m);
+        border-radius: var(--bl-border-radius-m);
       }
 
       @media (max-width: $breakpoint-s) {
@@ -153,8 +153,8 @@
   h3.h5,
   h4.h5,
   h6.h5 {
-    font-size: var(--fs-font-size-l);
-    line-height: var(--fs-line-height-l);
+    font-size: var(--bl-font-size-l);
+    line-height: var(--bl-line-height-l);
     font-weight: 600;
     margin-top: 16px;
     margin-bottom: 6px;
@@ -175,8 +175,8 @@
   h3.h6,
   h4.h6,
   h5.h6 {
-    font-size: var(--fs-default-font-size);
-    line-height: var(--fs-default-line-height);
+    font-size: var(--bl-default-font-size);
+    line-height: var(--bl-default-line-height);
     font-weight: 600;
     margin-top: 16px;
     margin-bottom: 4px;
@@ -198,7 +198,7 @@
     border: 0;
     height: 1px;
     border-radius: 1px;
-    background: var(--fs-color-gray-400);
+    background: var(--bl-color-gray-400);
     width: 100% !important;
     max-width: 100% !important;
 

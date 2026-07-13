@@ -52,8 +52,8 @@
     background: rgba(0, 0, 0, 0.08);
   }
 
-  #fs-media-folders-sidebar.is-edit-mode &,
-  #fs-media-folders-sidebar.is-delete-mode & {
+  #bl-media-folders-sidebar.is-edit-mode &,
+  #bl-media-folders-sidebar.is-delete-mode & {
     display: none;
   }
 }
@@ -498,12 +498,12 @@ body.bl-feature-media-folders {
   }
 
   /* Sidebar: room for rename/delete toolbar on folder rows */
-  #fs-media-folders-sidebar.is-edit-mode
+  #bl-media-folders-sidebar.is-edit-mode
     .bl-media-folders-item.bl-media-folders-link:not(.bl-media-folders-item--all):not(
       .bl-media-folders-item--unassigned
     )
     > .bl-media-folder-row,
-  #fs-media-folders-sidebar.is-delete-mode
+  #bl-media-folders-sidebar.is-delete-mode
     .bl-media-folders-item.bl-media-folders-link:not(.bl-media-folders-item--all):not(
       .bl-media-folders-item--unassigned
     )
@@ -527,8 +527,8 @@ body.bl-feature-media-folders {
     transform: translateY(-50%);
   }
 
-  #fs-media-folders-sidebar.is-edit-mode .bl-media-folders-item-toolbar,
-  #fs-media-folders-sidebar.is-delete-mode .bl-media-folders-item-toolbar {
+  #bl-media-folders-sidebar.is-edit-mode .bl-media-folders-item-toolbar,
+  #bl-media-folders-sidebar.is-delete-mode .bl-media-folders-item-toolbar {
     display: flex;
   }
 
@@ -561,7 +561,7 @@ body.bl-feature-media-folders {
     }
   }
 
-  #fs-media-folders-sidebar.is-edit-mode .bl-media-folder-edit-btn {
+  #bl-media-folders-sidebar.is-edit-mode .bl-media-folder-edit-btn {
     display: inline-flex;
   }
 
@@ -580,7 +580,7 @@ body.bl-feature-media-folders {
     outline-color: #fff;
   }
 
-  #fs-media-folders-sidebar.is-delete-mode .bl-media-folder-delete-btn {
+  #bl-media-folders-sidebar.is-delete-mode .bl-media-folder-delete-btn {
     display: inline-flex;
   }
 
@@ -682,7 +682,7 @@ body.bl-feature-media-folders {
     }
   }
 
-  #fs-media-folder-delete-text {
+  #bl-media-folder-delete-text {
     text-wrap: pretty;
   }
 
@@ -943,12 +943,12 @@ body.bl-feature-media-folders {
     overscroll-behavior: none;
   }
 
-  label[for='attachment-details-fs-media-folder-id'] {
+  label[for='attachment-details-bl-media-folder-id'] {
     margin-right: 0;
     min-width: 20%;
   }
 
-  select[id='attachment-details-fs-media-folder-id'] {
+  select[id='attachment-details-bl-media-folder-id'] {
     float: right;
     min-width: 77%;
   }

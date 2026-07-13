@@ -120,7 +120,7 @@ function bl_svg_code(string $path, array $attributes = []): string
 function bl_img($image, $size = 'medium', array $args = []): string
 {
 	$defaults = [
-		'class' => 'fs-img',
+		'class' => 'bl-img',
 		'loading' => 'lazy',
 		'decoding' => 'async',
 	];
@@ -297,7 +297,7 @@ add_action('enqueue_block_editor_assets', 'bl_enqueue_child_theme_editor_scripts
  * Enqueue theme icon mask CSS (child assets/css/icons.css when present, else parent).
  *
  * Relative url() values are rewritten to absolute theme URIs so browsers resolve
- * them correctly when mask-image uses var(--fs-icon) from the parent stylesheet.
+ * them correctly when mask-image uses var(--bl-icon) from the parent stylesheet.
  *
  * @param string[] $deps Style handle dependencies.
  */

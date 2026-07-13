@@ -103,116 +103,116 @@ $editor-content-width-padding: 24px;
 // Variables
 :root {
   // Colors
-  --fs-color-primary: #{$color-primary};
-  --fs-color-primary-dark: #{$color-primary-dark};
-  --fs-color-secondary: #{$color-secondary};
-  --fs-color-secondary-dark: #{$color-secondary-dark};
+  --bl-color-primary: #{$color-primary};
+  --bl-color-primary-dark: #{$color-primary-dark};
+  --bl-color-secondary: #{$color-secondary};
+  --bl-color-secondary-dark: #{$color-secondary-dark};
 
   // Grayscale
-  --fs-color-white: #{$color-white};
-  --fs-color-black: #{$color-black};
-  --fs-color-off-black: #{$color-off-black};
-  --fs-color-gray-600: #{$color-gray-600};
-  --fs-color-gray-500: #{$color-gray-500};
-  --fs-color-gray-400: #{$color-gray-400};
-  --fs-color-gray-300: #{$color-gray-300};
-  --fs-color-gray-200: #{$color-gray-200};
-  --fs-color-gray-100: #{$color-gray-100};
+  --bl-color-white: #{$color-white};
+  --bl-color-black: #{$color-black};
+  --bl-color-off-black: #{$color-off-black};
+  --bl-color-gray-600: #{$color-gray-600};
+  --bl-color-gray-500: #{$color-gray-500};
+  --bl-color-gray-400: #{$color-gray-400};
+  --bl-color-gray-300: #{$color-gray-300};
+  --bl-color-gray-200: #{$color-gray-200};
+  --bl-color-gray-100: #{$color-gray-100};
 
   // Status colors
-  --fs-color-error: #{$color-error};
-  --fs-color-warning: #{$color-warning};
-  --fs-color-success: #{$color-success};
+  --bl-color-error: #{$color-error};
+  --bl-color-warning: #{$color-warning};
+  --bl-color-success: #{$color-success};
 
   // Gradients
-  --fs-gradient-primary: linear-gradient(to right, var(--fs-color-primary), var(--fs-color-secondary));
+  --bl-gradient-primary: linear-gradient(to right, var(--bl-color-primary), var(--bl-color-secondary));
 
   // Font sizes
-  --fs-font-size-s: #{$font-size-s};
-  --fs-font-size-m: #{$font-size-m};
-  --fs-font-size-l: #{$font-size-l};
-  --fs-font-size-xl: #{$font-size-xl};
+  --bl-font-size-s: #{$font-size-s};
+  --bl-font-size-m: #{$font-size-m};
+  --bl-font-size-l: #{$font-size-l};
+  --bl-font-size-xl: #{$font-size-xl};
 
   // Line heights
-  --fs-line-height-s: #{$line-height-s};
-  --fs-line-height-m: #{$line-height-m};
-  --fs-line-height-l: #{$line-height-l};
-  --fs-line-height-xl: #{$line-height-xl};
+  --bl-line-height-s: #{$line-height-s};
+  --bl-line-height-m: #{$line-height-m};
+  --bl-line-height-l: #{$line-height-l};
+  --bl-line-height-xl: #{$line-height-xl};
 
   // Text
-  --fs-primary-font-family: #{$primary-font-family};
-  --fs-default-text-color: var(--fs-color-off-black);
-  --fs-gray-text-color: var(--fs-color-gray-500);
-  --fs-default-font-size: var(--fs-font-size-m);
-  --fs-default-line-height: var(--fs-line-height-m);
-  --fs-link-color: var(--fs-color-primary);
-  --fs-link-color-hover: var(--fs-color-primary-dark);
+  --bl-primary-font-family: #{$primary-font-family};
+  --bl-default-text-color: var(--bl-color-off-black);
+  --bl-gray-text-color: var(--bl-color-gray-500);
+  --bl-default-font-size: var(--bl-font-size-m);
+  --bl-default-line-height: var(--bl-line-height-m);
+  --bl-link-color: var(--bl-color-primary);
+  --bl-link-color-hover: var(--bl-color-primary-dark);
 
   // Buttons
-  --fs-button-primary-color: #fff;
-  --fs-button-primary-color-hover: #fff;
-  --fs-button-primary-background-color: var(--fs-color-primary);
-  --fs-button-primary-background-color-hover: var(--fs-color-primary-dark);
-  --fs-button-secondary-color: #fff;
-  --fs-button-secondary-color-hover: #fff;
-  --fs-button-secondary-background-color: var(--fs-color-secondary);
-  --fs-button-secondary-background-color-hover: var(--fs-color-secondary-dark);
-  --fs-button-white-color: var(--fs-default-text-color);
-  --fs-button-white-color-hover: var(--fs-default-text-color);
-  --fs-button-white-background-color: var(--fs-color-white);
-  --fs-button-white-background-color-hover: var(--fs-color-gray-200);
+  --bl-button-primary-color: #fff;
+  --bl-button-primary-color-hover: #fff;
+  --bl-button-primary-background-color: var(--bl-color-primary);
+  --bl-button-primary-background-color-hover: var(--bl-color-primary-dark);
+  --bl-button-secondary-color: #fff;
+  --bl-button-secondary-color-hover: #fff;
+  --bl-button-secondary-background-color: var(--bl-color-secondary);
+  --bl-button-secondary-background-color-hover: var(--bl-color-secondary-dark);
+  --bl-button-white-color: var(--bl-default-text-color);
+  --bl-button-white-color-hover: var(--bl-default-text-color);
+  --bl-button-white-background-color: var(--bl-color-white);
+  --bl-button-white-background-color-hover: var(--bl-color-gray-200);
 
   // Padding
-  --fs-content-padding-xs: #{$content-padding-xs};
-  --fs-content-padding-m: #{$content-padding-m};
-  --fs-content-padding-s: #{$content-padding-s};
-  --fs-content-padding-l: #{$content-padding-l};
-  --fs-content-padding-xl: #{$content-padding-xl};
+  --bl-content-padding-xs: #{$content-padding-xs};
+  --bl-content-padding-m: #{$content-padding-m};
+  --bl-content-padding-s: #{$content-padding-s};
+  --bl-content-padding-l: #{$content-padding-l};
+  --bl-content-padding-xl: #{$content-padding-xl};
 
   // Margins
-  --fs-content-margin-xs: #{$content-margin-xs};
-  --fs-content-margin-s: #{$content-margin-s};
-  --fs-content-margin-m: #{$content-margin-m};
-  --fs-content-margin-l: #{$content-margin-l};
-  --fs-content-margin-xl: #{$content-margin-xl};
+  --bl-content-margin-xs: #{$content-margin-xs};
+  --bl-content-margin-s: #{$content-margin-s};
+  --bl-content-margin-m: #{$content-margin-m};
+  --bl-content-margin-l: #{$content-margin-l};
+  --bl-content-margin-xl: #{$content-margin-xl};
 
   // Content
-  --fs-content-width: #{$content-width};
-  --fs-content-width-narrow: #{$content-width-narrow};
-  --fs-content-width-very-narrow: #{$content-width-very-narrow};
-  --fs-content-width-extra-narrow: #{$content-width-extra-narrow};
+  --bl-content-width: #{$content-width};
+  --bl-content-width-narrow: #{$content-width-narrow};
+  --bl-content-width-very-narrow: #{$content-width-very-narrow};
+  --bl-content-width-extra-narrow: #{$content-width-extra-narrow};
 
   // Content bleeds
-  --fs-container-wide-bleed: #{$content-container-wide-bleed};
-  --fs-alignwide-bleed: #{$content-alignwide-bleed};
+  --bl-container-wide-bleed: #{$content-container-wide-bleed};
+  --bl-alignwide-bleed: #{$content-alignwide-bleed};
 
   // Breakpoints
-  --fs-breakpoint-xs: #{$breakpoint-xs};
-  --fs-breakpoint-s: #{$breakpoint-s};
-  --fs-breakpoint-m: #{$breakpoint-m};
-  --fs-breakpoint-l: #{$breakpoint-l};
-  --fs-breakpoint-xl: #{$breakpoint-xl};
-  --fs-breakpoint-mobile: #{$breakpoint-mobile};
+  --bl-breakpoint-xs: #{$breakpoint-xs};
+  --bl-breakpoint-s: #{$breakpoint-s};
+  --bl-breakpoint-m: #{$breakpoint-m};
+  --bl-breakpoint-l: #{$breakpoint-l};
+  --bl-breakpoint-xl: #{$breakpoint-xl};
+  --bl-breakpoint-mobile: #{$breakpoint-mobile};
 
   // Header
-  --fs-header-height: #{$header-height};
-  --fs-header-height-scrolled: #{$header-height-scrolled};
-  --fs-header-height-mobile: #{$header-height-mobile};
-  --fs-header-height-mobile-scrolled: #{$header-height-mobile-scrolled};
+  --bl-header-height: #{$header-height};
+  --bl-header-height-scrolled: #{$header-height-scrolled};
+  --bl-header-height-mobile: #{$header-height-mobile};
+  --bl-header-height-mobile-scrolled: #{$header-height-mobile-scrolled};
 
   // Mobile menu
-  --fs-mobile-menu-width: #{$mobile-menu-width};
+  --bl-mobile-menu-width: #{$mobile-menu-width};
 
   // Transitions
-  --fs-transition-speed: #{$transition-speed};
-  --fs-transition-speed-slow: #{$transition-speed-slow};
+  --bl-transition-speed: #{$transition-speed};
+  --bl-transition-speed-slow: #{$transition-speed-slow};
 
   // Border radius
-  --fs-border-radius-s: #{$border-radius-s};
-  --fs-border-radius-m: #{$border-radius-m};
-  --fs-border-radius-l: #{$border-radius-l};
+  --bl-border-radius-s: #{$border-radius-s};
+  --bl-border-radius-m: #{$border-radius-m};
+  --bl-border-radius-l: #{$border-radius-l};
 
   // Editor
-  --fs-editor-content-width: #{$editor-content-width};
-  --fs-editor-content-width-padding: #{$editor-content-width-padding};
+  --bl-editor-content-width: #{$editor-content-width};
+  --bl-editor-content-width-padding: #{$editor-content-width-padding};
 }

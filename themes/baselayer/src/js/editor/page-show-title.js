@@ -12,7 +12,7 @@
   const PluginPostStatusInfo = editor.PluginPostStatusInfo;
 
   const META_KEY = '_bl_show_page_title';
-  const BODY_CLASS_HIDDEN = 'fs-page-title-hidden';
+  const BODY_CLASS_HIDDEN = 'bl-page-title-hidden';
 
   function isShowTitleChecked(value) {
     return value === undefined || value === null || value === true || value === '1' || value === 1;

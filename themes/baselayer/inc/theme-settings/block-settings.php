@@ -54,7 +54,7 @@ add_action('admin_init', function () {
 }, 1);
 
 add_action('admin_enqueue_scripts', function ($hook_suffix) {
-	if ($hook_suffix !== 'settings_page_fs-theme-settings') {
+	if ($hook_suffix !== 'settings_page_bl-theme-settings') {
 		return;
 	}
 
@@ -138,12 +138,12 @@ add_action('admin_enqueue_scripts', function ($hook_suffix) {
 function bl_render_theme_settings_blocks_tab(): void
 {
 	?>
-	<form method="post" action="<?= esc_url(bl_theme_settings_url_with_tab('blocks')) ?>" class="fs-page-settings-form" id="fs-block-settings-form">
+	<form method="post" action="<?= esc_url(bl_theme_settings_url_with_tab('blocks')) ?>" class="bl-page-settings-form" id="bl-block-settings-form">
 		<?php wp_nonce_field('baselayer_save_block_settings'); ?>
 		<input type="hidden" name="baselayer_save_block_settings" value="1">
-		<input type="hidden" name="baselayer_block_settings_json" id="fs-block-settings-json" value="">
-		<input type="hidden" name="baselayer_block_variations_json" id="fs-block-variations-json" value="">
-		<div id="fs-block-settings-app"></div>
+		<input type="hidden" name="baselayer_block_settings_json" id="bl-block-settings-json" value="">
+		<input type="hidden" name="baselayer_block_variations_json" id="bl-block-variations-json" value="">
+		<div id="bl-block-settings-app"></div>
 	</form>
 	<?php
 }

@@ -233,7 +233,7 @@ function bl_weekly_report_email_iso_week_row_labels(array $row): array
 	$week_end_ts = $monday->modify('+6 days')->getTimestamp();
 	$line2 = function_exists('bl_dashboard_format_week_date_range')
 		? bl_dashboard_format_week_date_range($monday)
-		: '<span class="fs-mail__nowrap">' . wp_date('j. M', $monday->getTimestamp()) . '</span> – <span class="fs-mail__nowrap">' . wp_date('j. M Y', $week_end_ts) . '</span>';
+		: '<span class="bl-mail__nowrap">' . wp_date('j. M', $monday->getTimestamp()) . '</span> – <span class="bl-mail__nowrap">' . wp_date('j. M Y', $week_end_ts) . '</span>';
 
 	return [
 		sprintf(__('Week %d', 'baselayer'), $week_no),
@@ -520,7 +520,7 @@ function bl_weekly_report_build_html(): string
 	$site_url = home_url();
 	$admin_url = admin_url();
 	$stats_url = function_exists('bl_dashboard_statistics_url') ? bl_dashboard_statistics_url() : admin_url();
-	$theme_settings_url = admin_url('options-general.php?page=fs-theme-settings');
+	$theme_settings_url = admin_url('options-general.php?page=bl-theme-settings');
 	$developer_settings_url = admin_url('options-general.php?page=' . bl_developer_settings_page_slug('developer'));
 	$developer_email = function_exists('bl_developer_email') ? bl_developer_email() : '';
 	$admin_email = get_option('admin_email', '');

@@ -31,11 +31,11 @@ export function SpacerResponsiveHeightControl({ option, attributes, onChange }) 
   }
 
   return (
-    <div className="fs-spacer-responsive-height">
-      {option.label ? <span className="fs-spacer-responsive-height__label">{option.label}</span> : null}
+    <div className="bl-spacer-responsive-height">
+      {option.label ? <span className="bl-spacer-responsive-height__label">{option.label}</span> : null}
 
       <ToggleGroupControl
-        className="fs-spacer-responsive-height__sizes fs-block-option-button-group"
+        className="bl-spacer-responsive-height__sizes bl-block-option-button-group"
         label={option.label ? option.label : 'Responsive Höhe'}
         hideLabelFromVision
         value={displayValue}

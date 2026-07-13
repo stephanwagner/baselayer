@@ -3,7 +3,7 @@
 
 // Reusable icon picker (block options sidebar + modal grid).
 
-$fs-icon-picker-height: 504px;
+$bl-icon-picker-height: 504px;
 
 body.bl-icon-picker-modal-open {
   overflow: hidden;
@@ -85,7 +85,7 @@ body.bl-icon-picker-modal-open {
   padding: 0 20px;
 
   &.bl-icon-picker__panel {
-    height: min($fs-icon-picker-height, calc(100vh - 163px));
+    height: min($bl-icon-picker-height, calc(100vh - 163px));
   }
 }
 
@@ -131,7 +131,7 @@ input[type='search'].bl-icon-picker-modal__search {
 .bl-icon-picker__panel {
   display: flex;
   flex-direction: column;
-  height: min($fs-icon-picker-height, calc(100vh - 163px));
+  height: min($bl-icon-picker-height, calc(100vh - 163px));
   min-height: 0;
 }
 
@@ -155,8 +155,8 @@ input[type='search'].bl-icon-picker-modal__search {
   padding: 8px 10px;
   font-size: 12px;
   line-height: 1.4;
-  color: var(--fs-color-gray-700, #3c434a);
-  background: var(--fs-color-gray-100, #f0f0f1);
+  color: var(--bl-color-gray-700, #3c434a);
+  background: var(--bl-color-gray-100, #f0f0f1);
   border-radius: 4px;
 
   .bl-icon {
@@ -224,7 +224,7 @@ input[type='search'].bl-icon-picker-modal__search {
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.02em;
-  color: var(--fs-color-gray-600, #50575e);
+  color: var(--bl-color-gray-600, #50575e);
 }
 
 .bl-icon-picker__grid {
@@ -239,9 +239,9 @@ input[type='search'].bl-icon-picker-modal__search {
   justify-content: center;
   aspect-ratio: 1;
   padding: 0;
-  color: var(--fs-color-gray-700, #3c434a);
+  color: var(--bl-color-gray-700, #3c434a);
   background: #fff;
-  border: 1px solid var(--fs-color-gray-300, #dcdcde);
+  border: 1px solid var(--bl-color-gray-300, #dcdcde);
   border-radius: 6px;
   cursor: pointer;
   transition: transition('background-color', 'border-color', 'color');
@@ -251,13 +251,13 @@ input[type='search'].bl-icon-picker-modal__search {
   }
 
   &:hover {
-    color: var(--fs-color-primary, #2271b1);
-    border-color: var(--fs-color-primary, #2271b1);
+    color: var(--bl-color-primary, #2271b1);
+    border-color: var(--bl-color-primary, #2271b1);
   }
 
   &.is-selected {
-    color: var(--fs-color-primary, #2271b1);
-    border-color: var(--fs-color-primary, #2271b1);
+    color: var(--bl-color-primary, #2271b1);
+    border-color: var(--bl-color-primary, #2271b1);
     background: rgba(34, 113, 177, 0.08);
   }
 }

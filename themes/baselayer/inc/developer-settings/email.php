@@ -8,7 +8,7 @@ defined('ABSPATH') || exit;
 function bl_developer_render_email_settings_section(): void
 {
 	?>
-	<form method="post" action="" class="fs-page-settings-form">
+	<form method="post" action="" class="bl-page-settings-form">
 		<?php settings_fields(BL_THEME_OPTION_GROUP_DEVELOPER_GENERAL); ?>
 		<h2 class="title" style="margin-top: 0;"><?= esc_html__('Email addresses', 'baselayer') ?></h2>
 		<table class="form-table" role="presentation">
@@ -27,14 +27,14 @@ function bl_developer_render_email_settings_section(): void
 				</td>
 			</tr>
 		</table>
-		<div class="fs-submit-row">
+		<div class="bl-submit-row">
 			<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
 		</div>
 	</form>
 
-	<hr class="fs-page-settings-divider">
+	<hr class="bl-page-settings-divider">
 
-	<form method="post" action="" class="fs-page-settings-form fs-mail-delivery-form" id="fs-mail-delivery">
+	<form method="post" action="" class="bl-page-settings-form bl-mail-delivery-form" id="bl-mail-delivery">
 		<?php wp_nonce_field('baselayer_system_mail_delivery'); ?>
 		<input type="hidden" name="baselayer_save_mail_delivery" value="1">
 		<h2 class="title"><?= esc_html__('Mail delivery', 'baselayer') ?></h2>
@@ -77,53 +77,53 @@ function bl_developer_render_email_settings_section(): void
 		<h3 class="title" style="margin-top: 20px;"><?= esc_html__('Method', 'baselayer') ?></h3>
 		<p class="description"><?= esc_html__('Choose how WordPress sends email.', 'baselayer') ?></p>
 		<input type="hidden" name="baselayer_mailer" id="baselayer_mailer_input" value="<?= esc_attr($current_mailer) ?>">
-		<div class="fs-tabs -form-table" data-fs-tabs style="margin-top: 20px;">
-			<nav class="fs-tabs-nav" data-fs-tabs-nav role="tablist">
+		<div class="bl-tabs -form-table" data-bl-tabs style="margin-top: 20px;">
+			<nav class="bl-tabs-nav" data-bl-tabs-nav role="tablist">
 				<?php foreach ($bl_mailer_options as $value => $opt) : ?>
-					<button type="button" class="button fs-tabs-btn fs-button-can-toggle has-icon <?= $current_mailer === $value ? 'active' : '' ?>" role="tab" aria-selected="<?= $current_mailer === $value ? 'true' : 'false' ?>" aria-controls="fs-mailer-panel-<?= esc_attr($value) ?>" data-fs-tabs-btn data-tab="<?= esc_attr($value) ?>" data-mailer-value="<?= esc_attr($value) ?>">
-						<span class="fs-tab-button-icon">
+					<button type="button" class="button bl-tabs-btn bl-button-can-toggle has-icon <?= $current_mailer === $value ? 'active' : '' ?>" role="tab" aria-selected="<?= $current_mailer === $value ? 'true' : 'false' ?>" aria-controls="bl-mailer-panel-<?= esc_attr($value) ?>" data-bl-tabs-btn data-tab="<?= esc_attr($value) ?>" data-mailer-value="<?= esc_attr($value) ?>">
+						<span class="bl-tab-button-icon">
 							<?= $opt['icon'] ?>
 						</span>
 						<?= esc_html($opt['label']) ?>
 					</button>
 				<?php endforeach; ?>
 			</nav>
-			<div class="fs-tabs-panels" data-fs-tabs-panels>
-				<div id="fs-mailer-panel-php" class="fs-tabs-panel <?= $current_mailer === 'php' ? 'fs-tabs-panel--active' : '' ?>" data-fs-tabs-panel role="tabpanel" data-tab="php" <?= $current_mailer === 'php' ? 'data-fs-tabs-panel-active="1"' : '' ?>>
+			<div class="bl-tabs-panels" data-bl-tabs-panels>
+				<div id="bl-mailer-panel-php" class="bl-tabs-panel <?= $current_mailer === 'php' ? 'bl-tabs-panel--active' : '' ?>" data-bl-tabs-panel role="tabpanel" data-tab="php" <?= $current_mailer === 'php' ? 'data-bl-tabs-panel-active="1"' : '' ?>>
 					<p class="description"><?= esc_html__('Uses the WordPress default mail function (PHP mail()).', 'baselayer') ?></p>
 					<p class="description"><?= esc_html__('No mail configuration is applied by the theme, so SMTP or mail plugins can override delivery.', 'baselayer') ?></p>
 				</div>
-				<div id="fs-mailer-panel-smtp" class="fs-tabs-panel <?= $current_mailer === 'smtp' ? 'fs-tabs-panel--active' : '' ?>" data-fs-tabs-panel role="tabpanel" data-tab="smtp" <?= $current_mailer === 'smtp' ? 'data-fs-tabs-panel-active="1"' : '' ?>>
-					<div class="fs-form-row">
-						<label for="baselayer_smtp_host" class="fs-input-label"><?= esc_html__('SMTP host', 'baselayer') ?></label>
+				<div id="bl-mailer-panel-smtp" class="bl-tabs-panel <?= $current_mailer === 'smtp' ? 'bl-tabs-panel--active' : '' ?>" data-bl-tabs-panel role="tabpanel" data-tab="smtp" <?= $current_mailer === 'smtp' ? 'data-bl-tabs-panel-active="1"' : '' ?>>
+					<div class="bl-form-row">
+						<label for="baselayer_smtp_host" class="bl-input-label"><?= esc_html__('SMTP host', 'baselayer') ?></label>
 						<input type="text" name="baselayer_smtp_host" id="baselayer_smtp_host" value="<?= esc_attr(get_option('baselayer_smtp_host', '')) ?>" class="regular-text" placeholder="smtp.example.com" style="width: 100%; max-width: 400px;">
 					</div>
-					<div class="fs-form-row">
-						<label for="baselayer_smtp_port" class="fs-input-label"><?= esc_html__('Port', 'baselayer') ?></label>
+					<div class="bl-form-row">
+						<label for="baselayer_smtp_port" class="bl-input-label"><?= esc_html__('Port', 'baselayer') ?></label>
 						<input type="number" name="baselayer_smtp_port" id="baselayer_smtp_port" value="<?= esc_attr(get_option('baselayer_smtp_port', '587')) ?>" min="1" max="65535" class="small-text">
 						<p class="description" style="margin-top: 4px;"><?= esc_html__('Common: 587 (TLS), 465 (SSL), 25 (none).', 'baselayer') ?></p>
 					</div>
-					<div class="fs-form-row">
-						<label for="baselayer_smtp_encryption" class="fs-input-label"><?= esc_html__('Encryption', 'baselayer') ?></label>
+					<div class="bl-form-row">
+						<label for="baselayer_smtp_encryption" class="bl-input-label"><?= esc_html__('Encryption', 'baselayer') ?></label>
 						<select name="baselayer_smtp_encryption" id="baselayer_smtp_encryption" style="width: 100%; max-width: 400px;">
 							<option value="none" <?= selected(get_option('baselayer_smtp_encryption', 'tls'), 'none', false) ?>><?= esc_html__('None', 'baselayer') ?></option>
 							<option value="tls" <?= selected(get_option('baselayer_smtp_encryption', 'tls'), 'tls', false) ?>><?= esc_html__('TLS', 'baselayer') ?></option>
 							<option value="ssl" <?= selected(get_option('baselayer_smtp_encryption', 'tls'), 'ssl', false) ?>><?= esc_html__('SSL', 'baselayer') ?></option>
 						</select>
 					</div>
-					<div class="fs-form-row">
-						<label for="baselayer_smtp_user" class="fs-input-label"><?= esc_html__('Username', 'baselayer') ?></label>
+					<div class="bl-form-row">
+						<label for="baselayer_smtp_user" class="bl-input-label"><?= esc_html__('Username', 'baselayer') ?></label>
 						<input type="text" name="baselayer_smtp_user" id="baselayer_smtp_user" value="<?= esc_attr(get_option('baselayer_smtp_user', '')) ?>" class="regular-text" autocomplete="username" style="width: 100%; max-width: 400px;">
 					</div>
-					<div class="fs-form-row">
-						<label for="baselayer_smtp_pass" class="fs-input-label"><?= esc_html__('Password', 'baselayer') ?></label>
+					<div class="bl-form-row">
+						<label for="baselayer_smtp_pass" class="bl-input-label"><?= esc_html__('Password', 'baselayer') ?></label>
 						<input type="password" name="baselayer_smtp_pass" id="baselayer_smtp_pass" value="" class="regular-text" autocomplete="new-password" placeholder="" style="width: 100%; max-width: 400px;">
 						<p class="description"><?= esc_html__('Leave blank to keep current.', 'baselayer') ?></p>
 					</div>
 				</div>
-				<div id="fs-mailer-panel-sendgrid" class="fs-tabs-panel <?= $current_mailer === 'sendgrid' ? 'fs-tabs-panel--active' : '' ?>" data-fs-tabs-panel role="tabpanel" data-tab="sendgrid" <?= $current_mailer === 'sendgrid' ? 'data-fs-tabs-panel-active="1"' : '' ?>>
-					<div class="fs-form-row">
-						<label for="baselayer_sendgrid_api_key" class="fs-input-label"><?= esc_html__('API key', 'baselayer') ?></label>
+				<div id="bl-mailer-panel-sendgrid" class="bl-tabs-panel <?= $current_mailer === 'sendgrid' ? 'bl-tabs-panel--active' : '' ?>" data-bl-tabs-panel role="tabpanel" data-tab="sendgrid" <?= $current_mailer === 'sendgrid' ? 'data-bl-tabs-panel-active="1"' : '' ?>>
+					<div class="bl-form-row">
+						<label for="baselayer_sendgrid_api_key" class="bl-input-label"><?= esc_html__('API key', 'baselayer') ?></label>
 						<input type="password" name="baselayer_sendgrid_api_key" id="baselayer_sendgrid_api_key" value="<?= esc_attr(get_option('baselayer_sendgrid_api_key', '')) ?>" class="regular-text" autocomplete="off" style="width: 100%; max-width: 400px;">
 						<p class="description" style="margin-top: 4px;"><?= esc_html__('Create an API key in the SendGrid dashboard with send permissions.', 'baselayer') ?></p>
 					</div>
@@ -133,7 +133,7 @@ function bl_developer_render_email_settings_section(): void
 
 		<script>
 		(function() {
-			var form = document.getElementById('fs-mail-delivery');
+			var form = document.getElementById('bl-mail-delivery');
 			if (!form) return;
 			var input = document.getElementById('baselayer_mailer_input');
 			var buttons = form.querySelectorAll('[data-mailer-value]');
@@ -145,14 +145,14 @@ function bl_developer_render_email_settings_section(): void
 		})();
 		</script>
 
-		<div class="fs-submit-row">
+		<div class="bl-submit-row">
 			<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
 		</div>
 	</form>
 
-	<hr class="fs-page-settings-divider">
+	<hr class="bl-page-settings-divider">
 
-	<form method="post" action="" class="fs-test-mail-form" id="fs-test-mail-form">
+	<form method="post" action="" class="bl-test-mail-form" id="bl-test-mail-form">
 		<?php wp_nonce_field('baselayer_system_test_mail'); ?>
 		<input type="hidden" name="baselayer_send_test_mail" value="1">
 		<h3 class="title"><?= esc_html__('Test email', 'baselayer') ?></h3>
@@ -165,7 +165,7 @@ function bl_developer_render_email_settings_section(): void
 				</td>
 			</tr>
 		</table>
-		<div class="fs-submit-row">
+		<div class="bl-submit-row">
 			<button type="submit" name="baselayer_test_mail" class="button button-primary"><?= esc_html__('Send test email', 'baselayer') ?></button>
 		</div>
 	</form>

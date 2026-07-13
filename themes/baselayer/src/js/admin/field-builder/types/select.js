@@ -74,7 +74,7 @@ export default {
     );
     const allowMultiple = mark(el('input', { type: 'checkbox' }), 'allow_multiple');
     container.appendChild(
-      el('label', { className: 'fs-field-builder__checkbox-label' }, [
+      el('label', { className: 'bl-field-builder__checkbox-label' }, [
         allowMultiple,
         document.createTextNode(' Allow multiple'),
       ])
@@ -83,9 +83,9 @@ export default {
 
   serialize(fieldRoot) {
     const out = {};
-    const optionsText = fieldRoot.querySelector('[data-fs-fb="options_text"]');
-    const defaultValue = fieldRoot.querySelector('[data-fs-fb="default_value"]');
-    const allowMultiple = fieldRoot.querySelector('[data-fs-fb="allow_multiple"]');
+    const optionsText = fieldRoot.querySelector('[data-bl-fb="options_text"]');
+    const defaultValue = fieldRoot.querySelector('[data-bl-fb="default_value"]');
+    const allowMultiple = fieldRoot.querySelector('[data-bl-fb="allow_multiple"]');
     const options = parseOptionsText(optionsText ? optionsText.value : '');
     if (options.length) {
       out.options = options;
@@ -100,9 +100,9 @@ export default {
   },
 
   hydrate(fieldRoot, data) {
-    const optionsText = fieldRoot.querySelector('[data-fs-fb="options_text"]');
-    const defaultValue = fieldRoot.querySelector('[data-fs-fb="default_value"]');
-    const allowMultiple = fieldRoot.querySelector('[data-fs-fb="allow_multiple"]');
+    const optionsText = fieldRoot.querySelector('[data-bl-fb="options_text"]');
+    const defaultValue = fieldRoot.querySelector('[data-bl-fb="default_value"]');
+    const allowMultiple = fieldRoot.querySelector('[data-bl-fb="allow_multiple"]');
     if (optionsText) {
       optionsText.value = optionsToText(data.options);
     }

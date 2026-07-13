@@ -7,7 +7,7 @@
  */
 
 function initDeveloperInstaller() {
-  const form = document.querySelector('form[data-fs-install-form]');
+  const form = document.querySelector('form[data-bl-install-form]');
 
   if (!form) {
     return;
@@ -32,9 +32,9 @@ function initDeveloperInstaller() {
     if (!currentHasDev && newHasDev) {
       // Only new user will be developer → force "Log in as this user" (readonly, value still sent).
       loginAfterSetupCheckbox.checked = true;
-      loginAfterSetupCheckbox.setAttribute('data-fs-forced', '1');
+      loginAfterSetupCheckbox.setAttribute('data-bl-forced', '1');
     } else {
-      loginAfterSetupCheckbox.removeAttribute('data-fs-forced');
+      loginAfterSetupCheckbox.removeAttribute('data-bl-forced');
       if (currentHasDev && !newHasDev) {
         // Only current user is developer → uncheck "Log in as this user".
         loginAfterSetupCheckbox.checked = false;
@@ -43,7 +43,7 @@ function initDeveloperInstaller() {
   }
 
   loginAfterSetupCheckbox.addEventListener('click', (e) => {
-    if (loginAfterSetupCheckbox.getAttribute('data-fs-forced') === '1') {
+    if (loginAfterSetupCheckbox.getAttribute('data-bl-forced') === '1') {
       e.preventDefault();
       loginAfterSetupCheckbox.checked = true;
     }
@@ -60,7 +60,7 @@ function initDeveloperInstaller() {
  * Replaces "BaseLayer" or the previously synced name so typo fixes update too.
  */
 function initThemeNameDescriptionSync() {
-  const form = document.querySelector('form[data-fs-install-form]');
+  const form = document.querySelector('form[data-bl-install-form]');
   if (!form) {
     return;
   }

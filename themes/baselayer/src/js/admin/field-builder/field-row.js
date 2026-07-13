@@ -11,7 +11,7 @@ import { renderPresentation, serializePresentation } from './presentation';
  */
 function buildTypeSelect(mode, selected) {
   const select = el('select', {
-    className: 'fs-field-builder__type-select widefat',
+    className: 'bl-field-builder__type-select widefat',
     dataset: { fsFb: 'type' },
   });
   listTypesForMode(mode).forEach((type) => {
@@ -37,7 +37,7 @@ function buildTypeSelect(mode, selected) {
  * @param {object|null} data
  */
 function renderTypeOptions(fieldRoot, typeId, data = null) {
-  const host = fieldRoot.querySelector('[data-fs-fb-options-host]');
+  const host = fieldRoot.querySelector('[data-bl-fb-options-host]');
   if (!host) {
     return;
   }
@@ -59,18 +59,18 @@ function renderTypeOptions(fieldRoot, typeId, data = null) {
  */
 function initTabs(tabsNav, panelsHost) {
   tabsNav.addEventListener('click', (event) => {
-    const tab = event.target.closest('[data-fs-fb-tab]');
+    const tab = event.target.closest('[data-bl-fb-tab]');
     if (!tab || !tabsNav.contains(tab)) {
       return;
     }
-    const id = tab.getAttribute('data-fs-fb-tab');
-    tabsNav.querySelectorAll('[data-fs-fb-tab]').forEach((btn) => {
+    const id = tab.getAttribute('data-bl-fb-tab');
+    tabsNav.querySelectorAll('[data-bl-fb-tab]').forEach((btn) => {
       const active = btn === tab;
       btn.classList.toggle('is-active', active);
       btn.setAttribute('aria-selected', active ? 'true' : 'false');
     });
-    panelsHost.querySelectorAll('[data-fs-fb-tab-panel]').forEach((panel) => {
-      const active = panel.getAttribute('data-fs-fb-tab-panel') === id;
+    panelsHost.querySelectorAll('[data-bl-fb-tab-panel]').forEach((panel) => {
+      const active = panel.getAttribute('data-bl-fb-tab-panel') === id;
       panel.classList.toggle('is-active', active);
       panel.hidden = !active;
     });
@@ -95,33 +95,33 @@ export function createFieldRow({ mode = 'fields', data = {}, open = false } = {}
   const slug = data.slug != null ? String(data.slug) : '';
 
   const root = el('div', {
-    className: 'fs-field-builder__field' + (open ? ' is-open' : ''),
+    className: 'bl-field-builder__field' + (open ? ' is-open' : ''),
     dataset: { fsFbField: '1' },
   });
 
-  const header = el('div', { className: 'fs-field-builder__field-header' });
+  const header = el('div', { className: 'bl-field-builder__field-header' });
   const toggler = el('button', {
     type: 'button',
-    className: 'fs-field-builder__field-toggle',
+    className: 'bl-field-builder__field-toggle',
     'aria-expanded': open ? 'true' : 'false',
     text: open ? '▾' : '▸',
   });
   const titlePreview = el('span', {
-    className: 'fs-field-builder__field-title-preview',
+    className: 'bl-field-builder__field-title-preview',
     text: title || '(untitled)',
   });
   const typePreview = el('span', {
-    className: 'fs-field-builder__field-type-preview',
+    className: 'bl-field-builder__field-type-preview',
     text: (getType(typeId) && getType(typeId).label) || typeId,
   });
   const handle = el('span', {
-    className: 'fs-field-builder__field-handle',
+    className: 'bl-field-builder__field-handle',
     title: 'Drag to reorder',
     text: '⋮⋮',
   });
   const deleteBtn = el('button', {
     type: 'button',
-    className: 'button-link-delete fs-field-builder__field-delete',
+    className: 'button-link-delete bl-field-builder__field-delete',
     text: 'Delete',
   });
 
@@ -132,12 +132,12 @@ export function createFieldRow({ mode = 'fields', data = {}, open = false } = {}
   header.appendChild(deleteBtn);
 
   const body = el('div', {
-    className: 'fs-field-builder__field-body',
+    className: 'bl-field-builder__field-body',
     hidden: open ? undefined : true,
   });
 
   const tabsNav = el('div', {
-    className: 'fs-field-builder__tabs',
+    className: 'bl-field-builder__tabs',
     role: 'tablist',
   });
   [
@@ -148,7 +148,7 @@ export function createFieldRow({ mode = 'fields', data = {}, open = false } = {}
     tabsNav.appendChild(
       el('button', {
         type: 'button',
-        className: 'fs-field-builder__tab' + (index === 0 ? ' is-active' : ''),
+        className: 'bl-field-builder__tab' + (index === 0 ? ' is-active' : ''),
         role: 'tab',
         dataset: { fsFbTab: id },
         'aria-selected': index === 0 ? 'true' : 'false',
@@ -157,10 +157,10 @@ export function createFieldRow({ mode = 'fields', data = {}, open = false } = {}
     );
   });
 
-  const panelsHost = el('div', { className: 'fs-field-builder__tab-panels' });
+  const panelsHost = el('div', { className: 'bl-field-builder__tab-panels' });
 
   const panelGeneral = el('div', {
-    className: 'fs-field-builder__tab-panel is-active',
+    className: 'bl-field-builder__tab-panel is-active',
     dataset: { fsFbTabPanel: 'general' },
     role: 'tabpanel',
   });
@@ -181,13 +181,13 @@ export function createFieldRow({ mode = 'fields', data = {}, open = false } = {}
   panelGeneral.appendChild(formRow('Title', titleInput));
   panelGeneral.appendChild(formRow('Slug', slugInput));
   const optionsHost = el('div', {
-    className: 'fs-field-builder__type-options',
+    className: 'bl-field-builder__type-options',
     dataset: { fsFbOptionsHost: '1' },
   });
   panelGeneral.appendChild(optionsHost);
 
   const panelPresentation = el('div', {
-    className: 'fs-field-builder__tab-panel',
+    className: 'bl-field-builder__tab-panel',
     dataset: { fsFbTabPanel: 'presentation' },
     role: 'tabpanel',
     hidden: true,
@@ -195,7 +195,7 @@ export function createFieldRow({ mode = 'fields', data = {}, open = false } = {}
   renderPresentation(panelPresentation, data);
 
   const panelLogic = el('div', {
-    className: 'fs-field-builder__tab-panel',
+    className: 'bl-field-builder__tab-panel',
     dataset: { fsFbTabPanel: 'logic' },
     role: 'tabpanel',
     hidden: true,
@@ -232,7 +232,7 @@ export function createFieldRow({ mode = 'fields', data = {}, open = false } = {}
   });
 
   deleteBtn.addEventListener('click', () => {
-    root.dispatchEvent(new CustomEvent('fs-fb-delete', { bubbles: true }));
+    root.dispatchEvent(new CustomEvent('bl-fb-delete', { bubbles: true }));
   });
 
   titleInput.addEventListener('input', () => {
@@ -263,9 +263,9 @@ export function createFieldRow({ mode = 'fields', data = {}, open = false } = {}
  * @param {HTMLElement} fieldRoot
  */
 export function serializeFieldRow(fieldRoot) {
-  const typeInput = fieldRoot.querySelector('[data-fs-fb="type"]');
-  const titleInput = fieldRoot.querySelector('[data-fs-fb="title"]');
-  const slugInput = fieldRoot.querySelector('[data-fs-fb="slug"]');
+  const typeInput = fieldRoot.querySelector('[data-bl-fb="type"]');
+  const titleInput = fieldRoot.querySelector('[data-bl-fb="title"]');
+  const slugInput = fieldRoot.querySelector('[data-bl-fb="slug"]');
   const typeId = typeInput ? typeInput.value : defaultTypeId;
   const field = {
     type: typeId || defaultTypeId,
