@@ -839,11 +839,11 @@ function bl_normalize_redirect_to_path(string $path): string
 	return $path === '' ? '/' : '/' . $path;
 }
 
-const BL_HTACCESS_REDIRECTS_MARKER_START = '# BEGIN FromScratch redirects';
-const BL_HTACCESS_REDIRECTS_MARKER_END = '# END FromScratch redirects';
+const BL_HTACCESS_REDIRECTS_MARKER_START = '# BEGIN BaseLayer redirects';
+const BL_HTACCESS_REDIRECTS_MARKER_END = '# END BaseLayer redirects';
 
 /**
- * Remove the FromScratch redirects block from .htaccess.
+ * Remove the BaseLayer redirects block from .htaccess.
  */
 function bl_remove_redirects_htaccess_block(): bool
 {

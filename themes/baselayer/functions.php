@@ -4,7 +4,6 @@ defined('ABSPATH') || exit;
 
 // Foundation
 require_once 'inc/bootstrap.php';
-require_once 'inc/migrate-fromscratch.php';
 require_once 'inc/config.php';
 require_once 'inc/language.php';
 require_once 'inc/features.php';

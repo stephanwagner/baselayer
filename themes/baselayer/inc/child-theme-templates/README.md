@@ -1,6 +1,6 @@
 # {{name}}
 
-Child theme of **FromScratch**.
+Child theme of **BaseLayer**.
 
 ## First run
 

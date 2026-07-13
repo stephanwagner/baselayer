@@ -21,7 +21,7 @@ add_action('wp_dashboard_setup', function () {
 	remove_meta_box('dashboard_primary', 'dashboard', 'side');
 	wp_add_dashboard_widget(
 		'bl_dashboard_panel_widget',
-		__('FromScratch', 'baselayer'),
+		__('BaseLayer', 'baselayer'),
 		'bl_dashboard_panel_widget_render',
 		null,
 		null,

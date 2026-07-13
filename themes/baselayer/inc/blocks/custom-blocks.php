@@ -601,7 +601,7 @@ function bl_block_creator_register_custom_blocks(): void
 		}
 		$categories[] = [
 			'slug' => 'baselayer',
-			'title' => __('FromScratch', 'baselayer'),
+			'title' => __('BaseLayer', 'baselayer'),
 			'icon' => null,
 		];
 		return $categories;

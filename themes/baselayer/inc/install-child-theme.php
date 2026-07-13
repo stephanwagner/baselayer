@@ -32,7 +32,7 @@ function bl_install_child_theme_templates_dir(): string
 }
 
 /**
- * Create a thin FromScratch child theme and return its directory slug, or WP_Error.
+ * Create a thin BaseLayer child theme and return its directory slug, or WP_Error.
  *
  * @param array{name: string, slug: string, description: string, author: string, author_uri: string} $theme
  * @return string|WP_Error Child theme stylesheet slug on success.

@@ -49,7 +49,7 @@ add_action('admin_init', function () {
 }, 5);
 
 /**
- * After switching to FromScratch (parent or child), schedule a redirect to the installer.
+ * After switching to BaseLayer (parent or child), schedule a redirect to the installer.
  */
 add_action('after_switch_theme', function () {
   if (bl_setup_completed()) {
@@ -84,7 +84,7 @@ add_action('admin_init', function () {
 }, 1);
 
 /**
- * Add FromScratch installer to admin menu (when setup not completed or viewing success page).
+ * Add BaseLayer installer to admin menu (when setup not completed or viewing success page).
  * After setup, the page stays accessible for the success message but the menu link is hidden.
  */
 add_action('admin_menu', function () {
@@ -109,7 +109,7 @@ add_action('admin_menu', function () {
 }, 20);
 
 /**
- * Show FromScratch installer notice (when not on the install page; redirect usually sends users there).
+ * Show BaseLayer installer notice (when not on the install page; redirect usually sends users there).
  */
 add_action('admin_notices', function () {
   if (bl_setup_completed()) {
@@ -122,7 +122,7 @@ add_action('admin_notices', function () {
   }
 
   echo '<div class="notice notice-warning">';
-  echo '<p><strong>' . esc_html__('FromScratch isn\'t set up yet.', 'baselayer') . '</strong></p>';
+  echo '<p><strong>' . esc_html__('BaseLayer isn\'t set up yet.', 'baselayer') . '</strong></p>';
   echo '<p>' . esc_html__('A one-time initialization is required to configure core options and activate essential system features.', 'baselayer') . '</p>';
   echo '<p style="margin-top: 12px;">';
   echo '<a href="' . esc_url(admin_url('themes.php?page=baselayer-install')) . '" class="button button-primary">' . esc_html__('Go to installer', 'baselayer') . '</a>';
@@ -132,7 +132,7 @@ add_action('admin_notices', function () {
 
 
 /**
- * Render the FromScratch installer page (theme setup wizard).
+ * Render the BaseLayer installer page (theme setup wizard).
  *
  * @return void
  */
@@ -144,17 +144,17 @@ function bl_render_installer(): void
 
 ?>
   <div class="wrap">
-    <h1><?= esc_html__('Install FromScratch', 'baselayer') ?></h1>
+    <h1><?= esc_html__('Install BaseLayer', 'baselayer') ?></h1>
 
     <?php if (bl_setup_completed()) { ?>
 
       <div class="notice notice-success">
-        <p><strong><?= esc_html__('FromScratch is installed.', 'baselayer') ?></strong></p>
+        <p><strong><?= esc_html__('BaseLayer is installed.', 'baselayer') ?></strong></p>
         <?php if (is_child_theme()) { ?>
           <p><?= esc_html(
             sprintf(
               /* translators: %s: child theme slug */
-              __('Active child theme: %s. Parent FromScratch stays installed for updates.', 'baselayer'),
+              __('Active child theme: %s. Parent BaseLayer stays installed for updates.', 'baselayer'),
               get_stylesheet()
             )
           ) ?></p>
@@ -234,7 +234,7 @@ function bl_render_installer(): void
                 <?= esc_html__('Create child theme', 'baselayer') ?>
                 <span class="fs-install-recommended" style="display:inline-block;margin-left:6px;padding:1px 7px;border-radius:3px;background:#2271b1;color:#fff;font-size:11px;font-weight:600;line-height:1.7;vertical-align:1px;"><?= esc_html__('Recommended', 'baselayer') ?></span>
               </label>
-              <p class="description"><?= esc_html__('Creates a project-specific child theme. FromScratch remains installed for updates, while your custom styles, scripts, and templates live in the child theme.', 'baselayer') ?></p>
+              <p class="description"><?= esc_html__('Creates a project-specific child theme. BaseLayer remains installed for updates, while your custom styles, scripts, and templates live in the child theme.', 'baselayer') ?></p>
             </td>
           </tr>
         </table>
@@ -618,7 +618,7 @@ function bl_render_installer(): void
 }
 
 /**
- * Run FromScratch installation on admin_init (after init), not while functions.php loads.
+ * Run BaseLayer installation on admin_init (after init), not while functions.php loads.
  */
 add_action('admin_init', function (): void {
 	if (!isset($_POST['baselayer_run_install'])) {
@@ -787,14 +787,14 @@ function baselayer_install_redirect_with_errors(array $errors): void
 }
 
 /**
- * Run the FromScratch installation: theme info, pages, menus, options.
+ * Run the BaseLayer installation: theme info, pages, menus, options.
  *
  * @return void
  */
 function baselayer_run_install(): void
 {
   if (bl_setup_completed()) {
-    wp_die('FromScratch installation is already complete.');
+    wp_die('BaseLayer installation is already complete.');
     return;
   }
 

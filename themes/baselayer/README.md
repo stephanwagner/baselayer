@@ -1,6 +1,6 @@
-# FromScratch
+# BaseLayer
 
-A structured WordPress foundation theme designed for developers who prefer full control.
+A modern WordPress foundation theme for developers who prefer full control.
 
 ## Author
 

@@ -395,7 +395,7 @@ function bl_register_cpts(): void
 
 /**
  * Resolve CPT menu icon (dashicon class, URL/data URI, or inline SVG).
- * Falls back to the default FromScratch SVG icon.
+ * Falls back to the default BaseLayer SVG icon.
  *
  * @param mixed $icon Raw menu_icon value from config.
  */
@@ -1309,7 +1309,7 @@ function bl_cpt_default_labels(string $post_type, array $labels = []): array
 
 /**
  * Post type for the current archive listing (CPT archives and post taxonomy archives only).
- * Does not cover the blog posts index (`is_home()`); FromScratch does not ship a default posts listing.
+ * Does not cover the blog posts index (`is_home()`); BaseLayer does not ship a default posts listing.
  */
 function bl_archive_current_post_type(): string
 {

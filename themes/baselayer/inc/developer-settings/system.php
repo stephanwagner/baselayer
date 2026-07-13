@@ -23,7 +23,7 @@ function bl_developer_redis_safeguard_block(): string
 	}
 	$relative_path = '/wp-content/themes/' . $stylesheet . '/inc/baselayer-redis-safeguard.php';
 	return implode("\n", [
-		'// BEGIN FromScratch Redis safeguard',
+		'// BEGIN BaseLayer Redis safeguard',
 		'if (!defined(\'WP_REDIS_DISABLE_COMMENT\')) {',
 		"\tdefine('WP_REDIS_DISABLE_COMMENT', true);",
 		'}',
@@ -31,7 +31,7 @@ function bl_developer_redis_safeguard_block(): string
 		'if (file_exists($bl_redis_safeguard)) {',
 		"\trequire_once \$bl_redis_safeguard;",
 		'}',
-		'// END FromScratch Redis safeguard',
+		'// END BaseLayer Redis safeguard',
 	]) . "\n\n";
 }
 
@@ -46,8 +46,8 @@ function bl_developer_redis_safeguard_is_installed(): bool
 	if ($wp_config === false) {
 		return false;
 	}
-	return strpos($wp_config, '// BEGIN FromScratch Redis safeguard') !== false
-		&& strpos($wp_config, '// END FromScratch Redis safeguard') !== false;
+	return strpos($wp_config, '// BEGIN BaseLayer Redis safeguard') !== false
+		&& strpos($wp_config, '// END BaseLayer Redis safeguard') !== false;
 }
 
 const BL_LATEST_PHP_VERSION_HOOK = 'baselayer_refresh_latest_php_version';
@@ -133,7 +133,7 @@ function bl_developer_redis_safeguard_install(): array
 	if ($wp_config === false) {
 		return ['ok' => false, 'message' => __('Failed to read wp-config.php.', 'baselayer')];
 	}
-	if (strpos($wp_config, '// BEGIN FromScratch Redis safeguard') === false) {
+	if (strpos($wp_config, '// BEGIN BaseLayer Redis safeguard') === false) {
 		$needle = "/* That's all, stop editing! Happy publishing. */";
 		if (strpos($wp_config, $needle) !== false) {
 			$wp_config = str_replace($needle, "\n" . $block . "\n" . $needle, $wp_config);
@@ -142,7 +142,7 @@ function bl_developer_redis_safeguard_install(): array
 		}
 	} else {
 		$wp_config = (string) preg_replace(
-			'/\/\/ BEGIN FromScratch Redis safeguard.*?\/\/ END FromScratch Redis safeguard\s*/s',
+			'/\/\/ BEGIN BaseLayer Redis safeguard.*?\/\/ END BaseLayer Redis safeguard\s*/s',
 			$block,
 			$wp_config
 		);

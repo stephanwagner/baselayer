@@ -3,7 +3,7 @@
 defined('ABSPATH') || exit;
 
 /**
- * FromScratch Block Creator — block options engine + optional admin UI.
+ * BaseLayer Block Creator — block options engine + optional admin UI.
  *
  * File baseline: config/block-options.php
  * UI overlay (feature-flagged): option bl_block_creator_block_options

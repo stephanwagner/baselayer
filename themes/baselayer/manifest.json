@@ -1,6 +1,6 @@
 {
-  "short_name": "baselayer",
-  "name": "baselayer",
+  "short_name": "BaseLayer",
+  "name": "BaseLayer",
   "icons": [
     {
       "src": "/wp-content/themes/baselayer/assets/img/favicon-192.png",
@@ -16,5 +16,5 @@
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FFFFFF",
-  "theme_color": "#00aaff"
+  "theme_color": "#4080ff"
 }

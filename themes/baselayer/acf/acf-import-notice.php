@@ -254,7 +254,7 @@ function bl_acf_import_admin_notice(): void
 	?>
 	<div class="notice notice-warning">
 		<p>
-			<strong><?= esc_html__('FromScratch ACF field groups', 'baselayer') ?></strong>
+			<strong><?= esc_html__('BaseLayer ACF field groups', 'baselayer') ?></strong>
 		</p>
 		<p>
 			<?= esc_html__('ACF Pro is active, but the theme’s block and website field groups are not imported yet. Import them now, or skip if you manage fields yourself.', 'baselayer') ?>

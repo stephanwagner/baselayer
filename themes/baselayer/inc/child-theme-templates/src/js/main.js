@@ -15,4 +15,4 @@
 import '../../acf/blocks/blocks.js';
 
 // Test log message
-console.log('FromScratch Child Theme JavaScript loaded.');
+console.log('BaseLayer Child Theme JavaScript loaded.');

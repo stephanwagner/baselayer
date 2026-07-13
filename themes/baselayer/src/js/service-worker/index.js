@@ -1,5 +1,5 @@
 /**
- * FromScratch service worker — base lifecycle + feature modules.
+ * BaseLayer service worker — base lifecycle + feature modules.
  *
  * Offline shells: assets/html/offline.html + offline-de.html (locale via PHP). Add more modules here as needed.
  * (e.g. caching, background sync). Keep each feature in its own file.

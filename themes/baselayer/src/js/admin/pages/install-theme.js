@@ -1,8 +1,8 @@
 /**
- * Developer section on the FromScratch install page:
+ * Developer section on the BaseLayer install page:
  * - When only the new user has developer rights: force "Log in as this user" checked (readonly, value still sent).
  * - When only the current user has developer rights: uncheck "Log in as this user".
- * - Sync theme name into the description on blur (FromScratch / previous name → new name).
+ * - Sync theme name into the description on blur (BaseLayer / previous name → new name).
  * Runs once on DOMContentLoaded.
  */
 
@@ -57,7 +57,7 @@ function initDeveloperInstaller() {
 
 /**
  * Keep theme description in sync with theme name on blur.
- * Replaces "FromScratch" or the previously synced name so typo fixes update too.
+ * Replaces "BaseLayer" or the previously synced name so typo fixes update too.
  */
 function initThemeNameDescriptionSync() {
   const form = document.querySelector('form[data-fs-install-form]');
@@ -97,8 +97,8 @@ function initThemeNameDescriptionSync() {
       description = replaceAll(description, syncedName, nextName);
     }
 
-    if (description.includes('FromScratch') && nextName !== 'FromScratch') {
-      description = replaceAll(description, 'FromScratch', nextName);
+    if (description.includes('BaseLayer') && nextName !== 'BaseLayer') {
+      description = replaceAll(description, 'BaseLayer', nextName);
     }
 
     if (description !== before) {

@@ -1,5 +1,5 @@
 /**
- * Register FromScratch Creator custom blocks in the editor (PoC).
+ * Register BaseLayer Creator custom blocks in the editor (PoC).
  */
 (function (wp) {
   if (!wp || !wp.blocks || !wp.element || !wp.blockEditor || !wp.components) {

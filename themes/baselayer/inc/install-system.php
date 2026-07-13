@@ -2,12 +2,12 @@
 
 defined('ABSPATH') || exit;
 
-const BL_HTACCESS_MARKER_START = '# BEGIN FromScratch performance';
-const BL_HTACCESS_MARKER_END = '# END FromScratch performance';
+const BL_HTACCESS_MARKER_START = '# BEGIN BaseLayer performance';
+const BL_HTACCESS_MARKER_END = '# END BaseLayer performance';
 
 /** @deprecated Legacy markers overlapped with redirects block; kept for cleanup only. */
-const BL_HTACCESS_MARKER_START_LEGACY = '# BEGIN FromScratch ';
-const BL_HTACCESS_MARKER_END_LEGACY = '# END FromScratch';
+const BL_HTACCESS_MARKER_START_LEGACY = '# BEGIN BaseLayer ';
+const BL_HTACCESS_MARKER_END_LEGACY = '# END BaseLayer';
 
 /**
  * Build the recommended performance .htaccess block (with markers).
@@ -38,11 +38,11 @@ function bl_remove_htaccess_marked_block(string $content, string $start_marker, 
 /**
  * Remove legacy performance block without touching the redirects block.
  *
- * Old markers used "# BEGIN FromScratch " which is a prefix of "# BEGIN FromScratch redirects".
+ * Old markers used "# BEGIN BaseLayer " which is a prefix of "# BEGIN BaseLayer redirects".
  */
 function bl_remove_htaccess_legacy_performance_block(string $content): string
 {
-	$pattern = '/(?:^|(\r\n|\r|\n))# BEGIN FromScratch \r?\n.*?\r?\n# END FromScratch(?:\r?\n|$)(?! redirects)/s';
+	$pattern = '/(?:^|(\r\n|\r|\n))# BEGIN BaseLayer \r?\n.*?\r?\n# END BaseLayer(?:\r?\n|$)(?! redirects)/s';
 
 	return (string) preg_replace($pattern, '$1', $content, 1);
 }
@@ -58,7 +58,7 @@ function bl_htaccess_cleanup_corruption(string $content): string
 /**
  * Write recommended .htaccess rules to WP root (Apache only).
  * Adds: MIME types, Cache-Control via mod_headers, Brotli/deflate, Vary Accept-Encoding.
- * Safe to call multiple times; replaces existing FromScratch block when present.
+ * Safe to call multiple times; replaces existing BaseLayer block when present.
  *
  * @return bool True if block was written or already present, false if skipped (Nginx, unwritable, etc.)
  */
@@ -204,7 +204,7 @@ function bl_install_write_acf_pro_license(string $key)
 		);
 	}
 
-	$block = "// FromScratch: ACF Pro license\n"
+	$block = "// BaseLayer: ACF Pro license\n"
 		. 'define( \'ACF_PRO_LICENSE\', ' . var_export($key, true) . " );\n\n";
 
 	$needle = "/* That's all, stop editing! Happy publishing. */";

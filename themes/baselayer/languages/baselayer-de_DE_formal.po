@@ -1,6 +1,6 @@
-# German translation for FromScratch theme (install page).
+# German translation for BaseLayer theme (install page).
 # Copyright (C) 2026
-# This file is distributed under the same license as the FromScratch theme.
+# This file is distributed under the same license as the BaseLayer theme.
 #
 msgid ""
 msgstr "Report-Msgid-Bugs-To: https://wordpress.org/support/theme/baselayer\nPOT-Creation-Date: 2026-05-02T13:05:23+00:00\nLanguage: de_DE\nMIME-Version: 1.0\nContent-Type: text/plain; charset=UTF-8\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=2; plural=(n != 1);\nX-Generator: \n"
@@ -500,8 +500,8 @@ msgstr "Weitere Einstellungen kannst du auf der Seite <a href=\"%s\">Theme Einst
 msgid "Slider"
 msgstr "Slider"
 
-msgid "FromScratch isn't set up yet."
-msgstr "FromScratch ist noch nicht eingerichtet."
+msgid "BaseLayer isn't set up yet."
+msgstr "BaseLayer ist noch nicht eingerichtet."
 
 msgid "A one-time initialization is required to configure core options and activate essential system features."
 msgstr "Eine einmalige Initialisierung ist erforderlich, um zentrale Optionen zu konfigurieren und grundlegende Systemfunktionen zu aktivieren."
@@ -509,11 +509,11 @@ msgstr "Eine einmalige Initialisierung ist erforderlich, um zentrale Optionen zu
 msgid "Go to installer"
 msgstr "Zum Installierer"
 
-msgid "Install FromScratch"
-msgstr "FromScratch installieren"
+msgid "Install BaseLayer"
+msgstr "BaseLayer installieren"
 
-msgid "FromScratch is installed."
-msgstr "FromScratch ist installiert."
+msgid "BaseLayer is installed."
+msgstr "BaseLayer ist installiert."
 
 msgid "Edit theme settings"
 msgstr "Theme Einstellungen bearbeiten"
@@ -545,11 +545,11 @@ msgstr "Child Theme erstellen"
 msgid "Recommended"
 msgstr "Empfohlen"
 
-msgid "Creates a project-specific child theme. FromScratch remains installed for updates, while your custom styles, scripts, and templates live in the child theme."
-msgstr "Erstellt ein projektspezifisches Child Theme. FromScratch bleibt für Updates installiert, während eigene Styles, Skripte und Templates im Child Theme liegen."
+msgid "Creates a project-specific child theme. BaseLayer remains installed for updates, while your custom styles, scripts, and templates live in the child theme."
+msgstr "Erstellt ein projektspezifisches Child Theme. BaseLayer bleibt für Updates installiert, während eigene Styles, Skripte und Templates im Child Theme liegen."
 
-msgid "Active child theme: %s. Parent FromScratch stays installed for updates."
-msgstr "Aktives Child Theme: %s. Das Parent-Theme FromScratch bleibt für Updates installiert."
+msgid "Active child theme: %s. Parent BaseLayer stays installed for updates."
+msgstr "Aktives Child Theme: %s. Das Parent-Theme BaseLayer bleibt für Updates installiert."
 
 msgid "Theme name"
 msgstr "Theme Name"
@@ -2670,8 +2670,8 @@ msgid_plural "Imported %d ACF field groups."
 msgstr[0] "%d ACF-Feldgruppe importiert."
 msgstr[1] "%d ACF-Feldgruppen importiert."
 
-msgid "FromScratch ACF field groups"
-msgstr "FromScratch ACF-Feldgruppen"
+msgid "BaseLayer ACF field groups"
+msgstr "BaseLayer ACF-Feldgruppen"
 
 msgid "ACF Pro is active, but the theme’s block and website field groups are not imported yet. Import them now, or skip if you manage fields yourself."
 msgstr "ACF Pro ist aktiv, aber die Block- und Website-Feldgruppen des Themes sind noch nicht importiert. Importiere sie jetzt, oder überspringe dies, wenn du Felder selbst verwaltest."

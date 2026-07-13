@@ -15,7 +15,7 @@ function bl_register_admin_color_scheme(): void
 
 	wp_admin_css_color(
 		'baselayer',
-		__('Baselayer', 'baselayer'),
+		'BaseLayer',
 		get_template_directory_uri() . '/assets/admin/theme-baselayer.css',
 		['#0c0c0c', '#1e1e1e', '#1d6ebf', '#4387db']
 	);
@@ -40,7 +40,7 @@ add_filter('get_user_option_admin_color', static function ($color): string {
 		return 'baselayer';
 	}
 
-	if ($color === 'fromscratch') {
+	if ($color === 'baselayer') {
 		return 'baselayer';
 	}
 
@@ -48,7 +48,7 @@ add_filter('get_user_option_admin_color', static function ($color): string {
 }, 5);
 
 /**
- * New users: assign the FromScratch admin color scheme.
+ * New users: assign the BaseLayer admin color scheme.
  */
 add_action('user_register', static function (int $user_id): void {
 	update_user_meta($user_id, 'admin_color', 'baselayer');
