@@ -491,7 +491,7 @@ function bl_scripts(): void
 				$lang_codes[] = (string) $lang['id'];
 			}
 		}
-		wp_localize_script('baselayer-scripts', 'fsGoogleTranslate', [
+		wp_localize_script('baselayer-scripts', 'blGoogleTranslate', [
 			'pageLang' => function_exists('bl_get_default_language') ? bl_get_default_language() : '',
 			'languages' => $lang_codes,
 			'triggerLabel' => __('Select language, current: %s', 'baselayer'),

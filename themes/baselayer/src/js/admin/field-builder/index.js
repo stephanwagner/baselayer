@@ -19,7 +19,7 @@ function ensureTypes() {
  */
 export function mount(el, options = {}) {
   if (!el) {
-    throw new Error('FsFieldBuilder.mount requires a container element');
+    throw new Error('BlFieldBuilder.mount requires a container element');
   }
   ensureTypes();
   return createShell(el, options);
@@ -27,9 +27,9 @@ export function mount(el, options = {}) {
 
 export { getType, listTypesForMode, registerType } from './registry';
 
-const FsFieldBuilder = { mount };
-export default FsFieldBuilder;
+const BlFieldBuilder = { mount };
+export default BlFieldBuilder;
 
 if (typeof window !== 'undefined') {
-  window.FsFieldBuilder = FsFieldBuilder;
+  window.BlFieldBuilder = BlFieldBuilder;
 }

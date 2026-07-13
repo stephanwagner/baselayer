@@ -354,7 +354,7 @@ add_action('admin_enqueue_scripts', function ($hook_suffix) {
 	wp_add_inline_script(
 		'code-editor',
 		sprintf(
-			'window.fsCssVarsOverviewEditorSettings = %s;',
+			'window.blCssVarsOverviewEditorSettings = %s;',
 			wp_json_encode($overview_settings)
 		)
 	);
@@ -1164,7 +1164,7 @@ function theme_settings_page(): void
 
 				<script>
 					(function() {
-						function fsSyncHomepageStaticFields() {
+						function blSyncHomepageStaticFields() {
 							var posts = document.getElementById('bl_show_on_front_posts');
 							var wrap = document.getElementById('bl-homepage-static-fields');
 							if (!wrap) return;
@@ -1172,9 +1172,9 @@ function theme_settings_page(): void
 							wrap.style.display = showStatic && showStatic.checked ? '' : 'none';
 						}
 						document.querySelectorAll('input[name="show_on_front"]').forEach(function(el) {
-							el.addEventListener('change', fsSyncHomepageStaticFields);
+							el.addEventListener('change', blSyncHomepageStaticFields);
 						});
-						fsSyncHomepageStaticFields();
+						blSyncHomepageStaticFields();
 					})();
 				</script>
 
@@ -1472,10 +1472,10 @@ function theme_settings_page(): void
 							overviewEditor.codemirror.refresh();
 							return;
 						}
-						if (!window.wp || !window.wp.codeEditor || !window.fsCssVarsOverviewEditorSettings) {
+						if (!window.wp || !window.wp.codeEditor || !window.blCssVarsOverviewEditorSettings) {
 							return;
 						}
-						overviewEditor = window.wp.codeEditor.initialize('bl-css-vars-overview-code', window.fsCssVarsOverviewEditorSettings);
+						overviewEditor = window.wp.codeEditor.initialize('bl-css-vars-overview-code', window.blCssVarsOverviewEditorSettings);
 						if (overviewEditor && overviewEditor.codemirror) {
 							window.setTimeout(function() {
 								overviewEditor.codemirror.refresh();

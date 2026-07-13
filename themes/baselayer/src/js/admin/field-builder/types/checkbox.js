@@ -1,7 +1,7 @@
 import { el, formRow } from '../dom';
 
 function mark(input, key) {
-  input.dataset.fsFb = key;
+  input.dataset.blFb = key;
   return input;
 }
 

@@ -384,7 +384,7 @@ function bl_dashboard_enqueue_matomo_stats(string $hook_suffix): void
 	}
 	wp_register_script('bl-dashboard-matomo', false, [], null, true);
 	wp_enqueue_script('bl-dashboard-matomo');
-	wp_localize_script('bl-dashboard-matomo', 'fsDashboardMatomo', [
+	wp_localize_script('bl-dashboard-matomo', 'blDashboardMatomo', [
 		'ajaxUrl'             => admin_url('admin-ajax.php'),
 		'nonce'               => wp_create_nonce('bl_dashboard_matomo_stats'),
 		'pollPendingMs'       => 2500,
@@ -393,7 +393,7 @@ function bl_dashboard_enqueue_matomo_stats(string $hook_suffix): void
 	$inline = <<<'JS'
 (function () {
 	document.addEventListener('DOMContentLoaded', function () {
-		var cfg = typeof fsDashboardMatomo !== 'undefined' ? fsDashboardMatomo : null;
+		var cfg = typeof blDashboardMatomo !== 'undefined' ? blDashboardMatomo : null;
 		var wrap = document.querySelector('[data-bl-dashboard-stats]');
 		if (!wrap || !cfg) {
 			return;

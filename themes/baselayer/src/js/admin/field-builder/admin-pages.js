@@ -15,7 +15,7 @@ function bootBlocksAdmin() {
     return;
   }
 
-  const cfg = window.fsFieldBuilderBlocksAdmin || {};
+  const cfg = window.blFieldBuilderBlocksAdmin || {};
 
   let initialFields = [];
   try {
@@ -66,15 +66,15 @@ function bootBlocksAdmin() {
   const slugInput = document.getElementById('bl-block-slug');
   if (nameInput && slugInput) {
     nameInput.addEventListener('input', () => {
-      if (!slugInput.dataset.fsSlugTouched) {
+      if (!slugInput.dataset.blSlugTouched) {
         slugInput.value = slugify(nameInput.value);
       }
     });
     slugInput.addEventListener('input', () => {
-      slugInput.dataset.fsSlugTouched = '1';
+      slugInput.dataset.blSlugTouched = '1';
     });
     if (slugInput.value) {
-      slugInput.dataset.fsSlugTouched = '1';
+      slugInput.dataset.blSlugTouched = '1';
     }
   }
 }
@@ -90,7 +90,7 @@ function bootUiDev() {
     return;
   }
 
-  const i18n = window.fsFieldBuilderUiDev || {};
+  const i18n = window.blFieldBuilderUiDev || {};
   const api = mount(root, {
     mode: 'fields',
     initialFields: Array.isArray(i18n.initialFields) ? i18n.initialFields : [],

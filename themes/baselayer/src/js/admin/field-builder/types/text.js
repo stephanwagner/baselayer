@@ -5,7 +5,7 @@ import { el, formRow } from '../dom';
  * @param {string} key
  */
 function mark(input, key) {
-  input.dataset.fsFb = key;
+  input.dataset.blFb = key;
   return input;
 }
 

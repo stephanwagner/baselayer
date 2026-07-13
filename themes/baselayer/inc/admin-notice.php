@@ -4,7 +4,7 @@
  * Themed one-shot toast (user meta, no query args). Not a core .notice, so admin common.js
  * does not relocate it. Rendered in admin_footer and wp_footer (logged-in front + admin bar purge).
  *
- * Same UI can be shown immediately via window.fsAdminNoticeShow(type, message) after admin assets print.
+ * Same UI can be shown immediately via window.blAdminNoticeShow(type, message) after admin assets print.
  */
 
 defined('ABSPATH') || exit;
@@ -80,7 +80,7 @@ function bl_admin_notice_position_vars(): array
 }
 
 /**
- * Print shared toast styles + window.fsAdminNoticeShow once per request (logged-in).
+ * Print shared toast styles + window.blAdminNoticeShow once per request (logged-in).
  */
 function bl_admin_notice_print_client_assets(): void
 {
@@ -198,7 +198,7 @@ function bl_admin_notice_print_client_assets(): void
 	<script>
 		(function() {
 			var dismissLabel = <?= wp_json_encode($dismiss, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
-			window.fsAdminNoticeShow = window.fsAdminNoticeShow || function(type, message) {
+			window.blAdminNoticeShow = window.blAdminNoticeShow || function(type, message) {
 				var ok = {
 					success: 1,
 					error: 1,
@@ -302,8 +302,8 @@ function bl_admin_notice_maybe_output(): void
 ?>
 	<script>
 		(function() {
-			if (typeof window.fsAdminNoticeShow === 'function') {
-				window.fsAdminNoticeShow(<?= wp_json_encode($type, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>, <?= wp_json_encode($message, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>);
+			if (typeof window.blAdminNoticeShow === 'function') {
+				window.blAdminNoticeShow(<?= wp_json_encode($type, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>, <?= wp_json_encode($message, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>);
 			}
 		})();
 	</script>

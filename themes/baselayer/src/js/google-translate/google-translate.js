@@ -69,7 +69,7 @@ function updateLanguageSwitcherTrigger(lang) {
   trigger.setAttribute('data-language', lang);
 
   const label = activeItem.querySelector('.bl-lang-item__label')?.textContent?.trim() || '';
-  const config = window.fsGoogleTranslate || {};
+  const config = window.blGoogleTranslate || {};
   const labelTemplate = typeof config.triggerLabel === 'string' ? config.triggerLabel : 'Select language, current: %s';
   const labelEmpty = typeof config.triggerLabelEmpty === 'string' ? config.triggerLabelEmpty : 'Select language';
 
@@ -207,7 +207,7 @@ export async function resetToOriginal() {
 }
 
 export async function initGoogleTranslateOnLoad() {
-  const config = window.fsGoogleTranslate;
+  const config = window.blGoogleTranslate;
   if (config) {
     configureGoogleTranslate(config);
   }

@@ -446,7 +446,7 @@ function bl_blocks_enqueue_field_builder_assets(string $hook_suffix): void
 	];
 
 	if ($is_ui_dev) {
-		wp_localize_script($handle, 'fsFieldBuilderUiDev', $i18n);
+		wp_localize_script($handle, 'blFieldBuilderUiDev', $i18n);
 	}
 
 	if ($is_block_edit) {
@@ -460,7 +460,7 @@ function bl_blocks_enqueue_field_builder_assets(string $hook_suffix): void
 				'label' => $label,
 			];
 		}
-		wp_localize_script($handle, 'fsFieldBuilderBlocksAdmin', array_merge($i18n, [
+		wp_localize_script($handle, 'blFieldBuilderBlocksAdmin', array_merge($i18n, [
 			'addOption' => __('Add option', 'baselayer'),
 			'emptyOptionsStack' => __('No options yet. Add a preset or a custom option.', 'baselayer'),
 			'initialOptionsStack' => [],

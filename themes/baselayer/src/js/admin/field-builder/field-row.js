@@ -12,7 +12,7 @@ import { renderPresentation, serializePresentation } from './presentation';
 function buildTypeSelect(mode, selected) {
   const select = el('select', {
     className: 'bl-field-builder__type-select widefat',
-    dataset: { fsFb: 'type' },
+    dataset: { blFb: 'type' },
   });
   listTypesForMode(mode).forEach((type) => {
     select.appendChild(
@@ -96,7 +96,7 @@ export function createFieldRow({ mode = 'fields', data = {}, open = false } = {}
 
   const root = el('div', {
     className: 'bl-field-builder__field' + (open ? ' is-open' : ''),
-    dataset: { fsFbField: '1' },
+    dataset: { blFbField: '1' },
   });
 
   const header = el('div', { className: 'bl-field-builder__field-header' });
@@ -150,7 +150,7 @@ export function createFieldRow({ mode = 'fields', data = {}, open = false } = {}
         type: 'button',
         className: 'bl-field-builder__tab' + (index === 0 ? ' is-active' : ''),
         role: 'tab',
-        dataset: { fsFbTab: id },
+        dataset: { blFbTab: id },
         'aria-selected': index === 0 ? 'true' : 'false',
         text: label,
       })
@@ -161,20 +161,20 @@ export function createFieldRow({ mode = 'fields', data = {}, open = false } = {}
 
   const panelGeneral = el('div', {
     className: 'bl-field-builder__tab-panel is-active',
-    dataset: { fsFbTabPanel: 'general' },
+    dataset: { blFbTabPanel: 'general' },
     role: 'tabpanel',
   });
   const typeSelect = buildTypeSelect(mode, typeId);
   const titleInput = el('input', {
     type: 'text',
     className: 'widefat',
-    dataset: { fsFb: 'title' },
+    dataset: { blFb: 'title' },
     value: title,
   });
   const slugInput = el('input', {
     type: 'text',
     className: 'widefat',
-    dataset: { fsFb: 'slug' },
+    dataset: { blFb: 'slug' },
     value: slug,
   });
   panelGeneral.appendChild(formRow('Type', typeSelect));
@@ -182,13 +182,13 @@ export function createFieldRow({ mode = 'fields', data = {}, open = false } = {}
   panelGeneral.appendChild(formRow('Slug', slugInput));
   const optionsHost = el('div', {
     className: 'bl-field-builder__type-options',
-    dataset: { fsFbOptionsHost: '1' },
+    dataset: { blFbOptionsHost: '1' },
   });
   panelGeneral.appendChild(optionsHost);
 
   const panelPresentation = el('div', {
     className: 'bl-field-builder__tab-panel',
-    dataset: { fsFbTabPanel: 'presentation' },
+    dataset: { blFbTabPanel: 'presentation' },
     role: 'tabpanel',
     hidden: true,
   });
@@ -196,7 +196,7 @@ export function createFieldRow({ mode = 'fields', data = {}, open = false } = {}
 
   const panelLogic = el('div', {
     className: 'bl-field-builder__tab-panel',
-    dataset: { fsFbTabPanel: 'logic' },
+    dataset: { blFbTabPanel: 'logic' },
     role: 'tabpanel',
     hidden: true,
   });
@@ -237,13 +237,13 @@ export function createFieldRow({ mode = 'fields', data = {}, open = false } = {}
 
   titleInput.addEventListener('input', () => {
     syncPreviews();
-    if (!slugInput.dataset.fsFbSlugTouched) {
+    if (!slugInput.dataset.blFbSlugTouched) {
       slugInput.value = slugify(titleInput.value);
     }
   });
 
   slugInput.addEventListener('input', () => {
-    slugInput.dataset.fsFbSlugTouched = '1';
+    slugInput.dataset.blFbSlugTouched = '1';
   });
 
   typeSelect.addEventListener('change', () => {

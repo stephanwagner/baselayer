@@ -364,7 +364,7 @@ function bl_media_folders_query_patch_script(): string
 {
 	return <<<'JS'
 (function() {
-	function fsMediaFoldersQueryUsesFolderFilter(props) {
+	function blMediaFoldersQueryUsesFolderFilter(props) {
 		if (!props || typeof props.get !== 'function') {
 			return false;
 		}
@@ -376,7 +376,7 @@ function bl_media_folders_query_patch_script(): string
 		return unassigned === 1 || unassigned === '1' || unassigned === true;
 	}
 
-	function fsMediaFoldersIsInUploadQueue(attachment) {
+	function blMediaFoldersIsInUploadQueue(attachment) {
 		if (!attachment) {
 			return false;
 		}
@@ -395,12 +395,12 @@ function bl_media_folders_query_patch_script(): string
 		});
 	}
 
-	function fsMediaFoldersAttachFolderFilter(library) {
-		if (!library || library.__fsFolderFilterAttached) {
+	function blMediaFoldersAttachFolderFilter(library) {
+		if (!library || library.__blFolderFilterAttached) {
 			return;
 		}
 		library.filters = library.filters || {};
-		library.filters.fsMediaFolder = function(attachment) {
+		library.filters.blMediaFolder = function(attachment) {
 			var fid = 0;
 			if (this.props && typeof this.props.get === 'function') {
 				fid = parseInt(this.props.get('bl_media_folder_id'), 10) || 0;
@@ -414,44 +414,44 @@ function bl_media_folders_query_patch_script(): string
 			}
 			return attFid === fid;
 		};
-		library.__fsFolderFilterAttached = true;
+		library.__blFolderFilterAttached = true;
 	}
 
-	function fsMediaFoldersPatchOrderFilterForUploads(library) {
-		if (!library || !library.filters || !library.filters.order || library.__fsOrderFilterPatched) {
+	function blMediaFoldersPatchOrderFilterForUploads(library) {
+		if (!library || !library.filters || !library.filters.order || library.__blOrderFilterPatched) {
 			return;
 		}
 		var orderFilter = library.filters.order;
 		library.filters.order = function(attachment) {
-			if (fsMediaFoldersIsInUploadQueue(attachment)) {
+			if (blMediaFoldersIsInUploadQueue(attachment)) {
 				return true;
 			}
 			return orderFilter.call(this, attachment);
 		};
-		library.__fsOrderFilterPatched = true;
+		library.__blOrderFilterPatched = true;
 	}
 
-	function fsMediaFoldersObserveUploaderQueue(library) {
-		if (!library || !library.observe || library.__fsObservesUploaderQueue) {
+	function blMediaFoldersObserveUploaderQueue(library) {
+		if (!library || !library.observe || library.__blObservesUploaderQueue) {
 			return;
 		}
 		if (!window.wp || !wp.Uploader || !wp.Uploader.queue) {
 			return;
 		}
-		fsMediaFoldersAttachFolderFilter(library);
-		fsMediaFoldersPatchOrderFilterForUploads(library);
+		blMediaFoldersAttachFolderFilter(library);
+		blMediaFoldersPatchOrderFilterForUploads(library);
 		library.observe(wp.Uploader.queue);
-		library.__fsObservesUploaderQueue = true;
+		library.__blObservesUploaderQueue = true;
 	}
 
-	window.fsMediaFoldersQueryUsesFolderFilter = fsMediaFoldersQueryUsesFolderFilter;
-	window.fsMediaFoldersObserveUploaderQueue = fsMediaFoldersObserveUploaderQueue;
+	window.blMediaFoldersQueryUsesFolderFilter = blMediaFoldersQueryUsesFolderFilter;
+	window.blMediaFoldersObserveUploaderQueue = blMediaFoldersObserveUploaderQueue;
 
 	var wpRef = window.wp;
 	if (!wpRef || !wpRef.media || !wpRef.media.model || !wpRef.media.model.Query) {
 		return;
 	}
-	if (wpRef.media.model.Query.prototype.__fsFolderQueryPatched) {
+	if (wpRef.media.model.Query.prototype.__blFolderQueryPatched) {
 		return;
 	}
 	var originalInit = wpRef.media.model.Query.prototype.initialize;
@@ -463,8 +463,8 @@ function bl_media_folders_query_patch_script(): string
 				bl_media_folder_unassigned: this.props.get('bl_media_folder_unassigned') || 0
 			});
 		}
-		if (fsMediaFoldersQueryUsesFolderFilter(this.props)) {
-			fsMediaFoldersObserveUploaderQueue(this);
+		if (blMediaFoldersQueryUsesFolderFilter(this.props)) {
+			blMediaFoldersObserveUploaderQueue(this);
 		}
 	};
 	var originalSync = wpRef.media.model.Query.prototype.sync;
@@ -489,7 +489,7 @@ function bl_media_folders_query_patch_script(): string
 		}
 		return originalSync.call(this, method, model, options);
 	};
-	wpRef.media.model.Query.prototype.__fsFolderQueryPatched = true;
+	wpRef.media.model.Query.prototype.__blFolderQueryPatched = true;
 })();
 JS;
 }
@@ -511,10 +511,10 @@ add_action('admin_head', function (): void {
 ?>
 	<script>
 		(function() {
-			if (window.fsMediaFolderPanel) {
+			if (window.blMediaFolderPanel) {
 				return;
 			}
-			var key = 'fsMediaFoldersSidebarCollapsed';
+			var key = 'blMediaFoldersSidebarCollapsed';
 
 			function read() {
 				try {
@@ -592,7 +592,7 @@ add_action('admin_head', function (): void {
 					applyToDom(read());
 				}
 			});
-			window.fsMediaFolderPanel = {
+			window.blMediaFolderPanel = {
 				key: key,
 				isCollapsed: read,
 				setCollapsed: setCollapsed,
@@ -687,23 +687,23 @@ add_action('admin_footer', function (): void {
 			var uploadLibraryUrl = cfg.uploadLibraryUrl || '';
 			var L = cfg.i18n || {};
 
-			function fsModalFmtCount(n) {
+			function blModalFmtCount(n) {
 				var x = parseInt(n, 10);
 				if (isNaN(x) || x < 0) {
 					x = 0;
 				}
 				return String(x);
 			}
-			var fsBranchCollapsedKey = 'baselayer_bl_media_folder_collapsed_branches';
+			var blBranchCollapsedKey = 'baselayer_bl_media_folder_collapsed_branches';
 
-			function fsEsc(s) {
+			function blEsc(s) {
 				return String(s)
 					.replace(/&/g, '&amp;')
 					.replace(/</g, '&lt;')
 					.replace(/>/g, '&gt;');
 			}
 
-			function fsEscAttr(s) {
+			function blEscAttr(s) {
 				return String(s)
 					.replace(/&/g, '&amp;')
 					.replace(/"/g, '&quot;')
@@ -711,12 +711,12 @@ add_action('admin_footer', function (): void {
 					.replace(/>/g, '&gt;');
 			}
 
-			function fsModalReadCollapsedBranches() {
+			function blModalReadCollapsedBranches() {
 				try {
 					if (!window.localStorage) {
 						return [];
 					}
-					var raw = window.localStorage.getItem(fsBranchCollapsedKey);
+					var raw = window.localStorage.getItem(blBranchCollapsedKey);
 					if (!raw) {
 						return [];
 					}
@@ -734,16 +734,16 @@ add_action('admin_footer', function (): void {
 				}
 			}
 
-			function fsModalWriteCollapsedBranches(ids) {
+			function blModalWriteCollapsedBranches(ids) {
 				try {
 					if (window.localStorage) {
-						window.localStorage.setItem(fsBranchCollapsedKey, JSON.stringify(ids));
+						window.localStorage.setItem(blBranchCollapsedKey, JSON.stringify(ids));
 					}
 				} catch (err) {}
 			}
 
-			function fsModalPersistBranchCollapse(termId, collapsed) {
-				var ids = fsModalReadCollapsedBranches();
+			function blModalPersistBranchCollapse(termId, collapsed) {
+				var ids = blModalReadCollapsedBranches();
 				var ix = ids.indexOf(termId);
 				if (collapsed && ix === -1) {
 					ids.push(termId);
@@ -751,15 +751,15 @@ add_action('admin_footer', function (): void {
 				if (!collapsed && ix !== -1) {
 					ids.splice(ix, 1);
 				}
-				fsModalWriteCollapsedBranches(ids);
+				blModalWriteCollapsedBranches(ids);
 			}
 
-			function fsModalApplyStoredBranchState(root) {
+			function blModalApplyStoredBranchState(root) {
 				if (!root) {
 					return;
 				}
 				var collapsed = {};
-				fsModalReadCollapsedBranches().forEach(function(id) {
+				blModalReadCollapsedBranches().forEach(function(id) {
 					collapsed[id] = true;
 				});
 				var branches = root.querySelectorAll('.bl-media-folders-tree-item--branch[data-folder-term-id]');
@@ -785,14 +785,14 @@ add_action('admin_footer', function (): void {
 				}
 			}
 
-			function fsModalRenderFolderTree(parentId) {
+			function blModalRenderFolderTree(parentId) {
 				var items = byParent[String(parentId)] || [];
 				var out = '';
 				var ti;
 				for (ti = 0; ti < items.length; ti++) {
 					var it = items[ti];
 					var id = parseInt(it.id, 10);
-					var name = fsEsc(it.name);
+					var name = blEsc(it.name);
 					var kids = byParent[String(id)] || [];
 					var hasChildren = kids.length > 0;
 					var liClass = 'bl-media-modal-folders__tree-item bl-media-folders-tree-item';
@@ -808,7 +808,7 @@ add_action('admin_footer', function (): void {
 					var cnt = typeof it.count !== 'undefined' ? it.count : 0;
 					out += '<button type="button" class="bl-media-folder-row" data-folder-id="' + id + '">';
 					if (hasChildren) {
-						out += '<span class="bl-media-folders-folder-toggle" role="button" tabindex="0" aria-expanded="true" aria-label="' + fsEscAttr(L.expandCollapse || '') + '">';
+						out += '<span class="bl-media-folders-folder-toggle" role="button" tabindex="0" aria-expanded="true" aria-label="' + blEscAttr(L.expandCollapse || '') + '">';
 						out += icons.folderBranch || '';
 						out += '</span>';
 					} else {
@@ -817,12 +817,12 @@ add_action('admin_footer', function (): void {
 						out += '</span>';
 					}
 					out += '<span class="name">' + name + '</span>';
-					out += '<span class="bl-media-folders-count">' + fsModalFmtCount(cnt) + '</span>';
+					out += '<span class="bl-media-folders-count">' + blModalFmtCount(cnt) + '</span>';
 					out += '</button>';
 					out += '</div>';
 					if (hasChildren) {
 						out += '<div class="bl-media-folders-branch"><ul class="bl-media-folders-branch-list">';
-						out += fsModalRenderFolderTree(id);
+						out += blModalRenderFolderTree(id);
 						out += '</ul></div>';
 					}
 					out += '</li>';
@@ -934,8 +934,8 @@ add_action('admin_footer', function (): void {
 						bar.appendChild(btn);
 					}
 				}
-				if (window.fsMediaFolderPanel && typeof window.fsMediaFolderPanel.applyFromStorage === 'function') {
-					window.fsMediaFolderPanel.applyFromStorage();
+				if (window.blMediaFolderPanel && typeof window.blMediaFolderPanel.applyFromStorage === 'function') {
+					window.blMediaFolderPanel.applyFromStorage();
 				}
 			}
 
@@ -952,29 +952,29 @@ add_action('admin_footer', function (): void {
 				panel.id = 'bl-media-modal-folders';
 				panel.className = 'bl-media-modal-folders';
 				var html = '<div class="bl-media-modal-folders__heading-row">';
-				html += '<span class="bl-media-modal-folders__heading">' + fsEsc(L.heading || 'Folders') + '</span>';
+				html += '<span class="bl-media-modal-folders__heading">' + blEsc(L.heading || 'Folders') + '</span>';
 				if (uploadLibraryUrl) {
-					html += '<a class="components-button is-small is-tertiary bl-media-modal-folders__edit-library" href="' + fsEscAttr(uploadLibraryUrl) + '">' + fsEsc(L.openMediaLibrary || 'Open Media Library') + '</a>';
+					html += '<a class="components-button is-small is-tertiary bl-media-modal-folders__edit-library" href="' + blEscAttr(uploadLibraryUrl) + '">' + blEsc(L.openMediaLibrary || 'Open Media Library') + '</a>';
 				}
 				html += '</div>';
 				html += '<ul class="bl-media-modal-folders__list">';
 				html += '<li class="bl-media-modal-folders__item"><div class="bl-media-modal-folders__row bl-media-folders-item bl-media-folders-item--all bl-media-folders-link">';
 				html += '<button type="button" class="bl-media-folder-row bl-media-folder-row--all" data-folder-id="0" data-bl-all="1">';
 				html += icons.all || '';
-				html += '<span class="bl-media-folders-link-label">' + fsEsc(L.allFiles || 'All files') + '</span>';
-				html += '<span class="bl-media-folders-count">' + fsModalFmtCount(counts.allFiles) + '</span>';
+				html += '<span class="bl-media-folders-link-label">' + blEsc(L.allFiles || 'All files') + '</span>';
+				html += '<span class="bl-media-folders-count">' + blModalFmtCount(counts.allFiles) + '</span>';
 				html += '</button></div></li>';
 				html += '<li class="bl-media-modal-folders__item"><div class="bl-media-modal-folders__row bl-media-folders-item bl-media-folders-item--unassigned bl-media-folders-link">';
 				html += '<button type="button" class="bl-media-folder-row bl-media-folder-row--unassigned" data-folder-id="0" data-bl-unassigned="1">';
 				html += icons.unassigned || '';
-				html += '<span class="name">' + fsEsc(L.notInFolder || 'Not in a folder') + '</span>';
-				html += '<span class="bl-media-folders-count">' + fsModalFmtCount(counts.unassigned) + '</span>';
+				html += '<span class="name">' + blEsc(L.notInFolder || 'Not in a folder') + '</span>';
+				html += '<span class="bl-media-folders-count">' + blModalFmtCount(counts.unassigned) + '</span>';
 				html += '</button></div></li>';
-				html += fsModalRenderFolderTree(0);
+				html += blModalRenderFolderTree(0);
 				html += '</ul>';
 				panel.innerHTML = html;
 				browser.appendChild(panel);
-				fsModalApplyStoredBranchState(panel);
+				blModalApplyStoredBranchState(panel);
 
 				function repaintActive() {
 					var active = selectedFolderId();
@@ -1016,7 +1016,7 @@ add_action('admin_footer', function (): void {
 						folderToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
 						var tid = parseInt(treeItem.getAttribute('data-folder-term-id') || '0', 10);
 						if (!isNaN(tid) && tid > 0) {
-							fsModalPersistBranchCollapse(tid, !expanded);
+							blModalPersistBranchCollapse(tid, !expanded);
 						}
 						return;
 					}
@@ -1868,18 +1868,18 @@ add_action('admin_footer-upload.php', function (): void {
 		(function() {
 			var sidebar = document.getElementById('bl-media-folders-sidebar');
 			var wrap = document.querySelector('#wpbody-content .wrap');
-			if (!sidebar || !wrap || wrap.dataset.fsMediaFoldersReady === '1') {
+			if (!sidebar || !wrap || wrap.dataset.blMediaFoldersReady === '1') {
 				return;
 			}
 
-			var fsBranchCollapsedKey = 'baselayer_bl_media_folder_collapsed_branches';
+			var blBranchCollapsedKey = 'baselayer_bl_media_folder_collapsed_branches';
 
-			function fsMediaFoldersReadCollapsedBranches() {
+			function blMediaFoldersReadCollapsedBranches() {
 				try {
 					if (!window.localStorage) {
 						return [];
 					}
-					var raw = window.localStorage.getItem(fsBranchCollapsedKey);
+					var raw = window.localStorage.getItem(blBranchCollapsedKey);
 					if (!raw) {
 						return [];
 					}
@@ -1897,16 +1897,16 @@ add_action('admin_footer-upload.php', function (): void {
 				}
 			}
 
-			function fsMediaFoldersWriteCollapsedBranches(ids) {
+			function blMediaFoldersWriteCollapsedBranches(ids) {
 				try {
 					if (window.localStorage) {
-						window.localStorage.setItem(fsBranchCollapsedKey, JSON.stringify(ids));
+						window.localStorage.setItem(blBranchCollapsedKey, JSON.stringify(ids));
 					}
 				} catch (err) {}
 			}
 
-			function fsMediaFoldersPersistBranchCollapse(termId, collapsed) {
-				var ids = fsMediaFoldersReadCollapsedBranches();
+			function blMediaFoldersPersistBranchCollapse(termId, collapsed) {
+				var ids = blMediaFoldersReadCollapsedBranches();
 				var ix = ids.indexOf(termId);
 				if (collapsed && ix === -1) {
 					ids.push(termId);
@@ -1914,15 +1914,15 @@ add_action('admin_footer-upload.php', function (): void {
 				if (!collapsed && ix !== -1) {
 					ids.splice(ix, 1);
 				}
-				fsMediaFoldersWriteCollapsedBranches(ids);
+				blMediaFoldersWriteCollapsedBranches(ids);
 			}
 
-			function fsMediaFoldersApplyStoredBranchState(root) {
+			function blMediaFoldersApplyStoredBranchState(root) {
 				if (!root) {
 					return;
 				}
 				var collapsed = {};
-				fsMediaFoldersReadCollapsedBranches().forEach(function(id) {
+				blMediaFoldersReadCollapsedBranches().forEach(function(id) {
 					collapsed[id] = true;
 				});
 				var branches = root.querySelectorAll('.bl-media-folders-tree-item--branch[data-folder-term-id]');
@@ -1973,10 +1973,10 @@ add_action('admin_footer-upload.php', function (): void {
 			});
 
 			sidebar.style.display = '';
-			fsMediaFoldersApplyStoredBranchState(sidebar);
-			wrap.dataset.fsMediaFoldersReady = '1';
+			blMediaFoldersApplyStoredBranchState(sidebar);
+			wrap.dataset.blMediaFoldersReady = '1';
 
-			function fsMediaFoldersGetUploadFolderId() {
+			function blMediaFoldersGetUploadFolderId() {
 				try {
 					var fromUrl = parseInt(new URLSearchParams(window.location.search).get('bl_media_folder_id') || '0', 10);
 					if (!isNaN(fromUrl) && fromUrl > 0) {
@@ -1996,8 +1996,8 @@ add_action('admin_footer-upload.php', function (): void {
 				return 0;
 			}
 
-			function fsMediaFoldersPatchUploadParams() {
-				var folderId = fsMediaFoldersGetUploadFolderId();
+			function blMediaFoldersPatchUploadParams() {
+				var folderId = blMediaFoldersGetUploadFolderId();
 				if (folderId < 1) {
 					return;
 				}
@@ -2011,8 +2011,8 @@ add_action('admin_footer-upload.php', function (): void {
 				}
 			}
 
-			function fsMediaFoldersEnsureGridUploadPreview(frame) {
-				if (!frame || typeof frame.state !== 'function' || typeof window.fsMediaFoldersObserveUploaderQueue !== 'function') {
+			function blMediaFoldersEnsureGridUploadPreview(frame) {
+				if (!frame || typeof frame.state !== 'function' || typeof window.blMediaFoldersObserveUploaderQueue !== 'function') {
 					return;
 				}
 				var state = frame.state();
@@ -2020,31 +2020,31 @@ add_action('admin_footer-upload.php', function (): void {
 					return;
 				}
 				var library = state.get('library');
-				if (!library || !library.props || typeof window.fsMediaFoldersQueryUsesFolderFilter !== 'function') {
+				if (!library || !library.props || typeof window.blMediaFoldersQueryUsesFolderFilter !== 'function') {
 					return;
 				}
-				if (!window.fsMediaFoldersQueryUsesFolderFilter(library.props)) {
+				if (!window.blMediaFoldersQueryUsesFolderFilter(library.props)) {
 					return;
 				}
-				window.fsMediaFoldersObserveUploaderQueue(library);
+				window.blMediaFoldersObserveUploaderQueue(library);
 			}
 
-			fsMediaFoldersPatchUploadParams();
+			blMediaFoldersPatchUploadParams();
 			if (window.jQuery) {
-				window.jQuery(document).on('uploader:ready', fsMediaFoldersPatchUploadParams);
+				window.jQuery(document).on('uploader:ready', blMediaFoldersPatchUploadParams);
 				window.jQuery(wrap).on('wp-media-grid-ready', function(e, frame) {
-					fsMediaFoldersPatchUploadParams();
-					fsMediaFoldersEnsureGridUploadPreview(frame);
+					blMediaFoldersPatchUploadParams();
+					blMediaFoldersEnsureGridUploadPreview(frame);
 				});
 			}
-			setTimeout(fsMediaFoldersPatchUploadParams, 0);
-			setTimeout(fsMediaFoldersPatchUploadParams, 500);
+			setTimeout(blMediaFoldersPatchUploadParams, 0);
+			setTimeout(blMediaFoldersPatchUploadParams, 500);
 
-			function fsMediaFoldersOnUploadSuccess(attachmentData) {
+			function blMediaFoldersOnUploadSuccess(attachmentData) {
 				if (!attachmentData || !attachmentData.id) {
 					return;
 				}
-				var folderId = fsMediaFoldersGetUploadFolderId();
+				var folderId = blMediaFoldersGetUploadFolderId();
 				if (folderId < 1 || !window.wp || !wp.media) {
 					return;
 				}
@@ -2061,7 +2061,7 @@ add_action('admin_footer-upload.php', function (): void {
 
 			if (window.jQuery) {
 				window.jQuery(document).on('uploadsuccess', function(e, attachmentData) {
-					fsMediaFoldersOnUploadSuccess(attachmentData);
+					blMediaFoldersOnUploadSuccess(attachmentData);
 				});
 			}
 
@@ -2122,13 +2122,13 @@ add_action('admin_footer-upload.php', function (): void {
 					togglePlaceObserver.disconnect();
 				}, 15000);
 			}
-			if (window.fsMediaFolderPanel && typeof window.fsMediaFolderPanel.applyFromStorage === 'function') {
-				var _fsOrigApplyFromStorage = window.fsMediaFolderPanel.applyFromStorage;
-				window.fsMediaFolderPanel.applyFromStorage = function() {
-					_fsOrigApplyFromStorage.call(window.fsMediaFolderPanel);
-					fsMediaFoldersApplyStoredBranchState(sidebar);
+			if (window.blMediaFolderPanel && typeof window.blMediaFolderPanel.applyFromStorage === 'function') {
+				var _blOrigApplyFromStorage = window.blMediaFolderPanel.applyFromStorage;
+				window.blMediaFolderPanel.applyFromStorage = function() {
+					_blOrigApplyFromStorage.call(window.blMediaFolderPanel);
+					blMediaFoldersApplyStoredBranchState(sidebar);
 				};
-				window.fsMediaFolderPanel.applyFromStorage();
+				window.blMediaFolderPanel.applyFromStorage();
 			}
 
 			/*
@@ -2136,7 +2136,7 @@ add_action('admin_footer-upload.php', function (): void {
 			 * After we insert the flex layout, that frame would sit below the row and cover full width.
 			 * Move it into .bl-media-folders-content so folders stay beside the library when selecting items.
 			 */
-			function fsMoveMediaFrameIntoFolderContent() {
+			function blMoveMediaFrameIntoFolderContent() {
 				var gridRoot = document.getElementById('wp-media-grid');
 				if (!gridRoot) {
 					return;
@@ -2156,18 +2156,18 @@ add_action('admin_footer-upload.php', function (): void {
 				contentCol.insertBefore(frame, contentCol.firstChild);
 			}
 			if (wrap.id === 'wp-media-grid') {
-				fsMoveMediaFrameIntoFolderContent();
+				blMoveMediaFrameIntoFolderContent();
 				if (window.jQuery) {
 					var $wrap = window.jQuery(wrap);
-					$wrap.on('wp-media-grid-ready', fsMoveMediaFrameIntoFolderContent);
-					window.jQuery(fsMoveMediaFrameIntoFolderContent);
+					$wrap.on('wp-media-grid-ready', blMoveMediaFrameIntoFolderContent);
+					window.jQuery(blMoveMediaFrameIntoFolderContent);
 				}
-				var gridObserver = new MutationObserver(fsMoveMediaFrameIntoFolderContent);
+				var gridObserver = new MutationObserver(blMoveMediaFrameIntoFolderContent);
 				gridObserver.observe(wrap, {
 					childList: true
 				});
-				setTimeout(fsMoveMediaFrameIntoFolderContent, 0);
-				setTimeout(fsMoveMediaFrameIntoFolderContent, 200);
+				setTimeout(blMoveMediaFrameIntoFolderContent, 0);
+				setTimeout(blMoveMediaFrameIntoFolderContent, 200);
 			}
 
 			var modal = document.getElementById('bl-media-folder-delete-modal');
@@ -2339,7 +2339,7 @@ add_action('admin_footer-upload.php', function (): void {
 					folderToggle.setAttribute('aria-expanded', expanded ? 'true' : 'false');
 					var tid = parseInt(treeItem.getAttribute('data-folder-term-id') || '0', 10);
 					if (!isNaN(tid) && tid > 0) {
-						fsMediaFoldersPersistBranchCollapse(tid, !expanded);
+						blMediaFoldersPersistBranchCollapse(tid, !expanded);
 					}
 					return;
 				}
@@ -2396,7 +2396,7 @@ add_action('admin_footer-upload.php', function (): void {
 				});
 			}
 
-			function fsSetFolderDeleteMode(on) {
+			function blSetFolderDeleteMode(on) {
 				if (!sidebar || !deleteToggleBtn) {
 					return;
 				}
@@ -2407,7 +2407,7 @@ add_action('admin_footer-upload.php', function (): void {
 				deleteToggleBtn.setAttribute('title', dlabel);
 			}
 
-			function fsSetFolderEditMode(on) {
+			function blSetFolderEditMode(on) {
 				if (!sidebar || !editToggleBtn) {
 					return;
 				}
@@ -2422,10 +2422,10 @@ add_action('admin_footer-upload.php', function (): void {
 				deleteToggleBtn.addEventListener('click', function() {
 					var wasOn = sidebar.classList.contains('is-delete-mode');
 					if (wasOn) {
-						fsSetFolderDeleteMode(false);
+						blSetFolderDeleteMode(false);
 					} else {
-						fsSetFolderEditMode(false);
-						fsSetFolderDeleteMode(true);
+						blSetFolderEditMode(false);
+						blSetFolderDeleteMode(true);
 					}
 				});
 			}
@@ -2433,10 +2433,10 @@ add_action('admin_footer-upload.php', function (): void {
 				editToggleBtn.addEventListener('click', function() {
 					var wasOn = sidebar.classList.contains('is-edit-mode');
 					if (wasOn) {
-						fsSetFolderEditMode(false);
+						blSetFolderEditMode(false);
 					} else {
-						fsSetFolderDeleteMode(false);
-						fsSetFolderEditMode(true);
+						blSetFolderDeleteMode(false);
+						blSetFolderEditMode(true);
 					}
 				});
 			}
@@ -2485,8 +2485,8 @@ add_action('admin_footer-upload.php', function (): void {
 						assignSaveBtn.disabled = false;
 
 						function showNotice(t, m) {
-							if (typeof window.fsAdminNoticeShow === 'function' && m) {
-								window.fsAdminNoticeShow(t, m);
+							if (typeof window.blAdminNoticeShow === 'function' && m) {
+								window.blAdminNoticeShow(t, m);
 							}
 						}
 						if (payload && payload.success) {
@@ -2511,8 +2511,8 @@ add_action('admin_footer-upload.php', function (): void {
 					}).catch(function() {
 						assignSaveBtn.disabled = false;
 						var fail = <?= wp_json_encode(__('Could not complete the request. Try again.', 'baselayer'), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
-						if (typeof window.fsAdminNoticeShow === 'function') {
-							window.fsAdminNoticeShow('error', fail);
+						if (typeof window.blAdminNoticeShow === 'function') {
+							window.blAdminNoticeShow('error', fail);
 						}
 					});
 				});

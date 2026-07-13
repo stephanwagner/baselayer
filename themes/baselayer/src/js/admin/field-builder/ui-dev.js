@@ -8,7 +8,7 @@ function boot() {
     return;
   }
 
-  const i18n = window.fsFieldBuilderUiDev || {};
+  const i18n = window.blFieldBuilderUiDev || {};
   const api = mount(root, {
     mode: 'fields',
     initialFields: Array.isArray(i18n.initialFields) ? i18n.initialFields : [],

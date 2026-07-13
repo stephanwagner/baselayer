@@ -69,7 +69,7 @@ export function mountOptionsStack(root, options = {}) {
 
   const syncSelectOptions = () => {
     const used = new Set(
-      Array.from(list.querySelectorAll('[data-bl-op-slug]')).map((row) => row.dataset.fsOpSlug)
+      Array.from(list.querySelectorAll('[data-bl-op-slug]')).map((row) => row.dataset.blOpSlug)
     );
     Array.from(select.options).forEach((opt) => {
       if (!opt.value) {
@@ -88,7 +88,7 @@ export function mountOptionsStack(root, options = {}) {
     }
     const row = el('div', {
       className: 'bl-option-presets__row bl-options-stack__item',
-      dataset: { fsOpSlug: slug },
+      dataset: { blOpSlug: slug },
     });
     row.appendChild(
       el('span', {
@@ -196,10 +196,10 @@ export function mountOptionsStack(root, options = {}) {
       return Array.from(list.children)
         .filter((row) => row.classList.contains('bl-options-stack__item'))
         .map((row) => {
-          if (row.dataset.fsOpSlug) {
-            return { kind: 'preset', slug: row.dataset.fsOpSlug };
+          if (row.dataset.blOpSlug) {
+            return { kind: 'preset', slug: row.dataset.blOpSlug };
           }
-          if (row.dataset.fsFbField) {
+          if (row.dataset.blFbField) {
             return { kind: 'custom', ...serializeFieldRow(row) };
           }
           return null;

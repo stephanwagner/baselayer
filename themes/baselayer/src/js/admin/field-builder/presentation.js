@@ -3,7 +3,7 @@ import { el, formRow } from './dom';
 const WIDTH_OPTIONS = ['25', '50', '75', '100', 'custom'];
 
 function mark(input, key) {
-  input.dataset.fsFb = key;
+  input.dataset.blFb = key;
   return input;
 }
 

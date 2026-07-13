@@ -17,7 +17,7 @@ export function createShell(root, options = {}) {
 
   const list = el('div', {
     className: 'bl-field-builder__list',
-    dataset: { fsFbList: '1' },
+    dataset: { blFbList: '1' },
   });
   const emptyState = el('p', {
     className: 'bl-field-builder__empty description',
