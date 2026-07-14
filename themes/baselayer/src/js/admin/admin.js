@@ -11,3 +11,4 @@ import './media/media-folders';
 // Pages
 import './pages/install-theme';
 import './pages/developer-icons';
+import './pages/event-occurrences';

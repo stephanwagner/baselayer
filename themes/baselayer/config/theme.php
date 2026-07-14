@@ -131,6 +131,16 @@ return [
 	'site_password_cookie_days' => 14,
 
 	/**
+	 * Events
+	 * 
+	 * Recurring series: how far ahead to create occurrence posts (rolling from today).
+	 * strtotime-relative string, e.g. '1 year', '6 months', '2 years'.
+	 */
+	'events' => [
+		'recurrence_lookahead' => '1 year',
+	],
+
+	/**
 	 * Redis integration in Developer settings.
 	 * When false, Redis-specific UI/actions are hidden.
 	 */

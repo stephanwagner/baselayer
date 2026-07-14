@@ -35,4 +35,12 @@ return [
             'title' => 'Footer menu',
         ],
     ],
+
+    /**
+     * Events — override parent defaults as needed.
+     * recurrence_lookahead: how far ahead to create occurrence posts (e.g. '1 year', '6 months').
+     */
+    // 'events' => [
+    //     'recurrence_lookahead' => '1 year',
+    // ],
 ];

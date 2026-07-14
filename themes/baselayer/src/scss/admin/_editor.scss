@@ -301,6 +301,105 @@ div.baselayer-seo-panel {
   margin: 0 !important;
 }
 
+.bl-event-recurring {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #ddd;
+
+  &__heading {
+    margin: 0 0 8px;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  &__line,
+  &__count,
+  &__master-label,
+  &__master-title {
+    margin: 0 0 4px;
+  }
+
+  &__master-title {
+    font-weight: 600;
+  }
+
+  &__count {
+    margin-bottom: 10px;
+    color: #757575;
+  }
+
+  &__detached {
+    margin: 10px 0;
+    padding: 8px 10px;
+
+    p {
+      margin: 0 0 6px;
+    }
+  }
+
+  &__edit-master {
+    margin-top: 8px;
+  }
+
+  .components-button {
+    margin-top: 8px;
+  }
+}
+
+.bl-event-recurrence-modal {
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: min(100%, 360px);
+  }
+
+  &__every-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    .components-base-control {
+      margin-bottom: 0;
+      max-width: 5rem;
+    }
+  }
+
+  &__days {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__preview {
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 1px solid #ddd;
+
+    ul {
+      margin: 8px 0;
+      padding-left: 1.2em;
+    }
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 1px solid #ddd;
+  }
+
+  &__footer-actions {
+    display: flex;
+    gap: 8px;
+  }
+}
+
 // Pagination
 
 .pagination__link {

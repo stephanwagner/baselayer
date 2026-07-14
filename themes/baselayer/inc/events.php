@@ -6,6 +6,8 @@ defined('ABSPATH') || exit;
  * Event CPTs (`type` => `event` in config/content-types/): dates, archive query, editor panel.
  */
 
+require_once __DIR__ . '/events-recurrence.php';
+
 const BL_EVENT_META_START_DATE = '_bl_event_start_date';
 const BL_EVENT_META_END_DATE = '_bl_event_end_date';
 const BL_EVENT_META_START_TIME = '_bl_event_start_time';
@@ -300,9 +302,94 @@ function bl_event_register_post_type_hooks(): void
 		add_filter('manage_' . $post_type . '_posts_columns', 'bl_event_posts_columns');
 		add_action('manage_' . $post_type . '_posts_custom_column', 'bl_event_posts_custom_column', 10, 2);
 	}
+
+	add_filter('display_post_states', 'bl_event_display_post_states', 10, 2);
 }
 
 add_action('init', 'bl_event_register_post_type_hooks', 21);
+
+/**
+ * Admin Events list: hide occurrence children (masters + one-offs only).
+ */
+function bl_event_admin_list_pre_get_posts(\WP_Query $query): void
+{
+	if (!is_admin() || !$query->is_main_query()) {
+		return;
+	}
+	global $pagenow;
+	if ($pagenow !== 'edit.php') {
+		return;
+	}
+
+	$pt = $query->get('post_type');
+	if (is_array($pt)) {
+		$pt = (string) reset($pt);
+	}
+	if (!is_string($pt) || $pt === '' || !bl_is_event_post_type($pt)) {
+		return;
+	}
+
+	// Hierarchical children are materialized occurrences.
+	$query->set('post_parent', 0);
+}
+
+add_action('pre_get_posts', 'bl_event_admin_list_pre_get_posts', 20);
+
+/**
+ * Pin recurring masters to the top of the Events admin list.
+ *
+ * @param array<string, string> $clauses
+ * @return array<string, string>
+ */
+function bl_event_admin_list_posts_clauses(array $clauses, \WP_Query $query): array
+{
+	if (!is_admin() || !$query->is_main_query()) {
+		return $clauses;
+	}
+	global $pagenow, $wpdb;
+	if ($pagenow !== 'edit.php') {
+		return $clauses;
+	}
+
+	$pt = $query->get('post_type');
+	if (is_array($pt)) {
+		$pt = (string) reset($pt);
+	}
+	if (!is_string($pt) || $pt === '' || !bl_is_event_post_type($pt)) {
+		return $clauses;
+	}
+
+	$alias = 'bl_event_rec_meta';
+	$clauses['join'] .= $wpdb->prepare(
+		" LEFT JOIN {$wpdb->postmeta} AS {$alias} ON ({$alias}.post_id = {$wpdb->posts}.ID AND {$alias}.meta_key = %s) ",
+		BL_EVENT_META_RECURRENCE
+	);
+	$pin = "(CASE WHEN {$alias}.meta_value IS NOT NULL AND {$alias}.meta_value <> '' THEN 0 ELSE 1 END)";
+	$orderby = isset($clauses['orderby']) ? trim((string) $clauses['orderby']) : '';
+	$clauses['orderby'] = $orderby !== '' ? $pin . ', ' . $orderby : $pin . ', ' . $wpdb->posts . '.post_date DESC';
+
+	return $clauses;
+}
+
+add_filter('posts_clauses', 'bl_event_admin_list_posts_clauses', 20, 2);
+
+/**
+ * Mark recurring masters in the title column.
+ *
+ * @param array<string, string> $states
+ * @return array<string, string>
+ */
+function bl_event_display_post_states(array $states, $post): array
+{
+	if (!$post instanceof \WP_Post || !bl_is_event_post_type($post->post_type)) {
+		return $states;
+	}
+	if (function_exists('bl_event_is_series_master') && bl_event_is_series_master((int) $post->ID)) {
+		$states['bl_event_recurring'] = __('Recurring', 'baselayer');
+	}
+
+	return $states;
+}
 
 /**
  * Frontend archive: show events that have not ended yet; sort by start date/time.
@@ -334,6 +421,9 @@ function bl_event_archive_pre_get_posts(\WP_Query $query): void
 	$upcoming = [];
 	foreach ($candidate_ids as $post_id) {
 		$post_id = (int) $post_id;
+		if (function_exists('bl_event_is_series_master') && bl_event_is_series_master($post_id)) {
+			continue;
+		}
 		if (bl_event_is_upcoming($post_id, $now)) {
 			$upcoming[] = $post_id;
 		}
@@ -381,7 +471,13 @@ function bl_event_past_published_ids(?int $now = null): array
 		]);
 		foreach ($candidate_ids as $post_id) {
 			$post_id = (int) $post_id;
-			if ($post_id > 0 && !bl_event_is_upcoming($post_id, $now)) {
+			if ($post_id <= 0) {
+				continue;
+			}
+			if (function_exists('bl_event_is_series_master') && bl_event_is_series_master($post_id)) {
+				continue;
+			}
+			if (!bl_event_is_upcoming($post_id, $now)) {
 				$past[] = $post_id;
 			}
 		}
@@ -390,6 +486,44 @@ function bl_event_past_published_ids(?int $now = null): array
 	$cache = $past;
 
 	return $past;
+}
+
+/**
+ * Published series master IDs (excluded from public listings).
+ *
+ * @return int[]
+ */
+function bl_event_series_master_ids(): array
+{
+	static $cache = null;
+	if (is_array($cache)) {
+		return $cache;
+	}
+
+	$ids = [];
+	foreach (bl_event_post_types() as $post_type) {
+		$candidate_ids = get_posts([
+			'post_type' => $post_type,
+			'post_status' => 'publish',
+			'posts_per_page' => -1,
+			'fields' => 'ids',
+			'post_parent' => 0,
+			'meta_key' => BL_EVENT_META_RECURRENCE,
+			'meta_compare' => '!=',
+			'meta_value' => '',
+			'no_found_rows' => true,
+		]);
+		foreach ($candidate_ids as $post_id) {
+			$post_id = (int) $post_id;
+			if ($post_id > 0 && bl_event_is_series_master($post_id)) {
+				$ids[] = $post_id;
+			}
+		}
+	}
+
+	$cache = $ids;
+
+	return $ids;
 }
 
 /**
@@ -420,13 +554,15 @@ function bl_event_search_exclude_past_posts_where(string $where, \WP_Query $quer
 	}
 
 	$past_ids = bl_event_past_published_ids();
-	if ($past_ids === []) {
+	$master_ids = function_exists('bl_event_series_master_ids') ? bl_event_series_master_ids() : [];
+	$exclude_ids = array_values(array_unique(array_merge($past_ids, $master_ids)));
+	if ($exclude_ids === []) {
 		return $where;
 	}
 
 	global $wpdb;
 	$type_list = "'" . implode("','", array_map('esc_sql', $event_types)) . "'";
-	$id_list = implode(',', array_map('intval', $past_ids));
+	$id_list = implode(',', array_map('intval', $exclude_ids));
 	$where .= " AND NOT ({$wpdb->posts}.post_type IN ({$type_list}) AND {$wpdb->posts}.ID IN ({$id_list}))";
 
 	return $where;
@@ -492,15 +628,70 @@ add_action('enqueue_block_editor_assets', function (): void {
 	if ($post_types === []) {
 		return;
 	}
+	$pt = $post_types[0];
+	$lookahead = function_exists('bl_event_recurrence_lookahead_label')
+		? bl_event_recurrence_lookahead_label($pt)
+		: '1 year';
+	$horizon = function_exists('bl_event_recurrence_horizon_date')
+		? bl_event_recurrence_horizon_date($pt)
+		: '';
+
 	wp_localize_script('baselayer-editor', 'baselayerEvents', [
 		'postTypes' => $post_types,
-		'postType' => $post_types[0],
+		'postType' => $pt,
 		'panelTitle' => __('Event', 'baselayer'),
 		'startDateLabel' => __('Start date', 'baselayer'),
 		'endDateLabel' => __('End date', 'baselayer'),
 		'includeTimesLabel' => __('Include times', 'baselayer'),
 		'startTimeLabel' => __('Start time', 'baselayer'),
 		'endTimeLabel' => __('End time', 'baselayer'),
+		'recurringTitle' => __('Recurring', 'baselayer'),
+		'notRepeating' => __('Not repeating', 'baselayer'),
+		'editRecurrence' => __('Edit recurrence…', 'baselayer'),
+		'partOfRecurring' => __('Part of a recurring event.', 'baselayer'),
+		'masterLabel' => __('Master:', 'baselayer'),
+		'editInMaster' => __('Edit in master event', 'baselayer'),
+		'occurrencesLabel' => __('%d occurrences', 'baselayer'),
+		'occurrenceLabel' => __('%d occurrence', 'baselayer'),
+		'customContentTitle' => __('This occurrence has custom content.', 'baselayer'),
+		'customContentHelp' => __('It will not update when the master event changes.', 'baselayer'),
+		'revertToMaster' => __('Revert to master', 'baselayer'),
+		'modalTitle' => __('Repeats', 'baselayer'),
+		'freqLabel' => __('Repeats', 'baselayer'),
+		'everyLabel' => __('Every', 'baselayer'),
+		'onLabel' => __('On', 'baselayer'),
+		'endsLabel' => __('Ends', 'baselayer'),
+		'endsNever' => __('Never', 'baselayer'),
+		'endsOnDate' => __('On date', 'baselayer'),
+		'endsAfter' => __('After', 'baselayer'),
+		'occurrencesUnit' => __('occurrences', 'baselayer'),
+		'nextOccurrences' => __('Next occurrences', 'baselayer'),
+		'moreOccurrences' => __('+%d more', 'baselayer'),
+		'cancelLabel' => __('Cancel', 'baselayer'),
+		'saveLabel' => __('Save', 'baselayer'),
+		'clearRecurrence' => __('Stop repeating', 'baselayer'),
+		'freqDaily' => __('Daily', 'baselayer'),
+		'freqWeekly' => __('Weekly', 'baselayer'),
+		'freqMonthly' => __('Monthly', 'baselayer'),
+		'freqYearly' => __('Yearly', 'baselayer'),
+		'unitDay' => __('day(s)', 'baselayer'),
+		'unitWeek' => __('week(s)', 'baselayer'),
+		'unitMonth' => __('month(s)', 'baselayer'),
+		'unitYear' => __('year(s)', 'baselayer'),
+		'weekdayLabels' => [
+			'mo' => __('Mon', 'baselayer'),
+			'tu' => __('Tue', 'baselayer'),
+			'we' => __('Wed', 'baselayer'),
+			'th' => __('Thu', 'baselayer'),
+			'fr' => __('Fri', 'baselayer'),
+			'sa' => __('Sat', 'baselayer'),
+			'su' => __('Sun', 'baselayer'),
+		],
+		'lookaheadLabel' => $lookahead,
+		'horizonDate' => $horizon,
+		'revertRestUrl' => esc_url_raw(rest_url('baselayer/v1/event-revert/')),
+		'restNonce' => wp_create_nonce('wp_rest'),
+		'dateFormat' => get_option('date_format', 'F j, Y'),
 	]);
 }, 12);
 
@@ -541,6 +732,50 @@ function bl_event_posts_custom_column(string $column, int $post_id): void
 	if ($column !== 'bl_event_dates' || !bl_is_event_post_type(get_post_type($post_id))) {
 		return;
 	}
+
+	if (function_exists('bl_event_is_series_master') && bl_event_is_series_master($post_id)) {
+		$lines = bl_event_format_recurrence_summary_lines(bl_event_get_recurrence($post_id));
+		foreach ($lines as $i => $line) {
+			if ($i === 0) {
+				echo esc_html($line);
+			} else {
+				echo '<br>' . esc_html($line);
+			}
+		}
+
+		$upcoming = function_exists('bl_event_get_upcoming_occurrence_rows')
+			? count(bl_event_get_upcoming_occurrence_rows($post_id))
+			: 0;
+		$total = count(bl_event_get_occurrence_ids($post_id));
+		$title = get_the_title($post_id);
+		echo '<br>';
+		echo '<button type="button" class="button-link bl-event-edit-occurrences"';
+		echo ' data-master-id="' . esc_attr((string) $post_id) . '"';
+		echo ' data-master-title="' . esc_attr($title !== '' ? $title : __('Event', 'baselayer')) . '">';
+		echo esc_html__('Edit occurrences', 'baselayer');
+		if ($upcoming > 0) {
+			echo ' (' . esc_html((string) $upcoming) . ')';
+		} elseif ($total > 0) {
+			echo ' (' . esc_html((string) $total) . ')';
+		}
+		echo '</button>';
+
+		return;
+	}
+
+	if (function_exists('bl_event_is_occurrence') && bl_event_is_occurrence($post_id)) {
+		// Occurrences are hidden from the list; keep a fallback if shown elsewhere.
+		$master_id = bl_event_get_master_id($post_id);
+		echo '<span class="description">' . esc_html__('Occurrence', 'baselayer') . '</span><br>';
+		if ($master_id > 0) {
+			$edit = get_edit_post_link($master_id, 'raw');
+			$title = get_the_title($master_id);
+			if ($edit) {
+				echo '<a href="' . esc_url($edit) . '">' . esc_html($title !== '' ? $title : __('Master', 'baselayer')) . '</a><br>';
+			}
+		}
+	}
+
 	$range = bl_event_format_range_text($post_id, true);
 	if ($range === '') {
 		echo '<span aria-hidden="true">—</span>';
@@ -560,6 +795,33 @@ add_action('admin_head', static function (): void {
 	}
 	echo '<style>.column-bl_event_dates{width:14em;} @media(min-width:900px){.column-bl_event_dates{width:20em}}</style>';
 });
+
+/**
+ * Localize occurrences-modal strings on the Events list screen.
+ */
+add_action('admin_enqueue_scripts', static function (string $hook_suffix): void {
+	if ($hook_suffix !== 'edit.php') {
+		return;
+	}
+	$pt = sanitize_key(wp_unslash((string) ($_GET['post_type'] ?? '')));
+	if ($pt === '' || !bl_is_event_post_type($pt)) {
+		return;
+	}
+	if (!wp_script_is('main-admin-scripts', 'enqueued') && !wp_script_is('main-admin-scripts', 'registered')) {
+		return;
+	}
+	wp_localize_script('main-admin-scripts', 'baselayerEventOccurrences', [
+		'restUrl' => esc_url_raw(rest_url('baselayer/v1/event-occurrences/')),
+		'restNonce' => wp_create_nonce('wp_rest'),
+		'modalTitle' => __('Occurrences', 'baselayer'),
+		'empty' => __('No upcoming occurrences.', 'baselayer'),
+		'editLabel' => __('Edit', 'baselayer'),
+		'closeLabel' => __('Close', 'baselayer'),
+		'loadingLabel' => __('Loading…', 'baselayer'),
+		'customContent' => __('Custom content', 'baselayer'),
+		'errorLabel' => __('Could not load occurrences.', 'baselayer'),
+	]);
+}, 20);
 
 /**
  * Adapt a php date()/wp_date format string so full-month tokens (F) become abbreviated months (M).
