@@ -32,12 +32,17 @@ add_filter('document_title_parts', 'bl_document_title_parts', 20);
 
 /**
  * Output manifest link in head.
+ * Prefers the active child theme file when present.
  *
  * @return void
  */
 function bl_add_manifest(): void
 {
-	echo '<link rel="manifest" href="' . get_template_directory_uri() . '/manifest.json">' . "\n";
+	$uri = get_template_directory_uri() . '/manifest.json';
+	if (is_child_theme() && is_file(trailingslashit(get_stylesheet_directory()) . 'manifest.json')) {
+		$uri = get_stylesheet_directory_uri() . '/manifest.json';
+	}
+	echo '<link rel="manifest" href="' . esc_url($uri) . '">' . "\n";
 }
 add_action('wp_head', 'bl_add_manifest');
 

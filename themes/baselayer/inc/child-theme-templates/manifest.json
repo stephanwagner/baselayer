@@ -1,0 +1,20 @@
+{
+  "short_name": "{{name}}",
+  "name": "{{name}}",
+  "icons": [
+    {
+      "src": "{{child_theme_path}}/assets/img/favicon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "{{child_theme_path}}/assets/img/favicon.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#4080ff"
+}
