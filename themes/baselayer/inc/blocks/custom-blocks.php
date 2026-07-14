@@ -607,19 +607,14 @@ function bl_block_creator_register_custom_blocks(): void
 		return $categories;
 	});
 
-	$min = function_exists('bl_is_debug') && bl_is_debug() ? '' : '.min';
-	$rel = '/assets/js/creator-blocks' . $min . '.js';
-	$path = get_template_directory() . $rel;
-	if (!is_readable($path)) {
-		$rel = '/assets/js/creator-blocks.js';
-		$path = get_template_directory() . $rel;
-	}
-
 	$script_handle = 'baselayer-creator-blocks';
-	if (is_readable($path)) {
+	$asset = function_exists('bl_resolve_built_asset')
+		? bl_resolve_built_asset('creator-blocks', 'js')
+		: null;
+	if ($asset !== null) {
 		wp_register_script(
 			$script_handle,
-			get_template_directory_uri() . $rel,
+			$asset['uri'],
 			[
 				'wp-blocks',
 				'wp-element',
@@ -627,7 +622,7 @@ function bl_block_creator_register_custom_blocks(): void
 				'wp-components',
 				'wp-i18n',
 			],
-			(string) filemtime($path),
+			$asset['ver'],
 			true
 		);
 		wp_localize_script($script_handle, 'baselayerCreatorBlocks', [

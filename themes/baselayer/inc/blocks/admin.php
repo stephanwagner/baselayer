@@ -392,23 +392,9 @@ function bl_blocks_render_ui_dev_page(): void
  */
 function bl_blocks_field_builder_script(): ?array
 {
-	$min = function_exists('bl_is_debug') && bl_is_debug() ? '' : '.min';
-	$rel = '/assets/js/field-builder-admin' . $min . '.js';
-	$path = get_template_directory() . $rel;
-	if (!is_readable($path)) {
-		$rel = '/assets/js/field-builder-admin.js';
-		$path = get_template_directory() . $rel;
-	}
-	if (!is_readable($path)) {
-		return null;
-	}
-
-	return [
-		'rel' => $rel,
-		'path' => $path,
-		'uri' => get_template_directory_uri() . $rel,
-		'ver' => (string) filemtime($path),
-	];
+	return function_exists('bl_resolve_built_asset')
+		? bl_resolve_built_asset('field-builder-admin', 'js')
+		: null;
 }
 
 /**

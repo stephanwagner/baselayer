@@ -24,14 +24,24 @@ function bl_service_worker_scope(): string
 }
 
 /**
- * Readable path to the built service worker script (dev vs min).
+ * Readable path to the built service worker script (local build, then release min).
  */
 function bl_service_worker_built_js_path(): string
 {
+	if (function_exists('bl_resolve_built_asset')) {
+		$asset = bl_resolve_built_asset('service-worker', 'js');
+		if ($asset !== null) {
+			return $asset['path'];
+		}
+	}
+
 	$min = function_exists('bl_is_debug') && bl_is_debug() ? '' : '.min';
 	$path = get_template_directory() . '/assets/js/service-worker' . $min . '.js';
 	if (!is_readable($path)) {
 		$path = get_template_directory() . '/assets/js/service-worker.min.js';
+	}
+	if (!is_readable($path)) {
+		$path = get_template_directory() . '/assets/release/js/service-worker.min.js';
 	}
 
 	return $path;

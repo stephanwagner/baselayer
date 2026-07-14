@@ -100,12 +100,13 @@ add_action('admin_enqueue_scripts', function ($hook_suffix) {
 		'after'
 	);
 
-	$min = function_exists('bl_is_debug') && bl_is_debug() ? '' : '.min';
-	$file = '/assets/js/block-settings' . $min . '.js';
+	if (!function_exists('bl_enqueue_theme_script')) {
+		return;
+	}
 
-	wp_enqueue_script(
+	if (!bl_enqueue_theme_script(
 		'baselayer-block-settings',
-		get_template_directory_uri() . $file,
+		'block-settings',
 		[
 			'wp-block-library',
 			'wp-block-editor',
@@ -116,9 +117,10 @@ add_action('admin_enqueue_scripts', function ($hook_suffix) {
 			'wp-components',
 			'wp-i18n',
 		],
-		function_exists('bl_asset_hash') ? bl_asset_hash($file) : '1.0',
 		true
-	);
+	)) {
+		return;
+	}
 
 	if (function_exists('bl_block_settings_admin_config')) {
 		wp_localize_script(

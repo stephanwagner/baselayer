@@ -167,22 +167,145 @@ function bl_asset_hash(string $file): string
 }
 
 /**
+ * Absolute path under the parent theme for a relative asset path.
+ */
+function bl_theme_asset_abs(string $rel): string
+{
+	return trailingslashit(get_template_directory()) . ltrim($rel, '/');
+}
+
+/**
+ * Resolve a built parent theme CSS/JS bundle.
+ *
+ * Prefer local build under assets/{css|js}/ (debug → unmin first, else min first),
+ * then fall back to committed assets/release/{css|js}/ min files.
+ *
+ * @param string     $name Basename without extension (e.g. baselayer, admin, icons).
+ * @param 'css'|'js' $kind
+ * @return array{rel: string, path: string, uri: string, ver: string}|null
+ */
+function bl_resolve_built_asset(string $name, string $kind): ?array
+{
+	$name = sanitize_file_name($name);
+	if ($name === '' || ($kind !== 'css' && $kind !== 'js')) {
+		return null;
+	}
+
+	$base = trailingslashit(get_template_directory());
+	$base_uri = trailingslashit(get_template_directory_uri());
+	$ext = $kind;
+	$prefer_min = !(function_exists('bl_is_debug') && bl_is_debug());
+
+	$candidates = [];
+	$build_dir = 'assets/' . $kind . '/';
+	$release_dir = 'assets/release/' . $kind . '/';
+
+	if ($prefer_min) {
+		$candidates[] = $build_dir . $name . '.min.' . $ext;
+		$candidates[] = $build_dir . $name . '.' . $ext;
+	} else {
+		$candidates[] = $build_dir . $name . '.' . $ext;
+		$candidates[] = $build_dir . $name . '.min.' . $ext;
+	}
+
+	$candidates[] = $release_dir . $name . '.min.' . $ext;
+	// icons.css has no .min variant in the build.
+	if ($name === 'icons' && $kind === 'css') {
+		$candidates[] = $release_dir . 'icons.css';
+	}
+
+	$seen = [];
+	foreach ($candidates as $rel) {
+		$rel = ltrim($rel, '/');
+		if (isset($seen[$rel])) {
+			continue;
+		}
+		$seen[$rel] = true;
+		$path = $base . $rel;
+		if (!is_readable($path)) {
+			continue;
+		}
+
+		$ver = (function_exists('bl_is_debug') && bl_is_debug())
+			? (string) time()
+			: (string) filemtime($path);
+
+		return [
+			'rel' => '/' . $rel,
+			'path' => $path,
+			'uri' => $base_uri . $rel,
+			'ver' => $ver,
+		];
+	}
+
+	return null;
+}
+
+/**
+ * Enqueue a resolved parent theme stylesheet, or no-op if missing.
+ *
+ * @param string   $handle
+ * @param string   $name   Basename without extension.
+ * @param string[] $deps
+ */
+function bl_enqueue_theme_style(string $handle, string $name, array $deps = []): bool
+{
+	$asset = bl_resolve_built_asset($name, 'css');
+	if ($asset === null) {
+		return false;
+	}
+
+	wp_enqueue_style($handle, $asset['uri'], $deps, $asset['ver']);
+
+	return true;
+}
+
+/**
+ * Enqueue a resolved parent theme script, or no-op if missing.
+ *
+ * @param string   $handle
+ * @param string   $name   Basename without extension.
+ * @param string[] $deps
+ */
+function bl_enqueue_theme_script(string $handle, string $name, array $deps = [], bool $in_footer = true): bool
+{
+	$asset = bl_resolve_built_asset($name, 'js');
+	if ($asset === null) {
+		return false;
+	}
+
+	wp_enqueue_script($handle, $asset['uri'], $deps, $asset['ver'], $in_footer);
+
+	return true;
+}
+
+/**
+ * Register a resolved parent theme script (without enqueue), or null if missing.
+ *
+ * @param string   $handle
+ * @param string   $name
+ * @param string[] $deps
+ */
+function bl_register_theme_script(string $handle, string $name, array $deps = [], bool $in_footer = true): ?array
+{
+	$asset = bl_resolve_built_asset($name, 'js');
+	if ($asset === null) {
+		return null;
+	}
+
+	wp_register_script($handle, $asset['uri'], $deps, $asset['ver'], $in_footer);
+
+	return $asset;
+}
+
+/**
  * Enqueue front-end stylesheets (baselayer.css).
  *
  * @return void
  */
 function bl_styles(): void
 {
-	$min = bl_is_debug() ? '' : '.min';
-
-	$file = '/assets/css/baselayer' . $min . '.css';
-
-	wp_enqueue_style(
-		'baselayer-styles',
-		get_template_directory_uri() . $file,
-		[],
-		bl_asset_hash($file),
-	);
+	bl_enqueue_theme_style('baselayer-styles', 'baselayer');
 }
 add_action('wp_enqueue_scripts', 'bl_styles');
 
@@ -303,24 +426,24 @@ add_action('enqueue_block_editor_assets', 'bl_enqueue_child_theme_editor_scripts
  */
 function bl_enqueue_theme_icons_style(array $deps = []): void
 {
-	$rel = 'assets/css/icons.css';
 	$path = '';
 	$uri_base = '';
 
 	if (is_child_theme()) {
+		$child_rel = 'assets/css/icons.css';
 		$child_base = trailingslashit(get_stylesheet_directory());
-		if (is_readable($child_base . $rel)) {
-			$path = $child_base . $rel;
+		if (is_readable($child_base . $child_rel)) {
+			$path = $child_base . $child_rel;
 			$uri_base = trailingslashit(get_stylesheet_directory_uri());
 		}
 	}
 
 	if ($path === '') {
-		$parent_base = trailingslashit(get_template_directory());
-		if (!is_readable($parent_base . $rel)) {
+		$parent = bl_resolve_built_asset('icons', 'css');
+		if ($parent === null) {
 			return;
 		}
-		$path = $parent_base . $rel;
+		$path = $parent['path'];
 		$uri_base = trailingslashit(get_template_directory_uri());
 	}
 
@@ -389,15 +512,7 @@ add_action('enqueue_block_editor_assets', 'bl_enqueue_theme_icons_editor', 20);
  */
 function bl_enqueue_admin_styles(): void
 {
-	$min = bl_is_debug() ? '' : '.min';
-
-	$file = '/assets/css/admin' . $min . '.css';
-	wp_enqueue_style(
-		'main-admin-styles',
-		get_template_directory_uri() . $file,
-		[],
-		bl_asset_hash($file),
-	);
+	bl_enqueue_theme_style('main-admin-styles', 'admin');
 }
 
 /**
@@ -452,14 +567,7 @@ function bl_admin_bar_styles(): void
 		return;
 	}
 
-	$min = bl_is_debug() ? '' : '.min';
-	$file = '/assets/css/admin-bar' . $min . '.css';
-	wp_enqueue_style(
-		'baselayer-admin-bar-styles',
-		get_template_directory_uri() . $file,
-		['admin-bar'],
-		bl_asset_hash($file)
-	);
+	bl_enqueue_theme_style('baselayer-admin-bar-styles', 'admin-bar', ['admin-bar']);
 }
 add_action('wp_enqueue_scripts', 'bl_admin_bar_styles', 20);
 add_action('admin_enqueue_scripts', 'bl_admin_bar_styles', 20);
@@ -471,17 +579,9 @@ add_action('admin_enqueue_scripts', 'bl_admin_bar_styles', 20);
  */
 function bl_scripts(): void
 {
-	$min = bl_is_debug() ? '' : '.min';
-
-	$file = '/assets/js/baselayer' . $min . '.js';
-
-	wp_enqueue_script(
-		'baselayer-scripts',
-		get_template_directory_uri() . $file,
-		[],
-		bl_asset_hash($file),
-		true
-	);
+	if (!bl_enqueue_theme_script('baselayer-scripts', 'baselayer', [], true)) {
+		return;
+	}
 
 	if (function_exists('bl_uses_google_translate') && bl_uses_google_translate()) {
 		$languages = function_exists('bl_get_content_languages') ? bl_get_content_languages() : [];
@@ -508,17 +608,7 @@ add_action('wp_enqueue_scripts', 'bl_scripts');
  */
 function bl_admin_scripts(): void
 {
-	$min = bl_is_debug() ? '' : '.min';
-
-	$file = '/assets/js/admin' . $min . '.js';
-
-	wp_enqueue_script(
-		'main-admin-scripts',
-		get_template_directory_uri() . $file,
-		[],
-		bl_asset_hash($file),
-		true
-	);
+	bl_enqueue_theme_script('main-admin-scripts', 'admin', [], true);
 }
 add_action('admin_enqueue_scripts', 'bl_admin_scripts');
 
@@ -529,32 +619,27 @@ add_action('admin_enqueue_scripts', 'bl_admin_scripts');
  */
 function bl_editor_scripts(): void
 {
-	$min = bl_is_debug() ? '' : '.min';
+	$deps = array_values(array_filter([
+		'wp-plugins',
+		'wp-edit-post',
+		'wp-editor',
+		'wp-element',
+		'wp-block-editor',
+		'wp-blocks',
+		'wp-rich-text',
+		'wp-components',
+		'wp-data',
+		'wp-core-data',
+		'wp-i18n',
+		'wp-date',
+		'wp-preferences',
+		wp_script_is('acf-input', 'registered') ? 'acf-input' : null,
+	]));
 
-	$file = '/assets/js/editor' . $min . '.js';
+	if (!bl_enqueue_theme_script('baselayer-editor', 'editor', $deps, true)) {
+		return;
+	}
 
-	wp_enqueue_script(
-		'baselayer-editor',
-		get_template_directory_uri() . $file,
-		array_values(array_filter([
-			'wp-plugins',
-			'wp-edit-post',
-			'wp-editor',
-			'wp-element',
-			'wp-block-editor',
-			'wp-blocks',
-			'wp-rich-text',
-			'wp-components',
-			'wp-data',
-			'wp-core-data',
-			'wp-i18n',
-			'wp-date',
-			'wp-preferences',
-			wp_script_is('acf-input', 'registered') ? 'acf-input' : null,
-		])),
-		bl_asset_hash($file),
-		true
-	);
 	wp_localize_script('baselayer-editor', 'baselayerFeatures', [
 		'seo' => function_exists('bl_theme_feature_enabled') && bl_theme_feature_enabled('seo'),
 		'post_expirator' => function_exists('bl_theme_feature_enabled') && bl_theme_feature_enabled('post_expirator'),

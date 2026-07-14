@@ -11,25 +11,27 @@ https://bytesandstripes.com
 
 ## Assets
 
-All CSS and JavaScript source files live in: `wordpress/wp-content/themes/baselayer/src`.
+Source files live in `themes/baselayer/src` (repo root has the npm project).
 
-To work on assets, navigate to the theme directory and run one of the following commands:
+Local build output goes to `themes/baselayer/assets/css` and `assets/js` (gitignored).
+Committed fallbacks live in `themes/baselayer/assets/release/` (minified). Enqueue prefers a local build, then release files.
 
 ### Watch (development)
-Continuously rebuild assets while you work:
 
 ```bash
-cd wordpress/wp-content/themes/baselayer
-
 npm run watch
 ```
 
-### Build (production)
-
-Create an optimized production build:
+### Build (local)
 
 ```bash
-cd wordpress/wp-content/themes/baselayer
-
 npm run build
 ```
+
+### Release (commit-ready mins)
+
+```bash
+npm run release
+```
+
+Copies built `*.min.*` (and `icons.css`) into `assets/release/`.

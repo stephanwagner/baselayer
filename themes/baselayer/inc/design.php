@@ -258,13 +258,19 @@ function bl_variables_scss_root_block(): string
  */
 function bl_variables_compiled_root_block(): string
 {
+	$candidates = [];
+	if (function_exists('bl_resolve_built_asset')) {
+		$asset = bl_resolve_built_asset('admin', 'css');
+		if ($asset !== null) {
+			$candidates[] = $asset['path'];
+		}
+	}
 	$min = function_exists('bl_is_debug') && bl_is_debug() ? '' : '.min';
-	$candidates = [
-		get_template_directory() . '/assets/css/admin' . $min . '.css',
-		get_template_directory() . '/assets/css/admin.css',
-	];
+	$candidates[] = get_template_directory() . '/assets/css/admin' . $min . '.css';
+	$candidates[] = get_template_directory() . '/assets/css/admin.css';
+	$candidates[] = get_template_directory() . '/assets/release/css/admin.min.css';
 
-	foreach ($candidates as $path) {
+	foreach (array_unique($candidates) as $path) {
 		if (!is_readable($path)) {
 			continue;
 		}

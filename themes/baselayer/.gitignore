@@ -1,0 +1,5 @@
+# Local build output (npm run build) — use assets/release for committed fallbacks
+/assets/js/*
+!/assets/js/.gitkeep
+/assets/css/*
+!/assets/css/.gitkeep
