@@ -1,0 +1,77 @@
+.wp-list-table td.column-title > strong {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+}
+
+.bl-post-states {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  order: -1;
+}
+
+.bl-post-state {
+  --bl-post-state-bg: var(--bl-post-state-neutral-bg);
+  --bl-post-state-fg: var(--bl-post-state-neutral-fg);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  margin: 0;
+  padding: 2px 7px;
+  border-radius: 3px;
+  background: var(--bl-post-state-bg);
+  color: var(--bl-post-state-fg);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.4;
+  white-space: nowrap;
+
+  &.post-state {
+    color: var(--bl-post-state-fg);
+  }
+
+  &.-icon-before::before {
+    font-size: 12px;
+    margin-inline-end: 4px;
+    vertical-align: -0.15em;
+  }
+
+  &--draft {
+    --bl-post-state-bg: var(--bl-post-state-draft-bg);
+    --bl-post-state-fg: var(--bl-post-state-draft-fg);
+  }
+
+  &--pending {
+    --bl-post-state-bg: var(--bl-post-state-pending-bg);
+    --bl-post-state-fg: var(--bl-post-state-pending-fg);
+  }
+
+  &--scheduled {
+    --bl-post-state-bg: var(--bl-post-state-scheduled-bg);
+    --bl-post-state-fg: var(--bl-post-state-scheduled-fg);
+  }
+
+  &--private {
+    --bl-post-state-bg: var(--bl-post-state-private-bg);
+    --bl-post-state-fg: var(--bl-post-state-private-fg);
+  }
+
+  &--protected {
+    --bl-post-state-bg: var(--bl-post-state-protected-bg);
+    --bl-post-state-fg: var(--bl-post-state-protected-fg);
+  }
+
+  &--recurring {
+    --bl-post-state-bg: var(--bl-post-state-recurring-bg);
+    --bl-post-state-fg: var(--bl-post-state-recurring-fg);
+  }
+
+  &--neutral {
+    --bl-post-state-bg: var(--bl-post-state-neutral-bg);
+    --bl-post-state-fg: var(--bl-post-state-neutral-fg);
+  }
+}

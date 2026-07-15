@@ -40,6 +40,7 @@ require_once 'inc/developer-settings.php';
 if (is_admin()) {
 	require_once 'inc/dashboard.php';
 	require_once 'inc/media-sizes.php';
+	require_once 'inc/admin-post-states.php';
 }
 
 // Helpers
