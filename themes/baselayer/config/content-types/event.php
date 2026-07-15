@@ -15,6 +15,64 @@ return [
 		'public' => true,
 		'hierarchical' => true,
 
+		/**
+		 * Extra event fields (sidebar panel + singular template below content).
+		 * group => [ title, fields => field_id => [ type, label ] ]
+		 * Field types: text | textarea | email | url
+		 */
+		'meta' => [
+			'title' => 'Veranstaltungs-Metadaten',
+			'groups' => [
+				'location' => [
+					'title' => 'Location',
+					'fields' => [
+						'venue' => [
+							'type' => 'text',
+							'label' => 'Venue name',
+						],
+						'address' => [
+							'type' => 'textarea',
+							'label' => 'Address',
+						],
+					],
+				],
+				'organizer' => [
+					'title' => 'Organizer',
+					'fields' => [
+						'name' => [
+							'type' => 'text',
+							'label' => 'Organizer name',
+						],
+						'email' => [
+							'type' => 'email',
+							'label' => 'Organizer email',
+						],
+						'website' => [
+							'type' => 'url',
+							'label' => 'Organizer website',
+						],
+					],
+				],
+				'contact' => [
+					'title' => 'Contact',
+					'fields' => [
+						'person' => [
+							'type' => 'text',
+							'label' => 'Contact person',
+						],
+						'email' => [
+							'type' => 'email',
+							'label' => 'Email',
+						],
+						'phone' => [
+							'type' => 'text',
+							'label' => 'Phone',
+						],
+					],
+				],
+			],
+		],
+
 		'labels' => [
 			'name' => 'Events',
 			'singular_name' => 'Event',

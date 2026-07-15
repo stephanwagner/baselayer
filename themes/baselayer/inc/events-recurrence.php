@@ -480,6 +480,9 @@ function bl_event_apply_master_content(int $master_id, int $occurrence_id): void
 		delete_post_thumbnail($occurrence_id);
 	}
 	bl_event_copy_taxonomies($master_id, $occurrence_id);
+	if (function_exists('bl_event_copy_metadata')) {
+		bl_event_copy_metadata($master_id, $occurrence_id);
+	}
 	$GLOBALS['bl_event_syncing'] = false;
 }
 
@@ -590,6 +593,9 @@ function bl_event_sync_series(int $master_id): void
 			set_post_thumbnail($new_id, $thumb);
 		}
 		bl_event_copy_taxonomies($master_id, $new_id);
+		if (function_exists('bl_event_copy_metadata')) {
+			bl_event_copy_metadata($master_id, $new_id);
+		}
 		bl_event_recalculate_timestamps($new_id);
 		$by_date[$slot['start_date']] = $new_id;
 	}
@@ -704,6 +710,14 @@ function bl_event_maybe_detach_occurrence_on_save(int $post_id): void
 				$diverged = true;
 				break;
 			}
+		}
+	}
+
+	if (!$diverged && function_exists('bl_event_get_metadata')) {
+		$meta_m = bl_event_get_metadata($master_id);
+		$meta_o = bl_event_get_metadata($post_id);
+		if ($meta_m !== $meta_o) {
+			$diverged = true;
 		}
 	}
 

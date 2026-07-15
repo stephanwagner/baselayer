@@ -7,6 +7,8 @@ defined('ABSPATH') || exit;
  */
 
 require_once __DIR__ . '/events-recurrence.php';
+require_once __DIR__ . '/events-meta.php';
+require_once __DIR__ . '/events-ical.php';
 
 const BL_EVENT_META_START_DATE = '_bl_event_start_date';
 const BL_EVENT_META_END_DATE = '_bl_event_end_date';
@@ -636,6 +638,13 @@ add_action('enqueue_block_editor_assets', function (): void {
 		? bl_event_recurrence_horizon_date($pt)
 		: '';
 
+	$meta_by_type = [];
+	foreach ($post_types as $type) {
+		$meta_by_type[$type] = function_exists('bl_cpt_event_meta_config')
+			? bl_cpt_event_meta_config($type)
+			: ['title' => '', 'groups' => []];
+	}
+
 	wp_localize_script('baselayer-editor', 'baselayerEvents', [
 		'postTypes' => $post_types,
 		'postType' => $pt,
@@ -692,6 +701,13 @@ add_action('enqueue_block_editor_assets', function (): void {
 		'revertRestUrl' => esc_url_raw(rest_url('baselayer/v1/event-revert/')),
 		'restNonce' => wp_create_nonce('wp_rest'),
 		'dateFormat' => get_option('date_format', 'F j, Y'),
+		'meta' => $meta_by_type[$pt] ?? ['title' => '', 'groups' => []],
+		'metaByType' => $meta_by_type,
+		'editMetadata' => __('Edit metadata…', 'baselayer'),
+		'noMetadata' => __('No metadata', 'baselayer'),
+		'metadataModalTitle' => __('Event metadata', 'baselayer'),
+		'downloadIcal' => __('Download iCal', 'baselayer'),
+		'icalNeedsDate' => __('Set a start date to enable the iCal download.', 'baselayer'),
 	]);
 }, 12);
 

@@ -91,11 +91,19 @@ function bl_breadcrumbs(array $args = []): string
         }
 
         // Hierarchical CPT (and any hierarchical singular): parent chain like pages.
+        // Skip recurring series masters — they are structural parents, not navigation destinations.
         global $post;
         $singular = ($post instanceof \WP_Post) ? $post : get_queried_object();
         if ($singular instanceof \WP_Post && is_post_type_hierarchical($singular->post_type)) {
             $parents = array_reverse(get_post_ancestors($singular));
             foreach ($parents as $parent_id) {
+                $parent_id = (int) $parent_id;
+                if (
+                    function_exists('bl_event_is_series_master')
+                    && bl_event_is_series_master($parent_id)
+                ) {
+                    continue;
+                }
                 $items[] = [
                     'label' => get_the_title($parent_id),
                     'url'   => get_permalink($parent_id),

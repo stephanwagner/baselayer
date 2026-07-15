@@ -21,6 +21,10 @@
 				}
 
 				the_content();
+
+				if (function_exists('bl_is_event_post_type') && bl_is_event_post_type(get_post_type())) {
+					bl_render_template('event-meta', ['post_id' => $post_id]);
+				}
 			}
 			?>
 		</div>
