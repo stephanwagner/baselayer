@@ -6,6 +6,7 @@
 }
 
 .bl-post-states {
+  flex-basis: 100%;
   display: inline-flex;
   flex-wrap: wrap;
   align-items: center;
@@ -21,13 +22,13 @@
   align-items: center;
   gap: 0;
   margin: 0;
-  padding: 2px 7px;
-  border-radius: 3px;
+  padding: 3px 8px 3px 6px;
+  border-radius: 4px;
   background: var(--bl-post-state-bg);
   color: var(--bl-post-state-fg);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 16px;
   white-space: nowrap;
 
   &.post-state {
@@ -35,7 +36,7 @@
   }
 
   &.-icon-before::before {
-    font-size: 12px;
+    font-size: 16px;
     margin-inline-end: 4px;
     vertical-align: -0.15em;
   }
@@ -68,6 +69,11 @@
   &--recurring {
     --bl-post-state-bg: var(--bl-post-state-recurring-bg);
     --bl-post-state-fg: var(--bl-post-state-recurring-fg);
+  }
+
+  &--expiring {
+    --bl-post-state-bg: var(--bl-post-state-expiring-bg);
+    --bl-post-state-fg: var(--bl-post-state-expiring-fg);
   }
 
   &--neutral {

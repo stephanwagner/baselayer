@@ -1,19 +1,21 @@
 // Admin design tokens (extend as needed).
 
 :root {
-  // Post states — modern UI palette
-  --bl-post-state-draft-bg: #3b82f6;
+  // Post states — solid + white type; bright value, lower saturation
+  --bl-post-state-draft-bg: #5d82d8;
   --bl-post-state-draft-fg: #fff;
-  --bl-post-state-pending-bg: #f97316;
+  --bl-post-state-pending-bg: #ec8f34;
   --bl-post-state-pending-fg: #fff;
-  --bl-post-state-scheduled-bg: #8b5cf6;
+  --bl-post-state-scheduled-bg: #8471cf;
   --bl-post-state-scheduled-fg: #fff;
-  --bl-post-state-private-bg: #64748b;
+  --bl-post-state-private-bg: #687789;
   --bl-post-state-private-fg: #fff;
-  --bl-post-state-protected-bg: #e11d48;
+  --bl-post-state-protected-bg: #d1546e;
   --bl-post-state-protected-fg: #fff;
-  --bl-post-state-recurring-bg: #14b8a6;
+  --bl-post-state-recurring-bg: #38a898;
   --bl-post-state-recurring-fg: #fff;
-  --bl-post-state-neutral-bg: #e2e8f0;
-  --bl-post-state-neutral-fg: #334155;
+  --bl-post-state-expiring-bg: #c9785a;
+  --bl-post-state-expiring-fg: #fff;
+  --bl-post-state-neutral-bg: #8793a1;
+  --bl-post-state-neutral-fg: #fff;
 }

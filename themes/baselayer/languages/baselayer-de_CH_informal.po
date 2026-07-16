@@ -2682,3 +2682,33 @@ msgstr "Feldgruppen importieren"
 msgid "Skip"
 msgstr "Überspringen"
 
+# Admin post-state badges
+
+msgid "Scheduled: %s"
+msgstr "Geplant: %s"
+
+msgid "Expiring: %s"
+msgstr "Läuft ab: %s"
+
+msgid "Expiring"
+msgstr "Läuft ab"
+
+msgid "Recurring"
+msgstr "Wiederkehrend"
+
+msgctxt "post status"
+msgid "Draft"
+msgstr "Entwurf"
+
+msgctxt "post status"
+msgid "Pending"
+msgstr "Ausstehend"
+
+msgctxt "post status"
+msgid "Scheduled"
+msgstr "Geplant"
+
+msgctxt "post status"
+msgid "Private"
+msgstr "Privat"
+

@@ -25,7 +25,7 @@ function bl_admin_post_state_config(): array
 			'label' => _x('Draft', 'post status', 'baselayer'),
 		],
 		'pending' => [
-			'icon' => 'hourglass',
+			'icon' => 'editor-choice',
 			'modifier' => 'pending',
 			'label' => _x('Pending', 'post status', 'baselayer'),
 		],
@@ -49,6 +49,11 @@ function bl_admin_post_state_config(): array
 			'modifier' => 'recurring',
 			'label' => __('Recurring', 'baselayer'),
 		],
+		'bl_expiring' => [
+			'icon' => 'hourglass',
+			'modifier' => 'expiring',
+			'label' => __('Expiring', 'baselayer'),
+		],
 	];
 
 	/**
@@ -64,6 +69,7 @@ function bl_admin_post_state_config(): array
 /**
  * Ensure non-publish primary statuses are present when core omits them (e.g. current status view).
  * Published posts keep no status badge — same as WordPress default.
+ * Scheduled badges include date (other day) or time (same day).
  *
  * @param array<string, string> $states
  * @return array<string, string>
@@ -93,7 +99,48 @@ function bl_admin_enrich_post_states(array $states, $post): array
 		$states['protected'] = $config['protected']['label'];
 	}
 
+	$scheduled_label = bl_admin_scheduled_label($post);
+	if ($scheduled_label !== null) {
+		$states['scheduled'] = $scheduled_label;
+	}
+
 	return $states;
+}
+
+/**
+ * Scheduled badge label with date (other day) or time (same day), or null when not scheduled.
+ */
+function bl_admin_scheduled_label(\WP_Post $post): ?string
+{
+	if ($post->post_status !== 'future') {
+		return null;
+	}
+
+	$ts = get_post_time('U', false, $post);
+	if (!is_numeric($ts) || (int) $ts <= 0) {
+		return null;
+	}
+	$ts = (int) $ts;
+
+	$today = current_time('Y-m-d');
+	$day = wp_date('Y-m-d', $ts);
+	if ($day === $today) {
+		$when = wp_date(get_option('time_format', 'H:i'), $ts);
+
+		return sprintf(
+			/* translators: %s: scheduled publish time (same day) */
+			__('Scheduled: %s', 'baselayer'),
+			$when
+		);
+	}
+
+	$when = wp_date(get_option('date_format', 'F j, Y'), $ts);
+
+	return sprintf(
+		/* translators: %s: scheduled publish date (another day) */
+		__('Scheduled: %s', 'baselayer'),
+		$when
+	);
 }
 
 add_filter('display_post_states', 'bl_admin_enrich_post_states', 5, 2);

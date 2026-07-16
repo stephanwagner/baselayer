@@ -323,3 +323,82 @@ add_action('template_redirect', function (): void {
 	wp_safe_redirect($target, 301);
 	exit;
 });
+
+/**
+ * Whether a post has expiration enabled with a future date (still live, not yet expired).
+ */
+function bl_post_is_expiring(int $post_id): bool
+{
+	return bl_post_expiring_label($post_id) !== null;
+}
+
+/**
+ * List-table label for an expiring post, or null when not expiring.
+ * Same calendar day → "Expiring: {time}"; otherwise "Expiring: {date}".
+ */
+function bl_post_expiring_label(int $post_id): ?string
+{
+	if ($post_id <= 0) {
+		return null;
+	}
+	if (get_post_meta($post_id, BL_EXPIRATION_ENABLED_KEY, true) !== '1') {
+		return null;
+	}
+	$raw = get_post_meta($post_id, BL_EXPIRATION_META_KEY, true);
+	if (!is_string($raw) || !preg_match('/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/', $raw)) {
+		return null;
+	}
+
+	$now = current_time('Y-m-d H:i');
+	if (strcmp($raw, $now) <= 0) {
+		return null;
+	}
+
+	$tz = function_exists('wp_timezone') ? wp_timezone() : new \DateTimeZone(wp_timezone_string() ?: 'UTC');
+	$dt = \DateTimeImmutable::createFromFormat('Y-m-d H:i', $raw, $tz);
+	if (!$dt instanceof \DateTimeImmutable) {
+		return null;
+	}
+
+	$today = current_time('Y-m-d');
+	$exp_day = $dt->format('Y-m-d');
+	if ($exp_day === $today) {
+		$when = wp_date(get_option('time_format', 'H:i'), $dt->getTimestamp());
+
+		return sprintf(
+			/* translators: %s: expiration time (same day) */
+			__('Expiring: %s', 'baselayer'),
+			$when
+		);
+	}
+
+	$when = wp_date(get_option('date_format', 'F j, Y'), $dt->getTimestamp());
+
+	return sprintf(
+		/* translators: %s: expiration date (another day) */
+		__('Expiring: %s', 'baselayer'),
+		$when
+	);
+}
+
+/**
+ * List-table badge: Expiring with date or time.
+ *
+ * @param array<string, string> $states
+ * @return array<string, string>
+ */
+function bl_expirator_display_post_states(array $states, $post): array
+{
+	if (!$post instanceof \WP_Post) {
+		return $states;
+	}
+	$label = bl_post_expiring_label((int) $post->ID);
+	if ($label === null) {
+		return $states;
+	}
+	$states['bl_expiring'] = $label;
+
+	return $states;
+}
+
+add_filter('display_post_states', 'bl_expirator_display_post_states', 10, 2);
