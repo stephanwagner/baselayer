@@ -19,6 +19,9 @@ $child-theme-path: '{{child_theme_path}}';
   $color-primary: #4080ff,
   $color-secondary: #00aaff,
 
+  // Font families
+  $primary-font-family: ('Nunito Sans', sans-serif),
+
   // Breakpoints
   $breakpoint-mobile: 900px
 );
