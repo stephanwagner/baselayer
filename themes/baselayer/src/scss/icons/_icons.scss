@@ -1,8 +1,6 @@
 @use 'sass:list';
+@use '../config' as *;
 @use 'icon-names' as *;
-
-// Path from the compiled stylesheets (assets/css/*.css) to the icon files.
-$bl-icon-path: '../icons' !default;
 
 // Icon mixin
 @mixin bl-icon {

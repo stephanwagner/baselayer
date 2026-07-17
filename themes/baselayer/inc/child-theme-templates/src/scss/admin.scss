@@ -1,0 +1,16 @@
+/**
+ * Complete child theme admin/editor bundle — compiled to assets/css/admin.css.
+ */
+
+// Config
+@forward 'config';
+
+// Parent admin/editor styles, compiled with the child config
+@forward '../../../baselayer/src/scss/admin';
+
+// Child-only CSS custom properties
+@forward 'root';
+
+// Child ACF blocks
+@forward '../../acf/blocks/blocks';
+@forward '../../acf/blocks/blocks-editor';

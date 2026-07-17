@@ -1,5 +1,5 @@
 /**
- * Theme values for JS, read from :root in src/scss/_variables.scss.
+ * Theme values for JS, read from :root in src/scss/_root.scss.
  * `prop` = custom property name; `fallback` = default if CSS is missing (keep in sync with SCSS).
  * `parse: 'unit'` → number. `parse: 'string'` → raw trim.
  */
@@ -48,7 +48,7 @@ const ROOT_VAR_MAP = [
   },
   {
     key: 'startScrolled',
-    prop: '--bl-header-height-scrolled',
+    prop: '--bl-header-start-scrolled',
     parse: 'unit',
     fallback: 64,
   },

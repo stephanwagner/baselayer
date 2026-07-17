@@ -12,9 +12,16 @@ npm run build    # icons + JS + CSS
 npm run watch    # rebuild on change
 ```
 
-Built files land in `assets/css/main.css`, `assets/js/main.js`, `assets/css/icons.css`, and `assets/icons.generated.json`.
+Built files land in `assets/css/main.css`, `assets/css/admin.css`, `assets/js/main.js`, `assets/css/icons.css`, and `assets/icons.generated.json`.
 
-Edit `src/scss/main.scss` and `src/js/main.js`. After build, child CSS/JS load on the front **and** in the block editor.
+The child CSS bundles contain the complete configured parent styles plus child styles. `main.css` replaces the parent frontend bundle; `admin.css` replaces the parent admin/editor bundle. If a child bundle is missing, BaseLayer falls back to its standalone parent bundle.
+
+## Sass and CSS variables
+
+- Override parent Sass defaults in `src/scss/_config.scss`. It includes color and breakpoint examples; all available values are listed in the parent `src/scss/_config.scss`.
+- Add child-only CSS custom properties in `src/scss/_root.scss`.
+- `npm run build:css` compiles the complete parent frontend and admin styles with the child config. Sass-only values, including media-query breakpoints, are therefore overridden too.
+- After updating or replacing BaseLayer, run the child build again so both CSS bundles contain the new parent styles. BaseLayer keeps `src/scss/_config.scss`, `src/scss/main.scss`, and `src/scss/admin.scss` as stable child-theme entrypoints.
 
 ## Icons
 

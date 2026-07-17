@@ -1,106 +1,12 @@
 /**
- * Variables
- * 
- * Sync variables with configs in config/design.php
+ * CSS custom properties
+ *
+ * Values come from _config.scss. Child themes configure that Sass module before
+ * compiling the complete parent frontend and admin entrypoints.
  */
 
-@use 'sass:color';
+@use 'config' as *;
 
-// Paths
-$theme-path: '/wp-content/themes/baselayer';
-
-// Colors
-$color-primary: #4080ff;
-$color-primary-dark: #{color.adjust($color-primary, $lightness: -8%)};
-$color-secondary: #00aaff;
-$color-secondary-dark: #{color.adjust($color-secondary, $lightness: -8%)};
-
-// Grayscale
-$color-white: #fff;
-$color-black: #000;
-$color-off-black: #222;
-$color-gray-600: #666;
-$color-gray-500: #999;
-$color-gray-400: #ccc;
-$color-gray-300: #ddd;
-$color-gray-200: #eee;
-$color-gray-100: #f6f6f6;
-
-// Status colors
-$color-error: #f33;
-$color-warning: #fc0;
-$color-success: #5d5;
-
-// Font families
-$primary-font-family: 'Nunito Sans', sans-serif;
-
-// Font sizes
-$font-size-s: 14px;
-$font-size-m: 16px;
-$font-size-l: 18px;
-$font-size-xl: 22px;
-
-// Line heights
-$line-height-s: 1.4;
-$line-height-m: 1.5;
-$line-height-l: 1.5;
-$line-height-xl: 1.4;
-
-// Padding
-$content-padding-xs: 16px;
-$content-padding-s: 24px;
-$content-padding-m: 32px;
-$content-padding-l: 48px;
-$content-padding-xl: 64px;
-
-// Margins
-$content-margin-xs: 24px;
-$content-margin-s: 32px;
-$content-margin-m: 48px;
-$content-margin-l: 64px;
-$content-margin-xl: 96px;
-
-// Content
-$content-width: 1200px;
-$content-width-narrow: 900px;
-$content-width-very-narrow: 600px;
-$content-width-extra-narrow: 300px;
-
-// Content bleeds
-$content-container-wide-bleed: $content-padding-xl;
-$content-alignwide-bleed: $content-padding-m;
-
-// Breakpoints
-$breakpoint-xs: 400px;
-$breakpoint-s: 600px;
-$breakpoint-m: 900px;
-$breakpoint-l: 1200px;
-$breakpoint-xl: 1400px;
-$breakpoint-mobile: 900px;
-
-// Header
-$header-height: 96px;
-$header-height-scrolled: 64px;
-$header-height-mobile: 64px;
-$header-height-mobile-scrolled: 56px;
-
-// Mobile menu
-$mobile-menu-width: 280px;
-
-// Transitions
-$transition-speed: 240ms;
-$transition-speed-slow: 360ms;
-
-// Border radius
-$border-radius-s: 4px;
-$border-radius-m: 8px;
-$border-radius-l: 16px;
-
-// Block editor content widths
-$editor-content-width: 960px;
-$editor-content-width-padding: 24px;
-
-// Variables
 :root {
   // Colors
   --bl-color-primary: #{$color-primary};
@@ -199,6 +105,7 @@ $editor-content-width-padding: 24px;
   --bl-header-height-scrolled: #{$header-height-scrolled};
   --bl-header-height-mobile: #{$header-height-mobile};
   --bl-header-height-mobile-scrolled: #{$header-height-mobile-scrolled};
+  --bl-header-start-scrolled: #{$header-start-scrolled};
 
   // Mobile menu
   --bl-mobile-menu-width: #{$mobile-menu-width};

@@ -1,10 +1,12 @@
+// Configured CSS custom properties
+@forward 'root';
+
 // Reset browser defaults
-@forward '../../../../node_modules/normalize.css/normalize';
 @forward 'lib/reset';
 
 // Libraries
-@forward '../../../../node_modules/swiper/swiper-bundle.min';
-@forward '../../../../node_modules/photoswipe/dist/photoswipe.css';
+@forward 'swiper/swiper-bundle.min';
+@forward 'photoswipe/dist/photoswipe.css';
 
 // Fonts
 @forward 'fonts/fonts';

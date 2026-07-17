@@ -1,4 +1,4 @@
-@use '../variables' as *;
+@use '../config' as *;
 @use '../mixins' as *;
 
 $content-wide-width: $content-width + ($content-container-wide-bleed * 2);

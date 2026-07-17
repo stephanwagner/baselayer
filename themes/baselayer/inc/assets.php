@@ -299,12 +299,19 @@ function bl_register_theme_script(string $handle, string $name, array $deps = []
 }
 
 /**
- * Enqueue front-end stylesheets (baselayer.css).
+ * Enqueue the complete front-end stylesheet.
  *
- * @return void
+ * A built child main.css already contains the configured parent styles and
+ * replaces baselayer.css. The standalone parent bundle remains the fallback.
  */
 function bl_styles(): void
 {
+	$child = bl_child_theme_built_asset('css', 'main');
+	if ($child !== null) {
+		wp_enqueue_style('baselayer-styles', $child['uri'], [], $child['ver']);
+		return;
+	}
+
 	bl_enqueue_theme_style('baselayer-styles', 'baselayer');
 }
 add_action('wp_enqueue_scripts', 'bl_styles');
@@ -315,11 +322,17 @@ add_action('wp_enqueue_scripts', 'bl_styles');
  * Prefers `.min` when not in debug, falls back to the unminified file.
  *
  * @param 'css'|'js' $kind
+ * @param string     $name Basename without extension.
  * @return array{rel: string, path: string, uri: string, ver: string}|null
  */
-function bl_child_theme_built_asset(string $kind): ?array
+function bl_child_theme_built_asset(string $kind, string $name = 'main'): ?array
 {
 	if (!is_child_theme() || ($kind !== 'css' && $kind !== 'js')) {
+		return null;
+	}
+
+	$name = sanitize_file_name($name);
+	if ($name === '') {
 		return null;
 	}
 
@@ -327,8 +340,8 @@ function bl_child_theme_built_asset(string $kind): ?array
 	$base = trailingslashit(get_stylesheet_directory());
 	$base_uri = trailingslashit(get_stylesheet_directory_uri());
 	$dir = $kind === 'css' ? 'assets/css' : 'assets/js';
-	$rel = $dir . '/main' . $min . '.' . $kind;
-	$fallback = $dir . '/main.' . $kind;
+	$rel = $dir . '/' . $name . $min . '.' . $kind;
+	$fallback = $dir . '/' . $name . '.' . $kind;
 	$file = is_readable($base . $rel) ? $rel : (is_readable($base . $fallback) ? $fallback : '');
 
 	if ($file === '') {
@@ -344,20 +357,12 @@ function bl_child_theme_built_asset(string $kind): ?array
 }
 
 /**
- * Enqueue child theme front-end assets after parent (when built files exist).
+ * Enqueue the child theme script when its built file exists.
+ *
+ * Child CSS is a complete bundle selected by bl_styles().
  */
 function bl_enqueue_child_theme_assets(): void
 {
-	$css = bl_child_theme_built_asset('css');
-	if ($css !== null) {
-		wp_enqueue_style(
-			'child-main-styles',
-			$css['uri'],
-			['baselayer-styles'],
-			$css['ver']
-		);
-	}
-
 	$js = bl_child_theme_built_asset('js');
 	if ($js !== null) {
 		wp_enqueue_script(
@@ -370,31 +375,6 @@ function bl_enqueue_child_theme_assets(): void
 	}
 }
 add_action('wp_enqueue_scripts', 'bl_enqueue_child_theme_assets', 20);
-
-/**
- * Load child main.css in the block editor canvas (same path as admin.css).
- *
- * Child block styles compile into main.css; without this they only appear on the front.
- */
-function bl_enqueue_child_theme_block_assets(): void
-{
-	if (!is_admin() || !bl_admin_is_block_editor_screen()) {
-		return;
-	}
-
-	$css = bl_child_theme_built_asset('css');
-	if ($css === null) {
-		return;
-	}
-
-	wp_enqueue_style(
-		'child-main-styles',
-		$css['uri'],
-		['main-admin-styles'],
-		$css['ver']
-	);
-}
-add_action('enqueue_block_assets', 'bl_enqueue_child_theme_block_assets', 20);
 
 /**
  * Load child main.js in the block editor (ACF block scripts bundled there).
@@ -505,13 +485,19 @@ function bl_enqueue_theme_icons_editor(): void
 add_action('enqueue_block_editor_assets', 'bl_enqueue_theme_icons_editor', 20);
 
 /**
- * Enqueue theme admin.css (same bundle as wp-admin).
- * Used on login screen via login_enqueue_scripts as well.
+ * Enqueue the complete admin/editor stylesheet.
  *
- * @return void
+ * A built child admin.css already contains the configured parent styles and
+ * replaces the parent admin.css. Used on the login screen as well.
  */
 function bl_enqueue_admin_styles(): void
 {
+	$child = bl_child_theme_built_asset('css', 'admin');
+	if ($child !== null) {
+		wp_enqueue_style('main-admin-styles', $child['uri'], [], $child['ver']);
+		return;
+	}
+
 	bl_enqueue_theme_style('main-admin-styles', 'admin');
 }
 

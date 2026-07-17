@@ -1,0 +1,107 @@
+/**
+ * Sass configuration
+ *
+ * Keep these values in sync with config/design.php where applicable.
+ * Every value is !default so a child theme can configure this module with
+ * `@forward '<parent>/src/scss/config' with (...)`.
+ */
+
+@use 'sass:color';
+
+// Theme path
+$theme-path: '/wp-content/themes/baselayer';
+
+// Icon path
+$icon-path: #{$theme-path}/assets/icons !default;
+
+// Colors
+$color-primary: #4080ff !default;
+$color-primary-dark: #{color.adjust($color-primary, $lightness: -8%)} !default;
+$color-secondary: #00aaff !default;
+$color-secondary-dark: #{color.adjust($color-secondary, $lightness: -8%)} !default;
+
+// Grayscale
+$color-white: #fff !default;
+$color-black: #000 !default;
+$color-off-black: #222 !default;
+$color-gray-600: #666 !default;
+$color-gray-500: #999 !default;
+$color-gray-400: #ccc !default;
+$color-gray-300: #ddd !default;
+$color-gray-200: #eee !default;
+$color-gray-100: #f6f6f6 !default;
+
+// Status colors
+$color-error: #f33 !default;
+$color-warning: #fc0 !default;
+$color-success: #5d5 !default;
+
+// Font families
+$primary-font-family: 'Nunito Sans', sans-serif !default;
+
+// Font sizes
+$font-size-s: 14px !default;
+$font-size-m: 16px !default;
+$font-size-l: 18px !default;
+$font-size-xl: 22px !default;
+
+// Line heights
+$line-height-s: 1.4 !default;
+$line-height-m: 1.5 !default;
+$line-height-l: 1.5 !default;
+$line-height-xl: 1.4 !default;
+
+// Padding
+$content-padding-xs: 16px !default;
+$content-padding-s: 24px !default;
+$content-padding-m: 32px !default;
+$content-padding-l: 48px !default;
+$content-padding-xl: 64px !default;
+
+// Margins
+$content-margin-xs: 24px !default;
+$content-margin-s: 32px !default;
+$content-margin-m: 48px !default;
+$content-margin-l: 64px !default;
+$content-margin-xl: 96px !default;
+
+// Content
+$content-width: 1200px !default;
+$content-width-narrow: 900px !default;
+$content-width-very-narrow: 600px !default;
+$content-width-extra-narrow: 300px !default;
+
+// Content bleeds
+$content-container-wide-bleed: $content-padding-xl !default;
+$content-alignwide-bleed: $content-padding-m !default;
+
+// Breakpoints
+$breakpoint-xs: 400px !default;
+$breakpoint-s: 600px !default;
+$breakpoint-m: 900px !default;
+$breakpoint-l: 1200px !default;
+$breakpoint-xl: 1400px !default;
+$breakpoint-mobile: 900px !default;
+
+// Header
+$header-height: 96px !default;
+$header-height-scrolled: 64px !default;
+$header-height-mobile: 64px !default;
+$header-height-mobile-scrolled: 56px !default;
+$header-start-scrolled: 64px !default;
+
+// Mobile menu
+$mobile-menu-width: 280px !default;
+
+// Transitions
+$transition-speed: 240ms !default;
+$transition-speed-slow: 360ms !default;
+
+// Border radius
+$border-radius-s: 4px !default;
+$border-radius-m: 8px !default;
+$border-radius-l: 16px !default;
+
+// Block editor content widths
+$editor-content-width: 960px !default;
+$editor-content-width-padding: 24px !default;

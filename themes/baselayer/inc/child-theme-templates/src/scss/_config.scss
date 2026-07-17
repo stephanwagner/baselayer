@@ -1,0 +1,35 @@
+/**
+ * Parent theme Sass configuration.
+ *
+ * Add only the values you want to override. The available variables and their
+ * defaults are in baselayer/src/scss/_config.scss.
+ *
+ * The child build compiles the complete parent frontend and admin styles with
+ * these values, so overrides also apply to Sass-only values such as breakpoints.
+ */
+
+// Path for assets that belong to this child theme.
+$child-theme-path: '{{child_theme_path}}';
+
+// Parent theme Sass configuration.
+@forward '../../../baselayer/src/scss/config' with (
+  // Colors
+  $color-primary: #4080ff,
+  $color-secondary: #00aaff,
+
+  // Font families
+  $primary-font-family: ('Nunito Sans', sans-serif),
+
+  // Content
+  $content-width: 1200px,
+
+  // Header
+  $header-height: 96px,
+  $header-height-scrolled: 64px,
+  $header-height-mobile: 64px,
+  $header-height-mobile-scrolled: 56px,
+  $header-start-scrolled: 64px,
+
+  // Breakpoints
+  $breakpoint-mobile: 900px
+);
