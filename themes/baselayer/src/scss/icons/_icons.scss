@@ -2,9 +2,6 @@
 @use '../config' as *;
 @use 'icon-names' as *;
 
-// Path from the compiled stylesheets (assets/css/*.css) to the icon files.
-$bl-icon-path: #{$theme-path}/assets/icons;
-
 // Icon mixin
 @mixin bl-icon {
   display: inline-block;

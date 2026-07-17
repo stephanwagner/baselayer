@@ -8,8 +8,11 @@
 
 @use 'sass:color';
 
-// Paths
+// Theme path
 $theme-path: '/wp-content/themes/baselayer';
+
+// Icon path
+$icon-path: #{$theme-path}/assets/icons !default;
 
 // Colors
 $color-primary: #4080ff !default;
@@ -85,6 +88,7 @@ $header-height: 96px !default;
 $header-height-scrolled: 64px !default;
 $header-height-mobile: 64px !default;
 $header-height-mobile-scrolled: 56px !default;
+$header-start-scrolled: 64px !default;
 
 // Mobile menu
 $mobile-menu-width: 280px !default;

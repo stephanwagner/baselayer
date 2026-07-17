@@ -6,8 +6,6 @@
  *
  * The child build compiles the complete parent frontend and admin styles with
  * these values, so overrides also apply to Sass-only values such as breakpoints.
- * Derived defaults (for example $color-primary-dark) automatically use the
- * configured base value unless you override the derived value as well.
  */
 
 // Path for assets that belong to this child theme.
@@ -21,6 +19,16 @@ $child-theme-path: '{{child_theme_path}}';
 
   // Font families
   $primary-font-family: ('Nunito Sans', sans-serif),
+
+  // Content
+  $content-width: 1200px,
+
+  // Header
+  $header-height: 96px,
+  $header-height-scrolled: 64px,
+  $header-height-mobile: 64px,
+  $header-height-mobile-scrolled: 56px,
+  $header-start-scrolled: 64px,
 
   // Breakpoints
   $breakpoint-mobile: 900px

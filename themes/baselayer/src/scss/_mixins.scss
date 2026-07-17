@@ -3,28 +3,27 @@
 // Transition helpers
 
 @function transition($properties...) {
-    $out: ();
-    @each $p in $properties {
-      $out: list.append($out, #{$p} var(--bl-transition-speed), comma);
-    }
-    @return $out;
+  $out: ();
+  @each $p in $properties {
+    $out: list.append($out, #{$p} var(--bl-transition-speed), comma);
   }
-  
-  @function transition-slow($properties...) {
-    $out: ();
-    @each $p in $properties {
-      $out: list.append($out, #{$p} var(--bl-transition-speed-slow), comma);
-    }
-    @return $out;
+  @return $out;
+}
+
+@function transition-slow($properties...) {
+  $out: ();
+  @each $p in $properties {
+    $out: list.append($out, #{$p} var(--bl-transition-speed-slow), comma);
   }
-  
-  // Line clamp helper
-  
-  @mixin line-clamp($lines) {
-    display: -webkit-box;
-    line-clamp: $lines;
-    -webkit-line-clamp: $lines;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
-  
+  @return $out;
+}
+
+// Line clamp helper
+
+@mixin line-clamp($lines) {
+  display: -webkit-box;
+  line-clamp: $lines;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

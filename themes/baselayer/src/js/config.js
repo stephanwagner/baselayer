@@ -48,7 +48,7 @@ const ROOT_VAR_MAP = [
   },
   {
     key: 'startScrolled',
-    prop: '--bl-header-height-scrolled',
+    prop: '--bl-header-start-scrolled',
     parse: 'unit',
     fallback: 64,
   },
