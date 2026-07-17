@@ -2,10 +2,18 @@
   "$schema": "https://schemas.wp.org/trunk/theme.json",
   "version": 3,
   "settings": {
+    "background": {
+      "backgroundImage": false,
+      "backgroundSize": false
+    },
     "blocks": {
       "core/group": {
         "layout": {
           "allowEditing": false
+        },
+        "background": {
+          "backgroundImage": true,
+          "backgroundSize": true
         }
       },
       "core/cover": {

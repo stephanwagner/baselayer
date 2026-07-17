@@ -77,7 +77,7 @@ $fontSizes: (
 
   @each $name, $size, $line-height in $fontSizes {
     .has-#{$name}-font-size {
-      font-size: $size;
+      font-size: $size !important;
       line-height: $line-height;
     }
   }

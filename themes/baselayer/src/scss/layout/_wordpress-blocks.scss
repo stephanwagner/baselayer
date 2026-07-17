@@ -98,6 +98,10 @@
     position: relative;
 
     &.has-background {
+      background-repeat: no-repeat;
+      background-position: center center;
+      background-size: cover;
+
       &:not(.alignfull) {
         border-radius: var(--bl-border-radius-m);
 
@@ -511,7 +515,7 @@
   // Media and text
 
   .wp-block-media-text {
-    >.wp-block-media-text__media {
+    > .wp-block-media-text__media {
       img {
         border-radius: var(--bl-border-radius-m);
       }
