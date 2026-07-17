@@ -1,4 +1,4 @@
-@use '../../variables' as *;
+@use '../../config' as *;
 @use '../wordpress-blocks' as *;
 
 $editor-content-width-outer: $editor-content-width + ($editor-content-width-padding * 2);

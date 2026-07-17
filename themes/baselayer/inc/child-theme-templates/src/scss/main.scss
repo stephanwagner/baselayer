@@ -1,5 +1,5 @@
 /**
- * Child theme styles — compiled to assets/css/main.css (loads after parent).
+ * Complete child theme frontend bundle — compiled to assets/css/main.css.
  *
  * Install assets from the theme folder:
  *   npm install
@@ -11,9 +11,14 @@
  *   npm run watch
  */
 
-// Variables
-@forward 'variables';
+// Config
+@forward 'config';
 
-// ACF blocks
+// Parent frontend styles, compiled with the child config
+@forward '../../../baselayer/src/scss/main';
+
+// Child-only CSS custom properties
+@forward 'root';
+
+// Child ACF blocks
 @forward '../../acf/blocks/blocks';
-@forward '../../acf/blocks/blocks-editor';

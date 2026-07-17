@@ -1,7 +1,7 @@
-@use '../variables' as *;
+@use '../config' as *;
 @use '../mixins' as *;
 
-// CSS tab — variable overview modal (_variables.scss :root)
+// CSS tab — variable overview modal (_root.scss :root)
 
 body.bl-css-vars-overview-modal-active {
   overflow: hidden;

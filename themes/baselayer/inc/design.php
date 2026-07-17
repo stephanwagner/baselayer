@@ -229,13 +229,13 @@ function bl_theme_json_typography_settings(): array
 }
 
 /**
- * Contents of `src/scss/_variables.scss` — the `:root { … }` block only (readonly overview in Theme → CSS admin).
+ * Contents of `src/scss/_root.scss` — the `:root { … }` block only (readonly overview in Theme → CSS admin).
  *
  * @return string
  */
 function bl_variables_scss_root_block(): string
 {
-	$path = get_template_directory() . '/src/scss/_variables.scss';
+	$path = get_template_directory() . '/src/scss/_root.scss';
 	if (!is_readable($path)) {
 		return '';
 	}

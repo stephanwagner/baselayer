@@ -1,0 +1,24 @@
+/**
+ * Parent theme Sass configuration.
+ *
+ * Add only the values you want to override. The available variables and their
+ * defaults are in baselayer/src/scss/_config.scss.
+ *
+ * The child build compiles the complete parent frontend and admin styles with
+ * these values, so overrides also apply to Sass-only values such as breakpoints.
+ * Derived defaults (for example $color-primary-dark) automatically use the
+ * configured base value unless you override the derived value as well.
+ */
+
+// Path for assets that belong to this child theme.
+$child-theme-path: '{{child_theme_path}}';
+
+// Parent theme Sass configuration.
+@forward '../../../baselayer/src/scss/config' with (
+  // Colors
+  $color-primary: #4080ff,
+  $color-secondary: #00aaff,
+
+  // Breakpoints
+  $breakpoint-mobile: 900px
+);

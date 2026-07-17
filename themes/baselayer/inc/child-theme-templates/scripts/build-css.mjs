@@ -24,8 +24,12 @@ function resolveBin(name) {
 
 const sassBin = resolveBin('sass');
 const chokidarBin = resolveBin('chokidar');
+const sassLoadPathArgs = ['--load-path', path.join(themeDir, 'node_modules')];
 
-const entries = [{ src: path.join(themeDir, 'src/scss/main.scss'), name: 'main' }];
+const entries = [
+  { src: path.join(themeDir, 'src/scss/main.scss'), name: 'main' },
+  { src: path.join(themeDir, 'src/scss/admin.scss'), name: 'admin' }
+];
 
 function sassPairs(prod) {
   const suffix = prod ? '.min' : '';
@@ -64,6 +68,7 @@ async function build(prod) {
   if (prod) {
     await run(sassBin, [
       ...sassPairs(true),
+      ...sassLoadPathArgs,
       '--style=compressed',
       '--no-source-map'
     ]);
@@ -72,6 +77,7 @@ async function build(prod) {
 
   await run(sassBin, [
     ...sassPairs(false),
+    ...sassLoadPathArgs,
     '--style=expanded',
     '--source-map'
   ]);
@@ -80,8 +86,11 @@ async function build(prod) {
 async function buildAll() {
   fs.mkdirSync(path.join(themeDir, 'assets/css'), { recursive: true });
 
-  if (!fs.existsSync(entries[0].src)) {
-    console.log(`Skipping CSS (missing ${path.relative(themeDir, entries[0].src)})`);
+  const missing = entries.filter(({ src }) => !fs.existsSync(src));
+  if (missing.length > 0) {
+    console.log(
+      `Skipping CSS (missing ${missing.map(({ src }) => path.relative(themeDir, src)).join(', ')})`
+    );
     return;
   }
 
@@ -90,8 +99,11 @@ async function buildAll() {
 }
 
 function watch() {
-  if (!fs.existsSync(entries[0].src)) {
-    console.error(`Missing ${path.relative(themeDir, entries[0].src)}`);
+  const missing = entries.filter(({ src }) => !fs.existsSync(src));
+  if (missing.length > 0) {
+    console.error(
+      `Missing ${missing.map(({ src }) => path.relative(themeDir, src)).join(', ')}`
+    );
     process.exit(1);
   }
 
@@ -101,6 +113,7 @@ function watch() {
   const children = [
     spawnWatch(sassBin, [
       ...sassPairs(false),
+      ...sassLoadPathArgs,
       '--watch',
       '--poll',
       '--source-map'

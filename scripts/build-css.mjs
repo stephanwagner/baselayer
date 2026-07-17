@@ -10,6 +10,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
 const sassBin = path.join(root, 'node_modules/.bin/sass');
 const chokidarBin = path.join(root, 'node_modules/.bin/chokidar');
+const sassLoadPathArgs = ['--load-path', path.join(root, 'node_modules')];
 
 const entries = [
   { src: `${themeDir}/src/scss/main.scss`, name: 'baselayer' },
@@ -53,6 +54,7 @@ async function build(prod) {
   if (prod) {
     await run(sassBin, [
       ...sassPairs(true),
+      ...sassLoadPathArgs,
       '--style=compressed',
       '--no-source-map'
     ]);
@@ -61,6 +63,7 @@ async function build(prod) {
 
   await run(sassBin, [
     ...sassPairs(false),
+    ...sassLoadPathArgs,
     '--style=expanded',
     '--source-map'
   ]);
@@ -77,6 +80,7 @@ function watch() {
   const children = [
     spawnWatch(sassBin, [
       ...sassPairs(false),
+      ...sassLoadPathArgs,
       '--watch',
       '--poll',
       '--source-map'
