@@ -32,7 +32,10 @@ $classNames[] = 'icon-text__wrapper';
 			</div>
 			<div class="icon-text__text-container">
 				<div class="icon-text__text">
-					<InnerBlocks  allowedBlocks="<?= esc_attr(wp_json_encode(['core/heading', 'core/paragraph', 'core/buttons', 'core/separator'])) ?>" />
+					<InnerBlocks
+						allowedBlocks="<?= esc_attr(wp_json_encode(['core/heading', 'core/paragraph', 'core/buttons', 'core/separator'])) ?>"
+						template="<?= esc_attr(wp_json_encode([['core/paragraph', new stdClass()]])) ?>"
+					/>
 				</div>
 			</div>
 		</div>

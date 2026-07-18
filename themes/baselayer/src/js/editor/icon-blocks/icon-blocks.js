@@ -6,9 +6,7 @@ const ICON_SLUG_ATTRIBUTE = 'iconSlug';
 
 // Keep in sync with icon-text.php InnerBlocks allowedBlocks
 const ICON_TEXT_ALLOWED_BLOCKS = ['core/heading', 'core/paragraph', 'core/buttons', 'core/separator'];
-
-// No default inner blocks — editor starts empty
-const ICON_TEXT_INNER_TEMPLATE = [];
+const ICON_TEXT_INNER_TEMPLATE = [['core/paragraph', {}]];
 
 const ICON_BLOCKS = {
   'acf/icon': IconBlockEdit,
@@ -27,11 +25,7 @@ function IconBlockEdit({ attributes, setAttributes, isSelected }) {
       <div className="icon__container">
         <div className="icon__content">
           <div className={'icon__icon' + (hasIcon ? ' -has-icon' : '')}>
-            <InlineIconControl
-              value={iconSlug}
-              isActive={isSelected}
-              onChange={(next) => setAttributes({ [ICON_SLUG_ATTRIBUTE]: next })}
-            />
+            <InlineIconControl value={iconSlug} isActive={isSelected} onChange={(next) => setAttributes({ [ICON_SLUG_ATTRIBUTE]: next })} />
           </div>
         </div>
       </div>
@@ -51,11 +45,7 @@ function IconTextBlockEdit({ attributes, setAttributes, isSelected }) {
       <div className="icon-text__container">
         <div className="icon-text__content">
           <div className={'icon-text__icon icon__icon' + (hasIcon ? ' -has-icon' : '')}>
-            <InlineIconControl
-              value={iconSlug}
-              isActive={isSelected}
-              onChange={(next) => setAttributes({ [ICON_SLUG_ATTRIBUTE]: next })}
-            />
+            <InlineIconControl value={iconSlug} isActive={isSelected} onChange={(next) => setAttributes({ [ICON_SLUG_ATTRIBUTE]: next })} />
           </div>
           <div className="icon-text__text-container">
             <div className="icon-text__text">

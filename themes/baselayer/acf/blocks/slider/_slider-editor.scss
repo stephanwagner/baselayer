@@ -43,13 +43,18 @@
       display: block;
     }
 
-    // Anchor absolute children to .slider__wrapper, not inner blocks layout.
     .slider__container,
     .slider__slides,
     .swiper,
     .swiper > .acf-innerblocks-container,
     .swiper > .acf-innerblocks-container > .block-editor-block-list__layout {
       position: static;
+    }
+
+    &[data-slider-has-content='true'] {
+      .slider-slide__content {
+        display: flex !important;
+      }
     }
   }
 

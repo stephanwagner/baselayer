@@ -67,8 +67,8 @@ $spaceBetween = max(0, (int) $spaceBetween);
 	data-slider-pagination="<?= $pagination ? 'true' : 'false' ?>"
 	data-slider-navigation="<?= $navigation ? 'true' : 'false' ?>"
 	data-slider-dynamic-bullets="<?= $dynamicBullets ? 'true' : 'false' ?>"
-	data-slider-has-call-to-action="<?= $hasCallToAction ? 'true' : 'false' ?>"
-	data-slider-call-to-action-align="<?= $callToActionAlign ?>">
+	data-slider-has-content="<?= $hasCallToAction ? 'true' : 'false' ?>"
+	data-slider-content-align="<?= $callToActionAlign ?>">
 	<?php if (is_admin()) { ?>
 		<div class="slider__editor-badge" aria-hidden="true">
 			<span class="slider__editor-badge-icon">
@@ -82,7 +82,10 @@ $spaceBetween = max(0, (int) $spaceBetween);
 	<div class="slider__container">
 		<div class="slider__slides">
 			<div class="swiper">
-				<InnerBlocks allowedBlocks="<?= esc_attr(wp_json_encode(['acf/slider-slide'])) ?>" />
+				<InnerBlocks
+					allowedBlocks="<?= esc_attr(wp_json_encode(['acf/slider-slide'])) ?>"
+					template="<?= esc_attr(wp_json_encode([['acf/slider-slide', new stdClass()]])) ?>"
+				/>
 			</div>
 		</div>
 		<div class="slider__navigation">
