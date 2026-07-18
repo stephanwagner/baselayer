@@ -29,7 +29,7 @@ if ($classes !== '') {
 ?>
 
 <article id="post-<?= $id ?>" <?php post_class($post_classes); ?>>
-	<<?= is_admin() ? 'div' : 'a href="' . esc_url($url) . '"' ?> class="article-preview__link read-more-link-trigger">
+	<<?= is_admin() ? 'div' : 'a href="' . esc_url($url) . '"' ?> class="article-preview__link read-more-link-trigger -button-trigger">
 		<div class="article-preview__image-container">
 			<?= bl_image_with_placeholder(get_post_thumbnail_id(), 'medium', ['class' => 'article-preview__image']); ?>
 		</div>

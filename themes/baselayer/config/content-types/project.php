@@ -60,7 +60,7 @@ return [
 
 			// Sorts projects by menu order
 			'orderby' => 'menu_order',
-			'order' => 'DESC',
+			'order' => 'ASC',
 		],
 
 		'admin' => [
