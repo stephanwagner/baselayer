@@ -246,6 +246,12 @@ msgstr "Auszug"
 
 # Theme settings
 
+msgid "Website title"
+msgstr "Website-Titel"
+
+msgid "Used in the admin bar, emails, and schema."
+msgstr "Wird in der Adminleiste, in E-Mails und im Schema verwendet."
+
 msgid "Site logo"
 msgstr "Website-Logo"
 

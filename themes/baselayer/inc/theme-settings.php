@@ -186,6 +186,7 @@ function bl_theme_settings_save_general_options_from_post(): void
 	];
 
 	$pairs = [
+		'blogname' => 'sanitize_text_field',
 		'baselayer_weekly_report_enabled' => static function ($raw): string {
 			return !empty($raw) ? '1' : '0';
 		},
@@ -1054,6 +1055,7 @@ function theme_settings_page(): void
 
 		<?php if ($tab === 'theme') : ?>
 			<?php
+			$blogname = (string) get_option('blogname', '');
 			$custom_logo_id = (int) get_theme_mod('custom_logo');
 			$custom_logo_url = $custom_logo_id > 0 ? wp_get_attachment_image_url($custom_logo_id, 'medium') : '';
 			$og_fallback_id = (int) get_option('baselayer_og_image_fallback', 0);
@@ -1072,6 +1074,13 @@ function theme_settings_page(): void
 				$bl_show_on_front = ($bl_show_on_front === 'page') ? 'page' : 'posts';
 				?>
 				<table class="form-table" style="margin-top: -8px;" role="presentation">
+					<tr>
+						<th scope="row"><label for="blogname"><?= esc_html__('Website title', 'baselayer') ?></label></th>
+						<td>
+							<input name="blogname" type="text" id="blogname" value="<?= esc_attr($blogname) ?>" class="regular-text">
+							<p class="description"><?= esc_html__('Used in the admin bar, emails, and schema.', 'baselayer') ?></p>
+						</td>
+					</tr>
 					<tr>
 						<th scope="row"><?= esc_html(__('Your homepage displays', 'default')) ?></th>
 						<td>
