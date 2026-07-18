@@ -20,7 +20,7 @@
 
 // Set the icon variables for an icon
 @mixin bl-icon-var($name) {
-  --bl-icon: url('#{$bl-icon-path}/#{$name}.svg');
+  --bl-icon: url('#{$icon-path}/#{$name}.svg');
 }
 
 // Register a single icon by class suffix + explicit file URL
