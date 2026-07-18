@@ -1,18 +1,14 @@
 import { InlineIconControl } from '../icons/inline-icon-control';
 
 const { useBlockProps, InnerBlocks } = wp.blockEditor;
-const { __ } = wp.i18n;
 
 const ICON_SLUG_ATTRIBUTE = 'iconSlug';
 
-const ICON_TEXT_INNER_TEMPLATE = [
-  [
-    'core/paragraph',
-    {
-      content: __('Begleitender Text neben dem Icon.', 'baselayer'),
-    },
-  ],
-];
+// Keep in sync with icon-text.php InnerBlocks allowedBlocks
+const ICON_TEXT_ALLOWED_BLOCKS = ['core/heading', 'core/paragraph', 'core/buttons', 'core/separator'];
+
+// No default inner blocks — editor starts empty
+const ICON_TEXT_INNER_TEMPLATE = [];
 
 const ICON_BLOCKS = {
   'acf/icon': IconBlockEdit,
@@ -64,6 +60,7 @@ function IconTextBlockEdit({ attributes, setAttributes, isSelected }) {
           <div className="icon-text__text-container">
             <div className="icon-text__text">
               <InnerBlocks
+                allowedBlocks={ICON_TEXT_ALLOWED_BLOCKS}
                 template={ICON_TEXT_INNER_TEMPLATE}
                 templateLock={false}
                 renderAppender={isSelected ? InnerBlocks.ButtonBlockAppender : InnerBlocks.DefaultBlockAppender}
