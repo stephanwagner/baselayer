@@ -2718,3 +2718,189 @@ msgctxt "post status"
 msgid "Private"
 msgstr "Privat"
 
+
+# Events – recurrence, occurrences, metadata UI (not CPT field labels from config)
+
+msgid "Recurrence settings"
+msgstr "Wiederholungseinstellungen"
+
+msgid "Not repeating"
+msgstr "Keine Wiederholung"
+
+msgid "Edit recurrence"
+msgstr "Wiederholung bearbeiten"
+
+msgid "Set a start date to create occurrence posts."
+msgstr "Lege ein Startdatum fest, um Termine anzulegen."
+
+msgid "Part of a recurring event."
+msgstr "Teil einer wiederkehrenden Veranstaltung."
+
+msgid "Master:"
+msgstr "Vorlage:"
+
+msgid "Master"
+msgstr "Vorlage"
+
+msgid "Edit in master event"
+msgstr "In der Vorlage bearbeiten"
+
+msgid "%d occurrence"
+msgstr "%d Termin"
+
+msgid "%d occurrences"
+msgstr "%d Termine"
+
+msgid "This occurrence has custom content."
+msgstr "Dieser Termin hat eigenen Inhalt."
+
+msgid "It will not update when the master event changes."
+msgstr "Er wird nicht aktualisiert, wenn sich die Vorlage ändert."
+
+msgid "Revert to master"
+msgstr "Auf Vorlage zurücksetzen"
+
+msgid "Repeats"
+msgstr "Wiederholt sich"
+
+msgid "Every"
+msgstr "Alle"
+
+msgid "On weekday"
+msgstr "An Wochentag"
+
+msgid "Ends"
+msgstr "Endet"
+
+msgid "Never"
+msgstr "Nie"
+
+msgid "On date"
+msgstr "Am Datum"
+
+msgid "After"
+msgstr "Nach"
+
+msgid "occurrences"
+msgstr "Wiederholungen"
+
+msgid "Next occurrences"
+msgstr "Nächste Termine"
+
+msgid "+%d more"
+msgstr "+%d weitere"
+
+msgid "Stop repeating"
+msgstr "Wiederholung beenden"
+
+msgid "Daily"
+msgstr "Täglich"
+
+msgid "Weekly"
+msgstr "Wöchentlich"
+
+msgid "Monthly"
+msgstr "Monatlich"
+
+msgid "Yearly"
+msgstr "Jährlich"
+
+msgid "day(s)"
+msgstr "Tag(e)"
+
+msgid "week(s)"
+msgstr "Woche(n)"
+
+msgid "month(s)"
+msgstr "Monat(e)"
+
+msgid "year(s)"
+msgstr "Jahr(e)"
+
+msgid "Every %d days"
+msgstr "Alle %d Tage"
+
+msgid "Every %d weeks"
+msgstr "Alle %d Wochen"
+
+msgid "Every %d months"
+msgstr "Alle %d Monate"
+
+msgid "Every %d years"
+msgstr "Alle %d Jahre"
+
+msgid "Mon"
+msgstr "Mo"
+
+msgid "Tue"
+msgstr "Di"
+
+msgid "Wed"
+msgstr "Mi"
+
+msgid "Thu"
+msgstr "Do"
+
+msgid "Fri"
+msgstr "Fr"
+
+msgid "Sat"
+msgstr "Sa"
+
+msgid "Sun"
+msgstr "So"
+
+msgid "Edit metadata"
+msgstr "Metadaten bearbeiten"
+
+msgid "No metadata"
+msgstr "Keine Metadaten"
+
+msgid "Event metadata"
+msgstr "Veranstaltungs-Metadaten"
+
+msgid "Edit occurrences"
+msgstr "Termine bearbeiten"
+
+msgid "Occurrence"
+msgstr "Termin"
+
+msgid "Occurrences"
+msgstr "Termine"
+
+msgid "No upcoming occurrences."
+msgstr "Keine bevorstehenden Termine."
+
+msgid "Edit"
+msgstr "Bearbeiten"
+
+msgid "Loading…"
+msgstr "Wird geladen…"
+
+msgid "Custom content"
+msgstr "Eigener Inhalt"
+
+msgid "Could not load occurrences."
+msgstr "Termine konnten nicht geladen werden."
+
+msgid "Not an occurrence."
+msgstr "Kein Termin."
+
+msgid "Not a recurring master event."
+msgstr "Keine wiederkehrende Vorlage."
+
+msgid "Until %s"
+msgstr "Bis %s"
+
+msgid "Download iCal"
+msgstr "iCal herunterladen"
+
+msgid "All events"
+msgstr "Alle Veranstaltungen"
+
+msgid "Organizer: %s"
+msgstr "Veranstalter: %s"
+
+msgid "Contact: %s"
+msgstr "Kontakt: %s"
+
