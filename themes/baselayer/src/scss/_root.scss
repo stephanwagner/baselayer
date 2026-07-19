@@ -144,4 +144,15 @@
   // Editor
   --bl-editor-content-width: #{$editor-content-width};
   --bl-editor-content-padding: #{$editor-content-padding};
+
+  // Admin bar
+  --bl-admin-bar-height: 0px;
+}
+
+body.admin-bar {
+  --bl-admin-bar-height: 32px;
+
+  @media (max-width: 782px) {
+    --bl-admin-bar-height: 46px;
+  }
 }

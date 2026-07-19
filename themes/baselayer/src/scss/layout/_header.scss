@@ -5,20 +5,9 @@
 
 .header__wrapper {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  inset: var(--bl-admin-bar-height) 0 auto;
   z-index: 100;
   background: var(--bl-color-gray-200);
-
-  // Adjust when wordpress admin bar is present
-  .logged-in.admin-bar & {
-    top: 32px;
-
-    @media (max-width: 782px) {
-      top: 46px;
-    }
-  }
 }
 
 .header__placeholder {

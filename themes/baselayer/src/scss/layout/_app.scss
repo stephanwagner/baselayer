@@ -16,18 +16,10 @@ body {
 // Scaffold
 
 .page__wrapper {
-  min-height: 100vh;
+  min-height: calc(100vh - var(--bl-admin-bar-height));
   display: flex;
   flex-direction: column;
   overflow-x: clip;
-
-  .logged-in.admin-bar & {
-    min-height: calc(100vh - 32px);
-
-    @media (max-width: 781px) {
-      min-height: calc(100vh - 46px);
-    }
-  }
 }
 
 .content__wrapper {
