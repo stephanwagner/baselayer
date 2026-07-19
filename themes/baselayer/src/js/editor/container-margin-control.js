@@ -1,9 +1,9 @@
 import {
-  contentMarginSizesForOption,
+  containerMarginSizesForOption,
   displayMarginSize,
   resetMarginSize,
   storedMarginSize,
-} from './content-margin-utils';
+} from './container-margin-utils';
 import { BlockOptionToggleGroupOption } from './block-option-toggle-group-option';
 import { BlockOptionDescription } from './block-option-help';
 
@@ -11,13 +11,13 @@ const { Button } = wp.components;
 const ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
 
 /**
- * Linked top/bottom content margin picker for block options.
+ * Linked top/bottom container margin picker for block options.
  */
-export function ContentMarginControl({ option, attributes, onChange }) {
+export function ContainerMarginControl({ option, attributes, onChange }) {
   const { top, bottom, linked } = option.attributeNames;
   const defaultSize = option.defaultSize ?? '';
   const allowUnset = option.allowUnset === true;
-  const sizes = contentMarginSizesForOption(option);
+  const sizes = containerMarginSizesForOption(option);
   const isLinked = attributes[linked] !== false;
   const topValue = attributes[top] ?? '';
   const bottomValue = attributes[bottom] ?? '';
@@ -75,7 +75,7 @@ export function ContentMarginControl({ option, attributes, onChange }) {
   const renderSizeControl = (sideLabel, value, onSelect, onReset) => {
     const control = ToggleGroupControl ? (
       <ToggleGroupControl
-        className="bl-content-margin__sizes bl-block-option-button-group"
+        className="bl-container-margin__sizes bl-block-option-button-group"
         label={sideLabel}
         hideLabelFromVision
         value={value}
@@ -95,10 +95,10 @@ export function ContentMarginControl({ option, attributes, onChange }) {
     ) : null;
 
     return (
-      <div className="bl-content-margin__field">
-        <div className="bl-content-margin__header">
-          <span className="bl-content-margin__side-label">{sideLabel}</span>
-          <Button variant="link" className="bl-content-margin__reset" onClick={onReset}>
+      <div className="bl-container-margin__field">
+        <div className="bl-container-margin__header">
+          <span className="bl-container-margin__side-label">{sideLabel}</span>
+          <Button variant="link" className="bl-container-margin__reset" onClick={onReset}>
             Reset
           </Button>
         </div>
@@ -108,23 +108,23 @@ export function ContentMarginControl({ option, attributes, onChange }) {
   };
 
   const renderActionButton = (icon, label, onClick, className) => (
-    <Button variant="link" className={'bl-content-margin__action ' + className} onClick={onClick}>
+    <Button variant="link" className={'bl-container-margin__action ' + className} onClick={onClick}>
       <span className={'bl-icon -icon-' + icon} aria-hidden="true" />
       {label}
     </Button>
   );
 
   return (
-    <div className="bl-content-margin">
-      {option.label ? <span className="bl-content-margin__label">{option.label}</span> : null}
+    <div className="bl-container-margin">
+      {option.label ? <span className="bl-container-margin__label">{option.label}</span> : null}
 
       {renderSizeControl(isLinked ? 'Oben und Unten' : 'Oben', displayTop, setTop, resetTop)}
 
       {isLinked
-        ? renderActionButton('link-off', 'Unten', revealBottom, 'bl-content-margin__action--reveal')
+        ? renderActionButton('link-off', 'Unten', revealBottom, 'bl-container-margin__action--reveal')
         : (
           <>
-            {renderActionButton('link', 'Verknüpfen', relink, 'bl-content-margin__action--relink')}
+            {renderActionButton('link', 'Verknüpfen', relink, 'bl-container-margin__action--relink')}
             {renderSizeControl('Unten', displayBottom, setBottom, resetBottom)}
           </>
         )}

@@ -97,7 +97,7 @@ function openAccordion(wrapper, options = {}) {
   wrapper.addClass('accordion-open');
   wrapper.attr('aria-expanded', 'true');
   wrapper.find('.accordion__content').slideDown({
-    duration: config.transitionSpeed,
+    duration: config.transitionDuration,
     queue: false,
     complete: function () {
       if (scrollAfterOpen) {
@@ -117,7 +117,7 @@ function closeAccordion(wrapper) {
   wrapper.removeClass('accordion-open');
   wrapper.attr('aria-expanded', 'false');
   wrapper.find('.accordion__content').slideUp({
-    duration: config.transitionSpeed,
+    duration: config.transitionDuration,
     queue: false,
   });
 }

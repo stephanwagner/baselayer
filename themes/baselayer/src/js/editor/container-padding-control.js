@@ -1,10 +1,10 @@
 import {
-  contentPaddingSizesForOption,
-  contentPaddingAttributeName,
+  containerPaddingSizesForOption,
+  containerPaddingAttributeName,
   displayPaddingSize,
   resetPaddingSize,
   storedPaddingSize,
-} from './content-padding-utils';
+} from './container-padding-utils';
 import { BlockOptionToggleGroupOption } from './block-option-toggle-group-option';
 import { BlockOptionDescription } from './block-option-help';
 
@@ -12,12 +12,12 @@ const { Button } = wp.components;
 const ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
 
 /**
- * Uniform content padding picker for block options.
+ * Uniform container padding picker for block options.
  */
-export function ContentPaddingControl({ option, attributes, onChange }) {
-  const attributeName = contentPaddingAttributeName(option);
+export function ContainerPaddingControl({ option, attributes, onChange }) {
+  const attributeName = containerPaddingAttributeName(option);
   const defaultSize = option.defaultSize ?? 'm';
-  const sizes = contentPaddingSizesForOption(option);
+  const sizes = containerPaddingSizesForOption(option);
   const value = displayPaddingSize(attributes[attributeName] ?? '', false);
 
   const setSize = (pickedSize) => {
@@ -30,7 +30,7 @@ export function ContentPaddingControl({ option, attributes, onChange }) {
 
   const control = ToggleGroupControl ? (
     <ToggleGroupControl
-      className="bl-content-padding__sizes bl-block-option-button-group"
+      className="bl-container-padding__sizes bl-block-option-button-group"
       label={option.label || 'Innenabstand'}
       hideLabelFromVision
       value={value}
@@ -50,10 +50,10 @@ export function ContentPaddingControl({ option, attributes, onChange }) {
   ) : null;
 
   return (
-    <div className="bl-content-padding">
-      <div className="bl-content-padding__header">
-        {option.label ? <span className="bl-content-padding__label">{option.label}</span> : <span />}
-        <Button variant="link" className="bl-content-padding__reset" onClick={reset}>
+    <div className="bl-container-padding">
+      <div className="bl-container-padding__header">
+        {option.label ? <span className="bl-container-padding__label">{option.label}</span> : <span />}
+        <Button variant="link" className="bl-container-padding__reset" onClick={reset}>
           Reset
         </Button>
       </div>

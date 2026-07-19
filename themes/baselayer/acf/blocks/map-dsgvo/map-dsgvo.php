@@ -15,7 +15,7 @@ if (!empty($block['className'])) {
 $classNames[] = 'map-dsgvo__wrapper';
 
 // Add margin class
-$classNames[] = '-content-margin-xs';
+$classNames[] = '-container-margin-xs';
 ?>
 
 <?php if (is_admin()) { ?>

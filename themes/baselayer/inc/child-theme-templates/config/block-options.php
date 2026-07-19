@@ -20,7 +20,7 @@ defined('ABSPATH') || exit;
  *     'my-spacing' => [
  *       'label' => 'My spacing',
  *       'controls' => [
- *         bl_block_options_control_content_margin('m'),
+ *         bl_block_options_control_container_margin('m'),
  *       ],
  *     ],
  *   ],

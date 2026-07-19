@@ -1,7 +1,7 @@
 @use '../config' as *;
 @use '../mixins' as *;
 
-$content-wide-width: $content-width + ($content-container-wide-bleed * 2);
+$content-wide-width: $content-width + ($container-wide-bleed * 2);
 
 // Container
 
@@ -9,19 +9,7 @@ $content-wide-width: $content-width + ($content-container-wide-bleed * 2);
   position: relative;
   margin: auto;
   max-width: var(--bl-content-width);
-  width: calc(100% - var(--bl-content-padding-l) - var(--bl-content-padding-l));
-
-  @media (max-width: $breakpoint-m) {
-    width: calc(100% - var(--bl-content-padding-m) - var(--bl-content-padding-m));
-  }
-
-  @media (max-width: $breakpoint-s) {
-    width: calc(100% - var(--bl-content-padding-s) - var(--bl-content-padding-s));
-  }
-
-  @media (max-width: $breakpoint-xs) {
-    width: calc(100% - var(--bl-content-padding-xs) - var(--bl-content-padding-xs));
-  }
+  width: calc(100% - var(--bl-page-padding-x) - var(--bl-page-padding-x));
 }
 
 // Expand from `.container` by the wide bleed. Reset when wide + 24 + 24 no longer fits.
@@ -54,23 +42,8 @@ $content-wide-width: $content-width + ($content-container-wide-bleed * 2);
   margin-right: calc(var(--bl-alignwide-bleed) * -1);
 
   @media (max-width: $breakpoint-xl) {
-    margin-left: calc(var(--bl-content-padding-l) * -0.5);
-    margin-right: calc(var(--bl-content-padding-l) * -0.5);
-  }
-
-  @media (max-width: $breakpoint-m) {
-    margin-left: calc(var(--bl-content-padding-m) * -0.5);
-    margin-right: calc(var(--bl-content-padding-m) * -0.5);
-  }
-
-  @media (max-width: $breakpoint-s) {
-    margin-left: calc(var(--bl-content-padding-s) * -0.5);
-    margin-right: calc(var(--bl-content-padding-s) * -0.5);
-  }
-
-  @media (max-width: $breakpoint-xs) {
-    margin-left: calc(var(--bl-content-padding-xs) * -0.5);
-    margin-right: calc(var(--bl-content-padding-xs) * -0.5);
+    margin-left: calc(var(--bl-page-padding-x) * -0.5);
+    margin-right: calc(var(--bl-page-padding-x) * -0.5);
   }
 
   &.has-background {
@@ -79,18 +52,8 @@ $content-wide-width: $content-width + ($content-container-wide-bleed * 2);
       padding-right: var(--bl-alignwide-bleed);
 
       @media (max-width: $breakpoint-xl) {
-        padding-left: calc(var(--bl-content-padding-l) * 0.5);
-        padding-right: calc(var(--bl-content-padding-l) * 0.5);
-      }
-    
-      @media (max-width: $breakpoint-m) {
-        padding-left: calc(var(--bl-content-padding-m) * 0.5);
-        padding-right: calc(var(--bl-content-padding-m) * 0.5);
-      }
-    
-      @media (max-width: $breakpoint-s) {
-        padding-left: calc(var(--bl-content-padding-s) * 0.5);
-        padding-right: calc(var(--bl-content-padding-s) * 0.5);
+        padding-left: calc(var(--bl-page-padding-x) * 0.5);
+        padding-right: calc(var(--bl-page-padding-x) * 0.5);
       }
     }
   }
@@ -100,24 +63,9 @@ $content-wide-width: $content-width + ($content-container-wide-bleed * 2);
   margin-left: calc((100vw - var(--bl-content-width)) * -0.5);
   margin-right: calc((100vw - var(--bl-content-width)) * -0.5);
 
-  @media (max-width: calc(#{$content-width} + #{$content-padding-l} + #{$content-padding-l})) {
-    margin-left: calc(var(--bl-content-padding-l) * -1);
-    margin-right: calc(var(--bl-content-padding-l) * -1);
-  }
-
-  @media (max-width: $breakpoint-m) {
-    margin-left: calc(var(--bl-content-padding-m) * -1);
-    margin-right: calc(var(--bl-content-padding-m) * -1);
-  }
-
-  @media (max-width: $breakpoint-s) {
-    margin-left: calc(var(--bl-content-padding-s) * -1);
-    margin-right: calc(var(--bl-content-padding-s) * -1);
-  }
-
-  @media (max-width: $breakpoint-xs) {
-    margin-left: calc(var(--bl-content-padding-xs) * -1);
-    margin-right: calc(var(--bl-content-padding-xs) * -1);
+  @media (max-width: calc(#{$content-width} + #{$page-padding-l} + #{$page-padding-l})) {
+    margin-left: calc(var(--bl-page-padding-x) * -1);
+    margin-right: calc(var(--bl-page-padding-x) * -1);
   }
 
   &.has-background {
@@ -125,24 +73,9 @@ $content-wide-width: $content-width + ($content-container-wide-bleed * 2);
       padding-left: calc((100vw - var(--bl-content-width)) * 0.5);
       padding-right: calc((100vw - var(--bl-content-width)) * 0.5);
 
-      @media (max-width: calc(#{$content-width} + #{$content-padding-l} + #{$content-padding-l})) {
-        padding-left: calc(var(--bl-content-padding-l));
-        padding-right: calc(var(--bl-content-padding-l));
-      }
-
-      @media (max-width: $breakpoint-m) {
-        padding-left: calc(var(--bl-content-padding-m));
-        padding-right: calc(var(--bl-content-padding-m));
-      }
-
-      @media (max-width: $breakpoint-s) {
-        padding-left: calc(var(--bl-content-padding-s));
-        padding-right: calc(var(--bl-content-padding-s));
-      }
-
-      @media (max-width: $breakpoint-xs) {
-        padding-left: calc(var(--bl-content-padding-xs));
-        padding-right: calc(var(--bl-content-padding-xs));
+      @media (max-width: calc(#{$content-width} + #{$page-padding-l} + #{$page-padding-l})) {
+        padding-left: var(--bl-page-padding-x);
+        padding-right: var(--bl-page-padding-x);
       }
     }
   }

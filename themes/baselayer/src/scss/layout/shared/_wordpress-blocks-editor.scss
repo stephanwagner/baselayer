@@ -1,7 +1,7 @@
 @use '../../config' as *;
 @use '../wordpress-blocks' as *;
 
-$editor-content-width-outer: $editor-content-width + ($editor-content-width-padding * 2);
+$editor-content-width-outer: $editor-content-width + ($editor-content-padding * 2);
 
 .editor-styles-wrapper {
   @include wordpress-blocks();

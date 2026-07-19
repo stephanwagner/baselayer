@@ -53,14 +53,14 @@ const ROOT_VAR_MAP = [
     fallback: 64,
   },
   {
-    key: 'transitionSpeed',
-    prop: '--bl-transition-speed',
+    key: 'transitionDuration',
+    prop: '--bl-transition-duration',
     parse: 'unit',
     fallback: 240,
   },
   {
-    key: 'transitionSpeedSlow',
-    prop: '--bl-transition-speed-slow',
+    key: 'transitionDurationSlow',
+    prop: '--bl-transition-duration-slow',
     parse: 'unit',
     fallback: 360,
   },

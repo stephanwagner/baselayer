@@ -2,68 +2,69 @@
 @use '../mixins' as *;
 @use 'sass:map';
 
-// Content margin mixin
+// Container margin mixin
 
-@mixin content-margin($top: null, $bottom: null, $responsive: ()) {
-  // Base
-  @if $top !=null {
-    margin-top: $top;
+@mixin container-margin($top: null, $bottom: null, $responsive: ()) {
+  @if $top != null {
+    --bl-container-margin-top: #{$top};
+    margin-top: var(--bl-container-margin-top);
 
     &:first-child {
       margin-top: 0;
     }
   }
 
-  @if $bottom !=null {
-    margin-bottom: $bottom;
+  @if $bottom != null {
+    --bl-container-margin-bottom: #{$bottom};
+    margin-bottom: var(--bl-container-margin-bottom);
 
     &:last-child {
       margin-bottom: 0;
     }
   }
 
-  // Responsive
   @each $breakpoint, $values in $responsive {
     @media (max-width: $breakpoint) {
       @if map.has-key($values, top) {
-        margin-top: map.get($values, top);
+        --bl-container-margin-top: #{map.get($values, top)};
       }
 
       @if map.has-key($values, bottom) {
-        margin-bottom: map.get($values, bottom);
+        --bl-container-margin-bottom: #{map.get($values, bottom)};
       }
     }
   }
 }
 
-// Content padding mixin
+// Container padding mixin
 
-@mixin block-content-padding($y: null, $x: null, $responsive: ()) {
-  @if $x !=null {
-    padding-left: $x;
-    padding-right: $x;
+@mixin block-container-padding($y: null, $x: null, $responsive: ()) {
+  @if $x != null {
+    --bl-container-padding-x: #{$x};
+    padding-left: var(--bl-container-padding-x);
+    padding-right: var(--bl-container-padding-x);
   }
 
-  @if $y !=null {
-    padding-top: $y;
-    padding-bottom: $y;
+  @if $y != null {
+    --bl-container-padding-y: #{$y};
+    padding-top: var(--bl-container-padding-y);
+    padding-bottom: var(--bl-container-padding-y);
   }
 
   @each $breakpoint, $values in $responsive {
     @media (max-width: $breakpoint) {
       @if map.has-key($values, x) {
-        padding-left: map.get($values, x);
-        padding-right: map.get($values, x);
+        --bl-container-padding-x: #{map.get($values, x)};
       }
+
       @if map.has-key($values, y) {
-        padding-top: map.get($values, y);
-        padding-bottom: map.get($values, y);
+        --bl-container-padding-y: #{map.get($values, y)};
       }
     }
   }
 }
 
-@mixin content-padding-targets {
+@mixin container-padding-targets {
   &.wp-block-group {
     @content;
   }
@@ -593,77 +594,77 @@
 
   // Content margin top and bottom
 
-  .-content-margin-none {
-    @include content-margin(0, 0);
+  .-container-margin-none {
+    @include container-margin(0, 0);
   }
 
-  .-content-margin-xs {
-    @include content-margin(var(--bl-content-margin-xs), var(--bl-content-margin-xs));
+  .-container-margin-xs {
+    @include container-margin(var(--bl-container-margin-xs), var(--bl-container-margin-xs));
   }
 
-  .-content-margin-s {
-    @include content-margin(
-      var(--bl-content-margin-s),
-      var(--bl-content-margin-s),
+  .-container-margin-s {
+    @include container-margin(
+      var(--bl-container-margin-s),
+      var(--bl-container-margin-s),
       (
         $breakpoint-xs: (
-          top: var(--bl-content-margin-xs),
-          bottom: var(--bl-content-margin-xs),
+          top: var(--bl-container-margin-xs),
+          bottom: var(--bl-container-margin-xs),
         ),
       )
     );
   }
 
-  .-content-margin-m {
-    @include content-margin(
-      var(--bl-content-margin-m),
-      var(--bl-content-margin-m),
+  .-container-margin-m {
+    @include container-margin(
+      var(--bl-container-margin-m),
+      var(--bl-container-margin-m),
       (
         $breakpoint-s: (
-          top: var(--bl-content-margin-s),
-          bottom: var(--bl-content-margin-s),
+          top: var(--bl-container-margin-s),
+          bottom: var(--bl-container-margin-s),
         ),
         $breakpoint-xs: (
-          top: var(--bl-content-margin-xs),
-          bottom: var(--bl-content-margin-xs),
+          top: var(--bl-container-margin-xs),
+          bottom: var(--bl-container-margin-xs),
         ),
       )
     );
   }
 
-  .-content-margin-l {
-    @include content-margin(
-      var(--bl-content-margin-l),
-      var(--bl-content-margin-l),
+  .-container-margin-l {
+    @include container-margin(
+      var(--bl-container-margin-l),
+      var(--bl-container-margin-l),
       (
         $breakpoint-m: (
-          top: var(--bl-content-margin-m),
-          bottom: var(--bl-content-margin-m),
+          top: var(--bl-container-margin-m),
+          bottom: var(--bl-container-margin-m),
         ),
         $breakpoint-s: (
-          top: var(--bl-content-margin-s),
-          bottom: var(--bl-content-margin-s),
+          top: var(--bl-container-margin-s),
+          bottom: var(--bl-container-margin-s),
         ),
       )
     );
   }
 
-  .-content-margin-xl {
-    @include content-margin(
-      var(--bl-content-margin-xl),
-      var(--bl-content-margin-xl),
+  .-container-margin-xl {
+    @include container-margin(
+      var(--bl-container-margin-xl),
+      var(--bl-container-margin-xl),
       (
         $breakpoint-l: (
-          top: var(--bl-content-margin-l),
-          bottom: var(--bl-content-margin-l),
+          top: var(--bl-container-margin-l),
+          bottom: var(--bl-container-margin-l),
         ),
         $breakpoint-m: (
-          top: var(--bl-content-margin-m),
-          bottom: var(--bl-content-margin-m),
+          top: var(--bl-container-margin-m),
+          bottom: var(--bl-container-margin-m),
         ),
         $breakpoint-s: (
-          top: var(--bl-content-margin-s),
-          bottom: var(--bl-content-margin-s),
+          top: var(--bl-container-margin-s),
+          bottom: var(--bl-container-margin-s),
         ),
       )
     );
@@ -671,69 +672,69 @@
 
   // Content margin top
 
-  .-content-margin-top-none {
-    @include content-margin(0, null);
+  .-container-margin-top-none {
+    @include container-margin(0, null);
   }
 
-  .-content-margin-top-xs {
-    @include content-margin(var(--bl-content-margin-xs), null);
+  .-container-margin-top-xs {
+    @include container-margin(var(--bl-container-margin-xs), null);
   }
 
-  .-content-margin-top-s {
-    @include content-margin(
-      var(--bl-content-margin-s),
+  .-container-margin-top-s {
+    @include container-margin(
+      var(--bl-container-margin-s),
       null,
       (
         $breakpoint-xs: (
-          top: var(--bl-content-margin-xs),
+          top: var(--bl-container-margin-xs),
         ),
       )
     );
   }
 
-  .-content-margin-top-m {
-    @include content-margin(
-      var(--bl-content-margin-m),
+  .-container-margin-top-m {
+    @include container-margin(
+      var(--bl-container-margin-m),
       null,
       (
         $breakpoint-s: (
-          top: var(--bl-content-margin-s),
+          top: var(--bl-container-margin-s),
         ),
         $breakpoint-xs: (
-          top: var(--bl-content-margin-xs),
+          top: var(--bl-container-margin-xs),
         ),
       )
     );
   }
 
-  .-content-margin-top-l {
-    @include content-margin(
-      var(--bl-content-margin-l),
+  .-container-margin-top-l {
+    @include container-margin(
+      var(--bl-container-margin-l),
       null,
       (
         $breakpoint-m: (
-          top: var(--bl-content-margin-m),
+          top: var(--bl-container-margin-m),
         ),
         $breakpoint-s: (
-          top: var(--bl-content-margin-s),
+          top: var(--bl-container-margin-s),
         ),
       )
     );
   }
 
-  .-content-margin-top-xl {
-    @include content-margin(
-      var(--bl-content-margin-xl),
+  .-container-margin-top-xl {
+    @include container-margin(
+      var(--bl-container-margin-xl),
       null,
       (
         $breakpoint-l: (
-          top: var(--bl-content-margin-l),
+          top: var(--bl-container-margin-l),
         ),
         $breakpoint-m: (
-          top: var(--bl-content-margin-m),
+          top: var(--bl-container-margin-m),
         ),
         $breakpoint-s: (
-          top: var(--bl-content-margin-s),
+          top: var(--bl-container-margin-s),
         ),
       )
     );
@@ -741,166 +742,166 @@
 
   // Content margin bottom
 
-  .-content-margin-bottom-none {
-    @include content-margin(null, 0);
+  .-container-margin-bottom-none {
+    @include container-margin(null, 0);
   }
 
-  .-content-margin-bottom-xs {
-    @include content-margin(null, var(--bl-content-margin-xs));
+  .-container-margin-bottom-xs {
+    @include container-margin(null, var(--bl-container-margin-xs));
   }
 
-  .-content-margin-bottom-s {
-    @include content-margin(
+  .-container-margin-bottom-s {
+    @include container-margin(
       null,
-      var(--bl-content-margin-s),
+      var(--bl-container-margin-s),
       (
         $breakpoint-xs: (
-          bottom: var(--bl-content-margin-xs),
+          bottom: var(--bl-container-margin-xs),
         ),
       )
     );
   }
 
-  .-content-margin-bottom-m {
-    @include content-margin(
+  .-container-margin-bottom-m {
+    @include container-margin(
       null,
-      var(--bl-content-margin-m),
+      var(--bl-container-margin-m),
       (
         $breakpoint-s: (
-          bottom: var(--bl-content-margin-s),
+          bottom: var(--bl-container-margin-s),
         ),
         $breakpoint-xs: (
-          bottom: var(--bl-content-margin-xs),
+          bottom: var(--bl-container-margin-xs),
         ),
       )
     );
   }
 
-  .-content-margin-bottom-l {
-    @include content-margin(
+  .-container-margin-bottom-l {
+    @include container-margin(
       null,
-      var(--bl-content-margin-l),
+      var(--bl-container-margin-l),
       (
         $breakpoint-m: (
-          bottom: var(--bl-content-margin-m),
+          bottom: var(--bl-container-margin-m),
         ),
         $breakpoint-s: (
-          bottom: var(--bl-content-margin-s),
+          bottom: var(--bl-container-margin-s),
         ),
       )
     );
   }
 
-  .-content-margin-bottom-xl {
-    @include content-margin(
+  .-container-margin-bottom-xl {
+    @include container-margin(
       null,
-      var(--bl-content-margin-xl),
+      var(--bl-container-margin-xl),
       (
         $breakpoint-l: (
-          bottom: var(--bl-content-margin-l),
+          bottom: var(--bl-container-margin-l),
         ),
         $breakpoint-m: (
-          bottom: var(--bl-content-margin-m),
+          bottom: var(--bl-container-margin-m),
         ),
         $breakpoint-s: (
-          bottom: var(--bl-content-margin-s),
+          bottom: var(--bl-container-margin-s),
         ),
       )
     );
   }
 
-  // Content padding (group wrapper / cover inner container)
+  // Container padding (group wrapper / cover inner container)
 
-  .-content-padding-none {
-    @include content-padding-targets {
-      @include block-content-padding(0, 0);
+  .-container-padding-none {
+    @include container-padding-targets {
+      @include block-container-padding(0, 0);
     }
   }
 
-  .-content-padding-xs {
-    @include content-padding-targets {
-      @include block-content-padding(var(--bl-content-padding-xs), var(--bl-content-padding-xs));
+  .-container-padding-xs {
+    @include container-padding-targets {
+      @include block-container-padding(var(--bl-container-padding-xs), var(--bl-container-padding-xs));
     }
   }
 
-  .-content-padding-s {
-    @include content-padding-targets {
-      @include block-content-padding(
-        var(--bl-content-padding-s),
-        var(--bl-content-padding-s),
+  .-container-padding-s {
+    @include container-padding-targets {
+      @include block-container-padding(
+        var(--bl-container-padding-s),
+        var(--bl-container-padding-s),
         (
           $breakpoint-xs: (
-            x: var(--bl-content-padding-xs),
-            y: var(--bl-content-padding-xs),
+            x: var(--bl-container-padding-xs),
+            y: var(--bl-container-padding-xs),
           ),
         )
       );
     }
   }
 
-  .-content-padding-m {
-    @include content-padding-targets {
-      @include block-content-padding(
-        var(--bl-content-padding-m),
-        var(--bl-content-padding-m),
+  .-container-padding-m {
+    @include container-padding-targets {
+      @include block-container-padding(
+        var(--bl-container-padding-m),
+        var(--bl-container-padding-m),
         (
           $breakpoint-s: (
-            x: var(--bl-content-padding-s),
-            y: var(--bl-content-padding-s),
+            x: var(--bl-container-padding-s),
+            y: var(--bl-container-padding-s),
           ),
           $breakpoint-xs: (
-            x: var(--bl-content-padding-xs),
-            y: var(--bl-content-padding-xs),
+            x: var(--bl-container-padding-xs),
+            y: var(--bl-container-padding-xs),
           ),
         )
       );
     }
   }
 
-  .-content-padding-l {
-    @include content-padding-targets {
-      @include block-content-padding(
-        var(--bl-content-padding-l),
-        var(--bl-content-padding-l),
+  .-container-padding-l {
+    @include container-padding-targets {
+      @include block-container-padding(
+        var(--bl-container-padding-l),
+        var(--bl-container-padding-l),
         (
           $breakpoint-m: (
-            x: var(--bl-content-padding-m),
-            y: var(--bl-content-padding-m),
+            x: var(--bl-container-padding-m),
+            y: var(--bl-container-padding-m),
           ),
           $breakpoint-s: (
-            x: var(--bl-content-padding-s),
-            y: var(--bl-content-padding-s),
+            x: var(--bl-container-padding-s),
+            y: var(--bl-container-padding-s),
           ),
           $breakpoint-xs: (
-            x: var(--bl-content-padding-xs),
-            y: var(--bl-content-padding-xs),
+            x: var(--bl-container-padding-xs),
+            y: var(--bl-container-padding-xs),
           ),
         )
       );
     }
   }
 
-  .-content-padding-xl {
-    @include content-padding-targets {
-      @include block-content-padding(
-        var(--bl-content-padding-xl),
-        var(--bl-content-padding-xl),
+  .-container-padding-xl {
+    @include container-padding-targets {
+      @include block-container-padding(
+        var(--bl-container-padding-xl),
+        var(--bl-container-padding-xl),
         (
           $breakpoint-l: (
-            x: var(--bl-content-padding-m),
-            y: var(--bl-content-padding-l),
+            x: var(--bl-container-padding-m),
+            y: var(--bl-container-padding-l),
           ),
           $breakpoint-m: (
-            x: var(--bl-content-padding-m),
-            y: var(--bl-content-padding-m),
+            x: var(--bl-container-padding-m),
+            y: var(--bl-container-padding-m),
           ),
           $breakpoint-s: (
-            x: var(--bl-content-padding-s),
-            y: var(--bl-content-padding-s),
+            x: var(--bl-container-padding-s),
+            y: var(--bl-container-padding-s),
           ),
           $breakpoint-xs: (
-            x: var(--bl-content-padding-xs),
-            y: var(--bl-content-padding-xs),
+            x: var(--bl-container-padding-xs),
+            y: var(--bl-container-padding-xs),
           ),
         )
       );
@@ -917,45 +918,45 @@
     }
 
     &.-spacer-height-xs {
-      @include spacer-responsive-height(var(--bl-content-margin-xs));
+      @include spacer-responsive-height(var(--bl-container-margin-xs));
     }
 
     &.-spacer-height-s {
       @include spacer-responsive-height(
-        var(--bl-content-margin-s),
+        var(--bl-container-margin-s),
         (
-          $breakpoint-xs: var(--bl-content-margin-xs),
+          $breakpoint-xs: var(--bl-container-margin-xs),
         )
       );
     }
 
     &.-spacer-height-m {
       @include spacer-responsive-height(
-        var(--bl-content-margin-m),
+        var(--bl-container-margin-m),
         (
-          $breakpoint-s: var(--bl-content-margin-s),
-          $breakpoint-xs: var(--bl-content-margin-xs),
+          $breakpoint-s: var(--bl-container-margin-s),
+          $breakpoint-xs: var(--bl-container-margin-xs),
         )
       );
     }
 
     &.-spacer-height-l {
       @include spacer-responsive-height(
-        var(--bl-content-margin-l),
+        var(--bl-container-margin-l),
         (
-          $breakpoint-m: var(--bl-content-margin-m),
-          $breakpoint-s: var(--bl-content-margin-s),
+          $breakpoint-m: var(--bl-container-margin-m),
+          $breakpoint-s: var(--bl-container-margin-s),
         )
       );
     }
 
     &.-spacer-height-xl {
       @include spacer-responsive-height(
-        var(--bl-content-margin-xl),
+        var(--bl-container-margin-xl),
         (
-          $breakpoint-l: var(--bl-content-margin-l),
-          $breakpoint-m: var(--bl-content-margin-m),
-          $breakpoint-s: var(--bl-content-margin-s),
+          $breakpoint-l: var(--bl-container-margin-l),
+          $breakpoint-m: var(--bl-container-margin-m),
+          $breakpoint-s: var(--bl-container-margin-s),
         )
       );
     }

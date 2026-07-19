@@ -34,7 +34,7 @@ $archive_type = bl_archive_cpt_type();
 			$has_category_filter = bl_archive_has_category_filter($archive_post_type);
 			?>
 
-			<div class="article-list__wrapper -content-margin-m">
+			<div class="article-list__wrapper -container-margin-m">
 			<h1 class="article-list__title<?= $has_category_filter ? ' -has-category-filter' : '' ?>">
 				<span class="article-list__title-text"><?= wp_kses_post($archive_heading) ?></span>
 

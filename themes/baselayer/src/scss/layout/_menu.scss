@@ -15,10 +15,10 @@
   min-width: 220px;
   pointer-events: none;
   transition:
-    top var(--bl-transition-speed),
-    opacity var(--bl-transition-speed),
-    transform var(--bl-transition-speed),
-    visibility 0s linear var(--bl-transition-speed);
+    top var(--bl-transition-duration),
+    opacity var(--bl-transition-duration),
+    transform var(--bl-transition-duration),
+    visibility 0s linear var(--bl-transition-duration);
 
   body.-scrolled & {
     top: calc(100% + 12px);
@@ -46,8 +46,8 @@
   pointer-events: all;
   visibility: visible;
   transition:
-    opacity var(--bl-transition-speed),
-    transform var(--bl-transition-speed),
+    opacity var(--bl-transition-duration),
+    transform var(--bl-transition-duration),
     visibility 0s;
 }
 
@@ -142,11 +142,11 @@
     display: block;
     top: calc(100% + 8px);
     width: var(--bl-mobile-menu-width);
-    right: calc(var(--bl-content-padding-l) * -1 + 8px - 24px);
+    right: calc(var(--bl-page-padding-x) * -1 + 8px - 24px);
     background: #fff;
     margin: 0;
     height: calc(100vh - var(--bl-header-height) - 8px - 8px);
-    padding: 24px var(--bl-content-padding-l) 24px 32px;
+    padding: 24px var(--bl-page-padding-x) 24px 32px;
     border-radius: var(--bl-border-radius-m);
     pointer-events: none;
     visibility: hidden;
@@ -154,9 +154,9 @@
 
     body.-transition-init & {
       transition:
-        right var(--bl-transition-speed),
-        opacity var(--bl-transition-speed),
-        visibility 0s linear var(--bl-transition-speed);
+        right var(--bl-transition-duration),
+        opacity var(--bl-transition-duration),
+        visibility 0s linear var(--bl-transition-duration);
     }
 
     body.-scrolled & {
@@ -179,43 +179,22 @@
       }
     }
 
-    @media (max-width: $breakpoint-m) {
-      padding-right: var(--bl-content-padding-m);
-      right: calc(var(--bl-content-padding-m) * -1 + 8px - 24px);
-    }
-
     @media (max-width: $breakpoint-s) {
-      padding-right: var(--bl-content-padding-s);
       padding-left: 24px;
-      right: calc(var(--bl-content-padding-s) * -1 + 8px - 24px);
     }
 
     @media (max-width: $breakpoint-xs) {
-      padding-right: var(--bl-content-padding-xs);
       width: calc(100vw - 8px - 8px);
-      right: calc(var(--bl-content-padding-xs) * -1 + 8px - 24px);
     }
 
     body.-menu-open & {
       visibility: visible;
       pointer-events: all;
       opacity: 1;
-      right: calc(var(--bl-content-padding-l) * -1 + 8px);
+      right: calc(var(--bl-page-padding-x) * -1 + 8px);
       transition:
-        right var(--bl-transition-speed),
+        right var(--bl-transition-duration),
         visibility 0s;
-
-      @media (max-width: $breakpoint-m) {
-        right: calc(var(--bl-content-padding-m) * -1 + 8px);
-      }
-
-      @media (max-width: $breakpoint-s) {
-        right: calc(var(--bl-content-padding-s) * -1 + 8px);
-      }
-
-      @media (max-width: $breakpoint-xs) {
-        right: calc(var(--bl-content-padding-xs) * -1 + 8px);
-      }
     }
   }
 }

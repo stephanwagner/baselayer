@@ -140,7 +140,7 @@ function bl_theme_json_layout_sizes(): array
 	}
 
 	$content = (int) ($layout['editor_content_width'] ?? 840);
-	$bleed = (int) ($layout['wide_bleed'] ?? 32);
+	$bleed = (int) ($layout['alignwide_bleed'] ?? 32);
 
 	if ($content <= 0) {
 		$content = 840;
@@ -172,7 +172,7 @@ function bl_theme_json_root_spacing(): array
 		$layout = [];
 	}
 
-	$padding_x = (int) ($layout['editor_padding_x'] ?? 24);
+	$padding_x = (int) ($layout['editor_content_padding'] ?? 24);
 	if ($padding_x < 0) {
 		$padding_x = 24;
 	}

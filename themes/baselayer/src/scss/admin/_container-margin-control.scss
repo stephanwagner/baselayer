@@ -1,11 +1,11 @@
 @use '../config' as *;
 @use '../mixins' as *;
 
-.bl-content-margin {
+.bl-container-margin {
   margin-bottom: 0;
 }
 
-.bl-content-margin__label {
+.bl-container-margin__label {
   display: block;
   margin-bottom: 6px;
   font-size: 11px;
@@ -14,7 +14,7 @@
   text-transform: uppercase;
 }
 
-.bl-content-margin__header {
+.bl-container-margin__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -22,13 +22,13 @@
   margin-bottom: 8px;
 }
 
-.bl-content-margin__side-label {
+.bl-container-margin__side-label {
   font-size: 13px;
   font-weight: 500;
   line-height: 1.4;
 }
 
-.bl-content-margin__reset.components-button.is-link {
+.bl-container-margin__reset.components-button.is-link {
   height: auto;
   margin: 0;
   padding: 0;
@@ -38,16 +38,16 @@
   text-decoration: none;
 }
 
-.bl-content-margin__sizes.components-toggle-group-control {
+.bl-container-margin__sizes.components-toggle-group-control {
   width: 100%;
 }
 
-.bl-content-margin__field + .bl-content-margin__action,
-.bl-content-margin__action + .bl-content-margin__field {
+.bl-container-margin__field + .bl-container-margin__action,
+.bl-container-margin__action + .bl-container-margin__field {
   margin-top: 4px;
 }
 
-.bl-content-margin__action.components-button.is-link {
+.bl-container-margin__action.components-button.is-link {
   display: inline-flex;
   align-items: center;
   gap: 6px;
@@ -62,7 +62,7 @@
   }
 }
 
-.bl-content-margin__action--relink {
+.bl-container-margin__action--relink {
   margin-bottom: 4px;
 }
 

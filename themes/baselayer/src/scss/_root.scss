@@ -68,19 +68,41 @@
   --bl-button-white-background-color: var(--bl-color-white);
   --bl-button-white-background-color-hover: var(--bl-color-gray-200);
 
-  // Padding
-  --bl-content-padding-xs: #{$content-padding-xs};
-  --bl-content-padding-m: #{$content-padding-m};
-  --bl-content-padding-s: #{$content-padding-s};
-  --bl-content-padding-l: #{$content-padding-l};
-  --bl-content-padding-xl: #{$content-padding-xl};
+  // Page paddings (page gutters)
+  --bl-page-padding-xs: #{$page-padding-xs};
+  --bl-page-padding-s: #{$page-padding-s};
+  --bl-page-padding-m: #{$page-padding-m};
+  --bl-page-padding-l: #{$page-padding-l};
+  --bl-page-padding-xl: #{$page-padding-xl};
 
-  // Margins
-  --bl-content-margin-xs: #{$content-margin-xs};
-  --bl-content-margin-s: #{$content-margin-s};
-  --bl-content-margin-m: #{$content-margin-m};
-  --bl-content-margin-l: #{$content-margin-l};
-  --bl-content-margin-xl: #{$content-margin-xl};
+  // Current page gutter (steps with breakpoints; matches .container)
+  --bl-page-padding-x: var(--bl-page-padding-l);
+
+  @media (max-width: #{$breakpoint-m}) {
+    --bl-page-padding-x: var(--bl-page-padding-m);
+  }
+
+  @media (max-width: #{$breakpoint-s}) {
+    --bl-page-padding-x: var(--bl-page-padding-s);
+  }
+
+  @media (max-width: #{$breakpoint-xs}) {
+    --bl-page-padding-x: var(--bl-page-padding-xs);
+  }
+
+  // Container paddings (block content padding)
+  --bl-container-padding-xs: #{$container-padding-xs};
+  --bl-container-padding-s: #{$container-padding-s};
+  --bl-container-padding-m: #{$container-padding-m};
+  --bl-container-padding-l: #{$container-padding-l};
+  --bl-container-padding-xl: #{$container-padding-xl};
+
+  // Container margins
+  --bl-container-margin-xs: #{$container-margin-xs};
+  --bl-container-margin-s: #{$container-margin-s};
+  --bl-container-margin-m: #{$container-margin-m};
+  --bl-container-margin-l: #{$container-margin-l};
+  --bl-container-margin-xl: #{$container-margin-xl};
 
   // Content
   --bl-content-width: #{$content-width};
@@ -89,8 +111,8 @@
   --bl-content-width-extra-narrow: #{$content-width-extra-narrow};
 
   // Content bleeds
-  --bl-container-wide-bleed: #{$content-container-wide-bleed};
-  --bl-alignwide-bleed: #{$content-alignwide-bleed};
+  --bl-container-wide-bleed: #{$container-wide-bleed};
+  --bl-alignwide-bleed: #{$alignwide-bleed};
 
   // Breakpoints
   --bl-breakpoint-xs: #{$breakpoint-xs};
@@ -111,8 +133,8 @@
   --bl-mobile-menu-width: #{$mobile-menu-width};
 
   // Transitions
-  --bl-transition-speed: #{$transition-speed};
-  --bl-transition-speed-slow: #{$transition-speed-slow};
+  --bl-transition-duration: #{$transition-duration};
+  --bl-transition-duration-slow: #{$transition-duration-slow};
 
   // Border radius
   --bl-border-radius-s: #{$border-radius-s};
@@ -121,5 +143,5 @@
 
   // Editor
   --bl-editor-content-width: #{$editor-content-width};
-  --bl-editor-content-width-padding: #{$editor-content-width-padding};
+  --bl-editor-content-padding: #{$editor-content-padding};
 }

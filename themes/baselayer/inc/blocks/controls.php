@@ -3,41 +3,41 @@
 defined('ABSPATH') || exit;
 
 /**
- * Linked top/bottom content margin control.
+ * Linked top/bottom container margin control.
  *
  * @param string $default Combined default size token, e.g. `m` or ''.
  * @return array<string, mixed>
  */
-function bl_block_options_control_content_margin(string $default = ''): array
+function bl_block_options_control_container_margin(string $default = ''): array
 {
 	$default_size = preg_match('/^(none|xs|s|m|l|xl)$/', $default) ? $default : '';
 
 	return [
-		'type' => 'content-margin',
+		'type' => 'container-margin',
 		'label' => 'Abstände',
 		'defaultSize' => $default_size,
 		'allowUnset' => $default_size === '',
 		'attributeNames' => [
-			'top' => 'contentMarginTop',
-			'bottom' => 'contentMarginBottom',
-			'linked' => 'contentMarginLinked',
+			'top' => 'containerMarginTop',
+			'bottom' => 'containerMarginBottom',
+			'linked' => 'containerMarginLinked',
 		],
 	];
 }
 
 /**
- * Uniform content padding control.
+ * Uniform container padding control.
  *
  * @return array<string, mixed>
  */
-function bl_block_options_control_content_padding(string $default = 'm'): array
+function bl_block_options_control_container_padding(string $default = 'm'): array
 {
 	return [
-		'type' => 'content-padding',
+		'type' => 'container-padding',
 		'label' => 'Innenabstand',
 		'defaultSize' => $default,
 		'allowUnset' => false,
-		'attributeName' => 'contentPadding',
+		'attributeName' => 'containerPadding',
 	];
 }
 

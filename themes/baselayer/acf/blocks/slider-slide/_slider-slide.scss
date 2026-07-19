@@ -52,26 +52,10 @@
   position: absolute;
   inset: 0;
   z-index: 3;
-  padding: 0 var(--bl-content-padding-xl);
+  padding: 0 var(--bl-page-padding-x);
   align-items: center;
   display: none;
   color: #fff;
-
-  @media (max-width: $breakpoint-l) {
-    padding: 0 var(--bl-content-padding-l);
-  }
-
-  @media (max-width: $breakpoint-m) {
-    padding: 0 var(--bl-content-padding-m);
-  }
-
-  @media (max-width: $breakpoint-s) {
-    padding: 0 var(--bl-content-padding-s);
-  }
-
-  @media (max-width: $breakpoint-xs) {
-    padding: 0 var(--bl-content-padding-xs);
-  }
 
   .slider__wrapper[data-slider-has-content='true'] & {
     display: flex;

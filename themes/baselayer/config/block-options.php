@@ -16,34 +16,34 @@ defined('ABSPATH') || exit;
  */
 return [
 	'presets' => [
-		'content-margin' => [
+		'container-margin' => [
 			'label' => 'Abstand',
 			'controls' => [
-				bl_block_options_control_content_margin(''),
+				bl_block_options_control_container_margin(''),
 			],
 		],
-		'content-margin-m' => [
+		'container-margin-m' => [
 			'label' => 'Abstand (M)',
 			'controls' => [
-				bl_block_options_control_content_margin('m'),
+				bl_block_options_control_container_margin('m'),
 			],
 		],
-		'content-padding-m' => [
+		'container-padding-m' => [
 			'label' => 'Innenabstand (M)',
 			'controls' => [
-				bl_block_options_control_content_padding('m'),
+				bl_block_options_control_container_padding('m'),
 			],
 		],
-		'content-padding-l' => [
+		'container-padding-l' => [
 			'label' => 'Innenabstand (L)',
 			'controls' => [
-				bl_block_options_control_content_padding('l'),
+				bl_block_options_control_container_padding('l'),
 			],
 		],
-		'content-padding-xl' => [
+		'container-padding-xl' => [
 			'label' => 'Innenabstand (XL)',
 			'controls' => [
-				bl_block_options_control_content_padding('xl'),
+				bl_block_options_control_container_padding('xl'),
 			],
 		],
 		'limit-width' => [
@@ -318,7 +318,7 @@ return [
 
 	'assignments' => [
 		// Columns
-		['preset' => 'content-margin-m', 'blocks' => ['core/columns'], 'target' => 'block_option'],
+		['preset' => 'container-margin-m', 'blocks' => ['core/columns'], 'target' => 'block_option'],
 		['preset' => 'limit-width', 'blocks' => ['core/columns'], 'target' => 'block_option'],
 		['preset' => 'columns-layout', 'blocks' => ['core/columns'], 'target' => 'block_option'],
 
@@ -328,63 +328,63 @@ return [
 
 		// Heading
 		['preset' => 'heading-show-as', 'blocks' => ['core/heading'], 'target' => 'block_option'],
-		['preset' => 'content-margin', 'blocks' => ['core/heading'], 'target' => 'block_option'],
+		['preset' => 'container-margin', 'blocks' => ['core/heading'], 'target' => 'block_option'],
 		['preset' => 'limit-width', 'blocks' => ['core/heading'], 'target' => 'block_option'],
 		['preset' => 'text-wrap', 'blocks' => ['core/heading'], 'target' => 'block_option'],
 
 		// Paragraph
-		['preset' => 'content-margin', 'blocks' => ['core/paragraph'], 'target' => 'block_option'],
+		['preset' => 'container-margin', 'blocks' => ['core/paragraph'], 'target' => 'block_option'],
 		['preset' => 'limit-width', 'blocks' => ['core/paragraph'], 'target' => 'block_option'],
 		['preset' => 'text-wrap', 'blocks' => ['core/paragraph'], 'target' => 'block_option'],
 
 		// Image
 		['preset' => 'align-wide-container', 'blocks' => ['core/image'], 'target' => 'block_option'],
-		['preset' => 'content-margin', 'blocks' => ['core/image'], 'target' => 'block_option'],
+		['preset' => 'container-margin', 'blocks' => ['core/image'], 'target' => 'block_option'],
 		['preset' => 'image-extras', 'blocks' => ['core/image'], 'target' => 'block_option'],
 
 		// Video
-		['preset' => 'content-margin', 'blocks' => ['core/video'], 'target' => 'block_option'],
+		['preset' => 'container-margin', 'blocks' => ['core/video'], 'target' => 'block_option'],
 		['preset' => 'video-caption', 'blocks' => ['core/video'], 'target' => 'block_option'],
 
 		// Gallery
-		['preset' => 'content-margin-m', 'blocks' => ['core/gallery'], 'target' => 'block_option'],
+		['preset' => 'container-margin-m', 'blocks' => ['core/gallery'], 'target' => 'block_option'],
 		['preset' => 'gallery-extras', 'blocks' => ['core/gallery'], 'target' => 'block_option'],
 
 		// Group
 		['preset' => 'align-wide-container', 'blocks' => ['core/group'], 'target' => 'block_option'],
-		['preset' => 'content-margin-m', 'blocks' => ['core/group'], 'target' => 'block_option'],
-		['preset' => 'content-padding-m', 'blocks' => ['core/group'], 'target' => 'block_option'],
+		['preset' => 'container-margin-m', 'blocks' => ['core/group'], 'target' => 'block_option'],
+		['preset' => 'container-padding-m', 'blocks' => ['core/group'], 'target' => 'block_option'],
 		['preset' => 'limit-width', 'blocks' => ['core/group'], 'target' => 'block_option'],
 
 		// Quote
-		['preset' => 'content-margin', 'blocks' => ['core/quote'], 'target' => 'block_option'],
+		['preset' => 'container-margin', 'blocks' => ['core/quote'], 'target' => 'block_option'],
 
 		// Pullquote
 		['preset' => 'align-wide-container', 'blocks' => ['core/pullquote'], 'target' => 'block_option'],
-		['preset' => 'content-margin-m', 'blocks' => ['core/pullquote'], 'target' => 'block_option'],
-		['preset' => 'content-padding-l', 'blocks' => ['core/pullquote'], 'target' => 'block_option'],
+		['preset' => 'container-margin-m', 'blocks' => ['core/pullquote'], 'target' => 'block_option'],
+		['preset' => 'container-padding-l', 'blocks' => ['core/pullquote'], 'target' => 'block_option'],
 
 		// Separator
-		['preset' => 'content-margin-m', 'blocks' => ['core/separator'], 'target' => 'block_option'],
+		['preset' => 'container-margin-m', 'blocks' => ['core/separator'], 'target' => 'block_option'],
 
 		// Spacer
 		['preset' => 'spacer-responsive-height', 'blocks' => ['core/spacer'], 'target' => 'block_option'],
 
 		// Cover
 		['preset' => 'align-wide-container', 'blocks' => ['core/cover'], 'target' => 'block_option'],
-		['preset' => 'content-margin-m', 'blocks' => ['core/cover'], 'target' => 'block_option'],
-		['preset' => 'content-padding-xl', 'blocks' => ['core/cover'], 'target' => 'block_option'],
+		['preset' => 'container-margin-m', 'blocks' => ['core/cover'], 'target' => 'block_option'],
+		['preset' => 'container-padding-xl', 'blocks' => ['core/cover'], 'target' => 'block_option'],
 
 		// Buttons / Button
-		['preset' => 'content-margin', 'blocks' => ['core/buttons'], 'target' => 'block_option'],
+		['preset' => 'container-margin', 'blocks' => ['core/buttons'], 'target' => 'block_option'],
 		['preset' => 'button-extras', 'blocks' => ['core/button'], 'target' => 'block_option'],
 
 		// ACF
 		['preset' => 'icon-align', 'blocks' => ['acf/icon'], 'target' => 'block_option'],
-		['preset' => 'content-margin', 'blocks' => ['acf/icon'], 'target' => 'block_option'],
+		['preset' => 'container-margin', 'blocks' => ['acf/icon'], 'target' => 'block_option'],
 		['preset' => 'icon-text-position', 'blocks' => ['acf/icon-text'], 'target' => 'block_option'],
-		['preset' => 'content-margin', 'blocks' => ['acf/icon-text'], 'target' => 'block_option'],
+		['preset' => 'container-margin', 'blocks' => ['acf/icon-text'], 'target' => 'block_option'],
 		['preset' => 'align-wide-container', 'blocks' => ['acf/slider', 'acf/map', 'acf/article-list', 'acf/number-ticker'], 'target' => 'block_option'],
-		['preset' => 'content-margin-m', 'blocks' => ['acf/slider', 'acf/map', 'acf/article-list', 'acf/number-ticker'], 'target' => 'block_option'],
+		['preset' => 'container-margin-m', 'blocks' => ['acf/slider', 'acf/map', 'acf/article-list', 'acf/number-ticker'], 'target' => 'block_option'],
 	],
 ];
