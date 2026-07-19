@@ -26,20 +26,6 @@
 
   const L = baselayerEvents;
   const META_KEY = '_bl_event_metadata';
-  const START_DATE_KEY = '_bl_event_start_date';
-
-  function appendIcalQuery(url) {
-    if (!url || typeof url !== 'string') {
-      return '';
-    }
-    try {
-      const u = new URL(url, window.location.origin);
-      u.searchParams.set('bl_ical', '1');
-      return u.toString();
-    } catch (e) {
-      return url + (url.indexOf('?') >= 0 ? '&' : '?') + 'bl_ical=1';
-    }
-  }
 
   function metaConfigForType(postType) {
     if (L.metaByType && L.metaByType[postType]) {
@@ -107,32 +93,58 @@
       el(
         'div',
         { className: 'bl-event-metadata-modal__body' },
-        Object.keys(groups).map(function (groupId) {
-          const group = groups[groupId];
-          return el(
-            'div',
-            { key: groupId, className: 'bl-event-metadata-modal__group' },
-            el('h3', { className: 'bl-event-metadata-modal__group-title' }, group.title || groupId),
-            Object.keys(group.fields || {}).map(function (fieldId) {
-              const field = group.fields[fieldId];
-              const value = (draft[groupId] && draft[groupId][fieldId]) || '';
-              const common = {
-                key: groupId + '-' + fieldId,
-                label: field.label || fieldId,
-                value: value,
-                onChange: function (v) {
-                  setField(groupId, fieldId, v);
-                },
-              };
-              if (field.type === 'textarea') {
-                return el(TextareaControl, Object.assign({}, common, { rows: 3 }));
-              }
-              const inputType =
-                field.type === 'email' ? 'email' : field.type === 'url' ? 'url' : 'text';
-              return el(TextControl, Object.assign({}, common, { type: inputType }));
-            }),
-          );
-        }),
+        el(
+          'div',
+          { className: 'bl-event-metadata-modal__fields' },
+          Object.keys(groups).map(function (groupId) {
+            const group = groups[groupId];
+            return el(
+              'div',
+              { key: groupId, className: 'bl-event-metadata-modal__group' },
+              el('h3', { className: 'bl-event-metadata-modal__group-title' }, group.title || groupId),
+              el(
+                'div',
+                { className: 'bl-event-metadata-modal__table' },
+                Object.keys(group.fields || {}).map(function (fieldId) {
+                  const field = group.fields[fieldId];
+                  const value = (draft[groupId] && draft[groupId][fieldId]) || '';
+                  const label = field.label || fieldId;
+                  const control =
+                    field.type === 'textarea'
+                      ? el(TextareaControl, {
+                          hideLabelFromVision: true,
+                          label: label,
+                          rows: 3,
+                          value: value,
+                          onChange: function (v) {
+                            setField(groupId, fieldId, v);
+                          },
+                        })
+                      : el(TextControl, {
+                          hideLabelFromVision: true,
+                          label: label,
+                          type:
+                            field.type === 'email'
+                              ? 'email'
+                              : field.type === 'url'
+                                ? 'url'
+                                : 'text',
+                          value: value,
+                          onChange: function (v) {
+                            setField(groupId, fieldId, v);
+                          },
+                        });
+                  return el(
+                    'div',
+                    { key: groupId + '-' + fieldId, className: 'bl-event-metadata-modal__row' },
+                    el('div', { className: 'bl-event-metadata-modal__row-label' }, label),
+                    el('div', { className: 'bl-event-metadata-modal__row-field' }, control),
+                  );
+                }),
+              ),
+            );
+          }),
+        ),
         el(
           'div',
           { className: 'bl-event-metadata-modal__footer' },
@@ -164,9 +176,6 @@
     const postId = useSelect(function (select) {
       return select('core/editor')?.getCurrentPostId?.();
     }, []);
-    const permalink = useSelect(function (select) {
-      return select('core/editor')?.getPermalink?.() || '';
-    }, []);
 
     if (!postType || EVENT_TYPES.indexOf(postType) === -1 || !postId) {
       return null;
@@ -178,15 +187,14 @@
     }
 
     const [meta, setMeta] = useEntityProp('postType', postType, 'meta', postId);
+    const [modalOpen, setModalOpen] = useState(false);
+
     if (!meta || typeof setMeta !== 'function') {
       return null;
     }
 
     const raw = meta[META_KEY] || '';
     const data = parseMetadata(raw);
-    const [modalOpen, setModalOpen] = useState(false);
-    const startDate = typeof meta[START_DATE_KEY] === 'string' ? meta[START_DATE_KEY].trim() : '';
-    const icalUrl = startDate && /^\d{4}-\d{2}-\d{2}$/.test(startDate) ? appendIcalQuery(permalink) : '';
 
     function patch(next) {
       setMeta(Object.assign({}, meta, next));
@@ -231,34 +239,14 @@
             })
           : el('p', { className: 'description' }, L.noMetadata || 'No metadata'),
         el(
-          'div',
-          { className: 'bl-event-metadata__actions' },
-          el(
-            Button,
-            {
-              variant: 'secondary',
-              onClick: function () {
-                setModalOpen(true);
-              },
+          Button,
+          {
+            variant: 'secondary',
+            onClick: function () {
+              setModalOpen(true);
             },
-            L.editMetadata || 'Edit metadata…',
-          ),
-          icalUrl
-            ? el(
-                Button,
-                {
-                  variant: 'secondary',
-                  href: icalUrl,
-                  target: '_blank',
-                  rel: 'noopener noreferrer',
-                },
-                L.downloadIcal || 'Download iCal',
-              )
-            : el(
-                'p',
-                { className: 'description bl-event-metadata__ical-hint' },
-                L.icalNeedsDate || 'Set a start date to enable the iCal download.',
-              ),
+          },
+          L.editMetadata || 'Edit metadata',
         ),
         modalOpen
           ? el(MetadataModal, {

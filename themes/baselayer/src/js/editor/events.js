@@ -23,16 +23,7 @@
   const { useEntityProp } = wp.coreData;
   const { registerPlugin } = wp.plugins;
   const { PluginDocumentSettingPanel } = wp.editor;
-  const {
-    PanelRow,
-    ToggleControl,
-    Button,
-    Modal,
-    SelectControl,
-    TextControl,
-    CheckboxControl,
-    RadioControl,
-  } = wp.components;
+  const { PanelRow, ToggleControl, Button, Modal, SelectControl, TextControl } = wp.components;
 
   const L = baselayerEvents;
 
@@ -139,8 +130,7 @@
     if (rule.ends === 'on_date' && rule.until && rule.until < until) {
       until = rule.until;
     }
-    const max =
-      rule.ends === 'after' && rule.count ? Math.min(500, rule.count) : 500;
+    const max = rule.ends === 'after' && rule.count ? Math.min(500, rule.count) : 500;
     const out = [];
     const interval = Math.max(1, rule.interval || 1);
 
@@ -232,7 +222,7 @@
 
   function summaryLines(rule) {
     if (!rule) {
-      return [L.notRepeating || 'Not repeating'];
+      return [];
     }
     const freqMap = {
       daily: L.freqDaily || 'Daily',
@@ -242,7 +232,7 @@
     };
     let freq = freqMap[rule.freq] || rule.freq;
     if (rule.interval > 1) {
-      freq = (L.everyLabel || 'Every') + ' ' + rule.interval + ' ' + unitLabel(rule.freq);
+      freq = everyIntervalLabel(rule.freq, rule.interval);
     }
     const lines = [freq];
     if (rule.freq === 'weekly' && rule.byweekday && rule.byweekday.length) {
@@ -276,18 +266,33 @@
     return L.unitWeek || 'week(s)';
   }
 
+  function everyIntervalLabel(freq, interval) {
+    const n = Math.max(1, parseInt(interval, 10) || 1);
+    const templates = {
+      daily: L.everyNDays || 'Every %d days',
+      weekly: L.everyNWeeks || 'Every %d weeks',
+      monthly: L.everyNMonths || 'Every %d months',
+      yearly: L.everyNYears || 'Every %d years',
+    };
+    return (templates[freq] || templates.weekly).replace('%d', String(n));
+  }
+
   function RecurrenceModal(props) {
     const { initialRule, startDate, endDate, onSave, onRequestClose } = props;
     const [draft, setDraft] = useState(function () {
       return initialRule ? Object.assign({}, initialRule) : defaultRule(startDate);
     });
 
+    const hasStartDate = !!(startDate && /^\d{4}-\d{2}-\d{2}$/.test(startDate));
     const horizon = L.horizonDate || addDays(startDate || new Date().toISOString().slice(0, 10), 365);
     const upcoming = useMemo(
       function () {
+        if (!hasStartDate) {
+          return [];
+        }
         return expandOccurrences(draft, startDate, endDate || startDate, horizon);
       },
-      [draft, startDate, endDate, horizon],
+      [draft, startDate, endDate, horizon, hasStartDate],
     );
     const preview = upcoming.slice(0, 4);
     const more = Math.max(0, upcoming.length - preview.length);
@@ -306,140 +311,184 @@
       } else {
         set[day] = true;
       }
-      patch({ byweekday: WEEKDAYS.filter(function (d) {
-        return set[d];
-      }) });
+      patch({
+        byweekday: WEEKDAYS.filter(function (d) {
+          return set[d];
+        }),
+      });
     }
 
     return el(
       Modal,
       {
-        title: L.modalTitle || 'Repeats',
+        title: L.modalTitle || 'Recurrence settings',
         onRequestClose: onRequestClose,
         className: 'bl-event-recurrence-modal',
       },
       el(
         'div',
         { className: 'bl-event-recurrence-modal__body' },
-        el(SelectControl, {
-          label: L.freqLabel || 'Repeats',
-          value: draft.freq,
-          options: [
-            { label: L.freqDaily || 'Daily', value: 'daily' },
-            { label: L.freqWeekly || 'Weekly', value: 'weekly' },
-            { label: L.freqMonthly || 'Monthly', value: 'monthly' },
-            { label: L.freqYearly || 'Yearly', value: 'yearly' },
-          ],
-          onChange: function (freq) {
-            const next = { freq: freq };
-            if (freq === 'weekly' && (!draft.byweekday || !draft.byweekday.length)) {
-              next.byweekday = [weekdayKeyFromDate(startDate)];
-            }
-            patch(next);
-          },
-        }),
         el(
           'div',
-          { className: 'bl-event-recurrence-modal__every' },
+          { className: 'bl-event-recurrence-modal__layout' },
           el(
-            'label',
-            { className: 'components-base-control__label' },
-            L.everyLabel || 'Every',
+            'div',
+            { className: 'bl-event-recurrence-modal__settings' },
+            el(
+              'div',
+              { className: 'bl-event-recurrence-modal__freq' },
+              el('label', { className: 'bl-event-recurrence-modal__label' }, L.freqLabel || 'Repeats'),
+              el(SelectControl, {
+                hideLabelFromVision: true,
+                label: L.freqLabel || 'Repeats',
+                value: draft.freq,
+                options: [
+                  { label: L.freqDaily || 'Daily', value: 'daily' },
+                  { label: L.freqWeekly || 'Weekly', value: 'weekly' },
+                  { label: L.freqMonthly || 'Monthly', value: 'monthly' },
+                  { label: L.freqYearly || 'Yearly', value: 'yearly' },
+                ],
+                onChange: function (freq) {
+                  const next = { freq: freq };
+                  if (freq === 'weekly' && (!draft.byweekday || !draft.byweekday.length)) {
+                    next.byweekday = [weekdayKeyFromDate(startDate)];
+                  }
+                  patch(next);
+                },
+              }),
+            ),
+            el(
+              'div',
+              { className: 'bl-event-recurrence-modal__every' },
+              el('label', { className: 'bl-event-recurrence-modal__label' }, L.everyLabel || 'Every'),
+              el(
+                'div',
+                { className: 'bl-event-recurrence-modal__every-row' },
+                el(TextControl, {
+                  type: 'number',
+                  min: 1,
+                  max: 99,
+                  value: String(draft.interval || 1),
+                  onChange: function (v) {
+                    patch({ interval: Math.max(1, parseInt(v, 10) || 1) });
+                  },
+                }),
+                el('span', null, unitLabel(draft.freq)),
+              ),
+            ),
+            draft.freq === 'weekly'
+              ? el(
+                  'div',
+                  { className: 'bl-event-recurrence-modal__days' },
+                  el('label', { className: 'bl-event-recurrence-modal__label' }, L.onLabel || 'On weekday'),
+                  el(
+                    'div',
+                    { className: 'bl-event-recurrence-modal__days-row', role: 'group' },
+                    WEEKDAYS.map(function (day) {
+                      const labels = L.weekdayLabels || {};
+                      const checked = (draft.byweekday || []).indexOf(day) !== -1;
+                      return el(
+                        Button,
+                        {
+                          key: day,
+                          type: 'button',
+                          variant: checked ? 'primary' : 'secondary',
+                          className: 'bl-event-recurrence-modal__day' + (checked ? ' is-pressed' : ''),
+                          'aria-pressed': checked,
+                          onClick: function () {
+                            toggleDay(day);
+                          },
+                        },
+                        labels[day] || day,
+                      );
+                    }),
+                  ),
+                )
+              : el('div', {
+                  className: 'bl-event-recurrence-modal__days bl-event-recurrence-modal__days--spacer',
+                  'aria-hidden': true,
+                }),
+            el(
+              'div',
+              { className: 'bl-event-recurrence-modal__ends' },
+              el('label', { className: 'bl-event-recurrence-modal__label' }, L.endsLabel || 'Ends'),
+              el(
+                'div',
+                { className: 'bl-event-recurrence-modal__ends-row', role: 'group' },
+                [
+                  { value: 'never', label: L.endsNever || 'Never' },
+                  { value: 'on_date', label: L.endsOnDate || 'On date' },
+                  { value: 'after', label: L.endsAfter || 'After' },
+                ].map(function (opt) {
+                  const checked = (draft.ends || 'never') === opt.value;
+                  return el(
+                    Button,
+                    {
+                      key: opt.value,
+                      type: 'button',
+                      variant: checked ? 'primary' : 'secondary',
+                      className: 'bl-event-recurrence-modal__ends-option' + (checked ? ' is-pressed' : ''),
+                      'aria-pressed': checked,
+                      onClick: function () {
+                        patch({ ends: opt.value });
+                      },
+                    },
+                    opt.label,
+                  );
+                }),
+              ),
+              el(
+                'div',
+                { className: 'bl-event-recurrence-modal__ends-extra' },
+                draft.ends === 'on_date'
+                  ? el('input', {
+                      type: 'date',
+                      className: 'components-text-control__input',
+                      value: draft.until || '',
+                      min: startDate || undefined,
+                      onChange: function (e) {
+                        patch({ until: e.target.value });
+                      },
+                    })
+                  : null,
+                draft.ends === 'after'
+                  ? el(
+                      'div',
+                      { className: 'bl-event-recurrence-modal__every-row' },
+                      el(TextControl, {
+                        type: 'number',
+                        min: 1,
+                        max: 999,
+                        value: String(draft.count || 10),
+                        onChange: function (v) {
+                          patch({ count: Math.max(1, parseInt(v, 10) || 1) });
+                        },
+                      }),
+                      el('span', null, L.occurrencesUnit || 'occurrences'),
+                    )
+                  : null,
+              ),
+            ),
           ),
           el(
             'div',
-            { className: 'bl-event-recurrence-modal__every-row' },
-            el(TextControl, {
-              type: 'number',
-              min: 1,
-              max: 99,
-              value: String(draft.interval || 1),
-              onChange: function (v) {
-                patch({ interval: Math.max(1, parseInt(v, 10) || 1) });
-              },
-            }),
-            el('span', null, unitLabel(draft.freq)),
+            { className: 'bl-event-recurrence-modal__preview' },
+            el('strong', null, L.nextOccurrences || 'Next occurrences'),
+            !hasStartDate
+              ? el('p', { className: 'description' }, L.recurrenceNeedsDate || 'Set a start date to create occurrence posts.')
+              : el(
+                  Fragment,
+                  null,
+                  el(
+                    'ul',
+                    null,
+                    preview.map(function (item) {
+                      return el('li', { key: item.start_date }, formatDisplayDate(item.start_date));
+                    }),
+                  ),
+                  more > 0 ? el('p', { className: 'description' }, (L.moreOccurrences || '+%d more').replace('%d', String(more))) : null,
+                ),
           ),
-        ),
-        draft.freq === 'weekly'
-          ? el(
-              'div',
-              { className: 'bl-event-recurrence-modal__days' },
-              el(
-                'label',
-                { className: 'components-base-control__label' },
-                L.onLabel || 'On',
-              ),
-              WEEKDAYS.map(function (day) {
-                const labels = L.weekdayLabels || {};
-                return el(CheckboxControl, {
-                  key: day,
-                  label: labels[day] || day,
-                  checked: (draft.byweekday || []).indexOf(day) !== -1,
-                  onChange: function () {
-                    toggleDay(day);
-                  },
-                });
-              }),
-            )
-          : null,
-        el(RadioControl, {
-          label: L.endsLabel || 'Ends',
-          selected: draft.ends || 'never',
-          options: [
-            { label: L.endsNever || 'Never', value: 'never' },
-            { label: L.endsOnDate || 'On date', value: 'on_date' },
-            { label: L.endsAfter || 'After', value: 'after' },
-          ],
-          onChange: function (ends) {
-            patch({ ends: ends });
-          },
-        }),
-        draft.ends === 'on_date'
-          ? el('input', {
-              type: 'date',
-              className: 'components-text-control__input',
-              value: draft.until || '',
-              min: startDate || undefined,
-              onChange: function (e) {
-                patch({ until: e.target.value });
-              },
-            })
-          : null,
-        draft.ends === 'after'
-          ? el(
-              'div',
-              { className: 'bl-event-recurrence-modal__every-row' },
-              el(TextControl, {
-                type: 'number',
-                min: 1,
-                max: 999,
-                value: String(draft.count || 10),
-                onChange: function (v) {
-                  patch({ count: Math.max(1, parseInt(v, 10) || 1) });
-                },
-              }),
-              el('span', null, L.occurrencesUnit || 'occurrences'),
-            )
-          : null,
-        el(
-          'div',
-          { className: 'bl-event-recurrence-modal__preview' },
-          el('strong', null, L.nextOccurrences || 'Next occurrences'),
-          el(
-            'ul',
-            null,
-            preview.map(function (item) {
-              return el('li', { key: item.start_date }, formatDisplayDate(item.start_date));
-            }),
-          ),
-          more > 0
-            ? el(
-                'p',
-                { className: 'description' },
-                (L.moreOccurrences || '+%d more').replace('%d', String(more)),
-              )
-            : null,
         ),
         el(
           'div',
@@ -459,11 +508,7 @@
           el(
             'div',
             { className: 'bl-event-recurrence-modal__footer-actions' },
-            el(
-              Button,
-              { variant: 'tertiary', onClick: onRequestClose },
-              L.cancelLabel || 'Cancel',
-            ),
+            el(Button, { variant: 'tertiary', onClick: onRequestClose }, L.cancelLabel || 'Cancel'),
             el(
               Button,
               {
@@ -495,32 +540,33 @@
     const postParent = useSelect(function (select) {
       return select('core/editor')?.getEditedPostAttribute?.('parent') || 0;
     }, []);
-    const currentPost = useSelect(function (select) {
-      if (!postId || !postType) {
-        return null;
-      }
-      return select('core').getEntityRecord('postType', postType, postId);
-    }, [postId, postType]);
+    const currentPost = useSelect(
+      function (select) {
+        if (!postId || !postType) {
+          return null;
+        }
+        return select('core').getEntityRecord('postType', postType, postId);
+      },
+      [postId, postType],
+    );
 
     if (!postType || EVENT_TYPES.indexOf(postType) === -1 || !postId) {
       return null;
     }
 
     const [meta, setMeta] = useEntityProp('postType', postType, 'meta', postId);
-    if (!meta || typeof setMeta !== 'function') {
-      return null;
-    }
 
-    const startDate = meta[META_START_DATE] || '';
-    const endDate = meta[META_END_DATE] || '';
-    const startTime = meta[META_START_TIME] || '';
-    const endTime = meta[META_END_TIME] || '';
-    const recurrenceRaw = meta[META_RECURRENCE] || '';
-    const occurrenceOf = parseInt(meta[META_OCCURRENCE_OF], 10) || 0;
-    const detached = meta[META_DETACHED] === '1';
+    const startDate = (meta && meta[META_START_DATE]) || '';
+    const endDate = (meta && meta[META_END_DATE]) || '';
+    const startTime = (meta && meta[META_START_TIME]) || '';
+    const endTime = (meta && meta[META_END_TIME]) || '';
+    const recurrenceRaw = (meta && meta[META_RECURRENCE]) || '';
+    const occurrenceOf = parseInt(meta && meta[META_OCCURRENCE_OF], 10) || 0;
+    const detached = !!(meta && meta[META_DETACHED] === '1');
     const isOccurrence = occurrenceOf > 0 || (postParent && postParent > 0);
     const masterId = occurrenceOf || postParent || 0;
     const rule = parseRule(recurrenceRaw);
+    const hasStartDate = !!(startDate && /^\d{4}-\d{2}-\d{2}$/.test(startDate));
 
     const masterRecord = useSelect(
       function (select) {
@@ -532,9 +578,7 @@
       [isOccurrence, masterId, postType],
     );
 
-    const [timesEnabled, setTimesEnabled] = useState(function () {
-      return !!(startTime || endTime);
-    });
+    const [timesEnabled, setTimesEnabled] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
     const [reverting, setReverting] = useState(false);
 
@@ -542,8 +586,12 @@
       function () {
         setTimesEnabled(!!(startTime || endTime));
       },
-      [postId],
+      [postId, startTime, endTime],
     );
+
+    if (!meta || typeof setMeta !== 'function') {
+      return null;
+    }
 
     function patch(next) {
       setMeta(Object.assign({}, meta, next));
@@ -560,17 +608,9 @@
     }
 
     const dateFieldsDisabled = !!isOccurrence;
-    const occurrenceCount =
-      currentPost && typeof currentPost.bl_occurrence_count === 'number'
-        ? currentPost.bl_occurrence_count
-        : null;
-    const masterTitle =
-      (currentPost && currentPost.bl_master_title) ||
-      (masterRecord && (masterRecord.title?.rendered || masterRecord.title?.raw)) ||
-      '';
-    const masterEditUrl =
-      (currentPost && currentPost.bl_master_edit_link) ||
-      (masterId ? 'post.php?post=' + masterId + '&action=edit' : '');
+    const occurrenceCount = currentPost && typeof currentPost.bl_occurrence_count === 'number' ? currentPost.bl_occurrence_count : null;
+    const masterTitle = (currentPost && currentPost.bl_master_title) || (masterRecord && (masterRecord.title?.rendered || masterRecord.title?.raw)) || '';
+    const masterEditUrl = (currentPost && currentPost.bl_master_edit_link) || (masterId ? 'post.php?post=' + masterId + '&action=edit' : '');
 
     function revertToMaster() {
       if (!L.revertRestUrl || reverting) {
@@ -611,28 +651,27 @@
             ? el(
                 Fragment,
                 null,
-                el(
-                  'p',
-                  { className: 'bl-event-recurring__master-label' },
-                  L.masterLabel || 'Master:',
-                ),
+                el('p', { className: 'bl-event-recurring__master-label' }, L.masterLabel || 'Master:'),
                 el(
                   'p',
                   { className: 'bl-event-recurring__master-title' },
-                  masterEditUrl
-                    ? el('a', { href: masterEditUrl }, masterTitle || '#' + masterId)
-                    : masterTitle || '#' + masterId,
+                  masterEditUrl ? el('a', { href: masterEditUrl }, masterTitle || '#' + masterId) : masterTitle || '#' + masterId,
                 ),
               )
             : null,
           (function () {
-            const masterRule = masterRecord && masterRecord.meta
-              ? parseRule(masterRecord.meta[META_RECURRENCE] || '')
-              : null;
+            const masterRule = masterRecord && masterRecord.meta ? parseRule(masterRecord.meta[META_RECURRENCE] || '') : null;
             const lines = summaryLines(masterRule);
-            return lines.map(function (line, i) {
-              return el('p', { key: 'mline-' + i, className: 'bl-event-recurring__line' }, line);
-            });
+            if (!lines.length) {
+              return el('p', { className: 'description' }, L.notRepeating || 'Not repeating');
+            }
+            return el(
+              Fragment,
+              null,
+              lines.map(function (line, i) {
+                return el('p', { key: 'mline-' + i, className: 'bl-event-recurring__line' }, line);
+              }),
+            );
           })(),
           detached
             ? el(
@@ -668,10 +707,15 @@
           'div',
           { className: 'bl-event-recurring' },
           el('h3', { className: 'bl-event-recurring__heading' }, L.recurringTitle || 'Recurring'),
-          summaryLines(rule).map(function (line, i) {
-            return el('p', { key: 'line-' + i, className: 'bl-event-recurring__line' }, line);
-          }),
-          rule && occurrenceCount != null
+          rule
+            ? summaryLines(rule).map(function (line, i) {
+                return el('p', { key: 'line-' + i, className: 'bl-event-recurring__line' }, line);
+              })
+            : el('p', { className: 'description' }, L.notRepeating || 'Not repeating'),
+          !hasStartDate
+            ? el('p', { className: 'description bl-event-recurring__needs-date' }, L.recurrenceNeedsDate || 'Set a start date to create occurrence posts.')
+            : null,
+          rule && hasStartDate && occurrenceCount != null
             ? el(
                 'p',
                 { className: 'bl-event-recurring__count' },
@@ -688,7 +732,7 @@
                 setModalOpen(true);
               },
             },
-            L.editRecurrence || 'Edit recurrence…',
+            L.editRecurrence || 'Edit recurrence',
           ),
           modalOpen
             ? el(RecurrenceModal, {
@@ -718,11 +762,7 @@
         el(
           PanelRow,
           null,
-          el(
-            'label',
-            { className: 'components-base-control__label', htmlFor: 'bl-event-start-date' },
-            L.startDateLabel || 'Start date',
-          ),
+          el('label', { className: 'components-base-control__label', htmlFor: 'bl-event-start-date' }, L.startDateLabel || 'Start date'),
           el('input', {
             id: 'bl-event-start-date',
             type: 'date',
@@ -741,11 +781,7 @@
         el(
           PanelRow,
           null,
-          el(
-            'label',
-            { className: 'components-base-control__label', htmlFor: 'bl-event-end-date' },
-            L.endDateLabel || 'End date',
-          ),
+          el('label', { className: 'components-base-control__label', htmlFor: 'bl-event-end-date' }, L.endDateLabel || 'End date'),
           el('input', {
             id: 'bl-event-end-date',
             type: 'date',
@@ -776,11 +812,7 @@
           ? el(
               PanelRow,
               { key: 'bl-event-start-time-row' },
-              el(
-                'label',
-                { className: 'components-base-control__label', htmlFor: 'bl-event-start-time' },
-                L.startTimeLabel || 'Start time',
-              ),
+              el('label', { className: 'components-base-control__label', htmlFor: 'bl-event-start-time' }, L.startTimeLabel || 'Start time'),
               el('input', {
                 id: 'bl-event-start-time',
                 type: 'time',
@@ -797,11 +829,7 @@
           ? el(
               PanelRow,
               { key: 'bl-event-end-time-row' },
-              el(
-                'label',
-                { className: 'components-base-control__label', htmlFor: 'bl-event-end-time' },
-                L.endTimeLabel || 'End time',
-              ),
+              el('label', { className: 'components-base-control__label', htmlFor: 'bl-event-end-time' }, L.endTimeLabel || 'End time'),
               el('input', {
                 id: 'bl-event-end-time',
                 type: 'time',

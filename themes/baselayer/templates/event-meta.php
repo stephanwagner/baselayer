@@ -46,44 +46,65 @@ if ($config['groups'] !== []) {
 	}
 }
 
-if ($groups_out === [] && !$can_ical) {
+$aria = $config['title'] !== '' ? $config['title'] : __('Event metadata', 'baselayer');
+$archive_url = $post_type ? get_post_type_archive_link($post_type) : false;
+$archive_url = is_string($archive_url) ? $archive_url : '';
+$show_actions = $archive_url !== '' || $can_ical;
+
+if ($groups_out === [] && !$show_actions) {
 	return;
 }
 
-$aria = $config['title'] !== '' ? $config['title'] : __('Event metadata', 'baselayer');
+$all_events_label = __('All events', 'baselayer');
+$obj = $post_type ? get_post_type_object($post_type) : null;
+if ($obj && !empty($obj->labels->name)) {
+	/* translators: %s: post type plural label (e.g. Events) */
+	$all_events_label = sprintf(__('All %s', 'baselayer'), $obj->labels->name);
+}
 ?>
 <aside class="event-meta" aria-label="<?= esc_attr($aria) ?>">
-	<?php foreach ($groups_out as $group) { ?>
-		<section class="event-meta__group event-meta__group--<?= esc_attr($group['id']) ?>">
-			<h2 class="event-meta__title"><?= esc_html($group['title']) ?></h2>
-			<dl class="event-meta__list">
-				<?php foreach ($group['fields'] as $field) { ?>
-					<div class="event-meta__row event-meta__row--<?= esc_attr($field['id']) ?>">
-						<dt class="event-meta__label"><?= esc_html($field['label']) ?></dt>
-						<dd class="event-meta__value">
-							<?php
-							if ($field['type'] === 'email') {
-								echo '<a href="' . esc_url('mailto:' . $field['value']) . '">' . esc_html($field['value']) . '</a>';
-							} elseif ($field['type'] === 'url') {
-								echo '<a href="' . esc_url($field['value']) . '" rel="noopener noreferrer">' . esc_html($field['value']) . '</a>';
-							} elseif ($field['type'] === 'textarea') {
-								echo nl2br(esc_html($field['value']));
-							} else {
-								echo esc_html($field['value']);
-							}
-							?>
-						</dd>
-					</div>
-				<?php } ?>
-			</dl>
-		</section>
+	<?php if ($groups_out !== []) { ?>
+		<div class="event-meta__groups">
+			<?php foreach ($groups_out as $group) { ?>
+				<section class="event-meta__group event-meta__group--<?= esc_attr($group['id']) ?>">
+					<h2 class="event-meta__title"><?= esc_html($group['title']) ?></h2>
+					<dl class="event-meta__list">
+						<?php foreach ($group['fields'] as $field) { ?>
+							<div class="event-meta__row event-meta__row--<?= esc_attr($field['id']) ?>">
+								<dt class="event-meta__label"><?= esc_html($field['label']) ?></dt>
+								<dd class="event-meta__value">
+									<?php
+									if ($field['type'] === 'email') {
+										echo '<a href="' . esc_url('mailto:' . $field['value']) . '">' . esc_html($field['value']) . '</a>';
+									} elseif ($field['type'] === 'url') {
+										echo '<a href="' . esc_url($field['value']) . '" rel="noopener noreferrer">' . esc_html($field['value']) . '</a>';
+									} elseif ($field['type'] === 'textarea') {
+										echo nl2br(esc_html($field['value']));
+									} else {
+										echo esc_html($field['value']);
+									}
+									?>
+								</dd>
+							</div>
+						<?php } ?>
+					</dl>
+				</section>
+			<?php } ?>
+		</div>
 	<?php } ?>
 
-	<?php if ($can_ical) { ?>
-		<p class="event-meta__ical">
-			<a class="event-meta__ical-link button -secondary -outline -has-icon -icon-calendar" href="<?= esc_url(bl_event_ical_url($post_id)) ?>">
-				<?= esc_html__('Download iCal', 'baselayer') ?>
-			</a>
-		</p>
+	<?php if ($show_actions) { ?>
+		<div class="event-meta__actions">
+			<?php if ($archive_url !== '') { ?>
+				<a class="event-meta__all-events button -secondary -outline -small -has-icon -icon-arrow-left" href="<?= esc_url($archive_url) ?>">
+					<?= esc_html($all_events_label) ?>
+				</a>
+			<?php } ?>
+			<?php if ($can_ical) { ?>
+				<a class="event-meta__ical-link button -secondary -outline -small -has-icon -icon-calendar" href="<?= esc_url(bl_event_ical_url($post_id)) ?>">
+					<?= esc_html__('Download iCal', 'baselayer') ?>
+				</a>
+			<?php } ?>
+		</div>
 	<?php } ?>
 </aside>

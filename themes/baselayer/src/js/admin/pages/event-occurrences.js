@@ -71,7 +71,7 @@
     const modal = ensureModal();
     const titleEl = modal.querySelector('.bl-event-occurrences-modal__title');
     const bodyEl = modal.querySelector('.bl-event-occurrences-modal__body');
-    const heading = (L.modalTitle || 'Occurrences') + (masterTitle ? ' — ' + masterTitle : '');
+    const heading = (L.modalTitle || 'Occurrences') + (masterTitle ? ' – ' + masterTitle : '');
     titleEl.textContent = heading;
     bodyEl.innerHTML = '<p class="bl-event-occurrences-modal__loading">' + escapeHtml(L.loadingLabel || 'Loading…') + '</p>';
     modal.removeAttribute('hidden');

@@ -519,7 +519,7 @@ function bl_event_sync_series(int $master_id): void
 		}
 	}
 
-	if ($rule === null || $schedule === null) {
+	if ($rule === null) {
 		// No rule: remove future occurrences only.
 		foreach ($existing as $oid) {
 			$start_ts = bl_event_get_start_timestamp($oid);
@@ -530,6 +530,11 @@ function bl_event_sync_series(int $master_id): void
 			}
 		}
 
+		return;
+	}
+
+	// Rule without a start date: keep existing children; cannot expand new ones yet.
+	if ($schedule === null) {
 		return;
 	}
 

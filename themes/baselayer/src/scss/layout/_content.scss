@@ -60,12 +60,23 @@
   padding-top: 24px;
   border-top: 1px solid var(--bl-color-gray-200, #e5e5e5);
 
-  &__group {
-    margin: 0 0 24px;
+  &__groups {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px 32px;
 
-    &:last-child {
-      margin-bottom: 0;
+    @media (max-width: $breakpoint-m) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+
+    @media (max-width: $breakpoint-s) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__group {
+    margin: 0;
+    min-width: 0;
   }
 
   &__title {
@@ -99,12 +110,16 @@
     margin: 0;
   }
 
-  &__ical {
-    margin: 24px 0 0;
+  &__actions {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
   }
 
-  &__group + &__ical {
-    margin-top: 8px;
+  &__ical-link {
+    margin-left: auto;
   }
 }
 

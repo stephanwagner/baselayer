@@ -656,7 +656,8 @@ add_action('enqueue_block_editor_assets', function (): void {
 		'endTimeLabel' => __('End time', 'baselayer'),
 		'recurringTitle' => __('Recurring', 'baselayer'),
 		'notRepeating' => __('Not repeating', 'baselayer'),
-		'editRecurrence' => __('Edit recurrence…', 'baselayer'),
+		'editRecurrence' => __('Edit recurrence', 'baselayer'),
+		'recurrenceNeedsDate' => __('Set a start date to create occurrence posts.', 'baselayer'),
 		'partOfRecurring' => __('Part of a recurring event.', 'baselayer'),
 		'masterLabel' => __('Master:', 'baselayer'),
 		'editInMaster' => __('Edit in master event', 'baselayer'),
@@ -665,10 +666,10 @@ add_action('enqueue_block_editor_assets', function (): void {
 		'customContentTitle' => __('This occurrence has custom content.', 'baselayer'),
 		'customContentHelp' => __('It will not update when the master event changes.', 'baselayer'),
 		'revertToMaster' => __('Revert to master', 'baselayer'),
-		'modalTitle' => __('Repeats', 'baselayer'),
+		'modalTitle' => __('Recurrence settings', 'baselayer'),
 		'freqLabel' => __('Repeats', 'baselayer'),
 		'everyLabel' => __('Every', 'baselayer'),
-		'onLabel' => __('On', 'baselayer'),
+		'onLabel' => __('On weekday', 'baselayer'),
 		'endsLabel' => __('Ends', 'baselayer'),
 		'endsNever' => __('Never', 'baselayer'),
 		'endsOnDate' => __('On date', 'baselayer'),
@@ -687,6 +688,14 @@ add_action('enqueue_block_editor_assets', function (): void {
 		'unitWeek' => __('week(s)', 'baselayer'),
 		'unitMonth' => __('month(s)', 'baselayer'),
 		'unitYear' => __('year(s)', 'baselayer'),
+		/* translators: %d: interval */
+		'everyNDays' => __('Every %d days', 'baselayer'),
+		/* translators: %d: interval */
+		'everyNWeeks' => __('Every %d weeks', 'baselayer'),
+		/* translators: %d: interval */
+		'everyNMonths' => __('Every %d months', 'baselayer'),
+		/* translators: %d: interval */
+		'everyNYears' => __('Every %d years', 'baselayer'),
 		'weekdayLabels' => [
 			'mo' => __('Mon', 'baselayer'),
 			'tu' => __('Tue', 'baselayer'),
@@ -703,11 +712,9 @@ add_action('enqueue_block_editor_assets', function (): void {
 		'dateFormat' => get_option('date_format', 'F j, Y'),
 		'meta' => $meta_by_type[$pt] ?? ['title' => '', 'groups' => []],
 		'metaByType' => $meta_by_type,
-		'editMetadata' => __('Edit metadata…', 'baselayer'),
+		'editMetadata' => __('Edit metadata', 'baselayer'),
 		'noMetadata' => __('No metadata', 'baselayer'),
 		'metadataModalTitle' => __('Event metadata', 'baselayer'),
-		'downloadIcal' => __('Download iCal', 'baselayer'),
-		'icalNeedsDate' => __('Set a start date to enable the iCal download.', 'baselayer'),
 	]);
 }, 12);
 
@@ -794,7 +801,7 @@ function bl_event_posts_custom_column(string $column, int $post_id): void
 
 	$range = bl_event_format_range_text($post_id, true);
 	if ($range === '') {
-		echo '<span aria-hidden="true">—</span>';
+		echo '<span aria-hidden="true">–</span>';
 		return;
 	}
 	echo esc_html($range);
@@ -865,6 +872,29 @@ function bl_event_abbr_month_datetime_format(string $php_format): string
 }
 
 /**
+ * Some locales (e.g. de_DE) include a trailing period on month abbreviations ("Jul.").
+ * Strip those dots for compact admin UI dates.
+ */
+function bl_event_strip_month_abbrev_dots(string $formatted): string
+{
+	global $wp_locale;
+	if (!$wp_locale instanceof \WP_Locale) {
+		return $formatted;
+	}
+
+	for ($m = 1; $m <= 12; ++$m) {
+		$full = $wp_locale->get_month($m);
+		$abbr = $wp_locale->get_month_abbrev($full);
+		if (!is_string($abbr) || $abbr === '' || !str_ends_with($abbr, '.')) {
+			continue;
+		}
+		$formatted = str_replace($abbr, rtrim($abbr, '.'), $formatted);
+	}
+
+	return $formatted;
+}
+
+/**
  * Human-readable range for templates.
  *
  * @param bool $abbr_month_names When true (e.g. admin list column), formatted months use abbreviated names (M not F).
@@ -899,14 +929,15 @@ function bl_event_format_range_text(int $post_id, bool $abbr_month_names = false
 	if ($start_date === $end_date) {
 		if ($st !== '' || $et !== '') {
 			$ts_fmt = $df . ' ' . $tf;
-			return trim(wp_date($ts_fmt, $start_ts, $tz) . ' – ' . wp_date($tf, $end_ts, $tz));
+			$out = trim(wp_date($ts_fmt, $start_ts, $tz) . ' – ' . wp_date($tf, $end_ts, $tz));
+		} else {
+			$out = $ds;
 		}
-		return $ds;
+	} elseif ($st !== '' || $et !== '') {
+		$out = trim(wp_date($df . ' ' . $tf, $start_ts, $tz) . ' – ' . wp_date($df . ' ' . $tf, $end_ts, $tz));
+	} else {
+		$out = $ds . ' – ' . $de;
 	}
 
-	if ($st !== '' || $et !== '') {
-		return trim(wp_date($df . ' ' . $tf, $start_ts, $tz) . ' – ' . wp_date($df . ' ' . $tf, $end_ts, $tz));
-	}
-
-	return $ds . ' – ' . $de;
+	return $abbr_month_names ? bl_event_strip_month_abbrev_dots($out) : $out;
 }
