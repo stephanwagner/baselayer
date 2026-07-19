@@ -93,8 +93,8 @@
     transition: transition('color');
   }
 
-  .block-editor-block-list__block.is-selected .slider__wrapper .slider__editor-badge-icon,
-  .block-editor-block-list__block:has(.is-selected) .slider__wrapper .slider__editor-badge-icon,
+  .wp-block-acf-slider.is-selected .slider__wrapper .slider__editor-badge-icon,
+  .wp-block-acf-slider.has-child-selected .slider__wrapper .slider__editor-badge-icon,
   .slider__editor-badge:hover .slider__editor-badge-icon {
     color: #1d2327;
   }
@@ -107,8 +107,8 @@
     transition: transition('color');
   }
 
-  .block-editor-block-list__block.is-selected .slider__wrapper .slider__editor-badge-label,
-  .block-editor-block-list__block:has(.is-selected) .slider__wrapper .slider__editor-badge-label,
+  .wp-block-acf-slider.is-selected .slider__wrapper .slider__editor-badge-label,
+  .wp-block-acf-slider.has-child-selected .slider__wrapper .slider__editor-badge-label,
   .slider__editor-badge:hover .slider__editor-badge-label {
     color: #1d2327;
   }
@@ -169,8 +169,8 @@
     }
   }
 
-  .block-editor-block-list__block.is-selected .slider__wrapper .swiper > .acf-innerblocks-container > .block-list-appender,
-  .block-editor-block-list__block:has(.is-selected) .slider__wrapper .swiper > .acf-innerblocks-container > .block-list-appender {
+  .wp-block-acf-slider.is-selected .slider__wrapper .swiper > .acf-innerblocks-container > .block-list-appender,
+  .wp-block-acf-slider.has-child-selected .slider__wrapper .swiper > .acf-innerblocks-container > .block-list-appender {
     display: block !important;
   }
 
@@ -179,8 +179,8 @@
   @include slider-editor-innerblocks-wrap(12);
   @include slider-editor-hide-extra-slides(12);
 
-  .block-editor-block-list__block.is-selected .slider__wrapper,
-  .block-editor-block-list__block:has(.is-selected) .slider__wrapper {
+  .wp-block-acf-slider.is-selected .slider__wrapper,
+  .wp-block-acf-slider.has-child-selected .slider__wrapper {
     .swiper > .acf-innerblocks-container {
       gap: max(8px, var(--slider-editor-slide-gap, 16px));
     }
