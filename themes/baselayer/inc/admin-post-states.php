@@ -50,7 +50,7 @@ function bl_admin_post_state_config(): array
 			'label' => __('Recurring', 'baselayer'),
 		],
 		'bl_expiring' => [
-			'icon' => 'hourglass',
+			'icon' => 'calendar-x-fill',
 			'modifier' => 'expiring',
 			'label' => __('Expiring', 'baselayer'),
 		],

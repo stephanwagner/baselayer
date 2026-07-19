@@ -1197,6 +1197,10 @@ msgctxt "icon name"
 msgid "Calendar (text)"
 msgstr "Kalender (Text)"
 
+msgctxt "icon name"
+msgid "Calendar (x)"
+msgstr "Kalender (x)"
+
 # Icon names — Symbols & misc
 
 msgctxt "icon name"

@@ -655,6 +655,7 @@ const builtInCategories = [
       { filename: 'calendar', alternatives: ['fill'], keywords: ['date', 'schedule', 'event', 'day', 'blank'] },
       { filename: 'calendar-month', alternatives: ['fill'], keywords: ['date', 'month', 'schedule', 'event'] },
       { filename: 'calendar-text', alternatives: ['fill'], keywords: ['date', 'event', 'schedule', 'agenda'] },
+      { filename: 'calendar-x', alternatives: ['fill'], keywords: ['date', 'event', 'schedule', 'cancel', 'busy', 'unavailable'] },
       { filename: 'speed-low', alternatives: ['fill'], keywords: ['speed', 'slow', 'performance', 'low'] },
       { filename: 'speed-high', alternatives: ['fill'], keywords: ['speed', 'fast', 'performance', 'high'] },
       { filename: 'label', alternatives: ['fill'], keywords: ['tag', 'badge', 'category'] },

@@ -585,6 +585,7 @@ function bl_icon_labels(): array
 		'calendar'                 => _x('Calendar (blank)', 'icon name', 'baselayer-icons'),
 		'calendar-month'           => _x('Calendar', 'icon name', 'baselayer-icons'),
 		'calendar-text'            => _x('Calendar (text)', 'icon name', 'baselayer-icons'),
+		'calendar-x'               => _x('Calendar (x)', 'icon name', 'baselayer-icons'),
 		'timer'                    => _x('Timer', 'icon name', 'baselayer-icons'),
 		'speed-high'               => _x('High speed', 'icon name', 'baselayer-icons'),
 		'speed-low'                => _x('Low speed', 'icon name', 'baselayer-icons'),
