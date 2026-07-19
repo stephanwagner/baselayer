@@ -88,6 +88,13 @@
     &:last-child {
       border-bottom: 0;
     }
+
+    &.is-deleted {
+      .bl-event-occurrences-modal__date {
+        color: #646970;
+        text-decoration: line-through;
+      }
+    }
   }
 
   &__item-main {
@@ -109,6 +116,16 @@
     background: #fcf0e3;
     color: #996800;
     font-size: 11px;
+
+    &--deleted {
+      background: #f0f0f1;
+      color: #50575e;
+    }
+
+    &--status {
+      background: color-mix(in srgb, var(--event-status-color, #2563eb) 16%, #fff);
+      color: var(--event-status-color, #2563eb);
+    }
   }
 
   &__edit {

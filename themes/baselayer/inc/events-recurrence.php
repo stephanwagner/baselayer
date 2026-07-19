@@ -9,6 +9,8 @@ defined('ABSPATH') || exit;
 const BL_EVENT_META_RECURRENCE = '_bl_event_recurrence';
 const BL_EVENT_META_OCCURRENCE_OF = '_bl_event_occurrence_of';
 const BL_EVENT_META_SERIES_DETACHED = '_bl_event_series_detached';
+/** JSON list of Y-m-d dates excluded from the series (user-deleted occurrences). */
+const BL_EVENT_META_EXDATES = '_bl_event_exdates';
 const BL_EVENT_CRON_HOOK = 'bl_event_extend_recurring_series';
 const BL_EVENT_RECURRENCE_LOOKAHEAD_DEFAULT = '1 year';
 
@@ -163,6 +165,108 @@ function bl_event_encode_recurrence(array $rule): string
 	}
 
 	return wp_json_encode($parsed, JSON_UNESCAPED_SLASHES);
+}
+
+/**
+ * @param mixed $raw
+ * @return list<string> Unique Y-m-d dates, sorted ascending.
+ */
+function bl_event_parse_exdates($raw): array
+{
+	$dates = [];
+	if (is_string($raw)) {
+		$raw = trim($raw);
+		if ($raw === '') {
+			return [];
+		}
+		$decoded = json_decode($raw, true);
+		if (!is_array($decoded)) {
+			return [];
+		}
+		$raw = $decoded;
+	}
+	if (!is_array($raw)) {
+		return [];
+	}
+	foreach ($raw as $date) {
+		if (!is_string($date)) {
+			continue;
+		}
+		$date = trim($date);
+		if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+			continue;
+		}
+		$dates[$date] = true;
+	}
+	$out = array_keys($dates);
+	sort($out);
+
+	return $out;
+}
+
+/**
+ * @return list<string>
+ */
+function bl_event_get_exdates(int $master_id): array
+{
+	if ($master_id <= 0) {
+		return [];
+	}
+	$raw = get_post_meta($master_id, BL_EVENT_META_EXDATES, true);
+
+	return bl_event_parse_exdates(is_string($raw) ? $raw : '');
+}
+
+/**
+ * @param list<string>|string $dates
+ */
+function bl_event_set_exdates(int $master_id, $dates): void
+{
+	if ($master_id <= 0) {
+		return;
+	}
+	$parsed = bl_event_parse_exdates($dates);
+	if ($parsed === []) {
+		delete_post_meta($master_id, BL_EVENT_META_EXDATES);
+
+		return;
+	}
+	update_post_meta($master_id, BL_EVENT_META_EXDATES, wp_json_encode($parsed, JSON_UNESCAPED_SLASHES));
+}
+
+function bl_event_add_exdate(int $master_id, string $date): void
+{
+	if ($master_id <= 0 || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+		return;
+	}
+	$dates = bl_event_get_exdates($master_id);
+	if (in_array($date, $dates, true)) {
+		return;
+	}
+	$dates[] = $date;
+	bl_event_set_exdates($master_id, $dates);
+}
+
+function bl_event_remove_exdate(int $master_id, string $date): void
+{
+	if ($master_id <= 0 || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+		return;
+	}
+	$dates = array_values(array_filter(
+		bl_event_get_exdates($master_id),
+		static function (string $d) use ($date): bool {
+			return $d !== $date;
+		}
+	));
+	bl_event_set_exdates($master_id, $dates);
+}
+
+function bl_event_clear_exdates(int $master_id): void
+{
+	if ($master_id <= 0) {
+		return;
+	}
+	delete_post_meta($master_id, BL_EVENT_META_EXDATES);
 }
 
 function bl_event_is_series_master(int $post_id): bool
@@ -529,6 +633,7 @@ function bl_event_sync_series(int $master_id): void
 				$GLOBALS['bl_event_syncing'] = false;
 			}
 		}
+		bl_event_clear_exdates($master_id);
 
 		return;
 	}
@@ -537,6 +642,8 @@ function bl_event_sync_series(int $master_id): void
 	if ($schedule === null) {
 		return;
 	}
+
+	$exdates = array_fill_keys(bl_event_get_exdates($master_id), true);
 
 	$horizon = bl_event_recurrence_horizon_date($post_type);
 	$dates = bl_event_expand_occurrences(
@@ -551,6 +658,10 @@ function bl_event_sync_series(int $master_id): void
 
 	foreach ($dates as $slot) {
 		$wanted_dates[$slot['start_date']] = true;
+		if (isset($exdates[$slot['start_date']])) {
+			// User excluded this date — do not create or revive.
+			continue;
+		}
 		$start_ts = bl_event_to_timestamp($slot['start_date'], $schedule['start_time'], false);
 		if ($start_ts > 0 && $start_ts < $now) {
 			// Past slot: leave existing alone; do not create missing past.
@@ -605,13 +716,13 @@ function bl_event_sync_series(int $master_id): void
 		$by_date[$slot['start_date']] = $new_id;
 	}
 
-	// Prune future occurrences that are no longer in the rule.
+	// Prune future occurrences that are no longer in the rule (or are excluded).
 	foreach ($by_date as $date => $oid) {
 		$start_ts = bl_event_get_start_timestamp($oid);
 		if ($start_ts < $now) {
 			continue;
 		}
-		if (!isset($wanted_dates[$date])) {
+		if (!isset($wanted_dates[$date]) || isset($exdates[$date])) {
 			wp_trash_post($oid);
 		}
 	}
@@ -882,7 +993,23 @@ function bl_event_register_recurrence_hooks(): void
 		add_action('save_post_' . $post_type, 'bl_event_save_series', 30);
 		// After meta from the REST request has been persisted.
 		add_action('rest_after_insert_' . $post_type, 'bl_event_rest_after_save_event', 20, 3);
+
+		register_post_meta($post_type, BL_EVENT_META_EXDATES, [
+			'type' => 'string',
+			'single' => true,
+			'show_in_rest' => true,
+			'auth_callback' => $auth,
+			'sanitize_callback' => static function ($value): string {
+				$parsed = bl_event_parse_exdates($value);
+
+				return $parsed === [] ? '' : (string) wp_json_encode($parsed, JSON_UNESCAPED_SLASHES);
+			},
+		]);
 	}
+
+	add_action('trashed_post', 'bl_event_on_occurrence_trashed');
+	add_action('untrashed_post', 'bl_event_on_occurrence_untrashed');
+	add_action('before_delete_post', 'bl_event_on_occurrence_before_delete');
 
 	if (!wp_next_scheduled(BL_EVENT_CRON_HOOK)) {
 		wp_schedule_event(time() + HOUR_IN_SECONDS, 'daily', BL_EVENT_CRON_HOOK);
@@ -891,6 +1018,76 @@ function bl_event_register_recurrence_hooks(): void
 
 add_action('init', 'bl_event_register_recurrence_hooks', 22);
 add_action(BL_EVENT_CRON_HOOK, 'bl_event_cron_extend_recurring_series');
+
+/**
+ * User trashed an occurrence → exclude that date from the series (do not recreate on sync).
+ */
+function bl_event_on_occurrence_trashed(int $post_id): void
+{
+	if (!empty($GLOBALS['bl_event_syncing'])) {
+		return;
+	}
+	if ($post_id <= 0 || !bl_event_is_occurrence($post_id)) {
+		return;
+	}
+	$master_id = bl_event_get_master_id($post_id);
+	if ($master_id <= 0) {
+		return;
+	}
+	$start = get_post_meta($post_id, BL_EVENT_META_START_DATE, true);
+	if (!is_string($start) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $start)) {
+		return;
+	}
+	bl_event_add_exdate($master_id, $start);
+}
+
+/**
+ * User restored an occurrence from trash → allow that date in the series again.
+ */
+function bl_event_on_occurrence_untrashed(int $post_id): void
+{
+	if (!empty($GLOBALS['bl_event_syncing'])) {
+		return;
+	}
+	if ($post_id <= 0 || !bl_event_is_occurrence($post_id)) {
+		return;
+	}
+	$master_id = bl_event_get_master_id($post_id);
+	if ($master_id <= 0) {
+		return;
+	}
+	$start = get_post_meta($post_id, BL_EVENT_META_START_DATE, true);
+	if (!is_string($start) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $start)) {
+		return;
+	}
+	bl_event_remove_exdate($master_id, $start);
+}
+
+/**
+ * Permanent delete of an occurrence → keep the date excluded (unless sync is pruning).
+ */
+function bl_event_on_occurrence_before_delete(int $post_id): void
+{
+	if (!empty($GLOBALS['bl_event_syncing'])) {
+		return;
+	}
+	if ($post_id <= 0 || !bl_event_is_occurrence($post_id)) {
+		return;
+	}
+	$master_id = bl_event_get_master_id($post_id);
+	if ($master_id <= 0 || (int) $master_id === $post_id) {
+		return;
+	}
+	// Master itself being deleted — do not write EXDATEs onto a dying post.
+	if (get_post_status($master_id) === false) {
+		return;
+	}
+	$start = get_post_meta($post_id, BL_EVENT_META_START_DATE, true);
+	if (!is_string($start) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $start)) {
+		return;
+	}
+	bl_event_add_exdate($master_id, $start);
+}
 
 /**
  * Daily: re-sync all masters so the lookahead window stays filled.
@@ -963,8 +1160,9 @@ add_action('rest_api_init', 'bl_event_register_revert_rest_route');
 
 /**
  * Upcoming occurrence rows for a master (start_ts >= now), ascending.
+ * Includes user-deleted dates (EXDATEs) marked as deleted.
  *
- * @return list<array{id: int, title: string, start_date: string, end_date: string, range_text: string, edit_link: string, detached: bool}>
+ * @return list<array{id: int, title: string, start_date: string, end_date: string, range_text: string, edit_link: string, detached: bool, deleted: bool}>
  */
 function bl_event_get_upcoming_occurrence_rows(int $master_id, int $limit = 200): array
 {
@@ -973,23 +1171,108 @@ function bl_event_get_upcoming_occurrence_rows(int $master_id, int $limit = 200)
 	}
 
 	$now = time();
+	$tz = bl_event_timezone();
+	$today = (new \DateTimeImmutable('now', $tz))->format('Y-m-d');
+	$master_schedule = bl_event_get_schedule($master_id);
+	$span_days = 0;
+	$start_time = '';
+	$end_time = '';
+	if ($master_schedule !== null) {
+		$start_time = $master_schedule['start_time'];
+		$end_time = $master_schedule['end_time'];
+		$ms = \DateTimeImmutable::createFromFormat('Y-m-d', $master_schedule['start_date'], $tz);
+		$me = \DateTimeImmutable::createFromFormat('Y-m-d', $master_schedule['end_date'], $tz);
+		if ($ms && $me) {
+			$span_days = max(0, (int) $ms->diff($me)->format('%r%a'));
+		}
+	}
+
 	$rows = [];
+	$seen_dates = [];
+
 	foreach (bl_event_get_occurrence_ids($master_id) as $oid) {
 		$start_ts = bl_event_get_start_timestamp($oid);
 		if ($start_ts <= 0 || $start_ts < $now) {
 			continue;
 		}
 		$schedule = bl_event_get_schedule($oid);
+		$start_date = $schedule['start_date'] ?? '';
+		if ($start_date !== '') {
+			$seen_dates[$start_date] = true;
+		}
 		$edit = get_edit_post_link($oid, 'raw');
 		$rows[] = [
 			'id' => $oid,
 			'title' => (string) get_the_title($oid),
-			'start_date' => $schedule['start_date'] ?? '',
+			'start_date' => $start_date,
 			'end_date' => $schedule['end_date'] ?? '',
 			'start_ts' => $start_ts,
 			'range_text' => bl_event_format_range_text($oid, true),
 			'edit_link' => is_string($edit) ? $edit : '',
 			'detached' => bl_event_is_occurrence_detached($oid),
+			'deleted' => false,
+			'status_key' => '',
+			'status_label' => '',
+			'status_color' => '',
+		];
+		if (function_exists('bl_event_get_status')) {
+			$status = bl_event_get_status($oid);
+			if ($status !== null) {
+				$rows[count($rows) - 1]['status_key'] = $status['key'];
+				$rows[count($rows) - 1]['status_label'] = $status['label'];
+				$rows[count($rows) - 1]['status_color'] = $status['color'];
+			}
+		}
+	}
+
+	$rule = bl_event_get_recurrence($master_id);
+	$exdates = bl_event_get_exdates($master_id);
+	$wanted_exdates = [];
+	if ($rule !== null && $master_schedule !== null && $exdates !== []) {
+		$horizon = bl_event_recurrence_horizon_date(get_post_type($master_id) ?: null);
+		$expanded = bl_event_expand_occurrences(
+			$rule,
+			$master_schedule['start_date'],
+			$master_schedule['end_date'],
+			$horizon
+		);
+		foreach ($expanded as $slot) {
+			$wanted_exdates[$slot['start_date']] = $slot['end_date'];
+		}
+	}
+
+	foreach ($exdates as $exdate) {
+		if ($exdate < $today || isset($seen_dates[$exdate])) {
+			continue;
+		}
+		// Only list exclusions that still belong to the current rule window.
+		if ($wanted_exdates !== [] && !isset($wanted_exdates[$exdate])) {
+			continue;
+		}
+		$end_date = $wanted_exdates[$exdate] ?? $exdate;
+		if ($end_date === $exdate && $span_days > 0) {
+			$dt = \DateTimeImmutable::createFromFormat('Y-m-d', $exdate, $tz);
+			if ($dt) {
+				$end_date = $dt->modify('+' . $span_days . ' days')->format('Y-m-d');
+			}
+		}
+		$start_ts = bl_event_to_timestamp($exdate, $start_time, false);
+		if ($start_ts > 0 && $start_ts < $now) {
+			continue;
+		}
+		$rows[] = [
+			'id' => 0,
+			'title' => '',
+			'start_date' => $exdate,
+			'end_date' => $end_date,
+			'start_ts' => $start_ts > 0 ? $start_ts : 0,
+			'range_text' => bl_event_format_slot_range_text($exdate, $end_date, $start_time, $end_time, true),
+			'edit_link' => '',
+			'detached' => false,
+			'deleted' => true,
+			'status_key' => '',
+			'status_label' => '',
+			'status_color' => '',
 		];
 	}
 

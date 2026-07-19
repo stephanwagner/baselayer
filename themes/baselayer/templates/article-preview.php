@@ -34,8 +34,28 @@ if ($classes !== '') {
 			<?= bl_image_with_placeholder(get_post_thumbnail_id(), 'medium', ['class' => 'article-preview__image']); ?>
 		</div>
 		<div class="article-preview__content">
-			<?php if ($range !== '') : ?>
-				<p class="article-preview__date"><?php echo esc_html($range); ?></p>
+			<?php
+			$status_badge = '';
+			if (
+				function_exists('bl_event_should_display_status')
+				&& function_exists('bl_is_event_post_type')
+				&& bl_is_event_post_type(get_post_type($id))
+				&& bl_event_should_display_status((int) $id)
+			) {
+				ob_start();
+				bl_event_render_status_badge((int) $id, 'event-status-badge article-preview__status');
+				$status_badge = trim((string) ob_get_clean());
+			}
+			?>
+			<?php if ($range !== '' || $status_badge !== '') : ?>
+				<div class="article-preview__meta">
+					<?php if ($range !== '') : ?>
+						<p class="article-preview__date"><?php echo esc_html($range); ?></p>
+					<?php endif; ?>
+					<?php if ($status_badge !== '') : ?>
+						<?= $status_badge ?>
+					<?php endif; ?>
+				</div>
 			<?php endif; ?>
 			<<?= esc_attr($title_tag) ?> class="article-preview__title">
 				<?php the_title(); ?>

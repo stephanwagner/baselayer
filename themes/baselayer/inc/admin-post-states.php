@@ -49,6 +49,10 @@ function bl_admin_post_state_config(): array
 			'modifier' => 'recurring',
 			'label' => __('Recurring', 'baselayer'),
 		],
+		'bl_event_status' => [
+			'icon' => 'info',
+			'modifier' => 'event-status',
+		],
 		'bl_expiring' => [
 			'icon' => 'calendar-x-fill',
 			'modifier' => 'expiring',
@@ -147,8 +151,10 @@ add_filter('display_post_states', 'bl_admin_enrich_post_states', 5, 2);
 
 /**
  * Build a single badge span.
+ *
+ * @param \WP_Post|null $post Optional post for dynamic status colors.
  */
-function bl_admin_post_state_badge_html(string $key, string $label): string
+function bl_admin_post_state_badge_html(string $key, string $label, $post = null): string
 {
 	$config = bl_admin_post_state_config();
 	$cfg = $config[$key] ?? null;
@@ -165,7 +171,19 @@ function bl_admin_post_state_badge_html(string $key, string $label): string
 		$classes[] = '-icon-' . $icon;
 	}
 
-	return '<span class="' . esc_attr(implode(' ', $classes)) . '">' . esc_html(wp_strip_all_tags($label)) . '</span>';
+	$style = '';
+	if (
+		$key === 'bl_event_status'
+		&& $post instanceof \WP_Post
+		&& function_exists('bl_event_get_status')
+	) {
+		$status = bl_event_get_status((int) $post->ID);
+		if ($status !== null && $status['color'] !== '') {
+			$style = ' style="--event-status-color: ' . esc_attr($status['color']) . '"';
+		}
+	}
+
+	return '<span class="' . esc_attr(implode(' ', $classes)) . '"' . $style . '>' . esc_html(wp_strip_all_tags($label)) . '</span>';
 }
 
 /**
@@ -185,7 +203,7 @@ function bl_admin_post_states_html(string $html, array $post_states, $post): str
 		if ($key === '' || !is_string($label) || $label === '') {
 			continue;
 		}
-		$badges[] = bl_admin_post_state_badge_html($key, $label);
+		$badges[] = bl_admin_post_state_badge_html($key, $label, $post);
 	}
 
 	if ($badges === []) {
@@ -219,7 +237,7 @@ function bl_admin_post_states_html_fallback(array $states, $post): array
 		if ($key === '' || !is_string($label)) {
 			continue;
 		}
-		$out[$key] = bl_admin_post_state_badge_html($key, $label);
+		$out[$key] = bl_admin_post_state_badge_html($key, $label, $post);
 	}
 
 	return $out;

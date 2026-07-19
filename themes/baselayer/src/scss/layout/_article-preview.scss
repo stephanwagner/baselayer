@@ -95,6 +95,22 @@
   color: var(--bl-color-gray-600);
   font-size: var(--bl-font-size-s);
   line-height: var(--bl-line-height-s);
+
+  .article-preview__meta & {
+    margin: 0;
+  }
+}
+
+.article-preview__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 10px;
+  margin: 0 0 8px;
+}
+
+.article-preview__status {
+  flex-shrink: 0;
 }
 
 .article-preview__read-more-container {

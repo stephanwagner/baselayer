@@ -102,17 +102,34 @@
         items.forEach(function (item) {
           const range = item.range_text || item.start_date || '';
           const edit = item.edit_link || '';
-          html += '<li class="bl-event-occurrences-modal__item">';
+          const deleted = !!item.deleted;
+          html +=
+            '<li class="bl-event-occurrences-modal__item' +
+            (deleted ? ' is-deleted' : '') +
+            '">';
           html += '<div class="bl-event-occurrences-modal__item-main">';
           html += '<span class="bl-event-occurrences-modal__date">' + escapeHtml(range) + '</span>';
-          if (item.detached) {
+          if (deleted) {
+            html +=
+              ' <span class="bl-event-occurrences-modal__badge bl-event-occurrences-modal__badge--deleted">' +
+              escapeHtml(L.deletedLabel || 'Deleted') +
+              '</span>';
+          } else if (item.detached) {
             html +=
               ' <span class="bl-event-occurrences-modal__badge">' +
               escapeHtml(L.customContent || 'Custom content') +
               '</span>';
           }
+          if (!deleted && item.status_key && item.status_key !== 'active' && item.status_label) {
+            html +=
+              ' <span class="bl-event-occurrences-modal__badge bl-event-occurrences-modal__badge--status" style="--event-status-color:' +
+              escapeAttr(item.status_color || '#2563eb') +
+              '">' +
+              escapeHtml(item.status_label) +
+              '</span>';
+          }
           html += '</div>';
-          if (edit) {
+          if (edit && !deleted) {
             html +=
               '<a class="bl-event-occurrences-modal__edit" href="' +
               escapeAttr(edit) +

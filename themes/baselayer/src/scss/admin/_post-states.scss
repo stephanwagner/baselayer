@@ -71,6 +71,13 @@
     --bl-post-state-fg: var(--bl-post-state-recurring-fg);
   }
 
+  &--event-status {
+    --event-status-color: #2563eb;
+    --bl-post-state-bg: color-mix(in srgb, var(--event-status-color) 16%, #fff);
+    --bl-post-state-fg: var(--event-status-color);
+    border: 1px solid color-mix(in srgb, var(--event-status-color) 35%, #fff);
+  }
+
   &--expiring {
     --bl-post-state-bg: var(--bl-post-state-expiring-bg);
     --bl-post-state-fg: var(--bl-post-state-expiring-fg);

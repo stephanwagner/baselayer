@@ -2904,3 +2904,24 @@ msgstr "Veranstalter: %s"
 msgid "Contact: %s"
 msgstr "Kontakt: %s"
 
+
+msgid "Deleted"
+msgstr "Gelöscht"
+
+msgid "Cancelled"
+msgstr "Abgesagt"
+
+msgid "Postponed"
+msgstr "Verschoben"
+
+msgid "Custom"
+msgstr "Benutzerdefiniert"
+
+msgid "Status"
+msgstr "Status"
+
+msgid "Status label"
+msgstr "Statusbezeichnung"
+
+msgid "Status information"
+msgstr "Statusinformationen"

@@ -23,7 +23,7 @@
   const { useEntityProp } = wp.coreData;
   const { registerPlugin } = wp.plugins;
   const { PluginDocumentSettingPanel } = wp.editor;
-  const { PanelRow, ToggleControl, Button, Modal, SelectControl, TextControl } = wp.components;
+  const { PanelRow, ToggleControl, Button, Modal, SelectControl, TextControl, TextareaControl } = wp.components;
 
   const L = baselayerEvents;
 
@@ -34,6 +34,10 @@
   const META_RECURRENCE = '_bl_event_recurrence';
   const META_OCCURRENCE_OF = '_bl_event_occurrence_of';
   const META_DETACHED = '_bl_event_series_detached';
+  const META_EXDATES = '_bl_event_exdates';
+  const META_STATUS = '_bl_event_status';
+  const META_STATUS_LABEL = '_bl_event_status_label';
+  const META_STATUS_INFO = '_bl_event_status_info';
 
   const WEEKDAYS = ['mo', 'tu', 'we', 'th', 'fr', 'sa', 'su'];
 
@@ -119,6 +123,23 @@
     const a = new Date(start + 'T12:00:00');
     const b = new Date(end + 'T12:00:00');
     return Math.max(0, Math.round((b - a) / 86400000));
+  }
+
+  function parseExdates(raw) {
+    if (!raw || typeof raw !== 'string') {
+      return [];
+    }
+    try {
+      const data = JSON.parse(raw);
+      if (!Array.isArray(data)) {
+        return [];
+      }
+      return data.filter(function (d) {
+        return typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d);
+      });
+    } catch (e) {
+      return [];
+    }
   }
 
   function expandOccurrences(rule, anchorStart, anchorEnd, horizon) {
@@ -278,21 +299,24 @@
   }
 
   function RecurrenceModal(props) {
-    const { initialRule, startDate, endDate, onSave, onRequestClose } = props;
+    const { initialRule, startDate, endDate, exdates, onSave, onRequestClose } = props;
     const [draft, setDraft] = useState(function () {
       return initialRule ? Object.assign({}, initialRule) : defaultRule(startDate);
     });
 
     const hasStartDate = !!(startDate && /^\d{4}-\d{2}-\d{2}$/.test(startDate));
     const horizon = L.horizonDate || addDays(startDate || new Date().toISOString().slice(0, 10), 365);
+    const excluded = Array.isArray(exdates) ? exdates : [];
     const upcoming = useMemo(
       function () {
         if (!hasStartDate) {
           return [];
         }
-        return expandOccurrences(draft, startDate, endDate || startDate, horizon);
+        return expandOccurrences(draft, startDate, endDate || startDate, horizon).filter(function (slot) {
+          return excluded.indexOf(slot.start_date) === -1;
+        });
       },
-      [draft, startDate, endDate, horizon, hasStartDate],
+      [draft, startDate, endDate, horizon, hasStartDate, excluded.join(',')],
     );
     const preview = upcoming.slice(0, 4);
     const more = Math.max(0, upcoming.length - preview.length);
@@ -561,12 +585,29 @@
     const startTime = (meta && meta[META_START_TIME]) || '';
     const endTime = (meta && meta[META_END_TIME]) || '';
     const recurrenceRaw = (meta && meta[META_RECURRENCE]) || '';
+    const exdates = parseExdates((meta && meta[META_EXDATES]) || '');
     const occurrenceOf = parseInt(meta && meta[META_OCCURRENCE_OF], 10) || 0;
     const detached = !!(meta && meta[META_DETACHED] === '1');
     const isOccurrence = occurrenceOf > 0 || (postParent && postParent > 0);
     const masterId = occurrenceOf || postParent || 0;
     const rule = parseRule(recurrenceRaw);
     const hasStartDate = !!(startDate && /^\d{4}-\d{2}-\d{2}$/.test(startDate));
+    const isSeriesMaster = !isOccurrence && !!rule;
+    const showStatus = !isSeriesMaster;
+    const statusKey = (meta && meta[META_STATUS]) || 'active';
+    const statusCustomLabel = (meta && meta[META_STATUS_LABEL]) || '';
+    const statusInfo = (meta && meta[META_STATUS_INFO]) || '';
+    const statusOptions = (function () {
+      const raw =
+        (L.statusesByType && L.statusesByType[postType]) || L.statuses || [];
+      return raw.map(function (opt) {
+        return {
+          label: opt.label,
+          value: opt.key,
+          disabled: !!opt.disabled,
+        };
+      });
+    })();
 
     const masterRecord = useSelect(
       function (select) {
@@ -739,11 +780,16 @@
                 initialRule: rule || defaultRule(startDate),
                 startDate: startDate,
                 endDate: endDate || startDate,
+                exdates: exdates,
                 onRequestClose: function () {
                   setModalOpen(false);
                 },
                 onSave: function (encoded) {
-                  patch({ [META_RECURRENCE]: encoded });
+                  const next = { [META_RECURRENCE]: encoded };
+                  if (!encoded) {
+                    next[META_EXDATES] = '';
+                  }
+                  patch(next);
                 },
               })
             : null,
@@ -840,6 +886,72 @@
                   patch({ [META_END_TIME]: e.target.value });
                 },
               }),
+            )
+          : null,
+        showStatus
+          ? el(
+              'div',
+              { key: 'bl-event-status', className: 'bl-event-status' },
+              el(SelectControl, {
+                label: L.statusLabel || 'Status',
+                value: statusKey || 'active',
+                options: statusOptions.length
+                  ? statusOptions
+                  : [
+                      { label: 'Active', value: 'active' },
+                      { label: 'Cancelled', value: 'cancelled' },
+                      { label: 'Postponed', value: 'postponed' },
+                      { label: '────────', value: '__sep__', disabled: true },
+                      { label: 'Custom', value: 'custom' },
+                    ],
+                onChange: function (value) {
+                  if (value === '__sep__') {
+                    return;
+                  }
+                  const next = { [META_STATUS]: value || 'active' };
+                  if (!value || value === 'active') {
+                    next[META_STATUS_INFO] = '';
+                  }
+                  patch(next);
+                },
+              }),
+              statusKey === 'custom'
+                ? el(TextControl, {
+                    label: L.statusCustomLabel || 'Status label',
+                    value: statusCustomLabel,
+                    onChange: function (v) {
+                      patch({ [META_STATUS_LABEL]: v });
+                    },
+                  })
+                : null,
+              statusKey && statusKey !== 'active'
+                ? TextareaControl
+                  ? el(TextareaControl, {
+                      label: L.statusInfoLabel || 'Status information',
+                      value: statusInfo,
+                      rows: 3,
+                      onChange: function (v) {
+                        patch({ [META_STATUS_INFO]: v });
+                      },
+                    })
+                  : el(
+                      PanelRow,
+                      null,
+                      el(
+                        'label',
+                        { className: 'components-base-control__label' },
+                        L.statusInfoLabel || 'Status information',
+                      ),
+                      el('textarea', {
+                        className: 'components-textarea-control__input',
+                        rows: 3,
+                        value: statusInfo,
+                        onChange: function (e) {
+                          patch({ [META_STATUS_INFO]: e.target.value });
+                        },
+                      }),
+                    )
+                : null,
             )
           : null,
         recurrenceBlock,

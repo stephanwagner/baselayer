@@ -9,6 +9,7 @@ defined('ABSPATH') || exit;
 require_once __DIR__ . '/events-recurrence.php';
 require_once __DIR__ . '/events-meta.php';
 require_once __DIR__ . '/events-ical.php';
+require_once __DIR__ . '/events-status.php';
 
 const BL_EVENT_META_START_DATE = '_bl_event_start_date';
 const BL_EVENT_META_END_DATE = '_bl_event_end_date';
@@ -388,6 +389,18 @@ function bl_event_display_post_states(array $states, $post): array
 	}
 	if (function_exists('bl_event_is_series_master') && bl_event_is_series_master((int) $post->ID)) {
 		$states['bl_event_recurring'] = __('Recurring', 'baselayer');
+
+		return $states;
+	}
+	if (
+		function_exists('bl_event_should_display_status')
+		&& function_exists('bl_event_get_status')
+		&& bl_event_should_display_status((int) $post->ID)
+	) {
+		$status = bl_event_get_status((int) $post->ID);
+		if ($status !== null && $status['label'] !== '') {
+			$states['bl_event_status'] = $status['label'];
+		}
 	}
 
 	return $states;
@@ -639,10 +652,14 @@ add_action('enqueue_block_editor_assets', function (): void {
 		: '';
 
 	$meta_by_type = [];
+	$statuses_by_type = [];
 	foreach ($post_types as $type) {
 		$meta_by_type[$type] = function_exists('bl_cpt_event_meta_config')
 			? bl_cpt_event_meta_config($type)
 			: ['title' => '', 'groups' => []];
+		$statuses_by_type[$type] = function_exists('bl_event_get_status_options')
+			? bl_event_get_status_options($type)
+			: [];
 	}
 
 	wp_localize_script('baselayer-editor', 'baselayerEvents', [
@@ -654,6 +671,11 @@ add_action('enqueue_block_editor_assets', function (): void {
 		'includeTimesLabel' => __('Include times', 'baselayer'),
 		'startTimeLabel' => __('Start time', 'baselayer'),
 		'endTimeLabel' => __('End time', 'baselayer'),
+		'statusLabel' => __('Status', 'baselayer'),
+		'statusCustomLabel' => __('Status label', 'baselayer'),
+		'statusInfoLabel' => __('Status information', 'baselayer'),
+		'statuses' => $statuses_by_type[$pt] ?? [],
+		'statusesByType' => $statuses_by_type,
 		'recurringTitle' => __('Recurring', 'baselayer'),
 		'notRepeating' => __('Not repeating', 'baselayer'),
 		'editRecurrence' => __('Edit recurrence', 'baselayer'),
@@ -842,6 +864,7 @@ add_action('admin_enqueue_scripts', static function (string $hook_suffix): void 
 		'closeLabel' => __('Close', 'baselayer'),
 		'loadingLabel' => __('Loading…', 'baselayer'),
 		'customContent' => __('Custom content', 'baselayer'),
+		'deletedLabel' => __('Deleted', 'baselayer'),
 		'errorLabel' => __('Could not load occurrences.', 'baselayer'),
 	]);
 }, 20);
@@ -906,18 +929,41 @@ function bl_event_format_range_text(int $post_id, bool $abbr_month_names = false
 		return '';
 	}
 
-	$start_ts = bl_event_get_start_timestamp($post_id);
-	$end_ts = bl_event_get_end_timestamp($post_id);
+	return bl_event_format_slot_range_text(
+		$schedule['start_date'],
+		$schedule['end_date'],
+		$schedule['start_time'],
+		$schedule['end_time'],
+		$abbr_month_names
+	);
+}
+
+/**
+ * Format a date/time slot the same way as bl_event_format_range_text (no post required).
+ */
+function bl_event_format_slot_range_text(
+	string $start_date,
+	string $end_date,
+	string $start_time = '',
+	string $end_time = '',
+	bool $abbr_month_names = false
+): string {
+	if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $start_date)) {
+		return '';
+	}
+	if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $end_date)) {
+		$end_date = $start_date;
+	}
+
+	$st = bl_event_normalize_time($start_time);
+	$et = bl_event_normalize_time($end_time);
+	$start_ts = bl_event_to_timestamp($start_date, $st, false);
+	$end_ts = bl_event_to_timestamp($end_date, $et, $et === '');
 	if ($start_ts <= 0 || $end_ts <= 0) {
 		return '';
 	}
 
-	$start_date = $schedule['start_date'];
-	$end_date = $schedule['end_date'];
-	$st = $schedule['start_time'];
-	$et = $schedule['end_time'];
 	$tz = bl_event_timezone();
-
 	$df = get_option('date_format', 'F j, Y');
 	if ($abbr_month_names) {
 		$df = bl_event_abbr_month_datetime_format((string) $df);

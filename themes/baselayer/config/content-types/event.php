@@ -16,6 +16,18 @@ return [
 		'hierarchical' => true,
 
 		/**
+		 * Extra statuses for one-offs / occurrences (after Postponed, before Custom).
+		 * Built-ins Active / Cancelled / Postponed / Custom are always available.
+		 * color: hex (#rgb or #rrggbb) for badges and the singular notice.
+		 */
+		'statuses' => [
+			'sold_out' => [
+				'label' => 'Sold Out',
+				'color' => '#b45309',
+			],
+		],
+
+		/**
 		 * Extra event fields (sidebar panel + singular template below content).
 		 * group => [ title, fields => field_id => [ type, label ] ]
 		 * Field types: text | textarea | email | url

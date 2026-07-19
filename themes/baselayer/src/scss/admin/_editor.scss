@@ -302,6 +302,16 @@ div.baselayer-seo-panel {
   margin: 0 !important;
 }
 
+.bl-event-status {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #ddd;
+
+  .components-base-control {
+    margin-bottom: 10px;
+  }
+}
+
 .bl-event-recurring {
   margin-top: 16px;
   padding-top: 12px;
