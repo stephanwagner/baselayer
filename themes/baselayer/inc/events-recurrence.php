@@ -312,18 +312,23 @@ function bl_event_is_occurrence_detached(int $post_id): bool
 }
 
 /**
+ * @param list<string>|null $post_status Null = live statuses (not trash).
  * @return int[]
  */
-function bl_event_get_occurrence_ids(int $master_id): array
+function bl_event_get_occurrence_ids(int $master_id, ?array $post_status = null): array
 {
 	$post_type = get_post_type($master_id);
 	if (!$post_type || !bl_is_event_post_type($post_type)) {
 		return [];
 	}
 
+	if ($post_status === null) {
+		$post_status = ['publish', 'draft', 'pending', 'future', 'private'];
+	}
+
 	$ids = get_posts([
 		'post_type' => $post_type,
-		'post_status' => ['publish', 'draft', 'pending', 'future', 'private'],
+		'post_status' => $post_status,
 		'posts_per_page' => -1,
 		'fields' => 'ids',
 		'post_parent' => $master_id,
@@ -333,6 +338,41 @@ function bl_event_get_occurrence_ids(int $master_id): array
 	]);
 
 	return array_map('intval', $ids);
+}
+
+/**
+ * Occurrence IDs including trash (for cascade lifecycle).
+ *
+ * @return int[]
+ */
+function bl_event_get_occurrence_ids_including_trash(int $master_id): array
+{
+	return bl_event_get_occurrence_ids($master_id, [
+		'publish',
+		'draft',
+		'pending',
+		'future',
+		'private',
+		'trash',
+	]);
+}
+
+/**
+ * Whether this post is a series master (including when already in trash).
+ */
+function bl_event_is_series_master_post(int $post_id): bool
+{
+	if ($post_id <= 0 || !bl_is_event_post_type(get_post_type($post_id))) {
+		return false;
+	}
+	if ((int) wp_get_post_parent_id($post_id) > 0) {
+		return false;
+	}
+	if (bl_event_get_recurrence($post_id) !== null) {
+		return true;
+	}
+
+	return bl_event_get_occurrence_ids_including_trash($post_id) !== [];
 }
 
 /**
@@ -625,14 +665,14 @@ function bl_event_sync_series(int $master_id): void
 
 	if ($rule === null) {
 		// No rule: remove future occurrences only.
+		$GLOBALS['bl_event_syncing'] = true;
 		foreach ($existing as $oid) {
 			$start_ts = bl_event_get_start_timestamp($oid);
 			if ($start_ts >= $now) {
-				$GLOBALS['bl_event_syncing'] = true;
-				wp_trash_post($oid);
-				$GLOBALS['bl_event_syncing'] = false;
+				wp_delete_post($oid, true);
 			}
 		}
+		$GLOBALS['bl_event_syncing'] = false;
 		bl_event_clear_exdates($master_id);
 
 		return;
@@ -723,7 +763,7 @@ function bl_event_sync_series(int $master_id): void
 			continue;
 		}
 		if (!isset($wanted_dates[$date]) || isset($exdates[$date])) {
-			wp_trash_post($oid);
+			wp_delete_post($oid, true);
 		}
 	}
 
@@ -1007,9 +1047,11 @@ function bl_event_register_recurrence_hooks(): void
 		]);
 	}
 
-	add_action('trashed_post', 'bl_event_on_occurrence_trashed');
-	add_action('untrashed_post', 'bl_event_on_occurrence_untrashed');
 	add_action('before_delete_post', 'bl_event_on_occurrence_before_delete');
+	add_filter('pre_trash_post', 'bl_event_pre_trash_occurrence', 10, 3);
+	add_action('trashed_post', 'bl_event_on_master_trashed', 5);
+	add_action('untrashed_post', 'bl_event_on_master_untrashed', 5);
+	add_action('before_delete_post', 'bl_event_on_master_before_delete', 5);
 
 	if (!wp_next_scheduled(BL_EVENT_CRON_HOOK)) {
 		wp_schedule_event(time() + HOUR_IN_SECONDS, 'daily', BL_EVENT_CRON_HOOK);
@@ -1020,51 +1062,151 @@ add_action('init', 'bl_event_register_recurrence_hooks', 22);
 add_action(BL_EVENT_CRON_HOOK, 'bl_event_cron_extend_recurring_series');
 
 /**
- * User trashed an occurrence → exclude that date from the series (do not recreate on sync).
+ * Soft-delete an occurrence: EXDATE on master + force-remove the child post (never WP Trash).
+ *
+ * @return true|\WP_Error
  */
-function bl_event_on_occurrence_trashed(int $post_id): void
+function bl_event_soft_delete_occurrence(int $occurrence_id)
+{
+	if ($occurrence_id <= 0 || !bl_event_is_occurrence($occurrence_id)) {
+		return new \WP_Error('bl_not_occurrence', __('Not an occurrence.', 'baselayer'), ['status' => 400]);
+	}
+	$master_id = bl_event_get_master_id($occurrence_id);
+	if ($master_id <= 0) {
+		return new \WP_Error('bl_no_master', __('Master event not found.', 'baselayer'), ['status' => 400]);
+	}
+	$master_status = get_post_status($master_id);
+	if ($master_status === false || $master_status === 'trash') {
+		return new \WP_Error('bl_master_unavailable', __('Master event is not available.', 'baselayer'), ['status' => 400]);
+	}
+
+	$start = get_post_meta($occurrence_id, BL_EVENT_META_START_DATE, true);
+	if (is_string($start) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $start)) {
+		bl_event_add_exdate($master_id, $start);
+	}
+
+	$GLOBALS['bl_event_syncing'] = true;
+	wp_delete_post($occurrence_id, true);
+	$GLOBALS['bl_event_syncing'] = false;
+
+	return true;
+}
+
+/**
+ * Intercept Move to Trash on occurrences → soft-delete instead.
+ *
+ * @param mixed         $check            Non-null aborts core trash.
+ * @param \WP_Post|null $post             Post being trashed.
+ * @param string        $previous_status  Previous status.
+ * @return mixed
+ */
+function bl_event_pre_trash_occurrence($check, $post, $previous_status)
+{
+	unset($previous_status);
+	if ($check !== null) {
+		return $check;
+	}
+	if (!empty($GLOBALS['bl_event_syncing'])) {
+		return $check;
+	}
+	if (!$post instanceof \WP_Post || !bl_event_is_occurrence((int) $post->ID)) {
+		return $check;
+	}
+
+	$master_id = bl_event_get_master_id((int) $post->ID);
+	$result = bl_event_soft_delete_occurrence((int) $post->ID);
+	if (is_wp_error($result)) {
+		return false;
+	}
+
+	if (is_admin() && !wp_doing_ajax() && !(defined('REST_REQUEST') && REST_REQUEST)) {
+		$redirect = '';
+		if ($master_id > 0) {
+			$link = get_edit_post_link($master_id, 'raw');
+			$redirect = is_string($link) ? $link : '';
+		}
+		if ($redirect === '') {
+			$redirect = admin_url('edit.php?post_type=' . rawurlencode($post->post_type));
+		}
+		wp_safe_redirect(add_query_arg('bl_occurrence_removed', '1', $redirect));
+		exit;
+	}
+
+	return true;
+}
+
+/**
+ * Trash master → force-delete all occurrence children (never leave them in Trash).
+ */
+function bl_event_on_master_trashed(int $post_id): void
 {
 	if (!empty($GLOBALS['bl_event_syncing'])) {
 		return;
 	}
-	if ($post_id <= 0 || !bl_event_is_occurrence($post_id)) {
+	if ($post_id <= 0 || !bl_event_is_series_master_post($post_id)) {
 		return;
 	}
-	$master_id = bl_event_get_master_id($post_id);
-	if ($master_id <= 0) {
+	if (bl_event_is_occurrence($post_id)) {
 		return;
 	}
-	$start = get_post_meta($post_id, BL_EVENT_META_START_DATE, true);
-	if (!is_string($start) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $start)) {
-		return;
+
+	$GLOBALS['bl_event_syncing'] = true;
+	foreach (bl_event_get_occurrence_ids_including_trash($post_id) as $oid) {
+		wp_delete_post($oid, true);
 	}
-	bl_event_add_exdate($master_id, $start);
+	bl_event_clear_exdates($post_id);
+	$GLOBALS['bl_event_syncing'] = false;
 }
 
 /**
- * User restored an occurrence from trash → allow that date in the series again.
+ * Untrash master → rebuild occurrence window via sync.
  */
-function bl_event_on_occurrence_untrashed(int $post_id): void
+function bl_event_on_master_untrashed(int $post_id): void
 {
 	if (!empty($GLOBALS['bl_event_syncing'])) {
 		return;
 	}
-	if ($post_id <= 0 || !bl_event_is_occurrence($post_id)) {
+	if ($post_id <= 0 || !bl_is_event_post_type(get_post_type($post_id))) {
 		return;
 	}
-	$master_id = bl_event_get_master_id($post_id);
-	if ($master_id <= 0) {
+	if ((int) wp_get_post_parent_id($post_id) > 0) {
 		return;
 	}
-	$start = get_post_meta($post_id, BL_EVENT_META_START_DATE, true);
-	if (!is_string($start) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $start)) {
+	if (bl_event_get_recurrence($post_id) === null) {
 		return;
 	}
-	bl_event_remove_exdate($master_id, $start);
+
+	bl_event_sync_series($post_id);
+	bl_event_sync_series_content($post_id);
 }
 
 /**
- * Permanent delete of an occurrence → keep the date excluded (unless sync is pruning).
+ * Permanent delete master → permanently delete all occurrence children.
+ */
+function bl_event_on_master_before_delete(int $post_id): void
+{
+	if (!empty($GLOBALS['bl_event_syncing'])) {
+		return;
+	}
+	if ($post_id <= 0 || !bl_is_event_post_type(get_post_type($post_id))) {
+		return;
+	}
+	if ((int) wp_get_post_parent_id($post_id) > 0) {
+		return;
+	}
+	if (!bl_event_is_series_master_post($post_id)) {
+		return;
+	}
+
+	$GLOBALS['bl_event_syncing'] = true;
+	foreach (bl_event_get_occurrence_ids_including_trash($post_id) as $oid) {
+		wp_delete_post($oid, true);
+	}
+	$GLOBALS['bl_event_syncing'] = false;
+}
+
+/**
+ * Permanent delete of an occurrence (non-helper path) → keep the date excluded.
  */
 function bl_event_on_occurrence_before_delete(int $post_id): void
 {
@@ -1078,8 +1220,7 @@ function bl_event_on_occurrence_before_delete(int $post_id): void
 	if ($master_id <= 0 || (int) $master_id === $post_id) {
 		return;
 	}
-	// Master itself being deleted — do not write EXDATEs onto a dying post.
-	if (get_post_status($master_id) === false) {
+	if (get_post_status($master_id) === false || get_post_status($master_id) === 'trash') {
 		return;
 	}
 	$start = get_post_meta($post_id, BL_EVENT_META_START_DATE, true);
@@ -1324,6 +1465,137 @@ function bl_event_register_occurrences_list_rest_route(): void
 }
 
 add_action('rest_api_init', 'bl_event_register_occurrences_list_rest_route');
+
+/**
+ * Restore a skipped (EXDATE) occurrence date on a master.
+ *
+ * @return true|\WP_Error
+ */
+function bl_event_restore_occurrence_date(int $master_id, string $start_date)
+{
+	if ($master_id <= 0 || !bl_event_is_series_master($master_id)) {
+		return new \WP_Error('bl_not_master', __('Not a recurring master event.', 'baselayer'), ['status' => 400]);
+	}
+	if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $start_date)) {
+		return new \WP_Error('bl_bad_date', __('Invalid date.', 'baselayer'), ['status' => 400]);
+	}
+
+	bl_event_remove_exdate($master_id, $start_date);
+	bl_event_sync_series($master_id);
+	bl_event_sync_series_content($master_id);
+
+	return true;
+}
+
+/**
+ * REST: restore a deleted occurrence date on a master.
+ */
+function bl_event_register_restore_occurrence_rest_route(): void
+{
+	register_rest_route('baselayer/v1', '/event-restore-occurrence', [
+		'methods' => 'POST',
+		'permission_callback' => static function (\WP_REST_Request $request): bool {
+			$master_id = (int) $request->get_param('master_id');
+
+			return $master_id > 0 && current_user_can('edit_post', $master_id);
+		},
+		'args' => [
+			'master_id' => [
+				'required' => true,
+				'type' => 'integer',
+			],
+			'start_date' => [
+				'required' => true,
+				'type' => 'string',
+			],
+		],
+		'callback' => static function (\WP_REST_Request $request) {
+			$master_id = (int) $request->get_param('master_id');
+			$start_date = (string) $request->get_param('start_date');
+			$result = bl_event_restore_occurrence_date($master_id, $start_date);
+			if (is_wp_error($result)) {
+				return $result;
+			}
+
+			return rest_ensure_response([
+				'master_id' => $master_id,
+				'start_date' => $start_date,
+				'occurrences' => bl_event_get_upcoming_occurrence_rows($master_id),
+			]);
+		},
+	]);
+}
+
+add_action('rest_api_init', 'bl_event_register_restore_occurrence_rest_route');
+
+/**
+ * REST: soft-delete an occurrence (EXDATE + remove child post).
+ */
+function bl_event_register_soft_delete_occurrence_rest_route(): void
+{
+	register_rest_route('baselayer/v1', '/event-soft-delete-occurrence', [
+		'methods' => 'POST',
+		'permission_callback' => static function (\WP_REST_Request $request): bool {
+			$master_id = (int) $request->get_param('master_id');
+
+			return $master_id > 0 && current_user_can('edit_post', $master_id);
+		},
+		'args' => [
+			'master_id' => [
+				'required' => true,
+				'type' => 'integer',
+			],
+			'occurrence_id' => [
+				'required' => false,
+				'type' => 'integer',
+				'default' => 0,
+			],
+			'start_date' => [
+				'required' => false,
+				'type' => 'string',
+				'default' => '',
+			],
+		],
+		'callback' => static function (\WP_REST_Request $request) {
+			$master_id = (int) $request->get_param('master_id');
+			$occurrence_id = (int) $request->get_param('occurrence_id');
+			$start_date = trim((string) $request->get_param('start_date'));
+
+			if ($master_id <= 0 || !bl_event_is_series_master($master_id)) {
+				return new \WP_Error('bl_not_master', __('Not a recurring master event.', 'baselayer'), ['status' => 400]);
+			}
+
+			if ($occurrence_id <= 0 && preg_match('/^\d{4}-\d{2}-\d{2}$/', $start_date)) {
+				foreach (bl_event_get_occurrence_ids($master_id) as $oid) {
+					$sd = get_post_meta($oid, BL_EVENT_META_START_DATE, true);
+					if (is_string($sd) && $sd === $start_date) {
+						$occurrence_id = $oid;
+						break;
+					}
+				}
+			}
+
+			if ($occurrence_id <= 0) {
+				return new \WP_Error('bl_not_occurrence', __('Not an occurrence.', 'baselayer'), ['status' => 400]);
+			}
+			if (bl_event_get_master_id($occurrence_id) !== $master_id) {
+				return new \WP_Error('bl_wrong_master', __('Occurrence does not belong to this master.', 'baselayer'), ['status' => 400]);
+			}
+
+			$result = bl_event_soft_delete_occurrence($occurrence_id);
+			if (is_wp_error($result)) {
+				return $result;
+			}
+
+			return rest_ensure_response([
+				'master_id' => $master_id,
+				'occurrences' => bl_event_get_upcoming_occurrence_rows($master_id),
+			]);
+		},
+	]);
+}
+
+add_action('rest_api_init', 'bl_event_register_soft_delete_occurrence_rest_route');
 
 /**
  * Expose occurrence count on masters for the editor sidebar.

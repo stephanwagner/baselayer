@@ -312,7 +312,7 @@ function bl_event_register_post_type_hooks(): void
 add_action('init', 'bl_event_register_post_type_hooks', 21);
 
 /**
- * Admin Events list: hide occurrence children (masters + one-offs only).
+ * Admin Events list: hide occurrence children (masters + one-offs only), including Trash.
  */
 function bl_event_admin_list_pre_get_posts(\WP_Query $query): void
 {
@@ -332,7 +332,7 @@ function bl_event_admin_list_pre_get_posts(\WP_Query $query): void
 		return;
 	}
 
-	// Hierarchical children are materialized occurrences.
+	// Hierarchical children are materialized occurrences — never list them (All or Trash).
 	$query->set('post_parent', 0);
 }
 
@@ -788,6 +788,10 @@ function bl_event_posts_custom_column(string $column, int $post_id): void
 			}
 		}
 
+		if (get_post_status($post_id) === 'trash') {
+			return;
+		}
+
 		$upcoming = function_exists('bl_event_get_upcoming_occurrence_rows')
 			? count(bl_event_get_upcoming_occurrence_rows($post_id))
 			: 0;
@@ -857,10 +861,16 @@ add_action('admin_enqueue_scripts', static function (string $hook_suffix): void 
 	}
 	wp_localize_script('main-admin-scripts', 'baselayerEventOccurrences', [
 		'restUrl' => esc_url_raw(rest_url('baselayer/v1/event-occurrences/')),
+		'restoreUrl' => esc_url_raw(rest_url('baselayer/v1/event-restore-occurrence')),
+		'softDeleteUrl' => esc_url_raw(rest_url('baselayer/v1/event-soft-delete-occurrence')),
 		'restNonce' => wp_create_nonce('wp_rest'),
 		'modalTitle' => __('Occurrences', 'baselayer'),
 		'empty' => __('No upcoming occurrences.', 'baselayer'),
 		'editLabel' => __('Edit', 'baselayer'),
+		'restoreLabel' => __('Restore', 'baselayer'),
+		'deleteLabel' => __('Delete', 'baselayer'),
+		'deleteConfirm' => __('Remove this date from the series? It will not appear in Trash; you can restore it here later.', 'baselayer'),
+		'deleteDetachedConfirm' => __('This occurrence has custom content. Deleting removes that content permanently. Continue?', 'baselayer'),
 		'closeLabel' => __('Close', 'baselayer'),
 		'loadingLabel' => __('Loading…', 'baselayer'),
 		'customContent' => __('Custom content', 'baselayer'),

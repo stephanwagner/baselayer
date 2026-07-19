@@ -2925,3 +2925,27 @@ msgstr "Statusbezeichnung"
 
 msgid "Status information"
 msgstr "Statusinformationen"
+
+msgid "Restore"
+msgstr "Wiederherstellen"
+
+msgid "Invalid date."
+msgstr "Ungültiges Datum."
+
+msgid "Delete"
+msgstr "Löschen"
+
+msgid "Remove this date from the series? It will not appear in Trash; you can restore it here later."
+msgstr "Dieses Datum aus der Serie entfernen? Es erscheint nicht im Papierkorb; Sie können es hier später wiederherstellen."
+
+msgid "This occurrence has custom content. Deleting removes that content permanently. Continue?"
+msgstr "Dieser Termin hat eigenen Inhalt. Löschen entfernt diesen Inhalt dauerhaft. Fortfahren?"
+
+msgid "Master event not found."
+msgstr "Master-Event nicht gefunden."
+
+msgid "Master event is not available."
+msgstr "Master-Event ist nicht verfügbar."
+
+msgid "Occurrence does not belong to this master."
+msgstr "Termin gehört nicht zu diesem Master."

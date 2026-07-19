@@ -128,8 +128,26 @@
     }
   }
 
-  &__edit {
+  &__actions {
+    display: flex;
     flex-shrink: 0;
+    align-items: center;
+    gap: 10px;
+  }
+
+  &__edit,
+  &__restore,
+  &__delete {
+    flex-shrink: 0;
+  }
+
+  &__restore,
+  &__delete {
+    cursor: pointer;
+  }
+
+  &__delete {
+    color: #b32d2e;
   }
 }
 
