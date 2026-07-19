@@ -471,9 +471,13 @@
       }
     }
 
-    &.-no-image-caption {
+    .wp-element-caption {
+      display: none;
+    }
+
+    &.-show-image-caption {
       .wp-element-caption {
-        display: none;
+        display: block;
       }
     }
 
@@ -506,9 +510,13 @@
       }
     }
 
-    &.-no-image-caption {
+    .wp-element-caption {
+      display: none;
+    }
+
+    &.-show-image-caption {
       .wp-element-caption {
-        display: none;
+        display: block;
       }
     }
   }
@@ -528,6 +536,7 @@
   .wp-block-gallery {
     figure.wp-block-image {
       figcaption.wp-element-caption {
+        display: none;
         padding: 16px 12px 8px;
         pointer-events: none;
         white-space: nowrap;
@@ -549,10 +558,10 @@
       }
     }
 
-    &.-no-image-captions {
+    &.-show-image-captions {
       figure.wp-block-image {
         figcaption.wp-element-caption {
-          display: none;
+          display: block;
         }
       }
     }
@@ -592,7 +601,7 @@
     margin-right: 0;
   }
 
-  // Content margin top and bottom
+  // Container margin top and bottom
 
   .-container-margin-none {
     @include container-margin(0, 0);
@@ -670,7 +679,7 @@
     );
   }
 
-  // Content margin top
+  // Container margin top
 
   .-container-margin-top-none {
     @include container-margin(0, null);
@@ -740,7 +749,7 @@
     );
   }
 
-  // Content margin bottom
+  // Container margin bottom
 
   .-container-margin-bottom-none {
     @include container-margin(null, 0);

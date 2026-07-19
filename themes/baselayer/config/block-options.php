@@ -171,10 +171,10 @@ return [
 				],
 				[
 					'type' => 'boolean',
-					'toggleLabel' => 'Ohne Untertitel',
+					'toggleLabel' => 'Untertitel anzeigen',
 					'default' => false,
-					'attributeName' => 'noImageLabel',
-					'className' => '-no-image-caption',
+					'attributeName' => 'showImageLabel',
+					'className' => '-show-image-caption',
 				],
 				[
 					'type' => 'boolean',
@@ -191,11 +191,11 @@ return [
 			'controls' => [
 				[
 					'type' => 'boolean',
-					'toggleLabel' => 'Ohne Untertitel',
+					'toggleLabel' => 'Untertitel anzeigen',
 					'noSeparator' => true,
 					'default' => false,
-					'attributeName' => 'noImageLabel',
-					'className' => '-no-image-caption',
+					'attributeName' => 'showImageLabel',
+					'className' => '-show-image-caption',
 				],
 			],
 		],
@@ -204,10 +204,10 @@ return [
 			'controls' => [
 				[
 					'type' => 'boolean',
-					'toggleLabel' => 'Ohne Untertitel',
+					'toggleLabel' => 'Untertitel anzeigen',
 					'default' => false,
-					'attributeName' => 'noImageLabels',
-					'className' => '-no-image-captions',
+					'attributeName' => 'showImageLabels',
+					'className' => '-show-image-captions',
 				],
 				[
 					'type' => 'boolean',
