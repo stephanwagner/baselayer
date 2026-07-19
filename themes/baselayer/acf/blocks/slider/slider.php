@@ -33,9 +33,9 @@ $navigation = get_field('navigation') ?? false;
 $ratio = get_field('ratio') ?? '3-2';
 $ratioX = get_field('ratio_x') ?? 3;
 $ratioY = get_field('ratio_y') ?? 2;
-$hasCallToAction = get_field('has_call_to_action') ?? false;
-$callToActionAlign = get_field('call_to_action_align') ?? 'left';
-
+$hasContent = get_field('has_content') ?? false;
+$contentAlign = get_field('content_align') ?? 'left';
+$contentVisibilityMobile = (bool) (get_field('content_visibility_mobile') ?? false);
 
 // Ratio
 $paddingTop = 100;
@@ -67,8 +67,9 @@ $spaceBetween = max(0, (int) $spaceBetween);
 	data-slider-pagination="<?= $pagination ? 'true' : 'false' ?>"
 	data-slider-navigation="<?= $navigation ? 'true' : 'false' ?>"
 	data-slider-dynamic-bullets="<?= $dynamicBullets ? 'true' : 'false' ?>"
-	data-slider-has-content="<?= $hasCallToAction ? 'true' : 'false' ?>"
-	data-slider-content-align="<?= $callToActionAlign ?>">
+	data-slider-has-content="<?= $hasContent ? 'true' : 'false' ?>"
+	data-slider-content-align="<?= esc_attr($contentAlign) ?>"
+	data-slider-content-visibility-mobile="<?= $contentVisibilityMobile ? 'true' : 'false' ?>">
 	<?php if (is_admin()) { ?>
 		<div class="slider__editor-badge" aria-hidden="true">
 			<span class="slider__editor-badge-icon">

@@ -1230,7 +1230,7 @@
             {
                 "key": "field_6a50e6118a219",
                 "label": "",
-                "name": "has_call_to_action",
+                "name": "has_content",
                 "aria-label": "",
                 "type": "true_false",
                 "instructions": "Ermöglicht Überschrift, Text und Buttons in allen Slides.",
@@ -1251,7 +1251,7 @@
             {
                 "key": "field_6a50e6388a21a",
                 "label": "Slide-Inhalt Ausrichtung",
-                "name": "call_to_action_align",
+                "name": "content_align",
                 "aria-label": "",
                 "type": "button_group",
                 "instructions": "",
@@ -1280,6 +1280,35 @@
                 "allow_null": 0,
                 "allow_in_bindings": 0,
                 "layout": "horizontal"
+            },
+            {
+                "key": "field_6a5c5f99272ee",
+                "label": "Slide-Inhalt Sichtbarkeit",
+                "name": "content_visibility_mobile",
+                "aria-label": "",
+                "type": "true_false",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_6a50e6118a219",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "Auf mobilen Geräten anzeigen",
+                "default_value": 0,
+                "allow_in_bindings": 0,
+                "ui": 0,
+                "ui_on_text": "",
+                "ui_off_text": ""
             }
         ],
         "location": [
