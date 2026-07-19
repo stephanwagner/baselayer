@@ -156,20 +156,6 @@ return [
 			'label' => 'Bild-Optionen',
 			'controls' => [
 				[
-					'type' => 'button-group',
-					'label' => 'Bildausschnitt',
-					'description' => 'Legt fest, welcher Teil des Bildes sichtbar bleibt, wenn es nicht vollständig angezeigt werden kann.',
-					'default' => '',
-					'attributeName' => 'imageObjectPosition',
-					'options' => [
-						['icon' => 'select-all', 'label' => 'Mitte', 'value' => ''],
-						['icon' => 'move-selection-left', 'label' => 'Links', 'value' => '-object-position-left'],
-						['icon' => 'move-selection-right', 'label' => 'Rechts', 'value' => '-object-position-right'],
-						['icon' => 'move-selection-up', 'label' => 'Oben', 'value' => '-object-position-top'],
-						['icon' => 'move-selection-down', 'label' => 'Unten', 'value' => '-object-position-bottom'],
-					],
-				],
-				[
 					'type' => 'boolean',
 					'toggleLabel' => 'Untertitel anzeigen',
 					'default' => false,

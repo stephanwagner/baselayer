@@ -480,22 +480,6 @@
         display: block;
       }
     }
-
-    &.-object-position-left img {
-      object-position: left center;
-    }
-
-    &.-object-position-right img {
-      object-position: right center;
-    }
-
-    &.-object-position-top img {
-      object-position: center top;
-    }
-
-    &.-object-position-bottom img {
-      object-position: center bottom;
-    }
   }
 
   .wp-block-video {
