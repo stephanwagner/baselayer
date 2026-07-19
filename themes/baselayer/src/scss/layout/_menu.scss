@@ -134,8 +134,6 @@
   margin-left: auto;
   display: flex;
   align-items: center;
-  overflow: auto;
-  overscroll-behavior: none;
 
   // Mobile menu
 
@@ -151,6 +149,8 @@
     padding: 24px var(--bl-page-padding-x) 24px 32px;
     border-radius: var(--bl-border-radius-m);
     pointer-events: none;
+    overflow: auto;
+    overscroll-behavior: none;
     visibility: hidden;
     opacity: 0;
 
