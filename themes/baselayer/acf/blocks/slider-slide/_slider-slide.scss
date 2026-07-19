@@ -52,7 +52,7 @@
   position: absolute;
   inset: 0;
   z-index: 3;
-  padding: 0 var(--bl-page-padding-x);
+  padding: 0 var(--bl-page-padding);
   align-items: center;
   display: none;
   color: #fff;
@@ -62,8 +62,8 @@
     padding-right: var(--bl-alignwide-bleed);
 
     @media (max-width: $breakpoint-xl) {
-      padding-left: calc(var(--bl-page-padding-x) * 0.5);
-      padding-right: calc(var(--bl-page-padding-x) * 0.5);
+      padding-left: calc(var(--bl-page-padding) * 0.5);
+      padding-right: calc(var(--bl-page-padding) * 0.5);
     }
   }
 
@@ -72,8 +72,8 @@
     padding-right: calc((100vw - var(--bl-content-width)) * 0.5);
 
     @media (max-width: calc(#{$content-width} + #{$page-padding-l} + #{$page-padding-l})) {
-      padding-left: var(--bl-page-padding-x);
-      padding-right: var(--bl-page-padding-x);
+      padding-left: var(--bl-page-padding);
+      padding-right: var(--bl-page-padding);
     }
   }
 

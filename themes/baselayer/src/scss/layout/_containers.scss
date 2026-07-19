@@ -9,7 +9,7 @@ $content-wide-width: $content-width + ($container-wide-bleed * 2);
   position: relative;
   margin: auto;
   max-width: var(--bl-content-width);
-  width: calc(100% - var(--bl-page-padding-x) - var(--bl-page-padding-x));
+  width: calc(100% - var(--bl-page-padding) - var(--bl-page-padding));
 }
 
 // Expand from `.container` by the wide bleed. Reset when wide + 24 + 24 no longer fits.
@@ -42,8 +42,8 @@ $content-wide-width: $content-width + ($container-wide-bleed * 2);
   margin-right: calc(var(--bl-alignwide-bleed) * -1);
 
   @media (max-width: $breakpoint-xl) {
-    margin-left: calc(var(--bl-page-padding-x) * -0.5);
-    margin-right: calc(var(--bl-page-padding-x) * -0.5);
+    margin-left: calc(var(--bl-page-padding) * -0.5);
+    margin-right: calc(var(--bl-page-padding) * -0.5);
   }
 
   &.has-background {
@@ -52,8 +52,8 @@ $content-wide-width: $content-width + ($container-wide-bleed * 2);
       padding-right: var(--bl-alignwide-bleed);
 
       @media (max-width: $breakpoint-xl) {
-        padding-left: calc(var(--bl-page-padding-x) * 0.5);
-        padding-right: calc(var(--bl-page-padding-x) * 0.5);
+        padding-left: calc(var(--bl-page-padding) * 0.5);
+        padding-right: calc(var(--bl-page-padding) * 0.5);
       }
     }
   }
@@ -64,8 +64,8 @@ $content-wide-width: $content-width + ($container-wide-bleed * 2);
   margin-right: calc((100vw - var(--bl-content-width)) * -0.5);
 
   @media (max-width: calc(#{$content-width} + #{$page-padding-l} + #{$page-padding-l})) {
-    margin-left: calc(var(--bl-page-padding-x) * -1);
-    margin-right: calc(var(--bl-page-padding-x) * -1);
+    margin-left: calc(var(--bl-page-padding) * -1);
+    margin-right: calc(var(--bl-page-padding) * -1);
   }
 
   &.has-background {
@@ -74,8 +74,8 @@ $content-wide-width: $content-width + ($container-wide-bleed * 2);
       padding-right: calc((100vw - var(--bl-content-width)) * 0.5);
 
       @media (max-width: calc(#{$content-width} + #{$page-padding-l} + #{$page-padding-l})) {
-        padding-left: var(--bl-page-padding-x);
-        padding-right: var(--bl-page-padding-x);
+        padding-left: var(--bl-page-padding);
+        padding-right: var(--bl-page-padding);
       }
     }
   }

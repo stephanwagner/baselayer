@@ -31,5 +31,27 @@ $child-theme-path: '{{child_theme_path}}';
   $header-start-scrolled: 64px,
 
   // Breakpoints
-  $breakpoint-mobile: 900px
+  $breakpoint-mobile: 900px,
+
+  // Buttons
+  // $button-padding-y: 7px,
+  // $button-padding-x: 20px,
+  // $button-border-radius: 21px,
+  // $button-font-size: 16px,
+  // $button-icon-inset: 12px,
+  // $button-icon-size: 1.25em,
+  // $button-icon-gap: 0.375em,
+  // $button-padding-y-s: 3px,
+  // $button-padding-x-s: 14px,
+  // $button-border-radius-s: 17px,
+  // $button-font-size-s: 14px,
+  // $button-icon-inset-s: 9px,
+  // $button-padding-y-l: 11px,
+  // $button-padding-x-l: 26px,
+  // $button-border-radius-l: 25px,
+  // $button-font-size-l: 18px,
+  // $button-icon-inset-l: 14px,
+
+  // Copy more settings from parent theme config
+  // baselayer/src/scss/_config.scss
 );

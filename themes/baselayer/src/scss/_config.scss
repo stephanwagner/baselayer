@@ -109,6 +109,29 @@ $border-radius-s: 4px !default;
 $border-radius-m: 8px !default;
 $border-radius-l: 16px !default;
 
+// Buttons (geometry — colors live as CSS vars in _root.scss)
+$button-padding-y: 7px !default;
+$button-padding-x: 20px !default;
+$button-border-radius: 21px !default;
+$button-font-size: $font-size-m !default;
+$button-icon-inset: 12px !default;
+
+$button-padding-y-s: 3px !default;
+$button-padding-x-s: 14px !default;
+$button-border-radius-s: 17px !default;
+$button-font-size-s: $font-size-s !default;
+$button-icon-inset-s: 9px !default;
+
+$button-padding-y-l: 11px !default;
+$button-padding-x-l: 26px !default;
+$button-border-radius-l: 25px !default;
+$button-font-size-l: $font-size-l !default;
+$button-icon-inset-l: 14px !default;
+
+// Gap between icon and label / icon size (relative to button font-size)
+$button-icon-size: 1.25em !default;
+$button-icon-gap: 0.375em !default;
+
 // Block editor content widths
 $editor-content-width: 960px !default;
 $editor-content-padding: 24px !default;

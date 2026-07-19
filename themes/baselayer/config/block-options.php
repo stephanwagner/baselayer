@@ -238,7 +238,6 @@ return [
 						['label' => 'S', 'value' => '-small'],
 						['label' => 'M', 'value' => ''],
 						['label' => 'L', 'value' => '-large'],
-						['label' => 'XL', 'value' => '-extra-large'],
 					],
 				],
 				[

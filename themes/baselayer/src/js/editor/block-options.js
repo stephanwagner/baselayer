@@ -195,8 +195,6 @@ const FONT_SIZE_TO_BUTTON_SIZE = {
   medium: '',
   l: '-large',
   large: '-large',
-  xl: '-extra-large',
-  'x-large': '-extra-large',
 };
 
 // Placeholder label so core/button save() outputs markup for icon-only buttons (WP skips empty text).
