@@ -673,9 +673,25 @@ add_action('enqueue_block_editor_assets', function (): void {
 		'endTimeLabel' => __('End time', 'baselayer'),
 		'statusLabel' => __('Status', 'baselayer'),
 		'statusCustomLabel' => __('Status label', 'baselayer'),
+		'statusColorLabel' => __('Color', 'baselayer'),
 		'statusInfoLabel' => __('Status information', 'baselayer'),
 		'statuses' => $statuses_by_type[$pt] ?? [],
 		'statusesByType' => $statuses_by_type,
+		'statusColorPresets' => function_exists('bl_event_status_color_presets')
+			? array_map(
+				static function (string $key, string $label): array {
+					return [
+						'key' => $key,
+						'label' => $label,
+					];
+				},
+				array_keys(bl_event_status_color_presets()),
+				array_values(bl_event_status_color_presets())
+			)
+			: [],
+		'statusColorDefault' => defined('BL_EVENT_STATUS_COLOR_DEFAULT')
+			? BL_EVENT_STATUS_COLOR_DEFAULT
+			: 'info',
 		'recurringTitle' => __('Recurring', 'baselayer'),
 		'notRepeating' => __('Not repeating', 'baselayer'),
 		'editRecurrence' => __('Edit recurrence', 'baselayer'),

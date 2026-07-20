@@ -17,13 +17,16 @@ return [
 
 		/**
 		 * Extra statuses for one-offs / occurrences (after Postponed, before Custom).
-		 * Built-ins Active / Cancelled / Postponed / Custom are always available.
-		 * color: hex (#rgb or #rrggbb) for badges and the singular notice.
+		 * Built-ins None / Cancelled / Postponed / Custom are always available.
+		 *
+		 * color: theme token (neutral | info | error | warning | success | highlight)
+		 *        or hex (#rgb / #rrggbb). Tokens use CSS vars from _config.scss.
 		 */
 		'statuses' => [
 			'sold_out' => [
 				'label' => 'Sold Out',
-				'color' => '#b45309',
+				'color' => 'warning',
+				// 'color' => '#b45309', // or a free hex
 			],
 		],
 

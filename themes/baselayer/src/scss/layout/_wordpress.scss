@@ -16,10 +16,16 @@ $colors: (
   'gray-400' var(--bl-color-gray-400),
   'gray-500' var(--bl-color-gray-500),
   'gray-600' var(--bl-color-gray-600),
+  'gray-700' var(--bl-color-gray-700),
+  'gray-800' var(--bl-color-gray-800),
+  'gray-900' var(--bl-color-gray-900),
   // Status colors
+  'neutral' var(--bl-color-neutral),
+  'info' var(--bl-color-info),
   'error' var(--bl-color-error),
   'warning' var(--bl-color-warning),
-  'success' var(--bl-color-success)
+  'success' var(--bl-color-success),
+  'highlight' var(--bl-color-highlight)
 );
 
 // Gradients
@@ -61,7 +67,10 @@ $fontSizes: (
 
   .has-black-background-color,
   .has-off-black-background-color,
-  .has-gray-600-background-color {
+  .has-gray-600-background-color,
+  .has-gray-700-background-color,
+  .has-gray-800-background-color,
+  .has-gray-900-background-color {
     color: #fff;
   }
 

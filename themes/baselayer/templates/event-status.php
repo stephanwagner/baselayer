@@ -17,15 +17,33 @@ $status = bl_event_get_status($post_id);
 if ($status === null) {
 	return;
 }
+
+$modifier = function_exists('bl_event_status_css_modifier')
+	? bl_event_status_css_modifier($status)
+	: sanitize_html_class($status['key']);
+$style = function_exists('bl_event_status_inline_style')
+	? bl_event_status_inline_style($status)
+	: '';
+$modifier_class = $modifier !== '' ? ' event-status-' . sanitize_html_class($modifier) : '';
 ?>
 
 <aside
-	class="event-status event-status--<?= esc_attr($status['key']) ?>"
-	style="--event-status-color: <?= esc_attr($status['color']) ?>"
+	class="event-status<?= esc_attr($modifier_class) ?>"<?= $style ?>
 	role="status"
 >
 	<strong class="event-status__label"><?= esc_html($status['label']) ?></strong>
 	<?php if ($status['info'] !== '') : ?>
-		<p class="event-status__info"><?= esc_html($status['info']) ?></p>
+		<div class="event-status__info">
+			<?php
+			$lines = preg_split('/\R/u', $status['info']) ?: [];
+			foreach ($lines as $line) {
+				$line = trim($line);
+				if ($line === '') {
+					continue;
+				}
+				echo '<p>' . esc_html($line) . '</p>';
+			}
+			?>
+		</div>
 	<?php endif; ?>
 </aside>

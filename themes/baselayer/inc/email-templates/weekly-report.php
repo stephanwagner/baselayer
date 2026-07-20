@@ -4,7 +4,7 @@
 		margin: 0;
 		font-size: 24px;
 		line-height: 1.3;
-		font-weight: bold;
+		font-weight: 700;
 		text-wrap: balance;
 		text-align: center;
 	">
@@ -150,9 +150,9 @@ if (!$has_insights && !$has_matomo) {
 		">
 		<tr>
 			<th style="border-bottom: 2px solid #e2e8f0;"></th>
-			<th class="bl-mail__table-th" style="border-bottom: 2px solid #e2e8f0; padding: 0 4px 6px; text-align: center; font-weight: bold; color: #2284e5; white-space: nowrap;"><?= wp_kses(__('Unique<br>visitors', 'baselayer'), ['br' => []]) ?></th>
-			<th class="bl-mail__table-th" style="border-bottom: 2px solid #e2e8f0; padding: 0 4px 6px; text-align: center; font-weight: bold; color: #8f70cc; white-space: nowrap;"><?= wp_kses(__('Visits<br>total', 'baselayer'), ['br' => []]) ?></th>
-			<th class="bl-mail__table-th" style="border-bottom: 2px solid #e2e8f0; padding: 0 4px 6px; text-align: center; font-weight: bold; color: #ff6673; white-space: nowrap;"><?= wp_kses(__('Page<br>views', 'baselayer'), ['br' => []]) ?></th>
+			<th class="bl-mail__table-th" style="border-bottom: 2px solid #e2e8f0; padding: 0 4px 6px; text-align: center; font-weight: 700; color: #2284e5; white-space: nowrap;"><?= wp_kses(__('Unique<br>visitors', 'baselayer'), ['br' => []]) ?></th>
+			<th class="bl-mail__table-th" style="border-bottom: 2px solid #e2e8f0; padding: 0 4px 6px; text-align: center; font-weight: 700; color: #8f70cc; white-space: nowrap;"><?= wp_kses(__('Visits<br>total', 'baselayer'), ['br' => []]) ?></th>
+			<th class="bl-mail__table-th" style="border-bottom: 2px solid #e2e8f0; padding: 0 4px 6px; text-align: center; font-weight: 700; color: #ff6673; white-space: nowrap;"><?= wp_kses(__('Page<br>views', 'baselayer'), ['br' => []]) ?></th>
 		</tr>
 		<?php foreach (($daily ?? []) as $row) : ?>
 			<?php
@@ -168,8 +168,8 @@ if (!$has_insights && !$has_matomo) {
 			}
 			?>
 			<tr>
-				<td style="border-bottom: 2px solid #e2e8f0; line-height: 1.4; padding: 6px 0"><b style="font-weight: bold;"><?php if ($daily_weekday !== '') : ?><?= esc_html($daily_weekday) ?></b><br><span style="color: #64748b;"><?= esc_html($daily_written) ?></span><?php endif; ?></td>
-				<td style="border-bottom: 2px solid #e2e8f0; padding: 6px; text-align: center; font-weight: bold;"><?= esc_html(number_format_i18n((int) ($row['unique'] ?? 0))) ?></td>
+				<td style="border-bottom: 2px solid #e2e8f0; line-height: 1.4; padding: 6px 0"><b style="font-weight: 700;"><?php if ($daily_weekday !== '') : ?><?= esc_html($daily_weekday) ?></b><br><span style="color: #64748b;"><?= esc_html($daily_written) ?></span><?php endif; ?></td>
+				<td style="border-bottom: 2px solid #e2e8f0; padding: 6px; text-align: center; font-weight: 700;"><?= esc_html(number_format_i18n((int) ($row['unique'] ?? 0))) ?></td>
 				<td style="border-bottom: 2px solid #e2e8f0; padding: 6px; text-align: center;"><?= esc_html(number_format_i18n((int) ($row['visits'] ?? 0))) ?></td>
 				<td style="border-bottom: 2px solid #e2e8f0; padding: 6px; text-align: center;"><?= esc_html(number_format_i18n((int) ($row['pageviews'] ?? 0))) ?></td>
 			</tr>
@@ -225,8 +225,8 @@ if (!$has_insights && !$has_matomo) {
 			}
 			?>
 			<tr>
-				<td style="border-bottom: 2px solid #e2e8f0; line-height: 1.4; padding: 6px 0"><b style="font-weight: bold;"><?php if ($week_line !== '') : ?><?= esc_html($week_line) ?></b><br><span style="color: #64748b;"><?= esc_html($monday_written) ?></span><?php endif; ?></td>
-				<td style="border-bottom: 2px solid #e2e8f0; padding: 6px; text-align: center; font-weight: bold;"><?= esc_html(number_format_i18n((int) ($row['unique'] ?? 0))) ?></td>
+				<td style="border-bottom: 2px solid #e2e8f0; line-height: 1.4; padding: 6px 0"><b style="font-weight: 700;"><?php if ($week_line !== '') : ?><?= esc_html($week_line) ?></b><br><span style="color: #64748b;"><?= esc_html($monday_written) ?></span><?php endif; ?></td>
+				<td style="border-bottom: 2px solid #e2e8f0; padding: 6px; text-align: center; font-weight: 700;"><?= esc_html(number_format_i18n((int) ($row['unique'] ?? 0))) ?></td>
 				<td style="border-bottom: 2px solid #e2e8f0; padding: 6px; text-align: center;"><?= esc_html(number_format_i18n((int) ($row['visits'] ?? 0))) ?></td>
 				<td style="border-bottom: 2px solid #e2e8f0; padding: 6px; text-align: center;"><?= esc_html(number_format_i18n((int) ($row['pageviews'] ?? 0))) ?></td>
 			</tr>

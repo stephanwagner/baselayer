@@ -178,8 +178,13 @@ function bl_admin_post_state_badge_html(string $key, string $label, $post = null
 		&& function_exists('bl_event_get_status')
 	) {
 		$status = bl_event_get_status((int) $post->ID);
-		if ($status !== null && $status['color'] !== '') {
-			$style = ' style="--event-status-color: ' . esc_attr($status['color']) . '"';
+		if ($status !== null) {
+			$css_color = function_exists('bl_event_status_css_color_value')
+				? bl_event_status_css_color_value($status)
+				: (string) ($status['color'] ?? '');
+			if ($css_color !== '') {
+				$style = ' style="--bl-status-color: ' . esc_attr($css_color) . '"';
+			}
 		}
 	}
 

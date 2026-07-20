@@ -123,8 +123,8 @@
     }
 
     &--status {
-      background: color-mix(in srgb, var(--event-status-color, #2563eb) 16%, #fff);
-      color: var(--event-status-color, #2563eb);
+      background: color-mix(in srgb, var(--bl-status-color, var(--bl-color-info)) 16%, #fff);
+      color: var(--bl-status-color, var(--bl-color-info));
     }
   }
 

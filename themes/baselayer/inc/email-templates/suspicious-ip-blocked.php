@@ -9,7 +9,7 @@ $security_url = admin_url('options-general.php?page=' . $security_page . '#bl-se
 		margin: 0 0 20px;
 		font-size: 24px;
 		line-height: 1.3;
-		font-weight: bold;
+		font-weight: 700;
 		text-align: left;
 		color: #1f2937;
 	"><?= esc_html__('IP temporarily blocked', 'baselayer') ?></h1>

@@ -110,8 +110,8 @@
       }
       if (!deleted && item.status_key && item.status_key !== 'active' && item.status_label) {
         html +=
-          ' <span class="bl-event-occurrences-modal__badge bl-event-occurrences-modal__badge--status" style="--event-status-color:' +
-          escapeAttr(item.status_color || '#2563eb') +
+          ' <span class="bl-event-occurrences-modal__badge bl-event-occurrences-modal__badge--status" style="--bl-status-color:' +
+          escapeAttr(item.status_color || '') +
           '">' +
           escapeHtml(item.status_label) +
           '</span>';

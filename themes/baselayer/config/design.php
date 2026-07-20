@@ -16,13 +16,16 @@ return [
 		// Grayscale
 		['slug' => 'white', 'color' => '#fff', 'name' => 'White'],
 		['slug' => 'black', 'color' => '#000', 'name' => 'Black'],
-		['slug' => 'off-black', 'color' => '#222', 'name' => 'Lighter black'],
-		['slug' => 'gray-600', 'color' => '#666', 'name' => 'Gray 600'],
-		['slug' => 'gray-500', 'color' => '#999', 'name' => 'Gray 500'],
-		['slug' => 'gray-400', 'color' => '#ccc', 'name' => 'Gray 400'],
-		['slug' => 'gray-300', 'color' => '#ddd', 'name' => 'Gray 300'],
-		['slug' => 'gray-200', 'color' => '#eee', 'name' => 'Gray 200'],
-		['slug' => 'gray-100', 'color' => '#f6f6f6', 'name' => 'Gray 100'],
+		['slug' => 'off-black', 'color' => '#23292e', 'name' => 'Lighter black'],
+		['slug' => 'gray-900', 'color' => '#23292e', 'name' => 'Gray 900'],
+		['slug' => 'gray-800', 'color' => '#3c434a', 'name' => 'Gray 800'],
+		['slug' => 'gray-700', 'color' => '#58616b', 'name' => 'Gray 700'],
+		['slug' => 'gray-600', 'color' => '#6f7882', 'name' => 'Gray 600'],
+		['slug' => 'gray-500', 'color' => '#8b959e', 'name' => 'Gray 500'],
+		['slug' => 'gray-400', 'color' => '#afb8c1', 'name' => 'Gray 400'],
+		['slug' => 'gray-300', 'color' => '#d0d7de', 'name' => 'Gray 300'],
+		['slug' => 'gray-200', 'color' => '#eaeef2', 'name' => 'Gray 200'],
+		['slug' => 'gray-100', 'color' => '#f6f8fa', 'name' => 'Gray 100'],
 	],
 
 	// Color picker (theme.json settings.color — hides WordPress “Standard” presets when false)

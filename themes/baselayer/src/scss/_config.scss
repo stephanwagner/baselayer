@@ -12,7 +12,7 @@
 $theme-path: '/wp-content/themes/baselayer';
 
 // Icon path
-$icon-path: #{$theme-path}/assets/icons !default;
+$icon-path: '#{$theme-path}/assets/icons' !default;
 
 // Colors
 $color-primary: #4080ff !default;
@@ -23,18 +23,30 @@ $color-secondary-dark: #{color.adjust($color-secondary, $lightness: -8%)} !defau
 // Grayscale
 $color-white: #fff !default;
 $color-black: #000 !default;
-$color-off-black: #222 !default;
-$color-gray-600: #666 !default;
-$color-gray-500: #999 !default;
-$color-gray-400: #ccc !default;
-$color-gray-300: #ddd !default;
-$color-gray-200: #eee !default;
-$color-gray-100: #f6f6f6 !default;
+$color-off-black: #23292e !default;
+$color-gray-900: #23292e !default;
+$color-gray-800: #3c434a !default;
+$color-gray-700: #58616b !default;
+$color-gray-600: #6f7882 !default;
+$color-gray-500: #8b959e !default;
+$color-gray-400: #afb8c1 !default;
+$color-gray-300: #d0d7de !default;
+$color-gray-200: #eaeef2 !default;
+$color-gray-100: #f6f8fa !default;
 
 // Status colors
-$color-error: #f33 !default;
-$color-warning: #fc0 !default;
-$color-success: #5d5 !default;
+$color-neutral: #6f7882 !default;
+$color-neutral-bg: color.scale($color-neutral, $lightness: 90%) !default;
+$color-info: #366cd9 !default;
+$color-info-bg: color.scale($color-info, $lightness: 91%) !default;
+$color-error: #d1343a !default;
+$color-error-bg: color.scale($color-error, $lightness: 93%) !default;
+$color-warning: #e97800 !default;
+$color-warning-bg: color.scale($color-warning, $lightness: 92%) !default;
+$color-success: #28a15a !default;
+$color-success-bg: color.scale($color-success, $lightness: 93%) !default;
+$color-highlight: #8257e5 !default;
+$color-highlight-bg: color.scale($color-highlight, $lightness: 92%) !default;
 
 // Font families
 $primary-font-family: 'Nunito Sans', sans-serif !default;
@@ -109,7 +121,7 @@ $border-radius-s: 4px !default;
 $border-radius-m: 8px !default;
 $border-radius-l: 16px !default;
 
-// Buttons (geometry — colors live as CSS vars in _root.scss)
+// Buttons
 $button-padding-y: 7px !default;
 $button-padding-x: 20px !default;
 $button-border-radius: 21px !default;
@@ -128,9 +140,11 @@ $button-border-radius-l: 25px !default;
 $button-font-size-l: $font-size-l !default;
 $button-icon-inset-l: 14px !default;
 
-// Gap between icon and label / icon size (relative to button font-size)
 $button-icon-size: 1.25em !default;
 $button-icon-gap: 0.375em !default;
+
+// Pixel density
+$high-density-dppx: 1.9dppx !default;
 
 // Block editor content widths
 $editor-content-width: 960px !default;

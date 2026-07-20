@@ -202,7 +202,7 @@
     width: 100% !important;
     max-width: 100% !important;
 
-    @media (min-resolution: 1.9dppx) {
+    @media (min-resolution: $high-density-dppx) {
       height: 1.5px;
     }
   }

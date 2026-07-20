@@ -6,7 +6,7 @@ defined('ABSPATH') || exit;
 		margin: 0 0 20px;
 		font-size: 24px;
 		line-height: 1.3;
-		font-weight: bold;
+		font-weight: 700;
 		text-align: left;
 		color: #1f2937;
 	"><?= esc_html__('Test email', 'baselayer') ?></h1>

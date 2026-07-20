@@ -72,10 +72,10 @@
   }
 
   &--event-status {
-    --event-status-color: #2563eb;
-    --bl-post-state-bg: color-mix(in srgb, var(--event-status-color) 16%, #fff);
-    --bl-post-state-fg: var(--event-status-color);
-    border: 1px solid color-mix(in srgb, var(--event-status-color) 35%, #fff);
+    --bl-status-color: var(--bl-color-info);
+    --bl-post-state-bg: color-mix(in srgb, var(--bl-status-color) 16%, #fff);
+    --bl-post-state-fg: var(--bl-status-color);
+    border: 1px solid color-mix(in srgb, var(--bl-status-color) 35%, #fff);
   }
 
   &--expiring {

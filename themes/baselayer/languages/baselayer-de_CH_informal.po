@@ -2926,6 +2926,27 @@ msgstr "Statusbezeichnung"
 msgid "Status information"
 msgstr "Statusinformationen"
 
+msgid "Color"
+msgstr "Farbe"
+
+msgid "Neutral"
+msgstr "Neutral"
+
+msgid "Info"
+msgstr "Info"
+
+msgid "Warning"
+msgstr "Warnung"
+
+msgid "Success"
+msgstr "Erfolg"
+
+msgid "Highlight"
+msgstr "Hervorhebung"
+
+msgid "Sold Out"
+msgstr "Ausverkauft"
+
 msgid "Restore"
 msgstr "Wiederherstellen"
 

@@ -18,6 +18,9 @@
   --bl-color-white: #{$color-white};
   --bl-color-black: #{$color-black};
   --bl-color-off-black: #{$color-off-black};
+  --bl-color-gray-900: #{$color-gray-900};
+  --bl-color-gray-800: #{$color-gray-800};
+  --bl-color-gray-700: #{$color-gray-700};
   --bl-color-gray-600: #{$color-gray-600};
   --bl-color-gray-500: #{$color-gray-500};
   --bl-color-gray-400: #{$color-gray-400};
@@ -26,9 +29,18 @@
   --bl-color-gray-100: #{$color-gray-100};
 
   // Status colors
+  --bl-color-neutral: #{$color-neutral};
+  --bl-color-neutral-bg: #{$color-neutral-bg};
+  --bl-color-info: #{$color-info};
+  --bl-color-info-bg: #{$color-info-bg};
   --bl-color-error: #{$color-error};
+  --bl-color-error-bg: #{$color-error-bg};
   --bl-color-warning: #{$color-warning};
+  --bl-color-warning-bg: #{$color-warning-bg};
   --bl-color-success: #{$color-success};
+  --bl-color-success-bg: #{$color-success-bg};
+  --bl-color-highlight: #{$color-highlight};
+  --bl-color-highlight-bg: #{$color-highlight-bg};
 
   // Gradients
   --bl-gradient-primary: linear-gradient(to right, var(--bl-color-primary), var(--bl-color-secondary));
@@ -48,7 +60,7 @@
   // Text
   --bl-primary-font-family: #{$primary-font-family};
   --bl-default-text-color: var(--bl-color-off-black);
-  --bl-gray-text-color: var(--bl-color-gray-500);
+  --bl-gray-text-color: var(--bl-color-gray-600);
   --bl-default-font-size: var(--bl-font-size-m);
   --bl-default-line-height: var(--bl-line-height-m);
   --bl-link-color: var(--bl-color-primary);
@@ -97,7 +109,7 @@
   --bl-page-padding-l: #{$page-padding-l};
   --bl-page-padding-xl: #{$page-padding-xl};
 
-  // Current page gutter (steps with breakpoints)
+  // Current page gutter
   --bl-page-padding: var(--bl-page-padding-l);
 
   @media (max-width: #{$breakpoint-m}) {

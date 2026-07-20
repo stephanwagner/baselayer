@@ -38,6 +38,7 @@
   const META_STATUS = '_bl_event_status';
   const META_STATUS_LABEL = '_bl_event_status_label';
   const META_STATUS_INFO = '_bl_event_status_info';
+  const META_STATUS_COLOR = '_bl_event_status_color';
 
   const WEEKDAYS = ['mo', 'tu', 'we', 'th', 'fr', 'sa', 'su'];
 
@@ -597,6 +598,21 @@
     const statusKey = (meta && meta[META_STATUS]) || 'active';
     const statusCustomLabel = (meta && meta[META_STATUS_LABEL]) || '';
     const statusInfo = (meta && meta[META_STATUS_INFO]) || '';
+    const statusColorDefault = L.statusColorDefault || 'info';
+    const statusColorToken = (meta && meta[META_STATUS_COLOR]) || statusColorDefault;
+    const statusColorPresets = Array.isArray(L.statusColorPresets) ? L.statusColorPresets : [];
+    const statusColorOptions = statusColorPresets.map(function (opt) {
+      return { label: opt.label, value: opt.key };
+    });
+    const statusColorHex = (function () {
+      if (typeof document === 'undefined' || !document.documentElement) {
+        return '';
+      }
+      const raw = getComputedStyle(document.documentElement)
+        .getPropertyValue('--bl-color-' + statusColorToken)
+        .trim();
+      return raw || '';
+    })();
     const statusOptions = (function () {
       const raw =
         (L.statusesByType && L.statusesByType[postType]) || L.statuses || [];
@@ -898,7 +914,7 @@
                 options: statusOptions.length
                   ? statusOptions
                   : [
-                      { label: 'Active', value: 'active' },
+                      { label: 'None', value: 'active' },
                       { label: 'Cancelled', value: 'cancelled' },
                       { label: 'Postponed', value: 'postponed' },
                       { label: '────────', value: '__sep__', disabled: true },
@@ -923,6 +939,26 @@
                       patch({ [META_STATUS_LABEL]: v });
                     },
                   })
+                : null,
+              statusKey === 'custom' && statusColorOptions.length
+                ? el(
+                    'div',
+                    { key: 'bl-event-status-color', className: 'bl-event-status-color' },
+                    el(SelectControl, {
+                      label: L.statusColorLabel || 'Color',
+                      value: statusColorToken,
+                      options: statusColorOptions,
+                      onChange: function (value) {
+                        patch({ [META_STATUS_COLOR]: value || statusColorDefault });
+                      },
+                    }),
+                    el('span', {
+                      className: 'bl-event-status-color__swatch',
+                      style: { backgroundColor: statusColorHex },
+                      title: statusColorHex,
+                      'aria-hidden': true,
+                    }),
+                  )
                 : null,
               statusKey && statusKey !== 'active'
                 ? TextareaControl

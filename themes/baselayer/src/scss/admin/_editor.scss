@@ -312,6 +312,28 @@ div.baselayer-seo-panel {
   }
 }
 
+.bl-event-status-color {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  margin-bottom: 10px;
+
+  .components-base-control {
+    flex: 1;
+    margin-bottom: 0;
+  }
+
+  &__swatch {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    margin-bottom: 1px;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+}
+
 .bl-event-recurring {
   margin-top: 16px;
   padding-top: 12px;

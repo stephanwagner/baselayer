@@ -1361,7 +1361,9 @@ function bl_event_get_upcoming_occurrence_rows(int $master_id, int $limit = 200)
 			if ($status !== null) {
 				$rows[count($rows) - 1]['status_key'] = $status['key'];
 				$rows[count($rows) - 1]['status_label'] = $status['label'];
-				$rows[count($rows) - 1]['status_color'] = $status['color'];
+				$rows[count($rows) - 1]['status_color'] = function_exists('bl_event_status_css_color_value')
+					? bl_event_status_css_color_value($status)
+					: (string) ($status['color'] ?? '');
 			}
 		}
 	}

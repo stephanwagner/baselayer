@@ -86,7 +86,7 @@
     text-decoration: none !important;
     cursor: pointer;
 
-    @media (min-resolution: 1.9dppx) {
+    @media (min-resolution: $high-density-dppx) {
       border-width: 1.5px;
       line-height: 25px;
     }

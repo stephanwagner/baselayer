@@ -1,0 +1,178 @@
+@use '../config' as *;
+
+// Event status palette
+$event-status-keys: ('neutral', 'info', 'error', 'warning', 'success', 'highlight', 'cancelled', 'postponed');
+
+// Variables
+:root {
+  --bl-event-status-neutral: var(--bl-color-neutral);
+  --bl-event-status-neutral-bg: var(--bl-color-neutral-bg);
+  --bl-event-status-info: var(--bl-color-info);
+  --bl-event-status-info-bg: var(--bl-color-info-bg);
+  --bl-event-status-error: var(--bl-color-error);
+  --bl-event-status-error-bg: var(--bl-color-error-bg);
+  --bl-event-status-warning: var(--bl-color-warning);
+  --bl-event-status-warning-bg: var(--bl-color-warning-bg);
+  --bl-event-status-success: var(--bl-color-success);
+  --bl-event-status-success-bg: var(--bl-color-success-bg);
+  --bl-event-status-highlight: var(--bl-color-highlight);
+  --bl-event-status-highlight-bg: var(--bl-color-highlight-bg);
+
+  --bl-event-status-cancelled: var(--bl-event-status-error);
+  --bl-event-status-cancelled-bg: var(--bl-event-status-error-bg);
+  --bl-event-status-postponed: var(--bl-event-status-warning);
+  --bl-event-status-postponed-bg: var(--bl-event-status-warning-bg);
+}
+
+// Event date
+.event-date {
+  margin: 0 0 24px;
+  font-weight: 400;
+  color: var(--bl-gray-text-color);
+
+  @media (max-width: $breakpoint-s) {
+    margin-bottom: 16px;
+  }
+}
+
+// Event status
+.event-status {
+  --bl-status-color: var(--bl-event-status-neutral);
+  --bl-status-bg: var(--bl-event-status-neutral-bg);
+  margin: -8px 0 24px;
+  padding: 14px 16px 14px 18px;
+  border: 2px solid color-mix(in srgb, var(--bl-status-color) 65%, #fff);
+  border-color: var(--bl-status-color);
+  border-left-width: 5px;
+  border-left-color: var(--bl-status-color);
+  border-radius: var(--bl-border-radius-m);
+  background: var(--bl-status-bg);
+  color: var(--bl-color-gray-800);
+
+  @media (min-resolution: $high-density-dppx) {
+    border-width: 1.5px;
+    border-left-width: 5px;
+  }
+
+  @media (max-width: $breakpoint-s) {
+    margin-bottom: 20px;
+  }
+}
+
+// Event status label
+.event-status__label {
+  display: block;
+  margin: 0;
+  font-weight: 700;
+  line-height: 1.3;
+  color: var(--bl-status-color);
+}
+
+// Event status info
+.event-status__info {
+  margin: 6px 0 0;
+  color: var(--bl-color-gray-700);
+
+  p {
+    margin: 0 0 6px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.event-status-badge {
+  --bl-status-color: var(--bl-event-status-neutral);
+  --bl-status-bg: var(--bl-event-status-neutral-bg);
+  display: inline-block;
+  padding: 0 6px;
+  border-radius: 4px;
+  font-size: 13px;
+  line-height: 20px;
+  white-space: nowrap;
+  font-weight: 600;
+  background: var(--bl-status-bg);
+  color: var(--bl-status-color);
+  border: 1px solid var(--bl-status-color);
+}
+
+@each $key in $event-status-keys {
+  .event-status-#{$key},
+  .event-status-badge-#{$key} {
+    --bl-status-color: var(--bl-event-status-#{$key});
+    --bl-status-bg: var(--bl-event-status-#{$key}-bg);
+  }
+}
+
+.event-meta {
+  margin: 32px 0 0;
+  padding-top: 24px;
+  border-top: 2px solid var(--bl-color-gray-300);
+
+  @media (min-resolution: $high-density-dppx) {
+    border-top-width: 1.5px;
+  }
+}
+
+.event-meta__groups {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px 32px;
+
+  @media (max-width: $breakpoint-m) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: $breakpoint-s) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.event-meta__group {
+  margin: 0;
+  min-width: 0;
+}
+
+.event-meta__title {
+  margin: 0 0 12px;
+  font-size: 1.125rem;
+}
+
+.event-meta__list {
+  margin: 0;
+}
+
+.event-meta__row {
+  display: grid;
+  grid-template-columns: minmax(7rem, 10rem) 1fr;
+  gap: 8px 16px;
+  margin: 0 0 8px;
+
+  @media (max-width: $breakpoint-s) {
+    grid-template-columns: 1fr;
+    gap: 2px;
+  }
+}
+
+.event-meta__label {
+  margin: 0;
+  font-weight: 600;
+  color: var(--bl-color-gray-600);
+}
+
+.event-meta__value {
+  margin: 0;
+}
+
+.event-meta__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.event-meta__ical-link {
+  margin-left: auto;
+}

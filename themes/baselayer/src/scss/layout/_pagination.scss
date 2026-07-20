@@ -55,7 +55,7 @@
       border-radius: 1px;
       background-color: var(--bl-default-text-color);
 
-      @media (min-resolution: 1.9dppx) {
+      @media (min-resolution: $high-density-dppx) {
         height: 1.5px;
       }
     }

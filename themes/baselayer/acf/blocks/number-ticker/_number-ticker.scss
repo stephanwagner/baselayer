@@ -63,7 +63,7 @@
   padding: 16px 12px 0;
   margin: 16px 0 0;
 
-  @media (min-resolution: 1.9dppx) {
+  @media (min-resolution: $high-density-dppx) {
     border-width: 1.5px;
   }
 }
