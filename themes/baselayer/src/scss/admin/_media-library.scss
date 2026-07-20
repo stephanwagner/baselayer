@@ -199,15 +199,11 @@ a.bl-media-folder-row {
   display: none;
 }
 
-.bl-media-folders-tree-item:not(.is-expanded)
-  .bl-media-folders-item-icon--branch
-  .bl-media-folders-item-icon-visual--closed {
+.bl-media-folders-tree-item:not(.is-expanded) .bl-media-folders-item-icon--branch .bl-media-folders-item-icon-visual--closed {
   display: inline-flex;
 }
 
-.bl-media-folders-tree-item:not(.is-expanded)
-  .bl-media-folders-item-icon--branch
-  .bl-media-folders-item-icon-visual--open {
+.bl-media-folders-tree-item:not(.is-expanded) .bl-media-folders-item-icon--branch .bl-media-folders-item-icon-visual--open {
   display: none;
 }
 
@@ -499,14 +495,10 @@ body.bl-feature-media-folders {
 
   /* Sidebar: room for rename/delete toolbar on folder rows */
   #bl-media-folders-sidebar.is-edit-mode
-    .bl-media-folders-item.bl-media-folders-link:not(.bl-media-folders-item--all):not(
-      .bl-media-folders-item--unassigned
-    )
+    .bl-media-folders-item.bl-media-folders-link:not(.bl-media-folders-item--all):not(.bl-media-folders-item--unassigned)
     > .bl-media-folder-row,
   #bl-media-folders-sidebar.is-delete-mode
-    .bl-media-folders-item.bl-media-folders-link:not(.bl-media-folders-item--all):not(
-      .bl-media-folders-item--unassigned
-    )
+    .bl-media-folders-item.bl-media-folders-link:not(.bl-media-folders-item--all):not(.bl-media-folders-item--unassigned)
     > .bl-media-folder-row {
     padding-right: calc(28px + 4px);
   }
@@ -957,4 +949,10 @@ body.bl-feature-media-folders {
   .media-sidebar .copy-to-clipboard-container {
     margin-left: calc(23% - 1px);
   }
+}
+
+// Fix Gallery selecting images
+
+.wp-core-ui .attachment:not(:has(.filename)):has(input[class='describe'])::after {
+  bottom: 39px;
 }
