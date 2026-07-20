@@ -407,104 +407,296 @@ function bl_event_display_post_states(array $states, $post): array
 }
 
 /**
- * Frontend archive: show events that have not ended yet; sort by start date/time.
+ * Whether a main query is a public event listing (CPT or event taxonomy archive).
+ */
+function bl_event_is_public_listing_query(\WP_Query $query): bool
+{
+	if (is_admin() || !$query->is_main_query()) {
+		return false;
+	}
+
+	if ($query->is_post_type_archive()) {
+		$pt = $query->get('post_type');
+		if (is_array($pt)) {
+			$pt = (string) reset($pt);
+		}
+
+		return is_string($pt) && $pt !== '' && bl_is_event_post_type($pt);
+	}
+
+	if (!$query->is_tax()) {
+		return false;
+	}
+
+	$taxonomy = $query->get('taxonomy');
+	if (!is_string($taxonomy) || $taxonomy === '') {
+		$obj = get_queried_object();
+		$taxonomy = $obj instanceof \WP_Term ? $obj->taxonomy : '';
+	}
+	if ($taxonomy === '' || !taxonomy_exists($taxonomy)) {
+		return false;
+	}
+
+	// Only taxonomies attached exclusively to event CPTs (skip shared ones like language).
+	$tax = get_taxonomy($taxonomy);
+	$object_types = $tax && is_array($tax->object_type) ? $tax->object_type : [];
+	if ($object_types === []) {
+		return false;
+	}
+	$event_types = bl_event_post_types();
+	foreach ($object_types as $object_type) {
+		if (!in_array($object_type, $event_types, true)) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+/**
+ * SQL fragment: exclude series masters (parent 0 + non-empty recurrence meta).
+ */
+function bl_event_sql_not_series_master(string $posts_alias = ''): string
+{
+	global $wpdb;
+	$alias = $posts_alias !== '' ? $posts_alias : $wpdb->posts;
+	$meta_key = esc_sql(BL_EVENT_META_RECURRENCE);
+
+	return " NOT (
+		{$alias}.post_parent = 0
+		AND EXISTS (
+			SELECT 1 FROM {$wpdb->postmeta} bl_ev_rec
+			WHERE bl_ev_rec.post_id = {$alias}.ID
+				AND bl_ev_rec.meta_key = '{$meta_key}'
+				AND bl_ev_rec.meta_value <> ''
+		)
+	)";
+}
+
+/**
+ * Meta query: end timestamp is still upcoming (uses stored _bl_event_end_ts).
+ *
+ * @return array<string, mixed>
+ */
+function bl_event_upcoming_meta_query(?int $now = null): array
+{
+	return [
+		'key' => BL_EVENT_META_END_TS,
+		'value' => $now ?? time(),
+		'compare' => '>=',
+		'type' => 'NUMERIC',
+	];
+}
+
+/**
+ * Apply upcoming + non-master filters to a WP_Query args array (Article List, etc.).
+ *
+ * @param array<string, mixed> $args
+ * @return array<string, mixed>
+ */
+function bl_event_apply_public_listing_query_args(array $args, ?int $now = null, bool $sort_by_start = true): array
+{
+	$now = $now ?? time();
+	$clause = bl_event_upcoming_meta_query($now);
+	$old = isset($args['meta_query']) && is_array($args['meta_query']) ? $args['meta_query'] : null;
+	if (empty($old)) {
+		$args['meta_query'] = [$clause];
+	} else {
+		$args['meta_query'] = [
+			'relation' => 'AND',
+			$old,
+			$clause,
+		];
+	}
+
+	if ($sort_by_start) {
+		$orderby = $args['orderby'] ?? '';
+		if ($orderby === 'date' || $orderby === '' || $orderby === 'post_date') {
+			$args['meta_key'] = BL_EVENT_META_START_TS;
+			$args['orderby'] = 'meta_value_num';
+			$args['order'] = isset($args['order']) ? $args['order'] : 'ASC';
+		}
+	}
+
+	// Flag for posts_where to drop series masters on this query.
+	$args['bl_event_public_listing'] = true;
+
+	return $args;
+}
+
+/**
+ * Drop series masters from queries flagged as public event listings.
+ *
+ * @param string    $where SQL WHERE.
+ * @param \WP_Query $query Query.
+ */
+function bl_event_public_listing_posts_where(string $where, \WP_Query $query): string
+{
+	if (empty($query->get('bl_event_public_listing'))) {
+		return $where;
+	}
+
+	return $where . ' AND ' . bl_event_sql_not_series_master();
+}
+
+add_filter('posts_where', 'bl_event_public_listing_posts_where', 10, 2);
+
+/**
+ * Frontend CPT + taxonomy archives: upcoming only, exclude series masters, sort by start.
  */
 function bl_event_archive_pre_get_posts(\WP_Query $query): void
 {
-	if (is_admin() || !$query->is_main_query() || !$query->is_post_type_archive()) {
-		return;
-	}
-	$pt = $query->get('post_type');
-	if (is_array($pt)) {
-		$pt = (string) reset($pt);
-	}
-	if (!is_string($pt) || $pt === '' || !bl_is_event_post_type($pt)) {
+	if (!bl_event_is_public_listing_query($query)) {
 		return;
 	}
 
-	$now = time();
-	$candidate_ids = get_posts([
-		'post_type' => $pt,
-		'post_status' => 'publish',
-		'posts_per_page' => -1,
-		'fields' => 'ids',
-		'orderby' => 'ID',
+	$args = bl_event_apply_public_listing_query_args([
+		'meta_query' => $query->get('meta_query'),
+		'orderby' => 'date',
 		'order' => 'ASC',
-		'no_found_rows' => true,
 	]);
-
-	$upcoming = [];
-	foreach ($candidate_ids as $post_id) {
-		$post_id = (int) $post_id;
-		if (function_exists('bl_event_is_series_master') && bl_event_is_series_master($post_id)) {
-			continue;
-		}
-		if (bl_event_is_upcoming($post_id, $now)) {
-			$upcoming[] = $post_id;
-		}
-	}
-
-	usort($upcoming, static function (int $a, int $b): int {
-		$start_a = bl_event_get_start_timestamp($a);
-		$start_b = bl_event_get_start_timestamp($b);
-		if ($start_a === $start_b) {
-			return $a <=> $b;
-		}
-
-		return $start_a <=> $start_b;
-	});
-
-	$query->set('post__in', $upcoming !== [] ? $upcoming : [0]);
-	$query->set('orderby', 'post__in');
+	$query->set('meta_query', $args['meta_query']);
+	$query->set('meta_key', BL_EVENT_META_START_TS);
+	$query->set('orderby', 'meta_value_num');
+	$query->set('order', 'ASC');
+	$query->set('bl_event_public_listing', true);
 }
 
 add_action('pre_get_posts', 'bl_event_archive_pre_get_posts', 25);
 
 /**
- * Published event IDs that have ended (same rule as the events archive).
+ * Exclude ended events and series masters from front-end search.
  *
- * @return int[]
+ * @param string    $where SQL WHERE clause.
+ * @param \WP_Query $query Query instance.
  */
-function bl_event_past_published_ids(?int $now = null): array
+function bl_event_search_exclude_past_posts_where(string $where, \WP_Query $query): string
 {
-	static $cache = null;
-	if (is_array($cache)) {
-		return $cache;
+	if (is_admin()) {
+		return $where;
+	}
+	if (apply_filters('bl_event_search_exclude_past_apply', true, $query) === false) {
+		return $where;
+	}
+	if (!$query->is_search()) {
+		return $where;
+	}
+	$s = $query->get('s');
+	if ($s === null || $s === '') {
+		return $where;
 	}
 
-	$now = $now ?? time();
-	$past = [];
-	foreach (bl_event_post_types() as $post_type) {
-		$candidate_ids = get_posts([
-			'post_type' => $post_type,
-			'post_status' => 'publish',
-			'posts_per_page' => -1,
-			'fields' => 'ids',
-			'orderby' => 'ID',
-			'order' => 'ASC',
-			'no_found_rows' => true,
-		]);
-		foreach ($candidate_ids as $post_id) {
-			$post_id = (int) $post_id;
-			if ($post_id <= 0) {
-				continue;
-			}
-			if (function_exists('bl_event_is_series_master') && bl_event_is_series_master($post_id)) {
-				continue;
-			}
-			if (!bl_event_is_upcoming($post_id, $now)) {
-				$past[] = $post_id;
-			}
-		}
+	$event_types = bl_event_post_types();
+	if ($event_types === []) {
+		return $where;
 	}
 
-	$cache = $past;
+	global $wpdb;
+	$now = (int) time();
+	$type_list = "'" . implode("','", array_map('esc_sql', $event_types)) . "'";
+	$end_key = esc_sql(BL_EVENT_META_END_TS);
+	$not_master = trim(bl_event_sql_not_series_master());
 
-	return $past;
+	// Keep non-events unchanged; for events require non-master + upcoming end_ts.
+	$where .= " AND (
+		{$wpdb->posts}.post_type NOT IN ({$type_list})
+		OR (
+			{$not_master}
+			AND EXISTS (
+				SELECT 1 FROM {$wpdb->postmeta} bl_ev_end
+				WHERE bl_ev_end.post_id = {$wpdb->posts}.ID
+					AND bl_ev_end.meta_key = '{$end_key}'
+					AND CAST(bl_ev_end.meta_value AS UNSIGNED) >= {$now}
+			)
+		)
+	)";
+
+	return $where;
+}
+
+add_filter('posts_where', 'bl_event_search_exclude_past_posts_where', 10, 2);
+
+/**
+ * REST collection search: hide ended events and series masters.
+ *
+ * @param array<string, mixed>            $args    Query args.
+ * @param \WP_REST_Request<string, mixed> $request Request.
+ * @return array<string, mixed>
+ */
+function bl_event_rest_search_exclude_past(array $args, \WP_REST_Request $request): array
+{
+	if (!$request->has_param('search')) {
+		return $args;
+	}
+	$search = $request->get_param('search');
+	if ($search === null || $search === '' || (is_string($search) && trim($search) === '')) {
+		return $args;
+	}
+
+	return bl_event_apply_public_listing_query_args($args, null, false);
 }
 
 /**
- * Published series master IDs (excluded from public listings).
+ * @return void
+ */
+function bl_event_register_rest_search_filters(): void
+{
+	foreach (bl_event_post_types() as $post_type) {
+		add_filter('rest_' . $post_type . '_query', 'bl_event_rest_search_exclude_past', 10, 2);
+	}
+}
+
+add_action('init', 'bl_event_register_rest_search_filters', 22);
+
+/**
+ * Redirect public series master URLs to the next upcoming occurrence (404 if none).
+ */
+function bl_event_redirect_series_master(): void
+{
+	if (is_admin() || !is_singular() || is_preview()) {
+		return;
+	}
+	$post_id = (int) get_queried_object_id();
+	if ($post_id <= 0 || !function_exists('bl_event_is_series_master') || !bl_event_is_series_master($post_id)) {
+		return;
+	}
+	// Allow iCal on masters to fail closed via serve_ical (no schedule on master UX).
+	if (isset($_GET['bl_ical'])) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		return;
+	}
+
+	$target = 0;
+	if (function_exists('bl_event_get_upcoming_occurrence_rows')) {
+		foreach (bl_event_get_upcoming_occurrence_rows($post_id) as $row) {
+			if (empty($row['deleted']) && !empty($row['id'])) {
+				$target = (int) $row['id'];
+				break;
+			}
+		}
+	}
+	if ($target > 0) {
+		$url = get_permalink($target);
+		if (is_string($url) && $url !== '') {
+			wp_safe_redirect($url, 302);
+			exit;
+		}
+	}
+
+	global $wp_query;
+	$wp_query->set_404();
+	status_header(404);
+	nocache_headers();
+	$template = get_404_template();
+	if (is_string($template) && $template !== '') {
+		include $template;
+	}
+	exit;
+}
+
+add_action('template_redirect', 'bl_event_redirect_series_master', 5);
+
+/**
+ * Published series master IDs (for admin / tooling; prefer SQL exclude on public listings).
  *
  * @return int[]
  */
@@ -540,100 +732,6 @@ function bl_event_series_master_ids(): array
 
 	return $ids;
 }
-
-/**
- * Exclude ended events from front-end search (keep published for direct URLs / SEO).
- *
- * @param string    $where SQL WHERE clause.
- * @param \WP_Query $query Query instance.
- */
-function bl_event_search_exclude_past_posts_where(string $where, \WP_Query $query): string
-{
-	if (is_admin()) {
-		return $where;
-	}
-	if (apply_filters('bl_event_search_exclude_past_apply', true, $query) === false) {
-		return $where;
-	}
-	if (!$query->is_search()) {
-		return $where;
-	}
-	$s = $query->get('s');
-	if ($s === null || $s === '') {
-		return $where;
-	}
-
-	$event_types = bl_event_post_types();
-	if ($event_types === []) {
-		return $where;
-	}
-
-	$past_ids = bl_event_past_published_ids();
-	$master_ids = function_exists('bl_event_series_master_ids') ? bl_event_series_master_ids() : [];
-	$exclude_ids = array_values(array_unique(array_merge($past_ids, $master_ids)));
-	if ($exclude_ids === []) {
-		return $where;
-	}
-
-	global $wpdb;
-	$type_list = "'" . implode("','", array_map('esc_sql', $event_types)) . "'";
-	$id_list = implode(',', array_map('intval', $exclude_ids));
-	$where .= " AND NOT ({$wpdb->posts}.post_type IN ({$type_list}) AND {$wpdb->posts}.ID IN ({$id_list}))";
-
-	return $where;
-}
-
-add_filter('posts_where', 'bl_event_search_exclude_past_posts_where', 10, 2);
-
-/**
- * REST collection search: hide ended events via stored end timestamp.
- *
- * @param array<string, mixed>            $args    Query args.
- * @param \WP_REST_Request<string, mixed> $request Request.
- * @return array<string, mixed>
- */
-function bl_event_rest_search_exclude_past(array $args, \WP_REST_Request $request): array
-{
-	if (!$request->has_param('search')) {
-		return $args;
-	}
-	$search = $request->get_param('search');
-	if ($search === null || $search === '' || (is_string($search) && trim($search) === '')) {
-		return $args;
-	}
-
-	$clause = [
-		'key' => BL_EVENT_META_END_TS,
-		'value' => time(),
-		'compare' => '>=',
-		'type' => 'NUMERIC',
-	];
-	$old = isset($args['meta_query']) ? $args['meta_query'] : null;
-	if (empty($old)) {
-		$args['meta_query'] = $clause;
-
-		return $args;
-	}
-	$args['meta_query'] = [
-		'relation' => 'AND',
-		$old,
-		$clause,
-	];
-
-	return $args;
-}
-
-/**
- * @return void
- */
-function bl_event_register_rest_search_filters(): void
-{
-	foreach (bl_event_post_types() as $post_type) {
-		add_filter('rest_' . $post_type . '_query', 'bl_event_rest_search_exclude_past', 10, 2);
-	}
-}
-
-add_action('init', 'bl_event_register_rest_search_filters', 22);
 
 /**
  * Block editor: strings for the Event panel (same script as expirator).
@@ -808,9 +906,15 @@ function bl_event_posts_custom_column(string $column, int $post_id): void
 			return;
 		}
 
-		$upcoming = function_exists('bl_event_get_upcoming_occurrence_rows')
-			? count(bl_event_get_upcoming_occurrence_rows($post_id))
-			: 0;
+		$upcoming_rows = function_exists('bl_event_get_upcoming_occurrence_rows')
+			? bl_event_get_upcoming_occurrence_rows($post_id)
+			: [];
+		$upcoming = 0;
+		foreach ($upcoming_rows as $row) {
+			if (empty($row['deleted'])) {
+				++$upcoming;
+			}
+		}
 		$total = count(bl_event_get_occurrence_ids($post_id));
 		$title = get_the_title($post_id);
 		echo '<br>';
@@ -883,6 +987,7 @@ add_action('admin_enqueue_scripts', static function (string $hook_suffix): void 
 		'modalTitle' => __('Occurrences', 'baselayer'),
 		'empty' => __('No upcoming occurrences.', 'baselayer'),
 		'editLabel' => __('Edit', 'baselayer'),
+		'editOccurrencesLabel' => __('Edit occurrences', 'baselayer'),
 		'restoreLabel' => __('Restore', 'baselayer'),
 		'deleteLabel' => __('Delete', 'baselayer'),
 		'deleteConfirm' => __('Remove this date from the series? It will not appear in Trash; you can restore it here later.', 'baselayer'),
@@ -892,6 +997,7 @@ add_action('admin_enqueue_scripts', static function (string $hook_suffix): void 
 		'customContent' => __('Custom content', 'baselayer'),
 		'deletedLabel' => __('Deleted', 'baselayer'),
 		'errorLabel' => __('Could not load occurrences.', 'baselayer'),
+		'actionErrorLabel' => __('Something went wrong. Please try again.', 'baselayer'),
 	]);
 }, 20);
 

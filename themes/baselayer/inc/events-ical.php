@@ -39,7 +39,7 @@ function bl_event_ical_escape_text(string $value): string
 }
 
 /**
- * Fold an iCalendar content line to ≤75 octets (RFC 5545).
+ * Fold an iCalendar content line to ≤75 octets (RFC 5545), respecting UTF-8.
  */
 function bl_event_ical_fold_line(string $line): string
 {
@@ -49,8 +49,16 @@ function bl_event_ical_fold_line(string $line): string
 
 	$chunks = [];
 	while (strlen($line) > 75) {
-		$chunks[] = substr($line, 0, 75);
-		$line = substr($line, 75);
+		$cut = 75;
+		// Back up so we do not split a multibyte UTF-8 sequence.
+		while ($cut > 0 && (ord($line[$cut]) & 0xC0) === 0x80) {
+			--$cut;
+		}
+		if ($cut === 0) {
+			$cut = 75;
+		}
+		$chunks[] = substr($line, 0, $cut);
+		$line = substr($line, $cut);
 	}
 	$chunks[] = $line;
 
@@ -58,7 +66,7 @@ function bl_event_ical_fold_line(string $line): string
 }
 
 /**
- * Format a DateTimeImmutable for iCal (local floating or all-day).
+ * Format a DateTimeImmutable for iCal (UTC timed or all-day DATE).
  *
  * @return array{0: string, 1: string} Property name suffix and value.
  */
@@ -70,10 +78,12 @@ function bl_event_ical_format_dt(\DateTimeImmutable $dt, bool $all_day, bool $en
 			$dt = $dt->modify('+1 day');
 		}
 
-		return [';VALUE=DATE', $dt->format('Ymd')];
+		return ['VALUE=DATE', $dt->format('Ymd')];
 	}
 
-	return ['', $dt->format('Ymd\THis')];
+	$utc = $dt->setTimezone(new \DateTimeZone('UTC'));
+
+	return ['', $utc->format('Ymd\THis\Z')];
 }
 
 /**
@@ -185,7 +195,6 @@ function bl_event_build_ical(int $post_id): ?string
 	$permalink = get_permalink($post_id);
 	$fields = bl_event_ical_meta_fields($post_id);
 
-	$tzid = $tz->getName();
 	$lines = [
 		'BEGIN:VCALENDAR',
 		'VERSION:2.0',
@@ -201,8 +210,9 @@ function bl_event_build_ical(int $post_id): ?string
 		$lines[] = 'DTSTART;' . $start_param . ':' . $start_val;
 		$lines[] = 'DTEND;' . $end_param . ':' . $end_val;
 	} else {
-		$lines[] = 'DTSTART;TZID=' . $tzid . ':' . $start_val;
-		$lines[] = 'DTEND;TZID=' . $tzid . ':' . $end_val;
+		// UTC with Z — avoids TZID without a VTIMEZONE block.
+		$lines[] = 'DTSTART:' . $start_val;
+		$lines[] = 'DTEND:' . $end_val;
 	}
 
 	$lines[] = 'SUMMARY:' . bl_event_ical_escape_text(is_string($title) ? $title : '');
@@ -278,4 +288,4 @@ function bl_event_serve_ical(): void
 	exit;
 }
 
-add_action('template_redirect', 'bl_event_serve_ical', 5);
+add_action('template_redirect', 'bl_event_serve_ical', 4);

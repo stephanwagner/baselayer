@@ -80,6 +80,45 @@
       .replace(/"/g, '&quot;');
   }
 
+  function activeOccurrenceCount(items) {
+    return (items || []).filter(function (item) {
+      return !item.deleted;
+    }).length;
+  }
+
+  function updateListButtonCount(masterId, items) {
+    const btn = document.querySelector(
+      '.bl-event-edit-occurrences[data-master-id="' + String(masterId) + '"]'
+    );
+    if (!btn) {
+      return;
+    }
+    const base = L.editOccurrencesLabel || 'Edit occurrences';
+    const count = activeOccurrenceCount(items);
+    btn.textContent = count > 0 ? base + ' (' + count + ')' : base;
+  }
+
+  function showBodyError(bodyEl, message) {
+    bodyEl.innerHTML =
+      '<p class="bl-event-occurrences-modal__empty">' +
+      escapeHtml(message || L.errorLabel || 'Could not load occurrences.') +
+      '</p>';
+  }
+
+  function showActionError(bodyEl, message) {
+    if (!bodyEl) {
+      return;
+    }
+    const existing = bodyEl.querySelector('.bl-event-occurrences-modal__error');
+    if (existing) {
+      existing.remove();
+    }
+    const p = document.createElement('p');
+    p.className = 'bl-event-occurrences-modal__error notice notice-error';
+    p.textContent = message || L.actionErrorLabel || 'Something went wrong. Please try again.';
+    bodyEl.insertBefore(p, bodyEl.firstChild);
+  }
+
   function renderList(bodyEl, items) {
     if (!items.length) {
       bodyEl.innerHTML =
@@ -152,6 +191,16 @@
     bodyEl.innerHTML = html;
   }
 
+  function parseErrorMessage(res, data) {
+    if (data && data.message) {
+      return String(data.message);
+    }
+    if (data && data.code) {
+      return String(data.code);
+    }
+    return L.actionErrorLabel || L.errorLabel || 'Something went wrong. Please try again.';
+  }
+
   function postJson(url, body) {
     return window.fetch(url, {
       method: 'POST',
@@ -162,17 +211,27 @@
       },
       body: JSON.stringify(body),
     }).then(function (res) {
-      if (!res.ok) {
-        throw new Error('bad status');
-      }
-      return res.json();
+      return res.json().catch(function () {
+        return null;
+      }).then(function (data) {
+        if (!res.ok) {
+          const err = new Error(parseErrorMessage(res, data));
+          err.response = data;
+          throw err;
+        }
+        return data;
+      });
     });
   }
 
   function refreshFromResponse(data) {
+    const items = (data && data.occurrences) || [];
     const bodyEl = overlay && overlay.querySelector('.bl-event-occurrences-modal__body');
     if (bodyEl) {
-      renderList(bodyEl, (data && data.occurrences) || []);
+      renderList(bodyEl, items);
+    }
+    if (currentMasterId) {
+      updateListButtonCount(currentMasterId, items);
     }
   }
 
@@ -190,8 +249,10 @@
       start_date: startDate,
     })
       .then(refreshFromResponse)
-      .catch(function () {
+      .catch(function (err) {
         btn.disabled = false;
+        const bodyEl = overlay && overlay.querySelector('.bl-event-occurrences-modal__body');
+        showActionError(bodyEl, err && err.message);
       });
   }
 
@@ -216,8 +277,10 @@
       occurrence_id: occurrenceId,
     })
       .then(refreshFromResponse)
-      .catch(function () {
+      .catch(function (err) {
         btn.disabled = false;
+        const bodyEl = overlay && overlay.querySelector('.bl-event-occurrences-modal__body');
+        showActionError(bodyEl, err && err.message);
       });
   }
 
@@ -241,17 +304,22 @@
         },
       })
       .then(function (res) {
-        if (!res.ok) {
-          throw new Error('bad status');
-        }
-        return res.json();
+        return res.json().catch(function () {
+          return null;
+        }).then(function (data) {
+          if (!res.ok) {
+            throw new Error(parseErrorMessage(res, data));
+          }
+          return data;
+        });
       })
       .then(function (data) {
-        renderList(bodyEl, (data && data.occurrences) || []);
+        const items = (data && data.occurrences) || [];
+        renderList(bodyEl, items);
+        updateListButtonCount(masterId, items);
       })
-      .catch(function () {
-        bodyEl.innerHTML =
-          '<p class="bl-event-occurrences-modal__empty">' + escapeHtml(L.errorLabel || 'Could not load occurrences.') + '</p>';
+      .catch(function (err) {
+        showBodyError(bodyEl, err && err.message);
       });
   }
 

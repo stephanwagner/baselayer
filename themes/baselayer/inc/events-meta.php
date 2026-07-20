@@ -53,20 +53,21 @@ function bl_cpt_event_meta_config(?string $post_type = null): array
 			$label = isset($field['label']) ? trim((string) $field['label']) : $field_id;
 			$fields[$field_id] = [
 				'type' => $type,
-				'label' => $label,
+				'label' => $label !== '' ? __($label, 'baselayer') : $field_id, // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText -- config labels
 			];
 		}
 		if ($fields === []) {
 			continue;
 		}
+		$group_title = isset($group['title']) ? trim((string) $group['title']) : $group_id;
 		$groups[$group_id] = [
-			'title' => isset($group['title']) ? trim((string) $group['title']) : $group_id,
+			'title' => $group_title !== '' ? __($group_title, 'baselayer') : $group_id, // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText -- config titles
 			'fields' => $fields,
 		];
 	}
 
 	return [
-		'title' => $title !== '' ? $title : __('Event metadata', 'baselayer'),
+		'title' => $title !== '' ? __($title, 'baselayer') : __('Event metadata', 'baselayer'), // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText -- config title
 		'groups' => $groups,
 	];
 }

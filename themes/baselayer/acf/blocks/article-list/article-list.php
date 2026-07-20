@@ -67,6 +67,11 @@ if ($taxQuery !== []) {
     $queryArgs['tax_query'] = $taxQuery;
 }
 
+if (function_exists('bl_is_event_post_type') && bl_is_event_post_type($postType)
+	&& function_exists('bl_event_apply_public_listing_query_args')) {
+	$queryArgs = bl_event_apply_public_listing_query_args($queryArgs);
+}
+
 $query = new WP_Query($queryArgs);
 $posts = $query->posts;
 

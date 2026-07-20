@@ -2510,44 +2510,6 @@ msgstr "Entwicklerrechte"
 msgid "This user has developer rights"
 msgstr "Dieser Benutzer hat Entwicklerrechte"
 
-# Content variables
-
-msgid "Global Content"
-msgstr "Globale Inhalte"
-
-msgid "Define content that is used across the website."
-msgstr "Definiere Inhalte, die websiteweit verwendet werden."
-
-msgid "Updating these values will automatically update them wherever they are used."
-msgstr "Änderungen werden automatisch überall übernommen, wo sie genutzt werden."
-
-msgctxt "Content variables"
-msgid "General"
-msgstr "Allgemein"
-
-msgctxt "Content variables"
-msgid "Examples"
-msgstr "Beispiele"
-
-msgctxt "Content variables"
-msgid "Company data"
-msgstr "Unternehmensdaten"
-
-msgctxt "Content variables"
-msgid "Company name"
-msgstr "Firmenname"
-
-msgctxt "Content variables"
-msgid "Address"
-msgstr "Adresse"
-
-msgctxt "Content variables"
-msgid "Phone"
-msgstr "Telefon"
-
-msgctxt "Content variables"
-msgid "Email"
-msgstr "E-Mail"
 
 msgid "Main navigation"
 msgstr "Hauptnavigation"
@@ -2904,7 +2866,6 @@ msgstr "Veranstalter: %s"
 msgid "Contact: %s"
 msgstr "Kontakt: %s"
 
-
 msgid "Deleted"
 msgstr "Gelöscht"
 
@@ -2970,3 +2931,21 @@ msgstr "Master-Event ist nicht verfügbar."
 
 msgid "Occurrence does not belong to this master."
 msgstr "Termin gehört nicht zu diesem Master."
+
+msgid "Something went wrong. Please try again."
+msgstr "Etwas ist schiefgelaufen. Bitte erneut versuchen."
+
+msgid "Address"
+msgstr "Adresse"
+
+msgid "Phone"
+msgstr "Telefon"
+
+msgid "Venue name"
+msgstr "Veranstaltungsort"
+
+msgid "Location"
+msgstr "Ort"
+
+msgid "Organizer"
+msgstr "Veranstalter"

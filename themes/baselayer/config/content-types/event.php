@@ -36,7 +36,7 @@ return [
 		 * Field types: text | textarea | email | url
 		 */
 		'meta' => [
-			'title' => 'Veranstaltungs-Metadaten',
+			'title' => 'Event metadata',
 			'groups' => [
 				'location' => [
 					'title' => 'Location',
@@ -56,24 +56,24 @@ return [
 					'fields' => [
 						'name' => [
 							'type' => 'text',
-							'label' => 'Organizer name',
+							'label' => 'Name',
 						],
 						'email' => [
 							'type' => 'email',
-							'label' => 'Organizer email',
+							'label' => 'Email',
 						],
 						'website' => [
 							'type' => 'url',
-							'label' => 'Organizer website',
+							'label' => 'Website',
 						],
 					],
 				],
 				'contact' => [
 					'title' => 'Contact',
 					'fields' => [
-						'person' => [
+						'name' => [
 							'type' => 'text',
-							'label' => 'Contact person',
+							'label' => 'Name',
 						],
 						'email' => [
 							'type' => 'email',
