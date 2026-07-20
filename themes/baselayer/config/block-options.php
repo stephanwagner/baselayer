@@ -370,6 +370,7 @@ return [
 		['preset' => 'icon-text-position', 'blocks' => ['acf/icon-text'], 'target' => 'block_option'],
 		['preset' => 'container-margin', 'blocks' => ['acf/icon-text'], 'target' => 'block_option'],
 		['preset' => 'align-wide-container', 'blocks' => ['acf/slider', 'acf/map', 'acf/article-list', 'acf/number-ticker'], 'target' => 'block_option'],
+		['preset' => 'container-padding-m', 'blocks' => ['acf/slider'], 'target' => 'block_option'],
 		['preset' => 'container-margin-m', 'blocks' => ['acf/slider', 'acf/map', 'acf/article-list', 'acf/number-ticker'], 'target' => 'block_option'],
 	],
 ];

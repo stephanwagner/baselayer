@@ -1,5 +1,7 @@
 @use '../../../src/scss/config' as *;
 
+$slider-content-wide-collapse: $content-width + ($container-wide-bleed * 2) + 24px + 24px;
+
 .slider-slide__wrapper {
   position: relative;
 
@@ -52,18 +54,23 @@
   position: absolute;
   inset: 0;
   z-index: 3;
-  padding: 0 var(--bl-page-padding);
+  padding-top: var(--bl-container-padding-y, 0);
+  padding-bottom: var(--bl-container-padding-y, 0);
+  padding-left: var(--bl-container-padding-x, var(--bl-page-padding));
+  padding-right: var(--bl-container-padding-x, var(--bl-page-padding));
   align-items: center;
   display: none;
   color: #fff;
 
-  .slider__wrapper.alignwide & {
+  // Wide container + alignwide: same content inset until the shared collapse breakpoint.
+  .slider__wrapper.alignwide &,
+  .slider__wrapper.container-wide & {
     padding-left: var(--bl-alignwide-bleed);
     padding-right: var(--bl-alignwide-bleed);
 
-    @media (max-width: $breakpoint-xl) {
-      padding-left: calc(var(--bl-page-padding) * 0.5);
-      padding-right: calc(var(--bl-page-padding) * 0.5);
+    @media (max-width: $slider-content-wide-collapse) {
+      padding-left: var(--bl-container-padding-x, var(--bl-page-padding));
+      padding-right: var(--bl-container-padding-x, var(--bl-page-padding));
     }
   }
 
@@ -72,8 +79,8 @@
     padding-right: calc((100vw - var(--bl-content-width)) * 0.5);
 
     @media (max-width: calc(#{$content-width} + #{$page-padding-l} + #{$page-padding-l})) {
-      padding-left: var(--bl-page-padding);
-      padding-right: var(--bl-page-padding);
+      padding-left: var(--bl-container-padding-x, var(--bl-page-padding));
+      padding-right: var(--bl-container-padding-x, var(--bl-page-padding));
     }
   }
 
