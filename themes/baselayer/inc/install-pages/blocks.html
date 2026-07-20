@@ -571,11 +571,11 @@
 <!-- /wp:heading -->
 
 <!-- wp:paragraph -->
-<p>The gallery block displays several images in a responsive grid. Adjust the column count and enable the lightbox to let visitors view each image full-size.</p>
+<p>The gallery block displays several images in a responsive grid. Captions are shown by default, adjust the column count and lightbox in the gallery settings.</p>
 <!-- /wp:paragraph -->
 
-<!-- wp:gallery {"linkTo":"none","aspectRatio":"3/2","className":"-container-margin-s -has-lightbox","containerMarginTop":"s","containerMarginBottom":"s"} -->
-<figure class="wp-block-gallery has-nested-images columns-default is-cropped -container-margin-s -has-lightbox"><!-- wp:image {"id":{{media:sample-image-1:id}},"aspectRatio":"3/2","sizeSlug":"large","linkDestination":"none"} -->
+<!-- wp:gallery {"linkTo":"none","aspectRatio":"3/2","className":"-container-margin-s -show-image-captions -has-lightbox","containerMarginTop":"s","containerMarginBottom":"s","showImageLabels":true,"hasLightbox":true} -->
+<figure class="wp-block-gallery has-nested-images columns-default is-cropped -container-margin-s -show-image-captions -has-lightbox"><!-- wp:image {"id":{{media:sample-image-1:id}},"aspectRatio":"3/2","sizeSlug":"large","linkDestination":"none"} -->
 <figure class="wp-block-image size-large"><img src="{{media:sample-image-1:url}}" alt="" class="wp-image-{{media:sample-image-1:id}}" style="aspect-ratio:3/2"/><figcaption class="wp-element-caption">Evening glow across the hills</figcaption></figure>
 <!-- /wp:image -->
 
