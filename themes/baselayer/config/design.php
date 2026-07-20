@@ -16,7 +16,6 @@ return [
 		// Grayscale
 		['slug' => 'white', 'color' => '#fff', 'name' => 'White'],
 		['slug' => 'black', 'color' => '#000', 'name' => 'Black'],
-		['slug' => 'off-black', 'color' => '#23292e', 'name' => 'Lighter black'],
 		['slug' => 'gray-900', 'color' => '#23292e', 'name' => 'Gray 900'],
 		['slug' => 'gray-800', 'color' => '#3c434a', 'name' => 'Gray 800'],
 		['slug' => 'gray-700', 'color' => '#58616b', 'name' => 'Gray 700'],
