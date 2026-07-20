@@ -229,6 +229,45 @@ function bl_theme_json_typography_settings(): array
 }
 
 /**
+ * Block editor dimension settings for theme.json from config/design.php.
+ *
+ * @return array{aspectRatios?: list<array{name: string, slug: string, ratio: string}>}
+ */
+function bl_theme_json_dimensions_settings(): array
+{
+	$ratios = bl_config('aspect_ratios');
+	if (!is_array($ratios) || $ratios === []) {
+		return [];
+	}
+
+	$aspect_ratios = [];
+	foreach ($ratios as $entry) {
+		if (!is_array($entry)) {
+			continue;
+		}
+		$name = sanitize_text_field((string) ($entry['name'] ?? ''));
+		$slug = sanitize_title((string) ($entry['slug'] ?? ''));
+		$ratio = sanitize_text_field((string) ($entry['ratio'] ?? ''));
+		if ($name === '' || $slug === '' || $ratio === '') {
+			continue;
+		}
+		$aspect_ratios[] = [
+			'name'  => $name,
+			'slug'  => $slug,
+			'ratio' => $ratio,
+		];
+	}
+
+	if ($aspect_ratios === []) {
+		return [];
+	}
+
+	return [
+		'aspectRatios' => $aspect_ratios,
+	];
+}
+
+/**
  * Contents of `src/scss/_root.scss` — the `:root { … }` block only (readonly overview in Theme → CSS admin).
  *
  * @return string

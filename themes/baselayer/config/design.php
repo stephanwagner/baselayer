@@ -59,6 +59,15 @@ return [
 		['name' => 'Extra large', 'shortName' => 'XL', 'size' => '22px', 'slug' => 'xl'],
 	],
 
+	// Image aspect ratios
+	'aspect_ratios' => [
+		[
+			'name'  => 'Banner – 2:1',
+			'slug'  => '2-1',
+			'ratio' => '2/1',
+		],
+	],
+
 	// Block editor layout
 	'layout' => [
 		'editor_content_width'   => 960,

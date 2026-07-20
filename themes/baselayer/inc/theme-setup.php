@@ -201,7 +201,7 @@ function bl_excerpt_more(): string
 add_filter('excerpt_more', 'bl_excerpt_more');
 
 /**
- * Sync config/design.php into theme.json (colors, typography, layout).
+ * Sync config/design.php into theme.json (colors, typography, layout, dimensions).
  */
 add_filter('wp_theme_json_data_theme', function ($theme_json) {
 	$data = $theme_json->get_data();
@@ -220,6 +220,18 @@ add_filter('wp_theme_json_data_theme', function ($theme_json) {
 	if (function_exists('bl_theme_json_typography_settings')) {
 		foreach (bl_theme_json_typography_settings() as $key => $value) {
 			$data['settings']['typography'][$key] = $value;
+		}
+	}
+
+	if (function_exists('bl_theme_json_dimensions_settings')) {
+		$dimensions = bl_theme_json_dimensions_settings();
+		if ($dimensions !== []) {
+			if (!isset($data['settings']['dimensions']) || !is_array($data['settings']['dimensions'])) {
+				$data['settings']['dimensions'] = [];
+			}
+			foreach ($dimensions as $key => $value) {
+				$data['settings']['dimensions'][$key] = $value;
+			}
 		}
 	}
 
