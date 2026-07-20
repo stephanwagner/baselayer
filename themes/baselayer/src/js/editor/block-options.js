@@ -31,7 +31,12 @@ const { InspectorControls } = wp.blockEditor;
 const { PanelBody, ToggleControl, SelectControl } = wp.components;
 const ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
 const { createHigherOrderComponent } = wp.compose;
+const { useSelect } = wp.data;
 const { Fragment, useEffect, useRef } = wp.element;
+
+/** Image options owned by the gallery when nested — skip in the image inspector. */
+const GALLERY_OWNED_IMAGE_ATTRIBUTES = ['showImageLabel', 'hasLightbox', 'alignWideContainer'];
+const GALLERY_OWNED_IMAGE_TYPES = ['container-margin'];
 
 /** Resolved from PHP (config/block-options.php + optional Block Creator UI overlay). */
 const blockOptions = Array.isArray(window.baselayerBlockOptions)
@@ -452,11 +457,25 @@ blockOptions.forEach((block) => {
 // Add custom control
 const addControl = createHigherOrderComponent((BlockEdit) => {
   return (props) => {
-    const { attributes, setAttributes, isSelected } = props;
+    const { attributes, setAttributes, isSelected, clientId } = props;
 
     // Find the block configuration based on the block name
     const listedConfig = blockOptions.find((block) => block.name === props.name);
     const blockConfig = effectiveBlockConfig(props.name, listedConfig);
+
+    const isImageInGallery = useSelect(
+      (select) => {
+        if (props.name !== 'core/image' || !clientId) {
+          return false;
+        }
+        const parents = select('core/block-editor').getBlockParentsByBlockName(
+          clientId,
+          'core/gallery'
+        );
+        return Array.isArray(parents) && parents.length > 0;
+      },
+      [props.name, clientId]
+    );
 
     const skipHeightResetRef = useRef(false);
     const prevHeightRef = useRef(attributes.height);
@@ -599,6 +618,15 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                   buttonIconOnly &&
                   option.type === 'button-group' &&
                   option.attributeName === 'buttonIconPosition'
+                ) {
+                  return null;
+                }
+
+                // Gallery settings own layout + caption/lightbox for nested images.
+                if (
+                  isImageInGallery &&
+                  (GALLERY_OWNED_IMAGE_ATTRIBUTES.includes(option.attributeName) ||
+                    GALLERY_OWNED_IMAGE_TYPES.includes(option.type))
                 ) {
                   return null;
                 }

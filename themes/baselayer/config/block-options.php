@@ -191,7 +191,7 @@ return [
 				[
 					'type' => 'boolean',
 					'toggleLabel' => 'Untertitel anzeigen',
-					'default' => false,
+					'default' => true,
 					'attributeName' => 'showImageLabels',
 					'className' => '-show-image-captions',
 				],
