@@ -106,6 +106,7 @@ function bl_block_options_control_align_wide_container(): array
 	return [
 		'type' => 'button-group',
 		'label' => 'Inhaltsbreite',
+		'description' => 'Verwendet den breiten Inhaltscontainer. Nicht zu verwechseln mit der WordPress-Ausrichtung „Erweiterte Breite“.',
 		'default' => '',
 		'attributeName' => 'alignWideContainer',
 		'options' => [

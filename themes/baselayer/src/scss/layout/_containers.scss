@@ -2,6 +2,7 @@
 @use '../mixins' as *;
 
 $content-wide-width: $content-width + ($container-wide-bleed * 2);
+$content-wide-collapse: $content-wide-width + 24px + 24px;
 
 // Container
 
@@ -12,20 +13,21 @@ $content-wide-width: $content-width + ($container-wide-bleed * 2);
   width: calc(100% - var(--bl-page-padding) - var(--bl-page-padding));
 }
 
-// Expand from `.container` by the wide bleed. Reset when wide + 24 + 24 no longer fits.
+// Wide container
+
 .container-wide {
   margin-left: calc(var(--bl-container-wide-bleed) * -1);
   margin-right: calc(var(--bl-container-wide-bleed) * -1);
   width: calc(100% + var(--bl-container-wide-bleed) + var(--bl-container-wide-bleed));
 
   &.has-background {
-    @media (min-width: calc($content-wide-width + 24px + 24px + 1px)) {
+    @media (min-width: calc(#{$content-wide-collapse} + 1px)) {
       padding-left: var(--bl-container-wide-bleed);
       padding-right: var(--bl-container-wide-bleed);
     }
   }
 
-  @media (max-width: calc($content-wide-width + 24px + 24px)) {
+  @media (max-width: $content-wide-collapse) {
     margin-left: 0;
     margin-right: 0;
     width: 100%;
@@ -37,11 +39,13 @@ $content-wide-width: $content-width + ($container-wide-bleed * 2);
   }
 }
 
+// Alignwide
+
 .alignwide {
   margin-left: calc(var(--bl-alignwide-bleed) * -1);
   margin-right: calc(var(--bl-alignwide-bleed) * -1);
 
-  @media (max-width: $breakpoint-xl) {
+  @media (max-width: $content-wide-collapse) {
     margin-left: calc(var(--bl-page-padding) * -0.5);
     margin-right: calc(var(--bl-page-padding) * -0.5);
   }
@@ -51,13 +55,15 @@ $content-wide-width: $content-width + ($container-wide-bleed * 2);
       padding-left: var(--bl-alignwide-bleed);
       padding-right: var(--bl-alignwide-bleed);
 
-      @media (max-width: $breakpoint-xl) {
-        padding-left: calc(var(--bl-page-padding) * 0.5);
-        padding-right: calc(var(--bl-page-padding) * 0.5);
+      @media (max-width: $content-wide-collapse) {
+        padding-left: var(--bl-container-padding-x, 0);
+        padding-right: var(--bl-container-padding-x, 0);
       }
     }
   }
 }
+
+// Alignfull
 
 .alignfull {
   margin-left: calc((100vw - var(--bl-content-width)) * -0.5);
