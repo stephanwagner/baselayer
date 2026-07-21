@@ -159,7 +159,7 @@ function bl_forms_email_field_rows(array $fields, array $values): array
 	$rows = [];
 	foreach ($fields as $field) {
 		$type = (string) ($field['type'] ?? '');
-		if (in_array($type, ['heading', 'text_block'], true)) {
+		if (in_array($type, bl_forms_content_field_types(), true) || $type === 'honeypot') {
 			continue;
 		}
 		$name = (string) ($field['name'] ?? '');
@@ -167,19 +167,9 @@ function bl_forms_email_field_rows(array $fields, array $values): array
 			continue;
 		}
 		$label = (string) ($field['label'] ?? $name);
-		$value = $values[$name];
-		if (is_array($value)) {
-			$value = implode(', ', array_map('strval', $value));
-		}
-		$value = (string) $value;
-		if ($type === 'terms') {
-			$value = $value !== '' && $value !== '0'
-				? __('Yes', 'baselayer')
-				: __('No', 'baselayer');
-		}
 		$rows[] = [
 			'label' => $label,
-			'value' => $value,
+			'value' => bl_forms_format_field_display_value($field, $values[$name]),
 		];
 	}
 

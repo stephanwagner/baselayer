@@ -109,20 +109,39 @@ function bl_forms_render_entry_metabox(WP_Post $post): void
 		return;
 	}
 
-	$labels = [];
+	$fields_by_name = [];
 	foreach ($config['fields'] as $field) {
 		if (!empty($field['name'])) {
-			$labels[(string) $field['name']] = (string) ($field['label'] ?? $field['name']);
+			$fields_by_name[(string) $field['name']] = $field;
 		}
 	}
 
 	echo '<table class="widefat striped"><tbody>';
 	foreach ($values as $name => $value) {
-		$label = $labels[$name] ?? $name;
-		if (is_array($value)) {
-			$value = implode(', ', array_map('strval', $value));
+		$field = $fields_by_name[$name] ?? ['name' => $name, 'label' => $name, 'type' => ''];
+		$label = (string) ($field['label'] ?? $name);
+		$type = (string) ($field['type'] ?? '');
+		echo '<tr><th style="width:28%;">' . esc_html($label) . '</th><td>';
+		if (in_array($type, ['file', 'image'], true) && is_array($value)) {
+			$links = [];
+			foreach ($value as $item) {
+				if (!is_array($item)) {
+					continue;
+				}
+				$fname = (string) ($item['name'] ?? '');
+				$furl = (string) ($item['url'] ?? '');
+				if ($fname !== '' && $furl !== '') {
+					$links[] = '<a href="' . esc_url($furl) . '" target="_blank" rel="noopener noreferrer">' . esc_html($fname) . '</a>';
+				} elseif ($fname !== '') {
+					$links[] = esc_html($fname);
+				}
+			}
+			echo $links !== [] ? implode('<br>', $links) : '—';
+		} else {
+			$display = bl_forms_format_field_display_value($field, $value);
+			echo nl2br(esc_html($display));
 		}
-		echo '<tr><th style="width:28%;">' . esc_html((string) $label) . '</th><td>' . nl2br(esc_html((string) $value)) . '</td></tr>';
+		echo '</td></tr>';
 	}
 	echo '</tbody></table>';
 }

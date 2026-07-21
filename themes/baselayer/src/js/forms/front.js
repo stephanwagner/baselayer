@@ -1,6 +1,35 @@
 /**
- * Frontend form AJAX submit + spinner.
+ * Frontend form AJAX submit + spinner + image preview.
  */
+function initImagePreviews(root) {
+  root.querySelectorAll('[data-bl-form-image-input]').forEach((input) => {
+    const preview = input
+      .closest('.bl-form__field')
+      ?.querySelector('[data-bl-form-image-preview]');
+    if (!preview) return;
+
+    input.addEventListener('change', () => {
+      preview.replaceChildren();
+      const files = Array.from(input.files || []).filter((file) =>
+        String(file.type || '').startsWith('image/')
+      );
+      if (!files.length) {
+        preview.hidden = true;
+        return;
+      }
+      preview.hidden = false;
+      files.forEach((file) => {
+        const img = document.createElement('img');
+        img.className = 'bl-form__image-preview-item';
+        img.alt = file.name || '';
+        img.src = URL.createObjectURL(file);
+        img.onload = () => URL.revokeObjectURL(img.src);
+        preview.appendChild(img);
+      });
+    });
+  });
+}
+
 function initForm(root) {
   const form = root.querySelector('[data-bl-form-el]');
   const message = root.querySelector('[data-bl-form-message]');
@@ -8,6 +37,8 @@ function initForm(root) {
   const spinner = root.querySelector('[data-bl-form-spinner]');
   const label = root.querySelector('.bl-form__submit-label');
   if (!form || !submit) return;
+
+  initImagePreviews(root);
 
   const ajaxUrl = root.dataset.blFormAjax || '/wp-admin/admin-ajax.php';
   const successMsg = root.dataset.blFormSuccess || '';
@@ -56,7 +87,9 @@ function initForm(root) {
       const data = await response.json();
       if (data && data.success) {
         showMessage((data.data && data.data.message) || successMsg, 'success');
-        form.hidden = true;
+        const fields = root.querySelector('.bl-form__fields');
+        if (fields) fields.hidden = true;
+        submit.hidden = true;
         return;
       }
 

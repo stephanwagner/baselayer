@@ -12,6 +12,17 @@ function bl_forms_register_block(): void
 	}
 
 	$editor = bl_forms_resolve_asset('forms-block', 'js');
+
+	$icon = 'feedback';
+	$icon_svg = '';
+	if (function_exists('bl_svg_code') && function_exists('bl_icon_svg_asset_path')) {
+		$svg = bl_svg_code(bl_icon_svg_asset_path('inbox-text-fill'));
+		if ($svg !== '') {
+			$icon_svg = $svg;
+			$icon = $svg;
+		}
+	}
+
 	if ($editor !== null) {
 		wp_register_script(
 			'bl-forms-block',
@@ -34,6 +45,7 @@ function bl_forms_register_block(): void
 
 		wp_localize_script('bl-forms-block', 'blFormsBlock', [
 			'options' => $options,
+			'icon'    => $icon_svg,
 		]);
 	}
 
@@ -42,7 +54,7 @@ function bl_forms_register_block(): void
 		'title'           => __('Form', 'baselayer'),
 		'description'     => __('Place a form created under Forms.', 'baselayer'),
 		'category'        => 'widgets',
-		'icon'            => 'feedback',
+		'icon'            => $icon,
 		'keywords'        => ['form', 'contact', 'email'],
 		'editor_script'   => $editor !== null ? 'bl-forms-block' : null,
 		'render_callback' => 'bl_forms_block_render',

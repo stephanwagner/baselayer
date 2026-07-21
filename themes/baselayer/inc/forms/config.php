@@ -9,7 +9,44 @@ defined('ABSPATH') || exit;
  */
 function bl_forms_field_types(): array
 {
-	return ['text', 'email', 'textarea', 'radio', 'checkboxes', 'terms', 'heading', 'text_block'];
+	return [
+		'text',
+		'email',
+		'url',
+		'number',
+		'password',
+		'phone',
+		'textarea',
+		'radio',
+		'checkboxes',
+		'select',
+		'toggle',
+		'button_group',
+		'terms',
+		'date',
+		'time',
+		'datetime',
+		'file',
+		'image',
+		'heading',
+		'text_block',
+		'html',
+		'divider',
+		'spacer',
+		'hidden',
+		'honeypot',
+		'captcha',
+	];
+}
+
+/**
+ * Non-submittable layout / content field types.
+ *
+ * @return list<string>
+ */
+function bl_forms_content_field_types(): array
+{
+	return ['heading', 'text_block', 'html', 'divider', 'spacer', 'captcha'];
 }
 
 /**
@@ -136,6 +173,81 @@ function bl_forms_sanitize_options($options): array
 }
 
 /**
+ * Map stored option value(s) to option labels for display (email / entry UI).
+ *
+ * @param array<string, mixed> $field
+ * @param mixed                $value Stored submission value.
+ */
+function bl_forms_format_field_display_value(array $field, $value): string
+{
+	$type = (string) ($field['type'] ?? '');
+
+	if ($type === 'terms' || $type === 'toggle') {
+		return $value !== '' && $value !== '0' && $value !== null && $value !== false
+			? __('Yes', 'baselayer')
+			: __('No', 'baselayer');
+	}
+
+	if ($type === 'password') {
+		return $value !== '' && $value !== null ? '••••••••' : '';
+	}
+
+	if (in_array($type, ['file', 'image'], true)) {
+		$items = is_array($value) ? $value : [];
+		$parts = [];
+		foreach ($items as $item) {
+			if (!is_array($item)) {
+				continue;
+			}
+			$fname = (string) ($item['name'] ?? '');
+			$furl = (string) ($item['url'] ?? '');
+			if ($fname !== '' && $furl !== '') {
+				$parts[] = $fname . ' — ' . $furl;
+			} elseif ($fname !== '') {
+				$parts[] = $fname;
+			} elseif ($furl !== '') {
+				$parts[] = $furl;
+			}
+		}
+
+		return implode("\n", $parts);
+	}
+
+	if (in_array($type, ['radio', 'checkboxes', 'select', 'button_group'], true)) {
+		$map = [];
+		$options = isset($field['options']) && is_array($field['options']) ? $field['options'] : [];
+		foreach ($options as $opt) {
+			if (!is_array($opt)) {
+				continue;
+			}
+			$opt_value = (string) ($opt['value'] ?? '');
+			$opt_label = (string) ($opt['label'] ?? $opt_value);
+			if ($opt_value !== '') {
+				$map[$opt_value] = $opt_label !== '' ? $opt_label : $opt_value;
+			}
+		}
+
+		$selected = is_array($value) ? $value : [$value];
+		$labels = [];
+		foreach ($selected as $item) {
+			if (!is_scalar($item) || (string) $item === '') {
+				continue;
+			}
+			$key = (string) $item;
+			$labels[] = $map[$key] ?? $key;
+		}
+
+		return implode(', ', $labels);
+	}
+
+	if (is_array($value)) {
+		return implode(', ', array_map('strval', $value));
+	}
+
+	return (string) $value;
+}
+
+/**
  * Allowed field width presets (percent).
  *
  * @return list<string>
@@ -218,7 +330,7 @@ function bl_forms_sanitize_field($field): ?array
 	}
 
 	$name = sanitize_key((string) ($field['name'] ?? ''));
-	if ($name === '' && !in_array($type, ['heading', 'text_block'], true)) {
+	if ($name === '' && !in_array($type, bl_forms_content_field_types(), true)) {
 		$name = $id;
 	}
 
@@ -233,9 +345,43 @@ function bl_forms_sanitize_field($field): ?array
 		'width_custom' => $width['width_custom'],
 	];
 
-	if (in_array($type, ['heading', 'text_block'], true)) {
-		$out['content'] = sanitize_textarea_field((string) ($field['content'] ?? ''));
+	if ($type === 'divider' || $type === 'captcha') {
+		unset($out['name'], $out['label']);
+
+		return $out;
+	}
+
+	if ($type === 'spacer') {
+		$height = sanitize_text_field((string) ($field['height'] ?? '24px'));
+		if ($height === '') {
+			$height = '24px';
+		}
+		$out['height'] = $height;
+		unset($out['name'], $out['label']);
+
+		return $out;
+	}
+
+	if (in_array($type, ['heading', 'text_block', 'html'], true)) {
+		$content = (string) ($field['content'] ?? '');
+		$out['content'] = $type === 'html'
+			? wp_kses_post($content)
+			: sanitize_textarea_field($content);
 		unset($out['name']);
+
+		return $out;
+	}
+
+	if ($type === 'honeypot') {
+		$out['label'] = $out['label'] !== '' ? $out['label'] : __('Honeypot', 'baselayer');
+		unset($out['required'], $out['placeholder']);
+
+		return $out;
+	}
+
+	if ($type === 'hidden') {
+		$out['default_value'] = sanitize_text_field((string) ($field['default_value'] ?? ''));
+		unset($out['required'], $out['placeholder']);
 
 		return $out;
 	}
@@ -243,18 +389,35 @@ function bl_forms_sanitize_field($field): ?array
 	$out['required'] = !empty($field['required']);
 	$out['placeholder'] = sanitize_text_field((string) ($field['placeholder'] ?? ''));
 
-	if (in_array($type, ['text', 'email', 'textarea'], true)) {
+	if (in_array($type, ['text', 'email', 'url', 'number', 'password', 'phone', 'textarea', 'date', 'time', 'datetime', 'file', 'image', 'toggle'], true)) {
 		$out['description'] = sanitize_textarea_field((string) ($field['description'] ?? ''));
 	}
 
-	if (in_array($type, ['radio', 'checkboxes'], true)) {
+	if (in_array($type, ['radio', 'checkboxes', 'select', 'button_group'], true)) {
 		$out['options'] = bl_forms_sanitize_options($field['options'] ?? []);
 	}
 
+	if (in_array($type, ['select', 'button_group', 'file', 'image'], true)) {
+		$out['multiple'] = !empty($field['multiple']);
+	}
+
 	if ($type === 'terms') {
+		$content = sanitize_textarea_field((string) ($field['content'] ?? ''));
+		// Legacy configs stored the checkbox text in `label`.
+		if ($content === '' && !array_key_exists('content', $field) && $out['label'] !== '') {
+			$content = $out['label'];
+			$out['label'] = '';
+		}
+		if ($content === '') {
+			$content = __('I agree to the [Privacy Policy](page:privacy).', 'baselayer');
+		}
+		$out['content'] = $content;
+	}
+
+	if ($type === 'toggle') {
 		$out['label'] = $out['label'] !== ''
 			? $out['label']
-			: __('I agree to the terms.', 'baselayer');
+			: __('Enable', 'baselayer');
 	}
 
 	return $out;

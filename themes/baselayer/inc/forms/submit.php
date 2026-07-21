@@ -25,9 +25,13 @@ function bl_forms_ajax_submit(): void
 	}
 
 	$hp = isset($_POST['bl_forms_hp']) ? trim((string) wp_unslash($_POST['bl_forms_hp'])) : '';
-	if ($hp !== '') {
+	$config = bl_forms_get_config($form_id);
+	$settings = $config['settings'];
+	$raw_fields = isset($_POST['fields']) && is_array($_POST['fields']) ? wp_unslash($_POST['fields']) : [];
+
+	if ($hp !== '' || bl_forms_honeypot_triggered($config['fields'], $raw_fields)) {
 		wp_send_json_success([
-			'message' => bl_forms_resolve_message(bl_forms_get_config($form_id)['settings'], 'success_message'),
+			'message' => bl_forms_resolve_message($settings, 'success_message'),
 		]);
 	}
 
@@ -38,11 +42,7 @@ function bl_forms_ajax_submit(): void
 		], 429);
 	}
 
-	$config = bl_forms_get_config($form_id);
-	$settings = $config['settings'];
-	$raw_fields = isset($_POST['fields']) && is_array($_POST['fields']) ? wp_unslash($_POST['fields']) : [];
-
-	[$values, $invalid] = bl_forms_validate_submission($config['fields'], $raw_fields);
+	[$values, $invalid] = bl_forms_validate_submission($config['fields'], $raw_fields, $_FILES);
 	if ($invalid !== []) {
 		wp_send_json_error([
 			'message' => bl_forms_resolve_message($settings, 'validation_message'),
@@ -97,6 +97,51 @@ add_action('wp_ajax_bl_forms_submit', 'bl_forms_ajax_submit');
 add_action('wp_ajax_nopriv_bl_forms_submit', 'bl_forms_ajax_submit');
 
 /**
+ * Soft phone number check (digits with common separators / leading +).
+ */
+function bl_forms_is_valid_phone(string $value): bool
+{
+	$trimmed = trim($value);
+	if ($trimmed === '') {
+		return false;
+	}
+
+	// Allow +, spaces, dashes, dots, parentheses; require at least 6 digits.
+	if (!preg_match('/^\+?[\d\s.\-()]{6,}$/u', $trimmed)) {
+		return false;
+	}
+
+	$digits = preg_replace('/\D+/', '', $trimmed);
+
+	return is_string($digits) && strlen($digits) >= 6 && strlen($digits) <= 20;
+}
+
+/**
+ * Whether any builder honeypot field was filled (bot signal).
+ *
+ * @param list<array<string, mixed>> $fields
+ * @param array<string, mixed>       $raw
+ */
+function bl_forms_honeypot_triggered(array $fields, array $raw): bool
+{
+	foreach ($fields as $field) {
+		if ((string) ($field['type'] ?? '') !== 'honeypot') {
+			continue;
+		}
+		$name = (string) ($field['name'] ?? '');
+		if ($name === '') {
+			continue;
+		}
+		$value = $raw[$name] ?? null;
+		if (is_scalar($value) && trim((string) $value) !== '') {
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/**
  * Soft rate limit: 5 submissions / form / IP / minute.
  */
 function bl_forms_rate_limit_ok(int $form_id): bool
@@ -125,20 +170,21 @@ function bl_forms_client_ip_hash(): string
 }
 
 /**
- * Validate and sanitize submitted fields.
+ * Validate and sanitize submitted fields (including uploads).
  *
  * @param list<array<string, mixed>> $fields
  * @param array<string, mixed>       $raw
+ * @param array<string, mixed>       $files Raw $_FILES.
  * @return array{0: array<string, mixed>, 1: list<string>}
  */
-function bl_forms_validate_submission(array $fields, array $raw): array
+function bl_forms_validate_submission(array $fields, array $raw, array $files = []): array
 {
 	$values = [];
 	$invalid = [];
 
 	foreach ($fields as $field) {
 		$type = (string) ($field['type'] ?? '');
-		if (in_array($type, ['heading', 'text_block'], true)) {
+		if (in_array($type, bl_forms_content_field_types(), true) || $type === 'honeypot') {
 			continue;
 		}
 
@@ -149,14 +195,40 @@ function bl_forms_validate_submission(array $fields, array $raw): array
 
 		$required = !empty($field['required']);
 		$raw_value = $raw[$name] ?? null;
+		$multiple = !empty($field['multiple']);
 
-		if ($type === 'checkboxes') {
+		if ($type === 'hidden') {
+			$value = is_scalar($raw_value) ? sanitize_text_field((string) $raw_value) : '';
+			if ($value === '') {
+				$value = sanitize_text_field((string) ($field['default_value'] ?? ''));
+			}
+			$values[$name] = $value;
+			continue;
+		}
+
+		if (in_array($type, ['file', 'image'], true)) {
+			[$stored, $ok] = bl_forms_process_field_uploads($name, $files, $type === 'image', $multiple);
+			$values[$name] = $stored;
+			if (!$ok || ($required && $stored === [])) {
+				$invalid[] = $name;
+			}
+			continue;
+		}
+
+		if ($type === 'checkboxes' || ($type === 'button_group' && $multiple) || ($type === 'select' && $multiple)) {
 			$list = [];
 			if (is_array($raw_value)) {
 				foreach ($raw_value as $item) {
 					$list[] = sanitize_text_field((string) $item);
 				}
+			} elseif (is_scalar($raw_value) && (string) $raw_value !== '') {
+				$list[] = sanitize_text_field((string) $raw_value);
 			}
+
+			if (in_array($type, ['checkboxes', 'button_group', 'select'], true)) {
+				$list = bl_forms_filter_allowed_option_values($field, $list);
+			}
+
 			$values[$name] = $list;
 			if ($required && $list === []) {
 				$invalid[] = $name;
@@ -164,7 +236,7 @@ function bl_forms_validate_submission(array $fields, array $raw): array
 			continue;
 		}
 
-		if ($type === 'terms') {
+		if ($type === 'terms' || $type === 'toggle') {
 			$checked = !empty($raw_value);
 			$values[$name] = $checked ? '1' : '';
 			if ($required && !$checked) {
@@ -178,8 +250,33 @@ function bl_forms_validate_submission(array $fields, array $raw): array
 			$value = sanitize_textarea_field($value);
 		} elseif ($type === 'email') {
 			$value = sanitize_email($value);
+		} elseif ($type === 'url') {
+			$value = esc_url_raw($value);
+		} elseif ($type === 'number') {
+			if ($value !== '' && !is_numeric($value)) {
+				$values[$name] = sanitize_text_field($value);
+				$invalid[] = $name;
+				continue;
+			}
+		} elseif ($type === 'phone') {
+			$value = sanitize_text_field($value);
+			if ($value !== '' && !bl_forms_is_valid_phone($value)) {
+				$values[$name] = $value;
+				$invalid[] = $name;
+				continue;
+			}
 		} else {
 			$value = sanitize_text_field($value);
+		}
+
+		if (in_array($type, ['radio', 'select', 'button_group'], true) && $value !== '') {
+			$allowed = bl_forms_filter_allowed_option_values($field, [$value]);
+			$value = $allowed[0] ?? '';
+			if ($value === '' && $raw_value !== null && (string) $raw_value !== '') {
+				$invalid[] = $name;
+				$values[$name] = '';
+				continue;
+			}
 		}
 
 		$values[$name] = $value;
@@ -192,7 +289,200 @@ function bl_forms_validate_submission(array $fields, array $raw): array
 		if ($type === 'email' && $value !== '' && !is_email($value)) {
 			$invalid[] = $name;
 		}
+
+		if ($type === 'url' && $value !== '') {
+			$valid_url = function_exists('wp_http_validate_url')
+				? (bool) wp_http_validate_url($value)
+				: (bool) filter_var($value, FILTER_VALIDATE_URL);
+			if (!$valid_url) {
+				$invalid[] = $name;
+			}
+		}
+
+		if ($type === 'number' && $value !== '' && !is_numeric($value)) {
+			$invalid[] = $name;
+		}
 	}
 
 	return [$values, $invalid];
+}
+
+/**
+ * Keep only option values that exist on the field definition.
+ *
+ * @param array<string, mixed> $field
+ * @param list<string>         $values
+ * @return list<string>
+ */
+function bl_forms_filter_allowed_option_values(array $field, array $values): array
+{
+	$allowed = [];
+	$options = isset($field['options']) && is_array($field['options']) ? $field['options'] : [];
+	foreach ($options as $opt) {
+		if (is_array($opt) && isset($opt['value'])) {
+			$allowed[] = (string) $opt['value'];
+		}
+	}
+	if ($allowed === []) {
+		return $values;
+	}
+
+	return array_values(array_filter($values, static function ($value) use ($allowed) {
+		return in_array((string) $value, $allowed, true);
+	}));
+}
+
+/**
+ * Normalize and store uploads for one field.
+ *
+ * @param array<string, mixed> $files Raw $_FILES.
+ * @return array{0: list<array{id:int,url:string,name:string,mime:string}>, 1: bool}
+ */
+function bl_forms_process_field_uploads(string $name, array $files, bool $images_only, bool $multiple): array
+{
+	$bucket = bl_forms_extract_uploaded_files($name, $files);
+	if ($bucket === []) {
+		return [[], true];
+	}
+
+	if (!$multiple) {
+		$bucket = [ $bucket[0] ];
+	}
+
+	$stored = [];
+	$ok = true;
+	foreach ($bucket as $file) {
+		if (!is_array($file) || (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+			continue;
+		}
+		if ((int) ($file['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
+			$ok = false;
+			continue;
+		}
+
+		$result = bl_forms_store_uploaded_file($file, $images_only);
+		if (is_wp_error($result)) {
+			$ok = false;
+			continue;
+		}
+		$stored[] = $result;
+	}
+
+	return [$stored, $ok];
+}
+
+/**
+ * Pull one field's file entries out of nested $_FILES['fields'].
+ *
+ * @param array<string, mixed> $files
+ * @return list<array{name:string,type:string,tmp_name:string,error:int,size:int}>
+ */
+function bl_forms_extract_uploaded_files(string $name, array $files): array
+{
+	if (!isset($files['fields']) || !is_array($files['fields'])) {
+		return [];
+	}
+
+	$root = $files['fields'];
+	if (!isset($root['name'][$name])) {
+		return [];
+	}
+
+	$names = $root['name'][$name];
+	if (!is_array($names)) {
+		return [[
+			'name'     => (string) $names,
+			'type'     => (string) ($root['type'][$name] ?? ''),
+			'tmp_name' => (string) ($root['tmp_name'][$name] ?? ''),
+			'error'    => (int) ($root['error'][$name] ?? UPLOAD_ERR_NO_FILE),
+			'size'     => (int) ($root['size'][$name] ?? 0),
+		]];
+	}
+
+	$out = [];
+	foreach ($names as $i => $filename) {
+		$out[] = [
+			'name'     => (string) $filename,
+			'type'     => (string) ($root['type'][$name][$i] ?? ''),
+			'tmp_name' => (string) ($root['tmp_name'][$name][$i] ?? ''),
+			'error'    => (int) ($root['error'][$name][$i] ?? UPLOAD_ERR_NO_FILE),
+			'size'     => (int) ($root['size'][$name][$i] ?? 0),
+		];
+	}
+
+	return $out;
+}
+
+/**
+ * Move an uploaded file into the media library.
+ *
+ * @param array{name:string,type:string,tmp_name:string,error:int,size:int} $file
+ * @return array{id:int,url:string,name:string,mime:string}|\WP_Error
+ */
+function bl_forms_store_uploaded_file(array $file, bool $images_only = false)
+{
+	if (!function_exists('wp_handle_upload')) {
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+	}
+	if (!function_exists('wp_generate_attachment_metadata')) {
+		require_once ABSPATH . 'wp-admin/includes/image.php';
+	}
+	if (!function_exists('media_handle_upload') && !function_exists('wp_insert_attachment')) {
+		require_once ABSPATH . 'wp-admin/includes/media.php';
+	}
+
+	$check = wp_check_filetype_and_ext($file['tmp_name'], $file['name']);
+	$mime = (string) ($check['type'] ?: $file['type']);
+	if ($images_only && strpos($mime, 'image/') !== 0) {
+		return new WP_Error('bl_forms_not_image', __('Please upload an image file.', 'baselayer'));
+	}
+
+	$overrides = [
+		'test_form' => false,
+		'mimes'     => $images_only ? null : null,
+	];
+	if ($images_only) {
+		$overrides['mimes'] = [
+			'jpg|jpeg|jpe' => 'image/jpeg',
+			'gif'          => 'image/gif',
+			'png'          => 'image/png',
+			'webp'         => 'image/webp',
+		];
+	}
+
+	$moved = wp_handle_upload($file, $overrides);
+	if (!is_array($moved) || !empty($moved['error'])) {
+		return new WP_Error(
+			'bl_forms_upload_failed',
+			is_array($moved) && !empty($moved['error'])
+				? (string) $moved['error']
+				: __('Upload failed.', 'baselayer')
+		);
+	}
+
+	$attachment = [
+		'post_mime_type' => (string) ($moved['type'] ?? $mime),
+		'post_title'     => sanitize_file_name(wp_basename((string) $moved['file'])),
+		'post_content'   => '',
+		'post_status'    => 'inherit',
+	];
+	$attach_id = wp_insert_attachment($attachment, (string) $moved['file']);
+	if (is_wp_error($attach_id) || !$attach_id) {
+		return is_wp_error($attach_id)
+			? $attach_id
+			: new WP_Error('bl_forms_attach_failed', __('Could not save uploaded file.', 'baselayer'));
+	}
+
+	$attach_id = (int) $attach_id;
+	$meta = wp_generate_attachment_metadata($attach_id, (string) $moved['file']);
+	if (is_array($meta)) {
+		wp_update_attachment_metadata($attach_id, $meta);
+	}
+
+	return [
+		'id'   => $attach_id,
+		'url'  => (string) ($moved['url'] ?? wp_get_attachment_url($attach_id)),
+		'name' => (string) ($file['name'] ?? wp_basename((string) $moved['file'])),
+		'mime' => (string) ($moved['type'] ?? $mime),
+	];
 }

@@ -1,6 +1,82 @@
 /** Shared DOM / i18n helpers for the form builder. */
 
-export const TYPE_KEYS = ['text', 'email', 'textarea', 'radio', 'checkboxes', 'terms', 'heading', 'text_block'];
+export const TYPE_KEYS = [
+  'text',
+  'textarea',
+  'email',
+  'phone',
+  'url',
+  'number',
+  'terms',
+  'checkboxes',
+  'radio',
+  'select',
+  'toggle',
+  'button_group',
+  'date',
+  'time',
+  'datetime',
+  'file',
+  'image',
+  'heading',
+  'text_block',
+  'divider',
+  'spacer',
+  'html',
+  'hidden',
+  'password',
+  'honeypot',
+  'captcha',
+];
+
+/** Palette accordion groups (Popular is default-open). */
+export const PALETTE_SECTIONS = [
+  {
+    id: 'popular',
+    headingKey: 'paletteSectionPopular',
+    headingFallback: 'Popular',
+    types: ['text', 'textarea', 'email', 'phone', 'terms'],
+  },
+  {
+    id: 'input',
+    headingKey: 'paletteSectionInput',
+    headingFallback: 'Input',
+    types: ['text', 'textarea', 'email', 'phone', 'url', 'number', 'terms'],
+  },
+  {
+    id: 'choice',
+    headingKey: 'paletteSectionChoice',
+    headingFallback: 'Choice',
+    types: ['checkboxes', 'radio', 'select', 'toggle', 'button_group'],
+  },
+  {
+    id: 'datetime',
+    headingKey: 'paletteSectionDatetime',
+    headingFallback: 'Date & time',
+    types: ['date', 'time', 'datetime'],
+  },
+  {
+    id: 'files',
+    headingKey: 'paletteSectionFiles',
+    headingFallback: 'Uploads',
+    types: ['file', 'image'],
+  },
+  {
+    id: 'content',
+    headingKey: 'paletteSectionContent',
+    headingFallback: 'Content',
+    types: ['heading', 'text_block', 'divider', 'spacer', 'html'],
+  },
+  {
+    id: 'advanced',
+    headingKey: 'paletteSectionAdvanced',
+    headingFallback: 'Advanced',
+    types: ['hidden', 'password', 'honeypot', 'captcha'],
+  },
+];
+
+/** Type dropdown groups (no Popular duplicates). */
+export const TYPE_SELECT_SECTIONS = PALETTE_SECTIONS.filter((section) => section.id !== 'popular');
 
 export function uid() {
   return 'f' + Math.random().toString(36).slice(2, 10);
@@ -30,6 +106,24 @@ export function t(key, fallback = '') {
   return dict[key] || fallback || key;
 }
 
+/** Inline SVG from localized blFormsAdmin.icons. */
+export function iconMarkup(key) {
+  const icons = (window.blFormsAdmin && window.blFormsAdmin.icons) || {};
+  return icons[key] || '';
+}
+
+export function iconEl(key, className = 'bl-forms-builder__icon') {
+  const wrap = el('span', {
+    className,
+    'aria-hidden': 'true',
+  });
+  const markup = iconMarkup(key);
+  if (markup) {
+    wrap.innerHTML = markup;
+  }
+  return wrap;
+}
+
 export function typeLabel(type) {
   const dict = (window.blFormsAdmin && window.blFormsAdmin.i18n) || {};
   return (dict.types && dict.types[type]) || type;
@@ -37,11 +131,41 @@ export function typeLabel(type) {
 
 export function defaultField(type = 'text') {
   const id = uid();
-  if (type === 'heading' || type === 'text_block') {
+  if (type === 'divider') {
+    return { id, type, width: '100', width_custom: '' };
+  }
+  if (type === 'spacer') {
+    return { id, type, height: '24px', width: '100', width_custom: '' };
+  }
+  if (type === 'captcha') {
+    return { id, type, width: '100', width_custom: '' };
+  }
+  if (type === 'heading' || type === 'text_block' || type === 'html') {
     return {
       id,
       type,
       content: type === 'heading' ? typeLabel(type) : '',
+      width: '100',
+      width_custom: '',
+    };
+  }
+  if (type === 'honeypot') {
+    return {
+      id,
+      type,
+      name: id,
+      label: typeLabel(type),
+      width: '100',
+      width_custom: '',
+    };
+  }
+  if (type === 'hidden') {
+    return {
+      id,
+      type,
+      name: id,
+      label: typeLabel(type),
+      default_value: '',
       width: '100',
       width_custom: '',
     };
@@ -57,14 +181,21 @@ export function defaultField(type = 'text') {
     width: '100',
     width_custom: '',
   };
-  if (type === 'radio' || type === 'checkboxes') {
+  if (['radio', 'checkboxes', 'select', 'button_group'].includes(type)) {
     base.options = [
       { label: 'Option 1', value: 'option-1' },
       { label: 'Option 2', value: 'option-2' },
     ];
   }
+  if (['select', 'button_group', 'file', 'image'].includes(type)) {
+    base.multiple = false;
+  }
   if (type === 'terms') {
-    base.label = 'I agree to the terms.';
+    base.label = '';
+    base.content = t('termsDefaultLabel', 'I agree to the [Privacy Policy](page:privacy).');
+  }
+  if (type === 'toggle') {
+    base.label = typeLabel(type);
   }
   return base;
 }

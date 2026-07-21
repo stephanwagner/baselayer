@@ -7,14 +7,25 @@
   }
 
   const { registerBlockType } = wp.blocks;
-  const { createElement: el, Fragment } = wp.element;
+  const { createElement: el, Fragment, RawHTML } = wp.element;
   const { InspectorControls, useBlockProps } = wp.blockEditor;
   const { PanelBody, SelectControl } = wp.components;
-  const options = (window.blFormsBlock && window.blFormsBlock.options) || [
-    { label: 'Select a form…', value: '0' },
-  ];
+  const config = window.blFormsBlock || {};
+  const options = config.options || [{ label: 'Select a form…', value: '0' }];
+  const iconSvg = typeof config.icon === 'string' ? config.icon.trim() : '';
 
   registerBlockType('baselayer/form', {
+    icon: iconSvg
+      ? {
+          src: el(
+            'span',
+            {
+              style: { display: 'flex' },
+            },
+            el(RawHTML, null, iconSvg)
+          ),
+        }
+      : 'feedback',
     edit: function Edit(props) {
       const { attributes, setAttributes } = props;
       const formId = attributes.formId || 0;

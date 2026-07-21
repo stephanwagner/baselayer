@@ -374,6 +374,6 @@ return [
 		['preset' => 'container-padding-m', 'blocks' => ['acf/slider'], 'target' => 'block_option'],
 
 		// Forms
-		['preset' => 'container-margin', 'blocks' => ['baselayer/form'], 'target' => 'block_option'],
+		['preset' => 'container-margin-m', 'blocks' => ['baselayer/form'], 'target' => 'block_option'],
 	],
 ];
