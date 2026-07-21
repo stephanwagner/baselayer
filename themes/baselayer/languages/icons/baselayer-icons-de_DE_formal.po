@@ -2445,6 +2445,10 @@ msgid "Checklist (RTL)"
 msgstr "Checkliste (RTL)"
 
 msgctxt "icon name"
+msgid "Horizontal rule"
+msgstr "Horizontale Linie"
+
+msgctxt "icon name"
 msgid "Combine columns"
 msgstr "Spalten zusammenführen"
 

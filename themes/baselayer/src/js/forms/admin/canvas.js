@@ -1,5 +1,5 @@
 import Sortable from 'sortablejs';
-import { el, t, defaultField } from './dom.js';
+import { el, t, defaultField, uniqueFieldName } from './dom.js';
 import { createFieldCard, serializeRow } from './field-card.js';
 
 /**
@@ -26,9 +26,18 @@ export function createCanvas({ fields = [], onChange }) {
     empty.hidden = list.querySelector('[data-bl-forms-field]') != null;
   };
 
+  const prepareField = (typeOrData) => {
+    const data = typeof typeOrData === 'string' ? defaultField(typeOrData) : { ...typeOrData };
+    if (data.name != null && data.name_manual === false) {
+      data.name = uniqueFieldName(data.label || data.name || data.type || 'field', data.id || '');
+    } else if (data.name) {
+      data.name = uniqueFieldName(data.name, data.id || '');
+    }
+    return data;
+  };
+
   const addField = (typeOrData, open = true) => {
-    const data = typeof typeOrData === 'string' ? defaultField(typeOrData) : typeOrData;
-    const card = createFieldCard(data, open);
+    const card = createFieldCard(prepareField(typeOrData), open);
     list.appendChild(card);
     syncEmpty();
     onChange();
@@ -45,12 +54,18 @@ export function createCanvas({ fields = [], onChange }) {
     handle: '.bl-forms-builder__handle',
     animation: 150,
     draggable: '.bl-forms-builder__field, .bl-forms-builder__template',
+    onStart() {
+      document.body.classList.add('is-dragging');
+    },
+    onEnd() {
+      document.body.classList.remove('is-dragging');
+    },
     onAdd(evt) {
       const item = evt.item;
       const type = item.dataset.fieldType || 'text';
       // Palette clones are buttons — replace with a real field card.
       if (item.classList.contains('bl-forms-builder__template')) {
-        const card = createFieldCard(defaultField(type), true);
+        const card = createFieldCard(prepareField(type), true);
         item.replaceWith(card);
       }
       syncEmpty();

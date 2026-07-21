@@ -192,6 +192,7 @@ function bl_icon_labels(): array
 		'list-numbered-rtl'       => _x('Numbered list (RTL)', 'icon name', 'baselayer-icons'),
 		'checklist'               => _x('Checklist', 'icon name', 'baselayer-icons'),
 		'checklist-rtl'           => _x('Checklist (RTL)', 'icon name', 'baselayer-icons'),
+		'horizontal-rule'         => _x('Horizontal rule', 'icon name', 'baselayer-icons'),
 		'list-alt'                => _x('List', 'icon name', 'baselayer-icons'),
 		'list'                    => _x('List', 'icon name', 'baselayer-icons'),
 		'indent-decrease'         => _x('Decrease indent', 'icon name', 'baselayer-icons'),

@@ -16,8 +16,10 @@ export function mountApp(root, initial) {
   let settingsState = { ...(initial.settings || {}) };
 
   const syncAll = () => {
+    const fields = canvas.getFields();
+    panels.syncFields(fields);
     writeConfig({
-      fields: canvas.getFields(),
+      fields,
       settings: panels.getSettings(),
     });
     canvas.syncEmpty();

@@ -43,20 +43,73 @@ function paletteAddButton(type, onAdd) {
  */
 export function createPalette(onAdd) {
   const wrap = el('aside', { className: 'bl-forms-builder__palette' });
-  wrap.appendChild(
-    el('h3', { className: 'bl-forms-builder__col-title', text: t('paletteHeading', 'Field templates') })
-  );
+
+  const search = el('input', {
+    type: 'search',
+    className: 'bl-forms-builder__palette-search',
+    placeholder: t('paletteSearch', 'Search fields…'),
+    'aria-label': t('paletteSearch', 'Search fields…'),
+    autocomplete: 'off',
+  });
+  wrap.appendChild(search);
+
+  const empty = el('p', {
+    className: 'description bl-forms-builder__palette-empty',
+    text: t('paletteSearchEmpty', 'No fields match your search.'),
+    hidden: true,
+  });
+  wrap.appendChild(empty);
 
   const sections = [];
+  let openId = PALETTE_SECTIONS[0]?.id || '';
 
-  const setOpen = (openId) => {
+  const setOpen = (nextId) => {
+    openId = nextId;
     sections.forEach(({ sectionEl, toggle, panel, id }) => {
-      const open = id === openId;
+      const open = openId !== '' && id === openId;
       sectionEl.classList.toggle('is-open', open);
       toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
       panel.hidden = !open;
     });
   };
+
+  const applySearch = () => {
+    const query = search.value.trim().toLowerCase();
+    const searching = query !== '';
+    let totalVisible = 0;
+
+    sections.forEach(({ sectionEl, toggle, panel, list, id }) => {
+      let sectionVisible = 0;
+      list.querySelectorAll('.bl-forms-builder__template').forEach((item) => {
+        const type = item.dataset.fieldType || '';
+        const label = (item.querySelector('.bl-forms-builder__template-label')?.textContent || '').toLowerCase();
+        const match = !searching || label.includes(query) || type.toLowerCase().includes(query);
+        item.hidden = !match;
+        if (match) {
+          sectionVisible += 1;
+        }
+      });
+
+      const showSection = !searching || sectionVisible > 0;
+      sectionEl.hidden = !showSection;
+      totalVisible += sectionVisible;
+
+      if (searching) {
+        const open = sectionVisible > 0;
+        sectionEl.classList.toggle('is-open', open);
+        toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+        panel.hidden = !open;
+      }
+    });
+
+    if (!searching) {
+      setOpen(openId);
+    }
+
+    empty.hidden = !searching || totalVisible > 0;
+  };
+
+  search.addEventListener('input', applySearch);
 
   PALETTE_SECTIONS.forEach((section, index) => {
     const panelId = 'bl-forms-palette-' + section.id;
@@ -71,11 +124,11 @@ export function createPalette(onAdd) {
       'aria-expanded': index === 0 ? 'true' : 'false',
       'aria-controls': panelId,
       onClick: () => {
-        const isOpen = sectionEl.classList.contains('is-open');
-        // Keep one open: clicking the open section does nothing; clicking another opens it.
-        if (!isOpen) {
-          setOpen(section.id);
+        if (search.value.trim() !== '') {
+          return;
         }
+        const isOpen = sectionEl.classList.contains('is-open');
+        setOpen(isOpen ? '' : section.id);
       },
     });
     const chevron = iconEl('caret', 'bl-forms-builder__palette-section-chevron');
@@ -123,7 +176,7 @@ export function createPalette(onAdd) {
     panel.appendChild(list);
     sectionEl.append(toggle, panel);
     wrap.appendChild(sectionEl);
-    sections.push({ id: section.id, sectionEl, toggle, panel });
+    sections.push({ id: section.id, sectionEl, toggle, panel, list });
 
     Sortable.create(list, {
       group: { name: 'bl-forms-fields', pull: 'clone', put: false },
@@ -132,6 +185,12 @@ export function createPalette(onAdd) {
       draggable: '.bl-forms-builder__template',
       filter: '.bl-forms-builder__template-add',
       preventOnFilter: true,
+      onStart() {
+        document.body.classList.add('is-dragging');
+      },
+      onEnd() {
+        document.body.classList.remove('is-dragging');
+      },
     });
   });
 

@@ -63,6 +63,7 @@ function bl_forms_default_settings(): array
 		'error_message'       => '',
 		'validation_message'  => '',
 		'notify_user'         => false,
+		'user_email_field'    => '',
 		'admin_email_subject' => '',
 		'user_email_subject'  => '',
 		'user_email_intro'    => '',
@@ -258,6 +259,23 @@ function bl_forms_width_presets(): array
 }
 
 /**
+ * Sanitize one or more CSS class names.
+ */
+function bl_forms_sanitize_css_class(string $raw): string
+{
+	$parts = preg_split('/\s+/', trim($raw)) ?: [];
+	$clean = [];
+	foreach ($parts as $part) {
+		$class = sanitize_html_class($part);
+		if ($class !== '') {
+			$clean[] = $class;
+		}
+	}
+
+	return implode(' ', array_unique($clean));
+}
+
+/**
  * Sanitize field width settings.
  *
  * @param array<string, mixed> $field
@@ -283,28 +301,79 @@ function bl_forms_sanitize_width(array $field): array
 }
 
 /**
+ * CSS width value + flex gap factor for a field.
+ *
+ * Factor is the width as 0–1 so siblings can share row gap:
+ * width: calc(var(--bl-form-field-width) - gap * (1 - factor))
+ *
+ * @param array<string, mixed> $field
+ * @return array{width: string, factor: string}
+ */
+function bl_forms_field_width_vars(array $field): array
+{
+	$width = (string) ($field['width'] ?? '100');
+	if ($width === 'custom') {
+		$custom = trim((string) ($field['width_custom'] ?? ''));
+		if ($custom === '') {
+			return [
+				'width'  => '100%',
+				'factor' => '1',
+			];
+		}
+		if (preg_match('/^(\d+(?:\.\d+)?)%$/', $custom, $matches)) {
+			$pct = (float) $matches[1];
+			$factor = max(0, min(1, $pct / 100));
+
+			return [
+				'width'  => $custom,
+				'factor' => rtrim(rtrim(sprintf('%.6F', $factor), '0'), '.'),
+			];
+		}
+
+		// px / rem / etc. — use as-is, no gap share.
+		return [
+			'width'  => $custom,
+			'factor' => '1',
+		];
+	}
+
+	$map = [
+		'100' => ['100%', '1'],
+		'75'  => ['75%', '0.75'],
+		'66'  => ['66.6667%', '0.666667'],
+		'50'  => ['50%', '0.5'],
+		'33'  => ['33.3333%', '0.333333'],
+		'25'  => ['25%', '0.25'],
+	];
+
+	[$css, $factor] = $map[$width] ?? ['100%', '1'];
+
+	return [
+		'width'  => $css,
+		'factor' => $factor,
+	];
+}
+
+/**
+ * Inline CSS custom properties for field width layout.
+ *
+ * @param array<string, mixed> $field
+ */
+function bl_forms_field_width_style(array $field): string
+{
+	$vars = bl_forms_field_width_vars($field);
+
+	return '--bl-form-field-width:' . $vars['width'] . ';--bl-form-field-width-factor:' . $vars['factor'];
+}
+
+/**
  * CSS width value for a field.
  *
  * @param array<string, mixed> $field
  */
 function bl_forms_field_width_css(array $field): string
 {
-	$width = (string) ($field['width'] ?? '100');
-	if ($width === 'custom') {
-		$custom = trim((string) ($field['width_custom'] ?? ''));
-		return $custom !== '' ? $custom : '100%';
-	}
-
-	$map = [
-		'100' => '100%',
-		'75'  => '75%',
-		'66'  => '66.6667%',
-		'50'  => '50%',
-		'33'  => '33.3333%',
-		'25'  => '25%',
-	];
-
-	return $map[$width] ?? '100%';
+	return bl_forms_field_width_vars($field)['width'];
 }
 
 /**
@@ -341,12 +410,15 @@ function bl_forms_sanitize_field($field): ?array
 		'type'         => $type,
 		'label'        => sanitize_text_field((string) ($field['label'] ?? '')),
 		'name'         => $name,
+		'name_manual'  => !empty($field['name_manual']),
+		'hide_label'   => !empty($field['hide_label']),
+		'css_class'    => bl_forms_sanitize_css_class((string) ($field['css_class'] ?? '')),
 		'width'        => $width['width'],
 		'width_custom' => $width['width_custom'],
 	];
 
 	if ($type === 'divider' || $type === 'captcha') {
-		unset($out['name'], $out['label']);
+		unset($out['name'], $out['label'], $out['name_manual'], $out['hide_label']);
 
 		return $out;
 	}
@@ -357,7 +429,7 @@ function bl_forms_sanitize_field($field): ?array
 			$height = '24px';
 		}
 		$out['height'] = $height;
-		unset($out['name'], $out['label']);
+		unset($out['name'], $out['label'], $out['name_manual'], $out['hide_label']);
 
 		return $out;
 	}
@@ -367,21 +439,21 @@ function bl_forms_sanitize_field($field): ?array
 		$out['content'] = $type === 'html'
 			? wp_kses_post($content)
 			: sanitize_textarea_field($content);
-		unset($out['name']);
+		unset($out['name'], $out['name_manual'], $out['hide_label']);
 
 		return $out;
 	}
 
 	if ($type === 'honeypot') {
 		$out['label'] = $out['label'] !== '' ? $out['label'] : __('Honeypot', 'baselayer');
-		unset($out['required'], $out['placeholder']);
+		unset($out['required'], $out['placeholder'], $out['hide_label']);
 
 		return $out;
 	}
 
 	if ($type === 'hidden') {
 		$out['default_value'] = sanitize_text_field((string) ($field['default_value'] ?? ''));
-		unset($out['required'], $out['placeholder']);
+		unset($out['required'], $out['placeholder'], $out['hide_label']);
 
 		return $out;
 	}
@@ -395,6 +467,10 @@ function bl_forms_sanitize_field($field): ?array
 
 	if (in_array($type, ['radio', 'checkboxes', 'select', 'button_group'], true)) {
 		$out['options'] = bl_forms_sanitize_options($field['options'] ?? []);
+	}
+
+	if (in_array($type, ['radio', 'checkboxes'], true)) {
+		$out['layout'] = (($field['layout'] ?? 'vertical') === 'horizontal') ? 'horizontal' : 'vertical';
 	}
 
 	if (in_array($type, ['select', 'button_group', 'file', 'image'], true)) {
@@ -412,12 +488,26 @@ function bl_forms_sanitize_field($field): ?array
 			$content = __('I agree to the [Privacy Policy](page:privacy).', 'baselayer');
 		}
 		$out['content'] = $content;
+		$out['default_value'] = !empty($field['default_value']) ? '1' : '';
 	}
 
 	if ($type === 'toggle') {
 		$out['label'] = $out['label'] !== ''
 			? $out['label']
 			: __('Enable', 'baselayer');
+		$out['default_value'] = !empty($field['default_value']) ? '1' : '';
+	}
+
+	$no_default = ['password', 'file', 'image', 'honeypot', 'captcha'];
+	if (
+		!isset($out['default_value'])
+		&& !in_array($type, $no_default, true)
+	) {
+		if ($type === 'textarea') {
+			$out['default_value'] = sanitize_textarea_field((string) ($field['default_value'] ?? ''));
+		} else {
+			$out['default_value'] = sanitize_text_field((string) ($field['default_value'] ?? ''));
+		}
 	}
 
 	return $out;
@@ -445,6 +535,7 @@ function bl_forms_sanitize_config($config): array
 			}
 		}
 	}
+	$fields = bl_forms_ensure_unique_field_names($fields);
 
 	$settings_in = isset($config['settings']) && is_array($config['settings'])
 		? $config['settings']
@@ -457,6 +548,10 @@ function bl_forms_sanitize_config($config): array
 		}
 		if ($key === 'notify_user') {
 			$settings[$key] = !empty($settings_in[$key]);
+			continue;
+		}
+		if ($key === 'user_email_field') {
+			$settings[$key] = sanitize_key((string) $settings_in[$key]);
 			continue;
 		}
 		if ($key === 'recipient') {
@@ -479,6 +574,40 @@ function bl_forms_sanitize_config($config): array
 }
 
 /**
+ * Ensure field name keys are unique within a form.
+ *
+ * @param list<array<string, mixed>> $fields
+ * @return list<array<string, mixed>>
+ */
+function bl_forms_ensure_unique_field_names(array $fields): array
+{
+	$used = [];
+
+	foreach ($fields as $index => $field) {
+		if (!isset($field['name']) || !is_string($field['name']) || $field['name'] === '') {
+			continue;
+		}
+
+		$base = sanitize_key($field['name']);
+		if ($base === '') {
+			$base = 'field';
+		}
+
+		$candidate = $base;
+		$suffix = 2;
+		while (isset($used[$candidate])) {
+			$candidate = $base . '_' . $suffix;
+			$suffix++;
+		}
+
+		$fields[$index]['name'] = $candidate;
+		$used[$candidate] = true;
+	}
+
+	return $fields;
+}
+
+/**
  * Admin notification recipient for a form.
  */
 function bl_forms_recipient(array $settings): string
@@ -494,15 +623,27 @@ function bl_forms_recipient(array $settings): string
 }
 
 /**
- * First email field name in config (for reply-to / user notify).
+ * Email field name used for reply-to / user confirmation.
+ *
+ * Prefers settings.user_email_field when it still exists on the form.
  */
 function bl_forms_primary_email_field_name(array $config): string
 {
+	$preferred = sanitize_key((string) ($config['settings']['user_email_field'] ?? ''));
+	$first = '';
+
 	foreach ($config['fields'] as $field) {
-		if (($field['type'] ?? '') === 'email' && !empty($field['name'])) {
-			return (string) $field['name'];
+		if (($field['type'] ?? '') !== 'email' || empty($field['name'])) {
+			continue;
+		}
+		$name = (string) $field['name'];
+		if ($first === '') {
+			$first = $name;
+		}
+		if ($preferred !== '' && $name === $preferred) {
+			return $name;
 		}
 	}
 
-	return '';
+	return $first;
 }

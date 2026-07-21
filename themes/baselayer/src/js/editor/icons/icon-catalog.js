@@ -207,6 +207,7 @@ const builtInCategories = [
       { filename: 'list-numbered-rtl', alternatives: [], keywords: ['list', 'numbered', 'ordered', 'ol', 'rtl', 'right-to-left'] },
       { filename: 'checklist', alternatives: [], keywords: ['checklist', 'todo', 'tasks', 'list'] },
       { filename: 'checklist-rtl', alternatives: [], keywords: ['checklist', 'todo', 'rtl', 'right-to-left', 'tasks'] },
+      { filename: 'horizontal-rule', alternatives: [], keywords: ['horizontal', 'rule', 'divider', 'separator', 'line', 'hr'] },
       { filename: 'special-character', alternatives: [], keywords: ['special character', 'symbol', 'typography', 'glyph', 'insert'] },
       { filename: 'indent-decrease', alternatives: [], keywords: ['indent', 'decrease', 'outdent', 'margin'] },
       { filename: 'indent-increase', alternatives: [], keywords: ['indent', 'increase', 'margin'] },

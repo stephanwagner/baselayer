@@ -22,10 +22,19 @@
 
 .bl-form__field-wrap {
   box-sizing: border-box;
-  width: var(--bl-form-field-width, 100%);
+  flex: 0 1 auto;
+  // Share the row gap so 50% + 50% (and 33/33/33, etc.) fit on one line.
+  width: min(
+    100%,
+    calc(
+      var(--bl-form-field-width, 100%) -
+        (var(--bl-form-gap) * (1 - var(--bl-form-field-width-factor, 1)))
+    )
+  );
   max-width: 100%;
 
   @media (max-width: 600px) {
+    flex-basis: 100%;
     width: 100% !important;
   }
 }
@@ -108,7 +117,13 @@ select.bl-form__control {
 }
 
 .bl-form__spacer-wrap {
-  width: var(--bl-form-field-width, 100%);
+  width: min(
+    100%,
+    calc(
+      var(--bl-form-field-width, 100%) -
+        (var(--bl-form-gap) * (1 - var(--bl-form-field-width-factor, 1)))
+    )
+  );
   height: var(--bl-form-spacer-height, 24px);
   max-width: 100%;
   pointer-events: none;
@@ -127,6 +142,12 @@ select.bl-form__control {
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
+
+  &--horizontal {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.65rem 1.25rem;
+  }
 }
 
 .bl-form__option {

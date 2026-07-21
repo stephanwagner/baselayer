@@ -75,9 +75,6 @@ export const PALETTE_SECTIONS = [
   },
 ];
 
-/** Type dropdown groups (no Popular duplicates). */
-export const TYPE_SELECT_SECTIONS = PALETTE_SECTIONS.filter((section) => section.id !== 'popular');
-
 export function uid() {
   return 'f' + Math.random().toString(36).slice(2, 10);
 }
@@ -129,16 +126,76 @@ export function typeLabel(type) {
   return (dict.types && dict.types[type]) || type;
 }
 
+/** Slug for field name keys (ASCII, underscore). */
+export function slugifyName(text) {
+  const slug = String(text || '')
+    .trim()
+    .toLowerCase()
+    .replace(/ä/g, 'ae')
+    .replace(/ö/g, 'oe')
+    .replace(/ü/g, 'ue')
+    .replace(/ß/g, 'ss')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+    .replace(/_+/g, '_');
+  return slug || 'field';
+}
+
+/** Slug for option values (ASCII, hyphen). */
+export function slugifyOption(text) {
+  const slug = String(text || '')
+    .trim()
+    .toLowerCase()
+    .replace(/ä/g, 'ae')
+    .replace(/ö/g, 'oe')
+    .replace(/ü/g, 'ue')
+    .replace(/ß/g, 'ss')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .replace(/-+/g, '-');
+  return slug || 'option';
+}
+
+/** Collect field name keys currently on the canvas (optional exclude id). */
+export function collectFieldNames(exceptId = '') {
+  return Array.from(document.querySelectorAll('[data-bl-forms-field]'))
+    .filter((row) => !exceptId || row.dataset.fieldId !== exceptId)
+    .map((row) => {
+      const input = row.querySelector('[data-bl-name]');
+      const value = (input?.value || row.dataset.fieldName || '').trim();
+      return value;
+    })
+    .filter(Boolean);
+}
+
+/** Ensure a unique field name among siblings on the canvas. */
+export function uniqueFieldName(base, exceptId = '') {
+  const root = slugifyName(base);
+  const used = new Set(collectFieldNames(exceptId).map((n) => n.toLowerCase()));
+  if (!used.has(root)) {
+    return root;
+  }
+  let i = 2;
+  while (used.has(`${root}_${i}`)) {
+    i += 1;
+  }
+  return `${root}_${i}`;
+}
+
 export function defaultField(type = 'text') {
   const id = uid();
   if (type === 'divider') {
-    return { id, type, width: '100', width_custom: '' };
+    return { id, type, width: '100', width_custom: '', css_class: '' };
   }
   if (type === 'spacer') {
-    return { id, type, height: '24px', width: '100', width_custom: '' };
+    return { id, type, height: '24px', width: '100', width_custom: '', css_class: '' };
   }
   if (type === 'captcha') {
-    return { id, type, width: '100', width_custom: '' };
+    return { id, type, width: '100', width_custom: '', css_class: '' };
   }
   if (type === 'heading' || type === 'text_block' || type === 'html') {
     return {
@@ -147,39 +204,49 @@ export function defaultField(type = 'text') {
       content: type === 'heading' ? typeLabel(type) : '',
       width: '100',
       width_custom: '',
+      css_class: '',
     };
   }
   if (type === 'honeypot') {
     return {
       id,
       type,
-      name: id,
+      name: slugifyName(typeLabel(type)),
+      name_manual: false,
       label: typeLabel(type),
+      hide_label: false,
       width: '100',
       width_custom: '',
+      css_class: '',
     };
   }
   if (type === 'hidden') {
     return {
       id,
       type,
-      name: id,
+      name: slugifyName(typeLabel(type)),
+      name_manual: false,
       label: typeLabel(type),
+      hide_label: false,
       default_value: '',
       width: '100',
       width_custom: '',
+      css_class: '',
     };
   }
   const base = {
     id,
     type,
     label: typeLabel(type),
-    name: id,
+    name: slugifyName(typeLabel(type)),
+    name_manual: false,
+    hide_label: false,
     required: type === 'terms',
     placeholder: '',
     description: '',
     width: '100',
     width_custom: '',
+    css_class: '',
   };
   if (['radio', 'checkboxes', 'select', 'button_group'].includes(type)) {
     base.options = [
@@ -187,15 +254,20 @@ export function defaultField(type = 'text') {
       { label: 'Option 2', value: 'option-2' },
     ];
   }
+  if (['radio', 'checkboxes'].includes(type)) {
+    base.layout = 'vertical';
+  }
   if (['select', 'button_group', 'file', 'image'].includes(type)) {
     base.multiple = false;
   }
   if (type === 'terms') {
     base.label = '';
     base.content = t('termsDefaultLabel', 'I agree to the [Privacy Policy](page:privacy).');
+    base.default_value = '1';
   }
   if (type === 'toggle') {
     base.label = typeLabel(type);
+    base.default_value = '';
   }
   return base;
 }
