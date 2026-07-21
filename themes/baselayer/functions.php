@@ -66,6 +66,7 @@ if (is_admin() && (!bl_setup_completed() || isset($_GET['baselayer_success']))) 
 
 // Mail, Matomo
 require_once 'inc/mail.php';
+require_once 'inc/forms/forms.php';
 require_once 'inc/matomo.php';
 require_once 'inc/weekly-report.php';
 

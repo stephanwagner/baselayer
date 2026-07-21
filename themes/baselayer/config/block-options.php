@@ -372,5 +372,8 @@ return [
 		['preset' => 'align-wide-container', 'blocks' => ['acf/slider', 'acf/map', 'acf/article-list', 'acf/number-ticker'], 'target' => 'block_option'],
 		['preset' => 'container-margin-m', 'blocks' => ['acf/slider', 'acf/map', 'acf/article-list', 'acf/number-ticker'], 'target' => 'block_option'],
 		['preset' => 'container-padding-m', 'blocks' => ['acf/slider'], 'target' => 'block_option'],
+
+		// Forms
+		['preset' => 'container-margin', 'blocks' => ['baselayer/form'], 'target' => 'block_option'],
 	],
 ];

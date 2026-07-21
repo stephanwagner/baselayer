@@ -27,6 +27,9 @@ const bundles = [
     }
   },
   { input: `${themeDir}/src/js/admin/field-builder/admin-pages.js`, name: 'field-builder-admin' },
+  { input: `${themeDir}/src/js/forms/front.js`, name: 'forms' },
+  { input: `${themeDir}/src/js/forms/admin.js`, name: 'forms-admin' },
+  { input: `${themeDir}/src/js/forms/block.js`, name: 'forms-block' },
   { input: `${themeDir}/src/js/editor/creator-blocks.js`, name: 'creator-blocks' },
   { input: `${themeDir}/src/js/service-worker/index.js`, name: 'service-worker' }
 ];

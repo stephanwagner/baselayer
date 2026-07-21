@@ -15,7 +15,9 @@ const sassLoadPathArgs = ['--load-path', path.join(root, 'node_modules')];
 const entries = [
   { src: `${themeDir}/src/scss/main.scss`, name: 'baselayer' },
   { src: `${themeDir}/src/scss/admin.scss`, name: 'admin' },
-  { src: `${themeDir}/src/scss/admin-bar.scss`, name: 'admin-bar' }
+  { src: `${themeDir}/src/scss/admin-bar.scss`, name: 'admin-bar' },
+  { src: `${themeDir}/src/scss/forms/forms.scss`, name: 'forms' },
+  { src: `${themeDir}/src/scss/forms/forms-admin.scss`, name: 'forms-admin' }
 ];
 
 function sassPairs(prod) {

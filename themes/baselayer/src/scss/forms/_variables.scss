@@ -1,0 +1,23 @@
+/**
+ * Forms module — own tokens (override these in a child theme).
+ * Softly mirrors common Baselayer spacing/radius if those vars exist.
+ */
+
+:root {
+  --bl-form-font-family: var(--bl-font-family, inherit);
+  --bl-form-font-size: 1rem;
+  --bl-form-line-height: 1.5;
+  --bl-form-color: var(--bl-color-text, #1f2937);
+  --bl-form-muted: var(--bl-color-muted, #64748b);
+  --bl-form-border: var(--bl-color-border, #cbd5e1);
+  --bl-form-border-focus: var(--bl-color-primary, #2563eb);
+  --bl-form-bg: var(--bl-color-surface, #fff);
+  --bl-form-danger: #b32d2e;
+  --bl-form-success: #008a20;
+  --bl-form-radius: var(--bl-radius, 6px);
+  --bl-form-gap: 1rem;
+  --bl-form-control-padding: 0.65rem 0.85rem;
+  --bl-form-submit-bg: var(--bl-color-primary, #2563eb);
+  --bl-form-submit-color: #fff;
+  --bl-form-spinner-size: 1.1rem;
+}
