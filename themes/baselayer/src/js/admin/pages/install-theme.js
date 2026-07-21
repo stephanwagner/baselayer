@@ -112,5 +112,33 @@ function initThemeNameDescriptionSync() {
 document.addEventListener('DOMContentLoaded', () => {
   initDeveloperInstaller();
   initThemeNameDescriptionSync();
+  initSeedModeToggle();
 });
 
+/**
+ * Sample vs test data: show CPT checkboxes for sample, notice for test.
+ */
+function initSeedModeToggle() {
+  const form = document.querySelector('form[data-bl-install-form]');
+  if (!form) {
+    return;
+  }
+
+  const radios = form.querySelectorAll('input[type="radio"][data-bl-seed-mode-toggle]');
+  const panels = form.querySelectorAll('[data-bl-seed-mode-panel]');
+  if (!radios.length || !panels.length) {
+    return;
+  }
+
+  function sync() {
+    const selected = form.querySelector('input[type="radio"][data-bl-seed-mode-toggle]:checked');
+    const mode = selected ? selected.value : 'sample';
+    panels.forEach((panel) => {
+      const show = panel.getAttribute('data-bl-seed-mode-panel') === mode;
+      panel.style.display = show ? '' : 'none';
+    });
+  }
+
+  radios.forEach((radio) => radio.addEventListener('change', sync));
+  sync();
+}

@@ -683,6 +683,33 @@ msgstr "Erstellte Seiten in Menüs eintragen"
 msgid "Adds the pages to the configured menu locations."
 msgstr "Fügt die Seiten den konfigurierten Menü-Positionen hinzu."
 
+msgid "Choose how much starter content to create. Content-type config files are always installed, so you can switch types on or off later."
+msgstr "Wähle aus, wie viel Starter-Inhalt erstellt werden soll. Die Konfigurationsdateien der Inhaltstypen werden immer installiert, sodass du sie später noch aktivieren oder deaktivieren kannst."
+
+msgid "Create content"
+msgstr "Inhalt erstellen"
+
+msgid "Sample data"
+msgstr "Beispieldaten"
+
+msgid "Creates a few pages, images, and sample items so you can learn the theme."
+msgstr "Erstellt einige Seiten, Bilder und Beispieleinträge, damit du das Theme kennenlernen kannst."
+
+msgid "Test data"
+msgstr "Testdaten"
+
+msgid "Creates everything and many auto-generated items for layouts, filters, and performance testing."
+msgstr "Erstellt alles und viele automatisch generierte Einträge zum Testen von Layouts, Filtern und Performance."
+
+msgid "Test data will create:"
+msgstr "Testdaten erstellen:"
+
+msgid "All content types enabled, curated samples, plus a large set of posts, projects, and events (including past/future, timed, cancelled, recurring, and trash variants)."
+msgstr "Alle Inhaltstypen aktiviert, kuratierte Beispiele sowie eine große Menge an Beiträgen, Projekten und Veranstaltungen (inkl. vergangen/zukünftig, mit Uhrzeit, abgesagt, wiederkehrend und Papierkorb-Varianten)."
+
+msgid "Parent content-types config is missing."
+msgstr "Die Inhaltstypen-Konfiguration des Parent-Themes fehlt."
+
 msgid "Choose which content types to use. Their config files are always installed, so you can also switch them on or off later."
 msgstr "Wähle aus, welche Inhaltstypen du nutzen möchtest. Die Konfigurationsdateien werden immer installiert, sodass du sie auch später noch aktivieren oder deaktivieren kannst."
 

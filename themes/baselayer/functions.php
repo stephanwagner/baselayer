@@ -61,7 +61,7 @@ require_once 'inc/page-editor-options.php';
 // Install wizard: must load after custom-post-types.php so CPT registration
 // exists when the installer seeds projects/events on form POST.
 if (is_admin() && (!bl_setup_completed() || isset($_GET['baselayer_success']))) {
-	require_once 'inc/install.php';
+	require_once 'inc/install/install.php';
 }
 
 // Mail, Matomo
