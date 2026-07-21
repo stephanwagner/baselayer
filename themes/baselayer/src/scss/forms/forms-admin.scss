@@ -104,16 +104,18 @@
   background: var(--bl-forms-admin-surface);
 }
 
-.bl-forms-builder__palette-search {
+input.bl-forms-builder__palette-search {
   display: block;
   width: 100%;
-  margin: 0 0 12px;
-  padding: 6px 8px;
+  margin: 0;
+  padding: 4px 12px;
+  height: auto;
+  min-height: 0;
   border: 1px solid var(--bl-forms-admin-border);
   border-radius: var(--bl-forms-admin-radius);
   background: #fff;
   font-size: 12px;
-  line-height: 1.4;
+  line-height: 24px;
   box-sizing: border-box;
 
   &:focus {
@@ -123,17 +125,13 @@
   }
 }
 
-.bl-forms-builder__palette-empty {
-  margin: 0 0 8px;
+p.bl-forms-builder__palette-empty {
+  margin: 16px 0 6px;
+  font-size: 12px;
+  font-style: italic;
 }
 
 .bl-forms-builder__palette-section {
-  & + & {
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 1px solid var(--bl-forms-admin-border);
-  }
-
   &[hidden] {
     display: none !important;
   }
@@ -149,8 +147,7 @@
   align-items: center;
   gap: 8px;
   width: 100%;
-  margin: 0;
-  padding: 4px 2px;
+  padding: 12px 2px 4px;
   border: 0;
   background: transparent;
   cursor: pointer;
@@ -194,21 +191,21 @@
   border-radius: 4px;
   color: var(--bl-forms-admin-muted);
   line-height: 1;
-  transition: transform 0.15s ease, background 0.12s ease, color 0.12s ease;
 
   svg {
     display: block;
     width: 14px;
     height: 14px;
+    transition: transform 0.15s ease;
   }
 }
 
-.bl-forms-builder__palette-section.is-open .bl-forms-builder__palette-section-chevron {
+.bl-forms-builder__palette-section.is-open .bl-forms-builder__palette-section-chevron svg {
   transform: scaleY(-1);
 }
 
 .bl-forms-builder__palette-panel {
-  margin-top: 8px;
+  margin-top: 4px;
 }
 
 .bl-forms-builder__palette-list {
@@ -362,7 +359,7 @@
 
 .bl-forms-builder__canvas {
   min-height: 420px;
-  padding: 12px 12px 48px;
+  padding: 8px 12px 48px;
   border: 1px dashed var(--bl-forms-admin-border);
   border-radius: var(--bl-forms-admin-radius);
   background: #fff;
@@ -386,6 +383,7 @@
   border: 1px solid var(--bl-forms-admin-border);
   border-radius: var(--bl-forms-admin-radius);
   background: #fff;
+  overflow: hidden;
 }
 
 .bl-forms-builder__field.is-open {
@@ -428,7 +426,7 @@
 .bl-forms-builder__field-type {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
   flex: 0 1 auto;
   max-width: 160px;
   min-width: 0;
@@ -437,7 +435,7 @@
   border-radius: 999px;
   background: #fff;
   color: var(--bl-forms-admin-muted);
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1.2;
 }
 
@@ -462,21 +460,22 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-weight: 600;
+  font-weight: 500;
   color: #1d2327;
 }
 
 .bl-forms-builder__width-badge {
   flex: 0 0 auto;
-  padding: 2px 7px;
+  padding: 3px 8px;
+  border: 1px solid var(--bl-forms-admin-border);
   border-radius: 999px;
-  background: color-mix(in srgb, var(--bl-forms-admin-accent) 12%, #fff);
-  color: var(--bl-forms-admin-accent);
+  background: #fff;
+  color: var(--bl-forms-admin-muted);
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 500;
   font-variant-numeric: tabular-nums;
   letter-spacing: 0.02em;
-  line-height: 1.4;
+  line-height: 1.2;
   white-space: nowrap;
 
   &[hidden] {
@@ -511,7 +510,9 @@
   color: var(--bl-forms-admin-muted);
   user-select: none;
   line-height: 1;
-  transition: background 0.12s ease, color 0.12s ease;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease;
 
   svg {
     display: block;
@@ -708,7 +709,10 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
   line-height: 1.3;
   color: var(--bl-forms-admin-muted);
   cursor: pointer;
-  transition: background 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
+  transition:
+    background 0.12s ease,
+    color 0.12s ease,
+    box-shadow 0.12s ease;
 
   &:hover {
     color: #1d2327;

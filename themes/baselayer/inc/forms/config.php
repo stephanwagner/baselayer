@@ -453,6 +453,8 @@ function bl_forms_sanitize_field($field): ?array
 
 	if ($type === 'hidden') {
 		$out['default_value'] = sanitize_text_field((string) ($field['default_value'] ?? ''));
+		$out['width'] = '100';
+		$out['width_custom'] = '';
 		unset($out['required'], $out['placeholder'], $out['hide_label']);
 
 		return $out;

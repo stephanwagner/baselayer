@@ -315,10 +315,9 @@ function widthBadgeLabel(field) {
     return '';
   }
   if (width === 'custom') {
-    const custom = (field.width_custom || '').trim();
-    return custom !== '' ? `[${custom}]` : '';
+    return (field.width_custom || '').trim();
   }
-  return `[${width}%]`;
+  return `${width}%`;
 }
 
 function createCheckboxSetting(key, label, checked, onChange) {
@@ -528,7 +527,7 @@ export function serializeRow(row) {
       name_manual: nameManual,
       hide_label: hideLabel,
       default_value: row.querySelector('[data-bl-default]')?.value || '',
-      ...appearancePayload(row, width, widthCustom),
+      ...appearancePayload(row, '100', ''),
     };
   }
 
@@ -611,7 +610,7 @@ export function createFieldCard(initial, open = false) {
     preview.textContent = title;
     preview.hidden = title === '';
 
-    const widthText = widthBadgeLabel(field);
+    const widthText = field.type === 'hidden' ? '' : widthBadgeLabel(field);
     widthBadge.textContent = widthText;
     widthBadge.hidden = widthText === '';
 
@@ -710,7 +709,9 @@ export function createFieldCard(initial, open = false) {
     let generalCount = 0;
     let advancedCount = 0;
 
-    appearance.appendChild(createWidthControl(field, updatePreview));
+    if (field.type !== 'hidden') {
+      appearance.appendChild(createWidthControl(field, updatePreview));
+    }
     if (field.type === 'radio' || field.type === 'checkboxes') {
       appearance.appendChild(createLayoutControl(field));
     }
