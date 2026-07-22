@@ -110,7 +110,7 @@ function bl_forms_render_entry_metabox(WP_Post $post): void
 	}
 
 	$fields_by_name = [];
-	foreach ($config['fields'] as $field) {
+	foreach (bl_forms_iter_fields($config['fields']) as $field) {
 		if (!empty($field['name'])) {
 			$fields_by_name[(string) $field['name']] = $field;
 		}

@@ -1,5 +1,20 @@
 /** Shared DOM / i18n helpers for the form builder. */
 
+let formsDragDepth = 0;
+
+/** Mark body while a Sortable drag is active (supports nested/cross-list). */
+export function formsDragStart() {
+  formsDragDepth += 1;
+  document.body.classList.add('is-dragging');
+}
+
+export function formsDragEnd() {
+  formsDragDepth = Math.max(0, formsDragDepth - 1);
+  if (formsDragDepth === 0) {
+    document.body.classList.remove('is-dragging');
+  }
+}
+
 export const TYPE_KEYS = [
   'text',
   'textarea',
@@ -23,6 +38,7 @@ export const TYPE_KEYS = [
   'divider',
   'spacer',
   'html',
+  'column',
   'hidden',
   'password',
   'honeypot',
@@ -60,6 +76,12 @@ export const PALETTE_SECTIONS = [
     headingKey: 'paletteSectionFiles',
     headingFallback: 'Uploads',
     types: ['file', 'image'],
+  },
+  {
+    id: 'layout',
+    headingKey: 'paletteSectionLayout',
+    headingFallback: 'Layout',
+    types: ['column'],
   },
   {
     id: 'content',
@@ -234,6 +256,15 @@ export function defaultField(type = 'text') {
       css_class: '',
     };
   }
+  if (type === 'column') {
+    return {
+      id,
+      type,
+      width: '100',
+      width_custom: '',
+      children: [],
+    };
+  }
   const base = {
     id,
     type,
@@ -290,4 +321,21 @@ export function writeConfig(partial) {
     fields: partial.fields !== undefined ? partial.fields : current.fields || [],
     settings: partial.settings !== undefined ? partial.settings : current.settings || {},
   });
+}
+
+/** Flatten nested column trees to leaf fields. */
+export function flattenFields(fields = []) {
+  const out = [];
+  const walk = (list) => {
+    (list || []).forEach((field) => {
+      if (!field) return;
+      if (field.type === 'column' || field.type === 'group') {
+        walk(field.children || []);
+        return;
+      }
+      out.push(field);
+    });
+  };
+  walk(fields);
+  return out;
 }

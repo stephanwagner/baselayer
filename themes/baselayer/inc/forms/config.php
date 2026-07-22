@@ -33,6 +33,7 @@ function bl_forms_field_types(): array
 		'html',
 		'divider',
 		'spacer',
+		'column',
 		'hidden',
 		'honeypot',
 		'captcha',
@@ -46,7 +47,60 @@ function bl_forms_field_types(): array
  */
 function bl_forms_content_field_types(): array
 {
-	return ['heading', 'text_block', 'html', 'divider', 'spacer', 'captcha'];
+	return ['heading', 'text_block', 'html', 'divider', 'spacer', 'column', 'captcha'];
+}
+
+/**
+ * Layout container types (have nested children).
+ *
+ * @return list<string>
+ */
+function bl_forms_layout_field_types(): array
+{
+	return ['column'];
+}
+
+/**
+ * Field types that must stay at the form root (not inside columns).
+ *
+ * @return list<string>
+ */
+function bl_forms_root_only_field_types(): array
+{
+	return ['column', 'hidden', 'honeypot', 'captcha'];
+}
+
+/**
+ * Yield every non-layout field in tree order (inputs + content).
+ *
+ * @param list<array<string, mixed>> $fields
+ * @return \Generator<int, array<string, mixed>>
+ */
+function bl_forms_iter_fields(array $fields): \Generator
+{
+	foreach ($fields as $field) {
+		if (!is_array($field)) {
+			continue;
+		}
+		$type = (string) ($field['type'] ?? '');
+		if (in_array($type, bl_forms_layout_field_types(), true)) {
+			$children = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
+			yield from bl_forms_iter_fields($children);
+			continue;
+		}
+		yield $field;
+	}
+}
+
+/**
+ * Flat list of non-layout fields (for submit, mail, uploads checks).
+ *
+ * @param list<array<string, mixed>> $fields
+ * @return list<array<string, mixed>>
+ */
+function bl_forms_flatten_fields(array $fields): array
+{
+	return iterator_to_array(bl_forms_iter_fields($fields), false);
 }
 
 /**
@@ -255,7 +309,7 @@ function bl_forms_format_field_display_value(array $field, $value): string
  */
 function bl_forms_width_presets(): array
 {
-	return ['100', '75', '66', '50', '33', '25'];
+	return ['100', '75', '66', '50', '33', '25', 'auto'];
 }
 
 /**
@@ -312,6 +366,12 @@ function bl_forms_sanitize_width(array $field): array
 function bl_forms_field_width_vars(array $field): array
 {
 	$width = (string) ($field['width'] ?? '100');
+	if ($width === 'auto') {
+		return [
+			'width'  => 'auto',
+			'factor' => '0',
+		];
+	}
 	if ($width === 'custom') {
 		$custom = trim((string) ($field['width_custom'] ?? ''));
 		if ($custom === '') {
@@ -416,6 +476,27 @@ function bl_forms_sanitize_field($field): ?array
 		'width'        => $width['width'],
 		'width_custom' => $width['width_custom'],
 	];
+
+	if ($type === 'column') {
+		$children_in = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
+		$children = [];
+		$blocked = bl_forms_root_only_field_types();
+		foreach ($children_in as $child) {
+			$clean = bl_forms_sanitize_field($child);
+			if ($clean === null) {
+				continue;
+			}
+			$child_type = (string) ($clean['type'] ?? '');
+			if (in_array($child_type, $blocked, true)) {
+				continue;
+			}
+			$children[] = $clean;
+		}
+		$out['children'] = $children;
+		unset($out['name'], $out['name_manual'], $out['hide_label'], $out['label']);
+
+		return $out;
+	}
 
 	if ($type === 'divider' || $type === 'captcha') {
 		unset($out['name'], $out['label'], $out['name_manual'], $out['hide_label']);
@@ -531,6 +612,20 @@ function bl_forms_sanitize_config($config): array
 	$fields = [];
 	if (isset($config['fields']) && is_array($config['fields'])) {
 		foreach ($config['fields'] as $field) {
+			if (!is_array($field)) {
+				continue;
+			}
+			// Legacy layout groups → consecutive root columns.
+			if (($field['type'] ?? '') === 'group') {
+				$children = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
+				foreach ($children as $child) {
+					$clean = bl_forms_sanitize_field($child);
+					if ($clean !== null && ($clean['type'] ?? '') === 'column') {
+						$fields[] = $clean;
+					}
+				}
+				continue;
+			}
 			$clean = bl_forms_sanitize_field($field);
 			if ($clean !== null) {
 				$fields[] = $clean;
@@ -576,16 +671,22 @@ function bl_forms_sanitize_config($config): array
 }
 
 /**
- * Ensure field name keys are unique within a form.
+ * Ensure field name keys are unique within a form (walks layout trees).
  *
  * @param list<array<string, mixed>> $fields
+ * @param array<string, true>        $used
  * @return list<array<string, mixed>>
  */
-function bl_forms_ensure_unique_field_names(array $fields): array
+function bl_forms_ensure_unique_field_names(array $fields, array &$used = []): array
 {
-	$used = [];
-
 	foreach ($fields as $index => $field) {
+		$type = (string) ($field['type'] ?? '');
+		if (in_array($type, bl_forms_layout_field_types(), true)) {
+			$children = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
+			$fields[$index]['children'] = bl_forms_ensure_unique_field_names($children, $used);
+			continue;
+		}
+
 		if (!isset($field['name']) || !is_string($field['name']) || $field['name'] === '') {
 			continue;
 		}
@@ -634,7 +735,7 @@ function bl_forms_primary_email_field_name(array $config): string
 	$preferred = sanitize_key((string) ($config['settings']['user_email_field'] ?? ''));
 	$first = '';
 
-	foreach ($config['fields'] as $field) {
+	foreach (bl_forms_iter_fields($config['fields'] ?? []) as $field) {
 		if (($field['type'] ?? '') !== 'email' || empty($field['name'])) {
 			continue;
 		}

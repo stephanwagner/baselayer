@@ -124,7 +124,7 @@ function bl_forms_is_valid_phone(string $value): bool
  */
 function bl_forms_honeypot_triggered(array $fields, array $raw): bool
 {
-	foreach ($fields as $field) {
+	foreach (bl_forms_iter_fields($fields) as $field) {
 		if ((string) ($field['type'] ?? '') !== 'honeypot') {
 			continue;
 		}
@@ -182,7 +182,7 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 	$values = [];
 	$invalid = [];
 
-	foreach ($fields as $field) {
+	foreach (bl_forms_iter_fields($fields) as $field) {
 		$type = (string) ($field['type'] ?? '');
 		if (in_array($type, bl_forms_content_field_types(), true) || $type === 'honeypot') {
 			continue;

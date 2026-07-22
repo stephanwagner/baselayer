@@ -1,5 +1,5 @@
 import Sortable from 'sortablejs';
-import { PALETTE_SECTIONS, el, t, typeLabel, iconEl } from './dom.js';
+import { PALETTE_SECTIONS, el, t, typeLabel, iconEl, formsDragStart, formsDragEnd } from './dom.js';
 
 function paletteIcon(type) {
   const icons = (window.blFormsAdmin && window.blFormsAdmin.icons) || {};
@@ -186,10 +186,10 @@ export function createPalette(onAdd) {
       filter: '.bl-forms-builder__template-add',
       preventOnFilter: true,
       onStart() {
-        document.body.classList.add('is-dragging');
+        formsDragStart();
       },
       onEnd() {
-        document.body.classList.remove('is-dragging');
+        formsDragEnd();
       },
     });
   });

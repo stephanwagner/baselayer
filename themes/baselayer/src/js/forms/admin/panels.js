@@ -1,4 +1,4 @@
-import { el, t } from './dom.js';
+import { el, t, flattenFields } from './dom.js';
 
 function fieldRow(label, control, help = '') {
   const children = [
@@ -12,7 +12,7 @@ function fieldRow(label, control, help = '') {
 }
 
 function emailFieldsFromList(fields) {
-  return (fields || []).filter(
+  return flattenFields(fields || []).filter(
     (field) => field && field.type === 'email' && field.name
   );
 }

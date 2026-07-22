@@ -20,7 +20,7 @@ function bl_forms_render(int $form_id, array $args = []): string
 	$validation = bl_forms_resolve_message($settings, 'validation_message');
 
 	$has_uploads = false;
-	foreach ($config['fields'] as $field) {
+	foreach (bl_forms_iter_fields($config['fields']) as $field) {
 		if (in_array((string) ($field['type'] ?? ''), ['file', 'image'], true)) {
 			$has_uploads = true;
 			break;
@@ -53,9 +53,7 @@ function bl_forms_render(int $form_id, array $args = []): string
 				<input type="text" name="bl_forms_hp" id="<?= esc_attr($uid) ?>-hp" value="" tabindex="-1" autocomplete="off">
 			</div>
 			<div class="bl-form__fields">
-				<?php foreach ($config['fields'] as $field) : ?>
-					<?= bl_forms_render_field($field, $uid) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-				<?php endforeach; ?>
+				<?= bl_forms_render_fields($config['fields'], $uid) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			</div>
 			<div class="bl-form__actions">
 				<div class="bl-form__message" data-bl-form-message hidden role="status" aria-live="polite"></div>
@@ -253,6 +251,47 @@ function bl_forms_field_describedby_attr(array $field, string $input_id): string
 }
 
 /**
+ * Render root fields, wrapping consecutive columns in a row.
+ *
+ * @param list<array<string, mixed>> $fields
+ */
+function bl_forms_render_fields(array $fields, string $uid): string
+{
+	$html = '';
+	$count = count($fields);
+	$i = 0;
+
+	while ($i < $count) {
+		$field = $fields[$i];
+		if (!is_array($field)) {
+			$i++;
+			continue;
+		}
+
+		if (($field['type'] ?? '') === 'column') {
+			$run = [];
+			while ($i < $count && is_array($fields[$i]) && ($fields[$i]['type'] ?? '') === 'column') {
+				$run[] = $fields[$i];
+				$i++;
+			}
+			$inner = '';
+			foreach ($run as $column) {
+				$inner .= bl_forms_render_field($column, $uid);
+			}
+			if ($inner !== '') {
+				$html .= '<div class="bl-form__group">' . $inner . '</div>';
+			}
+			continue;
+		}
+
+		$html .= bl_forms_render_field($field, $uid);
+		$i++;
+	}
+
+	return $html;
+}
+
+/**
  * Render one field.
  *
  * @param array<string, mixed> $field
@@ -262,6 +301,30 @@ function bl_forms_render_field(array $field, string $uid): string
 	$type = (string) ($field['type'] ?? 'text');
 	$id = (string) ($field['id'] ?? '');
 	$input_id = $uid . '-' . $id;
+
+	if ($type === 'column') {
+		$children = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
+		$inner = '';
+		foreach ($children as $child) {
+			if (!is_array($child)) {
+				continue;
+			}
+			$inner .= bl_forms_render_field($child, $uid);
+		}
+		$is_auto = (($field['width'] ?? '') === 'auto');
+		$classes = 'bl-form__column' . ($is_auto ? ' bl-form__column--auto' : '');
+		$extra = bl_forms_sanitize_css_class((string) ($field['css_class'] ?? ''));
+		if ($extra !== '') {
+			$classes .= ' ' . $extra;
+		}
+		$style = $is_auto ? '' : bl_forms_field_width_style($field);
+		$attrs = 'class="' . esc_attr($classes) . '"';
+		if ($style !== '') {
+			$attrs .= ' style="' . esc_attr($style) . '"';
+		}
+
+		return '<div ' . $attrs . '>' . $inner . '</div>';
+	}
 
 	if ($type === 'divider') {
 		return '<div ' . bl_forms_field_wrap_attrs($field, 'bl-form__divider-wrap') . '><hr class="bl-form__divider"></div>';

@@ -1,4 +1,5 @@
 import { el, t, typeLabel, uid, iconEl, uniqueFieldName, slugifyOption } from './dom.js';
+import { createColumnCard, serializeLayoutRow } from './layout.js';
 
 const WIDTH_PRESETS = [
   { value: '100', label: '100%' },
@@ -7,6 +8,7 @@ const WIDTH_PRESETS = [
   { value: '50', label: '50%' },
   { value: '33', label: '33%' },
   { value: '25', label: '25%' },
+  { value: 'auto', labelKey: 'widthAuto' },
   { value: 'custom', labelKey: 'widthCustom' },
 ];
 
@@ -215,7 +217,7 @@ function createSegmentedControl(options, active, datasetKey, onSelect) {
   return group;
 }
 
-function createWidthControl(field, onChange = () => {}) {
+export function createWidthControl(field, onChange = () => {}) {
   const wrap = el('div', { className: 'bl-forms-builder__width' });
   const customInput = el('input', {
     type: 'text',
@@ -287,7 +289,7 @@ function createLayoutControl(field) {
   return wrap;
 }
 
-function createCssClassControl(field) {
+export function createCssClassControl(field) {
   const input = el('input', {
     type: 'text',
     className: 'widefat',
@@ -313,6 +315,9 @@ function widthBadgeLabel(field) {
   const width = field.width || '100';
   if (width === '100') {
     return '';
+  }
+  if (width === 'auto') {
+    return t('widthAuto', 'Auto');
   }
   if (width === 'custom') {
     return (field.width_custom || '').trim();
@@ -404,11 +409,11 @@ function appendDefaultValueControl(general, field, updatePreview) {
   return true;
 }
 
-function appearancePayload(row, width, widthCustom) {
+function appearancePayload(scope, width, widthCustom) {
   return {
     width,
     width_custom: width === 'custom' ? widthCustom : '',
-    css_class: row.querySelector('[data-bl-css-class]')?.value || '',
+    css_class: scope.querySelector('[data-bl-css-class]')?.value || '',
   };
 }
 
@@ -476,24 +481,31 @@ function appendEmptyHint(panel, text) {
 }
 
 export function serializeRow(row) {
+  const layoutData = serializeLayoutRow(row);
+  if (layoutData) {
+    return layoutData;
+  }
+
   const type = row.dataset.fieldType || 'text';
   const id = row.dataset.fieldId || uid();
-  const widthBtn = row.querySelector('[data-bl-width].is-active');
+  const body = row.querySelector(':scope > .bl-forms-builder__field-body') || row;
+  const q = (sel) => body.querySelector(sel);
+  const widthBtn = q('[data-bl-width].is-active');
   const width = widthBtn?.dataset.blWidth || row.dataset.fieldWidth || '100';
-  const widthCustom = row.querySelector('[data-bl-width-custom]')?.value || '';
+  const widthCustom = q('[data-bl-width-custom]')?.value || '';
   const nameManual = row.dataset.nameManual === '1';
-  const hideLabel = Boolean(row.querySelector('[data-bl-hide-label]')?.checked);
+  const hideLabel = Boolean(q('[data-bl-hide-label]')?.checked);
 
   if (type === 'divider' || type === 'captcha') {
-    return { id, type, ...appearancePayload(row, width, widthCustom) };
+    return { id, type, ...appearancePayload(body, width, widthCustom) };
   }
 
   if (type === 'spacer') {
     return {
       id,
       type,
-      height: row.querySelector('[data-bl-height]')?.value || '24px',
-      ...appearancePayload(row, width, widthCustom),
+      height: q('[data-bl-height]')?.value || '24px',
+      ...appearancePayload(body, width, widthCustom),
     };
   }
 
@@ -501,8 +513,8 @@ export function serializeRow(row) {
     return {
       id,
       type,
-      content: row.querySelector('[data-bl-content]')?.value || '',
-      ...appearancePayload(row, width, widthCustom),
+      content: q('[data-bl-content]')?.value || '',
+      ...appearancePayload(body, width, widthCustom),
     };
   }
 
@@ -510,11 +522,11 @@ export function serializeRow(row) {
     return {
       id,
       type,
-      label: row.querySelector('[data-bl-label]')?.value || '',
-      name: row.querySelector('[data-bl-name]')?.value || id,
+      label: q('[data-bl-label]')?.value || '',
+      name: q('[data-bl-name]')?.value || id,
       name_manual: nameManual,
       hide_label: hideLabel,
-      ...appearancePayload(row, width, widthCustom),
+      ...appearancePayload(body, width, widthCustom),
     };
   }
 
@@ -522,50 +534,50 @@ export function serializeRow(row) {
     return {
       id,
       type,
-      label: row.querySelector('[data-bl-label]')?.value || '',
-      name: row.querySelector('[data-bl-name]')?.value || id,
+      label: q('[data-bl-label]')?.value || '',
+      name: q('[data-bl-name]')?.value || id,
       name_manual: nameManual,
       hide_label: hideLabel,
-      default_value: row.querySelector('[data-bl-default]')?.value || '',
-      ...appearancePayload(row, '100', ''),
+      default_value: q('[data-bl-default]')?.value || '',
+      ...appearancePayload(body, '100', ''),
     };
   }
 
   const data = {
     id,
     type,
-    label: row.querySelector('[data-bl-label]')?.value || '',
-    name: row.querySelector('[data-bl-name]')?.value || id,
+    label: q('[data-bl-label]')?.value || '',
+    name: q('[data-bl-name]')?.value || id,
     name_manual: nameManual,
     hide_label: hideLabel,
-    required: Boolean(row.querySelector('[data-bl-required]')?.checked),
-    placeholder: row.querySelector('[data-bl-placeholder]')?.value || '',
-    ...appearancePayload(row, width, widthCustom),
+    required: Boolean(q('[data-bl-required]')?.checked),
+    placeholder: q('[data-bl-placeholder]')?.value || '',
+    ...appearancePayload(body, width, widthCustom),
   };
 
   if (DESCRIPTION_TYPES.includes(type)) {
-    data.description = row.querySelector('[data-bl-description]')?.value || '';
+    data.description = q('[data-bl-description]')?.value || '';
   }
   if (type === 'terms') {
-    data.content = row.querySelector('[data-bl-content]')?.value || '';
+    data.content = q('[data-bl-content]')?.value || '';
   }
   if (OPTION_TYPES.includes(type)) {
-    data.options = Array.from(row.querySelectorAll('[data-bl-option]')).map((opt) => ({
+    data.options = Array.from(body.querySelectorAll('[data-bl-option]')).map((opt) => ({
       label: opt.querySelector('[data-bl-opt-label]')?.value || '',
       value: opt.querySelector('[data-bl-opt-value]')?.value || '',
     }));
   }
   if (type === 'radio' || type === 'checkboxes') {
-    const layoutBtn = row.querySelector('[data-bl-layout].is-active');
+    const layoutBtn = q('[data-bl-layout].is-active');
     data.layout = layoutBtn?.dataset.blLayout === 'horizontal' ? 'horizontal' : 'vertical';
   }
   if (MULTIPLE_TYPES.includes(type)) {
-    data.multiple = Boolean(row.querySelector('[data-bl-multiple]')?.checked);
+    data.multiple = Boolean(q('[data-bl-multiple]')?.checked);
   }
   if (!NO_DEFAULT.includes(type)) {
-    const defaultValue = readDefaultValueFromRow(row);
-    if (defaultValue !== undefined) {
-      data.default_value = defaultValue;
+    const defEl = q('[data-bl-default]');
+    if (defEl) {
+      data.default_value = defEl.type === 'checkbox' ? (defEl.checked ? '1' : '') : defEl.value || '';
     }
   }
 
@@ -573,6 +585,10 @@ export function serializeRow(row) {
 }
 
 export function createFieldCard(initial, open = false) {
+  if ((initial?.type || '') === 'column') {
+    return createColumnCard(initial, open);
+  }
+
   let field = {
     width: '100',
     width_custom: '',
@@ -624,6 +640,23 @@ export function createFieldCard(initial, open = false) {
     row.dataset.nameManual = field.name_manual ? '1' : '0';
   };
 
+  const syncEditButton = (btn, isOpen) => {
+    if (!btn) {
+      return;
+    }
+    btn.replaceChildren();
+    const icon = iconEl(isOpen ? 'done' : 'edit');
+    if (icon.innerHTML) {
+      btn.appendChild(icon);
+    } else {
+      btn.textContent = isOpen ? '✓' : '✎';
+    }
+    const label = isOpen ? t('doneEditing', 'Done editing') : t('editField', 'Edit field');
+    btn.title = label;
+    btn.setAttribute('aria-label', label);
+    btn.classList.toggle('is-editing', isOpen);
+  };
+
   const setOpen = (nextOpen) => {
     if (nextOpen) {
       document.querySelectorAll('.bl-forms-builder__field.is-open').forEach((other) => {
@@ -636,6 +669,7 @@ export function createFieldCard(initial, open = false) {
           otherToggle.setAttribute('aria-expanded', 'false');
           otherToggle.setAttribute('aria-label', t('expandField', 'Expand field'));
         }
+        syncEditButton(other.querySelector('.bl-forms-builder__field-edit'), false);
       });
     }
 
@@ -645,6 +679,7 @@ export function createFieldCard(initial, open = false) {
       'aria-label',
       nextOpen ? t('collapseField', 'Collapse field') : t('expandField', 'Expand field')
     );
+    syncEditButton(editBtn, nextOpen);
   };
 
   const toggle = el('button', {
@@ -666,14 +701,9 @@ export function createFieldCard(initial, open = false) {
     className: 'bl-forms-builder__icon-btn bl-forms-builder__field-edit',
     title: t('editField', 'Edit field'),
     'aria-label': t('editField', 'Edit field'),
-    onClick: () => setOpen(true),
+    onClick: () => setOpen(!row.classList.contains('is-open')),
   });
-  const editIcon = iconEl('edit');
-  if (editIcon.innerHTML) {
-    editBtn.appendChild(editIcon);
-  } else {
-    editBtn.textContent = '✎';
-  }
+  syncEditButton(editBtn, !!open);
 
   const deleteBtn = el('button', {
     type: 'button',

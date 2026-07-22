@@ -157,7 +157,7 @@ function bl_forms_send_emails(int $form_id, int $entry_id, array $config, array 
 function bl_forms_email_field_rows(array $fields, array $values): array
 {
 	$rows = [];
-	foreach ($fields as $field) {
+	foreach (bl_forms_iter_fields($fields) as $field) {
 		$type = (string) ($field['type'] ?? '');
 		if (in_array($type, bl_forms_content_field_types(), true) || $type === 'honeypot') {
 			continue;

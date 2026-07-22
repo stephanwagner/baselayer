@@ -1,6 +1,28 @@
 import Sortable from 'sortablejs';
-import { el, t, defaultField, uniqueFieldName } from './dom.js';
+import { el, t, defaultField, uniqueFieldName, formsDragStart, formsDragEnd } from './dom.js';
 import { createFieldCard, serializeRow } from './field-card.js';
+import { equalizeColumnRun } from './layout.js';
+
+/**
+ * Flatten legacy group fields into consecutive columns for the canvas.
+ *
+ * @param {list} fields
+ */
+function expandLegacyGroups(fields) {
+  const out = [];
+  (fields || []).forEach((field) => {
+    if ((field?.type || '') === 'group') {
+      (field.children || []).forEach((child) => {
+        if ((child?.type || '') === 'column') {
+          out.push(child);
+        }
+      });
+      return;
+    }
+    out.push(field);
+  });
+  return out;
+}
 
 /**
  * Right column: drop canvas + reorderable field cards.
@@ -23,7 +45,7 @@ export function createCanvas({ fields = [], onChange }) {
   });
 
   const syncEmpty = () => {
-    empty.hidden = list.querySelector('[data-bl-forms-field]') != null;
+    empty.hidden = list.querySelector(':scope > [data-bl-forms-field]') != null;
   };
 
   const prepareField = (typeOrData) => {
@@ -39,34 +61,45 @@ export function createCanvas({ fields = [], onChange }) {
   const addField = (typeOrData, open = true) => {
     const card = createFieldCard(prepareField(typeOrData), open);
     list.appendChild(card);
+    if ((card.dataset.fieldType || '') === 'column') {
+      equalizeColumnRun(list, card);
+    }
     syncEmpty();
     onChange();
     return card;
   };
 
-  (fields || []).forEach((field) => list.appendChild(createFieldCard(field, false)));
+  expandLegacyGroups(fields || []).forEach((field) => {
+    list.appendChild(createFieldCard(field, false));
+  });
   syncEmpty();
 
   wrap.append(list, empty);
 
   Sortable.create(list, {
-    group: 'bl-forms-fields',
+    group: {
+      name: 'bl-forms-fields',
+      put(to, from, dragEl) {
+        // Nested-only types shouldn't land here from column interiors as invalid;
+        // columns and normal fields are fine at root.
+        return true;
+      },
+    },
     handle: '.bl-forms-builder__handle',
     animation: 150,
     draggable: '.bl-forms-builder__field, .bl-forms-builder__template',
-    onStart() {
-      document.body.classList.add('is-dragging');
-    },
-    onEnd() {
-      document.body.classList.remove('is-dragging');
-    },
+    onStart: formsDragStart,
+    onEnd: formsDragEnd,
     onAdd(evt) {
       const item = evt.item;
       const type = item.dataset.fieldType || 'text';
-      // Palette clones are buttons — replace with a real field card.
+      let card = item;
       if (item.classList.contains('bl-forms-builder__template')) {
-        const card = createFieldCard(prepareField(type), true);
+        card = createFieldCard(prepareField(type), true);
         item.replaceWith(card);
+      }
+      if ((card.dataset.fieldType || '') === 'column') {
+        equalizeColumnRun(list, card);
       }
       syncEmpty();
       onChange();
@@ -84,7 +117,9 @@ export function createCanvas({ fields = [], onChange }) {
     addField,
     syncEmpty,
     getFields() {
-      return Array.from(list.querySelectorAll('[data-bl-forms-field]')).map(serializeRow);
+      return Array.from(list.children)
+        .filter((el) => el.matches?.('[data-bl-forms-field]'))
+        .map(serializeRow);
     },
   };
 }
