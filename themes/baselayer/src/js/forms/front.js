@@ -51,6 +51,8 @@ function initForm(root) {
   const successMsg = root.dataset.blFormSuccess || '';
   const errorMsg = root.dataset.blFormError || '';
   const validationMsg = root.dataset.blFormValidation || '';
+  const afterSubmit = root.dataset.blFormAfter || 'message';
+  const redirectUrl = root.dataset.blFormRedirect || '';
 
   const showMessage = (text, type) => {
     if (!message) return;
@@ -78,6 +80,22 @@ function initForm(root) {
     });
   };
 
+  const handleSuccess = (payload) => {
+    // Only trust redirect from a real submission response (not honeypot / JS-check fakes).
+    const redirect =
+      (payload && payload.redirect) ||
+      (payload && payload.entry_id && afterSubmit === 'redirect' ? redirectUrl : '') ||
+      '';
+    if (redirect) {
+      window.location.assign(redirect);
+      return;
+    }
+    showMessage((payload && payload.message) || successMsg, 'success');
+    const fields = root.querySelector('.bl-form__fields');
+    if (fields) fields.hidden = true;
+    submit.hidden = true;
+  };
+
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (jsField && jsToken) {
@@ -96,10 +114,7 @@ function initForm(root) {
       });
       const data = await response.json();
       if (data && data.success) {
-        showMessage((data.data && data.data.message) || successMsg, 'success');
-        const fields = root.querySelector('.bl-form__fields');
-        if (fields) fields.hidden = true;
-        submit.hidden = true;
+        handleSuccess((data && data.data) || {});
         return;
       }
 

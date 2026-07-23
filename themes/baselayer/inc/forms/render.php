@@ -18,6 +18,11 @@ function bl_forms_render(int $form_id, array $args = []): string
 	$success = bl_forms_resolve_message($settings, 'success_message');
 	$error = bl_forms_resolve_message($settings, 'error_message');
 	$validation = bl_forms_resolve_message($settings, 'validation_message');
+	$after_submit = sanitize_key((string) ($settings['after_submit'] ?? 'message'));
+	if (!in_array($after_submit, ['message', 'redirect'], true)) {
+		$after_submit = 'message';
+	}
+	$redirect_url = bl_forms_after_submit_redirect_url($settings);
 
 	$has_uploads = false;
 	foreach (bl_forms_iter_fields($config['fields']) as $field) {
@@ -50,6 +55,10 @@ function bl_forms_render(int $form_id, array $args = []): string
 		data-bl-form-success="<?= esc_attr($success) ?>"
 		data-bl-form-error="<?= esc_attr($error) ?>"
 		data-bl-form-validation="<?= esc_attr($validation) ?>"
+		data-bl-form-after="<?= esc_attr($after_submit) ?>"
+		<?php if ($redirect_url !== '') : ?>
+		data-bl-form-redirect="<?= esc_url($redirect_url) ?>"
+		<?php endif; ?>
 		data-bl-form-js="<?= esc_attr($js_token) ?>"
 	>
 		<form class="bl-form__form" method="post" action="" novalidate data-bl-form-el id="<?= esc_attr($uid) ?>"<?= $has_uploads ? ' enctype="multipart/form-data"' : '' ?>>

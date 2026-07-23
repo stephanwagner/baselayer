@@ -3,6 +3,7 @@ import './utils/charts';
 import './utils/checkbox-toggle';
 import './utils/copy-from-source';
 import './utils/image-picker';
+import './utils/page-picker';
 import './utils/tabs';
 
 // Media

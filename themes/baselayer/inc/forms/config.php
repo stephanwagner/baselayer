@@ -139,6 +139,8 @@ function bl_forms_default_settings(): array
 		'success_message'        => '',
 		'error_message'          => '',
 		'validation_message'     => '',
+		'after_submit'           => 'message',
+		'redirect_page_id'       => 0,
 		'notify_user'            => false,
 		'user_email_field'       => '',
 		'admin_email_subject'    => '',
@@ -151,6 +153,25 @@ function bl_forms_default_settings(): array
 		'rate_limit_max'         => 3,
 		'rate_limit_window'      => 5,
 	];
+}
+
+/**
+ * Resolve after-submit redirect URL from settings (empty when not redirecting).
+ *
+ * @param array<string, mixed> $settings
+ */
+function bl_forms_after_submit_redirect_url(array $settings): string
+{
+	if (sanitize_key((string) ($settings['after_submit'] ?? 'message')) !== 'redirect') {
+		return '';
+	}
+
+	$page_id = (int) ($settings['redirect_page_id'] ?? 0);
+	if ($page_id <= 0) {
+		return '';
+	}
+
+	return bl_forms_permalink_for_post(get_post($page_id));
 }
 
 /**
@@ -700,6 +721,7 @@ function bl_forms_sanitize_config($config): array
 		'min_fill_time'      => [1, 300],
 		'rate_limit_max'     => [1, 100],
 		'rate_limit_window'  => [1, 1440],
+		'redirect_page_id'   => [0, PHP_INT_MAX],
 	];
 
 	foreach ($settings as $key => $default) {
@@ -713,6 +735,11 @@ function bl_forms_sanitize_config($config): array
 		if (isset($int_keys[$key])) {
 			[$min, $max] = $int_keys[$key];
 			$settings[$key] = max($min, min($max, (int) $settings_in[$key]));
+			continue;
+		}
+		if ($key === 'after_submit') {
+			$mode = sanitize_key((string) $settings_in[$key]);
+			$settings[$key] = in_array($mode, ['message', 'redirect'], true) ? $mode : 'message';
 			continue;
 		}
 		if ($key === 'user_email_field' || $key === 'honeypot_name') {

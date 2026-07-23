@@ -1,5 +1,6 @@
 @use 'variables';
 @use '../config' as *;
+@use '../admin/page-picker';
 
 // Form edit screen: static side boxes (Publish is a WP default postbox).
 .post-type-bl_form {
@@ -962,6 +963,47 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
 .bl-forms-builder__width-custom {
   margin-top: 8px;
   max-width: 280px;
+}
+
+.bl-forms-builder__after-submit {
+  margin: 0 0 14px;
+  max-width: 520px;
+}
+
+.bl-forms-builder__after-submit-modes {
+  margin-top: 4px;
+}
+
+.bl-forms-builder__after-submit-redirect {
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid var(--bl-forms-admin-border);
+  border-radius: var(--bl-forms-admin-radius);
+  background: var(--bl-forms-admin-surface);
+}
+
+.bl-forms-builder__page-picker-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 10px;
+}
+
+.bl-forms-builder__page-picker-value {
+  font-weight: 600;
+  color: #1d2327;
+}
+
+.bl-forms-builder__page-picker-url {
+  margin: 0;
+  word-break: break-all;
+}
+
+.bl-forms-builder__page-picker-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
 }
 
 // Notifications / Settings / Security

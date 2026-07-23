@@ -177,8 +177,32 @@ function bl_forms_admin_enqueue(string $hook): void
 
 	if ($is_form_edit && bl_forms_user_can_manage()) {
 		bl_forms_enqueue_script('bl-forms-admin', 'forms-admin', [], true);
+		$form_id = 0;
+		if (!empty($_GET['post'])) {
+			$form_id = (int) $_GET['post'];
+		} elseif (isset($GLOBALS['post']) && $GLOBALS['post'] instanceof WP_Post) {
+			$form_id = (int) $GLOBALS['post']->ID;
+		}
+		$redirect_page = null;
+		if ($form_id > 0) {
+			$config = bl_forms_get_config($form_id);
+			$redirect_page_id = (int) ($config['settings']['redirect_page_id'] ?? 0);
+			if ($redirect_page_id > 0) {
+				$page = get_post($redirect_page_id);
+				if ($page instanceof WP_Post) {
+					$redirect_page = [
+						'id'    => $redirect_page_id,
+						'title' => get_the_title($page),
+						'url'   => bl_forms_permalink_for_post($page),
+					];
+				}
+			}
+		}
 		wp_localize_script('bl-forms-admin', 'blFormsAdmin', [
 			'icons' => bl_forms_palette_icons(),
+			'pagesRestUrl' => esc_url_raw(rest_url('wp/v2/pages')),
+			'restNonce' => wp_create_nonce('wp_rest'),
+			'redirectPage' => $redirect_page,
 			'i18n' => [
 				'tabFields'         => __('Fields', 'baselayer'),
 				'tabNotifications'  => __('Notifications', 'baselayer'),
@@ -270,6 +294,20 @@ function bl_forms_admin_enqueue(string $hook): void
 				'successMessage'    => __('Success message', 'baselayer'),
 				'errorMessage'      => __('Error message', 'baselayer'),
 				'validationMessage' => __('Validation message', 'baselayer'),
+				'afterSubmit'       => __('After submission', 'baselayer'),
+				'afterSubmitHelp'   => __('Choose what visitors see after a successful submission.', 'baselayer'),
+				'afterSubmitMessage'=> __('Show message', 'baselayer'),
+				'afterSubmitRedirect' => __('Go to page', 'baselayer'),
+				'choosePage'        => __('Choose page', 'baselayer'),
+				'changePage'        => __('Change page', 'baselayer'),
+				'clearPage'         => __('Clear', 'baselayer'),
+				'choosePageHelp'    => __('Select the page visitors should land on.', 'baselayer'),
+				'selectedPage'      => __('Selected page', 'baselayer'),
+				'pagePickerTitle'   => __('Select a page', 'baselayer'),
+				'pagePickerSearch'  => __('Search pages…', 'baselayer'),
+				'pagePickerEmpty'   => __('No pages found.', 'baselayer'),
+				'pagePickerLoading' => __('Loading…', 'baselayer'),
+				'selectPage'        => __('Select', 'baselayer'),
 				'notifyUser'        => __('Send confirmation email to submitter', 'baselayer'),
 				'notifyUserHelp'    => __('Requires an Email field on the form.', 'baselayer'),
 				'sendTo'            => __('Send to', 'baselayer'),

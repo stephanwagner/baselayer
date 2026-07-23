@@ -130,6 +130,7 @@ function bl_forms_ajax_submit(): void
 	wp_send_json_success([
 		'message'  => bl_forms_resolve_message($settings, 'success_message'),
 		'entry_id' => $entry_id,
+		'redirect' => bl_forms_after_submit_redirect_url($settings),
 	]);
 }
 add_action('wp_ajax_bl_forms_submit', 'bl_forms_ajax_submit');

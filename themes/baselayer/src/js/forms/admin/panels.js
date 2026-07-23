@@ -1,4 +1,5 @@
 import { el, t, flattenFields } from './dom.js';
+import { openPagePicker } from '../../admin/utils/page-picker.js';
 
 function fieldRow(label, control, help = '') {
   const children = [
@@ -94,6 +95,10 @@ export function createPanels(settings, builderRoot, onChange) {
   if (state.rate_limit_window === undefined || state.rate_limit_window === '') {
     state.rate_limit_window = 5;
   }
+  if (!state.after_submit || !['message', 'redirect'].includes(state.after_submit)) {
+    state.after_submit = 'message';
+  }
+  state.redirect_page_id = Number(state.redirect_page_id) || 0;
 
   const emit = () => onChange({ ...state });
 
@@ -243,9 +248,169 @@ export function createPanels(settings, builderRoot, onChange) {
     'validation_message'
   );
 
+  const successRow = fieldRow(t('successMessage', 'Success message'), success);
+  const afterOptions = el('div', { className: 'bl-forms-builder__after-submit' });
+  const afterChoices = el('div', {
+    className: 'bl-forms-builder__segmented bl-forms-builder__after-submit-modes',
+    role: 'radiogroup',
+    'aria-label': t('afterSubmit', 'After submission'),
+  });
+
+  const redirectPanel = el('div', {
+    className: 'bl-forms-builder__after-submit-redirect',
+    hidden: state.after_submit !== 'redirect',
+  });
+  const redirectSummary = el('div', { className: 'bl-forms-builder__page-picker-summary' });
+  const redirectPickBtn = el('button', {
+    type: 'button',
+    className: 'button',
+    text: t('choosePage', 'Choose page'),
+  });
+  const redirectClearBtn = el('button', {
+    type: 'button',
+    className: 'button-link',
+    text: t('clearPage', 'Clear'),
+    hidden: !state.redirect_page_id,
+  });
+
+  const syncAfterSubmitUi = () => {
+    const isRedirect = state.after_submit === 'redirect';
+    successRow.hidden = isRedirect;
+    redirectPanel.hidden = !isRedirect;
+    afterChoices.querySelectorAll('[data-after-submit]').forEach((btn) => {
+      const on = btn.dataset.afterSubmit === state.after_submit;
+      btn.classList.toggle('is-active', on);
+      btn.setAttribute('aria-checked', on ? 'true' : 'false');
+    });
+
+    redirectSummary.replaceChildren();
+    if (state.redirect_page_id) {
+      const title =
+        state.redirect_page_title ||
+        t('selectedPage', 'Selected page') + ' #' + state.redirect_page_id;
+      redirectSummary.appendChild(
+        el('span', {
+          className: 'bl-forms-builder__page-picker-value',
+          text: title,
+        })
+      );
+      if (state.redirect_page_url) {
+        redirectSummary.appendChild(
+          el('span', {
+            className: 'description bl-forms-builder__page-picker-url',
+            text: state.redirect_page_url,
+          })
+        );
+      }
+    } else {
+      redirectSummary.appendChild(
+        el('span', {
+          className: 'description',
+          text: t('choosePageHelp', 'Select the page visitors should land on.'),
+        })
+      );
+    }
+    redirectClearBtn.hidden = !state.redirect_page_id;
+    redirectPickBtn.textContent = state.redirect_page_id
+      ? t('changePage', 'Change page')
+      : t('choosePage', 'Choose page');
+  };
+
+  [
+    { id: 'message', label: t('afterSubmitMessage', 'Show message') },
+    { id: 'redirect', label: t('afterSubmitRedirect', 'Go to page') },
+  ].forEach((mode) => {
+    const btn = el('button', {
+      type: 'button',
+      className:
+        'bl-forms-builder__segmented-btn' +
+        (state.after_submit === mode.id ? ' is-active' : ''),
+      role: 'radio',
+      text: mode.label,
+      dataset: { afterSubmit: mode.id },
+      onClick: () => {
+        state.after_submit = mode.id;
+        syncAfterSubmitUi();
+        emit();
+      },
+    });
+    btn.setAttribute(
+      'aria-checked',
+      state.after_submit === mode.id ? 'true' : 'false'
+    );
+    afterChoices.appendChild(btn);
+  });
+
+  redirectPickBtn.addEventListener('click', async () => {
+    const cfg = window.blFormsAdmin || {};
+    const page = await openPagePicker({
+      selectedId: state.redirect_page_id || 0,
+      title: t('pagePickerTitle', 'Select a page'),
+      searchPlaceholder: t('pagePickerSearch', 'Search pages…'),
+      empty: t('pagePickerEmpty', 'No pages found.'),
+      loading: t('pagePickerLoading', 'Loading…'),
+      cancelLabel: t('cancel', 'Cancel'),
+      selectLabel: t('selectPage', 'Select'),
+      restUrl: cfg.pagesRestUrl || '',
+      restNonce: cfg.restNonce || '',
+    });
+    if (!page) {
+      return;
+    }
+    state.redirect_page_id = page.id;
+    state.redirect_page_title = page.title;
+    state.redirect_page_url = page.url;
+    syncAfterSubmitUi();
+    emit();
+  });
+
+  redirectClearBtn.addEventListener('click', () => {
+    state.redirect_page_id = 0;
+    state.redirect_page_title = '';
+    state.redirect_page_url = '';
+    syncAfterSubmitUi();
+    emit();
+  });
+
+  redirectPanel.append(
+    redirectSummary,
+    el('div', { className: 'bl-forms-builder__page-picker-actions' }, [
+      redirectPickBtn,
+      redirectClearBtn,
+    ])
+  );
+
+  afterOptions.append(
+    el('p', { className: 'bl-forms-builder__setting' }, [
+      el('label', {}, [el('strong', { text: t('afterSubmit', 'After submission') })]),
+      afterChoices,
+      el('span', {
+        className: 'description',
+        text: t(
+          'afterSubmitHelp',
+          'Choose what visitors see after a successful submission.'
+        ),
+      }),
+    ]),
+    redirectPanel
+  );
+
+  // Hydrate selected page label from localized bootstrap when editing.
+  const boot = window.blFormsAdmin || {};
+  if (
+    state.redirect_page_id &&
+    boot.redirectPage &&
+    Number(boot.redirectPage.id) === state.redirect_page_id
+  ) {
+    state.redirect_page_title = boot.redirectPage.title || '';
+    state.redirect_page_url = boot.redirectPage.url || '';
+  }
+  syncAfterSubmitUi();
+
   settingsPanel.append(
     fieldRow(t('submitLabel', 'Submit button label'), submitLabel),
-    fieldRow(t('successMessage', 'Success message'), success),
+    afterOptions,
+    successRow,
     fieldRow(t('errorMessage', 'Error message'), error),
     fieldRow(t('validationMessage', 'Validation message'), validation)
   );
@@ -398,7 +563,12 @@ export function createPanels(settings, builderRoot, onChange) {
     notifications,
     settings: settingsPanel,
     security: securityPanel,
-    getSettings: () => ({ ...state }),
+    getSettings: () => {
+      const next = { ...state };
+      delete next.redirect_page_title;
+      delete next.redirect_page_url;
+      return next;
+    },
     syncFields(fields) {
       emailFields = emailFieldsFromList(fields);
       if (notify.checked) {
