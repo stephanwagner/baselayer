@@ -8,6 +8,18 @@ export function formsDragStart() {
   document.body.classList.add('is-dragging');
 }
 
+/** Collapse any open field editors (call from Sortable onChoose, before drag starts). */
+export function collapseOpenFields() {
+  document.querySelectorAll('.bl-forms-builder__field.is-open').forEach((field) => {
+    field.classList.remove('is-open');
+    const toggle = field.querySelector('.bl-forms-builder__field-toggle');
+    if (toggle) {
+      toggle.setAttribute('aria-expanded', 'false');
+      toggle.setAttribute('aria-label', t('expandField', 'Expand field'));
+    }
+  });
+}
+
 export function formsDragEnd() {
   formsDragDepth = Math.max(0, formsDragDepth - 1);
   if (formsDragDepth === 0) {

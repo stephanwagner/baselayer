@@ -1,6 +1,6 @@
 import Sortable from 'sortablejs';
-import { el, t, uid, iconEl, defaultField, uniqueFieldName, formsDragStart, formsDragEnd } from './dom.js';
-import { createFieldCard, serializeRow, createWidthControl } from './field-card.js';
+import { el, t, uid, iconEl, defaultField, uniqueFieldName, formsDragStart, formsDragEnd, collapseOpenFields } from './dom.js';
+import { createFieldCard, serializeRow, openFieldWidthModal } from './field-card.js';
 
 const COLUMN_CHILD_BLOCKED = ['column', 'hidden', 'honeypot', 'captcha'];
 
@@ -29,6 +29,7 @@ function bindFieldListSortable(list, onChange) {
     handle: '.bl-forms-builder__handle',
     animation: 150,
     draggable: '.bl-forms-builder__field, .bl-forms-builder__template',
+    onChoose: collapseOpenFields,
     onStart: formsDragStart,
     onEnd: formsDragEnd,
     onAdd(evt) {
@@ -122,89 +123,6 @@ export function equalizeColumnRun(list, columnEl) {
 }
 
 /**
- * Modal to edit a column's width.
- */
-function openColumnWidthModal(field, onApply) {
-  document.querySelectorAll('.bl-forms-builder__modal').forEach((node) => node.remove());
-
-  const draft = {
-    width: field.width || '100',
-    width_custom: field.width_custom || '',
-  };
-
-  const backdrop = el('div', {
-    className: 'bl-forms-builder__modal',
-    role: 'dialog',
-    'aria-modal': 'true',
-    'aria-label': t('columnWidthTitle', 'Column width'),
-  });
-
-  const close = () => {
-    document.removeEventListener('keydown', onKey);
-    backdrop.remove();
-  };
-
-  const apply = () => {
-    field.width = draft.width;
-    field.width_custom = draft.width === 'custom' ? draft.width_custom : '';
-    onApply(field);
-    close();
-  };
-
-  const onKey = (evt) => {
-    if (evt.key === 'Escape') {
-      close();
-    }
-  };
-  document.addEventListener('keydown', onKey);
-
-  backdrop.addEventListener('click', (evt) => {
-    if (evt.target === backdrop) {
-      close();
-    }
-  });
-
-  const dialog = el('div', { className: 'bl-forms-builder__modal-dialog' });
-  const header = el('div', { className: 'bl-forms-builder__modal-header' }, [
-    el('h2', {
-      className: 'bl-forms-builder__modal-title',
-      text: t('columnWidthTitle', 'Column width'),
-    }),
-  ]);
-
-  const body = el('div', { className: 'bl-forms-builder__modal-body' });
-  body.appendChild(
-    createWidthControl(draft, () => {
-      // draft is mutated by createWidthControl via field reference
-    })
-  );
-
-  const footer = el('div', { className: 'bl-forms-builder__modal-footer' }, [
-    el('button', {
-      type: 'button',
-      className: 'button',
-      text: t('cancel', 'Cancel'),
-      onClick: close,
-    }),
-    el('button', {
-      type: 'button',
-      className: 'button button-primary',
-      text: t('apply', 'Apply'),
-      onClick: apply,
-    }),
-  ]);
-
-  dialog.append(header, body, footer);
-  backdrop.appendChild(dialog);
-  document.body.appendChild(backdrop);
-
-  const firstBtn = body.querySelector('button, input');
-  if (firstBtn) {
-    firstBtn.focus();
-  }
-}
-
-/**
  * Root-level column card with nested fields; width edited via modal.
  */
 export function createColumnCard(initial = {}) {
@@ -273,25 +191,11 @@ export function createColumnCard(initial = {}) {
   const notify = () => document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
 
   const openWidthModal = () => {
-    openColumnWidthModal(field, () => {
+    openFieldWidthModal(field, () => {
       updatePreview();
       notify();
     });
   };
-
-  const editBtn = el('button', {
-    type: 'button',
-    className: 'bl-forms-builder__icon-btn bl-forms-builder__field-edit',
-    title: t('columnWidthTitle', 'Column width'),
-    'aria-label': t('columnWidthTitle', 'Column width'),
-    onClick: openWidthModal,
-  });
-  const editIcon = iconEl('edit');
-  if (editIcon.innerHTML) {
-    editBtn.appendChild(editIcon);
-  } else {
-    editBtn.textContent = '✎';
-  }
 
   const deleteBtn = el('button', {
     type: 'button',
@@ -337,14 +241,13 @@ export function createColumnCard(initial = {}) {
   syncEmpty();
 
   // Clicking the width badge also opens the modal.
-  widthBadge.style.cursor = 'pointer';
+  widthBadge.classList.add('is-interactive');
   widthBadge.title = t('columnWidthTitle', 'Column width');
   widthBadge.addEventListener('click', openWidthModal);
 
   const header = el('div', { className: 'bl-forms-builder__field-header' }, [
     preview,
     el('div', { className: 'bl-forms-builder__field-meta' }, [widthBadge, typeChip]),
-    editBtn,
     deleteBtn,
     handle,
   ]);

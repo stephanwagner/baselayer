@@ -9,7 +9,7 @@ const WIDTH_PRESETS = [
   { value: '33', label: '33%' },
   { value: '25', label: '25%' },
   { value: 'auto', labelKey: 'widthAuto' },
-  { value: 'custom', labelKey: 'widthCustom' },
+  { value: 'custom', labelKey: 'widthCustom', icon: 'edit' },
 ];
 
 const OPTION_TYPES = ['radio', 'checkboxes', 'select', 'button_group'];
@@ -200,16 +200,29 @@ function createSegmentedControl(options, active, datasetKey, onSelect) {
   };
 
   options.forEach((opt) => {
+    const label = opt.label || '';
     const btn = el('button', {
       type: 'button',
-      className: 'bl-forms-builder__segmented-btn',
+      className:
+        'bl-forms-builder__segmented-btn' + (opt.icon ? ' bl-forms-builder__segmented-btn--icon' : ''),
       dataset: { value: opt.value, ...(opt.dataset || {}) },
-      text: opt.label,
+      title: opt.title || label,
+      'aria-label': label,
       onClick: () => {
         sync(opt.value);
         onSelect(opt.value);
       },
     });
+    if (opt.icon) {
+      const icon = iconEl(opt.icon);
+      if (icon.innerHTML) {
+        btn.appendChild(icon);
+      } else {
+        btn.textContent = '✎';
+      }
+    } else {
+      btn.textContent = label;
+    }
     group.appendChild(btn);
   });
 
@@ -217,7 +230,7 @@ function createSegmentedControl(options, active, datasetKey, onSelect) {
   return group;
 }
 
-export function createWidthControl(field, onChange = () => {}) {
+export function createWidthControl(field, onChange = () => {}, { showLabel = true } = {}) {
   const wrap = el('div', { className: 'bl-forms-builder__width' });
   const customInput = el('input', {
     type: 'text',
@@ -232,6 +245,7 @@ export function createWidthControl(field, onChange = () => {}) {
     WIDTH_PRESETS.map((preset) => ({
       value: preset.value,
       label: preset.label || t(preset.labelKey, 'Custom'),
+      icon: preset.icon || '',
       dataset: { blWidth: preset.value },
     })),
     field.width || '100',
@@ -263,8 +277,110 @@ export function createWidthControl(field, onChange = () => {}) {
     onChange();
   });
 
-  wrap.append(el('label', { text: t('width', 'Width') }), group, customInput);
+  if (showLabel) {
+    wrap.appendChild(el('label', { text: t('width', 'Width') }));
+  }
+  wrap.append(group, customInput);
   return wrap;
+}
+
+/**
+ * Modal to edit a field's width (columns and non-full-width fields).
+ */
+export function openFieldWidthModal(field, onApply) {
+  document.querySelectorAll('.bl-forms-builder__modal').forEach((node) => node.remove());
+
+  const draft = {
+    width: field.width || '100',
+    width_custom: field.width_custom || '',
+  };
+
+  const title =
+    field.type === 'column'
+      ? t('columnWidthTitle', 'Column width')
+      : t('width', 'Width');
+
+  const backdrop = el('div', {
+    className: 'bl-forms-builder__modal',
+    role: 'dialog',
+    'aria-modal': 'true',
+    'aria-label': title,
+  });
+
+  const close = () => {
+    document.removeEventListener('keydown', onKey);
+    backdrop.remove();
+  };
+
+  const apply = () => {
+    field.width = draft.width;
+    field.width_custom = draft.width === 'custom' ? draft.width_custom : '';
+    onApply(field);
+    close();
+  };
+
+  const onKey = (evt) => {
+    if (evt.key === 'Escape') {
+      close();
+    }
+  };
+  document.addEventListener('keydown', onKey);
+
+  backdrop.addEventListener('click', (evt) => {
+    if (evt.target === backdrop) {
+      close();
+    }
+  });
+
+  const dialog = el('div', { className: 'bl-forms-builder__modal-dialog' });
+  const header = el('div', { className: 'bl-forms-builder__modal-header' }, [
+    el('h2', {
+      className: 'bl-forms-builder__modal-title',
+      text: title,
+    }),
+  ]);
+
+  const body = el('div', { className: 'bl-forms-builder__modal-body' });
+  body.appendChild(createWidthControl(draft, () => {}, { showLabel: false }));
+
+  const footer = el('div', { className: 'bl-forms-builder__modal-footer' }, [
+    el('button', {
+      type: 'button',
+      className: 'button',
+      text: t('cancel', 'Cancel'),
+      onClick: close,
+    }),
+    el('button', {
+      type: 'button',
+      className: 'button button-primary',
+      text: t('apply', 'Apply'),
+      onClick: apply,
+    }),
+  ]);
+
+  dialog.append(header, body, footer);
+  backdrop.appendChild(dialog);
+  document.body.appendChild(backdrop);
+}
+
+function syncWidthControlUi(scope, field) {
+  const group = scope?.querySelector('[data-bl-width-group]');
+  if (!group) {
+    return;
+  }
+  const width = field.width || '100';
+  group.querySelectorAll('[data-bl-width]').forEach((btn) => {
+    const on = btn.dataset.blWidth === width;
+    btn.classList.toggle('is-active', on);
+    btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+  });
+  const custom = scope.querySelector('[data-bl-width-custom]');
+  if (custom) {
+    custom.hidden = width !== 'custom';
+    if (width === 'custom') {
+      custom.value = field.width_custom || '';
+    }
+  }
 }
 
 function createLayoutControl(field) {
@@ -629,6 +745,12 @@ export function createFieldCard(initial, open = false) {
     const widthText = field.type === 'hidden' ? '' : widthBadgeLabel(field);
     widthBadge.textContent = widthText;
     widthBadge.hidden = widthText === '';
+    widthBadge.classList.toggle('is-interactive', widthText !== '');
+    if (widthText !== '') {
+      widthBadge.title = t('width', 'Width');
+    } else {
+      widthBadge.removeAttribute('title');
+    }
 
     typeChip.replaceChildren(
       iconEl(field.type, 'bl-forms-builder__field-type-icon'),
@@ -638,23 +760,6 @@ export function createFieldCard(initial, open = false) {
     row.dataset.fieldWidth = field.width || '100';
     row.dataset.fieldName = field.name || '';
     row.dataset.nameManual = field.name_manual ? '1' : '0';
-  };
-
-  const syncEditButton = (btn, isOpen) => {
-    if (!btn) {
-      return;
-    }
-    btn.replaceChildren();
-    const icon = iconEl(isOpen ? 'done' : 'edit');
-    if (icon.innerHTML) {
-      btn.appendChild(icon);
-    } else {
-      btn.textContent = isOpen ? '✓' : '✎';
-    }
-    const label = isOpen ? t('doneEditing', 'Done editing') : t('editField', 'Edit field');
-    btn.title = label;
-    btn.setAttribute('aria-label', label);
-    btn.classList.toggle('is-editing', isOpen);
   };
 
   const setOpen = (nextOpen) => {
@@ -669,7 +774,6 @@ export function createFieldCard(initial, open = false) {
           otherToggle.setAttribute('aria-expanded', 'false');
           otherToggle.setAttribute('aria-label', t('expandField', 'Expand field'));
         }
-        syncEditButton(other.querySelector('.bl-forms-builder__field-edit'), false);
       });
     }
 
@@ -679,7 +783,6 @@ export function createFieldCard(initial, open = false) {
       'aria-label',
       nextOpen ? t('collapseField', 'Collapse field') : t('expandField', 'Expand field')
     );
-    syncEditButton(editBtn, nextOpen);
   };
 
   const toggle = el('button', {
@@ -695,15 +798,6 @@ export function createFieldCard(initial, open = false) {
   } else {
     toggle.textContent = '▾';
   }
-
-  const editBtn = el('button', {
-    type: 'button',
-    className: 'bl-forms-builder__icon-btn bl-forms-builder__field-edit',
-    title: t('editField', 'Edit field'),
-    'aria-label': t('editField', 'Edit field'),
-    onClick: () => setOpen(!row.classList.contains('is-open')),
-  });
-  syncEditButton(editBtn, !!open);
 
   const deleteBtn = el('button', {
     type: 'button',
@@ -1028,11 +1122,23 @@ export function createFieldCard(initial, open = false) {
     typeChip,
   ]);
 
+  widthBadge.addEventListener('click', (evt) => {
+    if (widthBadge.hidden || field.type === 'hidden') {
+      return;
+    }
+    evt.preventDefault();
+    evt.stopPropagation();
+    openFieldWidthModal(field, () => {
+      updatePreview();
+      syncWidthControlUi(body, field);
+      document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+    });
+  });
+
   const header = el('div', { className: 'bl-forms-builder__field-header' }, [
     toggle,
     preview,
     headerMeta,
-    editBtn,
     deleteBtn,
     handle,
   ]);

@@ -1,4 +1,5 @@
 @use 'variables';
+@use '../config' as *;
 
 // Form edit screen: static side boxes (Publish is a WP default postbox).
 .post-type-bl_form {
@@ -14,17 +15,26 @@
   .postbox .handle-order-lower {
     display: none;
   }
+
+  // Forms are not publicly viewable — hide Visibility: Public.
+  #submitdiv .misc-pub-visibility {
+    display: none;
+  }
 }
 
-// Admin builder tokens (override in child theme if needed)
-.bl-forms-builder {
+// Admin builder tokens (override in child theme if needed).
+// Also on __modal — it mounts on document.body, outside .bl-forms-builder.
+.bl-forms-builder,
+.bl-forms-builder__modal {
   --bl-forms-admin-border: #c3c4c7;
   --bl-forms-admin-muted: #646970;
   --bl-forms-admin-surface: #f6f7f7;
   --bl-forms-admin-accent: #2271b1;
   --bl-forms-admin-radius: 4px;
   --bl-forms-admin-palette-width: 220px;
+}
 
+.bl-forms-builder {
   margin: 12px 0 0;
   border: 1px solid #c3c4c7;
   border-radius: 6px;
@@ -410,6 +420,17 @@ p.bl-forms-builder__palette-empty {
   }
 }
 
+.bl-forms-builder__field.is-open .bl-forms-builder__field-toggle {
+  background: color-mix(in srgb, var(--bl-forms-admin-muted) 22%, #fff);
+  color: #1d2327;
+
+  &:hover,
+  &:focus-visible {
+    background: color-mix(in srgb, var(--bl-forms-admin-accent) 20%, #fff);
+    color: var(--bl-forms-admin-accent);
+  }
+}
+
 .bl-forms-builder__field.is-open .bl-forms-builder__field-toggle-icon {
   transform: scaleY(-1);
 }
@@ -477,9 +498,25 @@ p.bl-forms-builder__palette-empty {
   letter-spacing: 0.02em;
   line-height: 1.2;
   white-space: nowrap;
+  transition:
+    border-color 0.12s ease,
+    background 0.12s ease,
+    color 0.12s ease;
 
   &[hidden] {
     display: none !important;
+  }
+
+  &.is-interactive {
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      border-color: color-mix(in srgb, var(--bl-forms-admin-accent) 45%, var(--bl-forms-admin-border));
+      background: color-mix(in srgb, var(--bl-forms-admin-accent) 10%, #fff);
+      color: var(--bl-forms-admin-accent);
+      outline: none;
+    }
   }
 }
 
@@ -492,15 +529,6 @@ p.bl-forms-builder__palette-empty {
   font-size: 13px;
   font-weight: 500;
   color: #1d2327;
-}
-
-.bl-forms-builder__field-edit {
-  margin-left: 0;
-
-  &.is-editing {
-    background: color-mix(in srgb, var(--bl-forms-admin-accent) 14%, #fff);
-    color: var(--bl-forms-admin-accent);
-  }
 }
 
 .bl-forms-builder__handle {
@@ -557,10 +585,10 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
   margin: 0;
   border-color: color-mix(in srgb, var(--bl-forms-admin-accent) 35%, var(--bl-forms-admin-border));
   background: color-mix(in srgb, var(--bl-forms-admin-accent) 6%, #fff);
-}
 
-.bl-forms-builder__column-card > .bl-forms-builder__field-header {
-  background: color-mix(in srgb, var(--bl-forms-admin-accent) 10%, #fff);
+  > .bl-forms-builder__field-header {
+    background: transparent;
+  }
 }
 
 .bl-forms-builder__field-type--column {
@@ -577,6 +605,13 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
 .bl-forms-builder__column-card .bl-forms-builder__width-badge {
   border-color: color-mix(in srgb, var(--bl-forms-admin-accent) 35%, var(--bl-forms-admin-border));
   color: var(--bl-forms-admin-accent);
+
+  &.is-interactive:hover,
+  &.is-interactive:focus-visible {
+    border-color: color-mix(in srgb, var(--bl-forms-admin-accent) 55%, var(--bl-forms-admin-border));
+    background: color-mix(in srgb, var(--bl-forms-admin-accent) 14%, #fff);
+    color: var(--bl-forms-admin-accent);
+  }
 }
 
 .bl-forms-builder__column-fields-wrap {
@@ -595,9 +630,12 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
 }
 
 .bl-forms-builder__column-empty {
-  margin: 8px 0 0;
   text-align: center;
   color: var(--bl-forms-admin-muted);
+
+  &.description {
+    margin: 6px 0 0;
+  }
 
   &[hidden] {
     display: none !important;
@@ -641,7 +679,11 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
 }
 
 .bl-forms-builder__modal-body {
-  padding: 16px;
+  padding: 20px 16px;
+
+  > .bl-forms-builder__width {
+    margin: 0;
+  }
 }
 
 .bl-forms-builder__modal-footer {
@@ -792,12 +834,11 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
 .bl-forms-builder__segmented {
   display: flex;
   width: 100%;
-  padding: 3px;
-  gap: 2px;
-  border: 1px solid var(--bl-forms-admin-border);
-  border-radius: 8px;
-  background: var(--bl-forms-admin-surface);
+  border: 1px solid var(--bl-forms-admin-border, #c3c4c7);
+  border-radius: var(--bl-forms-admin-radius, 4px);
+  background: #fff;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .bl-forms-builder__segmented-btn {
@@ -806,33 +847,88 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
   min-width: 0;
   margin: 0;
   border: 0;
-  border-radius: 6px;
+  border-right: 1px solid var(--bl-forms-admin-border, #c3c4c7);
+  border-radius: 0;
   background: transparent;
-  padding: 7px 6px;
+  box-shadow: none;
+  height: auto;
+  min-height: 0;
+  padding: 6px 4px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.3;
-  color: var(--bl-forms-admin-muted);
+  color: var(--bl-forms-admin-muted, #646970);
   cursor: pointer;
-  transition:
-    background 0.12s ease,
-    color 0.12s ease,
-    box-shadow 0.12s ease;
+
+  &:last-child {
+    border-right: 0;
+  }
 
   &:hover {
     color: #1d2327;
-    background: color-mix(in srgb, #fff 70%, transparent);
+    background: var(--bl-forms-admin-surface, #f6f7f7);
   }
 
   &.is-active {
-    background: #fff;
-    color: var(--bl-forms-admin-accent);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+    background: #{$color-gray-200};
+    color: #1d2327;
+    font-weight: 600;
+    box-shadow: none;
   }
 
   &:focus-visible {
-    outline: 2px solid var(--bl-forms-admin-accent);
-    outline-offset: 1px;
+    outline: 2px solid var(--bl-forms-admin-accent, #2271b1);
+    outline-offset: -2px;
+    z-index: 1;
+  }
+
+  &--icon {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    padding: 6px 0;
+
+    .bl-forms-builder__icon,
+    svg {
+      display: block;
+      width: 14px;
+      height: 14px;
+    }
+  }
+}
+
+// Beat WP admin button chrome when the control lives outside the builder (width modal).
+.wp-core-ui .bl-forms-builder__segmented-btn {
+  border-radius: 0;
+  border-style: solid;
+  border-width: 0 1px 0 0;
+  border-color: var(--bl-forms-admin-border, #c3c4c7);
+  background: transparent;
+  box-shadow: none;
+  height: auto;
+  min-height: 0;
+  line-height: 1.3;
+  text-decoration: none;
+  text-shadow: none;
+
+  &:last-child {
+    border-right-width: 0;
+  }
+
+  &:hover,
+  &:focus {
+    background: var(--bl-forms-admin-surface, #f6f7f7);
+    border-color: var(--bl-forms-admin-border, #c3c4c7);
+    color: #1d2327;
+    box-shadow: none;
+  }
+
+  &.is-active {
+    background: #{$color-gray-200};
+    color: #1d2327;
+    box-shadow: none;
   }
 }
 

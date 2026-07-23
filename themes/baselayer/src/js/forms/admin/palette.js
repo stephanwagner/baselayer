@@ -1,5 +1,5 @@
 import Sortable from 'sortablejs';
-import { PALETTE_SECTIONS, el, t, typeLabel, iconEl, formsDragStart, formsDragEnd } from './dom.js';
+import { PALETTE_SECTIONS, el, t, typeLabel, iconEl, formsDragStart, formsDragEnd, collapseOpenFields } from './dom.js';
 
 function paletteIcon(type) {
   const icons = (window.blFormsAdmin && window.blFormsAdmin.icons) || {};
@@ -185,6 +185,9 @@ export function createPalette(onAdd) {
       draggable: '.bl-forms-builder__template',
       filter: '.bl-forms-builder__template-add',
       preventOnFilter: true,
+      onChoose() {
+        collapseOpenFields();
+      },
       onStart() {
         formsDragStart();
       },
