@@ -137,71 +137,6 @@ add_action('wp_ajax_bl_forms_submit', 'bl_forms_ajax_submit');
 add_action('wp_ajax_nopriv_bl_forms_submit', 'bl_forms_ajax_submit');
 
 /**
- * Soft phone number check (digits with common separators / leading +).
- */
-function bl_forms_is_valid_phone(string $value): bool
-{
-	$trimmed = trim($value);
-	if ($trimmed === '') {
-		return false;
-	}
-
-	// Allow +, spaces, dashes, dots, parentheses; require at least 6 digits.
-	if (!preg_match('/^\+?[\d\s.\-()]{6,}$/u', $trimmed)) {
-		return false;
-	}
-
-	$digits = preg_replace('/\D+/', '', $trimmed);
-
-	return is_string($digits) && strlen($digits) >= 6 && strlen($digits) <= 20;
-}
-
-/**
- * HTML date input format: YYYY-MM-DD.
- */
-function bl_forms_is_valid_date(string $value): bool
-{
-	if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
-		return false;
-	}
-	$dt = \DateTimeImmutable::createFromFormat('!Y-m-d', $value);
-
-	return $dt instanceof \DateTimeImmutable && $dt->format('Y-m-d') === $value;
-}
-
-/**
- * HTML time input format: HH:MM or HH:MM:SS.
- */
-function bl_forms_is_valid_time(string $value): bool
-{
-	if (preg_match('/^\d{2}:\d{2}$/', $value)) {
-		$dt = \DateTimeImmutable::createFromFormat('!H:i', $value);
-
-		return $dt instanceof \DateTimeImmutable && $dt->format('H:i') === $value;
-	}
-	if (preg_match('/^\d{2}:\d{2}:\d{2}$/', $value)) {
-		$dt = \DateTimeImmutable::createFromFormat('!H:i:s', $value);
-
-		return $dt instanceof \DateTimeImmutable && $dt->format('H:i:s') === $value;
-	}
-
-	return false;
-}
-
-/**
- * HTML datetime-local format: YYYY-MM-DDTHH:MM.
- */
-function bl_forms_is_valid_datetime(string $value): bool
-{
-	if (!preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/', $value)) {
-		return false;
-	}
-	$dt = \DateTimeImmutable::createFromFormat('!Y-m-d\TH:i', $value);
-
-	return $dt instanceof \DateTimeImmutable && $dt->format('Y-m-d\TH:i') === $value;
-}
-
-/**
  * Whether any builder honeypot field was filled (bot signal).
  *
  * @param list<array<string, mixed>> $fields
@@ -331,6 +266,20 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 		$required = !empty($field['required']);
 		$raw_value = $raw[$name] ?? null;
 		$multiple = !empty($field['multiple']);
+
+		// Disabled controls are not posted — use configured defaults and skip required checks.
+		if (!empty($field['disabled'])) {
+			if (in_array($type, ['file', 'image'], true)) {
+				$values[$name] = [];
+			} elseif ($type === 'checkboxes' || ($type === 'button_group' && $multiple) || ($type === 'select' && $multiple)) {
+				$values[$name] = bl_forms_field_default_values($field);
+			} elseif ($type === 'terms' || $type === 'toggle') {
+				$values[$name] = bl_forms_field_default_checked($field) ? '1' : '';
+			} else {
+				$values[$name] = sanitize_text_field((string) ($field['default_value'] ?? ''));
+			}
+			continue;
+		}
 
 		if ($type === 'hidden') {
 			$value = is_scalar($raw_value) ? sanitize_text_field((string) $raw_value) : '';

@@ -77,12 +77,20 @@ function createCaptchaSettings(field, onChange) {
   field.captcha_secret_key = field.captcha_secret_key || '';
 
   const root = el('div', { className: 'bl-forms-builder__captcha' });
-  const nav = el('div', {
-    className: 'bl-forms-builder__captcha-nav',
-    role: 'tablist',
-    'aria-label': t('captchaService', 'CAPTCHA service'),
+
+  const provider = el('select', {
+    className: 'widefat',
+    dataset: { blCaptchaProvider: '1' },
   });
-  const panel = el('div', { className: 'bl-forms-builder__captcha-panel' });
+  CAPTCHA_PROVIDERS.forEach((meta) => {
+    const opt = document.createElement('option');
+    opt.value = meta.id;
+    opt.textContent = t(meta.labelKey, meta.labelFallback);
+    if (meta.id === field.captcha_provider) {
+      opt.selected = true;
+    }
+    provider.appendChild(opt);
+  });
 
   const help = el('p', { className: 'description' });
   const siteKey = el('input', {
@@ -100,49 +108,19 @@ function createCaptchaSettings(field, onChange) {
     autocomplete: 'new-password',
   });
   const secretLabel = el('strong', { text: '' });
-  const providerInput = el('input', {
-    type: 'hidden',
-    dataset: { blCaptchaProvider: '1' },
-    value: field.captcha_provider,
-  });
 
-  const siteRow = el('p', {}, [
-    el('label', {}, [el('strong', { text: t('captchaSiteKey', 'Site key') })]),
-    siteKey,
-  ]);
-  const secretRow = el('p', {}, [el('label', {}, [secretLabel]), secretKey]);
-
-  panel.append(help, siteRow, secretRow, providerInput);
-
-  const renderPanel = () => {
+  const syncLabels = () => {
     const meta = captchaProviderMeta(field.captcha_provider);
     help.textContent = t(meta.helpKey, meta.helpFallback);
     secretLabel.textContent = t(meta.secretKey, meta.secretFallback);
-    providerInput.value = field.captcha_provider;
-    nav.querySelectorAll('.bl-forms-builder__captcha-service').forEach((btn) => {
-      const active = btn.dataset.provider === field.captcha_provider;
-      btn.classList.toggle('is-active', active);
-      btn.setAttribute('aria-selected', active ? 'true' : 'false');
-    });
   };
 
-  CAPTCHA_PROVIDERS.forEach((meta) => {
-    const btn = el('button', {
-      type: 'button',
-      className: 'bl-forms-builder__captcha-service',
-      role: 'tab',
-      text: t(meta.labelKey, meta.labelFallback),
-      dataset: { provider: meta.id },
-      onClick: () => {
-        field.captcha_provider = meta.id;
-        renderPanel();
-        onChange();
-        document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
-      },
-    });
-    nav.appendChild(btn);
+  provider.addEventListener('change', () => {
+    field.captcha_provider = provider.value;
+    syncLabels();
+    onChange();
+    document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
   });
-
   siteKey.addEventListener('input', () => {
     field.captcha_site_key = siteKey.value;
     onChange();
@@ -152,8 +130,16 @@ function createCaptchaSettings(field, onChange) {
     onChange();
   });
 
-  renderPanel();
-  root.append(nav, panel);
+  syncLabels();
+  root.append(
+    el('p', {}, [
+      el('label', {}, [el('strong', { text: t('captchaService', 'CAPTCHA service') })]),
+      provider,
+    ]),
+    help,
+    el('p', {}, [el('label', {}, [el('strong', { text: t('captchaSiteKey', 'Site key') })]), siteKey]),
+    el('p', {}, [el('label', {}, [secretLabel]), secretKey])
+  );
   return root;
 }
 
@@ -320,6 +306,18 @@ const NO_PLACEHOLDER = [
   'captcha',
 ];
 const NO_REQUIRED = ['hidden', 'honeypot', 'captcha', 'divider', 'spacer', 'heading', 'text_block', 'html'];
+const NO_READONLY = [
+  ...NO_REQUIRED,
+  'radio',
+  'checkboxes',
+  'select',
+  'button_group',
+  'toggle',
+  'terms',
+  'file',
+  'image',
+];
+const NO_DISABLED = [...NO_REQUIRED];
 const NO_DEFAULT = [
   'file',
   'image',
@@ -717,6 +715,10 @@ function widthBadgeLabel(field) {
   return `${width}%`;
 }
 
+function settingHeading(text) {
+  return el('p', { className: 'bl-forms-builder__setting-heading', text });
+}
+
 function createCheckboxSetting(key, label, checked, onChange) {
   const input = el('input', {
     type: 'checkbox',
@@ -724,7 +726,25 @@ function createCheckboxSetting(key, label, checked, onChange) {
     checked: !!checked,
   });
   input.addEventListener('change', () => onChange(input.checked));
-  return el('p', {}, [el('label', {}, [input, ' ' + label])]);
+  return el('p', { className: 'bl-forms-builder__check-setting' }, [
+    el('label', {}, [input, ' ' + label]),
+  ]);
+}
+
+function createSwitchSetting(key, label, checked, onChange) {
+  const input = el('input', {
+    type: 'checkbox',
+    dataset: { [key]: '1' },
+    checked: !!checked,
+  });
+  input.addEventListener('change', () => onChange(input.checked));
+  return el('div', { className: 'bl-forms-builder__switch-setting' }, [
+    el('label', { className: 'bl-forms-builder__switch' }, [
+      input,
+      el('span', { className: 'bl-forms-builder__switch-ui', 'aria-hidden': 'true' }),
+      el('span', { className: 'bl-forms-builder__switch-label', text: label }),
+    ]),
+  ]);
 }
 
 function isDefaultChecked(value) {
@@ -742,13 +762,80 @@ function readDefaultValueFromRow(row) {
   return defEl.value || '';
 }
 
-function appendDefaultValueControl(general, field, updatePreview) {
+function defaultInputType(type) {
+  switch (type) {
+    case 'number':
+      return 'number';
+    case 'email':
+      return 'email';
+    case 'url':
+      return 'url';
+    case 'phone':
+      return 'tel';
+    case 'date':
+      return 'date';
+    case 'time':
+      return 'time';
+    case 'datetime':
+      return 'datetime-local';
+    default:
+      return 'text';
+  }
+}
+
+function isValidDefaultValue(type, value) {
+  const v = String(value || '').trim();
+  if (v === '') {
+    return true;
+  }
+  if (type === 'number') {
+    return v !== '' && !Number.isNaN(Number(v)) && /^-?\d+(\.\d+)?$/.test(v);
+  }
+  if (type === 'email') {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  }
+  if (type === 'url') {
+    try {
+      const parsed = new URL(v, window.location.origin);
+      return parsed.protocol === 'http:' || parsed.protocol === 'https:';
+    } catch (err) {
+      return false;
+    }
+  }
+  if (type === 'phone') {
+    if (!/^\+?[\d\s.\-()]{6,}$/.test(v)) {
+      return false;
+    }
+    const digits = v.replace(/\D+/g, '');
+    return digits.length >= 6 && digits.length <= 20;
+  }
+  if (type === 'date') {
+    return /^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(Date.parse(v));
+  }
+  if (type === 'time') {
+    return /^\d{2}:\d{2}(:\d{2})?$/.test(v);
+  }
+  if (type === 'datetime') {
+    return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(v);
+  }
+  return true;
+}
+
+function normalizeDefaultValue(type, value) {
+  const v = String(value || '').trim();
+  if (v === '' || isValidDefaultValue(type, v)) {
+    return v;
+  }
+  return '';
+}
+
+function createDefaultValueControl(field, updatePreview) {
   if (NO_DEFAULT.includes(field.type) || field.type === 'hidden') {
-    return false;
+    return null;
   }
 
   if (CHECKED_DEFAULT_TYPES.includes(field.type)) {
-    general.appendChild(
+    return [
       createCheckboxSetting(
         'blDefault',
         t('defaultChecked', 'Checked by default'),
@@ -757,10 +844,11 @@ function appendDefaultValueControl(general, field, updatePreview) {
           field.default_value = checked ? '1' : '';
           document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
         }
-      )
-    );
-    return true;
+      ),
+    ];
   }
+
+  field.default_value = normalizeDefaultValue(field.type, field.default_value || '');
 
   const def =
     field.type === 'textarea'
@@ -770,7 +858,7 @@ function appendDefaultValueControl(general, field, updatePreview) {
           dataset: { blDefault: '1' },
         })
       : el('input', {
-          type: 'text',
+          type: defaultInputType(field.type),
           className: 'widefat',
           dataset: { blDefault: '1' },
           value: field.default_value || '',
@@ -778,16 +866,37 @@ function appendDefaultValueControl(general, field, updatePreview) {
   if (field.type === 'textarea') {
     def.value = field.default_value || '';
   }
+  if (field.type === 'number') {
+    def.setAttribute('step', 'any');
+    def.setAttribute('inputmode', 'decimal');
+  }
+
+  const commit = () => {
+    const next = normalizeDefaultValue(field.type, def.value);
+    if (next !== def.value) {
+      def.value = next;
+    }
+    field.default_value = next;
+    updatePreview();
+    document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+  };
+
   def.addEventListener('input', () => {
+    if (['text', 'textarea', 'phone'].includes(field.type) || OPTION_TYPES.includes(field.type)) {
+      field.default_value = def.value;
+      updatePreview();
+      return;
+    }
     field.default_value = def.value;
     updatePreview();
   });
-  general.appendChild(
-    el('p', {}, [el('label', { text: t('defaultValue', 'Default value') }), def])
-  );
+  def.addEventListener('change', commit);
+  def.addEventListener('blur', commit);
+
+  const nodes = [el('p', {}, [el('label', { text: t('defaultValue', 'Default value') }), def])];
 
   if (OPTION_TYPES.includes(field.type)) {
-    general.appendChild(
+    nodes.push(
       el('p', {
         className: 'description',
         text: t(
@@ -798,7 +907,7 @@ function appendDefaultValueControl(general, field, updatePreview) {
     );
   }
 
-  return true;
+  return nodes;
 }
 
 function appearancePayload(scope, width, widthCustom) {
@@ -850,6 +959,13 @@ function createFieldEditorTabs(activeId = 'general') {
 
   const activate = (id) => {
     tabs.forEach((tab) => {
+      if (tab.button.hidden) {
+        tab.panel.hidden = true;
+        tab.panel.classList.remove('is-active');
+        tab.button.classList.remove('is-active');
+        tab.button.setAttribute('aria-selected', 'false');
+        return;
+      }
       const active = tab.id === id;
       tab.button.classList.toggle('is-active', active);
       tab.button.setAttribute('aria-selected', active ? 'true' : 'false');
@@ -864,16 +980,54 @@ function createFieldEditorTabs(activeId = 'general') {
     general: tabs[0].panel,
     advanced: tabs[1].panel,
     appearance: tabs[2].panel,
+    /**
+     * Hide tabs whose panels have no sections, and activate a visible tab if needed.
+     */
+    syncVisibility(preferredId = initialId) {
+      tabs.forEach((tab) => {
+        const empty = tab.panel.childElementCount === 0;
+        tab.button.hidden = empty;
+        if (empty) {
+          tab.panel.hidden = true;
+          tab.panel.classList.remove('is-active');
+          tab.button.classList.remove('is-active');
+          tab.button.setAttribute('aria-selected', 'false');
+        }
+      });
+
+      const visible = tabs.filter((tab) => !tab.button.hidden);
+      tabBar.hidden = visible.length <= 1;
+
+      if (visible.length === 0) {
+        return;
+      }
+
+      const preferred = visible.find((tab) => tab.id === preferredId) || visible[0];
+      activate(preferred.id);
+    },
   };
 }
 
-function appendEmptyHint(panel, text) {
-  panel.appendChild(
-    el('p', {
-      className: 'description bl-forms-builder__field-panel-empty',
-      text,
-    })
-  );
+/**
+ * Append logical sections to a field tab panel, separated by gray hrs.
+ *
+ * @param {HTMLElement} panel
+ */
+function createSectionAppender(panel) {
+  let count = 0;
+  return {
+    get count() {
+      return count;
+    },
+    add(...nodes) {
+      const list = nodes.flat().filter(Boolean);
+      if (!list.length) {
+        return;
+      }
+      panel.appendChild(el('div', { className: 'bl-forms-builder__field-section' }, list));
+      count += 1;
+    },
+  };
 }
 
 export function serializeRow(row) {
@@ -958,6 +1112,8 @@ export function serializeRow(row) {
     name_manual: nameManual,
     hide_label: hideLabel,
     required: Boolean(q('[data-bl-required]')?.checked),
+    readonly: Boolean(q('[data-bl-readonly]')?.checked),
+    disabled: Boolean(q('[data-bl-disabled]')?.checked),
     placeholder: q('[data-bl-placeholder]')?.value || '',
     ...appearancePayload(body, width, widthCustom),
   };
@@ -980,6 +1136,15 @@ export function serializeRow(row) {
   }
   if (MULTIPLE_TYPES.includes(type)) {
     data.multiple = Boolean(q('[data-bl-multiple]')?.checked);
+  }
+  if (NO_READONLY.includes(type)) {
+    delete data.readonly;
+  }
+  if (NO_DISABLED.includes(type)) {
+    delete data.disabled;
+  }
+  if (NO_REQUIRED.includes(type)) {
+    delete data.required;
   }
   if (!NO_DEFAULT.includes(type)) {
     const defEl = q('[data-bl-default]');
@@ -1124,8 +1289,9 @@ export function createFieldCard(initial, open = false) {
     body.replaceChildren();
     const tabs = createFieldEditorTabs(activeTab);
     const { general, advanced, appearance } = tabs;
-    let generalCount = 0;
-    let advancedCount = 0;
+    const generalSections = createSectionAppender(general);
+    const advancedSections = createSectionAppender(advanced);
+    const appearanceSections = createSectionAppender(appearance);
 
     const onTypeConvert = () => {
       updatePreview();
@@ -1138,20 +1304,18 @@ export function createFieldCard(initial, open = false) {
     const typeSelect = createTypeSelect(field, row, onTypeConvert);
     const contentTypes = ['heading', 'text_block', 'html'];
     if (typeSelect && contentTypes.includes(field.type)) {
-      general.appendChild(typeSelect);
-      generalCount += 1;
+      generalSections.add(typeSelect);
     } else if (typeSelect) {
-      advanced.appendChild(typeSelect);
-      advancedCount += 1;
+      advancedSections.add(typeSelect);
     }
 
     if (field.type !== 'hidden') {
-      appearance.appendChild(createWidthControl(field, updatePreview));
+      appearanceSections.add(createWidthControl(field, updatePreview));
     }
     if (field.type === 'radio' || field.type === 'checkboxes') {
-      appearance.appendChild(createLayoutControl(field));
+      appearanceSections.add(createLayoutControl(field));
     }
-    appearance.appendChild(createCssClassControl(field));
+    appearanceSections.add(createCssClassControl(field));
 
     if (field.type === 'spacer') {
       const heightInput = el('input', {
@@ -1164,20 +1328,19 @@ export function createFieldCard(initial, open = false) {
       heightInput.addEventListener('input', () => {
         field.height = heightInput.value;
       });
-      appearance.appendChild(
+      appearanceSections.add(
         el('p', {}, [el('label', { text: t('spacerHeight', 'Height') }), heightInput])
       );
     }
 
     if (field.type === 'divider') {
-      // no general settings
+      // Appearance only.
     } else if (field.type === 'captcha') {
-      general.appendChild(
+      generalSections.add(
         createCaptchaSettings(field, () => {
           updatePreview();
         })
       );
-      generalCount += 1;
     } else if (['heading', 'text_block', 'html'].includes(field.type)) {
       const ta = el('textarea', {
         className: 'widefat',
@@ -1191,8 +1354,7 @@ export function createFieldCard(initial, open = false) {
       });
       const contentLabel =
         field.type === 'html' ? t('htmlContent', 'HTML') : t('content', 'Content');
-      general.appendChild(el('p', {}, [el('label', { text: contentLabel }), ta]));
-      generalCount += 1;
+      generalSections.add(el('p', {}, [el('label', { text: contentLabel }), ta]));
     } else {
       const labelInput = el('input', {
         type: 'text',
@@ -1238,29 +1400,24 @@ export function createFieldCard(initial, open = false) {
         ])
       );
       if (HIDE_LABEL_TYPES.includes(field.type)) {
-        const hide = el('input', {
-          type: 'checkbox',
-          dataset: { blHideLabel: '1' },
-          checked: !!field.hide_label,
-        });
-        hide.addEventListener('change', () => {
-          field.hide_label = hide.checked;
-          document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
-        });
         labelRow.appendChild(
-          el('p', { className: 'bl-forms-builder__hide-label' }, [
-            el('label', {}, [hide, ' ' + t('hideLabel', 'Hide label')]),
-          ])
+          el(
+            'div',
+            { className: 'bl-forms-builder__hide-label' },
+            [
+              createSwitchSetting('blHideLabel', t('hideLabel', 'Hide label'), !!field.hide_label, (checked) => {
+                field.hide_label = checked;
+                document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+              }),
+            ]
+          )
         );
       }
-      general.appendChild(labelRow);
-      generalCount += 1;
+      generalSections.add(labelRow);
 
       if (nameInput) {
-        advanced.appendChild(
-          el('p', {}, [el('label', { text: t('name', 'Field name') }), nameInput])
-        );
-        advanced.appendChild(
+        advancedSections.add(
+          el('p', {}, [el('label', { text: t('name', 'Field name') }), nameInput]),
           el('p', {
             className: 'description',
             text: t(
@@ -1269,7 +1426,6 @@ export function createFieldCard(initial, open = false) {
             ),
           })
         );
-        advancedCount += 1;
       }
 
       if (field.type === 'terms') {
@@ -1283,10 +1439,8 @@ export function createFieldCard(initial, open = false) {
           field.content = consentText.value;
           updatePreview();
         });
-        general.appendChild(
-          el('p', {}, [el('label', { text: t('checkboxText', 'Checkbox text') }), consentText])
-        );
-        general.appendChild(
+        generalSections.add(
+          el('p', {}, [el('label', { text: t('checkboxText', 'Checkbox text') }), consentText]),
           el('p', {
             className: 'description',
             text: t(
@@ -1295,13 +1449,6 @@ export function createFieldCard(initial, open = false) {
             ),
           })
         );
-        generalCount += 1;
-      }
-
-      if (CHECKED_DEFAULT_TYPES.includes(field.type)) {
-        if (appendDefaultValueControl(general, field, updatePreview)) {
-          generalCount += 1;
-        }
       }
 
       if (field.type === 'hidden') {
@@ -1315,14 +1462,13 @@ export function createFieldCard(initial, open = false) {
           field.default_value = def.value;
           document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
         });
-        general.appendChild(
+        generalSections.add(
           el('p', {}, [el('label', { text: t('defaultValue', 'Default value') }), def])
         );
-        generalCount += 1;
       }
 
       if (field.type === 'honeypot') {
-        general.appendChild(
+        generalSections.add(
           el('p', {
             className: 'description',
             text: t(
@@ -1331,7 +1477,6 @@ export function createFieldCard(initial, open = false) {
             ),
           })
         );
-        generalCount += 1;
       }
 
       if (!NO_PLACEHOLDER.includes(field.type)) {
@@ -1345,10 +1490,9 @@ export function createFieldCard(initial, open = false) {
           field.placeholder = ph.value;
           updatePreview();
         });
-        general.appendChild(
+        generalSections.add(
           el('p', {}, [el('label', { text: t('placeholder', 'Placeholder') }), ph])
         );
-        generalCount += 1;
       }
 
       if (DESCRIPTION_TYPES.includes(field.type)) {
@@ -1361,12 +1505,38 @@ export function createFieldCard(initial, open = false) {
         desc.addEventListener('input', () => {
           field.description = desc.value;
         });
-        general.appendChild(
+        generalSections.add(
           el('p', {}, [el('label', { text: t('description', 'Description') }), desc])
         );
-        generalCount += 1;
       }
 
+      if (OPTION_TYPES.includes(field.type)) {
+        generalSections.add(
+          settingHeading(t('choices', 'Choices')),
+          createOptionsEditor(field.options || [])
+        );
+      }
+
+      if (field.type !== 'hidden') {
+        const defaults = createDefaultValueControl(field, updatePreview);
+        if (defaults) {
+          if (CHECKED_DEFAULT_TYPES.includes(field.type)) {
+            generalSections.add(settingHeading(t('defaultValue', 'Default value')), ...defaults);
+          } else {
+            generalSections.add(...defaults);
+          }
+        }
+      }
+
+      const optionToggles = [];
+      if (!NO_REQUIRED.includes(field.type)) {
+        optionToggles.push(
+          createSwitchSetting('blRequired', t('required', 'Required'), !!field.required, (checked) => {
+            field.required = checked;
+            document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+          })
+        );
+      }
       if (MULTIPLE_TYPES.includes(field.type)) {
         let multipleLabel = t('allowMultiple', 'Allow multiple');
         if (field.type === 'button_group') {
@@ -1374,45 +1544,38 @@ export function createFieldCard(initial, open = false) {
         } else if (field.type === 'select') {
           multipleLabel = t('selectMultiple', 'Allow multiple selection');
         }
-        general.appendChild(
-          createCheckboxSetting('blMultiple', multipleLabel, !!field.multiple, (checked) => {
+        optionToggles.push(
+          createSwitchSetting('blMultiple', multipleLabel, !!field.multiple, (checked) => {
             field.multiple = checked;
             document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
           })
         );
-        generalCount += 1;
       }
-
-      if (OPTION_TYPES.includes(field.type)) {
-        general.appendChild(el('p', { text: t('options', 'Options') }));
-        general.appendChild(createOptionsEditor(field.options || []));
-        generalCount += 1;
-      }
-
-      if (!CHECKED_DEFAULT_TYPES.includes(field.type) && appendDefaultValueControl(general, field, updatePreview)) {
-        generalCount += 1;
-      }
-
-      if (!NO_REQUIRED.includes(field.type)) {
-        const req = el('input', {
-          type: 'checkbox',
-          dataset: { blRequired: '1' },
-          checked: !!field.required,
-        });
-        general.appendChild(
-          el('p', {}, [el('label', {}, [req, ' ' + t('required', 'Required')])])
+      if (!NO_READONLY.includes(field.type)) {
+        optionToggles.push(
+          createSwitchSetting('blReadonly', t('readOnly', 'Read only'), !!field.readonly, (checked) => {
+            field.readonly = checked;
+            document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+          })
         );
-        generalCount += 1;
+      }
+      if (!NO_DISABLED.includes(field.type)) {
+        optionToggles.push(
+          createSwitchSetting('blDisabled', t('disabled', 'Disabled'), !!field.disabled, (checked) => {
+            field.disabled = checked;
+            document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+          })
+        );
+      }
+      if (optionToggles.length) {
+        generalSections.add(
+          settingHeading(t('options', 'Options')),
+          el('div', { className: 'bl-forms-builder__options-toggles' }, optionToggles)
+        );
       }
     }
 
-    if (generalCount === 0) {
-      appendEmptyHint(general, t('fieldTabGeneralEmpty', 'No general settings for this field.'));
-    }
-    if (advancedCount === 0) {
-      appendEmptyHint(advanced, t('fieldTabAdvancedEmpty', 'No advanced settings for this field.'));
-    }
-
+    tabs.syncVisibility(activeTab);
     body.appendChild(tabs.wrap);
   };
 

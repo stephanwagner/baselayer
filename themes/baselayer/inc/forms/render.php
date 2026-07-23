@@ -131,6 +131,30 @@ function bl_forms_field_wrap_attrs(array $field, string $extra_class = '', strin
 }
 
 /**
+ * Control attributes: required, readonly, disabled.
+ *
+ * Disabled fields omit required (invalid HTML combination).
+ *
+ * @param array<string, mixed> $field
+ */
+function bl_forms_field_control_attrs(array $field, bool $allow_readonly = true): string
+{
+	$disabled = !empty($field['disabled']);
+	$attrs = '';
+	if (!$disabled && !empty($field['required'])) {
+		$attrs .= ' required';
+	}
+	if ($allow_readonly && !$disabled && !empty($field['readonly'])) {
+		$attrs .= ' readonly';
+	}
+	if ($disabled) {
+		$attrs .= ' disabled';
+	}
+
+	return $attrs;
+}
+
+/**
  * Options layout for radio / checkboxes.
  *
  * @param array<string, mixed> $field
@@ -423,11 +447,13 @@ function bl_forms_render_field(array $field, string $uid): string
 
 	$name = (string) ($field['name'] ?? $id);
 	$label = (string) ($field['label'] ?? '');
-	$required = !empty($field['required']);
+	$required = !empty($field['required']) && empty($field['disabled']);
 	$placeholder = (string) ($field['placeholder'] ?? '');
 	$multiple = !empty($field['multiple']);
 	$default_value = (string) ($field['default_value'] ?? '');
-	$req_attr = $required ? ' required' : '';
+	$control_attrs = bl_forms_field_control_attrs($field);
+	$choice_attrs = bl_forms_field_control_attrs($field, false);
+	$disabled_attr = !empty($field['disabled']) ? ' disabled' : '';
 	$req_mark = $required ? ' <span class="bl-form__required" aria-hidden="true">*</span>' : '';
 	$field_name = 'fields[' . $name . ']';
 	$options = isset($field['options']) && is_array($field['options']) ? $field['options'] : [];
@@ -439,7 +465,7 @@ function bl_forms_render_field(array $field, string $uid): string
 		<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--textarea', $name) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<?= bl_forms_field_label_html($field, $input_id, $req_mark) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-			<textarea class="bl-form__control" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" rows="5" placeholder="<?= esc_attr($placeholder) ?>"<?= $req_attr ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?= esc_textarea($default_value) ?></textarea>
+			<textarea class="bl-form__control" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" rows="5" placeholder="<?= esc_attr($placeholder) ?>"<?= $control_attrs ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?= esc_textarea($default_value) ?></textarea>
 		</div>
 		<?php
 		return (string) ob_get_clean();
@@ -451,7 +477,7 @@ function bl_forms_render_field(array $field, string $uid): string
 		<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--select', $name) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<?= bl_forms_field_label_html($field, $input_id, $req_mark) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-			<select class="bl-form__control" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($select_name) ?>"<?= $multiple ? ' multiple' : '' ?><?= $req_attr ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+			<select class="bl-form__control" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($select_name) ?>"<?= $multiple ? ' multiple' : '' ?><?= $choice_attrs ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 				<?php if (!$multiple) : ?>
 					<option value=""><?= esc_html($placeholder !== '' ? $placeholder : __('Please select…', 'baselayer')) ?></option>
 				<?php endif; ?>
@@ -480,7 +506,7 @@ function bl_forms_render_field(array $field, string $uid): string
 					$checked = bl_forms_field_default_is($field, $opt_value) ? ' checked' : '';
 					?>
 					<label class="bl-form__option" for="<?= esc_attr($oid) ?>">
-						<input type="radio" id="<?= esc_attr($oid) ?>" name="<?= esc_attr($field_name) ?>" value="<?= esc_attr($opt_value) ?>"<?= $req_attr ?><?= $checked ?>>
+						<input type="radio" id="<?= esc_attr($oid) ?>" name="<?= esc_attr($field_name) ?>" value="<?= esc_attr($opt_value) ?>"<?= $choice_attrs ?><?= $checked ?>>
 						<span><?= esc_html((string) ($opt['label'] ?? '')) ?></span>
 					</label>
 				<?php endforeach; ?>
@@ -503,7 +529,7 @@ function bl_forms_render_field(array $field, string $uid): string
 					$checked = bl_forms_field_default_is($field, $opt_value) ? ' checked' : '';
 					?>
 					<label class="bl-form__option" for="<?= esc_attr($oid) ?>">
-						<input type="checkbox" id="<?= esc_attr($oid) ?>" name="<?= esc_attr($field_name) ?>[]" value="<?= esc_attr($opt_value) ?>"<?= $checked ?>>
+						<input type="checkbox" id="<?= esc_attr($oid) ?>" name="<?= esc_attr($field_name) ?>[]" value="<?= esc_attr($opt_value) ?>"<?= $checked ?><?= $disabled_attr ?>>
 						<span><?= esc_html((string) ($opt['label'] ?? '')) ?></span>
 					</label>
 				<?php endforeach; ?>
@@ -527,7 +553,7 @@ function bl_forms_render_field(array $field, string $uid): string
 					$checked = bl_forms_field_default_is($field, $opt_value) ? ' checked' : '';
 					?>
 					<label class="bl-form__btn-option" for="<?= esc_attr($oid) ?>">
-						<input type="<?= esc_attr($input_type) ?>" id="<?= esc_attr($oid) ?>" name="<?= esc_attr($input_name) ?>" value="<?= esc_attr($opt_value) ?>"<?= !$multiple ? $req_attr : '' ?><?= $checked ?>>
+						<input type="<?= esc_attr($input_type) ?>" id="<?= esc_attr($oid) ?>" name="<?= esc_attr($input_name) ?>" value="<?= esc_attr($opt_value) ?>"<?= !$multiple ? $choice_attrs : $disabled_attr ?><?= $checked ?>>
 						<span><?= esc_html((string) ($opt['label'] ?? '')) ?></span>
 					</label>
 				<?php endforeach; ?>
@@ -551,7 +577,7 @@ function bl_forms_render_field(array $field, string $uid): string
 			<?php endif; ?>
 			<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<label class="bl-form__option bl-form__option--terms" for="<?= esc_attr($input_id) ?>">
-				<input type="checkbox" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" value="1"<?= $req_attr ?><?= $checked ?><?= $show_terms_label ? ' aria-labelledby="' . esc_attr($input_id) . '-label"' : '' ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+				<input type="checkbox" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" value="1"<?= $choice_attrs ?><?= $checked ?><?= $show_terms_label ? ' aria-labelledby="' . esc_attr($input_id) . '-label"' : '' ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 				<span><?= bl_forms_format_inline_links($checkbox_text) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped/kses in helper. ?><?= !$show_terms_label ? $req_mark : '' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 			</label>
 		</div>
@@ -584,7 +610,7 @@ function bl_forms_render_field(array $field, string $uid): string
 		<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--toggle', $name) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<label class="bl-form__switch" for="<?= esc_attr($input_id) ?>">
-				<input type="checkbox" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" value="1"<?= $req_attr ?><?= $checked ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+				<input type="checkbox" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" value="1"<?= $choice_attrs ?><?= $checked ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 				<span class="bl-form__switch-ui" aria-hidden="true"></span>
 				<?php if (!$hide_toggle_label) : ?>
 					<span class="bl-form__switch-label"><?= esc_html($label) ?><?= $req_mark // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
@@ -609,7 +635,7 @@ function bl_forms_render_field(array $field, string $uid): string
 				name="<?= esc_attr($file_name) ?>"
 				<?= $accept !== '' ? 'accept="' . esc_attr($accept) . '"' : '' ?>
 				<?= $multiple ? ' multiple' : '' ?>
-				<?= $req_attr ?>
+				<?= $choice_attrs ?>
 				<?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 				<?= $type === 'image' ? ' data-bl-form-image-input' : '' ?>
@@ -642,7 +668,7 @@ function bl_forms_render_field(array $field, string $uid): string
 	<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--' . sanitize_html_class($type), $name) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 		<?= bl_forms_field_label_html($field, $input_id, $req_mark) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-		<input class="bl-form__control" type="<?= esc_attr($input_type) ?>" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" value="<?= esc_attr($default_value) ?>" placeholder="<?= esc_attr($placeholder) ?>"<?= $req_attr ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<input class="bl-form__control" type="<?= esc_attr($input_type) ?>" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" value="<?= esc_attr($default_value) ?>" placeholder="<?= esc_attr($placeholder) ?>"<?= $control_attrs ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	</div>
 	<?php
 

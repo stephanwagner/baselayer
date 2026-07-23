@@ -507,6 +507,42 @@ function bl_forms_field_width_css(array $field): string
 }
 
 /**
+ * Sanitize a field default so it matches the field type (or clear it).
+ */
+function bl_forms_sanitize_typed_default(string $type, string $raw): string
+{
+	if ($type === 'textarea') {
+		return sanitize_textarea_field($raw);
+	}
+
+	$value = sanitize_text_field($raw);
+	if ($value === '') {
+		return '';
+	}
+
+	switch ($type) {
+		case 'number':
+			return is_numeric($value) ? $value : '';
+		case 'email':
+			$email = sanitize_email($value);
+			return is_email($email) ? $email : '';
+		case 'url':
+			$url = esc_url_raw($value);
+			return $url !== '' ? $url : '';
+		case 'phone':
+			return bl_forms_is_valid_phone($value) ? $value : '';
+		case 'date':
+			return bl_forms_is_valid_date($value) ? $value : '';
+		case 'time':
+			return bl_forms_is_valid_time($value) ? $value : '';
+		case 'datetime':
+			return bl_forms_is_valid_datetime($value) ? $value : '';
+		default:
+			return $value;
+	}
+}
+
+/**
  * Sanitize one field definition.
  *
  * @param mixed $field
@@ -620,7 +656,14 @@ function bl_forms_sanitize_field($field): ?array
 	}
 
 	$out['required'] = !empty($field['required']);
+	$out['readonly'] = !empty($field['readonly']);
+	$out['disabled'] = !empty($field['disabled']);
 	$out['placeholder'] = sanitize_text_field((string) ($field['placeholder'] ?? ''));
+
+	$no_readonly = ['radio', 'checkboxes', 'select', 'button_group', 'toggle', 'terms', 'file', 'image'];
+	if (in_array($type, $no_readonly, true)) {
+		unset($out['readonly']);
+	}
 
 	if (in_array($type, ['text', 'email', 'url', 'number', 'phone', 'textarea', 'date', 'time', 'datetime', 'file', 'image', 'toggle'], true)) {
 		$out['description'] = sanitize_textarea_field((string) ($field['description'] ?? ''));
@@ -664,11 +707,10 @@ function bl_forms_sanitize_field($field): ?array
 		!isset($out['default_value'])
 		&& !in_array($type, $no_default, true)
 	) {
-		if ($type === 'textarea') {
-			$out['default_value'] = sanitize_textarea_field((string) ($field['default_value'] ?? ''));
-		} else {
-			$out['default_value'] = sanitize_text_field((string) ($field['default_value'] ?? ''));
-		}
+		$out['default_value'] = bl_forms_sanitize_typed_default(
+			$type,
+			(string) ($field['default_value'] ?? '')
+		);
 	}
 
 	return $out;
