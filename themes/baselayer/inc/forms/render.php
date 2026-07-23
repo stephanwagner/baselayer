@@ -29,6 +29,13 @@ function bl_forms_render(int $form_id, array $args = []): string
 
 	$uid = 'bl-form-' . $form_id . '-' . wp_unique_id();
 	$nonce = wp_create_nonce('bl_forms_submit_' . $form_id);
+	$hp_name = sanitize_key((string) ($settings['honeypot_name'] ?? ''));
+	if ($hp_name === '') {
+		$hp_name = 'bl_forms_hp';
+	}
+	$loaded_at = time();
+	$loaded_sig = bl_forms_fill_time_signature($form_id, $loaded_at);
+	$js_token = bl_forms_js_check_token($form_id, $loaded_at);
 	$wrapper_attributes = isset($args['wrapper_attributes']) && is_string($args['wrapper_attributes']) && $args['wrapper_attributes'] !== ''
 		? $args['wrapper_attributes']
 		: 'class="bl-form"';
@@ -43,14 +50,18 @@ function bl_forms_render(int $form_id, array $args = []): string
 		data-bl-form-success="<?= esc_attr($success) ?>"
 		data-bl-form-error="<?= esc_attr($error) ?>"
 		data-bl-form-validation="<?= esc_attr($validation) ?>"
+		data-bl-form-js="<?= esc_attr($js_token) ?>"
 	>
 		<form class="bl-form__form" method="post" action="" novalidate data-bl-form-el id="<?= esc_attr($uid) ?>"<?= $has_uploads ? ' enctype="multipart/form-data"' : '' ?>>
 			<input type="hidden" name="action" value="bl_forms_submit">
 			<input type="hidden" name="form_id" value="<?= esc_attr((string) $form_id) ?>">
 			<input type="hidden" name="nonce" value="<?= esc_attr($nonce) ?>">
+			<input type="hidden" name="bl_forms_loaded" value="<?= esc_attr((string) $loaded_at) ?>">
+			<input type="hidden" name="bl_forms_loaded_sig" value="<?= esc_attr($loaded_sig) ?>">
+			<input type="hidden" name="bl_forms_js" value="" data-bl-form-js-field autocomplete="off">
 			<div class="bl-form__honeypot" aria-hidden="true">
 				<label for="<?= esc_attr($uid) ?>-hp"><?= esc_html__('Leave blank', 'baselayer') ?></label>
-				<input type="text" name="bl_forms_hp" id="<?= esc_attr($uid) ?>-hp" value="" tabindex="-1" autocomplete="off">
+				<input type="text" name="<?= esc_attr($hp_name) ?>" id="<?= esc_attr($uid) ?>-hp" value="" tabindex="-1" autocomplete="off">
 			</div>
 			<div class="bl-form__fields">
 				<?= bl_forms_render_fields($config['fields'], $uid) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
@@ -342,10 +353,36 @@ function bl_forms_render_field(array $field, string $uid): string
 	}
 
 	if ($type === 'captcha') {
-		return '<div ' . bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--captcha') . '>'
-			. '<div class="bl-form__captcha-placeholder" role="note">'
-			. esc_html__('CAPTCHA placeholder — integration coming soon.', 'baselayer')
-			. '</div></div>';
+		$provider = sanitize_key((string) ($field['captcha_provider'] ?? 'turnstile'));
+		if (!in_array($provider, bl_forms_captcha_providers(), true)) {
+			$provider = 'turnstile';
+		}
+		$site_key = trim((string) ($field['captcha_site_key'] ?? ''));
+
+		if ($site_key === '') {
+			return '<div ' . bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--captcha') . '>'
+				. '<div class="bl-form__captcha-placeholder" role="note">'
+				. esc_html__('CAPTCHA is not configured yet.', 'baselayer')
+				. '</div></div>';
+		}
+
+		bl_forms_enqueue_captcha_script($provider);
+
+		ob_start();
+		?>
+		<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--captcha') // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+			<?php if ($provider === 'turnstile') : ?>
+				<div class="cf-turnstile" data-sitekey="<?= esc_attr($site_key) ?>"></div>
+			<?php elseif ($provider === 'hcaptcha') : ?>
+				<div class="h-captcha" data-sitekey="<?= esc_attr($site_key) ?>"></div>
+			<?php elseif ($provider === 'friendly') : ?>
+				<div class="frc-captcha" data-sitekey="<?= esc_attr($site_key) ?>"></div>
+			<?php else : ?>
+				<div class="g-recaptcha" data-sitekey="<?= esc_attr($site_key) ?>"></div>
+			<?php endif; ?>
+		</div>
+		<?php
+		return (string) ob_get_clean();
 	}
 
 	if ($type === 'heading') {
@@ -585,8 +622,6 @@ function bl_forms_render_field(array $field, string $uid): string
 		$input_type = 'tel';
 	} elseif ($type === 'number') {
 		$input_type = 'number';
-	} elseif ($type === 'password') {
-		$input_type = 'password';
 	} elseif ($type === 'date') {
 		$input_type = 'date';
 	} elseif ($type === 'time') {
@@ -594,12 +629,11 @@ function bl_forms_render_field(array $field, string $uid): string
 	} elseif ($type === 'datetime') {
 		$input_type = 'datetime-local';
 	}
-	$input_default = $type === 'password' ? '' : $default_value;
 	?>
 	<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--' . sanitize_html_class($type), $name) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 		<?= bl_forms_field_label_html($field, $input_id, $req_mark) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-		<input class="bl-form__control" type="<?= esc_attr($input_type) ?>" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" value="<?= esc_attr($input_default) ?>" placeholder="<?= esc_attr($placeholder) ?>"<?= $req_attr ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<input class="bl-form__control" type="<?= esc_attr($input_type) ?>" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" value="<?= esc_attr($default_value) ?>" placeholder="<?= esc_attr($placeholder) ?>"<?= $req_attr ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	</div>
 	<?php
 

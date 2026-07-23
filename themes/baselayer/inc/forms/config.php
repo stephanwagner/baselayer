@@ -14,7 +14,6 @@ function bl_forms_field_types(): array
 		'email',
 		'url',
 		'number',
-		'password',
 		'phone',
 		'textarea',
 		'radio',
@@ -104,6 +103,30 @@ function bl_forms_flatten_fields(array $fields): array
 }
 
 /**
+ * Generate a random honeypot field name.
+ */
+function bl_forms_generate_honeypot_name(): string
+{
+	return 'hp_' . strtolower(wp_generate_password(10, false, false));
+}
+
+/**
+ * HMAC signature for the form load timestamp (min fill time).
+ */
+function bl_forms_fill_time_signature(int $form_id, int $loaded_at): string
+{
+	return hash_hmac('sha256', $form_id . '|' . $loaded_at, wp_salt('nonce'));
+}
+
+/**
+ * Expected value for the JavaScript check field (set by front-end JS).
+ */
+function bl_forms_js_check_token(int $form_id, int $loaded_at): string
+{
+	return hash_hmac('sha256', 'js|' . $form_id . '|' . $loaded_at, wp_salt('nonce'));
+}
+
+/**
  * Default settings (empty strings mean use runtime fallbacks).
  *
  * @return array<string, mixed>
@@ -111,16 +134,22 @@ function bl_forms_flatten_fields(array $fields): array
 function bl_forms_default_settings(): array
 {
 	return [
-		'submit_label'        => '',
-		'recipient'           => '',
-		'success_message'     => '',
-		'error_message'       => '',
-		'validation_message'  => '',
-		'notify_user'         => false,
-		'user_email_field'    => '',
-		'admin_email_subject' => '',
-		'user_email_subject'  => '',
-		'user_email_intro'    => '',
+		'submit_label'           => '',
+		'recipient'              => '',
+		'success_message'        => '',
+		'error_message'          => '',
+		'validation_message'     => '',
+		'notify_user'            => false,
+		'user_email_field'       => '',
+		'admin_email_subject'    => '',
+		'user_email_subject'     => '',
+		'user_email_intro'       => '',
+		'honeypot_name'          => '',
+		'min_fill_time_enabled'  => true,
+		'min_fill_time'          => 2,
+		'rate_limit_enabled'     => true,
+		'rate_limit_max'         => 3,
+		'rate_limit_window'      => 5,
 	];
 }
 
@@ -243,10 +272,6 @@ function bl_forms_format_field_display_value(array $field, $value): string
 			: __('No', 'baselayer');
 	}
 
-	if ($type === 'password') {
-		return $value !== '' && $value !== null ? '••••••••' : '';
-	}
-
 	if (in_array($type, ['file', 'image'], true)) {
 		$items = is_array($value) ? $value : [];
 		$parts = [];
@@ -330,6 +355,27 @@ function bl_forms_sanitize_css_class(string $raw): string
 }
 
 /**
+ * Sanitize a single CSS length for inline styles (blocks injection).
+ *
+ * Allows: 24px, 1.5rem, 50%, 10vw, auto. Rejects ; } url( etc.
+ */
+function bl_forms_sanitize_css_length(string $raw, string $fallback = ''): string
+{
+	$value = trim($raw);
+	if ($value === '') {
+		return $fallback;
+	}
+	if (strcasecmp($value, 'auto') === 0) {
+		return 'auto';
+	}
+	if (preg_match('/^(-?\d+(?:\.\d+)?)(px|rem|em|%|vh|vw|vmin|vmax|ch|ex)$/i', $value)) {
+		return $value;
+	}
+
+	return $fallback;
+}
+
+/**
  * Sanitize field width settings.
  *
  * @param array<string, mixed> $field
@@ -343,9 +389,12 @@ function bl_forms_sanitize_width(array $field): array
 		$width = '100';
 	}
 
-	$custom = sanitize_text_field((string) ($field['width_custom'] ?? ''));
-	if ($width !== 'custom') {
-		$custom = '';
+	$custom = '';
+	if ($width === 'custom') {
+		$custom = bl_forms_sanitize_css_length((string) ($field['width_custom'] ?? ''), '');
+		if ($custom === '') {
+			$width = '100';
+		}
 	}
 
 	return [
@@ -373,7 +422,7 @@ function bl_forms_field_width_vars(array $field): array
 		];
 	}
 	if ($width === 'custom') {
-		$custom = trim((string) ($field['width_custom'] ?? ''));
+		$custom = bl_forms_sanitize_css_length(trim((string) ($field['width_custom'] ?? '')), '');
 		if ($custom === '') {
 			return [
 				'width'  => '100%',
@@ -453,6 +502,11 @@ function bl_forms_sanitize_field($field): ?array
 		$type = 'text';
 	}
 
+	// Built-in form honeypot lives in settings; drop palette honeypot fields.
+	if ($type === 'honeypot') {
+		return null;
+	}
+
 	$id = sanitize_key((string) ($field['id'] ?? ''));
 	if ($id === '') {
 		$id = 'f' . wp_generate_password(8, false, false);
@@ -498,17 +552,27 @@ function bl_forms_sanitize_field($field): ?array
 		return $out;
 	}
 
-	if ($type === 'divider' || $type === 'captcha') {
+	if ($type === 'divider') {
+		unset($out['name'], $out['label'], $out['name_manual'], $out['hide_label']);
+
+		return $out;
+	}
+
+	if ($type === 'captcha') {
+		$provider = sanitize_key((string) ($field['captcha_provider'] ?? 'turnstile'));
+		if (!in_array($provider, bl_forms_captcha_providers(), true)) {
+			$provider = 'turnstile';
+		}
+		$out['captcha_provider'] = $provider;
+		$out['captcha_site_key'] = sanitize_text_field((string) ($field['captcha_site_key'] ?? ''));
+		$out['captcha_secret_key'] = sanitize_text_field((string) ($field['captcha_secret_key'] ?? ''));
 		unset($out['name'], $out['label'], $out['name_manual'], $out['hide_label']);
 
 		return $out;
 	}
 
 	if ($type === 'spacer') {
-		$height = sanitize_text_field((string) ($field['height'] ?? '24px'));
-		if ($height === '') {
-			$height = '24px';
-		}
+		$height = bl_forms_sanitize_css_length((string) ($field['height'] ?? '24px'), '24px');
 		$out['height'] = $height;
 		unset($out['name'], $out['label'], $out['name_manual'], $out['hide_label']);
 
@@ -525,13 +589,6 @@ function bl_forms_sanitize_field($field): ?array
 		return $out;
 	}
 
-	if ($type === 'honeypot') {
-		$out['label'] = $out['label'] !== '' ? $out['label'] : __('Honeypot', 'baselayer');
-		unset($out['required'], $out['placeholder'], $out['hide_label']);
-
-		return $out;
-	}
-
 	if ($type === 'hidden') {
 		$out['default_value'] = sanitize_text_field((string) ($field['default_value'] ?? ''));
 		$out['width'] = '100';
@@ -544,7 +601,7 @@ function bl_forms_sanitize_field($field): ?array
 	$out['required'] = !empty($field['required']);
 	$out['placeholder'] = sanitize_text_field((string) ($field['placeholder'] ?? ''));
 
-	if (in_array($type, ['text', 'email', 'url', 'number', 'password', 'phone', 'textarea', 'date', 'time', 'datetime', 'file', 'image', 'toggle'], true)) {
+	if (in_array($type, ['text', 'email', 'url', 'number', 'phone', 'textarea', 'date', 'time', 'datetime', 'file', 'image', 'toggle'], true)) {
 		$out['description'] = sanitize_textarea_field((string) ($field['description'] ?? ''));
 	}
 
@@ -581,7 +638,7 @@ function bl_forms_sanitize_field($field): ?array
 		$out['default_value'] = !empty($field['default_value']) ? '1' : '';
 	}
 
-	$no_default = ['password', 'file', 'image', 'honeypot', 'captcha'];
+	$no_default = ['file', 'image', 'honeypot', 'captcha'];
 	if (
 		!isset($out['default_value'])
 		&& !in_array($type, $no_default, true)
@@ -638,16 +695,27 @@ function bl_forms_sanitize_config($config): array
 		? $config['settings']
 		: [];
 	$settings = bl_forms_default_settings();
+	$bool_keys = ['notify_user', 'min_fill_time_enabled', 'rate_limit_enabled'];
+	$int_keys = [
+		'min_fill_time'      => [1, 300],
+		'rate_limit_max'     => [1, 100],
+		'rate_limit_window'  => [1, 1440],
+	];
 
 	foreach ($settings as $key => $default) {
 		if (!array_key_exists($key, $settings_in)) {
 			continue;
 		}
-		if ($key === 'notify_user') {
+		if (in_array($key, $bool_keys, true)) {
 			$settings[$key] = !empty($settings_in[$key]);
 			continue;
 		}
-		if ($key === 'user_email_field') {
+		if (isset($int_keys[$key])) {
+			[$min, $max] = $int_keys[$key];
+			$settings[$key] = max($min, min($max, (int) $settings_in[$key]));
+			continue;
+		}
+		if ($key === 'user_email_field' || $key === 'honeypot_name') {
 			$settings[$key] = sanitize_key((string) $settings_in[$key]);
 			continue;
 		}
@@ -663,6 +731,27 @@ function bl_forms_sanitize_config($config): array
 			$settings[$key] = sanitize_text_field($value);
 		}
 	}
+
+	$used_names = [];
+	foreach (bl_forms_iter_fields($fields) as $field) {
+		$name = sanitize_key((string) ($field['name'] ?? ''));
+		if ($name !== '') {
+			$used_names[$name] = true;
+		}
+	}
+
+	$hp = (string) ($settings['honeypot_name'] ?? '');
+	$reserved = ['action', 'form_id', 'nonce', 'fields', 'bl_forms_loaded', 'bl_forms_loaded_sig', 'bl_forms_js'];
+	if ($hp === '') {
+		// Stable until the builder saves a random name.
+		$hp = 'bl_forms_hp';
+	}
+	if (isset($used_names[$hp]) || in_array($hp, $reserved, true)) {
+		do {
+			$hp = bl_forms_generate_honeypot_name();
+		} while (isset($used_names[$hp]) || in_array($hp, $reserved, true));
+	}
+	$settings['honeypot_name'] = $hp;
 
 	return [
 		'fields'   => $fields,

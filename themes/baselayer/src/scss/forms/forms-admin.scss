@@ -117,7 +117,7 @@
 input.bl-forms-builder__palette-search {
   display: block;
   width: 100%;
-  margin: 0;
+  margin: 0 0 4px;
   padding: 4px 12px;
   height: auto;
   min-height: 0;
@@ -157,7 +157,7 @@ p.bl-forms-builder__palette-empty {
   align-items: center;
   gap: 8px;
   width: 100%;
-  padding: 12px 2px 4px;
+  padding: 8px 2px 2px;
   border: 0;
   background: transparent;
   cursor: pointer;
@@ -215,7 +215,7 @@ p.bl-forms-builder__palette-empty {
 }
 
 .bl-forms-builder__palette-panel {
-  margin-top: 4px;
+  margin: 4px 0 6px;
 }
 
 .bl-forms-builder__palette-list {
@@ -368,7 +368,7 @@ p.bl-forms-builder__palette-empty {
 }
 
 .bl-forms-builder__canvas {
-  min-height: 420px;
+  position: relative;
   padding: 8px 12px 48px;
   border: 1px dashed var(--bl-forms-admin-border);
   border-radius: var(--bl-forms-admin-radius);
@@ -376,17 +376,37 @@ p.bl-forms-builder__palette-empty {
 }
 
 .bl-forms-builder__list {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   gap: 8px;
-  min-height: 200px;
+  min-height: 360px;
   padding-bottom: 64px;
 }
 
 .bl-forms-builder__empty {
-  margin: 24px 0 8px;
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 420px;
+
+  max-width: calc(100% - 24px - 24px);
+  text-wrap: balance;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: p;
   text-align: center;
   color: var(--bl-forms-admin-muted);
+  pointer-events: none;
+
+  &[hidden] {
+    display: none !important;
+  }
 }
 
 .bl-forms-builder__field {
@@ -442,6 +462,13 @@ p.bl-forms-builder__palette-empty {
   flex: 0 1 auto;
   min-width: 0;
   margin-left: auto;
+}
+
+.bl-forms-builder__field-actions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0;
 }
 
 .bl-forms-builder__field-type {
@@ -937,7 +964,7 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
   max-width: 280px;
 }
 
-// Notifications / Settings
+// Notifications / Settings / Security
 .bl-forms-builder__setting {
   margin: 0 0 14px;
   max-width: 520px;
@@ -955,6 +982,152 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
   .description {
     display: block;
     margin-top: 4px;
+  }
+}
+
+.bl-forms-builder__security-option {
+  > .bl-forms-builder__security-label {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 8px;
+    margin-bottom: 0;
+  }
+
+  > .bl-forms-builder__security-label input[type='checkbox'] {
+    margin: 0;
+    flex: 0 0 auto;
+  }
+}
+
+.bl-forms-builder__security-label-text {
+  font-weight: 600;
+}
+
+.bl-forms-builder__security-badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+  text-transform: lowercase;
+
+  &::before {
+    content: '[';
+  }
+
+  &::after {
+    content: ']';
+  }
+
+  &--required {
+    color: #8a2424;
+    background: color-mix(in srgb, #d63638 12%, #fff);
+  }
+
+  &--recommended {
+    color: #1e5a2c;
+    background: color-mix(in srgb, #00a32a 12%, #fff);
+  }
+}
+
+.bl-forms-builder__security-options {
+  margin-top: 8px;
+  padding-left: 22px;
+}
+
+.bl-forms-builder__security-inline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+
+  input[type='number'] {
+    width: 4.5em;
+  }
+}
+
+.bl-forms-builder__captcha {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+  max-width: 640px;
+}
+
+.bl-forms-builder__captcha-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 0 0 200px;
+  min-width: 160px;
+}
+
+.bl-forms-builder__captcha-service {
+  appearance: none;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid var(--bl-forms-admin-border);
+  border-radius: var(--bl-forms-admin-radius);
+  background: var(--bl-forms-admin-surface);
+  color: #1d2327;
+  font-size: 13px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  line-height: 1.35;
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--bl-forms-admin-accent) 45%, var(--bl-forms-admin-border));
+  }
+
+  &.is-active {
+    border-color: var(--bl-forms-admin-accent);
+    background: color-mix(in srgb, var(--bl-forms-admin-accent) 10%, #fff);
+    box-shadow: inset 3px 0 0 var(--bl-forms-admin-accent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--bl-forms-admin-accent);
+    outline-offset: 2px;
+  }
+}
+
+.bl-forms-builder__captcha-panel {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 4px 0 0;
+
+  > .description {
+    margin: 0 0 12px;
+  }
+
+  > p {
+    margin: 0 0 12px;
+  }
+
+  label {
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  strong {
+    display: block;
+    margin-bottom: 4px;
+  }
+}
+
+@media (max-width: 782px) {
+  .bl-forms-builder__captcha {
+    flex-direction: column;
+  }
+
+  .bl-forms-builder__captcha-nav {
+    flex: 1 1 auto;
+    width: 100%;
   }
 }
 

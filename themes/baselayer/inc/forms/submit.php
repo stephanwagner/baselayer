@@ -24,10 +24,19 @@ function bl_forms_ajax_submit(): void
 		], 403);
 	}
 
-	$hp = isset($_POST['bl_forms_hp']) ? trim((string) wp_unslash($_POST['bl_forms_hp'])) : '';
 	$config = bl_forms_get_config($form_id);
 	$settings = $config['settings'];
 	$raw_fields = isset($_POST['fields']) && is_array($_POST['fields']) ? wp_unslash($_POST['fields']) : [];
+
+	$hp_name = sanitize_key((string) ($settings['honeypot_name'] ?? ''));
+	$hp = '';
+	if ($hp_name !== '' && isset($_POST[$hp_name])) {
+		$hp = trim((string) wp_unslash($_POST[$hp_name]));
+	}
+	// Legacy fixed honeypot name.
+	if ($hp === '' && isset($_POST['bl_forms_hp'])) {
+		$hp = trim((string) wp_unslash($_POST['bl_forms_hp']));
+	}
 
 	if ($hp !== '' || bl_forms_honeypot_triggered($config['fields'], $raw_fields)) {
 		wp_send_json_success([
@@ -35,11 +44,41 @@ function bl_forms_ajax_submit(): void
 		]);
 	}
 
-	if (!bl_forms_rate_limit_ok($form_id)) {
+	if (!bl_forms_js_check_ok($form_id)) {
+		// No JS (or forged POST): pretend success like the honeypot.
+		wp_send_json_success([
+			'message' => bl_forms_resolve_message($settings, 'success_message'),
+		]);
+	}
+
+	if (!bl_forms_fill_time_ok($form_id, $settings)) {
+		wp_send_json_error([
+			'message' => __('Please wait a moment before submitting.', 'baselayer'),
+			'code'    => 'too_fast',
+		], 429);
+	}
+
+	if (!bl_forms_rate_limit_ok($form_id, $settings)) {
 		wp_send_json_error([
 			'message' => __('Please wait a moment before submitting again.', 'baselayer'),
 			'code'    => 'rate_limited',
 		], 429);
+	}
+
+	$captcha_field = bl_forms_find_captcha_field($config['fields']);
+	if ($captcha_field !== null) {
+		$provider = sanitize_key((string) ($captcha_field['captcha_provider'] ?? 'turnstile'));
+		$response_key = bl_forms_captcha_response_key($provider);
+		$token = ($response_key !== '' && isset($_POST[$response_key]))
+			? trim((string) wp_unslash($_POST[$response_key]))
+			: '';
+		$remote_ip = isset($_SERVER['REMOTE_ADDR']) ? (string) wp_unslash($_SERVER['REMOTE_ADDR']) : '';
+		if (!bl_forms_verify_captcha($captcha_field, $token, $remote_ip)) {
+			wp_send_json_error([
+				'message' => __('Please complete the CAPTCHA and try again.', 'baselayer'),
+				'code'    => 'captcha_failed',
+			], 422);
+		}
 	}
 
 	[$values, $invalid] = bl_forms_validate_submission($config['fields'], $raw_fields, $_FILES);
@@ -117,6 +156,51 @@ function bl_forms_is_valid_phone(string $value): bool
 }
 
 /**
+ * HTML date input format: YYYY-MM-DD.
+ */
+function bl_forms_is_valid_date(string $value): bool
+{
+	if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $value)) {
+		return false;
+	}
+	$dt = \DateTimeImmutable::createFromFormat('!Y-m-d', $value);
+
+	return $dt instanceof \DateTimeImmutable && $dt->format('Y-m-d') === $value;
+}
+
+/**
+ * HTML time input format: HH:MM or HH:MM:SS.
+ */
+function bl_forms_is_valid_time(string $value): bool
+{
+	if (preg_match('/^\d{2}:\d{2}$/', $value)) {
+		$dt = \DateTimeImmutable::createFromFormat('!H:i', $value);
+
+		return $dt instanceof \DateTimeImmutable && $dt->format('H:i') === $value;
+	}
+	if (preg_match('/^\d{2}:\d{2}:\d{2}$/', $value)) {
+		$dt = \DateTimeImmutable::createFromFormat('!H:i:s', $value);
+
+		return $dt instanceof \DateTimeImmutable && $dt->format('H:i:s') === $value;
+	}
+
+	return false;
+}
+
+/**
+ * HTML datetime-local format: YYYY-MM-DDTHH:MM.
+ */
+function bl_forms_is_valid_datetime(string $value): bool
+{
+	if (!preg_match('/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/', $value)) {
+		return false;
+	}
+	$dt = \DateTimeImmutable::createFromFormat('!Y-m-d\TH:i', $value);
+
+	return $dt instanceof \DateTimeImmutable && $dt->format('Y-m-d\TH:i') === $value;
+}
+
+/**
  * Whether any builder honeypot field was filled (bot signal).
  *
  * @param list<array<string, mixed>> $fields
@@ -142,16 +226,66 @@ function bl_forms_honeypot_triggered(array $fields, array $raw): bool
 }
 
 /**
- * Soft rate limit: 5 submissions / form / IP / minute.
+ * Whether the JavaScript check field was filled with the expected token.
  */
-function bl_forms_rate_limit_ok(int $form_id): bool
+function bl_forms_js_check_ok(int $form_id): bool
 {
-	$key = 'bl_forms_rl_' . $form_id . '_' . bl_forms_client_ip_hash();
-	$count = (int) get_transient($key);
-	if ($count >= 5) {
+	$loaded_at = isset($_POST['bl_forms_loaded']) ? (int) wp_unslash($_POST['bl_forms_loaded']) : 0;
+	$token = isset($_POST['bl_forms_js']) ? (string) wp_unslash($_POST['bl_forms_js']) : '';
+	if ($loaded_at <= 0 || $token === '') {
 		return false;
 	}
-	set_transient($key, $count + 1, MINUTE_IN_SECONDS);
+
+	return hash_equals(bl_forms_js_check_token($form_id, $loaded_at), $token);
+}
+
+/**
+ * Whether the submission waited long enough after the form was rendered.
+ *
+ * @param array<string, mixed> $settings
+ */
+function bl_forms_fill_time_ok(int $form_id, array $settings): bool
+{
+	if (empty($settings['min_fill_time_enabled'])) {
+		return true;
+	}
+
+	$min = max(1, (int) ($settings['min_fill_time'] ?? 2));
+	$loaded_at = isset($_POST['bl_forms_loaded']) ? (int) wp_unslash($_POST['bl_forms_loaded']) : 0;
+	$sig = isset($_POST['bl_forms_loaded_sig']) ? (string) wp_unslash($_POST['bl_forms_loaded_sig']) : '';
+
+	if ($loaded_at <= 0 || $sig === '' || !hash_equals(bl_forms_fill_time_signature($form_id, $loaded_at), $sig)) {
+		return false;
+	}
+
+	$elapsed = time() - $loaded_at;
+	// Reject forged future timestamps and absurdly old loads (1 day).
+	if ($elapsed < $min || $elapsed > DAY_IN_SECONDS) {
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Soft rate limit per form / IP, using form security settings.
+ *
+ * @param array<string, mixed> $settings
+ */
+function bl_forms_rate_limit_ok(int $form_id, array $settings = []): bool
+{
+	if ($settings !== [] && empty($settings['rate_limit_enabled'])) {
+		return true;
+	}
+
+	$max = max(1, (int) ($settings['rate_limit_max'] ?? 3));
+	$window = max(1, (int) ($settings['rate_limit_window'] ?? 5));
+	$key = 'bl_forms_rl_' . $form_id . '_' . bl_forms_client_ip_hash();
+	$count = (int) get_transient($key);
+	if ($count >= $max) {
+		return false;
+	}
+	set_transient($key, $count + 1, $window * MINUTE_IN_SECONDS);
 
 	return true;
 }
@@ -261,6 +395,27 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 		} elseif ($type === 'phone') {
 			$value = sanitize_text_field($value);
 			if ($value !== '' && !bl_forms_is_valid_phone($value)) {
+				$values[$name] = $value;
+				$invalid[] = $name;
+				continue;
+			}
+		} elseif ($type === 'date') {
+			$value = sanitize_text_field($value);
+			if ($value !== '' && !bl_forms_is_valid_date($value)) {
+				$values[$name] = $value;
+				$invalid[] = $name;
+				continue;
+			}
+		} elseif ($type === 'time') {
+			$value = sanitize_text_field($value);
+			if ($value !== '' && !bl_forms_is_valid_time($value)) {
+				$values[$name] = $value;
+				$invalid[] = $name;
+				continue;
+			}
+		} elseif ($type === 'datetime') {
+			$value = sanitize_text_field($value);
+			if ($value !== '' && !bl_forms_is_valid_datetime($value)) {
 				$values[$name] = $value;
 				$invalid[] = $name;
 				continue;

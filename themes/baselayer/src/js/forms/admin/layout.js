@@ -4,6 +4,9 @@ import { createFieldCard, serializeRow, openFieldWidthModal } from './field-card
 
 const COLUMN_CHILD_BLOCKED = ['column', 'hidden', 'honeypot', 'captcha'];
 
+/** Live column field objects keyed by card element (keeps equalize + modal in sync). */
+const columnFieldByEl = new WeakMap();
+
 function prepareNestedField(typeOrData) {
   const data = typeof typeOrData === 'string' ? defaultField(typeOrData) : { ...typeOrData };
   if (COLUMN_CHILD_BLOCKED.includes(data.type)) {
@@ -88,6 +91,11 @@ function applyColumnWidthToCard(el, width, widthCustom = '') {
   } else {
     delete el.dataset.fieldWidthCustom;
   }
+  const field = columnFieldByEl.get(el);
+  if (field) {
+    field.width = width;
+    field.width_custom = width === 'custom' ? widthCustom || '' : '';
+  }
   const badge = el.querySelector(':scope > .bl-forms-builder__field-header .bl-forms-builder__width-badge');
   if (badge) {
     const text = widthBadgeText(width, widthCustom);
@@ -147,6 +155,7 @@ export function createColumnCard(initial = {}) {
         : {}),
     },
   });
+  columnFieldByEl.set(row, field);
 
   const preview = el('span', {
     className: 'bl-forms-builder__preview',
@@ -248,8 +257,7 @@ export function createColumnCard(initial = {}) {
   const header = el('div', { className: 'bl-forms-builder__field-header' }, [
     preview,
     el('div', { className: 'bl-forms-builder__field-meta' }, [widthBadge, typeChip]),
-    deleteBtn,
-    handle,
+    el('div', { className: 'bl-forms-builder__field-actions' }, [deleteBtn, handle]),
   ]);
 
   row.append(header, fieldsWrap);

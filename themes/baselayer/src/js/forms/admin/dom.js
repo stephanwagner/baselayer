@@ -52,7 +52,6 @@ export const TYPE_KEYS = [
   'html',
   'column',
   'hidden',
-  'password',
   'honeypot',
   'captcha',
 ];
@@ -105,7 +104,7 @@ export const PALETTE_SECTIONS = [
     id: 'advanced',
     headingKey: 'paletteSectionAdvanced',
     headingFallback: 'Advanced',
-    types: ['hidden', 'password', 'honeypot', 'captcha'],
+    types: ['hidden', 'captcha'],
   },
 ];
 
@@ -229,7 +228,16 @@ export function defaultField(type = 'text') {
     return { id, type, height: '24px', width: '100', width_custom: '', css_class: '' };
   }
   if (type === 'captcha') {
-    return { id, type, width: '100', width_custom: '', css_class: '' };
+    return {
+      id,
+      type,
+      captcha_provider: 'turnstile',
+      captcha_site_key: '',
+      captcha_secret_key: '',
+      width: '100',
+      width_custom: '',
+      css_class: '',
+    };
   }
   if (type === 'heading' || type === 'text_block' || type === 'html') {
     return {
@@ -293,8 +301,8 @@ export function defaultField(type = 'text') {
   };
   if (['radio', 'checkboxes', 'select', 'button_group'].includes(type)) {
     base.options = [
-      { label: 'Option 1', value: 'option-1' },
-      { label: 'Option 2', value: 'option-2' },
+      { label: t('optionOne', 'Option 1'), value: 'option-1' },
+      { label: t('optionTwo', 'Option 2'), value: 'option-2' },
     ];
   }
   if (['radio', 'checkboxes'].includes(type)) {
@@ -306,7 +314,7 @@ export function defaultField(type = 'text') {
   if (type === 'terms') {
     base.label = '';
     base.content = t('termsDefaultLabel', 'I agree to the [Privacy Policy](page:privacy).');
-    base.default_value = '1';
+    base.default_value = '';
   }
   if (type === 'toggle') {
     base.label = typeLabel(type);

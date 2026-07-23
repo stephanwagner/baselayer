@@ -39,7 +39,7 @@ export function createCanvas({ fields = [], onChange }) {
     className: 'bl-forms-builder__list',
     dataset: { blFormsCanvas: '1' },
   });
-  const empty = el('p', {
+  const empty = el('div', {
     className: 'description bl-forms-builder__empty',
     text: t('empty', 'Drag a field here, or click a template to add it.'),
   });

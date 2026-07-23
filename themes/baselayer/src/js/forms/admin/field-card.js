@@ -14,12 +14,290 @@ const WIDTH_PRESETS = [
 
 const OPTION_TYPES = ['radio', 'checkboxes', 'select', 'button_group'];
 const MULTIPLE_TYPES = ['select', 'button_group', 'file', 'image'];
+
+const CAPTCHA_PROVIDERS = [
+  {
+    id: 'turnstile',
+    labelKey: 'captchaTurnstile',
+    labelFallback: 'Cloudflare Turnstile',
+    helpKey: 'captchaTurnstileHelp',
+    helpFallback: 'Mostly invisible. Excellent privacy and very easy to set up.',
+    secretKey: 'captchaSecretKey',
+    secretFallback: 'Secret key',
+  },
+  {
+    id: 'hcaptcha',
+    labelKey: 'captchaHcaptcha',
+    labelFallback: 'hCaptcha',
+    helpKey: 'captchaHcaptchaHelp',
+    helpFallback: 'Good privacy and UX. Very easy to set up.',
+    secretKey: 'captchaSecretKey',
+    secretFallback: 'Secret key',
+  },
+  {
+    id: 'friendly',
+    labelKey: 'captchaFriendly',
+    labelFallback: 'Friendly Captcha',
+    helpKey: 'captchaFriendlyHelp',
+    helpFallback: 'Excellent privacy and accessibility. Easy to set up.',
+    secretKey: 'captchaApiKey',
+    secretFallback: 'API key',
+  },
+  {
+    id: 'recaptcha_v2',
+    labelKey: 'captchaRecaptcha',
+    labelFallback: 'Google reCAPTCHA v2',
+    helpKey: 'captchaRecaptchaHelp',
+    helpFallback: 'Familiar checkbox challenge. Weaker privacy. Very easy to set up.',
+    secretKey: 'captchaSecretKey',
+    secretFallback: 'Secret key',
+  },
+];
+
+function captchaProviderMeta(id) {
+  return CAPTCHA_PROVIDERS.find((p) => p.id === id) || CAPTCHA_PROVIDERS[0];
+}
+
+function captchaProviderLabel(id) {
+  const meta = captchaProviderMeta(id);
+  return t(meta.labelKey, meta.labelFallback);
+}
+
+/**
+ * Service picker + keys for a captcha field.
+ *
+ * @param {object} field
+ * @param {() => void} onChange
+ */
+function createCaptchaSettings(field, onChange) {
+  if (!field.captcha_provider || !CAPTCHA_PROVIDERS.some((p) => p.id === field.captcha_provider)) {
+    field.captcha_provider = 'turnstile';
+  }
+  field.captcha_site_key = field.captcha_site_key || '';
+  field.captcha_secret_key = field.captcha_secret_key || '';
+
+  const root = el('div', { className: 'bl-forms-builder__captcha' });
+  const nav = el('div', {
+    className: 'bl-forms-builder__captcha-nav',
+    role: 'tablist',
+    'aria-label': t('captchaService', 'CAPTCHA service'),
+  });
+  const panel = el('div', { className: 'bl-forms-builder__captcha-panel' });
+
+  const help = el('p', { className: 'description' });
+  const siteKey = el('input', {
+    type: 'text',
+    className: 'widefat code',
+    dataset: { blCaptchaSiteKey: '1' },
+    value: field.captcha_site_key,
+    autocomplete: 'off',
+  });
+  const secretKey = el('input', {
+    type: 'password',
+    className: 'widefat code',
+    dataset: { blCaptchaSecretKey: '1' },
+    value: field.captcha_secret_key,
+    autocomplete: 'new-password',
+  });
+  const secretLabel = el('strong', { text: '' });
+  const providerInput = el('input', {
+    type: 'hidden',
+    dataset: { blCaptchaProvider: '1' },
+    value: field.captcha_provider,
+  });
+
+  const siteRow = el('p', {}, [
+    el('label', {}, [el('strong', { text: t('captchaSiteKey', 'Site key') })]),
+    siteKey,
+  ]);
+  const secretRow = el('p', {}, [el('label', {}, [secretLabel]), secretKey]);
+
+  panel.append(help, siteRow, secretRow, providerInput);
+
+  const renderPanel = () => {
+    const meta = captchaProviderMeta(field.captcha_provider);
+    help.textContent = t(meta.helpKey, meta.helpFallback);
+    secretLabel.textContent = t(meta.secretKey, meta.secretFallback);
+    providerInput.value = field.captcha_provider;
+    nav.querySelectorAll('.bl-forms-builder__captcha-service').forEach((btn) => {
+      const active = btn.dataset.provider === field.captcha_provider;
+      btn.classList.toggle('is-active', active);
+      btn.setAttribute('aria-selected', active ? 'true' : 'false');
+    });
+  };
+
+  CAPTCHA_PROVIDERS.forEach((meta) => {
+    const btn = el('button', {
+      type: 'button',
+      className: 'bl-forms-builder__captcha-service',
+      role: 'tab',
+      text: t(meta.labelKey, meta.labelFallback),
+      dataset: { provider: meta.id },
+      onClick: () => {
+        field.captcha_provider = meta.id;
+        renderPanel();
+        onChange();
+        document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+      },
+    });
+    nav.appendChild(btn);
+  });
+
+  siteKey.addEventListener('input', () => {
+    field.captcha_site_key = siteKey.value;
+    onChange();
+  });
+  secretKey.addEventListener('input', () => {
+    field.captcha_secret_key = secretKey.value;
+    onChange();
+  });
+
+  renderPanel();
+  root.append(nav, panel);
+  return root;
+}
+
+/** Types that can convert into each other without wiping shared settings. */
+const TYPE_CONVERT_GROUPS = [
+  ['text', 'textarea', 'email', 'phone', 'url', 'number'],
+  ['date', 'time', 'datetime'],
+  ['radio', 'checkboxes', 'select', 'button_group'],
+  ['toggle', 'terms'],
+  ['file', 'image'],
+  ['heading', 'text_block', 'html'],
+];
+
+function convertibleTypes(type) {
+  const group = TYPE_CONVERT_GROUPS.find((list) => list.includes(type));
+  return group ? [...group] : [];
+}
+
+function canConvertType(from, to) {
+  if (!from || !to || from === to) {
+    return from === to;
+  }
+  const group = TYPE_CONVERT_GROUPS.find((list) => list.includes(from));
+  return Boolean(group && group.includes(to));
+}
+
+/**
+ * Copy live editor DOM values onto the in-memory field before type convert/rebuild.
+ */
+function hydrateFieldFromCard(row, field) {
+  const data = serializeRow(row);
+  if (!data || data.type === 'column') {
+    return;
+  }
+  const keepId = field.id;
+  const keepType = field.type;
+  Object.keys(field).forEach((key) => {
+    if (key === 'id' || key === 'type') {
+      return;
+    }
+    if (!(key in data)) {
+      delete field[key];
+    }
+  });
+  Object.assign(field, data, { id: keepId, type: keepType });
+}
+
+/**
+ * Switch field type within a conversion group, keeping shared values.
+ */
+function convertFieldType(field, nextType) {
+  if (!canConvertType(field.type, nextType) || field.type === nextType) {
+    return;
+  }
+
+  field.type = nextType;
+
+  if (OPTION_TYPES.includes(nextType)) {
+    if (!Array.isArray(field.options) || field.options.length === 0) {
+      field.options = [
+        { label: t('optionOne', 'Option 1'), value: 'option-1' },
+        { label: t('optionTwo', 'Option 2'), value: 'option-2' },
+      ];
+    }
+  } else {
+    delete field.options;
+  }
+
+  if (nextType === 'radio' || nextType === 'checkboxes') {
+    if (field.layout !== 'horizontal') {
+      field.layout = 'vertical';
+    }
+  } else {
+    delete field.layout;
+  }
+
+  if (MULTIPLE_TYPES.includes(nextType)) {
+    field.multiple = Boolean(field.multiple);
+  } else {
+    delete field.multiple;
+  }
+
+  if (nextType === 'terms') {
+    if (field.content == null || String(field.content).trim() === '') {
+      field.content = field.label || '';
+    }
+    field.required = true;
+  }
+
+  if (['heading', 'text_block', 'html'].includes(nextType) && field.content == null) {
+    field.content = '';
+  }
+
+  if (NO_DEFAULT.includes(nextType)) {
+    delete field.default_value;
+  }
+
+  if (NO_PLACEHOLDER.includes(nextType)) {
+    field.placeholder = '';
+  }
+}
+
+function createTypeSelect(field, row, onConvert) {
+  const types = convertibleTypes(field.type);
+  if (types.length < 2) {
+    return null;
+  }
+
+  const select = el('select', {
+    className: 'widefat',
+    dataset: { blType: '1' },
+  });
+  types.forEach((type) => {
+    const opt = el('option', {
+      value: type,
+      text: typeLabel(type),
+    });
+    if (type === field.type) {
+      opt.selected = true;
+    }
+    select.appendChild(opt);
+  });
+  select.addEventListener('change', () => {
+    const next = select.value;
+    if (!canConvertType(field.type, next)) {
+      select.value = field.type;
+      return;
+    }
+    hydrateFieldFromCard(row, field);
+    convertFieldType(field, next);
+    onConvert(next);
+  });
+
+  return el('p', { className: 'bl-forms-builder__type-select' }, [
+    el('label', { text: t('type', 'Type') }),
+    select,
+  ]);
+}
+
 const DESCRIPTION_TYPES = [
   'text',
   'email',
   'url',
   'number',
-  'password',
   'phone',
   'textarea',
   'date',
@@ -43,7 +321,6 @@ const NO_PLACEHOLDER = [
 ];
 const NO_REQUIRED = ['hidden', 'honeypot', 'captcha', 'divider', 'spacer', 'heading', 'text_block', 'html'];
 const NO_DEFAULT = [
-  'password',
   'file',
   'image',
   'honeypot',
@@ -62,7 +339,6 @@ const NAMED_TYPES = [
   'phone',
   'url',
   'number',
-  'password',
   'checkboxes',
   'radio',
   'select',
@@ -533,36 +809,40 @@ function appearancePayload(scope, width, widthCustom) {
   };
 }
 
-function createFieldEditorTabs() {
+function createFieldEditorTabs(activeId = 'general') {
   const tabBar = el('nav', {
     className: 'bl-forms-builder__field-tabs',
     role: 'tablist',
   });
   const panelsWrap = el('div', { className: 'bl-forms-builder__field-panels' });
-  const tabs = [
+  const tabDefs = [
     { id: 'general', label: t('fieldTabGeneral', 'General') },
     { id: 'advanced', label: t('fieldTabAdvanced', 'Advanced') },
     { id: 'appearance', label: t('fieldTabAppearance', 'Appearance') },
-  ].map((tab, index) => {
+  ];
+  const initialId = tabDefs.some((tab) => tab.id === activeId) ? activeId : 'general';
+
+  const tabs = tabDefs.map((tab) => {
+    const active = tab.id === initialId;
     const panel = el('div', {
-      className: 'bl-forms-builder__field-panel' + (index === 0 ? ' is-active' : ''),
+      className: 'bl-forms-builder__field-panel' + (active ? ' is-active' : ''),
       dataset: { blFieldPanel: tab.id },
       role: 'tabpanel',
     });
-    if (index !== 0) {
+    if (!active) {
       panel.hidden = true;
     }
     panelsWrap.appendChild(panel);
 
     const button = el('button', {
       type: 'button',
-      className: 'bl-forms-builder__field-tab' + (index === 0 ? ' is-active' : ''),
+      className: 'bl-forms-builder__field-tab' + (active ? ' is-active' : ''),
       role: 'tab',
       text: tab.label,
       dataset: { blFieldTab: tab.id },
       onClick: () => activate(tab.id),
     });
-    button.setAttribute('aria-selected', index === 0 ? 'true' : 'false');
+    button.setAttribute('aria-selected', active ? 'true' : 'false');
     tabBar.appendChild(button);
 
     return { ...tab, button, panel };
@@ -612,8 +892,19 @@ export function serializeRow(row) {
   const nameManual = row.dataset.nameManual === '1';
   const hideLabel = Boolean(q('[data-bl-hide-label]')?.checked);
 
-  if (type === 'divider' || type === 'captcha') {
+  if (type === 'divider') {
     return { id, type, ...appearancePayload(body, width, widthCustom) };
+  }
+
+  if (type === 'captcha') {
+    return {
+      id,
+      type,
+      captcha_provider: q('[data-bl-captcha-provider]')?.value || 'turnstile',
+      captcha_site_key: q('[data-bl-captcha-site-key]')?.value || '',
+      captcha_secret_key: q('[data-bl-captcha-secret-key]')?.value || '',
+      ...appearancePayload(body, width, widthCustom),
+    };
   }
 
   if (type === 'spacer') {
@@ -738,7 +1029,10 @@ export function createFieldCard(initial, open = false) {
   const body = el('div', { className: 'bl-forms-builder__field-body' });
 
   const updatePreview = () => {
-    const title = (field.label || field.content || field.placeholder || '').trim();
+    let title = (field.label || field.content || field.placeholder || '').trim();
+    if (field.type === 'captcha') {
+      title = captchaProviderLabel(field.captcha_provider || 'turnstile');
+    }
     preview.textContent = title;
     preview.hidden = title === '';
 
@@ -826,12 +1120,30 @@ export function createFieldCard(initial, open = false) {
     row.dataset.fieldName = next;
   };
 
-  const renderBody = () => {
+  const renderBody = (activeTab = 'general') => {
     body.replaceChildren();
-    const tabs = createFieldEditorTabs();
+    const tabs = createFieldEditorTabs(activeTab);
     const { general, advanced, appearance } = tabs;
     let generalCount = 0;
     let advancedCount = 0;
+
+    const onTypeConvert = () => {
+      updatePreview();
+      const stayOn =
+        ['heading', 'text_block', 'html'].includes(field.type) ? 'general' : 'advanced';
+      renderBody(stayOn);
+      document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+    };
+
+    const typeSelect = createTypeSelect(field, row, onTypeConvert);
+    const contentTypes = ['heading', 'text_block', 'html'];
+    if (typeSelect && contentTypes.includes(field.type)) {
+      general.appendChild(typeSelect);
+      generalCount += 1;
+    } else if (typeSelect) {
+      advanced.appendChild(typeSelect);
+      advancedCount += 1;
+    }
 
     if (field.type !== 'hidden') {
       appearance.appendChild(createWidthControl(field, updatePreview));
@@ -857,16 +1169,15 @@ export function createFieldCard(initial, open = false) {
       );
     }
 
-    if (field.type === 'divider' || field.type === 'captcha') {
-      if (field.type === 'captcha') {
-        general.appendChild(
-          el('p', {
-            className: 'description',
-            text: t('captchaHelp', 'CAPTCHA will be wired up later. This is a placeholder field.'),
-          })
-        );
-        generalCount += 1;
-      }
+    if (field.type === 'divider') {
+      // no general settings
+    } else if (field.type === 'captcha') {
+      general.appendChild(
+        createCaptchaSettings(field, () => {
+          updatePreview();
+        })
+      );
+      generalCount += 1;
     } else if (['heading', 'text_block', 'html'].includes(field.type)) {
       const ta = el('textarea', {
         className: 'widefat',
@@ -947,7 +1258,7 @@ export function createFieldCard(initial, open = false) {
 
       if (nameInput) {
         advanced.appendChild(
-          el('p', {}, [el('label', { text: t('name', 'Name (key)') }), nameInput])
+          el('p', {}, [el('label', { text: t('name', 'Field name') }), nameInput])
         );
         advanced.appendChild(
           el('p', {
@@ -1139,8 +1450,7 @@ export function createFieldCard(initial, open = false) {
     toggle,
     preview,
     headerMeta,
-    deleteBtn,
-    handle,
+    el('div', { className: 'bl-forms-builder__field-actions' }, [deleteBtn, handle]),
   ]);
 
   updatePreview();

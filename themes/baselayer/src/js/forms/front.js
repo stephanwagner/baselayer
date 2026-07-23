@@ -40,6 +40,13 @@ function initForm(root) {
 
   initImagePreviews(root);
 
+  // Prove JavaScript ran: copy the signed token into the hidden check field.
+  const jsField = form.querySelector('[data-bl-form-js-field]');
+  const jsToken = root.dataset.blFormJs || '';
+  if (jsField && jsToken) {
+    jsField.value = jsToken;
+  }
+
   const ajaxUrl = root.dataset.blFormAjax || '/wp-admin/admin-ajax.php';
   const successMsg = root.dataset.blFormSuccess || '';
   const errorMsg = root.dataset.blFormError || '';
@@ -73,6 +80,9 @@ function initForm(root) {
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (jsField && jsToken) {
+      jsField.value = jsToken;
+    }
     clearInvalid();
     showMessage('', '');
     setLoading(true);

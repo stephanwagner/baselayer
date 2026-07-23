@@ -22,6 +22,7 @@ const BL_FORM_ENTRY_MAIL_META = '_bl_entry_mail';
 
 require_once __DIR__ . '/helpers.php';
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/captcha.php';
 require_once __DIR__ . '/cpt.php';
 require_once __DIR__ . '/render.php';
 require_once __DIR__ . '/mail.php';
@@ -89,11 +90,11 @@ function bl_forms_resolve_asset(string $name, string $type): ?array
 	$type = $type === 'css' ? 'css' : 'js';
 	$dir = bl_forms_theme_path('assets/' . $type);
 	$uri_dir = bl_forms_theme_uri('assets/' . $type);
+	$debug = function_exists('bl_is_debug') && bl_is_debug();
 
-	$candidates = [
-		$name . '.min.' . $type,
-		$name . '.' . $type,
-	];
+	$candidates = $debug
+		? [$name . '.' . $type, $name . '.min.' . $type]
+		: [$name . '.min.' . $type, $name . '.' . $type];
 
 	foreach ($candidates as $file) {
 		$path = $dir . '/' . $file;
@@ -101,7 +102,7 @@ function bl_forms_resolve_asset(string $name, string $type): ?array
 			return [
 				'uri'  => $uri_dir . '/' . $file,
 				'path' => $path,
-				'ver'  => (string) filemtime($path),
+				'ver'  => $debug ? (string) time() : (string) filemtime($path),
 			];
 		}
 	}

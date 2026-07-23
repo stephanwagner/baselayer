@@ -89,7 +89,6 @@ function bl_forms_palette_icons(): array
 		'email'        => 'mail',
 		'url'          => 'link',
 		'number'       => '123',
-		'password'     => 'password',
 		'phone'        => 'phone',
 		'checkboxes'   => 'checklist',
 		'radio'        => 'radio-button-checked',
@@ -157,11 +156,21 @@ function bl_forms_admin_enqueue(string $hook): void
 
 	if ($is_form_edit) {
 		// Publish (and any other) side boxes are WP defaults — keep them, but not draggable.
+		// Defer until after postbox initializes sortable; only destroy when present.
 		wp_add_inline_script(
 			'postbox',
 			"jQuery(function($){
-				$('.meta-box-sortables').sortable('destroy');
-				$('.postbox .hndle').css('cursor', 'default');
+				function blFormsDisableMetaBoxSort() {
+					$('.meta-box-sortables').each(function(){
+						var \$el = $(this);
+						if (\$el.data('ui-sortable')) {
+							\$el.sortable('destroy');
+						}
+					});
+					$('.postbox .hndle, .postbox .handlediv').css('cursor', 'default');
+				}
+				blFormsDisableMetaBoxSort();
+				setTimeout(blFormsDisableMetaBoxSort, 0);
 			});"
 		);
 	}
@@ -174,6 +183,7 @@ function bl_forms_admin_enqueue(string $hook): void
 				'tabFields'         => __('Fields', 'baselayer'),
 				'tabNotifications'  => __('Notifications', 'baselayer'),
 				'tabSettings'       => __('Settings', 'baselayer'),
+				'tabSecurity'       => __('Security', 'baselayer'),
 				'paletteSearch'     => __('Search fields…', 'baselayer'),
 				'paletteSearchEmpty'=> __('No fields match your search.', 'baselayer'),
 				'paletteSectionPopular' => __('Popular', 'baselayer'),
@@ -194,7 +204,7 @@ function bl_forms_admin_enqueue(string $hook): void
 				'cancel'            => __('Cancel', 'baselayer'),
 				'apply'             => __('Apply', 'baselayer'),
 				'label'             => __('Label', 'baselayer'),
-				'name'              => __('Name (key)', 'baselayer'),
+				'name'              => __('Field name', 'baselayer'),
 				'nameHelp'          => __('Internal field key used in submissions, emails, and entry data. Auto-filled from the label until you edit it.', 'baselayer'),
 				'hideLabel'         => __('Hide label', 'baselayer'),
 				'fieldTabGeneral'   => __('General', 'baselayer'),
@@ -213,7 +223,19 @@ function bl_forms_admin_enqueue(string $hook): void
 				'defaultValueOptionsHelp' => __('Use option slugs from the list above. For multiple values, separate with commas (e.g. option-1, option-2).', 'baselayer'),
 				'spacerHeight'      => __('Height', 'baselayer'),
 				'honeypotHelp'      => __('Hidden from visitors. If filled, the submission is treated as spam.', 'baselayer'),
-				'captchaHelp'       => __('CAPTCHA will be wired up later. This is a placeholder field.', 'baselayer'),
+				'captchaHelp'       => __('Choose a CAPTCHA service and enter your keys.', 'baselayer'),
+				'captchaService'    => __('CAPTCHA service', 'baselayer'),
+				'captchaSiteKey'    => __('Site key', 'baselayer'),
+				'captchaSecretKey'  => __('Secret key', 'baselayer'),
+				'captchaApiKey'     => __('API key', 'baselayer'),
+				'captchaTurnstile'  => __('Cloudflare Turnstile', 'baselayer'),
+				'captchaTurnstileHelp' => __('Mostly invisible. Excellent privacy and very easy to set up.', 'baselayer'),
+				'captchaHcaptcha'   => __('hCaptcha', 'baselayer'),
+				'captchaHcaptchaHelp' => __('Good privacy and UX. Very easy to set up.', 'baselayer'),
+				'captchaFriendly'   => __('Friendly Captcha', 'baselayer'),
+				'captchaFriendlyHelp' => __('Excellent privacy and accessibility. Easy to set up.', 'baselayer'),
+				'captchaRecaptcha'  => __('Google reCAPTCHA v2', 'baselayer'),
+				'captchaRecaptchaHelp' => __('Familiar checkbox challenge. Weaker privacy. Very easy to set up.', 'baselayer'),
 				'termsDefaultLabel' => __('I agree to the [Privacy Policy](page:privacy).', 'baselayer'),
 				'checkboxText'      => __('Checkbox text', 'baselayer'),
 				'checkboxTextHelp'  => __('Links: [Privacy Policy](page:privacy) (site privacy page), [Privacy Policy](/privacy-policy), or [Privacy Policy](page:234). Unresolved page links show as plain text.', 'baselayer'),
@@ -224,6 +246,8 @@ function bl_forms_admin_enqueue(string $hook): void
 				'optionLabel'       => __('Label', 'baselayer'),
 				'optionSlug'        => __('Slug', 'baselayer'),
 				'optionValue'       => __('Slug', 'baselayer'),
+				'optionOne'         => __('Option 1', 'baselayer'),
+				'optionTwo'         => __('Option 2', 'baselayer'),
 				'delete'            => __('Delete', 'baselayer'),
 				'editField'         => __('Edit field', 'baselayer'),
 				'doneEditing'       => __('Done editing', 'baselayer'),
@@ -252,12 +276,28 @@ function bl_forms_admin_enqueue(string $hook): void
 				'adminSubject'      => __('Admin email subject', 'baselayer'),
 				'userSubject'       => __('User email subject', 'baselayer'),
 				'userIntro'         => __('User email intro', 'baselayer'),
+				'securityCsrf'      => __('CSRF protection', 'baselayer'),
+				'securityCsrfHelp'  => __('A WordPress nonce is verified on every submission to block forged requests.', 'baselayer'),
+				'securityRequired'  => __('required', 'baselayer'),
+				'securityRecommended' => __('recommended', 'baselayer'),
+				'securityJsCheck'   => __('JavaScript check', 'baselayer'),
+				'securityJsCheckHelp' => __('A hidden field is filled by JavaScript. Submissions without a valid value are discarded quietly.', 'baselayer'),
+				'securityHoneypot'  => __('Honeypot field', 'baselayer'),
+				'securityHoneypotHelp' => __('A hidden field traps bots. If it is filled, the submission is discarded quietly.', 'baselayer'),
+				'securityHoneypotName' => __('Field name', 'baselayer'),
+				'securityMinFillTime' => __('Minimum fill time', 'baselayer'),
+				'securityMinFillTimeHelp' => __('Reject submissions that are sent faster than a real visitor would typically fill the form.', 'baselayer'),
+				'securityMinFillTimeSeconds' => __('seconds', 'baselayer'),
+				'securityRateLimit' => __('Maximum submissions', 'baselayer'),
+				'securityRateLimitHelp' => __('Limit how many times the same visitor can submit this form in a time window.', 'baselayer'),
+				'securityRateLimitMax' => __('Max', 'baselayer'),
+				'securityRateLimitIn' => __('submissions in', 'baselayer'),
+				'securityRateLimitMinutes' => __('minutes', 'baselayer'),
 				'types'             => [
 					'text'         => __('Text', 'baselayer'),
 					'email'        => __('Email', 'baselayer'),
 					'url'          => __('URL', 'baselayer'),
 					'number'       => __('Number', 'baselayer'),
-					'password'     => __('Password', 'baselayer'),
 					'phone'        => __('Phone', 'baselayer'),
 					'textarea'     => __('Textarea', 'baselayer'),
 					'radio'        => __('Radio Buttons', 'baselayer'),

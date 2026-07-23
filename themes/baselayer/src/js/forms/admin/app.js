@@ -54,6 +54,7 @@ export function mountApp(root, initial) {
     { id: 'fields', label: t('tabFields', 'Fields'), panel: fieldsPanel },
     { id: 'notifications', label: t('tabNotifications', 'Notifications'), panel: panels.notifications },
     { id: 'settings', label: t('tabSettings', 'Settings'), panel: panels.settings },
+    { id: 'security', label: t('tabSecurity', 'Security'), panel: panels.security },
   ];
 
   const activate = (id) => {
@@ -83,6 +84,7 @@ export function mountApp(root, initial) {
     fieldsPanel,
     panels.notifications,
     panels.settings,
+    panels.security,
   ]);
 
   root.append(tabBar, panelsWrap);
