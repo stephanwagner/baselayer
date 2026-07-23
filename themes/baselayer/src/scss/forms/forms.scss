@@ -91,12 +91,28 @@
   flex-direction: column;
   gap: 0.35rem;
 
-  &.is-invalid .bl-form__control,
+  &.is-invalid .bl-form__control {
+    border-color: var(--bl-form-danger);
+    outline: 2px solid color-mix(in srgb, var(--bl-form-danger) 35%, transparent);
+    outline-offset: 0;
+  }
+
   &.is-invalid .bl-form__option,
   &.is-invalid .bl-form__btn-option,
   &.is-invalid .bl-form__switch-ui {
     outline: 2px solid var(--bl-form-danger);
     outline-offset: 1px;
+  }
+}
+
+.bl-form__error {
+  margin: 0;
+  font-size: 0.875em;
+  font-weight: 500;
+  color: var(--bl-form-danger);
+
+  &[hidden] {
+    display: none !important;
   }
 }
 

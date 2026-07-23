@@ -240,6 +240,15 @@ function convertFieldType(field, nextType) {
   if (NO_PLACEHOLDER.includes(nextType)) {
     field.placeholder = '';
   }
+
+  if (!AUTOCOMPLETE_TYPES.includes(nextType)) {
+    delete field.autocomplete;
+  }
+
+  if (nextType !== 'number') {
+    delete field.min;
+    delete field.max;
+  }
 }
 
 function createTypeSelect(field, row, onConvert) {
@@ -318,6 +327,18 @@ const NO_READONLY = [
   'image',
 ];
 const NO_DISABLED = [...NO_REQUIRED];
+const AUTOCOMPLETE_TYPES = [
+  'text',
+  'email',
+  'url',
+  'number',
+  'phone',
+  'textarea',
+  'date',
+  'time',
+  'datetime',
+  'select',
+];
 const NO_DEFAULT = [
   'file',
   'image',
@@ -677,6 +698,64 @@ function createLayoutControl(field) {
   });
   wrap.append(el('label', { text: t('layout', 'Layout') }), group);
   return wrap;
+}
+
+function createAutocompleteControl(field) {
+  const select = el('select', {
+    className: 'widefat',
+    dataset: { blAutocomplete: '1' },
+  });
+  const active = field.autocomplete === 'off' ? 'off' : 'auto';
+  [
+    { value: 'auto', label: t('autocompleteAutomatic', 'Automatic') },
+    { value: 'off', label: t('autocompleteOff', 'Off') },
+  ].forEach((opt) => {
+    const option = el('option', { value: opt.value, text: opt.label });
+    if (opt.value === active) {
+      option.selected = true;
+    }
+    select.appendChild(option);
+  });
+  select.addEventListener('change', () => {
+    field.autocomplete = select.value === 'off' ? 'off' : 'auto';
+    document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+  });
+  return el('p', { className: 'bl-forms-builder__autocomplete bl-forms-builder__type-select' }, [
+    el('label', { text: t('autocomplete', 'Autocomplete') }),
+    select,
+  ]);
+}
+
+function createNumberBoundsControl(field) {
+  const minInput = el('input', {
+    type: 'number',
+    className: 'widefat',
+    dataset: { blMin: '1' },
+    value: field.min != null && field.min !== '' ? String(field.min) : '',
+    step: 'any',
+  });
+  const maxInput = el('input', {
+    type: 'number',
+    className: 'widefat',
+    dataset: { blMax: '1' },
+    value: field.max != null && field.max !== '' ? String(field.max) : '',
+    step: 'any',
+  });
+
+  const sync = () => {
+    field.min = minInput.value.trim();
+    field.max = maxInput.value.trim();
+    document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+  };
+  minInput.addEventListener('change', sync);
+  maxInput.addEventListener('change', sync);
+  minInput.addEventListener('blur', sync);
+  maxInput.addEventListener('blur', sync);
+
+  return el('div', { className: 'bl-forms-builder__number-bounds' }, [
+    el('p', {}, [el('label', { text: t('minValue', 'Minimum') }), minInput]),
+    el('p', {}, [el('label', { text: t('maxValue', 'Maximum') }), maxInput]),
+  ]);
 }
 
 export function createCssClassControl(field) {
@@ -1137,6 +1216,14 @@ export function serializeRow(row) {
   if (MULTIPLE_TYPES.includes(type)) {
     data.multiple = Boolean(q('[data-bl-multiple]')?.checked);
   }
+  if (AUTOCOMPLETE_TYPES.includes(type)) {
+    const ac = q('[data-bl-autocomplete]');
+    data.autocomplete = ac?.value === 'off' ? 'off' : 'auto';
+  }
+  if (type === 'number') {
+    data.min = q('[data-bl-min]')?.value?.trim() || '';
+    data.max = q('[data-bl-max]')?.value?.trim() || '';
+  }
   if (NO_READONLY.includes(type)) {
     delete data.readonly;
   }
@@ -1392,28 +1479,23 @@ export function createFieldCard(initial, open = false) {
         updatePreview();
       });
 
-      const labelRow = el('div', { className: 'bl-forms-builder__label-row' });
-      labelRow.appendChild(
-        el('p', { className: 'bl-forms-builder__label-field' }, [
-          el('label', { text: t('label', 'Label') }),
-          labelInput,
-        ])
-      );
+      const labelControls = el('div', { className: 'bl-forms-builder__label-controls' }, [labelInput]);
       if (HIDE_LABEL_TYPES.includes(field.type)) {
-        labelRow.appendChild(
-          el(
-            'div',
-            { className: 'bl-forms-builder__hide-label' },
-            [
-              createSwitchSetting('blHideLabel', t('hideLabel', 'Hide label'), !!field.hide_label, (checked) => {
-                field.hide_label = checked;
-                document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
-              }),
-            ]
-          )
+        labelControls.appendChild(
+          el('div', { className: 'bl-forms-builder__hide-label' }, [
+            createSwitchSetting('blHideLabel', t('hideLabel', 'Hide label'), !!field.hide_label, (checked) => {
+              field.hide_label = checked;
+              document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+            }),
+          ])
         );
       }
-      generalSections.add(labelRow);
+      generalSections.add(
+        el('div', { className: 'bl-forms-builder__label-row' }, [
+          el('label', { text: t('label', 'Label') }),
+          labelControls,
+        ])
+      );
 
       if (nameInput) {
         advancedSections.add(
@@ -1422,10 +1504,18 @@ export function createFieldCard(initial, open = false) {
             className: 'description',
             text: t(
               'nameHelp',
-              'Internal field key used in submissions, emails, and entry data. Auto-filled from the label until you edit it.'
+              'Internal field key used in submissions, emails, and entry data.'
             ),
           })
         );
+      }
+
+      if (AUTOCOMPLETE_TYPES.includes(field.type)) {
+        advancedSections.add(createAutocompleteControl(field));
+      }
+
+      if (field.type === 'number') {
+        advancedSections.add(createNumberBoundsControl(field));
       }
 
       if (field.type === 'terms') {

@@ -3,6 +3,50 @@
 defined('ABSPATH') || exit;
 
 /**
+ * Human-readable validation message for a field error code.
+ *
+ * @param array<string, mixed> $field
+ * @param array<string, mixed> $settings
+ */
+function bl_forms_field_error_message(string $code, array $field = [], array $settings = []): string
+{
+	switch ($code) {
+		case 'required':
+			return bl_forms_resolve_message($settings, 'required_message');
+		case 'min':
+			return sprintf(
+				bl_forms_resolve_message($settings, 'min_message'),
+				(string) ($field['min'] ?? '')
+			);
+		case 'max':
+			return sprintf(
+				bl_forms_resolve_message($settings, 'max_message'),
+				(string) ($field['max'] ?? '')
+			);
+		case 'number':
+			return __('Enter a valid number.', 'baselayer');
+		case 'email':
+			return __('Enter a valid email address.', 'baselayer');
+		case 'url':
+			return __('Enter a valid URL.', 'baselayer');
+		case 'phone':
+			return __('Enter a valid phone number.', 'baselayer');
+		case 'date':
+			return __('Enter a valid date.', 'baselayer');
+		case 'time':
+			return __('Enter a valid time.', 'baselayer');
+		case 'datetime':
+			return __('Enter a valid date and time.', 'baselayer');
+		case 'file':
+			return __('Please upload a valid file.', 'baselayer');
+		case 'option':
+			return __('Please choose a valid option.', 'baselayer');
+		default:
+			return __('Please check this field.', 'baselayer');
+	}
+}
+
+/**
  * AJAX submit handler (logged-in + guests).
  */
 function bl_forms_ajax_submit(): void
@@ -81,7 +125,7 @@ function bl_forms_ajax_submit(): void
 		}
 	}
 
-	[$values, $invalid] = bl_forms_validate_submission($config['fields'], $raw_fields, $_FILES);
+	[$values, $invalid] = bl_forms_validate_submission($config['fields'], $raw_fields, $_FILES, $settings);
 	if ($invalid !== []) {
 		wp_send_json_error([
 			'message' => bl_forms_resolve_message($settings, 'validation_message'),
@@ -245,11 +289,13 @@ function bl_forms_client_ip_hash(): string
  * @param list<array<string, mixed>> $fields
  * @param array<string, mixed>       $raw
  * @param array<string, mixed>       $files Raw $_FILES.
- * @return array{0: array<string, mixed>, 1: list<string>}
+ * @param array<string, mixed>       $settings Form settings (for custom validation copy).
+ * @return array{0: array<string, mixed>, 1: array<string, string>}
  */
-function bl_forms_validate_submission(array $fields, array $raw, array $files = []): array
+function bl_forms_validate_submission(array $fields, array $raw, array $files = [], array $settings = []): array
 {
 	$values = [];
+	/** @var array<string, string> $invalid */
 	$invalid = [];
 
 	foreach (bl_forms_iter_fields($fields) as $field) {
@@ -293,8 +339,10 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 		if (in_array($type, ['file', 'image'], true)) {
 			[$stored, $ok] = bl_forms_process_field_uploads($name, $files, $type === 'image', $multiple);
 			$values[$name] = $stored;
-			if (!$ok || ($required && $stored === [])) {
-				$invalid[] = $name;
+			if (!$ok) {
+				$invalid[$name] = bl_forms_field_error_message('file', $field, $settings);
+			} elseif ($required && $stored === []) {
+				$invalid[$name] = bl_forms_field_error_message('required', $field, $settings);
 			}
 			continue;
 		}
@@ -315,7 +363,7 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 
 			$values[$name] = $list;
 			if ($required && $list === []) {
-				$invalid[] = $name;
+				$invalid[$name] = bl_forms_field_error_message('required', $field, $settings);
 			}
 			continue;
 		}
@@ -324,7 +372,7 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 			$checked = !empty($raw_value);
 			$values[$name] = $checked ? '1' : '';
 			if ($required && !$checked) {
-				$invalid[] = $name;
+				$invalid[$name] = bl_forms_field_error_message('required', $field, $settings);
 			}
 			continue;
 		}
@@ -339,35 +387,35 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 		} elseif ($type === 'number') {
 			if ($value !== '' && !is_numeric($value)) {
 				$values[$name] = sanitize_text_field($value);
-				$invalid[] = $name;
+				$invalid[$name] = bl_forms_field_error_message('number', $field, $settings);
 				continue;
 			}
 		} elseif ($type === 'phone') {
 			$value = sanitize_text_field($value);
 			if ($value !== '' && !bl_forms_is_valid_phone($value)) {
 				$values[$name] = $value;
-				$invalid[] = $name;
+				$invalid[$name] = bl_forms_field_error_message('phone', $field, $settings);
 				continue;
 			}
 		} elseif ($type === 'date') {
 			$value = sanitize_text_field($value);
 			if ($value !== '' && !bl_forms_is_valid_date($value)) {
 				$values[$name] = $value;
-				$invalid[] = $name;
+				$invalid[$name] = bl_forms_field_error_message('date', $field, $settings);
 				continue;
 			}
 		} elseif ($type === 'time') {
 			$value = sanitize_text_field($value);
 			if ($value !== '' && !bl_forms_is_valid_time($value)) {
 				$values[$name] = $value;
-				$invalid[] = $name;
+				$invalid[$name] = bl_forms_field_error_message('time', $field, $settings);
 				continue;
 			}
 		} elseif ($type === 'datetime') {
 			$value = sanitize_text_field($value);
 			if ($value !== '' && !bl_forms_is_valid_datetime($value)) {
 				$values[$name] = $value;
-				$invalid[] = $name;
+				$invalid[$name] = bl_forms_field_error_message('datetime', $field, $settings);
 				continue;
 			}
 		} else {
@@ -378,7 +426,7 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 			$allowed = bl_forms_filter_allowed_option_values($field, [$value]);
 			$value = $allowed[0] ?? '';
 			if ($value === '' && $raw_value !== null && (string) $raw_value !== '') {
-				$invalid[] = $name;
+				$invalid[$name] = bl_forms_field_error_message('option', $field, $settings);
 				$values[$name] = '';
 				continue;
 			}
@@ -387,12 +435,13 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 		$values[$name] = $value;
 
 		if ($required && $value === '') {
-			$invalid[] = $name;
+			$invalid[$name] = bl_forms_field_error_message('required', $field, $settings);
 			continue;
 		}
 
 		if ($type === 'email' && $value !== '' && !is_email($value)) {
-			$invalid[] = $name;
+			$invalid[$name] = bl_forms_field_error_message('email', $field, $settings);
+			continue;
 		}
 
 		if ($type === 'url' && $value !== '') {
@@ -400,12 +449,23 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 				? (bool) wp_http_validate_url($value)
 				: (bool) filter_var($value, FILTER_VALIDATE_URL);
 			if (!$valid_url) {
-				$invalid[] = $name;
+				$invalid[$name] = bl_forms_field_error_message('url', $field, $settings);
+				continue;
 			}
 		}
 
-		if ($type === 'number' && $value !== '' && !is_numeric($value)) {
-			$invalid[] = $name;
+		if ($type === 'number' && $value !== '' && is_numeric($value)) {
+			$num = (float) $value;
+			$min = isset($field['min']) ? bl_forms_sanitize_optional_number((string) $field['min']) : '';
+			$max = isset($field['max']) ? bl_forms_sanitize_optional_number((string) $field['max']) : '';
+			if ($min !== '' && $num < (float) $min) {
+				$invalid[$name] = bl_forms_field_error_message('min', $field, $settings);
+				continue;
+			}
+			if ($max !== '' && $num > (float) $max) {
+				$invalid[$name] = bl_forms_field_error_message('max', $field, $settings);
+				continue;
+			}
 		}
 	}
 

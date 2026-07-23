@@ -126,6 +126,8 @@ function bl_forms_send_emails(int $form_id, int $entry_id, array $config, array 
 		$intro = trim((string) ($settings['user_email_intro'] ?? ''));
 		if ($intro === '') {
 			$intro = __('Thank you for your message. Here is a copy of what you sent:', 'baselayer');
+		} else {
+			$intro = bl_forms_replace_field_placeholders($intro, $config['fields'], $values);
 		}
 
 		$body = bl_forms_compose_email('form-confirmation', [
@@ -145,6 +147,41 @@ function bl_forms_send_emails(int $form_id, int $entry_id, array $config, array 
 	}
 
 	return $status;
+}
+
+/**
+ * Replace [field-name] tokens with submitted display values.
+ *
+ * @param list<array<string, mixed>> $fields
+ * @param array<string, mixed>       $values
+ */
+function bl_forms_replace_field_placeholders(string $text, array $fields, array $values): string
+{
+	if ($text === '' || !str_contains($text, '[')) {
+		return $text;
+	}
+
+	$by_name = [];
+	foreach (bl_forms_iter_fields($fields) as $field) {
+		$name = sanitize_key((string) ($field['name'] ?? ''));
+		if ($name === '' || !array_key_exists($name, $values)) {
+			continue;
+		}
+		$by_name[$name] = bl_forms_format_field_display_value($field, $values[$name]);
+	}
+
+	if ($by_name === []) {
+		return $text;
+	}
+
+	return (string) preg_replace_callback(
+		'/\[([a-zA-Z0-9_-]+)\]/',
+		static function (array $matches) use ($by_name): string {
+			$key = sanitize_key($matches[1]);
+			return array_key_exists($key, $by_name) ? $by_name[$key] : $matches[0];
+		},
+		$text
+	);
 }
 
 /**

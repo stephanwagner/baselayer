@@ -131,9 +131,10 @@ function bl_forms_field_wrap_attrs(array $field, string $extra_class = '', strin
 }
 
 /**
- * Control attributes: required, readonly, disabled.
+ * Control attributes: required, readonly, disabled, autocomplete.
  *
  * Disabled fields omit required (invalid HTML combination).
+ * Autocomplete is only emitted when explicitly set to off.
  *
  * @param array<string, mixed> $field
  */
@@ -149,6 +150,9 @@ function bl_forms_field_control_attrs(array $field, bool $allow_readonly = true)
 	}
 	if ($disabled) {
 		$attrs .= ' disabled';
+	}
+	if (($field['autocomplete'] ?? 'auto') === 'off') {
+		$attrs .= ' autocomplete="off"';
 	}
 
 	return $attrs;
@@ -664,11 +668,24 @@ function bl_forms_render_field(array $field, string $uid): string
 	} elseif ($type === 'datetime') {
 		$input_type = 'datetime-local';
 	}
+
+	$number_attrs = '';
+	if ($type === 'number') {
+		$min = isset($field['min']) ? bl_forms_sanitize_optional_number((string) $field['min']) : '';
+		$max = isset($field['max']) ? bl_forms_sanitize_optional_number((string) $field['max']) : '';
+		if ($min !== '') {
+			$number_attrs .= ' min="' . esc_attr($min) . '"';
+		}
+		if ($max !== '') {
+			$number_attrs .= ' max="' . esc_attr($max) . '"';
+		}
+		$number_attrs .= ' step="any"';
+	}
 	?>
 	<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--' . sanitize_html_class($type), $name) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 		<?= bl_forms_field_label_html($field, $input_id, $req_mark) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-		<input class="bl-form__control" type="<?= esc_attr($input_type) ?>" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" value="<?= esc_attr($default_value) ?>" placeholder="<?= esc_attr($placeholder) ?>"<?= $control_attrs ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<input class="bl-form__control" type="<?= esc_attr($input_type) ?>" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" value="<?= esc_attr($default_value) ?>" placeholder="<?= esc_attr($placeholder) ?>"<?= $control_attrs ?><?= $number_attrs // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	</div>
 	<?php
 

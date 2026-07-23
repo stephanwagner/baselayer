@@ -1,5 +1,5 @@
 /**
- * Frontend form AJAX submit + spinner + image preview.
+ * Frontend form AJAX submit + spinner + image preview + field errors.
  */
 function initImagePreviews(root) {
   root.querySelectorAll('[data-bl-form-image-input]').forEach((input) => {
@@ -28,6 +28,32 @@ function initImagePreviews(root) {
       });
     });
   });
+}
+
+function ensureErrorEl(field) {
+  let err = field.querySelector('[data-bl-form-field-error]');
+  if (err) {
+    return err;
+  }
+  err = document.createElement('p');
+  err.className = 'bl-form__error';
+  err.setAttribute('data-bl-form-field-error', '');
+  err.hidden = true;
+  field.appendChild(err);
+  return err;
+}
+
+function fieldEntriesFromPayload(fields) {
+  if (!fields) {
+    return [];
+  }
+  if (Array.isArray(fields)) {
+    return fields.map((name) => [String(name), '']);
+  }
+  if (typeof fields === 'object') {
+    return Object.entries(fields).map(([name, message]) => [String(name), String(message || '')]);
+  }
+  return [];
 }
 
 function initForm(root) {
@@ -69,16 +95,47 @@ function initForm(root) {
     if (label) label.hidden = loading;
   };
 
-  const clearInvalid = () => {
-    root.querySelectorAll('.is-invalid').forEach((node) => node.classList.remove('is-invalid'));
+  const clearFieldInvalid = (field) => {
+    if (!field) return;
+    field.classList.remove('is-invalid');
+    field.removeAttribute('aria-invalid');
+    const err = field.querySelector('[data-bl-form-field-error]');
+    if (err) {
+      err.hidden = true;
+      err.textContent = '';
+    }
+    if (!root.querySelector('.is-invalid')) {
+      showMessage('', '');
+    }
   };
 
-  const markInvalid = (names) => {
-    (names || []).forEach((name) => {
+  const clearInvalid = () => {
+    root.querySelectorAll('.is-invalid').forEach((node) => clearFieldInvalid(node));
+  };
+
+  const markInvalid = (fields) => {
+    fieldEntriesFromPayload(fields).forEach(([name, msg]) => {
       const field = root.querySelector('[data-bl-form-field="' + CSS.escape(name) + '"]');
-      if (field) field.classList.add('is-invalid');
+      if (!field) return;
+      field.classList.add('is-invalid');
+      field.setAttribute('aria-invalid', 'true');
+      const err = ensureErrorEl(field);
+      err.textContent = msg;
+      err.hidden = !msg;
     });
   };
+
+  const clearInvalidFromEvent = (event) => {
+    const target = event.target;
+    if (!(target instanceof Element)) return;
+    const field = target.closest('[data-bl-form-field]');
+    if (field && field.classList.contains('is-invalid')) {
+      clearFieldInvalid(field);
+    }
+  };
+
+  form.addEventListener('input', clearInvalidFromEvent);
+  form.addEventListener('change', clearInvalidFromEvent);
 
   const handleSuccess = (payload) => {
     // Only trust redirect from a real submission response (not honeypot / JS-check fakes).
@@ -120,7 +177,7 @@ function initForm(root) {
 
       const payload = (data && data.data) || {};
       if (payload.code === 'validation') {
-        markInvalid(payload.fields || []);
+        markInvalid(payload.fields || {});
         showMessage(payload.message || validationMsg, 'error');
       } else {
         showMessage(payload.message || errorMsg, 'error');

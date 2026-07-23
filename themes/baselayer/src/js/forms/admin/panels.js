@@ -1,4 +1,4 @@
-import { el, t, flattenFields } from './dom.js';
+import { el, t, flattenFields, iconEl } from './dom.js';
 import { openPagePicker } from '../../admin/utils/page-picker.js';
 
 function fieldRow(label, control, help = '') {
@@ -37,33 +37,100 @@ function randomHoneypotName() {
 }
 
 function securityBadge(kind) {
-  const isRequired = kind === 'required';
-  return el('span', {
-    className:
-      'bl-forms-builder__security-badge' +
-      (isRequired
-        ? ' bl-forms-builder__security-badge--required'
-        : ' bl-forms-builder__security-badge--recommended'),
-    text: isRequired
-      ? t('securityRequired', 'required')
-      : t('securityRecommended', 'recommended'),
+  if (kind !== 'required' && kind !== 'always') {
+    return null;
+  }
+  const badge = el('span', {
+    className: 'bl-forms-builder__security-badge bl-forms-builder__security-badge--always',
   });
+  const icon = iconEl('lock', 'bl-forms-builder__security-badge-icon');
+  if (icon.innerHTML) {
+    badge.appendChild(icon);
+  }
+  badge.appendChild(
+    el('span', {
+      className: 'bl-forms-builder__security-badge-text',
+      text: t('securityAlwaysOn', 'Always on'),
+    })
+  );
+  return badge;
 }
 
-function securityLabel(checkbox, label, kind) {
-  return el('label', { className: 'bl-forms-builder__security-label' }, [
-    checkbox,
-    el('span', { className: 'bl-forms-builder__security-label-text', text: label }),
-    securityBadge(kind),
+/**
+ * Security row heading with the shared switch control + status badge.
+ *
+ * @returns {{ root: HTMLElement, input: HTMLInputElement }}
+ */
+function securitySwitch(label, kind, { checked = false, disabled = false, onChange = null } = {}) {
+  const input = el('input', {
+    type: 'checkbox',
+    checked: !!checked,
+    disabled: !!disabled,
+  });
+  if (onChange && !disabled) {
+    input.addEventListener('change', () => onChange(input.checked));
+  }
+
+  const labelChildren = [
+    input,
+    el('span', { className: 'bl-forms-builder__switch-ui', 'aria-hidden': 'true' }),
+    el('span', { className: 'bl-forms-builder__switch-label', text: label }),
+  ];
+  const badge = securityBadge(kind);
+  if (badge) {
+    labelChildren.push(badge);
+  }
+
+  const root = el(
+    'div',
+    {
+      className:
+        'bl-forms-builder__switch-setting bl-forms-builder__security-heading' +
+        (disabled ? ' is-disabled' : ''),
+    },
+    [el('label', { className: 'bl-forms-builder__switch' }, labelChildren)]
+  );
+
+  return { root, input };
+}
+
+/**
+ * Plain switch (no security badge).
+ *
+ * @returns {{ root: HTMLElement, input: HTMLInputElement }}
+ */
+function plainSwitch(label, { checked = false, onChange = null } = {}) {
+  const input = el('input', {
+    type: 'checkbox',
+    checked: !!checked,
+  });
+  if (onChange) {
+    input.addEventListener('change', () => onChange(input.checked));
+  }
+  const root = el('div', { className: 'bl-forms-builder__switch-setting' }, [
+    el('label', { className: 'bl-forms-builder__switch' }, [
+      input,
+      el('span', { className: 'bl-forms-builder__switch-ui', 'aria-hidden': 'true' }),
+      el('span', { className: 'bl-forms-builder__switch-label', text: label }),
+    ]),
   ]);
+  return { root, input };
 }
 
-function lockedOption(label, help, kind = 'required') {
-  const cb = el('input', { type: 'checkbox', checked: true, disabled: true });
+function securityOption(heading, help, extra = null) {
+  const bodyChildren = [el('span', { className: 'description', text: help })];
+  if (extra) {
+    bodyChildren.push(extra);
+  }
   return el('div', { className: 'bl-forms-builder__setting bl-forms-builder__security-option' }, [
-    securityLabel(cb, label, kind),
-    el('span', { className: 'description', text: help }),
+    heading,
+    el('div', { className: 'bl-forms-builder__security-body' }, bodyChildren),
   ]);
+}
+
+function lockedOption(label, help) {
+  const { root } = securitySwitch(label, 'always', { checked: true, disabled: true });
+  return securityOption(root, help);
 }
 
 /**
@@ -112,10 +179,14 @@ export function createPanels(settings, builderRoot, onChange) {
   };
 
   const adminEmail = builderRoot.dataset.adminEmail || '';
+  const fbAdminSubject = builderRoot.dataset.fallbackAdminSubject || '';
   const fbSubmit = builderRoot.dataset.fallbackSubmit || '';
   const fbSuccess = builderRoot.dataset.fallbackSuccess || '';
   const fbError = builderRoot.dataset.fallbackError || '';
   const fbValidation = builderRoot.dataset.fallbackValidation || '';
+  const fbRequired = builderRoot.dataset.fallbackRequired || '';
+  const fbMin = builderRoot.dataset.fallbackMin || '';
+  const fbMax = builderRoot.dataset.fallbackMax || '';
 
   // Notifications
   const notifications = el('div', {
@@ -128,21 +199,34 @@ export function createPanels(settings, builderRoot, onChange) {
     el('input', { type: 'email', className: 'widefat', placeholder: adminEmail }),
     'recipient'
   );
-  const adminSubject = bindText(el('input', { type: 'text', className: 'widefat' }), 'admin_email_subject');
-  const notify = el('input', { type: 'checkbox', checked: !!state.notify_user });
+  const adminSubject = bindText(
+    el('input', {
+      type: 'text',
+      className: 'widefat',
+      placeholder: fbAdminSubject,
+    }),
+    'admin_email_subject'
+  );
 
   const userOptions = el('div', { className: 'bl-forms-builder__notify-user-options' });
   const sendToWrap = el('div', { className: 'bl-forms-builder__setting bl-forms-builder__send-to' });
   const sendToControl = el('div', { className: 'bl-forms-builder__send-to-control' });
   sendToWrap.append(
-    el('label', {}, [el('strong', { text: t('sendTo', 'Send to') })]),
+    el('label', {}, [el('strong', { text: t('emailField', 'Email field') })]),
     sendToControl
   );
 
   const userSubject = bindText(el('input', { type: 'text', className: 'widefat' }), 'user_email_subject');
   const userIntro = bindText(el('textarea', { className: 'widefat', rows: '3' }), 'user_email_intro');
-  const userSubjectRow = fieldRow(t('userSubject', 'User email subject'), userSubject);
-  const userIntroRow = fieldRow(t('userIntro', 'User email intro'), userIntro);
+  const userSubjectRow = fieldRow(t('subject', 'Subject'), userSubject);
+  const userIntroRow = fieldRow(
+    t('introText', 'Intro text'),
+    userIntro,
+    t(
+      'introTextHelp',
+      'This text appears above the submitted form data in the email. Placeholders can be used [field-id].'
+    )
+  );
 
   userOptions.append(sendToWrap, userSubjectRow, userIntroRow);
 
@@ -163,8 +247,9 @@ export function createPanels(settings, builderRoot, onChange) {
 
     if (emailFields.length === 0) {
       sendToControl.appendChild(
-        el('span', {
-          className: 'description',
+        el('div', {
+          className: 'bl-forms-builder__notice bl-forms-builder__notice--warning',
+          role: 'status',
           text: t('notifyUserHelp', 'Requires an Email field on the form.'),
         })
       );
@@ -200,6 +285,16 @@ export function createPanels(settings, builderRoot, onChange) {
     sendToControl.appendChild(select);
   };
 
+  const notifySwitch = plainSwitch(t('notifyUser', 'Enable'), {
+    checked: !!state.notify_user,
+    onChange: (checked) => {
+      state.notify_user = checked;
+      syncNotifyOptions();
+      emit();
+    },
+  });
+  const notify = notifySwitch.input;
+
   const syncNotifyOptions = () => {
     userOptions.hidden = !notify.checked;
     if (notify.checked) {
@@ -207,19 +302,22 @@ export function createPanels(settings, builderRoot, onChange) {
     }
   };
 
-  notify.addEventListener('change', () => {
-    state.notify_user = notify.checked;
-    syncNotifyOptions();
-    emit();
-  });
-
   notifications.append(
-    fieldRow(t('recipient', 'Notification recipient'), recipient, t('recipientHelp')),
-    fieldRow(t('adminSubject', 'Admin email subject'), adminSubject),
-    el('p', { className: 'bl-forms-builder__setting' }, [
-      el('label', {}, [notify, ' ' + t('notifyUser', 'Send confirmation email to submitter')]),
-    ]),
-    userOptions
+    fieldRow(
+      t('recipient', 'Recipient'),
+      recipient,
+      t('recipientHelp', 'Leave empty to use the site administrator email.')
+    ),
+    fieldRow(t('subject', 'Subject'), adminSubject),
+    el('hr', { className: 'bl-forms-builder__separator' }),
+    el('div', { className: 'bl-forms-builder__section' }, [
+      el('h3', {
+        className: 'bl-forms-builder__section-title',
+        text: t('confirmationEmail', 'Confirmation email'),
+      }),
+      notifySwitch.root,
+      userOptions,
+    ])
   );
 
   syncNotifyOptions();
@@ -246,6 +344,18 @@ export function createPanels(settings, builderRoot, onChange) {
   const validation = bindText(
     el('textarea', { className: 'widefat', rows: '2', placeholder: fbValidation }),
     'validation_message'
+  );
+  const requiredMsg = bindText(
+    el('input', { type: 'text', className: 'widefat', placeholder: fbRequired }),
+    'required_message'
+  );
+  const minMsg = bindText(
+    el('input', { type: 'text', className: 'widefat', placeholder: fbMin }),
+    'min_message'
+  );
+  const maxMsg = bindText(
+    el('input', { type: 'text', className: 'widefat', placeholder: fbMax }),
+    'max_message'
   );
 
   const successRow = fieldRow(t('successMessage', 'Success message'), success);
@@ -412,7 +522,22 @@ export function createPanels(settings, builderRoot, onChange) {
     afterOptions,
     successRow,
     fieldRow(t('errorMessage', 'Error message'), error),
-    fieldRow(t('validationMessage', 'Validation message'), validation)
+    fieldRow(t('validationMessage', 'Validation message'), validation),
+    el('div', { className: 'bl-forms-builder__field-errors' }, [
+      el('h3', {
+        className: 'bl-forms-builder__section-title',
+        text: t('fieldErrors', 'Field errors'),
+      }),
+      el('div', { className: 'bl-forms-builder__field-errors-box' }, [
+        fieldRow(t('requiredError', 'Required'), requiredMsg),
+        fieldRow(t('minError', 'Minimum'), minMsg),
+        fieldRow(t('maxError', 'Maximum'), maxMsg),
+        el('span', {
+          className: 'description',
+          text: t('minMaxMessageHelp', 'Use %s where the number should appear.'),
+        }),
+      ]),
+    ])
   );
 
   // Security
@@ -422,35 +547,28 @@ export function createPanels(settings, builderRoot, onChange) {
     hidden: true,
   });
 
-  const minFillEnabled = el('input', {
-    type: 'checkbox',
-    checked: !!state.min_fill_time_enabled,
-  });
   const minFillSeconds = el('input', {
     type: 'number',
-    className: 'small-text',
+    className: 'small-text bl-forms-builder__security-input',
     min: '1',
     max: '300',
     step: '1',
     value: String(state.min_fill_time || 2),
   });
   const minFillOptions = el('div', {
-    className: 'bl-forms-builder__security-options',
+    className: 'bl-forms-builder__security-controls',
     hidden: !state.min_fill_time_enabled,
   }, [
     el('div', { className: 'bl-forms-builder__security-inline' }, [
+      el('span', { text: t('securityMinFillTimeAtLeast', 'At least') }),
       minFillSeconds,
       el('span', { text: t('securityMinFillTimeSeconds', 'seconds') }),
     ]),
   ]);
 
-  const rateEnabled = el('input', {
-    type: 'checkbox',
-    checked: !!state.rate_limit_enabled,
-  });
   const rateMax = el('input', {
     type: 'number',
-    className: 'small-text',
+    className: 'small-text bl-forms-builder__security-input',
     min: '1',
     max: '100',
     step: '1',
@@ -458,14 +576,14 @@ export function createPanels(settings, builderRoot, onChange) {
   });
   const rateWindow = el('input', {
     type: 'number',
-    className: 'small-text',
+    className: 'small-text bl-forms-builder__security-input',
     min: '1',
     max: '1440',
     step: '1',
     value: String(state.rate_limit_window || 5),
   });
   const rateOptions = el('div', {
-    className: 'bl-forms-builder__security-options',
+    className: 'bl-forms-builder__security-controls',
     hidden: !state.rate_limit_enabled,
   }, [
     el('div', { className: 'bl-forms-builder__security-inline' }, [
@@ -477,20 +595,34 @@ export function createPanels(settings, builderRoot, onChange) {
     ]),
   ]);
 
-  minFillEnabled.addEventListener('change', () => {
-    state.min_fill_time_enabled = minFillEnabled.checked;
-    minFillOptions.hidden = !minFillEnabled.checked;
-    emit();
-  });
+  const minFillSwitch = securitySwitch(
+    t('securityMinFillTime', 'Minimum fill time'),
+    'recommended',
+    {
+      checked: !!state.min_fill_time_enabled,
+      onChange: (checked) => {
+        state.min_fill_time_enabled = checked;
+        minFillOptions.hidden = !checked;
+        emit();
+      },
+    }
+  );
+  const rateSwitch = securitySwitch(
+    t('securityRateLimit', 'Submission limit'),
+    'recommended',
+    {
+      checked: !!state.rate_limit_enabled,
+      onChange: (checked) => {
+        state.rate_limit_enabled = checked;
+        rateOptions.hidden = !checked;
+        emit();
+      },
+    }
+  );
+
   minFillSeconds.addEventListener('input', () => {
     const n = parseInt(minFillSeconds.value, 10);
     state.min_fill_time = Number.isFinite(n) && n > 0 ? n : 2;
-    emit();
-  });
-
-  rateEnabled.addEventListener('change', () => {
-    state.rate_limit_enabled = rateEnabled.checked;
-    rateOptions.hidden = !rateEnabled.checked;
     emit();
   });
   rateMax.addEventListener('input', () => {
@@ -510,53 +642,38 @@ export function createPanels(settings, builderRoot, onChange) {
       t(
         'securityCsrfHelp',
         'A WordPress nonce is verified on every submission to block forged requests.'
-      ),
-      'required'
+      )
     ),
     lockedOption(
       t('securityJsCheck', 'JavaScript check'),
       t(
         'securityJsCheckHelp',
-        'A hidden field is filled by JavaScript. Submissions without a valid value are discarded quietly.'
-      ),
-      'required'
+        'A hidden field is set by JavaScript. If the expected value is missing, the submission is discarded.'
+      )
     ),
-    el('div', { className: 'bl-forms-builder__setting bl-forms-builder__security-option' }, [
-      securityLabel(
-        el('input', { type: 'checkbox', checked: true, disabled: true }),
-        t('securityHoneypot', 'Honeypot field'),
-        'required'
+    lockedOption(
+      t('securityHoneypot', 'Honeypot field'),
+      t(
+        'securityHoneypotHelp',
+        'A field hidden from visitors detects simple bots. If it is filled, the submission is discarded.'
+      )
+    ),
+    securityOption(
+      minFillSwitch.root,
+      t(
+        'securityMinFillTimeHelp',
+        'Submissions are rejected when the form is sent unusually quickly.'
       ),
-      el('span', {
-        className: 'description',
-        text: t(
-          'securityHoneypotHelp',
-          'A hidden field traps bots. If it is filled, the submission is discarded quietly.'
-        ),
-      }),
-    ]),
-    el('div', { className: 'bl-forms-builder__setting bl-forms-builder__security-option' }, [
-      securityLabel(minFillEnabled, t('securityMinFillTime', 'Minimum fill time'), 'recommended'),
-      el('span', {
-        className: 'description',
-        text: t(
-          'securityMinFillTimeHelp',
-          'Reject submissions that are sent faster than a real visitor would typically fill the form.'
-        ),
-      }),
-      minFillOptions,
-    ]),
-    el('div', { className: 'bl-forms-builder__setting bl-forms-builder__security-option' }, [
-      securityLabel(rateEnabled, t('securityRateLimit', 'Maximum submissions'), 'recommended'),
-      el('span', {
-        className: 'description',
-        text: t(
-          'securityRateLimitHelp',
-          'Limit how many times the same visitor can submit this form in a time window.'
-        ),
-      }),
-      rateOptions,
-    ])
+      minFillOptions
+    ),
+    securityOption(
+      rateSwitch.root,
+      t(
+        'securityRateLimitHelp',
+        'Limits how often the same visitor can submit the form within a time period.'
+      ),
+      rateOptions
+    )
   );
 
   return {

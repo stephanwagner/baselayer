@@ -23,6 +23,21 @@ function bl_forms_render_builder_after_title(WP_Post $post): void
 
 	$config = bl_forms_get_config((int) $post->ID);
 	$fallbacks = bl_forms_message_fallbacks();
+	$site_name = wp_specialchars_decode(get_bloginfo('name'), ENT_QUOTES);
+	$form_title = get_the_title($post);
+	if ($form_title === '') {
+		$form_title = sprintf(
+			/* translators: %d: form post ID */
+			__('Form #%d', 'baselayer'),
+			(int) $post->ID
+		);
+	}
+	$default_admin_subject = sprintf(
+		/* translators: 1: site name, 2: form title */
+		__('[%1$s] New submission: %2$s', 'baselayer'),
+		$site_name,
+		$form_title
+	);
 	wp_nonce_field('bl_forms_save_config', 'bl_forms_config_nonce');
 	?>
 	<input type="hidden" name="bl_forms_config_json" id="bl-forms-config-json" value="<?= esc_attr(wp_json_encode($config)) ?>">
@@ -31,10 +46,14 @@ function bl_forms_render_builder_after_title(WP_Post $post): void
 		class="bl-forms-builder"
 		data-bl-forms-builder
 		data-admin-email="<?= esc_attr((string) get_option('admin_email', '')) ?>"
+		data-fallback-admin-subject="<?= esc_attr($default_admin_subject) ?>"
 		data-fallback-submit="<?= esc_attr($fallbacks['submit']) ?>"
 		data-fallback-success="<?= esc_attr($fallbacks['success']) ?>"
 		data-fallback-error="<?= esc_attr($fallbacks['error']) ?>"
 		data-fallback-validation="<?= esc_attr($fallbacks['validation']) ?>"
+		data-fallback-required="<?= esc_attr($fallbacks['required']) ?>"
+		data-fallback-min="<?= esc_attr($fallbacks['min']) ?>"
+		data-fallback-max="<?= esc_attr($fallbacks['max']) ?>"
 	></div>
 	<?php
 }
@@ -116,6 +135,8 @@ function bl_forms_palette_icons(): array
 		'done'         => 'checkmark',
 		'trash'        => 'delete',
 		'drag'         => 'drag-handle',
+		'lock'         => 'lock',
+		'shield'       => 'shield',
 	];
 
 	$icons = [];
@@ -229,7 +250,7 @@ function bl_forms_admin_enqueue(string $hook): void
 				'apply'             => __('Apply', 'baselayer'),
 				'label'             => __('Label', 'baselayer'),
 				'name'              => __('Field name', 'baselayer'),
-				'nameHelp'          => __('Internal field key used in submissions, emails, and entry data. Auto-filled from the label until you edit it.', 'baselayer'),
+				'nameHelp'          => __('Internal field key used in submissions, emails, and entry data.', 'baselayer'),
 				'hideLabel'         => __('Hide label', 'baselayer'),
 				'fieldTabGeneral'   => __('General', 'baselayer'),
 				'fieldTabAdvanced'  => __('Advanced', 'baselayer'),
@@ -241,6 +262,11 @@ function bl_forms_admin_enqueue(string $hook): void
 				'required'          => __('Required', 'baselayer'),
 				'readOnly'          => __('Read only', 'baselayer'),
 				'disabled'          => __('Disabled', 'baselayer'),
+				'autocomplete'      => __('Autocomplete', 'baselayer'),
+				'autocompleteAutomatic' => __('Automatic', 'baselayer'),
+				'autocompleteOff'   => __('Off', 'baselayer'),
+				'minValue'          => __('Minimum', 'baselayer'),
+				'maxValue'          => __('Maximum', 'baselayer'),
 				'allowMultiple'     => __('Allow multiple', 'baselayer'),
 				'selectMultiple'    => __('Allow multiple selection', 'baselayer'),
 				'buttonGroupMultiple' => __('Allow multiple selection', 'baselayer'),
@@ -292,11 +318,16 @@ function bl_forms_admin_enqueue(string $hook): void
 				'cssClassPlaceholder' => __('e.g. my-field', 'baselayer'),
 				'cssClassHelp'      => __('Optional class names added to this field’s wrapper.', 'baselayer'),
 				'submitLabel'       => __('Submit button label', 'baselayer'),
-				'recipient'         => __('Notification recipient', 'baselayer'),
-				'recipientHelp'     => __('Leave empty to use the site admin email.', 'baselayer'),
+				'recipient'         => __('Recipient', 'baselayer'),
+				'recipientHelp'     => __('Leave empty to use the site administrator email.', 'baselayer'),
 				'successMessage'    => __('Success message', 'baselayer'),
 				'errorMessage'      => __('Error message', 'baselayer'),
 				'validationMessage' => __('Validation message', 'baselayer'),
+				'fieldErrors'       => __('Field errors', 'baselayer'),
+				'requiredError'     => __('Required', 'baselayer'),
+				'minError'          => __('Minimum', 'baselayer'),
+				'maxError'          => __('Maximum', 'baselayer'),
+				'minMaxMessageHelp' => __('Use %s where the number should appear.', 'baselayer'),
 				'afterSubmit'       => __('After submission', 'baselayer'),
 				'afterSubmitHelp'   => __('Choose what visitors see after a successful submission.', 'baselayer'),
 				'afterSubmitMessage'=> __('Show message', 'baselayer'),
@@ -311,26 +342,28 @@ function bl_forms_admin_enqueue(string $hook): void
 				'pagePickerEmpty'   => __('No pages found.', 'baselayer'),
 				'pagePickerLoading' => __('Loading…', 'baselayer'),
 				'selectPage'        => __('Select', 'baselayer'),
-				'notifyUser'        => __('Send confirmation email to submitter', 'baselayer'),
+				'confirmationEmail' => __('Confirmation email', 'baselayer'),
+				'notifyUser'        => __('Enable', 'baselayer'),
 				'notifyUserHelp'    => __('Requires an Email field on the form.', 'baselayer'),
-				'sendTo'            => __('Send to', 'baselayer'),
-				'adminSubject'      => __('Admin email subject', 'baselayer'),
-				'userSubject'       => __('User email subject', 'baselayer'),
-				'userIntro'         => __('User email intro', 'baselayer'),
+				'emailField'        => __('Email field', 'baselayer'),
+				'subject'           => __('Subject', 'baselayer'),
+				'introText'         => __('Intro text', 'baselayer'),
+				'introTextHelp'     => __('This text appears above the submitted form data in the email. Placeholders can be used [field-id].', 'baselayer'),
 				'securityCsrf'      => __('CSRF protection', 'baselayer'),
 				'securityCsrfHelp'  => __('A WordPress nonce is verified on every submission to block forged requests.', 'baselayer'),
-				'securityRequired'  => __('required', 'baselayer'),
-				'securityRecommended' => __('recommended', 'baselayer'),
+				'securityAlwaysOn'  => __('Always on', 'baselayer'),
+				'securityRecommended' => __('Recommended', 'baselayer'),
 				'securityJsCheck'   => __('JavaScript check', 'baselayer'),
-				'securityJsCheckHelp' => __('A hidden field is filled by JavaScript. Submissions without a valid value are discarded quietly.', 'baselayer'),
+				'securityJsCheckHelp' => __('A hidden field is set by JavaScript. If the expected value is missing, the submission is discarded.', 'baselayer'),
 				'securityHoneypot'  => __('Honeypot field', 'baselayer'),
-				'securityHoneypotHelp' => __('A hidden field traps bots. If it is filled, the submission is discarded quietly.', 'baselayer'),
+				'securityHoneypotHelp' => __('A field hidden from visitors detects simple bots. If it is filled, the submission is discarded.', 'baselayer'),
 				'securityHoneypotName' => __('Field name', 'baselayer'),
 				'securityMinFillTime' => __('Minimum fill time', 'baselayer'),
-				'securityMinFillTimeHelp' => __('Reject submissions that are sent faster than a real visitor would typically fill the form.', 'baselayer'),
+				'securityMinFillTimeHelp' => __('Submissions are rejected when the form is sent unusually quickly.', 'baselayer'),
+				'securityMinFillTimeAtLeast' => __('At least', 'baselayer'),
 				'securityMinFillTimeSeconds' => __('seconds', 'baselayer'),
-				'securityRateLimit' => __('Maximum submissions', 'baselayer'),
-				'securityRateLimitHelp' => __('Limit how many times the same visitor can submit this form in a time window.', 'baselayer'),
+				'securityRateLimit' => __('Submission limit', 'baselayer'),
+				'securityRateLimitHelp' => __('Limits how often the same visitor can submit the form within a time period.', 'baselayer'),
 				'securityRateLimitMax' => __('Max', 'baselayer'),
 				'securityRateLimitIn' => __('submissions in', 'baselayer'),
 				'securityRateLimitMinutes' => __('minutes', 'baselayer'),

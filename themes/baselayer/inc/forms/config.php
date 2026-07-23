@@ -139,6 +139,9 @@ function bl_forms_default_settings(): array
 		'success_message'        => '',
 		'error_message'          => '',
 		'validation_message'     => '',
+		'required_message'       => '',
+		'min_message'            => '',
+		'max_message'            => '',
 		'after_submit'           => 'message',
 		'redirect_page_id'       => 0,
 		'notify_user'            => false,
@@ -190,15 +193,28 @@ function bl_forms_default_config(): array
 /**
  * Runtime message fallbacks (translatable).
  *
- * @return array{success: string, error: string, validation: string, submit: string}
+ * @return array{
+ *   success: string,
+ *   error: string,
+ *   validation: string,
+ *   submit: string,
+ *   required: string,
+ *   min: string,
+ *   max: string
+ * }
  */
 function bl_forms_message_fallbacks(): array
 {
 	return [
 		'success'    => __('Thank you. Your message has been sent.', 'baselayer'),
 		'error'      => __('Something went wrong. Please try again.', 'baselayer'),
-		'validation' => __('Please check the highlighted fields.', 'baselayer'),
+		'validation' => __('Some fields need attention. Please check the highlighted fields.', 'baselayer'),
 		'submit'     => __('Send', 'baselayer'),
+		'required'   => __('This field is required.', 'baselayer'),
+		/* translators: %s: minimum number */
+		'min'        => __('Enter a number of at least %s.', 'baselayer'),
+		/* translators: %s: maximum number */
+		'max'        => __('Enter a number of at most %s.', 'baselayer'),
 	];
 }
 
@@ -212,6 +228,9 @@ function bl_forms_resolve_message(array $settings, string $key): string
 		'success_message'    => 'success',
 		'error_message'      => 'error',
 		'validation_message' => 'validation',
+		'required_message'   => 'required',
+		'min_message'        => 'min',
+		'max_message'        => 'max',
 		'submit_label'       => 'submit',
 	];
 
@@ -507,6 +526,19 @@ function bl_forms_field_width_css(array $field): string
 }
 
 /**
+ * Sanitize an optional numeric string (empty allowed).
+ */
+function bl_forms_sanitize_optional_number(string $raw): string
+{
+	$value = trim(sanitize_text_field($raw));
+	if ($value === '' || !is_numeric($value)) {
+		return '';
+	}
+
+	return $value;
+}
+
+/**
  * Sanitize a field default so it matches the field type (or clear it).
  */
 function bl_forms_sanitize_typed_default(string $type, string $raw): string
@@ -663,6 +695,33 @@ function bl_forms_sanitize_field($field): ?array
 	$no_readonly = ['radio', 'checkboxes', 'select', 'button_group', 'toggle', 'terms', 'file', 'image'];
 	if (in_array($type, $no_readonly, true)) {
 		unset($out['readonly']);
+	}
+
+	$autocomplete_types = ['text', 'email', 'url', 'number', 'phone', 'textarea', 'date', 'time', 'datetime', 'select'];
+	if (in_array($type, $autocomplete_types, true)) {
+		$out['autocomplete'] = (($field['autocomplete'] ?? 'auto') === 'off') ? 'off' : 'auto';
+	} else {
+		unset($out['autocomplete']);
+	}
+
+	if ($type === 'number') {
+		$min = bl_forms_sanitize_optional_number((string) ($field['min'] ?? ''));
+		$max = bl_forms_sanitize_optional_number((string) ($field['max'] ?? ''));
+		if ($min !== '' && $max !== '' && (float) $min > (float) $max) {
+			$max = '';
+		}
+		if ($min !== '') {
+			$out['min'] = $min;
+		} else {
+			unset($out['min']);
+		}
+		if ($max !== '') {
+			$out['max'] = $max;
+		} else {
+			unset($out['max']);
+		}
+	} else {
+		unset($out['min'], $out['max']);
 	}
 
 	if (in_array($type, ['text', 'email', 'url', 'number', 'phone', 'textarea', 'date', 'time', 'datetime', 'file', 'image', 'toggle'], true)) {
