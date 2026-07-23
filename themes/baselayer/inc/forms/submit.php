@@ -7,40 +7,43 @@ defined('ABSPATH') || exit;
  *
  * @param array<string, mixed> $field
  * @param array<string, mixed> $settings
+ * @param string               $bound Resolved min/max value for range errors.
  */
-function bl_forms_field_error_message(string $code, array $field = [], array $settings = []): string
+function bl_forms_field_error_message(string $code, array $field = [], array $settings = [], string $bound = ''): string
 {
 	switch ($code) {
 		case 'required':
 			return bl_forms_resolve_message($settings, 'required_message');
 		case 'min':
+			$value = $bound !== '' ? $bound : (string) ($field['min'] ?? '');
 			return sprintf(
 				bl_forms_resolve_message($settings, 'min_message'),
-				(string) ($field['min'] ?? '')
+				$value
 			);
 		case 'max':
+			$value = $bound !== '' ? $bound : (string) ($field['max'] ?? '');
 			return sprintf(
 				bl_forms_resolve_message($settings, 'max_message'),
-				(string) ($field['max'] ?? '')
+				$value
 			);
 		case 'number':
-			return __('Enter a valid number.', 'baselayer');
+			return bl_forms_resolve_message($settings, 'number_message');
 		case 'email':
-			return __('Enter a valid email address.', 'baselayer');
+			return bl_forms_resolve_message($settings, 'email_message');
 		case 'url':
-			return __('Enter a valid URL.', 'baselayer');
+			return bl_forms_resolve_message($settings, 'url_message');
 		case 'phone':
-			return __('Enter a valid phone number.', 'baselayer');
+			return bl_forms_resolve_message($settings, 'phone_message');
 		case 'date':
-			return __('Enter a valid date.', 'baselayer');
+			return bl_forms_resolve_message($settings, 'date_message');
 		case 'time':
-			return __('Enter a valid time.', 'baselayer');
+			return bl_forms_resolve_message($settings, 'time_message');
 		case 'datetime':
-			return __('Enter a valid date and time.', 'baselayer');
+			return bl_forms_resolve_message($settings, 'datetime_message');
 		case 'file':
-			return __('Please upload a valid file.', 'baselayer');
+			return bl_forms_resolve_message($settings, 'file_message');
 		case 'option':
-			return __('Please choose a valid option.', 'baselayer');
+			return bl_forms_resolve_message($settings, 'option_message');
 		default:
 			return __('Please check this field.', 'baselayer');
 	}
@@ -321,6 +324,8 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 				$values[$name] = bl_forms_field_default_values($field);
 			} elseif ($type === 'terms' || $type === 'toggle') {
 				$values[$name] = bl_forms_field_default_checked($field) ? '1' : '';
+			} elseif (in_array($type, ['date', 'time', 'datetime'], true)) {
+				$values[$name] = bl_forms_resolve_temporal_bound($field, 'default');
 			} else {
 				$values[$name] = sanitize_text_field((string) ($field['default_value'] ?? ''));
 			}
@@ -459,11 +464,24 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 			$min = isset($field['min']) ? bl_forms_sanitize_optional_number((string) $field['min']) : '';
 			$max = isset($field['max']) ? bl_forms_sanitize_optional_number((string) $field['max']) : '';
 			if ($min !== '' && $num < (float) $min) {
-				$invalid[$name] = bl_forms_field_error_message('min', $field, $settings);
+				$invalid[$name] = bl_forms_field_error_message('min', $field, $settings, $min);
 				continue;
 			}
 			if ($max !== '' && $num > (float) $max) {
-				$invalid[$name] = bl_forms_field_error_message('max', $field, $settings);
+				$invalid[$name] = bl_forms_field_error_message('max', $field, $settings, $max);
+				continue;
+			}
+		}
+
+		if (in_array($type, ['date', 'time', 'datetime'], true) && $value !== '') {
+			$min = bl_forms_resolve_temporal_bound($field, 'min');
+			$max = bl_forms_resolve_temporal_bound($field, 'max');
+			if ($min !== '' && bl_forms_compare_temporal_values($type, $value, $min) < 0) {
+				$invalid[$name] = bl_forms_field_error_message('min', $field, $settings, $min);
+				continue;
+			}
+			if ($max !== '' && bl_forms_compare_temporal_values($type, $value, $max) > 0) {
+				$invalid[$name] = bl_forms_field_error_message('max', $field, $settings, $max);
 				continue;
 			}
 		}

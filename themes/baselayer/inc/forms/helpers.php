@@ -210,3 +210,250 @@ function bl_forms_is_valid_datetime(string $value): bool
 
 	return $dt instanceof \DateTimeImmutable && $dt->format('Y-m-d\TH:i') === $value;
 }
+
+/**
+ * Bound modes for date / time / datetime fields.
+ *
+ * @param string $type Field type (time includes `hour`).
+ * @return list<string>
+ */
+function bl_forms_temporal_bound_modes(string $type = ''): array
+{
+	if ($type === 'time') {
+		return ['fixed', 'today', 'hour', 'offset'];
+	}
+
+	return ['fixed', 'today', 'offset'];
+}
+
+/**
+ * Current site time as DateTimeImmutable.
+ */
+function bl_forms_site_now(): \DateTimeImmutable
+{
+	return new \DateTimeImmutable('now', wp_timezone());
+}
+
+/**
+ * Format a DateTimeImmutable for an HTML date/time/datetime-local control.
+ */
+function bl_forms_format_temporal_value(\DateTimeImmutable $dt, string $type): string
+{
+	switch ($type) {
+		case 'date':
+			return $dt->format('Y-m-d');
+		case 'time':
+			return $dt->format('H:i');
+		case 'datetime':
+			return $dt->format('Y-m-d\TH:i');
+		default:
+			return '';
+	}
+}
+
+/**
+ * Whether a fixed bound string matches the field type.
+ */
+function bl_forms_is_valid_temporal_value(string $type, string $value): bool
+{
+	if ($value === '') {
+		return false;
+	}
+	switch ($type) {
+		case 'date':
+			return bl_forms_is_valid_date($value);
+		case 'time':
+			return bl_forms_is_valid_time($value);
+		case 'datetime':
+			return bl_forms_is_valid_datetime($value);
+		default:
+			return false;
+	}
+}
+
+/**
+ * Resolve a temporal min/max/default bound to a concrete value string (empty = none).
+ *
+ * Modes: fixed | today | offset
+ * Offset unit: days for date/datetime, minutes for time.
+ *
+ * @param array<string, mixed> $field
+ * @param 'min'|'max'|'default' $which
+ */
+function bl_forms_resolve_temporal_bound(array $field, string $which): string
+{
+	$type = (string) ($field['type'] ?? '');
+	if (!in_array($type, ['date', 'time', 'datetime'], true)) {
+		return '';
+	}
+
+	$mode = sanitize_key((string) ($field[$which . '_mode'] ?? ''));
+	if (!in_array($mode, bl_forms_temporal_bound_modes($type), true)) {
+		// Legacy: plain default_value without a mode → treat as fixed.
+		if ($which === 'default') {
+			$value = trim((string) ($field['default_value'] ?? ''));
+			if ($type === 'time' && preg_match('/^\d{2}:\d{2}:\d{2}$/', $value)) {
+				$value = substr($value, 0, 5);
+			}
+
+			return bl_forms_is_valid_temporal_value($type, $value) ? $value : '';
+		}
+
+		return '';
+	}
+
+	$now = bl_forms_site_now();
+
+	if ($mode === 'today') {
+		return bl_forms_format_temporal_value($now, $type);
+	}
+
+	if ($mode === 'hour') {
+		// Floor to the start of the current hour (HH:00).
+		$dt = $now->setTime((int) $now->format('G'), 0, 0);
+
+		return bl_forms_format_temporal_value($dt, 'time');
+	}
+
+	if ($mode === 'offset') {
+		$n = (int) ($field[$which . '_offset'] ?? 0);
+		if ($type === 'time') {
+			$dt = $now->modify(($n >= 0 ? '+' : '') . $n . ' minutes');
+		} else {
+			$dt = $now->modify(($n >= 0 ? '+' : '') . $n . ' days');
+		}
+
+		return bl_forms_format_temporal_value($dt, $type);
+	}
+
+	// fixed
+	$value_key = $which === 'default' ? 'default_value' : $which;
+	$value = trim((string) ($field[$value_key] ?? ''));
+	if ($type === 'time' && preg_match('/^\d{2}:\d{2}:\d{2}$/', $value)) {
+		$value = substr($value, 0, 5);
+	}
+
+	return bl_forms_is_valid_temporal_value($type, $value) ? $value : '';
+}
+
+/**
+ * Compare two temporal values of the same type.
+ *
+ * @return int -1 if $a < $b, 0 if equal, 1 if $a > $b, or 0 if either invalid
+ */
+function bl_forms_compare_temporal_values(string $type, string $a, string $b): int
+{
+	if (!bl_forms_is_valid_temporal_value($type, $a) || !bl_forms_is_valid_temporal_value($type, $b)) {
+		return 0;
+	}
+
+	$normalize_time = static function (string $value): string {
+		return preg_match('/^\d{2}:\d{2}:\d{2}$/', $value) ? substr($value, 0, 5) : $value;
+	};
+
+	if ($type === 'time') {
+		$a = $normalize_time($a);
+		$b = $normalize_time($b);
+	}
+
+	return $a <=> $b;
+}
+
+/**
+ * Sanitize temporal bound keys onto a field (or strip them).
+ *
+ * @param array<string, mixed> $out
+ * @param array<string, mixed> $field
+ * @return array<string, mixed>
+ */
+function bl_forms_sanitize_temporal_bounds(array $out, array $field): array
+{
+	$type = (string) ($out['type'] ?? '');
+	if (!in_array($type, ['date', 'time', 'datetime'], true)) {
+		unset(
+			$out['min_mode'],
+			$out['max_mode'],
+			$out['default_mode'],
+			$out['min_offset'],
+			$out['max_offset'],
+			$out['default_offset']
+		);
+		if ($type !== 'number') {
+			unset($out['min'], $out['max']);
+		}
+
+		return $out;
+	}
+
+	foreach (['min', 'max', 'default'] as $which) {
+		$mode_key = $which . '_mode';
+		$offset_key = $which . '_offset';
+		$value_key = $which === 'default' ? 'default_value' : $which;
+
+		$mode = sanitize_key((string) ($field[$mode_key] ?? ''));
+
+		// Legacy plain default_value without mode → fixed.
+		if (
+			$which === 'default'
+			&& $mode === ''
+			&& trim((string) ($field['default_value'] ?? '')) !== ''
+		) {
+			$legacy = trim((string) $field['default_value']);
+			if ($type === 'time' && preg_match('/^\d{2}:\d{2}:\d{2}$/', $legacy)) {
+				$legacy = substr($legacy, 0, 5);
+			}
+			if (bl_forms_is_valid_temporal_value($type, $legacy)) {
+				$mode = 'fixed';
+				$field['default_value'] = $legacy;
+			}
+		}
+
+		if (!in_array($mode, bl_forms_temporal_bound_modes($type), true)) {
+			unset($out[$mode_key], $out[$offset_key]);
+			if ($which === 'default') {
+				$out['default_value'] = '';
+			} else {
+				unset($out[$which]);
+			}
+			continue;
+		}
+
+		$out[$mode_key] = $mode;
+
+		if ($mode === 'fixed') {
+			$value = trim((string) ($field[$value_key] ?? ''));
+			if ($type === 'time' && preg_match('/^\d{2}:\d{2}:\d{2}$/', $value)) {
+				$value = substr($value, 0, 5);
+			}
+			if (bl_forms_is_valid_temporal_value($type, $value)) {
+				$out[$value_key] = $value;
+			} else {
+				unset($out[$mode_key], $out[$offset_key]);
+				if ($which === 'default') {
+					$out['default_value'] = '';
+				} else {
+					unset($out[$which]);
+				}
+				continue;
+			}
+			unset($out[$offset_key]);
+		} elseif ($mode === 'offset') {
+			$out[$offset_key] = (int) ($field[$offset_key] ?? 0);
+			if ($which === 'default') {
+				$out['default_value'] = '';
+			} else {
+				unset($out[$which]);
+			}
+		} else {
+			// today / now / current hour
+			unset($out[$offset_key]);
+			if ($which === 'default') {
+				$out['default_value'] = '';
+			} else {
+				unset($out[$which]);
+			}
+		}
+	}
+
+	return $out;
+}

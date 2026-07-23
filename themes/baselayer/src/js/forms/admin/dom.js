@@ -8,18 +8,6 @@ export function formsDragStart() {
   document.body.classList.add('is-dragging');
 }
 
-/** Collapse any open field editors (call from Sortable onChoose, before drag starts). */
-export function collapseOpenFields() {
-  document.querySelectorAll('.bl-forms-builder__field.is-open').forEach((field) => {
-    field.classList.remove('is-open');
-    const toggle = field.querySelector('.bl-forms-builder__field-toggle');
-    if (toggle) {
-      toggle.setAttribute('aria-expanded', 'false');
-      toggle.setAttribute('aria-label', t('expandField', 'Expand field'));
-    }
-  });
-}
-
 export function formsDragEnd() {
   formsDragDepth = Math.max(0, formsDragDepth - 1);
   if (formsDragDepth === 0) {
@@ -51,6 +39,7 @@ export const TYPE_KEYS = [
   'spacer',
   'html',
   'column',
+  'section',
   'hidden',
   'honeypot',
   'captcha',
@@ -89,16 +78,16 @@ export const PALETTE_SECTIONS = [
     types: ['file', 'image'],
   },
   {
-    id: 'layout',
-    headingKey: 'paletteSectionLayout',
-    headingFallback: 'Layout',
-    types: ['column'],
-  },
-  {
     id: 'content',
     headingKey: 'paletteSectionContent',
     headingFallback: 'Content',
-    types: ['heading', 'text_block', 'divider', 'spacer', 'html'],
+    types: ['heading', 'text_block', 'html'],
+  },
+  {
+    id: 'layout',
+    headingKey: 'paletteSectionLayout',
+    headingFallback: 'Layout',
+    types: ['section', 'column', 'divider', 'spacer'],
   },
   {
     id: 'advanced',
@@ -225,7 +214,15 @@ export function defaultField(type = 'text') {
     return { id, type, width: '100', width_custom: '', css_class: '' };
   }
   if (type === 'spacer') {
-    return { id, type, height: '24px', width: '100', width_custom: '', css_class: '' };
+    return {
+      id,
+      type,
+      height: 'm',
+      height_custom: '',
+      width: '100',
+      width_custom: '',
+      css_class: '',
+    };
   }
   if (type === 'captcha') {
     return {
@@ -239,11 +236,22 @@ export function defaultField(type = 'text') {
       css_class: '',
     };
   }
-  if (type === 'heading' || type === 'text_block' || type === 'html') {
+  if (type === 'heading') {
     return {
       id,
       type,
-      content: type === 'heading' ? typeLabel(type) : '',
+      content: typeLabel(type),
+      level: 'h2',
+      width: '100',
+      width_custom: '',
+      css_class: '',
+    };
+  }
+  if (type === 'text_block' || type === 'html') {
+    return {
+      id,
+      type,
+      content: '',
       width: '100',
       width_custom: '',
       css_class: '',
@@ -285,6 +293,16 @@ export function defaultField(type = 'text') {
       children: [],
     };
   }
+  if (type === 'section') {
+    return {
+      id,
+      type,
+      label: typeLabel(type),
+      width: '100',
+      width_custom: '',
+      children: [],
+    };
+  }
   const base = {
     id,
     type,
@@ -312,7 +330,9 @@ export function defaultField(type = 'text') {
     base.multiple = false;
   }
   if (type === 'terms') {
-    base.label = '';
+    base.label = t('termsDefaultFieldLabel', 'Privacy Policy');
+    base.name = slugifyName(base.label);
+    base.hide_label = true;
     base.content = t('termsDefaultLabel', 'I agree to the [Privacy Policy](page:privacy).');
     base.default_value = '';
   }
@@ -349,7 +369,7 @@ export function flattenFields(fields = []) {
   const walk = (list) => {
     (list || []).forEach((field) => {
       if (!field) return;
-      if (field.type === 'column' || field.type === 'group') {
+      if (field.type === 'column' || field.type === 'section' || field.type === 'group') {
         walk(field.children || []);
         return;
       }

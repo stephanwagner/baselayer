@@ -358,6 +358,27 @@ export function createPanels(settings, builderRoot, onChange) {
     'max_message'
   );
 
+  const msgFallbacks = (window.blFormsAdmin && window.blFormsAdmin.messageFallbacks) || {};
+  const bindErrorMsg = (key, fallbackKey) =>
+    bindText(
+      el('input', {
+        type: 'text',
+        className: 'widefat',
+        placeholder: msgFallbacks[fallbackKey] || '',
+      }),
+      key
+    );
+
+  const numberMsg = bindErrorMsg('number_message', 'number');
+  const emailMsg = bindErrorMsg('email_message', 'email');
+  const urlMsg = bindErrorMsg('url_message', 'url');
+  const phoneMsg = bindErrorMsg('phone_message', 'phone');
+  const dateMsg = bindErrorMsg('date_message', 'date');
+  const timeMsg = bindErrorMsg('time_message', 'time');
+  const datetimeMsg = bindErrorMsg('datetime_message', 'datetime');
+  const fileMsg = bindErrorMsg('file_message', 'file');
+  const optionMsg = bindErrorMsg('option_message', 'option');
+
   const successRow = fieldRow(t('successMessage', 'Success message'), success);
   const afterOptions = el('div', { className: 'bl-forms-builder__after-submit' });
   const afterChoices = el('div', {
@@ -533,9 +554,19 @@ export function createPanels(settings, builderRoot, onChange) {
         fieldRow(t('minError', 'Minimum'), minMsg),
         fieldRow(t('maxError', 'Maximum'), maxMsg),
         el('span', {
-          className: 'description',
-          text: t('minMaxMessageHelp', 'Use %s where the number should appear.'),
+          className: 'description bl-forms-builder__field-errors-help',
+          text: t('minMaxMessageHelp', 'Use %s where the limit should appear.'),
         }),
+        el('hr', { className: 'bl-forms-builder__field-errors-sep' }),
+        fieldRow(t('numberError', 'Number'), numberMsg),
+        fieldRow(t('emailError', 'Email'), emailMsg),
+        fieldRow(t('urlError', 'URL'), urlMsg),
+        fieldRow(t('phoneError', 'Phone'), phoneMsg),
+        fieldRow(t('dateError', 'Date'), dateMsg),
+        fieldRow(t('timeError', 'Time'), timeMsg),
+        fieldRow(t('datetimeError', 'Date & time'), datetimeMsg),
+        fieldRow(t('fileError', 'File'), fileMsg),
+        fieldRow(t('optionError', 'Choice'), optionMsg),
       ]),
     ])
   );

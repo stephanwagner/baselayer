@@ -33,6 +33,7 @@ function bl_forms_field_types(): array
 		'divider',
 		'spacer',
 		'column',
+		'section',
 		'hidden',
 		'honeypot',
 		'captcha',
@@ -46,7 +47,7 @@ function bl_forms_field_types(): array
  */
 function bl_forms_content_field_types(): array
 {
-	return ['heading', 'text_block', 'html', 'divider', 'spacer', 'column', 'captcha'];
+	return ['heading', 'text_block', 'html', 'divider', 'spacer', 'column', 'section', 'captcha'];
 }
 
 /**
@@ -56,17 +57,17 @@ function bl_forms_content_field_types(): array
  */
 function bl_forms_layout_field_types(): array
 {
-	return ['column'];
+	return ['column', 'section'];
 }
 
 /**
- * Field types that must stay at the form root (not inside columns).
+ * Field types that must stay at the form root (not inside columns/sections).
  *
  * @return list<string>
  */
 function bl_forms_root_only_field_types(): array
 {
-	return ['column', 'hidden', 'honeypot', 'captcha'];
+	return ['column', 'section', 'hidden', 'honeypot', 'captcha'];
 }
 
 /**
@@ -142,6 +143,15 @@ function bl_forms_default_settings(): array
 		'required_message'       => '',
 		'min_message'            => '',
 		'max_message'            => '',
+		'number_message'         => '',
+		'email_message'          => '',
+		'url_message'            => '',
+		'phone_message'          => '',
+		'date_message'           => '',
+		'time_message'           => '',
+		'datetime_message'       => '',
+		'file_message'           => '',
+		'option_message'         => '',
 		'after_submit'           => 'message',
 		'redirect_page_id'       => 0,
 		'notify_user'            => false,
@@ -193,15 +203,7 @@ function bl_forms_default_config(): array
 /**
  * Runtime message fallbacks (translatable).
  *
- * @return array{
- *   success: string,
- *   error: string,
- *   validation: string,
- *   submit: string,
- *   required: string,
- *   min: string,
- *   max: string
- * }
+ * @return array<string, string>
  */
 function bl_forms_message_fallbacks(): array
 {
@@ -211,10 +213,19 @@ function bl_forms_message_fallbacks(): array
 		'validation' => __('Some fields need attention. Please check the highlighted fields.', 'baselayer'),
 		'submit'     => __('Send', 'baselayer'),
 		'required'   => __('This field is required.', 'baselayer'),
-		/* translators: %s: minimum number */
-		'min'        => __('Enter a number of at least %s.', 'baselayer'),
-		/* translators: %s: maximum number */
-		'max'        => __('Enter a number of at most %s.', 'baselayer'),
+		/* translators: %s: minimum value (number, date, time, …) */
+		'min'        => __('Enter a value of at least %s.', 'baselayer'),
+		/* translators: %s: maximum value (number, date, time, …) */
+		'max'        => __('Enter a value of at most %s.', 'baselayer'),
+		'number'     => __('Enter a valid number.', 'baselayer'),
+		'email'      => __('Enter a valid email address.', 'baselayer'),
+		'url'        => __('Enter a valid URL.', 'baselayer'),
+		'phone'      => __('Enter a valid phone number.', 'baselayer'),
+		'date'       => __('Enter a valid date.', 'baselayer'),
+		'time'       => __('Enter a valid time.', 'baselayer'),
+		'datetime'   => __('Enter a valid date and time.', 'baselayer'),
+		'file'       => __('Please upload a valid file.', 'baselayer'),
+		'option'     => __('Please choose a valid option.', 'baselayer'),
 	];
 }
 
@@ -231,6 +242,15 @@ function bl_forms_resolve_message(array $settings, string $key): string
 		'required_message'   => 'required',
 		'min_message'        => 'min',
 		'max_message'        => 'max',
+		'number_message'     => 'number',
+		'email_message'      => 'email',
+		'url_message'        => 'url',
+		'phone_message'      => 'phone',
+		'date_message'       => 'date',
+		'time_message'       => 'time',
+		'datetime_message'   => 'datetime',
+		'file_message'       => 'file',
+		'option_message'     => 'option',
 		'submit_label'       => 'submit',
 	];
 
@@ -641,6 +661,31 @@ function bl_forms_sanitize_field($field): ?array
 		return $out;
 	}
 
+	if ($type === 'section') {
+		$children_in = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
+		$children = [];
+		$blocked = bl_forms_root_only_field_types();
+		foreach ($children_in as $child) {
+			$clean = bl_forms_sanitize_field($child);
+			if ($clean === null) {
+				continue;
+			}
+			$child_type = (string) ($clean['type'] ?? '');
+			// One level only — no nested columns/sections.
+			if (in_array($child_type, $blocked, true)) {
+				continue;
+			}
+			$children[] = $clean;
+		}
+		$out['label'] = sanitize_text_field((string) ($field['label'] ?? ''));
+		$out['children'] = $children;
+		$out['width'] = '100';
+		$out['width_custom'] = '';
+		unset($out['name'], $out['name_manual'], $out['hide_label']);
+
+		return $out;
+	}
+
 	if ($type === 'divider') {
 		unset($out['name'], $out['label'], $out['name_manual'], $out['hide_label']);
 
@@ -661,19 +706,51 @@ function bl_forms_sanitize_field($field): ?array
 	}
 
 	if ($type === 'spacer') {
-		$height = bl_forms_sanitize_css_length((string) ($field['height'] ?? '24px'), '24px');
-		$out['height'] = $height;
-		unset($out['name'], $out['label'], $out['name_manual'], $out['hide_label']);
+		$presets = ['xs', 's', 'm', 'l', 'xl', 'custom'];
+		$raw = sanitize_key((string) ($field['height'] ?? 'm'));
+		// Legacy free-form CSS lengths → custom.
+		$legacy = trim((string) ($field['height'] ?? ''));
+		if ($raw === '' || !in_array($raw, $presets, true)) {
+			if ($legacy !== '' && preg_match('/^(-?\d+(?:\.\d+)?)(px|rem|em|%|vh|vw|vmin|vmax|ch|ex)$/i', $legacy)) {
+				$out['height'] = 'custom';
+				$out['height_custom'] = bl_forms_sanitize_css_length($legacy, '24px');
+			} else {
+				$out['height'] = 'm';
+				unset($out['height_custom']);
+			}
+		} elseif ($raw === 'custom') {
+			$custom = (string) ($field['height_custom'] ?? '');
+			if ($custom === '' && $legacy !== '' && $legacy !== 'custom') {
+				$custom = $legacy;
+			}
+			$out['height'] = 'custom';
+			$out['height_custom'] = bl_forms_sanitize_css_length($custom, '24px');
+		} else {
+			$out['height'] = $raw;
+			unset($out['height_custom']);
+		}
+		unset($out['name'], $out['label'], $out['name_manual'], $out['hide_label'], $out['placeholder']);
 
 		return $out;
 	}
 
-	if (in_array($type, ['heading', 'text_block', 'html'], true)) {
+	if ($type === 'heading') {
+		$content = (string) ($field['content'] ?? '');
+		$out['content'] = sanitize_textarea_field($content);
+		$level = sanitize_key((string) ($field['level'] ?? 'h2'));
+		$allowed = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+		$out['level'] = in_array($level, $allowed, true) ? $level : 'h2';
+		unset($out['name'], $out['name_manual'], $out['hide_label']);
+
+		return $out;
+	}
+
+	if (in_array($type, ['text_block', 'html'], true)) {
 		$content = (string) ($field['content'] ?? '');
 		$out['content'] = $type === 'html'
 			? wp_kses_post($content)
 			: sanitize_textarea_field($content);
-		unset($out['name'], $out['name_manual'], $out['hide_label']);
+		unset($out['name'], $out['name_manual'], $out['hide_label'], $out['level']);
 
 		return $out;
 	}
@@ -692,12 +769,12 @@ function bl_forms_sanitize_field($field): ?array
 	$out['disabled'] = !empty($field['disabled']);
 	$out['placeholder'] = sanitize_text_field((string) ($field['placeholder'] ?? ''));
 
-	$no_readonly = ['radio', 'checkboxes', 'select', 'button_group', 'toggle', 'terms', 'file', 'image'];
+	$no_readonly = ['radio', 'checkboxes', 'button_group', 'toggle', 'terms', 'file', 'image'];
 	if (in_array($type, $no_readonly, true)) {
 		unset($out['readonly']);
 	}
 
-	$autocomplete_types = ['text', 'email', 'url', 'number', 'phone', 'textarea', 'date', 'time', 'datetime', 'select'];
+	$autocomplete_types = ['text', 'email', 'url', 'number', 'phone', 'textarea', 'select'];
 	if (in_array($type, $autocomplete_types, true)) {
 		$out['autocomplete'] = (($field['autocomplete'] ?? 'auto') === 'off') ? 'off' : 'auto';
 	} else {
@@ -720,8 +797,20 @@ function bl_forms_sanitize_field($field): ?array
 		} else {
 			unset($out['max']);
 		}
+		unset(
+			$out['min_mode'],
+			$out['max_mode'],
+			$out['default_mode'],
+			$out['min_offset'],
+			$out['max_offset'],
+			$out['default_offset']
+		);
 	} else {
-		unset($out['min'], $out['max']);
+		$out = bl_forms_sanitize_temporal_bounds($out, $field);
+	}
+
+	if (in_array($type, ['date', 'time', 'datetime'], true)) {
+		unset($out['placeholder']);
 	}
 
 	if (in_array($type, ['text', 'email', 'url', 'number', 'phone', 'textarea', 'date', 'time', 'datetime', 'file', 'image', 'toggle'], true)) {
@@ -765,6 +854,7 @@ function bl_forms_sanitize_field($field): ?array
 	if (
 		!isset($out['default_value'])
 		&& !in_array($type, $no_default, true)
+		&& !in_array($type, ['date', 'time', 'datetime'], true)
 	) {
 		$out['default_value'] = bl_forms_sanitize_typed_default(
 			$type,

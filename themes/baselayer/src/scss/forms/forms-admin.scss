@@ -412,7 +412,7 @@ p.bl-forms-builder__palette-empty {
   align-items: center;
   justify-content: center;
   margin: 0;
-  padding: p;
+  padding: 0;
   text-align: center;
   color: var(--bl-forms-admin-muted);
   pointer-events: none;
@@ -631,9 +631,59 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
   }
 }
 
+.bl-forms-builder__section-card {
+  margin: 0;
+  border-color: color-mix(in srgb, var(--bl-forms-admin-accent) 28%, var(--bl-forms-admin-border));
+  background: color-mix(in srgb, var(--bl-forms-admin-accent) 4%, #fff);
+
+  > .bl-forms-builder__field-header {
+    background: transparent;
+    align-items: center;
+    gap: 10px;
+  }
+}
+
+.bl-forms-builder__section-label-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  padding: 4px 8px;
+  border: 1px solid transparent;
+  border-radius: var(--bl-forms-admin-radius, 4px);
+  background: transparent;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #1d2327;
+  box-shadow: none;
+
+  &:hover {
+    border-color: var(--bl-forms-admin-border, #c3c4c7);
+    background: #fff;
+  }
+
+  &:focus {
+    border-color: var(--bl-forms-admin-accent, #2271b1);
+    background: #fff;
+    outline: none;
+    box-shadow: 0 0 0 1px var(--bl-forms-admin-accent, #2271b1);
+  }
+}
+
 .bl-forms-builder__field-type--column {
   border-color: color-mix(in srgb, var(--bl-forms-admin-accent) 40%, var(--bl-forms-admin-border));
   background: color-mix(in srgb, var(--bl-forms-admin-accent) 12%, #fff);
+  color: var(--bl-forms-admin-accent);
+
+  .bl-forms-builder__field-type-icon,
+  .bl-forms-builder__field-type-label {
+    color: var(--bl-forms-admin-accent);
+  }
+}
+
+.bl-forms-builder__field-type--section {
+  border-color: color-mix(in srgb, var(--bl-forms-admin-accent) 35%, var(--bl-forms-admin-border));
+  background: color-mix(in srgb, var(--bl-forms-admin-accent) 10%, #fff);
   color: var(--bl-forms-admin-accent);
 
   .bl-forms-builder__field-type-icon,
@@ -654,11 +704,13 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
   }
 }
 
-.bl-forms-builder__column-fields-wrap {
+.bl-forms-builder__column-fields-wrap,
+.bl-forms-builder__section-fields-wrap {
   padding: 0 12px 10px;
 }
 
-.bl-forms-builder__column-fields {
+.bl-forms-builder__column-fields,
+.bl-forms-builder__section-fields {
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -669,7 +721,8 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
   background: #fff;
 }
 
-.bl-forms-builder__column-empty {
+.bl-forms-builder__column-empty,
+.bl-forms-builder__section-empty {
   text-align: center;
   color: var(--bl-forms-admin-muted);
 
@@ -814,7 +867,8 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
   }
 }
 
-.bl-forms-builder__number-bounds {
+.bl-forms-builder__number-bounds,
+.bl-forms-builder__temporal-bounds {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
@@ -822,6 +876,31 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
 
   > p {
     margin: 0;
+  }
+}
+
+.bl-forms-builder__temporal-extras {
+  margin-top: 8px;
+
+  &:empty {
+    display: none;
+  }
+}
+
+.bl-forms-builder__temporal-offset-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--bl-forms-admin-muted, #646970);
+
+  .bl-forms-builder__temporal-offset {
+    width: 4.5em;
+    min-height: 28px;
+    padding: 2px 6px;
+    font-size: 12px;
+    color: #2c3338;
   }
 }
 
@@ -1062,6 +1141,8 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
 }
 
 .bl-forms-builder__width,
+.bl-forms-builder__height,
+.bl-forms-builder__heading-level,
 .bl-forms-builder__layout {
   margin: 0 0 12px;
 
@@ -1173,7 +1254,8 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
   }
 }
 
-.bl-forms-builder__width-custom {
+.bl-forms-builder__width-custom,
+.bl-forms-builder__height-custom {
   margin-top: 8px;
   max-width: 280px;
 }
@@ -1212,7 +1294,7 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
     max-width: none;
 
     &:last-of-type {
-      margin-bottom: 8px;
+      margin-bottom: 0;
     }
   }
 
@@ -1220,6 +1302,16 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
     display: block;
     margin: 0;
   }
+}
+
+.bl-forms-builder__field-errors-help {
+  margin-bottom: 4px !important;
+}
+
+.bl-forms-builder__field-errors-sep {
+  margin: 14px 0;
+  border: 0;
+  border-top: 1px solid var(--bl-forms-admin-border, #c3c4c7);
 }
 
 .bl-forms-builder__page-picker-summary {

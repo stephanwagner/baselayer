@@ -1,5 +1,5 @@
 import Sortable from 'sortablejs';
-import { el, t, defaultField, uniqueFieldName, formsDragStart, formsDragEnd, collapseOpenFields } from './dom.js';
+import { el, t, defaultField, uniqueFieldName, formsDragStart, formsDragEnd } from './dom.js';
 import { createFieldCard, serializeRow } from './field-card.js';
 import { equalizeColumnRun } from './layout.js';
 
@@ -88,7 +88,6 @@ export function createCanvas({ fields = [], onChange }) {
     handle: '.bl-forms-builder__handle',
     animation: 150,
     draggable: '.bl-forms-builder__field, .bl-forms-builder__template',
-    onChoose: collapseOpenFields,
     onStart: formsDragStart,
     onEnd: formsDragEnd,
     onAdd(evt) {

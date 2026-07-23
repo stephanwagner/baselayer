@@ -374,19 +374,61 @@ function bl_forms_render_field(array $field, string $uid): string
 		return '<div ' . $attrs . '>' . $inner . '</div>';
 	}
 
+	if ($type === 'section') {
+		$children = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
+		$inner = '';
+		foreach ($children as $child) {
+			if (!is_array($child)) {
+				continue;
+			}
+			$inner .= bl_forms_render_field($child, $uid);
+		}
+		$label = trim((string) ($field['label'] ?? ''));
+		$classes = 'bl-form__section';
+		$extra = bl_forms_sanitize_css_class((string) ($field['css_class'] ?? ''));
+		if ($extra !== '') {
+			$classes .= ' ' . $extra;
+		}
+		$html = '<section class="' . esc_attr($classes) . '">';
+		if ($label !== '') {
+			$html .= '<h3 class="bl-form__section-title">' . esc_html($label) . '</h3>';
+		}
+		$html .= '<div class="bl-form__section-body">' . $inner . '</div></section>';
+
+		return $html;
+	}
+
 	if ($type === 'divider') {
 		return '<div ' . bl_forms_field_wrap_attrs($field, 'bl-form__divider-wrap') . '><hr class="bl-form__divider"></div>';
 	}
 
 	if ($type === 'spacer') {
-		$height = trim((string) ($field['height'] ?? '24px'));
-		if ($height === '') {
-			$height = '24px';
-		}
+		$height = sanitize_key((string) ($field['height'] ?? 'm'));
+		$presets = ['xs', 's', 'm', 'l', 'xl'];
 		$classes = 'bl-form__field-wrap bl-form__spacer-wrap';
-		$style = bl_forms_field_width_style($field) . ';--bl-form-spacer-height:' . $height;
+		$style = bl_forms_field_width_style($field);
 
-		return '<div class="' . esc_attr($classes) . '" style="' . esc_attr($style) . '" aria-hidden="true"></div>';
+		if (in_array($height, $presets, true)) {
+			$classes .= ' bl-form__spacer-wrap--' . $height;
+		} else {
+			$custom = bl_forms_sanitize_css_length((string) ($field['height_custom'] ?? ''), '24px');
+			// Legacy: height stored as a CSS length.
+			if ($custom === '24px' && $height !== 'custom' && $height !== '') {
+				$maybe = bl_forms_sanitize_css_length((string) ($field['height'] ?? ''), '');
+				if ($maybe !== '') {
+					$custom = $maybe;
+				}
+			}
+			$classes .= ' bl-form__spacer-wrap--custom';
+			$style .= ';--bl-form-spacer-height:' . $custom;
+		}
+
+		$attrs = 'class="' . esc_attr($classes) . '"';
+		if ($style !== '') {
+			$attrs .= ' style="' . esc_attr($style) . '"';
+		}
+
+		return '<div ' . $attrs . ' aria-hidden="true"></div>';
 	}
 
 	if ($type === 'captcha') {
@@ -427,8 +469,12 @@ function bl_forms_render_field(array $field, string $uid): string
 		if ($content === '') {
 			return '';
 		}
+		$level = sanitize_key((string) ($field['level'] ?? 'h2'));
+		if (!in_array($level, ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'], true)) {
+			$level = 'h2';
+		}
 
-		return '<div ' . bl_forms_field_wrap_attrs($field, 'bl-form__heading') . '><h3 class="bl-form__title">' . esc_html($content) . '</h3></div>';
+		return '<div ' . bl_forms_field_wrap_attrs($field, 'bl-form__heading') . '><' . $level . ' class="bl-form__title">' . esc_html($content) . '</' . $level . '></div>';
 	}
 
 	if ($type === 'text_block') {
@@ -455,6 +501,10 @@ function bl_forms_render_field(array $field, string $uid): string
 	$placeholder = (string) ($field['placeholder'] ?? '');
 	$multiple = !empty($field['multiple']);
 	$default_value = (string) ($field['default_value'] ?? '');
+	if (in_array($type, ['date', 'time', 'datetime'], true)) {
+		$placeholder = '';
+		$default_value = bl_forms_resolve_temporal_bound($field, 'default');
+	}
 	$control_attrs = bl_forms_field_control_attrs($field);
 	$choice_attrs = bl_forms_field_control_attrs($field, false);
 	$disabled_attr = !empty($field['disabled']) ? ' disabled' : '';
@@ -477,19 +527,25 @@ function bl_forms_render_field(array $field, string $uid): string
 
 	if ($type === 'select') {
 		$select_name = $multiple ? $field_name . '[]' : $field_name;
+		// <select> has no readonly attribute — lock non-selected options instead.
+		$readonly = empty($field['disabled']) && !empty($field['readonly']);
+		$readonly_attr = $readonly ? ' aria-readonly="true"' : '';
+		$has_defaults = bl_forms_field_default_values($field) !== [];
 		?>
 		<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--select', $name) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<?= bl_forms_field_label_html($field, $input_id, $req_mark) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-			<select class="bl-form__control" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($select_name) ?>"<?= $multiple ? ' multiple' : '' ?><?= $choice_attrs ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+			<select class="bl-form__control" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($select_name) ?>"<?= $multiple ? ' multiple' : '' ?><?= $choice_attrs ?><?= $readonly_attr ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 				<?php if (!$multiple) : ?>
-					<option value=""><?= esc_html($placeholder !== '' ? $placeholder : __('Please select…', 'baselayer')) ?></option>
+					<option value=""<?= ($readonly && $has_defaults) ? ' disabled' : '' ?>><?= esc_html($placeholder !== '' ? $placeholder : __('Please select…', 'baselayer')) ?></option>
 				<?php endif; ?>
 				<?php foreach ($options as $opt) :
 					$opt_value = (string) ($opt['value'] ?? '');
-					$selected = bl_forms_field_default_is($field, $opt_value) ? ' selected' : '';
+					$is_selected = bl_forms_field_default_is($field, $opt_value);
+					$selected = $is_selected ? ' selected' : '';
+					$opt_disabled = ($readonly && !$is_selected) ? ' disabled' : '';
 					?>
-					<option value="<?= esc_attr($opt_value) ?>"<?= $selected ?>><?= esc_html((string) ($opt['label'] ?? '')) ?></option>
+					<option value="<?= esc_attr($opt_value) ?>"<?= $selected ?><?= $opt_disabled ?>><?= esc_html((string) ($opt['label'] ?? '')) ?></option>
 				<?php endforeach; ?>
 			</select>
 		</div>
@@ -570,10 +626,13 @@ function bl_forms_render_field(array $field, string $uid): string
 	if ($type === 'terms') {
 		$checkbox_text = trim((string) ($field['content'] ?? ''));
 		if ($checkbox_text === '') {
-			$checkbox_text = $label !== '' ? $label : __('I agree to the [Privacy Policy](page:privacy).', 'baselayer');
+			$checkbox_text = __('I agree to the [Privacy Policy](page:privacy).', 'baselayer');
 		}
 		$show_terms_label = $label !== '' && !bl_forms_field_hide_label($field);
 		$checked = bl_forms_field_default_checked($field) ? ' checked' : '';
+		$terms_name_attr = $show_terms_label
+			? ' aria-labelledby="' . esc_attr($input_id) . '-label"'
+			: bl_forms_field_aria_label_attr($field);
 		?>
 		<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--terms', $name) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<?php if ($show_terms_label) : ?>
@@ -581,7 +640,7 @@ function bl_forms_render_field(array $field, string $uid): string
 			<?php endif; ?>
 			<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<label class="bl-form__option bl-form__option--terms" for="<?= esc_attr($input_id) ?>">
-				<input type="checkbox" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" value="1"<?= $choice_attrs ?><?= $checked ?><?= $show_terms_label ? ' aria-labelledby="' . esc_attr($input_id) . '-label"' : '' ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+				<input type="checkbox" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" value="1"<?= $choice_attrs ?><?= $checked ?><?= $terms_name_attr // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 				<span><?= bl_forms_format_inline_links($checkbox_text) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped/kses in helper. ?><?= !$show_terms_label ? $req_mark : '' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
 			</label>
 		</div>
@@ -680,12 +739,21 @@ function bl_forms_render_field(array $field, string $uid): string
 			$number_attrs .= ' max="' . esc_attr($max) . '"';
 		}
 		$number_attrs .= ' step="any"';
+	} elseif (in_array($type, ['date', 'time', 'datetime'], true)) {
+		$min = bl_forms_resolve_temporal_bound($field, 'min');
+		$max = bl_forms_resolve_temporal_bound($field, 'max');
+		if ($min !== '') {
+			$number_attrs .= ' min="' . esc_attr($min) . '"';
+		}
+		if ($max !== '') {
+			$number_attrs .= ' max="' . esc_attr($max) . '"';
+		}
 	}
 	?>
 	<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--' . sanitize_html_class($type), $name) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 		<?= bl_forms_field_label_html($field, $input_id, $req_mark) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-		<input class="bl-form__control" type="<?= esc_attr($input_type) ?>" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" value="<?= esc_attr($default_value) ?>" placeholder="<?= esc_attr($placeholder) ?>"<?= $control_attrs ?><?= $number_attrs // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<input class="bl-form__control" type="<?= esc_attr($input_type) ?>" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" value="<?= esc_attr($default_value) ?>"<?= $placeholder !== '' ? ' placeholder="' . esc_attr($placeholder) . '"' : '' ?><?= $control_attrs ?><?= $number_attrs // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 	</div>
 	<?php
 

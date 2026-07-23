@@ -1,5 +1,5 @@
 import Sortable from 'sortablejs';
-import { PALETTE_SECTIONS, el, t, typeLabel, iconEl, formsDragStart, formsDragEnd, collapseOpenFields } from './dom.js';
+import { PALETTE_SECTIONS, el, t, typeLabel, iconEl, formsDragStart, formsDragEnd } from './dom.js';
 
 function paletteIcon(type) {
   const icons = (window.blFormsAdmin && window.blFormsAdmin.icons) || {};
@@ -28,6 +28,12 @@ function paletteAddButton(type, onAdd) {
       onAdd(type);
     },
   });
+  // Keep Sortable from swallowing the click / starting a drag from this control.
+  const stopSortable = (event) => {
+    event.stopPropagation();
+  };
+  btn.addEventListener('pointerdown', stopSortable);
+  btn.addEventListener('mousedown', stopSortable);
   if (markup) {
     btn.innerHTML = markup;
   } else {
@@ -184,10 +190,8 @@ export function createPalette(onAdd) {
       animation: 150,
       draggable: '.bl-forms-builder__template',
       filter: '.bl-forms-builder__template-add',
-      preventOnFilter: true,
-      onChoose() {
-        collapseOpenFields();
-      },
+      // false: allow the › button click; drag is blocked via filter + stopPropagation.
+      preventOnFilter: false,
       onStart() {
         formsDragStart();
       },
