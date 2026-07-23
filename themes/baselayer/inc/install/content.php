@@ -184,9 +184,9 @@ function bl_install_media_manifest(): array
 		],
 		'sample-video-1' => [
 			'file'    => $base . '/sample-video-1.mp4',
-			'title'   => 'Snowy Hills',
-			'caption' => 'Slow camera move across snowy hills',
-			'description' => 'By Julien Goettelmann (@julien-goettelmann-44396125) on pexels',
+			'title'   => 'Forest Flyover',
+			'caption' => 'Flyover of dense forest below a mountain range',
+			'description' => 'By Dudubangbang Travel (@dudubangbang) on pexels',
 		],
 		'sample-video-2' => [
 			'file'    => $base . '/sample-video-2.mp4',
