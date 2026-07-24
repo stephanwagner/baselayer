@@ -197,6 +197,39 @@ msgstr "Abbrechen"
 msgid "Apply"
 msgstr "Übernehmen"
 
+
+#: includes/admin.php:70 includes/admin.php:284
+msgid "Tools"
+msgstr "Werkzeuge"
+
+#: includes/admin.php:72 includes/admin.php:285
+msgid "Export"
+msgstr "Exportieren"
+
+#: includes/admin.php:73 includes/admin.php:286
+msgid "Import"
+msgstr "Importieren"
+
+#: includes/admin.php:287
+msgid "Import fields?"
+msgstr "Felder importieren?"
+
+#: includes/admin.php:288
+msgid "Importing will overwrite all existing fields on this form. Settings (emails, messages, security) are not changed. This cannot be undone until you save or discard."
+msgstr "Beim Importieren werden alle bestehenden Felder dieses Formulars überschrieben. Einstellungen (E-Mails, Meldungen, Sicherheit) bleiben unverändert. Das lässt sich erst rückgängig machen, wenn du speicherst oder verwirfst."
+
+#: includes/admin.php:289
+msgid "Overwrite fields"
+msgstr "Felder überschreiben"
+
+#: includes/admin.php:290
+msgid "This file is not a valid form fields export."
+msgstr "Diese Datei ist kein gültiger Formularfelder-Export."
+
+#: includes/admin.php:291
+msgid "Could not read the selected file."
+msgstr "Die ausgewählte Datei konnte nicht gelesen werden."
+
 #: includes/admin.php:264 includes/admin.php:345
 msgid "Label"
 msgstr "Beschriftung"

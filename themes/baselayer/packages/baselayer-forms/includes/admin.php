@@ -9,6 +9,19 @@ defined('ABSPATH') || exit;
 function bl_forms_admin_meta_boxes(): void
 {
 	remove_meta_box('slugdiv', BL_FORM_POST_TYPE, 'normal');
+
+	if (!bl_forms_user_can_manage()) {
+		return;
+	}
+
+	add_meta_box(
+		'bl_forms_tools',
+		__('Tools', 'baselayer-forms'),
+		'bl_forms_render_tools_metabox',
+		BL_FORM_POST_TYPE,
+		'side',
+		'default'
+	);
 }
 add_action('add_meta_boxes', 'bl_forms_admin_meta_boxes');
 
@@ -56,6 +69,21 @@ function bl_forms_render_builder_after_title(WP_Post $post): void
 	<?php
 }
 add_action('edit_form_after_title', 'bl_forms_render_builder_after_title');
+
+/**
+ * Tools metabox (import/export) under Publish.
+ */
+function bl_forms_render_tools_metabox(WP_Post $post): void
+{
+	?>
+	<div class="bl-forms-tools">
+		<div class="bl-forms-tools__actions">
+			<button type="button" class="button -small" data-bl-forms-export><?= esc_html__('Export', 'baselayer-forms') ?></button>
+			<button type="button" class="button -small" data-bl-forms-import><?= esc_html__('Import', 'baselayer-forms') ?></button>
+		</div>
+	</div>
+	<?php
+}
 
 /**
  * Save form config from builder JSON only.
@@ -261,6 +289,14 @@ function bl_forms_admin_enqueue(string $hook): void
 				'widthAuto'         => __('Auto', 'baselayer-forms'),
 				'cancel'            => __('Cancel', 'baselayer-forms'),
 				'apply'             => __('Apply', 'baselayer-forms'),
+				'tools'             => __('Tools', 'baselayer-forms'),
+				'export'            => __('Export', 'baselayer-forms'),
+				'import'            => __('Import', 'baselayer-forms'),
+				'importOverwriteTitle' => __('Import fields?', 'baselayer-forms'),
+				'importOverwriteMessage' => __('Importing will overwrite all existing fields on this form. Settings (emails, messages, security) are not changed. This cannot be undone until you save or discard.', 'baselayer-forms'),
+				'importOverwriteConfirm' => __('Overwrite fields', 'baselayer-forms'),
+				'importInvalid'     => __('This file is not a valid form fields export.', 'baselayer-forms'),
+				'importReadError'   => __('Could not read the selected file.', 'baselayer-forms'),
 				'label'             => __('Label', 'baselayer-forms'),
 				'name'              => __('Field name', 'baselayer-forms'),
 				'nameHelp'          => __('Internal field key used in submissions, emails, and entry data.', 'baselayer-forms'),

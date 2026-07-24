@@ -37,6 +37,23 @@
   #submitdiv #delete-action {
     display: none;
   }
+
+  #bl_forms_tools .inside {
+    margin: 0;
+    padding: 12px;
+  }
+
+  .bl-forms-tools__actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+
+    .button {
+      width: 100%;
+      justify-content: center;
+      text-align: center;
+    }
+  }
 }
 
 // Admin builder tokens (override in child theme if needed).

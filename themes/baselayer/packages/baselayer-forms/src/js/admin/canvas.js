@@ -112,9 +112,19 @@ export function createCanvas({ fields = [], onChange }) {
     },
   });
 
+  const replaceFields = (nextFields = []) => {
+    list.replaceChildren();
+    expandLegacyGroups(nextFields || []).forEach((field) => {
+      list.appendChild(createFieldCard(field, false));
+    });
+    syncEmpty();
+    onChange();
+  };
+
   return {
     root: wrap,
     addField,
+    replaceFields,
     syncEmpty,
     getFields() {
       return Array.from(list.children)

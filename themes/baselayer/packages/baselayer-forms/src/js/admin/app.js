@@ -2,6 +2,7 @@ import { el, t, writeConfig } from './dom.js';
 import { createPalette } from './palette.js';
 import { createCanvas } from './canvas.js';
 import { createPanels } from './panels.js';
+import { bindImportExport } from './import-export.js';
 
 /**
  * Mount the tabbed form builder.
@@ -99,5 +100,6 @@ export function mountApp(root, initial) {
   root.addEventListener('change', syncAll);
   document.addEventListener('bl-forms-builder-changed', syncAll);
 
+  bindImportExport(canvas);
   syncAll();
 }

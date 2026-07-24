@@ -177,6 +177,20 @@ body.bl-page-picker-open {
 .post-type-bl_form #submitdiv #delete-action {
   display: none;
 }
+.post-type-bl_form #bl_forms_tools .inside {
+  margin: 0;
+  padding: 12px;
+}
+.post-type-bl_form .bl-forms-tools__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+.post-type-bl_form .bl-forms-tools__actions .button {
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+}
 
 .bl-forms-builder,
 .bl-forms-builder__modal {
