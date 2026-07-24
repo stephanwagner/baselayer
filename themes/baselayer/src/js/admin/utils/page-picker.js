@@ -65,6 +65,7 @@ export function openPagePicker(options = {}) {
 
     const cleanup = () => {
       document.removeEventListener('keydown', onKey);
+      document.body.classList.remove('bl-page-picker-open');
       if (abort) {
         abort.abort();
         abort = null;
@@ -116,13 +117,13 @@ export function openPagePicker(options = {}) {
     footer.className = 'bl-page-picker__footer';
     const cancelBtn = document.createElement('button');
     cancelBtn.type = 'button';
-    cancelBtn.className = 'button';
+    cancelBtn.className = 'button -small';
     cancelBtn.textContent = opts.cancelLabel;
     cancelBtn.addEventListener('click', () => finish(null));
 
     const selectBtn = document.createElement('button');
     selectBtn.type = 'button';
-    selectBtn.className = 'button button-primary';
+    selectBtn.className = 'button button-primary -small';
     selectBtn.textContent = opts.selectLabel;
     selectBtn.disabled = !selected.id;
     selectBtn.addEventListener('click', () => {
@@ -250,6 +251,7 @@ export function openPagePicker(options = {}) {
       }, 220);
     });
 
+    document.body.classList.add('bl-page-picker-open');
     document.body.appendChild(backdrop);
     search.focus();
     fetchPages('');

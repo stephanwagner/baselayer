@@ -1,4 +1,8 @@
 // Shared page picker modal (admin util).
+body.bl-page-picker-open {
+  overflow: hidden;
+}
+
 .bl-page-picker {
   position: fixed;
   inset: 0;
@@ -8,13 +12,14 @@
   justify-content: center;
   padding: 24px;
   background: rgba(0, 0, 0, 0.45);
+  overscroll-behavior: none;
 }
 
 .bl-page-picker__dialog {
   display: flex;
   flex-direction: column;
   width: min(520px, 100%);
-  max-height: min(80vh, 640px);
+  height: min(80vh, 640px);
   overflow: hidden;
   border-radius: 6px;
   background: #fff;
@@ -59,10 +64,10 @@
 
 .bl-page-picker__list {
   flex: 1 1 auto;
-  min-height: 180px;
-  max-height: 360px;
+  min-height: 0;
   overflow: auto;
-  margin: 0 0 4px;
+  overscroll-behavior: contain;
+  margin: 0 0 12px;
   border: 1px solid #c3c4c7;
   border-radius: 4px;
   background: #fff;

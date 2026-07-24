@@ -1,6 +1,7 @@
 @use 'variables';
 @use '../config' as *;
 @use '../admin/page-picker';
+@use '../admin/button-small';
 
 // Form edit screen: static side boxes (Publish is a WP default postbox).
 .post-type-bl_form {
@@ -1263,10 +1264,6 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
 .bl-forms-builder__after-submit {
   margin: 0 0 14px;
   max-width: 520px;
-}
-
-.bl-forms-builder__after-submit-modes {
-  margin-top: 4px;
 }
 
 .bl-forms-builder__after-submit-redirect {

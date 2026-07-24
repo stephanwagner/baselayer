@@ -3252,7 +3252,7 @@ msgstr "Legen Sie fest, was Besucher nach einer erfolgreichen Übermittlung sehe
 msgid "Show message"
 msgstr "Nachricht anzeigen"
 msgid "Go to page"
-msgstr "Zur Seite weiterleiten"
+msgstr "Zu einer Seite weiterleiten"
 msgid "Choose page"
 msgstr "Seite wählen"
 msgid "Change page"

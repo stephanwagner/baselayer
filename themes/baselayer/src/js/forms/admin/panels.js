@@ -381,10 +381,19 @@ export function createPanels(settings, builderRoot, onChange) {
 
   const successRow = fieldRow(t('successMessage', 'Success message'), success);
   const afterOptions = el('div', { className: 'bl-forms-builder__after-submit' });
-  const afterChoices = el('div', {
-    className: 'bl-forms-builder__segmented bl-forms-builder__after-submit-modes',
-    role: 'radiogroup',
+  const afterSelect = el('select', {
+    className: 'widefat',
     'aria-label': t('afterSubmit', 'After submission'),
+  });
+  [
+    { id: 'message', label: t('afterSubmitMessage', 'Show message') },
+    { id: 'redirect', label: t('afterSubmitRedirect', 'Go to page') },
+  ].forEach((mode) => {
+    const option = el('option', { value: mode.id, text: mode.label });
+    if (state.after_submit === mode.id) {
+      option.selected = true;
+    }
+    afterSelect.appendChild(option);
   });
 
   const redirectPanel = el('div', {
@@ -394,7 +403,7 @@ export function createPanels(settings, builderRoot, onChange) {
   const redirectSummary = el('div', { className: 'bl-forms-builder__page-picker-summary' });
   const redirectPickBtn = el('button', {
     type: 'button',
-    className: 'button',
+    className: 'button -small',
     text: t('choosePage', 'Choose page'),
   });
   const redirectClearBtn = el('button', {
@@ -408,11 +417,7 @@ export function createPanels(settings, builderRoot, onChange) {
     const isRedirect = state.after_submit === 'redirect';
     successRow.hidden = isRedirect;
     redirectPanel.hidden = !isRedirect;
-    afterChoices.querySelectorAll('[data-after-submit]').forEach((btn) => {
-      const on = btn.dataset.afterSubmit === state.after_submit;
-      btn.classList.toggle('is-active', on);
-      btn.setAttribute('aria-checked', on ? 'true' : 'false');
-    });
+    afterSelect.value = state.after_submit === 'redirect' ? 'redirect' : 'message';
 
     redirectSummary.replaceChildren();
     if (state.redirect_page_id) {
@@ -447,29 +452,10 @@ export function createPanels(settings, builderRoot, onChange) {
       : t('choosePage', 'Choose page');
   };
 
-  [
-    { id: 'message', label: t('afterSubmitMessage', 'Show message') },
-    { id: 'redirect', label: t('afterSubmitRedirect', 'Go to page') },
-  ].forEach((mode) => {
-    const btn = el('button', {
-      type: 'button',
-      className:
-        'bl-forms-builder__segmented-btn' +
-        (state.after_submit === mode.id ? ' is-active' : ''),
-      role: 'radio',
-      text: mode.label,
-      dataset: { afterSubmit: mode.id },
-      onClick: () => {
-        state.after_submit = mode.id;
-        syncAfterSubmitUi();
-        emit();
-      },
-    });
-    btn.setAttribute(
-      'aria-checked',
-      state.after_submit === mode.id ? 'true' : 'false'
-    );
-    afterChoices.appendChild(btn);
+  afterSelect.addEventListener('change', () => {
+    state.after_submit = afterSelect.value === 'redirect' ? 'redirect' : 'message';
+    syncAfterSubmitUi();
+    emit();
   });
 
   redirectPickBtn.addEventListener('click', async () => {
@@ -512,17 +498,11 @@ export function createPanels(settings, builderRoot, onChange) {
   );
 
   afterOptions.append(
-    el('p', { className: 'bl-forms-builder__setting' }, [
-      el('label', {}, [el('strong', { text: t('afterSubmit', 'After submission') })]),
-      afterChoices,
-      el('span', {
-        className: 'description',
-        text: t(
-          'afterSubmitHelp',
-          'Choose what visitors see after a successful submission.'
-        ),
-      }),
-    ]),
+    fieldRow(
+      t('afterSubmit', 'After submission'),
+      afterSelect,
+      t('afterSubmitHelp', 'Choose what visitors see after a successful submission.')
+    ),
     redirectPanel
   );
 

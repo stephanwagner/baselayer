@@ -1,0 +1,6 @@
+@use 'mixins' as *;
+
+.wp-core-ui .button.-small,
+.button.-small {
+  @include button-small;
+}
