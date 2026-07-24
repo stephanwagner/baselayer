@@ -394,6 +394,10 @@ export function createPanels(settings, builderRoot, onChange) {
   const datetimeMaxMsg = bindErrorMsg('datetime_max_message', 'datetime_max');
   const fileMsg = bindErrorMsg('file_message', 'file');
   const optionMsg = bindErrorMsg('option_message', 'option');
+  const uploadButton = bindErrorMsg('upload_button_text', 'upload_button');
+  const uploadEmpty = bindErrorMsg('upload_empty_text', 'upload_empty');
+  const uploadDrop = bindErrorMsg('upload_drop_text', 'upload_drop');
+  const uploadRemove = bindErrorMsg('upload_remove_text', 'upload_remove');
 
   const rangeHelp = () =>
     el('span', {
@@ -599,6 +603,12 @@ export function createPanels(settings, builderRoot, onChange) {
         fieldRow(t('minError', 'Minimum'), datetimeMinMsg),
         fieldRow(t('maxError', 'Maximum'), datetimeMaxMsg),
         rangeHelp(),
+        el('hr', { className: 'bl-forms-builder__field-errors-sep' }),
+        errorGroupTitle(t('uploadTexts', 'File upload')),
+        fieldRow(t('uploadButtonText', 'Button label'), uploadButton),
+        fieldRow(t('uploadEmptyText', 'Empty text'), uploadEmpty),
+        fieldRow(t('uploadDropText', 'Drop hint'), uploadDrop),
+        fieldRow(t('uploadRemoveText', 'Remove label'), uploadRemove),
         el('hr', { className: 'bl-forms-builder__field-errors-sep' }),
         fieldRow(t('fileError', 'File'), fileMsg),
         fieldRow(t('optionError', 'Choice'), optionMsg),

@@ -328,6 +328,11 @@ export function defaultField(type = 'text') {
   if (['select', 'button_group', 'file', 'image'].includes(type)) {
     base.multiple = false;
   }
+  if (type === 'file' || type === 'image') {
+    base.preview = true;
+    base.extensions =
+      type === 'image' ? 'jpg, jpeg, png, webp, gif, heic' : '';
+  }
   if (type === 'terms') {
     base.label = t('termsDefaultFieldLabel', 'Privacy Policy');
     base.name = slugifyName(base.label);

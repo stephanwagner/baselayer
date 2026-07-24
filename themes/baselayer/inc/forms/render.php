@@ -78,6 +78,13 @@ function bl_forms_render(int $form_id, array $args = []): string
 			</div>
 			<div class="bl-form__actions">
 				<div class="bl-form__message" data-bl-form-message hidden role="status" aria-live="polite"></div>
+				<div class="bl-form__progress" data-bl-form-progress hidden aria-live="polite">
+					<p class="bl-form__progress-status" data-bl-form-progress-status></p>
+					<p class="bl-form__progress-detail" data-bl-form-progress-detail hidden></p>
+					<div class="bl-form__progress-track" aria-hidden="true">
+						<div class="bl-form__progress-bar" data-bl-form-progress-bar></div>
+					</div>
+				</div>
 				<button type="submit" class="button" data-bl-form-submit>
 					<span class="bl-form__submit-label"><?= esc_html($submit_label) ?></span>
 					<span class="bl-form__spinner" data-bl-form-spinner hidden aria-hidden="true"></span>
@@ -129,6 +136,19 @@ function bl_forms_enqueue_front_assets(): void
 
 	bl_forms_enqueue_style('bl-forms', 'forms');
 	bl_forms_enqueue_script('bl-forms', 'forms', [], true);
+	if (wp_script_is('bl-forms', 'enqueued') || wp_script_is('bl-forms', 'registered')) {
+		wp_localize_script('bl-forms', 'blForms', [
+			'fileTypes' => bl_forms_file_type_styles(),
+			'i18n'      => [
+				'uploadingImage'  => __('Uploading image %1$s/%2$s', 'baselayer'),
+				'uploadingFile'   => __('Uploading file %1$s/%2$s', 'baselayer'),
+				'uploadingFiles'  => __('Uploading %1$s/%2$s', 'baselayer'),
+				'sendingMessage'  => __('Sending message…', 'baselayer'),
+				'progressOf'      => __('%1$s of %2$s', 'baselayer'),
+				'filesSelected'   => __('%s files selected', 'baselayer'),
+			],
+		]);
+	}
 }
 
 /**
@@ -932,26 +952,61 @@ function bl_forms_render_field(array $field, string $uid, array $settings = []):
 
 	if ($type === 'file' || $type === 'image') {
 		$file_name = $multiple ? $field_name . '[]' : $field_name;
-		$accept = $type === 'image' ? 'image/*' : '';
+		$extensions = bl_forms_field_extensions($field);
+		$accept = bl_forms_accept_from_extensions($extensions);
+		if ($accept === '' && $type === 'image') {
+			$accept = 'image/*';
+		}
+		$preview = !array_key_exists('preview', $field) || !empty($field['preview']);
+		$button_text = bl_forms_resolve_message($settings, 'upload_button_text');
+		$empty_text = bl_forms_resolve_message($settings, 'upload_empty_text');
+		$drop_text = bl_forms_resolve_message($settings, 'upload_drop_text');
+		$remove_text = bl_forms_resolve_message($settings, 'upload_remove_text');
+		$ext_hint = $extensions !== []
+			? strtoupper(implode(', ', $extensions))
+			: '';
 		?>
 		<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--' . $type, $name) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<?= bl_forms_field_label_html($field, $input_id, $req_mark) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-			<input
-				class="bl-form__control bl-form__control--file"
-				type="file"
-				id="<?= esc_attr($input_id) ?>"
-				name="<?= esc_attr($file_name) ?>"
-				<?= $accept !== '' ? 'accept="' . esc_attr($accept) . '"' : '' ?>
-				<?= $multiple ? ' multiple' : '' ?>
-				<?= $choice_attrs ?>
-				<?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-				<?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-				<?= $type === 'image' ? ' data-bl-form-image-input' : '' ?>
+			<div
+				class="bl-form__upload<?= $preview ? ' bl-form__upload--preview' : '' ?>"
+				data-bl-form-upload
+				data-bl-form-upload-kind="<?= esc_attr($type) ?>"
+				data-bl-form-upload-preview="<?= $preview ? '1' : '0' ?>"
+				data-bl-form-upload-remove="<?= esc_attr($remove_text) ?>"
 			>
-			<?php if ($type === 'image') : ?>
-				<div class="bl-form__image-preview" data-bl-form-image-preview hidden></div>
-			<?php endif; ?>
+				<input
+					class="bl-form__upload-input"
+					type="file"
+					id="<?= esc_attr($input_id) ?>"
+					name="<?= esc_attr($file_name) ?>"
+					<?= $accept !== '' ? 'accept="' . esc_attr($accept) . '"' : '' ?>
+					<?= $multiple ? ' multiple' : '' ?>
+					<?= $choice_attrs ?>
+					<?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					<?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+					data-bl-form-file-input
+					hidden
+				>
+				<div class="bl-form__upload-shell" data-bl-form-upload-shell tabindex="0" role="button" aria-controls="<?= esc_attr($input_id) ?>">
+					<div class="bl-form__upload-actions">
+						<span class="bl-form__upload-btn" aria-hidden="true"><?= esc_html($button_text) ?></span>
+						<span class="bl-form__upload-meta">
+							<span class="bl-form__upload-empty" data-bl-form-upload-empty><?= esc_html($empty_text) ?></span>
+							<?php if ($drop_text !== '') : ?>
+								<span class="bl-form__upload-drop"><?= esc_html($drop_text) ?></span>
+							<?php endif; ?>
+							<?php if ($ext_hint !== '') : ?>
+								<span class="bl-form__upload-types"><?= esc_html($ext_hint) ?></span>
+							<?php endif; ?>
+						</span>
+					</div>
+				</div>
+				<?php if ($preview) : ?>
+					<div class="bl-form__upload-preview" data-bl-form-upload-preview-list hidden></div>
+				<?php endif; ?>
+			</div>
 		</div>
 		<?php
 		return (string) ob_get_clean();

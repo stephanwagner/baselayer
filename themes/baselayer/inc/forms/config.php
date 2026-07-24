@@ -162,6 +162,10 @@ function bl_forms_default_settings(): array
 		'date_before_message'    => '',
 		'date_after_message'     => '',
 		'file_message'           => '',
+		'upload_button_text'     => '',
+		'upload_empty_text'      => '',
+		'upload_drop_text'       => '',
+		'upload_remove_text'     => '',
 		'option_message'         => '',
 		'after_submit'           => 'message',
 		'redirect_page_id'       => 0,
@@ -257,6 +261,10 @@ function bl_forms_message_fallbacks(): array
 		/* translators: %s: related field label */
 		'date_after' => __('This value must be after %s.', 'baselayer'),
 		'file'       => __('Please upload a valid file.', 'baselayer'),
+		'upload_button' => __('Choose file', 'baselayer'),
+		'upload_empty'  => __('No file chosen', 'baselayer'),
+		'upload_drop'   => __('or drag and drop here', 'baselayer'),
+		'upload_remove' => __('Remove', 'baselayer'),
 		'option'     => __('Please choose a valid option.', 'baselayer'),
 	];
 }
@@ -293,6 +301,10 @@ function bl_forms_resolve_message(array $settings, string $key): string
 		'date_before_message'=> 'date_before',
 		'date_after_message' => 'date_after',
 		'file_message'       => 'file',
+		'upload_button_text' => 'upload_button',
+		'upload_empty_text'  => 'upload_empty',
+		'upload_drop_text'   => 'upload_drop',
+		'upload_remove_text' => 'upload_remove',
 		'option_message'     => 'option',
 		'submit_label'       => 'submit',
 	];
@@ -961,6 +973,20 @@ function bl_forms_sanitize_field($field): ?array
 
 	if (in_array($type, ['select', 'button_group', 'file', 'image'], true)) {
 		$out['multiple'] = !empty($field['multiple']);
+	}
+
+	if (in_array($type, ['file', 'image'], true)) {
+		if (array_key_exists('extensions', $field)) {
+			$exts = bl_forms_sanitize_extensions($field['extensions']);
+		} elseif ($type === 'image') {
+			$exts = bl_forms_default_image_extensions();
+		} else {
+			$exts = [];
+		}
+		$out['extensions'] = $exts !== [] ? implode(', ', $exts) : '';
+		$out['preview'] = !array_key_exists('preview', $field) || !empty($field['preview']);
+	} else {
+		unset($out['extensions'], $out['preview']);
 	}
 
 	if ($type === 'terms') {

@@ -287,6 +287,21 @@ function convertFieldType(field, nextType) {
     delete field.multiple;
   }
 
+  if (nextType === 'file' || nextType === 'image') {
+    if (field.preview === undefined) {
+      field.preview = true;
+    }
+    if (nextType === 'image' && !String(field.extensions || '').trim()) {
+      field.extensions = 'jpg, jpeg, png, webp, gif, heic';
+    }
+    if (field.extensions === undefined) {
+      field.extensions = '';
+    }
+  } else {
+    delete field.extensions;
+    delete field.preview;
+  }
+
   if (nextType === 'terms') {
     if (field.content == null || String(field.content).trim() === '') {
       field.content = t('termsDefaultLabel', 'I agree to the [Privacy Policy](page:privacy).');
@@ -1189,6 +1204,44 @@ function createTextareaRowsControl(field) {
   return el('p', {}, [el('label', { text: t('textareaRows', 'Rows') }), input]);
 }
 
+function createExtensionsControl(field) {
+  const placeholder =
+    field.type === 'image'
+      ? 'jpg, jpeg, png, webp, gif, heic'
+      : 'pdf, docx, xlsx, zip';
+  const input = el('input', {
+    type: 'text',
+    className: 'widefat',
+    dataset: { blExtensions: '1' },
+    value:
+      field.extensions != null
+        ? String(field.extensions)
+        : field.type === 'image'
+          ? 'jpg, jpeg, png, webp, gif, heic'
+          : '',
+    placeholder,
+  });
+
+  const sync = () => {
+    field.extensions = input.value.trim();
+    document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+  };
+  input.addEventListener('input', sync);
+  input.addEventListener('change', sync);
+  input.addEventListener('blur', sync);
+
+  return el('div', { className: 'bl-forms-builder__extensions' }, [
+    el('p', {}, [el('label', { text: t('allowedExtensions', 'Allowed extensions') }), input]),
+    el('p', {
+      className: 'description',
+      text: t(
+        'allowedExtensionsHelp',
+        'Comma-separated list without dots, e.g. pdf, docx, xlsx. Leave empty to allow all WordPress-permitted types.'
+      ),
+    }),
+  ]);
+}
+
 function temporalInputType(type) {
   if (type === 'time') {
     return 'time';
@@ -1955,6 +2008,10 @@ export function serializeRow(row) {
   if (MULTIPLE_TYPES.includes(type)) {
     data.multiple = Boolean(q('[data-bl-multiple]')?.checked);
   }
+  if (type === 'file' || type === 'image') {
+    data.extensions = q('[data-bl-extensions]')?.value?.trim() || '';
+    data.preview = Boolean(q('[data-bl-preview]')?.checked);
+  }
   if (AUTOCOMPLETE_TYPES.includes(type)) {
     const ac = q('[data-bl-autocomplete]');
     data.autocomplete = ac?.value === 'off' ? 'off' : 'auto';
@@ -2256,6 +2313,22 @@ export function createFieldCard(initial, open = false) {
     if (field.type !== 'hidden' && field.type !== 'divider' && field.type !== 'spacer') {
       appearanceSections.add(createWidthControl(field, updatePreview));
     }
+    if (field.type === 'file' || field.type === 'image') {
+      if (field.preview === undefined) {
+        field.preview = true;
+      }
+      appearanceSections.add(
+        createSwitchSetting(
+          'blPreview',
+          t('showUploadPreview', 'Show file preview'),
+          field.preview !== false,
+          (checked) => {
+            field.preview = checked;
+            document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+          }
+        )
+      );
+    }
     if (field.type === 'radio' || field.type === 'checkboxes') {
       appearanceSections.add(createLayoutControl(field));
     }
@@ -2357,6 +2430,10 @@ export function createFieldCard(initial, open = false) {
 
       if (field.type === 'text' || field.type === 'textarea') {
         advancedSections.add(createMaxLengthControl(field));
+      }
+
+      if (field.type === 'file' || field.type === 'image') {
+        advancedSections.add(createExtensionsControl(field));
       }
 
       if (field.type === 'number') {

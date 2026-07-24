@@ -21,6 +21,7 @@ const BL_FORM_ENTRY_META_META = '_bl_entry_meta';
 const BL_FORM_ENTRY_MAIL_META = '_bl_entry_mail';
 
 require_once __DIR__ . '/helpers.php';
+require_once __DIR__ . '/file-types.php';
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/captcha.php';
 require_once __DIR__ . '/cpt.php';

@@ -405,7 +405,12 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 		}
 
 		if (in_array($type, ['file', 'image'], true)) {
-			[$stored, $ok] = bl_forms_process_field_uploads($name, $files, $type === 'image', $multiple);
+			[$stored, $ok] = bl_forms_process_field_uploads(
+				$name,
+				$files,
+				$field,
+				$multiple
+			);
 			$values[$name] = $stored;
 			if (!$ok) {
 				$invalid[$name] = bl_forms_field_error_message('file', $field, $settings);
@@ -632,9 +637,10 @@ function bl_forms_filter_allowed_option_values(array $field, array $values): arr
  * Normalize and store uploads for one field.
  *
  * @param array<string, mixed> $files Raw $_FILES.
+ * @param array<string, mixed> $field Field config.
  * @return array{0: list<array{id:int,url:string,name:string,mime:string}>, 1: bool}
  */
-function bl_forms_process_field_uploads(string $name, array $files, bool $images_only, bool $multiple): array
+function bl_forms_process_field_uploads(string $name, array $files, array $field, bool $multiple): array
 {
 	$bucket = bl_forms_extract_uploaded_files($name, $files);
 	if ($bucket === []) {
@@ -642,9 +648,11 @@ function bl_forms_process_field_uploads(string $name, array $files, bool $images
 	}
 
 	if (!$multiple) {
-		$bucket = [ $bucket[0] ];
+		$bucket = [$bucket[0]];
 	}
 
+	$images_only = ((string) ($field['type'] ?? '')) === 'image';
+	$extensions = bl_forms_field_extensions($field);
 	$stored = [];
 	$ok = true;
 	foreach ($bucket as $file) {
@@ -655,8 +663,12 @@ function bl_forms_process_field_uploads(string $name, array $files, bool $images
 			$ok = false;
 			continue;
 		}
+		if (!bl_forms_extension_allowed((string) ($file['name'] ?? ''), $extensions)) {
+			$ok = false;
+			continue;
+		}
 
-		$result = bl_forms_store_uploaded_file($file, $images_only);
+		$result = bl_forms_store_uploaded_file($file, $images_only, $extensions);
 		if (is_wp_error($result)) {
 			$ok = false;
 			continue;
@@ -713,9 +725,10 @@ function bl_forms_extract_uploaded_files(string $name, array $files): array
  * Move an uploaded file into the media library.
  *
  * @param array{name:string,type:string,tmp_name:string,error:int,size:int} $file
+ * @param list<string>                                                       $extensions
  * @return array{id:int,url:string,name:string,mime:string}|\WP_Error
  */
-function bl_forms_store_uploaded_file(array $file, bool $images_only = false)
+function bl_forms_store_uploaded_file(array $file, bool $images_only = false, array $extensions = [])
 {
 	if (!function_exists('wp_handle_upload')) {
 		require_once ABSPATH . 'wp-admin/includes/file.php';
@@ -729,21 +742,22 @@ function bl_forms_store_uploaded_file(array $file, bool $images_only = false)
 
 	$check = wp_check_filetype_and_ext($file['tmp_name'], $file['name']);
 	$mime = (string) ($check['type'] ?: $file['type']);
-	if ($images_only && strpos($mime, 'image/') !== 0) {
-		return new WP_Error('bl_forms_not_image', __('Please upload an image file.', 'baselayer'));
+	if ($images_only && $mime !== '' && strpos($mime, 'image/') !== 0) {
+		$ext = strtolower(pathinfo((string) $file['name'], PATHINFO_EXTENSION));
+		if (!in_array($ext, ['heic', 'heif'], true)) {
+			return new WP_Error('bl_forms_not_image', __('Please upload an image file.', 'baselayer'));
+		}
 	}
 
 	$overrides = [
 		'test_form' => false,
-		'mimes'     => $images_only ? null : null,
+		'mimes'     => null,
 	];
-	if ($images_only) {
-		$overrides['mimes'] = [
-			'jpg|jpeg|jpe' => 'image/jpeg',
-			'gif'          => 'image/gif',
-			'png'          => 'image/png',
-			'webp'         => 'image/webp',
-		];
+	$mimes = bl_forms_mimes_for_extensions($extensions);
+	if ($mimes !== null) {
+		$overrides['mimes'] = $mimes;
+	} elseif ($images_only) {
+		$overrides['mimes'] = bl_forms_mimes_for_extensions(bl_forms_default_image_extensions());
 	}
 
 	$moved = wp_handle_upload($file, $overrides);
