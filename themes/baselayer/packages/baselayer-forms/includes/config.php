@@ -305,7 +305,6 @@ function bl_forms_message_fallbacks(): array
 		'file_max'   => __('You can upload at most %s files.', 'baselayer-forms'),
 		'upload_button' => __('Choose file', 'baselayer-forms'),
 		'upload_empty'  => __('No file chosen', 'baselayer-forms'),
-		'upload_drop'   => __('or drag and drop here', 'baselayer-forms'),
 		'option'     => __('Please choose a valid option.', 'baselayer-forms'),
 	];
 }

@@ -12,9 +12,13 @@
   --bl-form-muted: var(--bl-color-gray-600, #{$color-gray-600});
   --bl-form-border: var(--bl-color-border, #{$color-gray-300});
   --bl-form-border-focus: var(--bl-color-primary, #{$color-primary});
+  --bl-form-outline-focus: color-mix(in srgb, var(--bl-form-border-focus) 20%, transparent);
   --bl-form-bg: var(--bl-color-surface, #{$color-white});
   --bl-form-danger: #{$color-error};
+  --bl-form-danger-bg: var(--bl-color-error-bg, #{$color-error-bg});
+  --bl-form-outline-danger: color-mix(in srgb, var(--bl-form-danger) 20%, transparent);
   --bl-form-success: #{$color-success};
+  --bl-form-success-bg: var(--bl-color-success-bg, #{$color-success-bg});
   --bl-form-radius: var(--bl-radius, 6px);
   --bl-form-gap: 16px;
   --bl-form-control-padding: 10px 14px;

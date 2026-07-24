@@ -13,9 +13,11 @@ $color-gray-200: #eaeef2 !default;
 $color-neutral: #6f7882 !default;
 $color-neutral-bg: color.scale($color-neutral, $lightness: 90%) !default;
 $color-error: #d1343a !default;
+$color-error-bg: color.scale($color-error, $lightness: 93%) !default;
 $color-warning: #e97800 !default;
 $color-warning-bg: color.scale($color-warning, $lightness: 92%) !default;
 $color-success: #28a15a !default;
+$color-success-bg: color.scale($color-success, $lightness: 93%) !default;
 
 $font-size-s: 14px !default;
 $font-size-m: 16px !default;

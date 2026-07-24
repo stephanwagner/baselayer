@@ -977,11 +977,19 @@ function bl_forms_render_field(array $field, string $uid, array $settings = []):
 			$button_text = (string) ($fallbacks['upload_button'] ?? __('Choose file', 'baselayer-forms'));
 		}
 		$empty_text = (string) ($fallbacks['upload_empty'] ?? __('No file chosen', 'baselayer-forms'));
-		$drop_text = (string) ($fallbacks['upload_drop'] ?? __('or drag and drop here', 'baselayer-forms'));
 		$remove_text = __('Remove', 'baselayer-forms');
-		$ext_hint = $extensions !== []
+		$ext_hint = ($type === 'file' && $extensions !== [])
 			? strtoupper(implode(', ', $extensions))
 			: '';
+		$max_bytes = bl_forms_upload_max_bytes($settings);
+		$size_label = $max_bytes > 0 ? (string) size_format($max_bytes) : '';
+		if ($ext_hint !== '' && $size_label !== '') {
+			/* translators: 1: allowed file types (e.g. PDF, DOC), 2: maximum size (e.g. 12 MB) */
+			$ext_hint = sprintf(__('%1$s · max. %2$s', 'baselayer-forms'), $ext_hint, $size_label);
+		} elseif ($size_label !== '') {
+			/* translators: %s: maximum file size (e.g. 12 MB) */
+			$ext_hint = sprintf(__('max. %s', 'baselayer-forms'), $size_label);
+		}
 		?>
 		<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--' . $type, $name) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<?= bl_forms_field_label_html($field, $input_id, $req_mark) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
@@ -1027,9 +1035,6 @@ function bl_forms_render_field(array $field, string $uid, array $settings = []):
 							<span class="bl-form__upload-btn" aria-hidden="true"><?= esc_html($button_text) ?></span>
 							<span class="bl-form__upload-meta">
 								<span class="bl-form__upload-empty" data-bl-form-upload-empty><?= esc_html($empty_text) ?></span>
-								<?php if ($drop_text !== '') : ?>
-									<span class="bl-form__upload-drop"><?= esc_html($drop_text) ?></span>
-								<?php endif; ?>
 								<?php if ($ext_hint !== '') : ?>
 									<span class="bl-form__upload-types"><?= esc_html($ext_hint) ?></span>
 								<?php endif; ?>

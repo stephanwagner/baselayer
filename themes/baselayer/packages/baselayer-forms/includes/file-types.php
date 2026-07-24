@@ -15,7 +15,7 @@ defined('ABSPATH') || exit;
  */
 function bl_forms_default_image_extensions(): array
 {
-	return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'heic'];
+	return ['jpg', 'jpeg', 'png', 'webp', 'gif', 'heic', 'avif'];
 }
 
 /**
@@ -267,6 +267,7 @@ function bl_forms_file_type_styles(): array
 		'gif'  => ['bg' => '#EC4899', 'fg' => '#FFFFFF', 'label' => 'GIF'],
 		'webp' => ['bg' => '#EC4899', 'fg' => '#FFFFFF', 'label' => 'WEBP'],
 		'heic' => ['bg' => '#EC4899', 'fg' => '#FFFFFF', 'label' => 'HEIC'],
+		'avif' => ['bg' => '#EC4899', 'fg' => '#FFFFFF', 'label' => 'AVIF'],
 		'svg'  => ['bg' => '#EC4899', 'fg' => '#FFFFFF', 'label' => 'SVG'],
 
 		// Code / data

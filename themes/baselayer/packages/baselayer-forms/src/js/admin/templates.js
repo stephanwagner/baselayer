@@ -46,7 +46,7 @@ function makeField(partial) {
       partial.extensions != null
         ? String(partial.extensions)
         : type === 'image'
-          ? 'jpg, jpeg, png, webp, gif, heic'
+          ? 'jpg, jpeg, png, webp, gif, heic, avif'
           : 'pdf, doc, docx';
   }
   if (type === 'section') {

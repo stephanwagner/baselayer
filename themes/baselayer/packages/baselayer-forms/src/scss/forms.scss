@@ -187,13 +187,13 @@
   &.is-invalid .bl-form__control,
   &.is-invalid .bl-form__upload-shell {
     border-color: var(--bl-form-danger);
-    outline: 2px solid color-mix(in srgb, var(--bl-form-danger) 35%, transparent);
+    outline: 2px solid var(--bl-form-outline-danger);
     outline-offset: 0;
   }
 
   &.is-invalid .bl-form__input-group {
     border-color: var(--bl-form-danger);
-    outline: 2px solid color-mix(in srgb, var(--bl-form-danger) 35%, transparent);
+    outline: 2px solid var(--bl-form-outline-danger);
     outline-offset: 0;
   }
 
@@ -202,11 +202,17 @@
     outline: none;
   }
 
-  &.is-invalid .bl-form__option,
+  &.is-invalid .bl-form__option input[type='checkbox'],
+  &.is-invalid .bl-form__option input[type='radio'],
   &.is-invalid .bl-form__btn-option,
   &.is-invalid .bl-form__switch-ui {
-    outline: 2px solid var(--bl-form-danger);
+    outline: 2px solid var(--bl-form-outline-danger);
     outline-offset: 1px;
+  }
+
+  &.is-invalid .bl-form__option input[type='checkbox'],
+  &.is-invalid .bl-form__option input[type='radio'] {
+    border-color: var(--bl-form-danger);
   }
 }
 
@@ -252,7 +258,7 @@
 
   &:focus {
     border-color: var(--bl-form-border-focus);
-    outline: 2px solid color-mix(in srgb, var(--bl-form-border-focus) 35%, transparent);
+    outline: 2px solid var(--bl-form-outline-focus);
   }
 }
 
@@ -271,7 +277,8 @@
 
   &:focus-within {
     border-color: var(--bl-form-border-focus);
-    outline: 2px solid color-mix(in srgb, var(--bl-form-border-focus) 35%, transparent);
+    outline: 2px solid var(--bl-form-outline-focus);
+    outline-offset: 0;
   }
 
   .bl-form__control {
@@ -334,8 +341,14 @@ textarea.bl-form__control {
 }
 
 select.bl-form__control {
-  appearance: auto;
+  appearance: none;
   cursor: pointer;
+  // Match textfield horizontal padding; leave room for the chevron.
+  padding-right: calc(14px + 1.25rem);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M4 6l4 4 4-4' stroke='%236f7882' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 1rem;
 }
 
 .bl-form__html {
@@ -447,7 +460,7 @@ select.bl-form__control {
 .bl-form__options {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 
   &--horizontal {
     flex-direction: row;
@@ -459,9 +472,64 @@ select.bl-form__control {
 .bl-form__option {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: 10px;
   font-weight: 400;
   cursor: pointer;
+
+  input[type='checkbox'],
+  input[type='radio'] {
+    appearance: none;
+    box-sizing: border-box;
+    width: 1.125rem;
+    height: 1.125rem;
+    margin: 0.2em 0 0;
+    flex-shrink: 0;
+    border: 1.5px solid var(--bl-form-border);
+    background-color: var(--bl-form-bg);
+    background-position: center;
+    background-repeat: no-repeat;
+    color: inherit;
+    cursor: pointer;
+    outline-offset: 0;
+    transition:
+      border-color 0.15s ease,
+      background-color 0.15s ease,
+      box-shadow 0.15s ease;
+
+    &:focus-visible {
+      border-color: var(--bl-form-border-focus);
+      outline: 2px solid var(--bl-form-outline-focus);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  input[type='checkbox'] {
+    border-radius: calc(var(--bl-form-radius) * 0.55);
+
+    &:checked {
+      border-color: var(--bl-form-border-focus);
+      background-color: var(--bl-form-border-focus);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M2.5 6.2L4.8 8.5 9.5 3.5' stroke='%23fff' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-size: 0.75rem;
+    }
+  }
+
+  input[type='radio'] {
+    border-radius: 50%;
+
+    &:checked {
+      border-color: var(--bl-form-border-focus);
+      background-image: radial-gradient(
+        circle at center,
+        var(--bl-form-border-focus) 0 38%,
+        transparent 40%
+      );
+    }
+  }
 }
 
 .bl-form__button-group {
@@ -499,7 +567,7 @@ select.bl-form__control {
   }
 
   input:focus-visible + span {
-    outline: 2px solid color-mix(in srgb, var(--bl-form-border-focus) 45%, transparent);
+    outline: 2px solid var(--bl-form-outline-focus);
     outline-offset: 1px;
   }
 
@@ -556,7 +624,7 @@ select.bl-form__control {
   }
 
   .bl-form__switch input:focus-visible + & {
-    outline: 2px solid color-mix(in srgb, var(--bl-form-border-focus) 45%, transparent);
+    outline: 2px solid var(--bl-form-outline-focus);
     outline-offset: 2px;
   }
 }
@@ -616,7 +684,7 @@ select.bl-form__control {
   }
 
   &:focus-visible {
-    outline: 2px solid color-mix(in srgb, var(--bl-form-border-focus) 45%, transparent);
+    outline: 2px solid var(--bl-form-outline-focus);
     outline-offset: 2px;
   }
 }
@@ -660,16 +728,11 @@ select.bl-form__control {
   white-space: nowrap;
 }
 
-.bl-form__upload-drop,
 .bl-form__upload-types {
   font-size: 12px;
   line-height: 1.35;
   color: var(--bl-form-muted);
-}
-
-.bl-form__upload-types {
   letter-spacing: 0.02em;
-  text-transform: uppercase;
   opacity: 0.85;
 }
 
@@ -847,11 +910,7 @@ select.bl-form__control {
   height: 100%;
   width: 0%;
   border-radius: inherit;
-  background: linear-gradient(
-    90deg,
-    var(--bl-form-border-focus),
-    color-mix(in srgb, var(--bl-form-border-focus) 70%, #fff)
-  );
+  background: linear-gradient(90deg, var(--bl-form-border-focus), color-mix(in srgb, var(--bl-form-border-focus) 70%, #fff));
   transition: width 0.15s ease-out;
 }
 
@@ -887,17 +946,31 @@ select.bl-form__control {
 
 .bl-form__message {
   width: 100%;
-  padding: 12px 16px;
-  border-radius: var(--bl-form-radius);
+  margin: 0;
+  padding: 12px 14px;
   border: 1px solid var(--bl-form-border);
+  border-left-width: 4px;
+  border-radius: var(--bl-form-radius);
+  font-size: #{$font-size-s};
+  font-weight: 500;
+  line-height: 1.45;
+  background: var(--bl-form-bg);
+  color: var(--bl-form-color);
+
+  @media (min-resolution: $high-density-dppx) {
+    border-width: 1.5px;
+    border-left-width: 4px;
+  }
 
   &.is-success {
-    border-color: color-mix(in srgb, var(--bl-form-success) 40%, var(--bl-form-border));
+    border-color: var(--bl-form-success);
+    background: var(--bl-form-success-bg);
     color: var(--bl-form-success);
   }
 
   &.is-error {
-    border-color: color-mix(in srgb, var(--bl-form-danger) 40%, var(--bl-form-border));
+    border-color: var(--bl-form-danger);
+    background: var(--bl-form-danger-bg);
     color: var(--bl-form-danger);
   }
 }

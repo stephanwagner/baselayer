@@ -807,7 +807,7 @@ function bl_forms_store_uploaded_file(array $file, bool $images_only = false, ar
 	$mime = (string) ($check['type'] ?: $file['type']);
 	if ($images_only && $mime !== '' && strpos($mime, 'image/') !== 0) {
 		$ext = strtolower(pathinfo((string) $file['name'], PATHINFO_EXTENSION));
-		if (!in_array($ext, ['heic', 'heif'], true)) {
+		if (!in_array($ext, ['heic', 'heif', 'avif'], true)) {
 			return new WP_Error('bl_forms_not_image', __('Please upload an image file.', 'baselayer-forms'));
 		}
 	}

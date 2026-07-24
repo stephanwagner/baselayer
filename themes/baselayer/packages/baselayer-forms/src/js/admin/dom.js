@@ -338,7 +338,7 @@ export function defaultField(type = 'text') {
     base.preview = true;
     base.upload_style = 'modern';
     base.extensions =
-      type === 'image' ? 'jpg, jpeg, png, webp, gif, heic' : '';
+      type === 'image' ? 'jpg, jpeg, png, webp, gif, heic, avif' : '';
   }
   if (type === 'terms') {
     base.label = t('termsDefaultFieldLabel', 'Privacy Policy');

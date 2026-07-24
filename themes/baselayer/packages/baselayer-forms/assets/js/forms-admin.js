@@ -259,7 +259,7 @@
     if (type === "file" || type === "image") {
       base.preview = true;
       base.upload_style = "modern";
-      base.extensions = type === "image" ? "jpg, jpeg, png, webp, gif, heic" : "";
+      base.extensions = type === "image" ? "jpg, jpeg, png, webp, gif, heic, avif" : "";
     }
     if (type === "terms") {
       base.label = t("termsDefaultFieldLabel", "Privacy Policy");
@@ -3366,7 +3366,7 @@
         field.upload_style = "modern";
       }
       if (nextType === "image" && !String(field.extensions || "").trim()) {
-        field.extensions = "jpg, jpeg, png, webp, gif, heic";
+        field.extensions = "jpg, jpeg, png, webp, gif, heic, avif";
       }
       if (field.extensions === void 0) {
         field.extensions = "";
@@ -4222,12 +4222,12 @@
     return el("p", {}, [el("label", { text: t("textareaRows", "Rows") }), input]);
   }
   function createExtensionsControl(field) {
-    const placeholder = field.type === "image" ? "jpg, jpeg, png, webp, gif, heic" : "pdf, docx, xlsx, zip";
+    const placeholder = field.type === "image" ? "jpg, jpeg, png, webp, gif, heic, avif" : "pdf, docx, xlsx, zip";
     const input = el("input", {
       type: "text",
       className: "widefat",
       dataset: { blExtensions: "1" },
-      value: field.extensions != null ? String(field.extensions) : field.type === "image" ? "jpg, jpeg, png, webp, gif, heic" : "",
+      value: field.extensions != null ? String(field.extensions) : field.type === "image" ? "jpg, jpeg, png, webp, gif, heic, avif" : "",
       placeholder
     });
     const sync = () => {
@@ -6900,7 +6900,7 @@
       field.multiple = false;
       field.preview = true;
       field.upload_style = "modern";
-      field.extensions = partial.extensions != null ? String(partial.extensions) : type === "image" ? "jpg, jpeg, png, webp, gif, heic" : "pdf, doc, docx";
+      field.extensions = partial.extensions != null ? String(partial.extensions) : type === "image" ? "jpg, jpeg, png, webp, gif, heic, avif" : "pdf, doc, docx";
     }
     if (type === "section") {
       return {

@@ -13,9 +13,13 @@
   --bl-form-muted: var(--bl-color-gray-600, #6f7882);
   --bl-form-border: var(--bl-color-border, #d0d7de);
   --bl-form-border-focus: var(--bl-color-primary, #4080ff);
+  --bl-form-outline-focus: color-mix(in srgb, var(--bl-form-border-focus) 20%, transparent);
   --bl-form-bg: var(--bl-color-surface, #fff);
   --bl-form-danger: #d1343a;
+  --bl-form-danger-bg: var(--bl-color-error-bg, rgb(98.737254902%, 94.4274509804%, 94.5921568627%));
+  --bl-form-outline-danger: color-mix(in srgb, var(--bl-form-danger) 20%, transparent);
   --bl-form-success: #28a15a;
+  --bl-form-success-bg: var(--bl-color-success-bg, rgb(93.2056774949%, 98.3119695639%, 95.3157155399%));
   --bl-form-radius: var(--bl-radius, 6px);
   --bl-form-gap: 16px;
   --bl-form-control-padding: 10px 14px;
@@ -181,6 +185,9 @@ body.bl-page-picker-open {
 .post-type-bl_form #bl_forms_templates .inside {
   margin: 0;
   padding: 12px;
+}
+.post-type-bl_form .bl-forms-tools__help {
+  margin: 0 0 10px;
 }
 .post-type-bl_form .bl-forms-tools__actions {
   display: grid;

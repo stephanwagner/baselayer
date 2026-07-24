@@ -214,6 +214,10 @@ msgstr ""
 msgid "Tools"
 msgstr ""
 
+msgid "Export the current form fields as JSON, or import a previously exported file."
+msgstr ""
+
+
 #: includes/admin.php:20
 msgid "Templates"
 msgstr ""
@@ -1294,14 +1298,19 @@ msgstr ""
 msgid "Choose file"
 msgstr ""
 
+
+#. translators: 1: allowed file types (e.g. PDF, DOC), 2: maximum size (e.g. 12 MB)
+msgid "%1$s · max. %2$s"
+msgstr ""
+
+#. translators: %s: maximum file size (e.g. 12 MB)
+msgid "max. %s"
+msgstr ""
+
+
 #: includes/config.php:307
 #: includes/render.php:979
 msgid "No file chosen"
-msgstr ""
-
-#: includes/config.php:308
-#: includes/render.php:980
-msgid "or drag and drop here"
 msgstr ""
 
 #: includes/config.php:309

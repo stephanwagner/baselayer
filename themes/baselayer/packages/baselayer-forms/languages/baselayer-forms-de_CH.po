@@ -202,6 +202,10 @@ msgstr "Übernehmen"
 msgid "Tools"
 msgstr "Werkzeuge"
 
+msgid "Export the current form fields as JSON, or import a previously exported file."
+msgstr "Exportiere die aktuellen Formularfelder als JSON, oder importiere eine zuvor exportierte Datei."
+
+
 #: includes/admin.php:20
 msgid "Templates"
 msgstr "Vorlagen"
@@ -1298,13 +1302,19 @@ msgstr "Du kannst höchstens %s Dateien hochladen."
 msgid "Choose file"
 msgstr "Datei auswählen"
 
+
+#. translators: 1: allowed file types (e.g. PDF, DOC), 2: maximum size (e.g. 12 MB)
+msgid "%1$s · max. %2$s"
+msgstr "%1$s · max. %2$s"
+
+#. translators: %s: maximum file size (e.g. 12 MB)
+msgid "max. %s"
+msgstr "max. %s"
+
+
 #: includes/config.php:307 includes/render.php:979
 msgid "No file chosen"
 msgstr "Keine Datei ausgewählt"
-
-#: includes/config.php:308 includes/render.php:980
-msgid "or drag and drop here"
-msgstr "oder hierher ziehen"
 
 #: includes/config.php:309
 msgid "Please choose a valid option."

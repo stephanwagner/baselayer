@@ -295,7 +295,7 @@ function convertFieldType(field, nextType) {
       field.upload_style = 'modern';
     }
     if (nextType === 'image' && !String(field.extensions || '').trim()) {
-      field.extensions = 'jpg, jpeg, png, webp, gif, heic';
+      field.extensions = 'jpg, jpeg, png, webp, gif, heic, avif';
     }
     if (field.extensions === undefined) {
       field.extensions = '';
@@ -1259,7 +1259,7 @@ function createTextareaRowsControl(field) {
 function createExtensionsControl(field) {
   const placeholder =
     field.type === 'image'
-      ? 'jpg, jpeg, png, webp, gif, heic'
+      ? 'jpg, jpeg, png, webp, gif, heic, avif'
       : 'pdf, docx, xlsx, zip';
   const input = el('input', {
     type: 'text',
@@ -1269,7 +1269,7 @@ function createExtensionsControl(field) {
       field.extensions != null
         ? String(field.extensions)
         : field.type === 'image'
-          ? 'jpg, jpeg, png, webp, gif, heic'
+          ? 'jpg, jpeg, png, webp, gif, heic, avif'
           : '',
     placeholder,
   });
