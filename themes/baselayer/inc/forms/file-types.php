@@ -61,6 +61,30 @@ function bl_forms_field_extensions(array $field): array
 }
 
 /**
+ * Max files for a multiple file/image field (default 10).
+ *
+ * @param array<string, mixed> $field
+ */
+function bl_forms_field_max_files(array $field): int
+{
+	if (empty($field['multiple'])) {
+		return 1;
+	}
+
+	$raw = $field['max_files'] ?? '';
+	if ($raw === '' || $raw === null) {
+		return 10;
+	}
+
+	$n = (int) $raw;
+	if ($n < 1) {
+		return 10;
+	}
+
+	return min(50, $n);
+}
+
+/**
  * HTML accept attribute from an extensions list.
  *
  * @param list<string> $extensions

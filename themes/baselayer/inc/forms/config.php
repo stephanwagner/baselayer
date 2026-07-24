@@ -165,7 +165,6 @@ function bl_forms_default_settings(): array
 		'upload_button_text'     => '',
 		'upload_empty_text'      => '',
 		'upload_drop_text'       => '',
-		'upload_remove_text'     => '',
 		'option_message'         => '',
 		'after_submit'           => 'message',
 		'redirect_page_id'       => 0,
@@ -264,7 +263,6 @@ function bl_forms_message_fallbacks(): array
 		'upload_button' => __('Choose file', 'baselayer'),
 		'upload_empty'  => __('No file chosen', 'baselayer'),
 		'upload_drop'   => __('or drag and drop here', 'baselayer'),
-		'upload_remove' => __('Remove', 'baselayer'),
 		'option'     => __('Please choose a valid option.', 'baselayer'),
 	];
 }
@@ -304,7 +302,6 @@ function bl_forms_resolve_message(array $settings, string $key): string
 		'upload_button_text' => 'upload_button',
 		'upload_empty_text'  => 'upload_empty',
 		'upload_drop_text'   => 'upload_drop',
-		'upload_remove_text' => 'upload_remove',
 		'option_message'     => 'option',
 		'submit_label'       => 'submit',
 	];
@@ -985,8 +982,13 @@ function bl_forms_sanitize_field($field): ?array
 		}
 		$out['extensions'] = $exts !== [] ? implode(', ', $exts) : '';
 		$out['preview'] = !array_key_exists('preview', $field) || !empty($field['preview']);
+		if (!empty($out['multiple'])) {
+			$out['max_files'] = bl_forms_field_max_files(array_merge($field, ['multiple' => true]));
+		} else {
+			unset($out['max_files']);
+		}
 	} else {
-		unset($out['extensions'], $out['preview']);
+		unset($out['extensions'], $out['preview'], $out['max_files']);
 	}
 
 	if ($type === 'terms') {

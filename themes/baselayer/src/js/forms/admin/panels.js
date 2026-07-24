@@ -397,7 +397,6 @@ export function createPanels(settings, builderRoot, onChange) {
   const uploadButton = bindErrorMsg('upload_button_text', 'upload_button');
   const uploadEmpty = bindErrorMsg('upload_empty_text', 'upload_empty');
   const uploadDrop = bindErrorMsg('upload_drop_text', 'upload_drop');
-  const uploadRemove = bindErrorMsg('upload_remove_text', 'upload_remove');
 
   const rangeHelp = () =>
     el('span', {
@@ -414,7 +413,7 @@ export function createPanels(settings, builderRoot, onChange) {
     'aria-label': t('afterSubmit', 'After submission'),
   });
   [
-    { id: 'message', label: t('afterSubmitMessage', 'Show message') },
+    { id: 'message', label: t('afterSubmitMessage', 'Show success message') },
     { id: 'redirect', label: t('afterSubmitRedirect', 'Go to page') },
   ].forEach((mode) => {
     const option = el('option', { value: mode.id, text: mode.label });
@@ -608,7 +607,6 @@ export function createPanels(settings, builderRoot, onChange) {
         fieldRow(t('uploadButtonText', 'Button label'), uploadButton),
         fieldRow(t('uploadEmptyText', 'Empty text'), uploadEmpty),
         fieldRow(t('uploadDropText', 'Drop hint'), uploadDrop),
-        fieldRow(t('uploadRemoveText', 'Remove label'), uploadRemove),
         el('hr', { className: 'bl-forms-builder__field-errors-sep' }),
         fieldRow(t('fileError', 'File'), fileMsg),
         fieldRow(t('optionError', 'Choice'), optionMsg),

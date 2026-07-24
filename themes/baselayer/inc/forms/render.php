@@ -958,10 +958,11 @@ function bl_forms_render_field(array $field, string $uid, array $settings = []):
 			$accept = 'image/*';
 		}
 		$preview = !array_key_exists('preview', $field) || !empty($field['preview']);
+		$max_files = bl_forms_field_max_files($field);
 		$button_text = bl_forms_resolve_message($settings, 'upload_button_text');
 		$empty_text = bl_forms_resolve_message($settings, 'upload_empty_text');
 		$drop_text = bl_forms_resolve_message($settings, 'upload_drop_text');
-		$remove_text = bl_forms_resolve_message($settings, 'upload_remove_text');
+		$remove_text = __('Remove', 'baselayer');
 		$ext_hint = $extensions !== []
 			? strtoupper(implode(', ', $extensions))
 			: '';
@@ -974,6 +975,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = []):
 				data-bl-form-upload
 				data-bl-form-upload-kind="<?= esc_attr($type) ?>"
 				data-bl-form-upload-preview="<?= $preview ? '1' : '0' ?>"
+				data-bl-form-upload-max="<?= esc_attr((string) $max_files) ?>"
 				data-bl-form-upload-remove="<?= esc_attr($remove_text) ?>"
 			>
 				<input

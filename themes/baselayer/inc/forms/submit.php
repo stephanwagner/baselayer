@@ -649,6 +649,18 @@ function bl_forms_process_field_uploads(string $name, array $files, array $field
 
 	if (!$multiple) {
 		$bucket = [$bucket[0]];
+	} else {
+		$max_files = bl_forms_field_max_files($field);
+		$present = 0;
+		foreach ($bucket as $file) {
+			if (!is_array($file) || (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
+				continue;
+			}
+			$present++;
+		}
+		if ($present > $max_files) {
+			return [[], false];
+		}
 	}
 
 	$images_only = ((string) ($field['type'] ?? '')) === 'image';

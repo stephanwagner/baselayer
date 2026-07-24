@@ -86,14 +86,17 @@ function isImageFile(file, kind) {
   return String(file.type || '').startsWith('image/');
 }
 
-function assignFiles(input, files) {
+function assignFiles(input, files, maxFiles = 0) {
   const list = Array.from(files || []);
   if (typeof DataTransfer === 'undefined') {
     return false;
   }
   const dt = new DataTransfer();
   const multiple = !!input.multiple;
-  (multiple ? list : list.slice(0, 1)).forEach((file) => {
+  const limit = multiple
+    ? Math.max(1, Number(maxFiles) || 10)
+    : 1;
+  list.slice(0, limit).forEach((file) => {
     if (file) dt.items.add(file);
   });
   input.files = dt.files;
@@ -111,6 +114,7 @@ function initFileUploads(root) {
 
     const kind = wrap.getAttribute('data-bl-form-upload-kind') || 'file';
     const showPreview = wrap.getAttribute('data-bl-form-upload-preview') === '1';
+    const maxFiles = Math.max(1, Number(wrap.getAttribute('data-bl-form-upload-max')) || (input.multiple ? 10 : 1));
     const removeLabel = wrap.getAttribute('data-bl-form-upload-remove') || 'Remove';
     const emptyDefault = emptyEl?.textContent || 'No file chosen';
     const objectUrls = [];
@@ -162,7 +166,7 @@ function initFileUploads(root) {
       if (input.disabled) return;
       const files = event.dataTransfer?.files;
       if (!files?.length) return;
-      assignFiles(input, files);
+      assignFiles(input, files, maxFiles);
     });
 
     const renderPreview = () => {
@@ -246,7 +250,7 @@ function initFileUploads(root) {
           event.preventDefault();
           event.stopPropagation();
           const next = Array.from(input.files || []).filter((_, i) => i !== index);
-          assignFiles(input, next);
+          assignFiles(input, next, maxFiles);
         });
 
         card.append(media, body, removeBtn);
@@ -254,7 +258,14 @@ function initFileUploads(root) {
       });
     };
 
-    input.addEventListener('change', renderPreview);
+    input.addEventListener('change', () => {
+      const files = Array.from(input.files || []);
+      if (files.length > maxFiles) {
+        assignFiles(input, files, maxFiles);
+        return;
+      }
+      renderPreview();
+    });
     renderPreview();
   });
 }

@@ -297,10 +297,11 @@ function convertFieldType(field, nextType) {
     if (field.extensions === undefined) {
       field.extensions = '';
     }
-  } else {
-    delete field.extensions;
-    delete field.preview;
-  }
+	} else {
+		delete field.extensions;
+		delete field.preview;
+		delete field.max_files;
+	}
 
   if (nextType === 'terms') {
     if (field.content == null || String(field.content).trim() === '') {
@@ -1242,6 +1243,37 @@ function createExtensionsControl(field) {
   ]);
 }
 
+function createMaxFilesControl(field) {
+  const raw = parseInt(field.max_files, 10);
+  const value = Number.isFinite(raw) && raw >= 1 ? String(Math.min(50, raw)) : '10';
+  const input = el('input', {
+    type: 'number',
+    className: 'widefat',
+    min: '1',
+    max: '50',
+    step: '1',
+    dataset: { blMaxFiles: '1' },
+    value,
+  });
+
+  const sync = () => {
+    const next = parseInt(input.value, 10);
+    field.max_files = Number.isFinite(next) && next >= 1 ? Math.min(50, next) : 10;
+    input.value = String(field.max_files);
+    document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+  };
+  input.addEventListener('change', sync);
+  input.addEventListener('blur', sync);
+
+  return el('div', { className: 'bl-forms-builder__max-files' }, [
+    el('p', {}, [el('label', { text: t('maxFiles', 'Maximum files') }), input]),
+    el('p', {
+      className: 'description',
+      text: t('maxFilesHelp', 'Maximum number of files visitors can upload.'),
+    }),
+  ]);
+}
+
 function temporalInputType(type) {
   if (type === 'time') {
     return 'time';
@@ -2011,6 +2043,11 @@ export function serializeRow(row) {
   if (type === 'file' || type === 'image') {
     data.extensions = q('[data-bl-extensions]')?.value?.trim() || '';
     data.preview = Boolean(q('[data-bl-preview]')?.checked);
+    if (data.multiple) {
+      const rawMax = q('[data-bl-max-files]')?.value?.trim();
+      const parsed = parseInt(rawMax, 10);
+      data.max_files = Number.isFinite(parsed) && parsed >= 1 ? Math.min(50, parsed) : 10;
+    }
   }
   if (AUTOCOMPLETE_TYPES.includes(type)) {
     const ac = q('[data-bl-autocomplete]');
@@ -2434,6 +2471,9 @@ export function createFieldCard(initial, open = false) {
 
       if (field.type === 'file' || field.type === 'image') {
         advancedSections.add(createExtensionsControl(field));
+        if (field.multiple) {
+          advancedSections.add(createMaxFilesControl(field));
+        }
       }
 
       if (field.type === 'number') {
@@ -2568,10 +2608,18 @@ export function createFieldCard(initial, open = false) {
           multipleLabel = t('buttonGroupMultiple', 'Allow multiple selection');
         } else if (field.type === 'select') {
           multipleLabel = t('selectMultiple', 'Allow multiple selection');
+        } else if (field.type === 'file' || field.type === 'image') {
+          multipleLabel = t('allowMultipleFiles', 'Allow multiple files');
         }
         optionToggles.push(
           createSwitchSetting('blMultiple', multipleLabel, !!field.multiple, (checked) => {
             field.multiple = checked;
+            if (field.type === 'file' || field.type === 'image') {
+              if (checked && (field.max_files == null || field.max_files === '')) {
+                field.max_files = 10;
+              }
+              renderBody('general');
+            }
             document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
           })
         );
