@@ -12,6 +12,7 @@
   --bl-form-color: var(--bl-color-text, #23292e);
   --bl-form-muted: var(--bl-color-gray-600, #6f7882);
   --bl-form-border: var(--bl-color-border, #d0d7de);
+  --bl-form-border-hover: color-mix(in srgb, var(--bl-form-muted) 40%, var(--bl-form-border));
   --bl-form-border-focus: var(--bl-color-primary, #4080ff);
   --bl-form-outline-focus: color-mix(in srgb, var(--bl-form-border-focus) 20%, transparent);
   --bl-form-bg: var(--bl-color-surface, #fff);

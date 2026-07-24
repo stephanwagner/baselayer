@@ -12,6 +12,7 @@
   --bl-form-color: var(--bl-color-text, #23292e);
   --bl-form-muted: var(--bl-color-gray-600, #6f7882);
   --bl-form-border: var(--bl-color-border, #d0d7de);
+  --bl-form-border-hover: color-mix(in srgb, var(--bl-form-muted) 40%, var(--bl-form-border));
   --bl-form-border-focus: var(--bl-color-primary, #4080ff);
   --bl-form-outline-focus: color-mix(in srgb, var(--bl-form-border-focus) 20%, transparent);
   --bl-form-bg: var(--bl-color-surface, #fff);
@@ -250,11 +251,15 @@
   color: inherit;
   font: inherit;
   outline-offset: 0;
+  transition: border-color 0.15s ease;
 }
 @media (min-resolution: 1.5dppx) {
   .bl-form__control {
     border-width: 1.5px;
   }
+}
+.bl-form__control:hover:not(:disabled):not(:focus) {
+  border-color: var(--bl-form-border-hover);
 }
 .bl-form__control:focus {
   border-color: var(--bl-form-border-focus);
@@ -269,11 +274,15 @@
   border-radius: var(--bl-form-radius);
   background: var(--bl-form-bg);
   overflow: hidden;
+  transition: border-color 0.15s ease;
 }
 @media (min-resolution: 1.5dppx) {
   .bl-form__input-group {
     border-width: 1.5px;
   }
+}
+.bl-form__input-group:hover:not(:focus-within) {
+  border-color: var(--bl-form-border-hover);
 }
 .bl-form__input-group:focus-within {
   border-color: var(--bl-form-border-focus);
@@ -479,6 +488,10 @@ select.bl-form__control {
   outline-offset: 0;
   transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 }
+.bl-form__option input[type=checkbox]:hover:not(:disabled):not(:checked),
+.bl-form__option input[type=radio]:hover:not(:disabled):not(:checked) {
+  border-color: var(--bl-form-border-hover);
+}
 .bl-form__option input[type=checkbox]:focus-visible,
 .bl-form__option input[type=radio]:focus-visible {
   border-color: var(--bl-form-border-focus);
@@ -636,7 +649,7 @@ select.bl-form__control {
   transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 }
 .bl-form__upload-shell:hover {
-  border-color: color-mix(in srgb, var(--bl-form-border-focus) 55%, var(--bl-form-border));
+  border-color: var(--bl-form-border-hover);
 }
 .bl-form__upload-shell:focus-visible {
   outline: 2px solid var(--bl-form-outline-focus);
