@@ -1156,8 +1156,7 @@ function bl_forms_sanitize_config($config): array
 			continue;
 		}
 		if ($key === 'recipient') {
-			$email = sanitize_email((string) $settings_in[$key]);
-			$settings[$key] = is_email($email) ? $email : '';
+			$settings[$key] = implode("\n", bl_forms_parse_recipients($settings_in[$key] ?? ''));
 			continue;
 		}
 		if ($key === 'upload_max_size_mb') {
@@ -1246,13 +1245,33 @@ function bl_forms_ensure_unique_field_names(array $fields, array &$used = []): a
 }
 
 /**
- * Admin notification recipient for a form.
+ * Parse recipient setting into a list of valid emails (one per line or comma-separated).
+ *
+ * @param mixed $raw
+ * @return list<string>
+ */
+function bl_forms_parse_recipients($raw): array
+{
+	$chunks = preg_split('/[\r\n,;]+/', (string) $raw) ?: [];
+	$out = [];
+	foreach ($chunks as $chunk) {
+		$email = sanitize_email(trim($chunk));
+		if ($email !== '' && is_email($email) && !in_array($email, $out, true)) {
+			$out[] = $email;
+		}
+	}
+
+	return $out;
+}
+
+/**
+ * Admin notification recipient(s) for a form (comma-separated for wp_mail).
  */
 function bl_forms_recipient(array $settings): string
 {
-	$custom = isset($settings['recipient']) ? trim((string) $settings['recipient']) : '';
-	if ($custom !== '' && is_email($custom)) {
-		return $custom;
+	$list = bl_forms_parse_recipients($settings['recipient'] ?? '');
+	if ($list !== []) {
+		return implode(', ', $list);
 	}
 
 	$admin = get_option('admin_email', '');

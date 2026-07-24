@@ -369,7 +369,7 @@ function bl_forms_admin_enqueue(string $hook): void
 				'cssClassHelp'      => __('Optional class names added to this field’s wrapper.', 'baselayer'),
 				'submitLabel'       => __('Submit button label', 'baselayer'),
 				'recipient'         => __('Recipient', 'baselayer'),
-				'recipientHelp'     => __('Leave empty to use the site administrator email.', 'baselayer'),
+				'recipientHelp'     => __('One email per line. Leave empty to use the site administrator email.', 'baselayer'),
 				'successMessage'    => __('Success message', 'baselayer'),
 				'errorMessage'      => __('Error message', 'baselayer'),
 				'validationMessage' => __('Validation message', 'baselayer'),

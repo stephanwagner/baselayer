@@ -203,10 +203,22 @@ export function createPanels(settings, builderRoot, onChange) {
     hidden: true,
   });
 
+  const recipientRows = (value) =>
+    Math.max(2, String(value || '').split(/\r?\n/).length);
+
   const recipient = bindText(
-    el('input', { type: 'email', className: 'widefat', placeholder: adminEmail }),
+    el('textarea', {
+      className: 'widefat',
+      rows: String(recipientRows(state.recipient)),
+      placeholder: adminEmail,
+    }),
     'recipient'
   );
+  const syncRecipientRows = () => {
+    recipient.rows = recipientRows(recipient.value);
+  };
+  recipient.addEventListener('input', syncRecipientRows);
+  recipient.addEventListener('change', syncRecipientRows);
   const adminSubject = bindText(
     el('input', {
       type: 'text',
@@ -314,7 +326,10 @@ export function createPanels(settings, builderRoot, onChange) {
     fieldRow(
       t('recipient', 'Recipient'),
       recipient,
-      t('recipientHelp', 'Leave empty to use the site administrator email.')
+      t(
+        'recipientHelp',
+        'One email per line. Leave empty to use the site administrator email.'
+      )
     ),
     fieldRow(t('subject', 'Subject'), adminSubject),
     el('hr', { className: 'bl-forms-builder__separator' }),
