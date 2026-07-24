@@ -3,6 +3,28 @@
 defined('ABSPATH') || exit;
 
 /**
+ * Settings key for a min/max validation message (number vs date/time/datetime).
+ *
+ * @param array<string, mixed> $field
+ * @param 'min'|'max'          $which
+ */
+function bl_forms_range_message_key(array $field, string $which): string
+{
+	$type = (string) ($field['type'] ?? '');
+	if ($type === 'date') {
+		return $which === 'max' ? 'date_max_message' : 'date_min_message';
+	}
+	if ($type === 'time') {
+		return $which === 'max' ? 'time_max_message' : 'time_min_message';
+	}
+	if ($type === 'datetime') {
+		return $which === 'max' ? 'datetime_max_message' : 'datetime_min_message';
+	}
+
+	return $which === 'max' ? 'max_message' : 'min_message';
+}
+
+/**
  * Human-readable validation message for a field error code.
  *
  * @param array<string, mixed> $field
@@ -17,13 +39,13 @@ function bl_forms_field_error_message(string $code, array $field = [], array $se
 		case 'min':
 			$value = $bound !== '' ? $bound : (string) ($field['min'] ?? '');
 			return sprintf(
-				bl_forms_resolve_message($settings, 'min_message'),
+				bl_forms_resolve_message($settings, bl_forms_range_message_key($field, 'min')),
 				$value
 			);
 		case 'max':
 			$value = $bound !== '' ? $bound : (string) ($field['max'] ?? '');
 			return sprintf(
-				bl_forms_resolve_message($settings, 'max_message'),
+				bl_forms_resolve_message($settings, bl_forms_range_message_key($field, 'max')),
 				$value
 			);
 		case 'maxlength':
@@ -46,6 +68,16 @@ function bl_forms_field_error_message(string $code, array $field = [], array $se
 			return bl_forms_resolve_message($settings, 'time_message');
 		case 'datetime':
 			return bl_forms_resolve_message($settings, 'datetime_message');
+		case 'date_before':
+			return sprintf(
+				bl_forms_resolve_message($settings, 'date_before_message'),
+				$bound !== '' ? $bound : ''
+			);
+		case 'date_after':
+			return sprintf(
+				bl_forms_resolve_message($settings, 'date_after_message'),
+				$bound !== '' ? $bound : ''
+			);
 		case 'file':
 			return bl_forms_resolve_message($settings, 'file_message');
 		case 'option':
@@ -180,6 +212,9 @@ function bl_forms_ajax_submit(): void
 	$mail = bl_forms_send_emails($form_id, $entry_id, $config, $values);
 	update_post_meta($entry_id, BL_FORM_ENTRY_MAIL_META, $mail);
 
+	// Count only completed submissions (not failed validation / early rejects).
+	bl_forms_rate_limit_hit($form_id, $settings);
+
 	wp_send_json_success([
 		'message'  => bl_forms_resolve_message($settings, 'success_message'),
 		'entry_id' => $entry_id,
@@ -259,6 +294,9 @@ function bl_forms_fill_time_ok(int $form_id, array $settings): bool
 /**
  * Soft rate limit per form / IP, using form security settings.
  *
+ * Check only — the counter is incremented via bl_forms_rate_limit_hit()
+ * after a successful submission.
+ *
  * @param array<string, mixed> $settings
  */
 function bl_forms_rate_limit_ok(int $form_id, array $settings = []): bool
@@ -268,15 +306,34 @@ function bl_forms_rate_limit_ok(int $form_id, array $settings = []): bool
 	}
 
 	$max = max(1, (int) ($settings['rate_limit_max'] ?? 3));
-	$window = max(1, (int) ($settings['rate_limit_window'] ?? 5));
-	$key = 'bl_forms_rl_' . $form_id . '_' . bl_forms_client_ip_hash();
-	$count = (int) get_transient($key);
-	if ($count >= $max) {
-		return false;
-	}
-	set_transient($key, $count + 1, $window * MINUTE_IN_SECONDS);
+	$count = (int) get_transient(bl_forms_rate_limit_key($form_id));
 
-	return true;
+	return $count < $max;
+}
+
+/**
+ * Record a successful submission against the rate limit.
+ *
+ * @param array<string, mixed> $settings
+ */
+function bl_forms_rate_limit_hit(int $form_id, array $settings = []): void
+{
+	if ($settings !== [] && empty($settings['rate_limit_enabled'])) {
+		return;
+	}
+
+	$window = max(1, (int) ($settings['rate_limit_window'] ?? 5));
+	$key = bl_forms_rate_limit_key($form_id);
+	$count = (int) get_transient($key);
+	set_transient($key, $count + 1, $window * MINUTE_IN_SECONDS);
+}
+
+/**
+ * Transient key for the form / IP rate limit.
+ */
+function bl_forms_rate_limit_key(int $form_id): string
+{
+	return 'bl_forms_rl_' . $form_id . '_' . bl_forms_client_ip_hash();
 }
 
 /**
@@ -498,6 +555,48 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 				$invalid[$name] = bl_forms_field_error_message('max', $field, $settings, $max);
 				continue;
 			}
+		}
+	}
+
+	// Second pass: date/time relations (before / after another field).
+	$field_by_name = [];
+	foreach (bl_forms_iter_fields($fields) as $field) {
+		$fname = (string) ($field['name'] ?? '');
+		if ($fname !== '') {
+			$field_by_name[$fname] = $field;
+		}
+	}
+	foreach ($field_by_name as $name => $field) {
+		if (isset($invalid[$name])) {
+			continue;
+		}
+		$type = (string) ($field['type'] ?? '');
+		if (!in_array($type, ['date', 'time', 'datetime'], true)) {
+			continue;
+		}
+		$relation = sanitize_key((string) ($field['relation'] ?? ''));
+		$related_name = sanitize_key((string) ($field['relation_field'] ?? ''));
+		if (!in_array($relation, ['before', 'after'], true) || $related_name === '') {
+			continue;
+		}
+		$value = isset($values[$name]) ? (string) $values[$name] : '';
+		$other = isset($values[$related_name]) ? (string) $values[$related_name] : '';
+		if ($value === '' || $other === '') {
+			continue;
+		}
+		$related = $field_by_name[$related_name] ?? null;
+		if (!is_array($related) || (string) ($related['type'] ?? '') !== $type) {
+			continue;
+		}
+		$cmp = bl_forms_compare_temporal_values($type, $value, $other);
+		$other_label = trim((string) ($related['label'] ?? ''));
+		if ($other_label === '') {
+			$other_label = $related_name;
+		}
+		if ($relation === 'before' && $cmp >= 0) {
+			$invalid[$name] = bl_forms_field_error_message('date_before', $field, $settings, $other_label);
+		} elseif ($relation === 'after' && $cmp <= 0) {
+			$invalid[$name] = bl_forms_field_error_message('date_after', $field, $settings, $other_label);
 		}
 	}
 

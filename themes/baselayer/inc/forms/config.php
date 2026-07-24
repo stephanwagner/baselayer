@@ -143,6 +143,12 @@ function bl_forms_default_settings(): array
 		'required_message'       => '',
 		'min_message'            => '',
 		'max_message'            => '',
+		'date_min_message'       => '',
+		'date_max_message'       => '',
+		'time_min_message'       => '',
+		'time_max_message'       => '',
+		'datetime_min_message'   => '',
+		'datetime_max_message'   => '',
 		'maxlength_message'      => '',
 		'char_count_text'        => '',
 		'char_count_empty_text'  => '',
@@ -153,6 +159,8 @@ function bl_forms_default_settings(): array
 		'date_message'           => '',
 		'time_message'           => '',
 		'datetime_message'       => '',
+		'date_before_message'    => '',
+		'date_after_message'     => '',
 		'file_message'           => '',
 		'option_message'         => '',
 		'after_submit'           => 'message',
@@ -216,10 +224,22 @@ function bl_forms_message_fallbacks(): array
 		'validation' => __('Some fields need attention. Please check the highlighted fields.', 'baselayer'),
 		'submit'     => __('Send', 'baselayer'),
 		'required'   => __('This field is required.', 'baselayer'),
-		/* translators: %s: minimum value (number, date, time, …) */
-		'min'        => __('Enter a value of at least %s.', 'baselayer'),
-		/* translators: %s: maximum value (number, date, time, …) */
-		'max'        => __('Enter a value of at most %s.', 'baselayer'),
+		/* translators: %s: minimum number */
+		'min'        => __('Enter a number of at least %s.', 'baselayer'),
+		/* translators: %s: maximum number */
+		'max'        => __('Enter a number of at most %s.', 'baselayer'),
+		/* translators: %s: minimum date */
+		'date_min'   => __('Enter a date on or after %s.', 'baselayer'),
+		/* translators: %s: maximum date */
+		'date_max'   => __('Enter a date on or before %s.', 'baselayer'),
+		/* translators: %s: minimum time */
+		'time_min'   => __('Enter a time on or after %s.', 'baselayer'),
+		/* translators: %s: maximum time */
+		'time_max'   => __('Enter a time on or before %s.', 'baselayer'),
+		/* translators: %s: minimum datetime */
+		'datetime_min' => __('Enter a date and time on or after %s.', 'baselayer'),
+		/* translators: %s: maximum datetime */
+		'datetime_max' => __('Enter a date and time on or before %s.', 'baselayer'),
 		/* translators: %s: maximum character length */
 		'maxlength'  => __('Enter no more than %s characters.', 'baselayer'),
 		/* translators: Placeholders: %remaining%, %count%, %max% */
@@ -232,6 +252,10 @@ function bl_forms_message_fallbacks(): array
 		'date'       => __('Enter a valid date.', 'baselayer'),
 		'time'       => __('Enter a valid time.', 'baselayer'),
 		'datetime'   => __('Enter a valid date and time.', 'baselayer'),
+		/* translators: %s: related field label */
+		'date_before'=> __('This value must be before %s.', 'baselayer'),
+		/* translators: %s: related field label */
+		'date_after' => __('This value must be after %s.', 'baselayer'),
 		'file'       => __('Please upload a valid file.', 'baselayer'),
 		'option'     => __('Please choose a valid option.', 'baselayer'),
 	];
@@ -250,6 +274,12 @@ function bl_forms_resolve_message(array $settings, string $key): string
 		'required_message'   => 'required',
 		'min_message'        => 'min',
 		'max_message'        => 'max',
+		'date_min_message'   => 'date_min',
+		'date_max_message'   => 'date_max',
+		'time_min_message'   => 'time_min',
+		'time_max_message'   => 'time_max',
+		'datetime_min_message' => 'datetime_min',
+		'datetime_max_message' => 'datetime_max',
 		'maxlength_message'  => 'maxlength',
 		'char_count_text'    => 'char_count',
 		'char_count_empty_text' => 'char_count_empty',
@@ -260,6 +290,8 @@ function bl_forms_resolve_message(array $settings, string $key): string
 		'date_message'       => 'date',
 		'time_message'       => 'time',
 		'datetime_message'   => 'datetime',
+		'date_before_message'=> 'date_before',
+		'date_after_message' => 'date_after',
 		'file_message'       => 'file',
 		'option_message'     => 'option',
 		'submit_label'       => 'submit',

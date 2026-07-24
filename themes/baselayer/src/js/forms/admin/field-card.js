@@ -1,4 +1,4 @@
-import { el, t, typeLabel, uid, iconEl, uniqueFieldName, slugifyOption } from './dom.js';
+import { el, t, typeLabel, uid, iconEl, uniqueFieldName, slugifyOption, readConfig, flattenFields } from './dom.js';
 import { createColumnCard, createSectionCard, serializeLayoutRow } from './layout.js';
 
 const WIDTH_PRESETS = [
@@ -350,6 +350,8 @@ function convertFieldType(field, nextType) {
     delete field.max_offset;
     delete field.default_mode;
     delete field.default_offset;
+    delete field.relation;
+    delete field.relation_field;
   } else {
     // Migrating into a temporal type: legacy plain default → fixed mode.
     if (
@@ -359,6 +361,9 @@ function convertFieldType(field, nextType) {
     ) {
       field.default_mode = 'fixed';
     }
+    // Relations are type-specific (date↔date only).
+    delete field.relation;
+    delete field.relation_field;
   }
 }
 
@@ -1355,6 +1360,108 @@ function createTemporalBoundsControl(field) {
   ]);
 }
 
+/**
+ * Other temporal fields of the same type (for before/after relations).
+ */
+function siblingTemporalFields(field) {
+  const config = readConfig();
+  return flattenFields(config.fields || []).filter(
+    (item) =>
+      item &&
+      item.type === field.type &&
+      item.id !== field.id &&
+      String(item.name || '').trim() !== ''
+  );
+}
+
+/**
+ * Relation validator: this date/time must be before or after another field.
+ */
+function createTemporalRelationControl(field) {
+  const siblings = siblingTemporalFields(field);
+  if (siblings.length === 0) {
+    return null;
+  }
+
+  let relation = String(field.relation || 'none');
+  if (!['none', 'before', 'after'].includes(relation)) {
+    relation = 'none';
+  }
+  field.relation = relation;
+
+  const wrap = el('div', { className: 'bl-forms-builder__date-relation' });
+
+  const modeSelect = el('select', {
+    className: 'widefat',
+    dataset: { blRelation: '1' },
+    'aria-label': t('dateRelation', 'Relation'),
+  });
+  [
+    { value: 'none', label: t('dateRelationNone', 'No relation') },
+    { value: 'before', label: t('dateRelationBefore', 'Must be before') },
+    { value: 'after', label: t('dateRelationAfter', 'Must be after') },
+  ].forEach((item) => {
+    const option = el('option', { value: item.value, text: item.label });
+    if (item.value === relation) {
+      option.selected = true;
+    }
+    modeSelect.appendChild(option);
+  });
+
+  const fieldSelect = el('select', {
+    className: 'widefat',
+    dataset: { blRelationField: '1' },
+    'aria-label': t('dateRelationSelect', 'Select field'),
+  });
+  fieldSelect.appendChild(
+    el('option', { value: '', text: t('dateRelationSelect', 'Select field') })
+  );
+  const currentRelated = String(field.relation_field || '');
+  siblings.forEach((item) => {
+    const value = String(item.name || '');
+    const label = String(item.label || item.name || value).trim() || value;
+    const option = el('option', { value, text: label });
+    if (value === currentRelated) {
+      option.selected = true;
+    }
+    fieldSelect.appendChild(option);
+  });
+  if (currentRelated && !siblings.some((item) => String(item.name || '') === currentRelated)) {
+    field.relation_field = '';
+    fieldSelect.value = '';
+  }
+
+  const fieldWrap = el('div', { className: 'bl-forms-builder__date-relation-field' }, [fieldSelect]);
+
+  const syncUi = () => {
+    fieldWrap.hidden = (field.relation || 'none') === 'none';
+  };
+
+  const notify = () => document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+
+  modeSelect.addEventListener('change', () => {
+    field.relation = modeSelect.value || 'none';
+    if (field.relation === 'none') {
+      field.relation_field = '';
+      fieldSelect.value = '';
+    }
+    syncUi();
+    notify();
+  });
+
+  fieldSelect.addEventListener('change', () => {
+    field.relation_field = fieldSelect.value || '';
+    notify();
+  });
+
+  wrap.append(
+    el('p', {}, [el('label', { text: t('dateRelation', 'Relation') }), modeSelect]),
+    fieldWrap
+  );
+  syncUi();
+  return wrap;
+}
+
 export function createCssClassControl(field) {
   const input = el('input', {
     type: 'text',
@@ -1902,6 +2009,18 @@ export function serializeRow(row) {
     readSide('min');
     readSide('max');
     readSide('default');
+    const relation = q('[data-bl-relation]')?.value || 'none';
+    if (relation === 'before' || relation === 'after') {
+      data.relation = relation;
+      data.relation_field = q('[data-bl-relation-field]')?.value || '';
+      if (!data.relation_field) {
+        data.relation = 'none';
+        data.relation_field = '';
+      }
+    } else {
+      data.relation = 'none';
+      data.relation_field = '';
+    }
   }
   if (NO_READONLY.includes(type)) {
     delete data.readonly;
@@ -2246,6 +2365,10 @@ export function createFieldCard(initial, open = false) {
 
       if (['date', 'time', 'datetime'].includes(field.type)) {
         advancedSections.add(createTemporalBoundsControl(field));
+        const relationControl = createTemporalRelationControl(field);
+        if (relationControl) {
+          advancedSections.add(relationControl);
+        }
       }
 
       if (AUTOCOMPLETE_TYPES.includes(field.type)) {

@@ -185,8 +185,6 @@ export function createPanels(settings, builderRoot, onChange) {
   const fbError = builderRoot.dataset.fallbackError || '';
   const fbValidation = builderRoot.dataset.fallbackValidation || '';
   const fbRequired = builderRoot.dataset.fallbackRequired || '';
-  const fbMin = builderRoot.dataset.fallbackMin || '';
-  const fbMax = builderRoot.dataset.fallbackMax || '';
 
   // Notifications
   const notifications = el('div', {
@@ -349,14 +347,6 @@ export function createPanels(settings, builderRoot, onChange) {
     el('input', { type: 'text', className: 'widefat', placeholder: fbRequired }),
     'required_message'
   );
-  const minMsg = bindText(
-    el('input', { type: 'text', className: 'widefat', placeholder: fbMin }),
-    'min_message'
-  );
-  const maxMsg = bindText(
-    el('input', { type: 'text', className: 'widefat', placeholder: fbMax }),
-    'max_message'
-  );
 
   const msgFallbacks = (window.blFormsAdmin && window.blFormsAdmin.messageFallbacks) || {};
   const charCountText = bindText(
@@ -386,14 +376,32 @@ export function createPanels(settings, builderRoot, onChange) {
     );
 
   const numberMsg = bindErrorMsg('number_message', 'number');
+  const minMsg = bindErrorMsg('min_message', 'min');
+  const maxMsg = bindErrorMsg('max_message', 'max');
   const emailMsg = bindErrorMsg('email_message', 'email');
   const urlMsg = bindErrorMsg('url_message', 'url');
   const phoneMsg = bindErrorMsg('phone_message', 'phone');
   const dateMsg = bindErrorMsg('date_message', 'date');
+  const dateMinMsg = bindErrorMsg('date_min_message', 'date_min');
+  const dateMaxMsg = bindErrorMsg('date_max_message', 'date_max');
+  const dateBeforeMsg = bindErrorMsg('date_before_message', 'date_before');
+  const dateAfterMsg = bindErrorMsg('date_after_message', 'date_after');
   const timeMsg = bindErrorMsg('time_message', 'time');
+  const timeMinMsg = bindErrorMsg('time_min_message', 'time_min');
+  const timeMaxMsg = bindErrorMsg('time_max_message', 'time_max');
   const datetimeMsg = bindErrorMsg('datetime_message', 'datetime');
+  const datetimeMinMsg = bindErrorMsg('datetime_min_message', 'datetime_min');
+  const datetimeMaxMsg = bindErrorMsg('datetime_max_message', 'datetime_max');
   const fileMsg = bindErrorMsg('file_message', 'file');
   const optionMsg = bindErrorMsg('option_message', 'option');
+
+  const rangeHelp = () =>
+    el('span', {
+      className: 'description bl-forms-builder__field-errors-help',
+      text: t('minMaxMessageHelp', 'Use %s where the limit should appear.'),
+    });
+  const errorGroupTitle = (label) =>
+    el('p', { className: 'bl-forms-builder__field-errors-group-title', text: label });
 
   const successRow = fieldRow(t('successMessage', 'Success message'), success);
   const afterOptions = el('div', { className: 'bl-forms-builder__after-submit' });
@@ -547,12 +555,6 @@ export function createPanels(settings, builderRoot, onChange) {
       }),
       el('div', { className: 'bl-forms-builder__field-errors-box' }, [
         fieldRow(t('requiredError', 'Required'), requiredMsg),
-        fieldRow(t('minError', 'Minimum'), minMsg),
-        fieldRow(t('maxError', 'Maximum'), maxMsg),
-        el('span', {
-          className: 'description bl-forms-builder__field-errors-help',
-          text: t('minMaxMessageHelp', 'Use %s where the limit should appear.'),
-        }),
         el('hr', { className: 'bl-forms-builder__field-errors-sep' }),
         fieldRow(
           t('charCountText', 'Character count text'),
@@ -564,13 +566,40 @@ export function createPanels(settings, builderRoot, onChange) {
           charCountEmptyText
         ),
         el('hr', { className: 'bl-forms-builder__field-errors-sep' }),
-        fieldRow(t('numberError', 'Number'), numberMsg),
+        errorGroupTitle(t('numberError', 'Number')),
+        fieldRow(t('invalidError', 'Invalid'), numberMsg),
+        fieldRow(t('minError', 'Minimum'), minMsg),
+        fieldRow(t('maxError', 'Maximum'), maxMsg),
+        rangeHelp(),
+        el('hr', { className: 'bl-forms-builder__field-errors-sep' }),
         fieldRow(t('emailError', 'Email'), emailMsg),
         fieldRow(t('urlError', 'URL'), urlMsg),
         fieldRow(t('phoneError', 'Phone'), phoneMsg),
-        fieldRow(t('dateError', 'Date'), dateMsg),
-        fieldRow(t('timeError', 'Time'), timeMsg),
-        fieldRow(t('datetimeError', 'Date & time'), datetimeMsg),
+        el('hr', { className: 'bl-forms-builder__field-errors-sep' }),
+        errorGroupTitle(t('dateError', 'Date')),
+        fieldRow(t('invalidError', 'Invalid'), dateMsg),
+        fieldRow(t('minError', 'Minimum'), dateMinMsg),
+        fieldRow(t('maxError', 'Maximum'), dateMaxMsg),
+        rangeHelp(),
+        fieldRow(t('dateBeforeError', 'Before related field'), dateBeforeMsg),
+        fieldRow(t('dateAfterError', 'After related field'), dateAfterMsg),
+        el('span', {
+          className: 'description bl-forms-builder__field-errors-help',
+          text: t('dateRelationMessageHelp', 'Use %s where the related field label should appear.'),
+        }),
+        el('hr', { className: 'bl-forms-builder__field-errors-sep' }),
+        errorGroupTitle(t('timeError', 'Time')),
+        fieldRow(t('invalidError', 'Invalid'), timeMsg),
+        fieldRow(t('minError', 'Minimum'), timeMinMsg),
+        fieldRow(t('maxError', 'Maximum'), timeMaxMsg),
+        rangeHelp(),
+        el('hr', { className: 'bl-forms-builder__field-errors-sep' }),
+        errorGroupTitle(t('datetimeError', 'Date & time')),
+        fieldRow(t('invalidError', 'Invalid'), datetimeMsg),
+        fieldRow(t('minError', 'Minimum'), datetimeMinMsg),
+        fieldRow(t('maxError', 'Maximum'), datetimeMaxMsg),
+        rangeHelp(),
+        el('hr', { className: 'bl-forms-builder__field-errors-sep' }),
         fieldRow(t('fileError', 'File'), fileMsg),
         fieldRow(t('optionError', 'Choice'), optionMsg),
       ]),

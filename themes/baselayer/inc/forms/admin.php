@@ -52,8 +52,6 @@ function bl_forms_render_builder_after_title(WP_Post $post): void
 		data-fallback-error="<?= esc_attr($fallbacks['error']) ?>"
 		data-fallback-validation="<?= esc_attr($fallbacks['validation']) ?>"
 		data-fallback-required="<?= esc_attr($fallbacks['required']) ?>"
-		data-fallback-min="<?= esc_attr($fallbacks['min']) ?>"
-		data-fallback-max="<?= esc_attr($fallbacks['max']) ?>"
 	></div>
 	<?php
 }
@@ -368,6 +366,7 @@ function bl_forms_admin_enqueue(string $hook): void
 				'validationMessage' => __('Validation message', 'baselayer'),
 				'fieldErrors'       => __('Field errors', 'baselayer'),
 				'requiredError'     => __('Required', 'baselayer'),
+				'invalidError'      => __('Invalid', 'baselayer'),
 				'minError'          => __('Minimum', 'baselayer'),
 				'maxError'          => __('Maximum', 'baselayer'),
 				'minMaxMessageHelp' => __('Use %s where the limit should appear.', 'baselayer'),
@@ -376,6 +375,14 @@ function bl_forms_admin_enqueue(string $hook): void
 				'urlError'          => __('URL', 'baselayer'),
 				'phoneError'        => __('Phone', 'baselayer'),
 				'dateError'         => __('Date', 'baselayer'),
+				'dateBeforeError'   => __('Before related field', 'baselayer'),
+				'dateAfterError'    => __('After related field', 'baselayer'),
+				'dateRelationMessageHelp' => __('Use %s where the related field label should appear.', 'baselayer'),
+				'dateRelation'      => __('Relation', 'baselayer'),
+				'dateRelationNone'  => __('No relation', 'baselayer'),
+				'dateRelationBefore'=> __('Must be before', 'baselayer'),
+				'dateRelationAfter' => __('Must be after', 'baselayer'),
+				'dateRelationSelect'=> __('Select field', 'baselayer'),
 				'timeError'         => __('Time', 'baselayer'),
 				'datetimeError'     => __('Date & time', 'baselayer'),
 				'fileError'         => __('File', 'baselayer'),

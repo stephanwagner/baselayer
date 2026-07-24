@@ -49,6 +49,13 @@
   --bl-forms-admin-accent: #2271b1;
   --bl-forms-admin-radius: 4px;
   --bl-forms-admin-palette-width: 220px;
+
+  // Override WP admin’s narrow select max-width.
+  select {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
 }
 
 .bl-forms-builder {
@@ -1028,13 +1035,6 @@ input.bl-forms-builder__section-label-input {
   }
 }
 
-.bl-forms-builder__type-select {
-  select {
-    width: 100%;
-    max-width: 100%;
-  }
-}
-
 .bl-forms-builder__number-bounds,
 .bl-forms-builder__temporal-bounds {
   display: grid;
@@ -1044,6 +1044,23 @@ input.bl-forms-builder__section-label-input {
 
   > p {
     margin: 0;
+  }
+}
+
+.bl-forms-builder__date-relation {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin: 0 0 10px;
+
+  > p {
+    margin: 0;
+  }
+}
+
+.bl-forms-builder__date-relation-field {
+  &[hidden] {
+    display: none !important;
   }
 }
 
@@ -1484,6 +1501,16 @@ input.bl-forms-builder__section-label-input {
 
 .bl-forms-builder__field-errors-help {
   margin-bottom: 4px !important;
+}
+
+.bl-forms-builder__field-errors-group-title {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--bl-forms-admin-muted, #646970);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .bl-forms-builder__field-errors-sep {

@@ -376,7 +376,9 @@ function bl_forms_sanitize_temporal_bounds(array $out, array $field): array
 			$out['default_mode'],
 			$out['min_offset'],
 			$out['max_offset'],
-			$out['default_offset']
+			$out['default_offset'],
+			$out['relation'],
+			$out['relation_field']
 		);
 		if ($type !== 'number') {
 			unset($out['min'], $out['max']);
@@ -453,6 +455,15 @@ function bl_forms_sanitize_temporal_bounds(array $out, array $field): array
 				unset($out[$which]);
 			}
 		}
+	}
+
+	$relation = sanitize_key((string) ($field['relation'] ?? 'none'));
+	$relation_field = sanitize_key((string) ($field['relation_field'] ?? ''));
+	if (!in_array($relation, ['before', 'after'], true) || $relation_field === '') {
+		unset($out['relation'], $out['relation_field']);
+	} else {
+		$out['relation'] = $relation;
+		$out['relation_field'] = $relation_field;
 	}
 
 	return $out;
