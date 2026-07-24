@@ -49,6 +49,7 @@ function paletteAddButton(type, onAdd) {
  */
 export function createPalette(onAdd) {
   const wrap = el('aside', { className: 'bl-forms-builder__palette' });
+  const bodyId = 'bl-forms-palette-body';
 
   const search = el('input', {
     type: 'search',
@@ -57,17 +58,69 @@ export function createPalette(onAdd) {
     'aria-label': t('paletteSearch', 'Search fields…'),
     autocomplete: 'off',
   });
-  wrap.appendChild(search);
+
+  const collapseBtn = el('button', {
+    type: 'button',
+    className: 'bl-forms-builder__palette-collapse',
+    'aria-expanded': 'true',
+    'aria-controls': bodyId,
+    title: t('paletteHide', 'Hide field templates'),
+    'aria-label': t('paletteHide', 'Hide field templates'),
+  });
+  const collapseIcon = el('span', {
+    className: 'bl-forms-builder__palette-collapse-icon',
+    'aria-hidden': 'true',
+  });
+  collapseBtn.appendChild(collapseIcon);
+
+  const toolbar = el('div', { className: 'bl-forms-builder__palette-toolbar' }, [
+    search,
+    collapseBtn,
+  ]);
+  wrap.appendChild(toolbar);
+
+  const body = el('div', {
+    id: bodyId,
+    className: 'bl-forms-builder__palette-body',
+  });
+  wrap.appendChild(body);
 
   const empty = el('p', {
     className: 'description bl-forms-builder__palette-empty',
     text: t('paletteSearchEmpty', 'No fields match your search.'),
     hidden: true,
   });
-  wrap.appendChild(empty);
+  body.appendChild(empty);
 
   const sections = [];
   let openId = PALETTE_SECTIONS[0]?.id || '';
+  let collapsed = false;
+
+  const syncCollapseUi = () => {
+    wrap.classList.toggle('is-collapsed', collapsed);
+    collapseBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    const label = collapsed
+      ? t('paletteShow', 'Show field templates')
+      : t('paletteHide', 'Hide field templates');
+    collapseBtn.title = label;
+    collapseBtn.setAttribute('aria-label', label);
+
+    const icons = (window.blFormsAdmin && window.blFormsAdmin.icons) || {};
+    const markup = collapsed
+      ? icons.panelExpand || icons.panelCollapse || ''
+      : icons.panelCollapse || icons.panelExpand || '';
+    if (markup) {
+      collapseIcon.innerHTML = markup;
+    } else {
+      collapseIcon.textContent = collapsed ? '›' : '‹';
+    }
+  };
+
+  collapseBtn.addEventListener('click', () => {
+    collapsed = !collapsed;
+    syncCollapseUi();
+  });
+  syncCollapseUi();
 
   const setOpen = (nextId) => {
     openId = nextId;
@@ -83,6 +136,11 @@ export function createPalette(onAdd) {
     const query = search.value.trim().toLowerCase();
     const searching = query !== '';
     let totalVisible = 0;
+
+    if (searching && collapsed) {
+      collapsed = false;
+      syncCollapseUi();
+    }
 
     sections.forEach(({ sectionEl, toggle, panel, list, id }) => {
       let sectionVisible = 0;
@@ -181,7 +239,7 @@ export function createPalette(onAdd) {
 
     panel.appendChild(list);
     sectionEl.append(toggle, panel);
-    wrap.appendChild(sectionEl);
+    body.appendChild(sectionEl);
     sections.push({ id: section.id, sectionEl, toggle, panel, list });
 
     Sortable.create(list, {

@@ -111,6 +111,11 @@
   @media (max-width: 782px) {
     grid-template-columns: 1fr;
   }
+
+  // Collapsed palette: free the side column so the form can use full width.
+  &:has(.bl-forms-builder__palette.is-collapsed) {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .bl-forms-builder__col-title {
@@ -126,12 +131,39 @@
   border: 1px solid var(--bl-forms-admin-border);
   border-radius: var(--bl-forms-admin-radius);
   background: var(--bl-forms-admin-surface);
+
+  @media (max-width: 782px) {
+    position: static;
+    top: auto;
+  }
+
+  &.is-collapsed {
+    position: static;
+    top: auto;
+
+    .bl-forms-builder__palette-body {
+      display: none;
+    }
+
+    .bl-forms-builder__palette-toolbar {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.bl-forms-builder__palette-toolbar {
+  display: flex;
+  align-items: stretch;
+  gap: 6px;
+  margin: 0 0 4px;
 }
 
 input.bl-forms-builder__palette-search {
   display: block;
-  width: 100%;
-  margin: 0 0 4px;
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+  margin: 0;
   padding: 4px 12px;
   height: auto;
   min-height: 0;
@@ -147,6 +179,53 @@ input.bl-forms-builder__palette-search {
     box-shadow: 0 0 0 1px var(--bl-forms-admin-accent);
     outline: none;
   }
+}
+
+.bl-forms-builder__palette-collapse {
+  appearance: none;
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid var(--bl-forms-admin-border);
+  border-radius: var(--bl-forms-admin-radius);
+  background: #fff;
+  color: var(--bl-forms-admin-muted);
+  cursor: pointer;
+  box-sizing: border-box;
+
+  &:hover {
+    color: #1d2327;
+    border-color: #8c8f94;
+  }
+
+  &:focus-visible {
+    border-color: var(--bl-forms-admin-accent);
+    box-shadow: 0 0 0 1px var(--bl-forms-admin-accent);
+    outline: none;
+  }
+}
+
+.bl-forms-builder__palette-collapse-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  line-height: 1;
+
+  svg {
+    display: block;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.bl-forms-builder__palette-body {
+  min-width: 0;
 }
 
 p.bl-forms-builder__palette-empty {
@@ -264,6 +343,21 @@ p.bl-forms-builder__palette-empty {
 
   &:active {
     cursor: grabbing;
+  }
+}
+
+@media (max-width: 782px) {
+  .bl-forms-builder__palette:not(.is-collapsed) {
+    .bl-forms-builder__palette-list {
+      flex-direction: row;
+      flex-wrap: wrap;
+    }
+
+    .bl-forms-builder__template {
+      width: auto;
+      flex: 0 1 auto;
+      max-width: 100%;
+    }
   }
 }
 

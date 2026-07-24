@@ -3153,6 +3153,12 @@ msgstr "Benachrichtigungen"
 msgid "Field templates"
 msgstr "Feldvorlagen"
 
+msgid "Hide field templates"
+msgstr "Feldvorlagen ausblenden"
+
+msgid "Show field templates"
+msgstr "Feldvorlagen einblenden"
+
 msgid "Drag a field here, or click a template to add it."
 msgstr "Ziehe ein Feld hierher oder klicke auf eine Vorlage, um es hinzuzufügen."
 
