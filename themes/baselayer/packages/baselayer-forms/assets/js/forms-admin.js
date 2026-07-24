@@ -6695,6 +6695,13 @@
         delete next.redirect_page_url;
         return next;
       },
+      applySettings(partial = {}) {
+        Object.assign(state, partial || {});
+        if (Object.prototype.hasOwnProperty.call(partial || {}, "submit_label")) {
+          submitLabel.value = state.submit_label || "";
+        }
+        emit();
+      },
       syncFields(fields) {
         emailFields = emailFieldsFromList(fields);
         if (notify.checked) {
@@ -6857,6 +6864,293 @@
     });
   }
 
+  // themes/baselayer/packages/baselayer-forms/src/js/admin/templates.js
+  function makeField(partial) {
+    const type = partial.type || "text";
+    const label = partial.label != null ? String(partial.label) : "";
+    const id = uid();
+    const field = {
+      id,
+      type,
+      label,
+      name: slugifyName(partial.name || label || type),
+      name_manual: true,
+      hide_label: !!partial.hide_label,
+      active: true,
+      required: !!partial.required,
+      placeholder: partial.placeholder || "",
+      description: partial.description || "",
+      width: partial.width || "100",
+      width_custom: "",
+      css_class: ""
+    };
+    if (type === "textarea") {
+      field.rows = partial.rows || 5;
+    }
+    if (type === "terms") {
+      field.hide_label = partial.hide_label !== false;
+      field.content = partial.content || t("termsDefaultLabel", "I agree to the [Privacy Policy](page:privacy).");
+      field.default_value = "";
+      if (!label) {
+        field.label = t("termsDefaultFieldLabel", "Privacy Policy");
+        field.name = slugifyName(field.label);
+      }
+    }
+    if (type === "file" || type === "image") {
+      field.multiple = false;
+      field.preview = true;
+      field.upload_style = "modern";
+      field.extensions = partial.extensions != null ? String(partial.extensions) : type === "image" ? "jpg, jpeg, png, webp, gif, heic" : "pdf, doc, docx";
+    }
+    if (type === "section") {
+      return {
+        id,
+        type: "section",
+        label,
+        width: partial.width || "100",
+        width_custom: "",
+        design: partial.design || "card",
+        children: Array.isArray(partial.children) ? partial.children : []
+      };
+    }
+    return field;
+  }
+  function consentField() {
+    return makeField({
+      type: "terms",
+      required: true,
+      label: t("termsDefaultFieldLabel", "Privacy Policy")
+    });
+  }
+  function getStarterTemplates() {
+    return [
+      {
+        id: "contact",
+        label: t("templateContact", "Contact Form"),
+        fields: () => [
+          makeField({
+            type: "text",
+            label: t("templateFieldName", "Name"),
+            name: "name",
+            required: true,
+            width: "50",
+            placeholder: t("templatePlaceholderName", "Jane Doe")
+          }),
+          makeField({
+            type: "email",
+            label: t("templateFieldEmail", "Email"),
+            name: "email",
+            required: true,
+            width: "50",
+            placeholder: "name@example.com"
+          }),
+          makeField({
+            type: "text",
+            label: t("templateFieldSubject", "Subject"),
+            name: "subject",
+            placeholder: t("templatePlaceholderSubject", "How can we help?")
+          }),
+          makeField({
+            type: "textarea",
+            label: t("templateFieldMessage", "Message"),
+            name: "message",
+            required: true,
+            rows: 5,
+            placeholder: t("templatePlaceholderMessage", "Tell us a bit more\u2026")
+          }),
+          consentField()
+        ]
+      },
+      {
+        id: "newsletter",
+        label: t("templateNewsletter", "Newsletter Signup"),
+        settings: () => ({
+          submit_label: t("templateSubmitSubscribe", "Subscribe")
+        }),
+        fields: () => [
+          makeField({
+            type: "section",
+            label: t("templateNewsletterSection", "Sign up to our Newsletter"),
+            design: "card",
+            children: [
+              makeField({
+                type: "text",
+                label: t("templateFieldName", "Name"),
+                name: "name",
+                required: true,
+                placeholder: t("templatePlaceholderName", "Jane Doe")
+              }),
+              makeField({
+                type: "email",
+                label: t("templateFieldEmail", "Email"),
+                name: "email",
+                required: true,
+                placeholder: "name@example.com"
+              }),
+              consentField()
+            ]
+          })
+        ]
+      },
+      {
+        id: "job",
+        label: t("templateJob", "Job Application"),
+        settings: () => ({
+          submit_label: t("templateSubmitApplication", "Submit Application")
+        }),
+        fields: () => [
+          makeField({
+            type: "text",
+            label: t("templateFieldFullName", "Full name"),
+            name: "full_name",
+            required: true,
+            placeholder: t("templatePlaceholderName", "Jane Doe")
+          }),
+          makeField({
+            type: "email",
+            label: t("templateFieldEmail", "Email"),
+            name: "email",
+            required: true,
+            placeholder: "name@example.com"
+          }),
+          makeField({
+            type: "file",
+            label: t("templateFieldCv", "CV / R\xE9sum\xE9"),
+            name: "cv",
+            required: true,
+            extensions: "pdf, doc, docx"
+          }),
+          makeField({
+            type: "textarea",
+            label: t("templateFieldMessage", "Message"),
+            name: "message",
+            rows: 4,
+            placeholder: t("templatePlaceholderCover", "A short note about your application\u2026")
+          }),
+          consentField()
+        ]
+      }
+    ];
+  }
+  function openSimpleModal(title, message, options = {}) {
+    document.querySelectorAll(".bl-forms-builder__modal").forEach((node) => node.remove());
+    const backdrop = el("div", {
+      className: "bl-forms-builder__modal",
+      role: "dialog",
+      "aria-modal": "true",
+      "aria-label": title
+    });
+    const close = () => {
+      document.removeEventListener("keydown", onKey);
+      backdrop.remove();
+    };
+    const onKey = (evt) => {
+      if (evt.key === "Escape") {
+        close();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    backdrop.addEventListener("click", (evt) => {
+      if (evt.target === backdrop) {
+        close();
+      }
+    });
+    const footerChildren = [
+      el("button", {
+        type: "button",
+        className: "button",
+        text: options.onConfirm ? t("cancel", "Cancel") : t("templatePremiumClose", "Got it"),
+        onClick: close
+      })
+    ];
+    if (options.onConfirm) {
+      footerChildren.push(
+        el("button", {
+          type: "button",
+          className: "button button-primary",
+          text: options.confirmLabel || t("apply", "Apply"),
+          onClick: () => {
+            options.onConfirm();
+            close();
+          }
+        })
+      );
+    }
+    const dialog = el("div", { className: "bl-forms-builder__modal-dialog" });
+    dialog.append(
+      el("div", { className: "bl-forms-builder__modal-header" }, [
+        el("h2", { className: "bl-forms-builder__modal-title", text: title })
+      ]),
+      el("div", { className: "bl-forms-builder__modal-body" }, [el("p", { text: message })]),
+      el("div", { className: "bl-forms-builder__modal-footer" }, footerChildren)
+    );
+    backdrop.appendChild(dialog);
+    document.body.appendChild(backdrop);
+  }
+  function templateButton(label, onClick) {
+    const caret = iconEl("caret", "bl-forms-templates__caret");
+    if (!caret.innerHTML) {
+      caret.textContent = "\u2039";
+    }
+    return el(
+      "button",
+      {
+        type: "button",
+        className: "button -small bl-forms-templates__btn",
+        onClick
+      },
+      [caret, el("span", { className: "bl-forms-templates__btn-label", text: label })]
+    );
+  }
+  function bindTemplates(canvas, panels) {
+    const root = document.querySelector("[data-bl-forms-templates]");
+    if (!root || typeof canvas.replaceFields !== "function") {
+      return;
+    }
+    root.replaceChildren();
+    const list = el("div", { className: "bl-forms-templates__list" });
+    getStarterTemplates().forEach((tpl) => {
+      list.appendChild(
+        templateButton(tpl.label, () => {
+          openSimpleModal(
+            t("templateApplyTitle", "Apply template?"),
+            t(
+              "templateApplyMessage",
+              "Applying this template will overwrite all existing fields on this form. Other settings stay as they are, except the submit button label when the template defines one."
+            ),
+            {
+              confirmLabel: t("templateApplyConfirm", "Apply template"),
+              onConfirm: () => {
+                canvas.replaceFields(tpl.fields());
+                if (typeof tpl.settings === "function" && typeof panels?.applySettings === "function") {
+                  panels.applySettings(tpl.settings());
+                }
+              }
+            }
+          );
+        })
+      );
+    });
+    const premium = el(
+      "button",
+      {
+        type: "button",
+        className: "button -small bl-forms-templates__premium",
+        onClick: () => {
+          openSimpleModal(
+            t("templatePremiumTitle", "Premium templates"),
+            t(
+              "templatePremiumMessage",
+              "A library of premium form templates is in development. Licensed Pro users will be able to browse and import polished templates from the cloud \u2014 including advanced layouts and optional styling packs."
+            )
+          );
+        }
+      },
+      [el("span", { text: t("templatePremium", "More templates\u2026") })]
+    );
+    root.append(list, premium);
+  }
+
   // themes/baselayer/packages/baselayer-forms/src/js/admin/app.js
   function mountApp(root, initial) {
     root.replaceChildren();
@@ -6936,6 +7230,7 @@
     root.addEventListener("change", syncAll);
     document.addEventListener("bl-forms-builder-changed", syncAll);
     bindImportExport(canvas);
+    bindTemplates(canvas, panels);
     syncAll();
   }
 

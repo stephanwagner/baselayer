@@ -15,12 +15,21 @@ function bl_forms_admin_meta_boxes(): void
 	}
 
 	add_meta_box(
+		'bl_forms_templates',
+		__('Templates', 'baselayer-forms'),
+		'bl_forms_render_templates_metabox',
+		BL_FORM_POST_TYPE,
+		'side',
+		'default'
+	);
+
+	add_meta_box(
 		'bl_forms_tools',
 		__('Tools', 'baselayer-forms'),
 		'bl_forms_render_tools_metabox',
 		BL_FORM_POST_TYPE,
 		'side',
-		'default'
+		'low'
 	);
 }
 add_action('add_meta_boxes', 'bl_forms_admin_meta_boxes');
@@ -69,6 +78,14 @@ function bl_forms_render_builder_after_title(WP_Post $post): void
 	<?php
 }
 add_action('edit_form_after_title', 'bl_forms_render_builder_after_title');
+
+/**
+ * Starter + premium template packs (UI filled by forms-admin JS).
+ */
+function bl_forms_render_templates_metabox(WP_Post $post): void
+{
+	echo '<div class="bl-forms-templates" data-bl-forms-templates></div>';
+}
 
 /**
  * Tools metabox (import/export) under Publish.
@@ -292,6 +309,30 @@ function bl_forms_admin_enqueue(string $hook): void
 				'tools'             => __('Tools', 'baselayer-forms'),
 				'export'            => __('Export', 'baselayer-forms'),
 				'import'            => __('Import', 'baselayer-forms'),
+				'templates'         => __('Templates', 'baselayer-forms'),
+				'templateContact'   => __('Contact Form', 'baselayer-forms'),
+				'templateNewsletter'=> __('Newsletter Signup', 'baselayer-forms'),
+				'templateJob'       => __('Job Application', 'baselayer-forms'),
+				'templateApplyTitle'=> __('Apply template?', 'baselayer-forms'),
+				'templateApplyMessage' => __('Applying this template will overwrite all existing fields on this form. Other settings stay as they are, except the submit button label when the template defines one.', 'baselayer-forms'),
+				'templateApplyConfirm' => __('Apply template', 'baselayer-forms'),
+				'templatePremium'   => __('More templates…', 'baselayer-forms'),
+				'templatePremiumTitle' => __('Premium templates', 'baselayer-forms'),
+				'templatePremiumMessage' => __('A library of premium form templates is in development. Licensed Pro users will be able to browse and import polished templates from the cloud — including advanced layouts and optional styling packs.', 'baselayer-forms'),
+				'templatePremiumClose' => __('Got it', 'baselayer-forms'),
+				'templateFieldName' => __('Name', 'baselayer-forms'),
+				'templateFieldEmail'=> __('Email', 'baselayer-forms'),
+				'templateFieldSubject' => __('Subject', 'baselayer-forms'),
+				'templateFieldMessage' => __('Message', 'baselayer-forms'),
+				'templateFieldFullName' => __('Full name', 'baselayer-forms'),
+				'templateFieldCv'   => __('CV / Résumé', 'baselayer-forms'),
+				'templateNewsletterSection' => __('Sign up to our Newsletter', 'baselayer-forms'),
+				'templatePlaceholderName' => __('Jane Doe', 'baselayer-forms'),
+				'templatePlaceholderSubject' => __('How can we help?', 'baselayer-forms'),
+				'templatePlaceholderMessage' => __('Tell us a bit more…', 'baselayer-forms'),
+				'templatePlaceholderCover' => __('A short note about your application…', 'baselayer-forms'),
+				'templateSubmitSubscribe' => __('Subscribe', 'baselayer-forms'),
+				'templateSubmitApplication' => __('Submit Application', 'baselayer-forms'),
 				'importOverwriteTitle' => __('Import fields?', 'baselayer-forms'),
 				'importOverwriteMessage' => __('Importing will overwrite all existing fields on this form. Settings (emails, messages, security) are not changed. This cannot be undone until you save or discard.', 'baselayer-forms'),
 				'importOverwriteConfirm' => __('Overwrite fields', 'baselayer-forms'),

@@ -846,6 +846,13 @@ export function createPanels(settings, builderRoot, onChange) {
       delete next.redirect_page_url;
       return next;
     },
+    applySettings(partial = {}) {
+      Object.assign(state, partial || {});
+      if (Object.prototype.hasOwnProperty.call(partial || {}, 'submit_label')) {
+        submitLabel.value = state.submit_label || '';
+      }
+      emit();
+    },
     syncFields(fields) {
       emailFields = emailFieldsFromList(fields);
       if (notify.checked) {

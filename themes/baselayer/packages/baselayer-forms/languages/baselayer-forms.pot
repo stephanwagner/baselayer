@@ -214,6 +214,93 @@ msgstr ""
 msgid "Tools"
 msgstr ""
 
+#: includes/admin.php:20
+msgid "Templates"
+msgstr ""
+
+#: includes/admin.php:295
+msgid "Contact Form"
+msgstr ""
+
+#: includes/admin.php:296
+msgid "Newsletter Signup"
+msgstr ""
+
+#: includes/admin.php:298
+msgid "Job Application"
+msgstr ""
+
+#: includes/admin.php:299
+msgid "Apply template?"
+msgstr ""
+
+#: includes/admin.php:300
+msgid "Applying this template will overwrite all existing fields on this form. Other settings stay as they are, except the submit button label when the template defines one."
+msgstr ""
+
+#: includes/admin.php:301
+msgid "Apply template"
+msgstr ""
+
+#: includes/admin.php:302
+msgid "More templates…"
+msgstr ""
+
+#: includes/admin.php:303
+msgid "Premium templates"
+msgstr ""
+
+#: includes/admin.php:304
+msgid "A library of premium form templates is in development. Licensed Pro users will be able to browse and import polished templates from the cloud — including advanced layouts and optional styling packs."
+msgstr ""
+
+#: includes/admin.php:305
+msgid "Got it"
+msgstr ""
+
+
+#: includes/admin.php:311
+msgid "Name"
+msgstr ""
+
+msgid "Message"
+msgstr ""
+
+#: includes/admin.php:312
+msgid "Full name"
+msgstr ""
+
+#: includes/admin.php:313
+msgid "CV / Résumé"
+msgstr ""
+
+#: includes/admin.php:314
+msgid "Sign up to our Newsletter"
+msgstr ""
+
+
+msgid "Jane Doe"
+msgstr ""
+
+msgid "How can we help?"
+msgstr ""
+
+msgid "Tell us a bit more…"
+msgstr ""
+
+msgid "A short note about your application…"
+msgstr ""
+
+
+msgid "Subscribe"
+msgstr ""
+
+msgid "Submit Application"
+msgstr ""
+
+
+
+
 #: includes/admin.php:72
 #: includes/admin.php:285
 msgid "Export"

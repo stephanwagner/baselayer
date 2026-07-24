@@ -202,6 +202,94 @@ msgstr "Übernehmen"
 msgid "Tools"
 msgstr "Werkzeuge"
 
+#: includes/admin.php:20
+msgid "Templates"
+msgstr "Vorlagen"
+
+#: includes/admin.php:295
+msgid "Contact Form"
+msgstr "Kontaktformular"
+
+#: includes/admin.php:296
+msgid "Newsletter Signup"
+msgstr "Newsletter-Anmeldung"
+
+#: includes/admin.php:298
+msgid "Job Application"
+msgstr "Bewerbung"
+
+#: includes/admin.php:299
+msgid "Apply template?"
+msgstr "Vorlage anwenden?"
+
+#: includes/admin.php:300
+msgid "Applying this template will overwrite all existing fields on this form. Other settings stay as they are, except the submit button label when the template defines one."
+msgstr "Beim Anwenden dieser Vorlage werden alle bestehenden Felder dieses Formulars überschrieben. Andere Einstellungen bleiben unverändert, außer der Absenden-Beschriftung, falls die Vorlage eine vorgibt."
+
+#: includes/admin.php:301
+msgid "Apply template"
+msgstr "Vorlage anwenden"
+
+#: includes/admin.php:302
+msgid "More templates…"
+msgstr "Weitere Vorlagen…"
+
+#: includes/admin.php:303
+msgid "Premium templates"
+msgstr "Premium-Vorlagen"
+
+#: includes/admin.php:304
+msgid "A library of premium form templates is in development. Licensed Pro users will be able to browse and import polished templates from the cloud — including advanced layouts and optional styling packs."
+msgstr "Eine Bibliothek mit Premium-Formularvorlagen ist in Entwicklung. Lizenzierte Pro-Nutzer können später polierte Vorlagen aus der Cloud durchsuchen und importieren — inklusive komplexer Layouts und optionaler Style-Pakete."
+
+#: includes/admin.php:305
+msgid "Got it"
+msgstr "Verstanden"
+
+
+#: includes/admin.php:311
+msgid "Name"
+msgstr "Name"
+
+
+msgid "Message"
+msgstr "Nachricht"
+
+#: includes/admin.php:312
+msgid "Full name"
+msgstr "Vollständiger Name"
+
+#: includes/admin.php:313
+msgid "CV / Résumé"
+msgstr "Lebenslauf"
+
+#: includes/admin.php:314
+msgid "Sign up to our Newsletter"
+msgstr "Für unseren Newsletter anmelden"
+
+
+msgid "Jane Doe"
+msgstr "Erika Mustermann"
+
+msgid "How can we help?"
+msgstr "Wobei können wir helfen?"
+
+msgid "Tell us a bit more…"
+msgstr "Erzählen Sie uns etwas mehr…"
+
+msgid "A short note about your application…"
+msgstr "Kurze Nachricht zu Ihrer Bewerbung…"
+
+
+msgid "Subscribe"
+msgstr "Anmelden"
+
+msgid "Submit Application"
+msgstr "Bewerbung senden"
+
+
+
+
 #: includes/admin.php:72 includes/admin.php:285
 msgid "Export"
 msgstr "Exportieren"
