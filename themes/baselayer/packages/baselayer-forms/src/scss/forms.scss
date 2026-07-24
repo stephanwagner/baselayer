@@ -137,7 +137,7 @@
 
 .bl-form__section-title {
   margin: 0;
-  font-size: #{$font-size-l};
+  font-size: var(--bl-form-font-size-l);
   font-weight: 600;
   line-height: 1.3;
   color: var(--bl-form-color);
@@ -172,10 +172,6 @@
 }
 
 .bl-form__field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-
   // Drop browser fieldset chrome (radio / checkboxes / button group).
   &:where(fieldset) {
     margin: 0;
@@ -218,7 +214,7 @@
 
 .bl-form__error {
   margin: 0;
-  font-size: #{$font-size-s};
+  font-size: var(--bl-form-font-size-s);
   font-weight: 500;
   color: var(--bl-form-danger);
 
@@ -228,13 +224,21 @@
 }
 
 .bl-form__label {
+  display: block;
   font-weight: 600;
+  padding: 0 2px;
+  margin: 0 0 4px;
 }
 
 .bl-form__description {
-  margin: 0;
-  font-size: #{$font-size-s};
+  font-size: var(--bl-form-font-size-s);
   color: var(--bl-form-muted);
+  padding: 0 2px;
+  margin: 0 0 4px;
+}
+
+.bl-form__label + .bl-form__description {
+  margin-top: -2px;
 }
 
 .bl-form__required {
@@ -345,7 +349,7 @@ textarea.bl-form__control {
 
 .bl-form__char-count {
   margin: 6px 0 0;
-  font-size: #{$font-size-s};
+  font-size: var(--bl-form-font-size-s);
   line-height: 1.4;
   color: var(--bl-form-muted);
 }
@@ -464,7 +468,7 @@ select.bl-form__control {
   border-radius: var(--bl-form-radius);
   background: color-mix(in srgb, var(--bl-form-border) 8%, var(--bl-form-bg));
   color: var(--bl-form-muted);
-  font-size: #{$font-size-s};
+  font-size: var(--bl-form-font-size-s);
 }
 
 .bl-form__options {
@@ -537,11 +541,7 @@ select.bl-form__control {
 
     &:checked {
       border-color: var(--bl-form-border-focus);
-      background-image: radial-gradient(
-        circle at center,
-        var(--bl-form-border-focus) 0 38%,
-        transparent 40%
-      );
+      background-image: radial-gradient(circle at center, var(--bl-form-border-focus) 0 38%, transparent 40%);
     }
   }
 }

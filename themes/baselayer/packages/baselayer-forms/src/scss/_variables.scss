@@ -7,6 +7,8 @@
 :root {
   --bl-form-font-family: var(--bl-font-family, inherit);
   --bl-form-font-size: #{$font-size-m};
+  --bl-form-font-size-s: #{$font-size-s};
+  --bl-form-font-size-l: #{$font-size-l};
   --bl-form-line-height: 1.5;
   --bl-form-color: var(--bl-color-text, #{$color-gray-900});
   --bl-form-muted: var(--bl-color-gray-600, #{$color-gray-600});
