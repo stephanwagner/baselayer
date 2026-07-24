@@ -359,6 +359,22 @@ export function createPanels(settings, builderRoot, onChange) {
   );
 
   const msgFallbacks = (window.blFormsAdmin && window.blFormsAdmin.messageFallbacks) || {};
+  const charCountText = bindText(
+    el('input', {
+      type: 'text',
+      className: 'widefat',
+      placeholder: msgFallbacks.char_count || t('charCountTextDefault', '%remaining% characters remaining'),
+    }),
+    'char_count_text'
+  );
+  const charCountEmptyText = bindText(
+    el('input', {
+      type: 'text',
+      className: 'widefat',
+      placeholder: msgFallbacks.char_count_empty || t('charCountEmptyDefault', 'No characters remaining'),
+    }),
+    'char_count_empty_text'
+  );
   const bindErrorMsg = (key, fallbackKey) =>
     bindText(
       el('input', {
@@ -537,6 +553,16 @@ export function createPanels(settings, builderRoot, onChange) {
           className: 'description bl-forms-builder__field-errors-help',
           text: t('minMaxMessageHelp', 'Use %s where the limit should appear.'),
         }),
+        el('hr', { className: 'bl-forms-builder__field-errors-sep' }),
+        fieldRow(
+          t('charCountText', 'Character count text'),
+          charCountText,
+          t('charCountTextHelp', 'Use %remaining%, %count%, and %max% as placeholders.')
+        ),
+        fieldRow(
+          t('charCountEmptyText', 'When limit is reached'),
+          charCountEmptyText
+        ),
         el('hr', { className: 'bl-forms-builder__field-errors-sep' }),
         fieldRow(t('numberError', 'Number'), numberMsg),
         fieldRow(t('emailError', 'Email'), emailMsg),

@@ -3,21 +3,21 @@
  * Softly mirrors common Baselayer spacing/radius if those vars exist.
  */
 
+@use '../config' as *;
+
 :root {
   --bl-form-font-family: var(--bl-font-family, inherit);
-  --bl-form-font-size: 1rem;
+  --bl-form-font-size: #{$font-size-m};
   --bl-form-line-height: 1.5;
-  --bl-form-color: var(--bl-color-text, #1f2937);
-  --bl-form-muted: var(--bl-color-muted, #64748b);
-  --bl-form-border: var(--bl-color-border, #cbd5e1);
-  --bl-form-border-focus: var(--bl-color-primary, #2563eb);
-  --bl-form-bg: var(--bl-color-surface, #fff);
-  --bl-form-danger: #b32d2e;
-  --bl-form-success: #008a20;
+  --bl-form-color: var(--bl-color-text, #{$color-gray-900});
+  --bl-form-muted: var(--bl-color-gray-600, #{$color-gray-600});
+  --bl-form-border: var(--bl-color-border, #{$color-gray-300});
+  --bl-form-border-focus: var(--bl-color-primary, #{$color-primary});
+  --bl-form-bg: var(--bl-color-surface, #{$color-white});
+  --bl-form-danger: #{$color-error};
+  --bl-form-success: #{$color-success};
   --bl-form-radius: var(--bl-radius, 6px);
-  --bl-form-gap: 1rem;
-  --bl-form-control-padding: 0.65rem 0.85rem;
-  --bl-form-submit-bg: var(--bl-color-primary, #2563eb);
-  --bl-form-submit-color: #fff;
-  --bl-form-spinner-size: 1.1rem;
+  --bl-form-gap: 16px;
+  --bl-form-control-padding: 10px 14px;
+  --bl-form-spinner-size: 18px;
 }

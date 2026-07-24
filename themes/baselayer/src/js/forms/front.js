@@ -1,6 +1,54 @@
 /**
  * Frontend form AJAX submit + spinner + image preview + field errors.
  */
+function charLength(value) {
+  return Array.from(String(value || '')).length;
+}
+
+function formatCharCountText(template, remaining, max, count, emptyText) {
+  if (remaining <= 0) {
+    return String(emptyText || '').trim() || 'No characters remaining';
+  }
+  const text =
+    String(template || '').trim() || '%remaining% characters remaining';
+  return text
+    .split('%remaining%')
+    .join(String(Math.max(0, remaining)))
+    .split('%count%')
+    .join(String(Math.max(0, count)))
+    .split('%max%')
+    .join(String(Math.max(0, max)));
+}
+
+function initCharCounters(root) {
+  root.querySelectorAll('[data-bl-form-char-count]').forEach((counter) => {
+    const field = counter.closest('[data-bl-form-field]');
+    const control = field?.querySelector('.bl-form__control');
+    if (!control) return;
+
+    const max = Number(counter.getAttribute('data-bl-form-char-count-max')) || 0;
+    const template = counter.getAttribute('data-bl-form-char-count-template') || '';
+    const emptyText = counter.getAttribute('data-bl-form-char-count-empty') || '';
+    if (max < 1) return;
+
+    const update = () => {
+      const count = charLength(control.value);
+      const remaining = Math.max(0, max - count);
+      counter.textContent = formatCharCountText(
+        template,
+        remaining,
+        max,
+        count,
+        emptyText
+      );
+    };
+
+    control.addEventListener('input', update);
+    control.addEventListener('change', update);
+    update();
+  });
+}
+
 function initImagePreviews(root) {
   root.querySelectorAll('[data-bl-form-image-input]').forEach((input) => {
     const preview = input
@@ -65,6 +113,7 @@ function initForm(root) {
   if (!form || !submit) return;
 
   initImagePreviews(root);
+  initCharCounters(root);
 
   // Prove JavaScript ran: copy the signed token into the hidden check field.
   const jsField = form.querySelector('[data-bl-form-js-field]');

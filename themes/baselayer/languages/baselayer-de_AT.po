@@ -3048,6 +3048,30 @@ msgid "Minimum"
 msgstr "Minimum"
 msgid "Maximum"
 msgstr "Maximum"
+
+msgid "Maximum length"
+msgstr "Maximale Länge"
+
+msgid "Show remaining characters"
+msgstr "Verbleibende Zeichen anzeigen"
+
+msgid "Character count text"
+msgstr "Zeichenzähler-Text"
+
+msgid "%remaining% characters remaining"
+msgstr "%remaining% Zeichen übrig"
+
+msgid "No characters remaining"
+msgstr "Keine Zeichen übrig"
+
+msgid "When limit is reached"
+msgstr "Wenn das Limit erreicht ist"
+
+msgid "Use %remaining%, %count%, and %max% as placeholders."
+msgstr "Platzhalter: %remaining%, %count% und %max%."
+
+msgid "Enter no more than %s characters."
+msgstr "Gib höchstens %s Zeichen ein."
 msgid "Use %s where the limit should appear."
 msgstr "Verwende %s an der Stelle, an der der Grenzwert erscheinen soll."
 msgid "Confirmation email"

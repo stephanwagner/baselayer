@@ -457,3 +457,116 @@ function bl_forms_sanitize_temporal_bounds(array $out, array $field): array
 
 	return $out;
 }
+
+/**
+ * Positive integer max length, or 0 if unset/invalid.
+ *
+ * @param array<string, mixed> $field
+ */
+function bl_forms_field_max_length(array $field): int
+{
+	if (!in_array((string) ($field['type'] ?? ''), ['text', 'textarea'], true)) {
+		return 0;
+	}
+
+	$raw = trim((string) ($field['max_length'] ?? ''));
+	if ($raw === '' || !ctype_digit($raw)) {
+		return 0;
+	}
+
+	return max(0, (int) $raw);
+}
+
+/**
+ * Whether the field should show a live character counter.
+ *
+ * @param array<string, mixed> $field
+ */
+function bl_forms_field_shows_char_count(array $field): bool
+{
+	return bl_forms_field_max_length($field) > 0 && !empty($field['show_char_count']);
+}
+
+/**
+ * Default character-count template (translatable).
+ */
+function bl_forms_char_count_text_default(): string
+{
+	/* translators: Placeholders: %remaining%, %count%, %max% */
+	return __('%remaining% characters remaining', 'baselayer');
+}
+
+/**
+ * Resolve character-count template from form settings.
+ *
+ * @param array<string, mixed> $settings
+ */
+function bl_forms_resolve_char_count_text(array $settings = []): string
+{
+	if (function_exists('bl_forms_resolve_message')) {
+		$text = bl_forms_resolve_message($settings, 'char_count_text');
+		if ($text !== '') {
+			return $text;
+		}
+	}
+
+	return bl_forms_char_count_text_default();
+}
+
+/**
+ * Default text when no characters remain.
+ */
+function bl_forms_char_count_empty_text_default(): string
+{
+	return __('No characters remaining', 'baselayer');
+}
+
+/**
+ * Resolve “no characters remaining” text from form settings.
+ *
+ * @param array<string, mixed> $settings
+ */
+function bl_forms_resolve_char_count_empty_text(array $settings = []): string
+{
+	if (function_exists('bl_forms_resolve_message')) {
+		$text = bl_forms_resolve_message($settings, 'char_count_empty_text');
+		if ($text !== '') {
+			return $text;
+		}
+	}
+
+	return bl_forms_char_count_empty_text_default();
+}
+
+/**
+ * Format character-count text with named placeholders.
+ *
+ * @param array<string, mixed> $settings
+ */
+function bl_forms_format_char_count_text(string $template, int $remaining, int $max, int $count, array $settings = []): string
+{
+	if ($remaining <= 0) {
+		return bl_forms_resolve_char_count_empty_text($settings);
+	}
+
+	$template = trim($template) !== '' ? $template : bl_forms_char_count_text_default();
+
+	return strtr($template, [
+		'%remaining%' => (string) max(0, $remaining),
+		'%count%'     => (string) max(0, $count),
+		'%max%'       => (string) max(0, $max),
+	]);
+}
+
+/**
+ * Character length using mb_strlen when available.
+ */
+function bl_forms_string_length(string $value): int
+{
+	if (function_exists('mb_strlen')) {
+		return (int) mb_strlen($value);
+	}
+
+	return strlen($value);
+}
+

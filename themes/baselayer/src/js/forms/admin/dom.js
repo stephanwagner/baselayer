@@ -211,7 +211,7 @@ export function uniqueFieldName(base, exceptId = '') {
 export function defaultField(type = 'text') {
   const id = uid();
   if (type === 'divider') {
-    return { id, type, width: '100', width_custom: '', css_class: '' };
+    return { id, type, margin: 'm', margin_custom: '', css_class: '' };
   }
   if (type === 'spacer') {
     return {
@@ -219,8 +219,6 @@ export function defaultField(type = 'text') {
       type,
       height: 'm',
       height_custom: '',
-      width: '100',
-      width_custom: '',
       css_class: '',
     };
   }

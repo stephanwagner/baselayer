@@ -22,6 +22,15 @@ const SPACER_HEIGHT_PRESETS = [
 ];
 
 const SPACER_HEIGHT_VALUES = SPACER_HEIGHT_PRESETS.map((preset) => preset.value);
+const DIVIDER_MARGIN_PRESETS = [
+  { value: 'xs', label: '8' },
+  { value: 's', label: '16' },
+  { value: 'm', label: '24' },
+  { value: 'l', label: '32' },
+  { value: 'xl', label: '48' },
+  { value: 'custom', labelKey: 'widthCustom', icon: 'edit' },
+];
+const DIVIDER_MARGIN_VALUES = DIVIDER_MARGIN_PRESETS.map((preset) => preset.value);
 const CSS_LENGTH_RE = /^(-?\d+(?:\.\d+)?)(px|rem|em|%|vh|vw|vmin|vmax|ch|ex)$/i;
 
 /** Migrate legacy free-form spacer heights to preset / custom. */
@@ -44,6 +53,28 @@ function normalizeSpacerHeight(field) {
   }
   field.height = 'm';
   field.height_custom = '';
+}
+
+/** Migrate divider margin to preset / custom. */
+function normalizeDividerMargin(field) {
+  const raw = String(field.margin ?? 'm').trim();
+  const key = raw.toLowerCase();
+  if (DIVIDER_MARGIN_VALUES.includes(key)) {
+    field.margin = key;
+    if (key !== 'custom') {
+      field.margin_custom = '';
+    } else if (field.margin_custom == null) {
+      field.margin_custom = '';
+    }
+    return;
+  }
+  if (CSS_LENGTH_RE.test(raw)) {
+    field.margin_custom = raw;
+    field.margin = 'custom';
+    return;
+  }
+  field.margin = 'm';
+  field.margin_custom = '';
 }
 
 const OPTION_TYPES = ['radio', 'checkboxes', 'select', 'button_group'];
@@ -288,6 +319,12 @@ function convertFieldType(field, nextType) {
 
   if (!AUTOCOMPLETE_TYPES.includes(nextType)) {
     delete field.autocomplete;
+  }
+
+  if (!['text', 'textarea'].includes(nextType)) {
+    delete field.max_length;
+    delete field.show_char_count;
+    delete field.char_count_text;
   }
 
   if (nextType === 'number') {
@@ -723,6 +760,66 @@ export function createHeightControl(field, onChange = () => {}, { showLabel = tr
   return wrap;
 }
 
+/** Divider vertical margin: XS–XL presets + custom length (edit icon). */
+export function createMarginControl(field, onChange = () => {}, { showLabel = true } = {}) {
+  normalizeDividerMargin(field);
+
+  const wrap = el('div', { className: 'bl-forms-builder__margin' });
+  const customInput = el('input', {
+    type: 'text',
+    className: 'widefat bl-forms-builder__margin-custom',
+    dataset: { blMarginCustom: '1' },
+    placeholder: t('dividerMarginCustomPlaceholder', 'e.g. 24px or 2rem'),
+    value: field.margin_custom || '',
+  });
+  customInput.hidden = (field.margin || 'm') !== 'custom';
+
+  const group = createSegmentedControl(
+    DIVIDER_MARGIN_PRESETS.map((preset) => ({
+      value: preset.value,
+      label: preset.label || t(preset.labelKey, 'Custom'),
+      icon: preset.icon || '',
+      dataset: { blMargin: preset.value },
+    })),
+    field.margin || 'm',
+    'blMarginGroup',
+    (value) => {
+      field.margin = value;
+      if (value !== 'custom') {
+        field.margin_custom = '';
+      }
+      customInput.hidden = value !== 'custom';
+      onChange();
+      document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+    }
+  );
+
+  group.querySelectorAll('button').forEach((btn) => {
+    if (btn.dataset.value) {
+      btn.dataset.blMargin = btn.dataset.value;
+    }
+  });
+
+  customInput.addEventListener('input', () => {
+    field.margin_custom = customInput.value;
+    field.margin = 'custom';
+    group.querySelectorAll('button').forEach((btn) => {
+      const on = btn.dataset.blMargin === 'custom';
+      btn.classList.toggle('is-active', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    customInput.hidden = false;
+    onChange();
+    document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+  });
+
+  if (showLabel) {
+    wrap.appendChild(el('label', { text: t('dividerMargin', 'Margin') }));
+  }
+  wrap.append(group, customInput);
+  return wrap;
+}
+
 /**
  * Modal to edit a field's width (columns and non-full-width fields).
  */
@@ -933,6 +1030,42 @@ function createNumberBoundsControl(field) {
   return el('div', { className: 'bl-forms-builder__number-bounds' }, [
     el('p', {}, [el('label', { text: t('minValue', 'Minimum') }), minInput]),
     el('p', {}, [el('label', { text: t('maxValue', 'Maximum') }), maxInput]),
+  ]);
+}
+
+function createMaxLengthControl(field) {
+  const maxInput = el('input', {
+    type: 'number',
+    className: 'widefat',
+    min: '1',
+    step: '1',
+    dataset: { blMaxLength: '1' },
+    value: field.max_length != null && field.max_length !== '' ? String(field.max_length) : '',
+  });
+
+  const syncShow = (checked) => {
+    field.show_char_count = !!checked;
+    document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+  };
+
+  const showSwitch = createSwitchSetting(
+    'blShowCharCount',
+    t('showCharCount', 'Show remaining characters'),
+    !!field.show_char_count,
+    syncShow
+  );
+
+  const syncMax = () => {
+    field.max_length = maxInput.value.trim();
+    document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+  };
+  maxInput.addEventListener('change', syncMax);
+  maxInput.addEventListener('blur', syncMax);
+  maxInput.addEventListener('input', syncMax);
+
+  return el('div', { className: 'bl-forms-builder__max-length' }, [
+    el('p', {}, [el('label', { text: t('maxLength', 'Maximum length') }), maxInput]),
+    showSwitch,
   ]);
 }
 
@@ -1485,7 +1618,16 @@ export function serializeRow(row) {
   const hideLabel = Boolean(q('[data-bl-hide-label]')?.checked);
 
   if (type === 'divider') {
-    return { id, type, ...appearancePayload(body, width, widthCustom) };
+    const marginBtn = q('[data-bl-margin].is-active');
+    const margin = marginBtn?.dataset.blMargin || row.dataset.fieldMargin || 'm';
+    const marginCustom = q('[data-bl-margin-custom]')?.value || '';
+    return {
+      id,
+      type,
+      margin,
+      margin_custom: margin === 'custom' ? marginCustom : '',
+      css_class: q('[data-bl-css-class]')?.value || '',
+    };
   }
 
   if (type === 'captcha') {
@@ -1508,7 +1650,7 @@ export function serializeRow(row) {
       type,
       height,
       height_custom: height === 'custom' ? heightCustom : '',
-      ...appearancePayload(body, width, widthCustom),
+      css_class: q('[data-bl-css-class]')?.value || '',
     };
   }
 
@@ -1599,6 +1741,10 @@ export function serializeRow(row) {
     data.min = q('[data-bl-min]')?.value?.trim() || '';
     data.max = q('[data-bl-max]')?.value?.trim() || '';
   }
+  if (type === 'text' || type === 'textarea') {
+    data.max_length = q('[data-bl-max-length]')?.value?.trim() || '';
+    data.show_char_count = Boolean(q('[data-bl-show-char-count]')?.checked);
+  }
   if (type === 'date' || type === 'time' || type === 'datetime') {
     data.placeholder = '';
     const readSide = (which) => {
@@ -1684,6 +1830,9 @@ export function createFieldCard(initial, open = false) {
   if (field.type === 'spacer') {
     normalizeSpacerHeight(field);
   }
+  if (field.type === 'divider') {
+    normalizeDividerMargin(field);
+  }
   if (field.type === 'heading') {
     normalizeHeadingLevel(field);
   }
@@ -1699,6 +1848,7 @@ export function createFieldCard(initial, open = false) {
       fieldType: field.type,
       fieldWidth: field.width || '100',
       fieldHeight: field.type === 'spacer' ? field.height || 'm' : '',
+      fieldMargin: field.type === 'divider' ? field.margin || 'm' : '',
       fieldName: field.name || '',
       nameManual: field.name_manual ? '1' : '0',
     },
@@ -1719,13 +1869,24 @@ export function createFieldCard(initial, open = false) {
         height === 'custom'
           ? (field.height_custom || t('widthCustom', 'Custom')).trim()
           : height.toUpperCase();
+    } else if (field.type === 'divider') {
+      const margin = field.margin || 'm';
+      if (margin === 'custom') {
+        title = (field.margin_custom || t('widthCustom', 'Custom')).trim();
+      } else {
+        const preset = DIVIDER_MARGIN_PRESETS.find((item) => item.value === margin);
+        title = preset?.label || margin.toUpperCase();
+      }
     } else if (field.type === 'heading' || field.type === 'text_block' || field.type === 'html') {
       title = (field.content || '').trim();
     }
     preview.textContent = title;
     preview.hidden = title === '';
 
-    const widthText = field.type === 'hidden' ? '' : widthBadgeLabel(field);
+    const widthText =
+      field.type === 'hidden' || field.type === 'divider' || field.type === 'spacer'
+        ? ''
+        : widthBadgeLabel(field);
     widthBadge.textContent = widthText;
     widthBadge.hidden = widthText === '';
     widthBadge.classList.toggle('is-interactive', widthText !== '');
@@ -1735,13 +1896,24 @@ export function createFieldCard(initial, open = false) {
       widthBadge.removeAttribute('title');
     }
 
-    typeChip.replaceChildren(
+    const typeChildren = [
       iconEl(field.type, 'bl-forms-builder__field-type-icon'),
-      el('span', { className: 'bl-forms-builder__field-type-label', text: typeLabel(field.type) })
-    );
+      el('span', { className: 'bl-forms-builder__field-type-label', text: typeLabel(field.type) }),
+    ];
+    if (field.required && !NO_REQUIRED.includes(field.type)) {
+      typeChildren.push(
+        el('span', {
+          className: 'bl-forms-builder__field-required-dot',
+          title: t('required', 'Required'),
+          'aria-label': t('required', 'Required'),
+        })
+      );
+    }
+    typeChip.replaceChildren(...typeChildren);
     row.dataset.fieldType = field.type;
     row.dataset.fieldWidth = field.width || '100';
     row.dataset.fieldHeight = field.type === 'spacer' ? field.height || 'm' : '';
+    row.dataset.fieldMargin = field.type === 'divider' ? field.margin || 'm' : '';
     row.dataset.fieldName = field.name || '';
     row.dataset.nameManual = field.name_manual ? '1' : '0';
   };
@@ -1840,7 +2012,10 @@ export function createFieldCard(initial, open = false) {
     if (field.type === 'spacer') {
       appearanceSections.add(createHeightControl(field, updatePreview));
     }
-    if (field.type !== 'hidden') {
+    if (field.type === 'divider') {
+      appearanceSections.add(createMarginControl(field, updatePreview));
+    }
+    if (field.type !== 'hidden' && field.type !== 'divider' && field.type !== 'spacer') {
       appearanceSections.add(createWidthControl(field, updatePreview));
     }
     if (field.type === 'radio' || field.type === 'checkboxes') {
@@ -1940,6 +2115,10 @@ export function createFieldCard(initial, open = false) {
 
       if (AUTOCOMPLETE_TYPES.includes(field.type)) {
         advancedSections.add(createAutocompleteControl(field));
+      }
+
+      if (field.type === 'text' || field.type === 'textarea') {
+        advancedSections.add(createMaxLengthControl(field));
       }
 
       if (field.type === 'number') {
@@ -2055,6 +2234,7 @@ export function createFieldCard(initial, open = false) {
         optionToggles.push(
           createSwitchSetting('blRequired', t('required', 'Required'), !!field.required, (checked) => {
             field.required = checked;
+            updatePreview();
             document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
           })
         );
@@ -2119,7 +2299,12 @@ export function createFieldCard(initial, open = false) {
   ]);
 
   widthBadge.addEventListener('click', (evt) => {
-    if (widthBadge.hidden || field.type === 'hidden') {
+    if (
+      widthBadge.hidden ||
+      field.type === 'hidden' ||
+      field.type === 'divider' ||
+      field.type === 'spacer'
+    ) {
       return;
     }
     evt.preventDefault();

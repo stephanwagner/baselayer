@@ -143,6 +143,9 @@ function bl_forms_default_settings(): array
 		'required_message'       => '',
 		'min_message'            => '',
 		'max_message'            => '',
+		'maxlength_message'      => '',
+		'char_count_text'        => '',
+		'char_count_empty_text'  => '',
 		'number_message'         => '',
 		'email_message'          => '',
 		'url_message'            => '',
@@ -217,6 +220,11 @@ function bl_forms_message_fallbacks(): array
 		'min'        => __('Enter a value of at least %s.', 'baselayer'),
 		/* translators: %s: maximum value (number, date, time, …) */
 		'max'        => __('Enter a value of at most %s.', 'baselayer'),
+		/* translators: %s: maximum character length */
+		'maxlength'  => __('Enter no more than %s characters.', 'baselayer'),
+		/* translators: Placeholders: %remaining%, %count%, %max% */
+		'char_count' => __('%remaining% characters remaining', 'baselayer'),
+		'char_count_empty' => __('No characters remaining', 'baselayer'),
 		'number'     => __('Enter a valid number.', 'baselayer'),
 		'email'      => __('Enter a valid email address.', 'baselayer'),
 		'url'        => __('Enter a valid URL.', 'baselayer'),
@@ -242,6 +250,9 @@ function bl_forms_resolve_message(array $settings, string $key): string
 		'required_message'   => 'required',
 		'min_message'        => 'min',
 		'max_message'        => 'max',
+		'maxlength_message'  => 'maxlength',
+		'char_count_text'    => 'char_count',
+		'char_count_empty_text' => 'char_count_empty',
 		'number_message'     => 'number',
 		'email_message'      => 'email',
 		'url_message'        => 'url',
@@ -687,7 +698,37 @@ function bl_forms_sanitize_field($field): ?array
 	}
 
 	if ($type === 'divider') {
-		unset($out['name'], $out['label'], $out['name_manual'], $out['hide_label']);
+		$presets = ['xs', 's', 'm', 'l', 'xl', 'custom'];
+		$raw = sanitize_key((string) ($field['margin'] ?? 'm'));
+		$legacy = trim((string) ($field['margin'] ?? ''));
+		if ($raw === '' || !in_array($raw, $presets, true)) {
+			if ($legacy !== '' && preg_match('/^(-?\d+(?:\.\d+)?)(px|rem|em|%|vh|vw|vmin|vmax|ch|ex)$/i', $legacy)) {
+				$out['margin'] = 'custom';
+				$out['margin_custom'] = bl_forms_sanitize_css_length($legacy, '24px');
+			} else {
+				$out['margin'] = 'm';
+				unset($out['margin_custom']);
+			}
+		} elseif ($raw === 'custom') {
+			$custom = (string) ($field['margin_custom'] ?? '');
+			if ($custom === '' && $legacy !== '' && $legacy !== 'custom') {
+				$custom = $legacy;
+			}
+			$out['margin'] = 'custom';
+			$out['margin_custom'] = bl_forms_sanitize_css_length($custom, '24px');
+		} else {
+			$out['margin'] = $raw;
+			unset($out['margin_custom']);
+		}
+		unset(
+			$out['name'],
+			$out['label'],
+			$out['name_manual'],
+			$out['hide_label'],
+			$out['placeholder'],
+			$out['width'],
+			$out['width_custom']
+		);
 
 		return $out;
 	}
@@ -729,7 +770,15 @@ function bl_forms_sanitize_field($field): ?array
 			$out['height'] = $raw;
 			unset($out['height_custom']);
 		}
-		unset($out['name'], $out['label'], $out['name_manual'], $out['hide_label'], $out['placeholder']);
+		unset(
+			$out['name'],
+			$out['label'],
+			$out['name_manual'],
+			$out['hide_label'],
+			$out['placeholder'],
+			$out['width'],
+			$out['width_custom']
+		);
 
 		return $out;
 	}
@@ -807,6 +856,22 @@ function bl_forms_sanitize_field($field): ?array
 		);
 	} else {
 		$out = bl_forms_sanitize_temporal_bounds($out, $field);
+	}
+
+	if (in_array($type, ['text', 'textarea'], true)) {
+		$max_length = bl_forms_field_max_length([
+			'type' => $type,
+			'max_length' => $field['max_length'] ?? '',
+		]);
+		if ($max_length > 0) {
+			$out['max_length'] = $max_length;
+			$out['show_char_count'] = !empty($field['show_char_count']);
+		} else {
+			unset($out['max_length'], $out['show_char_count']);
+		}
+		unset($out['char_count_text']);
+	} else {
+		unset($out['max_length'], $out['show_char_count'], $out['char_count_text']);
 	}
 
 	if (in_array($type, ['date', 'time', 'datetime'], true)) {

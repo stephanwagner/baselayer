@@ -620,6 +620,15 @@ p.bl-forms-builder__palette-empty {
   color: #1d2327;
 }
 
+.bl-forms-builder__field-required-dot {
+  flex: 0 0 auto;
+  width: 5px;
+  height: 5px;
+  margin-left: 1px;
+  border-radius: 50%;
+  background: #{$color-error};
+}
+
 .bl-forms-builder__width-badge {
   flex: 0 0 auto;
   padding: 3px 8px;
@@ -974,6 +983,18 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
   }
 }
 
+.bl-forms-builder__max-length {
+  margin: 0 0 10px;
+
+  > p {
+    margin: 0 0 10px;
+  }
+
+  .bl-forms-builder__switch-setting {
+    margin-bottom: 0;
+  }
+}
+
 .bl-forms-builder__temporal-extras {
   margin-top: 8px;
 
@@ -1237,6 +1258,7 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
 
 .bl-forms-builder__width,
 .bl-forms-builder__height,
+.bl-forms-builder__margin,
 .bl-forms-builder__heading-level,
 .bl-forms-builder__layout {
   margin: 0 0 12px;
@@ -1350,7 +1372,8 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
 }
 
 .bl-forms-builder__width-custom,
-.bl-forms-builder__height-custom {
+.bl-forms-builder__height-custom,
+.bl-forms-builder__margin-custom {
   margin-top: 8px;
   max-width: 280px;
 }

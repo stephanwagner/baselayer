@@ -26,6 +26,12 @@ function bl_forms_field_error_message(string $code, array $field = [], array $se
 				bl_forms_resolve_message($settings, 'max_message'),
 				$value
 			);
+		case 'maxlength':
+			$value = $bound !== '' ? $bound : (string) (bl_forms_field_max_length($field) ?: '');
+			return sprintf(
+				bl_forms_resolve_message($settings, 'maxlength_message'),
+				$value
+			);
 		case 'number':
 			return bl_forms_resolve_message($settings, 'number_message');
 		case 'email':
@@ -442,6 +448,14 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 		if ($required && $value === '') {
 			$invalid[$name] = bl_forms_field_error_message('required', $field, $settings);
 			continue;
+		}
+
+		if (in_array($type, ['text', 'textarea'], true) && $value !== '') {
+			$max_length = bl_forms_field_max_length($field);
+			if ($max_length > 0 && bl_forms_string_length($value) > $max_length) {
+				$invalid[$name] = bl_forms_field_error_message('maxlength', $field, $settings, (string) $max_length);
+				continue;
+			}
 		}
 
 		if ($type === 'email' && $value !== '' && !is_email($value)) {

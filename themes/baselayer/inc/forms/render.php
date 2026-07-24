@@ -73,11 +73,11 @@ function bl_forms_render(int $form_id, array $args = []): string
 				<input type="text" name="<?= esc_attr($hp_name) ?>" id="<?= esc_attr($uid) ?>-hp" value="" tabindex="-1" autocomplete="off">
 			</div>
 			<div class="bl-form__fields">
-				<?= bl_forms_render_fields($config['fields'], $uid) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+				<?= bl_forms_render_fields($config['fields'], $uid, $settings) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			</div>
 			<div class="bl-form__actions">
 				<div class="bl-form__message" data-bl-form-message hidden role="status" aria-live="polite"></div>
-				<button type="submit" class="bl-form__submit" data-bl-form-submit>
+				<button type="submit" class="button" data-bl-form-submit>
 					<span class="bl-form__submit-label"><?= esc_html($submit_label) ?></span>
 					<span class="bl-form__spinner" data-bl-form-spinner hidden aria-hidden="true"></span>
 				</button>
@@ -285,25 +285,75 @@ function bl_forms_field_description_html(array $field, string $input_id): string
 }
 
 /**
- * aria-describedby when a description is present.
+ * aria-describedby when description and/or character counter are present.
  *
  * @param array<string, mixed> $field
  */
 function bl_forms_field_describedby_attr(array $field, string $input_id): string
 {
-	if (trim((string) ($field['description'] ?? '')) === '') {
+	$ids = [];
+	if (trim((string) ($field['description'] ?? '')) !== '') {
+		$ids[] = $input_id . '-desc';
+	}
+	if (bl_forms_field_shows_char_count($field)) {
+		$ids[] = $input_id . '-count';
+	}
+	if ($ids === []) {
 		return '';
 	}
 
-	return ' aria-describedby="' . esc_attr($input_id) . '-desc"';
+	return ' aria-describedby="' . esc_attr(implode(' ', $ids)) . '"';
+}
+
+/**
+ * maxlength HTML attribute when configured.
+ *
+ * @param array<string, mixed> $field
+ */
+function bl_forms_field_maxlength_attr(array $field): string
+{
+	$max_length = bl_forms_field_max_length($field);
+	if ($max_length < 1) {
+		return '';
+	}
+
+	return ' maxlength="' . esc_attr((string) $max_length) . '"';
+}
+
+/**
+ * Live character counter markup (empty when disabled).
+ *
+ * @param array<string, mixed> $field
+ * @param array<string, mixed> $settings
+ */
+function bl_forms_field_char_count_html(array $field, string $input_id, array $settings = []): string
+{
+	if (!bl_forms_field_shows_char_count($field)) {
+		return '';
+	}
+
+	$max = bl_forms_field_max_length($field);
+	$count = bl_forms_string_length((string) ($field['default_value'] ?? ''));
+	$remaining = max(0, $max - $count);
+	$template = bl_forms_resolve_char_count_text($settings);
+	$empty = bl_forms_resolve_char_count_empty_text($settings);
+	$text = bl_forms_format_char_count_text($template, $remaining, $max, $count, $settings);
+
+	return '<p class="bl-form__char-count" id="' . esc_attr($input_id) . '-count"'
+		. ' data-bl-form-char-count'
+		. ' data-bl-form-char-count-max="' . esc_attr((string) $max) . '"'
+		. ' data-bl-form-char-count-template="' . esc_attr($template) . '"'
+		. ' data-bl-form-char-count-empty="' . esc_attr($empty) . '"'
+		. '>' . esc_html($text) . '</p>';
 }
 
 /**
  * Render root fields, wrapping consecutive columns in a row.
  *
  * @param list<array<string, mixed>> $fields
+ * @param array<string, mixed>       $settings
  */
-function bl_forms_render_fields(array $fields, string $uid): string
+function bl_forms_render_fields(array $fields, string $uid, array $settings = []): string
 {
 	$html = '';
 	$count = count($fields);
@@ -324,7 +374,7 @@ function bl_forms_render_fields(array $fields, string $uid): string
 			}
 			$inner = '';
 			foreach ($run as $column) {
-				$inner .= bl_forms_render_field($column, $uid);
+				$inner .= bl_forms_render_field($column, $uid, $settings);
 			}
 			if ($inner !== '') {
 				$html .= '<div class="bl-form__group">' . $inner . '</div>';
@@ -332,7 +382,7 @@ function bl_forms_render_fields(array $fields, string $uid): string
 			continue;
 		}
 
-		$html .= bl_forms_render_field($field, $uid);
+		$html .= bl_forms_render_field($field, $uid, $settings);
 		$i++;
 	}
 
@@ -343,8 +393,9 @@ function bl_forms_render_fields(array $fields, string $uid): string
  * Render one field.
  *
  * @param array<string, mixed> $field
+ * @param array<string, mixed> $settings
  */
-function bl_forms_render_field(array $field, string $uid): string
+function bl_forms_render_field(array $field, string $uid, array $settings = []): string
 {
 	$type = (string) ($field['type'] ?? 'text');
 	$id = (string) ($field['id'] ?? '');
@@ -357,7 +408,7 @@ function bl_forms_render_field(array $field, string $uid): string
 			if (!is_array($child)) {
 				continue;
 			}
-			$inner .= bl_forms_render_field($child, $uid);
+			$inner .= bl_forms_render_field($child, $uid, $settings);
 		}
 		$is_auto = (($field['width'] ?? '') === 'auto');
 		$classes = 'bl-form__column' . ($is_auto ? ' bl-form__column--auto' : '');
@@ -381,7 +432,7 @@ function bl_forms_render_field(array $field, string $uid): string
 			if (!is_array($child)) {
 				continue;
 			}
-			$inner .= bl_forms_render_field($child, $uid);
+			$inner .= bl_forms_render_field($child, $uid, $settings);
 		}
 		$label = trim((string) ($field['label'] ?? ''));
 		$classes = 'bl-form__section';
@@ -399,14 +450,46 @@ function bl_forms_render_field(array $field, string $uid): string
 	}
 
 	if ($type === 'divider') {
-		return '<div ' . bl_forms_field_wrap_attrs($field, 'bl-form__divider-wrap') . '><hr class="bl-form__divider"></div>';
+		$margin = sanitize_key((string) ($field['margin'] ?? 'm'));
+		$presets = ['xs', 's', 'm', 'l', 'xl'];
+		$classes = 'bl-form__divider-wrap';
+		$style = '';
+		$extra = bl_forms_sanitize_css_class((string) ($field['css_class'] ?? ''));
+		if ($extra !== '') {
+			$classes .= ' ' . $extra;
+		}
+
+		if (in_array($margin, $presets, true)) {
+			$classes .= ' bl-form__divider-wrap--' . $margin;
+		} else {
+			$custom = bl_forms_sanitize_css_length((string) ($field['margin_custom'] ?? ''), '24px');
+			if ($custom === '24px' && $margin !== 'custom' && $margin !== '') {
+				$maybe = bl_forms_sanitize_css_length((string) ($field['margin'] ?? ''), '');
+				if ($maybe !== '') {
+					$custom = $maybe;
+				}
+			}
+			$classes .= ' bl-form__divider-wrap--custom';
+			$style = '--bl-form-divider-margin:' . $custom;
+		}
+
+		$attrs = 'class="' . esc_attr($classes) . '"';
+		if ($style !== '') {
+			$attrs .= ' style="' . esc_attr($style) . '"';
+		}
+
+		return '<div ' . $attrs . '><hr class="bl-form__divider"></div>';
 	}
 
 	if ($type === 'spacer') {
 		$height = sanitize_key((string) ($field['height'] ?? 'm'));
 		$presets = ['xs', 's', 'm', 'l', 'xl'];
-		$classes = 'bl-form__field-wrap bl-form__spacer-wrap';
-		$style = bl_forms_field_width_style($field);
+		$classes = 'bl-form__spacer-wrap';
+		$style = '';
+		$extra = bl_forms_sanitize_css_class((string) ($field['css_class'] ?? ''));
+		if ($extra !== '') {
+			$classes .= ' ' . $extra;
+		}
 
 		if (in_array($height, $presets, true)) {
 			$classes .= ' bl-form__spacer-wrap--' . $height;
@@ -420,7 +503,7 @@ function bl_forms_render_field(array $field, string $uid): string
 				}
 			}
 			$classes .= ' bl-form__spacer-wrap--custom';
-			$style .= ';--bl-form-spacer-height:' . $custom;
+			$style = '--bl-form-spacer-height:' . $custom;
 		}
 
 		$attrs = 'class="' . esc_attr($classes) . '"';
@@ -519,7 +602,8 @@ function bl_forms_render_field(array $field, string $uid): string
 		<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--textarea', $name) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<?= bl_forms_field_label_html($field, $input_id, $req_mark) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-			<textarea class="bl-form__control" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" rows="5" placeholder="<?= esc_attr($placeholder) ?>"<?= $control_attrs ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?= esc_textarea($default_value) ?></textarea>
+			<textarea class="bl-form__control" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" rows="5" placeholder="<?= esc_attr($placeholder) ?>"<?= $control_attrs ?><?= bl_forms_field_maxlength_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?= esc_textarea($default_value) ?></textarea>
+			<?= bl_forms_field_char_count_html($field, $input_id, $settings) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		</div>
 		<?php
 		return (string) ob_get_clean();
@@ -753,7 +837,8 @@ function bl_forms_render_field(array $field, string $uid): string
 	<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--' . sanitize_html_class($type), $name) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 		<?= bl_forms_field_label_html($field, $input_id, $req_mark) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-		<input class="bl-form__control" type="<?= esc_attr($input_type) ?>" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" value="<?= esc_attr($default_value) ?>"<?= $placeholder !== '' ? ' placeholder="' . esc_attr($placeholder) . '"' : '' ?><?= $control_attrs ?><?= $number_attrs // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<input class="bl-form__control" type="<?= esc_attr($input_type) ?>" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" value="<?= esc_attr($default_value) ?>"<?= $placeholder !== '' ? ' placeholder="' . esc_attr($placeholder) . '"' : '' ?><?= $control_attrs ?><?= $number_attrs // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_maxlength_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<?= bl_forms_field_char_count_html($field, $input_id, $settings) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 	</div>
 	<?php
 
