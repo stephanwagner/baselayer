@@ -1,5 +1,5 @@
 (() => {
-  // packages/baselayer-forms/src/js/block.js
+  // themes/baselayer/packages/baselayer-forms/src/js/block.js
   (function(wp) {
     if (!wp || !wp.blocks || !wp.element || !wp.blockEditor || !wp.components) {
       return;

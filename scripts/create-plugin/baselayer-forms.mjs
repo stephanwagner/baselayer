@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '../..');
-const pkg = path.join(root, 'packages/baselayer-forms');
+const pkg = path.join(root, 'themes/baselayer/packages/baselayer-forms');
 const out = path.join(root, 'plugins/baselayer-forms');
 
 function run(bin, args) {

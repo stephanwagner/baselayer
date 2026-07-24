@@ -1,5 +1,5 @@
 (() => {
-  // packages/baselayer-forms/src/js/admin/dom.js
+  // themes/baselayer/packages/baselayer-forms/src/js/admin/dom.js
   var formsDragDepth = 0;
   function formsDragStart() {
     formsDragDepth += 1;
@@ -2500,7 +2500,7 @@
   Sortable.mount(Remove, Revert);
   var sortable_esm_default = Sortable;
 
-  // packages/baselayer-forms/src/js/admin/palette.js
+  // themes/baselayer/packages/baselayer-forms/src/js/admin/palette.js
   function paletteIcon(type) {
     const icons = window.blFormsAdmin && window.blFormsAdmin.icons || {};
     const markup = icons[type] || "";
@@ -2724,7 +2724,7 @@
     return wrap;
   }
 
-  // packages/baselayer-forms/src/js/admin/layout.js
+  // themes/baselayer/packages/baselayer-forms/src/js/admin/layout.js
   var NESTED_BLOCKED = ["column", "section", "hidden", "honeypot", "captcha"];
   var columnFieldByEl = /* @__PURE__ */ new WeakMap();
   var sectionFieldByEl = /* @__PURE__ */ new WeakMap();
@@ -3111,7 +3111,7 @@
     return null;
   }
 
-  // packages/baselayer-forms/src/js/admin/field-card.js
+  // themes/baselayer/packages/baselayer-forms/src/js/admin/field-card.js
   var WIDTH_PRESETS = [
     { value: "100", label: "100%" },
     { value: "75", label: "75%" },
@@ -5585,7 +5585,7 @@
     return row;
   }
 
-  // packages/baselayer-forms/src/js/admin/canvas.js
+  // themes/baselayer/packages/baselayer-forms/src/js/admin/canvas.js
   function expandLegacyGroups(fields) {
     const out = [];
     (fields || []).forEach((field) => {
@@ -5682,7 +5682,7 @@
     };
   }
 
-  // packages/baselayer-forms/src/js/admin/page-picker.js
+  // themes/baselayer/packages/baselayer-forms/src/js/admin/page-picker.js
   function openPagePicker(options = {}) {
     const opts = {
       selectedId: 0,
@@ -5890,7 +5890,7 @@
   }
   window.baselayerOpenPagePicker = openPagePicker;
 
-  // packages/baselayer-forms/src/js/admin/panels.js
+  // themes/baselayer/packages/baselayer-forms/src/js/admin/panels.js
   function fieldRow(label, control, help = "") {
     const children = [
       el("label", {}, [el("strong", { text: label })]),
@@ -6648,7 +6648,7 @@
     };
   }
 
-  // packages/baselayer-forms/src/js/admin/app.js
+  // themes/baselayer/packages/baselayer-forms/src/js/admin/app.js
   function mountApp(root, initial) {
     root.replaceChildren();
     root.classList.add("bl-forms-builder", "bl-forms-builder--tabs");
@@ -6729,7 +6729,7 @@
     syncAll();
   }
 
-  // packages/baselayer-forms/src/js/admin.js
+  // themes/baselayer/packages/baselayer-forms/src/js/admin.js
   document.addEventListener("DOMContentLoaded", () => {
     const root = document.querySelector("[data-bl-forms-builder]");
     const input = document.getElementById("bl-forms-config-json");

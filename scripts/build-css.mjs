@@ -8,7 +8,7 @@ const { themeDir } = require('./config.cjs');
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
-const formsPkg = 'packages/baselayer-forms';
+const formsPkg = 'themes/baselayer/packages/baselayer-forms';
 const sassBin = path.join(root, 'node_modules/.bin/sass');
 const chokidarBin = path.join(root, 'node_modules/.bin/chokidar');
 const sassLoadPathArgs = ['--load-path', path.join(root, 'node_modules')];

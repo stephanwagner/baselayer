@@ -50,31 +50,34 @@ function bl_forms_base_url(): string
 		return $url;
 	}
 
-	$path = wp_normalize_path(BL_FORMS_PATH);
-	$plugin_dir = wp_normalize_path(WP_PLUGIN_DIR);
-	if (strpos($path, trailingslashit($plugin_dir)) === 0) {
+	$path = wp_normalize_path(trailingslashit(realpath(BL_FORMS_PATH) ?: BL_FORMS_PATH));
+	$plugin_dir = wp_normalize_path(trailingslashit(realpath(WP_PLUGIN_DIR) ?: WP_PLUGIN_DIR));
+
+	// Installed as a real plugin under wp-content/plugins.
+	if (strpos($path, $plugin_dir) === 0) {
 		$url = trailingslashit(plugins_url('', BL_FORMS_FILE));
 		return $url;
 	}
 
-	$abspath = wp_normalize_path(ABSPATH);
+	// Bundled under the active parent theme (…/packages/baselayer-forms/).
+	$theme_dir = get_template_directory();
+	$theme = wp_normalize_path(trailingslashit(realpath($theme_dir) ?: $theme_dir));
+	if (strpos($path, $theme) === 0) {
+		$rel = ltrim(substr($path, strlen($theme)), '/');
+		$url = trailingslashit(trailingslashit(get_template_directory_uri()) . $rel);
+		return $url;
+	}
+
+	// Last resort: relative to ABSPATH when the package is web-served from there.
+	$abspath = wp_normalize_path(trailingslashit(realpath(ABSPATH) ?: ABSPATH));
 	if (strpos($path, $abspath) === 0) {
 		$rel = ltrim(substr($path, strlen($abspath)), '/');
 		$url = trailingslashit(site_url($rel));
 		return $url;
 	}
 
-	// Monorepo: packages/ next to themes/ (theme at …/themes/baselayer).
-	$theme = wp_normalize_path(get_template_directory());
-	$root = dirname(dirname($theme));
-	$pkg = wp_normalize_path($root . '/packages/baselayer-forms');
-	if ($path === trailingslashit($pkg) || strpos($path, trailingslashit($pkg)) === 0) {
-		$theme_uri = get_template_directory_uri();
-		$url = trailingslashit(dirname(dirname($theme_uri)) . '/packages/baselayer-forms');
-		return $url;
-	}
-
-	$url = trailingslashit(plugins_url('', BL_FORMS_FILE));
+	// Do not call plugins_url() for non-plugin paths — it produces invalid URLs.
+	$url = trailingslashit(get_template_directory_uri() . '/packages/baselayer-forms');
 	return $url;
 }
 

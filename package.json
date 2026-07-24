@@ -16,7 +16,7 @@
     "build:css": "node scripts/build-css.mjs",
     "create-plugin:baselayer-forms": "node scripts/create-plugin/baselayer-forms.mjs",
     "compile:po": "bash scripts/compile_po.sh",
-    "make-pot:baselayer-forms": "wp i18n make-pot packages/baselayer-forms packages/baselayer-forms/languages/baselayer-forms.pot --domain=baselayer-forms",
+    "make-pot:baselayer-forms": "wp i18n make-pot themes/baselayer/packages/baselayer-forms themes/baselayer/packages/baselayer-forms/languages/baselayer-forms.pot --domain=baselayer-forms",
     "build:language-flags": "node scripts/build-language-flags.cjs",
     "format": "prettier \"theme/baselayer/src\" --write"
   },

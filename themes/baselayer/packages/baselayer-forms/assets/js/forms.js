@@ -1,5 +1,5 @@
 (() => {
-  // packages/baselayer-forms/src/js/front.js
+  // themes/baselayer/packages/baselayer-forms/src/js/front.js
   function charLength(value) {
     return Array.from(String(value || "")).length;
   }

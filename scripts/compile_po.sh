@@ -4,7 +4,7 @@
 find . -name ".DS_Store" -exec rm -f {} \;
 
 THEME_LANGUAGE_DIR="./themes/baselayer/languages"
-FORMS_LANGUAGE_DIR="./packages/baselayer-forms/languages"
+FORMS_LANGUAGE_DIR="./themes/baselayer/packages/baselayer-forms/languages"
 
 # Replicate a de_DE .po to all German variants (same translations, new header).
 # $1 = path to the de_DE .po, $2 = file name prefix (e.g. baselayer, baselayer-icons, baselayer-forms)

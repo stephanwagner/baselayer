@@ -5,7 +5,7 @@ import path from 'node:path';
 const require = createRequire(import.meta.url);
 const { themeDir } = require('./config.cjs');
 
-const formsPkg = 'packages/baselayer-forms';
+const formsPkg = 'themes/baselayer/packages/baselayer-forms';
 
 const themeBundles = [
   { input: `${themeDir}/src/js/main/main.js`, name: 'baselayer', outDir: `${themeDir}/assets/js` },
