@@ -480,6 +480,21 @@ function postFormData(url, body, { onUploadProgress, onUploadComplete } = {}) {
   });
 }
 
+function initClassicFileLimits(root) {
+  root.querySelectorAll('input.bl-form__control--file[data-bl-form-file-input]').forEach((input) => {
+    const maxFiles = Math.max(
+      1,
+      Number(input.getAttribute('data-bl-form-upload-max')) || (input.multiple ? 10 : 1)
+    );
+    input.addEventListener('change', () => {
+      const files = Array.from(input.files || []);
+      if (files.length > maxFiles) {
+        assignFiles(input, files, maxFiles);
+      }
+    });
+  });
+}
+
 function initForm(root) {
   const form = root.querySelector('[data-bl-form-el]');
   const message = root.querySelector('[data-bl-form-message]');
@@ -489,6 +504,7 @@ function initForm(root) {
   if (!form || !submit) return;
 
   initFileUploads(root);
+  initClassicFileLimits(root);
   initCharCounters(root);
   const progress = createProgressController(root);
 

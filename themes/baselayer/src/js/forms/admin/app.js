@@ -54,6 +54,7 @@ export function mountApp(root, initial) {
     { id: 'fields', label: t('tabFields', 'Fields'), panel: fieldsPanel },
     { id: 'notifications', label: t('tabNotifications', 'Notifications'), panel: panels.notifications },
     { id: 'settings', label: t('tabSettings', 'Settings'), panel: panels.settings },
+    { id: 'validation', label: t('tabValidation', 'Validation'), panel: panels.validation },
     { id: 'security', label: t('tabSecurity', 'Security'), panel: panels.security },
   ];
 
@@ -84,6 +85,7 @@ export function mountApp(root, initial) {
     fieldsPanel,
     panels.notifications,
     panels.settings,
+    panels.validation,
     panels.security,
   ]);
 

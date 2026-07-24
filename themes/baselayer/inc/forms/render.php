@@ -26,6 +26,9 @@ function bl_forms_render(int $form_id, array $args = []): string
 
 	$has_uploads = false;
 	foreach (bl_forms_iter_fields($config['fields']) as $field) {
+		if (!bl_forms_field_is_active($field)) {
+			continue;
+		}
 		if (in_array((string) ($field['type'] ?? ''), ['file', 'image'], true)) {
 			$has_uploads = true;
 			break;
@@ -578,6 +581,10 @@ function bl_forms_render_fields(array $fields, string $uid, array $settings = []
  */
 function bl_forms_render_field(array $field, string $uid, array $settings = []): string
 {
+	if (!bl_forms_field_is_active($field)) {
+		return '';
+	}
+
 	$type = (string) ($field['type'] ?? 'text');
 	$id = (string) ($field['id'] ?? '');
 	$input_id = $uid . '-' . $id;
@@ -957,11 +964,20 @@ function bl_forms_render_field(array $field, string $uid, array $settings = []):
 		if ($accept === '' && $type === 'image') {
 			$accept = 'image/*';
 		}
-		$preview = !array_key_exists('preview', $field) || !empty($field['preview']);
+		$upload_style = sanitize_key((string) ($field['upload_style'] ?? 'modern'));
+		if ($upload_style !== 'classic') {
+			$upload_style = 'modern';
+		}
+		$preview = $upload_style === 'modern'
+			&& (!array_key_exists('preview', $field) || !empty($field['preview']));
 		$max_files = bl_forms_field_max_files($field);
-		$button_text = bl_forms_resolve_message($settings, 'upload_button_text');
-		$empty_text = bl_forms_resolve_message($settings, 'upload_empty_text');
-		$drop_text = bl_forms_resolve_message($settings, 'upload_drop_text');
+		$fallbacks = bl_forms_message_fallbacks();
+		$button_text = trim((string) ($field['button_text'] ?? ''));
+		if ($button_text === '') {
+			$button_text = (string) ($fallbacks['upload_button'] ?? __('Choose file', 'baselayer'));
+		}
+		$empty_text = (string) ($fallbacks['upload_empty'] ?? __('No file chosen', 'baselayer'));
+		$drop_text = (string) ($fallbacks['upload_drop'] ?? __('or drag and drop here', 'baselayer'));
 		$remove_text = __('Remove', 'baselayer');
 		$ext_hint = $extensions !== []
 			? strtoupper(implode(', ', $extensions))
@@ -970,16 +986,9 @@ function bl_forms_render_field(array $field, string $uid, array $settings = []):
 		<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--' . $type, $name) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<?= bl_forms_field_label_html($field, $input_id, $req_mark) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-			<div
-				class="bl-form__upload<?= $preview ? ' bl-form__upload--preview' : '' ?>"
-				data-bl-form-upload
-				data-bl-form-upload-kind="<?= esc_attr($type) ?>"
-				data-bl-form-upload-preview="<?= $preview ? '1' : '0' ?>"
-				data-bl-form-upload-max="<?= esc_attr((string) $max_files) ?>"
-				data-bl-form-upload-remove="<?= esc_attr($remove_text) ?>"
-			>
+			<?php if ($upload_style === 'classic') : ?>
 				<input
-					class="bl-form__upload-input"
+					class="bl-form__control bl-form__control--file"
 					type="file"
 					id="<?= esc_attr($input_id) ?>"
 					name="<?= esc_attr($file_name) ?>"
@@ -989,26 +998,49 @@ function bl_forms_render_field(array $field, string $uid, array $settings = []):
 					<?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 					<?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 					data-bl-form-file-input
-					hidden
+					data-bl-form-upload-max="<?= esc_attr((string) $max_files) ?>"
 				>
-				<div class="bl-form__upload-shell" data-bl-form-upload-shell tabindex="0" role="button" aria-controls="<?= esc_attr($input_id) ?>">
-					<div class="bl-form__upload-actions">
-						<span class="bl-form__upload-btn" aria-hidden="true"><?= esc_html($button_text) ?></span>
-						<span class="bl-form__upload-meta">
-							<span class="bl-form__upload-empty" data-bl-form-upload-empty><?= esc_html($empty_text) ?></span>
-							<?php if ($drop_text !== '') : ?>
-								<span class="bl-form__upload-drop"><?= esc_html($drop_text) ?></span>
-							<?php endif; ?>
-							<?php if ($ext_hint !== '') : ?>
-								<span class="bl-form__upload-types"><?= esc_html($ext_hint) ?></span>
-							<?php endif; ?>
-						</span>
+			<?php else : ?>
+				<div
+					class="bl-form__upload<?= $preview ? ' bl-form__upload--preview' : '' ?>"
+					data-bl-form-upload
+					data-bl-form-upload-kind="<?= esc_attr($type) ?>"
+					data-bl-form-upload-preview="<?= $preview ? '1' : '0' ?>"
+					data-bl-form-upload-max="<?= esc_attr((string) $max_files) ?>"
+					data-bl-form-upload-remove="<?= esc_attr($remove_text) ?>"
+				>
+					<input
+						class="bl-form__upload-input"
+						type="file"
+						id="<?= esc_attr($input_id) ?>"
+						name="<?= esc_attr($file_name) ?>"
+						<?= $accept !== '' ? 'accept="' . esc_attr($accept) . '"' : '' ?>
+						<?= $multiple ? ' multiple' : '' ?>
+						<?= $choice_attrs ?>
+						<?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						data-bl-form-file-input
+						hidden
+					>
+					<div class="bl-form__upload-shell" data-bl-form-upload-shell tabindex="0" role="button" aria-controls="<?= esc_attr($input_id) ?>">
+						<div class="bl-form__upload-actions">
+							<span class="bl-form__upload-btn" aria-hidden="true"><?= esc_html($button_text) ?></span>
+							<span class="bl-form__upload-meta">
+								<span class="bl-form__upload-empty" data-bl-form-upload-empty><?= esc_html($empty_text) ?></span>
+								<?php if ($drop_text !== '') : ?>
+									<span class="bl-form__upload-drop"><?= esc_html($drop_text) ?></span>
+								<?php endif; ?>
+								<?php if ($ext_hint !== '') : ?>
+									<span class="bl-form__upload-types"><?= esc_html($ext_hint) ?></span>
+								<?php endif; ?>
+							</span>
+						</div>
 					</div>
+					<?php if ($preview) : ?>
+						<div class="bl-form__upload-preview" data-bl-form-upload-preview-list hidden></div>
+					<?php endif; ?>
 				</div>
-				<?php if ($preview) : ?>
-					<div class="bl-form__upload-preview" data-bl-form-upload-preview-list hidden></div>
-				<?php endif; ?>
-			</div>
+			<?php endif; ?>
 		</div>
 		<?php
 		return (string) ob_get_clean();

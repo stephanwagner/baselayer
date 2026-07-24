@@ -80,6 +80,30 @@ function bl_forms_field_error_message(string $code, array $field = [], array $se
 			);
 		case 'file':
 			return bl_forms_resolve_message($settings, 'file_message');
+		case 'file_type':
+			$template = bl_forms_resolve_message($settings, 'file_type_message');
+			if ($bound !== '' && strpos($template, '%s') !== false) {
+				return sprintf($template, $bound);
+			}
+			if ($template !== '' && strpos($template, '%s') === false) {
+				return $template;
+			}
+			if ($bound !== '') {
+				return sprintf(bl_forms_message_fallbacks()['file_type'], $bound);
+			}
+			return __('This file type is not allowed.', 'baselayer');
+		case 'file_size':
+			$value = $bound !== '' ? $bound : (string) size_format(bl_forms_upload_max_bytes($settings));
+			return sprintf(
+				bl_forms_resolve_message($settings, 'file_size_message'),
+				$value
+			);
+		case 'file_max':
+			$value = $bound !== '' ? $bound : (string) bl_forms_field_max_files($field);
+			return sprintf(
+				bl_forms_resolve_message($settings, 'file_max_message'),
+				$value
+			);
 		case 'option':
 			return bl_forms_resolve_message($settings, 'option_message');
 		default:
@@ -369,6 +393,9 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 		if (in_array($type, bl_forms_content_field_types(), true) || $type === 'honeypot') {
 			continue;
 		}
+		if (!bl_forms_field_is_active($field)) {
+			continue;
+		}
 
 		$name = (string) ($field['name'] ?? '');
 		if ($name === '') {
@@ -405,15 +432,16 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 		}
 
 		if (in_array($type, ['file', 'image'], true)) {
-			[$stored, $ok] = bl_forms_process_field_uploads(
+			[$stored, $error_code, $error_bound] = bl_forms_process_field_uploads(
 				$name,
 				$files,
 				$field,
-				$multiple
+				$multiple,
+				$settings
 			);
 			$values[$name] = $stored;
-			if (!$ok) {
-				$invalid[$name] = bl_forms_field_error_message('file', $field, $settings);
+			if ($error_code !== '') {
+				$invalid[$name] = bl_forms_field_error_message($error_code, $field, $settings, $error_bound);
 			} elseif ($required && $stored === []) {
 				$invalid[$name] = bl_forms_field_error_message('required', $field, $settings);
 			}
@@ -638,13 +666,15 @@ function bl_forms_filter_allowed_option_values(array $field, array $values): arr
  *
  * @param array<string, mixed> $files Raw $_FILES.
  * @param array<string, mixed> $field Field config.
- * @return array{0: list<array{id:int,url:string,name:string,mime:string}>, 1: bool}
+ * @param array<string, mixed> $settings Form settings.
+ * @return array{0: list<array{id:int,url:string,name:string,mime:string}>, 1: string, 2: string}
+ *         [stored, error_code, error_bound]. Empty error_code means success.
  */
-function bl_forms_process_field_uploads(string $name, array $files, array $field, bool $multiple): array
+function bl_forms_process_field_uploads(string $name, array $files, array $field, bool $multiple, array $settings = []): array
 {
 	$bucket = bl_forms_extract_uploaded_files($name, $files);
 	if ($bucket === []) {
-		return [[], true];
+		return [[], '', ''];
 	}
 
 	if (!$multiple) {
@@ -659,36 +689,57 @@ function bl_forms_process_field_uploads(string $name, array $files, array $field
 			$present++;
 		}
 		if ($present > $max_files) {
-			return [[], false];
+			return [[], 'file_max', (string) $max_files];
 		}
 	}
 
 	$images_only = ((string) ($field['type'] ?? '')) === 'image';
 	$extensions = bl_forms_field_extensions($field);
+	$max_bytes = bl_forms_upload_max_bytes($settings);
+	$ext_label = $extensions !== []
+		? strtoupper(implode(', ', $extensions))
+		: '';
+	$size_label = $max_bytes > 0 ? (string) size_format($max_bytes) : '';
 	$stored = [];
-	$ok = true;
+	$error_code = '';
+	$error_bound = '';
+
 	foreach ($bucket as $file) {
 		if (!is_array($file) || (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
 			continue;
 		}
 		if ((int) ($file['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK) {
-			$ok = false;
+			if ($error_code === '') {
+				$error_code = 'file';
+			}
 			continue;
 		}
 		if (!bl_forms_extension_allowed((string) ($file['name'] ?? ''), $extensions)) {
-			$ok = false;
+			if ($error_code === '') {
+				$error_code = 'file_type';
+				$error_bound = $ext_label;
+			}
+			continue;
+		}
+		if ($max_bytes > 0 && (int) ($file['size'] ?? 0) > $max_bytes) {
+			if ($error_code === '') {
+				$error_code = 'file_size';
+				$error_bound = $size_label;
+			}
 			continue;
 		}
 
 		$result = bl_forms_store_uploaded_file($file, $images_only, $extensions);
 		if (is_wp_error($result)) {
-			$ok = false;
+			if ($error_code === '') {
+				$error_code = 'file';
+			}
 			continue;
 		}
 		$stored[] = $result;
 	}
 
-	return [$stored, $ok];
+	return [$stored, $error_code, $error_bound];
 }
 
 /**

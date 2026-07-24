@@ -12,9 +12,19 @@ function fieldRow(label, control, help = '') {
   return el('p', { className: 'bl-forms-builder__setting' }, children);
 }
 
+function errorSection(title, children) {
+  return el('div', { className: 'bl-forms-builder__field-errors' }, [
+    el('h3', {
+      className: 'bl-forms-builder__section-title',
+      text: title,
+    }),
+    el('div', { className: 'bl-forms-builder__field-errors-box' }, children),
+  ]);
+}
+
 function emailFieldsFromList(fields) {
   return flattenFields(fields || []).filter(
-    (field) => field && field.type === 'email' && field.name
+    (field) => field && field.type === 'email' && field.name && field.active !== false
   );
 }
 
@@ -393,20 +403,63 @@ export function createPanels(settings, builderRoot, onChange) {
   const datetimeMinMsg = bindErrorMsg('datetime_min_message', 'datetime_min');
   const datetimeMaxMsg = bindErrorMsg('datetime_max_message', 'datetime_max');
   const fileMsg = bindErrorMsg('file_message', 'file');
+  const fileTypeMsg = bindErrorMsg('file_type_message', 'file_type');
+  const fileSizeMsg = bindErrorMsg('file_size_message', 'file_size');
+  const fileMaxMsg = bindErrorMsg('file_max_message', 'file_max');
   const optionMsg = bindErrorMsg('option_message', 'option');
-  const uploadButton = bindErrorMsg('upload_button_text', 'upload_button');
-  const uploadEmpty = bindErrorMsg('upload_empty_text', 'upload_empty');
-  const uploadDrop = bindErrorMsg('upload_drop_text', 'upload_drop');
 
   const rangeHelp = () =>
     el('span', {
       className: 'description bl-forms-builder__field-errors-help',
-      text: t('minMaxMessageHelp', 'Use %s where the limit should appear.'),
+      text: t('minMaxMessageHelp', 'The placeholder %s is replaced by the limit.'),
     });
-  const errorGroupTitle = (label) =>
-    el('p', { className: 'bl-forms-builder__field-errors-group-title', text: label });
 
   const successRow = fieldRow(t('successMessage', 'Success message'), success);
+  const wpMaxUploadLabel =
+    (window.blFormsAdmin && window.blFormsAdmin.wpMaxUploadSize) || '';
+  const uploadMaxSize = el('input', {
+    type: 'number',
+    className: 'small-text bl-forms-builder__security-input',
+    min: '0.1',
+    step: '0.1',
+    value: state.upload_max_size_mb != null && state.upload_max_size_mb !== ''
+      ? String(state.upload_max_size_mb)
+      : '',
+  });
+  uploadMaxSize.addEventListener('input', () => {
+    state.upload_max_size_mb = uploadMaxSize.value.trim();
+    emit();
+  });
+  uploadMaxSize.addEventListener('change', () => {
+    state.upload_max_size_mb = uploadMaxSize.value.trim();
+    emit();
+  });
+  const uploadMaxSizeRow = el('div', { className: 'bl-forms-builder__security-inline' }, [
+    uploadMaxSize,
+    el('span', { text: t('uploadMaxSizeUnit', 'MB') }),
+  ]);
+  const fileSettingsBlock = el('div', { className: 'bl-forms-builder__field-errors' }, [
+    el('h3', {
+      className: 'bl-forms-builder__section-title',
+      text: t('fileSettings', 'File settings'),
+    }),
+    el('div', { className: 'bl-forms-builder__field-errors-box' }, [
+      fieldRow(
+        t('uploadMaxSize', 'Maximum file size'),
+        uploadMaxSizeRow,
+        wpMaxUploadLabel
+          ? t(
+              'uploadMaxSizeHelp',
+              'Leave empty to use the server limit (%s).'
+            ).replace('%s', wpMaxUploadLabel)
+          : t(
+              'uploadMaxSizeHelpEmpty',
+              'Leave empty to use the server limit.'
+            )
+      ),
+    ]),
+  ]);
+
   const afterOptions = el('div', { className: 'bl-forms-builder__after-submit' });
   const afterSelect = el('select', {
     className: 'widefat',
@@ -439,10 +492,17 @@ export function createPanels(settings, builderRoot, onChange) {
     text: t('clearPage', 'Clear'),
     hidden: !state.redirect_page_id,
   });
+  const redirectActions = el('div', { className: 'bl-forms-builder__page-picker-actions' }, [
+    redirectPickBtn,
+    redirectClearBtn,
+  ]);
+  const redirectRow = el('div', { className: 'bl-forms-builder__page-picker-row' }, [
+    redirectSummary,
+    redirectActions,
+  ]);
 
   const syncAfterSubmitUi = () => {
     const isRedirect = state.after_submit === 'redirect';
-    successRow.hidden = isRedirect;
     redirectPanel.hidden = !isRedirect;
     afterSelect.value = state.after_submit === 'redirect' ? 'redirect' : 'message';
 
@@ -462,6 +522,7 @@ export function createPanels(settings, builderRoot, onChange) {
           el('span', {
             className: 'description bl-forms-builder__page-picker-url',
             text: state.redirect_page_url,
+            title: state.redirect_page_url,
           })
         );
       }
@@ -516,20 +577,10 @@ export function createPanels(settings, builderRoot, onChange) {
     emit();
   });
 
-  redirectPanel.append(
-    redirectSummary,
-    el('div', { className: 'bl-forms-builder__page-picker-actions' }, [
-      redirectPickBtn,
-      redirectClearBtn,
-    ])
-  );
+  redirectPanel.append(redirectRow);
 
   afterOptions.append(
-    fieldRow(
-      t('afterSubmit', 'After submission'),
-      afterSelect,
-      t('afterSubmitHelp', 'Choose what visitors see after a successful submission.')
-    ),
+    fieldRow(t('afterSubmit', 'After submission'), afterSelect),
     redirectPanel
   );
 
@@ -551,67 +602,81 @@ export function createPanels(settings, builderRoot, onChange) {
     successRow,
     fieldRow(t('errorMessage', 'Error message'), error),
     fieldRow(t('validationMessage', 'Validation message'), validation),
-    el('div', { className: 'bl-forms-builder__field-errors' }, [
-      el('h3', {
-        className: 'bl-forms-builder__section-title',
-        text: t('fieldErrors', 'Field errors'),
+    fileSettingsBlock
+  );
+
+  // Validation (field errors)
+  const validationPanel = el('div', {
+    className: 'bl-forms-builder__panel',
+    dataset: { blFormsPanel: 'validation' },
+    hidden: true,
+  });
+
+  validationPanel.append(
+    errorSection(t('requiredError', 'Required'), [requiredMsg]),
+    errorSection(t('charCountSection', 'Character count'), [
+      fieldRow(
+        t('charCountText', 'Character count text'),
+        charCountText,
+        t('charCountTextHelp', 'The placeholders %remaining%, %count%, and %max% are replaced by the remaining count, current count, and maximum.')
+      ),
+      fieldRow(t('charCountEmptyText', 'When limit is reached'), charCountEmptyText),
+    ]),
+    errorSection(t('numberError', 'Number'), [
+      fieldRow(t('invalidError', 'Invalid'), numberMsg),
+      fieldRow(t('minError', 'Minimum'), minMsg),
+      fieldRow(t('maxError', 'Maximum'), maxMsg),
+      rangeHelp(),
+    ]),
+    errorSection(t('emailError', 'Email'), [emailMsg]),
+    errorSection(t('urlError', 'URL'), [urlMsg]),
+    errorSection(t('phoneError', 'Phone'), [phoneMsg]),
+    errorSection(t('dateError', 'Date'), [
+      fieldRow(t('invalidError', 'Invalid'), dateMsg),
+      fieldRow(t('minError', 'Minimum'), dateMinMsg),
+      fieldRow(t('maxError', 'Maximum'), dateMaxMsg),
+      rangeHelp(),
+      fieldRow(t('dateBeforeError', 'Before related field'), dateBeforeMsg),
+      fieldRow(t('dateAfterError', 'After related field'), dateAfterMsg),
+      el('span', {
+        className: 'description bl-forms-builder__field-errors-help',
+        text: t(
+          'dateRelationMessageHelp',
+          'The placeholder %s is replaced by the related field label.'
+        ),
       }),
-      el('div', { className: 'bl-forms-builder__field-errors-box' }, [
-        fieldRow(t('requiredError', 'Required'), requiredMsg),
-        el('hr', { className: 'bl-forms-builder__field-errors-sep' }),
-        fieldRow(
-          t('charCountText', 'Character count text'),
-          charCountText,
-          t('charCountTextHelp', 'Use %remaining%, %count%, and %max% as placeholders.')
-        ),
-        fieldRow(
-          t('charCountEmptyText', 'When limit is reached'),
-          charCountEmptyText
-        ),
-        el('hr', { className: 'bl-forms-builder__field-errors-sep' }),
-        errorGroupTitle(t('numberError', 'Number')),
-        fieldRow(t('invalidError', 'Invalid'), numberMsg),
-        fieldRow(t('minError', 'Minimum'), minMsg),
-        fieldRow(t('maxError', 'Maximum'), maxMsg),
-        rangeHelp(),
-        el('hr', { className: 'bl-forms-builder__field-errors-sep' }),
-        fieldRow(t('emailError', 'Email'), emailMsg),
-        fieldRow(t('urlError', 'URL'), urlMsg),
-        fieldRow(t('phoneError', 'Phone'), phoneMsg),
-        el('hr', { className: 'bl-forms-builder__field-errors-sep' }),
-        errorGroupTitle(t('dateError', 'Date')),
-        fieldRow(t('invalidError', 'Invalid'), dateMsg),
-        fieldRow(t('minError', 'Minimum'), dateMinMsg),
-        fieldRow(t('maxError', 'Maximum'), dateMaxMsg),
-        rangeHelp(),
-        fieldRow(t('dateBeforeError', 'Before related field'), dateBeforeMsg),
-        fieldRow(t('dateAfterError', 'After related field'), dateAfterMsg),
-        el('span', {
-          className: 'description bl-forms-builder__field-errors-help',
-          text: t('dateRelationMessageHelp', 'Use %s where the related field label should appear.'),
-        }),
-        el('hr', { className: 'bl-forms-builder__field-errors-sep' }),
-        errorGroupTitle(t('timeError', 'Time')),
-        fieldRow(t('invalidError', 'Invalid'), timeMsg),
-        fieldRow(t('minError', 'Minimum'), timeMinMsg),
-        fieldRow(t('maxError', 'Maximum'), timeMaxMsg),
-        rangeHelp(),
-        el('hr', { className: 'bl-forms-builder__field-errors-sep' }),
-        errorGroupTitle(t('datetimeError', 'Date & time')),
-        fieldRow(t('invalidError', 'Invalid'), datetimeMsg),
-        fieldRow(t('minError', 'Minimum'), datetimeMinMsg),
-        fieldRow(t('maxError', 'Maximum'), datetimeMaxMsg),
-        rangeHelp(),
-        el('hr', { className: 'bl-forms-builder__field-errors-sep' }),
-        errorGroupTitle(t('uploadTexts', 'File upload')),
-        fieldRow(t('uploadButtonText', 'Button label'), uploadButton),
-        fieldRow(t('uploadEmptyText', 'Empty text'), uploadEmpty),
-        fieldRow(t('uploadDropText', 'Drop hint'), uploadDrop),
-        el('hr', { className: 'bl-forms-builder__field-errors-sep' }),
-        fieldRow(t('fileError', 'File'), fileMsg),
-        fieldRow(t('optionError', 'Choice'), optionMsg),
-      ]),
-    ])
+    ]),
+    errorSection(t('timeError', 'Time'), [
+      fieldRow(t('invalidError', 'Invalid'), timeMsg),
+      fieldRow(t('minError', 'Minimum'), timeMinMsg),
+      fieldRow(t('maxError', 'Maximum'), timeMaxMsg),
+      rangeHelp(),
+    ]),
+    errorSection(t('datetimeError', 'Date & time'), [
+      fieldRow(t('invalidError', 'Invalid'), datetimeMsg),
+      fieldRow(t('minError', 'Minimum'), datetimeMinMsg),
+      fieldRow(t('maxError', 'Maximum'), datetimeMaxMsg),
+      rangeHelp(),
+    ]),
+    errorSection(t('fileError', 'File'), [
+      fieldRow(t('invalidError', 'Invalid'), fileMsg),
+      fieldRow(
+        t('fileTypeError', 'Wrong file type'),
+        fileTypeMsg,
+        t('fileTypeErrorHelp', 'The placeholder %s is replaced by the allowed file types.')
+      ),
+      fieldRow(
+        t('fileSizeError', 'File too large'),
+        fileSizeMsg,
+        t('fileSizeErrorHelp', 'The placeholder %s is replaced by the maximum size.')
+      ),
+      fieldRow(
+        t('fileMaxError', 'Too many files'),
+        fileMaxMsg,
+        t('fileMaxErrorHelp', 'The placeholder %s is replaced by the maximum number of files.')
+      ),
+    ]),
+    errorSection(t('optionError', 'Choice'), [optionMsg])
   );
 
   // Security
@@ -753,6 +818,7 @@ export function createPanels(settings, builderRoot, onChange) {
   return {
     notifications,
     settings: settingsPanel,
+    validation: validationPanel,
     security: securityPanel,
     getSettings: () => {
       const next = { ...state };

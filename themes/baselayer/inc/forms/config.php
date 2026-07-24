@@ -93,6 +93,42 @@ function bl_forms_iter_fields(array $fields): \Generator
 }
 
 /**
+ * Max upload bytes for form file fields (custom MB setting, capped by WordPress).
+ *
+ * @param array<string, mixed> $settings
+ */
+function bl_forms_upload_max_bytes(array $settings): int
+{
+	$wp = (int) wp_max_upload_size();
+	$raw = trim((string) ($settings['upload_max_size_mb'] ?? ''));
+	if ($raw === '') {
+		return max(0, $wp);
+	}
+
+	$n = (float) $raw;
+	if ($n <= 0) {
+		return max(0, $wp);
+	}
+
+	$custom = (int) round($n * MB_IN_BYTES);
+	if ($wp > 0) {
+		return min($custom, $wp);
+	}
+
+	return max(0, $custom);
+}
+
+/**
+ * Whether a field is active (shown on the frontend). Missing key = active.
+ *
+ * @param array<string, mixed> $field
+ */
+function bl_forms_field_is_active(array $field): bool
+{
+	return !array_key_exists('active', $field) || !empty($field['active']);
+}
+
+/**
  * Flat list of non-layout fields (for submit, mail, uploads checks).
  *
  * @param list<array<string, mixed>> $fields
@@ -162,9 +198,10 @@ function bl_forms_default_settings(): array
 		'date_before_message'    => '',
 		'date_after_message'     => '',
 		'file_message'           => '',
-		'upload_button_text'     => '',
-		'upload_empty_text'      => '',
-		'upload_drop_text'       => '',
+		'file_type_message'      => '',
+		'file_size_message'      => '',
+		'file_max_message'       => '',
+		'upload_max_size_mb'     => '12',
 		'option_message'         => '',
 		'after_submit'           => 'message',
 		'redirect_page_id'       => 0,
@@ -260,6 +297,12 @@ function bl_forms_message_fallbacks(): array
 		/* translators: %s: related field label */
 		'date_after' => __('This value must be after %s.', 'baselayer'),
 		'file'       => __('Please upload a valid file.', 'baselayer'),
+		/* translators: %s: allowed file types, e.g. "PDF, JPG, PNG" */
+		'file_type'  => __('Please upload a file of type %s.', 'baselayer'),
+		/* translators: %s: maximum file size, e.g. "12 MB" */
+		'file_size'  => __('This file is too large. Maximum size is %s.', 'baselayer'),
+		/* translators: %s: maximum number of files */
+		'file_max'   => __('You can upload at most %s files.', 'baselayer'),
 		'upload_button' => __('Choose file', 'baselayer'),
 		'upload_empty'  => __('No file chosen', 'baselayer'),
 		'upload_drop'   => __('or drag and drop here', 'baselayer'),
@@ -299,9 +342,9 @@ function bl_forms_resolve_message(array $settings, string $key): string
 		'date_before_message'=> 'date_before',
 		'date_after_message' => 'date_after',
 		'file_message'       => 'file',
-		'upload_button_text' => 'upload_button',
-		'upload_empty_text'  => 'upload_empty',
-		'upload_drop_text'   => 'upload_drop',
+		'file_type_message'  => 'file_type',
+		'file_size_message'  => 'file_size',
+		'file_max_message'   => 'file_max',
 		'option_message'     => 'option',
 		'submit_label'       => 'submit',
 	];
@@ -711,6 +754,7 @@ function bl_forms_sanitize_field($field): ?array
 		'css_class'    => bl_forms_sanitize_css_class((string) ($field['css_class'] ?? '')),
 		'width'        => $width['width'],
 		'width_custom' => $width['width_custom'],
+		'active'       => bl_forms_field_is_active($field),
 	];
 
 	if ($type === 'column') {
@@ -981,14 +1025,26 @@ function bl_forms_sanitize_field($field): ?array
 			$exts = [];
 		}
 		$out['extensions'] = $exts !== [] ? implode(', ', $exts) : '';
-		$out['preview'] = !array_key_exists('preview', $field) || !empty($field['preview']);
+		$style = sanitize_key((string) ($field['upload_style'] ?? 'modern'));
+		$out['upload_style'] = $style === 'classic' ? 'classic' : 'modern';
+		if ($out['upload_style'] === 'modern') {
+			$out['preview'] = !array_key_exists('preview', $field) || !empty($field['preview']);
+		} else {
+			unset($out['preview']);
+		}
 		if (!empty($out['multiple'])) {
 			$out['max_files'] = bl_forms_field_max_files(array_merge($field, ['multiple' => true]));
 		} else {
 			unset($out['max_files']);
 		}
+		$button = sanitize_text_field((string) ($field['button_text'] ?? ''));
+		if ($button !== '') {
+			$out['button_text'] = $button;
+		} else {
+			unset($out['button_text']);
+		}
 	} else {
-		unset($out['extensions'], $out['preview'], $out['max_files']);
+		unset($out['extensions'], $out['preview'], $out['max_files'], $out['upload_style'], $out['button_text']);
 	}
 
 	if ($type === 'terms') {
@@ -1104,6 +1160,16 @@ function bl_forms_sanitize_config($config): array
 			$settings[$key] = is_email($email) ? $email : '';
 			continue;
 		}
+		if ($key === 'upload_max_size_mb') {
+			$raw = trim((string) $settings_in[$key]);
+			if ($raw === '') {
+				$settings[$key] = '';
+			} else {
+				$n = (float) $raw;
+				$settings[$key] = $n > 0 ? rtrim(rtrim(number_format($n, 2, '.', ''), '0'), '.') : '';
+			}
+			continue;
+		}
 		$value = (string) $settings_in[$key];
 		if (in_array($key, ['success_message', 'error_message', 'validation_message', 'user_email_intro'], true)) {
 			$settings[$key] = sanitize_textarea_field($value);
@@ -1206,6 +1272,9 @@ function bl_forms_primary_email_field_name(array $config): string
 
 	foreach (bl_forms_iter_fields($config['fields'] ?? []) as $field) {
 		if (($field['type'] ?? '') !== 'email' || empty($field['name'])) {
+			continue;
+		}
+		if (!bl_forms_field_is_active($field)) {
 			continue;
 		}
 		$name = (string) $field['name'];

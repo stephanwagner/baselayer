@@ -148,6 +148,11 @@ export function typeLabel(type) {
   return (dict.types && dict.types[type]) || type;
 }
 
+/** Field is shown on the frontend unless explicitly inactive. */
+export function fieldIsActive(field) {
+  return !field || field.active !== false;
+}
+
 /** Slug for field name keys (ASCII, underscore). */
 export function slugifyName(text) {
   const slug = String(text || '')
@@ -309,6 +314,7 @@ export function defaultField(type = 'text') {
     name: slugifyName(typeLabel(type)),
     name_manual: false,
     hide_label: false,
+    active: true,
     required: type === 'terms',
     placeholder: '',
     description: '',
@@ -330,6 +336,7 @@ export function defaultField(type = 'text') {
   }
   if (type === 'file' || type === 'image') {
     base.preview = true;
+    base.upload_style = 'modern';
     base.extensions =
       type === 'image' ? 'jpg, jpeg, png, webp, gif, heic' : '';
   }

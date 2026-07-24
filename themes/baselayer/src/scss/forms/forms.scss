@@ -488,6 +488,10 @@ select.bl-form__control {
   }
 }
 
+.bl-form__control--file {
+  padding: 7px;
+}
+
 .bl-form__upload {
   display: flex;
   flex-direction: column;
