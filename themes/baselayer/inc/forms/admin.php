@@ -333,7 +333,7 @@ function bl_forms_admin_enqueue(string $hook): void
 				'termsDefaultLabel' => __('I agree to the [Privacy Policy](page:privacy).', 'baselayer'),
 				'termsDefaultFieldLabel' => __('Privacy Policy', 'baselayer'),
 				'checkboxText'      => __('Checkbox text', 'baselayer'),
-				'checkboxTextHelp'  => __('Links: [Privacy Policy](page:privacy) (site privacy page), [Privacy Policy](/privacy-policy), or [Privacy Policy](page:234). Unresolved page links show as plain text.', 'baselayer'),
+				'checkboxTextHelp'  => __("You can insert links using Markdown:\n[Privacy Policy](page:privacy)\n[Imprint](page:123)\n[AGB](/abg)", 'baselayer'),
 				'content'           => __('Content', 'baselayer'),
 				'htmlContent'       => __('HTML', 'baselayer'),
 				'options'           => __('Options', 'baselayer'),

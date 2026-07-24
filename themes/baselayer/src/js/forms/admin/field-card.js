@@ -2232,16 +2232,12 @@ export function createFieldCard(initial, open = false) {
         );
       }
 
-      if (AUTOCOMPLETE_TYPES.includes(field.type)) {
-        advancedSections.add(createAutocompleteControl(field));
+      if (field.type === 'textarea') {
+        advancedSections.add(createTextareaRowsControl(field));
       }
 
       if (field.type === 'text' || field.type === 'textarea') {
         advancedSections.add(createMaxLengthControl(field));
-      }
-
-      if (field.type === 'textarea') {
-        advancedSections.add(createTextareaRowsControl(field));
       }
 
       if (field.type === 'number') {
@@ -2250,6 +2246,10 @@ export function createFieldCard(initial, open = false) {
 
       if (['date', 'time', 'datetime'].includes(field.type)) {
         advancedSections.add(createTemporalBoundsControl(field));
+      }
+
+      if (AUTOCOMPLETE_TYPES.includes(field.type)) {
+        advancedSections.add(createAutocompleteControl(field));
       }
 
       if (field.type === 'terms') {
@@ -2266,10 +2266,10 @@ export function createFieldCard(initial, open = false) {
         generalSections.add(
           el('p', {}, [el('label', { text: t('checkboxText', 'Checkbox text') }), consentText]),
           el('p', {
-            className: 'description',
+            className: 'description bl-forms-builder__help-lines',
             text: t(
               'checkboxTextHelp',
-              'Links: [Privacy Policy](page:privacy) (site privacy page), [Privacy Policy](/privacy-policy), or [Privacy Policy](page:234). Unresolved page links show as plain text.'
+              "You can insert links using Markdown:\n[Privacy Policy](page:privacy)\n[Imprint](page:123)\n[AGB](/abg)"
             ),
           })
         );

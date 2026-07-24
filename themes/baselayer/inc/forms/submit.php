@@ -450,7 +450,7 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 			continue;
 		}
 
-		if (in_array($type, ['text', 'textarea'], true) && $value !== '') {
+		if (in_array($type, ['text', 'textarea', 'email', 'phone', 'url'], true) && $value !== '') {
 			$max_length = bl_forms_field_max_length($field);
 			if ($max_length > 0 && bl_forms_string_length($value) > $max_length) {
 				$invalid[$name] = bl_forms_field_error_message('maxlength', $field, $settings, (string) $max_length);

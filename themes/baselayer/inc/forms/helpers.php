@@ -461,11 +461,23 @@ function bl_forms_sanitize_temporal_bounds(array $out, array $field): array
 /**
  * Positive integer max length, or 0 if unset/invalid.
  *
+ * Email / phone / URL use fixed limits (not editable in the builder).
+ *
  * @param array<string, mixed> $field
  */
 function bl_forms_field_max_length(array $field): int
 {
-	if (!in_array((string) ($field['type'] ?? ''), ['text', 'textarea'], true)) {
+	$type = (string) ($field['type'] ?? '');
+	$forced = [
+		'email' => 254,
+		'phone' => 32,
+		'url'   => 2048,
+	];
+	if (isset($forced[$type])) {
+		return $forced[$type];
+	}
+
+	if (!in_array($type, ['text', 'textarea'], true)) {
 		return 0;
 	}
 
