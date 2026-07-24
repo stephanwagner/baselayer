@@ -226,7 +226,7 @@ function bl_forms_admin_enqueue(string $hook): void
 			'messageFallbacks' => bl_forms_message_fallbacks(),
 			'wpMaxUploadSize' => size_format(wp_max_upload_size()),
 			'i18n' => [
-				'tabFields'         => __('Fields', 'baselayer-forms'),
+				'tabFields'         => __('Fields › Form', 'baselayer-forms'),
 				'tabNotifications'  => __('Notifications', 'baselayer-forms'),
 				'tabSettings'       => __('Settings', 'baselayer-forms'),
 				'tabValidation'     => __('Validation', 'baselayer-forms'),

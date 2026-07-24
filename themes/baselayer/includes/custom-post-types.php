@@ -1535,5 +1535,5 @@ function bl_is_event_archive(): bool
 	return is_post_type_archive() && bl_archive_cpt_type() === 'event';
 }
 
-// Register after theme textdomain is loaded (init priority 1 in inc/language.php).
+// Register after theme textdomain is loaded (init priority 1 in includes/language.php).
 add_action('init', 'bl_register_cpts', 2);

@@ -72,7 +72,7 @@ function bl_render_developer_features(): void
 	$language_mode = function_exists('bl_language_mode') ? bl_language_mode() : 'content';
 
 	if (!function_exists('bl_webp_supported')) {
-		require_once get_template_directory() . '/inc/image-webp.php';
+		require_once get_template_directory() . '/includes/image-webp.php';
 	}
 	$webp_enabled_no_support = ($feat('enable_webp') === 1 && !bl_webp_supported());
 ?>
@@ -206,6 +206,19 @@ function bl_render_developer_features(): void
 						checkbox.addEventListener('change', toggle);
 					})();
 				</script>
+
+				<hr>
+
+				<table class="form-table" role="presentation">
+					<tr>
+						<th scope="row" class="form-table-checkbox-label"><?= esc_html__('Forms', 'baselayer') ?></th>
+						<td>
+							<input type="hidden" name="baselayer_features[enable_forms]" value="0">
+							<label><input type="checkbox" name="baselayer_features[enable_forms]" value="1" <?= checked($feat('enable_forms'), 1, false) ?>> <?= esc_html__('Enable forms', 'baselayer') ?></label>
+							<p class="description bl-indent-checkbox"><?= esc_html__('Adds a form builder, submissions, email notifications, and a Form block.', 'baselayer') ?></p>
+						</td>
+					</tr>
+				</table>
 
 			</div>
 

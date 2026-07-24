@@ -1057,6 +1057,15 @@ msgstr "Breadcrumbs aktivieren"
 msgid "Shows breadcrumb navigation on pages, posts, archives, and search."
 msgstr "Zeigt Breadcrumb-Navigation auf Seiten, Beiträgen, Archiven und der Suche."
 
+msgid "Forms"
+msgstr "Formulare"
+
+msgid "Enable forms"
+msgstr "Formulare aktivieren"
+
+msgid "Adds a form builder, submissions, email notifications, and a Form block."
+msgstr "Fügt einen Formular-Builder, Übermittlungen, E-Mail-Benachrichtigungen und einen Formular-Block hinzu."
+
 msgid "Needs <code class=\"bl-code-small\">bl_breadcrumbs()</code> in templates to show."
 msgstr "Benötigt <code class=\"bl-code-small\">bl_breadcrumbs()</code> in Templates um angezeigt zu werden."
 
@@ -1409,8 +1418,8 @@ msgstr "Test E-Mail von %s"
 msgid "Your PHP version (%1$s) is older than recommended. Consider upgrading to at least %2$s (latest stable is %3$s)."
 msgstr "Deine PHP-Version (%1$s) ist älter als empfohlen. Erwäge ein Upgrade auf mindestens %2$s (aktuell stabil: %3$s)."
 
-msgid "Safeguard file is missing in theme /inc folder."
-msgstr "Die Schutzdatei fehlt im Theme-Ordner /inc."
+msgid "Safeguard file is missing in theme /includes folder."
+msgstr "Die Schutzdatei fehlt im Theme-Ordner /includes."
 
 msgid "Cannot update wp-config.php for Redis safeguard."
 msgstr "wp-config.php kann für den Redis-Schutz nicht aktualisiert werden."

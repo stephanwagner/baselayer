@@ -10,7 +10,7 @@
  *
  * Human-readable names (per icon) and category labels are translatable and are
  * NOT stored here — they come from PHP via `window.baselayerIcons`
- * (text domain: baselayer-icons, see inc/editor-icons.php).
+ * (text domain: baselayer-icons, see includes/editor-icons.php).
  *
  * The generated class names use the filename (`-icon-heart`, `-icon-heart-fill`)
  * and must stay in sync with the SCSS catalog in src/scss/_icons.scss.

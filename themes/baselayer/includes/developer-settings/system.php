@@ -7,7 +7,19 @@ $bl_developer_page_slug = bl_developer_settings_page_slug($bl_developer_tab);
 
 function bl_developer_redis_safeguard_file_path(): string
 {
-	return trailingslashit(get_stylesheet_directory()) . 'inc/baselayer-redis-safeguard.php';
+	$stylesheet_dir = trailingslashit(get_stylesheet_directory());
+	$preferred = $stylesheet_dir . 'includes/baselayer-redis-safeguard.php';
+	if (is_readable($preferred)) {
+		return $preferred;
+	}
+
+	// Legacy child-theme path before includes/ rename.
+	$legacy = $stylesheet_dir . 'inc/baselayer-redis-safeguard.php';
+	if (is_readable($legacy)) {
+		return $legacy;
+	}
+
+	return $preferred;
 }
 
 function bl_developer_redis_safeguard_wpconfig_path(): string
@@ -21,7 +33,7 @@ function bl_developer_redis_safeguard_block(): string
 	if ($stylesheet === '') {
 		$stylesheet = 'baselayer';
 	}
-	$relative_path = '/wp-content/themes/' . $stylesheet . '/inc/baselayer-redis-safeguard.php';
+	$relative_path = '/wp-content/themes/' . $stylesheet . '/includes/baselayer-redis-safeguard.php';
 	return implode("\n", [
 		'// BEGIN BaseLayer Redis safeguard',
 		'if (!defined(\'WP_REDIS_DISABLE_COMMENT\')) {',
@@ -123,7 +135,7 @@ function bl_developer_redis_safeguard_install(): array
 	$block = bl_developer_redis_safeguard_block();
 
 	if (!is_file($file_path) || !is_readable($file_path)) {
-		return ['ok' => false, 'message' => __('Safeguard file is missing in theme /inc folder.', 'baselayer')];
+		return ['ok' => false, 'message' => __('Safeguard file is missing in theme /includes folder.', 'baselayer')];
 	}
 	if (!is_file($wp_config_path) || !is_readable($wp_config_path) || !is_writable($wp_config_path)) {
 		return ['ok' => false, 'message' => __('Cannot update wp-config.php for Redis safeguard.', 'baselayer')];

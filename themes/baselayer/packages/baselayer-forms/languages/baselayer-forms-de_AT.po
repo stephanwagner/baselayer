@@ -64,8 +64,8 @@ msgid "[%1$s] New submission: %2$s"
 msgstr "[%1$s] Neue Übermittlung: %2$s"
 
 #: includes/admin.php:229
-msgid "Fields"
-msgstr "Felder"
+msgid "Fields › Form"
+msgstr "Felder › Formular"
 
 #: includes/admin.php:230
 msgid "Notifications"

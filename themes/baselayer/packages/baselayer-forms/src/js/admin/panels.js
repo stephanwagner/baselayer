@@ -430,6 +430,10 @@ export function createPanels(settings, builderRoot, onChange) {
     });
 
   const successRow = fieldRow(t('successMessage', 'Success message'), success);
+  const successPanel = el('div', {
+    className: 'bl-forms-builder__after-submit-message',
+    hidden: state.after_submit === 'redirect',
+  }, [successRow]);
   const wpMaxUploadLabel =
     (window.blFormsAdmin && window.blFormsAdmin.wpMaxUploadSize) || '';
   const uploadMaxSize = el('input', {
@@ -519,6 +523,7 @@ export function createPanels(settings, builderRoot, onChange) {
   const syncAfterSubmitUi = () => {
     const isRedirect = state.after_submit === 'redirect';
     redirectPanel.hidden = !isRedirect;
+    successPanel.hidden = isRedirect;
     afterSelect.value = state.after_submit === 'redirect' ? 'redirect' : 'message';
 
     redirectSummary.replaceChildren();
@@ -614,7 +619,7 @@ export function createPanels(settings, builderRoot, onChange) {
   settingsPanel.append(
     fieldRow(t('submitLabel', 'Submit button label'), submitLabel),
     afterOptions,
-    successRow,
+    successPanel,
     fieldRow(t('errorMessage', 'Error message'), error),
     fieldRow(t('validationMessage', 'Validation message'), validation),
     fileSettingsBlock

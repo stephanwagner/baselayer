@@ -6258,6 +6258,10 @@
       text: t("minMaxMessageHelp", "The placeholder %s is replaced by the limit.")
     });
     const successRow = fieldRow(t("successMessage", "Success message"), success);
+    const successPanel = el("div", {
+      className: "bl-forms-builder__after-submit-message",
+      hidden: state.after_submit === "redirect"
+    }, [successRow]);
     const wpMaxUploadLabel = window.blFormsAdmin && window.blFormsAdmin.wpMaxUploadSize || "";
     const uploadMaxSize = el("input", {
       type: "number",
@@ -6339,6 +6343,7 @@
     const syncAfterSubmitUi = () => {
       const isRedirect = state.after_submit === "redirect";
       redirectPanel.hidden = !isRedirect;
+      successPanel.hidden = isRedirect;
       afterSelect.value = state.after_submit === "redirect" ? "redirect" : "message";
       redirectSummary.replaceChildren();
       if (state.redirect_page_id) {
@@ -6417,7 +6422,7 @@
     settingsPanel.append(
       fieldRow(t("submitLabel", "Submit button label"), submitLabel),
       afterOptions,
-      successRow,
+      successPanel,
       fieldRow(t("errorMessage", "Error message"), error),
       fieldRow(t("validationMessage", "Validation message"), validation),
       fileSettingsBlock
@@ -6684,7 +6689,7 @@
     fieldsPanel.appendChild(fieldsLayout);
     const tabBar = el("nav", { className: "bl-forms-builder__tabs", role: "tablist" });
     const tabs = [
-      { id: "fields", label: t("tabFields", "Fields"), panel: fieldsPanel },
+      { id: "fields", label: t("tabFields", "Fields \u203A Form"), panel: fieldsPanel },
       { id: "notifications", label: t("tabNotifications", "Notifications"), panel: panels.notifications },
       { id: "settings", label: t("tabSettings", "Settings"), panel: panels.settings },
       { id: "validation", label: t("tabValidation", "Validation"), panel: panels.validation },

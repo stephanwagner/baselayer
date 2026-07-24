@@ -3,7 +3,7 @@
 defined('ABSPATH') || exit;
 
 /**
- * Load an email template from inc/email-templates. Variables in $args are extracted for the template.
+ * Load an email template from includes/email-templates. Variables in $args are extracted for the template.
  *
  * @param string $name Template name (file name without .php).
  * @param array  $args Variables to pass to the template (e.g. site_name, to_email).
@@ -11,7 +11,7 @@ defined('ABSPATH') || exit;
  */
 function bl_get_email_template(string $name, array $args = []): string
 {
-	$path = get_template_directory() . '/inc/email-templates/' . $name . '.php';
+	$path = get_template_directory() . '/includes/email-templates/' . $name . '.php';
 	if (!is_readable($path)) {
 		return '';
 	}
@@ -29,7 +29,7 @@ function bl_get_email_template(string $name, array $args = []): string
  * - email_footer_html — footer row (sanitized with wp_kses_post)
  * - email_html_lang — `<html lang>`; defaults from site locale when omitted or empty
  *
- * @param string $content_template Template name under inc/email-templates (without .php).
+ * @param string $content_template Template name under includes/email-templates (without .php).
  * @see baselayer_email_document_args Filter to adjust $args per template.
  */
 function bl_compose_email_document(string $content_template, array $args = []): string
