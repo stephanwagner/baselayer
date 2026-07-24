@@ -1,9 +1,10 @@
 <?php
 /**
  * Plugin Name: BaseLayer Forms
- * Description: Form builder, submissions, and notifications for WordPress.
- * Version: 1.0.0
+ * Description: Create forms with drag-and-drop, file uploads, validation, notifications, and flexible layouts.
+ * Version: 0.1.0
  * Author: BaseLayer
+ * Author URI: https://baselayerwp.com/baselayer-forms
  * Text Domain: baselayer-forms
  * Domain Path: /languages
  * Requires at least: 6.0
