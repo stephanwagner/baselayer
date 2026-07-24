@@ -1085,7 +1085,8 @@ input.bl-forms-builder__section-label-input {
 }
 
 .bl-forms-builder__number-bounds,
-.bl-forms-builder__temporal-bounds {
+.bl-forms-builder__temporal-bounds,
+.bl-forms-builder__affix-bounds {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;

@@ -226,7 +226,7 @@ function bl_forms_admin_enqueue(string $hook): void
 			'messageFallbacks' => bl_forms_message_fallbacks(),
 			'wpMaxUploadSize' => size_format(wp_max_upload_size()),
 			'i18n' => [
-				'tabFields'         => __('Fields › Form', 'baselayer-forms'),
+				'tabFields'         => __('Fields', 'baselayer-forms'),
 				'tabNotifications'  => __('Notifications', 'baselayer-forms'),
 				'tabSettings'       => __('Settings', 'baselayer-forms'),
 				'tabValidation'     => __('Validation', 'baselayer-forms'),
@@ -289,6 +289,8 @@ function bl_forms_admin_enqueue(string $hook): void
 				'charCountEmptyDefault' => __('No characters remaining', 'baselayer-forms'),
 				'minValue'          => __('Minimum', 'baselayer-forms'),
 				'maxValue'          => __('Maximum', 'baselayer-forms'),
+				'prefix'            => __('Prefix', 'baselayer-forms'),
+				'suffix'            => __('Suffix', 'baselayer-forms'),
 				'boundNone'         => __('No limit', 'baselayer-forms'),
 				'boundFixedDate'    => __('Fixed date', 'baselayer-forms'),
 				'boundFixedTime'    => __('Fixed time', 'baselayer-forms'),

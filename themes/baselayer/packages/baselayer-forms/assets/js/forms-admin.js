@@ -3406,6 +3406,10 @@
     if (!AUTOCOMPLETE_TYPES.includes(nextType)) {
       delete field.autocomplete;
     }
+    if (!AFFIX_TYPES.includes(nextType)) {
+      delete field.prefix;
+      delete field.suffix;
+    }
     if (!["text", "textarea"].includes(nextType)) {
       delete field.max_length;
       delete field.show_char_count;
@@ -3544,6 +3548,16 @@
     "phone",
     "textarea",
     "select"
+  ];
+  var AFFIX_TYPES = [
+    "text",
+    "email",
+    "phone",
+    "url",
+    "number",
+    "date",
+    "time",
+    "datetime"
   ];
   var NO_DEFAULT = [
     "file",
@@ -4125,6 +4139,33 @@
     return el("div", { className: "bl-forms-builder__number-bounds" }, [
       el("p", {}, [el("label", { text: t("minValue", "Minimum") }), minInput]),
       el("p", {}, [el("label", { text: t("maxValue", "Maximum") }), maxInput])
+    ]);
+  }
+  function createPrefixSuffixControl(field) {
+    const prefixInput = el("input", {
+      type: "text",
+      className: "widefat",
+      dataset: { blPrefix: "1" },
+      value: field.prefix != null ? String(field.prefix) : ""
+    });
+    const suffixInput = el("input", {
+      type: "text",
+      className: "widefat",
+      dataset: { blSuffix: "1" },
+      value: field.suffix != null ? String(field.suffix) : ""
+    });
+    const sync = () => {
+      field.prefix = prefixInput.value;
+      field.suffix = suffixInput.value;
+      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+    };
+    prefixInput.addEventListener("input", sync);
+    suffixInput.addEventListener("input", sync);
+    prefixInput.addEventListener("change", sync);
+    suffixInput.addEventListener("change", sync);
+    return el("div", { className: "bl-forms-builder__affix-bounds" }, [
+      el("p", {}, [el("label", { text: t("prefix", "Prefix") }), prefixInput]),
+      el("p", {}, [el("label", { text: t("suffix", "Suffix") }), suffixInput])
     ]);
   }
   function createMaxLengthControl(field) {
@@ -4982,6 +5023,10 @@
       const ac = q("[data-bl-autocomplete]");
       data.autocomplete = ac?.value === "off" ? "off" : "auto";
     }
+    if (AFFIX_TYPES.includes(type)) {
+      data.prefix = q("[data-bl-prefix]")?.value ?? "";
+      data.suffix = q("[data-bl-suffix]")?.value ?? "";
+    }
     if (type === "number") {
       data.min = q("[data-bl-min]")?.value?.trim() || "";
       data.max = q("[data-bl-max]")?.value?.trim() || "";
@@ -5364,6 +5409,9 @@
               )
             })
           );
+        }
+        if (AFFIX_TYPES.includes(field.type)) {
+          advancedSections.add(createPrefixSuffixControl(field));
         }
         if (field.type === "textarea") {
           advancedSections.add(createTextareaRowsControl(field));
@@ -6689,7 +6737,7 @@
     fieldsPanel.appendChild(fieldsLayout);
     const tabBar = el("nav", { className: "bl-forms-builder__tabs", role: "tablist" });
     const tabs = [
-      { id: "fields", label: t("tabFields", "Fields \u203A Form"), panel: fieldsPanel },
+      { id: "fields", label: t("tabFields", "Fields"), panel: fieldsPanel },
       { id: "notifications", label: t("tabNotifications", "Notifications"), panel: panels.notifications },
       { id: "settings", label: t("tabSettings", "Settings"), panel: panels.settings },
       { id: "validation", label: t("tabValidation", "Validation"), panel: panels.validation },

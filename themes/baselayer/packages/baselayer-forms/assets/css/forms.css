@@ -196,6 +196,15 @@
   outline: 2px solid color-mix(in srgb, var(--bl-form-danger) 35%, transparent);
   outline-offset: 0;
 }
+.bl-form__field.is-invalid .bl-form__input-group {
+  border-color: var(--bl-form-danger);
+  outline: 2px solid color-mix(in srgb, var(--bl-form-danger) 35%, transparent);
+  outline-offset: 0;
+}
+.bl-form__field.is-invalid .bl-form__input-group .bl-form__control {
+  border-color: transparent;
+  outline: none;
+}
 .bl-form__field.is-invalid .bl-form__option, .bl-form__field.is-invalid .bl-form__btn-option, .bl-form__field.is-invalid .bl-form__switch-ui {
   outline: 2px solid var(--bl-form-danger);
   outline-offset: 1px;
@@ -243,6 +252,62 @@
 .bl-form__control:focus {
   border-color: var(--bl-form-border-focus);
   outline: 2px solid color-mix(in srgb, var(--bl-form-border-focus) 35%, transparent);
+}
+
+.bl-form__input-group {
+  display: flex;
+  align-items: stretch;
+  width: 100%;
+  border: 1px solid var(--bl-form-border);
+  border-radius: var(--bl-form-radius);
+  background: var(--bl-form-bg);
+  overflow: hidden;
+}
+@media (min-resolution: 1.5dppx) {
+  .bl-form__input-group {
+    border-width: 1.5px;
+  }
+}
+.bl-form__input-group:focus-within {
+  border-color: var(--bl-form-border-focus);
+  outline: 2px solid color-mix(in srgb, var(--bl-form-border-focus) 35%, transparent);
+}
+.bl-form__input-group .bl-form__control {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.bl-form__input-group .bl-form__control:focus {
+  border: 0;
+  outline: none;
+}
+
+.bl-form__affix {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  padding: var(--bl-form-control-padding);
+  background: color-mix(in srgb, var(--bl-form-border) 28%, var(--bl-form-bg));
+  color: var(--bl-form-muted);
+  white-space: nowrap;
+  user-select: none;
+}
+.bl-form__affix--prefix {
+  border-right: 1px solid var(--bl-form-border);
+}
+.bl-form__affix--suffix {
+  border-left: 1px solid var(--bl-form-border);
+}
+@media (min-resolution: 1.5dppx) {
+  .bl-form__affix--prefix {
+    border-right-width: 1.5px;
+  }
+  .bl-form__affix--suffix {
+    border-left-width: 1.5px;
+  }
 }
 
 textarea.bl-form__control {

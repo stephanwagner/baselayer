@@ -328,6 +328,14 @@ msgid "Maximum"
 msgstr ""
 
 #: includes/admin.php:292
+msgid "Prefix"
+msgstr ""
+
+#: includes/admin.php:293
+msgid "Suffix"
+msgstr ""
+
+#: includes/admin.php:294
 msgid "No limit"
 msgstr ""
 

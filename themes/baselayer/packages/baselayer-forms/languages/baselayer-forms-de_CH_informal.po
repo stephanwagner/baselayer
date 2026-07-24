@@ -64,8 +64,8 @@ msgid "[%1$s] New submission: %2$s"
 msgstr "[%1$s] Neue Übermittlung: %2$s"
 
 #: includes/admin.php:229
-msgid "Fields › Form"
-msgstr "Felder › Formular"
+msgid "Fields"
+msgstr "Felder"
 
 #: includes/admin.php:230
 msgid "Notifications"
@@ -312,6 +312,14 @@ msgid "Maximum"
 msgstr "Maximum"
 
 #: includes/admin.php:292
+msgid "Prefix"
+msgstr "Präfix"
+
+#: includes/admin.php:293
+msgid "Suffix"
+msgstr "Suffix"
+
+#: includes/admin.php:294
 msgid "No limit"
 msgstr "Keine Beschränkung"
 

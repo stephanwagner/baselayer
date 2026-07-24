@@ -1123,14 +1123,16 @@ input.bl-forms-builder__section-label-input:focus {
 }
 
 .bl-forms-builder__number-bounds,
-.bl-forms-builder__temporal-bounds {
+.bl-forms-builder__temporal-bounds,
+.bl-forms-builder__affix-bounds {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
   margin: 0 0 10px;
 }
 .bl-forms-builder__number-bounds > p,
-.bl-forms-builder__temporal-bounds > p {
+.bl-forms-builder__temporal-bounds > p,
+.bl-forms-builder__affix-bounds > p {
   margin: 0;
 }
 

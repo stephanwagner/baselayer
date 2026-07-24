@@ -939,6 +939,24 @@ function bl_forms_sanitize_field($field): ?array
 		unset($out['autocomplete']);
 	}
 
+	$affix_types = ['text', 'email', 'phone', 'url', 'number', 'date', 'time', 'datetime'];
+	if (in_array($type, $affix_types, true)) {
+		$prefix = sanitize_text_field((string) ($field['prefix'] ?? ''));
+		$suffix = sanitize_text_field((string) ($field['suffix'] ?? ''));
+		if ($prefix !== '') {
+			$out['prefix'] = $prefix;
+		} else {
+			unset($out['prefix']);
+		}
+		if ($suffix !== '') {
+			$out['suffix'] = $suffix;
+		} else {
+			unset($out['suffix']);
+		}
+	} else {
+		unset($out['prefix'], $out['suffix']);
+	}
+
 	if ($type === 'number') {
 		$min = bl_forms_sanitize_optional_number((string) ($field['min'] ?? ''));
 		$max = bl_forms_sanitize_optional_number((string) ($field['max'] ?? ''));

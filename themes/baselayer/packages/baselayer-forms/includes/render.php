@@ -1084,11 +1084,26 @@ function bl_forms_render_field(array $field, string $uid, array $settings = []):
 			$number_attrs .= ' max="' . esc_attr($max) . '"';
 		}
 	}
+	$prefix = sanitize_text_field((string) ($field['prefix'] ?? ''));
+	$suffix = sanitize_text_field((string) ($field['suffix'] ?? ''));
+	$has_affix = $prefix !== '' || $suffix !== '';
 	?>
 	<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--' . sanitize_html_class($type), $name) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 		<?= bl_forms_field_label_html($field, $input_id, $req_mark) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+		<?php if ($has_affix) : ?>
+		<div class="bl-form__input-group">
+			<?php if ($prefix !== '') : ?>
+			<span class="bl-form__affix bl-form__affix--prefix"><?= esc_html($prefix) ?></span>
+			<?php endif; ?>
+		<?php endif; ?>
 		<input class="bl-form__control" type="<?= esc_attr($input_type) ?>" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" value="<?= esc_attr($default_value) ?>"<?= $placeholder !== '' ? ' placeholder="' . esc_attr($placeholder) . '"' : '' ?><?= $control_attrs ?><?= $number_attrs // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_maxlength_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<?php if ($has_affix) : ?>
+			<?php if ($suffix !== '') : ?>
+			<span class="bl-form__affix bl-form__affix--suffix"><?= esc_html($suffix) ?></span>
+			<?php endif; ?>
+		</div>
+		<?php endif; ?>
 		<?= bl_forms_field_char_count_html($field, $input_id, $settings) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 	</div>
 	<?php

@@ -342,6 +342,11 @@ function convertFieldType(field, nextType) {
     delete field.autocomplete;
   }
 
+  if (!AFFIX_TYPES.includes(nextType)) {
+    delete field.prefix;
+    delete field.suffix;
+  }
+
   if (!['text', 'textarea'].includes(nextType)) {
     delete field.max_length;
     delete field.show_char_count;
@@ -492,6 +497,17 @@ const AUTOCOMPLETE_TYPES = [
   'phone',
   'textarea',
   'select',
+];
+/** Single-line (and date) inputs that support ACF-style prefix / suffix. */
+const AFFIX_TYPES = [
+  'text',
+  'email',
+  'phone',
+  'url',
+  'number',
+  'date',
+  'time',
+  'datetime',
 ];
 const NO_DEFAULT = [
   'file',
@@ -1146,6 +1162,36 @@ function createNumberBoundsControl(field) {
   return el('div', { className: 'bl-forms-builder__number-bounds' }, [
     el('p', {}, [el('label', { text: t('minValue', 'Minimum') }), minInput]),
     el('p', {}, [el('label', { text: t('maxValue', 'Maximum') }), maxInput]),
+  ]);
+}
+
+function createPrefixSuffixControl(field) {
+  const prefixInput = el('input', {
+    type: 'text',
+    className: 'widefat',
+    dataset: { blPrefix: '1' },
+    value: field.prefix != null ? String(field.prefix) : '',
+  });
+  const suffixInput = el('input', {
+    type: 'text',
+    className: 'widefat',
+    dataset: { blSuffix: '1' },
+    value: field.suffix != null ? String(field.suffix) : '',
+  });
+
+  const sync = () => {
+    field.prefix = prefixInput.value;
+    field.suffix = suffixInput.value;
+    document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+  };
+  prefixInput.addEventListener('input', sync);
+  suffixInput.addEventListener('input', sync);
+  prefixInput.addEventListener('change', sync);
+  suffixInput.addEventListener('change', sync);
+
+  return el('div', { className: 'bl-forms-builder__affix-bounds' }, [
+    el('p', {}, [el('label', { text: t('prefix', 'Prefix') }), prefixInput]),
+    el('p', {}, [el('label', { text: t('suffix', 'Suffix') }), suffixInput]),
   ]);
 }
 
@@ -2150,6 +2196,10 @@ export function serializeRow(row) {
     const ac = q('[data-bl-autocomplete]');
     data.autocomplete = ac?.value === 'off' ? 'off' : 'auto';
   }
+  if (AFFIX_TYPES.includes(type)) {
+    data.prefix = q('[data-bl-prefix]')?.value ?? '';
+    data.suffix = q('[data-bl-suffix]')?.value ?? '';
+  }
   if (type === 'number') {
     data.min = q('[data-bl-min]')?.value?.trim() || '';
     data.max = q('[data-bl-max]')?.value?.trim() || '';
@@ -2581,6 +2631,10 @@ export function createFieldCard(initial, open = false) {
             ),
           })
         );
+      }
+
+      if (AFFIX_TYPES.includes(field.type)) {
+        advancedSections.add(createPrefixSuffixControl(field));
       }
 
       if (field.type === 'textarea') {
