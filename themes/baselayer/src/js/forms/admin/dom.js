@@ -298,6 +298,7 @@ export function defaultField(type = 'text') {
       label: typeLabel(type),
       width: '100',
       width_custom: '',
+      design: 'standard',
       children: [],
     };
   }
@@ -337,6 +338,9 @@ export function defaultField(type = 'text') {
   if (type === 'toggle') {
     base.label = typeLabel(type);
     base.default_value = '';
+  }
+  if (type === 'textarea') {
+    base.rows = 5;
   }
   return base;
 }

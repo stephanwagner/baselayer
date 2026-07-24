@@ -16,9 +16,28 @@
 
 .bl-form__fields {
   display: flex;
+  flex-direction: column;
+  gap: var(--bl-form-gap);
+}
+
+.bl-form__row {
+  display: flex;
   flex-wrap: wrap;
   gap: var(--bl-form-gap);
   align-items: flex-start;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+}
+
+// Rows where every field is ≤50%: pair to 50/50 at -m (25×4 → 2×2, 33×3 → 2+1).
+// Mixed rows like 75|25 keep desktop widths until -s.
+.bl-form__row--pair-m {
+  @media (max-width: $breakpoint-m) {
+    > .bl-form__field-wrap {
+      width: min(100%, calc(50% - (var(--bl-form-gap) * 0.5)));
+    }
+  }
 }
 
 .bl-form__group {
@@ -35,18 +54,12 @@
 .bl-form__column {
   box-sizing: border-box;
   flex: 0 1 auto;
-  width: min(
-    100%,
-    calc(
-      var(--bl-form-field-width, 100%) -
-        (var(--bl-form-gap) * (1 - var(--bl-form-field-width-factor, 1)))
-    )
-  );
+  width: min(100%, calc(var(--bl-form-field-width, 100%) - (var(--bl-form-gap) * (1 - var(--bl-form-field-width-factor, 1)))));
   max-width: 100%;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: var(--bl-form-gap);
-  align-items: flex-start;
+  align-items: stretch;
   min-width: 0;
 
   &--auto {
@@ -54,19 +67,72 @@
     width: auto;
   }
 
-  @media (max-width: 600px) {
+  // Always stack to one column at -s.
+  @media (max-width: $breakpoint-s) {
+    flex: 0 1 auto;
     flex-basis: 100%;
     width: 100% !important;
   }
 }
 
+// 4+ columns: pair up (2/2, 2/2/2, …) at -m.
+.bl-form__group--wrap-m {
+  @media (max-width: $breakpoint-m) {
+    .bl-form__column {
+      flex: 0 1 auto;
+      width: min(100%, calc(50% - (var(--bl-form-gap) * 0.5)));
+    }
+
+    .bl-form__column--auto {
+      flex: 0 1 auto;
+      width: min(100%, calc(50% - (var(--bl-form-gap) * 0.5)));
+    }
+  }
+
+  @media (max-width: $breakpoint-s) {
+    .bl-form__column,
+    .bl-form__column--auto {
+      flex-basis: 100%;
+      width: 100% !important;
+    }
+  }
+}
+
 .bl-form__section {
   box-sizing: border-box;
-  width: 100%;
+  flex: 0 1 auto;
+  width: min(100%, calc(var(--bl-form-field-width, 100%) - (var(--bl-form-gap) * (1 - var(--bl-form-field-width-factor, 1)))));
   max-width: 100%;
   display: flex;
   flex-direction: column;
   gap: 10px;
+  min-width: 0;
+
+  &--auto {
+    flex: 1 1 0;
+    width: auto;
+  }
+
+  &--outline {
+    padding: 16px;
+    border: 1px solid var(--bl-form-border);
+    border-radius: var(--bl-form-radius);
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--bl-form-color) 6%, transparent);
+  }
+
+  &--card {
+    padding: 18px 16px;
+    border: 1px solid color-mix(in srgb, var(--bl-form-border) 70%, transparent);
+    border-radius: var(--bl-form-radius);
+    background: color-mix(in srgb, var(--bl-form-muted) 8%, var(--bl-form-bg));
+    box-shadow: 0 1px 2px color-mix(in srgb, var(--bl-form-color) 6%, transparent);
+  }
+
+  @media (max-width: $breakpoint-s) {
+    flex: 0 1 auto;
+    flex-basis: 100%;
+    width: 100% !important;
+  }
 }
 
 .bl-form__section-title {
@@ -79,9 +145,8 @@
 
 .bl-form__section-body {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   gap: var(--bl-form-gap);
-  align-items: flex-start;
   width: 100%;
 }
 
@@ -89,16 +154,10 @@
   box-sizing: border-box;
   flex: 0 1 auto;
   // Share the row gap so 50% + 50% (and 33/33/33, etc.) fit on one line.
-  width: min(
-    100%,
-    calc(
-      var(--bl-form-field-width, 100%) -
-        (var(--bl-form-gap) * (1 - var(--bl-form-field-width-factor, 1)))
-    )
-  );
+  width: min(100%, calc(var(--bl-form-field-width, 100%) - (var(--bl-form-gap) * (1 - var(--bl-form-field-width-factor, 1)))));
   max-width: 100%;
 
-  @media (max-width: 600px) {
+  @media (max-width: $breakpoint-s) {
     flex-basis: 100%;
     width: 100% !important;
   }
@@ -164,17 +223,25 @@
   background: var(--bl-form-bg);
   color: inherit;
   font: inherit;
+  outline-offset: 0;
+  // TODO line heigth fixed
+
+  @media (min-resolution: $high-density-dppx) {
+    border-width: 1.5px;
+  }
 
   &:focus {
     border-color: var(--bl-form-border-focus);
     outline: 2px solid color-mix(in srgb, var(--bl-form-border-focus) 35%, transparent);
-    outline-offset: 1px;
   }
 }
 
 textarea.bl-form__control {
-  min-height: 112px;
   resize: vertical;
+
+  &:not([rows]) {
+    min-height: 112px;
+  }
 }
 
 .bl-form__char-count {
@@ -215,10 +282,6 @@ select.bl-form__control {
 
   &--xl {
     --bl-form-divider-margin: 48px;
-  }
-
-  &--custom {
-    // Value comes from inline --bl-form-divider-margin on the wrap.
   }
 }
 
@@ -347,7 +410,10 @@ select.bl-form__control {
     border-radius: var(--bl-form-radius);
     background: var(--bl-form-bg);
     font-weight: 600;
-    transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+    transition:
+      border-color 0.15s ease,
+      background 0.15s ease,
+      color 0.15s ease;
   }
 
   input:focus-visible + span {

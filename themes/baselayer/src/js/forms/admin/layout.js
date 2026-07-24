@@ -1,6 +1,6 @@
 import Sortable from 'sortablejs';
 import { el, t, uid, iconEl, defaultField, uniqueFieldName, formsDragStart, formsDragEnd } from './dom.js';
-import { createFieldCard, serializeRow, openFieldWidthModal } from './field-card.js';
+import { createFieldCard, serializeRow, openFieldWidthModal, openSectionDesignModal } from './field-card.js';
 
 /** Types that cannot be nested inside columns or sections. */
 const NESTED_BLOCKED = ['column', 'section', 'hidden', 'honeypot', 'captcha'];
@@ -281,12 +281,16 @@ export function createSectionCard(initial = {}) {
     children: [],
     width: '100',
     width_custom: '',
+    design: 'standard',
     ...initial,
     id: initial.id || uid(),
     type: 'section',
   };
   if (!field.label) {
     field.label = (window.blFormsAdmin?.i18n?.types?.section) || t('sectionType', 'Section');
+  }
+  if (!['standard', 'outline', 'card'].includes(field.design)) {
+    field.design = 'standard';
   }
 
   const row = el('div', {
@@ -295,7 +299,11 @@ export function createSectionCard(initial = {}) {
       blFormsField: '1',
       fieldId: field.id,
       fieldType: 'section',
-      fieldWidth: '100',
+      fieldWidth: field.width || '100',
+      fieldDesign: field.design || 'standard',
+      ...(field.width === 'custom' && field.width_custom
+        ? { fieldWidthCustom: field.width_custom }
+        : {}),
     },
   });
   sectionFieldByEl.set(row, field);
@@ -311,6 +319,15 @@ export function createSectionCard(initial = {}) {
     field.label = labelInput.value;
     document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
   });
+
+  const widthBadge = el('span', { className: 'bl-forms-builder__width-badge' });
+  const designBtn = el('button', {
+    type: 'button',
+    className: 'bl-forms-builder__design-btn',
+    title: t('sectionDesignTitle', 'Section design'),
+    'aria-label': t('sectionDesignTitle', 'Section design'),
+  });
+  designBtn.appendChild(iconEl('design', 'bl-forms-builder__design-btn-icon'));
 
   const typeChip = el('span', { className: 'bl-forms-builder__field-type bl-forms-builder__field-type--section' }, [
     iconEl('section', 'bl-forms-builder__field-type-icon'),
@@ -333,7 +350,37 @@ export function createSectionCard(initial = {}) {
     emptyHint.hidden = fieldsList.querySelector('[data-bl-forms-field]') != null;
   };
 
+  const updatePreview = () => {
+    const width = field.width || '100';
+    const widthCustom = field.width_custom || '';
+    const design = field.design || 'standard';
+    row.dataset.fieldWidth = width;
+    row.dataset.fieldDesign = design;
+    if (width === 'custom') {
+      row.dataset.fieldWidthCustom = widthCustom || '';
+    } else {
+      delete row.dataset.fieldWidthCustom;
+    }
+    const text = widthBadgeText(width, widthCustom);
+    widthBadge.textContent = text;
+    widthBadge.hidden = text === '';
+  };
+
   const notify = () => document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+
+  const openWidthModal = () => {
+    openFieldWidthModal(field, () => {
+      updatePreview();
+      notify();
+    });
+  };
+
+  const openDesignModal = () => {
+    openSectionDesignModal(field, () => {
+      updatePreview();
+      notify();
+    });
+  };
 
   (field.children || []).forEach((child) => {
     fieldsList.appendChild(createFieldCard(child, false));
@@ -349,9 +396,14 @@ export function createSectionCard(initial = {}) {
   ]);
   syncEmpty();
 
+  widthBadge.classList.add('is-interactive');
+  widthBadge.title = t('sectionWidthTitle', 'Section width');
+  widthBadge.addEventListener('click', openWidthModal);
+  designBtn.addEventListener('click', openDesignModal);
+
   const header = el('div', { className: 'bl-forms-builder__field-header' }, [
     labelInput,
-    el('div', { className: 'bl-forms-builder__field-meta' }, [typeChip]),
+    el('div', { className: 'bl-forms-builder__field-meta' }, [widthBadge, designBtn, typeChip]),
     createContainerActions(() => {
       row.remove();
       notify();
@@ -359,6 +411,7 @@ export function createSectionCard(initial = {}) {
   ]);
 
   row.append(header, fieldsWrap);
+  updatePreview();
   return row;
 }
 
@@ -387,13 +440,17 @@ export function serializeLayoutRow(row) {
     const live = sectionFieldByEl.get(row);
     const labelInput = row.querySelector('.bl-forms-builder__section-label-input');
     const label = labelInput?.value ?? live?.label ?? '';
+    const width = row.dataset.fieldWidth || live?.width || '100';
+    const widthCustom = row.dataset.fieldWidthCustom || live?.width_custom || '';
+    const design = row.dataset.fieldDesign || live?.design || 'standard';
 
     return {
       id,
       type: 'section',
       label,
-      width: '100',
-      width_custom: '',
+      width,
+      width_custom: width === 'custom' ? widthCustom : '',
+      design,
       children: Array.from(fields?.children || [])
         .filter((el) => el.matches('[data-bl-forms-field]') && !NESTED_BLOCKED.includes(el.dataset.fieldType))
         .map((child) => serializeRow(child)),

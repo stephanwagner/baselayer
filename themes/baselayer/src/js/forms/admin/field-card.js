@@ -23,11 +23,11 @@ const SPACER_HEIGHT_PRESETS = [
 
 const SPACER_HEIGHT_VALUES = SPACER_HEIGHT_PRESETS.map((preset) => preset.value);
 const DIVIDER_MARGIN_PRESETS = [
-  { value: 'xs', label: '8' },
-  { value: 's', label: '16' },
-  { value: 'm', label: '24' },
-  { value: 'l', label: '32' },
-  { value: 'xl', label: '48' },
+  { value: 'xs', label: 'XS' },
+  { value: 's', label: 'S' },
+  { value: 'm', label: 'M' },
+  { value: 'l', label: 'L' },
+  { value: 'xl', label: 'XL' },
   { value: 'custom', labelKey: 'widthCustom', icon: 'edit' },
 ];
 const DIVIDER_MARGIN_VALUES = DIVIDER_MARGIN_PRESETS.map((preset) => preset.value);
@@ -325,6 +325,13 @@ function convertFieldType(field, nextType) {
     delete field.max_length;
     delete field.show_char_count;
     delete field.char_count_text;
+  }
+
+  if (nextType === 'textarea') {
+    const rows = parseInt(field.rows, 10);
+    field.rows = Number.isFinite(rows) && rows >= 2 ? Math.min(50, rows) : 5;
+  } else {
+    delete field.rows;
   }
 
   if (nextType === 'number') {
@@ -834,7 +841,9 @@ export function openFieldWidthModal(field, onApply) {
   const title =
     field.type === 'column'
       ? t('columnWidthTitle', 'Column width')
-      : t('width', 'Width');
+      : field.type === 'section'
+        ? t('sectionWidthTitle', 'Section width')
+        : t('width', 'Width');
 
   const backdrop = el('div', {
     className: 'bl-forms-builder__modal',
@@ -878,6 +887,87 @@ export function openFieldWidthModal(field, onApply) {
 
   const body = el('div', { className: 'bl-forms-builder__modal-body' });
   body.appendChild(createWidthControl(draft, () => {}, { showLabel: false }));
+
+  const footer = el('div', { className: 'bl-forms-builder__modal-footer' }, [
+    el('button', {
+      type: 'button',
+      className: 'button',
+      text: t('cancel', 'Cancel'),
+      onClick: close,
+    }),
+    el('button', {
+      type: 'button',
+      className: 'button button-primary',
+      text: t('apply', 'Apply'),
+      onClick: apply,
+    }),
+  ]);
+
+  dialog.append(header, body, footer);
+  backdrop.appendChild(dialog);
+  document.body.appendChild(backdrop);
+}
+
+/**
+ * Modal to pick a section design (standard / outline / card).
+ */
+export function openSectionDesignModal(field, onApply) {
+  document.querySelectorAll('.bl-forms-builder__modal').forEach((node) => node.remove());
+
+  const designs = [
+    { value: 'standard', label: t('sectionDesignStandard', 'Standard') },
+    { value: 'outline', label: t('sectionDesignOutline', 'Outline') },
+    { value: 'card', label: t('sectionDesignCard', 'Card') },
+  ];
+  const allowed = designs.map((item) => item.value);
+  let draft = allowed.includes(field.design) ? field.design : 'standard';
+  const title = t('sectionDesignTitle', 'Section design');
+
+  const backdrop = el('div', {
+    className: 'bl-forms-builder__modal',
+    role: 'dialog',
+    'aria-modal': 'true',
+    'aria-label': title,
+  });
+
+  const close = () => {
+    document.removeEventListener('keydown', onKey);
+    backdrop.remove();
+  };
+
+  const apply = () => {
+    field.design = draft;
+    onApply(field);
+    close();
+  };
+
+  const onKey = (evt) => {
+    if (evt.key === 'Escape') {
+      close();
+    }
+  };
+  document.addEventListener('keydown', onKey);
+
+  backdrop.addEventListener('click', (evt) => {
+    if (evt.target === backdrop) {
+      close();
+    }
+  });
+
+  const dialog = el('div', { className: 'bl-forms-builder__modal-dialog' });
+  const header = el('div', { className: 'bl-forms-builder__modal-header' }, [
+    el('h2', {
+      className: 'bl-forms-builder__modal-title',
+      text: title,
+    }),
+  ]);
+
+  const body = el('div', { className: 'bl-forms-builder__modal-body' });
+  body.appendChild(
+    createSegmentedControl(designs, draft, 'blDesignGroup', (value) => {
+      draft = value;
+    })
+  );
 
   const footer = el('div', { className: 'bl-forms-builder__modal-footer' }, [
     el('button', {
@@ -1067,6 +1157,31 @@ function createMaxLengthControl(field) {
     el('p', {}, [el('label', { text: t('maxLength', 'Maximum length') }), maxInput]),
     showSwitch,
   ]);
+}
+
+function createTextareaRowsControl(field) {
+  const rows = parseInt(field.rows, 10);
+  const value = Number.isFinite(rows) && rows >= 2 ? String(Math.min(50, rows)) : '5';
+  const input = el('input', {
+    type: 'number',
+    className: 'widefat',
+    min: '2',
+    max: '50',
+    step: '1',
+    dataset: { blRows: '1' },
+    value,
+  });
+
+  const sync = () => {
+    const next = parseInt(input.value, 10);
+    field.rows = Number.isFinite(next) && next >= 2 ? Math.min(50, next) : 5;
+    input.value = String(field.rows);
+    document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+  };
+  input.addEventListener('change', sync);
+  input.addEventListener('blur', sync);
+
+  return el('p', {}, [el('label', { text: t('textareaRows', 'Rows') }), input]);
 }
 
 function temporalInputType(type) {
@@ -1745,6 +1860,10 @@ export function serializeRow(row) {
     data.max_length = q('[data-bl-max-length]')?.value?.trim() || '';
     data.show_char_count = Boolean(q('[data-bl-show-char-count]')?.checked);
   }
+  if (type === 'textarea') {
+    const rawRows = parseInt(q('[data-bl-rows]')?.value, 10);
+    data.rows = Number.isFinite(rawRows) && rawRows >= 2 ? Math.min(50, rawRows) : 5;
+  }
   if (type === 'date' || type === 'time' || type === 'datetime') {
     data.placeholder = '';
     const readSide = (which) => {
@@ -2119,6 +2238,10 @@ export function createFieldCard(initial, open = false) {
 
       if (field.type === 'text' || field.type === 'textarea') {
         advancedSections.add(createMaxLengthControl(field));
+      }
+
+      if (field.type === 'textarea') {
+        advancedSections.add(createTextareaRowsControl(field));
       }
 
       if (field.type === 'number') {

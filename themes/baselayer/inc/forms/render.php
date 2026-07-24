@@ -43,7 +43,8 @@ function bl_forms_render(int $form_id, array $args = []): string
 	$js_token = bl_forms_js_check_token($form_id, $loaded_at);
 	$wrapper_attributes = isset($args['wrapper_attributes']) && is_string($args['wrapper_attributes']) && $args['wrapper_attributes'] !== ''
 		? $args['wrapper_attributes']
-		: 'class="bl-form"';
+		: 'class="' . esc_attr('bl-form bl-form--' . $form_id) . '"';
+	$wrapper_attributes = bl_forms_ensure_form_wrapper_attributes($form_id, $wrapper_attributes);
 
 	ob_start();
 	?>
@@ -89,6 +90,30 @@ function bl_forms_render(int $form_id, array $args = []): string
 	bl_forms_enqueue_front_assets();
 
 	return (string) ob_get_clean();
+}
+
+/**
+ * Ensure the form wrapper always has bl-form and a unique bl-form--{id} class.
+ */
+function bl_forms_ensure_form_wrapper_attributes(int $form_id, string $attrs): string
+{
+	$form_id = absint($form_id);
+	$required = ['bl-form', 'bl-form--' . $form_id];
+	if (preg_match('/\bclass=(["\'])(.*?)\1/', $attrs, $matches)) {
+		$quote = $matches[1];
+		$classes = preg_split('/\s+/', trim($matches[2])) ?: [];
+		$classes = array_values(array_filter($classes, static fn($class) => $class !== ''));
+		foreach ($required as $class) {
+			if (!in_array($class, $classes, true)) {
+				$classes[] = $class;
+			}
+		}
+		$replacement = 'class=' . $quote . esc_attr(implode(' ', $classes)) . $quote;
+
+		return (string) preg_replace('/\bclass=(["\'])(.*?)\1/', $replacement, $attrs, 1);
+	}
+
+	return trim($attrs . ' class="' . esc_attr(implode(' ', $required)) . '"');
 }
 
 /**
@@ -321,6 +346,24 @@ function bl_forms_field_maxlength_attr(array $field): string
 }
 
 /**
+ * Textarea rows (2–50, default 5).
+ *
+ * @param array<string, mixed> $field
+ */
+function bl_forms_field_rows(array $field): int
+{
+	$rows = absint($field['rows'] ?? 5);
+	if ($rows < 2) {
+		$rows = 2;
+	}
+	if ($rows > 50) {
+		$rows = 50;
+	}
+
+	return $rows;
+}
+
+/**
  * Live character counter markup (empty when disabled).
  *
  * @param array<string, mixed> $field
@@ -348,7 +391,108 @@ function bl_forms_field_char_count_html(array $field, string $input_id, array $s
 }
 
 /**
- * Render root fields, wrapping consecutive columns in a row.
+ * Group fields into flex rows the way percentage widths pack on desktop.
+ *
+ * @param list<array<string, mixed>> $fields
+ * @return list<list<array<string, mixed>>>
+ */
+function bl_forms_chunk_fields_into_rows(array $fields): array
+{
+	$rows = [];
+	$current = [];
+	$sum = 0.0;
+
+	foreach ($fields as $field) {
+		if (!is_array($field)) {
+			continue;
+		}
+
+		$factor = bl_forms_field_pack_factor($field);
+		$pack = $factor ?? 1.0;
+
+		// Full-width / unknown units start a fresh row alone.
+		if ($factor === null || $pack >= 0.999) {
+			if ($current !== []) {
+				$rows[] = $current;
+				$current = [];
+				$sum = 0.0;
+			}
+			$rows[] = [$field];
+			continue;
+		}
+
+		if ($sum > 0.0 && ($sum + $pack) > 1.001) {
+			$rows[] = $current;
+			$current = [];
+			$sum = 0.0;
+		}
+
+		$current[] = $field;
+		$sum += $pack;
+	}
+
+	if ($current !== []) {
+		$rows[] = $current;
+	}
+
+	return $rows;
+}
+
+/**
+ * Whether a packed row should pair to ~50% columns at breakpoint-m.
+ *
+ * Rule: 2+ fields and every field is ≤50% (e.g. 25×4, 33×3, 50×2),
+ * but not mixed rows like 75|25.
+ *
+ * @param list<array<string, mixed>> $row
+ */
+function bl_forms_row_should_pair_at_m(array $row): bool
+{
+	if (count($row) < 2) {
+		return false;
+	}
+
+	$max = 0.0;
+	foreach ($row as $field) {
+		$factor = bl_forms_field_pack_factor($field);
+		if ($factor === null) {
+			return false;
+		}
+		$max = max($max, $factor);
+	}
+
+	return $max <= 0.5001;
+}
+
+/**
+ * Render a list of fields wrapped in responsive rows.
+ *
+ * @param list<array<string, mixed>> $fields
+ * @param array<string, mixed>       $settings
+ */
+function bl_forms_render_field_rows(array $fields, string $uid, array $settings = []): string
+{
+	$html = '';
+	foreach (bl_forms_chunk_fields_into_rows($fields) as $row) {
+		$inner = '';
+		foreach ($row as $field) {
+			$inner .= bl_forms_render_field($field, $uid, $settings);
+		}
+		if ($inner === '') {
+			continue;
+		}
+		$classes = 'bl-form__row';
+		if (bl_forms_row_should_pair_at_m($row)) {
+			$classes .= ' bl-form__row--pair-m';
+		}
+		$html .= '<div class="' . esc_attr($classes) . '">' . $inner . '</div>';
+	}
+
+	return $html;
+}
+
+/**
+ * Render root fields, wrapping consecutive columns in a group and other fields in rows.
  *
  * @param list<array<string, mixed>> $fields
  * @param array<string, mixed>       $settings
@@ -356,8 +500,17 @@ function bl_forms_field_char_count_html(array $field, string $input_id, array $s
 function bl_forms_render_fields(array $fields, string $uid, array $settings = []): string
 {
 	$html = '';
+	$buffer = [];
 	$count = count($fields);
 	$i = 0;
+
+	$flush = static function () use (&$html, &$buffer, $uid, $settings): void {
+		if ($buffer === []) {
+			return;
+		}
+		$html .= bl_forms_render_field_rows($buffer, $uid, $settings);
+		$buffer = [];
+	};
 
 	while ($i < $count) {
 		$field = $fields[$i];
@@ -367,6 +520,7 @@ function bl_forms_render_fields(array $fields, string $uid, array $settings = []
 		}
 
 		if (($field['type'] ?? '') === 'column') {
+			$flush();
 			$run = [];
 			while ($i < $count && is_array($fields[$i]) && ($fields[$i]['type'] ?? '') === 'column') {
 				$run[] = $fields[$i];
@@ -377,14 +531,21 @@ function bl_forms_render_fields(array $fields, string $uid, array $settings = []
 				$inner .= bl_forms_render_field($column, $uid, $settings);
 			}
 			if ($inner !== '') {
-				$html .= '<div class="bl-form__group">' . $inner . '</div>';
+				$cols = count($run);
+				$classes = 'bl-form__group';
+				if ($cols >= 4) {
+					$classes .= ' bl-form__group--wrap-m';
+				}
+				$html .= '<div class="' . esc_attr($classes) . '" data-bl-form-cols="' . esc_attr((string) $cols) . '">' . $inner . '</div>';
 			}
 			continue;
 		}
 
-		$html .= bl_forms_render_field($field, $uid, $settings);
+		$buffer[] = $field;
 		$i++;
 	}
+
+	$flush();
 
 	return $html;
 }
@@ -403,13 +564,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = []):
 
 	if ($type === 'column') {
 		$children = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
-		$inner = '';
-		foreach ($children as $child) {
-			if (!is_array($child)) {
-				continue;
-			}
-			$inner .= bl_forms_render_field($child, $uid, $settings);
-		}
+		$inner = bl_forms_render_field_rows($children, $uid, $settings);
 		$is_auto = (($field['width'] ?? '') === 'auto');
 		$classes = 'bl-form__column' . ($is_auto ? ' bl-form__column--auto' : '');
 		$extra = bl_forms_sanitize_css_class((string) ($field['css_class'] ?? ''));
@@ -427,20 +582,27 @@ function bl_forms_render_field(array $field, string $uid, array $settings = []):
 
 	if ($type === 'section') {
 		$children = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
-		$inner = '';
-		foreach ($children as $child) {
-			if (!is_array($child)) {
-				continue;
-			}
-			$inner .= bl_forms_render_field($child, $uid, $settings);
-		}
+		$inner = bl_forms_render_field_rows($children, $uid, $settings);
 		$label = trim((string) ($field['label'] ?? ''));
-		$classes = 'bl-form__section';
+		$design = sanitize_key((string) ($field['design'] ?? 'standard'));
+		if (!in_array($design, ['standard', 'outline', 'card'], true)) {
+			$design = 'standard';
+		}
+		$is_auto = (($field['width'] ?? '') === 'auto');
+		$classes = 'bl-form__section bl-form__section--' . $design;
+		if ($is_auto) {
+			$classes .= ' bl-form__section--auto';
+		}
 		$extra = bl_forms_sanitize_css_class((string) ($field['css_class'] ?? ''));
 		if ($extra !== '') {
 			$classes .= ' ' . $extra;
 		}
-		$html = '<section class="' . esc_attr($classes) . '">';
+		$style = $is_auto ? '' : bl_forms_field_width_style($field);
+		$attrs = 'class="' . esc_attr($classes) . '"';
+		if ($style !== '') {
+			$attrs .= ' style="' . esc_attr($style) . '"';
+		}
+		$html = '<section ' . $attrs . '>';
 		if ($label !== '') {
 			$html .= '<h3 class="bl-form__section-title">' . esc_html($label) . '</h3>';
 		}
@@ -602,7 +764,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = []):
 		<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--textarea', $name) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<?= bl_forms_field_label_html($field, $input_id, $req_mark) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-			<textarea class="bl-form__control" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" rows="5" placeholder="<?= esc_attr($placeholder) ?>"<?= $control_attrs ?><?= bl_forms_field_maxlength_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?= esc_textarea($default_value) ?></textarea>
+			<textarea class="bl-form__control" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" rows="<?= esc_attr((string) bl_forms_field_rows($field)) ?>" placeholder="<?= esc_attr($placeholder) ?>"<?= $control_attrs ?><?= bl_forms_field_maxlength_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?= esc_textarea($default_value) ?></textarea>
 			<?= bl_forms_field_char_count_html($field, $input_id, $settings) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		</div>
 		<?php

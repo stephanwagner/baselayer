@@ -140,6 +140,7 @@ function bl_forms_palette_icons(): array
 		'drag'         => 'drag-handle',
 		'lock'         => 'lock',
 		'shield'       => 'shield',
+		'design'       => 'palette',
 	];
 
 	$icons = [];
@@ -251,6 +252,11 @@ function bl_forms_admin_enqueue(string $hook): void
 				'columnEmpty'       => __('Drop fields here', 'baselayer'),
 				'columnType'        => __('Columns', 'baselayer'),
 				'columnWidthTitle'  => __('Column width', 'baselayer'),
+				'sectionWidthTitle' => __('Section width', 'baselayer'),
+				'sectionDesignTitle' => __('Section design', 'baselayer'),
+				'sectionDesignStandard' => __('Standard', 'baselayer'),
+				'sectionDesignOutline' => __('Outline', 'baselayer'),
+				'sectionDesignCard' => __('Card', 'baselayer'),
 				'sectionType'       => __('Section', 'baselayer'),
 				'sectionLabel'      => __('Section title', 'baselayer'),
 				'sectionLabelPlaceholder' => __('Section title', 'baselayer'),
@@ -277,6 +283,7 @@ function bl_forms_admin_enqueue(string $hook): void
 				'autocompleteOff'   => __('Off', 'baselayer'),
 				'maxLength'         => __('Maximum length', 'baselayer'),
 				'showCharCount'     => __('Show remaining characters', 'baselayer'),
+				'textareaRows'      => __('Rows', 'baselayer'),
 				'charCountText'     => __('Character count text', 'baselayer'),
 				'charCountTextDefault' => __('%remaining% characters remaining', 'baselayer'),
 				'charCountTextHelp' => __('Use %remaining%, %count%, and %max% as placeholders.', 'baselayer'),

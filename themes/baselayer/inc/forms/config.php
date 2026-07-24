@@ -547,6 +547,27 @@ function bl_forms_field_width_style(array $field): string
 }
 
 /**
+ * Pack factor (0–1) for flex row grouping, or null when width is not a shareable %.
+ *
+ * @param array<string, mixed> $field
+ */
+function bl_forms_field_pack_factor(array $field): ?float
+{
+	$width = (string) ($field['width'] ?? '100');
+	if ($width === 'auto') {
+		return null;
+	}
+	if ($width === 'custom') {
+		$custom = trim((string) ($field['width_custom'] ?? ''));
+		if ($custom === '' || !preg_match('/^\d+(?:\.\d+)?%$/', $custom)) {
+			return null;
+		}
+	}
+
+	return (float) bl_forms_field_width_vars($field)['factor'];
+}
+
+/**
  * CSS width value for a field.
  *
  * @param array<string, mixed> $field
@@ -690,8 +711,11 @@ function bl_forms_sanitize_field($field): ?array
 		}
 		$out['label'] = sanitize_text_field((string) ($field['label'] ?? ''));
 		$out['children'] = $children;
-		$out['width'] = '100';
-		$out['width_custom'] = '';
+		$design = sanitize_key((string) ($field['design'] ?? 'standard'));
+		if (!in_array($design, ['standard', 'outline', 'card'], true)) {
+			$design = 'standard';
+		}
+		$out['design'] = $design;
 		unset($out['name'], $out['name_manual'], $out['hide_label']);
 
 		return $out;
@@ -872,6 +896,19 @@ function bl_forms_sanitize_field($field): ?array
 		unset($out['char_count_text']);
 	} else {
 		unset($out['max_length'], $out['show_char_count'], $out['char_count_text']);
+	}
+
+	if ($type === 'textarea') {
+		$rows = absint($field['rows'] ?? 5);
+		if ($rows < 2) {
+			$rows = 2;
+		}
+		if ($rows > 50) {
+			$rows = 50;
+		}
+		$out['rows'] = $rows;
+	} else {
+		unset($out['rows']);
 	}
 
 	if (in_array($type, ['date', 'time', 'datetime'], true)) {

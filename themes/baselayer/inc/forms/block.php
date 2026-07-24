@@ -91,7 +91,9 @@ function bl_forms_block_render(array $attributes = [], string $content = '', $bl
 		return '';
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes(['class' => 'bl-form']);
+	$wrapper_attributes = get_block_wrapper_attributes([
+		'class' => 'bl-form bl-form--' . $form_id,
+	]);
 	$html = bl_forms_render($form_id, [
 		'wrapper_attributes' => $wrapper_attributes,
 	]);
