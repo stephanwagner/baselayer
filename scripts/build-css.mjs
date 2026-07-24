@@ -8,23 +8,44 @@ const { themeDir } = require('./config.cjs');
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
+const formsPkg = 'packages/baselayer-forms';
 const sassBin = path.join(root, 'node_modules/.bin/sass');
 const chokidarBin = path.join(root, 'node_modules/.bin/chokidar');
 const sassLoadPathArgs = ['--load-path', path.join(root, 'node_modules')];
 
 const entries = [
-  { src: `${themeDir}/src/scss/main.scss`, name: 'baselayer' },
-  { src: `${themeDir}/src/scss/admin.scss`, name: 'admin' },
-  { src: `${themeDir}/src/scss/admin-bar.scss`, name: 'admin-bar' },
-  { src: `${themeDir}/src/scss/forms/forms.scss`, name: 'forms' },
-  { src: `${themeDir}/src/scss/forms/forms-admin.scss`, name: 'forms-admin' }
+  { src: `${themeDir}/src/scss/main.scss`, name: 'baselayer', outDir: `${themeDir}/assets/css` },
+  { src: `${themeDir}/src/scss/admin.scss`, name: 'admin', outDir: `${themeDir}/assets/css` },
+  { src: `${themeDir}/src/scss/admin-bar.scss`, name: 'admin-bar', outDir: `${themeDir}/assets/css` },
+  { src: `${formsPkg}/src/scss/forms.scss`, name: 'forms', outDir: `${formsPkg}/assets/css` },
+  { src: `${formsPkg}/src/scss/forms-admin.scss`, name: 'forms-admin', outDir: `${formsPkg}/assets/css` }
 ];
+
+function parseFilter() {
+  const idx = process.argv.indexOf('--filter');
+  if (idx === -1 || !process.argv[idx + 1]) {
+    return null;
+  }
+  return new Set(
+    process.argv[idx + 1]
+      .split(',')
+      .map((s) => s.trim())
+      .filter(Boolean)
+  );
+}
+
+function selectedEntries() {
+  const filter = parseFilter();
+  if (!filter) {
+    return entries;
+  }
+  return entries.filter((e) => filter.has(e.name));
+}
 
 function sassPairs(prod) {
   const suffix = prod ? '.min' : '';
-
-  return entries.map(
-    ({ src, name }) => `${src}:${themeDir}/assets/css/${name}${suffix}.css`
+  return selectedEntries().map(
+    ({ src, name, outDir }) => `${src}:${outDir}/${name}${suffix}.css`
   );
 }
 
@@ -51,11 +72,16 @@ function spawnWatch(bin, args) {
 
 async function build(prod) {
   const label = prod ? 'production' : 'development';
+  const pairs = sassPairs(prod);
+  if (!pairs.length) {
+    console.log(`No CSS entries matched filter (${label}).`);
+    return;
+  }
   console.log(`Building CSS (${label})...`);
 
   if (prod) {
     await run(sassBin, [
-      ...sassPairs(true),
+      ...pairs,
       ...sassLoadPathArgs,
       '--style=compressed',
       '--no-source-map'
@@ -64,7 +90,7 @@ async function build(prod) {
   }
 
   await run(sassBin, [
-    ...sassPairs(false),
+    ...pairs,
     ...sassLoadPathArgs,
     '--style=expanded',
     '--source-map'
@@ -78,10 +104,15 @@ async function buildAll() {
 
 function watch() {
   console.log('Watching CSS...');
+  const pairs = sassPairs(false);
+  if (!pairs.length) {
+    console.log('No CSS entries matched filter.');
+    return;
+  }
 
   const children = [
     spawnWatch(sassBin, [
-      ...sassPairs(false),
+      ...pairs,
       ...sassLoadPathArgs,
       '--watch',
       '--poll',

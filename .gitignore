@@ -2,6 +2,10 @@
 /themes/*
 !/themes/baselayer
 
+# Exported plugins (scripts/create-plugin/*) — keep folder, ignore generated trees
+/plugins/*
+!/plugins/.gitkeep
+
 # DB exports
 /db
 

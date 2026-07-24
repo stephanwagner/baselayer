@@ -1,0 +1,35 @@
+/**
+ * Minimal design tokens for BaseLayer Forms (standalone; no theme required).
+ */
+
+@use 'sass:color';
+
+$color-primary: #4080ff !default;
+$color-white: #fff !default;
+$color-gray-900: #23292e !default;
+$color-gray-600: #6f7882 !default;
+$color-gray-300: #d0d7de !default;
+$color-gray-200: #eaeef2 !default;
+$color-neutral: #6f7882 !default;
+$color-neutral-bg: color.scale($color-neutral, $lightness: 90%) !default;
+$color-error: #d1343a !default;
+$color-warning: #e97800 !default;
+$color-warning-bg: color.scale($color-warning, $lightness: 92%) !default;
+$color-success: #28a15a !default;
+
+$font-size-s: 14px !default;
+$font-size-m: 16px !default;
+$font-size-l: 18px !default;
+
+$breakpoint-xs: 400px !default;
+$breakpoint-s: 600px !default;
+$breakpoint-m: 900px !default;
+$breakpoint-l: 1200px !default;
+
+$container-margin-xs: 24px !default;
+$container-margin-s: 32px !default;
+$container-margin-m: 48px !default;
+$container-margin-l: 64px !default;
+$container-margin-xl: 96px !default;
+
+$high-density-dppx: 1.5dppx !default;

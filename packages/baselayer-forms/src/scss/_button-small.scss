@@ -1,0 +1,8 @@
+// Compact WP admin button modifier used by Forms UI.
+.wp-core-ui .button.-small,
+.button.-small {
+  min-height: 28px;
+  padding: 0 10px;
+  font-size: 12px;
+  line-height: 2.15384615;
+}
