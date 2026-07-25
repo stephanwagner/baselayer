@@ -70,6 +70,7 @@
       if (value == null || value === false) return;
       if (key === "className") node.className = value;
       else if (key === "text") node.textContent = value;
+      else if (key === "html") appendSafeHelpHtml(node, value);
       else if (key === "dataset") Object.assign(node.dataset, value);
       else if (key.startsWith("on") && typeof value === "function") {
         node.addEventListener(key.slice(2).toLowerCase(), value);
@@ -81,6 +82,37 @@
       node.appendChild(typeof child === "string" ? document.createTextNode(child) : child);
     });
     return node;
+  }
+  function appendSafeHelpHtml(node, html) {
+    const template = document.createElement("template");
+    template.innerHTML = String(html || "");
+    const appendFrom = (parent, target) => {
+      parent.childNodes.forEach((child) => {
+        if (child.nodeType === Node.TEXT_NODE) {
+          target.appendChild(document.createTextNode(child.textContent || ""));
+          return;
+        }
+        if (child.nodeType !== Node.ELEMENT_NODE) {
+          return;
+        }
+        const tag = child.tagName.toLowerCase();
+        if (tag === "b" || tag === "i") {
+          const elNode = document.createElement(tag);
+          appendFrom(child, elNode);
+          target.appendChild(elNode);
+          return;
+        }
+        if (tag === "span") {
+          const span = document.createElement("span");
+          span.style.whiteSpace = "nowrap";
+          appendFrom(child, span);
+          target.appendChild(span);
+          return;
+        }
+        appendFrom(child, target);
+      });
+    };
+    appendFrom(template.content, node);
   }
   function t(key, fallback = "") {
     const dict = window.blFormsAdmin && window.blFormsAdmin.i18n || {};
@@ -3294,6 +3326,19 @@
     } else {
       delete field.layout;
     }
+    if (nextType === "checkboxes") {
+      if (field.min_selections != null && field.min_selections !== "") {
+        const min = parseInt(field.min_selections, 10);
+        field.min_selections = Number.isFinite(min) && min >= 1 ? Math.min(50, min) : "";
+      }
+      if (field.max_selections != null && field.max_selections !== "") {
+        const max = parseInt(field.max_selections, 10);
+        field.max_selections = Number.isFinite(max) && max >= 1 ? Math.min(50, max) : "";
+      }
+    } else {
+      delete field.min_selections;
+      delete field.max_selections;
+    }
     if (MULTIPLE_TYPES.includes(nextType)) {
       field.multiple = Boolean(field.multiple);
     } else {
@@ -4086,6 +4131,59 @@
     return el("div", { className: "bl-forms-builder__number-bounds" }, [
       el("p", {}, [el("label", { text: t("minValue", "Minimum") }), minInput]),
       el("p", {}, [el("label", { text: t("maxValue", "Maximum") }), maxInput])
+    ]);
+  }
+  function createSelectionBoundsControl(field) {
+    const parseLimit = (raw) => {
+      const next = parseInt(raw, 10);
+      return Number.isFinite(next) && next >= 1 ? Math.min(50, next) : "";
+    };
+    const minInput = el("input", {
+      type: "number",
+      className: "widefat",
+      min: "1",
+      max: "50",
+      step: "1",
+      dataset: { blMinSelections: "1" },
+      value: field.min_selections != null && field.min_selections !== "" ? String(parseLimit(field.min_selections) || "") : ""
+    });
+    const maxInput = el("input", {
+      type: "number",
+      className: "widefat",
+      min: "1",
+      max: "50",
+      step: "1",
+      dataset: { blMaxSelections: "1" },
+      value: field.max_selections != null && field.max_selections !== "" ? String(parseLimit(field.max_selections) || "") : ""
+    });
+    const sync = () => {
+      let min = parseLimit(minInput.value);
+      let max = parseLimit(maxInput.value);
+      if (min !== "" && max !== "" && min > max) {
+        [min, max] = [max, min];
+      }
+      field.min_selections = min === "" ? "" : min;
+      field.max_selections = max === "" ? "" : max;
+      minInput.value = min === "" ? "" : String(min);
+      maxInput.value = max === "" ? "" : String(max);
+      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+    };
+    minInput.addEventListener("change", sync);
+    maxInput.addEventListener("change", sync);
+    minInput.addEventListener("blur", sync);
+    maxInput.addEventListener("blur", sync);
+    return el("div", { className: "bl-forms-builder__selection-bounds" }, [
+      el("div", { className: "bl-forms-builder__number-bounds" }, [
+        el("p", {}, [el("label", { text: t("minSelections", "Minimum selections") }), minInput]),
+        el("p", {}, [el("label", { text: t("maxSelections", "Maximum selections") }), maxInput])
+      ]),
+      el("p", {
+        className: "description",
+        text: t(
+          "selectionBoundsHelp",
+          "Leave empty for no limit. When the maximum is reached, further options cannot be selected."
+        )
+      })
     ]);
   }
   function createPrefixSuffixControl(field) {
@@ -5052,6 +5150,19 @@
       const layoutBtn = q("[data-bl-layout].is-active");
       data.layout = layoutBtn?.dataset.blLayout === "horizontal" ? "horizontal" : "vertical";
     }
+    if (type === "checkboxes") {
+      const parseLimit = (raw) => {
+        const next = parseInt(raw, 10);
+        return Number.isFinite(next) && next >= 1 ? Math.min(50, next) : "";
+      };
+      let min = parseLimit(q("[data-bl-min-selections]")?.value?.trim());
+      let max = parseLimit(q("[data-bl-max-selections]")?.value?.trim());
+      if (min !== "" && max !== "" && min > max) {
+        [min, max] = [max, min];
+      }
+      data.min_selections = min;
+      data.max_selections = max;
+    }
     if (MULTIPLE_TYPES.includes(type)) {
       data.multiple = Boolean(q("[data-bl-multiple]")?.checked);
     }
@@ -5489,6 +5600,9 @@
         if (field.type === "number") {
           advancedSections.add(createNumberBoundsControl(field));
         }
+        if (field.type === "checkboxes") {
+          advancedSections.add(createSelectionBoundsControl(field));
+        }
         if (["date", "time", "datetime"].includes(field.type)) {
           advancedSections.add(createTemporalBoundsControl(field));
           const relationControl = createTemporalRelationControl(field);
@@ -5513,10 +5627,10 @@
           generalSections.add(
             el("p", {}, [el("label", { text: t("checkboxText", "Checkbox text") }), consentText]),
             el("p", {
-              className: "description bl-forms-builder__help-lines",
-              text: t(
+              className: "description",
+              html: t(
                 "checkboxTextHelp",
-                "You can insert links using Markdown:\n[Privacy Policy](page:privacy)\n[Imprint](page:123)\n[AGB](/abg)"
+                'Markdown is supported, e.g. <b>**Bold**</b>, <i>*Italic*</i>, and <span style="white-space: nowrap">[Link](...)</span>. For the target you can use a URL (/agb), a WordPress page (page:123), or a standard page such as page:privacy.'
               )
             })
           );
@@ -6102,6 +6216,7 @@
     const adminEmail = builderRoot.dataset.adminEmail || "";
     const fbAdminSubject = builderRoot.dataset.fallbackAdminSubject || "";
     const fbSubmit = builderRoot.dataset.fallbackSubmit || "";
+    const fbSubmitClass = builderRoot.dataset.fallbackSubmitClass || "";
     const fbSuccess = builderRoot.dataset.fallbackSuccess || "";
     const fbError = builderRoot.dataset.fallbackError || "";
     const fbValidation = builderRoot.dataset.fallbackValidation || "";
@@ -6298,6 +6413,14 @@
       el("input", { type: "text", className: "widefat", placeholder: fbSubmit }),
       "submit_label"
     );
+    const submitButtonClass = bindText(
+      el("input", {
+        type: "text",
+        className: "widefat",
+        placeholder: fbSubmitClass
+      }),
+      "submit_button_class"
+    );
     const success = bindText(
       el("textarea", { className: "widefat", rows: "2", placeholder: fbSuccess }),
       "success_message"
@@ -6361,6 +6484,8 @@
     const fileSizeMsg = bindErrorMsg("file_size_message", "file_size");
     const fileMaxMsg = bindErrorMsg("file_max_message", "file_max");
     const optionMsg = bindErrorMsg("option_message", "option");
+    const selectionMinMsg = bindErrorMsg("selection_min_message", "selection_min");
+    const selectionMaxMsg = bindErrorMsg("selection_max_message", "selection_max");
     const rangeHelp = () => el("span", {
       className: "description bl-forms-builder__field-errors-help",
       text: t("minMaxMessageHelp", "The placeholder {limit} is replaced by the limit.")
@@ -6542,6 +6667,14 @@
     syncAfterSubmitUi();
     settingsPanel.append(
       fieldRow(t("submitLabel", "Submit button label"), submitLabel),
+      fieldRow(
+        t("submitButtonClass", "Submit button classes"),
+        submitButtonClass,
+        t(
+          "submitButtonClassHelp",
+          "Extra CSS classes for the submit button (space-separated), e.g. button -primary."
+        )
+      ),
       afterOptions,
       successPanel,
       fieldRow(t("errorMessage", "Error message"), error),
@@ -6617,7 +6750,25 @@
           t("fileMaxErrorHelp", "The placeholder {max} is replaced by the maximum number of files.")
         )
       ]),
-      errorSection(t("optionError", "Choice"), [optionMsg])
+      errorSection(t("optionError", "Choice"), [
+        fieldRow(t("invalidError", "Invalid"), optionMsg),
+        fieldRow(
+          t("selectionMinError", "Minimum selections"),
+          selectionMinMsg,
+          t(
+            "selectionMinErrorHelp",
+            "The placeholder {min} is replaced by the minimum number of options."
+          )
+        ),
+        fieldRow(
+          t("selectionMaxError", "Maximum selections"),
+          selectionMaxMsg,
+          t(
+            "selectionMaxErrorHelp",
+            "The placeholder {max} is replaced by the maximum number of options."
+          )
+        )
+      ])
     );
     return {
       notifications,

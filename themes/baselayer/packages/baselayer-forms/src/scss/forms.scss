@@ -214,7 +214,7 @@
   &.is-invalid .bl-form__btn-option,
   &.is-invalid .bl-form__switch-ui {
     outline: 2px solid var(--bl-form-outline-danger);
-    outline-offset: 1px;
+    outline-offset: 0;
   }
 
   &.is-invalid .bl-form__option input[type='checkbox'],
@@ -611,7 +611,7 @@ select.bl-form__control {
 
   input:focus-visible + span {
     outline: 2px solid var(--bl-form-outline-focus);
-    outline-offset: 1px;
+    outline-offset: 0;
   }
 
   input:checked + span {
@@ -874,23 +874,6 @@ select.bl-form__control {
     background: color-mix(in srgb, var(--bl-form-danger) 12%, transparent);
     color: var(--bl-form-danger);
     outline: none;
-  }
-}
-
-.bl-form__heading .bl-form__title {
-  margin: 0;
-  font-size: 20px;
-}
-
-.bl-form__text {
-  color: var(--bl-form-muted);
-
-  p {
-    margin: 0 0 8px;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
   }
 }
 

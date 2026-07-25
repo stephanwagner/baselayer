@@ -83,6 +83,7 @@ function bl_forms_render_builder_after_title(WP_Post $post): void
 		data-fallback-user-intro="<?= esc_attr($user_intro_placeholder) ?>"
 		data-fallback-user-footer="<?= esc_attr($user_footer_placeholder) ?>"
 		data-fallback-submit="<?= esc_attr($placeholders['submit']) ?>"
+		data-fallback-submit-class="<?= esc_attr(bl_forms_resolve_setting_string([], 'submit_button_class')) ?>"
 		data-fallback-success="<?= esc_attr($placeholders['success']) ?>"
 		data-fallback-error="<?= esc_attr($placeholders['error']) ?>"
 		data-fallback-validation="<?= esc_attr($placeholders['validation']) ?>"
@@ -117,6 +118,24 @@ function bl_forms_render_tools_metabox(WP_Post $post): void
 	</div>
 	<?php
 }
+
+/**
+ * Hint under the publish date: how to place the form on the site.
+ */
+function bl_forms_submitbox_placement_help(): void
+{
+	$screen = function_exists('get_current_screen') ? get_current_screen() : null;
+	if (!$screen instanceof WP_Screen || $screen->post_type !== BL_FORM_POST_TYPE) {
+		return;
+	}
+
+	?>
+	<div class="misc-pub-section bl-forms-submitbox-help">
+		<?= esc_html__('Use the Form block to insert this form anywhere on your site.', 'baselayer-forms') ?>
+	</div>
+	<?php
+}
+add_action('post_submitbox_misc_actions', 'bl_forms_submitbox_placement_help');
 
 /**
  * Save form config from builder JSON only.
@@ -449,7 +468,10 @@ function bl_forms_admin_enqueue(string $hook): void
 				'termsDefaultLabel' => __('I agree to the [Privacy Policy](page:privacy).', 'baselayer-forms'),
 				'termsDefaultFieldLabel' => __('Privacy Policy', 'baselayer-forms'),
 				'checkboxText'      => __('Checkbox text', 'baselayer-forms'),
-				'checkboxTextHelp'  => __("You can insert links using Markdown:\n[Privacy Policy](page:privacy)\n[Imprint](page:123)\n[AGB](/abg)", 'baselayer-forms'),
+				'checkboxTextHelp'  => __(
+					'Markdown is supported, e.g. <b>**Bold**</b>, <i>*Italic*</i>, and <span style="white-space: nowrap">[Link](...)</span>. For the target you can use a URL (/agb), a WordPress page (page:123), or a standard page such as page:privacy.',
+					'baselayer-forms'
+				),
 				'content'           => __('Content', 'baselayer-forms'),
 				'htmlContent'       => __('HTML', 'baselayer-forms'),
 				'options'           => __('Options', 'baselayer-forms'),
@@ -477,6 +499,8 @@ function bl_forms_admin_enqueue(string $hook): void
 				'cssClassPlaceholder' => __('e.g. my-field', 'baselayer-forms'),
 				'cssClassHelp'      => __('Optional class names added to this field’s wrapper.', 'baselayer-forms'),
 				'submitLabel'       => __('Submit button label', 'baselayer-forms'),
+				'submitButtonClass' => __('Submit button classes', 'baselayer-forms'),
+				'submitButtonClassHelp' => __('Extra CSS classes for the submit button (space-separated), e.g. button -primary.', 'baselayer-forms'),
 				'recipient'         => __('Recipient', 'baselayer-forms'),
 				'recipientHelp'     => __('One email per line. Leave empty to use the global default (or the site administrator email).', 'baselayer-forms'),
 				'successMessage'    => __('Success message', 'baselayer-forms'),
@@ -510,6 +534,13 @@ function bl_forms_admin_enqueue(string $hook): void
 				'fileMaxError'      => __('Too many files', 'baselayer-forms'),
 				'fileMaxErrorHelp'  => __('The placeholder {max} is replaced by the maximum number of files.', 'baselayer-forms'),
 				'optionError'       => __('Choice', 'baselayer-forms'),
+				'selectionMinError' => __('Minimum selections', 'baselayer-forms'),
+				'selectionMaxError' => __('Maximum selections', 'baselayer-forms'),
+				'selectionMinErrorHelp' => __('The placeholder {min} is replaced by the minimum number of options.', 'baselayer-forms'),
+				'selectionMaxErrorHelp' => __('The placeholder {max} is replaced by the maximum number of options.', 'baselayer-forms'),
+				'minSelections'     => __('Minimum selections', 'baselayer-forms'),
+				'maxSelections'     => __('Maximum selections', 'baselayer-forms'),
+				'selectionBoundsHelp' => __('Leave empty for no limit. When the maximum is reached, further options cannot be selected.', 'baselayer-forms'),
 				'uploadButtonText'  => __('Button label', 'baselayer-forms'),
 				'allowedExtensions' => __('Allowed extensions', 'baselayer-forms'),
 				'allowedExtensionsHelp' => __('Comma-separated list without dots, e.g. pdf, docx, xlsx. Leave empty to allow all WordPress-permitted types.', 'baselayer-forms'),

@@ -15,6 +15,8 @@ function bl_forms_render(int $form_id, array $args = []): string
 	$config = bl_forms_get_config($form_id);
 	$settings = $config['settings'];
 	$submit_label = bl_forms_resolve_message($settings, 'submit_label');
+	$submit_button_class = bl_forms_resolve_setting_string($settings, 'submit_button_class');
+	$submit_btn_classes = trim('button' . ($submit_button_class !== '' ? ' ' . $submit_button_class : ''));
 	$success = bl_forms_resolve_message($settings, 'success_message');
 	$error = bl_forms_resolve_message($settings, 'error_message');
 	$validation = bl_forms_resolve_message($settings, 'validation_message');
@@ -88,7 +90,7 @@ function bl_forms_render(int $form_id, array $args = []): string
 						<div class="bl-form__progress-bar" data-bl-form-progress-bar></div>
 					</div>
 				</div>
-				<button type="submit" class="button" data-bl-form-submit>
+				<button type="submit" class="<?= esc_attr($submit_btn_classes) ?>" data-bl-form-submit>
 					<span class="bl-form__submit-label"><?= esc_html($submit_label) ?></span>
 					<span class="bl-form__spinner" data-bl-form-spinner hidden aria-hidden="true"></span>
 				</button>
@@ -744,7 +746,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = []):
 			$level = 'h2';
 		}
 
-		return '<div ' . bl_forms_field_wrap_attrs($field, 'bl-form__heading') . '><' . $level . ' class="bl-form__title">' . esc_html($content) . '</' . $level . '></div>';
+		return '<div ' . bl_forms_field_wrap_attrs($field, 'bl-form__heading') . '><' . $level . '>' . esc_html($content) . '</' . $level . '></div>';
 	}
 
 	if ($type === 'text_block') {
@@ -753,7 +755,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = []):
 			return '';
 		}
 
-		return '<div ' . bl_forms_field_wrap_attrs($field, 'bl-form__text') . '>' . nl2br(esc_html($content)) . '</div>';
+		return '<div ' . bl_forms_field_wrap_attrs($field, 'bl-form__text') . '><p>' . nl2br(esc_html($content), false) . '</p></div>';
 	}
 
 	if ($type === 'html') {
@@ -849,8 +851,20 @@ function bl_forms_render_field(array $field, string $uid, array $settings = []):
 
 	if ($type === 'checkboxes') {
 		$options_class = 'bl-form__options bl-form__options--' . bl_forms_field_options_layout($field);
+		$min_sel = bl_forms_field_min_selections($field);
+		$max_sel = bl_forms_field_max_selections($field);
+		$limit_attrs = '';
+		if ($min_sel > 0) {
+			$limit_attrs .= ' data-bl-form-min-selections="' . esc_attr((string) $min_sel) . '"';
+		}
+		if ($max_sel > 0) {
+			$limit_attrs .= ' data-bl-form-max-selections="' . esc_attr((string) $max_sel) . '"';
+			$limit_attrs .= ' data-bl-form-selection-max-msg="' . esc_attr(
+				bl_forms_field_error_message('selection_max', $field, $settings, (string) $max_sel)
+			) . '"';
+		}
 		?>
-		<fieldset <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--checkboxes', $name) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<fieldset <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--checkboxes', $name) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= $limit_attrs // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<?= bl_forms_field_label_html($field, $input_id, $req_mark, 'legend') // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<div class="<?= esc_attr($options_class) ?>">

@@ -264,6 +264,20 @@ function convertFieldType(field, nextType) {
     delete field.layout;
   }
 
+  if (nextType === 'checkboxes') {
+    if (field.min_selections != null && field.min_selections !== '') {
+      const min = parseInt(field.min_selections, 10);
+      field.min_selections = Number.isFinite(min) && min >= 1 ? Math.min(50, min) : '';
+    }
+    if (field.max_selections != null && field.max_selections !== '') {
+      const max = parseInt(field.max_selections, 10);
+      field.max_selections = Number.isFinite(max) && max >= 1 ? Math.min(50, max) : '';
+    }
+  } else {
+    delete field.min_selections;
+    delete field.max_selections;
+  }
+
   if (MULTIPLE_TYPES.includes(nextType)) {
     field.multiple = Boolean(field.multiple);
   } else {
@@ -1155,6 +1169,69 @@ function createNumberBoundsControl(field) {
   return el('div', { className: 'bl-forms-builder__number-bounds' }, [
     el('p', {}, [el('label', { text: t('minValue', 'Minimum') }), minInput]),
     el('p', {}, [el('label', { text: t('maxValue', 'Maximum') }), maxInput]),
+  ]);
+}
+
+function createSelectionBoundsControl(field) {
+  const parseLimit = (raw) => {
+    const next = parseInt(raw, 10);
+    return Number.isFinite(next) && next >= 1 ? Math.min(50, next) : '';
+  };
+
+  const minInput = el('input', {
+    type: 'number',
+    className: 'widefat',
+    min: '1',
+    max: '50',
+    step: '1',
+    dataset: { blMinSelections: '1' },
+    value:
+      field.min_selections != null && field.min_selections !== ''
+        ? String(parseLimit(field.min_selections) || '')
+        : '',
+  });
+  const maxInput = el('input', {
+    type: 'number',
+    className: 'widefat',
+    min: '1',
+    max: '50',
+    step: '1',
+    dataset: { blMaxSelections: '1' },
+    value:
+      field.max_selections != null && field.max_selections !== ''
+        ? String(parseLimit(field.max_selections) || '')
+        : '',
+  });
+
+  const sync = () => {
+    let min = parseLimit(minInput.value);
+    let max = parseLimit(maxInput.value);
+    if (min !== '' && max !== '' && min > max) {
+      [min, max] = [max, min];
+    }
+    field.min_selections = min === '' ? '' : min;
+    field.max_selections = max === '' ? '' : max;
+    minInput.value = min === '' ? '' : String(min);
+    maxInput.value = max === '' ? '' : String(max);
+    document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+  };
+  minInput.addEventListener('change', sync);
+  maxInput.addEventListener('change', sync);
+  minInput.addEventListener('blur', sync);
+  maxInput.addEventListener('blur', sync);
+
+  return el('div', { className: 'bl-forms-builder__selection-bounds' }, [
+    el('div', { className: 'bl-forms-builder__number-bounds' }, [
+      el('p', {}, [el('label', { text: t('minSelections', 'Minimum selections') }), minInput]),
+      el('p', {}, [el('label', { text: t('maxSelections', 'Maximum selections') }), maxInput]),
+    ]),
+    el('p', {
+      className: 'description',
+      text: t(
+        'selectionBoundsHelp',
+        'Leave empty for no limit. When the maximum is reached, further options cannot be selected.'
+      ),
+    }),
   ]);
 }
 
@@ -2288,6 +2365,19 @@ export function serializeRow(row) {
     const layoutBtn = q('[data-bl-layout].is-active');
     data.layout = layoutBtn?.dataset.blLayout === 'horizontal' ? 'horizontal' : 'vertical';
   }
+  if (type === 'checkboxes') {
+    const parseLimit = (raw) => {
+      const next = parseInt(raw, 10);
+      return Number.isFinite(next) && next >= 1 ? Math.min(50, next) : '';
+    };
+    let min = parseLimit(q('[data-bl-min-selections]')?.value?.trim());
+    let max = parseLimit(q('[data-bl-max-selections]')?.value?.trim());
+    if (min !== '' && max !== '' && min > max) {
+      [min, max] = [max, min];
+    }
+    data.min_selections = min;
+    data.max_selections = max;
+  }
   if (MULTIPLE_TYPES.includes(type)) {
     data.multiple = Boolean(q('[data-bl-multiple]')?.checked);
   }
@@ -2784,6 +2874,10 @@ export function createFieldCard(initial, open = false) {
         advancedSections.add(createNumberBoundsControl(field));
       }
 
+      if (field.type === 'checkboxes') {
+        advancedSections.add(createSelectionBoundsControl(field));
+      }
+
       if (['date', 'time', 'datetime'].includes(field.type)) {
         advancedSections.add(createTemporalBoundsControl(field));
         const relationControl = createTemporalRelationControl(field);
@@ -2810,10 +2904,10 @@ export function createFieldCard(initial, open = false) {
         generalSections.add(
           el('p', {}, [el('label', { text: t('checkboxText', 'Checkbox text') }), consentText]),
           el('p', {
-            className: 'description bl-forms-builder__help-lines',
-            text: t(
+            className: 'description',
+            html: t(
               'checkboxTextHelp',
-              "You can insert links using Markdown:\n[Privacy Policy](page:privacy)\n[Imprint](page:123)\n[AGB](/abg)"
+              'Markdown is supported, e.g. <b>**Bold**</b>, <i>*Italic*</i>, and <span style="white-space: nowrap">[Link](...)</span>. For the target you can use a URL (/agb), a WordPress page (page:123), or a standard page such as page:privacy.'
             ),
           })
         );

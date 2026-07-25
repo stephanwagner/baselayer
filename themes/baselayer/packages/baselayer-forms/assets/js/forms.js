@@ -501,7 +501,34 @@
         err.hidden = !msg;
       });
     };
+    const markFieldInvalid = (field, msg) => {
+      if (!field) return;
+      field.classList.add("is-invalid");
+      field.setAttribute("aria-invalid", "true");
+      const err = ensureErrorEl(field);
+      err.textContent = msg || "";
+      err.hidden = !msg;
+    };
+    const enforceCheckboxMax = (event) => {
+      const target = event.target;
+      if (!(target instanceof HTMLInputElement) || target.type !== "checkbox" || !target.checked) {
+        return false;
+      }
+      const field = target.closest("[data-bl-form-field][data-bl-form-max-selections]");
+      if (!field) return false;
+      const max = Math.max(0, Number(field.getAttribute("data-bl-form-max-selections")) || 0);
+      if (max < 1) return false;
+      const checked = field.querySelectorAll('input[type="checkbox"]:checked');
+      if (checked.length <= max) return false;
+      target.checked = false;
+      const message2 = field.getAttribute("data-bl-form-selection-max-msg") || `You can select at most ${max} options.`;
+      markFieldInvalid(field, message2);
+      return true;
+    };
     const clearInvalidFromEvent = (event) => {
+      if (enforceCheckboxMax(event)) {
+        return;
+      }
       const target = event.target;
       if (!(target instanceof Element)) return;
       const field = target.closest("[data-bl-form-field]");

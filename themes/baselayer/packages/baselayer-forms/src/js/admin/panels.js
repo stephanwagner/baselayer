@@ -196,6 +196,7 @@ export function createPanels(settings, builderRoot, onChange) {
   const adminEmail = builderRoot.dataset.adminEmail || '';
   const fbAdminSubject = builderRoot.dataset.fallbackAdminSubject || '';
   const fbSubmit = builderRoot.dataset.fallbackSubmit || '';
+  const fbSubmitClass = builderRoot.dataset.fallbackSubmitClass || '';
   const fbSuccess = builderRoot.dataset.fallbackSuccess || '';
   const fbError = builderRoot.dataset.fallbackError || '';
   const fbValidation = builderRoot.dataset.fallbackValidation || '';
@@ -413,6 +414,14 @@ export function createPanels(settings, builderRoot, onChange) {
     el('input', { type: 'text', className: 'widefat', placeholder: fbSubmit }),
     'submit_label'
   );
+  const submitButtonClass = bindText(
+    el('input', {
+      type: 'text',
+      className: 'widefat',
+      placeholder: fbSubmitClass,
+    }),
+    'submit_button_class'
+  );
   const success = bindText(
     el('textarea', { className: 'widefat', rows: '2', placeholder: fbSuccess }),
     'success_message'
@@ -479,6 +488,8 @@ export function createPanels(settings, builderRoot, onChange) {
   const fileSizeMsg = bindErrorMsg('file_size_message', 'file_size');
   const fileMaxMsg = bindErrorMsg('file_max_message', 'file_max');
   const optionMsg = bindErrorMsg('option_message', 'option');
+  const selectionMinMsg = bindErrorMsg('selection_min_message', 'selection_min');
+  const selectionMaxMsg = bindErrorMsg('selection_max_message', 'selection_max');
 
   const rangeHelp = () =>
     el('span', {
@@ -691,6 +702,14 @@ export function createPanels(settings, builderRoot, onChange) {
 
   settingsPanel.append(
     fieldRow(t('submitLabel', 'Submit button label'), submitLabel),
+    fieldRow(
+      t('submitButtonClass', 'Submit button classes'),
+      submitButtonClass,
+      t(
+        'submitButtonClassHelp',
+        'Extra CSS classes for the submit button (space-separated), e.g. button -primary.'
+      )
+    ),
     afterOptions,
     successPanel,
     fieldRow(t('errorMessage', 'Error message'), error),
@@ -769,7 +788,25 @@ export function createPanels(settings, builderRoot, onChange) {
         t('fileMaxErrorHelp', 'The placeholder {max} is replaced by the maximum number of files.')
       ),
     ]),
-    errorSection(t('optionError', 'Choice'), [optionMsg])
+    errorSection(t('optionError', 'Choice'), [
+      fieldRow(t('invalidError', 'Invalid'), optionMsg),
+      fieldRow(
+        t('selectionMinError', 'Minimum selections'),
+        selectionMinMsg,
+        t(
+          'selectionMinErrorHelp',
+          'The placeholder {min} is replaced by the minimum number of options.'
+        )
+      ),
+      fieldRow(
+        t('selectionMaxError', 'Maximum selections'),
+        selectionMaxMsg,
+        t(
+          'selectionMaxErrorHelp',
+          'The placeholder {max} is replaced by the maximum number of options.'
+        )
+      ),
+    ])
   );
 
   // Security is managed under Forms → Settings (global only).

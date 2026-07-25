@@ -178,6 +178,12 @@ body.bl-page-picker-open {
 .post-type-bl_form #submitdiv #delete-action {
   display: none;
 }
+.post-type-bl_form #submitdiv .bl-forms-submitbox-help {
+  margin: 0;
+  padding-top: 8px;
+  color: #646970;
+  line-height: 1.4;
+}
 .post-type-bl_form #bl_forms_tools .inside,
 .post-type-bl_form #bl_forms_templates .inside {
   margin: 0;
@@ -1177,10 +1183,6 @@ input.bl-forms-builder__section-label-input:focus {
   display: none !important;
 }
 
-.bl-forms-builder__help-lines {
-  white-space: pre-line;
-}
-
 .bl-forms-builder__field-section {
   margin: 0 0 16px;
 }
@@ -1195,6 +1197,7 @@ input.bl-forms-builder__section-label-input:focus {
 }
 
 .bl-forms-builder__number-bounds,
+.bl-forms-builder__selection-bounds .bl-forms-builder__number-bounds,
 .bl-forms-builder__temporal-bounds,
 .bl-forms-builder__affix-bounds {
   display: grid;
@@ -1203,8 +1206,16 @@ input.bl-forms-builder__section-label-input:focus {
   margin: 0 0 10px;
 }
 .bl-forms-builder__number-bounds > p,
+.bl-forms-builder__selection-bounds .bl-forms-builder__number-bounds > p,
 .bl-forms-builder__temporal-bounds > p,
 .bl-forms-builder__affix-bounds > p {
+  margin: 0;
+}
+
+.bl-forms-builder__selection-bounds {
+  margin: 0 0 10px;
+}
+.bl-forms-builder__selection-bounds > .description {
   margin: 0;
 }
 
@@ -1513,7 +1524,7 @@ input.bl-forms-builder__section-label-input:focus {
 .bl-forms-builder label.bl-forms-builder__switch input:focus-visible + .bl-forms-builder__switch-ui,
 .bl-forms-settings label.bl-forms-builder__switch input:focus-visible + .bl-forms-builder__switch-ui {
   outline: 2px solid var(--bl-forms-admin-accent, #2271b1);
-  outline-offset: 1px;
+  outline-offset: 0;
 }
 
 .bl-forms-builder__switch-setting.is-disabled .bl-forms-builder__switch-ui {

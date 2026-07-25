@@ -3,6 +3,64 @@
 defined('ABSPATH') || exit;
 
 /**
+ * Sanitize a space-separated CSS class list (allows Baselayer modifiers like -primary).
+ */
+function bl_forms_sanitize_css_classes(string $raw): string
+{
+	$parts = preg_split('/\s+/', trim($raw), -1, PREG_SPLIT_NO_EMPTY);
+	if (!is_array($parts) || $parts === []) {
+		return '';
+	}
+
+	$clean = [];
+	foreach ($parts as $part) {
+		$class = preg_replace('/[^A-Za-z0-9_-]/', '', (string) $part);
+		if (!is_string($class) || $class === '' || $class === '-' || $class === '_') {
+			continue;
+		}
+		$clean[$class] = $class;
+	}
+
+	return implode(' ', array_values($clean));
+}
+
+/**
+ * Sanitize a selection count limit (empty / 0 = no limit).
+ *
+ * @param mixed $raw
+ */
+function bl_forms_sanitize_selection_limit($raw): int
+{
+	if ($raw === '' || $raw === null) {
+		return 0;
+	}
+
+	$n = (int) $raw;
+
+	return $n > 0 ? min(50, $n) : 0;
+}
+
+/**
+ * Minimum checkbox selections (0 = no minimum).
+ *
+ * @param array<string, mixed> $field
+ */
+function bl_forms_field_min_selections(array $field): int
+{
+	return bl_forms_sanitize_selection_limit($field['min_selections'] ?? '');
+}
+
+/**
+ * Maximum checkbox selections (0 = no maximum).
+ *
+ * @param array<string, mixed> $field
+ */
+function bl_forms_field_max_selections(array $field): int
+{
+	return bl_forms_sanitize_selection_limit($field['max_selections'] ?? '');
+}
+
+/**
  * Permalink for a published page/post, or empty string.
  */
 function bl_forms_permalink_for_post(?WP_Post $post): string
@@ -89,7 +147,12 @@ function bl_forms_resolve_link_target(string $target): string
 }
 
 /**
- * Format plain text with optional [label](target) links for consent checkbox copy.
+ * Format plain text with optional Markdown for consent checkbox copy.
+ *
+ * Supports:
+ * - Links: [label](target)
+ * - Bold: **text**
+ * - Italic: *text*
  *
  * Unresolved page: targets omit the link and keep the label as plain text.
  */
@@ -112,10 +175,10 @@ function bl_forms_format_inline_links(string $text): string
 		}
 
 		if (preg_match('/^\[([^\]]+)\]\(([^)]+)\)$/u', $part, $matches)) {
-			$label = (string) $matches[1];
+			$label = bl_forms_format_inline_emphasis(esc_html((string) $matches[1]));
 			$url = bl_forms_resolve_link_target((string) $matches[2]);
 			if ($url === '') {
-				$html .= esc_html($label);
+				$html .= $label;
 				continue;
 			}
 
@@ -127,11 +190,11 @@ function bl_forms_format_inline_links(string $text): string
 				$attrs .= ' target="_blank" rel="noopener noreferrer"';
 			}
 
-			$html .= '<a ' . $attrs . '>' . esc_html($label) . '</a>';
+			$html .= '<a ' . $attrs . '>' . $label . '</a>';
 			continue;
 		}
 
-		$html .= esc_html($part);
+		$html .= bl_forms_format_inline_emphasis(esc_html($part));
 	}
 
 	$allowed = [
@@ -141,9 +204,26 @@ function bl_forms_format_inline_links(string $text): string
 			'target' => true,
 			'rel'    => true,
 		],
+		'b' => [],
+		'i' => [],
 	];
 
 	return wp_kses($html, $allowed);
+}
+
+/**
+ * Convert **bold** and *italic* Markdown in already-escaped text.
+ */
+function bl_forms_format_inline_emphasis(string $escaped): string
+{
+	$escaped = preg_replace('/\*\*(.+?)\*\*/us', '<b>$1</b>', $escaped);
+	if (!is_string($escaped)) {
+		return '';
+	}
+
+	$escaped = preg_replace('/\*(.+?)\*/us', '<i>$1</i>', $escaped);
+
+	return is_string($escaped) ? $escaped : '';
 }
 
 /**

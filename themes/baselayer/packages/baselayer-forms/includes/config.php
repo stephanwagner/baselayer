@@ -101,6 +101,7 @@ function bl_forms_default_global_settings(): array
 {
 	return [
 		'submit_label'           => '',
+		'submit_button_class'    => '',
 		'recipient'              => '',
 		'success_message'        => '',
 		'error_message'          => '',
@@ -131,6 +132,8 @@ function bl_forms_default_global_settings(): array
 		'file_size_message'      => '',
 		'file_max_message'       => '',
 		'option_message'         => '',
+		'selection_min_message'  => '',
+		'selection_max_message'  => '',
 		'admin_email_subject'    => '',
 		'user_email_subject'     => '',
 		'user_email_title'       => '',
@@ -218,6 +221,10 @@ function bl_forms_sanitize_global_settings($input): array
 		}
 		if ($key === 'captcha_site_key' || $key === 'captcha_secret_key') {
 			$settings[$key] = sanitize_text_field((string) $input[$key]);
+			continue;
+		}
+		if ($key === 'submit_button_class') {
+			$settings[$key] = bl_forms_sanitize_css_classes((string) $input[$key]);
 			continue;
 		}
 		if ($key === 'recipient') {
@@ -454,6 +461,7 @@ function bl_forms_default_settings(): array
 
 	return [
 		'submit_label'           => '',
+		'submit_button_class'    => '',
 		'recipient'              => '',
 		'success_message'        => '',
 		'error_message'          => '',
@@ -485,6 +493,8 @@ function bl_forms_default_settings(): array
 		'file_max_message'       => '',
 		'save_uploads'           => !empty($globals['allow_save_uploads']) && !empty($globals['save_uploads']),
 		'option_message'         => '',
+		'selection_min_message'  => '',
+		'selection_max_message'  => '',
 		'after_submit'           => 'message',
 		'redirect_page_id'       => 0,
 		'notify_user'            => !empty($globals['notify_user']),
@@ -585,6 +595,10 @@ function bl_forms_message_fallbacks(): array
 		'upload_button' => __('Choose file', 'baselayer-forms'),
 		'upload_empty'  => __('No file chosen', 'baselayer-forms'),
 		'option'     => __('Please choose a valid option.', 'baselayer-forms'),
+		/* translators: Placeholder: {min} — minimum number of options (used when minimum is greater than 1) */
+		'selection_min' => __('Select at least {min} options.', 'baselayer-forms'),
+		/* translators: Placeholder: {max} — maximum number of options. Used as admin placeholder; runtime uses singular/plural via _n(). */
+		'selection_max' => __('You can select at most {max} options.', 'baselayer-forms'),
 	];
 }
 
@@ -624,6 +638,8 @@ function bl_forms_resolve_message(array $settings, string $key): string
 		'file_size_message'  => 'file_size',
 		'file_max_message'   => 'file_max',
 		'option_message'     => 'option',
+		'selection_min_message' => 'selection_min',
+		'selection_max_message' => 'selection_max',
 		'submit_label'       => 'submit',
 	];
 
@@ -677,6 +693,8 @@ function bl_forms_form_message_placeholders(): array
 		'file_size' => 'file_size_message',
 		'file_max' => 'file_max_message',
 		'option' => 'option_message',
+		'selection_min' => 'selection_min_message',
+		'selection_max' => 'selection_max_message',
 		'upload_button' => '',
 		'upload_empty' => '',
 	];
@@ -1532,6 +1550,26 @@ function bl_forms_sanitize_field($field): ?array
 		$out['layout'] = (($field['layout'] ?? 'vertical') === 'horizontal') ? 'horizontal' : 'vertical';
 	}
 
+	if ($type === 'checkboxes') {
+		$min_sel = bl_forms_sanitize_selection_limit($field['min_selections'] ?? '');
+		$max_sel = bl_forms_sanitize_selection_limit($field['max_selections'] ?? '');
+		if ($min_sel > 0 && $max_sel > 0 && $min_sel > $max_sel) {
+			[$min_sel, $max_sel] = [$max_sel, $min_sel];
+		}
+		if ($min_sel > 0) {
+			$out['min_selections'] = $min_sel;
+		} else {
+			unset($out['min_selections']);
+		}
+		if ($max_sel > 0) {
+			$out['max_selections'] = $max_sel;
+		} else {
+			unset($out['max_selections']);
+		}
+	} else {
+		unset($out['min_selections'], $out['max_selections']);
+	}
+
 	if (in_array($type, ['select', 'button_group', 'file', 'image'], true)) {
 		$out['multiple'] = !empty($field['multiple']);
 	}
@@ -1680,6 +1718,10 @@ function bl_forms_sanitize_config($config): array
 		}
 		if ($key === 'user_email_field' || $key === 'honeypot_name') {
 			$settings[$key] = sanitize_key((string) $settings_in[$key]);
+			continue;
+		}
+		if ($key === 'submit_button_class') {
+			$settings[$key] = bl_forms_sanitize_css_classes((string) $settings_in[$key]);
 			continue;
 		}
 		if ($key === 'recipient') {

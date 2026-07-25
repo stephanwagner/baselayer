@@ -424,6 +424,13 @@ function bl_forms_render_settings_page(): void
 
 				bl_forms_settings_message_section(__('Form messages', 'baselayer-forms'), static function () use ($settings, $fallbacks): void {
 					bl_forms_settings_message_field($settings, 'submit_label', __('Submit button label', 'baselayer-forms'), $fallbacks['submit']);
+					bl_forms_settings_message_field(
+						$settings,
+						'submit_button_class',
+						__('Submit button classes', 'baselayer-forms'),
+						'',
+						__('Extra CSS classes for the submit button (space-separated), e.g. button -primary.', 'baselayer-forms')
+					);
 					bl_forms_settings_message_field($settings, 'success_message', __('Success message', 'baselayer-forms'), $fallbacks['success'], '', 'textarea');
 					bl_forms_settings_message_field($settings, 'error_message', __('Error message', 'baselayer-forms'), $fallbacks['error'], '', 'textarea');
 					bl_forms_settings_message_field($settings, 'validation_message', __('Validation message', 'baselayer-forms'), $fallbacks['validation'], '', 'textarea');
@@ -515,6 +522,20 @@ function bl_forms_render_settings_page(): void
 
 				bl_forms_settings_message_section(__('Choice', 'baselayer-forms'), static function () use ($settings, $fallbacks): void {
 					bl_forms_settings_message_field($settings, 'option_message', __('Invalid', 'baselayer-forms'), $fallbacks['option']);
+					bl_forms_settings_message_field(
+						$settings,
+						'selection_min_message',
+						__('Minimum selections', 'baselayer-forms'),
+						$fallbacks['selection_min'],
+						__('The placeholder {min} is replaced by the minimum number of options.', 'baselayer-forms')
+					);
+					bl_forms_settings_message_field(
+						$settings,
+						'selection_max_message',
+						__('Maximum selections', 'baselayer-forms'),
+						$fallbacks['selection_max'],
+						__('The placeholder {max} is replaced by the maximum number of options.', 'baselayer-forms')
+					);
 				});
 				?>
 			<?php elseif ($tab === 'security') : ?>

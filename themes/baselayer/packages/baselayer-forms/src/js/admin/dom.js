@@ -107,6 +107,7 @@ export function el(tag, props = {}, children = []) {
     if (value == null || value === false) return;
     if (key === 'className') node.className = value;
     else if (key === 'text') node.textContent = value;
+    else if (key === 'html') appendSafeHelpHtml(node, value);
     else if (key === 'dataset') Object.assign(node.dataset, value);
     else if (key.startsWith('on') && typeof value === 'function') {
       node.addEventListener(key.slice(2).toLowerCase(), value);
@@ -118,6 +119,47 @@ export function el(tag, props = {}, children = []) {
     node.appendChild(typeof child === 'string' ? document.createTextNode(child) : child);
   });
   return node;
+}
+
+/**
+ * Append help text that may include trusted <b>, <i>, and nowrap <span> from translations.
+ *
+ * @param {HTMLElement} node
+ * @param {string} html
+ */
+export function appendSafeHelpHtml(node, html) {
+  const template = document.createElement('template');
+  template.innerHTML = String(html || '');
+
+  const appendFrom = (parent, target) => {
+    parent.childNodes.forEach((child) => {
+      if (child.nodeType === Node.TEXT_NODE) {
+        target.appendChild(document.createTextNode(child.textContent || ''));
+        return;
+      }
+      if (child.nodeType !== Node.ELEMENT_NODE) {
+        return;
+      }
+      const tag = child.tagName.toLowerCase();
+      if (tag === 'b' || tag === 'i') {
+        const elNode = document.createElement(tag);
+        appendFrom(child, elNode);
+        target.appendChild(elNode);
+        return;
+      }
+      if (tag === 'span') {
+        const span = document.createElement('span');
+        span.style.whiteSpace = 'nowrap';
+        appendFrom(child, span);
+        target.appendChild(span);
+        return;
+      }
+      // Keep readable text from unexpected tags; drop the markup.
+      appendFrom(child, target);
+    });
+  };
+
+  appendFrom(template.content, node);
 }
 
 export function t(key, fallback = '') {

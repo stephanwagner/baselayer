@@ -219,7 +219,7 @@
 }
 .bl-form__field.is-invalid .bl-form__option input[type=checkbox], .bl-form__field.is-invalid .bl-form__option input[type=radio], .bl-form__field.is-invalid .bl-form__btn-option, .bl-form__field.is-invalid .bl-form__switch-ui {
   outline: 2px solid var(--bl-form-outline-danger);
-  outline-offset: 1px;
+  outline-offset: 0;
 }
 .bl-form__field.is-invalid .bl-form__option input[type=checkbox], .bl-form__field.is-invalid .bl-form__option input[type=radio] {
   border-color: var(--bl-form-danger);
@@ -581,7 +581,7 @@ select.bl-form__control {
 }
 .bl-form__btn-option input:focus-visible + span {
   outline: 2px solid var(--bl-form-outline-focus);
-  outline-offset: 1px;
+  outline-offset: 0;
 }
 .bl-form__btn-option input:checked + span {
   border-color: var(--bl-form-border-focus);
@@ -828,21 +828,6 @@ select.bl-form__control {
   background: color-mix(in srgb, var(--bl-form-danger) 12%, transparent);
   color: var(--bl-form-danger);
   outline: none;
-}
-
-.bl-form__heading .bl-form__title {
-  margin: 0;
-  font-size: 20px;
-}
-
-.bl-form__text {
-  color: var(--bl-form-muted);
-}
-.bl-form__text p {
-  margin: 0 0 8px;
-}
-.bl-form__text p:last-child {
-  margin-bottom: 0;
 }
 
 .bl-form__actions {

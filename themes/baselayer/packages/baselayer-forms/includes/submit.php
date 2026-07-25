@@ -106,6 +106,29 @@ function bl_forms_field_error_message(string $code, array $field = [], array $se
 			);
 		case 'option':
 			return bl_forms_resolve_message($settings, 'option_message');
+		case 'selection_min':
+			$value = $bound !== '' ? $bound : (string) bl_forms_field_min_selections($field);
+			return bl_forms_replace_placeholders(
+				bl_forms_resolve_message($settings, 'selection_min_message'),
+				['min' => $value]
+			);
+		case 'selection_max':
+			$count = (int) ($bound !== '' ? $bound : bl_forms_field_max_selections($field));
+			$custom = bl_forms_resolve_setting_string($settings, 'selection_max_message');
+			if ($custom !== '') {
+				return bl_forms_replace_placeholders($custom, ['max' => (string) $count]);
+			}
+
+			return sprintf(
+				/* translators: %d: maximum number of options */
+				_n(
+					'You can select at most %d option.',
+					'You can select at most %d options.',
+					$count,
+					'baselayer-forms'
+				),
+				$count
+			);
 		default:
 			return __('Please check this field.', 'baselayer-forms');
 	}
@@ -465,7 +488,19 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 			}
 
 			$values[$name] = $list;
-			if ($required && $list === []) {
+			if ($type === 'checkboxes') {
+				$count = count($list);
+				$min_sel = bl_forms_field_min_selections($field);
+				$max_sel = bl_forms_field_max_selections($field);
+				// Minimum of 1 is the same as required.
+				if (($required || $min_sel === 1) && $list === []) {
+					$invalid[$name] = bl_forms_field_error_message('required', $field, $settings);
+				} elseif ($min_sel > 1 && $count < $min_sel) {
+					$invalid[$name] = bl_forms_field_error_message('selection_min', $field, $settings, (string) $min_sel);
+				} elseif ($max_sel > 0 && $count > $max_sel) {
+					$invalid[$name] = bl_forms_field_error_message('selection_max', $field, $settings, (string) $max_sel);
+				}
+			} elseif ($required && $list === []) {
 				$invalid[$name] = bl_forms_field_error_message('required', $field, $settings);
 			}
 			continue;
