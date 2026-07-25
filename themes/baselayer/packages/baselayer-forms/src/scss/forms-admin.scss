@@ -1460,7 +1460,8 @@ input.bl-forms-builder__section-label-input {
   font-weight: 600;
 }
 
-// Must beat `.bl-forms-builder__field-body label { display: block }`.
+// Must beat `.bl-forms-builder__field-body label { display: block }` and
+// inherited/admin label font-size overrides.
 .bl-forms-builder label.bl-forms-builder__switch,
 .bl-forms-settings label.bl-forms-builder__switch {
   display: inline-flex;
@@ -1469,6 +1470,7 @@ input.bl-forms-builder__section-label-input {
   margin: 0;
   padding: 0;
   cursor: pointer;
+  font-size: 13px;
   font-weight: 500;
   line-height: 1.3;
 

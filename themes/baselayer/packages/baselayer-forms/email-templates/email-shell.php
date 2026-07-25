@@ -10,8 +10,8 @@ defined('ABSPATH') || exit;
 		<title><?= esc_html((string) $email_page_title) ?></title>
 	<?php endif; ?>
 </head>
-<body style="margin:0;padding:24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1f2937;background:#f8fafc;">
-	<div style="max-width:640px;margin:0 auto;background:#fff;padding:24px 28px;border-radius:8px;">
+<body style="margin:0;padding:24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#23292e;background:#f6f8fa;">
+	<div style="max-width:640px;margin:0 auto;background:#fff;padding:24px 28px;border-radius:8px;border:2px solid #eaeef2;">
 		<?= $email_body_html // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 	</div>
 </body>
