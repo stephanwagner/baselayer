@@ -5,6 +5,7 @@ find . -name ".DS_Store" -exec rm -f {} \;
 
 THEME_LANGUAGE_DIR="./themes/baselayer/languages"
 FORMS_LANGUAGE_DIR="./themes/baselayer/packages/baselayer-forms/languages"
+EVENTS_LANGUAGE_DIR="./themes/baselayer/packages/baselayer-events/languages"
 
 # Replicate a de_DE .po to all German variants (same translations, new header).
 # $1 = path to the de_DE .po, $2 = file name prefix (e.g. baselayer, baselayer-icons, baselayer-forms)
@@ -53,11 +54,13 @@ compile_po_dir() {
 replicate_de_variants "$THEME_LANGUAGE_DIR/baselayer-de_DE.po" "baselayer"
 replicate_de_variants "$THEME_LANGUAGE_DIR/icons/baselayer-icons-de_DE.po" "baselayer-icons"
 replicate_de_variants "$FORMS_LANGUAGE_DIR/baselayer-forms-de_DE.po" "baselayer-forms"
+replicate_de_variants "$EVENTS_LANGUAGE_DIR/baselayer-events-de_DE.po" "baselayer-events"
 
-# Compile every .po (theme + icons + forms + variants) into a .mo alongside it
+# Compile every .po (theme + icons + forms + events + variants) into a .mo alongside it
 failed=0
 compile_po_dir "$THEME_LANGUAGE_DIR" || failed=1
 compile_po_dir "$FORMS_LANGUAGE_DIR" || failed=1
+compile_po_dir "$EVENTS_LANGUAGE_DIR" || failed=1
 
 if [[ "$failed" -ne 0 ]]; then
     echo -e "\033[31m✖ PO compilation finished with errors.\033[0m"

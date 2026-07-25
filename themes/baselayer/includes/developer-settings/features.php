@@ -218,6 +218,14 @@ function bl_render_developer_features(): void
 							<p class="description bl-indent-checkbox"><?= esc_html__('Adds a form builder, submissions, email notifications, and a Form block.', 'baselayer') ?></p>
 						</td>
 					</tr>
+					<tr>
+						<th scope="row" class="form-table-checkbox-label"><?= esc_html__('Events', 'baselayer') ?></th>
+						<td>
+							<input type="hidden" name="baselayer_features[enable_events]" value="0">
+							<label><input type="checkbox" name="baselayer_features[enable_events]" value="1" <?= checked($feat('enable_events'), 1, false) ?>> <?= esc_html__('Enable events', 'baselayer') ?></label>
+							<p class="description bl-indent-checkbox"><?= esc_html__('Adds event types with dates, recurrence, statuses, metadata, and archives. Manage types under Events → Event types.', 'baselayer') ?></p>
+						</td>
+					</tr>
 				</table>
 
 			</div>

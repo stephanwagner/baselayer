@@ -1,9 +1,3 @@
-@use '../config' as *;
-
-// Event status palette
-$event-status-keys: ('neutral', 'info', 'error', 'warning', 'success', 'highlight', 'cancelled', 'postponed');
-
-// Variables
 :root {
   --bl-event-status-neutral: var(--bl-color-neutral);
   --bl-event-status-neutral-bg: var(--bl-color-neutral-bg);
@@ -17,25 +11,23 @@ $event-status-keys: ('neutral', 'info', 'error', 'warning', 'success', 'highligh
   --bl-event-status-success-bg: var(--bl-color-success-bg);
   --bl-event-status-highlight: var(--bl-color-highlight);
   --bl-event-status-highlight-bg: var(--bl-color-highlight-bg);
-
   --bl-event-status-cancelled: var(--bl-event-status-error);
   --bl-event-status-cancelled-bg: var(--bl-event-status-error-bg);
   --bl-event-status-postponed: var(--bl-event-status-warning);
   --bl-event-status-postponed-bg: var(--bl-event-status-warning-bg);
 }
 
-// Event date
 .event-date {
   margin: 0 0 24px;
   font-weight: 400;
   color: var(--bl-gray-text-color);
-
-  @media (max-width: $breakpoint-s) {
+}
+@media (max-width: 600px) {
+  .event-date {
     margin-bottom: 16px;
   }
 }
 
-// Event status
 .event-status {
   --bl-status-color: var(--bl-event-status-neutral);
   --bl-status-bg: var(--bl-event-status-neutral-bg);
@@ -48,18 +40,19 @@ $event-status-keys: ('neutral', 'info', 'error', 'warning', 'success', 'highligh
   border-radius: var(--bl-border-radius-m);
   background: var(--bl-status-bg);
   color: var(--bl-color-gray-800);
-
-  @media (min-resolution: $high-density-dppx) {
+}
+@media (min-resolution: 1.5dppx) {
+  .event-status {
     border-width: 1.5px;
     border-left-width: 5px;
   }
-
-  @media (max-width: $breakpoint-s) {
+}
+@media (max-width: 600px) {
+  .event-status {
     margin-bottom: 20px;
   }
 }
 
-// Event status label
 .event-status__label {
   display: block;
   margin: 0;
@@ -68,18 +61,15 @@ $event-status-keys: ('neutral', 'info', 'error', 'warning', 'success', 'highligh
   color: var(--bl-status-color);
 }
 
-// Event status info
 .event-status__info {
   margin: 6px 0 0;
   color: var(--bl-color-gray-700);
-
-  p {
-    margin: 0 0 6px;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
+}
+.event-status__info p {
+  margin: 0 0 6px;
+}
+.event-status__info p:last-child {
+  margin-bottom: 0;
 }
 
 .event-status-badge {
@@ -97,20 +87,61 @@ $event-status-keys: ('neutral', 'info', 'error', 'warning', 'success', 'highligh
   border: 1px solid var(--bl-status-color);
 }
 
-@each $key in $event-status-keys {
-  .event-status-#{$key},
-  .event-status-badge-#{$key} {
-    --bl-status-color: var(--bl-event-status-#{$key});
-    --bl-status-bg: var(--bl-event-status-#{$key}-bg);
-  }
+.event-status-neutral,
+.event-status-badge-neutral {
+  --bl-status-color: var(--bl-event-status-neutral);
+  --bl-status-bg: var(--bl-event-status-neutral-bg);
+}
+
+.event-status-info,
+.event-status-badge-info {
+  --bl-status-color: var(--bl-event-status-info);
+  --bl-status-bg: var(--bl-event-status-info-bg);
+}
+
+.event-status-error,
+.event-status-badge-error {
+  --bl-status-color: var(--bl-event-status-error);
+  --bl-status-bg: var(--bl-event-status-error-bg);
+}
+
+.event-status-warning,
+.event-status-badge-warning {
+  --bl-status-color: var(--bl-event-status-warning);
+  --bl-status-bg: var(--bl-event-status-warning-bg);
+}
+
+.event-status-success,
+.event-status-badge-success {
+  --bl-status-color: var(--bl-event-status-success);
+  --bl-status-bg: var(--bl-event-status-success-bg);
+}
+
+.event-status-highlight,
+.event-status-badge-highlight {
+  --bl-status-color: var(--bl-event-status-highlight);
+  --bl-status-bg: var(--bl-event-status-highlight-bg);
+}
+
+.event-status-cancelled,
+.event-status-badge-cancelled {
+  --bl-status-color: var(--bl-event-status-cancelled);
+  --bl-status-bg: var(--bl-event-status-cancelled-bg);
+}
+
+.event-status-postponed,
+.event-status-badge-postponed {
+  --bl-status-color: var(--bl-event-status-postponed);
+  --bl-status-bg: var(--bl-event-status-postponed-bg);
 }
 
 .event-meta {
   margin: 32px 0 0;
   padding-top: 24px;
   border-top: 2px solid var(--bl-color-gray-300);
-
-  @media (min-resolution: $high-density-dppx) {
+}
+@media (min-resolution: 1.5dppx) {
+  .event-meta {
     border-top-width: 1.5px;
   }
 }
@@ -119,12 +150,14 @@ $event-status-keys: ('neutral', 'info', 'error', 'warning', 'success', 'highligh
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px 32px;
-
-  @media (max-width: $breakpoint-m) {
+}
+@media (max-width: 960px) {
+  .event-meta__groups {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
-  @media (max-width: $breakpoint-s) {
+}
+@media (max-width: 600px) {
+  .event-meta__groups {
     grid-template-columns: 1fr;
   }
 }
@@ -148,8 +181,9 @@ $event-status-keys: ('neutral', 'info', 'error', 'warning', 'success', 'highligh
   grid-template-columns: minmax(7rem, 10rem) 1fr;
   gap: 8px 16px;
   margin: 0 0 8px;
-
-  @media (max-width: $breakpoint-s) {
+}
+@media (max-width: 600px) {
+  .event-meta__row {
     grid-template-columns: 1fr;
     gap: 2px;
   }
@@ -176,3 +210,5 @@ $event-status-keys: ('neutral', 'info', 'error', 'warning', 'success', 'highligh
 .event-meta__ical-link {
   margin-left: auto;
 }
+
+/*# sourceMappingURL=events.css.map */

@@ -196,7 +196,7 @@ function bl_event_config_statuses(?string $post_type = null): array
 		return [];
 	}
 
-	$cfg = function_exists('bl_config_cpt') ? bl_config_cpt($post_type) : null;
+	$cfg = function_exists('bl_events_get_instance') ? bl_events_get_instance($post_type) : null;
 	if (!is_array($cfg) || empty($cfg['statuses']) || !is_array($cfg['statuses'])) {
 		return [];
 	}
@@ -213,7 +213,7 @@ function bl_event_config_statuses(?string $post_type = null): array
 			$label = $key;
 		} else {
 			// Translate parent-theme defaults (e.g. "Sold Out"); unknown labels pass through.
-			$label = __($label, 'baselayer');
+			$label = __($label, 'baselayer-events');
 		}
 		$parsed = bl_event_parse_status_color_value($row['color'] ?? '');
 		$out[$key] = [

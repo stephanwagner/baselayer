@@ -5,8 +5,6 @@ import './embed-variations';
 import './acf-inner-blocks-toolbar';
 import './icon-blocks/icon-blocks';
 import './expirator';
-import './events';
-import './events-meta';
 import './page-show-title';
 import './exclude-from-search';
 import './page-pin-dashboard';

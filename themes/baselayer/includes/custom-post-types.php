@@ -1356,6 +1356,10 @@ function bl_cpt_type(?string $post_type = null): string
 		return 'default';
 	}
 
+	if (function_exists('bl_events_owns_post_type') && bl_events_owns_post_type($post_type)) {
+		return 'event';
+	}
+
 	$cfg = bl_config_cpt($post_type);
 	if (!is_array($cfg)) {
 		return 'default';

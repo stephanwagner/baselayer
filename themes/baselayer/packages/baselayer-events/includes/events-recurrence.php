@@ -9,7 +9,6 @@ defined('ABSPATH') || exit;
 const BL_EVENT_META_RECURRENCE = '_bl_event_recurrence';
 const BL_EVENT_META_OCCURRENCE_OF = '_bl_event_occurrence_of';
 const BL_EVENT_META_SERIES_DETACHED = '_bl_event_series_detached';
-/** JSON list of Y-m-d dates excluded from the series (user-deleted occurrences). */
 const BL_EVENT_META_EXDATES = '_bl_event_exdates';
 const BL_EVENT_CRON_HOOK = 'bl_event_extend_recurring_series';
 const BL_EVENT_RECURRENCE_LOOKAHEAD_DEFAULT = '1 year';

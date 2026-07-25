@@ -23,7 +23,7 @@ const BL_EVENT_META_END_TS = '_bl_event_end_ts';
  */
 function bl_event_post_types(): array
 {
-	return bl_cpt_slugs_by_type('event');
+	return array_keys(bl_events_get_instances(true));
 }
 
 function bl_is_event_post_type(?string $post_type = null): bool
@@ -32,7 +32,9 @@ function bl_is_event_post_type(?string $post_type = null): bool
 		$post_type = function_exists('get_post_type') ? (string) get_post_type() : '';
 	}
 
-	return $post_type !== '' && bl_cpt_type($post_type) === 'event';
+	$inst = bl_events_get_instance($post_type);
+
+	return is_array($inst) && !empty($inst['enabled']);
 }
 
 /**
@@ -733,126 +735,6 @@ function bl_event_series_master_ids(): array
 	return $ids;
 }
 
-/**
- * Block editor: strings for the Event panel (same script as expirator).
- */
-add_action('enqueue_block_editor_assets', function (): void {
-	$post_types = bl_event_post_types();
-	if ($post_types === []) {
-		return;
-	}
-	$pt = $post_types[0];
-	$lookahead = function_exists('bl_event_recurrence_lookahead_label')
-		? bl_event_recurrence_lookahead_label($pt)
-		: '1 year';
-	$horizon = function_exists('bl_event_recurrence_horizon_date')
-		? bl_event_recurrence_horizon_date($pt)
-		: '';
-
-	$meta_by_type = [];
-	$statuses_by_type = [];
-	foreach ($post_types as $type) {
-		$meta_by_type[$type] = function_exists('bl_cpt_event_meta_config')
-			? bl_cpt_event_meta_config($type)
-			: ['title' => '', 'groups' => []];
-		$statuses_by_type[$type] = function_exists('bl_event_get_status_options')
-			? bl_event_get_status_options($type)
-			: [];
-	}
-
-	wp_localize_script('baselayer-editor', 'baselayerEvents', [
-		'postTypes' => $post_types,
-		'postType' => $pt,
-		'panelTitle' => __('Event', 'baselayer'),
-		'startDateLabel' => __('Start date', 'baselayer'),
-		'endDateLabel' => __('End date', 'baselayer'),
-		'includeTimesLabel' => __('Include times', 'baselayer'),
-		'startTimeLabel' => __('Start time', 'baselayer'),
-		'endTimeLabel' => __('End time', 'baselayer'),
-		'statusLabel' => __('Status', 'baselayer'),
-		'statusCustomLabel' => __('Status label', 'baselayer'),
-		'statusColorLabel' => __('Color', 'baselayer'),
-		'statusInfoLabel' => __('Status information', 'baselayer'),
-		'statuses' => $statuses_by_type[$pt] ?? [],
-		'statusesByType' => $statuses_by_type,
-		'statusColorPresets' => function_exists('bl_event_status_color_presets')
-			? array_map(
-				static function (string $key, string $label): array {
-					return [
-						'key' => $key,
-						'label' => $label,
-					];
-				},
-				array_keys(bl_event_status_color_presets()),
-				array_values(bl_event_status_color_presets())
-			)
-			: [],
-		'statusColorDefault' => defined('BL_EVENT_STATUS_COLOR_DEFAULT')
-			? BL_EVENT_STATUS_COLOR_DEFAULT
-			: 'info',
-		'recurringTitle' => __('Recurring', 'baselayer'),
-		'notRepeating' => __('Not repeating', 'baselayer'),
-		'editRecurrence' => __('Edit recurrence', 'baselayer'),
-		'recurrenceNeedsDate' => __('Set a start date to create occurrence posts.', 'baselayer'),
-		'partOfRecurring' => __('Part of a recurring event.', 'baselayer'),
-		'masterLabel' => __('Master:', 'baselayer'),
-		'editInMaster' => __('Edit in master event', 'baselayer'),
-		'occurrencesLabel' => __('%d occurrences', 'baselayer'),
-		'occurrenceLabel' => __('%d occurrence', 'baselayer'),
-		'customContentTitle' => __('This occurrence has custom content.', 'baselayer'),
-		'customContentHelp' => __('It will not update when the master event changes.', 'baselayer'),
-		'revertToMaster' => __('Revert to master', 'baselayer'),
-		'modalTitle' => __('Recurrence settings', 'baselayer'),
-		'freqLabel' => __('Repeats', 'baselayer'),
-		'everyLabel' => __('Every', 'baselayer'),
-		'onLabel' => __('On weekday', 'baselayer'),
-		'endsLabel' => __('Ends', 'baselayer'),
-		'endsNever' => __('Never', 'baselayer'),
-		'endsOnDate' => __('On date', 'baselayer'),
-		'endsAfter' => __('After', 'baselayer'),
-		'occurrencesUnit' => __('occurrences', 'baselayer'),
-		'nextOccurrences' => __('Next occurrences', 'baselayer'),
-		'moreOccurrences' => __('+%d more', 'baselayer'),
-		'cancelLabel' => __('Cancel', 'baselayer'),
-		'saveLabel' => __('Save', 'baselayer'),
-		'clearRecurrence' => __('Stop repeating', 'baselayer'),
-		'freqDaily' => __('Daily', 'baselayer'),
-		'freqWeekly' => __('Weekly', 'baselayer'),
-		'freqMonthly' => __('Monthly', 'baselayer'),
-		'freqYearly' => __('Yearly', 'baselayer'),
-		'unitDay' => __('day(s)', 'baselayer'),
-		'unitWeek' => __('week(s)', 'baselayer'),
-		'unitMonth' => __('month(s)', 'baselayer'),
-		'unitYear' => __('year(s)', 'baselayer'),
-		/* translators: %d: interval */
-		'everyNDays' => __('Every %d days', 'baselayer'),
-		/* translators: %d: interval */
-		'everyNWeeks' => __('Every %d weeks', 'baselayer'),
-		/* translators: %d: interval */
-		'everyNMonths' => __('Every %d months', 'baselayer'),
-		/* translators: %d: interval */
-		'everyNYears' => __('Every %d years', 'baselayer'),
-		'weekdayLabels' => [
-			'mo' => __('Mon', 'baselayer'),
-			'tu' => __('Tue', 'baselayer'),
-			'we' => __('Wed', 'baselayer'),
-			'th' => __('Thu', 'baselayer'),
-			'fr' => __('Fri', 'baselayer'),
-			'sa' => __('Sat', 'baselayer'),
-			'su' => __('Sun', 'baselayer'),
-		],
-		'lookaheadLabel' => $lookahead,
-		'horizonDate' => $horizon,
-		'revertRestUrl' => esc_url_raw(rest_url('baselayer/v1/event-revert/')),
-		'restNonce' => wp_create_nonce('wp_rest'),
-		'dateFormat' => get_option('date_format', 'F j, Y'),
-		'meta' => $meta_by_type[$pt] ?? ['title' => '', 'groups' => []],
-		'metaByType' => $meta_by_type,
-		'editMetadata' => __('Edit metadata', 'baselayer'),
-		'noMetadata' => __('No metadata', 'baselayer'),
-		'metadataModalTitle' => __('Event metadata', 'baselayer'),
-	]);
-}, 12);
 
 /**
  * Admin list table: Event dates column (display only).
@@ -965,41 +847,6 @@ add_action('admin_head', static function (): void {
 	echo '<style>.column-bl_event_dates{width:14em;} @media(min-width:900px){.column-bl_event_dates{width:20em}}</style>';
 });
 
-/**
- * Localize occurrences-modal strings on the Events list screen.
- */
-add_action('admin_enqueue_scripts', static function (string $hook_suffix): void {
-	if ($hook_suffix !== 'edit.php') {
-		return;
-	}
-	$pt = sanitize_key(wp_unslash((string) ($_GET['post_type'] ?? '')));
-	if ($pt === '' || !bl_is_event_post_type($pt)) {
-		return;
-	}
-	if (!wp_script_is('main-admin-scripts', 'enqueued') && !wp_script_is('main-admin-scripts', 'registered')) {
-		return;
-	}
-	wp_localize_script('main-admin-scripts', 'baselayerEventOccurrences', [
-		'restUrl' => esc_url_raw(rest_url('baselayer/v1/event-occurrences/')),
-		'restoreUrl' => esc_url_raw(rest_url('baselayer/v1/event-restore-occurrence')),
-		'softDeleteUrl' => esc_url_raw(rest_url('baselayer/v1/event-soft-delete-occurrence')),
-		'restNonce' => wp_create_nonce('wp_rest'),
-		'modalTitle' => __('Occurrences', 'baselayer'),
-		'empty' => __('No upcoming occurrences.', 'baselayer'),
-		'editLabel' => __('Edit', 'baselayer'),
-		'editOccurrencesLabel' => __('Edit occurrences', 'baselayer'),
-		'restoreLabel' => __('Restore', 'baselayer'),
-		'deleteLabel' => __('Delete', 'baselayer'),
-		'deleteConfirm' => __('Remove this date from the series? It will not appear in Trash; you can restore it here later.', 'baselayer'),
-		'deleteDetachedConfirm' => __('This occurrence has custom content. Deleting removes that content permanently. Continue?', 'baselayer'),
-		'closeLabel' => __('Close', 'baselayer'),
-		'loadingLabel' => __('Loading…', 'baselayer'),
-		'customContent' => __('Custom content', 'baselayer'),
-		'deletedLabel' => __('Deleted', 'baselayer'),
-		'errorLabel' => __('Could not load occurrences.', 'baselayer'),
-		'actionErrorLabel' => __('Something went wrong. Please try again.', 'baselayer'),
-	]);
-}, 20);
 
 /**
  * Adapt a php date()/wp_date format string so full-month tokens (F) become abbreviated months (M).

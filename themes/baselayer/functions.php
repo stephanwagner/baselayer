@@ -54,9 +54,13 @@ require_once __DIR__ . '/includes/helpers/images.php';
 require_once __DIR__ . '/includes/service-worker.php';
 require_once __DIR__ . '/includes/custom-post-types.php';
 require_once __DIR__ . '/includes/article-list-filters.php';
-require_once __DIR__ . '/includes/events.php';
 require_once __DIR__ . '/includes/exclude-from-search.php';
 require_once __DIR__ . '/includes/page-editor-options.php';
+
+// Events package (before install wizard so CPT seeding sees event types).
+if (bl_theme_feature_enabled('events')) {
+	require_once __DIR__ . '/packages/baselayer-events/baselayer-events.php';
+}
 
 // Install wizard: must load after custom-post-types.php so CPT registration
 // exists when the installer seeds projects/events on form POST.

@@ -163,6 +163,16 @@ function bl_get_content_types(): array
 		}
 	}
 
+	/**
+	 * Filter content types after loading config/content-types/*.php.
+	 *
+	 * @param array<string, array<string, mixed>> $types
+	 */
+	$types = apply_filters('bl_content_types', $types);
+	if (!is_array($types)) {
+		$types = [];
+	}
+
 	bl_content_types_cache($types);
 
 	return $types;

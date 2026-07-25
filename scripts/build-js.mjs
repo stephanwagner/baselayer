@@ -6,6 +6,7 @@ const require = createRequire(import.meta.url);
 const { themeDir } = require('./config.cjs');
 
 const formsPkg = 'themes/baselayer/packages/baselayer-forms';
+const eventsPkg = 'themes/baselayer/packages/baselayer-events';
 
 const themeBundles = [
   { input: `${themeDir}/src/js/main/main.js`, name: 'baselayer', outDir: `${themeDir}/assets/js` },
@@ -55,7 +56,12 @@ const formsBundles = [
   { input: `${formsPkg}/src/js/block.js`, name: 'forms-block', outDir: `${formsPkg}/assets/js` }
 ];
 
-const bundles = [...themeBundles, ...formsBundles];
+const eventsBundles = [
+  { input: `${eventsPkg}/src/js/editor.js`, name: 'events-editor', outDir: `${eventsPkg}/assets/js` },
+  { input: `${eventsPkg}/src/js/admin.js`, name: 'events-admin', outDir: `${eventsPkg}/assets/js` }
+];
+
+const bundles = [...themeBundles, ...formsBundles, ...eventsBundles];
 
 function parseFilter() {
   const idx = process.argv.indexOf('--filter');

@@ -1,0 +1,551 @@
+# Copyright (C) 2026 BaseLayer
+# This file is distributed under the same license as the BaseLayer Events plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: BaseLayer Events 0.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/baselayer-events\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-07-25T22:37:50+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: baselayer-events\n"
+
+#. Plugin Name of the plugin
+#: baselayer-events.php
+msgid "BaseLayer Events"
+msgstr ""
+
+#. Description of the plugin
+#: baselayer-events.php
+msgid "Event types with dates, recurrence, statuses, metadata, and archives. Supports multiple event CPTs (events, courses, workshops)."
+msgstr ""
+
+#. Author of the plugin
+#: baselayer-events.php
+msgid "BaseLayer"
+msgstr ""
+
+#. Author URI of the plugin
+#: baselayer-events.php
+msgid "https://baselayerwp.com/baselayer-events"
+msgstr ""
+
+#: includes/assets.php:68
+msgid "Event"
+msgstr ""
+
+#: includes/assets.php:70
+msgid "Start date"
+msgstr ""
+
+#: includes/assets.php:71
+msgid "End date"
+msgstr ""
+
+#: includes/assets.php:72
+msgid "Include times"
+msgstr ""
+
+#: includes/assets.php:73
+msgid "Start time"
+msgstr ""
+
+#: includes/assets.php:74
+msgid "End time"
+msgstr ""
+
+#: includes/assets.php:75
+msgid "Status"
+msgstr ""
+
+#: includes/assets.php:76
+msgid "Status label"
+msgstr ""
+
+#: includes/assets.php:77
+#: includes/settings-page.php:429
+msgid "Color"
+msgstr ""
+
+#: includes/assets.php:78
+msgid "Status information"
+msgstr ""
+
+#: includes/assets.php:96
+msgid "Recurring"
+msgstr ""
+
+#: includes/assets.php:97
+msgid "Not repeating"
+msgstr ""
+
+#: includes/assets.php:98
+msgid "Edit recurrence"
+msgstr ""
+
+#: includes/assets.php:99
+msgid "Set a start date to create occurrence posts."
+msgstr ""
+
+#: includes/assets.php:100
+msgid "Part of a recurring event."
+msgstr ""
+
+#: includes/assets.php:101
+msgid "Master:"
+msgstr ""
+
+#: includes/assets.php:102
+msgid "Edit in master event"
+msgstr ""
+
+#: includes/assets.php:103
+#, php-format
+msgid "%d occurrences"
+msgstr ""
+
+#: includes/assets.php:104
+#, php-format
+msgid "%d occurrence"
+msgstr ""
+
+#: includes/assets.php:105
+msgid "This occurrence has custom content."
+msgstr ""
+
+#: includes/assets.php:106
+msgid "It will not update when the master event changes."
+msgstr ""
+
+#: includes/assets.php:107
+msgid "Revert to master"
+msgstr ""
+
+#: includes/assets.php:108
+msgid "Recurrence settings"
+msgstr ""
+
+#: includes/assets.php:109
+msgid "Repeats"
+msgstr ""
+
+#: includes/assets.php:110
+msgid "Every"
+msgstr ""
+
+#: includes/assets.php:111
+msgid "On weekday"
+msgstr ""
+
+#: includes/assets.php:112
+msgid "Ends"
+msgstr ""
+
+#: includes/assets.php:113
+msgid "Never"
+msgstr ""
+
+#: includes/assets.php:114
+msgid "On date"
+msgstr ""
+
+#: includes/assets.php:115
+msgid "After"
+msgstr ""
+
+#: includes/assets.php:116
+msgid "occurrences"
+msgstr ""
+
+#: includes/assets.php:117
+msgid "Next occurrences"
+msgstr ""
+
+#: includes/assets.php:118
+#, php-format
+msgid "+%d more"
+msgstr ""
+
+#: includes/assets.php:119
+msgid "Cancel"
+msgstr ""
+
+#: includes/assets.php:120
+msgid "Save"
+msgstr ""
+
+#: includes/assets.php:121
+msgid "Stop repeating"
+msgstr ""
+
+#: includes/assets.php:122
+msgid "Daily"
+msgstr ""
+
+#: includes/assets.php:123
+msgid "Weekly"
+msgstr ""
+
+#: includes/assets.php:124
+msgid "Monthly"
+msgstr ""
+
+#: includes/assets.php:125
+msgid "Yearly"
+msgstr ""
+
+#: includes/assets.php:126
+msgid "day(s)"
+msgstr ""
+
+#: includes/assets.php:127
+msgid "week(s)"
+msgstr ""
+
+#: includes/assets.php:128
+msgid "month(s)"
+msgstr ""
+
+#: includes/assets.php:129
+msgid "year(s)"
+msgstr ""
+
+#. translators: %d: interval
+#: includes/assets.php:131
+#, php-format
+msgid "Every %d days"
+msgstr ""
+
+#. translators: %d: interval
+#: includes/assets.php:133
+#, php-format
+msgid "Every %d weeks"
+msgstr ""
+
+#. translators: %d: interval
+#: includes/assets.php:135
+#, php-format
+msgid "Every %d months"
+msgstr ""
+
+#. translators: %d: interval
+#: includes/assets.php:137
+#, php-format
+msgid "Every %d years"
+msgstr ""
+
+#: includes/assets.php:139
+msgid "Mon"
+msgstr ""
+
+#: includes/assets.php:140
+msgid "Tue"
+msgstr ""
+
+#: includes/assets.php:141
+msgid "Wed"
+msgstr ""
+
+#: includes/assets.php:142
+msgid "Thu"
+msgstr ""
+
+#: includes/assets.php:143
+msgid "Fri"
+msgstr ""
+
+#: includes/assets.php:144
+msgid "Sat"
+msgstr ""
+
+#: includes/assets.php:145
+msgid "Sun"
+msgstr ""
+
+#: includes/assets.php:154
+msgid "Edit metadata"
+msgstr ""
+
+#: includes/assets.php:155
+msgid "No metadata"
+msgstr ""
+
+#: includes/assets.php:156
+#: includes/events-meta.php:70
+msgid "Event metadata"
+msgstr ""
+
+#: includes/assets.php:186
+msgid "Occurrences"
+msgstr ""
+
+#: includes/assets.php:187
+msgid "No upcoming occurrences."
+msgstr ""
+
+#: includes/assets.php:188
+msgid "Edit"
+msgstr ""
+
+#: includes/assets.php:189
+msgid "Edit occurrences"
+msgstr ""
+
+#: includes/assets.php:190
+msgid "Restore"
+msgstr ""
+
+#: includes/assets.php:191
+msgid "Delete"
+msgstr ""
+
+#: includes/assets.php:192
+msgid "Remove this date from the series? It will not appear in Trash; you can restore it here later."
+msgstr ""
+
+#: includes/assets.php:193
+msgid "This occurrence has custom content. Deleting removes that content permanently. Continue?"
+msgstr ""
+
+#: includes/assets.php:194
+msgid "Close"
+msgstr ""
+
+#: includes/assets.php:195
+msgid "Loading…"
+msgstr ""
+
+#: includes/assets.php:196
+msgid "Custom content"
+msgstr ""
+
+#: includes/assets.php:197
+msgid "Deleted"
+msgstr ""
+
+#: includes/assets.php:198
+msgid "Could not load occurrences."
+msgstr ""
+
+#: includes/assets.php:199
+msgid "Something went wrong. Please try again."
+msgstr ""
+
+#: includes/settings-page.php:38
+#: includes/settings-page.php:39
+#: includes/settings-page.php:272
+msgid "Event types"
+msgstr ""
+
+#: includes/settings-page.php:260
+msgid "General"
+msgstr ""
+
+#: includes/settings-page.php:261
+#: includes/settings-page.php:385
+msgid "Archive"
+msgstr ""
+
+#: includes/settings-page.php:262
+msgid "Taxonomies"
+msgstr ""
+
+#: includes/settings-page.php:263
+msgid "Statuses"
+msgstr ""
+
+#: includes/settings-page.php:264
+msgid "Metadata"
+msgstr ""
+
+#: includes/settings-page.php:274
+msgid "Settings saved."
+msgstr ""
+
+#: includes/settings-page.php:277
+msgid "Each event type is its own post type (for example Events, Courses, Workshops), with its own labels, statuses, and metadata."
+msgstr ""
+
+#: includes/settings-page.php:291
+msgid "Add type"
+msgstr ""
+
+#: includes/settings-page.php:293
+msgid "Add"
+msgstr ""
+
+#: includes/settings-page.php:297
+msgid "No event types yet."
+msgstr ""
+
+#: includes/settings-page.php:329
+msgid "Save changes"
+msgstr ""
+
+#: includes/settings-page.php:333
+msgid "Delete this event type? Existing posts are not deleted."
+msgstr ""
+
+#: includes/settings-page.php:337
+msgid "Delete this event type"
+msgstr ""
+
+#: includes/settings-page.php:353
+msgid "Slug"
+msgstr ""
+
+#: includes/settings-page.php:354
+msgid "Immutable after creation (post type key)."
+msgstr ""
+
+#: includes/settings-page.php:356
+msgid "Enabled"
+msgstr ""
+
+#: includes/settings-page.php:357
+msgid "Register and show this type"
+msgstr ""
+
+#: includes/settings-page.php:359
+msgid "Plural name"
+msgstr ""
+
+#: includes/settings-page.php:360
+msgid "Singular name"
+msgstr ""
+
+#: includes/settings-page.php:361
+msgid "Menu name"
+msgstr ""
+
+#: includes/settings-page.php:363
+msgid "Public"
+msgstr ""
+
+#: includes/settings-page.php:363
+msgid "Publicly queryable"
+msgstr ""
+
+#: includes/settings-page.php:364
+msgid "Hierarchical"
+msgstr ""
+
+#: includes/settings-page.php:364
+msgid "Like pages (parent/child)"
+msgstr ""
+
+#: includes/settings-page.php:367
+msgid "Supports"
+msgstr ""
+
+#: includes/settings-page.php:373
+msgid "Menu position"
+msgstr ""
+
+#: includes/settings-page.php:374
+msgid "Menu icon"
+msgstr ""
+
+#: includes/settings-page.php:375
+msgid "Dashicon class, image URL, or inline SVG."
+msgstr ""
+
+#: includes/settings-page.php:385
+msgid "Enable archive"
+msgstr ""
+
+#: includes/settings-page.php:386
+msgid "Archive slug"
+msgstr ""
+
+#: includes/settings-page.php:387
+msgid "Design"
+msgstr ""
+
+#: includes/settings-page.php:388
+msgid "List"
+msgstr ""
+
+#: includes/settings-page.php:388
+msgid "Grid"
+msgstr ""
+
+#: includes/settings-page.php:392
+msgid "Category filter"
+msgstr ""
+
+#: includes/settings-page.php:392
+msgid "Show category filter on archive"
+msgstr ""
+
+#: includes/settings-page.php:393
+msgid "Heading"
+msgstr ""
+
+#: includes/settings-page.php:394
+msgid "Empty text"
+msgstr ""
+
+#: includes/settings-page.php:403
+msgid "Custom taxonomies attached to this type. Leave ID empty on a new row to skip it."
+msgstr ""
+
+#: includes/settings-page.php:405
+#: includes/settings-page.php:429
+msgid "ID"
+msgstr ""
+
+#: includes/settings-page.php:405
+#: includes/settings-page.php:429
+#: includes/settings-page.php:467
+msgid "Label"
+msgstr ""
+
+#: includes/settings-page.php:405
+msgid "Singular"
+msgstr ""
+
+#: includes/settings-page.php:405
+msgid "URL"
+msgstr ""
+
+#: includes/settings-page.php:427
+msgid "Extra statuses beyond built-ins (None, Cancelled, Postponed, Custom). Color: token (warning, success, …) or hex."
+msgstr ""
+
+#: includes/settings-page.php:451
+msgid "Panel title"
+msgstr ""
+
+#: includes/settings-page.php:452
+msgid "Groups and fields for the editor metadata panel. Field types: text, textarea, email, url."
+msgstr ""
+
+#: includes/settings-page.php:454
+msgid "Groups"
+msgstr ""
+
+#: includes/settings-page.php:455
+#: includes/settings-page.php:467
+msgid "Group ID"
+msgstr ""
+
+#: includes/settings-page.php:455
+msgid "Title"
+msgstr ""
+
+#: includes/settings-page.php:465
+msgid "Fields"
+msgstr ""
+
+#: includes/settings-page.php:467
+msgid "Field ID"
+msgstr ""
+
+#: includes/settings-page.php:467
+msgid "Type"
+msgstr ""

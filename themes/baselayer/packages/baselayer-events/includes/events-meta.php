@@ -23,7 +23,7 @@ function bl_cpt_event_meta_config(?string $post_type = null): array
 		return $empty;
 	}
 
-	$cfg = function_exists('bl_config_cpt') ? bl_config_cpt($post_type) : null;
+	$cfg = function_exists('bl_events_get_instance') ? bl_events_get_instance($post_type) : null;
 	if (!is_array($cfg) || empty($cfg['meta']) || !is_array($cfg['meta'])) {
 		return $empty;
 	}
@@ -53,7 +53,7 @@ function bl_cpt_event_meta_config(?string $post_type = null): array
 			$label = isset($field['label']) ? trim((string) $field['label']) : $field_id;
 			$fields[$field_id] = [
 				'type' => $type,
-				'label' => $label !== '' ? __($label, 'baselayer') : $field_id, // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText -- config labels
+				'label' => $label !== '' ? __($label, 'baselayer-events') : $field_id, // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText -- config labels
 			];
 		}
 		if ($fields === []) {
@@ -61,13 +61,13 @@ function bl_cpt_event_meta_config(?string $post_type = null): array
 		}
 		$group_title = isset($group['title']) ? trim((string) $group['title']) : $group_id;
 		$groups[$group_id] = [
-			'title' => $group_title !== '' ? __($group_title, 'baselayer') : $group_id, // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText -- config titles
+			'title' => $group_title !== '' ? __($group_title, 'baselayer-events') : $group_id, // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText -- config titles
 			'fields' => $fields,
 		];
 	}
 
 	return [
-		'title' => $title !== '' ? __($title, 'baselayer') : __('Event metadata', 'baselayer'), // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText -- config title
+		'title' => $title !== '' ? __($title, 'baselayer-events') : __('Event metadata', 'baselayer-events'), // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText -- config title
 		'groups' => $groups,
 	];
 }

@@ -9,6 +9,7 @@ const { themeDir } = require('./config.cjs');
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
 const formsPkg = 'themes/baselayer/packages/baselayer-forms';
+const eventsPkg = 'themes/baselayer/packages/baselayer-events';
 const sassBin = path.join(root, 'node_modules/.bin/sass');
 const chokidarBin = path.join(root, 'node_modules/.bin/chokidar');
 const sassLoadPathArgs = ['--load-path', path.join(root, 'node_modules')];
@@ -18,7 +19,9 @@ const entries = [
   { src: `${themeDir}/src/scss/admin.scss`, name: 'admin', outDir: `${themeDir}/assets/css` },
   { src: `${themeDir}/src/scss/admin-bar.scss`, name: 'admin-bar', outDir: `${themeDir}/assets/css` },
   { src: `${formsPkg}/src/scss/forms.scss`, name: 'forms', outDir: `${formsPkg}/assets/css` },
-  { src: `${formsPkg}/src/scss/forms-admin.scss`, name: 'forms-admin', outDir: `${formsPkg}/assets/css` }
+  { src: `${formsPkg}/src/scss/forms-admin.scss`, name: 'forms-admin', outDir: `${formsPkg}/assets/css` },
+  { src: `${eventsPkg}/src/scss/events.scss`, name: 'events', outDir: `${eventsPkg}/assets/css` },
+  { src: `${eventsPkg}/src/scss/events-admin.scss`, name: 'events-admin', outDir: `${eventsPkg}/assets/css` }
 ];
 
 function parseFilter() {
