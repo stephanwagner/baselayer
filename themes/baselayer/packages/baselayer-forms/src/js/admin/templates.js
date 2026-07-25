@@ -24,6 +24,10 @@ function makeField(partial) {
     css_class: '',
   };
 
+  if (partial.show_in_list !== undefined) {
+    field.show_in_list = !!partial.show_in_list;
+  }
+
   if (type === 'textarea') {
     field.rows = partial.rows || 5;
   }
@@ -48,6 +52,9 @@ function makeField(partial) {
         : type === 'image'
           ? 'jpg, jpeg, png, webp, gif, heic, avif'
           : 'pdf, doc, docx';
+    if (partial.button_text != null) {
+      field.button_text = String(partial.button_text);
+    }
   }
   if (type === 'section') {
     return {
@@ -78,6 +85,9 @@ export function getStarterTemplates() {
     {
       id: 'contact',
       label: t('templateContact', 'Contact Form'),
+      settings: () => ({
+        user_email_field: 'email',
+      }),
       fields: () => [
         makeField({
           type: 'text',
@@ -86,6 +96,7 @@ export function getStarterTemplates() {
           required: true,
           width: '50',
           placeholder: t('templatePlaceholderName', 'Jane Doe'),
+          show_in_list: true,
         }),
         makeField({
           type: 'email',
@@ -94,6 +105,7 @@ export function getStarterTemplates() {
           required: true,
           width: '50',
           placeholder: 'name@example.com',
+          show_in_list: true,
         }),
         makeField({
           type: 'text',
@@ -117,6 +129,7 @@ export function getStarterTemplates() {
       label: t('templateNewsletter', 'Newsletter Signup'),
       settings: () => ({
         submit_label: t('templateSubmitSubscribe', 'Subscribe'),
+        user_email_field: 'email',
       }),
       fields: () => [
         makeField({
@@ -130,6 +143,7 @@ export function getStarterTemplates() {
               name: 'name',
               required: true,
               placeholder: t('templatePlaceholderName', 'Jane Doe'),
+              show_in_list: true,
             }),
             makeField({
               type: 'email',
@@ -137,6 +151,7 @@ export function getStarterTemplates() {
               name: 'email',
               required: true,
               placeholder: 'name@example.com',
+              show_in_list: true,
             }),
             consentField(),
           ],
@@ -148,6 +163,7 @@ export function getStarterTemplates() {
       label: t('templateJob', 'Job Application'),
       settings: () => ({
         submit_label: t('templateSubmitApplication', 'Submit Application'),
+        user_email_field: 'email',
       }),
       fields: () => [
         makeField({
@@ -156,6 +172,7 @@ export function getStarterTemplates() {
           name: 'full_name',
           required: true,
           placeholder: t('templatePlaceholderName', 'Jane Doe'),
+          show_in_list: true,
         }),
         makeField({
           type: 'email',
@@ -163,6 +180,7 @@ export function getStarterTemplates() {
           name: 'email',
           required: true,
           placeholder: 'name@example.com',
+          show_in_list: true,
         }),
         makeField({
           type: 'file',

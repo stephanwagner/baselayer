@@ -649,7 +649,7 @@ msgstr "CAPTCHA-Schlüssel sind unter Formulare → Einstellungen konfiguriert."
 #: includes/admin.php:426
 msgid "CAPTCHA keys are not configured yet. Add them under Forms → Settings."
 msgstr ""
-"CAPTCHA-Schlüssel sind noch nicht konfiguriert. Füge sie unter"
+"CAPTCHA-Schlüssel sind noch nicht konfiguriert. Füge sie unter "
 "Formulare → Einstellungen hinzu."
 
 #: includes/admin.php:427 includes/admin.php:519
@@ -1005,7 +1005,7 @@ msgstr ""
 #: includes/admin.php:518
 msgid "Saving uploaded files is disabled in Forms → Settings."
 msgstr ""
-"Das Speichern hochgeladener Dateien ist unter Formulare →"
+"Das Speichern hochgeladener Dateien ist unter Formulare → "
 "Einstellungen deaktiviert."
 
 #: includes/admin.php:520

@@ -3195,32 +3195,39 @@
     const configured = !!(window.blFormsAdmin && window.blFormsAdmin.captchaConfigured);
     const settingsUrl = window.blFormsAdmin && window.blFormsAdmin.captchaSettingsUrl || window.blFormsAdmin && window.blFormsAdmin.settingsUrl || "";
     const root = el("div", { className: "bl-forms-builder__captcha" });
+    const settingsLink = settingsUrl ? el("a", {
+      href: settingsUrl,
+      className: "bl-forms-builder__notice-link",
+      text: t("captchaOpenSettings", "Open settings")
+    }) : null;
     root.append(
       el("p", {
         className: "description",
         text: t("captchaHelp", "Uses the CAPTCHA keys from Forms \u2192 Settings.")
-      }),
-      el(
-        "div",
-        {
-          className: "bl-forms-builder__notice" + (configured ? "" : " bl-forms-builder__notice--warning"),
-          role: "status"
-        },
-        [
-          el("span", {
-            text: configured ? t("captchaConfigured", "CAPTCHA keys are configured in Forms \u2192 Settings.") : t(
-              "captchaNotConfigured",
-              "CAPTCHA keys are not configured yet. Add them under Forms \u2192 Settings."
-            )
-          }),
-          settingsUrl ? el("a", {
-            href: settingsUrl,
-            className: "bl-forms-builder__notice-link",
-            text: t("captchaOpenSettings", "Open settings")
-          }) : null
-        ]
-      )
+      })
     );
+    if (!configured) {
+      root.append(
+        el(
+          "div",
+          {
+            className: "bl-forms-builder__notice bl-forms-builder__notice--warning",
+            role: "status"
+          },
+          [
+            el("span", {
+              text: t(
+                "captchaNotConfigured",
+                "CAPTCHA keys are not configured yet. Add them under Forms \u2192 Settings."
+              )
+            }),
+            settingsLink
+          ]
+        )
+      );
+    } else if (settingsLink) {
+      root.append(settingsLink);
+    }
     void onChange;
     return root;
   }
@@ -6787,6 +6794,9 @@
       width_custom: "",
       css_class: ""
     };
+    if (partial.show_in_list !== void 0) {
+      field.show_in_list = !!partial.show_in_list;
+    }
     if (type === "textarea") {
       field.rows = partial.rows || 5;
     }
@@ -6804,6 +6814,9 @@
       field.preview = true;
       field.upload_style = "modern";
       field.extensions = partial.extensions != null ? String(partial.extensions) : type === "image" ? "jpg, jpeg, png, webp, gif, heic, avif" : "pdf, doc, docx";
+      if (partial.button_text != null) {
+        field.button_text = String(partial.button_text);
+      }
     }
     if (type === "section") {
       return {
@@ -6830,6 +6843,9 @@
       {
         id: "contact",
         label: t("templateContact", "Contact Form"),
+        settings: () => ({
+          user_email_field: "email"
+        }),
         fields: () => [
           makeField({
             type: "text",
@@ -6837,7 +6853,8 @@
             name: "name",
             required: true,
             width: "50",
-            placeholder: t("templatePlaceholderName", "Jane Doe")
+            placeholder: t("templatePlaceholderName", "Jane Doe"),
+            show_in_list: true
           }),
           makeField({
             type: "email",
@@ -6845,7 +6862,8 @@
             name: "email",
             required: true,
             width: "50",
-            placeholder: "name@example.com"
+            placeholder: "name@example.com",
+            show_in_list: true
           }),
           makeField({
             type: "text",
@@ -6868,7 +6886,8 @@
         id: "newsletter",
         label: t("templateNewsletter", "Newsletter Signup"),
         settings: () => ({
-          submit_label: t("templateSubmitSubscribe", "Subscribe")
+          submit_label: t("templateSubmitSubscribe", "Subscribe"),
+          user_email_field: "email"
         }),
         fields: () => [
           makeField({
@@ -6881,14 +6900,16 @@
                 label: t("templateFieldName", "Name"),
                 name: "name",
                 required: true,
-                placeholder: t("templatePlaceholderName", "Jane Doe")
+                placeholder: t("templatePlaceholderName", "Jane Doe"),
+                show_in_list: true
               }),
               makeField({
                 type: "email",
                 label: t("templateFieldEmail", "Email"),
                 name: "email",
                 required: true,
-                placeholder: "name@example.com"
+                placeholder: "name@example.com",
+                show_in_list: true
               }),
               consentField()
             ]
@@ -6899,7 +6920,8 @@
         id: "job",
         label: t("templateJob", "Job Application"),
         settings: () => ({
-          submit_label: t("templateSubmitApplication", "Submit Application")
+          submit_label: t("templateSubmitApplication", "Submit Application"),
+          user_email_field: "email"
         }),
         fields: () => [
           makeField({
@@ -6907,14 +6929,16 @@
             label: t("templateFieldFullName", "Full name"),
             name: "full_name",
             required: true,
-            placeholder: t("templatePlaceholderName", "Jane Doe")
+            placeholder: t("templatePlaceholderName", "Jane Doe"),
+            show_in_list: true
           }),
           makeField({
             type: "email",
             label: t("templateFieldEmail", "Email"),
             name: "email",
             required: true,
-            placeholder: "name@example.com"
+            placeholder: "name@example.com",
+            show_in_list: true
           }),
           makeField({
             type: "file",

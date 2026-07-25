@@ -499,7 +499,7 @@ select.bl-form__control {
 .bl-form__options {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 4px;
 
   &--horizontal {
     flex-direction: row;
@@ -511,7 +511,7 @@ select.bl-form__control {
 .bl-form__option {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 8px;
   font-weight: 400;
   cursor: pointer;
 
@@ -519,11 +519,11 @@ select.bl-form__control {
   input[type='radio'] {
     appearance: none;
     box-sizing: border-box;
-    width: 1.125rem;
-    height: 1.125rem;
-    margin: 0.2em 0 0;
+    width: 18px;
+    height: 18px;
+    margin: 2px 0 0;
     flex-shrink: 0;
-    border: 1.5px solid var(--bl-form-border);
+    border: 2px solid var(--bl-form-border);
     background-color: var(--bl-form-bg);
     background-position: center;
     background-repeat: no-repeat;
@@ -534,6 +534,10 @@ select.bl-form__control {
       border-color 0.15s ease,
       background-color 0.15s ease,
       box-shadow 0.15s ease;
+
+    @media (min-resolution: $high-density-dppx) {
+      border-width: 1.5px;
+    }
 
     &:hover:not(:disabled):not(:checked) {
       border-color: var(--bl-form-border-hover);
@@ -557,7 +561,7 @@ select.bl-form__control {
       border-color: var(--bl-form-border-focus);
       background-color: var(--bl-form-border-focus);
       background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M2.5 6.2L4.8 8.5 9.5 3.5' stroke='%23fff' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
-      background-size: 0.75rem;
+      background-size: 14px;
     }
   }
 

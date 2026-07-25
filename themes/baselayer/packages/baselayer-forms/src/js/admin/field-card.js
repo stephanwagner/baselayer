@@ -142,38 +142,44 @@ function createCaptchaSettings(field, onChange) {
     || (window.blFormsAdmin && window.blFormsAdmin.settingsUrl)
     || '';
   const root = el('div', { className: 'bl-forms-builder__captcha' });
+  const settingsLink = settingsUrl
+    ? el('a', {
+        href: settingsUrl,
+        className: 'bl-forms-builder__notice-link',
+        text: t('captchaOpenSettings', 'Open settings'),
+      })
+    : null;
+
   root.append(
     el('p', {
       className: 'description',
       text: t('captchaHelp', 'Uses the CAPTCHA keys from Forms → Settings.'),
-    }),
-    el(
-      'div',
-      {
-        className:
-          'bl-forms-builder__notice' +
-          (configured ? '' : ' bl-forms-builder__notice--warning'),
-        role: 'status',
-      },
-      [
-        el('span', {
-          text: configured
-            ? t('captchaConfigured', 'CAPTCHA keys are configured in Forms → Settings.')
-            : t(
-                'captchaNotConfigured',
-                'CAPTCHA keys are not configured yet. Add them under Forms → Settings.'
-              ),
-        }),
-        settingsUrl
-          ? el('a', {
-              href: settingsUrl,
-              className: 'bl-forms-builder__notice-link',
-              text: t('captchaOpenSettings', 'Open settings'),
-            })
-          : null,
-      ]
-    )
+    })
   );
+
+  if (!configured) {
+    root.append(
+      el(
+        'div',
+        {
+          className: 'bl-forms-builder__notice bl-forms-builder__notice--warning',
+          role: 'status',
+        },
+        [
+          el('span', {
+            text: t(
+              'captchaNotConfigured',
+              'CAPTCHA keys are not configured yet. Add them under Forms → Settings.'
+            ),
+          }),
+          settingsLink,
+        ]
+      )
+    );
+  } else if (settingsLink) {
+    root.append(settingsLink);
+  }
+
   // Keep callback signature for call sites; keys are stripped above.
   void onChange;
   return root;

@@ -1333,8 +1333,8 @@ input.bl-forms-builder__section-label-input:focus {
 }
 
 .bl-forms-builder__notice-link {
-  font-weight: 600;
-  text-decoration: underline;
+  font-weight: 400;
+  text-decoration: none;
   white-space: nowrap;
 }
 
@@ -1883,6 +1883,13 @@ input.bl-forms-builder__section-label-input:focus {
 }
 .bl-forms-builder__captcha > .description {
   margin-top: -6px;
+}
+.bl-forms-builder__captcha > .bl-forms-builder__notice {
+  margin-top: 12px;
+}
+.bl-forms-builder__captcha > .bl-forms-builder__notice-link {
+  display: inline-block;
+  margin-top: 8px;
 }
 .bl-forms-builder__captcha label {
   display: block;

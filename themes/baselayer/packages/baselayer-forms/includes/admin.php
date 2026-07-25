@@ -422,7 +422,6 @@ function bl_forms_admin_enqueue(string $hook): void
 				'captchaSiteKey'    => __('Site key', 'baselayer-forms'),
 				'captchaSecretKey'  => __('Secret key', 'baselayer-forms'),
 				'captchaApiKey'     => __('API key', 'baselayer-forms'),
-				'captchaConfigured' => __('CAPTCHA keys are configured in Forms → Settings.', 'baselayer-forms'),
 				'captchaNotConfigured' => __('CAPTCHA keys are not configured yet. Add them under Forms → Settings.', 'baselayer-forms'),
 				'captchaOpenSettings' => __('Open settings', 'baselayer-forms'),
 				'captchaTurnstile'  => __('Cloudflare Turnstile', 'baselayer-forms'),
