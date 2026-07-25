@@ -6089,7 +6089,9 @@
     delete state.rate_limit_window;
     delete state.upload_max_size_mb;
     const emit = () => onChange({ ...state });
+    const textControls = {};
     const bindText = (input, key) => {
+      textControls[key] = input;
       input.value = state[key] || "";
       input.addEventListener("input", () => {
         state[key] = input.value;
@@ -6637,9 +6639,42 @@
         return next;
       },
       applySettings(partial = {}) {
-        Object.assign(state, partial || {});
-        if (Object.prototype.hasOwnProperty.call(partial || {}, "submit_label")) {
-          submitLabel.value = state.submit_label || "";
+        const incoming = partial && typeof partial === "object" ? partial : {};
+        Object.assign(state, incoming);
+        delete state.min_fill_time_enabled;
+        delete state.min_fill_time;
+        delete state.rate_limit_enabled;
+        delete state.rate_limit_max;
+        delete state.rate_limit_window;
+        delete state.upload_max_size_mb;
+        if (!state.after_submit || !["message", "redirect"].includes(state.after_submit)) {
+          state.after_submit = "message";
+        }
+        state.redirect_page_id = Number(state.redirect_page_id) || 0;
+        if (!allowSaveUploads) {
+          state.save_uploads = false;
+        }
+        Object.entries(textControls).forEach(([key, input]) => {
+          if (Object.prototype.hasOwnProperty.call(incoming, key)) {
+            input.value = state[key] || "";
+          }
+        });
+        syncRecipientRows();
+        if (Object.prototype.hasOwnProperty.call(incoming, "notify_user")) {
+          notify.checked = !!state.notify_user;
+          syncNotifyOptions();
+        } else if (Object.prototype.hasOwnProperty.call(incoming, "user_email_field")) {
+          if (notify.checked) {
+            renderSendTo();
+          } else {
+            ensureSelectedEmailField();
+          }
+        }
+        if (Object.prototype.hasOwnProperty.call(incoming, "save_uploads") && allowSaveUploads) {
+          saveUploadsSwitch.input.checked = !!state.save_uploads;
+        }
+        if (Object.prototype.hasOwnProperty.call(incoming, "after_submit") || Object.prototype.hasOwnProperty.call(incoming, "redirect_page_id")) {
+          syncAfterSubmitUi();
         }
         emit();
       },
@@ -6659,8 +6694,42 @@
   }
 
   // themes/baselayer/packages/baselayer-forms/src/js/admin/import-export.js
-  var FORMAT = "baselayer-form-fields";
-  var VERSION = 1;
+  var FORMAT = "baselayer-form";
+  var FORMAT_LEGACY = "baselayer-form-fields";
+  var VERSION = 2;
+  var SETTINGS_EXPORT_SKIP = /* @__PURE__ */ new Set([
+    "honeypot_name",
+    "redirect_page_title",
+    "redirect_page_url",
+    "min_fill_time_enabled",
+    "min_fill_time",
+    "rate_limit_enabled",
+    "rate_limit_max",
+    "rate_limit_window",
+    "upload_max_size_mb"
+  ]);
+  function pickExportSettings(settings) {
+    const out = {};
+    Object.entries(settings || {}).forEach(([key, value]) => {
+      if (SETTINGS_EXPORT_SKIP.has(key)) {
+        return;
+      }
+      if (typeof value === "string") {
+        if (value.trim() !== "") {
+          out[key] = value;
+        }
+        return;
+      }
+      if (typeof value === "boolean") {
+        out[key] = value;
+        return;
+      }
+      if (typeof value === "number" && value !== 0) {
+        out[key] = value;
+      }
+    });
+    return out;
+  }
   function extractFieldsFromImport(data) {
     if (Array.isArray(data)) {
       return data;
@@ -6673,13 +6742,26 @@
     }
     return null;
   }
-  function downloadFieldsExport(fields) {
+  function extractSettingsFromImport(data) {
+    if (!data || typeof data !== "object" || Array.isArray(data)) {
+      return {};
+    }
+    if (!data.settings || typeof data.settings !== "object" || Array.isArray(data.settings)) {
+      return {};
+    }
+    return pickExportSettings(data.settings);
+  }
+  function downloadFormExport(fields, settings = {}) {
+    const exportedSettings = pickExportSettings(settings);
     const payload = {
       format: FORMAT,
       version: VERSION,
       exported_at: (/* @__PURE__ */ new Date()).toISOString(),
       fields: fields || []
     };
+    if (Object.keys(exportedSettings).length > 0) {
+      payload.settings = exportedSettings;
+    }
     const blob = new Blob([JSON.stringify(payload, null, 2)], {
       type: "application/json"
     });
@@ -6689,15 +6771,16 @@
     const raw = titleInput && titleInput.value.trim() || document.querySelector("#title-prompt-text")?.textContent?.trim() || "form";
     const slug = raw.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "form";
     a.href = url;
-    a.download = `${slug}-fields.json`;
+    a.download = `${slug}-form.json`;
     document.body.appendChild(a);
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
   }
-  function openImportConfirmModal(fields, onConfirm) {
+  function openImportConfirmModal(fields, settings, onConfirm) {
     document.querySelectorAll(".bl-forms-builder__modal").forEach((node) => node.remove());
-    const title = t("importOverwriteTitle", "Import fields?");
+    const hasSettings = Object.keys(settings || {}).length > 0;
+    const title = hasSettings ? t("importOverwriteTitleWithSettings", "Import form?") : t("importOverwriteTitle", "Import fields?");
     const backdrop = el("div", {
       className: "bl-forms-builder__modal",
       role: "dialog",
@@ -6709,7 +6792,7 @@
       backdrop.remove();
     };
     const apply = () => {
-      onConfirm(fields);
+      onConfirm(fields, settings || {});
       close();
     };
     const onKey = (evt) => {
@@ -6732,9 +6815,12 @@
     ]);
     const body = el("div", { className: "bl-forms-builder__modal-body" }, [
       el("p", {
-        text: t(
+        text: hasSettings ? t(
+          "importOverwriteMessageWithSettings",
+          "Importing will overwrite all existing fields on this form and apply any messages, subjects, and other texts included in the file. This cannot be undone until you save or discard."
+        ) : t(
           "importOverwriteMessage",
-          "Importing will overwrite all existing fields on this form. Settings (emails, messages, security) are not changed. This cannot be undone until you save or discard."
+          "Importing will overwrite all existing fields on this form. Settings (emails, messages) are not changed because this file does not include them. This cannot be undone until you save or discard."
         )
       })
     ]);
@@ -6748,7 +6834,7 @@
       el("button", {
         type: "button",
         className: "button button-primary",
-        text: t("importOverwriteConfirm", "Overwrite fields"),
+        text: hasSettings ? t("importOverwriteConfirmWithSettings", "Overwrite form") : t("importOverwriteConfirm", "Overwrite fields"),
         onClick: apply
       })
     ]);
@@ -6756,7 +6842,19 @@
     backdrop.appendChild(dialog);
     document.body.appendChild(backdrop);
   }
-  function bindImportExport(canvas) {
+  function isValidImportPayload(data) {
+    if (Array.isArray(data)) {
+      return true;
+    }
+    if (!data || typeof data !== "object") {
+      return false;
+    }
+    if (data.format && data.format !== FORMAT && data.format !== FORMAT_LEGACY) {
+      return false;
+    }
+    return Array.isArray(data.fields);
+  }
+  function bindImportExport(canvas, panels = null) {
     const exportBtn = document.querySelector("[data-bl-forms-export]");
     const importBtn = document.querySelector("[data-bl-forms-import]");
     if (!exportBtn && !importBtn) {
@@ -6769,7 +6867,8 @@
     document.body.appendChild(fileInput);
     exportBtn?.addEventListener("click", () => {
       const fields = typeof canvas.getFields === "function" ? canvas.getFields() : readConfig().fields || [];
-      downloadFieldsExport(fields);
+      const settings = typeof panels?.getSettings === "function" ? panels.getSettings() : readConfig().settings || {};
+      downloadFormExport(fields, settings);
     });
     importBtn?.addEventListener("click", () => {
       fileInput.value = "";
@@ -6789,16 +6888,24 @@
         try {
           parsed = JSON.parse(String(reader.result || ""));
         } catch (e) {
-          window.alert(t("importInvalid", "This file is not a valid form fields export."));
+          window.alert(t("importInvalid", "This file is not a valid form export."));
+          return;
+        }
+        if (!isValidImportPayload(parsed)) {
+          window.alert(t("importInvalid", "This file is not a valid form export."));
           return;
         }
         const fields = extractFieldsFromImport(parsed);
         if (!fields) {
-          window.alert(t("importInvalid", "This file is not a valid form fields export."));
+          window.alert(t("importInvalid", "This file is not a valid form export."));
           return;
         }
-        openImportConfirmModal(fields, (next) => {
-          canvas.replaceFields(next);
+        const settings = extractSettingsFromImport(parsed);
+        openImportConfirmModal(fields, settings, (nextFields, nextSettings) => {
+          canvas.replaceFields(nextFields);
+          if (nextSettings && Object.keys(nextSettings).length > 0 && typeof panels?.applySettings === "function") {
+            panels.applySettings(nextSettings);
+          }
         });
       };
       reader.readAsText(file);
@@ -6875,6 +6982,7 @@
         id: "contact",
         label: t("templateContact", "Contact Form"),
         settings: () => ({
+          submit_label: t("templateSubmitContact", "Send message"),
           user_email_field: "email"
         }),
         fields: () => [
@@ -7185,7 +7293,7 @@
     root.addEventListener("input", syncAll);
     root.addEventListener("change", syncAll);
     document.addEventListener("bl-forms-builder-changed", syncAll);
-    bindImportExport(canvas);
+    bindImportExport(canvas, panels);
     bindTemplates(canvas, panels);
     syncAll();
   }

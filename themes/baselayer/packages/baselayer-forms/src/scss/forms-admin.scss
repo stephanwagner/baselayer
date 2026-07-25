@@ -78,6 +78,8 @@
     color: #1d2327 !important;
     box-shadow: none !important;
     text-align: left;
+    min-height: 36px;
+    height: 36px;
 
     &:hover,
     &:focus {
@@ -1937,11 +1939,34 @@ input.bl-forms-builder__section-label-input {
 }
 
 .bl-form-block-editor .bl-form-block-placeholder {
-  padding: 16px;
-  border: 1px dashed var(--bl-forms-admin-border);
-  border-radius: var(--bl-forms-admin-radius);
-  color: var(--bl-forms-admin-muted);
-  background: var(--bl-forms-admin-surface);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid #{$color-neutral};
+  border-radius: var(--bl-forms-admin-radius, 4px);
+  background: #{$color-neutral-bg};
+  color: var(--bl-forms-admin-text, #1d2327);
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  color: inherit;
+
+  svg {
+    display: block;
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+  }
+}
+
+.bl-form-block-editor .bl-form-block-placeholder__text {
+  min-width: 0;
 }
 
 // Sortable ghost from palette

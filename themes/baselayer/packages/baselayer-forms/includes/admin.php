@@ -108,7 +108,7 @@ function bl_forms_render_tools_metabox(WP_Post $post): void
 	?>
 	<div class="bl-forms-tools">
 		<p class="description bl-forms-tools__help">
-			<?= esc_html__('Export the current form fields as JSON, or import a previously exported file.', 'baselayer-forms') ?>
+			<?= esc_html__('Export the current form (fields and filled-in settings) as JSON, or import a previously exported file.', 'baselayer-forms') ?>
 		</p>
 		<div class="bl-forms-tools__actions">
 			<button type="button" class="button -small" data-bl-forms-export><?= esc_html__('Export', 'baselayer-forms') ?></button>
@@ -356,12 +356,16 @@ function bl_forms_admin_enqueue(string $hook): void
 				'templatePlaceholderSubject' => __('How can we help?', 'baselayer-forms'),
 				'templatePlaceholderMessage' => __('Tell us a bit more…', 'baselayer-forms'),
 				'templatePlaceholderCover' => __('A short note about your application…', 'baselayer-forms'),
+				'templateSubmitContact' => __('Send message', 'baselayer-forms'),
 				'templateSubmitSubscribe' => __('Subscribe', 'baselayer-forms'),
 				'templateSubmitApplication' => __('Submit Application', 'baselayer-forms'),
 				'importOverwriteTitle' => __('Import fields?', 'baselayer-forms'),
-				'importOverwriteMessage' => __('Importing will overwrite all existing fields on this form. Settings (emails, messages, security) are not changed. This cannot be undone until you save or discard.', 'baselayer-forms'),
+				'importOverwriteTitleWithSettings' => __('Import form?', 'baselayer-forms'),
+				'importOverwriteMessage' => __('Importing will overwrite all existing fields on this form. Settings (emails, messages) are not changed because this file does not include them. This cannot be undone until you save or discard.', 'baselayer-forms'),
+				'importOverwriteMessageWithSettings' => __('Importing will overwrite all existing fields on this form and apply any messages, subjects, and other texts included in the file. This cannot be undone until you save or discard.', 'baselayer-forms'),
 				'importOverwriteConfirm' => __('Overwrite fields', 'baselayer-forms'),
-				'importInvalid'     => __('This file is not a valid form fields export.', 'baselayer-forms'),
+				'importOverwriteConfirmWithSettings' => __('Overwrite form', 'baselayer-forms'),
+				'importInvalid'     => __('This file is not a valid form export.', 'baselayer-forms'),
 				'importReadError'   => __('Could not read the selected file.', 'baselayer-forms'),
 				'label'             => __('Label', 'baselayer-forms'),
 				'name'              => __('Field name', 'baselayer-forms'),

@@ -99,7 +99,7 @@ export function mountApp(root, initial) {
   root.addEventListener('change', syncAll);
   document.addEventListener('bl-forms-builder-changed', syncAll);
 
-  bindImportExport(canvas);
+  bindImportExport(canvas, panels);
   bindTemplates(canvas, panels);
   syncAll();
 }

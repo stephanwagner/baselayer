@@ -86,6 +86,7 @@ export function getStarterTemplates() {
       id: 'contact',
       label: t('templateContact', 'Contact Form'),
       settings: () => ({
+        submit_label: t('templateSubmitContact', 'Send message'),
         user_email_field: 'email',
       }),
       fields: () => [

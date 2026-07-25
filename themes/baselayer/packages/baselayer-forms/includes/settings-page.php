@@ -619,6 +619,7 @@ function bl_forms_render_settings_page(): void
 								min="0.1"
 								step="0.1"
 								value="<?= esc_attr((string) $settings['upload_max_size_mb']) ?>"
+								style="min-height: 32px; height: 32px;"
 							>
 							<?= esc_html__('MB', 'baselayer-forms') ?>
 							<p class="description">

@@ -10,7 +10,21 @@
     const { PanelBody, SelectControl } = wp.components;
     const config = window.blFormsBlock || {};
     const options = config.options || [{ label: "Select a form\u2026", value: "0" }];
+    const i18n = config.i18n || {};
     const iconSvg = typeof config.icon === "string" ? config.icon.trim() : "";
+    const placeholder = (text) => el(
+      "div",
+      { className: "bl-form-block-placeholder" },
+      iconSvg ? el(
+        "span",
+        {
+          className: "bl-form-block-placeholder__icon",
+          "aria-hidden": "true"
+        },
+        el(RawHTML, null, iconSvg)
+      ) : null,
+      el("span", { className: "bl-form-block-placeholder__text" }, text)
+    );
     registerBlockType("baselayer/form", {
       icon: iconSvg ? {
         src: el(
@@ -26,6 +40,9 @@
         const formId = attributes.formId || 0;
         const blockProps = useBlockProps({ className: "bl-form-block-editor" });
         const selected = options.find((opt) => String(opt.value) === String(formId));
+        const formLabel = i18n.form || "Form";
+        const selectText = i18n.selectForm || "Select a form in the block settings.";
+        const text = formId ? formLabel + ": " + (selected ? selected.label : "#" + formId) : selectText;
         return el(
           Fragment,
           null,
@@ -34,24 +51,16 @@
             null,
             el(
               PanelBody,
-              { title: "Form", initialOpen: true },
+              { title: formLabel, initialOpen: true },
               el(SelectControl, {
-                label: "Form",
+                label: formLabel,
                 value: String(formId || 0),
                 options,
                 onChange: (value) => setAttributes({ formId: parseInt(value, 10) || 0 })
               })
             )
           ),
-          el(
-            "div",
-            blockProps,
-            el(
-              "div",
-              { className: "bl-form-block-placeholder" },
-              formId ? "Form: " + (selected ? selected.label : "#" + formId) : "Select a form in the block settings."
-            )
-          )
+          el("div", blockProps, placeholder(text))
         );
       },
       save: function save() {

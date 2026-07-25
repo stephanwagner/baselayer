@@ -995,7 +995,7 @@ select.bl-form__control {
   border-left-width: 4px;
   border-radius: var(--bl-form-radius);
   font-size: #{$font-size-s};
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1.45;
   background: var(--bl-form-bg);
   color: var(--bl-form-color);
@@ -1019,8 +1019,44 @@ select.bl-form__control {
 }
 
 .bl-form-block-placeholder {
-  padding: 16px;
-  border: 1px dashed var(--bl-form-border);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid #{$color-neutral};
   border-radius: var(--bl-form-radius);
-  color: var(--bl-form-muted);
+  background: #{$color-neutral-bg};
+  color: var(--bl-form-color);
+  font-size: #{$font-size-s};
+  font-weight: 600;
+  line-height: 1.4;
+  border-left-width: 4px;
+
+  @media (min-resolution: $high-density-dppx) {
+    border-width: 1.5px;
+    border-left-width: 4px;
+  }
+}
+
+.bl-form-block-placeholder__icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  color: inherit;
+
+  svg {
+    display: block;
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+  }
+}
+
+.bl-form-block-placeholder__text {
+  min-width: 0;
 }

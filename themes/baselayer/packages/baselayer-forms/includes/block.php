@@ -12,11 +12,21 @@ function bl_forms_register_block(): void
 	}
 
 	$editor = bl_forms_resolve_asset('forms-block', 'js');
+	$style = bl_forms_resolve_asset('forms', 'css');
 
 	$icon = 'feedback';
 	$svg = bl_forms_svg_code('inbox-text-fill');
 	if ($svg !== '') {
 		$icon = $svg;
+	}
+
+	if ($style !== null) {
+		wp_register_style(
+			'bl-forms',
+			$style['uri'],
+			[],
+			$style['ver']
+		);
 	}
 
 	if ($editor !== null) {
@@ -42,6 +52,10 @@ function bl_forms_register_block(): void
 		wp_localize_script('bl-forms-block', 'blFormsBlock', [
 			'options' => $options,
 			'icon'    => $icon,
+			'i18n'    => [
+				'form'       => __('Form', 'baselayer-forms'),
+				'selectForm' => __('Select a form in the block settings.', 'baselayer-forms'),
+			],
 		]);
 	}
 
@@ -53,6 +67,8 @@ function bl_forms_register_block(): void
 		'icon'            => $icon,
 		'keywords'        => ['form', 'contact', 'email'],
 		'editor_script'   => $editor !== null ? 'bl-forms-block' : null,
+		'editor_style'    => $style !== null ? 'bl-forms' : null,
+		'style'           => $style !== null ? 'bl-forms' : null,
 		'render_callback' => 'bl_forms_block_render',
 		'attributes'      => [
 			'formId' => [
@@ -81,7 +97,7 @@ function bl_forms_block_render(array $attributes = [], string $content = '', $bl
 	$form_id = isset($attributes['formId']) ? (int) $attributes['formId'] : 0;
 	if ($form_id <= 0) {
 		if (is_admin() || (defined('REST_REQUEST') && REST_REQUEST)) {
-			return '<p class="bl-form-block-placeholder">' . esc_html__('Select a form in the block settings.', 'baselayer-forms') . '</p>';
+			return bl_forms_block_placeholder_html(__('Select a form in the block settings.', 'baselayer-forms'));
 		}
 
 		return '';
@@ -95,9 +111,25 @@ function bl_forms_block_render(array $attributes = [], string $content = '', $bl
 	]);
 	if ($html === '') {
 		return is_admin() || (defined('REST_REQUEST') && REST_REQUEST)
-			? '<p class="bl-form-block-placeholder">' . esc_html__('This form is unavailable.', 'baselayer-forms') . '</p>'
+			? bl_forms_block_placeholder_html(__('This form is unavailable.', 'baselayer-forms'))
 			: '';
 	}
+
+	return $html;
+}
+
+/**
+ * Editor/admin placeholder markup (icon + text).
+ */
+function bl_forms_block_placeholder_html(string $text): string
+{
+	$icon = bl_forms_svg_code('inbox-text-fill');
+	$html = '<div class="bl-form-block-placeholder">';
+	if ($icon !== '') {
+		$html .= '<span class="bl-form-block-placeholder__icon" aria-hidden="true">' . $icon . '</span>';
+	}
+	$html .= '<span class="bl-form-block-placeholder__text">' . esc_html($text) . '</span>';
+	$html .= '</div>';
 
 	return $html;
 }

@@ -180,7 +180,11 @@ export function createPanels(settings, builderRoot, onChange) {
 
   const emit = () => onChange({ ...state });
 
+  /** @type {Record<string, HTMLInputElement|HTMLTextAreaElement>} */
+  const textControls = {};
+
   const bindText = (input, key) => {
+    textControls[key] = input;
     input.value = state[key] || '';
     input.addEventListener('input', () => {
       state[key] = input.value;
@@ -790,10 +794,54 @@ export function createPanels(settings, builderRoot, onChange) {
       return next;
     },
     applySettings(partial = {}) {
-      Object.assign(state, partial || {});
-      if (Object.prototype.hasOwnProperty.call(partial || {}, 'submit_label')) {
-        submitLabel.value = state.submit_label || '';
+      const incoming = partial && typeof partial === 'object' ? partial : {};
+      Object.assign(state, incoming);
+
+      // Drop legacy / non-portable keys if they came along.
+      delete state.min_fill_time_enabled;
+      delete state.min_fill_time;
+      delete state.rate_limit_enabled;
+      delete state.rate_limit_max;
+      delete state.rate_limit_window;
+      delete state.upload_max_size_mb;
+
+      if (!state.after_submit || !['message', 'redirect'].includes(state.after_submit)) {
+        state.after_submit = 'message';
       }
+      state.redirect_page_id = Number(state.redirect_page_id) || 0;
+      if (!allowSaveUploads) {
+        state.save_uploads = false;
+      }
+
+      Object.entries(textControls).forEach(([key, input]) => {
+        if (Object.prototype.hasOwnProperty.call(incoming, key)) {
+          input.value = state[key] || '';
+        }
+      });
+      syncRecipientRows();
+
+      if (Object.prototype.hasOwnProperty.call(incoming, 'notify_user')) {
+        notify.checked = !!state.notify_user;
+        syncNotifyOptions();
+      } else if (Object.prototype.hasOwnProperty.call(incoming, 'user_email_field')) {
+        if (notify.checked) {
+          renderSendTo();
+        } else {
+          ensureSelectedEmailField();
+        }
+      }
+
+      if (Object.prototype.hasOwnProperty.call(incoming, 'save_uploads') && allowSaveUploads) {
+        saveUploadsSwitch.input.checked = !!state.save_uploads;
+      }
+
+      if (
+        Object.prototype.hasOwnProperty.call(incoming, 'after_submit') ||
+        Object.prototype.hasOwnProperty.call(incoming, 'redirect_page_id')
+      ) {
+        syncAfterSubmitUi();
+      }
+
       emit();
     },
     syncFields(fields) {
