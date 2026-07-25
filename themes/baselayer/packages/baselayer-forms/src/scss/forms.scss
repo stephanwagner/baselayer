@@ -238,10 +238,11 @@
 }
 
 .bl-form__error {
-  margin: 0;
   font-size: var(--bl-form-font-size-s);
   font-weight: 500;
   color: var(--bl-form-danger);
+  padding: 0 2px;
+  margin: 4px 0 0;
 
   &[hidden] {
     display: none !important;
