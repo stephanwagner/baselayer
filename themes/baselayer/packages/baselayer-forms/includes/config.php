@@ -746,7 +746,113 @@ function bl_forms_sanitize_options($options): array
 }
 
 /**
+ * Whether a stored value looks like a list of uploaded file items.
+ *
+ * @param mixed $value
+ */
+function bl_forms_value_looks_like_files($value): bool
+{
+	if (!is_array($value) || $value === []) {
+		return false;
+	}
+
+	foreach ($value as $item) {
+		if (!is_array($item) || !array_key_exists('name', $item)) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+/**
+ * Format uploaded file items as filenames (one per line).
+ *
+ * @param mixed $value
+ */
+function bl_forms_format_file_display_value($value): string
+{
+	$items = is_array($value) ? $value : [];
+	$parts = [];
+	foreach ($items as $item) {
+		if (!is_array($item)) {
+			continue;
+		}
+		$fname = (string) ($item['name'] ?? '');
+		if ($fname !== '') {
+			$parts[] = $fname;
+		}
+	}
+
+	return implode("\n", $parts);
+}
+
+/**
+ * Flatten mixed array values into a safe display string (never casts arrays).
+ *
+ * @param mixed $value
+ */
+function bl_forms_flatten_display_value($value): string
+{
+	if ($value === null || $value === false) {
+		return '';
+	}
+	if (is_bool($value)) {
+		return $value ? '1' : '0';
+	}
+	if (is_scalar($value)) {
+		return (string) $value;
+	}
+	if (!is_array($value)) {
+		return '';
+	}
+
+	if (bl_forms_value_looks_like_files($value)) {
+		return bl_forms_format_file_display_value($value);
+	}
+
+	// Single associative payload (e.g. one file item stored without a list wrapper).
+	if ($value !== [] && !array_is_list($value)) {
+		if (array_key_exists('name', $value) && is_scalar($value['name'])) {
+			return (string) $value['name'];
+		}
+		$parts = [];
+		foreach ($value as $item) {
+			if (is_scalar($item) && (string) $item !== '') {
+				$parts[] = (string) $item;
+			}
+		}
+
+		return implode(', ', $parts);
+	}
+
+	$parts = [];
+	foreach ($value as $item) {
+		if (is_scalar($item) && (string) $item !== '') {
+			$parts[] = (string) $item;
+			continue;
+		}
+		if (!is_array($item)) {
+			continue;
+		}
+		if (array_key_exists('name', $item) && is_scalar($item['name']) && (string) $item['name'] !== '') {
+			$parts[] = (string) $item['name'];
+			continue;
+		}
+		$nested = bl_forms_flatten_display_value($item);
+		if ($nested !== '') {
+			$parts[] = $nested;
+		}
+	}
+
+	return implode(', ', $parts);
+}
+
+/**
  * Map stored option value(s) to option labels for display (email / entry UI).
+ *
+ * Defensive against form edits: when the live/snapshot type does not match the
+ * stored value shape, infer from the value instead of casting arrays to string.
  *
  * @param array<string, mixed> $field
  * @param mixed                $value Stored submission value.
@@ -755,26 +861,24 @@ function bl_forms_format_field_display_value(array $field, $value): string
 {
 	$type = (string) ($field['type'] ?? '');
 
+	// Prefer value shape when type is missing or clearly mismatched.
+	if ($type === '' || (in_array($type, ['text', 'email', 'phone', 'url', 'number', 'textarea', 'date', 'time', 'datetime'], true) && is_array($value))) {
+		if (bl_forms_value_looks_like_files($value)) {
+			return bl_forms_format_file_display_value($value);
+		}
+		if (is_array($value)) {
+			return bl_forms_flatten_display_value($value);
+		}
+	}
+
 	if ($type === 'terms' || $type === 'toggle') {
 		return $value !== '' && $value !== '0' && $value !== null && $value !== false
 			? __('Yes', 'baselayer-forms')
 			: __('No', 'baselayer-forms');
 	}
 
-	if (in_array($type, ['file', 'image'], true)) {
-		$items = is_array($value) ? $value : [];
-		$parts = [];
-		foreach ($items as $item) {
-			if (!is_array($item)) {
-				continue;
-			}
-			$fname = (string) ($item['name'] ?? '');
-			if ($fname !== '') {
-				$parts[] = $fname;
-			}
-		}
-
-		return implode("\n", $parts);
+	if (in_array($type, ['file', 'image'], true) || bl_forms_value_looks_like_files($value)) {
+		return bl_forms_format_file_display_value($value);
 	}
 
 	if (in_array($type, ['radio', 'checkboxes', 'select', 'button_group'], true)) {
@@ -805,10 +909,72 @@ function bl_forms_format_field_display_value(array $field, $value): string
 	}
 
 	if (is_array($value)) {
-		return implode(', ', array_map('strval', $value));
+		return bl_forms_flatten_display_value($value);
+	}
+
+	if ($value === null || is_bool($value)) {
+		return bl_forms_flatten_display_value($value);
 	}
 
 	return (string) $value;
+}
+
+/**
+ * Lean field schema snapshot for an entry (submit-time labels/types/options).
+ *
+ * Only includes fields present in $values, in form order.
+ *
+ * @param list<array<string, mixed>> $fields
+ * @param array<string, mixed>       $values
+ * @return list<array<string, mixed>>
+ */
+function bl_forms_entry_schema_from_config(array $fields, array $values): array
+{
+	$schema = [];
+	$choice_types = ['radio', 'checkboxes', 'select', 'button_group'];
+
+	foreach (bl_forms_iter_fields($fields) as $field) {
+		$name = sanitize_key((string) ($field['name'] ?? ''));
+		if ($name === '' || !array_key_exists($name, $values)) {
+			continue;
+		}
+
+		$type = sanitize_key((string) ($field['type'] ?? ''));
+		$item = [
+			'name'  => $name,
+			'type'  => $type,
+			'label' => (string) ($field['label'] ?? $name),
+		];
+
+		if (in_array($type, ['text', 'email', 'phone'], true)) {
+			$item['show_in_list'] = !empty($field['show_in_list']);
+		}
+
+		if (in_array($type, $choice_types, true) && isset($field['options']) && is_array($field['options'])) {
+			$options = [];
+			foreach ($field['options'] as $opt) {
+				if (!is_array($opt)) {
+					continue;
+				}
+				$opt_value = (string) ($opt['value'] ?? '');
+				if ($opt_value === '') {
+					continue;
+				}
+				$opt_label = (string) ($opt['label'] ?? $opt_value);
+				$options[] = [
+					'value' => $opt_value,
+					'label' => $opt_label !== '' ? $opt_label : $opt_value,
+				];
+			}
+			if ($options !== []) {
+				$item['options'] = $options;
+			}
+		}
+
+		$schema[] = $item;
+	}
+
+	return $schema;
 }
 
 /**

@@ -28,6 +28,7 @@ const BL_FORM_ENTRY_POST_TYPE = 'bl_form_entry';
 const BL_FORM_CONFIG_META = '_bl_form_config';
 const BL_FORM_ENTRY_FORM_META = '_bl_form_id';
 const BL_FORM_ENTRY_FIELDS_META = '_bl_entry_fields';
+const BL_FORM_ENTRY_SCHEMA_META = '_bl_entry_schema';
 const BL_FORM_ENTRY_META_META = '_bl_entry_meta';
 const BL_FORM_ENTRY_MAIL_META = '_bl_entry_mail';
 const BL_FORMS_GLOBAL_SETTINGS_OPTION = 'bl_forms_global_settings';

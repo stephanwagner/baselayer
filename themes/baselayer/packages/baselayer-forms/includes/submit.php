@@ -225,6 +225,11 @@ function bl_forms_ajax_submit(): void
 	$entry_id = (int) $entry_id;
 	update_post_meta($entry_id, BL_FORM_ENTRY_FORM_META, $form_id);
 	update_post_meta($entry_id, BL_FORM_ENTRY_FIELDS_META, $values);
+	update_post_meta(
+		$entry_id,
+		BL_FORM_ENTRY_SCHEMA_META,
+		bl_forms_entry_schema_from_config($config['fields'] ?? [], $values)
+	);
 	update_post_meta($entry_id, BL_FORM_ENTRY_META_META, [
 		'ip_hash'    => bl_forms_client_ip_hash(),
 		'user_agent' => isset($_SERVER['HTTP_USER_AGENT'])

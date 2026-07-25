@@ -128,18 +128,57 @@ function bl_forms_entry_column_content(string $column, int $post_id): void
 add_action('manage_' . BL_FORM_ENTRY_POST_TYPE . '_posts_custom_column', 'bl_forms_entry_column_content', 10, 2);
 
 /**
+ * Load entry field schema snapshot (empty list when missing/invalid).
+ *
+ * @return list<array<string, mixed>>
+ */
+function bl_forms_get_entry_schema(int $entry_id): array
+{
+	$schema = get_post_meta($entry_id, BL_FORM_ENTRY_SCHEMA_META, true);
+	if (!is_array($schema)) {
+		return [];
+	}
+
+	$out = [];
+	foreach ($schema as $field) {
+		if (!is_array($field) || empty($field['name'])) {
+			continue;
+		}
+		$out[] = $field;
+	}
+
+	return $out;
+}
+
+/**
+ * Resolve display fields for an entry: snapshot first, else live form config.
+ *
+ * @return list<array<string, mixed>>
+ */
+function bl_forms_entry_display_fields(int $entry_id, int $form_id): array
+{
+	$schema = bl_forms_get_entry_schema($entry_id);
+	if ($schema !== []) {
+		return $schema;
+	}
+
+	$config = $form_id > 0 ? bl_forms_get_config($form_id) : bl_forms_default_config();
+
+	return iterator_to_array(bl_forms_iter_fields($config['fields'] ?? []), false);
+}
+
+/**
  * Stack up to 3 “show in list” field values (or — when none).
  */
 function bl_forms_entry_list_overview_html(int $entry_id, int $form_id): void
 {
-	$config = bl_forms_get_config($form_id);
 	$values = get_post_meta($entry_id, BL_FORM_ENTRY_FIELDS_META, true);
 	if (!is_array($values)) {
 		$values = [];
 	}
 
 	$lines = [];
-	foreach (bl_forms_iter_fields($config['fields'] ?? []) as $field) {
+	foreach (bl_forms_entry_display_fields($entry_id, $form_id) as $field) {
 		$type = (string) ($field['type'] ?? '');
 		if (!in_array($type, ['text', 'email', 'phone'], true) || empty($field['show_in_list'])) {
 			continue;
@@ -248,9 +287,9 @@ add_action('add_meta_boxes', 'bl_forms_entry_meta_boxes');
  */
 function bl_forms_render_entry_metabox(WP_Post $post): void
 {
-	$values = get_post_meta((int) $post->ID, BL_FORM_ENTRY_FIELDS_META, true);
-	$form_id = (int) get_post_meta((int) $post->ID, BL_FORM_ENTRY_FORM_META, true);
-	$config = $form_id > 0 ? bl_forms_get_config($form_id) : bl_forms_default_config();
+	$entry_id = (int) $post->ID;
+	$values = get_post_meta($entry_id, BL_FORM_ENTRY_FIELDS_META, true);
+	$form_id = (int) get_post_meta($entry_id, BL_FORM_ENTRY_FORM_META, true);
 
 	if (!is_array($values) || $values === []) {
 		echo '<p>' . esc_html__('No field data stored.', 'baselayer-forms') . '</p>';
@@ -259,19 +298,33 @@ function bl_forms_render_entry_metabox(WP_Post $post): void
 	}
 
 	$fields_by_name = [];
-	foreach (bl_forms_iter_fields($config['fields']) as $field) {
-		if (!empty($field['name'])) {
-			$fields_by_name[(string) $field['name']] = $field;
+	foreach (bl_forms_entry_display_fields($entry_id, $form_id) as $field) {
+		$name = (string) ($field['name'] ?? '');
+		if ($name !== '') {
+			$fields_by_name[$name] = $field;
+		}
+	}
+
+	// Live config fills gaps for keys present only in values (renamed fields, etc.).
+	if ($form_id > 0) {
+		$config = bl_forms_get_config($form_id);
+		foreach (bl_forms_iter_fields($config['fields'] ?? []) as $field) {
+			$name = (string) ($field['name'] ?? '');
+			if ($name !== '' && !isset($fields_by_name[$name])) {
+				$fields_by_name[$name] = $field;
+			}
 		}
 	}
 
 	echo '<table class="widefat striped"><tbody>';
 	foreach ($values as $name => $value) {
+		$name = (string) $name;
 		$field = $fields_by_name[$name] ?? ['name' => $name, 'label' => $name, 'type' => ''];
 		$label = (string) ($field['label'] ?? $name);
 		$type = (string) ($field['type'] ?? '');
+		$is_file = in_array($type, ['file', 'image'], true) || bl_forms_value_looks_like_files($value);
 		echo '<tr><th style="width:28%;">' . esc_html($label) . '</th><td>';
-		if (in_array($type, ['file', 'image'], true) && is_array($value)) {
+		if ($is_file && is_array($value)) {
 			$links = [];
 			foreach ($value as $item) {
 				if (!is_array($item)) {
