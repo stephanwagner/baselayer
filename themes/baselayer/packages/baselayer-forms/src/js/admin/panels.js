@@ -256,13 +256,13 @@ export function createPanels(settings, builderRoot, onChange) {
     }),
     'user_email_intro'
   );
-  const userSubjectRow = fieldRow(t('subject', 'Subject'), userSubject);
+  const userSubjectRow = fieldRow(t('subject', 'Email subject'), userSubject);
   const userIntroRow = fieldRow(
     t('introText', 'Intro text'),
     userIntro,
     t(
       'introTextHelp',
-      'This text appears above the submitted form data in the email. Placeholders can be used [field-id].'
+      'This text appears above the submitted form data in the email. Placeholders like {field-id} can be used.'
     )
   );
 
@@ -349,7 +349,11 @@ export function createPanels(settings, builderRoot, onChange) {
         'One email per line. Leave empty to use the site administrator email.'
       )
     ),
-    fieldRow(t('subject', 'Subject'), adminSubject),
+    fieldRow(
+      t('subject', 'Email subject'),
+      adminSubject,
+      t('subjectHelp', 'The placeholders {form_title} and {site_name} are replaced by the form title and site name.')
+    ),
     el('hr', { className: 'bl-forms-builder__separator' }),
     el('div', { className: 'bl-forms-builder__section' }, [
       el('h3', {
@@ -396,7 +400,7 @@ export function createPanels(settings, builderRoot, onChange) {
     el('input', {
       type: 'text',
       className: 'widefat',
-      placeholder: msgFallbacks.char_count || t('charCountTextDefault', '%remaining% characters remaining'),
+      placeholder: msgFallbacks.char_count || t('charCountTextDefault', '{remaining} characters remaining'),
     }),
     'char_count_text'
   );
@@ -444,7 +448,7 @@ export function createPanels(settings, builderRoot, onChange) {
   const rangeHelp = () =>
     el('span', {
       className: 'description bl-forms-builder__field-errors-help',
-      text: t('minMaxMessageHelp', 'The placeholder %s is replaced by the limit.'),
+      text: t('minMaxMessageHelp', 'The placeholder {limit} is replaced by the limit.'),
     });
 
   const successRow = fieldRow(t('successMessage', 'Success message'), success);
@@ -478,7 +482,7 @@ export function createPanels(settings, builderRoot, onChange) {
         className: 'description',
         text: t(
           'saveUploadsHelp',
-          'Uploaded files are stored outside the media library under unguessable filenames.'
+          'Uploaded files are stored securely outside the Media Library using unguessable filenames.'
         ),
       })
     : el('div', { className: 'bl-forms-builder__notice bl-forms-builder__notice--warning', role: 'status' }, [
@@ -672,7 +676,7 @@ export function createPanels(settings, builderRoot, onChange) {
       fieldRow(
         t('charCountText', 'Character count text'),
         charCountText,
-        t('charCountTextHelp', 'The placeholders %remaining%, %count%, and %max% are replaced by the remaining count, current count, and maximum.')
+        t('charCountTextHelp', 'The placeholders {remaining}, {count}, and {max} are replaced by the remaining count, current count, and maximum.')
       ),
       fieldRow(t('charCountEmptyText', 'When limit is reached'), charCountEmptyText),
     ]),
@@ -696,7 +700,7 @@ export function createPanels(settings, builderRoot, onChange) {
         className: 'description bl-forms-builder__field-errors-help',
         text: t(
           'dateRelationMessageHelp',
-          'The placeholder %s is replaced by the related field label.'
+          'The placeholder {field} is replaced by the related field label.'
         ),
       }),
     ]),
@@ -717,17 +721,17 @@ export function createPanels(settings, builderRoot, onChange) {
       fieldRow(
         t('fileTypeError', 'Wrong file type'),
         fileTypeMsg,
-        t('fileTypeErrorHelp', 'The placeholder %s is replaced by the allowed file types.')
+        t('fileTypeErrorHelp', 'The placeholder {types} is replaced by the allowed file types.')
       ),
       fieldRow(
         t('fileSizeError', 'File too large'),
         fileSizeMsg,
-        t('fileSizeErrorHelp', 'The placeholder %s is replaced by the maximum size.')
+        t('fileSizeErrorHelp', 'The placeholder {size} is replaced by the maximum size.')
       ),
       fieldRow(
         t('fileMaxError', 'Too many files'),
         fileMaxMsg,
-        t('fileMaxErrorHelp', 'The placeholder %s is replaced by the maximum number of files.')
+        t('fileMaxErrorHelp', 'The placeholder {max} is replaced by the maximum number of files.')
       ),
     ]),
     errorSection(t('optionError', 'Choice'), [optionMsg])

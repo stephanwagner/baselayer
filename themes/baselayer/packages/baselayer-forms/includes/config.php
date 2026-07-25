@@ -538,26 +538,26 @@ function bl_forms_message_fallbacks(): array
 		'validation' => __('Some fields need attention. Please check the highlighted fields.', 'baselayer-forms'),
 		'submit'     => __('Send', 'baselayer-forms'),
 		'required'   => __('This field is required.', 'baselayer-forms'),
-		/* translators: %s: minimum number */
-		'min'        => __('Enter a number of at least %s.', 'baselayer-forms'),
-		/* translators: %s: maximum number */
-		'max'        => __('Enter a number of at most %s.', 'baselayer-forms'),
-		/* translators: %s: minimum date */
-		'date_min'   => __('Enter a date on or after %s.', 'baselayer-forms'),
-		/* translators: %s: maximum date */
-		'date_max'   => __('Enter a date on or before %s.', 'baselayer-forms'),
-		/* translators: %s: minimum time */
-		'time_min'   => __('Enter a time on or after %s.', 'baselayer-forms'),
-		/* translators: %s: maximum time */
-		'time_max'   => __('Enter a time on or before %s.', 'baselayer-forms'),
-		/* translators: %s: minimum datetime */
-		'datetime_min' => __('Enter a date and time on or after %s.', 'baselayer-forms'),
-		/* translators: %s: maximum datetime */
-		'datetime_max' => __('Enter a date and time on or before %s.', 'baselayer-forms'),
-		/* translators: %s: maximum character length */
-		'maxlength'  => __('Enter no more than %s characters.', 'baselayer-forms'),
-		/* translators: Placeholders: %remaining%, %count%, %max% */
-		'char_count' => __('%remaining% characters remaining', 'baselayer-forms'),
+		/* translators: Placeholder: {limit} */
+		'min'        => __('Enter a number of at least {limit}.', 'baselayer-forms'),
+		/* translators: Placeholder: {limit} */
+		'max'        => __('Enter a number of at most {limit}.', 'baselayer-forms'),
+		/* translators: Placeholder: {limit} */
+		'date_min'   => __('Enter a date on or after {limit}.', 'baselayer-forms'),
+		/* translators: Placeholder: {limit} */
+		'date_max'   => __('Enter a date on or before {limit}.', 'baselayer-forms'),
+		/* translators: Placeholder: {limit} */
+		'time_min'   => __('Enter a time on or after {limit}.', 'baselayer-forms'),
+		/* translators: Placeholder: {limit} */
+		'time_max'   => __('Enter a time on or before {limit}.', 'baselayer-forms'),
+		/* translators: Placeholder: {limit} */
+		'datetime_min' => __('Enter a date and time on or after {limit}.', 'baselayer-forms'),
+		/* translators: Placeholder: {limit} */
+		'datetime_max' => __('Enter a date and time on or before {limit}.', 'baselayer-forms'),
+		/* translators: Placeholder: {limit} */
+		'maxlength'  => __('Enter no more than {limit} characters.', 'baselayer-forms'),
+		/* translators: Placeholders: {remaining}, {count}, {max} */
+		'char_count' => __('{remaining} characters remaining', 'baselayer-forms'),
 		'char_count_empty' => __('No characters remaining', 'baselayer-forms'),
 		'number'     => __('Enter a valid number.', 'baselayer-forms'),
 		'email'      => __('Enter a valid email address.', 'baselayer-forms'),
@@ -566,17 +566,17 @@ function bl_forms_message_fallbacks(): array
 		'date'       => __('Enter a valid date.', 'baselayer-forms'),
 		'time'       => __('Enter a valid time.', 'baselayer-forms'),
 		'datetime'   => __('Enter a valid date and time.', 'baselayer-forms'),
-		/* translators: %s: related field label */
-		'date_before'=> __('This value must be before %s.', 'baselayer-forms'),
-		/* translators: %s: related field label */
-		'date_after' => __('This value must be after %s.', 'baselayer-forms'),
+		/* translators: Placeholder: {field} */
+		'date_before'=> __('This value must be before {field}.', 'baselayer-forms'),
+		/* translators: Placeholder: {field} */
+		'date_after' => __('This value must be after {field}.', 'baselayer-forms'),
 		'file'       => __('Please upload a valid file.', 'baselayer-forms'),
-		/* translators: %s: allowed file types, e.g. "PDF, JPG, PNG" */
-		'file_type'  => __('Please upload a file of type %s.', 'baselayer-forms'),
-		/* translators: %s: maximum file size, e.g. "12 MB" */
-		'file_size'  => __('This file is too large. Maximum size is %s.', 'baselayer-forms'),
-		/* translators: %s: maximum number of files */
-		'file_max'   => __('You can upload at most %s files.', 'baselayer-forms'),
+		/* translators: Placeholder: {types} — allowed file types, e.g. "PDF, JPG, PNG" */
+		'file_type'  => __('Please upload a file of type {types}.', 'baselayer-forms'),
+		/* translators: Placeholder: {size} — maximum file size, e.g. "12 MB" */
+		'file_size'  => __('This file is too large. Maximum size is {size}.', 'baselayer-forms'),
+		/* translators: Placeholder: {max} — maximum number of files */
+		'file_max'   => __('You can upload at most {max} files.', 'baselayer-forms'),
 		'upload_button' => __('Choose file', 'baselayer-forms'),
 		'upload_empty'  => __('No file chosen', 'baselayer-forms'),
 		'option'     => __('Please choose a valid option.', 'baselayer-forms'),

@@ -10,8 +10,14 @@ function formatCharCountText(template, remaining, max, count, emptyText) {
     return String(emptyText || '').trim() || 'No characters remaining';
   }
   const text =
-    String(template || '').trim() || '%remaining% characters remaining';
+    String(template || '').trim() || '{remaining} characters remaining';
   return text
+    .split('{remaining}')
+    .join(String(Math.max(0, remaining)))
+    .split('{count}')
+    .join(String(Math.max(0, count)))
+    .split('{max}')
+    .join(String(Math.max(0, max)))
     .split('%remaining%')
     .join(String(Math.max(0, remaining)))
     .split('%count%')

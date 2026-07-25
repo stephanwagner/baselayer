@@ -77,8 +77,8 @@ msgstr "Formular #%d"
 #. translators: 1: site name, 2: form title
 #: includes/admin.php:59 includes/mail.php:86
 #, php-format
-msgid "[%1$s] New submission: %2$s"
-msgstr "[%1$s] Neue Übermittlung: %2$s"
+msgid "[{site_name}] New submission: {form_title}"
+msgstr "[{site_name}] Neue Übermittlung: {form_title}"
 
 #: includes/admin.php:98
 msgid ""
@@ -293,6 +293,12 @@ msgstr "E-Mail"
 msgid "Subject"
 msgstr "Betreff"
 
+msgid "Email subject"
+msgstr "E-Mail-Betreff"
+
+msgid "The placeholders {form_title} and {site_name} are replaced by the form title and site name."
+msgstr "Die Platzhalter {form_title} und {site_name} werden durch Formularnamen und Website-Namen ersetzt."
+
 #: includes/admin.php:329
 msgid "Message"
 msgstr "Nachricht"
@@ -452,18 +458,18 @@ msgstr "Zeilen"
 msgid "Character count text"
 msgstr "Zeichenzähler-Text"
 
-#. translators: Placeholders: %remaining%, %count%, %max%
+#. translators: Placeholders: {remaining}, {count}, {max}
 #: includes/admin.php:368 includes/config.php:301 includes/helpers.php:519
-msgid "%remaining% characters remaining"
-msgstr "%remaining% Zeichen übrig"
+msgid "{remaining} characters remaining"
+msgstr "{remaining} Zeichen übrig"
 
 #: includes/admin.php:369
 #, php-format
 msgid ""
-"The placeholders %remaining%, %count%, and %max% are replaced by the "
+"The placeholders {remaining}, {count}, and {max} are replaced by the "
 "remaining count, current count, and maximum."
 msgstr ""
-"Die Platzhalter %remaining%, %count% und %max% werden durch die verbleibende "
+"Die Platzhalter {remaining}, {count} und {max} werden durch die verbleibende "
 "Anzahl, die aktuelle Anzahl und das Maximum ersetzt."
 
 #: includes/admin.php:370
@@ -786,7 +792,7 @@ msgstr "Optionale Klassennamen für den Wrapper dieses Feldes."
 
 #: includes/admin.php:451
 msgid "Submit button label"
-msgstr "Beschriftung des Senden-Buttons"
+msgstr "Text des Senden-Buttons"
 
 #: includes/admin.php:452
 msgid "Recipient"
@@ -816,8 +822,8 @@ msgstr "Ungültig"
 
 #: includes/admin.php:461
 #, php-format
-msgid "The placeholder %s is replaced by the limit."
-msgstr "Der Platzhalter %s wird durch den Grenzwert ersetzt."
+msgid "The placeholder {limit} is replaced by the limit."
+msgstr "Der Platzhalter {limit} wird durch den Grenzwert ersetzt."
 
 #: includes/admin.php:462 includes/admin.php:544
 msgid "Number"
@@ -845,9 +851,8 @@ msgstr "Nach verwandtem Feld"
 
 #: includes/admin.php:469
 #, php-format
-msgid "The placeholder %s is replaced by the related field label."
-msgstr ""
-"Der Platzhalter %s wird durch die Bezeichnung des verknüpften Feldes ersetzt."
+msgid "The placeholder {field} is replaced by the related field label."
+msgstr "Der Platzhalter {field} wird durch die Bezeichnung des verknüpften Feldes ersetzt."
 
 #: includes/admin.php:470
 msgid "Relation"
@@ -883,8 +888,8 @@ msgstr "Falscher Dateityp"
 
 #: includes/admin.php:479
 #, php-format
-msgid "The placeholder %s is replaced by the allowed file types."
-msgstr "Der Platzhalter %s wird durch die erlaubten Dateitypen ersetzt."
+msgid "The placeholder {types} is replaced by the allowed file types."
+msgstr "Der Platzhalter {types} wird durch die erlaubten Dateitypen ersetzt."
 
 #: includes/admin.php:480
 msgid "File too large"
@@ -892,8 +897,8 @@ msgstr "Datei zu groß"
 
 #: includes/admin.php:481
 #, php-format
-msgid "The placeholder %s is replaced by the maximum size."
-msgstr "Der Platzhalter %s wird durch die maximale Dateigröße ersetzt."
+msgid "The placeholder {size} is replaced by the maximum size."
+msgstr "Der Platzhalter {size} wird durch die maximale Größe ersetzt."
 
 #: includes/admin.php:482
 msgid "Too many files"
@@ -901,8 +906,8 @@ msgstr "Zu viele Dateien"
 
 #: includes/admin.php:483
 #, php-format
-msgid "The placeholder %s is replaced by the maximum number of files."
-msgstr "Der Platzhalter %s wird durch die maximale Dateianzahl ersetzt."
+msgid "The placeholder {max} is replaced by the maximum number of files."
+msgstr "Der Platzhalter {max} wird durch die maximale Anzahl Dateien ersetzt."
 
 #: includes/admin.php:485
 msgid "Button label"
@@ -968,13 +973,29 @@ msgstr "Leer lassen, um das Server-Limit zu verwenden."
 
 #: includes/admin.php:500
 msgid "Save uploaded files"
-msgstr "Hochgeladene Dateien speichern"
+msgstr "Datei-Uploads speichern"
+
+msgid "Default maximum file size for file upload fields. Leave empty to use the server limit (%s). Individual fields can override this."
+msgstr "Standardmäßige maximale Dateigröße für Datei-Upload-Felder. Leer lassen, um das Server-Limit (%s) zu verwenden. Einzelne Felder können dies überschreiben."
+
+msgid "Default maximum file size for file upload fields. Leave empty to use the server limit. Individual fields can override this."
+msgstr "Standardmäßige maximale Dateigröße für Datei-Upload-Felder. Leer lassen, um das Server-Limit zu verwenden. Einzelne Felder können dies überschreiben."
+
+msgid "Allow forms to save uploaded files"
+msgstr "Formulare dürfen hochgeladene Dateien speichern"
+
+msgid "When disabled, uploaded files are deleted after processing and the per-form option is unavailable."
+msgstr "Bei Deaktivierung werden Dateien nach der Verarbeitung gelöscht. Die Einstellung im Formular ist dann nicht verfügbar."
+
+msgid "Enable by default on new forms"
+msgstr "Bei neuen Formularen standardmäßig aktivieren"
+
+msgid "Copied onto new forms when they are created. Existing forms keep their own setting."
+msgstr "Wird beim Erstellen neuer Formulare übernommen. Bestehende Formulare behalten ihre eigene Einstellung."
 
 #: includes/admin.php:501
-msgid ""
-"Uploaded files are stored outside the media library under unguessable "
-"filenames."
-msgstr "Hochgeladene Dateien werden außerhalb der Mediathek unter unlesbaren Dateinamen gespeichert."
+msgid "Uploaded files are stored securely outside the Media Library using unguessable filenames."
+msgstr "Hochgeladene Dateien werden sicher außerhalb der Mediathek unter nicht erratbaren Dateinamen gespeichert."
 
 #: includes/admin.php:502
 msgid "After submission"
@@ -1051,10 +1072,10 @@ msgstr "Einleitungstext"
 #: includes/admin.php:521
 msgid ""
 "This text appears above the submitted form data in the email. Placeholders "
-"can be used [field-id]."
+"like {field-id} can be used."
 msgstr ""
 "Dieser Text erscheint oberhalb der übermittelten Formulardaten in der E-"
-"Mail. Platzhalter wie [field-id] sind möglich."
+"Mail. Platzhalter wie {field-id} sind möglich."
 
 #: includes/admin.php:522
 msgid "CSRF protection"
@@ -1110,8 +1131,8 @@ msgstr ""
 "abgesendet wird."
 
 #: includes/admin.php:533
-msgid "At least"
-msgstr "Mindestens"
+msgid "Min."
+msgstr "Min."
 
 #: includes/admin.php:534
 msgid "seconds"
@@ -1241,56 +1262,56 @@ msgstr "Dieses Feld ist erforderlich."
 #. translators: %s: minimum number
 #: includes/config.php:283
 #, php-format
-msgid "Enter a number of at least %s."
-msgstr "Gib eine Zahl von mindestens %s ein."
+msgid "Enter a number of at least {limit}."
+msgstr "Gib eine Zahl von mindestens {limit} ein."
 
 #. translators: %s: maximum number
 #: includes/config.php:285
 #, php-format
-msgid "Enter a number of at most %s."
-msgstr "Gib eine Zahl von höchstens %s ein."
+msgid "Enter a number of at most {limit}."
+msgstr "Gib eine Zahl von höchstens {limit} ein."
 
 #. translators: %s: minimum date
 #: includes/config.php:287
 #, php-format
-msgid "Enter a date on or after %s."
-msgstr "Gib ein Datum ab dem %s ein."
+msgid "Enter a date on or after {limit}."
+msgstr "Gib ein Datum ab dem {limit} ein."
 
 #. translators: %s: maximum date
 #: includes/config.php:289
 #, php-format
-msgid "Enter a date on or before %s."
-msgstr "Gib ein Datum bis zum %s ein."
+msgid "Enter a date on or before {limit}."
+msgstr "Gib ein Datum bis zum {limit} ein."
 
 #. translators: %s: minimum time
 #: includes/config.php:291
 #, php-format
-msgid "Enter a time on or after %s."
-msgstr "Gib eine Uhrzeit ab %s ein."
+msgid "Enter a time on or after {limit}."
+msgstr "Gib eine Uhrzeit ab {limit} ein."
 
 #. translators: %s: maximum time
 #: includes/config.php:293
 #, php-format
-msgid "Enter a time on or before %s."
-msgstr "Gib eine Uhrzeit bis %s ein."
+msgid "Enter a time on or before {limit}."
+msgstr "Gib eine Uhrzeit bis {limit} ein."
 
 #. translators: %s: minimum datetime
 #: includes/config.php:295
 #, php-format
-msgid "Enter a date and time on or after %s."
-msgstr "Gib Datum und Uhrzeit ab %s ein."
+msgid "Enter a date and time on or after {limit}."
+msgstr "Gib Datum und Uhrzeit ab {limit} ein."
 
 #. translators: %s: maximum datetime
 #: includes/config.php:297
 #, php-format
-msgid "Enter a date and time on or before %s."
-msgstr "Gib Datum und Uhrzeit bis %s ein."
+msgid "Enter a date and time on or before {limit}."
+msgstr "Gib Datum und Uhrzeit bis {limit} ein."
 
 #. translators: %s: maximum character length
 #: includes/config.php:299
 #, php-format
-msgid "Enter no more than %s characters."
-msgstr "Gib höchstens %s Zeichen ein."
+msgid "Enter no more than {limit} characters."
+msgstr "Gib höchstens {limit} Zeichen ein."
 
 #: includes/config.php:303
 msgid "Enter a valid number."
@@ -1323,14 +1344,14 @@ msgstr "Gib ein gültiges Datum und eine gültige Uhrzeit ein."
 #. translators: %s: related field label
 #: includes/config.php:311
 #, php-format
-msgid "This value must be before %s."
-msgstr "Dieser Wert muss vor %s liegen."
+msgid "This value must be before {field}."
+msgstr "Dieser Wert muss vor {field} liegen."
 
 #. translators: %s: related field label
 #: includes/config.php:313
 #, php-format
-msgid "This value must be after %s."
-msgstr "Dieser Wert muss nach %s liegen."
+msgid "This value must be after {field}."
+msgstr "Dieser Wert muss nach {field} liegen."
 
 #: includes/config.php:314
 msgid "Please upload a valid file."
@@ -1339,20 +1360,20 @@ msgstr "Bitte lade eine gültige Datei hoch."
 #. translators: %s: allowed file types, e.g. "PDF, JPG, PNG"
 #: includes/config.php:316
 #, php-format
-msgid "Please upload a file of type %s."
-msgstr "Bitte lade eine Datei vom Typ %s hoch."
+msgid "Please upload a file of type {types}."
+msgstr "Bitte lade eine Datei vom Typ {types} hoch."
 
 #. translators: %s: maximum file size, e.g. "12 MB"
 #: includes/config.php:318
 #, php-format
-msgid "This file is too large. Maximum size is %s."
-msgstr "Diese Datei ist zu groß. Maximale Größe ist %s."
+msgid "This file is too large. Maximum size is {size}."
+msgstr "Diese Datei ist zu groß. Maximale Größe ist {size}."
 
 #. translators: %s: maximum number of files
 #: includes/config.php:320
 #, php-format
-msgid "You can upload at most %s files."
-msgstr "Du kannst höchstens %s Dateien hochladen."
+msgid "You can upload at most {max} files."
+msgstr "Du kannst höchstens {max} Dateien hochladen."
 
 #: includes/config.php:321 includes/render.php:977
 msgid "Choose file"
@@ -1503,8 +1524,8 @@ msgstr "Kein gültiger Empfänger konfiguriert."
 #. translators: %s: site name
 #: includes/mail.php:121
 #, php-format
-msgid "We received your message – %s"
-msgstr "Wir haben deine Nachricht erhalten – %s"
+msgid "We received your message – {site_name}"
+msgstr "Wir haben deine Nachricht erhalten – {site_name}"
 
 #: includes/mail.php:128
 msgid "Thank you for your message. Here is a copy of what you sent:"

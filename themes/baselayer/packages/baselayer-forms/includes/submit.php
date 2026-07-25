@@ -38,21 +38,21 @@ function bl_forms_field_error_message(string $code, array $field = [], array $se
 			return bl_forms_resolve_message($settings, 'required_message');
 		case 'min':
 			$value = $bound !== '' ? $bound : (string) ($field['min'] ?? '');
-			return sprintf(
+			return bl_forms_replace_placeholders(
 				bl_forms_resolve_message($settings, bl_forms_range_message_key($field, 'min')),
-				$value
+				['limit' => $value]
 			);
 		case 'max':
 			$value = $bound !== '' ? $bound : (string) ($field['max'] ?? '');
-			return sprintf(
+			return bl_forms_replace_placeholders(
 				bl_forms_resolve_message($settings, bl_forms_range_message_key($field, 'max')),
-				$value
+				['limit' => $value]
 			);
 		case 'maxlength':
 			$value = $bound !== '' ? $bound : (string) (bl_forms_field_max_length($field) ?: '');
-			return sprintf(
+			return bl_forms_replace_placeholders(
 				bl_forms_resolve_message($settings, 'maxlength_message'),
-				$value
+				['limit' => $value]
 			);
 		case 'number':
 			return bl_forms_resolve_message($settings, 'number_message');
@@ -69,40 +69,40 @@ function bl_forms_field_error_message(string $code, array $field = [], array $se
 		case 'datetime':
 			return bl_forms_resolve_message($settings, 'datetime_message');
 		case 'date_before':
-			return sprintf(
+			return bl_forms_replace_placeholders(
 				bl_forms_resolve_message($settings, 'date_before_message'),
-				$bound !== '' ? $bound : ''
+				['field' => $bound]
 			);
 		case 'date_after':
-			return sprintf(
+			return bl_forms_replace_placeholders(
 				bl_forms_resolve_message($settings, 'date_after_message'),
-				$bound !== '' ? $bound : ''
+				['field' => $bound]
 			);
 		case 'file':
 			return bl_forms_resolve_message($settings, 'file_message');
 		case 'file_type':
 			$template = bl_forms_resolve_message($settings, 'file_type_message');
-			if ($bound !== '' && strpos($template, '%s') !== false) {
-				return sprintf($template, $bound);
+			if ($bound !== '' && (str_contains($template, '{types}') || str_contains($template, '%s'))) {
+				return bl_forms_replace_placeholders($template, ['types' => $bound]);
 			}
-			if ($template !== '' && strpos($template, '%s') === false) {
+			if ($template !== '' && !str_contains($template, '{types}') && !str_contains($template, '%s')) {
 				return $template;
 			}
 			if ($bound !== '') {
-				return sprintf(bl_forms_message_fallbacks()['file_type'], $bound);
+				return bl_forms_replace_placeholders(bl_forms_message_fallbacks()['file_type'], ['types' => $bound]);
 			}
 			return __('This file type is not allowed.', 'baselayer-forms');
 		case 'file_size':
 			$value = $bound !== '' ? $bound : (string) size_format(bl_forms_upload_max_bytes($settings));
-			return sprintf(
+			return bl_forms_replace_placeholders(
 				bl_forms_resolve_message($settings, 'file_size_message'),
-				$value
+				['size' => $value]
 			);
 		case 'file_max':
 			$value = $bound !== '' ? $bound : (string) bl_forms_field_max_files($field);
-			return sprintf(
+			return bl_forms_replace_placeholders(
 				bl_forms_resolve_message($settings, 'file_max_message'),
-				$value
+				['max' => $value]
 			);
 		case 'option':
 			return bl_forms_resolve_message($settings, 'option_message');

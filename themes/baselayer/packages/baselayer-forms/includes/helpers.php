@@ -515,8 +515,8 @@ function bl_forms_field_shows_char_count(array $field): bool
  */
 function bl_forms_char_count_text_default(): string
 {
-	/* translators: Placeholders: %remaining%, %count%, %max% */
-	return __('%remaining% characters remaining', 'baselayer-forms');
+	/* translators: Placeholders: {remaining}, {count}, {max} */
+	return __('{remaining} characters remaining', 'baselayer-forms');
 }
 
 /**
@@ -562,6 +562,50 @@ function bl_forms_resolve_char_count_empty_text(array $settings = []): string
 }
 
 /**
+ * Replace {token} placeholders in a string.
+ *
+ * Also accepts legacy %token% (character count) and a single %s (filled from
+ * limit / field / types / size / max, or the first provided value).
+ *
+ * @param array<string, string|int|float> $vars
+ */
+function bl_forms_replace_placeholders(string $text, array $vars): string
+{
+	if ($text === '' || $vars === []) {
+		return $text;
+	}
+
+	$map = [];
+	foreach ($vars as $key => $value) {
+		$bare = sanitize_key((string) $key);
+		if ($bare === '') {
+			continue;
+		}
+		$str = (string) $value;
+		$map['{' . $bare . '}'] = $str;
+		$map['%' . $bare . '%'] = $str;
+	}
+
+	$out = strtr($text, $map);
+
+	if (str_contains($out, '%s')) {
+		$legacy = $vars['limit'] ?? $vars['field'] ?? $vars['types'] ?? $vars['size'] ?? $vars['max'] ?? null;
+		if ($legacy === null) {
+			$first = reset($vars);
+			$legacy = $first === false ? null : $first;
+		}
+		if ($legacy !== null) {
+			$replaced = preg_replace('/%s/', (string) $legacy, $out, 1);
+			if (is_string($replaced)) {
+				$out = $replaced;
+			}
+		}
+	}
+
+	return $out;
+}
+
+/**
  * Format character-count text with named placeholders.
  *
  * @param array<string, mixed> $settings
@@ -574,10 +618,10 @@ function bl_forms_format_char_count_text(string $template, int $remaining, int $
 
 	$template = trim($template) !== '' ? $template : bl_forms_char_count_text_default();
 
-	return strtr($template, [
-		'%remaining%' => (string) max(0, $remaining),
-		'%count%'     => (string) max(0, $count),
-		'%max%'       => (string) max(0, $max),
+	return bl_forms_replace_placeholders($template, [
+		'remaining' => (string) max(0, $remaining),
+		'count'     => (string) max(0, $count),
+		'max'       => (string) max(0, $max),
 	]);
 }
 

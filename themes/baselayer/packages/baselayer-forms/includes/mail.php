@@ -79,15 +79,16 @@ function bl_forms_send_emails(int $form_id, int $entry_id, array $config, array 
 	}
 
 	$recipient = bl_forms_recipient($settings);
+	$subject_vars = [
+		'form_title' => $form_title,
+		'site_name'  => $site_name,
+	];
 	$admin_subject = bl_forms_resolve_setting_string($settings, 'admin_email_subject');
 	if ($admin_subject === '') {
-		$admin_subject = sprintf(
-			/* translators: 1: site name, 2: form title */
-			__('[%1$s] New submission: %2$s', 'baselayer-forms'),
-			$site_name,
-			$form_title
-		);
+		/* translators: Placeholders: {site_name}, {form_title} */
+		$admin_subject = __('[{site_name}] New submission: {form_title}', 'baselayer-forms');
 	}
+	$admin_subject = bl_forms_replace_placeholders($admin_subject, $subject_vars);
 
 	$headers = ['Content-Type: text/html; charset=UTF-8'];
 	if ($reply_to !== '') {
@@ -116,17 +117,16 @@ function bl_forms_send_emails(int $form_id, int $entry_id, array $config, array 
 	if (!empty($settings['notify_user']) && $reply_to !== '') {
 		$user_subject = bl_forms_resolve_setting_string($settings, 'user_email_subject');
 		if ($user_subject === '') {
-			$user_subject = sprintf(
-				/* translators: %s: site name */
-				__('We received your message – %s', 'baselayer-forms'),
-				$site_name
-			);
+			/* translators: Placeholder: {site_name} */
+			$user_subject = __('We received your message – {site_name}', 'baselayer-forms');
 		}
+		$user_subject = bl_forms_replace_placeholders($user_subject, $subject_vars);
 
 		$intro = bl_forms_resolve_setting_string($settings, 'user_email_intro');
 		if ($intro === '') {
 			$intro = __('Thank you for your message. Here is a copy of what you sent:', 'baselayer-forms');
 		} else {
+			$intro = bl_forms_replace_placeholders($intro, $subject_vars);
 			$intro = bl_forms_replace_field_placeholders($intro, $config['fields'], $values);
 		}
 
@@ -150,14 +150,27 @@ function bl_forms_send_emails(int $form_id, int $entry_id, array $config, array 
 }
 
 /**
- * Replace [field-name] tokens with submitted display values.
+ * Replace {token} placeholders in email subjects (and similar strings).
+ *
+ * Supported tokens: form_title, site_name.
+ *
+ * @param array<string, string> $vars
+ */
+function bl_forms_replace_email_placeholders(string $text, array $vars): string
+{
+	return bl_forms_replace_placeholders($text, $vars);
+}
+
+/**
+ * Replace {field-name} tokens with submitted display values.
+ * Legacy [field-name] tokens are still supported.
  *
  * @param list<array<string, mixed>> $fields
  * @param array<string, mixed>       $values
  */
 function bl_forms_replace_field_placeholders(string $text, array $fields, array $values): string
 {
-	if ($text === '' || !str_contains($text, '[')) {
+	if ($text === '' || (!str_contains($text, '{') && !str_contains($text, '['))) {
 		return $text;
 	}
 
@@ -175,9 +188,9 @@ function bl_forms_replace_field_placeholders(string $text, array $fields, array 
 	}
 
 	return (string) preg_replace_callback(
-		'/\[([a-zA-Z0-9_-]+)\]/',
+		'/\{([a-zA-Z0-9_-]+)\}|\[([a-zA-Z0-9_-]+)\]/',
 		static function (array $matches) use ($by_name): string {
-			$key = sanitize_key($matches[1]);
+			$key = sanitize_key($matches[1] !== '' ? $matches[1] : ($matches[2] ?? ''));
 			return array_key_exists($key, $by_name) ? $by_name[$key] : $matches[0];
 		},
 		$text

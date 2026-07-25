@@ -1336,6 +1336,15 @@ input.bl-forms-builder__section-label-input {
     width: 220px;
   }
 
+  .bl-forms-settings__help-row th,
+  .bl-forms-settings__help-row td {
+    padding-top: 0;
+  }
+
+  .bl-forms-settings__help-row .description {
+    margin-top: 0;
+  }
+
   .nav-tab-wrapper {
     margin: 16px 0 12px;
   }
@@ -1344,27 +1353,58 @@ input.bl-forms-builder__section-label-input {
     margin-top: 8px;
   }
 
-  .bl-forms-settings__security {
-    max-width: 640px;
-    margin: 12px 0 8px;
+  h2.title {
+    margin: 1.5em 0 0.6em;
+    padding-bottom: 0.4em;
+    border-bottom: 1px solid #dcdcde;
+    font-size: 1.2em;
   }
 
-  .bl-forms-settings__messages {
-    max-width: 560px;
-    margin: 12px 0 8px;
+  .bl-forms-settings__switch-setting {
+    margin: 0 0 6px;
+  }
 
-    .bl-forms-builder__field-errors {
-      max-width: none;
+  .bl-forms-settings__switch-setting.is-disabled {
+    label.bl-forms-builder__switch {
+      cursor: not-allowed;
     }
 
-    .bl-forms-builder__setting label {
-      display: block;
-      margin-bottom: 4px;
+    .bl-forms-builder__switch-label {
+      font-weight: 600;
+      color: #23292e;
     }
 
-    .bl-forms-builder__setting .widefat {
-      max-width: 100%;
+    .bl-forms-builder__switch-ui {
+      opacity: 0.55;
+      background: #dcdcde;
+      border-color: #c3c4c7;
+
+      &::after {
+        background: #f6f7f7;
+        border-color: #c3c4c7;
+      }
     }
+
+    label.bl-forms-builder__switch input:checked + .bl-forms-builder__switch-ui {
+      background: #a7aaad;
+      border-color: #8c8f94;
+
+      &::after {
+        border-color: #f6f7f7;
+      }
+    }
+  }
+
+  .bl-forms-settings__badge {
+    display: inline-block;
+    margin-left: 4px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 1.4;
+    color: #50575e;
+    background: #f0f0f1;
   }
 }
 

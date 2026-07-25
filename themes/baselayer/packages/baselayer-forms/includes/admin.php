@@ -45,35 +45,17 @@ function bl_forms_render_builder_after_title(WP_Post $post): void
 
 	$config = bl_forms_get_config((int) $post->ID);
 	$placeholders = bl_forms_form_message_placeholders();
-	$site_name = wp_specialchars_decode(get_bloginfo('name'), ENT_QUOTES);
-	$form_title = get_the_title($post);
-	if ($form_title === '') {
-		$form_title = sprintf(
-			/* translators: %d: form post ID */
-			__('Form #%d', 'baselayer-forms'),
-			(int) $post->ID
-		);
-	}
 	$global_admin_subject = bl_forms_resolve_setting_string([], 'admin_email_subject');
 	$default_admin_subject = $global_admin_subject !== ''
 		? $global_admin_subject
-		: sprintf(
-			/* translators: 1: site name, 2: form title */
-			__('[%1$s] New submission: %2$s', 'baselayer-forms'),
-			$site_name,
-			$form_title
-		);
+		: __('[{site_name}] New submission: {form_title}', 'baselayer-forms');
 	$recipient_placeholder = bl_forms_resolve_setting_string([], 'recipient');
 	if ($recipient_placeholder === '') {
 		$recipient_placeholder = (string) get_option('admin_email', '');
 	}
 	$user_subject_placeholder = bl_forms_resolve_setting_string([], 'user_email_subject');
 	if ($user_subject_placeholder === '') {
-		$user_subject_placeholder = sprintf(
-			/* translators: %s: site name */
-			__('We received your message – %s', 'baselayer-forms'),
-			$site_name
-		);
+		$user_subject_placeholder = __('We received your message – {site_name}', 'baselayer-forms');
 	}
 	$user_intro_placeholder = bl_forms_resolve_setting_string([], 'user_email_intro');
 	if ($user_intro_placeholder === '') {
@@ -395,8 +377,8 @@ function bl_forms_admin_enqueue(string $hook): void
 				'showInListMax'     => __('You can show at most 3 fields in the entries list.', 'baselayer-forms'),
 				'textareaRows'      => __('Rows', 'baselayer-forms'),
 				'charCountText'     => __('Character count text', 'baselayer-forms'),
-				'charCountTextDefault' => __('%remaining% characters remaining', 'baselayer-forms'),
-				'charCountTextHelp' => __('The placeholders %remaining%, %count%, and %max% are replaced by the remaining count, current count, and maximum.', 'baselayer-forms'),
+				'charCountTextDefault' => __('{remaining} characters remaining', 'baselayer-forms'),
+				'charCountTextHelp' => __('The placeholders {remaining}, {count}, and {max} are replaced by the remaining count, current count, and maximum.', 'baselayer-forms'),
 				'charCountSection'  => __('Character count', 'baselayer-forms'),
 				'charCountEmptyText'=> __('When limit is reached', 'baselayer-forms'),
 				'charCountEmptyDefault' => __('No characters remaining', 'baselayer-forms'),
@@ -491,7 +473,7 @@ function bl_forms_admin_enqueue(string $hook): void
 				'invalidError'      => __('Invalid', 'baselayer-forms'),
 				'minError'          => __('Minimum', 'baselayer-forms'),
 				'maxError'          => __('Maximum', 'baselayer-forms'),
-				'minMaxMessageHelp' => __('The placeholder %s is replaced by the limit.', 'baselayer-forms'),
+				'minMaxMessageHelp' => __('The placeholder {limit} is replaced by the limit.', 'baselayer-forms'),
 				'numberError'       => __('Number', 'baselayer-forms'),
 				'emailError'        => __('Email', 'baselayer-forms'),
 				'urlError'          => __('URL', 'baselayer-forms'),
@@ -499,7 +481,7 @@ function bl_forms_admin_enqueue(string $hook): void
 				'dateError'         => __('Date', 'baselayer-forms'),
 				'dateBeforeError'   => __('Before related field', 'baselayer-forms'),
 				'dateAfterError'    => __('After related field', 'baselayer-forms'),
-				'dateRelationMessageHelp' => __('The placeholder %s is replaced by the related field label.', 'baselayer-forms'),
+				'dateRelationMessageHelp' => __('The placeholder {field} is replaced by the related field label.', 'baselayer-forms'),
 				'dateRelation'      => __('Relation', 'baselayer-forms'),
 				'dateRelationNone'  => __('No relation', 'baselayer-forms'),
 				'dateRelationBefore'=> __('Must be before', 'baselayer-forms'),
@@ -509,11 +491,11 @@ function bl_forms_admin_enqueue(string $hook): void
 				'datetimeError'     => __('Date & time', 'baselayer-forms'),
 				'fileError'         => __('File', 'baselayer-forms'),
 				'fileTypeError'     => __('Wrong file type', 'baselayer-forms'),
-				'fileTypeErrorHelp' => __('The placeholder %s is replaced by the allowed file types.', 'baselayer-forms'),
+				'fileTypeErrorHelp' => __('The placeholder {types} is replaced by the allowed file types.', 'baselayer-forms'),
 				'fileSizeError'     => __('File too large', 'baselayer-forms'),
-				'fileSizeErrorHelp' => __('The placeholder %s is replaced by the maximum size.', 'baselayer-forms'),
+				'fileSizeErrorHelp' => __('The placeholder {size} is replaced by the maximum size.', 'baselayer-forms'),
 				'fileMaxError'      => __('Too many files', 'baselayer-forms'),
-				'fileMaxErrorHelp'  => __('The placeholder %s is replaced by the maximum number of files.', 'baselayer-forms'),
+				'fileMaxErrorHelp'  => __('The placeholder {max} is replaced by the maximum number of files.', 'baselayer-forms'),
 				'optionError'       => __('Choice', 'baselayer-forms'),
 				'uploadButtonText'  => __('Button label', 'baselayer-forms'),
 				'allowedExtensions' => __('Allowed extensions', 'baselayer-forms'),
@@ -532,7 +514,7 @@ function bl_forms_admin_enqueue(string $hook): void
 				'uploadMaxSize'     => __('Maximum file size', 'baselayer-forms'),
 				'uploadMaxSizeUnit' => __('MB', 'baselayer-forms'),
 				'saveUploads'       => __('Save uploaded files', 'baselayer-forms'),
-				'saveUploadsHelp'   => __('Uploaded files are stored outside the media library under unguessable filenames.', 'baselayer-forms'),
+				'saveUploadsHelp'   => __('Uploaded files are stored securely outside the Media Library using unguessable filenames.', 'baselayer-forms'),
 				'saveUploadsDisabled' => __('Saving uploaded files is disabled in Forms → Settings.', 'baselayer-forms'),
 				'saveUploadsOpenSettings' => __('Open settings', 'baselayer-forms'),
 				'afterSubmit'       => __('After submission', 'baselayer-forms'),
@@ -552,9 +534,10 @@ function bl_forms_admin_enqueue(string $hook): void
 				'notifyUser'        => __('Enable', 'baselayer-forms'),
 				'notifyUserHelp'    => __('Requires an Email field on the form.', 'baselayer-forms'),
 				'emailField'        => __('Email field', 'baselayer-forms'),
-				'subject'           => __('Subject', 'baselayer-forms'),
+				'subject'           => __('Email subject', 'baselayer-forms'),
+				'subjectHelp'       => __('The placeholders {form_title} and {site_name} are replaced by the form title and site name.', 'baselayer-forms'),
 				'introText'         => __('Intro text', 'baselayer-forms'),
-				'introTextHelp'     => __('This text appears above the submitted form data in the email. Placeholders can be used [field-id].', 'baselayer-forms'),
+				'introTextHelp'     => __('This text appears above the submitted form data in the email. Placeholders like {field-id} can be used.', 'baselayer-forms'),
 				'securityCsrf'      => __('CSRF protection', 'baselayer-forms'),
 				'securityCsrfHelp'  => __('A WordPress nonce is verified on every submission to block forged requests.', 'baselayer-forms'),
 				'securityAlwaysOn'  => __('Always on', 'baselayer-forms'),
@@ -566,7 +549,7 @@ function bl_forms_admin_enqueue(string $hook): void
 				'securityHoneypotName' => __('Field name', 'baselayer-forms'),
 				'securityMinFillTime' => __('Minimum fill time', 'baselayer-forms'),
 				'securityMinFillTimeHelp' => __('Submissions are rejected when the form is sent unusually quickly.', 'baselayer-forms'),
-				'securityMinFillTimeAtLeast' => __('At least', 'baselayer-forms'),
+				'securityMinFillTimeAtLeast' => __('Min.', 'baselayer-forms'),
 				'securityMinFillTimeSeconds' => __('seconds', 'baselayer-forms'),
 				'securityRateLimit' => __('Submission limit', 'baselayer-forms'),
 				'securityRateLimitHelp' => __('Limits how often the same visitor can submit the form within a time period.', 'baselayer-forms'),
