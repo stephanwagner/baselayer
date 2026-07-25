@@ -1,7 +1,6 @@
 @use 'variables';
 @use 'tokens' as *;
 @use 'page-picker';
-@use 'button-small';
 
 // Form edit screen: static side boxes (Publish is a WP default postbox).
 .post-type-bl_form {
@@ -78,8 +77,6 @@
     color: #1d2327 !important;
     box-shadow: none !important;
     text-align: left;
-    min-height: 36px;
-    height: 36px;
 
     &:hover,
     &:focus {

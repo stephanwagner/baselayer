@@ -280,7 +280,7 @@ function templateButton(label, onClick) {
     'button',
     {
       type: 'button',
-      className: 'button -small bl-forms-templates__btn',
+      className: 'button bl-button-small bl-forms-templates__btn',
       onClick,
     },
     [caret, el('span', { className: 'bl-forms-templates__btn-label', text: label })]
@@ -329,7 +329,7 @@ export function bindTemplates(canvas, panels) {
     'button',
     {
       type: 'button',
-      className: 'button -small bl-forms-templates__premium',
+      className: 'button bl-button-small bl-forms-templates__premium',
       onClick: () => {
         openSimpleModal(
           t('templatePremiumTitle', 'Premium templates'),

@@ -575,7 +575,7 @@ export function createPanels(settings, builderRoot, onChange) {
   const redirectSummary = el('div', { className: 'bl-forms-builder__page-picker-summary' });
   const redirectPickBtn = el('button', {
     type: 'button',
-    className: 'button -small',
+    className: 'button bl-button-small',
     text: t('choosePage', 'Choose page'),
   });
   const redirectClearBtn = el('button', {

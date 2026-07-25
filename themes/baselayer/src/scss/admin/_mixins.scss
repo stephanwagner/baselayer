@@ -1,6 +1,7 @@
 // Admin-only mixins (not used on the frontend).
 
-// WordPress `.button.-small` at 36px.
+// WP admin `.button.bl-button-small` at 36px.
+// Do not reuse frontend `.button.-small` here — that modifier is for theme buttons.
 @mixin button-small {
   box-sizing: border-box;
   display: inline-flex;

@@ -154,14 +154,6 @@ body.bl-page-picker-open {
   background: #f6f7f7;
 }
 
-.wp-core-ui .button.-small,
-.button.-small {
-  min-height: 28px;
-  padding: 0 10px;
-  font-size: 12px;
-  line-height: 2.15384615;
-}
-
 .post-type-bl_form .page-title-action {
   display: none !important;
 }
@@ -221,8 +213,6 @@ body.bl-page-picker-open {
   color: #1d2327 !important;
   box-shadow: none !important;
   text-align: left;
-  min-height: 36px;
-  height: 36px;
 }
 .post-type-bl_form .bl-forms-templates__btn:hover, .post-type-bl_form .bl-forms-templates__btn:focus {
   background: #f6f7f7 !important;

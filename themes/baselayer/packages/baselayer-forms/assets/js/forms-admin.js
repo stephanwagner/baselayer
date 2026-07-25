@@ -3627,7 +3627,7 @@
     wrap.appendChild(
       el("button", {
         type: "button",
-        className: "button button-small",
+        className: "button bl-button-small",
         text: t("addOption", "Add option"),
         onClick: () => addOption()
       })
@@ -5882,12 +5882,12 @@
       footer.className = "bl-page-picker__footer";
       const cancelBtn = document.createElement("button");
       cancelBtn.type = "button";
-      cancelBtn.className = "button -small";
+      cancelBtn.className = "button bl-button-small";
       cancelBtn.textContent = opts.cancelLabel;
       cancelBtn.addEventListener("click", () => finish(null));
       const selectBtn = document.createElement("button");
       selectBtn.type = "button";
-      selectBtn.className = "button button-primary -small";
+      selectBtn.className = "button button-primary bl-button-small";
       selectBtn.textContent = opts.selectLabel;
       selectBtn.disabled = !selected.id;
       selectBtn.addEventListener("click", () => {
@@ -6444,7 +6444,7 @@
     const redirectSummary = el("div", { className: "bl-forms-builder__page-picker-summary" });
     const redirectPickBtn = el("button", {
       type: "button",
-      className: "button -small",
+      className: "button bl-button-small",
       text: t("choosePage", "Choose page")
     });
     const redirectClearBtn = el("button", {
@@ -7162,7 +7162,7 @@
       "button",
       {
         type: "button",
-        className: "button -small bl-forms-templates__btn",
+        className: "button bl-button-small bl-forms-templates__btn",
         onClick
       },
       [caret, el("span", { className: "bl-forms-templates__btn-label", text: label })]
@@ -7201,7 +7201,7 @@
       "button",
       {
         type: "button",
-        className: "button -small bl-forms-templates__premium",
+        className: "button bl-button-small bl-forms-templates__premium",
         onClick: () => {
           openSimpleModal(
             t("templatePremiumTitle", "Premium templates"),
