@@ -133,7 +133,9 @@ function bl_forms_default_global_settings(): array
 		'option_message'         => '',
 		'admin_email_subject'    => '',
 		'user_email_subject'     => '',
+		'user_email_title'       => '',
 		'user_email_intro'       => '',
+		'user_email_footer'      => '',
 		'notify_user'            => false,
 		'upload_max_size_mb'     => '12',
 		'allow_save_uploads'     => true,
@@ -180,6 +182,7 @@ function bl_forms_sanitize_global_settings($input): array
 		'error_message',
 		'validation_message',
 		'user_email_intro',
+		'user_email_footer',
 		'recipient',
 	];
 
@@ -488,7 +491,9 @@ function bl_forms_default_settings(): array
 		'user_email_field'       => '',
 		'admin_email_subject'    => '',
 		'user_email_subject'     => '',
+		'user_email_title'       => '',
 		'user_email_intro'       => '',
+		'user_email_footer'      => '',
 		'honeypot_name'          => '',
 	];
 }
@@ -764,13 +769,8 @@ function bl_forms_format_field_display_value(array $field, $value): string
 				continue;
 			}
 			$fname = (string) ($item['name'] ?? '');
-			$furl = (string) ($item['url'] ?? '');
-			if ($fname !== '' && $furl !== '') {
-				$parts[] = $fname . ' – ' . $furl;
-			} elseif ($fname !== '') {
+			if ($fname !== '') {
 				$parts[] = $fname;
-			} elseif ($furl !== '') {
-				$parts[] = $furl;
 			}
 		}
 
@@ -1521,7 +1521,7 @@ function bl_forms_sanitize_config($config): array
 			continue;
 		}
 		$value = (string) $settings_in[$key];
-		if (in_array($key, ['success_message', 'error_message', 'validation_message', 'user_email_intro'], true)) {
+		if (in_array($key, ['success_message', 'error_message', 'validation_message', 'user_email_intro', 'user_email_footer'], true)) {
 			$settings[$key] = sanitize_textarea_field($value);
 		} else {
 			$settings[$key] = sanitize_text_field($value);

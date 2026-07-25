@@ -238,7 +238,9 @@ export function createPanels(settings, builderRoot, onChange) {
   );
 
   const fbUserSubject = builderRoot.dataset.fallbackUserSubject || '';
+  const fbUserTitle = builderRoot.dataset.fallbackUserTitle || '';
   const fbUserIntro = builderRoot.dataset.fallbackUserIntro || '';
+  const fbUserFooter = builderRoot.dataset.fallbackUserFooter || '';
 
   const userSubject = bindText(
     el('input', {
@@ -248,6 +250,14 @@ export function createPanels(settings, builderRoot, onChange) {
     }),
     'user_email_subject'
   );
+  const userTitle = bindText(
+    el('input', {
+      type: 'text',
+      className: 'widefat',
+      placeholder: fbUserTitle,
+    }),
+    'user_email_title'
+  );
   const userIntro = bindText(
     el('textarea', {
       className: 'widefat',
@@ -256,7 +266,20 @@ export function createPanels(settings, builderRoot, onChange) {
     }),
     'user_email_intro'
   );
+  const userFooter = bindText(
+    el('textarea', {
+      className: 'widefat',
+      rows: '3',
+      placeholder: fbUserFooter,
+    }),
+    'user_email_footer'
+  );
   const userSubjectRow = fieldRow(t('subject', 'Email subject'), userSubject);
+  const userTitleRow = fieldRow(
+    t('emailTitle', 'Email title'),
+    userTitle,
+    t('emailTitleHelp', 'Shown as the heading inside the confirmation email.')
+  );
   const userIntroRow = fieldRow(
     t('introText', 'Intro text'),
     userIntro,
@@ -265,8 +288,16 @@ export function createPanels(settings, builderRoot, onChange) {
       'This text appears above the submitted form data in the email. Placeholders like {field-id} can be used.'
     )
   );
+  const userFooterRow = fieldRow(
+    t('footerText', 'Footer text'),
+    userFooter,
+    t(
+      'footerTextHelp',
+      'The placeholders {form_title} and {site_name} are supported.'
+    )
+  );
 
-  userOptions.append(sendToWrap, userSubjectRow, userIntroRow);
+  userOptions.append(sendToWrap, userSubjectRow, userTitleRow, userIntroRow, userFooterRow);
 
   const ensureSelectedEmailField = () => {
     const names = emailFields.map((field) => field.name);

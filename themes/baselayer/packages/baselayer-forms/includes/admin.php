@@ -57,9 +57,17 @@ function bl_forms_render_builder_after_title(WP_Post $post): void
 	if ($user_subject_placeholder === '') {
 		$user_subject_placeholder = __('We received your message – {site_name}', 'baselayer-forms');
 	}
+	$user_title_placeholder = bl_forms_resolve_setting_string([], 'user_email_title');
+	if ($user_title_placeholder === '') {
+		$user_title_placeholder = __('Thank you', 'baselayer-forms');
+	}
 	$user_intro_placeholder = bl_forms_resolve_setting_string([], 'user_email_intro');
 	if ($user_intro_placeholder === '') {
 		$user_intro_placeholder = __('Thank you for your message. Here is a copy of what you sent:', 'baselayer-forms');
+	}
+	$user_footer_placeholder = bl_forms_resolve_setting_string([], 'user_email_footer');
+	if ($user_footer_placeholder === '') {
+		$user_footer_placeholder = __('You received this email because you submitted a form on {site_name}.', 'baselayer-forms');
 	}
 	wp_nonce_field('bl_forms_save_config', 'bl_forms_config_nonce');
 	?>
@@ -71,7 +79,9 @@ function bl_forms_render_builder_after_title(WP_Post $post): void
 		data-admin-email="<?= esc_attr($recipient_placeholder) ?>"
 		data-fallback-admin-subject="<?= esc_attr($default_admin_subject) ?>"
 		data-fallback-user-subject="<?= esc_attr($user_subject_placeholder) ?>"
+		data-fallback-user-title="<?= esc_attr($user_title_placeholder) ?>"
 		data-fallback-user-intro="<?= esc_attr($user_intro_placeholder) ?>"
+		data-fallback-user-footer="<?= esc_attr($user_footer_placeholder) ?>"
 		data-fallback-submit="<?= esc_attr($placeholders['submit']) ?>"
 		data-fallback-success="<?= esc_attr($placeholders['success']) ?>"
 		data-fallback-error="<?= esc_attr($placeholders['error']) ?>"
@@ -535,8 +545,12 @@ function bl_forms_admin_enqueue(string $hook): void
 				'emailField'        => __('Email field', 'baselayer-forms'),
 				'subject'           => __('Email subject', 'baselayer-forms'),
 				'subjectHelp'       => __('The placeholders {form_title} and {site_name} are replaced by the form title and site name.', 'baselayer-forms'),
+				'emailTitle'        => __('Email title', 'baselayer-forms'),
+				'emailTitleHelp'    => __('Shown as the heading inside the confirmation email.', 'baselayer-forms'),
 				'introText'         => __('Intro text', 'baselayer-forms'),
 				'introTextHelp'     => __('This text appears above the submitted form data in the email. Placeholders like {field-id} can be used.', 'baselayer-forms'),
+				'footerText'        => __('Footer text', 'baselayer-forms'),
+				'footerTextHelp'    => __('The placeholders {form_title} and {site_name} are supported.', 'baselayer-forms'),
 				'securityCsrf'      => __('CSRF protection', 'baselayer-forms'),
 				'securityCsrfHelp'  => __('A WordPress nonce is verified on every submission to block forged requests.', 'baselayer-forms'),
 				'securityAlwaysOn'  => __('Always on', 'baselayer-forms'),

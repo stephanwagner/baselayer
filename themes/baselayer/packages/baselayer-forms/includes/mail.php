@@ -71,7 +71,7 @@ function bl_forms_send_emails(int $form_id, int $entry_id, array $config, array 
 	}
 
 	$site_name = wp_specialchars_decode(get_bloginfo('name'), ENT_QUOTES);
-	$rows = bl_forms_email_field_rows($config['fields'], $values);
+	$admin_rows = bl_forms_email_field_rows($config['fields'], $values, true);
 	$reply_to = '';
 	$email_name = bl_forms_primary_email_field_name($config);
 	if ($email_name !== '' && !empty($values[$email_name]) && is_email((string) $values[$email_name])) {
@@ -101,7 +101,7 @@ function bl_forms_send_emails(int $form_id, int $entry_id, array $config, array 
 			'site_name'        => $site_name,
 			'form_title'       => $form_title,
 			'entry_id'         => $entry_id,
-			'rows'             => $rows,
+			'rows'             => $admin_rows,
 			'site_url'         => home_url('/'),
 		]);
 
@@ -122,6 +122,12 @@ function bl_forms_send_emails(int $form_id, int $entry_id, array $config, array 
 		}
 		$user_subject = bl_forms_replace_placeholders($user_subject, $subject_vars);
 
+		$title = bl_forms_resolve_setting_string($settings, 'user_email_title');
+		if ($title === '') {
+			$title = __('Thank you', 'baselayer-forms');
+		}
+		$title = bl_forms_replace_placeholders($title, $subject_vars);
+
 		$intro = bl_forms_resolve_setting_string($settings, 'user_email_intro');
 		if ($intro === '') {
 			$intro = __('Thank you for your message. Here is a copy of what you sent:', 'baselayer-forms');
@@ -130,12 +136,21 @@ function bl_forms_send_emails(int $form_id, int $entry_id, array $config, array 
 			$intro = bl_forms_replace_field_placeholders($intro, $config['fields'], $values);
 		}
 
+		$footer = bl_forms_resolve_setting_string($settings, 'user_email_footer');
+		if ($footer === '') {
+			/* translators: Placeholder: {site_name} */
+			$footer = __('You received this email because you submitted a form on {site_name}.', 'baselayer-forms');
+		}
+		$footer = bl_forms_replace_placeholders($footer, $subject_vars);
+
 		$body = bl_forms_compose_email('form-confirmation', [
 			'email_page_title' => $user_subject,
 			'site_name'        => $site_name,
 			'form_title'       => $form_title,
+			'title'            => $title,
 			'intro'            => $intro,
-			'rows'             => $rows,
+			'footer'           => $footer,
+			'rows'             => bl_forms_email_field_rows($config['fields'], $values, false),
 			'site_url'         => home_url('/'),
 		]);
 
@@ -200,11 +215,15 @@ function bl_forms_replace_field_placeholders(string $text, array $fields, array 
 /**
  * Build label/value rows for email templates.
  *
+ * When `$link_files` is true, saved file/image values use the filename as the link text.
+ * Confirmation emails pass false so download URLs are not exposed to submitters.
+ * `value` is HTML-safe for direct output in email templates.
+ *
  * @param list<array<string, mixed>> $fields
  * @param array<string, mixed>       $values
  * @return list<array{label: string, value: string}>
  */
-function bl_forms_email_field_rows(array $fields, array $values): array
+function bl_forms_email_field_rows(array $fields, array $values, bool $link_files = false): array
 {
 	$rows = [];
 	foreach (bl_forms_iter_fields($fields) as $field) {
@@ -219,9 +238,42 @@ function bl_forms_email_field_rows(array $fields, array $values): array
 		$label = (string) ($field['label'] ?? $name);
 		$rows[] = [
 			'label' => $label,
-			'value' => bl_forms_format_field_display_value($field, $values[$name]),
+			'value' => bl_forms_email_field_value_html($field, $values[$name], $link_files),
 		];
 	}
 
 	return $rows;
+}
+
+/**
+ * HTML-safe display value for one field in notification emails.
+ *
+ * @param array<string, mixed> $field
+ * @param mixed                $value
+ */
+function bl_forms_email_field_value_html(array $field, $value, bool $link_files = false): string
+{
+	$type = (string) ($field['type'] ?? '');
+	if (in_array($type, ['file', 'image'], true)) {
+		$items = is_array($value) ? $value : [];
+		$parts = [];
+		foreach ($items as $item) {
+			if (!is_array($item)) {
+				continue;
+			}
+			$fname = (string) ($item['name'] ?? '');
+			$furl = (string) ($item['url'] ?? '');
+			if ($link_files && $fname !== '' && $furl !== '') {
+				$parts[] = '<a href="' . esc_url($furl) . '" style="color:#2563eb;text-decoration:underline;">' . esc_html($fname) . '</a>';
+			} elseif ($fname !== '') {
+				$parts[] = esc_html($fname);
+			} elseif ($link_files && $furl !== '') {
+				$parts[] = '<a href="' . esc_url($furl) . '" style="color:#2563eb;text-decoration:underline;">' . esc_html($furl) . '</a>';
+			}
+		}
+
+		return implode('<br>', $parts);
+	}
+
+	return nl2br(esc_html(bl_forms_format_field_display_value($field, $value)));
 }

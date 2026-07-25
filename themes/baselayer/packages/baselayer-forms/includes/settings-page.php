@@ -317,7 +317,9 @@ function bl_forms_render_settings_page(): void
 	$wp_max = size_format(wp_max_upload_size());
 	$admin_subject_fb = __('[{site_name}] New submission: {form_title}', 'baselayer-forms');
 	$user_subject_fb = __('We received your message – {site_name}', 'baselayer-forms');
+	$user_title_fb = __('Thank you', 'baselayer-forms');
 	$user_intro_fb = __('Thank you for your message. Here is a copy of what you sent:', 'baselayer-forms');
+	$user_footer_fb = __('You received this email because you submitted a form on {site_name}.', 'baselayer-forms');
 
 	$providers = [
 		'turnstile'    => __('Cloudflare Turnstile', 'baselayer-forms'),
@@ -391,10 +393,26 @@ function bl_forms_render_settings_page(): void
 					);
 					bl_forms_settings_text_row(
 						$settings,
+						'user_email_title',
+						__('Confirmation title', 'baselayer-forms'),
+						$user_title_fb,
+						__('Shown as the heading inside the confirmation email.', 'baselayer-forms')
+					);
+					bl_forms_settings_text_row(
+						$settings,
 						'user_email_intro',
 						__('Confirmation intro', 'baselayer-forms'),
 						$user_intro_fb,
 						__('Placeholders like {field-id} can be used.', 'baselayer-forms'),
+						'textarea',
+						3
+					);
+					bl_forms_settings_text_row(
+						$settings,
+						'user_email_footer',
+						__('Confirmation footer', 'baselayer-forms'),
+						$user_footer_fb,
+						__('The placeholders {form_title} and {site_name} are supported.', 'baselayer-forms'),
 						'textarea',
 						3
 					);

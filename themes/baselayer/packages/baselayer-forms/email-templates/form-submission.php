@@ -21,7 +21,7 @@ $rows = isset($rows) && is_array($rows) ? $rows : [];
 				<?= esc_html((string) ($row['label'] ?? '')) ?>
 			</td>
 			<td style="padding:10px 0;border-bottom:1px solid #e2e8f0;font-size:15px;color:#1f2937;vertical-align:top;">
-				<?= nl2br(esc_html((string) ($row['value'] ?? ''))) ?>
+				<?= $row['value'] ?? '' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped in bl_forms_email_field_value_html. ?>
 			</td>
 		</tr>
 	<?php endforeach; ?>
