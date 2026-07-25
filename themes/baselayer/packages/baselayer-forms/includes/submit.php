@@ -209,7 +209,7 @@ function bl_forms_ajax_submit(): void
 		'post_status' => 'publish',
 		'post_title'  => sprintf(
 			/* translators: 1: form title, 2: datetime */
-			__('%1$s — %2$s', 'baselayer-forms'),
+			__('%1$s – %2$s', 'baselayer-forms'),
 			$form_title,
 			wp_date('Y-m-d H:i')
 		),
@@ -667,7 +667,7 @@ function bl_forms_filter_allowed_option_values(array $field, array $values): arr
  * @param array<string, mixed> $files Raw $_FILES.
  * @param array<string, mixed> $field Field config.
  * @param array<string, mixed> $settings Form settings.
- * @return array{0: list<array{id:int,url:string,name:string,mime:string}>, 1: string, 2: string}
+ * @return array{0: list<array{name:string,url?:string,mime?:string}>, 1: string, 2: string}
  *         [stored, error_code, error_bound]. Empty error_code means success.
  */
 function bl_forms_process_field_uploads(string $name, array $files, array $field, bool $multiple, array $settings = []): array
@@ -696,6 +696,7 @@ function bl_forms_process_field_uploads(string $name, array $files, array $field
 	$images_only = ((string) ($field['type'] ?? '')) === 'image';
 	$extensions = bl_forms_field_extensions($field);
 	$max_bytes = bl_forms_upload_max_bytes($settings);
+	$save_uploads = bl_forms_save_uploads_enabled($settings);
 	$ext_label = $extensions !== []
 		? strtoupper(implode(', ', $extensions))
 		: '';
@@ -729,7 +730,7 @@ function bl_forms_process_field_uploads(string $name, array $files, array $field
 			continue;
 		}
 
-		$result = bl_forms_store_uploaded_file($file, $images_only, $extensions);
+		$result = bl_forms_store_uploaded_file($file, $images_only, $extensions, $save_uploads);
 		if (is_wp_error($result)) {
 			if ($error_code === '') {
 				$error_code = 'file';
@@ -785,24 +786,30 @@ function bl_forms_extract_uploaded_files(string $name, array $files): array
 }
 
 /**
- * Move an uploaded file into the media library.
+ * Route uploads into uploads/baselayer-forms/YYYY/MM (no media library).
+ *
+ * @param array{basedir:string,baseurl:string,subdir:string,path:string,url:string} $dirs
+ * @return array{basedir:string,baseurl:string,subdir:string,path:string,url:string}
+ */
+function bl_forms_upload_dir(array $dirs): array
+{
+	$subdir = '/baselayer-forms' . (string) ($dirs['subdir'] ?? '');
+	$dirs['subdir'] = $subdir;
+	$dirs['path'] = trailingslashit((string) $dirs['basedir']) . ltrim($subdir, '/');
+	$dirs['url'] = trailingslashit((string) $dirs['baseurl']) . ltrim($subdir, '/');
+
+	return $dirs;
+}
+
+/**
+ * Validate and optionally store an uploaded file (dedicated folder, not media library).
  *
  * @param array{name:string,type:string,tmp_name:string,error:int,size:int} $file
  * @param list<string>                                                       $extensions
- * @return array{id:int,url:string,name:string,mime:string}|\WP_Error
+ * @return array{name:string,url?:string,mime?:string}|\WP_Error
  */
-function bl_forms_store_uploaded_file(array $file, bool $images_only = false, array $extensions = [])
+function bl_forms_store_uploaded_file(array $file, bool $images_only = false, array $extensions = [], bool $save = true)
 {
-	if (!function_exists('wp_handle_upload')) {
-		require_once ABSPATH . 'wp-admin/includes/file.php';
-	}
-	if (!function_exists('wp_generate_attachment_metadata')) {
-		require_once ABSPATH . 'wp-admin/includes/image.php';
-	}
-	if (!function_exists('media_handle_upload') && !function_exists('wp_insert_attachment')) {
-		require_once ABSPATH . 'wp-admin/includes/media.php';
-	}
-
 	$check = wp_check_filetype_and_ext($file['tmp_name'], $file['name']);
 	$mime = (string) ($check['type'] ?: $file['type']);
 	if ($images_only && $mime !== '' && strpos($mime, 'image/') !== 0) {
@@ -810,6 +817,19 @@ function bl_forms_store_uploaded_file(array $file, bool $images_only = false, ar
 		if (!in_array($ext, ['heic', 'heif', 'avif'], true)) {
 			return new WP_Error('bl_forms_not_image', __('Please upload an image file.', 'baselayer-forms'));
 		}
+	}
+
+	$original_name = (string) ($file['name'] ?? '');
+	$display_name = $original_name !== '' ? wp_basename($original_name) : __('file', 'baselayer-forms');
+
+	if (!$save) {
+		return [
+			'name' => $display_name,
+		];
+	}
+
+	if (!function_exists('wp_handle_upload')) {
+		require_once ABSPATH . 'wp-admin/includes/file.php';
 	}
 
 	$overrides = [
@@ -823,7 +843,10 @@ function bl_forms_store_uploaded_file(array $file, bool $images_only = false, ar
 		$overrides['mimes'] = bl_forms_mimes_for_extensions(bl_forms_default_image_extensions());
 	}
 
+	add_filter('upload_dir', 'bl_forms_upload_dir');
 	$moved = wp_handle_upload($file, $overrides);
+	remove_filter('upload_dir', 'bl_forms_upload_dir');
+
 	if (!is_array($moved) || !empty($moved['error'])) {
 		return new WP_Error(
 			'bl_forms_upload_failed',
@@ -833,29 +856,9 @@ function bl_forms_store_uploaded_file(array $file, bool $images_only = false, ar
 		);
 	}
 
-	$attachment = [
-		'post_mime_type' => (string) ($moved['type'] ?? $mime),
-		'post_title'     => sanitize_file_name(wp_basename((string) $moved['file'])),
-		'post_content'   => '',
-		'post_status'    => 'inherit',
-	];
-	$attach_id = wp_insert_attachment($attachment, (string) $moved['file']);
-	if (is_wp_error($attach_id) || !$attach_id) {
-		return is_wp_error($attach_id)
-			? $attach_id
-			: new WP_Error('bl_forms_attach_failed', __('Could not save uploaded file.', 'baselayer-forms'));
-	}
-
-	$attach_id = (int) $attach_id;
-	$meta = wp_generate_attachment_metadata($attach_id, (string) $moved['file']);
-	if (is_array($meta)) {
-		wp_update_attachment_metadata($attach_id, $meta);
-	}
-
 	return [
-		'id'   => $attach_id,
-		'url'  => (string) ($moved['url'] ?? wp_get_attachment_url($attach_id)),
-		'name' => (string) ($file['name'] ?? wp_basename((string) $moved['file'])),
+		'name' => $display_name,
+		'url'  => (string) ($moved['url'] ?? ''),
 		'mime' => (string) ($moved['type'] ?? $mime),
 	];
 }

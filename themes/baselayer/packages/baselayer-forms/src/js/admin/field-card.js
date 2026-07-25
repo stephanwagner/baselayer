@@ -353,6 +353,15 @@ function convertFieldType(field, nextType) {
     delete field.char_count_text;
   }
 
+  if (!['text', 'email', 'phone'].includes(nextType)) {
+    delete field.show_in_list;
+  } else if (
+    (nextType === 'text' || nextType === 'email') &&
+    field.show_in_list === undefined
+  ) {
+    field.show_in_list = defaultShowInListForNewField(nextType, field.id);
+  }
+
   if (nextType === 'textarea') {
     const rows = parseInt(field.rows, 10);
     field.rows = Number.isFinite(rows) && rows >= 2 ? Math.min(50, rows) : 5;
@@ -1228,6 +1237,86 @@ function createMaxLengthControl(field) {
   return el('div', { className: 'bl-forms-builder__max-length' }, [
     el('p', {}, [el('label', { text: t('maxLength', 'Maximum length') }), maxInput]),
     showSwitch,
+  ]);
+}
+
+function countOtherListOverviewFields(exceptId) {
+  let n = 0;
+  document.querySelectorAll('.bl-forms-builder__field[data-bl-forms-field]').forEach((row) => {
+    if (exceptId && row.dataset.fieldId === exceptId) {
+      return;
+    }
+    const input = row.querySelector('[data-bl-show-in-list]');
+    if (input && input.checked) {
+      n += 1;
+    }
+  });
+  return n;
+}
+
+/**
+ * Whether another field of this type already has “show in list” enabled.
+ */
+function hasShowInListForType(type, exceptId = '') {
+  let found = false;
+  document.querySelectorAll('.bl-forms-builder__field[data-bl-forms-field]').forEach((row) => {
+    if (found) {
+      return;
+    }
+    if (exceptId && row.dataset.fieldId === exceptId) {
+      return;
+    }
+    if ((row.dataset.fieldType || '') !== type) {
+      return;
+    }
+    const input = row.querySelector('[data-bl-show-in-list]');
+    if (input && input.checked) {
+      found = true;
+    }
+  });
+  return found;
+}
+
+/**
+ * First text / first email on the canvas get list overview on by default (max 3 total).
+ */
+function defaultShowInListForNewField(type, exceptId = '') {
+  if (type !== 'text' && type !== 'email') {
+    return false;
+  }
+  if (countOtherListOverviewFields(exceptId) >= 3) {
+    return false;
+  }
+  return !hasShowInListForType(type, exceptId);
+}
+
+function createListOverviewControl(field) {
+  const input = el('input', {
+    type: 'checkbox',
+    dataset: { blShowInList: '1' },
+    checked: !!field.show_in_list,
+  });
+  input.addEventListener('change', () => {
+    if (input.checked && countOtherListOverviewFields(field.id) >= 3) {
+      input.checked = false;
+      window.alert(
+        t('showInListMax', 'You can show at most 3 fields in the entries list.')
+      );
+      return;
+    }
+    field.show_in_list = !!input.checked;
+    document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+  });
+
+  return el('div', { className: 'bl-forms-builder__switch-setting' }, [
+    el('label', { className: 'bl-forms-builder__switch' }, [
+      input,
+      el('span', { className: 'bl-forms-builder__switch-ui', 'aria-hidden': 'true' }),
+      el('span', {
+        className: 'bl-forms-builder__switch-label',
+        text: t('showInList', 'Show in overview'),
+      }),
+    ]),
   ]);
 }
 
@@ -2208,6 +2297,9 @@ export function serializeRow(row) {
     data.max_length = q('[data-bl-max-length]')?.value?.trim() || '';
     data.show_char_count = Boolean(q('[data-bl-show-char-count]')?.checked);
   }
+  if (type === 'text' || type === 'email' || type === 'phone') {
+    data.show_in_list = Boolean(q('[data-bl-show-in-list]')?.checked);
+  }
   if (type === 'textarea') {
     const rawRows = parseInt(q('[data-bl-rows]')?.value, 10);
     data.rows = Number.isFinite(rawRows) && rawRows >= 2 ? Math.min(50, rawRows) : 5;
@@ -2321,6 +2413,12 @@ export function createFieldCard(initial, open = false) {
   }
   if (NAMED_TYPES.includes(field.type) && !field.name) {
     field.name = uniqueFieldName(field.label || field.type, field.id);
+  }
+  if (
+    (field.type === 'text' || field.type === 'email') &&
+    field.show_in_list === undefined
+  ) {
+    field.show_in_list = defaultShowInListForNewField(field.type, field.id);
   }
 
   const row = el('div', {
@@ -2497,14 +2595,19 @@ export function createFieldCard(initial, open = false) {
     const appearanceSections = createSectionAppender(appearance);
 
     generalSections.add(
-      el('div', { className: 'bl-forms-builder__field-status' }, [
-        settingHeading(t('fieldStatus', 'Status')),
-        createSwitchSetting('blActive', t('fieldActive', 'Active'), fieldIsActive(field), (checked) => {
-          field.active = checked;
-          updatePreview();
-          document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
-        }),
-      ])
+      (() => {
+        const switches = [
+          createSwitchSetting('blActive', t('fieldActive', 'Active'), fieldIsActive(field), (checked) => {
+            field.active = checked;
+            updatePreview();
+            document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+          }),
+        ];
+        if (field.type === 'text' || field.type === 'email' || field.type === 'phone') {
+          switches.push(createListOverviewControl(field));
+        }
+        return el('div', { className: 'bl-forms-builder__field-status' }, switches);
+      })()
     );
 
     const onTypeConvert = () => {
@@ -2606,7 +2709,7 @@ export function createFieldCard(initial, open = false) {
       if (HIDE_LABEL_TYPES.includes(field.type)) {
         labelControls.appendChild(
           el('div', { className: 'bl-forms-builder__hide-label' }, [
-            createSwitchSetting('blHideLabel', t('hideLabel', 'Hide label'), !!field.hide_label, (checked) => {
+            createSwitchSetting('blHideLabel', t('hideLabel', 'Hide'), !!field.hide_label, (checked) => {
               field.hide_label = checked;
               document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
             }),

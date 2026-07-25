@@ -20,7 +20,9 @@
   --bl-form-bg: var(--bl-color-surface, #fff);
   --bl-form-danger: #d1343a;
   --bl-form-danger-bg: var(--bl-color-error-bg, rgb(98.737254902%, 94.4274509804%, 94.5921568627%));
+  --bl-form-danger-hover: color-mix(in srgb, var(--bl-form-danger) 72%, #000);
   --bl-form-outline-danger: color-mix(in srgb, var(--bl-form-danger) 20%, transparent);
+  --bl-form-outline-danger-hover: color-mix(in srgb, var(--bl-form-danger) 32%, transparent);
   --bl-form-success: #28a15a;
   --bl-form-success-bg: var(--bl-color-success-bg, rgb(93.2056774949%, 98.3119695639%, 95.3157155399%));
   --bl-form-radius: var(--bl-radius, 6px);
@@ -198,10 +200,18 @@
   outline: 2px solid var(--bl-form-outline-danger);
   outline-offset: 0;
 }
+.bl-form__field.is-invalid .bl-form__control:hover:not(:disabled):not(:focus), .bl-form__field.is-invalid .bl-form__upload-shell:hover {
+  border-color: var(--bl-form-danger-hover);
+  outline-color: var(--bl-form-outline-danger-hover);
+}
 .bl-form__field.is-invalid .bl-form__input-group {
   border-color: var(--bl-form-danger);
   outline: 2px solid var(--bl-form-outline-danger);
   outline-offset: 0;
+}
+.bl-form__field.is-invalid .bl-form__input-group:hover:not(:focus-within) {
+  border-color: var(--bl-form-danger-hover);
+  outline-color: var(--bl-form-outline-danger-hover);
 }
 .bl-form__field.is-invalid .bl-form__input-group .bl-form__control {
   border-color: transparent;
@@ -213,6 +223,16 @@
 }
 .bl-form__field.is-invalid .bl-form__option input[type=checkbox], .bl-form__field.is-invalid .bl-form__option input[type=radio] {
   border-color: var(--bl-form-danger);
+}
+.bl-form__field.is-invalid .bl-form__option input[type=checkbox]:hover:not(:disabled):not(:checked), .bl-form__field.is-invalid .bl-form__option input[type=radio]:hover:not(:disabled):not(:checked) {
+  border-color: var(--bl-form-danger-hover);
+  outline-color: var(--bl-form-outline-danger-hover);
+}
+.bl-form__field.is-invalid .bl-form__btn-option:hover span {
+  border-color: var(--bl-form-danger-hover);
+}
+.bl-form__field.is-invalid .bl-form__switch:hover .bl-form__switch-ui {
+  outline-color: var(--bl-form-outline-danger-hover);
 }
 
 .bl-form__error {

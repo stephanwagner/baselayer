@@ -457,6 +457,16 @@ export function createPanels(settings, builderRoot, onChange) {
     uploadMaxSize,
     el('span', { text: t('uploadMaxSizeUnit', 'MB') }),
   ]);
+  if (state.save_uploads === undefined) {
+    state.save_uploads = true;
+  }
+  const saveUploadsSwitch = plainSwitch(t('saveUploads', 'Save uploaded files'), {
+    checked: !!state.save_uploads,
+    onChange: (checked) => {
+      state.save_uploads = checked;
+      emit();
+    },
+  });
   const fileSettingsBlock = el('div', { className: 'bl-forms-builder__field-errors' }, [
     el('h3', {
       className: 'bl-forms-builder__section-title',
@@ -476,6 +486,17 @@ export function createPanels(settings, builderRoot, onChange) {
               'Leave empty to use the server limit.'
             )
       ),
+      el('hr', { className: 'bl-forms-builder__separator' }),
+      el('div', { className: 'bl-forms-builder__setting' }, [
+        saveUploadsSwitch.root,
+        el('span', {
+          className: 'description',
+          text: t(
+            'saveUploadsHelp',
+            'Uploaded files are stored in a protected folder outside the media library. If this option is disabled, only the filename is saved on the form entry.'
+          ),
+        }),
+      ]),
     ]),
   ]);
 

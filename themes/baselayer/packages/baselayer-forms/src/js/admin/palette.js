@@ -143,6 +143,17 @@ export function createPalette(onAdd) {
     }
 
     sections.forEach(({ sectionEl, toggle, panel, list, id }) => {
+      if (searching && id === 'popular') {
+        sectionEl.hidden = true;
+        sectionEl.classList.remove('is-open');
+        toggle.setAttribute('aria-expanded', 'false');
+        panel.hidden = true;
+        list.querySelectorAll('.bl-forms-builder__template').forEach((item) => {
+          item.hidden = true;
+        });
+        return;
+      }
+
       let sectionVisible = 0;
       list.querySelectorAll('.bl-forms-builder__template').forEach((item) => {
         const type = item.dataset.fieldType || '';

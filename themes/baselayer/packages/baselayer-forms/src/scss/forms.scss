@@ -187,10 +187,21 @@
     outline-offset: 0;
   }
 
+  &.is-invalid .bl-form__control:hover:not(:disabled):not(:focus),
+  &.is-invalid .bl-form__upload-shell:hover {
+    border-color: var(--bl-form-danger-hover);
+    outline-color: var(--bl-form-outline-danger-hover);
+  }
+
   &.is-invalid .bl-form__input-group {
     border-color: var(--bl-form-danger);
     outline: 2px solid var(--bl-form-outline-danger);
     outline-offset: 0;
+  }
+
+  &.is-invalid .bl-form__input-group:hover:not(:focus-within) {
+    border-color: var(--bl-form-danger-hover);
+    outline-color: var(--bl-form-outline-danger-hover);
   }
 
   &.is-invalid .bl-form__input-group .bl-form__control {
@@ -209,6 +220,20 @@
   &.is-invalid .bl-form__option input[type='checkbox'],
   &.is-invalid .bl-form__option input[type='radio'] {
     border-color: var(--bl-form-danger);
+  }
+
+  &.is-invalid .bl-form__option input[type='checkbox']:hover:not(:disabled):not(:checked),
+  &.is-invalid .bl-form__option input[type='radio']:hover:not(:disabled):not(:checked) {
+    border-color: var(--bl-form-danger-hover);
+    outline-color: var(--bl-form-outline-danger-hover);
+  }
+
+  &.is-invalid .bl-form__btn-option:hover span {
+    border-color: var(--bl-form-danger-hover);
+  }
+
+  &.is-invalid .bl-form__switch:hover .bl-form__switch-ui {
+    outline-color: var(--bl-form-outline-danger-hover);
   }
 }
 

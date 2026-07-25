@@ -93,6 +93,20 @@ function bl_forms_iter_fields(array $fields): \Generator
 }
 
 /**
+ * Whether submitted files should be kept on disk (dedicated folder, not media library).
+ *
+ * @param array<string, mixed> $settings
+ */
+function bl_forms_save_uploads_enabled(array $settings): bool
+{
+	if (!array_key_exists('save_uploads', $settings)) {
+		return true;
+	}
+
+	return !empty($settings['save_uploads']);
+}
+
+/**
  * Max upload bytes for form file fields (custom MB setting, capped by WordPress).
  *
  * @param array<string, mixed> $settings
@@ -202,6 +216,7 @@ function bl_forms_default_settings(): array
 		'file_size_message'      => '',
 		'file_max_message'       => '',
 		'upload_max_size_mb'     => '12',
+		'save_uploads'           => true,
 		'option_message'         => '',
 		'after_submit'           => 'message',
 		'redirect_page_id'       => 0,
@@ -1000,6 +1015,12 @@ function bl_forms_sanitize_field($field): ?array
 		unset($out['max_length'], $out['show_char_count'], $out['char_count_text']);
 	}
 
+	if (in_array($type, ['text', 'email', 'phone'], true)) {
+		$out['show_in_list'] = !empty($field['show_in_list']);
+	} else {
+		unset($out['show_in_list']);
+	}
+
 	if ($type === 'textarea') {
 		$rows = absint($field['rows'] ?? 5);
 		if ($rows < 2) {
@@ -1142,7 +1163,7 @@ function bl_forms_sanitize_config($config): array
 		? $config['settings']
 		: [];
 	$settings = bl_forms_default_settings();
-	$bool_keys = ['notify_user', 'min_fill_time_enabled', 'rate_limit_enabled'];
+	$bool_keys = ['notify_user', 'min_fill_time_enabled', 'rate_limit_enabled', 'save_uploads'];
 	$int_keys = [
 		'min_fill_time'      => [1, 300],
 		'rate_limit_max'     => [1, 100],
@@ -1215,10 +1236,47 @@ function bl_forms_sanitize_config($config): array
 	}
 	$settings['honeypot_name'] = $hp;
 
+	$fields = bl_forms_limit_show_in_list_fields($fields, 3);
+
 	return [
 		'fields'   => $fields,
 		'settings' => $settings,
 	];
+}
+
+/**
+ * Keep at most $max fields marked show_in_list (form order).
+ *
+ * @param list<array<string, mixed>> $fields
+ * @return list<array<string, mixed>>
+ */
+function bl_forms_limit_show_in_list_fields(array $fields, int $max = 3): array
+{
+	$count = 0;
+	$walk = static function (array $list) use (&$walk, &$count, $max): array {
+		foreach ($list as $i => $field) {
+			if (!is_array($field)) {
+				continue;
+			}
+			$type = (string) ($field['type'] ?? '');
+			if (in_array($type, bl_forms_layout_field_types(), true)) {
+				$children = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
+				$list[$i]['children'] = $walk($children);
+				continue;
+			}
+			if (!empty($field['show_in_list']) && in_array($type, ['text', 'email', 'phone'], true)) {
+				if ($count >= $max) {
+					$list[$i]['show_in_list'] = false;
+				} else {
+					$count++;
+				}
+			}
+		}
+
+		return $list;
+	};
+
+	return $walk($fields);
 }
 
 /**

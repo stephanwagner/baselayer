@@ -20,7 +20,9 @@
   --bl-form-bg: var(--bl-color-surface, #fff);
   --bl-form-danger: #d1343a;
   --bl-form-danger-bg: var(--bl-color-error-bg, rgb(98.737254902%, 94.4274509804%, 94.5921568627%));
+  --bl-form-danger-hover: color-mix(in srgb, var(--bl-form-danger) 72%, #000);
   --bl-form-outline-danger: color-mix(in srgb, var(--bl-form-danger) 20%, transparent);
+  --bl-form-outline-danger-hover: color-mix(in srgb, var(--bl-form-danger) 32%, transparent);
   --bl-form-success: #28a15a;
   --bl-form-success-bg: var(--bl-color-success-bg, rgb(93.2056774949%, 98.3119695639%, 95.3157155399%));
   --bl-form-radius: var(--bl-radius, 6px);
@@ -236,16 +238,17 @@ body.bl-page-picker-open {
   opacity: 0.65;
 }
 .post-type-bl_form .bl-forms-templates__caret svg {
-  width: 12px;
-  height: 12px;
+  width: 16px;
+  height: 16px;
   display: block;
+  flex-shrink: 0;
 }
 .post-type-bl_form .bl-forms-templates__btn-label {
   flex: 1 1 auto;
   min-width: 0;
 }
 .post-type-bl_form .bl-forms-templates__premium {
-  display: block;
+  display: none !important;
   width: 100%;
   margin-top: 10px;
   box-sizing: border-box;
@@ -496,8 +499,8 @@ p.bl-forms-builder__palette-empty {
 }
 .bl-forms-builder__palette-section-chevron svg {
   display: block;
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   transition: transform 0.15s ease;
 }
 
@@ -595,8 +598,8 @@ p.bl-forms-builder__palette-empty {
 }
 .bl-forms-builder__template-add svg {
   display: block;
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
 }
 .bl-forms-builder__template-add:hover, .bl-forms-builder__template-add:focus-visible {
   background: color-mix(in srgb, var(--bl-forms-admin-accent) 14%, #fff);
@@ -750,10 +753,13 @@ p.bl-forms-builder__palette-empty {
 }
 
 .bl-forms-builder__field-status {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   margin-bottom: 4px;
 }
-.bl-forms-builder__field-status .bl-forms-builder__setting-heading {
-  margin-bottom: 8px;
+.bl-forms-builder__field-status .bl-forms-builder__switch-setting {
+  margin: 0;
 }
 
 .bl-forms-builder__field-toggle .bl-forms-builder__field-toggle-icon {
@@ -1309,7 +1315,6 @@ input.bl-forms-builder__section-label-input:focus {
 .bl-forms-builder__notify-user-options {
   display: block;
   margin: 0;
-  padding-left: 40px;
 }
 .bl-forms-builder__notify-user-options[hidden] {
   display: none;

@@ -67,6 +67,7 @@ function bl_forms_register_post_types(): void
 		'capability_type'     => 'post',
 		'map_meta_cap'        => true,
 		'hierarchical'        => false,
+		// Explicit title only — empty [] falls back to title + editor in WP.
 		'supports'            => ['title'],
 		'has_archive'         => false,
 		'rewrite'             => false,
@@ -76,7 +77,6 @@ function bl_forms_register_post_types(): void
 	]);
 }
 add_action('init', 'bl_forms_register_post_types');
-
 /**
  * Restrict form definition screens to developers; entries to manage_options.
  */

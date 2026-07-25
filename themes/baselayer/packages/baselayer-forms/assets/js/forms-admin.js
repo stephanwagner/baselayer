@@ -2618,6 +2618,16 @@
         syncCollapseUi();
       }
       sections.forEach(({ sectionEl, toggle, panel, list, id }) => {
+        if (searching && id === "popular") {
+          sectionEl.hidden = true;
+          sectionEl.classList.remove("is-open");
+          toggle.setAttribute("aria-expanded", "false");
+          panel.hidden = true;
+          list.querySelectorAll(".bl-forms-builder__template").forEach((item) => {
+            item.hidden = true;
+          });
+          return;
+        }
         let sectionVisible = 0;
         list.querySelectorAll(".bl-forms-builder__template").forEach((item) => {
           const type = item.dataset.fieldType || "";
@@ -3415,6 +3425,11 @@
       delete field.show_char_count;
       delete field.char_count_text;
     }
+    if (!["text", "email", "phone"].includes(nextType)) {
+      delete field.show_in_list;
+    } else if ((nextType === "text" || nextType === "email") && field.show_in_list === void 0) {
+      field.show_in_list = defaultShowInListForNewField(nextType, field.id);
+    }
     if (nextType === "textarea") {
       const rows = parseInt(field.rows, 10);
       field.rows = Number.isFinite(rows) && rows >= 2 ? Math.min(50, rows) : 5;
@@ -4197,6 +4212,75 @@
     return el("div", { className: "bl-forms-builder__max-length" }, [
       el("p", {}, [el("label", { text: t("maxLength", "Maximum length") }), maxInput]),
       showSwitch
+    ]);
+  }
+  function countOtherListOverviewFields(exceptId) {
+    let n = 0;
+    document.querySelectorAll(".bl-forms-builder__field[data-bl-forms-field]").forEach((row) => {
+      if (exceptId && row.dataset.fieldId === exceptId) {
+        return;
+      }
+      const input = row.querySelector("[data-bl-show-in-list]");
+      if (input && input.checked) {
+        n += 1;
+      }
+    });
+    return n;
+  }
+  function hasShowInListForType(type, exceptId = "") {
+    let found = false;
+    document.querySelectorAll(".bl-forms-builder__field[data-bl-forms-field]").forEach((row) => {
+      if (found) {
+        return;
+      }
+      if (exceptId && row.dataset.fieldId === exceptId) {
+        return;
+      }
+      if ((row.dataset.fieldType || "") !== type) {
+        return;
+      }
+      const input = row.querySelector("[data-bl-show-in-list]");
+      if (input && input.checked) {
+        found = true;
+      }
+    });
+    return found;
+  }
+  function defaultShowInListForNewField(type, exceptId = "") {
+    if (type !== "text" && type !== "email") {
+      return false;
+    }
+    if (countOtherListOverviewFields(exceptId) >= 3) {
+      return false;
+    }
+    return !hasShowInListForType(type, exceptId);
+  }
+  function createListOverviewControl(field) {
+    const input = el("input", {
+      type: "checkbox",
+      dataset: { blShowInList: "1" },
+      checked: !!field.show_in_list
+    });
+    input.addEventListener("change", () => {
+      if (input.checked && countOtherListOverviewFields(field.id) >= 3) {
+        input.checked = false;
+        window.alert(
+          t("showInListMax", "You can show at most 3 fields in the entries list.")
+        );
+        return;
+      }
+      field.show_in_list = !!input.checked;
+      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+    });
+    return el("div", { className: "bl-forms-builder__switch-setting" }, [
+      el("label", { className: "bl-forms-builder__switch" }, [
+        input,
+        el("span", { className: "bl-forms-builder__switch-ui", "aria-hidden": "true" }),
+        el("span", {
+          className: "bl-forms-builder__switch-label",
+          text: t("showInList", "Show in overview")
+        })
+      ])
     ]);
   }
   function createTextareaRowsControl(field) {
@@ -5035,6 +5119,9 @@
       data.max_length = q("[data-bl-max-length]")?.value?.trim() || "";
       data.show_char_count = Boolean(q("[data-bl-show-char-count]")?.checked);
     }
+    if (type === "text" || type === "email" || type === "phone") {
+      data.show_in_list = Boolean(q("[data-bl-show-in-list]")?.checked);
+    }
     if (type === "textarea") {
       const rawRows = parseInt(q("[data-bl-rows]")?.value, 10);
       data.rows = Number.isFinite(rawRows) && rawRows >= 2 ? Math.min(50, rawRows) : 5;
@@ -5129,6 +5216,9 @@
     }
     if (NAMED_TYPES.includes(field.type) && !field.name) {
       field.name = uniqueFieldName(field.label || field.type, field.id);
+    }
+    if ((field.type === "text" || field.type === "email") && field.show_in_list === void 0) {
+      field.show_in_list = defaultShowInListForNewField(field.type, field.id);
     }
     const row = el("div", {
       className: "bl-forms-builder__field" + (open ? " is-open" : ""),
@@ -5286,14 +5376,19 @@
       const advancedSections = createSectionAppender(advanced);
       const appearanceSections = createSectionAppender(appearance);
       generalSections.add(
-        el("div", { className: "bl-forms-builder__field-status" }, [
-          settingHeading(t("fieldStatus", "Status")),
-          createSwitchSetting("blActive", t("fieldActive", "Active"), fieldIsActive(field), (checked) => {
-            field.active = checked;
-            updatePreview();
-            document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-          })
-        ])
+        (() => {
+          const switches = [
+            createSwitchSetting("blActive", t("fieldActive", "Active"), fieldIsActive(field), (checked) => {
+              field.active = checked;
+              updatePreview();
+              document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+            })
+          ];
+          if (field.type === "text" || field.type === "email" || field.type === "phone") {
+            switches.push(createListOverviewControl(field));
+          }
+          return el("div", { className: "bl-forms-builder__field-status" }, switches);
+        })()
       );
       const onTypeConvert = () => {
         updatePreview();
@@ -5385,7 +5480,7 @@
         if (HIDE_LABEL_TYPES.includes(field.type)) {
           labelControls.appendChild(
             el("div", { className: "bl-forms-builder__hide-label" }, [
-              createSwitchSetting("blHideLabel", t("hideLabel", "Hide label"), !!field.hide_label, (checked) => {
+              createSwitchSetting("blHideLabel", t("hideLabel", "Hide"), !!field.hide_label, (checked) => {
                 field.hide_label = checked;
                 document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
               })
@@ -6339,6 +6434,16 @@
       uploadMaxSize,
       el("span", { text: t("uploadMaxSizeUnit", "MB") })
     ]);
+    if (state.save_uploads === void 0) {
+      state.save_uploads = true;
+    }
+    const saveUploadsSwitch = plainSwitch(t("saveUploads", "Save uploaded files"), {
+      checked: !!state.save_uploads,
+      onChange: (checked) => {
+        state.save_uploads = checked;
+        emit();
+      }
+    });
     const fileSettingsBlock = el("div", { className: "bl-forms-builder__field-errors" }, [
       el("h3", {
         className: "bl-forms-builder__section-title",
@@ -6355,7 +6460,18 @@
             "uploadMaxSizeHelpEmpty",
             "Leave empty to use the server limit."
           )
-        )
+        ),
+        el("hr", { className: "bl-forms-builder__separator" }),
+        el("div", { className: "bl-forms-builder__setting" }, [
+          saveUploadsSwitch.root,
+          el("span", {
+            className: "description",
+            text: t(
+              "saveUploadsHelp",
+              "Uploaded files are stored in a protected folder outside the media library. If this option is disabled, only the filename is saved on the form entry."
+            )
+          })
+        ])
       ])
     ]);
     const afterOptions = el("div", { className: "bl-forms-builder__after-submit" });
