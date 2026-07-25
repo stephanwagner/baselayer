@@ -509,6 +509,60 @@
         clearFieldInvalid(field);
       }
     };
+    const resetCaptchas = () => {
+      root.querySelectorAll(".cf-turnstile").forEach((el) => {
+        try {
+          window.turnstile?.reset?.(el);
+        } catch (err) {
+        }
+      });
+      root.querySelectorAll(".h-captcha").forEach((el) => {
+        const widgetId = el.getAttribute("data-hcaptcha-widget-id");
+        try {
+          if (widgetId != null && widgetId !== "") {
+            window.hcaptcha?.reset?.(widgetId);
+          } else {
+            window.hcaptcha?.reset?.();
+          }
+        } catch (err) {
+        }
+      });
+      root.querySelectorAll(".g-recaptcha").forEach((el) => {
+        const widgetId = el.getAttribute("data-widget-id");
+        try {
+          if (widgetId != null && widgetId !== "") {
+            window.grecaptcha?.reset?.(Number(widgetId));
+          } else {
+            window.grecaptcha?.reset?.();
+          }
+        } catch (err) {
+        }
+      });
+      root.querySelectorAll(".frc-captcha").forEach((el) => {
+        const widget = el.friendlyChallenge || el.frc;
+        try {
+          widget?.reset?.();
+        } catch (err) {
+        }
+      });
+    };
+    const resetForm = () => {
+      form.reset();
+      if (jsField && jsToken) {
+        jsField.value = jsToken;
+      }
+      form.querySelectorAll("[data-bl-form-file-input]").forEach((input) => {
+        input.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+      form.querySelectorAll(".bl-form__control, textarea.bl-form__control, input.bl-form__control").forEach((control) => {
+        control.dispatchEvent(new Event("input", { bubbles: true }));
+      });
+      resetCaptchas();
+      clearInvalid();
+      const fields = root.querySelector(".bl-form__fields");
+      if (fields) fields.hidden = false;
+      submit.hidden = false;
+    };
     form.addEventListener("input", clearInvalidFromEvent);
     form.addEventListener("change", clearInvalidFromEvent);
     const handleSuccess = (payload) => {
@@ -517,10 +571,8 @@
         window.location.assign(redirect);
         return;
       }
+      resetForm();
       showMessage(payload && payload.message || successMsg, "success");
-      const fields = root.querySelector(".bl-form__fields");
-      if (fields) fields.hidden = true;
-      submit.hidden = true;
       progress.hide();
     };
     form.addEventListener("submit", async (event) => {
