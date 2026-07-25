@@ -390,3 +390,105 @@ function bl_forms_entries_title_readonly(): void
 	echo '<script id="bl-forms-entry-title-ro">document.addEventListener("DOMContentLoaded",function(){var t=document.getElementById("title");if(t){t.readOnly=true;t.setAttribute("aria-readonly","true");}});</script>';
 }
 add_action('admin_footer', 'bl_forms_entries_title_readonly');
+
+/**
+ * Absolute path under uploads/baselayer-forms only (rejects path traversal).
+ */
+function bl_forms_resolve_entry_upload_path(array $item): string
+{
+	$uploads = wp_upload_dir();
+	if (!empty($uploads['error']) || empty($uploads['basedir'])) {
+		return '';
+	}
+
+	$basedir = wp_normalize_path(trailingslashit((string) $uploads['basedir']));
+	$forms_root = $basedir . 'baselayer-forms';
+	$forms_real = realpath($forms_root);
+	if ($forms_real === false) {
+		return '';
+	}
+	$forms_real = wp_normalize_path($forms_real);
+
+	$candidate = '';
+	$rel = isset($item['path']) ? ltrim(str_replace('\\', '/', (string) $item['path']), '/') : '';
+	if ($rel !== '' && str_starts_with($rel, 'baselayer-forms/')) {
+		$candidate = $basedir . $rel;
+	} else {
+		$url = (string) ($item['url'] ?? '');
+		if ($url === '' || empty($uploads['baseurl'])) {
+			return '';
+		}
+		$baseurl = trailingslashit((string) $uploads['baseurl']);
+		$baseurl_http = set_url_scheme($baseurl, 'http');
+		$baseurl_https = set_url_scheme($baseurl, 'https');
+		foreach ([$baseurl, $baseurl_http, $baseurl_https] as $prefix) {
+			if ($prefix !== '' && str_starts_with($url, $prefix)) {
+				$candidate = $basedir . ltrim(substr($url, strlen($prefix)), '/');
+				break;
+			}
+		}
+	}
+
+	if ($candidate === '') {
+		return '';
+	}
+
+	$real = realpath($candidate);
+	if ($real === false) {
+		return '';
+	}
+	$real = wp_normalize_path($real);
+	if ($real !== $forms_real && !str_starts_with($real, $forms_real . '/')) {
+		return '';
+	}
+	if (!is_file($real)) {
+		return '';
+	}
+
+	return $real;
+}
+
+/**
+ * Delete stored upload files for a form entry (idempotent).
+ */
+function bl_forms_delete_entry_uploads(int $post_id): void
+{
+	if ($post_id <= 0 || get_post_type($post_id) !== BL_FORM_ENTRY_POST_TYPE) {
+		return;
+	}
+
+	$values = get_post_meta($post_id, BL_FORM_ENTRY_FIELDS_META, true);
+	if (!is_array($values)) {
+		return;
+	}
+
+	foreach ($values as $value) {
+		if (!is_array($value)) {
+			continue;
+		}
+		// Single file shape or list of files.
+		$items = isset($value[0]) || $value === [] ? $value : [$value];
+		foreach ($items as $item) {
+			if (!is_array($item)) {
+				continue;
+			}
+			$path = bl_forms_resolve_entry_upload_path($item);
+			if ($path === '') {
+				continue;
+			}
+			wp_delete_file($path);
+		}
+	}
+}
+
+/**
+ * Remove upload files when an entry is trashed or permanently deleted.
+ *
+ * @param int $post_id
+ */
+function bl_forms_on_entry_removed($post_id): void
+{
+	bl_forms_delete_entry_uploads((int) $post_id);
+}
+add_action('wp_trash_post', 'bl_forms_on_entry_removed');
+add_action('before_delete_post', 'bl_forms_on_entry_removed');

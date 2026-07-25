@@ -856,9 +856,21 @@ function bl_forms_store_uploaded_file(array $file, bool $images_only = false, ar
 		);
 	}
 
+	$file = (string) ($moved['file'] ?? '');
+	$path = '';
+	$uploads = wp_upload_dir();
+	if ($file !== '' && empty($uploads['error']) && !empty($uploads['basedir'])) {
+		$basedir = wp_normalize_path(trailingslashit((string) $uploads['basedir']));
+		$norm = wp_normalize_path($file);
+		if (str_starts_with($norm, $basedir)) {
+			$path = ltrim(substr($norm, strlen($basedir)), '/');
+		}
+	}
+
 	return [
 		'name' => $display_name,
 		'url'  => (string) ($moved['url'] ?? ''),
 		'mime' => (string) ($moved['type'] ?? $mime),
+		'path' => $path,
 	];
 }

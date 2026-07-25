@@ -27,6 +27,8 @@ msgid ""
 "Create forms with drag-and-drop, file uploads, validation, notifications, "
 "and flexible layouts."
 msgstr ""
+"Formulare mit Drag-and-drop, Datei-Uploads, Validierung, Benachrichtigungen, "
+"und flexiblen Layouts erstellen."
 
 #. Author of the plugin
 #: baselayer-forms.php
@@ -36,7 +38,7 @@ msgstr "BaseLayer"
 #. Author URI of the plugin
 #: baselayer-forms.php
 msgid "https://baselayerwp.com/baselayer-forms"
-msgstr ""
+msgstr "https://baselayerwp.com/baselayer-forms"
 
 #: email-templates/form-confirmation.php:7
 msgid "Thank you"
@@ -1604,7 +1606,7 @@ msgstr "Bitte lade eine Bilddatei hoch."
 
 #: includes/submit.php:823
 msgid "file"
-msgstr ""
+msgstr "Datei"
 
 #: includes/submit.php:855
 msgid "Upload failed."
