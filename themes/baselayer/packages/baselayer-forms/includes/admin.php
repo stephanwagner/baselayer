@@ -498,7 +498,7 @@ function bl_forms_admin_enqueue(string $hook): void
 				'uploadMaxSizeHelp' => __('Leave empty to use the server limit (%s).', 'baselayer-forms'),
 				'uploadMaxSizeHelpEmpty' => __('Leave empty to use the server limit.', 'baselayer-forms'),
 				'saveUploads'       => __('Save uploaded files', 'baselayer-forms'),
-				'saveUploadsHelp'   => __('Uploaded files are stored in a protected folder outside the media library. If this option is disabled, only the filename is saved on the form entry.', 'baselayer-forms'),
+				'saveUploadsHelp'   => __('Uploaded files are stored outside the media library under unguessable filenames.', 'baselayer-forms'),
 				'afterSubmit'       => __('After submission', 'baselayer-forms'),
 				'afterSubmitMessage'=> __('Show success message', 'baselayer-forms'),
 				'afterSubmitRedirect' => __('Go to page', 'baselayer-forms'),

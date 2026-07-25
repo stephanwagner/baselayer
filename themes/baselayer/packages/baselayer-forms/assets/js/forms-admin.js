@@ -6468,7 +6468,7 @@
             className: "description",
             text: t(
               "saveUploadsHelp",
-              "Uploaded files are stored in a protected folder outside the media library. If this option is disabled, only the filename is saved on the form entry."
+              "Uploaded files are stored outside the media library under unguessable filenames."
             )
           })
         ])

@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BaseLayer Forms 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/baselayer-forms\n"
-"POT-Creation-Date: 2026-07-25T00:35:33+00:00\n"
+"POT-Creation-Date: 2026-07-25T02:20:11+00:00\n"
 "PO-Revision-Date: 2026-07-24T09:29:44+00:00\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -972,12 +972,9 @@ msgstr "Hochgeladene Dateien speichern"
 
 #: includes/admin.php:501
 msgid ""
-"Uploaded files are stored in a protected folder outside the media library. "
-"If this option is disabled, only the filename is saved on the form entry."
-msgstr ""
-"Hochgeladene Dateien werden in einem geschützten Ordner außerhalb der "
-"Mediathek gespeichert. Ist diese Option deaktiviert, wird nur der Dateiname "
-"im Formulareintrag gespeichert."
+"Uploaded files are stored outside the media library under unguessable "
+"filenames."
+msgstr "Hochgeladene Dateien werden außerhalb der Mediathek unter unlesbaren Dateinamen gespeichert."
 
 #: includes/admin.php:502
 msgid "After submission"
@@ -1608,9 +1605,18 @@ msgstr "Bitte lade eine Bilddatei hoch."
 msgid "file"
 msgstr "Datei"
 
-#: includes/submit.php:855
+#: includes/submit.php:863
 msgid "Upload failed."
 msgstr "Upload fehlgeschlagen."
+
+#~ msgid ""
+#~ "Uploaded files are stored in a protected folder outside the media "
+#~ "library. If this option is disabled, only the filename is saved on the "
+#~ "form entry."
+#~ msgstr ""
+#~ "Hochgeladene Dateien werden in einem geschützten Ordner außerhalb der "
+#~ "Mediathek gespeichert. Ist diese Option deaktiviert, wird nur der "
+#~ "Dateiname im Formulareintrag gespeichert."
 
 #~ msgid "Hide label"
 #~ msgstr "Bezeichnung ausblenden"

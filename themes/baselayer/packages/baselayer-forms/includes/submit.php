@@ -832,6 +832,14 @@ function bl_forms_store_uploaded_file(array $file, bool $images_only = false, ar
 		require_once ABSPATH . 'wp-admin/includes/file.php';
 	}
 
+	$ext = strtolower(pathinfo($original_name, PATHINFO_EXTENSION));
+	$ext = is_string($ext) ? preg_replace('/[^a-z0-9]/', '', $ext) : '';
+	$stored_name = wp_generate_uuid4();
+	if (is_string($ext) && $ext !== '') {
+		$stored_name .= '.' . $ext;
+	}
+	$file['name'] = $stored_name;
+
 	$overrides = [
 		'test_form' => false,
 		'mimes'     => null,
