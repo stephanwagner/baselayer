@@ -704,11 +704,9 @@ function bl_forms_render_field(array $field, string $uid, array $settings = []):
 	}
 
 	if ($type === 'captcha') {
-		$provider = sanitize_key((string) ($field['captcha_provider'] ?? 'turnstile'));
-		if (!in_array($provider, bl_forms_captcha_providers(), true)) {
-			$provider = 'turnstile';
-		}
-		$site_key = trim((string) ($field['captcha_site_key'] ?? ''));
+		$creds = bl_forms_captcha_credentials();
+		$provider = $creds['provider'];
+		$site_key = $creds['site_key'];
 
 		if ($site_key === '') {
 			return '<div ' . bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--captcha') . '>'
@@ -981,7 +979,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = []):
 		$ext_hint = ($type === 'file' && $extensions !== [])
 			? strtoupper(implode(', ', $extensions))
 			: '';
-		$max_bytes = bl_forms_upload_max_bytes($settings);
+		$max_bytes = bl_forms_upload_max_bytes($settings, $field);
 		$size_label = $max_bytes > 0 ? (string) size_format($max_bytes) : '';
 		if ($ext_hint !== '' && $size_label !== '') {
 			/* translators: 1: allowed file types (e.g. PDF, DOC), 2: maximum size (e.g. 12 MB) */

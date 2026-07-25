@@ -79,7 +79,7 @@ function bl_forms_send_emails(int $form_id, int $entry_id, array $config, array 
 	}
 
 	$recipient = bl_forms_recipient($settings);
-	$admin_subject = trim((string) ($settings['admin_email_subject'] ?? ''));
+	$admin_subject = bl_forms_resolve_setting_string($settings, 'admin_email_subject');
 	if ($admin_subject === '') {
 		$admin_subject = sprintf(
 			/* translators: 1: site name, 2: form title */
@@ -114,16 +114,16 @@ function bl_forms_send_emails(int $form_id, int $entry_id, array $config, array 
 	}
 
 	if (!empty($settings['notify_user']) && $reply_to !== '') {
-		$user_subject = trim((string) ($settings['user_email_subject'] ?? ''));
+		$user_subject = bl_forms_resolve_setting_string($settings, 'user_email_subject');
 		if ($user_subject === '') {
 			$user_subject = sprintf(
 				/* translators: %s: site name */
-				__('We received your message — %s', 'baselayer-forms'),
+				__('We received your message – %s', 'baselayer-forms'),
 				$site_name
 			);
 		}
 
-		$intro = trim((string) ($settings['user_email_intro'] ?? ''));
+		$intro = bl_forms_resolve_setting_string($settings, 'user_email_intro');
 		if ($intro === '') {
 			$intro = __('Thank you for your message. Here is a copy of what you sent:', 'baselayer-forms');
 		} else {

@@ -134,6 +134,10 @@ function bl_forms_maybe_hide_menu(): void
 				'edit.php?post_type=' . BL_FORM_POST_TYPE,
 				'edit.php?post_type=' . BL_FORM_POST_TYPE
 			);
+			remove_submenu_page(
+				'edit.php?post_type=' . BL_FORM_POST_TYPE,
+				'bl-forms-settings'
+			);
 		}
 
 		return;

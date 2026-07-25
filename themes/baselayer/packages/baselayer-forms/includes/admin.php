@@ -44,7 +44,7 @@ function bl_forms_render_builder_after_title(WP_Post $post): void
 	}
 
 	$config = bl_forms_get_config((int) $post->ID);
-	$fallbacks = bl_forms_message_fallbacks();
+	$placeholders = bl_forms_form_message_placeholders();
 	$site_name = wp_specialchars_decode(get_bloginfo('name'), ENT_QUOTES);
 	$form_title = get_the_title($post);
 	if ($form_title === '') {
@@ -54,12 +54,31 @@ function bl_forms_render_builder_after_title(WP_Post $post): void
 			(int) $post->ID
 		);
 	}
-	$default_admin_subject = sprintf(
-		/* translators: 1: site name, 2: form title */
-		__('[%1$s] New submission: %2$s', 'baselayer-forms'),
-		$site_name,
-		$form_title
-	);
+	$global_admin_subject = bl_forms_resolve_setting_string([], 'admin_email_subject');
+	$default_admin_subject = $global_admin_subject !== ''
+		? $global_admin_subject
+		: sprintf(
+			/* translators: 1: site name, 2: form title */
+			__('[%1$s] New submission: %2$s', 'baselayer-forms'),
+			$site_name,
+			$form_title
+		);
+	$recipient_placeholder = bl_forms_resolve_setting_string([], 'recipient');
+	if ($recipient_placeholder === '') {
+		$recipient_placeholder = (string) get_option('admin_email', '');
+	}
+	$user_subject_placeholder = bl_forms_resolve_setting_string([], 'user_email_subject');
+	if ($user_subject_placeholder === '') {
+		$user_subject_placeholder = sprintf(
+			/* translators: %s: site name */
+			__('We received your message – %s', 'baselayer-forms'),
+			$site_name
+		);
+	}
+	$user_intro_placeholder = bl_forms_resolve_setting_string([], 'user_email_intro');
+	if ($user_intro_placeholder === '') {
+		$user_intro_placeholder = __('Thank you for your message. Here is a copy of what you sent:', 'baselayer-forms');
+	}
 	wp_nonce_field('bl_forms_save_config', 'bl_forms_config_nonce');
 	?>
 	<input type="hidden" name="bl_forms_config_json" id="bl-forms-config-json" value="<?= esc_attr(wp_json_encode($config)) ?>">
@@ -67,13 +86,15 @@ function bl_forms_render_builder_after_title(WP_Post $post): void
 		id="bl-forms-builder"
 		class="bl-forms-builder"
 		data-bl-forms-builder
-		data-admin-email="<?= esc_attr((string) get_option('admin_email', '')) ?>"
+		data-admin-email="<?= esc_attr($recipient_placeholder) ?>"
 		data-fallback-admin-subject="<?= esc_attr($default_admin_subject) ?>"
-		data-fallback-submit="<?= esc_attr($fallbacks['submit']) ?>"
-		data-fallback-success="<?= esc_attr($fallbacks['success']) ?>"
-		data-fallback-error="<?= esc_attr($fallbacks['error']) ?>"
-		data-fallback-validation="<?= esc_attr($fallbacks['validation']) ?>"
-		data-fallback-required="<?= esc_attr($fallbacks['required']) ?>"
+		data-fallback-user-subject="<?= esc_attr($user_subject_placeholder) ?>"
+		data-fallback-user-intro="<?= esc_attr($user_intro_placeholder) ?>"
+		data-fallback-submit="<?= esc_attr($placeholders['submit']) ?>"
+		data-fallback-success="<?= esc_attr($placeholders['success']) ?>"
+		data-fallback-error="<?= esc_attr($placeholders['error']) ?>"
+		data-fallback-validation="<?= esc_attr($placeholders['validation']) ?>"
+		data-fallback-required="<?= esc_attr($placeholders['required']) ?>"
 	></div>
 	<?php
 }
@@ -271,8 +292,17 @@ function bl_forms_admin_enqueue(string $hook): void
 			'pagesRestUrl' => esc_url_raw(rest_url('wp/v2/pages')),
 			'restNonce' => wp_create_nonce('wp_rest'),
 			'redirectPage' => $redirect_page,
-			'messageFallbacks' => bl_forms_message_fallbacks(),
+			'messageFallbacks' => bl_forms_form_message_placeholders(),
 			'wpMaxUploadSize' => size_format(wp_max_upload_size()),
+			'uploadMaxSizeMb' => (string) (bl_forms_get_global_settings()['upload_max_size_mb'] ?? ''),
+			'allowSaveUploads' => bl_forms_allow_save_uploads(),
+			'captchaConfigured' => (static function (): bool {
+				$creds = bl_forms_captcha_credentials();
+				return $creds['site_key'] !== '' && $creds['secret_key'] !== '';
+			})(),
+			'settingsUrl' => esc_url(bl_forms_settings_url()),
+			'captchaSettingsUrl' => esc_url(bl_forms_settings_url('captcha')),
+			'uploadsSettingsUrl' => esc_url(bl_forms_settings_url('uploads')),
 			'i18n' => [
 				'tabFields'         => __('Fields', 'baselayer-forms'),
 				'tabNotifications'  => __('Notifications', 'baselayer-forms'),
@@ -321,7 +351,7 @@ function bl_forms_admin_enqueue(string $hook): void
 				'templateApplyConfirm' => __('Apply template', 'baselayer-forms'),
 				'templatePremium'   => __('More templates…', 'baselayer-forms'),
 				'templatePremiumTitle' => __('Premium templates', 'baselayer-forms'),
-				'templatePremiumMessage' => __('A library of premium form templates is in development. Licensed Pro users will be able to browse and import polished templates from the cloud — including advanced layouts and optional styling packs.', 'baselayer-forms'),
+				'templatePremiumMessage' => __('A library of premium form templates is in development. Licensed Pro users will be able to browse and import polished templates from the cloud – including advanced layouts and optional styling packs.', 'baselayer-forms'),
 				'templatePremiumClose' => __('Got it', 'baselayer-forms'),
 				'templateFieldName' => __('Name', 'baselayer-forms'),
 				'templateFieldEmail'=> __('Email', 'baselayer-forms'),
@@ -405,11 +435,14 @@ function bl_forms_admin_enqueue(string $hook): void
 				'dividerMarginCustomPlaceholder' => __('e.g. 24px or 2rem', 'baselayer-forms'),
 				'headingLevel'      => __('Level', 'baselayer-forms'),
 				'honeypotHelp'      => __('Hidden from visitors. If filled, the submission is treated as spam.', 'baselayer-forms'),
-				'captchaHelp'       => __('Choose a CAPTCHA service and enter your keys.', 'baselayer-forms'),
+				'captchaHelp'       => __('Uses the CAPTCHA keys from Forms → Settings.', 'baselayer-forms'),
 				'captchaService'    => __('CAPTCHA service', 'baselayer-forms'),
 				'captchaSiteKey'    => __('Site key', 'baselayer-forms'),
 				'captchaSecretKey'  => __('Secret key', 'baselayer-forms'),
 				'captchaApiKey'     => __('API key', 'baselayer-forms'),
+				'captchaConfigured' => __('CAPTCHA keys are configured in Forms → Settings.', 'baselayer-forms'),
+				'captchaNotConfigured' => __('CAPTCHA keys are not configured yet. Add them under Forms → Settings.', 'baselayer-forms'),
+				'captchaOpenSettings' => __('Open settings', 'baselayer-forms'),
 				'captchaTurnstile'  => __('Cloudflare Turnstile', 'baselayer-forms'),
 				'captchaTurnstileHelp' => __('Mostly invisible. Excellent privacy and very easy to set up.', 'baselayer-forms'),
 				'captchaHcaptcha'   => __('hCaptcha', 'baselayer-forms'),
@@ -450,7 +483,7 @@ function bl_forms_admin_enqueue(string $hook): void
 				'cssClassHelp'      => __('Optional class names added to this field’s wrapper.', 'baselayer-forms'),
 				'submitLabel'       => __('Submit button label', 'baselayer-forms'),
 				'recipient'         => __('Recipient', 'baselayer-forms'),
-				'recipientHelp'     => __('One email per line. Leave empty to use the site administrator email.', 'baselayer-forms'),
+				'recipientHelp'     => __('One email per line. Leave empty to use the global default (or the site administrator email).', 'baselayer-forms'),
 				'successMessage'    => __('Success message', 'baselayer-forms'),
 				'errorMessage'      => __('Error message', 'baselayer-forms'),
 				'validationMessage' => __('Validation message', 'baselayer-forms'),
@@ -487,6 +520,10 @@ function bl_forms_admin_enqueue(string $hook): void
 				'allowedExtensionsHelp' => __('Comma-separated list without dots, e.g. pdf, docx, xlsx. Leave empty to allow all WordPress-permitted types.', 'baselayer-forms'),
 				'maxFiles'          => __('Maximum files', 'baselayer-forms'),
 				'maxFilesHelp'      => __('Maximum number of files visitors can upload.', 'baselayer-forms'),
+				'fieldMaxSize'      => __('Maximum file size', 'baselayer-forms'),
+				/* translators: %s: global max upload size, e.g. "12 MB" */
+				'fieldMaxSizeHelp'  => __('Leave empty to use the global default (%s).', 'baselayer-forms'),
+				'fieldMaxSizeHelpEmpty' => __('Leave empty to use the global default.', 'baselayer-forms'),
 				'showUploadPreview' => __('Show file preview', 'baselayer-forms'),
 				'uploadStyle'       => __('Style', 'baselayer-forms'),
 				'uploadStyleModern' => __('Modern', 'baselayer-forms'),
@@ -494,11 +531,10 @@ function bl_forms_admin_enqueue(string $hook): void
 				'fileSettings'      => __('File settings', 'baselayer-forms'),
 				'uploadMaxSize'     => __('Maximum file size', 'baselayer-forms'),
 				'uploadMaxSizeUnit' => __('MB', 'baselayer-forms'),
-				/* translators: %s: server max upload size, e.g. "64 MB" */
-				'uploadMaxSizeHelp' => __('Leave empty to use the server limit (%s).', 'baselayer-forms'),
-				'uploadMaxSizeHelpEmpty' => __('Leave empty to use the server limit.', 'baselayer-forms'),
 				'saveUploads'       => __('Save uploaded files', 'baselayer-forms'),
 				'saveUploadsHelp'   => __('Uploaded files are stored outside the media library under unguessable filenames.', 'baselayer-forms'),
+				'saveUploadsDisabled' => __('Saving uploaded files is disabled in Forms → Settings.', 'baselayer-forms'),
+				'saveUploadsOpenSettings' => __('Open settings', 'baselayer-forms'),
 				'afterSubmit'       => __('After submission', 'baselayer-forms'),
 				'afterSubmitMessage'=> __('Show success message', 'baselayer-forms'),
 				'afterSubmitRedirect' => __('Go to page', 'baselayer-forms'),

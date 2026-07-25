@@ -93,12 +93,195 @@ function bl_forms_iter_fields(array $fields): \Generator
 }
 
 /**
+ * Default site-wide form settings.
+ *
+ * @return array<string, mixed>
+ */
+function bl_forms_default_global_settings(): array
+{
+	return [
+		'submit_label'           => '',
+		'recipient'              => '',
+		'success_message'        => '',
+		'error_message'          => '',
+		'validation_message'     => '',
+		'required_message'       => '',
+		'min_message'            => '',
+		'max_message'            => '',
+		'date_min_message'       => '',
+		'date_max_message'       => '',
+		'time_min_message'       => '',
+		'time_max_message'       => '',
+		'datetime_min_message'   => '',
+		'datetime_max_message'   => '',
+		'maxlength_message'      => '',
+		'char_count_text'        => '',
+		'char_count_empty_text'  => '',
+		'number_message'         => '',
+		'email_message'          => '',
+		'url_message'            => '',
+		'phone_message'          => '',
+		'date_message'           => '',
+		'time_message'           => '',
+		'datetime_message'       => '',
+		'date_before_message'    => '',
+		'date_after_message'     => '',
+		'file_message'           => '',
+		'file_type_message'      => '',
+		'file_size_message'      => '',
+		'file_max_message'       => '',
+		'option_message'         => '',
+		'admin_email_subject'    => '',
+		'user_email_subject'     => '',
+		'user_email_intro'       => '',
+		'notify_user'            => false,
+		'upload_max_size_mb'     => '12',
+		'allow_save_uploads'     => true,
+		'save_uploads'           => true,
+		'min_fill_time_enabled'  => true,
+		'min_fill_time'          => 2,
+		'rate_limit_enabled'     => true,
+		'rate_limit_max'         => 3,
+		'rate_limit_window'      => 5,
+		'captcha_provider'       => 'turnstile',
+		'captcha_site_key'       => '',
+		'captcha_secret_key'     => '',
+	];
+}
+
+/**
+ * Sanitize site-wide form settings.
+ *
+ * @param mixed $input
+ * @return array<string, mixed>
+ */
+function bl_forms_sanitize_global_settings($input): array
+{
+	$defaults = bl_forms_default_global_settings();
+	if (!is_array($input)) {
+		return $defaults;
+	}
+
+	$settings = $defaults;
+	$bool_keys = [
+		'notify_user',
+		'allow_save_uploads',
+		'save_uploads',
+		'min_fill_time_enabled',
+		'rate_limit_enabled',
+	];
+	$int_keys = [
+		'min_fill_time'     => [1, 300],
+		'rate_limit_max'    => [1, 100],
+		'rate_limit_window' => [1, 1440],
+	];
+	$textarea_keys = [
+		'success_message',
+		'error_message',
+		'validation_message',
+		'user_email_intro',
+		'recipient',
+	];
+
+	foreach ($defaults as $key => $default) {
+		if (!array_key_exists($key, $input)) {
+			continue;
+		}
+		if (in_array($key, $bool_keys, true)) {
+			$settings[$key] = !empty($input[$key]);
+			continue;
+		}
+		if (isset($int_keys[$key])) {
+			[$min, $max] = $int_keys[$key];
+			$settings[$key] = max($min, min($max, (int) $input[$key]));
+			continue;
+		}
+		if ($key === 'upload_max_size_mb') {
+			$raw = trim((string) $input[$key]);
+			if ($raw === '') {
+				$settings[$key] = '';
+			} else {
+				$n = (float) $raw;
+				$settings[$key] = $n > 0 ? rtrim(rtrim(number_format($n, 2, '.', ''), '0'), '.') : '';
+			}
+			continue;
+		}
+		if ($key === 'captcha_provider') {
+			$provider = sanitize_key((string) $input[$key]);
+			$settings[$key] = in_array($provider, bl_forms_captcha_providers(), true)
+				? $provider
+				: 'turnstile';
+			continue;
+		}
+		if ($key === 'captcha_site_key' || $key === 'captcha_secret_key') {
+			$settings[$key] = sanitize_text_field((string) $input[$key]);
+			continue;
+		}
+		if ($key === 'recipient') {
+			$settings[$key] = implode("\n", bl_forms_parse_recipients($input[$key] ?? ''));
+			continue;
+		}
+		$value = (string) $input[$key];
+		$settings[$key] = in_array($key, $textarea_keys, true)
+			? sanitize_textarea_field($value)
+			: sanitize_text_field($value);
+	}
+
+	if (empty($settings['allow_save_uploads'])) {
+		$settings['save_uploads'] = false;
+	}
+
+	return $settings;
+}
+
+/**
+ * Load site-wide form settings.
+ *
+ * @return array<string, mixed>
+ */
+function bl_forms_get_global_settings(): array
+{
+	$raw = get_option(BL_FORMS_GLOBAL_SETTINGS_OPTION, null);
+	if (!is_array($raw)) {
+		return bl_forms_default_global_settings();
+	}
+
+	return bl_forms_sanitize_global_settings($raw);
+}
+
+/**
+ * Persist site-wide form settings.
+ *
+ * @param array<string, mixed> $settings
+ */
+function bl_forms_update_global_settings(array $settings): bool
+{
+	$clean = bl_forms_sanitize_global_settings($settings);
+
+	return update_option(BL_FORMS_GLOBAL_SETTINGS_OPTION, $clean, false);
+}
+
+/**
+ * Whether the site allows forms to keep uploaded files.
+ */
+function bl_forms_allow_save_uploads(): bool
+{
+	$globals = bl_forms_get_global_settings();
+
+	return !empty($globals['allow_save_uploads']);
+}
+
+/**
  * Whether submitted files should be kept on disk (dedicated folder, not media library).
  *
  * @param array<string, mixed> $settings
  */
 function bl_forms_save_uploads_enabled(array $settings): bool
 {
+	if (!bl_forms_allow_save_uploads()) {
+		return false;
+	}
+
 	if (!array_key_exists('save_uploads', $settings)) {
 		return true;
 	}
@@ -107,14 +290,12 @@ function bl_forms_save_uploads_enabled(array $settings): bool
 }
 
 /**
- * Max upload bytes for form file fields (custom MB setting, capped by WordPress).
- *
- * @param array<string, mixed> $settings
+ * Convert an MB setting string into bytes, capped by WordPress max upload.
  */
-function bl_forms_upload_max_bytes(array $settings): int
+function bl_forms_mb_setting_to_bytes(string $raw): int
 {
 	$wp = (int) wp_max_upload_size();
-	$raw = trim((string) ($settings['upload_max_size_mb'] ?? ''));
+	$raw = trim($raw);
 	if ($raw === '') {
 		return max(0, $wp);
 	}
@@ -130,6 +311,84 @@ function bl_forms_upload_max_bytes(array $settings): int
 	}
 
 	return max(0, $custom);
+}
+
+/**
+ * Max upload bytes for a file/image field (field override → global → WP limit).
+ *
+ * @param array<string, mixed> $settings Form settings (unused for size; kept for call-site compat).
+ * @param array<string, mixed> $field
+ */
+function bl_forms_upload_max_bytes(array $settings, array $field = []): int
+{
+	unset($settings);
+	$raw = trim((string) ($field['max_size_mb'] ?? ''));
+	if ($raw === '') {
+		$globals = bl_forms_get_global_settings();
+		$raw = trim((string) ($globals['upload_max_size_mb'] ?? ''));
+	}
+
+	return bl_forms_mb_setting_to_bytes($raw);
+}
+
+/**
+ * Security settings always come from globals (not per-form).
+ *
+ * @return array{
+ *   min_fill_time_enabled: bool,
+ *   min_fill_time: int,
+ *   rate_limit_enabled: bool,
+ *   rate_limit_max: int,
+ *   rate_limit_window: int
+ * }
+ */
+function bl_forms_security_settings(): array
+{
+	$globals = bl_forms_get_global_settings();
+
+	return [
+		'min_fill_time_enabled' => !empty($globals['min_fill_time_enabled']),
+		'min_fill_time'         => max(1, min(300, (int) ($globals['min_fill_time'] ?? 2))),
+		'rate_limit_enabled'    => !empty($globals['rate_limit_enabled']),
+		'rate_limit_max'        => max(1, min(100, (int) ($globals['rate_limit_max'] ?? 3))),
+		'rate_limit_window'     => max(1, min(1440, (int) ($globals['rate_limit_window'] ?? 5))),
+	];
+}
+
+/**
+ * Global captcha credentials.
+ *
+ * @return array{provider: string, site_key: string, secret_key: string}
+ */
+function bl_forms_captcha_credentials(): array
+{
+	$globals = bl_forms_get_global_settings();
+	$provider = sanitize_key((string) ($globals['captcha_provider'] ?? 'turnstile'));
+	if (!in_array($provider, bl_forms_captcha_providers(), true)) {
+		$provider = 'turnstile';
+	}
+
+	return [
+		'provider'   => $provider,
+		'site_key'   => trim((string) ($globals['captcha_site_key'] ?? '')),
+		'secret_key' => trim((string) ($globals['captcha_secret_key'] ?? '')),
+	];
+}
+
+/**
+ * Resolve a string setting: form → global → empty.
+ */
+function bl_forms_resolve_setting_string(array $settings, string $key): string
+{
+	$form = isset($settings[$key]) && is_string($settings[$key]) ? trim($settings[$key]) : '';
+	if ($form !== '') {
+		return $form;
+	}
+
+	$globals = bl_forms_get_global_settings();
+	$global = isset($globals[$key]) && is_string($globals[$key]) ? trim($globals[$key]) : '';
+
+	return $global;
 }
 
 /**
@@ -178,12 +437,18 @@ function bl_forms_js_check_token(int $form_id, int $loaded_at): string
 }
 
 /**
- * Default settings (empty strings mean use runtime fallbacks).
+ * Default settings (empty strings mean use global / runtime fallbacks).
+ *
+ * Security, captcha, and upload max size live in global settings only.
  *
  * @return array<string, mixed>
  */
 function bl_forms_default_settings(): array
 {
+	$globals = function_exists('bl_forms_get_global_settings')
+		? bl_forms_get_global_settings()
+		: bl_forms_default_global_settings();
+
 	return [
 		'submit_label'           => '',
 		'recipient'              => '',
@@ -215,22 +480,16 @@ function bl_forms_default_settings(): array
 		'file_type_message'      => '',
 		'file_size_message'      => '',
 		'file_max_message'       => '',
-		'upload_max_size_mb'     => '12',
-		'save_uploads'           => true,
+		'save_uploads'           => !empty($globals['allow_save_uploads']) && !empty($globals['save_uploads']),
 		'option_message'         => '',
 		'after_submit'           => 'message',
 		'redirect_page_id'       => 0,
-		'notify_user'            => false,
+		'notify_user'            => !empty($globals['notify_user']),
 		'user_email_field'       => '',
 		'admin_email_subject'    => '',
 		'user_email_subject'     => '',
 		'user_email_intro'       => '',
 		'honeypot_name'          => '',
-		'min_fill_time_enabled'  => true,
-		'min_fill_time'          => 2,
-		'rate_limit_enabled'     => true,
-		'rate_limit_max'         => 3,
-		'rate_limit_window'      => 5,
 	];
 }
 
@@ -325,7 +584,7 @@ function bl_forms_message_fallbacks(): array
 }
 
 /**
- * Resolve a settings message with fallback.
+ * Resolve a settings message with form → global → plugin fallback.
  */
 function bl_forms_resolve_message(array $settings, string $key): string
 {
@@ -364,13 +623,69 @@ function bl_forms_resolve_message(array $settings, string $key): string
 	];
 
 	$fallback_key = $map[$key] ?? '';
-	$custom = isset($settings[$key]) && is_string($settings[$key]) ? trim($settings[$key]) : '';
+	$custom = bl_forms_resolve_setting_string($settings, $key);
 
 	if ($custom !== '') {
 		return $custom;
 	}
 
 	return $fallbacks[$fallback_key] ?? '';
+}
+
+/**
+ * Message placeholders for the form builder (global → plugin fallback).
+ *
+ * @return array<string, string>
+ */
+function bl_forms_form_message_placeholders(): array
+{
+	$fallbacks = bl_forms_message_fallbacks();
+	$empty = [];
+	$map = [
+		'success' => 'success_message',
+		'error' => 'error_message',
+		'validation' => 'validation_message',
+		'submit' => 'submit_label',
+		'required' => 'required_message',
+		'min' => 'min_message',
+		'max' => 'max_message',
+		'date_min' => 'date_min_message',
+		'date_max' => 'date_max_message',
+		'time_min' => 'time_min_message',
+		'time_max' => 'time_max_message',
+		'datetime_min' => 'datetime_min_message',
+		'datetime_max' => 'datetime_max_message',
+		'maxlength' => 'maxlength_message',
+		'char_count' => 'char_count_text',
+		'char_count_empty' => 'char_count_empty_text',
+		'number' => 'number_message',
+		'email' => 'email_message',
+		'url' => 'url_message',
+		'phone' => 'phone_message',
+		'date' => 'date_message',
+		'time' => 'time_message',
+		'datetime' => 'datetime_message',
+		'date_before' => 'date_before_message',
+		'date_after' => 'date_after_message',
+		'file' => 'file_message',
+		'file_type' => 'file_type_message',
+		'file_size' => 'file_size_message',
+		'file_max' => 'file_max_message',
+		'option' => 'option_message',
+		'upload_button' => '',
+		'upload_empty' => '',
+	];
+
+	$out = [];
+	foreach ($map as $short => $settings_key) {
+		if ($settings_key === '') {
+			$out[$short] = $fallbacks[$short] ?? '';
+			continue;
+		}
+		$out[$short] = bl_forms_resolve_message($empty, $settings_key);
+	}
+
+	return $out;
 }
 
 /**
@@ -451,7 +766,7 @@ function bl_forms_format_field_display_value(array $field, $value): string
 			$fname = (string) ($item['name'] ?? '');
 			$furl = (string) ($item['url'] ?? '');
 			if ($fname !== '' && $furl !== '') {
-				$parts[] = $fname . ' — ' . $furl;
+				$parts[] = $fname . ' – ' . $furl;
 			} elseif ($fname !== '') {
 				$parts[] = $fname;
 			} elseif ($furl !== '') {
@@ -857,14 +1172,15 @@ function bl_forms_sanitize_field($field): ?array
 	}
 
 	if ($type === 'captcha') {
-		$provider = sanitize_key((string) ($field['captcha_provider'] ?? 'turnstile'));
-		if (!in_array($provider, bl_forms_captcha_providers(), true)) {
-			$provider = 'turnstile';
-		}
-		$out['captcha_provider'] = $provider;
-		$out['captcha_site_key'] = sanitize_text_field((string) ($field['captcha_site_key'] ?? ''));
-		$out['captcha_secret_key'] = sanitize_text_field((string) ($field['captcha_secret_key'] ?? ''));
-		unset($out['name'], $out['label'], $out['name_manual'], $out['hide_label']);
+		unset(
+			$out['name'],
+			$out['label'],
+			$out['name_manual'],
+			$out['hide_label'],
+			$out['captcha_provider'],
+			$out['captcha_site_key'],
+			$out['captcha_secret_key']
+		);
 
 		return $out;
 	}
@@ -1075,6 +1391,16 @@ function bl_forms_sanitize_field($field): ?array
 		} else {
 			unset($out['max_files']);
 		}
+		$raw_max = trim((string) ($field['max_size_mb'] ?? ''));
+		if ($raw_max === '') {
+			unset($out['max_size_mb']);
+		} else {
+			$n = (float) $raw_max;
+			$out['max_size_mb'] = $n > 0 ? rtrim(rtrim(number_format($n, 2, '.', ''), '0'), '.') : '';
+			if ($out['max_size_mb'] === '') {
+				unset($out['max_size_mb']);
+			}
+		}
 		$button = sanitize_text_field((string) ($field['button_text'] ?? ''));
 		if ($button !== '') {
 			$out['button_text'] = $button;
@@ -1082,7 +1408,7 @@ function bl_forms_sanitize_field($field): ?array
 			unset($out['button_text']);
 		}
 	} else {
-		unset($out['extensions'], $out['preview'], $out['max_files'], $out['upload_style'], $out['button_text']);
+		unset($out['extensions'], $out['preview'], $out['max_files'], $out['max_size_mb'], $out['upload_style'], $out['button_text']);
 	}
 
 	if ($type === 'terms') {
@@ -1163,11 +1489,8 @@ function bl_forms_sanitize_config($config): array
 		? $config['settings']
 		: [];
 	$settings = bl_forms_default_settings();
-	$bool_keys = ['notify_user', 'min_fill_time_enabled', 'rate_limit_enabled', 'save_uploads'];
+	$bool_keys = ['notify_user', 'save_uploads'];
 	$int_keys = [
-		'min_fill_time'      => [1, 300],
-		'rate_limit_max'     => [1, 100],
-		'rate_limit_window'  => [1, 1440],
 		'redirect_page_id'   => [0, PHP_INT_MAX],
 	];
 
@@ -1197,22 +1520,16 @@ function bl_forms_sanitize_config($config): array
 			$settings[$key] = implode("\n", bl_forms_parse_recipients($settings_in[$key] ?? ''));
 			continue;
 		}
-		if ($key === 'upload_max_size_mb') {
-			$raw = trim((string) $settings_in[$key]);
-			if ($raw === '') {
-				$settings[$key] = '';
-			} else {
-				$n = (float) $raw;
-				$settings[$key] = $n > 0 ? rtrim(rtrim(number_format($n, 2, '.', ''), '0'), '.') : '';
-			}
-			continue;
-		}
 		$value = (string) $settings_in[$key];
 		if (in_array($key, ['success_message', 'error_message', 'validation_message', 'user_email_intro'], true)) {
 			$settings[$key] = sanitize_textarea_field($value);
 		} else {
 			$settings[$key] = sanitize_text_field($value);
 		}
+	}
+
+	if (!bl_forms_allow_save_uploads()) {
+		$settings['save_uploads'] = false;
 	}
 
 	$used_names = [];
@@ -1344,7 +1661,7 @@ function bl_forms_parse_recipients($raw): array
  */
 function bl_forms_recipient(array $settings): string
 {
-	$list = bl_forms_parse_recipients($settings['recipient'] ?? '');
+	$list = bl_forms_parse_recipients(bl_forms_resolve_setting_string($settings, 'recipient'));
 	if ($list !== []) {
 		return implode(', ', $list);
 	}

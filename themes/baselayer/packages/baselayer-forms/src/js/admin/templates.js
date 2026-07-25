@@ -316,7 +316,7 @@ export function bindTemplates(canvas, panels) {
           t('templatePremiumTitle', 'Premium templates'),
           t(
             'templatePremiumMessage',
-            'A library of premium form templates is in development. Licensed Pro users will be able to browse and import polished templates from the cloud — including advanced layouts and optional styling packs.'
+            'A library of premium form templates is in development. Licensed Pro users will be able to browse and import polished templates from the cloud – including advanced layouts and optional styling packs.'
           )
         );
       },

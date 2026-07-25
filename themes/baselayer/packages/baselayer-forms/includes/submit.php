@@ -160,14 +160,14 @@ function bl_forms_ajax_submit(): void
 		]);
 	}
 
-	if (!bl_forms_fill_time_ok($form_id, $settings)) {
+	if (!bl_forms_fill_time_ok($form_id)) {
 		wp_send_json_error([
 			'message' => __('Please wait a moment before submitting.', 'baselayer-forms'),
 			'code'    => 'too_fast',
 		], 429);
 	}
 
-	if (!bl_forms_rate_limit_ok($form_id, $settings)) {
+	if (!bl_forms_rate_limit_ok($form_id)) {
 		wp_send_json_error([
 			'message' => __('Please wait a moment before submitting again.', 'baselayer-forms'),
 			'code'    => 'rate_limited',
@@ -176,8 +176,8 @@ function bl_forms_ajax_submit(): void
 
 	$captcha_field = bl_forms_find_captcha_field($config['fields']);
 	if ($captcha_field !== null) {
-		$provider = sanitize_key((string) ($captcha_field['captcha_provider'] ?? 'turnstile'));
-		$response_key = bl_forms_captcha_response_key($provider);
+		$creds = bl_forms_captcha_credentials();
+		$response_key = bl_forms_captcha_response_key($creds['provider']);
 		$token = ($response_key !== '' && isset($_POST[$response_key]))
 			? trim((string) wp_unslash($_POST[$response_key]))
 			: '';
@@ -237,7 +237,7 @@ function bl_forms_ajax_submit(): void
 	update_post_meta($entry_id, BL_FORM_ENTRY_MAIL_META, $mail);
 
 	// Count only completed submissions (not failed validation / early rejects).
-	bl_forms_rate_limit_hit($form_id, $settings);
+	bl_forms_rate_limit_hit($form_id);
 
 	wp_send_json_success([
 		'message'  => bl_forms_resolve_message($settings, 'success_message'),
@@ -289,16 +289,15 @@ function bl_forms_js_check_ok(int $form_id): bool
 
 /**
  * Whether the submission waited long enough after the form was rendered.
- *
- * @param array<string, mixed> $settings
  */
-function bl_forms_fill_time_ok(int $form_id, array $settings): bool
+function bl_forms_fill_time_ok(int $form_id): bool
 {
-	if (empty($settings['min_fill_time_enabled'])) {
+	$security = bl_forms_security_settings();
+	if (empty($security['min_fill_time_enabled'])) {
 		return true;
 	}
 
-	$min = max(1, (int) ($settings['min_fill_time'] ?? 2));
+	$min = max(1, (int) ($security['min_fill_time'] ?? 2));
 	$loaded_at = isset($_POST['bl_forms_loaded']) ? (int) wp_unslash($_POST['bl_forms_loaded']) : 0;
 	$sig = isset($_POST['bl_forms_loaded_sig']) ? (string) wp_unslash($_POST['bl_forms_loaded_sig']) : '';
 
@@ -316,20 +315,19 @@ function bl_forms_fill_time_ok(int $form_id, array $settings): bool
 }
 
 /**
- * Soft rate limit per form / IP, using form security settings.
+ * Soft rate limit per form / IP, using global security settings.
  *
  * Check only — the counter is incremented via bl_forms_rate_limit_hit()
  * after a successful submission.
- *
- * @param array<string, mixed> $settings
  */
-function bl_forms_rate_limit_ok(int $form_id, array $settings = []): bool
+function bl_forms_rate_limit_ok(int $form_id): bool
 {
-	if ($settings !== [] && empty($settings['rate_limit_enabled'])) {
+	$security = bl_forms_security_settings();
+	if (empty($security['rate_limit_enabled'])) {
 		return true;
 	}
 
-	$max = max(1, (int) ($settings['rate_limit_max'] ?? 3));
+	$max = max(1, (int) ($security['rate_limit_max'] ?? 3));
 	$count = (int) get_transient(bl_forms_rate_limit_key($form_id));
 
 	return $count < $max;
@@ -337,16 +335,15 @@ function bl_forms_rate_limit_ok(int $form_id, array $settings = []): bool
 
 /**
  * Record a successful submission against the rate limit.
- *
- * @param array<string, mixed> $settings
  */
-function bl_forms_rate_limit_hit(int $form_id, array $settings = []): void
+function bl_forms_rate_limit_hit(int $form_id): void
 {
-	if ($settings !== [] && empty($settings['rate_limit_enabled'])) {
+	$security = bl_forms_security_settings();
+	if (empty($security['rate_limit_enabled'])) {
 		return;
 	}
 
-	$window = max(1, (int) ($settings['rate_limit_window'] ?? 5));
+	$window = max(1, (int) ($security['rate_limit_window'] ?? 5));
 	$key = bl_forms_rate_limit_key($form_id);
 	$count = (int) get_transient($key);
 	set_transient($key, $count + 1, $window * MINUTE_IN_SECONDS);
@@ -695,7 +692,7 @@ function bl_forms_process_field_uploads(string $name, array $files, array $field
 
 	$images_only = ((string) ($field['type'] ?? '')) === 'image';
 	$extensions = bl_forms_field_extensions($field);
-	$max_bytes = bl_forms_upload_max_bytes($settings);
+	$max_bytes = bl_forms_upload_max_bytes($settings, $field);
 	$save_uploads = bl_forms_save_uploads_enabled($settings);
 	$ext_label = $extensions !== []
 		? strtoupper(implode(', ', $extensions))

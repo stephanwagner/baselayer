@@ -153,9 +153,6 @@
       return {
         id,
         type,
-        captcha_provider: "turnstile",
-        captcha_site_key: "",
-        captcha_secret_key: "",
         width: "100",
         width_custom: "",
         css_class: ""
@@ -3193,117 +3190,44 @@
   }
   var OPTION_TYPES = ["radio", "checkboxes", "select", "button_group"];
   var MULTIPLE_TYPES = ["select", "button_group", "file", "image"];
-  var CAPTCHA_PROVIDERS = [
-    {
-      id: "turnstile",
-      labelKey: "captchaTurnstile",
-      labelFallback: "Cloudflare Turnstile",
-      helpKey: "captchaTurnstileHelp",
-      helpFallback: "Mostly invisible. Excellent privacy and very easy to set up.",
-      secretKey: "captchaSecretKey",
-      secretFallback: "Secret key"
-    },
-    {
-      id: "hcaptcha",
-      labelKey: "captchaHcaptcha",
-      labelFallback: "hCaptcha",
-      helpKey: "captchaHcaptchaHelp",
-      helpFallback: "Good privacy and UX. Very easy to set up.",
-      secretKey: "captchaSecretKey",
-      secretFallback: "Secret key"
-    },
-    {
-      id: "friendly",
-      labelKey: "captchaFriendly",
-      labelFallback: "Friendly Captcha",
-      helpKey: "captchaFriendlyHelp",
-      helpFallback: "Excellent privacy and accessibility. Easy to set up.",
-      secretKey: "captchaApiKey",
-      secretFallback: "API key"
-    },
-    {
-      id: "recaptcha_v2",
-      labelKey: "captchaRecaptcha",
-      labelFallback: "Google reCAPTCHA v2",
-      helpKey: "captchaRecaptchaHelp",
-      helpFallback: "Familiar checkbox challenge. Weaker privacy. Very easy to set up.",
-      secretKey: "captchaSecretKey",
-      secretFallback: "Secret key"
-    }
-  ];
-  function captchaProviderMeta(id) {
-    return CAPTCHA_PROVIDERS.find((p) => p.id === id) || CAPTCHA_PROVIDERS[0];
-  }
-  function captchaProviderLabel(id) {
-    const meta = captchaProviderMeta(id);
-    return t(meta.labelKey, meta.labelFallback);
-  }
   function createCaptchaSettings(field, onChange) {
-    if (!field.captcha_provider || !CAPTCHA_PROVIDERS.some((p) => p.id === field.captcha_provider)) {
-      field.captcha_provider = "turnstile";
-    }
-    field.captcha_site_key = field.captcha_site_key || "";
-    field.captcha_secret_key = field.captcha_secret_key || "";
+    unsetCaptchaFieldKeys(field);
+    const configured = !!(window.blFormsAdmin && window.blFormsAdmin.captchaConfigured);
+    const settingsUrl = window.blFormsAdmin && window.blFormsAdmin.captchaSettingsUrl || window.blFormsAdmin && window.blFormsAdmin.settingsUrl || "";
     const root = el("div", { className: "bl-forms-builder__captcha" });
-    const provider = el("select", {
-      className: "widefat",
-      dataset: { blCaptchaProvider: "1" }
-    });
-    CAPTCHA_PROVIDERS.forEach((meta) => {
-      const opt = document.createElement("option");
-      opt.value = meta.id;
-      opt.textContent = t(meta.labelKey, meta.labelFallback);
-      if (meta.id === field.captcha_provider) {
-        opt.selected = true;
-      }
-      provider.appendChild(opt);
-    });
-    const help = el("p", { className: "description" });
-    const siteKey = el("input", {
-      type: "text",
-      className: "widefat code",
-      dataset: { blCaptchaSiteKey: "1" },
-      value: field.captcha_site_key,
-      autocomplete: "off"
-    });
-    const secretKey = el("input", {
-      type: "password",
-      className: "widefat code",
-      dataset: { blCaptchaSecretKey: "1" },
-      value: field.captcha_secret_key,
-      autocomplete: "new-password"
-    });
-    const secretLabel = el("strong", { text: "" });
-    const syncLabels = () => {
-      const meta = captchaProviderMeta(field.captcha_provider);
-      help.textContent = t(meta.helpKey, meta.helpFallback);
-      secretLabel.textContent = t(meta.secretKey, meta.secretFallback);
-    };
-    provider.addEventListener("change", () => {
-      field.captcha_provider = provider.value;
-      syncLabels();
-      onChange();
-      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    });
-    siteKey.addEventListener("input", () => {
-      field.captcha_site_key = siteKey.value;
-      onChange();
-    });
-    secretKey.addEventListener("input", () => {
-      field.captcha_secret_key = secretKey.value;
-      onChange();
-    });
-    syncLabels();
     root.append(
-      el("p", {}, [
-        el("label", {}, [el("strong", { text: t("captchaService", "CAPTCHA service") })]),
-        provider
-      ]),
-      help,
-      el("p", {}, [el("label", {}, [el("strong", { text: t("captchaSiteKey", "Site key") })]), siteKey]),
-      el("p", {}, [el("label", {}, [secretLabel]), secretKey])
+      el("p", {
+        className: "description",
+        text: t("captchaHelp", "Uses the CAPTCHA keys from Forms \u2192 Settings.")
+      }),
+      el(
+        "div",
+        {
+          className: "bl-forms-builder__notice" + (configured ? "" : " bl-forms-builder__notice--warning"),
+          role: "status"
+        },
+        [
+          el("span", {
+            text: configured ? t("captchaConfigured", "CAPTCHA keys are configured in Forms \u2192 Settings.") : t(
+              "captchaNotConfigured",
+              "CAPTCHA keys are not configured yet. Add them under Forms \u2192 Settings."
+            )
+          }),
+          settingsUrl ? el("a", {
+            href: settingsUrl,
+            className: "bl-forms-builder__notice-link",
+            text: t("captchaOpenSettings", "Open settings")
+          }) : null
+        ]
+      )
     );
+    void onChange;
     return root;
+  }
+  function unsetCaptchaFieldKeys(field) {
+    delete field.captcha_provider;
+    delete field.captcha_site_key;
+    delete field.captcha_secret_key;
   }
   var TYPE_CONVERT_GROUPS = [
     ["text", "textarea", "email", "phone", "url", "number"],
@@ -3385,6 +3309,7 @@
       delete field.extensions;
       delete field.preview;
       delete field.max_files;
+      delete field.max_size_mb;
       delete field.upload_style;
       delete field.button_text;
     }
@@ -4360,6 +4285,40 @@
       })
     ]);
   }
+  function createMaxSizeControl(field) {
+    const globalMb = window.blFormsAdmin && window.blFormsAdmin.uploadMaxSizeMb || "";
+    const wpMaxLabel = window.blFormsAdmin && window.blFormsAdmin.wpMaxUploadSize || "";
+    const placeholder = globalMb !== "" ? String(globalMb) : "";
+    const help = globalMb !== "" || wpMaxLabel !== "" ? t("fieldMaxSizeHelp", "Leave empty to use the global default (%s).").replace(
+      "%s",
+      globalMb !== "" ? `${globalMb} ${t("uploadMaxSizeUnit", "MB")}` : wpMaxLabel
+    ) : t("fieldMaxSizeHelpEmpty", "Leave empty to use the global default.");
+    const input = el("input", {
+      type: "number",
+      className: "small-text",
+      min: "0.1",
+      step: "0.1",
+      dataset: { blMaxSizeMb: "1" },
+      value: field.max_size_mb != null && field.max_size_mb !== "" ? String(field.max_size_mb) : "",
+      placeholder
+    });
+    const sync = () => {
+      field.max_size_mb = input.value.trim();
+      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+    };
+    input.addEventListener("input", sync);
+    input.addEventListener("change", sync);
+    return el("div", { className: "bl-forms-builder__max-size" }, [
+      el("p", {}, [
+        el("label", { text: t("fieldMaxSize", "Maximum file size") }),
+        el("span", { className: "bl-forms-builder__security-inline" }, [
+          input,
+          el("span", { text: t("uploadMaxSizeUnit", "MB") })
+        ])
+      ]),
+      el("p", { className: "description", text: help })
+    ]);
+  }
   function createUploadButtonControl(field) {
     const fallbacks = window.blFormsAdmin && window.blFormsAdmin.messageFallbacks || {};
     const placeholder = fallbacks.upload_button || t("uploadButtonDefault", "Choose file");
@@ -4994,9 +4953,6 @@
         id,
         type,
         active,
-        captcha_provider: q("[data-bl-captcha-provider]")?.value || "turnstile",
-        captcha_site_key: q("[data-bl-captcha-site-key]")?.value || "",
-        captcha_secret_key: q("[data-bl-captcha-secret-key]")?.value || "",
         ...appearancePayload(body, width, widthCustom)
       };
     }
@@ -5097,6 +5053,7 @@
       data.upload_style = q("[data-bl-upload-style]")?.value === "classic" ? "classic" : "modern";
       data.preview = data.upload_style === "modern" ? Boolean(q("[data-bl-preview]")?.checked) : false;
       data.button_text = q("[data-bl-upload-button]")?.value?.trim() || "";
+      data.max_size_mb = q("[data-bl-max-size-mb]")?.value?.trim() || "";
       if (data.multiple) {
         const rawMax = q("[data-bl-max-files]")?.value?.trim();
         const parsed = parseInt(rawMax, 10);
@@ -5259,7 +5216,7 @@
     const updatePreview = () => {
       let title = (field.label || field.placeholder || "").trim();
       if (field.type === "captcha") {
-        title = captchaProviderLabel(field.captcha_provider || "turnstile");
+        title = typeLabel("captcha");
       } else if (field.type === "spacer") {
         const height = field.height || "m";
         title = height === "custom" ? (field.height_custom || t("widthCustom", "Custom")).trim() : height.toUpperCase();
@@ -5516,6 +5473,7 @@
         }
         if (field.type === "file" || field.type === "image") {
           advancedSections.add(createExtensionsControl(field));
+          advancedSections.add(createMaxSizeControl(field));
           advancedSections.add(createUploadButtonControl(field));
           if (field.multiple) {
             advancedSections.add(createMaxFilesControl(field));
@@ -6083,26 +6041,7 @@
     }
     return out;
   }
-  function securityBadge(kind) {
-    if (kind !== "required" && kind !== "always") {
-      return null;
-    }
-    const badge = el("span", {
-      className: "bl-forms-builder__security-badge bl-forms-builder__security-badge--always"
-    });
-    const icon = iconEl("lock", "bl-forms-builder__security-badge-icon");
-    if (icon.innerHTML) {
-      badge.appendChild(icon);
-    }
-    badge.appendChild(
-      el("span", {
-        className: "bl-forms-builder__security-badge-text",
-        text: t("securityAlwaysOn", "Always on")
-      })
-    );
-    return badge;
-  }
-  function securitySwitch(label, kind, { checked = false, disabled = false, onChange = null } = {}) {
+  function plainSwitch(label, { checked = false, disabled = false, onChange = null } = {}) {
     const input = el("input", {
       type: "checkbox",
       checked: !!checked,
@@ -6111,54 +6050,20 @@
     if (onChange && !disabled) {
       input.addEventListener("change", () => onChange(input.checked));
     }
-    const labelChildren = [
-      input,
-      el("span", { className: "bl-forms-builder__switch-ui", "aria-hidden": "true" }),
-      el("span", { className: "bl-forms-builder__switch-label", text: label })
-    ];
-    const badge = securityBadge(kind);
-    if (badge) {
-      labelChildren.push(badge);
-    }
     const root = el(
       "div",
       {
-        className: "bl-forms-builder__switch-setting bl-forms-builder__security-heading" + (disabled ? " is-disabled" : "")
+        className: "bl-forms-builder__switch-setting" + (disabled ? " is-disabled" : "")
       },
-      [el("label", { className: "bl-forms-builder__switch" }, labelChildren)]
+      [
+        el("label", { className: "bl-forms-builder__switch" }, [
+          input,
+          el("span", { className: "bl-forms-builder__switch-ui", "aria-hidden": "true" }),
+          el("span", { className: "bl-forms-builder__switch-label", text: label })
+        ])
+      ]
     );
     return { root, input };
-  }
-  function plainSwitch(label, { checked = false, onChange = null } = {}) {
-    const input = el("input", {
-      type: "checkbox",
-      checked: !!checked
-    });
-    if (onChange) {
-      input.addEventListener("change", () => onChange(input.checked));
-    }
-    const root = el("div", { className: "bl-forms-builder__switch-setting" }, [
-      el("label", { className: "bl-forms-builder__switch" }, [
-        input,
-        el("span", { className: "bl-forms-builder__switch-ui", "aria-hidden": "true" }),
-        el("span", { className: "bl-forms-builder__switch-label", text: label })
-      ])
-    ]);
-    return { root, input };
-  }
-  function securityOption(heading, help, extra = null) {
-    const bodyChildren = [el("span", { className: "description", text: help })];
-    if (extra) {
-      bodyChildren.push(extra);
-    }
-    return el("div", { className: "bl-forms-builder__setting bl-forms-builder__security-option" }, [
-      heading,
-      el("div", { className: "bl-forms-builder__security-body" }, bodyChildren)
-    ]);
-  }
-  function lockedOption(label, help) {
-    const { root } = securitySwitch(label, "always", { checked: true, disabled: true });
-    return securityOption(root, help);
   }
   function createPanels(settings, builderRoot, onChange) {
     const state = { ...settings || {} };
@@ -6166,25 +6071,16 @@
     if (!state.honeypot_name || state.honeypot_name === "bl_forms_hp") {
       state.honeypot_name = randomHoneypotName();
     }
-    if (state.min_fill_time_enabled === void 0) {
-      state.min_fill_time_enabled = true;
-    }
-    if (state.min_fill_time === void 0 || state.min_fill_time === "") {
-      state.min_fill_time = 2;
-    }
-    if (state.rate_limit_enabled === void 0) {
-      state.rate_limit_enabled = true;
-    }
-    if (state.rate_limit_max === void 0 || state.rate_limit_max === "") {
-      state.rate_limit_max = 3;
-    }
-    if (state.rate_limit_window === void 0 || state.rate_limit_window === "") {
-      state.rate_limit_window = 5;
-    }
     if (!state.after_submit || !["message", "redirect"].includes(state.after_submit)) {
       state.after_submit = "message";
     }
     state.redirect_page_id = Number(state.redirect_page_id) || 0;
+    delete state.min_fill_time_enabled;
+    delete state.min_fill_time;
+    delete state.rate_limit_enabled;
+    delete state.rate_limit_max;
+    delete state.rate_limit_window;
+    delete state.upload_max_size_mb;
     const emit = () => onChange({ ...state });
     const bindText = (input, key) => {
       input.value = state[key] || "";
@@ -6235,8 +6131,24 @@
       el("label", {}, [el("strong", { text: t("emailField", "Email field") })]),
       sendToControl
     );
-    const userSubject = bindText(el("input", { type: "text", className: "widefat" }), "user_email_subject");
-    const userIntro = bindText(el("textarea", { className: "widefat", rows: "3" }), "user_email_intro");
+    const fbUserSubject = builderRoot.dataset.fallbackUserSubject || "";
+    const fbUserIntro = builderRoot.dataset.fallbackUserIntro || "";
+    const userSubject = bindText(
+      el("input", {
+        type: "text",
+        className: "widefat",
+        placeholder: fbUserSubject
+      }),
+      "user_email_subject"
+    );
+    const userIntro = bindText(
+      el("textarea", {
+        className: "widefat",
+        rows: "3",
+        placeholder: fbUserIntro
+      }),
+      "user_email_intro"
+    );
     const userSubjectRow = fieldRow(t("subject", "Subject"), userSubject);
     const userIntroRow = fieldRow(
       t("introText", "Intro text"),
@@ -6414,63 +6326,55 @@
       className: "bl-forms-builder__after-submit-message",
       hidden: state.after_submit === "redirect"
     }, [successRow]);
-    const wpMaxUploadLabel = window.blFormsAdmin && window.blFormsAdmin.wpMaxUploadSize || "";
-    const uploadMaxSize = el("input", {
-      type: "number",
-      className: "small-text bl-forms-builder__security-input",
-      min: "0.1",
-      step: "0.1",
-      value: state.upload_max_size_mb != null && state.upload_max_size_mb !== "" ? String(state.upload_max_size_mb) : ""
-    });
-    uploadMaxSize.addEventListener("input", () => {
-      state.upload_max_size_mb = uploadMaxSize.value.trim();
-      emit();
-    });
-    uploadMaxSize.addEventListener("change", () => {
-      state.upload_max_size_mb = uploadMaxSize.value.trim();
-      emit();
-    });
-    const uploadMaxSizeRow = el("div", { className: "bl-forms-builder__security-inline" }, [
-      uploadMaxSize,
-      el("span", { text: t("uploadMaxSizeUnit", "MB") })
-    ]);
+    const allowSaveUploads = !!(window.blFormsAdmin && window.blFormsAdmin.allowSaveUploads);
+    const settingsUrl = window.blFormsAdmin && window.blFormsAdmin.uploadsSettingsUrl || window.blFormsAdmin && window.blFormsAdmin.settingsUrl || "";
     if (state.save_uploads === void 0) {
       state.save_uploads = true;
     }
+    if (!allowSaveUploads) {
+      state.save_uploads = false;
+    }
     const saveUploadsSwitch = plainSwitch(t("saveUploads", "Save uploaded files"), {
-      checked: !!state.save_uploads,
+      checked: !!state.save_uploads && allowSaveUploads,
+      disabled: !allowSaveUploads,
       onChange: (checked) => {
+        if (!allowSaveUploads) {
+          return;
+        }
         state.save_uploads = checked;
         emit();
       }
     });
-    const fileSettingsBlock = el("div", { className: "bl-forms-builder__field-errors" }, [
+    const saveUploadsNote = allowSaveUploads ? el("span", {
+      className: "description",
+      text: t(
+        "saveUploadsHelp",
+        "Uploaded files are stored outside the media library under unguessable filenames."
+      )
+    }) : el("div", { className: "bl-forms-builder__notice bl-forms-builder__notice--warning", role: "status" }, [
+      el("span", {
+        text: t(
+          "saveUploadsDisabled",
+          "Saving uploaded files is disabled in Forms \u2192 Settings."
+        )
+      }),
+      settingsUrl ? el("a", {
+        href: settingsUrl,
+        text: t("saveUploadsOpenSettings", "Open settings"),
+        className: "bl-forms-builder__notice-link"
+      }) : null
+    ].filter(Boolean));
+    const fileSettingsBlock = el("div", {
+      className: "bl-forms-builder__field-errors" + (allowSaveUploads ? "" : " bl-forms-builder__field-errors--disabled")
+    }, [
       el("h3", {
         className: "bl-forms-builder__section-title",
         text: t("fileSettings", "File settings")
       }),
       el("div", { className: "bl-forms-builder__field-errors-box" }, [
-        fieldRow(
-          t("uploadMaxSize", "Maximum file size"),
-          uploadMaxSizeRow,
-          wpMaxUploadLabel ? t(
-            "uploadMaxSizeHelp",
-            "Leave empty to use the server limit (%s)."
-          ).replace("%s", wpMaxUploadLabel) : t(
-            "uploadMaxSizeHelpEmpty",
-            "Leave empty to use the server limit."
-          )
-        ),
-        el("hr", { className: "bl-forms-builder__separator" }),
         el("div", { className: "bl-forms-builder__setting" }, [
           saveUploadsSwitch.root,
-          el("span", {
-            className: "description",
-            text: t(
-              "saveUploadsHelp",
-              "Uploaded files are stored outside the media library under unguessable filenames."
-            )
-          })
+          saveUploadsNote
         ])
       ])
     ]);
@@ -6671,144 +6575,23 @@
       ]),
       errorSection(t("optionError", "Choice"), [optionMsg])
     );
-    const securityPanel = el("div", {
-      className: "bl-forms-builder__panel",
-      dataset: { blFormsPanel: "security" },
-      hidden: true
-    });
-    const minFillSeconds = el("input", {
-      type: "number",
-      className: "small-text bl-forms-builder__security-input",
-      min: "1",
-      max: "300",
-      step: "1",
-      value: String(state.min_fill_time || 2)
-    });
-    const minFillOptions = el("div", {
-      className: "bl-forms-builder__security-controls",
-      hidden: !state.min_fill_time_enabled
-    }, [
-      el("div", { className: "bl-forms-builder__security-inline" }, [
-        el("span", { text: t("securityMinFillTimeAtLeast", "At least") }),
-        minFillSeconds,
-        el("span", { text: t("securityMinFillTimeSeconds", "seconds") })
-      ])
-    ]);
-    const rateMax = el("input", {
-      type: "number",
-      className: "small-text bl-forms-builder__security-input",
-      min: "1",
-      max: "100",
-      step: "1",
-      value: String(state.rate_limit_max || 3)
-    });
-    const rateWindow = el("input", {
-      type: "number",
-      className: "small-text bl-forms-builder__security-input",
-      min: "1",
-      max: "1440",
-      step: "1",
-      value: String(state.rate_limit_window || 5)
-    });
-    const rateOptions = el("div", {
-      className: "bl-forms-builder__security-controls",
-      hidden: !state.rate_limit_enabled
-    }, [
-      el("div", { className: "bl-forms-builder__security-inline" }, [
-        el("span", { text: t("securityRateLimitMax", "Max") }),
-        rateMax,
-        el("span", { text: t("securityRateLimitIn", "submissions in") }),
-        rateWindow,
-        el("span", { text: t("securityRateLimitMinutes", "minutes") })
-      ])
-    ]);
-    const minFillSwitch = securitySwitch(
-      t("securityMinFillTime", "Minimum fill time"),
-      "recommended",
-      {
-        checked: !!state.min_fill_time_enabled,
-        onChange: (checked) => {
-          state.min_fill_time_enabled = checked;
-          minFillOptions.hidden = !checked;
-          emit();
-        }
-      }
-    );
-    const rateSwitch = securitySwitch(
-      t("securityRateLimit", "Submission limit"),
-      "recommended",
-      {
-        checked: !!state.rate_limit_enabled,
-        onChange: (checked) => {
-          state.rate_limit_enabled = checked;
-          rateOptions.hidden = !checked;
-          emit();
-        }
-      }
-    );
-    minFillSeconds.addEventListener("input", () => {
-      const n = parseInt(minFillSeconds.value, 10);
-      state.min_fill_time = Number.isFinite(n) && n > 0 ? n : 2;
-      emit();
-    });
-    rateMax.addEventListener("input", () => {
-      const n = parseInt(rateMax.value, 10);
-      state.rate_limit_max = Number.isFinite(n) && n > 0 ? n : 3;
-      emit();
-    });
-    rateWindow.addEventListener("input", () => {
-      const n = parseInt(rateWindow.value, 10);
-      state.rate_limit_window = Number.isFinite(n) && n > 0 ? n : 5;
-      emit();
-    });
-    securityPanel.append(
-      lockedOption(
-        t("securityCsrf", "CSRF protection"),
-        t(
-          "securityCsrfHelp",
-          "A WordPress nonce is verified on every submission to block forged requests."
-        )
-      ),
-      lockedOption(
-        t("securityJsCheck", "JavaScript check"),
-        t(
-          "securityJsCheckHelp",
-          "A hidden field is set by JavaScript. If the expected value is missing, the submission is discarded."
-        )
-      ),
-      lockedOption(
-        t("securityHoneypot", "Honeypot field"),
-        t(
-          "securityHoneypotHelp",
-          "A field hidden from visitors detects simple bots. If it is filled, the submission is discarded."
-        )
-      ),
-      securityOption(
-        minFillSwitch.root,
-        t(
-          "securityMinFillTimeHelp",
-          "Submissions are rejected when the form is sent unusually quickly."
-        ),
-        minFillOptions
-      ),
-      securityOption(
-        rateSwitch.root,
-        t(
-          "securityRateLimitHelp",
-          "Limits how often the same visitor can submit the form within a time period."
-        ),
-        rateOptions
-      )
-    );
     return {
       notifications,
       settings: settingsPanel,
       validation: validationPanel,
-      security: securityPanel,
       getSettings: () => {
         const next = { ...state };
         delete next.redirect_page_title;
         delete next.redirect_page_url;
+        delete next.min_fill_time_enabled;
+        delete next.min_fill_time;
+        delete next.rate_limit_enabled;
+        delete next.rate_limit_max;
+        delete next.rate_limit_window;
+        delete next.upload_max_size_mb;
+        if (!(window.blFormsAdmin && window.blFormsAdmin.allowSaveUploads)) {
+          next.save_uploads = false;
+        }
         return next;
       },
       applySettings(partial = {}) {
@@ -7257,7 +7040,7 @@
             t("templatePremiumTitle", "Premium templates"),
             t(
               "templatePremiumMessage",
-              "A library of premium form templates is in development. Licensed Pro users will be able to browse and import polished templates from the cloud \u2014 including advanced layouts and optional styling packs."
+              "A library of premium form templates is in development. Licensed Pro users will be able to browse and import polished templates from the cloud \u2013 including advanced layouts and optional styling packs."
             )
           );
         }
@@ -7306,8 +7089,7 @@
       { id: "fields", label: t("tabFields", "Fields"), panel: fieldsPanel },
       { id: "notifications", label: t("tabNotifications", "Notifications"), panel: panels.notifications },
       { id: "settings", label: t("tabSettings", "Settings"), panel: panels.settings },
-      { id: "validation", label: t("tabValidation", "Validation"), panel: panels.validation },
-      { id: "security", label: t("tabSecurity", "Security"), panel: panels.security }
+      { id: "validation", label: t("tabValidation", "Validation"), panel: panels.validation }
     ];
     const activate = (id) => {
       tabs.forEach((tab) => {
@@ -7334,8 +7116,7 @@
       fieldsPanel,
       panels.notifications,
       panels.settings,
-      panels.validation,
-      panels.security
+      panels.validation
     ]);
     root.append(tabBar, panelsWrap);
     const form = root.closest("form");

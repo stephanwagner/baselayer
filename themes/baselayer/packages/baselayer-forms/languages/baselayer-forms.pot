@@ -271,7 +271,7 @@ msgid "Premium templates"
 msgstr ""
 
 #: includes/admin.php:324
-msgid "A library of premium form templates is in development. Licensed Pro users will be able to browse and import polished templates from the cloud — including advanced layouts and optional styling packs."
+msgid "A library of premium form templates is in development. Licensed Pro users will be able to browse and import polished templates from the cloud – including advanced layouts and optional styling packs."
 msgstr ""
 
 #: includes/admin.php:325
@@ -1484,7 +1484,7 @@ msgstr ""
 #. translators: %s: site name
 #: includes/mail.php:121
 #, php-format
-msgid "We received your message — %s"
+msgid "We received your message – %s"
 msgstr ""
 
 #: includes/mail.php:128

@@ -135,13 +135,15 @@ function bl_forms_captcha_friendly_script_tags(string $tag, string $handle): str
 /**
  * Verify a captcha response with the provider.
  *
- * @param array<string, mixed> $field
+ * @param array<string, mixed> $field Unused; credentials come from global settings.
  */
 function bl_forms_verify_captcha(array $field, string $response, string $remote_ip = ''): bool
 {
-	$provider = sanitize_key((string) ($field['captcha_provider'] ?? 'turnstile'));
-	$site_key = trim((string) ($field['captcha_site_key'] ?? ''));
-	$secret = trim((string) ($field['captcha_secret_key'] ?? ''));
+	unset($field);
+	$creds = bl_forms_captcha_credentials();
+	$provider = $creds['provider'];
+	$site_key = $creds['site_key'];
+	$secret = $creds['secret_key'];
 
 	if ($site_key === '' || $secret === '' || $response === '') {
 		return false;

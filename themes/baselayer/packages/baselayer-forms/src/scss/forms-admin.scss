@@ -1299,12 +1299,73 @@ input.bl-forms-builder__section-label-input {
   border-radius: var(--bl-forms-admin-radius, 4px);
   font-size: 13px;
   line-height: 1.45;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+}
+
+.bl-forms-builder__notice-link {
+  font-weight: 600;
+  text-decoration: underline;
+  white-space: nowrap;
 }
 
 .bl-forms-builder__notice--warning {
   border: 1px dashed #{$color-warning};
   background: #{$color-warning-bg};
   color: #{$color-warning};
+}
+
+.bl-forms-builder__field-errors--disabled {
+  opacity: 0.72;
+
+  .bl-forms-builder__field-errors-box {
+    pointer-events: none;
+  }
+
+  .bl-forms-builder__notice {
+    pointer-events: auto;
+  }
+}
+
+.bl-forms-settings {
+  max-width: 960px;
+
+  .form-table th {
+    width: 220px;
+  }
+
+  .nav-tab-wrapper {
+    margin: 16px 0 12px;
+  }
+
+  .bl-forms-settings__form {
+    margin-top: 8px;
+  }
+
+  .bl-forms-settings__security {
+    max-width: 640px;
+    margin: 12px 0 8px;
+  }
+
+  .bl-forms-settings__messages {
+    max-width: 560px;
+    margin: 12px 0 8px;
+
+    .bl-forms-builder__field-errors {
+      max-width: none;
+    }
+
+    .bl-forms-builder__setting label {
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .bl-forms-builder__setting .widefat {
+      max-width: 100%;
+    }
+  }
 }
 
 .bl-forms-builder__check-setting {
@@ -1349,7 +1410,8 @@ input.bl-forms-builder__section-label-input {
 }
 
 // Must beat `.bl-forms-builder__field-body label { display: block }`.
-.bl-forms-builder label.bl-forms-builder__switch {
+.bl-forms-builder label.bl-forms-builder__switch,
+.bl-forms-settings label.bl-forms-builder__switch {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -1402,7 +1464,8 @@ input.bl-forms-builder__section-label-input {
   }
 }
 
-.bl-forms-builder label.bl-forms-builder__switch input:checked + .bl-forms-builder__switch-ui {
+.bl-forms-builder label.bl-forms-builder__switch input:checked + .bl-forms-builder__switch-ui,
+.bl-forms-settings label.bl-forms-builder__switch input:checked + .bl-forms-builder__switch-ui {
   background: var(--bl-forms-admin-accent, #2271b1);
   border-color: var(--bl-forms-admin-accent, #2271b1);
 
@@ -1412,7 +1475,8 @@ input.bl-forms-builder__section-label-input {
   }
 }
 
-.bl-forms-builder label.bl-forms-builder__switch input:focus-visible + .bl-forms-builder__switch-ui {
+.bl-forms-builder label.bl-forms-builder__switch input:focus-visible + .bl-forms-builder__switch-ui,
+.bl-forms-settings label.bl-forms-builder__switch input:focus-visible + .bl-forms-builder__switch-ui {
   outline: 2px solid var(--bl-forms-admin-accent, #2271b1);
   outline-offset: 1px;
 }

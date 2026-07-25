@@ -30,6 +30,7 @@ const BL_FORM_ENTRY_FORM_META = '_bl_form_id';
 const BL_FORM_ENTRY_FIELDS_META = '_bl_entry_fields';
 const BL_FORM_ENTRY_META_META = '_bl_entry_meta';
 const BL_FORM_ENTRY_MAIL_META = '_bl_entry_mail';
+const BL_FORMS_GLOBAL_SETTINGS_OPTION = 'bl_forms_global_settings';
 
 /**
  * Absolute path under the package root.
@@ -105,6 +106,7 @@ require_once BL_FORMS_PATH . 'includes/block.php';
 
 if (is_admin()) {
 	require_once BL_FORMS_PATH . 'includes/admin.php';
+	require_once BL_FORMS_PATH . 'includes/settings-page.php';
 	require_once BL_FORMS_PATH . 'includes/entries.php';
 }
 

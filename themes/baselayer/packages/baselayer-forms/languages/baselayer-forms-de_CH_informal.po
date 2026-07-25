@@ -270,12 +270,12 @@ msgstr "Premium-Vorlagen"
 #: includes/admin.php:324
 msgid ""
 "A library of premium form templates is in development. Licensed Pro users "
-"will be able to browse and import polished templates from the cloud — "
+"will be able to browse and import polished templates from the cloud – "
 "including advanced layouts and optional styling packs."
 msgstr ""
 "Eine Bibliothek mit Premium-Formularvorlagen ist in Entwicklung. Lizenzierte "
 "Pro-Nutzer können später polierte Vorlagen aus der Cloud durchsuchen und "
-"importieren — inklusive komplexer Layouts und optionaler Style-Pakete."
+"importieren – inklusive komplexer Layouts und optionaler Style-Pakete."
 
 #: includes/admin.php:325
 msgid "Got it"
@@ -1503,8 +1503,8 @@ msgstr "Kein gültiger Empfänger konfiguriert."
 #. translators: %s: site name
 #: includes/mail.php:121
 #, php-format
-msgid "We received your message — %s"
-msgstr "Wir haben deine Nachricht erhalten — %s"
+msgid "We received your message – %s"
+msgstr "Wir haben deine Nachricht erhalten – %s"
 
 #: includes/mail.php:128
 msgid "Thank you for your message. Here is a copy of what you sent:"

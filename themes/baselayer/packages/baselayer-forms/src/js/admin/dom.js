@@ -231,9 +231,6 @@ export function defaultField(type = 'text') {
     return {
       id,
       type,
-      captcha_provider: 'turnstile',
-      captcha_site_key: '',
-      captcha_secret_key: '',
       width: '100',
       width_custom: '',
       css_class: '',

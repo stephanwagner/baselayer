@@ -129,83 +129,60 @@ function captchaProviderLabel(id) {
 }
 
 /**
- * Service picker + keys for a captcha field.
+ * Notice that CAPTCHA keys live in global Forms → Settings.
  *
  * @param {object} field
  * @param {() => void} onChange
  */
 function createCaptchaSettings(field, onChange) {
-  if (!field.captcha_provider || !CAPTCHA_PROVIDERS.some((p) => p.id === field.captcha_provider)) {
-    field.captcha_provider = 'turnstile';
-  }
-  field.captcha_site_key = field.captcha_site_key || '';
-  field.captcha_secret_key = field.captcha_secret_key || '';
+  unsetCaptchaFieldKeys(field);
 
+  const configured = !!(window.blFormsAdmin && window.blFormsAdmin.captchaConfigured);
+  const settingsUrl = (window.blFormsAdmin && window.blFormsAdmin.captchaSettingsUrl)
+    || (window.blFormsAdmin && window.blFormsAdmin.settingsUrl)
+    || '';
   const root = el('div', { className: 'bl-forms-builder__captcha' });
-
-  const provider = el('select', {
-    className: 'widefat',
-    dataset: { blCaptchaProvider: '1' },
-  });
-  CAPTCHA_PROVIDERS.forEach((meta) => {
-    const opt = document.createElement('option');
-    opt.value = meta.id;
-    opt.textContent = t(meta.labelKey, meta.labelFallback);
-    if (meta.id === field.captcha_provider) {
-      opt.selected = true;
-    }
-    provider.appendChild(opt);
-  });
-
-  const help = el('p', { className: 'description' });
-  const siteKey = el('input', {
-    type: 'text',
-    className: 'widefat code',
-    dataset: { blCaptchaSiteKey: '1' },
-    value: field.captcha_site_key,
-    autocomplete: 'off',
-  });
-  const secretKey = el('input', {
-    type: 'password',
-    className: 'widefat code',
-    dataset: { blCaptchaSecretKey: '1' },
-    value: field.captcha_secret_key,
-    autocomplete: 'new-password',
-  });
-  const secretLabel = el('strong', { text: '' });
-
-  const syncLabels = () => {
-    const meta = captchaProviderMeta(field.captcha_provider);
-    help.textContent = t(meta.helpKey, meta.helpFallback);
-    secretLabel.textContent = t(meta.secretKey, meta.secretFallback);
-  };
-
-  provider.addEventListener('change', () => {
-    field.captcha_provider = provider.value;
-    syncLabels();
-    onChange();
-    document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
-  });
-  siteKey.addEventListener('input', () => {
-    field.captcha_site_key = siteKey.value;
-    onChange();
-  });
-  secretKey.addEventListener('input', () => {
-    field.captcha_secret_key = secretKey.value;
-    onChange();
-  });
-
-  syncLabels();
   root.append(
-    el('p', {}, [
-      el('label', {}, [el('strong', { text: t('captchaService', 'CAPTCHA service') })]),
-      provider,
-    ]),
-    help,
-    el('p', {}, [el('label', {}, [el('strong', { text: t('captchaSiteKey', 'Site key') })]), siteKey]),
-    el('p', {}, [el('label', {}, [secretLabel]), secretKey])
+    el('p', {
+      className: 'description',
+      text: t('captchaHelp', 'Uses the CAPTCHA keys from Forms → Settings.'),
+    }),
+    el(
+      'div',
+      {
+        className:
+          'bl-forms-builder__notice' +
+          (configured ? '' : ' bl-forms-builder__notice--warning'),
+        role: 'status',
+      },
+      [
+        el('span', {
+          text: configured
+            ? t('captchaConfigured', 'CAPTCHA keys are configured in Forms → Settings.')
+            : t(
+                'captchaNotConfigured',
+                'CAPTCHA keys are not configured yet. Add them under Forms → Settings.'
+              ),
+        }),
+        settingsUrl
+          ? el('a', {
+              href: settingsUrl,
+              className: 'bl-forms-builder__notice-link',
+              text: t('captchaOpenSettings', 'Open settings'),
+            })
+          : null,
+      ]
+    )
   );
+  // Keep callback signature for call sites; keys are stripped above.
+  void onChange;
   return root;
+}
+
+function unsetCaptchaFieldKeys(field) {
+  delete field.captcha_provider;
+  delete field.captcha_site_key;
+  delete field.captcha_secret_key;
 }
 
 /** Types that can convert into each other without wiping shared settings. */
@@ -304,6 +281,7 @@ function convertFieldType(field, nextType) {
     delete field.extensions;
     delete field.preview;
     delete field.max_files;
+    delete field.max_size_mb;
     delete field.upload_style;
     delete field.button_text;
   }
@@ -1414,6 +1392,47 @@ function createMaxFilesControl(field) {
   ]);
 }
 
+function createMaxSizeControl(field) {
+  const globalMb = (window.blFormsAdmin && window.blFormsAdmin.uploadMaxSizeMb) || '';
+  const wpMaxLabel = (window.blFormsAdmin && window.blFormsAdmin.wpMaxUploadSize) || '';
+  const placeholder = globalMb !== '' ? String(globalMb) : '';
+  const help =
+    globalMb !== '' || wpMaxLabel !== ''
+      ? t('fieldMaxSizeHelp', 'Leave empty to use the global default (%s).').replace(
+          '%s',
+          globalMb !== '' ? `${globalMb} ${t('uploadMaxSizeUnit', 'MB')}` : wpMaxLabel
+        )
+      : t('fieldMaxSizeHelpEmpty', 'Leave empty to use the global default.');
+
+  const input = el('input', {
+    type: 'number',
+    className: 'small-text',
+    min: '0.1',
+    step: '0.1',
+    dataset: { blMaxSizeMb: '1' },
+    value: field.max_size_mb != null && field.max_size_mb !== '' ? String(field.max_size_mb) : '',
+    placeholder,
+  });
+
+  const sync = () => {
+    field.max_size_mb = input.value.trim();
+    document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+  };
+  input.addEventListener('input', sync);
+  input.addEventListener('change', sync);
+
+  return el('div', { className: 'bl-forms-builder__max-size' }, [
+    el('p', {}, [
+      el('label', { text: t('fieldMaxSize', 'Maximum file size') }),
+      el('span', { className: 'bl-forms-builder__security-inline' }, [
+        input,
+        el('span', { text: t('uploadMaxSizeUnit', 'MB') }),
+      ]),
+    ]),
+    el('p', { className: 'description', text: help }),
+  ]);
+}
+
 function createUploadButtonControl(field) {
   const fallbacks = (window.blFormsAdmin && window.blFormsAdmin.messageFallbacks) || {};
   const placeholder = fallbacks.upload_button || t('uploadButtonDefault', 'Choose file');
@@ -2164,9 +2183,6 @@ export function serializeRow(row) {
       id,
       type,
       active,
-      captcha_provider: q('[data-bl-captcha-provider]')?.value || 'turnstile',
-      captcha_site_key: q('[data-bl-captcha-site-key]')?.value || '',
-      captcha_secret_key: q('[data-bl-captcha-secret-key]')?.value || '',
       ...appearancePayload(body, width, widthCustom),
     };
   }
@@ -2275,6 +2291,7 @@ export function serializeRow(row) {
     data.preview =
       data.upload_style === 'modern' ? Boolean(q('[data-bl-preview]')?.checked) : false;
     data.button_text = q('[data-bl-upload-button]')?.value?.trim() || '';
+    data.max_size_mb = q('[data-bl-max-size-mb]')?.value?.trim() || '';
     if (data.multiple) {
       const rawMax = q('[data-bl-max-files]')?.value?.trim();
       const parsed = parseInt(rawMax, 10);
@@ -2462,7 +2479,7 @@ export function createFieldCard(initial, open = false) {
   const updatePreview = () => {
     let title = (field.label || field.placeholder || '').trim();
     if (field.type === 'captcha') {
-      title = captchaProviderLabel(field.captcha_provider || 'turnstile');
+      title = typeLabel('captcha');
     } else if (field.type === 'spacer') {
       const height = field.height || 'm';
       title =
@@ -2750,6 +2767,7 @@ export function createFieldCard(initial, open = false) {
 
       if (field.type === 'file' || field.type === 'image') {
         advancedSections.add(createExtensionsControl(field));
+        advancedSections.add(createMaxSizeControl(field));
         advancedSections.add(createUploadButtonControl(field));
         if (field.multiple) {
           advancedSections.add(createMaxFilesControl(field));

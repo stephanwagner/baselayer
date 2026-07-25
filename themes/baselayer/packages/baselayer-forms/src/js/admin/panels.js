@@ -109,21 +109,29 @@ function securitySwitch(label, kind, { checked = false, disabled = false, onChan
  *
  * @returns {{ root: HTMLElement, input: HTMLInputElement }}
  */
-function plainSwitch(label, { checked = false, onChange = null } = {}) {
+function plainSwitch(label, { checked = false, disabled = false, onChange = null } = {}) {
   const input = el('input', {
     type: 'checkbox',
     checked: !!checked,
+    disabled: !!disabled,
   });
-  if (onChange) {
+  if (onChange && !disabled) {
     input.addEventListener('change', () => onChange(input.checked));
   }
-  const root = el('div', { className: 'bl-forms-builder__switch-setting' }, [
-    el('label', { className: 'bl-forms-builder__switch' }, [
-      input,
-      el('span', { className: 'bl-forms-builder__switch-ui', 'aria-hidden': 'true' }),
-      el('span', { className: 'bl-forms-builder__switch-label', text: label }),
-    ]),
-  ]);
+  const root = el(
+    'div',
+    {
+      className:
+        'bl-forms-builder__switch-setting' + (disabled ? ' is-disabled' : ''),
+    },
+    [
+      el('label', { className: 'bl-forms-builder__switch' }, [
+        input,
+        el('span', { className: 'bl-forms-builder__switch-ui', 'aria-hidden': 'true' }),
+        el('span', { className: 'bl-forms-builder__switch-label', text: label }),
+      ]),
+    ]
+  );
   return { root, input };
 }
 
@@ -157,25 +165,18 @@ export function createPanels(settings, builderRoot, onChange) {
   if (!state.honeypot_name || state.honeypot_name === 'bl_forms_hp') {
     state.honeypot_name = randomHoneypotName();
   }
-  if (state.min_fill_time_enabled === undefined) {
-    state.min_fill_time_enabled = true;
-  }
-  if (state.min_fill_time === undefined || state.min_fill_time === '') {
-    state.min_fill_time = 2;
-  }
-  if (state.rate_limit_enabled === undefined) {
-    state.rate_limit_enabled = true;
-  }
-  if (state.rate_limit_max === undefined || state.rate_limit_max === '') {
-    state.rate_limit_max = 3;
-  }
-  if (state.rate_limit_window === undefined || state.rate_limit_window === '') {
-    state.rate_limit_window = 5;
-  }
   if (!state.after_submit || !['message', 'redirect'].includes(state.after_submit)) {
     state.after_submit = 'message';
   }
   state.redirect_page_id = Number(state.redirect_page_id) || 0;
+
+  // Drop legacy per-form keys (now global-only).
+  delete state.min_fill_time_enabled;
+  delete state.min_fill_time;
+  delete state.rate_limit_enabled;
+  delete state.rate_limit_max;
+  delete state.rate_limit_window;
+  delete state.upload_max_size_mb;
 
   const emit = () => onChange({ ...state });
 
@@ -236,8 +237,25 @@ export function createPanels(settings, builderRoot, onChange) {
     sendToControl
   );
 
-  const userSubject = bindText(el('input', { type: 'text', className: 'widefat' }), 'user_email_subject');
-  const userIntro = bindText(el('textarea', { className: 'widefat', rows: '3' }), 'user_email_intro');
+  const fbUserSubject = builderRoot.dataset.fallbackUserSubject || '';
+  const fbUserIntro = builderRoot.dataset.fallbackUserIntro || '';
+
+  const userSubject = bindText(
+    el('input', {
+      type: 'text',
+      className: 'widefat',
+      placeholder: fbUserSubject,
+    }),
+    'user_email_subject'
+  );
+  const userIntro = bindText(
+    el('textarea', {
+      className: 'widefat',
+      rows: '3',
+      placeholder: fbUserIntro,
+    }),
+    'user_email_intro'
+  );
   const userSubjectRow = fieldRow(t('subject', 'Subject'), userSubject);
   const userIntroRow = fieldRow(
     t('introText', 'Intro text'),
@@ -434,68 +452,63 @@ export function createPanels(settings, builderRoot, onChange) {
     className: 'bl-forms-builder__after-submit-message',
     hidden: state.after_submit === 'redirect',
   }, [successRow]);
-  const wpMaxUploadLabel =
-    (window.blFormsAdmin && window.blFormsAdmin.wpMaxUploadSize) || '';
-  const uploadMaxSize = el('input', {
-    type: 'number',
-    className: 'small-text bl-forms-builder__security-input',
-    min: '0.1',
-    step: '0.1',
-    value: state.upload_max_size_mb != null && state.upload_max_size_mb !== ''
-      ? String(state.upload_max_size_mb)
-      : '',
-  });
-  uploadMaxSize.addEventListener('input', () => {
-    state.upload_max_size_mb = uploadMaxSize.value.trim();
-    emit();
-  });
-  uploadMaxSize.addEventListener('change', () => {
-    state.upload_max_size_mb = uploadMaxSize.value.trim();
-    emit();
-  });
-  const uploadMaxSizeRow = el('div', { className: 'bl-forms-builder__security-inline' }, [
-    uploadMaxSize,
-    el('span', { text: t('uploadMaxSizeUnit', 'MB') }),
-  ]);
+  const allowSaveUploads = !!(window.blFormsAdmin && window.blFormsAdmin.allowSaveUploads);
+  const settingsUrl = (window.blFormsAdmin && window.blFormsAdmin.uploadsSettingsUrl)
+    || (window.blFormsAdmin && window.blFormsAdmin.settingsUrl)
+    || '';
   if (state.save_uploads === undefined) {
     state.save_uploads = true;
   }
+  if (!allowSaveUploads) {
+    state.save_uploads = false;
+  }
   const saveUploadsSwitch = plainSwitch(t('saveUploads', 'Save uploaded files'), {
-    checked: !!state.save_uploads,
+    checked: !!state.save_uploads && allowSaveUploads,
+    disabled: !allowSaveUploads,
     onChange: (checked) => {
+      if (!allowSaveUploads) {
+        return;
+      }
       state.save_uploads = checked;
       emit();
     },
   });
-  const fileSettingsBlock = el('div', { className: 'bl-forms-builder__field-errors' }, [
+  const saveUploadsNote = allowSaveUploads
+    ? el('span', {
+        className: 'description',
+        text: t(
+          'saveUploadsHelp',
+          'Uploaded files are stored outside the media library under unguessable filenames.'
+        ),
+      })
+    : el('div', { className: 'bl-forms-builder__notice bl-forms-builder__notice--warning', role: 'status' }, [
+        el('span', {
+          text: t(
+            'saveUploadsDisabled',
+            'Saving uploaded files is disabled in Forms → Settings.'
+          ),
+        }),
+        settingsUrl
+          ? el('a', {
+              href: settingsUrl,
+              text: t('saveUploadsOpenSettings', 'Open settings'),
+              className: 'bl-forms-builder__notice-link',
+            })
+          : null,
+      ].filter(Boolean));
+  const fileSettingsBlock = el('div', {
+    className:
+      'bl-forms-builder__field-errors' +
+      (allowSaveUploads ? '' : ' bl-forms-builder__field-errors--disabled'),
+  }, [
     el('h3', {
       className: 'bl-forms-builder__section-title',
       text: t('fileSettings', 'File settings'),
     }),
     el('div', { className: 'bl-forms-builder__field-errors-box' }, [
-      fieldRow(
-        t('uploadMaxSize', 'Maximum file size'),
-        uploadMaxSizeRow,
-        wpMaxUploadLabel
-          ? t(
-              'uploadMaxSizeHelp',
-              'Leave empty to use the server limit (%s).'
-            ).replace('%s', wpMaxUploadLabel)
-          : t(
-              'uploadMaxSizeHelpEmpty',
-              'Leave empty to use the server limit.'
-            )
-      ),
-      el('hr', { className: 'bl-forms-builder__separator' }),
       el('div', { className: 'bl-forms-builder__setting' }, [
         saveUploadsSwitch.root,
-        el('span', {
-          className: 'description',
-          text: t(
-            'saveUploadsHelp',
-            'Uploaded files are stored outside the media library under unguessable filenames.'
-          ),
-        }),
+        saveUploadsNote,
       ]),
     ]),
   ]);
@@ -720,151 +733,25 @@ export function createPanels(settings, builderRoot, onChange) {
     errorSection(t('optionError', 'Choice'), [optionMsg])
   );
 
-  // Security
-  const securityPanel = el('div', {
-    className: 'bl-forms-builder__panel',
-    dataset: { blFormsPanel: 'security' },
-    hidden: true,
-  });
-
-  const minFillSeconds = el('input', {
-    type: 'number',
-    className: 'small-text bl-forms-builder__security-input',
-    min: '1',
-    max: '300',
-    step: '1',
-    value: String(state.min_fill_time || 2),
-  });
-  const minFillOptions = el('div', {
-    className: 'bl-forms-builder__security-controls',
-    hidden: !state.min_fill_time_enabled,
-  }, [
-    el('div', { className: 'bl-forms-builder__security-inline' }, [
-      el('span', { text: t('securityMinFillTimeAtLeast', 'At least') }),
-      minFillSeconds,
-      el('span', { text: t('securityMinFillTimeSeconds', 'seconds') }),
-    ]),
-  ]);
-
-  const rateMax = el('input', {
-    type: 'number',
-    className: 'small-text bl-forms-builder__security-input',
-    min: '1',
-    max: '100',
-    step: '1',
-    value: String(state.rate_limit_max || 3),
-  });
-  const rateWindow = el('input', {
-    type: 'number',
-    className: 'small-text bl-forms-builder__security-input',
-    min: '1',
-    max: '1440',
-    step: '1',
-    value: String(state.rate_limit_window || 5),
-  });
-  const rateOptions = el('div', {
-    className: 'bl-forms-builder__security-controls',
-    hidden: !state.rate_limit_enabled,
-  }, [
-    el('div', { className: 'bl-forms-builder__security-inline' }, [
-      el('span', { text: t('securityRateLimitMax', 'Max') }),
-      rateMax,
-      el('span', { text: t('securityRateLimitIn', 'submissions in') }),
-      rateWindow,
-      el('span', { text: t('securityRateLimitMinutes', 'minutes') }),
-    ]),
-  ]);
-
-  const minFillSwitch = securitySwitch(
-    t('securityMinFillTime', 'Minimum fill time'),
-    'recommended',
-    {
-      checked: !!state.min_fill_time_enabled,
-      onChange: (checked) => {
-        state.min_fill_time_enabled = checked;
-        minFillOptions.hidden = !checked;
-        emit();
-      },
-    }
-  );
-  const rateSwitch = securitySwitch(
-    t('securityRateLimit', 'Submission limit'),
-    'recommended',
-    {
-      checked: !!state.rate_limit_enabled,
-      onChange: (checked) => {
-        state.rate_limit_enabled = checked;
-        rateOptions.hidden = !checked;
-        emit();
-      },
-    }
-  );
-
-  minFillSeconds.addEventListener('input', () => {
-    const n = parseInt(minFillSeconds.value, 10);
-    state.min_fill_time = Number.isFinite(n) && n > 0 ? n : 2;
-    emit();
-  });
-  rateMax.addEventListener('input', () => {
-    const n = parseInt(rateMax.value, 10);
-    state.rate_limit_max = Number.isFinite(n) && n > 0 ? n : 3;
-    emit();
-  });
-  rateWindow.addEventListener('input', () => {
-    const n = parseInt(rateWindow.value, 10);
-    state.rate_limit_window = Number.isFinite(n) && n > 0 ? n : 5;
-    emit();
-  });
-
-  securityPanel.append(
-    lockedOption(
-      t('securityCsrf', 'CSRF protection'),
-      t(
-        'securityCsrfHelp',
-        'A WordPress nonce is verified on every submission to block forged requests.'
-      )
-    ),
-    lockedOption(
-      t('securityJsCheck', 'JavaScript check'),
-      t(
-        'securityJsCheckHelp',
-        'A hidden field is set by JavaScript. If the expected value is missing, the submission is discarded.'
-      )
-    ),
-    lockedOption(
-      t('securityHoneypot', 'Honeypot field'),
-      t(
-        'securityHoneypotHelp',
-        'A field hidden from visitors detects simple bots. If it is filled, the submission is discarded.'
-      )
-    ),
-    securityOption(
-      minFillSwitch.root,
-      t(
-        'securityMinFillTimeHelp',
-        'Submissions are rejected when the form is sent unusually quickly.'
-      ),
-      minFillOptions
-    ),
-    securityOption(
-      rateSwitch.root,
-      t(
-        'securityRateLimitHelp',
-        'Limits how often the same visitor can submit the form within a time period.'
-      ),
-      rateOptions
-    )
-  );
+  // Security is managed under Forms → Settings (global only).
 
   return {
     notifications,
     settings: settingsPanel,
     validation: validationPanel,
-    security: securityPanel,
     getSettings: () => {
       const next = { ...state };
       delete next.redirect_page_title;
       delete next.redirect_page_url;
+      delete next.min_fill_time_enabled;
+      delete next.min_fill_time;
+      delete next.rate_limit_enabled;
+      delete next.rate_limit_max;
+      delete next.rate_limit_window;
+      delete next.upload_max_size_mb;
+      if (!(window.blFormsAdmin && window.blFormsAdmin.allowSaveUploads)) {
+        next.save_uploads = false;
+      }
       return next;
     },
     applySettings(partial = {}) {
