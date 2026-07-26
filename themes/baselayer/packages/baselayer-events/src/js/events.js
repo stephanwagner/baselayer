@@ -627,6 +627,8 @@
     const [timesEnabled, setTimesEnabled] = useState(false);
     const [modalOpen, setModalOpen] = useState(false);
     const [reverting, setReverting] = useState(false);
+    const [startDraft, setStartDraft] = useState(startDate);
+    const [endDraft, setEndDraft] = useState(endDate);
 
     useEffect(
       function () {
@@ -635,12 +637,41 @@
       [postId, startTime, endTime],
     );
 
+    useEffect(
+      function () {
+        setStartDraft(startDate);
+        setEndDraft(endDate);
+      },
+      [postId, startDate, endDate],
+    );
+
     if (!meta || typeof setMeta !== 'function') {
       return null;
     }
 
     function patch(next) {
       setMeta(Object.assign({}, meta, next));
+    }
+
+    function commitStartDate(v) {
+      const next = { [META_START_DATE]: v };
+      const currentEnd = endDraft || endDate;
+      if (v && (!currentEnd || currentEnd < v)) {
+        next[META_END_DATE] = v;
+        setEndDraft(v);
+      }
+      setStartDraft(v);
+      patch(next);
+    }
+
+    function commitEndDate(v) {
+      var nextEnd = v;
+      var start = startDraft || startDate;
+      if (start && nextEnd && nextEnd < start) {
+        nextEnd = start;
+      }
+      setEndDraft(nextEnd);
+      patch({ [META_END_DATE]: nextEnd });
     }
 
     function onToggleTimes(on) {
@@ -818,14 +849,13 @@
             id: 'bl-event-start-date',
             type: 'date',
             className: 'components-text-control__input bl-event-date-input bl-event-date-input--start',
-            value: startDate,
+            value: startDraft,
             disabled: dateFieldsDisabled,
             onChange: function (e) {
-              var v = e.target.value;
-              patch({
-                [META_START_DATE]: v,
-                [META_END_DATE]: endDate && endDate >= v ? endDate : v,
-              });
+              setStartDraft(e.target.value);
+            },
+            onBlur: function (e) {
+              commitStartDate(e.target.value);
             },
           }),
         ),
@@ -837,11 +867,14 @@
             id: 'bl-event-end-date',
             type: 'date',
             className: 'components-text-control__input bl-event-date-input bl-event-date-input--end',
-            value: endDate || startDate,
-            min: startDate || undefined,
+            value: endDraft,
+            min: startDraft || startDate || undefined,
             disabled: dateFieldsDisabled,
             onChange: function (e) {
-              patch({ [META_END_DATE]: e.target.value });
+              setEndDraft(e.target.value);
+            },
+            onBlur: function (e) {
+              commitEndDate(e.target.value);
             },
           }),
         ),
