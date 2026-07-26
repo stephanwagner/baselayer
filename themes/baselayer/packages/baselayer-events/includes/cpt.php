@@ -137,23 +137,6 @@ function bl_events_register_cpts_standalone(): void
 }
 
 /**
- * Detach core `category` from event types (legacy shared categories).
- */
-function bl_events_detach_core_category(): void
-{
-	if (!taxonomy_exists('category')) {
-		return;
-	}
-
-	foreach (array_keys(bl_events_get_instances(false)) as $post_type) {
-		if (!is_string($post_type) || $post_type === '') {
-			continue;
-		}
-		unregister_taxonomy_for_object_type('category', $post_type);
-	}
-}
-
-/**
  * Flush rewrites after settings / seed when flagged.
  */
 function bl_events_maybe_flush_rewrites(): void
@@ -166,7 +149,6 @@ function bl_events_maybe_flush_rewrites(): void
 }
 
 add_action('init', 'bl_events_register_cpts_standalone', 2);
-add_action('init', 'bl_events_detach_core_category', 12);
 add_action('init', 'bl_events_maybe_flush_rewrites', 99);
 
 if (function_exists('add_filter')) {

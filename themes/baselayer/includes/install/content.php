@@ -530,9 +530,9 @@ function bl_install_add_menu_page_item(int $menu_id, int $page_id, array $option
 function bl_install_archive_slug_defaults(): array
 {
 	return [
-		'post'     => 'blog',
-		'projects' => 'projects',
-		'event'    => 'events',
+		'post'      => 'blog',
+		'projects'  => 'projects',
+		'bl_events' => 'events',
 	];
 }
 
@@ -622,9 +622,9 @@ function bl_install_archive_title(string $post_type): string
 	}
 
 	$fallback = [
-		'post'     => 'Blog',
-		'projects' => 'Projects',
-		'event'    => 'Events',
+		'post'      => 'Blog',
+		'projects'  => 'Projects',
+		'bl_events' => 'Events',
 	];
 
 	return $fallback[$post_type] ?? ucfirst($post_type);
@@ -674,9 +674,9 @@ function bl_install_add_menu_archive_item(int $menu_id, string $post_type, bool 
 function bl_install_assign_menus(array $page_ids, array $content_flags = []): void
 {
 	$archive_types = [];
-	foreach (['post', 'projects', 'event'] as $post_type) {
-		if (!empty($content_flags[$post_type])) {
-			$archive_types[] = $post_type;
+	foreach (['post', 'projects', 'event'] as $flag_key) {
+		if (!empty($content_flags[$flag_key])) {
+			$archive_types[] = $flag_key === 'event' ? bl_install_events_post_type() : $flag_key;
 		}
 	}
 
@@ -903,20 +903,28 @@ function bl_install_apply_events_enabled(bool $enabled): void
 	$features['enable_events'] = $enabled ? 1 : 0;
 	update_option('baselayer_features', $features);
 
+	$key = function_exists('bl_events_default_post_type_key')
+		? bl_events_default_post_type_key()
+		: 'bl_events';
+
+	if (!$enabled) {
+		return;
+	}
+
 	if (function_exists('bl_events_get_instances') && function_exists('bl_events_save_instances')) {
 		$instances = bl_events_get_instances(false);
 		if ($instances === [] && function_exists('bl_events_default_instances')) {
 			$instances = bl_events_default_instances();
 		}
-		if (!isset($instances['event']) || !is_array($instances['event'])) {
+		if (!isset($instances[$key]) || !is_array($instances[$key])) {
 			if (function_exists('bl_events_default_instances')) {
 				$defaults_inst = bl_events_default_instances();
-				$instances['event'] = $defaults_inst['event'] ?? ['enabled' => true, 'type' => 'event'];
+				$instances[$key] = $defaults_inst[$key]
+					?? ['enabled' => true, 'type' => 'event'];
 			} else {
-				$instances['event'] = ['enabled' => true, 'type' => 'event'];
+				$instances[$key] = ['enabled' => true, 'type' => 'event'];
 			}
 		}
-		$instances['event']['enabled'] = $enabled;
 		bl_events_save_instances($instances);
 
 		return;
@@ -927,19 +935,31 @@ function bl_install_apply_events_enabled(bool $enabled): void
 	$raw = get_option($option_key, null);
 	if (!is_array($raw) || $raw === []) {
 		$raw = [
-			'event' => [
-				'enabled' => $enabled,
+			$key => [
+				'enabled' => true,
 				'type'    => 'event',
 			],
 		];
-	} else {
-		if (!isset($raw['event']) || !is_array($raw['event'])) {
-			$raw['event'] = ['type' => 'event'];
-		}
-		$raw['event']['enabled'] = $enabled;
+	} elseif (!isset($raw[$key]) || !is_array($raw[$key])) {
+		$raw[$key] = [
+			'enabled' => true,
+			'type'    => 'event',
+		];
 	}
 	update_option($option_key, $raw, false);
 	update_option('bl_events_flush_rewrite', 1, false);
+}
+
+/**
+ * CPT slug used for Events during install menus / sample content.
+ */
+function bl_install_events_post_type(): string
+{
+	if (function_exists('bl_events_default_post_type_key')) {
+		return bl_events_default_post_type_key();
+	}
+
+	return 'bl_events';
 }
 
 /**
@@ -1154,7 +1174,11 @@ function bl_install_seed_samples_for_type(string $post_type, array $media): arra
 		'sample-image-4',
 		'sample-image-5',
 	];
-	$event_dates = $post_type === 'event' ? bl_install_sample_event_dates() : [];
+	$event_dates = (
+		(function_exists('bl_is_event_post_type') && bl_is_event_post_type($post_type))
+		|| (function_exists('bl_events_default_post_type_key') && $post_type === bl_events_default_post_type_key())
+		|| $post_type === 'bl_events'
+	) ? bl_install_sample_event_dates() : [];
 	$created = [];
 
 	foreach ($texts as $index => $item) {
@@ -1186,7 +1210,7 @@ function bl_install_seed_samples_for_type(string $post_type, array $media): arra
 			set_post_thumbnail((int) $post_id, (int) $media[$image_keys[$index]]['id']);
 		}
 
-		if ($post_type === 'event' && isset($event_dates[$index])) {
+		if ($event_dates !== [] && isset($event_dates[$index])) {
 			$schedule = $event_dates[$index];
 			update_post_meta((int) $post_id, BL_EVENT_META_START_DATE, $schedule['start']);
 			update_post_meta((int) $post_id, BL_EVENT_META_END_DATE, $schedule['end']);
@@ -1224,11 +1248,12 @@ function bl_install_seed_content_type_examples(array $flags): array
 		'event'    => !empty($flags['event']) && !empty($flags['event_examples']),
 	];
 
-	foreach ($map as $post_type => $should_seed) {
+	foreach ($map as $flag_key => $should_seed) {
 		if (!$should_seed) {
 			continue;
 		}
-		$result[$post_type] = bl_install_seed_samples_for_type($post_type, $media);
+		$post_type = $flag_key === 'event' ? bl_install_events_post_type() : $flag_key;
+		$result[$flag_key] = bl_install_seed_samples_for_type($post_type, $media);
 	}
 
 	return $result;
@@ -1365,11 +1390,13 @@ function bl_install_seed_testdata_post_item(string $post_type, int $index, array
  */
 function bl_install_seed_testdata_event_item(int $index, array $item, array $media): int
 {
+	$post_type = bl_install_events_post_type();
+
 	if (bl_install_testdata_item_exists('event', $index)) {
 		return 0;
 	}
 
-	if (!post_type_exists('event')) {
+	if (!post_type_exists($post_type)) {
 		return 0;
 	}
 
@@ -1385,7 +1412,7 @@ function bl_install_seed_testdata_event_item(int $index, array $item, array $med
 	$end_date = bl_install_testdata_resolve_date($end_offset);
 
 	$post_id = wp_insert_post([
-		'post_type'    => 'event',
+		'post_type'    => $post_type,
 		'post_status'  => 'publish',
 		'post_title'   => $title,
 		'post_content' => bl_install_sample_item_content($item),
@@ -1429,7 +1456,7 @@ function bl_install_seed_testdata_event_item(int $index, array $item, array $med
 		}
 		if (!empty($item['soft_delete_occurrence']) && function_exists('bl_event_soft_delete_occurrence')) {
 			$children = get_posts([
-				'post_type'      => 'event',
+				'post_type'      => $post_type,
 				'post_parent'    => $post_id,
 				'post_status'    => 'publish',
 				'posts_per_page' => 1,
@@ -1494,7 +1521,7 @@ function bl_install_seed_testdata(array $flags): array
 		$result['projects'] = $ids;
 	}
 
-	if (!empty($flags['event']) && !empty($config['events']) && is_array($config['events']) && post_type_exists('event')) {
+	if (!empty($flags['event']) && !empty($config['events']) && is_array($config['events']) && post_type_exists(bl_install_events_post_type())) {
 		$ids = [];
 		foreach (array_values($config['events']) as $index => $item) {
 			if (!is_array($item)) {

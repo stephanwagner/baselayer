@@ -48,12 +48,16 @@ function bl_events_enqueue_editor_assets(): void
 
 	$meta_by_type = [];
 	$statuses_by_type = [];
+	$statuses_enabled_by_type = [];
 	$panel_titles = [];
 	foreach ($post_types as $type) {
 		$meta_by_type[$type] = function_exists('bl_cpt_event_meta_config')
 			? bl_cpt_event_meta_config($type)
 			: ['title' => '', 'groups' => []];
-		$statuses_by_type[$type] = function_exists('bl_event_get_status_options')
+		$statuses_enabled_by_type[$type] = function_exists('bl_event_statuses_enabled')
+			? bl_event_statuses_enabled($type)
+			: true;
+		$statuses_by_type[$type] = $statuses_enabled_by_type[$type] && function_exists('bl_event_get_status_options')
 			? bl_event_get_status_options($type)
 			: [];
 		$inst = bl_events_get_instance($type);
@@ -73,29 +77,11 @@ function bl_events_enqueue_editor_assets(): void
 		'startTimeLabel' => __('Start time', 'baselayer-events'),
 		'endTimeLabel' => __('End time', 'baselayer-events'),
 		'statusLabel' => __('Status', 'baselayer-events'),
-		'statusCustomLabel' => __('Status label', 'baselayer-events'),
-		'statusColorLabel' => __('Color', 'baselayer-events'),
 		'statusInfoLabel' => __('Status information', 'baselayer-events'),
 		'statuses' => $statuses_by_type[$pt] ?? [],
 		'statusesByType' => $statuses_by_type,
-		'statusColorPresets' => function_exists('bl_event_status_color_presets')
-			? array_map(
-				static function (string $key, string $label): array {
-					return [
-						'key' => $key,
-						'label' => $label,
-					];
-				},
-				array_keys(bl_event_status_color_presets()),
-				array_values(bl_event_status_color_presets())
-			)
-			: [],
-		'statusColorHex' => function_exists('bl_event_status_color_token_hex')
-			? bl_event_status_color_token_hex()
-			: [],
-		'statusColorDefault' => defined('BL_EVENT_STATUS_COLOR_DEFAULT')
-			? BL_EVENT_STATUS_COLOR_DEFAULT
-			: 'info',
+		'statusesEnabled' => $statuses_enabled_by_type[$pt] ?? true,
+		'statusesEnabledByType' => $statuses_enabled_by_type,
 		'recurringTitle' => __('Recurring', 'baselayer-events'),
 		'notRepeating' => __('Not repeating', 'baselayer-events'),
 		'editRecurrence' => __('Edit recurrence', 'baselayer-events'),
@@ -336,6 +322,7 @@ function bl_events_enqueue_settings_assets(string $hook): void
 
 	if ($tab === 'statuses') {
 		$statuses = is_array($cfg) && isset($cfg['statuses']) && is_array($cfg['statuses']) ? $cfg['statuses'] : [];
+		$items = isset($statuses['items']) && is_array($statuses['items']) ? $statuses['items'] : [];
 		$presets = function_exists('bl_event_status_color_presets') ? bl_event_status_color_presets() : [];
 		$preset_list = [];
 		foreach ($presets as $key => $label) {
@@ -345,7 +332,7 @@ function bl_events_enqueue_settings_assets(string $hook): void
 			];
 		}
 		wp_localize_script('bl-events-settings', 'blEventsStatusesBuilder', [
-			'initial' => $statuses,
+			'initial' => $items,
 			'colorPresets' => $preset_list,
 			'defaultColor' => defined('BL_EVENT_STATUS_COLOR_DEFAULT')
 				? BL_EVENT_STATUS_COLOR_DEFAULT

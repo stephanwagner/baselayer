@@ -11,13 +11,16 @@ return [
 	'hierarchical' => false,
 	'type' => 'event',
 	'statuses' => [
-		'cancelled' => [
-			'label' => 'Cancelled',
-			'color' => 'error',
-		],
-		'postponed' => [
-			'label' => 'Postponed',
-			'color' => 'warning',
+		'enabled' => true,
+		'items' => [
+			'cancelled' => [
+				'label' => 'Cancelled',
+				'color' => 'error',
+			],
+			'postponed' => [
+				'label' => 'Postponed',
+				'color' => 'warning',
+			],
 		],
 	],
 	'meta' => [

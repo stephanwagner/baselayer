@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BaseLayer Events 0.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/baselayer-events\n"
-"POT-Creation-Date: 2026-07-26T04:23:06+00:00\n"
+"POT-Creation-Date: 2026-07-26T06:59:28+00:00\n"
 "PO-Revision-Date: 2026-07-26T03:09:14+00:00\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -41,6 +41,7 @@ msgid "https://baselayerwp.com/baselayer-events"
 msgstr "https://baselayerwp.com/baselayer-events"
 
 #: includes/assets.php:68 includes/events.php:806 includes/i18n-defaults.php:38
+#: includes/settings-page.php:247 includes/settings-page.php:562
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -68,9 +69,6 @@ msgstr "Endzeit"
 msgid "Status"
 msgstr "Status"
 
-#: includes/assets.php:76
-msgid "Status label"
-msgstr "Statusbezeichnung"
 
 #: includes/assets.php:77 includes/assets.php:363
 msgid "Color"
@@ -175,8 +173,8 @@ msgstr "Nächste Termine"
 msgid "+%d more"
 msgstr "+%d weitere"
 
-#: includes/assets.php:122 includes/settings-page.php:534
-#: includes/settings-page.php:562
+#: includes/assets.php:122 includes/settings-page.php:568
+#: includes/settings-page.php:596
 msgid "Cancel"
 msgstr "Abbrechen"
 
@@ -306,7 +304,7 @@ msgid "Restore"
 msgstr "Wiederherstellen"
 
 #: includes/assets.php:194 includes/assets.php:324 includes/assets.php:359
-#: includes/settings-page.php:468
+#: includes/settings-page.php:498
 msgid "Delete"
 msgstr "Löschen"
 
@@ -492,11 +490,8 @@ msgstr "Akzent"
 
 #: includes/events-status.php:176
 msgid "None"
-msgstr "Keine"
+msgstr "Ohne"
 
-#: includes/events-status.php:191
-msgid "Custom"
-msgstr "Benutzerdefiniert"
 
 #: includes/events.php:748
 msgid "Event dates"
@@ -518,11 +513,11 @@ msgstr "Abgesagt"
 msgid "Postponed"
 msgstr "Verschoben"
 
-#: includes/i18n-defaults.php:21 includes/instances.php:390
+#: includes/i18n-defaults.php:21 includes/instances.php:422
 msgid "Categories"
 msgstr "Kategorien"
 
-#: includes/i18n-defaults.php:22 includes/instances.php:391
+#: includes/i18n-defaults.php:22 includes/instances.php:423
 msgid "Category"
 msgstr "Kategorie"
 
@@ -562,55 +557,56 @@ msgstr "Kontakt"
 msgid "Phone"
 msgstr "Telefon"
 
-#: includes/i18n-defaults.php:37
+#: includes/i18n-defaults.php:37 includes/settings-page.php:244
+#: includes/settings-page.php:560
 msgid "Events"
 msgstr "Veranstaltungen"
 
-#: includes/instances.php:398
+#: includes/instances.php:430
 msgid "Search categories"
 msgstr "Kategorien suchen"
 
-#: includes/instances.php:399
+#: includes/instances.php:431
 msgid "All categories"
 msgstr "Alle Kategorien"
 
-#: includes/instances.php:400
+#: includes/instances.php:432
 msgid "Parent category"
 msgstr "Übergeordnete Kategorie"
 
-#: includes/instances.php:401
+#: includes/instances.php:433
 msgid "Parent category:"
 msgstr "Übergeordnete Kategorie:"
 
-#: includes/instances.php:402
+#: includes/instances.php:434
 msgid "Edit category"
 msgstr "Kategorie bearbeiten"
 
-#: includes/instances.php:403
+#: includes/instances.php:435
 msgid "View category"
 msgstr "Kategorie anzeigen"
 
-#: includes/instances.php:404
+#: includes/instances.php:436
 msgid "Update category"
 msgstr "Kategorie aktualisieren"
 
-#: includes/instances.php:405
+#: includes/instances.php:437
 msgid "Add new category"
 msgstr "Neue Kategorie hinzufügen"
 
-#: includes/instances.php:406
+#: includes/instances.php:438
 msgid "New category name"
 msgstr "Neuer Kategoriename"
 
-#: includes/instances.php:407
+#: includes/instances.php:439
 msgid "No categories found."
 msgstr "Keine Kategorien gefunden."
 
-#: includes/instances.php:408
+#: includes/instances.php:440
 msgid "No categories"
 msgstr "Keine Kategorien"
 
-#: includes/instances.php:409
+#: includes/instances.php:441
 msgid "Filter by category"
 msgstr "Nach Kategorie filtern"
 
@@ -619,11 +615,11 @@ msgid "Event Settings"
 msgstr "Veranstaltungseinstellungen"
 
 #: includes/settings-page.php:144 includes/settings-page.php:145
-#: includes/settings-page.php:451
+#: includes/settings-page.php:481
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: includes/settings-page.php:167 includes/settings-page.php:433
+#: includes/settings-page.php:167 includes/settings-page.php:463
 msgid "You do not have permission to manage event type settings."
 msgstr ""
 "Du hast keine Berechtigung, Veranstaltungstyp-Einstellungen zu verwalten."
@@ -632,31 +628,31 @@ msgstr ""
 msgid "You do not have permission to manage event types."
 msgstr "Du hast keine Berechtigung, Veranstaltungstypen zu verwalten."
 
-#: includes/settings-page.php:440
+#: includes/settings-page.php:470
 msgid "General"
 msgstr "Allgemein"
 
-#: includes/settings-page.php:441 includes/settings-page.php:679
+#: includes/settings-page.php:471 includes/settings-page.php:718
 msgid "Archive"
 msgstr "Archiv"
 
-#: includes/settings-page.php:442
+#: includes/settings-page.php:472
 msgid "Statuses"
 msgstr "Status"
 
-#: includes/settings-page.php:443
+#: includes/settings-page.php:473
 msgid "Metadata"
 msgstr "Metadaten"
 
-#: includes/settings-page.php:453
+#: includes/settings-page.php:483
 msgid "Event type created."
 msgstr "Veranstaltungstyp erstellt."
 
-#: includes/settings-page.php:455
+#: includes/settings-page.php:485
 msgid "Settings saved."
 msgstr "Einstellungen gespeichert."
 
-#: includes/settings-page.php:465
+#: includes/settings-page.php:495
 msgid ""
 "Labels, archive, statuses, and metadata for this event type. Use Add type to "
 "create another post type (for example Courses or Workshops)."
@@ -665,49 +661,54 @@ msgstr ""
 "Mit „Typ hinzufügen“ kannst du einen weiteren Beitragstyp anlegen (z. B. "
 "Kurse oder Workshops)."
 
-#: includes/settings-page.php:467 includes/settings-page.php:535
+#: includes/settings-page.php:497 includes/settings-page.php:569
 msgid "Add type"
 msgstr "Typ hinzufügen"
 
-#: includes/settings-page.php:473
+#: includes/settings-page.php:503
 msgid "No event types yet."
 msgstr "Noch keine Veranstaltungstypen."
 
-#: includes/settings-page.php:505
+#: includes/settings-page.php:535
 msgid "Save changes"
 msgstr "Änderungen speichern"
 
-#: includes/settings-page.php:525
+#: includes/settings-page.php:555
 msgid "Add event type"
 msgstr "Veranstaltungstyp hinzufügen"
 
-#: includes/settings-page.php:528
+#: includes/settings-page.php:558
 msgid ""
-"Creates a new post type with default labels and archive. Each type gets its "
-"own categories (separate from Posts). You can rename it after saving."
+"Create a new event-like post type. Choose the names and public URL visitors "
+"will see. Categories are separate from Posts."
 msgstr ""
-"Erstellt einen neuen Beitragstyp mit Standardbezeichnungen und Archiv. Jeder "
-"Typ erhält eigene Kategorien (getrennt von Beiträgen). Du kannst ihn nach "
-"dem Speichern umbenennen."
+"Erstellt einen neuen veranstaltungsähnlichen Beitragstyp. Wähle die Namen "
+"und die öffentliche URL, die Besucher sehen. Kategorien sind getrennt von "
+"Beiträgen."
 
-#: includes/settings-page.php:529 includes/settings-page.php:586
-msgid "Slug"
-msgstr "Slug"
+#: includes/settings-page.php:559 includes/settings-page.php:627
+msgid "Plural name"
+msgstr "Pluralname"
 
-#: includes/settings-page.php:531
-msgid ""
-"Lowercase letters, numbers, hyphens, and underscores. Used as the post type "
-"key."
-msgstr ""
-"Kleinbuchstaben, Zahlen, Bindestriche und Unterstriche. Wird als Beitragstyp-"
-"Schlüssel verwendet."
+#: includes/settings-page.php:561 includes/settings-page.php:628
+msgid "Singular name"
+msgstr "Singularname"
 
-#: includes/settings-page.php:546
+#: includes/settings-page.php:563 includes/settings-page.php:631
+#: includes/settings-page.php:720
+msgid "URL slug"
+msgstr "URL-Slug"
+
+#: includes/settings-page.php:565
+msgid "Public archive and event permalinks (e.g. /veranstaltungen/)."
+msgstr "Öffentliches Archiv und Permalinks (z. B. /veranstaltungen/)."
+
+#: includes/settings-page.php:580
 msgid "Delete event type"
 msgstr "Veranstaltungstyp löschen"
 
 #. translators: %s: event type name
-#: includes/settings-page.php:553
+#: includes/settings-page.php:587
 #, php-format
 msgid ""
 "Delete “%s”? This removes the post type from Events. Existing posts are not "
@@ -716,77 +717,63 @@ msgstr ""
 "„%s“ löschen? Damit wird der Beitragstyp aus Events entfernt. Bestehende "
 "Beiträge werden nicht gelöscht."
 
-#: includes/settings-page.php:558
+#: includes/settings-page.php:592
 msgid ""
 "You need at least one event type. Add another type before deleting this one."
 msgstr ""
 "Es wird mindestens ein Veranstaltungstyp benötigt. Füge einen weiteren Typ "
 "hinzu, bevor du diesen löschst."
 
-#: includes/settings-page.php:564
+#: includes/settings-page.php:598
 msgid "Delete type"
 msgstr "Typ löschen"
 
-#: includes/settings-page.php:587
-msgid "Immutable after creation (post type key)."
-msgstr "Nach der Erstellung unveränderlich (Beitragstyp-Schlüssel)."
 
-#: includes/settings-page.php:589
-msgid "Enabled"
-msgstr "Aktiviert"
 
-#: includes/settings-page.php:590
-msgid "Register and show this type"
-msgstr "Diesen Typ registrieren und anzeigen"
-
-#: includes/settings-page.php:592
-msgid "Plural name"
-msgstr "Pluralname"
-
-#: includes/settings-page.php:593
-msgid "Singular name"
-msgstr "Singularname"
-
-#: includes/settings-page.php:594
+#: includes/settings-page.php:629
 msgid "Menu name"
 msgstr "Menüname"
 
-#: includes/settings-page.php:596
+#: includes/settings-page.php:633
+msgid "Public archive and single permalinks (e.g. veranstaltungen)."
+msgstr "Öffentliches Archiv und Einzel-Permalinks (z. B. veranstaltungen)."
+
+#: includes/settings-page.php:635
 msgid "Menu position"
 msgstr "Menüposition"
 
-#: includes/settings-page.php:611
+#: includes/settings-page.php:650
 msgid "Menu icon"
 msgstr "Menüsymbol"
 
-#: includes/settings-page.php:624 includes/settings-page.php:643
+#: includes/settings-page.php:663 includes/settings-page.php:682
 msgid "No icon selected"
 msgstr "Kein Symbol ausgewählt"
 
-#: includes/settings-page.php:626
+#: includes/settings-page.php:665
 msgid "Choose icon"
 msgstr "Symbol wählen"
 
-#: includes/settings-page.php:627 includes/settings-page.php:649
+#: includes/settings-page.php:666 includes/settings-page.php:688
 msgid "SVG code"
 msgstr "SVG-Code"
 
-#: includes/settings-page.php:628 includes/settings-page.php:645
+#: includes/settings-page.php:667 includes/settings-page.php:684
 msgid "Clear"
 msgstr "Leeren"
 
-#: includes/settings-page.php:632
+#: includes/settings-page.php:671
 msgid "Custom SVG code"
 msgstr "Eigener SVG-Code"
 
-#: includes/settings-page.php:634
+#: includes/settings-page.php:673
 msgid "Paste inline SVG to use a custom menu icon instead of a catalog icon."
 msgstr ""
 "Füge Inline-SVG ein, um ein eigenes Menüsymbol statt eines Katalogsymbols zu "
 "verwenden."
 
 #. translators: %s: Material Icons URL
-#: includes/settings-page.php:654
+#: includes/settings-page.php:693
 #, php-format
 msgid ""
 "Paste inline SVG for the admin menu icon. Browse icons at <a href=\"%s\" "
@@ -797,66 +784,67 @@ msgstr ""
 "href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">Material Icons "
 "(Rounded)</a> — Symbol öffnen und SVG kopieren."
 
-#: includes/settings-page.php:679
+#: includes/settings-page.php:718
 msgid "Enable archive"
 msgstr "Archiv aktivieren"
 
-#: includes/settings-page.php:680
-msgid "Archive slug"
-msgstr "Archiv-Slug"
+#: includes/settings-page.php:721
+msgid "Edit the public URL slug under General."
+msgstr "Den öffentlichen URL-Slug unter Allgemein bearbeiten."
 
-#: includes/settings-page.php:681
+#: includes/settings-page.php:722
 msgid "Design"
 msgstr "Design"
 
-#: includes/settings-page.php:682
+#: includes/settings-page.php:723
 msgid "List"
 msgstr "Liste"
 
-#: includes/settings-page.php:682
+#: includes/settings-page.php:723
 msgid "Grid"
 msgstr "Raster"
 
-#: includes/settings-page.php:686
+#: includes/settings-page.php:727
 msgid "Category filter"
 msgstr "Kategoriefilter"
 
-#: includes/settings-page.php:686
+#: includes/settings-page.php:727
 msgid "Show category filter on archive"
 msgstr "Kategoriefilter im Archiv anzeigen"
 
-#: includes/settings-page.php:687
+#: includes/settings-page.php:637
+msgid "Only shown when at least one category exists."
+msgstr "Wird nur angezeigt, wenn mindestens eine Kategorie vorhanden ist."
+
+#: includes/settings-page.php:728
 msgid "Heading"
 msgstr "Überschrift"
 
-#: includes/settings-page.php:688
+#: includes/settings-page.php:729
 msgid "Empty text"
 msgstr "Leertext"
 
-#: includes/settings-page.php:703
-msgid ""
-"Statuses shown in the event editor (in addition to None and Custom). Drag to "
-"reorder. Choose a theme color token or a custom hex color."
-msgstr ""
-"Status im Veranstaltungs-Editor (zusätzlich zu Keine und Benutzerdefiniert). "
-"Per Ziehen neu anordnen. Wähle ein Theme-Farbtoken oder eine eigene Hex-"
-"Farbe."
 
-#: includes/settings-page.php:725
+#: includes/settings-page.php:665
+msgid "Statuses shown in the event editor (in addition to None). Drag to reorder. Choose a theme color token or a custom hex color."
+msgstr "Status im Veranstaltungs-Editor (zusätzlich zu Ohne). Per Ziehen neu anordnen. Wähle ein Theme-Farbtoken oder eine eigene Hex-Farbe."
+
+
+#: includes/settings-page.php:766
 msgid "Enable metadata"
 msgstr "Metadaten aktivieren"
 
-#: includes/settings-page.php:726
+#: includes/settings-page.php:767
 msgid "Show the metadata panel in the editor and on the front end"
 msgstr "Metadaten-Panel im Editor und auf der Website anzeigen"
 
-#: includes/settings-page.php:727
+#: includes/settings-page.php:768
 msgid "When off, saved field definitions are kept but the panel is hidden."
 msgstr ""
 "Wenn deaktiviert, bleiben gespeicherte Felddefinitionen erhalten, das Panel "
 "wird aber ausgeblendet."
 
-#: includes/settings-page.php:731
+#: includes/settings-page.php:772
 msgid ""
 "Build metadata groups and fields for the editor panel. Drag to reorder. "
 "Field types: text, textarea, number, email, phone, url, select."
@@ -878,5 +866,41 @@ msgstr "Alle %s"
 msgid "Download iCal"
 msgstr "iCal herunterladen"
 
+#~ msgid ""
+#~ "Creates a new post type with default labels and archive. Each type gets "
+#~ "its own categories (separate from Posts). You can rename it after saving."
+#~ msgstr ""
+#~ "Erstellt einen neuen Beitragstyp mit Standardbezeichnungen und Archiv. "
+#~ "Jeder Typ erhält eigene Kategorien (getrennt von Beiträgen). Du kannst "
+#~ "ihn nach dem Speichern umbenennen."
+
+#~ msgid "Slug"
+#~ msgstr "Slug"
+
+#~ msgid ""
+#~ "Lowercase letters, numbers, hyphens, and underscores. Used as the post "
+#~ "type key."
+#~ msgstr ""
+#~ "Kleinbuchstaben, Zahlen, Bindestriche und Unterstriche. Wird als "
+#~ "Beitragstyp-Schlüssel verwendet."
+
+#~ msgid "Immutable after creation (post type key)."
+#~ msgstr "Nach der Erstellung unveränderlich (Beitragstyp-Schlüssel)."
+
+#~ msgid "Archive slug"
+#~ msgstr "Archiv-Slug"
+
 #~ msgid "Sold Out"
 #~ msgstr "Ausverkauft"
+
+#: includes/settings-page.php:658
+msgid "Enable statuses"
+msgstr "Status aktivieren"
+
+#: includes/settings-page.php:659
+msgid "Show the status panel in the editor and on the front end"
+msgstr "Status-Panel im Editor und auf der Website anzeigen"
+
+#: includes/settings-page.php:660
+msgid "When off, saved status definitions are kept but the panel is hidden."
+msgstr "Wenn deaktiviert, bleiben gespeicherte Statusdefinitionen erhalten, das Panel wird aber ausgeblendet."

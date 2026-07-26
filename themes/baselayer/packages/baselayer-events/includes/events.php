@@ -3,7 +3,7 @@
 defined('ABSPATH') || exit;
 
 /**
- * Event CPTs (`type` => `event` in config/content-types/): dates, archive query, editor panel.
+ * Event CPTs (`type` => `event` in instance config): dates, archive query, editor panel.
  */
 
 require_once __DIR__ . '/events-recurrence.php';

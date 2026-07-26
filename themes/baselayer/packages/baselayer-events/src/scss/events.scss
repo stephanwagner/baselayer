@@ -3,7 +3,7 @@ $breakpoint-m: 960px;
 $high-density-dppx: 1.5dppx;
 
 // Event status palette
-$event-status-keys: ('neutral', 'info', 'error', 'warning', 'success', 'accent', 'cancelled', 'postponed');
+$event-status-keys: ('neutral', 'info', 'error', 'warning', 'success', 'accent');
 
 // Standalone fallbacks when BaseLayer theme tokens are absent.
 $bl-fallback-neutral: #6f7882;
@@ -37,11 +37,6 @@ $bl-fallback-gray-300: #d0d7de;
   --bl-event-status-success-bg: var(--bl-color-success-bg, #{$bl-fallback-success-bg});
   --bl-event-status-accent: var(--bl-color-accent, #{$bl-fallback-accent});
   --bl-event-status-accent-bg: var(--bl-color-accent-bg, #{$bl-fallback-accent-bg});
-
-  --bl-event-status-cancelled: var(--bl-event-status-error);
-  --bl-event-status-cancelled-bg: var(--bl-event-status-error-bg);
-  --bl-event-status-postponed: var(--bl-event-status-warning);
-  --bl-event-status-postponed-bg: var(--bl-event-status-warning-bg);
 }
 
 // Event date

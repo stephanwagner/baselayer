@@ -229,21 +229,44 @@ add_action('admin_post_bl_events_delete_type', 'bl_events_admin_post_delete_type
 function bl_events_process_add_type(): void
 {
 	$instances = bl_events_get_instances(false);
-	$base = isset($_POST['new_slug']) ? sanitize_key(wp_unslash((string) $_POST['new_slug'])) : 'event';
-	$slug = bl_events_unique_slug($base !== '' ? $base : 'event');
+
+	$plural = isset($_POST['new_label_name']) ? sanitize_text_field(wp_unslash((string) $_POST['new_label_name'])) : '';
+	$singular = isset($_POST['new_label_singular']) ? sanitize_text_field(wp_unslash((string) $_POST['new_label_singular'])) : '';
+	$url_slug = isset($_POST['new_url_slug']) ? sanitize_title(wp_unslash((string) $_POST['new_url_slug'])) : '';
+
+	if ($singular === '' && $plural !== '') {
+		$singular = $plural;
+	}
+	if ($plural === '' && $singular !== '') {
+		$plural = $singular;
+	}
+	if ($plural === '') {
+		$plural = __('Events', 'baselayer-events');
+	}
+	if ($singular === '') {
+		$singular = __('Event', 'baselayer-events');
+	}
+	if ($url_slug === '') {
+		$url_slug = sanitize_title($plural);
+	}
+	if ($url_slug === '') {
+		$url_slug = 'events';
+	}
+
+	$slug = bl_events_make_internal_key($singular !== '' ? $singular : $url_slug);
+
 	$def = bl_events_default_instance_definition();
 	$def['type'] = 'event';
 	$def['enabled'] = true;
 	$def['labels'] = [
-		'name' => ucfirst(str_replace(['-', '_'], ' ', $slug)) . 's',
-		'singular_name' => ucfirst(str_replace(['-', '_'], ' ', $slug)),
-		'menu_name' => '',
+		'name' => $plural,
+		'singular_name' => $singular,
+		'menu_name' => $plural,
 	];
-	$def['labels']['menu_name'] = $def['labels']['name'];
 	if (!isset($def['archive']) || !is_array($def['archive'])) {
 		$def['archive'] = [];
 	}
-	$def['archive']['slug'] = sanitize_title($slug . 's');
+	$def['archive']['slug'] = $url_slug;
 	$instances[$slug] = $def;
 	bl_events_save_instances($instances);
 
@@ -284,16 +307,7 @@ function bl_events_process_save_settings(): void
 	$instances[$slug] = bl_events_sanitize_instance($cfg, $slug);
 	bl_events_save_instances($instances);
 
-	// If this type was disabled, its CPT menu is gone — land on another enabled type when possible.
-	$target = $slug;
-	if (empty($instances[$slug]['enabled'])) {
-		$enabled = array_keys(array_filter($instances, static function ($row) {
-			return is_array($row) && !empty($row['enabled']);
-		}));
-		$target = $enabled !== [] ? (string) $enabled[0] : $slug;
-	}
-
-	wp_safe_redirect(bl_events_settings_url($target, ['tab' => $tab, 'updated' => '1']));
+	wp_safe_redirect(bl_events_settings_url($slug, ['tab' => $tab, 'updated' => '1']));
 	exit;
 }
 
@@ -305,7 +319,6 @@ function bl_events_process_save_settings(): void
 function bl_events_apply_settings_tab(array $cfg, string $tab, array $post): array
 {
 	if ($tab === 'general') {
-		$cfg['enabled'] = !empty($post['enabled']);
 		$cfg['labels'] = [
 			'name' => sanitize_text_field((string) ($post['label_name'] ?? '')),
 			'singular_name' => sanitize_text_field((string) ($post['label_singular'] ?? '')),
@@ -316,12 +329,19 @@ function bl_events_apply_settings_tab(array $cfg, string $tab, array $post): arr
 			'menu_position' => (int) ($post['menu_position'] ?? 5),
 			'page_title_toggle' => !empty($post['page_title_toggle']),
 		];
+		$archive = isset($cfg['archive']) && is_array($cfg['archive']) ? $cfg['archive'] : [];
+		$archive['slug'] = sanitize_title((string) ($post['archive_slug'] ?? ($archive['slug'] ?? '')));
+		$cfg['archive'] = $archive;
 	}
 
 	if ($tab === 'archive') {
+		$existing_slug = '';
+		if (isset($cfg['archive']) && is_array($cfg['archive']) && isset($cfg['archive']['slug'])) {
+			$existing_slug = sanitize_title((string) $cfg['archive']['slug']);
+		}
 		$cfg['archive'] = [
 			'enabled' => !empty($post['archive_enabled']),
-			'slug' => sanitize_title((string) ($post['archive_slug'] ?? '')),
+			'slug' => $existing_slug,
 			'design' => sanitize_key((string) ($post['archive_design'] ?? 'list')),
 			'category_filter' => !empty($post['archive_category_filter']),
 			'texts' => [
@@ -332,99 +352,26 @@ function bl_events_apply_settings_tab(array $cfg, string $tab, array $post): arr
 	}
 
 	if ($tab === 'statuses') {
+		$decoded = [];
 		if (!empty($post['statuses_config_json']) && is_string($post['statuses_config_json'])) {
 			$decoded = json_decode(wp_unslash($post['statuses_config_json']), true);
-			$cfg['statuses'] = bl_events_sanitize_statuses(is_array($decoded) ? $decoded : []);
-		} else {
-			$ids = isset($post['status_id']) && is_array($post['status_id']) ? $post['status_id'] : [];
-			$labels = isset($post['status_label']) && is_array($post['status_label']) ? $post['status_label'] : [];
-			$colors = isset($post['status_color']) && is_array($post['status_color']) ? $post['status_color'] : [];
-			$statuses = [];
-			foreach ($ids as $i => $id) {
-				$id = sanitize_key((string) $id);
-				if ($id === '') {
-					continue;
-				}
-				$statuses[$id] = [
-					'label' => sanitize_text_field((string) ($labels[$i] ?? $id)),
-					'color' => sanitize_text_field((string) ($colors[$i] ?? '')),
-				];
-			}
-			$cfg['statuses'] = bl_events_sanitize_statuses($statuses);
 		}
+		$cfg['statuses'] = bl_events_sanitize_statuses_config([
+			'enabled' => !empty($post['statuses_enabled']),
+			'items' => is_array($decoded) ? $decoded : [],
+		]);
 	}
 
 	if ($tab === 'meta') {
+		$decoded = [];
 		if (!empty($post['meta_config_json']) && is_string($post['meta_config_json'])) {
 			$decoded = json_decode(wp_unslash($post['meta_config_json']), true);
-			$cfg['meta'] = bl_events_sanitize_meta_config(is_array($decoded) ? $decoded : []);
-		} else {
-			$cfg['meta'] = bl_events_sanitize_meta_config([
-				'title' => sanitize_text_field((string) ($post['meta_title'] ?? '')),
-				'groups' => bl_events_parse_meta_groups_from_post($post),
-			]);
 		}
+		$cfg['meta'] = bl_events_sanitize_meta_config(is_array($decoded) ? $decoded : []);
 		$cfg['meta']['enabled'] = !empty($post['meta_enabled']);
 	}
 
 	return $cfg;
-}
-
-/**
- * Parse metadata groups from settings POST (JSON builder payload preferred).
- *
- * @param array<string, mixed> $post
- * @return array<string, array{title: string, fields: array<string, array<string, mixed>>}>
- */
-function bl_events_parse_meta_groups_from_post(array $post): array
-{
-	if (!empty($post['meta_config_json']) && is_string($post['meta_config_json'])) {
-		$decoded = json_decode(wp_unslash($post['meta_config_json']), true);
-		if (is_array($decoded)) {
-			$sanitized = bl_events_sanitize_meta_config($decoded);
-
-			return $sanitized['groups'];
-		}
-	}
-
-	// Legacy parallel arrays (pre-builder).
-	$group_ids = isset($post['meta_group_id']) && is_array($post['meta_group_id']) ? $post['meta_group_id'] : [];
-	$group_titles = isset($post['meta_group_title']) && is_array($post['meta_group_title']) ? $post['meta_group_title'] : [];
-	$field_group = isset($post['meta_field_group']) && is_array($post['meta_field_group']) ? $post['meta_field_group'] : [];
-	$field_ids = isset($post['meta_field_id']) && is_array($post['meta_field_id']) ? $post['meta_field_id'] : [];
-	$field_labels = isset($post['meta_field_label']) && is_array($post['meta_field_label']) ? $post['meta_field_label'] : [];
-	$field_types = isset($post['meta_field_type']) && is_array($post['meta_field_type']) ? $post['meta_field_type'] : [];
-	$allowed = bl_events_meta_field_types();
-
-	$groups = [];
-	foreach ($group_ids as $i => $gid) {
-		$gid = sanitize_key((string) $gid);
-		if ($gid === '') {
-			continue;
-		}
-		$groups[$gid] = [
-			'title' => sanitize_text_field((string) ($group_titles[$i] ?? $gid)),
-			'fields' => [],
-		];
-	}
-
-	foreach ($field_ids as $i => $fid) {
-		$fid = sanitize_key((string) $fid);
-		$gid = sanitize_key((string) ($field_group[$i] ?? ''));
-		if ($fid === '' || $gid === '' || !isset($groups[$gid])) {
-			continue;
-		}
-		$type = sanitize_key((string) ($field_types[$i] ?? 'text'));
-		if (!in_array($type, $allowed, true)) {
-			$type = 'text';
-		}
-		$groups[$gid]['fields'][$fid] = [
-			'type' => $type,
-			'label' => sanitize_text_field((string) ($field_labels[$i] ?? $fid)),
-		];
-	}
-
-	return $groups;
 }
 
 function bl_events_render_settings_page(): void
@@ -492,7 +439,7 @@ function bl_events_render_settings_page(): void
 
 	echo '<table class="form-table" role="presentation"><tbody>';
 	if ($tab === 'general') {
-		bl_events_settings_general_fields($instance, $cfg);
+		bl_events_settings_general_fields($cfg);
 	} elseif ($tab === 'archive') {
 		bl_events_settings_archive_fields($cfg);
 	} elseif ($tab === 'statuses') {
@@ -525,10 +472,14 @@ function bl_events_settings_render_type_dialogs(string $instance, string $instan
 	echo '<h2 class="bl-events-settings-dialog__title">' . esc_html__('Add event type', 'baselayer-events') . '</h2>';
 	echo '</div>';
 	echo '<div class="bl-events-settings-dialog__body">';
-	echo '<p class="description">' . esc_html__('Creates a new post type with default labels and archive. Each type gets its own categories (separate from Posts). You can rename it after saving.', 'baselayer-events') . '</p>';
-	echo '<p><label for="bl-events-new-slug"><strong>' . esc_html__('Slug', 'baselayer-events') . '</strong></label><br>';
-	echo '<input type="text" class="regular-text" id="bl-events-new-slug" name="new_slug" placeholder="course" pattern="[a-z0-9_\\-]+" required autocomplete="off">';
-	echo '<span class="description">' . esc_html__('Lowercase letters, numbers, hyphens, and underscores. Used as the post type key.', 'baselayer-events') . '</span></p>';
+	echo '<p class="description">' . esc_html__('Create a new event-like post type. Choose the names and public URL visitors will see. Categories are separate from Posts.', 'baselayer-events') . '</p>';
+	echo '<p><label for="bl-events-new-label-name"><strong>' . esc_html__('Plural name', 'baselayer-events') . '</strong></label><br>';
+	echo '<input type="text" class="regular-text" id="bl-events-new-label-name" name="new_label_name" value="" placeholder="' . esc_attr__('Events', 'baselayer-events') . '" required autocomplete="off"></p>';
+	echo '<p><label for="bl-events-new-label-singular"><strong>' . esc_html__('Singular name', 'baselayer-events') . '</strong></label><br>';
+	echo '<input type="text" class="regular-text" id="bl-events-new-label-singular" name="new_label_singular" value="" placeholder="' . esc_attr__('Event', 'baselayer-events') . '" required autocomplete="off"></p>';
+	echo '<p><label for="bl-events-new-url-slug"><strong>' . esc_html__('URL slug', 'baselayer-events') . '</strong></label><br>';
+	echo '<input type="text" class="regular-text" id="bl-events-new-url-slug" name="new_url_slug" value="" placeholder="events" pattern="[a-z0-9\\-]+" required autocomplete="off">';
+	echo '<span class="description">' . esc_html__('Public archive and event permalinks (e.g. /veranstaltungen/).', 'baselayer-events') . '</span></p>';
 	echo '</div>';
 	echo '<div class="bl-events-settings-dialog__footer">';
 	echo '<button type="button" class="button" data-bl-events-dialog-close>' . esc_html__('Cancel', 'baselayer-events') . '</button>';
@@ -569,7 +520,7 @@ function bl_events_settings_render_type_dialogs(string $instance, string $instan
 
 	echo '<script>';
 	echo '(function(){';
-	echo 'document.querySelectorAll("[data-bl-events-dialog-open]").forEach(function(btn){btn.addEventListener("click",function(){var id=btn.getAttribute("data-bl-events-dialog-open");var el=id&&document.getElementById(id);if(el&&typeof el.showModal==="function"){el.showModal();var input=el.querySelector("input[name=new_slug]");if(input){input.focus();}}});});';
+	echo 'document.querySelectorAll("[data-bl-events-dialog-open]").forEach(function(btn){btn.addEventListener("click",function(){var id=btn.getAttribute("data-bl-events-dialog-open");var el=id&&document.getElementById(id);if(el&&typeof el.showModal==="function"){el.showModal();var input=el.querySelector("input[name=new_label_name]");if(input){input.focus();}}});});';
 	echo 'document.querySelectorAll("[data-bl-events-dialog-close]").forEach(function(btn){btn.addEventListener("click",function(){var d=btn.closest("dialog");if(d&&typeof d.close==="function"){d.close();}});});';
 	echo '})();';
 	echo '</script>';
@@ -578,20 +529,19 @@ function bl_events_settings_render_type_dialogs(string $instance, string $instan
 /**
  * @param array<string, mixed> $cfg
  */
-function bl_events_settings_general_fields(string $slug, array $cfg): void
+function bl_events_settings_general_fields(array $cfg): void
 {
 	$labels = is_array($cfg['labels'] ?? null) ? $cfg['labels'] : [];
 	$admin = is_array($cfg['admin'] ?? null) ? $cfg['admin'] : [];
-
-	echo '<tr><th>' . esc_html__('Slug', 'baselayer-events') . '</th><td><code>' . esc_html($slug) . '</code>';
-	echo '<p class="description">' . esc_html__('Immutable after creation (post type key).', 'baselayer-events') . '</p></td></tr>';
-
-	echo '<tr><th>' . esc_html__('Enabled', 'baselayer-events') . '</th><td>';
-	echo '<label><input type="checkbox" name="enabled" value="1" ' . checked(!empty($cfg['enabled']), true, false) . '> ' . esc_html__('Register and show this type', 'baselayer-events') . '</label></td></tr>';
+	$archive = is_array($cfg['archive'] ?? null) ? $cfg['archive'] : [];
 
 	echo '<tr><th>' . esc_html__('Plural name', 'baselayer-events') . '</th><td><input type="text" class="regular-text" name="label_name" value="' . esc_attr((string) ($labels['name'] ?? '')) . '"></td></tr>';
 	echo '<tr><th>' . esc_html__('Singular name', 'baselayer-events') . '</th><td><input type="text" class="regular-text" name="label_singular" value="' . esc_attr((string) ($labels['singular_name'] ?? '')) . '"></td></tr>';
 	echo '<tr><th>' . esc_html__('Menu name', 'baselayer-events') . '</th><td><input type="text" class="regular-text" name="label_menu" value="' . esc_attr((string) ($labels['menu_name'] ?? '')) . '"></td></tr>';
+
+	echo '<tr><th>' . esc_html__('URL slug', 'baselayer-events') . '</th><td>';
+	echo '<input type="text" class="regular-text" name="archive_slug" value="' . esc_attr((string) ($archive['slug'] ?? '')) . '" pattern="[a-z0-9\\-]+" autocomplete="off">';
+	echo '<p class="description">' . esc_html__('Public archive and single permalinks (e.g. veranstaltungen).', 'baselayer-events') . '</p></td></tr>';
 
 	echo '<tr><th>' . esc_html__('Menu position', 'baselayer-events') . '</th><td><input type="number" name="menu_position" value="' . esc_attr((string) ((int) ($admin['menu_position'] ?? 5))) . '" class="small-text"></td></tr>';
 
@@ -677,13 +627,17 @@ function bl_events_settings_archive_fields(array $cfg): void
 	$archive = is_array($cfg['archive'] ?? null) ? $cfg['archive'] : [];
 	$texts = is_array($archive['texts'] ?? null) ? $archive['texts'] : [];
 	echo '<tr><th>' . esc_html__('Archive', 'baselayer-events') . '</th><td><label><input type="checkbox" name="archive_enabled" value="1" ' . checked(!empty($archive['enabled']), true, false) . '> ' . esc_html__('Enable archive', 'baselayer-events') . '</label></td></tr>';
-	echo '<tr><th>' . esc_html__('Archive slug', 'baselayer-events') . '</th><td><input type="text" class="regular-text" name="archive_slug" value="' . esc_attr((string) ($archive['slug'] ?? '')) . '"></td></tr>';
+	$url_slug = (string) ($archive['slug'] ?? '');
+	echo '<tr><th>' . esc_html__('URL slug', 'baselayer-events') . '</th><td><code>' . esc_html($url_slug !== '' ? $url_slug : '—') . '</code>';
+	echo '<p class="description">' . esc_html__('Edit the public URL slug under General.', 'baselayer-events') . '</p></td></tr>';
 	echo '<tr><th>' . esc_html__('Design', 'baselayer-events') . '</th><td><select name="archive_design">';
 	foreach (['list' => __('List', 'baselayer-events'), 'grid' => __('Grid', 'baselayer-events')] as $k => $lab) {
 		echo '<option value="' . esc_attr($k) . '" ' . selected(($archive['design'] ?? 'list') === $k, true, false) . '>' . esc_html($lab) . '</option>';
 	}
 	echo '</select></td></tr>';
-	echo '<tr><th>' . esc_html__('Category filter', 'baselayer-events') . '</th><td><label><input type="checkbox" name="archive_category_filter" value="1" ' . checked(!empty($archive['category_filter']), true, false) . '> ' . esc_html__('Show category filter on archive', 'baselayer-events') . '</label></td></tr>';
+	echo '<tr><th>' . esc_html__('Category filter', 'baselayer-events') . '</th><td>';
+	echo '<label><input type="checkbox" name="archive_category_filter" value="1" ' . checked(!empty($archive['category_filter']), true, false) . '> ' . esc_html__('Show category filter on archive', 'baselayer-events') . '</label>';
+	echo '<p class="description">' . esc_html__('Only shown when at least one category exists.', 'baselayer-events') . '</p></td></tr>';
 	echo '<tr><th>' . esc_html__('Heading', 'baselayer-events') . '</th><td><input type="text" class="regular-text" name="archive_heading" value="' . esc_attr((string) ($texts['heading'] ?? '')) . '"></td></tr>';
 	echo '<tr><th>' . esc_html__('Empty text', 'baselayer-events') . '</th><td><input type="text" class="regular-text" name="archive_empty" value="' . esc_attr((string) ($texts['empty'] ?? '')) . '"></td></tr>';
 }
@@ -694,13 +648,20 @@ function bl_events_settings_archive_fields(array $cfg): void
 function bl_events_settings_statuses_fields(array $cfg): void
 {
 	$statuses = is_array($cfg['statuses'] ?? null) ? $cfg['statuses'] : [];
-	$json = wp_json_encode($statuses, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+	$enabled = !array_key_exists('enabled', $statuses) || !empty($statuses['enabled']);
+	$items = isset($statuses['items']) && is_array($statuses['items']) ? $statuses['items'] : [];
+	$json = wp_json_encode($items, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 	if (!is_string($json)) {
 		$json = '{}';
 	}
 
+	echo '<tr><th>' . esc_html__('Enable statuses', 'baselayer-events') . '</th><td>';
+	echo '<label><input type="checkbox" name="statuses_enabled" value="1" ' . checked($enabled, true, false) . '> ' . esc_html__('Show the status panel in the editor and on the front end', 'baselayer-events') . '</label>';
+	echo '<p class="description">' . esc_html__('When off, saved status definitions are kept but the panel is hidden.', 'baselayer-events') . '</p>';
+	echo '</td></tr>';
+
 	echo '<tr><td colspan="2">';
-	echo '<p class="description">' . esc_html__('Statuses shown in the event editor (in addition to None and Custom). Drag to reorder. Choose a theme color token or a custom hex color.', 'baselayer-events') . '</p>';
+	echo '<p class="description">' . esc_html__('Statuses shown in the event editor (in addition to None). Drag to reorder. Choose a theme color token or a custom hex color.', 'baselayer-events') . '</p>';
 	echo '<div data-bl-events-statuses-builder class="bl-events-statuses-builder"></div>';
 	echo '<input type="hidden" name="statuses_config_json" id="bl-events-statuses-config-json" value="' . esc_attr($json) . '">';
 	echo '</td></tr>';

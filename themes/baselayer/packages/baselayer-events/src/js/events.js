@@ -36,9 +36,7 @@
   const META_DETACHED = '_bl_event_series_detached';
   const META_EXDATES = '_bl_event_exdates';
   const META_STATUS = '_bl_event_status';
-  const META_STATUS_LABEL = '_bl_event_status_label';
   const META_STATUS_INFO = '_bl_event_status_info';
-  const META_STATUS_COLOR = '_bl_event_status_color';
 
   const WEEKDAYS = ['mo', 'tu', 'we', 'th', 'fr', 'sa', 'su'];
 
@@ -594,27 +592,16 @@
     const rule = parseRule(recurrenceRaw);
     const hasStartDate = !!(startDate && /^\d{4}-\d{2}-\d{2}$/.test(startDate));
     const isSeriesMaster = !isOccurrence && !!rule;
-    const showStatus = !isSeriesMaster;
-    const statusKey = (meta && meta[META_STATUS]) || 'active';
-    const statusCustomLabel = (meta && meta[META_STATUS_LABEL]) || '';
-    const statusInfo = (meta && meta[META_STATUS_INFO]) || '';
-    const statusColorDefault = L.statusColorDefault || 'info';
-    const statusColorToken = (meta && meta[META_STATUS_COLOR]) || statusColorDefault;
-    const statusColorPresets = Array.isArray(L.statusColorPresets) ? L.statusColorPresets : [];
-    const statusColorOptions = statusColorPresets.map(function (opt) {
-      return { label: opt.label, value: opt.key };
-    });
-    const statusColorHex = (function () {
-      const map = L.statusColorHex && typeof L.statusColorHex === 'object' ? L.statusColorHex : {};
-      const fallback = map[statusColorToken] || map[statusColorDefault] || '#366cd9';
-      if (typeof document === 'undefined' || !document.documentElement) {
-        return fallback;
-      }
-      const raw = getComputedStyle(document.documentElement)
-        .getPropertyValue('--bl-color-' + statusColorToken)
-        .trim();
-      return raw || fallback;
+    const showStatus = (function () {
+      const enabledMap = L.statusesEnabledByType;
+      const enabled =
+        enabledMap && typeof enabledMap === 'object' && Object.prototype.hasOwnProperty.call(enabledMap, postType)
+          ? !!enabledMap[postType]
+          : L.statusesEnabled !== false;
+      return enabled && !isSeriesMaster;
     })();
+    const statusKey = (meta && meta[META_STATUS]) || 'active';
+    const statusInfo = (meta && meta[META_STATUS_INFO]) || '';
     const statusOptions = (function () {
       const raw =
         (L.statusesByType && L.statusesByType[postType]) || L.statuses || [];
@@ -915,15 +902,8 @@
                 value: statusKey || 'active',
                 options: statusOptions.length
                   ? statusOptions
-                  : [
-                      { label: 'None', value: 'active' },
-                      { label: '────────', value: '__sep__', disabled: true },
-                      { label: 'Custom', value: 'custom' },
-                    ],
+                  : [{ label: 'None', value: 'active' }],
                 onChange: function (value) {
-                  if (value === '__sep__') {
-                    return;
-                  }
                   const next = { [META_STATUS]: value || 'active' };
                   if (!value || value === 'active') {
                     next[META_STATUS_INFO] = '';
@@ -931,35 +911,6 @@
                   patch(next);
                 },
               }),
-              statusKey === 'custom'
-                ? el(TextControl, {
-                    label: L.statusCustomLabel || 'Status label',
-                    value: statusCustomLabel,
-                    onChange: function (v) {
-                      patch({ [META_STATUS_LABEL]: v });
-                    },
-                  })
-                : null,
-              statusKey === 'custom' && statusColorOptions.length
-                ? el(
-                    'div',
-                    { key: 'bl-event-status-color', className: 'bl-event-status-color' },
-                    el(SelectControl, {
-                      label: L.statusColorLabel || 'Color',
-                      value: statusColorToken,
-                      options: statusColorOptions,
-                      onChange: function (value) {
-                        patch({ [META_STATUS_COLOR]: value || statusColorDefault });
-                      },
-                    }),
-                    el('span', {
-                      className: 'bl-event-status-color__swatch',
-                      style: { backgroundColor: statusColorHex },
-                      title: statusColorHex,
-                      'aria-hidden': true,
-                    }),
-                  )
-                : null,
               statusKey && statusKey !== 'active'
                 ? TextareaControl
                   ? el(TextareaControl, {

@@ -26,8 +26,40 @@ function bl_events_default_instances(): array
 	$def['type'] = 'event';
 
 	return [
-		'event' => $def,
+		bl_events_default_post_type_key() => $def,
 	];
+}
+
+/**
+ * Default CPT key for the seeded Event type (namespaced; not the public URL slug).
+ */
+function bl_events_default_post_type_key(): string
+{
+	return 'bl_events';
+}
+
+/**
+ * Build a unique internal CPT key from a label or URL stem (prefixed with bl_, max 20 chars).
+ */
+function bl_events_make_internal_key(string $stem): string
+{
+	$stem = sanitize_key($stem);
+	$stem = preg_replace('/^bl_+/', '', $stem) ?: '';
+	if ($stem === '' || $stem === 'event' || $stem === 'events') {
+		return bl_events_unique_slug(bl_events_default_post_type_key());
+	}
+
+	// Prefer bl_{stem}; trim so total length stays within WP’s 20-char CPT limit.
+	$max_stem = 20 - 3; // "bl_"
+	if (strlen($stem) > $max_stem) {
+		$stem = substr($stem, 0, $max_stem);
+		$stem = rtrim($stem, '_-');
+	}
+	if ($stem === '') {
+		return bl_events_unique_slug(bl_events_default_post_type_key());
+	}
+
+	return bl_events_unique_slug('bl_' . $stem);
 }
 
 /**
@@ -42,82 +74,6 @@ function bl_events_maybe_seed_instances(): void
 
 	update_option(BL_EVENTS_INSTANCES_OPTION, bl_events_sanitize_instances(bl_events_default_instances()), false);
 	update_option('bl_events_flush_rewrite', 1, false);
-	update_option('bl_events_statuses_list_migrated', 1, false);
-}
-
-/**
- * Default editable statuses seeded for new types (and once for existing installs).
- *
- * @return array<string, array{label: string, color: string}>
- */
-function bl_events_default_list_statuses(): array
-{
-	return [
-		'cancelled' => [
-			'label' => 'Cancelled',
-			'color' => 'error',
-		],
-		'postponed' => [
-			'label' => 'Postponed',
-			'color' => 'warning',
-		],
-	];
-}
-
-/**
- * One-time: move former built-in Cancelled/Postponed into each type’s editable list.
- */
-function bl_events_maybe_migrate_list_statuses(): void
-{
-	if (get_option('bl_events_statuses_list_migrated')) {
-		return;
-	}
-
-	$raw = get_option(BL_EVENTS_INSTANCES_OPTION, null);
-	if (!is_array($raw) || $raw === []) {
-		update_option('bl_events_statuses_list_migrated', 1, false);
-
-		return;
-	}
-
-	$defaults = bl_events_default_list_statuses();
-	$changed = false;
-	foreach ($raw as $slug => $cfg) {
-		if (!is_string($slug) || !is_array($cfg)) {
-			continue;
-		}
-		$statuses = isset($cfg['statuses']) && is_array($cfg['statuses']) ? $cfg['statuses'] : [];
-		$merged = [];
-		foreach ($defaults as $key => $row) {
-			if (!isset($statuses[$key])) {
-				$merged[$key] = $row;
-				$changed = true;
-			}
-		}
-		foreach ($statuses as $key => $row) {
-			$merged[$key] = $row;
-		}
-		$raw[$slug]['statuses'] = $merged;
-	}
-
-	if ($changed) {
-		update_option(BL_EVENTS_INSTANCES_OPTION, bl_events_sanitize_instances($raw), false);
-		bl_events_reset_instances_cache();
-	}
-	update_option('bl_events_statuses_list_migrated', 1, false);
-}
-
-/**
- * One-time rewrite flush after introducing per-type category taxonomies.
- */
-function bl_events_maybe_migrate_category_taxonomies(): void
-{
-	if (get_option('bl_events_category_tax_v1')) {
-		return;
-	}
-
-	update_option('bl_events_flush_rewrite', 1, false);
-	update_option('bl_events_category_tax_v1', 1, false);
 }
 
 /**
@@ -134,8 +90,6 @@ function bl_events_get_instances(bool $enabled_only = false): array
 		$cache_bust = $bust;
 		$cache_enabled = null;
 		bl_events_maybe_seed_instances();
-		bl_events_maybe_migrate_list_statuses();
-		bl_events_maybe_migrate_category_taxonomies();
 		$raw = get_option(BL_EVENTS_INSTANCES_OPTION, []);
 		if (!is_array($raw) || $raw === []) {
 			$raw = bl_events_default_instances();
@@ -300,7 +254,7 @@ function bl_events_sanitize_instance(array $cfg, string $slug = ''): array
 	$defaults = bl_events_default_instance_definition();
 	$cfg = array_merge($defaults, $cfg);
 	$cfg['type'] = 'event';
-	$cfg['enabled'] = !array_key_exists('enabled', $cfg) || !empty($cfg['enabled']);
+	$cfg['enabled'] = true;
 	$cfg['public'] = true;
 	$cfg['hierarchical'] = false;
 	$cfg['wp_categories'] = false;
@@ -320,7 +274,7 @@ function bl_events_sanitize_instance(array $cfg, string $slug = ''): array
 
 	$cfg['archive'] = bl_events_sanitize_archive($cfg['archive'] ?? []);
 	$cfg['admin'] = bl_events_sanitize_admin($cfg['admin'] ?? []);
-	$cfg['statuses'] = bl_events_sanitize_statuses($cfg['statuses'] ?? []);
+	$cfg['statuses'] = bl_events_sanitize_statuses_config($cfg['statuses'] ?? []);
 	$cfg['meta'] = bl_events_sanitize_meta_config($cfg['meta'] ?? []);
 	$cfg['taxonomies'] = $slug !== ''
 		? bl_events_build_category_taxonomies($slug, $cfg)
@@ -330,7 +284,7 @@ function bl_events_sanitize_instance(array $cfg, string $slug = ''): array
 }
 
 /**
- * Per-type category taxonomy slug (e.g. event → event_category).
+ * Per-type category taxonomy slug (e.g. bl_events → bl_events_category).
  */
 function bl_events_category_taxonomy(string $post_type): string
 {
@@ -482,6 +436,8 @@ function bl_events_sanitize_admin($raw): array
 }
 
 /**
+ * Sanitize the status items map (id => label/color).
+ *
  * @param mixed $raw
  * @return array<string, array{label: string, color: string}>
  */
@@ -490,7 +446,7 @@ function bl_events_sanitize_statuses($raw): array
 	if (!is_array($raw)) {
 		return [];
 	}
-	$reserved = ['active', 'custom'];
+	$reserved = ['active', 'custom', 'enabled', 'items'];
 	$out = [];
 	foreach ($raw as $key => $row) {
 		$key = sanitize_key((string) $key);
@@ -509,6 +465,31 @@ function bl_events_sanitize_statuses($raw): array
 	}
 
 	return $out;
+}
+
+/**
+ * Sanitize statuses config (`enabled` + `items`), matching metadata shape.
+ *
+ * @param mixed $raw
+ * @return array{enabled: bool, items: array<string, array{label: string, color: string}>}
+ */
+function bl_events_sanitize_statuses_config($raw): array
+{
+	if (!is_array($raw)) {
+		return ['enabled' => true, 'items' => []];
+	}
+
+	$enabled = array_key_exists('enabled', $raw) ? !empty($raw['enabled']) : true;
+	if (isset($raw['items']) && is_array($raw['items'])) {
+		$items = bl_events_sanitize_statuses($raw['items']);
+	} else {
+		$items = bl_events_sanitize_statuses($raw);
+	}
+
+	return [
+		'enabled' => $enabled,
+		'items' => $items,
+	];
 }
 
 /**
@@ -613,17 +594,29 @@ function bl_events_unique_slug(string $base): string
 {
 	$base = sanitize_key($base);
 	if ($base === '') {
-		$base = 'event';
+		$base = bl_events_default_post_type_key();
+	}
+	// CPT keys must be ≤ 20 characters (WordPress limit).
+	if (strlen($base) > 20) {
+		$base = substr($base, 0, 20);
+		$base = rtrim($base, '_-');
+		if ($base === '') {
+			$base = bl_events_default_post_type_key();
+		}
 	}
 	$existing = bl_events_get_instances(false);
 	$reserved = bl_events_reserved_post_types();
 	$candidate = $base;
 	$i = 2;
 	while (isset($existing[$candidate]) || in_array($candidate, $reserved, true) || post_type_exists($candidate)) {
-		$candidate = $base . '_' . $i;
+		$suffix = '_' . $i;
+		$trim = 20 - strlen($suffix);
+		$stem = $trim > 0 ? substr($base, 0, $trim) : bl_events_default_post_type_key();
+		$stem = rtrim($stem, '_-');
+		$candidate = ($stem !== '' ? $stem : bl_events_default_post_type_key()) . $suffix;
 		$i++;
 		if ($i > 100) {
-			$candidate = $base . '_' . wp_generate_password(4, false, false);
+			$candidate = 'bl_e_' . wp_generate_password(4, false, false);
 			break;
 		}
 	}

@@ -9,7 +9,7 @@ defined('ABSPATH') || exit;
 const BL_EVENT_META_METADATA = '_bl_event_metadata';
 
 /**
- * Event metadata config for a CPT (`meta` key in content-types config).
+ * Event metadata config for a CPT (`meta` key in instance config).
  *
  * @return array{title: string, groups: array<string, array{title: string, fields: array<string, array{type: string, label: string}>}>}
  */
@@ -28,8 +28,7 @@ function bl_cpt_event_meta_config(?string $post_type = null): array
 		return $empty;
 	}
 
-	// Missing `enabled` means on (legacy configs).
-	if (array_key_exists('enabled', $cfg['meta']) && empty($cfg['meta']['enabled'])) {
+	if (empty($cfg['meta']['enabled'])) {
 		return $empty;
 	}
 
@@ -52,9 +51,7 @@ function bl_cpt_event_meta_config(?string $post_type = null): array
 				continue;
 			}
 			$type = isset($field['type']) ? sanitize_key((string) $field['type']) : 'text';
-			$allowed = function_exists('bl_events_meta_field_types')
-				? bl_events_meta_field_types()
-				: ['text', 'textarea', 'email', 'url'];
+			$allowed = bl_events_meta_field_types();
 			if (!in_array($type, $allowed, true)) {
 				$type = 'text';
 			}

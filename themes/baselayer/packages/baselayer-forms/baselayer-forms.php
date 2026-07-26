@@ -44,7 +44,33 @@ function bl_forms_path(string $relative = ''): string
 }
 
 /**
- * Public URL for the package root (works as plugin or theme-loaded package).
+ * Whether this package is loaded as a WP plugin (copied or symlinked under wp-content/plugins).
+ * Uses plugin_basename() so realpath outside WP_PLUGIN_DIR still counts when WP registered the symlink.
+ */
+function bl_forms_loaded_as_plugin(): bool
+{
+	if (!defined('WP_PLUGIN_DIR') || !function_exists('plugin_basename')) {
+		return false;
+	}
+
+	$basename = plugin_basename(BL_FORMS_FILE);
+	if ($basename === '' || strpos($basename, '.php') === false) {
+		return false;
+	}
+
+	if ($basename[0] === '/' || preg_match('#^[a-zA-Z]:[/\\\\]#', $basename)) {
+		return false;
+	}
+
+	$candidate = wp_normalize_path(trailingslashit(WP_PLUGIN_DIR) . $basename);
+	$real_file = realpath(BL_FORMS_FILE);
+	$real_candidate = realpath($candidate);
+
+	return is_string($real_file) && is_string($real_candidate) && $real_file === $real_candidate;
+}
+
+/**
+ * Public URL for the package root (works as plugin — copy or symlink — or theme-loaded package).
  */
 function bl_forms_base_url(): string
 {
@@ -53,14 +79,13 @@ function bl_forms_base_url(): string
 		return $url;
 	}
 
-	$path = wp_normalize_path(trailingslashit(realpath(BL_FORMS_PATH) ?: BL_FORMS_PATH));
-	$plugin_dir = wp_normalize_path(trailingslashit(realpath(WP_PLUGIN_DIR) ?: WP_PLUGIN_DIR));
-
-	// Installed as a real plugin under wp-content/plugins.
-	if (strpos($path, $plugin_dir) === 0) {
+	// Copy or symlink under wp-content/plugins (plugins_url resolves via $wp_plugin_paths).
+	if (bl_forms_loaded_as_plugin()) {
 		$url = trailingslashit(plugins_url('', BL_FORMS_FILE));
 		return $url;
 	}
+
+	$path = wp_normalize_path(trailingslashit(realpath(BL_FORMS_PATH) ?: BL_FORMS_PATH));
 
 	// Bundled under the active parent theme (…/packages/baselayer-forms/).
 	$theme_dir = get_template_directory();
@@ -123,8 +148,8 @@ function bl_forms_load_textdomain(): void
 		load_textdomain($domain, $mofile);
 	}
 
-	// When installed as a real plugin, also use the standard lookup.
-	if (strpos(wp_normalize_path(BL_FORMS_PATH), wp_normalize_path(WP_PLUGIN_DIR)) === 0) {
+	// When installed as a plugin (copy or symlink), also use the standard lookup.
+	if (bl_forms_loaded_as_plugin()) {
 		load_plugin_textdomain($domain, false, dirname(plugin_basename(BL_FORMS_FILE)) . '/languages');
 	}
 }

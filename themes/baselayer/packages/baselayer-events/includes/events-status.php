@@ -10,11 +10,9 @@ defined('ABSPATH') || exit;
  */
 
 const BL_EVENT_META_STATUS = '_bl_event_status';
-const BL_EVENT_META_STATUS_LABEL = '_bl_event_status_label';
 const BL_EVENT_META_STATUS_INFO = '_bl_event_status_info';
-const BL_EVENT_META_STATUS_COLOR = '_bl_event_status_color';
 
-/** Default custom status color token. */
+/** Default status color token for config presets. */
 const BL_EVENT_STATUS_COLOR_DEFAULT = 'info';
 
 /**
@@ -49,19 +47,17 @@ function bl_event_status_color_token_hex(): array
 		'warning' => '#e97800',
 		'success' => '#28a15a',
 		'accent' => '#8257e5',
-		'cancelled' => '#d1343a',
-		'postponed' => '#e97800',
 	];
 }
 
 /**
- * All CSS modifier tokens (presets + cancelled/postponed aliases).
+ * All CSS modifier tokens (color presets).
  *
  * @return list<string>
  */
 function bl_event_status_css_tokens(): array
 {
-	return array_merge(array_keys(bl_event_status_color_presets()), ['cancelled', 'postponed']);
+	return array_keys(bl_event_status_color_presets());
 }
 
 /**
@@ -76,7 +72,7 @@ function bl_event_sanitize_status_color_token($token): string
 }
 
 /**
- * Whether a string is a known status color token (presets or cancelled/postponed).
+ * Whether a string is a known status color token.
  */
 function bl_event_is_status_color_token(string $token): bool
 {
@@ -123,14 +119,11 @@ function bl_event_parse_status_color_value($raw): array
 	}
 
 	$token = sanitize_key($raw);
-	if (bl_event_is_status_color_token($token)) {
-		// cancelled/postponed are CSS aliases; custom picker uses presets only.
-		if (isset(bl_event_status_color_presets()[$token]) || in_array($token, ['cancelled', 'postponed'], true)) {
-			return [
-				'color_token' => $token,
-				'color' => '',
-			];
-		}
+	if (isset(bl_event_status_color_presets()[$token])) {
+		return [
+			'color_token' => $token,
+			'color' => '',
+		];
 	}
 
 	return [
@@ -141,21 +134,15 @@ function bl_event_parse_status_color_value($raw): array
 
 /**
  * CSS custom property value for a status (var(--bl-color-*) with hex fallback, or hex).
- * Maps cancelled→error, postponed→warning for --bl-color-* (admin / inline).
  */
 function bl_event_status_css_color_value(array $status): string
 {
 	$token = isset($status['color_token']) ? sanitize_key((string) $status['color_token']) : '';
 	if ($token !== '' && bl_event_is_status_color_token($token)) {
-		$map = [
-			'cancelled' => 'error',
-			'postponed' => 'warning',
-		];
-		$css_token = $map[$token] ?? $token;
 		$hexes = bl_event_status_color_token_hex();
-		$fallback = $hexes[$css_token] ?? ($hexes[BL_EVENT_STATUS_COLOR_DEFAULT] ?? '#366cd9');
+		$fallback = $hexes[$token] ?? ($hexes[BL_EVENT_STATUS_COLOR_DEFAULT] ?? '#366cd9');
 
-		return 'var(--bl-color-' . $css_token . ', ' . $fallback . ')';
+		return 'var(--bl-color-' . $token . ', ' . $fallback . ')';
 	}
 
 	$color = isset($status['color']) ? (string) $status['color'] : '';
@@ -165,7 +152,6 @@ function bl_event_status_css_color_value(array $status): string
 
 /**
  * Built-in statuses that are not part of the editable list (None only).
- * Cancelled / Postponed ship as default list entries per event type.
  *
  * @return array<string, array{label: string, color_token: string, color: string}>
  */
@@ -181,21 +167,27 @@ function bl_event_builtin_statuses(): array
 }
 
 /**
- * Custom status definition (always last in the dropdown).
- *
- * @return array{label: string, color_token: string, color: string}
+ * Whether status UI is enabled for an event type.
  */
-function bl_event_custom_status_definition(): array
+function bl_event_statuses_enabled(?string $post_type = null): bool
 {
-	return [
-		'label' => __('Custom', 'baselayer-events'),
-		'color_token' => BL_EVENT_STATUS_COLOR_DEFAULT,
-		'color' => '',
-	];
+	if ($post_type === null || $post_type === '') {
+		$post_type = function_exists('get_post_type') ? (string) get_post_type() : '';
+	}
+	if ($post_type === '' || !bl_is_event_post_type($post_type)) {
+		return false;
+	}
+
+	$cfg = function_exists('bl_events_get_instance') ? bl_events_get_instance($post_type) : null;
+	if (!is_array($cfg) || !isset($cfg['statuses']) || !is_array($cfg['statuses'])) {
+		return true;
+	}
+
+	return !empty($cfg['statuses']['enabled']);
 }
 
 /**
- * Editable statuses from CPT config `statuses` (Cancelled, Postponed, …).
+ * Editable status items from CPT config (Cancelled, Postponed, …).
  *
  * @return array<string, array{label: string, color_token: string, color: string}>
  */
@@ -204,7 +196,7 @@ function bl_event_config_statuses(?string $post_type = null): array
 	if ($post_type === null || $post_type === '') {
 		$post_type = function_exists('get_post_type') ? (string) get_post_type() : '';
 	}
-	if ($post_type === '' || !bl_is_event_post_type($post_type)) {
+	if ($post_type === '' || !bl_is_event_post_type($post_type) || !bl_event_statuses_enabled($post_type)) {
 		return [];
 	}
 
@@ -213,9 +205,13 @@ function bl_event_config_statuses(?string $post_type = null): array
 		return [];
 	}
 
+	$items = isset($cfg['statuses']['items']) && is_array($cfg['statuses']['items'])
+		? $cfg['statuses']['items']
+		: [];
+
 	$reserved = ['active', 'custom'];
 	$out = [];
-	foreach ($cfg['statuses'] as $key => $row) {
+	foreach ($items as $key => $row) {
 		$key = sanitize_key((string) $key);
 		if ($key === '' || in_array($key, $reserved, true) || !is_array($row)) {
 			continue;
@@ -239,7 +235,7 @@ function bl_event_config_statuses(?string $post_type = null): array
 }
 
 /**
- * Full status map for a post type: built-ins + config + custom.
+ * Full status map for a post type: None + configured statuses.
  *
  * @return array<string, array{label: string, color_token: string, color: string}>
  */
@@ -249,13 +245,12 @@ function bl_event_get_status_definitions(?string $post_type = null): array
 	foreach (bl_event_config_statuses($post_type) as $key => $row) {
 		$defs[$key] = $row;
 	}
-	$defs['custom'] = bl_event_custom_status_definition();
 
 	return $defs;
 }
 
 /**
- * Ordered options for the editor select (includes a disabled separator before Custom).
+ * Ordered options for the editor select (None + configured statuses).
  *
  * @return list<array{key: string, label: string, color_token: string, color: string, disabled?: bool}>
  */
@@ -278,20 +273,6 @@ function bl_event_get_status_options(?string $post_type = null): array
 			'color' => $row['color'],
 		];
 	}
-	$options[] = [
-		'key' => '__sep__',
-		'label' => '────────',
-		'color_token' => '',
-		'color' => '',
-		'disabled' => true,
-	];
-	$custom = bl_event_custom_status_definition();
-	$options[] = [
-		'key' => 'custom',
-		'label' => $custom['label'],
-		'color_token' => $custom['color_token'],
-		'color' => $custom['color'],
-	];
 
 	return $options;
 }
@@ -302,6 +283,10 @@ function bl_event_get_status_options(?string $post_type = null): array
 function bl_event_supports_status(int $post_id): bool
 {
 	if ($post_id <= 0 || !bl_is_event_post_type(get_post_type($post_id))) {
+		return false;
+	}
+	$post_type = get_post_type($post_id);
+	if (!is_string($post_type) || !bl_event_statuses_enabled($post_type)) {
 		return false;
 	}
 	if (function_exists('bl_event_is_series_master') && bl_event_is_series_master($post_id)) {
@@ -331,16 +316,6 @@ function bl_event_get_status(int $post_id): ?array
 	$label = $defs[$key]['label'];
 	$color_token = $defs[$key]['color_token'];
 	$color = $defs[$key]['color'];
-	if ($key === 'custom') {
-		$custom_label = get_post_meta($post_id, BL_EVENT_META_STATUS_LABEL, true);
-		if (is_string($custom_label) && trim($custom_label) !== '') {
-			$label = trim($custom_label);
-		}
-		$color_token = bl_event_sanitize_status_color_token(
-			get_post_meta($post_id, BL_EVENT_META_STATUS_COLOR, true)
-		);
-		$color = '';
-	}
 
 	$info = get_post_meta($post_id, BL_EVENT_META_STATUS_INFO, true);
 	$info = is_string($info) ? trim($info) : '';
@@ -370,18 +345,13 @@ function bl_event_should_display_status(int $post_id): bool
 }
 
 /**
- * CSS modifier key for a status (token for custom/config; status key for builtins).
+ * CSS modifier key for a status (color token when set).
  */
 function bl_event_status_css_modifier(array $status): string
 {
 	$token = isset($status['color_token']) ? sanitize_key((string) $status['color_token']) : '';
 	if ($token !== '' && bl_event_is_status_color_token($token)) {
 		return $token;
-	}
-
-	$key = isset($status['key']) ? sanitize_key((string) $status['key']) : '';
-	if (in_array($key, ['cancelled', 'postponed'], true)) {
-		return $key;
 	}
 
 	return '';
@@ -471,16 +441,6 @@ function bl_event_register_status_hooks(): void
 			},
 		]);
 
-		register_post_meta($post_type, BL_EVENT_META_STATUS_LABEL, [
-			'type' => 'string',
-			'single' => true,
-			'show_in_rest' => true,
-			'auth_callback' => $auth,
-			'sanitize_callback' => static function ($value): string {
-				return is_string($value) ? sanitize_text_field($value) : '';
-			},
-		]);
-
 		register_post_meta($post_type, BL_EVENT_META_STATUS_INFO, [
 			'type' => 'string',
 			'single' => true,
@@ -488,17 +448,6 @@ function bl_event_register_status_hooks(): void
 			'auth_callback' => $auth,
 			'sanitize_callback' => static function ($value): string {
 				return is_string($value) ? sanitize_textarea_field($value) : '';
-			},
-		]);
-
-		register_post_meta($post_type, BL_EVENT_META_STATUS_COLOR, [
-			'type' => 'string',
-			'single' => true,
-			'show_in_rest' => true,
-			'default' => BL_EVENT_STATUS_COLOR_DEFAULT,
-			'auth_callback' => $auth,
-			'sanitize_callback' => static function ($value): string {
-				return bl_event_sanitize_status_color_token($value);
 			},
 		]);
 	}
