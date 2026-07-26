@@ -117,9 +117,39 @@ function bl_events_register_cpts_standalone(): void
 
 		register_post_type($post_type, $args);
 
-		if (!empty($cfg['wp_categories'])) {
-			register_taxonomy_for_object_type('category', $post_type);
+		$tax = function_exists('bl_events_category_taxonomy')
+			? bl_events_category_taxonomy($post_type)
+			: '';
+		if ($tax === '') {
+			continue;
 		}
+
+		if (taxonomy_exists($tax)) {
+			register_taxonomy_for_object_type($tax, $post_type);
+		} else {
+			register_taxonomy(
+				$tax,
+				$post_type,
+				bl_events_category_taxonomy_args($post_type, $cfg)
+			);
+		}
+	}
+}
+
+/**
+ * Detach core `category` from event types (legacy shared categories).
+ */
+function bl_events_detach_core_category(): void
+{
+	if (!taxonomy_exists('category')) {
+		return;
+	}
+
+	foreach (array_keys(bl_events_get_instances(false)) as $post_type) {
+		if (!is_string($post_type) || $post_type === '') {
+			continue;
+		}
+		unregister_taxonomy_for_object_type('category', $post_type);
 	}
 }
 
@@ -136,6 +166,7 @@ function bl_events_maybe_flush_rewrites(): void
 }
 
 add_action('init', 'bl_events_register_cpts_standalone', 2);
+add_action('init', 'bl_events_detach_core_category', 12);
 add_action('init', 'bl_events_maybe_flush_rewrites', 99);
 
 if (function_exists('add_filter')) {

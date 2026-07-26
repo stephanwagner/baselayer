@@ -90,6 +90,9 @@ function bl_events_enqueue_editor_assets(): void
 				array_values(bl_event_status_color_presets())
 			)
 			: [],
+		'statusColorHex' => function_exists('bl_event_status_color_token_hex')
+			? bl_event_status_color_token_hex()
+			: [],
 		'statusColorDefault' => defined('BL_EVENT_STATUS_COLOR_DEFAULT')
 			? BL_EVENT_STATUS_COLOR_DEFAULT
 			: 'info',
@@ -347,6 +350,9 @@ function bl_events_enqueue_settings_assets(string $hook): void
 			'defaultColor' => defined('BL_EVENT_STATUS_COLOR_DEFAULT')
 				? BL_EVENT_STATUS_COLOR_DEFAULT
 				: 'info',
+			'statusColorHex' => function_exists('bl_event_status_color_token_hex')
+				? bl_event_status_color_token_hex()
+				: [],
 			'i18n' => [
 				'addStatus' => __('Add status', 'baselayer-events'),
 				'empty' => __('No statuses yet. Add a status to get started.', 'baselayer-events'),

@@ -562,11 +562,13 @@
         return { label: opt.label, value: opt.key };
       });
       const statusColorHex = (function() {
+        const map = L.statusColorHex && typeof L.statusColorHex === "object" ? L.statusColorHex : {};
+        const fallback = map[statusColorToken] || map[statusColorDefault] || "#366cd9";
         if (typeof document === "undefined" || !document.documentElement) {
-          return "";
+          return fallback;
         }
         const raw = getComputedStyle(document.documentElement).getPropertyValue("--bl-color-" + statusColorToken).trim();
-        return raw || "";
+        return raw || fallback;
       })();
       const statusOptions = (function() {
         const raw = L.statusesByType && L.statusesByType[postType] || L.statuses || [];

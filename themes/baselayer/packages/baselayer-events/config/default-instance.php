@@ -19,10 +19,6 @@ return [
 			'label' => 'Postponed',
 			'color' => 'warning',
 		],
-		'sold_out' => [
-			'label' => 'Sold Out',
-			'color' => 'warning',
-		],
 	],
 	'meta' => [
 		'enabled' => true,
@@ -91,7 +87,7 @@ return [
 		'author',
 	],
 	'taxonomies' => [],
-	'wp_categories' => true,
+	'wp_categories' => false,
 	'wp_tags' => false,
 	'archive' => [
 		'enabled' => true,

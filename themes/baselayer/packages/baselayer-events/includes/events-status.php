@@ -19,7 +19,7 @@ const BL_EVENT_STATUS_COLOR_DEFAULT = 'info';
 
 /**
  * Theme status color tokens for Custom status (and config `color` values).
- * Actual colors come from CSS --bl-color-{token} (src/scss/_config.scss).
+ * Actual colors come from CSS --bl-color-{token}; hex map is the standalone fallback.
  *
  * @return array<string, string> token => label
  */
@@ -32,6 +32,25 @@ function bl_event_status_color_presets(): array
 		'warning' => __('Warning', 'baselayer-events'),
 		'success' => __('Success', 'baselayer-events'),
 		'accent' => __('Accent', 'baselayer-events'),
+	];
+}
+
+/**
+ * Hex fallbacks for status color tokens (match theme _config.scss; used without BaseLayer).
+ *
+ * @return array<string, string> token => #rrggbb
+ */
+function bl_event_status_color_token_hex(): array
+{
+	return [
+		'neutral' => '#6f7882',
+		'info' => '#366cd9',
+		'error' => '#d1343a',
+		'warning' => '#e97800',
+		'success' => '#28a15a',
+		'accent' => '#8257e5',
+		'cancelled' => '#d1343a',
+		'postponed' => '#e97800',
 	];
 }
 
@@ -121,7 +140,7 @@ function bl_event_parse_status_color_value($raw): array
 }
 
 /**
- * CSS custom property value for a status (var(--bl-color-*) or hex).
+ * CSS custom property value for a status (var(--bl-color-*) with hex fallback, or hex).
  * Maps cancelled→error, postponed→warning for --bl-color-* (admin / inline).
  */
 function bl_event_status_css_color_value(array $status): string
@@ -133,8 +152,10 @@ function bl_event_status_css_color_value(array $status): string
 			'postponed' => 'warning',
 		];
 		$css_token = $map[$token] ?? $token;
+		$hexes = bl_event_status_color_token_hex();
+		$fallback = $hexes[$css_token] ?? ($hexes[BL_EVENT_STATUS_COLOR_DEFAULT] ?? '#366cd9');
 
-		return 'var(--bl-color-' . $css_token . ')';
+		return 'var(--bl-color-' . $css_token . ', ' . $fallback . ')';
 	}
 
 	$color = isset($status['color']) ? (string) $status['color'] : '';
@@ -174,7 +195,7 @@ function bl_event_custom_status_definition(): array
 }
 
 /**
- * Editable statuses from CPT config `statuses` (Cancelled, Postponed, Sold Out, …).
+ * Editable statuses from CPT config `statuses` (Cancelled, Postponed, …).
  *
  * @return array<string, array{label: string, color_token: string, color: string}>
  */

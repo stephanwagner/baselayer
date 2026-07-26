@@ -108,6 +108,19 @@ function bl_events_maybe_migrate_list_statuses(): void
 }
 
 /**
+ * One-time rewrite flush after introducing per-type category taxonomies.
+ */
+function bl_events_maybe_migrate_category_taxonomies(): void
+{
+	if (get_option('bl_events_category_tax_v1')) {
+		return;
+	}
+
+	update_option('bl_events_flush_rewrite', 1, false);
+	update_option('bl_events_category_tax_v1', 1, false);
+}
+
+/**
  * @return array<string, array<string, mixed>>
  */
 function bl_events_get_instances(bool $enabled_only = false): array
@@ -122,6 +135,7 @@ function bl_events_get_instances(bool $enabled_only = false): array
 		$cache_enabled = null;
 		bl_events_maybe_seed_instances();
 		bl_events_maybe_migrate_list_statuses();
+		bl_events_maybe_migrate_category_taxonomies();
 		$raw = get_option(BL_EVENTS_INSTANCES_OPTION, []);
 		if (!is_array($raw) || $raw === []) {
 			$raw = bl_events_default_instances();
@@ -289,7 +303,7 @@ function bl_events_sanitize_instance(array $cfg, string $slug = ''): array
 	$cfg['enabled'] = !array_key_exists('enabled', $cfg) || !empty($cfg['enabled']);
 	$cfg['public'] = true;
 	$cfg['hierarchical'] = false;
-	$cfg['wp_categories'] = true;
+	$cfg['wp_categories'] = false;
 	$cfg['wp_tags'] = false;
 
 	$labels = isset($cfg['labels']) && is_array($cfg['labels']) ? $cfg['labels'] : [];
@@ -304,13 +318,105 @@ function bl_events_sanitize_instance(array $cfg, string $slug = ''): array
 
 	$cfg['supports'] = bl_events_forced_supports();
 
-	$cfg['taxonomies'] = [];
 	$cfg['archive'] = bl_events_sanitize_archive($cfg['archive'] ?? []);
 	$cfg['admin'] = bl_events_sanitize_admin($cfg['admin'] ?? []);
 	$cfg['statuses'] = bl_events_sanitize_statuses($cfg['statuses'] ?? []);
 	$cfg['meta'] = bl_events_sanitize_meta_config($cfg['meta'] ?? []);
+	$cfg['taxonomies'] = $slug !== ''
+		? bl_events_build_category_taxonomies($slug, $cfg)
+		: [];
 
 	return $cfg;
+}
+
+/**
+ * Per-type category taxonomy slug (e.g. event → event_category).
+ */
+function bl_events_category_taxonomy(string $post_type): string
+{
+	$post_type = sanitize_key($post_type);
+
+	return $post_type !== '' ? $post_type . '_category' : '';
+}
+
+/**
+ * Taxonomy config map for one event type (theme + instance storage).
+ *
+ * @param array<string, mixed> $cfg Sanitized instance (needs archive).
+ * @return array<string, array<string, mixed>>
+ */
+function bl_events_build_category_taxonomies(string $post_type, array $cfg): array
+{
+	$tax = bl_events_category_taxonomy($post_type);
+	if ($tax === '') {
+		return [];
+	}
+
+	$archive = isset($cfg['archive']) && is_array($cfg['archive']) ? $cfg['archive'] : [];
+	$archive_slug = !empty($archive['slug'])
+		? sanitize_title((string) $archive['slug'])
+		: sanitize_title($post_type);
+	if ($archive_slug === '') {
+		$archive_slug = $post_type;
+	}
+
+	return [
+		$tax => [
+			'label' => 'Categories',
+			'singular_label' => 'Category',
+			'url' => $archive_slug . '-category',
+			'hierarchical' => true,
+			'show_admin_column' => true,
+			'show_in_rest' => true,
+			'public' => true,
+			'show_ui' => true,
+		],
+	];
+}
+
+/**
+ * Args for register_taxonomy() (standalone plugin path).
+ *
+ * @param array<string, mixed> $cfg
+ * @return array<string, mixed>
+ */
+function bl_events_category_taxonomy_args(string $post_type, array $cfg): array
+{
+	$taxonomies = bl_events_build_category_taxonomies($post_type, $cfg);
+	$tax = bl_events_category_taxonomy($post_type);
+	$row = $taxonomies[$tax] ?? [];
+	$url = isset($row['url']) ? sanitize_title((string) $row['url']) : ($post_type . '-category');
+
+	$label = __('Categories', 'baselayer-events');
+	$singular = __('Category', 'baselayer-events');
+
+	return [
+		'labels' => [
+			'name' => $label,
+			'singular_name' => $singular,
+			'menu_name' => $label,
+			'search_items' => __('Search categories', 'baselayer-events'),
+			'all_items' => __('All categories', 'baselayer-events'),
+			'parent_item' => __('Parent category', 'baselayer-events'),
+			'parent_item_colon' => __('Parent category:', 'baselayer-events'),
+			'edit_item' => __('Edit category', 'baselayer-events'),
+			'view_item' => __('View category', 'baselayer-events'),
+			'update_item' => __('Update category', 'baselayer-events'),
+			'add_new_item' => __('Add new category', 'baselayer-events'),
+			'new_item_name' => __('New category name', 'baselayer-events'),
+			'not_found' => __('No categories found.', 'baselayer-events'),
+			'no_terms' => __('No categories', 'baselayer-events'),
+			'filter_by_item' => __('Filter by category', 'baselayer-events'),
+		],
+		'public' => true,
+		'hierarchical' => true,
+		'show_ui' => true,
+		'show_admin_column' => true,
+		'show_in_rest' => true,
+		'show_in_nav_menus' => true,
+		'rewrite' => ['slug' => $url],
+		'query_var' => true,
+	];
 }
 
 /**
@@ -321,7 +427,7 @@ function bl_events_sanitize_taxonomies($raw): array
 {
 	unset($raw);
 
-	// Custom taxonomies are not supported for event types; use core categories.
+	// Built in bl_events_sanitize_instance via bl_events_build_category_taxonomies().
 	return [];
 }
 

@@ -258,6 +258,21 @@ input[type=search].bl-icon-picker-modal__search {
   background: rgba(34, 113, 177, 0.08);
 }
 
+:root {
+  --bl-color-neutral: #6f7882;
+  --bl-color-neutral-bg: #eef0f2;
+  --bl-color-info: #366cd9;
+  --bl-color-info-bg: #e8f0fc;
+  --bl-color-error: #d1343a;
+  --bl-color-error-bg: #fceeef;
+  --bl-color-warning: #e97800;
+  --bl-color-warning-bg: #fff1e0;
+  --bl-color-success: #28a15a;
+  --bl-color-success-bg: #e6f6ec;
+  --bl-color-accent: #8257e5;
+  --bl-color-accent-bg: #f1ebfc;
+}
+
 .bl-event-occurrences-modal-open {
   overflow: hidden;
 }
@@ -378,8 +393,8 @@ input[type=search].bl-icon-picker-modal__search {
 }
 
 .bl-event-occurrences-modal__badge--status {
-  background: color-mix(in srgb, var(--bl-status-color, var(--bl-color-info)) 16%, #fff);
-  color: var(--bl-status-color, var(--bl-color-info));
+  background: color-mix(in srgb, var(--bl-status-color, var(--bl-color-info, #366cd9)) 16%, #fff);
+  color: var(--bl-status-color, var(--bl-color-info, #366cd9));
 }
 
 .bl-event-occurrences-modal__actions {

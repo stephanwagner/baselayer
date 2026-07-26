@@ -372,10 +372,21 @@ function bootStatusesBuilder() {
 
   const isHex = (value) => /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(String(value || '').trim());
 
+  const tokenHex = (typeof cfg.statusColorHex === 'object' && cfg.statusColorHex) || {
+    neutral: '#6f7882',
+    info: '#366cd9',
+    error: '#d1343a',
+    warning: '#e97800',
+    success: '#28a15a',
+    accent: '#8257e5',
+  };
+
+  const hexForToken = (token) => tokenHex[token] || tokenHex[defaultToken] || '#366cd9';
+
   const normalizeHex = (value) => {
     const v = String(value || '').trim();
     if (!isHex(v)) {
-      return '#2271b1';
+      return hexForToken(defaultToken);
     }
     if (v.length === 4) {
       return (
@@ -398,10 +409,11 @@ function bootStatusesBuilder() {
     }
     const token = color || defaultToken;
     const known = presets.some((p) => p.key === token);
+    const mode = known ? token : defaultToken;
     return {
-      mode: known ? token : defaultToken,
-      token: known ? token : defaultToken,
-      hex: '#2271b1',
+      mode,
+      token: mode,
+      hex: hexForToken(mode),
     };
   };
 
@@ -432,7 +444,7 @@ function bootStatusesBuilder() {
       const mode = colorSelect ? colorSelect.value : defaultToken;
       let color = defaultToken;
       if (mode === CUSTOM) {
-        color = normalizeHex(hexInput ? hexInput.value : '#2271b1');
+        color = normalizeHex(hexInput ? hexInput.value : hexForToken(defaultToken));
       } else if (mode) {
         color = mode;
       }
@@ -458,7 +470,7 @@ function bootStatusesBuilder() {
     } else {
       colorPreview.dataset.token = parsed.mode;
       colorPreview.classList.add('bl-events-statuses-builder__swatch--token');
-      colorPreview.style.setProperty('--bl-status-swatch', 'var(--bl-color-' + parsed.mode + ', #2271b1)');
+      colorPreview.style.setProperty('--bl-status-swatch', 'var(--bl-color-' + parsed.mode + ', ' + hexForToken(parsed.mode) + ')');
       colorPreview.style.backgroundColor = 'var(--bl-status-swatch)';
     }
 
@@ -523,7 +535,7 @@ function bootStatusesBuilder() {
       type: 'text',
       className: 'regular-text bl-events-statuses-builder__color-hex',
       value: parsed.hex,
-      placeholder: '#2271b1',
+      placeholder: hexForToken(defaultToken),
     });
     const customWrap = el(
       'div',
@@ -570,7 +582,7 @@ function bootStatusesBuilder() {
         delete colorPreview.dataset.token;
       } else {
         colorPreview.classList.add('bl-events-statuses-builder__swatch--token');
-        colorPreview.style.setProperty('--bl-status-swatch', 'var(--bl-color-' + mode + ', #2271b1)');
+        colorPreview.style.setProperty('--bl-status-swatch', 'var(--bl-color-' + mode + ', ' + hexForToken(mode) + ')');
         colorPreview.style.backgroundColor = 'var(--bl-status-swatch)';
         colorPreview.title = mode;
         colorPreview.dataset.token = mode;

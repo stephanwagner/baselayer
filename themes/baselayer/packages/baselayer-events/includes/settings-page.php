@@ -525,7 +525,7 @@ function bl_events_settings_render_type_dialogs(string $instance, string $instan
 	echo '<h2 class="bl-events-settings-dialog__title">' . esc_html__('Add event type', 'baselayer-events') . '</h2>';
 	echo '</div>';
 	echo '<div class="bl-events-settings-dialog__body">';
-	echo '<p class="description">' . esc_html__('Creates a new post type with default labels and archive. Uses WordPress categories. You can rename it after saving.', 'baselayer-events') . '</p>';
+	echo '<p class="description">' . esc_html__('Creates a new post type with default labels and archive. Each type gets its own categories (separate from Posts). You can rename it after saving.', 'baselayer-events') . '</p>';
 	echo '<p><label for="bl-events-new-slug"><strong>' . esc_html__('Slug', 'baselayer-events') . '</strong></label><br>';
 	echo '<input type="text" class="regular-text" id="bl-events-new-slug" name="new_slug" placeholder="course" pattern="[a-z0-9_\\-]+" required autocomplete="off">';
 	echo '<span class="description">' . esc_html__('Lowercase letters, numbers, hyphens, and underscores. Used as the post type key.', 'baselayer-events') . '</span></p>';

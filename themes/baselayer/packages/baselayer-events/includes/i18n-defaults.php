@@ -16,7 +16,10 @@ function bl_events_i18n_default_strings(): array
 		/* Statuses */
 		__('Cancelled', 'baselayer-events'),
 		__('Postponed', 'baselayer-events'),
-		__('Sold Out', 'baselayer-events'),
+
+		/* Per-type category taxonomy (config labels) */
+		__('Categories', 'baselayer-events'),
+		__('Category', 'baselayer-events'),
 
 		/* Metadata panel / groups / fields (config/default-instance.php) */
 		__('Event metadata', 'baselayer-events'),
