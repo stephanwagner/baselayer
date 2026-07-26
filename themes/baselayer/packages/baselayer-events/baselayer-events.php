@@ -84,6 +84,7 @@ require_once BL_EVENTS_PATH . 'includes/instances.php';
 require_once BL_EVENTS_PATH . 'includes/cpt.php';
 require_once BL_EVENTS_PATH . 'includes/events.php';
 require_once BL_EVENTS_PATH . 'includes/assets.php';
+require_once BL_EVENTS_PATH . 'includes/i18n-defaults.php';
 
 if (is_admin()) {
 	require_once BL_EVENTS_PATH . 'includes/settings-page.php';

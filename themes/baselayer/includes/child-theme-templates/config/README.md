@@ -16,7 +16,7 @@ Shipped stubs (edit as needed):
 `content-types/` is copied from the parent on install (`baselayer/config/content-types/`).
 When a child theme is active, only these files are loaded — there is no parent fallback.
 
-File-based CPTs only (e.g. `post.php`, `project.php`). **Events** are not content-types files: they are toggled under Developer → Features and configured in admin (**Events → Event types**). Do not put `packages/` in the child; Forms/Events load from the parent.
+File-based CPTs only (e.g. `post.php`, `project.php`). **Events** are not content-types files: they are toggled under Developer → Features and configured in admin (each event type’s menu → Settings). Do not put `packages/` in the child; Forms/Events load from the parent.
 
 ## ACF blocks
 

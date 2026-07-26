@@ -207,7 +207,11 @@ function bl_render_developer_features(): void
 					})();
 				</script>
 
-				<hr>
+			</div>
+
+			<h3 style="margin-top: 32px;"><?= esc_html__('Packages', 'baselayer') ?></h3>
+
+			<div class="bl-feature-group">
 
 				<table class="form-table" role="presentation">
 					<tr>
@@ -218,12 +222,33 @@ function bl_render_developer_features(): void
 							<p class="description bl-indent-checkbox"><?= esc_html__('Adds a form builder, submissions, email notifications, and a Form block.', 'baselayer') ?></p>
 						</td>
 					</tr>
+				</table>
+
+				<hr>
+
+				<table class="form-table" role="presentation">
 					<tr>
 						<th scope="row" class="form-table-checkbox-label"><?= esc_html__('Events', 'baselayer') ?></th>
 						<td>
 							<input type="hidden" name="baselayer_features[enable_events]" value="0">
 							<label><input type="checkbox" name="baselayer_features[enable_events]" value="1" <?= checked($feat('enable_events'), 1, false) ?>> <?= esc_html__('Enable events', 'baselayer') ?></label>
-							<p class="description bl-indent-checkbox"><?= esc_html__('Adds event types with dates, recurrence, statuses, metadata, and archives. Manage types under Events → Event types.', 'baselayer') ?></p>
+							<p class="description bl-indent-checkbox"><?= esc_html__('Adds event types with dates, recurrence, statuses, metadata, and archives. Developers manage each type under its menu → Settings.', 'baselayer') ?></p>
+						</td>
+					</tr>
+				</table>
+
+				<hr>
+
+				<table class="form-table" role="presentation">
+					<tr>
+						<th scope="row" class="form-table-checkbox-label">
+							<?= esc_html__('Block Creator', 'baselayer') ?>
+							<span class="bl-feature-beta"><?= esc_html__('Beta', 'baselayer') ?></span>
+						</th>
+						<td>
+							<input type="hidden" name="baselayer_features[enable_block_creator]" value="0">
+							<label><input type="checkbox" name="baselayer_features[enable_block_creator]" value="1" <?= checked($feat('enable_block_creator'), 1, false) ?>> <?= esc_html__('Enable Block Creator UI', 'baselayer') ?></label>
+							<p class="description bl-indent-checkbox"><?= esc_html__('Adds an admin UI to overlay block-option presets and assignments. File config (config/block-options.php) remains the baseline. Will become a standalone package later.', 'baselayer') ?></p>
 						</td>
 					</tr>
 				</table>
@@ -289,26 +314,6 @@ function bl_render_developer_features(): void
 							<input type="hidden" name="baselayer_features[enable_blocked_ips]" value="0">
 							<label><input type="checkbox" name="baselayer_features[enable_blocked_ips]" value="1" <?= checked($feat('enable_blocked_ips'), 1, false) ?>> <?= esc_html__('Enable IP blocking', 'baselayer') ?></label>
 							<p class="description bl-indent-checkbox"><?= esc_html__('Allows blocking specific IP addresses and detects suspicious login attempts.', 'baselayer') ?></p>
-						</td>
-					</tr>
-				</table>
-
-			</div>
-
-			<h3 style="margin-top: 32px;"><?= esc_html__('Blocks', 'baselayer') ?></h3>
-
-			<div class="bl-feature-group">
-
-				<table class="form-table" role="presentation">
-					<tr>
-						<th scope="row" class="form-table-checkbox-label">
-							<?= esc_html__('Block Creator', 'baselayer') ?>
-							<span class="bl-feature-beta"><?= esc_html__('Beta', 'baselayer') ?></span>
-						</th>
-						<td>
-							<input type="hidden" name="baselayer_features[enable_block_creator]" value="0">
-							<label><input type="checkbox" name="baselayer_features[enable_block_creator]" value="1" <?= checked($feat('enable_block_creator'), 1, false) ?>> <?= esc_html__('Enable Block Creator UI', 'baselayer') ?></label>
-							<p class="description bl-indent-checkbox"><?= esc_html__('Adds an admin UI to overlay block-option presets and assignments. File config (config/block-options.php) remains the baseline.', 'baselayer') ?></p>
 						</td>
 					</tr>
 				</table>

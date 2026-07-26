@@ -40,7 +40,7 @@ They also appear under **Theme** in the icon picker. An example `logo-child.svg`
 Do **not** copy `packages/` into the child. Forms and Events always load from the parent theme (or as standalone plugins). Parent updates replace package code; site config stays in the database.
 
 - **Forms:** Developer → Features → Enable forms
-- **Events:** Developer → Features → Enable events, then configure types under **Events → Event types** (stored in `bl_events_instances` — not `config/content-types/`)
+- **Events:** Developer → Features → Enable events, then configure each type under its menu → Settings (developers only; stored in `bl_events_instances` — not `config/content-types/`)
 
 Optional Events markup overrides (child wins via the same template paths as the parent):
 

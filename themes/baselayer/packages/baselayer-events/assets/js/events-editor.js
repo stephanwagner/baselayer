@@ -829,8 +829,6 @@
               value: statusKey || "active",
               options: statusOptions.length ? statusOptions : [
                 { label: "None", value: "active" },
-                { label: "Cancelled", value: "cancelled" },
-                { label: "Postponed", value: "postponed" },
                 { label: "\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500", value: "__sep__", disabled: true },
                 { label: "Custom", value: "custom" }
               ],

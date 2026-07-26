@@ -508,13 +508,13 @@ function bl_event_expand_occurrences(array $rule, string $anchor_start, string $
 function bl_event_weekday_labels(): array
 {
 	return [
-		'mo' => __('Mon', 'baselayer'),
-		'tu' => __('Tue', 'baselayer'),
-		'we' => __('Wed', 'baselayer'),
-		'th' => __('Thu', 'baselayer'),
-		'fr' => __('Fri', 'baselayer'),
-		'sa' => __('Sat', 'baselayer'),
-		'su' => __('Sun', 'baselayer'),
+		'mo' => __('Mon', 'baselayer-events'),
+		'tu' => __('Tue', 'baselayer-events'),
+		'we' => __('Wed', 'baselayer-events'),
+		'th' => __('Thu', 'baselayer-events'),
+		'fr' => __('Fri', 'baselayer-events'),
+		'sa' => __('Sat', 'baselayer-events'),
+		'su' => __('Sun', 'baselayer-events'),
 	];
 }
 
@@ -526,30 +526,30 @@ function bl_event_weekday_labels(): array
 function bl_event_format_recurrence_summary_lines(?array $rule): array
 {
 	if ($rule === null) {
-		return [__('Not repeating', 'baselayer')];
+		return [__('Not repeating', 'baselayer-events')];
 	}
 
 	$lines = [];
 	$freq_labels = [
-		'daily' => __('Daily', 'baselayer'),
-		'weekly' => __('Weekly', 'baselayer'),
-		'monthly' => __('Monthly', 'baselayer'),
-		'yearly' => __('Yearly', 'baselayer'),
+		'daily' => __('Daily', 'baselayer-events'),
+		'weekly' => __('Weekly', 'baselayer-events'),
+		'monthly' => __('Monthly', 'baselayer-events'),
+		'yearly' => __('Yearly', 'baselayer-events'),
 	];
 	$freq = $freq_labels[$rule['freq']] ?? ucfirst($rule['freq']);
 	if ($rule['interval'] > 1) {
 		if ($rule['freq'] === 'daily') {
 			/* translators: %d: interval */
-			$freq = sprintf(__('Every %d days', 'baselayer'), $rule['interval']);
+			$freq = sprintf(__('Every %d days', 'baselayer-events'), $rule['interval']);
 		} elseif ($rule['freq'] === 'weekly') {
 			/* translators: %d: interval */
-			$freq = sprintf(__('Every %d weeks', 'baselayer'), $rule['interval']);
+			$freq = sprintf(__('Every %d weeks', 'baselayer-events'), $rule['interval']);
 		} elseif ($rule['freq'] === 'monthly') {
 			/* translators: %d: interval */
-			$freq = sprintf(__('Every %d months', 'baselayer'), $rule['interval']);
+			$freq = sprintf(__('Every %d months', 'baselayer-events'), $rule['interval']);
 		} else {
 			/* translators: %d: interval */
-			$freq = sprintf(__('Every %d years', 'baselayer'), $rule['interval']);
+			$freq = sprintf(__('Every %d years', 'baselayer-events'), $rule['interval']);
 		}
 	}
 	$lines[] = $freq;
@@ -572,11 +572,11 @@ function bl_event_format_recurrence_summary_lines(?array $rule): array
 		$ts = bl_event_to_timestamp($rule['until'], '', false);
 		if ($ts > 0) {
 			/* translators: %s: formatted end date */
-			$lines[] = sprintf(__('Until %s', 'baselayer'), wp_date(get_option('date_format', 'F j, Y'), $ts, $tz));
+			$lines[] = sprintf(__('Until %s', 'baselayer-events'), wp_date(get_option('date_format', 'F j, Y'), $ts, $tz));
 		}
 	} elseif ($rule['ends'] === 'after' && !empty($rule['count'])) {
 		/* translators: %d: number of occurrences */
-		$lines[] = sprintf(_n('After %d occurrence', 'After %d occurrences', (int) $rule['count'], 'baselayer'), (int) $rule['count']);
+		$lines[] = sprintf(_n('After %d occurrence', 'After %d occurrences', (int) $rule['count'], 'baselayer-events'), (int) $rule['count']);
 	}
 
 	return $lines;
@@ -1068,15 +1068,15 @@ add_action(BL_EVENT_CRON_HOOK, 'bl_event_cron_extend_recurring_series');
 function bl_event_soft_delete_occurrence(int $occurrence_id)
 {
 	if ($occurrence_id <= 0 || !bl_event_is_occurrence($occurrence_id)) {
-		return new \WP_Error('bl_not_occurrence', __('Not an occurrence.', 'baselayer'), ['status' => 400]);
+		return new \WP_Error('bl_not_occurrence', __('Not an occurrence.', 'baselayer-events'), ['status' => 400]);
 	}
 	$master_id = bl_event_get_master_id($occurrence_id);
 	if ($master_id <= 0) {
-		return new \WP_Error('bl_no_master', __('Master event not found.', 'baselayer'), ['status' => 400]);
+		return new \WP_Error('bl_no_master', __('Master event not found.', 'baselayer-events'), ['status' => 400]);
 	}
 	$master_status = get_post_status($master_id);
 	if ($master_status === false || $master_status === 'trash') {
-		return new \WP_Error('bl_master_unavailable', __('Master event is not available.', 'baselayer'), ['status' => 400]);
+		return new \WP_Error('bl_master_unavailable', __('Master event is not available.', 'baselayer-events'), ['status' => 400]);
 	}
 
 	$start = get_post_meta($occurrence_id, BL_EVENT_META_START_DATE, true);
@@ -1282,7 +1282,7 @@ function bl_event_register_revert_rest_route(): void
 		'callback' => static function (\WP_REST_Request $request) {
 			$id = (int) $request['id'];
 			if (!bl_event_is_occurrence($id)) {
-				return new \WP_Error('bl_not_occurrence', __('Not an occurrence.', 'baselayer'), ['status' => 400]);
+				return new \WP_Error('bl_not_occurrence', __('Not an occurrence.', 'baselayer-events'), ['status' => 400]);
 			}
 			bl_event_revert_occurrence_to_master($id);
 			$post = get_post($id);
@@ -1453,7 +1453,7 @@ function bl_event_register_occurrences_list_rest_route(): void
 		'callback' => static function (\WP_REST_Request $request) {
 			$id = (int) $request['id'];
 			if (!bl_event_is_series_master($id)) {
-				return new \WP_Error('bl_not_master', __('Not a recurring master event.', 'baselayer'), ['status' => 400]);
+				return new \WP_Error('bl_not_master', __('Not a recurring master event.', 'baselayer-events'), ['status' => 400]);
 			}
 
 			return rest_ensure_response([
@@ -1475,10 +1475,10 @@ add_action('rest_api_init', 'bl_event_register_occurrences_list_rest_route');
 function bl_event_restore_occurrence_date(int $master_id, string $start_date)
 {
 	if ($master_id <= 0 || !bl_event_is_series_master($master_id)) {
-		return new \WP_Error('bl_not_master', __('Not a recurring master event.', 'baselayer'), ['status' => 400]);
+		return new \WP_Error('bl_not_master', __('Not a recurring master event.', 'baselayer-events'), ['status' => 400]);
 	}
 	if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $start_date)) {
-		return new \WP_Error('bl_bad_date', __('Invalid date.', 'baselayer'), ['status' => 400]);
+		return new \WP_Error('bl_bad_date', __('Invalid date.', 'baselayer-events'), ['status' => 400]);
 	}
 
 	bl_event_remove_exdate($master_id, $start_date);
@@ -1563,7 +1563,7 @@ function bl_event_register_soft_delete_occurrence_rest_route(): void
 			$start_date = trim((string) $request->get_param('start_date'));
 
 			if ($master_id <= 0 || !bl_event_is_series_master($master_id)) {
-				return new \WP_Error('bl_not_master', __('Not a recurring master event.', 'baselayer'), ['status' => 400]);
+				return new \WP_Error('bl_not_master', __('Not a recurring master event.', 'baselayer-events'), ['status' => 400]);
 			}
 
 			if ($occurrence_id <= 0 && preg_match('/^\d{4}-\d{2}-\d{2}$/', $start_date)) {
@@ -1577,10 +1577,10 @@ function bl_event_register_soft_delete_occurrence_rest_route(): void
 			}
 
 			if ($occurrence_id <= 0) {
-				return new \WP_Error('bl_not_occurrence', __('Not an occurrence.', 'baselayer'), ['status' => 400]);
+				return new \WP_Error('bl_not_occurrence', __('Not an occurrence.', 'baselayer-events'), ['status' => 400]);
 			}
 			if (bl_event_get_master_id($occurrence_id) !== $master_id) {
-				return new \WP_Error('bl_wrong_master', __('Occurrence does not belong to this master.', 'baselayer'), ['status' => 400]);
+				return new \WP_Error('bl_wrong_master', __('Occurrence does not belong to this master.', 'baselayer-events'), ['status' => 400]);
 			}
 
 			$result = bl_event_soft_delete_occurrence($occurrence_id);

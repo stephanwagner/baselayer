@@ -418,7 +418,7 @@ function bl_render_installer(): void
 
         <h2><?= esc_html__('Content', 'baselayer') ?></h2>
 
-        <p class="description"><?= esc_html__('Choose how much starter content to create. Blog and Projects use content-type config files; Events use the Events package (Developer → Features and Event types).', 'baselayer') ?></p>
+        <p class="description"><?= esc_html__('Choose how much starter content to create. Blog and Projects use content-type config files; Events use the Events package (Developer → Features and each type’s Settings).', 'baselayer') ?></p>
 
         <?php
         $content_seed_mode = (string) $bl_install_val(['install', 'content', 'seed_mode'], 'sample');
@@ -525,7 +525,7 @@ function bl_render_installer(): void
                   <?= esc_html__('Enable events', 'baselayer') ?>
                 </label>
                 <div class="bl-indent-checkbox">
-                  <p class="description" style="margin-top: 0;"><?= esc_html__('Dated items with archives, recurrence, and statuses. Configure event types later under Events → Event types (not content-types files).', 'baselayer') ?></p>
+                  <p class="description" style="margin-top: 0;"><?= esc_html__('Dated items with archives, recurrence, and statuses. Configure event types later under each type’s menu → Settings (not content-types files).', 'baselayer') ?></p>
                   <div data-bl-checkbox-toggle-content="content-event">
                     <label>
                       <input type="checkbox" name="install[content][event_examples]" value="1" <?= $content_event_examples ? ' checked' : '' ?>>

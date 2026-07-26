@@ -42,6 +42,69 @@ function bl_events_maybe_seed_instances(): void
 
 	update_option(BL_EVENTS_INSTANCES_OPTION, bl_events_sanitize_instances(bl_events_default_instances()), false);
 	update_option('bl_events_flush_rewrite', 1, false);
+	update_option('bl_events_statuses_list_migrated', 1, false);
+}
+
+/**
+ * Default editable statuses seeded for new types (and once for existing installs).
+ *
+ * @return array<string, array{label: string, color: string}>
+ */
+function bl_events_default_list_statuses(): array
+{
+	return [
+		'cancelled' => [
+			'label' => 'Cancelled',
+			'color' => 'error',
+		],
+		'postponed' => [
+			'label' => 'Postponed',
+			'color' => 'warning',
+		],
+	];
+}
+
+/**
+ * One-time: move former built-in Cancelled/Postponed into each type’s editable list.
+ */
+function bl_events_maybe_migrate_list_statuses(): void
+{
+	if (get_option('bl_events_statuses_list_migrated')) {
+		return;
+	}
+
+	$raw = get_option(BL_EVENTS_INSTANCES_OPTION, null);
+	if (!is_array($raw) || $raw === []) {
+		update_option('bl_events_statuses_list_migrated', 1, false);
+
+		return;
+	}
+
+	$defaults = bl_events_default_list_statuses();
+	$changed = false;
+	foreach ($raw as $slug => $cfg) {
+		if (!is_string($slug) || !is_array($cfg)) {
+			continue;
+		}
+		$statuses = isset($cfg['statuses']) && is_array($cfg['statuses']) ? $cfg['statuses'] : [];
+		$merged = [];
+		foreach ($defaults as $key => $row) {
+			if (!isset($statuses[$key])) {
+				$merged[$key] = $row;
+				$changed = true;
+			}
+		}
+		foreach ($statuses as $key => $row) {
+			$merged[$key] = $row;
+		}
+		$raw[$slug]['statuses'] = $merged;
+	}
+
+	if ($changed) {
+		update_option(BL_EVENTS_INSTANCES_OPTION, bl_events_sanitize_instances($raw), false);
+		bl_events_reset_instances_cache();
+	}
+	update_option('bl_events_statuses_list_migrated', 1, false);
 }
 
 /**
@@ -58,6 +121,7 @@ function bl_events_get_instances(bool $enabled_only = false): array
 		$cache_bust = $bust;
 		$cache_enabled = null;
 		bl_events_maybe_seed_instances();
+		bl_events_maybe_migrate_list_statuses();
 		$raw = get_option(BL_EVENTS_INSTANCES_OPTION, []);
 		if (!is_array($raw) || $raw === []) {
 			$raw = bl_events_default_instances();
@@ -319,11 +383,11 @@ function bl_events_sanitize_statuses($raw): array
 	if (!is_array($raw)) {
 		return [];
 	}
-	$builtin = ['active', 'cancelled', 'postponed', 'custom'];
+	$reserved = ['active', 'custom'];
 	$out = [];
 	foreach ($raw as $key => $row) {
 		$key = sanitize_key((string) $key);
-		if ($key === '' || in_array($key, $builtin, true) || !is_array($row)) {
+		if ($key === '' || in_array($key, $reserved, true) || !is_array($row)) {
 			continue;
 		}
 		$label = isset($row['label']) ? sanitize_text_field((string) $row['label']) : $key;

@@ -915,8 +915,6 @@
                   ? statusOptions
                   : [
                       { label: 'None', value: 'active' },
-                      { label: 'Cancelled', value: 'cancelled' },
-                      { label: 'Postponed', value: 'postponed' },
                       { label: '────────', value: '__sep__', disabled: true },
                       { label: 'Custom', value: 'custom' },
                     ],

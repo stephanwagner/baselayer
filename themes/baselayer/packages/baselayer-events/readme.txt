@@ -17,6 +17,15 @@ BaseLayer Events lets you create one or more event-like post types (Events, Cour
 * Statuses and custom metadata
 * Archives and iCal download
 
-Configure types under **Events → Event types** (or the first event type’s menu).
+Configure each type under its menu → **Settings** (developers only; for example **Events → Settings**).
 
 When bundled with the BaseLayer theme, enable it under Developer → Features.
+
+== Translations ==
+
+Text domain: `baselayer-events` (files in `languages/`).
+
+From the BaseLayer repo root:
+
+* `npm run make-pot:baselayer-events` — refresh the pot
+* `npm run compile:po` — replicate German variants from `baselayer-events-de_DE.po` and compile `.mo` files (theme + Forms + Events)

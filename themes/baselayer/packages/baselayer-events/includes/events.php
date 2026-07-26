@@ -390,7 +390,7 @@ function bl_event_display_post_states(array $states, $post): array
 		return $states;
 	}
 	if (function_exists('bl_event_is_series_master') && bl_event_is_series_master((int) $post->ID)) {
-		$states['bl_event_recurring'] = __('Recurring', 'baselayer');
+		$states['bl_event_recurring'] = __('Recurring', 'baselayer-events');
 
 		return $states;
 	}
@@ -744,7 +744,7 @@ function bl_event_series_master_ids(): array
  */
 function bl_event_posts_columns(array $columns): array
 {
-	$label = __('Event dates', 'baselayer');
+	$label = __('Event dates', 'baselayer-events');
 	$new = [];
 	$inserted = false;
 	foreach ($columns as $key => $heading) {
@@ -802,8 +802,8 @@ function bl_event_posts_custom_column(string $column, int $post_id): void
 		echo '<br>';
 		echo '<button type="button" class="button-link bl-event-edit-occurrences"';
 		echo ' data-master-id="' . esc_attr((string) $post_id) . '"';
-		echo ' data-master-title="' . esc_attr($title !== '' ? $title : __('Event', 'baselayer')) . '">';
-		echo esc_html__('Edit occurrences', 'baselayer');
+		echo ' data-master-title="' . esc_attr($title !== '' ? $title : __('Event', 'baselayer-events')) . '">';
+		echo esc_html__('Edit occurrences', 'baselayer-events');
 		if ($upcoming > 0) {
 			echo ' (' . esc_html((string) $upcoming) . ')';
 		} elseif ($total > 0) {
@@ -817,12 +817,12 @@ function bl_event_posts_custom_column(string $column, int $post_id): void
 	if (function_exists('bl_event_is_occurrence') && bl_event_is_occurrence($post_id)) {
 		// Occurrences are hidden from the list; keep a fallback if shown elsewhere.
 		$master_id = bl_event_get_master_id($post_id);
-		echo '<span class="description">' . esc_html__('Occurrence', 'baselayer') . '</span><br>';
+		echo '<span class="description">' . esc_html__('Occurrence', 'baselayer-events') . '</span><br>';
 		if ($master_id > 0) {
 			$edit = get_edit_post_link($master_id, 'raw');
 			$title = get_the_title($master_id);
 			if ($edit) {
-				echo '<a href="' . esc_url($edit) . '">' . esc_html($title !== '' ? $title : __('Master', 'baselayer')) . '</a><br>';
+				echo '<a href="' . esc_url($edit) . '">' . esc_html($title !== '' ? $title : __('Master', 'baselayer-events')) . '</a><br>';
 			}
 		}
 	}

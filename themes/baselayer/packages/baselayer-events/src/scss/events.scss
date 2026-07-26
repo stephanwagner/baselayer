@@ -3,7 +3,7 @@ $breakpoint-m: 960px;
 $high-density-dppx: 1.5dppx;
 
 // Event status palette
-$event-status-keys: ('neutral', 'info', 'error', 'warning', 'success', 'highlight', 'cancelled', 'postponed');
+$event-status-keys: ('neutral', 'info', 'error', 'warning', 'success', 'accent', 'cancelled', 'postponed');
 
 // Variables
 :root {
@@ -17,8 +17,8 @@ $event-status-keys: ('neutral', 'info', 'error', 'warning', 'success', 'highligh
   --bl-event-status-warning-bg: var(--bl-color-warning-bg);
   --bl-event-status-success: var(--bl-color-success);
   --bl-event-status-success-bg: var(--bl-color-success-bg);
-  --bl-event-status-highlight: var(--bl-color-highlight);
-  --bl-event-status-highlight-bg: var(--bl-color-highlight-bg);
+  --bl-event-status-accent: var(--bl-color-accent);
+  --bl-event-status-accent-bg: var(--bl-color-accent-bg);
 
   --bl-event-status-cancelled: var(--bl-event-status-error);
   --bl-event-status-cancelled-bg: var(--bl-event-status-error-bg);

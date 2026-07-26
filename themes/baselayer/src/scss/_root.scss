@@ -38,8 +38,8 @@
   --bl-color-warning-bg: #{$color-warning-bg};
   --bl-color-success: #{$color-success};
   --bl-color-success-bg: #{$color-success-bg};
-  --bl-color-highlight: #{$color-highlight};
-  --bl-color-highlight-bg: #{$color-highlight-bg};
+  --bl-color-accent: #{$color-accent};
+  --bl-color-accent-bg: #{$color-accent-bg};
 
   // Gradients
   --bl-gradient-primary: linear-gradient(to right, var(--bl-color-primary), var(--bl-color-secondary));

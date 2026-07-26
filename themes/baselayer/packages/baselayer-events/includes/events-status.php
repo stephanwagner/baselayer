@@ -26,12 +26,12 @@ const BL_EVENT_STATUS_COLOR_DEFAULT = 'info';
 function bl_event_status_color_presets(): array
 {
 	return [
-		'neutral' => __('Neutral', 'baselayer'),
-		'info' => __('Info', 'baselayer'),
-		'error' => __('Error', 'baselayer'),
-		'warning' => __('Warning', 'baselayer'),
-		'success' => __('Success', 'baselayer'),
-		'highlight' => __('Highlight', 'baselayer'),
+		'neutral' => __('Neutral', 'baselayer-events'),
+		'info' => __('Info', 'baselayer-events'),
+		'error' => __('Error', 'baselayer-events'),
+		'warning' => __('Warning', 'baselayer-events'),
+		'success' => __('Success', 'baselayer-events'),
+		'accent' => __('Accent', 'baselayer-events'),
 	];
 }
 
@@ -143,7 +143,8 @@ function bl_event_status_css_color_value(array $status): string
 }
 
 /**
- * Built-in statuses (always available; order before config extras).
+ * Built-in statuses that are not part of the editable list (None only).
+ * Cancelled / Postponed ship as default list entries per event type.
  *
  * @return array<string, array{label: string, color_token: string, color: string}>
  */
@@ -151,18 +152,8 @@ function bl_event_builtin_statuses(): array
 {
 	return [
 		'active' => [
-			'label' => __('None', 'baselayer'),
+			'label' => __('None', 'baselayer-events'),
 			'color_token' => '',
-			'color' => '',
-		],
-		'cancelled' => [
-			'label' => __('Cancelled', 'baselayer'),
-			'color_token' => 'cancelled',
-			'color' => '',
-		],
-		'postponed' => [
-			'label' => __('Postponed', 'baselayer'),
-			'color_token' => 'postponed',
 			'color' => '',
 		],
 	];
@@ -176,14 +167,14 @@ function bl_event_builtin_statuses(): array
 function bl_event_custom_status_definition(): array
 {
 	return [
-		'label' => __('Custom', 'baselayer'),
+		'label' => __('Custom', 'baselayer-events'),
 		'color_token' => BL_EVENT_STATUS_COLOR_DEFAULT,
 		'color' => '',
 	];
 }
 
 /**
- * Extra statuses from CPT config `statuses`.
+ * Editable statuses from CPT config `statuses` (Cancelled, Postponed, Sold Out, …).
  *
  * @return array<string, array{label: string, color_token: string, color: string}>
  */
@@ -201,7 +192,7 @@ function bl_event_config_statuses(?string $post_type = null): array
 		return [];
 	}
 
-	$reserved = ['active', 'cancelled', 'postponed', 'custom'];
+	$reserved = ['active', 'custom'];
 	$out = [];
 	foreach ($cfg['statuses'] as $key => $row) {
 		$key = sanitize_key((string) $key);

@@ -265,12 +265,11 @@ function bl_events_enqueue_field_builder_kit(): string
 }
 
 /**
- * Event types settings: admin chrome always; field-builder kit on Metadata / Statuses.
+ * Event type settings: admin chrome always; field-builder kit on Metadata / Statuses.
  */
 function bl_events_enqueue_settings_assets(string $hook): void
 {
-	$page = isset($_GET['page']) ? sanitize_key((string) wp_unslash($_GET['page'])) : '';
-	if ($page !== 'bl-events-settings') {
+	if (!function_exists('bl_events_is_settings_screen') || !bl_events_is_settings_screen()) {
 		return;
 	}
 
@@ -297,7 +296,9 @@ function bl_events_enqueue_settings_assets(string $hook): void
 		wp_localize_script('bl-events-settings', 'baselayerIcons', bl_icons_localize_payload());
 	}
 
-	$instance = isset($_GET['instance']) ? sanitize_key(wp_unslash((string) $_GET['instance'])) : '';
+	$instance = function_exists('bl_events_current_settings_instance')
+		? bl_events_current_settings_instance()
+		: (isset($_GET['post_type']) ? sanitize_key(wp_unslash((string) $_GET['post_type'])) : '');
 	$cfg = $instance !== '' && function_exists('bl_events_get_instance')
 		? bl_events_get_instance($instance)
 		: null;
@@ -348,7 +349,7 @@ function bl_events_enqueue_settings_assets(string $hook): void
 				: 'info',
 			'i18n' => [
 				'addStatus' => __('Add status', 'baselayer-events'),
-				'empty' => __('No custom statuses yet. Add a status to get started.', 'baselayer-events'),
+				'empty' => __('No statuses yet. Add a status to get started.', 'baselayer-events'),
 				'delete' => __('Delete', 'baselayer-events'),
 				'drag' => __('Drag to reorder', 'baselayer-events'),
 				'statusId' => __('Status ID', 'baselayer-events'),

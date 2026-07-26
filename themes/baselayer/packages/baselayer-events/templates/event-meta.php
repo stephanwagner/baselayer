@@ -46,7 +46,7 @@ if ($config['groups'] !== []) {
 	}
 }
 
-$aria = $config['title'] !== '' ? $config['title'] : __('Event metadata', 'baselayer');
+$aria = $config['title'] !== '' ? $config['title'] : __('Event metadata', 'baselayer-events');
 $archive_url = $post_type ? get_post_type_archive_link($post_type) : false;
 $archive_url = is_string($archive_url) ? $archive_url : '';
 $show_actions = $archive_url !== '' || $can_ical;
@@ -55,11 +55,11 @@ if ($groups_out === [] && !$show_actions) {
 	return;
 }
 
-$all_events_label = __('All events', 'baselayer');
+$all_events_label = __('All events', 'baselayer-events');
 $obj = $post_type ? get_post_type_object($post_type) : null;
 if ($obj && !empty($obj->labels->name)) {
 	/* translators: %s: post type plural label (e.g. Events) */
-	$all_events_label = sprintf(__('All %s', 'baselayer'), $obj->labels->name);
+	$all_events_label = sprintf(__('All %s', 'baselayer-events'), $obj->labels->name);
 }
 ?>
 <aside class="event-meta" aria-label="<?= esc_attr($aria) ?>">
@@ -105,7 +105,7 @@ if ($obj && !empty($obj->labels->name)) {
 			<?php } ?>
 			<?php if ($can_ical) { ?>
 				<a class="event-meta__ical-link button -secondary -outline -small -has-icon -icon-calendar" href="<?= esc_url(bl_event_ical_url($post_id)) ?>">
-					<?= esc_html__('Download iCal', 'baselayer') ?>
+					<?= esc_html__('Download iCal', 'baselayer-events') ?>
 				</a>
 			<?php } ?>
 		</div>

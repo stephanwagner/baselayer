@@ -916,10 +916,6 @@ input[type=search].bl-icon-picker-modal__search {
   opacity: 0.5;
 }
 
-.bl-events-settings__instance-tabs {
-  margin-top: 8px;
-}
-
 .bl-events-settings-dialog {
   padding: 0;
   border: 0;

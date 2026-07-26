@@ -9,8 +9,8 @@
   --bl-event-status-warning-bg: var(--bl-color-warning-bg);
   --bl-event-status-success: var(--bl-color-success);
   --bl-event-status-success-bg: var(--bl-color-success-bg);
-  --bl-event-status-highlight: var(--bl-color-highlight);
-  --bl-event-status-highlight-bg: var(--bl-color-highlight-bg);
+  --bl-event-status-accent: var(--bl-color-accent);
+  --bl-event-status-accent-bg: var(--bl-color-accent-bg);
   --bl-event-status-cancelled: var(--bl-event-status-error);
   --bl-event-status-cancelled-bg: var(--bl-event-status-error-bg);
   --bl-event-status-postponed: var(--bl-event-status-warning);
@@ -117,10 +117,10 @@
   --bl-status-bg: var(--bl-event-status-success-bg);
 }
 
-.event-status-highlight,
-.event-status-badge-highlight {
-  --bl-status-color: var(--bl-event-status-highlight);
-  --bl-status-bg: var(--bl-event-status-highlight-bg);
+.event-status-accent,
+.event-status-badge-accent {
+  --bl-status-color: var(--bl-event-status-accent);
+  --bl-status-bg: var(--bl-event-status-accent-bg);
 }
 
 .event-status-cancelled,

@@ -110,7 +110,7 @@ function bl_event_ical_meta_fields(int $post_id): array
 		if (!empty($org['name'])) {
 			$description[] = sprintf(
 				/* translators: %s: organizer name */
-				__('Organizer: %s', 'baselayer'),
+				__('Organizer: %s', 'baselayer-events'),
 				(string) $org['name']
 			);
 		}
@@ -130,7 +130,7 @@ function bl_event_ical_meta_fields(int $post_id): array
 		if ($contact_bits !== []) {
 			$description[] = sprintf(
 				/* translators: %s: contact details */
-				__('Contact: %s', 'baselayer'),
+				__('Contact: %s', 'baselayer-events'),
 				implode(', ', $contact_bits)
 			);
 		}

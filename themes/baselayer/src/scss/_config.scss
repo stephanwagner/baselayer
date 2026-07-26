@@ -44,8 +44,8 @@ $color-warning: #e97800 !default;
 $color-warning-bg: color.scale($color-warning, $lightness: 92%) !default;
 $color-success: #28a15a !default;
 $color-success-bg: color.scale($color-success, $lightness: 93%) !default;
-$color-highlight: #8257e5 !default;
-$color-highlight-bg: color.scale($color-highlight, $lightness: 92%) !default;
+$color-accent: #8257e5 !default;
+$color-accent-bg: color.scale($color-accent, $lightness: 92%) !default;
 
 // Font families
 $primary-font-family: 'Nunito Sans', sans-serif !default;

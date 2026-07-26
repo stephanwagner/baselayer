@@ -358,7 +358,7 @@ function bootStatusesBuilder() {
   });
   const emptyState = el('p', {
     className: 'bl-field-builder__empty description',
-    text: i18n.empty || 'No custom statuses yet. Add a status to get started.',
+    text: i18n.empty || 'No statuses yet. Add a status to get started.',
   });
   const addBtn = el('button', {
     type: 'button',
