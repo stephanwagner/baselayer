@@ -352,6 +352,7 @@ function bl_events_apply_settings_tab(array $cfg, string $tab, array $post): arr
 			'slug' => $existing_slug,
 			'design' => sanitize_key((string) ($post['archive_design'] ?? 'list')),
 			'category_filter' => !empty($post['archive_category_filter']),
+			'month_filter' => !empty($post['archive_month_filter']),
 			'posts_per_page' => $posts_per_page,
 			'texts' => [
 				'heading' => sanitize_text_field((string) ($post['archive_heading'] ?? '')),
@@ -647,6 +648,9 @@ function bl_events_settings_archive_fields(array $cfg): void
 	echo '<tr><th>' . esc_html__('Category filter', 'baselayer-events') . '</th><td>';
 	echo '<label><input type="checkbox" name="archive_category_filter" value="1" ' . checked(!empty($archive['category_filter']), true, false) . '> ' . esc_html__('Show category filter on archive', 'baselayer-events') . '</label>';
 	echo '<p class="description">' . esc_html__('Only shown when at least one category exists.', 'baselayer-events') . '</p></td></tr>';
+	echo '<tr><th>' . esc_html__('Month filter', 'baselayer-events') . '</th><td>';
+	echo '<label><input type="checkbox" name="archive_month_filter" value="1" ' . checked(!empty($archive['month_filter']), true, false) . '> ' . esc_html__('Show "From month" filter on archive', 'baselayer-events') . '</label>';
+	echo '<p class="description">' . esc_html__('Lets visitors jump ahead to a future month.', 'baselayer-events') . '</p></td></tr>';
 	$ppp = isset($archive['posts_per_page']) && $archive['posts_per_page'] !== null && (int) $archive['posts_per_page'] > 0
 		? (string) (int) $archive['posts_per_page']
 		: '';

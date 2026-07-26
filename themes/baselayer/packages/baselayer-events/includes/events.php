@@ -602,6 +602,37 @@ function bl_event_archive_pre_get_posts(\WP_Query $query): void
 	if ($ppp !== null && (int) $ppp > 0) {
 		$query->set('posts_per_page', min(100, (int) $ppp));
 	}
+
+	$from = function_exists('bl_events_archive_selected_from_month')
+		? bl_events_archive_selected_from_month()
+		: '';
+	if ($from === '' || !function_exists('bl_events_archive_month_start_ts')) {
+		return;
+	}
+	if (empty($archive['month_filter'])) {
+		return;
+	}
+	$from_ts = bl_events_archive_month_start_ts($from);
+	if ($from_ts <= 0) {
+		return;
+	}
+
+	$clause = [
+		'key' => BL_EVENT_META_START_TS,
+		'value' => $from_ts,
+		'compare' => '>=',
+		'type' => 'NUMERIC',
+	];
+	$existing = $query->get('meta_query');
+	if (is_array($existing) && $existing !== []) {
+		$query->set('meta_query', [
+			'relation' => 'AND',
+			$existing,
+			$clause,
+		]);
+	} else {
+		$query->set('meta_query', [$clause]);
+	}
 }
 
 add_action('pre_get_posts', 'bl_event_archive_pre_get_posts', 25);

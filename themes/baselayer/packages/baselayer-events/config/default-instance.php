@@ -97,6 +97,7 @@ return [
 		'slug' => 'events',
 		'design' => 'list',
 		'category_filter' => true,
+		'month_filter' => false,
 		'texts' => [
 			'heading' => 'Events',
 			'empty' => 'No events found.',

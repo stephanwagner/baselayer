@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-26T07:31:17+00:00\n"
+"POT-Creation-Date: 2026-07-26T08:53:27+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: baselayer-events\n"
@@ -35,10 +35,10 @@ msgid "https://baselayerwp.com/baselayer-events"
 msgstr ""
 
 #: includes/assets.php:72
-#: includes/events.php:806
+#: includes/events.php:876
 #: includes/i18n-defaults.php:38
 #: includes/settings-page.php:247
-#: includes/settings-page.php:479
+#: includes/settings-page.php:489
 msgid "Event"
 msgstr ""
 
@@ -168,8 +168,8 @@ msgid "+%d more"
 msgstr ""
 
 #: includes/assets.php:108
-#: includes/settings-page.php:485
-#: includes/settings-page.php:513
+#: includes/settings-page.php:495
+#: includes/settings-page.php:523
 msgid "Cancel"
 msgstr ""
 
@@ -308,7 +308,7 @@ msgid "Edit"
 msgstr ""
 
 #: includes/assets.php:178
-#: includes/events.php:807
+#: includes/events.php:877
 msgid "Edit occurrences"
 msgstr ""
 
@@ -319,7 +319,7 @@ msgstr ""
 #: includes/assets.php:180
 #: includes/assets.php:310
 #: includes/assets.php:346
-#: includes/settings-page.php:415
+#: includes/settings-page.php:425
 msgid "Delete"
 msgstr ""
 
@@ -426,13 +426,13 @@ msgid "Custom color"
 msgstr ""
 
 #. translators: %s: organizer name
-#: includes/events-ical.php:113
+#: includes/events-ical.php:120
 #, php-format
 msgid "Organizer: %s"
 msgstr ""
 
 #. translators: %s: contact details
-#: includes/events-ical.php:133
+#: includes/events-ical.php:140
 #, php-format
 msgid "Contact: %s"
 msgstr ""
@@ -507,16 +507,37 @@ msgstr ""
 msgid "None"
 msgstr ""
 
-#: includes/events.php:748
+#: includes/events.php:818
 msgid "Event dates"
 msgstr ""
 
-#: includes/events.php:821
+#: includes/events.php:891
 msgid "Occurrence"
 msgstr ""
 
-#: includes/events.php:826
+#: includes/events.php:896
 msgid "Master"
+msgstr ""
+
+#: includes/front.php:136
+#: includes/i18n-defaults.php:37
+#: includes/settings-page.php:244
+#: includes/settings-page.php:487
+#: templates/archive.php:14
+#: templates/archive.php:25
+msgid "Events"
+msgstr ""
+
+#: includes/front.php:148
+#: templates/archive.php:15
+#: templates/archive.php:26
+msgid "No events found."
+msgstr ""
+
+#. translators: %s: localized month and year, e.g. "August 2026"
+#: includes/front.php:349
+#, php-format
+msgid "From %s"
 msgstr ""
 
 #: includes/i18n-defaults.php:17
@@ -573,17 +594,12 @@ msgstr ""
 msgid "Phone"
 msgstr ""
 
-#: includes/i18n-defaults.php:37
-#: includes/settings-page.php:244
-#: includes/settings-page.php:477
-msgid "Events"
-msgstr ""
-
 #: includes/instances.php:352
 msgid "Search categories"
 msgstr ""
 
 #: includes/instances.php:353
+#: templates/archive.php:131
 msgid "All categories"
 msgstr ""
 
@@ -624,6 +640,7 @@ msgid "No categories"
 msgstr ""
 
 #: includes/instances.php:363
+#: templates/archive.php:124
 msgid "Filter by category"
 msgstr ""
 
@@ -634,12 +651,12 @@ msgstr ""
 
 #: includes/settings-page.php:144
 #: includes/settings-page.php:145
-#: includes/settings-page.php:398
+#: includes/settings-page.php:408
 msgid "Settings"
 msgstr ""
 
 #: includes/settings-page.php:167
-#: includes/settings-page.php:380
+#: includes/settings-page.php:390
 msgid "You do not have permission to manage event type settings."
 msgstr ""
 
@@ -648,213 +665,252 @@ msgstr ""
 msgid "You do not have permission to manage event types."
 msgstr ""
 
-#: includes/settings-page.php:387
+#: includes/settings-page.php:397
 msgid "General"
 msgstr ""
 
-#: includes/settings-page.php:388
-#: includes/settings-page.php:629
+#: includes/settings-page.php:398
+#: includes/settings-page.php:639
 msgid "Archive"
 msgstr ""
 
-#: includes/settings-page.php:389
+#: includes/settings-page.php:399
 msgid "Statuses"
 msgstr ""
 
-#: includes/settings-page.php:390
+#: includes/settings-page.php:400
 msgid "Metadata"
 msgstr ""
 
-#: includes/settings-page.php:400
+#: includes/settings-page.php:410
 msgid "Event type created."
 msgstr ""
 
-#: includes/settings-page.php:402
+#: includes/settings-page.php:412
 msgid "Settings saved."
 msgstr ""
 
-#: includes/settings-page.php:412
+#: includes/settings-page.php:422
 msgid "Labels, archive, statuses, and metadata for this event type. Use Add type to create another post type (for example Courses or Workshops)."
 msgstr ""
 
-#: includes/settings-page.php:414
-#: includes/settings-page.php:486
+#: includes/settings-page.php:424
+#: includes/settings-page.php:496
 msgid "Add type"
 msgstr ""
 
-#: includes/settings-page.php:420
+#: includes/settings-page.php:430
 msgid "No event types yet."
 msgstr ""
 
-#: includes/settings-page.php:452
+#: includes/settings-page.php:462
 msgid "Save changes"
 msgstr ""
 
-#: includes/settings-page.php:472
+#: includes/settings-page.php:482
 msgid "Add event type"
 msgstr ""
 
-#: includes/settings-page.php:475
+#: includes/settings-page.php:485
 msgid "Create a new event-like post type. Choose the names and public URL visitors will see. Categories are separate from Posts."
 msgstr ""
 
-#: includes/settings-page.php:476
-#: includes/settings-page.php:538
+#: includes/settings-page.php:486
+#: includes/settings-page.php:548
 msgid "Plural name"
 msgstr ""
 
-#: includes/settings-page.php:478
-#: includes/settings-page.php:539
+#: includes/settings-page.php:488
+#: includes/settings-page.php:549
 msgid "Singular name"
 msgstr ""
 
-#: includes/settings-page.php:480
-#: includes/settings-page.php:542
-#: includes/settings-page.php:631
+#: includes/settings-page.php:490
+#: includes/settings-page.php:552
+#: includes/settings-page.php:641
 msgid "URL slug"
 msgstr ""
 
-#: includes/settings-page.php:482
-msgid "Public archive and event permalinks (e.g. /veranstaltungen/)."
+#: includes/settings-page.php:492
+#: includes/settings-page.php:554
+msgid "URL for public archive and single permalinks."
 msgstr ""
 
-#: includes/settings-page.php:497
+#: includes/settings-page.php:507
 msgid "Delete event type"
 msgstr ""
 
 #. translators: %s: event type name
-#: includes/settings-page.php:504
+#: includes/settings-page.php:514
 #, php-format
 msgid "Delete “%s”? This removes the post type from Events. Existing posts are not deleted."
 msgstr ""
 
-#: includes/settings-page.php:509
+#: includes/settings-page.php:519
 msgid "You need at least one event type. Add another type before deleting this one."
 msgstr ""
 
-#: includes/settings-page.php:515
+#: includes/settings-page.php:525
 msgid "Delete type"
 msgstr ""
 
-#: includes/settings-page.php:540
+#: includes/settings-page.php:550
 msgid "Menu name"
 msgstr ""
 
-#: includes/settings-page.php:544
-msgid "Public archive and single permalinks (e.g. veranstaltungen)."
-msgstr ""
-
-#: includes/settings-page.php:546
+#: includes/settings-page.php:556
 msgid "Menu position"
 msgstr ""
 
-#: includes/settings-page.php:561
+#: includes/settings-page.php:571
 msgid "Menu icon"
 msgstr ""
 
-#: includes/settings-page.php:574
-#: includes/settings-page.php:593
+#: includes/settings-page.php:584
+#: includes/settings-page.php:603
 msgid "No icon selected"
 msgstr ""
 
-#: includes/settings-page.php:576
+#: includes/settings-page.php:586
 msgid "Choose icon"
 msgstr ""
 
-#: includes/settings-page.php:577
-#: includes/settings-page.php:599
+#: includes/settings-page.php:587
+#: includes/settings-page.php:609
 msgid "SVG code"
 msgstr ""
 
-#: includes/settings-page.php:578
-#: includes/settings-page.php:595
+#: includes/settings-page.php:588
+#: includes/settings-page.php:605
 msgid "Clear"
 msgstr ""
 
-#: includes/settings-page.php:582
+#: includes/settings-page.php:592
 msgid "Custom SVG code"
 msgstr ""
 
-#: includes/settings-page.php:584
+#: includes/settings-page.php:594
 msgid "Paste inline SVG to use a custom menu icon instead of a catalog icon."
 msgstr ""
 
 #. translators: %s: Material Icons URL
-#: includes/settings-page.php:604
+#: includes/settings-page.php:614
 #, php-format
-msgid "Paste inline SVG for the admin menu icon. Browse icons at <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">Material Icons</a>, open an icon, then copy the SVG."
-msgstr ""
-
-#: includes/settings-page.php:629
-msgid "Enable archive"
-msgstr ""
-
-#: includes/settings-page.php:632
-msgid "Edit the public URL slug under General."
-msgstr ""
-
-#: includes/settings-page.php:633
-msgid "Design"
-msgstr ""
-
-#: includes/settings-page.php:634
-msgid "List"
-msgstr ""
-
-#: includes/settings-page.php:634
-msgid "Grid"
-msgstr ""
-
-#: includes/settings-page.php:638
-msgid "Category filter"
+msgid "Browse icons at <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">Material Icons</a>."
 msgstr ""
 
 #: includes/settings-page.php:639
-msgid "Show category filter on archive"
-msgstr ""
-
-#: includes/settings-page.php:640
-msgid "Only shown when at least one category exists."
-msgstr ""
-
-#: includes/settings-page.php:641
-msgid "Heading"
+msgid "Enable archive"
 msgstr ""
 
 #: includes/settings-page.php:642
-msgid "Empty text"
+msgid "Edit the public URL slug under General."
+msgstr ""
+
+#: includes/settings-page.php:643
+msgid "Design"
+msgstr ""
+
+#: includes/settings-page.php:644
+msgid "List"
+msgstr ""
+
+#: includes/settings-page.php:644
+msgid "Grid"
+msgstr ""
+
+#: includes/settings-page.php:648
+msgid "Category filter"
+msgstr ""
+
+#: includes/settings-page.php:649
+msgid "Show category filter on archive"
+msgstr ""
+
+#: includes/settings-page.php:650
+msgid "Only shown when at least one category exists."
+msgstr ""
+
+#: includes/settings-page.php:651
+msgid "Month filter"
+msgstr ""
+
+#: includes/settings-page.php:652
+msgid "Show \"From month\" filter on archive"
+msgstr ""
+
+#: includes/settings-page.php:653
+msgid "Lets visitors jump ahead to a future month. Off by default."
 msgstr ""
 
 #: includes/settings-page.php:658
+msgid "Posts per page"
+msgstr ""
+
+#. translators: %d: WordPress Reading Settings posts per page
+#: includes/settings-page.php:663
+#, php-format
+msgid "Leave empty to use the WordPress default (%d) from Settings → Reading."
+msgstr ""
+
+#: includes/settings-page.php:667
+msgid "Heading"
+msgstr ""
+
+#: includes/settings-page.php:668
+msgid "Empty text"
+msgstr ""
+
+#: includes/settings-page.php:684
 msgid "Enable statuses"
 msgstr ""
 
-#: includes/settings-page.php:659
+#: includes/settings-page.php:685
 msgid "Show the status panel in the editor and on the front end"
 msgstr ""
 
-#: includes/settings-page.php:660
+#: includes/settings-page.php:686
 msgid "When off, saved status definitions are kept but the panel is hidden."
 msgstr ""
 
-#: includes/settings-page.php:664
+#: includes/settings-page.php:690
 msgid "Statuses shown in the event editor (in addition to None). Drag to reorder. Choose a theme color token or a custom hex color."
 msgstr ""
 
-#: includes/settings-page.php:686
+#: includes/settings-page.php:712
 msgid "Enable metadata"
 msgstr ""
 
-#: includes/settings-page.php:687
+#: includes/settings-page.php:713
 msgid "Show the metadata panel in the editor and on the front end"
 msgstr ""
 
-#: includes/settings-page.php:688
+#: includes/settings-page.php:714
 msgid "When off, saved field definitions are kept but the panel is hidden."
 msgstr ""
 
-#: includes/settings-page.php:692
+#: includes/settings-page.php:718
 msgid "Build metadata groups and fields for the editor panel. Drag to reorder. Field types: text, textarea, number, email, phone, url, select."
+msgstr ""
+
+#: templates/archive.php:93
+msgid "From month"
+msgstr ""
+
+#: templates/archive.php:100
+msgid "From today"
+msgstr ""
+
+#: templates/archive.php:145
+msgid "Filter"
+msgstr ""
+
+#: templates/archive.php:185
+msgid "Previous"
+msgstr ""
+
+#: templates/archive.php:186
+msgid "Next"
 msgstr ""
 
 #: templates/event-meta.php:58

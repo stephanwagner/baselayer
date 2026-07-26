@@ -111,6 +111,7 @@ function bl_events_is_event_listing_view(): bool
  *   empty: string,
  *   design: string,
  *   category_filter: bool,
+ *   month_filter: bool,
  *   taxonomy: string,
  *   archive_slug: string,
  *   archive_url: string
@@ -169,6 +170,7 @@ function bl_events_archive_context(): array
 		'empty' => $empty,
 		'design' => $design,
 		'category_filter' => !empty($archive['category_filter']) && $taxonomy !== '' && taxonomy_exists($taxonomy),
+		'month_filter' => !empty($archive['month_filter']),
 		'taxonomy' => $taxonomy,
 		'archive_slug' => $archive_slug,
 		'archive_url' => $archive_url,
@@ -249,6 +251,201 @@ function bl_events_archive_filter_terms(string $taxonomy): array
 	return array_values(array_filter($terms, static function ($term) {
 		return $term instanceof \WP_Term;
 	}));
+}
+
+/**
+ * Query arg for the archive “from month” picker.
+ */
+function bl_events_archive_from_query_var(): string
+{
+	return 'bl_event_from';
+}
+
+/**
+ * Whether a string is a valid YYYY-MM month key.
+ */
+function bl_events_archive_is_month_key(string $value): bool
+{
+	if (!preg_match('/^(\d{4})-(\d{2})$/', $value, $m)) {
+		return false;
+	}
+	$month = (int) $m[2];
+
+	return $month >= 1 && $month <= 12;
+}
+
+/**
+ * Unix timestamp for the first second of YYYY-MM in the site timezone, or 0.
+ */
+function bl_events_archive_month_start_ts(string $ym): int
+{
+	if (!bl_events_archive_is_month_key($ym)) {
+		return 0;
+	}
+
+	try {
+		$dt = new \DateTimeImmutable($ym . '-01 00:00:00', wp_timezone());
+	} catch (\Exception $e) {
+		return 0;
+	}
+
+	return $dt->getTimestamp();
+}
+
+/**
+ * Unix timestamp for the last second of YYYY-MM in the site timezone, or 0.
+ */
+function bl_events_archive_month_end_ts(string $ym): int
+{
+	if (!bl_events_archive_is_month_key($ym)) {
+		return 0;
+	}
+
+	try {
+		$dt = (new \DateTimeImmutable($ym . '-01 00:00:00', wp_timezone()))
+			->modify('last day of this month')
+			->setTime(23, 59, 59);
+	} catch (\Exception $e) {
+		return 0;
+	}
+
+	return $dt->getTimestamp();
+}
+
+/**
+ * Selected bl_event_from month key from the request, or ''.
+ */
+function bl_events_archive_selected_from_month(): string
+{
+	$qv = bl_events_archive_from_query_var();
+	// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- public filter URLs.
+	$raw = isset($_GET[$qv]) ? wp_unslash($_GET[$qv]) : '';
+	if (!is_string($raw)) {
+		return '';
+	}
+	$raw = sanitize_text_field($raw);
+	if (!bl_events_archive_is_month_key($raw)) {
+		return '';
+	}
+
+	return $raw;
+}
+
+/**
+ * Next calendar month through 12 months ahead (site timezone).
+ *
+ * @return list<array{key: string, label: string}>
+ */
+function bl_events_archive_from_month_options(): array
+{
+	$options = [];
+	try {
+		$cursor = (new \DateTimeImmutable('first day of next month 00:00:00', wp_timezone()));
+	} catch (\Exception $e) {
+		return [];
+	}
+
+	/* translators: %s: localized month and year, e.g. "August 2026" */
+	$label_tpl = __('From %s', 'baselayer-events');
+
+	for ($i = 0; $i < 12; $i++) {
+		$month = $cursor->modify('+' . $i . ' month');
+		$key = $month->format('Y-m');
+		$options[] = [
+			'key' => $key,
+			'label' => sprintf($label_tpl, wp_date('F Y', $month->getTimestamp())),
+		];
+	}
+
+	return $options;
+}
+
+/**
+ * Window for month-picker availability: start of next month → end of 12th option month.
+ *
+ * @return array{0: int, 1: int}|null
+ */
+function bl_events_archive_from_month_window(): ?array
+{
+	$options = bl_events_archive_from_month_options();
+	if ($options === []) {
+		return null;
+	}
+	$first = $options[0]['key'];
+	$last = $options[count($options) - 1]['key'];
+	$start = bl_events_archive_month_start_ts($first);
+	$end = bl_events_archive_month_end_ts($last);
+	if ($start <= 0 || $end <= 0) {
+		return null;
+	}
+
+	return [$start, $end];
+}
+
+/**
+ * Distinct Y-m keys that have at least one public upcoming event start in the from-picker window.
+ *
+ * @return list<string>
+ */
+function bl_events_archive_occupied_months(string $post_type): array
+{
+	global $wpdb;
+
+	$post_type = sanitize_key($post_type);
+	if ($post_type === '' || !bl_is_event_post_type($post_type)) {
+		return [];
+	}
+
+	$window = bl_events_archive_from_month_window();
+	if ($window === null) {
+		return [];
+	}
+	[$window_start, $window_end] = $window;
+	$now = time();
+
+	$start_key = defined('BL_EVENT_META_START_TS') ? BL_EVENT_META_START_TS : '_bl_event_start_ts';
+	$end_key = defined('BL_EVENT_META_END_TS') ? BL_EVENT_META_END_TS : '_bl_event_end_ts';
+	$not_master = function_exists('bl_event_sql_not_series_master')
+		? bl_event_sql_not_series_master('p')
+		: '1=1';
+
+	// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- meta keys and NOT-master fragment are fixed constants.
+	$sql = $wpdb->prepare(
+		"SELECT startm.meta_value
+		FROM {$wpdb->posts} p
+		INNER JOIN {$wpdb->postmeta} startm
+			ON startm.post_id = p.ID AND startm.meta_key = %s
+		INNER JOIN {$wpdb->postmeta} endm
+			ON endm.post_id = p.ID AND endm.meta_key = %s
+		WHERE p.post_type = %s
+			AND p.post_status = 'publish'
+			AND CAST(endm.meta_value AS UNSIGNED) >= %d
+			AND CAST(startm.meta_value AS UNSIGNED) BETWEEN %d AND %d
+			AND {$not_master}",
+		$start_key,
+		$end_key,
+		$post_type,
+		$now,
+		$window_start,
+		$window_end
+	);
+
+	// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- prepared above.
+	$rows = $wpdb->get_col($sql);
+	if (!is_array($rows) || $rows === []) {
+		return [];
+	}
+
+	$keys = [];
+	foreach ($rows as $raw_ts) {
+		$ts = (int) $raw_ts;
+		if ($ts <= 0) {
+			continue;
+		}
+		$keys[wp_date('Y-m', $ts)] = true;
+	}
+
+	return array_keys($keys);
 }
 
 /**

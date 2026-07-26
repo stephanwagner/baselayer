@@ -413,6 +413,7 @@ function bl_events_sanitize_archive($raw): array
 		'slug' => isset($raw['slug']) ? sanitize_title((string) $raw['slug']) : '',
 		'design' => $design,
 		'category_filter' => !empty($raw['category_filter']),
+		'month_filter' => !empty($raw['month_filter']),
 		'posts_per_page' => $posts_per_page,
 		'texts' => [
 			'heading' => isset($texts['heading']) ? sanitize_text_field((string) $texts['heading']) : '',
