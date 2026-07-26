@@ -21,21 +21,34 @@ function bl_events_default_menu_icon_svg(): string
 }
 
 /**
+ * Encode inline SVG as a menu_icon data URI for register_post_type.
+ */
+function bl_events_menu_icon_data_uri(string $svg): string
+{
+	$svg = preg_replace('/\sfill="[^"]*"/i', ' fill="#a7aaad"', $svg) ?: $svg;
+
+	return 'data:image/svg+xml;base64,' . base64_encode($svg);
+}
+
+/**
  * Resolve event type menu icon for register_post_type.
  * Accepts dashicon, URL/data URI, inline SVG, or BaseLayer icon catalog name.
+ * Without the theme catalog, catalog names fall back to the default calendar SVG.
  */
 function bl_events_resolve_menu_icon(string $icon): string
 {
 	$icon = trim($icon);
-	$fallback = 'dashicons-calendar-alt';
+	$fallback_svg = bl_events_default_menu_icon_svg();
 
 	if ($icon === '') {
-		return $fallback;
+		$icon = 'calendar-month';
 	}
 
 	if (function_exists('bl_cpt_menu_icon')) {
 		$resolved = bl_cpt_menu_icon($icon);
-		return is_string($resolved) && $resolved !== '' ? $resolved : $fallback;
+		return is_string($resolved) && $resolved !== ''
+			? $resolved
+			: bl_events_menu_icon_data_uri($fallback_svg);
 	}
 
 	if (strpos($icon, 'dashicons-') === 0 || strpos($icon, 'data:image/') === 0 || preg_match('#^https?://#i', $icon)) {
@@ -43,12 +56,11 @@ function bl_events_resolve_menu_icon(string $icon): string
 	}
 
 	if (stripos($icon, '<svg') !== false) {
-		$svg = preg_replace('/\sfill="[^"]*"/i', ' fill="#a7aaad"', $icon) ?: $icon;
-		return 'data:image/svg+xml;base64,' . base64_encode($svg);
+		return bl_events_menu_icon_data_uri($icon);
 	}
 
-	// Catalog names (e.g. calendar-month) only resolve with the theme helper.
-	return $fallback;
+	// Catalog names (e.g. calendar-month) without theme → default SVG.
+	return bl_events_menu_icon_data_uri($fallback_svg);
 }
 
 /**

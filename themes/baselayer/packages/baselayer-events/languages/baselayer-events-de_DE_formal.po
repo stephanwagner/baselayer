@@ -2,9 +2,9 @@
 # This file is distributed under the same license as the BaseLayer Events plugin.
 msgid ""
 msgstr ""
-"Project-Id-Version: BaseLayer Events 1.0.0\n"
+"Project-Id-Version: BaseLayer Events 0.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/baselayer-events\n"
-"POT-Creation-Date: 2026-07-26T03:10:38+00:00\n"
+"POT-Creation-Date: 2026-07-26T03:59:20+00:00\n"
 "PO-Revision-Date: 2026-07-26T03:09:14+00:00\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -40,7 +40,7 @@ msgstr "BaseLayer"
 msgid "https://baselayerwp.com/baselayer-events"
 msgstr "https://baselayerwp.com/baselayer-events"
 
-#: includes/assets.php:68 includes/events.php:805 includes/i18n-defaults.php:35
+#: includes/assets.php:68 includes/events.php:806 includes/i18n-defaults.php:35
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -80,7 +80,7 @@ msgstr "Farbe"
 msgid "Status information"
 msgstr "Statusinformationen"
 
-#: includes/assets.php:96 includes/events.php:393
+#: includes/assets.php:96 includes/events.php:394
 msgid "Recurring"
 msgstr "Wiederkehrend"
 
@@ -297,7 +297,7 @@ msgstr "Keine bevorstehenden Termine."
 msgid "Edit"
 msgstr "Bearbeiten"
 
-#: includes/assets.php:189 includes/events.php:806
+#: includes/assets.php:189 includes/events.php:807
 msgid "Edit occurrences"
 msgstr "Termine bearbeiten"
 
@@ -498,15 +498,15 @@ msgstr "Keine"
 msgid "Custom"
 msgstr "Benutzerdefiniert"
 
-#: includes/events.php:747
+#: includes/events.php:748
 msgid "Event dates"
 msgstr "Termin"
 
-#: includes/events.php:820
+#: includes/events.php:821
 msgid "Occurrence"
 msgstr "Termin"
 
-#: includes/events.php:825
+#: includes/events.php:826
 msgid "Master"
 msgstr "Vorlage"
 
@@ -584,7 +584,7 @@ msgstr "Du hast keine Berechtigung, Veranstaltungstypen zu verwalten."
 msgid "General"
 msgstr "Allgemein"
 
-#: includes/settings-page.php:441 includes/settings-page.php:634
+#: includes/settings-page.php:441 includes/settings-page.php:679
 msgid "Archive"
 msgstr "Archiv"
 
@@ -702,73 +702,85 @@ msgstr "Menüname"
 msgid "Menu position"
 msgstr "Menüposition"
 
-#: includes/settings-page.php:600
+#: includes/settings-page.php:611
 msgid "Menu icon"
 msgstr "Menüsymbol"
 
-#: includes/settings-page.php:611
+#: includes/settings-page.php:624 includes/settings-page.php:643
 msgid "No icon selected"
 msgstr "Kein Symbol ausgewählt"
 
-#: includes/settings-page.php:613
+#: includes/settings-page.php:626
 msgid "Choose icon"
 msgstr "Symbol wählen"
 
-#: includes/settings-page.php:614
+#: includes/settings-page.php:627 includes/settings-page.php:649
 msgid "SVG code"
 msgstr "SVG-Code"
 
-#: includes/settings-page.php:615
+#: includes/settings-page.php:628 includes/settings-page.php:645
 msgid "Clear"
 msgstr "Leeren"
 
-#: includes/settings-page.php:619
+#: includes/settings-page.php:632
 msgid "Custom SVG code"
 msgstr "Eigener SVG-Code"
 
-#: includes/settings-page.php:621
+#: includes/settings-page.php:634
 msgid "Paste inline SVG to use a custom menu icon instead of a catalog icon."
 msgstr ""
 "Füge Inline-SVG ein, um ein eigenes Menüsymbol statt eines Katalogsymbols zu "
 "verwenden."
 
-#: includes/settings-page.php:634
+#. translators: %s: Material Icons URL
+#: includes/settings-page.php:654
+#, php-format
+msgid ""
+"Paste inline SVG for the admin menu icon. Browse icons at <a href=\"%s\" "
+"target=\"_blank\" rel=\"noopener noreferrer\">Material Icons (Rounded)</a>, "
+"open an icon, then copy the SVG."
+msgstr ""
+"Füge Inline-SVG für das Admin-Menüsymbol ein. Icons findest du unter <a "
+"href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">Material Icons "
+"(Rounded)</a> — Symbol öffnen und SVG kopieren."
+
+#: includes/settings-page.php:679
 msgid "Enable archive"
 msgstr "Archiv aktivieren"
 
-#: includes/settings-page.php:635
+#: includes/settings-page.php:680
 msgid "Archive slug"
 msgstr "Archiv-Slug"
 
-#: includes/settings-page.php:636
+#: includes/settings-page.php:681
 msgid "Design"
 msgstr "Design"
 
-#: includes/settings-page.php:637
+#: includes/settings-page.php:682
 msgid "List"
 msgstr "Liste"
 
-#: includes/settings-page.php:637
+#: includes/settings-page.php:682
 msgid "Grid"
 msgstr "Raster"
 
-#: includes/settings-page.php:641
+#: includes/settings-page.php:686
 msgid "Category filter"
 msgstr "Kategoriefilter"
 
-#: includes/settings-page.php:641
+#: includes/settings-page.php:686
 msgid "Show category filter on archive"
 msgstr "Kategoriefilter im Archiv anzeigen"
 
-#: includes/settings-page.php:642
+#: includes/settings-page.php:687
 msgid "Heading"
 msgstr "Überschrift"
 
-#: includes/settings-page.php:643
+#: includes/settings-page.php:688
 msgid "Empty text"
 msgstr "Leertext"
 
-#: includes/settings-page.php:658
+#: includes/settings-page.php:703
 msgid ""
 "Statuses shown in the event editor (in addition to None and Custom). Drag to "
 "reorder. Choose a theme color token or a custom hex color."
@@ -777,21 +789,21 @@ msgstr ""
 "Per Ziehen neu anordnen. Wähle ein Theme-Farbtoken oder eine eigene Hex-"
 "Farbe."
 
-#: includes/settings-page.php:680
+#: includes/settings-page.php:725
 msgid "Enable metadata"
 msgstr "Metadaten aktivieren"
 
-#: includes/settings-page.php:681
+#: includes/settings-page.php:726
 msgid "Show the metadata panel in the editor and on the front end"
 msgstr "Metadaten-Panel im Editor und auf der Website anzeigen"
 
-#: includes/settings-page.php:682
+#: includes/settings-page.php:727
 msgid "When off, saved field definitions are kept but the panel is hidden."
 msgstr ""
 "Wenn deaktiviert, bleiben gespeicherte Felddefinitionen erhalten, das Panel "
 "wird aber ausgeblendet."
 
-#: includes/settings-page.php:686
+#: includes/settings-page.php:731
 msgid ""
 "Build metadata groups and fields for the editor panel. Drag to reorder. "
 "Field types: text, textarea, number, email, phone, url, select."
@@ -809,6 +821,6 @@ msgstr "Alle Veranstaltungen"
 msgid "All %s"
 msgstr "Alle %s"
 
-#: templates/event-meta.php:108
+#: templates/event-meta.php:116
 msgid "Download iCal"
 msgstr "iCal herunterladen"

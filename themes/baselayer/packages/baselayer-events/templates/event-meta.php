@@ -61,6 +61,14 @@ if ($obj && !empty($obj->labels->name)) {
 	/* translators: %s: post type plural label (e.g. Events) */
 	$all_events_label = sprintf(__('All %s', 'baselayer-events'), $obj->labels->name);
 }
+
+$plain_actions = !empty($plain_actions);
+$all_events_class = $plain_actions
+	? 'event-meta__all-events'
+	: 'event-meta__all-events button -secondary -outline -small -has-icon -icon-arrow-left';
+$ical_class = $plain_actions
+	? 'event-meta__ical-link'
+	: 'event-meta__ical-link button -secondary -outline -small -has-icon -icon-calendar';
 ?>
 <aside class="event-meta" aria-label="<?= esc_attr($aria) ?>">
 	<?php if ($groups_out !== []) { ?>
@@ -99,12 +107,12 @@ if ($obj && !empty($obj->labels->name)) {
 	<?php if ($show_actions) { ?>
 		<div class="event-meta__actions">
 			<?php if ($archive_url !== '') { ?>
-				<a class="event-meta__all-events button -secondary -outline -small -has-icon -icon-arrow-left" href="<?= esc_url($archive_url) ?>">
+				<a class="<?= esc_attr($all_events_class) ?>" href="<?= esc_url($archive_url) ?>">
 					<?= esc_html($all_events_label) ?>
 				</a>
 			<?php } ?>
 			<?php if ($can_ical) { ?>
-				<a class="event-meta__ical-link button -secondary -outline -small -has-icon -icon-calendar" href="<?= esc_url(bl_event_ical_url($post_id)) ?>">
+				<a class="<?= esc_attr($ical_class) ?>" href="<?= esc_url(bl_event_ical_url($post_id)) ?>">
 					<?= esc_html__('Download iCal', 'baselayer-events') ?>
 				</a>
 			<?php } ?>

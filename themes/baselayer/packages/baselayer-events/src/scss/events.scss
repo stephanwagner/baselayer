@@ -5,20 +5,38 @@ $high-density-dppx: 1.5dppx;
 // Event status palette
 $event-status-keys: ('neutral', 'info', 'error', 'warning', 'success', 'accent', 'cancelled', 'postponed');
 
+// Standalone fallbacks when BaseLayer theme tokens are absent.
+$bl-fallback-neutral: #6f7882;
+$bl-fallback-neutral-bg: #eef0f2;
+$bl-fallback-info: #366cd9;
+$bl-fallback-info-bg: #e8f0fc;
+$bl-fallback-error: #d1343a;
+$bl-fallback-error-bg: #fceeef;
+$bl-fallback-warning: #e97800;
+$bl-fallback-warning-bg: #fff1e0;
+$bl-fallback-success: #28a15a;
+$bl-fallback-success-bg: #e6f6ec;
+$bl-fallback-accent: #8257e5;
+$bl-fallback-accent-bg: #f1ebfc;
+$bl-fallback-gray-800: #3c434a;
+$bl-fallback-gray-700: #58616b;
+$bl-fallback-gray-600: #6f7882;
+$bl-fallback-gray-300: #d0d7de;
+
 // Variables
 :root {
-  --bl-event-status-neutral: var(--bl-color-neutral);
-  --bl-event-status-neutral-bg: var(--bl-color-neutral-bg);
-  --bl-event-status-info: var(--bl-color-info);
-  --bl-event-status-info-bg: var(--bl-color-info-bg);
-  --bl-event-status-error: var(--bl-color-error);
-  --bl-event-status-error-bg: var(--bl-color-error-bg);
-  --bl-event-status-warning: var(--bl-color-warning);
-  --bl-event-status-warning-bg: var(--bl-color-warning-bg);
-  --bl-event-status-success: var(--bl-color-success);
-  --bl-event-status-success-bg: var(--bl-color-success-bg);
-  --bl-event-status-accent: var(--bl-color-accent);
-  --bl-event-status-accent-bg: var(--bl-color-accent-bg);
+  --bl-event-status-neutral: var(--bl-color-neutral, #{$bl-fallback-neutral});
+  --bl-event-status-neutral-bg: var(--bl-color-neutral-bg, #{$bl-fallback-neutral-bg});
+  --bl-event-status-info: var(--bl-color-info, #{$bl-fallback-info});
+  --bl-event-status-info-bg: var(--bl-color-info-bg, #{$bl-fallback-info-bg});
+  --bl-event-status-error: var(--bl-color-error, #{$bl-fallback-error});
+  --bl-event-status-error-bg: var(--bl-color-error-bg, #{$bl-fallback-error-bg});
+  --bl-event-status-warning: var(--bl-color-warning, #{$bl-fallback-warning});
+  --bl-event-status-warning-bg: var(--bl-color-warning-bg, #{$bl-fallback-warning-bg});
+  --bl-event-status-success: var(--bl-color-success, #{$bl-fallback-success});
+  --bl-event-status-success-bg: var(--bl-color-success-bg, #{$bl-fallback-success-bg});
+  --bl-event-status-accent: var(--bl-color-accent, #{$bl-fallback-accent});
+  --bl-event-status-accent-bg: var(--bl-color-accent-bg, #{$bl-fallback-accent-bg});
 
   --bl-event-status-cancelled: var(--bl-event-status-error);
   --bl-event-status-cancelled-bg: var(--bl-event-status-error-bg);
@@ -30,11 +48,19 @@ $event-status-keys: ('neutral', 'info', 'error', 'warning', 'success', 'accent',
 .event-date {
   margin: 0 0 24px;
   font-weight: 400;
-  color: var(--bl-gray-text-color);
+  color: var(--bl-gray-text-color, #{$bl-fallback-gray-700});
 
   @media (max-width: $breakpoint-s) {
     margin-bottom: 16px;
   }
+}
+
+.event-date--inline {
+  display: block;
+  margin: 0.35em 0 0;
+  font-size: 0.875em;
+  font-weight: 400;
+  color: var(--bl-gray-text-color, #{$bl-fallback-gray-600});
 }
 
 // Event status
@@ -47,9 +73,9 @@ $event-status-keys: ('neutral', 'info', 'error', 'warning', 'success', 'accent',
   border-color: var(--bl-status-color);
   border-left-width: 5px;
   border-left-color: var(--bl-status-color);
-  border-radius: var(--bl-border-radius-m);
+  border-radius: var(--bl-border-radius-m, 6px);
   background: var(--bl-status-bg);
-  color: var(--bl-color-gray-800);
+  color: var(--bl-color-gray-800, #{$bl-fallback-gray-800});
 
   @media (min-resolution: $high-density-dppx) {
     border-width: 1.5px;
@@ -73,7 +99,7 @@ $event-status-keys: ('neutral', 'info', 'error', 'warning', 'success', 'accent',
 // Event status info
 .event-status__info {
   margin: 6px 0 0;
-  color: var(--bl-color-gray-700);
+  color: var(--bl-color-gray-700, #{$bl-fallback-gray-700});
 
   p {
     margin: 0 0 6px;
@@ -110,7 +136,7 @@ $event-status-keys: ('neutral', 'info', 'error', 'warning', 'success', 'accent',
 .event-meta {
   margin: 32px 0 0;
   padding-top: 24px;
-  border-top: 2px solid var(--bl-color-gray-300);
+  border-top: 2px solid var(--bl-color-gray-300, #{$bl-fallback-gray-300});
 
   @media (min-resolution: $high-density-dppx) {
     border-top-width: 1.5px;
@@ -160,7 +186,7 @@ $event-status-keys: ('neutral', 'info', 'error', 'warning', 'success', 'accent',
 .event-meta__label {
   margin: 0;
   font-weight: 600;
-  color: var(--bl-color-gray-600);
+  color: var(--bl-color-gray-600, #{$bl-fallback-gray-600});
 }
 
 .event-meta__value {
@@ -173,6 +199,15 @@ $event-status-keys: ('neutral', 'info', 'error', 'warning', 'success', 'accent',
   flex-wrap: wrap;
   gap: 12px;
   margin-top: 24px;
+}
+
+.event-meta__all-events,
+.event-meta__ical-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
 }
 
 .event-meta__ical-link {

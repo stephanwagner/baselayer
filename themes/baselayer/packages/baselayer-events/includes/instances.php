@@ -273,6 +273,7 @@ function bl_events_forced_supports(): array
 		'excerpt',
 		'revisions',
 		'author',
+		'custom-fields',
 	];
 }
 

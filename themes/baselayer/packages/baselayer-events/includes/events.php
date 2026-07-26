@@ -10,6 +10,7 @@ require_once __DIR__ . '/events-recurrence.php';
 require_once __DIR__ . '/events-meta.php';
 require_once __DIR__ . '/events-ical.php';
 require_once __DIR__ . '/events-status.php';
+require_once __DIR__ . '/front.php';
 
 const BL_EVENT_META_START_DATE = '_bl_event_start_date';
 const BL_EVENT_META_END_DATE = '_bl_event_end_date';

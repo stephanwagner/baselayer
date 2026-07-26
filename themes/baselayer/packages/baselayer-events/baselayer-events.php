@@ -18,7 +18,7 @@ if (defined('BL_EVENTS_LOADED')) {
 }
 
 define('BL_EVENTS_LOADED', true);
-define('BL_EVENTS_VERSION', '1.0.0');
+define('BL_EVENTS_VERSION', '0.1.0');
 define('BL_EVENTS_FILE', __FILE__);
 define('BL_EVENTS_PATH', trailingslashit(dirname(__FILE__)));
 define('BL_EVENTS_TEXTDOMAIN', 'baselayer-events');

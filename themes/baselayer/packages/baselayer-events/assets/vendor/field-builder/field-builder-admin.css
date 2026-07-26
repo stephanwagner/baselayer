@@ -189,10 +189,6 @@
   border-bottom-color: #2271b1;
 }
 
-.bl-field-builder__tab-panels {
-  padding: 12px 14px 14px;
-}
-
 .bl-field-builder__tab-panel:not(.is-active) {
   display: none;
 }
