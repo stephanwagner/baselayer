@@ -563,6 +563,45 @@ function bl_event_archive_pre_get_posts(\WP_Query $query): void
 	$query->set('orderby', 'meta_value_num');
 	$query->set('order', 'ASC');
 	$query->set('bl_event_public_listing', true);
+
+	$post_type = '';
+	if ($query->is_post_type_archive()) {
+		$pt = $query->get('post_type');
+		if (is_array($pt)) {
+			$pt = (string) reset($pt);
+		}
+		$post_type = is_string($pt) ? $pt : '';
+	} elseif ($query->is_tax() && function_exists('bl_events_archive_current_post_type')) {
+		// Queried object not always ready this early — resolve from taxonomy object types.
+		$taxonomy = $query->get('taxonomy');
+		if (!is_string($taxonomy) || $taxonomy === '') {
+			$obj = $query->get_queried_object();
+			$taxonomy = $obj instanceof \WP_Term ? $obj->taxonomy : '';
+		}
+		if (is_string($taxonomy) && $taxonomy !== '' && taxonomy_exists($taxonomy)) {
+			$tax = get_taxonomy($taxonomy);
+			$object_types = $tax && is_array($tax->object_type) ? $tax->object_type : [];
+			foreach ($object_types as $object_type) {
+				if (is_string($object_type) && bl_is_event_post_type($object_type)) {
+					$post_type = $object_type;
+					break;
+				}
+			}
+		}
+	}
+
+	if ($post_type === '' || !function_exists('bl_events_get_instance')) {
+		return;
+	}
+
+	$inst = bl_events_get_instance($post_type);
+	$archive = is_array($inst) && isset($inst['archive']) && is_array($inst['archive'])
+		? $inst['archive']
+		: [];
+	$ppp = isset($archive['posts_per_page']) ? $archive['posts_per_page'] : null;
+	if ($ppp !== null && (int) $ppp > 0) {
+		$query->set('posts_per_page', min(100, (int) $ppp));
+	}
 }
 
 add_action('pre_get_posts', 'bl_event_archive_pre_get_posts', 25);

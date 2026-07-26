@@ -339,11 +339,20 @@ function bl_events_apply_settings_tab(array $cfg, string $tab, array $post): arr
 		if (isset($cfg['archive']) && is_array($cfg['archive']) && isset($cfg['archive']['slug'])) {
 			$existing_slug = sanitize_title((string) $cfg['archive']['slug']);
 		}
+		$posts_per_page_raw = isset($post['archive_posts_per_page']) ? trim((string) $post['archive_posts_per_page']) : '';
+		$posts_per_page = null;
+		if ($posts_per_page_raw !== '') {
+			$n = (int) $posts_per_page_raw;
+			if ($n > 0) {
+				$posts_per_page = min(100, $n);
+			}
+		}
 		$cfg['archive'] = [
 			'enabled' => !empty($post['archive_enabled']),
 			'slug' => $existing_slug,
 			'design' => sanitize_key((string) ($post['archive_design'] ?? 'list')),
 			'category_filter' => !empty($post['archive_category_filter']),
+			'posts_per_page' => $posts_per_page,
 			'texts' => [
 				'heading' => sanitize_text_field((string) ($post['archive_heading'] ?? '')),
 				'empty' => sanitize_text_field((string) ($post['archive_empty'] ?? '')),
@@ -638,6 +647,19 @@ function bl_events_settings_archive_fields(array $cfg): void
 	echo '<tr><th>' . esc_html__('Category filter', 'baselayer-events') . '</th><td>';
 	echo '<label><input type="checkbox" name="archive_category_filter" value="1" ' . checked(!empty($archive['category_filter']), true, false) . '> ' . esc_html__('Show category filter on archive', 'baselayer-events') . '</label>';
 	echo '<p class="description">' . esc_html__('Only shown when at least one category exists.', 'baselayer-events') . '</p></td></tr>';
+	$ppp = isset($archive['posts_per_page']) && $archive['posts_per_page'] !== null && (int) $archive['posts_per_page'] > 0
+		? (string) (int) $archive['posts_per_page']
+		: '';
+	$wp_ppp = (int) get_option('posts_per_page');
+	echo '<tr><th>' . esc_html__('Posts per page', 'baselayer-events') . '</th><td>';
+	echo '<input type="number" class="small-text" name="archive_posts_per_page" value="' . esc_attr($ppp) . '" min="1" max="100" step="1" placeholder="' . esc_attr((string) max(1, $wp_ppp)) . '">';
+	echo '<p class="description">' . esc_html(
+		sprintf(
+			/* translators: %d: WordPress Reading Settings posts per page */
+			__('Leave empty to use the WordPress default (%d) from Settings → Reading.', 'baselayer-events'),
+			max(1, $wp_ppp)
+		)
+	) . '</p></td></tr>';
 	echo '<tr><th>' . esc_html__('Heading', 'baselayer-events') . '</th><td><input type="text" class="regular-text" name="archive_heading" value="' . esc_attr((string) ($texts['heading'] ?? '')) . '"></td></tr>';
 	echo '<tr><th>' . esc_html__('Empty text', 'baselayer-events') . '</th><td><input type="text" class="regular-text" name="archive_empty" value="' . esc_attr((string) ($texts['empty'] ?? '')) . '"></td></tr>';
 }

@@ -24,7 +24,14 @@ function bl_event_ical_url(int $post_id): string
  */
 function bl_event_can_download_ical(int $post_id): bool
 {
-	return bl_event_build_ical($post_id) !== null;
+	if ($post_id <= 0 || !function_exists('bl_event_get_schedule')) {
+		return false;
+	}
+	if (!bl_is_event_post_type(get_post_type($post_id))) {
+		return false;
+	}
+
+	return bl_event_get_schedule($post_id) !== null;
 }
 
 /**
@@ -136,9 +143,16 @@ function bl_event_ical_meta_fields(int $post_id): array
 		}
 	}
 
-	$excerpt = get_the_excerpt($post_id);
-	if (is_string($excerpt) && trim(wp_strip_all_tags($excerpt)) !== '') {
-		$description[] = trim(wp_strip_all_tags($excerpt));
+	// Raw excerpt only — never get_the_excerpt() (that can re-enter the_content).
+	$post = get_post($post_id);
+	if ($post instanceof \WP_Post) {
+		$excerpt = trim(wp_strip_all_tags((string) $post->post_excerpt));
+		if ($excerpt === '' && is_string($post->post_content) && $post->post_content !== '') {
+			$excerpt = trim(wp_strip_all_tags(wp_trim_words($post->post_content, 55, '')));
+		}
+		if ($excerpt !== '') {
+			$description[] = $excerpt;
+		}
 	}
 
 	return [

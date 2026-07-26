@@ -400,11 +400,20 @@ function bl_events_sanitize_archive($raw): array
 	}
 	$texts = isset($raw['texts']) && is_array($raw['texts']) ? $raw['texts'] : [];
 
+	$posts_per_page = null;
+	if (array_key_exists('posts_per_page', $raw) && $raw['posts_per_page'] !== '' && $raw['posts_per_page'] !== null) {
+		$n = (int) $raw['posts_per_page'];
+		if ($n > 0) {
+			$posts_per_page = min(100, $n);
+		}
+	}
+
 	return [
 		'enabled' => !array_key_exists('enabled', $raw) || !empty($raw['enabled']),
 		'slug' => isset($raw['slug']) ? sanitize_title((string) $raw['slug']) : '',
 		'design' => $design,
 		'category_filter' => !empty($raw['category_filter']),
+		'posts_per_page' => $posts_per_page,
 		'texts' => [
 			'heading' => isset($texts['heading']) ? sanitize_text_field((string) $texts['heading']) : '',
 			'empty' => isset($texts['empty']) ? sanitize_text_field((string) $texts['empty']) : '',

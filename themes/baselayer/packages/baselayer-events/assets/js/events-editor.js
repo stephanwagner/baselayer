@@ -12,7 +12,7 @@
     }
     const el = wp.element.createElement;
     const Fragment = wp.element.Fragment;
-    const { useState, useEffect, useMemo } = wp.element;
+    const { useState, useEffect, useMemo, useRef } = wp.element;
     const { useSelect } = wp.data;
     const { useEntityProp } = wp.coreData;
     const { registerPlugin } = wp.plugins;
@@ -593,6 +593,76 @@
         },
         [postId, startDate, endDate]
       );
+      const dateFieldsDisabled = !!isOccurrence;
+      const startDraftRef = useRef(startDraft);
+      const endDraftRef = useRef(endDraft);
+      const metaRef = useRef(meta);
+      const setMetaRef = useRef(setMeta);
+      startDraftRef.current = startDraft;
+      endDraftRef.current = endDraft;
+      metaRef.current = meta;
+      setMetaRef.current = setMeta;
+      useEffect(
+        function() {
+          if (dateFieldsDisabled) {
+            return void 0;
+          }
+          function flushDateDrafts() {
+            const currentMeta = metaRef.current;
+            const setCurrentMeta = setMetaRef.current;
+            if (!currentMeta || typeof setCurrentMeta !== "function") {
+              return;
+            }
+            const next = {};
+            const start = startDraftRef.current || "";
+            let end = endDraftRef.current || "";
+            if (start && (!end || end < start)) {
+              end = start;
+            }
+            const committedStart = currentMeta[META_START_DATE] || "";
+            const committedEnd = currentMeta[META_END_DATE] || "";
+            if (start !== committedStart) {
+              next[META_START_DATE] = start;
+            }
+            if (end !== committedEnd) {
+              next[META_END_DATE] = end;
+            }
+            if (!Object.keys(next).length) {
+              return;
+            }
+            if (next[META_END_DATE] !== void 0) {
+              setEndDraft(next[META_END_DATE]);
+            }
+            if (next[META_START_DATE] !== void 0) {
+              setStartDraft(next[META_START_DATE]);
+            }
+            setCurrentMeta(Object.assign({}, currentMeta, next));
+          }
+          function isEditorSaveControl(target) {
+            if (!(target instanceof Element)) {
+              return false;
+            }
+            return !!(target.closest(".editor-post-publish-button") || target.closest(".editor-post-publish-button__button") || target.closest(".editor-post-save-draft") || target.closest(".editor-post-publish-panel__toggle") || target.closest(".editor-post-publish-panel__header-publish-button"));
+          }
+          function onPointerDown(e) {
+            if (isEditorSaveControl(e.target)) {
+              flushDateDrafts();
+            }
+          }
+          function onKeyDown(e) {
+            if ((e.metaKey || e.ctrlKey) && (e.key === "s" || e.key === "S")) {
+              flushDateDrafts();
+            }
+          }
+          document.addEventListener("pointerdown", onPointerDown, true);
+          document.addEventListener("keydown", onKeyDown, true);
+          return function() {
+            document.removeEventListener("pointerdown", onPointerDown, true);
+            document.removeEventListener("keydown", onKeyDown, true);
+          };
+        },
+        [dateFieldsDisabled]
+      );
       if (!meta || typeof setMeta !== "function") {
         return null;
       }
@@ -627,7 +697,6 @@
           });
         }
       }
-      const dateFieldsDisabled = !!isOccurrence;
       const occurrenceCount = currentPost && typeof currentPost.bl_occurrence_count === "number" ? currentPost.bl_occurrence_count : null;
       const masterTitle = currentPost && currentPost.bl_master_title || masterRecord && (masterRecord.title?.rendered || masterRecord.title?.raw) || "";
       const masterEditUrl = currentPost && currentPost.bl_master_edit_link || (masterId ? "post.php?post=" + masterId + "&action=edit" : "");
