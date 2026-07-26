@@ -449,7 +449,27 @@ function bl_events_archive_occupied_months(string $post_type): array
 }
 
 /**
- * Theme override for event listings: archive-{post_type}.php, archive-{slug}.php, or taxonomy-{tax}.php.
+ * Archive rewrite slug for an event post type, or ''.
+ */
+function bl_events_post_type_archive_slug(string $post_type): string
+{
+	$post_type = sanitize_key($post_type);
+	if ($post_type === '') {
+		return '';
+	}
+
+	$inst = function_exists('bl_events_get_instance') ? bl_events_get_instance($post_type) : null;
+	$archive = is_array($inst) && isset($inst['archive']) && is_array($inst['archive'])
+		? $inst['archive']
+		: [];
+	$slug = isset($archive['slug']) ? sanitize_title((string) $archive['slug']) : '';
+
+	return $slug !== '' ? $slug : '';
+}
+
+/**
+ * Theme override for event listings.
+ * Prefers archive-event.php, then archive-{slug}.php, archive-{post_type}.php, taxonomy-{tax}.php.
  */
 function bl_events_locate_theme_archive_override(string $post_type): string
 {
@@ -462,30 +482,57 @@ function bl_events_locate_theme_archive_override(string $post_type): string
 		}
 	}
 
+	$candidates[] = 'archive-event.php';
 	if ($post_type !== '') {
-		$candidates[] = 'archive-' . $post_type . '.php';
-		$inst = function_exists('bl_events_get_instance') ? bl_events_get_instance($post_type) : null;
-		$archive = is_array($inst) && isset($inst['archive']) && is_array($inst['archive'])
-			? $inst['archive']
-			: [];
-		$slug = isset($archive['slug']) ? sanitize_title((string) $archive['slug']) : '';
-		if ($slug !== '' && $slug !== $post_type) {
+		$slug = bl_events_post_type_archive_slug($post_type);
+		if ($slug !== '' && $slug !== 'event') {
 			$candidates[] = 'archive-' . $slug . '.php';
+		}
+		if ($post_type !== 'event' && $post_type !== $slug) {
+			$candidates[] = 'archive-' . $post_type . '.php';
 		}
 	}
 
 	$candidates = array_values(array_unique(array_filter($candidates)));
-	if ($candidates === []) {
-		return '';
-	}
-
 	$found = locate_template($candidates, false, false);
 
 	return is_string($found) ? $found : '';
 }
 
 /**
- * Use package archive (or theme override) on standalone event listings.
+ * Theme override for singular events.
+ * Prefers single-event.php, then single-{slug}.php, single-{post_type}.php.
+ */
+function bl_events_locate_theme_single_override(string $post_type): string
+{
+	$candidates = ['single-event.php'];
+	if ($post_type !== '') {
+		$slug = bl_events_post_type_archive_slug($post_type);
+		if ($slug !== '' && $slug !== 'event') {
+			$candidates[] = 'single-' . $slug . '.php';
+		}
+		if ($post_type !== 'event' && $post_type !== $slug) {
+			$candidates[] = 'single-' . $post_type . '.php';
+		}
+	}
+
+	$candidates = array_values(array_unique(array_filter($candidates)));
+	$found = locate_template($candidates, false, false);
+
+	return is_string($found) ? $found : '';
+}
+
+/**
+ * Whether the current request uses the package/theme Events singular template
+ * (so the_content should not inject date/status/meta again).
+ */
+function bl_events_using_singular_template(): bool
+{
+	return !empty($GLOBALS['bl_events_using_singular_template']);
+}
+
+/**
+ * Use package archive/single (or theme override) on standalone event views.
  *
  * @param string $template
  * @return string
@@ -500,6 +547,31 @@ function bl_events_filter_template_include(string $template): string
 		return $template;
 	}
 
+	// Singular event posts.
+	if (is_singular()) {
+		$post_type = get_post_type();
+		if (!is_string($post_type) || $post_type === '' || !bl_is_event_post_type($post_type)) {
+			return $template;
+		}
+
+		$override = bl_events_locate_theme_single_override($post_type);
+		$path = $override !== '' ? $override : bl_events_template_path('single');
+		if ($path === '') {
+			return $template;
+		}
+
+		$GLOBALS['bl_events_using_singular_template'] = true;
+
+		/**
+		 * Filter the resolved event singular template path (theme override or package).
+		 *
+		 * @param string $path Absolute template path.
+		 * @param string $post_type Event post type.
+		 */
+		return (string) apply_filters('bl_events_single_template', $path, $post_type);
+	}
+
+	// CPT / category archives.
 	$post_type = bl_events_archive_current_post_type();
 	if ($post_type === '') {
 		return $template;
@@ -628,6 +700,11 @@ function bl_events_filter_the_content(string $content): string
 	}
 
 	if (!bl_events_should_auto_render_front()) {
+		return $content;
+	}
+
+	// Package/theme singular template already renders date, status, and meta.
+	if (bl_events_using_singular_template()) {
 		return $content;
 	}
 

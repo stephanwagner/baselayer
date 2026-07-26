@@ -1031,4 +1031,8 @@ input[type=search].bl-icon-picker-modal__search {
   margin-top: 10px;
 }
 
+.bl-events-menu-icon-field__svg-panel[hidden] {
+  display: none !important;
+}
+
 /*# sourceMappingURL=events-admin.css.map */

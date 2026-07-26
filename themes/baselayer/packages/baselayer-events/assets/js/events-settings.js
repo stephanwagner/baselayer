@@ -1206,26 +1206,25 @@
       return;
     }
     let value = input && input.value || textarea && textarea.value || "";
-    const startWithSvg = svgOnly || isSvgValue(value);
-    setSvgOpen(root, startWithSvg);
-    if (textarea && startWithSvg && isSvgValue(value)) {
+    setSvgOpen(root, false);
+    if (textarea && isSvgValue(value)) {
       textarea.value = value;
     }
-    syncPreview(root, value);
+    if (value !== "" || !svgOnly) {
+      syncPreview(root, value);
+    }
     const commit = (next, { openSvg = false } = {}) => {
       value = next == null ? "" : String(next);
       if (input) {
         input.value = value;
       }
-      if (textarea && (isSvgValue(value) || svgOnly)) {
+      if (textarea && (isSvgValue(value) || svgOnly && openSvg)) {
         textarea.value = value;
-      } else if (textarea && !openSvg && !svgOnly) {
-        if (!isSvgValue(value)) {
-          textarea.value = "";
-        }
+      } else if (textarea && !openSvg && !isSvgValue(value)) {
+        textarea.value = "";
       }
       syncPreview(root, value);
-      if (openSvg || svgOnly) {
+      if (openSvg) {
         setSvgOpen(root, true);
       }
     };
@@ -1249,7 +1248,7 @@
         }
       });
     }
-    if (svgToggle && !svgOnly) {
+    if (svgToggle) {
       svgToggle.addEventListener("click", () => {
         const panel = root.querySelector("[data-bl-events-menu-icon-svg-panel]");
         const willOpen = panel ? panel.hidden : true;
@@ -1267,9 +1266,7 @@
     if (clearBtn) {
       clearBtn.addEventListener("click", () => {
         commit("");
-        if (!svgOnly) {
-          setSvgOpen(root, false);
-        }
+        setSvgOpen(root, false);
         if (textarea) {
           textarea.value = "";
         }

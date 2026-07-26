@@ -820,3 +820,7 @@
 .bl-events-menu-icon-field__svg-panel {
   margin-top: 10px;
 }
+
+.bl-events-menu-icon-field__svg-panel[hidden] {
+  display: none !important;
+}

@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BaseLayer Events 0.1.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/baselayer-events\n"
-"POT-Creation-Date: 2026-07-26T08:53:27+00:00\n"
+"POT-Creation-Date: 2026-07-26T09:54:57+00:00\n"
 "PO-Revision-Date: 2026-07-26T03:09:14+00:00\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -641,7 +641,7 @@ msgstr "Du hast keine Berechtigung, Veranstaltungstypen zu verwalten."
 msgid "General"
 msgstr "Allgemein"
 
-#: includes/settings-page.php:398 includes/settings-page.php:639
+#: includes/settings-page.php:398 includes/settings-page.php:645
 msgid "Archive"
 msgstr "Archiv"
 
@@ -704,7 +704,7 @@ msgid "Singular name"
 msgstr "Singularname"
 
 #: includes/settings-page.php:490 includes/settings-page.php:552
-#: includes/settings-page.php:641
+#: includes/settings-page.php:647
 msgid "URL slug"
 msgstr "URL-Slug"
 
@@ -745,38 +745,39 @@ msgstr "Menüname"
 msgid "Menu position"
 msgstr "Menüposition"
 
-#: includes/settings-page.php:571
+#: includes/settings-page.php:576
 msgid "Menu icon"
 msgstr "Menüsymbol"
 
-#: includes/settings-page.php:584 includes/settings-page.php:603
+#: includes/settings-page.php:589 includes/settings-page.php:608
 msgid "No icon selected"
 msgstr "Kein Symbol ausgewählt"
 
-#: includes/settings-page.php:586
+#: includes/settings-page.php:591
 msgid "Choose icon"
 msgstr "Symbol wählen"
 
-#: includes/settings-page.php:587 includes/settings-page.php:609
+#: includes/settings-page.php:592 includes/settings-page.php:610
+#: includes/settings-page.php:615
 msgid "SVG code"
 msgstr "SVG-Code"
 
-#: includes/settings-page.php:588 includes/settings-page.php:605
+#: includes/settings-page.php:593 includes/settings-page.php:611
 msgid "Clear"
 msgstr "Leeren"
 
-#: includes/settings-page.php:592
+#: includes/settings-page.php:597
 msgid "Custom SVG code"
 msgstr "Eigener SVG-Code"
 
-#: includes/settings-page.php:594
+#: includes/settings-page.php:599
 msgid "Paste inline SVG to use a custom menu icon instead of a catalog icon."
 msgstr ""
 "Füge Inline-SVG ein, um ein eigenes Menüsymbol statt eines Katalogsymbols zu "
 "verwenden."
 
 #. translators: %s: Material Icons URL
-#: includes/settings-page.php:614
+#: includes/settings-page.php:620
 #, php-format
 msgid ""
 "Browse icons at <a href=\"%s\" target=\"_blank\" rel=\"noopener "
@@ -785,86 +786,102 @@ msgstr ""
 "Icons findest du unter <a href=\"%s\" target=\"_blank\" rel=\"noopener "
 "noreferrer\">Material Icons</a> ."
 
-#: includes/settings-page.php:639
+#: includes/settings-page.php:645
 msgid "Enable archive"
 msgstr "Archiv aktivieren"
 
-#: includes/settings-page.php:642
+#: includes/settings-page.php:648
 msgid "Edit the public URL slug under General."
 msgstr "Den öffentlichen URL-Slug unter Allgemein bearbeiten."
 
-#: includes/settings-page.php:643
+#: includes/settings-page.php:655
+msgid "Theme templates"
+msgstr "Theme-Templates"
+
+#: includes/settings-page.php:660
+#. translators: %s: comma-separated list of alternate theme template filenames
+msgid "Also accepted: %s"
+msgstr "Auch akzeptiert: %s"
+
+#: includes/settings-page.php:666
+msgid ""
+"Copy into your active theme (or child theme) root to override the plugin "
+"templates."
+msgstr ""
+"In den aktiven Theme- (oder Child-Theme-)Stamm kopieren, um die Plugin-"
+"Templates zu überschreiben."
+
+#: includes/settings-page.php:670
 msgid "Design"
 msgstr "Design"
 
-#: includes/settings-page.php:644
+#: includes/settings-page.php:671
 msgid "List"
 msgstr "Liste"
 
-#: includes/settings-page.php:644
+#: includes/settings-page.php:671
 msgid "Grid"
 msgstr "Raster"
 
-#: includes/settings-page.php:648
+#: includes/settings-page.php:675
 msgid "Category filter"
 msgstr "Kategoriefilter"
 
-#: includes/settings-page.php:649
+#: includes/settings-page.php:676
 msgid "Show category filter on archive"
 msgstr "Kategoriefilter im Archiv anzeigen"
 
-#: includes/settings-page.php:650
+#: includes/settings-page.php:677
 msgid "Only shown when at least one category exists."
 msgstr "Wird nur angezeigt, wenn mindestens eine Kategorie vorhanden ist."
 
-#: includes/settings-page.php:651
+#: includes/settings-page.php:678
 msgid "Month filter"
 msgstr "Monatsfilter"
 
-#: includes/settings-page.php:652
+#: includes/settings-page.php:679
 msgid "Show \"From month\" filter on archive"
 msgstr "Filter „Ab Monat“ im Archiv anzeigen"
 
-#: includes/settings-page.php:653
+#: includes/settings-page.php:680
 msgid "Lets visitors jump ahead to a future month."
 msgstr "Ermöglicht Besuchern, zu einem zukünftigen Monat zu springen."
 
-
-#: includes/settings-page.php:658
+#: includes/settings-page.php:685
 msgid "Posts per page"
 msgstr "Beiträge pro Seite"
 
 #. translators: %d: WordPress Reading Settings posts per page
-#: includes/settings-page.php:663
+#: includes/settings-page.php:690
 #, php-format
 msgid "Leave empty to use the WordPress default (%d) from Settings → Reading."
 msgstr ""
 "Leer lassen, um die WordPress-Standardeinstellung (%d) unter Einstellungen → "
 "Lesen zu verwenden."
 
-#: includes/settings-page.php:667
+#: includes/settings-page.php:694
 msgid "Heading"
 msgstr "Überschrift"
 
-#: includes/settings-page.php:668
+#: includes/settings-page.php:695
 msgid "Empty text"
 msgstr "Leertext"
 
-#: includes/settings-page.php:684
+#: includes/settings-page.php:711
 msgid "Enable statuses"
 msgstr "Status aktivieren"
 
-#: includes/settings-page.php:685
+#: includes/settings-page.php:712
 msgid "Show the status panel in the editor and on the front end"
 msgstr "Status-Panel im Editor und auf der Website anzeigen"
 
-#: includes/settings-page.php:686
+#: includes/settings-page.php:713
 msgid "When off, saved status definitions are kept but the panel is hidden."
 msgstr ""
 "Wenn deaktiviert, bleiben gespeicherte Statusdefinitionen erhalten, das "
 "Panel wird aber ausgeblendet."
 
-#: includes/settings-page.php:690
+#: includes/settings-page.php:717
 msgid ""
 "Statuses shown in the event editor (in addition to None). Drag to reorder. "
 "Choose a theme color token or a custom hex color."
@@ -872,21 +889,21 @@ msgstr ""
 "Status im Veranstaltungs-Editor (zusätzlich zu Ohne). Per Ziehen neu "
 "anordnen. Wähle ein Theme-Farbtoken oder eine eigene Hex-Farbe."
 
-#: includes/settings-page.php:712
+#: includes/settings-page.php:739
 msgid "Enable metadata"
 msgstr "Metadaten aktivieren"
 
-#: includes/settings-page.php:713
+#: includes/settings-page.php:740
 msgid "Show the metadata panel in the editor and on the front end"
 msgstr "Metadaten-Panel im Editor und auf der Website anzeigen"
 
-#: includes/settings-page.php:714
+#: includes/settings-page.php:741
 msgid "When off, saved field definitions are kept but the panel is hidden."
 msgstr ""
 "Wenn deaktiviert, bleiben gespeicherte Felddefinitionen erhalten, das Panel "
 "wird aber ausgeblendet."
 
-#: includes/settings-page.php:718
+#: includes/settings-page.php:745
 msgid ""
 "Build metadata groups and fields for the editor panel. Drag to reorder. "
 "Field types: text, textarea, number, email, phone, url, select."

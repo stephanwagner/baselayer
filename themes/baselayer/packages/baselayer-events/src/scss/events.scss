@@ -362,3 +362,28 @@ $bl-fallback-gray-300: #d0d7de;
   line-height: 1.5;
   color: var(--bl-gray-text-color, #{$bl-fallback-gray-700});
 }
+
+// Standalone singular
+.bl-events-single {
+  margin: 0;
+  padding: 2rem 0 3rem;
+}
+
+.bl-events-single__inner {
+  width: min(100% - 2rem, 48rem);
+  margin-inline: auto;
+}
+
+.bl-events-single__header {
+  margin: 0 0 1rem;
+}
+
+.bl-events-single__title {
+  margin: 0;
+  font-size: clamp(1.5rem, 2vw + 1rem, 2rem);
+  line-height: 1.2;
+}
+
+.bl-events-single__content {
+  margin: 0 0 1.5rem;
+}

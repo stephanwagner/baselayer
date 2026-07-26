@@ -449,7 +449,7 @@ function bl_events_render_settings_page(): void
 
 	echo '<table class="form-table" role="presentation"><tbody>';
 	if ($tab === 'general') {
-		bl_events_settings_general_fields($cfg);
+		bl_events_settings_general_fields($cfg, $instance);
 	} elseif ($tab === 'archive') {
 		bl_events_settings_archive_fields($cfg);
 	} elseif ($tab === 'statuses') {
@@ -539,7 +539,7 @@ function bl_events_settings_render_type_dialogs(string $instance, string $instan
 /**
  * @param array<string, mixed> $cfg
  */
-function bl_events_settings_general_fields(array $cfg): void
+function bl_events_settings_general_fields(array $cfg, string $post_type = ''): void
 {
 	$labels = is_array($cfg['labels'] ?? null) ? $cfg['labels'] : [];
 	$admin = is_array($cfg['admin'] ?? null) ? $cfg['admin'] : [];
@@ -553,61 +553,90 @@ function bl_events_settings_general_fields(array $cfg): void
 	echo '<input type="text" class="regular-text" name="archive_slug" value="' . esc_attr((string) ($archive['slug'] ?? '')) . '" pattern="[a-z0-9\\-]+" autocomplete="off">';
 	echo '<p class="description">' . esc_html__('URL for public archive and single permalinks.', 'baselayer-events') . '</p></td></tr>';
 
+	$post_type = sanitize_key($post_type);
+	$url_slug = sanitize_title((string) ($archive['slug'] ?? ''));
+	$also = [];
+	if ($url_slug !== '' && $url_slug !== 'event') {
+		$also[] = 'archive-' . $url_slug . '.php';
+		$also[] = 'single-' . $url_slug . '.php';
+	}
+	if ($post_type !== '' && $post_type !== 'event' && $post_type !== $url_slug) {
+		$also[] = 'archive-' . $post_type . '.php';
+		$also[] = 'single-' . $post_type . '.php';
+	}
+	echo '<tr><th>' . esc_html__('Theme templates', 'baselayer-events') . '</th><td>';
+	echo '<code>archive-event.php</code><br>';
+	echo '<code>single-event.php</code>';
+	if ($also !== []) {
+		echo '<p class="description">' . esc_html(
+			sprintf(
+				/* translators: %s: comma-separated list of alternate theme template filenames */
+				__('Also accepted: %s', 'baselayer-events'),
+				implode(', ', $also)
+			)
+		) . '</p>';
+	}
+	echo '</td></tr>';
+
 	echo '<tr><th>' . esc_html__('Menu position', 'baselayer-events') . '</th><td><input type="number" name="menu_position" value="' . esc_attr((string) ((int) ($admin['menu_position'] ?? 5))) . '" class="small-text"></td></tr>';
 
-	$menu_icon = (string) ($admin['menu_icon'] ?? '');
-	$is_svg = $menu_icon !== '' && stripos($menu_icon, '<svg') !== false;
+	$saved_icon = (string) ($admin['menu_icon'] ?? '');
+	$is_saved_svg = $saved_icon !== '' && stripos($saved_icon, '<svg') !== false;
 	$has_picker = function_exists('bl_events_has_theme_icon_picker') && bl_events_has_theme_icon_picker();
-	// Standalone plugin: catalog names are not usable — fall back to default SVG for the editor.
-	if (!$has_picker && $menu_icon !== '' && !$is_svg) {
-		$menu_icon = function_exists('bl_events_default_menu_icon_svg') ? bl_events_default_menu_icon_svg() : '';
-		$is_svg = $menu_icon !== '';
+
+	// Preview value (may differ from saved form value when using catalog / default).
+	$preview_icon = $saved_icon;
+	if (!$has_picker && !$is_saved_svg) {
+		$preview_icon = function_exists('bl_events_default_menu_icon_svg')
+			? bl_events_default_menu_icon_svg()
+			: '';
+	} elseif ($has_picker && $saved_icon !== '' && !$is_saved_svg) {
+		$preview_icon = $saved_icon;
 	}
-	if (!$has_picker && $menu_icon === '' && function_exists('bl_events_default_menu_icon_svg')) {
-		$menu_icon = bl_events_default_menu_icon_svg();
-		$is_svg = true;
-	}
+
+	$form_icon = $has_picker ? $saved_icon : ($is_saved_svg ? $saved_icon : '');
 
 	echo '<tr><th>' . esc_html__('Menu icon', 'baselayer-events') . '</th><td>';
 	echo '<div class="bl-events-menu-icon-field" data-bl-events-menu-icon-field data-bl-events-menu-icon-mode="' . esc_attr($has_picker ? 'picker' : 'svg') . '">';
 
 	if ($has_picker) {
-		echo '<input type="hidden" name="menu_icon" value="' . esc_attr($menu_icon) . '" data-bl-events-menu-icon-value>';
+		echo '<input type="hidden" name="menu_icon" value="' . esc_attr($form_icon) . '" data-bl-events-menu-icon-value>';
 		echo '<div class="bl-events-menu-icon-field__row">';
-		echo '<div class="bl-events-menu-icon-field__preview" data-bl-events-menu-icon-preview' . ($menu_icon === '' ? ' hidden' : '') . '>';
-		if ($is_svg) {
-			echo '<span class="bl-events-menu-icon-field__svg">' . $menu_icon . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- trusted admin SVG from settings
-		} elseif ($menu_icon !== '') {
-			echo '<span class="bl-icon -icon-' . esc_attr(preg_replace('/[^a-z0-9_-]/i', '', $menu_icon) ?: 'calendar-month') . '" aria-hidden="true"></span>';
+		echo '<div class="bl-events-menu-icon-field__preview" data-bl-events-menu-icon-preview' . ($saved_icon === '' ? ' hidden' : '') . '>';
+		if ($is_saved_svg) {
+			echo '<span class="bl-events-menu-icon-field__svg">' . $saved_icon . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- trusted admin SVG from settings
+		} elseif ($saved_icon !== '') {
+			echo '<span class="bl-icon -icon-' . esc_attr(preg_replace('/[^a-z0-9_-]/i', '', $saved_icon) ?: 'calendar-month') . '" aria-hidden="true"></span>';
 		}
 		echo '</div>';
-		echo '<span class="bl-events-menu-icon-field__empty description" data-bl-events-menu-icon-empty' . ($menu_icon !== '' ? ' hidden' : '') . '>' . esc_html__('No icon selected', 'baselayer-events') . '</span>';
+		echo '<span class="bl-events-menu-icon-field__empty description" data-bl-events-menu-icon-empty' . ($saved_icon !== '' ? ' hidden' : '') . '>' . esc_html__('No icon selected', 'baselayer-events') . '</span>';
 		echo '<div class="bl-events-menu-icon-field__actions">';
 		echo '<button type="button" class="button bl-button-small" data-bl-events-menu-icon-choose>' . esc_html__('Choose icon', 'baselayer-events') . '</button>';
-		echo '<button type="button" class="button bl-button-small" data-bl-events-menu-icon-svg-toggle aria-expanded="' . ($is_svg ? 'true' : 'false') . '">' . esc_html__('SVG code', 'baselayer-events') . '</button>';
+		echo '<button type="button" class="button bl-button-small" data-bl-events-menu-icon-svg-toggle aria-expanded="false">' . esc_html__('SVG code', 'baselayer-events') . '</button>';
 		echo '<button type="button" class="button bl-button-small" data-bl-events-menu-icon-clear>' . esc_html__('Clear', 'baselayer-events') . '</button>';
 		echo '</div>';
 		echo '</div>';
-		echo '<div class="bl-events-menu-icon-field__svg-panel" data-bl-events-menu-icon-svg-panel' . ($is_svg ? '' : ' hidden') . '>';
+		echo '<div class="bl-events-menu-icon-field__svg-panel" data-bl-events-menu-icon-svg-panel hidden>';
 		echo '<label class="screen-reader-text" for="bl-events-menu-icon-svg">' . esc_html__('Custom SVG code', 'baselayer-events') . '</label>';
-		echo '<textarea class="large-text code" rows="4" id="bl-events-menu-icon-svg" data-bl-events-menu-icon-svg placeholder="<svg …">' . esc_textarea($is_svg ? $menu_icon : '') . '</textarea>';
+		echo '<textarea class="large-text code" rows="4" id="bl-events-menu-icon-svg" data-bl-events-menu-icon-svg placeholder="<svg …">' . esc_textarea($is_saved_svg ? $saved_icon : '') . '</textarea>';
 		echo '<p class="description">' . esc_html__('Paste inline SVG to use a custom menu icon instead of a catalog icon.', 'baselayer-events') . '</p>';
 		echo '</div>';
 	} else {
 		echo '<div class="bl-events-menu-icon-field__row">';
-		echo '<div class="bl-events-menu-icon-field__preview" data-bl-events-menu-icon-preview' . ($menu_icon === '' ? ' hidden' : '') . '>';
-		if ($is_svg) {
-			echo '<span class="bl-events-menu-icon-field__svg">' . $menu_icon . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- trusted admin SVG from settings
+		echo '<div class="bl-events-menu-icon-field__preview" data-bl-events-menu-icon-preview' . ($preview_icon === '' ? ' hidden' : '') . '>';
+		if ($preview_icon !== '') {
+			echo '<span class="bl-events-menu-icon-field__svg">' . $preview_icon . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- trusted admin SVG from settings / default
 		}
 		echo '</div>';
-		echo '<span class="bl-events-menu-icon-field__empty description" data-bl-events-menu-icon-empty' . ($menu_icon !== '' ? ' hidden' : '') . '>' . esc_html__('No icon selected', 'baselayer-events') . '</span>';
+		echo '<span class="bl-events-menu-icon-field__empty description" data-bl-events-menu-icon-empty hidden>' . esc_html__('No icon selected', 'baselayer-events') . '</span>';
 		echo '<div class="bl-events-menu-icon-field__actions">';
+		echo '<button type="button" class="button bl-button-small" data-bl-events-menu-icon-svg-toggle aria-expanded="false">' . esc_html__('SVG code', 'baselayer-events') . '</button>';
 		echo '<button type="button" class="button bl-button-small" data-bl-events-menu-icon-clear>' . esc_html__('Clear', 'baselayer-events') . '</button>';
 		echo '</div>';
 		echo '</div>';
-		echo '<div class="bl-events-menu-icon-field__svg-panel" data-bl-events-menu-icon-svg-panel>';
+		echo '<div class="bl-events-menu-icon-field__svg-panel" data-bl-events-menu-icon-svg-panel hidden>';
 		echo '<label for="bl-events-menu-icon-svg"><strong>' . esc_html__('SVG code', 'baselayer-events') . '</strong></label><br>';
-		echo '<textarea class="large-text code" rows="5" id="bl-events-menu-icon-svg" name="menu_icon" data-bl-events-menu-icon-svg data-bl-events-menu-icon-value placeholder="<svg …">' . esc_textarea($is_svg ? $menu_icon : '') . '</textarea>';
+		echo '<textarea class="large-text code" rows="5" id="bl-events-menu-icon-svg" name="menu_icon" data-bl-events-menu-icon-svg data-bl-events-menu-icon-value placeholder="<svg …">' . esc_textarea($is_saved_svg ? $saved_icon : '') . '</textarea>';
 		echo '<p class="description">' . wp_kses(
 			sprintf(
 				/* translators: %s: Material Icons URL */
