@@ -926,7 +926,7 @@
     const { useEntityProp } = wp.coreData;
     const { registerPlugin } = wp.plugins;
     const { PluginDocumentSettingPanel } = wp.editor;
-    const { Button, Modal, TextControl, TextareaControl } = wp.components;
+    const { Button, Modal, TextControl, TextareaControl, SelectControl } = wp.components;
     const L = baselayerEvents;
     const META_KEY = "_bl_event_metadata";
     function metaConfigForType(postType) {
@@ -1005,23 +1005,52 @@
                     const field = group.fields[fieldId];
                     const value = draft[groupId] && draft[groupId][fieldId] || "";
                     const label = field.label || fieldId;
-                    const control = field.type === "textarea" ? el(TextareaControl, {
-                      hideLabelFromVision: true,
-                      label,
-                      rows: 3,
-                      value,
-                      onChange: function(v) {
-                        setField(groupId, fieldId, v);
-                      }
-                    }) : el(TextControl, {
-                      hideLabelFromVision: true,
-                      label,
-                      type: field.type === "email" ? "email" : field.type === "url" ? "url" : "text",
-                      value,
-                      onChange: function(v) {
-                        setField(groupId, fieldId, v);
-                      }
-                    });
+                    const help = field.help || "";
+                    let control;
+                    if (field.type === "textarea") {
+                      control = el(TextareaControl, {
+                        hideLabelFromVision: true,
+                        label,
+                        rows: 3,
+                        value,
+                        help: help || void 0,
+                        onChange: function(v) {
+                          setField(groupId, fieldId, v);
+                        }
+                      });
+                    } else if (field.type === "select") {
+                      const options = [{ label: "\u2014", value: "" }].concat(
+                        (field.options || []).map(function(opt) {
+                          return {
+                            label: opt.label || opt.value,
+                            value: opt.value
+                          };
+                        })
+                      );
+                      control = el(SelectControl, {
+                        hideLabelFromVision: true,
+                        label,
+                        value,
+                        options,
+                        help: help || void 0,
+                        onChange: function(v) {
+                          setField(groupId, fieldId, v);
+                        }
+                      });
+                    } else {
+                      const inputType = field.type === "email" ? "email" : field.type === "url" ? "url" : field.type === "number" ? "number" : field.type === "phone" ? "tel" : "text";
+                      control = el(TextControl, {
+                        hideLabelFromVision: true,
+                        label,
+                        type: inputType,
+                        value,
+                        help: help || void 0,
+                        placeholder: field.placeholder || void 0,
+                        onChange: function(v) {
+                          setField(groupId, fieldId, v);
+                        }
+                      });
+                    }
                     return el(
                       "div",
                       { key: groupId + "-" + fieldId, className: "bl-event-metadata-modal__row" },

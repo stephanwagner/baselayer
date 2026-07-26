@@ -411,6 +411,14 @@ function bl_cpt_menu_icon($icon): string
 		if (stripos($trimmed, '<svg') !== false) {
 			return bl_cpt_svg_to_data_uri($trimmed);
 		}
+		// BaseLayer icon catalog name (e.g. calendar-month).
+		$name = preg_replace('/[^a-z0-9_-]/i', '', $trimmed) ?: '';
+		if ($name !== '' && function_exists('bl_icon_svg_asset_path') && function_exists('bl_svg_code')) {
+			$svg = bl_svg_code(bl_icon_svg_asset_path($name));
+			if (is_string($svg) && $svg !== '' && stripos($svg, '<svg') !== false) {
+				return bl_cpt_svg_to_data_uri($svg);
+			}
+		}
 	}
 
 	return bl_cpt_svg_to_data_uri('<svg xmlns="http://www.w3.org/2000/svg" height="20px" viewBox="0 -960 960 960" width="20px" fill="#000"><path d="M371.96-240h215.76q15.28 0 25.78-10.29 10.5-10.29 10.5-25.5t-10.34-25.71Q603.32-312 588.04-312H372.28q-15.28 0-25.78 10.29-10.5 10.29-10.5 25.5t10.34 25.71q10.34 10.5 25.62 10.5Zm0-144h215.76q15.28 0 25.78-10.29 10.5-10.29 10.5-25.5t-10.34-25.71Q603.32-456 588.04-456H372.28q-15.28 0-25.78 10.29-10.5 10.29-10.5 25.5t10.34 25.71q10.34 10.5 25.62 10.5ZM263.72-96Q234-96 213-117.15T192-168v-624q0-29.7 21.15-50.85Q234.3-864 264-864h282q14 0 27.5 5t23.5 16l150 150q11 10 16 23.5t5 27.5v474q0 29.7-21.16 50.85Q725.68-96 695.96-96H263.72ZM528-660q0 15.3 10.35 25.65Q548.7-624 564-624h132L528-792v132Z"/></svg>');

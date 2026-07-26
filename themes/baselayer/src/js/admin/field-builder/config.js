@@ -6,7 +6,7 @@ export const fieldTypeGroups = [
   {
     id: 'general',
     label: 'General',
-    types: ['text', 'textarea'],
+    types: ['text', 'textarea', 'number', 'email', 'phone', 'url'],
   },
   {
     id: 'choice',

@@ -48,7 +48,7 @@ export default {
   id: 'select',
   group: 'choice',
   label: 'Select',
-  modes: ['fields', 'options'],
+  modes: ['fields', 'options', 'event-meta'],
 
   renderOptions(container) {
     const optionsArea = mark(

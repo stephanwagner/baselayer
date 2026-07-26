@@ -22,7 +22,7 @@ export function getType(id) {
 }
 
 /**
- * @param {'fields'|'options'} mode
+ * @param {'fields'|'options'|'event-meta'|'form'|'block'} mode
  * @returns {object[]}
  */
 export function listTypesForMode(mode = 'fields') {

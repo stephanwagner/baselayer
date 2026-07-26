@@ -12,7 +12,7 @@ return [
 
 		'type' => 'default',
 		'public' => true,
-		'hierarchical' => true,
+		'hierarchical' => false,
 
 		'labels' => [
 			'name' => 'Projects',

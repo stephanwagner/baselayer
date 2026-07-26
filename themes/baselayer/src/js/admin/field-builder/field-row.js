@@ -2,6 +2,8 @@ import { el, empty, formRow, slugify } from './dom';
 import { getType, listTypesForMode } from './registry';
 import { defaultTypeId } from './config';
 import { renderPresentation, serializePresentation } from './presentation';
+import { createSwitch } from './controls';
+import { createListRow } from './list-row';
 
 /**
  * Build type <select> for the current mode.
@@ -77,85 +79,81 @@ function initTabs(tabsNav, panelsHost) {
   });
 }
 
+const TAB_DEFS = {
+  general: 'General',
+  presentation: 'Presentation',
+  logic: 'Logic',
+};
+
 /**
- * Create a field row element.
+ * Create a field row element (list-row chrome + field editors).
  *
  * @param {object} options
  * @param {string} options.mode
  * @param {object} [options.data]
  * @param {boolean} [options.open]
+ * @param {string[]} [options.tabs] Subset of general|presentation|logic
+ * @param {{title?: string, slug?: string}} [options.labels]
+ * @param {boolean} [options.showRequired]
+ * @param {boolean} [options.showHelp]
  */
-export function createFieldRow({ mode = 'fields', data = {}, open = false } = {}) {
+export function createFieldRow({
+  mode = 'fields',
+  data = {},
+  open = false,
+  tabs = null,
+  labels = {},
+  showRequired = false,
+  showHelp = false,
+} = {}) {
   const allowed = listTypesForMode(mode);
   const fallbackType = (allowed[0] && allowed[0].id) || defaultTypeId;
   const requested = data.type && getType(data.type) ? data.type : '';
   const typeId =
     requested && allowed.some((type) => type.id === requested) ? requested : fallbackType;
-  const title = data.title != null ? String(data.title) : '';
-  const slug = data.slug != null ? String(data.slug) : '';
+  const title = data.title != null ? String(data.title) : data.label != null ? String(data.label) : '';
+  const slug = data.slug != null ? String(data.slug) : data.id != null ? String(data.id) : '';
+  const tabIds =
+    Array.isArray(tabs) && tabs.length
+      ? tabs.filter((id) => TAB_DEFS[id])
+      : ['general', 'presentation', 'logic'];
+  const titleLabel = labels.title || 'Title';
+  const slugLabel = labels.slug || 'Slug';
 
-  const root = el('div', {
-    className: 'bl-field-builder__field' + (open ? ' is-open' : ''),
-    dataset: { blFbField: '1' },
-  });
-
-  const header = el('div', { className: 'bl-field-builder__field-header' });
-  const toggler = el('button', {
-    type: 'button',
-    className: 'bl-field-builder__field-toggle',
-    'aria-expanded': open ? 'true' : 'false',
-    text: open ? '▾' : '▸',
-  });
-  const titlePreview = el('span', {
-    className: 'bl-field-builder__field-title-preview',
-    text: title || '(untitled)',
-  });
-  const typePreview = el('span', {
-    className: 'bl-field-builder__field-type-preview',
+  const typeChip = el('span', {
+    className: 'bl-field-builder__type-chip',
     text: (getType(typeId) && getType(typeId).label) || typeId,
   });
-  const handle = el('span', {
-    className: 'bl-field-builder__field-handle',
-    title: 'Drag to reorder',
-    text: '⋮⋮',
-  });
-  const deleteBtn = el('button', {
-    type: 'button',
-    className: 'button-link-delete bl-field-builder__field-delete',
-    text: 'Delete',
-  });
 
-  header.appendChild(toggler);
-  header.appendChild(titlePreview);
-  header.appendChild(typePreview);
-  header.appendChild(handle);
-  header.appendChild(deleteBtn);
+  const row = createListRow({
+    title,
+    open,
+    meta: typeChip,
+    className: 'bl-field-builder__field',
+    dataset: { blFbField: '1' },
+  });
+  const { root, body, setTitle, setMeta } = row;
 
-  const body = el('div', {
-    className: 'bl-field-builder__field-body',
-    hidden: open ? undefined : true,
-  });
-
-  const tabsNav = el('div', {
-    className: 'bl-field-builder__tabs',
-    role: 'tablist',
-  });
-  [
-    ['general', 'General'],
-    ['presentation', 'Presentation'],
-    ['logic', 'Logic'],
-  ].forEach(([id, label], index) => {
-    tabsNav.appendChild(
-      el('button', {
-        type: 'button',
-        className: 'bl-field-builder__tab' + (index === 0 ? ' is-active' : ''),
-        role: 'tab',
-        dataset: { blFbTab: id },
-        'aria-selected': index === 0 ? 'true' : 'false',
-        text: label,
-      })
-    );
-  });
+  const showTabNav = tabIds.length > 1;
+  let tabsNav = null;
+  if (showTabNav) {
+    tabsNav = el('div', {
+      className: 'bl-field-builder__tabs',
+      role: 'tablist',
+    });
+    tabIds.forEach((id, index) => {
+      tabsNav.appendChild(
+        el('button', {
+          type: 'button',
+          className: 'bl-field-builder__tab' + (index === 0 ? ' is-active' : ''),
+          role: 'tab',
+          dataset: { blFbTab: id },
+          'aria-selected': index === 0 ? 'true' : 'false',
+          text: TAB_DEFS[id],
+        })
+      );
+    });
+  }
 
   const panelsHost = el('div', { className: 'bl-field-builder__tab-panels' });
 
@@ -178,62 +176,79 @@ export function createFieldRow({ mode = 'fields', data = {}, open = false } = {}
     value: slug,
   });
   panelGeneral.appendChild(formRow('Type', typeSelect));
-  panelGeneral.appendChild(formRow('Title', titleInput));
-  panelGeneral.appendChild(formRow('Slug', slugInput));
+  panelGeneral.appendChild(formRow(titleLabel, titleInput));
+  panelGeneral.appendChild(formRow(slugLabel, slugInput));
+
+  if (showHelp || data.help != null) {
+    const helpInput = el('input', {
+      type: 'text',
+      className: 'widefat',
+      dataset: { blFb: 'help' },
+      value: data.help != null ? String(data.help) : '',
+    });
+    panelGeneral.appendChild(formRow('Help text', helpInput));
+  }
+
+  if (showRequired) {
+    panelGeneral.appendChild(
+      createSwitch({
+        label: 'Required',
+        checked: !!data.required,
+        datasetKey: 'required',
+      })
+    );
+  }
+
   const optionsHost = el('div', {
     className: 'bl-field-builder__type-options',
     dataset: { blFbOptionsHost: '1' },
   });
   panelGeneral.appendChild(optionsHost);
-
-  const panelPresentation = el('div', {
-    className: 'bl-field-builder__tab-panel',
-    dataset: { blFbTabPanel: 'presentation' },
-    role: 'tabpanel',
-    hidden: true,
-  });
-  renderPresentation(panelPresentation, data);
-
-  const panelLogic = el('div', {
-    className: 'bl-field-builder__tab-panel',
-    dataset: { blFbTabPanel: 'logic' },
-    role: 'tabpanel',
-    hidden: true,
-  });
-  panelLogic.appendChild(
-    el('p', {
-      className: 'description',
-      text: 'Conditional logic — coming soon.',
-    })
-  );
-
   panelsHost.appendChild(panelGeneral);
-  panelsHost.appendChild(panelPresentation);
-  panelsHost.appendChild(panelLogic);
 
-  body.appendChild(tabsNav);
+  if (tabIds.includes('presentation')) {
+    const panelPresentation = el('div', {
+      className: 'bl-field-builder__tab-panel',
+      dataset: { blFbTabPanel: 'presentation' },
+      role: 'tabpanel',
+      hidden: true,
+    });
+    renderPresentation(panelPresentation, data);
+    panelsHost.appendChild(panelPresentation);
+  }
+
+  if (tabIds.includes('logic')) {
+    const panelLogic = el('div', {
+      className: 'bl-field-builder__tab-panel',
+      dataset: { blFbTabPanel: 'logic' },
+      role: 'tabpanel',
+      hidden: true,
+    });
+    panelLogic.appendChild(
+      el('p', {
+        className: 'description',
+        text: 'Conditional logic — coming soon.',
+      })
+    );
+    panelsHost.appendChild(panelLogic);
+  }
+
+  if (tabsNav) {
+    body.appendChild(tabsNav);
+  }
   body.appendChild(panelsHost);
-  root.appendChild(header);
-  root.appendChild(body);
 
-  initTabs(tabsNav, panelsHost);
+  if (tabsNav) {
+    initTabs(tabsNav, panelsHost);
+  }
 
   const syncPreviews = () => {
-    titlePreview.textContent = titleInput.value.trim() || '(untitled)';
+    setTitle(titleInput.value);
     const currentType = getType(typeSelect.value);
-    typePreview.textContent = (currentType && currentType.label) || typeSelect.value;
+    const label = (currentType && currentType.label) || typeSelect.value;
+    typeChip.textContent = label;
+    setMeta(typeChip);
   };
-
-  toggler.addEventListener('click', () => {
-    const isOpen = root.classList.toggle('is-open');
-    body.hidden = !isOpen;
-    toggler.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
-    toggler.textContent = isOpen ? '▾' : '▸';
-  });
-
-  deleteBtn.addEventListener('click', () => {
-    root.dispatchEvent(new CustomEvent('bl-fb-delete', { bubbles: true }));
-  });
 
   titleInput.addEventListener('input', () => {
     syncPreviews();
@@ -266,12 +281,20 @@ export function serializeFieldRow(fieldRoot) {
   const typeInput = fieldRoot.querySelector('[data-bl-fb="type"]');
   const titleInput = fieldRoot.querySelector('[data-bl-fb="title"]');
   const slugInput = fieldRoot.querySelector('[data-bl-fb="slug"]');
+  const helpInput = fieldRoot.querySelector('[data-bl-fb="help"]');
+  const requiredInput = fieldRoot.querySelector('[data-bl-fb="required"]');
   const typeId = typeInput ? typeInput.value : defaultTypeId;
   const field = {
     type: typeId || defaultTypeId,
     title: titleInput ? titleInput.value.trim() : '',
     slug: slugInput ? slugInput.value.trim() : '',
   };
+  if (helpInput && helpInput.value.trim() !== '') {
+    field.help = helpInput.value.trim();
+  }
+  if (requiredInput) {
+    field.required = !!requiredInput.checked;
+  }
   const type = getType(field.type);
   if (type && typeof type.serialize === 'function') {
     Object.assign(field, type.serialize(fieldRoot) || {});

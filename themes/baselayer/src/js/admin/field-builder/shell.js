@@ -1,6 +1,6 @@
-import Sortable from 'sortablejs';
 import { el, empty } from './dom';
 import { createFieldRow, serializeFieldRow } from './field-row';
+import { createSortable } from './sortable';
 
 /**
  * Build the field list shell and wire interactions.
@@ -11,6 +11,7 @@ import { createFieldRow, serializeFieldRow } from './field-row';
 export function createShell(root, options = {}) {
   const mode = options.mode || 'fields';
   const i18n = options.i18n || {};
+  const rowOptions = options.rowOptions || {};
 
   empty(root);
   root.classList.add('bl-field-builder');
@@ -40,7 +41,7 @@ export function createShell(root, options = {}) {
   };
 
   const addField = (data = {}, open = true) => {
-    const row = createFieldRow({ mode, data, open });
+    const row = createFieldRow({ mode, data, open, ...rowOptions });
     list.appendChild(row);
     syncEmpty();
     return row;
@@ -58,11 +59,7 @@ export function createShell(root, options = {}) {
     }
   });
 
-  const sortable = Sortable.create(list, {
-    handle: '.bl-field-builder__field-handle',
-    animation: 150,
-    draggable: '[data-bl-fb-field]',
-  });
+  const sortable = createSortable(list, options.sortable || {});
 
   (options.initialFields || []).forEach((field) => {
     addField(field, false);
@@ -71,7 +68,7 @@ export function createShell(root, options = {}) {
 
   return {
     getSchema() {
-      return Array.from(list.querySelectorAll('[data-bl-fb-field]')).map((row) =>
+      return Array.from(list.querySelectorAll(':scope > [data-bl-fb-field]')).map((row) =>
         serializeFieldRow(row)
       );
     },
@@ -80,6 +77,7 @@ export function createShell(root, options = {}) {
       (Array.isArray(fields) ? fields : []).forEach((field) => addField(field, false));
       syncEmpty();
     },
+    addField,
     destroy() {
       sortable.destroy();
       empty(root);

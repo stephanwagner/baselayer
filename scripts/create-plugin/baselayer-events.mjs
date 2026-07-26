@@ -66,9 +66,17 @@ async function main() {
     throw new Error(`Package not found: ${pkg}`);
   }
 
-  console.log('Building events assets…');
-  await run('node', ['scripts/build-js.mjs', '--filter', 'events-editor,events-admin']);
-  await run('node', ['scripts/build-css.mjs', '--filter', 'events,events-admin']);
+  console.log('Building events assets + field-builder kit…');
+  await run('node', [
+    'scripts/build-js.mjs',
+    '--filter',
+    'field-builder-admin,events-editor,events-admin,events-settings',
+  ]);
+  await run('node', [
+    'scripts/build-css.mjs',
+    '--filter',
+    'field-builder-admin,events,events-admin',
+  ]);
 
   console.log('Compiling translations…');
   await run('bash', ['scripts/compile_po.sh']);

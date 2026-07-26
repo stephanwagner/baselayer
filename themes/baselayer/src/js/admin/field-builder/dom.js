@@ -61,6 +61,16 @@ export function slugify(text) {
     .replace(/_+/g, '_');
 }
 
+let uidCounter = 0;
+
+/**
+ * Unique id for ephemeral DOM keys (not persisted).
+ */
+export function uid(prefix = 'blfb') {
+  uidCounter += 1;
+  return `${prefix}_${Date.now().toString(36)}_${uidCounter}`;
+}
+
 export function formRow(labelText, control) {
   return el('div', { className: 'bl-field-builder__form-row' }, [
     el('div', { className: 'bl-field-builder__form-label', text: labelText }),

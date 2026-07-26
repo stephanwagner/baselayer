@@ -28,6 +28,11 @@ function bl_cpt_event_meta_config(?string $post_type = null): array
 		return $empty;
 	}
 
+	// Missing `enabled` means on (legacy configs).
+	if (array_key_exists('enabled', $cfg['meta']) && empty($cfg['meta']['enabled'])) {
+		return $empty;
+	}
+
 	$title = isset($cfg['meta']['title']) ? trim((string) $cfg['meta']['title']) : '';
 	$groups_in = isset($cfg['meta']['groups']) && is_array($cfg['meta']['groups'])
 		? $cfg['meta']['groups']
@@ -47,14 +52,30 @@ function bl_cpt_event_meta_config(?string $post_type = null): array
 				continue;
 			}
 			$type = isset($field['type']) ? sanitize_key((string) $field['type']) : 'text';
-			if (!in_array($type, ['text', 'textarea', 'email', 'url'], true)) {
+			$allowed = function_exists('bl_events_meta_field_types')
+				? bl_events_meta_field_types()
+				: ['text', 'textarea', 'email', 'url'];
+			if (!in_array($type, $allowed, true)) {
 				$type = 'text';
 			}
 			$label = isset($field['label']) ? trim((string) $field['label']) : $field_id;
-			$fields[$field_id] = [
+			$row = [
 				'type' => $type,
 				'label' => $label !== '' ? __($label, 'baselayer-events') : $field_id, // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText -- config labels
 			];
+			if (!empty($field['help']) && is_string($field['help'])) {
+				$row['help'] = __($field['help'], 'baselayer-events'); // phpcs:ignore WordPress.WP.I18n.NonSingularStringLiteralText
+			}
+			if (!empty($field['placeholder']) && is_string($field['placeholder'])) {
+				$row['placeholder'] = (string) $field['placeholder'];
+			}
+			if ($type === 'select' && isset($field['options']) && is_array($field['options'])) {
+				$row['options'] = $field['options'];
+			}
+			if (array_key_exists('default_value', $field)) {
+				$row['default_value'] = $field['default_value'];
+			}
+			$fields[$field_id] = $row;
 		}
 		if ($fields === []) {
 			continue;
@@ -108,18 +129,34 @@ function bl_event_sanitize_metadata($raw, ?string $post_type = null): array
 		$group_vals = isset($raw[$group_id]) && is_array($raw[$group_id]) ? $raw[$group_id] : [];
 		$row = [];
 		foreach ($group['fields'] as $field_id => $field) {
+			$type = isset($field['type']) ? (string) $field['type'] : 'text';
 			$value = isset($group_vals[$field_id]) ? $group_vals[$field_id] : '';
 			if (!is_scalar($value)) {
 				$value = '';
 			}
 			$value = trim((string) $value);
-			$type = $field['type'];
 			if ($type === 'email') {
 				$value = $value !== '' ? sanitize_email($value) : '';
 			} elseif ($type === 'url') {
 				$value = $value !== '' ? esc_url_raw($value) : '';
 			} elseif ($type === 'textarea') {
 				$value = sanitize_textarea_field($value);
+			} elseif ($type === 'number') {
+				$value = $value !== '' && is_numeric($value) ? (string) $value : '';
+			} elseif ($type === 'select') {
+				$allowed_values = [];
+				if (isset($field['options']) && is_array($field['options'])) {
+					foreach ($field['options'] as $opt) {
+						if (is_array($opt) && isset($opt['value'])) {
+							$allowed_values[] = (string) $opt['value'];
+						}
+					}
+				}
+				if ($value !== '' && $allowed_values !== [] && !in_array($value, $allowed_values, true)) {
+					$value = '';
+				} else {
+					$value = sanitize_text_field($value);
+				}
 			} else {
 				$value = sanitize_text_field($value);
 			}

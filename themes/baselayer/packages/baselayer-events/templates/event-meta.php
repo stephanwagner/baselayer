@@ -80,6 +80,9 @@ if ($obj && !empty($obj->labels->name)) {
 										echo '<a href="' . esc_url($field['value']) . '" rel="noopener noreferrer">' . esc_html($field['value']) . '</a>';
 									} elseif ($field['type'] === 'textarea') {
 										echo nl2br(esc_html($field['value']));
+									} elseif ($field['type'] === 'phone') {
+										$tel = preg_replace('/[^\d+]/', '', $field['value']);
+										echo '<a href="' . esc_url('tel:' . $tel) . '">' . esc_html($field['value']) . '</a>';
 									} else {
 										echo esc_html($field['value']);
 									}

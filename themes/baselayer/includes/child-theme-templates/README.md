@@ -35,10 +35,23 @@ Use as:
 
 They also appear under **Theme** in the icon picker. An example `logo-child.svg` is included.
 
+## Packages (Forms, Events)
+
+Do **not** copy `packages/` into the child. Forms and Events always load from the parent theme (or as standalone plugins). Parent updates replace package code; site config stays in the database.
+
+- **Forms:** Developer → Features → Enable forms
+- **Events:** Developer → Features → Enable events, then configure types under **Events → Event types** (stored in `bl_events_instances` — not `config/content-types/`)
+
+Optional Events markup overrides (child wins via the same template paths as the parent):
+
+- `templates/event-date.php`
+- `templates/event-status.php`
+- `templates/event-meta.php`
+
 ## Config / templates
 
 - Config stubs in `config/` (`theme.php`, `design.php`, `block-settings.php`, …) merge over the parent — see `config/README.md`
-- **Content types:** `config/content-types/` is copied from the parent on install. With a child active, **only** those files are loaded (no parent fallback). An empty or missing folder means no CPTs.
+- **Content types:** `config/content-types/` is copied from the parent on install (file-based CPTs such as `post` and `project`). With a child active, **only** those files are loaded (no parent fallback). An empty or missing folder means no file-based CPTs. Events are **not** defined here.
 - **`config/block-options.php`:** presets and assignments for editor sidebar options (merged over parent). Optional Block Creator UI (Developer → Features) can add an overlay without editing files.
 - Optional templates: `templates/…` (same paths as the parent; child wins)
 

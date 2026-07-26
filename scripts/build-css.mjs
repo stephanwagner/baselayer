@@ -18,6 +18,11 @@ const entries = [
   { src: `${themeDir}/src/scss/main.scss`, name: 'baselayer', outDir: `${themeDir}/assets/css` },
   { src: `${themeDir}/src/scss/admin.scss`, name: 'admin', outDir: `${themeDir}/assets/css` },
   { src: `${themeDir}/src/scss/admin-bar.scss`, name: 'admin-bar', outDir: `${themeDir}/assets/css` },
+  {
+    src: `${themeDir}/src/scss/field-builder-admin.scss`,
+    name: 'field-builder-admin',
+    outDir: `${themeDir}/assets/css`
+  },
   { src: `${formsPkg}/src/scss/forms.scss`, name: 'forms', outDir: `${formsPkg}/assets/css` },
   { src: `${formsPkg}/src/scss/forms-admin.scss`, name: 'forms-admin', outDir: `${formsPkg}/assets/css` },
   { src: `${eventsPkg}/src/scss/events.scss`, name: 'events', outDir: `${eventsPkg}/assets/css` },
@@ -138,10 +143,32 @@ function watch() {
   process.on('SIGTERM', shutdown);
 }
 
+/**
+ * Snapshot theme field-builder CSS into Events package for standalone plugin use.
+ */
+async function vendorFieldBuilderCss() {
+  const fs = await import('node:fs/promises');
+  const vendorDir = path.join(eventsPkg, 'assets/vendor/field-builder');
+  await fs.mkdir(vendorDir, { recursive: true });
+  for (const name of ['field-builder-admin.css', 'field-builder-admin.min.css']) {
+    const src = path.join(themeDir, 'assets/css', name);
+    try {
+      await fs.copyFile(src, path.join(vendorDir, name));
+      console.log(`Vendored ${name} → ${eventsPkg}/assets/vendor/field-builder/`);
+    } catch {
+      // ignore missing
+    }
+  }
+}
+
 const watchMode = process.argv.includes('--watch');
 
 if (watchMode) {
   watch();
 } else {
   await buildAll();
+  const filter = parseFilter();
+  if (!filter || filter.has('field-builder-admin')) {
+    await vendorFieldBuilderCss();
+  }
 }

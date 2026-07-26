@@ -92,7 +92,7 @@ export function mountOptionsStack(root, options = {}) {
     });
     row.appendChild(
       el('span', {
-        className: 'bl-option-presets__handle bl-field-builder__field-handle',
+        className: 'bl-option-presets__handle bl-field-builder__item-handle',
         title: 'Drag to reorder',
         text: '⋮⋮',
       })
@@ -164,7 +164,7 @@ export function mountOptionsStack(root, options = {}) {
   });
 
   Sortable.create(list, {
-    handle: '.bl-field-builder__field-handle',
+    handle: '.bl-field-builder__item-handle',
     animation: 150,
     draggable: '.bl-options-stack__item',
   });

@@ -418,7 +418,7 @@ function bl_render_installer(): void
 
         <h2><?= esc_html__('Content', 'baselayer') ?></h2>
 
-        <p class="description"><?= esc_html__('Choose how much starter content to create. Content-type config files are always installed, so you can switch types on or off later.', 'baselayer') ?></p>
+        <p class="description"><?= esc_html__('Choose how much starter content to create. Blog and Projects use content-type config files; Events use the Events package (Developer → Features and Event types).', 'baselayer') ?></p>
 
         <?php
         $content_seed_mode = (string) $bl_install_val(['install', 'content', 'seed_mode'], 'sample');
@@ -522,10 +522,10 @@ function bl_render_installer(): void
               <fieldset>
                 <label>
                   <input type="checkbox" name="install[content][event]" value="1" <?= $content_event ? ' checked' : '' ?> data-bl-checkbox-toggle="content-event">
-                  <?= esc_html__('Enable custom post type: Events', 'baselayer') ?>
+                  <?= esc_html__('Enable events', 'baselayer') ?>
                 </label>
                 <div class="bl-indent-checkbox">
-                  <p class="description" style="margin-top: 0;"><?= esc_html__('Items with start and end dates, ordered by date on archives – suited to happenings, workshops, or schedules.', 'baselayer') ?></p>
+                  <p class="description" style="margin-top: 0;"><?= esc_html__('Dated items with archives, recurrence, and statuses. Configure event types later under Events → Event types (not content-types files).', 'baselayer') ?></p>
                   <div data-bl-checkbox-toggle-content="content-event">
                     <label>
                       <input type="checkbox" name="install[content][event_examples]" value="1" <?= $content_event_examples ? ' checked' : '' ?>>
@@ -1080,8 +1080,8 @@ function baselayer_run_install(): void
   bl_install_apply_content_type_enabled($content_types_dir, [
     'post'     => !empty($content_flags['post']),
     'projects' => !empty($content_flags['projects']),
-    'event'    => !empty($content_flags['event']),
   ]);
+  bl_install_apply_events_enabled(!empty($content_flags['event']));
 
   update_option('baselayer_install_success', true);
 

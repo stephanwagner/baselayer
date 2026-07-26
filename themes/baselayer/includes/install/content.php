@@ -784,7 +784,8 @@ function bl_install_content_flags_from_request(): array
 }
 
 /**
- * Map CPT / post slug → content-types filename.
+ * Map CPT / post slug → content-types filename (file-based types only).
+ * Events are package-owned (`enable_events` + `bl_events_instances`), not content-types.
  *
  * @return array<string, string>
  */
@@ -793,7 +794,6 @@ function bl_install_content_type_file_map(): array
 	return [
 		'post'     => 'post.php',
 		'projects' => 'project.php',
-		'event'    => 'event.php',
 	];
 }
 
@@ -850,7 +850,7 @@ function bl_install_bootstrap_content_types(): void
 /**
  * Set `enabled` in content-type PHP files under $dir.
  *
- * @param array<string, bool> $enabled_by_slug Keys: post, projects, event.
+ * @param array<string, bool> $enabled_by_slug Keys: post, projects (file-based only).
  */
 function bl_install_apply_content_type_enabled(string $dir, array $enabled_by_slug): void
 {
@@ -886,6 +886,60 @@ function bl_install_apply_content_type_enabled(string $dir, array $enabled_by_sl
 			opcache_invalidate($path, true);
 		}
 	}
+}
+
+/**
+ * Apply install Events checkbox: feature toggle + default Event type instance.
+ * Mirrors Forms (`enable_forms`) — not content-types PHP.
+ */
+function bl_install_apply_events_enabled(bool $enabled): void
+{
+	$features = get_option('baselayer_features', []);
+	if (!is_array($features)) {
+		$features = [];
+	}
+	$defaults = function_exists('bl_theme_feature_defaults') ? bl_theme_feature_defaults() : [];
+	$features = array_merge($defaults, $features);
+	$features['enable_events'] = $enabled ? 1 : 0;
+	update_option('baselayer_features', $features);
+
+	if (function_exists('bl_events_get_instances') && function_exists('bl_events_save_instances')) {
+		$instances = bl_events_get_instances(false);
+		if ($instances === [] && function_exists('bl_events_default_instances')) {
+			$instances = bl_events_default_instances();
+		}
+		if (!isset($instances['event']) || !is_array($instances['event'])) {
+			if (function_exists('bl_events_default_instances')) {
+				$defaults_inst = bl_events_default_instances();
+				$instances['event'] = $defaults_inst['event'] ?? ['enabled' => true, 'type' => 'event'];
+			} else {
+				$instances['event'] = ['enabled' => true, 'type' => 'event'];
+			}
+		}
+		$instances['event']['enabled'] = $enabled;
+		bl_events_save_instances($instances);
+
+		return;
+	}
+
+	// Package not loaded this request — still persist option for the next load.
+	$option_key = defined('BL_EVENTS_INSTANCES_OPTION') ? BL_EVENTS_INSTANCES_OPTION : 'bl_events_instances';
+	$raw = get_option($option_key, null);
+	if (!is_array($raw) || $raw === []) {
+		$raw = [
+			'event' => [
+				'enabled' => $enabled,
+				'type'    => 'event',
+			],
+		];
+	} else {
+		if (!isset($raw['event']) || !is_array($raw['event'])) {
+			$raw['event'] = ['type' => 'event'];
+		}
+		$raw['event']['enabled'] = $enabled;
+	}
+	update_option($option_key, $raw, false);
+	update_option('bl_events_flush_rewrite', 1, false);
 }
 
 /**

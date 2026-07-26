@@ -196,6 +196,23 @@ function bl_events_reserved_post_types(): array
 }
 
 /**
+ * Fixed supports for all event types (not user-configurable).
+ *
+ * @return list<string>
+ */
+function bl_events_forced_supports(): array
+{
+	return [
+		'title',
+		'editor',
+		'thumbnail',
+		'excerpt',
+		'revisions',
+		'author',
+	];
+}
+
+/**
  * @param array<string, mixed> $cfg
  * @return array<string, mixed>
  */
@@ -205,10 +222,10 @@ function bl_events_sanitize_instance(array $cfg, string $slug = ''): array
 	$cfg = array_merge($defaults, $cfg);
 	$cfg['type'] = 'event';
 	$cfg['enabled'] = !array_key_exists('enabled', $cfg) || !empty($cfg['enabled']);
-	$cfg['public'] = !array_key_exists('public', $cfg) || !empty($cfg['public']);
-	$cfg['hierarchical'] = !empty($cfg['hierarchical']);
-	$cfg['wp_categories'] = !empty($cfg['wp_categories']);
-	$cfg['wp_tags'] = !empty($cfg['wp_tags']);
+	$cfg['public'] = true;
+	$cfg['hierarchical'] = false;
+	$cfg['wp_categories'] = true;
+	$cfg['wp_tags'] = false;
 
 	$labels = isset($cfg['labels']) && is_array($cfg['labels']) ? $cfg['labels'] : [];
 	$cfg['labels'] = [
@@ -220,27 +237,9 @@ function bl_events_sanitize_instance(array $cfg, string $slug = ''): array
 		$cfg['labels']['menu_name'] = $cfg['labels']['name'];
 	}
 
-	$supports_in = isset($cfg['supports']) && is_array($cfg['supports']) ? $cfg['supports'] : $defaults['supports'];
-	$allowed_supports = [
-		'title', 'editor', 'thumbnail', 'excerpt', 'revisions', 'page-attributes',
-		'custom-fields', 'author', 'comments', 'trackbacks', 'post-formats',
-	];
-	$supports = [];
-	foreach ($supports_in as $s) {
-		$s = sanitize_key((string) $s);
-		if (in_array($s, $allowed_supports, true)) {
-			$supports[] = $s;
-		}
-	}
-	if ($supports === []) {
-		$supports = ['title', 'editor', 'custom-fields'];
-	}
-	if (!in_array('custom-fields', $supports, true)) {
-		$supports[] = 'custom-fields';
-	}
-	$cfg['supports'] = array_values(array_unique($supports));
+	$cfg['supports'] = bl_events_forced_supports();
 
-	$cfg['taxonomies'] = bl_events_sanitize_taxonomies($cfg['taxonomies'] ?? []);
+	$cfg['taxonomies'] = [];
 	$cfg['archive'] = bl_events_sanitize_archive($cfg['archive'] ?? []);
 	$cfg['admin'] = bl_events_sanitize_admin($cfg['admin'] ?? []);
 	$cfg['statuses'] = bl_events_sanitize_statuses($cfg['statuses'] ?? []);
@@ -255,23 +254,10 @@ function bl_events_sanitize_instance(array $cfg, string $slug = ''): array
  */
 function bl_events_sanitize_taxonomies($raw): array
 {
-	if (!is_array($raw)) {
-		return [];
-	}
-	$out = [];
-	foreach ($raw as $tax => $args) {
-		$tax = sanitize_key((string) $tax);
-		if ($tax === '' || !is_array($args)) {
-			continue;
-		}
-		$out[$tax] = [
-			'label' => isset($args['label']) ? sanitize_text_field((string) $args['label']) : $tax,
-			'singular_label' => isset($args['singular_label']) ? sanitize_text_field((string) $args['singular_label']) : '',
-			'url' => isset($args['url']) ? sanitize_title((string) $args['url']) : $tax,
-		];
-	}
+	unset($raw);
 
-	return $out;
+	// Custom taxonomies are not supported for event types; use core categories.
+	return [];
 }
 
 /**
@@ -311,10 +297,10 @@ function bl_events_sanitize_admin($raw): array
 		$raw = [];
 	}
 	$icon = isset($raw['menu_icon']) ? (string) $raw['menu_icon'] : '';
-	// Allow dashicons, data URIs, URLs, or inline SVG.
+	// Allow dashicons, data URIs, URLs, inline SVG, or icon catalog names.
 	if ($icon !== '' && stripos($icon, '<svg') === false && strpos($icon, 'dashicons-') !== 0
 		&& strpos($icon, 'data:image/') !== 0 && !preg_match('#^https?://#i', $icon)) {
-		$icon = sanitize_text_field($icon);
+		$icon = preg_replace('/[^a-z0-9_-]/i', '', sanitize_text_field($icon)) ?: '';
 	}
 
 	return [
@@ -355,16 +341,28 @@ function bl_events_sanitize_statuses($raw): array
 }
 
 /**
+ * Allowed metadata field types for Event types schema.
+ *
+ * @return list<string>
+ */
+function bl_events_meta_field_types(): array
+{
+	return ['text', 'textarea', 'number', 'email', 'phone', 'url', 'select'];
+}
+
+/**
  * @param mixed $raw
- * @return array{title: string, groups: array<string, array{title: string, fields: array<string, array{type: string, label: string}>}>}
+ * @return array{title: string, groups: array<string, array{title: string, fields: array<string, array<string, mixed>>}>}
  */
 function bl_events_sanitize_meta_config($raw): array
 {
 	if (!is_array($raw)) {
-		return ['title' => '', 'groups' => []];
+		return ['enabled' => true, 'title' => '', 'groups' => []];
 	}
+	$enabled = !array_key_exists('enabled', $raw) || !empty($raw['enabled']);
 	$title = isset($raw['title']) ? sanitize_text_field((string) $raw['title']) : '';
 	$groups_in = isset($raw['groups']) && is_array($raw['groups']) ? $raw['groups'] : [];
+	$allowed = bl_events_meta_field_types();
 	$groups = [];
 	foreach ($groups_in as $group_id => $group) {
 		$group_id = sanitize_key((string) $group_id);
@@ -379,14 +377,46 @@ function bl_events_sanitize_meta_config($raw): array
 				continue;
 			}
 			$type = isset($field['type']) ? sanitize_key((string) $field['type']) : 'text';
-			if (!in_array($type, ['text', 'textarea', 'email', 'url'], true)) {
+			if (!in_array($type, $allowed, true)) {
 				$type = 'text';
 			}
 			$label = isset($field['label']) ? sanitize_text_field((string) $field['label']) : $field_id;
-			$fields[$field_id] = [
+			$row = [
 				'type' => $type,
 				'label' => $label !== '' ? $label : $field_id,
 			];
+			if (isset($field['help']) && is_string($field['help']) && trim($field['help']) !== '') {
+				$row['help'] = sanitize_text_field($field['help']);
+			}
+			if (isset($field['placeholder']) && is_string($field['placeholder']) && trim($field['placeholder']) !== '') {
+				$row['placeholder'] = sanitize_text_field($field['placeholder']);
+			}
+			if ($type === 'select' && isset($field['options']) && is_array($field['options'])) {
+				$options = [];
+				foreach ($field['options'] as $opt) {
+					if (!is_array($opt)) {
+						continue;
+					}
+					$ovalue = isset($opt['value']) ? sanitize_text_field((string) $opt['value']) : '';
+					if ($ovalue === '') {
+						continue;
+					}
+					$olabel = isset($opt['label']) ? sanitize_text_field((string) $opt['label']) : $ovalue;
+					$options[] = [
+						'label' => $olabel !== '' ? $olabel : $ovalue,
+						'value' => $ovalue,
+					];
+				}
+				if ($options !== []) {
+					$row['options'] = $options;
+				}
+			}
+			if (array_key_exists('default_value', $field)) {
+				if (is_scalar($field['default_value']) && (string) $field['default_value'] !== '') {
+					$row['default_value'] = sanitize_text_field((string) $field['default_value']);
+				}
+			}
+			$fields[$field_id] = $row;
 		}
 		if ($fields === []) {
 			continue;
@@ -399,6 +429,7 @@ function bl_events_sanitize_meta_config($raw): array
 	}
 
 	return [
+		'enabled' => $enabled,
 		'title' => $title,
 		'groups' => $groups,
 	];

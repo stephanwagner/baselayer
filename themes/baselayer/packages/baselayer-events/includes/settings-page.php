@@ -72,13 +72,6 @@ function bl_events_handle_settings_post(): void
 		];
 		$def['labels']['menu_name'] = $def['labels']['name'];
 		$def['archive']['slug'] = sanitize_title($slug . 's');
-		$def['taxonomies'] = [
-			$slug . '_category' => [
-				'label' => 'Categories',
-				'singular_label' => 'Category',
-				'url' => $slug . '-category',
-			],
-		];
 		$instances[$slug] = $def;
 		bl_events_save_instances($instances);
 		wp_safe_redirect(bl_events_settings_url(['instance' => $slug, 'updated' => '1']));
@@ -121,22 +114,16 @@ function bl_events_apply_settings_tab(array $cfg, string $tab, array $post): arr
 {
 	if ($tab === 'general') {
 		$cfg['enabled'] = !empty($post['enabled']);
-		$cfg['public'] = !empty($post['public']);
-		$cfg['hierarchical'] = !empty($post['hierarchical']);
 		$cfg['labels'] = [
 			'name' => sanitize_text_field((string) ($post['label_name'] ?? '')),
 			'singular_name' => sanitize_text_field((string) ($post['label_singular'] ?? '')),
 			'menu_name' => sanitize_text_field((string) ($post['label_menu'] ?? '')),
 		];
-		$supports = isset($post['supports']) && is_array($post['supports']) ? $post['supports'] : [];
-		$cfg['supports'] = array_map('sanitize_key', $supports);
 		$cfg['admin'] = [
 			'menu_icon' => (string) ($post['menu_icon'] ?? ''),
 			'menu_position' => (int) ($post['menu_position'] ?? 5),
 			'page_title_toggle' => !empty($post['page_title_toggle']),
 		];
-		$cfg['wp_categories'] = !empty($post['wp_categories']);
-		$cfg['wp_tags'] = !empty($post['wp_tags']);
 	}
 
 	if ($tab === 'archive') {
@@ -152,66 +139,70 @@ function bl_events_apply_settings_tab(array $cfg, string $tab, array $post): arr
 		];
 	}
 
-	if ($tab === 'taxonomies') {
-		$ids = isset($post['tax_id']) && is_array($post['tax_id']) ? $post['tax_id'] : [];
-		$labels = isset($post['tax_label']) && is_array($post['tax_label']) ? $post['tax_label'] : [];
-		$singulars = isset($post['tax_singular']) && is_array($post['tax_singular']) ? $post['tax_singular'] : [];
-		$urls = isset($post['tax_url']) && is_array($post['tax_url']) ? $post['tax_url'] : [];
-		$tax = [];
-		foreach ($ids as $i => $id) {
-			$id = sanitize_key((string) $id);
-			if ($id === '') {
-				continue;
-			}
-			$tax[$id] = [
-				'label' => sanitize_text_field((string) ($labels[$i] ?? $id)),
-				'singular_label' => sanitize_text_field((string) ($singulars[$i] ?? '')),
-				'url' => sanitize_title((string) ($urls[$i] ?? $id)),
-			];
-		}
-		$cfg['taxonomies'] = $tax;
-	}
-
 	if ($tab === 'statuses') {
-		$ids = isset($post['status_id']) && is_array($post['status_id']) ? $post['status_id'] : [];
-		$labels = isset($post['status_label']) && is_array($post['status_label']) ? $post['status_label'] : [];
-		$colors = isset($post['status_color']) && is_array($post['status_color']) ? $post['status_color'] : [];
-		$statuses = [];
-		foreach ($ids as $i => $id) {
-			$id = sanitize_key((string) $id);
-			if ($id === '') {
-				continue;
+		if (!empty($post['statuses_config_json']) && is_string($post['statuses_config_json'])) {
+			$decoded = json_decode(wp_unslash($post['statuses_config_json']), true);
+			$cfg['statuses'] = bl_events_sanitize_statuses(is_array($decoded) ? $decoded : []);
+		} else {
+			$ids = isset($post['status_id']) && is_array($post['status_id']) ? $post['status_id'] : [];
+			$labels = isset($post['status_label']) && is_array($post['status_label']) ? $post['status_label'] : [];
+			$colors = isset($post['status_color']) && is_array($post['status_color']) ? $post['status_color'] : [];
+			$statuses = [];
+			foreach ($ids as $i => $id) {
+				$id = sanitize_key((string) $id);
+				if ($id === '') {
+					continue;
+				}
+				$statuses[$id] = [
+					'label' => sanitize_text_field((string) ($labels[$i] ?? $id)),
+					'color' => sanitize_text_field((string) ($colors[$i] ?? '')),
+				];
 			}
-			$statuses[$id] = [
-				'label' => sanitize_text_field((string) ($labels[$i] ?? $id)),
-				'color' => sanitize_text_field((string) ($colors[$i] ?? '')),
-			];
+			$cfg['statuses'] = bl_events_sanitize_statuses($statuses);
 		}
-		$cfg['statuses'] = $statuses;
 	}
 
 	if ($tab === 'meta') {
-		$cfg['meta'] = [
-			'title' => sanitize_text_field((string) ($post['meta_title'] ?? '')),
-			'groups' => bl_events_parse_meta_groups_from_post($post),
-		];
+		if (!empty($post['meta_config_json']) && is_string($post['meta_config_json'])) {
+			$decoded = json_decode(wp_unslash($post['meta_config_json']), true);
+			$cfg['meta'] = bl_events_sanitize_meta_config(is_array($decoded) ? $decoded : []);
+		} else {
+			$cfg['meta'] = bl_events_sanitize_meta_config([
+				'title' => sanitize_text_field((string) ($post['meta_title'] ?? '')),
+				'groups' => bl_events_parse_meta_groups_from_post($post),
+			]);
+		}
+		$cfg['meta']['enabled'] = !empty($post['meta_enabled']);
 	}
 
 	return $cfg;
 }
 
 /**
+ * Parse metadata groups from settings POST (JSON builder payload preferred).
+ *
  * @param array<string, mixed> $post
- * @return array<string, array{title: string, fields: array<string, array{type: string, label: string}>}>
+ * @return array<string, array{title: string, fields: array<string, array<string, mixed>>}>
  */
 function bl_events_parse_meta_groups_from_post(array $post): array
 {
+	if (!empty($post['meta_config_json']) && is_string($post['meta_config_json'])) {
+		$decoded = json_decode(wp_unslash($post['meta_config_json']), true);
+		if (is_array($decoded)) {
+			$sanitized = bl_events_sanitize_meta_config($decoded);
+
+			return $sanitized['groups'];
+		}
+	}
+
+	// Legacy parallel arrays (pre-builder).
 	$group_ids = isset($post['meta_group_id']) && is_array($post['meta_group_id']) ? $post['meta_group_id'] : [];
 	$group_titles = isset($post['meta_group_title']) && is_array($post['meta_group_title']) ? $post['meta_group_title'] : [];
 	$field_group = isset($post['meta_field_group']) && is_array($post['meta_field_group']) ? $post['meta_field_group'] : [];
 	$field_ids = isset($post['meta_field_id']) && is_array($post['meta_field_id']) ? $post['meta_field_id'] : [];
 	$field_labels = isset($post['meta_field_label']) && is_array($post['meta_field_label']) ? $post['meta_field_label'] : [];
 	$field_types = isset($post['meta_field_type']) && is_array($post['meta_field_type']) ? $post['meta_field_type'] : [];
+	$allowed = bl_events_meta_field_types();
 
 	$groups = [];
 	foreach ($group_ids as $i => $gid) {
@@ -232,7 +223,7 @@ function bl_events_parse_meta_groups_from_post(array $post): array
 			continue;
 		}
 		$type = sanitize_key((string) ($field_types[$i] ?? 'text'));
-		if (!in_array($type, ['text', 'textarea', 'email', 'url'], true)) {
+		if (!in_array($type, $allowed, true)) {
 			$type = 'text';
 		}
 		$groups[$gid]['fields'][$fid] = [
@@ -259,7 +250,6 @@ function bl_events_render_settings_page(): void
 	$tabs = [
 		'general' => __('General', 'baselayer-events'),
 		'archive' => __('Archive', 'baselayer-events'),
-		'taxonomies' => __('Taxonomies', 'baselayer-events'),
 		'statuses' => __('Statuses', 'baselayer-events'),
 		'meta' => __('Metadata', 'baselayer-events'),
 	];
@@ -274,9 +264,21 @@ function bl_events_render_settings_page(): void
 		echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__('Settings saved.', 'baselayer-events') . '</p></div>';
 	}
 
-	echo '<p class="description">' . esc_html__('Each event type is its own post type (for example Events, Courses, Workshops), with its own labels, statuses, and metadata.', 'baselayer-events') . '</p>';
+	$instance_label = '';
+	if (is_array($cfg)) {
+		$instance_label = !empty($cfg['labels']['name']) ? (string) $cfg['labels']['name'] : $instance;
+	}
+	$can_delete = count($instances) > 1 && $instance !== '';
 
-	echo '<h2 class="nav-tab-wrapper" style="margin-top:16px">';
+	echo '<div class="bl-events-settings__toolbar">';
+	echo '<p class="bl-events-settings__toolbar-desc description">' . esc_html__('Each event type is its own post type (for example Events, Courses, Workshops), with its own labels, statuses, and metadata.', 'baselayer-events') . '</p>';
+	echo '<div class="bl-events-settings__toolbar-actions">';
+	echo '<button type="button" class="button bl-button-small" data-bl-events-dialog-open="bl-events-dialog-add">' . esc_html__('Add type', 'baselayer-events') . '</button>';
+	echo '<button type="button" class="button bl-button-small bl-button-danger" data-bl-events-dialog-open="bl-events-dialog-delete"' . ($can_delete ? '' : ' disabled') . '>' . esc_html__('Delete', 'baselayer-events') . '</button>';
+	echo '</div>';
+	echo '</div>';
+
+	echo '<h2 class="nav-tab-wrapper bl-events-settings__instance-tabs">';
 	foreach ($instances as $slug => $row) {
 		$url = bl_events_settings_url(['instance' => $slug, 'tab' => $tab]);
 		$class = $slug === $instance ? ' nav-tab-active' : '';
@@ -285,16 +287,10 @@ function bl_events_render_settings_page(): void
 	}
 	echo '</h2>';
 
-	echo '<form method="post" style="margin:12px 0 24px;display:flex;gap:8px;align-items:center">';
-	wp_nonce_field('bl_events_settings');
-	echo '<input type="hidden" name="bl_events_settings_action" value="add">';
-	echo '<label for="bl-events-new-slug"><strong>' . esc_html__('Add type', 'baselayer-events') . '</strong></label> ';
-	echo '<input type="text" class="regular-text" id="bl-events-new-slug" name="new_slug" placeholder="course" pattern="[a-z0-9_\\-]+">';
-	submit_button(__('Add', 'baselayer-events'), 'secondary', 'submit', false);
-	echo '</form>';
-
 	if (!is_array($cfg) || $instance === '') {
-		echo '<p>' . esc_html__('No event types yet.', 'baselayer-events') . '</p></div>';
+		echo '<p>' . esc_html__('No event types yet.', 'baselayer-events') . '</p>';
+		bl_events_settings_render_type_dialogs($instance, $instance_label, $can_delete);
+		echo '</div>';
 		return;
 	}
 
@@ -317,8 +313,6 @@ function bl_events_render_settings_page(): void
 		bl_events_settings_general_fields($instance, $cfg);
 	} elseif ($tab === 'archive') {
 		bl_events_settings_archive_fields($cfg);
-	} elseif ($tab === 'taxonomies') {
-		bl_events_settings_taxonomies_fields($cfg);
 	} elseif ($tab === 'statuses') {
 		bl_events_settings_statuses_fields($cfg);
 	} else {
@@ -329,16 +323,69 @@ function bl_events_render_settings_page(): void
 	submit_button(__('Save changes', 'baselayer-events'));
 	echo '</form>';
 
-	if (count($instances) > 1) {
-		echo '<form method="post" style="margin-top:24px" onsubmit="return confirm(\'' . esc_js(__('Delete this event type? Existing posts are not deleted.', 'baselayer-events')) . '\');">';
-		wp_nonce_field('bl_events_settings');
-		echo '<input type="hidden" name="bl_events_settings_action" value="delete">';
-		echo '<input type="hidden" name="instance" value="' . esc_attr($instance) . '">';
-		submit_button(__('Delete this event type', 'baselayer-events'), 'delete', 'submit', false);
-		echo '</form>';
-	}
+	bl_events_settings_render_type_dialogs($instance, $instance_label, $can_delete);
 
 	echo '</div>';
+}
+
+/**
+ * Add / delete event type dialogs + open/close script.
+ */
+function bl_events_settings_render_type_dialogs(string $instance, string $instance_label, bool $can_delete): void
+{
+	echo '<dialog id="bl-events-dialog-add" class="bl-events-settings-dialog">';
+	echo '<form method="post" class="bl-events-settings-dialog__form">';
+	wp_nonce_field('bl_events_settings');
+	echo '<input type="hidden" name="bl_events_settings_action" value="add">';
+	echo '<div class="bl-events-settings-dialog__header">';
+	echo '<h2 class="bl-events-settings-dialog__title">' . esc_html__('Add event type', 'baselayer-events') . '</h2>';
+	echo '</div>';
+	echo '<div class="bl-events-settings-dialog__body">';
+	echo '<p class="description">' . esc_html__('Creates a new post type with default labels and archive. Uses WordPress categories. You can rename it after saving.', 'baselayer-events') . '</p>';
+	echo '<p><label for="bl-events-new-slug"><strong>' . esc_html__('Slug', 'baselayer-events') . '</strong></label><br>';
+	echo '<input type="text" class="regular-text" id="bl-events-new-slug" name="new_slug" placeholder="course" pattern="[a-z0-9_\\-]+" required autocomplete="off">';
+	echo '<span class="description">' . esc_html__('Lowercase letters, numbers, hyphens, and underscores. Used as the post type key.', 'baselayer-events') . '</span></p>';
+	echo '</div>';
+	echo '<div class="bl-events-settings-dialog__footer">';
+	echo '<button type="submit" class="button" value="cancel" formmethod="dialog" formnovalidate>' . esc_html__('Cancel', 'baselayer-events') . '</button>';
+	echo '<button type="submit" class="button button-primary">' . esc_html__('Add type', 'baselayer-events') . '</button>';
+	echo '</div>';
+	echo '</form>';
+	echo '</dialog>';
+
+	echo '<dialog id="bl-events-dialog-delete" class="bl-events-settings-dialog">';
+	echo '<form method="post" class="bl-events-settings-dialog__form">';
+	wp_nonce_field('bl_events_settings');
+	echo '<input type="hidden" name="bl_events_settings_action" value="delete">';
+	echo '<input type="hidden" name="instance" value="' . esc_attr($instance) . '">';
+	echo '<div class="bl-events-settings-dialog__header">';
+	echo '<h2 class="bl-events-settings-dialog__title">' . esc_html__('Delete event type', 'baselayer-events') . '</h2>';
+	echo '</div>';
+	echo '<div class="bl-events-settings-dialog__body">';
+	if ($can_delete) {
+		echo '<p>' . esc_html(
+			sprintf(
+				/* translators: %s: event type name */
+				__('Delete “%s”? This removes it from Event types. Existing posts are not deleted.', 'baselayer-events'),
+				$instance_label !== '' ? $instance_label : $instance
+			)
+		) . '</p>';
+	} else {
+		echo '<p>' . esc_html__('You need at least one event type. Add another type before deleting this one.', 'baselayer-events') . '</p>';
+	}
+	echo '</div>';
+	echo '<div class="bl-events-settings-dialog__footer">';
+	echo '<button type="submit" class="button" value="cancel" formmethod="dialog" formnovalidate>' . esc_html__('Cancel', 'baselayer-events') . '</button>';
+	if ($can_delete) {
+		echo '<button type="submit" class="button bl-button-danger">' . esc_html__('Delete type', 'baselayer-events') . '</button>';
+	}
+	echo '</div>';
+	echo '</form>';
+	echo '</dialog>';
+
+	echo '<script>';
+	echo '(function(){document.querySelectorAll("[data-bl-events-dialog-open]").forEach(function(btn){btn.addEventListener("click",function(){var id=btn.getAttribute("data-bl-events-dialog-open");var el=id&&document.getElementById(id);if(el&&typeof el.showModal==="function"){el.showModal();var input=el.querySelector("input[name=new_slug]");if(input){input.focus();}}});});})();';
+	echo '</script>';
 }
 
 /**
@@ -348,7 +395,6 @@ function bl_events_settings_general_fields(string $slug, array $cfg): void
 {
 	$labels = is_array($cfg['labels'] ?? null) ? $cfg['labels'] : [];
 	$admin = is_array($cfg['admin'] ?? null) ? $cfg['admin'] : [];
-	$supports = is_array($cfg['supports'] ?? null) ? $cfg['supports'] : [];
 
 	echo '<tr><th>' . esc_html__('Slug', 'baselayer-events') . '</th><td><code>' . esc_html($slug) . '</code>';
 	echo '<p class="description">' . esc_html__('Immutable after creation (post type key).', 'baselayer-events') . '</p></td></tr>';
@@ -360,19 +406,35 @@ function bl_events_settings_general_fields(string $slug, array $cfg): void
 	echo '<tr><th>' . esc_html__('Singular name', 'baselayer-events') . '</th><td><input type="text" class="regular-text" name="label_singular" value="' . esc_attr((string) ($labels['singular_name'] ?? '')) . '"></td></tr>';
 	echo '<tr><th>' . esc_html__('Menu name', 'baselayer-events') . '</th><td><input type="text" class="regular-text" name="label_menu" value="' . esc_attr((string) ($labels['menu_name'] ?? '')) . '"></td></tr>';
 
-	echo '<tr><th>' . esc_html__('Public', 'baselayer-events') . '</th><td><label><input type="checkbox" name="public" value="1" ' . checked(!empty($cfg['public']), true, false) . '> ' . esc_html__('Publicly queryable', 'baselayer-events') . '</label></td></tr>';
-	echo '<tr><th>' . esc_html__('Hierarchical', 'baselayer-events') . '</th><td><label><input type="checkbox" name="hierarchical" value="1" ' . checked(!empty($cfg['hierarchical']), true, false) . '> ' . esc_html__('Like pages (parent/child)', 'baselayer-events') . '</label></td></tr>';
-
-	$all_supports = ['title', 'editor', 'thumbnail', 'excerpt', 'revisions', 'page-attributes', 'custom-fields', 'author', 'comments'];
-	echo '<tr><th>' . esc_html__('Supports', 'baselayer-events') . '</th><td>';
-	foreach ($all_supports as $s) {
-		echo '<label style="display:inline-block;margin:0 12px 6px 0"><input type="checkbox" name="supports[]" value="' . esc_attr($s) . '" ' . checked(in_array($s, $supports, true), true, false) . '> ' . esc_html($s) . '</label>';
-	}
-	echo '</td></tr>';
-
 	echo '<tr><th>' . esc_html__('Menu position', 'baselayer-events') . '</th><td><input type="number" name="menu_position" value="' . esc_attr((string) ((int) ($admin['menu_position'] ?? 5))) . '" class="small-text"></td></tr>';
-	echo '<tr><th>' . esc_html__('Menu icon', 'baselayer-events') . '</th><td><textarea class="large-text code" rows="3" name="menu_icon">' . esc_textarea((string) ($admin['menu_icon'] ?? '')) . '</textarea>';
-	echo '<p class="description">' . esc_html__('Dashicon class, image URL, or inline SVG.', 'baselayer-events') . '</p></td></tr>';
+
+	$menu_icon = (string) ($admin['menu_icon'] ?? '');
+	$is_svg = $menu_icon !== '' && stripos($menu_icon, '<svg') !== false;
+	echo '<tr><th>' . esc_html__('Menu icon', 'baselayer-events') . '</th><td>';
+	echo '<div class="bl-events-menu-icon-field" data-bl-events-menu-icon-field>';
+	echo '<input type="hidden" name="menu_icon" value="' . esc_attr($menu_icon) . '" data-bl-events-menu-icon-value>';
+	echo '<div class="bl-events-menu-icon-field__row">';
+	echo '<div class="bl-events-menu-icon-field__preview" data-bl-events-menu-icon-preview' . ($menu_icon === '' ? ' hidden' : '') . '>';
+	if ($is_svg) {
+		echo '<span class="bl-events-menu-icon-field__svg">' . $menu_icon . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- trusted admin SVG from settings
+	} elseif ($menu_icon !== '') {
+		echo '<span class="bl-icon -icon-' . esc_attr(preg_replace('/[^a-z0-9_-]/i', '', $menu_icon) ?: 'calendar-month') . '" aria-hidden="true"></span>';
+	}
+	echo '</div>';
+	echo '<span class="bl-events-menu-icon-field__empty description" data-bl-events-menu-icon-empty' . ($menu_icon !== '' ? ' hidden' : '') . '>' . esc_html__('No icon selected', 'baselayer-events') . '</span>';
+	echo '<div class="bl-events-menu-icon-field__actions">';
+	echo '<button type="button" class="button bl-button-small" data-bl-events-menu-icon-choose>' . esc_html__('Choose icon', 'baselayer-events') . '</button>';
+	echo '<button type="button" class="button bl-button-small" data-bl-events-menu-icon-svg-toggle aria-expanded="' . ($is_svg ? 'true' : 'false') . '">' . esc_html__('SVG code', 'baselayer-events') . '</button>';
+	echo '<button type="button" class="button bl-button-small" data-bl-events-menu-icon-clear>' . esc_html__('Clear', 'baselayer-events') . '</button>';
+	echo '</div>';
+	echo '</div>';
+	echo '<div class="bl-events-menu-icon-field__svg-panel" data-bl-events-menu-icon-svg-panel' . ($is_svg ? '' : ' hidden') . '>';
+	echo '<label class="screen-reader-text" for="bl-events-menu-icon-svg">' . esc_html__('Custom SVG code', 'baselayer-events') . '</label>';
+	echo '<textarea class="large-text code" rows="4" id="bl-events-menu-icon-svg" data-bl-events-menu-icon-svg placeholder="<svg …">' . esc_textarea($is_svg ? $menu_icon : '') . '</textarea>';
+	echo '<p class="description">' . esc_html__('Paste inline SVG to use a custom menu icon instead of a catalog icon.', 'baselayer-events') . '</p>';
+	echo '</div>';
+	echo '</div>';
+	echo '</td></tr>';
 }
 
 /**
@@ -397,48 +459,19 @@ function bl_events_settings_archive_fields(array $cfg): void
 /**
  * @param array<string, mixed> $cfg
  */
-function bl_events_settings_taxonomies_fields(array $cfg): void
-{
-	$tax = is_array($cfg['taxonomies'] ?? null) ? $cfg['taxonomies'] : [];
-	echo '<tr><td colspan="2"><p class="description">' . esc_html__('Custom taxonomies attached to this type. Leave ID empty on a new row to skip it.', 'baselayer-events') . '</p>';
-	echo '<table class="widefat striped" style="max-width:900px"><thead><tr>';
-	echo '<th>' . esc_html__('ID', 'baselayer-events') . '</th><th>' . esc_html__('Label', 'baselayer-events') . '</th><th>' . esc_html__('Singular', 'baselayer-events') . '</th><th>' . esc_html__('URL', 'baselayer-events') . '</th>';
-	echo '</tr></thead><tbody>';
-	$rows = $tax;
-	$rows[''] = ['label' => '', 'singular_label' => '', 'url' => ''];
-	foreach ($rows as $id => $row) {
-		$row = is_array($row) ? $row : [];
-		echo '<tr>';
-		echo '<td><input type="text" name="tax_id[]" value="' . esc_attr((string) $id) . '" class="regular-text"></td>';
-		echo '<td><input type="text" name="tax_label[]" value="' . esc_attr((string) ($row['label'] ?? '')) . '" class="regular-text"></td>';
-		echo '<td><input type="text" name="tax_singular[]" value="' . esc_attr((string) ($row['singular_label'] ?? '')) . '" class="regular-text"></td>';
-		echo '<td><input type="text" name="tax_url[]" value="' . esc_attr((string) ($row['url'] ?? '')) . '" class="regular-text"></td>';
-		echo '</tr>';
-	}
-	echo '</tbody></table></td></tr>';
-}
-
-/**
- * @param array<string, mixed> $cfg
- */
 function bl_events_settings_statuses_fields(array $cfg): void
 {
 	$statuses = is_array($cfg['statuses'] ?? null) ? $cfg['statuses'] : [];
-	echo '<tr><td colspan="2"><p class="description">' . esc_html__('Extra statuses beyond built-ins (None, Cancelled, Postponed, Custom). Color: token (warning, success, …) or hex.', 'baselayer-events') . '</p>';
-	echo '<table class="widefat striped" style="max-width:720px"><thead><tr>';
-	echo '<th>' . esc_html__('ID', 'baselayer-events') . '</th><th>' . esc_html__('Label', 'baselayer-events') . '</th><th>' . esc_html__('Color', 'baselayer-events') . '</th>';
-	echo '</tr></thead><tbody>';
-	$rows = $statuses;
-	$rows[''] = ['label' => '', 'color' => ''];
-	foreach ($rows as $id => $row) {
-		$row = is_array($row) ? $row : [];
-		echo '<tr>';
-		echo '<td><input type="text" name="status_id[]" value="' . esc_attr((string) $id) . '" class="regular-text"></td>';
-		echo '<td><input type="text" name="status_label[]" value="' . esc_attr((string) ($row['label'] ?? '')) . '" class="regular-text"></td>';
-		echo '<td><input type="text" name="status_color[]" value="' . esc_attr((string) ($row['color'] ?? '')) . '" class="regular-text"></td>';
-		echo '</tr>';
+	$json = wp_json_encode($statuses, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+	if (!is_string($json)) {
+		$json = '{}';
 	}
-	echo '</tbody></table></td></tr>';
+
+	echo '<tr><td colspan="2">';
+	echo '<p class="description">' . esc_html__('Extra statuses beyond built-ins (None, Cancelled, Postponed, Custom). Drag to reorder. Choose a theme color token or a custom hex color.', 'baselayer-events') . '</p>';
+	echo '<div data-bl-events-statuses-builder class="bl-events-statuses-builder"></div>';
+	echo '<input type="hidden" name="statuses_config_json" id="bl-events-statuses-config-json" value="' . esc_attr($json) . '">';
+	echo '</td></tr>';
 }
 
 /**
@@ -447,45 +480,24 @@ function bl_events_settings_statuses_fields(array $cfg): void
 function bl_events_settings_meta_fields(array $cfg): void
 {
 	$meta = is_array($cfg['meta'] ?? null) ? $cfg['meta'] : [];
-	$groups = is_array($meta['groups'] ?? null) ? $meta['groups'] : [];
-	echo '<tr><th>' . esc_html__('Panel title', 'baselayer-events') . '</th><td><input type="text" class="regular-text" name="meta_title" value="' . esc_attr((string) ($meta['title'] ?? '')) . '"></td></tr>';
-	echo '<tr><td colspan="2"><p class="description">' . esc_html__('Groups and fields for the editor metadata panel. Field types: text, textarea, email, url.', 'baselayer-events') . '</p>';
+	$enabled = !array_key_exists('enabled', $meta) || !empty($meta['enabled']);
+	$payload = [
+		'title' => (string) ($meta['title'] ?? ''),
+		'groups' => is_array($meta['groups'] ?? null) ? $meta['groups'] : [],
+	];
+	$json = wp_json_encode($payload, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+	if (!is_string($json)) {
+		$json = '{"title":"","groups":{}}';
+	}
 
-	echo '<h3>' . esc_html__('Groups', 'baselayer-events') . '</h3>';
-	echo '<table class="widefat striped" style="max-width:720px;margin-bottom:16px"><thead><tr><th>' . esc_html__('Group ID', 'baselayer-events') . '</th><th>' . esc_html__('Title', 'baselayer-events') . '</th></tr></thead><tbody>';
-	$group_rows = $groups;
-	$group_rows[''] = ['title' => '', 'fields' => []];
-	foreach ($group_rows as $gid => $group) {
-		$group = is_array($group) ? $group : [];
-		echo '<tr><td><input type="text" name="meta_group_id[]" value="' . esc_attr((string) $gid) . '" class="regular-text"></td>';
-		echo '<td><input type="text" name="meta_group_title[]" value="' . esc_attr((string) ($group['title'] ?? '')) . '" class="regular-text"></td></tr>';
-	}
-	echo '</tbody></table>';
+	echo '<tr><th>' . esc_html__('Enable metadata', 'baselayer-events') . '</th><td>';
+	echo '<label><input type="checkbox" name="meta_enabled" value="1" ' . checked($enabled, true, false) . '> ' . esc_html__('Show the metadata panel in the editor and on the front end', 'baselayer-events') . '</label>';
+	echo '<p class="description">' . esc_html__('When off, saved field definitions are kept but the panel is hidden.', 'baselayer-events') . '</p>';
+	echo '</td></tr>';
 
-	echo '<h3>' . esc_html__('Fields', 'baselayer-events') . '</h3>';
-	echo '<table class="widefat striped" style="max-width:960px"><thead><tr>';
-	echo '<th>' . esc_html__('Group ID', 'baselayer-events') . '</th><th>' . esc_html__('Field ID', 'baselayer-events') . '</th><th>' . esc_html__('Label', 'baselayer-events') . '</th><th>' . esc_html__('Type', 'baselayer-events') . '</th>';
-	echo '</tr></thead><tbody>';
-	$field_rows = [];
-	foreach ($groups as $gid => $group) {
-		$fields = is_array($group['fields'] ?? null) ? $group['fields'] : [];
-		foreach ($fields as $fid => $field) {
-			$field_rows[] = [$gid, $fid, $field];
-		}
-	}
-	$field_rows[] = ['', '', ['label' => '', 'type' => 'text']];
-	foreach ($field_rows as [$gid, $fid, $field]) {
-		$field = is_array($field) ? $field : [];
-		$type = (string) ($field['type'] ?? 'text');
-		echo '<tr>';
-		echo '<td><input type="text" name="meta_field_group[]" value="' . esc_attr((string) $gid) . '" class="regular-text"></td>';
-		echo '<td><input type="text" name="meta_field_id[]" value="' . esc_attr((string) $fid) . '" class="regular-text"></td>';
-		echo '<td><input type="text" name="meta_field_label[]" value="' . esc_attr((string) ($field['label'] ?? '')) . '" class="regular-text"></td>';
-		echo '<td><select name="meta_field_type[]">';
-		foreach (['text', 'textarea', 'email', 'url'] as $t) {
-			echo '<option value="' . esc_attr($t) . '" ' . selected($type === $t, true, false) . '>' . esc_html($t) . '</option>';
-		}
-		echo '</select></td></tr>';
-	}
-	echo '</tbody></table></td></tr>';
+	echo '<tr><td colspan="2">';
+	echo '<p class="description">' . esc_html__('Build metadata groups and fields for the editor panel. Drag to reorder. Field types: text, textarea, number, email, phone, url, select.', 'baselayer-events') . '</p>';
+	echo '<div data-bl-events-meta-builder class="bl-events-meta-builder"></div>';
+	echo '<input type="hidden" name="meta_config_json" id="bl-events-meta-config-json" value="' . esc_attr($json) . '">';
+	echo '</td></tr>';
 }

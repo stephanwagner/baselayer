@@ -3,6 +3,36 @@
 defined('ABSPATH') || exit;
 
 /**
+ * Resolve event type menu icon for register_post_type.
+ * Accepts dashicon, URL/data URI, inline SVG, or BaseLayer icon catalog name.
+ */
+function bl_events_resolve_menu_icon(string $icon): string
+{
+	$icon = trim($icon);
+	$fallback = 'dashicons-calendar-alt';
+
+	if ($icon === '') {
+		return $fallback;
+	}
+
+	if (function_exists('bl_cpt_menu_icon')) {
+		$resolved = bl_cpt_menu_icon($icon);
+		return is_string($resolved) && $resolved !== '' ? $resolved : $fallback;
+	}
+
+	if (strpos($icon, 'dashicons-') === 0 || strpos($icon, 'data:image/') === 0 || preg_match('#^https?://#i', $icon)) {
+		return $icon;
+	}
+
+	if (stripos($icon, '<svg') !== false) {
+		$svg = preg_replace('/\sfill="[^"]*"/i', ' fill="#a7aaad"', $icon) ?: $icon;
+		return 'data:image/svg+xml;base64,' . base64_encode($svg);
+	}
+
+	return $fallback;
+}
+
+/**
  * Inject Events instances into BaseLayer content-types map (theme archives, menus, etc.).
  *
  * @param array<string, array<string, mixed>> $types
@@ -42,51 +72,22 @@ function bl_events_register_cpts_standalone(): void
 				'singular_name' => $labels['singular_name'] ?? $post_type,
 				'menu_name' => $labels['menu_name'] ?? ($labels['name'] ?? $post_type),
 			],
-			'public' => !empty($cfg['public']),
-			'hierarchical' => !empty($cfg['hierarchical']),
+			'public' => true,
+			'hierarchical' => false,
 			'show_ui' => true,
 			'show_in_menu' => true,
 			'show_in_rest' => true,
-			'supports' => isset($cfg['supports']) && is_array($cfg['supports']) ? $cfg['supports'] : ['title', 'editor'],
+			'supports' => bl_events_forced_supports(),
 			'has_archive' => !empty($archive['enabled']),
 			'rewrite' => ['slug' => sanitize_title($archive_slug)],
 			'menu_position' => isset($admin['menu_position']) ? (int) $admin['menu_position'] : 5,
-			'menu_icon' => !empty($admin['menu_icon']) ? $admin['menu_icon'] : 'dashicons-calendar-alt',
+			'menu_icon' => bl_events_resolve_menu_icon((string) ($admin['menu_icon'] ?? '')),
 		];
-
-		if (is_string($args['menu_icon']) && stripos($args['menu_icon'], '<svg') !== false) {
-			$args['menu_icon'] = 'data:image/svg+xml;base64,' . base64_encode(
-				preg_replace('/\sfill="[^"]*"/i', ' fill="#a7aaad"', $args['menu_icon']) ?: $args['menu_icon']
-			);
-		}
 
 		register_post_type($post_type, $args);
 
-		$taxonomies = isset($cfg['taxonomies']) && is_array($cfg['taxonomies']) ? $cfg['taxonomies'] : [];
-		foreach ($taxonomies as $tax => $tax_args) {
-			$tax = sanitize_key((string) $tax);
-			if ($tax === '' || !is_array($tax_args)) {
-				continue;
-			}
-			if (!taxonomy_exists($tax)) {
-				$label = isset($tax_args['label']) ? (string) $tax_args['label'] : $tax;
-				$singular = isset($tax_args['singular_label']) ? (string) $tax_args['singular_label'] : $label;
-				$url = isset($tax_args['url']) ? sanitize_title((string) $tax_args['url']) : $tax;
-				register_taxonomy($tax, $post_type, [
-					'labels' => [
-						'name' => $label,
-						'singular_name' => $singular !== '' ? $singular : $label,
-					],
-					'public' => true,
-					'show_ui' => true,
-					'show_admin_column' => true,
-					'show_in_rest' => true,
-					'hierarchical' => true,
-					'rewrite' => ['slug' => $url],
-				]);
-			} else {
-				register_taxonomy_for_object_type($tax, $post_type);
-			}
+		if (!empty($cfg['wp_categories'])) {
+			register_taxonomy_for_object_type('category', $post_type);
 		}
 	}
 }

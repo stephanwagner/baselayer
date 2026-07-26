@@ -9,7 +9,7 @@ export default {
   id: 'textarea',
   group: 'general',
   label: 'Textarea',
-  modes: ['fields'],
+  modes: ['fields', 'event-meta'],
 
   renderOptions(container) {
     container.appendChild(

@@ -58,7 +58,8 @@ const formsBundles = [
 
 const eventsBundles = [
   { input: `${eventsPkg}/src/js/editor.js`, name: 'events-editor', outDir: `${eventsPkg}/assets/js` },
-  { input: `${eventsPkg}/src/js/admin.js`, name: 'events-admin', outDir: `${eventsPkg}/assets/js` }
+  { input: `${eventsPkg}/src/js/admin.js`, name: 'events-admin', outDir: `${eventsPkg}/assets/js` },
+  { input: `${eventsPkg}/src/js/settings.js`, name: 'events-settings', outDir: `${eventsPkg}/assets/js` }
 ];
 
 const bundles = [...themeBundles, ...formsBundles, ...eventsBundles];
@@ -114,6 +115,34 @@ async function buildAll() {
   await build(true);
 }
 
+/**
+ * Snapshot theme field-builder kit into Events package for standalone plugin use.
+ */
+async function vendorFieldBuilderToEvents() {
+  const fs = await import('node:fs/promises');
+  const themeAssetsJs = path.join(themeDir, 'assets/js');
+  const themeAssetsCss = path.join(themeDir, 'assets/css');
+  const vendorDir = path.join(eventsPkg, 'assets/vendor/field-builder');
+  await fs.mkdir(vendorDir, { recursive: true });
+
+  const files = [
+    ['js', 'field-builder-admin.js'],
+    ['js', 'field-builder-admin.min.js'],
+    ['css', 'field-builder-admin.css'],
+    ['css', 'field-builder-admin.min.css'],
+  ];
+
+  for (const [kind, name] of files) {
+    const src = path.join(kind === 'js' ? themeAssetsJs : themeAssetsCss, name);
+    try {
+      await fs.copyFile(src, path.join(vendorDir, name));
+      console.log(`Vendored ${name} → ${eventsPkg}/assets/vendor/field-builder/`);
+    } catch {
+      // CSS may not exist yet if only JS was filtered.
+    }
+  }
+}
+
 async function watch() {
   console.log('Watching JavaScript (development)...');
   const contexts = await Promise.all(
@@ -128,4 +157,8 @@ if (watchMode) {
   await watch();
 } else {
   await buildAll();
+  const filter = parseFilter();
+  if (!filter || filter.has('field-builder-admin')) {
+    await vendorFieldBuilderToEvents();
+  }
 }

@@ -1,4 +1,7 @@
 // Events admin list — occurrences modal
+// Settings builders load without full theme admin.css; include small WP buttons + icon picker here.
+@use '../../../../src/scss/admin/button-small';
+@use '../../../../src/scss/admin/icon-picker';
 
 .bl-event-occurrences-modal-open {
   overflow: hidden;
@@ -16,139 +19,139 @@
   &[hidden] {
     display: none;
   }
+}
 
-  &__backdrop {
-    position: absolute;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.45);
+.bl-event-occurrences-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.bl-event-occurrences-modal__dialog {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 480px);
+  max-height: min(80vh, 640px);
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 4px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.bl-event-occurrences-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid #dcdcde;
+}
+
+.bl-event-occurrences-modal__title {
+  margin: 0;
+  font-size: 1.1em;
+  line-height: 1.3;
+}
+
+.bl-event-occurrences-modal__close {
+  border: 0;
+  background: transparent;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  color: #50575e;
+  padding: 0 4px;
+}
+
+.bl-event-occurrences-modal__body {
+  padding: 12px 16px 16px;
+  overflow: auto;
+}
+
+.bl-event-occurrences-modal__loading,
+.bl-event-occurrences-modal__empty {
+  margin: 8px 0;
+  color: #646970;
+}
+
+.bl-event-occurrences-modal__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.bl-event-occurrences-modal__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f1;
+
+  &:last-child {
+    border-bottom: 0;
   }
 
-  &__dialog {
-    position: relative;
-    z-index: 1;
-    width: min(100%, 480px);
-    max-height: min(80vh, 640px);
-    display: flex;
-    flex-direction: column;
-    background: #fff;
-    border-radius: 4px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-  }
-
-  &__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 14px 16px;
-    border-bottom: 1px solid #dcdcde;
-  }
-
-  &__title {
-    margin: 0;
-    font-size: 1.1em;
-    line-height: 1.3;
-  }
-
-  &__close {
-    border: 0;
-    background: transparent;
-    font-size: 22px;
-    line-height: 1;
-    cursor: pointer;
-    color: #50575e;
-    padding: 0 4px;
-  }
-
-  &__body {
-    padding: 12px 16px 16px;
-    overflow: auto;
-  }
-
-  &__loading,
-  &__empty {
-    margin: 8px 0;
-    color: #646970;
-  }
-
-  &__list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  &__item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 10px 0;
-    border-bottom: 1px solid #f0f0f1;
-
-    &:last-child {
-      border-bottom: 0;
-    }
-
-    &.is-deleted {
-      .bl-event-occurrences-modal__date {
-        color: #646970;
-        text-decoration: line-through;
-      }
-    }
-  }
-
-  &__item-main {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px 8px;
-    min-width: 0;
-  }
-
-  &__date {
-    font-weight: 500;
-  }
-
-  &__badge {
-    display: inline-block;
-    padding: 1px 6px;
-    border-radius: 2px;
-    background: #fcf0e3;
-    color: #996800;
-    font-size: 11px;
-
-    &--deleted {
-      background: #f0f0f1;
-      color: #50575e;
-    }
-
-    &--status {
-      background: color-mix(in srgb, var(--bl-status-color, var(--bl-color-info)) 16%, #fff);
-      color: var(--bl-status-color, var(--bl-color-info));
+  &.is-deleted {
+    .bl-event-occurrences-modal__date {
+      color: #646970;
+      text-decoration: line-through;
     }
   }
+}
 
-  &__actions {
-    display: flex;
-    flex-shrink: 0;
-    align-items: center;
-    gap: 10px;
-  }
+.bl-event-occurrences-modal__item-main {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 8px;
+  min-width: 0;
+}
 
-  &__edit,
-  &__restore,
-  &__delete {
-    flex-shrink: 0;
-  }
+.bl-event-occurrences-modal__date {
+  font-weight: 500;
+}
 
-  &__restore,
-  &__delete {
-    cursor: pointer;
-  }
+.bl-event-occurrences-modal__badge {
+  display: inline-block;
+  padding: 1px 6px;
+  border-radius: 2px;
+  background: #fcf0e3;
+  color: #996800;
+  font-size: 11px;
+}
 
-  &__delete {
-    color: #b32d2e;
-  }
+.bl-event-occurrences-modal__badge--deleted {
+  background: #f0f0f1;
+  color: #50575e;
+}
+
+.bl-event-occurrences-modal__badge--status {
+  background: color-mix(in srgb, var(--bl-status-color, var(--bl-color-info)) 16%, #fff);
+  color: var(--bl-status-color, var(--bl-color-info));
+}
+
+.bl-event-occurrences-modal__actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 10px;
+}
+
+.bl-event-occurrences-modal__edit,
+.bl-event-occurrences-modal__restore,
+.bl-event-occurrences-modal__delete {
+  flex-shrink: 0;
+}
+
+.bl-event-occurrences-modal__restore,
+.bl-event-occurrences-modal__delete {
+  cursor: pointer;
+}
+
+.bl-event-occurrences-modal__delete {
+  color: #b32d2e;
 }
 
 .wp-list-table {
@@ -156,6 +159,7 @@
     margin-top: 4px;
   }
 }
+
 // Event post type
 
 .baselayer-event-panel {
@@ -192,16 +196,16 @@
     flex: 1;
     margin-bottom: 0;
   }
+}
 
-  &__swatch {
-    flex-shrink: 0;
-    width: 32px;
-    height: 32px;
-    margin-bottom: 1px;
-    border: 1px solid rgba(0, 0, 0, 0.15);
-    border-radius: 4px;
-    box-sizing: border-box;
-  }
+.bl-event-status-color__swatch {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  margin-bottom: 1px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  box-sizing: border-box;
 }
 
 .bl-event-recurring {
@@ -209,50 +213,50 @@
   padding-top: 12px;
   border-top: 1px solid #ddd;
 
-  &__heading {
-    margin: 0 0 8px;
-    font-size: 11px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-  }
-
-  &__line,
-  &__count,
-  &__master-label,
-  &__master-title {
-    margin: 0 0 4px;
-  }
-
-  &__master-title {
-    font-weight: 600;
-  }
-
-  &__count {
-    margin-bottom: 10px;
-    color: #757575;
-  }
-
-  &__needs-date {
-    margin: 0 0 10px;
-  }
-
-  &__detached {
-    margin: 10px 0;
-    padding: 8px 10px;
-
-    p {
-      margin: 0 0 6px;
-    }
-  }
-
-  &__edit-master {
-    margin-top: 8px;
-  }
-
   .components-button {
     margin-top: 8px;
   }
+}
+
+.bl-event-recurring__heading {
+  margin: 0 0 8px;
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.bl-event-recurring__line,
+.bl-event-recurring__count,
+.bl-event-recurring__master-label,
+.bl-event-recurring__master-title {
+  margin: 0 0 4px;
+}
+
+.bl-event-recurring__master-title {
+  font-weight: 600;
+}
+
+.bl-event-recurring__count {
+  margin-bottom: 10px;
+  color: #757575;
+}
+
+.bl-event-recurring__needs-date {
+  margin: 0 0 10px;
+}
+
+.bl-event-recurring__detached {
+  margin: 10px 0;
+  padding: 8px 10px;
+
+  p {
+    margin: 0 0 6px;
+  }
+}
+
+.bl-event-recurring__edit-master {
+  margin-top: 8px;
 }
 
 .bl-event-recurrence-modal {
@@ -262,168 +266,168 @@
   &.components-modal__frame {
     max-height: calc(100vh - 48px - 48px);
   }
+}
 
-  &__body {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    box-sizing: border-box;
-  }
+.bl-event-recurrence-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-sizing: border-box;
+}
 
-  &__layout {
-    display: grid;
-    grid-template-columns: 340px minmax(0, 1fr);
-    gap: 24px;
-    align-items: start;
+.bl-event-recurrence-modal__layout {
+  display: grid;
+  grid-template-columns: 340px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
 
-    @media (max-width: 600px) {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  &__settings {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    min-width: 0;
-
-    .components-base-control {
-      margin-bottom: 0;
-    }
-
-    .components-text-control__input,
-    .components-select-control__input,
-    select.components-select-control__input {
-      height: 32px;
-      min-height: 32px;
-      box-sizing: border-box;
-    }
-  }
-
-  &__label {
-    display: block;
-    margin: 0 0 6px;
-    font-size: 13px;
-    font-weight: 600;
-    line-height: 1.4;
-    color: #1e1e1e;
-  }
-
-  &__every-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    .components-base-control {
-      margin-bottom: 0;
-      max-width: 5rem;
-    }
-  }
-
-  &__days {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-    min-height: 60px;
-
-    &--spacer {
-      visibility: hidden;
-      pointer-events: none;
-    }
-  }
-
-  &__days-row,
-  &__ends-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-  }
-
-  &__day.components-button,
-  &__ends-option.components-button {
-    min-width: 2.5rem;
-    justify-content: center;
-    padding: 0 10px;
-    height: 32px;
-  }
-
-  &__ends {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-  }
-
-  &__ends-extra {
-    display: flex;
-    align-items: center;
-    min-height: 32px;
-    margin: 8px 0 0;
-
-    .components-text-control__input[type='date'] {
-      max-width: 11rem;
-      height: 32px;
-      min-height: 32px;
-      box-sizing: border-box;
-    }
-  }
-
-  &__preview {
-    min-width: 0;
-    padding: 10px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background: #f6f7f7;
-    box-sizing: border-box;
-
-    strong {
-      display: block;
-      margin-bottom: 6px;
-    }
-
-    ul {
-      margin: 0;
-      padding-left: 12px;
-    }
-
-    .description {
-      margin: 6px 0 0;
-    }
-  }
-
-  &__footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px;
-    margin-top: 4px;
-    padding-top: 10px;
-    border-top: 1px solid #ddd;
-  }
-
-  &__footer-actions {
-    display: flex;
-    gap: 8px;
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
   }
 }
 
+.bl-event-recurrence-modal__settings {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+
+  .components-base-control {
+    margin-bottom: 0;
+  }
+
+  .components-text-control__input,
+  .components-select-control__input,
+  select.components-select-control__input {
+    height: 32px;
+    min-height: 32px;
+    box-sizing: border-box;
+  }
+}
+
+.bl-event-recurrence-modal__label {
+  display: block;
+  margin: 0 0 6px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: #1e1e1e;
+}
+
+.bl-event-recurrence-modal__every-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .components-base-control {
+    margin-bottom: 0;
+    max-width: 5rem;
+  }
+}
+
+.bl-event-recurrence-modal__days {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-height: 60px;
+}
+
+.bl-event-recurrence-modal__days--spacer {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.bl-event-recurrence-modal__days-row,
+.bl-event-recurrence-modal__ends-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.bl-event-recurrence-modal__day.components-button,
+.bl-event-recurrence-modal__ends-option.components-button {
+  min-width: 2.5rem;
+  justify-content: center;
+  padding: 0 10px;
+  height: 32px;
+}
+
+.bl-event-recurrence-modal__ends {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.bl-event-recurrence-modal__ends-extra {
+  display: flex;
+  align-items: center;
+  min-height: 32px;
+  margin: 8px 0 0;
+
+  .components-text-control__input[type='date'] {
+    max-width: 11rem;
+    height: 32px;
+    min-height: 32px;
+    box-sizing: border-box;
+  }
+}
+
+.bl-event-recurrence-modal__preview {
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #f6f7f7;
+  box-sizing: border-box;
+
+  strong {
+    display: block;
+    margin-bottom: 6px;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 12px;
+  }
+
+  .description {
+    margin: 6px 0 0;
+  }
+}
+
+.bl-event-recurrence-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid #ddd;
+}
+
+.bl-event-recurrence-modal__footer-actions {
+  display: flex;
+  gap: 8px;
+}
+
 .bl-event-metadata {
-  &__group {
-    margin: 0 0 12px;
-  }
-
-  &__group-title {
-    margin: 0 0 4px;
-    font-weight: 600;
-  }
-
-  &__line {
-    margin: 0 0 2px;
-    color: #50575e;
-  }
-
   .components-button {
     margin-top: 8px;
   }
+}
+
+.bl-event-metadata__group {
+  margin: 0 0 12px;
+}
+
+.bl-event-metadata__group-title {
+  margin: 0 0 4px;
+  font-weight: 600;
+}
+
+.bl-event-metadata__line {
+  margin: 0 0 2px;
+  color: #50575e;
 }
 
 .bl-event-metadata-modal {
@@ -434,95 +438,373 @@
   &.components-modal__frame {
     max-height: calc(100vh - 48px - 48px);
   }
+}
 
-  &__body {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    box-sizing: border-box;
-  }
+.bl-event-metadata-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-sizing: border-box;
+}
 
-  &__fields {
-    max-height: min(60vh, 420px);
-    overflow: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
+.bl-event-metadata-modal__fields {
+  max-height: min(60vh, 420px);
+  overflow: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
 
-  &__group {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+.bl-event-metadata-modal__group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 
-    &:not(:first-child) {
-      margin-top: 4px;
-      padding-top: 14px;
-      border-top: 1px solid #c3c4c7;
-    }
-  }
-
-  &__group-title {
-    margin: 0;
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 1.3;
-    color: #1e1e1e;
-  }
-
-  &__table {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  &__row {
-    display: grid;
-    grid-template-columns: 140px minmax(0, 1fr);
-    gap: 12px;
-    align-items: start;
-  }
-
-  &__row-label {
-    padding-top: 7px;
-    font-size: 13px;
-    font-weight: 500;
-    line-height: 1.4;
-    color: #50575e;
-  }
-
-  &__row-field {
-    min-width: 0;
-
-    .components-base-control {
-      margin-bottom: 0;
-    }
-
-    .components-text-control__input,
-    .components-textarea-control__input {
-      width: 100%;
-      box-sizing: border-box;
-    }
-
-    .components-text-control__input {
-      height: 32px;
-      min-height: 32px;
-    }
-
-    .components-textarea-control__input {
-      min-height: 4.5rem;
-      resize: vertical;
-    }
-  }
-
-  &__footer {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    flex: 0 0 auto;
+  &:not(:first-child) {
     margin-top: 4px;
-    padding-top: 10px;
-    border-top: 1px solid #ddd;
+    padding-top: 14px;
+    border-top: 1px solid #c3c4c7;
   }
 }
 
+.bl-event-metadata-modal__group-title {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+  color: #1e1e1e;
+}
+
+.bl-event-metadata-modal__table {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.bl-event-metadata-modal__row {
+  display: grid;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+}
+
+.bl-event-metadata-modal__row-label {
+  padding-top: 7px;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.4;
+  color: #50575e;
+}
+
+.bl-event-metadata-modal__row-field {
+  min-width: 0;
+
+  .components-base-control {
+    margin-bottom: 0;
+  }
+
+  .components-text-control__input,
+  .components-textarea-control__input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .components-text-control__input {
+    height: 32px;
+    min-height: 32px;
+  }
+
+  .components-textarea-control__input {
+    min-height: 4.5rem;
+    resize: vertical;
+  }
+}
+
+.bl-event-metadata-modal__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  flex: 0 0 auto;
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid #ddd;
+}
+
+// Event types → Metadata builder
+.bl-events-meta-builder {
+  max-width: 880px;
+  margin-top: 8px;
+}
+
+.bl-events-meta-builder__title-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.bl-events-meta-builder__title-label {
+  font-weight: 600;
+}
+
+.bl-events-meta-builder__groups {
+  margin-bottom: 12px;
+}
+
+// Groups: light blue chrome so they nest above white field rows.
+.bl-events-meta-builder__group.bl-field-builder__item {
+  background: #edf5fc;
+  border-color: #c3d9ed;
+
+  > .bl-field-builder__item-header {
+    background: #edf5fc;
+  }
+
+  &.is-open > .bl-field-builder__item-header {
+    border-bottom-color: #c3d9ed;
+  }
+}
+
+.bl-events-meta-builder__group-body {
+  background: #f7fbfe;
+  padding: 12px 14px 14px;
+}
+
+.bl-events-meta-builder__fields-heading {
+  margin: 16px 0 8px;
+  font-size: 13px;
+}
+
+.bl-events-meta-builder__fields {
+  margin-bottom: 8px;
+}
+
+// Fields: white closed, soft gray when expanded.
+.bl-events-meta-builder__fields .bl-field-builder__field.bl-field-builder__item {
+  background: #fff;
+  border-color: #dcdcde;
+
+  > .bl-field-builder__item-header {
+    background: #fff;
+  }
+
+  &.is-open {
+    background: #f0f0f1;
+
+    > .bl-field-builder__item-header {
+      background: #f0f0f1;
+      border-bottom-color: #dcdcde;
+    }
+
+    > .bl-field-builder__item-body {
+      background: #f6f7f7;
+    }
+  }
+}
+
+.bl-events-meta-builder__fields-empty {
+  margin: 0 0 8px;
+}
+
+// Event types → Statuses builder
+.bl-events-statuses-builder {
+  max-width: 720px;
+  margin-top: 8px;
+}
+
+.bl-events-statuses-builder__list {
+  margin-bottom: 12px;
+}
+
+.bl-events-statuses-builder__swatch {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  flex: 0 0 auto;
+}
+
+.bl-events-statuses-builder__color-select {
+  max-width: 280px;
+}
+
+.bl-events-statuses-builder__custom-color {
+  margin-top: 10px;
+}
+
+.bl-events-statuses-builder__custom-color-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bl-events-statuses-builder__color-picker {
+  width: 44px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid #c3c4c7;
+  border-radius: 3px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.bl-events-statuses-builder__color-hex {
+  max-width: 140px;
+  font-family: Menlo, Consolas, monaco, monospace;
+  font-size: 12px;
+}
+
+// Event types settings — top toolbar
+.bl-events-settings__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 12px 0 16px;
+  max-width: 960px;
+}
+
+.bl-events-settings__toolbar-desc {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.bl-events-settings__toolbar-actions {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 8px;
+}
+
+.wp-core-ui .button.bl-button-danger,
+.button.bl-button-danger {
+  color: #b32d2e;
+  border-color: #dba7a7;
+  background: #fcf0f1;
+}
+
+.wp-core-ui .button.bl-button-danger:hover,
+.wp-core-ui .button.bl-button-danger:focus,
+.button.bl-button-danger:hover,
+.button.bl-button-danger:focus {
+  color: #8a2424;
+  border-color: #b32d2e;
+  background: #f8e5e5;
+}
+
+.wp-core-ui .button.bl-button-danger:disabled,
+.wp-core-ui .button.bl-button-danger[disabled],
+.button.bl-button-danger:disabled,
+.button.bl-button-danger[disabled] {
+  color: #b32d2e !important;
+  border-color: #dba7a7 !important;
+  background: #fcf0f1 !important;
+  opacity: 0.5;
+}
+
+.bl-events-settings__instance-tabs {
+  margin-top: 8px;
+}
+
+// Event types settings — add / delete dialogs
+.bl-events-settings-dialog {
+  padding: 0;
+  border: 0;
+  border-radius: 4px;
+  width: min(100%, 480px);
+  max-width: calc(100vw - 32px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.bl-events-settings-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.bl-events-settings-dialog__form {
+  display: flex;
+  flex-direction: column;
+}
+
+.bl-events-settings-dialog__header {
+  padding: 14px 16px;
+  border-bottom: 1px solid #dcdcde;
+}
+
+.bl-events-settings-dialog__title {
+  margin: 0;
+  font-size: 1.1em;
+  line-height: 1.3;
+}
+
+.bl-events-settings-dialog__body {
+  padding: 14px 16px 8px;
+}
+
+.bl-events-settings-dialog__body .description {
+  display: block;
+  margin-top: 6px;
+}
+
+.bl-events-settings-dialog__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 12px 16px 16px;
+  border-top: 1px solid #dcdcde;
+}
+
+// Event types settings — menu icon field
+.bl-events-menu-icon-field {
+  max-width: 520px;
+}
+
+.bl-events-menu-icon-field__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.bl-events-menu-icon-field__preview {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #dcdcde;
+  border-radius: 4px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.bl-events-menu-icon-field__preview .bl-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.bl-events-menu-icon-field__svg {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+}
+
+.bl-events-menu-icon-field__svg svg {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+.bl-events-menu-icon-field__empty {
+  margin: 0;
+}
+
+.bl-events-menu-icon-field__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.bl-events-menu-icon-field__svg-panel {
+  margin-top: 10px;
+}
