@@ -782,7 +782,7 @@ msgstr ""
 #. translators: %s: Material Icons URL
 #: includes/settings-page.php:604
 #, php-format
-msgid "Paste inline SVG for the admin menu icon. Browse icons at <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">Material Icons (Rounded)</a>, open an icon, then copy the SVG."
+msgid "Paste inline SVG for the admin menu icon. Browse icons at <a href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">Material Icons</a>, open an icon, then copy the SVG."
 msgstr ""
 
 #: includes/settings-page.php:629

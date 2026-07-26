@@ -735,8 +735,8 @@ msgid "Menu name"
 msgstr "Menüname"
 
 #: includes/settings-page.php:633
-msgid "Public archive and single permalinks (e.g. veranstaltungen)."
-msgstr "Öffentliches Archiv und Einzel-Permalinks (z. B. veranstaltungen)."
+msgid "URL for public archive and single permalinks."
+msgstr "URL für öffentliches Archiv und Einzel-Permalinks."
 
 #: includes/settings-page.php:635
 msgid "Menu position"
@@ -776,13 +776,11 @@ msgstr ""
 #: includes/settings-page.php:693
 #, php-format
 msgid ""
-"Paste inline SVG for the admin menu icon. Browse icons at <a href=\"%s\" "
-"target=\"_blank\" rel=\"noopener noreferrer\">Material Icons (Rounded)</a>, "
-"open an icon, then copy the SVG."
+"Browse icons at <a href=\"%s\" "
+"target=\"_blank\" rel=\"noopener noreferrer\">Material Icons</a>."
 msgstr ""
-"Füge Inline-SVG für das Admin-Menüsymbol ein. Icons findest du unter <a "
-"href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">Material Icons "
-"(Rounded)</a> — Symbol öffnen und SVG kopieren."
+"Icons findest du unter <a "
+"href=\"%s\" target=\"_blank\" rel=\"noopener noreferrer\">Material Icons</a> ."
 
 #: includes/settings-page.php:718
 msgid "Enable archive"

@@ -479,7 +479,7 @@ function bl_events_settings_render_type_dialogs(string $instance, string $instan
 	echo '<input type="text" class="regular-text" id="bl-events-new-label-singular" name="new_label_singular" value="" placeholder="' . esc_attr__('Event', 'baselayer-events') . '" required autocomplete="off"></p>';
 	echo '<p><label for="bl-events-new-url-slug"><strong>' . esc_html__('URL slug', 'baselayer-events') . '</strong></label><br>';
 	echo '<input type="text" class="regular-text" id="bl-events-new-url-slug" name="new_url_slug" value="" placeholder="events" pattern="[a-z0-9\\-]+" required autocomplete="off">';
-	echo '<span class="description">' . esc_html__('Public archive and event permalinks (e.g. /veranstaltungen/).', 'baselayer-events') . '</span></p>';
+	echo '<span class="description">' . esc_html__('URL for public archive and single permalinks.', 'baselayer-events') . '</span></p>';
 	echo '</div>';
 	echo '<div class="bl-events-settings-dialog__footer">';
 	echo '<button type="button" class="button" data-bl-events-dialog-close>' . esc_html__('Cancel', 'baselayer-events') . '</button>';
@@ -541,7 +541,7 @@ function bl_events_settings_general_fields(array $cfg): void
 
 	echo '<tr><th>' . esc_html__('URL slug', 'baselayer-events') . '</th><td>';
 	echo '<input type="text" class="regular-text" name="archive_slug" value="' . esc_attr((string) ($archive['slug'] ?? '')) . '" pattern="[a-z0-9\\-]+" autocomplete="off">';
-	echo '<p class="description">' . esc_html__('Public archive and single permalinks (e.g. veranstaltungen).', 'baselayer-events') . '</p></td></tr>';
+	echo '<p class="description">' . esc_html__('URL for public archive and single permalinks.', 'baselayer-events') . '</p></td></tr>';
 
 	echo '<tr><th>' . esc_html__('Menu position', 'baselayer-events') . '</th><td><input type="number" name="menu_position" value="' . esc_attr((string) ((int) ($admin['menu_position'] ?? 5))) . '" class="small-text"></td></tr>';
 
@@ -601,7 +601,7 @@ function bl_events_settings_general_fields(array $cfg): void
 		echo '<p class="description">' . wp_kses(
 			sprintf(
 				/* translators: %s: Material Icons URL */
-				__('Paste inline SVG for the admin menu icon. Browse icons at <a href="%s" target="_blank" rel="noopener noreferrer">Material Icons (Rounded)</a>, open an icon, then copy the SVG.', 'baselayer-events'),
+				__('Browse icons at <a href="%s" target="_blank" rel="noopener noreferrer">Material Icons</a>.', 'baselayer-events'),
 				'https://fonts.google.com/icons?icon.style=Rounded'
 			),
 			[
