@@ -253,7 +253,14 @@ function bl_events_process_add_type(): void
 		$url_slug = 'events';
 	}
 
-	$slug = bl_events_make_internal_key($singular !== '' ? $singular : $url_slug);
+	$id_stem = isset($_POST['new_internal_id'])
+		? sanitize_key(wp_unslash((string) $_POST['new_internal_id']))
+		: '';
+	$id_stem = preg_replace('/^bl_+/', '', $id_stem) ?: '';
+	if ($id_stem === '') {
+		$id_stem = sanitize_key($singular !== '' ? $singular : $url_slug);
+	}
+	$slug = bl_events_make_internal_key($id_stem);
 
 	$def = bl_events_default_instance_definition();
 	$def['type'] = 'event';
@@ -487,8 +494,14 @@ function bl_events_settings_render_type_dialogs(string $instance, string $instan
 	echo '<input type="text" class="regular-text" id="bl-events-new-label-name" name="new_label_name" value="" placeholder="' . esc_attr__('Events', 'baselayer-events') . '" required autocomplete="off"></p>';
 	echo '<p><label for="bl-events-new-label-singular"><strong>' . esc_html__('Singular name', 'baselayer-events') . '</strong></label><br>';
 	echo '<input type="text" class="regular-text" id="bl-events-new-label-singular" name="new_label_singular" value="" placeholder="' . esc_attr__('Event', 'baselayer-events') . '" required autocomplete="off"></p>';
+	echo '<p><label for="bl-events-new-internal-id"><strong>' . esc_html__('Internal ID', 'baselayer-events') . '</strong></label><br>';
+	echo '<span class="bl-events-id-field">';
+	echo '<span class="bl-events-id-field__prefix" aria-hidden="true">bl_</span>';
+	echo '<input type="text" class="regular-text" id="bl-events-new-internal-id" name="new_internal_id" value="" placeholder="workshops" pattern="[a-z0-9_]+" maxlength="17" required autocomplete="off" spellcheck="false">';
+	echo '</span>';
+	echo '<span class="description">' . esc_html__('One short word: lowercase letters, numbers, and underscores. Cannot be changed later.', 'baselayer-events') . '</span></p>';
 	echo '<p><label for="bl-events-new-url-slug"><strong>' . esc_html__('URL slug', 'baselayer-events') . '</strong></label><br>';
-	echo '<input type="text" class="regular-text" id="bl-events-new-url-slug" name="new_url_slug" value="" placeholder="events" pattern="[a-z0-9\\-]+" required autocomplete="off">';
+	echo '<input type="text" class="regular-text" id="bl-events-new-url-slug" name="new_url_slug" value="" placeholder="workshops" pattern="[a-z0-9\\-]+" required autocomplete="off">';
 	echo '<span class="description">' . esc_html__('URL for public archive and single permalinks.', 'baselayer-events') . '</span></p>';
 	echo '</div>';
 	echo '<div class="bl-events-settings-dialog__footer">';

@@ -703,6 +703,12 @@ msgstr "Pluralname"
 msgid "Singular name"
 msgstr "Singularname"
 
+msgid "Internal ID"
+msgstr "Interne ID"
+
+msgid "One short word: lowercase letters, numbers, and underscores. Cannot be changed later."
+msgstr "Ein kurzes Wort: Kleinbuchstaben, Zahlen und Unterstriche. Kann später nicht geändert werden."
+
 #: includes/settings-page.php:490 includes/settings-page.php:552
 #: includes/settings-page.php:647
 msgid "URL slug"

@@ -758,6 +758,50 @@
   margin-top: 6px;
 }
 
+.bl-events-id-field {
+  display: inline-flex;
+  align-items: stretch;
+  max-width: 100%;
+  border: 1px solid #8c8f94;
+  border-radius: 4px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.bl-events-id-field:focus-within {
+  border-color: #2271b1;
+  box-shadow: 0 0 0 1px #2271b1;
+}
+
+.bl-events-id-field__prefix {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 8px;
+  background: #f0f0f1;
+  border-right: 1px solid #8c8f94;
+  color: #50575e;
+  font-family: Menlo, Consolas, monaco, monospace;
+  font-size: 12px;
+  line-height: 1;
+  user-select: none;
+}
+
+.bl-events-id-field .regular-text {
+  width: 14rem;
+  max-width: 100%;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  font-family: Menlo, Consolas, monaco, monospace;
+}
+
+.bl-events-id-field .regular-text:focus {
+  border: 0;
+  box-shadow: none;
+  outline: none;
+}
+
 .bl-events-settings-dialog__footer {
   display: flex;
   justify-content: flex-end;

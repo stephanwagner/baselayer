@@ -725,6 +725,12 @@ msgstr ""
 msgid "Singular name"
 msgstr ""
 
+msgid "Internal ID"
+msgstr ""
+
+msgid "One short word: lowercase letters, numbers, and underscores. Cannot be changed later."
+msgstr ""
+
 #: includes/settings-page.php:490
 #: includes/settings-page.php:552
 #: includes/settings-page.php:647
