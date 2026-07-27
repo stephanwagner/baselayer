@@ -490,7 +490,7 @@
                 "name": "post_type",
                 "aria-label": "",
                 "type": "select",
-                "instructions": "Nach Änderung speichern die Seite neu laden, damit die Kategorie-Auswahl aktualisiert wird.",
+                "instructions": "Nach Änderung speichern und dann die Seite neu laden, damit die Kategorie-Auswahl aktualisiert wird.",
                 "required": 1,
                 "conditional_logic": 0,
                 "wrapper": {
