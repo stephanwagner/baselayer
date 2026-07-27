@@ -48,6 +48,12 @@ function bl_forms_field_error_message(string $code, array $field = [], array $se
 				bl_forms_resolve_message($settings, bl_forms_range_message_key($field, 'max')),
 				['limit' => $value]
 			);
+		case 'minlength':
+			$value = $bound !== '' ? $bound : (string) (bl_forms_field_min_length($field) ?: '');
+			return bl_forms_replace_placeholders(
+				bl_forms_resolve_message($settings, 'minlength_message'),
+				['limit' => $value]
+			);
 		case 'maxlength':
 			$value = $bound !== '' ? $bound : (string) (bl_forms_field_max_length($field) ?: '');
 			return bl_forms_replace_placeholders(
@@ -578,6 +584,11 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 		}
 
 		if (in_array($type, ['text', 'textarea', 'email', 'phone', 'url'], true) && $value !== '') {
+			$min_length = bl_forms_field_min_length($field);
+			if ($min_length > 0 && bl_forms_string_length($value) < $min_length) {
+				$invalid[$name] = bl_forms_field_error_message('minlength', $field, $settings, (string) $min_length);
+				continue;
+			}
 			$max_length = bl_forms_field_max_length($field);
 			if ($max_length > 0 && bl_forms_string_length($value) > $max_length) {
 				$invalid[$name] = bl_forms_field_error_message('maxlength', $field, $settings, (string) $max_length);

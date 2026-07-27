@@ -467,8 +467,11 @@ msgstr ""
 msgid "Maximum length"
 msgstr ""
 
+msgid "Minimum length"
+msgstr ""
+
 #: includes/admin.php:407
-msgid "Show remaining characters"
+msgid "Show character count"
 msgstr ""
 
 #: includes/admin.php:408
@@ -1432,6 +1435,10 @@ msgid "Enter a date and time on or before {limit}."
 msgstr ""
 
 #. translators: Placeholder: {limit}
+msgid "Enter at least {limit} characters."
+msgstr ""
+
+#. translators: Placeholder: {limit}
 #: includes/config.php:573
 msgid "Enter no more than {limit} characters."
 msgstr ""
@@ -1793,6 +1800,9 @@ msgid "Form messages"
 msgstr ""
 
 #: includes/settings-page.php:452
+msgid "Min length"
+msgstr ""
+
 msgid "Max length"
 msgstr ""
 

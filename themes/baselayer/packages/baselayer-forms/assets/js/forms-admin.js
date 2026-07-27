@@ -3398,6 +3398,7 @@
       delete field.suffix;
     }
     if (!["text", "textarea"].includes(nextType)) {
+      delete field.min_length;
       delete field.max_length;
       delete field.show_char_count;
       delete field.char_count_text;
@@ -4213,7 +4214,15 @@
       el("p", {}, [el("label", { text: t("suffix", "Suffix") }), suffixInput])
     ]);
   }
-  function createMaxLengthControl(field) {
+  function createLengthLimitsControl(field) {
+    const minInput = el("input", {
+      type: "number",
+      className: "widefat",
+      min: "1",
+      step: "1",
+      dataset: { blMinLength: "1" },
+      value: field.min_length != null && field.min_length !== "" ? String(field.min_length) : ""
+    });
     const maxInput = el("input", {
       type: "number",
       className: "widefat",
@@ -4228,20 +4237,45 @@
     };
     const showSwitch = createSwitchSetting(
       "blShowCharCount",
-      t("showCharCount", "Show remaining characters"),
+      t("showCharCount", "Show character count"),
       !!field.show_char_count,
       syncShow
     );
-    const syncMax = () => {
-      field.max_length = maxInput.value.trim();
+    const showWrap = el("div", { className: "bl-forms-builder__char-count-toggle" }, [showSwitch]);
+    const showInput = showSwitch.querySelector('input[type="checkbox"]');
+    const syncVisibility = () => {
+      const max = parseInt(maxInput.value, 10);
+      const hasMax = Number.isFinite(max) && max > 0;
+      showWrap.hidden = !hasMax;
+      if (!hasMax) {
+        field.show_char_count = false;
+        if (showInput) {
+          showInput.checked = false;
+        }
+      }
+    };
+    const syncMin = () => {
+      field.min_length = minInput.value.trim();
       document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
     };
+    const syncMax = () => {
+      field.max_length = maxInput.value.trim();
+      syncVisibility();
+      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+    };
+    minInput.addEventListener("change", syncMin);
+    minInput.addEventListener("blur", syncMin);
+    minInput.addEventListener("input", syncMin);
     maxInput.addEventListener("change", syncMax);
     maxInput.addEventListener("blur", syncMax);
     maxInput.addEventListener("input", syncMax);
-    return el("div", { className: "bl-forms-builder__max-length" }, [
-      el("p", {}, [el("label", { text: t("maxLength", "Maximum length") }), maxInput]),
-      showSwitch
+    syncVisibility();
+    return el("div", { className: "bl-forms-builder__length-limits" }, [
+      el("p", {}, [el("label", { text: t("minLength", "Minimum length") }), minInput]),
+      el("div", { className: "bl-forms-builder__length-max" }, [
+        el("p", {}, [el("label", { text: t("maxLength", "Maximum length") }), maxInput]),
+        showWrap
+      ])
     ]);
   }
   function countOtherListOverviewFields(exceptId) {
@@ -5191,6 +5225,7 @@
       data.max = q("[data-bl-max]")?.value?.trim() || "";
     }
     if (type === "text" || type === "textarea") {
+      data.min_length = q("[data-bl-min-length]")?.value?.trim() || "";
       data.max_length = q("[data-bl-max-length]")?.value?.trim() || "";
       data.show_char_count = Boolean(q("[data-bl-show-char-count]")?.checked);
     }
@@ -5587,7 +5622,7 @@
           advancedSections.add(createTextareaRowsControl(field));
         }
         if (field.type === "text" || field.type === "textarea") {
-          advancedSections.add(createMaxLengthControl(field));
+          advancedSections.add(createLengthLimitsControl(field));
         }
         if (field.type === "file" || field.type === "image") {
           advancedSections.add(createExtensionsControl(field));
@@ -6462,6 +6497,8 @@
       }),
       key
     );
+    const minlengthMsg = bindErrorMsg("minlength_message", "minlength");
+    const maxlengthMsg = bindErrorMsg("maxlength_message", "maxlength");
     const numberMsg = bindErrorMsg("number_message", "number");
     const minMsg = bindErrorMsg("min_message", "min");
     const maxMsg = bindErrorMsg("max_message", "max");
@@ -6694,7 +6731,9 @@
           charCountText,
           t("charCountTextHelp", "The placeholders {remaining}, {count}, and {max} are replaced by the remaining count, current count, and maximum.")
         ),
-        fieldRow(t("charCountEmptyText", "When limit is reached"), charCountEmptyText)
+        fieldRow(t("charCountEmptyText", "When limit is reached"), charCountEmptyText),
+        fieldRow(t("minLengthError", "Min length"), minlengthMsg, rangeHelp()),
+        fieldRow(t("maxLengthError", "Max length"), maxlengthMsg, rangeHelp())
       ]),
       errorSection(t("numberError", "Number"), [
         fieldRow(t("invalidError", "Invalid"), numberMsg),

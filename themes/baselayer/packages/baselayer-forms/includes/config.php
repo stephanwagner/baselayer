@@ -116,6 +116,7 @@ function bl_forms_default_global_settings(): array
 		'datetime_min_message'   => '',
 		'datetime_max_message'   => '',
 		'maxlength_message'      => '',
+		'minlength_message'      => '',
 		'char_count_text'        => '',
 		'char_count_empty_text'  => '',
 		'number_message'         => '',
@@ -476,6 +477,7 @@ function bl_forms_default_settings(): array
 		'datetime_min_message'   => '',
 		'datetime_max_message'   => '',
 		'maxlength_message'      => '',
+		'minlength_message'      => '',
 		'char_count_text'        => '',
 		'char_count_empty_text'  => '',
 		'number_message'         => '',
@@ -570,6 +572,8 @@ function bl_forms_message_fallbacks(): array
 		/* translators: Placeholder: {limit} */
 		'datetime_max' => __('Enter a date and time on or before {limit}.', 'baselayer-forms'),
 		/* translators: Placeholder: {limit} */
+		'minlength'  => __('Enter at least {limit} characters.', 'baselayer-forms'),
+		/* translators: Placeholder: {limit} */
 		'maxlength'  => __('Enter no more than {limit} characters.', 'baselayer-forms'),
 		/* translators: Placeholders: {remaining}, {count}, {max} */
 		'char_count' => __('{remaining} characters remaining', 'baselayer-forms'),
@@ -622,6 +626,7 @@ function bl_forms_resolve_message(array $settings, string $key): string
 		'datetime_min_message' => 'datetime_min',
 		'datetime_max_message' => 'datetime_max',
 		'maxlength_message'  => 'maxlength',
+		'minlength_message'  => 'minlength',
 		'char_count_text'    => 'char_count',
 		'char_count_empty_text' => 'char_count_empty',
 		'number_message'     => 'number',
@@ -677,6 +682,7 @@ function bl_forms_form_message_placeholders(): array
 		'datetime_min' => 'datetime_min_message',
 		'datetime_max' => 'datetime_max_message',
 		'maxlength' => 'maxlength_message',
+		'minlength' => 'minlength_message',
 		'char_count' => 'char_count_text',
 		'char_count_empty' => 'char_count_empty_text',
 		'number' => 'number_message',
@@ -1500,10 +1506,22 @@ function bl_forms_sanitize_field($field): ?array
 	}
 
 	if (in_array($type, ['text', 'textarea'], true)) {
+		$min_length = bl_forms_field_min_length([
+			'type' => $type,
+			'min_length' => $field['min_length'] ?? '',
+		]);
 		$max_length = bl_forms_field_max_length([
 			'type' => $type,
 			'max_length' => $field['max_length'] ?? '',
 		]);
+		if ($min_length > 0 && $max_length > 0 && $min_length > $max_length) {
+			[$min_length, $max_length] = [$max_length, $min_length];
+		}
+		if ($min_length > 0) {
+			$out['min_length'] = $min_length;
+		} else {
+			unset($out['min_length']);
+		}
 		if ($max_length > 0) {
 			$out['max_length'] = $max_length;
 			$out['show_char_count'] = !empty($field['show_char_count']);
@@ -1512,7 +1530,7 @@ function bl_forms_sanitize_field($field): ?array
 		}
 		unset($out['char_count_text']);
 	} else {
-		unset($out['max_length'], $out['show_char_count'], $out['char_count_text']);
+		unset($out['min_length'], $out['max_length'], $out['show_char_count'], $out['char_count_text']);
 	}
 
 	if (in_array($type, ['text', 'email', 'phone'], true)) {

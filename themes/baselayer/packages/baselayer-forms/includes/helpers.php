@@ -550,6 +550,26 @@ function bl_forms_sanitize_temporal_bounds(array $out, array $field): array
 }
 
 /**
+ * Positive integer min length for text/textarea, or 0 if unset/invalid.
+ *
+ * @param array<string, mixed> $field
+ */
+function bl_forms_field_min_length(array $field): int
+{
+	$type = (string) ($field['type'] ?? '');
+	if (!in_array($type, ['text', 'textarea'], true)) {
+		return 0;
+	}
+
+	$raw = trim((string) ($field['min_length'] ?? ''));
+	if ($raw === '' || !ctype_digit($raw)) {
+		return 0;
+	}
+
+	return max(0, (int) $raw);
+}
+
+/**
  * Positive integer max length, or 0 if unset/invalid.
  *
  * Email / phone / URL use fixed limits (not editable in the builder).

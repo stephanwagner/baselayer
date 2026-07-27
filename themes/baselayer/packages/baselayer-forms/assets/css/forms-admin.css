@@ -1233,13 +1233,30 @@ input.bl-forms-builder__section-label-input:focus {
   display: none !important;
 }
 
-.bl-forms-builder__max-length {
+.bl-forms-builder__length-limits {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
   margin: 0 0 10px;
+  align-items: start;
 }
-.bl-forms-builder__max-length > p {
-  margin: 0 0 10px;
+.bl-forms-builder__length-limits > p {
+  margin: 0;
 }
-.bl-forms-builder__max-length .bl-forms-builder__switch-setting {
+
+.bl-forms-builder__length-max {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.bl-forms-builder__length-max > p {
+  margin: 0;
+}
+
+.bl-forms-builder__char-count-toggle[hidden] {
+  display: none !important;
+}
+.bl-forms-builder__char-count-toggle .bl-forms-builder__switch-setting {
   margin-bottom: 0;
 }
 
