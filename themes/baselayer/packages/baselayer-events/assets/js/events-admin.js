@@ -11,6 +11,7 @@
       return;
     }
     let overlay = null;
+    let confirmOverlay = null;
     let currentMasterId = 0;
     function ensureModal() {
       if (overlay) {
@@ -24,6 +25,9 @@
       overlay.addEventListener("click", function(e) {
         const t = e.target;
         if (t && t.closest && t.closest("[data-bl-occ-close]")) {
+          if (confirmOverlay) {
+            return;
+          }
           closeModal();
           return;
         }
@@ -40,11 +44,52 @@
         }
       });
       document.addEventListener("keydown", function(e) {
-        if (e.key === "Escape" && overlay && !overlay.hasAttribute("hidden")) {
+        if (e.key !== "Escape") {
+          return;
+        }
+        if (confirmOverlay) {
+          closeConfirm();
+          return;
+        }
+        if (overlay && !overlay.hasAttribute("hidden")) {
           closeModal();
         }
       });
       return overlay;
+    }
+    function closeConfirm() {
+      if (!confirmOverlay) {
+        return;
+      }
+      confirmOverlay.remove();
+      confirmOverlay = null;
+    }
+    function openConfirm(message, onConfirm) {
+      closeConfirm();
+      const title = L.deleteConfirmTitle || L.deleteLabel || "Delete";
+      const cancelText = L.cancelLabel || "Cancel";
+      const deleteText = L.deleteLabel || "Delete";
+      confirmOverlay = document.createElement("div");
+      confirmOverlay.className = "bl-event-occurrences-confirm";
+      confirmOverlay.innerHTML = '<div class="bl-event-occurrences-confirm__backdrop" data-bl-occ-confirm-cancel></div><div class="bl-event-occurrences-confirm__dialog" role="dialog" aria-modal="true" aria-labelledby="bl-event-occ-confirm-title"><div class="bl-event-occurrences-confirm__header"><h2 id="bl-event-occ-confirm-title" class="bl-event-occurrences-confirm__title">' + escapeHtml(title) + '</h2><button type="button" class="bl-event-occurrences-confirm__close" data-bl-occ-confirm-cancel aria-label="' + escapeAttr(L.closeLabel || "Close") + '">&times;</button></div><div class="bl-event-occurrences-confirm__body"><p>' + escapeHtml(message) + '</p></div><div class="bl-event-occurrences-confirm__footer"><button type="button" class="button" data-bl-occ-confirm-cancel>' + escapeHtml(cancelText) + '</button><button type="button" class="button button-primary bl-event-occurrences-confirm__delete" data-bl-occ-confirm-ok>' + escapeHtml(deleteText) + "</button></div></div>";
+      document.body.appendChild(confirmOverlay);
+      const okBtn = confirmOverlay.querySelector("[data-bl-occ-confirm-ok]");
+      if (okBtn) {
+        okBtn.focus();
+      }
+      confirmOverlay.addEventListener("click", function(e) {
+        const t = e.target;
+        if (t && t.closest && t.closest("[data-bl-occ-confirm-cancel]")) {
+          closeConfirm();
+          return;
+        }
+        if (t && t.closest && t.closest("[data-bl-occ-confirm-ok]")) {
+          closeConfirm();
+          if (typeof onConfirm === "function") {
+            onConfirm();
+          }
+        }
+      });
     }
     function escapeAttr(s) {
       return String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
@@ -192,17 +237,16 @@
       }
       const detached = btn.getAttribute("data-detached") === "1";
       const msg = detached ? L.deleteDetachedConfirm || L.deleteConfirm || "Delete this occurrence?" : L.deleteConfirm || "Delete this occurrence?";
-      if (!window.confirm(msg)) {
-        return;
-      }
-      btn.disabled = true;
-      postJson(L.softDeleteUrl, {
-        master_id: currentMasterId,
-        occurrence_id: occurrenceId
-      }).then(refreshFromResponse).catch(function(err) {
-        btn.disabled = false;
-        const bodyEl = overlay && overlay.querySelector(".bl-event-occurrences-modal__body");
-        showActionError(bodyEl, err && err.message);
+      openConfirm(msg, function() {
+        btn.disabled = true;
+        postJson(L.softDeleteUrl, {
+          master_id: currentMasterId,
+          occurrence_id: occurrenceId
+        }).then(refreshFromResponse).catch(function(err) {
+          btn.disabled = false;
+          const bodyEl = overlay && overlay.querySelector(".bl-event-occurrences-modal__body");
+          showActionError(bodyEl, err && err.message);
+        });
       });
     }
     function openModal(masterId, masterTitle) {
@@ -242,6 +286,7 @@
       if (!overlay) {
         return;
       }
+      closeConfirm();
       overlay.setAttribute("hidden", "hidden");
       document.body.classList.remove("bl-event-occurrences-modal-open");
       currentMasterId = 0;

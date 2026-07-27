@@ -323,6 +323,9 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
+msgid "Delete occurrence"
+msgstr ""
+
 #: includes/assets.php:181
 msgid "Remove this date from the series? It will not appear in Trash; you can restore it here later."
 msgstr ""

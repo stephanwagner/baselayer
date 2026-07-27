@@ -303,13 +303,16 @@ msgstr "Wiederherstellen"
 msgid "Delete"
 msgstr "Löschen"
 
+msgid "Delete occurrence"
+msgstr "Vorkommen löschen"
+
 #: includes/assets.php:181
 msgid ""
-"Remove this date from the series? It will not appear in Trash; you can "
+"Remove this date from the series? It won't be moved to the trash. You can "
 "restore it here later."
 msgstr ""
-"Dieses Datum aus der Serie entfernen? Es erscheint nicht im Papierkorb; Sie "
-"können es hier später wiederherstellen."
+"Dieses Datum aus der Serie entfernen? Es wird nicht in den Papierkorb verschoben. Du "
+"kannst es hier später wiederherstellen."
 
 #: includes/assets.php:182
 msgid ""
