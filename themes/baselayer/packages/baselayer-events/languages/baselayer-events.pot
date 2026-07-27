@@ -812,9 +812,10 @@ msgstr ""
 msgid "Theme templates"
 msgstr ""
 
-#: includes/settings-page.php:660
-#. translators: %s: comma-separated list of alternate theme template filenames
-msgid "Also accepted: %s"
+msgid "This CPT"
+msgstr ""
+
+msgid "Detail page"
 msgstr ""
 
 #: includes/settings-page.php:666

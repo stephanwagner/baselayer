@@ -555,26 +555,26 @@ function bl_events_settings_general_fields(array $cfg, string $post_type = ''): 
 
 	$post_type = sanitize_key($post_type);
 	$url_slug = sanitize_title((string) ($archive['slug'] ?? ''));
-	$also = [];
-	if ($url_slug !== '' && $url_slug !== 'event') {
-		$also[] = 'archive-' . $url_slug . '.php';
-		$also[] = 'single-' . $url_slug . '.php';
-	}
-	if ($post_type !== '' && $post_type !== 'event' && $post_type !== $url_slug) {
-		$also[] = 'archive-' . $post_type . '.php';
-		$also[] = 'single-' . $post_type . '.php';
-	}
+	$primary = $url_slug !== '' ? $url_slug : $post_type;
 	echo '<tr><th>' . esc_html__('Theme templates', 'baselayer-events') . '</th><td>';
-	echo '<code>archive-event.php</code><br>';
-	echo '<code>single-event.php</code>';
-	if ($also !== []) {
-		echo '<p class="description">' . esc_html(
-			sprintf(
-				/* translators: %s: comma-separated list of alternate theme template filenames */
-				__('Also accepted: %s', 'baselayer-events'),
-				implode(', ', $also)
-			)
-		) . '</p>';
+	if ($primary !== '') {
+		echo '<table class="bl-events-theme-templates">';
+		echo '<thead><tr>';
+		echo '<th scope="col" class="bl-events-theme-templates__row-head"></th>';
+		echo '<th scope="col">' . esc_html__('All events', 'baselayer-events') . '</th>';
+		echo '<th scope="col">' . esc_html__('This CPT', 'baselayer-events') . '</th>';
+		echo '</tr></thead><tbody>';
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__('Archive', 'baselayer-events') . '</th>';
+		echo '<td><code>archive-event.php</code></td>';
+		echo '<td><code>archive-' . esc_html($primary) . '.php</code></td>';
+		echo '</tr>';
+		echo '<tr>';
+		echo '<th scope="row">' . esc_html__('Detail page', 'baselayer-events') . '</th>';
+		echo '<td><code>single-event.php</code></td>';
+		echo '<td><code>single-' . esc_html($primary) . '.php</code></td>';
+		echo '</tr>';
+		echo '</tbody></table>';
 	}
 	echo '</td></tr>';
 

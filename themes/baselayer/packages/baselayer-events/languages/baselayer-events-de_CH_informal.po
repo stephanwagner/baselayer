@@ -798,10 +798,11 @@ msgstr "Den öffentlichen URL-Slug unter Allgemein bearbeiten."
 msgid "Theme templates"
 msgstr "Theme-Templates"
 
-#: includes/settings-page.php:660
-#. translators: %s: comma-separated list of alternate theme template filenames
-msgid "Also accepted: %s"
-msgstr "Auch akzeptiert: %s"
+msgid "This CPT"
+msgstr "Dieser CPT"
+
+msgid "Detail page"
+msgstr "Detailseite"
 
 #: includes/settings-page.php:666
 msgid ""

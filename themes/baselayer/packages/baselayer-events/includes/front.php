@@ -469,7 +469,7 @@ function bl_events_post_type_archive_slug(string $post_type): string
 
 /**
  * Theme override for event listings.
- * Prefers archive-event.php, then archive-{slug}.php, archive-{post_type}.php, taxonomy-{tax}.php.
+ * Prefers archive-{slug}.php, then archive-{post_type}.php, then archive-event.php; taxonomy-{tax}.php first when is_tax().
  */
 function bl_events_locate_theme_archive_override(string $post_type): string
 {
@@ -482,15 +482,18 @@ function bl_events_locate_theme_archive_override(string $post_type): string
 		}
 	}
 
-	$candidates[] = 'archive-event.php';
+	$slug = '';
 	if ($post_type !== '') {
 		$slug = bl_events_post_type_archive_slug($post_type);
-		if ($slug !== '' && $slug !== 'event') {
+		if ($slug !== '') {
 			$candidates[] = 'archive-' . $slug . '.php';
 		}
-		if ($post_type !== 'event' && $post_type !== $slug) {
+		if ($post_type !== $slug) {
 			$candidates[] = 'archive-' . $post_type . '.php';
 		}
+	}
+	if ($slug !== 'event' && $post_type !== 'event') {
+		$candidates[] = 'archive-event.php';
 	}
 
 	$candidates = array_values(array_unique(array_filter($candidates)));
@@ -501,19 +504,23 @@ function bl_events_locate_theme_archive_override(string $post_type): string
 
 /**
  * Theme override for singular events.
- * Prefers single-event.php, then single-{slug}.php, single-{post_type}.php.
+ * Prefers single-{slug}.php, then single-{post_type}.php, then single-event.php.
  */
 function bl_events_locate_theme_single_override(string $post_type): string
 {
-	$candidates = ['single-event.php'];
+	$candidates = [];
+	$slug = '';
 	if ($post_type !== '') {
 		$slug = bl_events_post_type_archive_slug($post_type);
-		if ($slug !== '' && $slug !== 'event') {
+		if ($slug !== '') {
 			$candidates[] = 'single-' . $slug . '.php';
 		}
-		if ($post_type !== 'event' && $post_type !== $slug) {
+		if ($post_type !== $slug) {
 			$candidates[] = 'single-' . $post_type . '.php';
 		}
+	}
+	if ($slug !== 'event' && $post_type !== 'event') {
+		$candidates[] = 'single-event.php';
 	}
 
 	$candidates = array_values(array_unique(array_filter($candidates)));
