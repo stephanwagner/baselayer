@@ -1,4 +1,7 @@
 <?php
+$vhost    = '/var/www/vhosts/example.com';
+$httpdocs = $vhost . '/httpdocs';
+
 return [
     /**
      * Server config
@@ -17,37 +20,43 @@ return [
     'php_path'    => '/opt/plesk/php/8.4/bin/php',
 
     /**
-     * Deploy config
-     * 
-     * The root path to the folder where the repository is deployed to.
+     * Themes
+     *
+     * Same for staging and production. Each slug must exist under themes/
+     * in the release and is symlinked into {wp_path}/wp-content/themes/{slug}.
+     */
+
+    'themes' => [
+        'baselayer',
+        // 'my-child',
+    ],
+
+    /**
+     * Environments
+     *
+     * Layout (Plesk):
+     *   {vhost}/httpdocs/{env}/wordpress  ← WordPress (docroot)
+     *   {vhost}/deploy/{env}              ← Deployer releases (outside docroot)
+     *   {vhost}/deploy/shared/wp          ← WP-CLI
      */
 
     'environments' => [
         'production' => [
-            'deploy_path' => '/var/www/vhosts/__HOST__/httpdocs/baselayer/production/theme',
+            'deploy_path' => $vhost . '/deploy/production',
+            'wp_path'     => $httpdocs . '/production/wordpress',
         ],
         'staging' => [
-            'deploy_path' => '/var/www/vhosts/__HOST__/httpdocs/baselayer/staging/theme',
+            'deploy_path' => $vhost . '/deploy/staging',
+            'wp_path'     => $httpdocs . '/staging/wordpress',
         ],
     ],
 
     /**
      * WordPress config
-     * 
-     * You can use the {{deploy_path}} placeholder to reference the current deploy path.
      */
 
-    // The WordPress theme folder name
-    'theme_slug' => 'baselayer',
-
-    // The WordPress theme path in current deploy release
-    'theme_path' => '{{deploy_path}}/current/theme/baselayer',
-
-    // The path to the root of the WordPress installation
-    'wp_path' => '{{deploy_path}}/../wordpress',
-
     // Where to save the WP CLI binary
-    'wp_cli_path' => '/var/www/vhosts/baselayer/httpdocs/baselayer/shared/wp',
+    'wp_cli_path' => $vhost . '/deploy/shared/wp',
 
     /**
      * Release config

@@ -24,15 +24,11 @@ set('remote_user', $config['remote_user']);
 
 set('bin/php', $config['php_path']);
 
-//  WordPress config
-
-set('theme_slug', $config['theme_slug']);
-
-set('theme_path', $config['theme_path']);
-
-set('wp_path', $config['wp_path']);
+// WordPress config
 
 set('wp_cli_path', $config['wp_cli_path']);
+
+set('themes', $config['themes']);
 
 // Release config
 
@@ -57,7 +53,9 @@ foreach ($config['environments'] as $environment => $envConfig) {
 		->set('stage', $environment)
 		->set('hostname', $config['server_ip'])
 		->set('repository', $config['repository_url'])
-		->set('deploy_path', $envConfig['deploy_path']);
+		->set('deploy_path', $envConfig['deploy_path'])
+		->set('wp_path', $envConfig['wp_path'])
+		->set('themes', $config['themes']);
 }
 
 // Task: Create deploy version file
@@ -84,7 +82,7 @@ task('deploy:build-assets', function () {
 task('deploy:wp-cli', function () {
 	if (!test('[ -f {{wp_cli_path}} ]')) {
 		writeln('Installing WP-CLI...');
-
+		
 		run('mkdir -p $(dirname {{wp_cli_path}})');
 		run('curl -sS https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -o {{wp_cli_path}}');
 		run('chmod +x {{wp_cli_path}}');
@@ -107,15 +105,31 @@ task('deploy:clear-cache', function () use ($config) {
 	}
 })->desc('Clear cache');
 
-// Task: Link theme
+// Task: Link themes into WordPress
 
-task('deploy:link-theme', function () use ($config) {
-	if (!test('[ -d ' . $config['theme_path'] . ' ]')) {
-		throw new \Exception('Theme folder not found in release');
+task('deploy:link-themes', function () {
+	$themes = get('themes');
+
+	if (!is_array($themes) || $themes === []) {
+		throw new \Exception('No themes configured');
 	}
 
-	run('ln -nfs ' . $config['wp_path'] . '/wp-content/themes/' . $config['theme_slug'] . ' ' . $config['theme_path']);
-})->desc('Link theme');
+	run('mkdir -p {{wp_path}}/wp-content/themes');
+
+	foreach ($themes as $slug) {
+		$slug = (string) $slug;
+
+		if ($slug === '' || preg_match('/[^a-z0-9_-]/i', $slug)) {
+			throw new \Exception('Invalid theme slug: ' . $slug);
+		}
+
+		if (!test("[ -d {{release_path}}/themes/{$slug} ]")) {
+			throw new \Exception("Theme folder not found in release: themes/{$slug}");
+		}
+
+		run("ln -nfs {{release_path}}/themes/{$slug} {{wp_path}}/wp-content/themes/{$slug}");
+	}
+})->desc('Link themes into WordPress');
 
 // Deploy tasks
 
@@ -128,7 +142,7 @@ task('deploy', [
 
 // Hooks
 
-after('deploy:publish', 'deploy:link-theme');
+after('deploy:publish', 'deploy:link-themes');
 after('deploy:publish', 'deploy:wp-cli');
 after('deploy:publish', 'deploy:clear-cache');
 
