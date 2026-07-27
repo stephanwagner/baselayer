@@ -1,4 +1,4 @@
-import { el, empty, formRow, slugify } from './dom';
+import { el, empty, formRow, slugify, bindTitleSlugSync } from './dom';
 import { getType, listTypesForMode } from './registry';
 import { defaultTypeId } from './config';
 import { renderPresentation, serializePresentation } from './presentation';
@@ -250,16 +250,8 @@ export function createFieldRow({
     setMeta(typeChip);
   };
 
-  titleInput.addEventListener('input', () => {
-    syncPreviews();
-    if (!slugInput.dataset.blFbSlugTouched) {
-      slugInput.value = slugify(titleInput.value);
-    }
-  });
-
-  slugInput.addEventListener('input', () => {
-    slugInput.dataset.blFbSlugTouched = '1';
-  });
+  bindTitleSlugSync(titleInput, slugInput, slugify);
+  titleInput.addEventListener('input', syncPreviews);
 
   typeSelect.addEventListener('change', () => {
     syncPreviews();

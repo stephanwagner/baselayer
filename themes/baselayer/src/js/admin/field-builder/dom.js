@@ -61,6 +61,35 @@ export function slugify(text) {
     .replace(/_+/g, '_');
 }
 
+/**
+ * Keep slug/ID in sync with title until the slug is customized.
+ * Syncs while slug is empty or still equals slugify(title); stops after a manual slug edit
+ * or when loaded with a slug that already differs from the title.
+ *
+ * @param {HTMLInputElement} titleInput
+ * @param {HTMLInputElement} slugInput
+ * @param {(text: string) => string} [slugifyFn]
+ */
+export function bindTitleSlugSync(titleInput, slugInput, slugifyFn = slugify) {
+  if (!titleInput || !slugInput) {
+    return;
+  }
+
+  let manual =
+    String(slugInput.value || '').trim() !== '' &&
+    String(slugInput.value || '').trim() !== slugifyFn(titleInput.value);
+
+  titleInput.addEventListener('input', () => {
+    if (!manual) {
+      slugInput.value = slugifyFn(titleInput.value);
+    }
+  });
+
+  slugInput.addEventListener('input', () => {
+    manual = true;
+  });
+}
+
 let uidCounter = 0;
 
 /**

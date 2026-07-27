@@ -1,5 +1,5 @@
 import { mount } from './index';
-import { slugify } from './dom';
+import { slugify, bindTitleSlugSync } from './dom';
 import { mountOptionsStack } from './options-stack';
 
 /**
@@ -65,17 +65,7 @@ function bootBlocksAdmin() {
   const nameInput = document.getElementById('bl-block-title');
   const slugInput = document.getElementById('bl-block-slug');
   if (nameInput && slugInput) {
-    nameInput.addEventListener('input', () => {
-      if (!slugInput.dataset.blSlugTouched) {
-        slugInput.value = slugify(nameInput.value);
-      }
-    });
-    slugInput.addEventListener('input', () => {
-      slugInput.dataset.blSlugTouched = '1';
-    });
-    if (slugInput.value) {
-      slugInput.dataset.blSlugTouched = '1';
-    }
+    bindTitleSlugSync(nameInput, slugInput, slugify);
   }
 }
 

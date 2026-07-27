@@ -10,7 +10,7 @@ import { createListRow } from './list-row';
 import { createFieldRow, serializeFieldRow } from './field-row';
 import { createSortable } from './sortable';
 import { createSwitch, createSegmented, openModal } from './controls';
-import { el, empty, slugify, uid, formRow } from './dom';
+import { el, empty, slugify, uid, formRow, bindTitleSlugSync } from './dom';
 import { iconEl } from './icons';
 import { getType, listTypesForMode, registerType, listTypeIds } from './registry';
 
@@ -49,6 +49,7 @@ export {
   el,
   empty,
   slugify,
+  bindTitleSlugSync,
   uid,
   formRow,
   iconEl,
@@ -71,6 +72,7 @@ const BlFieldBuilder = {
   el,
   empty,
   slugify,
+  bindTitleSlugSync,
   uid,
   formRow,
   iconEl,

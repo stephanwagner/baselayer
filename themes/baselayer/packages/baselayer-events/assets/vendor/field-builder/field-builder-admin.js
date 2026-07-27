@@ -71,6 +71,20 @@
   function slugify(text) {
     return String(text || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "").replace(/_+/g, "_");
   }
+  function bindTitleSlugSync(titleInput, slugInput, slugifyFn = slugify) {
+    if (!titleInput || !slugInput) {
+      return;
+    }
+    let manual = String(slugInput.value || "").trim() !== "" && String(slugInput.value || "").trim() !== slugifyFn(titleInput.value);
+    titleInput.addEventListener("input", () => {
+      if (!manual) {
+        slugInput.value = slugifyFn(titleInput.value);
+      }
+    });
+    slugInput.addEventListener("input", () => {
+      manual = true;
+    });
+  }
   var uidCounter = 0;
   function uid(prefix = "blfb") {
     uidCounter += 1;
@@ -1003,15 +1017,8 @@
       typeChip.textContent = label;
       setMeta(typeChip);
     };
-    titleInput.addEventListener("input", () => {
-      syncPreviews();
-      if (!slugInput.dataset.blFbSlugTouched) {
-        slugInput.value = slugify(titleInput.value);
-      }
-    });
-    slugInput.addEventListener("input", () => {
-      slugInput.dataset.blFbSlugTouched = "1";
-    });
+    bindTitleSlugSync(titleInput, slugInput, slugify);
+    titleInput.addEventListener("input", syncPreviews);
     typeSelect.addEventListener("change", () => {
       syncPreviews();
       renderTypeOptions(root, typeSelect.value, null);
@@ -3353,6 +3360,7 @@
     el,
     empty,
     slugify,
+    bindTitleSlugSync,
     uid,
     formRow,
     iconEl,
@@ -3600,17 +3608,7 @@
     const nameInput = document.getElementById("bl-block-title");
     const slugInput = document.getElementById("bl-block-slug");
     if (nameInput && slugInput) {
-      nameInput.addEventListener("input", () => {
-        if (!slugInput.dataset.blSlugTouched) {
-          slugInput.value = slugify(nameInput.value);
-        }
-      });
-      slugInput.addEventListener("input", () => {
-        slugInput.dataset.blSlugTouched = "1";
-      });
-      if (slugInput.value) {
-        slugInput.dataset.blSlugTouched = "1";
-      }
+      bindTitleSlugSync(nameInput, slugInput, slugify);
     }
   }
   function bootUiDev() {

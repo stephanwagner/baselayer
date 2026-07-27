@@ -21,6 +21,7 @@ function bootMetaBuilder() {
     el,
     empty,
     slugify,
+    bindTitleSlugSync,
     createFieldRow,
     serializeFieldRow,
     createSortable,
@@ -278,17 +279,12 @@ function bootMetaBuilder() {
       syncJson();
     });
 
+    bindTitleSlugSync(gTitleInput, idInput, slugify);
     gTitleInput.addEventListener('input', () => {
       setTitle(gTitleInput.value);
-      if (!idInput.dataset.touched) {
-        idInput.value = slugify(gTitleInput.value);
-      }
       syncJson();
     });
-    idInput.addEventListener('input', () => {
-      idInput.dataset.touched = '1';
-      syncJson();
-    });
+    idInput.addEventListener('input', syncJson);
 
     return card;
   };
@@ -333,7 +329,7 @@ function bootStatusesBuilder() {
     return;
   }
 
-  const { el, empty, slugify, createSortable, createListRow } = FB;
+  const { el, empty, slugify, bindTitleSlugSync, createSortable, createListRow } = FB;
   const i18n = cfg.i18n || {};
   const presets = Array.isArray(cfg.colorPresets) ? cfg.colorPresets : [];
   const defaultToken = cfg.defaultColor || 'info';
@@ -597,17 +593,12 @@ function bootStatusesBuilder() {
       syncJson();
     };
 
+    bindTitleSlugSync(labelInput, idInput, slugify);
     labelInput.addEventListener('input', () => {
       setTitle(labelInput.value);
-      if (!idInput.dataset.touched) {
-        idInput.value = slugify(labelInput.value);
-      }
       syncJson();
     });
-    idInput.addEventListener('input', () => {
-      idInput.dataset.touched = '1';
-      syncJson();
-    });
+    idInput.addEventListener('input', syncJson);
 
     colorSelect.addEventListener('change', syncCustomVisibility);
 
