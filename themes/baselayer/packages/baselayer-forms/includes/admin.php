@@ -418,6 +418,7 @@ function bl_forms_admin_enqueue(string $hook): void
 				'charCountEmptyDefault' => __('No characters remaining', 'baselayer-forms'),
 				'minLengthError'    => __('Min length', 'baselayer-forms'),
 				'maxLengthError'    => __('Max length', 'baselayer-forms'),
+				'textError'         => __('Text', 'baselayer-forms'),
 				'minValue'          => __('Minimum', 'baselayer-forms'),
 				'maxValue'          => __('Maximum', 'baselayer-forms'),
 				'prefix'            => __('Prefix', 'baselayer-forms'),

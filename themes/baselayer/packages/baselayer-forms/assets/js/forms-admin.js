@@ -6731,9 +6731,12 @@
           charCountText,
           t("charCountTextHelp", "The placeholders {remaining}, {count}, and {max} are replaced by the remaining count, current count, and maximum.")
         ),
-        fieldRow(t("charCountEmptyText", "When limit is reached"), charCountEmptyText),
-        fieldRow(t("minLengthError", "Min length"), minlengthMsg, rangeHelp()),
-        fieldRow(t("maxLengthError", "Max length"), maxlengthMsg, rangeHelp())
+        fieldRow(t("charCountEmptyText", "When limit is reached"), charCountEmptyText)
+      ]),
+      errorSection(t("textError", "Text"), [
+        fieldRow(t("minLengthError", "Min length"), minlengthMsg),
+        fieldRow(t("maxLengthError", "Max length"), maxlengthMsg),
+        rangeHelp()
       ]),
       errorSection(t("numberError", "Number"), [
         fieldRow(t("invalidError", "Invalid"), numberMsg),

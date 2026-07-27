@@ -440,7 +440,7 @@ function bl_forms_render_settings_page(): void
 					bl_forms_settings_message_field($settings, 'required_message', __('Required', 'baselayer-forms'), $fallbacks['required']);
 				});
 
-				bl_forms_settings_message_section(__('Character count', 'baselayer-forms'), static function () use ($settings, $fallbacks, $range_help): void {
+				bl_forms_settings_message_section(__('Character count', 'baselayer-forms'), static function () use ($settings, $fallbacks): void {
 					bl_forms_settings_message_field(
 						$settings,
 						'char_count_text',
@@ -449,6 +449,9 @@ function bl_forms_render_settings_page(): void
 						__('The placeholders {remaining}, {count}, and {max} are replaced by the remaining count, current count, and maximum.', 'baselayer-forms')
 					);
 					bl_forms_settings_message_field($settings, 'char_count_empty_text', __('When limit is reached', 'baselayer-forms'), $fallbacks['char_count_empty']);
+				});
+
+				bl_forms_settings_message_section(__('Text', 'baselayer-forms'), static function () use ($settings, $fallbacks, $range_help): void {
 					bl_forms_settings_message_field($settings, 'minlength_message', __('Min length', 'baselayer-forms'), $fallbacks['minlength'], $range_help);
 					bl_forms_settings_message_field($settings, 'maxlength_message', __('Max length', 'baselayer-forms'), $fallbacks['maxlength'], $range_help);
 				});
