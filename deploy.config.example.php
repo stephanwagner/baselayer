@@ -1,6 +1,6 @@
 <?php
-$vhost    = '/var/www/vhosts/example.com';
-$httpdocs = $vhost . '/httpdocs';
+// Site root on the server
+$site = '/var/www/vhosts/example.com/httpdocs';
 
 return [
     /**
@@ -22,7 +22,7 @@ return [
     /**
      * Themes
      *
-     * Same for staging and production. Each slug must exist under themes/
+     * Same for every environment. Each slug must exist under themes/
      * in the release and is symlinked into {wp_path}/wp-content/themes/{slug}.
      */
 
@@ -34,20 +34,20 @@ return [
     /**
      * Environments
      *
-     * Layout (Plesk):
-     *   {vhost}/httpdocs/{env}/wordpress  ← WordPress (docroot)
-     *   {vhost}/deploy/{env}              ← Deployer releases (outside docroot)
-     *   {vhost}/deploy/shared/wp          ← WP-CLI
+     * Layout per site root:
+     *   {site}/wordpress        ← WordPress (Plesk docroot)
+     *   {site}/deploy           ← Deployer releases
+     *   {site}/deploy/shared/wp ← WP-CLI
      */
 
     'environments' => [
         'production' => [
-            'deploy_path' => $vhost . '/deploy/production',
-            'wp_path'     => $httpdocs . '/production/wordpress',
+            'deploy_path' => $site . '/production/deploy',
+            'wp_path'     => $site . '/production/wordpress',
         ],
         'staging' => [
-            'deploy_path' => $vhost . '/deploy/staging',
-            'wp_path'     => $httpdocs . '/staging/wordpress',
+            'deploy_path' => $site . '/staging/deploy',
+            'wp_path'     => $site . '/staging/wordpress',
         ],
     ],
 
@@ -55,8 +55,8 @@ return [
      * WordPress config
      */
 
-    // Where to save the WP CLI binary
-    'wp_cli_path' => $vhost . '/deploy/shared/wp',
+    // Where to save the WP CLI binary (shared under the production site)
+    'wp_cli_path' => $site . '/shared/wp',
 
     /**
      * Release config
