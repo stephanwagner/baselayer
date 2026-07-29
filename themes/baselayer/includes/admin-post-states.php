@@ -150,6 +150,30 @@ function bl_admin_scheduled_label(\WP_Post $post): ?string
 add_filter('display_post_states', 'bl_admin_enrich_post_states', 5, 2);
 
 /**
+ * Label the Theme → General contact page in admin page lists (like Front / Privacy).
+ *
+ * @param array<string, string> $states
+ * @return array<string, string>
+ */
+function bl_admin_contact_page_post_state(array $states, $post): array
+{
+	if (!$post instanceof \WP_Post || $post->post_type !== 'page') {
+		return $states;
+	}
+
+	$contact_id = (int) get_option('baselayer_page_for_contact', 0);
+	if ($contact_id <= 0 || (int) $post->ID !== $contact_id) {
+		return $states;
+	}
+
+	$states['page_for_contact'] = __('Contact page', 'baselayer');
+
+	return $states;
+}
+
+add_filter('display_post_states', 'bl_admin_contact_page_post_state', 10, 2);
+
+/**
  * Build a single badge span.
  *
  * @param \WP_Post|null $post Optional post for dynamic status colors.
