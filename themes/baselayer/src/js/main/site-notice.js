@@ -109,4 +109,8 @@ function initSiteNotice() {
   });
 }
 
-initSiteNotice();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initSiteNotice);
+} else {
+  initSiteNotice();
+}

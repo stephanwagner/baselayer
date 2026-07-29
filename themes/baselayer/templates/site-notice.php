@@ -14,8 +14,8 @@ if ($notice === null) {
 }
 
 $id = isset($notice['id']) ? (string) $notice['id'] : '';
-$type = isset($notice['type']) ? (string) $notice['type'] : 'info';
 $title = isset($notice['title']) ? (string) $notice['title'] : '';
+$extra_class = isset($notice['extra_class']) ? (string) $notice['extra_class'] : '';
 $dismissible = !empty($notice['dismissible']);
 $show_again_after = isset($notice['show_again_after']) ? (int) $notice['show_again_after'] : 7;
 $content_html = isset($notice['content_html']) ? (string) $notice['content_html'] : '';
@@ -30,15 +30,15 @@ if ($id === '') {
 }
 
 $modal_id = 'site-notice';
-$classes = [
-	'site-notice',
-	'site-notice--' . sanitize_html_class($type),
-];
+$classes = ['site-notice'];
+if ($extra_class !== '') {
+	$classes[] = $extra_class;
+}
 if ($dismissible) {
 	$classes[] = 'site-notice--dismissible';
 }
 
-$close_classes = ['site-notice__close', 'button', '-' . sanitize_html_class($close_button_style)];
+$close_classes = ['site-notice__close', 'button', '-small', '-' . sanitize_html_class($close_button_style)];
 if ($close_button_outline) {
 	$close_classes[] = '-outline';
 }
@@ -55,7 +55,7 @@ if ($close_button_outline) {
 	<div data-modal-content="<?= esc_attr($modal_id) ?>">
 		<div class="<?= esc_attr(implode(' ', $classes)) ?>">
 			<?php if ($title !== '') : ?>
-				<h2 class="site-notice__title modal__title"><?= esc_html($title) ?></h2>
+				<div class="site-notice__title modal__title h3"><?= wp_kses($title, ['br' => []]) ?></div>
 			<?php endif; ?>
 
 			<?php if ($content_html !== '') : ?>
@@ -79,7 +79,7 @@ if ($close_button_outline) {
 						$rel = $target === '_blank' ? 'noopener noreferrer' : '';
 						?>
 						<a
-							class="site-notice__button button"
+							class="site-notice__button button -small"
 							href="<?= esc_url($url) ?>"
 							<?php if ($target !== '') : ?>target="<?= esc_attr($target) ?>"<?php endif; ?>
 							<?php if ($rel !== '') : ?>rel="<?= esc_attr($rel) ?>"<?php endif; ?>

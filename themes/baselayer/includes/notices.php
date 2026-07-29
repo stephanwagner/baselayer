@@ -80,13 +80,35 @@ function bl_notice_matches_current_page(array $row): bool
 }
 
 /**
+ * Sanitize a space-separated CSS class list for notices.
+ */
+function bl_notice_sanitize_extra_class(string $raw): string
+{
+	$parts = preg_split('/\s+/', trim($raw), -1, PREG_SPLIT_NO_EMPTY);
+	if (!is_array($parts) || $parts === []) {
+		return '';
+	}
+
+	$clean = [];
+	foreach ($parts as $part) {
+		$class = preg_replace('/[^A-Za-z0-9_-]/', '', (string) $part);
+		if (!is_string($class) || $class === '' || $class === '-' || $class === '_') {
+			continue;
+		}
+		$clean[$class] = $class;
+	}
+
+	return implode(' ', array_values($clean));
+}
+
+/**
  * Normalize one notice row for the template / JS.
  *
  * @param array<string, mixed> $row
  * @return array{
  *   id: string,
  *   title: string,
- *   type: string,
+ *   extra_class: string,
  *   dismissible: bool,
  *   show_again_after: int,
  *   content_html: string,
@@ -127,10 +149,9 @@ function bl_notice_normalize_row(array $row, int $index): ?array
 		return null;
 	}
 
-	$type = isset($row['type']) ? (string) $row['type'] : 'info';
-	if (!in_array($type, ['info', 'success', 'warning', 'error', 'accent'], true)) {
-		$type = 'info';
-	}
+	$extra_class = bl_notice_sanitize_extra_class(
+		isset($row['extra_class']) ? (string) $row['extra_class'] : ''
+	);
 
 	$dismissible = !empty($row['dismissible']);
 	$show_again_after = isset($row['show_again_after']) ? (int) $row['show_again_after'] : 7;
@@ -148,12 +169,12 @@ function bl_notice_normalize_row(array $row, int $index): ?array
 		$close_style = 'secondary';
 	}
 
-	$id = 'n' . substr(md5($index . '|' . $type . '|' . $title . '|' . wp_strip_all_tags($content)), 0, 12);
+	$id = 'n' . substr(md5($index . '|' . $extra_class . '|' . $title . '|' . wp_strip_all_tags($content)), 0, 12);
 
 	return [
 		'id' => $id,
 		'title' => $title,
-		'type' => $type,
+		'extra_class' => $extra_class,
 		'dismissible' => $dismissible,
 		'show_again_after' => $show_again_after,
 		'content_html' => $content,
@@ -220,4 +241,5 @@ function bl_notices_render(): void
 
 	bl_render_template('site-notice', ['notice' => $notice]);
 }
-add_action('wp_footer', 'bl_notices_render', 20);
+// Before wp_print_footer_scripts (priority 20) so markup exists when footer JS runs.
+add_action('wp_footer', 'bl_notices_render', 5);
