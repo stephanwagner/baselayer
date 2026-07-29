@@ -62,42 +62,16 @@ function bl_acf_import_load_groups(): ?array
 }
 
 /**
- * Field group keys expected from the bundled export.
- *
- * @return list<string>
+ * Whether any ACF field group already exists in the site.
  */
-function bl_acf_import_expected_keys(): array
+function bl_acf_any_field_group_exists(): bool
 {
-	$groups = bl_acf_import_load_groups();
-	if ($groups === null) {
-		return [];
-	}
-
-	return array_values(array_map(static fn(array $g): string => (string) $g['key'], $groups));
-}
-
-/**
- * Whether every bundled field group key already exists in ACF.
- */
-function bl_acf_import_groups_present(): bool
-{
-	if (!function_exists('acf_get_field_group')) {
+	if (!function_exists('acf_get_field_groups')) {
 		return false;
 	}
 
-	$keys = bl_acf_import_expected_keys();
-	if ($keys === []) {
-		return true;
-	}
-
-	foreach ($keys as $key) {
-		$group = acf_get_field_group($key);
-		if (empty($group) || empty($group['key'])) {
-			return false;
-		}
-	}
-
-	return true;
+	$groups = acf_get_field_groups();
+	return is_array($groups) && $groups !== [];
 }
 
 /**
@@ -113,7 +87,7 @@ function bl_acf_import_should_show_notice(): bool
 		return false;
 	}
 
-	if (!function_exists('acf_import_field_group') || !function_exists('acf_get_field_group')) {
+	if (!function_exists('acf_import_field_group') || !function_exists('acf_get_field_groups')) {
 		return false;
 	}
 
@@ -125,7 +99,8 @@ function bl_acf_import_should_show_notice(): bool
 		return false;
 	}
 
-	return !bl_acf_import_groups_present();
+	// Only prompt when the site has no field groups at all.
+	return !bl_acf_any_field_group_exists();
 }
 
 /**
@@ -257,7 +232,7 @@ function bl_acf_import_admin_notice(): void
 			<strong><?= esc_html__('BaseLayer ACF field groups', 'baselayer') ?></strong>
 		</p>
 		<p>
-			<?= esc_html__('ACF Pro is active, but the theme’s block and website field groups are not imported yet. Import them now, or skip if you manage fields yourself.', 'baselayer') ?>
+			<?= esc_html__('ACF Pro is active, but no field groups are installed yet. Import the theme’s block and website field groups now, or skip if you manage fields yourself.', 'baselayer') ?>
 		</p>
 		<p style="margin-top: 12px;">
 			<a href="<?= esc_url($import_url) ?>" class="button button-primary"><?= esc_html__('Import field groups', 'baselayer') ?></a>

@@ -2466,7 +2466,7 @@
             },
             {
                 "key": "field_6a521bb0eea4b",
-                "label": "Aktivieren",
+                "label": "",
                 "name": "has_schema",
                 "aria-label": "",
                 "type": "true_false",
@@ -2481,9 +2481,9 @@
                 "message": "Schema.org verwenden",
                 "default_value": 0,
                 "allow_in_bindings": 0,
-                "ui": 0,
-                "ui_on_text": "",
-                "ui_off_text": ""
+                "ui_on_text": "Ja",
+                "ui_off_text": "Nein",
+                "ui": 1
             },
             {
                 "key": "field_6a521ec9720e6",
@@ -2825,6 +2825,569 @@
                                 "parent_repeater": "field_6a522101e58ad"
                             }
                         ]
+                    }
+                ]
+            },
+            {
+                "key": "field_bl_notices_tab",
+                "label": "Hinweise",
+                "name": "",
+                "aria-label": "",
+                "type": "tab",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "placement": "left",
+                "endpoint": 0,
+                "selected": 0
+            },
+            {
+                "key": "field_bl_notices_message",
+                "label": "",
+                "name": "",
+                "aria-label": "",
+                "type": "message",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "Zeige websiteweite Hinweis-Popups für Besucher. Wenn mehr als ein Hinweis aktiviert ist und zur aktuellen Seite sowie zum Zeitplan passt, wird der erste Eintrag in der Liste angezeigt.",
+                "new_lines": "wpautop",
+                "esc_html": 0
+            },
+            {
+                "key": "field_bl_notices_enabled",
+                "label": "",
+                "name": "notices_enabled",
+                "aria-label": "",
+                "type": "true_false",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "Hinweise aktivieren",
+                "default_value": 0,
+                "allow_in_bindings": 0,
+                "ui_on_text": "Ja",
+                "ui_off_text": "Nein",
+                "ui": 1
+            },
+            {
+                "key": "field_bl_notices",
+                "label": "Hinweise",
+                "name": "notices",
+                "aria-label": "",
+                "type": "repeater",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_bl_notices_enabled",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "layout": "block",
+                "pagination": 0,
+                "min": 0,
+                "max": 0,
+                "collapsed": "field_bl_notice_enabled",
+                "button_label": "Hinweis hinzufügen",
+                "rows_per_page": 20,
+                "sub_fields": [
+                    {
+                        "key": "field_bl_notice_enabled",
+                        "label": "Aktiviert",
+                        "name": "enabled",
+                        "aria-label": "",
+                        "type": "true_false",
+                        "instructions": "Wenn mehr als ein Hinweis aktiviert ist, hat der erste passende Hinweis Vorrang.",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "message": "",
+                        "default_value": 1,
+                        "allow_in_bindings": 0,
+                        "ui_on_text": "Ja",
+                        "ui_off_text": "Nein",
+                        "ui": 1,
+                        "parent_repeater": "field_bl_notices"
+                    },
+                    {
+                        "key": "field_bl_notice_display",
+                        "label": "Anzeige",
+                        "name": "display",
+                        "aria-label": "",
+                        "type": "button_group",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "choices": {
+                            "always": "Immer anzeigen",
+                            "schedule": "Zeitplan"
+                        },
+                        "default_value": "always",
+                        "return_format": "value",
+                        "allow_null": 0,
+                        "allow_in_bindings": 0,
+                        "layout": "horizontal",
+                        "parent_repeater": "field_bl_notices"
+                    },
+                    {
+                        "key": "field_bl_notice_start",
+                        "label": "Startdatum und -zeit",
+                        "name": "start",
+                        "aria-label": "",
+                        "type": "date_time_picker",
+                        "instructions": "Wenn leer, gilt der Hinweis als bereits gestartet.",
+                        "required": 0,
+                        "conditional_logic": [
+                            [
+                                {
+                                    "field": "field_bl_notice_display",
+                                    "operator": "==",
+                                    "value": "schedule"
+                                }
+                            ]
+                        ],
+                        "wrapper": {
+                            "width": "50",
+                            "class": "",
+                            "id": ""
+                        },
+                        "display_format": "d.m.Y H:i",
+                        "return_format": "Y-m-d H:i:s",
+                        "first_day": 1,
+                        "default_to_current_date": 0,
+                        "allow_in_bindings": 0,
+                        "parent_repeater": "field_bl_notices"
+                    },
+                    {
+                        "key": "field_bl_notice_end",
+                        "label": "Enddatum und -zeit",
+                        "name": "end",
+                        "aria-label": "",
+                        "type": "date_time_picker",
+                        "instructions": "Wenn leer, hat der Hinweis kein Enddatum.",
+                        "required": 0,
+                        "conditional_logic": [
+                            [
+                                {
+                                    "field": "field_bl_notice_display",
+                                    "operator": "==",
+                                    "value": "schedule"
+                                }
+                            ]
+                        ],
+                        "wrapper": {
+                            "width": "50",
+                            "class": "",
+                            "id": ""
+                        },
+                        "display_format": "d.m.Y H:i",
+                        "return_format": "Y-m-d H:i:s",
+                        "first_day": 1,
+                        "default_to_current_date": 0,
+                        "allow_in_bindings": 0,
+                        "parent_repeater": "field_bl_notices"
+                    },
+                    {
+                        "key": "field_bl_notice_type",
+                        "label": "Typ",
+                        "name": "type",
+                        "aria-label": "",
+                        "type": "select",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "50",
+                            "class": "",
+                            "id": ""
+                        },
+                        "choices": {
+                            "info": "Info",
+                            "success": "Erfolg",
+                            "warning": "Warnung",
+                            "error": "Fehler",
+                            "accent": "Akzent"
+                        },
+                        "default_value": "info",
+                        "return_format": "value",
+                        "multiple": 0,
+                        "allow_null": 0,
+                        "allow_in_bindings": 0,
+                        "ui": 0,
+                        "ajax": 0,
+                        "placeholder": "",
+                        "parent_repeater": "field_bl_notices",
+                        "create_options": 0,
+                        "save_options": 0
+                    },
+                    {
+                        "key": "field_bl_notice_show_on",
+                        "label": "Anzeigen auf",
+                        "name": "show_on",
+                        "aria-label": "",
+                        "type": "select",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "50",
+                            "class": "",
+                            "id": ""
+                        },
+                        "choices": {
+                            "all": "Gesamte Website",
+                            "home": "Nur Homepage",
+                            "pages": "Seiten auswählen"
+                        },
+                        "default_value": "all",
+                        "return_format": "value",
+                        "multiple": 0,
+                        "allow_null": 0,
+                        "allow_in_bindings": 0,
+                        "ui": 0,
+                        "ajax": 0,
+                        "placeholder": "",
+                        "create_options": 0,
+                        "save_options": 0,
+                        "parent_repeater": "field_bl_notices"
+                    },
+                    {
+                        "key": "field_bl_notice_pages",
+                        "label": "Seiten",
+                        "name": "pages",
+                        "aria-label": "",
+                        "type": "relationship",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": [
+                            [
+                                {
+                                    "field": "field_bl_notice_show_on",
+                                    "operator": "==",
+                                    "value": "pages"
+                                }
+                            ]
+                        ],
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "post_type": [
+                            "page"
+                        ],
+                        "post_status": [
+                            "publish"
+                        ],
+                        "taxonomy": "",
+                        "filters": [
+                            "search"
+                        ],
+                        "return_format": "id",
+                        "min": "",
+                        "max": "",
+                        "allow_in_bindings": 0,
+                        "elements": "",
+                        "bidirectional": 0,
+                        "bidirectional_target": [],
+                        "parent_repeater": "field_bl_notices"
+                    },
+                    {
+                        "key": "field_bl_notice_dismissible",
+                        "label": "Schließbar",
+                        "name": "dismissible",
+                        "aria-label": "",
+                        "type": "true_false",
+                        "instructions": "Wenn aktiviert, wird das Schließen des Hinweises im Browser des Besuchers gespeichert.",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "50",
+                            "class": "",
+                            "id": ""
+                        },
+                        "message": "Schließbar",
+                        "default_value": 1,
+                        "allow_in_bindings": 0,
+                        "ui_on_text": "",
+                        "ui_off_text": "",
+                        "ui": 1,
+                        "parent_repeater": "field_bl_notices"
+                    },
+                    {
+                        "key": "field_bl_notice_show_again_after",
+                        "label": "Erneut anzeigen nach",
+                        "name": "show_again_after",
+                        "aria-label": "",
+                        "type": "number",
+                        "instructions": "Anzahl Tage nach dem Schließen, bevor der Hinweis erneut erscheinen kann.",
+                        "required": 0,
+                        "conditional_logic": [
+                            [
+                                {
+                                    "field": "field_bl_notice_dismissible",
+                                    "operator": "==",
+                                    "value": "1"
+                                }
+                            ]
+                        ],
+                        "wrapper": {
+                            "width": "50",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": 7,
+                        "min": 0,
+                        "max": "",
+                        "placeholder": "",
+                        "step": 1,
+                        "prepend": "",
+                        "append": "Tage",
+                        "allow_in_bindings": 0,
+                        "parent_repeater": "field_bl_notices"
+                    },
+                    {
+                        "key": "field_bl_notice_content",
+                        "label": "Titel",
+                        "name": "title",
+                        "aria-label": "",
+                        "type": "textarea",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "maxlength": "",
+                        "allow_in_bindings": 0,
+                        "rows": 3,
+                        "placeholder": "",
+                        "new_lines": "br",
+                        "parent_repeater": "field_bl_notices"
+                    },
+                    {
+                        "key": "field_6a69ac8037a4d",
+                        "label": "Inhalt",
+                        "name": "content",
+                        "aria-label": "",
+                        "type": "wysiwyg",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "allow_in_bindings": 0,
+                        "tabs": "all",
+                        "toolbar": "basic",
+                        "media_upload": 0,
+                        "delay": 0,
+                        "parent_repeater": "field_bl_notices"
+                    },
+                    {
+                        "key": "field_bl_notice_buttons",
+                        "label": "Buttons",
+                        "name": "buttons",
+                        "aria-label": "",
+                        "type": "repeater",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "layout": "table",
+                        "pagination": 0,
+                        "min": 0,
+                        "max": 0,
+                        "collapsed": "",
+                        "button_label": "Button hinzufügen",
+                        "rows_per_page": 20,
+                        "parent_repeater": "field_bl_notices",
+                        "sub_fields": [
+                            {
+                                "key": "field_bl_notice_button_link",
+                                "label": "Link",
+                                "name": "link",
+                                "aria-label": "",
+                                "type": "link",
+                                "instructions": "",
+                                "required": 0,
+                                "conditional_logic": 0,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "return_format": "array",
+                                "allow_in_bindings": 0,
+                                "parent_repeater": "field_bl_notice_buttons"
+                            }
+                        ]
+                    },
+                    {
+                        "key": "field_bl_notice_show_close_button",
+                        "label": "Schließen-Button anzeigen",
+                        "name": "show_close_button",
+                        "aria-label": "",
+                        "type": "true_false",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": [
+                            [
+                                {
+                                    "field": "field_bl_notice_dismissible",
+                                    "operator": "==",
+                                    "value": "1"
+                                }
+                            ]
+                        ],
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "message": "",
+                        "default_value": 1,
+                        "allow_in_bindings": 0,
+                        "ui_on_text": "",
+                        "ui_off_text": "",
+                        "ui": 1,
+                        "parent_repeater": "field_bl_notices"
+                    },
+                    {
+                        "key": "field_bl_notice_close_button_text",
+                        "label": "Text des Schließen-Buttons",
+                        "name": "close_button_text",
+                        "aria-label": "",
+                        "type": "text",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": [
+                            [
+                                {
+                                    "field": "field_bl_notice_show_close_button",
+                                    "operator": "==",
+                                    "value": "1"
+                                }
+                            ]
+                        ],
+                        "wrapper": {
+                            "width": "40",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "Schließen",
+                        "maxlength": "",
+                        "allow_in_bindings": 0,
+                        "placeholder": "",
+                        "prepend": "",
+                        "append": "",
+                        "parent_repeater": "field_bl_notices"
+                    },
+                    {
+                        "key": "field_bl_notice_close_button_style",
+                        "label": "Stil des Schließen-Buttons",
+                        "name": "close_button_style",
+                        "aria-label": "",
+                        "type": "button_group",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": [
+                            [
+                                {
+                                    "field": "field_bl_notice_show_close_button",
+                                    "operator": "==",
+                                    "value": "1"
+                                }
+                            ]
+                        ],
+                        "wrapper": {
+                            "width": "40",
+                            "class": "",
+                            "id": ""
+                        },
+                        "choices": {
+                            "primary": "Primär",
+                            "secondary": "Sekundär"
+                        },
+                        "default_value": "secondary",
+                        "return_format": "value",
+                        "allow_null": 0,
+                        "allow_in_bindings": 0,
+                        "layout": "horizontal",
+                        "parent_repeater": "field_bl_notices"
+                    },
+                    {
+                        "key": "field_bl_notice_close_button_outline",
+                        "label": "Outline",
+                        "name": "close_button_outline",
+                        "aria-label": "",
+                        "type": "true_false",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": [
+                            [
+                                {
+                                    "field": "field_bl_notice_show_close_button",
+                                    "operator": "==",
+                                    "value": "1"
+                                }
+                            ]
+                        ],
+                        "wrapper": {
+                            "width": "20",
+                            "class": "",
+                            "id": ""
+                        },
+                        "message": "",
+                        "default_value": 1,
+                        "allow_in_bindings": 0,
+                        "ui_on_text": "Ja",
+                        "ui_off_text": "Nein",
+                        "ui": 1,
+                        "parent_repeater": "field_bl_notices"
                     }
                 ]
             }

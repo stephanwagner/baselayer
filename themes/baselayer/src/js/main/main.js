@@ -10,6 +10,7 @@ import './scrolled';
 import './search';
 import './article-list';
 import './hero';
+import './site-notice';
 
 // Components
 import '../components/modal';

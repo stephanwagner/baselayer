@@ -1,0 +1,64 @@
+@use '../config' as *;
+@use '../mixins' as *;
+
+.site-notice-modal {
+  .modal__close-button[hidden] {
+    display: none;
+  }
+
+  .modal__content-container {
+    padding-top: 28px;
+  }
+}
+
+.site-notice {
+  --site-notice-accent: var(--bl-color-primary, #2271b1);
+
+  &--info {
+    --site-notice-accent: var(--bl-color-info, #2271b1);
+  }
+
+  &--success {
+    --site-notice-accent: var(--bl-color-success, #1e7e34);
+  }
+
+  &--warning {
+    --site-notice-accent: var(--bl-color-warning, #c47d00);
+  }
+
+  &--error {
+    --site-notice-accent: var(--bl-color-error, #c62828);
+  }
+
+  &--accent {
+    --site-notice-accent: var(--bl-color-primary, #2271b1);
+  }
+}
+
+.site-notice__title {
+  margin: 0 0 12px;
+}
+
+.site-notice__content {
+  border-left: 4px solid var(--site-notice-accent);
+  padding-left: 16px;
+
+  > *:first-child {
+    margin-top: 0;
+  }
+
+  > *:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.site-notice__title + .site-notice__content {
+  margin-top: 4px;
+}
+
+.site-notice__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 24px;
+}

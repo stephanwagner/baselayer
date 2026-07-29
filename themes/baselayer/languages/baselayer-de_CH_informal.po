@@ -2645,8 +2645,8 @@ msgstr[1] "%d ACF-Feldgruppen importiert."
 msgid "BaseLayer ACF field groups"
 msgstr "BaseLayer ACF-Feldgruppen"
 
-msgid "ACF Pro is active, but the theme’s block and website field groups are not imported yet. Import them now, or skip if you manage fields yourself."
-msgstr "ACF Pro ist aktiv, aber die Block- und Website-Feldgruppen des Themes sind noch nicht importiert. Importiere sie jetzt, oder überspringe dies, wenn du Felder selbst verwaltest."
+msgid "ACF Pro is active, but no field groups are installed yet. Import the theme’s block and website field groups now, or skip if you manage fields yourself."
+msgstr "ACF Pro ist aktiv, aber es sind noch keine Feldgruppen installiert. Importiere jetzt die Block- und Website-Feldgruppen des Themes, oder überspringe dies, wenn du Felder selbst verwaltest."
 
 msgid "Import field groups"
 msgstr "Feldgruppen importieren"
