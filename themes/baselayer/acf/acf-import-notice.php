@@ -8,11 +8,50 @@ defined('ABSPATH') || exit;
 const BL_ACF_IMPORT_SKIPPED_OPTION = 'baselayer_acf_import_skipped';
 
 /**
- * Absolute path to the bundled ACF field-group export JSON.
+ * Language key for bundled ACF import JSON (e.g. de_CH → de, en_US → en).
+ *
+ * Uses the site language (not the current admin user’s locale).
+ * Falls back to "en" when no matching language file exists.
+ */
+function bl_acf_import_locale_key(): string
+{
+	$locale = get_option('WPLANG', '');
+	if (!is_string($locale) || $locale === '') {
+		$locale = function_exists('get_locale') ? (string) get_locale() : 'en_US';
+	}
+
+	$locale = strtolower(str_replace('-', '_', $locale));
+	if ($locale === '') {
+		return 'en';
+	}
+
+	$parts = explode('_', $locale);
+	$lang = $parts[0] !== '' ? $parts[0] : 'en';
+
+	return preg_match('/^[a-z]{2}$/', $lang) === 1 ? $lang : 'en';
+}
+
+/**
+ * Absolute path to the bundled ACF field-group export JSON for the site language.
+ *
+ * Prefers acf-import-{lang}.json (e.g. -de, -en), then falls back to -en.
  */
 function bl_acf_import_json_path(): string
 {
-	return get_template_directory() . '/acf/acf-import.json';
+	$dir = get_template_directory() . '/acf/';
+	$lang = bl_acf_import_locale_key();
+	$candidates = [
+		$dir . 'acf-import-' . $lang . '.json',
+		$dir . 'acf-import-en.json',
+	];
+
+	foreach ($candidates as $path) {
+		if (is_readable($path)) {
+			return $path;
+		}
+	}
+
+	return $dir . 'acf-import-en.json';
 }
 
 /**
