@@ -16,7 +16,6 @@ if ($notice === null) {
 $id = isset($notice['id']) ? (string) $notice['id'] : '';
 $title = isset($notice['title']) ? (string) $notice['title'] : '';
 $extra_class = isset($notice['extra_class']) ? (string) $notice['extra_class'] : '';
-$dismissible = !empty($notice['dismissible']);
 $show_again = isset($notice['show_again']) ? (string) $notice['show_again'] : 'session';
 $show_again_after = isset($notice['show_again_after']) ? (int) $notice['show_again_after'] : 7;
 $buttons_alignment = isset($notice['buttons_alignment']) ? (string) $notice['buttons_alignment'] : 'right';
@@ -24,7 +23,7 @@ $content_html = isset($notice['content_html']) ? (string) $notice['content_html'
 $buttons = isset($notice['buttons']) && is_array($notice['buttons']) ? $notice['buttons'] : [];
 $show_close_button = !empty($notice['show_close_button']);
 $close_button_text = isset($notice['close_button_text']) ? (string) $notice['close_button_text'] : __('Close', 'baselayer');
-$close_button_style = isset($notice['close_button_style']) ? (string) $notice['close_button_style'] : 'secondary';
+$close_button_style = isset($notice['close_button_style']) ? (string) $notice['close_button_style'] : 'primary';
 $close_button_outline = !empty($notice['close_button_outline']);
 
 if ($id === '') {
@@ -35,9 +34,6 @@ $modal_id = 'site-notice';
 $classes = ['site-notice'];
 if ($extra_class !== '') {
 	$classes[] = $extra_class;
-}
-if ($dismissible) {
-	$classes[] = 'site-notice--dismissible';
 }
 
 $close_classes = ['site-notice__close', 'button', '-small', '-' . sanitize_html_class($close_button_style)];
@@ -51,7 +47,7 @@ if ($close_button_outline) {
 	hidden
 	data-site-notice
 	data-site-notice-id="<?= esc_attr($id) ?>"
-	data-site-notice-dismissible="<?= $dismissible ? '1' : '0' ?>"
+	data-site-notice-show-close="<?= $show_close_button ? '1' : '0' ?>"
 	data-site-notice-show-again="<?= esc_attr($show_again) ?>"
 	data-site-notice-show-again-after="<?= esc_attr((string) $show_again_after) ?>"
 >

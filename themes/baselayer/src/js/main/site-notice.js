@@ -41,7 +41,7 @@ function shouldSuppressNotice(id, showAgain, showAgainAfterDays) {
   }
 }
 
-function rememberNoticeShown(id, showAgain, showAgainAfterDays) {
+function rememberNoticeShown(id, showAgain) {
   try {
     const key = storageKey(id);
 
@@ -76,7 +76,7 @@ function initSiteNotice() {
     return;
   }
 
-  const dismissible = source.dataset.siteNoticeDismissible === '1';
+  const showCloseButton = source.dataset.siteNoticeShowClose === '1';
   const showAgain = source.dataset.siteNoticeShowAgain || 'session';
   const showAgainAfter = source.dataset.siteNoticeShowAgainAfter || '7';
 
@@ -86,14 +86,14 @@ function initSiteNotice() {
 
   openModal(MODAL_ID, (modalEl) => {
     modalEl.classList.add('site-notice-modal');
-    rememberNoticeShown(id, showAgain, showAgainAfter);
+    rememberNoticeShown(id, showAgain);
 
     const builtInClose = modalEl.querySelector('.modal__close-button');
     if (builtInClose instanceof HTMLElement) {
       builtInClose.hidden = true;
     }
 
-    if (!dismissible) {
+    if (!showCloseButton) {
       disableClosingModal(MODAL_ID);
     } else {
       enableClosingModal(MODAL_ID);

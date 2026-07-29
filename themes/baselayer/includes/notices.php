@@ -109,7 +109,6 @@ function bl_notice_sanitize_extra_class(string $raw): string
  *   id: string,
  *   title: string,
  *   extra_class: string,
- *   dismissible: bool,
  *   show_again: string,
  *   show_again_after: int,
  *   buttons_alignment: string,
@@ -160,9 +159,7 @@ function bl_notice_normalize_row(array $row, int $index): ?array
 		$buttons_alignment = 'right';
 	}
 
-	// ACF currently uses `show_close_button` instead of a dedicated `dismissible` field.
 	$show_close_button = !empty($row['show_close_button']);
-	$dismissible = $show_close_button;
 
 	$show_again = isset($row['show_again']) ? (string) $row['show_again'] : 'session';
 	if (!in_array($show_again, ['never', 'always', 'session', 'after'], true)) {
@@ -178,22 +175,18 @@ function bl_notice_normalize_row(array $row, int $index): ?array
 	if ($close_text === '') {
 		$close_text = __('Close', 'baselayer');
 	}
-	$close_style = isset($row['close_button_style']) ? (string) $row['close_button_style'] : 'secondary';
+	$close_style = isset($row['close_button_style']) ? (string) $row['close_button_style'] : 'primary';
 	if (!in_array($close_style, ['primary', 'secondary'], true)) {
-		$close_style = 'secondary';
+		$close_style = 'primary';
 	}
 
-	$id = 'n' . substr(
-		md5($index . '|' . $extra_class . '|' . $title . '|' . wp_strip_all_tags($content) . '|' . $buttons_alignment . '|' . $show_again . '|' . $show_again_after . '|' . ($show_close_button ? '1' : '0')),
-		0,
-		12
-	);
+	// Content identity only — UI/timing tweaks must not reset visitor storage.
+	$id = 'n' . substr(md5($index . '|' . $extra_class . '|' . $title . '|' . wp_strip_all_tags($content)), 0, 12);
 
 	return [
 		'id' => $id,
 		'title' => $title,
 		'extra_class' => $extra_class,
-		'dismissible' => $dismissible,
 		'show_again' => $show_again,
 		'show_again_after' => $show_again_after,
 		'buttons_alignment' => $buttons_alignment,
