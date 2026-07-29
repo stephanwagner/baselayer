@@ -179,6 +179,9 @@ function bl_events_archive_context(): array
 
 /**
  * Query var used for standalone archive category filter.
+ *
+ * Dedicated name (not the taxonomy query_var) so filtering stays a post-type
+ * archive and does not flip the request to is_tax().
  */
 function bl_events_archive_filter_query_var(string $taxonomy): string
 {
@@ -186,13 +189,7 @@ function bl_events_archive_filter_query_var(string $taxonomy): string
 		return '';
 	}
 
-	$tax = get_taxonomy($taxonomy);
-	if ($tax instanceof \WP_Taxonomy && is_string($tax->query_var) && $tax->query_var !== '') {
-		return $tax->query_var;
-	}
-
-	return $taxonomy;
-}
+	return 'bl_event_cat';}
 
 /**
  * Selected category term ID from the request (CPT archive filter), or 0.

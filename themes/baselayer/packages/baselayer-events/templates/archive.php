@@ -26,7 +26,7 @@ $heading = isset($ctx['heading']) ? (string) $ctx['heading'] : __('Events', 'bas
 $empty = isset($ctx['empty']) ? (string) $ctx['empty'] : __('No events found.', 'baselayer-events');
 $post_type = isset($ctx['post_type']) ? (string) $ctx['post_type'] : '';
 $taxonomy = isset($ctx['taxonomy']) ? (string) $ctx['taxonomy'] : '';
-$show_category = !empty($ctx['category_filter']) && !is_tax() && $taxonomy !== '';
+$show_category = !empty($ctx['category_filter']) && $taxonomy !== '';
 $filter_terms = $show_category && function_exists('bl_events_archive_filter_terms')
 	? bl_events_archive_filter_terms($taxonomy)
 	: [];
@@ -34,6 +34,12 @@ $show_category = $show_category && $filter_terms !== [];
 $selected_term_id = $show_category && function_exists('bl_events_archive_filter_term_id')
 	? bl_events_archive_filter_term_id($taxonomy)
 	: 0;
+if ($selected_term_id <= 0 && $show_category && $taxonomy !== '' && is_tax($taxonomy)) {
+	$queried = get_queried_object();
+	if ($queried instanceof \WP_Term) {
+		$selected_term_id = (int) $queried->term_id;
+	}
+}
 $category_query_var = $show_category && function_exists('bl_events_archive_filter_query_var')
 	? bl_events_archive_filter_query_var($taxonomy)
 	: '';
@@ -53,16 +59,9 @@ $occupied_months = ($show_month && $post_type !== '' && function_exists('bl_even
 	: [];
 $occupied_lookup = array_fill_keys($occupied_months, true);
 
-$form_action = '';
-if (is_tax()) {
-	$term = get_queried_object();
-	if ($term instanceof \WP_Term) {
-		$link = get_term_link($term);
-		$form_action = is_string($link) && !is_wp_error($link) ? $link : '';
-	}
-} elseif (isset($ctx['archive_url']) && is_string($ctx['archive_url'])) {
-	$form_action = $ctx['archive_url'];
-}
+$form_action = isset($ctx['archive_url']) && is_string($ctx['archive_url'])
+	? $ctx['archive_url']
+	: '';
 
 $show_filters = $form_action !== '' && ($show_category || ($show_month && $from_options !== []));
 
