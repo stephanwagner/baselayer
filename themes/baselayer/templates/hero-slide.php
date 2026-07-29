@@ -85,7 +85,7 @@ if ($has_copy) {
 								$rel = $target === '_blank' ? 'noopener noreferrer' : '';
 								?>
 								<a
-									class="hero__link button"
+									class="hero__link button -small -white -outline"
 									href="<?= esc_url($url) ?>"
 									<?php if ($target !== '') : ?>target="<?= esc_attr($target) ?>"<?php endif; ?>
 									<?php if ($rel !== '') : ?>rel="<?= esc_attr($rel) ?>"<?php endif; ?>

@@ -3,6 +3,13 @@
 
 $hero-content-wide-collapse: $content-width + ($container-wide-bleed * 2) + 24px + 24px;
 
+:root {
+  --hero-max-height: 520px;
+  --hero-padding-top: calc(100% / 16 * 9);
+  --hero-padding-top-xs: calc(100% / 4 * 3);
+  --hero-content-max-width: 600px;
+}
+
 .hero {
   position: relative;
   margin-top: var(--bl-spacing-m);
@@ -26,16 +33,20 @@ $hero-content-wide-collapse: $content-width + ($container-wide-bleed * 2) + 24px
   overflow: hidden;
   border-radius: var(--bl-border-radius-m);
   background-color: var(--bl-color-gray-200, #e5e5e5);
-  max-height: 520px;
+  max-height: var(--hero-max-height);
   overflow: hidden;
 
   // Fixed 16:9 (same padding-top aspect box as the slider).
   &::after {
     content: '';
     display: block;
-    padding-top: var(--hero-padding-top, 56.25%);
+    padding-top: var(--hero-padding-top);
     position: relative;
     z-index: 1;
+
+    @media (max-width: $breakpoint-xs) {
+      padding-top: var(--hero-padding-top-xs);
+    }
   }
 }
 
@@ -84,23 +95,26 @@ $hero-content-wide-collapse: $content-width + ($container-wide-bleed * 2) + 24px
 
 .hero__content-inner {
   width: 100%;
-  max-width: 36rem;
+  max-width: var(--hero-content-max-width);
 }
 
 .hero__title {
-  margin: 0 0 0.5rem;
-  font-size: clamp(1.75rem, 4vw, 2.75rem);
-  line-height: 1.15;
   text-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
   text-wrap: balance;
+  margin-bottom: 0;
 }
 
 .hero__text {
   margin: 0;
-  font-size: var(--bl-font-size-m, 1rem);
-  line-height: 1.5;
+  font-size: var(--bl-font-size-m);
+  line-height: var(--bl-line-height-m);
+  margin-top: 6px;
   text-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
   text-wrap: balance;
+
+  &:first-child {
+    margin-top: 0;
+  }
 
   > *:first-child {
     margin-top: 0;
@@ -109,13 +123,17 @@ $hero-content-wide-collapse: $content-width + ($container-wide-bleed * 2) + 24px
   > *:last-child {
     margin-bottom: 0;
   }
+
+  @media (max-width: $breakpoint-s) {
+    @include line-clamp(2);
+  }
 }
 
 .hero__links {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 1rem;
+  gap: 12px;
+  margin-top: 16px;
 }
 
 .hero__link {
@@ -142,6 +160,10 @@ $hero-content-wide-collapse: $content-width + ($container-wide-bleed * 2) + 24px
   position: relative;
   height: 24px;
   margin: 8px 0 0;
+
+  @media (max-width: $breakpoint-xs) {
+    display: none;
+  }
 }
 
 .hero__button-prev,
