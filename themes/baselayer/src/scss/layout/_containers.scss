@@ -1,9 +1,6 @@
 @use '../config' as *;
 @use '../mixins' as *;
 
-$content-wide-width: $content-width + ($container-wide-bleed * 2);
-$content-wide-collapse: $content-wide-width + 24px + 24px;
-
 // Container
 
 .container {

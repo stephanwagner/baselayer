@@ -17,9 +17,9 @@ if ($ctx === null || empty($ctx['slides']) || !is_array($ctx['slides'])) {
 
 $slides = $ctx['slides'];
 $is_slider = !empty($ctx['is_slider']);
-$classes = ['hero', 'container-wide'];
+$classes = ['hero__wrapper', 'container-wide', '-container-margin-m'];
 if ($is_slider) {
-	$classes[] = 'hero--slider';
+	$classes[] = '-is-slider';
 }
 ?>
 

@@ -6,9 +6,10 @@ document.querySelectorAll('[data-hero-slider]').forEach((el) => {
     return;
   }
 
-  const paginationEl = el.closest('.hero')?.querySelector('.hero__pagination');
-  const nextEl = el.closest('.hero')?.querySelector('.hero__button-next');
-  const prevEl = el.closest('.hero')?.querySelector('.hero__button-prev');
+  const root = el.closest('.hero__wrapper');
+  const paginationEl = root?.querySelector('.hero__pagination');
+  const nextEl = root?.querySelector('.hero__button-next');
+  const prevEl = root?.querySelector('.hero__button-prev');
 
   const swiper = new Swiper(el, {
     modules: [Autoplay, EffectFade, Navigation, Pagination],

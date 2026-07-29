@@ -93,6 +93,10 @@ $content-width-extra-narrow: 300px !default;
 $container-wide-bleed: $page-padding-xl !default;
 $alignwide-bleed: $page-padding-xl !default;
 
+// Content wide widths
+$content-wide-width: $content-width + ($container-wide-bleed * 2);
+$content-wide-collapse: $content-wide-width + 24px + 24px;
+
 // Breakpoints
 $breakpoint-xs: 400px !default;
 $breakpoint-s: 600px !default;

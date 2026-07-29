@@ -109,7 +109,11 @@
   --bl-page-padding-xl: #{$page-padding-xl};
 
   // Current page gutter
-  --bl-page-padding: var(--bl-page-padding-l);
+  --bl-page-padding: var(--bl-page-padding-xl);
+
+  @media (max-width: #{$breakpoint-l}) {
+    --bl-page-padding: var(--bl-page-padding-l);
+  }
 
   @media (max-width: #{$breakpoint-m}) {
     --bl-page-padding: var(--bl-page-padding-m);
@@ -130,12 +134,50 @@
   --bl-container-padding-l: #{$container-padding-l};
   --bl-container-padding-xl: #{$container-padding-xl};
 
+  // Current container padding
+  --bl-container-padding: var(--bl-container-padding-xl);
+
+  @media (max-width: #{$breakpoint-l}) {
+    --bl-container-padding: var(--bl-container-padding-l);
+  }
+
+  @media (max-width: #{$breakpoint-m}) {
+    --bl-container-padding: var(--bl-container-padding-m);
+  }
+
+  @media (max-width: #{$breakpoint-s}) {
+    --bl-container-padding: var(--bl-container-padding-s);
+  }
+
+  @media (max-width: #{$breakpoint-xs}) {
+    --bl-container-padding: var(--bl-container-padding-xs);
+  }
+
   // Container margins
   --bl-container-margin-xs: #{$container-margin-xs};
   --bl-container-margin-s: #{$container-margin-s};
   --bl-container-margin-m: #{$container-margin-m};
   --bl-container-margin-l: #{$container-margin-l};
   --bl-container-margin-xl: #{$container-margin-xl};
+
+  // Current container margin
+  --bl-container-margin: var(--bl-container-margin-xl);
+
+  @media (max-width: #{$breakpoint-l}) {
+    --bl-container-margin: var(--bl-container-margin-l);
+  }
+
+  @media (max-width: #{$breakpoint-m}) {
+    --bl-container-margin: var(--bl-container-margin-m);
+  }
+
+  @media (max-width: #{$breakpoint-s}) {
+    --bl-container-margin: var(--bl-container-margin-s);
+  }
+
+  @media (max-width: #{$breakpoint-xs}) {
+    --bl-container-margin: var(--bl-container-margin-xs);
+  }
 
   // Content
   --bl-content-width: #{$content-width};
