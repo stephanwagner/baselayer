@@ -17,7 +17,9 @@ $id = isset($notice['id']) ? (string) $notice['id'] : '';
 $title = isset($notice['title']) ? (string) $notice['title'] : '';
 $extra_class = isset($notice['extra_class']) ? (string) $notice['extra_class'] : '';
 $dismissible = !empty($notice['dismissible']);
+$show_again = isset($notice['show_again']) ? (string) $notice['show_again'] : 'session';
 $show_again_after = isset($notice['show_again_after']) ? (int) $notice['show_again_after'] : 7;
+$buttons_alignment = isset($notice['buttons_alignment']) ? (string) $notice['buttons_alignment'] : 'right';
 $content_html = isset($notice['content_html']) ? (string) $notice['content_html'] : '';
 $buttons = isset($notice['buttons']) && is_array($notice['buttons']) ? $notice['buttons'] : [];
 $show_close_button = !empty($notice['show_close_button']);
@@ -50,6 +52,7 @@ if ($close_button_outline) {
 	data-site-notice
 	data-site-notice-id="<?= esc_attr($id) ?>"
 	data-site-notice-dismissible="<?= $dismissible ? '1' : '0' ?>"
+	data-site-notice-show-again="<?= esc_attr($show_again) ?>"
 	data-site-notice-show-again-after="<?= esc_attr((string) $show_again_after) ?>"
 >
 	<div data-modal-content="<?= esc_attr($modal_id) ?>">
@@ -65,7 +68,15 @@ if ($close_button_outline) {
 			<?php endif; ?>
 
 			<?php if ($buttons !== [] || $show_close_button) : ?>
-				<div class="site-notice__actions">
+				<div class="site-notice__actions site-notice__actions--<?= esc_attr($buttons_alignment) ?>">
+					<?php if ($show_close_button) : ?>
+						<button
+							type="button"
+							class="<?= esc_attr(implode(' ', $close_classes)) ?>"
+							data-site-notice-close
+						><?= esc_html($close_button_text) ?></button>
+					<?php endif; ?>
+
 					<?php foreach ($buttons as $button) :
 						if (!is_array($button)) {
 							continue;
@@ -85,14 +96,6 @@ if ($close_button_outline) {
 							<?php if ($rel !== '') : ?>rel="<?= esc_attr($rel) ?>"<?php endif; ?>
 						><?= esc_html($button_title) ?></a>
 					<?php endforeach; ?>
-
-					<?php if ($show_close_button) : ?>
-						<button
-							type="button"
-							class="<?= esc_attr(implode(' ', $close_classes)) ?>"
-							data-site-notice-close
-						><?= esc_html($close_button_text) ?></button>
-					<?php endif; ?>
 				</div>
 			<?php endif; ?>
 		</div>

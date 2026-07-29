@@ -110,7 +110,9 @@ function bl_notice_sanitize_extra_class(string $raw): string
  *   title: string,
  *   extra_class: string,
  *   dismissible: bool,
+ *   show_again: string,
  *   show_again_after: int,
+ *   buttons_alignment: string,
  *   content_html: string,
  *   buttons: list<array{url: string, title: string, target: string}>,
  *   show_close_button: bool,
@@ -153,13 +155,25 @@ function bl_notice_normalize_row(array $row, int $index): ?array
 		isset($row['extra_class']) ? (string) $row['extra_class'] : ''
 	);
 
-	$dismissible = !empty($row['dismissible']);
+	$buttons_alignment = isset($row['buttons_alignment']) ? (string) $row['buttons_alignment'] : 'right';
+	if (!in_array($buttons_alignment, ['left', 'center', 'right'], true)) {
+		$buttons_alignment = 'right';
+	}
+
+	// ACF currently uses `show_close_button` instead of a dedicated `dismissible` field.
+	$show_close_button = !empty($row['show_close_button']);
+	$dismissible = $show_close_button;
+
+	$show_again = isset($row['show_again']) ? (string) $row['show_again'] : 'session';
+	if (!in_array($show_again, ['never', 'always', 'session', 'after'], true)) {
+		$show_again = 'session';
+	}
+
 	$show_again_after = isset($row['show_again_after']) ? (int) $row['show_again_after'] : 7;
 	if ($show_again_after < 0) {
 		$show_again_after = 0;
 	}
 
-	$show_close_button = $dismissible && !empty($row['show_close_button']);
 	$close_text = isset($row['close_button_text']) ? trim((string) $row['close_button_text']) : '';
 	if ($close_text === '') {
 		$close_text = __('Close', 'baselayer');
@@ -169,14 +183,20 @@ function bl_notice_normalize_row(array $row, int $index): ?array
 		$close_style = 'secondary';
 	}
 
-	$id = 'n' . substr(md5($index . '|' . $extra_class . '|' . $title . '|' . wp_strip_all_tags($content)), 0, 12);
+	$id = 'n' . substr(
+		md5($index . '|' . $extra_class . '|' . $title . '|' . wp_strip_all_tags($content) . '|' . $buttons_alignment . '|' . $show_again . '|' . $show_again_after . '|' . ($show_close_button ? '1' : '0')),
+		0,
+		12
+	);
 
 	return [
 		'id' => $id,
 		'title' => $title,
 		'extra_class' => $extra_class,
 		'dismissible' => $dismissible,
+		'show_again' => $show_again,
 		'show_again_after' => $show_again_after,
+		'buttons_alignment' => $buttons_alignment,
 		'content_html' => $content,
 		'buttons' => $buttons,
 		'show_close_button' => $show_close_button,

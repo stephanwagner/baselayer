@@ -3347,7 +3347,7 @@
                         "name": "show_again",
                         "aria-label": "",
                         "type": "select",
-                        "instructions": "Bestimmt, wann der Hinweis nach dem Schließen wieder erscheint.",
+                        "instructions": "Bestimmt, wann der Hinweis nach dem Anzeigen wieder erscheint.",
                         "required": 0,
                         "conditional_logic": 0,
                         "wrapper": {
@@ -3379,7 +3379,7 @@
                         "name": "show_again_after",
                         "aria-label": "",
                         "type": "number",
-                        "instructions": "Anzahl Tage nach dem Schließen, bevor der Hinweis erneut erscheinen kann.",
+                        "instructions": "Anzahl Tage nach dem Anzeigen, bevor der Hinweis erneut erscheinen kann.",
                         "required": 0,
                         "conditional_logic": [
                             [

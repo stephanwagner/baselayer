@@ -7,36 +7,61 @@ function storageKey(id) {
   return STORAGE_PREFIX + id;
 }
 
-function isDismissed(id, showAgainAfterDays) {
+function shouldSuppressNotice(id, showAgain, showAgainAfterDays) {
   try {
-    const raw = window.localStorage.getItem(storageKey(id));
+    const key = storageKey(id);
+
+    if (showAgain === 'always') {
+      return false;
+    }
+
+    if (showAgain === 'never') {
+      return window.localStorage.getItem(key) !== null;
+    }
+
+    if (showAgain === 'session') {
+      return window.sessionStorage.getItem(key) !== null;
+    }
+
+    // showAgain === 'after'
+    const raw = window.localStorage.getItem(key);
     if (!raw) {
       return false;
     }
-    const dismissedAt = Date.parse(raw);
-    if (Number.isNaN(dismissedAt)) {
+    const shownAt = Date.parse(raw);
+    if (Number.isNaN(shownAt)) {
       return false;
     }
+
     const days = Math.max(0, Number(showAgainAfterDays) || 0);
-    const expiresAt = dismissedAt + days * 24 * 60 * 60 * 1000;
+    const expiresAt = shownAt + days * 24 * 60 * 60 * 1000;
     return Date.now() < expiresAt;
   } catch {
     return false;
   }
 }
 
-function rememberDismissal(id) {
+function rememberNoticeShown(id, showAgain, showAgainAfterDays) {
   try {
-    window.localStorage.setItem(storageKey(id), new Date().toISOString());
+    const key = storageKey(id);
+
+    if (showAgain === 'always') {
+      return;
+    }
+
+    // "After" and "never" are persisted in localStorage; "session" uses sessionStorage.
+    if (showAgain === 'session') {
+      window.sessionStorage.setItem(key, new Date().toISOString());
+      return;
+    }
+
+    window.localStorage.setItem(key, new Date().toISOString());
   } catch {
     // Ignore quota / private mode errors.
   }
 }
 
-function dismissAndClose(id, dismissible) {
-  if (dismissible) {
-    rememberDismissal(id);
-  }
+function closeSiteNotice() {
   closeModal(MODAL_ID);
 }
 
@@ -52,14 +77,16 @@ function initSiteNotice() {
   }
 
   const dismissible = source.dataset.siteNoticeDismissible === '1';
+  const showAgain = source.dataset.siteNoticeShowAgain || 'session';
   const showAgainAfter = source.dataset.siteNoticeShowAgainAfter || '7';
 
-  if (dismissible && isDismissed(id, showAgainAfter)) {
+  if (shouldSuppressNotice(id, showAgain, showAgainAfter)) {
     return;
   }
 
   openModal(MODAL_ID, (modalEl) => {
     modalEl.classList.add('site-notice-modal');
+    rememberNoticeShown(id, showAgain, showAgainAfter);
 
     const builtInClose = modalEl.querySelector('.modal__close-button');
     if (builtInClose instanceof HTMLElement) {
@@ -81,7 +108,7 @@ function initSiteNotice() {
               return;
             }
             if (!ev.target.closest('.modal__content-container') && modalEl.classList.contains('-open')) {
-              rememberDismissal(id);
+              closeSiteNotice();
             }
           },
           true
@@ -93,7 +120,7 @@ function initSiteNotice() {
         modalEl.dataset.siteNoticeEscBound = '1';
         document.addEventListener('keyup', (ev) => {
           if (ev.key === 'Escape' && modalEl.classList.contains('-open')) {
-            rememberDismissal(id);
+            closeSiteNotice();
           }
         });
       }
@@ -104,7 +131,7 @@ function initSiteNotice() {
         return;
       }
       btn.dataset.siteNoticeBound = '1';
-      btn.addEventListener('click', () => dismissAndClose(id, dismissible));
+      btn.addEventListener('click', () => closeSiteNotice());
     });
   });
 }
