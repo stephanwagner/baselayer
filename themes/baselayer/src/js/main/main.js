@@ -9,6 +9,7 @@ import './menu';
 import './scrolled';
 import './search';
 import './article-list';
+import './hero';
 
 // Components
 import '../components/modal';

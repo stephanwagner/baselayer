@@ -490,7 +490,7 @@
                 "name": "post_type",
                 "aria-label": "",
                 "type": "select",
-                "instructions": "Nach Änderung speichern und dann die Seite neu laden, damit die Kategorie-Auswahl aktualisiert wird.",
+                "instructions": "Nach Änderung speichern die Seite neu laden, damit die Kategorie-Auswahl aktualisiert wird.",
                 "required": 1,
                 "conditional_logic": 0,
                 "wrapper": {
@@ -500,8 +500,8 @@
                 },
                 "choices": {
                     "post": "Beiträge",
-                    "event": "Veranstaltungen",
-                    "projects": "Projekte"
+                    "projects": "Projekte",
+                    "bl_event": "Events"
                 },
                 "default_value": "post",
                 "return_format": "value",
@@ -746,6 +746,386 @@
         ],
         "menu_order": 0,
         "position": "normal",
+        "style": "default",
+        "label_placement": "top",
+        "instruction_placement": "label",
+        "hide_on_screen": "",
+        "active": true,
+        "description": "",
+        "show_in_rest": 0,
+        "display_title": "",
+        "allow_ai_access": false,
+        "ai_description": ""
+    },
+    {
+        "key": "group_bl_hero_page",
+        "title": "Hero",
+        "fields": [
+            {
+                "key": "field_bl_hero_enabled",
+                "label": "",
+                "name": "hero_enabled",
+                "aria-label": "",
+                "type": "true_false",
+                "instructions": "",
+                "required": 0,
+                "conditional_logic": 0,
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "message": "Enable Hero section",
+                "default_value": 0,
+                "allow_in_bindings": 0,
+                "ui": 0,
+                "ui_on_text": "",
+                "ui_off_text": ""
+            },
+            {
+                "key": "field_bl_hero_slides",
+                "label": "Slides",
+                "name": "hero_slides",
+                "aria-label": "",
+                "type": "repeater",
+                "instructions": "One slide shows a static hero. Two or more become a slider.",
+                "required": 0,
+                "conditional_logic": [
+                    [
+                        {
+                            "field": "field_bl_hero_enabled",
+                            "operator": "==",
+                            "value": "1"
+                        }
+                    ]
+                ],
+                "wrapper": {
+                    "width": "",
+                    "class": "",
+                    "id": ""
+                },
+                "layout": "block",
+                "pagination": 0,
+                "min": 0,
+                "max": 0,
+                "collapsed": "field_bl_hero_slide_title_source",
+                "button_label": "Add slide",
+                "rows_per_page": 20,
+                "sub_fields": [
+                    {
+                        "key": "field_bl_hero_slide_background",
+                        "label": "Background",
+                        "name": "background",
+                        "aria-label": "",
+                        "type": "select",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "choices": {
+                            "featured": "Featured image",
+                            "image": "Image",
+                            "video": "Video"
+                        },
+                        "default_value": "featured",
+                        "return_format": "value",
+                        "multiple": 0,
+                        "allow_null": 0,
+                        "allow_in_bindings": 0,
+                        "ui": 0,
+                        "ajax": 0,
+                        "placeholder": "",
+                        "create_options": 0,
+                        "save_options": 0,
+                        "parent_repeater": "field_bl_hero_slides"
+                    },
+                    {
+                        "key": "field_bl_hero_slide_image",
+                        "label": "Image",
+                        "name": "image",
+                        "aria-label": "",
+                        "type": "image",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": [
+                            [
+                                {
+                                    "field": "field_bl_hero_slide_background",
+                                    "operator": "==",
+                                    "value": "image"
+                                }
+                            ]
+                        ],
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "return_format": "id",
+                        "library": "all",
+                        "min_width": "",
+                        "min_height": "",
+                        "min_size": "",
+                        "max_width": "",
+                        "max_height": "",
+                        "max_size": "",
+                        "mime_types": "",
+                        "allow_in_bindings": 0,
+                        "preview_size": "medium",
+                        "parent_repeater": "field_bl_hero_slides"
+                    },
+                    {
+                        "key": "field_bl_hero_slide_video",
+                        "label": "Video",
+                        "name": "video",
+                        "aria-label": "",
+                        "type": "file",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": [
+                            [
+                                {
+                                    "field": "field_bl_hero_slide_background",
+                                    "operator": "==",
+                                    "value": "video"
+                                }
+                            ]
+                        ],
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "return_format": "id",
+                        "library": "all",
+                        "min_size": "",
+                        "max_size": "",
+                        "mime_types": "mp4,webm",
+                        "allow_in_bindings": 0,
+                        "parent_repeater": "field_bl_hero_slides"
+                    },
+                    {
+                        "key": "field_bl_hero_slide_title_source",
+                        "label": "Title",
+                        "name": "title_source",
+                        "aria-label": "",
+                        "type": "select",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "choices": {
+                            "none": "None",
+                            "page_title": "Page title",
+                            "custom": "Custom"
+                        },
+                        "default_value": "page_title",
+                        "return_format": "value",
+                        "multiple": 0,
+                        "allow_null": 0,
+                        "allow_in_bindings": 0,
+                        "ui": 0,
+                        "ajax": 0,
+                        "placeholder": "",
+                        "create_options": 0,
+                        "save_options": 0,
+                        "parent_repeater": "field_bl_hero_slides"
+                    },
+                    {
+                        "key": "field_bl_hero_slide_title",
+                        "label": "Title text",
+                        "name": "title",
+                        "aria-label": "",
+                        "type": "textarea",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": [
+                            [
+                                {
+                                    "field": "field_bl_hero_slide_title_source",
+                                    "operator": "==",
+                                    "value": "custom"
+                                }
+                            ]
+                        ],
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "maxlength": "",
+                        "allow_in_bindings": 0,
+                        "rows": 3,
+                        "placeholder": "",
+                        "new_lines": "br",
+                        "parent_repeater": "field_bl_hero_slides"
+                    },
+                    {
+                        "key": "field_bl_hero_slide_text_source",
+                        "label": "Text",
+                        "name": "text_source",
+                        "aria-label": "",
+                        "type": "select",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "choices": {
+                            "none": "None",
+                            "excerpt": "Excerpt",
+                            "custom": "Custom"
+                        },
+                        "default_value": "none",
+                        "return_format": "value",
+                        "multiple": 0,
+                        "allow_null": 0,
+                        "allow_in_bindings": 0,
+                        "ui": 0,
+                        "ajax": 0,
+                        "placeholder": "",
+                        "create_options": 0,
+                        "save_options": 0,
+                        "parent_repeater": "field_bl_hero_slides"
+                    },
+                    {
+                        "key": "field_bl_hero_slide_text",
+                        "label": "Text body",
+                        "name": "text",
+                        "aria-label": "",
+                        "type": "textarea",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": [
+                            [
+                                {
+                                    "field": "field_bl_hero_slide_text_source",
+                                    "operator": "==",
+                                    "value": "custom"
+                                }
+                            ]
+                        ],
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "default_value": "",
+                        "maxlength": "",
+                        "allow_in_bindings": 0,
+                        "rows": 4,
+                        "placeholder": "",
+                        "new_lines": "wpautop",
+                        "parent_repeater": "field_bl_hero_slides"
+                    },
+                    {
+                        "key": "field_bl_hero_slide_links_source",
+                        "label": "Links",
+                        "name": "links_source",
+                        "aria-label": "",
+                        "type": "select",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": 0,
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "choices": {
+                            "none": "None",
+                            "contact": "Contact page",
+                            "custom": "Custom"
+                        },
+                        "default_value": "none",
+                        "return_format": "value",
+                        "multiple": 0,
+                        "allow_null": 0,
+                        "allow_in_bindings": 0,
+                        "ui": 0,
+                        "ajax": 0,
+                        "placeholder": "",
+                        "create_options": 0,
+                        "save_options": 0,
+                        "parent_repeater": "field_bl_hero_slides"
+                    },
+                    {
+                        "key": "field_bl_hero_slide_links",
+                        "label": "Links",
+                        "name": "links",
+                        "aria-label": "",
+                        "type": "repeater",
+                        "instructions": "",
+                        "required": 0,
+                        "conditional_logic": [
+                            [
+                                {
+                                    "field": "field_bl_hero_slide_links_source",
+                                    "operator": "==",
+                                    "value": "custom"
+                                }
+                            ]
+                        ],
+                        "wrapper": {
+                            "width": "",
+                            "class": "",
+                            "id": ""
+                        },
+                        "layout": "block",
+                        "pagination": 0,
+                        "min": 0,
+                        "max": 0,
+                        "collapsed": "",
+                        "button_label": "Add link",
+                        "rows_per_page": 20,
+                        "parent_repeater": "field_bl_hero_slides",
+                        "sub_fields": [
+                            {
+                                "key": "field_bl_hero_slide_link",
+                                "label": "Link",
+                                "name": "link",
+                                "aria-label": "",
+                                "type": "link",
+                                "instructions": "",
+                                "required": 0,
+                                "conditional_logic": 0,
+                                "wrapper": {
+                                    "width": "",
+                                    "class": "",
+                                    "id": ""
+                                },
+                                "return_format": "array",
+                                "allow_in_bindings": 0,
+                                "parent_repeater": "field_bl_hero_slide_links"
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "location": [
+            [
+                {
+                    "param": "post_type",
+                    "operator": "==",
+                    "value": "page"
+                }
+            ]
+        ],
+        "menu_order": 0,
+        "position": "side",
         "style": "default",
         "label_placement": "top",
         "instruction_placement": "label",

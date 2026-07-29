@@ -56,6 +56,7 @@ require_once __DIR__ . '/includes/custom-post-types.php';
 require_once __DIR__ . '/includes/article-list-filters.php';
 require_once __DIR__ . '/includes/exclude-from-search.php';
 require_once __DIR__ . '/includes/page-editor-options.php';
+require_once __DIR__ . '/includes/hero.php';
 
 // Events package (before install wizard so CPT seeding sees event types).
 if (bl_theme_feature_enabled('events')) {
