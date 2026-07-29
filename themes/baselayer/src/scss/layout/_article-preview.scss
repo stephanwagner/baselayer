@@ -48,6 +48,8 @@
 .article-preview__image-container {
   align-self: flex-start;
   flex-shrink: 0;
+  border-radius: var(--bl-border-radius-m);
+  overflow: hidden;
   width: 280px;
 
   @media (max-width: $breakpoint-m) {
@@ -73,7 +75,6 @@
   height: auto;
   object-fit: cover;
   aspect-ratio: 3/2;
-  border-radius: var(--bl-border-radius-m);
 }
 
 .article-preview__content {
