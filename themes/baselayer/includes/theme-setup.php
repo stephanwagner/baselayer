@@ -181,7 +181,7 @@ function bl_excerpt_length(): int
 	if ($opt !== '') {
 		return (int) $opt;
 	}
-	return 60;
+	return 40;
 }
 add_filter('excerpt_length', 'bl_excerpt_length');
 
