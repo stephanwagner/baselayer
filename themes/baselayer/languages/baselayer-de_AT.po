@@ -408,6 +408,18 @@ msgstr "Deine letzten Beiträge"
 msgid "A static page (select below)"
 msgstr "Eine statische Seite (unten auswählen)"
 
+msgid "Privacy page"
+msgstr "Datenschutzseite"
+
+msgid "Used for privacy policy links across the site."
+msgstr "Wird für Links zur Datenschutzerklärung auf der gesamten Website verwendet."
+
+msgid "Contact page"
+msgstr "Kontaktseite"
+
+msgid "Used for contact links across the site."
+msgstr "Wird für Kontakt-Links auf der gesamten Website verwendet."
+
 msgid "Posts per page"
 msgstr "Beiträge pro Seite"
 

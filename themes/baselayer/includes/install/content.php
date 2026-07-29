@@ -458,6 +458,10 @@ function bl_install_create_pages(array $media = []): array
 		update_option('wp_page_for_privacy_policy', (int) $page_ids['privacy']);
 	}
 
+	if (!empty($page_ids['contact'])) {
+		update_option('baselayer_page_for_contact', (int) $page_ids['contact']);
+	}
+
 	return $page_ids;
 }
 

@@ -202,6 +202,8 @@ function bl_theme_settings_save_general_options_from_post(): void
 		'show_on_front' => 'bl_sanitize_show_on_front',
 		'page_on_front' => 'bl_sanitize_homepage_page_id',
 		'page_for_posts' => 'bl_sanitize_homepage_page_id',
+		'wp_page_for_privacy_policy' => 'bl_sanitize_homepage_page_id',
+		'baselayer_page_for_contact' => 'bl_sanitize_homepage_page_id',
 	];
 	foreach ($pairs as $name => $sanitize) {
 		if (!array_key_exists($name, $_POST)) {
@@ -512,6 +514,14 @@ add_action('admin_init', function () {
 	register_setting(BL_THEME_OPTION_GROUP_GENERAL, 'posts_per_page', [
 		'type' => 'integer',
 		'sanitize_callback' => 'bl_sanitize_posts_per_page',
+	]);
+	register_setting(BL_THEME_OPTION_GROUP_GENERAL, 'wp_page_for_privacy_policy', [
+		'type' => 'integer',
+		'sanitize_callback' => 'bl_sanitize_homepage_page_id',
+	]);
+	register_setting(BL_THEME_OPTION_GROUP_GENERAL, 'baselayer_page_for_contact', [
+		'type' => 'integer',
+		'sanitize_callback' => 'bl_sanitize_homepage_page_id',
 	]);
 	register_setting(BL_THEME_OPTION_GROUP_GENERAL, 'baselayer_og_image_fallback', [
 		'type' => 'integer',
@@ -1106,7 +1116,7 @@ function theme_settings_page(): void
 											'name' => 'page_on_front',
 											'id' => 'page_on_front',
 											'echo' => 1,
-											'show_option_none' => __('– Select –', 'default'),
+											'show_option_none' => __('– Select –', 'baselayer'),
 											'option_none_value' => '0',
 											'selected' => (int) get_option('page_on_front'),
 										]);
@@ -1119,7 +1129,7 @@ function theme_settings_page(): void
 											'name' => 'page_for_posts',
 											'id' => 'page_for_posts',
 											'echo' => 1,
-											'show_option_none' => __('– Select –', 'default'),
+											'show_option_none' => __('– Select –', 'baselayer'),
 											'option_none_value' => '0',
 											'selected' => (int) get_option('page_for_posts'),
 										]);
@@ -1127,6 +1137,42 @@ function theme_settings_page(): void
 									</li>
 								</ul>
 							</fieldset>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">
+							<label for="wp_page_for_privacy_policy"><?= esc_html__('Privacy page', 'baselayer') ?></label>
+						</th>
+						<td>
+							<?php
+							wp_dropdown_pages([
+								'name' => 'wp_page_for_privacy_policy',
+								'id' => 'wp_page_for_privacy_policy',
+								'echo' => 1,
+								'show_option_none' => __('– Select –', 'baselayer'),
+								'option_none_value' => '0',
+								'selected' => (int) get_option('wp_page_for_privacy_policy'),
+							]);
+							?>
+							<p class="description"><?= esc_html__('Used for privacy policy links across the site.', 'baselayer') ?></p>
+						</td>
+					</tr>
+					<tr>
+						<th scope="row">
+							<label for="baselayer_page_for_contact"><?= esc_html__('Contact page', 'baselayer') ?></label>
+						</th>
+						<td>
+							<?php
+							wp_dropdown_pages([
+								'name' => 'baselayer_page_for_contact',
+								'id' => 'baselayer_page_for_contact',
+								'echo' => 1,
+								'show_option_none' => __('– Select –', 'baselayer'),
+								'option_none_value' => '0',
+								'selected' => (int) get_option('baselayer_page_for_contact'),
+							]);
+							?>
+							<p class="description"><?= esc_html__('Used for contact links across the site.', 'baselayer') ?></p>
 						</td>
 					</tr>
 					<tr>

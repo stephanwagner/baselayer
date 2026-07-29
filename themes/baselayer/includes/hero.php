@@ -16,10 +16,21 @@ function bl_hero_is_enabled(?int $post_id = null): bool
 }
 
 /**
- * URL of the Contact page (install slug contact / kontakt), or ''.
+ * URL of the Contact page (Theme setting, then install slug fallback), or ''.
  */
 function bl_hero_contact_page_url(): string
 {
+	$contact_id = (int) get_option('baselayer_page_for_contact', 0);
+	if ($contact_id > 0) {
+		$page = get_post($contact_id);
+		if ($page instanceof WP_Post && $page->post_type === 'page' && $page->post_status === 'publish') {
+			$url = get_permalink($page);
+			if (is_string($url) && $url !== '') {
+				return $url;
+			}
+		}
+	}
+
 	$slugs = apply_filters('bl_hero_contact_page_slugs', ['contact', 'kontakt']);
 	if (!is_array($slugs)) {
 		$slugs = ['contact', 'kontakt'];
