@@ -166,7 +166,7 @@ function bl_admin_access_defaults(): array
     'options_reading' => ['admin' => 0, 'developer' => 1],
     'options_media' => ['admin' => 0, 'developer' => 1],
     'options_permalink' => ['admin' => 0, 'developer' => 1],
-    'options_connectors' => ['admin' => 1, 'developer' => 1],
+    'options_connectors' => ['admin' => 0, 'developer' => 1],
     'options_privacy' => ['admin' => 1, 'developer' => 1],
     'tools' => ['admin' => 0, 'developer' => 1],
     'themes' => ['admin' => 0, 'developer' => 1],
