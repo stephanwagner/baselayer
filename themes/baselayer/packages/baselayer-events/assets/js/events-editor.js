@@ -1019,10 +1019,35 @@
       });
       return Object.keys(clean).length ? JSON.stringify(clean) : "";
     }
+    function stripUrlScheme(value) {
+      return String(value || "").trim().replace(/^(https?:)?\/\//i, "").replace(/^\/+/, "");
+    }
+    function forceHttpsUrl(value) {
+      const host = stripUrlScheme(value);
+      return host !== "" ? "https://" + host : "";
+    }
+    function normalizeUrlFields(config, data) {
+      const next = JSON.parse(JSON.stringify(data || {}));
+      const groups = config && config.groups || {};
+      Object.keys(groups).forEach(function(groupId) {
+        const fields = groups[groupId] && groups[groupId].fields ? groups[groupId].fields : {};
+        Object.keys(fields).forEach(function(fieldId) {
+          if (fields[fieldId].type !== "url") {
+            return;
+          }
+          const row = next[groupId] || {};
+          if (row[fieldId] != null && String(row[fieldId]).trim() !== "") {
+            row[fieldId] = forceHttpsUrl(row[fieldId]);
+            next[groupId] = row;
+          }
+        });
+      });
+      return next;
+    }
     function MetadataModal(props) {
       const { config, initialData, onSave, onRequestClose } = props;
       const [draft, setDraft] = useState(function() {
-        return JSON.parse(JSON.stringify(initialData || {}));
+        return normalizeUrlFields(config, initialData || {});
       });
       function setField(groupId, fieldId, value) {
         const next = Object.assign({}, draft);
@@ -1090,8 +1115,26 @@
                           setField(groupId, fieldId, v);
                         }
                       });
+                    } else if (field.type === "url") {
+                      control = el(
+                        "div",
+                        { className: "bl-event-metadata-modal__url" },
+                        el("span", { className: "bl-event-metadata-modal__url-prefix", "aria-hidden": "true" }, "https://"),
+                        el(TextControl, {
+                          hideLabelFromVision: true,
+                          label,
+                          type: "text",
+                          className: "bl-event-metadata-modal__url-input",
+                          value: stripUrlScheme(value),
+                          help: help || void 0,
+                          placeholder: field.placeholder || "",
+                          onChange: function(v) {
+                            setField(groupId, fieldId, forceHttpsUrl(v));
+                          }
+                        })
+                      );
                     } else {
-                      const inputType = field.type === "email" ? "email" : field.type === "url" ? "url" : field.type === "number" ? "number" : field.type === "phone" ? "tel" : "text";
+                      const inputType = field.type === "email" ? "email" : field.type === "number" ? "number" : field.type === "phone" ? "tel" : "text";
                       control = el(TextControl, {
                         hideLabelFromVision: true,
                         label,
@@ -1128,7 +1171,7 @@
               {
                 variant: "primary",
                 onClick: function() {
-                  onSave(encodeMetadata(draft));
+                  onSave(encodeMetadata(normalizeUrlFields(config, draft)));
                   onRequestClose();
                 }
               },

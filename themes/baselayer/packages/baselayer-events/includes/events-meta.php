@@ -101,6 +101,26 @@ function bl_event_has_meta_config(?string $post_type = null): bool
 }
 
 /**
+ * Normalize a metadata URL to https (strip http/https,// then re-prefix).
+ */
+function bl_event_force_https_url(string $value): string
+{
+	$value = trim($value);
+	if ($value === '') {
+		return '';
+	}
+
+	$value = preg_replace('#^(https?:)?//#i', '', $value) ?? $value;
+	$value = ltrim($value, '/');
+	if ($value === '') {
+		return '';
+	}
+
+	$url = esc_url_raw('https://' . $value);
+	return is_string($url) ? $url : '';
+}
+
+/**
  * Sanitize metadata payload against the CPT schema.
  *
  * @param mixed $raw
@@ -135,7 +155,7 @@ function bl_event_sanitize_metadata($raw, ?string $post_type = null): array
 			if ($type === 'email') {
 				$value = $value !== '' ? sanitize_email($value) : '';
 			} elseif ($type === 'url') {
-				$value = $value !== '' ? esc_url_raw($value) : '';
+				$value = $value !== '' ? bl_event_force_https_url($value) : '';
 			} elseif ($type === 'textarea') {
 				$value = sanitize_textarea_field($value);
 			} elseif ($type === 'number') {
