@@ -58,6 +58,7 @@ require_once __DIR__ . '/includes/exclude-from-search.php';
 require_once __DIR__ . '/includes/page-editor-options.php';
 require_once __DIR__ . '/includes/hero.php';
 require_once __DIR__ . '/includes/notices.php';
+require_once __DIR__ . '/includes/password-form.php';
 
 // Events package (before install wizard so CPT seeding sees event types).
 if (bl_theme_feature_enabled('events')) {

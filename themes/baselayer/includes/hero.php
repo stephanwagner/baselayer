@@ -11,6 +11,9 @@ function bl_hero_is_enabled(?int $post_id = null): bool
 	if ($post_id <= 0 || !function_exists('get_field')) {
 		return false;
 	}
+	if (post_password_required($post_id)) {
+		return false;
+	}
 
 	return (bool) get_field('hero_enabled', $post_id);
 }

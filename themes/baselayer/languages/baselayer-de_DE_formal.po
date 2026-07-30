@@ -1801,6 +1801,19 @@ msgstr "Scan-Ergebnisse abgelaufen. Bitte erneut scannen."
 msgid "You do not have permission to run Media Cleanup."
 msgstr "Du hast keine Berechtigung, Medien zu bereinigen."
 
+msgid "Protected content"
+msgstr "Geschützter Inhalt"
+
+msgid "This content is password-protected. Enter the password to view it."
+msgstr "Dieser Inhalt ist passwortgeschützt. Gib das Passwort ein, um die Seite zu betreten."
+
+msgid "Continue"
+msgstr "Weiter"
+
+msgctxt "post password form"
+msgid "Enter"
+msgstr "Eingeben"
+
 msgid "Asset version increased to %s."
 msgstr "Cache-Version auf %s erhöht."
 
