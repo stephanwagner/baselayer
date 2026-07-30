@@ -194,7 +194,8 @@
             { filename: "code", alternatives: [], keywords: ["code", "developer", "markup"] },
             { filename: "code-slash", alternatives: [], keywords: ["code", "developer", "slash", "programming"] },
             { filename: "book", alternatives: ["fill"], keywords: ["read", "library", "publication"] },
-            { filename: "book-open", alternatives: ["fill"], keywords: ["read", "open", "library", "publication"] }
+            { filename: "book-open", alternatives: ["fill"], keywords: ["read", "open", "library", "publication"] },
+            { filename: "fact-check", alternatives: ["fill"], keywords: ["fact", "check", "verify", "review", "checklist", "approved", "document"] }
           ]
         },
         {

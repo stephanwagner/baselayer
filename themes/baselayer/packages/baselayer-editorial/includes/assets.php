@@ -81,6 +81,8 @@ add_action('admin_enqueue_scripts', 'bl_editorial_enqueue_admin_assets');
  */
 function bl_editorial_enqueue_editor_assets(): void
 {
+	bl_editorial_enqueue_style('bl-editorial-editor', 'editorial-editor');
+
 	if (!bl_editorial_enqueue_script(
 		'bl-editorial-editor',
 		'editorial-editor',

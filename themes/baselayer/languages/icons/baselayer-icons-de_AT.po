@@ -2220,6 +2220,10 @@ msgid "Traffic light"
 msgstr "Ampel"
 
 msgctxt "icon name"
+msgid "Fact check"
+msgstr "Faktencheck"
+
+msgctxt "icon name"
 msgid "Factory"
 msgstr "Fabrik"
 

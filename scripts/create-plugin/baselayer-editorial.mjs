@@ -68,7 +68,7 @@ async function main() {
 
   console.log('Building editorial assets…');
   await run('node', ['scripts/build-js.mjs', '--filter', 'editorial-admin,editorial-editor']);
-  await run('node', ['scripts/build-css.mjs', '--filter', 'editorial-admin']);
+  await run('node', ['scripts/build-css.mjs', '--filter', 'editorial-admin,editorial-editor']);
 
   console.log('Compiling translations…');
   await run('bash', ['scripts/compile_po.sh']);

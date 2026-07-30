@@ -160,6 +160,7 @@ function bl_icon_labels(): array
 		'asterix'                => _x('Asterisk', 'icon name', 'baselayer-icons'),
 		'document-person'        => _x('Document person', 'icon name', 'baselayer-icons'),
 		'document-scan'          => _x('Document scan', 'icon name', 'baselayer-icons'),
+		'fact-check'             => _x('Fact check', 'icon name', 'baselayer-icons'),
 		'two-pager'              => _x('Two pager', 'icon name', 'baselayer-icons'),
 		'book'                   => _x('Book', 'icon name', 'baselayer-icons'),
 		'book-open'              => _x('Book open', 'icon name', 'baselayer-icons'),

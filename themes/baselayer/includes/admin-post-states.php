@@ -25,7 +25,7 @@ function bl_admin_post_state_config(): array
 			'label' => _x('Draft', 'post status', 'baselayer'),
 		],
 		'pending' => [
-			'icon' => 'editor-choice',
+			'icon' => 'fact-check',
 			'modifier' => 'pending',
 			'label' => _x('Pending', 'post status', 'baselayer'),
 		],
