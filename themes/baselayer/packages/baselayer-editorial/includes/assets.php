@@ -89,7 +89,13 @@ function bl_editorial_enqueue_editor_assets(): void
 		return;
 	}
 
+	$user_id = get_current_user_id();
+	$requires_approval = $user_id > 0 && bl_editorial_user_requires_approval($user_id);
+
 	wp_localize_script('bl-editorial-editor', 'blEditorialEditor', [
+		'requiresApproval' => $requires_approval,
+		'canUpdatePublished' => true,
+		'liveStatuses' => ['publish', 'future'],
 		'i18n' => [
 			'pendingLabel' => __('Editorial', 'baselayer-editorial'),
 			'pendingText'  => __('Pending review — awaiting approval', 'baselayer-editorial'),

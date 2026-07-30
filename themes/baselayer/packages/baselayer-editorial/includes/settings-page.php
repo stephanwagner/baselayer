@@ -80,7 +80,7 @@ function bl_editorial_render_rights_fields(array $rights, string $name, array $a
 						<?= esc_html__('Require approval', 'baselayer-editorial') ?>
 					</label>
 				</fieldset>
-				<p class="description"><?= esc_html__('When approval is required, editors can save drafts and submit for review. Content stays pending until an administrator publishes it.', 'baselayer-editorial') ?></p>
+				<p class="description"><?= esc_html__('New drafts must be submitted for review. Edits to already-published content go live immediately.', 'baselayer-editorial') ?></p>
 			</td>
 		</tr>
 		<?php if ($show_pages) :

@@ -9,11 +9,14 @@
     const el = wp.element.createElement;
     const { registerPlugin } = wp.plugins;
     const { PluginPostStatusInfo } = wp.editor;
-    const { useSelect } = wp.data;
-    const labels = typeof window.blEditorialEditor !== "undefined" && window.blEditorialEditor.i18n ? window.blEditorialEditor.i18n : {};
+    const { useSelect, subscribe, select, dispatch } = wp.data;
+    const cfg = typeof window.blEditorialEditor !== "undefined" ? window.blEditorialEditor : {};
+    const labels = cfg.i18n || {};
+    const liveStatuses = Array.isArray(cfg.liveStatuses) ? cfg.liveStatuses : ["publish", "future"];
+    const requiresApproval = !!cfg.requiresApproval;
     function EditorialPendingStatus() {
-      const status = useSelect((select) => {
-        const editor = select("core/editor");
+      const status = useSelect((sel) => {
+        const editor = sel("core/editor");
         if (!editor || typeof editor.getEditedPostAttribute !== "function") {
           return "";
         }
@@ -40,6 +43,36 @@
     registerPlugin("baselayer-editorial-status", {
       render: EditorialPendingStatus
     });
+    if (requiresApproval && typeof subscribe === "function") {
+      let syncing = false;
+      subscribe(() => {
+        if (syncing) {
+          return;
+        }
+        const editor = select("core/editor");
+        if (!editor || typeof editor.getCurrentPostAttribute !== "function") {
+          return;
+        }
+        const savedStatus = editor.getCurrentPostAttribute("status") || "";
+        if (liveStatuses.indexOf(savedStatus) === -1) {
+          return;
+        }
+        const editedStatus = editor.getEditedPostAttribute("status") || "";
+        if (editedStatus === savedStatus) {
+          return;
+        }
+        const edits = dispatch("core/editor");
+        if (!edits || typeof edits.editPost !== "function") {
+          return;
+        }
+        syncing = true;
+        try {
+          edits.editPost({ status: savedStatus }, { undoIgnore: true });
+        } finally {
+          syncing = false;
+        }
+      });
+    }
   })();
 })();
 //# sourceMappingURL=editorial-editor.js.map
