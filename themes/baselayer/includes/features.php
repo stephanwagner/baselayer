@@ -19,6 +19,7 @@ function bl_theme_feature_defaults(): array
 		'enable_post_expirator'     => 1,
 		'enable_forms'              => 1,
 		'enable_events'             => 1,
+		'enable_editorial'          => 0,
 		'enable_languages'          => 0,
 		'language_mode'             => 'content',
 		'enable_blocked_ips'        => 1,
@@ -37,7 +38,7 @@ function bl_theme_feature_defaults(): array
  */
 function bl_theme_feature_default_off_when_missing(): array
 {
-	return ['enable_languages', 'enable_webp', 'enable_webp_convert_original', 'enable_matomo', 'enable_block_creator'];
+	return ['enable_languages', 'enable_editorial', 'enable_webp', 'enable_webp_convert_original', 'enable_matomo', 'enable_block_creator'];
 }
 
 /**
@@ -56,6 +57,7 @@ function bl_theme_feature_option_keys_map(): array
 		'post_expirator'          => 'enable_post_expirator',
 		'forms'                   => 'enable_forms',
 		'events'                  => 'enable_events',
+		'editorial'               => 'enable_editorial',
 		'languages'               => 'enable_languages',
 		'blocked_ips'             => 'enable_blocked_ips',
 		'webp'                    => 'enable_webp',

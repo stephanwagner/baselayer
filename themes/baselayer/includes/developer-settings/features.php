@@ -246,6 +246,19 @@ function bl_render_developer_features(): void
 
 				<table class="form-table" role="presentation">
 					<tr>
+						<th scope="row" class="form-table-checkbox-label"><?= esc_html__('Editorial', 'baselayer') ?></th>
+						<td>
+							<input type="hidden" name="baselayer_features[enable_editorial]" value="0">
+							<label><input type="checkbox" name="baselayer_features[enable_editorial]" value="1" <?= checked($feat('enable_editorial'), 1, false) ?>> <?= esc_html__('Enable editorial rights', 'baselayer') ?></label>
+							<p class="description bl-indent-checkbox"><?= esc_html__('Per-editor content access, publishing approval, page allowlists, and media restrictions. Configure under Developer → Editorial and on editor profiles.', 'baselayer') ?></p>
+						</td>
+					</tr>
+				</table>
+
+				<hr>
+
+				<table class="form-table" role="presentation">
+					<tr>
 						<th scope="row" class="form-table-checkbox-label">
 							<?= esc_html__('Block Creator', 'baselayer') ?>
 							<span class="bl-feature-beta"><?= esc_html__('Beta', 'baselayer') ?></span>

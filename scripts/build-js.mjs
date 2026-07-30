@@ -7,6 +7,7 @@ const { themeDir } = require('./config.cjs');
 
 const formsPkg = 'themes/baselayer/packages/baselayer-forms';
 const eventsPkg = 'themes/baselayer/packages/baselayer-events';
+const editorialPkg = 'themes/baselayer/packages/baselayer-editorial';
 
 const themeBundles = [
   { input: `${themeDir}/src/js/main/main.js`, name: 'baselayer', outDir: `${themeDir}/assets/js` },
@@ -62,7 +63,12 @@ const eventsBundles = [
   { input: `${eventsPkg}/src/js/settings.js`, name: 'events-settings', outDir: `${eventsPkg}/assets/js` }
 ];
 
-const bundles = [...themeBundles, ...formsBundles, ...eventsBundles];
+const editorialBundles = [
+  { input: `${editorialPkg}/src/js/admin.js`, name: 'editorial-admin', outDir: `${editorialPkg}/assets/js` },
+  { input: `${editorialPkg}/src/js/editor.js`, name: 'editorial-editor', outDir: `${editorialPkg}/assets/js` }
+];
+
+const bundles = [...themeBundles, ...formsBundles, ...eventsBundles, ...editorialBundles];
 
 function parseFilter() {
   const idx = process.argv.indexOf('--filter');

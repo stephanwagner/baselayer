@@ -16,21 +16,31 @@ const BL_DEVELOPER_TABS_BASE = [
 	'security' => ['label' => 'Sicherheit'],
 ];
 
-/** Tab definitions: base tabs + Languages (before Security) when feature is on. */
+/** Tab definitions: base tabs + Languages / Editorial when features are on. */
 function bl_developer_settings_available_tabs(): array
 {
 	$tabs = BL_DEVELOPER_TABS_BASE;
+	$inject = [];
 	if (function_exists('bl_theme_feature_enabled') && bl_theme_feature_enabled('languages')) {
-		$out = [];
-		foreach ($tabs as $key => $val) {
-			if ($key === 'security') {
-				$out['languages'] = ['label' => 'Sprachen'];
-			}
-			$out[$key] = $val;
-		}
-		$tabs = $out;
+		$inject['languages'] = ['label' => 'Sprachen'];
 	}
-	return $tabs;
+	if (function_exists('bl_theme_feature_enabled') && bl_theme_feature_enabled('editorial')) {
+		$inject['editorial'] = ['label' => 'Editorial'];
+	}
+	if ($inject === []) {
+		return $tabs;
+	}
+
+	$out = [];
+	foreach ($tabs as $key => $val) {
+		if ($key === 'security') {
+			foreach ($inject as $ik => $iv) {
+				$out[$ik] = $iv;
+			}
+		}
+		$out[$key] = $val;
+	}
+	return $out;
 }
 
 /**
