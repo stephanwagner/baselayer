@@ -191,6 +191,12 @@ function bl_editorial_sanitize_rights($raw): array
 		$page_ids = [];
 	}
 
+	// Page access only applies when pages are editable.
+	if (!in_array('page', $post_types, true)) {
+		$page_access = 'all';
+		$page_ids = [];
+	}
+
 	return [
 		'post_types'       => $post_types,
 		'own_posts_only'   => !empty($raw['own_posts_only']),
@@ -314,15 +320,8 @@ function bl_editorial_denied_primitive_caps(int $user_id): array
 		}
 	}
 
-	if ($rights['page_access'] === 'selected' && in_array('page', $allowed_types, true)) {
-		$page_obj = get_post_type_object('page');
-		if ($page_obj) {
-			$create = $page_obj->cap->create_posts ?? 'edit_pages';
-			if ($create !== '') {
-				$denied[] = $create;
-			}
-		}
-	}
+	// Do NOT deny create_posts for page allowlists: for pages, create_posts === edit_pages,
+	// which would block the entire Pages menu/list. Add New is blocked via menu + admin_init.
 
 	$denied = array_values(array_unique($denied));
 	$cache['denied'][$user_id] = $denied;

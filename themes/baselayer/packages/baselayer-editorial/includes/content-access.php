@@ -196,14 +196,26 @@ function bl_editorial_pre_get_posts(WP_Query $query): void
 
 	$post_type = $query->get('post_type');
 	if (is_array($post_type)) {
-		$post_type = $post_type[0] ?? 'post';
+		$post_type = $post_type[0] ?? '';
 	}
-	$post_type = $post_type ? (string) $post_type : 'post';
+	$post_type = is_string($post_type) ? $post_type : '';
+	if ($post_type === '') {
+		global $typenow, $pagenow;
+		if (!empty($typenow) && is_string($typenow)) {
+			$post_type = $typenow;
+		} elseif ($pagenow === 'edit.php' && isset($_GET['post_type'])) {
+			$post_type = sanitize_key((string) $_GET['post_type']);
+		} else {
+			$post_type = 'post';
+		}
+	}
 
 	if ($post_type === 'page') {
 		$allowed = bl_editorial_user_allowed_page_ids($user_id);
 		if (is_array($allowed)) {
-			$query->set('post__in', $allowed === [] ? [0] : $allowed);
+			// Keep list usable: only allowlisted IDs (empty allowlist → no pages).
+			$query->set('post__in', $allowed === [] ? [0] : array_map('intval', $allowed));
+			$query->set('orderby', 'post__in');
 		}
 	}
 

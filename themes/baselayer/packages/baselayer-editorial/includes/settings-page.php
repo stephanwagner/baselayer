@@ -83,8 +83,10 @@ function bl_editorial_render_rights_fields(array $rights, string $name, array $a
 				<p class="description"><?= esc_html__('When approval is required, editors can save drafts and submit for review. Content stays pending until an administrator publishes it.', 'baselayer-editorial') ?></p>
 			</td>
 		</tr>
-		<?php if ($show_pages) : ?>
-		<tr class="bl-editorial-page-access-row">
+		<?php if ($show_pages) :
+			$pages_enabled = in_array('page', $selected_types, true);
+			?>
+		<tr class="bl-editorial-page-access-row" <?= $pages_enabled ? '' : 'hidden' ?>>
 			<th scope="row"><?= esc_html__('Page access', 'baselayer-editorial') ?></th>
 			<td>
 				<fieldset>
@@ -95,6 +97,7 @@ function bl_editorial_render_rights_fields(array $rights, string $name, array $a
 							value="all"
 							class="bl-editorial-page-access"
 							<?= checked($page_access === 'all', true, false) ?>
+							<?= $pages_enabled ? '' : 'disabled' ?>
 						>
 						<?= esc_html__('All pages', 'baselayer-editorial') ?>
 					</label>
@@ -105,12 +108,13 @@ function bl_editorial_render_rights_fields(array $rights, string $name, array $a
 							value="selected"
 							class="bl-editorial-page-access"
 							<?= checked($page_access === 'selected', true, false) ?>
+							<?= $pages_enabled ? '' : 'disabled' ?>
 						>
 						<?= esc_html__('Selected pages…', 'baselayer-editorial') ?>
 					</label>
 				</fieldset>
-				<div class="bl-editorial-page-picker-wrap" <?= $page_access === 'selected' ? '' : 'hidden' ?>>
-					<button type="button" class="button bl-editorial-pick-pages">
+				<div class="bl-editorial-page-picker-wrap" <?= ($pages_enabled && $page_access === 'selected') ? '' : 'hidden' ?>>
+					<button type="button" class="button bl-editorial-pick-pages" <?= $pages_enabled ? '' : 'disabled' ?>>
 						<?= esc_html__('Choose pages', 'baselayer-editorial') ?>
 					</button>
 					<ul class="bl-editorial-selected-pages" data-empty="<?= esc_attr__('No pages selected.', 'baselayer-editorial') ?>">
@@ -122,7 +126,7 @@ function bl_editorial_render_rights_fields(array $rights, string $name, array $a
 							}
 							?>
 							<li class="bl-editorial-selected-pages__chip" data-id="<?= (int) $page_id ?>">
-								<input type="hidden" name="<?= esc_attr($name) ?>[allowed_page_ids][]" value="<?= (int) $page_id ?>">
+								<input type="hidden" name="<?= esc_attr($name) ?>[allowed_page_ids][]" value="<?= (int) $page_id ?>" <?= $pages_enabled ? '' : 'disabled' ?>>
 								<span class="bl-editorial-selected-pages__title"><?= esc_html($title) ?></span>
 								<button type="button" class="button-link bl-editorial-remove-page" aria-label="<?= esc_attr__('Remove', 'baselayer-editorial') ?>">&times;</button>
 							</li>

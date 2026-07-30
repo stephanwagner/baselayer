@@ -15,7 +15,27 @@ import { openPagePicker, renderPageSelectionChips } from './admin/page-picker.js
     const selected = root.querySelector('.bl-editorial-page-access[value="selected"]');
     const wrap = root.querySelector('.bl-editorial-page-picker-wrap');
     if (!wrap) return;
-    wrap.hidden = !(selected && selected.checked);
+    const pagesEnabled = isPagesPostTypeEnabled(root);
+    wrap.hidden = !(pagesEnabled && selected && selected.checked);
+  }
+
+  function isPagesPostTypeEnabled(root) {
+    const pageType = root.querySelector('.bl-editorial-post-type[value="page"]');
+    return !!(pageType && pageType.checked);
+  }
+
+  function syncPageAccessRow(root) {
+    if (!root) return;
+    const row = root.querySelector('.bl-editorial-page-access-row');
+    if (!row) return;
+    const enabled = isPagesPostTypeEnabled(root);
+    row.hidden = !enabled;
+    row.querySelectorAll('input, button').forEach((el) => {
+      if (el instanceof HTMLInputElement || el instanceof HTMLButtonElement) {
+        el.disabled = !enabled;
+      }
+    });
+    syncPageAccess(root);
   }
 
   function renderSelectedList(list, pages, inputName) {
@@ -69,6 +89,9 @@ import { openPagePicker, renderPageSelectionChips } from './admin/page-picker.js
 
     fields.hidden = !toggle.checked;
     setRightsFieldsDisabled(fields, !toggle.checked);
+    if (toggle.checked) {
+      syncPageAccessRow(fields);
+    }
 
     // First enable (no saved rights yet): fill from site defaults.
     if (
@@ -99,6 +122,11 @@ import { openPagePicker, renderPageSelectionChips } from './admin/page-picker.js
 
     if (target.classList.contains('bl-editorial-page-access')) {
       syncPageAccess(closestRightsRoot(target));
+      return;
+    }
+
+    if (target.classList.contains('bl-editorial-post-type')) {
+      syncPageAccessRow(closestRightsRoot(target));
     }
   });
 
@@ -199,7 +227,7 @@ import { openPagePicker, renderPageSelectionChips } from './admin/page-picker.js
       renderSelectedList(list, pages, 'bl_editorial_rights[allowed_page_ids][]');
     }
 
-    syncPageAccess(root.querySelector('[data-bl-editorial-rights]'));
+    syncPageAccessRow(root.querySelector('[data-bl-editorial-rights]') || root);
 
     if (!options.keepEnableState) {
       const enable = document.getElementById('bl-editorial-enable-rights');
@@ -209,11 +237,12 @@ import { openPagePicker, renderPageSelectionChips } from './admin/page-picker.js
       }
     } else {
       setRightsFieldsDisabled(root, false);
+      syncPageAccessRow(root.querySelector('[data-bl-editorial-rights]') || root);
     }
   }
 
   document.querySelectorAll('[data-bl-editorial-rights]').forEach((root) => {
-    syncPageAccess(root);
+    syncPageAccessRow(root);
     const list = root.querySelector('.bl-editorial-selected-pages');
     if (list && !list.querySelector('li[data-id]')) {
       renderSelectedList(list, [], inputNameForList(list));
