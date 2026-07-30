@@ -1454,6 +1454,7 @@ function bl_event_pre_trash_occurrence($check, $post, $previous_status)
 
 /**
  * Trash master → force-delete all occurrence children (never leave them in Trash).
+ * Keep EXDATEs on the master so untrash does not recreate soft-deleted or standalone dates.
  */
 function bl_event_on_master_trashed(int $post_id): void
 {
@@ -1471,12 +1472,49 @@ function bl_event_on_master_trashed(int $post_id): void
 	foreach (bl_event_get_occurrence_ids_including_trash($post_id) as $oid) {
 		wp_delete_post($oid, true);
 	}
-	bl_event_clear_exdates($post_id);
 	$GLOBALS['bl_event_syncing'] = false;
 }
 
 /**
- * Untrash master → rebuild occurrence window via sync.
+ * Ensure EXDATEs still cover every standalone event that left this master.
+ * Heals masters whose EXDATEs were wiped by older trash handling.
+ */
+function bl_event_reapply_standalone_exdates(int $master_id): void
+{
+	if ($master_id <= 0 || !bl_is_event_post_type(get_post_type($master_id))) {
+		return;
+	}
+	$post_type = get_post_type($master_id);
+	if (!$post_type) {
+		return;
+	}
+
+	$ids = get_posts([
+		'post_type' => $post_type,
+		'post_status' => ['publish', 'draft', 'pending', 'future', 'private'],
+		'posts_per_page' => -1,
+		'fields' => 'ids',
+		'no_found_rows' => true,
+		'meta_query' => [
+			[
+				'key' => BL_EVENT_META_STANDALONE_FROM,
+				'value' => $master_id,
+				'compare' => '=',
+				'type' => 'NUMERIC',
+			],
+		],
+	]);
+
+	foreach ($ids as $oid) {
+		$start = get_post_meta((int) $oid, BL_EVENT_META_START_DATE, true);
+		if (is_string($start) && preg_match('/^\d{4}-\d{2}-\d{2}$/', $start)) {
+			bl_event_add_exdate($master_id, $start);
+		}
+	}
+}
+
+/**
+ * Untrash master → rebuild occurrence window via sync (EXDATEs + standalones preserved).
  */
 function bl_event_on_master_untrashed(int $post_id): void
 {
@@ -1493,6 +1531,7 @@ function bl_event_on_master_untrashed(int $post_id): void
 		return;
 	}
 
+	bl_event_reapply_standalone_exdates($post_id);
 	bl_event_sync_series($post_id);
 	bl_event_sync_series_content($post_id);
 }
