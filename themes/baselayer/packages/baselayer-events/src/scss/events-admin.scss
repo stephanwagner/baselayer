@@ -143,6 +143,11 @@
   color: #50575e;
 }
 
+.bl-event-occurrences-modal__badge--standalone {
+  background: #e7f5ef;
+  color: #1e6b45;
+}
+
 .bl-event-occurrences-modal__badge--status {
   background: color-mix(in srgb, var(--bl-status-color, var(--bl-color-info, #366cd9)) 16%, #fff);
   color: var(--bl-status-color, var(--bl-color-info, #366cd9));
@@ -341,7 +346,18 @@
   margin: 0 0 10px;
 }
 
-.bl-event-recurring__detached {
+.bl-event-recurring__header {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: space-between;
+
+  .bl-event-recurring__heading {
+    margin: 0;
+  }
+}
+
+.bl-event-recurring__customized {
   margin: 10px 0;
   padding: 8px 10px;
 

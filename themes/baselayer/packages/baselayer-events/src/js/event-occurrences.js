@@ -204,9 +204,11 @@
       const range = item.range_text || item.start_date || '';
       const edit = item.edit_link || '';
       const deleted = !!item.deleted;
+      const standalone = !!item.standalone;
       html +=
         '<li class="bl-event-occurrences-modal__item' +
         (deleted ? ' is-deleted' : '') +
+        (standalone ? ' is-standalone' : '') +
         '">';
       html += '<div class="bl-event-occurrences-modal__item-main">';
       html += '<span class="bl-event-occurrences-modal__date">' + escapeHtml(range) + '</span>';
@@ -215,10 +217,15 @@
           ' <span class="bl-event-occurrences-modal__badge bl-event-occurrences-modal__badge--deleted">' +
           escapeHtml(L.deletedLabel || 'Deleted') +
           '</span>';
-      } else if (item.detached) {
+      } else if (standalone) {
+        html +=
+          ' <span class="bl-event-occurrences-modal__badge bl-event-occurrences-modal__badge--standalone">' +
+          escapeHtml(L.standaloneLabel || 'Standalone') +
+          '</span>';
+      } else if (item.customized) {
         html +=
           ' <span class="bl-event-occurrences-modal__badge">' +
-          escapeHtml(L.customContent || 'Custom content') +
+          escapeHtml(L.customContent || 'Customized') +
           '</span>';
       }
       if (!deleted && item.status_key && item.status_key !== 'active' && item.status_label) {
@@ -247,12 +254,12 @@
             escapeHtml(L.editLabel || 'Edit') +
             '</a>';
         }
-        if (item.id) {
+        if (item.id && !standalone) {
           html +=
             '<button type="button" class="button-link bl-event-occurrences-modal__delete" data-bl-occ-delete data-occurrence-id="' +
             escapeAttr(String(item.id)) +
-            '" data-detached="' +
-            (item.detached ? '1' : '0') +
+            '" data-customized="' +
+            (item.customized ? '1' : '0') +
             '">' +
             escapeHtml(L.deleteLabel || 'Delete') +
             '</button>';
@@ -338,9 +345,9 @@
     if (!occurrenceId) {
       return;
     }
-    const detached = btn.getAttribute('data-detached') === '1';
-    const msg = detached
-      ? L.deleteDetachedConfirm || L.deleteConfirm || 'Delete this occurrence?'
+    const customized = btn.getAttribute('data-customized') === '1';
+    const msg = customized
+      ? L.deleteCustomizedConfirm || L.deleteConfirm || 'Delete this occurrence?'
       : L.deleteConfirm || 'Delete this occurrence?';
 
     openConfirm(msg, function () {

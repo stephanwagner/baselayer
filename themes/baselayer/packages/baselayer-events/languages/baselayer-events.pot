@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-30T09:28:43+00:00\n"
+"POT-Creation-Date: 2026-07-30T10:10:54+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: baselayer-events\n"
@@ -76,7 +76,7 @@ msgid "Recurring"
 msgstr ""
 
 #: includes/assets.php:86
-#: includes/events-recurrence.php:529
+#: includes/events-recurrence.php:605
 msgid "Not repeating"
 msgstr ""
 
@@ -111,11 +111,11 @@ msgid "%d occurrence"
 msgstr ""
 
 #: includes/assets.php:94
-msgid "This occurrence has custom content."
+msgid "Some fields are customized."
 msgstr ""
 
 #: includes/assets.php:95
-msgid "It will not update when the master event changes."
+msgid "Changed fields keep your edits when the master updates. This date is still removed if it leaves the series."
 msgstr ""
 
 #: includes/assets.php:96
@@ -123,306 +123,322 @@ msgid "Revert to master"
 msgstr ""
 
 #: includes/assets.php:97
-msgid "Recurrence settings"
+msgid "Make standalone event"
 msgstr ""
 
 #: includes/assets.php:98
-msgid "Repeats"
+msgid "Remove this date from the series and keep it as its own event? It will no longer update with the series."
 msgstr ""
 
 #: includes/assets.php:99
-msgid "Every"
+msgid "More options"
 msgstr ""
 
 #: includes/assets.php:100
-msgid "On weekday"
+msgid "Recurrence settings"
 msgstr ""
 
 #: includes/assets.php:101
-msgid "Ends"
+msgid "Repeats"
 msgstr ""
 
 #: includes/assets.php:102
-msgid "Never"
+msgid "Every"
 msgstr ""
 
 #: includes/assets.php:103
-msgid "On date"
+msgid "On weekday"
 msgstr ""
 
 #: includes/assets.php:104
-msgid "After"
+msgid "Ends"
 msgstr ""
 
 #: includes/assets.php:105
-msgid "occurrences"
+msgid "Never"
 msgstr ""
 
 #: includes/assets.php:106
-msgid "Next occurrences"
+msgid "On date"
 msgstr ""
 
 #: includes/assets.php:107
+msgid "After"
+msgstr ""
+
+#: includes/assets.php:108
+msgid "occurrences"
+msgstr ""
+
+#: includes/assets.php:109
+msgid "Next occurrences"
+msgstr ""
+
+#: includes/assets.php:110
 #, php-format
 msgid "+%d more"
 msgstr ""
 
-#: includes/assets.php:108
-#: includes/assets.php:181
+#: includes/assets.php:111
+#: includes/assets.php:185
 #: includes/settings-page.php:515
 #: includes/settings-page.php:543
 msgid "Cancel"
 msgstr ""
 
-#: includes/assets.php:109
+#: includes/assets.php:112
 msgid "Save"
 msgstr ""
 
-#: includes/assets.php:110
+#: includes/assets.php:113
 msgid "Stop repeating"
 msgstr ""
 
-#: includes/assets.php:111
-#: includes/events-recurrence.php:534
+#: includes/assets.php:114
+#: includes/events-recurrence.php:610
 msgid "Daily"
 msgstr ""
 
-#: includes/assets.php:112
-#: includes/events-recurrence.php:535
+#: includes/assets.php:115
+#: includes/events-recurrence.php:611
 msgid "Weekly"
 msgstr ""
 
-#: includes/assets.php:113
-#: includes/events-recurrence.php:536
+#: includes/assets.php:116
+#: includes/events-recurrence.php:612
 msgid "Monthly"
 msgstr ""
 
-#: includes/assets.php:114
-#: includes/events-recurrence.php:537
+#: includes/assets.php:117
+#: includes/events-recurrence.php:613
 msgid "Yearly"
 msgstr ""
 
-#: includes/assets.php:115
+#: includes/assets.php:118
 msgid "day(s)"
 msgstr ""
 
-#: includes/assets.php:116
+#: includes/assets.php:119
 msgid "week(s)"
 msgstr ""
 
-#: includes/assets.php:117
+#: includes/assets.php:120
 msgid "month(s)"
 msgstr ""
 
-#: includes/assets.php:118
+#: includes/assets.php:121
 msgid "year(s)"
 msgstr ""
 
 #. translators: %d: interval
-#: includes/assets.php:120
-#: includes/events-recurrence.php:543
+#: includes/assets.php:123
+#: includes/events-recurrence.php:619
 #, php-format
 msgid "Every %d days"
 msgstr ""
 
 #. translators: %d: interval
-#: includes/assets.php:122
-#: includes/events-recurrence.php:546
+#: includes/assets.php:125
+#: includes/events-recurrence.php:622
 #, php-format
 msgid "Every %d weeks"
 msgstr ""
 
 #. translators: %d: interval
-#: includes/assets.php:124
-#: includes/events-recurrence.php:549
+#: includes/assets.php:127
+#: includes/events-recurrence.php:625
 #, php-format
 msgid "Every %d months"
 msgstr ""
 
 #. translators: %d: interval
-#: includes/assets.php:126
-#: includes/events-recurrence.php:552
+#: includes/assets.php:129
+#: includes/events-recurrence.php:628
 #, php-format
 msgid "Every %d years"
 msgstr ""
 
-#: includes/assets.php:128
-#: includes/events-recurrence.php:511
+#: includes/assets.php:131
+#: includes/events-recurrence.php:587
 msgid "Mon"
 msgstr ""
 
-#: includes/assets.php:129
-#: includes/events-recurrence.php:512
+#: includes/assets.php:132
+#: includes/events-recurrence.php:588
 msgid "Tue"
 msgstr ""
 
-#: includes/assets.php:130
-#: includes/events-recurrence.php:513
+#: includes/assets.php:133
+#: includes/events-recurrence.php:589
 msgid "Wed"
 msgstr ""
 
-#: includes/assets.php:131
-#: includes/events-recurrence.php:514
+#: includes/assets.php:134
+#: includes/events-recurrence.php:590
 msgid "Thu"
 msgstr ""
 
-#: includes/assets.php:132
-#: includes/events-recurrence.php:515
+#: includes/assets.php:135
+#: includes/events-recurrence.php:591
 msgid "Fri"
 msgstr ""
 
-#: includes/assets.php:133
-#: includes/events-recurrence.php:516
+#: includes/assets.php:136
+#: includes/events-recurrence.php:592
 msgid "Sat"
 msgstr ""
 
-#: includes/assets.php:134
-#: includes/events-recurrence.php:517
+#: includes/assets.php:137
+#: includes/events-recurrence.php:593
 msgid "Sun"
 msgstr ""
 
-#: includes/assets.php:143
+#: includes/assets.php:147
 msgid "Edit metadata"
 msgstr ""
 
-#: includes/assets.php:144
+#: includes/assets.php:148
 msgid "No metadata"
 msgstr ""
 
-#: includes/assets.php:145
+#: includes/assets.php:149
 #: includes/events-meta.php:88
 #: includes/i18n-defaults.php:25
 #: templates/event-meta.php:49
 msgid "Event metadata"
 msgstr ""
 
-#: includes/assets.php:175
+#: includes/assets.php:179
 msgid "Occurrences"
 msgstr ""
 
-#: includes/assets.php:176
+#: includes/assets.php:180
 msgid "No upcoming occurrences."
 msgstr ""
 
-#: includes/assets.php:177
+#: includes/assets.php:181
 msgid "Edit"
 msgstr ""
 
-#: includes/assets.php:178
+#: includes/assets.php:182
 #: includes/events.php:877
 msgid "Edit occurrences"
 msgstr ""
 
-#: includes/assets.php:179
+#: includes/assets.php:183
 msgid "Restore"
 msgstr ""
 
-#: includes/assets.php:180
-#: includes/assets.php:312
-#: includes/assets.php:348
+#: includes/assets.php:184
+#: includes/assets.php:317
+#: includes/assets.php:353
 #: includes/settings-page.php:439
 msgid "Delete"
 msgstr ""
 
-#: includes/assets.php:182
+#: includes/assets.php:186
 msgid "Delete occurrence"
 msgstr ""
 
-#: includes/assets.php:183
+#: includes/assets.php:187
 msgid "Remove this date from the series? It won't be moved to the trash. You can restore it here later."
 msgstr ""
 
-#: includes/assets.php:184
-msgid "This occurrence has custom content. Deleting removes that content permanently. Continue?"
-msgstr ""
-
-#: includes/assets.php:185
-msgid "Close"
-msgstr ""
-
-#: includes/assets.php:186
-msgid "Loading…"
-msgstr ""
-
-#: includes/assets.php:187
-msgid "Custom content"
-msgstr ""
-
 #: includes/assets.php:188
-msgid "Deleted"
+msgid "This occurrence has customized fields. Deleting removes those edits permanently. Continue?"
 msgstr ""
 
 #: includes/assets.php:189
-msgid "Could not load occurrences."
+msgid "Close"
 msgstr ""
 
 #: includes/assets.php:190
+msgid "Loading…"
+msgstr ""
+
+#: includes/assets.php:191
+msgid "Customized"
+msgstr ""
+
+#: includes/assets.php:192
+msgid "Standalone"
+msgstr ""
+
+#: includes/assets.php:193
+msgid "Deleted"
+msgstr ""
+
+#: includes/assets.php:194
+msgid "Could not load occurrences."
+msgstr ""
+
+#: includes/assets.php:195
 msgid "Something went wrong. Please try again."
 msgstr ""
 
-#: includes/assets.php:309
+#: includes/assets.php:314
 msgid "Panel title"
 msgstr ""
 
-#: includes/assets.php:310
+#: includes/assets.php:315
 msgid "Add group"
 msgstr ""
 
-#: includes/assets.php:311
+#: includes/assets.php:316
 msgid "Add field"
 msgstr ""
 
-#: includes/assets.php:313
+#: includes/assets.php:318
 msgid "No metadata groups yet. Add a group to get started."
 msgstr ""
 
-#: includes/assets.php:314
+#: includes/assets.php:319
 msgid "No fields in this group."
 msgstr ""
 
-#: includes/assets.php:315
+#: includes/assets.php:320
 msgid "Group ID"
 msgstr ""
 
-#: includes/assets.php:316
+#: includes/assets.php:321
 msgid "Group title"
 msgstr ""
 
-#: includes/assets.php:317
-#: includes/assets.php:350
+#: includes/assets.php:322
+#: includes/assets.php:355
 msgid "Label"
 msgstr ""
 
-#: includes/assets.php:318
+#: includes/assets.php:323
 msgid "Field ID"
 msgstr ""
 
-#: includes/assets.php:319
+#: includes/assets.php:324
 msgid "Fields"
 msgstr ""
 
-#: includes/assets.php:320
-#: includes/assets.php:349
+#: includes/assets.php:325
+#: includes/assets.php:354
 msgid "Drag to reorder"
 msgstr ""
 
-#: includes/assets.php:346
+#: includes/assets.php:351
 msgid "Add status"
 msgstr ""
 
-#: includes/assets.php:347
+#: includes/assets.php:352
 msgid "No statuses yet. Add a status to get started."
 msgstr ""
 
-#: includes/assets.php:351
+#: includes/assets.php:356
 msgid "Color"
 msgstr ""
 
-#: includes/assets.php:352
+#: includes/assets.php:357
 msgid "Custom…"
 msgstr ""
 
-#: includes/assets.php:353
+#: includes/assets.php:358
 msgid "Custom color"
 msgstr ""
 
@@ -439,44 +455,55 @@ msgid "Contact: %s"
 msgstr ""
 
 #. translators: %s: formatted end date
-#: includes/events-recurrence.php:575
+#: includes/events-recurrence.php:651
 #, php-format
 msgid "Until %s"
 msgstr ""
 
 #. translators: %d: number of occurrences
-#: includes/events-recurrence.php:579
+#: includes/events-recurrence.php:655
 #, php-format
 msgid "After %d occurrence"
 msgid_plural "After %d occurrences"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/events-recurrence.php:1071
-#: includes/events-recurrence.php:1285
-#: includes/events-recurrence.php:1580
+#: includes/events-recurrence.php:928
+#: includes/events-recurrence.php:1294
+#: includes/events-recurrence.php:1508
+#: includes/events-recurrence.php:1877
 msgid "Not an occurrence."
 msgstr ""
 
-#: includes/events-recurrence.php:1075
+#: includes/events-recurrence.php:931
+msgid "Sorry, you are not allowed to edit this event."
+msgstr ""
+
+#: includes/events-recurrence.php:936
+#: includes/events-recurrence.php:1298
 msgid "Master event not found."
 msgstr ""
 
-#: includes/events-recurrence.php:1079
-msgid "Master event is not available."
-msgstr ""
-
-#: includes/events-recurrence.php:1456
-#: includes/events-recurrence.php:1478
-#: includes/events-recurrence.php:1566
-msgid "Not a recurring master event."
-msgstr ""
-
-#: includes/events-recurrence.php:1481
+#: includes/events-recurrence.php:941
+#: includes/events-recurrence.php:1771
 msgid "Invalid date."
 msgstr ""
 
-#: includes/events-recurrence.php:1583
+#: includes/events-recurrence.php:1302
+msgid "Master event is not available."
+msgstr ""
+
+#: includes/events-recurrence.php:1746
+#: includes/events-recurrence.php:1768
+#: includes/events-recurrence.php:1863
+msgid "Not a recurring master event."
+msgstr ""
+
+#: includes/events-recurrence.php:1776
+msgid "This date is a standalone event and cannot be restored into the series."
+msgstr ""
+
+#: includes/events-recurrence.php:1880
 msgid "Occurrence does not belong to this master."
 msgstr ""
 

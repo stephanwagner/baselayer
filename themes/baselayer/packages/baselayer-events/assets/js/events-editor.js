@@ -17,7 +17,7 @@
     const { useEntityProp } = wp.coreData;
     const { registerPlugin } = wp.plugins;
     const { PluginDocumentSettingPanel } = wp.editor;
-    const { PanelRow, ToggleControl, Button, Modal, SelectControl, TextControl, TextareaControl } = wp.components;
+    const { PanelRow, ToggleControl, Button, Modal, SelectControl, TextControl, TextareaControl, DropdownMenu } = wp.components;
     const L = baselayerEvents;
     const META_START_DATE = "_bl_event_start_date";
     const META_END_DATE = "_bl_event_end_date";
@@ -25,11 +25,29 @@
     const META_END_TIME = "_bl_event_end_time";
     const META_RECURRENCE = "_bl_event_recurrence";
     const META_OCCURRENCE_OF = "_bl_event_occurrence_of";
-    const META_DETACHED = "_bl_event_series_detached";
+    const META_OVERRIDES = "_bl_event_series_overrides";
     const META_EXDATES = "_bl_event_exdates";
     const META_STATUS = "_bl_event_status";
     const META_STATUS_INFO = "_bl_event_status_info";
     const WEEKDAYS = ["mo", "tu", "we", "th", "fr", "sa", "su"];
+    function parseOverrides(raw) {
+      if (Array.isArray(raw)) {
+        return raw.filter(function(k) {
+          return typeof k === "string" && k !== "";
+        });
+      }
+      if (typeof raw === "string" && raw !== "") {
+        try {
+          const decoded = JSON.parse(raw);
+          return Array.isArray(decoded) ? decoded.filter(function(k) {
+            return typeof k === "string" && k !== "";
+          }) : [];
+        } catch (e) {
+          return [];
+        }
+      }
+      return [];
+    }
     function parseRule(raw) {
       if (!raw || typeof raw !== "string") {
         return null;
@@ -543,7 +561,8 @@
       const recurrenceRaw = meta && meta[META_RECURRENCE] || "";
       const exdates = parseExdates(meta && meta[META_EXDATES] || "");
       const occurrenceOf = parseInt(meta && meta[META_OCCURRENCE_OF], 10) || 0;
-      const detached = !!(meta && meta[META_DETACHED] === "1");
+      const overrides = parseOverrides(meta && meta[META_OVERRIDES]);
+      const customized = overrides.length > 0;
       const isOccurrence = occurrenceOf > 0 || postParent && postParent > 0;
       const masterId = occurrenceOf || postParent || 0;
       const rule = parseRule(recurrenceRaw);
@@ -578,6 +597,7 @@
       const [timesEnabled, setTimesEnabled] = useState(false);
       const [modalOpen, setModalOpen] = useState(false);
       const [reverting, setReverting] = useState(false);
+      const [makingStandalone, setMakingStandalone] = useState(false);
       const [startDraft, setStartDraft] = useState(startDate);
       const [endDraft, setEndDraft] = useState(endDate);
       useEffect(
@@ -701,7 +721,7 @@
       const masterTitle = currentPost && currentPost.bl_master_title || masterRecord && (masterRecord.title?.rendered || masterRecord.title?.raw) || "";
       const masterEditUrl = currentPost && currentPost.bl_master_edit_link || (masterId ? "post.php?post=" + masterId + "&action=edit" : "");
       function revertToMaster() {
-        if (!L.revertRestUrl || reverting) {
+        if (!L.revertRestUrl || reverting || makingStandalone) {
           return;
         }
         setReverting(true);
@@ -713,20 +733,62 @@
         }).then(function(res) {
           return res.json();
         }).then(function() {
-          patch({ [META_DETACHED]: "" });
-          if (wp.data.dispatch("core/editor")?.editPost && masterRecord) {
-            window.location.reload();
-          } else {
-            window.location.reload();
-          }
+          patch({ [META_OVERRIDES]: "" });
+          window.location.reload();
         }).catch(function() {
           setReverting(false);
+        });
+      }
+      function makeStandalone() {
+        if (!L.standaloneRestUrl || makingStandalone || reverting) {
+          return;
+        }
+        const confirmMsg = L.makeStandaloneConfirm || "Remove this date from the series and keep it as its own event? It will no longer update with the series.";
+        if (!window.confirm(confirmMsg)) {
+          return;
+        }
+        setMakingStandalone(true);
+        window.fetch(L.standaloneRestUrl + postId, {
+          method: "POST",
+          headers: {
+            "X-WP-Nonce": L.restNonce || ""
+          }
+        }).then(function(res) {
+          return res.json().then(function(data) {
+            return { ok: res.ok, data };
+          });
+        }).then(function(result) {
+          if (!result.ok) {
+            setMakingStandalone(false);
+            return;
+          }
+          const link = result.data && result.data.edit_link;
+          window.location.href = link || window.location.href;
+        }).catch(function() {
+          setMakingStandalone(false);
         });
       }
       const recurrenceBlock = isOccurrence ? el(
         "div",
         { className: "bl-event-recurring" },
-        el("h3", { className: "bl-event-recurring__heading" }, L.recurringTitle || "Recurring"),
+        el(
+          "div",
+          { className: "bl-event-recurring__header" },
+          el("h3", { className: "bl-event-recurring__heading" }, L.recurringTitle || "Recurring"),
+          el(DropdownMenu, {
+            icon: "ellipsis",
+            label: L.moreActions || "More options",
+            toggleProps: {
+              disabled: makingStandalone || reverting
+            },
+            controls: [
+              {
+                title: L.makeStandalone || "Make standalone event",
+                onClick: makeStandalone
+              }
+            ]
+          })
+        ),
         el("p", null, L.partOfRecurring || "Part of a recurring event."),
         masterId ? el(
           Fragment,
@@ -752,17 +814,21 @@
             })
           );
         })(),
-        detached ? el(
+        customized ? el(
           "div",
-          { className: "bl-event-recurring__detached notice notice-warning inline" },
-          el("p", null, el("strong", null, L.customContentTitle || "This occurrence has custom content.")),
-          el("p", null, L.customContentHelp || "It will not update when the master event changes."),
+          { className: "bl-event-recurring__customized notice notice-info inline" },
+          el("p", null, el("strong", null, L.customContentTitle || "Some fields are customized.")),
+          el(
+            "p",
+            null,
+            L.customContentHelp || "Changed fields keep your edits when the master updates. This date is still removed if it leaves the series."
+          ),
           el(
             Button,
             {
-              variant: "secondary",
+              variant: "tertiary",
               isBusy: reverting,
-              disabled: reverting,
+              disabled: reverting || makingStandalone,
               onClick: revertToMaster
             },
             L.revertToMaster || "Revert to master"
@@ -773,7 +839,8 @@
           {
             variant: "secondary",
             className: "bl-event-recurring__edit-master",
-            href: masterEditUrl
+            href: masterEditUrl,
+            disabled: makingStandalone
           },
           L.editInMaster || "Edit in master event"
         ) : null

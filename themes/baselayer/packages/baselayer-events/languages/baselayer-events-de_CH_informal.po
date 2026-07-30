@@ -112,18 +112,30 @@ msgid "%d occurrence"
 msgstr "%d Termin"
 
 #: includes/assets.php:94
-msgid "This occurrence has custom content."
-msgstr "Dieser Termin hat eigenen Inhalt."
+msgid "Some fields are customized."
+msgstr "Einige Felder sind angepasst."
 
 #: includes/assets.php:95
-msgid "It will not update when the master event changes."
-msgstr "Er wird nicht aktualisiert, wenn sich die Vorlage ändert."
+msgid "Changed fields keep your edits when the master updates. This date is still removed if it leaves the series."
+msgstr "Geänderte Felder behalten deine Anpassungen, wenn die Vorlage aktualisiert wird. Dieses Datum wird trotzdem entfernt, wenn es die Serie verlässt."
 
 #: includes/assets.php:96
 msgid "Revert to master"
 msgstr "Auf Vorlage zurücksetzen"
 
 #: includes/assets.php:97
+msgid "Make standalone event"
+msgstr "Als eigenständiges Event"
+
+#: includes/assets.php:98
+msgid "Remove this date from the series and keep it as its own event? It will no longer update with the series."
+msgstr "Dieses Datum aus der Serie nehmen und als eigenes Event behalten? Es wird dann nicht mehr mit der Serie aktualisiert."
+
+#: includes/assets.php:99
+msgid "More options"
+msgstr "Weitere Optionen"
+
+#: includes/assets.php:100
 msgid "Recurrence settings"
 msgstr "Wiederholungseinstellungen"
 
@@ -316,10 +328,10 @@ msgstr ""
 
 #: includes/assets.php:182
 msgid ""
-"This occurrence has custom content. Deleting removes that content "
+"This occurrence has customized fields. Deleting removes those edits "
 "permanently. Continue?"
 msgstr ""
-"Dieser Termin hat eigenen Inhalt. Löschen entfernt diesen Inhalt dauerhaft. "
+"Dieser Termin hat angepasste Felder. Löschen entfernt diese Anpassungen dauerhaft. "
 "Fortfahren?"
 
 #: includes/assets.php:183
@@ -331,10 +343,14 @@ msgid "Loading…"
 msgstr "Wird geladen…"
 
 #: includes/assets.php:185
-msgid "Custom content"
-msgstr "Eigener Inhalt"
+msgid "Customized"
+msgstr "Angepasst"
 
 #: includes/assets.php:186
+msgid "Standalone"
+msgstr "Eigenständig"
+
+#: includes/assets.php:187
 msgid "Deleted"
 msgstr "Gelöscht"
 
@@ -442,6 +458,10 @@ msgstr[1] "Nach %d Terminen"
 msgid "Not an occurrence."
 msgstr "Kein Termin."
 
+#: includes/events-recurrence.php
+msgid "Sorry, you are not allowed to edit this event."
+msgstr "Du darfst dieses Event leider nicht bearbeiten."
+
 #: includes/events-recurrence.php:1075
 msgid "Master event not found."
 msgstr "Master-Event nicht gefunden."
@@ -458,6 +478,10 @@ msgstr "Keine wiederkehrende Vorlage."
 #: includes/events-recurrence.php:1481
 msgid "Invalid date."
 msgstr "Ungültiges Datum."
+
+#: includes/events-recurrence.php
+msgid "This date is a standalone event and cannot be restored into the series."
+msgstr "Dieses Datum ist ein eigenständiges Event und kann nicht in die Serie zurückgeholt werden."
 
 #: includes/events-recurrence.php:1583
 msgid "Occurrence does not belong to this master."

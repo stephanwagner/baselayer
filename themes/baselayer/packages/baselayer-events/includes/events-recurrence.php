@@ -8,10 +8,22 @@ defined('ABSPATH') || exit;
 
 const BL_EVENT_META_RECURRENCE = '_bl_event_recurrence';
 const BL_EVENT_META_OCCURRENCE_OF = '_bl_event_occurrence_of';
-const BL_EVENT_META_SERIES_DETACHED = '_bl_event_series_detached';
+const BL_EVENT_META_SERIES_OVERRIDES = '_bl_event_series_overrides';
+const BL_EVENT_META_STANDALONE_FROM = '_bl_event_standalone_from';
 const BL_EVENT_META_EXDATES = '_bl_event_exdates';
 const BL_EVENT_CRON_HOOK = 'bl_event_extend_recurring_series';
 const BL_EVENT_RECURRENCE_LOOKAHEAD_DEFAULT = '1 year';
+
+/** @var list<string> */
+const BL_EVENT_SERIES_OVERRIDE_KEYS = [
+	'title',
+	'content',
+	'excerpt',
+	'status',
+	'thumbnail',
+	'taxonomies',
+	'metadata',
+];
 
 /** @var bool */
 $GLOBALS['bl_event_syncing'] = false;
@@ -305,9 +317,73 @@ function bl_event_get_master_id(int $post_id): int
 	return $parent > 0 ? $parent : 0;
 }
 
-function bl_event_is_occurrence_detached(int $post_id): bool
+/**
+ * Field keys that are not synced from the master onto this occurrence.
+ *
+ * @return list<string>
+ */
+function bl_event_get_series_overrides(int $post_id): array
 {
-	return (string) get_post_meta($post_id, BL_EVENT_META_SERIES_DETACHED, true) === '1';
+	$raw = get_post_meta($post_id, BL_EVENT_META_SERIES_OVERRIDES, true);
+	if (is_string($raw) && $raw !== '') {
+		$decoded = json_decode($raw, true);
+		$raw = is_array($decoded) ? $decoded : [];
+	}
+	if (!is_array($raw)) {
+		return [];
+	}
+	$allowed = array_fill_keys(BL_EVENT_SERIES_OVERRIDE_KEYS, true);
+	$out = [];
+	foreach ($raw as $key) {
+		if (!is_string($key)) {
+			continue;
+		}
+		$key = sanitize_key($key);
+		if (isset($allowed[$key])) {
+			$out[] = $key;
+		}
+	}
+
+	return array_values(array_unique($out));
+}
+
+function bl_event_occurrence_has_overrides(int $post_id): bool
+{
+	return bl_event_get_series_overrides($post_id) !== [];
+}
+
+function bl_event_occurrence_overrides_field(int $post_id, string $field): bool
+{
+	return in_array($field, bl_event_get_series_overrides($post_id), true);
+}
+
+/**
+ * @param list<string> $keys
+ */
+function bl_event_set_series_overrides(int $post_id, array $keys): void
+{
+	$allowed = array_fill_keys(BL_EVENT_SERIES_OVERRIDE_KEYS, true);
+	$clean = [];
+	foreach ($keys as $key) {
+		if (!is_string($key)) {
+			continue;
+		}
+		$key = sanitize_key($key);
+		if (isset($allowed[$key])) {
+			$clean[] = $key;
+		}
+	}
+	$clean = array_values(array_unique($clean));
+	if ($clean === []) {
+		delete_post_meta($post_id, BL_EVENT_META_SERIES_OVERRIDES);
+
+		return;
+	}
+	update_post_meta(
+		$post_id,
+		BL_EVENT_META_SERIES_OVERRIDES,
+		(string) wp_json_encode($clean, JSON_UNESCAPED_SLASHES)
+	);
 }
 
 /**
@@ -598,9 +674,11 @@ function bl_event_copy_taxonomies(int $master_id, int $occurrence_id): void
 }
 
 /**
- * Push master content onto an occurrence (caller checks detached / future).
+ * Push master content onto an occurrence (skips fields listed in series overrides).
+ *
+ * @param list<string>|null $force_fields When set, only these fields are applied (ignores overrides). Null = all non-overridden.
  */
-function bl_event_apply_master_content(int $master_id, int $occurrence_id): void
+function bl_event_apply_master_content(int $master_id, int $occurrence_id, ?array $force_fields = null): void
 {
 	$master = get_post($master_id);
 	$occurrence = get_post($occurrence_id);
@@ -608,30 +686,59 @@ function bl_event_apply_master_content(int $master_id, int $occurrence_id): void
 		return;
 	}
 
+	$overrides = $force_fields !== null
+		? []
+		: array_fill_keys(bl_event_get_series_overrides($occurrence_id), true);
+	$only = $force_fields !== null ? array_fill_keys($force_fields, true) : null;
+	$should = static function (string $field) use ($overrides, $only): bool {
+		if ($only !== null) {
+			return isset($only[$field]);
+		}
+
+		return !isset($overrides[$field]);
+	};
+
 	$GLOBALS['bl_event_syncing'] = true;
-	wp_update_post([
-		'ID' => $occurrence_id,
-		'post_title' => $master->post_title,
-		'post_content' => $master->post_content,
-		'post_excerpt' => $master->post_excerpt,
-		'post_status' => $master->post_status,
-	]);
-	$thumb = get_post_thumbnail_id($master_id);
-	if ($thumb) {
-		set_post_thumbnail($occurrence_id, $thumb);
-	} else {
-		delete_post_thumbnail($occurrence_id);
+
+	$post_update = ['ID' => $occurrence_id];
+	if ($should('title')) {
+		$post_update['post_title'] = $master->post_title;
 	}
-	bl_event_copy_taxonomies($master_id, $occurrence_id);
-	if (function_exists('bl_event_copy_metadata')) {
+	if ($should('content')) {
+		$post_update['post_content'] = $master->post_content;
+	}
+	if ($should('excerpt')) {
+		$post_update['post_excerpt'] = $master->post_excerpt;
+	}
+	if ($should('status')) {
+		$post_update['post_status'] = $master->post_status;
+	}
+	if (count($post_update) > 1) {
+		wp_update_post($post_update);
+	}
+
+	if ($should('thumbnail')) {
+		$thumb = get_post_thumbnail_id($master_id);
+		if ($thumb) {
+			set_post_thumbnail($occurrence_id, $thumb);
+		} else {
+			delete_post_thumbnail($occurrence_id);
+		}
+	}
+	if ($should('taxonomies')) {
+		bl_event_copy_taxonomies($master_id, $occurrence_id);
+	}
+	if ($should('metadata') && function_exists('bl_event_copy_metadata')) {
 		bl_event_copy_metadata($master_id, $occurrence_id);
 	}
+
 	$GLOBALS['bl_event_syncing'] = false;
 }
 
 /**
  * Create or update occurrence children for a master within the lookahead.
  * Past occurrences are never modified or deleted.
+ * Customized (field-override) future occurrences are still removed when the date leaves the rule.
  */
 function bl_event_sync_series(int $master_id): void
 {
@@ -770,7 +877,7 @@ function bl_event_sync_series(int $master_id): void
 }
 
 /**
- * Sync master content to future, non-detached occurrences.
+ * Sync master content to future occurrences (respecting per-field overrides).
  */
 function bl_event_sync_series_content(int $master_id): void
 {
@@ -786,9 +893,6 @@ function bl_event_sync_series_content(int $master_id): void
 
 	$now = time();
 	foreach (bl_event_get_occurrence_ids($master_id) as $oid) {
-		if (bl_event_is_occurrence_detached($oid)) {
-			continue;
-		}
 		$start_ts = bl_event_get_start_timestamp($oid);
 		if ($start_ts > 0 && $start_ts < $now) {
 			continue;
@@ -798,7 +902,7 @@ function bl_event_sync_series_content(int $master_id): void
 }
 
 /**
- * Revert an occurrence to master content and clear detach.
+ * Revert an occurrence to master content and clear field overrides.
  */
 function bl_event_revert_occurrence_to_master(int $occurrence_id): bool
 {
@@ -806,16 +910,93 @@ function bl_event_revert_occurrence_to_master(int $occurrence_id): bool
 	if ($master_id <= 0) {
 		return false;
 	}
-	delete_post_meta($occurrence_id, BL_EVENT_META_SERIES_DETACHED);
-	bl_event_apply_master_content($master_id, $occurrence_id);
+	bl_event_set_series_overrides($occurrence_id, []);
+	bl_event_apply_master_content($master_id, $occurrence_id, BL_EVENT_SERIES_OVERRIDE_KEYS);
 
 	return true;
 }
 
 /**
- * After user saves an occurrence, mark content as custom when it diverges from the master.
+ * Promote an occurrence to a standalone event (leaves the series permanently).
+ * Adds an EXDATE on the master so sync does not recreate the date.
+ *
+ * @return true|\WP_Error
  */
-function bl_event_maybe_detach_occurrence_on_save(int $post_id): void
+function bl_event_make_occurrence_standalone(int $occurrence_id)
+{
+	if ($occurrence_id <= 0 || !bl_event_is_occurrence($occurrence_id)) {
+		return new \WP_Error('bl_not_occurrence', __('Not an occurrence.', 'baselayer-events'), ['status' => 400]);
+	}
+	if (!current_user_can('edit_post', $occurrence_id)) {
+		return new \WP_Error('bl_forbidden', __('Sorry, you are not allowed to edit this event.', 'baselayer-events'), ['status' => 403]);
+	}
+
+	$master_id = bl_event_get_master_id($occurrence_id);
+	if ($master_id <= 0) {
+		return new \WP_Error('bl_no_master', __('Master event not found.', 'baselayer-events'), ['status' => 400]);
+	}
+
+	$start = get_post_meta($occurrence_id, BL_EVENT_META_START_DATE, true);
+	if (!is_string($start) || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $start)) {
+		return new \WP_Error('bl_bad_date', __('Invalid date.', 'baselayer-events'), ['status' => 400]);
+	}
+
+	$GLOBALS['bl_event_syncing'] = true;
+	bl_event_add_exdate($master_id, $start);
+	update_post_meta($occurrence_id, BL_EVENT_META_STANDALONE_FROM, $master_id);
+	wp_update_post([
+		'ID' => $occurrence_id,
+		'post_parent' => 0,
+	]);
+	delete_post_meta($occurrence_id, BL_EVENT_META_OCCURRENCE_OF);
+	bl_event_set_series_overrides($occurrence_id, []);
+	$GLOBALS['bl_event_syncing'] = false;
+
+	return true;
+}
+
+/**
+ * Find a standalone event that left this master on the given start date.
+ */
+function bl_event_find_standalone_for_date(int $master_id, string $start_date): int
+{
+	if ($master_id <= 0 || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $start_date)) {
+		return 0;
+	}
+	$post_type = get_post_type($master_id);
+	if (!$post_type || !bl_is_event_post_type($post_type)) {
+		return 0;
+	}
+
+	$ids = get_posts([
+		'post_type' => $post_type,
+		'post_status' => ['publish', 'draft', 'pending', 'future', 'private'],
+		'posts_per_page' => 1,
+		'fields' => 'ids',
+		'no_found_rows' => true,
+		'meta_query' => [
+			'relation' => 'AND',
+			[
+				'key' => BL_EVENT_META_STANDALONE_FROM,
+				'value' => $master_id,
+				'compare' => '=',
+				'type' => 'NUMERIC',
+			],
+			[
+				'key' => BL_EVENT_META_START_DATE,
+				'value' => $start_date,
+				'compare' => '=',
+			],
+		],
+	]);
+
+	return $ids !== [] ? (int) $ids[0] : 0;
+}
+
+/**
+ * After user saves an occurrence, mark diverged fields so master sync skips them.
+ */
+function bl_event_maybe_update_occurrence_overrides_on_save(int $post_id): void
 {
 	if (!empty($GLOBALS['bl_event_syncing'])) {
 		return;
@@ -844,41 +1025,52 @@ function bl_event_maybe_detach_occurrence_on_save(int $post_id): void
 		return;
 	}
 
-	$thumb_m = (int) get_post_thumbnail_id($master_id);
-	$thumb_o = (int) get_post_thumbnail_id($post_id);
-	$diverged = $master->post_title !== $post->post_title
-		|| $master->post_content !== $post->post_content
-		|| $master->post_excerpt !== $post->post_excerpt
-		|| $thumb_m !== $thumb_o;
+	$overrides = [];
 
-	if (!$diverged) {
-		$taxonomies = get_object_taxonomies($post->post_type);
-		foreach ($taxonomies as $taxonomy) {
-			$a = wp_get_object_terms($master_id, $taxonomy, ['fields' => 'ids']);
-			$b = wp_get_object_terms($post_id, $taxonomy, ['fields' => 'ids']);
-			if (is_wp_error($a) || is_wp_error($b)) {
-				continue;
-			}
-			sort($a);
-			sort($b);
-			if ($a !== $b) {
-				$diverged = true;
-				break;
-			}
-		}
+	if ($master->post_title !== $post->post_title) {
+		$overrides[] = 'title';
+	}
+	if ($master->post_content !== $post->post_content) {
+		$overrides[] = 'content';
+	}
+	if ($master->post_excerpt !== $post->post_excerpt) {
+		$overrides[] = 'excerpt';
+	}
+	if ($master->post_status !== $post->post_status) {
+		$overrides[] = 'status';
+	}
+	if ((int) get_post_thumbnail_id($master_id) !== (int) get_post_thumbnail_id($post_id)) {
+		$overrides[] = 'thumbnail';
 	}
 
-	if (!$diverged && function_exists('bl_event_get_metadata')) {
+	$tax_diverged = false;
+	$taxonomies = get_object_taxonomies($post->post_type);
+	foreach ($taxonomies as $taxonomy) {
+		$a = wp_get_object_terms($master_id, $taxonomy, ['fields' => 'ids']);
+		$b = wp_get_object_terms($post_id, $taxonomy, ['fields' => 'ids']);
+		if (is_wp_error($a) || is_wp_error($b)) {
+			continue;
+		}
+		sort($a);
+		sort($b);
+		if ($a !== $b) {
+			$tax_diverged = true;
+			break;
+		}
+	}
+	if ($tax_diverged) {
+		$overrides[] = 'taxonomies';
+	}
+
+	if (function_exists('bl_event_get_metadata')) {
 		$meta_m = bl_event_get_metadata($master_id);
 		$meta_o = bl_event_get_metadata($post_id);
 		if ($meta_m !== $meta_o) {
-			$diverged = true;
+			$overrides[] = 'metadata';
 		}
 	}
 
-	if ($diverged) {
-		update_post_meta($post_id, BL_EVENT_META_SERIES_DETACHED, '1');
-	}
+	bl_event_set_series_overrides($post_id, $overrides);
 }
 
 /**
@@ -906,7 +1098,7 @@ function bl_event_can_sync_series_for_post(int $post_id): bool
 }
 
 /**
- * Recalc timestamps, detach occurrences, sync master series (meta must already be written).
+ * Recalc timestamps, update occurrence overrides, sync master series (meta must already be written).
  */
 function bl_event_run_series_sync(int $post_id): void
 {
@@ -917,7 +1109,7 @@ function bl_event_run_series_sync(int $post_id): void
 	bl_event_recalculate_timestamps($post_id);
 
 	if (bl_event_is_occurrence($post_id)) {
-		bl_event_maybe_detach_occurrence_on_save($post_id);
+		bl_event_maybe_update_occurrence_overrides_on_save($post_id);
 
 		return;
 	}
@@ -940,7 +1132,7 @@ function bl_event_save_series(int $post_id): void
 	if (defined('REST_REQUEST') && REST_REQUEST) {
 		if (bl_event_is_occurrence($post_id)) {
 			bl_event_recalculate_timestamps($post_id);
-			bl_event_maybe_detach_occurrence_on_save($post_id);
+			bl_event_maybe_update_occurrence_overrides_on_save($post_id);
 		}
 
 		return;
@@ -1019,13 +1211,44 @@ function bl_event_register_recurrence_hooks(): void
 			},
 		]);
 
-		register_post_meta($post_type, BL_EVENT_META_SERIES_DETACHED, [
+		register_post_meta($post_type, BL_EVENT_META_SERIES_OVERRIDES, [
 			'type' => 'string',
 			'single' => true,
 			'show_in_rest' => true,
 			'auth_callback' => $auth,
 			'sanitize_callback' => static function ($value): string {
-				return ((string) $value === '1' || $value === true || $value === 1) ? '1' : '';
+				if (is_array($value)) {
+					$keys = $value;
+				} elseif (is_string($value) && $value !== '') {
+					$decoded = json_decode($value, true);
+					$keys = is_array($decoded) ? $decoded : [];
+				} else {
+					$keys = [];
+				}
+				$allowed = array_fill_keys(BL_EVENT_SERIES_OVERRIDE_KEYS, true);
+				$clean = [];
+				foreach ($keys as $key) {
+					if (!is_string($key)) {
+						continue;
+					}
+					$key = sanitize_key($key);
+					if (isset($allowed[$key])) {
+						$clean[] = $key;
+					}
+				}
+				$clean = array_values(array_unique($clean));
+
+				return $clean === [] ? '' : (string) wp_json_encode($clean, JSON_UNESCAPED_SLASHES);
+			},
+		]);
+
+		register_post_meta($post_type, BL_EVENT_META_STANDALONE_FROM, [
+			'type' => 'integer',
+			'single' => true,
+			'show_in_rest' => true,
+			'auth_callback' => $auth,
+			'sanitize_callback' => static function ($value): int {
+				return max(0, (int) $value);
 			},
 		]);
 
@@ -1289,7 +1512,7 @@ function bl_event_register_revert_rest_route(): void
 
 			return rest_ensure_response([
 				'id' => $id,
-				'detached' => false,
+				'customized' => false,
 				'title' => $post ? $post->post_title : '',
 			]);
 		},
@@ -1299,10 +1522,41 @@ function bl_event_register_revert_rest_route(): void
 add_action('rest_api_init', 'bl_event_register_revert_rest_route');
 
 /**
+ * REST: promote occurrence to a standalone event.
+ */
+function bl_event_register_standalone_rest_route(): void
+{
+	register_rest_route('baselayer/v1', '/event-standalone/(?P<id>\d+)', [
+		'methods' => 'POST',
+		'permission_callback' => static function (\WP_REST_Request $request): bool {
+			$id = (int) $request['id'];
+
+			return $id > 0 && current_user_can('edit_post', $id);
+		},
+		'callback' => static function (\WP_REST_Request $request) {
+			$id = (int) $request['id'];
+			$result = bl_event_make_occurrence_standalone($id);
+			if (is_wp_error($result)) {
+				return $result;
+			}
+			$edit = get_edit_post_link($id, 'raw');
+
+			return rest_ensure_response([
+				'id' => $id,
+				'standalone' => true,
+				'edit_link' => is_string($edit) ? $edit : '',
+			]);
+		},
+	]);
+}
+
+add_action('rest_api_init', 'bl_event_register_standalone_rest_route');
+
+/**
  * Upcoming occurrence rows for a master (start_ts >= now), ascending.
- * Includes user-deleted dates (EXDATEs) marked as deleted.
+ * Includes user-deleted dates (EXDATEs) and standalone dates marked accordingly.
  *
- * @return list<array{id: int, title: string, start_date: string, end_date: string, range_text: string, edit_link: string, detached: bool, deleted: bool}>
+ * @return list<array{id: int, title: string, start_date: string, end_date: string, range_text: string, edit_link: string, customized: bool, standalone: bool, deleted: bool}>
  */
 function bl_event_get_upcoming_occurrence_rows(int $master_id, int $limit = 200): array
 {
@@ -1349,7 +1603,8 @@ function bl_event_get_upcoming_occurrence_rows(int $master_id, int $limit = 200)
 			'start_ts' => $start_ts,
 			'range_text' => bl_event_format_range_text($oid, true),
 			'edit_link' => is_string($edit) ? $edit : '',
-			'detached' => bl_event_is_occurrence_detached($oid),
+			'customized' => bl_event_occurrence_has_overrides($oid),
+			'standalone' => false,
 			'deleted' => false,
 			'status_key' => '',
 			'status_label' => '',
@@ -1402,6 +1657,40 @@ function bl_event_get_upcoming_occurrence_rows(int $master_id, int $limit = 200)
 		if ($start_ts > 0 && $start_ts < $now) {
 			continue;
 		}
+
+		$standalone_id = bl_event_find_standalone_for_date($master_id, $exdate);
+		if ($standalone_id > 0) {
+			$edit = get_edit_post_link($standalone_id, 'raw');
+			$schedule = bl_event_get_schedule($standalone_id);
+			$row = [
+				'id' => $standalone_id,
+				'title' => (string) get_the_title($standalone_id),
+				'start_date' => $exdate,
+				'end_date' => $schedule['end_date'] ?? $end_date,
+				'start_ts' => $start_ts > 0 ? $start_ts : 0,
+				'range_text' => bl_event_format_range_text($standalone_id, true),
+				'edit_link' => is_string($edit) ? $edit : '',
+				'customized' => false,
+				'standalone' => true,
+				'deleted' => false,
+				'status_key' => '',
+				'status_label' => '',
+				'status_color' => '',
+			];
+			if (function_exists('bl_event_get_status')) {
+				$status = bl_event_get_status($standalone_id);
+				if ($status !== null) {
+					$row['status_key'] = $status['key'];
+					$row['status_label'] = $status['label'];
+					$row['status_color'] = function_exists('bl_event_status_css_color_value')
+						? bl_event_status_css_color_value($status)
+						: (string) ($status['color'] ?? '');
+				}
+			}
+			$rows[] = $row;
+			continue;
+		}
+
 		$rows[] = [
 			'id' => 0,
 			'title' => '',
@@ -1410,7 +1699,8 @@ function bl_event_get_upcoming_occurrence_rows(int $master_id, int $limit = 200)
 			'start_ts' => $start_ts > 0 ? $start_ts : 0,
 			'range_text' => bl_event_format_slot_range_text($exdate, $end_date, $start_time, $end_time, true),
 			'edit_link' => '',
-			'detached' => false,
+			'customized' => false,
+			'standalone' => false,
 			'deleted' => true,
 			'status_key' => '',
 			'status_label' => '',
@@ -1479,6 +1769,13 @@ function bl_event_restore_occurrence_date(int $master_id, string $start_date)
 	}
 	if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $start_date)) {
 		return new \WP_Error('bl_bad_date', __('Invalid date.', 'baselayer-events'), ['status' => 400]);
+	}
+	if (bl_event_find_standalone_for_date($master_id, $start_date) > 0) {
+		return new \WP_Error(
+			'bl_standalone_date',
+			__('This date is a standalone event and cannot be restored into the series.', 'baselayer-events'),
+			['status' => 400]
+		);
 	}
 
 	bl_event_remove_exdate($master_id, $start_date);
