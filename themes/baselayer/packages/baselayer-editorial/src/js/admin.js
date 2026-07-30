@@ -1,4 +1,4 @@
-import { openPagePicker } from './admin/page-picker.js';
+import { openPagePicker, renderPageSelectionChips } from './admin/page-picker.js';
 
 (function () {
   'use strict';
@@ -19,36 +19,10 @@ import { openPagePicker } from './admin/page-picker.js';
   }
 
   function renderSelectedList(list, pages, inputName) {
-    list.replaceChildren();
-    if (!pages.length) {
-      const empty = document.createElement('li');
-      empty.className = 'bl-editorial-selected-pages__empty description';
-      empty.textContent = list.dataset.empty || i18n.noPagesSelected || 'No pages selected.';
-      list.appendChild(empty);
-      return;
-    }
-
-    pages.forEach((page) => {
-      const li = document.createElement('li');
-      li.dataset.id = String(page.id);
-
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = inputName;
-      input.value = String(page.id);
-
-      const title = document.createElement('span');
-      title.className = 'bl-editorial-selected-pages__title';
-      title.textContent = page.title || `#${page.id}`;
-
-      const remove = document.createElement('button');
-      remove.type = 'button';
-      remove.className = 'button-link bl-editorial-remove-page';
-      remove.setAttribute('aria-label', i18n.remove || 'Remove');
-      remove.textContent = '×';
-
-      li.append(input, title, remove);
-      list.appendChild(li);
+    renderPageSelectionChips(list, pages, {
+      inputName,
+      emptyLabel: list.dataset.empty || i18n.noPagesSelected || 'No pages selected.',
+      removeLabel: i18n.remove || 'Remove',
     });
   }
 
@@ -73,21 +47,63 @@ import { openPagePicker } from './admin/page-picker.js';
     return 'bl_editorial_rights[allowed_page_ids][]';
   }
 
+  function setRightsFieldsDisabled(fields, disabled) {
+    if (!fields) return;
+    fields.querySelectorAll('input, select, textarea').forEach((el) => {
+      if (!(el instanceof HTMLInputElement || el instanceof HTMLSelectElement || el instanceof HTMLTextAreaElement)) {
+        return;
+      }
+      const name = el.getAttribute('name') || '';
+      if (name.indexOf('bl_editorial_rights') !== 0) {
+        return;
+      }
+      el.disabled = !!disabled;
+    });
+  }
+
+  function syncRestrictionsToggle(toggle) {
+    if (!(toggle instanceof HTMLInputElement)) return;
+    const fieldsId = toggle.getAttribute('data-bl-editorial-fields');
+    const fields = fieldsId ? document.getElementById(fieldsId) : null;
+    if (!fields) return;
+
+    fields.hidden = !toggle.checked;
+    setRightsFieldsDisabled(fields, !toggle.checked);
+
+    // First enable (no saved rights yet): fill from site defaults.
+    if (
+      toggle.checked &&
+      toggle.id === 'bl-editorial-enable-rights' &&
+      toggle.getAttribute('data-bl-editorial-has-saved') !== '1'
+    ) {
+      const json = document.getElementById('bl-editorial-site-defaults');
+      if (!json) return;
+      let defaults;
+      try {
+        defaults = JSON.parse(json.textContent || '{}');
+      } catch (e) {
+        return;
+      }
+      applyDefaultsToProfile(defaults, { keepEnableState: true });
+    }
+  }
+
   document.addEventListener('change', (evt) => {
     const target = evt.target;
     if (!(target instanceof HTMLElement)) return;
 
-    if (target.id === 'bl-editorial-enable-rights') {
-      const fields = document.getElementById('bl-editorial-rights-fields');
-      if (fields) {
-        fields.hidden = !target.checked;
-      }
+    if (target.classList.contains('bl-editorial-enable-restrictions')) {
+      syncRestrictionsToggle(target);
       return;
     }
 
     if (target.classList.contains('bl-editorial-page-access')) {
       syncPageAccess(closestRightsRoot(target));
     }
+  });
+
+  document.querySelectorAll('.bl-editorial-enable-restrictions').forEach((toggle) => {
+    syncRestrictionsToggle(toggle);
   });
 
   document.addEventListener('click', async (evt) => {
@@ -126,7 +142,6 @@ import { openPagePicker } from './admin/page-picker.js';
 
       if (!result) return;
       const pages = Array.isArray(result) ? result : [result];
-      // Preserve titles from previous selection when picker returned empty titles.
       const merged = pages.map((page) => {
         const prev = current.find((c) => c.id === page.id);
         return {
@@ -152,7 +167,7 @@ import { openPagePicker } from './admin/page-picker.js';
     }
   });
 
-  function applyDefaultsToProfile(defaults) {
+  function applyDefaultsToProfile(defaults, options = {}) {
     const root = document.getElementById('bl-editorial-rights-fields');
     if (!root) return;
 
@@ -185,10 +200,15 @@ import { openPagePicker } from './admin/page-picker.js';
     }
 
     syncPageAccess(root.querySelector('[data-bl-editorial-rights]'));
-    const enable = document.getElementById('bl-editorial-enable-rights');
-    if (enable) {
-      enable.checked = true;
-      root.hidden = false;
+
+    if (!options.keepEnableState) {
+      const enable = document.getElementById('bl-editorial-enable-rights');
+      if (enable) {
+        enable.checked = true;
+        syncRestrictionsToggle(enable);
+      }
+    } else {
+      setRightsFieldsDisabled(root, false);
     }
   }
 

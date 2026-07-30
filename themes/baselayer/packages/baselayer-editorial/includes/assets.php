@@ -10,20 +10,30 @@ defined('ABSPATH') || exit;
 function bl_editorial_should_enqueue_admin_assets(): bool
 {
 	$screen = function_exists('get_current_screen') ? get_current_screen() : null;
-	if (!$screen) {
-		return false;
-	}
-
-	if (in_array($screen->id, ['profile', 'user-edit'], true)) {
+	if ($screen && in_array($screen->id, ['profile', 'user-edit'], true)) {
 		return true;
 	}
 
 	$page = isset($_GET['page']) ? sanitize_key((string) $_GET['page']) : '';
+	if ($page === '' && $screen && !empty($screen->id)) {
+		// Fallback: settings_page_bl-developer-editorial → bl-developer-editorial
+		if (str_starts_with($screen->id, 'settings_page_')) {
+			$page = substr($screen->id, strlen('settings_page_'));
+		}
+	}
+
 	if ($page === 'bl-editorial-settings') {
 		return true;
 	}
 
 	if (function_exists('bl_developer_settings_page_slug') && $page === bl_developer_settings_page_slug('editorial')) {
+		return true;
+	}
+
+	if ($screen && (
+		$screen->id === 'settings_page_bl-editorial-settings'
+		|| $screen->id === 'settings_page_bl-developer-editorial'
+	)) {
 		return true;
 	}
 

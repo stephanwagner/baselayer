@@ -37,9 +37,10 @@ function bl_editorial_render_user_profile_fields(WP_User $user): void
 			? admin_url('options-general.php?page=' . bl_developer_settings_page_slug('editorial'))
 			: '');
 	?>
+	<hr class="bl-editorial-profile-hr" style="margin-top: 24px;">
 	<h2><?= esc_html__('Editorial rights', 'baselayer-editorial') ?></h2>
 	<p class="description">
-		<?= esc_html__('Restrict what this editor can access. Leave cleared to keep a normal WordPress editor.', 'baselayer-editorial') ?>
+		<?= esc_html__('Restrict what this editor can access. When restrictions are off, they behave like a normal WordPress editor.', 'baselayer-editorial') ?>
 		<?php if ($settings_url !== '') : ?>
 			<a href="<?= esc_url($settings_url) ?>"><?= esc_html__('Site defaults & approval email', 'baselayer-editorial') ?></a>
 		<?php endif; ?>
@@ -51,16 +52,25 @@ function bl_editorial_render_user_profile_fields(WP_User $user): void
 		<tr>
 			<th scope="row"><?= esc_html__('Restrictions', 'baselayer-editorial') ?></th>
 			<td>
-				<label>
-					<input type="checkbox" name="bl_editorial_enable_rights" id="bl-editorial-enable-rights" value="1" <?= checked($has_custom, true, false) ?>>
-					<?= esc_html__('Customize editorial rights for this user', 'baselayer-editorial') ?>
+				<label for="bl-editorial-enable-rights">
+					<input
+						type="checkbox"
+						name="bl_editorial_enable_rights"
+						id="bl-editorial-enable-rights"
+						value="1"
+						class="bl-editorial-enable-restrictions"
+						data-bl-editorial-fields="bl-editorial-rights-fields"
+						data-bl-editorial-has-saved="<?= $has_custom ? '1' : '0' ?>"
+						<?= checked($has_custom, true, false) ?>
+					>
+					<?= esc_html__('Enable restrictions for this editor', 'baselayer-editorial') ?>
 				</label>
-				<p class="description"><?= esc_html__('When unchecked, this user behaves like a normal editor (and any saved restrictions are cleared on save).', 'baselayer-editorial') ?></p>
+				<p class="description"><?= esc_html__('Limit which content this editor can access, how they publish, and what they see in the media library.', 'baselayer-editorial') ?></p>
 			</td>
 		</tr>
 	</table>
 
-	<div id="bl-editorial-rights-fields" <?= $has_custom ? '' : 'hidden' ?>>
+	<div id="bl-editorial-rights-fields" class="bl-editorial-restrictions-fields" <?= $has_custom ? '' : 'hidden' ?>>
 		<?php bl_editorial_render_rights_fields($rights, 'bl_editorial_rights', ['id_prefix' => 'bl-editorial-user']); ?>
 		<p>
 			<button type="button" class="button bl-editorial-apply-defaults">
@@ -95,6 +105,7 @@ function bl_editorial_save_user_profile_fields(int $user_id): void
 
 	$enabled = !empty($_POST['bl_editorial_enable_rights']);
 	if (!$enabled) {
+		// Do not persist rights while disabled — next enable starts from site defaults.
 		bl_editorial_clear_user_rights($user_id);
 		return;
 	}

@@ -121,7 +121,7 @@ function bl_editorial_render_rights_fields(array $rights, string $name, array $a
 								$title = sprintf('#%d', $page_id);
 							}
 							?>
-							<li data-id="<?= (int) $page_id ?>">
+							<li class="bl-editorial-selected-pages__chip" data-id="<?= (int) $page_id ?>">
 								<input type="hidden" name="<?= esc_attr($name) ?>[allowed_page_ids][]" value="<?= (int) $page_id ?>">
 								<span class="bl-editorial-selected-pages__title"><?= esc_html($title) ?></span>
 								<button type="button" class="button-link bl-editorial-remove-page" aria-label="<?= esc_attr__('Remove', 'baselayer-editorial') ?>">&times;</button>
@@ -234,9 +234,10 @@ function bl_editorial_handle_settings_save(): void
 		: [];
 
 	bl_editorial_update_settings([
-		'approval_recipients' => $raw['approval_recipients'] ?? '',
-		'approval_subject'    => $raw['approval_subject'] ?? '',
-		'defaults'            => $defaults_raw,
+		'approval_recipients'  => $raw['approval_recipients'] ?? '',
+		'approval_subject'     => $raw['approval_subject'] ?? '',
+		'restrict_new_editors' => !empty($raw['restrict_new_editors']),
+		'defaults'             => $defaults_raw,
 	]);
 
 	set_transient('bl_editorial_settings_saved', '1', 30);
@@ -317,7 +318,25 @@ function bl_editorial_render_settings_page(): void
 			</table>
 
 			<h2><?= esc_html__('Defaults for new editors', 'baselayer-editorial') ?></h2>
-			<p class="description"><?= esc_html__('Applied when a new editor account is created (or when a user becomes an editor). Existing editors keep their own settings until changed on their profile.', 'baselayer-editorial') ?></p>
+			<p class="description"><?= esc_html__('Choose whether new editors get restrictions by default. Existing editors keep their own settings until changed on their profile.', 'baselayer-editorial') ?></p>
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row"><?= esc_html__('Restrictions', 'baselayer-editorial') ?></th>
+					<td>
+						<label for="bl-editorial-restrict-new">
+							<input
+								type="checkbox"
+								name="bl_editorial_settings[restrict_new_editors]"
+								id="bl-editorial-restrict-new"
+								value="1"
+								<?= checked(!empty($settings['restrict_new_editors']), true, false) ?>
+							>
+							<?= esc_html__('Enable restrictions for new editors by default', 'baselayer-editorial') ?>
+						</label>
+						<p class="description"><?= esc_html__('When off, new editors behave like a normal WordPress editor until you enable restrictions on their profile.', 'baselayer-editorial') ?></p>
+					</td>
+				</tr>
+			</table>
 			<?php bl_editorial_render_rights_fields($settings['defaults'], 'bl_editorial_defaults', ['id_prefix' => 'bl-editorial-defaults']); ?>
 
 			<?php submit_button(__('Save settings', 'baselayer-editorial')); ?>

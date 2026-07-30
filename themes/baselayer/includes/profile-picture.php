@@ -164,6 +164,7 @@ function bl_profile_picture_profile_section(WP_User $user): void
 
 	$url = bl_profile_picture_url((int) $user->ID);
 	?>
+	<hr class="bl-profile-picture-hr">
 	<h2><?= esc_html__('Profile picture', 'baselayer') ?></h2>
 	<table class="form-table" role="presentation">
 		<tr>

@@ -3,6 +3,42 @@
 defined('ABSPATH') || exit;
 
 /**
+ * Request caches (direct statics — no copy-out helpers on the hot path).
+ *
+ * @return array{
+ *   editors: array<int, bool>,
+ *   rights: array<int, array|false>,
+ *   denied: array<int, list<string>>
+ * }
+ */
+function &bl_editorial_request_cache(): array
+{
+	static $cache = [
+		'editors' => [],
+		'rights'  => [],
+		'denied'  => [],
+	];
+
+	return $cache;
+}
+
+/**
+ * Invalidate request caches for a user (or all users).
+ */
+function bl_editorial_invalidate_user_cache(?int $user_id = null): void
+{
+	$cache = &bl_editorial_request_cache();
+	if ($user_id === null) {
+		$cache['editors'] = [];
+		$cache['rights'] = [];
+		$cache['denied'] = [];
+		return;
+	}
+
+	unset($cache['editors'][$user_id], $cache['rights'][$user_id], $cache['denied'][$user_id]);
+}
+
+/**
  * Whether the given user has the editor role (exact slug).
  */
 function bl_editorial_user_is_editor(?int $user_id = null): bool
@@ -12,12 +48,16 @@ function bl_editorial_user_is_editor(?int $user_id = null): bool
 		return false;
 	}
 
-	$user = get_userdata($user_id);
-	if (!$user) {
-		return false;
+	$cache = &bl_editorial_request_cache();
+	if (array_key_exists($user_id, $cache['editors'])) {
+		return $cache['editors'][$user_id];
 	}
 
-	return in_array('editor', (array) $user->roles, true);
+	$user = get_userdata($user_id);
+	$is_editor = $user ? in_array('editor', (array) $user->roles, true) : false;
+	$cache['editors'][$user_id] = $is_editor;
+
+	return $is_editor;
 }
 
 /**
@@ -45,7 +85,12 @@ function bl_editorial_user_is_admin(?int $user_id = null): bool
  */
 function bl_editorial_restrictable_post_types(): array
 {
-	$types = get_post_types(
+	static $types = null;
+	if ($types !== null) {
+		return $types;
+	}
+
+	$found = get_post_types(
 		[
 			'public'  => true,
 			'show_ui' => true,
@@ -53,14 +98,16 @@ function bl_editorial_restrictable_post_types(): array
 		'objects'
 	);
 
-	unset($types['attachment']);
+	unset($found['attachment']);
 
 	/**
 	 * Filter post types available for per-editor access control.
 	 *
-	 * @param array<string, WP_Post_Type> $types
+	 * @param array<string, WP_Post_Type> $found
 	 */
-	return apply_filters('bl_editorial_restrictable_post_types', $types);
+	$types = apply_filters('bl_editorial_restrictable_post_types', $found);
+
+	return $types;
 }
 
 /**
@@ -168,16 +215,31 @@ function bl_editorial_sanitize_rights($raw): array
  */
 function bl_editorial_get_user_rights(int $user_id): ?array
 {
-	if ($user_id <= 0 || !bl_editorial_user_is_editor($user_id)) {
+	if ($user_id <= 0) {
+		return null;
+	}
+
+	$cache = &bl_editorial_request_cache();
+	if (array_key_exists($user_id, $cache['rights'])) {
+		$hit = $cache['rights'][$user_id];
+		return $hit === false ? null : $hit;
+	}
+
+	if (!bl_editorial_user_is_editor($user_id)) {
+		$cache['rights'][$user_id] = false;
 		return null;
 	}
 
 	$raw = get_user_meta($user_id, BL_EDITORIAL_USER_META, true);
 	if (!is_array($raw) || $raw === []) {
+		$cache['rights'][$user_id] = false;
 		return null;
 	}
 
-	return bl_editorial_sanitize_rights($raw);
+	$rights = bl_editorial_sanitize_rights($raw);
+	$cache['rights'][$user_id] = $rights;
+
+	return $rights;
 }
 
 /**
@@ -189,6 +251,86 @@ function bl_editorial_user_is_restricted(int $user_id): bool
 }
 
 /**
+ * Primitive caps to deny for a restricted editor (built once per request).
+ *
+ * @return list<string>
+ */
+function bl_editorial_denied_primitive_caps(int $user_id): array
+{
+	$cache = &bl_editorial_request_cache();
+	if (array_key_exists($user_id, $cache['denied'])) {
+		return $cache['denied'][$user_id];
+	}
+
+	$rights = bl_editorial_get_user_rights($user_id);
+	if ($rights === null) {
+		$cache['denied'][$user_id] = [];
+		return [];
+	}
+
+	$denied = [];
+	$allowed_types = $rights['post_types'];
+
+	foreach (bl_editorial_restrictable_post_types() as $slug => $object) {
+		$is_allowed = in_array($slug, $allowed_types, true);
+
+		if (!$is_allowed) {
+			foreach ([
+				$object->cap->edit_posts ?? '',
+				$object->cap->edit_others_posts ?? '',
+				$object->cap->edit_published_posts ?? '',
+				$object->cap->edit_private_posts ?? '',
+				$object->cap->publish_posts ?? '',
+				$object->cap->delete_posts ?? '',
+				$object->cap->delete_others_posts ?? '',
+				$object->cap->delete_published_posts ?? '',
+				$object->cap->delete_private_posts ?? '',
+				$object->cap->create_posts ?? '',
+				$object->cap->read_private_posts ?? '',
+			] as $cap_name) {
+				if ($cap_name !== '') {
+					$denied[] = $cap_name;
+				}
+			}
+			continue;
+		}
+
+		if (!empty($rights['own_posts_only'])) {
+			$edit_others = $object->cap->edit_others_posts ?? '';
+			$delete_others = $object->cap->delete_others_posts ?? '';
+			if ($edit_others !== '') {
+				$denied[] = $edit_others;
+			}
+			if ($delete_others !== '') {
+				$denied[] = $delete_others;
+			}
+		}
+
+		if ($rights['publish_mode'] === 'approval') {
+			$publish = $object->cap->publish_posts ?? '';
+			if ($publish !== '') {
+				$denied[] = $publish;
+			}
+		}
+	}
+
+	if ($rights['page_access'] === 'selected' && in_array('page', $allowed_types, true)) {
+		$page_obj = get_post_type_object('page');
+		if ($page_obj) {
+			$create = $page_obj->cap->create_posts ?? 'edit_pages';
+			if ($create !== '') {
+				$denied[] = $create;
+			}
+		}
+	}
+
+	$denied = array_values(array_unique($denied));
+	$cache['denied'][$user_id] = $denied;
+
+	return $denied;
+}
+
+/**
  * Persist rights for a user (overwrites).
  *
  * @param array<string, mixed> $rights
@@ -196,6 +338,7 @@ function bl_editorial_user_is_restricted(int $user_id): bool
 function bl_editorial_set_user_rights(int $user_id, array $rights): void
 {
 	update_user_meta($user_id, BL_EDITORIAL_USER_META, bl_editorial_sanitize_rights($rights));
+	bl_editorial_invalidate_user_cache($user_id);
 }
 
 /**
@@ -204,6 +347,7 @@ function bl_editorial_set_user_rights(int $user_id, array $rights): void
 function bl_editorial_clear_user_rights(int $user_id): void
 {
 	delete_user_meta($user_id, BL_EDITORIAL_USER_META);
+	bl_editorial_invalidate_user_cache($user_id);
 }
 
 /**
@@ -249,7 +393,7 @@ function bl_editorial_user_allowed_page_ids(int $user_id): ?array
 		return null;
 	}
 
-	return array_map('intval', $rights['allowed_page_ids']);
+	return $rights['allowed_page_ids'];
 }
 
 /**

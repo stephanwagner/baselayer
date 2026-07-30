@@ -3,22 +3,19 @@
 defined('ABSPATH') || exit;
 
 /**
- * Meta caps that carry a post ID in $args[0].
+ * Meta caps that need per-post Editorial checks (isset map for O(1) reject).
  *
- * @return list<string>
+ * @var array<string, true>
  */
-function bl_editorial_post_meta_caps(): array
-{
-	return [
-		'edit_post',
-		'delete_post',
-		'read_post',
-		'publish_post',
-	];
-}
+const BL_EDITORIAL_META_CAPS = [
+	'edit_post'    => true,
+	'delete_post'  => true,
+	'read_post'    => true,
+	'publish_post' => true,
+];
 
 /**
- * Deny meta capabilities for restricted editors.
+ * Thin map_meta_cap: almost all calls exit on the isset check.
  *
  * @param string[] $caps
  * @param string   $cap
@@ -28,16 +25,12 @@ function bl_editorial_post_meta_caps(): array
  */
 function bl_editorial_map_meta_cap(array $caps, string $cap, int $user_id, array $args): array
 {
-	if ($user_id <= 0 || !bl_editorial_user_is_restricted($user_id)) {
+	if (!isset(BL_EDITORIAL_META_CAPS[$cap]) || $user_id <= 0) {
 		return $caps;
 	}
 
 	$rights = bl_editorial_get_user_rights($user_id);
 	if ($rights === null) {
-		return $caps;
-	}
-
-	if (!in_array($cap, bl_editorial_post_meta_caps(), true)) {
 		return $caps;
 	}
 
@@ -69,121 +62,83 @@ function bl_editorial_map_meta_cap(array $caps, string $cap, int $user_id, array
 		return $caps;
 	}
 
-	if (!bl_editorial_user_can_edit_post_type($user_id, $post_type)) {
+	if (!in_array($post_type, $rights['post_types'], true)) {
 		return ['do_not_allow'];
 	}
 
-	if ($post_type === 'page') {
-		$allowed = bl_editorial_user_allowed_page_ids($user_id);
-		if (is_array($allowed) && !in_array($post_id, $allowed, true)) {
+	if ($post_type === 'page' && $rights['page_access'] === 'selected') {
+		if (!in_array($post_id, $rights['allowed_page_ids'], true)) {
 			return ['do_not_allow'];
 		}
 	}
 
 	if (
-		bl_editorial_user_own_posts_only($user_id)
+		!empty($rights['own_posts_only'])
 		&& (int) $post->post_author !== $user_id
-		&& in_array($cap, ['edit_post', 'delete_post', 'publish_post'], true)
+		&& ($cap === 'edit_post' || $cap === 'delete_post' || $cap === 'publish_post')
 	) {
 		return ['do_not_allow'];
 	}
 
 	return $caps;
 }
-add_filter('map_meta_cap', 'bl_editorial_map_meta_cap', 10, 4);
 
 /**
- * Adjust primitive capabilities for restricted editors.
- *
- * @param array<string, bool> $allcaps
- * @param string[]            $caps
- * @param array               $args
- * @param WP_User             $user
- * @return array<string, bool>
+ * Patch denied primitive caps onto the user object once (no user_has_cap filter).
  */
-function bl_editorial_user_has_cap(array $allcaps, array $caps, array $args, WP_User $user): array
+function bl_editorial_patch_user_allcaps(WP_User $user): void
 {
 	$user_id = (int) $user->ID;
-	if ($user_id <= 0 || !bl_editorial_user_is_restricted($user_id)) {
-		return $allcaps;
+	if ($user_id <= 0) {
+		return;
 	}
 
-	$rights = bl_editorial_get_user_rights($user_id);
-	if ($rights === null) {
-		return $allcaps;
+	foreach (bl_editorial_denied_primitive_caps($user_id) as $cap_name) {
+		$user->allcaps[$cap_name] = false;
 	}
-
-	$requested = isset($args[0]) ? (string) $args[0] : '';
-
-	foreach (bl_editorial_restrictable_post_types() as $slug => $object) {
-		if (in_array($slug, $rights['post_types'], true)) {
-			continue;
-		}
-
-		$pto = $object;
-		$type_caps = [
-			$pto->cap->edit_posts ?? '',
-			$pto->cap->edit_others_posts ?? '',
-			$pto->cap->edit_published_posts ?? '',
-			$pto->cap->edit_private_posts ?? '',
-			$pto->cap->publish_posts ?? '',
-			$pto->cap->delete_posts ?? '',
-			$pto->cap->delete_others_posts ?? '',
-			$pto->cap->delete_published_posts ?? '',
-			$pto->cap->delete_private_posts ?? '',
-			$pto->cap->create_posts ?? '',
-			$pto->cap->read_private_posts ?? '',
-		];
-
-		foreach ($type_caps as $cap_name) {
-			if ($cap_name !== '') {
-				$allcaps[$cap_name] = false;
-			}
-		}
-	}
-
-	if (bl_editorial_user_own_posts_only($user_id)) {
-		foreach (bl_editorial_restrictable_post_types() as $slug => $object) {
-			if (!in_array($slug, $rights['post_types'], true)) {
-				continue;
-			}
-			$edit_others = $object->cap->edit_others_posts ?? '';
-			$delete_others = $object->cap->delete_others_posts ?? '';
-			if ($edit_others !== '') {
-				$allcaps[$edit_others] = false;
-			}
-			if ($delete_others !== '') {
-				$allcaps[$delete_others] = false;
-			}
-		}
-	}
-
-	if (bl_editorial_user_requires_approval($user_id)) {
-		foreach (bl_editorial_restrictable_post_types() as $slug => $object) {
-			if (!in_array($slug, $rights['post_types'], true)) {
-				continue;
-			}
-			$publish = $object->cap->publish_posts ?? '';
-			if ($publish !== '') {
-				$allcaps[$publish] = false;
-			}
-		}
-	}
-
-	$allowed_pages = bl_editorial_user_allowed_page_ids($user_id);
-	if (is_array($allowed_pages)) {
-		$page_obj = get_post_type_object('page');
-		if ($page_obj) {
-			$create = $page_obj->cap->create_posts ?? 'edit_pages';
-			$allcaps[$create] = false;
-		}
-	}
-
-	// Short-circuit explicit checks that still appear in $caps after map_meta_cap.
-	if ($requested === 'do_not_allow') {
-		$allcaps['do_not_allow'] = false;
-	}
-
-	return $allcaps;
 }
-add_filter('user_has_cap', 'bl_editorial_user_has_cap', 10, 4);
+
+/**
+ * Enable Editorial capability enforcement only for the current restricted editor.
+ *
+ * Admins / unrestricted users: attach nothing (zero hot-path cost).
+ * Restricted editors: one-time allcaps patch + thin map_meta_cap only.
+ */
+function bl_editorial_sync_capability_hooks(): void
+{
+	static $hooks_attached = false;
+	static $patched_user_id = 0;
+
+	$user_id = get_current_user_id();
+
+	// Always detach first when user changes or becomes unrestricted.
+	if ($hooks_attached) {
+		remove_filter('map_meta_cap', 'bl_editorial_map_meta_cap', 10);
+		$hooks_attached = false;
+	}
+
+	if ($user_id <= 0 || !bl_editorial_user_is_restricted($user_id)) {
+		$patched_user_id = 0;
+		return;
+	}
+
+	$user = wp_get_current_user();
+	if (!$user instanceof WP_User || (int) $user->ID !== $user_id) {
+		return;
+	}
+
+	if ($patched_user_id !== $user_id) {
+		bl_editorial_patch_user_allcaps($user);
+		$patched_user_id = $user_id;
+	}
+
+	add_filter('map_meta_cap', 'bl_editorial_map_meta_cap', 10, 4);
+	$hooks_attached = true;
+}
+
+add_action('set_current_user', 'bl_editorial_sync_capability_hooks', 20);
+
+// User may already be set when this file loads (plugins_loaded / theme).
+if (did_action('set_current_user') || get_current_user_id() > 0) {
+	bl_editorial_sync_capability_hooks();
+}

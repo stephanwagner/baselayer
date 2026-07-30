@@ -3,7 +3,35 @@
 defined('ABSPATH') || exit;
 
 /**
- * Remove admin menus for disallowed post types.
+ * Whether a restricted editor may access a post type in admin (menu / screens).
+ */
+function bl_editorial_user_may_access_post_type_admin(int $user_id, string $post_type): bool
+{
+	if ($post_type === '' || $post_type === 'attachment') {
+		return true;
+	}
+
+	return bl_editorial_user_can_edit_post_type($user_id, $post_type);
+}
+
+/**
+ * Post type slug from an admin menu/submenu file slug, or null if not a post-type screen.
+ */
+function bl_editorial_post_type_from_menu_slug(string $slug): ?string
+{
+	if ($slug === 'edit.php' || $slug === 'post-new.php') {
+		return 'post';
+	}
+
+	if (preg_match('/^(?:edit|post-new)\.php\?post_type=([a-z0-9_-]+)/i', $slug, $m)) {
+		return sanitize_key($m[1]);
+	}
+
+	return null;
+}
+
+/**
+ * Remove admin menus / submenus for post types the editor cannot edit.
  */
 function bl_editorial_admin_menu_cleanup(): void
 {
@@ -17,6 +45,45 @@ function bl_editorial_admin_menu_cleanup(): void
 		return;
 	}
 
+	global $menu, $submenu;
+
+	// Top-level menus (Posts, Pages, CPTs with show_in_menu => true).
+	if (is_array($menu)) {
+		foreach ($menu as $index => $item) {
+			$slug = isset($item[2]) ? (string) $item[2] : '';
+			$post_type = bl_editorial_post_type_from_menu_slug($slug);
+			if ($post_type === null) {
+				continue;
+			}
+			if (!bl_editorial_user_may_access_post_type_admin($user_id, $post_type)) {
+				unset($menu[$index]);
+			}
+		}
+	}
+
+	// Submenus under CPT parents or nested under another menu (show_in_menu => 'parent.php').
+	if (is_array($submenu)) {
+		foreach ($submenu as $parent => $items) {
+			if (!is_array($items)) {
+				continue;
+			}
+			foreach ($items as $index => $item) {
+				$slug = isset($item[2]) ? (string) $item[2] : '';
+				$post_type = bl_editorial_post_type_from_menu_slug($slug);
+				if ($post_type === null) {
+					continue;
+				}
+				if (!bl_editorial_user_may_access_post_type_admin($user_id, $post_type)) {
+					unset($submenu[$parent][$index]);
+				}
+			}
+			if (isset($submenu[$parent]) && $submenu[$parent] === []) {
+				unset($submenu[$parent]);
+			}
+		}
+	}
+
+	// Also use WP helpers for common cases (harmless if already removed).
 	foreach (bl_editorial_restrictable_post_types() as $slug => $object) {
 		if (in_array($slug, $rights['post_types'], true)) {
 			continue;
@@ -27,31 +94,20 @@ function bl_editorial_admin_menu_cleanup(): void
 			continue;
 		}
 
-		if ($slug === 'page') {
-			remove_menu_page('edit.php?post_type=page');
-			continue;
-		}
+		remove_menu_page('edit.php?post_type=' . $slug);
 
-		$menu_slug = is_string($object->show_in_menu) && $object->show_in_menu !== ''
-			? $object->show_in_menu
-			: 'edit.php?post_type=' . $slug;
-
-		if ($object->show_in_menu === true || $object->show_in_menu === '1') {
-			remove_menu_page('edit.php?post_type=' . $slug);
-		} elseif (is_string($object->show_in_menu) && $object->show_in_menu !== '') {
-			remove_submenu_page($menu_slug, 'edit.php?post_type=' . $slug);
-			remove_submenu_page($menu_slug, 'post-new.php?post_type=' . $slug);
-		} else {
-			remove_menu_page('edit.php?post_type=' . $slug);
+		if (is_string($object->show_in_menu) && $object->show_in_menu !== '' && $object->show_in_menu !== '1') {
+			remove_submenu_page($object->show_in_menu, 'edit.php?post_type=' . $slug);
+			remove_submenu_page($object->show_in_menu, 'post-new.php?post_type=' . $slug);
 		}
 	}
 
-	$allowed_pages = bl_editorial_user_allowed_page_ids($user_id);
-	if (is_array($allowed_pages) && in_array('page', $rights['post_types'], true)) {
+	// Page allowlist: no “Add New”.
+	if (in_array('page', $rights['post_types'], true) && is_array(bl_editorial_user_allowed_page_ids($user_id))) {
 		remove_submenu_page('edit.php?post_type=page', 'post-new.php?post_type=page');
 	}
 }
-add_action('admin_menu', 'bl_editorial_admin_menu_cleanup', 999);
+add_action('admin_menu', 'bl_editorial_admin_menu_cleanup', 9999);
 
 /**
  * Hide “Add New” for pages when an allowlist is active.
@@ -101,7 +157,7 @@ function bl_editorial_block_disallowed_screens(): void
 		return;
 	}
 
-	if (!bl_editorial_user_can_edit_post_type($user_id, $post_type)) {
+	if (!bl_editorial_user_may_access_post_type_admin($user_id, $post_type)) {
 		wp_die(
 			esc_html__('You are not allowed to access this content type.', 'baselayer-editorial'),
 			esc_html__('Forbidden', 'baselayer-editorial'),

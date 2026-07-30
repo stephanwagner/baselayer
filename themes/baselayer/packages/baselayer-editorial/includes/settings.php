@@ -8,15 +8,17 @@ defined('ABSPATH') || exit;
  * @return array{
  *   approval_recipients: string,
  *   approval_subject: string,
+ *   restrict_new_editors: bool,
  *   defaults: array
  * }
  */
 function bl_editorial_settings_defaults(): array
 {
 	return [
-		'approval_recipients' => '',
-		'approval_subject'    => '',
-		'defaults'            => bl_editorial_default_rights(),
+		'approval_recipients'  => '',
+		'approval_subject'     => '',
+		'restrict_new_editors' => false,
+		'defaults'             => bl_editorial_default_rights(),
 	];
 }
 
@@ -27,6 +29,7 @@ function bl_editorial_settings_defaults(): array
  * @return array{
  *   approval_recipients: string,
  *   approval_subject: string,
+ *   restrict_new_editors: bool,
  *   defaults: array
  * }
  */
@@ -45,9 +48,10 @@ function bl_editorial_sanitize_settings($raw): array
 	$defaults_raw = isset($raw['defaults']) && is_array($raw['defaults']) ? $raw['defaults'] : [];
 
 	return [
-		'approval_recipients' => $recipients,
-		'approval_subject'    => $subject,
-		'defaults'            => bl_editorial_sanitize_rights($defaults_raw),
+		'approval_recipients'  => $recipients,
+		'approval_subject'     => $subject,
+		'restrict_new_editors' => !empty($raw['restrict_new_editors']),
+		'defaults'             => bl_editorial_sanitize_rights($defaults_raw),
 	];
 }
 
@@ -87,6 +91,7 @@ function bl_editorial_parse_recipients(string $raw): array
  * @return array{
  *   approval_recipients: string,
  *   approval_subject: string,
+ *   restrict_new_editors: bool,
  *   defaults: array
  * }
  */
@@ -111,26 +116,16 @@ function bl_editorial_update_settings(array $settings): void
 }
 
 /**
- * Apply site defaults to a newly created editor (only when meta is empty).
+ * Apply site defaults to a newly created editor when “restrict new editors” is on.
  */
 function bl_editorial_maybe_apply_defaults_on_user_register(int $user_id): void
 {
-	if (!bl_editorial_user_is_editor($user_id)) {
-		return;
-	}
-
-	$existing = get_user_meta($user_id, BL_EDITORIAL_USER_META, true);
-	if (is_array($existing) && $existing !== []) {
-		return;
-	}
-
-	$settings = bl_editorial_get_settings();
-	bl_editorial_set_user_rights($user_id, $settings['defaults']);
+	bl_editorial_maybe_apply_defaults_for_editor($user_id);
 }
 add_action('user_register', 'bl_editorial_maybe_apply_defaults_on_user_register', 20);
 
 /**
- * When a user’s role becomes editor and they have no rights yet, apply defaults.
+ * When a user’s role becomes editor and they have no rights yet, apply defaults if enabled.
  *
  * @param int    $user_id
  * @param string $role
@@ -142,12 +137,28 @@ function bl_editorial_maybe_apply_defaults_on_set_role(int $user_id, string $rol
 		return;
 	}
 
+	bl_editorial_maybe_apply_defaults_for_editor($user_id);
+}
+add_action('set_user_role', 'bl_editorial_maybe_apply_defaults_on_set_role', 20, 3);
+
+/**
+ * Copy site defaults into user meta when restriction-by-default is enabled and meta is empty.
+ */
+function bl_editorial_maybe_apply_defaults_for_editor(int $user_id): void
+{
+	if (!bl_editorial_user_is_editor($user_id)) {
+		return;
+	}
+
+	$settings = bl_editorial_get_settings();
+	if (empty($settings['restrict_new_editors'])) {
+		return;
+	}
+
 	$existing = get_user_meta($user_id, BL_EDITORIAL_USER_META, true);
 	if (is_array($existing) && $existing !== []) {
 		return;
 	}
 
-	$settings = bl_editorial_get_settings();
 	bl_editorial_set_user_rights($user_id, $settings['defaults']);
 }
-add_action('set_user_role', 'bl_editorial_maybe_apply_defaults_on_set_role', 20, 3);

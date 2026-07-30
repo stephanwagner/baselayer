@@ -243,6 +243,60 @@
     });
   }
   window.baselayerOpenPagePicker = openPagePicker;
+  function renderPageSelectionChips(container, pages, options = {}) {
+    if (!container) {
+      return;
+    }
+    const opts = {
+      inputName: "",
+      emptyLabel: "No pages selected.",
+      removeLabel: "Remove",
+      onChange: null,
+      ...options
+    };
+    const list = Array.isArray(pages) ? pages.map((page) => ({
+      id: Number(page && page.id) || 0,
+      title: page && page.title || "",
+      url: page && page.url || ""
+    })).filter((page) => page.id > 0) : [];
+    container.replaceChildren();
+    if (!list.length) {
+      const empty = document.createElement("li");
+      empty.className = "bl-editorial-selected-pages__empty description";
+      empty.textContent = opts.emptyLabel || container.dataset.empty || "No pages selected.";
+      container.appendChild(empty);
+      if (typeof opts.onChange === "function") {
+        opts.onChange([]);
+      }
+      return;
+    }
+    list.forEach((page) => {
+      const li = document.createElement("li");
+      li.dataset.id = String(page.id);
+      li.className = "bl-editorial-selected-pages__chip";
+      if (opts.inputName) {
+        const input = document.createElement("input");
+        input.type = "hidden";
+        input.name = opts.inputName;
+        input.value = String(page.id);
+        li.appendChild(input);
+      }
+      const title = document.createElement("span");
+      title.className = "bl-editorial-selected-pages__title";
+      title.textContent = page.title || `#${page.id}`;
+      const remove = document.createElement("button");
+      remove.type = "button";
+      remove.className = "button-link bl-editorial-remove-page";
+      remove.setAttribute("aria-label", opts.removeLabel);
+      remove.textContent = "\xD7";
+      li.append(title, remove);
+      container.appendChild(li);
+    });
+    if (typeof opts.onChange === "function") {
+      opts.onChange(list);
+    }
+  }
+  window.baselayerRenderPageSelectionChips = renderPageSelectionChips;
 
   // themes/baselayer/packages/baselayer-editorial/src/js/admin.js
   (function() {
@@ -260,31 +314,10 @@
       wrap.hidden = !(selected && selected.checked);
     }
     function renderSelectedList(list, pages, inputName) {
-      list.replaceChildren();
-      if (!pages.length) {
-        const empty = document.createElement("li");
-        empty.className = "bl-editorial-selected-pages__empty description";
-        empty.textContent = list.dataset.empty || i18n.noPagesSelected || "No pages selected.";
-        list.appendChild(empty);
-        return;
-      }
-      pages.forEach((page) => {
-        const li = document.createElement("li");
-        li.dataset.id = String(page.id);
-        const input = document.createElement("input");
-        input.type = "hidden";
-        input.name = inputName;
-        input.value = String(page.id);
-        const title = document.createElement("span");
-        title.className = "bl-editorial-selected-pages__title";
-        title.textContent = page.title || `#${page.id}`;
-        const remove = document.createElement("button");
-        remove.type = "button";
-        remove.className = "button-link bl-editorial-remove-page";
-        remove.setAttribute("aria-label", i18n.remove || "Remove");
-        remove.textContent = "\xD7";
-        li.append(input, title, remove);
-        list.appendChild(li);
+      renderPageSelectionChips(list, pages, {
+        inputName,
+        emptyLabel: list.dataset.empty || i18n.noPagesSelected || "No pages selected.",
+        removeLabel: i18n.remove || "Remove"
       });
     }
     function currentSelectedPages(list) {
@@ -306,19 +339,51 @@
       }
       return "bl_editorial_rights[allowed_page_ids][]";
     }
+    function setRightsFieldsDisabled(fields, disabled) {
+      if (!fields) return;
+      fields.querySelectorAll("input, select, textarea").forEach((el) => {
+        if (!(el instanceof HTMLInputElement || el instanceof HTMLSelectElement || el instanceof HTMLTextAreaElement)) {
+          return;
+        }
+        const name = el.getAttribute("name") || "";
+        if (name.indexOf("bl_editorial_rights") !== 0) {
+          return;
+        }
+        el.disabled = !!disabled;
+      });
+    }
+    function syncRestrictionsToggle(toggle) {
+      if (!(toggle instanceof HTMLInputElement)) return;
+      const fieldsId = toggle.getAttribute("data-bl-editorial-fields");
+      const fields = fieldsId ? document.getElementById(fieldsId) : null;
+      if (!fields) return;
+      fields.hidden = !toggle.checked;
+      setRightsFieldsDisabled(fields, !toggle.checked);
+      if (toggle.checked && toggle.id === "bl-editorial-enable-rights" && toggle.getAttribute("data-bl-editorial-has-saved") !== "1") {
+        const json = document.getElementById("bl-editorial-site-defaults");
+        if (!json) return;
+        let defaults;
+        try {
+          defaults = JSON.parse(json.textContent || "{}");
+        } catch (e) {
+          return;
+        }
+        applyDefaultsToProfile(defaults, { keepEnableState: true });
+      }
+    }
     document.addEventListener("change", (evt) => {
       const target = evt.target;
       if (!(target instanceof HTMLElement)) return;
-      if (target.id === "bl-editorial-enable-rights") {
-        const fields = document.getElementById("bl-editorial-rights-fields");
-        if (fields) {
-          fields.hidden = !target.checked;
-        }
+      if (target.classList.contains("bl-editorial-enable-restrictions")) {
+        syncRestrictionsToggle(target);
         return;
       }
       if (target.classList.contains("bl-editorial-page-access")) {
         syncPageAccess(closestRightsRoot(target));
       }
+    });
+    document.querySelectorAll(".bl-editorial-enable-restrictions").forEach((toggle) => {
+      syncRestrictionsToggle(toggle);
     });
     document.addEventListener("click", async (evt) => {
       const target = evt.target;
@@ -375,7 +440,7 @@
         applyDefaultsToProfile(defaults);
       }
     });
-    function applyDefaultsToProfile(defaults) {
+    function applyDefaultsToProfile(defaults, options = {}) {
       const root = document.getElementById("bl-editorial-rights-fields");
       if (!root) return;
       root.querySelectorAll(".bl-editorial-post-type").forEach((input) => {
@@ -401,10 +466,14 @@
         renderSelectedList(list, pages, "bl_editorial_rights[allowed_page_ids][]");
       }
       syncPageAccess(root.querySelector("[data-bl-editorial-rights]"));
-      const enable = document.getElementById("bl-editorial-enable-rights");
-      if (enable) {
-        enable.checked = true;
-        root.hidden = false;
+      if (!options.keepEnableState) {
+        const enable = document.getElementById("bl-editorial-enable-rights");
+        if (enable) {
+          enable.checked = true;
+          syncRestrictionsToggle(enable);
+        }
+      } else {
+        setRightsFieldsDisabled(root, false);
       }
     }
     document.querySelectorAll("[data-bl-editorial-rights]").forEach((root) => {
