@@ -295,12 +295,16 @@ function bl_editorial_render_settings_page(): void
 				<tr>
 					<th scope="row"><label for="bl-editorial-recipients"><?= esc_html__('Recipients', 'baselayer-editorial') ?></label></th>
 					<td>
+						<?php
+						$admin_email = (string) get_option('admin_email');
+						$recipients_placeholder = is_email($admin_email) ? $admin_email : '';
+						?>
 						<textarea
 							name="bl_editorial_settings[approval_recipients]"
 							id="bl-editorial-recipients"
 							class="large-text"
 							rows="3"
-							placeholder="<?= esc_attr__('editor@example.com, ops@example.com', 'baselayer-editorial') ?>"
+							placeholder="<?= esc_attr($recipients_placeholder) ?>"
 						><?= esc_textarea($settings['approval_recipients']) ?></textarea>
 						<p class="description"><?= esc_html__('Comma or newline separated email addresses.', 'baselayer-editorial') ?></p>
 					</td>

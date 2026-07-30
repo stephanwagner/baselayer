@@ -205,9 +205,6 @@ msgstr "Wird gesendet, wenn ein Redakteur Inhalte zur Freigabe einreicht. Leer l
 msgid "Recipients"
 msgstr "Empfänger"
 
-#: includes/settings-page.php:303
-msgid "editor@example.com, ops@example.com"
-msgstr "redaktion@example.com, ops@example.com"
 
 #: includes/settings-page.php:305
 msgid "Comma or newline separated email addresses."
