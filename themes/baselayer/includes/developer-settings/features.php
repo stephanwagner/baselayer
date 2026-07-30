@@ -158,12 +158,17 @@ function bl_render_developer_features(): void
 						<th scope="row" class="form-table-checkbox-label"><?= esc_html__('Breadcrumbs', 'baselayer') ?></th>
 						<td>
 							<input type="hidden" name="baselayer_features[enable_breadcrumbs]" value="0">
-							<label><input type="checkbox" name="baselayer_features[enable_breadcrumbs]" value="1" <?= checked($feat('enable_breadcrumbs'), 1, false) ?>> <?= esc_html__('Enable breadcrumbs', 'baselayer') ?></label>
+							<label><input type="checkbox" name="baselayer_features[enable_breadcrumbs]" id="baselayer_features_enable_breadcrumbs" value="1" <?= checked($feat('enable_breadcrumbs'), 1, false) ?>> <?= esc_html__('Enable breadcrumbs', 'baselayer') ?></label>
 							<p class="description bl-indent-checkbox"><?= esc_html__('Shows breadcrumb navigation on pages, posts, archives, and search.', 'baselayer') ?></p>
 							<p class="description bl-indent-checkbox"><?= wp_kses(
 								__('Needs <code class="bl-code-small">bl_breadcrumbs()</code> in templates to show.', 'baselayer'),
 								['code' => ['class' => true]]
 							) ?></p>
+							<div class="bl-feature-sub" id="bl-feature-sub-breadcrumbs" style="margin-top: 12px; <?= $feat('enable_breadcrumbs') !== 1 ? 'display:none;' : '' ?>">
+								<input type="hidden" name="baselayer_features[breadcrumbs_hide_first_level]" value="0">
+								<label><input type="checkbox" name="baselayer_features[breadcrumbs_hide_first_level]" value="1" <?= checked($feat('breadcrumbs_hide_first_level'), 1, false) ?>> <?= esc_html__('Hide on first level pages', 'baselayer') ?></label>
+								<p class="description bl-indent-checkbox"><?= esc_html__('Only show breadcrumbs when there is a parent page other than the home page.', 'baselayer') ?></p>
+							</div>
 						</td>
 					</tr>
 				</table>
@@ -354,6 +359,7 @@ function bl_render_developer_features(): void
 					main.addEventListener('change', toggle);
 				}
 				bindToggle('baselayer_features_enable_webp', 'bl-feature-sub-webp');
+				bindToggle('baselayer_features_enable_breadcrumbs', 'bl-feature-sub-breadcrumbs');
 			})();
 		</script>
 	</div>

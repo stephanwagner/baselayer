@@ -931,6 +931,9 @@ function bl_sanitize_features($value): array
 	if (empty($out['enable_webp'])) {
 		$out['enable_webp_convert_original'] = 0;
 	}
+	if (empty($out['enable_breadcrumbs'])) {
+		$out['breadcrumbs_hide_first_level'] = 0;
+	}
 	if (empty($out['enable_post_expirator'])) {
 		wp_clear_scheduled_hook('bl_expire_post');
 	}

@@ -159,7 +159,12 @@ function bl_breadcrumbs(array $args = []): string
     }
 
     // Unsupported context would only output "Home" — omit rather than mislead.
-    if (count($items) < 2) {
+    // With "hide on first level", require a non-home parent (Home › Parent › Current).
+    $min_items = 2;
+    if (function_exists('bl_theme_feature_enabled') && bl_theme_feature_enabled('breadcrumbs_hide_first_level')) {
+        $min_items = 3;
+    }
+    if (count($items) < $min_items) {
         return '';
     }
 

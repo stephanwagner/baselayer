@@ -1081,6 +1081,12 @@ msgstr "Fügt einen Formular-Builder, Übermittlungen, E-Mail-Benachrichtigungen
 msgid "Needs <code class=\"bl-code-small\">bl_breadcrumbs()</code> in templates to show."
 msgstr "Benötigt <code class=\"bl-code-small\">bl_breadcrumbs()</code> in Templates um angezeigt zu werden."
 
+msgid "Hide on first level pages"
+msgstr "Auf Seiten der ersten Ebene ausblenden"
+
+msgid "Only show breadcrumbs when there is a parent page other than the home page."
+msgstr "Breadcrumbs nur anzeigen, wenn es eine übergeordnete Seite gibt, die nicht die Startseite ist."
+
 msgid "Languages"
 msgstr "Sprachen"
 
