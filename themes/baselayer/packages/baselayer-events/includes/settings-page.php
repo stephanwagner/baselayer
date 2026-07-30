@@ -373,10 +373,17 @@ function bl_events_apply_settings_tab(array $cfg, string $tab, array $post): arr
 		if (!empty($post['statuses_config_json']) && is_string($post['statuses_config_json'])) {
 			$decoded = json_decode(wp_unslash($post['statuses_config_json']), true);
 		}
-		$cfg['statuses'] = bl_events_sanitize_statuses_config([
-			'enabled' => !empty($post['statuses_enabled']),
-			'items' => is_array($decoded) ? $decoded : [],
-		]);
+		$previous_items = [];
+		if (isset($cfg['statuses']['items']) && is_array($cfg['statuses']['items'])) {
+			$previous_items = $cfg['statuses']['items'];
+		}
+		$cfg['statuses'] = bl_events_sanitize_statuses_config(
+			[
+				'enabled' => !empty($post['statuses_enabled']),
+				'items' => is_array($decoded) ? $decoded : [],
+			],
+			$previous_items
+		);
 	}
 
 	if ($tab === 'meta') {

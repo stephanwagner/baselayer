@@ -478,12 +478,57 @@ function bl_events_sanitize_statuses($raw): array
 }
 
 /**
+ * Whether the current user may rename status IDs (BaseLayer developers only).
+ */
+function bl_events_user_can_edit_status_ids(): bool
+{
+	return function_exists('bl_is_developer_user')
+		&& bl_is_developer_user((int) get_current_user_id());
+}
+
+/**
+ * For non-developers, keep existing status IDs stable (block renames).
+ * New statuses and deletions are still allowed.
+ *
+ * @param array<string, array{label: string, color: string}> $incoming
+ * @param array<string, array{label: string, color: string}> $previous
+ * @return array<string, array{label: string, color: string}>
+ */
+function bl_events_preserve_status_ids(array $incoming, array $previous): array
+{
+	if (bl_events_user_can_edit_status_ids() || $previous === []) {
+		return $incoming;
+	}
+
+	$prev_keys = array_keys($previous);
+	$new_keys = array_keys($incoming);
+	$removed = array_values(array_diff($prev_keys, $new_keys));
+	$added = array_values(array_diff($new_keys, $prev_keys));
+
+	// Pair removed→added in order so a DevTools ID rename maps back to the old key.
+	$remap = [];
+	$pair_count = min(count($removed), count($added));
+	for ($i = 0; $i < $pair_count; $i++) {
+		$remap[$added[$i]] = $removed[$i];
+	}
+
+	$out = [];
+	foreach ($incoming as $id => $row) {
+		$final = $remap[$id] ?? $id;
+		$out[$final] = $row;
+	}
+
+	return $out;
+}
+
+/**
  * Sanitize statuses config (`enabled` + `items`), matching metadata shape.
  *
  * @param mixed $raw
+ * @param array<string, array{label: string, color: string}>|null $previous_items
  * @return array{enabled: bool, items: array<string, array{label: string, color: string}>}
  */
-function bl_events_sanitize_statuses_config($raw): array
+function bl_events_sanitize_statuses_config($raw, ?array $previous_items = null): array
 {
 	if (!is_array($raw)) {
 		return ['enabled' => true, 'items' => []];
@@ -494,6 +539,10 @@ function bl_events_sanitize_statuses_config($raw): array
 		$items = bl_events_sanitize_statuses($raw['items']);
 	} else {
 		$items = bl_events_sanitize_statuses($raw);
+	}
+
+	if (is_array($previous_items)) {
+		$items = bl_events_preserve_status_ids($items, $previous_items);
 	}
 
 	return [

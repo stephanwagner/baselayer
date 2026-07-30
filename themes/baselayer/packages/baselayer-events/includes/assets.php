@@ -347,7 +347,6 @@ function bl_events_enqueue_settings_assets(string $hook): void
 				'empty' => __('No statuses yet. Add a status to get started.', 'baselayer-events'),
 				'delete' => __('Delete', 'baselayer-events'),
 				'drag' => __('Drag to reorder', 'baselayer-events'),
-				'statusId' => __('Status ID', 'baselayer-events'),
 				'statusLabel' => __('Label', 'baselayer-events'),
 				'color' => __('Color', 'baselayer-events'),
 				'customColor' => __('Custom…', 'baselayer-events'),

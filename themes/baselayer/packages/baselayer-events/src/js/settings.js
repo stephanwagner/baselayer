@@ -329,11 +329,32 @@ function bootStatusesBuilder() {
     return;
   }
 
-  const { el, empty, slugify, bindTitleSlugSync, createSortable, createListRow } = FB;
+  const { el, empty, createSortable, createListRow } = FB;
   const i18n = cfg.i18n || {};
   const presets = Array.isArray(cfg.colorPresets) ? cfg.colorPresets : [];
   const defaultToken = cfg.defaultColor || 'info';
   const CUSTOM = '__custom__';
+  const reservedIds = { active: 1, custom: 1, enabled: 1, items: 1 };
+
+  const newStatusId = () => {
+    let id = '';
+    do {
+      const bytes = new Uint8Array(4);
+      if (typeof crypto !== 'undefined' && typeof crypto.getRandomValues === 'function') {
+        crypto.getRandomValues(bytes);
+      } else {
+        for (let i = 0; i < bytes.length; i += 1) {
+          bytes[i] = Math.floor(Math.random() * 256);
+        }
+      }
+      id =
+        'st_' +
+        Array.from(bytes)
+          .map((b) => b.toString(16).padStart(2, '0'))
+          .join('');
+    } while (reservedIds[id]);
+    return id;
+  };
 
   let initial = {};
   try {
@@ -420,22 +441,16 @@ function bootStatusesBuilder() {
   const syncJson = () => {
     const statuses = {};
     list.querySelectorAll(':scope > [data-bl-events-status]').forEach((row) => {
-      const idInput = row.querySelector('[data-bl-events-status-id]');
       const labelInput = row.querySelector('[data-bl-events-status-label]');
       const colorSelect = row.querySelector('[data-bl-events-status-color-mode]');
       const hexInput = row.querySelector('[data-bl-events-status-color-hex]');
-      let id = idInput ? slugify(idInput.value) : '';
-      if (id === '') {
-        id = slugify(labelInput ? labelInput.value : '') || 'status';
-      }
-      let base = id;
-      let n = 2;
-      while (statuses[id]) {
-        id = base + '_' + n;
-        n += 1;
-      }
-      if (idInput) {
-        idInput.value = id;
+      let id = row.dataset.statusId ? String(row.dataset.statusId) : '';
+      if (id === '' || reservedIds[id] || statuses[id]) {
+        id = newStatusId();
+        while (statuses[id]) {
+          id = newStatusId();
+        }
+        row.dataset.statusId = id;
       }
       const mode = colorSelect ? colorSelect.value : defaultToken;
       let color = defaultToken;
@@ -444,8 +459,9 @@ function bootStatusesBuilder() {
       } else if (mode) {
         color = mode;
       }
+      const label = labelInput ? labelInput.value.trim() : '';
       statuses[id] = {
-        label: labelInput ? labelInput.value.trim() || id : id,
+        label: label !== '' ? label : id,
         color,
       };
     });
@@ -455,6 +471,7 @@ function bootStatusesBuilder() {
   const createStatusRow = (statusId, data, open) => {
     const rowData = data && typeof data === 'object' ? data : { label: '', color: defaultToken };
     const parsed = parseStoredColor(rowData.color);
+    const id = String(statusId || '').trim() || newStatusId();
 
     const colorPreview = el('span', {
       className: 'bl-events-statuses-builder__swatch',
@@ -471,11 +488,11 @@ function bootStatusesBuilder() {
     }
 
     const listRow = createListRow({
-      title: rowData.label || statusId || '',
+      title: rowData.label || '',
       open,
       meta: colorPreview,
       className: 'bl-events-statuses-builder__row',
-      dataset: { blEventsStatus: '1' },
+      dataset: { blEventsStatus: '1', statusId: id },
       dragTitle: i18n.drag || 'Drag to reorder',
       deleteTitle: i18n.delete || 'Delete',
       onDelete: () => {
@@ -487,12 +504,6 @@ function bootStatusesBuilder() {
     const { root: card, body, setTitle, setMeta } = listRow;
     body.classList.add('bl-events-statuses-builder__body');
 
-    const idInput = el('input', {
-      type: 'text',
-      className: 'regular-text',
-      dataset: { blEventsStatusId: '1' },
-      value: statusId || '',
-    });
     const labelInput = el('input', {
       type: 'text',
       className: 'regular-text',
@@ -550,12 +561,6 @@ function bootStatusesBuilder() {
 
     body.appendChild(
       el('div', { className: 'bl-field-builder__form-row' }, [
-        el('div', { className: 'bl-field-builder__form-label', text: i18n.statusId || 'Status ID' }),
-        idInput,
-      ])
-    );
-    body.appendChild(
-      el('div', { className: 'bl-field-builder__form-row' }, [
         el('div', { className: 'bl-field-builder__form-label', text: i18n.statusLabel || 'Label' }),
         labelInput,
       ])
@@ -593,12 +598,10 @@ function bootStatusesBuilder() {
       syncJson();
     };
 
-    bindTitleSlugSync(labelInput, idInput, slugify);
     labelInput.addEventListener('input', () => {
       setTitle(labelInput.value);
       syncJson();
     });
-    idInput.addEventListener('input', syncJson);
 
     colorSelect.addEventListener('change', syncCustomVisibility);
 
@@ -641,7 +644,7 @@ function bootStatusesBuilder() {
   });
 
   addBtn.addEventListener('click', () => {
-    list.appendChild(createStatusRow('', { label: '', color: defaultToken }, true));
+    list.appendChild(createStatusRow(newStatusId(), { label: '', color: defaultToken }, true));
     syncEmpty();
     syncJson();
   });

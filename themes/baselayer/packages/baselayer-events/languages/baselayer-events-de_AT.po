@@ -398,9 +398,6 @@ msgstr "Status hinzufügen"
 msgid "No statuses yet. Add a status to get started."
 msgstr "Noch keine Status. Füge einen Status hinzu, um zu starten."
 
-#: includes/assets.php:348
-msgid "Status ID"
-msgstr "Status-ID"
 
 #: includes/assets.php:350
 msgid "Color"
