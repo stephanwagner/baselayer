@@ -92,7 +92,7 @@ function bl_events_enqueue_editor_assets(): void
 		'occurrencesLabel' => __('%d occurrences', 'baselayer-events'),
 		'occurrenceLabel' => __('%d occurrence', 'baselayer-events'),
 		'customContentTitle' => __('Some fields are customized.', 'baselayer-events'),
-		'customContentHelp' => __('Changed fields keep your edits when the master updates. This date is still removed if it leaves the series.', 'baselayer-events'),
+		'customContentHelp' => __('Changed fields keep your edits when the master updates.', 'baselayer-events'),
 		'revertToMaster' => __('Revert to master', 'baselayer-events'),
 		'makeStandalone' => __('Make standalone event', 'baselayer-events'),
 		'makeStandaloneConfirm' => __('Remove this date from the series and keep it as its own event? It will no longer update with the series.', 'baselayer-events'),

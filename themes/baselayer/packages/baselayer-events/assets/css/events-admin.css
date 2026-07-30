@@ -600,6 +600,10 @@ input[type=search].bl-icon-picker-modal__search {
 .bl-event-recurring__customized p {
   margin: 0 0 6px;
 }
+.bl-event-recurring__customized .components-button.is-tertiary {
+  margin-top: 2px;
+  margin-left: -4px;
+}
 
 .bl-event-recurring__edit-master {
   margin-top: 8px;

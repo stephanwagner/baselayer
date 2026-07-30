@@ -116,8 +116,8 @@ msgid "Some fields are customized."
 msgstr "Einige Felder sind angepasst."
 
 #: includes/assets.php:95
-msgid "Changed fields keep your edits when the master updates. This date is still removed if it leaves the series."
-msgstr "Geänderte Felder behalten deine Anpassungen, wenn die Vorlage aktualisiert wird. Dieses Datum wird trotzdem entfernt, wenn es die Serie verlässt."
+msgid "Changed fields keep your edits when the master updates."
+msgstr "Geänderte Felder behalten deine Anpassungen, wenn die Vorlage aktualisiert wird."
 
 #: includes/assets.php:96
 msgid "Revert to master"
