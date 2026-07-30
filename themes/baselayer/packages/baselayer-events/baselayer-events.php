@@ -135,6 +135,16 @@ function bl_events_load_textdomain(): void
 }
 add_action('init', 'bl_events_load_textdomain', 1);
 
+if (bl_events_loaded_as_plugin()) {
+	register_deactivation_hook(BL_EVENTS_FILE, static function (): void {
+		if (function_exists('bl_event_clear_recurrence_cron')) {
+			bl_event_clear_recurrence_cron();
+		} else {
+			wp_clear_scheduled_hook('bl_event_extend_recurring_series');
+		}
+	});
+}
+
 /**
  * @return array{uri: string, path: string, ver: string}|null
  */

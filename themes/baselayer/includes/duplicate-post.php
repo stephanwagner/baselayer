@@ -59,6 +59,14 @@ add_action('admin_action_bl_duplicate_post', function (): void {
 		'post_password'  => $post->post_password,
 	];
 
+	/**
+	 * Filter the post data used to create a duplicate.
+	 *
+	 * @param array<string, mixed> $new_post Args for wp_insert_post().
+	 * @param \WP_Post             $post     Source post.
+	 */
+	$new_post = apply_filters('bl_duplicate_post_args', $new_post, $post);
+
 	$new_post_id = wp_insert_post($new_post);
 	if (is_wp_error($new_post_id)) {
 		wp_die(esc_html__('Failed to create duplicate.', 'baselayer'));
@@ -66,9 +74,15 @@ add_action('admin_action_bl_duplicate_post', function (): void {
 
 	// Copy meta (excluding internal keys that shouldn't be cloned)
 	$meta = get_post_meta($post_id);
-	$exclude_keys = ['_edit_lock', '_edit_last'];
+	$exclude_keys = apply_filters(
+		'bl_duplicate_post_exclude_meta_keys',
+		['_edit_lock', '_edit_last'],
+		$post_id,
+		$post->post_type
+	);
+	$exclude_keys = array_values(array_unique(array_map('strval', (array) $exclude_keys)));
 	foreach ($meta as $key => $values) {
-		if (in_array($key, $exclude_keys, true)) {
+		if (in_array((string) $key, $exclude_keys, true)) {
 			continue;
 		}
 		foreach ($values as $value) {
@@ -84,6 +98,15 @@ add_action('admin_action_bl_duplicate_post', function (): void {
 			wp_set_object_terms($new_post_id, $terms, $taxonomy);
 		}
 	}
+
+	/**
+	 * Fires after a post has been duplicated.
+	 *
+	 * @param int      $new_post_id New post ID.
+	 * @param int      $post_id     Source post ID.
+	 * @param \WP_Post $post        Source post.
+	 */
+	do_action('bl_duplicate_post', (int) $new_post_id, $post_id, $post);
 
 	wp_safe_redirect(admin_url('post.php?action=edit&post=' . $new_post_id));
 	exit;

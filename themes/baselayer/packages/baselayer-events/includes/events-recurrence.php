@@ -1284,6 +1284,101 @@ add_action('init', 'bl_event_register_recurrence_hooks', 22);
 add_action(BL_EVENT_CRON_HOOK, 'bl_event_cron_extend_recurring_series');
 
 /**
+ * Series-linkage meta keys that must never be cloned onto a duplicate.
+ *
+ * @return list<string>
+ */
+function bl_event_series_linkage_meta_keys(): array
+{
+	return [
+		BL_EVENT_META_RECURRENCE,
+		BL_EVENT_META_OCCURRENCE_OF,
+		BL_EVENT_META_SERIES_OVERRIDES,
+		BL_EVENT_META_STANDALONE_FROM,
+		BL_EVENT_META_EXDATES,
+	];
+}
+
+/**
+ * @param list<string> $keys
+ * @return list<string>
+ */
+function bl_event_duplicate_exclude_meta_keys(array $keys, int $source_id, string $post_type): array
+{
+	unset($source_id);
+	if (!bl_is_event_post_type($post_type)) {
+		return $keys;
+	}
+
+	return array_values(array_unique(array_merge($keys, bl_event_series_linkage_meta_keys())));
+}
+
+/**
+ * Duplicates are always standalone one-offs (never series children / masters).
+ *
+ * @param array<string, mixed> $new_post
+ * @return array<string, mixed>
+ */
+function bl_event_duplicate_post_args(array $new_post, $post): array
+{
+	if (!$post instanceof \WP_Post || !bl_is_event_post_type($post->post_type)) {
+		return $new_post;
+	}
+	$new_post['post_parent'] = 0;
+
+	return $new_post;
+}
+
+/**
+ * Belt-and-suspenders: strip series linkage after meta copy.
+ *
+ * @param \WP_Post $source Source post.
+ */
+function bl_event_on_duplicate_post(int $new_post_id, int $source_id, $source): void
+{
+	unset($source_id);
+	if ($new_post_id <= 0 || !$source instanceof \WP_Post || !bl_is_event_post_type($source->post_type)) {
+		return;
+	}
+
+	if ((int) wp_get_post_parent_id($new_post_id) !== 0) {
+		wp_update_post([
+			'ID' => $new_post_id,
+			'post_parent' => 0,
+		]);
+	}
+
+	foreach (bl_event_series_linkage_meta_keys() as $key) {
+		delete_post_meta($new_post_id, $key);
+	}
+}
+
+add_filter('bl_duplicate_post_exclude_meta_keys', 'bl_event_duplicate_exclude_meta_keys', 10, 3);
+add_filter('bl_duplicate_post_args', 'bl_event_duplicate_post_args', 10, 2);
+add_action('bl_duplicate_post', 'bl_event_on_duplicate_post', 10, 3);
+
+/**
+ * Unschedule the daily series lookahead cron.
+ */
+function bl_event_clear_recurrence_cron(): void
+{
+	wp_clear_scheduled_hook(BL_EVENT_CRON_HOOK);
+}
+
+/**
+ * Theme package path: clear cron when leaving BaseLayer (plugin path stays active).
+ */
+function bl_event_on_switch_theme(): void
+{
+	if (function_exists('bl_events_loaded_as_plugin') && bl_events_loaded_as_plugin()) {
+		return;
+	}
+	bl_event_clear_recurrence_cron();
+}
+
+add_action('switch_theme', 'bl_event_on_switch_theme');
+
+/**
  * Soft-delete an occurrence: EXDATE on master + force-remove the child post (never WP Trash).
  *
  * @return true|\WP_Error

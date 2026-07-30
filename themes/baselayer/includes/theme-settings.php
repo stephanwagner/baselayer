@@ -937,6 +937,13 @@ function bl_sanitize_features($value): array
 	if (empty($out['enable_post_expirator'])) {
 		wp_clear_scheduled_hook('bl_expire_post');
 	}
+	if (empty($out['enable_events'])) {
+		if (function_exists('bl_event_clear_recurrence_cron')) {
+			bl_event_clear_recurrence_cron();
+		} else {
+			wp_clear_scheduled_hook('bl_event_extend_recurring_series');
+		}
+	}
 	return $out;
 }
 
