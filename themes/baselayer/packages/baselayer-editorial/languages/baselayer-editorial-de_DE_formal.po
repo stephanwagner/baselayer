@@ -1,0 +1,275 @@
+# Copyright (C) 2026 BaseLayer
+# This file is distributed under the same license as the BaseLayer Editorial plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: BaseLayer Editorial 0.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/baselayer-editorial\n"
+"POT-Creation-Date: 2026-07-30T08:54:38+00:00\n"
+"PO-Revision-Date: 2026-07-30T09:00:00+00:00\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: de_DE_formal\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: baselayer-editorial\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. Plugin Name of the plugin
+#: baselayer-editorial.php
+msgid "BaseLayer Editorial"
+msgstr "BaseLayer Editorial"
+
+#. Description of the plugin
+#: baselayer-editorial.php
+msgid "Per-editor content access, publishing approval, page allowlists, and media library restrictions."
+msgstr "Inhaltszugriff, Freigabe zum Veröffentlichen, Seiten-Allowlists und Medienbibliothek-Einschränkungen pro Redakteur."
+
+#. Author of the plugin
+#: baselayer-editorial.php
+msgid "BaseLayer"
+msgstr "BaseLayer"
+
+#. Author URI of the plugin
+#: baselayer-editorial.php
+msgid "https://baselayerwp.com/baselayer-editorial"
+msgstr "https://baselayerwp.com/baselayer-editorial"
+
+#: includes/assets.php:66
+msgid "Select pages"
+msgstr "Seiten auswählen"
+
+#: includes/assets.php:67
+msgid "Search pages…"
+msgstr "Seiten suchen…"
+
+#: includes/assets.php:68
+msgid "No pages found."
+msgstr "Keine Seiten gefunden."
+
+#: includes/assets.php:69
+msgid "Loading…"
+msgstr "Laden…"
+
+#: includes/assets.php:70
+msgid "Cancel"
+msgstr "Abbrechen"
+
+#: includes/assets.php:71
+msgid "Select"
+msgstr "Auswählen"
+
+#: includes/assets.php:72
+#: includes/settings-page.php:120
+msgid "No pages selected."
+msgstr "Keine Seiten ausgewählt."
+
+#: includes/assets.php:73
+#: includes/settings-page.php:131
+msgid "Remove"
+msgstr "Entfernen"
+
+#: includes/assets.php:102
+#: includes/settings-page.php:172
+#: includes/settings-page.php:173
+#: includes/settings-page.php:277
+msgid "Editorial"
+msgstr "Editorial"
+
+#: includes/assets.php:103
+msgid "Pending review — awaiting approval"
+msgstr "Ausstehend — wartet auf Freigabe"
+
+#: includes/content-access.php:162
+msgid "You are not allowed to access this content type."
+msgstr "Du hast keinen Zugriff auf diesen Inhaltstyp."
+
+#: includes/content-access.php:163
+#: includes/content-access.php:173
+#: includes/pages.php:33
+#: includes/pages.php:41
+msgid "Forbidden"
+msgstr "Verboten"
+
+#: includes/content-access.php:172
+#: includes/pages.php:32
+msgid "You are not allowed to create new pages."
+msgstr "Du darfst keine neuen Seiten erstellen."
+
+#: includes/pages.php:40
+msgid "You are not allowed to edit this page."
+msgstr "Du darfst diese Seite nicht bearbeiten."
+
+#: includes/publishing.php:164
+msgid "An editor"
+msgstr "Ein Redakteur"
+
+#: includes/publishing.php:165
+msgid "(no title)"
+msgstr "(kein Titel)"
+
+#. translators: 1: site name, 2: content title
+#: includes/publishing.php:174
+#, php-format
+msgid "[%1$s] Approval requested: %2$s"
+msgstr "[%1$s] Freigabe angefordert: %2$s"
+
+#. translators: 1: author name, 2: content type, 3: title, 4: edit URL
+#: includes/publishing.php:189
+#, php-format
+msgid ""
+"%1$s submitted a %2$s for approval.\n"
+"\n"
+"Title: %3$s\n"
+"\n"
+"Review and publish:\n"
+"%4$s\n"
+msgstr ""
+"%1$s hat %2$s zur Freigabe eingereicht.\n"
+"\n"
+"Titel: %3$s\n"
+"\n"
+"Prüfen und veröffentlichen:\n"
+"%4$s\n"
+
+#: includes/settings-page.php:26
+msgid "Can edit"
+msgstr "Darf bearbeiten"
+
+#: includes/settings-page.php:55
+msgid "Can only edit own posts"
+msgstr "Nur eigene Beiträge bearbeiten"
+
+#: includes/settings-page.php:61
+msgid "Publishing"
+msgstr "Veröffentlichen"
+
+#: includes/settings-page.php:71
+msgid "Publish directly"
+msgstr "Direkt veröffentlichen"
+
+#: includes/settings-page.php:80
+msgid "Require approval"
+msgstr "Freigabe erforderlich"
+
+#: includes/settings-page.php:83
+msgid "New drafts must be submitted for review. Edits to already-published content go live immediately."
+msgstr "Neue Entwürfe müssen zur Prüfung eingereicht werden. Änderungen an bereits veröffentlichten Inhalten gehen sofort live."
+
+#: includes/settings-page.php:90
+msgid "Page access"
+msgstr "Seitenzugriff"
+
+#: includes/settings-page.php:102
+msgid "All pages"
+msgstr "Alle Seiten"
+
+#: includes/settings-page.php:113
+msgid "Selected pages…"
+msgstr "Ausgewählte Seiten…"
+
+#: includes/settings-page.php:118
+msgid "Choose pages"
+msgstr "Seiten wählen"
+
+#: includes/settings-page.php:142
+msgid "Media"
+msgstr "Medien"
+
+#: includes/settings-page.php:152
+msgid "Only show own uploads"
+msgstr "Nur eigene Uploads anzeigen"
+
+#: includes/settings-page.php:154
+msgid "Keeps the media library focused on files this editor uploaded."
+msgstr "Die Medienbibliothek zeigt nur Dateien, die dieser Redakteur hochgeladen hat."
+
+#: includes/settings-page.php:260
+msgid "You do not have permission to manage editorial settings."
+msgstr "Du hast keine Berechtigung, Editorial-Einstellungen zu verwalten."
+
+#: includes/settings-page.php:281
+msgid "Settings saved."
+msgstr "Einstellungen gespeichert."
+
+#: includes/settings-page.php:292
+msgid "Approval email"
+msgstr "Freigabe-E-Mail"
+
+#: includes/settings-page.php:293
+msgid "Sent when an editor submits content for approval. Leave recipients empty to use the site admin email."
+msgstr "Wird gesendet, wenn ein Redakteur Inhalte zur Freigabe einreicht. Leer lassen, um die Admin-E-Mail der Website zu verwenden."
+
+#: includes/settings-page.php:296
+msgid "Recipients"
+msgstr "Empfänger"
+
+#: includes/settings-page.php:303
+msgid "editor@example.com, ops@example.com"
+msgstr "redaktion@example.com, ops@example.com"
+
+#: includes/settings-page.php:305
+msgid "Comma or newline separated email addresses."
+msgstr "E-Mail-Adressen, getrennt durch Komma oder Zeilenumbruch."
+
+#: includes/settings-page.php:309
+msgid "Subject"
+msgstr "Betreff"
+
+#: includes/settings-page.php:317
+msgid "[{site_name}] Approval requested: {title}"
+msgstr "[{site_name}] Freigabe angefordert: {title}"
+
+#: includes/settings-page.php:319
+msgid "Optional. Placeholders: {site_name}, {title}, {author}, {type}."
+msgstr "Optional. Platzhalter: {site_name}, {title}, {author}, {type}."
+
+#: includes/settings-page.php:324
+msgid "Defaults for new editors"
+msgstr "Standards für neue Redakteure"
+
+#: includes/settings-page.php:325
+msgid "Choose whether new editors get restrictions by default. Existing editors keep their own settings until changed on their profile."
+msgstr "Lege fest, ob neue Redakteure standardmäßig Einschränkungen erhalten. Bestehende Redakteure behalten ihre Einstellungen, bis sie im Profil geändert werden."
+
+#: includes/settings-page.php:328
+#: includes/user-profile.php:53
+msgid "Restrictions"
+msgstr "Einschränkungen"
+
+#: includes/settings-page.php:338
+msgid "Enable restrictions for new editors by default"
+msgstr "Einschränkungen für neue Redakteure standardmäßig aktivieren"
+
+#: includes/settings-page.php:340
+msgid "When off, new editors behave like a normal WordPress editor until you enable restrictions on their profile."
+msgstr "Wenn deaktiviert, verhalten sich neue Redakteure wie normale WordPress-Redakteure, bis du Einschränkungen in ihrem Profil aktivierst."
+
+#: includes/settings-page.php:346
+msgid "Save settings"
+msgstr "Einstellungen speichern"
+
+#: includes/user-profile.php:41
+msgid "Editorial rights"
+msgstr "Editorial-Rechte"
+
+#: includes/user-profile.php:43
+msgid "Restrict what this editor can access. When restrictions are off, they behave like a normal WordPress editor."
+msgstr "Lege fest, worauf dieser Redakteur zugreifen kann. Ohne Einschränkungen verhält er sich wie ein normaler WordPress-Redakteur."
+
+#: includes/user-profile.php:45
+msgid "Site defaults & approval email"
+msgstr "Website-Standards & Freigabe-E-Mail"
+
+#: includes/user-profile.php:66
+msgid "Enable restrictions for this editor"
+msgstr "Einschränkungen für diesen Redakteur aktivieren"
+
+#: includes/user-profile.php:68
+msgid "Limit which content this editor can access, how they publish, and what they see in the media library."
+msgstr "Begrenze, welche Inhalte dieser Redakteur bearbeiten darf, wie er veröffentlicht und was er in der Medienbibliothek sieht."
+
+#: includes/user-profile.php:77
+msgid "Reset to site defaults"
+msgstr "Auf Website-Standards zurücksetzen"

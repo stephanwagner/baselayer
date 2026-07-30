@@ -1,0 +1,268 @@
+# Copyright (C) 2026 BaseLayer
+# This file is distributed under the same license as the BaseLayer Editorial plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: BaseLayer Editorial 0.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/baselayer-editorial\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-07-30T08:54:38+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: baselayer-editorial\n"
+
+#. Plugin Name of the plugin
+#: baselayer-editorial.php
+msgid "BaseLayer Editorial"
+msgstr ""
+
+#. Description of the plugin
+#: baselayer-editorial.php
+msgid "Per-editor content access, publishing approval, page allowlists, and media library restrictions."
+msgstr ""
+
+#. Author of the plugin
+#: baselayer-editorial.php
+msgid "BaseLayer"
+msgstr ""
+
+#. Author URI of the plugin
+#: baselayer-editorial.php
+msgid "https://baselayerwp.com/baselayer-editorial"
+msgstr ""
+
+#: includes/assets.php:66
+msgid "Select pages"
+msgstr ""
+
+#: includes/assets.php:67
+msgid "Search pages…"
+msgstr ""
+
+#: includes/assets.php:68
+msgid "No pages found."
+msgstr ""
+
+#: includes/assets.php:69
+msgid "Loading…"
+msgstr ""
+
+#: includes/assets.php:70
+msgid "Cancel"
+msgstr ""
+
+#: includes/assets.php:71
+msgid "Select"
+msgstr ""
+
+#: includes/assets.php:72
+#: includes/settings-page.php:120
+msgid "No pages selected."
+msgstr ""
+
+#: includes/assets.php:73
+#: includes/settings-page.php:131
+msgid "Remove"
+msgstr ""
+
+#: includes/assets.php:102
+#: includes/settings-page.php:172
+#: includes/settings-page.php:173
+#: includes/settings-page.php:277
+msgid "Editorial"
+msgstr ""
+
+#: includes/assets.php:103
+msgid "Pending review — awaiting approval"
+msgstr ""
+
+#: includes/content-access.php:162
+msgid "You are not allowed to access this content type."
+msgstr ""
+
+#: includes/content-access.php:163
+#: includes/content-access.php:173
+#: includes/pages.php:33
+#: includes/pages.php:41
+msgid "Forbidden"
+msgstr ""
+
+#: includes/content-access.php:172
+#: includes/pages.php:32
+msgid "You are not allowed to create new pages."
+msgstr ""
+
+#: includes/pages.php:40
+msgid "You are not allowed to edit this page."
+msgstr ""
+
+#: includes/publishing.php:164
+msgid "An editor"
+msgstr ""
+
+#: includes/publishing.php:165
+msgid "(no title)"
+msgstr ""
+
+#. translators: 1: site name, 2: content title
+#: includes/publishing.php:174
+#, php-format
+msgid "[%1$s] Approval requested: %2$s"
+msgstr ""
+
+#. translators: 1: author name, 2: content type, 3: title, 4: edit URL
+#: includes/publishing.php:189
+#, php-format
+msgid ""
+"%1$s submitted a %2$s for approval.\n"
+"\n"
+"Title: %3$s\n"
+"\n"
+"Review and publish:\n"
+"%4$s\n"
+""
+msgstr ""
+
+#: includes/settings-page.php:26
+msgid "Can edit"
+msgstr ""
+
+#: includes/settings-page.php:55
+msgid "Can only edit own posts"
+msgstr ""
+
+#: includes/settings-page.php:61
+msgid "Publishing"
+msgstr ""
+
+#: includes/settings-page.php:71
+msgid "Publish directly"
+msgstr ""
+
+#: includes/settings-page.php:80
+msgid "Require approval"
+msgstr ""
+
+#: includes/settings-page.php:83
+msgid "New drafts must be submitted for review. Edits to already-published content go live immediately."
+msgstr ""
+
+#: includes/settings-page.php:90
+msgid "Page access"
+msgstr ""
+
+#: includes/settings-page.php:102
+msgid "All pages"
+msgstr ""
+
+#: includes/settings-page.php:113
+msgid "Selected pages…"
+msgstr ""
+
+#: includes/settings-page.php:118
+msgid "Choose pages"
+msgstr ""
+
+#: includes/settings-page.php:142
+msgid "Media"
+msgstr ""
+
+#: includes/settings-page.php:152
+msgid "Only show own uploads"
+msgstr ""
+
+#: includes/settings-page.php:154
+msgid "Keeps the media library focused on files this editor uploaded."
+msgstr ""
+
+#: includes/settings-page.php:260
+msgid "You do not have permission to manage editorial settings."
+msgstr ""
+
+#: includes/settings-page.php:281
+msgid "Settings saved."
+msgstr ""
+
+#: includes/settings-page.php:292
+msgid "Approval email"
+msgstr ""
+
+#: includes/settings-page.php:293
+msgid "Sent when an editor submits content for approval. Leave recipients empty to use the site admin email."
+msgstr ""
+
+#: includes/settings-page.php:296
+msgid "Recipients"
+msgstr ""
+
+#: includes/settings-page.php:303
+msgid "editor@example.com, ops@example.com"
+msgstr ""
+
+#: includes/settings-page.php:305
+msgid "Comma or newline separated email addresses."
+msgstr ""
+
+#: includes/settings-page.php:309
+msgid "Subject"
+msgstr ""
+
+#: includes/settings-page.php:317
+msgid "[{site_name}] Approval requested: {title}"
+msgstr ""
+
+#: includes/settings-page.php:319
+msgid "Optional. Placeholders: {site_name}, {title}, {author}, {type}."
+msgstr ""
+
+#: includes/settings-page.php:324
+msgid "Defaults for new editors"
+msgstr ""
+
+#: includes/settings-page.php:325
+msgid "Choose whether new editors get restrictions by default. Existing editors keep their own settings until changed on their profile."
+msgstr ""
+
+#: includes/settings-page.php:328
+#: includes/user-profile.php:53
+msgid "Restrictions"
+msgstr ""
+
+#: includes/settings-page.php:338
+msgid "Enable restrictions for new editors by default"
+msgstr ""
+
+#: includes/settings-page.php:340
+msgid "When off, new editors behave like a normal WordPress editor until you enable restrictions on their profile."
+msgstr ""
+
+#: includes/settings-page.php:346
+msgid "Save settings"
+msgstr ""
+
+#: includes/user-profile.php:41
+msgid "Editorial rights"
+msgstr ""
+
+#: includes/user-profile.php:43
+msgid "Restrict what this editor can access. When restrictions are off, they behave like a normal WordPress editor."
+msgstr ""
+
+#: includes/user-profile.php:45
+msgid "Site defaults & approval email"
+msgstr ""
+
+#: includes/user-profile.php:66
+msgid "Enable restrictions for this editor"
+msgstr ""
+
+#: includes/user-profile.php:68
+msgid "Limit which content this editor can access, how they publish, and what they see in the media library."
+msgstr ""
+
+#: includes/user-profile.php:77
+msgid "Reset to site defaults"
+msgstr ""

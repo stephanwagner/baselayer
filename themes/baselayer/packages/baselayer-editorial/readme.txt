@@ -29,6 +29,15 @@ Site-wide defaults and approval email recipients live under Settings → Editori
 3. Configure Settings → Editorial
 4. Edit an editor’s profile to customize rights
 
+== Translations ==
+
+Text domain: `baselayer-editorial` (files in `languages/`).
+
+From the BaseLayer repo root:
+
+* `npm run make-pot:baselayer-editorial` — refresh the pot
+* `npm run compile:po` — replicate German variants from `baselayer-editorial-de_DE.po` and compile `.mo` files (theme + Forms + Events + Editorial)
+
 == Changelog ==
 
 = 0.1.0 =
