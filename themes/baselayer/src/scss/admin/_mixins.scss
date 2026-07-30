@@ -13,3 +13,19 @@
   padding-bottom: 0;
   line-height: normal;
 }
+
+// WP admin `.button.bl-button-tiny` at 28px — denser than bl-button-small.
+@mixin button-tiny {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  height: 28px;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 10px;
+  padding-right: 10px;
+  line-height: normal;
+  font-size: 12px;
+}

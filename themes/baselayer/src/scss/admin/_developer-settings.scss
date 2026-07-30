@@ -630,3 +630,256 @@ input[type='search'].bl-dev-icon-modal__search {
     min-height: 36px !important;
   }
 }
+
+// Media Cleanup (Developer → Tools)
+
+.bl-media-cleanup__status {
+  margin: 12px 0 16px;
+}
+
+.bl-media-cleanup__status-line {
+  margin: 0 0 6px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.bl-media-cleanup__status-line--ok {
+  color: #1a5f29;
+}
+
+.bl-media-cleanup__status-line--warn {
+  color: #9a6700;
+}
+
+.bl-media-cleanup__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+body.bl-media-cleanup-modal-open {
+  overflow: hidden;
+}
+
+.bl-media-cleanup-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100100;
+  display: none;
+}
+
+.bl-media-cleanup-modal.is-open {
+  display: block;
+}
+
+.bl-media-cleanup-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.bl-media-cleanup-modal__dialog {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 640px;
+  max-width: calc(100vw - 48px);
+  max-height: calc(100vh - 96px);
+  margin: 48px auto 0;
+  padding: 0;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+}
+
+.bl-media-cleanup-modal__header {
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid #dcdcde;
+
+  h2 {
+    margin: 0 0 8px;
+  }
+
+  .description {
+    margin: 0 0 6px;
+  }
+}
+
+.bl-media-cleanup-modal__intro {
+  margin: 0 0 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.bl-media-cleanup-modal__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 20px;
+  border-bottom: 1px solid #dcdcde;
+  background: #f6f7f7;
+}
+
+.bl-media-cleanup-modal__list {
+  flex: 1 1 auto;
+  overflow: auto;
+  padding: 8px 12px;
+  max-height: min(50vh, 420px);
+}
+
+.bl-media-cleanup-modal__row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin: 0;
+  padding: 10px 8px;
+  border-bottom: 1px solid #f0f0f1;
+  cursor: pointer;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  input[type='checkbox'] {
+    margin: 0;
+    flex: 0 0 auto;
+  }
+}
+
+.bl-media-cleanup-modal__preview {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  overflow: hidden;
+  border: 1px solid #dcdcde;
+  border-radius: 4px;
+  background: #f6f7f7;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.bl-media-cleanup-modal__preview--file {
+  color: #646970;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
+}
+
+.bl-media-cleanup-modal__row-body {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.bl-media-cleanup-modal__name {
+  font-size: 13px;
+  font-weight: 600;
+  word-break: break-all;
+  text-decoration: none;
+
+  &:is(a) {
+    color: #2271b1;
+
+    &:hover,
+    &:focus {
+      color: #135e96;
+      text-decoration: underline;
+    }
+  }
+}
+
+.bl-media-cleanup-modal__meta {
+  color: #646970;
+  font-size: 12px;
+}
+
+.bl-media-cleanup-modal__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px 16px;
+  border-top: 1px solid #dcdcde;
+  background: #f6f7f7;
+}
+
+.bl-media-cleanup-modal__selection {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 8px;
+  align-items: baseline;
+  font-size: 13px;
+
+  [data-media-cleanup-selected-size]:not(:empty)::before {
+    content: '·';
+    margin-right: 8px;
+    color: #646970;
+  }
+}
+
+.bl-media-cleanup-modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+  margin-left: auto;
+}
+
+.bl-media-cleanup-confirm {
+  position: fixed;
+  inset: 0;
+  z-index: 100110;
+  display: none;
+}
+
+.bl-media-cleanup-confirm.is-open {
+  display: block;
+}
+
+.bl-media-cleanup-confirm__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.bl-media-cleanup-confirm__dialog {
+  position: relative;
+  width: 400px;
+  max-width: calc(100vw - 64px);
+  margin: 18vh auto 0;
+  padding: 16px;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+
+  h2 {
+    margin: 0 0 12px;
+  }
+
+  p {
+    margin: 0;
+    text-wrap: pretty;
+  }
+}
+
+.bl-media-cleanup-confirm__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 16px;
+}

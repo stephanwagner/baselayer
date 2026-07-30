@@ -1699,6 +1699,108 @@ msgstr "Revisionen (0 = alle löschen)"
 msgid "Clean revisions"
 msgstr "Revisionen bereinigen"
 
+msgid "Media Cleanup"
+msgstr "Medien bereinigen"
+
+msgid "Find files in /uploads that are no longer referenced by WordPress."
+msgstr "Finde Dateien in /uploads, die nicht mehr von WordPress referenziert werden."
+
+msgid "Orphaned files: Not scanned yet"
+msgstr "Verwaiste Dateien: Noch nicht gescannt"
+
+msgid "Scan Uploads"
+msgstr "Uploads scannen"
+
+msgid "Review Files"
+msgstr "Dateien prüfen"
+
+msgid "Scanning uploads…"
+msgstr "Uploads werden gescannt…"
+
+msgid "✓ %s file checked"
+msgstr "✓ %s Datei geprüft"
+
+msgid "✓ %s files checked"
+msgstr "✓ %s Dateien geprüft"
+
+msgid "⚠ %s orphaned file found"
+msgstr "⚠ %s verwaiste Datei gefunden"
+
+msgid "⚠ %s orphaned files found"
+msgstr "⚠ %s verwaiste Dateien gefunden"
+
+msgid "✓ No orphaned files found"
+msgstr "✓ Keine verwaisten Dateien gefunden"
+
+msgid "%s orphaned file was found."
+msgstr "%s verwaiste Datei wurde gefunden."
+
+msgid "%s orphaned files were found."
+msgstr "%s verwaiste Dateien wurden gefunden."
+
+msgid "%s file"
+msgstr "%s Datei"
+
+msgid "%s files"
+msgstr "%s Dateien"
+
+msgid "Deleting…"
+msgstr "Wird gelöscht…"
+
+msgid "Could not delete the selected files."
+msgstr "Die ausgewählten Dateien konnten nicht gelöscht werden."
+
+msgid "Could not scan uploads."
+msgstr "Uploads konnten nicht gescannt werden."
+
+msgid "Delete the selected files permanently? This cannot be undone."
+msgstr "Ausgewählte Dateien dauerhaft löschen? Das kann nicht rückgängig gemacht werden."
+
+msgid "Delete files?"
+msgstr "Dateien löschen?"
+
+msgid "Delete permanently"
+msgstr "Dauerhaft löschen"
+
+msgid "Delete %s selected file permanently? This cannot be undone."
+msgstr "%s ausgewählte Datei dauerhaft löschen? Das kann nicht rückgängig gemacht werden."
+
+msgid "Delete %s selected files permanently? This cannot be undone."
+msgstr "%s ausgewählte Dateien dauerhaft löschen? Das kann nicht rückgängig gemacht werden."
+
+msgid "Open file in new tab"
+msgstr "Datei in neuem Tab öffnen"
+
+msgid "Select all"
+msgstr "Alle auswählen"
+
+msgid "Select none"
+msgstr "Auswahl aufheben"
+
+msgid "These files exist in uploads but are not referenced by any attachment."
+msgstr "Diese Dateien liegen in uploads, sind aber keinem Anhang zugeordnet."
+
+msgid "They may still be used manually from HTML, CSS or another plugin."
+msgstr "Sie können dennoch manuell in HTML, CSS oder einem anderen Plugin verwendet werden."
+
+msgid "Selected:"
+msgstr "Ausgewählt:"
+
+msgid "Delete Selected"
+msgstr "Auswahl löschen"
+
+msgid "Modified %s ago"
+msgstr "Geändert vor %s"
+
+msgid "Uploads directory is not available."
+msgstr "Das Uploads-Verzeichnis ist nicht verfügbar."
+
+msgid "Scan results expired. Please scan again."
+msgstr "Scan-Ergebnisse abgelaufen. Bitte erneut scannen."
+
+msgid "You do not have permission to run Media Cleanup."
+msgstr "Du hast keine Berechtigung, Medien zu bereinigen."
+
 msgid "Asset version increased to %s."
 msgstr "Cache-Version auf %s erhöht."
 

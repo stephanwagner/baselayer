@@ -155,6 +155,99 @@ function bl_render_developer_tools(): void
 				</div>
 				<div class="bl-submit-row"><button type="submit" class="button button-primary"><?= esc_html__('Clean revisions', 'baselayer') ?></button></div>
 			</form>
+
+			<hr>
+
+			<?php
+			$media_cleanup_i18n = [
+				'notScanned' => __('Orphaned files: Not scanned yet', 'baselayer'),
+				'scanning' => __('Scanning uploads…', 'baselayer'),
+				'checkedOne' => __('✓ %s file checked', 'baselayer'),
+				'checkedMany' => __('✓ %s files checked', 'baselayer'),
+				'orphansFoundOne' => __('⚠ %s orphaned file found', 'baselayer'),
+				'orphansFoundMany' => __('⚠ %s orphaned files found', 'baselayer'),
+				'orphansNone' => __('✓ No orphaned files found', 'baselayer'),
+				'modalIntroOne' => __('%s orphaned file was found.', 'baselayer'),
+				'modalIntroMany' => __('%s orphaned files were found.', 'baselayer'),
+				'fileOne' => __('%s file', 'baselayer'),
+				'fileMany' => __('%s files', 'baselayer'),
+				'deleting' => __('Deleting…', 'baselayer'),
+				'deleteError' => __('Could not delete the selected files.', 'baselayer'),
+				'scanError' => __('Could not scan uploads.', 'baselayer'),
+				'confirmDelete' => __('Delete the selected files permanently? This cannot be undone.', 'baselayer'),
+				'confirmDeleteTitle' => __('Delete files?', 'baselayer'),
+				'confirmDeleteAction' => __('Delete permanently', 'baselayer'),
+				'confirmDeleteCountOne' => __('Delete %s selected file permanently? This cannot be undone.', 'baselayer'),
+				'confirmDeleteCountMany' => __('Delete %s selected files permanently? This cannot be undone.', 'baselayer'),
+				'openFile' => __('Open file in new tab', 'baselayer'),
+				'selectAll' => __('Select all', 'baselayer'),
+				'selectNone' => __('Select none', 'baselayer'),
+			];
+			?>
+			<div
+				id="bl-media-cleanup"
+				class="bl-media-cleanup"
+				data-ajax-url="<?= esc_url(admin_url('admin-ajax.php')) ?>"
+				data-nonce="<?= esc_attr(wp_create_nonce('bl_media_cleanup')) ?>"
+				data-i18n="<?= esc_attr(wp_json_encode($media_cleanup_i18n)) ?>"
+			>
+				<h2 class="title" style="margin-top: 28px;"><?= esc_html__('Media Cleanup', 'baselayer') ?></h2>
+				<p class="description"><?= esc_html__('Find files in /uploads that are no longer referenced by WordPress.', 'baselayer') ?></p>
+				<div class="bl-media-cleanup__status" data-media-cleanup-status>
+					<p class="bl-media-cleanup__status-line" data-media-cleanup-idle><?= esc_html__('Orphaned files: Not scanned yet', 'baselayer') ?></p>
+					<div class="bl-media-cleanup__status-results" data-media-cleanup-results hidden>
+						<p class="bl-media-cleanup__status-line bl-media-cleanup__status-line--ok" data-media-cleanup-checked></p>
+						<p class="bl-media-cleanup__status-line bl-media-cleanup__status-line--warn" data-media-cleanup-orphans></p>
+					</div>
+				</div>
+				<div class="bl-submit-row bl-media-cleanup__actions">
+					<button type="button" class="button button-primary" data-media-cleanup-scan><?= esc_html__('Scan Uploads', 'baselayer') ?></button>
+					<button type="button" class="button" data-media-cleanup-review hidden disabled><?= esc_html__('Review Files', 'baselayer') ?></button>
+				</div>
+
+				<div id="bl-media-cleanup-modal" class="bl-media-cleanup-modal" aria-hidden="true" hidden>
+					<div class="bl-media-cleanup-modal__backdrop" data-media-cleanup-close></div>
+					<div class="bl-media-cleanup-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="bl-media-cleanup-modal-title">
+						<div class="bl-media-cleanup-modal__header">
+							<h2 id="bl-media-cleanup-modal-title"><?= esc_html__('Media Cleanup', 'baselayer') ?></h2>
+							<p class="bl-media-cleanup-modal__intro" data-media-cleanup-modal-intro></p>
+							<p class="description">
+								<?= esc_html__('These files exist in uploads but are not referenced by any attachment.', 'baselayer') ?>
+							</p>
+							<p class="description">
+								<?= esc_html__('They may still be used manually from HTML, CSS or another plugin.', 'baselayer') ?>
+							</p>
+						</div>
+						<div class="bl-media-cleanup-modal__toolbar">
+							<button type="button" class="button bl-button-tiny" data-media-cleanup-select-toggle><?= esc_html__('Select all', 'baselayer') ?></button>
+						</div>
+						<div class="bl-media-cleanup-modal__list" data-media-cleanup-list role="list"></div>
+						<div class="bl-media-cleanup-modal__footer">
+							<div class="bl-media-cleanup-modal__selection" data-media-cleanup-selection>
+								<strong><?= esc_html__('Selected:', 'baselayer') ?></strong>
+								<span data-media-cleanup-selected-count><?= esc_html(sprintf(__('%s files', 'baselayer'), '0')) ?></span>
+								<span data-media-cleanup-selected-size></span>
+							</div>
+							<div class="bl-media-cleanup-modal__actions">
+								<button type="button" class="button" data-media-cleanup-close><?= esc_html__('Cancel', 'baselayer') ?></button>
+								<button type="button" class="button button-primary button-link-delete" data-media-cleanup-delete disabled><?= esc_html__('Delete Selected', 'baselayer') ?></button>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div id="bl-media-cleanup-confirm" class="bl-media-cleanup-confirm" aria-hidden="true" hidden>
+					<div class="bl-media-cleanup-confirm__backdrop" data-media-cleanup-confirm-close></div>
+					<div class="bl-media-cleanup-confirm__dialog" role="dialog" aria-modal="true" aria-labelledby="bl-media-cleanup-confirm-title">
+						<h2 id="bl-media-cleanup-confirm-title"><?= esc_html__('Delete files?', 'baselayer') ?></h2>
+						<p id="bl-media-cleanup-confirm-text" data-media-cleanup-confirm-text></p>
+						<div class="bl-media-cleanup-confirm__actions">
+							<button type="button" class="button" data-media-cleanup-confirm-close><?= esc_html__('Cancel', 'baselayer') ?></button>
+							<button type="button" class="button button-primary button-link-delete" data-media-cleanup-confirm-delete><?= esc_html__('Delete permanently', 'baselayer') ?></button>
+						</div>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 	<?php

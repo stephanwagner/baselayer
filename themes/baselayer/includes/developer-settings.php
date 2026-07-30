@@ -225,6 +225,7 @@ require_once $bl_developer_settings_dir . 'developer.php';
 require_once $bl_developer_settings_dir . 'email.php';
 require_once $bl_developer_settings_dir . 'system.php';
 require_once $bl_developer_settings_dir . 'tools.php';
+require_once $bl_developer_settings_dir . 'media-cleanup.php';
 require_once $bl_developer_settings_dir . 'features.php';
 require_once $bl_developer_settings_dir . 'access.php';
 require_once $bl_developer_settings_dir . 'security.php';

@@ -1,0 +1,6 @@
+@use 'mixins' as *;
+
+.wp-core-ui .button.bl-button-tiny,
+.button.bl-button-tiny {
+  @include button-tiny;
+}
