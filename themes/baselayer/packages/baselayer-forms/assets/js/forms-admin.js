@@ -5083,13 +5083,60 @@
       tab.button.setAttribute("aria-selected", index === 0 ? "true" : "false");
       tabBar.appendChild(tab.button);
     });
+    let fullscreen = false;
+    const setFullscreen = (next) => {
+      fullscreen = !!next;
+      root.classList.toggle("is-fullscreen", fullscreen);
+      document.body.classList.toggle("bl-forms-builder-fullscreen", fullscreen);
+      const label = fullscreen ? t("fullscreenExit", "Exit fullscreen") : t("fullscreenEnter", "Fullscreen");
+      fullscreenBtn.title = label;
+      fullscreenBtn.setAttribute("aria-label", label);
+      fullscreenBtn.setAttribute("aria-pressed", fullscreen ? "true" : "false");
+      fullscreenBtn.replaceChildren();
+      const icon = iconEl(fullscreen ? "fullscreenExit" : "fullscreen");
+      if (icon.innerHTML) {
+        fullscreenBtn.appendChild(icon);
+      } else {
+        fullscreenBtn.textContent = fullscreen ? "\u2715" : "\u26F6";
+      }
+      if (fullscreen) {
+        document.addEventListener("keydown", onFullscreenKey);
+      } else {
+        document.removeEventListener("keydown", onFullscreenKey);
+      }
+    };
+    const onFullscreenKey = (evt) => {
+      if (evt.key === "Escape" && fullscreen) {
+        evt.preventDefault();
+        setFullscreen(false);
+      }
+    };
+    const fullscreenBtn = el("button", {
+      type: "button",
+      className: "bl-forms-builder__icon-btn bl-forms-builder__fullscreen-btn",
+      title: t("fullscreenEnter", "Fullscreen"),
+      "aria-label": t("fullscreenEnter", "Fullscreen"),
+      "aria-pressed": "false",
+      onClick: () => setFullscreen(!fullscreen)
+    });
+    const enterIcon = iconEl("fullscreen");
+    if (enterIcon.innerHTML) {
+      fullscreenBtn.appendChild(enterIcon);
+    } else {
+      fullscreenBtn.textContent = "\u26F6";
+    }
+    tabBar.appendChild(fullscreenBtn);
     const panelsWrap = el("div", { className: "bl-forms-builder__panels" }, [
       fieldsPanel,
       panels.notifications,
       panels.settings,
       panels.validation
     ]);
-    root.append(tabBar, panelsWrap);
+    root.append(
+      el("div", { className: "bl-forms-builder__scroll" }, [
+        el("div", { className: "bl-forms-builder__scroll-inner" }, [tabBar, panelsWrap])
+      ])
+    );
     const form = root.closest("form");
     if (form) {
       form.addEventListener("submit", syncAll);

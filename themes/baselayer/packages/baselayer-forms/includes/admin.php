@@ -217,6 +217,8 @@ function bl_forms_palette_icons(): array
 		'shield'       => 'shield',
 		'design'       => 'palette',
 		'inactive'     => 'visibility-off',
+		'fullscreen'   => 'fullscreen',
+		'fullscreenExit'=> 'fullscreen-exit',
 	];
 
 	$icons = [];
@@ -368,6 +370,8 @@ function bl_forms_admin_enqueue(string $hook): void
 				'tabNotifications'  => __('Notifications', 'baselayer-forms'),
 				'tabSettings'       => __('Settings', 'baselayer-forms'),
 				'tabValidation'     => __('Validation', 'baselayer-forms'),
+				'fullscreenEnter'   => __('Fullscreen', 'baselayer-forms'),
+				'fullscreenExit'    => __('Exit fullscreen', 'baselayer-forms'),
 				'tabSecurity'       => __('Security', 'baselayer-forms'),
 				'paletteSearch'     => __('Search fields…', 'baselayer-forms'),
 				'paletteSearchEmpty'=> __('No fields match your search.', 'baselayer-forms'),

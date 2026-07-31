@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BaseLayer Forms 1.0.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/baselayer-forms\n"
-"POT-Creation-Date: 2026-07-31T04:55:32+00:00\n"
+"POT-Creation-Date: 2026-07-31T05:54:10+00:00\n"
 "PO-Revision-Date: 2026-07-24T09:29:44+00:00\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -60,11 +60,11 @@ msgstr "Eine neue Übermittlung wurde für „%1$s“ auf %2$s empfangen."
 msgid "Entry ID: %d"
 msgstr "Eintrags-ID: %d"
 
-#: includes/admin.php:19 includes/admin.php:405
+#: includes/admin.php:19 includes/admin.php:409
 msgid "Templates"
 msgstr "Vorlagen"
 
-#: includes/admin.php:28 includes/admin.php:402
+#: includes/admin.php:28 includes/admin.php:406
 msgid "Tools"
 msgstr "Werkzeuge"
 
@@ -97,11 +97,11 @@ msgstr ""
 "Exportiere das aktuelle Formular (Felder und ausgefüllte Einstellungen) als "
 "JSON, oder importiere eine zuvor exportierte Datei."
 
-#: includes/admin.php:115 includes/admin.php:403
+#: includes/admin.php:115 includes/admin.php:407
 msgid "Export"
 msgstr "Exportieren"
 
-#: includes/admin.php:116 includes/admin.php:404
+#: includes/admin.php:116 includes/admin.php:408
 msgid "Import"
 msgstr "Importieren"
 
@@ -111,161 +111,169 @@ msgstr ""
 "Verwende den Formular-Block, um dieses Formular überall auf deiner Website "
 "einzufügen."
 
-#: includes/admin.php:367 includes/entries.php:18
+#: includes/admin.php:369 includes/entries.php:18
 msgid "Fields"
 msgstr "Felder"
 
-#: includes/admin.php:368 includes/settings-page.php:13
+#: includes/admin.php:370 includes/settings-page.php:13
 msgid "Notifications"
 msgstr "Benachrichtigungen"
 
-#: includes/admin.php:369 includes/settings-page.php:63
+#: includes/admin.php:371 includes/settings-page.php:63
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: includes/admin.php:370
+#: includes/admin.php:372
 msgid "Validation"
 msgstr "Validierung"
 
-#: includes/admin.php:371 includes/settings-page.php:15
+#: includes/admin.php:373
+msgid "Fullscreen"
+msgstr "Vollbild"
+
+#: includes/admin.php:374
+msgid "Exit fullscreen"
+msgstr "Vollbild beenden"
+
+#: includes/admin.php:375 includes/settings-page.php:15
 msgid "Security"
 msgstr "Sicherheit"
 
-#: includes/admin.php:372
+#: includes/admin.php:376
 msgid "Search fields…"
 msgstr "Felder suchen…"
 
-#: includes/admin.php:373
+#: includes/admin.php:377
 msgid "No fields match your search."
 msgstr "Keine Felder entsprechen deiner Suche."
 
-#: includes/admin.php:374
+#: includes/admin.php:378
 msgid "Hide field templates"
 msgstr "Feldvorlagen ausblenden"
 
-#: includes/admin.php:375
+#: includes/admin.php:379
 msgid "Show field templates"
 msgstr "Feldvorlagen einblenden"
 
-#: includes/admin.php:376
+#: includes/admin.php:380
 msgid "Popular"
 msgstr "Beliebt"
 
-#: includes/admin.php:377
+#: includes/admin.php:381
 msgid "Input"
 msgstr "Eingabe"
 
-#: includes/admin.php:378 includes/admin.php:590 includes/settings-page.php:527
+#: includes/admin.php:382 includes/admin.php:594 includes/settings-page.php:527
 msgid "Choice"
 msgstr "Auswahl"
 
-#: includes/admin.php:379 includes/admin.php:582 includes/settings-page.php:495
+#: includes/admin.php:383 includes/admin.php:586 includes/settings-page.php:495
 msgid "Date & time"
 msgstr "Datum & Uhrzeit"
 
-#: includes/admin.php:380 includes/settings-page.php:17
+#: includes/admin.php:384 includes/settings-page.php:17
 msgid "Uploads"
 msgstr "Uploads"
 
-#: includes/admin.php:381 includes/admin.php:549
+#: includes/admin.php:385 includes/admin.php:553
 msgid "Layout"
 msgstr "Layout"
 
-#: includes/admin.php:382 includes/admin.php:528
+#: includes/admin.php:386 includes/admin.php:532
 msgid "Content"
 msgstr "Inhalt"
 
-#: includes/admin.php:383 includes/admin.php:443
+#: includes/admin.php:387 includes/admin.php:447
 msgid "Advanced"
 msgstr "Erweitert"
 
-#: includes/admin.php:384
+#: includes/admin.php:388
 msgid "Add field"
 msgstr "Feld hinzufügen"
 
-#: includes/admin.php:385 includes/block.php:56 includes/block.php:64
+#: includes/admin.php:389 includes/block.php:56 includes/block.php:64
 #: includes/cpt.php:12 includes/entries.php:17
 msgid "Form"
 msgstr "Formular"
 
-#: includes/admin.php:386
+#: includes/admin.php:390
 msgid "Drag a field here, or click a template to add it."
 msgstr ""
 "Ziehe ein Feld hierher oder klicke auf eine Vorlage, um es hinzuzufügen."
 
-#: includes/admin.php:387 includes/admin.php:398
+#: includes/admin.php:391 includes/admin.php:402
 msgid "Drop fields here"
 msgstr "Felder hier ablegen"
 
-#: includes/admin.php:388 includes/admin.php:684
+#: includes/admin.php:392 includes/admin.php:688
 msgid "Columns"
 msgstr "Spalten"
 
-#: includes/admin.php:389
+#: includes/admin.php:393
 msgid "Column width"
 msgstr "Spaltenbreite"
 
-#: includes/admin.php:390
+#: includes/admin.php:394
 msgid "Section width"
 msgstr "Abschnittsbreite"
 
-#: includes/admin.php:391
+#: includes/admin.php:395
 msgid "Section design"
 msgstr "Abschnittsdesign"
 
-#: includes/admin.php:392
+#: includes/admin.php:396
 msgid "Standard"
 msgstr "Standard"
 
-#: includes/admin.php:393
+#: includes/admin.php:397
 msgid "Outline"
 msgstr "Umrandung"
 
-#: includes/admin.php:394
+#: includes/admin.php:398
 msgid "Card"
 msgstr "Karte"
 
-#: includes/admin.php:395 includes/admin.php:685
+#: includes/admin.php:399 includes/admin.php:689
 msgid "Section"
 msgstr "Bereich"
 
-#: includes/admin.php:396
+#: includes/admin.php:400
 msgid "Section title"
 msgstr "Abschnittsüberschrift"
 
-#: includes/admin.php:397
+#: includes/admin.php:401
 msgid "No title"
 msgstr "Kein Titel"
 
-#: includes/admin.php:399
+#: includes/admin.php:403
 msgid "Auto"
 msgstr "Auto"
 
-#: includes/admin.php:400
+#: includes/admin.php:404
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: includes/admin.php:401
+#: includes/admin.php:405
 msgid "Apply"
 msgstr "Übernehmen"
 
-#: includes/admin.php:406
+#: includes/admin.php:410
 msgid "Contact Form"
 msgstr "Kontaktformular"
 
-#: includes/admin.php:407
+#: includes/admin.php:411
 msgid "Newsletter Signup"
 msgstr "Newsletter-Anmeldung"
 
-#: includes/admin.php:408
+#: includes/admin.php:412
 msgid "Job Application"
 msgstr "Bewerbung"
 
-#: includes/admin.php:409
+#: includes/admin.php:413
 msgid "Apply template?"
 msgstr "Vorlage anwenden?"
 
-#: includes/admin.php:410
+#: includes/admin.php:414
 msgid ""
 "Applying this template will overwrite all existing fields on this form. "
 "Other settings stay as they are, except the submit button label when the "
@@ -275,19 +283,19 @@ msgstr ""
 "überschrieben. Andere Einstellungen bleiben unverändert, außer der Absenden-"
 "Beschriftung, falls die Vorlage eine vorgibt."
 
-#: includes/admin.php:411
+#: includes/admin.php:415
 msgid "Apply template"
 msgstr "Vorlage anwenden"
 
-#: includes/admin.php:412
+#: includes/admin.php:416
 msgid "More templates…"
 msgstr "Weitere Vorlagen…"
 
-#: includes/admin.php:413
+#: includes/admin.php:417
 msgid "Premium templates"
 msgstr "Premium-Vorlagen"
 
-#: includes/admin.php:414
+#: includes/admin.php:418
 msgid ""
 "A library of premium form templates is in development. Licensed Pro users "
 "will be able to browse and import polished templates from the cloud – "
@@ -297,76 +305,76 @@ msgstr ""
 "Pro-Nutzer können später polierte Vorlagen aus der Cloud durchsuchen und "
 "importieren – inklusive komplexer Layouts und optionaler Style-Pakete."
 
-#: includes/admin.php:415
+#: includes/admin.php:419
 msgid "Got it"
 msgstr "Verstanden"
 
-#: includes/admin.php:416
+#: includes/admin.php:420
 msgid "Name"
 msgstr "Name"
 
-#: includes/admin.php:417 includes/admin.php:569 includes/admin.php:663
+#: includes/admin.php:421 includes/admin.php:573 includes/admin.php:667
 #: includes/settings-page.php:466
 msgid "Email"
 msgstr "E-Mail"
 
-#: includes/admin.php:418
+#: includes/admin.php:422
 msgid "Subject"
 msgstr "Betreff"
 
-#: includes/admin.php:419
+#: includes/admin.php:423
 msgid "Message"
 msgstr "Nachricht"
 
-#: includes/admin.php:420
+#: includes/admin.php:424
 msgid "Full name"
 msgstr "Vollständiger Name"
 
-#: includes/admin.php:421
+#: includes/admin.php:425
 msgid "CV / Résumé"
 msgstr "Lebenslauf"
 
-#: includes/admin.php:422
+#: includes/admin.php:426
 msgid "Sign up to our Newsletter"
 msgstr "Für unseren Newsletter anmelden"
 
-#: includes/admin.php:423
+#: includes/admin.php:427
 msgid "Jane Doe"
 msgstr "Erika Mustermann"
 
-#: includes/admin.php:424
+#: includes/admin.php:428
 msgid "How can we help?"
 msgstr "Wobei können wir helfen?"
 
-#: includes/admin.php:425
+#: includes/admin.php:429
 msgid "Tell us a bit more…"
 msgstr "Erzählen Sie uns etwas mehr…"
 
-#: includes/admin.php:426
+#: includes/admin.php:430
 msgid "A short note about your application…"
 msgstr "Kurze Nachricht zu Ihrer Bewerbung…"
 
-#: includes/admin.php:427
+#: includes/admin.php:431
 msgid "Send message"
 msgstr "Nachricht senden"
 
-#: includes/admin.php:428
+#: includes/admin.php:432
 msgid "Subscribe"
 msgstr "Anmelden"
 
-#: includes/admin.php:429
+#: includes/admin.php:433
 msgid "Submit Application"
 msgstr "Bewerbung senden"
 
-#: includes/admin.php:430
+#: includes/admin.php:434
 msgid "Import fields?"
 msgstr "Felder importieren?"
 
-#: includes/admin.php:431
+#: includes/admin.php:435
 msgid "Import form?"
 msgstr "Formular importieren?"
 
-#: includes/admin.php:432
+#: includes/admin.php:436
 msgid ""
 "Importing will overwrite all existing fields on this form. Settings (emails, "
 "messages) are not changed because this file does not include them. This "
@@ -377,7 +385,7 @@ msgstr ""
 "diese Datei sie nicht enthält. Das lässt sich erst rückgängig machen, wenn "
 "du speicherst oder verwirfst."
 
-#: includes/admin.php:433
+#: includes/admin.php:437
 msgid ""
 "Importing will overwrite all existing fields on this form and apply any "
 "messages, subjects, and other texts included in the file. This cannot be "
@@ -388,125 +396,125 @@ msgstr ""
 "sonstigen Texte übernommen. Das lässt sich erst rückgängig machen, wenn du "
 "speicherst oder verwirfst."
 
-#: includes/admin.php:434
+#: includes/admin.php:438
 msgid "Overwrite fields"
 msgstr "Felder überschreiben"
 
-#: includes/admin.php:435
+#: includes/admin.php:439
 msgid "Overwrite form"
 msgstr "Formular überschreiben"
 
-#: includes/admin.php:436
+#: includes/admin.php:440
 msgid "This file is not a valid form export."
 msgstr "Diese Datei ist kein gültiger Formularexport."
 
-#: includes/admin.php:437
+#: includes/admin.php:441
 msgid "Could not read the selected file."
 msgstr "Die ausgewählte Datei konnte nicht gelesen werden."
 
-#: includes/admin.php:438 includes/admin.php:533
+#: includes/admin.php:442 includes/admin.php:537
 msgid "Label"
 msgstr "Bezeichnung"
 
-#: includes/admin.php:439 includes/admin.php:651
+#: includes/admin.php:443 includes/admin.php:655
 msgid "Field name"
 msgstr "Feldname"
 
-#: includes/admin.php:440
+#: includes/admin.php:444
 msgid "Internal field key used in submissions, emails, and entry data."
 msgstr "Interner Feldschlüssel für Übermittlungen, E-Mails und Eintragsdaten."
 
-#: includes/admin.php:441
+#: includes/admin.php:445
 msgid "Hide"
 msgstr "Ausblenden"
 
-#: includes/admin.php:442
+#: includes/admin.php:446
 msgid "General"
 msgstr "Allgemein"
 
-#: includes/admin.php:444
+#: includes/admin.php:448
 msgid "Appearance"
 msgstr "Darstellung"
 
-#: includes/admin.php:445
+#: includes/admin.php:449
 msgid "No general settings for this field."
 msgstr "Keine allgemeinen Einstellungen für dieses Feld."
 
-#: includes/admin.php:446
+#: includes/admin.php:450
 msgid "No advanced settings for this field."
 msgstr "Keine erweiterten Einstellungen für dieses Feld."
 
-#: includes/admin.php:447
+#: includes/admin.php:451
 msgid "Placeholder"
 msgstr "Platzhalter"
 
-#: includes/admin.php:448
+#: includes/admin.php:452
 msgid "Description"
 msgstr "Beschreibung"
 
-#: includes/admin.php:449 includes/admin.php:563 includes/settings-page.php:439
+#: includes/admin.php:453 includes/admin.php:567 includes/settings-page.php:439
 #: includes/settings-page.php:440
 msgid "Required"
 msgstr "Pflichtfeld"
 
-#: includes/admin.php:450
+#: includes/admin.php:454
 msgid "Read only"
 msgstr "Schreibgeschützt"
 
-#: includes/admin.php:451
+#: includes/admin.php:455
 msgid "Disabled"
 msgstr "Deaktiviert"
 
-#: includes/admin.php:452
+#: includes/admin.php:456
 msgid "Autocomplete"
 msgstr "Autovervollständigung"
 
-#: includes/admin.php:453
+#: includes/admin.php:457
 msgid "Automatic"
 msgstr "Automatisch"
 
-#: includes/admin.php:454
+#: includes/admin.php:458
 msgid "Off"
 msgstr "Aus"
 
-#: includes/admin.php:455
+#: includes/admin.php:459
 msgid "Maximum length"
 msgstr "Maximale Länge"
 
-#: includes/admin.php:456
+#: includes/admin.php:460
 msgid "Minimum length"
 msgstr "Minimale Länge"
 
-#: includes/admin.php:457
+#: includes/admin.php:461
 msgid "Show character count"
 msgstr "Zeichenzähler anzeigen"
 
-#: includes/admin.php:458
+#: includes/admin.php:462
 msgid "List"
 msgstr "Liste"
 
-#: includes/admin.php:459
+#: includes/admin.php:463
 msgid "Show in overview"
 msgstr "In der Übersicht anzeigen"
 
-#: includes/admin.php:460
+#: includes/admin.php:464
 msgid "You can show at most 3 fields in the entries list."
 msgstr "In der Eintragsliste können höchstens 3 Felder angezeigt werden."
 
-#: includes/admin.php:461
+#: includes/admin.php:465
 msgid "Rows"
 msgstr "Zeilen"
 
-#: includes/admin.php:462 includes/settings-page.php:447
+#: includes/admin.php:466 includes/settings-page.php:447
 msgid "Character count text"
 msgstr "Zeichenzähler-Text"
 
 #. translators: Placeholders: {remaining}, {count}, {max}
-#: includes/admin.php:463 includes/config.php:579 includes/helpers.php:619
+#: includes/admin.php:467 includes/config.php:579 includes/helpers.php:619
 msgid "{remaining} characters remaining"
 msgstr "{remaining} Zeichen übrig"
 
-#: includes/admin.php:464 includes/settings-page.php:449
+#: includes/admin.php:468 includes/settings-page.php:449
 msgid ""
 "The placeholders {remaining}, {count}, and {max} are replaced by the "
 "remaining count, current count, and maximum."
@@ -514,144 +522,144 @@ msgstr ""
 "Die Platzhalter {remaining}, {count} und {max} werden durch die verbleibende "
 "Anzahl, die aktuelle Anzahl und das Maximum ersetzt."
 
-#: includes/admin.php:465 includes/settings-page.php:443
+#: includes/admin.php:469 includes/settings-page.php:443
 msgid "Character count"
 msgstr "Zeichenzähler"
 
-#: includes/admin.php:466 includes/settings-page.php:451
+#: includes/admin.php:470 includes/settings-page.php:451
 msgid "When limit is reached"
 msgstr "Wenn das Limit erreicht ist"
 
-#: includes/admin.php:467 includes/config.php:580 includes/helpers.php:644
+#: includes/admin.php:471 includes/config.php:580 includes/helpers.php:644
 msgid "No characters remaining"
 msgstr "Keine Zeichen übrig"
 
-#: includes/admin.php:468 includes/settings-page.php:455
+#: includes/admin.php:472 includes/settings-page.php:455
 msgid "Min length"
 msgstr "Minimale Länge"
 
-#: includes/admin.php:469 includes/settings-page.php:456
+#: includes/admin.php:473 includes/settings-page.php:456
 msgid "Max length"
 msgstr "Maximale Länge"
 
-#: includes/admin.php:470 includes/admin.php:662 includes/admin.php:680
+#: includes/admin.php:474 includes/admin.php:666 includes/admin.php:684
 #: includes/settings-page.php:454
 msgid "Text"
 msgstr "Text"
 
-#: includes/admin.php:471 includes/admin.php:565 includes/settings-page.php:461
+#: includes/admin.php:475 includes/admin.php:569 includes/settings-page.php:461
 #: includes/settings-page.php:480 includes/settings-page.php:490
 #: includes/settings-page.php:497
 msgid "Minimum"
 msgstr "Minimum"
 
-#: includes/admin.php:472 includes/admin.php:566 includes/settings-page.php:462
+#: includes/admin.php:476 includes/admin.php:570 includes/settings-page.php:462
 #: includes/settings-page.php:481 includes/settings-page.php:491
 #: includes/settings-page.php:498
 msgid "Maximum"
 msgstr "Maximum"
 
-#: includes/admin.php:473
+#: includes/admin.php:477
 msgid "Prefix"
 msgstr "Präfix"
 
-#: includes/admin.php:474
+#: includes/admin.php:478
 msgid "Suffix"
 msgstr "Suffix"
 
-#: includes/admin.php:475
+#: includes/admin.php:479
 msgid "No limit"
 msgstr "Keine Beschränkung"
 
-#: includes/admin.php:476
+#: includes/admin.php:480
 msgid "Fixed date"
 msgstr "Festes Datum"
 
-#: includes/admin.php:477
+#: includes/admin.php:481
 msgid "Fixed time"
 msgstr "Feste Uhrzeit"
 
-#: includes/admin.php:478
+#: includes/admin.php:482
 msgid "Fixed date & time"
 msgstr "Festes Datum & Uhrzeit"
 
-#: includes/admin.php:479
+#: includes/admin.php:483
 msgid "Today"
 msgstr "Heute"
 
-#: includes/admin.php:480
+#: includes/admin.php:484
 msgid "Now"
 msgstr "Jetzt"
 
-#: includes/admin.php:481
+#: includes/admin.php:485
 msgid "Current hour"
 msgstr "Aktuelle Stunde"
 
-#: includes/admin.php:482
+#: includes/admin.php:486
 msgid "Days relative to today"
 msgstr "Tage relativ zu heute"
 
-#: includes/admin.php:483
+#: includes/admin.php:487
 msgid "Minutes relative to now"
 msgstr "Minuten relativ zu jetzt"
 
-#: includes/admin.php:484
+#: includes/admin.php:488
 msgid "Today ±"
 msgstr "Heute ±"
 
-#: includes/admin.php:485
+#: includes/admin.php:489
 msgid "Now ±"
 msgstr "Jetzt ±"
 
-#: includes/admin.php:486
+#: includes/admin.php:490
 msgid "days"
 msgstr "Tage"
 
-#: includes/admin.php:487 includes/admin.php:660 includes/settings-page.php:598
+#: includes/admin.php:491 includes/admin.php:664 includes/settings-page.php:598
 msgid "minutes"
 msgstr "Minuten"
 
-#: includes/admin.php:488
+#: includes/admin.php:492
 msgid "Allow multiple"
 msgstr "Mehrfachauswahl erlauben"
 
-#: includes/admin.php:489
+#: includes/admin.php:493
 msgid "Allow multiple files"
 msgstr "Mehrere Dateien erlauben"
 
-#: includes/admin.php:490 includes/entries.php:19
+#: includes/admin.php:494 includes/entries.php:19
 msgid "Status"
 msgstr "Status"
 
-#: includes/admin.php:491
+#: includes/admin.php:495
 msgid "Active"
 msgstr "Aktiv"
 
-#: includes/admin.php:492
+#: includes/admin.php:496
 msgid "Not visible on the frontend"
 msgstr "Im Frontend nicht sichtbar"
 
-#: includes/admin.php:493
+#: includes/admin.php:497
 msgid "Show on the frontend"
 msgstr "Im Frontend anzeigen"
 
-#: includes/admin.php:494 includes/admin.php:495
+#: includes/admin.php:498 includes/admin.php:499
 msgid "Allow multiple selection"
 msgstr "Mehrfachauswahl erlauben"
 
-#: includes/admin.php:496
+#: includes/admin.php:500
 msgid "Default value"
 msgstr "Standardwert"
 
-#: includes/admin.php:497
+#: includes/admin.php:501
 msgid "None"
 msgstr "Ohne"
 
-#: includes/admin.php:498
+#: includes/admin.php:502
 msgid "Checked by default"
 msgstr "Standardmäßig ausgewählt"
 
-#: includes/admin.php:499
+#: includes/admin.php:503
 msgid ""
 "Use option slugs from the list above. For multiple values, separate with "
 "commas (e.g. option-1, option-2)."
@@ -659,107 +667,107 @@ msgstr ""
 "Verwende die Option-Slugs aus der Liste oben. Mehrere Werte mit Kommas "
 "trennen (z. B. option-1, option-2)."
 
-#: includes/admin.php:500
+#: includes/admin.php:504
 msgid "Height"
 msgstr "Höhe"
 
-#: includes/admin.php:501 includes/admin.php:503
+#: includes/admin.php:505 includes/admin.php:507
 msgid "e.g. 24px or 2rem"
 msgstr "z. B. 24px oder 2rem"
 
-#: includes/admin.php:502
+#: includes/admin.php:506
 msgid "Margin"
 msgstr "Abstand"
 
-#: includes/admin.php:504
+#: includes/admin.php:508
 msgid "Level"
 msgstr "Ebene"
 
-#: includes/admin.php:505
+#: includes/admin.php:509
 msgid "Hidden from visitors. If filled, the submission is treated as spam."
 msgstr ""
 "Für Besucher ausgeblendet. Wird es ausgefüllt, gilt die Übermittlung als "
 "Spam."
 
-#: includes/admin.php:506
+#: includes/admin.php:510
 msgid "Uses the CAPTCHA keys from Forms → Settings."
 msgstr "Verwendet die CAPTCHA-Schlüssel aus Formulare → Einstellungen."
 
-#: includes/admin.php:507 includes/settings-page.php:607
+#: includes/admin.php:511 includes/settings-page.php:607
 msgid "CAPTCHA service"
 msgstr "CAPTCHA-Dienst"
 
-#: includes/admin.php:508 includes/settings-page.php:618
+#: includes/admin.php:512 includes/settings-page.php:618
 msgid "Site key"
 msgstr "Site Key"
 
-#: includes/admin.php:509 includes/settings-page.php:621
+#: includes/admin.php:513 includes/settings-page.php:621
 msgid "Secret key"
 msgstr "Secret Key"
 
-#: includes/admin.php:510
+#: includes/admin.php:514
 msgid "API key"
 msgstr "API-Schlüssel"
 
-#: includes/admin.php:511
+#: includes/admin.php:515
 msgid "CAPTCHA keys are not configured yet. Add them under Forms → Settings."
 msgstr ""
 "CAPTCHA-Schlüssel sind noch nicht konfiguriert. Füge sie unter Formulare → "
 "Einstellungen hinzu."
 
-#: includes/admin.php:512 includes/admin.php:617
+#: includes/admin.php:516 includes/admin.php:621
 msgid "Open settings"
 msgstr "Einstellungen öffnen"
 
-#: includes/admin.php:513 includes/settings-page.php:325
+#: includes/admin.php:517 includes/settings-page.php:325
 msgid "Cloudflare Turnstile"
 msgstr "Cloudflare Turnstile"
 
-#: includes/admin.php:514
+#: includes/admin.php:518
 msgid "Mostly invisible. Excellent privacy and very easy to set up."
 msgstr ""
 "Größtenteils unsichtbar. Hervorragender Datenschutz und sehr einfach "
 "einzurichten."
 
-#: includes/admin.php:515 includes/settings-page.php:326
+#: includes/admin.php:519 includes/settings-page.php:326
 msgid "hCaptcha"
 msgstr "hCaptcha"
 
-#: includes/admin.php:516
+#: includes/admin.php:520
 msgid "Good privacy and UX. Very easy to set up."
 msgstr "Guter Datenschutz und gute UX. Sehr einfach einzurichten."
 
-#: includes/admin.php:517 includes/settings-page.php:327
+#: includes/admin.php:521 includes/settings-page.php:327
 msgid "Friendly Captcha"
 msgstr "Friendly Captcha"
 
-#: includes/admin.php:518
+#: includes/admin.php:522
 msgid "Excellent privacy and accessibility. Easy to set up."
 msgstr "Hervorragender Datenschutz und Barrierefreiheit. Einfach einzurichten."
 
-#: includes/admin.php:519 includes/settings-page.php:328
+#: includes/admin.php:523 includes/settings-page.php:328
 msgid "Google reCAPTCHA v2"
 msgstr "Google reCAPTCHA v2"
 
-#: includes/admin.php:520
+#: includes/admin.php:524
 msgid "Familiar checkbox challenge. Weaker privacy. Very easy to set up."
 msgstr ""
 "Vertraute Checkbox-Herausforderung. Schwächerer Datenschutz. Sehr einfach "
 "einzurichten."
 
-#: includes/admin.php:521 includes/config.php:1649 includes/render.php:929
+#: includes/admin.php:525 includes/config.php:1649 includes/render.php:929
 msgid "I agree to the [Privacy Policy](page:privacy)."
 msgstr "Ich stimme der [Datenschutzerklärung](page:privacy) zu."
 
-#: includes/admin.php:522
+#: includes/admin.php:526
 msgid "Privacy Policy"
 msgstr "Datenschutzerklärung"
 
-#: includes/admin.php:523
+#: includes/admin.php:527
 msgid "Checkbox text"
 msgstr "Checkbox-Text"
 
-#: includes/admin.php:524
+#: includes/admin.php:528
 msgid ""
 "Markdown is supported, e.g. <b>**Bold**</b>, <i>*Italic*</i>, and <span "
 "style=\"white-space: nowrap\">[Link](...)</span>. For the target you can use "
@@ -771,107 +779,107 @@ msgstr ""
 "URL (/agb), eine WordPress-Seite (page:123) oder eine Standardseite wie "
 "page:privacy verwenden."
 
-#: includes/admin.php:529 includes/admin.php:681
+#: includes/admin.php:533 includes/admin.php:685
 msgid "HTML"
 msgstr "HTML"
 
-#: includes/admin.php:530
+#: includes/admin.php:534
 msgid "Options"
 msgstr "Optionen"
 
-#: includes/admin.php:531
+#: includes/admin.php:535
 msgid "Choices"
 msgstr "Auswahlmöglichkeiten"
 
-#: includes/admin.php:532
+#: includes/admin.php:536
 msgid "Add option"
 msgstr "Option hinzufügen"
 
-#: includes/admin.php:534 includes/admin.php:535
+#: includes/admin.php:538 includes/admin.php:539
 msgid "Slug"
 msgstr "Slug"
 
-#: includes/admin.php:536
+#: includes/admin.php:540
 msgid "Option 1"
 msgstr "Option 1"
 
-#: includes/admin.php:537
+#: includes/admin.php:541
 msgid "Option 2"
 msgstr "Option 2"
 
-#: includes/admin.php:538
+#: includes/admin.php:542
 msgid "Delete"
 msgstr "Löschen"
 
-#: includes/admin.php:539
+#: includes/admin.php:543
 msgid "Duplicate"
 msgstr "Duplizieren"
 
-#: includes/admin.php:540
+#: includes/admin.php:544
 msgid "Edit field"
 msgstr "Feld bearbeiten"
 
-#: includes/admin.php:541
+#: includes/admin.php:545
 msgid "Done editing"
 msgstr "Bearbeitung beenden"
 
-#: includes/admin.php:542
+#: includes/admin.php:546
 msgid "Expand field"
 msgstr "Feld ausklappen"
 
-#: includes/admin.php:543
+#: includes/admin.php:547
 msgid "Collapse field"
 msgstr "Feld einklappen"
 
-#: includes/admin.php:544
+#: includes/admin.php:548
 msgid "Drag to reorder"
 msgstr "Zum Sortieren ziehen"
 
-#: includes/admin.php:545
+#: includes/admin.php:549
 msgid "Type"
 msgstr "Typ"
 
-#: includes/admin.php:546
+#: includes/admin.php:550
 msgid "Width"
 msgstr "Breite"
 
-#: includes/admin.php:547
+#: includes/admin.php:551
 msgid "Custom"
 msgstr "Benutzerdefiniert"
 
-#: includes/admin.php:548
+#: includes/admin.php:552
 msgid "e.g. 40% or 280px"
 msgstr "z. B. 40% oder 280px"
 
-#: includes/admin.php:550
+#: includes/admin.php:554
 msgid "Vertical"
 msgstr "Vertikal"
 
-#: includes/admin.php:551
+#: includes/admin.php:555
 msgid "Horizontal"
 msgstr "Horizontal"
 
-#: includes/admin.php:552
+#: includes/admin.php:556
 msgid "CSS class"
 msgstr "CSS-Klasse"
 
-#: includes/admin.php:553
+#: includes/admin.php:557
 msgid "e.g. my-field"
 msgstr "z. B. my-field"
 
-#: includes/admin.php:554
+#: includes/admin.php:558
 msgid "Optional class names added to this field’s wrapper."
 msgstr "Optionale Klassennamen für den Wrapper dieses Feldes."
 
-#: includes/admin.php:555 includes/settings-page.php:426
+#: includes/admin.php:559 includes/settings-page.php:426
 msgid "Submit button label"
 msgstr "Text des Senden-Buttons"
 
-#: includes/admin.php:556 includes/settings-page.php:430
+#: includes/admin.php:560 includes/settings-page.php:430
 msgid "Submit button classes"
 msgstr "CSS-Klassen des Senden-Buttons"
 
-#: includes/admin.php:557 includes/settings-page.php:432
+#: includes/admin.php:561 includes/settings-page.php:432
 msgid ""
 "Extra CSS classes for the submit button (space-separated), e.g. button "
 "-primary."
@@ -879,11 +887,11 @@ msgstr ""
 "Zusätzliche CSS-Klassen für den Senden-Button (durch Leerzeichen getrennt), "
 "z. B. button -primary."
 
-#: includes/admin.php:558 includes/settings-page.php:363
+#: includes/admin.php:562 includes/settings-page.php:363
 msgid "Recipient"
 msgstr "Empfänger"
 
-#: includes/admin.php:559
+#: includes/admin.php:563
 msgid ""
 "One email per line. Leave empty to use the global default (or the site "
 "administrator email)."
@@ -891,19 +899,19 @@ msgstr ""
 "Eine E-Mail-Adresse pro Zeile. Leer lassen, um die globale "
 "Standardeinstellung (oder die Administrator-E-Mail der Website) zu verwenden."
 
-#: includes/admin.php:560 includes/settings-page.php:434
+#: includes/admin.php:564 includes/settings-page.php:434
 msgid "Success message"
 msgstr "Erfolgsmeldung"
 
-#: includes/admin.php:561 includes/settings-page.php:435
+#: includes/admin.php:565 includes/settings-page.php:435
 msgid "Error message"
 msgstr "Fehlermeldung"
 
-#: includes/admin.php:562 includes/settings-page.php:436
+#: includes/admin.php:566 includes/settings-page.php:436
 msgid "Validation message"
 msgstr "Validierungsmeldung"
 
-#: includes/admin.php:564 includes/settings-page.php:460
+#: includes/admin.php:568 includes/settings-page.php:460
 #: includes/settings-page.php:467 includes/settings-page.php:471
 #: includes/settings-page.php:475 includes/settings-page.php:479
 #: includes/settings-page.php:489 includes/settings-page.php:496
@@ -911,110 +919,110 @@ msgstr "Validierungsmeldung"
 msgid "Invalid"
 msgstr "Ungültig"
 
-#: includes/admin.php:567 includes/settings-page.php:423
+#: includes/admin.php:571 includes/settings-page.php:423
 msgid "The placeholder {limit} is replaced by the limit."
 msgstr "Der Platzhalter {limit} wird durch den Grenzwert ersetzt."
 
-#: includes/admin.php:568 includes/admin.php:665 includes/settings-page.php:459
+#: includes/admin.php:572 includes/admin.php:669 includes/settings-page.php:459
 msgid "Number"
 msgstr "Zahl"
 
-#: includes/admin.php:570 includes/admin.php:664 includes/settings-page.php:470
+#: includes/admin.php:574 includes/admin.php:668 includes/settings-page.php:470
 msgid "URL"
 msgstr "URL"
 
-#: includes/admin.php:571 includes/admin.php:666 includes/settings-page.php:474
+#: includes/admin.php:575 includes/admin.php:670 includes/settings-page.php:474
 msgid "Phone"
 msgstr "Telefon"
 
-#: includes/admin.php:572 includes/admin.php:674 includes/entries.php:20
+#: includes/admin.php:576 includes/admin.php:678 includes/entries.php:20
 #: includes/settings-page.php:478
 msgid "Date"
 msgstr "Datum"
 
-#: includes/admin.php:573 includes/settings-page.php:483
+#: includes/admin.php:577 includes/settings-page.php:483
 msgid "Before related field"
 msgstr "Vor verwandtem Feld"
 
-#: includes/admin.php:574 includes/settings-page.php:484
+#: includes/admin.php:578 includes/settings-page.php:484
 msgid "After related field"
 msgstr "Nach verwandtem Feld"
 
-#: includes/admin.php:575 includes/settings-page.php:485
+#: includes/admin.php:579 includes/settings-page.php:485
 msgid "The placeholder {field} is replaced by the related field label."
 msgstr ""
 "Der Platzhalter {field} wird durch die Bezeichnung des verknüpften Feldes "
 "ersetzt."
 
-#: includes/admin.php:576
+#: includes/admin.php:580
 msgid "Relation"
 msgstr "Bezug"
 
-#: includes/admin.php:577
+#: includes/admin.php:581
 msgid "No relation"
 msgstr "Kein Bezug"
 
-#: includes/admin.php:578
+#: includes/admin.php:582
 msgid "Must be before"
 msgstr "Muss vor"
 
-#: includes/admin.php:579
+#: includes/admin.php:583
 msgid "Must be after"
 msgstr "Muss nach"
 
-#: includes/admin.php:580
+#: includes/admin.php:584
 msgid "Select field"
 msgstr "Feld wählen"
 
-#: includes/admin.php:581 includes/admin.php:675 includes/settings-page.php:488
+#: includes/admin.php:585 includes/admin.php:679 includes/settings-page.php:488
 msgid "Time"
 msgstr "Uhrzeit"
 
-#: includes/admin.php:583 includes/settings-page.php:502
+#: includes/admin.php:587 includes/settings-page.php:502
 msgid "File"
 msgstr "Datei"
 
-#: includes/admin.php:584 includes/settings-page.php:507
+#: includes/admin.php:588 includes/settings-page.php:507
 msgid "Wrong file type"
 msgstr "Falscher Dateityp"
 
-#: includes/admin.php:585 includes/settings-page.php:509
+#: includes/admin.php:589 includes/settings-page.php:509
 msgid "The placeholder {types} is replaced by the allowed file types."
 msgstr "Der Platzhalter {types} wird durch die erlaubten Dateitypen ersetzt."
 
-#: includes/admin.php:586 includes/settings-page.php:514
+#: includes/admin.php:590 includes/settings-page.php:514
 msgid "File too large"
 msgstr "Datei zu groß"
 
-#: includes/admin.php:587 includes/settings-page.php:516
+#: includes/admin.php:591 includes/settings-page.php:516
 msgid "The placeholder {size} is replaced by the maximum size."
 msgstr "Der Platzhalter {size} wird durch die maximale Größe ersetzt."
 
-#: includes/admin.php:588 includes/settings-page.php:521
+#: includes/admin.php:592 includes/settings-page.php:521
 msgid "Too many files"
 msgstr "Zu viele Dateien"
 
-#: includes/admin.php:589 includes/settings-page.php:523
+#: includes/admin.php:593 includes/settings-page.php:523
 msgid "The placeholder {max} is replaced by the maximum number of files."
 msgstr "Der Platzhalter {max} wird durch die maximale Anzahl Dateien ersetzt."
 
-#: includes/admin.php:591 includes/admin.php:595 includes/settings-page.php:532
+#: includes/admin.php:595 includes/admin.php:599 includes/settings-page.php:532
 msgid "Minimum selections"
 msgstr "Minimale Auswahl"
 
-#: includes/admin.php:592 includes/admin.php:596 includes/settings-page.php:539
+#: includes/admin.php:596 includes/admin.php:600 includes/settings-page.php:539
 msgid "Maximum selections"
 msgstr "Maximale Auswahl"
 
-#: includes/admin.php:593 includes/settings-page.php:534
+#: includes/admin.php:597 includes/settings-page.php:534
 msgid "The placeholder {min} is replaced by the minimum number of options."
 msgstr "Der Platzhalter {min} wird durch die minimale Anzahl Optionen ersetzt."
 
-#: includes/admin.php:594 includes/settings-page.php:541
+#: includes/admin.php:598 includes/settings-page.php:541
 msgid "The placeholder {max} is replaced by the maximum number of options."
 msgstr "Der Platzhalter {max} wird durch die maximale Anzahl Optionen ersetzt."
 
-#: includes/admin.php:597
+#: includes/admin.php:601
 msgid ""
 "Leave empty for no limit. When the maximum is reached, further options "
 "cannot be selected."
@@ -1022,15 +1030,15 @@ msgstr ""
 "Leer lassen für keine Begrenzung. Ist das Maximum erreicht, können keine "
 "weiteren Optionen ausgewählt werden."
 
-#: includes/admin.php:598
+#: includes/admin.php:602
 msgid "Button label"
 msgstr "Button-Beschriftung"
 
-#: includes/admin.php:599
+#: includes/admin.php:603
 msgid "Allowed extensions"
 msgstr "Erlaubte Dateiendungen"
 
-#: includes/admin.php:600
+#: includes/admin.php:604
 msgid ""
 "Comma-separated list without dots, e.g. pdf, docx, xlsx. Leave empty to "
 "allow all WordPress-permitted types."
@@ -1038,57 +1046,57 @@ msgstr ""
 "Kommagetrennte Liste ohne Punkte, z. B. pdf, docx, xlsx. Leer lassen, um "
 "alle von WordPress erlaubten Typen zuzulassen."
 
-#: includes/admin.php:601
+#: includes/admin.php:605
 msgid "Maximum files"
 msgstr "Maximale Dateianzahl"
 
-#: includes/admin.php:602
+#: includes/admin.php:606
 msgid "Maximum number of files visitors can upload."
 msgstr "Maximale Anzahl Dateien, die Besucher hochladen können."
 
-#: includes/admin.php:603 includes/admin.php:612 includes/settings-page.php:637
+#: includes/admin.php:607 includes/admin.php:616 includes/settings-page.php:637
 msgid "Maximum file size"
 msgstr "Maximale Dateigröße"
 
 #. translators: %s: global max upload size, e.g. "12 MB"
-#: includes/admin.php:605
+#: includes/admin.php:609
 #, php-format
 msgid "Leave empty to use the global default (%s)."
 msgstr "Leer lassen, um die globale Standardeinstellung (%s) zu verwenden."
 
-#: includes/admin.php:606
+#: includes/admin.php:610
 msgid "Leave empty to use the global default."
 msgstr "Leer lassen, um die globale Standardeinstellung zu verwenden."
 
-#: includes/admin.php:607
+#: includes/admin.php:611
 msgid "Show file preview"
 msgstr "Dateivorschau anzeigen"
 
-#: includes/admin.php:608
+#: includes/admin.php:612
 msgid "Style"
 msgstr "Darstellung"
 
-#: includes/admin.php:609
+#: includes/admin.php:613
 msgid "Modern"
 msgstr "Modern"
 
-#: includes/admin.php:610
+#: includes/admin.php:614
 msgid "Classic"
 msgstr "Klassisch"
 
-#: includes/admin.php:611
+#: includes/admin.php:615
 msgid "File settings"
 msgstr "Datei-Einstellungen"
 
-#: includes/admin.php:613 includes/settings-page.php:649
+#: includes/admin.php:617 includes/settings-page.php:649
 msgid "MB"
 msgstr "MB"
 
-#: includes/admin.php:614 includes/settings-page.php:662
+#: includes/admin.php:618 includes/settings-page.php:662
 msgid "Save uploaded files"
 msgstr "Datei-Uploads speichern"
 
-#: includes/admin.php:615 includes/settings-page.php:676
+#: includes/admin.php:619 includes/settings-page.php:676
 msgid ""
 "Uploaded files are stored securely outside the Media Library using "
 "unguessable filenames."
@@ -1096,85 +1104,85 @@ msgstr ""
 "Hochgeladene Dateien werden sicher außerhalb der Mediathek unter nicht "
 "erratbaren Dateinamen gespeichert."
 
-#: includes/admin.php:616
+#: includes/admin.php:620
 msgid "Saving uploaded files is disabled in Forms → Settings."
 msgstr ""
 "Das Speichern hochgeladener Dateien ist unter Formulare → Einstellungen "
 "deaktiviert."
 
-#: includes/admin.php:618
+#: includes/admin.php:622
 msgid "After submission"
 msgstr "Nach dem Absenden"
 
-#: includes/admin.php:619
+#: includes/admin.php:623
 msgid "Show success message"
 msgstr "Erfolgsmeldung anzeigen"
 
-#: includes/admin.php:620
+#: includes/admin.php:624
 msgid "Go to page"
 msgstr "Zu einer Seite weiterleiten"
 
-#: includes/admin.php:621
+#: includes/admin.php:625
 msgid "Choose page"
 msgstr "Seite wählen"
 
-#: includes/admin.php:622
+#: includes/admin.php:626
 msgid "Change page"
 msgstr "Seite ändern"
 
-#: includes/admin.php:623
+#: includes/admin.php:627
 msgid "Clear"
 msgstr "Leeren"
 
-#: includes/admin.php:624
+#: includes/admin.php:628
 msgid "Select the page visitors should land on."
 msgstr "Wähle die Seite, auf der Besucher landen sollen."
 
-#: includes/admin.php:625
+#: includes/admin.php:629
 msgid "Selected page"
 msgstr "Ausgewählte Seite"
 
-#: includes/admin.php:626
+#: includes/admin.php:630
 msgid "Select a page"
 msgstr "Seite auswählen"
 
-#: includes/admin.php:627
+#: includes/admin.php:631
 msgid "Search pages…"
 msgstr "Seiten suchen…"
 
-#: includes/admin.php:628
+#: includes/admin.php:632
 msgid "No pages found."
 msgstr "Keine Seiten gefunden."
 
-#: includes/admin.php:629
+#: includes/admin.php:633
 msgid "Loading…"
 msgstr "Wird geladen…"
 
-#: includes/admin.php:630 includes/admin.php:670
+#: includes/admin.php:634 includes/admin.php:674
 msgid "Select"
 msgstr "Auswahl"
 
-#: includes/admin.php:631 includes/settings-page.php:378
+#: includes/admin.php:635 includes/settings-page.php:378
 msgid "Confirmation email"
 msgstr "Bestätigungs-E-Mail"
 
-#: includes/admin.php:632 includes/config.php:1658
+#: includes/admin.php:636 includes/config.php:1658
 msgid "Enable"
 msgstr "Aktivieren"
 
-#: includes/admin.php:633
+#: includes/admin.php:637
 msgid "Requires an Email field on the form."
 msgstr "Erfordert ein E-Mail-Feld im Formular."
 
-#: includes/admin.php:634
+#: includes/admin.php:638
 msgid "Email field"
 msgstr "E-Mail-Feld"
 
-#: includes/admin.php:635 includes/settings-page.php:372
+#: includes/admin.php:639 includes/settings-page.php:372
 msgid "Email subject"
 msgstr "E-Mail-Betreff"
 
-#: includes/admin.php:636 includes/settings-page.php:374
+#: includes/admin.php:640 includes/settings-page.php:374
 msgid ""
 "The placeholders {form_title} and {site_name} are replaced by the form title "
 "and site name."
@@ -1182,19 +1190,19 @@ msgstr ""
 "Die Platzhalter {form_title} und {site_name} werden durch Formularnamen und "
 "Website-Namen ersetzt."
 
-#: includes/admin.php:637
+#: includes/admin.php:641
 msgid "Email title"
 msgstr "E-Mail-Titel"
 
-#: includes/admin.php:638 includes/settings-page.php:399
+#: includes/admin.php:642 includes/settings-page.php:399
 msgid "Shown as the heading inside the confirmation email."
 msgstr "Wird als Überschrift in der Bestätigungs-E-Mail angezeigt."
 
-#: includes/admin.php:639
+#: includes/admin.php:643
 msgid "Intro text"
 msgstr "Einleitungstext"
 
-#: includes/admin.php:640
+#: includes/admin.php:644
 msgid ""
 "This text appears above the submitted form data in the email. Placeholders "
 "like {field-id} can be used."
@@ -1202,38 +1210,38 @@ msgstr ""
 "Dieser Text erscheint oberhalb der übermittelten Formulardaten in der E-"
 "Mail. Platzhalter wie {field-id} sind möglich."
 
-#: includes/admin.php:641
+#: includes/admin.php:645
 msgid "Footer text"
 msgstr "Fußzeilentext"
 
-#: includes/admin.php:642 includes/settings-page.php:415
+#: includes/admin.php:646 includes/settings-page.php:415
 msgid "The placeholders {form_title} and {site_name} are supported."
 msgstr "Die Platzhalter {form_title} und {site_name} werden unterstützt."
 
-#: includes/admin.php:643 includes/settings-page.php:549
+#: includes/admin.php:647 includes/settings-page.php:549
 msgid "CSRF protection"
 msgstr "CSRF-Schutz"
 
-#: includes/admin.php:644 includes/settings-page.php:550
+#: includes/admin.php:648 includes/settings-page.php:550
 msgid ""
 "A WordPress nonce is verified on every submission to block forged requests."
 msgstr ""
 "Bei jeder Übermittlung wird ein WordPress-Nonce geprüft, um gefälschte "
 "Anfragen zu verhindern."
 
-#: includes/admin.php:645 includes/settings-page.php:296
+#: includes/admin.php:649 includes/settings-page.php:296
 msgid "Always on"
 msgstr "Immer aktiv"
 
-#: includes/admin.php:646
+#: includes/admin.php:650
 msgid "Recommended"
 msgstr "Empfohlen"
 
-#: includes/admin.php:647 includes/settings-page.php:553
+#: includes/admin.php:651 includes/settings-page.php:553
 msgid "JavaScript check"
 msgstr "JavaScript-Prüfung"
 
-#: includes/admin.php:648 includes/settings-page.php:554
+#: includes/admin.php:652 includes/settings-page.php:554
 msgid ""
 "A hidden field is set by JavaScript. If the expected value is missing, the "
 "submission is discarded."
@@ -1241,11 +1249,11 @@ msgstr ""
 "Ein verstecktes Feld wird per JavaScript gesetzt. Fehlt der erwartete Wert, "
 "wird die Übermittlung verworfen."
 
-#: includes/admin.php:649 includes/settings-page.php:557
+#: includes/admin.php:653 includes/settings-page.php:557
 msgid "Honeypot field"
 msgstr "Honeypot-Feld"
 
-#: includes/admin.php:650 includes/settings-page.php:558
+#: includes/admin.php:654 includes/settings-page.php:558
 msgid ""
 "A field hidden from visitors detects simple bots. If it is filled, the "
 "submission is discarded."
@@ -1253,100 +1261,100 @@ msgstr ""
 "Ein für Besucher unsichtbares Feld erkennt einfache Bots. Wird es "
 "ausgefüllt, wird die Übermittlung verworfen."
 
-#: includes/admin.php:652 includes/settings-page.php:562
+#: includes/admin.php:656 includes/settings-page.php:562
 msgid "Minimum fill time"
 msgstr "Mindestausfüllzeit"
 
-#: includes/admin.php:653 includes/settings-page.php:571
+#: includes/admin.php:657 includes/settings-page.php:571
 msgid "Submissions are rejected when the form is sent unusually quickly."
 msgstr ""
 "Übermittlungen werden abgelehnt, wenn das Formular ungewöhnlich schnell "
 "abgesendet wird."
 
-#: includes/admin.php:654 includes/settings-page.php:574
+#: includes/admin.php:658 includes/settings-page.php:574
 msgid "Min."
 msgstr "Min."
 
-#: includes/admin.php:655 includes/settings-page.php:576
+#: includes/admin.php:659 includes/settings-page.php:576
 msgid "seconds"
 msgstr "Sekunden"
 
-#: includes/admin.php:656 includes/settings-page.php:582
+#: includes/admin.php:660 includes/settings-page.php:582
 msgid "Submission limit"
 msgstr "Übermittlungslimit"
 
-#: includes/admin.php:657 includes/settings-page.php:591
+#: includes/admin.php:661 includes/settings-page.php:591
 msgid ""
 "Limits how often the same visitor can submit the form within a time period."
 msgstr ""
 "Begrenzt, wie oft derselbe Besucher das Formular innerhalb eines Zeitraums "
 "absenden kann."
 
-#: includes/admin.php:658 includes/settings-page.php:594
+#: includes/admin.php:662 includes/settings-page.php:594
 msgid "Max"
 msgstr "Max."
 
-#: includes/admin.php:659 includes/settings-page.php:596
+#: includes/admin.php:663 includes/settings-page.php:596
 msgid "submissions in"
 msgstr "Übermittlungen in"
 
-#: includes/admin.php:667
+#: includes/admin.php:671
 msgid "Textarea"
 msgstr "Textbereich"
 
-#: includes/admin.php:668
+#: includes/admin.php:672
 msgid "Radio Buttons"
 msgstr "Radiobuttons"
 
-#: includes/admin.php:669
+#: includes/admin.php:673
 msgid "Checkboxes"
 msgstr "Checkboxen"
 
-#: includes/admin.php:671
+#: includes/admin.php:675
 msgid "Toggle"
 msgstr "Umschalter"
 
-#: includes/admin.php:672
+#: includes/admin.php:676
 msgid "Button Group"
 msgstr "Button-Gruppe"
 
-#: includes/admin.php:673
+#: includes/admin.php:677
 msgid "Consent"
 msgstr "Einwilligung"
 
-#: includes/admin.php:676
+#: includes/admin.php:680
 msgid "Date & Time"
 msgstr "Datum & Uhrzeit"
 
-#: includes/admin.php:677
+#: includes/admin.php:681
 msgid "File Upload"
 msgstr "Datei-Upload"
 
-#: includes/admin.php:678
+#: includes/admin.php:682
 msgid "Image Upload"
 msgstr "Bild-Upload"
 
-#: includes/admin.php:679
+#: includes/admin.php:683
 msgid "Heading"
 msgstr "Überschrift"
 
-#: includes/admin.php:682
+#: includes/admin.php:686
 msgid "Divider"
 msgstr "Trennlinie"
 
-#: includes/admin.php:683
+#: includes/admin.php:687
 msgid "Spacer"
 msgstr "Abstandhalter"
 
-#: includes/admin.php:686
+#: includes/admin.php:690
 msgid "Hidden"
 msgstr "Versteckt"
 
-#: includes/admin.php:687
+#: includes/admin.php:691
 msgid "Honeypot"
 msgstr "Honeypot"
 
-#: includes/admin.php:688 includes/settings-page.php:16
+#: includes/admin.php:692 includes/settings-page.php:16
 msgid "CAPTCHA"
 msgstr "CAPTCHA"
 
