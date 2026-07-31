@@ -476,6 +476,8 @@ function bl_forms_admin_enqueue(string $hook): void
 				'logicValue'        => __('Value', 'baselayer-forms'),
 				'logicSelectValue'  => __('— Select —', 'baselayer-forms'),
 				'logicNoFields'     => __('No fields available', 'baselayer-forms'),
+				'logicThisField'    => __('This field', 'baselayer-forms'),
+				'logicMissingField' => __('Missing field', 'baselayer-forms'),
 				'logicOpChecked'    => __('Checked', 'baselayer-forms'),
 				'logicOpNotChecked' => __('Not checked', 'baselayer-forms'),
 				'logicOpEquals'     => __('Is equal to', 'baselayer-forms'),

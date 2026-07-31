@@ -907,31 +907,60 @@
       return { enabled: false, groups: [] };
     }
   }
-  function collectLogicSourceFields(exceptId = "") {
+  function collectLogicSourceFields(exceptId = "", options = {}) {
+    const includeSelf = !!options.includeSelf;
     const out = [];
+    const seen = /* @__PURE__ */ new Set();
+    const push = (entry) => {
+      if (!entry?.id || seen.has(entry.id)) {
+        return;
+      }
+      const isSelf = !!entry.isSelf;
+      if (isSelf && !includeSelf) {
+        return;
+      }
+      if (!isSelf && LOGIC_SOURCE_EXCLUDE.includes(entry.type)) {
+        return;
+      }
+      seen.add(entry.id);
+      out.push(entry);
+    };
     document.querySelectorAll(".bl-forms-builder__field[data-bl-forms-field]").forEach((row) => {
       const id = row.dataset.fieldId || "";
       const type = row.dataset.fieldType || "";
-      if (!id || id === exceptId) {
-        return;
-      }
-      if (LOGIC_SOURCE_EXCLUDE.includes(type)) {
+      if (!id) {
         return;
       }
       const labelInput = row.querySelector("[data-bl-label]");
       const sectionLabel = row.querySelector(".bl-forms-builder__section-label-input");
       const preview = row.querySelector(":scope > .bl-forms-builder__field-header .bl-forms-builder__preview");
       const label = (labelInput?.value || "").trim() || (sectionLabel?.value || "").trim() || (preview?.textContent || "").trim() || typeLabel(type);
-      const options = Array.from(row.querySelectorAll("[data-bl-option]")).map((opt) => ({
+      const fieldOptions = Array.from(row.querySelectorAll("[data-bl-option]")).map((opt) => ({
         label: opt.querySelector("[data-bl-opt-label]")?.value || "",
         value: opt.querySelector("[data-bl-opt-value]")?.value || ""
       }));
-      out.push({ id, type, label, options });
+      push({ id, type, label, options: fieldOptions, isSelf: id === exceptId });
+    });
+    flattenFields(readConfig().fields || []).forEach((field) => {
+      if (!field?.id || seen.has(field.id)) {
+        return;
+      }
+      const type = field.type || "text";
+      push({
+        id: field.id,
+        type,
+        label: (field.label || "").trim() || typeLabel(type),
+        options: Array.isArray(field.options) ? field.options : [],
+        isSelf: field.id === exceptId
+      });
     });
     return out;
   }
+  function selectableSources(sources) {
+    return (sources || []).filter((s) => !s.isSelf);
+  }
   function emptyRule(sources) {
-    const first = sources[0];
+    const first = selectableSources(sources)[0];
     const ops = first ? operatorsForType(first.type) : ["=="];
     return {
       field: first?.id || "",
@@ -939,7 +968,7 @@
       value: ""
     };
   }
-  function createConditionalLogicEditor(field, getSources = () => collectLogicSourceFields(field.id)) {
+  function createConditionalLogicEditor(field, getSources = () => collectLogicSourceFields(field.id, { includeSelf: true }), onChange = null) {
     if (!field.conditional_logic || typeof field.conditional_logic !== "object") {
       field.conditional_logic = { enabled: false, groups: [] };
     } else {
@@ -952,20 +981,15 @@
     });
     const syncHidden = (notify = true) => {
       hidden.value = JSON.stringify(normalizeConditionalLogic(field.conditional_logic));
+      if (typeof onChange === "function") {
+        onChange();
+      }
       if (notify) {
         document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
       }
     };
     const getGroup = (groupIndex) => field.conditional_logic.groups[groupIndex];
     const getRule = (groupIndex, ruleIndex) => getGroup(groupIndex)?.[ruleIndex];
-    const pruneMissingSources = () => {
-      const ids = new Set(getSources().map((s) => s.id));
-      field.conditional_logic.groups = field.conditional_logic.groups.map((group) => group.filter((rule) => ids.has(rule.field))).filter((group) => group.length > 0);
-      if (!field.conditional_logic.groups.length) {
-        field.conditional_logic.enabled = false;
-      }
-    };
-    pruneMissingSources();
     const groupsMount = el("div", { className: "bl-forms-builder__logic-groups" });
     const renderValueControl = (groupIndex, ruleIndex, source) => {
       const rule = getRule(groupIndex, ruleIndex);
@@ -1026,36 +1050,50 @@
       if (!rule) {
         return el("div", { className: "bl-forms-builder__logic-rule" });
       }
-      let source = sources.find((s) => s.id === rule.field) || sources[0] || null;
-      if (source && rule.field !== source.id) {
-        rule.field = source.id;
+      const selectable = selectableSources(sources);
+      let source = selectable.find((s) => s.id === rule.field) || null;
+      if (!rule.field && selectable[0]) {
+        rule.field = selectable[0].id;
+        source = selectable[0];
       }
-      const ops = source ? operatorsForType(source.type) : ["=="];
-      if (!ops.includes(rule.operator)) {
+      const ops = source ? operatorsForType(source.type) : ["==", "!=", "==empty", "!=empty"];
+      if (source && !ops.includes(rule.operator)) {
         rule.operator = ops[0];
         if (!operatorNeedsValue(rule.operator)) {
           rule.value = "";
         }
+      } else if (!ops.includes(rule.operator) && rule.operator) {
+        ops.unshift(rule.operator);
       }
       const fieldSelect = el("select", {
         className: "bl-forms-builder__logic-field",
         "aria-label": t("logicField", "Field")
       });
-      if (!sources.length) {
+      if (!selectable.length && !rule.field) {
         fieldSelect.appendChild(
           el("option", { value: "", text: t("logicNoFields", "No fields available") })
         );
         fieldSelect.disabled = true;
       } else {
         sources.forEach((s) => {
+          const opt = el("option", {
+            value: s.id,
+            text: s.isSelf ? `${s.label} (${typeLabel(s.type)}) \u2014 ${t("logicThisField", "This field")}` : `${s.label} (${typeLabel(s.type)})`
+          });
+          if (s.isSelf) {
+            opt.disabled = true;
+          }
+          fieldSelect.appendChild(opt);
+        });
+        if (rule.field && !sources.some((s) => s.id === rule.field)) {
           fieldSelect.appendChild(
             el("option", {
-              value: s.id,
-              text: `${s.label} (${typeLabel(s.type)})`
+              value: rule.field,
+              text: t("logicMissingField", "Missing field")
             })
           );
-        });
-        fieldSelect.value = rule.field || sources[0].id;
+        }
+        fieldSelect.value = rule.field || selectable[0]?.id || "";
       }
       const opSelect = el("select", {
         className: "bl-forms-builder__logic-operator",
@@ -1068,7 +1106,7 @@
       const valueSlot = el("div", { className: "bl-forms-builder__logic-value-slot" });
       const refreshValue = () => {
         const live = getRule(groupIndex, ruleIndex);
-        const liveSource = sources.find((s) => s.id === live?.field) || sources[0] || null;
+        const liveSource = selectable.find((s) => s.id === live?.field) || null;
         valueSlot.replaceChildren(renderValueControl(groupIndex, ruleIndex, liveSource));
       };
       refreshValue();
@@ -1078,7 +1116,7 @@
           return;
         }
         live.field = fieldSelect.value;
-        source = sources.find((s) => s.id === live.field) || null;
+        source = selectable.find((s) => s.id === live.field) || null;
         const nextOps = source ? operatorsForType(source.type) : ["=="];
         live.operator = nextOps.includes(live.operator) ? live.operator : nextOps[0];
         if (!operatorNeedsValue(live.operator)) {
@@ -1229,6 +1267,13 @@
     );
     renderGroups();
     syncHidden(false);
+    wrap.refreshLogicSources = () => {
+      if (!wrap.isConnected) {
+        return;
+      }
+      renderGroups();
+      syncHidden(false);
+    };
     return wrap;
   }
 
@@ -3044,9 +3089,21 @@
     };
   }
   function withConditionalLogic(body, data) {
+    const row = body?.closest?.("[data-bl-forms-field]") || body;
+    const live = row && row._blFieldRef ? row._blFieldRef.conditional_logic : null;
+    if (live && typeof live === "object") {
+      const normalized = normalizeConditionalLogic(live);
+      if (normalized.enabled || normalized.groups.length) {
+        data.conditional_logic = normalized;
+        return data;
+      }
+    }
     const logic = readConditionalLogicFromDom(body);
     if (logic) {
-      data.conditional_logic = normalizeConditionalLogic(logic);
+      const normalized = normalizeConditionalLogic(logic);
+      if (normalized.enabled || normalized.groups.length) {
+        data.conditional_logic = normalized;
+      }
     }
     return data;
   }
@@ -3101,6 +3158,13 @@
         tab.panel.hidden = !active;
         tab.panel.classList.toggle("is-active", active);
       });
+      if (id === "logic") {
+        tabs[3].panel.querySelectorAll(".bl-forms-builder__logic").forEach((node) => {
+          if (typeof node.refreshLogicSources === "function") {
+            node.refreshLogicSources();
+          }
+        });
+      }
     };
     const wrap = el("div", { className: "bl-forms-builder__field-editor" }, [tabBar, panelsWrap]);
     return {
@@ -3453,6 +3517,7 @@
         nameManual: field.name_manual ? "1" : "0"
       }
     });
+    row._blFieldRef = field;
     const preview = el("span", { className: "bl-forms-builder__preview" });
     const widthBadge = el("span", { className: "bl-forms-builder__width-badge" });
     const activateBtn = el("button", {
@@ -3521,6 +3586,16 @@
           })
         );
       }
+      const logic = field.conditional_logic;
+      if (logic && logic.enabled && Array.isArray(logic.groups) && logic.groups.length > 0) {
+        typeChildren.push(
+          el("span", {
+            className: "bl-forms-builder__field-logic-dot",
+            title: t("logicEnable", "Conditional logic"),
+            "aria-label": t("logicEnable", "Conditional logic")
+          })
+        );
+      }
       typeChip.replaceChildren(...typeChildren);
       row.dataset.fieldType = field.type;
       row.dataset.fieldWidth = field.width || "100";
@@ -3549,6 +3624,13 @@
         "aria-label",
         nextOpen ? t("collapseField", "Collapse field") : t("expandField", "Expand field")
       );
+      if (nextOpen) {
+        body.querySelectorAll(".bl-forms-builder__logic").forEach((node) => {
+          if (typeof node.refreshLogicSources === "function") {
+            node.refreshLogicSources();
+          }
+        });
+      }
     };
     const toggle = el("button", {
       type: "button",
@@ -3656,7 +3738,7 @@
         appearanceSections.add(createLayoutControl(field));
       }
       appearanceSections.add(createCssClassControl(field));
-      logicSections.add(createConditionalLogicEditor(field));
+      logicSections.add(createConditionalLogicEditor(field, void 0, updatePreview));
       if (field.type === "divider" || field.type === "spacer") {
       } else if (field.type === "captcha") {
         generalSections.add(

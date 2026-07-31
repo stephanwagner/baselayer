@@ -513,6 +513,14 @@ msgid "No fields available"
 msgstr "Keine Felder verfügbar"
 
 #: includes/admin.php:479
+msgid "This field"
+msgstr "Dieses Feld"
+
+#: includes/admin.php:480
+msgid "Missing field"
+msgstr "Fehlendes Feld"
+
+#: includes/admin.php:481
 msgid "Checked"
 msgstr "Aktiviert"
 

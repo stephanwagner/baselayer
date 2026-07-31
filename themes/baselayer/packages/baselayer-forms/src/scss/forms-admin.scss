@@ -896,6 +896,15 @@ p.bl-forms-builder__palette-empty {
   background: #{$color-error};
 }
 
+.bl-forms-builder__field-logic-dot {
+  flex: 0 0 auto;
+  width: 5px;
+  height: 5px;
+  margin-left: 1px;
+  border-radius: 50%;
+  background: #{$color-success};
+}
+
 .bl-forms-builder__width-badge {
   flex: 0 0 auto;
   padding: 3px 8px;

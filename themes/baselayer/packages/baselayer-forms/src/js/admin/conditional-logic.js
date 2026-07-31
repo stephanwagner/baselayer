@@ -1,4 +1,4 @@
-import { el, t, typeLabel } from './dom.js';
+import { el, t, typeLabel, readConfig, flattenFields } from './dom.js';
 
 /** Field types that cannot be used as condition sources. */
 export const LOGIC_SOURCE_EXCLUDE = [
@@ -159,20 +159,38 @@ export function readConditionalLogicFromDom(body) {
 }
 
 /**
- * Collect sibling fields that can act as condition sources.
+ * Collect fields that can appear in the condition field dropdown.
+ * Uses the canvas DOM when present, and fills gaps from the form config JSON
+ * so rules still resolve while cards are mounting one-by-one.
  *
- * @param {string} exceptId
+ * @param {string} exceptId Current field id (marked as self when includeSelf).
+ * @param {{ includeSelf?: boolean }} [options]
  * @returns {array}
  */
-export function collectLogicSourceFields(exceptId = '') {
+export function collectLogicSourceFields(exceptId = '', options = {}) {
+  const includeSelf = !!options.includeSelf;
   const out = [];
+  const seen = new Set();
+
+  const push = (entry) => {
+    if (!entry?.id || seen.has(entry.id)) {
+      return;
+    }
+    const isSelf = !!entry.isSelf;
+    if (isSelf && !includeSelf) {
+      return;
+    }
+    if (!isSelf && LOGIC_SOURCE_EXCLUDE.includes(entry.type)) {
+      return;
+    }
+    seen.add(entry.id);
+    out.push(entry);
+  };
+
   document.querySelectorAll('.bl-forms-builder__field[data-bl-forms-field]').forEach((row) => {
     const id = row.dataset.fieldId || '';
     const type = row.dataset.fieldType || '';
-    if (!id || id === exceptId) {
-      return;
-    }
-    if (LOGIC_SOURCE_EXCLUDE.includes(type)) {
+    if (!id) {
       return;
     }
     const labelInput = row.querySelector('[data-bl-label]');
@@ -183,17 +201,37 @@ export function collectLogicSourceFields(exceptId = '') {
       (sectionLabel?.value || '').trim() ||
       (preview?.textContent || '').trim() ||
       typeLabel(type);
-    const options = Array.from(row.querySelectorAll('[data-bl-option]')).map((opt) => ({
+    const fieldOptions = Array.from(row.querySelectorAll('[data-bl-option]')).map((opt) => ({
       label: opt.querySelector('[data-bl-opt-label]')?.value || '',
       value: opt.querySelector('[data-bl-opt-value]')?.value || '',
     }));
-    out.push({ id, type, label, options });
+    push({ id, type, label, options: fieldOptions, isSelf: id === exceptId });
   });
+
+  // Config backup for fields not mounted yet (or nested cards still rendering).
+  flattenFields(readConfig().fields || []).forEach((field) => {
+    if (!field?.id || seen.has(field.id)) {
+      return;
+    }
+    const type = field.type || 'text';
+    push({
+      id: field.id,
+      type,
+      label: (field.label || '').trim() || typeLabel(type),
+      options: Array.isArray(field.options) ? field.options : [],
+      isSelf: field.id === exceptId,
+    });
+  });
+
   return out;
 }
 
+function selectableSources(sources) {
+  return (sources || []).filter((s) => !s.isSelf);
+}
+
 function emptyRule(sources) {
-  const first = sources[0];
+  const first = selectableSources(sources)[0];
   const ops = first ? operatorsForType(first.type) : ['=='];
   return {
     field: first?.id || '',
@@ -207,9 +245,14 @@ function emptyRule(sources) {
  *
  * @param {object} field
  * @param {() => array} [getSources]
+ * @param {() => void} [onChange]
  * @returns {HTMLElement}
  */
-export function createConditionalLogicEditor(field, getSources = () => collectLogicSourceFields(field.id)) {
+export function createConditionalLogicEditor(
+  field,
+  getSources = () => collectLogicSourceFields(field.id, { includeSelf: true }),
+  onChange = null
+) {
   if (!field.conditional_logic || typeof field.conditional_logic !== 'object') {
     field.conditional_logic = { enabled: false, groups: [] };
   } else {
@@ -226,6 +269,9 @@ export function createConditionalLogicEditor(field, getSources = () => collectLo
   // orphaned closures on Add rule / field selects so clicks mutated discarded arrays.
   const syncHidden = (notify = true) => {
     hidden.value = JSON.stringify(normalizeConditionalLogic(field.conditional_logic));
+    if (typeof onChange === 'function') {
+      onChange();
+    }
     if (notify) {
       document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
     }
@@ -234,16 +280,8 @@ export function createConditionalLogicEditor(field, getSources = () => collectLo
   const getGroup = (groupIndex) => field.conditional_logic.groups[groupIndex];
   const getRule = (groupIndex, ruleIndex) => getGroup(groupIndex)?.[ruleIndex];
 
-  const pruneMissingSources = () => {
-    const ids = new Set(getSources().map((s) => s.id));
-    field.conditional_logic.groups = field.conditional_logic.groups
-      .map((group) => group.filter((rule) => ids.has(rule.field)))
-      .filter((group) => group.length > 0);
-    if (!field.conditional_logic.groups.length) {
-      field.conditional_logic.enabled = false;
-    }
-  };
-  pruneMissingSources();
+  // Do not prune against the live DOM on create — cards mount one-by-one, so
+  // sibling fields are often missing and valid rules would be wiped before save.
 
   const groupsMount = el('div', { className: 'bl-forms-builder__logic-groups' });
 
@@ -307,37 +345,56 @@ export function createConditionalLogicEditor(field, getSources = () => collectLo
     if (!rule) {
       return el('div', { className: 'bl-forms-builder__logic-rule' });
     }
-    let source = sources.find((s) => s.id === rule.field) || sources[0] || null;
-    if (source && rule.field !== source.id) {
-      rule.field = source.id;
+    const selectable = selectableSources(sources);
+    // Never remap an existing rule to another field — during card mount siblings
+    // may not be in the DOM yet, and remapping would corrupt saved logic.
+    let source = selectable.find((s) => s.id === rule.field) || null;
+    if (!rule.field && selectable[0]) {
+      rule.field = selectable[0].id;
+      source = selectable[0];
     }
-    const ops = source ? operatorsForType(source.type) : ['=='];
-    if (!ops.includes(rule.operator)) {
+    const ops = source ? operatorsForType(source.type) : ['==', '!=', '==empty', '!=empty'];
+    if (source && !ops.includes(rule.operator)) {
       rule.operator = ops[0];
       if (!operatorNeedsValue(rule.operator)) {
         rule.value = '';
       }
+    } else if (!ops.includes(rule.operator) && rule.operator) {
+      // Keep unknown/orphan operator in the list so the saved value is visible.
+      ops.unshift(rule.operator);
     }
 
     const fieldSelect = el('select', {
       className: 'bl-forms-builder__logic-field',
       'aria-label': t('logicField', 'Field'),
     });
-    if (!sources.length) {
+    if (!selectable.length && !rule.field) {
       fieldSelect.appendChild(
         el('option', { value: '', text: t('logicNoFields', 'No fields available') })
       );
       fieldSelect.disabled = true;
     } else {
       sources.forEach((s) => {
+        const opt = el('option', {
+          value: s.id,
+          text: s.isSelf
+            ? `${s.label} (${typeLabel(s.type)}) — ${t('logicThisField', 'This field')}`
+            : `${s.label} (${typeLabel(s.type)})`,
+        });
+        if (s.isSelf) {
+          opt.disabled = true;
+        }
+        fieldSelect.appendChild(opt);
+      });
+      if (rule.field && !sources.some((s) => s.id === rule.field)) {
         fieldSelect.appendChild(
           el('option', {
-            value: s.id,
-            text: `${s.label} (${typeLabel(s.type)})`,
+            value: rule.field,
+            text: t('logicMissingField', 'Missing field'),
           })
         );
-      });
-      fieldSelect.value = rule.field || sources[0].id;
+      }
+      fieldSelect.value = rule.field || selectable[0]?.id || '';
     }
 
     const opSelect = el('select', {
@@ -352,8 +409,7 @@ export function createConditionalLogicEditor(field, getSources = () => collectLo
     const valueSlot = el('div', { className: 'bl-forms-builder__logic-value-slot' });
     const refreshValue = () => {
       const live = getRule(groupIndex, ruleIndex);
-      const liveSource =
-        sources.find((s) => s.id === live?.field) || sources[0] || null;
+      const liveSource = selectable.find((s) => s.id === live?.field) || null;
       valueSlot.replaceChildren(renderValueControl(groupIndex, ruleIndex, liveSource));
     };
     refreshValue();
@@ -364,7 +420,7 @@ export function createConditionalLogicEditor(field, getSources = () => collectLo
         return;
       }
       live.field = fieldSelect.value;
-      source = sources.find((s) => s.id === live.field) || null;
+      source = selectable.find((s) => s.id === live.field) || null;
       const nextOps = source ? operatorsForType(source.type) : ['=='];
       live.operator = nextOps.includes(live.operator) ? live.operator : nextOps[0];
       if (!operatorNeedsValue(live.operator)) {
@@ -529,6 +585,14 @@ export function createConditionalLogicEditor(field, getSources = () => collectLo
 
   renderGroups();
   syncHidden(false);
+
+  wrap.refreshLogicSources = () => {
+    if (!wrap.isConnected) {
+      return;
+    }
+    renderGroups();
+    syncHidden(false);
+  };
 
   return wrap;
 }

@@ -2154,16 +2154,28 @@ function appearancePayload(scope, width, widthCustom) {
 }
 
 /**
- * Attach conditional_logic from the Logic tab hidden input when present.
+ * Attach conditional_logic from the live field object or Logic tab hidden input.
  *
  * @param {HTMLElement} body
  * @param {object} data
  * @returns {object}
  */
 function withConditionalLogic(body, data) {
+  const row = body?.closest?.('[data-bl-forms-field]') || body;
+  const live = row && row._blFieldRef ? row._blFieldRef.conditional_logic : null;
+  if (live && typeof live === 'object') {
+    const normalized = normalizeConditionalLogic(live);
+    if (normalized.enabled || normalized.groups.length) {
+      data.conditional_logic = normalized;
+      return data;
+    }
+  }
   const logic = readConditionalLogicFromDom(body);
   if (logic) {
-    data.conditional_logic = normalizeConditionalLogic(logic);
+    const normalized = normalizeConditionalLogic(logic);
+    if (normalized.enabled || normalized.groups.length) {
+      data.conditional_logic = normalized;
+    }
   }
   return data;
 }
@@ -2223,6 +2235,13 @@ function createFieldEditorTabs(activeId = 'general') {
       tab.panel.hidden = !active;
       tab.panel.classList.toggle('is-active', active);
     });
+    if (id === 'logic') {
+      tabs[3].panel.querySelectorAll('.bl-forms-builder__logic').forEach((node) => {
+        if (typeof node.refreshLogicSources === 'function') {
+          node.refreshLogicSources();
+        }
+      });
+    }
   };
 
   const wrap = el('div', { className: 'bl-forms-builder__field-editor' }, [tabBar, panelsWrap]);
@@ -2626,6 +2645,7 @@ export function createFieldCard(initial, open = false) {
       nameManual: field.name_manual ? '1' : '0',
     },
   });
+  row._blFieldRef = field;
 
   const preview = el('span', { className: 'bl-forms-builder__preview' });
   const widthBadge = el('span', { className: 'bl-forms-builder__width-badge' });
@@ -2705,6 +2725,16 @@ export function createFieldCard(initial, open = false) {
         })
       );
     }
+    const logic = field.conditional_logic;
+    if (logic && logic.enabled && Array.isArray(logic.groups) && logic.groups.length > 0) {
+      typeChildren.push(
+        el('span', {
+          className: 'bl-forms-builder__field-logic-dot',
+          title: t('logicEnable', 'Conditional logic'),
+          'aria-label': t('logicEnable', 'Conditional logic'),
+        })
+      );
+    }
     typeChip.replaceChildren(...typeChildren);
     row.dataset.fieldType = field.type;
     row.dataset.fieldWidth = field.width || '100';
@@ -2735,6 +2765,13 @@ export function createFieldCard(initial, open = false) {
       'aria-label',
       nextOpen ? t('collapseField', 'Collapse field') : t('expandField', 'Expand field')
     );
+    if (nextOpen) {
+      body.querySelectorAll('.bl-forms-builder__logic').forEach((node) => {
+        if (typeof node.refreshLogicSources === 'function') {
+          node.refreshLogicSources();
+        }
+      });
+    }
   };
 
   const toggle = el('button', {
@@ -2853,7 +2890,7 @@ export function createFieldCard(initial, open = false) {
     }
     appearanceSections.add(createCssClassControl(field));
 
-    logicSections.add(createConditionalLogicEditor(field));
+    logicSections.add(createConditionalLogicEditor(field, undefined, updatePreview));
 
     if (field.type === 'divider' || field.type === 'spacer') {
       // Appearance only.
