@@ -154,65 +154,83 @@ body.bl-page-picker-open {
   background: #f6f7f7;
 }
 
-.post-type-bl_form .page-title-action {
+.post-type-bl_form .page-title-action,
+.post-type-bl_block .page-title-action {
   display: none !important;
 }
-.post-type-bl_form #poststuff .meta-box-sortables {
+.post-type-bl_form #poststuff .meta-box-sortables,
+.post-type-bl_block #poststuff .meta-box-sortables {
   min-height: 0;
 }
-.post-type-bl_form .postbox .hndle {
+.post-type-bl_form .postbox .hndle,
+.post-type-bl_block .postbox .hndle {
   cursor: default;
 }
 .post-type-bl_form .postbox .handle-order-higher,
-.post-type-bl_form .postbox .handle-order-lower {
+.post-type-bl_form .postbox .handle-order-lower,
+.post-type-bl_block .postbox .handle-order-higher,
+.post-type-bl_block .postbox .handle-order-lower {
   display: none;
 }
-.post-type-bl_form #titlediv input {
+.post-type-bl_form #titlediv input,
+.post-type-bl_block #titlediv input {
   border-radius: 4px;
   font-size: 18px !important;
   padding: 6px 12px !important;
 }
-.post-type-bl_form #submitdiv .misc-pub-visibility {
+.post-type-bl_form #submitdiv .misc-pub-visibility,
+.post-type-bl_block #submitdiv .misc-pub-visibility {
   display: none;
 }
 .post-type-bl_form #submitdiv .misc-pub-section::before,
-.post-type-bl_form #submitdiv .curtime #timestamp::before {
+.post-type-bl_form #submitdiv .curtime #timestamp::before,
+.post-type-bl_block #submitdiv .misc-pub-section::before,
+.post-type-bl_block #submitdiv .curtime #timestamp::before {
   content: none;
   display: none;
 }
-.post-type-bl_form #submitdiv #delete-action {
+.post-type-bl_form #submitdiv #delete-action,
+.post-type-bl_block #submitdiv #delete-action {
   display: none;
 }
-.post-type-bl_form #submitdiv .bl-forms-submitbox-help {
+.post-type-bl_form #submitdiv .bl-forms-submitbox-help,
+.post-type-bl_block #submitdiv .bl-forms-submitbox-help {
   margin: 0;
   padding-top: 8px;
   color: #646970;
   line-height: 1.4;
 }
 .post-type-bl_form #bl_forms_tools .inside,
-.post-type-bl_form #bl_forms_templates .inside {
+.post-type-bl_form #bl_forms_templates .inside,
+.post-type-bl_block #bl_forms_tools .inside,
+.post-type-bl_block #bl_forms_templates .inside {
   margin: 0;
   padding: 12px;
 }
-.post-type-bl_form .bl-forms-tools__help {
+.post-type-bl_form .bl-forms-tools__help,
+.post-type-bl_block .bl-forms-tools__help {
   margin: 0 0 10px;
 }
-.post-type-bl_form .bl-forms-tools__actions {
+.post-type-bl_form .bl-forms-tools__actions,
+.post-type-bl_block .bl-forms-tools__actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 6px;
 }
-.post-type-bl_form .bl-forms-tools__actions .button {
+.post-type-bl_form .bl-forms-tools__actions .button,
+.post-type-bl_block .bl-forms-tools__actions .button {
   width: 100%;
   justify-content: center;
   text-align: center;
 }
-.post-type-bl_form .bl-forms-templates__list {
+.post-type-bl_form .bl-forms-templates__list,
+.post-type-bl_block .bl-forms-templates__list {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
-.post-type-bl_form .bl-forms-templates__btn {
+.post-type-bl_form .bl-forms-templates__btn,
+.post-type-bl_block .bl-forms-templates__btn {
   display: flex !important;
   align-items: center;
   justify-content: flex-start;
@@ -226,12 +244,15 @@ body.bl-page-picker-open {
   text-align: left;
   padding-left: 8px;
 }
-.post-type-bl_form .bl-forms-templates__btn:hover, .post-type-bl_form .bl-forms-templates__btn:focus {
+.post-type-bl_form .bl-forms-templates__btn:hover, .post-type-bl_form .bl-forms-templates__btn:focus,
+.post-type-bl_block .bl-forms-templates__btn:hover,
+.post-type-bl_block .bl-forms-templates__btn:focus {
   background: #f6f7f7 !important;
   border-color: #8c8f94 !important;
   color: #1d2327 !important;
 }
-.post-type-bl_form .bl-forms-templates__caret {
+.post-type-bl_form .bl-forms-templates__caret,
+.post-type-bl_block .bl-forms-templates__caret {
   display: inline-flex;
   flex: 0 0 auto;
   width: 14px;
@@ -241,17 +262,20 @@ body.bl-page-picker-open {
   transform: rotate(90deg);
   opacity: 0.65;
 }
-.post-type-bl_form .bl-forms-templates__caret svg {
+.post-type-bl_form .bl-forms-templates__caret svg,
+.post-type-bl_block .bl-forms-templates__caret svg {
   width: 16px;
   height: 16px;
   display: block;
   flex-shrink: 0;
 }
-.post-type-bl_form .bl-forms-templates__btn-label {
+.post-type-bl_form .bl-forms-templates__btn-label,
+.post-type-bl_block .bl-forms-templates__btn-label {
   flex: 1 1 auto;
   min-width: 0;
 }
-.post-type-bl_form .bl-forms-templates__premium {
+.post-type-bl_form .bl-forms-templates__premium,
+.post-type-bl_block .bl-forms-templates__premium {
   display: none !important;
   width: 100%;
   margin-top: 10px;

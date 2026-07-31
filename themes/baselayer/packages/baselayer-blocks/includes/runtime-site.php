@@ -20,9 +20,17 @@ function bl_blocks_render_website_page(): void
 		$def_id = (int) $_POST['bl_blocks_definition_id'];
 		$post = get_post($def_id);
 		if ($post instanceof WP_Post && $post->post_type === BL_BLOCK_POST_TYPE
+			&& $post->post_status === 'publish'
 			&& bl_blocks_get_definition_type($def_id) === 'site_settings'
 		) {
 			$config = bl_blocks_get_config($def_id);
+			if (empty($config['settings']['active'])) {
+				$config = null;
+			}
+		} else {
+			$config = null;
+		}
+		if ($config !== null) {
 			$slug = bl_blocks_definition_slug($def_id, $config['settings']);
 			$raw = isset($_POST['bl_blocks_values']) && is_array($_POST['bl_blocks_values'])
 				? wp_unslash($_POST['bl_blocks_values'])

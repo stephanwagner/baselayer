@@ -3,7 +3,8 @@
 @use 'page-picker';
 
 // Form edit screen: static side boxes (Publish is a WP default postbox).
-.post-type-bl_form {
+.post-type-bl_form,
+.post-type-bl_block {
   // “Add Form” is only needed on the list screen (this stylesheet isn’t loaded there).
   .page-title-action {
     display: none !important;

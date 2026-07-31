@@ -1,10 +1,14 @@
 // Blocks admin: definition editor extras + Website + field UI modal.
 
-.post-type-bl_block {
+// Hide WP “Add New” on the definition edit screens only (list keeps it).
+body.post-php.post-type-bl_block,
+body.post-new-php.post-type-bl_block {
   .page-title-action {
     display: none !important;
   }
+}
 
+.post-type-bl_block {
   #poststuff .meta-box-sortables {
     min-height: 0;
   }
@@ -21,6 +25,120 @@
   #submitdiv .misc-pub-visibility {
     display: none;
   }
+
+  .column-bl_menu_order {
+    width: 74px;
+    text-align: center;
+  }
+
+  .column-bl_block_name {
+    width: 28%;
+  }
+
+  .bl-blocks-list-block-name {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    max-width: 100%;
+  }
+
+  .bl-blocks-list-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    color: #1d2327;
+  }
+
+  .bl-blocks-list-icon__media {
+    display: inline-flex;
+    width: 20px;
+    height: 20px;
+  }
+
+  .bl-blocks-list-icon__media svg,
+  .bl-blocks-list-icon .bl-icon {
+    width: 20px;
+    height: 20px;
+    display: block;
+  }
+
+  .bl-blocks-list-icon .dashicons {
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+    line-height: 1;
+  }
+
+  .bl-blocks-list-block-name code {
+    font-size: 12px;
+    overflow-wrap: anywhere;
+  }
+
+  tr.bl-blocks-is-inactive .row-title {
+    color: #8c8f94;
+  }
+
+  // Icon via ::before — list titles are esc_html()'d so markup cannot be injected.
+  // --bl-icon comes from tr.-icon-visibility-off (theme icons CSS).
+  tr.bl-blocks-is-inactive .row-title::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-inline-end: 6px;
+    vertical-align: text-bottom;
+    background-color: currentColor;
+    mask-image: var(--bl-icon);
+    mask-repeat: no-repeat;
+    mask-position: center;
+    mask-size: contain;
+    -webkit-mask-image: var(--bl-icon);
+    -webkit-mask-repeat: no-repeat;
+    -webkit-mask-position: center;
+    -webkit-mask-size: contain;
+  }
+}
+
+// Pre-JS mount placeholder (cleared by mountApp replaceChildren).
+// Kept in blocks-admin so it always shows even if forms-admin CSS is missing.
+.bl-blocks-builder.bl-forms-builder {
+  margin-top: 12px;
+  border: 1px solid #c3c4c7;
+  border-radius: 6px;
+  background: #fff;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+  min-height: 220px;
+}
+
+.bl-blocks-builder .bl-forms-builder__skeleton {
+  display: flex;
+  flex-direction: column;
+}
+
+.bl-blocks-builder .bl-forms-builder__skeleton-tabs {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 14px 12px;
+  border-bottom: 1px solid #c3c4c7;
+  background: #f6f7f7;
+  border-radius: 6px 6px 0 0;
+}
+
+.bl-blocks-builder .bl-forms-builder__skeleton-tab {
+  display: block;
+  width: 64px;
+  height: 12px;
+  border-radius: 3px;
+  background: #e2e2e4;
+}
+
+.bl-blocks-builder .bl-forms-builder__skeleton-body {
+  min-height: 180px;
+  box-sizing: border-box;
 }
 
 .bl-blocks-settings-post-types {
@@ -39,6 +157,68 @@
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+.bl-blocks-icon-field {
+  max-width: 520px;
+}
+
+.bl-blocks-icon-field__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.bl-blocks-icon-field__preview {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border: 1px solid #dcdcde;
+  border-radius: 4px;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.bl-blocks-icon-field__preview .bl-icon,
+.bl-blocks-icon-field__preview .dashicons {
+  width: 24px;
+  height: 24px;
+  font-size: 24px;
+  line-height: 1;
+}
+
+.bl-blocks-icon-field__svg {
+  display: inline-flex;
+  width: 24px;
+  height: 24px;
+}
+
+.bl-blocks-icon-field__svg svg {
+  width: 24px;
+  height: 24px;
+  display: block;
+}
+
+.bl-blocks-icon-field__empty {
+  margin: 0;
+}
+
+.bl-blocks-icon-field__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.bl-blocks-icon-field__svg-panel {
+  margin-top: 10px;
+}
+
+.bl-blocks-icon-field__svg-panel[hidden] {
+  display: none !important;
 }
 
 // —— Shared field form ——

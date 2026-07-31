@@ -30,6 +30,14 @@ function bl_blocks_render_builder_after_title(WP_Post $post): void
 	$config = bl_blocks_get_config((int) $post->ID);
 	$config['settings'] = bl_blocks_sanitize_settings($config['settings'], $type);
 
+	// New site settings: order = existing tabs + 1.
+	if ($type === 'site_settings') {
+		$saved = get_post_meta((int) $post->ID, BL_BLOCK_CONFIG_META, true);
+		if (!is_array($saved)) {
+			$config['settings']['menu_order'] = bl_blocks_next_site_settings_order((int) $post->ID);
+		}
+	}
+
 	wp_nonce_field('bl_blocks_save_config', 'bl_blocks_config_nonce');
 	?>
 	<input type="hidden" name="bl_block_type" value="<?= esc_attr($type) ?>">
@@ -42,7 +50,15 @@ function bl_blocks_render_builder_after_title(WP_Post $post): void
 		class="bl-forms-builder bl-blocks-builder"
 		data-bl-blocks-builder
 		data-bl-block-type="<?= esc_attr($type) ?>"
-	></div>
+	>
+		<div class="bl-forms-builder__skeleton" aria-hidden="true">
+			<div class="bl-forms-builder__skeleton-tabs">
+				<span class="bl-forms-builder__skeleton-tab"></span>
+				<span class="bl-forms-builder__skeleton-tab"></span>
+			</div>
+			<div class="bl-forms-builder__skeleton-body"></div>
+		</div>
+	</div>
 	<?php
 }
 add_action('edit_form_after_title', 'bl_blocks_render_builder_after_title');
@@ -119,6 +135,16 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 	}
 	bl_blocks_enqueue_script('bl-blocks-admin', 'blocks-admin', $deps, true);
 
+	$has_icon_picker = function_exists('bl_icons_localize_payload')
+		&& function_exists('bl_enqueue_theme_icons_style');
+	if ($has_icon_picker) {
+		if (function_exists('bl_load_icons_textdomain')) {
+			bl_load_icons_textdomain();
+		}
+		bl_enqueue_theme_icons_style(['bl-blocks-admin']);
+		wp_localize_script('bl-blocks-admin', 'baselayerIcons', bl_icons_localize_payload());
+	}
+
 	wp_add_inline_script(
 		'postbox',
 		"jQuery(function($){
@@ -138,6 +164,10 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 
 	$post_types = [];
 	foreach (get_post_types(['public' => true], 'objects') as $pt) {
+		// Media library has no page-settings UI.
+		if ($pt->name === 'attachment') {
+			continue;
+		}
 		$post_types[] = [
 			'value' => $pt->name,
 			'label' => $pt->labels->singular_name ?: $pt->name,
@@ -183,6 +213,13 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'settingsDescription'      => __('Description', 'baselayer-blocks'),
 		'blockTitle'               => __('Block title', 'baselayer-blocks'),
 		'blockIcon'                => __('Block icon', 'baselayer-blocks'),
+		'blockIconChoose'          => __('Choose icon', 'baselayer-blocks'),
+		'blockIconSvg'             => __('SVG code', 'baselayer-blocks'),
+		'blockIconSvgToggle'       => __('SVG code', 'baselayer-blocks'),
+		'blockIconClear'           => __('Clear', 'baselayer-blocks'),
+		'blockIconEmpty'           => __('No icon selected', 'baselayer-blocks'),
+		'blockIconMaterialHelp'    => __('Browse Material Icons (Rounded), copy SVG, and paste here: ', 'baselayer-blocks'),
+		'blockIconMaterialLink'    => __('fonts.google.com/icons', 'baselayer-blocks'),
 		'blockCategory'            => __('Block category', 'baselayer-blocks'),
 		'blockKeywords'            => __('Keywords', 'baselayer-blocks'),
 		'blockKeywordsHelp'        => __('Comma-separated search keywords for the block inserter.', 'baselayer-blocks'),
@@ -205,12 +242,13 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 	];
 
 	wp_localize_script('bl-blocks-admin', 'blBlocksAdmin', [
-		'type'      => $type,
-		'postTypes' => $post_types,
-		'icons'     => $icons,
-		'i18n'      => $i18n,
+		'type'             => $type,
+		'postTypes'        => $post_types,
+		'blockCategories'  => bl_blocks_block_category_choices(),
+		'hasIconPicker'    => $has_icon_picker,
+		'icons'            => $icons,
+		'i18n'             => $i18n,
 	]);
-
 	// Forms field-card modules read window.blFormsAdmin.
 	wp_add_inline_script(
 		'bl-blocks-admin',

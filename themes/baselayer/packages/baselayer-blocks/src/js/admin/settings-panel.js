@@ -3,6 +3,8 @@
  */
 import { el, t, writeConfig } from '../../../../baselayer-forms/src/js/admin/dom.js';
 
+const MATERIAL_ICONS_URL = 'https://fonts.google.com/icons?icon.style=Rounded';
+
 function fieldRow(label, control, help = '') {
   const children = [el('label', {}, [el('strong', { text: label })]), control];
   if (help) {
@@ -30,6 +32,202 @@ function plainSwitch(label, { checked = false, onChange = null } = {}) {
     ),
     input,
   };
+}
+
+function isSvgValue(value) {
+  return typeof value === 'string' && value.trim().toLowerCase().includes('<svg');
+}
+
+function hasThemeIconPicker() {
+  return !!(window.baselayerIcons && window.blBlocksAdmin && window.blBlocksAdmin.hasIconPicker);
+}
+
+/**
+ * Block icon: theme catalog picker + SVG paste + Material Icons link.
+ *
+ * @param {string} initial
+ * @param {(next: string) => void} onChange
+ */
+function createBlockIconField(initial, onChange) {
+  let value = initial || 'block-default';
+  const usePicker = hasThemeIconPicker();
+
+  const preview = el('div', {
+    className: 'bl-blocks-icon-field__preview',
+    dataset: { blBlocksIconPreview: '' },
+  });
+  const empty = el('span', {
+    className: 'bl-blocks-icon-field__empty description',
+    text: t('blockIconEmpty', 'No icon selected'),
+    dataset: { blBlocksIconEmpty: '' },
+  });
+
+  const hidden = el('input', {
+    type: 'hidden',
+    value,
+    dataset: { blBlocksIconValue: '' },
+  });
+
+  const textarea = el('textarea', {
+    className: 'large-text code',
+    rows: 4,
+    placeholder: '<svg …>',
+    dataset: { blBlocksIconSvg: '' },
+  });
+  if (isSvgValue(value)) {
+    textarea.value = value;
+  }
+
+  const svgPanel = el(
+    'div',
+    {
+      className: 'bl-blocks-icon-field__svg-panel',
+      dataset: { blBlocksIconSvgPanel: '' },
+      hidden: true,
+    },
+    [
+      el('label', {}, [
+        el('strong', { text: t('blockIconSvg', 'SVG code') }),
+      ]),
+      textarea,
+      el('p', { className: 'description' }, [
+        document.createTextNode(t('blockIconMaterialHelp', 'Browse Material Icons (Rounded), copy SVG, and paste here: ')),
+        el('a', {
+          href: MATERIAL_ICONS_URL,
+          target: '_blank',
+          rel: 'noopener noreferrer',
+          text: t('blockIconMaterialLink', 'fonts.google.com/icons'),
+        }),
+      ]),
+    ]
+  );
+
+  const chooseBtn = usePicker
+    ? el('button', {
+        type: 'button',
+        className: 'button',
+        text: t('blockIconChoose', 'Choose icon'),
+        dataset: { blBlocksIconChoose: '' },
+      })
+    : null;
+
+  const svgToggle = el('button', {
+    type: 'button',
+    className: 'button',
+    text: t('blockIconSvgToggle', 'SVG code'),
+    'aria-expanded': 'false',
+    dataset: { blBlocksIconSvgToggle: '' },
+  });
+
+  const clearBtn = el('button', {
+    type: 'button',
+    className: 'button-link-delete',
+    text: t('blockIconClear', 'Clear'),
+    dataset: { blBlocksIconClear: '' },
+  });
+
+  const actions = el('div', { className: 'bl-blocks-icon-field__actions' }, [
+    chooseBtn,
+    svgToggle,
+    clearBtn,
+  ].filter(Boolean));
+
+  const root = el('div', { className: 'bl-blocks-icon-field', dataset: { blBlocksIconField: '' } }, [
+    el('div', { className: 'bl-blocks-icon-field__row' }, [preview, empty, actions]),
+    hidden,
+    svgPanel,
+  ]);
+
+  const setSvgOpen = (open) => {
+    svgPanel.hidden = !open;
+    svgToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+    svgToggle.classList.toggle('is-active', open);
+  };
+
+  const syncPreview = () => {
+    const trimmed = (value || '').trim();
+    preview.replaceChildren();
+    preview.hidden = trimmed === '';
+    empty.hidden = trimmed !== '';
+    if (trimmed === '') {
+      return;
+    }
+    if (isSvgValue(trimmed)) {
+      const wrap = el('span', { className: 'bl-blocks-icon-field__svg' });
+      wrap.innerHTML = trimmed;
+      preview.appendChild(wrap);
+      return;
+    }
+    if (trimmed.indexOf('dashicons-') === 0 || trimmed === 'block-default') {
+      const dash = trimmed.indexOf('dashicons-') === 0 ? trimmed : 'dashicons-' + trimmed;
+      preview.appendChild(el('span', { className: 'dashicons ' + dash, 'aria-hidden': 'true' }));
+      return;
+    }
+    preview.appendChild(
+      el('span', {
+        className: 'bl-icon -icon-' + trimmed.replace(/[^a-z0-9_-]/gi, ''),
+        'aria-hidden': 'true',
+      })
+    );
+  };
+
+  const commit = (next, { openSvg = false } = {}) => {
+    value = next == null ? '' : String(next);
+    hidden.value = value;
+    if (isSvgValue(value) || openSvg) {
+      textarea.value = isSvgValue(value) ? value : textarea.value;
+    } else if (!openSvg) {
+      textarea.value = '';
+    }
+    syncPreview();
+    onChange(value || 'block-default');
+    if (openSvg) {
+      setSvgOpen(true);
+    }
+  };
+
+  if (chooseBtn) {
+    chooseBtn.addEventListener('click', async () => {
+      try {
+        const { openIconPicker } = await import(
+          '../../../../../src/js/editor/icons/icon-picker-service.js'
+        );
+        openIconPicker({
+          currentValue: isSvgValue(value) ? '' : value,
+          returnFocus: chooseBtn,
+          onSelect: (iconName) => {
+            commit(iconName);
+            setSvgOpen(false);
+          },
+        });
+      } catch (err) {
+        setSvgOpen(true);
+        textarea.focus();
+      }
+    });
+  }
+
+  svgToggle.addEventListener('click', () => {
+    const willOpen = svgPanel.hidden;
+    setSvgOpen(willOpen);
+    if (willOpen) {
+      textarea.focus();
+    }
+  });
+
+  textarea.addEventListener('input', () => {
+    commit(textarea.value, { openSvg: true });
+  });
+
+  clearBtn.addEventListener('click', () => {
+    commit('block-default');
+    setSvgOpen(false);
+    textarea.value = '';
+  });
+
+  syncPreview();
+
+  return root;
 }
 
 /**
@@ -98,23 +296,40 @@ export function createSettingsPanel(initial, definitionType, onChange) {
       notify();
     });
 
-    const iconInput = el('input', {
-      type: 'text',
-      className: 'regular-text',
-      value: state.block_icon || 'block-default',
-    });
-    iconInput.addEventListener('input', () => {
-      state.block_icon = iconInput.value.trim() || 'block-default';
+    const iconField = createBlockIconField(state.block_icon || 'block-default', (next) => {
+      state.block_icon = next;
       notify();
     });
 
-    const categoryInput = el('input', {
-      type: 'text',
-      className: 'regular-text',
-      value: state.block_category || 'widgets',
+    const categories = (window.blBlocksAdmin && window.blBlocksAdmin.blockCategories) || [];
+    const categorySelect = el('select', { className: 'regular-text' });
+    const currentCat = state.block_category || 'widgets';
+    let hasCurrent = false;
+    categories.forEach((cat) => {
+      const opt = el('option', {
+        value: cat.slug,
+        text: cat.title || cat.slug,
+      });
+      if (cat.slug === currentCat) {
+        opt.selected = true;
+        hasCurrent = true;
+      }
+      categorySelect.appendChild(opt);
     });
-    categoryInput.addEventListener('input', () => {
-      state.block_category = categoryInput.value.trim() || 'widgets';
+    if (!hasCurrent && currentCat) {
+      categorySelect.appendChild(
+        el('option', { value: currentCat, text: currentCat, selected: true })
+      );
+    }
+    if (categories.length === 0) {
+      ['text', 'media', 'design', 'widgets', 'theme', 'embed'].forEach((slug) => {
+        const opt = el('option', { value: slug, text: slug });
+        if (slug === currentCat) opt.selected = true;
+        categorySelect.appendChild(opt);
+      });
+    }
+    categorySelect.addEventListener('change', () => {
+      state.block_category = categorySelect.value || 'widgets';
       notify();
     });
 
@@ -130,8 +345,8 @@ export function createSettingsPanel(initial, definitionType, onChange) {
 
     children.push(
       fieldRow(t('blockTitle', 'Block title'), titleInput),
-      fieldRow(t('blockIcon', 'Block icon'), iconInput),
-      fieldRow(t('blockCategory', 'Block category'), categoryInput),
+      fieldRow(t('blockIcon', 'Block icon'), iconField),
+      fieldRow(t('blockCategory', 'Block category'), categorySelect),
       fieldRow(t('blockKeywords', 'Keywords'), keywordsInput, t('blockKeywordsHelp', ''))
     );
   }
@@ -174,7 +389,7 @@ export function createSettingsPanel(initial, definitionType, onChange) {
     const orderInput = el('input', {
       type: 'number',
       className: 'small-text',
-      value: String(state.menu_order != null ? state.menu_order : 10),
+      value: String(state.menu_order != null ? state.menu_order : 1),
     });
     orderInput.addEventListener('input', () => {
       state.menu_order = parseInt(orderInput.value, 10) || 0;

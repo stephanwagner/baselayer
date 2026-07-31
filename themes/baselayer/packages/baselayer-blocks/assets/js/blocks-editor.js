@@ -305,7 +305,7 @@
     if (!wp || !wp.element || !wp.components || !wp.blocks) {
       return;
     }
-    const { createElement: el2, Fragment } = wp.element;
+    const { createElement: el2, Fragment, RawHTML } = wp.element;
     const { Button, PanelBody, ToolbarGroup, ToolbarButton } = wp.components;
     const { InspectorControls, BlockControls, useBlockProps } = wp.blockEditor || {};
     const { registerBlockType } = wp.blocks;
@@ -316,6 +316,18 @@
     const pageConfig = window.blBlocksPage || {};
     const blockI18n = blockConfig.i18n || {};
     const pageI18n = pageConfig.i18n || {};
+    function blockIcon(icon) {
+      if (typeof icon === "string" && icon.toLowerCase().includes("<svg")) {
+        return {
+          src: el2(
+            "span",
+            { style: { display: "flex" } },
+            el2(RawHTML, null, icon)
+          )
+        };
+      }
+      return icon || "block-default";
+    }
     function openBlockModal(fields, values, onSave, title) {
       openFieldsModal({
         title: title || blockI18n.edit || "Edit fields",
@@ -331,7 +343,7 @@
         title: def.title || def.slug,
         description: def.description || "",
         category: def.category || "widgets",
-        icon: def.icon || "block-default",
+        icon: blockIcon(def.icon),
         keywords: def.keywords || [],
         attributes: {
           values: {

@@ -26,7 +26,7 @@ function bl_blocks_block_definition_payload(WP_Post $post): ?array
 		return null;
 	}
 	$config = bl_blocks_get_config((int) $post->ID);
-	if (empty($config['settings']['active'])) {
+	if ($post->post_status !== 'publish' || empty($config['settings']['active'])) {
 		return null;
 	}
 	$slug = bl_blocks_definition_slug((int) $post->ID, $config['settings']);
@@ -39,13 +39,17 @@ function bl_blocks_block_definition_payload(WP_Post $post): ?array
 		explode(',', (string) ($config['settings']['block_keywords'] ?? ''))
 	)));
 
+	$raw_icon = (string) ($config['settings']['block_icon'] ?? 'block-default');
+	$gutenberg_icon = bl_blocks_resolve_gutenberg_icon($raw_icon);
+
 	return [
 		'id'          => (int) $post->ID,
 		'name'        => bl_blocks_gutenberg_name($slug),
 		'slug'        => $slug,
 		'title'       => $title,
 		'description' => (string) ($config['settings']['description'] ?? ''),
-		'icon'        => (string) ($config['settings']['block_icon'] ?? 'block-default'),
+		'icon'        => $gutenberg_icon,
+		'iconRaw'     => $raw_icon,
 		'category'    => (string) ($config['settings']['block_category'] ?? 'widgets'),
 		'keywords'    => $keywords,
 		'fields'      => $config['fields'],
@@ -101,7 +105,7 @@ function bl_blocks_register_dynamic_blocks(): void
 			'title'           => $def['title'],
 			'description'     => $def['description'],
 			'category'        => $def['category'] !== '' ? $def['category'] : 'widgets',
-			'icon'            => $def['icon'] !== '' ? $def['icon'] : 'block-default',
+			'icon'            => !empty($def['icon']) ? $def['icon'] : 'block-default',
 			'keywords'        => $def['keywords'],
 			'attributes'      => [
 				'values' => [

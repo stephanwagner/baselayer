@@ -38,7 +38,7 @@ function bl_blocks_default_settings(string $type = 'block'): array
 		'block_keywords' => '',
 		'post_types'     => $type === 'page_settings' ? ['page'] : [],
 		'menu_label'     => '',
-		'menu_order'     => 10,
+		'menu_order'     => 1,
 	];
 }
 
@@ -51,6 +51,150 @@ function bl_blocks_default_config(string $type = 'block'): array
 		'fields'   => [],
 		'settings' => bl_blocks_default_settings($type),
 	];
+}
+
+/**
+ * Sanitize block icon: catalog slug, dashicon, or inline SVG.
+ *
+ * @param mixed $icon
+ */
+function bl_blocks_sanitize_block_icon($icon): string
+{
+	$icon = is_string($icon) ? trim($icon) : '';
+	if ($icon === '') {
+		return 'block-default';
+	}
+
+	if (stripos($icon, '<svg') !== false) {
+		$clean = wp_kses($icon, [
+			'svg'  => [
+				'xmlns'       => true,
+				'viewbox'     => true,
+				'viewBox'     => true,
+				'width'       => true,
+				'height'      => true,
+				'fill'        => true,
+				'aria-hidden' => true,
+				'focusable'   => true,
+				'role'        => true,
+				'class'       => true,
+				'style'       => true,
+			],
+			'path' => [
+				'd'            => true,
+				'fill'         => true,
+				'stroke'       => true,
+				'stroke-width' => true,
+				'fill-rule'    => true,
+				'clip-rule'    => true,
+				'opacity'      => true,
+			],
+			'g'       => ['fill' => true, 'transform' => true, 'opacity' => true],
+			'circle'  => ['cx' => true, 'cy' => true, 'r' => true, 'fill' => true],
+			'rect'    => [
+				'x' => true, 'y' => true, 'width' => true, 'height' => true,
+				'rx' => true, 'ry' => true, 'fill' => true,
+			],
+			'polygon'  => ['points' => true, 'fill' => true],
+			'polyline' => ['points' => true, 'fill' => true, 'stroke' => true],
+			'line'     => [
+				'x1' => true, 'y1' => true, 'x2' => true, 'y2' => true,
+				'stroke' => true, 'stroke-width' => true,
+			],
+		]);
+
+		return $clean !== '' ? $clean : 'block-default';
+	}
+
+	if (strpos($icon, 'dashicons-') === 0) {
+		$key = sanitize_key($icon);
+
+		return $key !== '' ? $key : 'block-default';
+	}
+
+	$key = sanitize_key($icon);
+
+	return $key !== '' ? $key : 'block-default';
+}
+
+/**
+ * Resolve stored icon for Gutenberg (dashicon slug without prefix, or SVG markup).
+ */
+function bl_blocks_resolve_gutenberg_icon(string $icon): string
+{
+	$icon = trim($icon);
+	if ($icon === '') {
+		return 'block-default';
+	}
+
+	if (stripos($icon, '<svg') !== false) {
+		return $icon;
+	}
+
+	if (strpos($icon, 'dashicons-') === 0) {
+		return substr($icon, strlen('dashicons-')) ?: 'block-default';
+	}
+
+	if (function_exists('bl_icon_svg_asset_path') && function_exists('bl_svg_code')) {
+		$svg = bl_svg_code(bl_icon_svg_asset_path($icon), [
+			'width'       => '24',
+			'height'      => '24',
+			'aria-hidden' => 'true',
+			'focusable'   => 'false',
+		]);
+		if (is_string($svg) && $svg !== '' && stripos($svg, '<svg') !== false) {
+			return $svg;
+		}
+	}
+
+	return $icon;
+}
+
+/**
+ * Gutenberg block category choices for the Settings select.
+ *
+ * @return list<array{slug: string, title: string}>
+ */
+function bl_blocks_block_category_choices(): array
+{
+	$fallback = [
+		['slug' => 'text', 'title' => __('Text', 'baselayer-blocks')],
+		['slug' => 'media', 'title' => __('Media', 'baselayer-blocks')],
+		['slug' => 'design', 'title' => __('Design', 'baselayer-blocks')],
+		['slug' => 'widgets', 'title' => __('Widgets', 'baselayer-blocks')],
+		['slug' => 'theme', 'title' => __('Theme', 'baselayer-blocks')],
+		['slug' => 'embed', 'title' => __('Embeds', 'baselayer-blocks')],
+	];
+
+	if (!function_exists('get_block_categories')) {
+		return $fallback;
+	}
+
+	$context = class_exists('WP_Block_Editor_Context')
+		? new WP_Block_Editor_Context(['name' => 'core/edit-post'])
+		: null;
+	$raw = get_block_categories($context);
+	if (!is_array($raw) || $raw === []) {
+		return $fallback;
+	}
+
+	$out = [];
+	foreach ($raw as $cat) {
+		if (!is_array($cat)) {
+			continue;
+		}
+		$slug = sanitize_key((string) ($cat['slug'] ?? ''));
+		$title = sanitize_text_field((string) ($cat['title'] ?? $slug));
+		if ($slug === '') {
+			continue;
+		}
+		$out[] = [
+			'slug'  => $slug,
+			'title' => $title !== '' ? $title : $slug,
+		];
+	}
+
+	return $out !== [] ? $out : $fallback;
 }
 
 /**
@@ -70,25 +214,23 @@ function bl_blocks_sanitize_settings($settings, string $type = 'block'): array
 	$out['slug'] = sanitize_key((string) ($settings['slug'] ?? ''));
 	$out['description'] = sanitize_textarea_field((string) ($settings['description'] ?? ''));
 	$out['block_title'] = sanitize_text_field((string) ($settings['block_title'] ?? ''));
-	$out['block_icon'] = sanitize_key((string) ($settings['block_icon'] ?? 'block-default'));
-	if ($out['block_icon'] === '') {
-		$out['block_icon'] = 'block-default';
-	}
+	$out['block_icon'] = bl_blocks_sanitize_block_icon($settings['block_icon'] ?? 'block-default');
 	$out['block_category'] = sanitize_key((string) ($settings['block_category'] ?? 'widgets'));
 	if ($out['block_category'] === '') {
 		$out['block_category'] = 'widgets';
 	}
 	$out['block_keywords'] = sanitize_text_field((string) ($settings['block_keywords'] ?? ''));
 	$out['menu_label'] = sanitize_text_field((string) ($settings['menu_label'] ?? ''));
-	$out['menu_order'] = (int) ($settings['menu_order'] ?? 10);
+	$out['menu_order'] = (int) ($settings['menu_order'] ?? 1);
 
 	$post_types = [];
 	if (isset($settings['post_types']) && is_array($settings['post_types'])) {
 		foreach ($settings['post_types'] as $pt) {
 			$pt = sanitize_key((string) $pt);
-			if ($pt !== '' && post_type_exists($pt)) {
-				$post_types[] = $pt;
+			if ($pt === '' || $pt === 'attachment' || !post_type_exists($pt)) {
+				continue;
 			}
+			$post_types[] = $pt;
 		}
 	}
 	$out['post_types'] = array_values(array_unique($post_types));
@@ -260,14 +402,39 @@ function bl_blocks_definition_slug(int $post_id, array $settings = []): string
 }
 
 /**
+ * Next Website tab order: existing site_settings count + 1.
+ */
+function bl_blocks_next_site_settings_order(int $exclude_id = 0): int
+{
+	$count = 0;
+	foreach (bl_blocks_query_definitions('site_settings', false) as $post) {
+		if ($exclude_id > 0 && (int) $post->ID === $exclude_id) {
+			continue;
+		}
+		// Skip unsaved auto-drafts.
+		if ($post->post_status === 'auto-draft') {
+			continue;
+		}
+		$count++;
+	}
+
+	return $count + 1;
+}
+
+/**
  * @return list<WP_Post>
  */
 function bl_blocks_query_definitions(string $type, bool $active_only = false): array
 {
 	$type = bl_blocks_sanitize_definition_type($type);
+	// Runtime (blocks / Website / page panels): published only.
+	// Admin lists / meta registration: include drafts & pending too.
+	$statuses = $active_only
+		? ['publish']
+		: ['publish', 'draft', 'pending', 'private'];
 	$posts = get_posts([
 		'post_type'      => BL_BLOCK_POST_TYPE,
-		'post_status'    => ['publish', 'draft', 'private'],
+		'post_status'    => $statuses,
 		'posts_per_page' => -1,
 		'orderby'        => 'menu_order title',
 		'order'          => 'ASC',
@@ -291,8 +458,8 @@ function bl_blocks_query_definitions(string $type, bool $active_only = false): a
 		usort($out, static function (WP_Post $a, WP_Post $b): int {
 			$sa = bl_blocks_get_config((int) $a->ID)['settings'];
 			$sb = bl_blocks_get_config((int) $b->ID)['settings'];
-			$oa = (int) ($sa['menu_order'] ?? 10);
-			$ob = (int) ($sb['menu_order'] ?? 10);
+			$oa = (int) ($sa['menu_order'] ?? 1);
+			$ob = (int) ($sb['menu_order'] ?? 1);
 			if ($oa === $ob) {
 				return strcasecmp($a->post_title, $b->post_title);
 			}

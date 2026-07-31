@@ -3,6 +3,19 @@
 defined('ABSPATH') || exit;
 
 /**
+ * Disable Quick Edit for forms (builder config is not inline-editable).
+ */
+function bl_forms_disable_quick_edit(bool $enable, string $post_type): bool
+{
+	if ($post_type === BL_FORM_POST_TYPE) {
+		return false;
+	}
+
+	return $enable;
+}
+add_filter('quick_edit_enabled_for_post_type', 'bl_forms_disable_quick_edit', 10, 2);
+
+/**
  * Strip unused meta boxes on the form edit screen.
  * Builder is rendered outside a postbox (see edit_form_after_title).
  */

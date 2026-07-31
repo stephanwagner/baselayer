@@ -8,7 +8,7 @@ import { openFieldsModal } from './admin/field-form.js';
     return;
   }
 
-  const { createElement: el, Fragment } = wp.element;
+  const { createElement: el, Fragment, RawHTML } = wp.element;
   const { Button, PanelBody, ToolbarGroup, ToolbarButton } = wp.components;
   const { InspectorControls, BlockControls, useBlockProps } = wp.blockEditor || {};
   const { registerBlockType } = wp.blocks;
@@ -20,6 +20,19 @@ import { openFieldsModal } from './admin/field-form.js';
   const pageConfig = window.blBlocksPage || {};
   const blockI18n = blockConfig.i18n || {};
   const pageI18n = pageConfig.i18n || {};
+
+  function blockIcon(icon) {
+    if (typeof icon === 'string' && icon.toLowerCase().includes('<svg')) {
+      return {
+        src: el(
+          'span',
+          { style: { display: 'flex' } },
+          el(RawHTML, null, icon)
+        ),
+      };
+    }
+    return icon || 'block-default';
+  }
 
   function openBlockModal(fields, values, onSave, title) {
     openFieldsModal({
@@ -38,7 +51,7 @@ import { openFieldsModal } from './admin/field-form.js';
       title: def.title || def.slug,
       description: def.description || '',
       category: def.category || 'widgets',
-      icon: def.icon || 'block-default',
+      icon: blockIcon(def.icon),
       keywords: def.keywords || [],
       attributes: {
         values: {

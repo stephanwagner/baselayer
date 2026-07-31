@@ -251,3 +251,226 @@ function bl_blocks_save_post(int $post_id, WP_Post $post): void
 	update_post_meta($post_id, BL_BLOCK_CONFIG_META, $config);
 }
 add_action('save_post', 'bl_blocks_save_post', 10, 2);
+
+/**
+ * Disable Quick Edit for definition lists (no useful inline fields).
+ */
+function bl_blocks_disable_quick_edit(bool $enable, string $post_type): bool
+{
+	if ($post_type === BL_BLOCK_POST_TYPE) {
+		return false;
+	}
+
+	return $enable;
+}
+add_filter('quick_edit_enabled_for_post_type', 'bl_blocks_disable_quick_edit', 10, 2);
+
+/**
+ * Type-aware list columns: block name (+ icon) / site settings order / page settings post types.
+ *
+ * @param array<string, string> $columns
+ * @return array<string, string>
+ */
+function bl_blocks_list_columns(array $columns): array
+{
+	$type = bl_blocks_current_list_type();
+	$out = [];
+	foreach ($columns as $key => $label) {
+		$out[$key] = $label;
+		if ($key !== 'title') {
+			continue;
+		}
+		if ($type === 'block') {
+			$out['bl_block_name'] = __('Block name', 'baselayer-blocks');
+		} elseif ($type === 'site_settings') {
+			$out['bl_menu_order'] = __('Order', 'baselayer-blocks');
+		} elseif ($type === 'page_settings') {
+			$out['bl_post_types'] = __('Post types', 'baselayer-blocks');
+		}
+	}
+
+	return $out;
+}
+add_filter('manage_' . BL_BLOCK_POST_TYPE . '_posts_columns', 'bl_blocks_list_columns');
+
+/**
+ * Safe HTML for a block icon in the admin list (SVG, dashicon, or theme icon).
+ */
+function bl_blocks_list_icon_html(string $icon): string
+{
+	$icon = bl_blocks_sanitize_block_icon($icon);
+
+	if (stripos($icon, '<svg') !== false) {
+		return '<span class="bl-blocks-list-icon__media" aria-hidden="true">' . $icon . '</span>';
+	}
+
+	if (strpos($icon, 'dashicons-') === 0) {
+		return '<span class="dashicons ' . esc_attr($icon) . '" aria-hidden="true"></span>';
+	}
+
+	if ($icon === 'block-default') {
+		return '<span class="dashicons dashicons-block-default" aria-hidden="true"></span>';
+	}
+
+	$resolved = bl_blocks_resolve_gutenberg_icon($icon);
+	if (is_string($resolved) && stripos($resolved, '<svg') !== false) {
+		return '<span class="bl-blocks-list-icon__media" aria-hidden="true">' . $resolved . '</span>';
+	}
+
+	return '<span class="bl-icon -icon-' . esc_attr(sanitize_key($icon)) . '" aria-hidden="true"></span>';
+}
+
+/**
+ * Human-readable labels for page settings post types (comma-separated).
+ */
+function bl_blocks_list_post_types_label(array $post_types): string
+{
+	$labels = [];
+	foreach ($post_types as $pt) {
+		$pt = sanitize_key((string) $pt);
+		if ($pt === '') {
+			continue;
+		}
+		$obj = get_post_type_object($pt);
+		$labels[] = $obj && isset($obj->labels->singular_name) && $obj->labels->singular_name !== ''
+			? (string) $obj->labels->singular_name
+			: $pt;
+	}
+
+	return implode(', ', $labels);
+}
+
+/**
+ * Render custom list column cells.
+ */
+function bl_blocks_list_column_content(string $column, int $post_id): void
+{
+	if ($column === 'bl_menu_order') {
+		$config = bl_blocks_get_config($post_id);
+		echo esc_html((string) (int) ($config['settings']['menu_order'] ?? 1));
+
+		return;
+	}
+
+	if ($column === 'bl_post_types') {
+		$config = bl_blocks_get_config($post_id);
+		$types = $config['settings']['post_types'] ?? [];
+		$label = is_array($types) ? bl_blocks_list_post_types_label($types) : '';
+		echo $label !== '' ? esc_html($label) : '—';
+
+		return;
+	}
+
+	if ($column !== 'bl_block_name') {
+		return;
+	}
+
+	$config = bl_blocks_get_config($post_id);
+	$slug = bl_blocks_definition_slug($post_id, $config['settings']);
+	$name = bl_blocks_gutenberg_name($slug);
+	$icon = (string) ($config['settings']['block_icon'] ?? 'block-default');
+
+	echo '<span class="bl-blocks-list-block-name">';
+	echo '<span class="bl-blocks-list-icon">' . bl_blocks_list_icon_html($icon) . '</span>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- trusted sanitized SVG / escaped classes
+	echo '<code>' . esc_html($name) . '</code>';
+	echo '</span>';
+}
+add_action('manage_' . BL_BLOCK_POST_TYPE . '_posts_custom_column', 'bl_blocks_list_column_content', 10, 2);
+
+/**
+ * Sort Site Settings list by settings menu_order (ascending).
+ *
+ * @param list<WP_Post>|array<int, mixed> $posts
+ * @param WP_Query                        $query
+ * @return list<WP_Post>|array<int, mixed>
+ */
+function bl_blocks_sort_site_settings_list($posts, $query)
+{
+	if (!is_admin() || !($query instanceof WP_Query) || !$query->is_main_query()) {
+		return $posts;
+	}
+	$screen = function_exists('get_current_screen') ? get_current_screen() : null;
+	if (!$screen || $screen->post_type !== BL_BLOCK_POST_TYPE || $screen->base !== 'edit') {
+		return $posts;
+	}
+	if (bl_blocks_current_list_type() !== 'site_settings' || !is_array($posts) || $posts === []) {
+		return $posts;
+	}
+
+	usort($posts, static function ($a, $b): int {
+		if (!($a instanceof WP_Post) || !($b instanceof WP_Post)) {
+			return 0;
+		}
+		$oa = (int) (bl_blocks_get_config((int) $a->ID)['settings']['menu_order'] ?? 1);
+		$ob = (int) (bl_blocks_get_config((int) $b->ID)['settings']['menu_order'] ?? 1);
+		if ($oa === $ob) {
+			return strcasecmp($a->post_title, $b->post_title);
+		}
+
+		return $oa <=> $ob;
+	});
+
+	return $posts;
+}
+add_filter('the_posts', 'bl_blocks_sort_site_settings_list', 10, 2);
+
+/**
+ * Whether a definition is inactive (settings.active empty/false).
+ * Draft/pending status is separate — those are excluded from runtime, not marked inactive in the list.
+ */
+function bl_blocks_definition_is_inactive(int $post_id): bool
+{
+	if ($post_id <= 0 || get_post_type($post_id) !== BL_BLOCK_POST_TYPE) {
+		return false;
+	}
+	$config = bl_blocks_get_config($post_id);
+
+	return empty($config['settings']['active']);
+}
+
+/**
+ * Mark inactive definition rows in the list table.
+ *
+ * Icon is drawn with CSS on `.row-title::before` — list titles pass through
+ * `_draft_or_post_title()` → `esc_html()`, so markup in `the_title` cannot work.
+ *
+ * @param list<string> $classes
+ * @param list<string> $class
+ * @param int          $post_id
+ * @return list<string>
+ */
+function bl_blocks_list_post_class(array $classes, array $class, int $post_id): array
+{
+	if (bl_blocks_definition_is_inactive($post_id)) {
+		$classes[] = 'bl-blocks-is-inactive';
+		// Sets --bl-icon (from theme icons CSS); inherited by .row-title::before.
+		$classes[] = '-icon-visibility-off';
+	}
+
+	return $classes;
+}
+add_filter('post_class', 'bl_blocks_list_post_class', 10, 3);
+
+/**
+ * List table styles (icons + column layout).
+ */
+function bl_blocks_enqueue_list_assets(string $hook): void
+{
+	if ($hook !== 'edit.php') {
+		return;
+	}
+	$screen = function_exists('get_current_screen') ? get_current_screen() : null;
+	if (!$screen || $screen->post_type !== BL_BLOCK_POST_TYPE) {
+		return;
+	}
+	if (!bl_blocks_user_can_manage()) {
+		return;
+	}
+
+	bl_blocks_enqueue_style('bl-blocks-admin', 'blocks-admin');
+
+	if (function_exists('bl_enqueue_theme_icons_style')) {
+		bl_enqueue_theme_icons_style(['bl-blocks-admin']);
+	}
+}
+add_action('admin_enqueue_scripts', 'bl_blocks_enqueue_list_assets');
