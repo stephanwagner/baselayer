@@ -255,6 +255,48 @@ export function uniqueFieldName(base, exceptId = '') {
   return `${root}_${i}`;
 }
 
+/**
+ * Deep-clone field config for duplicate: new ids, unique names, recurse children.
+ *
+ * @param {object} data
+ * @returns {object}
+ */
+export function cloneFieldData(data) {
+  const copy = JSON.parse(JSON.stringify(data || {}));
+  const reserved = new Set(collectFieldNames().map((n) => n.toLowerCase()));
+
+  const mintName = (base) => {
+    const root = slugifyName(base);
+    if (!reserved.has(root)) {
+      reserved.add(root);
+      return root;
+    }
+    let i = 2;
+    while (reserved.has(`${root}_${i}`)) {
+      i += 1;
+    }
+    const next = `${root}_${i}`;
+    reserved.add(next);
+    return next;
+  };
+
+  const walk = (node) => {
+    if (!node || typeof node !== 'object') {
+      return;
+    }
+    node.id = uid();
+    if (node.name != null && String(node.name).trim() !== '') {
+      node.name = mintName(node.name);
+    }
+    if (Array.isArray(node.children)) {
+      node.children.forEach(walk);
+    }
+  };
+
+  walk(copy);
+  return copy;
+}
+
 export function defaultField(type = 'text') {
   const id = uid();
   if (type === 'divider') {

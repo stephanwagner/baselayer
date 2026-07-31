@@ -1,5 +1,5 @@
-import { el, t, typeLabel, uid, iconEl, uniqueFieldName, slugifyOption, readConfig, flattenFields, fieldIsActive } from './dom.js';
-import { createColumnCard, createSectionCard, serializeLayoutRow } from './layout.js';
+import { el, t, typeLabel, uid, iconEl, uniqueFieldName, slugifyOption, readConfig, flattenFields, fieldIsActive, cloneFieldData } from './dom.js';
+import { createColumnCard, createSectionCard, serializeLayoutRow, equalizeColumnRun } from './layout.js';
 
 const WIDTH_PRESETS = [
   { value: '100', label: '100%' },
@@ -2528,6 +2528,31 @@ export function serializeRow(row) {
   return data;
 }
 
+/**
+ * Duplicate a canvas field card (deep clone) and insert it after the source.
+ *
+ * @param {HTMLElement} row
+ */
+export function duplicateFieldCard(row) {
+  if (!row) {
+    return;
+  }
+  const data = serializeRow(row);
+  if (!data) {
+    return;
+  }
+  const clone = cloneFieldData(data);
+  const copy = createFieldCard(clone, false);
+  row.after(copy);
+  if ((copy.dataset.fieldType || '') === 'column') {
+    const list = row.parentElement;
+    if (list) {
+      equalizeColumnRun(list, copy);
+    }
+  }
+  document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+}
+
 export function createFieldCard(initial, open = false) {
   if ((initial?.type || '') === 'column') {
     return createColumnCard(initial, open);
@@ -2723,6 +2748,20 @@ export function createFieldCard(initial, open = false) {
     deleteBtn.appendChild(trashIcon);
   } else {
     deleteBtn.textContent = '×';
+  }
+
+  const duplicateBtn = el('button', {
+    type: 'button',
+    className: 'bl-forms-builder__icon-btn',
+    title: t('duplicate', 'Duplicate'),
+    'aria-label': t('duplicate', 'Duplicate'),
+    onClick: () => duplicateFieldCard(row),
+  });
+  const duplicateIcon = iconEl('duplicate');
+  if (duplicateIcon.innerHTML) {
+    duplicateBtn.appendChild(duplicateIcon);
+  } else {
+    duplicateBtn.textContent = '⧉';
   }
 
   const syncNameFromLabel = (nameInput) => {
@@ -3125,7 +3164,7 @@ export function createFieldCard(initial, open = false) {
     toggle,
     preview,
     headerMeta,
-    el('div', { className: 'bl-forms-builder__field-actions' }, [activateBtn, deleteBtn, handle]),
+    el('div', { className: 'bl-forms-builder__field-actions' }, [activateBtn, duplicateBtn, deleteBtn, handle]),
   ]);
 
   updatePreview();

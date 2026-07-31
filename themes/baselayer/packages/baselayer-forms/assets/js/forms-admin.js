@@ -156,6 +156,38 @@
     }
     return `${root}_${i}`;
   }
+  function cloneFieldData(data) {
+    const copy = JSON.parse(JSON.stringify(data || {}));
+    const reserved = new Set(collectFieldNames().map((n) => n.toLowerCase()));
+    const mintName = (base) => {
+      const root = slugifyName(base);
+      if (!reserved.has(root)) {
+        reserved.add(root);
+        return root;
+      }
+      let i = 2;
+      while (reserved.has(`${root}_${i}`)) {
+        i += 1;
+      }
+      const next = `${root}_${i}`;
+      reserved.add(next);
+      return next;
+    };
+    const walk = (node) => {
+      if (!node || typeof node !== "object") {
+        return;
+      }
+      node.id = uid();
+      if (node.name != null && String(node.name).trim() !== "") {
+        node.name = mintName(node.name);
+      }
+      if (Array.isArray(node.children)) {
+        node.children.forEach(walk);
+      }
+    };
+    walk(copy);
+    return copy;
+  }
   function defaultField(type = "text") {
     const id = uid();
     if (type === "divider") {
@@ -454,7 +486,20 @@
     const width = equalWidthForCount(run.length);
     run.forEach((el2) => applyColumnWidthToCard(el2, width));
   }
-  function createContainerActions(onDelete) {
+  function createContainerActions(onDelete, onDuplicate) {
+    const duplicateBtn = el("button", {
+      type: "button",
+      className: "bl-forms-builder__icon-btn",
+      title: t("duplicate", "Duplicate"),
+      "aria-label": t("duplicate", "Duplicate"),
+      onClick: onDuplicate
+    });
+    const duplicateIcon = iconEl("duplicate");
+    if (duplicateIcon.innerHTML) {
+      duplicateBtn.appendChild(duplicateIcon);
+    } else {
+      duplicateBtn.textContent = "\u29C9";
+    }
     const deleteBtn = el("button", {
       type: "button",
       className: "bl-forms-builder__icon-btn bl-forms-builder__icon-btn--danger",
@@ -479,7 +524,7 @@
     } else {
       handle.textContent = "\u22EE\u22EE";
     }
-    return el("div", { className: "bl-forms-builder__field-actions" }, [deleteBtn, handle]);
+    return el("div", { className: "bl-forms-builder__field-actions" }, [duplicateBtn, deleteBtn, handle]);
   }
   function createColumnCard(initial = {}) {
     let field = {
@@ -562,10 +607,13 @@
     const header = el("div", { className: "bl-forms-builder__field-header" }, [
       preview,
       el("div", { className: "bl-forms-builder__field-meta" }, [widthBadge, typeChip]),
-      createContainerActions(() => {
-        row.remove();
-        notify();
-      })
+      createContainerActions(
+        () => {
+          row.remove();
+          notify();
+        },
+        () => duplicateFieldCard(row)
+      )
     ]);
     row.append(header, fieldsWrap);
     updatePreview();
@@ -681,10 +729,13 @@
     const header = el("div", { className: "bl-forms-builder__field-header" }, [
       labelInput,
       el("div", { className: "bl-forms-builder__field-meta" }, [widthBadge, designBtn, typeChip]),
-      createContainerActions(() => {
-        row.remove();
-        notify();
-      })
+      createContainerActions(
+        () => {
+          row.remove();
+          notify();
+        },
+        () => duplicateFieldCard(row)
+      )
     ]);
     row.append(header, fieldsWrap);
     updatePreview();
@@ -2869,6 +2920,25 @@
     }
     return data;
   }
+  function duplicateFieldCard(row) {
+    if (!row) {
+      return;
+    }
+    const data = serializeRow(row);
+    if (!data) {
+      return;
+    }
+    const clone = cloneFieldData(data);
+    const copy = createFieldCard(clone, false);
+    row.after(copy);
+    if ((copy.dataset.fieldType || "") === "column") {
+      const list = row.parentElement;
+      if (list) {
+        equalizeColumnRun(list, copy);
+      }
+    }
+    document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+  }
   function createFieldCard(initial, open = false) {
     if ((initial?.type || "") === "column") {
       return createColumnCard(initial, open);
@@ -3044,6 +3114,19 @@
       deleteBtn.appendChild(trashIcon);
     } else {
       deleteBtn.textContent = "\xD7";
+    }
+    const duplicateBtn = el("button", {
+      type: "button",
+      className: "bl-forms-builder__icon-btn",
+      title: t("duplicate", "Duplicate"),
+      "aria-label": t("duplicate", "Duplicate"),
+      onClick: () => duplicateFieldCard(row)
+    });
+    const duplicateIcon = iconEl("duplicate");
+    if (duplicateIcon.innerHTML) {
+      duplicateBtn.appendChild(duplicateIcon);
+    } else {
+      duplicateBtn.textContent = "\u29C9";
     }
     const syncNameFromLabel = (nameInput) => {
       if (field.name_manual || !nameInput) {
@@ -3406,7 +3489,7 @@
       toggle,
       preview,
       headerMeta,
-      el("div", { className: "bl-forms-builder__field-actions" }, [activateBtn, deleteBtn, handle])
+      el("div", { className: "bl-forms-builder__field-actions" }, [activateBtn, duplicateBtn, deleteBtn, handle])
     ]);
     updatePreview();
     renderBody();

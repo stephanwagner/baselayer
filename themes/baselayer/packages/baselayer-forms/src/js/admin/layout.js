@@ -1,5 +1,5 @@
 import { el, t, uid, iconEl, defaultField, uniqueFieldName } from './dom.js';
-import { createFieldCard, serializeRow, openFieldWidthModal, openSectionDesignModal } from './field-card.js';
+import { createFieldCard, serializeRow, openFieldWidthModal, openSectionDesignModal, duplicateFieldCard } from './field-card.js';
 
 /** Types that cannot be nested inside columns or sections. */
 const NESTED_BLOCKED = ['column', 'section', 'hidden', 'honeypot', 'captcha'];
@@ -149,7 +149,21 @@ export function equalizeColumnRun(list, columnEl) {
   run.forEach((el) => applyColumnWidthToCard(el, width));
 }
 
-function createContainerActions(onDelete) {
+function createContainerActions(onDelete, onDuplicate) {
+  const duplicateBtn = el('button', {
+    type: 'button',
+    className: 'bl-forms-builder__icon-btn',
+    title: t('duplicate', 'Duplicate'),
+    'aria-label': t('duplicate', 'Duplicate'),
+    onClick: onDuplicate,
+  });
+  const duplicateIcon = iconEl('duplicate');
+  if (duplicateIcon.innerHTML) {
+    duplicateBtn.appendChild(duplicateIcon);
+  } else {
+    duplicateBtn.textContent = '⧉';
+  }
+
   const deleteBtn = el('button', {
     type: 'button',
     className: 'bl-forms-builder__icon-btn bl-forms-builder__icon-btn--danger',
@@ -176,7 +190,7 @@ function createContainerActions(onDelete) {
     handle.textContent = '⋮⋮';
   }
 
-  return el('div', { className: 'bl-forms-builder__field-actions' }, [deleteBtn, handle]);
+  return el('div', { className: 'bl-forms-builder__field-actions' }, [duplicateBtn, deleteBtn, handle]);
 }
 
 /**
@@ -276,10 +290,13 @@ export function createColumnCard(initial = {}) {
   const header = el('div', { className: 'bl-forms-builder__field-header' }, [
     preview,
     el('div', { className: 'bl-forms-builder__field-meta' }, [widthBadge, typeChip]),
-    createContainerActions(() => {
-      row.remove();
-      notify();
-    }),
+    createContainerActions(
+      () => {
+        row.remove();
+        notify();
+      },
+      () => duplicateFieldCard(row)
+    ),
   ]);
 
   row.append(header, fieldsWrap);
@@ -417,10 +434,13 @@ export function createSectionCard(initial = {}) {
   const header = el('div', { className: 'bl-forms-builder__field-header' }, [
     labelInput,
     el('div', { className: 'bl-forms-builder__field-meta' }, [widthBadge, designBtn, typeChip]),
-    createContainerActions(() => {
-      row.remove();
-      notify();
-    }),
+    createContainerActions(
+      () => {
+        row.remove();
+        notify();
+      },
+      () => duplicateFieldCard(row)
+    ),
   ]);
 
   row.append(header, fieldsWrap);
