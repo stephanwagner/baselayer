@@ -240,21 +240,180 @@ function bl_blocks_sanitize_settings($settings, string $type = 'block'): array
 }
 
 /**
- * Sanitize one field; prefer Forms sanitizer when available.
+ * Max nesting depth for repeater fields (repeater → repeater → repeater).
+ */
+function bl_blocks_repeater_max_depth(): int
+{
+	return 3;
+}
+
+/**
+ * Whether a field type is layout-only (no value of its own).
+ */
+function bl_blocks_is_layout_field_type(string $type): bool
+{
+	return in_array($type, ['column', 'section', 'group'], true);
+}
+
+/**
+ * Whether a field type is static content (no editable value).
+ */
+function bl_blocks_is_static_field_type(string $type): bool
+{
+	return in_array($type, ['divider', 'spacer', 'heading', 'text_block', 'html', 'captcha', 'honeypot'], true);
+}
+
+/**
+ * Sanitize one field; Blocks handles repeater + layout so nested repeaters survive Forms whitelist.
  *
  * @param mixed $field
+ * @param int   $repeater_depth Depth of the nearest ancestor repeater (0 = root).
  * @return array<string, mixed>|null
  */
-function bl_blocks_sanitize_field($field): ?array
+function bl_blocks_sanitize_field($field, int $repeater_depth = 0): ?array
 {
-	if (function_exists('bl_forms_sanitize_field')) {
-		return bl_forms_sanitize_field($field);
-	}
-
 	if (!is_array($field)) {
 		return null;
 	}
 
+	$type = sanitize_key((string) ($field['type'] ?? 'text'));
+	if ($type === '') {
+		$type = 'text';
+	}
+
+	if ($type === 'repeater') {
+		return bl_blocks_sanitize_repeater_field($field, $repeater_depth);
+	}
+
+	if (bl_blocks_is_layout_field_type($type)) {
+		return bl_blocks_sanitize_layout_field($field, $repeater_depth);
+	}
+
+	if (function_exists('bl_forms_sanitize_field')) {
+		$clean = bl_forms_sanitize_field($field);
+		if ($clean === null) {
+			return null;
+		}
+		// Leaf fields must not keep a children tree.
+		unset($clean['children']);
+
+		return $clean;
+	}
+
+	return bl_blocks_sanitize_leaf_field_fallback($field);
+}
+
+/**
+ * @param array<string, mixed> $field
+ * @return array<string, mixed>|null
+ */
+function bl_blocks_sanitize_repeater_field(array $field, int $repeater_depth): ?array
+{
+	$depth = $repeater_depth + 1;
+	if ($depth > bl_blocks_repeater_max_depth()) {
+		return null;
+	}
+
+	$id = sanitize_key((string) ($field['id'] ?? ''));
+	if ($id === '') {
+		$id = 'f' . wp_generate_password(8, false, false);
+	}
+	$name = sanitize_key((string) ($field['name'] ?? ''));
+	if ($name === '') {
+		$name = $id;
+	}
+
+	$min_rows = max(0, (int) ($field['min_rows'] ?? 0));
+	$max_rows = max(0, (int) ($field['max_rows'] ?? 0));
+	if ($max_rows > 0 && $max_rows < $min_rows) {
+		$max_rows = $min_rows;
+	}
+
+	$children = [];
+	$raw_children = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
+	foreach ($raw_children as $child) {
+		if (!is_array($child)) {
+			continue;
+		}
+		$child_type = sanitize_key((string) ($child['type'] ?? ''));
+		// No layout containers inside repeater rows.
+		if (bl_blocks_is_layout_field_type($child_type)) {
+			continue;
+		}
+		$clean = bl_blocks_sanitize_field($child, $depth);
+		if ($clean !== null) {
+			$children[] = $clean;
+		}
+	}
+
+	return [
+		'id'            => $id,
+		'type'          => 'repeater',
+		'label'         => sanitize_text_field((string) ($field['label'] ?? '')),
+		'name'          => $name,
+		'name_manual'   => !empty($field['name_manual']),
+		'hide_label'    => !empty($field['hide_label']),
+		'css_class'     => sanitize_html_class((string) ($field['css_class'] ?? '')),
+		'width'         => sanitize_text_field((string) ($field['width'] ?? '100')),
+		'width_custom'  => sanitize_text_field((string) ($field['width_custom'] ?? '')),
+		'active'        => !array_key_exists('active', $field) || !empty($field['active']),
+		'required'      => !empty($field['required']),
+		'description'   => sanitize_textarea_field((string) ($field['description'] ?? '')),
+		'min_rows'      => $min_rows,
+		'max_rows'      => $max_rows,
+		'button_label'  => sanitize_text_field((string) ($field['button_label'] ?? '')),
+		'children'      => $children,
+	];
+}
+
+/**
+ * @param array<string, mixed> $field
+ * @return array<string, mixed>|null
+ */
+function bl_blocks_sanitize_layout_field(array $field, int $repeater_depth): ?array
+{
+	$type = sanitize_key((string) ($field['type'] ?? 'column'));
+	$id = sanitize_key((string) ($field['id'] ?? ''));
+	if ($id === '') {
+		$id = 'f' . wp_generate_password(8, false, false);
+	}
+
+	$out = [
+		'id'           => $id,
+		'type'         => $type,
+		'width'        => sanitize_text_field((string) ($field['width'] ?? '100')),
+		'width_custom' => sanitize_text_field((string) ($field['width_custom'] ?? '')),
+		'css_class'    => sanitize_html_class((string) ($field['css_class'] ?? '')),
+		'active'       => !array_key_exists('active', $field) || !empty($field['active']),
+	];
+
+	if ($type === 'section') {
+		$out['label'] = sanitize_text_field((string) ($field['label'] ?? ''));
+		$design = sanitize_key((string) ($field['design'] ?? 'standard'));
+		$out['design'] = in_array($design, ['standard', 'outline', 'card'], true) ? $design : 'standard';
+	}
+
+	$children = [];
+	$raw_children = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
+	foreach ($raw_children as $child) {
+		$clean = bl_blocks_sanitize_field($child, $repeater_depth);
+		if ($clean !== null) {
+			$children[] = $clean;
+		}
+	}
+	$out['children'] = $children;
+
+	return $out;
+}
+
+/**
+ * Fallback leaf sanitize when Forms is not loaded.
+ *
+ * @param array<string, mixed> $field
+ * @return array<string, mixed>
+ */
+function bl_blocks_sanitize_leaf_field_fallback(array $field): array
+{
 	$type = sanitize_key((string) ($field['type'] ?? 'text'));
 	$id = sanitize_key((string) ($field['id'] ?? ''));
 	if ($id === '') {
@@ -266,19 +425,19 @@ function bl_blocks_sanitize_field($field): ?array
 	}
 
 	$out = [
-		'id'          => $id,
-		'type'        => $type !== '' ? $type : 'text',
-		'label'       => sanitize_text_field((string) ($field['label'] ?? '')),
-		'name'        => $name,
-		'name_manual' => !empty($field['name_manual']),
-		'hide_label'  => !empty($field['hide_label']),
-		'css_class'   => sanitize_html_class((string) ($field['css_class'] ?? '')),
-		'width'       => sanitize_text_field((string) ($field['width'] ?? '100')),
-		'width_custom'=> sanitize_text_field((string) ($field['width_custom'] ?? '')),
-		'active'      => !array_key_exists('active', $field) || !empty($field['active']),
-		'required'    => !empty($field['required']),
-		'placeholder' => sanitize_text_field((string) ($field['placeholder'] ?? '')),
-		'description' => sanitize_textarea_field((string) ($field['description'] ?? '')),
+		'id'            => $id,
+		'type'          => $type !== '' ? $type : 'text',
+		'label'         => sanitize_text_field((string) ($field['label'] ?? '')),
+		'name'          => $name,
+		'name_manual'   => !empty($field['name_manual']),
+		'hide_label'    => !empty($field['hide_label']),
+		'css_class'     => sanitize_html_class((string) ($field['css_class'] ?? '')),
+		'width'         => sanitize_text_field((string) ($field['width'] ?? '100')),
+		'width_custom'  => sanitize_text_field((string) ($field['width_custom'] ?? '')),
+		'active'        => !array_key_exists('active', $field) || !empty($field['active']),
+		'required'      => !empty($field['required']),
+		'placeholder'   => sanitize_text_field((string) ($field['placeholder'] ?? '')),
+		'description'   => sanitize_textarea_field((string) ($field['description'] ?? '')),
 		'default_value' => sanitize_text_field((string) ($field['default_value'] ?? '')),
 	];
 
@@ -301,22 +460,71 @@ function bl_blocks_sanitize_field($field): ?array
 		$out['options'] = $options;
 	}
 
-	if (isset($field['children']) && is_array($field['children'])) {
-		$children = [];
-		foreach ($field['children'] as $child) {
-			$clean = bl_blocks_sanitize_field($child);
-			if ($clean !== null) {
-				$children[] = $clean;
-			}
-		}
-		$out['children'] = $children;
-	}
-
 	if (isset($field['conditional_logic']) && is_array($field['conditional_logic'])) {
 		$out['conditional_logic'] = $field['conditional_logic'];
 	}
 
 	return $out;
+}
+
+/**
+ * Ensure field names are unique among siblings; repeater children get a fresh scope.
+ *
+ * @param list<array<string, mixed>> $fields
+ * @param array<string, true>        $used
+ * @return list<array<string, mixed>>
+ */
+function bl_blocks_ensure_unique_field_names(array $fields, array &$used = []): array
+{
+	foreach ($fields as $index => $field) {
+		if (!is_array($field)) {
+			continue;
+		}
+		$type = (string) ($field['type'] ?? '');
+
+		if (bl_blocks_is_layout_field_type($type)) {
+			$children = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
+			$fields[$index]['children'] = bl_blocks_ensure_unique_field_names($children, $used);
+			continue;
+		}
+
+		if ($type === 'repeater') {
+			if (isset($field['name']) && is_string($field['name']) && $field['name'] !== '') {
+				$fields[$index]['name'] = bl_blocks_mint_unique_name($field['name'], $used);
+			}
+			$child_used = [];
+			$children = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
+			$fields[$index]['children'] = bl_blocks_ensure_unique_field_names($children, $child_used);
+			continue;
+		}
+
+		if (!isset($field['name']) || !is_string($field['name']) || $field['name'] === '') {
+			continue;
+		}
+		$fields[$index]['name'] = bl_blocks_mint_unique_name($field['name'], $used);
+	}
+
+	return $fields;
+}
+
+/**
+ * @param array<string, true> $used
+ */
+function bl_blocks_mint_unique_name(string $name, array &$used): string
+{
+	$base = sanitize_key($name);
+	if ($base === '') {
+		$base = 'field';
+	}
+	$candidate = $base;
+	$suffix = 2;
+	while (isset($used[$candidate])) {
+		$candidate = $base . '_' . $suffix;
+		$suffix++;
+	}
+	$used[$candidate] = true;
+
+	return $candidate;
 }
 
 /**
@@ -335,16 +543,14 @@ function bl_blocks_sanitize_config($config, string $type = 'block'): array
 	$fields = [];
 	if (isset($config['fields']) && is_array($config['fields'])) {
 		foreach ($config['fields'] as $field) {
-			$clean = bl_blocks_sanitize_field($field);
+			$clean = bl_blocks_sanitize_field($field, 0);
 			if ($clean !== null) {
 				$fields[] = $clean;
 			}
 		}
 	}
 
-	if (function_exists('bl_forms_ensure_unique_field_names')) {
-		$fields = bl_forms_ensure_unique_field_names($fields);
-	}
+	$fields = bl_blocks_ensure_unique_field_names($fields);
 
 	$settings = bl_blocks_sanitize_settings($config['settings'] ?? [], $type);
 
@@ -483,62 +689,81 @@ function bl_blocks_sanitize_values(array $fields, $raw): array
 	}
 
 	$values = [];
-	$walk = static function (array $list) use (&$walk, &$values, $raw): void {
-		foreach ($list as $field) {
-			if (!is_array($field)) {
-				continue;
-			}
-			$type = (string) ($field['type'] ?? '');
-			if (in_array($type, ['column', 'section', 'group'], true)) {
-				$children = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
-				$walk($children);
-				continue;
-			}
-			if (in_array($type, ['divider', 'spacer', 'heading', 'text_block', 'html', 'captcha', 'honeypot'], true)) {
-				continue;
-			}
-			if (isset($field['active']) && empty($field['active'])) {
-				continue;
-			}
-			$name = (string) ($field['name'] ?? '');
-			if ($name === '') {
-				continue;
-			}
-			$raw_value = $raw[$name] ?? null;
-
-			if ($type === 'toggle' || $type === 'terms') {
-				$values[$name] = !empty($raw_value) ? '1' : '';
-				continue;
-			}
-
-			$multi = $type === 'checkboxes'
-				|| ($type === 'button_group' && !empty($field['multiple']))
-				|| ($type === 'select' && !empty($field['multiple']));
-
-			if ($multi) {
-				$list = [];
-				if (is_array($raw_value)) {
-					foreach ($raw_value as $item) {
-						if (is_scalar($item) && (string) $item !== '') {
-							$list[] = sanitize_text_field((string) $item);
-						}
-					}
-				} elseif (is_scalar($raw_value) && (string) $raw_value !== '') {
-					$list[] = sanitize_text_field((string) $raw_value);
-				}
-				$values[$name] = $list;
-				continue;
-			}
-
-			if (in_array($type, ['textarea', 'html'], true)) {
-				$values[$name] = sanitize_textarea_field(is_scalar($raw_value) ? (string) $raw_value : '');
-				continue;
-			}
-
-			$values[$name] = sanitize_text_field(is_scalar($raw_value) ? (string) $raw_value : '');
+	foreach ($fields as $field) {
+		if (!is_array($field)) {
+			continue;
 		}
-	};
-	$walk($fields);
+		$type = (string) ($field['type'] ?? '');
+		if (bl_blocks_is_layout_field_type($type)) {
+			$children = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
+			$values = array_merge($values, bl_blocks_sanitize_values($children, $raw));
+			continue;
+		}
+		if (bl_blocks_is_static_field_type($type)) {
+			continue;
+		}
+		if (isset($field['active']) && empty($field['active'])) {
+			continue;
+		}
+		$name = (string) ($field['name'] ?? '');
+		if ($name === '') {
+			continue;
+		}
+		$raw_value = $raw[$name] ?? null;
+
+		if ($type === 'repeater') {
+			$children = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
+			$rows_out = [];
+			$rows_in = is_array($raw_value) ? $raw_value : [];
+			foreach ($rows_in as $row) {
+				if (!is_array($row)) {
+					continue;
+				}
+				$rows_out[] = bl_blocks_sanitize_values($children, $row);
+			}
+			$min_rows = max(0, (int) ($field['min_rows'] ?? 0));
+			while (count($rows_out) < $min_rows) {
+				$rows_out[] = bl_blocks_sanitize_values($children, []);
+			}
+			$max_rows = max(0, (int) ($field['max_rows'] ?? 0));
+			if ($max_rows > 0 && count($rows_out) > $max_rows) {
+				$rows_out = array_slice($rows_out, 0, $max_rows);
+			}
+			$values[$name] = array_values($rows_out);
+			continue;
+		}
+
+		if ($type === 'toggle' || $type === 'terms') {
+			$values[$name] = !empty($raw_value) ? '1' : '';
+			continue;
+		}
+
+		$multi = $type === 'checkboxes'
+			|| ($type === 'button_group' && !empty($field['multiple']))
+			|| ($type === 'select' && !empty($field['multiple']));
+
+		if ($multi) {
+			$list = [];
+			if (is_array($raw_value)) {
+				foreach ($raw_value as $item) {
+					if (is_scalar($item) && (string) $item !== '') {
+						$list[] = sanitize_text_field((string) $item);
+					}
+				}
+			} elseif (is_scalar($raw_value) && (string) $raw_value !== '') {
+				$list[] = sanitize_text_field((string) $raw_value);
+			}
+			$values[$name] = $list;
+			continue;
+		}
+
+		if (in_array($type, ['textarea', 'html'], true)) {
+			$values[$name] = sanitize_textarea_field(is_scalar($raw_value) ? (string) $raw_value : '');
+			continue;
+		}
+
+		$values[$name] = sanitize_text_field(is_scalar($raw_value) ? (string) $raw_value : '');
+	}
 
 	return $values;
 }

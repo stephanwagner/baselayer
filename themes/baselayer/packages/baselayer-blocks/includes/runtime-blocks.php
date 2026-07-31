@@ -227,6 +227,10 @@ function bl_blocks_register_dynamic_blocks(): void
 				'previewError'    => __('Error loading preview: %s', 'baselayer-blocks'),
 				'previewEmpty'    => __('Block rendered as empty.', 'baselayer-blocks'),
 				'templateMissing' => __('Template missing.', 'baselayer-blocks'),
+				'addRow'         => __('Add row', 'baselayer-blocks'),
+				'removeRow'       => __('Remove row', 'baselayer-blocks'),
+				'rowLabel'        => __('Row %d', 'baselayer-blocks'),
+				'close'           => __('Close', 'baselayer-blocks'),
 			],
 		]);
 	}
@@ -337,7 +341,8 @@ function bl_blocks_render_block_fallback(array $def, array $values): string
 		}
 		$val = $values[$name];
 		if (is_array($val)) {
-			$val = implode(', ', array_map('strval', $val));
+			$encoded = wp_json_encode($val);
+			$val = is_string($encoded) ? $encoded : '';
 		}
 		if ((string) $val === '') {
 			continue;

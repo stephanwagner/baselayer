@@ -107,6 +107,10 @@ function bl_blocks_enqueue_page_editor(string $hook): void
 			'previewError'    => __('Error loading preview: %s', 'baselayer-blocks'),
 			'previewEmpty'    => __('Block rendered as empty.', 'baselayer-blocks'),
 			'templateMissing' => __('Template missing.', 'baselayer-blocks'),
+			'addRow'         => __('Add row', 'baselayer-blocks'),
+			'removeRow'       => __('Remove row', 'baselayer-blocks'),
+			'rowLabel'        => __('Row %d', 'baselayer-blocks'),
+			'close'           => __('Close', 'baselayer-blocks'),
 		],
 	]);
 

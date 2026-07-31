@@ -13,6 +13,11 @@ import {
 import { createFieldCard, serializeRow } from '../../../../baselayer-forms/src/js/admin/field-card.js';
 import { equalizeColumnRun } from '../../../../baselayer-forms/src/js/admin/layout.js';
 import { createSettingsPanel } from './settings-panel.js';
+import {
+  createRepeaterCard,
+  serializeRepeaterRow,
+  defaultRepeater,
+} from './repeater-card.js';
 
 const EXCLUDED_TYPES = new Set(['honeypot', 'captcha', 'terms']);
 
@@ -20,10 +25,13 @@ const EXCLUDED_TYPES = new Set(['honeypot', 'captcha', 'terms']);
 const BLOCKS_POPULAR_TYPES = ['text', 'textarea', 'select', 'toggle'];
 
 const BLOCKS_PALETTE = PALETTE_SECTIONS.map((section) => {
-  const types =
+  let types =
     section.id === 'popular'
       ? BLOCKS_POPULAR_TYPES
       : (section.types || []).filter((type) => !EXCLUDED_TYPES.has(type));
+  if (section.id === 'advanced') {
+    types = [...types.filter((type) => type !== 'repeater'), 'repeater'];
+  }
   return { ...section, types };
 }).filter((section) => (section.types || []).length > 0);
 
@@ -41,6 +49,20 @@ function expandLegacyGroups(fields) {
     out.push(field);
   });
   return out;
+}
+
+function createBlocksItem(data, open) {
+  if ((data?.type || '') === 'repeater') {
+    return createRepeaterCard(data, open, 1);
+  }
+  return createFieldCard(data, open);
+}
+
+function serializeBlocksItem(row) {
+  if ((row?.dataset?.fieldType || '') === 'repeater') {
+    return serializeRepeaterRow(row);
+  }
+  return serializeRow(row);
 }
 
 /**
@@ -82,6 +104,15 @@ export function mountApp(root, initial, definitionType = 'block') {
   });
 
   const prepareField = (typeOrData) => {
+    if (typeOrData === 'repeater' || (typeOrData && typeOrData.type === 'repeater')) {
+      const data = typeof typeOrData === 'string' ? defaultRepeater() : defaultRepeater(typeOrData);
+      if (data.name != null && data.name_manual === false) {
+        data.name = uniqueFieldName(data.label || data.name || 'items', data.id || '');
+      } else if (data.name) {
+        data.name = uniqueFieldName(data.name, data.id || '');
+      }
+      return data;
+    }
     const data = typeof typeOrData === 'string' ? defaultField(typeOrData) : { ...typeOrData };
     if (data.name != null && data.name_manual === false) {
       data.name = uniqueFieldName(data.label || data.name || data.type || 'field', data.id || '');
@@ -108,12 +139,15 @@ export function mountApp(root, initial, definitionType = 'block') {
     t,
     typeLabel: (type) => {
       const dict = (window.blFormsAdmin && window.blFormsAdmin.i18n) || {};
+      if (type === 'repeater') {
+        return (dict.types && dict.types.repeater) || t('repeaterType', 'Repeater');
+      }
       return (dict.types && dict.types[type]) || type;
     },
     normalizeItems: expandLegacyGroups,
     prepareItem: prepareField,
-    createItem: (data, open) => createFieldCard(data, open),
-    serializeItem: serializeRow,
+    createItem: createBlocksItem,
+    serializeItem: serializeBlocksItem,
     onItemMounted: (card, list) => {
       if ((card.dataset.fieldType || '') === 'column') {
         equalizeColumnRun(list, card);

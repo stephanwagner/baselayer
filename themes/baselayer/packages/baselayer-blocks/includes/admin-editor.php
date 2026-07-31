@@ -259,6 +259,7 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'spacer'       => __('Spacer', 'baselayer-blocks'),
 		'column'       => __('Column', 'baselayer-blocks'),
 		'section'      => __('Section', 'baselayer-blocks'),
+		'repeater'     => __('Repeater', 'baselayer-blocks'),
 		'hidden'       => __('Hidden', 'baselayer-blocks'),
 	];
 
@@ -297,6 +298,17 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'paletteSectionLayout'     => __('Layout', 'baselayer-blocks'),
 		'paletteSectionContent'    => __('Content', 'baselayer-blocks'),
 		'paletteSectionAdvanced'   => __('Advanced', 'baselayer-blocks'),
+		'repeaterType'             => __('Repeater', 'baselayer-blocks'),
+		'repeaterLabel'            => __('Repeater label', 'baselayer-blocks'),
+		'repeaterLabelPlaceholder' => __('Repeater label', 'baselayer-blocks'),
+		'repeaterMinRows'          => __('Min rows', 'baselayer-blocks'),
+		'repeaterMaxRows'          => __('Max rows (0 = unlimited)', 'baselayer-blocks'),
+		'repeaterMaxRowsShort'     => __('Max', 'baselayer-blocks'),
+		'repeaterButtonLabel'      => __('Add button label', 'baselayer-blocks'),
+		'repeaterEmpty'            => __('Drop fields or a nested repeater here', 'baselayer-blocks'),
+		'repeaterEmptyMaxDepth'    => __('Drop fields here (nested repeater not allowed at this depth)', 'baselayer-blocks'),
+		'addRow'                  => __('Add row', 'baselayer-blocks'),
+		'fieldName'                => __('Name', 'baselayer-blocks'),
 		'types'                    => $type_labels,
 	];
 

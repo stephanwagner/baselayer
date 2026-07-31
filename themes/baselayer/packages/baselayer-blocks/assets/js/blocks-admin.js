@@ -5578,11 +5578,378 @@
     };
   }
 
+  // themes/baselayer/packages/baselayer-blocks/src/js/admin/repeater-card.js
+  var REPEATER_MAX_DEPTH = 3;
+  var LAYOUT_BLOCKED = ["column", "section", "group"];
+  var repeaterFieldByEl = /* @__PURE__ */ new WeakMap();
+  function createNestedSortable2(list, options) {
+    const Builder = window.BlCanvasBuilder;
+    if (!Builder || typeof Builder.createSortable !== "function") {
+      console.error("BlCanvasBuilder.createSortable is required for repeater field lists");
+      return null;
+    }
+    return Builder.createSortable(list, options);
+  }
+  function notifyChanged() {
+    document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+  }
+  function typeLabel2(type) {
+    const dict = window.blFormsAdmin && window.blFormsAdmin.i18n || {};
+    if (dict.types && dict.types[type]) {
+      return dict.types[type];
+    }
+    if (type === "repeater") {
+      return t("repeaterType", "Repeater");
+    }
+    return type;
+  }
+  function prepareChildField(typeOrData, depth) {
+    const data = typeof typeOrData === "string" ? defaultFieldForBlocks(typeOrData) : { ...typeOrData };
+    if (LAYOUT_BLOCKED.includes(data.type)) {
+      return null;
+    }
+    if (data.type === "repeater" && depth >= REPEATER_MAX_DEPTH) {
+      return null;
+    }
+    if (data.name != null && data.name_manual === false) {
+      data.name = uniqueFieldName(data.label || data.name || data.type || "field", data.id || "");
+    } else if (data.name) {
+      data.name = uniqueFieldName(data.name, data.id || "");
+    }
+    return data;
+  }
+  function defaultRepeater(partial = {}) {
+    const id = partial.id || uid();
+    return {
+      id,
+      type: "repeater",
+      label: partial.label || typeLabel2("repeater"),
+      name: partial.name || "items",
+      name_manual: partial.name_manual != null ? !!partial.name_manual : false,
+      hide_label: !!partial.hide_label,
+      active: partial.active !== false,
+      required: !!partial.required,
+      description: partial.description || "",
+      css_class: partial.css_class || "",
+      width: partial.width || "100",
+      width_custom: partial.width_custom || "",
+      min_rows: Math.max(0, parseInt(partial.min_rows, 10) || 0),
+      max_rows: Math.max(0, parseInt(partial.max_rows, 10) || 0),
+      button_label: partial.button_label || "",
+      children: Array.isArray(partial.children) ? partial.children : []
+    };
+  }
+  function defaultFieldForBlocks(type) {
+    if (type === "repeater") {
+      return defaultRepeater();
+    }
+    return defaultField(type);
+  }
+  function serializeChildCard(row) {
+    if ((row.dataset.fieldType || "") === "repeater") {
+      return serializeRepeaterRow(row);
+    }
+    return serializeRow(row);
+  }
+  function bindRepeaterChildList(list, depth, onChange) {
+    const Builder = window.BlCanvasBuilder;
+    const onStart = Builder?.dragStart || (() => {
+    });
+    const onEnd = Builder?.dragEnd || (() => {
+    });
+    createNestedSortable2(list, {
+      group: {
+        name: "bl-blocks-fields",
+        put(to, from, dragEl) {
+          const type = dragEl.dataset.fieldType || "";
+          if (LAYOUT_BLOCKED.includes(type)) {
+            return false;
+          }
+          if (type === "repeater" && depth >= REPEATER_MAX_DEPTH) {
+            return false;
+          }
+          return true;
+        }
+      },
+      handle: ".bl-forms-builder__handle",
+      animation: 150,
+      draggable: ".bl-forms-builder__field, .bl-forms-builder__template",
+      onStart,
+      onEnd,
+      onAdd(evt) {
+        const item = evt.item;
+        const type = item.dataset.fieldType || "text";
+        if (item.classList.contains("bl-forms-builder__template")) {
+          const prepared = prepareChildField(type, depth);
+          if (!prepared) {
+            item.remove();
+            return;
+          }
+          const card = prepared.type === "repeater" ? createRepeaterCard(prepared, true, depth + 1) : createFieldCard(prepared, true);
+          item.replaceWith(card);
+          onChange();
+          return;
+        }
+        if (LAYOUT_BLOCKED.includes(type)) {
+          if (evt.from && evt.from !== list) {
+            evt.from.insertBefore(item, evt.from.children[evt.oldIndex] || null);
+          } else {
+            item.remove();
+          }
+          return;
+        }
+        if (type === "repeater") {
+          const itemDepth = parseInt(item.dataset.repeaterDepth || "1", 10);
+          if (depth >= REPEATER_MAX_DEPTH || itemDepth > REPEATER_MAX_DEPTH) {
+            if (evt.from && evt.from !== list) {
+              evt.from.insertBefore(item, evt.from.children[evt.oldIndex] || null);
+            } else {
+              item.remove();
+            }
+            return;
+          }
+          const data = serializeRepeaterRow(item);
+          if (depth + 1 > REPEATER_MAX_DEPTH) {
+            if (evt.from && evt.from !== list) {
+              evt.from.insertBefore(item, evt.from.children[evt.oldIndex] || null);
+            } else {
+              item.remove();
+            }
+            return;
+          }
+          item.replaceWith(createRepeaterCard(data, false, depth + 1));
+        }
+        onChange();
+      },
+      onUpdate: onChange,
+      onSort: onChange
+    });
+  }
+  function createRepeaterCard(initial = {}, open = false, depth = 1) {
+    if (depth > REPEATER_MAX_DEPTH) {
+      depth = REPEATER_MAX_DEPTH;
+    }
+    let field = defaultRepeater(initial);
+    field = {
+      ...field,
+      ...initial,
+      id: initial.id || field.id,
+      type: "repeater",
+      children: Array.isArray(initial.children) ? initial.children : field.children
+    };
+    const row = el("div", {
+      className: "bl-forms-builder__field bl-blocks-builder__repeater-card",
+      dataset: {
+        blFormsField: "1",
+        fieldId: field.id,
+        fieldType: "repeater",
+        repeaterDepth: String(depth),
+        fieldWidth: field.width || "100"
+      }
+    });
+    repeaterFieldByEl.set(row, field);
+    const labelInput = el("input", {
+      type: "text",
+      className: "bl-forms-builder__section-label-input",
+      value: field.label || "",
+      placeholder: t("repeaterLabelPlaceholder", "Repeater label"),
+      "aria-label": t("repeaterLabel", "Repeater label")
+    });
+    labelInput.addEventListener("input", () => {
+      field.label = labelInput.value;
+      if (!field.name_manual) {
+        nameInput.value = uniqueFieldName(field.label || "items", field.id);
+        field.name = nameInput.value;
+      }
+      notifyChanged();
+    });
+    const nameInput = el("input", {
+      type: "text",
+      className: "bl-blocks-builder__repeater-name",
+      value: field.name || "",
+      placeholder: "items",
+      "aria-label": t("fieldName", "Name")
+    });
+    nameInput.addEventListener("input", () => {
+      field.name_manual = true;
+      field.name = nameInput.value;
+      notifyChanged();
+    });
+    const minInput = el("input", {
+      type: "number",
+      className: "bl-blocks-builder__repeater-min",
+      min: "0",
+      value: String(field.min_rows || 0),
+      "aria-label": t("repeaterMinRows", "Min rows")
+    });
+    minInput.addEventListener("input", () => {
+      field.min_rows = Math.max(0, parseInt(minInput.value, 10) || 0);
+      notifyChanged();
+    });
+    const maxInput = el("input", {
+      type: "number",
+      className: "bl-blocks-builder__repeater-max",
+      min: "0",
+      value: String(field.max_rows || 0),
+      "aria-label": t("repeaterMaxRows", "Max rows (0 = unlimited)")
+    });
+    maxInput.addEventListener("input", () => {
+      field.max_rows = Math.max(0, parseInt(maxInput.value, 10) || 0);
+      notifyChanged();
+    });
+    const buttonInput = el("input", {
+      type: "text",
+      className: "bl-blocks-builder__repeater-button",
+      value: field.button_label || "",
+      placeholder: t("addRow", "Add row"),
+      "aria-label": t("repeaterButtonLabel", "Add button label")
+    });
+    buttonInput.addEventListener("input", () => {
+      field.button_label = buttonInput.value;
+      notifyChanged();
+    });
+    const typeChip = el("span", { className: "bl-forms-builder__field-type" }, [
+      iconEl("repeater", "bl-forms-builder__field-type-icon"),
+      el("span", {
+        className: "bl-forms-builder__field-type-label",
+        text: typeLabel2("repeater") + (depth > 1 ? ` (${depth})` : "")
+      })
+    ]);
+    const fieldsList = el("div", {
+      className: "bl-blocks-builder__repeater-fields",
+      dataset: { blRepeaterFields: "1", repeaterDepth: String(depth) }
+    });
+    const emptyHint = el("p", {
+      className: "description bl-forms-builder__section-empty",
+      text: depth >= REPEATER_MAX_DEPTH ? t("repeaterEmptyMaxDepth", "Drop fields here (nested repeater not allowed at this depth)") : t("repeaterEmpty", "Drop fields or a nested repeater here")
+    });
+    const syncEmpty = () => {
+      emptyHint.hidden = fieldsList.querySelector("[data-bl-forms-field]") != null;
+    };
+    const onListChange = () => {
+      syncEmpty();
+      notifyChanged();
+    };
+    (field.children || []).forEach((child) => {
+      if ((child?.type || "") === "repeater") {
+        if (depth >= REPEATER_MAX_DEPTH) {
+          return;
+        }
+        fieldsList.appendChild(createRepeaterCard(child, false, depth + 1));
+        return;
+      }
+      fieldsList.appendChild(createFieldCard(child, false));
+    });
+    bindRepeaterChildList(fieldsList, depth, onListChange);
+    const fieldsWrap = el("div", { className: "bl-blocks-builder__repeater-fields-wrap" }, [
+      fieldsList,
+      emptyHint
+    ]);
+    syncEmpty();
+    const meta = el("div", { className: "bl-blocks-builder__repeater-meta" }, [
+      el("label", { className: "bl-blocks-builder__repeater-meta-item" }, [
+        el("span", { text: t("fieldName", "Name") }),
+        nameInput
+      ]),
+      el("label", { className: "bl-blocks-builder__repeater-meta-item" }, [
+        el("span", { text: t("repeaterMinRows", "Min") }),
+        minInput
+      ]),
+      el("label", { className: "bl-blocks-builder__repeater-meta-item" }, [
+        el("span", { text: t("repeaterMaxRowsShort", "Max") }),
+        maxInput
+      ]),
+      el("label", { className: "bl-blocks-builder__repeater-meta-item bl-blocks-builder__repeater-meta-item--grow" }, [
+        el("span", { text: t("repeaterButtonLabel", "Button") }),
+        buttonInput
+      ])
+    ]);
+    const duplicateBtn = el("button", {
+      type: "button",
+      className: "bl-forms-builder__icon-btn",
+      title: t("duplicate", "Duplicate"),
+      "aria-label": t("duplicate", "Duplicate"),
+      onClick: () => {
+        const data = serializeRepeaterRow(row);
+        const clone = cloneFieldData(data);
+        const copy = createRepeaterCard(clone, false, depth);
+        row.after(copy);
+        notifyChanged();
+      }
+    });
+    const dupIcon = iconEl("duplicate");
+    if (dupIcon.innerHTML) duplicateBtn.appendChild(dupIcon);
+    else duplicateBtn.textContent = "\u29C9";
+    const deleteBtn = el("button", {
+      type: "button",
+      className: "bl-forms-builder__icon-btn bl-forms-builder__icon-btn--danger",
+      title: t("delete", "Delete"),
+      "aria-label": t("delete", "Delete"),
+      onClick: () => {
+        row.remove();
+        notifyChanged();
+      }
+    });
+    const trashIcon = iconEl("trash");
+    if (trashIcon.innerHTML) deleteBtn.appendChild(trashIcon);
+    else deleteBtn.textContent = "\xD7";
+    const handle = el("span", {
+      className: "bl-forms-builder__handle",
+      title: t("dragField", "Drag to reorder"),
+      "aria-hidden": "true"
+    });
+    const dragIcon = iconEl("drag");
+    if (dragIcon.innerHTML) handle.appendChild(dragIcon);
+    else handle.textContent = "\u22EE\u22EE";
+    const header = el("div", { className: "bl-forms-builder__field-header" }, [
+      labelInput,
+      el("div", { className: "bl-forms-builder__field-meta" }, [typeChip]),
+      el("div", { className: "bl-forms-builder__field-actions" }, [duplicateBtn, deleteBtn, handle])
+    ]);
+    row.append(header, meta, fieldsWrap);
+    if (open) {
+      labelInput.focus();
+    }
+    return row;
+  }
+  function serializeRepeaterRow(row) {
+    const live = repeaterFieldByEl.get(row);
+    const id = row.dataset.fieldId || live?.id || uid();
+    const labelInput = row.querySelector(":scope > .bl-forms-builder__field-header .bl-forms-builder__section-label-input");
+    const nameInput = row.querySelector(":scope > .bl-blocks-builder__repeater-meta .bl-blocks-builder__repeater-name");
+    const minInput = row.querySelector(":scope > .bl-blocks-builder__repeater-meta .bl-blocks-builder__repeater-min");
+    const maxInput = row.querySelector(":scope > .bl-blocks-builder__repeater-meta .bl-blocks-builder__repeater-max");
+    const buttonInput = row.querySelector(":scope > .bl-blocks-builder__repeater-meta .bl-blocks-builder__repeater-button");
+    const fields = row.querySelector(":scope > .bl-blocks-builder__repeater-fields-wrap [data-bl-repeater-fields]");
+    const children = Array.from(fields?.children || []).filter((el3) => el3.matches("[data-bl-forms-field]")).filter((el3) => !LAYOUT_BLOCKED.includes(el3.dataset.fieldType || "")).map((child) => serializeChildCard(child));
+    return {
+      id,
+      type: "repeater",
+      label: labelInput?.value ?? live?.label ?? "",
+      name: (nameInput?.value || live?.name || "items").trim() || "items",
+      name_manual: live?.name_manual !== false,
+      hide_label: !!live?.hide_label,
+      active: live?.active !== false,
+      required: !!live?.required,
+      description: live?.description || "",
+      css_class: live?.css_class || "",
+      width: row.dataset.fieldWidth || live?.width || "100",
+      width_custom: live?.width_custom || "",
+      min_rows: Math.max(0, parseInt(minInput?.value ?? live?.min_rows ?? 0, 10) || 0),
+      max_rows: Math.max(0, parseInt(maxInput?.value ?? live?.max_rows ?? 0, 10) || 0),
+      button_label: buttonInput?.value ?? live?.button_label ?? "",
+      children
+    };
+  }
+
   // themes/baselayer/packages/baselayer-blocks/src/js/admin/app.js
   var EXCLUDED_TYPES = /* @__PURE__ */ new Set(["honeypot", "captcha", "terms"]);
   var BLOCKS_POPULAR_TYPES = ["text", "textarea", "select", "toggle"];
   var BLOCKS_PALETTE = PALETTE_SECTIONS.map((section) => {
-    const types = section.id === "popular" ? BLOCKS_POPULAR_TYPES : (section.types || []).filter((type) => !EXCLUDED_TYPES.has(type));
+    let types = section.id === "popular" ? BLOCKS_POPULAR_TYPES : (section.types || []).filter((type) => !EXCLUDED_TYPES.has(type));
+    if (section.id === "advanced") {
+      types = [...types.filter((type) => type !== "repeater"), "repeater"];
+    }
     return { ...section, types };
   }).filter((section) => (section.types || []).length > 0);
   function expandLegacyGroups(fields) {
@@ -5599,6 +5966,18 @@
       out.push(field);
     });
     return out;
+  }
+  function createBlocksItem(data, open) {
+    if ((data?.type || "") === "repeater") {
+      return createRepeaterCard(data, open, 1);
+    }
+    return createFieldCard(data, open);
+  }
+  function serializeBlocksItem(row) {
+    if ((row?.dataset?.fieldType || "") === "repeater") {
+      return serializeRepeaterRow(row);
+    }
+    return serializeRow(row);
   }
   function mountApp(root, initial, definitionType = "block") {
     const Builder = window.BlCanvasBuilder;
@@ -5627,6 +6006,15 @@
       dataset: { blFormsPanel: "fields" }
     });
     const prepareField = (typeOrData) => {
+      if (typeOrData === "repeater" || typeOrData && typeOrData.type === "repeater") {
+        const data2 = typeof typeOrData === "string" ? defaultRepeater() : defaultRepeater(typeOrData);
+        if (data2.name != null && data2.name_manual === false) {
+          data2.name = uniqueFieldName(data2.label || data2.name || "items", data2.id || "");
+        } else if (data2.name) {
+          data2.name = uniqueFieldName(data2.name, data2.id || "");
+        }
+        return data2;
+      }
       const data = typeof typeOrData === "string" ? defaultField(typeOrData) : { ...typeOrData };
       if (data.name != null && data.name_manual === false) {
         data.name = uniqueFieldName(data.label || data.name || data.type || "field", data.id || "");
@@ -5652,12 +6040,15 @@
       t,
       typeLabel: (type) => {
         const dict = window.blFormsAdmin && window.blFormsAdmin.i18n || {};
+        if (type === "repeater") {
+          return dict.types && dict.types.repeater || t("repeaterType", "Repeater");
+        }
         return dict.types && dict.types[type] || type;
       },
       normalizeItems: expandLegacyGroups,
       prepareItem: prepareField,
-      createItem: (data, open) => createFieldCard(data, open),
-      serializeItem: serializeRow,
+      createItem: createBlocksItem,
+      serializeItem: serializeBlocksItem,
       onItemMounted: (card, list) => {
         if ((card.dataset.fieldType || "") === "column") {
           equalizeColumnRun(list, card);
@@ -5786,10 +6177,160 @@
   function isStatic(type) {
     return type === "divider" || type === "spacer" || type === "heading" || type === "text_block" || type === "html" || type === "honeypot" || type === "captcha";
   }
+  function collectLeafValue(field, control, type) {
+    const name = field.name;
+    if (!name) return null;
+    if (type === "select") {
+      if (control.multiple) {
+        return Array.from(control.selectedOptions).map((o) => o.value);
+      }
+      return control.value;
+    }
+    if (type === "checkboxes") {
+      return Array.from(control.querySelectorAll('input[type="checkbox"]:checked')).map(
+        (input) => input.value
+      );
+    }
+    if (type === "radio" || type === "button_group") {
+      const checked = control.querySelector('input[type="radio"]:checked');
+      return checked ? checked.value : "";
+    }
+    if (type === "toggle" || type === "terms") {
+      const input = control.tagName === "INPUT" ? control : control.querySelector("input");
+      return input && input.checked ? "1" : "";
+    }
+    if (control && "value" in control) {
+      return control.value;
+    }
+    return "";
+  }
+  function createLeafControl(field, values, controls) {
+    const type = field.type || "text";
+    const name = field.name || "";
+    if (!name) return null;
+    const current = values[name] !== void 0 && values[name] !== null ? values[name] : field.default_value != null ? field.default_value : "";
+    const row = el2("div", {
+      className: "bl-blocks-fields__row",
+      dataset: { fieldName: name }
+    });
+    const id = "bl-blocks-ui-" + name.replace(/[^a-z0-9_-]/gi, "_") + "-" + Math.random().toString(36).slice(2, 7);
+    if (!field.hide_label && type !== "toggle" && type !== "terms") {
+      const label = el2("label", { className: "bl-blocks-fields__label", text: field.label || name });
+      label.setAttribute("for", id);
+      if (field.required) {
+        label.appendChild(document.createTextNode(" "));
+        label.appendChild(el2("span", { className: "required", text: "*" }));
+      }
+      row.appendChild(label);
+    }
+    let control = null;
+    const options = Array.isArray(field.options) ? field.options : [];
+    if (type === "textarea") {
+      control = el2("textarea", {
+        className: "widefat",
+        id,
+        rows: field.rows || 4,
+        value: current == null ? "" : String(current)
+      });
+      if (field.placeholder) control.placeholder = field.placeholder;
+    } else if (type === "select") {
+      const multiple = !!field.multiple;
+      control = el2("select", { className: "widefat", id });
+      if (multiple) control.multiple = true;
+      if (!multiple) {
+        control.appendChild(el2("option", { value: "", text: "\u2014" }));
+      }
+      const selected = multiple ? (Array.isArray(current) ? current : []).map(String) : [String(current == null ? "" : current)];
+      options.forEach((opt) => {
+        const ov = String(opt.value ?? "");
+        const option = el2("option", { value: ov, text: opt.label || ov });
+        if (selected.includes(ov)) option.selected = true;
+        control.appendChild(option);
+      });
+    } else if (type === "radio" || type === "button_group") {
+      control = el2("div", { className: "bl-blocks-fields__choices" });
+      options.forEach((opt, i) => {
+        const ov = String(opt.value ?? "");
+        const oid = id + "-" + i;
+        const input = el2("input", {
+          type: "radio",
+          name: id,
+          id: oid,
+          value: ov,
+          checked: String(current) === ov
+        });
+        control.appendChild(
+          el2("label", { className: "bl-blocks-fields__choice" }, [
+            input,
+            document.createTextNode(" " + (opt.label || ov))
+          ])
+        );
+      });
+    } else if (type === "checkboxes") {
+      control = el2("div", { className: "bl-blocks-fields__choices" });
+      const list = Array.isArray(current) ? current.map(String) : [];
+      options.forEach((opt, i) => {
+        const ov = String(opt.value ?? "");
+        const oid = id + "-" + i;
+        const input = el2("input", {
+          type: "checkbox",
+          id: oid,
+          value: ov,
+          checked: list.includes(ov)
+        });
+        control.appendChild(
+          el2("label", { className: "bl-blocks-fields__choice" }, [
+            input,
+            document.createTextNode(" " + (opt.label || ov))
+          ])
+        );
+      });
+    } else if (type === "toggle" || type === "terms") {
+      const input = el2("input", {
+        type: "checkbox",
+        id,
+        checked: !!current && current !== "0" && current !== ""
+      });
+      control = el2("label", { className: "bl-blocks-fields__toggle" }, [
+        input,
+        document.createTextNode(" " + (field.label || name))
+      ]);
+    } else if (type === "hidden") {
+      control = el2("input", {
+        type: "hidden",
+        id,
+        value: current == null ? "" : String(current)
+      });
+    } else {
+      let inputType = "text";
+      if (type === "email" || type === "url" || type === "number" || type === "date" || type === "time") {
+        inputType = type;
+      } else if (type === "phone") {
+        inputType = "tel";
+      } else if (type === "datetime") {
+        inputType = "datetime-local";
+      }
+      control = el2("input", {
+        className: "widefat",
+        type: inputType,
+        id,
+        value: current == null ? "" : String(current)
+      });
+      if (field.placeholder) control.placeholder = field.placeholder;
+    }
+    if (control) {
+      row.appendChild(control);
+      controls.push({ field, control, type });
+    }
+    if (field.description) {
+      row.appendChild(el2("p", { className: "description", text: field.description }));
+    }
+    return row;
+  }
   function createFieldForm(fields, values = {}) {
     const root = el2("div", { className: "bl-blocks-fields", dataset: { blBlocksFields: "" } });
-    const controls = [];
-    const walk = (list, parent) => {
+    const entries = [];
+    const walk = (list, parent, valueMap) => {
       (list || []).forEach((field) => {
         if (!field || field.active === false) return;
         const type = field.type || "text";
@@ -5801,7 +6342,7 @@
             wrap.appendChild(el2("h3", { className: "bl-blocks-fields__section-title", text: field.label }));
           }
           parent.appendChild(wrap);
-          walk(field.children || [], wrap);
+          walk(field.children || [], wrap, valueMap);
           return;
         }
         if (type === "heading") {
@@ -5818,175 +6359,131 @@
           return;
         }
         if (isStatic(type)) return;
-        const name = field.name || "";
-        if (!name) return;
-        const current = values[name] !== void 0 && values[name] !== null ? values[name] : field.default_value != null ? field.default_value : "";
-        const row = el2("div", {
-          className: "bl-blocks-fields__row",
-          dataset: { fieldName: name }
-        });
-        const id = "bl-blocks-ui-" + name.replace(/[^a-z0-9_-]/gi, "_");
-        if (!field.hide_label && type !== "toggle" && type !== "terms") {
-          const label = el2("label", { className: "bl-blocks-fields__label", text: field.label || name });
-          label.setAttribute("for", id);
-          if (field.required) {
-            label.appendChild(document.createTextNode(" "));
-            label.appendChild(el2("span", { className: "required", text: "*" }));
-          }
-          row.appendChild(label);
+        if (type === "repeater") {
+          parent.appendChild(createRepeaterControl(field, valueMap, entries));
+          return;
         }
-        let control = null;
-        const options = Array.isArray(field.options) ? field.options : [];
-        if (type === "textarea") {
-          control = el2("textarea", {
-            className: "widefat",
-            id,
-            rows: field.rows || 4,
-            value: current == null ? "" : String(current)
-          });
-          if (field.placeholder) control.placeholder = field.placeholder;
-        } else if (type === "select") {
-          const multiple = !!field.multiple;
-          control = el2("select", { className: "widefat", id });
-          if (multiple) control.multiple = true;
-          if (!multiple) {
-            control.appendChild(el2("option", { value: "", text: "\u2014" }));
-          }
-          const selected = multiple ? (Array.isArray(current) ? current : []).map(String) : [String(current == null ? "" : current)];
-          options.forEach((opt) => {
-            const ov = String(opt.value ?? "");
-            const option = el2("option", { value: ov, text: opt.label || ov });
-            if (selected.includes(ov)) option.selected = true;
-            control.appendChild(option);
-          });
-        } else if (type === "radio" || type === "button_group") {
-          control = el2("div", { className: "bl-blocks-fields__choices" });
-          options.forEach((opt, i) => {
-            const ov = String(opt.value ?? "");
-            const oid = id + "-" + i;
-            const input = el2("input", {
-              type: "radio",
-              name: id,
-              id: oid,
-              value: ov,
-              checked: String(current) === ov
-            });
-            control.appendChild(
-              el2("label", { className: "bl-blocks-fields__choice" }, [
-                input,
-                document.createTextNode(" " + (opt.label || ov))
-              ])
-            );
-          });
-        } else if (type === "checkboxes") {
-          control = el2("div", { className: "bl-blocks-fields__choices" });
-          const list2 = Array.isArray(current) ? current.map(String) : [];
-          options.forEach((opt, i) => {
-            const ov = String(opt.value ?? "");
-            const oid = id + "-" + i;
-            const input = el2("input", {
-              type: "checkbox",
-              id: oid,
-              value: ov,
-              checked: list2.includes(ov)
-            });
-            control.appendChild(
-              el2("label", { className: "bl-blocks-fields__choice" }, [
-                input,
-                document.createTextNode(" " + (opt.label || ov))
-              ])
-            );
-          });
-        } else if (type === "toggle" || type === "terms") {
-          const input = el2("input", {
-            type: "checkbox",
-            id,
-            checked: !!current && current !== "0" && current !== ""
-          });
-          control = el2("label", { className: "bl-blocks-fields__toggle" }, [
-            input,
-            document.createTextNode(" " + (field.label || name))
-          ]);
-        } else if (type === "hidden") {
-          control = el2("input", {
-            type: "hidden",
-            id,
-            value: current == null ? "" : String(current)
-          });
-        } else {
-          let inputType = "text";
-          if (type === "email" || type === "url" || type === "number" || type === "date" || type === "time") {
-            inputType = type;
-          } else if (type === "phone") {
-            inputType = "tel";
-          } else if (type === "datetime") {
-            inputType = "datetime-local";
-          }
-          control = el2("input", {
-            className: "widefat",
-            type: inputType,
-            id,
-            value: current == null ? "" : String(current)
-          });
-          if (field.placeholder) control.placeholder = field.placeholder;
+        const leafControls = [];
+        const row = createLeafControl(field, valueMap, leafControls);
+        if (row) {
+          parent.appendChild(row);
+          leafControls.forEach((c) => entries.push({ kind: "leaf", ...c }));
         }
-        if (control) {
-          row.appendChild(control);
-          controls.push({ field, control, type });
-        }
-        if (field.description) {
-          row.appendChild(el2("p", { className: "description", text: field.description }));
-        }
-        parent.appendChild(row);
       });
     };
-    walk(fields, root);
+    walk(fields, root, values || {});
     const getValues = () => {
       const out = {};
-      controls.forEach(({ field, control, type }) => {
-        const name = field.name;
-        if (!name) return;
-        if (type === "textarea" || type === "hidden" || control.tagName === "INPUT" && control.type !== "checkbox" && control.type !== "radio") {
-          if (control.tagName === "INPUT" || control.tagName === "TEXTAREA") {
-            if (control.type === "checkbox") {
-              out[name] = control.checked ? "1" : "";
-              return;
-            }
-            out[name] = control.value;
-            return;
-          }
-        }
-        if (type === "select") {
-          if (control.multiple) {
-            out[name] = Array.from(control.selectedOptions).map((o) => o.value);
-          } else {
-            out[name] = control.value;
+      entries.forEach((entry) => {
+        if (entry.kind === "repeater" && typeof entry.getRows === "function") {
+          if (entry.field.name) {
+            out[entry.field.name] = entry.getRows();
           }
           return;
         }
-        if (type === "checkboxes") {
-          out[name] = Array.from(control.querySelectorAll('input[type="checkbox"]:checked')).map(
-            (input) => input.value
-          );
-          return;
-        }
-        if (type === "radio" || type === "button_group") {
-          const checked = control.querySelector('input[type="radio"]:checked');
-          out[name] = checked ? checked.value : "";
-          return;
-        }
-        if (type === "toggle" || type === "terms") {
-          const input = control.tagName === "INPUT" ? control : control.querySelector("input");
-          out[name] = input && input.checked ? "1" : "";
-          return;
-        }
-        if (control && "value" in control) {
-          out[name] = control.value;
+        if (entry.kind === "leaf") {
+          const val = collectLeafValue(entry.field, entry.control, entry.type);
+          if (entry.field.name) {
+            out[entry.field.name] = val;
+          }
         }
       });
       return out;
     };
     return { root, getValues };
+  }
+  function createRepeaterControl(field, valueMap, entries) {
+    const name = field.name || "";
+    const children = Array.isArray(field.children) ? field.children : [];
+    const minRows = Math.max(0, parseInt(field.min_rows, 10) || 0);
+    const maxRows = Math.max(0, parseInt(field.max_rows, 10) || 0);
+    const buttonLabel = field.button_label || i18n("addRow", "Add row");
+    let rows = Array.isArray(valueMap[name]) ? valueMap[name].slice() : [];
+    while (rows.length < minRows) {
+      rows.push({});
+    }
+    const wrap = el2("div", {
+      className: "bl-blocks-fields__repeater",
+      dataset: { fieldName: name }
+    });
+    if (!field.hide_label && field.label) {
+      wrap.appendChild(el2("div", { className: "bl-blocks-fields__label", text: field.label }));
+    }
+    if (field.description) {
+      wrap.appendChild(el2("p", { className: "description", text: field.description }));
+    }
+    const rowsEl = el2("div", { className: "bl-blocks-fields__repeater-rows" });
+    const rowForms = [];
+    const syncRowTitles = () => {
+      Array.from(rowsEl.children).forEach((rowEl, i) => {
+        const title = rowEl.querySelector(".bl-blocks-fields__repeater-row-title");
+        if (title) {
+          const template = i18n("rowLabel", "Row %d");
+          title.textContent = template.replace("%d", String(i + 1));
+        }
+      });
+    };
+    const canAdd = () => maxRows === 0 || rowForms.length < maxRows;
+    const canRemove = () => rowForms.length > minRows;
+    const addBtn = el2("button", {
+      type: "button",
+      className: "button bl-blocks-fields__repeater-add",
+      text: buttonLabel
+    });
+    const refreshAddBtn = () => {
+      addBtn.disabled = !canAdd();
+    };
+    const mountRow = (rowValues) => {
+      const rowEl = el2("div", { className: "bl-blocks-fields__repeater-row" });
+      const header = el2("div", { className: "bl-blocks-fields__repeater-row-header" }, [
+        el2("span", { className: "bl-blocks-fields__repeater-row-title", text: "" })
+      ]);
+      const removeBtn = el2("button", {
+        type: "button",
+        className: "button-link-delete bl-blocks-fields__repeater-remove",
+        text: i18n("removeRow", "Remove row")
+      });
+      header.appendChild(removeBtn);
+      rowEl.appendChild(header);
+      const form = createFieldForm(children, rowValues || {});
+      rowEl.appendChild(form.root);
+      rowsEl.appendChild(rowEl);
+      const entry = { getValues: form.getValues, rowEl, removeBtn };
+      rowForms.push(entry);
+      removeBtn.addEventListener("click", () => {
+        if (!canRemove()) return;
+        const idx = rowForms.indexOf(entry);
+        if (idx >= 0) rowForms.splice(idx, 1);
+        rowEl.remove();
+        syncRowTitles();
+        refreshAddBtn();
+        rowForms.forEach((r) => {
+          r.removeBtn.disabled = !canRemove();
+        });
+      });
+      removeBtn.disabled = !canRemove();
+      syncRowTitles();
+      refreshAddBtn();
+    };
+    rows.forEach((rowValues) => mountRow(rowValues));
+    if (rows.length === 0 && minRows === 0) {
+    }
+    addBtn.addEventListener("click", () => {
+      if (!canAdd()) return;
+      mountRow({});
+      rowForms.forEach((r) => {
+        r.removeBtn.disabled = !canRemove();
+      });
+    });
+    wrap.appendChild(rowsEl);
+    wrap.appendChild(addBtn);
+    refreshAddBtn();
+    entries.push({
+      kind: "repeater",
+      field,
+      getRows: () => rowForms.map((r) => r.getValues())
+    });
+    return wrap;
   }
   function openFieldsModal(opts) {
     const title = opts.title || i18n("edit", "Edit");

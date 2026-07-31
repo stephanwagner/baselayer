@@ -38,6 +38,7 @@ function bl_blocks_palette_icons(): array
 		'spacer'       => 'expand',
 		'column'       => 'view-column',
 		'section'      => 'layers',
+		'repeater'     => 'view-list',
 		'hidden'       => 'visibility-off',
 		'add'          => 'chevron-right',
 		'caret'        => 'chevron-down',
@@ -88,19 +89,25 @@ function bl_blocks_field_types(): array
 	if (function_exists('bl_forms_field_types')) {
 		$types = bl_forms_field_types();
 		// Blocks definitions don't need form-only anti-spam fields.
-		return array_values(array_filter(
+		$types = array_values(array_filter(
 			$types,
 			static fn($t) => !in_array($t, ['honeypot', 'captcha', 'terms'], true)
 		));
+	} else {
+		$types = [
+			'text', 'textarea', 'email', 'phone', 'url', 'number',
+			'checkboxes', 'radio', 'select', 'toggle', 'button_group',
+			'date', 'time', 'datetime', 'file', 'image',
+			'heading', 'text_block', 'divider', 'spacer', 'html',
+			'column', 'section', 'hidden',
+		];
 	}
 
-	return [
-		'text', 'textarea', 'email', 'phone', 'url', 'number',
-		'checkboxes', 'radio', 'select', 'toggle', 'button_group',
-		'date', 'time', 'datetime', 'file', 'image',
-		'heading', 'text_block', 'divider', 'spacer', 'html',
-		'column', 'section', 'hidden',
-	];
+	if (!in_array('repeater', $types, true)) {
+		$types[] = 'repeater';
+	}
+
+	return $types;
 }
 
 /**
@@ -139,12 +146,13 @@ function bl_blocks_iter_fields(array $fields): array
 				continue;
 			}
 			$type = (string) ($field['type'] ?? '');
-			if (in_array($type, ['column', 'section', 'group'], true)) {
+			if (bl_blocks_is_layout_field_type($type)) {
 				$children = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
 				$walk($children);
 				continue;
 			}
 			$out[] = $field;
+			// Nested subfields live under row values; do not flatten into the root list.
 		}
 	};
 	$walk($fields);
@@ -182,7 +190,7 @@ function bl_blocks_render_admin_fields_walk(array $fields, array $values, string
 			continue;
 		}
 		$type = (string) ($field['type'] ?? 'text');
-		if (in_array($type, ['column', 'section', 'group'], true)) {
+		if (bl_blocks_is_layout_field_type($type)) {
 			$children = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
 			$class = 'bl-blocks-fields__layout bl-blocks-fields__layout--' . sanitize_html_class($type);
 			echo '<div class="' . esc_attr($class) . '">';
@@ -196,7 +204,7 @@ function bl_blocks_render_admin_fields_walk(array $fields, array $values, string
 			echo '</div>';
 			continue;
 		}
-		if (in_array($type, ['divider', 'spacer', 'honeypot', 'captcha'], true)) {
+		if (bl_blocks_is_static_field_type($type) && !in_array($type, ['heading', 'text_block', 'html'], true)) {
 			continue;
 		}
 		if ($type === 'heading') {
@@ -218,6 +226,12 @@ function bl_blocks_render_admin_fields_walk(array $fields, array $values, string
 		if ($name === '') {
 			continue;
 		}
+
+		if ($type === 'repeater') {
+			bl_blocks_render_admin_repeater($field, $values[$name] ?? [], $name_prefix);
+			continue;
+		}
+
 		$id = 'bl-blocks-field-' . sanitize_html_class($name);
 		$label = (string) ($field['label'] ?? $name);
 		$hide_label = !empty($field['hide_label']);
@@ -382,6 +396,61 @@ function bl_blocks_render_admin_fields_walk(array $fields, array $values, string
 }
 
 /**
+ * Render a repeater control for PHP admin (Website settings).
+ *
+ * @param array<string, mixed>       $field
+ * @param mixed                      $rows
+ */
+function bl_blocks_render_admin_repeater(array $field, $rows, string $name_prefix): void
+{
+	$name = (string) ($field['name'] ?? '');
+	if ($name === '') {
+		return;
+	}
+	$children = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
+	$label = (string) ($field['label'] ?? $name);
+	$button = (string) ($field['button_label'] ?? '');
+	if ($button === '') {
+		$button = __('Add row', 'baselayer-blocks');
+	}
+	$min_rows = max(0, (int) ($field['min_rows'] ?? 0));
+	$max_rows = max(0, (int) ($field['max_rows'] ?? 0));
+	$rows = is_array($rows) ? array_values($rows) : [];
+	while (count($rows) < $min_rows) {
+		$rows[] = [];
+	}
+	if ($max_rows > 0 && count($rows) > $max_rows) {
+		$rows = array_slice($rows, 0, $max_rows);
+	}
+	if ($rows === [] && $min_rows === 0) {
+		// Keep one empty visual row for easier editing when optional.
+		$rows = [[]];
+	}
+
+	$input_base = $name_prefix . '[' . $name . ']';
+	echo '<div class="bl-blocks-fields__repeater" data-bl-blocks-repeater data-min-rows="' . esc_attr((string) $min_rows) . '" data-max-rows="' . esc_attr((string) $max_rows) . '">';
+	if ($label !== '' && empty($field['hide_label'])) {
+		echo '<div class="bl-blocks-fields__label">' . esc_html($label) . '</div>';
+	}
+	$desc = (string) ($field['description'] ?? '');
+	if ($desc !== '') {
+		echo '<p class="description">' . esc_html($desc) . '</p>';
+	}
+	echo '<div class="bl-blocks-fields__repeater-rows">';
+	foreach ($rows as $i => $row_values) {
+		$row_values = is_array($row_values) ? $row_values : [];
+		echo '<div class="bl-blocks-fields__repeater-row">';
+		echo '<div class="bl-blocks-fields__repeater-row-header">';
+		echo '<span class="bl-blocks-fields__repeater-row-title">' . esc_html(sprintf(/* translators: %d: row number */ __('Row %d', 'baselayer-blocks'), $i + 1)) . '</span>';
+		echo '</div>';
+		bl_blocks_render_admin_fields_walk($children, $row_values, $input_base . '[' . $i . ']');
+		echo '</div>';
+	}
+	echo '</div>';
+	echo '</div>';
+}
+
+/**
  * Read values from a request map for a definition.
  *
  * @param list<array<string, mixed>> $fields
@@ -409,10 +478,14 @@ function bl_blocks_enqueue_field_ui_assets(): void
 
 	wp_localize_script('bl-blocks-admin', 'blBlocksFieldUi', [
 		'i18n' => [
-			'edit'   => __('Edit', 'baselayer-blocks'),
-			'save'   => __('Save', 'baselayer-blocks'),
-			'cancel' => __('Cancel', 'baselayer-blocks'),
-			'close'  => __('Close', 'baselayer-blocks'),
+			'edit'        => __('Edit', 'baselayer-blocks'),
+			'save'        => __('Save', 'baselayer-blocks'),
+			'cancel'      => __('Cancel', 'baselayer-blocks'),
+			'close'       => __('Close', 'baselayer-blocks'),
+			'addRow'     => __('Add row', 'baselayer-blocks'),
+			'removeRow'  => __('Remove row', 'baselayer-blocks'),
+			'rowLabel'    => __('Row %d', 'baselayer-blocks'),
+			'repeater'    => __('Repeater', 'baselayer-blocks'),
 		],
 	]);
 }
