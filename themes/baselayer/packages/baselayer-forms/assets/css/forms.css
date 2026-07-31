@@ -174,11 +174,22 @@
   width: min(100%, var(--bl-form-field-width, 100%) - var(--bl-form-gap) * (1 - var(--bl-form-field-width-factor, 1)));
   max-width: 100%;
 }
+.bl-form__field-wrap[hidden] {
+  display: none !important;
+}
 @media (max-width: 600px) {
   .bl-form__field-wrap {
     flex-basis: 100%;
     width: 100% !important;
   }
+}
+
+.bl-form__divider-wrap[hidden],
+.bl-form__spacer-wrap[hidden],
+.bl-form__heading[hidden],
+.bl-form__text[hidden],
+.bl-form__html[hidden] {
+  display: none !important;
 }
 
 .bl-form__honeypot {

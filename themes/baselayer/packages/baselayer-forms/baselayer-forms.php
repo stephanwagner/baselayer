@@ -126,6 +126,7 @@ require_once BL_FORMS_PATH . 'includes/config.php';
 require_once BL_FORMS_PATH . 'includes/captcha.php';
 require_once BL_FORMS_PATH . 'includes/cpt.php';
 require_once BL_FORMS_PATH . 'includes/render.php';
+require_once BL_FORMS_PATH . 'includes/conditional-logic.php';
 require_once BL_FORMS_PATH . 'includes/mail.php';
 require_once BL_FORMS_PATH . 'includes/submit.php';
 require_once BL_FORMS_PATH . 'includes/block.php';

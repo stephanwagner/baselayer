@@ -435,6 +435,172 @@
       });
     });
   }
+  function parseConditionalLogic(raw) {
+    if (!raw) return null;
+    try {
+      const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+      if (!parsed || typeof parsed !== "object" || !parsed.enabled || !Array.isArray(parsed.groups)) {
+        return null;
+      }
+      return parsed.groups.length ? parsed : null;
+    } catch (e) {
+      return null;
+    }
+  }
+  function logicValueIsEmpty(value) {
+    if (Array.isArray(value)) return value.length === 0;
+    return String(value ?? "").trim() === "";
+  }
+  function logicCompare(left, right, operator) {
+    const a = Array.isArray(left) ? "" : String(left ?? "");
+    const b = Array.isArray(right) ? "" : String(right ?? "");
+    if (a === "" || b === "") return false;
+    if (a !== "" && b !== "" && !Number.isNaN(Number(a)) && !Number.isNaN(Number(b))) {
+      const an = Number(a);
+      const bn = Number(b);
+      if (operator === ">") return an > bn;
+      if (operator === "<") return an < bn;
+      if (operator === ">=") return an >= bn;
+      if (operator === "<=") return an <= bn;
+      return false;
+    }
+    const cmp = a < b ? -1 : a > b ? 1 : 0;
+    if (operator === ">") return cmp > 0;
+    if (operator === "<") return cmp < 0;
+    if (operator === ">=") return cmp >= 0;
+    if (operator === "<=") return cmp <= 0;
+    return false;
+  }
+  function logicRulePasses(rule, value) {
+    const operator = String(rule?.operator || "");
+    const expected = String(rule?.value ?? "");
+    const empty = logicValueIsEmpty(value);
+    switch (operator) {
+      case "checked":
+        return !empty && !Array.isArray(value) && String(value) !== "0";
+      case "not_checked":
+        return empty || !Array.isArray(value) && String(value) === "0";
+      case "==empty":
+        return empty;
+      case "!=empty":
+        return !empty;
+      case "==":
+        return Array.isArray(value) ? value.includes(expected) : String(value) === expected;
+      case "!=":
+        return Array.isArray(value) ? !value.includes(expected) : String(value) !== expected;
+      case "contains":
+        return Array.isArray(value) ? value.includes(expected) : expected !== "" && String(value).includes(expected);
+      case "not_contains":
+        return Array.isArray(value) ? !value.includes(expected) : expected === "" || !String(value).includes(expected);
+      case ">":
+      case "<":
+      case ">=":
+      case "<=":
+        return logicCompare(value, expected, operator);
+      default:
+        return false;
+    }
+  }
+  function readLogicSourceValue(form, fieldId) {
+    const safeId = typeof CSS !== "undefined" && typeof CSS.escape === "function" ? CSS.escape(fieldId) : String(fieldId).replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+    const source = form.querySelector(`[data-bl-field-id="${safeId}"]`);
+    if (!source) return "";
+    const fileInput = source.matches("[data-bl-form-file-input]") ? source : source.querySelector("[data-bl-form-file-input]");
+    if (fileInput) {
+      return fileInput.files && fileInput.files.length > 0 ? "1" : "";
+    }
+    const checks = source.querySelectorAll('input[type="checkbox"]');
+    if (checks.length) {
+      if (source.classList.contains("bl-form__field--toggle") || source.classList.contains("bl-form__field--terms")) {
+        return checks[0].checked ? "1" : "";
+      }
+      return Array.from(checks).filter((el) => el.checked).map((el) => el.value || "1");
+    }
+    const radios = source.querySelectorAll('input[type="radio"]');
+    if (radios.length) {
+      const selected = Array.from(radios).find((el) => el.checked);
+      return selected ? selected.value : "";
+    }
+    const select = source.querySelector("select");
+    if (select) {
+      if (select.multiple) {
+        return Array.from(select.selectedOptions).map((opt) => opt.value);
+      }
+      return select.value;
+    }
+    const control = source.matches("input, textarea") ? source : source.querySelector('input.bl-form__control, textarea.bl-form__control, input[type="hidden"]');
+    if (control) {
+      return control.value ?? "";
+    }
+    return "";
+  }
+  function logicConditionsMet(logic, form) {
+    if (!logic || !logic.enabled || !Array.isArray(logic.groups) || !logic.groups.length) {
+      return true;
+    }
+    return logic.groups.some((group) => {
+      if (!Array.isArray(group) || !group.length) return false;
+      return group.every((rule) => {
+        const fieldId = String(rule?.field || "");
+        if (!fieldId) return false;
+        return logicRulePasses(rule, readLogicSourceValue(form, fieldId));
+      });
+    });
+  }
+  function setLogicFieldVisible(wrap, visible) {
+    wrap.hidden = !visible;
+    wrap.setAttribute("aria-hidden", visible ? "false" : "true");
+    wrap.querySelectorAll("input, select, textarea, button").forEach((el) => {
+      if (visible) {
+        if (el.dataset.blLogicDisabled === "1") {
+          el.disabled = false;
+          delete el.dataset.blLogicDisabled;
+        }
+        if (el.dataset.blLogicRequired === "1") {
+          el.required = true;
+          delete el.dataset.blLogicRequired;
+        }
+      } else {
+        if (el.required) {
+          el.dataset.blLogicRequired = "1";
+          el.required = false;
+        }
+        if (!el.disabled) {
+          el.dataset.blLogicDisabled = "1";
+          el.disabled = true;
+        }
+      }
+    });
+  }
+  function initConditionalLogic(root) {
+    const form = root.querySelector("[data-bl-form-el]");
+    if (!form) return () => {
+    };
+    const targets = Array.from(form.querySelectorAll("[data-bl-conditional-logic]"));
+    if (!targets.length) return () => {
+    };
+    const evaluate = () => {
+      targets.forEach((wrap) => {
+        if (!wrap.isConnected) return;
+        const logic = parseConditionalLogic(wrap.getAttribute("data-bl-conditional-logic"));
+        const visible = logicConditionsMet(logic, form);
+        setLogicFieldVisible(wrap, visible);
+        if (!visible) {
+          wrap.classList.remove("is-invalid");
+          wrap.removeAttribute("aria-invalid");
+          const err = wrap.querySelector("[data-bl-form-field-error]");
+          if (err) {
+            err.hidden = true;
+            err.textContent = "";
+          }
+        }
+      });
+    };
+    form.addEventListener("input", evaluate);
+    form.addEventListener("change", evaluate);
+    evaluate();
+    return evaluate;
+  }
   function initForm(root) {
     const form = root.querySelector("[data-bl-form-el]");
     const message = root.querySelector("[data-bl-form-message]");
@@ -445,6 +611,7 @@
     initFileUploads(root);
     initClassicFileLimits(root);
     initCharCounters(root);
+    const evaluateLogic = initConditionalLogic(root);
     const progress = createProgressController(root);
     const jsField = form.querySelector("[data-bl-form-js-field]");
     const jsToken = root.dataset.blFormJs || "";
@@ -586,6 +753,7 @@
       });
       resetCaptchas();
       clearInvalid();
+      evaluateLogic();
       const fields = root.querySelector(".bl-form__fields");
       if (fields) fields.hidden = false;
       submit.hidden = false;

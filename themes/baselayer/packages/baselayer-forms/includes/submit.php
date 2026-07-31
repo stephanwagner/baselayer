@@ -437,6 +437,22 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 		$raw_value = $raw[$name] ?? null;
 		$multiple = !empty($field['multiple']);
 
+		// Conditionally hidden fields are not required and contribute empty values.
+		if (!bl_forms_field_conditions_met($field, $fields, $raw, $files)) {
+			if (in_array($type, ['file', 'image'], true)) {
+				$values[$name] = [];
+			} elseif (
+				$type === 'checkboxes'
+				|| ($type === 'button_group' && $multiple)
+				|| ($type === 'select' && $multiple)
+			) {
+				$values[$name] = [];
+			} else {
+				$values[$name] = '';
+			}
+			continue;
+		}
+
 		// Disabled controls are not posted — use configured defaults and skip required checks.
 		if (!empty($field['disabled'])) {
 			if (in_array($type, ['file', 'image'], true)) {
