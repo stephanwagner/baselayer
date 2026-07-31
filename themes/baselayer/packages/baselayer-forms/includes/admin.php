@@ -393,7 +393,7 @@ function bl_forms_admin_enqueue(string $hook): void
 				'sectionDesignCard' => __('Card', 'baselayer-forms'),
 				'sectionType'       => __('Section', 'baselayer-forms'),
 				'sectionLabel'      => __('Section title', 'baselayer-forms'),
-				'sectionLabelPlaceholder' => __('Section title', 'baselayer-forms'),
+				'sectionLabelPlaceholder' => __('No title', 'baselayer-forms'),
 				'sectionEmpty'      => __('Drop fields here', 'baselayer-forms'),
 				'widthAuto'         => __('Auto', 'baselayer-forms'),
 				'cancel'            => __('Cancel', 'baselayer-forms'),

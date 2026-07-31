@@ -1,5 +1,4 @@
-import Sortable from 'sortablejs';
-import { el, t, uid, iconEl, defaultField, uniqueFieldName, formsDragStart, formsDragEnd } from './dom.js';
+import { el, t, uid, iconEl, defaultField, uniqueFieldName } from './dom.js';
 import { createFieldCard, serializeRow, openFieldWidthModal, openSectionDesignModal } from './field-card.js';
 
 /** Types that cannot be nested inside columns or sections. */
@@ -10,6 +9,19 @@ const columnFieldByEl = new WeakMap();
 
 /** Live section field objects keyed by card element. */
 const sectionFieldByEl = new WeakMap();
+
+/**
+ * Use the canvas-builder Sortable instance so nested lists share the same group
+ * registry as the root canvas (separate Sortable bundles cannot cross-drag).
+ */
+function createNestedSortable(list, options) {
+  const Builder = window.BlCanvasBuilder;
+  if (!Builder || typeof Builder.createSortable !== 'function') {
+    console.error('BlCanvasBuilder.createSortable is required for nested field lists');
+    return null;
+  }
+  return Builder.createSortable(list, options);
+}
 
 function prepareNestedField(typeOrData) {
   const data = typeof typeOrData === 'string' ? defaultField(typeOrData) : { ...typeOrData };
@@ -25,7 +37,11 @@ function prepareNestedField(typeOrData) {
 }
 
 function bindFieldListSortable(list, onChange) {
-  Sortable.create(list, {
+  const Builder = window.BlCanvasBuilder;
+  const onStart = Builder?.dragStart || (() => {});
+  const onEnd = Builder?.dragEnd || (() => {});
+
+  createNestedSortable(list, {
     group: {
       name: 'bl-forms-fields',
       put(to, from, dragEl) {
@@ -36,8 +52,8 @@ function bindFieldListSortable(list, onChange) {
     handle: '.bl-forms-builder__handle',
     animation: 150,
     draggable: '.bl-forms-builder__field, .bl-forms-builder__template',
-    onStart: formsDragStart,
-    onEnd: formsDragEnd,
+    onStart,
+    onEnd,
     onAdd(evt) {
       const item = evt.item;
       const type = item.dataset.fieldType || 'text';
@@ -286,9 +302,6 @@ export function createSectionCard(initial = {}) {
     id: initial.id || uid(),
     type: 'section',
   };
-  if (!field.label) {
-    field.label = (window.blFormsAdmin?.i18n?.types?.section) || t('sectionType', 'Section');
-  }
   if (!['standard', 'outline', 'card'].includes(field.design)) {
     field.design = 'standard';
   }
@@ -312,7 +325,7 @@ export function createSectionCard(initial = {}) {
     type: 'text',
     className: 'bl-forms-builder__section-label-input',
     value: field.label || '',
-    placeholder: t('sectionLabelPlaceholder', 'Section title'),
+    placeholder: t('sectionLabelPlaceholder', 'No title'),
     'aria-label': t('sectionLabel', 'Section title'),
   });
   labelInput.addEventListener('input', () => {

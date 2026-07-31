@@ -1031,7 +1031,8 @@ function bl_forms_sanitize_css_class(string $raw): string
 /**
  * Sanitize a single CSS length for inline styles (blocks injection).
  *
- * Allows: 24px, 1.5rem, 50%, 10vw, auto. Rejects ; } url( etc.
+ * Allows: 24px, 1.5rem, 50%, 10vw, auto, or a bare number (treated as px).
+ * Rejects ; } url( etc.
  */
 function bl_forms_sanitize_css_length(string $raw, string $fallback = ''): string
 {
@@ -1041,6 +1042,10 @@ function bl_forms_sanitize_css_length(string $raw, string $fallback = ''): strin
 	}
 	if (strcasecmp($value, 'auto') === 0) {
 		return 'auto';
+	}
+	// Unitless number → px (e.g. "4" → "4px").
+	if (preg_match('/^(-?\d+(?:\.\d+)?)$/', $value)) {
+		return $value . 'px';
 	}
 	if (preg_match('/^(-?\d+(?:\.\d+)?)(px|rem|em|%|vh|vw|vmin|vmax|ch|ex)$/i', $value)) {
 		return $value;
@@ -1330,7 +1335,7 @@ function bl_forms_sanitize_field($field): ?array
 		$raw = sanitize_key((string) ($field['margin'] ?? 'm'));
 		$legacy = trim((string) ($field['margin'] ?? ''));
 		if ($raw === '' || !in_array($raw, $presets, true)) {
-			if ($legacy !== '' && preg_match('/^(-?\d+(?:\.\d+)?)(px|rem|em|%|vh|vw|vmin|vmax|ch|ex)$/i', $legacy)) {
+			if ($legacy !== '' && preg_match('/^(-?\d+(?:\.\d+)?)(px|rem|em|%|vh|vw|vmin|vmax|ch|ex)?$/i', $legacy)) {
 				$out['margin'] = 'custom';
 				$out['margin_custom'] = bl_forms_sanitize_css_length($legacy, '24px');
 			} else {
@@ -1381,7 +1386,7 @@ function bl_forms_sanitize_field($field): ?array
 		// Legacy free-form CSS lengths → custom.
 		$legacy = trim((string) ($field['height'] ?? ''));
 		if ($raw === '' || !in_array($raw, $presets, true)) {
-			if ($legacy !== '' && preg_match('/^(-?\d+(?:\.\d+)?)(px|rem|em|%|vh|vw|vmin|vmax|ch|ex)$/i', $legacy)) {
+			if ($legacy !== '' && preg_match('/^(-?\d+(?:\.\d+)?)(px|rem|em|%|vh|vw|vmin|vmax|ch|ex)?$/i', $legacy)) {
 				$out['height'] = 'custom';
 				$out['height_custom'] = bl_forms_sanitize_css_length($legacy, '24px');
 			} else {
