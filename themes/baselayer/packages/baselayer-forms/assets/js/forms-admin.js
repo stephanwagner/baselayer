@@ -2529,240 +2529,6 @@
   Sortable.mount(Remove, Revert);
   var sortable_esm_default = Sortable;
 
-  // themes/baselayer/packages/baselayer-forms/src/js/admin/palette.js
-  function paletteIcon(type) {
-    const icons = window.blFormsAdmin && window.blFormsAdmin.icons || {};
-    const markup = icons[type] || "";
-    const wrap = el("span", {
-      className: "bl-forms-builder__template-icon",
-      "aria-hidden": "true"
-    });
-    if (markup) {
-      wrap.innerHTML = markup;
-    }
-    return wrap;
-  }
-  function paletteAddButton(type, onAdd) {
-    const icons = window.blFormsAdmin && window.blFormsAdmin.icons || {};
-    const markup = icons.add || "";
-    const btn = el("button", {
-      type: "button",
-      className: "bl-forms-builder__template-add",
-      title: t("paletteAdd", "Add field"),
-      "aria-label": t("paletteAdd", "Add field"),
-      onClick: (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        onAdd(type);
-      }
-    });
-    const stopSortable = (event) => {
-      event.stopPropagation();
-    };
-    btn.addEventListener("pointerdown", stopSortable);
-    btn.addEventListener("mousedown", stopSortable);
-    if (markup) {
-      btn.innerHTML = markup;
-    } else {
-      btn.textContent = "\u203A";
-    }
-    return btn;
-  }
-  function createPalette(onAdd) {
-    const wrap = el("aside", { className: "bl-forms-builder__palette" });
-    const bodyId = "bl-forms-palette-body";
-    const search = el("input", {
-      type: "search",
-      className: "bl-forms-builder__palette-search",
-      placeholder: t("paletteSearch", "Search fields\u2026"),
-      "aria-label": t("paletteSearch", "Search fields\u2026"),
-      autocomplete: "off"
-    });
-    const collapseBtn = el("button", {
-      type: "button",
-      className: "bl-forms-builder__palette-collapse",
-      "aria-expanded": "true",
-      "aria-controls": bodyId,
-      title: t("paletteHide", "Hide field templates"),
-      "aria-label": t("paletteHide", "Hide field templates")
-    });
-    const collapseIcon = el("span", {
-      className: "bl-forms-builder__palette-collapse-icon",
-      "aria-hidden": "true"
-    });
-    collapseBtn.appendChild(collapseIcon);
-    const toolbar = el("div", { className: "bl-forms-builder__palette-toolbar" }, [
-      search,
-      collapseBtn
-    ]);
-    wrap.appendChild(toolbar);
-    const body = el("div", {
-      id: bodyId,
-      className: "bl-forms-builder__palette-body"
-    });
-    wrap.appendChild(body);
-    const empty = el("p", {
-      className: "description bl-forms-builder__palette-empty",
-      text: t("paletteSearchEmpty", "No fields match your search."),
-      hidden: true
-    });
-    body.appendChild(empty);
-    const sections = [];
-    let openId = PALETTE_SECTIONS[0]?.id || "";
-    let collapsed = false;
-    const syncCollapseUi = () => {
-      wrap.classList.toggle("is-collapsed", collapsed);
-      collapseBtn.setAttribute("aria-expanded", collapsed ? "false" : "true");
-      const label = collapsed ? t("paletteShow", "Show field templates") : t("paletteHide", "Hide field templates");
-      collapseBtn.title = label;
-      collapseBtn.setAttribute("aria-label", label);
-      const icons = window.blFormsAdmin && window.blFormsAdmin.icons || {};
-      const markup = collapsed ? icons.panelExpand || icons.panelCollapse || "" : icons.panelCollapse || icons.panelExpand || "";
-      if (markup) {
-        collapseIcon.innerHTML = markup;
-      } else {
-        collapseIcon.textContent = collapsed ? "\u203A" : "\u2039";
-      }
-    };
-    collapseBtn.addEventListener("click", () => {
-      collapsed = !collapsed;
-      syncCollapseUi();
-    });
-    syncCollapseUi();
-    const setOpen = (nextId) => {
-      openId = nextId;
-      sections.forEach(({ sectionEl, toggle, panel, id }) => {
-        const open = openId !== "" && id === openId;
-        sectionEl.classList.toggle("is-open", open);
-        toggle.setAttribute("aria-expanded", open ? "true" : "false");
-        panel.hidden = !open;
-      });
-    };
-    const applySearch = () => {
-      const query = search.value.trim().toLowerCase();
-      const searching = query !== "";
-      let totalVisible = 0;
-      if (searching && collapsed) {
-        collapsed = false;
-        syncCollapseUi();
-      }
-      sections.forEach(({ sectionEl, toggle, panel, list, id }) => {
-        if (searching && id === "popular") {
-          sectionEl.hidden = true;
-          sectionEl.classList.remove("is-open");
-          toggle.setAttribute("aria-expanded", "false");
-          panel.hidden = true;
-          list.querySelectorAll(".bl-forms-builder__template").forEach((item) => {
-            item.hidden = true;
-          });
-          return;
-        }
-        let sectionVisible = 0;
-        list.querySelectorAll(".bl-forms-builder__template").forEach((item) => {
-          const type = item.dataset.fieldType || "";
-          const label = (item.querySelector(".bl-forms-builder__template-label")?.textContent || "").toLowerCase();
-          const match = !searching || label.includes(query) || type.toLowerCase().includes(query);
-          item.hidden = !match;
-          if (match) {
-            sectionVisible += 1;
-          }
-        });
-        const showSection = !searching || sectionVisible > 0;
-        sectionEl.hidden = !showSection;
-        totalVisible += sectionVisible;
-        if (searching) {
-          const open = sectionVisible > 0;
-          sectionEl.classList.toggle("is-open", open);
-          toggle.setAttribute("aria-expanded", open ? "true" : "false");
-          panel.hidden = !open;
-        }
-      });
-      if (!searching) {
-        setOpen(openId);
-      }
-      empty.hidden = !searching || totalVisible > 0;
-    };
-    search.addEventListener("input", applySearch);
-    PALETTE_SECTIONS.forEach((section, index2) => {
-      const panelId = "bl-forms-palette-" + section.id;
-      const sectionEl = el("div", {
-        className: "bl-forms-builder__palette-section" + (index2 === 0 ? " is-open" : ""),
-        dataset: { blFormsPaletteSection: section.id }
-      });
-      const toggle = el("button", {
-        type: "button",
-        className: "bl-forms-builder__palette-section-toggle",
-        "aria-expanded": index2 === 0 ? "true" : "false",
-        "aria-controls": panelId,
-        onClick: () => {
-          if (search.value.trim() !== "") {
-            return;
-          }
-          const isOpen = sectionEl.classList.contains("is-open");
-          setOpen(isOpen ? "" : section.id);
-        }
-      });
-      const chevron = iconEl("caret", "bl-forms-builder__palette-section-chevron");
-      if (!chevron.innerHTML) {
-        chevron.textContent = "\u25BE";
-      }
-      toggle.append(
-        el("span", {
-          className: "bl-forms-builder__palette-section-title",
-          text: t(section.headingKey, section.headingFallback)
-        }),
-        chevron
-      );
-      const panel = el("div", {
-        id: panelId,
-        className: "bl-forms-builder__palette-panel",
-        role: "region"
-      });
-      panel.hidden = index2 !== 0;
-      const list = el("div", {
-        className: "bl-forms-builder__palette-list",
-        dataset: { blFormsPalette: section.id }
-      });
-      section.types.forEach((type) => {
-        list.appendChild(
-          el(
-            "div",
-            {
-              className: "bl-forms-builder__template",
-              dataset: { fieldType: type },
-              onClick: () => onAdd(type)
-            },
-            [
-              paletteIcon(type),
-              el("span", { className: "bl-forms-builder__template-label", text: typeLabel(type) }),
-              paletteAddButton(type, onAdd)
-            ]
-          )
-        );
-      });
-      panel.appendChild(list);
-      sectionEl.append(toggle, panel);
-      body.appendChild(sectionEl);
-      sections.push({ id: section.id, sectionEl, toggle, panel, list });
-      sortable_esm_default.create(list, {
-        group: { name: "bl-forms-fields", pull: "clone", put: false },
-        sort: false,
-        animation: 150,
-        draggable: ".bl-forms-builder__template",
-        filter: ".bl-forms-builder__template-add",
-        // false: allow the › button click; drag is blocked via filter + stopPropagation.
-        preventOnFilter: false,
-        onStart() {
-          formsDragStart();
-        },
-        onEnd() {
-          formsDragEnd();
-        }
-      });
-    });
-    return wrap;
-  }
-
   // themes/baselayer/packages/baselayer-forms/src/js/admin/layout.js
   var NESTED_BLOCKED = ["column", "section", "hidden", "honeypot", "captcha"];
   var columnFieldByEl = /* @__PURE__ */ new WeakMap();
@@ -5842,112 +5608,6 @@
     return row;
   }
 
-  // themes/baselayer/packages/baselayer-forms/src/js/admin/canvas.js
-  function expandLegacyGroups(fields) {
-    const out = [];
-    (fields || []).forEach((field) => {
-      if ((field?.type || "") === "group") {
-        (field.children || []).forEach((child) => {
-          if ((child?.type || "") === "column") {
-            out.push(child);
-          }
-        });
-        return;
-      }
-      out.push(field);
-    });
-    return out;
-  }
-  function createCanvas({ fields = [], onChange }) {
-    const wrap = el("section", { className: "bl-forms-builder__canvas" });
-    wrap.appendChild(el("h3", { className: "bl-forms-builder__col-title", text: t("canvasHeading", "Form") }));
-    const list = el("div", {
-      className: "bl-forms-builder__list",
-      dataset: { blFormsCanvas: "1" }
-    });
-    const empty = el("div", {
-      className: "description bl-forms-builder__empty",
-      text: t("empty", "Drag a field here, or click a template to add it.")
-    });
-    const syncEmpty = () => {
-      empty.hidden = list.querySelector(":scope > [data-bl-forms-field]") != null;
-    };
-    const prepareField = (typeOrData) => {
-      const data = typeof typeOrData === "string" ? defaultField(typeOrData) : { ...typeOrData };
-      if (data.name != null && data.name_manual === false) {
-        data.name = uniqueFieldName(data.label || data.name || data.type || "field", data.id || "");
-      } else if (data.name) {
-        data.name = uniqueFieldName(data.name, data.id || "");
-      }
-      return data;
-    };
-    const addField = (typeOrData, open = true) => {
-      const card = createFieldCard(prepareField(typeOrData), open);
-      list.appendChild(card);
-      if ((card.dataset.fieldType || "") === "column") {
-        equalizeColumnRun(list, card);
-      }
-      syncEmpty();
-      onChange();
-      return card;
-    };
-    expandLegacyGroups(fields || []).forEach((field) => {
-      list.appendChild(createFieldCard(field, false));
-    });
-    syncEmpty();
-    wrap.append(list, empty);
-    sortable_esm_default.create(list, {
-      group: {
-        name: "bl-forms-fields",
-        put(to, from, dragEl2) {
-          return true;
-        }
-      },
-      handle: ".bl-forms-builder__handle",
-      animation: 150,
-      draggable: ".bl-forms-builder__field, .bl-forms-builder__template",
-      onStart: formsDragStart,
-      onEnd: formsDragEnd,
-      onAdd(evt) {
-        const item = evt.item;
-        const type = item.dataset.fieldType || "text";
-        let card = item;
-        if (item.classList.contains("bl-forms-builder__template")) {
-          card = createFieldCard(prepareField(type), true);
-          item.replaceWith(card);
-        }
-        if ((card.dataset.fieldType || "") === "column") {
-          equalizeColumnRun(list, card);
-        }
-        syncEmpty();
-        onChange();
-      },
-      onUpdate() {
-        onChange();
-      },
-      onSort() {
-        onChange();
-      }
-    });
-    const replaceFields = (nextFields = []) => {
-      list.replaceChildren();
-      expandLegacyGroups(nextFields || []).forEach((field) => {
-        list.appendChild(createFieldCard(field, false));
-      });
-      syncEmpty();
-      onChange();
-    };
-    return {
-      root: wrap,
-      addField,
-      replaceFields,
-      syncEmpty,
-      getFields() {
-        return Array.from(list.children).filter((el2) => el2.matches?.("[data-bl-forms-field]")).map(serializeRow);
-      }
-    };
-  }
-
   // themes/baselayer/packages/baselayer-forms/src/js/admin/page-picker.js
   function openPagePicker(options = {}) {
     const opts = {
@@ -7411,26 +7071,40 @@
   }
 
   // themes/baselayer/packages/baselayer-forms/src/js/admin/app.js
+  function expandLegacyGroups(fields) {
+    const out = [];
+    (fields || []).forEach((field) => {
+      if ((field?.type || "") === "group") {
+        (field.children || []).forEach((child) => {
+          if ((child?.type || "") === "column") {
+            out.push(child);
+          }
+        });
+        return;
+      }
+      out.push(field);
+    });
+    return out;
+  }
   function mountApp(root, initial) {
+    const Builder = window.BlCanvasBuilder;
+    if (!Builder || typeof Builder.mount !== "function") {
+      root.textContent = "Canvas builder failed to load.";
+      return;
+    }
     root.replaceChildren();
-    root.classList.add("bl-forms-builder", "bl-forms-builder--tabs");
+    root.classList.add("bl-forms-builder--tabs");
     let settingsState = { ...initial.settings || {} };
+    let builderApi = null;
     const syncAll = () => {
-      const fields = canvas.getFields();
+      const fields = builderApi ? builderApi.getFields() : [];
       panels.syncFields(fields);
       writeConfig({
         fields,
         settings: panels.getSettings()
       });
-      canvas.syncEmpty();
+      builderApi?.canvas?.syncEmpty?.();
     };
-    const canvas = createCanvas({
-      fields: initial.fields || [],
-      onChange: syncAll
-    });
-    const palette = createPalette((type) => {
-      canvas.addField(type, true);
-    });
     const panels = createPanels(settingsState, root, (next) => {
       settingsState = next;
       syncAll();
@@ -7439,11 +7113,55 @@
       className: "bl-forms-builder__panel is-active",
       dataset: { blFormsPanel: "fields" }
     });
-    const fieldsLayout = el("div", { className: "bl-forms-builder__fields-layout" }, [
-      palette,
-      canvas.root
-    ]);
-    fieldsPanel.appendChild(fieldsLayout);
+    const prepareField = (typeOrData) => {
+      const data = typeof typeOrData === "string" ? defaultField(typeOrData) : { ...typeOrData };
+      if (data.name != null && data.name_manual === false) {
+        data.name = uniqueFieldName(data.label || data.name || data.type || "field", data.id || "");
+      } else if (data.name) {
+        data.name = uniqueFieldName(data.name, data.id || "");
+      }
+      return data;
+    };
+    builderApi = Builder.mount(fieldsPanel, {
+      replaceRoot: false,
+      // Keep a single .bl-forms-builder on the outer shell; ns only prefixes children.
+      addRootClass: false,
+      ns: "bl-forms-builder",
+      groupName: "bl-forms-fields",
+      items: initial.fields || [],
+      sections: PALETTE_SECTIONS,
+      heading: t("canvasHeading", "Form"),
+      emptyText: t("empty", "Drag a field here, or click a template to add it."),
+      handleSelector: ".bl-forms-builder__handle",
+      draggableSelector: ".bl-forms-builder__field, .bl-forms-builder__template",
+      templateClass: "bl-forms-builder__template",
+      itemAttr: "data-bl-forms-field",
+      icons: window.blFormsAdmin && window.blFormsAdmin.icons || {},
+      t,
+      typeLabel: (type) => {
+        const dict = window.blFormsAdmin && window.blFormsAdmin.i18n || {};
+        return dict.types && dict.types[type] || type;
+      },
+      normalizeItems: expandLegacyGroups,
+      prepareItem: prepareField,
+      createItem: (data, open) => createFieldCard(data, open),
+      serializeItem: serializeRow,
+      onItemMounted: (card, list) => {
+        if ((card.dataset.fieldType || "") === "column") {
+          equalizeColumnRun(list, card);
+        }
+      },
+      onChange: () => {
+        syncAll();
+      }
+    });
+    const canvas = {
+      root: builderApi.canvas.root,
+      addField: (...args) => builderApi.addField(...args),
+      replaceFields: (...args) => builderApi.setFields(...args),
+      getFields: () => builderApi.getFields(),
+      syncEmpty: () => builderApi.canvas.syncEmpty()
+    };
     const tabBar = el("nav", { className: "bl-forms-builder__tabs", role: "tablist" });
     const tabs = [
       { id: "fields", label: t("tabFields", "Fields"), panel: fieldsPanel },

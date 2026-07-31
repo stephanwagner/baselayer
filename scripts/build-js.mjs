@@ -8,6 +8,7 @@ const { themeDir } = require('./config.cjs');
 const formsPkg = 'themes/baselayer/packages/baselayer-forms';
 const eventsPkg = 'themes/baselayer/packages/baselayer-events';
 const editorialPkg = 'themes/baselayer/packages/baselayer-editorial';
+const blocksPkg = 'themes/baselayer/packages/baselayer-blocks';
 
 const themeBundles = [
   { input: `${themeDir}/src/js/main/main.js`, name: 'baselayer', outDir: `${themeDir}/assets/js` },
@@ -37,6 +38,11 @@ const themeBundles = [
   {
     input: `${themeDir}/src/js/admin/field-builder/admin-pages.js`,
     name: 'field-builder-admin',
+    outDir: `${themeDir}/assets/js`
+  },
+  {
+    input: `${themeDir}/src/js/admin/canvas-builder/index.js`,
+    name: 'canvas-builder-admin',
     outDir: `${themeDir}/assets/js`
   },
   {
@@ -149,6 +155,42 @@ async function vendorFieldBuilderToEvents() {
   }
 }
 
+/**
+ * Snapshot canvas-builder kit into Forms + Blocks for standalone plugin use.
+ */
+async function vendorCanvasBuilderToPackages() {
+  const fs = await import('node:fs/promises');
+  const themeAssetsJs = path.join(themeDir, 'assets/js');
+  const themeAssetsCss = path.join(themeDir, 'assets/css');
+  const targets = [
+    path.join(formsPkg, 'assets/vendor/canvas-builder'),
+    path.join(blocksPkg, 'assets/vendor/canvas-builder'),
+  ];
+
+  const files = [
+    ['js', 'canvas-builder-admin.js'],
+    ['js', 'canvas-builder-admin.min.js'],
+    ['css', 'canvas-builder-admin.css'],
+    ['css', 'canvas-builder-admin.min.css'],
+  ];
+
+  for (const vendorDir of targets) {
+    await fs.mkdir(vendorDir, { recursive: true });
+    for (const [kind, name] of files) {
+      const src = path.join(kind === 'js' ? themeAssetsJs : themeAssetsCss, name);
+      try {
+        await fs.copyFile(src, path.join(vendorDir, name));
+        console.log(`Vendored ${name} → ${vendorDir}/`);
+      } catch {
+        // ignore missing when filtered builds skip CSS/JS
+      }
+    }
+  }
+
+  // Remove legacy Forms vendor path if present.
+  await fs.rm(path.join(formsPkg, 'assets/vendor/builder'), { recursive: true, force: true });
+}
+
 async function watch() {
   console.log('Watching JavaScript (development)...');
   const contexts = await Promise.all(
@@ -166,5 +208,8 @@ if (watchMode) {
   const filter = parseFilter();
   if (!filter || filter.has('field-builder-admin')) {
     await vendorFieldBuilderToEvents();
+  }
+  if (!filter || filter.has('canvas-builder-admin') || filter.has('forms-admin')) {
+    await vendorCanvasBuilderToPackages();
   }
 }

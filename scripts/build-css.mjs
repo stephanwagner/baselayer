@@ -11,6 +11,7 @@ const root = path.join(__dirname, '..');
 const formsPkg = 'themes/baselayer/packages/baselayer-forms';
 const eventsPkg = 'themes/baselayer/packages/baselayer-events';
 const editorialPkg = 'themes/baselayer/packages/baselayer-editorial';
+const blocksPkg = 'themes/baselayer/packages/baselayer-blocks';
 const sassBin = path.join(root, 'node_modules/.bin/sass');
 const chokidarBin = path.join(root, 'node_modules/.bin/chokidar');
 const sassLoadPathArgs = ['--load-path', path.join(root, 'node_modules')];
@@ -22,6 +23,11 @@ const entries = [
   {
     src: `${themeDir}/src/scss/field-builder-admin.scss`,
     name: 'field-builder-admin',
+    outDir: `${themeDir}/assets/css`
+  },
+  {
+    src: `${themeDir}/src/scss/canvas-builder-admin.scss`,
+    name: 'canvas-builder-admin',
     outDir: `${themeDir}/assets/css`
   },
   { src: `${formsPkg}/src/scss/forms.scss`, name: 'forms', outDir: `${formsPkg}/assets/css` },
@@ -164,6 +170,30 @@ async function vendorFieldBuilderCss() {
   }
 }
 
+/**
+ * Snapshot canvas-builder CSS into Forms + Blocks vendor folders.
+ */
+async function vendorCanvasBuilderCss() {
+  const fs = await import('node:fs/promises');
+  const targets = [
+    path.join(formsPkg, 'assets/vendor/canvas-builder'),
+    path.join(blocksPkg, 'assets/vendor/canvas-builder'),
+  ];
+  for (const vendorDir of targets) {
+    await fs.mkdir(vendorDir, { recursive: true });
+    for (const name of ['canvas-builder-admin.css', 'canvas-builder-admin.min.css']) {
+      const src = path.join(themeDir, 'assets/css', name);
+      try {
+        await fs.copyFile(src, path.join(vendorDir, name));
+        console.log(`Vendored ${name} → ${vendorDir}/`);
+      } catch {
+        // ignore missing
+      }
+    }
+  }
+  await fs.rm(path.join(formsPkg, 'assets/vendor/builder'), { recursive: true, force: true });
+}
+
 const watchMode = process.argv.includes('--watch');
 
 if (watchMode) {
@@ -173,5 +203,8 @@ if (watchMode) {
   const filter = parseFilter();
   if (!filter || filter.has('field-builder-admin')) {
     await vendorFieldBuilderCss();
+  }
+  if (!filter || filter.has('canvas-builder-admin') || filter.has('forms-admin')) {
+    await vendorCanvasBuilderCss();
   }
 }

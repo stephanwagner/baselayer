@@ -1,0 +1,70 @@
+/**
+ * Shared canvas builder chrome.
+ * Consumers (Forms) typically keep their own BEM under bl-forms-builder__*;
+ * this sheet covers the neutral .bl-builder namespace for future editors.
+ */
+.bl-builder {
+  --bl-builder-border: #dcdcde;
+  --bl-builder-muted: #646970;
+  --bl-builder-surface: #f6f7f7;
+  --bl-builder-radius: 4px;
+}
+
+.bl-builder__fields-layout {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  min-height: 420px;
+}
+
+.bl-builder__palette,
+.bl-builder__canvas {
+  background: #fff;
+  border: 1px solid var(--bl-builder-border);
+  border-radius: var(--bl-builder-radius);
+  padding: 12px;
+}
+
+.bl-builder__col-title {
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.bl-builder__list {
+  min-height: 120px;
+}
+
+.bl-builder__empty {
+  margin: 12px 0 0;
+}
+
+.bl-builder__template {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border: 1px solid var(--bl-builder-border);
+  border-radius: var(--bl-builder-radius);
+  margin-bottom: 6px;
+  cursor: grab;
+  background: var(--bl-builder-surface);
+}
+
+.bl-builder__palette-toolbar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.bl-builder__palette-search {
+  flex: 1;
+  min-width: 0;
+}
+
+.bl-builder__palette.is-collapsed .bl-builder__palette-body {
+  display: none;
+}
+
+/*# sourceMappingURL=canvas-builder-admin.css.map */

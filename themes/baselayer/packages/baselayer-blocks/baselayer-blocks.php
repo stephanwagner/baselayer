@@ -181,16 +181,54 @@ function bl_blocks_enqueue_script(string $handle, string $name, array $deps = []
 	return true;
 }
 
-require_once BL_BLOCKS_PATH . 'includes/sanitize.php';
-require_once BL_BLOCKS_PATH . 'includes/schema.php';
-require_once BL_BLOCKS_PATH . 'includes/repository.php';
+/**
+ * Enqueue shared canvas-builder kit (theme helper, else Blocks vendor copy).
+ * Ready for the CPT edit UI; unused until that screen mounts BlCanvasBuilder.
+ */
+function bl_blocks_enqueue_canvas_builder_kit(): string
+{
+	$args = [
+		'vendor_dir' => bl_blocks_path('assets/vendor/canvas-builder'),
+		'vendor_url' => bl_blocks_url('assets/vendor/canvas-builder'),
+	];
+
+	if (function_exists('bl_canvas_builder_enqueue_kit')) {
+		return bl_canvas_builder_enqueue_kit($args);
+	}
+
+	$handle = 'baselayer-canvas-builder-admin';
+	$debug = function_exists('bl_is_debug') && bl_is_debug();
+	$base = $args['vendor_dir'];
+	$uri = $args['vendor_url'];
+	$enqueued = false;
+	$name = 'canvas-builder-admin';
+
+	foreach (['css', 'js'] as $type) {
+		$candidates = $debug
+			? [$name . '.' . $type, $name . '.min.' . $type]
+			: [$name . '.min.' . $type, $name . '.' . $type];
+		foreach ($candidates as $file) {
+			$path = trailingslashit($base) . $file;
+			if (!is_readable($path)) {
+				continue;
+			}
+			$url = trailingslashit($uri) . $file;
+			$ver = $debug ? (string) time() : (string) filemtime($path);
+			if ($type === 'css') {
+				wp_enqueue_style($handle, $url, [], $ver);
+			} else {
+				wp_enqueue_script($handle, $url, [], $ver, true);
+			}
+			$enqueued = true;
+			break;
+		}
+	}
+
+	return $enqueued ? $handle : '';
+}
 
 if (is_admin()) {
 	require_once BL_BLOCKS_PATH . 'includes/admin.php';
-}
-
-if (bl_blocks_loaded_as_plugin()) {
-	register_activation_hook(BL_BLOCKS_FILE, 'bl_blocks_install_schema');
 }
 
 /**

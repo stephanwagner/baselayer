@@ -235,6 +235,52 @@ function bl_forms_palette_icons(): array
 }
 
 /**
+ * Enqueue shared canvas-builder kit (theme helper, else Forms vendor copy).
+ */
+function bl_forms_enqueue_builder_kit(): string
+{
+	$args = [
+		'vendor_dir' => bl_forms_path('assets/vendor/canvas-builder'),
+		'vendor_url' => bl_forms_url('assets/vendor/canvas-builder'),
+	];
+
+	if (function_exists('bl_canvas_builder_enqueue_kit')) {
+		return bl_canvas_builder_enqueue_kit($args);
+	}
+
+	// Plugin-only fallback when theme helper is unavailable.
+	$handle = 'baselayer-canvas-builder-admin';
+	$debug = function_exists('bl_is_debug') && bl_is_debug();
+	$base = $args['vendor_dir'];
+	$uri = $args['vendor_url'];
+	$enqueued = false;
+	$name = 'canvas-builder-admin';
+
+	foreach (['css', 'js'] as $type) {
+		$candidates = $debug
+			? [$name . '.' . $type, $name . '.min.' . $type]
+			: [$name . '.min.' . $type, $name . '.' . $type];
+		foreach ($candidates as $file) {
+			$path = trailingslashit($base) . $file;
+			if (!is_readable($path)) {
+				continue;
+			}
+			$url = trailingslashit($uri) . $file;
+			$ver = $debug ? (string) time() : (string) filemtime($path);
+			if ($type === 'css') {
+				wp_enqueue_style($handle, $url, [], $ver);
+			} else {
+				wp_enqueue_script($handle, $url, [], $ver, true);
+			}
+			$enqueued = true;
+			break;
+		}
+	}
+
+	return $enqueued ? $handle : '';
+}
+
+/**
  * Enqueue builder assets on form edit screens.
  */
 function bl_forms_admin_enqueue(string $hook): void
@@ -276,7 +322,9 @@ function bl_forms_admin_enqueue(string $hook): void
 	}
 
 	if ($is_form_edit && bl_forms_user_can_manage()) {
-		bl_forms_enqueue_script('bl-forms-admin', 'forms-admin', [], true);
+		$builder_handle = bl_forms_enqueue_builder_kit();
+		$deps = $builder_handle !== '' ? [$builder_handle] : [];
+		bl_forms_enqueue_script('bl-forms-admin', 'forms-admin', $deps, true);
 		$form_id = 0;
 		if (!empty($_GET['post'])) {
 			$form_id = (int) $_GET['post'];

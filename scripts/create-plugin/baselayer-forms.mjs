@@ -66,9 +66,17 @@ async function main() {
     throw new Error(`Package not found: ${pkg}`);
   }
 
-  console.log('Building forms assets…');
-  await run('node', ['scripts/build-js.mjs', '--filter', 'forms,forms-admin,forms-block']);
-  await run('node', ['scripts/build-css.mjs', '--filter', 'forms,forms-admin']);
+  console.log('Building forms + canvas builder assets…');
+  await run('node', [
+    'scripts/build-js.mjs',
+    '--filter',
+    'canvas-builder-admin,forms,forms-admin,forms-block',
+  ]);
+  await run('node', [
+    'scripts/build-css.mjs',
+    '--filter',
+    'canvas-builder-admin,forms,forms-admin',
+  ]);
 
   console.log('Compiling translations…');
   await run('bash', ['scripts/compile_po.sh']);

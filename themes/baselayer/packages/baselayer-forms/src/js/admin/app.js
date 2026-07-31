@@ -1,40 +1,61 @@
-import { el, t, writeConfig } from './dom.js';
-import { createPalette } from './palette.js';
-import { createCanvas } from './canvas.js';
+import { el, t, writeConfig, PALETTE_SECTIONS, defaultField, uniqueFieldName } from './dom.js';
+import { createFieldCard, serializeRow } from './field-card.js';
+import { equalizeColumnRun } from './layout.js';
 import { createPanels } from './panels.js';
 import { bindImportExport } from './import-export.js';
 import { bindTemplates } from './templates.js';
 
 /**
- * Mount the tabbed form builder.
+ * Flatten legacy group fields into consecutive columns for the canvas.
+ *
+ * @param {list} fields
+ */
+function expandLegacyGroups(fields) {
+  const out = [];
+  (fields || []).forEach((field) => {
+    if ((field?.type || '') === 'group') {
+      (field.children || []).forEach((child) => {
+        if ((child?.type || '') === 'column') {
+          out.push(child);
+        }
+      });
+      return;
+    }
+    out.push(field);
+  });
+  return out;
+}
+
+/**
+ * Mount the tabbed form builder (shared canvas + form-specific panels).
  *
  * @param {HTMLElement} root
  * @param {{ fields?: array, settings?: object }} initial
  */
 export function mountApp(root, initial) {
+  const Builder = window.BlCanvasBuilder;
+  if (!Builder || typeof Builder.mount !== 'function') {
+    root.textContent = 'Canvas builder failed to load.';
+    return;
+  }
+
   root.replaceChildren();
-  root.classList.add('bl-forms-builder', 'bl-forms-builder--tabs');
+  // PHP already stamps .bl-forms-builder on #bl-forms-builder — only add the tabs modifier.
+  root.classList.add('bl-forms-builder--tabs');
 
   let settingsState = { ...(initial.settings || {}) };
+  /** @type {{ canvas: object, getFields: Function, setFields: Function, addField: Function } | null} */
+  let builderApi = null;
 
   const syncAll = () => {
-    const fields = canvas.getFields();
+    const fields = builderApi ? builderApi.getFields() : [];
     panels.syncFields(fields);
     writeConfig({
       fields,
       settings: panels.getSettings(),
     });
-    canvas.syncEmpty();
+    builderApi?.canvas?.syncEmpty?.();
   };
-
-  const canvas = createCanvas({
-    fields: initial.fields || [],
-    onChange: syncAll,
-  });
-
-  const palette = createPalette((type) => {
-    canvas.addField(type, true);
-  });
 
   const panels = createPanels(settingsState, root, (next) => {
     settingsState = next;
@@ -45,11 +66,59 @@ export function mountApp(root, initial) {
     className: 'bl-forms-builder__panel is-active',
     dataset: { blFormsPanel: 'fields' },
   });
-  const fieldsLayout = el('div', { className: 'bl-forms-builder__fields-layout' }, [
-    palette,
-    canvas.root,
-  ]);
-  fieldsPanel.appendChild(fieldsLayout);
+
+  const prepareField = (typeOrData) => {
+    const data = typeof typeOrData === 'string' ? defaultField(typeOrData) : { ...typeOrData };
+    if (data.name != null && data.name_manual === false) {
+      data.name = uniqueFieldName(data.label || data.name || data.type || 'field', data.id || '');
+    } else if (data.name) {
+      data.name = uniqueFieldName(data.name, data.id || '');
+    }
+    return data;
+  };
+
+  builderApi = Builder.mount(fieldsPanel, {
+    replaceRoot: false,
+    // Keep a single .bl-forms-builder on the outer shell; ns only prefixes children.
+    addRootClass: false,
+    ns: 'bl-forms-builder',
+    groupName: 'bl-forms-fields',
+    items: initial.fields || [],
+    sections: PALETTE_SECTIONS,
+    heading: t('canvasHeading', 'Form'),
+    emptyText: t('empty', 'Drag a field here, or click a template to add it.'),
+    handleSelector: '.bl-forms-builder__handle',
+    draggableSelector: '.bl-forms-builder__field, .bl-forms-builder__template',
+    templateClass: 'bl-forms-builder__template',
+    itemAttr: 'data-bl-forms-field',
+    icons: (window.blFormsAdmin && window.blFormsAdmin.icons) || {},
+    t,
+    typeLabel: (type) => {
+      const dict = (window.blFormsAdmin && window.blFormsAdmin.i18n) || {};
+      return (dict.types && dict.types[type]) || type;
+    },
+    normalizeItems: expandLegacyGroups,
+    prepareItem: prepareField,
+    createItem: (data, open) => createFieldCard(data, open),
+    serializeItem: serializeRow,
+    onItemMounted: (card, list) => {
+      if ((card.dataset.fieldType || '') === 'column') {
+        equalizeColumnRun(list, card);
+      }
+    },
+    onChange: () => {
+      syncAll();
+    },
+  });
+
+  // Compatibility aliases used by templates / import-export.
+  const canvas = {
+    root: builderApi.canvas.root,
+    addField: (...args) => builderApi.addField(...args),
+    replaceFields: (...args) => builderApi.setFields(...args),
+    getFields: () => builderApi.getFields(),
+    syncEmpty: () => builderApi.canvas.syncEmpty(),
+  };
 
   const tabBar = el('nav', { className: 'bl-forms-builder__tabs', role: 'tablist' });
   const tabs = [
