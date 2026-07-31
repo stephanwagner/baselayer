@@ -86,6 +86,9 @@ require_once __DIR__ . '/includes/security/rest-api.php';
 if (bl_theme_feature_enabled('forms')) {
 	require_once __DIR__ . '/packages/baselayer-forms/baselayer-forms.php';
 }
+if (bl_theme_feature_enabled('blocks')) {
+	require_once __DIR__ . '/packages/baselayer-blocks/baselayer-blocks.php';
+}
 if (bl_theme_feature_enabled('editorial')) {
 	require_once __DIR__ . '/packages/baselayer-editorial/baselayer-editorial.php';
 }

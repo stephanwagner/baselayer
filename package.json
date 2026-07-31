@@ -17,10 +17,12 @@
     "create-plugin:baselayer-forms": "node scripts/create-plugin/baselayer-forms.mjs",
     "create-plugin:baselayer-events": "node scripts/create-plugin/baselayer-events.mjs",
     "create-plugin:baselayer-editorial": "node scripts/create-plugin/baselayer-editorial.mjs",
+    "create-plugin:baselayer-blocks": "node scripts/create-plugin/baselayer-blocks.mjs",
     "compile:po": "bash scripts/compile_po.sh",
     "make-pot:baselayer-forms": "wp i18n make-pot themes/baselayer/packages/baselayer-forms themes/baselayer/packages/baselayer-forms/languages/baselayer-forms.pot --domain=baselayer-forms",
     "make-pot:baselayer-events": "wp i18n make-pot themes/baselayer/packages/baselayer-events themes/baselayer/packages/baselayer-events/languages/baselayer-events.pot --domain=baselayer-events",
     "make-pot:baselayer-editorial": "wp i18n make-pot themes/baselayer/packages/baselayer-editorial themes/baselayer/packages/baselayer-editorial/languages/baselayer-editorial.pot --domain=baselayer-editorial",
+    "make-pot:baselayer-blocks": "wp i18n make-pot themes/baselayer/packages/baselayer-blocks themes/baselayer/packages/baselayer-blocks/languages/baselayer-blocks.pot --domain=baselayer-blocks",
     "build:language-flags": "node scripts/build-language-flags.cjs",
     "format": "prettier \"theme/baselayer/src\" --write"
   },

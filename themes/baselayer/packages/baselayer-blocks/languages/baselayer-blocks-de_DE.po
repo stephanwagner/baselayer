@@ -1,0 +1,115 @@
+# Copyright (C) 2026 BaseLayer
+# This file is distributed under the same license as the BaseLayer Blocks plugin.
+msgid ""
+msgstr ""
+"Project-Id-Version: BaseLayer Blocks 0.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/baselayer-blocks\n"
+"POT-Creation-Date: 2026-07-31T00:35:55+00:00\n"
+"PO-Revision-Date: 2026-07-31T00:40:00+00:00\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: de_DE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: baselayer-blocks\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. Plugin Name of the plugin
+#: baselayer-blocks.php
+msgid "BaseLayer Blocks"
+msgstr "BaseLayer Blocks"
+
+#. Description of the plugin
+#: baselayer-blocks.php
+msgid "Create custom Gutenberg blocks with a field builder."
+msgstr "Erstelle individuelle Gutenberg-Blöcke mit einem Feld-Builder."
+
+#. Author of the plugin
+#: baselayer-blocks.php
+msgid "BaseLayer"
+msgstr "BaseLayer"
+
+#. Author URI of the plugin
+#: baselayer-blocks.php
+msgid "https://baselayerwp.com/baselayer-blocks"
+msgstr "https://baselayerwp.com/baselayer-blocks"
+
+#: includes/admin.php:15
+#: includes/admin.php:16
+#: includes/admin.php:83
+#: includes/admin.php:145
+msgid "Blocks"
+msgstr "Blöcke"
+
+#: includes/admin.php:32
+#: includes/admin.php:186
+msgid "You do not have permission to manage blocks."
+msgstr "Du hast keine Berechtigung, Blöcke zu verwalten."
+
+#: includes/admin.php:85
+msgid "Add New"
+msgstr "Neu hinzufügen"
+
+#: includes/admin.php:91
+msgid "You haven't created any blocks yet."
+msgstr "Du hast noch keine Blöcke erstellt."
+
+#: includes/admin.php:94
+msgid "Create your first block"
+msgstr "Erstelle deinen ersten Block"
+
+#: includes/admin.php:102
+#: includes/admin.php:153
+msgid "Title"
+msgstr "Titel"
+
+#: includes/admin.php:112
+msgid "(no title)"
+msgstr "(kein Titel)"
+
+#: includes/admin.php:134
+#: includes/repository.php:166
+msgid "Block not found."
+msgstr "Block nicht gefunden."
+
+#: includes/admin.php:144
+msgid "Add Block"
+msgstr "Block hinzufügen"
+
+#: includes/admin.php:144
+msgid "Edit Block"
+msgstr "Block bearbeiten"
+
+#: includes/admin.php:160
+msgid "Add title"
+msgstr "Titel hinzufügen"
+
+#: includes/admin.php:165
+msgid "Save"
+msgstr "Speichern"
+
+#: includes/admin.php:171
+msgid "Block creator"
+msgstr "Block-Creator"
+
+#: includes/admin.php:172
+msgid "Coming soon. The field builder will live here."
+msgstr "Demnächst. Der Feld-Builder kommt hierhin."
+
+#: includes/admin.php:213
+msgid "Block saved."
+msgstr "Block gespeichert."
+
+#: includes/repository.php:152
+msgid "Title is required."
+msgstr "Titel ist erforderlich."
+
+#: includes/repository.php:198
+msgid "Could not update block."
+msgstr "Block konnte nicht aktualisiert werden."
+
+#: includes/repository.php:217
+msgid "Could not create block."
+msgstr "Block konnte nicht erstellt werden."

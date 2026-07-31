@@ -227,6 +227,14 @@ function bl_render_developer_features(): void
 							<p class="description bl-indent-checkbox"><?= esc_html__('Adds a form builder, submissions, email notifications, and a Form block.', 'baselayer') ?></p>
 						</td>
 					</tr>
+					<tr>
+						<th scope="row" class="form-table-checkbox-label"><?= esc_html__('Blocks', 'baselayer') ?></th>
+						<td>
+							<input type="hidden" name="baselayer_features[enable_blocks]" value="0">
+							<label><input type="checkbox" name="baselayer_features[enable_blocks]" value="1" <?= checked($feat('enable_blocks'), 1, false) ?>> <?= esc_html__('Enable Blocks package', 'baselayer') ?></label>
+							<p class="description bl-indent-checkbox"><?= esc_html__('Adds an admin UI to create custom Gutenberg blocks.', 'baselayer') ?></p>
+						</td>
+					</tr>
 				</table>
 
 				<hr>
