@@ -1,5 +1,6 @@
 import { el, t, typeLabel, uid, iconEl, uniqueFieldName, slugifyOption, readConfig, flattenFields, fieldIsActive, cloneFieldData } from './dom.js';
 import { createColumnCard, createSectionCard, serializeLayoutRow, equalizeColumnRun } from './layout.js';
+import { createConditionalLogicEditor, readConditionalLogicFromDom, normalizeConditionalLogic } from './conditional-logic.js';
 
 const WIDTH_PRESETS = [
   { value: '100', label: '100%' },
@@ -2152,6 +2153,21 @@ function appearancePayload(scope, width, widthCustom) {
   };
 }
 
+/**
+ * Attach conditional_logic from the Logic tab hidden input when present.
+ *
+ * @param {HTMLElement} body
+ * @param {object} data
+ * @returns {object}
+ */
+function withConditionalLogic(body, data) {
+  const logic = readConditionalLogicFromDom(body);
+  if (logic) {
+    data.conditional_logic = normalizeConditionalLogic(logic);
+  }
+  return data;
+}
+
 function createFieldEditorTabs(activeId = 'general') {
   const tabBar = el('nav', {
     className: 'bl-forms-builder__field-tabs',
@@ -2162,6 +2178,7 @@ function createFieldEditorTabs(activeId = 'general') {
     { id: 'general', label: t('fieldTabGeneral', 'General') },
     { id: 'advanced', label: t('fieldTabAdvanced', 'Advanced') },
     { id: 'appearance', label: t('fieldTabAppearance', 'Appearance') },
+    { id: 'logic', label: t('fieldTabLogic', 'Logic') },
   ];
   const initialId = tabDefs.some((tab) => tab.id === activeId) ? activeId : 'general';
 
@@ -2214,6 +2231,7 @@ function createFieldEditorTabs(activeId = 'general') {
     general: tabs[0].panel,
     advanced: tabs[1].panel,
     appearance: tabs[2].panel,
+    logic: tabs[3].panel,
     /**
      * Hide tabs whose panels have no sections, and activate a visible tab if needed.
      */
@@ -2286,64 +2304,64 @@ export function serializeRow(row) {
     const marginBtn = q('[data-bl-margin].is-active');
     const margin = marginBtn?.dataset.blMargin || row.dataset.fieldMargin || 'm';
     const marginCustom = q('[data-bl-margin-custom]')?.value || '';
-    return {
+    return withConditionalLogic(body, {
       id,
       type,
       active,
       margin,
       margin_custom: margin === 'custom' ? marginCustom : '',
       css_class: q('[data-bl-css-class]')?.value || '',
-    };
+    });
   }
 
   if (type === 'captcha') {
-    return {
+    return withConditionalLogic(body, {
       id,
       type,
       active,
       ...appearancePayload(body, width, widthCustom),
-    };
+    });
   }
 
   if (type === 'spacer') {
     const heightBtn = q('[data-bl-height].is-active');
     const height = heightBtn?.dataset.blHeight || row.dataset.fieldHeight || 'm';
     const heightCustom = q('[data-bl-height-custom]')?.value || '';
-    return {
+    return withConditionalLogic(body, {
       id,
       type,
       active,
       height,
       height_custom: height === 'custom' ? heightCustom : '',
       css_class: q('[data-bl-css-class]')?.value || '',
-    };
+    });
   }
 
   if (type === 'heading') {
     const levelBtn = q('[data-bl-heading-level].is-active');
     const level = levelBtn?.dataset.blHeadingLevel || 'h2';
-    return {
+    return withConditionalLogic(body, {
       id,
       type,
       active,
       content: q('[data-bl-content]')?.value || '',
       level: HEADING_LEVELS.includes(level) ? level : 'h2',
       ...appearancePayload(body, width, widthCustom),
-    };
+    });
   }
 
   if (type === 'text_block' || type === 'html') {
-    return {
+    return withConditionalLogic(body, {
       id,
       type,
       active,
       content: q('[data-bl-content]')?.value || '',
       ...appearancePayload(body, width, widthCustom),
-    };
+    });
   }
 
   if (type === 'honeypot') {
-    return {
+    return withConditionalLogic(body, {
       id,
       type,
       active,
@@ -2352,11 +2370,11 @@ export function serializeRow(row) {
       name_manual: nameManual,
       hide_label: hideLabel,
       ...appearancePayload(body, width, widthCustom),
-    };
+    });
   }
 
   if (type === 'hidden') {
-    return {
+    return withConditionalLogic(body, {
       id,
       type,
       active,
@@ -2366,7 +2384,7 @@ export function serializeRow(row) {
       hide_label: hideLabel,
       default_value: q('[data-bl-default]')?.value || '',
       ...appearancePayload(body, '100', ''),
-    };
+    });
   }
 
   const data = {
@@ -2525,7 +2543,7 @@ export function serializeRow(row) {
     }
   }
 
-  return data;
+  return withConditionalLogic(body, data);
 }
 
 /**
@@ -2777,10 +2795,11 @@ export function createFieldCard(initial, open = false) {
   const renderBody = (activeTab = 'general') => {
     body.replaceChildren();
     const tabs = createFieldEditorTabs(activeTab);
-    const { general, advanced, appearance } = tabs;
+    const { general, advanced, appearance, logic } = tabs;
     const generalSections = createSectionAppender(general);
     const advancedSections = createSectionAppender(advanced);
     const appearanceSections = createSectionAppender(appearance);
+    const logicSections = createSectionAppender(logic);
 
     generalSections.add(
       (() => {
@@ -2833,6 +2852,8 @@ export function createFieldCard(initial, open = false) {
       appearanceSections.add(createLayoutControl(field));
     }
     appearanceSections.add(createCssClassControl(field));
+
+    logicSections.add(createConditionalLogicEditor(field));
 
     if (field.type === 'divider' || field.type === 'spacer') {
       // Appearance only.

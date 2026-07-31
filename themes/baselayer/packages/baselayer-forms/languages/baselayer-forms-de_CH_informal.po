@@ -449,14 +449,118 @@ msgid "Appearance"
 msgstr "Darstellung"
 
 #: includes/admin.php:463
+msgid "Logic"
+msgstr "Logik"
+
+#: includes/admin.php:464
 msgid "No general settings for this field."
 msgstr "Keine allgemeinen Einstellungen für dieses Feld."
 
-#: includes/admin.php:464
+#: includes/admin.php:465
 msgid "No advanced settings for this field."
 msgstr "Keine erweiterten Einstellungen für dieses Feld."
 
-#: includes/admin.php:465
+#: includes/admin.php:466
+msgid "Conditional logic"
+msgstr "Bedingte Logik"
+
+#: includes/admin.php:467
+msgid "Show this field only when the conditions below are met. Rules in a group use AND; groups use OR."
+msgstr "Dieses Feld nur anzeigen, wenn die folgenden Bedingungen erfüllt sind. Regeln in einer Gruppe verwenden UND; Gruppen verwenden ODER."
+
+#: includes/admin.php:468
+msgid "Show this field if"
+msgstr "Anzeigen wenn"
+
+#: includes/admin.php:469
+msgid "or if"
+msgstr "oder wenn"
+
+#: includes/admin.php:470
+msgid "and"
+msgstr "und"
+
+#: includes/admin.php:471
+msgid "or"
+msgstr "oder"
+
+#: includes/admin.php:472
+msgid "Add rule"
+msgstr "Regel hinzufügen"
+
+#: includes/admin.php:473
+msgid "Add rule group"
+msgstr "Regelgruppe hinzufügen"
+
+#: includes/admin.php:474
+msgid "Field"
+msgstr "Feld"
+
+#: includes/admin.php:475
+msgid "Operator"
+msgstr "Operator"
+
+#: includes/admin.php:476
+msgid "Value"
+msgstr "Wert"
+
+#: includes/admin.php:477
+msgid "— Select —"
+msgstr "— Auswählen —"
+
+#: includes/admin.php:478
+msgid "No fields available"
+msgstr "Keine Felder verfügbar"
+
+#: includes/admin.php:479
+msgid "Checked"
+msgstr "Aktiviert"
+
+#: includes/admin.php:480
+msgid "Not checked"
+msgstr "Nicht aktiviert"
+
+#: includes/admin.php:481
+msgid "Is equal to"
+msgstr "Ist gleich"
+
+#: includes/admin.php:482
+msgid "Is not equal to"
+msgstr "Ist ungleich"
+
+#: includes/admin.php:483
+msgid "Contains"
+msgstr "Enthält"
+
+#: includes/admin.php:484
+msgid "Does not contain"
+msgstr "Enthält nicht"
+
+#: includes/admin.php:485
+msgid "Has no value"
+msgstr "Hat keinen Wert"
+
+#: includes/admin.php:486
+msgid "Has any value"
+msgstr "Hat einen Wert"
+
+#: includes/admin.php:487
+msgid "Greater than"
+msgstr "Größer als"
+
+#: includes/admin.php:488
+msgid "Less than"
+msgstr "Kleiner als"
+
+#: includes/admin.php:489
+msgid "Greater than or equal to"
+msgstr "Größer oder gleich"
+
+#: includes/admin.php:490
+msgid "Less than or equal to"
+msgstr "Kleiner oder gleich"
+
+#: includes/admin.php:491
 msgid "Placeholder"
 msgstr "Platzhalter"
 

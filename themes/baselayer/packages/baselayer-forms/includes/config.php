@@ -413,6 +413,106 @@ function bl_forms_field_is_active(array $field): bool
 }
 
 /**
+ * Allowed conditional-logic operators.
+ *
+ * @return list<string>
+ */
+function bl_forms_conditional_logic_operators(): array
+{
+	return [
+		'checked',
+		'not_checked',
+		'==',
+		'!=',
+		'contains',
+		'not_contains',
+		'==empty',
+		'!=empty',
+		'>',
+		'<',
+		'>=',
+		'<=',
+	];
+}
+
+/**
+ * Sanitize field conditional_logic (ACF-style groups).
+ *
+ * @param mixed $raw
+ * @return array{enabled: bool, groups: list<list<array{field: string, operator: string, value: string}>>}|null
+ */
+function bl_forms_sanitize_conditional_logic($raw): ?array
+{
+	if (!is_array($raw)) {
+		return null;
+	}
+
+	$allowed = bl_forms_conditional_logic_operators();
+	$no_value = ['checked', 'not_checked', '==empty', '!=empty'];
+	$groups_in = isset($raw['groups']) && is_array($raw['groups']) ? $raw['groups'] : [];
+	$groups = [];
+
+	foreach ($groups_in as $group) {
+		if (!is_array($group)) {
+			continue;
+		}
+		$rules = [];
+		foreach ($group as $rule) {
+			if (!is_array($rule)) {
+				continue;
+			}
+			$field_id = sanitize_key((string) ($rule['field'] ?? ''));
+			$operator = (string) ($rule['operator'] ?? '');
+			if ($field_id === '' || !in_array($operator, $allowed, true)) {
+				continue;
+			}
+			$value = in_array($operator, $no_value, true)
+				? ''
+				: sanitize_text_field((string) ($rule['value'] ?? ''));
+			$rules[] = [
+				'field'    => $field_id,
+				'operator' => $operator,
+				'value'    => $value,
+			];
+		}
+		if ($rules !== []) {
+			$groups[] = $rules;
+		}
+	}
+
+	$enabled = !empty($raw['enabled']) && $groups !== [];
+	if (!$enabled && $groups === []) {
+		return null;
+	}
+
+	return [
+		'enabled' => $enabled,
+		'groups'  => $groups,
+	];
+}
+
+/**
+ * Attach sanitized conditional_logic onto a field array when present.
+ *
+ * @param array<string, mixed> $out
+ * @param array<string, mixed> $field
+ * @return array<string, mixed>
+ */
+function bl_forms_attach_conditional_logic(array $out, array $field): array
+{
+	$type = (string) ($out['type'] ?? '');
+	if (in_array($type, ['column', 'section'], true)) {
+		return $out;
+	}
+	$logic = bl_forms_sanitize_conditional_logic($field['conditional_logic'] ?? null);
+	if ($logic !== null) {
+		$out['conditional_logic'] = $logic;
+	}
+
+	return $out;
+}
+
+/**
  * Flat list of non-layout fields (for submit, mail, uploads checks).
  *
  * @param list<array<string, mixed>> $fields
@@ -1363,7 +1463,7 @@ function bl_forms_sanitize_field($field): ?array
 			$out['width_custom']
 		);
 
-		return $out;
+		return bl_forms_attach_conditional_logic($out, $field);
 	}
 
 	if ($type === 'captcha') {
@@ -1377,7 +1477,7 @@ function bl_forms_sanitize_field($field): ?array
 			$out['captcha_secret_key']
 		);
 
-		return $out;
+		return bl_forms_attach_conditional_logic($out, $field);
 	}
 
 	if ($type === 'spacer') {
@@ -1414,7 +1514,7 @@ function bl_forms_sanitize_field($field): ?array
 			$out['width_custom']
 		);
 
-		return $out;
+		return bl_forms_attach_conditional_logic($out, $field);
 	}
 
 	if ($type === 'heading') {
@@ -1425,7 +1525,7 @@ function bl_forms_sanitize_field($field): ?array
 		$out['level'] = in_array($level, $allowed, true) ? $level : 'h2';
 		unset($out['name'], $out['name_manual'], $out['hide_label']);
 
-		return $out;
+		return bl_forms_attach_conditional_logic($out, $field);
 	}
 
 	if (in_array($type, ['text_block', 'html'], true)) {
@@ -1435,7 +1535,7 @@ function bl_forms_sanitize_field($field): ?array
 			: sanitize_textarea_field($content);
 		unset($out['name'], $out['name_manual'], $out['hide_label'], $out['level']);
 
-		return $out;
+		return bl_forms_attach_conditional_logic($out, $field);
 	}
 
 	if ($type === 'hidden') {
@@ -1444,7 +1544,7 @@ function bl_forms_sanitize_field($field): ?array
 		$out['width_custom'] = '';
 		unset($out['required'], $out['placeholder'], $out['hide_label']);
 
-		return $out;
+		return bl_forms_attach_conditional_logic($out, $field);
 	}
 
 	$out['required'] = !empty($field['required']);
@@ -1671,7 +1771,7 @@ function bl_forms_sanitize_field($field): ?array
 		);
 	}
 
-	return $out;
+	return bl_forms_attach_conditional_logic($out, $field);
 }
 
 /**
