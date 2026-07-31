@@ -4276,7 +4276,32 @@
       dataset: { blFormsPanel: "validation" },
       hidden: true
     });
+    const messagesSettingsUrl = window.blFormsAdmin && window.blFormsAdmin.messagesSettingsUrl || window.blFormsAdmin && window.blFormsAdmin.settingsUrl || "";
+    const validationIntro = el("div", { className: "bl-forms-builder__panel-intro" }, [
+      el("p", {
+        className: "description",
+        text: t(
+          "validationPanelHelp",
+          "These settings apply to this form only."
+        )
+      })
+    ]);
+    if (messagesSettingsUrl) {
+      validationIntro.appendChild(
+        el("p", { className: "description" }, [
+          el("span", {
+            text: t("validationPanelHelpGlobal", "You can also set them globally in") + " "
+          }),
+          el("a", {
+            href: messagesSettingsUrl,
+            text: t("validationPanelHelpLink", "Forms \u2192 Settings")
+          }),
+          el("span", { text: "." })
+        ])
+      );
+    }
     validationPanel.append(
+      validationIntro,
       errorSection(t("requiredError", "Required"), [requiredMsg]),
       errorSection(t("charCountSection", "Character count"), [
         fieldRow(

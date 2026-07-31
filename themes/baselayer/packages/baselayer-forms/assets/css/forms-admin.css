@@ -283,6 +283,49 @@ body.bl-page-picker-open {
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
 }
 
+.bl-forms-builder__skeleton {
+  display: flex;
+  flex-direction: column;
+}
+
+.bl-forms-builder__skeleton-tabs {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--bl-forms-admin-border, #c3c4c7);
+  background: var(--bl-forms-admin-surface, #f6f7f7);
+  border-radius: 6px 6px 0 0;
+}
+
+.bl-forms-builder__skeleton-tab {
+  display: block;
+  width: 64px;
+  height: 12px;
+  border-radius: 3px;
+  background: #e2e2e4;
+}
+
+.bl-forms-builder__skeleton-tab:nth-child(4) {
+  width: 72px;
+}
+
+.bl-forms-builder__skeleton-body {
+  min-height: 180px;
+  box-sizing: border-box;
+}
+
+.bl-forms-builder__panel-intro {
+  margin: 0 0 14px;
+  max-width: 52rem;
+}
+.bl-forms-builder__panel-intro > .description {
+  margin: 0 0 0.5em;
+}
+.bl-forms-builder__panel-intro > .description:last-child {
+  margin-bottom: 0;
+}
+
 .bl-forms-builder__tabs {
   display: flex;
   align-items: center;

@@ -88,7 +88,17 @@ function bl_forms_render_builder_after_title(WP_Post $post): void
 		data-fallback-error="<?= esc_attr($placeholders['error']) ?>"
 		data-fallback-validation="<?= esc_attr($placeholders['validation']) ?>"
 		data-fallback-required="<?= esc_attr($placeholders['required']) ?>"
-	></div>
+	>
+		<div class="bl-forms-builder__skeleton" aria-hidden="true">
+			<div class="bl-forms-builder__skeleton-tabs">
+				<span class="bl-forms-builder__skeleton-tab"></span>
+				<span class="bl-forms-builder__skeleton-tab"></span>
+				<span class="bl-forms-builder__skeleton-tab"></span>
+				<span class="bl-forms-builder__skeleton-tab"></span>
+			</div>
+			<div class="bl-forms-builder__skeleton-body"></div>
+		</div>
+	</div>
 	<?php
 }
 add_action('edit_form_after_title', 'bl_forms_render_builder_after_title');
@@ -365,11 +375,15 @@ function bl_forms_admin_enqueue(string $hook): void
 			'settingsUrl' => esc_url(bl_forms_settings_url()),
 			'captchaSettingsUrl' => esc_url(bl_forms_settings_url('captcha')),
 			'uploadsSettingsUrl' => esc_url(bl_forms_settings_url('uploads')),
+			'messagesSettingsUrl' => esc_url(bl_forms_settings_url('messages')),
 			'i18n' => [
 				'tabFields'         => __('Fields', 'baselayer-forms'),
 				'tabNotifications'  => __('Notifications', 'baselayer-forms'),
 				'tabSettings'       => __('Settings', 'baselayer-forms'),
 				'tabValidation'     => __('Validation', 'baselayer-forms'),
+				'validationPanelHelp' => __('These settings apply to this form only.', 'baselayer-forms'),
+				'validationPanelHelpGlobal' => __('You can also set them globally in', 'baselayer-forms'),
+				'validationPanelHelpLink' => __('Forms → Settings', 'baselayer-forms'),
 				'fullscreenEnter'   => __('Fullscreen', 'baselayer-forms'),
 				'fullscreenExit'    => __('Exit fullscreen', 'baselayer-forms'),
 				'tabSecurity'       => __('Security', 'baselayer-forms'),
