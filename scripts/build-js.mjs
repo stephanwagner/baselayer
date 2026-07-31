@@ -63,6 +63,21 @@ const formsBundles = [
   { input: `${formsPkg}/src/js/block.js`, name: 'forms-block', outDir: `${formsPkg}/assets/js` }
 ];
 
+const blocksBundles = [
+  { input: `${blocksPkg}/src/js/admin.js`, name: 'blocks-admin', outDir: `${blocksPkg}/assets/js` },
+  {
+    input: `${blocksPkg}/src/js/editor.js`,
+    name: 'blocks-editor',
+    outDir: `${blocksPkg}/assets/js`,
+    jsx: {
+      loader: { '.js': 'jsx' },
+      jsx: 'transform',
+      jsxFactory: 'wp.element.createElement',
+      jsxFragment: 'wp.element.Fragment'
+    }
+  }
+];
+
 const eventsBundles = [
   { input: `${eventsPkg}/src/js/editor.js`, name: 'events-editor', outDir: `${eventsPkg}/assets/js` },
   { input: `${eventsPkg}/src/js/admin.js`, name: 'events-admin', outDir: `${eventsPkg}/assets/js` },
@@ -74,7 +89,7 @@ const editorialBundles = [
   { input: `${editorialPkg}/src/js/editor.js`, name: 'editorial-editor', outDir: `${editorialPkg}/assets/js` }
 ];
 
-const bundles = [...themeBundles, ...formsBundles, ...eventsBundles, ...editorialBundles];
+const bundles = [...themeBundles, ...formsBundles, ...blocksBundles, ...eventsBundles, ...editorialBundles];
 
 function parseFilter() {
   const idx = process.argv.indexOf('--filter');

@@ -32,6 +32,8 @@ const entries = [
   },
   { src: `${formsPkg}/src/scss/forms.scss`, name: 'forms', outDir: `${formsPkg}/assets/css` },
   { src: `${formsPkg}/src/scss/forms-admin.scss`, name: 'forms-admin', outDir: `${formsPkg}/assets/css` },
+  { src: `${blocksPkg}/src/scss/blocks-admin.scss`, name: 'blocks-admin', outDir: `${blocksPkg}/assets/css` },
+  { src: `${blocksPkg}/src/scss/blocks-editor.scss`, name: 'blocks-editor', outDir: `${blocksPkg}/assets/css` },
   { src: `${eventsPkg}/src/scss/events.scss`, name: 'events', outDir: `${eventsPkg}/assets/css` },
   { src: `${eventsPkg}/src/scss/events-admin.scss`, name: 'events-admin', outDir: `${eventsPkg}/assets/css` },
   { src: `${editorialPkg}/src/scss/editorial-admin.scss`, name: 'editorial-admin', outDir: `${editorialPkg}/assets/css` },

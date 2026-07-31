@@ -227,8 +227,16 @@ function bl_blocks_enqueue_canvas_builder_kit(): string
 	return $enqueued ? $handle : '';
 }
 
+require_once BL_BLOCKS_PATH . 'includes/config.php';
+require_once BL_BLOCKS_PATH . 'includes/cpt.php';
+require_once BL_BLOCKS_PATH . 'includes/field-ui.php';
+require_once BL_BLOCKS_PATH . 'includes/runtime-site.php';
+require_once BL_BLOCKS_PATH . 'includes/runtime-page.php';
+require_once BL_BLOCKS_PATH . 'includes/runtime-blocks.php';
+
 if (is_admin()) {
 	require_once BL_BLOCKS_PATH . 'includes/admin.php';
+	require_once BL_BLOCKS_PATH . 'includes/admin-editor.php';
 }
 
 /**
