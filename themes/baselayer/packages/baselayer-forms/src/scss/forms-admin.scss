@@ -84,6 +84,7 @@
     color: #1d2327 !important;
     box-shadow: none !important;
     text-align: left;
+    padding-left: 8px;
 
     &:hover,
     &:focus {
@@ -185,7 +186,7 @@
 }
 
 .bl-forms-builder__panels {
-  padding: 16px 12px 12px;
+  padding: 12px;
 }
 
 .bl-forms-builder__panel {
@@ -198,7 +199,7 @@
 .bl-forms-builder__fields-layout {
   display: grid;
   grid-template-columns: var(--bl-forms-admin-palette-width) minmax(0, 1fr);
-  gap: 16px;
+  gap: 12px;
   align-items: start;
 
   @media (max-width: 782px) {
@@ -220,7 +221,7 @@
 .bl-forms-builder__palette {
   position: sticky;
   top: 46px;
-  padding: 12px;
+  padding: 8px;
   border: 1px solid var(--bl-forms-admin-border);
   border-radius: var(--bl-forms-admin-radius);
   background: var(--bl-forms-admin-surface);
@@ -343,7 +344,7 @@ p.bl-forms-builder__palette-empty {
   align-items: center;
   gap: 8px;
   width: 100%;
-  padding: 8px 2px 2px;
+  padding: 8px 2px 0;
   border: 0;
   background: transparent;
   cursor: pointer;
