@@ -8,18 +8,21 @@ import { openFieldsModal } from './admin/field-form.js';
     return;
   }
 
-  const { createElement: el, Fragment, RawHTML } = wp.element;
-  const { Button, PanelBody, ToolbarGroup, ToolbarButton } = wp.components;
+  const { createElement: el, Fragment, RawHTML, useState, useEffect, useRef } = wp.element;
+  const { Button, PanelBody, ToolbarGroup, ToolbarButton, Placeholder, Spinner } = wp.components;
   const { InspectorControls, BlockControls, useBlockProps } = wp.blockEditor || {};
   const { registerBlockType } = wp.blocks;
   const { registerPlugin } = wp.plugins || {};
   const { PluginDocumentSettingPanel } = wp.editPost || wp.editor || {};
   const { useSelect, useDispatch } = wp.data || {};
+  const apiFetch = wp.apiFetch;
+  const debounce = (wp.compose && wp.compose.debounce) || null;
 
   const blockConfig = window.blBlocksEditor || {};
   const pageConfig = window.blBlocksPage || {};
   const blockI18n = blockConfig.i18n || {};
   const pageI18n = pageConfig.i18n || {};
+  const renderPath = blockConfig.renderPath || 'baselayer-blocks/v1/render';
 
   function blockIcon(icon) {
     if (typeof icon === 'string' && icon.toLowerCase().includes('<svg')) {
@@ -41,6 +44,101 @@ import { openFieldsModal } from './admin/field-form.js';
       values: values || {},
       onSave,
     });
+  }
+
+  function normalizeValues(raw) {
+    return raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+  }
+
+  function PreviewLoading() {
+    return el('div', { className: 'bl-blocks-block-preview-loading' }, el(Spinner, null));
+  }
+
+  /**
+   * Preview via package REST (name + values only). Avoids core /block-renderer
+   * attribute schema validation against theme-injected attrs (hideBlock, style, …).
+   */
+  function BlockServerPreview({ name, values }) {
+    const [response, setResponse] = useState({ status: 'idle' });
+    const shouldDebounceRef = useRef(false);
+    const valuesKey = JSON.stringify(values || {});
+
+    useEffect(() => {
+      if (!apiFetch || !name) {
+        return undefined;
+      }
+
+      const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+      let cancelled = false;
+
+      const run = () => {
+        setResponse({ status: 'loading' });
+        apiFetch({
+          path: renderPath,
+          method: 'POST',
+          data: { name, values: values || {} },
+          signal: controller ? controller.signal : undefined,
+        })
+          .then((res) => {
+            if (cancelled) return;
+            setResponse({
+              status: 'success',
+              content: res && typeof res.rendered === 'string' ? res.rendered : '',
+            });
+          })
+          .catch((error) => {
+            if (cancelled || (error && error.name === 'AbortError')) {
+              return;
+            }
+            setResponse({
+              status: 'error',
+              error: (error && error.message) || String(error),
+            });
+          })
+          .finally(() => {
+            shouldDebounceRef.current = true;
+          });
+      };
+
+      let cancelDebounce = () => {};
+      if (debounce && shouldDebounceRef.current) {
+        const debounced = debounce(run, 500);
+        debounced();
+        cancelDebounce = () => debounced.cancel();
+      } else if (shouldDebounceRef.current) {
+        const t = window.setTimeout(run, 500);
+        cancelDebounce = () => window.clearTimeout(t);
+      } else {
+        run();
+      }
+
+      return () => {
+        cancelled = true;
+        if (controller) {
+          controller.abort();
+        }
+        cancelDebounce();
+      };
+    }, [name, valuesKey]);
+
+    if (response.status === 'loading' || response.status === 'idle') {
+      return el(PreviewLoading, null);
+    }
+
+    if (response.status === 'error') {
+      const template = blockI18n.previewError || 'Error loading preview: %s';
+      const message = template.replace('%s', response.error || '');
+      return el(Placeholder, { className: 'bl-blocks-block-preview-error', label: message });
+    }
+
+    if (!response.content) {
+      return el(Placeholder, {
+        className: 'bl-blocks-block-preview-empty',
+        label: blockI18n.previewEmpty || 'Block rendered as empty.',
+      });
+    }
+
+    return el(RawHTML, null, response.content);
   }
 
   (blockConfig.blocks || []).forEach((def) => {
@@ -66,15 +164,24 @@ import { openFieldsModal } from './admin/field-form.js';
       },
       edit: function Edit(props) {
         const { attributes, setAttributes } = props;
-        const values = attributes.values || {};
+        const values = normalizeValues(attributes.values);
         const open = () =>
           openBlockModal(def.fields || [], values, (next) => {
-            setAttributes({ values: next });
+            setAttributes({ values: normalizeValues(next) });
           }, def.title);
 
         const blockProps = useBlockProps
           ? useBlockProps({ className: 'bl-blocks-block-editor' })
           : { className: 'bl-blocks-block-editor' };
+
+        const preview = apiFetch
+          ? el(BlockServerPreview, { name: def.name, values })
+          : el(
+              'div',
+              { className: 'bl-blocks-block-editor__fallback' },
+              el('strong', null, def.title || def.slug),
+              el('p', null, blockI18n.preview || 'Edit fields to configure this block.')
+            );
 
         return el(
           Fragment,
@@ -109,12 +216,7 @@ import { openFieldsModal } from './admin/field-form.js';
                 )
               )
             : null,
-          el(
-            'div',
-            blockProps,
-            el('strong', null, def.title || def.slug),
-            el('p', null, blockI18n.preview || 'Edit fields to configure this block.')
-          )
+          el('div', blockProps, preview)
         );
       },
       save: function save() {

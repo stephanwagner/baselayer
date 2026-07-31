@@ -89,20 +89,24 @@ function bl_blocks_enqueue_page_editor(string $hook): void
 	wp_enqueue_script(
 		'bl-blocks-editor',
 		$asset['uri'],
-		['wp-plugins', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data', 'wp-i18n', 'wp-block-editor', 'wp-blocks', 'wp-compose'],
+		['wp-plugins', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data', 'wp-i18n', 'wp-block-editor', 'wp-blocks', 'wp-compose', 'wp-api-fetch'],
 		$asset['ver'],
 		true
 	);
 	bl_blocks_enqueue_style('bl-blocks-editor', 'blocks-editor');
 
 	wp_localize_script('bl-blocks-editor', 'blBlocksEditor', [
-		'blocks' => function_exists('bl_blocks_active_block_payloads') ? bl_blocks_active_block_payloads() : [],
-		'i18n'   => [
-			'edit'       => __('Edit fields', 'baselayer-blocks'),
-			'save'       => __('Apply', 'baselayer-blocks'),
-			'cancel'     => __('Cancel', 'baselayer-blocks'),
-			'panelTitle' => __('Block fields', 'baselayer-blocks'),
-			'preview'    => __('Edit fields to configure this block.', 'baselayer-blocks'),
+		'blocks'     => function_exists('bl_blocks_active_block_payloads') ? bl_blocks_active_block_payloads() : [],
+		'renderPath' => 'baselayer-blocks/v1/render',
+		'i18n'       => [
+			'edit'            => __('Edit fields', 'baselayer-blocks'),
+			'save'            => __('Apply', 'baselayer-blocks'),
+			'cancel'          => __('Cancel', 'baselayer-blocks'),
+			'panelTitle'      => __('Block fields', 'baselayer-blocks'),
+			'preview'         => __('Edit fields to configure this block.', 'baselayer-blocks'),
+			'previewError'    => __('Error loading preview: %s', 'baselayer-blocks'),
+			'previewEmpty'    => __('Block rendered as empty.', 'baselayer-blocks'),
+			'templateMissing' => __('Template missing.', 'baselayer-blocks'),
 		],
 	]);
 

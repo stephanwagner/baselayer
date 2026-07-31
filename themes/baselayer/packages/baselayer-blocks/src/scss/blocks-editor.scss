@@ -1,20 +1,61 @@
 // Blocks editor (Gutenberg) styles.
 
 .bl-blocks-block-editor {
+  padding: 0;
+  border: 0;
+  background: transparent;
+
+  .components-placeholder {
+    min-height: 80px;
+  }
+}
+
+.bl-blocks-block-preview-loading {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 80px;
   padding: 16px;
-  border: 1px dashed #c3c4c7;
+  border: 1px solid #c3c4c7;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.bl-blocks-block-missing-template {
+  padding: 14px 16px;
+  border: 1px solid #f0b849;
+  border-left-width: 4px;
   border-radius: 4px;
-  background: #f6f7f7;
+  background: #fcf9e8;
+  color: #1d2327;
+}
 
-  strong {
-    display: block;
-    margin-bottom: 4px;
-  }
+.bl-blocks-block-missing-template__title {
+  margin: 0 0 4px;
+}
 
-  p {
-    margin: 0;
-    color: #646970;
-  }
+.bl-blocks-block-missing-template__name {
+  margin: 0 0 8px;
+}
+
+.bl-blocks-block-missing-template__status {
+  margin: 0 0 8px;
+  font-weight: 600;
+  color: #996800;
+}
+
+.bl-blocks-block-missing-template__help {
+  margin: 0 0 4px;
+  color: #646970;
+}
+
+.bl-blocks-block-missing-template__path {
+  margin: 0;
+  word-break: break-word;
+}
+
+.bl-blocks-block-missing-template__path code {
+  font-size: 12px;
 }
 
 .bl-blocks-page-panel {

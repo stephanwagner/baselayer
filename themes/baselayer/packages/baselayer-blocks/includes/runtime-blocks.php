@@ -16,6 +16,79 @@ function bl_blocks_gutenberg_name(string $slug): string
 }
 
 /**
+ * Relative theme path for a block render template: blocks/{slug}/{slug}.php
+ */
+function bl_blocks_template_relative_path(string $slug): string
+{
+	$slug = sanitize_key($slug);
+	if ($slug === '') {
+		$slug = 'block';
+	}
+
+	return 'blocks/' . $slug . '/' . $slug . '.php';
+}
+
+/**
+ * Absolute path to an existing block template, or empty string.
+ */
+function bl_blocks_locate_template(string $slug): string
+{
+	$relative = bl_blocks_template_relative_path($slug);
+	$path = get_theme_file_path('/' . $relative);
+	if (is_string($path) && $path !== '' && is_readable($path)) {
+		return $path;
+	}
+
+	return '';
+}
+
+/**
+ * Template status for admin UI.
+ *
+ * @return array{exists: bool, relative: string, absolute: string, display_path: string, create_path: string}
+ */
+function bl_blocks_template_info(string $slug): array
+{
+	$relative = bl_blocks_template_relative_path($slug);
+	$absolute = bl_blocks_locate_template($slug);
+	$exists = $absolute !== '';
+
+	$stylesheet = trailingslashit(get_stylesheet_directory());
+	$template = trailingslashit(get_template_directory());
+	$create_abs = $stylesheet . $relative;
+
+	$display = $relative;
+	if ($exists) {
+		if (str_starts_with($absolute, $stylesheet)) {
+			$display = ltrim(substr($absolute, strlen($stylesheet)), '/');
+			if (is_child_theme()) {
+				$display = basename(get_stylesheet()) . '/' . $display;
+			}
+		} elseif (str_starts_with($absolute, $template)) {
+			$display = ltrim(substr($absolute, strlen($template)), '/');
+			$display = basename(get_template()) . '/' . $display;
+		} else {
+			$display = $absolute;
+		}
+	}
+
+	$create_display = $relative;
+	if (is_child_theme()) {
+		$create_display = basename(get_stylesheet()) . '/' . $relative;
+	} else {
+		$create_display = basename(get_template()) . '/' . $relative;
+	}
+
+	return [
+		'exists'       => $exists,
+		'relative'     => $relative,
+		'absolute'     => $exists ? $absolute : $create_abs,
+		'display_path' => $display,
+		'create_path'  => $create_display,
+	];
+}
+
+/**
  * Payload for one block definition (editor + registration).
  *
  * @return array<string, mixed>|null
@@ -30,10 +103,7 @@ function bl_blocks_block_definition_payload(WP_Post $post): ?array
 		return null;
 	}
 	$slug = bl_blocks_definition_slug((int) $post->ID, $config['settings']);
-	$title = (string) ($config['settings']['block_title'] ?? '');
-	if ($title === '') {
-		$title = $post->post_title !== '' ? $post->post_title : $slug;
-	}
+	$title = $post->post_title !== '' ? $post->post_title : $slug;
 	$keywords = array_values(array_filter(array_map(
 		'trim',
 		explode(',', (string) ($config['settings']['block_keywords'] ?? ''))
@@ -43,16 +113,18 @@ function bl_blocks_block_definition_payload(WP_Post $post): ?array
 	$gutenberg_icon = bl_blocks_resolve_gutenberg_icon($raw_icon);
 
 	return [
-		'id'          => (int) $post->ID,
-		'name'        => bl_blocks_gutenberg_name($slug),
-		'slug'        => $slug,
-		'title'       => $title,
-		'description' => (string) ($config['settings']['description'] ?? ''),
-		'icon'        => $gutenberg_icon,
-		'iconRaw'     => $raw_icon,
-		'category'    => (string) ($config['settings']['block_category'] ?? 'widgets'),
-		'keywords'    => $keywords,
-		'fields'      => $config['fields'],
+		'id'             => (int) $post->ID,
+		'name'           => bl_blocks_gutenberg_name($slug),
+		'slug'           => $slug,
+		'title'          => $title,
+		'description'    => (string) ($config['settings']['description'] ?? ''),
+		'icon'           => $gutenberg_icon,
+		'iconRaw'        => $raw_icon,
+		'category'       => (string) ($config['settings']['block_category'] ?? 'widgets'),
+		'keywords'       => $keywords,
+		'fields'         => $config['fields'],
+		'templateExists' => bl_blocks_locate_template($slug) !== '',
+		'createPath'     => bl_blocks_template_info($slug)['create_path'],
 	];
 }
 
@@ -87,7 +159,18 @@ function bl_blocks_register_dynamic_blocks(): void
 		wp_register_script(
 			'bl-blocks-editor',
 			$asset['uri'],
-			['wp-blocks', 'wp-element', 'wp-block-editor', 'wp-components', 'wp-i18n', 'wp-data', 'wp-plugins', 'wp-edit-post', 'wp-compose'],
+			[
+				'wp-blocks',
+				'wp-element',
+				'wp-block-editor',
+				'wp-components',
+				'wp-i18n',
+				'wp-data',
+				'wp-plugins',
+				'wp-edit-post',
+				'wp-compose',
+				'wp-api-fetch',
+			],
 			$asset['ver'],
 			true
 		);
@@ -109,8 +192,10 @@ function bl_blocks_register_dynamic_blocks(): void
 			'keywords'        => $def['keywords'],
 			'attributes'      => [
 				'values' => [
-					'type'    => 'object',
-					'default' => (object) [],
+					// object|array: empty {} often arrives as [] over REST.
+					'type'                 => ['object', 'array'],
+					'default'              => [],
+					'additionalProperties' => true,
 				],
 			],
 			'supports'        => [
@@ -131,13 +216,17 @@ function bl_blocks_register_dynamic_blocks(): void
 
 	if ($editor_script !== '') {
 		wp_localize_script('bl-blocks-editor', 'blBlocksEditor', [
-			'blocks' => bl_blocks_active_block_payloads(),
-			'i18n'   => [
-				'edit'       => __('Edit fields', 'baselayer-blocks'),
-				'save'       => __('Apply', 'baselayer-blocks'),
-				'cancel'     => __('Cancel', 'baselayer-blocks'),
-				'panelTitle' => __('Block fields', 'baselayer-blocks'),
-				'preview'    => __('Edit fields to configure this block.', 'baselayer-blocks'),
+			'blocks'     => bl_blocks_active_block_payloads(),
+			'renderPath' => 'baselayer-blocks/v1/render',
+			'i18n'       => [
+				'edit'            => __('Edit fields', 'baselayer-blocks'),
+				'save'            => __('Apply', 'baselayer-blocks'),
+				'cancel'          => __('Cancel', 'baselayer-blocks'),
+				'panelTitle'      => __('Block fields', 'baselayer-blocks'),
+				'preview'         => __('Edit fields to configure this block.', 'baselayer-blocks'),
+				'previewError'    => __('Error loading preview: %s', 'baselayer-blocks'),
+				'previewEmpty'    => __('Block rendered as empty.', 'baselayer-blocks'),
+				'templateMissing' => __('Template missing.', 'baselayer-blocks'),
 			],
 		]);
 	}
@@ -145,20 +234,103 @@ function bl_blocks_register_dynamic_blocks(): void
 add_action('init', 'bl_blocks_register_dynamic_blocks', 30);
 
 /**
- * Minimal front/editor render.
+ * Editor preview REST: only name + values (avoids core block-renderer attribute schema fights).
+ */
+function bl_blocks_register_rest_routes(): void
+{
+	register_rest_route('baselayer-blocks/v1', '/render', [
+		'methods'             => 'POST',
+		'callback'            => 'bl_blocks_rest_render_block',
+		'permission_callback' => static function (): bool {
+			return current_user_can('edit_posts');
+		},
+		'args'                => [
+			'name'   => [
+				'required'          => true,
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			],
+			'values' => [
+				'required'          => false,
+				'default'           => [],
+				'validate_callback' => static function ($value): bool {
+					return $value === null || is_array($value) || is_object($value);
+				},
+			],
+		],
+	]);
+}
+add_action('rest_api_init', 'bl_blocks_register_rest_routes');
+
+/**
+ * @param WP_REST_Request $request
+ * @return WP_REST_Response|WP_Error
+ */
+function bl_blocks_rest_render_block(WP_REST_Request $request)
+{
+	$name = (string) $request->get_param('name');
+	$values = $request->get_param('values');
+	if (is_object($values)) {
+		$values = (array) $values;
+	}
+	if (!is_array($values)) {
+		$values = [];
+	}
+
+	$def = null;
+	foreach (bl_blocks_active_block_payloads() as $payload) {
+		if (($payload['name'] ?? '') === $name) {
+			$def = $payload;
+			break;
+		}
+	}
+	if ($def === null) {
+		return new WP_Error(
+			'bl_blocks_unknown_block',
+			__('Unknown block.', 'baselayer-blocks'),
+			['status' => 404]
+		);
+	}
+
+	return rest_ensure_response([
+		'rendered' => bl_blocks_render_block($def, ['values' => $values]),
+	]);
+}
+
+/**
+ * Whether the current render is an editor preview REST request.
+ */
+function bl_blocks_is_editor_render(): bool
+{
+	if (!defined('REST_REQUEST') || !REST_REQUEST) {
+		return false;
+	}
+
+	$route = '';
+	if (isset($GLOBALS['wp']) && is_object($GLOBALS['wp']) && isset($GLOBALS['wp']->query_vars['rest_route'])) {
+		$route = (string) $GLOBALS['wp']->query_vars['rest_route'];
+	}
+	if ($route === '' && isset($_SERVER['REQUEST_URI'])) {
+		$route = (string) wp_unslash($_SERVER['REQUEST_URI']);
+	}
+
+	return str_contains($route, '/baselayer-blocks/v1/render')
+		|| str_contains($route, '/block-renderer/');
+}
+
+/**
+ * Field-value dump used when the theme template is missing (frontend) or empty.
  *
  * @param array<string, mixed> $def
- * @param array<string, mixed> $attributes
+ * @param array<string, mixed> $values
  */
-function bl_blocks_render_block(array $def, array $attributes): string
+function bl_blocks_render_block_fallback(array $def, array $values): string
 {
-	$values = isset($attributes['values']) && is_array($attributes['values'])
-		? bl_blocks_sanitize_values($def['fields'], $attributes['values'])
-		: [];
-
+	$fields = isset($def['fields']) && is_array($def['fields']) ? $def['fields'] : [];
+	$slug = (string) ($def['slug'] ?? '');
 	$title = esc_html((string) ($def['title'] ?? 'Block'));
 	$parts = [];
-	foreach (bl_blocks_iter_fields($def['fields']) as $field) {
+	foreach (bl_blocks_iter_fields($fields) as $field) {
 		$name = (string) ($field['name'] ?? '');
 		if ($name === '' || !array_key_exists($name, $values)) {
 			continue;
@@ -175,7 +347,7 @@ function bl_blocks_render_block(array $def, array $attributes): string
 	}
 
 	$wrapper = get_block_wrapper_attributes([
-		'class' => 'bl-blocks-block bl-blocks-block--' . sanitize_html_class((string) ($def['slug'] ?? '')),
+		'class' => 'bl-blocks-block bl-blocks-block--' . sanitize_html_class($slug),
 	]);
 
 	$html = '<div ' . $wrapper . '>';
@@ -184,6 +356,68 @@ function bl_blocks_render_block(array $def, array $attributes): string
 		$html .= '<ul class="bl-blocks-block__values">' . implode('', $parts) . '</ul>';
 	}
 	$html .= '</div>';
+
+	return $html;
+}
+
+/**
+ * Editor-only notice when the theme template file is missing.
+ *
+ * @param array<string, mixed> $def
+ */
+function bl_blocks_render_missing_template_notice(string $slug, array $def): string
+{
+	$info = bl_blocks_template_info($slug);
+	$title = (string) ($def['title'] ?? $slug);
+	$name = bl_blocks_gutenberg_name($slug);
+
+	$html = '<div class="bl-blocks-block-missing-template">';
+	$html .= '<p class="bl-blocks-block-missing-template__title"><strong>' . esc_html($title) . '</strong></p>';
+	$html .= '<p class="bl-blocks-block-missing-template__name"><code>' . esc_html($name) . '</code></p>';
+	$html .= '<p class="bl-blocks-block-missing-template__status">' . esc_html__('Template missing.', 'baselayer-blocks') . '</p>';
+	$html .= '<p class="bl-blocks-block-missing-template__help">' . esc_html__('Create this PHP file in your theme (child theme preferred):', 'baselayer-blocks') . '</p>';
+	$html .= '<p class="bl-blocks-block-missing-template__path"><code>' . esc_html($info['create_path']) . '</code></p>';
+	$html .= '</div>';
+
+	return $html;
+}
+
+/**
+ * Front/editor render: theme template when present, otherwise notice (editor) or field dump.
+ *
+ * Template path: blocks/{slug}/{slug}.php (child theme preferred).
+ * Available in the template: $values, $fields, $block, $attributes, $def.
+ *
+ * @param array<string, mixed> $def
+ * @param array<string, mixed> $attributes
+ */
+function bl_blocks_render_block(array $def, array $attributes): string
+{
+	$values = isset($attributes['values']) && is_array($attributes['values'])
+		? bl_blocks_sanitize_values($def['fields'], $attributes['values'])
+		: [];
+	if ($values === [] && isset($attributes['values']) && is_object($attributes['values'])) {
+		$values = bl_blocks_sanitize_values($def['fields'], (array) $attributes['values']);
+	}
+	$fields = isset($def['fields']) && is_array($def['fields']) ? $def['fields'] : [];
+	$slug = (string) ($def['slug'] ?? '');
+	$block = $def;
+
+	$path = bl_blocks_locate_template($slug);
+	if ($path === '') {
+		if (bl_blocks_is_editor_render()) {
+			return bl_blocks_render_missing_template_notice($slug, $def);
+		}
+
+		return bl_blocks_render_block_fallback($def, $values);
+	}
+
+	ob_start();
+	include $path;
+	$html = trim((string) ob_get_clean());
+	if ($html === '') {
+		return bl_blocks_render_block_fallback($def, $values);
+	}
 
 	return $html;
 }

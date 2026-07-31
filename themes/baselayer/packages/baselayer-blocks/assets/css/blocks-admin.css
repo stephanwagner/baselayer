@@ -291,6 +291,32 @@ body.post-new-php.post-type-bl_block .page-title-action {
   margin-top: 0;
 }
 
+.bl-blocks-template-metabox__name {
+  margin-top: 0;
+}
+
+.bl-blocks-template-metabox__status {
+  margin: 0 0 8px;
+  font-weight: 600;
+}
+
+.bl-blocks-template-metabox__status.is-found {
+  color: #008a20;
+}
+
+.bl-blocks-template-metabox__status.is-missing {
+  color: #b32d2e;
+}
+
+.bl-blocks-template-metabox__path {
+  margin: 0 0 8px;
+  word-break: break-word;
+}
+
+.bl-blocks-template-metabox__path code {
+  font-size: 12px;
+}
+
 @media (max-width: 782px) {
   .bl-blocks-website__layout {
     grid-template-columns: 1fr;

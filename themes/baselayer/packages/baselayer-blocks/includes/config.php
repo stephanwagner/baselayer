@@ -22,7 +22,7 @@ function bl_blocks_sanitize_definition_type($type): string
 }
 
 /**
- * @return array{active: bool, slug: string, description: string, block_title: string, block_icon: string, block_category: string, block_keywords: string, post_types: list<string>, menu_label: string, menu_order: int}
+ * @return array{active: bool, slug: string, description: string, block_icon: string, block_category: string, block_keywords: string, post_types: list<string>, menu_label: string, menu_order: int}
  */
 function bl_blocks_default_settings(string $type = 'block'): array
 {
@@ -32,7 +32,6 @@ function bl_blocks_default_settings(string $type = 'block'): array
 		'active'         => true,
 		'slug'           => '',
 		'description'    => '',
-		'block_title'    => '',
 		'block_icon'     => 'block-default',
 		'block_category' => 'widgets',
 		'block_keywords' => '',
@@ -213,7 +212,6 @@ function bl_blocks_sanitize_settings($settings, string $type = 'block'): array
 	$out['active'] = array_key_exists('active', $settings) ? !empty($settings['active']) : true;
 	$out['slug'] = sanitize_key((string) ($settings['slug'] ?? ''));
 	$out['description'] = sanitize_textarea_field((string) ($settings['description'] ?? ''));
-	$out['block_title'] = sanitize_text_field((string) ($settings['block_title'] ?? ''));
 	$out['block_icon'] = bl_blocks_sanitize_block_icon($settings['block_icon'] ?? 'block-default');
 	$out['block_category'] = sanitize_key((string) ($settings['block_category'] ?? 'widgets'));
 	if ($out['block_category'] === '') {

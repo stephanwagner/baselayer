@@ -5234,6 +5234,9 @@
   function hasThemeIconPicker() {
     return !!(window.baselayerIcons && window.blBlocksAdmin && window.blBlocksAdmin.hasIconPicker);
   }
+  function slugifyFromTitle(text) {
+    return String(text || "").trim().toLowerCase().replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").replace(/-+/g, "-");
+  }
   function createBlockIconField(initial, onChange) {
     let value = initial || "block-default";
     const usePicker = hasThemeIconPicker();
@@ -5417,11 +5420,36 @@
       value: state.slug || "",
       pattern: "[a-z0-9\\-]*"
     });
-    slugInput.addEventListener("input", () => {
-      state.slug = slugInput.value.trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
-      slugInput.value = state.slug;
+    const allowAutoSlug = document.body.classList.contains("post-new-php") && !(state.slug || "").trim();
+    let slugManual = !allowAutoSlug;
+    const applySlug = (next, { manual = false } = {}) => {
+      const cleaned = String(next || "").trim().toLowerCase().replace(/[^a-z0-9-]/g, "");
+      if (manual) {
+        slugManual = true;
+      }
+      state.slug = cleaned;
+      slugInput.value = cleaned;
       notify();
+    };
+    slugInput.addEventListener("input", () => {
+      applySlug(slugInput.value, { manual: true });
     });
+    if (allowAutoSlug) {
+      const titleInput = document.getElementById("title");
+      if (titleInput) {
+        const syncFromTitle = () => {
+          if (slugManual) {
+            return;
+          }
+          applySlug(slugifyFromTitle(titleInput.value));
+        };
+        titleInput.addEventListener("input", syncFromTitle);
+        titleInput.addEventListener("change", syncFromTitle);
+        if (titleInput.value.trim()) {
+          syncFromTitle();
+        }
+      }
+    }
     const descInput = el("textarea", {
       className: "large-text",
       rows: 3,
@@ -5438,15 +5466,6 @@
       fieldRow(t("settingsDescription", "Description"), descInput)
     ];
     if (definitionType === "block") {
-      const titleInput = el("input", {
-        type: "text",
-        className: "regular-text",
-        value: state.block_title || ""
-      });
-      titleInput.addEventListener("input", () => {
-        state.block_title = titleInput.value;
-        notify();
-      });
       const iconField = createBlockIconField(state.block_icon || "block-default", (next) => {
         state.block_icon = next;
         notify();
@@ -5491,8 +5510,8 @@
         state.block_keywords = keywordsInput.value;
         notify();
       });
+      delete state.block_title;
       children.push(
-        fieldRow(t("blockTitle", "Block title"), titleInput),
         fieldRow(t("blockIcon", "Block icon"), iconField),
         fieldRow(t("blockCategory", "Block category"), categorySelect),
         fieldRow(t("blockKeywords", "Keywords"), keywordsInput, t("blockKeywordsHelp", ""))
