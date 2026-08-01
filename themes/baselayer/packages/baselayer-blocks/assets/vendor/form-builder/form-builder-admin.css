@@ -77,7 +77,7 @@
   --bl-forms-admin-surface: #f6f7f7;
   --bl-forms-admin-accent: #2271b1;
   --bl-forms-admin-radius: 4px;
-  --bl-forms-admin-palette-width: 220px;
+  --bl-forms-admin-palette-width: 200px;
 }
 .bl-forms-builder select,
 .bl-forms-builder__modal select {
@@ -244,9 +244,6 @@ body.bl-forms-builder-fullscreen {
     grid-template-columns: 1fr;
   }
 }
-.bl-forms-builder__fields-layout:has(.bl-forms-builder__palette.is-collapsed) {
-  grid-template-columns: minmax(0, 1fr);
-}
 
 .bl-forms-builder__col-title {
   margin: 0 0 10px;
@@ -271,16 +268,6 @@ body.bl-forms-builder-fullscreen {
 .bl-forms-builder.is-fullscreen .bl-forms-builder__palette {
   top: 12px;
 }
-.bl-forms-builder__palette.is-collapsed {
-  position: static;
-  top: auto;
-}
-.bl-forms-builder__palette.is-collapsed .bl-forms-builder__palette-body {
-  display: none;
-}
-.bl-forms-builder__palette.is-collapsed .bl-forms-builder__palette-toolbar {
-  margin-bottom: 0;
-}
 
 .bl-forms-builder__palette-toolbar {
   display: flex;
@@ -292,7 +279,7 @@ body.bl-forms-builder-fullscreen {
 input.bl-forms-builder__palette-search {
   display: block;
   flex: 1 1 auto;
-  width: auto;
+  width: 100%;
   min-width: 0;
   margin: 0;
   padding: 4px 12px;
@@ -309,46 +296,6 @@ input.bl-forms-builder__palette-search:focus {
   border-color: var(--bl-forms-admin-accent);
   box-shadow: 0 0 0 1px var(--bl-forms-admin-accent);
   outline: none;
-}
-
-.bl-forms-builder__palette-collapse {
-  appearance: none;
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  margin: 0;
-  padding: 0;
-  border: 1px solid var(--bl-forms-admin-border);
-  border-radius: var(--bl-forms-admin-radius);
-  background: #fff;
-  color: var(--bl-forms-admin-muted);
-  cursor: pointer;
-  box-sizing: border-box;
-}
-.bl-forms-builder__palette-collapse:hover {
-  color: #1d2327;
-  border-color: #8c8f94;
-}
-.bl-forms-builder__palette-collapse:focus-visible {
-  border-color: var(--bl-forms-admin-accent);
-  box-shadow: 0 0 0 1px var(--bl-forms-admin-accent);
-  outline: none;
-}
-
-.bl-forms-builder__palette-collapse-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 18px;
-  height: 18px;
-  line-height: 1;
-}
-.bl-forms-builder__palette-collapse-icon svg {
-  display: block;
-  width: 18px;
-  height: 18px;
 }
 
 .bl-forms-builder__palette-body {
@@ -446,7 +393,7 @@ p.bl-forms-builder__palette-empty {
   align-items: center;
   gap: 8px;
   width: 100%;
-  padding: 6px 6px 6px 10px;
+  padding: 8px 8px 10px;
   border: 1px solid var(--bl-forms-admin-border);
   border-radius: var(--bl-forms-admin-radius);
   background: #fff;
@@ -468,11 +415,11 @@ p.bl-forms-builder__palette-empty {
 }
 
 @media (max-width: 782px) {
-  .bl-forms-builder__palette:not(.is-collapsed) .bl-forms-builder__palette-list {
+  .bl-forms-builder__palette .bl-forms-builder__palette-list {
     flex-direction: row;
     flex-wrap: wrap;
   }
-  .bl-forms-builder__palette:not(.is-collapsed) .bl-forms-builder__template {
+  .bl-forms-builder__palette .bl-forms-builder__template {
     width: auto;
     flex: 0 1 auto;
     max-width: 100%;
@@ -499,38 +446,6 @@ p.bl-forms-builder__palette-empty {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-.bl-forms-builder__template-add {
-  appearance: none;
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: center;
-  justify-content: center;
-  width: 24px;
-  height: 24px;
-  margin: 0;
-  margin-left: auto;
-  padding: 0;
-  border: 0;
-  border-radius: var(--bl-forms-admin-radius);
-  background: transparent;
-  color: var(--bl-forms-admin-muted);
-  cursor: pointer;
-  line-height: 1;
-}
-.bl-forms-builder__template-add svg {
-  display: block;
-  width: 16px;
-  height: 16px;
-}
-.bl-forms-builder__template-add:hover, .bl-forms-builder__template-add:focus-visible {
-  background: color-mix(in srgb, var(--bl-forms-admin-accent) 14%, #fff);
-  color: var(--bl-forms-admin-accent);
-  outline: none;
-}
-.bl-forms-builder__template-add:active {
-  background: color-mix(in srgb, var(--bl-forms-admin-accent) 22%, #fff);
 }
 
 .bl-forms-builder__icon-btn {

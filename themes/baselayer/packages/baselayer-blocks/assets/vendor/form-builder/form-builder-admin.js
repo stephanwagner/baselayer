@@ -3201,7 +3201,7 @@
     return `${width}%`;
   }
   function settingHeading(text) {
-    return el("p", { className: "bl-forms-builder__setting-heading", text });
+    return el("div", { className: "bl-forms-builder__setting-heading", text });
   }
   function createSwitchSetting(key, label, checked, onChange) {
     const input = el("input", {

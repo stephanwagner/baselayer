@@ -35,21 +35,7 @@ export function createPalette(options = {}) {
     autocomplete: 'off',
   });
 
-  const collapseBtn = el('button', {
-    type: 'button',
-    className: `${ns}__palette-collapse`,
-    'aria-expanded': 'true',
-    'aria-controls': bodyId,
-    title: t('paletteHide', 'Hide templates'),
-    'aria-label': t('paletteHide', 'Hide templates'),
-  });
-  const collapseIcon = el('span', {
-    className: `${ns}__palette-collapse-icon`,
-    'aria-hidden': 'true',
-  });
-  collapseBtn.appendChild(collapseIcon);
-
-  wrap.appendChild(el('div', { className: `${ns}__palette-toolbar` }, [search, collapseBtn]));
+  wrap.appendChild(el('div', { className: `${ns}__palette-toolbar` }, [search]));
 
   const body = el('div', { id: bodyId, className: `${ns}__palette-body` });
   wrap.appendChild(body);
@@ -63,7 +49,6 @@ export function createPalette(options = {}) {
 
   const sections = [];
   let openId = sectionsConfig[0]?.id || '';
-  let collapsed = false;
 
   const defaultIcon = (type) => {
     if (typeof options.renderIcon === 'function') {
@@ -79,53 +64,6 @@ export function createPalette(options = {}) {
     return wrapIcon;
   };
 
-  const addButton = (type) => {
-    const btn = el('button', {
-      type: 'button',
-      className: `${ns}__template-add`,
-      title: t('paletteAdd', 'Add'),
-      'aria-label': t('paletteAdd', 'Add'),
-      onClick: (event) => {
-        event.preventDefault();
-        event.stopPropagation();
-        onAdd(type);
-      },
-    });
-    const stop = (event) => event.stopPropagation();
-    btn.addEventListener('pointerdown', stop);
-    btn.addEventListener('mousedown', stop);
-    if (icons.add) {
-      btn.innerHTML = icons.add;
-    } else {
-      btn.textContent = '›';
-    }
-    return btn;
-  };
-
-  const syncCollapseUi = () => {
-    wrap.classList.toggle('is-collapsed', collapsed);
-    collapseBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
-    const label = collapsed
-      ? t('paletteShow', 'Show templates')
-      : t('paletteHide', 'Hide templates');
-    collapseBtn.title = label;
-    collapseBtn.setAttribute('aria-label', label);
-    const markup = collapsed
-      ? icons.panelExpand || icons.panelCollapse || ''
-      : icons.panelCollapse || icons.panelExpand || '';
-    if (markup) {
-      collapseIcon.innerHTML = markup;
-    } else {
-      collapseIcon.textContent = collapsed ? '›' : '‹';
-    }
-  };
-
-  collapseBtn.addEventListener('click', () => {
-    collapsed = !collapsed;
-    syncCollapseUi();
-  });
-  syncCollapseUi();
-
   const setOpen = (nextId) => {
     openId = nextId;
     sections.forEach(({ sectionEl, toggle, panel, id }) => {
@@ -140,11 +78,6 @@ export function createPalette(options = {}) {
     const query = search.value.trim().toLowerCase();
     const searching = query !== '';
     let totalVisible = 0;
-
-    if (searching && collapsed) {
-      collapsed = false;
-      syncCollapseUi();
-    }
 
     sections.forEach(({ sectionEl, toggle, panel, list, id }) => {
       if (searching && id === 'popular') {
@@ -251,7 +184,6 @@ export function createPalette(options = {}) {
           [
             defaultIcon(type),
             el('span', { className: `${ns}__template-label`, text: typeLabel(type) }),
-            addButton(type),
           ]
         )
       );
@@ -267,8 +199,6 @@ export function createPalette(options = {}) {
       sort: false,
       animation: 150,
       draggable: `.${ns}__template`,
-      filter: `.${ns}__template-add`,
-      preventOnFilter: false,
       onStart: dragStart,
       onEnd: dragEnd,
     });
