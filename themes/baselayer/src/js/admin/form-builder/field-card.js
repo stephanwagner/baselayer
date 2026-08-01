@@ -449,6 +449,11 @@ const DESCRIPTION_TYPES = [
   'file',
   'image',
   'toggle',
+  'select',
+  'radio',
+  'checkboxes',
+  'button_group',
+  'terms',
 ];
 const NO_PLACEHOLDER = [
   'terms',

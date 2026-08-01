@@ -1829,7 +1829,12 @@
     "datetime",
     "file",
     "image",
-    "toggle"
+    "toggle",
+    "select",
+    "radio",
+    "checkboxes",
+    "button_group",
+    "terms"
   ];
   var NO_PLACEHOLDER = [
     "terms",
