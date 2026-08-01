@@ -1278,6 +1278,32 @@ input.bl-forms-builder__section-label-input:focus {
 .bl-forms-builder__modal-body > .bl-forms-builder__width {
   margin: 0;
 }
+.bl-forms-builder__modal-body--design {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.bl-forms-builder__modal-body--design > .bl-forms-builder__design-style,
+.bl-forms-builder__modal-body--design > .bl-forms-builder__switch-setting,
+.bl-forms-builder__modal-body--design > .bl-forms-builder__css-class {
+  margin: 0;
+}
+.bl-forms-builder__modal-body--design > .bl-forms-builder__css-class > p > label,
+.bl-forms-builder__modal-body--design .bl-forms-builder__setting-heading {
+  display: block;
+  margin: 0 0 6px;
+  font-weight: 600;
+}
+.bl-forms-builder__modal-body--design > .bl-forms-builder__css-class > p {
+  margin: 0 0 6px;
+}
+.bl-forms-builder__modal-body--design > .bl-forms-builder__css-class > p.description {
+  margin: -2px 0 0;
+  font-weight: 400;
+}
+.bl-forms-builder__modal-body--design > .bl-forms-builder__css-class > p:last-child {
+  margin-bottom: 0;
+}
 
 .bl-forms-builder__modal-footer {
   display: flex;
@@ -1634,6 +1660,7 @@ input.bl-forms-builder__section-label-input:focus {
 }
 
 .bl-forms-builder label.bl-forms-builder__switch,
+.bl-forms-builder__modal label.bl-forms-builder__switch,
 .bl-forms-settings label.bl-forms-builder__switch {
   display: inline-flex;
   align-items: center;
@@ -1646,6 +1673,7 @@ input.bl-forms-builder__section-label-input:focus {
   line-height: 1.3;
 }
 .bl-forms-builder label.bl-forms-builder__switch input,
+.bl-forms-builder__modal label.bl-forms-builder__switch input,
 .bl-forms-settings label.bl-forms-builder__switch input {
   position: absolute;
   opacity: 0;
@@ -1686,17 +1714,20 @@ input.bl-forms-builder__section-label-input:focus {
 }
 
 .bl-forms-builder label.bl-forms-builder__switch input:checked + .bl-forms-builder__switch-ui,
+.bl-forms-builder__modal label.bl-forms-builder__switch input:checked + .bl-forms-builder__switch-ui,
 .bl-forms-settings label.bl-forms-builder__switch input:checked + .bl-forms-builder__switch-ui {
   background: var(--bl-forms-admin-accent, #2271b1);
   border-color: var(--bl-forms-admin-accent, #2271b1);
 }
 .bl-forms-builder label.bl-forms-builder__switch input:checked + .bl-forms-builder__switch-ui::after,
+.bl-forms-builder__modal label.bl-forms-builder__switch input:checked + .bl-forms-builder__switch-ui::after,
 .bl-forms-settings label.bl-forms-builder__switch input:checked + .bl-forms-builder__switch-ui::after {
   border-color: #fff;
   transform: translateX(14px);
 }
 
 .bl-forms-builder label.bl-forms-builder__switch input:focus-visible + .bl-forms-builder__switch-ui,
+.bl-forms-builder__modal label.bl-forms-builder__switch input:focus-visible + .bl-forms-builder__switch-ui,
 .bl-forms-settings label.bl-forms-builder__switch input:focus-visible + .bl-forms-builder__switch-ui {
   outline: 2px solid var(--bl-forms-admin-accent, #2271b1);
   outline-offset: 0;

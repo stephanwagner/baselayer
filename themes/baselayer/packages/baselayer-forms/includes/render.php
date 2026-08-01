@@ -621,8 +621,15 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 	if ($type === 'column') {
 		$children = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
 		$inner = bl_forms_render_field_rows($children, $uid, $settings, $context);
+		$design = sanitize_key((string) ($field['design'] ?? 'standard'));
+		if (!in_array($design, ['standard', 'outline', 'card'], true)) {
+			$design = 'standard';
+		}
 		$is_auto = (($field['width'] ?? '') === 'auto');
-		$classes = 'bl-form__column' . ($is_auto ? ' bl-form__column--auto' : '');
+		$classes = 'bl-form__column bl-form__column--' . $design;
+		if ($is_auto) {
+			$classes .= ' bl-form__column--auto';
+		}
 		$extra = bl_forms_sanitize_css_class((string) ($field['css_class'] ?? ''));
 		if ($extra !== '') {
 			$classes .= ' ' . $extra;
@@ -658,8 +665,9 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 		if ($style !== '') {
 			$attrs .= ' style="' . esc_attr($style) . '"';
 		}
+		$show_title = !array_key_exists('show_title', $field) || !empty($field['show_title']);
 		$html = '<section ' . $attrs . '>';
-		if ($label !== '') {
+		if ($show_title && $label !== '') {
 			$html .= '<h3 class="bl-form__section-title">' . esc_html($label) . '</h3>';
 		}
 		$html .= '<div class="bl-form__section-body">' . $inner . '</div></section>';

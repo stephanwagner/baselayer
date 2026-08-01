@@ -64,6 +64,8 @@ function makeField(partial) {
       width: partial.width || '100',
       width_custom: '',
       design: partial.design || 'card',
+      show_title: partial.show_title !== false,
+      css_class: typeof partial.css_class === 'string' ? partial.css_class : '',
       children: Array.isArray(partial.children) ? partial.children : [],
     };
   }

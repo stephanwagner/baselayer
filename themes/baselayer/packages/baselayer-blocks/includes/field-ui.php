@@ -48,7 +48,7 @@ function bl_blocks_palette_icons(): array
 		'done'         => 'checkmark',
 		'trash'        => 'delete',
 		'duplicate'    => 'copy',
-		'drag'         => 'drag-handle',
+		'drag'         => 'drag',
 		'fullscreen'   => 'fullscreen',
 		'fullscreenExit'=> 'fullscreen-exit',
 	];

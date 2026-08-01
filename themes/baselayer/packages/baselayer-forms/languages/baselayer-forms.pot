@@ -245,33 +245,37 @@ msgstr ""
 msgid "Section width"
 msgstr ""
 
-#: includes/admin.php:409
-msgid "Section design"
+#: includes/admin.php:422
+msgid "Design"
 msgstr ""
 
-#: includes/admin.php:410
+#: includes/admin.php:423
 msgid "Standard"
 msgstr ""
 
-#: includes/admin.php:411
+#: includes/admin.php:424
 msgid "Outline"
 msgstr ""
 
-#: includes/admin.php:412
+#: includes/admin.php:425
 msgid "Card"
 msgstr ""
 
-#: includes/admin.php:413
-#: includes/admin.php:731
+#: includes/admin.php:426
+msgid "Hide title"
+msgstr ""
+
+#: includes/admin.php:427
+#: includes/admin.php:745
 msgid "Section"
 msgstr ""
 
-#: includes/admin.php:414
+#: includes/admin.php:428
 msgid "Section title"
 msgstr ""
 
-#: includes/admin.php:415
-msgid "No title"
+#: includes/admin.php:429
+msgid "Title"
 msgstr ""
 
 #: includes/admin.php:417

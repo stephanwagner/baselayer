@@ -230,8 +230,8 @@ msgid "Section width"
 msgstr "Abschnittsbreite"
 
 #: includes/admin.php:409
-msgid "Section design"
-msgstr "Abschnittsdesign"
+msgid "Design"
+msgstr "Design"
 
 #: includes/admin.php:410
 msgid "Standard"
@@ -254,8 +254,11 @@ msgid "Section title"
 msgstr "Abschnittsüberschrift"
 
 #: includes/admin.php:415
-msgid "No title"
-msgstr "Kein Titel"
+msgid "Hide title"
+msgstr "Titel ausblenden"
+
+msgid "Title"
+msgstr "Titel"
 
 #: includes/admin.php:417
 msgid "Auto"

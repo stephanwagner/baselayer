@@ -1397,6 +1397,11 @@ function bl_forms_sanitize_field($field): ?array
 			$children[] = $clean;
 		}
 		$out['children'] = $children;
+		$design = sanitize_key((string) ($field['design'] ?? 'standard'));
+		if (!in_array($design, ['standard', 'outline', 'card'], true)) {
+			$design = 'standard';
+		}
+		$out['design'] = $design;
 		unset($out['name'], $out['name_manual'], $out['hide_label'], $out['label']);
 
 		return $out;
@@ -1425,6 +1430,8 @@ function bl_forms_sanitize_field($field): ?array
 			$design = 'standard';
 		}
 		$out['design'] = $design;
+		// Default on when missing (no legacy “empty label hides title”).
+		$out['show_title'] = !array_key_exists('show_title', $field) || !empty($field['show_title']);
 		unset($out['name'], $out['name_manual'], $out['hide_label']);
 
 		return $out;

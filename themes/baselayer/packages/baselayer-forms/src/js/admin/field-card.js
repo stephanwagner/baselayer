@@ -960,9 +960,14 @@ export function openFieldWidthModal(field, onApply) {
 }
 
 /**
- * Modal to pick a section design (standard / outline / card).
+ * Modal to pick layout design (standard / outline / card), optional hide title, CSS class.
+ *
+ * @param {object} field
+ * @param {(field: object) => void} onApply
+ * @param {object} [options]
+ * @param {boolean} [options.withShowTitle=false] - Show the hide-title switch (section).
  */
-export function openSectionDesignModal(field, onApply) {
+export function openLayoutDesignModal(field, onApply, options = {}) {
   document.querySelectorAll('.bl-forms-builder__modal').forEach((node) => node.remove());
 
   const designs = [
@@ -972,7 +977,14 @@ export function openSectionDesignModal(field, onApply) {
   ];
   const allowed = designs.map((item) => item.value);
   let draft = allowed.includes(field.design) ? field.design : 'standard';
-  const title = t('sectionDesignTitle', 'Section design');
+  const withShowTitle = !!options.withShowTitle;
+  // show_title defaults true; UI is inverted as “Hide title” (off by default).
+  const showTitleOn =
+    !withShowTitle ||
+    (field.show_title !== false && field.show_title !== 0 && field.show_title !== '0');
+  let draftHideTitle = withShowTitle ? !showTitleOn : false;
+  let draftCssClass = field.css_class || '';
+  const title = t('layoutDesignTitle', 'Design');
 
   const backdrop = el('div', {
     className: 'bl-forms-builder__modal',
@@ -988,6 +1000,10 @@ export function openSectionDesignModal(field, onApply) {
 
   const apply = () => {
     field.design = draft;
+    field.css_class = draftCssClass.trim();
+    if (withShowTitle) {
+      field.show_title = !draftHideTitle;
+    }
     onApply(field);
     close();
   };
@@ -1013,12 +1029,46 @@ export function openSectionDesignModal(field, onApply) {
     }),
   ]);
 
-  const body = el('div', { className: 'bl-forms-builder__modal-body' });
-  body.appendChild(
+  const body = el('div', {
+    className: 'bl-forms-builder__modal-body bl-forms-builder__modal-body--design',
+  });
+
+  if (withShowTitle) {
+    body.appendChild(
+      createSwitchSetting('blHideTitle', t('sectionHideTitle', 'Hide title'), draftHideTitle, (checked) => {
+        draftHideTitle = checked;
+      })
+    );
+  }
+
+  const designWrap = el('div', { className: 'bl-forms-builder__design-style' });
+  designWrap.append(
+    settingHeading(t('layoutDesignStyle', 'Style')),
     createSegmentedControl(designs, draft, 'blDesignGroup', (value) => {
       draft = value;
     })
   );
+  body.appendChild(designWrap);
+
+  const cssInput = el('input', {
+    type: 'text',
+    className: 'widefat',
+    dataset: { blCssClass: '1' },
+    value: draftCssClass,
+    placeholder: t('cssClassPlaceholder', 'e.g. my-field'),
+  });
+  cssInput.addEventListener('input', () => {
+    draftCssClass = cssInput.value;
+  });
+  const cssWrap = el('div', { className: 'bl-forms-builder__css-class' });
+  cssWrap.appendChild(el('p', {}, [el('label', { text: t('cssClass', 'CSS class') }), cssInput]));
+  cssWrap.appendChild(
+    el('p', {
+      className: 'description',
+      text: t('cssClassHelp', 'Optional class names added to this field’s wrapper.'),
+    })
+  );
+  body.appendChild(cssWrap);
 
   const footer = el('div', { className: 'bl-forms-builder__modal-footer' }, [
     el('button', {
@@ -1038,6 +1088,11 @@ export function openSectionDesignModal(field, onApply) {
   dialog.append(header, body, footer);
   backdrop.appendChild(dialog);
   document.body.appendChild(backdrop);
+}
+
+/** @deprecated Use openLayoutDesignModal */
+export function openSectionDesignModal(field, onApply, options = {}) {
+  openLayoutDesignModal(field, onApply, { withShowTitle: true, ...options });
 }
 
 function syncWidthControlUi(scope, field) {

@@ -1219,6 +1219,39 @@ input.bl-forms-builder__section-label-input {
   > .bl-forms-builder__width {
     margin: 0;
   }
+
+  &--design {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    > .bl-forms-builder__design-style,
+    > .bl-forms-builder__switch-setting,
+    > .bl-forms-builder__css-class {
+      margin: 0;
+    }
+
+    // Match field-settings label treatment.
+    > .bl-forms-builder__css-class > p > label,
+    .bl-forms-builder__setting-heading {
+      display: block;
+      margin: 0 0 6px;
+      font-weight: 600;
+    }
+
+    > .bl-forms-builder__css-class > p {
+      margin: 0 0 6px;
+    }
+
+    > .bl-forms-builder__css-class > p.description {
+      margin: -2px 0 0;
+      font-weight: 400;
+    }
+
+    > .bl-forms-builder__css-class > p:last-child {
+      margin-bottom: 0;
+    }
+  }
 }
 
 .bl-forms-builder__modal-footer {
@@ -1614,8 +1647,9 @@ input.bl-forms-builder__section-label-input {
 }
 
 // Must beat `.bl-forms-builder__field-body label { display: block }` and
-// inherited/admin label font-size overrides.
+// inherited/admin label font-size overrides. Modal is portaled to body.
 .bl-forms-builder label.bl-forms-builder__switch,
+.bl-forms-builder__modal label.bl-forms-builder__switch,
 .bl-forms-settings label.bl-forms-builder__switch {
   display: inline-flex;
   align-items: center;
@@ -1671,6 +1705,7 @@ input.bl-forms-builder__section-label-input {
 }
 
 .bl-forms-builder label.bl-forms-builder__switch input:checked + .bl-forms-builder__switch-ui,
+.bl-forms-builder__modal label.bl-forms-builder__switch input:checked + .bl-forms-builder__switch-ui,
 .bl-forms-settings label.bl-forms-builder__switch input:checked + .bl-forms-builder__switch-ui {
   background: var(--bl-forms-admin-accent, #2271b1);
   border-color: var(--bl-forms-admin-accent, #2271b1);
@@ -1682,6 +1717,7 @@ input.bl-forms-builder__section-label-input {
 }
 
 .bl-forms-builder label.bl-forms-builder__switch input:focus-visible + .bl-forms-builder__switch-ui,
+.bl-forms-builder__modal label.bl-forms-builder__switch input:focus-visible + .bl-forms-builder__switch-ui,
 .bl-forms-settings label.bl-forms-builder__switch input:focus-visible + .bl-forms-builder__switch-ui {
   outline: 2px solid var(--bl-forms-admin-accent, #2271b1);
   outline-offset: 0;
