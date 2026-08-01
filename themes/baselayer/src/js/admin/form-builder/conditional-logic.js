@@ -1,4 +1,4 @@
-import { el, t, typeLabel, readConfig, flattenFields } from './dom.js';
+import { el, t, typeLabel, readConfig, flattenFields, iconEl } from './dom.js';
 
 /** Field types that cannot be used as condition sources. */
 export const LOGIC_SOURCE_EXCLUDE = [
@@ -445,7 +445,8 @@ export function createConditionalLogicEditor(
 
     const deleteBtn = el('button', {
       type: 'button',
-      className: 'bl-forms-builder__icon-btn bl-forms-builder__icon-btn--danger',
+      className:
+        'bl-forms-builder__icon-btn bl-forms-builder__icon-btn--danger bl-forms-builder__icon-btn--close',
       title: t('delete', 'Delete'),
       'aria-label': t('delete', 'Delete'),
       onClick: () => {
@@ -461,7 +462,12 @@ export function createConditionalLogicEditor(
         syncHidden();
       },
     });
-    deleteBtn.textContent = '×';
+    const closeIcon = iconEl('close');
+    if (closeIcon.innerHTML) {
+      deleteBtn.appendChild(closeIcon);
+    } else {
+      deleteBtn.textContent = '×';
+    }
 
     return el('div', { className: 'bl-forms-builder__logic-rule' }, [
       fieldSelect,
@@ -477,17 +483,12 @@ export function createConditionalLogicEditor(
       return el('div', { className: 'bl-forms-builder__logic-group' });
     }
     const box = el('div', { className: 'bl-forms-builder__logic-group' });
-    const label =
-      groupIndex === 0
-        ? t('logicShowIf', 'Show this field if')
-        : t('logicOrIf', 'or if');
-    box.appendChild(el('p', { className: 'bl-forms-builder__logic-group-label', text: label }));
 
     const rulesWrap = el('div', { className: 'bl-forms-builder__logic-rules' });
     group.forEach((_, ruleIndex) => {
       if (ruleIndex > 0) {
         rulesWrap.appendChild(
-          el('p', { className: 'bl-forms-builder__logic-and', text: t('logicAnd', 'and') })
+          el('div', { className: 'bl-forms-builder__logic-and', text: t('logicAnd', 'and') })
         );
       }
       rulesWrap.appendChild(renderRuleRow(groupIndex, ruleIndex, sources));
@@ -497,7 +498,7 @@ export function createConditionalLogicEditor(
     box.appendChild(
       el('button', {
         type: 'button',
-        className: 'button bl-button-small',
+        className: 'button bl-button-tiny',
         text: t('logicAddRule', 'Add rule'),
         onClick: () => {
           const liveGroup = getGroup(groupIndex);
@@ -523,6 +524,12 @@ export function createConditionalLogicEditor(
     if (!field.conditional_logic.groups.length) {
       field.conditional_logic.groups.push([emptyRule(sources)]);
     }
+    groupsMount.appendChild(
+      el('p', {
+        className: 'bl-forms-builder__logic-group-label',
+        text: t('logicShowIf', 'Show this field if'),
+      })
+    );
     field.conditional_logic.groups.forEach((_, index) => {
       if (index > 0) {
         groupsMount.appendChild(
@@ -534,7 +541,7 @@ export function createConditionalLogicEditor(
     groupsMount.appendChild(
       el('button', {
         type: 'button',
-        className: 'button bl-button-small bl-forms-builder__logic-add-group',
+        className: 'button bl-button-tiny bl-forms-builder__logic-add-group',
         text: t('logicAddGroup', 'Add rule group'),
         onClick: () => {
           field.conditional_logic.groups.push([emptyRule(getSources())]);

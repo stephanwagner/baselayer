@@ -8,26 +8,6 @@
 
 .post-type-bl_form {
   // Forms are not publicly viewable — hide Visibility: Public.
-  #submitdiv .misc-pub-visibility {
-    display: none;
-  }
-
-  #submitdiv .misc-pub-section::before,
-  #submitdiv .curtime #timestamp::before {
-    content: none;
-    display: none;
-  }
-
-  #submitdiv #delete-action {
-    display: none;
-  }
-
-  #submitdiv .bl-forms-submitbox-help {
-    margin: 0;
-    padding-top: 8px;
-    color: #646970;
-    line-height: 1.4;
-  }
 
   #bl_forms_tools .inside,
   #bl_forms_templates .inside {

@@ -91,11 +91,8 @@ msgstr ""
 
 #: includes/admin.php:135
 msgid ""
-"Export the current form (fields and filled-in settings) as JSON, or import a"
-" previously exported file."
-msgstr ""
-"Exportiere das aktuelle Formular (Felder und ausgefüllte Einstellungen) als "
-"JSON, oder importiere eine zuvor exportierte Datei."
+"Export the current form as JSON, or import a previously exported file."
+msgstr "Exportiere das aktuelle Formular als JSON, oder importiere eine zuvor exportierte Datei."
 
 #: includes/admin.php:138 includes/admin.php:439
 msgid "Export"
@@ -108,8 +105,7 @@ msgstr "Importieren"
 #: includes/admin.php:157
 msgid "Use the Form block to insert this form anywhere on your site."
 msgstr ""
-"Verwende den Formular-Block, um dieses Formular überall auf deiner Website "
-"einzufügen."
+"Verwende den Formular-Block, um dieses Formular auf deiner Website einzufügen."
 
 #: includes/admin.php:394 includes/entries.php:18
 msgid "Fields"

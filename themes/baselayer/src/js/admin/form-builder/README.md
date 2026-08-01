@@ -10,3 +10,14 @@ Packages vendor a copy under `assets/vendor/form-builder/` for standalone plugin
 
 Runtime global: `window.BlFormBuilder`  
 Canvas / palette DnD remains `window.BlCanvasBuilder`.
+
+## Package-specific field UI
+
+Use `BlFormBuilder.configure({ fieldCard: { … } })` before mounting:
+
+- `onInitField(field)` — defaults for new/loaded fields
+- `onNormalizeType(field, nextType)` — strip/set keys on type change
+- `extraSwitches(field)` — return `Node[]` appended to Active / status switches
+- `onSerialize(data, { type, q, body, row })` — package keys when serializing
+
+Forms registers entry-list “Show in overview” this way; Blocks leaves hooks unset.

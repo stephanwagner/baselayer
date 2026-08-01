@@ -763,7 +763,7 @@
       });
       const deleteBtn = el("button", {
         type: "button",
-        className: "bl-forms-builder__icon-btn bl-forms-builder__icon-btn--danger",
+        className: "bl-forms-builder__icon-btn bl-forms-builder__icon-btn--danger bl-forms-builder__icon-btn--close",
         title: t("delete", "Delete"),
         "aria-label": t("delete", "Delete"),
         onClick: () => {
@@ -779,7 +779,12 @@
           syncHidden();
         }
       });
-      deleteBtn.textContent = "\xD7";
+      const closeIcon = iconEl("close");
+      if (closeIcon.innerHTML) {
+        deleteBtn.appendChild(closeIcon);
+      } else {
+        deleteBtn.textContent = "\xD7";
+      }
       return el("div", { className: "bl-forms-builder__logic-rule" }, [
         fieldSelect,
         opSelect,
@@ -793,8 +798,6 @@
         return el("div", { className: "bl-forms-builder__logic-group" });
       }
       const box = el("div", { className: "bl-forms-builder__logic-group" });
-      const label = groupIndex === 0 ? t("logicShowIf", "Show this field if") : t("logicOrIf", "or if");
-      box.appendChild(el("p", { className: "bl-forms-builder__logic-group-label", text: label }));
       const rulesWrap = el("div", { className: "bl-forms-builder__logic-rules" });
       group.forEach((_, ruleIndex) => {
         if (ruleIndex > 0) {
@@ -832,6 +835,12 @@
       if (!field.conditional_logic.groups.length) {
         field.conditional_logic.groups.push([emptyRule(sources)]);
       }
+      groupsMount.appendChild(
+        el("p", {
+          className: "bl-forms-builder__logic-group-label",
+          text: t("logicShowIf", "Show this field if")
+        })
+      );
       field.conditional_logic.groups.forEach((_, index) => {
         if (index > 0) {
           groupsMount.appendChild(
@@ -1418,6 +1427,22 @@
     return null;
   }
 
+  // themes/baselayer/src/js/admin/form-builder/config.js
+  var state = {
+    fieldCard: {}
+  };
+  function configure(options = {}) {
+    if (options.fieldCard && typeof options.fieldCard === "object") {
+      state.fieldCard = { ...state.fieldCard, ...options.fieldCard };
+    }
+  }
+  function resetConfig(options = {}) {
+    state.fieldCard = options.fieldCard && typeof options.fieldCard === "object" ? { ...options.fieldCard } : {};
+  }
+  function getFieldCardHooks() {
+    return state.fieldCard;
+  }
+
   // themes/baselayer/src/js/admin/form-builder/field-card.js
   var WIDTH_PRESETS = [
     { value: "100", label: "100%" },
@@ -1671,11 +1696,6 @@
       delete field.show_char_count;
       delete field.char_count_text;
     }
-    if (!["text", "email", "phone"].includes(nextType)) {
-      delete field.show_in_list;
-    } else if ((nextType === "text" || nextType === "email") && field.show_in_list === void 0) {
-      field.show_in_list = defaultShowInListForNewField(nextType, field.id);
-    }
     if (nextType === "textarea") {
       const rows = parseInt(field.rows, 10);
       field.rows = Number.isFinite(rows) && rows >= 2 ? Math.min(50, rows) : 5;
@@ -1706,6 +1726,10 @@
       }
       delete field.relation;
       delete field.relation_field;
+    }
+    const hooks = getFieldCardHooks();
+    if (typeof hooks.onNormalizeType === "function") {
+      hooks.onNormalizeType(field, nextType);
     }
   }
   function createTypeSelect(field, row, onConvert) {
@@ -2743,75 +2767,6 @@
       ])
     ]);
   }
-  function countOtherListOverviewFields(exceptId) {
-    let n = 0;
-    document.querySelectorAll(".bl-forms-builder__field[data-bl-forms-field]").forEach((row) => {
-      if (exceptId && row.dataset.fieldId === exceptId) {
-        return;
-      }
-      const input = row.querySelector("[data-bl-show-in-list]");
-      if (input && input.checked) {
-        n += 1;
-      }
-    });
-    return n;
-  }
-  function hasShowInListForType(type, exceptId = "") {
-    let found = false;
-    document.querySelectorAll(".bl-forms-builder__field[data-bl-forms-field]").forEach((row) => {
-      if (found) {
-        return;
-      }
-      if (exceptId && row.dataset.fieldId === exceptId) {
-        return;
-      }
-      if ((row.dataset.fieldType || "") !== type) {
-        return;
-      }
-      const input = row.querySelector("[data-bl-show-in-list]");
-      if (input && input.checked) {
-        found = true;
-      }
-    });
-    return found;
-  }
-  function defaultShowInListForNewField(type, exceptId = "") {
-    if (type !== "text" && type !== "email") {
-      return false;
-    }
-    if (countOtherListOverviewFields(exceptId) >= 3) {
-      return false;
-    }
-    return !hasShowInListForType(type, exceptId);
-  }
-  function createListOverviewControl(field) {
-    const input = el("input", {
-      type: "checkbox",
-      dataset: { blShowInList: "1" },
-      checked: !!field.show_in_list
-    });
-    input.addEventListener("change", () => {
-      if (input.checked && countOtherListOverviewFields(field.id) >= 3) {
-        input.checked = false;
-        window.alert(
-          t("showInListMax", "You can show at most 3 fields in the entries list.")
-        );
-        return;
-      }
-      field.show_in_list = !!input.checked;
-      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    });
-    return el("div", { className: "bl-forms-builder__switch-setting" }, [
-      el("label", { className: "bl-forms-builder__switch" }, [
-        input,
-        el("span", { className: "bl-forms-builder__switch-ui", "aria-hidden": "true" }),
-        el("span", {
-          className: "bl-forms-builder__switch-label",
-          text: t("showInList", "Show in overview")
-        })
-      ])
-    ]);
-  }
   function createTextareaRowsControl(field) {
     const rows = parseInt(field.rows, 10);
     const value = Number.isFinite(rows) && rows >= 2 ? String(Math.min(50, rows)) : "5";
@@ -3722,9 +3677,6 @@
       data.max_length = q("[data-bl-max-length]")?.value?.trim() || "";
       data.show_char_count = Boolean(q("[data-bl-show-char-count]")?.checked);
     }
-    if (type === "text" || type === "email" || type === "phone") {
-      data.show_in_list = Boolean(q("[data-bl-show-in-list]")?.checked);
-    }
     if (type === "textarea") {
       const rawRows = parseInt(q("[data-bl-rows]")?.value, 10);
       data.rows = Number.isFinite(rawRows) && rawRows >= 2 ? Math.min(50, rawRows) : 5;
@@ -3784,6 +3736,10 @@
         data.default_value = defEl.type === "checkbox" ? defEl.checked ? "1" : "" : defEl.value || "";
       }
     }
+    const hooks = getFieldCardHooks();
+    if (typeof hooks.onSerialize === "function") {
+      hooks.onSerialize(data, { type, q, body, row });
+    }
     return withConditionalLogic(body, data);
   }
   function duplicateFieldCard(row) {
@@ -3839,8 +3795,9 @@
     if (NAMED_TYPES.includes(field.type) && !field.name) {
       field.name = uniqueFieldName(field.label || field.type, field.id);
     }
-    if ((field.type === "text" || field.type === "email") && field.show_in_list === void 0) {
-      field.show_in_list = defaultShowInListForNewField(field.type, field.id);
+    const initHooks = getFieldCardHooks();
+    if (typeof initHooks.onInitField === "function") {
+      initHooks.onInitField(field);
     }
     const row = el("div", {
       className: "bl-forms-builder__field" + (open ? " is-open" : ""),
@@ -4038,8 +3995,10 @@
               document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
             })
           ];
-          if (field.type === "text" || field.type === "email" || field.type === "phone") {
-            switches.push(createListOverviewControl(field));
+          const switchHooks = getFieldCardHooks();
+          if (typeof switchHooks.extraSwitches === "function") {
+            const extra = switchHooks.extraSwitches(field) || [];
+            extra.filter(Boolean).forEach((node) => switches.push(node));
           }
           return el("div", { className: "bl-forms-builder__field-status" }, switches);
         })()
@@ -4433,7 +4392,10 @@
     normalizeConditionalLogic,
     readConditionalLogicFromDom,
     collectLogicSourceFields,
-    createConditionalLogicEditor
+    createConditionalLogicEditor,
+    configure,
+    resetConfig,
+    getFieldCardHooks
   };
   var index_default = BlFormBuilder;
   if (typeof window !== "undefined") {

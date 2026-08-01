@@ -203,7 +203,7 @@ export function createRepeaterCard(initial = {}, open = false, depth = 1) {
   field = defaultRepeater(field);
 
   const row = el('div', {
-    className: 'bl-forms-builder__field bl-blocks-builder__repeater-card',
+    className: 'bl-forms-builder__field bl-forms-builder__repeater-card',
     dataset: {
       blFormsField: '1',
       fieldId: field.id,
@@ -249,7 +249,7 @@ export function createRepeaterCard(initial = {}, open = false, depth = 1) {
   settingsBtn.appendChild(iconEl('tune', 'bl-forms-builder__design-btn-icon'));
 
   const fieldsList = el('div', {
-    className: 'bl-blocks-builder__repeater-fields',
+    className: 'bl-forms-builder__repeater-fields',
     dataset: { blRepeaterFields: '1', repeaterDepth: String(depth) },
   });
   const emptyHint = el('p', {
@@ -282,7 +282,7 @@ export function createRepeaterCard(initial = {}, open = false, depth = 1) {
 
   bindRepeaterChildList(fieldsList, depth, onListChange);
 
-  const fieldsWrap = el('div', { className: 'bl-blocks-builder__repeater-fields-wrap' }, [
+  const fieldsWrap = el('div', { className: 'bl-forms-builder__repeater-fields-wrap' }, [
     fieldsList,
     emptyHint,
   ]);
@@ -396,7 +396,7 @@ export function serializeRepeaterRow(row) {
     ':scope > .bl-forms-builder__field-header .bl-forms-builder__section-label-input'
   );
   const fields = row.querySelector(
-    ':scope > .bl-blocks-builder__repeater-fields-wrap [data-bl-repeater-fields]'
+    ':scope > .bl-forms-builder__repeater-fields-wrap [data-bl-repeater-fields]'
   );
 
   const children = Array.from(fields?.children || [])

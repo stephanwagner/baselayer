@@ -47,6 +47,7 @@ function bl_blocks_palette_icons(): array
 		'edit',
 		'done',
 		'trash',
+		'close',
 		'duplicate',
 		'drag',
 		'design',

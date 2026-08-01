@@ -43,6 +43,37 @@ $color-gray-200: #eaeef2 !default;
       padding: 6px 12px !important;
     }
   }
+
+  #submitdiv .misc-pub-visibility {
+    display: none;
+  }
+
+  #submitdiv .misc-pub-section::before,
+  #submitdiv .curtime #timestamp::before {
+    content: none;
+    display: none;
+  }
+
+  #submitdiv #delete-action {
+    display: none;
+  }
+
+  #submitdiv .bl-forms-submitbox-help {
+    margin: 0;
+    padding-top: 8px;
+    color: #646970;
+    line-height: 1.4;
+  }
+
+  #minor-publishing-actions {
+    display: none;
+  }
+
+  #misc-publishing-actions {
+    #post_status {
+      margin-bottom: 8px;
+    }
+  }
 }
 
 // Admin builder tokens (override in child theme if needed).
@@ -601,12 +632,43 @@ p.bl-forms-builder__palette-empty {
   }
 }
 
+.bl-forms-builder__icon-btn--close {
+  svg {
+    width: 18px;
+    height: 18px;
+  }
+}
+
 .bl-forms-builder__canvas {
   position: relative;
   padding: 8px 12px 48px;
   border: 1px dashed var(--bl-forms-admin-border);
   border-radius: var(--bl-forms-admin-radius);
   background: #fff;
+}
+
+.bl-forms-builder__canvas,
+.bl-forms-builder__modal-panel {
+  input[type='date'],
+  input[type='datetime-local'],
+  input[type='datetime'],
+  input[type='email'],
+  input[type='month'],
+  input[type='number'],
+  input[type='password'],
+  input[type='search'],
+  input[type='tel'],
+  input[type='text'],
+  input[type='time'],
+  input[type='url'],
+  input[type='week'] {
+    min-height: 36px;
+  }
+
+  select {
+    min-height: 36px;
+    line-height: 1.5;
+  }
 }
 
 .bl-forms-builder__list {
@@ -763,7 +825,7 @@ p.bl-forms-builder__palette-empty {
   gap: 4px;
   flex: 0 1 auto;
   max-width: 160px;
-  min-width: 0;
+  min-width: 46px;
   padding: 3px 8px 3px 6px;
   border: 1px solid var(--bl-forms-admin-border);
   border-radius: 999px;
@@ -934,6 +996,18 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
   }
 }
 
+.bl-forms-builder__repeater-card {
+  margin: 0;
+  border-color: color-mix(in srgb, var(--bl-forms-admin-accent) 28%, var(--bl-forms-admin-border));
+  background: color-mix(in srgb, var(--bl-forms-admin-accent) 4%, #fff);
+
+  > .bl-forms-builder__field-header {
+    background: transparent;
+    align-items: center;
+    gap: 10px;
+  }
+}
+
 input.bl-forms-builder__section-label-input {
   appearance: none;
   flex: 1 1 auto;
@@ -1056,16 +1130,18 @@ input.bl-forms-builder__section-label-input {
 }
 
 .bl-forms-builder__column-fields-wrap,
-.bl-forms-builder__section-fields-wrap {
+.bl-forms-builder__section-fields-wrap,
+.bl-forms-builder__repeater-fields-wrap {
   padding: 0 12px 10px;
 }
 
 .bl-forms-builder__column-fields,
-.bl-forms-builder__section-fields {
+.bl-forms-builder__section-fields,
+.bl-forms-builder__repeater-fields {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  min-height: 44px;
+  min-height: 42px;
   padding: 8px;
   border: 1px dashed color-mix(in srgb, var(--bl-forms-admin-accent) 28%, var(--bl-forms-admin-border));
   border-radius: var(--bl-forms-admin-radius);
@@ -1073,7 +1149,8 @@ input.bl-forms-builder__section-label-input {
 }
 
 .bl-forms-builder__column-empty,
-.bl-forms-builder__section-empty {
+.bl-forms-builder__section-empty,
+.bl-forms-builder__repeater-empty {
   text-align: center;
   color: var(--bl-forms-admin-muted);
 
@@ -1607,10 +1684,10 @@ input.bl-forms-builder__section-label-input {
 }
 
 .bl-forms-builder__field-body p {
-  margin: 0 0 10px;
+  margin: 0;
 
   &.description {
-    margin: -4px 0 0;
+    margin: 4px 0 0;
   }
 }
 
@@ -1990,18 +2067,18 @@ input.bl-forms-builder__section-label-input {
   gap: 10px;
 }
 
+.bl-forms-builder__logic-group-label {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1d2327;
+}
+
 .bl-forms-builder__logic-group {
   padding: 12px;
   border: 1px solid var(--bl-forms-admin-border, #c3c4c7);
   border-radius: var(--bl-forms-admin-radius, 4px);
   background: #f6f7f7;
-}
-
-.bl-forms-builder__logic-group-label {
-  margin: 0 0 8px;
-  font-size: 12px;
-  font-weight: 600;
-  color: #1d2327;
 }
 
 .bl-forms-builder__logic-rules {
@@ -2037,13 +2114,12 @@ input.bl-forms-builder__section-label-input {
 
 .bl-forms-builder__logic-and,
 .bl-forms-builder__logic-or {
-  margin: 2px 0;
+  margin: 2px 1px;
   font-size: 11px;
   font-weight: 600;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.5px;
   text-transform: uppercase;
   color: #646970;
-  text-align: center;
 }
 
 .bl-forms-builder__logic-add-group {

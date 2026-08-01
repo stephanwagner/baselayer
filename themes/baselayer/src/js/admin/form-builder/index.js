@@ -57,6 +57,7 @@ import {
   collectLogicSourceFields,
   createConditionalLogicEditor,
 } from './conditional-logic.js';
+import { configure, resetConfig, getFieldCardHooks } from './config.js';
 
 export {
   formsDragStart,
@@ -104,6 +105,9 @@ export {
   readConditionalLogicFromDom,
   collectLogicSourceFields,
   createConditionalLogicEditor,
+  configure,
+  resetConfig,
+  getFieldCardHooks,
 };
 
 const BlFormBuilder = {
@@ -152,6 +156,9 @@ const BlFormBuilder = {
   readConditionalLogicFromDom,
   collectLogicSourceFields,
   createConditionalLogicEditor,
+  configure,
+  resetConfig,
+  getFieldCardHooks,
 };
 
 export default BlFormBuilder;

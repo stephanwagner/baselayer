@@ -1709,7 +1709,7 @@
     };
     field = defaultRepeater(field);
     const row = el2("div", {
-      className: "bl-forms-builder__field bl-blocks-builder__repeater-card",
+      className: "bl-forms-builder__field bl-forms-builder__repeater-card",
       dataset: {
         blFormsField: "1",
         fieldId: field.id,
@@ -1746,7 +1746,7 @@
     });
     settingsBtn.appendChild(iconEl("tune", "bl-forms-builder__design-btn-icon"));
     const fieldsList = el2("div", {
-      className: "bl-blocks-builder__repeater-fields",
+      className: "bl-forms-builder__repeater-fields",
       dataset: { blRepeaterFields: "1", repeaterDepth: String(depth) }
     });
     const emptyHint = el2("p", {
@@ -1771,7 +1771,7 @@
       fieldsList.appendChild(createFieldCard(child, false));
     });
     bindRepeaterChildList(fieldsList, depth, onListChange);
-    const fieldsWrap = el2("div", { className: "bl-blocks-builder__repeater-fields-wrap" }, [
+    const fieldsWrap = el2("div", { className: "bl-forms-builder__repeater-fields-wrap" }, [
       fieldsList,
       emptyHint
     ]);
@@ -1874,7 +1874,7 @@
       ":scope > .bl-forms-builder__field-header .bl-forms-builder__section-label-input"
     );
     const fields = row.querySelector(
-      ":scope > .bl-blocks-builder__repeater-fields-wrap [data-bl-repeater-fields]"
+      ":scope > .bl-forms-builder__repeater-fields-wrap [data-bl-repeater-fields]"
     );
     const children = Array.from(fields?.children || []).filter((node) => node.matches("[data-bl-forms-field]")).filter((node) => !LAYOUT_BLOCKED.includes(node.dataset.fieldType || "")).map((child) => serializeChildCard(child));
     const design = row.dataset.fieldDesign || live?.design || "standard";

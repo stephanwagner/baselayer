@@ -104,45 +104,6 @@ body.post-new-php.post-type-bl_block {
   }
 }
 
-// Pre-JS mount placeholder (cleared by mountApp replaceChildren).
-// Shared builder chrome comes from vendored form-builder-admin; this is a light fallback.
-.bl-blocks-builder.bl-forms-builder {
-  margin-top: 12px;
-  border: 1px solid #c3c4c7;
-  border-radius: 6px;
-  background: #fff;
-  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
-  min-height: 220px;
-}
-
-.bl-blocks-builder .bl-forms-builder__skeleton {
-  display: flex;
-  flex-direction: column;
-}
-
-.bl-blocks-builder .bl-forms-builder__skeleton-tabs {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 14px 12px;
-  border-bottom: 1px solid #c3c4c7;
-  background: #f6f7f7;
-  border-radius: 6px 6px 0 0;
-}
-
-.bl-blocks-builder .bl-forms-builder__skeleton-tab {
-  display: block;
-  width: 64px;
-  height: 12px;
-  border-radius: 3px;
-  background: #e2e2e4;
-}
-
-.bl-blocks-builder .bl-forms-builder__skeleton-body {
-  min-height: 180px;
-  box-sizing: border-box;
-}
-
 .bl-blocks-settings-post-types {
   display: flex;
   flex-direction: column;
@@ -325,24 +286,6 @@ body.post-new-php.post-type-bl_block {
   &--card {
     background: #f6f7f7;
   }
-}
-
-.bl-blocks-builder__repeater-card {
-  border: 1px solid #c3c4c7;
-  border-radius: 6px;
-  background: #f6f7f7;
-}
-
-.bl-blocks-builder__repeater-fields-wrap {
-  padding: 0 12px 12px;
-}
-
-.bl-blocks-builder__repeater-fields {
-  min-height: 44px;
-  padding: 8px;
-  border: 1px dashed #c3c4c7;
-  border-radius: 4px;
-  background: #fff;
 }
 
 // —— Website page ——

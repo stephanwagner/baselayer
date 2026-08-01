@@ -132,7 +132,7 @@ function bl_forms_render_tools_metabox(WP_Post $post): void
 	?>
 	<div class="bl-forms-tools">
 		<p class="description bl-forms-tools__help">
-			<?= esc_html__('Export the current form (fields and filled-in settings) as JSON, or import a previously exported file.', 'baselayer-forms') ?>
+			<?= esc_html__('Export the current form as JSON, or import a previously exported file.', 'baselayer-forms') ?>
 		</p>
 		<div class="bl-forms-tools__actions">
 			<button type="button" class="button bl-button-small" data-bl-forms-export><?= esc_html__('Export', 'baselayer-forms') ?></button>
@@ -235,6 +235,7 @@ function bl_forms_palette_icons(): array
 		'edit',
 		'done',
 		'trash',
+		'close',
 		'duplicate',
 		'drag',
 		'lock',
@@ -557,7 +558,6 @@ function bl_forms_admin_enqueue(string $hook): void
 				'repeaterButtonLabel' => __('Add button label', 'baselayer-forms'),
 				'addRow'           => __('Add row', 'baselayer-forms'),
 				'logicShowIf'       => __('Show this field if', 'baselayer-forms'),
-				'logicOrIf'         => __('or if', 'baselayer-forms'),
 				'logicAnd'          => __('and', 'baselayer-forms'),
 				'logicOr'           => __('or', 'baselayer-forms'),
 				'logicAddRule'      => __('Add rule', 'baselayer-forms'),

@@ -1,6 +1,7 @@
 import { createPanels } from './panels.js';
 import { bindImportExport } from './import-export.js';
 import { bindTemplates } from './templates.js';
+import { registerFormsFieldExtras } from './field-extras.js';
 
 const {
   el,
@@ -53,6 +54,8 @@ export function mountApp(root, initial) {
     root.textContent = 'Form builder failed to load.';
     return;
   }
+
+  registerFormsFieldExtras();
 
   root.replaceChildren();
   // PHP already stamps .bl-forms-builder on #bl-forms-builder — only add the tabs modifier.

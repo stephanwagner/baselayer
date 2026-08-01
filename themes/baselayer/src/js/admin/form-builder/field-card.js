@@ -1,6 +1,7 @@
 import { el, t, typeLabel, uid, iconEl, uniqueFieldName, slugifyOption, readConfig, flattenFields, fieldIsActive, cloneFieldData } from './dom.js';
 import { createColumnCard, createSectionCard, serializeLayoutRow, equalizeColumnRun } from './layout.js';
 import { createConditionalLogicEditor, readConditionalLogicFromDom, normalizeConditionalLogic } from './conditional-logic.js';
+import { getFieldCardHooks } from './config.js';
 
 const WIDTH_PRESETS = [
   { value: '100', label: '100%' },
@@ -353,15 +354,6 @@ function convertFieldType(field, nextType) {
     delete field.char_count_text;
   }
 
-  if (!['text', 'email', 'phone'].includes(nextType)) {
-    delete field.show_in_list;
-  } else if (
-    (nextType === 'text' || nextType === 'email') &&
-    field.show_in_list === undefined
-  ) {
-    field.show_in_list = defaultShowInListForNewField(nextType, field.id);
-  }
-
   if (nextType === 'textarea') {
     const rows = parseInt(field.rows, 10);
     field.rows = Number.isFinite(rows) && rows >= 2 ? Math.min(50, rows) : 5;
@@ -399,6 +391,11 @@ function convertFieldType(field, nextType) {
     // Relations are type-specific (date↔date only).
     delete field.relation;
     delete field.relation_field;
+  }
+
+  const hooks = getFieldCardHooks();
+  if (typeof hooks.onNormalizeType === 'function') {
+    hooks.onNormalizeType(field, nextType);
   }
 }
 
@@ -1570,86 +1567,6 @@ function createLengthLimitsControl(field) {
   ]);
 }
 
-function countOtherListOverviewFields(exceptId) {
-  let n = 0;
-  document.querySelectorAll('.bl-forms-builder__field[data-bl-forms-field]').forEach((row) => {
-    if (exceptId && row.dataset.fieldId === exceptId) {
-      return;
-    }
-    const input = row.querySelector('[data-bl-show-in-list]');
-    if (input && input.checked) {
-      n += 1;
-    }
-  });
-  return n;
-}
-
-/**
- * Whether another field of this type already has “show in list” enabled.
- */
-function hasShowInListForType(type, exceptId = '') {
-  let found = false;
-  document.querySelectorAll('.bl-forms-builder__field[data-bl-forms-field]').forEach((row) => {
-    if (found) {
-      return;
-    }
-    if (exceptId && row.dataset.fieldId === exceptId) {
-      return;
-    }
-    if ((row.dataset.fieldType || '') !== type) {
-      return;
-    }
-    const input = row.querySelector('[data-bl-show-in-list]');
-    if (input && input.checked) {
-      found = true;
-    }
-  });
-  return found;
-}
-
-/**
- * First text / first email on the canvas get list overview on by default (max 3 total).
- */
-function defaultShowInListForNewField(type, exceptId = '') {
-  if (type !== 'text' && type !== 'email') {
-    return false;
-  }
-  if (countOtherListOverviewFields(exceptId) >= 3) {
-    return false;
-  }
-  return !hasShowInListForType(type, exceptId);
-}
-
-function createListOverviewControl(field) {
-  const input = el('input', {
-    type: 'checkbox',
-    dataset: { blShowInList: '1' },
-    checked: !!field.show_in_list,
-  });
-  input.addEventListener('change', () => {
-    if (input.checked && countOtherListOverviewFields(field.id) >= 3) {
-      input.checked = false;
-      window.alert(
-        t('showInListMax', 'You can show at most 3 fields in the entries list.')
-      );
-      return;
-    }
-    field.show_in_list = !!input.checked;
-    document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
-  });
-
-  return el('div', { className: 'bl-forms-builder__switch-setting' }, [
-    el('label', { className: 'bl-forms-builder__switch' }, [
-      input,
-      el('span', { className: 'bl-forms-builder__switch-ui', 'aria-hidden': 'true' }),
-      el('span', {
-        className: 'bl-forms-builder__switch-label',
-        text: t('showInList', 'Show in overview'),
-      }),
-    ]),
-  ]);
-}
-
 function createTextareaRowsControl(field) {
   const rows = parseInt(field.rows, 10);
   const value = Number.isFinite(rows) && rows >= 2 ? String(Math.min(50, rows)) : '5';
@@ -2716,9 +2633,6 @@ export function serializeRow(row) {
     data.max_length = q('[data-bl-max-length]')?.value?.trim() || '';
     data.show_char_count = Boolean(q('[data-bl-show-char-count]')?.checked);
   }
-  if (type === 'text' || type === 'email' || type === 'phone') {
-    data.show_in_list = Boolean(q('[data-bl-show-in-list]')?.checked);
-  }
   if (type === 'textarea') {
     const rawRows = parseInt(q('[data-bl-rows]')?.value, 10);
     data.rows = Number.isFinite(rawRows) && rawRows >= 2 ? Math.min(50, rawRows) : 5;
@@ -2795,6 +2709,11 @@ export function serializeRow(row) {
     }
   }
 
+  const hooks = getFieldCardHooks();
+  if (typeof hooks.onSerialize === 'function') {
+    hooks.onSerialize(data, { type, q, body, row });
+  }
+
   return withConditionalLogic(body, data);
 }
 
@@ -2858,11 +2777,9 @@ export function createFieldCard(initial, open = false) {
   if (NAMED_TYPES.includes(field.type) && !field.name) {
     field.name = uniqueFieldName(field.label || field.type, field.id);
   }
-  if (
-    (field.type === 'text' || field.type === 'email') &&
-    field.show_in_list === undefined
-  ) {
-    field.show_in_list = defaultShowInListForNewField(field.type, field.id);
+  const initHooks = getFieldCardHooks();
+  if (typeof initHooks.onInitField === 'function') {
+    initHooks.onInitField(field);
   }
 
   const row = el('div', {
@@ -3080,8 +2997,10 @@ export function createFieldCard(initial, open = false) {
             document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
           }),
         ];
-        if (field.type === 'text' || field.type === 'email' || field.type === 'phone') {
-          switches.push(createListOverviewControl(field));
+        const switchHooks = getFieldCardHooks();
+        if (typeof switchHooks.extraSwitches === 'function') {
+          const extra = switchHooks.extraSwitches(field) || [];
+          extra.filter(Boolean).forEach((node) => switches.push(node));
         }
         return el('div', { className: 'bl-forms-builder__field-status' }, switches);
       })()
