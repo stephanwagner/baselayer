@@ -800,7 +800,7 @@ function bl_blocks_normalize_link_href(string $raw): string
 		return '';
 	}
 
-	if (preg_match('#^([/#?]|//|[a-z][a-z0-9+.\-]*:)#i', $v)) {
+	if (preg_match('~^([/#?]|//|[a-z][a-z0-9+.\-]*:)~i', $v)) {
 		return sanitize_text_field($v);
 	}
 

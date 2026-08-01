@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-01T02:03:59+00:00\n"
+"POT-Creation-Date: 2026-08-01T10:59:41+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: baselayer-blocks\n"
@@ -47,14 +47,14 @@ msgid "Loaded from:"
 msgstr ""
 
 #: includes/admin-editor.php:60
-#: includes/runtime-blocks.php:229
-#: includes/runtime-blocks.php:382
-#: includes/runtime-page.php:109
+#: includes/runtime-blocks.php:233
+#: includes/runtime-blocks.php:426
+#: includes/runtime-page.php:112
 msgid "Template missing."
 msgstr ""
 
 #: includes/admin-editor.php:63
-#: includes/runtime-blocks.php:383
+#: includes/runtime-blocks.php:427
 msgid "Create this PHP file in your theme (child theme preferred):"
 msgstr ""
 
@@ -62,374 +62,983 @@ msgstr ""
 msgid "Available in the template: $values, $fields, $block, $attributes."
 msgstr ""
 
-#: includes/admin-editor.php:239
-#: includes/config.php:160
+#: includes/admin-editor.php:215
+#: includes/config.php:161
 msgid "Text"
 msgstr ""
 
-#: includes/admin-editor.php:240
+#: includes/admin-editor.php:216
 msgid "Textarea"
 msgstr ""
 
-#: includes/admin-editor.php:241
+#: includes/admin-editor.php:217
+#: includes/admin-editor.php:329
+#: includes/field-ui.php:930
+#: includes/runtime-blocks.php:254
+#: includes/runtime-page.php:133
 msgid "Email"
 msgstr ""
 
-#: includes/admin-editor.php:242
+#: includes/admin-editor.php:218
+#: includes/admin-editor.php:330
+#: includes/field-ui.php:931
+#: includes/runtime-blocks.php:255
+#: includes/runtime-page.php:134
 msgid "Phone"
 msgstr ""
 
-#: includes/admin-editor.php:243
+#: includes/admin-editor.php:219
+#: includes/admin-editor.php:328
+#: includes/admin-editor.php:333
+#: includes/field-ui.php:929
+#: includes/field-ui.php:934
+#: includes/runtime-blocks.php:253
+#: includes/runtime-blocks.php:258
+#: includes/runtime-page.php:132
+#: includes/runtime-page.php:137
 msgid "URL"
 msgstr ""
 
-#: includes/admin-editor.php:244
+#: includes/admin-editor.php:220
 msgid "Number"
 msgstr ""
 
-#: includes/admin-editor.php:245
+#: includes/admin-editor.php:221
 msgid "Checkboxes"
 msgstr ""
 
-#: includes/admin-editor.php:246
+#: includes/admin-editor.php:222
 msgid "Radio"
 msgstr ""
 
-#: includes/admin-editor.php:247
+#: includes/admin-editor.php:223
+#: includes/field-ui.php:882
+#: includes/field-ui.php:927
+#: includes/runtime-blocks.php:251
+#: includes/runtime-page.php:130
 msgid "Select"
 msgstr ""
 
-#: includes/admin-editor.php:248
+#: includes/admin-editor.php:224
 msgid "Toggle"
 msgstr ""
 
-#: includes/admin-editor.php:249
+#: includes/admin-editor.php:225
 msgid "Button group"
 msgstr ""
 
-#: includes/admin-editor.php:250
+#: includes/admin-editor.php:226
 msgid "Date"
 msgstr ""
 
-#: includes/admin-editor.php:251
+#: includes/admin-editor.php:227
 msgid "Time"
 msgstr ""
 
-#: includes/admin-editor.php:252
-#: includes/admin-editor.php:296
+#: includes/admin-editor.php:228
+#: includes/admin-editor.php:275
 msgid "Date & time"
 msgstr ""
 
-#: includes/admin-editor.php:253
+#: includes/admin-editor.php:229
 msgid "File"
 msgstr ""
 
-#: includes/admin-editor.php:254
+#: includes/admin-editor.php:230
 msgid "Image"
 msgstr ""
 
-#: includes/admin-editor.php:255
+#: includes/admin-editor.php:231
 msgid "Heading"
 msgstr ""
 
-#: includes/admin-editor.php:256
+#: includes/admin-editor.php:232
 msgid "Text block"
 msgstr ""
 
-#: includes/admin-editor.php:257
+#: includes/admin-editor.php:233
+#: includes/admin-editor.php:398
 msgid "HTML"
 msgstr ""
 
-#: includes/admin-editor.php:258
+#: includes/admin-editor.php:234
 msgid "Divider"
 msgstr ""
 
-#: includes/admin-editor.php:259
+#: includes/admin-editor.php:235
 msgid "Spacer"
 msgstr ""
 
-#: includes/admin-editor.php:260
+#: includes/admin-editor.php:236
 msgid "Column"
 msgstr ""
 
-#: includes/admin-editor.php:261
+#: includes/admin-editor.php:237
+#: includes/admin-editor.php:446
 msgid "Section"
 msgstr ""
 
-#: includes/admin-editor.php:262
-#: includes/admin-editor.php:301
-#: includes/field-ui.php:500
+#: includes/admin-editor.php:238
+#: includes/admin-editor.php:282
+#: includes/field-ui.php:913
 msgid "Repeater"
 msgstr ""
 
-#: includes/admin-editor.php:263
+#: includes/admin-editor.php:239
 msgid "Hidden"
 msgstr ""
 
-#: includes/admin-editor.php:267
-#: includes/admin-editor.php:269
+#: includes/admin-editor.php:240
+#: includes/admin-editor.php:327
+#: includes/admin-editor.php:332
+#: includes/field-ui.php:928
+#: includes/field-ui.php:933
+#: includes/runtime-blocks.php:252
+#: includes/runtime-blocks.php:257
+#: includes/runtime-page.php:131
+#: includes/runtime-page.php:136
+msgid "Page"
+msgstr ""
+
+#: includes/admin-editor.php:241
+msgid "Link"
+msgstr ""
+
+#: includes/admin-editor.php:245
+#: includes/admin-editor.php:247
 msgid "Fields"
 msgstr ""
 
-#: includes/admin-editor.php:268
-#: includes/admin-editor.php:313
-#: includes/admin-editor.php:316
+#: includes/admin-editor.php:246
+#: includes/admin-editor.php:295
+#: includes/admin-editor.php:298
 #: includes/runtime-site.php:108
 msgid "Settings"
 msgstr ""
 
-#: includes/admin-editor.php:270
+#: includes/admin-editor.php:248
 msgid "Drag a field here."
 msgstr ""
 
-#: includes/admin-editor.php:271
+#: includes/admin-editor.php:249
+#: includes/admin-editor.php:388
 msgid "Active"
 msgstr ""
 
-#: includes/admin-editor.php:272
+#: includes/admin-editor.php:250
+msgid "Allow editing directly in sidebar"
+msgstr ""
+
+#: includes/admin-editor.php:251
+#: includes/admin-editor.php:437
 msgid "Slug"
 msgstr ""
 
-#: includes/admin-editor.php:273
+#: includes/admin-editor.php:252
 msgid "Internal key used in code and storage. Lowercase letters, numbers, and hyphens."
 msgstr ""
 
-#: includes/admin-editor.php:274
+#: includes/admin-editor.php:253
+#: includes/admin-editor.php:378
 msgid "Description"
 msgstr ""
 
-#: includes/admin-editor.php:275
+#: includes/admin-editor.php:254
 msgid "Block icon"
 msgstr ""
 
-#: includes/admin-editor.php:276
+#: includes/admin-editor.php:255
 msgid "Choose icon"
 msgstr ""
 
-#: includes/admin-editor.php:277
-#: includes/admin-editor.php:278
+#: includes/admin-editor.php:256
+#: includes/admin-editor.php:257
 msgid "SVG code"
 msgstr ""
 
-#: includes/admin-editor.php:279
+#: includes/admin-editor.php:258
+#: includes/field-ui.php:519
+#: includes/field-ui.php:686
+#: includes/field-ui.php:873
+#: includes/field-ui.php:918
+#: includes/runtime-blocks.php:242
+#: includes/runtime-page.php:121
 msgid "Clear"
 msgstr ""
 
-#: includes/admin-editor.php:280
+#: includes/admin-editor.php:259
 msgid "No icon selected"
 msgstr ""
 
-#: includes/admin-editor.php:281
-msgid "Browse Material Icons (Rounded), copy SVG, and paste here: "
+#: includes/admin-editor.php:260
+msgid "Browse Material Icons, copy SVG, and paste here: "
 msgstr ""
 
-#: includes/admin-editor.php:282
+#: includes/admin-editor.php:261
 msgid "fonts.google.com/icons"
 msgstr ""
 
-#: includes/admin-editor.php:283
+#: includes/admin-editor.php:262
 msgid "Block category"
 msgstr ""
 
-#: includes/admin-editor.php:284
+#: includes/admin-editor.php:263
 msgid "Keywords"
 msgstr ""
 
-#: includes/admin-editor.php:285
+#: includes/admin-editor.php:264
 msgid "Comma-separated search keywords for the block inserter."
 msgstr ""
 
-#: includes/admin-editor.php:286
+#: includes/admin-editor.php:265
 #: includes/admin.php:319
 msgid "Post types"
 msgstr ""
 
-#: includes/admin-editor.php:287
+#: includes/admin-editor.php:266
 msgid "Show these page settings on the selected post types."
 msgstr ""
 
-#: includes/admin-editor.php:288
+#: includes/admin-editor.php:267
 msgid "Tab label"
 msgstr ""
 
-#: includes/admin-editor.php:289
+#: includes/admin-editor.php:268
 msgid "Label in the Website settings sidebar. Defaults to the title."
 msgstr ""
 
-#: includes/admin-editor.php:290
+#: includes/admin-editor.php:269
 #: includes/admin.php:317
 msgid "Order"
 msgstr ""
 
-#: includes/admin-editor.php:291
+#: includes/admin-editor.php:270
 msgid "Fullscreen"
 msgstr ""
 
-#: includes/admin-editor.php:292
+#: includes/admin-editor.php:271
 msgid "Exit fullscreen"
 msgstr ""
 
-#: includes/admin-editor.php:293
+#: includes/admin-editor.php:272
 msgid "Popular"
 msgstr ""
 
-#: includes/admin-editor.php:294
+#: includes/admin-editor.php:273
 msgid "Input"
 msgstr ""
 
-#: includes/admin-editor.php:295
+#: includes/admin-editor.php:274
 msgid "Choice"
 msgstr ""
 
-#: includes/admin-editor.php:297
+#: includes/admin-editor.php:276
 msgid "Uploads"
 msgstr ""
 
-#: includes/admin-editor.php:298
+#: includes/admin-editor.php:277
+#: includes/config.php:162
+msgid "Media"
+msgstr ""
+
+#: includes/admin-editor.php:278
+#: includes/admin-editor.php:400
 msgid "Layout"
 msgstr ""
 
-#: includes/admin-editor.php:299
+#: includes/admin-editor.php:279
+#: includes/admin-editor.php:367
 msgid "Content"
 msgstr ""
 
-#: includes/admin-editor.php:300
+#: includes/admin-editor.php:280
+#: includes/admin-editor.php:392
 msgid "Advanced"
 msgstr ""
 
-#: includes/admin-editor.php:302
-#: includes/admin-editor.php:303
+#: includes/admin-editor.php:281
+msgid "Relations"
+msgstr ""
+
+#: includes/admin-editor.php:283
+#: includes/admin-editor.php:284
 msgid "Repeater label"
 msgstr ""
 
-#: includes/admin-editor.php:304
+#: includes/admin-editor.php:285
 msgid "Min rows"
 msgstr ""
 
-#: includes/admin-editor.php:305
+#: includes/admin-editor.php:286
 msgid "Max rows"
 msgstr ""
 
+#: includes/admin-editor.php:287
 msgid "0 = unlimited"
 msgstr ""
 
-#: includes/admin-editor.php:306
+#: includes/admin-editor.php:288
 msgid "Max"
 msgstr ""
 
-#: includes/admin-editor.php:307
+#: includes/admin-editor.php:289
 msgid "Add button label"
 msgstr ""
 
-#: includes/admin-editor.php:308
+#: includes/admin-editor.php:290
 msgid "Drop fields or a nested repeater here"
 msgstr ""
 
-#: includes/admin-editor.php:309
+#: includes/admin-editor.php:291
 msgid "Drop fields here (nested repeater not allowed at this depth)"
 msgstr ""
 
-#: includes/admin-editor.php:310
-#: includes/field-ui.php:416
-#: includes/field-ui.php:497
-#: includes/runtime-blocks.php:230
-#: includes/runtime-page.php:110
+#: includes/admin-editor.php:292
+#: includes/field-ui.php:796
+#: includes/field-ui.php:910
+#: includes/runtime-blocks.php:234
+#: includes/runtime-page.php:113
 msgid "Add row"
 msgstr ""
 
-#: includes/admin-editor.php:311
+#: includes/admin-editor.php:293
 msgid "Field name"
 msgstr ""
 
-#: includes/admin-editor.php:312
+#: includes/admin-editor.php:294
 msgid "Internal field key used when saving values."
 msgstr ""
 
-#: includes/admin-editor.php:314
-#: includes/config.php:162
+#: includes/admin-editor.php:296
+#: includes/config.php:163
 msgid "Design"
 msgstr ""
 
-#: includes/admin-editor.php:315
+#: includes/admin-editor.php:297
+#: includes/admin-editor.php:462
 msgid "Style"
 msgstr ""
 
-#: includes/admin-editor.php:317
+#: includes/admin-editor.php:299
 msgid "Logic"
 msgstr ""
 
-#: includes/admin-editor.php:318
+#: includes/admin-editor.php:300
 msgid "Standard"
 msgstr ""
 
-#: includes/admin-editor.php:319
+#: includes/admin-editor.php:301
 msgid "Outline"
 msgstr ""
 
-#: includes/admin-editor.php:320
+#: includes/admin-editor.php:302
 msgid "Card"
 msgstr ""
 
-#: includes/admin-editor.php:321
+#: includes/admin-editor.php:303
 msgid "Hide title"
 msgstr ""
 
-#: includes/admin-editor.php:322
+#: includes/admin-editor.php:304
 msgid "Title"
 msgstr ""
 
-#: includes/admin-editor.php:323
+#: includes/admin-editor.php:305
 msgid "Name"
 msgstr ""
 
-#: includes/admin-editor.php:324
+#: includes/admin-editor.php:306
 msgid "CSS class"
 msgstr ""
 
-#: includes/admin-editor.php:325
+#: includes/admin-editor.php:307
 msgid "e.g. my-field"
 msgstr ""
 
-#: includes/admin-editor.php:326
+#: includes/admin-editor.php:308
 msgid "Optional class names added to this field’s wrapper."
 msgstr ""
 
-#: includes/admin-editor.php:327
-#: includes/field-ui.php:495
-#: includes/runtime-blocks.php:224
-#: includes/runtime-page.php:104
-#: includes/runtime-page.php:133
+#: includes/admin-editor.php:309
+#: includes/field-ui.php:908
+#: includes/runtime-blocks.php:228
+#: includes/runtime-page.php:107
+#: includes/runtime-page.php:161
 msgid "Cancel"
 msgstr ""
 
-#: includes/admin-editor.php:328
-#: includes/runtime-blocks.php:223
-#: includes/runtime-page.php:103
+#: includes/admin-editor.php:310
+#: includes/runtime-blocks.php:227
+#: includes/runtime-page.php:106
 msgid "Apply"
 msgstr ""
 
-#: includes/admin-editor.php:329
+#: includes/admin-editor.php:311
 msgid "Conditional logic"
 msgstr ""
 
-#: includes/admin-editor.php:330
+#: includes/admin-editor.php:312
 msgid "Show this field only when the conditions below are met."
 msgstr ""
 
-#: includes/admin-editor.php:331
+#: includes/admin-editor.php:313
 msgid "Show this block only when the conditions below are met."
 msgstr ""
 
-#: includes/admin-editor.php:332
+#: includes/admin-editor.php:314
 msgid "Show this section only when the conditions below are met."
 msgstr ""
 
-#: includes/admin-editor.php:333
+#: includes/admin-editor.php:315
 msgid "Show this column only when the conditions below are met."
 msgstr ""
 
-#: includes/admin-editor.php:334
+#: includes/admin-editor.php:316
 msgid "Show this repeater only when the conditions below are met."
+msgstr ""
+
+#: includes/admin-editor.php:318
+msgid "Add option"
+msgstr ""
+
+#: includes/admin-editor.php:319
+#: includes/admin-editor.php:321
+msgid "Allow multiple"
+msgstr ""
+
+#: includes/admin-editor.php:320
+msgid "Allow multiple files"
+msgstr ""
+
+#: includes/admin-editor.php:322
+msgid "Maximum items"
+msgstr ""
+
+#: includes/admin-editor.php:323
+msgid "Maximum number of items that can be selected from the media library."
+msgstr ""
+
+#: includes/admin-editor.php:324
+msgid "Allow multiple pages"
+msgstr ""
+
+#: includes/admin-editor.php:325
+msgid "Allowed types"
+msgstr ""
+
+#: includes/admin-editor.php:326
+msgid "Allow editor to set target"
+msgstr ""
+
+#: includes/admin-editor.php:331
+#: includes/admin-editor.php:458
+#: includes/field-ui.php:932
+#: includes/runtime-blocks.php:256
+#: includes/runtime-page.php:135
+msgid "Type"
+msgstr ""
+
+#: includes/admin-editor.php:334
+#: includes/field-ui.php:935
+#: includes/runtime-blocks.php:259
+#: includes/runtime-page.php:138
+msgid "Email address"
+msgstr ""
+
+#: includes/admin-editor.php:335
+#: includes/field-ui.php:936
+#: includes/runtime-blocks.php:260
+#: includes/runtime-page.php:139
+msgid "Phone number"
+msgstr ""
+
+#: includes/admin-editor.php:336
+#: includes/field-ui.php:937
+#: includes/runtime-blocks.php:261
+#: includes/runtime-page.php:140
+msgid "Link text"
+msgstr ""
+
+#: includes/admin-editor.php:337
+#: includes/field-ui.php:938
+#: includes/runtime-blocks.php:262
+#: includes/runtime-page.php:141
+msgid "Open in new tab"
+msgstr ""
+
+#: includes/admin-editor.php:338
+msgid "Allowed extensions"
+msgstr ""
+
+#: includes/admin-editor.php:339
+msgid "Comma-separated list without dots, e.g. pdf, docx, xlsx. Leave empty to allow all WordPress-permitted types."
+msgstr ""
+
+#: includes/admin-editor.php:340
+msgid "Autocomplete"
+msgstr ""
+
+#: includes/admin-editor.php:341
+msgid "Automatic"
+msgstr ""
+
+#: includes/admin-editor.php:342
+msgid "Off"
+msgstr ""
+
+#: includes/admin-editor.php:343
+msgid "Current hour"
+msgstr ""
+
+#: includes/admin-editor.php:344
+msgid "days"
+msgstr ""
+
+#: includes/admin-editor.php:345
+msgid "Fixed date"
+msgstr ""
+
+#: includes/admin-editor.php:346
+msgid "Fixed date & time"
+msgstr ""
+
+#: includes/admin-editor.php:347
+msgid "Fixed time"
+msgstr ""
+
+#: includes/admin-editor.php:348
+msgid "minutes"
+msgstr ""
+
+#: includes/admin-editor.php:349
+msgid "No limit"
+msgstr ""
+
+#: includes/admin-editor.php:350
+msgid "Now"
+msgstr ""
+
+#: includes/admin-editor.php:351
+msgid "Minutes relative to now"
+msgstr ""
+
+#: includes/admin-editor.php:352
+msgid "Now ±"
+msgstr ""
+
+#: includes/admin-editor.php:353
+msgid "Today"
+msgstr ""
+
+#: includes/admin-editor.php:354
+msgid "Days relative to today"
+msgstr ""
+
+#: includes/admin-editor.php:355
+msgid "Today ±"
+msgstr ""
+
+#: includes/admin-editor.php:356
+#: includes/admin-editor.php:448
+msgid "Allow multiple selection"
+msgstr ""
+
+#: includes/admin-editor.php:357
+msgid "Uses the CAPTCHA keys from Forms → Settings."
+msgstr ""
+
+#: includes/admin-editor.php:358
+msgid "CAPTCHA keys are not configured yet. Add them under Forms → Settings."
+msgstr ""
+
+#: includes/admin-editor.php:359
+msgid "Open settings"
+msgstr ""
+
+#: includes/admin-editor.php:360
+msgid "Checkbox text"
+msgstr ""
+
+#: includes/admin-editor.php:361
+msgid "Markdown is supported, e.g. <b>**Bold**</b>, <i>*Italic*</i>, and <span style=\"white-space: nowrap\">[Link](...)</span>. For the target you can use a URL (/agb), a WordPress page (page:123), or a standard page such as page:privacy."
+msgstr ""
+
+#: includes/admin-editor.php:362
+msgid "Choices"
+msgstr ""
+
+#: includes/admin-editor.php:363
+msgid "Collapse field"
+msgstr ""
+
+#: includes/admin-editor.php:364
+#: includes/admin-editor.php:444
+msgid "Drop fields here"
+msgstr ""
+
+#: includes/admin-editor.php:365
+msgid "Columns"
+msgstr ""
+
+#: includes/admin-editor.php:366
+msgid "Column width"
+msgstr ""
+
+#: includes/admin-editor.php:368
+msgid "Relation"
+msgstr ""
+
+#: includes/admin-editor.php:369
+msgid "Must be after"
+msgstr ""
+
+#: includes/admin-editor.php:370
+msgid "Must be before"
+msgstr ""
+
+#: includes/admin-editor.php:371
+msgid "No relation"
+msgstr ""
+
+#: includes/admin-editor.php:372
+msgid "Select field"
+msgstr ""
+
+#: includes/admin-editor.php:373
+msgid "Checked by default"
+msgstr ""
+
+#: includes/admin-editor.php:374
+msgid "None"
+msgstr ""
+
+#: includes/admin-editor.php:375
+msgid "Default value"
+msgstr ""
+
+#: includes/admin-editor.php:376
+msgid "Use option slugs from the list above. For multiple values, separate with commas (e.g. option-1, option-2)."
+msgstr ""
+
+#: includes/admin-editor.php:377
+msgid "Delete"
+msgstr ""
+
+#: includes/admin-editor.php:379
+msgid "Disabled"
+msgstr ""
+
+#: includes/admin-editor.php:380
+msgid "Margin"
+msgstr ""
+
+#: includes/admin-editor.php:381
+#: includes/admin-editor.php:453
+msgid "e.g. 24px or 2rem"
+msgstr ""
+
+#: includes/admin-editor.php:382
+msgid "Drag to reorder"
+msgstr ""
+
+#: includes/admin-editor.php:383
+msgid "Duplicate"
+msgstr ""
+
+#: includes/admin-editor.php:384
+msgid "Collapse"
+msgstr ""
+
+#: includes/admin-editor.php:385
+msgid "Expand"
+msgstr ""
+
+#: includes/admin-editor.php:386
+msgid "Expand field"
+msgstr ""
+
+#: includes/admin-editor.php:387
+msgid "Show on the frontend"
+msgstr ""
+
+#: includes/admin-editor.php:389
+msgid "Maximum file size"
+msgstr ""
+
+#: includes/admin-editor.php:390
+#, php-format
+msgid "Leave empty to use the global default (%s)."
+msgstr ""
+
+#: includes/admin-editor.php:391
+msgid "Leave empty to use the global default."
+msgstr ""
+
+#: includes/admin-editor.php:393
+msgid "Appearance"
+msgstr ""
+
+#: includes/admin-editor.php:394
+msgid "General"
+msgstr ""
+
+#: includes/admin-editor.php:395
+msgid "Level"
+msgstr ""
+
+#: includes/admin-editor.php:396
+msgid "Hide"
+msgstr ""
+
+#: includes/admin-editor.php:397
+msgid "Hidden from visitors. If filled, the submission is treated as spam."
+msgstr ""
+
+#: includes/admin-editor.php:399
+#: includes/admin-editor.php:435
+msgid "Label"
+msgstr ""
+
+#: includes/admin-editor.php:401
+msgid "Horizontal"
+msgstr ""
+
+#: includes/admin-editor.php:402
+msgid "Vertical"
+msgstr ""
+
+#: includes/admin-editor.php:403
+msgid "Add rule group"
+msgstr ""
+
+#: includes/admin-editor.php:404
+msgid "Add rule"
+msgstr ""
+
+#: includes/admin-editor.php:405
+msgid "and"
+msgstr ""
+
+#: includes/admin-editor.php:406
+msgid "Field"
+msgstr ""
+
+#: includes/admin-editor.php:407
+msgid "Missing field"
+msgstr ""
+
+#: includes/admin-editor.php:408
+msgid "No fields available"
+msgstr ""
+
+#: includes/admin-editor.php:409
+msgid "Checked"
+msgstr ""
+
+#: includes/admin-editor.php:410
+msgid "Contains"
+msgstr ""
+
+#: includes/admin-editor.php:411
+msgid "Has no value"
+msgstr ""
+
+#: includes/admin-editor.php:412
+msgid "Is equal to"
+msgstr ""
+
+#: includes/admin-editor.php:413
+msgid "Greater than"
+msgstr ""
+
+#: includes/admin-editor.php:414
+msgid "Greater than or equal to"
+msgstr ""
+
+#: includes/admin-editor.php:415
+msgid "Less than"
+msgstr ""
+
+#: includes/admin-editor.php:416
+msgid "Less than or equal to"
+msgstr ""
+
+#: includes/admin-editor.php:417
+msgid "Not checked"
+msgstr ""
+
+#: includes/admin-editor.php:418
+msgid "Does not contain"
+msgstr ""
+
+#: includes/admin-editor.php:419
+msgid "Has any value"
+msgstr ""
+
+#: includes/admin-editor.php:420
+msgid "Is not equal to"
+msgstr ""
+
+#: includes/admin-editor.php:421
+msgid "Operator"
+msgstr ""
+
+#: includes/admin-editor.php:422
+msgid "or"
+msgstr ""
+
+#: includes/admin-editor.php:423
+msgid "— Select —"
+msgstr ""
+
+#: includes/admin-editor.php:424
+msgid "Show this field if"
+msgstr ""
+
+#: includes/admin-editor.php:425
+msgid "This field"
+msgstr ""
+
+#: includes/admin-editor.php:426
+msgid "Value"
+msgstr ""
+
+#: includes/admin-editor.php:427
+msgid "Maximum files"
+msgstr ""
+
+#: includes/admin-editor.php:428
+msgid "Maximum number of files visitors can upload."
+msgstr ""
+
+#: includes/admin-editor.php:429
+msgid "Maximum length"
+msgstr ""
+
+#: includes/admin-editor.php:430
+msgid "Maximum selections"
+msgstr ""
+
+#: includes/admin-editor.php:431
+msgid "Maximum"
+msgstr ""
+
+#: includes/admin-editor.php:432
+msgid "Minimum length"
+msgstr ""
+
+#: includes/admin-editor.php:433
+msgid "Minimum selections"
+msgstr ""
+
+#: includes/admin-editor.php:434
+msgid "Minimum"
+msgstr ""
+
+#: includes/admin-editor.php:436
+msgid "Option 1"
+msgstr ""
+
+#: includes/admin-editor.php:438
+msgid "Option 2"
+msgstr ""
+
+#: includes/admin-editor.php:439
+msgid "Options"
+msgstr ""
+
+#: includes/admin-editor.php:440
+msgid "Placeholder"
+msgstr ""
+
+#: includes/admin-editor.php:441
+msgid "Prefix"
+msgstr ""
+
+#: includes/admin-editor.php:442
+msgid "Read only"
+msgstr ""
+
+#: includes/admin-editor.php:443
+msgid "Required"
+msgstr ""
+
+#: includes/admin-editor.php:445
+msgid "Section title"
+msgstr ""
+
+#: includes/admin-editor.php:447
+msgid "Section width"
+msgstr ""
+
+#: includes/admin-editor.php:449
+msgid "Leave empty for no limit. When the maximum is reached, further options cannot be selected."
+msgstr ""
+
+#: includes/admin-editor.php:450
+msgid "Show character count"
+msgstr ""
+
+#: includes/admin-editor.php:451
+msgid "Show file preview"
+msgstr ""
+
+#: includes/admin-editor.php:452
+msgid "Height"
+msgstr ""
+
+#: includes/admin-editor.php:454
+msgid "Suffix"
+msgstr ""
+
+#: includes/admin-editor.php:455
+msgid "Privacy Policy"
+msgstr ""
+
+#: includes/admin-editor.php:456
+msgid "I agree to the [Privacy Policy](page:privacy)."
+msgstr ""
+
+#: includes/admin-editor.php:457
+msgid "Rows"
+msgstr ""
+
+#: includes/admin-editor.php:459
+#: includes/field-ui.php:620
+#: includes/field-ui.php:869
+msgid "Choose file"
+msgstr ""
+
+#: includes/admin-editor.php:460
+msgid "Button label"
+msgstr ""
+
+#: includes/admin-editor.php:461
+msgid "MB"
+msgstr ""
+
+#: includes/admin-editor.php:463
+msgid "Classic"
+msgstr ""
+
+#: includes/admin-editor.php:464
+msgid "Modern"
+msgstr ""
+
+#: includes/admin-editor.php:465
+msgid "Width"
+msgstr ""
+
+#: includes/admin-editor.php:466
+msgid "Auto"
+msgstr ""
+
+#: includes/admin-editor.php:467
+msgid "Custom"
+msgstr ""
+
+#: includes/admin-editor.php:468
+msgid "e.g. 40% or 280px"
 msgstr ""
 
 #: includes/admin.php:58
@@ -454,7 +1063,7 @@ msgstr ""
 #: includes/cpt.php:77
 #: includes/cpt.php:78
 #: includes/runtime-page.php:51
-#: includes/runtime-page.php:134
+#: includes/runtime-page.php:162
 msgid "Page Settings"
 msgstr ""
 
@@ -479,19 +1088,15 @@ msgstr ""
 msgid "Block name"
 msgstr ""
 
-#: includes/config.php:161
-msgid "Media"
-msgstr ""
-
-#: includes/config.php:163
+#: includes/config.php:164
 msgid "Widgets"
 msgstr ""
 
-#: includes/config.php:164
+#: includes/config.php:165
 msgid "Theme"
 msgstr ""
 
-#: includes/config.php:165
+#: includes/config.php:166
 msgid "Embeds"
 msgstr ""
 
@@ -506,8 +1111,8 @@ msgid "Add New"
 msgstr ""
 
 #: includes/cpt.php:15
-#: includes/field-ui.php:493
-#: includes/runtime-page.php:131
+#: includes/field-ui.php:906
+#: includes/runtime-page.php:159
 msgid "Edit"
 msgstr ""
 
@@ -552,63 +1157,228 @@ msgstr ""
 msgid "—"
 msgstr ""
 
+#. translators: %d: page ID
+#: includes/field-ui.php:443
+#, php-format
+msgid "Selected page #%d"
+msgstr ""
+
+#: includes/field-ui.php:489
+#: includes/field-ui.php:917
+#: includes/runtime-blocks.php:241
+#: includes/runtime-page.php:120
+msgid "Change pages"
+msgstr ""
+
+#: includes/field-ui.php:490
+#: includes/field-ui.php:916
+#: includes/runtime-blocks.php:240
+#: includes/runtime-page.php:119
+msgid "Change page"
+msgstr ""
+
+#: includes/field-ui.php:492
+#: includes/field-ui.php:915
+#: includes/runtime-blocks.php:239
+#: includes/runtime-page.php:118
+msgid "Choose pages"
+msgstr ""
+
+#: includes/field-ui.php:493
+#: includes/field-ui.php:914
+#: includes/runtime-blocks.php:238
+#: includes/runtime-page.php:117
+msgid "Choose page"
+msgstr ""
+
+#: includes/field-ui.php:501
+#: includes/field-ui.php:920
+#: includes/runtime-blocks.php:244
+#: includes/runtime-page.php:123
+msgid "Select one or more pages."
+msgstr ""
+
+#: includes/field-ui.php:502
+#: includes/field-ui.php:919
+#: includes/runtime-blocks.php:243
+#: includes/runtime-page.php:122
+msgid "Select a page."
+msgstr ""
+
+#: includes/field-ui.php:612
+#: includes/field-ui.php:868
+msgid "Change images"
+msgstr ""
+
+#: includes/field-ui.php:612
+#: includes/field-ui.php:867
+msgid "Change image"
+msgstr ""
+
+#: includes/field-ui.php:613
+#: includes/field-ui.php:866
+msgid "Choose images"
+msgstr ""
+
+#: includes/field-ui.php:613
+#: includes/field-ui.php:865
+msgid "Choose image"
+msgstr ""
+
+#: includes/field-ui.php:615
+#: includes/field-ui.php:875
+msgid "Select one or more images."
+msgstr ""
+
+#: includes/field-ui.php:616
+#: includes/field-ui.php:874
+msgid "Select an image."
+msgstr ""
+
+#: includes/field-ui.php:619
+#: includes/field-ui.php:872
+msgid "Change files"
+msgstr ""
+
+#: includes/field-ui.php:619
+#: includes/field-ui.php:871
+msgid "Change file"
+msgstr ""
+
+#: includes/field-ui.php:620
+#: includes/field-ui.php:870
+msgid "Choose files"
+msgstr ""
+
+#: includes/field-ui.php:622
+#: includes/field-ui.php:877
+msgid "Select one or more files."
+msgstr ""
+
+#: includes/field-ui.php:623
+#: includes/field-ui.php:876
+msgid "Select a file."
+msgstr ""
+
+#: includes/field-ui.php:667
+#: includes/field-ui.php:668
+#: includes/field-ui.php:883
+msgid "Remove"
+msgstr ""
+
 #. translators: %d: row number
-#: includes/field-ui.php:456
-#: includes/field-ui.php:499
-#: includes/runtime-blocks.php:232
-#: includes/runtime-page.php:112
+#: includes/field-ui.php:836
+#: includes/field-ui.php:912
+#: includes/runtime-blocks.php:236
+#: includes/runtime-page.php:115
 #, php-format
 msgid "Row %d"
 msgstr ""
 
-#: includes/field-ui.php:494
+#: includes/field-ui.php:878
+msgid "Select image"
+msgstr ""
+
+#: includes/field-ui.php:879
+msgid "Select images"
+msgstr ""
+
+#: includes/field-ui.php:880
+msgid "Select file"
+msgstr ""
+
+#: includes/field-ui.php:881
+msgid "Select files"
+msgstr ""
+
+#: includes/field-ui.php:907
 msgid "Save"
 msgstr ""
 
-#: includes/field-ui.php:496
-#: includes/runtime-blocks.php:233
-#: includes/runtime-page.php:113
+#: includes/field-ui.php:909
+#: includes/runtime-blocks.php:237
+#: includes/runtime-page.php:116
 msgid "Close"
 msgstr ""
 
-#: includes/field-ui.php:498
-#: includes/runtime-blocks.php:231
-#: includes/runtime-page.php:111
+#: includes/field-ui.php:911
+#: includes/runtime-blocks.php:235
+#: includes/runtime-page.php:114
 msgid "Remove row"
 msgstr ""
 
-#: includes/runtime-blocks.php:222
-#: includes/runtime-page.php:102
-#: includes/runtime-page.php:135
-msgid "Edit fields"
+#: includes/field-ui.php:921
+#: includes/runtime-blocks.php:245
+#: includes/runtime-page.php:124
+msgid "Selected page"
+msgstr ""
+
+#: includes/field-ui.php:922
+#: includes/runtime-blocks.php:246
+#: includes/runtime-page.php:125
+msgid "Select a page"
+msgstr ""
+
+#: includes/field-ui.php:923
+#: includes/runtime-blocks.php:247
+#: includes/runtime-page.php:126
+msgid "Select pages"
+msgstr ""
+
+#: includes/field-ui.php:924
+#: includes/runtime-blocks.php:248
+#: includes/runtime-page.php:127
+msgid "Search pages…"
+msgstr ""
+
+#: includes/field-ui.php:925
+#: includes/runtime-blocks.php:249
+#: includes/runtime-page.php:128
+msgid "No pages found."
+msgstr ""
+
+#: includes/field-ui.php:926
+#: includes/runtime-blocks.php:250
+#: includes/runtime-page.php:129
+msgid "Loading…"
 msgstr ""
 
 #: includes/runtime-blocks.php:225
 #: includes/runtime-page.php:105
-msgid "Block fields"
+#: includes/runtime-page.php:163
+msgid "Edit fields"
 msgstr ""
 
 #: includes/runtime-blocks.php:226
-#: includes/runtime-page.php:106
+msgid "Open field editor"
+msgstr ""
+
+#: includes/runtime-blocks.php:229
+#: includes/runtime-page.php:108
+msgid "Block fields"
+msgstr ""
+
+#: includes/runtime-blocks.php:230
+#: includes/runtime-page.php:109
 msgid "Edit fields to configure this block."
 msgstr ""
 
-#: includes/runtime-blocks.php:227
-#: includes/runtime-page.php:107
+#: includes/runtime-blocks.php:231
+#: includes/runtime-page.php:110
 #, php-format
 msgid "Error loading preview: %s"
 msgstr ""
 
-#: includes/runtime-blocks.php:228
-#: includes/runtime-page.php:108
+#: includes/runtime-blocks.php:232
+#: includes/runtime-page.php:111
 msgid "Block rendered as empty."
 msgstr ""
 
-#: includes/runtime-blocks.php:294
+#: includes/runtime-blocks.php:338
 msgid "Unknown block."
 msgstr ""
 
-#: includes/runtime-page.php:132
+#: includes/runtime-page.php:160
 msgid "Update"
 msgstr ""
 
@@ -634,480 +1404,4 @@ msgstr ""
 
 #: includes/runtime-site.php:119
 msgid "Save Changes"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Add option"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Add rule"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Add rule group"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Allow multiple"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Allow multiple files"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Allow multiple selection"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Allowed extensions"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Appearance"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Auto"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Autocomplete"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Automatic"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Button label"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "CAPTCHA keys are not configured yet. Add them under Forms → Settings."
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Checkbox text"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Checked"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Checked by default"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Choices"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Choose file"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Classic"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Collapse field"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Column width"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Columns"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Comma-separated list without dots, e.g. pdf, docx, xlsx. Leave empty to allow all WordPress-permitted types."
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Contains"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Current hour"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Custom"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Days relative to today"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Default value"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Delete"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Disabled"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Does not contain"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Drag to reorder"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Drop fields here"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Duplicate"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Expand field"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Field"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Fixed date"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Fixed date & time"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Fixed time"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "General"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Greater than"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Greater than or equal to"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Has any value"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Has no value"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Height"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Hidden from visitors. If filled, the submission is treated as spam."
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Hide"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Horizontal"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "I agree to the [Privacy Policy](page:privacy)."
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Is equal to"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Is not equal to"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Label"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Leave empty for no limit. When the maximum is reached, further options cannot be selected."
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Leave empty to use the global default (%s)."
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Leave empty to use the global default."
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Less than"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Less than or equal to"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Level"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "MB"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Margin"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Markdown is supported, e.g. <b>**Bold**</b>, <i>*Italic*</i>, and <span style=\\\"white-space: nowrap\\\">[Link](...)</span>. For the target you can use a URL (/agb), a WordPress page (page:123), or a standard page such as page:privacy."
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Maximum"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Maximum file size"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Maximum files"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Maximum length"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Maximum number of files visitors can upload."
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Maximum selections"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Minimum"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Minimum length"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Minimum selections"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Minutes relative to now"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Missing field"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Modern"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Must be after"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Must be before"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "No fields available"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "No limit"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "No relation"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "None"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Not checked"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Now"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Now ±"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Off"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Open settings"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Operator"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Option 1"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Option 2"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Options"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Placeholder"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Prefix"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Privacy Policy"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Read only"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Relation"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Required"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Rows"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Section title"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Section width"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Select field"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Show character count"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Show file preview"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Show on the frontend"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Show this field if"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Suffix"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "This field"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Today"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Today ±"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Type"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Use option slugs from the list above. For multiple values, separate with commas (e.g. option-1, option-2)."
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Uses the CAPTCHA keys from Forms → Settings."
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Value"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Vertical"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "Width"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "and"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "days"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "e.g. 24px or 2rem"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "e.g. 40% or 280px"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "minutes"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "or"
-msgstr ""
-
-#: includes/admin-editor.php
-msgid "— Select —"
 msgstr ""
