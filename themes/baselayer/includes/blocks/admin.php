@@ -7,7 +7,7 @@ defined('ABSPATH') || exit;
  */
 function bl_block_creator_register_admin_menu(): void
 {
-	if (!bl_block_creator_enabled() || !current_user_can('manage_options')) {
+	if (!bl_block_creator_enabled() || !bl_block_creator_user_can_manage()) {
 		return;
 	}
 
@@ -73,7 +73,7 @@ add_action('admin_menu', 'bl_block_creator_register_admin_menu');
  */
 function bl_blocks_render_under_construction(string $title, string $description = ''): void
 {
-	if (!bl_block_creator_enabled() || !current_user_can('manage_options')) {
+	if (!bl_block_creator_enabled() || !bl_block_creator_user_can_manage()) {
 		wp_die(esc_html__('You do not have sufficient permissions to access this page.', 'baselayer'));
 	}
 	?>
@@ -95,7 +95,7 @@ function bl_blocks_render_under_construction(string $title, string $description 
  */
 function bl_blocks_handle_library_post(): void
 {
-	if (!bl_block_creator_enabled() || !current_user_can('manage_options')) {
+	if (!bl_block_creator_enabled() || !bl_block_creator_user_can_manage()) {
 		return;
 	}
 
@@ -172,7 +172,7 @@ add_action('admin_init', 'bl_blocks_handle_library_post');
  */
 function bl_blocks_render_library_page(): void
 {
-	if (!bl_block_creator_enabled() || !current_user_can('manage_options')) {
+	if (!bl_block_creator_enabled() || !bl_block_creator_user_can_manage()) {
 		wp_die(esc_html__('You do not have sufficient permissions to access this page.', 'baselayer'));
 	}
 
@@ -359,7 +359,7 @@ function bl_blocks_render_menus_page(): void
  */
 function bl_blocks_render_ui_dev_page(): void
 {
-	if (!bl_block_creator_enabled() || !current_user_can('manage_options')) {
+	if (!bl_block_creator_enabled() || !bl_block_creator_user_can_manage()) {
 		wp_die(esc_html__('You do not have sufficient permissions to access this page.', 'baselayer'));
 	}
 	?>
@@ -404,7 +404,7 @@ function bl_blocks_field_builder_script(): ?array
  */
 function bl_blocks_enqueue_field_builder_assets(string $hook_suffix): void
 {
-	if (!bl_block_creator_enabled() || !current_user_can('manage_options')) {
+	if (!bl_block_creator_enabled() || !bl_block_creator_user_can_manage()) {
 		return;
 	}
 

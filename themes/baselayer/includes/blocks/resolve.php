@@ -13,6 +13,22 @@ function bl_block_creator_enabled(): bool
 }
 
 /**
+ * Whether the current user may open Block Creator admin screens.
+ */
+function bl_block_creator_user_can_manage(): bool
+{
+	if (!current_user_can('manage_options')) {
+		return false;
+	}
+
+	if (function_exists('bl_is_developer_user')) {
+		return bl_is_developer_user((int) get_current_user_id());
+	}
+
+	return true;
+}
+
+/**
  * Load file-based block-options config (parent + child merge).
  *
  * @return array<string, mixed>
