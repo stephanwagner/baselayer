@@ -1681,7 +1681,7 @@
     serializeRow,
     equalizeColumnRun
   } = window.BlFormBuilder || {};
-  var EXCLUDED_TYPES = /* @__PURE__ */ new Set(["page"]);
+  var EXCLUDED_TYPES = /* @__PURE__ */ new Set(["page", "link"]);
   var FORMS_PALETTE = PALETTE_SECTIONS.map((section) => ({
     ...section,
     types: (section.types || []).filter((type) => !EXCLUDED_TYPES.has(type))

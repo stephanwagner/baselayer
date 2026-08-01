@@ -38,6 +38,7 @@ function bl_forms_field_types(): array
 		'honeypot',
 		'captcha',
 		'page',
+		'link',
 	];
 }
 
@@ -1558,7 +1559,7 @@ function bl_forms_sanitize_field($field): ?array
 	$out['disabled'] = !empty($field['disabled']);
 	$out['placeholder'] = sanitize_text_field((string) ($field['placeholder'] ?? ''));
 
-	$no_readonly = ['radio', 'checkboxes', 'button_group', 'toggle', 'terms', 'file', 'image', 'page'];
+	$no_readonly = ['radio', 'checkboxes', 'button_group', 'toggle', 'terms', 'file', 'image', 'page', 'link'];
 	if (in_array($type, $no_readonly, true)) {
 		unset($out['readonly']);
 	}
@@ -1667,7 +1668,7 @@ function bl_forms_sanitize_field($field): ?array
 		unset($out['placeholder']);
 	}
 
-	if (in_array($type, ['text', 'email', 'url', 'number', 'phone', 'textarea', 'date', 'time', 'datetime', 'file', 'image', 'toggle', 'select', 'radio', 'checkboxes', 'button_group', 'terms', 'page'], true)) {
+	if (in_array($type, ['text', 'email', 'url', 'number', 'phone', 'textarea', 'date', 'time', 'datetime', 'file', 'image', 'toggle', 'select', 'radio', 'checkboxes', 'button_group', 'terms', 'page', 'link'], true)) {
 		$out['description'] = sanitize_textarea_field((string) ($field['description'] ?? ''));
 	}
 
@@ -1705,6 +1706,24 @@ function bl_forms_sanitize_field($field): ?array
 
 	if ($type === 'page') {
 		unset($out['placeholder'], $out['default_value'], $out['readonly']);
+	}
+
+	if ($type === 'link') {
+		$allowed = ['page', 'url', 'email', 'phone'];
+		$raw_types = isset($field['link_types']) && is_array($field['link_types']) ? $field['link_types'] : $allowed;
+		$types = [];
+		foreach ($raw_types as $lt) {
+			$key = sanitize_key((string) $lt);
+			if (in_array($key, $allowed, true) && !in_array($key, $types, true)) {
+				$types[] = $key;
+			}
+		}
+		if ($types === []) {
+			$types = $allowed;
+		}
+		$out['link_types'] = $types;
+		$out['allow_target'] = !array_key_exists('allow_target', $field) || !empty($field['allow_target']);
+		unset($out['placeholder'], $out['default_value'], $out['readonly'], $out['multiple']);
 	}
 
 	if (in_array($type, ['file', 'image'], true)) {
@@ -1769,7 +1788,7 @@ function bl_forms_sanitize_field($field): ?array
 		$out['default_value'] = !empty($field['default_value']) ? '1' : '';
 	}
 
-	$no_default = ['file', 'image', 'honeypot', 'captcha', 'page'];
+	$no_default = ['file', 'image', 'honeypot', 'captcha', 'page', 'link'];
 	if (
 		!isset($out['default_value'])
 		&& !in_array($type, $no_default, true)

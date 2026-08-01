@@ -54,6 +54,7 @@ export function operatorsForType(type) {
     case 'file':
     case 'image':
     case 'page':
+    case 'link':
       return [...OPS_FILE];
     case 'text':
     case 'textarea':

@@ -41,6 +41,7 @@ function bl_blocks_palette_icons(): array
 		'repeater',
 		'hidden',
 		'page',
+		'link',
 		'caret',
 		'expandContent',
 		'collapseContent',
@@ -92,12 +93,16 @@ function bl_blocks_field_types(): array
 			'checkboxes', 'radio', 'select', 'toggle', 'button_group',
 			'date', 'time', 'datetime', 'file', 'image',
 			'heading', 'text_block', 'divider', 'spacer', 'html',
-			'column', 'section', 'hidden', 'page',
+			'column', 'section', 'hidden', 'page', 'link',
 		];
 	}
 
 	if (!in_array('page', $types, true)) {
 		$types[] = 'page';
+	}
+
+	if (!in_array('link', $types, true)) {
+		$types[] = 'link';
 	}
 
 	if (!in_array('repeater', $types, true)) {
@@ -368,6 +373,10 @@ function bl_blocks_render_admin_fields_walk(array $fields, array $values, string
 				bl_blocks_render_admin_page_field($field, $value, $input_name);
 				break;
 
+			case 'link':
+				bl_blocks_render_admin_link_field($field, $value, $input_name);
+				break;
+
 			default:
 				$input_type = 'text';
 				if ($type === 'phone') {
@@ -521,6 +530,64 @@ function bl_blocks_render_admin_page_field(array $field, $value, string $input_n
 }
 
 /**
+ * Render a link field control for PHP admin (Website settings).
+ *
+ * @param array<string, mixed> $field
+ * @param mixed                $value
+ */
+function bl_blocks_render_admin_link_field(array $field, $value, string $input_name): void
+{
+	$allowed = ['page', 'url', 'email', 'phone'];
+	$link_types = [];
+	if (isset($field['link_types']) && is_array($field['link_types'])) {
+		foreach ($field['link_types'] as $lt) {
+			$key = sanitize_key((string) $lt);
+			if (in_array($key, $allowed, true) && !in_array($key, $link_types, true)) {
+				$link_types[] = $key;
+			}
+		}
+	}
+	if ($link_types === []) {
+		$link_types = $allowed;
+	}
+	$allow_target = !array_key_exists('allow_target', $field) || !empty($field['allow_target']);
+	$clean = function_exists('bl_blocks_sanitize_link_value')
+		? bl_blocks_sanitize_link_value($field, $value)
+		: [
+			'type'  => $link_types[0],
+			'url'   => '',
+			'title' => '',
+		];
+
+	printf(
+		'<div class="bl-blocks-fields__link" data-bl-blocks-link-field data-input-name="%s" data-link-types="%s" data-allow-target="%s">',
+		esc_attr($input_name),
+		esc_attr(implode(',', $link_types)),
+		esc_attr($allow_target ? '1' : '0')
+	);
+	echo '<div data-bl-link-ui></div>';
+	echo '<div data-bl-link-inputs>';
+	foreach (['type', 'url', 'title', 'page_id'] as $key) {
+		$val = $clean[$key] ?? '';
+		printf(
+			'<input type="hidden" name="%s[%s]" value="%s" data-bl-link-key="%s">',
+			esc_attr($input_name),
+			esc_attr($key),
+			esc_attr((string) $val),
+			esc_attr($key)
+		);
+	}
+	if (!empty($clean['target']) && $clean['target'] === '_blank') {
+		printf(
+			'<input type="hidden" name="%s[target]" value="_blank" data-bl-link-key="target">',
+			esc_attr($input_name)
+		);
+	}
+	echo '</div>';
+	echo '</div>';
+}
+
+/**
  * Render a repeater control for PHP admin (Website settings).
  *
  * @param array<string, mixed>       $field
@@ -637,6 +704,16 @@ function bl_blocks_enqueue_field_ui_assets(): void
 			'pagePickerEmpty'        => __('No pages found.', 'baselayer-blocks'),
 			'pagePickerLoading'      => __('Loading…', 'baselayer-blocks'),
 			'selectPage'             => __('Select', 'baselayer-blocks'),
+			'linkTypePage'           => __('Page', 'baselayer-blocks'),
+			'linkTypeUrl'            => __('URL', 'baselayer-blocks'),
+			'linkTypeEmail'          => __('Email', 'baselayer-blocks'),
+			'linkTypePhone'          => __('Phone', 'baselayer-blocks'),
+			'linkText'               => __('Link text', 'baselayer-blocks'),
+			'linkTextPlaceholder'    => __('Link text', 'baselayer-blocks'),
+			'linkOpenNewTab'         => __('Open in new tab', 'baselayer-blocks'),
+			'linkUrlPlaceholder'     => __('https://', 'baselayer-blocks'),
+			'linkEmailPlaceholder'   => __('name@example.com', 'baselayer-blocks'),
+			'linkPhonePlaceholder'   => __('+41 …', 'baselayer-blocks'),
 		],
 	]);
 }

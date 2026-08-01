@@ -1123,3 +1123,27 @@ msgstr "Keine Seiten gefunden."
 
 msgid "Loading…"
 msgstr "Wird geladen…"
+
+msgid "Link"
+msgstr "Link"
+
+msgid "Allowed types"
+msgstr "Erlaubte Typen"
+
+msgid "Allow editor to set target"
+msgstr "Erlauben, Ziel (neuer Tab) festzulegen"
+
+msgid "Link text"
+msgstr "Linktext"
+
+msgid "Open in new tab"
+msgstr "In neuem Tab öffnen"
+
+msgid "https://"
+msgstr "https://"
+
+msgid "name@example.com"
+msgstr "name@example.com"
+
+msgid "+41 …"
+msgstr "+41 …"

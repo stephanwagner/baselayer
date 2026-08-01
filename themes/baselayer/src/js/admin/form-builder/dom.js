@@ -44,6 +44,7 @@ export const TYPE_KEYS = [
   'honeypot',
   'captcha',
   'page',
+  'link',
 ];
 
 /** Palette accordion groups (Popular is default-open). */
@@ -88,7 +89,7 @@ export const PALETTE_SECTIONS = [
     id: 'relations',
     headingKey: 'paletteSectionRelations',
     headingFallback: 'Relations',
-    types: ['page'],
+    types: ['page', 'link'],
   },
   {
     id: 'layout',
@@ -421,6 +422,10 @@ export function defaultField(type = 'text') {
   }
   if (['select', 'button_group', 'file', 'image', 'page'].includes(type)) {
     base.multiple = false;
+  }
+  if (type === 'link') {
+    base.link_types = ['page', 'url', 'email', 'phone'];
+    base.allow_target = true;
   }
   if (type === 'file' || type === 'image') {
     base.preview = true;

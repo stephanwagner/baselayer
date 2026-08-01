@@ -308,6 +308,19 @@ function convertFieldType(field, nextType) {
     delete field.button_text;
   }
 
+  if (nextType === 'link') {
+    const allowed = ['page', 'url', 'email', 'phone'];
+    const raw = Array.isArray(field.link_types) ? field.link_types : [];
+    field.link_types = raw.filter((t) => allowed.includes(t));
+    if (field.link_types.length === 0) {
+      field.link_types = [...allowed];
+    }
+    field.allow_target = field.allow_target !== false;
+  } else {
+    delete field.link_types;
+    delete field.allow_target;
+  }
+
   if (nextType === 'terms') {
     if (field.content == null || String(field.content).trim() === '') {
       field.content = t('termsDefaultLabel', 'I agree to the [Privacy Policy](page:privacy).');
@@ -455,6 +468,7 @@ const DESCRIPTION_TYPES = [
   'button_group',
   'terms',
   'page',
+  'link',
 ];
 const NO_PLACEHOLDER = [
   'terms',
@@ -478,6 +492,7 @@ const NO_PLACEHOLDER = [
   'time',
   'datetime',
   'page',
+  'link',
 ];
 const NO_REQUIRED = [
   'hidden',
@@ -501,6 +516,7 @@ const NO_READONLY = [
   'file',
   'image',
   'page',
+  'link',
 ];
 const NO_DISABLED = [...NO_REQUIRED];
 const AUTOCOMPLETE_TYPES = [
@@ -534,6 +550,7 @@ const NO_DEFAULT = [
   'text_block',
   'html',
   'page',
+  'link',
 ];
 const CHECKED_DEFAULT_TYPES = ['terms', 'toggle'];
 const NAMED_TYPES = [
@@ -557,6 +574,7 @@ const NAMED_TYPES = [
   'hidden',
   'honeypot',
   'page',
+  'link',
 ];
 const HIDE_LABEL_TYPES = NAMED_TYPES.filter((type) => type !== 'hidden' && type !== 'honeypot');
 
@@ -2685,6 +2703,17 @@ export function serializeRow(row) {
   if (MULTIPLE_TYPES.includes(type)) {
     data.multiple = Boolean(q('[data-bl-multiple]')?.checked);
   }
+  if (type === 'link') {
+    const allowed = ['page', 'url', 'email', 'phone'];
+    const checked = Array.from(body.querySelectorAll('[data-bl-link-type]:checked')).map(
+      (input) => input.value
+    );
+    data.link_types = checked.filter((t) => allowed.includes(t));
+    if (data.link_types.length === 0) {
+      data.link_types = [...allowed];
+    }
+    data.allow_target = Boolean(q('[data-bl-allow-target]')?.checked);
+  }
   if (type === 'file' || type === 'image') {
     data.extensions = q('[data-bl-extensions]')?.value?.trim() || '';
     data.upload_style = q('[data-bl-upload-style]')?.value === 'classic' ? 'classic' : 'modern';
@@ -3338,6 +3367,64 @@ export function createFieldCard(initial, open = false) {
         generalSections.add(
           settingHeading(t('choices', 'Choices')),
           createOptionsEditor(field.options || [])
+        );
+      }
+
+      if (field.type === 'link') {
+        const allowedKeys = ['page', 'url', 'email', 'phone'];
+        const labels = {
+          page: t('linkTypePage', 'Page'),
+          url: t('linkTypeUrl', 'URL'),
+          email: t('linkTypeEmail', 'Email'),
+          phone: t('linkTypePhone', 'Phone'),
+        };
+        let selected = Array.isArray(field.link_types)
+          ? field.link_types.filter((k) => allowedKeys.includes(k))
+          : [...allowedKeys];
+        if (selected.length === 0) {
+          selected = [...allowedKeys];
+        }
+        field.link_types = selected;
+        if (field.allow_target === undefined) {
+          field.allow_target = true;
+        }
+
+        const typeChecks = allowedKeys.map((key) => {
+          const input = el('input', {
+            type: 'checkbox',
+            value: key,
+            dataset: { blLinkType: '1' },
+            checked: selected.includes(key),
+          });
+          input.addEventListener('change', () => {
+            let next = Array.from(
+              body.querySelectorAll('[data-bl-link-type]:checked')
+            ).map((elInput) => elInput.value);
+            if (next.length === 0) {
+              input.checked = true;
+              next = [key];
+            }
+            field.link_types = next;
+            document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+          });
+          return el('label', {}, [
+            input,
+            document.createTextNode(' ' + labels[key]),
+          ]);
+        });
+
+        generalSections.add(
+          settingHeading(t('linkAllowedTypes', 'Allowed types')),
+          el('div', { className: 'bl-forms-builder__options-toggles' }, typeChecks),
+          createSwitchSetting(
+            'blAllowTarget',
+            t('linkAllowTarget', 'Allow editor to set target'),
+            field.allow_target !== false,
+            (checked) => {
+              field.allow_target = checked;
+              document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+            }
+          )
         );
       }
 

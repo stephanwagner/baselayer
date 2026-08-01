@@ -1550,6 +1550,9 @@ msgstr "CAPTCHA"
 msgid "Page"
 msgstr "Seite"
 
+msgid "Link"
+msgstr "Link"
+
 #: includes/block.php:43
 msgid "Select a form…"
 msgstr "Formular auswählen…"

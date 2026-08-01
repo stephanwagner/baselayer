@@ -39,7 +39,8 @@
     "hidden",
     "honeypot",
     "captcha",
-    "page"
+    "page",
+    "link"
   ];
   var PALETTE_SECTIONS = [
     {
@@ -82,7 +83,7 @@
       id: "relations",
       headingKey: "paletteSectionRelations",
       headingFallback: "Relations",
-      types: ["page"]
+      types: ["page", "link"]
     },
     {
       id: "layout",
@@ -353,6 +354,10 @@
     if (["select", "button_group", "file", "image", "page"].includes(type)) {
       base.multiple = false;
     }
+    if (type === "link") {
+      base.link_types = ["page", "url", "email", "phone"];
+      base.allow_target = true;
+    }
     if (type === "file" || type === "image") {
       base.preview = true;
       base.upload_style = "modern";
@@ -455,6 +460,7 @@
       case "file":
       case "image":
       case "page":
+      case "link":
         return [...OPS_FILE];
       case "text":
       case "textarea":
@@ -1717,6 +1723,18 @@
       delete field.upload_style;
       delete field.button_text;
     }
+    if (nextType === "link") {
+      const allowed = ["page", "url", "email", "phone"];
+      const raw = Array.isArray(field.link_types) ? field.link_types : [];
+      field.link_types = raw.filter((t2) => allowed.includes(t2));
+      if (field.link_types.length === 0) {
+        field.link_types = [...allowed];
+      }
+      field.allow_target = field.allow_target !== false;
+    } else {
+      delete field.link_types;
+      delete field.allow_target;
+    }
     if (nextType === "terms") {
       if (field.content == null || String(field.content).trim() === "") {
         field.content = t("termsDefaultLabel", "I agree to the [Privacy Policy](page:privacy).");
@@ -1843,7 +1861,8 @@
     "checkboxes",
     "button_group",
     "terms",
-    "page"
+    "page",
+    "link"
   ];
   var NO_PLACEHOLDER = [
     "terms",
@@ -1866,7 +1885,8 @@
     "date",
     "time",
     "datetime",
-    "page"
+    "page",
+    "link"
   ];
   var NO_REQUIRED = [
     "hidden",
@@ -1889,7 +1909,8 @@
     "terms",
     "file",
     "image",
-    "page"
+    "page",
+    "link"
   ];
   var NO_DISABLED = [...NO_REQUIRED];
   var AUTOCOMPLETE_TYPES = [
@@ -1921,7 +1942,8 @@
     "heading",
     "text_block",
     "html",
-    "page"
+    "page",
+    "link"
   ];
   var CHECKED_DEFAULT_TYPES = ["terms", "toggle"];
   var NAMED_TYPES = [
@@ -1944,7 +1966,8 @@
     "terms",
     "hidden",
     "honeypot",
-    "page"
+    "page",
+    "link"
   ];
   var HIDE_LABEL_TYPES = NAMED_TYPES.filter((type) => type !== "hidden" && type !== "honeypot");
   function createOptionsEditor(options) {
@@ -3783,6 +3806,17 @@
     if (MULTIPLE_TYPES.includes(type)) {
       data.multiple = Boolean(q("[data-bl-multiple]")?.checked);
     }
+    if (type === "link") {
+      const allowed = ["page", "url", "email", "phone"];
+      const checked = Array.from(body.querySelectorAll("[data-bl-link-type]:checked")).map(
+        (input) => input.value
+      );
+      data.link_types = checked.filter((t2) => allowed.includes(t2));
+      if (data.link_types.length === 0) {
+        data.link_types = [...allowed];
+      }
+      data.allow_target = Boolean(q("[data-bl-allow-target]")?.checked);
+    }
     if (type === "file" || type === "image") {
       data.extensions = q("[data-bl-extensions]")?.value?.trim() || "";
       data.upload_style = q("[data-bl-upload-style]")?.value === "classic" ? "classic" : "modern";
@@ -4364,6 +4398,59 @@
           generalSections.add(
             settingHeading(t("choices", "Choices")),
             createOptionsEditor(field.options || [])
+          );
+        }
+        if (field.type === "link") {
+          const allowedKeys = ["page", "url", "email", "phone"];
+          const labels = {
+            page: t("linkTypePage", "Page"),
+            url: t("linkTypeUrl", "URL"),
+            email: t("linkTypeEmail", "Email"),
+            phone: t("linkTypePhone", "Phone")
+          };
+          let selected = Array.isArray(field.link_types) ? field.link_types.filter((k) => allowedKeys.includes(k)) : [...allowedKeys];
+          if (selected.length === 0) {
+            selected = [...allowedKeys];
+          }
+          field.link_types = selected;
+          if (field.allow_target === void 0) {
+            field.allow_target = true;
+          }
+          const typeChecks = allowedKeys.map((key) => {
+            const input = el("input", {
+              type: "checkbox",
+              value: key,
+              dataset: { blLinkType: "1" },
+              checked: selected.includes(key)
+            });
+            input.addEventListener("change", () => {
+              let next = Array.from(
+                body.querySelectorAll("[data-bl-link-type]:checked")
+              ).map((elInput) => elInput.value);
+              if (next.length === 0) {
+                input.checked = true;
+                next = [key];
+              }
+              field.link_types = next;
+              document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+            });
+            return el("label", {}, [
+              input,
+              document.createTextNode(" " + labels[key])
+            ]);
+          });
+          generalSections.add(
+            settingHeading(t("linkAllowedTypes", "Allowed types")),
+            el("div", { className: "bl-forms-builder__options-toggles" }, typeChecks),
+            createSwitchSetting(
+              "blAllowTarget",
+              t("linkAllowTarget", "Allow editor to set target"),
+              field.allow_target !== false,
+              (checked) => {
+                field.allow_target = checked;
+                document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+              }
+            )
           );
         }
         if (field.type !== "hidden") {

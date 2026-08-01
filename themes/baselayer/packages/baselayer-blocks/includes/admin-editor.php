@@ -236,6 +236,7 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'repeater'     => __('Repeater', 'baselayer-blocks'),
 		'hidden'       => __('Hidden', 'baselayer-blocks'),
 		'page'         => __('Page', 'baselayer-blocks'),
+		'link'         => __('Link', 'baselayer-blocks'),
 	];
 
 	$i18n = [
@@ -314,6 +315,18 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'allowMultiple'           => __('Allow multiple', 'baselayer-blocks'),
 		'allowMultipleFiles'      => __('Allow multiple files', 'baselayer-blocks'),
 		'pageMultiple'            => __('Allow multiple pages', 'baselayer-blocks'),
+		'linkAllowedTypes'        => __('Allowed types', 'baselayer-blocks'),
+		'linkAllowTarget'         => __('Allow editor to set target', 'baselayer-blocks'),
+		'linkTypePage'            => __('Page', 'baselayer-blocks'),
+		'linkTypeUrl'             => __('URL', 'baselayer-blocks'),
+		'linkTypeEmail'           => __('Email', 'baselayer-blocks'),
+		'linkTypePhone'           => __('Phone', 'baselayer-blocks'),
+		'linkText'                => __('Link text', 'baselayer-blocks'),
+		'linkTextPlaceholder'     => __('Link text', 'baselayer-blocks'),
+		'linkOpenNewTab'          => __('Open in new tab', 'baselayer-blocks'),
+		'linkUrlPlaceholder'      => __('https://', 'baselayer-blocks'),
+		'linkEmailPlaceholder'    => __('name@example.com', 'baselayer-blocks'),
+		'linkPhonePlaceholder'    => __('+41 …', 'baselayer-blocks'),
 		'allowedExtensions'       => __('Allowed extensions', 'baselayer-blocks'),
 		'allowedExtensionsHelp'   => __('Comma-separated list without dots, e.g. pdf, docx, xlsx. Leave empty to allow all WordPress-permitted types.', 'baselayer-blocks'),
 		'autocomplete'            => __('Autocomplete', 'baselayer-blocks'),

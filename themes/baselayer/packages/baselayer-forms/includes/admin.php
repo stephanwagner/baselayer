@@ -224,6 +224,7 @@ function bl_forms_palette_icons(): array
 		'honeypot',
 		'captcha',
 		'page',
+		'link',
 		'caret',
 
 		'expandContent',
@@ -822,6 +823,7 @@ function bl_forms_admin_enqueue(string $hook): void
 					'honeypot'     => __('Honeypot', 'baselayer-forms'),
 					'captcha'      => __('CAPTCHA', 'baselayer-forms'),
 					'page'         => __('Page', 'baselayer-forms'),
+					'link'         => __('Link', 'baselayer-forms'),
 				],
 			],
 		]);

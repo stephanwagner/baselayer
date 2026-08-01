@@ -503,6 +503,23 @@ function bl_blocks_sanitize_leaf_field_fallback(array $field): array
 		$out['multiple'] = !empty($field['multiple']);
 		unset($out['placeholder'], $out['default_value']);
 	}
+	if ($out['type'] === 'link') {
+		$allowed = ['page', 'url', 'email', 'phone'];
+		$raw_types = isset($field['link_types']) && is_array($field['link_types']) ? $field['link_types'] : $allowed;
+		$types = [];
+		foreach ($raw_types as $lt) {
+			$key = sanitize_key((string) $lt);
+			if (in_array($key, $allowed, true) && !in_array($key, $types, true)) {
+				$types[] = $key;
+			}
+		}
+		if ($types === []) {
+			$types = $allowed;
+		}
+		$out['link_types'] = $types;
+		$out['allow_target'] = !array_key_exists('allow_target', $field) || !empty($field['allow_target']);
+		unset($out['placeholder'], $out['default_value'], $out['multiple']);
+	}
 
 	if (isset($field['conditional_logic']) && is_array($field['conditional_logic'])) {
 		$out['conditional_logic'] = $field['conditional_logic'];
@@ -720,6 +737,92 @@ function bl_blocks_query_definitions(string $type, bool $active_only = false): a
 }
 
 /**
+ * Sanitize a stored link field value.
+ *
+ * @param array<string, mixed> $field
+ * @param mixed                $raw
+ * @return array{type:string,url:string,title:string,page_id?:int,target?:string}
+ */
+function bl_blocks_sanitize_link_value(array $field, $raw): array
+{
+	$allowed = ['page', 'url', 'email', 'phone'];
+	$link_types = [];
+	if (isset($field['link_types']) && is_array($field['link_types'])) {
+		foreach ($field['link_types'] as $lt) {
+			$key = sanitize_key((string) $lt);
+			if (in_array($key, $allowed, true) && !in_array($key, $link_types, true)) {
+				$link_types[] = $key;
+			}
+		}
+	}
+	if ($link_types === []) {
+		$link_types = $allowed;
+	}
+	$allow_target = !array_key_exists('allow_target', $field) || !empty($field['allow_target']);
+
+	$raw = is_array($raw) ? $raw : [];
+	$type = sanitize_key((string) ($raw['type'] ?? $link_types[0]));
+	if (!in_array($type, $link_types, true)) {
+		$type = $link_types[0];
+	}
+
+	$title = sanitize_text_field((string) ($raw['title'] ?? ''));
+	$url = '';
+	$page_id = 0;
+
+	if ($type === 'page') {
+		$page_id = absint($raw['page_id'] ?? 0);
+		if ($page_id > 0) {
+			$post = get_post($page_id);
+			if ($post && $post->post_type === 'page' && $post->post_status !== 'trash') {
+				$url = (string) get_permalink($post);
+				if ($title === '') {
+					$title = get_the_title($post) ?: '';
+				}
+			} else {
+				$page_id = 0;
+			}
+		}
+		// Allow explicit url from editor hydrate when post lookup fails in REST-only contexts.
+		if ($url === '' && !empty($raw['url'])) {
+			$url = esc_url_raw((string) $raw['url']);
+		}
+	} elseif ($type === 'email') {
+		$addr = sanitize_email(preg_replace('/^mailto:/i', '', (string) ($raw['url'] ?? '')));
+		$url = $addr !== '' ? 'mailto:' . $addr : '';
+		if ($title === '' && $addr !== '') {
+			$title = $addr;
+		}
+	} elseif ($type === 'phone') {
+		$num = sanitize_text_field(preg_replace('/^tel:/i', '', (string) ($raw['url'] ?? '')));
+		$url = $num !== '' ? 'tel:' . $num : '';
+		if ($title === '' && $num !== '') {
+			$title = $num;
+		}
+	} else {
+		$url = esc_url_raw((string) ($raw['url'] ?? ''));
+		if ($title === '' && $url !== '') {
+			$host = wp_parse_url($url, PHP_URL_HOST);
+			$title = is_string($host) && $host !== '' ? $host : $url;
+		}
+	}
+
+	$out = [
+		'type'  => $type,
+		'url'   => $url,
+		'title' => $title,
+	];
+	if ($type === 'page') {
+		$out['page_id'] = $page_id;
+	}
+	if ($allow_target && in_array($type, ['page', 'url'], true) && (($raw['target'] ?? '') === '_blank')) {
+		$out['target'] = '_blank';
+	}
+
+	return $out;
+}
+
+/**
  * Sanitize a map of field values against a definition's fields.
  *
  * @param list<array<string, mixed>> $fields
@@ -803,6 +906,11 @@ function bl_blocks_sanitize_values(array $fields, $raw): array
 			} else {
 				$values[$name] = $ids[0] ?? 0;
 			}
+			continue;
+		}
+
+		if ($type === 'link') {
+			$values[$name] = bl_blocks_sanitize_link_value($field, $raw_value);
 			continue;
 		}
 

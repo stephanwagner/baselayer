@@ -557,8 +557,388 @@
     });
   }
 
-  // themes/baselayer/packages/baselayer-blocks/src/js/admin/field-form.js
+  // themes/baselayer/packages/baselayer-blocks/src/js/admin/link-field.js
+  var LINK_TYPES = ["page", "url", "email", "phone"];
   function el2(tag, props = {}, children = []) {
+    const node = document.createElement(tag);
+    Object.entries(props).forEach(([key, value]) => {
+      if (value == null || value === false) return;
+      if (key === "className") node.className = value;
+      else if (key === "text") node.textContent = value;
+      else if (key === "dataset") Object.assign(node.dataset, value);
+      else if (key.startsWith("on") && typeof value === "function") {
+        node.addEventListener(key.slice(2).toLowerCase(), value);
+      } else if (key === "checked") node.checked = Boolean(value);
+      else if (key === "value") node.value = value === true ? "" : String(value);
+      else node.setAttribute(key, value === true ? "" : String(value));
+    });
+    (Array.isArray(children) ? children : [children]).forEach((child) => {
+      if (child == null || child === false) return;
+      node.appendChild(typeof child === "string" ? document.createTextNode(child) : child);
+    });
+    return node;
+  }
+  function i18n2(key, fallback) {
+    const dict = window.blBlocksFieldUi && window.blBlocksFieldUi.i18n || window.blBlocksEditor && window.blBlocksEditor.i18n || window.blBlocksPage && window.blBlocksPage.i18n || window.blBlocksAdmin && window.blBlocksAdmin.i18n || {};
+    return dict[key] || fallback || key;
+  }
+  function pickerConfig2() {
+    const sources = [
+      window.blBlocksFieldUi,
+      window.blBlocksEditor,
+      window.blBlocksPage,
+      window.blBlocksAdmin
+    ];
+    let restUrl = "";
+    let restNonce = "";
+    sources.forEach((src) => {
+      if (!src) return;
+      if (!restUrl && src.pagesRestUrl) restUrl = src.pagesRestUrl;
+      if (!restNonce && src.restNonce) restNonce = src.restNonce;
+    });
+    return { restUrl, restNonce };
+  }
+  function allowedLinkTypes(field) {
+    const raw = Array.isArray(field.link_types) ? field.link_types : LINK_TYPES;
+    const list = raw.map(String).filter((t) => LINK_TYPES.includes(t));
+    return list.length ? list : [...LINK_TYPES];
+  }
+  function normalizeLinkValue(current, allowed) {
+    const empty = {
+      type: allowed[0] || "url",
+      url: "",
+      title: "",
+      page_id: 0,
+      target: ""
+    };
+    if (!current || typeof current !== "object" || Array.isArray(current)) {
+      return empty;
+    }
+    let type = String(current.type || "");
+    if (!allowed.includes(type)) {
+      type = allowed[0] || "url";
+    }
+    return {
+      type,
+      url: current.url != null ? String(current.url) : "",
+      title: current.title != null ? String(current.title) : "",
+      page_id: Number(current.page_id) || 0,
+      target: current.target === "_blank" ? "_blank" : ""
+    };
+  }
+  function displayDestination(state) {
+    if (state.type === "email") {
+      return String(state.url || "").replace(/^mailto:/i, "");
+    }
+    if (state.type === "phone") {
+      return String(state.url || "").replace(/^tel:/i, "");
+    }
+    return String(state.url || "");
+  }
+  function createLinkControl(field, current) {
+    const allowed = allowedLinkTypes(field);
+    const allowTarget = field.allow_target !== false;
+    let state = normalizeLinkValue(current, allowed);
+    let pageMeta = state.type === "page" && state.page_id > 0 ? { id: state.page_id, title: state.title || "", url: state.url || "" } : null;
+    const root = el2("div", {
+      className: "bl-blocks-fields__link",
+      dataset: { blBlocksLinkField: "1" }
+    });
+    const typeRow = el2("div", { className: "bl-blocks-fields__link-types" });
+    const destWrap = el2("div", { className: "bl-blocks-fields__link-destination" });
+    const titleInput = el2("input", {
+      type: "text",
+      className: "widefat",
+      value: state.title,
+      placeholder: i18n2("linkTextPlaceholder", "Link text")
+    });
+    const titleRow = el2("p", { className: "bl-blocks-fields__link-title" }, [
+      el2("label", { text: i18n2("linkText", "Link text") }),
+      titleInput
+    ]);
+    const targetInput = el2("input", { type: "checkbox" });
+    const targetRow = el2("label", { className: "bl-blocks-fields__toggle bl-blocks-fields__link-target" }, [
+      targetInput,
+      document.createTextNode(" " + i18n2("linkOpenNewTab", "Open in new tab"))
+    ]);
+    const syncTargetVisibility = () => {
+      const show = allowTarget && (state.type === "page" || state.type === "url");
+      targetRow.hidden = !show;
+      if (!show) {
+        targetInput.checked = false;
+        state.target = "";
+      }
+    };
+    const renderDestination = () => {
+      destWrap.replaceChildren();
+      if (state.type === "page") {
+        const summary = el2("div", { className: "bl-blocks-fields__page-picker-summary" });
+        const pickBtn = el2("button", {
+          type: "button",
+          className: "button bl-button-small",
+          text: pageMeta ? i18n2("changePage", "Change page") : i18n2("choosePage", "Choose page")
+        });
+        const clearBtn = el2("button", {
+          type: "button",
+          className: "button-link",
+          text: i18n2("clearPage", "Clear"),
+          hidden: !pageMeta
+        });
+        if (pageMeta) {
+          summary.appendChild(
+            el2("span", {
+              className: "bl-blocks-fields__page-picker-value",
+              text: pageMeta.title || i18n2("selectedPage", "Selected page") + " #" + pageMeta.id
+            })
+          );
+          if (pageMeta.url) {
+            summary.appendChild(
+              el2("span", {
+                className: "description bl-blocks-fields__page-picker-url",
+                text: pageMeta.url,
+                title: pageMeta.url
+              })
+            );
+          }
+        } else {
+          summary.appendChild(
+            el2("span", {
+              className: "description",
+              text: i18n2("choosePageHelp", "Select a page.")
+            })
+          );
+        }
+        pickBtn.addEventListener("click", async () => {
+          if (typeof openPagePicker !== "function") {
+            console.error("Page picker is unavailable.");
+            return;
+          }
+          const { restUrl, restNonce } = pickerConfig2();
+          const page = await openPagePicker({
+            selectedId: pageMeta ? pageMeta.id : 0,
+            title: i18n2("pagePickerTitle", "Select a page"),
+            searchPlaceholder: i18n2("pagePickerSearch", "Search pages\u2026"),
+            empty: i18n2("pagePickerEmpty", "No pages found."),
+            loading: i18n2("pagePickerLoading", "Loading\u2026"),
+            cancelLabel: i18n2("cancel", "Cancel"),
+            selectLabel: i18n2("selectPage", "Select"),
+            restUrl,
+            restNonce
+          });
+          if (!page) return;
+          pageMeta = {
+            id: Number(page.id) || 0,
+            title: page.title || "",
+            url: page.url || ""
+          };
+          state.page_id = pageMeta.id;
+          state.url = pageMeta.url;
+          if (!String(titleInput.value || "").trim() && pageMeta.title) {
+            titleInput.value = pageMeta.title;
+            state.title = pageMeta.title;
+          }
+          renderDestination();
+        });
+        clearBtn.addEventListener("click", () => {
+          pageMeta = null;
+          state.page_id = 0;
+          state.url = "";
+          renderDestination();
+        });
+        destWrap.appendChild(
+          el2("div", { className: "bl-blocks-fields__page-picker-row" }, [
+            summary,
+            el2("div", { className: "bl-blocks-fields__page-picker-actions" }, [pickBtn, clearBtn])
+          ])
+        );
+        return;
+      }
+      let inputType = "url";
+      let placeholder = i18n2("linkUrlPlaceholder", "https://");
+      let value = displayDestination(state);
+      if (state.type === "email") {
+        inputType = "email";
+        placeholder = i18n2("linkEmailPlaceholder", "name@example.com");
+      } else if (state.type === "phone") {
+        inputType = "tel";
+        placeholder = i18n2("linkPhonePlaceholder", "+41 \u2026");
+      }
+      const input = el2("input", {
+        type: inputType,
+        className: "widefat",
+        value,
+        placeholder
+      });
+      input.addEventListener("input", () => {
+        state.url = input.value;
+      });
+      destWrap.appendChild(input);
+    };
+    if (allowed.length > 1) {
+      const labels = {
+        page: i18n2("linkTypePage", "Page"),
+        url: i18n2("linkTypeUrl", "URL"),
+        email: i18n2("linkTypeEmail", "Email"),
+        phone: i18n2("linkTypePhone", "Phone")
+      };
+      allowed.forEach((type) => {
+        const btn = el2("button", {
+          type: "button",
+          className: "button bl-button-small bl-blocks-fields__link-type" + (state.type === type ? " is-active" : ""),
+          text: labels[type] || type,
+          dataset: { linkType: type }
+        });
+        btn.addEventListener("click", () => {
+          if (state.type === type) return;
+          state.type = type;
+          state.url = "";
+          state.page_id = 0;
+          state.target = "";
+          pageMeta = null;
+          targetInput.checked = false;
+          typeRow.querySelectorAll("[data-link-type]").forEach((node) => {
+            node.classList.toggle("is-active", node.dataset.linkType === type);
+          });
+          syncTargetVisibility();
+          renderDestination();
+        });
+        typeRow.appendChild(btn);
+      });
+      root.appendChild(typeRow);
+    }
+    titleInput.addEventListener("input", () => {
+      state.title = titleInput.value;
+    });
+    targetInput.checked = state.target === "_blank";
+    targetInput.addEventListener("change", () => {
+      state.target = targetInput.checked ? "_blank" : "";
+    });
+    root.append(destWrap, titleRow, targetRow);
+    syncTargetVisibility();
+    renderDestination();
+    if (state.type === "page" && state.page_id > 0 && (!pageMeta || !pageMeta.title)) {
+      const { restUrl, restNonce } = pickerConfig2();
+      if (restUrl) {
+        fetch(String(restUrl).replace(/\/?$/, "/") + state.page_id + "?_fields=id,title,link", {
+          headers: restNonce ? { "X-WP-Nonce": restNonce } : {}
+        }).then((res) => res.ok ? res.json() : null).then((row) => {
+          if (!row || Number(row.id) !== state.page_id) return;
+          pageMeta = {
+            id: state.page_id,
+            title: row.title && row.title.rendered || "",
+            url: row.link || ""
+          };
+          state.url = pageMeta.url;
+          if (!String(titleInput.value || "").trim() && pageMeta.title) {
+            titleInput.value = pageMeta.title;
+            state.title = pageMeta.title;
+          }
+          renderDestination();
+        }).catch(() => {
+        });
+      }
+    }
+    root.getLinkValue = () => {
+      const destInput = destWrap.querySelector('input:not([type="hidden"])');
+      const title = String(titleInput.value || "").trim();
+      const out = {
+        type: state.type,
+        url: "",
+        title
+      };
+      if (state.type === "page") {
+        out.page_id = state.page_id > 0 ? state.page_id : 0;
+        out.url = pageMeta && pageMeta.url || state.url || "";
+      } else if (state.type === "email") {
+        const email = String(destInput ? destInput.value : state.url || "").replace(/^mailto:/i, "").trim();
+        out.url = email ? "mailto:" + email : "";
+      } else if (state.type === "phone") {
+        const phone = String(destInput ? destInput.value : state.url || "").replace(/^tel:/i, "").trim();
+        out.url = phone ? "tel:" + phone : "";
+      } else {
+        out.url = String(destInput ? destInput.value : state.url || "").trim();
+      }
+      if (allowTarget && (state.type === "page" || state.type === "url") && targetInput.checked) {
+        out.target = "_blank";
+      }
+      return out;
+    };
+    return root;
+  }
+  function bindLinkFields(root = document) {
+    root.querySelectorAll("[data-bl-blocks-link-field]").forEach((wrap) => {
+      if (wrap.dataset.blLinkBound === "1") return;
+      if (wrap.querySelector("[data-bl-link-interactive]")) return;
+      wrap.dataset.blLinkBound = "1";
+      const inputName = wrap.dataset.inputName || "";
+      if (!inputName) return;
+      let allowed = String(wrap.dataset.linkTypes || "").split(",").map((s) => s.trim()).filter((t) => LINK_TYPES.includes(t));
+      if (!allowed.length) allowed = [...LINK_TYPES];
+      const allowTarget = wrap.dataset.allowTarget === "1";
+      const readHidden = () => {
+        const get = (key) => {
+          const input = wrap.querySelector(`[data-bl-link-key="${key}"]`);
+          return input ? input.value : "";
+        };
+        return normalizeLinkValue(
+          {
+            type: get("type"),
+            url: get("url"),
+            title: get("title"),
+            page_id: get("page_id"),
+            target: get("target")
+          },
+          allowed
+        );
+      };
+      const field = { link_types: allowed, allow_target: allowTarget };
+      const control = createLinkControl(field, readHidden());
+      control.dataset.blLinkInteractive = "1";
+      const host = wrap.querySelector("[data-bl-link-ui]");
+      const inputsHost = wrap.querySelector("[data-bl-link-inputs]");
+      if (host) {
+        host.replaceChildren(control);
+      } else {
+        wrap.appendChild(control);
+      }
+      const writeInputs = () => {
+        if (!inputsHost) return;
+        const value = control.getLinkValue();
+        inputsHost.replaceChildren();
+        const keys = ["type", "url", "title", "page_id"];
+        keys.forEach((key) => {
+          const val = value[key] != null ? String(value[key]) : "";
+          const input = el2("input", {
+            type: "hidden",
+            name: `${inputName}[${key}]`,
+            value: val,
+            dataset: { blLinkKey: key }
+          });
+          inputsHost.appendChild(input);
+        });
+        if (value.target === "_blank") {
+          inputsHost.appendChild(
+            el2("input", {
+              type: "hidden",
+              name: `${inputName}[target]`,
+              value: "_blank",
+              dataset: { blLinkKey: "target" }
+            })
+          );
+        }
+      };
+      const form = wrap.closest("form");
+      if (form) {
+        form.addEventListener("submit", writeInputs);
+      }
+      wrap.addEventListener("change", writeInputs);
+      wrap.addEventListener("click", () => setTimeout(writeInputs, 0));
+      writeInputs();
+    });
+  }
+
+  // themes/baselayer/packages/baselayer-blocks/src/js/admin/field-form.js
+  function el3(tag, props = {}, children = []) {
     const node = document.createElement(tag);
     Object.entries(props).forEach(([key, value]) => {
       if (value == null || value === false) return;
@@ -578,7 +958,7 @@
     });
     return node;
   }
-  function i18n2(key, fallback) {
+  function i18n3(key, fallback) {
     const dict = window.blBlocksFieldUi && window.blBlocksFieldUi.i18n || window.blBlocksEditor && window.blBlocksEditor.i18n || window.blBlocksPage && window.blBlocksPage.i18n || {};
     return dict[key] || fallback || key;
   }
@@ -593,6 +973,9 @@
     if (!name) return null;
     if (type === "page" && control && typeof control.getPageValue === "function") {
       return control.getPageValue();
+    }
+    if (type === "link" && control && typeof control.getLinkValue === "function") {
+      return control.getLinkValue();
     }
     if (type === "select") {
       if (control.multiple) {
@@ -623,24 +1006,24 @@
     const name = field.name || "";
     if (!name) return null;
     const current = values[name] !== void 0 && values[name] !== null ? values[name] : field.default_value != null ? field.default_value : "";
-    const row = el2("div", {
+    const row = el3("div", {
       className: "bl-blocks-fields__row",
       dataset: { fieldName: name }
     });
     const id = "bl-blocks-ui-" + name.replace(/[^a-z0-9_-]/gi, "_") + "-" + Math.random().toString(36).slice(2, 7);
     if (!field.hide_label && type !== "toggle" && type !== "terms") {
-      const label = el2("label", { className: "bl-blocks-fields__label", text: field.label || name });
+      const label = el3("label", { className: "bl-blocks-fields__label", text: field.label || name });
       label.setAttribute("for", id);
       if (field.required) {
         label.appendChild(document.createTextNode(" "));
-        label.appendChild(el2("span", { className: "required", text: "*" }));
+        label.appendChild(el3("span", { className: "required", text: "*" }));
       }
       row.appendChild(label);
     }
     let control = null;
     const options = Array.isArray(field.options) ? field.options : [];
     if (type === "textarea") {
-      control = el2("textarea", {
+      control = el3("textarea", {
         className: "widefat",
         id,
         rows: field.rows || 4,
@@ -649,24 +1032,24 @@
       if (field.placeholder) control.placeholder = field.placeholder;
     } else if (type === "select") {
       const multiple = !!field.multiple;
-      control = el2("select", { className: "widefat", id });
+      control = el3("select", { className: "widefat", id });
       if (multiple) control.multiple = true;
       if (!multiple) {
-        control.appendChild(el2("option", { value: "", text: "\u2014" }));
+        control.appendChild(el3("option", { value: "", text: "\u2014" }));
       }
       const selected = multiple ? (Array.isArray(current) ? current : []).map(String) : [String(current == null ? "" : current)];
       options.forEach((opt) => {
         const ov = String(opt.value ?? "");
-        const option = el2("option", { value: ov, text: opt.label || ov });
+        const option = el3("option", { value: ov, text: opt.label || ov });
         if (selected.includes(ov)) option.selected = true;
         control.appendChild(option);
       });
     } else if (type === "radio" || type === "button_group") {
-      control = el2("div", { className: "bl-blocks-fields__choices" });
+      control = el3("div", { className: "bl-blocks-fields__choices" });
       options.forEach((opt, i) => {
         const ov = String(opt.value ?? "");
         const oid = id + "-" + i;
-        const input = el2("input", {
+        const input = el3("input", {
           type: "radio",
           name: id,
           id: oid,
@@ -674,49 +1057,52 @@
           checked: String(current) === ov
         });
         control.appendChild(
-          el2("label", { className: "bl-blocks-fields__choice" }, [
+          el3("label", { className: "bl-blocks-fields__choice" }, [
             input,
             document.createTextNode(" " + (opt.label || ov))
           ])
         );
       });
     } else if (type === "checkboxes") {
-      control = el2("div", { className: "bl-blocks-fields__choices" });
+      control = el3("div", { className: "bl-blocks-fields__choices" });
       const list = Array.isArray(current) ? current.map(String) : [];
       options.forEach((opt, i) => {
         const ov = String(opt.value ?? "");
         const oid = id + "-" + i;
-        const input = el2("input", {
+        const input = el3("input", {
           type: "checkbox",
           id: oid,
           value: ov,
           checked: list.includes(ov)
         });
         control.appendChild(
-          el2("label", { className: "bl-blocks-fields__choice" }, [
+          el3("label", { className: "bl-blocks-fields__choice" }, [
             input,
             document.createTextNode(" " + (opt.label || ov))
           ])
         );
       });
     } else if (type === "toggle" || type === "terms") {
-      const input = el2("input", {
+      const input = el3("input", {
         type: "checkbox",
         id,
         checked: !!current && current !== "0" && current !== ""
       });
-      control = el2("label", { className: "bl-blocks-fields__toggle" }, [
+      control = el3("label", { className: "bl-blocks-fields__toggle" }, [
         input,
         document.createTextNode(" " + (field.label || name))
       ]);
     } else if (type === "hidden") {
-      control = el2("input", {
+      control = el3("input", {
         type: "hidden",
         id,
         value: current == null ? "" : String(current)
       });
     } else if (type === "page") {
       control = createPagePickerControl(field, current);
+      if (control) control.id = id;
+    } else if (type === "link") {
+      control = createLinkControl(field, current);
       if (control) control.id = id;
     } else {
       let inputType = "text";
@@ -727,7 +1113,7 @@
       } else if (type === "datetime") {
         inputType = "datetime-local";
       }
-      control = el2("input", {
+      control = el3("input", {
         className: "widefat",
         type: inputType,
         id,
@@ -740,12 +1126,12 @@
       controls.push({ field, control, type });
     }
     if (field.description) {
-      row.appendChild(el2("p", { className: "description", text: field.description }));
+      row.appendChild(el3("p", { className: "description", text: field.description }));
     }
     return row;
   }
   function createFieldForm(fields, values = {}) {
-    const root = el2("div", { className: "bl-blocks-fields", dataset: { blBlocksFields: "" } });
+    const root = el3("div", { className: "bl-blocks-fields", dataset: { blBlocksFields: "" } });
     const entries = [];
     const walk = (list, parent, valueMap) => {
       (list || []).forEach((field) => {
@@ -761,10 +1147,10 @@
           if (field.css_class) {
             layoutClass.push(String(field.css_class).trim());
           }
-          const wrap = el2("div", { className: layoutClass.filter(Boolean).join(" ") });
+          const wrap = el3("div", { className: layoutClass.filter(Boolean).join(" ") });
           const showTitle = type !== "section" || field.show_title !== false && field.show_title !== 0 && field.show_title !== "0";
           if (type === "section" && showTitle && field.label) {
-            wrap.appendChild(el2("h3", { className: "bl-blocks-fields__section-title", text: field.label }));
+            wrap.appendChild(el3("h3", { className: "bl-blocks-fields__section-title", text: field.label }));
           }
           parent.appendChild(wrap);
           walk(field.children || [], wrap, valueMap);
@@ -772,14 +1158,14 @@
         }
         if (type === "heading") {
           if (field.label) {
-            parent.appendChild(el2("h4", { className: "bl-blocks-fields__heading", text: field.label }));
+            parent.appendChild(el3("h4", { className: "bl-blocks-fields__heading", text: field.label }));
           }
           return;
         }
         if (type === "text_block" || type === "html") {
           const content = field.default_value || field.content || field.label || "";
           if (content) {
-            parent.appendChild(el2("div", { className: "bl-blocks-fields__static", html: content }));
+            parent.appendChild(el3("div", { className: "bl-blocks-fields__static", html: content }));
           }
           return;
         }
@@ -822,7 +1208,7 @@
     const children = Array.isArray(field.children) ? field.children : [];
     const minRows = Math.max(0, parseInt(field.min_rows, 10) || 0);
     const maxRows = Math.max(0, parseInt(field.max_rows, 10) || 0);
-    const buttonLabel = field.button_label || i18n2("addRow", "Add row");
+    const buttonLabel = field.button_label || i18n3("addRow", "Add row");
     const design = ["standard", "outline", "card"].includes(field.design) ? field.design : "standard";
     const showTitle = field.show_title !== false && field.show_title !== 0 && field.show_title !== "0";
     let rows = Array.isArray(valueMap[name]) ? valueMap[name].slice() : [];
@@ -833,30 +1219,30 @@
     if (field.css_class) {
       classNames.push(String(field.css_class).trim());
     }
-    const wrap = el2("div", {
+    const wrap = el3("div", {
       className: classNames.filter(Boolean).join(" "),
       dataset: { fieldName: name }
     });
     if (showTitle && !field.hide_label && field.label) {
-      wrap.appendChild(el2("div", { className: "bl-blocks-fields__label", text: field.label }));
+      wrap.appendChild(el3("div", { className: "bl-blocks-fields__label", text: field.label }));
     }
     if (field.description) {
-      wrap.appendChild(el2("p", { className: "description", text: field.description }));
+      wrap.appendChild(el3("p", { className: "description", text: field.description }));
     }
-    const rowsEl = el2("div", { className: "bl-blocks-fields__repeater-rows" });
+    const rowsEl = el3("div", { className: "bl-blocks-fields__repeater-rows" });
     const rowForms = [];
     const syncRowTitles = () => {
       Array.from(rowsEl.children).forEach((rowEl, i) => {
         const title = rowEl.querySelector(".bl-blocks-fields__repeater-row-title");
         if (title) {
-          const template = i18n2("rowLabel", "Row %d");
+          const template = i18n3("rowLabel", "Row %d");
           title.textContent = template.replace("%d", String(i + 1));
         }
       });
     };
     const canAdd = () => maxRows === 0 || rowForms.length < maxRows;
     const canRemove = () => rowForms.length > minRows;
-    const addBtn = el2("button", {
+    const addBtn = el3("button", {
       type: "button",
       className: "button bl-blocks-fields__repeater-add",
       text: buttonLabel
@@ -865,14 +1251,14 @@
       addBtn.disabled = !canAdd();
     };
     const mountRow = (rowValues) => {
-      const rowEl = el2("div", { className: "bl-blocks-fields__repeater-row" });
-      const header = el2("div", { className: "bl-blocks-fields__repeater-row-header" }, [
-        el2("span", { className: "bl-blocks-fields__repeater-row-title", text: "" })
+      const rowEl = el3("div", { className: "bl-blocks-fields__repeater-row" });
+      const header = el3("div", { className: "bl-blocks-fields__repeater-row-header" }, [
+        el3("span", { className: "bl-blocks-fields__repeater-row-title", text: "" })
       ]);
-      const removeBtn = el2("button", {
+      const removeBtn = el3("button", {
         type: "button",
         className: "button-link-delete bl-blocks-fields__repeater-remove",
-        text: i18n2("removeRow", "Remove row")
+        text: i18n3("removeRow", "Remove row")
       });
       header.appendChild(removeBtn);
       rowEl.appendChild(header);
@@ -917,10 +1303,10 @@
     return wrap;
   }
   function openFieldsModal(opts) {
-    const title = opts.title || i18n2("edit", "Edit");
+    const title = opts.title || i18n3("edit", "Edit");
     const form = createFieldForm(opts.fields || [], opts.values || {});
-    const overlay = el2("div", { className: "bl-blocks-modal-overlay", role: "presentation" });
-    const dialog = el2("div", {
+    const overlay = el3("div", { className: "bl-blocks-modal-overlay", role: "presentation" });
+    const dialog = el3("div", {
       className: "bl-blocks-modal",
       role: "dialog",
       "aria-modal": "true",
@@ -936,28 +1322,28 @@
         close();
       }
     };
-    const header = el2("div", { className: "bl-blocks-modal__header" }, [
-      el2("h2", { className: "bl-blocks-modal__title", text: title }),
-      el2("button", {
+    const header = el3("div", { className: "bl-blocks-modal__header" }, [
+      el3("h2", { className: "bl-blocks-modal__title", text: title }),
+      el3("button", {
         type: "button",
         className: "bl-blocks-modal__close",
         text: "\xD7",
-        "aria-label": i18n2("close", "Close"),
+        "aria-label": i18n3("close", "Close"),
         onClick: close
       })
     ]);
-    const body = el2("div", { className: "bl-blocks-modal__body" }, [form.root]);
-    const footer = el2("div", { className: "bl-blocks-modal__footer" }, [
-      el2("button", {
+    const body = el3("div", { className: "bl-blocks-modal__body" }, [form.root]);
+    const footer = el3("div", { className: "bl-blocks-modal__footer" }, [
+      el3("button", {
         type: "button",
         className: "button",
-        text: i18n2("cancel", "Cancel"),
+        text: i18n3("cancel", "Cancel"),
         onClick: close
       }),
-      el2("button", {
+      el3("button", {
         type: "button",
         className: "button button-primary",
-        text: i18n2("save", "Save"),
+        text: i18n3("save", "Save"),
         onClick: () => {
           if (typeof opts.onSave === "function") {
             opts.onSave(form.getValues());
@@ -982,11 +1368,13 @@
   window.blBlocksFieldUiApi = {
     createFieldForm,
     openFieldsModal,
-    bindPagePickers
+    bindPagePickers,
+    bindLinkFields
   };
   if (typeof document !== "undefined") {
     document.addEventListener("DOMContentLoaded", () => {
       bindPagePickers(document);
+      bindLinkFields(document);
     });
   }
 
@@ -995,7 +1383,7 @@
     if (!wp || !wp.element || !wp.components || !wp.blocks) {
       return;
     }
-    const { createElement: el3, Fragment, RawHTML, useState, useEffect, useRef } = wp.element;
+    const { createElement: el4, Fragment, RawHTML, useState, useEffect, useRef } = wp.element;
     const { Button, PanelBody, ToolbarGroup, ToolbarButton, Placeholder, Spinner } = wp.components;
     const { InspectorControls, BlockControls, useBlockProps } = wp.blockEditor || {};
     const { registerBlockType } = wp.blocks;
@@ -1012,10 +1400,10 @@
     function blockIcon(icon) {
       if (typeof icon === "string" && icon.toLowerCase().includes("<svg")) {
         return {
-          src: el3(
+          src: el4(
             "span",
             { style: { display: "flex" } },
-            el3(RawHTML, null, icon)
+            el4(RawHTML, null, icon)
           )
         };
       }
@@ -1033,7 +1421,7 @@
       return raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
     }
     function PreviewLoading() {
-      return el3("div", { className: "bl-blocks-block-preview-loading" }, el3(Spinner, null));
+      return el4("div", { className: "bl-blocks-block-preview-loading" }, el4(Spinner, null));
     }
     function BlockServerPreview({ name, values }) {
       const [response, setResponse] = useState({ status: "idle" });
@@ -1091,20 +1479,20 @@
         };
       }, [name, valuesKey]);
       if (response.status === "loading" || response.status === "idle") {
-        return el3(PreviewLoading, null);
+        return el4(PreviewLoading, null);
       }
       if (response.status === "error") {
         const template = blockI18n.previewError || "Error loading preview: %s";
         const message = template.replace("%s", response.error || "");
-        return el3(Placeholder, { className: "bl-blocks-block-preview-error", label: message });
+        return el4(Placeholder, { className: "bl-blocks-block-preview-error", label: message });
       }
       if (!response.content) {
-        return el3(Placeholder, {
+        return el4(Placeholder, {
           className: "bl-blocks-block-preview-empty",
           label: blockI18n.previewEmpty || "Block rendered as empty."
         });
       }
-      return el3(RawHTML, null, response.content);
+      return el4(RawHTML, null, response.content);
     }
     (blockConfig.blocks || []).forEach((def) => {
       if (!def || !def.name) return;
@@ -1133,42 +1521,42 @@
             setAttributes({ values: normalizeValues(next) });
           }, def.title);
           const blockProps = useBlockProps ? useBlockProps({ className: "bl-blocks-block-editor" }) : { className: "bl-blocks-block-editor" };
-          const preview = apiFetch ? el3(BlockServerPreview, { name: def.name, values }) : el3(
+          const preview = apiFetch ? el4(BlockServerPreview, { name: def.name, values }) : el4(
             "div",
             { className: "bl-blocks-block-editor__fallback" },
-            el3("strong", null, def.title || def.slug),
-            el3("p", null, blockI18n.preview || "Edit fields to configure this block.")
+            el4("strong", null, def.title || def.slug),
+            el4("p", null, blockI18n.preview || "Edit fields to configure this block.")
           );
-          return el3(
+          return el4(
             Fragment,
             null,
-            BlockControls ? el3(
+            BlockControls ? el4(
               BlockControls,
               { group: "block" },
-              el3(
+              el4(
                 ToolbarGroup,
                 null,
-                el3(ToolbarButton, {
+                el4(ToolbarButton, {
                   icon: "edit",
                   label: blockI18n.edit || "Edit fields",
                   onClick: open
                 })
               )
             ) : null,
-            InspectorControls ? el3(
+            InspectorControls ? el4(
               InspectorControls,
               null,
-              el3(
+              el4(
                 PanelBody,
                 { title: blockI18n.panelTitle || "Block fields", initialOpen: true },
-                el3(
+                el4(
                   Button,
                   { variant: "secondary", onClick: open },
                   blockI18n.edit || "Edit fields"
                 )
               )
             ) : null,
-            el3("div", blockProps, preview)
+            el4("div", blockProps, preview)
           );
         },
         save: function save() {
@@ -1202,15 +1590,15 @@
                 }
               });
             };
-            return el3(
+            return el4(
               PluginDocumentSettingPanel,
               {
                 name: "bl-blocks-page-" + def.id,
                 title: def.title || pageI18n.panelTitle || "Page Settings",
                 className: "bl-blocks-page-panel"
               },
-              def.description ? el3("p", { className: "description" }, def.description) : null,
-              el3(
+              def.description ? el4("p", { className: "description" }, def.description) : null,
+              el4(
                 Button,
                 { variant: "secondary", onClick: open },
                 pageI18n.openFields || pageI18n.edit || "Edit fields"

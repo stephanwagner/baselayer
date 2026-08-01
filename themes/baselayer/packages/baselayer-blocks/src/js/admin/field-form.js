@@ -2,6 +2,7 @@
  * Shared admin field form renderer + modal shell for Blocks runtimes.
  */
 import { createPagePickerControl, bindPagePickers } from './page-field.js';
+import { createLinkControl, bindLinkFields } from './link-field.js';
 
 function el(tag, props = {}, children = []) {
   const node = document.createElement(tag);
@@ -54,6 +55,9 @@ function collectLeafValue(field, control, type) {
   if (!name) return null;
   if (type === 'page' && control && typeof control.getPageValue === 'function') {
     return control.getPageValue();
+  }
+  if (type === 'link' && control && typeof control.getLinkValue === 'function') {
+    return control.getLinkValue();
   }
   if (type === 'select') {
     if (control.multiple) {
@@ -191,6 +195,9 @@ function createLeafControl(field, values, controls) {
     });
   } else if (type === 'page') {
     control = createPagePickerControl(field, current);
+    if (control) control.id = id;
+  } else if (type === 'link') {
+    control = createLinkControl(field, current);
     if (control) control.id = id;
   } else {
     let inputType = 'text';
@@ -518,10 +525,12 @@ window.blBlocksFieldUiApi = {
   createFieldForm,
   openFieldsModal,
   bindPagePickers,
+  bindLinkFields,
 };
 
 if (typeof document !== 'undefined') {
   document.addEventListener('DOMContentLoaded', () => {
     bindPagePickers(document);
+    bindLinkFields(document);
   });
 }

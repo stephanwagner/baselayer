@@ -780,7 +780,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 	}
 
 	// Blocks-only field type — never render on public Forms.
-	if ($type === 'page') {
+	if ($type === 'page' || $type === 'link') {
 		return '';
 	}
 
