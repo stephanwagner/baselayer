@@ -1,9 +1,19 @@
-import { el, t, writeConfig, PALETTE_SECTIONS, defaultField, uniqueFieldName, iconEl } from './dom.js';
-import { createFieldCard, serializeRow } from './field-card.js';
-import { equalizeColumnRun } from './layout.js';
 import { createPanels } from './panels.js';
 import { bindImportExport } from './import-export.js';
 import { bindTemplates } from './templates.js';
+
+const {
+  el,
+  t,
+  writeConfig,
+  PALETTE_SECTIONS,
+  defaultField,
+  uniqueFieldName,
+  iconEl,
+  createFieldCard,
+  serializeRow,
+  equalizeColumnRun,
+} = window.BlFormBuilder || {};
 
 /**
  * Flatten legacy group fields into consecutive columns for the canvas.
@@ -34,8 +44,13 @@ function expandLegacyGroups(fields) {
  */
 export function mountApp(root, initial) {
   const Builder = window.BlCanvasBuilder;
+  const FormBuilder = window.BlFormBuilder;
   if (!Builder || typeof Builder.mount !== 'function') {
     root.textContent = 'Canvas builder failed to load.';
+    return;
+  }
+  if (!FormBuilder || typeof FormBuilder.createFieldCard !== 'function') {
+    root.textContent = 'Form builder failed to load.';
     return;
   }
 

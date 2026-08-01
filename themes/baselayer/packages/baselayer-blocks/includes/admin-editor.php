@@ -150,47 +150,21 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 	}
 
 	$builder_handle = bl_blocks_enqueue_canvas_builder_kit();
+	$form_builder_deps = $builder_handle ? [$builder_handle] : [];
+	$form_builder_handle = bl_blocks_enqueue_form_builder_kit($form_builder_deps);
 
-	// Reuse Forms admin chrome when the asset exists (always on disk in theme packages).
-	$forms_admin_css = null;
-	if (function_exists('bl_forms_resolve_asset')) {
-		$forms_admin_css = bl_forms_resolve_asset('forms-admin', 'css');
-	} else {
-		$forms_css_path = dirname(BL_BLOCKS_PATH) . '/baselayer-forms/assets/css/forms-admin.min.css';
-		$forms_css_alt = dirname(BL_BLOCKS_PATH) . '/baselayer-forms/assets/css/forms-admin.css';
-		$path = is_readable($forms_css_path) ? $forms_css_path : (is_readable($forms_css_alt) ? $forms_css_alt : '');
-		if ($path !== '') {
-			$uri = str_replace(BL_BLOCKS_PATH, bl_blocks_base_url(), $path);
-			// Prefer package URL helper for forms when available.
-			if (function_exists('bl_forms_url')) {
-				$file = basename($path);
-				$uri = bl_forms_url('assets/css/' . $file);
-			} else {
-				$uri = bl_blocks_url('../baselayer-forms/assets/css/' . basename($path));
-			}
-			$forms_admin_css = [
-				'uri' => $uri,
-				'ver' => (string) filemtime($path),
-			];
-		}
+	$style_deps = [];
+	if ($form_builder_handle) {
+		$style_deps[] = $form_builder_handle;
+	} elseif ($builder_handle) {
+		$style_deps[] = $builder_handle;
 	}
-	if (is_array($forms_admin_css) && isset($forms_admin_css['uri'])) {
-		wp_enqueue_style(
-			'bl-forms-admin',
-			$forms_admin_css['uri'],
-			$builder_handle ? [$builder_handle] : [],
-			$forms_admin_css['ver'] ?? BL_BLOCKS_VERSION
-		);
-	}
-
-	bl_blocks_enqueue_style(
-		'bl-blocks-admin',
-		'blocks-admin',
-		wp_style_is('bl-forms-admin', 'enqueued') ? ['bl-forms-admin'] : ($builder_handle ? [$builder_handle] : [])
-	);
+	bl_blocks_enqueue_style('bl-blocks-admin', 'blocks-admin', $style_deps);
 
 	$deps = [];
-	if ($builder_handle) {
+	if ($form_builder_handle) {
+		$deps[] = $form_builder_handle;
+	} elseif ($builder_handle) {
 		$deps[] = $builder_handle;
 	}
 	bl_blocks_enqueue_script('bl-blocks-admin', 'blocks-admin', $deps, true);

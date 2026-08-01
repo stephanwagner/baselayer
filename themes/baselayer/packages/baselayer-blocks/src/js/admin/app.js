@@ -1,7 +1,14 @@
 /**
- * Blocks definition editor — Fields + Settings (reuses Forms canvas field cards).
+ * Blocks definition editor — Fields + Settings (reuses form-builder field cards).
  */
+import { createSettingsPanel } from './settings-panel.js';
 import {
+  createRepeaterCard,
+  serializeRepeaterRow,
+  defaultRepeater,
+} from './repeater-card.js';
+
+const {
   el,
   t,
   writeConfig,
@@ -9,15 +16,10 @@ import {
   defaultField,
   uniqueFieldName,
   iconEl,
-} from '../../../../baselayer-forms/src/js/admin/dom.js';
-import { createFieldCard, serializeRow } from '../../../../baselayer-forms/src/js/admin/field-card.js';
-import { equalizeColumnRun } from '../../../../baselayer-forms/src/js/admin/layout.js';
-import { createSettingsPanel } from './settings-panel.js';
-import {
-  createRepeaterCard,
-  serializeRepeaterRow,
-  defaultRepeater,
-} from './repeater-card.js';
+  createFieldCard,
+  serializeRow,
+  equalizeColumnRun,
+} = window.BlFormBuilder || {};
 
 const EXCLUDED_TYPES = new Set(['honeypot', 'captcha', 'terms']);
 
@@ -72,8 +74,13 @@ function serializeBlocksItem(row) {
  */
 export function mountApp(root, initial, definitionType = 'block') {
   const Builder = window.BlCanvasBuilder;
+  const FormBuilder = window.BlFormBuilder;
   if (!Builder || typeof Builder.mount !== 'function') {
     root.textContent = 'Canvas builder failed to load.';
+    return;
+  }
+  if (!FormBuilder || typeof FormBuilder.createFieldCard !== 'function') {
+    root.textContent = 'Form builder failed to load.';
     return;
   }
 

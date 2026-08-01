@@ -1,4 +1,4 @@
-import { el, t, uid, iconEl, slugifyName } from './dom.js';
+const { el, t, uid, iconEl, slugifyName } = window.BlFormBuilder || {};
 
 /**
  * @param {object} partial

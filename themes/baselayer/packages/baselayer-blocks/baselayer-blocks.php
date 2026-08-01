@@ -183,7 +183,6 @@ function bl_blocks_enqueue_script(string $handle, string $name, array $deps = []
 
 /**
  * Enqueue shared canvas-builder kit (theme helper, else Blocks vendor copy).
- * Ready for the CPT edit UI; unused until that screen mounts BlCanvasBuilder.
  */
 function bl_blocks_enqueue_canvas_builder_kit(): string
 {
@@ -227,8 +226,57 @@ function bl_blocks_enqueue_canvas_builder_kit(): string
 	return $enqueued ? $handle : '';
 }
 
+/**
+ * Enqueue shared form-builder kit (theme helper, else Blocks vendor copy).
+ *
+ * @param string[] $deps Style/script handles (typically canvas-builder).
+ */
+function bl_blocks_enqueue_form_builder_kit(array $deps = []): string
+{
+	$args = [
+		'vendor_dir' => bl_blocks_path('assets/vendor/form-builder'),
+		'vendor_url' => bl_blocks_url('assets/vendor/form-builder'),
+		'deps'       => $deps,
+	];
+
+	if (function_exists('bl_form_builder_enqueue_kit')) {
+		return bl_form_builder_enqueue_kit($args);
+	}
+
+	$handle = 'baselayer-form-builder-admin';
+	$debug = function_exists('bl_is_debug') && bl_is_debug();
+	$base = $args['vendor_dir'];
+	$uri = $args['vendor_url'];
+	$enqueued = false;
+	$name = 'form-builder-admin';
+
+	foreach (['css', 'js'] as $type) {
+		$candidates = $debug
+			? [$name . '.' . $type, $name . '.min.' . $type]
+			: [$name . '.min.' . $type, $name . '.' . $type];
+		foreach ($candidates as $file) {
+			$path = trailingslashit($base) . $file;
+			if (!is_readable($path)) {
+				continue;
+			}
+			$url = trailingslashit($uri) . $file;
+			$ver = $debug ? (string) time() : (string) filemtime($path);
+			if ($type === 'css') {
+				wp_enqueue_style($handle, $url, $deps, $ver);
+			} else {
+				wp_enqueue_script($handle, $url, $deps, $ver, true);
+			}
+			$enqueued = true;
+			break;
+		}
+	}
+
+	return $enqueued ? $handle : '';
+}
+
 require_once BL_BLOCKS_PATH . 'includes/config.php';
 require_once BL_BLOCKS_PATH . 'includes/cpt.php';
+require_once BL_BLOCKS_PATH . 'includes/builder-icons.php';
 require_once BL_BLOCKS_PATH . 'includes/field-ui.php';
 require_once BL_BLOCKS_PATH . 'includes/runtime-site.php';
 require_once BL_BLOCKS_PATH . 'includes/runtime-page.php';

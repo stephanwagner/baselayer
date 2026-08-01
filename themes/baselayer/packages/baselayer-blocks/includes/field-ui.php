@@ -3,7 +3,8 @@
 defined('ABSPATH') || exit;
 
 /**
- * Palette / UI icons for the definition editor (Forms when available, else theme SVGs).
+ * Palette / UI icons for the definition editor.
+ * Prefer Forms when loaded; otherwise use Blocks' vendored SVG registry.
  *
  * @return array<string, string>
  */
@@ -13,63 +14,58 @@ function bl_blocks_palette_icons(): array
 		return bl_forms_palette_icons();
 	}
 
-	// Theme fallback when Forms is not loaded (logical key => theme icon filename).
-	$map = [
-		'text'          => 'text-short',
-		'textarea'      => 'article',
-		'email'         => 'mail',
-		'url'           => 'link',
-		'number'        => '123',
-		'phone'         => 'phone',
-		'checkboxes'    => 'checklist',
-		'radio'         => 'radio-button-checked',
-		'select'        => 'dropdown',
-		'toggle'        => 'toggle-on',
-		'button_group'  => 'button-group',
-		'terms'         => 'checkbox-checked',
-		'date'          => 'calendar',
-		'time'          => 'clock',
-		'datetime'      => 'calendar-month',
-		'file'          => 'upload',
-		'image'         => 'image',
-		'heading'       => 'format-size',
-		'text_block'    => 'paragraph',
-		'html'          => 'code-slash',
-		'divider'       => 'horizontal-rule',
-		'spacer'        => 'expand',
-		'column'        => 'view-column',
-		'section'       => 'layers',
-		'repeater'      => 'infinity',
-		'hidden'        => 'visibility-off',
-		'add'           => 'chevron-right',
-		'caret'         => 'chevron-down',
-		'panelCollapse' => 'arrow-menu-close',
-		'panelExpand'   => 'arrow-menu-open',
-		'edit'          => 'edit',
-		'done'          => 'checkmark',
-		'trash'         => 'delete',
-		'duplicate'     => 'copy',
-		'drag'          => 'drag',
-		'design'        => 'palette',
-		'tune'          => 'tune',
-		'fullscreen'    => 'fullscreen',
-		'fullscreenExit'=> 'fullscreen-exit',
+	$keys = [
+		'text',
+		'textarea',
+		'email',
+		'url',
+		'number',
+		'phone',
+		'checkboxes',
+		'radio',
+		'select',
+		'toggle',
+		'button_group',
+		'date',
+		'time',
+		'datetime',
+		'file',
+		'image',
+		'heading',
+		'text_block',
+		'html',
+		'divider',
+		'spacer',
+		'column',
+		'section',
+		'repeater',
+		'hidden',
+		'add',
+		'caret',
+		'panelCollapse',
+		'panelExpand',
+		'edit',
+		'done',
+		'trash',
+		'duplicate',
+		'drag',
+		'design',
+		'tune',
+		'fullscreen',
+		'fullscreenExit',
 	];
 
+	$registry = function_exists('bl_blocks_builder_icon_svgs')
+		? bl_blocks_builder_icon_svgs()
+		: [];
 	$icons = [];
-	foreach ($map as $key => $icon_name) {
-		$svg = '';
-		if (function_exists('bl_svg_code')) {
-			$svg = bl_svg_code('icons/' . $icon_name . '.svg', [
-				'width'       => '16',
-				'height'      => '16',
-				'aria-hidden' => 'true',
-				'focusable'   => 'false',
-			]);
+	foreach ($keys as $key) {
+		$svg = $registry[$key] ?? '';
+		if ($svg === '' || stripos($svg, '<svg') === false) {
+			continue;
 		}
-		if ($svg !== '') {
-			$icons[$key] = $svg;
-		}
+		$attrs = ' width="16" height="16" aria-hidden="true" focusable="false"';
+		$icons[$key] = (string) preg_replace('/<svg\b([^>]*)>/i', '<svg$1' . $attrs . '>', $svg, 1);
 	}
 
 	return $icons;

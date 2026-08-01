@@ -2,7 +2,7 @@
  * Blocks-only repeater field card for the definition canvas.
  * Nested repeaters allowed up to depth 3 (UI blocks level 4).
  */
-import {
+const {
   el,
   t,
   uid,
@@ -10,13 +10,11 @@ import {
   defaultField,
   uniqueFieldName,
   cloneFieldData,
-} from '../../../../baselayer-forms/src/js/admin/dom.js';
-import {
   createFieldCard,
   serializeRow,
   openLayoutSettingsModal,
-} from '../../../../baselayer-forms/src/js/admin/field-card.js';
-import { normalizeConditionalLogic } from '../../../../baselayer-forms/src/js/admin/conditional-logic.js';
+  normalizeConditionalLogic,
+} = window.BlFormBuilder || {};
 
 export const REPEATER_MAX_DEPTH = 3;
 

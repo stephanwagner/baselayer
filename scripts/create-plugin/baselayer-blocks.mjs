@@ -66,8 +66,17 @@ async function main() {
     throw new Error(`Package not found: ${pkg}`);
   }
 
-  // Asset builds land here when admin/editor entries are added to build-js / build-css.
-  console.log('Skipping asset build (no package build entries yet).');
+  console.log('Building blocks + canvas/form builder assets…');
+  await run('node', [
+    'scripts/build-js.mjs',
+    '--filter',
+    'canvas-builder-admin,form-builder-admin,blocks-admin,blocks-editor',
+  ]);
+  await run('node', [
+    'scripts/build-css.mjs',
+    '--filter',
+    'canvas-builder-admin,form-builder-admin,blocks-admin,blocks-editor',
+  ]);
 
   console.log('Compiling translations…');
   await run('bash', ['scripts/compile_po.sh']);

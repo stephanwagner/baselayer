@@ -30,6 +30,11 @@ const entries = [
     name: 'canvas-builder-admin',
     outDir: `${themeDir}/assets/css`
   },
+  {
+    src: `${themeDir}/src/scss/form-builder-admin.scss`,
+    name: 'form-builder-admin',
+    outDir: `${themeDir}/assets/css`
+  },
   { src: `${formsPkg}/src/scss/forms.scss`, name: 'forms', outDir: `${formsPkg}/assets/css` },
   { src: `${formsPkg}/src/scss/forms-admin.scss`, name: 'forms-admin', outDir: `${formsPkg}/assets/css` },
   { src: `${blocksPkg}/src/scss/blocks-admin.scss`, name: 'blocks-admin', outDir: `${blocksPkg}/assets/css` },
@@ -196,6 +201,29 @@ async function vendorCanvasBuilderCss() {
   await fs.rm(path.join(formsPkg, 'assets/vendor/builder'), { recursive: true, force: true });
 }
 
+/**
+ * Snapshot form-builder CSS into Forms + Blocks vendor folders.
+ */
+async function vendorFormBuilderCss() {
+  const fs = await import('node:fs/promises');
+  const targets = [
+    path.join(formsPkg, 'assets/vendor/form-builder'),
+    path.join(blocksPkg, 'assets/vendor/form-builder'),
+  ];
+  for (const vendorDir of targets) {
+    await fs.mkdir(vendorDir, { recursive: true });
+    for (const name of ['form-builder-admin.css', 'form-builder-admin.min.css']) {
+      const src = path.join(themeDir, 'assets/css', name);
+      try {
+        await fs.copyFile(src, path.join(vendorDir, name));
+        console.log(`Vendored ${name} → ${vendorDir}/`);
+      } catch {
+        // ignore missing
+      }
+    }
+  }
+}
+
 const watchMode = process.argv.includes('--watch');
 
 if (watchMode) {
@@ -208,5 +236,13 @@ if (watchMode) {
   }
   if (!filter || filter.has('canvas-builder-admin') || filter.has('forms-admin')) {
     await vendorCanvasBuilderCss();
+  }
+  if (
+    !filter ||
+    filter.has('form-builder-admin') ||
+    filter.has('forms-admin') ||
+    filter.has('blocks-admin')
+  ) {
+    await vendorFormBuilderCss();
   }
 }

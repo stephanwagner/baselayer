@@ -1,5 +1,6 @@
-import { el, t, flattenFields, iconEl } from './dom.js';
 import { openPagePicker } from '../../../../../src/js/admin/utils/page-picker.js';
+
+const { el, t, flattenFields, iconEl } = window.BlFormBuilder || {};
 
 function fieldRow(label, control, help = '') {
   const children = [

@@ -46,6 +46,11 @@ const themeBundles = [
     outDir: `${themeDir}/assets/js`
   },
   {
+    input: `${themeDir}/src/js/admin/form-builder/index.js`,
+    name: 'form-builder-admin',
+    outDir: `${themeDir}/assets/js`
+  },
+  {
     input: `${themeDir}/src/js/editor/creator-blocks.js`,
     name: 'creator-blocks',
     outDir: `${themeDir}/assets/js`
@@ -206,6 +211,39 @@ async function vendorCanvasBuilderToPackages() {
   await fs.rm(path.join(formsPkg, 'assets/vendor/builder'), { recursive: true, force: true });
 }
 
+/**
+ * Snapshot form-builder kit into Forms + Blocks for standalone plugin use.
+ */
+async function vendorFormBuilderToPackages() {
+  const fs = await import('node:fs/promises');
+  const themeAssetsJs = path.join(themeDir, 'assets/js');
+  const themeAssetsCss = path.join(themeDir, 'assets/css');
+  const targets = [
+    path.join(formsPkg, 'assets/vendor/form-builder'),
+    path.join(blocksPkg, 'assets/vendor/form-builder'),
+  ];
+
+  const files = [
+    ['js', 'form-builder-admin.js'],
+    ['js', 'form-builder-admin.min.js'],
+    ['css', 'form-builder-admin.css'],
+    ['css', 'form-builder-admin.min.css'],
+  ];
+
+  for (const vendorDir of targets) {
+    await fs.mkdir(vendorDir, { recursive: true });
+    for (const [kind, name] of files) {
+      const src = path.join(kind === 'js' ? themeAssetsJs : themeAssetsCss, name);
+      try {
+        await fs.copyFile(src, path.join(vendorDir, name));
+        console.log(`Vendored ${name} → ${vendorDir}/`);
+      } catch {
+        // ignore missing when filtered builds skip CSS/JS
+      }
+    }
+  }
+}
+
 async function watch() {
   console.log('Watching JavaScript (development)...');
   const contexts = await Promise.all(
@@ -226,5 +264,13 @@ if (watchMode) {
   }
   if (!filter || filter.has('canvas-builder-admin') || filter.has('forms-admin')) {
     await vendorCanvasBuilderToPackages();
+  }
+  if (
+    !filter ||
+    filter.has('form-builder-admin') ||
+    filter.has('forms-admin') ||
+    filter.has('blocks-admin')
+  ) {
+    await vendorFormBuilderToPackages();
   }
 }

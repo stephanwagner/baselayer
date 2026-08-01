@@ -989,17 +989,17 @@
     <div class="bl-icon-picker-modal__backdrop" data-bl-icon-picker-close tabindex="-1"></div>
     <div class="bl-icon-picker-modal__panel">
       <header class="bl-icon-picker-modal__header">
-        <h2 id="bl-icon-picker-modal-title" class="bl-icon-picker-modal__title">${t2("choose", "Choose icon")}</h2>
-        <button type="button" class="bl-icon-picker-modal__close" data-bl-icon-picker-close aria-label="${t2("close", "Close")}">
+        <h2 id="bl-icon-picker-modal-title" class="bl-icon-picker-modal__title">${t("choose", "Choose icon")}</h2>
+        <button type="button" class="bl-icon-picker-modal__close" data-bl-icon-picker-close aria-label="${t("close", "Close")}">
           <span class="dashicons dashicons-no-alt" aria-hidden="true"></span>
         </button>
       </header>
       <div class="bl-icon-picker-modal__body bl-icon-picker__panel">
         <div class="bl-icon-picker__toolbar">
-          <input type="search" class="bl-icon-picker-modal__search" data-bl-icon-picker-search placeholder="${t2("search", "Search icons\u2026")}" autocomplete="off">
-          <div class="bl-icon-picker__variant bl-icon-picker-modal__variant" role="group" aria-label="${t2("style", "Style")}">
-            <button type="button" class="button button-secondary" data-bl-icon-picker-variant="outline">${t2("outline", "Outline")}</button>
-            <button type="button" class="button button-secondary" data-bl-icon-picker-variant="fill">${t2("filled", "Filled")}</button>
+          <input type="search" class="bl-icon-picker-modal__search" data-bl-icon-picker-search placeholder="${t("search", "Search icons\u2026")}" autocomplete="off">
+          <div class="bl-icon-picker__variant bl-icon-picker-modal__variant" role="group" aria-label="${t("style", "Style")}">
+            <button type="button" class="button button-secondary" data-bl-icon-picker-variant="outline">${t("outline", "Outline")}</button>
+            <button type="button" class="button button-secondary" data-bl-icon-picker-variant="fill">${t("filled", "Filled")}</button>
           </div>
         </div>
         <div class="bl-icon-picker__categories" data-bl-icon-picker-categories></div>
@@ -1135,7 +1135,7 @@
   function closeIconPicker() {
     iconPickerService.close();
   }
-  var iconL10n2, iconLabels, categoryLabels, uiStrings, t2, humanize, iconName, categoryName, iconPickerService;
+  var iconL10n2, iconLabels, categoryLabels, uiStrings, t, humanize, iconName, categoryName, iconPickerService;
   var init_icon_picker_service = __esm({
     "themes/baselayer/src/js/editor/icons/icon-picker-service.js"() {
       init_icon_catalog();
@@ -1144,7 +1144,7 @@
       iconLabels = () => iconL10n2().labels || {};
       categoryLabels = () => iconL10n2().categories || {};
       uiStrings = () => iconL10n2().ui || {};
-      t2 = (key, fallback) => uiStrings()[key] || fallback;
+      t = (key, fallback) => uiStrings()[key] || fallback;
       humanize = (slug) => slug.replace(/-/g, " ").replace(/^\w/, (char) => char.toUpperCase());
       iconName = (icon, labels) => icon.label || labels[icon.filename] || humanize(icon.filename);
       categoryName = (category, labels) => category.label || labels[category.slug] || humanize(category.slug);
@@ -1152,4341 +1152,8 @@
     }
   });
 
-  // themes/baselayer/packages/baselayer-forms/src/js/admin/dom.js
-  var PALETTE_SECTIONS = [
-    {
-      id: "popular",
-      headingKey: "paletteSectionPopular",
-      headingFallback: "Popular",
-      types: ["text", "textarea", "email", "phone", "terms"]
-    },
-    {
-      id: "input",
-      headingKey: "paletteSectionInput",
-      headingFallback: "Input",
-      types: ["text", "textarea", "email", "phone", "url", "number", "terms"]
-    },
-    {
-      id: "choice",
-      headingKey: "paletteSectionChoice",
-      headingFallback: "Choice",
-      types: ["checkboxes", "radio", "select", "toggle", "button_group"]
-    },
-    {
-      id: "datetime",
-      headingKey: "paletteSectionDatetime",
-      headingFallback: "Date & time",
-      types: ["date", "time", "datetime"]
-    },
-    {
-      id: "files",
-      headingKey: "paletteSectionFiles",
-      headingFallback: "Uploads",
-      types: ["file", "image"]
-    },
-    {
-      id: "content",
-      headingKey: "paletteSectionContent",
-      headingFallback: "Content",
-      types: ["heading", "text_block", "html"]
-    },
-    {
-      id: "layout",
-      headingKey: "paletteSectionLayout",
-      headingFallback: "Layout",
-      types: ["section", "column", "divider", "spacer"]
-    },
-    {
-      id: "advanced",
-      headingKey: "paletteSectionAdvanced",
-      headingFallback: "Advanced",
-      types: ["hidden", "captcha"]
-    }
-  ];
-  function uid() {
-    return "f" + Math.random().toString(36).slice(2, 10);
-  }
-  function el(tag, props = {}, children = []) {
-    const node = document.createElement(tag);
-    Object.entries(props).forEach(([key, value]) => {
-      if (value == null || value === false) return;
-      if (key === "className") node.className = value;
-      else if (key === "text") node.textContent = value;
-      else if (key === "html") appendSafeHelpHtml(node, value);
-      else if (key === "dataset") Object.assign(node.dataset, value);
-      else if (key.startsWith("on") && typeof value === "function") {
-        node.addEventListener(key.slice(2).toLowerCase(), value);
-      } else if (key === "checked") node.checked = Boolean(value);
-      else node.setAttribute(key, value === true ? "" : String(value));
-    });
-    (Array.isArray(children) ? children : [children]).forEach((child) => {
-      if (child == null || child === false) return;
-      node.appendChild(typeof child === "string" ? document.createTextNode(child) : child);
-    });
-    return node;
-  }
-  function appendSafeHelpHtml(node, html) {
-    const template = document.createElement("template");
-    template.innerHTML = String(html || "");
-    const appendFrom = (parent, target) => {
-      parent.childNodes.forEach((child) => {
-        if (child.nodeType === Node.TEXT_NODE) {
-          target.appendChild(document.createTextNode(child.textContent || ""));
-          return;
-        }
-        if (child.nodeType !== Node.ELEMENT_NODE) {
-          return;
-        }
-        const tag = child.tagName.toLowerCase();
-        if (tag === "b" || tag === "i") {
-          const elNode = document.createElement(tag);
-          appendFrom(child, elNode);
-          target.appendChild(elNode);
-          return;
-        }
-        if (tag === "span") {
-          const span = document.createElement("span");
-          span.style.whiteSpace = "nowrap";
-          appendFrom(child, span);
-          target.appendChild(span);
-          return;
-        }
-        appendFrom(child, target);
-      });
-    };
-    appendFrom(template.content, node);
-  }
-  function t(key, fallback = "") {
-    const dict = window.blFormsAdmin && window.blFormsAdmin.i18n || {};
-    return dict[key] || fallback || key;
-  }
-  function iconMarkup(key) {
-    const icons = window.blFormsAdmin && window.blFormsAdmin.icons || {};
-    return icons[key] || "";
-  }
-  function iconEl(key, className = "bl-forms-builder__icon") {
-    const wrap = el("span", {
-      className,
-      "aria-hidden": "true"
-    });
-    const markup = iconMarkup(key);
-    if (markup) {
-      wrap.innerHTML = markup;
-    }
-    return wrap;
-  }
-  function typeLabel(type) {
-    const dict = window.blFormsAdmin && window.blFormsAdmin.i18n || {};
-    return dict.types && dict.types[type] || type;
-  }
-  function fieldIsActive(field) {
-    return !field || field.active !== false;
-  }
-  function slugifyName(text) {
-    const slug = String(text || "").trim().toLowerCase().replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "").replace(/_+/g, "_");
-    return slug || "field";
-  }
-  function slugifyOption(text) {
-    const slug = String(text || "").trim().toLowerCase().replace(/ä/g, "ae").replace(/ö/g, "oe").replace(/ü/g, "ue").replace(/ß/g, "ss").normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").replace(/-+/g, "-");
-    return slug || "option";
-  }
-  function collectFieldNames(exceptId = "") {
-    return Array.from(document.querySelectorAll("[data-bl-forms-field]")).filter((row) => !exceptId || row.dataset.fieldId !== exceptId).map((row) => {
-      const input = row.querySelector("[data-bl-name]");
-      const value = (input?.value || row.dataset.fieldName || "").trim();
-      return value;
-    }).filter(Boolean);
-  }
-  function uniqueFieldName(base, exceptId = "") {
-    const root = slugifyName(base);
-    const used = new Set(collectFieldNames(exceptId).map((n) => n.toLowerCase()));
-    if (!used.has(root)) {
-      return root;
-    }
-    let i = 2;
-    while (used.has(`${root}_${i}`)) {
-      i += 1;
-    }
-    return `${root}_${i}`;
-  }
-  function cloneFieldData(data) {
-    const copy = JSON.parse(JSON.stringify(data || {}));
-    const reserved = new Set(collectFieldNames().map((n) => n.toLowerCase()));
-    const mintName = (base) => {
-      const root = slugifyName(base);
-      if (!reserved.has(root)) {
-        reserved.add(root);
-        return root;
-      }
-      let i = 2;
-      while (reserved.has(`${root}_${i}`)) {
-        i += 1;
-      }
-      const next = `${root}_${i}`;
-      reserved.add(next);
-      return next;
-    };
-    const walk = (node) => {
-      if (!node || typeof node !== "object") {
-        return;
-      }
-      node.id = uid();
-      if (node.name != null && String(node.name).trim() !== "") {
-        node.name = mintName(node.name);
-      }
-      if (Array.isArray(node.children)) {
-        node.children.forEach(walk);
-      }
-    };
-    walk(copy);
-    return copy;
-  }
-  function defaultField(type = "text") {
-    const id = uid();
-    if (type === "divider") {
-      return { id, type, margin: "m", margin_custom: "", css_class: "" };
-    }
-    if (type === "spacer") {
-      return {
-        id,
-        type,
-        height: "m",
-        height_custom: "",
-        css_class: ""
-      };
-    }
-    if (type === "captcha") {
-      return {
-        id,
-        type,
-        width: "100",
-        width_custom: "",
-        css_class: ""
-      };
-    }
-    if (type === "heading") {
-      return {
-        id,
-        type,
-        content: typeLabel(type),
-        level: "h2",
-        width: "100",
-        width_custom: "",
-        css_class: ""
-      };
-    }
-    if (type === "text_block" || type === "html") {
-      return {
-        id,
-        type,
-        content: "",
-        width: "100",
-        width_custom: "",
-        css_class: ""
-      };
-    }
-    if (type === "honeypot") {
-      return {
-        id,
-        type,
-        name: slugifyName(typeLabel(type)),
-        name_manual: false,
-        label: typeLabel(type),
-        hide_label: false,
-        width: "100",
-        width_custom: "",
-        css_class: ""
-      };
-    }
-    if (type === "hidden") {
-      return {
-        id,
-        type,
-        name: slugifyName(typeLabel(type)),
-        name_manual: false,
-        label: typeLabel(type),
-        hide_label: false,
-        default_value: "",
-        width: "100",
-        width_custom: "",
-        css_class: ""
-      };
-    }
-    if (type === "column") {
-      return {
-        id,
-        type,
-        width: "100",
-        width_custom: "",
-        children: []
-      };
-    }
-    if (type === "section") {
-      return {
-        id,
-        type,
-        label: typeLabel(type),
-        width: "100",
-        width_custom: "",
-        design: "standard",
-        children: []
-      };
-    }
-    const base = {
-      id,
-      type,
-      label: typeLabel(type),
-      name: slugifyName(typeLabel(type)),
-      name_manual: false,
-      hide_label: false,
-      active: true,
-      required: type === "terms",
-      placeholder: "",
-      description: "",
-      width: "100",
-      width_custom: "",
-      css_class: ""
-    };
-    if (["radio", "checkboxes", "select", "button_group"].includes(type)) {
-      base.options = [
-        { label: t("optionOne", "Option 1"), value: "option-1" },
-        { label: t("optionTwo", "Option 2"), value: "option-2" }
-      ];
-    }
-    if (["radio", "checkboxes"].includes(type)) {
-      base.layout = "vertical";
-    }
-    if (["select", "button_group", "file", "image"].includes(type)) {
-      base.multiple = false;
-    }
-    if (type === "file" || type === "image") {
-      base.preview = true;
-      base.upload_style = "modern";
-      base.extensions = type === "image" ? "jpg, jpeg, png, webp, gif, heic, avif" : "";
-    }
-    if (type === "terms") {
-      base.label = t("termsDefaultFieldLabel", "Privacy Policy");
-      base.name = slugifyName(base.label);
-      base.hide_label = true;
-      base.content = t("termsDefaultLabel", "I agree to the [Privacy Policy](page:privacy).");
-      base.default_value = "";
-    }
-    if (type === "toggle") {
-      base.label = typeLabel(type);
-      base.default_value = "";
-    }
-    if (type === "textarea") {
-      base.rows = 5;
-    }
-    return base;
-  }
-  function readConfig() {
-    const input = document.getElementById("bl-forms-config-json");
-    if (!input) return { fields: [], settings: {} };
-    try {
-      return JSON.parse(input.value || "{}") || { fields: [], settings: {} };
-    } catch (e) {
-      return { fields: [], settings: {} };
-    }
-  }
-  function writeConfig(partial) {
-    const input = document.getElementById("bl-forms-config-json");
-    if (!input) return;
-    const current = readConfig();
-    input.value = JSON.stringify({
-      fields: partial.fields !== void 0 ? partial.fields : current.fields || [],
-      settings: partial.settings !== void 0 ? partial.settings : current.settings || {}
-    });
-  }
-  function flattenFields(fields = []) {
-    const out = [];
-    const walk = (list) => {
-      (list || []).forEach((field) => {
-        if (!field) return;
-        if (field.type === "column" || field.type === "section" || field.type === "group") {
-          walk(field.children || []);
-          return;
-        }
-        out.push(field);
-      });
-    };
-    walk(fields);
-    return out;
-  }
-
-  // themes/baselayer/packages/baselayer-forms/src/js/admin/conditional-logic.js
-  var LOGIC_SOURCE_EXCLUDE = [
-    "column",
-    "section",
-    "divider",
-    "spacer",
-    "heading",
-    "text_block",
-    "html",
-    "captcha",
-    "honeypot"
-  ];
-  var OPS_TOGGLE = ["checked", "not_checked"];
-  var OPS_CHOICE = ["==", "!=", "==empty", "!=empty"];
-  var OPS_MULTI = ["contains", "not_contains", "==empty", "!=empty"];
-  var OPS_TEXT = ["==", "!=", "contains", "not_contains", "==empty", "!=empty"];
-  var OPS_NUMBER = ["==", "!=", ">", "<", ">=", "<=", "==empty", "!=empty"];
-  var OPS_TEMPORAL = ["==", "!=", ">", "<", "==empty", "!=empty"];
-  var OPS_FILE = ["==empty", "!=empty"];
-  var ALL_OPERATORS = [
-    ...OPS_TOGGLE,
-    ...OPS_CHOICE,
-    ...OPS_MULTI,
-    ...OPS_TEXT,
-    ...OPS_NUMBER,
-    ...OPS_TEMPORAL
-  ];
-  function operatorsForType(type) {
-    switch (type) {
-      case "toggle":
-      case "terms":
-        return [...OPS_TOGGLE];
-      case "radio":
-      case "select":
-      case "button_group":
-        return [...OPS_CHOICE];
-      case "checkboxes":
-        return [...OPS_MULTI];
-      case "number":
-        return [...OPS_NUMBER];
-      case "date":
-      case "time":
-      case "datetime":
-        return [...OPS_TEMPORAL];
-      case "file":
-      case "image":
-        return [...OPS_FILE];
-      case "text":
-      case "textarea":
-      case "email":
-      case "url":
-      case "phone":
-      case "hidden":
-        return [...OPS_TEXT];
-      default:
-        return [...OPS_TEXT];
-    }
-  }
-  function operatorNeedsValue(operator) {
-    return !["checked", "not_checked", "==empty", "!=empty"].includes(operator);
-  }
-  function operatorLabel(operator) {
-    const map = {
-      checked: t("logicOpChecked", "Checked"),
-      not_checked: t("logicOpNotChecked", "Not checked"),
-      "==": t("logicOpEquals", "Is equal to"),
-      "!=": t("logicOpNotEquals", "Is not equal to"),
-      contains: t("logicOpContains", "Contains"),
-      not_contains: t("logicOpNotContains", "Does not contain"),
-      "==empty": t("logicOpEmpty", "Has no value"),
-      "!=empty": t("logicOpNotEmpty", "Has any value"),
-      ">": t("logicOpGreater", "Greater than"),
-      "<": t("logicOpLess", "Less than"),
-      ">=": t("logicOpGreaterOrEqual", "Greater than or equal to"),
-      "<=": t("logicOpLessOrEqual", "Less than or equal to")
-    };
-    return map[operator] || operator;
-  }
-  function normalizeConditionalLogic(raw) {
-    const empty = { enabled: false, groups: [] };
-    if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
-      return empty;
-    }
-    const groupsIn = Array.isArray(raw.groups) ? raw.groups : [];
-    const groups = [];
-    groupsIn.forEach((group) => {
-      if (!Array.isArray(group)) {
-        return;
-      }
-      const rules = [];
-      group.forEach((rule) => {
-        if (!rule || typeof rule !== "object") {
-          return;
-        }
-        const fieldId = String(rule.field || "").trim();
-        const operator = String(rule.operator || "").trim();
-        if (!fieldId || !ALL_OPERATORS.includes(operator)) {
-          return;
-        }
-        rules.push({
-          field: fieldId,
-          operator,
-          value: operatorNeedsValue(operator) ? String(rule.value ?? "") : ""
-        });
-      });
-      if (rules.length) {
-        groups.push(rules);
-      }
-    });
-    return {
-      enabled: !!raw.enabled && groups.length > 0,
-      groups
-    };
-  }
-  function readConditionalLogicFromDom(body) {
-    if (!body) {
-      return null;
-    }
-    const input = body.querySelector("[data-bl-conditional-logic]");
-    if (!input) {
-      return null;
-    }
-    try {
-      const parsed = JSON.parse(input.value || "{}");
-      const logic = normalizeConditionalLogic(parsed);
-      return logic.enabled || logic.groups.length ? logic : { enabled: false, groups: [] };
-    } catch (e) {
-      return { enabled: false, groups: [] };
-    }
-  }
-  function collectLogicSourceFields(exceptId = "", options = {}) {
-    const includeSelf = !!options.includeSelf;
-    const out = [];
-    const seen = /* @__PURE__ */ new Set();
-    const push = (entry) => {
-      if (!entry?.id || seen.has(entry.id)) {
-        return;
-      }
-      const isSelf = !!entry.isSelf;
-      if (isSelf && !includeSelf) {
-        return;
-      }
-      if (!isSelf && LOGIC_SOURCE_EXCLUDE.includes(entry.type)) {
-        return;
-      }
-      seen.add(entry.id);
-      out.push(entry);
-    };
-    document.querySelectorAll(".bl-forms-builder__field[data-bl-forms-field]").forEach((row) => {
-      const id = row.dataset.fieldId || "";
-      const type = row.dataset.fieldType || "";
-      if (!id) {
-        return;
-      }
-      const labelInput = row.querySelector("[data-bl-label]");
-      const sectionLabel = row.querySelector(".bl-forms-builder__section-label-input");
-      const preview = row.querySelector(":scope > .bl-forms-builder__field-header .bl-forms-builder__preview");
-      const label = (labelInput?.value || "").trim() || (sectionLabel?.value || "").trim() || (preview?.textContent || "").trim() || typeLabel(type);
-      const fieldOptions = Array.from(row.querySelectorAll("[data-bl-option]")).map((opt) => ({
-        label: opt.querySelector("[data-bl-opt-label]")?.value || "",
-        value: opt.querySelector("[data-bl-opt-value]")?.value || ""
-      }));
-      push({ id, type, label, options: fieldOptions, isSelf: id === exceptId });
-    });
-    flattenFields(readConfig().fields || []).forEach((field) => {
-      if (!field?.id || seen.has(field.id)) {
-        return;
-      }
-      const type = field.type || "text";
-      push({
-        id: field.id,
-        type,
-        label: (field.label || "").trim() || typeLabel(type),
-        options: Array.isArray(field.options) ? field.options : [],
-        isSelf: field.id === exceptId
-      });
-    });
-    return out;
-  }
-  function selectableSources(sources) {
-    return (sources || []).filter((s) => !s.isSelf);
-  }
-  function emptyRule(sources) {
-    const first = selectableSources(sources)[0];
-    const ops = first ? operatorsForType(first.type) : ["=="];
-    return {
-      field: first?.id || "",
-      operator: ops[0] || "==",
-      value: ""
-    };
-  }
-  function createConditionalLogicEditor(field, getSources = () => collectLogicSourceFields(field.id, { includeSelf: true }), onChange = null) {
-    if (!field.conditional_logic || typeof field.conditional_logic !== "object") {
-      field.conditional_logic = { enabled: false, groups: [] };
-    } else {
-      field.conditional_logic = normalizeConditionalLogic(field.conditional_logic);
-    }
-    const wrap = el("div", { className: "bl-forms-builder__logic" });
-    const hidden = el("input", {
-      type: "hidden",
-      dataset: { blConditionalLogic: "1" }
-    });
-    const syncHidden = (notify = true) => {
-      hidden.value = JSON.stringify(normalizeConditionalLogic(field.conditional_logic));
-      if (typeof onChange === "function") {
-        onChange();
-      }
-      if (notify) {
-        document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-      }
-    };
-    const getGroup = (groupIndex) => field.conditional_logic.groups[groupIndex];
-    const getRule = (groupIndex, ruleIndex) => getGroup(groupIndex)?.[ruleIndex];
-    const groupsMount = el("div", { className: "bl-forms-builder__logic-groups" });
-    const renderValueControl = (groupIndex, ruleIndex, source) => {
-      const rule = getRule(groupIndex, ruleIndex);
-      if (!rule) {
-        return el("span", { className: "bl-forms-builder__logic-value-empty", "aria-hidden": "true" });
-      }
-      if (!operatorNeedsValue(rule.operator)) {
-        return el("span", { className: "bl-forms-builder__logic-value-empty", "aria-hidden": "true" });
-      }
-      const options = Array.isArray(source?.options) ? source.options.filter((o) => (o.value || "").trim() !== "") : [];
-      if (options.length && ["radio", "select", "button_group", "checkboxes"].includes(source?.type)) {
-        const select = el("select", {
-          className: "bl-forms-builder__logic-value",
-          "aria-label": t("logicValue", "Value")
-        });
-        select.appendChild(el("option", { value: "", text: t("logicSelectValue", "\u2014 Select \u2014") }));
-        options.forEach((opt) => {
-          select.appendChild(
-            el("option", {
-              value: opt.value,
-              text: opt.label || opt.value
-            })
-          );
-        });
-        select.value = rule.value || "";
-        if (rule.value && select.value !== rule.value) {
-          select.appendChild(el("option", { value: rule.value, text: rule.value }));
-          select.value = rule.value;
-        }
-        select.addEventListener("change", () => {
-          const live = getRule(groupIndex, ruleIndex);
-          if (!live) {
-            return;
-          }
-          live.value = select.value;
-          syncHidden();
-        });
-        return select;
-      }
-      const input = el("input", {
-        type: source?.type === "number" ? "number" : "text",
-        className: "widefat bl-forms-builder__logic-value",
-        value: rule.value || "",
-        "aria-label": t("logicValue", "Value")
-      });
-      input.addEventListener("input", () => {
-        const live = getRule(groupIndex, ruleIndex);
-        if (!live) {
-          return;
-        }
-        live.value = input.value;
-        syncHidden();
-      });
-      return input;
-    };
-    const renderRuleRow = (groupIndex, ruleIndex, sources) => {
-      const rule = getRule(groupIndex, ruleIndex);
-      if (!rule) {
-        return el("div", { className: "bl-forms-builder__logic-rule" });
-      }
-      const selectable = selectableSources(sources);
-      let source = selectable.find((s) => s.id === rule.field) || null;
-      if (!rule.field && selectable[0]) {
-        rule.field = selectable[0].id;
-        source = selectable[0];
-      }
-      const ops = source ? operatorsForType(source.type) : ["==", "!=", "==empty", "!=empty"];
-      if (source && !ops.includes(rule.operator)) {
-        rule.operator = ops[0];
-        if (!operatorNeedsValue(rule.operator)) {
-          rule.value = "";
-        }
-      } else if (!ops.includes(rule.operator) && rule.operator) {
-        ops.unshift(rule.operator);
-      }
-      const fieldSelect = el("select", {
-        className: "bl-forms-builder__logic-field",
-        "aria-label": t("logicField", "Field")
-      });
-      if (!selectable.length && !rule.field) {
-        fieldSelect.appendChild(
-          el("option", { value: "", text: t("logicNoFields", "No fields available") })
-        );
-        fieldSelect.disabled = true;
-      } else {
-        sources.forEach((s) => {
-          const opt = el("option", {
-            value: s.id,
-            text: s.isSelf ? `${s.label} (${typeLabel(s.type)}) \u2014 ${t("logicThisField", "This field")}` : `${s.label} (${typeLabel(s.type)})`
-          });
-          if (s.isSelf) {
-            opt.disabled = true;
-          }
-          fieldSelect.appendChild(opt);
-        });
-        if (rule.field && !sources.some((s) => s.id === rule.field)) {
-          fieldSelect.appendChild(
-            el("option", {
-              value: rule.field,
-              text: t("logicMissingField", "Missing field")
-            })
-          );
-        }
-        fieldSelect.value = rule.field || selectable[0]?.id || "";
-      }
-      const opSelect = el("select", {
-        className: "bl-forms-builder__logic-operator",
-        "aria-label": t("logicOperator", "Operator")
-      });
-      ops.forEach((op) => {
-        opSelect.appendChild(el("option", { value: op, text: operatorLabel(op) }));
-      });
-      opSelect.value = rule.operator;
-      const valueSlot = el("div", { className: "bl-forms-builder__logic-value-slot" });
-      const refreshValue = () => {
-        const live = getRule(groupIndex, ruleIndex);
-        const liveSource = selectable.find((s) => s.id === live?.field) || null;
-        valueSlot.replaceChildren(renderValueControl(groupIndex, ruleIndex, liveSource));
-      };
-      refreshValue();
-      fieldSelect.addEventListener("change", () => {
-        const live = getRule(groupIndex, ruleIndex);
-        if (!live) {
-          return;
-        }
-        live.field = fieldSelect.value;
-        source = selectable.find((s) => s.id === live.field) || null;
-        const nextOps = source ? operatorsForType(source.type) : ["=="];
-        live.operator = nextOps.includes(live.operator) ? live.operator : nextOps[0];
-        if (!operatorNeedsValue(live.operator)) {
-          live.value = "";
-        }
-        renderGroups();
-        syncHidden();
-      });
-      opSelect.addEventListener("change", () => {
-        const live = getRule(groupIndex, ruleIndex);
-        if (!live) {
-          return;
-        }
-        live.operator = opSelect.value;
-        if (!operatorNeedsValue(live.operator)) {
-          live.value = "";
-        }
-        refreshValue();
-        syncHidden();
-      });
-      const deleteBtn = el("button", {
-        type: "button",
-        className: "bl-forms-builder__icon-btn bl-forms-builder__icon-btn--danger",
-        title: t("delete", "Delete"),
-        "aria-label": t("delete", "Delete"),
-        onClick: () => {
-          const group = getGroup(groupIndex);
-          if (!group) {
-            return;
-          }
-          group.splice(ruleIndex, 1);
-          if (!group.length) {
-            field.conditional_logic.groups.splice(groupIndex, 1);
-          }
-          renderGroups();
-          syncHidden();
-        }
-      });
-      deleteBtn.textContent = "\xD7";
-      return el("div", { className: "bl-forms-builder__logic-rule" }, [
-        fieldSelect,
-        opSelect,
-        valueSlot,
-        deleteBtn
-      ]);
-    };
-    const renderGroup = (groupIndex, sources) => {
-      const group = getGroup(groupIndex);
-      if (!group) {
-        return el("div", { className: "bl-forms-builder__logic-group" });
-      }
-      const box = el("div", { className: "bl-forms-builder__logic-group" });
-      const label = groupIndex === 0 ? t("logicShowIf", "Show this field if") : t("logicOrIf", "or if");
-      box.appendChild(el("p", { className: "bl-forms-builder__logic-group-label", text: label }));
-      const rulesWrap = el("div", { className: "bl-forms-builder__logic-rules" });
-      group.forEach((_, ruleIndex) => {
-        if (ruleIndex > 0) {
-          rulesWrap.appendChild(
-            el("p", { className: "bl-forms-builder__logic-and", text: t("logicAnd", "and") })
-          );
-        }
-        rulesWrap.appendChild(renderRuleRow(groupIndex, ruleIndex, sources));
-      });
-      box.appendChild(rulesWrap);
-      box.appendChild(
-        el("button", {
-          type: "button",
-          className: "button bl-button-small",
-          text: t("logicAddRule", "Add rule"),
-          onClick: () => {
-            const liveGroup = getGroup(groupIndex);
-            if (!liveGroup) {
-              return;
-            }
-            liveGroup.push(emptyRule(getSources()));
-            renderGroups();
-            syncHidden();
-          }
-        })
-      );
-      return box;
-    };
-    const renderGroups = () => {
-      const sources = getSources();
-      groupsMount.replaceChildren();
-      if (!field.conditional_logic.enabled) {
-        return;
-      }
-      if (!field.conditional_logic.groups.length) {
-        field.conditional_logic.groups.push([emptyRule(sources)]);
-      }
-      field.conditional_logic.groups.forEach((_, index) => {
-        if (index > 0) {
-          groupsMount.appendChild(
-            el("p", { className: "bl-forms-builder__logic-or", text: t("logicOr", "or") })
-          );
-        }
-        groupsMount.appendChild(renderGroup(index, sources));
-      });
-      groupsMount.appendChild(
-        el("button", {
-          type: "button",
-          className: "button bl-button-small bl-forms-builder__logic-add-group",
-          text: t("logicAddGroup", "Add rule group"),
-          onClick: () => {
-            field.conditional_logic.groups.push([emptyRule(getSources())]);
-            renderGroups();
-            syncHidden();
-          }
-        })
-      );
-    };
-    const enableSwitch = (() => {
-      const input = el("input", {
-        type: "checkbox",
-        checked: !!field.conditional_logic.enabled
-      });
-      input.addEventListener("change", () => {
-        field.conditional_logic.enabled = input.checked;
-        if (input.checked && !field.conditional_logic.groups.length) {
-          field.conditional_logic.groups = [[emptyRule(getSources())]];
-        }
-        renderGroups();
-        syncHidden();
-      });
-      return el("div", { className: "bl-forms-builder__switch-setting" }, [
-        el("label", { className: "bl-forms-builder__switch" }, [
-          input,
-          el("span", { className: "bl-forms-builder__switch-ui", "aria-hidden": "true" }),
-          el("span", {
-            className: "bl-forms-builder__switch-label",
-            text: t("logicEnable", "Conditional logic")
-          })
-        ])
-      ]);
-    })();
-    wrap.append(
-      enableSwitch,
-      el("p", {
-        className: "description bl-forms-builder__logic-help",
-        text: t(
-          "logicHelp",
-          "Show this field only when the conditions below are met."
-        )
-      }),
-      groupsMount,
-      hidden
-    );
-    renderGroups();
-    syncHidden(false);
-    wrap.refreshLogicSources = () => {
-      if (!wrap.isConnected) {
-        return;
-      }
-      renderGroups();
-      syncHidden(false);
-    };
-    return wrap;
-  }
-
-  // themes/baselayer/packages/baselayer-forms/src/js/admin/layout.js
-  var NESTED_BLOCKED = ["column", "section", "hidden", "honeypot", "captcha"];
-  var columnFieldByEl = /* @__PURE__ */ new WeakMap();
-  var sectionFieldByEl = /* @__PURE__ */ new WeakMap();
-  function createNestedSortable(list, options) {
-    const Builder = window.BlCanvasBuilder;
-    if (!Builder || typeof Builder.createSortable !== "function") {
-      console.error("BlCanvasBuilder.createSortable is required for nested field lists");
-      return null;
-    }
-    return Builder.createSortable(list, options);
-  }
-  function prepareNestedField(typeOrData) {
-    const data = typeof typeOrData === "string" ? defaultField(typeOrData) : { ...typeOrData };
-    if (NESTED_BLOCKED.includes(data.type)) {
-      return null;
-    }
-    if (data.name != null && data.name_manual === false) {
-      data.name = uniqueFieldName(data.label || data.name || data.type || "field", data.id || "");
-    } else if (data.name) {
-      data.name = uniqueFieldName(data.name, data.id || "");
-    }
-    return data;
-  }
-  function bindFieldListSortable(list, onChange) {
-    const Builder = window.BlCanvasBuilder;
-    const onStart = Builder?.dragStart || (() => {
-    });
-    const onEnd = Builder?.dragEnd || (() => {
-    });
-    createNestedSortable(list, {
-      group: {
-        name: "bl-forms-fields",
-        put(to, from, dragEl) {
-          const type = dragEl.dataset.fieldType || "";
-          return !NESTED_BLOCKED.includes(type);
-        }
-      },
-      handle: ".bl-forms-builder__handle",
-      animation: 150,
-      draggable: ".bl-forms-builder__field, .bl-forms-builder__template",
-      onStart,
-      onEnd,
-      onAdd(evt) {
-        const item = evt.item;
-        const type = item.dataset.fieldType || "text";
-        if (item.classList.contains("bl-forms-builder__template")) {
-          const prepared = prepareNestedField(type);
-          if (!prepared) {
-            item.remove();
-            return;
-          }
-          item.replaceWith(createFieldCard(prepared, true));
-        } else if (NESTED_BLOCKED.includes(type)) {
-          if (evt.from && evt.from !== list) {
-            evt.from.insertBefore(item, evt.from.children[evt.oldIndex] || null);
-          } else {
-            item.remove();
-          }
-          return;
-        }
-        onChange();
-      },
-      onUpdate: onChange,
-      onSort: onChange
-    });
-  }
-  function widthBadgeText(width, widthCustom = "") {
-    if (width === "auto") {
-      return t("widthAuto", "Auto");
-    }
-    if (width === "custom") {
-      return (widthCustom || "").trim();
-    }
-    return `${width}%`;
-  }
-  function equalWidthForCount(count) {
-    if (count <= 1) {
-      return "100";
-    }
-    if (count === 2) {
-      return "50";
-    }
-    if (count === 3) {
-      return "33";
-    }
-    return "25";
-  }
-  function applyColumnWidthToCard(el3, width, widthCustom = "") {
-    el3.dataset.fieldWidth = width;
-    if (width === "custom") {
-      el3.dataset.fieldWidthCustom = widthCustom || "";
-    } else {
-      delete el3.dataset.fieldWidthCustom;
-    }
-    const field = columnFieldByEl.get(el3);
-    if (field) {
-      field.width = width;
-      field.width_custom = width === "custom" ? widthCustom || "" : "";
-    }
-    const badge = el3.querySelector(":scope > .bl-forms-builder__field-header .bl-forms-builder__width-badge");
-    if (badge) {
-      const text = widthBadgeText(width, widthCustom);
-      badge.textContent = text;
-      badge.hidden = text === "";
-    }
-  }
-  function equalizeColumnRun(list, columnEl) {
-    const all = Array.from(list.children).filter((el3) => el3.matches?.("[data-bl-forms-field]"));
-    const pos = all.indexOf(columnEl);
-    if (pos < 0) {
-      return;
-    }
-    let start = pos;
-    let end = pos;
-    while (start > 0 && all[start - 1].dataset.fieldType === "column") {
-      start -= 1;
-    }
-    while (end < all.length - 1 && all[end + 1].dataset.fieldType === "column") {
-      end += 1;
-    }
-    const run = all.slice(start, end + 1);
-    const width = equalWidthForCount(run.length);
-    run.forEach((el3) => applyColumnWidthToCard(el3, width));
-  }
-  function createContainerActions(onDelete, onDuplicate) {
-    const duplicateBtn = el("button", {
-      type: "button",
-      className: "bl-forms-builder__icon-btn",
-      title: t("duplicate", "Duplicate"),
-      "aria-label": t("duplicate", "Duplicate"),
-      onClick: onDuplicate
-    });
-    const duplicateIcon = iconEl("duplicate");
-    if (duplicateIcon.innerHTML) {
-      duplicateBtn.appendChild(duplicateIcon);
-    } else {
-      duplicateBtn.textContent = "\u29C9";
-    }
-    const deleteBtn = el("button", {
-      type: "button",
-      className: "bl-forms-builder__icon-btn bl-forms-builder__icon-btn--danger",
-      title: t("delete", "Delete"),
-      "aria-label": t("delete", "Delete"),
-      onClick: onDelete
-    });
-    const trashIcon = iconEl("trash");
-    if (trashIcon.innerHTML) {
-      deleteBtn.appendChild(trashIcon);
-    } else {
-      deleteBtn.textContent = "\xD7";
-    }
-    const handle = el("span", {
-      className: "bl-forms-builder__handle",
-      title: t("dragField", "Drag to reorder"),
-      "aria-hidden": "true"
-    });
-    const dragIcon = iconEl("drag");
-    if (dragIcon.innerHTML) {
-      handle.appendChild(dragIcon);
-    } else {
-      handle.textContent = "\u22EE\u22EE";
-    }
-    return el("div", { className: "bl-forms-builder__field-actions" }, [duplicateBtn, deleteBtn, handle]);
-  }
-  function createColumnCard(initial = {}) {
-    let field = {
-      width: "100",
-      width_custom: "",
-      children: [],
-      design: "standard",
-      css_class: "",
-      conditional_logic: { enabled: false, groups: [] },
-      ...initial,
-      id: initial.id || uid(),
-      type: "column"
-    };
-    if (!["standard", "outline", "card"].includes(field.design)) {
-      field.design = "standard";
-    }
-    if (typeof field.css_class !== "string") {
-      field.css_class = "";
-    }
-    field.conditional_logic = normalizeConditionalLogic(field.conditional_logic);
-    const row = el("div", {
-      className: "bl-forms-builder__field bl-forms-builder__column-card",
-      dataset: {
-        blFormsField: "1",
-        fieldId: field.id,
-        fieldType: "column",
-        fieldWidth: field.width || "100",
-        fieldDesign: field.design || "standard",
-        ...field.width === "custom" && field.width_custom ? { fieldWidthCustom: field.width_custom } : {}
-      }
-    });
-    columnFieldByEl.set(row, field);
-    const preview = el("span", {
-      className: "bl-forms-builder__preview",
-      text: window.blFormsAdmin?.i18n?.types?.column || t("columnType", "Columns")
-    });
-    const widthBadge = el("span", { className: "bl-forms-builder__width-badge" });
-    const designBtn = el("button", {
-      type: "button",
-      className: "bl-forms-builder__design-btn",
-      title: t("layoutSettingsTitle", "Settings"),
-      "aria-label": t("layoutSettingsTitle", "Settings")
-    });
-    designBtn.appendChild(iconEl("tune", "bl-forms-builder__design-btn-icon"));
-    const typeChip = el("span", { className: "bl-forms-builder__field-type bl-forms-builder__field-type--column" });
-    const fieldsList = el("div", {
-      className: "bl-forms-builder__column-fields",
-      dataset: { blColumnFields: "1" }
-    });
-    const emptyHint = el("p", {
-      className: "description bl-forms-builder__column-empty",
-      text: t("columnEmpty", "Drop fields here")
-    });
-    const syncEmpty = () => {
-      emptyHint.hidden = fieldsList.querySelector("[data-bl-forms-field]") != null;
-    };
-    const updatePreview = () => {
-      const width = field.width || "100";
-      const widthCustom = field.width_custom || "";
-      const design = field.design || "standard";
-      row.dataset.fieldWidth = width;
-      row.dataset.fieldDesign = design;
-      if (width === "custom") {
-        row.dataset.fieldWidthCustom = widthCustom || "";
-      } else {
-        delete row.dataset.fieldWidthCustom;
-      }
-      const text = widthBadgeText(width, widthCustom);
-      widthBadge.textContent = text;
-      widthBadge.hidden = text === "";
-      const typeChildren = [
-        iconEl("column", "bl-forms-builder__field-type-icon"),
-        el("span", {
-          className: "bl-forms-builder__field-type-label",
-          text: window.blFormsAdmin?.i18n?.types?.column || t("columnType", "Columns")
-        })
-      ];
-      const logic = field.conditional_logic;
-      if (logic && logic.enabled && Array.isArray(logic.groups) && logic.groups.length > 0) {
-        typeChildren.push(
-          el("span", {
-            className: "bl-forms-builder__field-logic-dot",
-            title: t("logicEnable", "Conditional logic"),
-            "aria-label": t("logicEnable", "Conditional logic")
-          })
-        );
-      }
-      typeChip.replaceChildren(...typeChildren);
-    };
-    const notify = () => document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    const openWidthModal = () => {
-      openFieldWidthModal(field, () => {
-        updatePreview();
-        notify();
-      });
-    };
-    const openDesignModal = () => {
-      openLayoutSettingsModal(
-        field,
-        () => {
-          updatePreview();
-          notify();
-        },
-        {
-          tabs: ["design", "logic"],
-          logicHelp: t(
-            "logicHelpColumn",
-            "Show this column only when the conditions below are met."
-          )
-        }
-      );
-    };
-    (field.children || []).forEach((child) => {
-      fieldsList.appendChild(createFieldCard(child, false));
-    });
-    bindFieldListSortable(fieldsList, () => {
-      syncEmpty();
-      notify();
-    });
-    const fieldsWrap = el("div", { className: "bl-forms-builder__column-fields-wrap" }, [
-      fieldsList,
-      emptyHint
-    ]);
-    syncEmpty();
-    widthBadge.classList.add("is-interactive");
-    widthBadge.title = t("columnWidthTitle", "Column width");
-    widthBadge.addEventListener("click", openWidthModal);
-    designBtn.addEventListener("click", openDesignModal);
-    const header = el("div", { className: "bl-forms-builder__field-header" }, [
-      preview,
-      el("div", { className: "bl-forms-builder__field-meta" }, [widthBadge, designBtn, typeChip]),
-      createContainerActions(
-        () => {
-          row.remove();
-          notify();
-        },
-        () => duplicateFieldCard(row)
-      )
-    ]);
-    row.append(header, fieldsWrap);
-    updatePreview();
-    return row;
-  }
-  function createSectionCard(initial = {}) {
-    let field = {
-      label: "",
-      children: [],
-      width: "100",
-      width_custom: "",
-      design: "standard",
-      show_title: true,
-      css_class: "",
-      conditional_logic: { enabled: false, groups: [] },
-      ...initial,
-      id: initial.id || uid(),
-      type: "section"
-    };
-    if (!["standard", "outline", "card"].includes(field.design)) {
-      field.design = "standard";
-    }
-    if (field.show_title === false || field.show_title === 0 || field.show_title === "0") {
-      field.show_title = false;
-    } else {
-      field.show_title = true;
-    }
-    if (typeof field.css_class !== "string") {
-      field.css_class = "";
-    }
-    field.conditional_logic = normalizeConditionalLogic(field.conditional_logic);
-    const row = el("div", {
-      className: "bl-forms-builder__field bl-forms-builder__section-card",
-      dataset: {
-        blFormsField: "1",
-        fieldId: field.id,
-        fieldType: "section",
-        fieldWidth: field.width || "100",
-        fieldDesign: field.design || "standard",
-        fieldShowTitle: field.show_title ? "1" : "0",
-        ...field.width === "custom" && field.width_custom ? { fieldWidthCustom: field.width_custom } : {}
-      }
-    });
-    sectionFieldByEl.set(row, field);
-    const labelPlaceholder = () => field.show_title ? t("sectionLabelPlaceholder", "Title") : t("sectionLabelPlaceholderHidden", "Name");
-    const labelInput = el("input", {
-      type: "text",
-      className: "bl-forms-builder__section-label-input",
-      value: field.label || "",
-      placeholder: labelPlaceholder(),
-      "aria-label": t("sectionLabel", "Section title")
-    });
-    labelInput.addEventListener("input", () => {
-      field.label = labelInput.value;
-      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    });
-    const widthBadge = el("span", { className: "bl-forms-builder__width-badge" });
-    const designBtn = el("button", {
-      type: "button",
-      className: "bl-forms-builder__design-btn",
-      title: t("layoutSettingsTitle", "Settings"),
-      "aria-label": t("layoutSettingsTitle", "Settings")
-    });
-    designBtn.appendChild(iconEl("tune", "bl-forms-builder__design-btn-icon"));
-    const typeChip = el("span", {
-      className: "bl-forms-builder__field-type bl-forms-builder__field-type--section"
-    });
-    const fieldsList = el("div", {
-      className: "bl-forms-builder__section-fields",
-      dataset: { blSectionFields: "1" }
-    });
-    const emptyHint = el("p", {
-      className: "description bl-forms-builder__section-empty",
-      text: t("sectionEmpty", "Drop fields here")
-    });
-    const syncEmpty = () => {
-      emptyHint.hidden = fieldsList.querySelector("[data-bl-forms-field]") != null;
-    };
-    const updatePreview = () => {
-      const width = field.width || "100";
-      const widthCustom = field.width_custom || "";
-      const design = field.design || "standard";
-      row.dataset.fieldWidth = width;
-      row.dataset.fieldDesign = design;
-      row.dataset.fieldShowTitle = field.show_title ? "1" : "0";
-      if (width === "custom") {
-        row.dataset.fieldWidthCustom = widthCustom || "";
-      } else {
-        delete row.dataset.fieldWidthCustom;
-      }
-      labelInput.placeholder = labelPlaceholder();
-      const text = widthBadgeText(width, widthCustom);
-      widthBadge.textContent = text;
-      widthBadge.hidden = text === "";
-      const typeChildren = [
-        iconEl("section", "bl-forms-builder__field-type-icon"),
-        el("span", {
-          className: "bl-forms-builder__field-type-label",
-          text: window.blFormsAdmin?.i18n?.types?.section || t("sectionType", "Section")
-        })
-      ];
-      const logic = field.conditional_logic;
-      if (logic && logic.enabled && Array.isArray(logic.groups) && logic.groups.length > 0) {
-        typeChildren.push(
-          el("span", {
-            className: "bl-forms-builder__field-logic-dot",
-            title: t("logicEnable", "Conditional logic"),
-            "aria-label": t("logicEnable", "Conditional logic")
-          })
-        );
-      }
-      typeChip.replaceChildren(...typeChildren);
-    };
-    const notify = () => document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    const openWidthModal = () => {
-      openFieldWidthModal(field, () => {
-        updatePreview();
-        notify();
-      });
-    };
-    const openDesignModal = () => {
-      openLayoutSettingsModal(
-        field,
-        () => {
-          updatePreview();
-          notify();
-        },
-        {
-          tabs: ["design", "logic"],
-          withHideTitle: true,
-          logicHelp: t(
-            "logicHelpSection",
-            "Show this section only when the conditions below are met."
-          )
-        }
-      );
-    };
-    (field.children || []).forEach((child) => {
-      fieldsList.appendChild(createFieldCard(child, false));
-    });
-    bindFieldListSortable(fieldsList, () => {
-      syncEmpty();
-      notify();
-    });
-    const fieldsWrap = el("div", { className: "bl-forms-builder__section-fields-wrap" }, [
-      fieldsList,
-      emptyHint
-    ]);
-    syncEmpty();
-    widthBadge.classList.add("is-interactive");
-    widthBadge.title = t("sectionWidthTitle", "Section width");
-    widthBadge.addEventListener("click", openWidthModal);
-    designBtn.addEventListener("click", openDesignModal);
-    const header = el("div", { className: "bl-forms-builder__field-header" }, [
-      labelInput,
-      el("div", { className: "bl-forms-builder__field-meta" }, [widthBadge, designBtn, typeChip]),
-      createContainerActions(
-        () => {
-          row.remove();
-          notify();
-        },
-        () => duplicateFieldCard(row)
-      )
-    ]);
-    row.append(header, fieldsWrap);
-    updatePreview();
-    return row;
-  }
-  function serializeLayoutRow(row) {
-    const type = row.dataset.fieldType || "";
-    const id = row.dataset.fieldId || uid();
-    if (type === "column") {
-      const fields = row.querySelector("[data-bl-column-fields]");
-      const live = columnFieldByEl.get(row);
-      const width = row.dataset.fieldWidth || live?.width || "100";
-      const widthCustom = row.dataset.fieldWidthCustom || live?.width_custom || "";
-      const design = row.dataset.fieldDesign || live?.design || "standard";
-      const cssClass = typeof live?.css_class === "string" ? live.css_class : "";
-      return {
-        id,
-        type: "column",
-        width,
-        width_custom: width === "custom" ? widthCustom : "",
-        design,
-        css_class: cssClass,
-        conditional_logic: normalizeConditionalLogic(live?.conditional_logic),
-        children: Array.from(fields?.children || []).filter((el3) => el3.matches("[data-bl-forms-field]") && !NESTED_BLOCKED.includes(el3.dataset.fieldType)).map((child) => serializeRow(child))
-      };
-    }
-    if (type === "section") {
-      const fields = row.querySelector("[data-bl-section-fields]");
-      const live = sectionFieldByEl.get(row);
-      const labelInput = row.querySelector(".bl-forms-builder__section-label-input");
-      const label = labelInput?.value ?? live?.label ?? "";
-      const width = row.dataset.fieldWidth || live?.width || "100";
-      const widthCustom = row.dataset.fieldWidthCustom || live?.width_custom || "";
-      const design = row.dataset.fieldDesign || live?.design || "standard";
-      const showTitle = row.dataset.fieldShowTitle !== void 0 ? row.dataset.fieldShowTitle !== "0" : live?.show_title !== false;
-      const cssClass = typeof live?.css_class === "string" ? live.css_class : "";
-      return {
-        id,
-        type: "section",
-        label,
-        width,
-        width_custom: width === "custom" ? widthCustom : "",
-        design,
-        show_title: showTitle,
-        css_class: cssClass,
-        conditional_logic: normalizeConditionalLogic(live?.conditional_logic),
-        children: Array.from(fields?.children || []).filter((el3) => el3.matches("[data-bl-forms-field]") && !NESTED_BLOCKED.includes(el3.dataset.fieldType)).map((child) => serializeRow(child))
-      };
-    }
-    return null;
-  }
-
-  // themes/baselayer/packages/baselayer-forms/src/js/admin/field-card.js
-  var WIDTH_PRESETS = [
-    { value: "100", label: "100%" },
-    { value: "75", label: "75%" },
-    { value: "66", label: "66%" },
-    { value: "50", label: "50%" },
-    { value: "33", label: "33%" },
-    { value: "25", label: "25%" },
-    { value: "auto", labelKey: "widthAuto" },
-    { value: "custom", labelKey: "widthCustom", icon: "edit" }
-  ];
-  var SPACER_HEIGHT_PRESETS = [
-    { value: "xs", label: "XS" },
-    { value: "s", label: "S" },
-    { value: "m", label: "M" },
-    { value: "l", label: "L" },
-    { value: "xl", label: "XL" },
-    { value: "custom", labelKey: "widthCustom", icon: "edit" }
-  ];
-  var SPACER_HEIGHT_VALUES = SPACER_HEIGHT_PRESETS.map((preset) => preset.value);
-  var DIVIDER_MARGIN_PRESETS = [
-    { value: "xs", label: "XS" },
-    { value: "s", label: "S" },
-    { value: "m", label: "M" },
-    { value: "l", label: "L" },
-    { value: "xl", label: "XL" },
-    { value: "custom", labelKey: "widthCustom", icon: "edit" }
-  ];
-  var DIVIDER_MARGIN_VALUES = DIVIDER_MARGIN_PRESETS.map((preset) => preset.value);
-  var CSS_LENGTH_RE = /^(-?\d+(?:\.\d+)?)(px|rem|em|%|vh|vw|vmin|vmax|ch|ex)$/i;
-  function normalizeSpacerHeight(field) {
-    const raw = String(field.height ?? "m").trim();
-    const key = raw.toLowerCase();
-    if (SPACER_HEIGHT_VALUES.includes(key)) {
-      field.height = key;
-      if (key !== "custom") {
-        field.height_custom = "";
-      } else if (field.height_custom == null) {
-        field.height_custom = "";
-      }
-      return;
-    }
-    if (CSS_LENGTH_RE.test(raw)) {
-      field.height_custom = raw;
-      field.height = "custom";
-      return;
-    }
-    field.height = "m";
-    field.height_custom = "";
-  }
-  function normalizeDividerMargin(field) {
-    const raw = String(field.margin ?? "m").trim();
-    const key = raw.toLowerCase();
-    if (DIVIDER_MARGIN_VALUES.includes(key)) {
-      field.margin = key;
-      if (key !== "custom") {
-        field.margin_custom = "";
-      } else if (field.margin_custom == null) {
-        field.margin_custom = "";
-      }
-      return;
-    }
-    if (CSS_LENGTH_RE.test(raw)) {
-      field.margin_custom = raw;
-      field.margin = "custom";
-      return;
-    }
-    field.margin = "m";
-    field.margin_custom = "";
-  }
-  var OPTION_TYPES = ["radio", "checkboxes", "select", "button_group"];
-  var MULTIPLE_TYPES = ["select", "button_group", "file", "image"];
-  function createCaptchaSettings(field, onChange) {
-    unsetCaptchaFieldKeys(field);
-    const configured = !!(window.blFormsAdmin && window.blFormsAdmin.captchaConfigured);
-    const settingsUrl = window.blFormsAdmin && window.blFormsAdmin.captchaSettingsUrl || window.blFormsAdmin && window.blFormsAdmin.settingsUrl || "";
-    const root = el("div", { className: "bl-forms-builder__captcha" });
-    const settingsLink = settingsUrl ? el("a", {
-      href: settingsUrl,
-      className: "bl-forms-builder__notice-link",
-      text: t("captchaOpenSettings", "Open settings")
-    }) : null;
-    root.append(
-      el("p", {
-        className: "description",
-        text: t("captchaHelp", "Uses the CAPTCHA keys from Forms \u2192 Settings.")
-      })
-    );
-    if (!configured) {
-      root.append(
-        el(
-          "div",
-          {
-            className: "bl-forms-builder__notice bl-forms-builder__notice--warning",
-            role: "status"
-          },
-          [
-            el("span", {
-              text: t(
-                "captchaNotConfigured",
-                "CAPTCHA keys are not configured yet. Add them under Forms \u2192 Settings."
-              )
-            }),
-            settingsLink
-          ]
-        )
-      );
-    } else if (settingsLink) {
-      root.append(settingsLink);
-    }
-    void onChange;
-    return root;
-  }
-  function unsetCaptchaFieldKeys(field) {
-    delete field.captcha_provider;
-    delete field.captcha_site_key;
-    delete field.captcha_secret_key;
-  }
-  var TYPE_CONVERT_GROUPS = [
-    ["text", "textarea", "email", "phone", "url", "number"],
-    ["date", "time", "datetime"],
-    ["radio", "checkboxes", "select", "button_group"],
-    ["toggle", "terms"],
-    ["file", "image"],
-    ["heading", "text_block", "html"]
-  ];
-  function convertibleTypes(type) {
-    const group = TYPE_CONVERT_GROUPS.find((list) => list.includes(type));
-    return group ? [...group] : [];
-  }
-  function canConvertType(from, to) {
-    if (!from || !to || from === to) {
-      return from === to;
-    }
-    const group = TYPE_CONVERT_GROUPS.find((list) => list.includes(from));
-    return Boolean(group && group.includes(to));
-  }
-  function hydrateFieldFromCard(row, field) {
-    const data = serializeRow(row);
-    if (!data || data.type === "column" || data.type === "section") {
-      return;
-    }
-    const keepId = field.id;
-    const keepType = field.type;
-    Object.keys(field).forEach((key) => {
-      if (key === "id" || key === "type") {
-        return;
-      }
-      if (!(key in data)) {
-        delete field[key];
-      }
-    });
-    Object.assign(field, data, { id: keepId, type: keepType });
-  }
-  function convertFieldType(field, nextType) {
-    if (!canConvertType(field.type, nextType) || field.type === nextType) {
-      return;
-    }
-    field.type = nextType;
-    if (OPTION_TYPES.includes(nextType)) {
-      if (!Array.isArray(field.options) || field.options.length === 0) {
-        field.options = [
-          { label: t("optionOne", "Option 1"), value: "option-1" },
-          { label: t("optionTwo", "Option 2"), value: "option-2" }
-        ];
-      }
-    } else {
-      delete field.options;
-    }
-    if (nextType === "radio" || nextType === "checkboxes") {
-      if (field.layout !== "horizontal") {
-        field.layout = "vertical";
-      }
-    } else {
-      delete field.layout;
-    }
-    if (nextType === "checkboxes") {
-      if (field.min_selections != null && field.min_selections !== "") {
-        const min = parseInt(field.min_selections, 10);
-        field.min_selections = Number.isFinite(min) && min >= 1 ? Math.min(50, min) : "";
-      }
-      if (field.max_selections != null && field.max_selections !== "") {
-        const max = parseInt(field.max_selections, 10);
-        field.max_selections = Number.isFinite(max) && max >= 1 ? Math.min(50, max) : "";
-      }
-    } else {
-      delete field.min_selections;
-      delete field.max_selections;
-    }
-    if (MULTIPLE_TYPES.includes(nextType)) {
-      field.multiple = Boolean(field.multiple);
-    } else {
-      delete field.multiple;
-    }
-    if (nextType === "file" || nextType === "image") {
-      if (field.preview === void 0) {
-        field.preview = true;
-      }
-      if (field.upload_style === void 0) {
-        field.upload_style = "modern";
-      }
-      if (nextType === "image" && !String(field.extensions || "").trim()) {
-        field.extensions = "jpg, jpeg, png, webp, gif, heic, avif";
-      }
-      if (field.extensions === void 0) {
-        field.extensions = "";
-      }
-    } else {
-      delete field.extensions;
-      delete field.preview;
-      delete field.max_files;
-      delete field.max_size_mb;
-      delete field.upload_style;
-      delete field.button_text;
-    }
-    if (nextType === "terms") {
-      if (field.content == null || String(field.content).trim() === "") {
-        field.content = t("termsDefaultLabel", "I agree to the [Privacy Policy](page:privacy).");
-      }
-      if (!String(field.label || "").trim()) {
-        field.label = t("termsDefaultFieldLabel", "Privacy Policy");
-      }
-      field.hide_label = true;
-      field.required = true;
-    }
-    if (["heading", "text_block", "html"].includes(nextType) && field.content == null) {
-      field.content = "";
-    }
-    if (nextType === "heading") {
-      const level = String(field.level || "h2").toLowerCase();
-      field.level = ["h1", "h2", "h3", "h4", "h5", "h6"].includes(level) ? level : "h2";
-    } else {
-      delete field.level;
-    }
-    if (NO_DEFAULT.includes(nextType)) {
-      delete field.default_value;
-    }
-    if (NO_PLACEHOLDER.includes(nextType)) {
-      field.placeholder = "";
-    }
-    if (!AUTOCOMPLETE_TYPES.includes(nextType)) {
-      delete field.autocomplete;
-    }
-    if (!AFFIX_TYPES.includes(nextType)) {
-      delete field.prefix;
-      delete field.suffix;
-    }
-    if (!["text", "textarea"].includes(nextType)) {
-      delete field.min_length;
-      delete field.max_length;
-      delete field.show_char_count;
-      delete field.char_count_text;
-    }
-    if (!["text", "email", "phone"].includes(nextType)) {
-      delete field.show_in_list;
-    } else if ((nextType === "text" || nextType === "email") && field.show_in_list === void 0) {
-      field.show_in_list = defaultShowInListForNewField(nextType, field.id);
-    }
-    if (nextType === "textarea") {
-      const rows = parseInt(field.rows, 10);
-      field.rows = Number.isFinite(rows) && rows >= 2 ? Math.min(50, rows) : 5;
-    } else {
-      delete field.rows;
-    }
-    if (nextType === "number") {
-      delete field.min_mode;
-      delete field.max_mode;
-      delete field.min_offset;
-      delete field.max_offset;
-      delete field.default_mode;
-      delete field.default_offset;
-    } else if (!["date", "time", "datetime"].includes(nextType)) {
-      delete field.min;
-      delete field.max;
-      delete field.min_mode;
-      delete field.max_mode;
-      delete field.min_offset;
-      delete field.max_offset;
-      delete field.default_mode;
-      delete field.default_offset;
-      delete field.relation;
-      delete field.relation_field;
-    } else {
-      if (!field.default_mode && field.default_value != null && String(field.default_value).trim() !== "") {
-        field.default_mode = "fixed";
-      }
-      delete field.relation;
-      delete field.relation_field;
-    }
-  }
-  function createTypeSelect(field, row, onConvert) {
-    const types = convertibleTypes(field.type);
-    if (types.length < 2) {
-      return null;
-    }
-    const select = el("select", {
-      className: "widefat",
-      dataset: { blType: "1" }
-    });
-    types.forEach((type) => {
-      const opt = el("option", {
-        value: type,
-        text: typeLabel(type)
-      });
-      if (type === field.type) {
-        opt.selected = true;
-      }
-      select.appendChild(opt);
-    });
-    select.addEventListener("change", () => {
-      const next = select.value;
-      if (!canConvertType(field.type, next)) {
-        select.value = field.type;
-        return;
-      }
-      hydrateFieldFromCard(row, field);
-      convertFieldType(field, next);
-      onConvert(next);
-    });
-    return el("p", { className: "bl-forms-builder__type-select" }, [
-      el("label", { text: t("type", "Type") }),
-      select
-    ]);
-  }
-  var DESCRIPTION_TYPES = [
-    "text",
-    "email",
-    "url",
-    "number",
-    "phone",
-    "textarea",
-    "date",
-    "time",
-    "datetime",
-    "file",
-    "image",
-    "toggle"
-  ];
-  var NO_PLACEHOLDER = [
-    "terms",
-    "radio",
-    "checkboxes",
-    "button_group",
-    "toggle",
-    "file",
-    "image",
-    "hidden",
-    "honeypot",
-    "captcha",
-    "divider",
-    "spacer",
-    "heading",
-    "text_block",
-    "html",
-    "column",
-    "section",
-    "date",
-    "time",
-    "datetime"
-  ];
-  var NO_REQUIRED = [
-    "hidden",
-    "honeypot",
-    "captcha",
-    "divider",
-    "spacer",
-    "heading",
-    "text_block",
-    "html",
-    "column",
-    "section"
-  ];
-  var NO_READONLY = [
-    ...NO_REQUIRED,
-    "radio",
-    "checkboxes",
-    "button_group",
-    "toggle",
-    "terms",
-    "file",
-    "image"
-  ];
-  var NO_DISABLED = [...NO_REQUIRED];
-  var AUTOCOMPLETE_TYPES = [
-    "text",
-    "email",
-    "url",
-    "number",
-    "phone",
-    "textarea",
-    "select"
-  ];
-  var AFFIX_TYPES = [
-    "text",
-    "email",
-    "phone",
-    "url",
-    "number",
-    "date",
-    "time",
-    "datetime"
-  ];
-  var NO_DEFAULT = [
-    "file",
-    "image",
-    "honeypot",
-    "captcha",
-    "divider",
-    "spacer",
-    "heading",
-    "text_block",
-    "html"
-  ];
-  var CHECKED_DEFAULT_TYPES = ["terms", "toggle"];
-  var NAMED_TYPES = [
-    "text",
-    "textarea",
-    "email",
-    "phone",
-    "url",
-    "number",
-    "checkboxes",
-    "radio",
-    "select",
-    "toggle",
-    "button_group",
-    "date",
-    "time",
-    "datetime",
-    "file",
-    "image",
-    "terms",
-    "hidden",
-    "honeypot"
-  ];
-  var HIDE_LABEL_TYPES = NAMED_TYPES.filter((type) => type !== "hidden" && type !== "honeypot");
-  function createOptionsEditor(options) {
-    const wrap = el("div", { className: "bl-forms-builder__options" });
-    const list = el("div", { className: "bl-forms-builder__options-list" });
-    list.appendChild(
-      el("div", { className: "bl-forms-builder__option bl-forms-builder__option--head" }, [
-        el("span", {
-          className: "bl-forms-builder__option-heading",
-          text: t("optionLabel", "Label")
-        }),
-        el("span", {
-          className: "bl-forms-builder__option-heading",
-          text: t("optionSlug", "Slug")
-        }),
-        el("span", {
-          className: "bl-forms-builder__option-heading-spacer",
-          "aria-hidden": "true"
-        })
-      ])
-    );
-    const addOption = (opt = { label: "", value: "" }) => {
-      const labelText = opt.label || "";
-      const valueText = opt.value || "";
-      const autoSlug = labelText ? slugifyOption(labelText) : "";
-      let slugManual = valueText !== "" && valueText !== autoSlug;
-      const labelInput = el("input", {
-        type: "text",
-        className: "widefat",
-        dataset: { blOptLabel: "1" },
-        value: labelText,
-        placeholder: t("optionLabel", "Label"),
-        "aria-label": t("optionLabel", "Label")
-      });
-      const slugInput = el("input", {
-        type: "text",
-        className: "widefat",
-        dataset: { blOptValue: "1" },
-        value: valueText || autoSlug,
-        placeholder: t("optionSlug", "Slug"),
-        "aria-label": t("optionSlug", "Slug")
-      });
-      const syncSlugFromLabel = () => {
-        if (slugManual) {
-          return;
-        }
-        slugInput.value = slugifyOption(labelInput.value);
-      };
-      labelInput.addEventListener("input", () => {
-        syncSlugFromLabel();
-        document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-      });
-      slugInput.addEventListener("input", () => {
-        slugManual = true;
-        document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-      });
-      slugInput.addEventListener("blur", () => {
-        const next = slugifyOption(slugInput.value || labelInput.value);
-        slugInput.value = next;
-        document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-      });
-      const deleteBtn = el("button", {
-        type: "button",
-        className: "bl-forms-builder__icon-btn bl-forms-builder__icon-btn--danger",
-        title: t("delete", "Delete"),
-        "aria-label": t("delete", "Delete"),
-        onClick: () => {
-          row.remove();
-          document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-        }
-      });
-      const trashIcon = iconEl("trash");
-      if (trashIcon.innerHTML) {
-        deleteBtn.appendChild(trashIcon);
-      } else {
-        deleteBtn.textContent = "\xD7";
-      }
-      const row = el("div", { className: "bl-forms-builder__option", dataset: { blOption: "1" } }, [
-        labelInput,
-        slugInput,
-        deleteBtn
-      ]);
-      list.appendChild(row);
-    };
-    (options || []).forEach((opt) => addOption(opt));
-    wrap.appendChild(list);
-    wrap.appendChild(
-      el("button", {
-        type: "button",
-        className: "button bl-button-small",
-        text: t("addOption", "Add option"),
-        onClick: () => addOption()
-      })
-    );
-    return wrap;
-  }
-  function createSegmentedControl(options, active, datasetKey, onSelect) {
-    const group = el("div", {
-      className: "bl-forms-builder__segmented",
-      role: "group"
-    });
-    if (datasetKey) {
-      group.dataset[datasetKey] = "1";
-    }
-    const sync = (value) => {
-      group.querySelectorAll("button").forEach((btn) => {
-        const on = btn.dataset.value === value;
-        btn.classList.toggle("is-active", on);
-        btn.setAttribute("aria-pressed", on ? "true" : "false");
-      });
-    };
-    options.forEach((opt) => {
-      const label = opt.label || "";
-      const btn = el("button", {
-        type: "button",
-        className: "bl-forms-builder__segmented-btn" + (opt.icon ? " bl-forms-builder__segmented-btn--icon" : ""),
-        dataset: { value: opt.value, ...opt.dataset || {} },
-        title: opt.title || label,
-        "aria-label": label,
-        onClick: () => {
-          sync(opt.value);
-          onSelect(opt.value);
-        }
-      });
-      if (opt.icon) {
-        const icon = iconEl(opt.icon);
-        if (icon.innerHTML) {
-          btn.appendChild(icon);
-        } else {
-          btn.textContent = "\u270E";
-        }
-      } else {
-        btn.textContent = label;
-      }
-      group.appendChild(btn);
-    });
-    sync(active);
-    return group;
-  }
-  function createWidthControl(field, onChange = () => {
-  }, { showLabel = true } = {}) {
-    const wrap = el("div", { className: "bl-forms-builder__width" });
-    const customInput = el("input", {
-      type: "text",
-      className: "widefat bl-forms-builder__width-custom",
-      dataset: { blWidthCustom: "1" },
-      placeholder: t("widthCustomPlaceholder", "e.g. 40% or 280px"),
-      value: field.width_custom || ""
-    });
-    customInput.hidden = (field.width || "100") !== "custom";
-    const group = createSegmentedControl(
-      WIDTH_PRESETS.map((preset) => ({
-        value: preset.value,
-        label: preset.label || t(preset.labelKey, "Custom"),
-        icon: preset.icon || "",
-        dataset: { blWidth: preset.value }
-      })),
-      field.width || "100",
-      "blWidthGroup",
-      (value) => {
-        field.width = value;
-        customInput.hidden = value !== "custom";
-        onChange();
-        document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-      }
-    );
-    group.querySelectorAll("button").forEach((btn) => {
-      if (btn.dataset.value) {
-        btn.dataset.blWidth = btn.dataset.value;
-      }
-    });
-    customInput.addEventListener("input", () => {
-      field.width_custom = customInput.value;
-      field.width = "custom";
-      group.querySelectorAll("button").forEach((btn) => {
-        const on = btn.dataset.blWidth === "custom";
-        btn.classList.toggle("is-active", on);
-        btn.setAttribute("aria-pressed", on ? "true" : "false");
-      });
-      customInput.hidden = false;
-      onChange();
-    });
-    if (showLabel) {
-      wrap.appendChild(el("label", { text: t("width", "Width") }));
-    }
-    wrap.append(group, customInput);
-    return wrap;
-  }
-  function createHeightControl(field, onChange = () => {
-  }, { showLabel = true } = {}) {
-    normalizeSpacerHeight(field);
-    const wrap = el("div", { className: "bl-forms-builder__height" });
-    const customInput = el("input", {
-      type: "text",
-      className: "widefat bl-forms-builder__height-custom",
-      dataset: { blHeightCustom: "1" },
-      placeholder: t("spacerHeightCustomPlaceholder", "e.g. 24px or 2rem"),
-      value: field.height_custom || ""
-    });
-    customInput.hidden = (field.height || "m") !== "custom";
-    const group = createSegmentedControl(
-      SPACER_HEIGHT_PRESETS.map((preset) => ({
-        value: preset.value,
-        label: preset.label || t(preset.labelKey, "Custom"),
-        icon: preset.icon || "",
-        dataset: { blHeight: preset.value }
-      })),
-      field.height || "m",
-      "blHeightGroup",
-      (value) => {
-        field.height = value;
-        if (value !== "custom") {
-          field.height_custom = "";
-        }
-        customInput.hidden = value !== "custom";
-        onChange();
-        document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-      }
-    );
-    group.querySelectorAll("button").forEach((btn) => {
-      if (btn.dataset.value) {
-        btn.dataset.blHeight = btn.dataset.value;
-      }
-    });
-    customInput.addEventListener("input", () => {
-      field.height_custom = customInput.value;
-      field.height = "custom";
-      group.querySelectorAll("button").forEach((btn) => {
-        const on = btn.dataset.blHeight === "custom";
-        btn.classList.toggle("is-active", on);
-        btn.setAttribute("aria-pressed", on ? "true" : "false");
-      });
-      customInput.hidden = false;
-      onChange();
-      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    });
-    if (showLabel) {
-      wrap.appendChild(el("label", { text: t("spacerHeight", "Height") }));
-    }
-    wrap.append(group, customInput);
-    return wrap;
-  }
-  function createMarginControl(field, onChange = () => {
-  }, { showLabel = true } = {}) {
-    normalizeDividerMargin(field);
-    const wrap = el("div", { className: "bl-forms-builder__margin" });
-    const customInput = el("input", {
-      type: "text",
-      className: "widefat bl-forms-builder__margin-custom",
-      dataset: { blMarginCustom: "1" },
-      placeholder: t("dividerMarginCustomPlaceholder", "e.g. 24px or 2rem"),
-      value: field.margin_custom || ""
-    });
-    customInput.hidden = (field.margin || "m") !== "custom";
-    const group = createSegmentedControl(
-      DIVIDER_MARGIN_PRESETS.map((preset) => ({
-        value: preset.value,
-        label: preset.label || t(preset.labelKey, "Custom"),
-        icon: preset.icon || "",
-        dataset: { blMargin: preset.value }
-      })),
-      field.margin || "m",
-      "blMarginGroup",
-      (value) => {
-        field.margin = value;
-        if (value !== "custom") {
-          field.margin_custom = "";
-        }
-        customInput.hidden = value !== "custom";
-        onChange();
-        document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-      }
-    );
-    group.querySelectorAll("button").forEach((btn) => {
-      if (btn.dataset.value) {
-        btn.dataset.blMargin = btn.dataset.value;
-      }
-    });
-    customInput.addEventListener("input", () => {
-      field.margin_custom = customInput.value;
-      field.margin = "custom";
-      group.querySelectorAll("button").forEach((btn) => {
-        const on = btn.dataset.blMargin === "custom";
-        btn.classList.toggle("is-active", on);
-        btn.setAttribute("aria-pressed", on ? "true" : "false");
-      });
-      customInput.hidden = false;
-      onChange();
-      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    });
-    if (showLabel) {
-      wrap.appendChild(el("label", { text: t("dividerMargin", "Margin") }));
-    }
-    wrap.append(group, customInput);
-    return wrap;
-  }
-  function openFieldWidthModal(field, onApply) {
-    document.querySelectorAll(".bl-forms-builder__modal").forEach((node) => node.remove());
-    const draft = {
-      width: field.width || "100",
-      width_custom: field.width_custom || ""
-    };
-    const title = field.type === "column" ? t("columnWidthTitle", "Column width") : field.type === "section" ? t("sectionWidthTitle", "Section width") : t("width", "Width");
-    const backdrop = el("div", {
-      className: "bl-forms-builder__modal",
-      role: "dialog",
-      "aria-modal": "true",
-      "aria-label": title
-    });
-    const close = () => {
-      document.removeEventListener("keydown", onKey);
-      backdrop.remove();
-    };
-    const apply = () => {
-      field.width = draft.width;
-      field.width_custom = draft.width === "custom" ? draft.width_custom : "";
-      onApply(field);
-      close();
-    };
-    const onKey = (evt) => {
-      if (evt.key === "Escape") {
-        close();
-      }
-    };
-    document.addEventListener("keydown", onKey);
-    backdrop.addEventListener("click", (evt) => {
-      if (evt.target === backdrop) {
-        close();
-      }
-    });
-    const dialog = el("div", { className: "bl-forms-builder__modal-dialog" });
-    const header = el("div", { className: "bl-forms-builder__modal-header" }, [
-      el("h2", {
-        className: "bl-forms-builder__modal-title",
-        text: title
-      })
-    ]);
-    const body = el("div", { className: "bl-forms-builder__modal-body" });
-    body.appendChild(createWidthControl(draft, () => {
-    }, { showLabel: false }));
-    const footer = el("div", { className: "bl-forms-builder__modal-footer" }, [
-      el("button", {
-        type: "button",
-        className: "button",
-        text: t("cancel", "Cancel"),
-        onClick: close
-      }),
-      el("button", {
-        type: "button",
-        className: "button button-primary",
-        text: t("apply", "Apply"),
-        onClick: apply
-      })
-    ]);
-    dialog.append(header, body, footer);
-    backdrop.appendChild(dialog);
-    document.body.appendChild(backdrop);
-  }
-  function openLayoutSettingsModal(field, onApply, options = {}) {
-    document.querySelectorAll(".bl-forms-builder__modal").forEach((node) => node.remove());
-    const tabIds = Array.isArray(options.tabs) && options.tabs.length ? options.tabs.filter((id) => ["settings", "design", "logic"].includes(id)) : ["design", "logic"];
-    const withHideTitle = !!options.withHideTitle;
-    const withWidth = !!options.withWidth;
-    const logicHelp = options.logicHelp || t("logicHelpContainer", "Show this block only when the conditions below are met.");
-    const designs = [
-      { value: "standard", label: t("sectionDesignStandard", "Standard") },
-      { value: "outline", label: t("sectionDesignOutline", "Outline") },
-      { value: "card", label: t("sectionDesignCard", "Card") }
-    ];
-    const allowedDesigns = designs.map((item) => item.value);
-    const showTitleOn = !withHideTitle || field.show_title !== false && field.show_title !== 0 && field.show_title !== "0";
-    const draft = {
-      id: field.id,
-      type: field.type,
-      design: allowedDesigns.includes(field.design) ? field.design : "standard",
-      css_class: typeof field.css_class === "string" ? field.css_class : "",
-      show_title: showTitleOn,
-      width: field.width || "100",
-      width_custom: field.width_custom || "",
-      name: field.name || "",
-      name_manual: field.name_manual !== false,
-      min_rows: Math.max(0, parseInt(field.min_rows, 10) || 0),
-      max_rows: Math.max(0, parseInt(field.max_rows, 10) || 0),
-      button_label: field.button_label || "",
-      conditional_logic: normalizeConditionalLogic(
-        field.conditional_logic && typeof field.conditional_logic === "object" ? JSON.parse(JSON.stringify(field.conditional_logic)) : { enabled: false, groups: [] }
-      )
-    };
-    let draftHideTitle = withHideTitle ? !draft.show_title : false;
-    const tabLabels = {
-      settings: t("fieldTabSettings", "Settings"),
-      design: t("layoutDesignTitle", "Design"),
-      logic: t("fieldTabLogic", "Logic")
-    };
-    const backdrop = el("div", {
-      className: "bl-forms-builder__modal",
-      role: "dialog",
-      "aria-modal": "true",
-      "aria-label": t("layoutSettingsTitle", "Settings")
-    });
-    const close = () => {
-      document.removeEventListener("keydown", onKey);
-      backdrop.remove();
-    };
-    const apply = () => {
-      field.design = draft.design;
-      field.css_class = String(draft.css_class || "").trim();
-      if (withHideTitle) {
-        field.show_title = !draftHideTitle;
-      }
-      if (withWidth) {
-        field.width = draft.width || "100";
-        field.width_custom = field.width === "custom" ? draft.width_custom || "" : "";
-      }
-      if (tabIds.includes("settings")) {
-        field.name = String(draft.name || "").trim() || field.name || "items";
-        field.name_manual = draft.name_manual !== false;
-        field.min_rows = Math.max(0, parseInt(draft.min_rows, 10) || 0);
-        field.max_rows = Math.max(0, parseInt(draft.max_rows, 10) || 0);
-        field.button_label = String(draft.button_label || "");
-      }
-      if (tabIds.includes("logic")) {
-        field.conditional_logic = normalizeConditionalLogic(draft.conditional_logic);
-      }
-      onApply(field);
-      close();
-    };
-    const onKey = (evt) => {
-      if (evt.key === "Escape") {
-        close();
-      }
-    };
-    document.addEventListener("keydown", onKey);
-    backdrop.addEventListener("click", (evt) => {
-      if (evt.target === backdrop) {
-        close();
-      }
-    });
-    const dialog = el("div", {
-      className: "bl-forms-builder__modal-dialog bl-forms-builder__modal-dialog--settings"
-    });
-    const tabBar = el("nav", {
-      className: "bl-forms-builder__modal-tabs",
-      role: "tablist"
-    });
-    const panelsWrap = el("div", {
-      className: "bl-forms-builder__modal-body bl-forms-builder__modal-body--settings"
-    });
-    const panels = {};
-    const tabButtons = {};
-    let activeTab = tabIds[0];
-    const activate = (id) => {
-      activeTab = id;
-      tabIds.forEach((tabId) => {
-        const on = tabId === id;
-        tabButtons[tabId].classList.toggle("is-active", on);
-        tabButtons[tabId].setAttribute("aria-selected", on ? "true" : "false");
-        panels[tabId].hidden = !on;
-        panels[tabId].classList.toggle("is-active", on);
-      });
-    };
-    tabIds.forEach((tabId) => {
-      const panel = el("div", {
-        className: "bl-forms-builder__modal-panel" + (tabId === "design" ? " bl-forms-builder__modal-body--design" : ""),
-        role: "tabpanel",
-        dataset: { blModalPanel: tabId }
-      });
-      panels[tabId] = panel;
-      panelsWrap.appendChild(panel);
-      const btn = el("button", {
-        type: "button",
-        className: "bl-forms-builder__modal-tab",
-        role: "tab",
-        text: tabLabels[tabId] || tabId,
-        dataset: { blModalTab: tabId },
-        onClick: () => activate(tabId)
-      });
-      tabButtons[tabId] = btn;
-      tabBar.appendChild(btn);
-    });
-    if (tabIds.includes("settings")) {
-      const settingsPanel = panels.settings;
-      const nameInput = el("input", {
-        type: "text",
-        className: "widefat",
-        value: draft.name || "",
-        placeholder: "items"
-      });
-      nameInput.addEventListener("input", () => {
-        draft.name_manual = true;
-        draft.name = nameInput.value;
-      });
-      const minInput = el("input", {
-        type: "number",
-        className: "widefat",
-        min: "0",
-        value: String(draft.min_rows || 0)
-      });
-      minInput.addEventListener("input", () => {
-        draft.min_rows = Math.max(0, parseInt(minInput.value, 10) || 0);
-      });
-      const maxInput = el("input", {
-        type: "number",
-        className: "widefat",
-        min: "0",
-        value: String(draft.max_rows || 0)
-      });
-      maxInput.addEventListener("input", () => {
-        draft.max_rows = Math.max(0, parseInt(maxInput.value, 10) || 0);
-      });
-      const buttonInput = el("input", {
-        type: "text",
-        className: "widefat",
-        value: draft.button_label || "",
-        placeholder: t("addRow", "Add row")
-      });
-      buttonInput.addEventListener("input", () => {
-        draft.button_label = buttonInput.value;
-      });
-      settingsPanel.append(
-        el("p", {}, [el("label", { text: t("name", "Field name") }), nameInput]),
-        el("p", {
-          className: "description",
-          text: t(
-            "nameHelp",
-            "Internal field key used in submissions, emails, and entry data."
-          )
-        }),
-        el("p", {}, [el("label", { text: t("repeaterMinRows", "Min rows") }), minInput]),
-        el("p", {}, [
-          el("label", { text: t("repeaterMaxRows", "Max rows (0 = unlimited)") }),
-          maxInput
-        ]),
-        el("p", {}, [el("label", { text: t("repeaterButtonLabel", "Add button label") }), buttonInput])
-      );
-    }
-    if (tabIds.includes("design")) {
-      const designPanel = panels.design;
-      if (withHideTitle) {
-        designPanel.appendChild(
-          createSwitchSetting("blHideTitle", t("sectionHideTitle", "Hide title"), draftHideTitle, (checked) => {
-            draftHideTitle = checked;
-          })
-        );
-      }
-      const designWrap = el("div", { className: "bl-forms-builder__design-style" });
-      designWrap.append(
-        settingHeading(t("layoutDesignStyle", "Style")),
-        createSegmentedControl(designs, draft.design, "blDesignGroup", (value) => {
-          draft.design = value;
-        })
-      );
-      designPanel.appendChild(designWrap);
-      if (withWidth) {
-        designPanel.appendChild(createWidthControl(draft, () => {
-        }, { showLabel: true }));
-      }
-      const cssInput = el("input", {
-        type: "text",
-        className: "widefat",
-        dataset: { blCssClass: "1" },
-        value: draft.css_class,
-        placeholder: t("cssClassPlaceholder", "e.g. my-field")
-      });
-      cssInput.addEventListener("input", () => {
-        draft.css_class = cssInput.value;
-      });
-      const cssWrap = el("div", { className: "bl-forms-builder__css-class" });
-      cssWrap.appendChild(el("p", {}, [el("label", { text: t("cssClass", "CSS class") }), cssInput]));
-      cssWrap.appendChild(
-        el("p", {
-          className: "description",
-          text: t("cssClassHelp", "Optional class names added to this field\u2019s wrapper.")
-        })
-      );
-      designPanel.appendChild(cssWrap);
-    }
-    if (tabIds.includes("logic")) {
-      const logicPanel = panels.logic;
-      const editor = createConditionalLogicEditor(draft, void 0, null);
-      const help = editor.querySelector(".bl-forms-builder__logic-help");
-      if (help) {
-        help.textContent = logicHelp;
-      }
-      logicPanel.appendChild(editor);
-    }
-    activate(activeTab);
-    const footer = el("div", { className: "bl-forms-builder__modal-footer" }, [
-      el("button", {
-        type: "button",
-        className: "button",
-        text: t("cancel", "Cancel"),
-        onClick: close
-      }),
-      el("button", {
-        type: "button",
-        className: "button button-primary",
-        text: t("apply", "Apply"),
-        onClick: apply
-      })
-    ]);
-    const header = el("div", { className: "bl-forms-builder__modal-header bl-forms-builder__modal-header--tabs" }, [
-      tabBar
-    ]);
-    dialog.append(header, panelsWrap, footer);
-    backdrop.appendChild(dialog);
-    document.body.appendChild(backdrop);
-  }
-  function syncWidthControlUi(scope, field) {
-    const group = scope?.querySelector("[data-bl-width-group]");
-    if (!group) {
-      return;
-    }
-    const width = field.width || "100";
-    group.querySelectorAll("[data-bl-width]").forEach((btn) => {
-      const on = btn.dataset.blWidth === width;
-      btn.classList.toggle("is-active", on);
-      btn.setAttribute("aria-pressed", on ? "true" : "false");
-    });
-    const custom = scope.querySelector("[data-bl-width-custom]");
-    if (custom) {
-      custom.hidden = width !== "custom";
-      if (width === "custom") {
-        custom.value = field.width_custom || "";
-      }
-    }
-  }
-  function createLayoutControl(field) {
-    const wrap = el("div", { className: "bl-forms-builder__layout" });
-    const active = field.layout === "horizontal" ? "horizontal" : "vertical";
-    const group = createSegmentedControl(
-      [
-        { value: "vertical", label: t("layoutVertical", "Vertical") },
-        { value: "horizontal", label: t("layoutHorizontal", "Horizontal") }
-      ],
-      active,
-      "blLayoutGroup",
-      (value) => {
-        field.layout = value;
-        document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-      }
-    );
-    group.querySelectorAll("button").forEach((btn) => {
-      btn.dataset.blLayout = btn.dataset.value;
-    });
-    wrap.append(el("label", { text: t("layout", "Layout") }), group);
-    return wrap;
-  }
-  var HEADING_LEVELS = ["h1", "h2", "h3", "h4", "h5", "h6"];
-  function normalizeHeadingLevel(field) {
-    const level = String(field.level || "h2").toLowerCase();
-    field.level = HEADING_LEVELS.includes(level) ? level : "h2";
-  }
-  function createHeadingLevelControl(field, onChange = () => {
-  }) {
-    normalizeHeadingLevel(field);
-    const wrap = el("div", { className: "bl-forms-builder__heading-level" });
-    const group = createSegmentedControl(
-      HEADING_LEVELS.map((level) => ({
-        value: level,
-        label: level.toUpperCase(),
-        dataset: { blHeadingLevel: level }
-      })),
-      field.level || "h2",
-      "blHeadingLevelGroup",
-      (value) => {
-        field.level = value;
-        onChange();
-        document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-      }
-    );
-    group.querySelectorAll("button").forEach((btn) => {
-      if (btn.dataset.value) {
-        btn.dataset.blHeadingLevel = btn.dataset.value;
-      }
-    });
-    wrap.append(el("label", { text: t("headingLevel", "Level") }), group);
-    return wrap;
-  }
-  function createAutocompleteControl(field) {
-    const select = el("select", {
-      className: "widefat",
-      dataset: { blAutocomplete: "1" }
-    });
-    const active = field.autocomplete === "off" ? "off" : "auto";
-    [
-      { value: "auto", label: t("autocompleteAutomatic", "Automatic") },
-      { value: "off", label: t("autocompleteOff", "Off") }
-    ].forEach((opt) => {
-      const option = el("option", { value: opt.value, text: opt.label });
-      if (opt.value === active) {
-        option.selected = true;
-      }
-      select.appendChild(option);
-    });
-    select.addEventListener("change", () => {
-      field.autocomplete = select.value === "off" ? "off" : "auto";
-      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    });
-    return el("p", { className: "bl-forms-builder__autocomplete bl-forms-builder__type-select" }, [
-      el("label", { text: t("autocomplete", "Autocomplete") }),
-      select
-    ]);
-  }
-  function createNumberBoundsControl(field) {
-    const minInput = el("input", {
-      type: "number",
-      className: "widefat",
-      dataset: { blMin: "1" },
-      value: field.min != null && field.min !== "" ? String(field.min) : "",
-      step: "any"
-    });
-    const maxInput = el("input", {
-      type: "number",
-      className: "widefat",
-      dataset: { blMax: "1" },
-      value: field.max != null && field.max !== "" ? String(field.max) : "",
-      step: "any"
-    });
-    const sync = () => {
-      field.min = minInput.value.trim();
-      field.max = maxInput.value.trim();
-      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    };
-    minInput.addEventListener("change", sync);
-    maxInput.addEventListener("change", sync);
-    minInput.addEventListener("blur", sync);
-    maxInput.addEventListener("blur", sync);
-    return el("div", { className: "bl-forms-builder__number-bounds" }, [
-      el("p", {}, [el("label", { text: t("minValue", "Minimum") }), minInput]),
-      el("p", {}, [el("label", { text: t("maxValue", "Maximum") }), maxInput])
-    ]);
-  }
-  function createSelectionBoundsControl(field) {
-    const parseLimit = (raw) => {
-      const next = parseInt(raw, 10);
-      return Number.isFinite(next) && next >= 1 ? Math.min(50, next) : "";
-    };
-    const minInput = el("input", {
-      type: "number",
-      className: "widefat",
-      min: "1",
-      max: "50",
-      step: "1",
-      dataset: { blMinSelections: "1" },
-      value: field.min_selections != null && field.min_selections !== "" ? String(parseLimit(field.min_selections) || "") : ""
-    });
-    const maxInput = el("input", {
-      type: "number",
-      className: "widefat",
-      min: "1",
-      max: "50",
-      step: "1",
-      dataset: { blMaxSelections: "1" },
-      value: field.max_selections != null && field.max_selections !== "" ? String(parseLimit(field.max_selections) || "") : ""
-    });
-    const sync = () => {
-      let min = parseLimit(minInput.value);
-      let max = parseLimit(maxInput.value);
-      if (min !== "" && max !== "" && min > max) {
-        [min, max] = [max, min];
-      }
-      field.min_selections = min === "" ? "" : min;
-      field.max_selections = max === "" ? "" : max;
-      minInput.value = min === "" ? "" : String(min);
-      maxInput.value = max === "" ? "" : String(max);
-      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    };
-    minInput.addEventListener("change", sync);
-    maxInput.addEventListener("change", sync);
-    minInput.addEventListener("blur", sync);
-    maxInput.addEventListener("blur", sync);
-    return el("div", { className: "bl-forms-builder__selection-bounds" }, [
-      el("div", { className: "bl-forms-builder__number-bounds" }, [
-        el("p", {}, [el("label", { text: t("minSelections", "Minimum selections") }), minInput]),
-        el("p", {}, [el("label", { text: t("maxSelections", "Maximum selections") }), maxInput])
-      ]),
-      el("p", {
-        className: "description",
-        text: t(
-          "selectionBoundsHelp",
-          "Leave empty for no limit. When the maximum is reached, further options cannot be selected."
-        )
-      })
-    ]);
-  }
-  function createPrefixSuffixControl(field) {
-    const prefixInput = el("input", {
-      type: "text",
-      className: "widefat",
-      dataset: { blPrefix: "1" },
-      value: field.prefix != null ? String(field.prefix) : ""
-    });
-    const suffixInput = el("input", {
-      type: "text",
-      className: "widefat",
-      dataset: { blSuffix: "1" },
-      value: field.suffix != null ? String(field.suffix) : ""
-    });
-    const sync = () => {
-      field.prefix = prefixInput.value;
-      field.suffix = suffixInput.value;
-      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    };
-    prefixInput.addEventListener("input", sync);
-    suffixInput.addEventListener("input", sync);
-    prefixInput.addEventListener("change", sync);
-    suffixInput.addEventListener("change", sync);
-    return el("div", { className: "bl-forms-builder__affix-bounds" }, [
-      el("p", {}, [el("label", { text: t("prefix", "Prefix") }), prefixInput]),
-      el("p", {}, [el("label", { text: t("suffix", "Suffix") }), suffixInput])
-    ]);
-  }
-  function createLengthLimitsControl(field) {
-    const minInput = el("input", {
-      type: "number",
-      className: "widefat",
-      min: "1",
-      step: "1",
-      dataset: { blMinLength: "1" },
-      value: field.min_length != null && field.min_length !== "" ? String(field.min_length) : ""
-    });
-    const maxInput = el("input", {
-      type: "number",
-      className: "widefat",
-      min: "1",
-      step: "1",
-      dataset: { blMaxLength: "1" },
-      value: field.max_length != null && field.max_length !== "" ? String(field.max_length) : ""
-    });
-    const syncShow = (checked) => {
-      field.show_char_count = !!checked;
-      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    };
-    const showSwitch = createSwitchSetting(
-      "blShowCharCount",
-      t("showCharCount", "Show character count"),
-      !!field.show_char_count,
-      syncShow
-    );
-    const showWrap = el("div", { className: "bl-forms-builder__char-count-toggle" }, [showSwitch]);
-    const showInput = showSwitch.querySelector('input[type="checkbox"]');
-    const syncVisibility = () => {
-      const max = parseInt(maxInput.value, 10);
-      const hasMax = Number.isFinite(max) && max > 0;
-      showWrap.hidden = !hasMax;
-      if (!hasMax) {
-        field.show_char_count = false;
-        if (showInput) {
-          showInput.checked = false;
-        }
-      }
-    };
-    const syncMin = () => {
-      field.min_length = minInput.value.trim();
-      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    };
-    const syncMax = () => {
-      field.max_length = maxInput.value.trim();
-      syncVisibility();
-      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    };
-    minInput.addEventListener("change", syncMin);
-    minInput.addEventListener("blur", syncMin);
-    minInput.addEventListener("input", syncMin);
-    maxInput.addEventListener("change", syncMax);
-    maxInput.addEventListener("blur", syncMax);
-    maxInput.addEventListener("input", syncMax);
-    syncVisibility();
-    return el("div", { className: "bl-forms-builder__length-limits" }, [
-      el("p", {}, [el("label", { text: t("minLength", "Minimum length") }), minInput]),
-      el("div", { className: "bl-forms-builder__length-max" }, [
-        el("p", {}, [el("label", { text: t("maxLength", "Maximum length") }), maxInput]),
-        showWrap
-      ])
-    ]);
-  }
-  function countOtherListOverviewFields(exceptId) {
-    let n = 0;
-    document.querySelectorAll(".bl-forms-builder__field[data-bl-forms-field]").forEach((row) => {
-      if (exceptId && row.dataset.fieldId === exceptId) {
-        return;
-      }
-      const input = row.querySelector("[data-bl-show-in-list]");
-      if (input && input.checked) {
-        n += 1;
-      }
-    });
-    return n;
-  }
-  function hasShowInListForType(type, exceptId = "") {
-    let found = false;
-    document.querySelectorAll(".bl-forms-builder__field[data-bl-forms-field]").forEach((row) => {
-      if (found) {
-        return;
-      }
-      if (exceptId && row.dataset.fieldId === exceptId) {
-        return;
-      }
-      if ((row.dataset.fieldType || "") !== type) {
-        return;
-      }
-      const input = row.querySelector("[data-bl-show-in-list]");
-      if (input && input.checked) {
-        found = true;
-      }
-    });
-    return found;
-  }
-  function defaultShowInListForNewField(type, exceptId = "") {
-    if (type !== "text" && type !== "email") {
-      return false;
-    }
-    if (countOtherListOverviewFields(exceptId) >= 3) {
-      return false;
-    }
-    return !hasShowInListForType(type, exceptId);
-  }
-  function createListOverviewControl(field) {
-    const input = el("input", {
-      type: "checkbox",
-      dataset: { blShowInList: "1" },
-      checked: !!field.show_in_list
-    });
-    input.addEventListener("change", () => {
-      if (input.checked && countOtherListOverviewFields(field.id) >= 3) {
-        input.checked = false;
-        window.alert(
-          t("showInListMax", "You can show at most 3 fields in the entries list.")
-        );
-        return;
-      }
-      field.show_in_list = !!input.checked;
-      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    });
-    return el("div", { className: "bl-forms-builder__switch-setting" }, [
-      el("label", { className: "bl-forms-builder__switch" }, [
-        input,
-        el("span", { className: "bl-forms-builder__switch-ui", "aria-hidden": "true" }),
-        el("span", {
-          className: "bl-forms-builder__switch-label",
-          text: t("showInList", "Show in overview")
-        })
-      ])
-    ]);
-  }
-  function createTextareaRowsControl(field) {
-    const rows = parseInt(field.rows, 10);
-    const value = Number.isFinite(rows) && rows >= 2 ? String(Math.min(50, rows)) : "5";
-    const input = el("input", {
-      type: "number",
-      className: "widefat",
-      min: "2",
-      max: "50",
-      step: "1",
-      dataset: { blRows: "1" },
-      value
-    });
-    const sync = () => {
-      const next = parseInt(input.value, 10);
-      field.rows = Number.isFinite(next) && next >= 2 ? Math.min(50, next) : 5;
-      input.value = String(field.rows);
-      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    };
-    input.addEventListener("change", sync);
-    input.addEventListener("blur", sync);
-    return el("p", {}, [el("label", { text: t("textareaRows", "Rows") }), input]);
-  }
-  function createExtensionsControl(field) {
-    const placeholder = field.type === "image" ? "jpg, jpeg, png, webp, gif, heic, avif" : "pdf, docx, xlsx, zip";
-    const input = el("input", {
-      type: "text",
-      className: "widefat",
-      dataset: { blExtensions: "1" },
-      value: field.extensions != null ? String(field.extensions) : field.type === "image" ? "jpg, jpeg, png, webp, gif, heic, avif" : "",
-      placeholder
-    });
-    const sync = () => {
-      field.extensions = input.value.trim();
-      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    };
-    input.addEventListener("input", sync);
-    input.addEventListener("change", sync);
-    input.addEventListener("blur", sync);
-    return el("div", { className: "bl-forms-builder__extensions" }, [
-      el("p", {}, [el("label", { text: t("allowedExtensions", "Allowed extensions") }), input]),
-      el("p", {
-        className: "description",
-        text: t(
-          "allowedExtensionsHelp",
-          "Comma-separated list without dots, e.g. pdf, docx, xlsx. Leave empty to allow all WordPress-permitted types."
-        )
-      })
-    ]);
-  }
-  function createMaxFilesControl(field) {
-    const raw = parseInt(field.max_files, 10);
-    const value = Number.isFinite(raw) && raw >= 1 ? String(Math.min(50, raw)) : "10";
-    const input = el("input", {
-      type: "number",
-      className: "widefat",
-      min: "1",
-      max: "50",
-      step: "1",
-      dataset: { blMaxFiles: "1" },
-      value
-    });
-    const sync = () => {
-      const next = parseInt(input.value, 10);
-      field.max_files = Number.isFinite(next) && next >= 1 ? Math.min(50, next) : 10;
-      input.value = String(field.max_files);
-      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    };
-    input.addEventListener("change", sync);
-    input.addEventListener("blur", sync);
-    return el("div", { className: "bl-forms-builder__max-files" }, [
-      el("p", {}, [el("label", { text: t("maxFiles", "Maximum files") }), input]),
-      el("p", {
-        className: "description",
-        text: t("maxFilesHelp", "Maximum number of files visitors can upload.")
-      })
-    ]);
-  }
-  function createMaxSizeControl(field) {
-    const globalMb = window.blFormsAdmin && window.blFormsAdmin.uploadMaxSizeMb || "";
-    const wpMaxLabel = window.blFormsAdmin && window.blFormsAdmin.wpMaxUploadSize || "";
-    const placeholder = globalMb !== "" ? String(globalMb) : "";
-    const help = globalMb !== "" || wpMaxLabel !== "" ? t("fieldMaxSizeHelp", "Leave empty to use the global default (%s).").replace(
-      "%s",
-      globalMb !== "" ? `${globalMb} ${t("uploadMaxSizeUnit", "MB")}` : wpMaxLabel
-    ) : t("fieldMaxSizeHelpEmpty", "Leave empty to use the global default.");
-    const input = el("input", {
-      type: "number",
-      className: "small-text",
-      min: "0.1",
-      step: "0.1",
-      dataset: { blMaxSizeMb: "1" },
-      value: field.max_size_mb != null && field.max_size_mb !== "" ? String(field.max_size_mb) : "",
-      placeholder
-    });
-    const sync = () => {
-      field.max_size_mb = input.value.trim();
-      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    };
-    input.addEventListener("input", sync);
-    input.addEventListener("change", sync);
-    return el("div", { className: "bl-forms-builder__max-size" }, [
-      el("p", {}, [
-        el("label", { text: t("fieldMaxSize", "Maximum file size") }),
-        el("span", { className: "bl-forms-builder__security-inline" }, [
-          input,
-          el("span", { text: t("uploadMaxSizeUnit", "MB") })
-        ])
-      ]),
-      el("p", { className: "description", text: help })
-    ]);
-  }
-  function createUploadButtonControl(field) {
-    const fallbacks = window.blFormsAdmin && window.blFormsAdmin.messageFallbacks || {};
-    const placeholder = fallbacks.upload_button || t("uploadButtonDefault", "Choose file");
-    const input = el("input", {
-      type: "text",
-      className: "widefat",
-      value: field.button_text || "",
-      placeholder,
-      dataset: { blUploadButton: "1" }
-    });
-    input.addEventListener("input", () => {
-      field.button_text = input.value;
-      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    });
-    return el("p", {}, [
-      el("label", { text: t("uploadButtonText", "Button label") }),
-      input
-    ]);
-  }
-  function createUploadAppearanceControls(field) {
-    if (field.upload_style !== "classic" && field.upload_style !== "modern") {
-      field.upload_style = "modern";
-    }
-    if (field.preview === void 0) {
-      field.preview = true;
-    }
-    const styleSelect = el("select", {
-      className: "widefat",
-      dataset: { blUploadStyle: "1" },
-      "aria-label": t("uploadStyle", "Style")
-    });
-    [
-      { id: "modern", label: t("uploadStyleModern", "Modern") },
-      { id: "classic", label: t("uploadStyleClassic", "Classic") }
-    ].forEach((opt) => {
-      const option = el("option", { value: opt.id, text: opt.label });
-      if (field.upload_style === opt.id) {
-        option.selected = true;
-      }
-      styleSelect.appendChild(option);
-    });
-    const previewWrap = el("div", { className: "bl-forms-builder__upload-preview-setting" });
-    const syncPreviewVisibility = () => {
-      previewWrap.hidden = field.upload_style !== "modern";
-    };
-    const previewSwitch = createSwitchSetting(
-      "blPreview",
-      t("showUploadPreview", "Show file preview"),
-      field.preview !== false,
-      (checked) => {
-        field.preview = checked;
-        document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-      }
-    );
-    previewWrap.appendChild(previewSwitch);
-    styleSelect.addEventListener("change", () => {
-      field.upload_style = styleSelect.value === "classic" ? "classic" : "modern";
-      if (field.upload_style === "modern" && field.preview === void 0) {
-        field.preview = true;
-      }
-      syncPreviewVisibility();
-      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    });
-    syncPreviewVisibility();
-    return el("div", { className: "bl-forms-builder__upload-appearance" }, [
-      el("p", { className: "bl-forms-builder__type-select" }, [
-        el("label", { text: t("uploadStyle", "Style") }),
-        styleSelect
-      ]),
-      previewWrap
-    ]);
-  }
-  function temporalInputType(type) {
-    if (type === "time") {
-      return "time";
-    }
-    if (type === "datetime") {
-      return "datetime-local";
-    }
-    return "date";
-  }
-  function temporalBoundModes(type, { emptyLabel } = {}) {
-    const none = {
-      id: "",
-      label: emptyLabel || t("boundNone", "No limit")
-    };
-    if (type === "time") {
-      return [
-        none,
-        { id: "fixed", label: t("boundFixedTime", "Fixed time") },
-        { id: "today", label: t("boundNow", "Now") },
-        { id: "hour", label: t("boundCurrentHour", "Current hour") },
-        { id: "offset", label: t("boundNowOffset", "Minutes relative to now") }
-      ];
-    }
-    if (type === "datetime") {
-      return [
-        none,
-        { id: "fixed", label: t("boundFixedDatetime", "Fixed date & time") },
-        { id: "today", label: t("boundNow", "Now") },
-        { id: "offset", label: t("boundTodayOffset", "Days relative to today") }
-      ];
-    }
-    return [
-      none,
-      { id: "fixed", label: t("boundFixedDate", "Fixed date") },
-      { id: "today", label: t("boundToday", "Today") },
-      { id: "offset", label: t("boundTodayOffset", "Days relative to today") }
-    ];
-  }
-  function createTemporalModeControl(field, which, options = {}) {
-    const type = field.type;
-    const modeKey = `${which}_mode`;
-    const offsetKey = `${which}_offset`;
-    const valueKey = which === "default" ? "default_value" : which;
-    const datasetMode = which === "min" ? "blMinMode" : which === "max" ? "blMaxMode" : "blDefaultMode";
-    const datasetValue = which === "min" ? "blMin" : which === "max" ? "blMax" : "blDefault";
-    const datasetOffset = which === "min" ? "blMinOffset" : which === "max" ? "blMaxOffset" : "blDefaultOffset";
-    if (which === "default" && !field[modeKey] && field[valueKey] != null && String(field[valueKey]).trim() !== "") {
-      field[modeKey] = "fixed";
-    }
-    if (field[modeKey] == null) {
-      field[modeKey] = "";
-    }
-    if (field[offsetKey] == null || field[offsetKey] === "") {
-      field[offsetKey] = 0;
-    }
-    const modeSelect = el("select", {
-      className: "widefat",
-      dataset: { [datasetMode]: "1" }
-    });
-    temporalBoundModes(type, { emptyLabel: options.emptyLabel }).forEach((mode) => {
-      const option = el("option", { value: mode.id, text: mode.label });
-      if ((field[modeKey] || "") === mode.id) {
-        option.selected = true;
-      }
-      modeSelect.appendChild(option);
-    });
-    const fixedInput = el("input", {
-      type: temporalInputType(type),
-      className: "widefat bl-forms-builder__temporal-fixed",
-      dataset: { [datasetValue]: "1" },
-      value: field[valueKey] != null && field[valueKey] !== "" ? String(field[valueKey]) : ""
-    });
-    const offsetInput = el("input", {
-      type: "number",
-      className: "small-text bl-forms-builder__temporal-offset",
-      dataset: { [datasetOffset]: "1" },
-      step: "1",
-      value: String(field[offsetKey] ?? 0)
-    });
-    const extras = el("div", { className: "bl-forms-builder__temporal-extras" });
-    const emit = () => {
-      if (typeof options.onChange === "function") {
-        options.onChange();
-      }
-      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    };
-    const syncExtras = () => {
-      const mode = field[modeKey] || "";
-      extras.replaceChildren();
-      if (mode === "fixed") {
-        extras.appendChild(fixedInput);
-      } else if (mode === "offset") {
-        const unit = type === "time" ? t("boundMinutes", "minutes") : t("boundDays", "days");
-        const prefix = type === "time" ? t("boundNowPlus", "Now \xB1") : t("boundTodayPlus", "Today \xB1");
-        extras.appendChild(
-          el("div", { className: "bl-forms-builder__temporal-offset-row" }, [
-            el("span", { text: prefix }),
-            offsetInput,
-            el("span", { text: unit })
-          ])
-        );
-      }
-    };
-    modeSelect.addEventListener("change", () => {
-      field[modeKey] = modeSelect.value || "";
-      if (!field[modeKey]) {
-        field[valueKey] = "";
-      }
-      syncExtras();
-      emit();
-    });
-    fixedInput.addEventListener("change", () => {
-      field[valueKey] = fixedInput.value;
-      emit();
-    });
-    fixedInput.addEventListener("input", () => {
-      field[valueKey] = fixedInput.value;
-    });
-    offsetInput.addEventListener("input", () => {
-      const n = parseInt(offsetInput.value, 10);
-      field[offsetKey] = Number.isFinite(n) ? n : 0;
-      emit();
-    });
-    syncExtras();
-    const nodes = [modeSelect, extras];
-    if (options.label) {
-      nodes.unshift(el("label", { text: options.label }));
-    }
-    return el("p", { className: "bl-forms-builder__temporal-side" }, nodes);
-  }
-  function createTemporalBoundsControl(field) {
-    return el("div", { className: "bl-forms-builder__temporal-bounds" }, [
-      createTemporalModeControl(field, "min", { label: t("minValue", "Minimum") }),
-      createTemporalModeControl(field, "max", { label: t("maxValue", "Maximum") })
-    ]);
-  }
-  function siblingTemporalFields(field) {
-    const config = readConfig();
-    return flattenFields(config.fields || []).filter(
-      (item) => item && item.type === field.type && item.id !== field.id && String(item.name || "").trim() !== ""
-    );
-  }
-  function createTemporalRelationControl(field) {
-    const siblings = siblingTemporalFields(field);
-    if (siblings.length === 0) {
-      return null;
-    }
-    let relation = String(field.relation || "none");
-    if (!["none", "before", "after"].includes(relation)) {
-      relation = "none";
-    }
-    field.relation = relation;
-    const wrap = el("div", { className: "bl-forms-builder__date-relation" });
-    const modeSelect = el("select", {
-      className: "widefat",
-      dataset: { blRelation: "1" },
-      "aria-label": t("dateRelation", "Relation")
-    });
-    [
-      { value: "none", label: t("dateRelationNone", "No relation") },
-      { value: "before", label: t("dateRelationBefore", "Must be before") },
-      { value: "after", label: t("dateRelationAfter", "Must be after") }
-    ].forEach((item) => {
-      const option = el("option", { value: item.value, text: item.label });
-      if (item.value === relation) {
-        option.selected = true;
-      }
-      modeSelect.appendChild(option);
-    });
-    const fieldSelect = el("select", {
-      className: "widefat",
-      dataset: { blRelationField: "1" },
-      "aria-label": t("dateRelationSelect", "Select field")
-    });
-    fieldSelect.appendChild(
-      el("option", { value: "", text: t("dateRelationSelect", "Select field") })
-    );
-    const currentRelated = String(field.relation_field || "");
-    siblings.forEach((item) => {
-      const value = String(item.name || "");
-      const label = String(item.label || item.name || value).trim() || value;
-      const option = el("option", { value, text: label });
-      if (value === currentRelated) {
-        option.selected = true;
-      }
-      fieldSelect.appendChild(option);
-    });
-    if (currentRelated && !siblings.some((item) => String(item.name || "") === currentRelated)) {
-      field.relation_field = "";
-      fieldSelect.value = "";
-    }
-    const fieldWrap = el("div", { className: "bl-forms-builder__date-relation-field" }, [fieldSelect]);
-    const syncUi = () => {
-      fieldWrap.hidden = (field.relation || "none") === "none";
-    };
-    const notify = () => document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    modeSelect.addEventListener("change", () => {
-      field.relation = modeSelect.value || "none";
-      if (field.relation === "none") {
-        field.relation_field = "";
-        fieldSelect.value = "";
-      }
-      syncUi();
-      notify();
-    });
-    fieldSelect.addEventListener("change", () => {
-      field.relation_field = fieldSelect.value || "";
-      notify();
-    });
-    wrap.append(
-      el("p", {}, [el("label", { text: t("dateRelation", "Relation") }), modeSelect]),
-      fieldWrap
-    );
-    syncUi();
-    return wrap;
-  }
-  function createCssClassControl(field) {
-    const input = el("input", {
-      type: "text",
-      className: "widefat",
-      dataset: { blCssClass: "1" },
-      value: field.css_class || "",
-      placeholder: t("cssClassPlaceholder", "e.g. my-field")
-    });
-    input.addEventListener("input", () => {
-      field.css_class = input.value;
-    });
-    const wrap = el("div", { className: "bl-forms-builder__css-class" });
-    wrap.appendChild(el("p", {}, [el("label", { text: t("cssClass", "CSS class") }), input]));
-    wrap.appendChild(
-      el("p", {
-        className: "description",
-        text: t("cssClassHelp", "Optional class names added to this field\u2019s wrapper.")
-      })
-    );
-    return wrap;
-  }
-  function widthBadgeLabel(field) {
-    const width = field.width || "100";
-    if (width === "100") {
-      return "";
-    }
-    if (width === "auto") {
-      return t("widthAuto", "Auto");
-    }
-    if (width === "custom") {
-      return (field.width_custom || "").trim();
-    }
-    return `${width}%`;
-  }
-  function settingHeading(text) {
-    return el("p", { className: "bl-forms-builder__setting-heading", text });
-  }
-  function createCheckboxSetting(key, label, checked, onChange) {
-    const input = el("input", {
-      type: "checkbox",
-      dataset: { [key]: "1" },
-      checked: !!checked
-    });
-    input.addEventListener("change", () => onChange(input.checked));
-    return el("p", { className: "bl-forms-builder__check-setting" }, [
-      el("label", {}, [input, " " + label])
-    ]);
-  }
-  function createSwitchSetting(key, label, checked, onChange) {
-    const input = el("input", {
-      type: "checkbox",
-      dataset: { [key]: "1" },
-      checked: !!checked
-    });
-    input.addEventListener("change", () => onChange(input.checked));
-    return el("div", { className: "bl-forms-builder__switch-setting" }, [
-      el("label", { className: "bl-forms-builder__switch" }, [
-        input,
-        el("span", { className: "bl-forms-builder__switch-ui", "aria-hidden": "true" }),
-        el("span", { className: "bl-forms-builder__switch-label", text: label })
-      ])
-    ]);
-  }
-  function isDefaultChecked(value) {
-    return value === true || value === 1 || value === "1" || value === "true" || value === "yes";
-  }
-  function defaultInputType(type) {
-    switch (type) {
-      case "number":
-        return "number";
-      case "email":
-        return "email";
-      case "url":
-        return "url";
-      case "phone":
-        return "tel";
-      case "date":
-        return "date";
-      case "time":
-        return "time";
-      case "datetime":
-        return "datetime-local";
-      default:
-        return "text";
-    }
-  }
-  function isValidDefaultValue(type, value) {
-    const v = String(value || "").trim();
-    if (v === "") {
-      return true;
-    }
-    if (type === "number") {
-      return v !== "" && !Number.isNaN(Number(v)) && /^-?\d+(\.\d+)?$/.test(v);
-    }
-    if (type === "email") {
-      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-    }
-    if (type === "url") {
-      try {
-        const parsed = new URL(v, window.location.origin);
-        return parsed.protocol === "http:" || parsed.protocol === "https:";
-      } catch (err) {
-        return false;
-      }
-    }
-    if (type === "phone") {
-      if (!/^\+?[\d\s.\-()]{6,}$/.test(v)) {
-        return false;
-      }
-      const digits = v.replace(/\D+/g, "");
-      return digits.length >= 6 && digits.length <= 20;
-    }
-    if (type === "date") {
-      return /^\d{4}-\d{2}-\d{2}$/.test(v) && !Number.isNaN(Date.parse(v));
-    }
-    if (type === "time") {
-      return /^\d{2}:\d{2}(:\d{2})?$/.test(v);
-    }
-    if (type === "datetime") {
-      return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(v);
-    }
-    return true;
-  }
-  function normalizeDefaultValue(type, value) {
-    const v = String(value || "").trim();
-    if (v === "" || isValidDefaultValue(type, v)) {
-      return v;
-    }
-    return "";
-  }
-  function createDefaultValueControl(field, updatePreview) {
-    if (NO_DEFAULT.includes(field.type) || field.type === "hidden") {
-      return null;
-    }
-    if (CHECKED_DEFAULT_TYPES.includes(field.type)) {
-      return [
-        createCheckboxSetting(
-          "blDefault",
-          t("defaultChecked", "Checked by default"),
-          isDefaultChecked(field.default_value),
-          (checked) => {
-            field.default_value = checked ? "1" : "";
-            document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-          }
-        )
-      ];
-    }
-    if (["date", "time", "datetime"].includes(field.type)) {
-      return [
-        createTemporalModeControl(field, "default", {
-          label: t("defaultValue", "Default value"),
-          emptyLabel: t("defaultNone", "None"),
-          onChange: updatePreview
-        })
-      ];
-    }
-    field.default_value = normalizeDefaultValue(field.type, field.default_value || "");
-    const def = field.type === "textarea" ? el("textarea", {
-      className: "widefat",
-      rows: "2",
-      dataset: { blDefault: "1" }
-    }) : el("input", {
-      type: defaultInputType(field.type),
-      className: "widefat",
-      dataset: { blDefault: "1" },
-      value: field.default_value || ""
-    });
-    if (field.type === "textarea") {
-      def.value = field.default_value || "";
-    }
-    if (field.type === "number") {
-      def.setAttribute("step", "any");
-      def.setAttribute("inputmode", "decimal");
-    }
-    const commit = () => {
-      const next = normalizeDefaultValue(field.type, def.value);
-      if (next !== def.value) {
-        def.value = next;
-      }
-      field.default_value = next;
-      updatePreview();
-      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    };
-    def.addEventListener("input", () => {
-      if (["text", "textarea", "phone"].includes(field.type) || OPTION_TYPES.includes(field.type)) {
-        field.default_value = def.value;
-        updatePreview();
-        return;
-      }
-      field.default_value = def.value;
-      updatePreview();
-    });
-    def.addEventListener("change", commit);
-    def.addEventListener("blur", commit);
-    const nodes = [el("p", {}, [el("label", { text: t("defaultValue", "Default value") }), def])];
-    if (OPTION_TYPES.includes(field.type)) {
-      nodes.push(
-        el("p", {
-          className: "description",
-          text: t(
-            "defaultValueOptionsHelp",
-            "Use option slugs from the list above. For multiple values, separate with commas (e.g. option-1, option-2)."
-          )
-        })
-      );
-    }
-    return nodes;
-  }
-  function appearancePayload(scope, width, widthCustom) {
-    return {
-      width,
-      width_custom: width === "custom" ? widthCustom : "",
-      css_class: scope.querySelector("[data-bl-css-class]")?.value || ""
-    };
-  }
-  function withConditionalLogic(body, data) {
-    const row = body?.closest?.("[data-bl-forms-field]") || body;
-    const live = row && row._blFieldRef ? row._blFieldRef.conditional_logic : null;
-    if (live && typeof live === "object") {
-      const normalized = normalizeConditionalLogic(live);
-      if (normalized.enabled || normalized.groups.length) {
-        data.conditional_logic = normalized;
-        return data;
-      }
-    }
-    const logic = readConditionalLogicFromDom(body);
-    if (logic) {
-      const normalized = normalizeConditionalLogic(logic);
-      if (normalized.enabled || normalized.groups.length) {
-        data.conditional_logic = normalized;
-      }
-    }
-    return data;
-  }
-  function createFieldEditorTabs(activeId = "general") {
-    const tabBar = el("nav", {
-      className: "bl-forms-builder__field-tabs",
-      role: "tablist"
-    });
-    const panelsWrap = el("div", { className: "bl-forms-builder__field-panels" });
-    const tabDefs = [
-      { id: "general", label: t("fieldTabGeneral", "General") },
-      { id: "advanced", label: t("fieldTabAdvanced", "Advanced") },
-      { id: "appearance", label: t("fieldTabAppearance", "Appearance") },
-      { id: "logic", label: t("fieldTabLogic", "Logic") }
-    ];
-    const initialId = tabDefs.some((tab) => tab.id === activeId) ? activeId : "general";
-    const tabs = tabDefs.map((tab) => {
-      const active = tab.id === initialId;
-      const panel = el("div", {
-        className: "bl-forms-builder__field-panel" + (active ? " is-active" : ""),
-        dataset: { blFieldPanel: tab.id },
-        role: "tabpanel"
-      });
-      if (!active) {
-        panel.hidden = true;
-      }
-      panelsWrap.appendChild(panel);
-      const button = el("button", {
-        type: "button",
-        className: "bl-forms-builder__field-tab" + (active ? " is-active" : ""),
-        role: "tab",
-        text: tab.label,
-        dataset: { blFieldTab: tab.id },
-        onClick: () => activate(tab.id)
-      });
-      button.setAttribute("aria-selected", active ? "true" : "false");
-      tabBar.appendChild(button);
-      return { ...tab, button, panel };
-    });
-    const activate = (id) => {
-      tabs.forEach((tab) => {
-        if (tab.button.hidden) {
-          tab.panel.hidden = true;
-          tab.panel.classList.remove("is-active");
-          tab.button.classList.remove("is-active");
-          tab.button.setAttribute("aria-selected", "false");
-          return;
-        }
-        const active = tab.id === id;
-        tab.button.classList.toggle("is-active", active);
-        tab.button.setAttribute("aria-selected", active ? "true" : "false");
-        tab.panel.hidden = !active;
-        tab.panel.classList.toggle("is-active", active);
-      });
-      if (id === "logic") {
-        tabs[3].panel.querySelectorAll(".bl-forms-builder__logic").forEach((node) => {
-          if (typeof node.refreshLogicSources === "function") {
-            node.refreshLogicSources();
-          }
-        });
-      }
-    };
-    const wrap = el("div", { className: "bl-forms-builder__field-editor" }, [tabBar, panelsWrap]);
-    return {
-      wrap,
-      general: tabs[0].panel,
-      advanced: tabs[1].panel,
-      appearance: tabs[2].panel,
-      logic: tabs[3].panel,
-      /**
-       * Hide tabs whose panels have no sections, and activate a visible tab if needed.
-       */
-      syncVisibility(preferredId = initialId) {
-        tabs.forEach((tab) => {
-          const empty = tab.panel.childElementCount === 0;
-          tab.button.hidden = empty;
-          if (empty) {
-            tab.panel.hidden = true;
-            tab.panel.classList.remove("is-active");
-            tab.button.classList.remove("is-active");
-            tab.button.setAttribute("aria-selected", "false");
-          }
-        });
-        const visible = tabs.filter((tab) => !tab.button.hidden);
-        tabBar.hidden = visible.length <= 1;
-        if (visible.length === 0) {
-          return;
-        }
-        const preferred = visible.find((tab) => tab.id === preferredId) || visible[0];
-        activate(preferred.id);
-      }
-    };
-  }
-  function createSectionAppender(panel) {
-    let count = 0;
-    return {
-      get count() {
-        return count;
-      },
-      add(...nodes) {
-        const list = nodes.flat().filter(Boolean);
-        if (!list.length) {
-          return;
-        }
-        panel.appendChild(el("div", { className: "bl-forms-builder__field-section" }, list));
-        count += 1;
-      }
-    };
-  }
-  function serializeRow(row) {
-    const layoutData = serializeLayoutRow(row);
-    if (layoutData) {
-      return layoutData;
-    }
-    const type = row.dataset.fieldType || "text";
-    const id = row.dataset.fieldId || uid();
-    const body = row.querySelector(":scope > .bl-forms-builder__field-body") || row;
-    const q = (sel) => body.querySelector(sel);
-    const widthBtn = q("[data-bl-width].is-active");
-    const width = widthBtn?.dataset.blWidth || row.dataset.fieldWidth || "100";
-    const widthCustom = q("[data-bl-width-custom]")?.value || "";
-    const nameManual = row.dataset.nameManual === "1";
-    const hideLabel = Boolean(q("[data-bl-hide-label]")?.checked);
-    const activeInput = q("[data-bl-active]");
-    const active = activeInput ? Boolean(activeInput.checked) : true;
-    if (type === "divider") {
-      const marginBtn = q("[data-bl-margin].is-active");
-      const margin = marginBtn?.dataset.blMargin || row.dataset.fieldMargin || "m";
-      const marginCustom = q("[data-bl-margin-custom]")?.value || "";
-      return withConditionalLogic(body, {
-        id,
-        type,
-        active,
-        margin,
-        margin_custom: margin === "custom" ? marginCustom : "",
-        css_class: q("[data-bl-css-class]")?.value || ""
-      });
-    }
-    if (type === "captcha") {
-      return withConditionalLogic(body, {
-        id,
-        type,
-        active,
-        ...appearancePayload(body, width, widthCustom)
-      });
-    }
-    if (type === "spacer") {
-      const heightBtn = q("[data-bl-height].is-active");
-      const height = heightBtn?.dataset.blHeight || row.dataset.fieldHeight || "m";
-      const heightCustom = q("[data-bl-height-custom]")?.value || "";
-      return withConditionalLogic(body, {
-        id,
-        type,
-        active,
-        height,
-        height_custom: height === "custom" ? heightCustom : "",
-        css_class: q("[data-bl-css-class]")?.value || ""
-      });
-    }
-    if (type === "heading") {
-      const levelBtn = q("[data-bl-heading-level].is-active");
-      const level = levelBtn?.dataset.blHeadingLevel || "h2";
-      return withConditionalLogic(body, {
-        id,
-        type,
-        active,
-        content: q("[data-bl-content]")?.value || "",
-        level: HEADING_LEVELS.includes(level) ? level : "h2",
-        ...appearancePayload(body, width, widthCustom)
-      });
-    }
-    if (type === "text_block" || type === "html") {
-      return withConditionalLogic(body, {
-        id,
-        type,
-        active,
-        content: q("[data-bl-content]")?.value || "",
-        ...appearancePayload(body, width, widthCustom)
-      });
-    }
-    if (type === "honeypot") {
-      return withConditionalLogic(body, {
-        id,
-        type,
-        active,
-        label: q("[data-bl-label]")?.value || "",
-        name: q("[data-bl-name]")?.value || id,
-        name_manual: nameManual,
-        hide_label: hideLabel,
-        ...appearancePayload(body, width, widthCustom)
-      });
-    }
-    if (type === "hidden") {
-      return withConditionalLogic(body, {
-        id,
-        type,
-        active,
-        label: q("[data-bl-label]")?.value || "",
-        name: q("[data-bl-name]")?.value || id,
-        name_manual: nameManual,
-        hide_label: hideLabel,
-        default_value: q("[data-bl-default]")?.value || "",
-        ...appearancePayload(body, "100", "")
-      });
-    }
-    const data = {
-      id,
-      type,
-      active,
-      label: q("[data-bl-label]")?.value || "",
-      name: q("[data-bl-name]")?.value || id,
-      name_manual: nameManual,
-      hide_label: hideLabel,
-      required: Boolean(q("[data-bl-required]")?.checked),
-      readonly: Boolean(q("[data-bl-readonly]")?.checked),
-      disabled: Boolean(q("[data-bl-disabled]")?.checked),
-      placeholder: q("[data-bl-placeholder]")?.value || "",
-      ...appearancePayload(body, width, widthCustom)
-    };
-    if (DESCRIPTION_TYPES.includes(type)) {
-      data.description = q("[data-bl-description]")?.value || "";
-    }
-    if (type === "terms") {
-      data.content = q("[data-bl-content]")?.value || "";
-    }
-    if (OPTION_TYPES.includes(type)) {
-      data.options = Array.from(body.querySelectorAll("[data-bl-option]")).map((opt) => ({
-        label: opt.querySelector("[data-bl-opt-label]")?.value || "",
-        value: opt.querySelector("[data-bl-opt-value]")?.value || ""
-      }));
-    }
-    if (type === "radio" || type === "checkboxes") {
-      const layoutBtn = q("[data-bl-layout].is-active");
-      data.layout = layoutBtn?.dataset.blLayout === "horizontal" ? "horizontal" : "vertical";
-    }
-    if (type === "checkboxes") {
-      const parseLimit = (raw) => {
-        const next = parseInt(raw, 10);
-        return Number.isFinite(next) && next >= 1 ? Math.min(50, next) : "";
-      };
-      let min = parseLimit(q("[data-bl-min-selections]")?.value?.trim());
-      let max = parseLimit(q("[data-bl-max-selections]")?.value?.trim());
-      if (min !== "" && max !== "" && min > max) {
-        [min, max] = [max, min];
-      }
-      data.min_selections = min;
-      data.max_selections = max;
-    }
-    if (MULTIPLE_TYPES.includes(type)) {
-      data.multiple = Boolean(q("[data-bl-multiple]")?.checked);
-    }
-    if (type === "file" || type === "image") {
-      data.extensions = q("[data-bl-extensions]")?.value?.trim() || "";
-      data.upload_style = q("[data-bl-upload-style]")?.value === "classic" ? "classic" : "modern";
-      data.preview = data.upload_style === "modern" ? Boolean(q("[data-bl-preview]")?.checked) : false;
-      data.button_text = q("[data-bl-upload-button]")?.value?.trim() || "";
-      data.max_size_mb = q("[data-bl-max-size-mb]")?.value?.trim() || "";
-      if (data.multiple) {
-        const rawMax = q("[data-bl-max-files]")?.value?.trim();
-        const parsed = parseInt(rawMax, 10);
-        data.max_files = Number.isFinite(parsed) && parsed >= 1 ? Math.min(50, parsed) : 10;
-      }
-    }
-    if (AUTOCOMPLETE_TYPES.includes(type)) {
-      const ac = q("[data-bl-autocomplete]");
-      data.autocomplete = ac?.value === "off" ? "off" : "auto";
-    }
-    if (AFFIX_TYPES.includes(type)) {
-      data.prefix = q("[data-bl-prefix]")?.value ?? "";
-      data.suffix = q("[data-bl-suffix]")?.value ?? "";
-    }
-    if (type === "number") {
-      data.min = q("[data-bl-min]")?.value?.trim() || "";
-      data.max = q("[data-bl-max]")?.value?.trim() || "";
-    }
-    if (type === "text" || type === "textarea") {
-      data.min_length = q("[data-bl-min-length]")?.value?.trim() || "";
-      data.max_length = q("[data-bl-max-length]")?.value?.trim() || "";
-      data.show_char_count = Boolean(q("[data-bl-show-char-count]")?.checked);
-    }
-    if (type === "text" || type === "email" || type === "phone") {
-      data.show_in_list = Boolean(q("[data-bl-show-in-list]")?.checked);
-    }
-    if (type === "textarea") {
-      const rawRows = parseInt(q("[data-bl-rows]")?.value, 10);
-      data.rows = Number.isFinite(rawRows) && rawRows >= 2 ? Math.min(50, rawRows) : 5;
-    }
-    if (type === "date" || type === "time" || type === "datetime") {
-      data.placeholder = "";
-      const readSide = (which) => {
-        const modeSel = which === "min" ? "[data-bl-min-mode]" : which === "max" ? "[data-bl-max-mode]" : "[data-bl-default-mode]";
-        const valueSel = which === "min" ? "[data-bl-min]" : which === "max" ? "[data-bl-max]" : "[data-bl-default]";
-        const offsetSel = which === "min" ? "[data-bl-min-offset]" : which === "max" ? "[data-bl-max-offset]" : "[data-bl-default-offset]";
-        const valueKey = which === "default" ? "default_value" : which;
-        const mode = q(modeSel)?.value || "";
-        if (!mode) {
-          if (which === "default") {
-            data.default_value = "";
-          }
-          return;
-        }
-        data[`${which}_mode`] = mode;
-        if (mode === "fixed") {
-          data[valueKey] = q(valueSel)?.value?.trim() || "";
-        }
-        if (mode === "offset") {
-          const raw = q(offsetSel)?.value;
-          const n = parseInt(raw, 10);
-          data[`${which}_offset`] = Number.isFinite(n) ? n : 0;
-        }
-      };
-      readSide("min");
-      readSide("max");
-      readSide("default");
-      const relation = q("[data-bl-relation]")?.value || "none";
-      if (relation === "before" || relation === "after") {
-        data.relation = relation;
-        data.relation_field = q("[data-bl-relation-field]")?.value || "";
-        if (!data.relation_field) {
-          data.relation = "none";
-          data.relation_field = "";
-        }
-      } else {
-        data.relation = "none";
-        data.relation_field = "";
-      }
-    }
-    if (NO_READONLY.includes(type)) {
-      delete data.readonly;
-    }
-    if (NO_DISABLED.includes(type)) {
-      delete data.disabled;
-    }
-    if (NO_REQUIRED.includes(type)) {
-      delete data.required;
-    }
-    if (!NO_DEFAULT.includes(type) && type !== "date" && type !== "time" && type !== "datetime") {
-      const defEl = q("[data-bl-default]");
-      if (defEl) {
-        data.default_value = defEl.type === "checkbox" ? defEl.checked ? "1" : "" : defEl.value || "";
-      }
-    }
-    return withConditionalLogic(body, data);
-  }
-  function duplicateFieldCard(row) {
-    if (!row) {
-      return;
-    }
-    const data = serializeRow(row);
-    if (!data) {
-      return;
-    }
-    const clone = cloneFieldData(data);
-    const copy = createFieldCard(clone, false);
-    row.after(copy);
-    if ((copy.dataset.fieldType || "") === "column") {
-      const list = row.parentElement;
-      if (list) {
-        equalizeColumnRun(list, copy);
-      }
-    }
-    document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-  }
-  function createFieldCard(initial, open = false) {
-    if ((initial?.type || "") === "column") {
-      return createColumnCard(initial, open);
-    }
-    if ((initial?.type || "") === "section") {
-      return createSectionCard(initial, open);
-    }
-    let field = {
-      width: "100",
-      width_custom: "",
-      hide_label: false,
-      active: true,
-      ...initial,
-      id: initial.id || uid(),
-      name_manual: initial.name_manual != null ? !!initial.name_manual : true
-    };
-    if (field.active === void 0) {
-      field.active = true;
-    }
-    if (field.type === "terms" && field.content == null && field.label) {
-      field = { ...field, content: field.label, label: "" };
-    }
-    if (field.type === "spacer") {
-      normalizeSpacerHeight(field);
-    }
-    if (field.type === "divider") {
-      normalizeDividerMargin(field);
-    }
-    if (field.type === "heading") {
-      normalizeHeadingLevel(field);
-    }
-    if (NAMED_TYPES.includes(field.type) && !field.name) {
-      field.name = uniqueFieldName(field.label || field.type, field.id);
-    }
-    if ((field.type === "text" || field.type === "email") && field.show_in_list === void 0) {
-      field.show_in_list = defaultShowInListForNewField(field.type, field.id);
-    }
-    const row = el("div", {
-      className: "bl-forms-builder__field" + (open ? " is-open" : ""),
-      dataset: {
-        blFormsField: "1",
-        fieldId: field.id,
-        fieldType: field.type,
-        fieldWidth: field.width || "100",
-        fieldHeight: field.type === "spacer" ? field.height || "m" : "",
-        fieldMargin: field.type === "divider" ? field.margin || "m" : "",
-        fieldName: field.name || "",
-        nameManual: field.name_manual ? "1" : "0"
-      }
-    });
-    row._blFieldRef = field;
-    const preview = el("span", { className: "bl-forms-builder__preview" });
-    const widthBadge = el("span", { className: "bl-forms-builder__width-badge" });
-    const activateBtn = el("button", {
-      type: "button",
-      className: "bl-forms-builder__icon-btn bl-forms-builder__activate-btn",
-      title: t("fieldActivateTitle", "Show on the frontend"),
-      "aria-label": t("fieldActivateTitle", "Show on the frontend"),
-      hidden: fieldIsActive(field),
-      onClick: (evt) => {
-        evt.preventDefault();
-        evt.stopPropagation();
-        field.active = true;
-        const activeInput = body.querySelector("[data-bl-active]");
-        if (activeInput) {
-          activeInput.checked = true;
-        }
-        updatePreview();
-        document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-      }
-    });
-    activateBtn.appendChild(iconEl("inactive", "bl-forms-builder__activate-btn-icon"));
-    const typeChip = el("span", { className: "bl-forms-builder__field-type" });
-    const body = el("div", { className: "bl-forms-builder__field-body" });
-    const updatePreview = () => {
-      let title = (field.label || field.placeholder || "").trim();
-      if (field.type === "captcha") {
-        title = typeLabel("captcha");
-      } else if (field.type === "spacer") {
-        const height = field.height || "m";
-        title = height === "custom" ? (field.height_custom || t("widthCustom", "Custom")).trim() : height.toUpperCase();
-      } else if (field.type === "divider") {
-        const margin = field.margin || "m";
-        if (margin === "custom") {
-          title = (field.margin_custom || t("widthCustom", "Custom")).trim();
-        } else {
-          const preset = DIVIDER_MARGIN_PRESETS.find((item) => item.value === margin);
-          title = preset?.label || margin.toUpperCase();
-        }
-      } else if (field.type === "heading" || field.type === "text_block" || field.type === "html") {
-        title = (field.content || "").trim();
-      }
-      preview.textContent = title;
-      preview.hidden = title === "";
-      const widthText = field.type === "hidden" || field.type === "divider" || field.type === "spacer" ? "" : widthBadgeLabel(field);
-      widthBadge.textContent = widthText;
-      widthBadge.hidden = widthText === "";
-      widthBadge.classList.toggle("is-interactive", widthText !== "");
-      if (widthText !== "") {
-        widthBadge.title = t("width", "Width");
-      } else {
-        widthBadge.removeAttribute("title");
-      }
-      const active = fieldIsActive(field);
-      row.classList.toggle("is-inactive", !active);
-      activateBtn.hidden = active;
-      const typeChildren = [
-        iconEl(field.type, "bl-forms-builder__field-type-icon"),
-        el("span", { className: "bl-forms-builder__field-type-label", text: typeLabel(field.type) })
-      ];
-      if (field.required && !NO_REQUIRED.includes(field.type)) {
-        typeChildren.push(
-          el("span", {
-            className: "bl-forms-builder__field-required-dot",
-            title: t("required", "Required"),
-            "aria-label": t("required", "Required")
-          })
-        );
-      }
-      const logic = field.conditional_logic;
-      if (logic && logic.enabled && Array.isArray(logic.groups) && logic.groups.length > 0) {
-        typeChildren.push(
-          el("span", {
-            className: "bl-forms-builder__field-logic-dot",
-            title: t("logicEnable", "Conditional logic"),
-            "aria-label": t("logicEnable", "Conditional logic")
-          })
-        );
-      }
-      typeChip.replaceChildren(...typeChildren);
-      row.dataset.fieldType = field.type;
-      row.dataset.fieldWidth = field.width || "100";
-      row.dataset.fieldHeight = field.type === "spacer" ? field.height || "m" : "";
-      row.dataset.fieldMargin = field.type === "divider" ? field.margin || "m" : "";
-      row.dataset.fieldName = field.name || "";
-      row.dataset.nameManual = field.name_manual ? "1" : "0";
-    };
-    const setOpen = (nextOpen) => {
-      if (nextOpen) {
-        document.querySelectorAll(".bl-forms-builder__field.is-open").forEach((other) => {
-          if (other === row) {
-            return;
-          }
-          other.classList.remove("is-open");
-          const otherToggle = other.querySelector(".bl-forms-builder__field-toggle");
-          if (otherToggle) {
-            otherToggle.setAttribute("aria-expanded", "false");
-            otherToggle.setAttribute("aria-label", t("expandField", "Expand field"));
-          }
-        });
-      }
-      row.classList.toggle("is-open", nextOpen);
-      toggle.setAttribute("aria-expanded", nextOpen ? "true" : "false");
-      toggle.setAttribute(
-        "aria-label",
-        nextOpen ? t("collapseField", "Collapse field") : t("expandField", "Expand field")
-      );
-      if (nextOpen) {
-        body.querySelectorAll(".bl-forms-builder__logic").forEach((node) => {
-          if (typeof node.refreshLogicSources === "function") {
-            node.refreshLogicSources();
-          }
-        });
-      }
-    };
-    const toggle = el("button", {
-      type: "button",
-      className: "bl-forms-builder__icon-btn bl-forms-builder__field-toggle",
-      "aria-expanded": open ? "true" : "false",
-      "aria-label": open ? t("collapseField", "Collapse field") : t("expandField", "Expand field"),
-      onClick: () => setOpen(!row.classList.contains("is-open"))
-    });
-    const caretIcon = iconEl("caret", "bl-forms-builder__field-toggle-icon");
-    if (caretIcon.innerHTML) {
-      toggle.appendChild(caretIcon);
-    } else {
-      toggle.textContent = "\u25BE";
-    }
-    const deleteBtn = el("button", {
-      type: "button",
-      className: "bl-forms-builder__icon-btn bl-forms-builder__icon-btn--danger",
-      title: t("delete", "Delete"),
-      "aria-label": t("delete", "Delete"),
-      onClick: () => {
-        row.remove();
-        document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-      }
-    });
-    const trashIcon = iconEl("trash");
-    if (trashIcon.innerHTML) {
-      deleteBtn.appendChild(trashIcon);
-    } else {
-      deleteBtn.textContent = "\xD7";
-    }
-    const duplicateBtn = el("button", {
-      type: "button",
-      className: "bl-forms-builder__icon-btn",
-      title: t("duplicate", "Duplicate"),
-      "aria-label": t("duplicate", "Duplicate"),
-      onClick: () => duplicateFieldCard(row)
-    });
-    const duplicateIcon = iconEl("duplicate");
-    if (duplicateIcon.innerHTML) {
-      duplicateBtn.appendChild(duplicateIcon);
-    } else {
-      duplicateBtn.textContent = "\u29C9";
-    }
-    const syncNameFromLabel = (nameInput) => {
-      if (field.name_manual || !nameInput) {
-        return;
-      }
-      const next = uniqueFieldName(field.label || field.type, field.id);
-      field.name = next;
-      nameInput.value = next;
-      row.dataset.fieldName = next;
-    };
-    const renderBody = (activeTab = "general") => {
-      body.replaceChildren();
-      const tabs = createFieldEditorTabs(activeTab);
-      const { general, advanced, appearance, logic } = tabs;
-      const generalSections = createSectionAppender(general);
-      const advancedSections = createSectionAppender(advanced);
-      const appearanceSections = createSectionAppender(appearance);
-      const logicSections = createSectionAppender(logic);
-      generalSections.add(
-        (() => {
-          const switches = [
-            createSwitchSetting("blActive", t("fieldActive", "Active"), fieldIsActive(field), (checked) => {
-              field.active = checked;
-              updatePreview();
-              document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-            })
-          ];
-          if (field.type === "text" || field.type === "email" || field.type === "phone") {
-            switches.push(createListOverviewControl(field));
-          }
-          return el("div", { className: "bl-forms-builder__field-status" }, switches);
-        })()
-      );
-      const onTypeConvert = () => {
-        updatePreview();
-        const stayOn = ["heading", "text_block", "html"].includes(field.type) ? "general" : "advanced";
-        renderBody(stayOn);
-        document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-      };
-      const typeSelect = createTypeSelect(field, row, onTypeConvert);
-      const contentTypes = ["heading", "text_block", "html"];
-      if (typeSelect && contentTypes.includes(field.type)) {
-        generalSections.add(typeSelect);
-      } else if (typeSelect) {
-        advancedSections.add(typeSelect);
-      }
-      if (field.type === "heading") {
-        appearanceSections.add(createHeadingLevelControl(field, updatePreview));
-      }
-      if (field.type === "spacer") {
-        appearanceSections.add(createHeightControl(field, updatePreview));
-      }
-      if (field.type === "divider") {
-        appearanceSections.add(createMarginControl(field, updatePreview));
-      }
-      if (field.type !== "hidden" && field.type !== "divider" && field.type !== "spacer") {
-        appearanceSections.add(createWidthControl(field, updatePreview));
-      }
-      if (field.type === "file" || field.type === "image") {
-        appearanceSections.add(createUploadAppearanceControls(field));
-      }
-      if (field.type === "radio" || field.type === "checkboxes") {
-        appearanceSections.add(createLayoutControl(field));
-      }
-      appearanceSections.add(createCssClassControl(field));
-      logicSections.add(createConditionalLogicEditor(field, void 0, updatePreview));
-      if (field.type === "divider" || field.type === "spacer") {
-      } else if (field.type === "captcha") {
-        generalSections.add(
-          createCaptchaSettings(field, () => {
-            updatePreview();
-          })
-        );
-      } else if (["heading", "text_block", "html"].includes(field.type)) {
-        const ta = el("textarea", {
-          className: "widefat",
-          rows: field.type === "html" ? "6" : "3",
-          dataset: { blContent: "1" }
-        });
-        ta.value = field.content || "";
-        ta.addEventListener("input", () => {
-          field.content = ta.value;
-          updatePreview();
-        });
-        const contentLabel = field.type === "html" ? t("htmlContent", "HTML") : t("content", "Content");
-        generalSections.add(el("p", {}, [el("label", { text: contentLabel }), ta]));
-      } else {
-        const labelInput = el("input", {
-          type: "text",
-          className: "widefat",
-          dataset: { blLabel: "1" }
-        });
-        labelInput.value = field.label || "";
-        let nameInput = null;
-        if (NAMED_TYPES.includes(field.type)) {
-          nameInput = el("input", {
-            type: "text",
-            className: "widefat",
-            dataset: { blName: "1" },
-            value: field.name || uniqueFieldName(field.label || field.type, field.id)
-          });
-          nameInput.addEventListener("input", () => {
-            field.name_manual = true;
-            field.name = nameInput.value;
-            row.dataset.nameManual = "1";
-            row.dataset.fieldName = field.name;
-          });
-          nameInput.addEventListener("blur", () => {
-            const next = uniqueFieldName(nameInput.value || field.label || field.type, field.id);
-            field.name = next;
-            nameInput.value = next;
-            row.dataset.fieldName = next;
-            document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-          });
-        }
-        labelInput.addEventListener("input", () => {
-          field.label = labelInput.value;
-          syncNameFromLabel(nameInput);
-          updatePreview();
-        });
-        const labelControls = el("div", { className: "bl-forms-builder__label-controls" }, [labelInput]);
-        if (HIDE_LABEL_TYPES.includes(field.type)) {
-          labelControls.appendChild(
-            el("div", { className: "bl-forms-builder__hide-label" }, [
-              createSwitchSetting("blHideLabel", t("hideLabel", "Hide"), !!field.hide_label, (checked) => {
-                field.hide_label = checked;
-                document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-              })
-            ])
-          );
-        }
-        generalSections.add(
-          el("div", { className: "bl-forms-builder__label-row" }, [
-            el("label", { text: t("label", "Label") }),
-            labelControls
-          ])
-        );
-        if (nameInput) {
-          advancedSections.add(
-            el("p", {}, [el("label", { text: t("name", "Field name") }), nameInput]),
-            el("p", {
-              className: "description",
-              text: t(
-                "nameHelp",
-                "Internal field key used in submissions, emails, and entry data."
-              )
-            })
-          );
-        }
-        if (AFFIX_TYPES.includes(field.type)) {
-          advancedSections.add(createPrefixSuffixControl(field));
-        }
-        if (field.type === "textarea") {
-          advancedSections.add(createTextareaRowsControl(field));
-        }
-        if (field.type === "text" || field.type === "textarea") {
-          advancedSections.add(createLengthLimitsControl(field));
-        }
-        if (field.type === "file" || field.type === "image") {
-          advancedSections.add(createExtensionsControl(field));
-          advancedSections.add(createMaxSizeControl(field));
-          advancedSections.add(createUploadButtonControl(field));
-          if (field.multiple) {
-            advancedSections.add(createMaxFilesControl(field));
-          }
-        }
-        if (field.type === "number") {
-          advancedSections.add(createNumberBoundsControl(field));
-        }
-        if (field.type === "checkboxes") {
-          advancedSections.add(createSelectionBoundsControl(field));
-        }
-        if (["date", "time", "datetime"].includes(field.type)) {
-          advancedSections.add(createTemporalBoundsControl(field));
-          const relationControl = createTemporalRelationControl(field);
-          if (relationControl) {
-            advancedSections.add(relationControl);
-          }
-        }
-        if (AUTOCOMPLETE_TYPES.includes(field.type)) {
-          advancedSections.add(createAutocompleteControl(field));
-        }
-        if (field.type === "terms") {
-          const consentText = el("textarea", {
-            className: "widefat",
-            rows: "3",
-            dataset: { blContent: "1" }
-          });
-          consentText.value = field.content || "";
-          consentText.addEventListener("input", () => {
-            field.content = consentText.value;
-            updatePreview();
-          });
-          generalSections.add(
-            el("p", {}, [el("label", { text: t("checkboxText", "Checkbox text") }), consentText]),
-            el("p", {
-              className: "description",
-              html: t(
-                "checkboxTextHelp",
-                'Markdown is supported, e.g. <b>**Bold**</b>, <i>*Italic*</i>, and <span style="white-space: nowrap">[Link](...)</span>. For the target you can use a URL (/agb), a WordPress page (page:123), or a standard page such as page:privacy.'
-              )
-            })
-          );
-        }
-        if (field.type === "hidden") {
-          const def = el("input", {
-            type: "text",
-            className: "widefat",
-            dataset: { blDefault: "1" },
-            value: field.default_value || ""
-          });
-          def.addEventListener("input", () => {
-            field.default_value = def.value;
-            document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-          });
-          generalSections.add(
-            el("p", {}, [el("label", { text: t("defaultValue", "Default value") }), def])
-          );
-        }
-        if (field.type === "honeypot") {
-          generalSections.add(
-            el("p", {
-              className: "description",
-              text: t(
-                "honeypotHelp",
-                "Hidden from visitors. If filled, the submission is treated as spam."
-              )
-            })
-          );
-        }
-        if (!NO_PLACEHOLDER.includes(field.type)) {
-          const ph = el("input", {
-            type: "text",
-            className: "widefat",
-            dataset: { blPlaceholder: "1" }
-          });
-          ph.value = field.placeholder || "";
-          ph.addEventListener("input", () => {
-            field.placeholder = ph.value;
-            updatePreview();
-          });
-          generalSections.add(
-            el("p", {}, [el("label", { text: t("placeholder", "Placeholder") }), ph])
-          );
-        }
-        if (DESCRIPTION_TYPES.includes(field.type)) {
-          const desc = el("textarea", {
-            className: "widefat",
-            rows: "2",
-            dataset: { blDescription: "1" }
-          });
-          desc.value = field.description || "";
-          desc.addEventListener("input", () => {
-            field.description = desc.value;
-          });
-          generalSections.add(
-            el("p", {}, [el("label", { text: t("description", "Description") }), desc])
-          );
-        }
-        if (OPTION_TYPES.includes(field.type)) {
-          generalSections.add(
-            settingHeading(t("choices", "Choices")),
-            createOptionsEditor(field.options || [])
-          );
-        }
-        if (field.type !== "hidden") {
-          const defaults = createDefaultValueControl(field, updatePreview);
-          if (defaults) {
-            if (CHECKED_DEFAULT_TYPES.includes(field.type)) {
-              generalSections.add(settingHeading(t("defaultValue", "Default value")), ...defaults);
-            } else {
-              generalSections.add(...defaults);
-            }
-          }
-        }
-        const optionToggles = [];
-        if (!NO_REQUIRED.includes(field.type)) {
-          optionToggles.push(
-            createSwitchSetting("blRequired", t("required", "Required"), !!field.required, (checked) => {
-              field.required = checked;
-              updatePreview();
-              document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-            })
-          );
-        }
-        if (MULTIPLE_TYPES.includes(field.type)) {
-          let multipleLabel = t("allowMultiple", "Allow multiple");
-          if (field.type === "button_group") {
-            multipleLabel = t("buttonGroupMultiple", "Allow multiple selection");
-          } else if (field.type === "select") {
-            multipleLabel = t("selectMultiple", "Allow multiple selection");
-          } else if (field.type === "file" || field.type === "image") {
-            multipleLabel = t("allowMultipleFiles", "Allow multiple files");
-          }
-          optionToggles.push(
-            createSwitchSetting("blMultiple", multipleLabel, !!field.multiple, (checked) => {
-              field.multiple = checked;
-              if (field.type === "file" || field.type === "image") {
-                if (checked && (field.max_files == null || field.max_files === "")) {
-                  field.max_files = 10;
-                }
-                renderBody("general");
-              }
-              document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-            })
-          );
-        }
-        if (!NO_READONLY.includes(field.type)) {
-          optionToggles.push(
-            createSwitchSetting("blReadonly", t("readOnly", "Read only"), !!field.readonly, (checked) => {
-              field.readonly = checked;
-              document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-            })
-          );
-        }
-        if (!NO_DISABLED.includes(field.type)) {
-          optionToggles.push(
-            createSwitchSetting("blDisabled", t("disabled", "Disabled"), !!field.disabled, (checked) => {
-              field.disabled = checked;
-              document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-            })
-          );
-        }
-        if (optionToggles.length) {
-          generalSections.add(
-            settingHeading(t("options", "Options")),
-            el("div", { className: "bl-forms-builder__options-toggles" }, optionToggles)
-          );
-        }
-      }
-      tabs.syncVisibility(activeTab);
-      body.appendChild(tabs.wrap);
-    };
-    const handle = el("span", {
-      className: "bl-forms-builder__handle",
-      title: t("dragField", "Drag to reorder"),
-      "aria-hidden": "true"
-    });
-    const dragIcon = iconEl("drag");
-    if (dragIcon.innerHTML) {
-      handle.appendChild(dragIcon);
-    } else {
-      handle.textContent = "\u22EE\u22EE";
-    }
-    const headerMeta = el("div", { className: "bl-forms-builder__field-meta" }, [
-      widthBadge,
-      typeChip
-    ]);
-    widthBadge.addEventListener("click", (evt) => {
-      if (widthBadge.hidden || field.type === "hidden" || field.type === "divider" || field.type === "spacer") {
-        return;
-      }
-      evt.preventDefault();
-      evt.stopPropagation();
-      openFieldWidthModal(field, () => {
-        updatePreview();
-        syncWidthControlUi(body, field);
-        document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-      });
-    });
-    const header = el("div", { className: "bl-forms-builder__field-header" }, [
-      toggle,
-      preview,
-      headerMeta,
-      el("div", { className: "bl-forms-builder__field-actions" }, [activateBtn, duplicateBtn, deleteBtn, handle])
-    ]);
-    updatePreview();
-    renderBody();
-    row.appendChild(header);
-    row.appendChild(body);
-    if (open) {
-      setOpen(true);
-    }
-    return row;
-  }
-
   // themes/baselayer/packages/baselayer-blocks/src/js/admin/settings-panel.js
+  var { el, t: t2, writeConfig } = window.BlFormBuilder || {};
   var MATERIAL_ICONS_URL = "https://fonts.google.com/icons?icon.style=Rounded";
   function fieldRow(label, control, help = "") {
     const children = [el("label", {}, [el("strong", { text: label })]), control];
@@ -5533,7 +1200,7 @@
     });
     const empty = el("span", {
       className: "bl-blocks-icon-field__empty description",
-      text: t("blockIconEmpty", "No icon selected"),
+      text: t2("blockIconEmpty", "No icon selected"),
       dataset: { blBlocksIconEmpty: "" }
     });
     const hidden = el("input", {
@@ -5559,16 +1226,16 @@
       },
       [
         el("label", {}, [
-          el("strong", { text: t("blockIconSvg", "SVG code") })
+          el("strong", { text: t2("blockIconSvg", "SVG code") })
         ]),
         textarea,
         el("p", { className: "description" }, [
-          document.createTextNode(t("blockIconMaterialHelp", "Browse Material Icons (Rounded), copy SVG, and paste here: ")),
+          document.createTextNode(t2("blockIconMaterialHelp", "Browse Material Icons (Rounded), copy SVG, and paste here: ")),
           el("a", {
             href: MATERIAL_ICONS_URL,
             target: "_blank",
             rel: "noopener noreferrer",
-            text: t("blockIconMaterialLink", "fonts.google.com/icons")
+            text: t2("blockIconMaterialLink", "fonts.google.com/icons")
           })
         ])
       ]
@@ -5576,20 +1243,20 @@
     const chooseBtn = usePicker ? el("button", {
       type: "button",
       className: "button",
-      text: t("blockIconChoose", "Choose icon"),
+      text: t2("blockIconChoose", "Choose icon"),
       dataset: { blBlocksIconChoose: "" }
     }) : null;
     const svgToggle = el("button", {
       type: "button",
       className: "button",
-      text: t("blockIconSvgToggle", "SVG code"),
+      text: t2("blockIconSvgToggle", "SVG code"),
       "aria-expanded": "false",
       dataset: { blBlocksIconSvgToggle: "" }
     });
     const clearBtn = el("button", {
       type: "button",
       className: "button-link-delete",
-      text: t("blockIconClear", "Clear"),
+      text: t2("blockIconClear", "Clear"),
       dataset: { blBlocksIconClear: "" }
     });
     const actions = el("div", { className: "bl-blocks-icon-field__actions" }, [
@@ -5694,7 +1361,7 @@
       dataset: { blFormsPanel: "settings" },
       hidden: true
     });
-    const { root: activeRow, input: activeInput } = plainSwitch(t("settingsActive", "Active"), {
+    const { root: activeRow, input: activeInput } = plainSwitch(t2("settingsActive", "Active"), {
       checked: state.active !== false,
       onChange: (checked) => {
         state.active = checked;
@@ -5747,10 +1414,10 @@
       notify();
     });
     const children = [
-      el("h3", { className: "bl-forms-builder__section-title", text: t("tabSettings", "Settings") }),
+      el("h3", { className: "bl-forms-builder__section-title", text: t2("tabSettings", "Settings") }),
       activeRow,
-      fieldRow(t("settingsSlug", "Slug"), slugInput, t("settingsSlugHelp", "")),
-      fieldRow(t("settingsDescription", "Description"), descInput)
+      fieldRow(t2("settingsSlug", "Slug"), slugInput, t2("settingsSlugHelp", "")),
+      fieldRow(t2("settingsDescription", "Description"), descInput)
     ];
     if (definitionType === "block") {
       const iconField = createBlockIconField(state.block_icon || "block-default", (next) => {
@@ -5799,9 +1466,9 @@
       });
       delete state.block_title;
       children.push(
-        fieldRow(t("blockIcon", "Block icon"), iconField),
-        fieldRow(t("blockCategory", "Block category"), categorySelect),
-        fieldRow(t("blockKeywords", "Keywords"), keywordsInput, t("blockKeywordsHelp", ""))
+        fieldRow(t2("blockIcon", "Block icon"), iconField),
+        fieldRow(t2("blockCategory", "Block category"), categorySelect),
+        fieldRow(t2("blockKeywords", "Keywords"), keywordsInput, t2("blockKeywordsHelp", ""))
       );
     }
     if (definitionType === "page_settings") {
@@ -5826,7 +1493,7 @@
           ])
         );
       });
-      children.push(fieldRow(t("postTypes", "Post types"), box, t("postTypesHelp", "")));
+      children.push(fieldRow(t2("postTypes", "Post types"), box, t2("postTypesHelp", "")));
     }
     if (definitionType === "site_settings") {
       const labelInput = el("input", {
@@ -5848,8 +1515,8 @@
         notify();
       });
       children.push(
-        fieldRow(t("menuLabel", "Tab label"), labelInput, t("menuLabelHelp", "")),
-        fieldRow(t("menuOrder", "Order"), orderInput)
+        fieldRow(t2("menuLabel", "Tab label"), labelInput, t2("menuLabelHelp", "")),
+        fieldRow(t2("menuOrder", "Order"), orderInput)
       );
     }
     panel.append(...children);
@@ -5866,10 +1533,23 @@
   }
 
   // themes/baselayer/packages/baselayer-blocks/src/js/admin/repeater-card.js
+  var {
+    el: el2,
+    t: t3,
+    uid,
+    iconEl,
+    defaultField,
+    uniqueFieldName,
+    cloneFieldData,
+    createFieldCard,
+    serializeRow,
+    openLayoutSettingsModal,
+    normalizeConditionalLogic
+  } = window.BlFormBuilder || {};
   var REPEATER_MAX_DEPTH = 3;
   var LAYOUT_BLOCKED = ["column", "section", "group"];
   var repeaterFieldByEl = /* @__PURE__ */ new WeakMap();
-  function createNestedSortable2(list, options) {
+  function createNestedSortable(list, options) {
     const Builder = window.BlCanvasBuilder;
     if (!Builder || typeof Builder.createSortable !== "function") {
       console.error("BlCanvasBuilder.createSortable is required for repeater field lists");
@@ -5880,13 +1560,13 @@
   function notifyChanged() {
     document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
   }
-  function typeLabel2(type) {
+  function typeLabel(type) {
     const dict = window.blFormsAdmin && window.blFormsAdmin.i18n || {};
     if (dict.types && dict.types[type]) {
       return dict.types[type];
     }
     if (type === "repeater") {
-      return t("repeaterType", "Repeater");
+      return t3("repeaterType", "Repeater");
     }
     return type;
   }
@@ -5910,7 +1590,7 @@
     return {
       id,
       type: "repeater",
-      label: partial.label || typeLabel2("repeater"),
+      label: partial.label || typeLabel("repeater"),
       name: partial.name || "items",
       name_manual: partial.name_manual != null ? !!partial.name_manual : false,
       hide_label: !!partial.hide_label,
@@ -5947,7 +1627,7 @@
     });
     const onEnd = Builder?.dragEnd || (() => {
     });
-    createNestedSortable2(list, {
+    createNestedSortable(list, {
       group: {
         name: "bl-blocks-fields",
         put(to, from, dragEl) {
@@ -6028,7 +1708,7 @@
       children: Array.isArray(initial.children) ? initial.children : field.children
     };
     field = defaultRepeater(field);
-    const row = el("div", {
+    const row = el2("div", {
       className: "bl-forms-builder__field bl-blocks-builder__repeater-card",
       dataset: {
         blFormsField: "1",
@@ -6041,13 +1721,13 @@
       }
     });
     repeaterFieldByEl.set(row, field);
-    const labelPlaceholder = () => field.show_title ? t("sectionLabelPlaceholder", "Title") : t("sectionLabelPlaceholderHidden", "Name");
-    const labelInput = el("input", {
+    const labelPlaceholder = () => field.show_title ? t3("sectionLabelPlaceholder", "Title") : t3("sectionLabelPlaceholderHidden", "Name");
+    const labelInput = el2("input", {
       type: "text",
       className: "bl-forms-builder__section-label-input",
       value: field.label || "",
       placeholder: labelPlaceholder(),
-      "aria-label": t("repeaterLabel", "Repeater label")
+      "aria-label": t3("repeaterLabel", "Repeater label")
     });
     labelInput.addEventListener("input", () => {
       field.label = labelInput.value;
@@ -6056,22 +1736,22 @@
       }
       notifyChanged();
     });
-    const typeLabelText = () => typeLabel2("repeater") + (depth > 1 ? ` (${depth})` : "");
-    const typeChip = el("span", { className: "bl-forms-builder__field-type" });
-    const settingsBtn = el("button", {
+    const typeLabelText = () => typeLabel("repeater") + (depth > 1 ? ` (${depth})` : "");
+    const typeChip = el2("span", { className: "bl-forms-builder__field-type" });
+    const settingsBtn = el2("button", {
       type: "button",
       className: "bl-forms-builder__design-btn",
-      title: t("layoutSettingsTitle", "Settings"),
-      "aria-label": t("layoutSettingsTitle", "Settings")
+      title: t3("layoutSettingsTitle", "Settings"),
+      "aria-label": t3("layoutSettingsTitle", "Settings")
     });
     settingsBtn.appendChild(iconEl("tune", "bl-forms-builder__design-btn-icon"));
-    const fieldsList = el("div", {
+    const fieldsList = el2("div", {
       className: "bl-blocks-builder__repeater-fields",
       dataset: { blRepeaterFields: "1", repeaterDepth: String(depth) }
     });
-    const emptyHint = el("p", {
+    const emptyHint = el2("p", {
       className: "description bl-forms-builder__section-empty",
-      text: depth >= REPEATER_MAX_DEPTH ? t("repeaterEmptyMaxDepth", "Drop fields here (nested repeater not allowed at this depth)") : t("repeaterEmpty", "Drop fields or a nested repeater here")
+      text: depth >= REPEATER_MAX_DEPTH ? t3("repeaterEmptyMaxDepth", "Drop fields here (nested repeater not allowed at this depth)") : t3("repeaterEmpty", "Drop fields or a nested repeater here")
     });
     const syncEmpty = () => {
       emptyHint.hidden = fieldsList.querySelector("[data-bl-forms-field]") != null;
@@ -6091,7 +1771,7 @@
       fieldsList.appendChild(createFieldCard(child, false));
     });
     bindRepeaterChildList(fieldsList, depth, onListChange);
-    const fieldsWrap = el("div", { className: "bl-blocks-builder__repeater-fields-wrap" }, [
+    const fieldsWrap = el2("div", { className: "bl-blocks-builder__repeater-fields-wrap" }, [
       fieldsList,
       emptyHint
     ]);
@@ -6103,7 +1783,7 @@
       labelInput.placeholder = labelPlaceholder();
       const typeChildren = [
         iconEl("repeater", "bl-forms-builder__field-type-icon"),
-        el("span", {
+        el2("span", {
           className: "bl-forms-builder__field-type-label",
           text: typeLabelText()
         })
@@ -6111,10 +1791,10 @@
       const logic = field.conditional_logic;
       if (logic && logic.enabled && Array.isArray(logic.groups) && logic.groups.length > 0) {
         typeChildren.push(
-          el("span", {
+          el2("span", {
             className: "bl-forms-builder__field-logic-dot",
-            title: t("logicEnable", "Conditional logic"),
-            "aria-label": t("logicEnable", "Conditional logic")
+            title: t3("logicEnable", "Conditional logic"),
+            "aria-label": t3("logicEnable", "Conditional logic")
           })
         );
       }
@@ -6131,18 +1811,18 @@
           tabs: ["settings", "design", "logic"],
           withHideTitle: true,
           withWidth: true,
-          logicHelp: t(
+          logicHelp: t3(
             "logicHelpRepeater",
             "Show this repeater only when the conditions below are met."
           )
         }
       );
     });
-    const duplicateBtn = el("button", {
+    const duplicateBtn = el2("button", {
       type: "button",
       className: "bl-forms-builder__icon-btn",
-      title: t("duplicate", "Duplicate"),
-      "aria-label": t("duplicate", "Duplicate"),
+      title: t3("duplicate", "Duplicate"),
+      "aria-label": t3("duplicate", "Duplicate"),
       onClick: () => {
         const data = serializeRepeaterRow(row);
         const clone = cloneFieldData(data);
@@ -6154,11 +1834,11 @@
     const dupIcon = iconEl("duplicate");
     if (dupIcon.innerHTML) duplicateBtn.appendChild(dupIcon);
     else duplicateBtn.textContent = "\u29C9";
-    const deleteBtn = el("button", {
+    const deleteBtn = el2("button", {
       type: "button",
       className: "bl-forms-builder__icon-btn bl-forms-builder__icon-btn--danger",
-      title: t("delete", "Delete"),
-      "aria-label": t("delete", "Delete"),
+      title: t3("delete", "Delete"),
+      "aria-label": t3("delete", "Delete"),
       onClick: () => {
         row.remove();
         notifyChanged();
@@ -6167,18 +1847,18 @@
     const trashIcon = iconEl("trash");
     if (trashIcon.innerHTML) deleteBtn.appendChild(trashIcon);
     else deleteBtn.textContent = "\xD7";
-    const handle = el("span", {
+    const handle = el2("span", {
       className: "bl-forms-builder__handle",
-      title: t("dragField", "Drag to reorder"),
+      title: t3("dragField", "Drag to reorder"),
       "aria-hidden": "true"
     });
     const dragIcon = iconEl("drag");
     if (dragIcon.innerHTML) handle.appendChild(dragIcon);
     else handle.textContent = "\u22EE\u22EE";
-    const header = el("div", { className: "bl-forms-builder__field-header" }, [
+    const header = el2("div", { className: "bl-forms-builder__field-header" }, [
       labelInput,
-      el("div", { className: "bl-forms-builder__field-meta" }, [settingsBtn, typeChip]),
-      el("div", { className: "bl-forms-builder__field-actions" }, [duplicateBtn, deleteBtn, handle])
+      el2("div", { className: "bl-forms-builder__field-meta" }, [settingsBtn, typeChip]),
+      el2("div", { className: "bl-forms-builder__field-actions" }, [duplicateBtn, deleteBtn, handle])
     ]);
     row.append(header, fieldsWrap);
     updatePreview();
@@ -6223,6 +1903,18 @@
   }
 
   // themes/baselayer/packages/baselayer-blocks/src/js/admin/app.js
+  var {
+    el: el3,
+    t: t4,
+    writeConfig: writeConfig2,
+    PALETTE_SECTIONS,
+    defaultField: defaultField2,
+    uniqueFieldName: uniqueFieldName2,
+    iconEl: iconEl2,
+    createFieldCard: createFieldCard2,
+    serializeRow: serializeRow2,
+    equalizeColumnRun
+  } = window.BlFormBuilder || {};
   var EXCLUDED_TYPES = /* @__PURE__ */ new Set(["honeypot", "captcha", "terms"]);
   var BLOCKS_POPULAR_TYPES = ["text", "textarea", "select", "toggle"];
   var BLOCKS_PALETTE = PALETTE_SECTIONS.map((section) => {
@@ -6251,18 +1943,23 @@
     if ((data?.type || "") === "repeater") {
       return createRepeaterCard(data, open, 1);
     }
-    return createFieldCard(data, open);
+    return createFieldCard2(data, open);
   }
   function serializeBlocksItem(row) {
     if ((row?.dataset?.fieldType || "") === "repeater") {
       return serializeRepeaterRow(row);
     }
-    return serializeRow(row);
+    return serializeRow2(row);
   }
   function mountApp(root, initial, definitionType = "block") {
     const Builder = window.BlCanvasBuilder;
+    const FormBuilder = window.BlFormBuilder;
     if (!Builder || typeof Builder.mount !== "function") {
       root.textContent = "Canvas builder failed to load.";
+      return;
+    }
+    if (!FormBuilder || typeof FormBuilder.createFieldCard !== "function") {
+      root.textContent = "Form builder failed to load.";
       return;
     }
     root.replaceChildren();
@@ -6275,13 +1972,13 @@
     });
     const syncAll = () => {
       const fields = builderApi ? builderApi.getFields() : [];
-      writeConfig({
+      writeConfig2({
         fields,
         settings: panels.getSettings()
       });
       builderApi?.canvas?.syncEmpty?.();
     };
-    const fieldsPanel = el("div", {
+    const fieldsPanel = el3("div", {
       className: "bl-forms-builder__panel is-active",
       dataset: { blFormsPanel: "fields" }
     });
@@ -6289,17 +1986,17 @@
       if (typeOrData === "repeater" || typeOrData && typeOrData.type === "repeater") {
         const data2 = typeof typeOrData === "string" ? defaultRepeater() : defaultRepeater(typeOrData);
         if (data2.name != null && data2.name_manual === false) {
-          data2.name = uniqueFieldName(data2.label || data2.name || "items", data2.id || "");
+          data2.name = uniqueFieldName2(data2.label || data2.name || "items", data2.id || "");
         } else if (data2.name) {
-          data2.name = uniqueFieldName(data2.name, data2.id || "");
+          data2.name = uniqueFieldName2(data2.name, data2.id || "");
         }
         return data2;
       }
-      const data = typeof typeOrData === "string" ? defaultField(typeOrData) : { ...typeOrData };
+      const data = typeof typeOrData === "string" ? defaultField2(typeOrData) : { ...typeOrData };
       if (data.name != null && data.name_manual === false) {
-        data.name = uniqueFieldName(data.label || data.name || data.type || "field", data.id || "");
+        data.name = uniqueFieldName2(data.label || data.name || data.type || "field", data.id || "");
       } else if (data.name) {
-        data.name = uniqueFieldName(data.name, data.id || "");
+        data.name = uniqueFieldName2(data.name, data.id || "");
       }
       return data;
     };
@@ -6310,18 +2007,18 @@
       groupName: "bl-blocks-fields",
       items: initial.fields || [],
       sections: BLOCKS_PALETTE,
-      heading: t("canvasHeading", "Fields"),
-      emptyText: t("empty", "Drag a field here."),
+      heading: t4("canvasHeading", "Fields"),
+      emptyText: t4("empty", "Drag a field here."),
       handleSelector: ".bl-forms-builder__handle",
       draggableSelector: ".bl-forms-builder__field, .bl-forms-builder__template",
       templateClass: "bl-forms-builder__template",
       itemAttr: "data-bl-forms-field",
       icons: window.blFormsAdmin && window.blFormsAdmin.icons || {},
-      t,
+      t: t4,
       typeLabel: (type) => {
         const dict = window.blFormsAdmin && window.blFormsAdmin.i18n || {};
         if (type === "repeater") {
-          return dict.types && dict.types.repeater || t("repeaterType", "Repeater");
+          return dict.types && dict.types.repeater || t4("repeaterType", "Repeater");
         }
         return dict.types && dict.types[type] || type;
       },
@@ -6338,10 +2035,10 @@
         syncAll();
       }
     });
-    const tabBar = el("nav", { className: "bl-forms-builder__tabs", role: "tablist" });
+    const tabBar = el3("nav", { className: "bl-forms-builder__tabs", role: "tablist" });
     const tabs = [
-      { id: "fields", label: t("tabFields", "Fields"), panel: fieldsPanel },
-      { id: "settings", label: t("tabSettings", "Settings"), panel: panels.panel }
+      { id: "fields", label: t4("tabFields", "Fields"), panel: fieldsPanel },
+      { id: "settings", label: t4("tabSettings", "Settings"), panel: panels.panel }
     ];
     const activate = (id) => {
       tabs.forEach((tab) => {
@@ -6353,7 +2050,7 @@
       });
     };
     tabs.forEach((tab, index) => {
-      tab.button = el("button", {
+      tab.button = el3("button", {
         type: "button",
         className: "bl-forms-builder__tab" + (index === 0 ? " is-active" : ""),
         role: "tab",
@@ -6369,12 +2066,12 @@
       fullscreen = !!next;
       root.classList.toggle("is-fullscreen", fullscreen);
       document.body.classList.toggle("bl-forms-builder-fullscreen", fullscreen);
-      const label = fullscreen ? t("fullscreenExit", "Exit fullscreen") : t("fullscreenEnter", "Fullscreen");
+      const label = fullscreen ? t4("fullscreenExit", "Exit fullscreen") : t4("fullscreenEnter", "Fullscreen");
       fullscreenBtn.title = label;
       fullscreenBtn.setAttribute("aria-label", label);
       fullscreenBtn.setAttribute("aria-pressed", fullscreen ? "true" : "false");
       fullscreenBtn.replaceChildren();
-      const icon = iconEl(fullscreen ? "fullscreenExit" : "fullscreen");
+      const icon = iconEl2(fullscreen ? "fullscreenExit" : "fullscreen");
       if (icon.innerHTML) {
         fullscreenBtn.appendChild(icon);
       } else {
@@ -6392,28 +2089,28 @@
         setFullscreen(false);
       }
     };
-    const fullscreenBtn = el("button", {
+    const fullscreenBtn = el3("button", {
       type: "button",
       className: "bl-forms-builder__icon-btn bl-forms-builder__fullscreen-btn",
-      title: t("fullscreenEnter", "Fullscreen"),
-      "aria-label": t("fullscreenEnter", "Fullscreen"),
+      title: t4("fullscreenEnter", "Fullscreen"),
+      "aria-label": t4("fullscreenEnter", "Fullscreen"),
       "aria-pressed": "false",
       onClick: () => setFullscreen(!fullscreen)
     });
-    const enterIcon = iconEl("fullscreen");
+    const enterIcon = iconEl2("fullscreen");
     if (enterIcon.innerHTML) {
       fullscreenBtn.appendChild(enterIcon);
     } else {
       fullscreenBtn.textContent = "\u26F6";
     }
     tabBar.appendChild(fullscreenBtn);
-    const panelsWrap = el("div", { className: "bl-forms-builder__panels" }, [
+    const panelsWrap = el3("div", { className: "bl-forms-builder__panels" }, [
       fieldsPanel,
       panels.panel
     ]);
     root.append(
-      el("div", { className: "bl-forms-builder__scroll" }, [
-        el("div", { className: "bl-forms-builder__scroll-inner" }, [tabBar, panelsWrap])
+      el3("div", { className: "bl-forms-builder__scroll" }, [
+        el3("div", { className: "bl-forms-builder__scroll-inner" }, [tabBar, panelsWrap])
       ])
     );
     const form = root.closest("form");
@@ -6427,7 +2124,7 @@
   }
 
   // themes/baselayer/packages/baselayer-blocks/src/js/admin/field-form.js
-  function el2(tag, props = {}, children = []) {
+  function el4(tag, props = {}, children = []) {
     const node = document.createElement(tag);
     Object.entries(props).forEach(([key, value]) => {
       if (value == null || value === false) return;
@@ -6489,24 +2186,24 @@
     const name = field.name || "";
     if (!name) return null;
     const current = values[name] !== void 0 && values[name] !== null ? values[name] : field.default_value != null ? field.default_value : "";
-    const row = el2("div", {
+    const row = el4("div", {
       className: "bl-blocks-fields__row",
       dataset: { fieldName: name }
     });
     const id = "bl-blocks-ui-" + name.replace(/[^a-z0-9_-]/gi, "_") + "-" + Math.random().toString(36).slice(2, 7);
     if (!field.hide_label && type !== "toggle" && type !== "terms") {
-      const label = el2("label", { className: "bl-blocks-fields__label", text: field.label || name });
+      const label = el4("label", { className: "bl-blocks-fields__label", text: field.label || name });
       label.setAttribute("for", id);
       if (field.required) {
         label.appendChild(document.createTextNode(" "));
-        label.appendChild(el2("span", { className: "required", text: "*" }));
+        label.appendChild(el4("span", { className: "required", text: "*" }));
       }
       row.appendChild(label);
     }
     let control = null;
     const options = Array.isArray(field.options) ? field.options : [];
     if (type === "textarea") {
-      control = el2("textarea", {
+      control = el4("textarea", {
         className: "widefat",
         id,
         rows: field.rows || 4,
@@ -6515,24 +2212,24 @@
       if (field.placeholder) control.placeholder = field.placeholder;
     } else if (type === "select") {
       const multiple = !!field.multiple;
-      control = el2("select", { className: "widefat", id });
+      control = el4("select", { className: "widefat", id });
       if (multiple) control.multiple = true;
       if (!multiple) {
-        control.appendChild(el2("option", { value: "", text: "\u2014" }));
+        control.appendChild(el4("option", { value: "", text: "\u2014" }));
       }
       const selected = multiple ? (Array.isArray(current) ? current : []).map(String) : [String(current == null ? "" : current)];
       options.forEach((opt) => {
         const ov = String(opt.value ?? "");
-        const option = el2("option", { value: ov, text: opt.label || ov });
+        const option = el4("option", { value: ov, text: opt.label || ov });
         if (selected.includes(ov)) option.selected = true;
         control.appendChild(option);
       });
     } else if (type === "radio" || type === "button_group") {
-      control = el2("div", { className: "bl-blocks-fields__choices" });
+      control = el4("div", { className: "bl-blocks-fields__choices" });
       options.forEach((opt, i) => {
         const ov = String(opt.value ?? "");
         const oid = id + "-" + i;
-        const input = el2("input", {
+        const input = el4("input", {
           type: "radio",
           name: id,
           id: oid,
@@ -6540,43 +2237,43 @@
           checked: String(current) === ov
         });
         control.appendChild(
-          el2("label", { className: "bl-blocks-fields__choice" }, [
+          el4("label", { className: "bl-blocks-fields__choice" }, [
             input,
             document.createTextNode(" " + (opt.label || ov))
           ])
         );
       });
     } else if (type === "checkboxes") {
-      control = el2("div", { className: "bl-blocks-fields__choices" });
+      control = el4("div", { className: "bl-blocks-fields__choices" });
       const list = Array.isArray(current) ? current.map(String) : [];
       options.forEach((opt, i) => {
         const ov = String(opt.value ?? "");
         const oid = id + "-" + i;
-        const input = el2("input", {
+        const input = el4("input", {
           type: "checkbox",
           id: oid,
           value: ov,
           checked: list.includes(ov)
         });
         control.appendChild(
-          el2("label", { className: "bl-blocks-fields__choice" }, [
+          el4("label", { className: "bl-blocks-fields__choice" }, [
             input,
             document.createTextNode(" " + (opt.label || ov))
           ])
         );
       });
     } else if (type === "toggle" || type === "terms") {
-      const input = el2("input", {
+      const input = el4("input", {
         type: "checkbox",
         id,
         checked: !!current && current !== "0" && current !== ""
       });
-      control = el2("label", { className: "bl-blocks-fields__toggle" }, [
+      control = el4("label", { className: "bl-blocks-fields__toggle" }, [
         input,
         document.createTextNode(" " + (field.label || name))
       ]);
     } else if (type === "hidden") {
-      control = el2("input", {
+      control = el4("input", {
         type: "hidden",
         id,
         value: current == null ? "" : String(current)
@@ -6590,7 +2287,7 @@
       } else if (type === "datetime") {
         inputType = "datetime-local";
       }
-      control = el2("input", {
+      control = el4("input", {
         className: "widefat",
         type: inputType,
         id,
@@ -6603,12 +2300,12 @@
       controls.push({ field, control, type });
     }
     if (field.description) {
-      row.appendChild(el2("p", { className: "description", text: field.description }));
+      row.appendChild(el4("p", { className: "description", text: field.description }));
     }
     return row;
   }
   function createFieldForm(fields, values = {}) {
-    const root = el2("div", { className: "bl-blocks-fields", dataset: { blBlocksFields: "" } });
+    const root = el4("div", { className: "bl-blocks-fields", dataset: { blBlocksFields: "" } });
     const entries = [];
     const walk = (list, parent, valueMap) => {
       (list || []).forEach((field) => {
@@ -6624,10 +2321,10 @@
           if (field.css_class) {
             layoutClass.push(String(field.css_class).trim());
           }
-          const wrap = el2("div", { className: layoutClass.filter(Boolean).join(" ") });
+          const wrap = el4("div", { className: layoutClass.filter(Boolean).join(" ") });
           const showTitle = type !== "section" || field.show_title !== false && field.show_title !== 0 && field.show_title !== "0";
           if (type === "section" && showTitle && field.label) {
-            wrap.appendChild(el2("h3", { className: "bl-blocks-fields__section-title", text: field.label }));
+            wrap.appendChild(el4("h3", { className: "bl-blocks-fields__section-title", text: field.label }));
           }
           parent.appendChild(wrap);
           walk(field.children || [], wrap, valueMap);
@@ -6635,14 +2332,14 @@
         }
         if (type === "heading") {
           if (field.label) {
-            parent.appendChild(el2("h4", { className: "bl-blocks-fields__heading", text: field.label }));
+            parent.appendChild(el4("h4", { className: "bl-blocks-fields__heading", text: field.label }));
           }
           return;
         }
         if (type === "text_block" || type === "html") {
           const content = field.default_value || field.content || field.label || "";
           if (content) {
-            parent.appendChild(el2("div", { className: "bl-blocks-fields__static", html: content }));
+            parent.appendChild(el4("div", { className: "bl-blocks-fields__static", html: content }));
           }
           return;
         }
@@ -6696,17 +2393,17 @@
     if (field.css_class) {
       classNames.push(String(field.css_class).trim());
     }
-    const wrap = el2("div", {
+    const wrap = el4("div", {
       className: classNames.filter(Boolean).join(" "),
       dataset: { fieldName: name }
     });
     if (showTitle && !field.hide_label && field.label) {
-      wrap.appendChild(el2("div", { className: "bl-blocks-fields__label", text: field.label }));
+      wrap.appendChild(el4("div", { className: "bl-blocks-fields__label", text: field.label }));
     }
     if (field.description) {
-      wrap.appendChild(el2("p", { className: "description", text: field.description }));
+      wrap.appendChild(el4("p", { className: "description", text: field.description }));
     }
-    const rowsEl = el2("div", { className: "bl-blocks-fields__repeater-rows" });
+    const rowsEl = el4("div", { className: "bl-blocks-fields__repeater-rows" });
     const rowForms = [];
     const syncRowTitles = () => {
       Array.from(rowsEl.children).forEach((rowEl, i) => {
@@ -6719,7 +2416,7 @@
     };
     const canAdd = () => maxRows === 0 || rowForms.length < maxRows;
     const canRemove = () => rowForms.length > minRows;
-    const addBtn = el2("button", {
+    const addBtn = el4("button", {
       type: "button",
       className: "button bl-blocks-fields__repeater-add",
       text: buttonLabel
@@ -6728,11 +2425,11 @@
       addBtn.disabled = !canAdd();
     };
     const mountRow = (rowValues) => {
-      const rowEl = el2("div", { className: "bl-blocks-fields__repeater-row" });
-      const header = el2("div", { className: "bl-blocks-fields__repeater-row-header" }, [
-        el2("span", { className: "bl-blocks-fields__repeater-row-title", text: "" })
+      const rowEl = el4("div", { className: "bl-blocks-fields__repeater-row" });
+      const header = el4("div", { className: "bl-blocks-fields__repeater-row-header" }, [
+        el4("span", { className: "bl-blocks-fields__repeater-row-title", text: "" })
       ]);
-      const removeBtn = el2("button", {
+      const removeBtn = el4("button", {
         type: "button",
         className: "button-link-delete bl-blocks-fields__repeater-remove",
         text: i18n("removeRow", "Remove row")
@@ -6782,8 +2479,8 @@
   function openFieldsModal(opts) {
     const title = opts.title || i18n("edit", "Edit");
     const form = createFieldForm(opts.fields || [], opts.values || {});
-    const overlay = el2("div", { className: "bl-blocks-modal-overlay", role: "presentation" });
-    const dialog = el2("div", {
+    const overlay = el4("div", { className: "bl-blocks-modal-overlay", role: "presentation" });
+    const dialog = el4("div", {
       className: "bl-blocks-modal",
       role: "dialog",
       "aria-modal": "true",
@@ -6799,9 +2496,9 @@
         close();
       }
     };
-    const header = el2("div", { className: "bl-blocks-modal__header" }, [
-      el2("h2", { className: "bl-blocks-modal__title", text: title }),
-      el2("button", {
+    const header = el4("div", { className: "bl-blocks-modal__header" }, [
+      el4("h2", { className: "bl-blocks-modal__title", text: title }),
+      el4("button", {
         type: "button",
         className: "bl-blocks-modal__close",
         text: "\xD7",
@@ -6809,15 +2506,15 @@
         onClick: close
       })
     ]);
-    const body = el2("div", { className: "bl-blocks-modal__body" }, [form.root]);
-    const footer = el2("div", { className: "bl-blocks-modal__footer" }, [
-      el2("button", {
+    const body = el4("div", { className: "bl-blocks-modal__body" }, [form.root]);
+    const footer = el4("div", { className: "bl-blocks-modal__footer" }, [
+      el4("button", {
         type: "button",
         className: "button",
         text: i18n("cancel", "Cancel"),
         onClick: close
       }),
-      el2("button", {
+      el4("button", {
         type: "button",
         className: "button button-primary",
         text: i18n("save", "Save"),

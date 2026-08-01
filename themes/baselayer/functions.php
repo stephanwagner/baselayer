@@ -51,6 +51,7 @@ require_once __DIR__ . '/includes/helpers/templates.php';
 require_once __DIR__ . '/includes/login-client-logo.php';
 require_once __DIR__ . '/includes/assets.php';
 require_once __DIR__ . '/includes/canvas-builder.php';
+require_once __DIR__ . '/includes/form-builder.php';
 require_once __DIR__ . '/includes/helpers/images.php';
 require_once __DIR__ . '/includes/service-worker.php';
 require_once __DIR__ . '/includes/custom-post-types.php';

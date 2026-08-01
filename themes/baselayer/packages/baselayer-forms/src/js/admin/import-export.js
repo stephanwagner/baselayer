@@ -1,4 +1,4 @@
-import { el, t, readConfig } from './dom.js';
+const { el, t, readConfig } = window.BlFormBuilder || {};
 
 const FORMAT = 'baselayer-form';
 const FORMAT_LEGACY = 'baselayer-form-fields';

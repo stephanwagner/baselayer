@@ -1,7 +1,7 @@
 /**
  * Type-aware Settings panel for Blocks / Page Settings / Site Settings definitions.
  */
-import { el, t, writeConfig } from '../../../../baselayer-forms/src/js/admin/dom.js';
+const { el, t, writeConfig } = window.BlFormBuilder || {};
 
 const MATERIAL_ICONS_URL = 'https://fonts.google.com/icons?icon.style=Rounded';
 

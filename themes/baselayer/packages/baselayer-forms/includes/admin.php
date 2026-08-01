@@ -309,6 +309,54 @@ function bl_forms_enqueue_builder_kit(): string
 }
 
 /**
+ * Enqueue shared form-builder kit (theme helper, else Forms vendor copy).
+ *
+ * @param string[] $deps Style/script handles (typically canvas-builder).
+ */
+function bl_forms_enqueue_form_builder_kit(array $deps = []): string
+{
+	$args = [
+		'vendor_dir' => bl_forms_path('assets/vendor/form-builder'),
+		'vendor_url' => bl_forms_url('assets/vendor/form-builder'),
+		'deps'       => $deps,
+	];
+
+	if (function_exists('bl_form_builder_enqueue_kit')) {
+		return bl_form_builder_enqueue_kit($args);
+	}
+
+	$handle = 'baselayer-form-builder-admin';
+	$debug = function_exists('bl_is_debug') && bl_is_debug();
+	$base = $args['vendor_dir'];
+	$uri = $args['vendor_url'];
+	$enqueued = false;
+	$name = 'form-builder-admin';
+
+	foreach (['css', 'js'] as $type) {
+		$candidates = $debug
+			? [$name . '.' . $type, $name . '.min.' . $type]
+			: [$name . '.min.' . $type, $name . '.' . $type];
+		foreach ($candidates as $file) {
+			$path = trailingslashit($base) . $file;
+			if (!is_readable($path)) {
+				continue;
+			}
+			$url = trailingslashit($uri) . $file;
+			$ver = $debug ? (string) time() : (string) filemtime($path);
+			if ($type === 'css') {
+				wp_enqueue_style($handle, $url, $deps, $ver);
+			} else {
+				wp_enqueue_script($handle, $url, $deps, $ver, true);
+			}
+			$enqueued = true;
+			break;
+		}
+	}
+
+	return $enqueued ? $handle : '';
+}
+
+/**
  * Enqueue builder assets on form edit screens.
  */
 function bl_forms_admin_enqueue(string $hook): void
@@ -325,8 +373,6 @@ function bl_forms_admin_enqueue(string $hook): void
 	if (!$is_form_edit && !$is_entry) {
 		return;
 	}
-
-	bl_forms_enqueue_style('bl-forms-admin', 'forms-admin');
 
 	if ($is_form_edit) {
 		// Publish (and any other) side boxes are WP defaults — keep them, but not draggable.
@@ -349,9 +395,26 @@ function bl_forms_admin_enqueue(string $hook): void
 		);
 	}
 
+	if ($is_entry) {
+		bl_forms_enqueue_style('bl-forms-admin', 'forms-admin');
+	} elseif ($is_form_edit && !bl_forms_user_can_manage()) {
+		bl_forms_enqueue_style('bl-forms-admin', 'forms-admin');
+	}
+
 	if ($is_form_edit && bl_forms_user_can_manage()) {
-		$builder_handle = bl_forms_enqueue_builder_kit();
-		$deps = $builder_handle !== '' ? [$builder_handle] : [];
+		$canvas_handle = bl_forms_enqueue_builder_kit();
+		$form_builder_deps = $canvas_handle !== '' ? [$canvas_handle] : [];
+		$form_builder_handle = bl_forms_enqueue_form_builder_kit($form_builder_deps);
+
+		$style_deps = $form_builder_handle !== '' ? [$form_builder_handle] : ($canvas_handle !== '' ? [$canvas_handle] : []);
+		bl_forms_enqueue_style('bl-forms-admin', 'forms-admin', $style_deps);
+
+		$deps = [];
+		if ($form_builder_handle !== '') {
+			$deps[] = $form_builder_handle;
+		} elseif ($canvas_handle !== '') {
+			$deps[] = $canvas_handle;
+		}
 		bl_forms_enqueue_script('bl-forms-admin', 'forms-admin', $deps, true);
 		$form_id = 0;
 		if (!empty($_GET['post'])) {
