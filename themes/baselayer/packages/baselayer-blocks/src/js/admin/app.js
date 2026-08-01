@@ -8,43 +8,37 @@ import {
   defaultRepeater,
 } from './repeater-card.js';
 
-const {
-  el,
-  t,
-  writeConfig,
-  PALETTE_SECTIONS,
-  defaultField,
-  uniqueFieldName,
-  iconEl,
-  createFieldCard,
-  serializeRow,
-  equalizeColumnRun,
-} = window.BlFormBuilder || {};
-
 const EXCLUDED_TYPES = new Set(['honeypot', 'captcha', 'terms']);
 
 /** Popular fields for block / page / site settings (not form contact fields). */
 const BLOCKS_POPULAR_TYPES = ['text', 'textarea', 'select', 'toggle'];
 
-const BLOCKS_PALETTE = PALETTE_SECTIONS.map((section) => {
-  // Media library fields replace Forms Uploads, in the same palette slot (after Date & time).
-  if (section.id === 'files') {
-    return {
-      id: 'media',
-      headingKey: 'paletteSectionMedia',
-      headingFallback: 'Media',
-      types: ['image', 'file'],
-    };
-  }
-  let types =
-    section.id === 'popular'
-      ? BLOCKS_POPULAR_TYPES
-      : (section.types || []).filter((type) => !EXCLUDED_TYPES.has(type));
-  if (section.id === 'advanced') {
-    types = [...types.filter((type) => type !== 'repeater'), 'repeater'];
-  }
-  return { ...section, types };
-}).filter((section) => (section.types || []).length > 0);
+/**
+ * Palette sections for the definition canvas.
+ * Built at mount time so field-UI-only loads of this bundle (no BlFormBuilder) do not throw.
+ */
+function blocksPalette() {
+  const { PALETTE_SECTIONS = [] } = window.BlFormBuilder || {};
+  return PALETTE_SECTIONS.map((section) => {
+    // Media library fields replace Forms Uploads, in the same palette slot (after Date & time).
+    if (section.id === 'files') {
+      return {
+        id: 'media',
+        headingKey: 'paletteSectionMedia',
+        headingFallback: 'Media',
+        types: ['image', 'file'],
+      };
+    }
+    let types =
+      section.id === 'popular'
+        ? BLOCKS_POPULAR_TYPES
+        : (section.types || []).filter((type) => !EXCLUDED_TYPES.has(type));
+    if (section.id === 'advanced') {
+      types = [...types.filter((type) => type !== 'repeater'), 'repeater'];
+    }
+    return { ...section, types };
+  }).filter((section) => (section.types || []).length > 0);
+}
 
 function expandLegacyGroups(fields) {
   const out = [];
@@ -66,14 +60,14 @@ function createBlocksItem(data, open) {
   if ((data?.type || '') === 'repeater') {
     return createRepeaterCard(data, open, 1);
   }
-  return createFieldCard(data, open);
+  return window.BlFormBuilder.createFieldCard(data, open);
 }
 
 function serializeBlocksItem(row) {
   if ((row?.dataset?.fieldType || '') === 'repeater') {
     return serializeRepeaterRow(row);
   }
-  return serializeRow(row);
+  return window.BlFormBuilder.serializeRow(row);
 }
 
 /**
@@ -92,6 +86,18 @@ export function mountApp(root, initial, definitionType = 'block') {
     root.textContent = 'Form builder failed to load.';
     return;
   }
+
+  const {
+    el,
+    t,
+    writeConfig,
+    defaultField,
+    uniqueFieldName,
+    iconEl,
+    createFieldCard,
+    serializeRow,
+    equalizeColumnRun,
+  } = FormBuilder;
 
   if (typeof FormBuilder.configure === 'function') {
     FormBuilder.configure({ mediaLibraryFields: true });
@@ -155,7 +161,7 @@ export function mountApp(root, initial, definitionType = 'block') {
     ns: 'bl-forms-builder',
     groupName: 'bl-blocks-fields',
     items: initial.fields || [],
-    sections: BLOCKS_PALETTE,
+    sections: blocksPalette(),
     heading: t('canvasHeading', 'Fields'),
     emptyText: t('empty', 'Drag a field here.'),
     handleSelector: '.bl-forms-builder__handle',

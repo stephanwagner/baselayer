@@ -1939,35 +1939,26 @@
   }
 
   // themes/baselayer/packages/baselayer-blocks/src/js/admin/app.js
-  var {
-    el: el3,
-    t: t4,
-    writeConfig: writeConfig2,
-    PALETTE_SECTIONS,
-    defaultField: defaultField2,
-    uniqueFieldName: uniqueFieldName2,
-    iconEl: iconEl2,
-    createFieldCard: createFieldCard2,
-    serializeRow: serializeRow2,
-    equalizeColumnRun
-  } = window.BlFormBuilder || {};
   var EXCLUDED_TYPES = /* @__PURE__ */ new Set(["honeypot", "captcha", "terms"]);
   var BLOCKS_POPULAR_TYPES = ["text", "textarea", "select", "toggle"];
-  var BLOCKS_PALETTE = PALETTE_SECTIONS.map((section) => {
-    if (section.id === "files") {
-      return {
-        id: "media",
-        headingKey: "paletteSectionMedia",
-        headingFallback: "Media",
-        types: ["image", "file"]
-      };
-    }
-    let types = section.id === "popular" ? BLOCKS_POPULAR_TYPES : (section.types || []).filter((type) => !EXCLUDED_TYPES.has(type));
-    if (section.id === "advanced") {
-      types = [...types.filter((type) => type !== "repeater"), "repeater"];
-    }
-    return { ...section, types };
-  }).filter((section) => (section.types || []).length > 0);
+  function blocksPalette() {
+    const { PALETTE_SECTIONS = [] } = window.BlFormBuilder || {};
+    return PALETTE_SECTIONS.map((section) => {
+      if (section.id === "files") {
+        return {
+          id: "media",
+          headingKey: "paletteSectionMedia",
+          headingFallback: "Media",
+          types: ["image", "file"]
+        };
+      }
+      let types = section.id === "popular" ? BLOCKS_POPULAR_TYPES : (section.types || []).filter((type) => !EXCLUDED_TYPES.has(type));
+      if (section.id === "advanced") {
+        types = [...types.filter((type) => type !== "repeater"), "repeater"];
+      }
+      return { ...section, types };
+    }).filter((section) => (section.types || []).length > 0);
+  }
   function expandLegacyGroups(fields) {
     const out = [];
     (fields || []).forEach((field) => {
@@ -1987,13 +1978,13 @@
     if ((data?.type || "") === "repeater") {
       return createRepeaterCard(data, open, 1);
     }
-    return createFieldCard2(data, open);
+    return window.BlFormBuilder.createFieldCard(data, open);
   }
   function serializeBlocksItem(row) {
     if ((row?.dataset?.fieldType || "") === "repeater") {
       return serializeRepeaterRow(row);
     }
-    return serializeRow2(row);
+    return window.BlFormBuilder.serializeRow(row);
   }
   function mountApp(root, initial, definitionType = "block") {
     const Builder = window.BlCanvasBuilder;
@@ -2006,6 +1997,17 @@
       root.textContent = "Form builder failed to load.";
       return;
     }
+    const {
+      el: el7,
+      t: t4,
+      writeConfig: writeConfig2,
+      defaultField: defaultField2,
+      uniqueFieldName: uniqueFieldName2,
+      iconEl: iconEl2,
+      createFieldCard: createFieldCard2,
+      serializeRow: serializeRow2,
+      equalizeColumnRun
+    } = FormBuilder;
     if (typeof FormBuilder.configure === "function") {
       FormBuilder.configure({ mediaLibraryFields: true });
     }
@@ -2025,7 +2027,7 @@
       });
       builderApi?.canvas?.syncEmpty?.();
     };
-    const fieldsPanel = el3("div", {
+    const fieldsPanel = el7("div", {
       className: "bl-forms-builder__panel is-active",
       dataset: { blFormsPanel: "fields" }
     });
@@ -2060,7 +2062,7 @@
       ns: "bl-forms-builder",
       groupName: "bl-blocks-fields",
       items: initial.fields || [],
-      sections: BLOCKS_PALETTE,
+      sections: blocksPalette(),
       heading: t4("canvasHeading", "Fields"),
       emptyText: t4("empty", "Drag a field here."),
       handleSelector: ".bl-forms-builder__handle",
@@ -2089,7 +2091,7 @@
         syncAll();
       }
     });
-    const tabBar = el3("nav", { className: "bl-forms-builder__tabs", role: "tablist" });
+    const tabBar = el7("nav", { className: "bl-forms-builder__tabs", role: "tablist" });
     const tabs = [
       { id: "fields", label: t4("tabFields", "Fields"), panel: fieldsPanel },
       { id: "settings", label: t4("tabSettings", "Settings"), panel: panels.panel }
@@ -2104,7 +2106,7 @@
       });
     };
     tabs.forEach((tab, index2) => {
-      tab.button = el3("button", {
+      tab.button = el7("button", {
         type: "button",
         className: "bl-forms-builder__tab" + (index2 === 0 ? " is-active" : ""),
         role: "tab",
@@ -2143,7 +2145,7 @@
         setFullscreen(false);
       }
     };
-    const fullscreenBtn = el3("button", {
+    const fullscreenBtn = el7("button", {
       type: "button",
       className: "bl-forms-builder__icon-btn bl-forms-builder__fullscreen-btn",
       title: t4("fullscreenEnter", "Fullscreen"),
@@ -2158,13 +2160,13 @@
       fullscreenBtn.textContent = "\u26F6";
     }
     tabBar.appendChild(fullscreenBtn);
-    const panelsWrap = el3("div", { className: "bl-forms-builder__panels" }, [
+    const panelsWrap = el7("div", { className: "bl-forms-builder__panels" }, [
       fieldsPanel,
       panels.panel
     ]);
     root.append(
-      el3("div", { className: "bl-forms-builder__scroll" }, [
-        el3("div", { className: "bl-forms-builder__scroll-inner" }, [tabBar, panelsWrap])
+      el7("div", { className: "bl-forms-builder__scroll" }, [
+        el7("div", { className: "bl-forms-builder__scroll-inner" }, [tabBar, panelsWrap])
       ])
     );
     const form = root.closest("form");
@@ -2423,7 +2425,7 @@
   window.baselayerOpenPagePicker = openPagePicker;
 
   // themes/baselayer/packages/baselayer-blocks/src/js/admin/page-field.js
-  function el4(tag, props = {}, children = []) {
+  function el3(tag, props = {}, children = []) {
     const node = document.createElement(tag);
     Object.entries(props).forEach(([key, value]) => {
       if (value == null || value === false) return;
@@ -2477,33 +2479,33 @@
       title: "",
       url: ""
     }));
-    const summary = el4("div", { className: "bl-blocks-fields__page-picker-summary" });
-    const pickBtn = el4("button", {
+    const summary = el3("div", { className: "bl-blocks-fields__page-picker-summary" });
+    const pickBtn = el3("button", {
       type: "button",
       className: "button bl-button-small",
       text: i18n("choosePage", "Choose page")
     });
-    const clearBtn = el4("button", {
+    const clearBtn = el3("button", {
       type: "button",
       className: "button-link",
       text: i18n("clearPage", "Clear")
     });
-    const actions = el4("div", { className: "bl-blocks-fields__page-picker-actions" }, [
+    const actions = el3("div", { className: "bl-blocks-fields__page-picker-actions" }, [
       pickBtn,
       clearBtn
     ]);
-    const control = el4("div", {
+    const control = el3("div", {
       className: "bl-blocks-fields__page-picker",
       dataset: { blBlocksPagePicker: "1" }
     });
     control.append(
-      el4("div", { className: "bl-blocks-fields__page-picker-row" }, [summary, actions])
+      el3("div", { className: "bl-blocks-fields__page-picker-row" }, [summary, actions])
     );
     const syncUi = () => {
       summary.replaceChildren();
       if (selected.length === 0) {
         summary.appendChild(
-          el4("span", {
+          el3("span", {
             className: "description",
             text: multiple ? i18n("choosePagesHelp", "Select one or more pages.") : i18n("choosePageHelp", "Select a page.")
           })
@@ -2511,7 +2513,7 @@
       } else if (multiple) {
         selected.forEach((page) => {
           summary.appendChild(
-            el4("span", {
+            el3("span", {
               className: "bl-blocks-fields__page-picker-value",
               text: page.title || i18n("selectedPage", "Selected page") + " #" + page.id
             })
@@ -2520,14 +2522,14 @@
       } else {
         const page = selected[0];
         summary.appendChild(
-          el4("span", {
+          el3("span", {
             className: "bl-blocks-fields__page-picker-value",
             text: page.title || i18n("selectedPage", "Selected page") + " #" + page.id
           })
         );
         if (page.url) {
           summary.appendChild(
-            el4("span", {
+            el3("span", {
               className: "description bl-blocks-fields__page-picker-url",
               text: page.url,
               title: page.url
@@ -2648,16 +2650,16 @@
         if (selected.length === 0) {
           if (multiple) {
             inputsHost.appendChild(
-              el4("input", { type: "hidden", name: inputName + "[]", value: "" })
+              el3("input", { type: "hidden", name: inputName + "[]", value: "" })
             );
           } else {
-            inputsHost.appendChild(el4("input", { type: "hidden", name: inputName, value: "" }));
+            inputsHost.appendChild(el3("input", { type: "hidden", name: inputName, value: "" }));
           }
           return;
         }
         selected.forEach((page) => {
           const name = multiple ? inputName + "[]" : inputName;
-          const input = el4("input", {
+          const input = el3("input", {
             type: "hidden",
             name,
             value: String(page.id)
@@ -2671,7 +2673,7 @@
         summary.replaceChildren();
         if (selected.length === 0) {
           summary.appendChild(
-            el4("span", {
+            el3("span", {
               className: "description",
               text: multiple ? i18n("choosePagesHelp", "Select one or more pages.") : i18n("choosePageHelp", "Select a page.")
             })
@@ -2679,7 +2681,7 @@
         } else {
           selected.forEach((page) => {
             summary.appendChild(
-              el4("span", {
+              el3("span", {
                 className: "bl-blocks-fields__page-picker-value",
                 text: page.title || i18n("selectedPage", "Selected page") + " #" + page.id
               })
@@ -2737,7 +2739,7 @@
 
   // themes/baselayer/packages/baselayer-blocks/src/js/admin/link-field.js
   var LINK_TYPES = ["page", "url", "email", "phone"];
-  function el5(tag, props = {}, children = []) {
+  function el4(tag, props = {}, children = []) {
     const node = document.createElement(tag);
     Object.entries(props).forEach(([key, value]) => {
       if (value == null || value === false) return;
@@ -2778,7 +2780,7 @@
   }
   function allowedLinkTypes(field) {
     const raw = Array.isArray(field.link_types) ? field.link_types : LINK_TYPES;
-    const list = raw.map(String).filter((t5) => LINK_TYPES.includes(t5));
+    const list = raw.map(String).filter((t4) => LINK_TYPES.includes(t4));
     return list.length ? list : [...LINK_TYPES];
   }
   function normalizeLinkValue(current, allowed) {
@@ -2832,25 +2834,25 @@
     const allowTarget = field.allow_target !== false;
     let state = normalizeLinkValue(current, allowed);
     let pageMeta = state.type === "page" && state.page_id > 0 ? { id: state.page_id, title: state.title || "", url: state.url || "" } : null;
-    const root = el5("div", {
+    const root = el4("div", {
       className: "bl-blocks-fields__link",
       dataset: { blBlocksLinkField: "1" }
     });
-    const typeRow = el5("div", { className: "bl-blocks-fields__link-types" });
-    const destLabel = el5("label", { text: destinationFieldLabel(state.type) });
-    const destWrap = el5("div", { className: "bl-blocks-fields__link-destination" });
-    const destRow = el5("div", { className: "bl-blocks-fields__link-dest" }, [destLabel, destWrap]);
-    const titleInput = el5("input", {
+    const typeRow = el4("div", { className: "bl-blocks-fields__link-types" });
+    const destLabel = el4("label", { text: destinationFieldLabel(state.type) });
+    const destWrap = el4("div", { className: "bl-blocks-fields__link-destination" });
+    const destRow = el4("div", { className: "bl-blocks-fields__link-dest" }, [destLabel, destWrap]);
+    const titleInput = el4("input", {
       type: "text",
       className: "widefat",
       value: state.title
     });
-    const titleRow = el5("p", { className: "bl-blocks-fields__link-title" }, [
-      el5("label", { text: i18n2("linkText", "Link text") }),
+    const titleRow = el4("p", { className: "bl-blocks-fields__link-title" }, [
+      el4("label", { text: i18n2("linkText", "Link text") }),
       titleInput
     ]);
-    const targetInput = el5("input", { type: "checkbox" });
-    const targetRow = el5("label", { className: "bl-blocks-fields__toggle bl-blocks-fields__link-target" }, [
+    const targetInput = el4("input", { type: "checkbox" });
+    const targetRow = el4("label", { className: "bl-blocks-fields__toggle bl-blocks-fields__link-target" }, [
       targetInput,
       document.createTextNode(" " + i18n2("linkOpenNewTab", "Open in new tab"))
     ]);
@@ -2866,13 +2868,13 @@
       destLabel.textContent = destinationFieldLabel(state.type);
       destWrap.replaceChildren();
       if (state.type === "page") {
-        const summary = el5("div", { className: "bl-blocks-fields__page-picker-summary" });
-        const pickBtn = el5("button", {
+        const summary = el4("div", { className: "bl-blocks-fields__page-picker-summary" });
+        const pickBtn = el4("button", {
           type: "button",
           className: "button bl-button-small",
           text: pageMeta ? i18n2("changePage", "Change page") : i18n2("choosePage", "Choose page")
         });
-        const clearBtn = el5("button", {
+        const clearBtn = el4("button", {
           type: "button",
           className: "button-link",
           text: i18n2("clearPage", "Clear"),
@@ -2880,14 +2882,14 @@
         });
         if (pageMeta) {
           summary.appendChild(
-            el5("span", {
+            el4("span", {
               className: "bl-blocks-fields__page-picker-value",
               text: pageMeta.title || i18n2("selectedPage", "Selected page") + " #" + pageMeta.id
             })
           );
           if (pageMeta.url) {
             summary.appendChild(
-              el5("span", {
+              el4("span", {
                 className: "description bl-blocks-fields__page-picker-url",
                 text: pageMeta.url,
                 title: pageMeta.url
@@ -2896,7 +2898,7 @@
           }
         } else {
           summary.appendChild(
-            el5("span", {
+            el4("span", {
               className: "description",
               text: i18n2("choosePageHelp", "Select a page.")
             })
@@ -2940,9 +2942,9 @@
           renderDestination();
         });
         destWrap.appendChild(
-          el5("div", { className: "bl-blocks-fields__page-picker-row" }, [
+          el4("div", { className: "bl-blocks-fields__page-picker-row" }, [
             summary,
-            el5("div", { className: "bl-blocks-fields__page-picker-actions" }, [pickBtn, clearBtn])
+            el4("div", { className: "bl-blocks-fields__page-picker-actions" }, [pickBtn, clearBtn])
           ])
         );
         return;
@@ -2957,7 +2959,7 @@
         value = normalizeLinkHref(value);
         state.url = value;
       }
-      const input = el5("input", {
+      const input = el4("input", {
         type: inputType,
         className: "widefat",
         value
@@ -2984,7 +2986,7 @@
         phone: i18n2("linkTypePhone", "Phone")
       };
       allowed.forEach((type) => {
-        const btn = el5("button", {
+        const btn = el4("button", {
           type: "button",
           className: "button bl-button-small bl-blocks-fields__link-type" + (state.type === type ? " is-active" : ""),
           text: labels[type] || type,
@@ -3007,8 +3009,8 @@
         typeRow.appendChild(btn);
       });
       root.appendChild(
-        el5("div", { className: "bl-blocks-fields__link-type-block" }, [
-          el5("label", { text: i18n2("linkTypeLabel", "Type") }),
+        el4("div", { className: "bl-blocks-fields__link-type-block" }, [
+          el4("label", { text: i18n2("linkTypeLabel", "Type") }),
           typeRow
         ])
       );
@@ -3084,7 +3086,7 @@
       wrap.dataset.blLinkBound = "1";
       const inputName = wrap.dataset.inputName || "";
       if (!inputName) return;
-      let allowed = String(wrap.dataset.linkTypes || "").split(",").map((s) => s.trim()).filter((t5) => LINK_TYPES.includes(t5));
+      let allowed = String(wrap.dataset.linkTypes || "").split(",").map((s) => s.trim()).filter((t4) => LINK_TYPES.includes(t4));
       if (!allowed.length) allowed = [...LINK_TYPES];
       const allowTarget = wrap.dataset.allowTarget === "1";
       const readHidden = () => {
@@ -3120,7 +3122,7 @@
         const keys = ["type", "url", "title", "page_id"];
         keys.forEach((key) => {
           const val = value[key] != null ? String(value[key]) : "";
-          const input = el5("input", {
+          const input = el4("input", {
             type: "hidden",
             name: `${inputName}[${key}]`,
             value: val,
@@ -3130,7 +3132,7 @@
         });
         if (value.target === "_blank") {
           inputsHost.appendChild(
-            el5("input", {
+            el4("input", {
               type: "hidden",
               name: `${inputName}[target]`,
               value: "_blank",
@@ -3150,74 +3152,74 @@
   }
 
   // node_modules/sortablejs/modular/sortable.esm.js
-  function _defineProperty(e, r, t5) {
+  function _defineProperty(e, r, t4) {
     return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, {
-      value: t5,
+      value: t4,
       enumerable: true,
       configurable: true,
       writable: true
-    }) : e[r] = t5, e;
+    }) : e[r] = t4, e;
   }
   function _extends() {
     return _extends = Object.assign ? Object.assign.bind() : function(n) {
       for (var e = 1; e < arguments.length; e++) {
-        var t5 = arguments[e];
-        for (var r in t5) ({}).hasOwnProperty.call(t5, r) && (n[r] = t5[r]);
+        var t4 = arguments[e];
+        for (var r in t4) ({}).hasOwnProperty.call(t4, r) && (n[r] = t4[r]);
       }
       return n;
     }, _extends.apply(null, arguments);
   }
   function ownKeys(e, r) {
-    var t5 = Object.keys(e);
+    var t4 = Object.keys(e);
     if (Object.getOwnPropertySymbols) {
       var o = Object.getOwnPropertySymbols(e);
       r && (o = o.filter(function(r2) {
         return Object.getOwnPropertyDescriptor(e, r2).enumerable;
-      })), t5.push.apply(t5, o);
+      })), t4.push.apply(t4, o);
     }
-    return t5;
+    return t4;
   }
   function _objectSpread2(e) {
     for (var r = 1; r < arguments.length; r++) {
-      var t5 = null != arguments[r] ? arguments[r] : {};
-      r % 2 ? ownKeys(Object(t5), true).forEach(function(r2) {
-        _defineProperty(e, r2, t5[r2]);
-      }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t5)) : ownKeys(Object(t5)).forEach(function(r2) {
-        Object.defineProperty(e, r2, Object.getOwnPropertyDescriptor(t5, r2));
+      var t4 = null != arguments[r] ? arguments[r] : {};
+      r % 2 ? ownKeys(Object(t4), true).forEach(function(r2) {
+        _defineProperty(e, r2, t4[r2]);
+      }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t4)) : ownKeys(Object(t4)).forEach(function(r2) {
+        Object.defineProperty(e, r2, Object.getOwnPropertyDescriptor(t4, r2));
       });
     }
     return e;
   }
-  function _objectWithoutProperties(e, t5) {
+  function _objectWithoutProperties(e, t4) {
     if (null == e) return {};
-    var o, r, i = _objectWithoutPropertiesLoose(e, t5);
+    var o, r, i = _objectWithoutPropertiesLoose(e, t4);
     if (Object.getOwnPropertySymbols) {
       var n = Object.getOwnPropertySymbols(e);
-      for (r = 0; r < n.length; r++) o = n[r], -1 === t5.indexOf(o) && {}.propertyIsEnumerable.call(e, o) && (i[o] = e[o]);
+      for (r = 0; r < n.length; r++) o = n[r], -1 === t4.indexOf(o) && {}.propertyIsEnumerable.call(e, o) && (i[o] = e[o]);
     }
     return i;
   }
   function _objectWithoutPropertiesLoose(r, e) {
     if (null == r) return {};
-    var t5 = {};
+    var t4 = {};
     for (var n in r) if ({}.hasOwnProperty.call(r, n)) {
       if (-1 !== e.indexOf(n)) continue;
-      t5[n] = r[n];
+      t4[n] = r[n];
     }
-    return t5;
+    return t4;
   }
-  function _toPrimitive(t5, r) {
-    if ("object" != typeof t5 || !t5) return t5;
-    var e = t5[Symbol.toPrimitive];
+  function _toPrimitive(t4, r) {
+    if ("object" != typeof t4 || !t4) return t4;
+    var e = t4[Symbol.toPrimitive];
     if (void 0 !== e) {
-      var i = e.call(t5, r || "default");
+      var i = e.call(t4, r || "default");
       if ("object" != typeof i) return i;
       throw new TypeError("@@toPrimitive must return a primitive value.");
     }
-    return ("string" === r ? String : Number)(t5);
+    return ("string" === r ? String : Number)(t4);
   }
-  function _toPropertyKey(t5) {
-    var i = _toPrimitive(t5, "string");
+  function _toPropertyKey(t4) {
+    var i = _toPrimitive(t4, "string");
     return "symbol" == typeof i ? i : i + "";
   }
   function _typeof(o) {
@@ -3244,23 +3246,23 @@
     capture: false,
     passive: false
   };
-  function on(el8, event, fn) {
-    el8.addEventListener(event, fn, !IE11OrLess && captureMode);
+  function on(el7, event, fn) {
+    el7.addEventListener(event, fn, !IE11OrLess && captureMode);
   }
-  function off(el8, event, fn) {
-    el8.removeEventListener(event, fn, !IE11OrLess && captureMode);
+  function off(el7, event, fn) {
+    el7.removeEventListener(event, fn, !IE11OrLess && captureMode);
   }
-  function matches(el8, selector) {
+  function matches(el7, selector) {
     if (!selector) return;
     selector[0] === ">" && (selector = selector.substring(1));
-    if (el8) {
+    if (el7) {
       try {
-        if (el8.matches) {
-          return el8.matches(selector);
-        } else if (el8.msMatchesSelector) {
-          return el8.msMatchesSelector(selector);
-        } else if (el8.webkitMatchesSelector) {
-          return el8.webkitMatchesSelector(selector);
+        if (el7.matches) {
+          return el7.matches(selector);
+        } else if (el7.msMatchesSelector) {
+          return el7.msMatchesSelector(selector);
+        } else if (el7.webkitMatchesSelector) {
+          return el7.webkitMatchesSelector(selector);
         }
       } catch (_) {
         return false;
@@ -3268,40 +3270,40 @@
     }
     return false;
   }
-  function getParentOrHost(el8) {
-    return el8.host && el8 !== document && el8.host.nodeType && el8.host !== el8 ? el8.host : el8.parentNode;
+  function getParentOrHost(el7) {
+    return el7.host && el7 !== document && el7.host.nodeType && el7.host !== el7 ? el7.host : el7.parentNode;
   }
-  function closest(el8, selector, ctx, includeCTX) {
-    if (el8) {
+  function closest(el7, selector, ctx, includeCTX) {
+    if (el7) {
       ctx = ctx || document;
       do {
-        if (selector != null && (selector[0] === ">" ? el8.parentNode === ctx && matches(el8, selector) : matches(el8, selector)) || includeCTX && el8 === ctx) {
-          return el8;
+        if (selector != null && (selector[0] === ">" ? el7.parentNode === ctx && matches(el7, selector) : matches(el7, selector)) || includeCTX && el7 === ctx) {
+          return el7;
         }
-        if (el8 === ctx) break;
-      } while (el8 = getParentOrHost(el8));
+        if (el7 === ctx) break;
+      } while (el7 = getParentOrHost(el7));
     }
     return null;
   }
   var R_SPACE = /\s+/g;
-  function toggleClass(el8, name, state) {
-    if (el8 && name) {
-      if (el8.classList) {
-        el8.classList[state ? "add" : "remove"](name);
+  function toggleClass(el7, name, state) {
+    if (el7 && name) {
+      if (el7.classList) {
+        el7.classList[state ? "add" : "remove"](name);
       } else {
-        var className = (" " + el8.className + " ").replace(R_SPACE, " ").replace(" " + name + " ", " ");
-        el8.className = (className + (state ? " " + name : "")).replace(R_SPACE, " ");
+        var className = (" " + el7.className + " ").replace(R_SPACE, " ").replace(" " + name + " ", " ");
+        el7.className = (className + (state ? " " + name : "")).replace(R_SPACE, " ");
       }
     }
   }
-  function css(el8, prop, val) {
-    var style = el8 && el8.style;
+  function css(el7, prop, val) {
+    var style = el7 && el7.style;
     if (style) {
       if (val === void 0) {
         if (document.defaultView && document.defaultView.getComputedStyle) {
-          val = document.defaultView.getComputedStyle(el8, "");
-        } else if (el8.currentStyle) {
-          val = el8.currentStyle;
+          val = document.defaultView.getComputedStyle(el7, "");
+        } else if (el7.currentStyle) {
+          val = el7.currentStyle;
         }
         return prop === void 0 ? val : val[prop];
       } else {
@@ -3312,17 +3314,17 @@
       }
     }
   }
-  function matrix(el8, selfOnly) {
+  function matrix(el7, selfOnly) {
     var appliedTransforms = "";
-    if (typeof el8 === "string") {
-      appliedTransforms = el8;
+    if (typeof el7 === "string") {
+      appliedTransforms = el7;
     } else {
       do {
-        var transform = css(el8, "transform");
+        var transform = css(el7, "transform");
         if (transform && transform !== "none") {
           appliedTransforms = transform + " " + appliedTransforms;
         }
-      } while (!selfOnly && (el8 = el8.parentNode));
+      } while (!selfOnly && (el7 = el7.parentNode));
     }
     var matrixFn = window.DOMMatrix || window.WebKitCSSMatrix || window.CSSMatrix || window.MSCSSMatrix;
     return matrixFn && new matrixFn(appliedTransforms);
@@ -3347,11 +3349,11 @@
       return document.documentElement;
     }
   }
-  function getRect(el8, relativeToContainingBlock, relativeToNonStaticParent, undoScale, container) {
-    if (!el8.getBoundingClientRect && el8 !== window) return;
+  function getRect(el7, relativeToContainingBlock, relativeToNonStaticParent, undoScale, container) {
+    if (!el7.getBoundingClientRect && el7 !== window) return;
     var elRect, top, left, bottom, right, height, width;
-    if (el8 !== window && el8.parentNode && el8 !== getWindowScrollingElement()) {
-      elRect = el8.getBoundingClientRect();
+    if (el7 !== window && el7.parentNode && el7 !== getWindowScrollingElement()) {
+      elRect = el7.getBoundingClientRect();
       top = elRect.top;
       left = elRect.left;
       bottom = elRect.bottom;
@@ -3366,8 +3368,8 @@
       height = window.innerHeight;
       width = window.innerWidth;
     }
-    if ((relativeToContainingBlock || relativeToNonStaticParent) && el8 !== window) {
-      container = container || el8.parentNode;
+    if ((relativeToContainingBlock || relativeToNonStaticParent) && el7 !== window) {
+      container = container || el7.parentNode;
       if (!IE11OrLess) {
         do {
           if (container && container.getBoundingClientRect && (css(container, "transform") !== "none" || relativeToNonStaticParent && css(container, "position") !== "static")) {
@@ -3381,8 +3383,8 @@
         } while (container = container.parentNode);
       }
     }
-    if (undoScale && el8 !== window) {
-      var elMatrix = matrix(container || el8), scaleX = elMatrix && elMatrix.a, scaleY = elMatrix && elMatrix.d;
+    if (undoScale && el7 !== window) {
+      var elMatrix = matrix(container || el7), scaleX = elMatrix && elMatrix.a, scaleY = elMatrix && elMatrix.d;
       if (elMatrix) {
         top /= scaleY;
         left /= scaleX;
@@ -3401,8 +3403,8 @@
       height
     };
   }
-  function isScrolledPast(el8, elSide, parentSide) {
-    var parent = getParentAutoScrollElement(el8, true), elSideVal = getRect(el8)[elSide];
+  function isScrolledPast(el7, elSide, parentSide) {
+    var parent = getParentAutoScrollElement(el7, true), elSideVal = getRect(el7)[elSide];
     while (parent) {
       var parentSideVal = getRect(parent)[parentSide], visible = void 0;
       if (parentSide === "top" || parentSide === "left") {
@@ -3416,10 +3418,10 @@
     }
     return false;
   }
-  function getChild(el8, childNum, options, includeDragEl) {
-    var currentChild = 0, i = 0, children = el8.children;
+  function getChild(el7, childNum, options, includeDragEl) {
+    var currentChild = 0, i = 0, children = el7.children;
     while (i < children.length) {
-      if (children[i].style.display !== "none" && children[i] !== Sortable.ghost && (includeDragEl || children[i] !== Sortable.dragged) && closest(children[i], options.draggable, el8, false)) {
+      if (children[i].style.display !== "none" && children[i] !== Sortable.ghost && (includeDragEl || children[i] !== Sortable.dragged) && closest(children[i], options.draggable, el7, false)) {
         if (currentChild === childNum) {
           return children[i];
         }
@@ -3429,33 +3431,33 @@
     }
     return null;
   }
-  function lastChild(el8, selector) {
-    var last = el8.lastElementChild;
+  function lastChild(el7, selector) {
+    var last = el7.lastElementChild;
     while (last && (last === Sortable.ghost || css(last, "display") === "none" || selector && !matches(last, selector))) {
       last = last.previousElementSibling;
     }
     return last || null;
   }
-  function index(el8, selector) {
+  function index(el7, selector) {
     var index2 = 0;
-    if (!el8 || !el8.parentNode) {
+    if (!el7 || !el7.parentNode) {
       return -1;
     }
-    while (el8 = el8.previousElementSibling) {
-      if (el8.nodeName.toUpperCase() !== "TEMPLATE" && el8 !== Sortable.clone && (!selector || matches(el8, selector))) {
+    while (el7 = el7.previousElementSibling) {
+      if (el7.nodeName.toUpperCase() !== "TEMPLATE" && el7 !== Sortable.clone && (!selector || matches(el7, selector))) {
         index2++;
       }
     }
     return index2;
   }
-  function getRelativeScrollOffset(el8) {
+  function getRelativeScrollOffset(el7) {
     var offsetLeft = 0, offsetTop = 0, winScroller = getWindowScrollingElement();
-    if (el8) {
+    if (el7) {
       do {
-        var elMatrix = matrix(el8), scaleX = elMatrix.a, scaleY = elMatrix.d;
-        offsetLeft += el8.scrollLeft * scaleX;
-        offsetTop += el8.scrollTop * scaleY;
-      } while (el8 !== winScroller && (el8 = el8.parentNode));
+        var elMatrix = matrix(el7), scaleX = elMatrix.a, scaleY = elMatrix.d;
+        offsetLeft += el7.scrollLeft * scaleX;
+        offsetTop += el7.scrollTop * scaleY;
+      } while (el7 !== winScroller && (el7 = el7.parentNode));
     }
     return [offsetLeft, offsetTop];
   }
@@ -3468,9 +3470,9 @@
     }
     return -1;
   }
-  function getParentAutoScrollElement(el8, includeSelf) {
-    if (!el8 || !el8.getBoundingClientRect) return getWindowScrollingElement();
-    var elem = el8;
+  function getParentAutoScrollElement(el7, includeSelf) {
+    if (!el7 || !el7.getBoundingClientRect) return getWindowScrollingElement();
+    var elem = el7;
     var gotSelf = false;
     do {
       if (elem.clientWidth < elem.scrollWidth || elem.clientHeight < elem.scrollHeight) {
@@ -3517,19 +3519,19 @@
     clearTimeout(_throttleTimeout);
     _throttleTimeout = void 0;
   }
-  function scrollBy(el8, x, y) {
-    el8.scrollLeft += x;
-    el8.scrollTop += y;
+  function scrollBy(el7, x, y) {
+    el7.scrollLeft += x;
+    el7.scrollTop += y;
   }
-  function clone(el8) {
+  function clone(el7) {
     var Polymer = window.Polymer;
     var $ = window.jQuery || window.Zepto;
     if (Polymer && Polymer.dom) {
-      return Polymer.dom(el8).cloneNode(true);
+      return Polymer.dom(el7).cloneNode(true);
     } else if ($) {
-      return $(el8).clone(true)[0];
+      return $(el7).clone(true)[0];
     } else {
-      return el8.cloneNode(true);
+      return el7.cloneNode(true);
     }
   }
   function getChildContainingRectFromElement(container, options, ghostEl2) {
@@ -3703,11 +3705,11 @@
         }
       });
     },
-    initializePlugins: function initializePlugins(sortable, el8, defaults2, options) {
+    initializePlugins: function initializePlugins(sortable, el7, defaults2, options) {
       plugins.forEach(function(plugin) {
         var pluginName = plugin.pluginName;
         if (!sortable.options[pluginName] && !plugin.initializeByDefault) return;
-        var initialized = new plugin(sortable, el8, sortable.options);
+        var initialized = new plugin(sortable, el7, sortable.options);
         initialized.sortable = sortable;
         initialized.options = sortable.options;
         sortable[pluginName] = initialized;
@@ -3866,12 +3868,12 @@
     if (IE11OrLess) {
       return false;
     }
-    var el8 = document.createElement("x");
-    el8.style.cssText = "pointer-events:auto";
-    return el8.style.pointerEvents === "auto";
+    var el7 = document.createElement("x");
+    el7.style.cssText = "pointer-events:auto";
+    return el7.style.pointerEvents === "auto";
   })();
-  var _detectDirection = function _detectDirection2(el8, options) {
-    var elCSS = css(el8), elWidth = parseInt(elCSS.width) - parseInt(elCSS.paddingLeft) - parseInt(elCSS.paddingRight) - parseInt(elCSS.borderLeftWidth) - parseInt(elCSS.borderRightWidth), child1 = getChild(el8, 0, options), child2 = getChild(el8, 1, options), firstChildCSS = child1 && css(child1), secondChildCSS = child2 && css(child2), firstChildWidth = firstChildCSS && parseInt(firstChildCSS.marginLeft) + parseInt(firstChildCSS.marginRight) + getRect(child1).width, secondChildWidth = secondChildCSS && parseInt(secondChildCSS.marginLeft) + parseInt(secondChildCSS.marginRight) + getRect(child2).width;
+  var _detectDirection = function _detectDirection2(el7, options) {
+    var elCSS = css(el7), elWidth = parseInt(elCSS.width) - parseInt(elCSS.paddingLeft) - parseInt(elCSS.paddingRight) - parseInt(elCSS.borderLeftWidth) - parseInt(elCSS.borderRightWidth), child1 = getChild(el7, 0, options), child2 = getChild(el7, 1, options), firstChildCSS = child1 && css(child1), secondChildCSS = child2 && css(child2), firstChildWidth = firstChildCSS && parseInt(firstChildCSS.marginLeft) + parseInt(firstChildCSS.marginRight) + getRect(child1).width, secondChildWidth = secondChildCSS && parseInt(secondChildCSS.marginLeft) + parseInt(secondChildCSS.marginRight) + getRect(child2).width;
     if (elCSS.display === "flex") {
       return elCSS.flexDirection === "column" || elCSS.flexDirection === "column-reverse" ? "vertical" : "horizontal";
     }
@@ -3975,20 +3977,20 @@
       dragEl.parentNode[expando]._isOutsideThisEl(evt.target);
     }
   };
-  function Sortable(el8, options) {
-    if (!(el8 && el8.nodeType && el8.nodeType === 1)) {
-      throw "Sortable: `el` must be an HTMLElement, not ".concat({}.toString.call(el8));
+  function Sortable(el7, options) {
+    if (!(el7 && el7.nodeType && el7.nodeType === 1)) {
+      throw "Sortable: `el` must be an HTMLElement, not ".concat({}.toString.call(el7));
     }
-    this.el = el8;
+    this.el = el7;
     this.options = options = _extends({}, options);
-    el8[expando] = this;
+    el7[expando] = this;
     var defaults2 = {
       group: null,
       sort: true,
       disabled: false,
       store: null,
       handle: null,
-      draggable: /^[uo]l$/i.test(el8.nodeName) ? ">li" : ">*",
+      draggable: /^[uo]l$/i.test(el7.nodeName) ? ">li" : ">*",
       swapThreshold: 1,
       // percentage; 0 <= x <= 1
       invertSwap: false,
@@ -3997,7 +3999,7 @@
       // will be set to same as swapThreshold if default
       removeCloneOnHide: true,
       direction: function direction() {
-        return _detectDirection(el8, this.options);
+        return _detectDirection(el7, this.options);
       },
       ghostClass: "sortable-ghost",
       chosenClass: "sortable-chosen",
@@ -4028,7 +4030,7 @@
       supportPointer: Sortable.supportPointer !== false && "PointerEvent" in window && (!Safari || IOS),
       emptyInsertThreshold: 5
     };
-    PluginManager.initializePlugins(this, el8, defaults2);
+    PluginManager.initializePlugins(this, el7, defaults2);
     for (var name in defaults2) {
       !(name in options) && (options[name] = defaults2[name]);
     }
@@ -4043,14 +4045,14 @@
       this.options.touchStartThreshold = 1;
     }
     if (options.supportPointer) {
-      on(el8, "pointerdown", this._onTapStart);
+      on(el7, "pointerdown", this._onTapStart);
     } else {
-      on(el8, "mousedown", this._onTapStart);
-      on(el8, "touchstart", this._onTapStart);
+      on(el7, "mousedown", this._onTapStart);
+      on(el7, "touchstart", this._onTapStart);
     }
     if (this.nativeDraggable) {
-      on(el8, "dragover", this);
-      on(el8, "dragenter", this);
+      on(el7, "dragover", this);
+      on(el7, "dragenter", this);
     }
     sortables.push(this.el);
     options.store && options.store.get && this.sort(options.store.get(this) || []);
@@ -4069,8 +4071,8 @@
     },
     _onTapStart: function _onTapStart(evt) {
       if (!evt.cancelable) return;
-      var _this = this, el8 = this.el, options = this.options, preventOnFilter = options.preventOnFilter, type = evt.type, touch = evt.touches && evt.touches[0] || evt.pointerType && evt.pointerType === "touch" && evt, target = (touch || evt).target, originalTarget = evt.target.shadowRoot && (evt.path && evt.path[0] || evt.composedPath && evt.composedPath()[0]) || target, filter = options.filter;
-      _saveInputCheckedState(el8);
+      var _this = this, el7 = this.el, options = this.options, preventOnFilter = options.preventOnFilter, type = evt.type, touch = evt.touches && evt.touches[0] || evt.pointerType && evt.pointerType === "touch" && evt, target = (touch || evt).target, originalTarget = evt.target.shadowRoot && (evt.path && evt.path[0] || evt.composedPath && evt.composedPath()[0]) || target, filter = options.filter;
+      _saveInputCheckedState(el7);
       if (dragEl) {
         return;
       }
@@ -4083,7 +4085,7 @@
       if (!this.nativeDraggable && Safari && target && target.tagName.toUpperCase() === "SELECT") {
         return;
       }
-      target = closest(target, options.draggable, el8, false);
+      target = closest(target, options.draggable, el7, false);
       if (target && target.animated) {
         return;
       }
@@ -4099,8 +4101,8 @@
             rootEl: originalTarget,
             name: "filter",
             targetEl: target,
-            toEl: el8,
-            fromEl: el8
+            toEl: el7,
+            fromEl: el7
           });
           pluginEvent2("filter", _this, {
             evt
@@ -4110,15 +4112,15 @@
         }
       } else if (filter) {
         filter = filter.split(",").some(function(criteria) {
-          criteria = closest(originalTarget, criteria.trim(), el8, false);
+          criteria = closest(originalTarget, criteria.trim(), el7, false);
           if (criteria) {
             _dispatchEvent({
               sortable: _this,
               rootEl: criteria,
               name: "filter",
               targetEl: target,
-              fromEl: el8,
-              toEl: el8
+              fromEl: el7,
+              toEl: el7
             });
             pluginEvent2("filter", _this, {
               evt
@@ -4131,16 +4133,16 @@
           return;
         }
       }
-      if (options.handle && !closest(originalTarget, options.handle, el8, false)) {
+      if (options.handle && !closest(originalTarget, options.handle, el7, false)) {
         return;
       }
       this._prepareDragStart(evt, touch, target);
     },
     _prepareDragStart: function _prepareDragStart(evt, touch, target) {
-      var _this = this, el8 = _this.el, options = _this.options, ownerDocument = el8.ownerDocument, dragStartFn;
-      if (target && !dragEl && target.parentNode === el8) {
+      var _this = this, el7 = _this.el, options = _this.options, ownerDocument = el7.ownerDocument, dragStartFn;
+      if (target && !dragEl && target.parentNode === el7) {
         var dragRect = getRect(target);
-        rootEl = el8;
+        rootEl = el7;
         dragEl = target;
         parentEl = dragEl.parentNode;
         nextEl = dragEl.nextSibling;
@@ -4455,7 +4457,7 @@
     },
     // Returns true - if no further action is needed (either inserted or another condition)
     _onDragOver: function _onDragOver(evt) {
-      var el8 = this.el, target = evt.target, dragRect, targetRect, revert, options = this.options, group = options.group, activeSortable = Sortable.active, isOwner = activeGroup === group, canSort = options.sort, fromSortable = putSortable || activeSortable, vertical, _this = this, completedFired = false;
+      var el7 = this.el, target = evt.target, dragRect, targetRect, revert, options = this.options, group = options.group, activeSortable = Sortable.active, isOwner = activeGroup === group, canSort = options.sort, fromSortable = putSortable || activeSortable, vertical, _this = this, completedFired = false;
       if (_silent) return;
       function dragOverEvent(name, extra) {
         pluginEvent2(name, _this, _objectSpread2({
@@ -4470,7 +4472,7 @@
           target,
           completed,
           onMove: function onMove(target2, after2) {
-            return _onMove(rootEl, el8, dragEl, dragRect, target2, getRect(target2), evt, after2);
+            return _onMove(rootEl, el7, dragEl, dragRect, target2, getRect(target2), evt, after2);
           },
           changed
         }, extra));
@@ -4513,7 +4515,7 @@
             fromSortable._ignoreWhileAnimating = null;
           }
         }
-        if (target === dragEl && !dragEl.animated || target === el8 && !target.animated) {
+        if (target === dragEl && !dragEl.animated || target === el7 && !target.animated) {
           lastTarget = null;
         }
         if (!options.dragoverBubble && !evt.rootEl && target !== document) {
@@ -4529,7 +4531,7 @@
         _dispatchEvent({
           sortable: _this,
           name: "change",
-          toEl: el8,
+          toEl: el7,
           newIndex,
           newDraggableIndex,
           originalEvent: evt
@@ -4538,7 +4540,7 @@
       if (evt.preventDefault !== void 0) {
         evt.cancelable && evt.preventDefault();
       }
-      target = closest(target, options.draggable, el8, true);
+      target = closest(target, options.draggable, el7, true);
       dragOverEvent("dragOver");
       if (Sortable.eventCanceled) return completedFired;
       if (dragEl.contains(evt.target) || target.animated && target.animatingX && target.animatingY || _this._ignoreWhileAnimating === target) {
@@ -4564,45 +4566,45 @@
           }
           return completed(true);
         }
-        var elLastChild = lastChild(el8, options.draggable);
+        var elLastChild = lastChild(el7, options.draggable);
         if (!elLastChild || _ghostIsLast(evt, vertical, this) && !elLastChild.animated) {
           if (elLastChild === dragEl) {
             return completed(false);
           }
-          if (elLastChild && el8 === evt.target) {
+          if (elLastChild && el7 === evt.target) {
             target = elLastChild;
           }
           if (target) {
             targetRect = getRect(target);
           }
-          if (_onMove(rootEl, el8, dragEl, dragRect, target, targetRect, evt, !!target) !== false) {
+          if (_onMove(rootEl, el7, dragEl, dragRect, target, targetRect, evt, !!target) !== false) {
             capture();
             if (elLastChild && elLastChild.nextSibling) {
-              el8.insertBefore(dragEl, elLastChild.nextSibling);
+              el7.insertBefore(dragEl, elLastChild.nextSibling);
             } else {
-              el8.appendChild(dragEl);
+              el7.appendChild(dragEl);
             }
-            parentEl = el8;
+            parentEl = el7;
             changed();
             return completed(true);
           }
         } else if (elLastChild && _ghostIsFirst(evt, vertical, this)) {
-          var firstChild = getChild(el8, 0, options, true);
+          var firstChild = getChild(el7, 0, options, true);
           if (firstChild === dragEl) {
             return completed(false);
           }
           target = firstChild;
           targetRect = getRect(target);
-          if (_onMove(rootEl, el8, dragEl, dragRect, target, targetRect, evt, false) !== false) {
+          if (_onMove(rootEl, el7, dragEl, dragRect, target, targetRect, evt, false) !== false) {
             capture();
-            el8.insertBefore(dragEl, firstChild);
-            parentEl = el8;
+            el7.insertBefore(dragEl, firstChild);
+            parentEl = el7;
             changed();
             return completed(true);
           }
-        } else if (target.parentNode === el8) {
+        } else if (target.parentNode === el7) {
           targetRect = getRect(target);
-          var direction = 0, targetBeforeFirstSwap, differentLevel = dragEl.parentNode !== el8, differentRowCol = !_dragElInRowColumn(dragEl.animated && dragEl.toRect || dragRect, target.animated && target.toRect || targetRect, vertical), side1 = vertical ? "top" : "left", scrolledPastTop = isScrolledPast(target, "top", "top") || isScrolledPast(dragEl, "top", "top"), scrollBefore = scrolledPastTop ? scrolledPastTop.scrollTop : void 0;
+          var direction = 0, targetBeforeFirstSwap, differentLevel = dragEl.parentNode !== el7, differentRowCol = !_dragElInRowColumn(dragEl.animated && dragEl.toRect || dragRect, target.animated && target.toRect || targetRect, vertical), side1 = vertical ? "top" : "left", scrolledPastTop = isScrolledPast(target, "top", "top") || isScrolledPast(dragEl, "top", "top"), scrollBefore = scrolledPastTop ? scrolledPastTop.scrollTop : void 0;
           if (lastTarget !== target) {
             targetBeforeFirstSwap = targetRect[side1];
             pastFirstInvertThresh = false;
@@ -4624,7 +4626,7 @@
           lastDirection = direction;
           var nextSibling = target.nextElementSibling, after = false;
           after = direction === 1;
-          var moveVector = _onMove(rootEl, el8, dragEl, dragRect, target, targetRect, evt, after);
+          var moveVector = _onMove(rootEl, el7, dragEl, dragRect, target, targetRect, evt, after);
           if (moveVector !== false) {
             if (moveVector === 1 || moveVector === -1) {
               after = moveVector === 1;
@@ -4633,7 +4635,7 @@
             setTimeout(_unsilent, 30);
             capture();
             if (after && !nextSibling) {
-              el8.appendChild(dragEl);
+              el7.appendChild(dragEl);
             } else {
               target.parentNode.insertBefore(dragEl, after ? nextSibling : target);
             }
@@ -4648,7 +4650,7 @@
             return completed(true);
           }
         }
-        if (el8.contains(dragEl)) {
+        if (el7.contains(dragEl)) {
           return completed(false);
         }
       }
@@ -4673,7 +4675,7 @@
       off(document, "selectstart", this);
     },
     _onDrop: function _onDrop(evt) {
-      var el8 = this.el, options = this.options;
+      var el7 = this.el, options = this.options;
       newIndex = index(dragEl);
       newDraggableIndex = index(dragEl, options.draggable);
       pluginEvent2("drop", this, {
@@ -4695,7 +4697,7 @@
       _cancelNextTick(this._dragStartId);
       if (this.nativeDraggable) {
         off(document, "drop", this);
-        off(el8, "dragstart", this._onDragStart);
+        off(el7, "dragstart", this._onDragStart);
       }
       this._offMoveEvents();
       this._offUpEvents();
@@ -4798,9 +4800,9 @@
     _nulling: function _nulling() {
       pluginEvent2("nulling", this);
       rootEl = dragEl = parentEl = ghostEl = nextEl = cloneEl = lastDownEl = cloneHidden = tapEvt = touchEvt = moved = newIndex = newDraggableIndex = oldIndex = oldDraggableIndex = lastTarget = lastDirection = putSortable = activeGroup = Sortable.dragged = Sortable.ghost = Sortable.clone = Sortable.active = null;
-      var el8 = this.el;
+      var el7 = this.el;
       savedInputChecked.forEach(function(checkEl) {
-        if (el8.contains(checkEl)) {
+        if (el7.contains(checkEl)) {
           checkEl.checked = true;
         }
       });
@@ -4829,11 +4831,11 @@
      * @returns {String[]}
      */
     toArray: function toArray() {
-      var order = [], el8, children = this.el.children, i = 0, n = children.length, options = this.options;
+      var order = [], el7, children = this.el.children, i = 0, n = children.length, options = this.options;
       for (; i < n; i++) {
-        el8 = children[i];
-        if (closest(el8, options.draggable, this.el, false)) {
-          order.push(el8.getAttribute(options.dataIdAttr) || _generateId(el8));
+        el7 = children[i];
+        if (closest(el7, options.draggable, this.el, false)) {
+          order.push(el7.getAttribute(options.dataIdAttr) || _generateId(el7));
         }
       }
       return order;
@@ -4845,9 +4847,9 @@
     sort: function sort(order, useAnimation) {
       var items = {}, rootEl2 = this.el;
       this.toArray().forEach(function(id, i) {
-        var el8 = rootEl2.children[i];
-        if (closest(el8, this.options.draggable, rootEl2, false)) {
-          items[id] = el8;
+        var el7 = rootEl2.children[i];
+        if (closest(el7, this.options.draggable, rootEl2, false)) {
+          items[id] = el7;
         }
       }, this);
       useAnimation && this.captureAnimationState();
@@ -4872,8 +4874,8 @@
      * @param   {String}       [selector]  default: `options.draggable`
      * @returns {HTMLElement|null}
      */
-    closest: function closest$1(el8, selector) {
-      return closest(el8, selector || this.options.draggable, this.el, false);
+    closest: function closest$1(el7, selector) {
+      return closest(el7, selector || this.options.draggable, this.el, false);
     },
     /**
      * Set/get option
@@ -4902,22 +4904,22 @@
      */
     destroy: function destroy() {
       pluginEvent2("destroy", this);
-      var el8 = this.el;
-      el8[expando] = null;
-      off(el8, "mousedown", this._onTapStart);
-      off(el8, "touchstart", this._onTapStart);
-      off(el8, "pointerdown", this._onTapStart);
+      var el7 = this.el;
+      el7[expando] = null;
+      off(el7, "mousedown", this._onTapStart);
+      off(el7, "touchstart", this._onTapStart);
+      off(el7, "pointerdown", this._onTapStart);
       if (this.nativeDraggable) {
-        off(el8, "dragover", this);
-        off(el8, "dragenter", this);
+        off(el7, "dragover", this);
+        off(el7, "dragenter", this);
       }
-      Array.prototype.forEach.call(el8.querySelectorAll("[draggable]"), function(el9) {
-        el9.removeAttribute("draggable");
+      Array.prototype.forEach.call(el7.querySelectorAll("[draggable]"), function(el8) {
+        el8.removeAttribute("draggable");
       });
       this._onDrop();
       this._disableDelayedDragEvents();
       sortables.splice(sortables.indexOf(this.el), 1);
-      this.el = el8 = null;
+      this.el = el7 = null;
     },
     _hideClone: function _hideClone() {
       if (!cloneHidden) {
@@ -4984,8 +4986,8 @@
     }
     return retVal;
   }
-  function _disableDraggable(el8) {
-    el8.draggable = false;
+  function _disableDraggable(el7) {
+    el7.draggable = false;
   }
   function _unsilent() {
     _silent = false;
@@ -5037,8 +5039,8 @@
       return -1;
     }
   }
-  function _generateId(el8) {
-    var str = el8.tagName + el8.className + el8.src + el8.href + el8.textContent, i = str.length, sum = 0;
+  function _generateId(el7) {
+    var str = el7.tagName + el7.className + el7.src + el7.href + el7.textContent, i = str.length, sum = 0;
     while (i--) {
       sum += str.charCodeAt(i);
     }
@@ -5049,8 +5051,8 @@
     var inputs = root.getElementsByTagName("input");
     var idx = inputs.length;
     while (idx--) {
-      var el8 = inputs[idx];
-      el8.checked && savedInputChecked.push(el8);
+      var el7 = inputs[idx];
+      el7.checked && savedInputChecked.push(el7);
     }
   }
   function _nextTick(fn) {
@@ -5071,8 +5073,8 @@
     off,
     css,
     find,
-    is: function is(el8, selector) {
-      return !!closest(el8, selector, el8, false);
+    is: function is(el7, selector) {
+      return !!closest(el7, selector, el7, false);
     },
     extend,
     throttle,
@@ -5102,8 +5104,8 @@
       PluginManager.mount(plugin);
     });
   };
-  Sortable.create = function(el8, options) {
-    return new Sortable(el8, options);
+  Sortable.create = function(el7, options) {
+    return new Sortable(el7, options);
   };
   Sortable.version = version;
   var autoScrolls = [];
@@ -5228,8 +5230,8 @@
     var layersOut = 0;
     var currentParent = scrollEl;
     do {
-      var el8 = currentParent, rect = getRect(el8), top = rect.top, bottom = rect.bottom, left = rect.left, right = rect.right, width = rect.width, height = rect.height, canScrollX = void 0, canScrollY = void 0, scrollWidth = el8.scrollWidth, scrollHeight = el8.scrollHeight, elCSS = css(el8), scrollPosX = el8.scrollLeft, scrollPosY = el8.scrollTop;
-      if (el8 === winScroller) {
+      var el7 = currentParent, rect = getRect(el7), top = rect.top, bottom = rect.bottom, left = rect.left, right = rect.right, width = rect.width, height = rect.height, canScrollX = void 0, canScrollY = void 0, scrollWidth = el7.scrollWidth, scrollHeight = el7.scrollHeight, elCSS = css(el7), scrollPosX = el7.scrollLeft, scrollPosY = el7.scrollTop;
+      if (el7 === winScroller) {
         canScrollX = width < scrollWidth && (elCSS.overflowX === "auto" || elCSS.overflowX === "scroll" || elCSS.overflowX === "visible");
         canScrollY = height < scrollHeight && (elCSS.overflowY === "auto" || elCSS.overflowY === "scroll" || elCSS.overflowY === "visible");
       } else {
@@ -5245,8 +5247,8 @@
           }
         }
       }
-      if (autoScrolls[layersOut].vx != vx || autoScrolls[layersOut].vy != vy || autoScrolls[layersOut].el !== el8) {
-        autoScrolls[layersOut].el = el8;
+      if (autoScrolls[layersOut].vx != vx || autoScrolls[layersOut].vy != vy || autoScrolls[layersOut].el !== el7) {
+        autoScrolls[layersOut].el = el7;
         autoScrolls[layersOut].vx = vx;
         autoScrolls[layersOut].vy = vy;
         clearInterval(autoScrolls[layersOut].pid);
@@ -5339,12 +5341,12 @@
   var sortable_esm_default = Sortable;
 
   // themes/baselayer/src/js/admin/canvas-builder/sortable.js
-  function createSortable(el8, options = {}) {
-    return sortable_esm_default.create(el8, options);
+  function createSortable(el7, options = {}) {
+    return sortable_esm_default.create(el7, options);
   }
 
   // themes/baselayer/packages/baselayer-blocks/src/js/admin/media-field.js
-  function el6(tag, props = {}, children = []) {
+  function el5(tag, props = {}, children = []) {
     const node = document.createElement(tag);
     Object.entries(props).forEach(([key, value]) => {
       if (value == null || value === false) return;
@@ -5418,13 +5420,13 @@
   }
   function buildMediaCard(item, kind, onRemove) {
     const isImage = item.type === "image" || kind === "image";
-    const card = el6("div", {
+    const card = el5("div", {
       className: "bl-blocks-fields__media-card" + (isImage ? " is-image" : " is-file"),
       dataset: { mediaId: String(item.id) }
     });
     if (isImage && item.url) {
       card.appendChild(
-        el6("img", {
+        el5("img", {
           className: "bl-blocks-fields__media-thumb",
           src: item.url,
           alt: item.alt || ""
@@ -5432,7 +5434,7 @@
       );
     } else if (isImage) {
       card.appendChild(
-        el6("span", {
+        el5("span", {
           className: "bl-blocks-fields__media-badge",
           text: "IMG",
           "aria-hidden": "true"
@@ -5440,7 +5442,7 @@
       );
     } else {
       card.appendChild(
-        el6("span", {
+        el5("span", {
           className: "bl-blocks-fields__media-badge",
           text: extensionBadge(item.filename),
           "aria-hidden": "true"
@@ -5448,13 +5450,13 @@
       );
     }
     card.appendChild(
-      el6("span", {
+      el5("span", {
         className: "bl-blocks-fields__media-name",
         text: item.filename,
         title: item.filename
       })
     );
-    const removeBtn = el6("button", {
+    const removeBtn = el5("button", {
       type: "button",
       className: "button-link bl-blocks-fields__media-remove",
       text: "\xD7",
@@ -5507,32 +5509,32 @@
       type: kind === "image" ? "image" : "",
       alt: ""
     }));
-    const preview = el6("div", {
+    const preview = el5("div", {
       className: "bl-blocks-fields__media-preview" + (multiple ? " is-sortable" : ""),
       dataset: { blMediaPreview: "" }
     });
-    const empty = el6("span", {
+    const empty = el5("span", {
       className: "description bl-blocks-fields__media-empty",
       text: kind === "image" ? multiple ? i18n3("chooseImagesHelp", "Select one or more images.") : i18n3("chooseImageHelp", "Select an image.") : multiple ? i18n3("chooseFilesHelp", "Select one or more files.") : i18n3("chooseFileHelp", "Select a file."),
       dataset: { blMediaEmpty: "" }
     });
-    const chooseBtn = el6("button", {
+    const chooseBtn = el5("button", {
       type: "button",
       className: "button bl-button-small",
       text: "",
       dataset: { blMediaChoose: "" }
     });
-    const clearBtn = el6("button", {
+    const clearBtn = el5("button", {
       type: "button",
       className: "button-link",
       text: i18n3("clearMedia", "Clear"),
       dataset: { blMediaClear: "" }
     });
-    const actions = el6("div", { className: "bl-blocks-fields__media-actions" }, [
+    const actions = el5("div", { className: "bl-blocks-fields__media-actions" }, [
       chooseBtn,
       clearBtn
     ]);
-    const wrap = el6(
+    const wrap = el5(
       "div",
       {
         className: "bl-blocks-fields__media-picker",
@@ -5690,15 +5692,15 @@
         inputsHost.replaceChildren();
         if (selected.length === 0) {
           if (multiple) {
-            inputsHost.appendChild(el6("input", { type: "hidden", name: inputName + "[]", value: "" }));
+            inputsHost.appendChild(el5("input", { type: "hidden", name: inputName + "[]", value: "" }));
           } else {
-            inputsHost.appendChild(el6("input", { type: "hidden", name: inputName, value: "" }));
+            inputsHost.appendChild(el5("input", { type: "hidden", name: inputName, value: "" }));
           }
           return;
         }
         selected.forEach((item) => {
           const name = multiple ? inputName + "[]" : inputName;
-          const input = el6("input", {
+          const input = el5("input", {
             type: "hidden",
             name,
             value: String(item.id)
@@ -5805,7 +5807,7 @@
   }
 
   // themes/baselayer/packages/baselayer-blocks/src/js/admin/field-form.js
-  function el7(tag, props = {}, children = []) {
+  function el6(tag, props = {}, children = []) {
     const node = document.createElement(tag);
     Object.entries(props).forEach(([key, value]) => {
       if (value == null || value === false) return;
@@ -5920,24 +5922,24 @@
     const name = field.name || "";
     if (!name) return null;
     const current = values[name] !== void 0 && values[name] !== null ? values[name] : field.default_value != null ? field.default_value : "";
-    const row = el7("div", {
+    const row = el6("div", {
       className: "bl-blocks-fields__row",
       dataset: { fieldName: name }
     });
     const id = "bl-blocks-ui-" + name.replace(/[^a-z0-9_-]/gi, "_") + "-" + Math.random().toString(36).slice(2, 7);
     if (!field.hide_label && type !== "toggle" && type !== "terms") {
-      const label = el7("label", { className: "bl-blocks-fields__label", text: field.label || name });
+      const label = el6("label", { className: "bl-blocks-fields__label", text: field.label || name });
       label.setAttribute("for", id);
       if (field.required) {
         label.appendChild(document.createTextNode(" "));
-        label.appendChild(el7("span", { className: "required", text: "*" }));
+        label.appendChild(el6("span", { className: "required", text: "*" }));
       }
       row.appendChild(label);
     }
     let control = null;
     const options = Array.isArray(field.options) ? field.options : [];
     if (type === "textarea") {
-      control = el7("textarea", {
+      control = el6("textarea", {
         className: "widefat",
         id,
         rows: field.rows || 4,
@@ -5946,24 +5948,24 @@
       if (field.placeholder) control.placeholder = field.placeholder;
     } else if (type === "select") {
       const multiple = !!field.multiple;
-      control = el7("select", { className: "widefat", id });
+      control = el6("select", { className: "widefat", id });
       if (multiple) control.multiple = true;
       if (!multiple) {
-        control.appendChild(el7("option", { value: "", text: "\u2014" }));
+        control.appendChild(el6("option", { value: "", text: "\u2014" }));
       }
       const selected = multiple ? (Array.isArray(current) ? current : []).map(String) : [String(current == null ? "" : current)];
       options.forEach((opt) => {
         const ov = String(opt.value ?? "");
-        const option2 = el7("option", { value: ov, text: opt.label || ov });
+        const option2 = el6("option", { value: ov, text: opt.label || ov });
         if (selected.includes(ov)) option2.selected = true;
         control.appendChild(option2);
       });
     } else if (type === "radio" || type === "button_group") {
-      control = el7("div", { className: "bl-blocks-fields__choices" });
+      control = el6("div", { className: "bl-blocks-fields__choices" });
       options.forEach((opt, i) => {
         const ov = String(opt.value ?? "");
         const oid = id + "-" + i;
-        const input = el7("input", {
+        const input = el6("input", {
           type: "radio",
           name: id,
           id: oid,
@@ -5971,43 +5973,43 @@
           checked: String(current) === ov
         });
         control.appendChild(
-          el7("label", { className: "bl-blocks-fields__choice" }, [
+          el6("label", { className: "bl-blocks-fields__choice" }, [
             input,
             document.createTextNode(" " + (opt.label || ov))
           ])
         );
       });
     } else if (type === "checkboxes") {
-      control = el7("div", { className: "bl-blocks-fields__choices" });
+      control = el6("div", { className: "bl-blocks-fields__choices" });
       const list = Array.isArray(current) ? current.map(String) : [];
       options.forEach((opt, i) => {
         const ov = String(opt.value ?? "");
         const oid = id + "-" + i;
-        const input = el7("input", {
+        const input = el6("input", {
           type: "checkbox",
           id: oid,
           value: ov,
           checked: list.includes(ov)
         });
         control.appendChild(
-          el7("label", { className: "bl-blocks-fields__choice" }, [
+          el6("label", { className: "bl-blocks-fields__choice" }, [
             input,
             document.createTextNode(" " + (opt.label || ov))
           ])
         );
       });
     } else if (type === "toggle" || type === "terms") {
-      const input = el7("input", {
+      const input = el6("input", {
         type: "checkbox",
         id,
         checked: !!current && current !== "0" && current !== ""
       });
-      control = el7("label", { className: "bl-blocks-fields__toggle" }, [
+      control = el6("label", { className: "bl-blocks-fields__toggle" }, [
         input,
         document.createTextNode(" " + (field.label || name))
       ]);
     } else if (type === "hidden") {
-      control = el7("input", {
+      control = el6("input", {
         type: "hidden",
         id,
         value: current == null ? "" : String(current)
@@ -6030,7 +6032,7 @@
       } else if (type === "datetime") {
         inputType = "datetime-local";
       }
-      control = el7("input", {
+      control = el6("input", {
         className: "widefat",
         type: inputType,
         id,
@@ -6047,7 +6049,7 @@
       controls.push({ field, control, type });
     }
     if (field.description) {
-      row.appendChild(el7("p", { className: "description", text: field.description }));
+      row.appendChild(el6("p", { className: "description", text: field.description }));
     }
     return row;
   }
@@ -6060,7 +6062,7 @@
     if (compact) {
       rootAttrs.dataset.layout = "compact";
     }
-    const root = el7("div", rootAttrs);
+    const root = el6("div", rootAttrs);
     const entries = [];
     const appendLayoutWrap = (field, type, parent, valueMap) => {
       const design = compact ? "standard" : ["standard", "outline", "card"].includes(field.design) ? field.design : "standard";
@@ -6072,10 +6074,10 @@
       if (field.css_class) {
         layoutClass.push(String(field.css_class).trim());
       }
-      const wrap = el7("div", { className: layoutClass.filter(Boolean).join(" ") });
+      const wrap = el6("div", { className: layoutClass.filter(Boolean).join(" ") });
       const showTitle = type !== "section" || field.show_title !== false && field.show_title !== 0 && field.show_title !== "0";
       if (type === "section" && showTitle && field.label) {
-        wrap.appendChild(el7("h3", { className: "bl-blocks-fields__section-title", text: field.label }));
+        wrap.appendChild(el6("h3", { className: "bl-blocks-fields__section-title", text: field.label }));
       }
       parent.appendChild(wrap);
       walk(field.children || [], wrap, valueMap);
@@ -6083,11 +6085,11 @@
     const appendTabGroup = (tabs, parent, valueMap) => {
       const activeTabs = (tabs || []).filter((tab) => tab && tab.active !== false);
       if (!activeTabs.length) return;
-      const group = el7("div", {
+      const group = el6("div", {
         className: "bl-blocks-fields__tabs",
         dataset: { blBlocksTabs: "1" }
       });
-      const tablist = el7("div", {
+      const tablist = el6("div", {
         className: "bl-blocks-fields__tablist",
         role: "tablist"
       });
@@ -6097,7 +6099,7 @@
         const panelId = "bl-blocks-tab-panel-" + tabId;
         const btnId = "bl-blocks-tab-" + tabId;
         const label = String(tab.label || "").trim() || i18n4("tabType", "Tab") + " " + (index2 + 1);
-        const btn = el7("button", {
+        const btn = el6("button", {
           type: "button",
           className: "bl-blocks-fields__tab" + (index2 === 0 ? " is-active" : ""),
           role: "tab",
@@ -6117,7 +6119,7 @@
         if (tab.css_class) {
           panelClass.push(String(tab.css_class).trim());
         }
-        const panel = el7("div", {
+        const panel = el6("div", {
           className: panelClass.filter(Boolean).join(" "),
           role: "tabpanel",
           id: panelId,
@@ -6174,7 +6176,7 @@
         }
         if (type === "heading") {
           if (field.label) {
-            parent.appendChild(el7("h4", { className: "bl-blocks-fields__heading", text: field.label }));
+            parent.appendChild(el6("h4", { className: "bl-blocks-fields__heading", text: field.label }));
           }
           i += 1;
           continue;
@@ -6182,7 +6184,7 @@
         if (type === "text_block" || type === "html") {
           const content = field.default_value || field.content || field.label || "";
           if (content) {
-            parent.appendChild(el7("div", { className: "bl-blocks-fields__static", html: content }));
+            parent.appendChild(el6("div", { className: "bl-blocks-fields__static", html: content }));
           }
           i += 1;
           continue;
@@ -6243,17 +6245,17 @@
     if (field.css_class) {
       classNames.push(String(field.css_class).trim());
     }
-    const wrap = el7("div", {
+    const wrap = el6("div", {
       className: classNames.filter(Boolean).join(" "),
       dataset: { fieldName: name }
     });
     if (showTitle && !field.hide_label && field.label) {
-      wrap.appendChild(el7("div", { className: "bl-blocks-fields__label", text: field.label }));
+      wrap.appendChild(el6("div", { className: "bl-blocks-fields__label", text: field.label }));
     }
     if (field.description) {
-      wrap.appendChild(el7("p", { className: "description", text: field.description }));
+      wrap.appendChild(el6("p", { className: "description", text: field.description }));
     }
-    const rowsEl = el7("div", { className: "bl-blocks-fields__repeater-rows" });
+    const rowsEl = el6("div", { className: "bl-blocks-fields__repeater-rows" });
     const rowForms = [];
     const syncRowTitles = () => {
       Array.from(rowsEl.children).forEach((rowEl, i) => {
@@ -6266,7 +6268,7 @@
     };
     const canAdd = () => maxRows === 0 || rowForms.length < maxRows;
     const canRemove = () => rowForms.length > minRows;
-    const addBtn = el7("button", {
+    const addBtn = el6("button", {
       type: "button",
       className: "button bl-blocks-fields__repeater-add",
       text: buttonLabel
@@ -6275,11 +6277,11 @@
       addBtn.disabled = !canAdd();
     };
     const mountRow = (rowValues) => {
-      const rowEl = el7("div", { className: "bl-blocks-fields__repeater-row" });
-      const header = el7("div", { className: "bl-blocks-fields__repeater-row-header" }, [
-        el7("span", { className: "bl-blocks-fields__repeater-row-title", text: "" })
+      const rowEl = el6("div", { className: "bl-blocks-fields__repeater-row" });
+      const header = el6("div", { className: "bl-blocks-fields__repeater-row-header" }, [
+        el6("span", { className: "bl-blocks-fields__repeater-row-title", text: "" })
       ]);
-      const removeBtn = el7("button", {
+      const removeBtn = el6("button", {
         type: "button",
         className: "button-link-delete bl-blocks-fields__repeater-remove",
         text: i18n4("removeRow", "Remove row")
@@ -6329,8 +6331,8 @@
   function openFieldsModal(opts) {
     const title = opts.title || i18n4("edit", "Edit");
     const form = createFieldForm(opts.fields || [], opts.values || {});
-    const overlay = el7("div", { className: "bl-blocks-modal-overlay", role: "presentation" });
-    const dialog = el7("div", {
+    const overlay = el6("div", { className: "bl-blocks-modal-overlay", role: "presentation" });
+    const dialog = el6("div", {
       className: "bl-blocks-modal",
       role: "dialog",
       "aria-modal": "true",
@@ -6346,9 +6348,9 @@
         close();
       }
     };
-    const header = el7("div", { className: "bl-blocks-modal__header" }, [
-      el7("h2", { className: "bl-blocks-modal__title", text: title }),
-      el7("button", {
+    const header = el6("div", { className: "bl-blocks-modal__header" }, [
+      el6("h2", { className: "bl-blocks-modal__title", text: title }),
+      el6("button", {
         type: "button",
         className: "bl-blocks-modal__close",
         text: "\xD7",
@@ -6356,15 +6358,15 @@
         onClick: close
       })
     ]);
-    const body = el7("div", { className: "bl-blocks-modal__body" }, [form.root]);
-    const footer = el7("div", { className: "bl-blocks-modal__footer" }, [
-      el7("button", {
+    const body = el6("div", { className: "bl-blocks-modal__body" }, [form.root]);
+    const footer = el6("div", { className: "bl-blocks-modal__footer" }, [
+      el6("button", {
         type: "button",
         className: "button",
         text: i18n4("cancel", "Cancel"),
         onClick: close
       }),
-      el7("button", {
+      el6("button", {
         type: "button",
         className: "button button-primary",
         text: i18n4("save", "Save"),
