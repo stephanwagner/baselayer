@@ -165,7 +165,59 @@ function createDragHandle() {
   return handle;
 }
 
-function createContainerActions(onDelete, onDuplicate) {
+function isCollapsedFlag(value) {
+  return value === true || value === 1 || value === '1' || value === 'true';
+}
+
+/**
+ * Collapse/expand nested fields for column, section, and repeater cards.
+ * Persists on `field.collapsed` (default: expanded).
+ */
+function createContainerCollapseBtn(row, field, onChange) {
+  field.collapsed = isCollapsedFlag(field.collapsed);
+
+  const btn = el('button', {
+    type: 'button',
+    className: 'bl-forms-builder__icon-btn bl-forms-builder__container-collapse',
+  });
+
+  const sync = () => {
+    const collapsed = !!field.collapsed;
+    row.classList.toggle('is-collapsed', collapsed);
+    btn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    const label = collapsed
+      ? t('expandGroup', 'Expand')
+      : t('collapseGroup', 'Collapse');
+    btn.title = label;
+    btn.setAttribute('aria-label', label);
+    // Expanded → collapse-content; collapsed → expand-content.
+    const icon = iconEl(
+      collapsed ? 'expandContent' : 'collapseContent',
+      'bl-forms-builder__container-collapse-icon'
+    );
+    btn.replaceChildren();
+    if (icon.innerHTML) {
+      btn.appendChild(icon);
+    } else {
+      btn.textContent = collapsed ? '›' : '▾';
+    }
+  };
+
+  btn.addEventListener('click', (evt) => {
+    evt.preventDefault();
+    evt.stopPropagation();
+    field.collapsed = !field.collapsed;
+    sync();
+    if (typeof onChange === 'function') {
+      onChange();
+    }
+  });
+
+  sync();
+  return btn;
+}
+
+function createContainerActions(onDelete, onDuplicate, collapseBtn = null) {
   const duplicateBtn = el('button', {
     type: 'button',
     className: 'bl-forms-builder__icon-btn',
@@ -194,7 +246,12 @@ function createContainerActions(onDelete, onDuplicate) {
     deleteBtn.textContent = '×';
   }
 
-  return el('div', { className: 'bl-forms-builder__field-actions' }, [duplicateBtn, deleteBtn]);
+  const items = [];
+  if (collapseBtn) {
+    items.push(collapseBtn);
+  }
+  items.push(duplicateBtn, deleteBtn);
+  return el('div', { className: 'bl-forms-builder__field-actions' }, items);
 }
 
 /**
@@ -207,6 +264,7 @@ export function createColumnCard(initial = {}) {
     children: [],
     design: 'standard',
     css_class: '',
+    collapsed: false,
     conditional_logic: { enabled: false, groups: [] },
     ...initial,
     id: initial.id || uid(),
@@ -218,6 +276,7 @@ export function createColumnCard(initial = {}) {
   if (typeof field.css_class !== 'string') {
     field.css_class = '';
   }
+  field.collapsed = isCollapsedFlag(field.collapsed);
   field.conditional_logic = normalizeConditionalLogic(field.conditional_logic);
 
   const row = el('div', {
@@ -352,7 +411,8 @@ export function createColumnCard(initial = {}) {
         row.remove();
         notify();
       },
-      () => duplicateFieldCard(row)
+      () => duplicateFieldCard(row),
+      createContainerCollapseBtn(row, field, notify)
     ),
   ]);
 
@@ -374,6 +434,7 @@ export function createSectionCard(initial = {}) {
     design: 'standard',
     show_title: true,
     css_class: '',
+    collapsed: false,
     conditional_logic: { enabled: false, groups: [] },
     ...initial,
     id: initial.id || uid(),
@@ -390,6 +451,7 @@ export function createSectionCard(initial = {}) {
   if (typeof field.css_class !== 'string') {
     field.css_class = '';
   }
+  field.collapsed = isCollapsedFlag(field.collapsed);
   field.conditional_logic = normalizeConditionalLogic(field.conditional_logic);
 
   const row = el('div', {
@@ -408,22 +470,7 @@ export function createSectionCard(initial = {}) {
   });
   sectionFieldByEl.set(row, field);
 
-  const labelPlaceholder = () =>
-    field.show_title
-      ? t('sectionLabelPlaceholder', 'Title')
-      : t('sectionLabelPlaceholderHidden', 'Name');
-
-  const labelInput = el('input', {
-    type: 'text',
-    className: 'bl-forms-builder__section-label-input',
-    value: field.label || '',
-    placeholder: labelPlaceholder(),
-    'aria-label': t('sectionLabel', 'Section title'),
-  });
-  labelInput.addEventListener('input', () => {
-    field.label = labelInput.value;
-    document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
-  });
+  const preview = el('span', { className: 'bl-forms-builder__preview' });
 
   const widthBadge = el('span', { className: 'bl-forms-builder__width-badge' });
   const designBtn = el('button', {
@@ -463,7 +510,9 @@ export function createSectionCard(initial = {}) {
     } else {
       delete row.dataset.fieldWidthCustom;
     }
-    labelInput.placeholder = labelPlaceholder();
+    const title = (field.label || '').trim();
+    preview.textContent = title;
+    preview.hidden = title === '';
     const text = widthBadgeText(width, widthCustom);
     widthBadge.textContent = text;
     widthBadge.hidden = text === '';
@@ -505,8 +554,13 @@ export function createSectionCard(initial = {}) {
         notify();
       },
       {
-        tabs: ['design', 'logic'],
+        tabs: ['settings', 'design', 'logic'],
+        withLabel: true,
         withHideTitle: true,
+        onLiveUpdate: () => {
+          updatePreview();
+          notify();
+        },
         logicHelp: t(
           'logicHelpSection',
           'Show this section only when the conditions below are met.'
@@ -536,14 +590,15 @@ export function createSectionCard(initial = {}) {
 
   const header = el('div', { className: 'bl-forms-builder__field-header' }, [
     createDragHandle(),
-    labelInput,
+    preview,
     el('div', { className: 'bl-forms-builder__field-meta' }, [widthBadge, designBtn, typeChip]),
     createContainerActions(
       () => {
         row.remove();
         notify();
       },
-      () => duplicateFieldCard(row)
+      () => duplicateFieldCard(row),
+      createContainerCollapseBtn(row, field, notify)
     ),
   ]);
 
@@ -571,6 +626,7 @@ export function serializeLayoutRow(row) {
       width_custom: width === 'custom' ? widthCustom : '',
       design,
       css_class: cssClass,
+      collapsed: !!live?.collapsed,
       conditional_logic: normalizeConditionalLogic(live?.conditional_logic),
       children: Array.from(fields?.children || [])
         .filter((el) => el.matches('[data-bl-forms-field]') && !NESTED_BLOCKED.includes(el.dataset.fieldType))
@@ -581,8 +637,7 @@ export function serializeLayoutRow(row) {
   if (type === 'section') {
     const fields = row.querySelector('[data-bl-section-fields]');
     const live = sectionFieldByEl.get(row);
-    const labelInput = row.querySelector('.bl-forms-builder__section-label-input');
-    const label = labelInput?.value ?? live?.label ?? '';
+    const label = live?.label ?? '';
     const width = row.dataset.fieldWidth || live?.width || '100';
     const widthCustom = row.dataset.fieldWidthCustom || live?.width_custom || '';
     const design = row.dataset.fieldDesign || live?.design || 'standard';
@@ -601,6 +656,7 @@ export function serializeLayoutRow(row) {
       design,
       show_title: showTitle,
       css_class: cssClass,
+      collapsed: !!live?.collapsed,
       conditional_logic: normalizeConditionalLogic(live?.conditional_logic),
       children: Array.from(fields?.children || [])
         .filter((el) => el.matches('[data-bl-forms-field]') && !NESTED_BLOCKED.includes(el.dataset.fieldType))

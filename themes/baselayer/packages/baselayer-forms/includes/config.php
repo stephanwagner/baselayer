@@ -1398,6 +1398,7 @@ function bl_forms_sanitize_field($field): ?array
 			$design = 'standard';
 		}
 		$out['design'] = $design;
+		$out['collapsed'] = !empty($field['collapsed']);
 		unset($out['name'], $out['name_manual'], $out['hide_label'], $out['label']);
 
 		return bl_forms_attach_conditional_logic($out, $field);
@@ -1428,6 +1429,7 @@ function bl_forms_sanitize_field($field): ?array
 		$out['design'] = $design;
 		// Default on when missing (no legacy “empty label hides title”).
 		$out['show_title'] = !array_key_exists('show_title', $field) || !empty($field['show_title']);
+		$out['collapsed'] = !empty($field['collapsed']);
 		unset($out['name'], $out['name_manual'], $out['hide_label']);
 
 		return bl_forms_attach_conditional_logic($out, $field);

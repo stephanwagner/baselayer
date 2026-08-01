@@ -292,8 +292,11 @@ msgid "Min rows"
 msgstr "Mindestzeilen"
 
 #: includes/admin-editor.php:305
-msgid "Max rows (0 = unlimited)"
-msgstr "Max. Zeilen (0 = unbegrenzt)"
+msgid "Max rows"
+msgstr "Max. Zeilen"
+
+msgid "0 = unlimited"
+msgstr "0 = unbegrenzt"
 
 #: includes/admin-editor.php:306
 msgid "Max"
@@ -301,7 +304,7 @@ msgstr "Max"
 
 #: includes/admin-editor.php:307
 msgid "Add button label"
-msgstr "Beschriftung der Hinzufügen-Schaltfläche"
+msgstr "Beschriftung des Hinzufügen-Buttons"
 
 #: includes/admin-editor.php:308
 msgid "Drop fields or a nested repeater here"
@@ -1065,3 +1068,9 @@ msgstr "oder"
 #: includes/admin-editor.php
 msgid "— Select —"
 msgstr "— Auswählen —"
+
+msgid "Collapse"
+msgstr "Einklappen"
+
+msgid "Expand"
+msgstr "Ausklappen"

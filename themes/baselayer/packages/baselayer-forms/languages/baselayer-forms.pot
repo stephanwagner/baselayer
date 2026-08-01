@@ -496,7 +496,10 @@ msgid "Min rows"
 msgstr ""
 
 #: includes/admin.php:492
-msgid "Max rows (0 = unlimited)"
+msgid "Max rows"
+msgstr ""
+
+msgid "0 = unlimited"
 msgstr ""
 
 #: includes/admin.php:493

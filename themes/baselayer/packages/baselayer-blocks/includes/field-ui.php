@@ -41,6 +41,8 @@ function bl_blocks_palette_icons(): array
 		'repeater',
 		'hidden',
 		'caret',
+		'expandContent',
+		'collapseContent',
 		'edit',
 		'done',
 		'trash',

@@ -194,11 +194,9 @@ export function collectLogicSourceFields(exceptId = '', options = {}) {
       return;
     }
     const labelInput = row.querySelector('[data-bl-label]');
-    const sectionLabel = row.querySelector('.bl-forms-builder__section-label-input');
     const preview = row.querySelector(':scope > .bl-forms-builder__field-header .bl-forms-builder__preview');
     const label =
       (labelInput?.value || '').trim() ||
-      (sectionLabel?.value || '').trim() ||
       (preview?.textContent || '').trim() ||
       typeLabel(type);
     const fieldOptions = Array.from(row.querySelectorAll('[data-bl-option]')).map((opt) => ({

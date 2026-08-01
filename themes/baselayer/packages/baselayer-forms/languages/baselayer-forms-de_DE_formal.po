@@ -496,12 +496,15 @@ msgid "Min rows"
 msgstr "Mindestzeilen"
 
 #: includes/admin.php:492
-msgid "Max rows (0 = unlimited)"
-msgstr "Max. Zeilen (0 = unbegrenzt)"
+msgid "Max rows"
+msgstr "Max. Zeilen"
+
+msgid "0 = unlimited"
+msgstr "0 = unbegrenzt"
 
 #: includes/admin.php:493
 msgid "Add button label"
-msgstr "Beschriftung der Hinzufügen-Schaltfläche"
+msgstr "Beschriftung des Hinzufügen-Buttons"
 
 #: includes/admin.php:494
 msgid "Add row"
@@ -2063,3 +2066,9 @@ msgstr "Datei"
 #: includes/submit.php:927
 msgid "Upload failed."
 msgstr "Upload fehlgeschlagen."
+
+msgid "Collapse"
+msgstr "Einklappen"
+
+msgid "Expand"
+msgstr "Ausklappen"

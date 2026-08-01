@@ -481,7 +481,7 @@ p.bl-forms-builder__palette-empty {
   outline: none;
 }
 .bl-forms-builder__icon-btn:active {
-  background: color-mix(in srgb, var(--bl-forms-admin-accent) 22%, #fff);
+  background: color-mix(in srgb, var(--bl-forms-admin-accent) 26%, #fff);
 }
 
 .bl-forms-builder__icon-btn--danger:hover, .bl-forms-builder__icon-btn--danger:focus-visible {
@@ -620,7 +620,7 @@ p.bl-forms-builder__palette-empty {
 }
 .bl-forms-builder__field.is-open .bl-forms-builder__field-header .bl-forms-builder__handle:hover,
 .bl-forms-builder__field.is-open .bl-forms-builder__field-header .bl-forms-builder__handle:focus-visible {
-  background: color-mix(in srgb, var(--bl-forms-admin-muted) 22%, #fff);
+  background: color-mix(in srgb, var(--bl-forms-admin-muted) 26%, #fff);
 }
 
 .bl-forms-builder__field.is-open .bl-forms-builder__field-header--expandable:hover {
@@ -810,7 +810,7 @@ p.bl-forms-builder__palette-empty {
 }
 .bl-forms-builder__handle:active {
   cursor: grabbing;
-  background: color-mix(in srgb, var(--bl-forms-admin-muted) 24%, #fff);
+  background: color-mix(in srgb, var(--bl-forms-admin-muted) 26%, #fff);
 }
 
 body.is-dragging .bl-forms-builder__handle:hover, body.is-dragging .bl-forms-builder__handle:focus-visible {
@@ -820,9 +820,21 @@ body.is-dragging .bl-forms-builder__handle:hover, body.is-dragging .bl-forms-bui
 
 body.is-dragging .sortable-chosen .bl-forms-builder__handle,
 body.is-dragging .sortable-drag .bl-forms-builder__handle {
-  background: color-mix(in srgb, var(--bl-forms-admin-muted) 24%, #fff);
+  background: color-mix(in srgb, var(--bl-forms-admin-muted) 26%, #fff);
   color: #1d2327;
   cursor: grabbing;
+}
+
+.bl-forms-builder__field.is-collapsed > .bl-forms-builder__column-fields-wrap,
+.bl-forms-builder__field.is-collapsed > .bl-forms-builder__section-fields-wrap,
+.bl-forms-builder__field.is-collapsed > .bl-forms-builder__repeater-fields-wrap {
+  display: none;
+}
+
+.bl-forms-builder__container-collapse .bl-forms-builder__container-collapse-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .bl-forms-builder__column-card {
@@ -831,62 +843,32 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
   background: color-mix(in srgb, var(--bl-forms-admin-accent) 6%, #fff);
 }
 
+.bl-forms-builder__repeater-card,
 .bl-forms-builder__section-card {
   margin: 0;
   border-color: color-mix(in srgb, var(--bl-forms-admin-accent) 28%, var(--bl-forms-admin-border));
   background: color-mix(in srgb, var(--bl-forms-admin-accent) 4%, #fff);
 }
+
+.bl-forms-builder__column-card > .bl-forms-builder__field-header,
+.bl-forms-builder__repeater-card > .bl-forms-builder__field-header,
 .bl-forms-builder__section-card > .bl-forms-builder__field-header {
   background: transparent;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
 }
-
-.bl-forms-builder__repeater-card {
-  margin: 0;
-  border-color: color-mix(in srgb, var(--bl-forms-admin-accent) 28%, var(--bl-forms-admin-border));
-  background: color-mix(in srgb, var(--bl-forms-admin-accent) 4%, #fff);
-}
-.bl-forms-builder__repeater-card > .bl-forms-builder__field-header {
+.bl-forms-builder__column-card.is-open > .bl-forms-builder__field-header, .bl-forms-builder__column-card.is-open > .bl-forms-builder__field-header--expandable:hover, .bl-forms-builder__column-card.is-open > .bl-forms-builder__field-header--expandable:has(.bl-forms-builder__icon-btn:hover), .bl-forms-builder__column-card.is-open > .bl-forms-builder__field-header--expandable:has(.bl-forms-builder__width-badge.is-interactive:hover), .bl-forms-builder__column-card.is-open > .bl-forms-builder__field-header--expandable:has(.bl-forms-builder__handle:hover),
+.bl-forms-builder__repeater-card.is-open > .bl-forms-builder__field-header,
+.bl-forms-builder__repeater-card.is-open > .bl-forms-builder__field-header--expandable:hover,
+.bl-forms-builder__repeater-card.is-open > .bl-forms-builder__field-header--expandable:has(.bl-forms-builder__icon-btn:hover),
+.bl-forms-builder__repeater-card.is-open > .bl-forms-builder__field-header--expandable:has(.bl-forms-builder__width-badge.is-interactive:hover),
+.bl-forms-builder__repeater-card.is-open > .bl-forms-builder__field-header--expandable:has(.bl-forms-builder__handle:hover),
+.bl-forms-builder__section-card.is-open > .bl-forms-builder__field-header,
+.bl-forms-builder__section-card.is-open > .bl-forms-builder__field-header--expandable:hover,
+.bl-forms-builder__section-card.is-open > .bl-forms-builder__field-header--expandable:has(.bl-forms-builder__icon-btn:hover),
+.bl-forms-builder__section-card.is-open > .bl-forms-builder__field-header--expandable:has(.bl-forms-builder__width-badge.is-interactive:hover),
+.bl-forms-builder__section-card.is-open > .bl-forms-builder__field-header--expandable:has(.bl-forms-builder__handle:hover) {
   background: transparent;
-  align-items: center;
-  gap: 10px;
-}
-
-input.bl-forms-builder__section-label-input {
-  appearance: none;
-  flex: 1 1 auto;
-  min-width: 0;
-  width: auto;
-  max-width: 100%;
-  height: auto;
-  min-height: 0 !important;
-  margin: 0;
-  padding: 4px 8px;
-  border: 0;
-  border-radius: var(--bl-forms-admin-radius, 4px);
-  background: color-mix(in srgb, var(--bl-forms-admin-muted, #646970) 8%, #fff);
-  box-shadow: none;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.4;
-  color: #1d2327;
-  cursor: text;
-  transition: background 0.12s ease;
-}
-input.bl-forms-builder__section-label-input::placeholder {
-  color: var(--bl-forms-admin-muted, #646970);
-  font-weight: 500;
-  opacity: 1;
-}
-input.bl-forms-builder__section-label-input:hover {
-  background: color-mix(in srgb, var(--bl-forms-admin-muted, #646970) 14%, #fff);
-}
-input.bl-forms-builder__section-label-input:focus {
-  outline: none;
-  border-color: transparent;
-  box-shadow: none;
-  background: color-mix(in srgb, var(--bl-forms-admin-accent, #2271b1) 10%, #fff);
 }
 
 .bl-forms-builder__design-btn {
@@ -1078,7 +1060,7 @@ input.bl-forms-builder__section-label-input:focus {
 .bl-forms-builder__modal-body--settings {
   padding: 0;
   overflow: auto;
-  min-height: 0;
+  min-height: 200px;
   flex: 1 1 auto;
 }
 .bl-forms-builder__modal-body--design {
@@ -1127,6 +1109,14 @@ input.bl-forms-builder__section-label-input:focus {
 .bl-forms-builder__modal-panel > p.description {
   margin: -6px 0 12px;
   font-weight: 400;
+}
+.bl-forms-builder__modal-panel > .bl-forms-builder__label-row {
+  margin: 0 0 12px;
+}
+.bl-forms-builder__modal-panel > .bl-forms-builder__label-row > label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 600;
 }
 
 .bl-forms-builder__modal-footer {

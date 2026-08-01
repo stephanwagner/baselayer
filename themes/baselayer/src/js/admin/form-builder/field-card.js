@@ -962,22 +962,28 @@ export function openFieldWidthModal(field, onApply) {
  * @param {object} field
  * @param {(field: object) => void} onApply
  * @param {object} [options]
- * @param {Array<'settings'|'design'|'logic'>} [options.tabs=['design','logic']]
+ * @param {Array<'settings'|'advanced'|'design'|'logic'>} [options.tabs=['design','logic']]
+ * @param {boolean} [options.withLabel=false]
  * @param {boolean} [options.withHideTitle=false]
  * @param {boolean} [options.withWidth=false]
  * @param {string} [options.logicHelp]
+ * @param {(field: object) => void} [options.onLiveUpdate]
  */
 export function openLayoutSettingsModal(field, onApply, options = {}) {
   document.querySelectorAll('.bl-forms-builder__modal').forEach((node) => node.remove());
 
   const tabIds = Array.isArray(options.tabs) && options.tabs.length
-    ? options.tabs.filter((id) => ['settings', 'design', 'logic'].includes(id))
+    ? options.tabs.filter((id) => ['settings', 'advanced', 'design', 'logic'].includes(id))
     : ['design', 'logic'];
+  const withLabel = !!options.withLabel;
   const withHideTitle = !!options.withHideTitle;
   const withWidth = !!options.withWidth;
+  const isRepeater = field.type === 'repeater';
   const logicHelp =
     options.logicHelp ||
     t('logicHelpContainer', 'Show this block only when the conditions below are met.');
+  const liveUpdate =
+    typeof options.onLiveUpdate === 'function' ? options.onLiveUpdate : null;
 
   const designs = [
     { value: 'standard', label: t('sectionDesignStandard', 'Standard') },
@@ -990,9 +996,16 @@ export function openLayoutSettingsModal(field, onApply, options = {}) {
     !withHideTitle ||
     (field.show_title !== false && field.show_title !== 0 && field.show_title !== '0');
 
+  const originalLabel = typeof field.label === 'string' ? field.label : '';
+  const originalName = typeof field.name === 'string' ? field.name : '';
+  const originalNameManual = field.name_manual !== false;
+  /** @type {HTMLInputElement|null} */
+  let nameInputEl = null;
+
   const draft = {
     id: field.id,
     type: field.type,
+    label: originalLabel,
     design: allowedDesigns.includes(field.design) ? field.design : 'standard',
     css_class: typeof field.css_class === 'string' ? field.css_class : '',
     show_title: showTitleOn,
@@ -1010,10 +1023,12 @@ export function openLayoutSettingsModal(field, onApply, options = {}) {
     ),
   };
   let draftHideTitle = withHideTitle ? !draft.show_title : false;
+  let committed = false;
 
   const tabLabels = {
     settings: t('fieldTabSettings', 'Settings'),
-    design: t('layoutDesignTitle', 'Design'),
+    advanced: t('fieldTabAdvanced', 'Advanced'),
+    design: t('fieldTabAppearance', 'Appearance'),
     logic: t('fieldTabLogic', 'Logic'),
   };
 
@@ -1024,8 +1039,35 @@ export function openLayoutSettingsModal(field, onApply, options = {}) {
     'aria-label': t('layoutSettingsTitle', 'Settings'),
   });
 
+  const syncLabelLive = () => {
+    if (!withLabel) {
+      return;
+    }
+    field.label = draft.label;
+    if (isRepeater && !draft.name_manual) {
+      field.name = uniqueFieldName(draft.label || 'items', field.id);
+      draft.name = field.name;
+      if (nameInputEl) {
+        nameInputEl.value = field.name;
+      }
+    }
+    if (liveUpdate) {
+      liveUpdate(field);
+    }
+  };
+
   const close = () => {
     document.removeEventListener('keydown', onKey);
+    if (!committed && withLabel) {
+      field.label = originalLabel;
+      if (isRepeater) {
+        field.name = originalName;
+        field.name_manual = originalNameManual;
+      }
+      if (liveUpdate) {
+        liveUpdate(field);
+      }
+    }
     backdrop.remove();
   };
 
@@ -1040,15 +1082,23 @@ export function openLayoutSettingsModal(field, onApply, options = {}) {
       field.width_custom = field.width === 'custom' ? draft.width_custom || '' : '';
     }
     if (tabIds.includes('settings')) {
-      field.name = String(draft.name || '').trim() || field.name || 'items';
-      field.name_manual = draft.name_manual !== false;
+      if (withLabel) {
+        field.label = String(draft.label || '');
+      }
+      if (isRepeater) {
+        field.name = String(draft.name || '').trim() || field.name || 'items';
+        field.name_manual = draft.name_manual !== false;
+        field.button_label = String(draft.button_label || '');
+      }
+    }
+    if (tabIds.includes('advanced') && isRepeater) {
       field.min_rows = Math.max(0, parseInt(draft.min_rows, 10) || 0);
       field.max_rows = Math.max(0, parseInt(draft.max_rows, 10) || 0);
-      field.button_label = String(draft.button_label || '');
     }
     if (tabIds.includes('logic')) {
       field.conditional_logic = normalizeConditionalLogic(draft.conditional_logic);
     }
+    committed = true;
     onApply(field);
     close();
   };
@@ -1118,16 +1168,73 @@ export function openLayoutSettingsModal(field, onApply, options = {}) {
 
   if (tabIds.includes('settings')) {
     const settingsPanel = panels.settings;
-    const nameInput = el('input', {
-      type: 'text',
-      className: 'widefat',
-      value: draft.name || '',
-      placeholder: 'items',
-    });
-    nameInput.addEventListener('input', () => {
-      draft.name_manual = true;
-      draft.name = nameInput.value;
-    });
+    if (withLabel) {
+      const labelInput = el('input', {
+        type: 'text',
+        className: 'widefat',
+        value: draft.label || '',
+        placeholder: t('sectionLabelPlaceholder', 'Title'),
+      });
+      labelInput.addEventListener('input', () => {
+        draft.label = labelInput.value;
+        syncLabelLive();
+      });
+      const labelControls = el('div', { className: 'bl-forms-builder__label-controls' }, [labelInput]);
+      if (withHideTitle) {
+        labelControls.appendChild(
+          el('div', { className: 'bl-forms-builder__hide-label' }, [
+            createSwitchSetting('blHideTitle', t('hideLabel', 'Hide'), draftHideTitle, (checked) => {
+              draftHideTitle = checked;
+            }),
+          ])
+        );
+      }
+      settingsPanel.append(
+        el('div', { className: 'bl-forms-builder__label-row' }, [
+          el('label', { text: t('label', 'Label') }),
+          labelControls,
+        ])
+      );
+    }
+    if (isRepeater) {
+      const nameInput = el('input', {
+        type: 'text',
+        className: 'widefat',
+        value: draft.name || '',
+        placeholder: 'items',
+        dataset: { blLayoutName: '1' },
+      });
+      nameInputEl = nameInput;
+      nameInput.addEventListener('input', () => {
+        draft.name_manual = true;
+        draft.name = nameInput.value;
+      });
+      const buttonInput = el('input', {
+        type: 'text',
+        className: 'widefat',
+        value: draft.button_label || '',
+        placeholder: t('addRow', 'Add row'),
+      });
+      buttonInput.addEventListener('input', () => {
+        draft.button_label = buttonInput.value;
+      });
+
+      settingsPanel.append(
+        el('p', {}, [el('label', { text: t('name', 'Field name') }), nameInput]),
+        el('p', {
+          className: 'description',
+          text: t(
+            'nameHelp',
+            'Internal field key used in submissions, emails, and entry data.'
+          ),
+        }),
+        el('p', {}, [el('label', { text: t('repeaterButtonLabel', 'Add button label') }), buttonInput])
+      );
+    }
+  }
+
+  if (tabIds.includes('advanced') && isRepeater) {
+    const advancedPanel = panels.advanced;
     const minInput = el('input', {
       type: 'number',
       className: 'widefat',
@@ -1146,46 +1253,21 @@ export function openLayoutSettingsModal(field, onApply, options = {}) {
     maxInput.addEventListener('input', () => {
       draft.max_rows = Math.max(0, parseInt(maxInput.value, 10) || 0);
     });
-    const buttonInput = el('input', {
-      type: 'text',
-      className: 'widefat',
-      value: draft.button_label || '',
-      placeholder: t('addRow', 'Add row'),
-    });
-    buttonInput.addEventListener('input', () => {
-      draft.button_label = buttonInput.value;
-    });
-
-    settingsPanel.append(
-      el('p', {}, [el('label', { text: t('name', 'Field name') }), nameInput]),
+    advancedPanel.append(
+      el('p', {}, [el('label', { text: t('repeaterMinRows', 'Min rows') }), minInput]),
+      el('p', {}, [el('label', { text: t('repeaterMaxRows', 'Max rows') }), maxInput]),
       el('p', {
         className: 'description',
-        text: t(
-          'nameHelp',
-          'Internal field key used in submissions, emails, and entry data.'
-        ),
-      }),
-      el('p', {}, [el('label', { text: t('repeaterMinRows', 'Min rows') }), minInput]),
-      el('p', {}, [
-        el('label', { text: t('repeaterMaxRows', 'Max rows (0 = unlimited)') }),
-        maxInput,
-      ]),
-      el('p', {}, [el('label', { text: t('repeaterButtonLabel', 'Add button label') }), buttonInput])
+        text: t('repeaterMaxRowsHelp', '0 = unlimited'),
+      })
     );
   }
 
   if (tabIds.includes('design')) {
     const designPanel = panels.design;
-    if (withHideTitle) {
-      designPanel.appendChild(
-        createSwitchSetting('blHideTitle', t('sectionHideTitle', 'Hide title'), draftHideTitle, (checked) => {
-          draftHideTitle = checked;
-        })
-      );
-    }
     const designWrap = el('div', { className: 'bl-forms-builder__design-style' });
     designWrap.append(
-      settingHeading(t('layoutDesignStyle', 'Style')),
+      settingHeading(t('layoutDesignTitle', 'Design')),
       createSegmentedControl(designs, draft.design, 'blDesignGroup', (value) => {
         draft.design = value;
       })
@@ -1264,7 +1346,8 @@ export function openLayoutDesignModal(field, onApply, options = {}) {
 /** @deprecated Use openLayoutSettingsModal */
 export function openSectionDesignModal(field, onApply, options = {}) {
   openLayoutSettingsModal(field, onApply, {
-    tabs: ['design', 'logic'],
+    tabs: ['settings', 'design', 'logic'],
+    withLabel: true,
     withHideTitle: true,
     ...options,
   });
@@ -3106,7 +3189,7 @@ export function createFieldCard(initial, open = false) {
       );
 
       if (nameInput) {
-        advancedSections.add(
+        generalSections.add(
           el('p', {}, [el('label', { text: t('name', 'Field name') }), nameInput]),
           el('p', {
             className: 'description',
@@ -3115,6 +3198,21 @@ export function createFieldCard(initial, open = false) {
               'Internal field key used in submissions, emails, and entry data.'
             ),
           })
+        );
+      }
+
+      if (DESCRIPTION_TYPES.includes(field.type)) {
+        const desc = el('textarea', {
+          className: 'widefat',
+          rows: '2',
+          dataset: { blDescription: '1' },
+        });
+        desc.value = field.description || '';
+        desc.addEventListener('input', () => {
+          field.description = desc.value;
+        });
+        advancedSections.add(
+          el('p', {}, [el('label', { text: t('description', 'Description') }), desc])
         );
       }
 
@@ -3223,21 +3321,6 @@ export function createFieldCard(initial, open = false) {
         });
         generalSections.add(
           el('p', {}, [el('label', { text: t('placeholder', 'Placeholder') }), ph])
-        );
-      }
-
-      if (DESCRIPTION_TYPES.includes(field.type)) {
-        const desc = el('textarea', {
-          className: 'widefat',
-          rows: '2',
-          dataset: { blDescription: '1' },
-        });
-        desc.value = field.description || '';
-        desc.addEventListener('input', () => {
-          field.description = desc.value;
-        });
-        generalSections.add(
-          el('p', {}, [el('label', { text: t('description', 'Description') }), desc])
         );
       }
 

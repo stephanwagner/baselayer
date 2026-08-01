@@ -371,6 +371,7 @@ function bl_blocks_sanitize_repeater_field(array $field, int $repeater_depth): ?
 		'min_rows'      => $min_rows,
 		'max_rows'      => $max_rows,
 		'button_label'  => sanitize_text_field((string) ($field['button_label'] ?? '')),
+		'collapsed'     => !empty($field['collapsed']),
 		'children'      => $children,
 	];
 
@@ -412,6 +413,7 @@ function bl_blocks_sanitize_layout_field(array $field, int $repeater_depth): ?ar
 			: sanitize_html_class((string) ($field['css_class'] ?? '')),
 		'design'       => $design,
 		'active'       => !array_key_exists('active', $field) || !empty($field['active']),
+		'collapsed'    => !empty($field['collapsed']),
 	];
 
 	if ($type === 'section') {

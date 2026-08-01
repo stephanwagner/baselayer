@@ -86,6 +86,11 @@ export function defaultRepeater(partial = {}) {
     min_rows: Math.max(0, parseInt(partial.min_rows, 10) || 0),
     max_rows: Math.max(0, parseInt(partial.max_rows, 10) || 0),
     button_label: partial.button_label || '',
+    collapsed:
+      partial.collapsed === true ||
+      partial.collapsed === 1 ||
+      partial.collapsed === '1' ||
+      partial.collapsed === 'true',
     conditional_logic: normalizeConditionalLogic(partial.conditional_logic),
     children: Array.isArray(partial.children) ? partial.children : [],
   };
@@ -216,25 +221,7 @@ export function createRepeaterCard(initial = {}, open = false, depth = 1) {
   });
   repeaterFieldByEl.set(row, field);
 
-  const labelPlaceholder = () =>
-    field.show_title
-      ? t('sectionLabelPlaceholder', 'Title')
-      : t('sectionLabelPlaceholderHidden', 'Name');
-
-  const labelInput = el('input', {
-    type: 'text',
-    className: 'bl-forms-builder__section-label-input',
-    value: field.label || '',
-    placeholder: labelPlaceholder(),
-    'aria-label': t('repeaterLabel', 'Repeater label'),
-  });
-  labelInput.addEventListener('input', () => {
-    field.label = labelInput.value;
-    if (!field.name_manual) {
-      field.name = uniqueFieldName(field.label || 'items', field.id);
-    }
-    notifyChanged();
-  });
+  const preview = el('span', { className: 'bl-forms-builder__preview' });
 
   const typeLabelText = () => typeLabel('repeater') + (depth > 1 ? ` (${depth})` : '');
 
@@ -292,7 +279,9 @@ export function createRepeaterCard(initial = {}, open = false, depth = 1) {
     row.dataset.fieldWidth = field.width || '100';
     row.dataset.fieldDesign = field.design || 'standard';
     row.dataset.fieldShowTitle = field.show_title ? '1' : '0';
-    labelInput.placeholder = labelPlaceholder();
+    const title = (field.label || '').trim();
+    preview.textContent = title;
+    preview.hidden = title === '';
 
     const typeChildren = [
       iconEl('repeater', 'bl-forms-builder__field-type-icon'),
@@ -322,9 +311,14 @@ export function createRepeaterCard(initial = {}, open = false, depth = 1) {
         notifyChanged();
       },
       {
-        tabs: ['settings', 'design', 'logic'],
+        tabs: ['settings', 'advanced', 'design', 'logic'],
+        withLabel: true,
         withHideTitle: true,
         withWidth: true,
+        onLiveUpdate: () => {
+          updatePreview();
+          notifyChanged();
+        },
         logicHelp: t(
           'logicHelpRepeater',
           'Show this repeater only when the conditions below are met.'
@@ -373,19 +367,50 @@ export function createRepeaterCard(initial = {}, open = false, depth = 1) {
   if (dragIcon.innerHTML) handle.appendChild(dragIcon);
   else handle.textContent = '⋮⋮';
 
+  const collapseBtn = el('button', {
+    type: 'button',
+    className: 'bl-forms-builder__icon-btn bl-forms-builder__container-collapse',
+  });
+
+  const syncCollapse = () => {
+    const collapsed = !!field.collapsed;
+    row.classList.toggle('is-collapsed', collapsed);
+    collapseBtn.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    const label = collapsed
+      ? t('expandGroup', 'Expand')
+      : t('collapseGroup', 'Collapse');
+    collapseBtn.title = label;
+    collapseBtn.setAttribute('aria-label', label);
+    const icon = iconEl(
+      collapsed ? 'expandContent' : 'collapseContent',
+      'bl-forms-builder__container-collapse-icon'
+    );
+    collapseBtn.replaceChildren();
+    if (icon.innerHTML) collapseBtn.appendChild(icon);
+    else collapseBtn.textContent = collapsed ? '›' : '▾';
+  };
+  collapseBtn.addEventListener('click', (evt) => {
+    evt.preventDefault();
+    evt.stopPropagation();
+    field.collapsed = !field.collapsed;
+    syncCollapse();
+    notifyChanged();
+  });
+  syncCollapse();
+
   const header = el('div', { className: 'bl-forms-builder__field-header' }, [
     handle,
-    labelInput,
+    preview,
     el('div', { className: 'bl-forms-builder__field-meta' }, [settingsBtn, typeChip]),
-    el('div', { className: 'bl-forms-builder__field-actions' }, [duplicateBtn, deleteBtn]),
+    el('div', { className: 'bl-forms-builder__field-actions' }, [
+      collapseBtn,
+      duplicateBtn,
+      deleteBtn,
+    ]),
   ]);
 
   row.append(header, fieldsWrap);
   updatePreview();
-
-  if (open) {
-    labelInput.focus();
-  }
 
   return row;
 }
@@ -393,9 +418,6 @@ export function createRepeaterCard(initial = {}, open = false, depth = 1) {
 export function serializeRepeaterRow(row) {
   const live = repeaterFieldByEl.get(row);
   const id = row.dataset.fieldId || live?.id || uid();
-  const labelInput = row.querySelector(
-    ':scope > .bl-forms-builder__field-header .bl-forms-builder__section-label-input'
-  );
   const fields = row.querySelector(
     ':scope > .bl-forms-builder__repeater-fields-wrap [data-bl-repeater-fields]'
   );
@@ -414,7 +436,7 @@ export function serializeRepeaterRow(row) {
   return {
     id,
     type: 'repeater',
-    label: labelInput?.value ?? live?.label ?? '',
+    label: live?.label ?? '',
     name: (live?.name || 'items').trim() || 'items',
     name_manual: live?.name_manual !== false,
     hide_label: !!live?.hide_label,
@@ -429,6 +451,7 @@ export function serializeRepeaterRow(row) {
     min_rows: Math.max(0, parseInt(live?.min_rows ?? 0, 10) || 0),
     max_rows: Math.max(0, parseInt(live?.max_rows ?? 0, 10) || 0),
     button_label: live?.button_label ?? '',
+    collapsed: !!live?.collapsed,
     conditional_logic: normalizeConditionalLogic(live?.conditional_logic),
     children,
   };

@@ -307,7 +307,10 @@ msgid "Min rows"
 msgstr ""
 
 #: includes/admin-editor.php:305
-msgid "Max rows (0 = unlimited)"
+msgid "Max rows"
+msgstr ""
+
+msgid "0 = unlimited"
 msgstr ""
 
 #: includes/admin-editor.php:306
