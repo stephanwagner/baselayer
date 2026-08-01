@@ -369,6 +369,8 @@ function bl_icon_labels(): array
 		'stacks'                 => _x('Stacks', 'icon name', 'baselayer-icons'),
 		'aspect-ratio'           => _x('Aspect ratio', 'icon name', 'baselayer-icons'),
 		'toolbar'                => _x('Toolbar', 'icon name', 'baselayer-icons'),
+		'preview'                => _x('Preview', 'icon name', 'baselayer-icons'),
+		'tab'                    => _x('Tab', 'icon name', 'baselayer-icons'),
 		'call-to-action'         => _x('Call to action', 'icon name', 'baselayer-icons'),
 
 		// Commerce, finance & legal.

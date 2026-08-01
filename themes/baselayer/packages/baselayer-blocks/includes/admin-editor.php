@@ -70,7 +70,7 @@ function bl_blocks_render_template_metabox(WP_Post $post): void
 		echo '<div class="bl-blocks-template-metabox__path-row">';
 		echo '<code class="bl-blocks-template-metabox__path-code">' . esc_html($info['create_path']) . '</code>';
 		echo '<span id="' . esc_attr($path_id) . '" class="screen-reader-text">' . esc_html($filename) . '</span>';
-		echo '<button type="button" class="button bl-button-tiny bl-blocks-template-metabox__icon-btn" data-bl-copy-from-source="' . esc_attr($path_id) . '" title="' . esc_attr__('Copy filename', 'baselayer-blocks') . '" aria-label="' . esc_attr__('Copy filename', 'baselayer-blocks') . '">';
+		echo '<button type="button" class="button bl-button-small -icon-only" data-bl-copy-from-source="' . esc_attr($path_id) . '" title="' . esc_attr__('Copy filename', 'baselayer-blocks') . '" aria-label="' . esc_attr__('Copy filename', 'baselayer-blocks') . '">';
 		echo '<span class="bl-icon -icon-copy" aria-hidden="true"></span>';
 		echo '</button>';
 		echo '</div>';
@@ -79,8 +79,8 @@ function bl_blocks_render_template_metabox(WP_Post $post): void
 		echo '<button type="button" class="button button-primary bl-button-small" data-bl-blocks-generate-starter>';
 		echo esc_html__('Generate starter template', 'baselayer-blocks');
 		echo '</button>';
-		echo '<button type="button" class="button bl-button-tiny bl-blocks-template-metabox__icon-btn" data-bl-blocks-preview-starter title="' . esc_attr__('Preview starter template', 'baselayer-blocks') . '" aria-label="' . esc_attr__('Preview starter template', 'baselayer-blocks') . '">';
-		echo '<span class="bl-icon -icon-visibility" aria-hidden="true"></span>';
+		echo '<button type="button" class="button bl-button-small -icon-only" data-bl-blocks-preview-starter title="' . esc_attr__('Preview starter template', 'baselayer-blocks') . '" aria-label="' . esc_attr__('Preview starter template', 'baselayer-blocks') . '">';
+		echo '<span class="bl-icon -icon-preview" aria-hidden="true"></span>';
 		echo '</button>';
 		echo '</p>';
 	}

@@ -423,13 +423,14 @@
             { filename: "stacks", alternatives: ["fill"], keywords: ["stack", "layers", "collection"] },
             { filename: "aspect-ratio", alternatives: ["fill"], keywords: ["aspect", "ratio", "dimensions", "layout"] },
             { filename: "toolbar", alternatives: ["fill"], keywords: ["toolbar", "bar", "controls", "layout"] },
+            { filename: "preview", alternatives: ["fill"], keywords: ["preview", "eye", "view", "look", "visibility", "show"] },
+            { filename: "tab", alternatives: ["fill"], keywords: ["tab", "tabs", "panel", "layout", "navigation"] },
             { filename: "layout-section", alternatives: ["fill"], keywords: ["section", "layout", "content", "area", "region", "container", "block", "group", "spacing", "margin", "page section"] },
             { filename: "web-stories", alternatives: ["fill"], keywords: ["web", "stories", "story", "reels", "vertical", "social"] },
             { filename: "web-stories-stack", alternatives: ["fill"], keywords: ["web", "stories", "stack", "vertical", "social", "google"] },
             { filename: "carousel", alternatives: ["fill"], keywords: ["slider", "gallery", "slideshow"] },
             { filename: "call-to-action", alternatives: ["fill"], keywords: ["cta", "call to action", "button", "promote"] },
             { filename: "fit-page", alternatives: ["fill"], keywords: ["fit", "page", "document", "layout", "scale"] },
-            { filename: "brick", alternatives: ["fill"], keywords: ["block", "gutenberg", "layout", "section"] },
             { filename: "combine-columns", alternatives: ["fill"], keywords: ["table", "columns", "merge", "combine"] },
             { filename: "combine-rows", alternatives: ["fill"], keywords: ["table", "rows", "merge", "combine"] },
             { filename: "add-column-left", alternatives: ["fill"], keywords: ["table", "column", "add", "insert", "left"] },
@@ -439,7 +440,8 @@
             { filename: "move-selection-left", alternatives: ["fill"], keywords: ["move", "selection", "left", "arrow", "shift", "reorder"] },
             { filename: "move-selection-right", alternatives: ["fill"], keywords: ["move", "selection", "right", "arrow", "shift", "reorder"] },
             { filename: "move-selection-up", alternatives: ["fill"], keywords: ["move", "selection", "up", "arrow", "shift", "reorder"] },
-            { filename: "move-selection-down", alternatives: ["fill"], keywords: ["move", "selection", "down", "arrow", "shift", "reorder"] }
+            { filename: "move-selection-down", alternatives: ["fill"], keywords: ["move", "selection", "down", "arrow", "shift", "reorder"] },
+            { filename: "brick", alternatives: ["fill"], keywords: ["block", "gutenberg", "layout", "section"] }
           ]
         },
         {

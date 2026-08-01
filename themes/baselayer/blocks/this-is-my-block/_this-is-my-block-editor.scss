@@ -1,0 +1,11 @@
+@use '../../src/scss/config' as *;
+
+/**
+ * Editor-only tweaks for this-is-my-block (loaded via blocks/_blocks-editor.scss).
+ */
+
+.editor-styles-wrapper {
+  .bl-this-is-my-block {
+    // Add your editor-only styles here
+  }
+}

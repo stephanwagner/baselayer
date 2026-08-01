@@ -15,6 +15,22 @@
   line-height: normal;
 }
 
+.wp-core-ui .button.bl-button-small.-icon-only,
+.button.bl-button-small.-icon-only {
+  flex: 0 0 auto;
+  width: 36px;
+  min-width: 36px;
+  padding-left: 0;
+  padding-right: 0;
+}
+.wp-core-ui .button.bl-button-small.-icon-only .bl-icon,
+.button.bl-button-small.-icon-only .bl-icon {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  font-size: 18px;
+}
+
 .post-type-bl_form .page-title-action,
 .post-type-bl_block .page-title-action {
   display: none !important;

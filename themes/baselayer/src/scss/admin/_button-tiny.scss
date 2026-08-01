@@ -4,3 +4,20 @@
 .button.bl-button-tiny {
   @include button-tiny;
 }
+
+// Square icon-only control matching bl-button-tiny height.
+.wp-core-ui .button.bl-button-tiny.-icon-only,
+.button.bl-button-tiny.-icon-only {
+  flex: 0 0 auto;
+  width: 28px;
+  min-width: 28px;
+  padding-left: 0;
+  padding-right: 0;
+
+  .bl-icon {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+  }
+}
