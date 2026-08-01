@@ -210,7 +210,11 @@ import { openFieldsModal } from './admin/field-form.js';
                   { title: blockI18n.panelTitle || 'Block fields', initialOpen: true },
                   el(
                     Button,
-                    { variant: 'secondary', onClick: open },
+                    {
+                      variant: 'secondary',
+                      className: 'bl-blocks-edit-fields-button',
+                      onClick: open,
+                    },
                     blockI18n.edit || 'Edit fields'
                   )
                 )
@@ -267,7 +271,11 @@ import { openFieldsModal } from './admin/field-form.js';
             def.description ? el('p', { className: 'description' }, def.description) : null,
             el(
               Button,
-              { variant: 'secondary', onClick: open },
+              {
+                variant: 'secondary',
+                className: 'bl-blocks-edit-fields-button',
+                onClick: open,
+              },
               pageI18n.openFields || pageI18n.edit || 'Edit fields'
             )
           );

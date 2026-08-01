@@ -211,6 +211,15 @@ body.post-new-php.post-type-bl_block {
   flex-wrap: wrap;
   gap: 8px;
   align-items: center;
+
+  .button-link {
+    text-decoration: none;
+
+    &:hover,
+    &:focus {
+      text-decoration: none;
+    }
+  }
 }
 
 .bl-blocks-icon-field__svg-panel {

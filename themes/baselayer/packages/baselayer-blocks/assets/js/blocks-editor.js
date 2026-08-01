@@ -1635,7 +1635,11 @@
                 { title: blockI18n.panelTitle || "Block fields", initialOpen: true },
                 el4(
                   Button,
-                  { variant: "secondary", onClick: open },
+                  {
+                    variant: "secondary",
+                    className: "bl-blocks-edit-fields-button",
+                    onClick: open
+                  },
                   blockI18n.edit || "Edit fields"
                 )
               )
@@ -1684,7 +1688,11 @@
               def.description ? el4("p", { className: "description" }, def.description) : null,
               el4(
                 Button,
-                { variant: "secondary", onClick: open },
+                {
+                  variant: "secondary",
+                  className: "bl-blocks-edit-fields-button",
+                  onClick: open
+                },
                 pageI18n.openFields || pageI18n.edit || "Edit fields"
               )
             );

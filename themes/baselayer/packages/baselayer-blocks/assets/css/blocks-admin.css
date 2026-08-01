@@ -315,6 +315,12 @@ body.post-new-php.post-type-bl_block .page-title-action {
   gap: 8px;
   align-items: center;
 }
+.bl-blocks-icon-field__actions .button-link {
+  text-decoration: none;
+}
+.bl-blocks-icon-field__actions .button-link:hover, .bl-blocks-icon-field__actions .button-link:focus {
+  text-decoration: none;
+}
 
 .bl-blocks-icon-field__svg-panel {
   margin-top: 10px;

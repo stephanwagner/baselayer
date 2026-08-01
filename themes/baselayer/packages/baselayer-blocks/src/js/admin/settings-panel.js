@@ -137,7 +137,7 @@ function createBlockIconField(initial, onChange) {
 
   const clearBtn = el('button', {
     type: 'button',
-    className: 'button button-link-delete',
+    className: 'button-link',
     text: t('blockIconClear', 'Clear'),
     dataset: { blBlocksIconClear: '' },
   });

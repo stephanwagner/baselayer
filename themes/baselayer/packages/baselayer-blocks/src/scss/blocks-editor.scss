@@ -66,6 +66,11 @@
   }
 }
 
+.bl-blocks-edit-fields-button {
+  width: 100%;
+  justify-content: center;
+}
+
 // Modal shared with admin field UI (loaded in editor too).
 .bl-blocks-modal-overlay {
   position: fixed;
