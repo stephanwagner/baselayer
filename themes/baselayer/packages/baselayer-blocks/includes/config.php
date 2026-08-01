@@ -346,14 +346,23 @@ function bl_blocks_sanitize_repeater_field(array $field, int $repeater_depth): ?
 		}
 	}
 
-	return [
+	$design = sanitize_key((string) ($field['design'] ?? 'standard'));
+	if (!in_array($design, ['standard', 'outline', 'card'], true)) {
+		$design = 'standard';
+	}
+
+	$out = [
 		'id'            => $id,
 		'type'          => 'repeater',
 		'label'         => sanitize_text_field((string) ($field['label'] ?? '')),
 		'name'          => $name,
 		'name_manual'   => !empty($field['name_manual']),
 		'hide_label'    => !empty($field['hide_label']),
-		'css_class'     => sanitize_html_class((string) ($field['css_class'] ?? '')),
+		'show_title'    => !array_key_exists('show_title', $field) || !empty($field['show_title']),
+		'css_class'     => function_exists('bl_forms_sanitize_css_class')
+			? bl_forms_sanitize_css_class((string) ($field['css_class'] ?? ''))
+			: sanitize_html_class((string) ($field['css_class'] ?? '')),
+		'design'        => $design,
 		'width'         => sanitize_text_field((string) ($field['width'] ?? '100')),
 		'width_custom'  => sanitize_text_field((string) ($field['width_custom'] ?? '')),
 		'active'        => !array_key_exists('active', $field) || !empty($field['active']),
@@ -364,6 +373,16 @@ function bl_blocks_sanitize_repeater_field(array $field, int $repeater_depth): ?
 		'button_label'  => sanitize_text_field((string) ($field['button_label'] ?? '')),
 		'children'      => $children,
 	];
+
+	if (function_exists('bl_forms_attach_conditional_logic')) {
+		return bl_forms_attach_conditional_logic($out, $field);
+	}
+
+	if (isset($field['conditional_logic']) && is_array($field['conditional_logic'])) {
+		$out['conditional_logic'] = $field['conditional_logic'];
+	}
+
+	return $out;
 }
 
 /**
@@ -378,19 +397,26 @@ function bl_blocks_sanitize_layout_field(array $field, int $repeater_depth): ?ar
 		$id = 'f' . wp_generate_password(8, false, false);
 	}
 
+	$design = sanitize_key((string) ($field['design'] ?? 'standard'));
+	if (!in_array($design, ['standard', 'outline', 'card'], true)) {
+		$design = 'standard';
+	}
+
 	$out = [
 		'id'           => $id,
 		'type'         => $type,
 		'width'        => sanitize_text_field((string) ($field['width'] ?? '100')),
 		'width_custom' => sanitize_text_field((string) ($field['width_custom'] ?? '')),
-		'css_class'    => sanitize_html_class((string) ($field['css_class'] ?? '')),
+		'css_class'    => function_exists('bl_forms_sanitize_css_class')
+			? bl_forms_sanitize_css_class((string) ($field['css_class'] ?? ''))
+			: sanitize_html_class((string) ($field['css_class'] ?? '')),
+		'design'       => $design,
 		'active'       => !array_key_exists('active', $field) || !empty($field['active']),
 	];
 
 	if ($type === 'section') {
 		$out['label'] = sanitize_text_field((string) ($field['label'] ?? ''));
-		$design = sanitize_key((string) ($field['design'] ?? 'standard'));
-		$out['design'] = in_array($design, ['standard', 'outline', 'card'], true) ? $design : 'standard';
+		$out['show_title'] = !array_key_exists('show_title', $field) || !empty($field['show_title']);
 	}
 
 	$children = [];
@@ -402,6 +428,14 @@ function bl_blocks_sanitize_layout_field(array $field, int $repeater_depth): ?ar
 		}
 	}
 	$out['children'] = $children;
+
+	if (function_exists('bl_forms_attach_conditional_logic')) {
+		return bl_forms_attach_conditional_logic($out, $field);
+	}
+
+	if (isset($field['conditional_logic']) && is_array($field['conditional_logic'])) {
+		$out['conditional_logic'] = $field['conditional_logic'];
+	}
 
 	return $out;
 }

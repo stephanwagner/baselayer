@@ -960,37 +960,71 @@ export function openFieldWidthModal(field, onApply) {
 }
 
 /**
- * Modal to pick layout design (standard / outline / card), optional hide title, CSS class.
+ * Tabbed settings modal for layout containers (section / column / repeater).
  *
  * @param {object} field
  * @param {(field: object) => void} onApply
  * @param {object} [options]
- * @param {boolean} [options.withShowTitle=false] - Show the hide-title switch (section).
+ * @param {Array<'settings'|'design'|'logic'>} [options.tabs=['design','logic']]
+ * @param {boolean} [options.withHideTitle=false]
+ * @param {boolean} [options.withWidth=false]
+ * @param {string} [options.logicHelp]
  */
-export function openLayoutDesignModal(field, onApply, options = {}) {
+export function openLayoutSettingsModal(field, onApply, options = {}) {
   document.querySelectorAll('.bl-forms-builder__modal').forEach((node) => node.remove());
+
+  const tabIds = Array.isArray(options.tabs) && options.tabs.length
+    ? options.tabs.filter((id) => ['settings', 'design', 'logic'].includes(id))
+    : ['design', 'logic'];
+  const withHideTitle = !!options.withHideTitle;
+  const withWidth = !!options.withWidth;
+  const logicHelp =
+    options.logicHelp ||
+    t('logicHelpContainer', 'Show this block only when the conditions below are met.');
 
   const designs = [
     { value: 'standard', label: t('sectionDesignStandard', 'Standard') },
     { value: 'outline', label: t('sectionDesignOutline', 'Outline') },
     { value: 'card', label: t('sectionDesignCard', 'Card') },
   ];
-  const allowed = designs.map((item) => item.value);
-  let draft = allowed.includes(field.design) ? field.design : 'standard';
-  const withShowTitle = !!options.withShowTitle;
-  // show_title defaults true; UI is inverted as “Hide title” (off by default).
+  const allowedDesigns = designs.map((item) => item.value);
+
   const showTitleOn =
-    !withShowTitle ||
+    !withHideTitle ||
     (field.show_title !== false && field.show_title !== 0 && field.show_title !== '0');
-  let draftHideTitle = withShowTitle ? !showTitleOn : false;
-  let draftCssClass = field.css_class || '';
-  const title = t('layoutDesignTitle', 'Design');
+
+  const draft = {
+    id: field.id,
+    type: field.type,
+    design: allowedDesigns.includes(field.design) ? field.design : 'standard',
+    css_class: typeof field.css_class === 'string' ? field.css_class : '',
+    show_title: showTitleOn,
+    width: field.width || '100',
+    width_custom: field.width_custom || '',
+    name: field.name || '',
+    name_manual: field.name_manual !== false,
+    min_rows: Math.max(0, parseInt(field.min_rows, 10) || 0),
+    max_rows: Math.max(0, parseInt(field.max_rows, 10) || 0),
+    button_label: field.button_label || '',
+    conditional_logic: normalizeConditionalLogic(
+      field.conditional_logic && typeof field.conditional_logic === 'object'
+        ? JSON.parse(JSON.stringify(field.conditional_logic))
+        : { enabled: false, groups: [] }
+    ),
+  };
+  let draftHideTitle = withHideTitle ? !draft.show_title : false;
+
+  const tabLabels = {
+    settings: t('fieldTabSettings', 'Settings'),
+    design: t('layoutDesignTitle', 'Design'),
+    logic: t('fieldTabLogic', 'Logic'),
+  };
 
   const backdrop = el('div', {
     className: 'bl-forms-builder__modal',
     role: 'dialog',
     'aria-modal': 'true',
-    'aria-label': title,
+    'aria-label': t('layoutSettingsTitle', 'Settings'),
   });
 
   const close = () => {
@@ -999,10 +1033,24 @@ export function openLayoutDesignModal(field, onApply, options = {}) {
   };
 
   const apply = () => {
-    field.design = draft;
-    field.css_class = draftCssClass.trim();
-    if (withShowTitle) {
+    field.design = draft.design;
+    field.css_class = String(draft.css_class || '').trim();
+    if (withHideTitle) {
       field.show_title = !draftHideTitle;
+    }
+    if (withWidth) {
+      field.width = draft.width || '100';
+      field.width_custom = field.width === 'custom' ? draft.width_custom || '' : '';
+    }
+    if (tabIds.includes('settings')) {
+      field.name = String(draft.name || '').trim() || field.name || 'items';
+      field.name_manual = draft.name_manual !== false;
+      field.min_rows = Math.max(0, parseInt(draft.min_rows, 10) || 0);
+      field.max_rows = Math.max(0, parseInt(draft.max_rows, 10) || 0);
+      field.button_label = String(draft.button_label || '');
+    }
+    if (tabIds.includes('logic')) {
+      field.conditional_logic = normalizeConditionalLogic(draft.conditional_logic);
     }
     onApply(field);
     close();
@@ -1021,54 +1069,168 @@ export function openLayoutDesignModal(field, onApply, options = {}) {
     }
   });
 
-  const dialog = el('div', { className: 'bl-forms-builder__modal-dialog' });
-  const header = el('div', { className: 'bl-forms-builder__modal-header' }, [
-    el('h2', {
-      className: 'bl-forms-builder__modal-title',
-      text: title,
-    }),
-  ]);
-
-  const body = el('div', {
-    className: 'bl-forms-builder__modal-body bl-forms-builder__modal-body--design',
+  const dialog = el('div', {
+    className: 'bl-forms-builder__modal-dialog bl-forms-builder__modal-dialog--settings',
   });
 
-  if (withShowTitle) {
-    body.appendChild(
-      createSwitchSetting('blHideTitle', t('sectionHideTitle', 'Hide title'), draftHideTitle, (checked) => {
-        draftHideTitle = checked;
-      })
+  const tabBar = el('nav', {
+    className: 'bl-forms-builder__modal-tabs',
+    role: 'tablist',
+  });
+  const panelsWrap = el('div', {
+    className: 'bl-forms-builder__modal-body bl-forms-builder__modal-body--settings',
+  });
+
+  const panels = {};
+  const tabButtons = {};
+  let activeTab = tabIds[0];
+
+  const activate = (id) => {
+    activeTab = id;
+    tabIds.forEach((tabId) => {
+      const on = tabId === id;
+      tabButtons[tabId].classList.toggle('is-active', on);
+      tabButtons[tabId].setAttribute('aria-selected', on ? 'true' : 'false');
+      panels[tabId].hidden = !on;
+      panels[tabId].classList.toggle('is-active', on);
+    });
+  };
+
+  tabIds.forEach((tabId) => {
+    const panel = el('div', {
+      className:
+        'bl-forms-builder__modal-panel' +
+        (tabId === 'design' ? ' bl-forms-builder__modal-body--design' : ''),
+      role: 'tabpanel',
+      dataset: { blModalPanel: tabId },
+    });
+    panels[tabId] = panel;
+    panelsWrap.appendChild(panel);
+
+    const btn = el('button', {
+      type: 'button',
+      className: 'bl-forms-builder__modal-tab',
+      role: 'tab',
+      text: tabLabels[tabId] || tabId,
+      dataset: { blModalTab: tabId },
+      onClick: () => activate(tabId),
+    });
+    tabButtons[tabId] = btn;
+    tabBar.appendChild(btn);
+  });
+
+  if (tabIds.includes('settings')) {
+    const settingsPanel = panels.settings;
+    const nameInput = el('input', {
+      type: 'text',
+      className: 'widefat',
+      value: draft.name || '',
+      placeholder: 'items',
+    });
+    nameInput.addEventListener('input', () => {
+      draft.name_manual = true;
+      draft.name = nameInput.value;
+    });
+    const minInput = el('input', {
+      type: 'number',
+      className: 'widefat',
+      min: '0',
+      value: String(draft.min_rows || 0),
+    });
+    minInput.addEventListener('input', () => {
+      draft.min_rows = Math.max(0, parseInt(minInput.value, 10) || 0);
+    });
+    const maxInput = el('input', {
+      type: 'number',
+      className: 'widefat',
+      min: '0',
+      value: String(draft.max_rows || 0),
+    });
+    maxInput.addEventListener('input', () => {
+      draft.max_rows = Math.max(0, parseInt(maxInput.value, 10) || 0);
+    });
+    const buttonInput = el('input', {
+      type: 'text',
+      className: 'widefat',
+      value: draft.button_label || '',
+      placeholder: t('addRow', 'Add row'),
+    });
+    buttonInput.addEventListener('input', () => {
+      draft.button_label = buttonInput.value;
+    });
+
+    settingsPanel.append(
+      el('p', {}, [el('label', { text: t('name', 'Field name') }), nameInput]),
+      el('p', {
+        className: 'description',
+        text: t(
+          'nameHelp',
+          'Internal field key used in submissions, emails, and entry data.'
+        ),
+      }),
+      el('p', {}, [el('label', { text: t('repeaterMinRows', 'Min rows') }), minInput]),
+      el('p', {}, [
+        el('label', { text: t('repeaterMaxRows', 'Max rows (0 = unlimited)') }),
+        maxInput,
+      ]),
+      el('p', {}, [el('label', { text: t('repeaterButtonLabel', 'Add button label') }), buttonInput])
     );
   }
 
-  const designWrap = el('div', { className: 'bl-forms-builder__design-style' });
-  designWrap.append(
-    settingHeading(t('layoutDesignStyle', 'Style')),
-    createSegmentedControl(designs, draft, 'blDesignGroup', (value) => {
-      draft = value;
-    })
-  );
-  body.appendChild(designWrap);
+  if (tabIds.includes('design')) {
+    const designPanel = panels.design;
+    if (withHideTitle) {
+      designPanel.appendChild(
+        createSwitchSetting('blHideTitle', t('sectionHideTitle', 'Hide title'), draftHideTitle, (checked) => {
+          draftHideTitle = checked;
+        })
+      );
+    }
+    const designWrap = el('div', { className: 'bl-forms-builder__design-style' });
+    designWrap.append(
+      settingHeading(t('layoutDesignStyle', 'Style')),
+      createSegmentedControl(designs, draft.design, 'blDesignGroup', (value) => {
+        draft.design = value;
+      })
+    );
+    designPanel.appendChild(designWrap);
 
-  const cssInput = el('input', {
-    type: 'text',
-    className: 'widefat',
-    dataset: { blCssClass: '1' },
-    value: draftCssClass,
-    placeholder: t('cssClassPlaceholder', 'e.g. my-field'),
-  });
-  cssInput.addEventListener('input', () => {
-    draftCssClass = cssInput.value;
-  });
-  const cssWrap = el('div', { className: 'bl-forms-builder__css-class' });
-  cssWrap.appendChild(el('p', {}, [el('label', { text: t('cssClass', 'CSS class') }), cssInput]));
-  cssWrap.appendChild(
-    el('p', {
-      className: 'description',
-      text: t('cssClassHelp', 'Optional class names added to this field’s wrapper.'),
-    })
-  );
-  body.appendChild(cssWrap);
+    if (withWidth) {
+      designPanel.appendChild(createWidthControl(draft, () => {}, { showLabel: true }));
+    }
+
+    const cssInput = el('input', {
+      type: 'text',
+      className: 'widefat',
+      dataset: { blCssClass: '1' },
+      value: draft.css_class,
+      placeholder: t('cssClassPlaceholder', 'e.g. my-field'),
+    });
+    cssInput.addEventListener('input', () => {
+      draft.css_class = cssInput.value;
+    });
+    const cssWrap = el('div', { className: 'bl-forms-builder__css-class' });
+    cssWrap.appendChild(el('p', {}, [el('label', { text: t('cssClass', 'CSS class') }), cssInput]));
+    cssWrap.appendChild(
+      el('p', {
+        className: 'description',
+        text: t('cssClassHelp', 'Optional class names added to this field’s wrapper.'),
+      })
+    );
+    designPanel.appendChild(cssWrap);
+  }
+
+  if (tabIds.includes('logic')) {
+    const logicPanel = panels.logic;
+    const editor = createConditionalLogicEditor(draft, undefined, null);
+    const help = editor.querySelector('.bl-forms-builder__logic-help');
+    if (help) {
+      help.textContent = logicHelp;
+    }
+    logicPanel.appendChild(editor);
+  }
+
+  activate(activeTab);
 
   const footer = el('div', { className: 'bl-forms-builder__modal-footer' }, [
     el('button', {
@@ -1085,14 +1247,30 @@ export function openLayoutDesignModal(field, onApply, options = {}) {
     }),
   ]);
 
-  dialog.append(header, body, footer);
+  const header = el('div', { className: 'bl-forms-builder__modal-header bl-forms-builder__modal-header--tabs' }, [
+    tabBar,
+  ]);
+  dialog.append(header, panelsWrap, footer);
   backdrop.appendChild(dialog);
   document.body.appendChild(backdrop);
 }
 
-/** @deprecated Use openLayoutDesignModal */
+/** @deprecated Use openLayoutSettingsModal */
+export function openLayoutDesignModal(field, onApply, options = {}) {
+  openLayoutSettingsModal(field, onApply, {
+    tabs: ['design'],
+    withHideTitle: !!options.withShowTitle,
+    ...options,
+  });
+}
+
+/** @deprecated Use openLayoutSettingsModal */
 export function openSectionDesignModal(field, onApply, options = {}) {
-  openLayoutDesignModal(field, onApply, { withShowTitle: true, ...options });
+  openLayoutSettingsModal(field, onApply, {
+    tabs: ['design', 'logic'],
+    withHideTitle: true,
+    ...options,
+  });
 }
 
 function syncWidthControlUi(scope, field) {

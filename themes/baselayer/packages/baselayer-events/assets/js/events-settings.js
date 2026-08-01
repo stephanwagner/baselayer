@@ -141,6 +141,8 @@
             { filename: "drag", alternatives: [], keywords: ["move", "reorder", "handle", "grab"] },
             { filename: "drag-handle", alternatives: [], keywords: ["move", "reorder", "handle", "grab"] },
             { filename: "mobile-rotate", alternatives: ["fill"], keywords: ["mobile", "rotate", "orientation", "phone"] },
+            { filename: "button", alternatives: ["fill"], keywords: ["button", "cta", "click", "action", "ui"] },
+            { filename: "button-group", alternatives: ["fill"], keywords: ["button", "group", "segmented", "toggle", "options", "ui"] },
             { filename: "pinch-zoom-in", alternatives: ["fill"], keywords: ["pinch", "zoom", "in", "magnify", "gesture"] },
             { filename: "pinch-zoom-out", alternatives: ["fill"], keywords: ["pinch", "zoom", "out", "shrink", "gesture"] },
             { filename: "swipe-left-right", alternatives: ["fill"], keywords: ["swipe", "gesture", "horizontal", "touch"] },
@@ -396,7 +398,8 @@
             { filename: "table-edit", alternatives: ["fill"], keywords: ["table", "edit", "grid", "modify"] },
             { filename: "analytics", alternatives: ["fill"], keywords: ["analytics", "statistics", "metrics", "insights"] },
             { filename: "list-box", alternatives: ["fill"], keywords: ["list", "panel", "items"] },
-            { filename: "odometer", alternatives: ["fill"], keywords: ["odometer", "mileage", "counter", "distance", "gauge"] }
+            { filename: "odometer", alternatives: ["fill"], keywords: ["odometer", "mileage", "counter", "distance", "gauge"] },
+            { filename: "infinity", alternatives: [], keywords: ["infinity", "unlimited", "forever", "infinite", "loop", "endless"] }
           ]
         },
         {

@@ -500,10 +500,6 @@ function bl_forms_sanitize_conditional_logic($raw): ?array
  */
 function bl_forms_attach_conditional_logic(array $out, array $field): array
 {
-	$type = (string) ($out['type'] ?? '');
-	if (in_array($type, ['column', 'section'], true)) {
-		return $out;
-	}
 	$logic = bl_forms_sanitize_conditional_logic($field['conditional_logic'] ?? null);
 	if ($logic !== null) {
 		$out['conditional_logic'] = $logic;
@@ -1404,7 +1400,7 @@ function bl_forms_sanitize_field($field): ?array
 		$out['design'] = $design;
 		unset($out['name'], $out['name_manual'], $out['hide_label'], $out['label']);
 
-		return $out;
+		return bl_forms_attach_conditional_logic($out, $field);
 	}
 
 	if ($type === 'section') {
@@ -1434,7 +1430,7 @@ function bl_forms_sanitize_field($field): ?array
 		$out['show_title'] = !array_key_exists('show_title', $field) || !empty($field['show_title']);
 		unset($out['name'], $out['name_manual'], $out['hide_label']);
 
-		return $out;
+		return bl_forms_attach_conditional_logic($out, $field);
 	}
 
 	if ($type === 'divider') {

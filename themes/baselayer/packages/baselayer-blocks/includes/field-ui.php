@@ -9,10 +9,6 @@ defined('ABSPATH') || exit;
  */
 function bl_blocks_palette_icons(): array
 {
-	if (function_exists('bl_forms_palette_icons')) {
-		return bl_forms_palette_icons();
-	}
-
 	$map = [
 		'text'         => 'text-short',
 		'textarea'     => 'article',
@@ -24,7 +20,7 @@ function bl_blocks_palette_icons(): array
 		'radio'        => 'radio-button-checked',
 		'select'       => 'dropdown',
 		'toggle'       => 'toggle-on',
-		'button_group' => 'view-column',
+		'button_group' => 'button-group',
 		'terms'        => 'checkbox-checked',
 		'date'         => 'calendar',
 		'time'         => 'clock',
@@ -38,7 +34,7 @@ function bl_blocks_palette_icons(): array
 		'spacer'       => 'expand',
 		'column'       => 'view-column',
 		'section'      => 'layers',
-		'repeater'     => 'view-list',
+		'repeater'     => 'infinity',
 		'hidden'       => 'visibility-off',
 		'add'          => 'chevron-right',
 		'caret'        => 'chevron-down',
@@ -49,9 +45,43 @@ function bl_blocks_palette_icons(): array
 		'trash'        => 'delete',
 		'duplicate'    => 'copy',
 		'drag'         => 'drag',
+		'design'       => 'palette',
+		'tune'         => 'tune',
 		'fullscreen'   => 'fullscreen',
 		'fullscreenExit'=> 'fullscreen-exit',
 	];
+
+	if (function_exists('bl_forms_palette_icons')) {
+		$icons = bl_forms_palette_icons();
+		// Blocks-only types (e.g. repeater) may be absent from Forms palette.
+		foreach (['repeater'] as $key) {
+			if (isset($icons[$key]) || !isset($map[$key])) {
+				continue;
+			}
+			$svg = '';
+			if (function_exists('bl_forms_svg_code')) {
+				$svg = bl_forms_svg_code($map[$key], [
+					'width'       => '16',
+					'height'      => '16',
+					'aria-hidden' => 'true',
+					'focusable'   => 'false',
+				]);
+			}
+			if ($svg === '' && function_exists('bl_svg_code')) {
+				$svg = bl_svg_code('icons/' . $map[$key] . '.svg', [
+					'width'       => '16',
+					'height'      => '16',
+					'aria-hidden' => 'true',
+					'focusable'   => 'false',
+				]);
+			}
+			if ($svg !== '') {
+				$icons[$key] = $svg;
+			}
+		}
+
+		return $icons;
+	}
 
 	$icons = [];
 	foreach ($map as $key => $icon_name) {
@@ -428,8 +458,18 @@ function bl_blocks_render_admin_repeater(array $field, $rows, string $name_prefi
 	}
 
 	$input_base = $name_prefix . '[' . $name . ']';
-	echo '<div class="bl-blocks-fields__repeater" data-bl-blocks-repeater data-min-rows="' . esc_attr((string) $min_rows) . '" data-max-rows="' . esc_attr((string) $max_rows) . '">';
-	if ($label !== '' && empty($field['hide_label'])) {
+	$design = sanitize_key((string) ($field['design'] ?? 'standard'));
+	if (!in_array($design, ['standard', 'outline', 'card'], true)) {
+		$design = 'standard';
+	}
+	$classes = 'bl-blocks-fields__repeater bl-blocks-fields__repeater--' . $design;
+	$extra = sanitize_html_class((string) ($field['css_class'] ?? ''));
+	if ($extra !== '') {
+		$classes .= ' ' . $extra;
+	}
+	$show_title = !array_key_exists('show_title', $field) || !empty($field['show_title']);
+	echo '<div class="' . esc_attr($classes) . '" data-bl-blocks-repeater data-min-rows="' . esc_attr((string) $min_rows) . '" data-max-rows="' . esc_attr((string) $max_rows) . '">';
+	if ($label !== '' && $show_title && empty($field['hide_label'])) {
 		echo '<div class="bl-blocks-fields__label">' . esc_html($label) . '</div>';
 	}
 	$desc = (string) ($field['description'] ?? '');

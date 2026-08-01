@@ -6,15 +6,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: BaseLayer icons\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/theme/baselayer\n"
+"Language: de_CH\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: de_CH\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Domain: baselayer-icons\n"
 
 # Categories
-
 msgctxt "icon category"
 msgid "Arrows & navigation"
 msgstr "Pfeile & Navigation"
@@ -112,7 +111,6 @@ msgid "Brands"
 msgstr "Marken"
 
 # Icon names — Navigation
-
 msgctxt "icon name"
 msgid "Arrow left"
 msgstr "Pfeil links"
@@ -230,7 +228,6 @@ msgid "More (vertical)"
 msgstr "Mehr (vertikal)"
 
 # Icon names — Actions
-
 msgctxt "icon name"
 msgid "Add"
 msgstr "Hinzufügen"
@@ -336,7 +333,6 @@ msgid "Compare"
 msgstr "Vergleichen"
 
 # Icon names — Editing & text
-
 msgctxt "icon name"
 msgid "Edit"
 msgstr "Bearbeiten"
@@ -418,7 +414,6 @@ msgid "Language"
 msgstr "Sprache"
 
 # Icon names — Communication
-
 msgctxt "icon name"
 msgid "Chat"
 msgstr "Chat"
@@ -472,7 +467,6 @@ msgid "Megaphone"
 msgstr "Megafon"
 
 # Icon names — Social & feedback
-
 msgctxt "icon name"
 msgid "Heart"
 msgstr "Herz"
@@ -550,7 +544,6 @@ msgid "Bookmark"
 msgstr "Lesezeichen"
 
 # Icon names — Media
-
 msgctxt "icon name"
 msgid "Image"
 msgstr "Bild"
@@ -624,7 +617,6 @@ msgid "Volume off"
 msgstr "Ton aus"
 
 # Icon names — Files & storage
-
 msgctxt "icon name"
 msgid "Folder"
 msgstr "Ordner"
@@ -666,7 +658,6 @@ msgid "Backup"
 msgstr "Backup"
 
 # Icon names — Data & layout
-
 msgctxt "icon name"
 msgid "Bar chart"
 msgstr "Balkendiagramm"
@@ -744,7 +735,6 @@ msgid "Layers"
 msgstr "Ebenen"
 
 # Icon names — Commerce, finance & legal
-
 msgctxt "icon name"
 msgid "Shopping cart"
 msgstr "Warenkorb"
@@ -850,7 +840,6 @@ msgid "Diamond"
 msgstr "Diamant"
 
 # Icon names — People & accounts
-
 msgctxt "icon name"
 msgid "Account circle"
 msgstr "Konto"
@@ -900,7 +889,6 @@ msgid "Wheelchair"
 msgstr "Rollstuhl"
 
 # Icon names — Maps & places
-
 msgctxt "icon name"
 msgid "Location"
 msgstr "Standort"
@@ -962,7 +950,6 @@ msgid "Hotel"
 msgstr "Hotel"
 
 # Icon names — Devices & interaction
-
 msgctxt "icon name"
 msgid "Devices"
 msgstr "Geräte"
@@ -1044,7 +1031,6 @@ msgid "Power off"
 msgstr "Ausschalten"
 
 # Icon names — Security & privacy
-
 msgctxt "icon name"
 msgid "Lock"
 msgstr "Schloss"
@@ -1090,7 +1076,6 @@ msgid "Cookie"
 msgstr "Cookie"
 
 # Icon names — Controls & settings
-
 msgctxt "icon name"
 msgid "Settings"
 msgstr "Einstellungen"
@@ -1156,7 +1141,6 @@ msgid "Light mode"
 msgstr "Hellmodus"
 
 # Icon names — Status & time
-
 msgctxt "icon name"
 msgid "Info"
 msgstr "Info"
@@ -1202,7 +1186,6 @@ msgid "Calendar (x)"
 msgstr "Kalender (x)"
 
 # Icon names — Symbols & misc
-
 msgctxt "icon name"
 msgid "Crown"
 msgstr "Krone"
@@ -2255,7 +2238,6 @@ msgid "Magic wand"
 msgstr "Zauberstab"
 
 # Picker UI
-
 msgctxt "icon picker"
 msgid "Choose icon"
 msgstr "Icon wählen"
@@ -3027,3 +3009,15 @@ msgstr "Geteilte Szene"
 msgctxt "icon name"
 msgid "Split scene top"
 msgstr "Geteilte Szene (oben)"
+
+msgctxt "icon name"
+msgid "Infinity"
+msgstr "Unendlich"
+
+msgctxt "icon name"
+msgid "Button"
+msgstr "Button"
+
+msgctxt "icon name"
+msgid "Button group"
+msgstr "Button-Gruppe"

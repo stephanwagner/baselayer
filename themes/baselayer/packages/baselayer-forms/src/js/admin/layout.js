@@ -1,5 +1,6 @@
 import { el, t, uid, iconEl, defaultField, uniqueFieldName } from './dom.js';
-import { createFieldCard, serializeRow, openFieldWidthModal, openLayoutDesignModal, duplicateFieldCard } from './field-card.js';
+import { createFieldCard, serializeRow, openFieldWidthModal, openLayoutSettingsModal, duplicateFieldCard } from './field-card.js';
+import { normalizeConditionalLogic } from './conditional-logic.js';
 
 /** Types that cannot be nested inside columns or sections. */
 const NESTED_BLOCKED = ['column', 'section', 'hidden', 'honeypot', 'captcha'];
@@ -203,6 +204,7 @@ export function createColumnCard(initial = {}) {
     children: [],
     design: 'standard',
     css_class: '',
+    conditional_logic: { enabled: false, groups: [] },
     ...initial,
     id: initial.id || uid(),
     type: 'column',
@@ -213,6 +215,7 @@ export function createColumnCard(initial = {}) {
   if (typeof field.css_class !== 'string') {
     field.css_class = '';
   }
+  field.conditional_logic = normalizeConditionalLogic(field.conditional_logic);
 
   const row = el('div', {
     className: 'bl-forms-builder__field bl-forms-builder__column-card',
@@ -237,18 +240,12 @@ export function createColumnCard(initial = {}) {
   const designBtn = el('button', {
     type: 'button',
     className: 'bl-forms-builder__design-btn',
-    title: t('layoutDesignTitle', 'Design'),
-    'aria-label': t('layoutDesignTitle', 'Design'),
+    title: t('layoutSettingsTitle', 'Settings'),
+    'aria-label': t('layoutSettingsTitle', 'Settings'),
   });
-  designBtn.appendChild(iconEl('design', 'bl-forms-builder__design-btn-icon'));
+  designBtn.appendChild(iconEl('tune', 'bl-forms-builder__design-btn-icon'));
 
-  const typeChip = el('span', { className: 'bl-forms-builder__field-type bl-forms-builder__field-type--column' }, [
-    iconEl('column', 'bl-forms-builder__field-type-icon'),
-    el('span', {
-      className: 'bl-forms-builder__field-type-label',
-      text: (window.blFormsAdmin?.i18n?.types?.column) || t('columnType', 'Columns'),
-    }),
-  ]);
+  const typeChip = el('span', { className: 'bl-forms-builder__field-type bl-forms-builder__field-type--column' });
 
   const fieldsList = el('div', {
     className: 'bl-forms-builder__column-fields',
@@ -277,6 +274,25 @@ export function createColumnCard(initial = {}) {
     const text = widthBadgeText(width, widthCustom);
     widthBadge.textContent = text;
     widthBadge.hidden = text === '';
+
+    const typeChildren = [
+      iconEl('column', 'bl-forms-builder__field-type-icon'),
+      el('span', {
+        className: 'bl-forms-builder__field-type-label',
+        text: (window.blFormsAdmin?.i18n?.types?.column) || t('columnType', 'Columns'),
+      }),
+    ];
+    const logic = field.conditional_logic;
+    if (logic && logic.enabled && Array.isArray(logic.groups) && logic.groups.length > 0) {
+      typeChildren.push(
+        el('span', {
+          className: 'bl-forms-builder__field-logic-dot',
+          title: t('logicEnable', 'Conditional logic'),
+          'aria-label': t('logicEnable', 'Conditional logic'),
+        })
+      );
+    }
+    typeChip.replaceChildren(...typeChildren);
   };
 
   const notify = () => document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
@@ -289,10 +305,20 @@ export function createColumnCard(initial = {}) {
   };
 
   const openDesignModal = () => {
-    openLayoutDesignModal(field, () => {
-      updatePreview();
-      notify();
-    });
+    openLayoutSettingsModal(
+      field,
+      () => {
+        updatePreview();
+        notify();
+      },
+      {
+        tabs: ['design', 'logic'],
+        logicHelp: t(
+          'logicHelpColumn',
+          'Show this column only when the conditions below are met.'
+        ),
+      }
+    );
   };
 
   (field.children || []).forEach((child) => {
@@ -344,6 +370,7 @@ export function createSectionCard(initial = {}) {
     design: 'standard',
     show_title: true,
     css_class: '',
+    conditional_logic: { enabled: false, groups: [] },
     ...initial,
     id: initial.id || uid(),
     type: 'section',
@@ -359,6 +386,7 @@ export function createSectionCard(initial = {}) {
   if (typeof field.css_class !== 'string') {
     field.css_class = '';
   }
+  field.conditional_logic = normalizeConditionalLogic(field.conditional_logic);
 
   const row = el('div', {
     className: 'bl-forms-builder__field bl-forms-builder__section-card',
@@ -397,18 +425,14 @@ export function createSectionCard(initial = {}) {
   const designBtn = el('button', {
     type: 'button',
     className: 'bl-forms-builder__design-btn',
-    title: t('layoutDesignTitle', 'Design'),
-    'aria-label': t('layoutDesignTitle', 'Design'),
+    title: t('layoutSettingsTitle', 'Settings'),
+    'aria-label': t('layoutSettingsTitle', 'Settings'),
   });
-  designBtn.appendChild(iconEl('design', 'bl-forms-builder__design-btn-icon'));
+  designBtn.appendChild(iconEl('tune', 'bl-forms-builder__design-btn-icon'));
 
-  const typeChip = el('span', { className: 'bl-forms-builder__field-type bl-forms-builder__field-type--section' }, [
-    iconEl('section', 'bl-forms-builder__field-type-icon'),
-    el('span', {
-      className: 'bl-forms-builder__field-type-label',
-      text: (window.blFormsAdmin?.i18n?.types?.section) || t('sectionType', 'Section'),
-    }),
-  ]);
+  const typeChip = el('span', {
+    className: 'bl-forms-builder__field-type bl-forms-builder__field-type--section',
+  });
 
   const fieldsList = el('div', {
     className: 'bl-forms-builder__section-fields',
@@ -439,6 +463,25 @@ export function createSectionCard(initial = {}) {
     const text = widthBadgeText(width, widthCustom);
     widthBadge.textContent = text;
     widthBadge.hidden = text === '';
+
+    const typeChildren = [
+      iconEl('section', 'bl-forms-builder__field-type-icon'),
+      el('span', {
+        className: 'bl-forms-builder__field-type-label',
+        text: (window.blFormsAdmin?.i18n?.types?.section) || t('sectionType', 'Section'),
+      }),
+    ];
+    const logic = field.conditional_logic;
+    if (logic && logic.enabled && Array.isArray(logic.groups) && logic.groups.length > 0) {
+      typeChildren.push(
+        el('span', {
+          className: 'bl-forms-builder__field-logic-dot',
+          title: t('logicEnable', 'Conditional logic'),
+          'aria-label': t('logicEnable', 'Conditional logic'),
+        })
+      );
+    }
+    typeChip.replaceChildren(...typeChildren);
   };
 
   const notify = () => document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
@@ -451,13 +494,20 @@ export function createSectionCard(initial = {}) {
   };
 
   const openDesignModal = () => {
-    openLayoutDesignModal(
+    openLayoutSettingsModal(
       field,
       () => {
         updatePreview();
         notify();
       },
-      { withShowTitle: true }
+      {
+        tabs: ['design', 'logic'],
+        withHideTitle: true,
+        logicHelp: t(
+          'logicHelpSection',
+          'Show this section only when the conditions below are met.'
+        ),
+      }
     );
   };
 
@@ -516,6 +566,7 @@ export function serializeLayoutRow(row) {
       width_custom: width === 'custom' ? widthCustom : '',
       design,
       css_class: cssClass,
+      conditional_logic: normalizeConditionalLogic(live?.conditional_logic),
       children: Array.from(fields?.children || [])
         .filter((el) => el.matches('[data-bl-forms-field]') && !NESTED_BLOCKED.includes(el.dataset.fieldType))
         .map((child) => serializeRow(child)),
@@ -545,6 +596,7 @@ export function serializeLayoutRow(row) {
       design,
       show_title: showTitle,
       css_class: cssClass,
+      conditional_logic: normalizeConditionalLogic(live?.conditional_logic),
       children: Array.from(fields?.children || [])
         .filter((el) => el.matches('[data-bl-forms-field]') && !NESTED_BLOCKED.includes(el.dataset.fieldType))
         .map((child) => serializeRow(child)),

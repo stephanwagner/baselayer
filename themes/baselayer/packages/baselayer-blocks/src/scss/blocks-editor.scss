@@ -172,6 +172,17 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+
+  &--outline,
+  &--card {
+    padding: 12px;
+    border: 1px solid #c3c4c7;
+    border-radius: 6px;
+  }
+
+  &--card {
+    background: #f6f7f7;
+  }
 }
 
 .bl-blocks-fields__repeater-rows {
@@ -201,5 +212,18 @@
 
 .bl-blocks-fields__repeater-add {
   align-self: flex-start;
+}
+
+.bl-blocks-fields__layout {
+  &--outline,
+  &--card {
+    padding: 12px;
+    border: 1px solid #c3c4c7;
+    border-radius: 6px;
+  }
+
+  &--card {
+    background: #f6f7f7;
+  }
 }
 

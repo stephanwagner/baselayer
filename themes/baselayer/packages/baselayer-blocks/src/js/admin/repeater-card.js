@@ -11,7 +11,12 @@ import {
   uniqueFieldName,
   cloneFieldData,
 } from '../../../../baselayer-forms/src/js/admin/dom.js';
-import { createFieldCard, serializeRow } from '../../../../baselayer-forms/src/js/admin/field-card.js';
+import {
+  createFieldCard,
+  serializeRow,
+  openLayoutSettingsModal,
+} from '../../../../baselayer-forms/src/js/admin/field-card.js';
+import { normalizeConditionalLogic } from '../../../../baselayer-forms/src/js/admin/conditional-logic.js';
 
 export const REPEATER_MAX_DEPTH = 3;
 
@@ -72,15 +77,18 @@ export function defaultRepeater(partial = {}) {
     name: partial.name || 'items',
     name_manual: partial.name_manual != null ? !!partial.name_manual : false,
     hide_label: !!partial.hide_label,
+    show_title: partial.show_title !== false && partial.show_title !== 0 && partial.show_title !== '0',
     active: partial.active !== false,
     required: !!partial.required,
     description: partial.description || '',
     css_class: partial.css_class || '',
+    design: ['standard', 'outline', 'card'].includes(partial.design) ? partial.design : 'standard',
     width: partial.width || '100',
     width_custom: partial.width_custom || '',
     min_rows: Math.max(0, parseInt(partial.min_rows, 10) || 0),
     max_rows: Math.max(0, parseInt(partial.max_rows, 10) || 0),
     button_label: partial.button_label || '',
+    conditional_logic: normalizeConditionalLogic(partial.conditional_logic),
     children: Array.isArray(partial.children) ? partial.children : [],
   };
 }
@@ -150,7 +158,6 @@ function bindRepeaterChildList(list, depth, onChange) {
       }
       if (type === 'repeater') {
         const itemDepth = parseInt(item.dataset.repeaterDepth || '1', 10);
-        // Moving a repeater under this list makes its depth = parentDepth + 1.
         if (depth >= REPEATER_MAX_DEPTH || itemDepth > REPEATER_MAX_DEPTH) {
           if (evt.from && evt.from !== list) {
             evt.from.insertBefore(item, evt.from.children[evt.oldIndex] || null);
@@ -159,7 +166,6 @@ function bindRepeaterChildList(list, depth, onChange) {
           }
           return;
         }
-        // Re-hydrate so nested depth badges / put rules stay correct.
         const data = serializeRepeaterRow(item);
         if (depth + 1 > REPEATER_MAX_DEPTH) {
           if (evt.from && evt.from !== list) {
@@ -196,6 +202,7 @@ export function createRepeaterCard(initial = {}, open = false, depth = 1) {
     type: 'repeater',
     children: Array.isArray(initial.children) ? initial.children : field.children,
   };
+  field = defaultRepeater(field);
 
   const row = el('div', {
     className: 'bl-forms-builder__field bl-blocks-builder__repeater-card',
@@ -205,82 +212,43 @@ export function createRepeaterCard(initial = {}, open = false, depth = 1) {
       fieldType: 'repeater',
       repeaterDepth: String(depth),
       fieldWidth: field.width || '100',
+      fieldDesign: field.design || 'standard',
+      fieldShowTitle: field.show_title ? '1' : '0',
     },
   });
   repeaterFieldByEl.set(row, field);
+
+  const labelPlaceholder = () =>
+    field.show_title
+      ? t('sectionLabelPlaceholder', 'Title')
+      : t('sectionLabelPlaceholderHidden', 'Name');
 
   const labelInput = el('input', {
     type: 'text',
     className: 'bl-forms-builder__section-label-input',
     value: field.label || '',
-    placeholder: t('repeaterLabelPlaceholder', 'Repeater label'),
+    placeholder: labelPlaceholder(),
     'aria-label': t('repeaterLabel', 'Repeater label'),
   });
   labelInput.addEventListener('input', () => {
     field.label = labelInput.value;
     if (!field.name_manual) {
-      nameInput.value = uniqueFieldName(field.label || 'items', field.id);
-      field.name = nameInput.value;
+      field.name = uniqueFieldName(field.label || 'items', field.id);
     }
     notifyChanged();
   });
 
-  const nameInput = el('input', {
-    type: 'text',
-    className: 'bl-blocks-builder__repeater-name',
-    value: field.name || '',
-    placeholder: 'items',
-    'aria-label': t('fieldName', 'Name'),
-  });
-  nameInput.addEventListener('input', () => {
-    field.name_manual = true;
-    field.name = nameInput.value;
-    notifyChanged();
-  });
+  const typeLabelText = () => typeLabel('repeater') + (depth > 1 ? ` (${depth})` : '');
 
-  const minInput = el('input', {
-    type: 'number',
-    className: 'bl-blocks-builder__repeater-min',
-    min: '0',
-    value: String(field.min_rows || 0),
-    'aria-label': t('repeaterMinRows', 'Min rows'),
-  });
-  minInput.addEventListener('input', () => {
-    field.min_rows = Math.max(0, parseInt(minInput.value, 10) || 0);
-    notifyChanged();
-  });
+  const typeChip = el('span', { className: 'bl-forms-builder__field-type' });
 
-  const maxInput = el('input', {
-    type: 'number',
-    className: 'bl-blocks-builder__repeater-max',
-    min: '0',
-    value: String(field.max_rows || 0),
-    'aria-label': t('repeaterMaxRows', 'Max rows (0 = unlimited)'),
+  const settingsBtn = el('button', {
+    type: 'button',
+    className: 'bl-forms-builder__design-btn',
+    title: t('layoutSettingsTitle', 'Settings'),
+    'aria-label': t('layoutSettingsTitle', 'Settings'),
   });
-  maxInput.addEventListener('input', () => {
-    field.max_rows = Math.max(0, parseInt(maxInput.value, 10) || 0);
-    notifyChanged();
-  });
-
-  const buttonInput = el('input', {
-    type: 'text',
-    className: 'bl-blocks-builder__repeater-button',
-    value: field.button_label || '',
-    placeholder: t('addRow', 'Add row'),
-    'aria-label': t('repeaterButtonLabel', 'Add button label'),
-  });
-  buttonInput.addEventListener('input', () => {
-    field.button_label = buttonInput.value;
-    notifyChanged();
-  });
-
-  const typeChip = el('span', { className: 'bl-forms-builder__field-type' }, [
-    iconEl('repeater', 'bl-forms-builder__field-type-icon'),
-    el('span', {
-      className: 'bl-forms-builder__field-type-label',
-      text: typeLabel('repeater') + (depth > 1 ? ` (${depth})` : ''),
-    }),
-  ]);
+  settingsBtn.appendChild(iconEl('tune', 'bl-forms-builder__design-btn-icon'));
 
   const fieldsList = el('div', {
     className: 'bl-blocks-builder__repeater-fields',
@@ -322,24 +290,50 @@ export function createRepeaterCard(initial = {}, open = false, depth = 1) {
   ]);
   syncEmpty();
 
-  const meta = el('div', { className: 'bl-blocks-builder__repeater-meta' }, [
-    el('label', { className: 'bl-blocks-builder__repeater-meta-item' }, [
-      el('span', { text: t('fieldName', 'Name') }),
-      nameInput,
-    ]),
-    el('label', { className: 'bl-blocks-builder__repeater-meta-item' }, [
-      el('span', { text: t('repeaterMinRows', 'Min') }),
-      minInput,
-    ]),
-    el('label', { className: 'bl-blocks-builder__repeater-meta-item' }, [
-      el('span', { text: t('repeaterMaxRowsShort', 'Max') }),
-      maxInput,
-    ]),
-    el('label', { className: 'bl-blocks-builder__repeater-meta-item bl-blocks-builder__repeater-meta-item--grow' }, [
-      el('span', { text: t('repeaterButtonLabel', 'Button') }),
-      buttonInput,
-    ]),
-  ]);
+  const updatePreview = () => {
+    row.dataset.fieldWidth = field.width || '100';
+    row.dataset.fieldDesign = field.design || 'standard';
+    row.dataset.fieldShowTitle = field.show_title ? '1' : '0';
+    labelInput.placeholder = labelPlaceholder();
+
+    const typeChildren = [
+      iconEl('repeater', 'bl-forms-builder__field-type-icon'),
+      el('span', {
+        className: 'bl-forms-builder__field-type-label',
+        text: typeLabelText(),
+      }),
+    ];
+    const logic = field.conditional_logic;
+    if (logic && logic.enabled && Array.isArray(logic.groups) && logic.groups.length > 0) {
+      typeChildren.push(
+        el('span', {
+          className: 'bl-forms-builder__field-logic-dot',
+          title: t('logicEnable', 'Conditional logic'),
+          'aria-label': t('logicEnable', 'Conditional logic'),
+        })
+      );
+    }
+    typeChip.replaceChildren(...typeChildren);
+  };
+
+  settingsBtn.addEventListener('click', () => {
+    openLayoutSettingsModal(
+      field,
+      () => {
+        updatePreview();
+        notifyChanged();
+      },
+      {
+        tabs: ['settings', 'design', 'logic'],
+        withHideTitle: true,
+        withWidth: true,
+        logicHelp: t(
+          'logicHelpRepeater',
+          'Show this repeater only when the conditions below are met.'
+        ),
+      }
+    );
+  });
 
   const duplicateBtn = el('button', {
     type: 'button',
@@ -383,11 +377,12 @@ export function createRepeaterCard(initial = {}, open = false, depth = 1) {
 
   const header = el('div', { className: 'bl-forms-builder__field-header' }, [
     labelInput,
-    el('div', { className: 'bl-forms-builder__field-meta' }, [typeChip]),
+    el('div', { className: 'bl-forms-builder__field-meta' }, [settingsBtn, typeChip]),
     el('div', { className: 'bl-forms-builder__field-actions' }, [duplicateBtn, deleteBtn, handle]),
   ]);
 
-  row.append(header, meta, fieldsWrap);
+  row.append(header, fieldsWrap);
+  updatePreview();
 
   if (open) {
     labelInput.focus();
@@ -399,34 +394,43 @@ export function createRepeaterCard(initial = {}, open = false, depth = 1) {
 export function serializeRepeaterRow(row) {
   const live = repeaterFieldByEl.get(row);
   const id = row.dataset.fieldId || live?.id || uid();
-  const labelInput = row.querySelector(':scope > .bl-forms-builder__field-header .bl-forms-builder__section-label-input');
-  const nameInput = row.querySelector(':scope > .bl-blocks-builder__repeater-meta .bl-blocks-builder__repeater-name');
-  const minInput = row.querySelector(':scope > .bl-blocks-builder__repeater-meta .bl-blocks-builder__repeater-min');
-  const maxInput = row.querySelector(':scope > .bl-blocks-builder__repeater-meta .bl-blocks-builder__repeater-max');
-  const buttonInput = row.querySelector(':scope > .bl-blocks-builder__repeater-meta .bl-blocks-builder__repeater-button');
-  const fields = row.querySelector(':scope > .bl-blocks-builder__repeater-fields-wrap [data-bl-repeater-fields]');
+  const labelInput = row.querySelector(
+    ':scope > .bl-forms-builder__field-header .bl-forms-builder__section-label-input'
+  );
+  const fields = row.querySelector(
+    ':scope > .bl-blocks-builder__repeater-fields-wrap [data-bl-repeater-fields]'
+  );
 
   const children = Array.from(fields?.children || [])
-    .filter((el) => el.matches('[data-bl-forms-field]'))
-    .filter((el) => !LAYOUT_BLOCKED.includes(el.dataset.fieldType || ''))
+    .filter((node) => node.matches('[data-bl-forms-field]'))
+    .filter((node) => !LAYOUT_BLOCKED.includes(node.dataset.fieldType || ''))
     .map((child) => serializeChildCard(child));
+
+  const design = row.dataset.fieldDesign || live?.design || 'standard';
+  const showTitle =
+    row.dataset.fieldShowTitle !== undefined
+      ? row.dataset.fieldShowTitle !== '0'
+      : live?.show_title !== false;
 
   return {
     id,
     type: 'repeater',
     label: labelInput?.value ?? live?.label ?? '',
-    name: (nameInput?.value || live?.name || 'items').trim() || 'items',
+    name: (live?.name || 'items').trim() || 'items',
     name_manual: live?.name_manual !== false,
     hide_label: !!live?.hide_label,
+    show_title: showTitle,
     active: live?.active !== false,
     required: !!live?.required,
     description: live?.description || '',
     css_class: live?.css_class || '',
+    design: ['standard', 'outline', 'card'].includes(design) ? design : 'standard',
     width: row.dataset.fieldWidth || live?.width || '100',
-    width_custom: live?.width_custom || '',
-    min_rows: Math.max(0, parseInt(minInput?.value ?? live?.min_rows ?? 0, 10) || 0),
-    max_rows: Math.max(0, parseInt(maxInput?.value ?? live?.max_rows ?? 0, 10) || 0),
-    button_label: buttonInput?.value ?? live?.button_label ?? '',
+    width_custom: live?.width === 'custom' || row.dataset.fieldWidth === 'custom' ? live?.width_custom || '' : '',
+    min_rows: Math.max(0, parseInt(live?.min_rows ?? 0, 10) || 0),
+    max_rows: Math.max(0, parseInt(live?.max_rows ?? 0, 10) || 0),
+    button_label: live?.button_label ?? '',
+    conditional_logic: normalizeConditionalLogic(live?.conditional_logic),
     children,
   };
 }

@@ -231,10 +231,22 @@ export function createFieldForm(fields, values = {}) {
       const type = field.type || 'text';
 
       if (isLayout(type)) {
-        const wrap = el('div', {
-          className: 'bl-blocks-fields__layout bl-blocks-fields__layout--' + type,
-        });
-        if (type === 'section' && field.label) {
+        const design = ['standard', 'outline', 'card'].includes(field.design)
+          ? field.design
+          : 'standard';
+        const layoutClass = [
+          'bl-blocks-fields__layout',
+          'bl-blocks-fields__layout--' + type,
+          'bl-blocks-fields__layout--' + design,
+        ];
+        if (field.css_class) {
+          layoutClass.push(String(field.css_class).trim());
+        }
+        const wrap = el('div', { className: layoutClass.filter(Boolean).join(' ') });
+        const showTitle =
+          type !== 'section' ||
+          (field.show_title !== false && field.show_title !== 0 && field.show_title !== '0');
+        if (type === 'section' && showTitle && field.label) {
           wrap.appendChild(el('h3', { className: 'bl-blocks-fields__section-title', text: field.label }));
         }
         parent.appendChild(wrap);
@@ -301,18 +313,26 @@ function createRepeaterControl(field, valueMap, entries) {
   const minRows = Math.max(0, parseInt(field.min_rows, 10) || 0);
   const maxRows = Math.max(0, parseInt(field.max_rows, 10) || 0);
   const buttonLabel = field.button_label || i18n('addRow', 'Add row');
+  const design = ['standard', 'outline', 'card'].includes(field.design) ? field.design : 'standard';
+  const showTitle =
+    field.show_title !== false && field.show_title !== 0 && field.show_title !== '0';
 
   let rows = Array.isArray(valueMap[name]) ? valueMap[name].slice() : [];
   while (rows.length < minRows) {
     rows.push({});
   }
 
+  const classNames = ['bl-blocks-fields__repeater', 'bl-blocks-fields__repeater--' + design];
+  if (field.css_class) {
+    classNames.push(String(field.css_class).trim());
+  }
+
   const wrap = el('div', {
-    className: 'bl-blocks-fields__repeater',
+    className: classNames.filter(Boolean).join(' '),
     dataset: { fieldName: name },
   });
 
-  if (!field.hide_label && field.label) {
+  if (showTitle && !field.hide_label && field.label) {
     wrap.appendChild(el('div', { className: 'bl-blocks-fields__label', text: field.label }));
   }
   if (field.description) {

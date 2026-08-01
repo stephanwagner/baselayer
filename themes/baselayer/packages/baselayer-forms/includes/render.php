@@ -639,6 +639,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 		if ($style !== '') {
 			$attrs .= ' style="' . esc_attr($style) . '"';
 		}
+		$attrs .= bl_forms_field_id_and_logic_attrs($field, $context);
 
 		return '<div ' . $attrs . '>' . $inner . '</div>';
 	}
@@ -665,6 +666,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 		if ($style !== '') {
 			$attrs .= ' style="' . esc_attr($style) . '"';
 		}
+		$attrs .= bl_forms_field_id_and_logic_attrs($field, $context);
 		$show_title = !array_key_exists('show_title', $field) || !empty($field['show_title']);
 		$html = '<section ' . $attrs . '>';
 		if ($show_title && $label !== '') {

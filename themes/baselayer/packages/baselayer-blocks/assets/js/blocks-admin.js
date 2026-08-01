@@ -141,6 +141,8 @@
             { filename: "drag", alternatives: [], keywords: ["move", "reorder", "handle", "grab"] },
             { filename: "drag-handle", alternatives: [], keywords: ["move", "reorder", "handle", "grab"] },
             { filename: "mobile-rotate", alternatives: ["fill"], keywords: ["mobile", "rotate", "orientation", "phone"] },
+            { filename: "button", alternatives: ["fill"], keywords: ["button", "cta", "click", "action", "ui"] },
+            { filename: "button-group", alternatives: ["fill"], keywords: ["button", "group", "segmented", "toggle", "options", "ui"] },
             { filename: "pinch-zoom-in", alternatives: ["fill"], keywords: ["pinch", "zoom", "in", "magnify", "gesture"] },
             { filename: "pinch-zoom-out", alternatives: ["fill"], keywords: ["pinch", "zoom", "out", "shrink", "gesture"] },
             { filename: "swipe-left-right", alternatives: ["fill"], keywords: ["swipe", "gesture", "horizontal", "touch"] },
@@ -396,7 +398,8 @@
             { filename: "table-edit", alternatives: ["fill"], keywords: ["table", "edit", "grid", "modify"] },
             { filename: "analytics", alternatives: ["fill"], keywords: ["analytics", "statistics", "metrics", "insights"] },
             { filename: "list-box", alternatives: ["fill"], keywords: ["list", "panel", "items"] },
-            { filename: "odometer", alternatives: ["fill"], keywords: ["odometer", "mileage", "counter", "distance", "gauge"] }
+            { filename: "odometer", alternatives: ["fill"], keywords: ["odometer", "mileage", "counter", "distance", "gauge"] },
+            { filename: "infinity", alternatives: [], keywords: ["infinity", "unlimited", "forever", "infinite", "loop", "endless"] }
           ]
         },
         {
@@ -629,8 +632,8 @@
             { filename: "settings", alternatives: ["fill"], keywords: ["gear", "cog", "preferences", "options"] },
             { filename: "cogwheels", alternatives: ["fill"], keywords: ["manufacturing", "production", "industrial", "factory", "assembly"] },
             { filename: "wrench", alternatives: ["fill"], keywords: ["build", "wrench", "tools", "construct", "configure"] },
-            { filename: "tune", alternatives: [], keywords: ["sliders", "adjust", "options", "config", "settings"] },
-            { filename: "tune-alt", alternatives: [], keywords: ["sliders", "adjust", "options", "vertical", "tune", "config", "settings"] },
+            { filename: "tune", alternatives: [], keywords: ["sliders", "adjust", "options"] },
+            { filename: "tune-alt", alternatives: [], keywords: ["sliders", "adjust", "options", "vertical", "tune"] },
             { filename: "sort", alternatives: [], keywords: ["order", "arrange", "filter"] },
             { filename: "sort-by-alpha", alternatives: [], keywords: ["order", "alphabetical", "az"] },
             { filename: "filter", alternatives: [], keywords: ["funnel", "sort", "refine"] },
@@ -1511,474 +1514,6 @@
     return out;
   }
 
-  // themes/baselayer/packages/baselayer-forms/src/js/admin/layout.js
-  var NESTED_BLOCKED = ["column", "section", "hidden", "honeypot", "captcha"];
-  var columnFieldByEl = /* @__PURE__ */ new WeakMap();
-  var sectionFieldByEl = /* @__PURE__ */ new WeakMap();
-  function createNestedSortable(list, options) {
-    const Builder = window.BlCanvasBuilder;
-    if (!Builder || typeof Builder.createSortable !== "function") {
-      console.error("BlCanvasBuilder.createSortable is required for nested field lists");
-      return null;
-    }
-    return Builder.createSortable(list, options);
-  }
-  function prepareNestedField(typeOrData) {
-    const data = typeof typeOrData === "string" ? defaultField(typeOrData) : { ...typeOrData };
-    if (NESTED_BLOCKED.includes(data.type)) {
-      return null;
-    }
-    if (data.name != null && data.name_manual === false) {
-      data.name = uniqueFieldName(data.label || data.name || data.type || "field", data.id || "");
-    } else if (data.name) {
-      data.name = uniqueFieldName(data.name, data.id || "");
-    }
-    return data;
-  }
-  function bindFieldListSortable(list, onChange) {
-    const Builder = window.BlCanvasBuilder;
-    const onStart = Builder?.dragStart || (() => {
-    });
-    const onEnd = Builder?.dragEnd || (() => {
-    });
-    createNestedSortable(list, {
-      group: {
-        name: "bl-forms-fields",
-        put(to, from, dragEl) {
-          const type = dragEl.dataset.fieldType || "";
-          return !NESTED_BLOCKED.includes(type);
-        }
-      },
-      handle: ".bl-forms-builder__handle",
-      animation: 150,
-      draggable: ".bl-forms-builder__field, .bl-forms-builder__template",
-      onStart,
-      onEnd,
-      onAdd(evt) {
-        const item = evt.item;
-        const type = item.dataset.fieldType || "text";
-        if (item.classList.contains("bl-forms-builder__template")) {
-          const prepared = prepareNestedField(type);
-          if (!prepared) {
-            item.remove();
-            return;
-          }
-          item.replaceWith(createFieldCard(prepared, true));
-        } else if (NESTED_BLOCKED.includes(type)) {
-          if (evt.from && evt.from !== list) {
-            evt.from.insertBefore(item, evt.from.children[evt.oldIndex] || null);
-          } else {
-            item.remove();
-          }
-          return;
-        }
-        onChange();
-      },
-      onUpdate: onChange,
-      onSort: onChange
-    });
-  }
-  function widthBadgeText(width, widthCustom = "") {
-    if (width === "auto") {
-      return t("widthAuto", "Auto");
-    }
-    if (width === "custom") {
-      return (widthCustom || "").trim();
-    }
-    return `${width}%`;
-  }
-  function equalWidthForCount(count) {
-    if (count <= 1) {
-      return "100";
-    }
-    if (count === 2) {
-      return "50";
-    }
-    if (count === 3) {
-      return "33";
-    }
-    return "25";
-  }
-  function applyColumnWidthToCard(el3, width, widthCustom = "") {
-    el3.dataset.fieldWidth = width;
-    if (width === "custom") {
-      el3.dataset.fieldWidthCustom = widthCustom || "";
-    } else {
-      delete el3.dataset.fieldWidthCustom;
-    }
-    const field = columnFieldByEl.get(el3);
-    if (field) {
-      field.width = width;
-      field.width_custom = width === "custom" ? widthCustom || "" : "";
-    }
-    const badge = el3.querySelector(":scope > .bl-forms-builder__field-header .bl-forms-builder__width-badge");
-    if (badge) {
-      const text = widthBadgeText(width, widthCustom);
-      badge.textContent = text;
-      badge.hidden = text === "";
-    }
-  }
-  function equalizeColumnRun(list, columnEl) {
-    const all = Array.from(list.children).filter((el3) => el3.matches?.("[data-bl-forms-field]"));
-    const pos = all.indexOf(columnEl);
-    if (pos < 0) {
-      return;
-    }
-    let start = pos;
-    let end = pos;
-    while (start > 0 && all[start - 1].dataset.fieldType === "column") {
-      start -= 1;
-    }
-    while (end < all.length - 1 && all[end + 1].dataset.fieldType === "column") {
-      end += 1;
-    }
-    const run = all.slice(start, end + 1);
-    const width = equalWidthForCount(run.length);
-    run.forEach((el3) => applyColumnWidthToCard(el3, width));
-  }
-  function createContainerActions(onDelete, onDuplicate) {
-    const duplicateBtn = el("button", {
-      type: "button",
-      className: "bl-forms-builder__icon-btn",
-      title: t("duplicate", "Duplicate"),
-      "aria-label": t("duplicate", "Duplicate"),
-      onClick: onDuplicate
-    });
-    const duplicateIcon = iconEl("duplicate");
-    if (duplicateIcon.innerHTML) {
-      duplicateBtn.appendChild(duplicateIcon);
-    } else {
-      duplicateBtn.textContent = "\u29C9";
-    }
-    const deleteBtn = el("button", {
-      type: "button",
-      className: "bl-forms-builder__icon-btn bl-forms-builder__icon-btn--danger",
-      title: t("delete", "Delete"),
-      "aria-label": t("delete", "Delete"),
-      onClick: onDelete
-    });
-    const trashIcon = iconEl("trash");
-    if (trashIcon.innerHTML) {
-      deleteBtn.appendChild(trashIcon);
-    } else {
-      deleteBtn.textContent = "\xD7";
-    }
-    const handle = el("span", {
-      className: "bl-forms-builder__handle",
-      title: t("dragField", "Drag to reorder"),
-      "aria-hidden": "true"
-    });
-    const dragIcon = iconEl("drag");
-    if (dragIcon.innerHTML) {
-      handle.appendChild(dragIcon);
-    } else {
-      handle.textContent = "\u22EE\u22EE";
-    }
-    return el("div", { className: "bl-forms-builder__field-actions" }, [duplicateBtn, deleteBtn, handle]);
-  }
-  function createColumnCard(initial = {}) {
-    let field = {
-      width: "100",
-      width_custom: "",
-      children: [],
-      design: "standard",
-      css_class: "",
-      ...initial,
-      id: initial.id || uid(),
-      type: "column"
-    };
-    if (!["standard", "outline", "card"].includes(field.design)) {
-      field.design = "standard";
-    }
-    if (typeof field.css_class !== "string") {
-      field.css_class = "";
-    }
-    const row = el("div", {
-      className: "bl-forms-builder__field bl-forms-builder__column-card",
-      dataset: {
-        blFormsField: "1",
-        fieldId: field.id,
-        fieldType: "column",
-        fieldWidth: field.width || "100",
-        fieldDesign: field.design || "standard",
-        ...field.width === "custom" && field.width_custom ? { fieldWidthCustom: field.width_custom } : {}
-      }
-    });
-    columnFieldByEl.set(row, field);
-    const preview = el("span", {
-      className: "bl-forms-builder__preview",
-      text: window.blFormsAdmin?.i18n?.types?.column || t("columnType", "Columns")
-    });
-    const widthBadge = el("span", { className: "bl-forms-builder__width-badge" });
-    const designBtn = el("button", {
-      type: "button",
-      className: "bl-forms-builder__design-btn",
-      title: t("layoutDesignTitle", "Design"),
-      "aria-label": t("layoutDesignTitle", "Design")
-    });
-    designBtn.appendChild(iconEl("design", "bl-forms-builder__design-btn-icon"));
-    const typeChip = el("span", { className: "bl-forms-builder__field-type bl-forms-builder__field-type--column" }, [
-      iconEl("column", "bl-forms-builder__field-type-icon"),
-      el("span", {
-        className: "bl-forms-builder__field-type-label",
-        text: window.blFormsAdmin?.i18n?.types?.column || t("columnType", "Columns")
-      })
-    ]);
-    const fieldsList = el("div", {
-      className: "bl-forms-builder__column-fields",
-      dataset: { blColumnFields: "1" }
-    });
-    const emptyHint = el("p", {
-      className: "description bl-forms-builder__column-empty",
-      text: t("columnEmpty", "Drop fields here")
-    });
-    const syncEmpty = () => {
-      emptyHint.hidden = fieldsList.querySelector("[data-bl-forms-field]") != null;
-    };
-    const updatePreview = () => {
-      const width = field.width || "100";
-      const widthCustom = field.width_custom || "";
-      const design = field.design || "standard";
-      row.dataset.fieldWidth = width;
-      row.dataset.fieldDesign = design;
-      if (width === "custom") {
-        row.dataset.fieldWidthCustom = widthCustom || "";
-      } else {
-        delete row.dataset.fieldWidthCustom;
-      }
-      const text = widthBadgeText(width, widthCustom);
-      widthBadge.textContent = text;
-      widthBadge.hidden = text === "";
-    };
-    const notify = () => document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    const openWidthModal = () => {
-      openFieldWidthModal(field, () => {
-        updatePreview();
-        notify();
-      });
-    };
-    const openDesignModal = () => {
-      openLayoutDesignModal(field, () => {
-        updatePreview();
-        notify();
-      });
-    };
-    (field.children || []).forEach((child) => {
-      fieldsList.appendChild(createFieldCard(child, false));
-    });
-    bindFieldListSortable(fieldsList, () => {
-      syncEmpty();
-      notify();
-    });
-    const fieldsWrap = el("div", { className: "bl-forms-builder__column-fields-wrap" }, [
-      fieldsList,
-      emptyHint
-    ]);
-    syncEmpty();
-    widthBadge.classList.add("is-interactive");
-    widthBadge.title = t("columnWidthTitle", "Column width");
-    widthBadge.addEventListener("click", openWidthModal);
-    designBtn.addEventListener("click", openDesignModal);
-    const header = el("div", { className: "bl-forms-builder__field-header" }, [
-      preview,
-      el("div", { className: "bl-forms-builder__field-meta" }, [widthBadge, designBtn, typeChip]),
-      createContainerActions(
-        () => {
-          row.remove();
-          notify();
-        },
-        () => duplicateFieldCard(row)
-      )
-    ]);
-    row.append(header, fieldsWrap);
-    updatePreview();
-    return row;
-  }
-  function createSectionCard(initial = {}) {
-    let field = {
-      label: "",
-      children: [],
-      width: "100",
-      width_custom: "",
-      design: "standard",
-      show_title: true,
-      css_class: "",
-      ...initial,
-      id: initial.id || uid(),
-      type: "section"
-    };
-    if (!["standard", "outline", "card"].includes(field.design)) {
-      field.design = "standard";
-    }
-    if (field.show_title === false || field.show_title === 0 || field.show_title === "0") {
-      field.show_title = false;
-    } else {
-      field.show_title = true;
-    }
-    if (typeof field.css_class !== "string") {
-      field.css_class = "";
-    }
-    const row = el("div", {
-      className: "bl-forms-builder__field bl-forms-builder__section-card",
-      dataset: {
-        blFormsField: "1",
-        fieldId: field.id,
-        fieldType: "section",
-        fieldWidth: field.width || "100",
-        fieldDesign: field.design || "standard",
-        fieldShowTitle: field.show_title ? "1" : "0",
-        ...field.width === "custom" && field.width_custom ? { fieldWidthCustom: field.width_custom } : {}
-      }
-    });
-    sectionFieldByEl.set(row, field);
-    const labelPlaceholder = () => field.show_title ? t("sectionLabelPlaceholder", "Title") : t("sectionLabelPlaceholderHidden", "Name");
-    const labelInput = el("input", {
-      type: "text",
-      className: "bl-forms-builder__section-label-input",
-      value: field.label || "",
-      placeholder: labelPlaceholder(),
-      "aria-label": t("sectionLabel", "Section title")
-    });
-    labelInput.addEventListener("input", () => {
-      field.label = labelInput.value;
-      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    });
-    const widthBadge = el("span", { className: "bl-forms-builder__width-badge" });
-    const designBtn = el("button", {
-      type: "button",
-      className: "bl-forms-builder__design-btn",
-      title: t("layoutDesignTitle", "Design"),
-      "aria-label": t("layoutDesignTitle", "Design")
-    });
-    designBtn.appendChild(iconEl("design", "bl-forms-builder__design-btn-icon"));
-    const typeChip = el("span", { className: "bl-forms-builder__field-type bl-forms-builder__field-type--section" }, [
-      iconEl("section", "bl-forms-builder__field-type-icon"),
-      el("span", {
-        className: "bl-forms-builder__field-type-label",
-        text: window.blFormsAdmin?.i18n?.types?.section || t("sectionType", "Section")
-      })
-    ]);
-    const fieldsList = el("div", {
-      className: "bl-forms-builder__section-fields",
-      dataset: { blSectionFields: "1" }
-    });
-    const emptyHint = el("p", {
-      className: "description bl-forms-builder__section-empty",
-      text: t("sectionEmpty", "Drop fields here")
-    });
-    const syncEmpty = () => {
-      emptyHint.hidden = fieldsList.querySelector("[data-bl-forms-field]") != null;
-    };
-    const updatePreview = () => {
-      const width = field.width || "100";
-      const widthCustom = field.width_custom || "";
-      const design = field.design || "standard";
-      row.dataset.fieldWidth = width;
-      row.dataset.fieldDesign = design;
-      row.dataset.fieldShowTitle = field.show_title ? "1" : "0";
-      if (width === "custom") {
-        row.dataset.fieldWidthCustom = widthCustom || "";
-      } else {
-        delete row.dataset.fieldWidthCustom;
-      }
-      labelInput.placeholder = labelPlaceholder();
-      const text = widthBadgeText(width, widthCustom);
-      widthBadge.textContent = text;
-      widthBadge.hidden = text === "";
-    };
-    const notify = () => document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-    const openWidthModal = () => {
-      openFieldWidthModal(field, () => {
-        updatePreview();
-        notify();
-      });
-    };
-    const openDesignModal = () => {
-      openLayoutDesignModal(
-        field,
-        () => {
-          updatePreview();
-          notify();
-        },
-        { withShowTitle: true }
-      );
-    };
-    (field.children || []).forEach((child) => {
-      fieldsList.appendChild(createFieldCard(child, false));
-    });
-    bindFieldListSortable(fieldsList, () => {
-      syncEmpty();
-      notify();
-    });
-    const fieldsWrap = el("div", { className: "bl-forms-builder__section-fields-wrap" }, [
-      fieldsList,
-      emptyHint
-    ]);
-    syncEmpty();
-    widthBadge.classList.add("is-interactive");
-    widthBadge.title = t("sectionWidthTitle", "Section width");
-    widthBadge.addEventListener("click", openWidthModal);
-    designBtn.addEventListener("click", openDesignModal);
-    const header = el("div", { className: "bl-forms-builder__field-header" }, [
-      labelInput,
-      el("div", { className: "bl-forms-builder__field-meta" }, [widthBadge, designBtn, typeChip]),
-      createContainerActions(
-        () => {
-          row.remove();
-          notify();
-        },
-        () => duplicateFieldCard(row)
-      )
-    ]);
-    row.append(header, fieldsWrap);
-    updatePreview();
-    return row;
-  }
-  function serializeLayoutRow(row) {
-    const type = row.dataset.fieldType || "";
-    const id = row.dataset.fieldId || uid();
-    if (type === "column") {
-      const fields = row.querySelector("[data-bl-column-fields]");
-      const live = columnFieldByEl.get(row);
-      const width = row.dataset.fieldWidth || live?.width || "100";
-      const widthCustom = row.dataset.fieldWidthCustom || live?.width_custom || "";
-      const design = row.dataset.fieldDesign || live?.design || "standard";
-      const cssClass = typeof live?.css_class === "string" ? live.css_class : "";
-      return {
-        id,
-        type: "column",
-        width,
-        width_custom: width === "custom" ? widthCustom : "",
-        design,
-        css_class: cssClass,
-        children: Array.from(fields?.children || []).filter((el3) => el3.matches("[data-bl-forms-field]") && !NESTED_BLOCKED.includes(el3.dataset.fieldType)).map((child) => serializeRow(child))
-      };
-    }
-    if (type === "section") {
-      const fields = row.querySelector("[data-bl-section-fields]");
-      const live = sectionFieldByEl.get(row);
-      const labelInput = row.querySelector(".bl-forms-builder__section-label-input");
-      const label = labelInput?.value ?? live?.label ?? "";
-      const width = row.dataset.fieldWidth || live?.width || "100";
-      const widthCustom = row.dataset.fieldWidthCustom || live?.width_custom || "";
-      const design = row.dataset.fieldDesign || live?.design || "standard";
-      const showTitle = row.dataset.fieldShowTitle !== void 0 ? row.dataset.fieldShowTitle !== "0" : live?.show_title !== false;
-      const cssClass = typeof live?.css_class === "string" ? live.css_class : "";
-      return {
-        id,
-        type: "section",
-        label,
-        width,
-        width_custom: width === "custom" ? widthCustom : "",
-        design,
-        show_title: showTitle,
-        css_class: cssClass,
-        children: Array.from(fields?.children || []).filter((el3) => el3.matches("[data-bl-forms-field]") && !NESTED_BLOCKED.includes(el3.dataset.fieldType)).map((child) => serializeRow(child))
-      };
-    }
-    return null;
-  }
-
   // themes/baselayer/packages/baselayer-forms/src/js/admin/conditional-logic.js
   var LOGIC_SOURCE_EXCLUDE = [
     "column",
@@ -2477,6 +2012,523 @@
       syncHidden(false);
     };
     return wrap;
+  }
+
+  // themes/baselayer/packages/baselayer-forms/src/js/admin/layout.js
+  var NESTED_BLOCKED = ["column", "section", "hidden", "honeypot", "captcha"];
+  var columnFieldByEl = /* @__PURE__ */ new WeakMap();
+  var sectionFieldByEl = /* @__PURE__ */ new WeakMap();
+  function createNestedSortable(list, options) {
+    const Builder = window.BlCanvasBuilder;
+    if (!Builder || typeof Builder.createSortable !== "function") {
+      console.error("BlCanvasBuilder.createSortable is required for nested field lists");
+      return null;
+    }
+    return Builder.createSortable(list, options);
+  }
+  function prepareNestedField(typeOrData) {
+    const data = typeof typeOrData === "string" ? defaultField(typeOrData) : { ...typeOrData };
+    if (NESTED_BLOCKED.includes(data.type)) {
+      return null;
+    }
+    if (data.name != null && data.name_manual === false) {
+      data.name = uniqueFieldName(data.label || data.name || data.type || "field", data.id || "");
+    } else if (data.name) {
+      data.name = uniqueFieldName(data.name, data.id || "");
+    }
+    return data;
+  }
+  function bindFieldListSortable(list, onChange) {
+    const Builder = window.BlCanvasBuilder;
+    const onStart = Builder?.dragStart || (() => {
+    });
+    const onEnd = Builder?.dragEnd || (() => {
+    });
+    createNestedSortable(list, {
+      group: {
+        name: "bl-forms-fields",
+        put(to, from, dragEl) {
+          const type = dragEl.dataset.fieldType || "";
+          return !NESTED_BLOCKED.includes(type);
+        }
+      },
+      handle: ".bl-forms-builder__handle",
+      animation: 150,
+      draggable: ".bl-forms-builder__field, .bl-forms-builder__template",
+      onStart,
+      onEnd,
+      onAdd(evt) {
+        const item = evt.item;
+        const type = item.dataset.fieldType || "text";
+        if (item.classList.contains("bl-forms-builder__template")) {
+          const prepared = prepareNestedField(type);
+          if (!prepared) {
+            item.remove();
+            return;
+          }
+          item.replaceWith(createFieldCard(prepared, true));
+        } else if (NESTED_BLOCKED.includes(type)) {
+          if (evt.from && evt.from !== list) {
+            evt.from.insertBefore(item, evt.from.children[evt.oldIndex] || null);
+          } else {
+            item.remove();
+          }
+          return;
+        }
+        onChange();
+      },
+      onUpdate: onChange,
+      onSort: onChange
+    });
+  }
+  function widthBadgeText(width, widthCustom = "") {
+    if (width === "auto") {
+      return t("widthAuto", "Auto");
+    }
+    if (width === "custom") {
+      return (widthCustom || "").trim();
+    }
+    return `${width}%`;
+  }
+  function equalWidthForCount(count) {
+    if (count <= 1) {
+      return "100";
+    }
+    if (count === 2) {
+      return "50";
+    }
+    if (count === 3) {
+      return "33";
+    }
+    return "25";
+  }
+  function applyColumnWidthToCard(el3, width, widthCustom = "") {
+    el3.dataset.fieldWidth = width;
+    if (width === "custom") {
+      el3.dataset.fieldWidthCustom = widthCustom || "";
+    } else {
+      delete el3.dataset.fieldWidthCustom;
+    }
+    const field = columnFieldByEl.get(el3);
+    if (field) {
+      field.width = width;
+      field.width_custom = width === "custom" ? widthCustom || "" : "";
+    }
+    const badge = el3.querySelector(":scope > .bl-forms-builder__field-header .bl-forms-builder__width-badge");
+    if (badge) {
+      const text = widthBadgeText(width, widthCustom);
+      badge.textContent = text;
+      badge.hidden = text === "";
+    }
+  }
+  function equalizeColumnRun(list, columnEl) {
+    const all = Array.from(list.children).filter((el3) => el3.matches?.("[data-bl-forms-field]"));
+    const pos = all.indexOf(columnEl);
+    if (pos < 0) {
+      return;
+    }
+    let start = pos;
+    let end = pos;
+    while (start > 0 && all[start - 1].dataset.fieldType === "column") {
+      start -= 1;
+    }
+    while (end < all.length - 1 && all[end + 1].dataset.fieldType === "column") {
+      end += 1;
+    }
+    const run = all.slice(start, end + 1);
+    const width = equalWidthForCount(run.length);
+    run.forEach((el3) => applyColumnWidthToCard(el3, width));
+  }
+  function createContainerActions(onDelete, onDuplicate) {
+    const duplicateBtn = el("button", {
+      type: "button",
+      className: "bl-forms-builder__icon-btn",
+      title: t("duplicate", "Duplicate"),
+      "aria-label": t("duplicate", "Duplicate"),
+      onClick: onDuplicate
+    });
+    const duplicateIcon = iconEl("duplicate");
+    if (duplicateIcon.innerHTML) {
+      duplicateBtn.appendChild(duplicateIcon);
+    } else {
+      duplicateBtn.textContent = "\u29C9";
+    }
+    const deleteBtn = el("button", {
+      type: "button",
+      className: "bl-forms-builder__icon-btn bl-forms-builder__icon-btn--danger",
+      title: t("delete", "Delete"),
+      "aria-label": t("delete", "Delete"),
+      onClick: onDelete
+    });
+    const trashIcon = iconEl("trash");
+    if (trashIcon.innerHTML) {
+      deleteBtn.appendChild(trashIcon);
+    } else {
+      deleteBtn.textContent = "\xD7";
+    }
+    const handle = el("span", {
+      className: "bl-forms-builder__handle",
+      title: t("dragField", "Drag to reorder"),
+      "aria-hidden": "true"
+    });
+    const dragIcon = iconEl("drag");
+    if (dragIcon.innerHTML) {
+      handle.appendChild(dragIcon);
+    } else {
+      handle.textContent = "\u22EE\u22EE";
+    }
+    return el("div", { className: "bl-forms-builder__field-actions" }, [duplicateBtn, deleteBtn, handle]);
+  }
+  function createColumnCard(initial = {}) {
+    let field = {
+      width: "100",
+      width_custom: "",
+      children: [],
+      design: "standard",
+      css_class: "",
+      conditional_logic: { enabled: false, groups: [] },
+      ...initial,
+      id: initial.id || uid(),
+      type: "column"
+    };
+    if (!["standard", "outline", "card"].includes(field.design)) {
+      field.design = "standard";
+    }
+    if (typeof field.css_class !== "string") {
+      field.css_class = "";
+    }
+    field.conditional_logic = normalizeConditionalLogic(field.conditional_logic);
+    const row = el("div", {
+      className: "bl-forms-builder__field bl-forms-builder__column-card",
+      dataset: {
+        blFormsField: "1",
+        fieldId: field.id,
+        fieldType: "column",
+        fieldWidth: field.width || "100",
+        fieldDesign: field.design || "standard",
+        ...field.width === "custom" && field.width_custom ? { fieldWidthCustom: field.width_custom } : {}
+      }
+    });
+    columnFieldByEl.set(row, field);
+    const preview = el("span", {
+      className: "bl-forms-builder__preview",
+      text: window.blFormsAdmin?.i18n?.types?.column || t("columnType", "Columns")
+    });
+    const widthBadge = el("span", { className: "bl-forms-builder__width-badge" });
+    const designBtn = el("button", {
+      type: "button",
+      className: "bl-forms-builder__design-btn",
+      title: t("layoutSettingsTitle", "Settings"),
+      "aria-label": t("layoutSettingsTitle", "Settings")
+    });
+    designBtn.appendChild(iconEl("tune", "bl-forms-builder__design-btn-icon"));
+    const typeChip = el("span", { className: "bl-forms-builder__field-type bl-forms-builder__field-type--column" });
+    const fieldsList = el("div", {
+      className: "bl-forms-builder__column-fields",
+      dataset: { blColumnFields: "1" }
+    });
+    const emptyHint = el("p", {
+      className: "description bl-forms-builder__column-empty",
+      text: t("columnEmpty", "Drop fields here")
+    });
+    const syncEmpty = () => {
+      emptyHint.hidden = fieldsList.querySelector("[data-bl-forms-field]") != null;
+    };
+    const updatePreview = () => {
+      const width = field.width || "100";
+      const widthCustom = field.width_custom || "";
+      const design = field.design || "standard";
+      row.dataset.fieldWidth = width;
+      row.dataset.fieldDesign = design;
+      if (width === "custom") {
+        row.dataset.fieldWidthCustom = widthCustom || "";
+      } else {
+        delete row.dataset.fieldWidthCustom;
+      }
+      const text = widthBadgeText(width, widthCustom);
+      widthBadge.textContent = text;
+      widthBadge.hidden = text === "";
+      const typeChildren = [
+        iconEl("column", "bl-forms-builder__field-type-icon"),
+        el("span", {
+          className: "bl-forms-builder__field-type-label",
+          text: window.blFormsAdmin?.i18n?.types?.column || t("columnType", "Columns")
+        })
+      ];
+      const logic = field.conditional_logic;
+      if (logic && logic.enabled && Array.isArray(logic.groups) && logic.groups.length > 0) {
+        typeChildren.push(
+          el("span", {
+            className: "bl-forms-builder__field-logic-dot",
+            title: t("logicEnable", "Conditional logic"),
+            "aria-label": t("logicEnable", "Conditional logic")
+          })
+        );
+      }
+      typeChip.replaceChildren(...typeChildren);
+    };
+    const notify = () => document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+    const openWidthModal = () => {
+      openFieldWidthModal(field, () => {
+        updatePreview();
+        notify();
+      });
+    };
+    const openDesignModal = () => {
+      openLayoutSettingsModal(
+        field,
+        () => {
+          updatePreview();
+          notify();
+        },
+        {
+          tabs: ["design", "logic"],
+          logicHelp: t(
+            "logicHelpColumn",
+            "Show this column only when the conditions below are met."
+          )
+        }
+      );
+    };
+    (field.children || []).forEach((child) => {
+      fieldsList.appendChild(createFieldCard(child, false));
+    });
+    bindFieldListSortable(fieldsList, () => {
+      syncEmpty();
+      notify();
+    });
+    const fieldsWrap = el("div", { className: "bl-forms-builder__column-fields-wrap" }, [
+      fieldsList,
+      emptyHint
+    ]);
+    syncEmpty();
+    widthBadge.classList.add("is-interactive");
+    widthBadge.title = t("columnWidthTitle", "Column width");
+    widthBadge.addEventListener("click", openWidthModal);
+    designBtn.addEventListener("click", openDesignModal);
+    const header = el("div", { className: "bl-forms-builder__field-header" }, [
+      preview,
+      el("div", { className: "bl-forms-builder__field-meta" }, [widthBadge, designBtn, typeChip]),
+      createContainerActions(
+        () => {
+          row.remove();
+          notify();
+        },
+        () => duplicateFieldCard(row)
+      )
+    ]);
+    row.append(header, fieldsWrap);
+    updatePreview();
+    return row;
+  }
+  function createSectionCard(initial = {}) {
+    let field = {
+      label: "",
+      children: [],
+      width: "100",
+      width_custom: "",
+      design: "standard",
+      show_title: true,
+      css_class: "",
+      conditional_logic: { enabled: false, groups: [] },
+      ...initial,
+      id: initial.id || uid(),
+      type: "section"
+    };
+    if (!["standard", "outline", "card"].includes(field.design)) {
+      field.design = "standard";
+    }
+    if (field.show_title === false || field.show_title === 0 || field.show_title === "0") {
+      field.show_title = false;
+    } else {
+      field.show_title = true;
+    }
+    if (typeof field.css_class !== "string") {
+      field.css_class = "";
+    }
+    field.conditional_logic = normalizeConditionalLogic(field.conditional_logic);
+    const row = el("div", {
+      className: "bl-forms-builder__field bl-forms-builder__section-card",
+      dataset: {
+        blFormsField: "1",
+        fieldId: field.id,
+        fieldType: "section",
+        fieldWidth: field.width || "100",
+        fieldDesign: field.design || "standard",
+        fieldShowTitle: field.show_title ? "1" : "0",
+        ...field.width === "custom" && field.width_custom ? { fieldWidthCustom: field.width_custom } : {}
+      }
+    });
+    sectionFieldByEl.set(row, field);
+    const labelPlaceholder = () => field.show_title ? t("sectionLabelPlaceholder", "Title") : t("sectionLabelPlaceholderHidden", "Name");
+    const labelInput = el("input", {
+      type: "text",
+      className: "bl-forms-builder__section-label-input",
+      value: field.label || "",
+      placeholder: labelPlaceholder(),
+      "aria-label": t("sectionLabel", "Section title")
+    });
+    labelInput.addEventListener("input", () => {
+      field.label = labelInput.value;
+      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+    });
+    const widthBadge = el("span", { className: "bl-forms-builder__width-badge" });
+    const designBtn = el("button", {
+      type: "button",
+      className: "bl-forms-builder__design-btn",
+      title: t("layoutSettingsTitle", "Settings"),
+      "aria-label": t("layoutSettingsTitle", "Settings")
+    });
+    designBtn.appendChild(iconEl("tune", "bl-forms-builder__design-btn-icon"));
+    const typeChip = el("span", {
+      className: "bl-forms-builder__field-type bl-forms-builder__field-type--section"
+    });
+    const fieldsList = el("div", {
+      className: "bl-forms-builder__section-fields",
+      dataset: { blSectionFields: "1" }
+    });
+    const emptyHint = el("p", {
+      className: "description bl-forms-builder__section-empty",
+      text: t("sectionEmpty", "Drop fields here")
+    });
+    const syncEmpty = () => {
+      emptyHint.hidden = fieldsList.querySelector("[data-bl-forms-field]") != null;
+    };
+    const updatePreview = () => {
+      const width = field.width || "100";
+      const widthCustom = field.width_custom || "";
+      const design = field.design || "standard";
+      row.dataset.fieldWidth = width;
+      row.dataset.fieldDesign = design;
+      row.dataset.fieldShowTitle = field.show_title ? "1" : "0";
+      if (width === "custom") {
+        row.dataset.fieldWidthCustom = widthCustom || "";
+      } else {
+        delete row.dataset.fieldWidthCustom;
+      }
+      labelInput.placeholder = labelPlaceholder();
+      const text = widthBadgeText(width, widthCustom);
+      widthBadge.textContent = text;
+      widthBadge.hidden = text === "";
+      const typeChildren = [
+        iconEl("section", "bl-forms-builder__field-type-icon"),
+        el("span", {
+          className: "bl-forms-builder__field-type-label",
+          text: window.blFormsAdmin?.i18n?.types?.section || t("sectionType", "Section")
+        })
+      ];
+      const logic = field.conditional_logic;
+      if (logic && logic.enabled && Array.isArray(logic.groups) && logic.groups.length > 0) {
+        typeChildren.push(
+          el("span", {
+            className: "bl-forms-builder__field-logic-dot",
+            title: t("logicEnable", "Conditional logic"),
+            "aria-label": t("logicEnable", "Conditional logic")
+          })
+        );
+      }
+      typeChip.replaceChildren(...typeChildren);
+    };
+    const notify = () => document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+    const openWidthModal = () => {
+      openFieldWidthModal(field, () => {
+        updatePreview();
+        notify();
+      });
+    };
+    const openDesignModal = () => {
+      openLayoutSettingsModal(
+        field,
+        () => {
+          updatePreview();
+          notify();
+        },
+        {
+          tabs: ["design", "logic"],
+          withHideTitle: true,
+          logicHelp: t(
+            "logicHelpSection",
+            "Show this section only when the conditions below are met."
+          )
+        }
+      );
+    };
+    (field.children || []).forEach((child) => {
+      fieldsList.appendChild(createFieldCard(child, false));
+    });
+    bindFieldListSortable(fieldsList, () => {
+      syncEmpty();
+      notify();
+    });
+    const fieldsWrap = el("div", { className: "bl-forms-builder__section-fields-wrap" }, [
+      fieldsList,
+      emptyHint
+    ]);
+    syncEmpty();
+    widthBadge.classList.add("is-interactive");
+    widthBadge.title = t("sectionWidthTitle", "Section width");
+    widthBadge.addEventListener("click", openWidthModal);
+    designBtn.addEventListener("click", openDesignModal);
+    const header = el("div", { className: "bl-forms-builder__field-header" }, [
+      labelInput,
+      el("div", { className: "bl-forms-builder__field-meta" }, [widthBadge, designBtn, typeChip]),
+      createContainerActions(
+        () => {
+          row.remove();
+          notify();
+        },
+        () => duplicateFieldCard(row)
+      )
+    ]);
+    row.append(header, fieldsWrap);
+    updatePreview();
+    return row;
+  }
+  function serializeLayoutRow(row) {
+    const type = row.dataset.fieldType || "";
+    const id = row.dataset.fieldId || uid();
+    if (type === "column") {
+      const fields = row.querySelector("[data-bl-column-fields]");
+      const live = columnFieldByEl.get(row);
+      const width = row.dataset.fieldWidth || live?.width || "100";
+      const widthCustom = row.dataset.fieldWidthCustom || live?.width_custom || "";
+      const design = row.dataset.fieldDesign || live?.design || "standard";
+      const cssClass = typeof live?.css_class === "string" ? live.css_class : "";
+      return {
+        id,
+        type: "column",
+        width,
+        width_custom: width === "custom" ? widthCustom : "",
+        design,
+        css_class: cssClass,
+        conditional_logic: normalizeConditionalLogic(live?.conditional_logic),
+        children: Array.from(fields?.children || []).filter((el3) => el3.matches("[data-bl-forms-field]") && !NESTED_BLOCKED.includes(el3.dataset.fieldType)).map((child) => serializeRow(child))
+      };
+    }
+    if (type === "section") {
+      const fields = row.querySelector("[data-bl-section-fields]");
+      const live = sectionFieldByEl.get(row);
+      const labelInput = row.querySelector(".bl-forms-builder__section-label-input");
+      const label = labelInput?.value ?? live?.label ?? "";
+      const width = row.dataset.fieldWidth || live?.width || "100";
+      const widthCustom = row.dataset.fieldWidthCustom || live?.width_custom || "";
+      const design = row.dataset.fieldDesign || live?.design || "standard";
+      const showTitle = row.dataset.fieldShowTitle !== void 0 ? row.dataset.fieldShowTitle !== "0" : live?.show_title !== false;
+      const cssClass = typeof live?.css_class === "string" ? live.css_class : "";
+      return {
+        id,
+        type: "section",
+        label,
+        width,
+        width_custom: width === "custom" ? widthCustom : "",
+        design,
+        show_title: showTitle,
+        css_class: cssClass,
+        conditional_logic: normalizeConditionalLogic(live?.conditional_logic),
+        children: Array.from(fields?.children || []).filter((el3) => el3.matches("[data-bl-forms-field]") && !NESTED_BLOCKED.includes(el3.dataset.fieldType)).map((child) => serializeRow(child))
+      };
+    }
+    return null;
   }
 
   // themes/baselayer/packages/baselayer-forms/src/js/admin/field-card.js
@@ -3271,35 +3323,71 @@
     backdrop.appendChild(dialog);
     document.body.appendChild(backdrop);
   }
-  function openLayoutDesignModal(field, onApply, options = {}) {
+  function openLayoutSettingsModal(field, onApply, options = {}) {
     document.querySelectorAll(".bl-forms-builder__modal").forEach((node) => node.remove());
+    const tabIds = Array.isArray(options.tabs) && options.tabs.length ? options.tabs.filter((id) => ["settings", "design", "logic"].includes(id)) : ["design", "logic"];
+    const withHideTitle = !!options.withHideTitle;
+    const withWidth = !!options.withWidth;
+    const logicHelp = options.logicHelp || t("logicHelpContainer", "Show this block only when the conditions below are met.");
     const designs = [
       { value: "standard", label: t("sectionDesignStandard", "Standard") },
       { value: "outline", label: t("sectionDesignOutline", "Outline") },
       { value: "card", label: t("sectionDesignCard", "Card") }
     ];
-    const allowed = designs.map((item) => item.value);
-    let draft = allowed.includes(field.design) ? field.design : "standard";
-    const withShowTitle = !!options.withShowTitle;
-    const showTitleOn = !withShowTitle || field.show_title !== false && field.show_title !== 0 && field.show_title !== "0";
-    let draftHideTitle = withShowTitle ? !showTitleOn : false;
-    let draftCssClass = field.css_class || "";
-    const title = t("layoutDesignTitle", "Design");
+    const allowedDesigns = designs.map((item) => item.value);
+    const showTitleOn = !withHideTitle || field.show_title !== false && field.show_title !== 0 && field.show_title !== "0";
+    const draft = {
+      id: field.id,
+      type: field.type,
+      design: allowedDesigns.includes(field.design) ? field.design : "standard",
+      css_class: typeof field.css_class === "string" ? field.css_class : "",
+      show_title: showTitleOn,
+      width: field.width || "100",
+      width_custom: field.width_custom || "",
+      name: field.name || "",
+      name_manual: field.name_manual !== false,
+      min_rows: Math.max(0, parseInt(field.min_rows, 10) || 0),
+      max_rows: Math.max(0, parseInt(field.max_rows, 10) || 0),
+      button_label: field.button_label || "",
+      conditional_logic: normalizeConditionalLogic(
+        field.conditional_logic && typeof field.conditional_logic === "object" ? JSON.parse(JSON.stringify(field.conditional_logic)) : { enabled: false, groups: [] }
+      )
+    };
+    let draftHideTitle = withHideTitle ? !draft.show_title : false;
+    const tabLabels = {
+      settings: t("fieldTabSettings", "Settings"),
+      design: t("layoutDesignTitle", "Design"),
+      logic: t("fieldTabLogic", "Logic")
+    };
     const backdrop = el("div", {
       className: "bl-forms-builder__modal",
       role: "dialog",
       "aria-modal": "true",
-      "aria-label": title
+      "aria-label": t("layoutSettingsTitle", "Settings")
     });
     const close = () => {
       document.removeEventListener("keydown", onKey);
       backdrop.remove();
     };
     const apply = () => {
-      field.design = draft;
-      field.css_class = draftCssClass.trim();
-      if (withShowTitle) {
+      field.design = draft.design;
+      field.css_class = String(draft.css_class || "").trim();
+      if (withHideTitle) {
         field.show_title = !draftHideTitle;
+      }
+      if (withWidth) {
+        field.width = draft.width || "100";
+        field.width_custom = field.width === "custom" ? draft.width_custom || "" : "";
+      }
+      if (tabIds.includes("settings")) {
+        field.name = String(draft.name || "").trim() || field.name || "items";
+        field.name_manual = draft.name_manual !== false;
+        field.min_rows = Math.max(0, parseInt(draft.min_rows, 10) || 0);
+        field.max_rows = Math.max(0, parseInt(draft.max_rows, 10) || 0);
+        field.button_label = String(draft.button_label || "");
+      }
+      if (tabIds.includes("logic")) {
+        field.conditional_logic = normalizeConditionalLogic(draft.conditional_logic);
       }
       onApply(field);
       close();
@@ -3315,50 +3403,155 @@
         close();
       }
     });
-    const dialog = el("div", { className: "bl-forms-builder__modal-dialog" });
-    const header = el("div", { className: "bl-forms-builder__modal-header" }, [
-      el("h2", {
-        className: "bl-forms-builder__modal-title",
-        text: title
-      })
-    ]);
-    const body = el("div", {
-      className: "bl-forms-builder__modal-body bl-forms-builder__modal-body--design"
+    const dialog = el("div", {
+      className: "bl-forms-builder__modal-dialog bl-forms-builder__modal-dialog--settings"
     });
-    if (withShowTitle) {
-      body.appendChild(
-        createSwitchSetting("blHideTitle", t("sectionHideTitle", "Hide title"), draftHideTitle, (checked) => {
-          draftHideTitle = checked;
-        })
+    const tabBar = el("nav", {
+      className: "bl-forms-builder__modal-tabs",
+      role: "tablist"
+    });
+    const panelsWrap = el("div", {
+      className: "bl-forms-builder__modal-body bl-forms-builder__modal-body--settings"
+    });
+    const panels = {};
+    const tabButtons = {};
+    let activeTab = tabIds[0];
+    const activate = (id) => {
+      activeTab = id;
+      tabIds.forEach((tabId) => {
+        const on = tabId === id;
+        tabButtons[tabId].classList.toggle("is-active", on);
+        tabButtons[tabId].setAttribute("aria-selected", on ? "true" : "false");
+        panels[tabId].hidden = !on;
+        panels[tabId].classList.toggle("is-active", on);
+      });
+    };
+    tabIds.forEach((tabId) => {
+      const panel = el("div", {
+        className: "bl-forms-builder__modal-panel" + (tabId === "design" ? " bl-forms-builder__modal-body--design" : ""),
+        role: "tabpanel",
+        dataset: { blModalPanel: tabId }
+      });
+      panels[tabId] = panel;
+      panelsWrap.appendChild(panel);
+      const btn = el("button", {
+        type: "button",
+        className: "bl-forms-builder__modal-tab",
+        role: "tab",
+        text: tabLabels[tabId] || tabId,
+        dataset: { blModalTab: tabId },
+        onClick: () => activate(tabId)
+      });
+      tabButtons[tabId] = btn;
+      tabBar.appendChild(btn);
+    });
+    if (tabIds.includes("settings")) {
+      const settingsPanel = panels.settings;
+      const nameInput = el("input", {
+        type: "text",
+        className: "widefat",
+        value: draft.name || "",
+        placeholder: "items"
+      });
+      nameInput.addEventListener("input", () => {
+        draft.name_manual = true;
+        draft.name = nameInput.value;
+      });
+      const minInput = el("input", {
+        type: "number",
+        className: "widefat",
+        min: "0",
+        value: String(draft.min_rows || 0)
+      });
+      minInput.addEventListener("input", () => {
+        draft.min_rows = Math.max(0, parseInt(minInput.value, 10) || 0);
+      });
+      const maxInput = el("input", {
+        type: "number",
+        className: "widefat",
+        min: "0",
+        value: String(draft.max_rows || 0)
+      });
+      maxInput.addEventListener("input", () => {
+        draft.max_rows = Math.max(0, parseInt(maxInput.value, 10) || 0);
+      });
+      const buttonInput = el("input", {
+        type: "text",
+        className: "widefat",
+        value: draft.button_label || "",
+        placeholder: t("addRow", "Add row")
+      });
+      buttonInput.addEventListener("input", () => {
+        draft.button_label = buttonInput.value;
+      });
+      settingsPanel.append(
+        el("p", {}, [el("label", { text: t("name", "Field name") }), nameInput]),
+        el("p", {
+          className: "description",
+          text: t(
+            "nameHelp",
+            "Internal field key used in submissions, emails, and entry data."
+          )
+        }),
+        el("p", {}, [el("label", { text: t("repeaterMinRows", "Min rows") }), minInput]),
+        el("p", {}, [
+          el("label", { text: t("repeaterMaxRows", "Max rows (0 = unlimited)") }),
+          maxInput
+        ]),
+        el("p", {}, [el("label", { text: t("repeaterButtonLabel", "Add button label") }), buttonInput])
       );
     }
-    const designWrap = el("div", { className: "bl-forms-builder__design-style" });
-    designWrap.append(
-      settingHeading(t("layoutDesignStyle", "Style")),
-      createSegmentedControl(designs, draft, "blDesignGroup", (value) => {
-        draft = value;
-      })
-    );
-    body.appendChild(designWrap);
-    const cssInput = el("input", {
-      type: "text",
-      className: "widefat",
-      dataset: { blCssClass: "1" },
-      value: draftCssClass,
-      placeholder: t("cssClassPlaceholder", "e.g. my-field")
-    });
-    cssInput.addEventListener("input", () => {
-      draftCssClass = cssInput.value;
-    });
-    const cssWrap = el("div", { className: "bl-forms-builder__css-class" });
-    cssWrap.appendChild(el("p", {}, [el("label", { text: t("cssClass", "CSS class") }), cssInput]));
-    cssWrap.appendChild(
-      el("p", {
-        className: "description",
-        text: t("cssClassHelp", "Optional class names added to this field\u2019s wrapper.")
-      })
-    );
-    body.appendChild(cssWrap);
+    if (tabIds.includes("design")) {
+      const designPanel = panels.design;
+      if (withHideTitle) {
+        designPanel.appendChild(
+          createSwitchSetting("blHideTitle", t("sectionHideTitle", "Hide title"), draftHideTitle, (checked) => {
+            draftHideTitle = checked;
+          })
+        );
+      }
+      const designWrap = el("div", { className: "bl-forms-builder__design-style" });
+      designWrap.append(
+        settingHeading(t("layoutDesignStyle", "Style")),
+        createSegmentedControl(designs, draft.design, "blDesignGroup", (value) => {
+          draft.design = value;
+        })
+      );
+      designPanel.appendChild(designWrap);
+      if (withWidth) {
+        designPanel.appendChild(createWidthControl(draft, () => {
+        }, { showLabel: true }));
+      }
+      const cssInput = el("input", {
+        type: "text",
+        className: "widefat",
+        dataset: { blCssClass: "1" },
+        value: draft.css_class,
+        placeholder: t("cssClassPlaceholder", "e.g. my-field")
+      });
+      cssInput.addEventListener("input", () => {
+        draft.css_class = cssInput.value;
+      });
+      const cssWrap = el("div", { className: "bl-forms-builder__css-class" });
+      cssWrap.appendChild(el("p", {}, [el("label", { text: t("cssClass", "CSS class") }), cssInput]));
+      cssWrap.appendChild(
+        el("p", {
+          className: "description",
+          text: t("cssClassHelp", "Optional class names added to this field\u2019s wrapper.")
+        })
+      );
+      designPanel.appendChild(cssWrap);
+    }
+    if (tabIds.includes("logic")) {
+      const logicPanel = panels.logic;
+      const editor = createConditionalLogicEditor(draft, void 0, null);
+      const help = editor.querySelector(".bl-forms-builder__logic-help");
+      if (help) {
+        help.textContent = logicHelp;
+      }
+      logicPanel.appendChild(editor);
+    }
+    activate(activeTab);
     const footer = el("div", { className: "bl-forms-builder__modal-footer" }, [
       el("button", {
         type: "button",
@@ -3373,7 +3566,10 @@
         onClick: apply
       })
     ]);
-    dialog.append(header, body, footer);
+    const header = el("div", { className: "bl-forms-builder__modal-header bl-forms-builder__modal-header--tabs" }, [
+      tabBar
+    ]);
+    dialog.append(header, panelsWrap, footer);
     backdrop.appendChild(dialog);
     document.body.appendChild(backdrop);
   }
@@ -5718,15 +5914,18 @@
       name: partial.name || "items",
       name_manual: partial.name_manual != null ? !!partial.name_manual : false,
       hide_label: !!partial.hide_label,
+      show_title: partial.show_title !== false && partial.show_title !== 0 && partial.show_title !== "0",
       active: partial.active !== false,
       required: !!partial.required,
       description: partial.description || "",
       css_class: partial.css_class || "",
+      design: ["standard", "outline", "card"].includes(partial.design) ? partial.design : "standard",
       width: partial.width || "100",
       width_custom: partial.width_custom || "",
       min_rows: Math.max(0, parseInt(partial.min_rows, 10) || 0),
       max_rows: Math.max(0, parseInt(partial.max_rows, 10) || 0),
       button_label: partial.button_label || "",
+      conditional_logic: normalizeConditionalLogic(partial.conditional_logic),
       children: Array.isArray(partial.children) ? partial.children : []
     };
   }
@@ -5828,6 +6027,7 @@
       type: "repeater",
       children: Array.isArray(initial.children) ? initial.children : field.children
     };
+    field = defaultRepeater(field);
     const row = el("div", {
       className: "bl-forms-builder__field bl-blocks-builder__repeater-card",
       dataset: {
@@ -5835,77 +6035,36 @@
         fieldId: field.id,
         fieldType: "repeater",
         repeaterDepth: String(depth),
-        fieldWidth: field.width || "100"
+        fieldWidth: field.width || "100",
+        fieldDesign: field.design || "standard",
+        fieldShowTitle: field.show_title ? "1" : "0"
       }
     });
     repeaterFieldByEl.set(row, field);
+    const labelPlaceholder = () => field.show_title ? t("sectionLabelPlaceholder", "Title") : t("sectionLabelPlaceholderHidden", "Name");
     const labelInput = el("input", {
       type: "text",
       className: "bl-forms-builder__section-label-input",
       value: field.label || "",
-      placeholder: t("repeaterLabelPlaceholder", "Repeater label"),
+      placeholder: labelPlaceholder(),
       "aria-label": t("repeaterLabel", "Repeater label")
     });
     labelInput.addEventListener("input", () => {
       field.label = labelInput.value;
       if (!field.name_manual) {
-        nameInput.value = uniqueFieldName(field.label || "items", field.id);
-        field.name = nameInput.value;
+        field.name = uniqueFieldName(field.label || "items", field.id);
       }
       notifyChanged();
     });
-    const nameInput = el("input", {
-      type: "text",
-      className: "bl-blocks-builder__repeater-name",
-      value: field.name || "",
-      placeholder: "items",
-      "aria-label": t("fieldName", "Name")
+    const typeLabelText = () => typeLabel2("repeater") + (depth > 1 ? ` (${depth})` : "");
+    const typeChip = el("span", { className: "bl-forms-builder__field-type" });
+    const settingsBtn = el("button", {
+      type: "button",
+      className: "bl-forms-builder__design-btn",
+      title: t("layoutSettingsTitle", "Settings"),
+      "aria-label": t("layoutSettingsTitle", "Settings")
     });
-    nameInput.addEventListener("input", () => {
-      field.name_manual = true;
-      field.name = nameInput.value;
-      notifyChanged();
-    });
-    const minInput = el("input", {
-      type: "number",
-      className: "bl-blocks-builder__repeater-min",
-      min: "0",
-      value: String(field.min_rows || 0),
-      "aria-label": t("repeaterMinRows", "Min rows")
-    });
-    minInput.addEventListener("input", () => {
-      field.min_rows = Math.max(0, parseInt(minInput.value, 10) || 0);
-      notifyChanged();
-    });
-    const maxInput = el("input", {
-      type: "number",
-      className: "bl-blocks-builder__repeater-max",
-      min: "0",
-      value: String(field.max_rows || 0),
-      "aria-label": t("repeaterMaxRows", "Max rows (0 = unlimited)")
-    });
-    maxInput.addEventListener("input", () => {
-      field.max_rows = Math.max(0, parseInt(maxInput.value, 10) || 0);
-      notifyChanged();
-    });
-    const buttonInput = el("input", {
-      type: "text",
-      className: "bl-blocks-builder__repeater-button",
-      value: field.button_label || "",
-      placeholder: t("addRow", "Add row"),
-      "aria-label": t("repeaterButtonLabel", "Add button label")
-    });
-    buttonInput.addEventListener("input", () => {
-      field.button_label = buttonInput.value;
-      notifyChanged();
-    });
-    const typeChip = el("span", { className: "bl-forms-builder__field-type" }, [
-      iconEl("repeater", "bl-forms-builder__field-type-icon"),
-      el("span", {
-        className: "bl-forms-builder__field-type-label",
-        text: typeLabel2("repeater") + (depth > 1 ? ` (${depth})` : "")
-      })
-    ]);
+    settingsBtn.appendChild(iconEl("tune", "bl-forms-builder__design-btn-icon"));
     const fieldsList = el("div", {
       className: "bl-blocks-builder__repeater-fields",
       dataset: { blRepeaterFields: "1", repeaterDepth: String(depth) }
@@ -5937,24 +6096,48 @@
       emptyHint
     ]);
     syncEmpty();
-    const meta = el("div", { className: "bl-blocks-builder__repeater-meta" }, [
-      el("label", { className: "bl-blocks-builder__repeater-meta-item" }, [
-        el("span", { text: t("fieldName", "Name") }),
-        nameInput
-      ]),
-      el("label", { className: "bl-blocks-builder__repeater-meta-item" }, [
-        el("span", { text: t("repeaterMinRows", "Min") }),
-        minInput
-      ]),
-      el("label", { className: "bl-blocks-builder__repeater-meta-item" }, [
-        el("span", { text: t("repeaterMaxRowsShort", "Max") }),
-        maxInput
-      ]),
-      el("label", { className: "bl-blocks-builder__repeater-meta-item bl-blocks-builder__repeater-meta-item--grow" }, [
-        el("span", { text: t("repeaterButtonLabel", "Button") }),
-        buttonInput
-      ])
-    ]);
+    const updatePreview = () => {
+      row.dataset.fieldWidth = field.width || "100";
+      row.dataset.fieldDesign = field.design || "standard";
+      row.dataset.fieldShowTitle = field.show_title ? "1" : "0";
+      labelInput.placeholder = labelPlaceholder();
+      const typeChildren = [
+        iconEl("repeater", "bl-forms-builder__field-type-icon"),
+        el("span", {
+          className: "bl-forms-builder__field-type-label",
+          text: typeLabelText()
+        })
+      ];
+      const logic = field.conditional_logic;
+      if (logic && logic.enabled && Array.isArray(logic.groups) && logic.groups.length > 0) {
+        typeChildren.push(
+          el("span", {
+            className: "bl-forms-builder__field-logic-dot",
+            title: t("logicEnable", "Conditional logic"),
+            "aria-label": t("logicEnable", "Conditional logic")
+          })
+        );
+      }
+      typeChip.replaceChildren(...typeChildren);
+    };
+    settingsBtn.addEventListener("click", () => {
+      openLayoutSettingsModal(
+        field,
+        () => {
+          updatePreview();
+          notifyChanged();
+        },
+        {
+          tabs: ["settings", "design", "logic"],
+          withHideTitle: true,
+          withWidth: true,
+          logicHelp: t(
+            "logicHelpRepeater",
+            "Show this repeater only when the conditions below are met."
+          )
+        }
+      );
+    });
     const duplicateBtn = el("button", {
       type: "button",
       className: "bl-forms-builder__icon-btn",
@@ -5994,10 +6177,11 @@
     else handle.textContent = "\u22EE\u22EE";
     const header = el("div", { className: "bl-forms-builder__field-header" }, [
       labelInput,
-      el("div", { className: "bl-forms-builder__field-meta" }, [typeChip]),
+      el("div", { className: "bl-forms-builder__field-meta" }, [settingsBtn, typeChip]),
       el("div", { className: "bl-forms-builder__field-actions" }, [duplicateBtn, deleteBtn, handle])
     ]);
-    row.append(header, meta, fieldsWrap);
+    row.append(header, fieldsWrap);
+    updatePreview();
     if (open) {
       labelInput.focus();
     }
@@ -6006,29 +6190,34 @@
   function serializeRepeaterRow(row) {
     const live = repeaterFieldByEl.get(row);
     const id = row.dataset.fieldId || live?.id || uid();
-    const labelInput = row.querySelector(":scope > .bl-forms-builder__field-header .bl-forms-builder__section-label-input");
-    const nameInput = row.querySelector(":scope > .bl-blocks-builder__repeater-meta .bl-blocks-builder__repeater-name");
-    const minInput = row.querySelector(":scope > .bl-blocks-builder__repeater-meta .bl-blocks-builder__repeater-min");
-    const maxInput = row.querySelector(":scope > .bl-blocks-builder__repeater-meta .bl-blocks-builder__repeater-max");
-    const buttonInput = row.querySelector(":scope > .bl-blocks-builder__repeater-meta .bl-blocks-builder__repeater-button");
-    const fields = row.querySelector(":scope > .bl-blocks-builder__repeater-fields-wrap [data-bl-repeater-fields]");
-    const children = Array.from(fields?.children || []).filter((el3) => el3.matches("[data-bl-forms-field]")).filter((el3) => !LAYOUT_BLOCKED.includes(el3.dataset.fieldType || "")).map((child) => serializeChildCard(child));
+    const labelInput = row.querySelector(
+      ":scope > .bl-forms-builder__field-header .bl-forms-builder__section-label-input"
+    );
+    const fields = row.querySelector(
+      ":scope > .bl-blocks-builder__repeater-fields-wrap [data-bl-repeater-fields]"
+    );
+    const children = Array.from(fields?.children || []).filter((node) => node.matches("[data-bl-forms-field]")).filter((node) => !LAYOUT_BLOCKED.includes(node.dataset.fieldType || "")).map((child) => serializeChildCard(child));
+    const design = row.dataset.fieldDesign || live?.design || "standard";
+    const showTitle = row.dataset.fieldShowTitle !== void 0 ? row.dataset.fieldShowTitle !== "0" : live?.show_title !== false;
     return {
       id,
       type: "repeater",
       label: labelInput?.value ?? live?.label ?? "",
-      name: (nameInput?.value || live?.name || "items").trim() || "items",
+      name: (live?.name || "items").trim() || "items",
       name_manual: live?.name_manual !== false,
       hide_label: !!live?.hide_label,
+      show_title: showTitle,
       active: live?.active !== false,
       required: !!live?.required,
       description: live?.description || "",
       css_class: live?.css_class || "",
+      design: ["standard", "outline", "card"].includes(design) ? design : "standard",
       width: row.dataset.fieldWidth || live?.width || "100",
-      width_custom: live?.width_custom || "",
-      min_rows: Math.max(0, parseInt(minInput?.value ?? live?.min_rows ?? 0, 10) || 0),
-      max_rows: Math.max(0, parseInt(maxInput?.value ?? live?.max_rows ?? 0, 10) || 0),
-      button_label: buttonInput?.value ?? live?.button_label ?? "",
+      width_custom: live?.width === "custom" || row.dataset.fieldWidth === "custom" ? live?.width_custom || "" : "",
+      min_rows: Math.max(0, parseInt(live?.min_rows ?? 0, 10) || 0),
+      max_rows: Math.max(0, parseInt(live?.max_rows ?? 0, 10) || 0),
+      button_label: live?.button_label ?? "",
+      conditional_logic: normalizeConditionalLogic(live?.conditional_logic),
       children
     };
   }
@@ -6426,10 +6615,18 @@
         if (!field || field.active === false) return;
         const type = field.type || "text";
         if (isLayout(type)) {
-          const wrap = el2("div", {
-            className: "bl-blocks-fields__layout bl-blocks-fields__layout--" + type
-          });
-          if (type === "section" && field.label) {
+          const design = ["standard", "outline", "card"].includes(field.design) ? field.design : "standard";
+          const layoutClass = [
+            "bl-blocks-fields__layout",
+            "bl-blocks-fields__layout--" + type,
+            "bl-blocks-fields__layout--" + design
+          ];
+          if (field.css_class) {
+            layoutClass.push(String(field.css_class).trim());
+          }
+          const wrap = el2("div", { className: layoutClass.filter(Boolean).join(" ") });
+          const showTitle = type !== "section" || field.show_title !== false && field.show_title !== 0 && field.show_title !== "0";
+          if (type === "section" && showTitle && field.label) {
             wrap.appendChild(el2("h3", { className: "bl-blocks-fields__section-title", text: field.label }));
           }
           parent.appendChild(wrap);
@@ -6489,15 +6686,21 @@
     const minRows = Math.max(0, parseInt(field.min_rows, 10) || 0);
     const maxRows = Math.max(0, parseInt(field.max_rows, 10) || 0);
     const buttonLabel = field.button_label || i18n("addRow", "Add row");
+    const design = ["standard", "outline", "card"].includes(field.design) ? field.design : "standard";
+    const showTitle = field.show_title !== false && field.show_title !== 0 && field.show_title !== "0";
     let rows = Array.isArray(valueMap[name]) ? valueMap[name].slice() : [];
     while (rows.length < minRows) {
       rows.push({});
     }
+    const classNames = ["bl-blocks-fields__repeater", "bl-blocks-fields__repeater--" + design];
+    if (field.css_class) {
+      classNames.push(String(field.css_class).trim());
+    }
     const wrap = el2("div", {
-      className: "bl-blocks-fields__repeater",
+      className: classNames.filter(Boolean).join(" "),
       dataset: { fieldName: name }
     });
-    if (!field.hide_label && field.label) {
+    if (showTitle && !field.hide_label && field.label) {
       wrap.appendChild(el2("div", { className: "bl-blocks-fields__label", text: field.label }));
     }
     if (field.description) {

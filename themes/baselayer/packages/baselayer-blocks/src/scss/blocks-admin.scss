@@ -272,6 +272,17 @@ body.post-new-php.post-type-bl_block {
   display: flex;
   flex-direction: column;
   gap: 10px;
+
+  &--outline,
+  &--card {
+    padding: 12px;
+    border: 1px solid #c3c4c7;
+    border-radius: 6px;
+  }
+
+  &--card {
+    background: #f6f7f7;
+  }
 }
 
 .bl-blocks-fields__repeater-rows {
@@ -303,37 +314,23 @@ body.post-new-php.post-type-bl_block {
   align-self: flex-start;
 }
 
+.bl-blocks-fields__layout {
+  &--outline,
+  &--card {
+    padding: 12px;
+    border: 1px solid #c3c4c7;
+    border-radius: 6px;
+  }
+
+  &--card {
+    background: #f6f7f7;
+  }
+}
+
 .bl-blocks-builder__repeater-card {
   border: 1px solid #c3c4c7;
   border-radius: 6px;
   background: #f6f7f7;
-}
-
-.bl-blocks-builder__repeater-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px 14px;
-  padding: 0 12px 10px;
-}
-
-.bl-blocks-builder__repeater-meta-item {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  font-size: 11px;
-  color: #646970;
-
-  input {
-    min-width: 72px;
-  }
-}
-
-.bl-blocks-builder__repeater-meta-item--grow {
-  flex: 1 1 140px;
-
-  input {
-    min-width: 120px;
-  }
 }
 
 .bl-blocks-builder__repeater-fields-wrap {

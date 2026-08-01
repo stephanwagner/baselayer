@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-31T00:35:55+00:00\n"
+"POT-Creation-Date: 2026-08-01T02:03:59+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: baselayer-blocks\n"
@@ -34,80 +34,601 @@ msgstr ""
 msgid "https://baselayerwp.com/baselayer-blocks"
 msgstr ""
 
-#: includes/admin.php:15
-#: includes/admin.php:16
-#: includes/admin.php:83
-#: includes/admin.php:145
-msgid "Blocks"
+#: includes/admin-editor.php:30
+msgid "Template"
 msgstr ""
 
-#: includes/admin.php:32
-#: includes/admin.php:186
-msgid "You do not have permission to manage blocks."
+#: includes/admin-editor.php:54
+msgid "Template found."
 msgstr ""
 
-#: includes/admin.php:85
-msgid "Add New"
+#: includes/admin-editor.php:56
+msgid "Loaded from:"
 msgstr ""
 
-#: includes/admin.php:91
-msgid "You haven't created any blocks yet."
+#: includes/admin-editor.php:60
+#: includes/runtime-blocks.php:229
+#: includes/runtime-blocks.php:382
+#: includes/runtime-page.php:109
+msgid "Template missing."
 msgstr ""
 
-#: includes/admin.php:94
-msgid "Create your first block"
+#: includes/admin-editor.php:63
+#: includes/runtime-blocks.php:383
+msgid "Create this PHP file in your theme (child theme preferred):"
 msgstr ""
 
-#: includes/admin.php:102
-#: includes/admin.php:153
+#: includes/admin-editor.php:67
+msgid "Available in the template: $values, $fields, $block, $attributes."
+msgstr ""
+
+#: includes/admin-editor.php:239
+#: includes/config.php:160
+msgid "Text"
+msgstr ""
+
+#: includes/admin-editor.php:240
+msgid "Textarea"
+msgstr ""
+
+#: includes/admin-editor.php:241
+msgid "Email"
+msgstr ""
+
+#: includes/admin-editor.php:242
+msgid "Phone"
+msgstr ""
+
+#: includes/admin-editor.php:243
+msgid "URL"
+msgstr ""
+
+#: includes/admin-editor.php:244
+msgid "Number"
+msgstr ""
+
+#: includes/admin-editor.php:245
+msgid "Checkboxes"
+msgstr ""
+
+#: includes/admin-editor.php:246
+msgid "Radio"
+msgstr ""
+
+#: includes/admin-editor.php:247
+msgid "Select"
+msgstr ""
+
+#: includes/admin-editor.php:248
+msgid "Toggle"
+msgstr ""
+
+#: includes/admin-editor.php:249
+msgid "Button group"
+msgstr ""
+
+#: includes/admin-editor.php:250
+msgid "Date"
+msgstr ""
+
+#: includes/admin-editor.php:251
+msgid "Time"
+msgstr ""
+
+#: includes/admin-editor.php:252
+#: includes/admin-editor.php:296
+msgid "Date & time"
+msgstr ""
+
+#: includes/admin-editor.php:253
+msgid "File"
+msgstr ""
+
+#: includes/admin-editor.php:254
+msgid "Image"
+msgstr ""
+
+#: includes/admin-editor.php:255
+msgid "Heading"
+msgstr ""
+
+#: includes/admin-editor.php:256
+msgid "Text block"
+msgstr ""
+
+#: includes/admin-editor.php:257
+msgid "HTML"
+msgstr ""
+
+#: includes/admin-editor.php:258
+msgid "Divider"
+msgstr ""
+
+#: includes/admin-editor.php:259
+msgid "Spacer"
+msgstr ""
+
+#: includes/admin-editor.php:260
+msgid "Column"
+msgstr ""
+
+#: includes/admin-editor.php:261
+msgid "Section"
+msgstr ""
+
+#: includes/admin-editor.php:262
+#: includes/admin-editor.php:301
+#: includes/field-ui.php:500
+msgid "Repeater"
+msgstr ""
+
+#: includes/admin-editor.php:263
+msgid "Hidden"
+msgstr ""
+
+#: includes/admin-editor.php:267
+#: includes/admin-editor.php:269
+msgid "Fields"
+msgstr ""
+
+#: includes/admin-editor.php:268
+#: includes/admin-editor.php:313
+#: includes/admin-editor.php:316
+#: includes/runtime-site.php:108
+msgid "Settings"
+msgstr ""
+
+#: includes/admin-editor.php:270
+msgid "Drag a field here."
+msgstr ""
+
+#: includes/admin-editor.php:271
+msgid "Active"
+msgstr ""
+
+#: includes/admin-editor.php:272
+msgid "Slug"
+msgstr ""
+
+#: includes/admin-editor.php:273
+msgid "Internal key used in code and storage. Lowercase letters, numbers, and hyphens."
+msgstr ""
+
+#: includes/admin-editor.php:274
+msgid "Description"
+msgstr ""
+
+#: includes/admin-editor.php:275
+msgid "Block icon"
+msgstr ""
+
+#: includes/admin-editor.php:276
+msgid "Choose icon"
+msgstr ""
+
+#: includes/admin-editor.php:277
+#: includes/admin-editor.php:278
+msgid "SVG code"
+msgstr ""
+
+#: includes/admin-editor.php:279
+msgid "Clear"
+msgstr ""
+
+#: includes/admin-editor.php:280
+msgid "No icon selected"
+msgstr ""
+
+#: includes/admin-editor.php:281
+msgid "Browse Material Icons (Rounded), copy SVG, and paste here: "
+msgstr ""
+
+#: includes/admin-editor.php:282
+msgid "fonts.google.com/icons"
+msgstr ""
+
+#: includes/admin-editor.php:283
+msgid "Block category"
+msgstr ""
+
+#: includes/admin-editor.php:284
+msgid "Keywords"
+msgstr ""
+
+#: includes/admin-editor.php:285
+msgid "Comma-separated search keywords for the block inserter."
+msgstr ""
+
+#: includes/admin-editor.php:286
+#: includes/admin.php:319
+msgid "Post types"
+msgstr ""
+
+#: includes/admin-editor.php:287
+msgid "Show these page settings on the selected post types."
+msgstr ""
+
+#: includes/admin-editor.php:288
+msgid "Tab label"
+msgstr ""
+
+#: includes/admin-editor.php:289
+msgid "Label in the Website settings sidebar. Defaults to the title."
+msgstr ""
+
+#: includes/admin-editor.php:290
+#: includes/admin.php:317
+msgid "Order"
+msgstr ""
+
+#: includes/admin-editor.php:291
+msgid "Fullscreen"
+msgstr ""
+
+#: includes/admin-editor.php:292
+msgid "Exit fullscreen"
+msgstr ""
+
+#: includes/admin-editor.php:293
+msgid "Popular"
+msgstr ""
+
+#: includes/admin-editor.php:294
+msgid "Input"
+msgstr ""
+
+#: includes/admin-editor.php:295
+msgid "Choice"
+msgstr ""
+
+#: includes/admin-editor.php:297
+msgid "Uploads"
+msgstr ""
+
+#: includes/admin-editor.php:298
+msgid "Layout"
+msgstr ""
+
+#: includes/admin-editor.php:299
+msgid "Content"
+msgstr ""
+
+#: includes/admin-editor.php:300
+msgid "Advanced"
+msgstr ""
+
+#: includes/admin-editor.php:302
+#: includes/admin-editor.php:303
+msgid "Repeater label"
+msgstr ""
+
+#: includes/admin-editor.php:304
+msgid "Min rows"
+msgstr ""
+
+#: includes/admin-editor.php:305
+msgid "Max rows (0 = unlimited)"
+msgstr ""
+
+#: includes/admin-editor.php:306
+msgid "Max"
+msgstr ""
+
+#: includes/admin-editor.php:307
+msgid "Add button label"
+msgstr ""
+
+#: includes/admin-editor.php:308
+msgid "Drop fields or a nested repeater here"
+msgstr ""
+
+#: includes/admin-editor.php:309
+msgid "Drop fields here (nested repeater not allowed at this depth)"
+msgstr ""
+
+#: includes/admin-editor.php:310
+#: includes/field-ui.php:416
+#: includes/field-ui.php:497
+#: includes/runtime-blocks.php:230
+#: includes/runtime-page.php:110
+msgid "Add row"
+msgstr ""
+
+#: includes/admin-editor.php:311
+msgid "Field name"
+msgstr ""
+
+#: includes/admin-editor.php:312
+msgid "Internal field key used when saving values."
+msgstr ""
+
+#: includes/admin-editor.php:314
+#: includes/config.php:162
+msgid "Design"
+msgstr ""
+
+#: includes/admin-editor.php:315
+msgid "Style"
+msgstr ""
+
+#: includes/admin-editor.php:317
+msgid "Logic"
+msgstr ""
+
+#: includes/admin-editor.php:318
+msgid "Standard"
+msgstr ""
+
+#: includes/admin-editor.php:319
+msgid "Outline"
+msgstr ""
+
+#: includes/admin-editor.php:320
+msgid "Card"
+msgstr ""
+
+#: includes/admin-editor.php:321
+msgid "Hide title"
+msgstr ""
+
+#: includes/admin-editor.php:322
 msgid "Title"
 msgstr ""
 
-#: includes/admin.php:112
-msgid "(no title)"
+#: includes/admin-editor.php:323
+msgid "Name"
 msgstr ""
 
-#: includes/admin.php:134
-#: includes/repository.php:166
-msgid "Block not found."
+#: includes/admin-editor.php:324
+msgid "CSS class"
 msgstr ""
 
-#: includes/admin.php:144
+#: includes/admin-editor.php:325
+msgid "e.g. my-field"
+msgstr ""
+
+#: includes/admin-editor.php:326
+msgid "Optional class names added to this field’s wrapper."
+msgstr ""
+
+#: includes/admin-editor.php:327
+#: includes/field-ui.php:495
+#: includes/runtime-blocks.php:224
+#: includes/runtime-page.php:104
+#: includes/runtime-page.php:133
+msgid "Cancel"
+msgstr ""
+
+#: includes/admin-editor.php:328
+#: includes/runtime-blocks.php:223
+#: includes/runtime-page.php:103
+msgid "Apply"
+msgstr ""
+
+#: includes/admin-editor.php:329
+msgid "Conditional logic"
+msgstr ""
+
+#: includes/admin-editor.php:330
+msgid "Show this field only when the conditions below are met."
+msgstr ""
+
+#: includes/admin-editor.php:331
+msgid "Show this block only when the conditions below are met."
+msgstr ""
+
+#: includes/admin-editor.php:332
+msgid "Show this section only when the conditions below are met."
+msgstr ""
+
+#: includes/admin-editor.php:333
+msgid "Show this column only when the conditions below are met."
+msgstr ""
+
+#: includes/admin-editor.php:334
+msgid "Show this repeater only when the conditions below are met."
+msgstr ""
+
+#: includes/admin.php:58
+#: includes/admin.php:59
+#: includes/runtime-site.php:56
+msgid "Website"
+msgstr ""
+
+#: includes/admin.php:91
+#: includes/admin.php:92
+#: includes/admin.php:102
+#: includes/admin.php:103
+#: includes/cpt.php:11
+#: includes/cpt.php:21
+#: includes/cpt.php:22
+#: includes/cpt.php:89
+msgid "Blocks"
+msgstr ""
+
+#: includes/admin.php:110
+#: includes/admin.php:111
+#: includes/cpt.php:77
+#: includes/cpt.php:78
+#: includes/runtime-page.php:51
+#: includes/runtime-page.php:134
+msgid "Page Settings"
+msgstr ""
+
+#: includes/admin.php:118
+#: includes/admin.php:119
+#: includes/cpt.php:83
+#: includes/cpt.php:84
+msgid "Site Settings"
+msgstr ""
+
+#: includes/admin.php:138
+msgid "BaseLayer Blocks and Block Creator both use the Blocks admin menu. Disable Block Creator (Developer → Features) to use the Blocks package, or disable the Blocks package to keep Block Creator. The Website menu remains available."
+msgstr ""
+
+#. translators: %s: definition type singular
+#: includes/admin.php:216
+#, php-format
+msgid "Edit %s"
+msgstr ""
+
+#: includes/admin.php:315
+msgid "Block name"
+msgstr ""
+
+#: includes/config.php:161
+msgid "Media"
+msgstr ""
+
+#: includes/config.php:163
+msgid "Widgets"
+msgstr ""
+
+#: includes/config.php:164
+msgid "Theme"
+msgstr ""
+
+#: includes/config.php:165
+msgid "Embeds"
+msgstr ""
+
+#: includes/cpt.php:12
+#: includes/cpt.php:90
+msgid "Block"
+msgstr ""
+
+#: includes/cpt.php:13
+#: includes/cpt.php:14
+msgid "Add New"
+msgstr ""
+
+#: includes/cpt.php:15
+#: includes/field-ui.php:493
+#: includes/runtime-page.php:131
+msgid "Edit"
+msgstr ""
+
+#: includes/cpt.php:16
+msgid "New"
+msgstr ""
+
+#: includes/cpt.php:17
+msgid "View"
+msgstr ""
+
+#: includes/cpt.php:18
+msgid "Search"
+msgstr ""
+
+#: includes/cpt.php:19
+msgid "Nothing found."
+msgstr ""
+
+#: includes/cpt.php:20
+msgid "Nothing found in Trash."
+msgstr ""
+
+#: includes/cpt.php:79
+msgid "Add Page Settings"
+msgstr ""
+
+#: includes/cpt.php:85
+#: includes/runtime-site.php:61
+msgid "Add Site Settings"
+msgstr ""
+
+#: includes/cpt.php:91
 msgid "Add Block"
 msgstr ""
 
-#: includes/admin.php:144
-msgid "Edit Block"
+#: includes/cpt.php:118
+msgid "You do not have permission to manage blocks."
 msgstr ""
 
-#: includes/admin.php:160
-msgid "Add title"
+#: includes/field-ui.php:291
+msgid "—"
 msgstr ""
 
-#: includes/admin.php:165
+#. translators: %d: row number
+#: includes/field-ui.php:456
+#: includes/field-ui.php:499
+#: includes/runtime-blocks.php:232
+#: includes/runtime-page.php:112
+#, php-format
+msgid "Row %d"
+msgstr ""
+
+#: includes/field-ui.php:494
 msgid "Save"
 msgstr ""
 
-#: includes/admin.php:171
-msgid "Block creator"
+#: includes/field-ui.php:496
+#: includes/runtime-blocks.php:233
+#: includes/runtime-page.php:113
+msgid "Close"
 msgstr ""
 
-#: includes/admin.php:172
-msgid "Coming soon. The field builder will live here."
+#: includes/field-ui.php:498
+#: includes/runtime-blocks.php:231
+#: includes/runtime-page.php:111
+msgid "Remove row"
 msgstr ""
 
-#: includes/admin.php:213
-msgid "Block saved."
+#: includes/runtime-blocks.php:222
+#: includes/runtime-page.php:102
+#: includes/runtime-page.php:135
+msgid "Edit fields"
 msgstr ""
 
-#: includes/repository.php:152
-msgid "Title is required."
+#: includes/runtime-blocks.php:225
+#: includes/runtime-page.php:105
+msgid "Block fields"
 msgstr ""
 
-#: includes/repository.php:198
-msgid "Could not update block."
+#: includes/runtime-blocks.php:226
+#: includes/runtime-page.php:106
+msgid "Edit fields to configure this block."
 msgstr ""
 
-#: includes/repository.php:217
-msgid "Could not create block."
+#: includes/runtime-blocks.php:227
+#: includes/runtime-page.php:107
+#, php-format
+msgid "Error loading preview: %s"
+msgstr ""
+
+#: includes/runtime-blocks.php:228
+#: includes/runtime-page.php:108
+msgid "Block rendered as empty."
+msgstr ""
+
+#: includes/runtime-blocks.php:294
+msgid "Unknown block."
+msgstr ""
+
+#: includes/runtime-page.php:132
+msgid "Update"
+msgstr ""
+
+#: includes/runtime-site.php:11
+msgid "You do not have permission to manage site settings."
+msgstr ""
+
+#: includes/runtime-site.php:41
+msgid "Settings saved."
+msgstr ""
+
+#: includes/runtime-site.php:59
+msgid "No active site settings yet. Create one under Site Settings."
+msgstr ""
+
+#: includes/runtime-site.php:71
+msgid "Site settings"
+msgstr ""
+
+#: includes/runtime-site.php:77
+msgid "Untitled"
+msgstr ""
+
+#: includes/runtime-site.php:119
+msgid "Save Changes"
 msgstr ""
