@@ -150,6 +150,21 @@ export function equalizeColumnRun(list, columnEl) {
   run.forEach((el) => applyColumnWidthToCard(el, width));
 }
 
+function createDragHandle() {
+  const handle = el('span', {
+    className: 'bl-forms-builder__handle',
+    title: t('dragField', 'Drag to reorder'),
+    'aria-hidden': 'true',
+  });
+  const dragIcon = iconEl('drag');
+  if (dragIcon.innerHTML) {
+    handle.appendChild(dragIcon);
+  } else {
+    handle.textContent = '⋮⋮';
+  }
+  return handle;
+}
+
 function createContainerActions(onDelete, onDuplicate) {
   const duplicateBtn = el('button', {
     type: 'button',
@@ -179,19 +194,7 @@ function createContainerActions(onDelete, onDuplicate) {
     deleteBtn.textContent = '×';
   }
 
-  const handle = el('span', {
-    className: 'bl-forms-builder__handle',
-    title: t('dragField', 'Drag to reorder'),
-    'aria-hidden': 'true',
-  });
-  const dragIcon = iconEl('drag');
-  if (dragIcon.innerHTML) {
-    handle.appendChild(dragIcon);
-  } else {
-    handle.textContent = '⋮⋮';
-  }
-
-  return el('div', { className: 'bl-forms-builder__field-actions' }, [duplicateBtn, deleteBtn, handle]);
+  return el('div', { className: 'bl-forms-builder__field-actions' }, [duplicateBtn, deleteBtn]);
 }
 
 /**
@@ -341,6 +344,7 @@ export function createColumnCard(initial = {}) {
   designBtn.addEventListener('click', openDesignModal);
 
   const header = el('div', { className: 'bl-forms-builder__field-header' }, [
+    createDragHandle(),
     preview,
     el('div', { className: 'bl-forms-builder__field-meta' }, [widthBadge, designBtn, typeChip]),
     createContainerActions(
@@ -531,6 +535,7 @@ export function createSectionCard(initial = {}) {
   designBtn.addEventListener('click', openDesignModal);
 
   const header = el('div', { className: 'bl-forms-builder__field-header' }, [
+    createDragHandle(),
     labelInput,
     el('div', { className: 'bl-forms-builder__field-meta' }, [widthBadge, designBtn, typeChip]),
     createContainerActions(

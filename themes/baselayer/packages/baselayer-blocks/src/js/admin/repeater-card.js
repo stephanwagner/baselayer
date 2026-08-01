@@ -374,9 +374,10 @@ export function createRepeaterCard(initial = {}, open = false, depth = 1) {
   else handle.textContent = '⋮⋮';
 
   const header = el('div', { className: 'bl-forms-builder__field-header' }, [
+    handle,
     labelInput,
     el('div', { className: 'bl-forms-builder__field-meta' }, [settingsBtn, typeChip]),
-    el('div', { className: 'bl-forms-builder__field-actions' }, [duplicateBtn, deleteBtn, handle]),
+    el('div', { className: 'bl-forms-builder__field-actions' }, [duplicateBtn, deleteBtn]),
   ]);
 
   row.append(header, fieldsWrap);

@@ -1856,9 +1856,10 @@
     if (dragIcon.innerHTML) handle.appendChild(dragIcon);
     else handle.textContent = "\u22EE\u22EE";
     const header = el2("div", { className: "bl-forms-builder__field-header" }, [
+      handle,
       labelInput,
       el2("div", { className: "bl-forms-builder__field-meta" }, [settingsBtn, typeChip]),
-      el2("div", { className: "bl-forms-builder__field-actions" }, [duplicateBtn, deleteBtn, handle])
+      el2("div", { className: "bl-forms-builder__field-actions" }, [duplicateBtn, deleteBtn])
     ]);
     row.append(header, fieldsWrap);
     updatePreview();

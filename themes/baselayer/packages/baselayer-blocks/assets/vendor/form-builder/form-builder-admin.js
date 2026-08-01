@@ -1035,6 +1035,20 @@
     const width = equalWidthForCount(run.length);
     run.forEach((el2) => applyColumnWidthToCard(el2, width));
   }
+  function createDragHandle() {
+    const handle = el("span", {
+      className: "bl-forms-builder__handle",
+      title: t("dragField", "Drag to reorder"),
+      "aria-hidden": "true"
+    });
+    const dragIcon = iconEl("drag");
+    if (dragIcon.innerHTML) {
+      handle.appendChild(dragIcon);
+    } else {
+      handle.textContent = "\u22EE\u22EE";
+    }
+    return handle;
+  }
   function createContainerActions(onDelete, onDuplicate) {
     const duplicateBtn = el("button", {
       type: "button",
@@ -1062,18 +1076,7 @@
     } else {
       deleteBtn.textContent = "\xD7";
     }
-    const handle = el("span", {
-      className: "bl-forms-builder__handle",
-      title: t("dragField", "Drag to reorder"),
-      "aria-hidden": "true"
-    });
-    const dragIcon = iconEl("drag");
-    if (dragIcon.innerHTML) {
-      handle.appendChild(dragIcon);
-    } else {
-      handle.textContent = "\u22EE\u22EE";
-    }
-    return el("div", { className: "bl-forms-builder__field-actions" }, [duplicateBtn, deleteBtn, handle]);
+    return el("div", { className: "bl-forms-builder__field-actions" }, [duplicateBtn, deleteBtn]);
   }
   function createColumnCard(initial = {}) {
     let field = {
@@ -1203,6 +1206,7 @@
     widthBadge.addEventListener("click", openWidthModal);
     designBtn.addEventListener("click", openDesignModal);
     const header = el("div", { className: "bl-forms-builder__field-header" }, [
+      createDragHandle(),
       preview,
       el("div", { className: "bl-forms-builder__field-meta" }, [widthBadge, designBtn, typeChip]),
       createContainerActions(
@@ -1366,6 +1370,7 @@
     widthBadge.addEventListener("click", openWidthModal);
     designBtn.addEventListener("click", openDesignModal);
     const header = el("div", { className: "bl-forms-builder__field-header" }, [
+      createDragHandle(),
       labelInput,
       el("div", { className: "bl-forms-builder__field-meta" }, [widthBadge, designBtn, typeChip]),
       createContainerActions(
@@ -3896,19 +3901,22 @@
             return;
           }
           other.classList.remove("is-open");
-          const otherToggle = other.querySelector(".bl-forms-builder__field-toggle");
-          if (otherToggle) {
-            otherToggle.setAttribute("aria-expanded", "false");
-            otherToggle.setAttribute("aria-label", t("expandField", "Expand field"));
+          const otherHeader = other.querySelector(":scope > .bl-forms-builder__field-header");
+          if (otherHeader) {
+            otherHeader.setAttribute("aria-expanded", "false");
+            otherHeader.setAttribute("aria-label", t("expandField", "Expand field"));
           }
         });
       }
       row.classList.toggle("is-open", nextOpen);
-      toggle.setAttribute("aria-expanded", nextOpen ? "true" : "false");
-      toggle.setAttribute(
-        "aria-label",
-        nextOpen ? t("collapseField", "Collapse field") : t("expandField", "Expand field")
-      );
+      const currentHeader = row.querySelector(":scope > .bl-forms-builder__field-header");
+      if (currentHeader) {
+        currentHeader.setAttribute("aria-expanded", nextOpen ? "true" : "false");
+        currentHeader.setAttribute(
+          "aria-label",
+          nextOpen ? t("collapseField", "Collapse field") : t("expandField", "Expand field")
+        );
+      }
       if (nextOpen) {
         body.querySelectorAll(".bl-forms-builder__logic").forEach((node) => {
           if (typeof node.refreshLogicSources === "function") {
@@ -3917,25 +3925,14 @@
         });
       }
     };
-    const toggle = el("button", {
-      type: "button",
-      className: "bl-forms-builder__icon-btn bl-forms-builder__field-toggle",
-      "aria-expanded": open ? "true" : "false",
-      "aria-label": open ? t("collapseField", "Collapse field") : t("expandField", "Expand field"),
-      onClick: () => setOpen(!row.classList.contains("is-open"))
-    });
-    const caretIcon = iconEl("caret", "bl-forms-builder__field-toggle-icon");
-    if (caretIcon.innerHTML) {
-      toggle.appendChild(caretIcon);
-    } else {
-      toggle.textContent = "\u25BE";
-    }
     const deleteBtn = el("button", {
       type: "button",
       className: "bl-forms-builder__icon-btn bl-forms-builder__icon-btn--danger",
       title: t("delete", "Delete"),
       "aria-label": t("delete", "Delete"),
-      onClick: () => {
+      onClick: (evt) => {
+        evt.preventDefault();
+        evt.stopPropagation();
         row.remove();
         document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
       }
@@ -3951,7 +3948,11 @@
       className: "bl-forms-builder__icon-btn",
       title: t("duplicate", "Duplicate"),
       "aria-label": t("duplicate", "Duplicate"),
-      onClick: () => duplicateFieldCard(row)
+      onClick: (evt) => {
+        evt.preventDefault();
+        evt.stopPropagation();
+        duplicateFieldCard(row);
+      }
     });
     const duplicateIcon = iconEl("duplicate");
     if (duplicateIcon.innerHTML) {
@@ -4307,6 +4308,9 @@
     } else {
       handle.textContent = "\u22EE\u22EE";
     }
+    handle.addEventListener("click", (evt) => {
+      evt.stopPropagation();
+    });
     const headerMeta = el("div", { className: "bl-forms-builder__field-meta" }, [
       widthBadge,
       typeChip
@@ -4323,12 +4327,33 @@
         document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
       });
     });
-    const header = el("div", { className: "bl-forms-builder__field-header" }, [
-      toggle,
+    const header = el("div", {
+      className: "bl-forms-builder__field-header bl-forms-builder__field-header--expandable",
+      role: "button",
+      tabindex: "0",
+      "aria-expanded": open ? "true" : "false",
+      "aria-label": open ? t("collapseField", "Collapse field") : t("expandField", "Expand field")
+    }, [
+      handle,
       preview,
       headerMeta,
-      el("div", { className: "bl-forms-builder__field-actions" }, [activateBtn, duplicateBtn, deleteBtn, handle])
+      el("div", { className: "bl-forms-builder__field-actions" }, [activateBtn, duplicateBtn, deleteBtn])
     ]);
+    header.addEventListener("click", (evt) => {
+      if (evt.target.closest(
+        ".bl-forms-builder__icon-btn, .bl-forms-builder__width-badge.is-interactive, .bl-forms-builder__handle"
+      )) {
+        return;
+      }
+      setOpen(!row.classList.contains("is-open"));
+    });
+    header.addEventListener("keydown", (evt) => {
+      if (evt.target !== header || evt.key !== "Enter" && evt.key !== " ") {
+        return;
+      }
+      evt.preventDefault();
+      setOpen(!row.classList.contains("is-open"));
+    });
     updatePreview();
     renderBody();
     row.appendChild(header);
