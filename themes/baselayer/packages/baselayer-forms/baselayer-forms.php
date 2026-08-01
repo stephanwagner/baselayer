@@ -2,7 +2,7 @@
 /**
  * Plugin Name: BaseLayer Forms
  * Description: Create forms with drag-and-drop, file uploads, validation, notifications, and flexible layouts.
- * Version: 0.1.0
+ * Version: 0.2.0
  * Author: BaseLayer
  * Author URI: https://baselayerwp.com/baselayer-forms
  * Text Domain: baselayer-forms
@@ -18,7 +18,7 @@ if (defined('BL_FORMS_LOADED')) {
 }
 
 define('BL_FORMS_LOADED', true);
-define('BL_FORMS_VERSION', '1.0.0');
+define('BL_FORMS_VERSION', '0.2.0');
 define('BL_FORMS_FILE', __FILE__);
 define('BL_FORMS_PATH', trailingslashit(dirname(__FILE__)));
 define('BL_FORMS_TEXTDOMAIN', 'baselayer-forms');
