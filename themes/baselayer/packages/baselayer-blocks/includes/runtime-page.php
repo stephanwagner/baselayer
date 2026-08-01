@@ -48,7 +48,7 @@ function bl_blocks_page_definitions_for_post_type(string $post_type): array
 		}
 		$out[] = [
 			'id'          => (int) $post->ID,
-			'title'       => $post->post_title !== '' ? $post->post_title : __('Page Settings', 'baselayer-blocks'),
+			'title'       => $post->post_title !== '' ? $post->post_title : __('Content fields', 'baselayer-blocks'),
 			'description' => (string) ($config['settings']['description'] ?? ''),
 			'fields'      => $config['fields'],
 			'metaKey'     => bl_blocks_page_meta_key((int) $post->ID),
@@ -159,7 +159,7 @@ function bl_blocks_enqueue_page_editor(string $hook): void
 			'edit'        => __('Edit', 'baselayer-blocks'),
 			'save'        => __('Update', 'baselayer-blocks'),
 			'cancel'      => __('Cancel', 'baselayer-blocks'),
-			'panelTitle'  => __('Page Settings', 'baselayer-blocks'),
+			'panelTitle'  => __('Content fields', 'baselayer-blocks'),
 			'openFields'  => __('Edit fields', 'baselayer-blocks'),
 		],
 	]);

@@ -107,16 +107,16 @@ function bl_blocks_register_admin_menu(): void
 
 	add_submenu_page(
 		'bl-blocks',
-		__('Page Settings', 'baselayer-blocks'),
-		__('Page Settings', 'baselayer-blocks'),
+		__('Content fields', 'baselayer-blocks'),
+		__('Content fields', 'baselayer-blocks'),
 		$cap,
 		'edit.php?post_type=' . BL_BLOCK_POST_TYPE . '&bl_block_type=page_settings'
 	);
 
 	add_submenu_page(
 		'bl-blocks',
-		__('Site Settings', 'baselayer-blocks'),
-		__('Site Settings', 'baselayer-blocks'),
+		__('Website', 'baselayer-blocks'),
+		__('Website', 'baselayer-blocks'),
 		$cap,
 		'edit.php?post_type=' . BL_BLOCK_POST_TYPE . '&bl_block_type=site_settings'
 	);

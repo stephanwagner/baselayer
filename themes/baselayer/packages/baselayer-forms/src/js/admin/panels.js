@@ -494,11 +494,10 @@ export function createPanels(settings, builderRoot, onChange) {
   const selectionMinMsg = bindErrorMsg('selection_min_message', 'selection_min');
   const selectionMaxMsg = bindErrorMsg('selection_max_message', 'selection_max');
 
-  const rangeHelp = () =>
-    el('span', {
-      className: 'description bl-forms-builder__field-errors-help',
-      text: t('minMaxMessageHelp', 'The placeholder {limit} is replaced by the limit.'),
-    });
+  const rangeHelpText = t(
+    'minMaxMessageHelp',
+    'The placeholder {limit} is replaced by the limit.'
+  );
 
   const successRow = fieldRow(t('successMessage', 'Success message'), success);
   const successPanel = el('div', {
@@ -768,45 +767,47 @@ export function createPanels(settings, builderRoot, onChange) {
       fieldRow(t('charCountEmptyText', 'When limit is reached'), charCountEmptyText),
     ]),
     errorSection(t('textError', 'Text'), [
-      fieldRow(t('minLengthError', 'Min length'), minlengthMsg),
-      fieldRow(t('maxLengthError', 'Max length'), maxlengthMsg),
-      rangeHelp(),
+      fieldRow(t('minLengthError', 'Min length'), minlengthMsg, rangeHelpText),
+      fieldRow(t('maxLengthError', 'Max length'), maxlengthMsg, rangeHelpText),
     ]),
     errorSection(t('numberError', 'Number'), [
       fieldRow(t('invalidError', 'Invalid'), numberMsg),
-      fieldRow(t('minError', 'Minimum'), minMsg),
-      fieldRow(t('maxError', 'Maximum'), maxMsg),
-      rangeHelp(),
+      fieldRow(t('minError', 'Minimum'), minMsg, rangeHelpText),
+      fieldRow(t('maxError', 'Maximum'), maxMsg, rangeHelpText),
     ]),
     errorSection(t('emailError', 'Email'), [emailMsg]),
     errorSection(t('urlError', 'URL'), [urlMsg]),
     errorSection(t('phoneError', 'Phone'), [phoneMsg]),
     errorSection(t('dateError', 'Date'), [
       fieldRow(t('invalidError', 'Invalid'), dateMsg),
-      fieldRow(t('minError', 'Minimum'), dateMinMsg),
-      fieldRow(t('maxError', 'Maximum'), dateMaxMsg),
-      rangeHelp(),
-      fieldRow(t('dateBeforeError', 'Before related field'), dateBeforeMsg),
-      fieldRow(t('dateAfterError', 'After related field'), dateAfterMsg),
-      el('span', {
-        className: 'description bl-forms-builder__field-errors-help',
-        text: t(
+      fieldRow(t('minError', 'Minimum'), dateMinMsg, rangeHelpText),
+      fieldRow(t('maxError', 'Maximum'), dateMaxMsg, rangeHelpText),
+      fieldRow(
+        t('dateBeforeError', 'Before related field'),
+        dateBeforeMsg,
+        t(
           'dateRelationMessageHelp',
           'The placeholder {field} is replaced by the related field label.'
-        ),
-      }),
+        )
+      ),
+      fieldRow(
+        t('dateAfterError', 'After related field'),
+        dateAfterMsg,
+        t(
+          'dateRelationMessageHelp',
+          'The placeholder {field} is replaced by the related field label.'
+        )
+      ),
     ]),
     errorSection(t('timeError', 'Time'), [
       fieldRow(t('invalidError', 'Invalid'), timeMsg),
-      fieldRow(t('minError', 'Minimum'), timeMinMsg),
-      fieldRow(t('maxError', 'Maximum'), timeMaxMsg),
-      rangeHelp(),
+      fieldRow(t('minError', 'Minimum'), timeMinMsg, rangeHelpText),
+      fieldRow(t('maxError', 'Maximum'), timeMaxMsg, rangeHelpText),
     ]),
     errorSection(t('datetimeError', 'Date & time'), [
       fieldRow(t('invalidError', 'Invalid'), datetimeMsg),
-      fieldRow(t('minError', 'Minimum'), datetimeMinMsg),
-      fieldRow(t('maxError', 'Maximum'), datetimeMaxMsg),
-      rangeHelp(),
+      fieldRow(t('minError', 'Minimum'), datetimeMinMsg, rangeHelpText),
+      fieldRow(t('maxError', 'Maximum'), datetimeMaxMsg, rangeHelpText),
     ]),
     errorSection(t('fileError', 'File'), [
       fieldRow(t('invalidError', 'Invalid'), fileMsg),

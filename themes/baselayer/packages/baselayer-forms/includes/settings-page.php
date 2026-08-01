@@ -458,9 +458,8 @@ function bl_forms_render_settings_page(): void
 
 				bl_forms_settings_message_section(__('Number', 'baselayer-forms'), static function () use ($settings, $fallbacks, $range_help): void {
 					bl_forms_settings_message_field($settings, 'number_message', __('Invalid', 'baselayer-forms'), $fallbacks['number']);
-					bl_forms_settings_message_field($settings, 'min_message', __('Minimum', 'baselayer-forms'), $fallbacks['min']);
-					bl_forms_settings_message_field($settings, 'max_message', __('Maximum', 'baselayer-forms'), $fallbacks['max']);
-					bl_forms_settings_help_row($range_help);
+					bl_forms_settings_message_field($settings, 'min_message', __('Minimum', 'baselayer-forms'), $fallbacks['min'], $range_help);
+					bl_forms_settings_message_field($settings, 'max_message', __('Maximum', 'baselayer-forms'), $fallbacks['max'], $range_help);
 				});
 
 				bl_forms_settings_message_section(__('Email', 'baselayer-forms'), static function () use ($settings, $fallbacks): void {
@@ -476,27 +475,24 @@ function bl_forms_render_settings_page(): void
 				});
 
 				bl_forms_settings_message_section(__('Date', 'baselayer-forms'), static function () use ($settings, $fallbacks, $range_help): void {
+					$field_help = __('The placeholder {field} is replaced by the related field label.', 'baselayer-forms');
 					bl_forms_settings_message_field($settings, 'date_message', __('Invalid', 'baselayer-forms'), $fallbacks['date']);
-					bl_forms_settings_message_field($settings, 'date_min_message', __('Minimum', 'baselayer-forms'), $fallbacks['date_min']);
-					bl_forms_settings_message_field($settings, 'date_max_message', __('Maximum', 'baselayer-forms'), $fallbacks['date_max']);
-					bl_forms_settings_help_row($range_help);
-					bl_forms_settings_message_field($settings, 'date_before_message', __('Before related field', 'baselayer-forms'), $fallbacks['date_before']);
-					bl_forms_settings_message_field($settings, 'date_after_message', __('After related field', 'baselayer-forms'), $fallbacks['date_after']);
-					bl_forms_settings_help_row(__('The placeholder {field} is replaced by the related field label.', 'baselayer-forms'));
+					bl_forms_settings_message_field($settings, 'date_min_message', __('Minimum', 'baselayer-forms'), $fallbacks['date_min'], $range_help);
+					bl_forms_settings_message_field($settings, 'date_max_message', __('Maximum', 'baselayer-forms'), $fallbacks['date_max'], $range_help);
+					bl_forms_settings_message_field($settings, 'date_before_message', __('Before related field', 'baselayer-forms'), $fallbacks['date_before'], $field_help);
+					bl_forms_settings_message_field($settings, 'date_after_message', __('After related field', 'baselayer-forms'), $fallbacks['date_after'], $field_help);
 				});
 
 				bl_forms_settings_message_section(__('Time', 'baselayer-forms'), static function () use ($settings, $fallbacks, $range_help): void {
 					bl_forms_settings_message_field($settings, 'time_message', __('Invalid', 'baselayer-forms'), $fallbacks['time']);
-					bl_forms_settings_message_field($settings, 'time_min_message', __('Minimum', 'baselayer-forms'), $fallbacks['time_min']);
-					bl_forms_settings_message_field($settings, 'time_max_message', __('Maximum', 'baselayer-forms'), $fallbacks['time_max']);
-					bl_forms_settings_help_row($range_help);
+					bl_forms_settings_message_field($settings, 'time_min_message', __('Minimum', 'baselayer-forms'), $fallbacks['time_min'], $range_help);
+					bl_forms_settings_message_field($settings, 'time_max_message', __('Maximum', 'baselayer-forms'), $fallbacks['time_max'], $range_help);
 				});
 
 				bl_forms_settings_message_section(__('Date & time', 'baselayer-forms'), static function () use ($settings, $fallbacks, $range_help): void {
 					bl_forms_settings_message_field($settings, 'datetime_message', __('Invalid', 'baselayer-forms'), $fallbacks['datetime']);
-					bl_forms_settings_message_field($settings, 'datetime_min_message', __('Minimum', 'baselayer-forms'), $fallbacks['datetime_min']);
-					bl_forms_settings_message_field($settings, 'datetime_max_message', __('Maximum', 'baselayer-forms'), $fallbacks['datetime_max']);
-					bl_forms_settings_help_row($range_help);
+					bl_forms_settings_message_field($settings, 'datetime_min_message', __('Minimum', 'baselayer-forms'), $fallbacks['datetime_min'], $range_help);
+					bl_forms_settings_message_field($settings, 'datetime_max_message', __('Maximum', 'baselayer-forms'), $fallbacks['datetime_max'], $range_help);
 				});
 
 				bl_forms_settings_message_section(__('File', 'baselayer-forms'), static function () use ($settings, $fallbacks): void {

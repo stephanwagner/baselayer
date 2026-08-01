@@ -1,5 +1,5 @@
 /**
- * Type-aware Settings panel for Blocks / Page Settings / Site Settings definitions.
+ * Type-aware Settings panel for Blocks / Content fields / Website definitions.
  */
 const { el, t, writeConfig } = window.BlFormBuilder || {};
 

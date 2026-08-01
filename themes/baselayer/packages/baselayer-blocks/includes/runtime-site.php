@@ -56,9 +56,9 @@ function bl_blocks_render_website_page(): void
 	echo '<h1>' . esc_html__('Website', 'baselayer-blocks') . '</h1>';
 
 	if ($definitions === []) {
-		echo '<p>' . esc_html__('No active site settings yet. Create one under Site Settings.', 'baselayer-blocks') . '</p>';
+		echo '<p>' . esc_html__('No active website settings yet. Create one under Website.', 'baselayer-blocks') . '</p>';
 		echo '<p><a class="button button-primary" href="' . esc_url(admin_url('post-new.php?post_type=' . BL_BLOCK_POST_TYPE . '&bl_block_type=site_settings')) . '">';
-		echo esc_html__('Add Site Settings', 'baselayer-blocks');
+		echo esc_html__('Add fields', 'baselayer-blocks');
 		echo '</a></p></div>';
 
 		return;
@@ -68,7 +68,7 @@ function bl_blocks_render_website_page(): void
 	echo '<div class="bl-blocks-website__layout' . ($show_tabs ? '' : ' bl-blocks-website__layout--single') . '">';
 
 	if ($show_tabs) {
-		echo '<nav class="bl-blocks-website__tabs" aria-label="' . esc_attr__('Site settings', 'baselayer-blocks') . '">';
+		echo '<nav class="bl-blocks-website__tabs" aria-label="' . esc_attr__('Website', 'baselayer-blocks') . '">';
 		echo '<ul>';
 		foreach ($definitions as $def) {
 			$config = bl_blocks_get_config((int) $def->ID);

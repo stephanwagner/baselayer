@@ -1,5 +1,5 @@
 /**
- * Block editor: dynamic Blocks + Page Settings document panels.
+ * Block editor: dynamic Blocks + Content fields document panels.
  */
 import { createFieldForm, openFieldsModal } from './admin/field-form.js';
 
@@ -338,7 +338,7 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
 
           const open = () => {
             openFieldsModal({
-              title: def.title || pageI18n.panelTitle || 'Page Settings',
+              title: def.title || pageI18n.panelTitle || 'Content fields',
               fields: def.fields || [],
               values,
               onSave: (next) => {
@@ -357,7 +357,7 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
             PluginDocumentSettingPanel,
             {
               name: 'bl-blocks-page-' + def.id,
-              title: def.title || pageI18n.panelTitle || 'Page Settings',
+              title: def.title || pageI18n.panelTitle || 'Content fields',
               className: 'bl-blocks-page-settings-panel',
             },
             def.description

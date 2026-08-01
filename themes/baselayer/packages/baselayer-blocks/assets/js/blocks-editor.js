@@ -4531,7 +4531,7 @@
             const values = meta && meta[def.metaKey] || def.values || {};
             const open = () => {
               openFieldsModal({
-                title: def.title || pageI18n.panelTitle || "Page Settings",
+                title: def.title || pageI18n.panelTitle || "Content fields",
                 fields: def.fields || [],
                 values,
                 onSave: (next) => {
@@ -4549,7 +4549,7 @@
               PluginDocumentSettingPanel,
               {
                 name: "bl-blocks-page-" + def.id,
-                title: def.title || pageI18n.panelTitle || "Page Settings",
+                title: def.title || pageI18n.panelTitle || "Content fields",
                 className: "bl-blocks-page-settings-panel"
               },
               def.description ? el5("p", { className: "description" }, def.description) : null,
