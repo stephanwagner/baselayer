@@ -9,91 +9,57 @@ defined('ABSPATH') || exit;
  */
 function bl_blocks_palette_icons(): array
 {
+	if (function_exists('bl_forms_palette_icons')) {
+		return bl_forms_palette_icons();
+	}
+
+	// Theme fallback when Forms is not loaded (logical key => theme icon filename).
 	$map = [
-		'text'         => 'text-short',
-		'textarea'     => 'article',
-		'email'        => 'mail',
-		'url'          => 'link',
-		'number'       => '123',
-		'phone'        => 'phone',
-		'checkboxes'   => 'checklist',
-		'radio'        => 'radio-button-checked',
-		'select'       => 'dropdown',
-		'toggle'       => 'toggle-on',
-		'button_group' => 'button-group',
-		'terms'        => 'checkbox-checked',
-		'date'         => 'calendar',
-		'time'         => 'clock',
-		'datetime'     => 'calendar-month',
-		'file'         => 'upload',
-		'image'        => 'image',
-		'heading'      => 'format-size',
-		'text_block'   => 'paragraph',
-		'html'         => 'code-slash',
-		'divider'      => 'horizontal-rule',
-		'spacer'       => 'expand',
-		'column'       => 'view-column',
-		'section'      => 'layers',
-		'repeater'     => 'infinity',
-		'hidden'       => 'visibility-off',
-		'add'          => 'chevron-right',
-		'caret'        => 'chevron-down',
-		'panelCollapse'=> 'arrow-menu-close',
-		'panelExpand'  => 'arrow-menu-open',
-		'edit'         => 'edit',
-		'done'         => 'checkmark',
-		'trash'        => 'delete',
-		'duplicate'    => 'copy',
-		'drag'         => 'drag',
-		'design'       => 'palette',
-		'tune'         => 'tune',
-		'fullscreen'   => 'fullscreen',
+		'text'          => 'text-short',
+		'textarea'      => 'article',
+		'email'         => 'mail',
+		'url'           => 'link',
+		'number'        => '123',
+		'phone'         => 'phone',
+		'checkboxes'    => 'checklist',
+		'radio'         => 'radio-button-checked',
+		'select'        => 'dropdown',
+		'toggle'        => 'toggle-on',
+		'button_group'  => 'button-group',
+		'terms'         => 'checkbox-checked',
+		'date'          => 'calendar',
+		'time'          => 'clock',
+		'datetime'      => 'calendar-month',
+		'file'          => 'upload',
+		'image'         => 'image',
+		'heading'       => 'format-size',
+		'text_block'    => 'paragraph',
+		'html'          => 'code-slash',
+		'divider'       => 'horizontal-rule',
+		'spacer'        => 'expand',
+		'column'        => 'view-column',
+		'section'       => 'layers',
+		'repeater'      => 'infinity',
+		'hidden'        => 'visibility-off',
+		'add'           => 'chevron-right',
+		'caret'         => 'chevron-down',
+		'panelCollapse' => 'arrow-menu-close',
+		'panelExpand'   => 'arrow-menu-open',
+		'edit'          => 'edit',
+		'done'          => 'checkmark',
+		'trash'         => 'delete',
+		'duplicate'     => 'copy',
+		'drag'          => 'drag',
+		'design'        => 'palette',
+		'tune'          => 'tune',
+		'fullscreen'    => 'fullscreen',
 		'fullscreenExit'=> 'fullscreen-exit',
 	];
-
-	if (function_exists('bl_forms_palette_icons')) {
-		$icons = bl_forms_palette_icons();
-		// Blocks-only types (e.g. repeater) may be absent from Forms palette.
-		foreach (['repeater'] as $key) {
-			if (isset($icons[$key]) || !isset($map[$key])) {
-				continue;
-			}
-			$svg = '';
-			if (function_exists('bl_forms_svg_code')) {
-				$svg = bl_forms_svg_code($map[$key], [
-					'width'       => '16',
-					'height'      => '16',
-					'aria-hidden' => 'true',
-					'focusable'   => 'false',
-				]);
-			}
-			if ($svg === '' && function_exists('bl_svg_code')) {
-				$svg = bl_svg_code('icons/' . $map[$key] . '.svg', [
-					'width'       => '16',
-					'height'      => '16',
-					'aria-hidden' => 'true',
-					'focusable'   => 'false',
-				]);
-			}
-			if ($svg !== '') {
-				$icons[$key] = $svg;
-			}
-		}
-
-		return $icons;
-	}
 
 	$icons = [];
 	foreach ($map as $key => $icon_name) {
 		$svg = '';
-		if (function_exists('bl_forms_svg_code')) {
-			$svg = bl_forms_svg_code($icon_name, [
-				'width'       => '16',
-				'height'      => '16',
-				'aria-hidden' => 'true',
-				'focusable'   => 'false',
-			]);
-		} elseif (function_exists('bl_svg_code')) {
+		if (function_exists('bl_svg_code')) {
 			$svg = bl_svg_code('icons/' . $icon_name . '.svg', [
 				'width'       => '16',
 				'height'      => '16',

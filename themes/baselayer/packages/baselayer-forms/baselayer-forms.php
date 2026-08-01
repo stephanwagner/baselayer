@@ -119,6 +119,7 @@ function bl_forms_url(string $relative = ''): string
 	return $relative === '' ? bl_forms_base_url() : bl_forms_base_url() . $relative;
 }
 
+require_once BL_FORMS_PATH . 'includes/builder-icons.php';
 require_once BL_FORMS_PATH . 'includes/icons.php';
 require_once BL_FORMS_PATH . 'includes/helpers.php';
 require_once BL_FORMS_PATH . 'includes/file-types.php';

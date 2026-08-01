@@ -3,29 +3,15 @@
 defined('ABSPATH') || exit;
 
 /**
- * Absolute filesystem path to a package icon SVG.
- */
-function bl_forms_icon_path(string $icon_name): string
-{
-	$icon_name = sanitize_file_name($icon_name);
-	$icon_name = preg_replace('/\.svg$/i', '', $icon_name) ?: '';
-
-	return bl_forms_path('assets/icons/' . $icon_name . '.svg');
-}
-
-/**
- * Inline SVG markup from a package icon file.
+ * Inline SVG markup by logical key (form builder + menu icon).
  *
- * @param array<string, string|int|float|bool> $attributes
+ * @param string                                                    $icon_name Logical key (e.g. text, trash, inbox-text-fill).
+ * @param array<string, string|int|float|bool> $attributes Extra attributes merged onto the root <svg>.
  */
 function bl_forms_svg_code(string $icon_name, array $attributes = []): string
 {
-	$path = bl_forms_icon_path($icon_name);
-	if (!is_readable($path)) {
-		return '';
-	}
-
-	$svg = (string) file_get_contents($path);
+	$icons = bl_forms_builder_icon_svgs();
+	$svg = $icons[$icon_name] ?? '';
 	if ($svg === '' || stripos($svg, '<svg') === false) {
 		return '';
 	}

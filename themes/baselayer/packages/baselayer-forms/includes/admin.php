@@ -193,66 +193,66 @@ function bl_forms_save_post(int $post_id, WP_Post $post): void
 add_action('save_post', 'bl_forms_save_post', 10, 2);
 
 /**
- * Inline SVG icons for the form builder field palette.
+ * Inline SVG icons for the form builder field palette / chrome.
  *
- * @return array<string, string> field type => svg markup
+ * @return array<string, string> logical key => svg markup
  */
 function bl_forms_palette_icons(): array
 {
-	$map = [
-		'text'         => 'text-short',
-		'textarea'     => 'article',
-		'email'        => 'mail',
-		'url'          => 'link',
-		'number'       => '123',
-		'phone'        => 'phone',
-		'checkboxes'   => 'checklist',
-		'radio'        => 'radio-button-checked',
-		'select'       => 'dropdown',
-		'toggle'       => 'toggle-on',
-		'button_group' => 'button-group',
-		'terms'        => 'checkbox-checked',
-		'date'         => 'calendar',
-		'time'         => 'clock',
-		'datetime'     => 'calendar-month',
-		'file'         => 'upload',
-		'image'        => 'image',
-		'heading'      => 'format-size',
-		'text_block'   => 'paragraph',
-		'html'         => 'code-slash',
-		'divider'      => 'horizontal-rule',
-		'spacer'       => 'expand',
-		'column'       => 'view-column',
-		'section'      => 'layers',
-		'repeater'     => 'infinity',
-		'hidden'       => 'visibility-off',
-		'honeypot'     => 'bug',
-		'captcha'      => 'shield-lock',
-		'add'          => 'chevron-right',
-		'caret'        => 'chevron-down',
-		'panelCollapse'=> 'arrow-menu-close',
-		'panelExpand'  => 'arrow-menu-open',
-		'edit'         => 'edit',
-		'done'         => 'checkmark',
-		'trash'        => 'delete',
-		'duplicate'    => 'copy',
-		'drag'         => 'drag',
-		'lock'         => 'lock',
-		'shield'       => 'shield',
-		'design'       => 'palette',
-		'tune'         => 'tune',
-		'inactive'     => 'visibility-off',
-		'fullscreen'   => 'fullscreen',
-		'fullscreenExit'=> 'fullscreen-exit',
+	$keys = [
+		'text',
+		'textarea',
+		'email',
+		'url',
+		'number',
+		'phone',
+		'checkboxes',
+		'radio',
+		'select',
+		'toggle',
+		'button_group',
+		'terms',
+		'date',
+		'time',
+		'datetime',
+		'file',
+		'image',
+		'heading',
+		'text_block',
+		'html',
+		'divider',
+		'spacer',
+		'column',
+		'section',
+		'repeater',
+		'hidden',
+		'honeypot',
+		'captcha',
+		'add',
+		'caret',
+		'panelCollapse',
+		'panelExpand',
+		'edit',
+		'done',
+		'trash',
+		'duplicate',
+		'drag',
+		'lock',
+		'shield',
+		'design',
+		'tune',
+		'inactive',
+		'fullscreen',
+		'fullscreenExit',
 	];
 
 	$icons = [];
-	foreach ($map as $key => $icon_name) {
-		$svg = bl_forms_svg_code($icon_name, [
-			'width'  => '16',
-			'height' => '16',
+	foreach ($keys as $key) {
+		$svg = bl_forms_svg_code($key, [
+			'width'       => '16',
+			'height'      => '16',
 			'aria-hidden' => 'true',
-			'focusable' => 'false',
+			'focusable'   => 'false',
 		]);
 		if ($svg !== '') {
 			$icons[$key] = $svg;
