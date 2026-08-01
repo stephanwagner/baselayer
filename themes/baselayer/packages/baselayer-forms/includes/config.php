@@ -1666,7 +1666,7 @@ function bl_forms_sanitize_field($field): ?array
 		unset($out['placeholder']);
 	}
 
-	if (in_array($type, ['text', 'email', 'url', 'number', 'phone', 'textarea', 'date', 'time', 'datetime', 'file', 'image', 'toggle'], true)) {
+	if (in_array($type, ['text', 'email', 'url', 'number', 'phone', 'textarea', 'date', 'time', 'datetime', 'file', 'image', 'toggle', 'select', 'radio', 'checkboxes', 'button_group', 'terms'], true)) {
 		$out['description'] = sanitize_textarea_field((string) ($field['description'] ?? ''));
 	}
 
