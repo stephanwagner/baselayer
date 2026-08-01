@@ -1,6 +1,7 @@
 @use 'variables';
 @use 'tokens' as *;
-@use 'page-picker';
+@use '../../../../src/scss/admin/page-picker';
+@use '../../../../src/scss/admin/button-small';
 
 // Form edit screen: static side boxes (Publish is a WP default postbox).
 .post-type-bl_form,

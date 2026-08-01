@@ -1,4 +1,5 @@
-import { openPagePicker, renderPageSelectionChips } from './admin/page-picker.js';
+import { openPagePicker } from '../../../../src/js/admin/utils/page-picker.js';
+import { renderPageSelectionChips } from './admin/page-selection-chips.js';
 
 (function () {
   'use strict';

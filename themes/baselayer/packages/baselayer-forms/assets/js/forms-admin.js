@@ -4049,10 +4049,12 @@
     return row;
   }
 
-  // themes/baselayer/packages/baselayer-forms/src/js/admin/page-picker.js
+  // themes/baselayer/src/js/admin/utils/page-picker.js
   function openPagePicker(options = {}) {
     const opts = {
+      multi: false,
       selectedId: 0,
+      selectedIds: [],
       title: "Select a page",
       searchPlaceholder: "Search pages\u2026",
       empty: "No pages found.",
@@ -4068,11 +4070,21 @@
     const restNonce = opts.restNonce || api.nonce || "";
     return new Promise((resolve) => {
       let settled = false;
-      let selected = {
-        id: Number(opts.selectedId) || 0,
-        title: "",
-        url: ""
-      };
+      const selectedMap = /* @__PURE__ */ new Map();
+      if (opts.multi) {
+        const ids = Array.isArray(opts.selectedIds) ? opts.selectedIds : [];
+        ids.forEach((id) => {
+          const n = Number(id) || 0;
+          if (n > 0) {
+            selectedMap.set(n, { id: n, title: "", url: "" });
+          }
+        });
+      } else {
+        const id = Number(opts.selectedId) || 0;
+        if (id > 0) {
+          selectedMap.set(id, { id, title: "", url: "" });
+        }
+      }
       let debounceTimer = 0;
       let abort = null;
       const finish = (value) => {
@@ -4122,6 +4134,9 @@
       const list = document.createElement("div");
       list.className = "bl-page-picker__list";
       list.setAttribute("role", "listbox");
+      if (opts.multi) {
+        list.setAttribute("aria-multiselectable", "true");
+      }
       const status = document.createElement("p");
       status.className = "bl-page-picker__status description";
       status.hidden = true;
@@ -4139,11 +4154,17 @@
       selectBtn.type = "button";
       selectBtn.className = "button button-primary bl-button-small";
       selectBtn.textContent = opts.selectLabel;
-      selectBtn.disabled = !selected.id;
+      const syncSelectEnabled = () => {
+        selectBtn.disabled = selectedMap.size === 0;
+      };
+      syncSelectEnabled();
       selectBtn.addEventListener("click", () => {
-        if (selected.id) {
-          finish({ ...selected });
+        if (selectedMap.size === 0) return;
+        if (opts.multi) {
+          finish(Array.from(selectedMap.values()));
+          return;
         }
+        finish({ ...selectedMap.values().next().value });
       });
       footer.append(cancelBtn, selectBtn);
       dialog.append(header, body, footer);
@@ -4170,30 +4191,41 @@
           btn.type = "button";
           btn.className = "bl-page-picker__item";
           btn.setAttribute("role", "option");
-          const active = Number(page.id) === selected.id;
+          const id = Number(page.id) || 0;
+          const active = selectedMap.has(id);
           btn.classList.toggle("is-selected", active);
           btn.setAttribute("aria-selected", active ? "true" : "false");
+          btn.dataset.pageId = String(id);
           const title = document.createElement("span");
           title.className = "bl-page-picker__item-title";
-          title.textContent = page.title || `#${page.id}`;
+          title.textContent = page.title || `#${id}`;
           const meta = document.createElement("span");
           meta.className = "bl-page-picker__item-meta";
           meta.textContent = page.url || "";
           btn.append(title, meta);
           btn.addEventListener("click", () => {
-            selected = {
-              id: Number(page.id) || 0,
+            const item = {
+              id,
               title: page.title || "",
               url: page.url || ""
             };
+            if (opts.multi) {
+              if (selectedMap.has(id)) {
+                selectedMap.delete(id);
+              } else {
+                selectedMap.set(id, item);
+              }
+            } else {
+              selectedMap.clear();
+              selectedMap.set(id, item);
+            }
             list.querySelectorAll(".bl-page-picker__item").forEach((node) => {
-              const on = Number(node.dataset.pageId) === selected.id;
+              const on = selectedMap.has(Number(node.dataset.pageId) || 0);
               node.classList.toggle("is-selected", on);
               node.setAttribute("aria-selected", on ? "true" : "false");
             });
-            selectBtn.disabled = !selected.id;
+            syncSelectEnabled();
           });
-          btn.dataset.pageId = String(page.id);
           list.appendChild(btn);
         });
       };
@@ -4235,6 +4267,11 @@
             title: row.title && typeof row.title.rendered === "string" ? row.title.rendered.replace(/<[^>]+>/g, "") : String(row.title || ""),
             url: typeof row.link === "string" ? row.link : ""
           }));
+          pages.forEach((page) => {
+            if (selectedMap.has(page.id)) {
+              selectedMap.set(page.id, page);
+            }
+          });
           renderRows(pages);
         } catch (err) {
           if (err && err.name === "AbortError") {

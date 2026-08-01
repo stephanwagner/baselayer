@@ -1,5 +1,5 @@
 import { el, t, flattenFields, iconEl } from './dom.js';
-import { openPagePicker } from './page-picker.js';
+import { openPagePicker } from '../../../../../src/js/admin/utils/page-picker.js';
 
 function fieldRow(label, control, help = '') {
   const children = [

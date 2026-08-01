@@ -6,10 +6,13 @@
  * @example
  * import { openPagePicker } from '../../admin/utils/page-picker.js';
  * openPagePicker({ selectedId: 12 }).then((page) => { ... });
+ * openPagePicker({ multi: true, selectedIds: [1, 2] }).then((pages) => { ... });
  * // or window.baselayerOpenPagePicker({ ... })
  *
  * @param {object} options
+ * @param {boolean} [options.multi=false]
  * @param {number} [options.selectedId=0]
+ * @param {number[]} [options.selectedIds=[]]
  * @param {string} [options.title]
  * @param {string} [options.searchPlaceholder]
  * @param {string} [options.empty]
@@ -18,11 +21,13 @@
  * @param {string} [options.selectLabel]
  * @param {string} [options.restUrl] - Defaults to wpApiSettings.root + 'wp/v2/pages'
  * @param {string} [options.restNonce] - Defaults to wpApiSettings.nonce
- * @returns {Promise<{ id: number, title: string, url: string }|null>}
+ * @returns {Promise<{id:number,title:string,url:string}|Array<{id:number,title:string,url:string}>|null>}
  */
 export function openPagePicker(options = {}) {
   const opts = {
+    multi: false,
     selectedId: 0,
+    selectedIds: [],
     title: 'Select a page',
     searchPlaceholder: 'Search pages…',
     empty: 'No pages found.',
@@ -42,11 +47,24 @@ export function openPagePicker(options = {}) {
 
   return new Promise((resolve) => {
     let settled = false;
-    let selected = {
-      id: Number(opts.selectedId) || 0,
-      title: '',
-      url: '',
-    };
+    /** @type {Map<number, {id:number,title:string,url:string}>} */
+    const selectedMap = new Map();
+
+    if (opts.multi) {
+      const ids = Array.isArray(opts.selectedIds) ? opts.selectedIds : [];
+      ids.forEach((id) => {
+        const n = Number(id) || 0;
+        if (n > 0) {
+          selectedMap.set(n, { id: n, title: '', url: '' });
+        }
+      });
+    } else {
+      const id = Number(opts.selectedId) || 0;
+      if (id > 0) {
+        selectedMap.set(id, { id, title: '', url: '' });
+      }
+    }
+
     let debounceTimer = 0;
     let abort = null;
 
@@ -104,6 +122,9 @@ export function openPagePicker(options = {}) {
     const list = document.createElement('div');
     list.className = 'bl-page-picker__list';
     list.setAttribute('role', 'listbox');
+    if (opts.multi) {
+      list.setAttribute('aria-multiselectable', 'true');
+    }
 
     const status = document.createElement('p');
     status.className = 'bl-page-picker__status description';
@@ -125,11 +146,19 @@ export function openPagePicker(options = {}) {
     selectBtn.type = 'button';
     selectBtn.className = 'button button-primary bl-button-small';
     selectBtn.textContent = opts.selectLabel;
-    selectBtn.disabled = !selected.id;
+
+    const syncSelectEnabled = () => {
+      selectBtn.disabled = selectedMap.size === 0;
+    };
+    syncSelectEnabled();
+
     selectBtn.addEventListener('click', () => {
-      if (selected.id) {
-        finish({ ...selected });
+      if (selectedMap.size === 0) return;
+      if (opts.multi) {
+        finish(Array.from(selectedMap.values()));
+        return;
       }
+      finish({ ...selectedMap.values().next().value });
     });
 
     footer.append(cancelBtn, selectBtn);
@@ -160,13 +189,15 @@ export function openPagePicker(options = {}) {
         btn.type = 'button';
         btn.className = 'bl-page-picker__item';
         btn.setAttribute('role', 'option');
-        const active = Number(page.id) === selected.id;
+        const id = Number(page.id) || 0;
+        const active = selectedMap.has(id);
         btn.classList.toggle('is-selected', active);
         btn.setAttribute('aria-selected', active ? 'true' : 'false');
+        btn.dataset.pageId = String(id);
 
         const title = document.createElement('span');
         title.className = 'bl-page-picker__item-title';
-        title.textContent = page.title || `#${page.id}`;
+        title.textContent = page.title || `#${id}`;
 
         const meta = document.createElement('span');
         meta.className = 'bl-page-picker__item-meta';
@@ -174,19 +205,28 @@ export function openPagePicker(options = {}) {
 
         btn.append(title, meta);
         btn.addEventListener('click', () => {
-          selected = {
-            id: Number(page.id) || 0,
+          const item = {
+            id,
             title: page.title || '',
             url: page.url || '',
           };
+          if (opts.multi) {
+            if (selectedMap.has(id)) {
+              selectedMap.delete(id);
+            } else {
+              selectedMap.set(id, item);
+            }
+          } else {
+            selectedMap.clear();
+            selectedMap.set(id, item);
+          }
           list.querySelectorAll('.bl-page-picker__item').forEach((node) => {
-            const on = Number(node.dataset.pageId) === selected.id;
+            const on = selectedMap.has(Number(node.dataset.pageId) || 0);
             node.classList.toggle('is-selected', on);
             node.setAttribute('aria-selected', on ? 'true' : 'false');
           });
-          selectBtn.disabled = !selected.id;
+          syncSelectEnabled();
         });
-        btn.dataset.pageId = String(page.id);
         list.appendChild(btn);
       });
     };
@@ -230,11 +270,18 @@ export function openPagePicker(options = {}) {
         const data = await res.json();
         const pages = (Array.isArray(data) ? data : []).map((row) => ({
           id: Number(row.id) || 0,
-          title: row.title && typeof row.title.rendered === 'string'
-            ? row.title.rendered.replace(/<[^>]+>/g, '')
-            : String(row.title || ''),
+          title:
+            row.title && typeof row.title.rendered === 'string'
+              ? row.title.rendered.replace(/<[^>]+>/g, '')
+              : String(row.title || ''),
           url: typeof row.link === 'string' ? row.link : '',
         }));
+        // Fill titles for already-selected IDs when they appear in results.
+        pages.forEach((page) => {
+          if (selectedMap.has(page.id)) {
+            selectedMap.set(page.id, page);
+          }
+        });
         renderRows(pages);
       } catch (err) {
         if (err && err.name === 'AbortError') {

@@ -1,5 +1,5 @@
 (() => {
-  // themes/baselayer/packages/baselayer-editorial/src/js/admin/page-picker.js
+  // themes/baselayer/src/js/admin/utils/page-picker.js
   function openPagePicker(options = {}) {
     const opts = {
       multi: false,
@@ -243,6 +243,8 @@
     });
   }
   window.baselayerOpenPagePicker = openPagePicker;
+
+  // themes/baselayer/packages/baselayer-editorial/src/js/admin/page-selection-chips.js
   function renderPageSelectionChips(container, pages, options = {}) {
     if (!container) {
       return;

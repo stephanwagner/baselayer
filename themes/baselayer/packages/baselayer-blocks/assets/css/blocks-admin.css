@@ -1,3 +1,16 @@
+.wp-core-ui .button.bl-button-small,
+.button.bl-button-small {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  height: 36px;
+  padding-top: 0;
+  padding-bottom: 0;
+  line-height: normal;
+}
+
 body.post-php.post-type-bl_block .page-title-action,
 body.post-new-php.post-type-bl_block .page-title-action {
   display: none !important;
