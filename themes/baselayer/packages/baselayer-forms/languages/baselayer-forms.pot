@@ -460,7 +460,7 @@ msgid "Conditional logic"
 msgstr ""
 
 #: includes/admin.php:467
-msgid "Show this field only when the conditions below are met. Rules in a group use AND; groups use OR."
+msgid "Show this field only when the conditions below are met."
 msgstr ""
 
 #: includes/admin.php:468

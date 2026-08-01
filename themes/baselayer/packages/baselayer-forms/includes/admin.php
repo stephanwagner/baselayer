@@ -477,7 +477,7 @@ function bl_forms_admin_enqueue(string $hook): void
 				'fieldTabGeneralEmpty' => __('No general settings for this field.', 'baselayer-forms'),
 				'fieldTabAdvancedEmpty' => __('No advanced settings for this field.', 'baselayer-forms'),
 				'logicEnable'       => __('Conditional logic', 'baselayer-forms'),
-				'logicHelp'         => __('Show this field only when the conditions below are met. Rules in a group use AND; groups use OR.', 'baselayer-forms'),
+				'logicHelp'         => __('Show this field only when the conditions below are met.', 'baselayer-forms'),
 				'logicShowIf'       => __('Show this field if', 'baselayer-forms'),
 				'logicOrIf'         => __('or if', 'baselayer-forms'),
 				'logicAnd'          => __('and', 'baselayer-forms'),

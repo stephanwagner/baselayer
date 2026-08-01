@@ -465,8 +465,8 @@ msgid "Conditional logic"
 msgstr "Bedingte Logik"
 
 #: includes/admin.php:467
-msgid "Show this field only when the conditions below are met. Rules in a group use AND; groups use OR."
-msgstr "Dieses Feld nur anzeigen, wenn die folgenden Bedingungen erfüllt sind. Regeln in einer Gruppe verwenden UND; Gruppen verwenden ODER."
+msgid "Show this field only when the conditions below are met."
+msgstr "Dieses Feld nur anzeigen, wenn die folgenden Bedingungen erfüllt sind."
 
 #: includes/admin.php:468
 msgid "Show this field if"

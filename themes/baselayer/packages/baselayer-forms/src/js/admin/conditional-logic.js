@@ -576,7 +576,7 @@ export function createConditionalLogicEditor(
       className: 'description bl-forms-builder__logic-help',
       text: t(
         'logicHelp',
-        'Show this field only when the conditions below are met. Rules in a group use AND; groups use OR.'
+        'Show this field only when the conditions below are met.'
       ),
     }),
     groupsMount,
