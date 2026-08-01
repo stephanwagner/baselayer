@@ -1,6 +1,8 @@
 /**
  * Media library picker for Blocks image/file field values.
  */
+import { createSortable } from '../../../../../src/js/admin/canvas-builder/sortable.js';
+
 function el(tag, props = {}, children = []) {
   const node = document.createElement(tag);
   Object.entries(props).forEach(([key, value]) => {
@@ -168,6 +170,41 @@ function buildMediaCard(item, kind, onRemove) {
 }
 
 /**
+ * Enable drag-reorder for multi-select media lists.
+ *
+ * @param {HTMLElement} preview
+ * @param {{ getSelected: () => Array<{id:number}>, setSelected: (next: Array) => void, onChange?: () => void }} api
+ * @returns {import('sortablejs').default|null}
+ */
+function bindMediaSortable(preview, api) {
+  if (!preview) return null;
+  preview.classList.add('is-sortable');
+  return createSortable(preview, {
+    animation: 150,
+    draggable: '.bl-blocks-fields__media-card',
+    filter: '.bl-blocks-fields__media-remove',
+    preventOnFilter: true,
+    ghostClass: 'is-dragging-ghost',
+    chosenClass: 'is-dragging-chosen',
+    onEnd: () => {
+      const ids = Array.from(preview.querySelectorAll('.bl-blocks-fields__media-card[data-media-id]'))
+        .map((node) => Number(node.getAttribute('data-media-id')) || 0)
+        .filter((id) => id > 0);
+      const byId = new Map(api.getSelected().map((item) => [item.id, item]));
+      const next = [];
+      ids.forEach((id) => {
+        const item = byId.get(id);
+        if (item) next.push(item);
+      });
+      api.setSelected(next);
+      if (typeof api.onChange === 'function') {
+        api.onChange();
+      }
+    },
+  });
+}
+
+/**
  * @param {object} field
  * @param {unknown} current
  * @returns {HTMLElement & { getMediaValue: () => number|number[] }}
@@ -187,7 +224,7 @@ export function createMediaPickerControl(field, current) {
   }));
 
   const preview = el('div', {
-    className: 'bl-blocks-fields__media-preview',
+    className: 'bl-blocks-fields__media-preview' + (multiple ? ' is-sortable' : ''),
     dataset: { blMediaPreview: '' },
   });
   const empty = el('span', {
@@ -235,6 +272,7 @@ export function createMediaPickerControl(field, current) {
   );
 
   let frame = null;
+  let sortable = null;
 
   const syncChrome = () => {
     const has = selected.length > 0;
@@ -272,6 +310,18 @@ export function createMediaPickerControl(field, current) {
     });
     syncChrome();
   };
+
+  if (multiple) {
+    sortable = bindMediaSortable(preview, {
+      getSelected: () => selected,
+      setSelected: (next) => {
+        selected = next;
+      },
+      onChange: () => {
+        wrap.dispatchEvent(new Event('change', { bubbles: true }));
+      },
+    });
+  }
 
   const hydrate = () => {
     const ids = selected.map((s) => s.id);
@@ -462,6 +512,19 @@ export function bindMediaPickers(root = document) {
       syncChrome();
       syncInputs();
     };
+
+    if (multiple) {
+      preview.classList.add('is-sortable');
+      bindMediaSortable(preview, {
+        getSelected: () => selected,
+        setSelected: (next) => {
+          selected = next;
+        },
+        onChange: () => {
+          syncInputs();
+        },
+      });
+    }
 
     const openFrame = () => {
       if (typeof wp === 'undefined' || !wp.media) return;

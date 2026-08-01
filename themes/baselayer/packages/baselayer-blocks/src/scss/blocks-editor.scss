@@ -210,6 +210,22 @@
   gap: 8px;
 }
 
+.bl-blocks-fields__media-preview.is-sortable .bl-blocks-fields__media-card {
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.bl-blocks-fields__media-card.is-dragging-chosen {
+  opacity: 0.92;
+}
+
+.bl-blocks-fields__media-card.is-dragging-ghost {
+  opacity: 0.4;
+}
+
 .bl-blocks-fields__media-card {
   display: flex;
   align-items: center;
