@@ -1,7 +1,7 @@
 import { el, t, typeLabel, uid, iconEl, uniqueFieldName, slugifyOption, readConfig, flattenFields, fieldIsActive, cloneFieldData } from './dom.js';
 import { createColumnCard, createSectionCard, serializeLayoutRow, equalizeColumnRun } from './layout.js';
 import { createConditionalLogicEditor, readConditionalLogicFromDom, normalizeConditionalLogic } from './conditional-logic.js';
-import { getFieldCardHooks } from './config.js';
+import { getFieldCardHooks, useMediaLibraryFields } from './config.js';
 
 const WIDTH_PRESETS = [
   { value: '100', label: '100%' },
@@ -287,17 +287,28 @@ function convertFieldType(field, nextType) {
   }
 
   if (nextType === 'file' || nextType === 'image') {
-    if (field.preview === undefined) {
-      field.preview = true;
-    }
-    if (field.upload_style === undefined) {
-      field.upload_style = 'modern';
-    }
-    if (nextType === 'image' && !String(field.extensions || '').trim()) {
-      field.extensions = 'jpg, jpeg, png, webp, gif, heic, avif';
-    }
-    if (field.extensions === undefined) {
-      field.extensions = '';
+    if (useMediaLibraryFields()) {
+      delete field.upload_style;
+      delete field.preview;
+      delete field.extensions;
+      delete field.max_size_mb;
+      delete field.button_text;
+      if (field.multiple && (field.max_files == null || field.max_files === '')) {
+        field.max_files = 10;
+      }
+    } else {
+      if (field.preview === undefined) {
+        field.preview = true;
+      }
+      if (field.upload_style === undefined) {
+        field.upload_style = 'modern';
+      }
+      if (nextType === 'image' && !String(field.extensions || '').trim()) {
+        field.extensions = 'jpg, jpeg, png, webp, gif, heic, avif';
+      }
+      if (field.extensions === undefined) {
+        field.extensions = '';
+      }
     }
   } else {
     delete field.extensions;
@@ -1764,10 +1775,19 @@ function createMaxFilesControl(field) {
   input.addEventListener('blur', sync);
 
   return el('div', { className: 'bl-forms-builder__max-files' }, [
-    el('p', {}, [el('label', { text: t('maxFiles', 'Maximum files') }), input]),
+    el('p', {}, [
+      el('label', {
+        text: useMediaLibraryFields()
+          ? t('maxMediaItems', 'Maximum items')
+          : t('maxFiles', 'Maximum files'),
+      }),
+      input,
+    ]),
     el('p', {
       className: 'description',
-      text: t('maxFilesHelp', 'Maximum number of files visitors can upload.'),
+      text: useMediaLibraryFields()
+        ? t('maxMediaHelp', 'Maximum number of items that can be selected from the media library.')
+        : t('maxFilesHelp', 'Maximum number of files visitors can upload.'),
     }),
   ]);
 }
@@ -2741,16 +2761,31 @@ export function serializeRow(row) {
     data.allow_target = Boolean(q('[data-bl-allow-target]')?.checked);
   }
   if (type === 'file' || type === 'image') {
-    data.extensions = q('[data-bl-extensions]')?.value?.trim() || '';
-    data.upload_style = q('[data-bl-upload-style]')?.value === 'classic' ? 'classic' : 'modern';
-    data.preview =
-      data.upload_style === 'modern' ? Boolean(q('[data-bl-preview]')?.checked) : false;
-    data.button_text = q('[data-bl-upload-button]')?.value?.trim() || '';
-    data.max_size_mb = q('[data-bl-max-size-mb]')?.value?.trim() || '';
-    if (data.multiple) {
-      const rawMax = q('[data-bl-max-files]')?.value?.trim();
-      const parsed = parseInt(rawMax, 10);
-      data.max_files = Number.isFinite(parsed) && parsed >= 1 ? Math.min(50, parsed) : 10;
+    if (useMediaLibraryFields()) {
+      if (data.multiple) {
+        const rawMax = q('[data-bl-max-files]')?.value?.trim();
+        const parsed = parseInt(rawMax, 10);
+        data.max_files = Number.isFinite(parsed) && parsed >= 1 ? Math.min(50, parsed) : 10;
+      } else {
+        delete data.max_files;
+      }
+      delete data.extensions;
+      delete data.upload_style;
+      delete data.preview;
+      delete data.button_text;
+      delete data.max_size_mb;
+    } else {
+      data.extensions = q('[data-bl-extensions]')?.value?.trim() || '';
+      data.upload_style = q('[data-bl-upload-style]')?.value === 'classic' ? 'classic' : 'modern';
+      data.preview =
+        data.upload_style === 'modern' ? Boolean(q('[data-bl-preview]')?.checked) : false;
+      data.button_text = q('[data-bl-upload-button]')?.value?.trim() || '';
+      data.max_size_mb = q('[data-bl-max-size-mb]')?.value?.trim() || '';
+      if (data.multiple) {
+        const rawMax = q('[data-bl-max-files]')?.value?.trim();
+        const parsed = parseInt(rawMax, 10);
+        data.max_files = Number.isFinite(parsed) && parsed >= 1 ? Math.min(50, parsed) : 10;
+      }
     }
   }
   if (AUTOCOMPLETE_TYPES.includes(type)) {
@@ -3166,7 +3201,7 @@ export function createFieldCard(initial, open = false) {
     if (field.type !== 'hidden' && field.type !== 'divider' && field.type !== 'spacer') {
       appearanceSections.add(createWidthControl(field, updatePreview));
     }
-    if (field.type === 'file' || field.type === 'image') {
+    if ((field.type === 'file' || field.type === 'image') && !useMediaLibraryFields()) {
       appearanceSections.add(createUploadAppearanceControls(field));
     }
     if (field.type === 'radio' || field.type === 'checkboxes') {
@@ -3294,11 +3329,17 @@ export function createFieldCard(initial, open = false) {
       }
 
       if (field.type === 'file' || field.type === 'image') {
-        advancedSections.add(createExtensionsControl(field));
-        advancedSections.add(createMaxSizeControl(field));
-        advancedSections.add(createUploadButtonControl(field));
-        if (field.multiple) {
-          advancedSections.add(createMaxFilesControl(field));
+        if (useMediaLibraryFields()) {
+          if (field.multiple) {
+            advancedSections.add(createMaxFilesControl(field));
+          }
+        } else {
+          advancedSections.add(createExtensionsControl(field));
+          advancedSections.add(createMaxSizeControl(field));
+          advancedSections.add(createUploadButtonControl(field));
+          if (field.multiple) {
+            advancedSections.add(createMaxFilesControl(field));
+          }
         }
       }
 
@@ -3485,7 +3526,9 @@ export function createFieldCard(initial, open = false) {
         } else if (field.type === 'select') {
           multipleLabel = t('selectMultiple', 'Allow multiple selection');
         } else if (field.type === 'file' || field.type === 'image') {
-          multipleLabel = t('allowMultipleFiles', 'Allow multiple files');
+          multipleLabel = useMediaLibraryFields()
+            ? t('allowMultipleMedia', 'Allow multiple')
+            : t('allowMultipleFiles', 'Allow multiple files');
         } else if (field.type === 'page') {
           multipleLabel = t('pageMultiple', 'Allow multiple pages');
         }

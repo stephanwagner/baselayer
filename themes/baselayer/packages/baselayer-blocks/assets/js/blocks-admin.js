@@ -1954,6 +1954,14 @@
   var EXCLUDED_TYPES = /* @__PURE__ */ new Set(["honeypot", "captcha", "terms"]);
   var BLOCKS_POPULAR_TYPES = ["text", "textarea", "select", "toggle"];
   var BLOCKS_PALETTE = PALETTE_SECTIONS.map((section) => {
+    if (section.id === "files") {
+      return {
+        id: "media",
+        headingKey: "paletteSectionMedia",
+        headingFallback: "Media",
+        types: ["image", "file"]
+      };
+    }
     let types = section.id === "popular" ? BLOCKS_POPULAR_TYPES : (section.types || []).filter((type) => !EXCLUDED_TYPES.has(type));
     if (section.id === "advanced") {
       types = [...types.filter((type) => type !== "repeater"), "repeater"];
@@ -1998,6 +2006,9 @@
       root.textContent = "Form builder failed to load.";
       return;
     }
+    if (typeof FormBuilder.configure === "function") {
+      FormBuilder.configure({ mediaLibraryFields: true });
+    }
     root.replaceChildren();
     root.classList.add("bl-forms-builder--tabs");
     let settingsState = { ...initial.settings || {} };
@@ -2033,6 +2044,13 @@
         data.name = uniqueFieldName2(data.label || data.name || data.type || "field", data.id || "");
       } else if (data.name) {
         data.name = uniqueFieldName2(data.name, data.id || "");
+      }
+      if (data.type === "file" || data.type === "image") {
+        delete data.upload_style;
+        delete data.preview;
+        delete data.extensions;
+        delete data.max_size_mb;
+        delete data.button_text;
       }
       return data;
     };
@@ -3131,7 +3149,7 @@
     });
   }
 
-  // themes/baselayer/packages/baselayer-blocks/src/js/admin/field-form.js
+  // themes/baselayer/packages/baselayer-blocks/src/js/admin/media-field.js
   function el6(tag, props = {}, children = []) {
     const node = document.createElement(tag);
     Object.entries(props).forEach(([key, value]) => {
@@ -3153,6 +3171,418 @@
     return node;
   }
   function i18n3(key, fallback) {
+    const dict = window.blBlocksFieldUi && window.blBlocksFieldUi.i18n || window.blBlocksEditor && window.blBlocksEditor.i18n || window.blBlocksPage && window.blBlocksPage.i18n || window.blBlocksAdmin && window.blBlocksAdmin.i18n || {};
+    return dict[key] || fallback || key;
+  }
+  function normalizeAttachmentIds(current, multiple) {
+    if (multiple) {
+      const list = Array.isArray(current) ? current : current != null && current !== "" ? [current] : [];
+      return list.map((id) => Number(id) || 0).filter((id) => id > 0);
+    }
+    const one = Number(Array.isArray(current) ? current[0] : current) || 0;
+    return one > 0 ? [one] : [];
+  }
+  function attachmentFromJson(json) {
+    const sizes = json.sizes || {};
+    const url = sizes.thumbnail && sizes.thumbnail.url || sizes.medium && sizes.medium.url || json.url || json.icon || "";
+    return {
+      id: Number(json.id) || 0,
+      url: String(url || ""),
+      filename: String(json.filename || json.title || "#" + (json.id || "")),
+      mime: String(json.mime || json.mime_type || ""),
+      type: String(json.type || ""),
+      alt: String(json.alt || json.alt_text || json.title || "")
+    };
+  }
+  function fetchAttachment(id) {
+    return new Promise((resolve) => {
+      if (!id || typeof wp === "undefined" || !wp.media || !wp.media.attachment) {
+        resolve({ id, url: "", filename: "#" + id, mime: "", type: "", alt: "" });
+        return;
+      }
+      const att = wp.media.attachment(id);
+      const done = () => {
+        try {
+          resolve(attachmentFromJson(att.toJSON()));
+        } catch (e) {
+          resolve({ id, url: "", filename: "#" + id, mime: "", type: "", alt: "" });
+        }
+      };
+      if (att.get("url")) {
+        done();
+        return;
+      }
+      att.fetch().done(done).fail(() => {
+        resolve({ id, url: "", filename: "#" + id, mime: "", type: "", alt: "" });
+      });
+    });
+  }
+  function extensionBadge(filename) {
+    const parts = String(filename || "").split(".");
+    const ext = parts.length > 1 ? parts.pop().toUpperCase() : "FILE";
+    return ext.slice(0, 4);
+  }
+  function buildMediaCard(item, kind, onRemove) {
+    const isImage = item.type === "image" || kind === "image";
+    const card = el6("div", {
+      className: "bl-blocks-fields__media-card" + (isImage ? " is-image" : " is-file"),
+      dataset: { mediaId: String(item.id) }
+    });
+    if (isImage && item.url) {
+      card.appendChild(
+        el6("img", {
+          className: "bl-blocks-fields__media-thumb",
+          src: item.url,
+          alt: item.alt || ""
+        })
+      );
+    } else if (isImage) {
+      card.appendChild(
+        el6("span", {
+          className: "bl-blocks-fields__media-badge",
+          text: "IMG",
+          "aria-hidden": "true"
+        })
+      );
+    } else {
+      card.appendChild(
+        el6("span", {
+          className: "bl-blocks-fields__media-badge",
+          text: extensionBadge(item.filename),
+          "aria-hidden": "true"
+        })
+      );
+    }
+    card.appendChild(
+      el6("span", {
+        className: "bl-blocks-fields__media-name",
+        text: item.filename,
+        title: item.filename
+      })
+    );
+    const removeBtn = el6("button", {
+      type: "button",
+      className: "button-link bl-blocks-fields__media-remove",
+      text: "\xD7",
+      title: i18n3("removeMedia", "Remove"),
+      "aria-label": i18n3("removeMedia", "Remove"),
+      dataset: { blMediaRemove: String(item.id) }
+    });
+    removeBtn.addEventListener("click", (evt) => {
+      evt.preventDefault();
+      evt.stopPropagation();
+      onRemove(item.id);
+    });
+    card.appendChild(removeBtn);
+    return card;
+  }
+  function createMediaPickerControl(field, current) {
+    const kind = field.type === "image" ? "image" : "file";
+    const multiple = !!field.multiple;
+    const maxFiles = Math.max(1, Math.min(50, parseInt(field.max_files, 10) || 10));
+    let selected = normalizeAttachmentIds(current, multiple).map((id) => ({
+      id,
+      url: "",
+      filename: "#" + id,
+      mime: "",
+      type: kind === "image" ? "image" : "",
+      alt: ""
+    }));
+    const preview = el6("div", {
+      className: "bl-blocks-fields__media-preview",
+      dataset: { blMediaPreview: "" }
+    });
+    const empty = el6("span", {
+      className: "description bl-blocks-fields__media-empty",
+      text: kind === "image" ? multiple ? i18n3("chooseImagesHelp", "Select one or more images.") : i18n3("chooseImageHelp", "Select an image.") : multiple ? i18n3("chooseFilesHelp", "Select one or more files.") : i18n3("chooseFileHelp", "Select a file."),
+      dataset: { blMediaEmpty: "" }
+    });
+    const chooseBtn = el6("button", {
+      type: "button",
+      className: "button bl-button-small",
+      text: "",
+      dataset: { blMediaChoose: "" }
+    });
+    const clearBtn = el6("button", {
+      type: "button",
+      className: "button-link",
+      text: i18n3("clearMedia", "Clear"),
+      dataset: { blMediaClear: "" }
+    });
+    const actions = el6("div", { className: "bl-blocks-fields__media-actions" }, [
+      chooseBtn,
+      clearBtn
+    ]);
+    const wrap = el6(
+      "div",
+      {
+        className: "bl-blocks-fields__media-picker",
+        dataset: {
+          blBlocksMediaPicker: "",
+          mediaKind: kind,
+          multiple: multiple ? "1" : "0"
+        }
+      },
+      [preview, empty, actions]
+    );
+    let frame = null;
+    const syncChrome = () => {
+      const has = selected.length > 0;
+      empty.hidden = has;
+      clearBtn.hidden = !has;
+      if (kind === "image") {
+        chooseBtn.textContent = has ? multiple ? i18n3("changeImages", "Change images") : i18n3("changeImage", "Change image") : multiple ? i18n3("chooseImages", "Choose images") : i18n3("chooseImage", "Choose image");
+      } else {
+        chooseBtn.textContent = has ? multiple ? i18n3("changeFiles", "Change files") : i18n3("changeFile", "Change file") : multiple ? i18n3("chooseFiles", "Choose files") : i18n3("chooseFile", "Choose file");
+      }
+    };
+    const renderPreview = () => {
+      preview.replaceChildren();
+      selected.forEach((item) => {
+        preview.appendChild(
+          buildMediaCard(item, kind, (id) => {
+            selected = selected.filter((s) => s.id !== id);
+            renderPreview();
+            wrap.dispatchEvent(new Event("change", { bubbles: true }));
+          })
+        );
+      });
+      syncChrome();
+    };
+    const hydrate = () => {
+      const ids = selected.map((s) => s.id);
+      if (ids.length === 0) {
+        renderPreview();
+        return;
+      }
+      Promise.all(ids.map((id) => fetchAttachment(id))).then((items) => {
+        selected = items.filter((item) => item.id > 0);
+        renderPreview();
+      });
+    };
+    const openFrame = () => {
+      if (typeof wp === "undefined" || !wp.media) {
+        return;
+      }
+      if (frame) {
+        frame.open();
+        return;
+      }
+      const opts = {
+        title: kind === "image" ? multiple ? i18n3("mediaPickerTitleImages", "Select images") : i18n3("mediaPickerTitleImage", "Select image") : multiple ? i18n3("mediaPickerTitleFiles", "Select files") : i18n3("mediaPickerTitleFile", "Select file"),
+        button: {
+          text: i18n3("selectMedia", "Select")
+        },
+        multiple
+      };
+      if (kind === "image") {
+        opts.library = { type: "image" };
+      }
+      frame = wp.media(opts);
+      frame.on("select", () => {
+        const selection = frame.state().get("selection");
+        if (!selection) return;
+        let items = selection.map((model) => attachmentFromJson(model.toJSON()));
+        if (multiple) {
+          items = items.slice(0, maxFiles);
+        } else {
+          items = items.slice(0, 1);
+        }
+        selected = items.filter((item) => item.id > 0);
+        renderPreview();
+        wrap.dispatchEvent(new Event("change", { bubbles: true }));
+      });
+      frame.on("open", () => {
+        const selection = frame.state().get("selection");
+        if (!selection) return;
+        selection.reset();
+        selected.forEach((item) => {
+          const att = wp.media.attachment(item.id);
+          selection.add(att);
+          att.fetch();
+        });
+      });
+      frame.open();
+    };
+    chooseBtn.addEventListener("click", (evt) => {
+      evt.preventDefault();
+      openFrame();
+    });
+    clearBtn.addEventListener("click", (evt) => {
+      evt.preventDefault();
+      selected = [];
+      renderPreview();
+      wrap.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    const control = (
+      /** @type {any} */
+      wrap
+    );
+    control.getMediaValue = () => {
+      const ids = selected.map((s) => s.id).filter((id) => id > 0);
+      if (multiple) return ids;
+      return ids[0] || 0;
+    };
+    hydrate();
+    return control;
+  }
+  function bindMediaPickers(root = document) {
+    const scope = root && root.querySelectorAll ? root : document;
+    scope.querySelectorAll("[data-bl-blocks-media-picker]").forEach((wrap) => {
+      if (!(wrap instanceof HTMLElement) || wrap.dataset.blMediaBound === "1") return;
+      wrap.dataset.blMediaBound = "1";
+      const kind = wrap.dataset.mediaKind === "image" ? "image" : "file";
+      const multiple = wrap.dataset.multiple === "1";
+      const inputName = wrap.dataset.inputName || "";
+      const maxFiles = Math.max(1, Math.min(50, parseInt(wrap.dataset.maxFiles || "10", 10) || 10));
+      const preview = wrap.querySelector("[data-bl-media-preview]");
+      const empty = wrap.querySelector("[data-bl-media-empty]");
+      const chooseBtn = wrap.querySelector("[data-bl-media-choose]");
+      const clearBtn = wrap.querySelector("[data-bl-media-clear]");
+      const inputsHost = wrap.querySelector("[data-bl-media-inputs]");
+      if (!preview || !chooseBtn || !inputsHost || !inputName) return;
+      let selected = [];
+      inputsHost.querySelectorAll('input[type="hidden"]').forEach((input) => {
+        const id = Number(input.value) || 0;
+        if (id <= 0) return;
+        selected.push({
+          id,
+          url: input.getAttribute("data-url") || "",
+          filename: input.getAttribute("data-filename") || "#" + id,
+          mime: input.getAttribute("data-mime") || "",
+          type: input.getAttribute("data-type") || (kind === "image" ? "image" : ""),
+          alt: input.getAttribute("data-alt") || ""
+        });
+      });
+      let frame = null;
+      const syncInputs = () => {
+        inputsHost.replaceChildren();
+        if (selected.length === 0) {
+          if (multiple) {
+            inputsHost.appendChild(el6("input", { type: "hidden", name: inputName + "[]", value: "" }));
+          } else {
+            inputsHost.appendChild(el6("input", { type: "hidden", name: inputName, value: "" }));
+          }
+          return;
+        }
+        selected.forEach((item) => {
+          const name = multiple ? inputName + "[]" : inputName;
+          const input = el6("input", {
+            type: "hidden",
+            name,
+            value: String(item.id)
+          });
+          input.setAttribute("data-url", item.url || "");
+          input.setAttribute("data-filename", item.filename || "");
+          input.setAttribute("data-mime", item.mime || "");
+          input.setAttribute("data-type", item.type || "");
+          input.setAttribute("data-alt", item.alt || "");
+          inputsHost.appendChild(input);
+        });
+      };
+      const syncChrome = () => {
+        const has = selected.length > 0;
+        if (empty) empty.hidden = has;
+        if (clearBtn) clearBtn.hidden = !has;
+        if (kind === "image") {
+          chooseBtn.textContent = has ? multiple ? i18n3("changeImages", "Change images") : i18n3("changeImage", "Change image") : multiple ? i18n3("chooseImages", "Choose images") : i18n3("chooseImage", "Choose image");
+        } else {
+          chooseBtn.textContent = has ? multiple ? i18n3("changeFiles", "Change files") : i18n3("changeFile", "Change file") : multiple ? i18n3("chooseFiles", "Choose files") : i18n3("chooseFile", "Choose file");
+        }
+      };
+      const renderPreview = () => {
+        preview.replaceChildren();
+        selected.forEach((item) => {
+          preview.appendChild(
+            buildMediaCard(item, kind, (id) => {
+              selected = selected.filter((s) => s.id !== id);
+              renderPreview();
+            })
+          );
+        });
+        syncChrome();
+        syncInputs();
+      };
+      const openFrame = () => {
+        if (typeof wp === "undefined" || !wp.media) return;
+        if (frame) {
+          frame.open();
+          return;
+        }
+        const opts = {
+          title: kind === "image" ? multiple ? i18n3("mediaPickerTitleImages", "Select images") : i18n3("mediaPickerTitleImage", "Select image") : multiple ? i18n3("mediaPickerTitleFiles", "Select files") : i18n3("mediaPickerTitleFile", "Select file"),
+          button: { text: i18n3("selectMedia", "Select") },
+          multiple
+        };
+        if (kind === "image") {
+          opts.library = { type: "image" };
+        }
+        frame = wp.media(opts);
+        frame.on("select", () => {
+          const selection = frame.state().get("selection");
+          if (!selection) return;
+          let items = selection.map((model) => attachmentFromJson(model.toJSON()));
+          items = multiple ? items.slice(0, maxFiles) : items.slice(0, 1);
+          selected = items.filter((item) => item.id > 0);
+          renderPreview();
+        });
+        frame.on("open", () => {
+          const selection = frame.state().get("selection");
+          if (!selection) return;
+          selection.reset();
+          selected.forEach((item) => {
+            const att = wp.media.attachment(item.id);
+            selection.add(att);
+            att.fetch();
+          });
+        });
+        frame.open();
+      };
+      chooseBtn.addEventListener("click", (evt) => {
+        evt.preventDefault();
+        openFrame();
+      });
+      if (clearBtn) {
+        clearBtn.addEventListener("click", (evt) => {
+          evt.preventDefault();
+          selected = [];
+          renderPreview();
+        });
+      }
+      const needsHydrate = selected.some((s) => !s.url);
+      if (needsHydrate) {
+        Promise.all(selected.map((s) => fetchAttachment(s.id))).then((items) => {
+          selected = items.filter((item) => item.id > 0);
+          renderPreview();
+        });
+      } else {
+        renderPreview();
+      }
+    });
+  }
+
+  // themes/baselayer/packages/baselayer-blocks/src/js/admin/field-form.js
+  function el7(tag, props = {}, children = []) {
+    const node = document.createElement(tag);
+    Object.entries(props).forEach(([key, value]) => {
+      if (value == null || value === false) return;
+      if (key === "className") node.className = value;
+      else if (key === "text") node.textContent = value;
+      else if (key === "html") node.innerHTML = value;
+      else if (key === "dataset") Object.assign(node.dataset, value);
+      else if (key.startsWith("on") && typeof value === "function") {
+        node.addEventListener(key.slice(2).toLowerCase(), value);
+      } else if (key === "checked") node.checked = Boolean(value);
+      else if (key === "value") node.value = value === true ? "" : String(value);
+      else node.setAttribute(key, value === true ? "" : String(value));
+    });
+    (Array.isArray(children) ? children : [children]).forEach((child) => {
+      if (child == null || child === false) return;
+      node.appendChild(typeof child === "string" ? document.createTextNode(child) : child);
+    });
+    return node;
+  }
+  function i18n4(key, fallback) {
     const dict = window.blBlocksFieldUi && window.blBlocksFieldUi.i18n || window.blBlocksEditor && window.blBlocksEditor.i18n || window.blBlocksPage && window.blBlocksPage.i18n || {};
     return dict[key] || fallback || key;
   }
@@ -3205,6 +3635,9 @@
     if (type === "page" && control && typeof control.getPageValue === "function") {
       return control.getPageValue();
     }
+    if ((type === "image" || type === "file") && control && typeof control.getMediaValue === "function") {
+      return control.getMediaValue();
+    }
     if (type === "link" && control && typeof control.getLinkValue === "function") {
       return control.getLinkValue();
     }
@@ -3244,24 +3677,24 @@
     const name = field.name || "";
     if (!name) return null;
     const current = values[name] !== void 0 && values[name] !== null ? values[name] : field.default_value != null ? field.default_value : "";
-    const row = el6("div", {
+    const row = el7("div", {
       className: "bl-blocks-fields__row",
       dataset: { fieldName: name }
     });
     const id = "bl-blocks-ui-" + name.replace(/[^a-z0-9_-]/gi, "_") + "-" + Math.random().toString(36).slice(2, 7);
     if (!field.hide_label && type !== "toggle" && type !== "terms") {
-      const label = el6("label", { className: "bl-blocks-fields__label", text: field.label || name });
+      const label = el7("label", { className: "bl-blocks-fields__label", text: field.label || name });
       label.setAttribute("for", id);
       if (field.required) {
         label.appendChild(document.createTextNode(" "));
-        label.appendChild(el6("span", { className: "required", text: "*" }));
+        label.appendChild(el7("span", { className: "required", text: "*" }));
       }
       row.appendChild(label);
     }
     let control = null;
     const options = Array.isArray(field.options) ? field.options : [];
     if (type === "textarea") {
-      control = el6("textarea", {
+      control = el7("textarea", {
         className: "widefat",
         id,
         rows: field.rows || 4,
@@ -3270,24 +3703,24 @@
       if (field.placeholder) control.placeholder = field.placeholder;
     } else if (type === "select") {
       const multiple = !!field.multiple;
-      control = el6("select", { className: "widefat", id });
+      control = el7("select", { className: "widefat", id });
       if (multiple) control.multiple = true;
       if (!multiple) {
-        control.appendChild(el6("option", { value: "", text: "\u2014" }));
+        control.appendChild(el7("option", { value: "", text: "\u2014" }));
       }
       const selected = multiple ? (Array.isArray(current) ? current : []).map(String) : [String(current == null ? "" : current)];
       options.forEach((opt) => {
         const ov = String(opt.value ?? "");
-        const option = el6("option", { value: ov, text: opt.label || ov });
+        const option = el7("option", { value: ov, text: opt.label || ov });
         if (selected.includes(ov)) option.selected = true;
         control.appendChild(option);
       });
     } else if (type === "radio" || type === "button_group") {
-      control = el6("div", { className: "bl-blocks-fields__choices" });
+      control = el7("div", { className: "bl-blocks-fields__choices" });
       options.forEach((opt, i) => {
         const ov = String(opt.value ?? "");
         const oid = id + "-" + i;
-        const input = el6("input", {
+        const input = el7("input", {
           type: "radio",
           name: id,
           id: oid,
@@ -3295,49 +3728,52 @@
           checked: String(current) === ov
         });
         control.appendChild(
-          el6("label", { className: "bl-blocks-fields__choice" }, [
+          el7("label", { className: "bl-blocks-fields__choice" }, [
             input,
             document.createTextNode(" " + (opt.label || ov))
           ])
         );
       });
     } else if (type === "checkboxes") {
-      control = el6("div", { className: "bl-blocks-fields__choices" });
+      control = el7("div", { className: "bl-blocks-fields__choices" });
       const list = Array.isArray(current) ? current.map(String) : [];
       options.forEach((opt, i) => {
         const ov = String(opt.value ?? "");
         const oid = id + "-" + i;
-        const input = el6("input", {
+        const input = el7("input", {
           type: "checkbox",
           id: oid,
           value: ov,
           checked: list.includes(ov)
         });
         control.appendChild(
-          el6("label", { className: "bl-blocks-fields__choice" }, [
+          el7("label", { className: "bl-blocks-fields__choice" }, [
             input,
             document.createTextNode(" " + (opt.label || ov))
           ])
         );
       });
     } else if (type === "toggle" || type === "terms") {
-      const input = el6("input", {
+      const input = el7("input", {
         type: "checkbox",
         id,
         checked: !!current && current !== "0" && current !== ""
       });
-      control = el6("label", { className: "bl-blocks-fields__toggle" }, [
+      control = el7("label", { className: "bl-blocks-fields__toggle" }, [
         input,
         document.createTextNode(" " + (field.label || name))
       ]);
     } else if (type === "hidden") {
-      control = el6("input", {
+      control = el7("input", {
         type: "hidden",
         id,
         value: current == null ? "" : String(current)
       });
     } else if (type === "page") {
       control = createPagePickerControl(field, current);
+      if (control) control.id = id;
+    } else if (type === "image" || type === "file") {
+      control = createMediaPickerControl(field, current);
       if (control) control.id = id;
     } else if (type === "link") {
       control = createLinkControl(field, current);
@@ -3351,7 +3787,7 @@
       } else if (type === "datetime") {
         inputType = "datetime-local";
       }
-      control = el6("input", {
+      control = el7("input", {
         className: "widefat",
         type: inputType,
         id,
@@ -3368,7 +3804,7 @@
       controls.push({ field, control, type });
     }
     if (field.description) {
-      row.appendChild(el6("p", { className: "description", text: field.description }));
+      row.appendChild(el7("p", { className: "description", text: field.description }));
     }
     return row;
   }
@@ -3381,7 +3817,7 @@
     if (compact) {
       rootAttrs.dataset.layout = "compact";
     }
-    const root = el6("div", rootAttrs);
+    const root = el7("div", rootAttrs);
     const entries = [];
     const walk = (list, parent, valueMap) => {
       (list || []).forEach((field) => {
@@ -3397,10 +3833,10 @@
           if (field.css_class) {
             layoutClass.push(String(field.css_class).trim());
           }
-          const wrap = el6("div", { className: layoutClass.filter(Boolean).join(" ") });
+          const wrap = el7("div", { className: layoutClass.filter(Boolean).join(" ") });
           const showTitle = type !== "section" || field.show_title !== false && field.show_title !== 0 && field.show_title !== "0";
           if (type === "section" && showTitle && field.label) {
-            wrap.appendChild(el6("h3", { className: "bl-blocks-fields__section-title", text: field.label }));
+            wrap.appendChild(el7("h3", { className: "bl-blocks-fields__section-title", text: field.label }));
           }
           parent.appendChild(wrap);
           walk(field.children || [], wrap, valueMap);
@@ -3408,14 +3844,14 @@
         }
         if (type === "heading") {
           if (field.label) {
-            parent.appendChild(el6("h4", { className: "bl-blocks-fields__heading", text: field.label }));
+            parent.appendChild(el7("h4", { className: "bl-blocks-fields__heading", text: field.label }));
           }
           return;
         }
         if (type === "text_block" || type === "html") {
           const content = field.default_value || field.content || field.label || "";
           if (content) {
-            parent.appendChild(el6("div", { className: "bl-blocks-fields__static", html: content }));
+            parent.appendChild(el7("div", { className: "bl-blocks-fields__static", html: content }));
           }
           return;
         }
@@ -3459,7 +3895,7 @@
     const children = Array.isArray(field.children) ? field.children : [];
     const minRows = Math.max(0, parseInt(field.min_rows, 10) || 0);
     const maxRows = Math.max(0, parseInt(field.max_rows, 10) || 0);
-    const buttonLabel = field.button_label || i18n3("addRow", "Add row");
+    const buttonLabel = field.button_label || i18n4("addRow", "Add row");
     const design = compact ? "standard" : ["standard", "outline", "card"].includes(field.design) ? field.design : "standard";
     const showTitle = field.show_title !== false && field.show_title !== 0 && field.show_title !== "0";
     let rows = Array.isArray(valueMap[name]) ? valueMap[name].slice() : [];
@@ -3470,30 +3906,30 @@
     if (field.css_class) {
       classNames.push(String(field.css_class).trim());
     }
-    const wrap = el6("div", {
+    const wrap = el7("div", {
       className: classNames.filter(Boolean).join(" "),
       dataset: { fieldName: name }
     });
     if (showTitle && !field.hide_label && field.label) {
-      wrap.appendChild(el6("div", { className: "bl-blocks-fields__label", text: field.label }));
+      wrap.appendChild(el7("div", { className: "bl-blocks-fields__label", text: field.label }));
     }
     if (field.description) {
-      wrap.appendChild(el6("p", { className: "description", text: field.description }));
+      wrap.appendChild(el7("p", { className: "description", text: field.description }));
     }
-    const rowsEl = el6("div", { className: "bl-blocks-fields__repeater-rows" });
+    const rowsEl = el7("div", { className: "bl-blocks-fields__repeater-rows" });
     const rowForms = [];
     const syncRowTitles = () => {
       Array.from(rowsEl.children).forEach((rowEl, i) => {
         const title = rowEl.querySelector(".bl-blocks-fields__repeater-row-title");
         if (title) {
-          const template = i18n3("rowLabel", "Row %d");
+          const template = i18n4("rowLabel", "Row %d");
           title.textContent = template.replace("%d", String(i + 1));
         }
       });
     };
     const canAdd = () => maxRows === 0 || rowForms.length < maxRows;
     const canRemove = () => rowForms.length > minRows;
-    const addBtn = el6("button", {
+    const addBtn = el7("button", {
       type: "button",
       className: "button bl-blocks-fields__repeater-add",
       text: buttonLabel
@@ -3502,14 +3938,14 @@
       addBtn.disabled = !canAdd();
     };
     const mountRow = (rowValues) => {
-      const rowEl = el6("div", { className: "bl-blocks-fields__repeater-row" });
-      const header = el6("div", { className: "bl-blocks-fields__repeater-row-header" }, [
-        el6("span", { className: "bl-blocks-fields__repeater-row-title", text: "" })
+      const rowEl = el7("div", { className: "bl-blocks-fields__repeater-row" });
+      const header = el7("div", { className: "bl-blocks-fields__repeater-row-header" }, [
+        el7("span", { className: "bl-blocks-fields__repeater-row-title", text: "" })
       ]);
-      const removeBtn = el6("button", {
+      const removeBtn = el7("button", {
         type: "button",
         className: "button-link-delete bl-blocks-fields__repeater-remove",
-        text: i18n3("removeRow", "Remove row")
+        text: i18n4("removeRow", "Remove row")
       });
       header.appendChild(removeBtn);
       rowEl.appendChild(header);
@@ -3554,10 +3990,10 @@
     return wrap;
   }
   function openFieldsModal(opts) {
-    const title = opts.title || i18n3("edit", "Edit");
+    const title = opts.title || i18n4("edit", "Edit");
     const form = createFieldForm(opts.fields || [], opts.values || {});
-    const overlay = el6("div", { className: "bl-blocks-modal-overlay", role: "presentation" });
-    const dialog = el6("div", {
+    const overlay = el7("div", { className: "bl-blocks-modal-overlay", role: "presentation" });
+    const dialog = el7("div", {
       className: "bl-blocks-modal",
       role: "dialog",
       "aria-modal": "true",
@@ -3573,28 +4009,28 @@
         close();
       }
     };
-    const header = el6("div", { className: "bl-blocks-modal__header" }, [
-      el6("h2", { className: "bl-blocks-modal__title", text: title }),
-      el6("button", {
+    const header = el7("div", { className: "bl-blocks-modal__header" }, [
+      el7("h2", { className: "bl-blocks-modal__title", text: title }),
+      el7("button", {
         type: "button",
         className: "bl-blocks-modal__close",
         text: "\xD7",
-        "aria-label": i18n3("close", "Close"),
+        "aria-label": i18n4("close", "Close"),
         onClick: close
       })
     ]);
-    const body = el6("div", { className: "bl-blocks-modal__body" }, [form.root]);
-    const footer = el6("div", { className: "bl-blocks-modal__footer" }, [
-      el6("button", {
+    const body = el7("div", { className: "bl-blocks-modal__body" }, [form.root]);
+    const footer = el7("div", { className: "bl-blocks-modal__footer" }, [
+      el7("button", {
         type: "button",
         className: "button",
-        text: i18n3("cancel", "Cancel"),
+        text: i18n4("cancel", "Cancel"),
         onClick: close
       }),
-      el6("button", {
+      el7("button", {
         type: "button",
         className: "button button-primary",
-        text: i18n3("save", "Save"),
+        text: i18n4("save", "Save"),
         onClick: () => {
           if (typeof opts.onSave === "function") {
             opts.onSave(form.getValues());
@@ -3621,12 +4057,14 @@
     openFieldsModal,
     bindPagePickers,
     bindLinkFields,
+    bindMediaPickers,
     bindHttpsUrlFields
   };
   if (typeof document !== "undefined") {
     document.addEventListener("DOMContentLoaded", () => {
       bindPagePickers(document);
       bindLinkFields(document);
+      bindMediaPickers(document);
       bindHttpsUrlFields(document);
     });
   }

@@ -86,10 +86,11 @@ function bl_blocks_enqueue_page_editor(string $hook): void
 		return;
 	}
 
+	wp_enqueue_media();
 	wp_enqueue_script(
 		'bl-blocks-editor',
 		$asset['uri'],
-		['wp-plugins', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data', 'wp-i18n', 'wp-block-editor', 'wp-blocks', 'wp-compose', 'wp-api-fetch'],
+		['wp-plugins', 'wp-edit-post', 'wp-element', 'wp-components', 'wp-data', 'wp-i18n', 'wp-block-editor', 'wp-blocks', 'wp-compose', 'wp-api-fetch', 'media-editor', 'media-views'],
 		$asset['ver'],
 		true
 	);
@@ -138,7 +139,7 @@ function bl_blocks_enqueue_page_editor(string $hook): void
 			'linkDestPhone'          => __('Phone number', 'baselayer-blocks'),
 			'linkText'               => __('Link text', 'baselayer-blocks'),
 			'linkOpenNewTab'         => __('Open in new tab', 'baselayer-blocks'),
-		],
+		] + (function_exists('bl_blocks_media_field_i18n') ? bl_blocks_media_field_i18n() : []),
 	]);
 
 	$post_id = isset($_GET['post']) ? (int) $_GET['post'] : 0;

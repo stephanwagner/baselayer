@@ -981,6 +981,48 @@ function bl_blocks_sanitize_values(array $fields, $raw): array
 			continue;
 		}
 
+		if ($type === 'image' || $type === 'file') {
+			$ids = [];
+			if (is_array($raw_value)) {
+				foreach ($raw_value as $item) {
+					$n = absint($item);
+					if ($n <= 0 || get_post_type($n) !== 'attachment') {
+						continue;
+					}
+					if ($type === 'image') {
+						$mime = (string) get_post_mime_type($n);
+						if ($mime === '' || strpos($mime, 'image/') !== 0) {
+							continue;
+						}
+					}
+					$ids[] = $n;
+				}
+			} elseif (is_scalar($raw_value) && (string) $raw_value !== '') {
+				$n = absint($raw_value);
+				if ($n > 0 && get_post_type($n) === 'attachment') {
+					if ($type === 'image') {
+						$mime = (string) get_post_mime_type($n);
+						if ($mime !== '' && strpos($mime, 'image/') === 0) {
+							$ids[] = $n;
+						}
+					} else {
+						$ids[] = $n;
+					}
+				}
+			}
+			$ids = array_values(array_unique($ids));
+			if (!empty($field['multiple'])) {
+				$max_files = max(1, min(50, (int) ($field['max_files'] ?? 10)));
+				if (count($ids) > $max_files) {
+					$ids = array_slice($ids, 0, $max_files);
+				}
+				$values[$name] = $ids;
+			} else {
+				$values[$name] = $ids[0] ?? 0;
+			}
+			continue;
+		}
+
 		if ($type === 'link') {
 			$values[$name] = bl_blocks_sanitize_link_value($field, $raw_value);
 			continue;

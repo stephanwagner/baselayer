@@ -373,6 +373,11 @@ function bl_blocks_render_admin_fields_walk(array $fields, array $values, string
 				bl_blocks_render_admin_page_field($field, $value, $input_name);
 				break;
 
+			case 'image':
+			case 'file':
+				bl_blocks_render_admin_media_field($field, $value, $input_name);
+				break;
+
 			case 'link':
 				bl_blocks_render_admin_link_field($field, $value, $input_name);
 				break;
@@ -540,6 +545,181 @@ function bl_blocks_render_admin_page_field(array $field, $value, string $input_n
 }
 
 /**
+ * Summaries for media library attachment IDs.
+ *
+ * @param list<int> $ids
+ * @return array<int, array{url: string, filename: string, mime: string, type: string, alt: string}>
+ */
+function bl_blocks_media_picker_summaries(array $ids): array
+{
+	$out = [];
+	foreach ($ids as $id) {
+		$id = absint($id);
+		if ($id <= 0) {
+			continue;
+		}
+		$url = wp_get_attachment_image_url($id, 'thumbnail');
+		if (!$url) {
+			$url = (string) wp_get_attachment_url($id);
+		}
+		$file = get_attached_file($id);
+		$filename = $file ? wp_basename($file) : get_the_title($id);
+		$mime = (string) get_post_mime_type($id);
+		$type = $mime !== '' && strpos($mime, 'image/') === 0 ? 'image' : 'file';
+		$out[$id] = [
+			'url'      => $url ? (string) $url : '',
+			'filename' => $filename !== '' ? (string) $filename : ('#' . $id),
+			'mime'     => $mime,
+			'type'     => $type,
+			'alt'      => (string) get_post_meta($id, '_wp_attachment_image_alt', true),
+		];
+	}
+
+	return $out;
+}
+
+/**
+ * Compact media library picker for image/file fields.
+ *
+ * @param array<string, mixed> $field
+ * @param mixed                $value
+ */
+function bl_blocks_render_admin_media_field(array $field, $value, string $input_name): void
+{
+	$kind = (($field['type'] ?? '') === 'image') ? 'image' : 'file';
+	$multiple = !empty($field['multiple']);
+	$max_files = max(1, min(50, (int) ($field['max_files'] ?? 10)));
+	$ids = [];
+	if ($multiple) {
+		$list = is_array($value) ? $value : ((is_scalar($value) && (string) $value !== '') ? [$value] : []);
+		foreach ($list as $item) {
+			$n = absint($item);
+			if ($n > 0) {
+				$ids[] = $n;
+			}
+		}
+	} else {
+		$n = absint(is_array($value) ? ($value[0] ?? 0) : $value);
+		if ($n > 0) {
+			$ids[] = $n;
+		}
+	}
+	$ids = array_values(array_unique($ids));
+	$summaries = bl_blocks_media_picker_summaries($ids);
+
+	if ($kind === 'image') {
+		$choose_label = $ids !== []
+			? ($multiple ? __('Change images', 'baselayer-blocks') : __('Change image', 'baselayer-blocks'))
+			: ($multiple ? __('Choose images', 'baselayer-blocks') : __('Choose image', 'baselayer-blocks'));
+		$empty_help = $multiple
+			? __('Select one or more images.', 'baselayer-blocks')
+			: __('Select an image.', 'baselayer-blocks');
+	} else {
+		$choose_label = $ids !== []
+			? ($multiple ? __('Change files', 'baselayer-blocks') : __('Change file', 'baselayer-blocks'))
+			: ($multiple ? __('Choose files', 'baselayer-blocks') : __('Choose file', 'baselayer-blocks'));
+		$empty_help = $multiple
+			? __('Select one or more files.', 'baselayer-blocks')
+			: __('Select a file.', 'baselayer-blocks');
+	}
+
+	printf(
+		'<div class="bl-blocks-fields__media-picker" data-bl-blocks-media-picker data-media-kind="%s" data-multiple="%s" data-max-files="%s" data-input-name="%s">',
+		esc_attr($kind),
+		esc_attr($multiple ? '1' : '0'),
+		esc_attr((string) $max_files),
+		esc_attr($input_name)
+	);
+	echo '<div class="bl-blocks-fields__media-preview" data-bl-media-preview>';
+	foreach ($ids as $aid) {
+		$meta = $summaries[$aid] ?? [
+			'url'      => '',
+			'filename' => '#' . $aid,
+			'mime'     => '',
+			'type'     => $kind === 'image' ? 'image' : 'file',
+			'alt'      => '',
+		];
+		$is_image = ($meta['type'] ?? '') === 'image' || $kind === 'image';
+		echo '<div class="bl-blocks-fields__media-card' . ($is_image ? ' is-image' : ' is-file') . '">';
+		if ($is_image && ($meta['url'] ?? '') !== '') {
+			printf(
+				'<img class="bl-blocks-fields__media-thumb" src="%s" alt="%s">',
+				esc_url($meta['url']),
+				esc_attr((string) ($meta['alt'] ?? ''))
+			);
+		} else {
+			$parts = explode('.', (string) ($meta['filename'] ?? ''));
+			$ext = count($parts) > 1 ? strtoupper((string) array_pop($parts)) : 'FILE';
+			$ext = substr($ext, 0, 4);
+			printf(
+				'<span class="bl-blocks-fields__media-badge" aria-hidden="true">%s</span>',
+				esc_html($ext !== '' ? $ext : 'FILE')
+			);
+		}
+		printf(
+			'<span class="bl-blocks-fields__media-name" title="%s">%s</span>',
+			esc_attr((string) ($meta['filename'] ?? '')),
+			esc_html((string) ($meta['filename'] ?? ''))
+		);
+		printf(
+			'<button type="button" class="button-link bl-blocks-fields__media-remove" data-bl-media-remove="%s" title="%s" aria-label="%s">×</button>',
+			esc_attr((string) $aid),
+			esc_attr__('Remove', 'baselayer-blocks'),
+			esc_attr__('Remove', 'baselayer-blocks')
+		);
+		echo '</div>';
+	}
+	echo '</div>';
+	printf(
+		'<span class="description bl-blocks-fields__media-empty" data-bl-media-empty%s>%s</span>',
+		$ids !== [] ? ' hidden' : '',
+		esc_html($empty_help)
+	);
+	echo '<div class="bl-blocks-fields__media-actions">';
+	printf(
+		'<button type="button" class="button bl-button-small" data-bl-media-choose>%s</button>',
+		esc_html($choose_label)
+	);
+	printf(
+		'<button type="button" class="button-link" data-bl-media-clear%s>%s</button>',
+		$ids === [] ? ' hidden' : '',
+		esc_html__('Clear', 'baselayer-blocks')
+	);
+	echo '</div>';
+	echo '<div data-bl-media-inputs>';
+	if ($ids === []) {
+		if ($multiple) {
+			printf('<input type="hidden" name="%s[]" value="">', esc_attr($input_name));
+		} else {
+			printf('<input type="hidden" name="%s" value="">', esc_attr($input_name));
+		}
+	} else {
+		foreach ($ids as $aid) {
+			$name = $multiple ? $input_name . '[]' : $input_name;
+			$meta = $summaries[$aid] ?? [
+				'url'      => '',
+				'filename' => '',
+				'mime'     => '',
+				'type'     => '',
+				'alt'      => '',
+			];
+			printf(
+				'<input type="hidden" name="%s" value="%s" data-url="%s" data-filename="%s" data-mime="%s" data-type="%s" data-alt="%s">',
+				esc_attr($name),
+				esc_attr((string) $aid),
+				esc_attr((string) ($meta['url'] ?? '')),
+				esc_attr((string) ($meta['filename'] ?? '')),
+				esc_attr((string) ($meta['mime'] ?? '')),
+				esc_attr((string) ($meta['type'] ?? '')),
+				esc_attr((string) ($meta['alt'] ?? ''))
+			);
+		}
+	}
+	echo '</div>';
+	echo '</div>';
+}
+
+/**
  * Render a link field control for PHP admin (Website settings).
  *
  * @param array<string, mixed> $field
@@ -675,6 +855,36 @@ function bl_blocks_read_request_values(array $fields, $raw): array
 }
 
 /**
+ * Shared i18n strings for media library picker controls.
+ *
+ * @return array<string, string>
+ */
+function bl_blocks_media_field_i18n(): array
+{
+	return [
+		'chooseImage'              => __('Choose image', 'baselayer-blocks'),
+		'chooseImages'             => __('Choose images', 'baselayer-blocks'),
+		'changeImage'              => __('Change image', 'baselayer-blocks'),
+		'changeImages'             => __('Change images', 'baselayer-blocks'),
+		'chooseFile'               => __('Choose file', 'baselayer-blocks'),
+		'chooseFiles'              => __('Choose files', 'baselayer-blocks'),
+		'changeFile'               => __('Change file', 'baselayer-blocks'),
+		'changeFiles'              => __('Change files', 'baselayer-blocks'),
+		'clearMedia'               => __('Clear', 'baselayer-blocks'),
+		'chooseImageHelp'          => __('Select an image.', 'baselayer-blocks'),
+		'chooseImagesHelp'         => __('Select one or more images.', 'baselayer-blocks'),
+		'chooseFileHelp'           => __('Select a file.', 'baselayer-blocks'),
+		'chooseFilesHelp'          => __('Select one or more files.', 'baselayer-blocks'),
+		'mediaPickerTitleImage'    => __('Select image', 'baselayer-blocks'),
+		'mediaPickerTitleImages'   => __('Select images', 'baselayer-blocks'),
+		'mediaPickerTitleFile'     => __('Select file', 'baselayer-blocks'),
+		'mediaPickerTitleFiles'    => __('Select files', 'baselayer-blocks'),
+		'selectMedia'              => __('Select', 'baselayer-blocks'),
+		'removeMedia'              => __('Remove', 'baselayer-blocks'),
+	];
+}
+
+/**
  * Shared admin field UI assets (modal + site page).
  */
 function bl_blocks_enqueue_field_ui_assets(): void
@@ -685,6 +895,7 @@ function bl_blocks_enqueue_field_ui_assets(): void
 	}
 	$done = true;
 
+	wp_enqueue_media();
 	bl_blocks_enqueue_style('bl-blocks-admin', 'blocks-admin');
 	bl_blocks_enqueue_script('bl-blocks-admin', 'blocks-admin', [], true);
 
@@ -725,6 +936,6 @@ function bl_blocks_enqueue_field_ui_assets(): void
 			'linkDestPhone'          => __('Phone number', 'baselayer-blocks'),
 			'linkText'               => __('Link text', 'baselayer-blocks'),
 			'linkOpenNewTab'         => __('Open in new tab', 'baselayer-blocks'),
-		],
+		] + bl_blocks_media_field_i18n(),
 	]);
 }

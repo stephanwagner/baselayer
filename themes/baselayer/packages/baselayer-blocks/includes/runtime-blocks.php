@@ -260,11 +260,26 @@ function bl_blocks_register_dynamic_blocks(): void
 				'linkDestPhone'          => __('Phone number', 'baselayer-blocks'),
 				'linkText'               => __('Link text', 'baselayer-blocks'),
 				'linkOpenNewTab'         => __('Open in new tab', 'baselayer-blocks'),
-			],
+			] + (function_exists('bl_blocks_media_field_i18n') ? bl_blocks_media_field_i18n() : []),
 		]);
 	}
 }
 add_action('init', 'bl_blocks_register_dynamic_blocks', 30);
+
+/**
+ * Ensure media modal is available when editing Blocks in the block editor.
+ */
+function bl_blocks_enqueue_block_editor_media(): void
+{
+	if (!function_exists('bl_blocks_active_block_payloads')) {
+		return;
+	}
+	if (bl_blocks_active_block_payloads() === []) {
+		return;
+	}
+	wp_enqueue_media();
+}
+add_action('enqueue_block_editor_assets', 'bl_blocks_enqueue_block_editor_media');
 
 /**
  * Editor preview REST: only name + values (avoids core block-renderer attribute schema fights).

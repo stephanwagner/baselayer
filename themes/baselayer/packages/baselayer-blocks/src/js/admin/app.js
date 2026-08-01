@@ -27,6 +27,15 @@ const EXCLUDED_TYPES = new Set(['honeypot', 'captcha', 'terms']);
 const BLOCKS_POPULAR_TYPES = ['text', 'textarea', 'select', 'toggle'];
 
 const BLOCKS_PALETTE = PALETTE_SECTIONS.map((section) => {
+  // Media library fields replace Forms Uploads, in the same palette slot (after Date & time).
+  if (section.id === 'files') {
+    return {
+      id: 'media',
+      headingKey: 'paletteSectionMedia',
+      headingFallback: 'Media',
+      types: ['image', 'file'],
+    };
+  }
   let types =
     section.id === 'popular'
       ? BLOCKS_POPULAR_TYPES
@@ -84,6 +93,10 @@ export function mountApp(root, initial, definitionType = 'block') {
     return;
   }
 
+  if (typeof FormBuilder.configure === 'function') {
+    FormBuilder.configure({ mediaLibraryFields: true });
+  }
+
   root.replaceChildren();
   root.classList.add('bl-forms-builder--tabs');
 
@@ -125,6 +138,13 @@ export function mountApp(root, initial, definitionType = 'block') {
       data.name = uniqueFieldName(data.label || data.name || data.type || 'field', data.id || '');
     } else if (data.name) {
       data.name = uniqueFieldName(data.name, data.id || '');
+    }
+    if (data.type === 'file' || data.type === 'image') {
+      delete data.upload_style;
+      delete data.preview;
+      delete data.extensions;
+      delete data.max_size_mb;
+      delete data.button_text;
     }
     return data;
   };

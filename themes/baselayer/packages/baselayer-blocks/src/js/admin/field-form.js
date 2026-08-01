@@ -3,6 +3,7 @@
  */
 import { createPagePickerControl, bindPagePickers } from './page-field.js';
 import { createLinkControl, bindLinkFields } from './link-field.js';
+import { createMediaPickerControl, bindMediaPickers } from './media-field.js';
 
 function el(tag, props = {}, children = []) {
   const node = document.createElement(tag);
@@ -103,6 +104,9 @@ function collectLeafValue(field, control, type) {
   if (!name) return null;
   if (type === 'page' && control && typeof control.getPageValue === 'function') {
     return control.getPageValue();
+  }
+  if ((type === 'image' || type === 'file') && control && typeof control.getMediaValue === 'function') {
+    return control.getMediaValue();
   }
   if (type === 'link' && control && typeof control.getLinkValue === 'function') {
     return control.getLinkValue();
@@ -250,6 +254,9 @@ function createLeafControl(field, values, controls) {
     });
   } else if (type === 'page') {
     control = createPagePickerControl(field, current);
+    if (control) control.id = id;
+  } else if (type === 'image' || type === 'file') {
+    control = createMediaPickerControl(field, current);
     if (control) control.id = id;
   } else if (type === 'link') {
     control = createLinkControl(field, current);
@@ -601,6 +608,7 @@ window.blBlocksFieldUiApi = {
   openFieldsModal,
   bindPagePickers,
   bindLinkFields,
+  bindMediaPickers,
   bindHttpsUrlFields,
 };
 
@@ -608,6 +616,7 @@ if (typeof document !== 'undefined') {
   document.addEventListener('DOMContentLoaded', () => {
     bindPagePickers(document);
     bindLinkFields(document);
+    bindMediaPickers(document);
     bindHttpsUrlFields(document);
   });
 }

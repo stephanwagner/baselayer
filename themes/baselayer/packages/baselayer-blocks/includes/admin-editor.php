@@ -141,6 +141,8 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		return;
 	}
 
+	wp_enqueue_media();
+
 	$type = bl_blocks_current_list_type();
 	$post_id = isset($_GET['post']) ? (int) $_GET['post'] : 0;
 	if ($post_id > 0) {
@@ -272,6 +274,7 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'paletteSectionChoice'     => __('Choice', 'baselayer-blocks'),
 		'paletteSectionDatetime'   => __('Date & time', 'baselayer-blocks'),
 		'paletteSectionFiles'      => __('Uploads', 'baselayer-blocks'),
+		'paletteSectionMedia'      => __('Media', 'baselayer-blocks'),
 		'paletteSectionLayout'     => __('Layout', 'baselayer-blocks'),
 		'paletteSectionContent'    => __('Content', 'baselayer-blocks'),
 		'paletteSectionAdvanced'   => __('Advanced', 'baselayer-blocks'),
@@ -315,6 +318,9 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'addOption'               => __('Add option', 'baselayer-blocks'),
 		'allowMultiple'           => __('Allow multiple', 'baselayer-blocks'),
 		'allowMultipleFiles'      => __('Allow multiple files', 'baselayer-blocks'),
+		'allowMultipleMedia'      => __('Allow multiple', 'baselayer-blocks'),
+		'maxMediaItems'           => __('Maximum items', 'baselayer-blocks'),
+		'maxMediaHelp'            => __('Maximum number of items that can be selected from the media library.', 'baselayer-blocks'),
 		'pageMultiple'            => __('Allow multiple pages', 'baselayer-blocks'),
 		'linkAllowedTypes'        => __('Allowed types', 'baselayer-blocks'),
 		'linkAllowTarget'         => __('Allow editor to set target', 'baselayer-blocks'),

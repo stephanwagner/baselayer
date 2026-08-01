@@ -137,6 +137,8 @@ function bl_blocks_enqueue_website_assets(string $hook): void
 	if (!bl_blocks_user_can_manage()) {
 		return;
 	}
+	wp_enqueue_media();
+	bl_blocks_enqueue_field_ui_assets();
 	bl_blocks_enqueue_style('bl-blocks-admin', 'blocks-admin');
 }
 add_action('admin_enqueue_scripts', 'bl_blocks_enqueue_website_assets');
