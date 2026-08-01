@@ -289,7 +289,7 @@ export function createLinkControl(field, current) {
       const btn = el('button', {
         type: 'button',
         className:
-          'button bl-button-small bl-blocks-fields__link-type' +
+          'button bl-button-tiny bl-blocks-fields__link-type' +
           (state.type === type ? ' is-active' : ''),
         text: labels[type] || type,
         dataset: { linkType: type },

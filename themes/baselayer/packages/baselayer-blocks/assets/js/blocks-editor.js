@@ -808,7 +808,7 @@
       allowed.forEach((type) => {
         const btn = el2("button", {
           type: "button",
-          className: "button bl-button-small bl-blocks-fields__link-type" + (state.type === type ? " is-active" : ""),
+          className: "button bl-button-tiny bl-blocks-fields__link-type" + (state.type === type ? " is-active" : ""),
           text: labels[type] || type,
           dataset: { linkType: type }
         });

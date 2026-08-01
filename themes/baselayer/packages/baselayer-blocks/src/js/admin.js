@@ -3,6 +3,7 @@
  */
 import { mountApp } from './admin/app.js';
 import './admin/field-form.js';
+import './admin/template-metabox.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const root = document.querySelector('[data-bl-blocks-builder]');

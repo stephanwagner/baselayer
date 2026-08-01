@@ -307,8 +307,103 @@ function bl_blocks_register_rest_routes(): void
 			],
 		],
 	]);
+
+	register_rest_route('baselayer-blocks/v1', '/starter-template', [
+		'methods'             => 'POST',
+		'callback'            => 'bl_blocks_rest_starter_template',
+		'permission_callback' => static function (): bool {
+			return function_exists('bl_blocks_user_can_manage') && bl_blocks_user_can_manage();
+		},
+		'args'                => [
+			'postId' => [
+				'required'          => true,
+				'type'              => 'integer',
+				'sanitize_callback' => 'absint',
+			],
+			'write'  => [
+				'required' => false,
+				'type'     => 'boolean',
+				'default'  => false,
+			],
+			'fields' => [
+				'required' => false,
+				'default'  => null,
+			],
+			'title'  => [
+				'required'          => false,
+				'type'              => 'string',
+				'default'           => '',
+				'sanitize_callback' => 'sanitize_text_field',
+			],
+		],
+	]);
 }
 add_action('rest_api_init', 'bl_blocks_register_rest_routes');
+
+/**
+ * Preview or write a starter theme template for a block definition.
+ *
+ * @param WP_REST_Request $request
+ * @return WP_REST_Response|WP_Error
+ */
+function bl_blocks_rest_starter_template(WP_REST_Request $request)
+{
+	$post_id = (int) $request->get_param('postId');
+	$post = get_post($post_id);
+	if (!($post instanceof WP_Post) || $post->post_type !== BL_BLOCK_POST_TYPE) {
+		return new WP_Error(
+			'bl_blocks_invalid_post',
+			__('Invalid block definition.', 'baselayer-blocks'),
+			['status' => 404]
+		);
+	}
+	if (bl_blocks_get_definition_type($post_id) !== 'block') {
+		return new WP_Error(
+			'bl_blocks_not_block',
+			__('Starter templates are only available for blocks.', 'baselayer-blocks'),
+			['status' => 400]
+		);
+	}
+
+	$config = bl_blocks_get_config($post_id);
+	$raw_fields = $request->get_param('fields');
+	if (is_array($raw_fields)) {
+		$sanitized = bl_blocks_sanitize_config(['fields' => $raw_fields, 'settings' => []], 'block');
+		$fields = isset($sanitized['fields']) && is_array($sanitized['fields']) ? $sanitized['fields'] : [];
+	} else {
+		$fields = isset($config['fields']) && is_array($config['fields']) ? $config['fields'] : [];
+	}
+
+	$slug = bl_blocks_definition_slug($post_id, $config['settings']);
+	$title = (string) $request->get_param('title');
+	if ($title === '') {
+		$title = $post->post_title !== '' ? $post->post_title : $slug;
+	}
+
+	$code = bl_blocks_build_starter_template($slug, $title, $fields);
+	$write = (bool) $request->get_param('write');
+
+	if (!$write) {
+		return rest_ensure_response([
+			'code' => $code,
+			'slug' => $slug,
+		]);
+	}
+
+	$result = bl_blocks_write_starter_template($slug, $code);
+	if (is_wp_error($result)) {
+		$result->add_data(['status' => 400]);
+
+		return $result;
+	}
+
+	return rest_ensure_response([
+		'code'         => $code,
+		'slug'         => $slug,
+		'written'      => true,
+		'display_path' => $result['display_path'],
+	]);
+}
 
 /**
  * @param WP_REST_Request $request

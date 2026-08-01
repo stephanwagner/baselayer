@@ -749,30 +749,87 @@ body.post-new-php.post-type-bl_block .page-title-action {
   margin-top: 0;
 }
 
-.bl-blocks-template-metabox__name {
-  margin-top: 0;
-}
-
-.bl-blocks-template-metabox__status {
-  margin: 0 0 8px;
+.bl-blocks-template-metabox .bl-blocks-template-metabox__label {
+  margin: 0 0 4px;
   font-weight: 600;
 }
-
-.bl-blocks-template-metabox__status.is-found {
-  color: #008a20;
+.bl-blocks-template-metabox .bl-blocks-template-metabox__id {
+  margin: 0 0 12px;
 }
-
-.bl-blocks-template-metabox__status.is-missing {
-  color: #b32d2e;
-}
-
-.bl-blocks-template-metabox__path {
-  margin: 0 0 8px;
+.bl-blocks-template-metabox .bl-blocks-template-metabox__id code,
+.bl-blocks-template-metabox .bl-blocks-template-metabox__path code,
+.bl-blocks-template-metabox .bl-blocks-template-metabox__path-code {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.75;
   word-break: break-word;
 }
+.bl-blocks-template-metabox .bl-blocks-template-metabox__path {
+  margin: 0 0 12px;
+}
+.bl-blocks-template-metabox .bl-blocks-template-metabox__notice {
+  box-sizing: border-box;
+  margin: 0 0 12px;
+  padding: 10px 12px;
+  border: 1px dashed #e97800;
+  border-radius: 4px;
+  background: #fdf3e8;
+  color: #e97800;
+  font-size: 13px;
+  line-height: 1.45;
+  font-weight: 600;
+}
+.bl-blocks-template-metabox .bl-blocks-template-metabox__path-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0 0 12px;
+}
+.bl-blocks-template-metabox .bl-blocks-template-metabox__path-code {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.bl-blocks-template-metabox .bl-blocks-template-metabox__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+.bl-blocks-template-metabox .bl-blocks-template-metabox__icon-btn {
+  flex: 0 0 auto;
+  width: 28px;
+  min-width: 28px;
+  padding-left: 0;
+  padding-right: 0;
+}
+.bl-blocks-template-metabox .bl-blocks-template-metabox__icon-btn .bl-icon {
+  width: 16px;
+  height: 16px;
+  font-size: 16px;
+}
 
-.bl-blocks-template-metabox__path code {
+.bl-blocks-modal--starter {
+  width: min(720px, 100%);
+}
+
+.bl-blocks-template-metabox__code {
+  margin: 0;
+  padding: 12px 14px;
+  max-height: min(60vh, 520px);
+  overflow: auto;
+  background: #1d2327;
+  color: #f0f0f1;
+  border-radius: 4px;
   font-size: 12px;
+  line-height: 1.5;
+  white-space: pre;
+}
+
+.bl-blocks-template-metabox__code code {
+  font-family: Consolas, Monaco, monospace;
+  color: inherit;
+  background: transparent;
 }
 
 @media (max-width: 782px) {

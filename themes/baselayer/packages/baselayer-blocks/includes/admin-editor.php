@@ -27,7 +27,7 @@ function bl_blocks_admin_meta_boxes($post_type = '', $post = null): void
 
 	add_meta_box(
 		'bl_blocks_template',
-		__('Template', 'baselayer-blocks'),
+		__('Block', 'baselayer-blocks'),
 		'bl_blocks_render_template_metabox',
 		BL_BLOCK_POST_TYPE,
 		'side',
@@ -37,7 +37,7 @@ function bl_blocks_admin_meta_boxes($post_type = '', $post = null): void
 add_action('add_meta_boxes', 'bl_blocks_admin_meta_boxes', 10, 2);
 
 /**
- * Side panel: theme PHP template path status for this block.
+ * Side panel: block ID + theme PHP template status / starter actions.
  */
 function bl_blocks_render_template_metabox(WP_Post $post): void
 {
@@ -45,26 +45,43 @@ function bl_blocks_render_template_metabox(WP_Post $post): void
 	$slug = bl_blocks_definition_slug((int) $post->ID, $config['settings']);
 	$name = bl_blocks_gutenberg_name($slug);
 	$info = bl_blocks_template_info($slug);
+	$path_id = 'bl-blocks-template-path-' . (int) $post->ID;
+	$filename = basename($info['relative']);
 
-	echo '<div class="bl-blocks-template-metabox">';
-	echo '<p class="bl-blocks-template-metabox__name"><code>' . esc_html($name) . '</code></p>';
+	echo '<div class="bl-blocks-template-metabox" data-bl-blocks-template-metabox data-post-id="' . esc_attr((string) (int) $post->ID) . '">';
+
+	echo '<p class="bl-blocks-template-metabox__label"><label for="bl-blocks-block-id">' . esc_html__('Block ID:', 'baselayer-blocks') . '</label></p>';
+	echo '<p class="bl-blocks-template-metabox__id"><code id="bl-blocks-block-id">' . esc_html($name) . '</code></p>';
 
 	if ($info['exists']) {
-		echo '<p class="bl-blocks-template-metabox__status is-found">';
-		echo esc_html__('Template found.', 'baselayer-blocks');
+		echo '<p class="bl-blocks-template-metabox__label"><label for="' . esc_attr($path_id) . '">' . esc_html__('Template', 'baselayer-blocks') . '</label></p>';
+		echo '<p class="bl-blocks-template-metabox__path"><code id="' . esc_attr($path_id) . '">' . esc_html($info['display_path']) . '</code></p>';
+		echo '<p class="bl-blocks-template-metabox__actions">';
+		echo '<button type="button" class="button bl-button-small" data-bl-blocks-preview-starter>';
+		echo esc_html__('Preview starter template', 'baselayer-blocks');
+		echo '</button>';
 		echo '</p>';
-		echo '<p class="description">' . esc_html__('Loaded from:', 'baselayer-blocks') . '</p>';
-		echo '<p class="bl-blocks-template-metabox__path"><code>' . esc_html($info['display_path']) . '</code></p>';
 	} else {
-		echo '<p class="bl-blocks-template-metabox__status is-missing">';
-		echo esc_html__('Template missing.', 'baselayer-blocks');
-		echo '</p>';
-		echo '<p class="description">';
-		echo esc_html__('Create this PHP file in your theme (child theme preferred):', 'baselayer-blocks');
-		echo '</p>';
-		echo '<p class="bl-blocks-template-metabox__path"><code>' . esc_html($info['create_path']) . '</code></p>';
-		echo '<p class="description">';
-		echo esc_html__('Available in the template: $values, $fields, $block, $attributes.', 'baselayer-blocks');
+		echo '<div class="bl-blocks-template-metabox__notice" role="status">';
+		echo esc_html__('No template found', 'baselayer-blocks');
+		echo '</div>';
+
+		echo '<p class="bl-blocks-template-metabox__label"><label>' . esc_html__('Create this file:', 'baselayer-blocks') . '</label></p>';
+		echo '<div class="bl-blocks-template-metabox__path-row">';
+		echo '<code class="bl-blocks-template-metabox__path-code">' . esc_html($info['create_path']) . '</code>';
+		echo '<span id="' . esc_attr($path_id) . '" class="screen-reader-text">' . esc_html($filename) . '</span>';
+		echo '<button type="button" class="button bl-button-tiny bl-blocks-template-metabox__icon-btn" data-bl-copy-from-source="' . esc_attr($path_id) . '" title="' . esc_attr__('Copy filename', 'baselayer-blocks') . '" aria-label="' . esc_attr__('Copy filename', 'baselayer-blocks') . '">';
+		echo '<span class="bl-icon -icon-copy" aria-hidden="true"></span>';
+		echo '</button>';
+		echo '</div>';
+
+		echo '<p class="bl-blocks-template-metabox__actions">';
+		echo '<button type="button" class="button button-primary bl-button-small" data-bl-blocks-generate-starter>';
+		echo esc_html__('Generate starter template', 'baselayer-blocks');
+		echo '</button>';
+		echo '<button type="button" class="button bl-button-tiny bl-blocks-template-metabox__icon-btn" data-bl-blocks-preview-starter title="' . esc_attr__('Preview starter template', 'baselayer-blocks') . '" aria-label="' . esc_attr__('Preview starter template', 'baselayer-blocks') . '">';
+		echo '<span class="bl-icon -icon-visibility" aria-hidden="true"></span>';
+		echo '</button>';
 		echo '</p>';
 	}
 
@@ -163,7 +180,7 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 	}
 	bl_blocks_enqueue_style('bl-blocks-admin', 'blocks-admin', $style_deps);
 
-	$deps = [];
+	$deps = ['wp-api-fetch'];
 	if ($form_builder_handle) {
 		$deps[] = $form_builder_handle;
 	} elseif ($builder_handle) {
@@ -173,11 +190,13 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 
 	$has_icon_picker = function_exists('bl_icons_localize_payload')
 		&& function_exists('bl_enqueue_theme_icons_style');
-	if ($has_icon_picker) {
+	if (function_exists('bl_enqueue_theme_icons_style')) {
 		if (function_exists('bl_load_icons_textdomain')) {
 			bl_load_icons_textdomain();
 		}
 		bl_enqueue_theme_icons_style(['bl-blocks-admin']);
+	}
+	if ($has_icon_picker) {
 		wp_localize_script('bl-blocks-admin', 'baselayerIcons', bl_icons_localize_payload());
 	}
 
@@ -472,6 +491,14 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'widthCustom'             => __('Custom', 'baselayer-blocks'),
 		'widthCustomPlaceholder'  => __('e.g. 40% or 280px', 'baselayer-blocks'),
 
+		'starterPreviewTitle'     => __('Starter template', 'baselayer-blocks'),
+		'starterCopyCode'         => __('Copy code', 'baselayer-blocks'),
+		'starterCopied'           => __('Copied', 'baselayer-blocks'),
+		'starterClose'            => __('Close', 'baselayer-blocks'),
+		'starterGenerating'       => __('Generating…', 'baselayer-blocks'),
+		'starterGenerateFailed'   => __('Could not generate the starter template.', 'baselayer-blocks'),
+		'starterWriteFailed'      => __('Could not create the template file.', 'baselayer-blocks'),
+
 		'types'                    => $type_labels,
 	];
 
@@ -482,6 +509,7 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'hasIconPicker'    => $has_icon_picker,
 		'icons'            => $icons,
 		'pagesRestUrl'     => esc_url_raw(rest_url('wp/v2/pages')),
+		'starterPath'      => 'baselayer-blocks/v1/starter-template',
 		'restNonce'        => wp_create_nonce('wp_rest'),
 		'i18n'             => $i18n,
 	]);
