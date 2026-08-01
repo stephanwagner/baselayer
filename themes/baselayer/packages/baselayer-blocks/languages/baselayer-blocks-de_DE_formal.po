@@ -162,6 +162,10 @@ msgstr "Wiederholung"
 msgid "Hidden"
 msgstr "Versteckt"
 
+#: includes/admin-editor.php:264
+msgid "Page"
+msgstr "Seite"
+
 #: includes/admin-editor.php:267 includes/admin-editor.php:269
 msgid "Fields"
 msgstr "Felder"
@@ -282,6 +286,9 @@ msgstr "Inhalt"
 #: includes/admin-editor.php:300
 msgid "Advanced"
 msgstr "Erweitert"
+
+msgid "Relations"
+msgstr "Beziehungen"
 
 #: includes/admin-editor.php:302 includes/admin-editor.php:303
 msgid "Repeater label"
@@ -604,6 +611,9 @@ msgstr "Mehrfachauswahl erlauben"
 #: includes/admin-editor.php
 msgid "Allow multiple files"
 msgstr "Mehrere Dateien erlauben"
+
+msgid "Allow multiple pages"
+msgstr "Mehrere Seiten erlauben"
 
 #: includes/admin-editor.php
 msgid "Allow multiple selection"
@@ -1074,3 +1084,42 @@ msgstr "Einklappen"
 
 msgid "Expand"
 msgstr "Ausklappen"
+
+msgid "Choose page"
+msgstr "Seite wählen"
+
+msgid "Choose pages"
+msgstr "Seiten wählen"
+
+msgid "Change page"
+msgstr "Seite ändern"
+
+msgid "Change pages"
+msgstr "Seiten ändern"
+
+msgid "Select a page."
+msgstr "Wähle eine Seite."
+
+msgid "Select one or more pages."
+msgstr "Wähle eine oder mehrere Seiten."
+
+msgid "Selected page"
+msgstr "Ausgewählte Seite"
+
+msgid "Selected page #%d"
+msgstr "Ausgewählte Seite #%d"
+
+msgid "Select a page"
+msgstr "Seite auswählen"
+
+msgid "Select pages"
+msgstr "Seiten auswählen"
+
+msgid "Search pages…"
+msgstr "Seiten suchen…"
+
+msgid "No pages found."
+msgstr "Keine Seiten gefunden."
+
+msgid "Loading…"
+msgstr "Wird geladen…"

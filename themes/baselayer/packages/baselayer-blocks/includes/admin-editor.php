@@ -235,6 +235,7 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'section'      => __('Section', 'baselayer-blocks'),
 		'repeater'     => __('Repeater', 'baselayer-blocks'),
 		'hidden'       => __('Hidden', 'baselayer-blocks'),
+		'page'         => __('Page', 'baselayer-blocks'),
 	];
 
 	$i18n = [
@@ -272,6 +273,7 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'paletteSectionLayout'     => __('Layout', 'baselayer-blocks'),
 		'paletteSectionContent'    => __('Content', 'baselayer-blocks'),
 		'paletteSectionAdvanced'   => __('Advanced', 'baselayer-blocks'),
+		'paletteSectionRelations'  => __('Relations', 'baselayer-blocks'),
 		'repeaterType'             => __('Repeater', 'baselayer-blocks'),
 		'repeaterLabel'            => __('Repeater label', 'baselayer-blocks'),
 		'repeaterLabelPlaceholder' => __('Repeater label', 'baselayer-blocks'),
@@ -311,6 +313,7 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'addOption'               => __('Add option', 'baselayer-blocks'),
 		'allowMultiple'           => __('Allow multiple', 'baselayer-blocks'),
 		'allowMultipleFiles'      => __('Allow multiple files', 'baselayer-blocks'),
+		'pageMultiple'            => __('Allow multiple pages', 'baselayer-blocks'),
 		'allowedExtensions'       => __('Allowed extensions', 'baselayer-blocks'),
 		'allowedExtensionsHelp'   => __('Comma-separated list without dots, e.g. pdf, docx, xlsx. Leave empty to allow all WordPress-permitted types.', 'baselayer-blocks'),
 		'autocomplete'            => __('Autocomplete', 'baselayer-blocks'),
@@ -452,6 +455,8 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'blockCategories'  => bl_blocks_block_category_choices(),
 		'hasIconPicker'    => $has_icon_picker,
 		'icons'            => $icons,
+		'pagesRestUrl'     => esc_url_raw(rest_url('wp/v2/pages')),
+		'restNonce'        => wp_create_nonce('wp_rest'),
 		'i18n'             => $i18n,
 	]);
 	// Forms field-card modules read window.blFormsAdmin.

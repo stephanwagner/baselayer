@@ -223,7 +223,9 @@ function bl_forms_palette_icons(): array
 		'hidden',
 		'honeypot',
 		'captcha',
+		'page',
 		'caret',
+
 		'expandContent',
 		'collapseContent',
 		'edit',
@@ -470,6 +472,7 @@ function bl_forms_admin_enqueue(string $hook): void
 				'paletteSectionLayout' => __('Layout', 'baselayer-forms'),
 				'paletteSectionContent' => __('Content', 'baselayer-forms'),
 				'paletteSectionAdvanced' => __('Advanced', 'baselayer-forms'),
+				'paletteSectionRelations' => __('Relations', 'baselayer-forms'),
 				'canvasHeading'     => __('Form', 'baselayer-forms'),
 				'empty'             => __('Drag a field here, or click a template to add it.', 'baselayer-forms'),
 				'columnEmpty'       => __('Drop fields here', 'baselayer-forms'),
@@ -818,6 +821,7 @@ function bl_forms_admin_enqueue(string $hook): void
 					'hidden'       => __('Hidden', 'baselayer-forms'),
 					'honeypot'     => __('Honeypot', 'baselayer-forms'),
 					'captcha'      => __('CAPTCHA', 'baselayer-forms'),
+					'page'         => __('Page', 'baselayer-forms'),
 				],
 			],
 		]);

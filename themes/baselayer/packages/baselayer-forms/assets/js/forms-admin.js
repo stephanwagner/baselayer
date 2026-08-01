@@ -1681,6 +1681,11 @@
     serializeRow,
     equalizeColumnRun
   } = window.BlFormBuilder || {};
+  var EXCLUDED_TYPES = /* @__PURE__ */ new Set(["page"]);
+  var FORMS_PALETTE = PALETTE_SECTIONS.map((section) => ({
+    ...section,
+    types: (section.types || []).filter((type) => !EXCLUDED_TYPES.has(type))
+  })).filter((section) => (section.types || []).length > 0);
   function expandLegacyGroups(fields) {
     const out = [];
     (fields || []).forEach((field) => {
@@ -1745,7 +1750,7 @@
       ns: "bl-forms-builder",
       groupName: "bl-forms-fields",
       items: initial.fields || [],
-      sections: PALETTE_SECTIONS,
+      sections: FORMS_PALETTE,
       heading: t4("canvasHeading", "Form"),
       emptyText: t4("empty", "Drag a field here, or click a template to add it."),
       handleSelector: ".bl-forms-builder__handle",

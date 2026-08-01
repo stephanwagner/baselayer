@@ -40,6 +40,7 @@ function bl_blocks_palette_icons(): array
 		'section',
 		'repeater',
 		'hidden',
+		'page',
 		'caret',
 		'expandContent',
 		'collapseContent',
@@ -91,8 +92,12 @@ function bl_blocks_field_types(): array
 			'checkboxes', 'radio', 'select', 'toggle', 'button_group',
 			'date', 'time', 'datetime', 'file', 'image',
 			'heading', 'text_block', 'divider', 'spacer', 'html',
-			'column', 'section', 'hidden',
+			'column', 'section', 'hidden', 'page',
 		];
+	}
+
+	if (!in_array('page', $types, true)) {
+		$types[] = 'page';
 	}
 
 	if (!in_array('repeater', $types, true)) {
@@ -359,6 +364,10 @@ function bl_blocks_render_admin_fields_walk(array $fields, array $values, string
 				);
 				break;
 
+			case 'page':
+				bl_blocks_render_admin_page_field($field, $value, $input_name);
+				break;
+
 			default:
 				$input_type = 'text';
 				if ($type === 'phone') {
@@ -385,6 +394,130 @@ function bl_blocks_render_admin_fields_walk(array $fields, array $values, string
 		}
 		echo '</div>';
 	}
+}
+
+/**
+ * Resolve page titles for admin summary (first paint).
+ *
+ * @param list<int> $ids
+ * @return array<int, array{id:int,title:string,url:string}>
+ */
+function bl_blocks_page_picker_summaries(array $ids): array
+{
+	$out = [];
+	foreach ($ids as $id) {
+		$id = (int) $id;
+		if ($id <= 0) {
+			continue;
+		}
+		$post = get_post($id);
+		if (!$post || $post->post_type !== 'page') {
+			$out[$id] = [
+				'id'    => $id,
+				'title' => sprintf(
+					/* translators: %d: page ID */
+					__('Selected page #%d', 'baselayer-blocks'),
+					$id
+				),
+				'url'   => '',
+			];
+			continue;
+		}
+		$out[$id] = [
+			'id'    => $id,
+			'title' => get_the_title($post) ?: ('#' . $id),
+			'url'   => (string) get_permalink($post),
+		];
+	}
+
+	return $out;
+}
+
+/**
+ * Render a page picker control for PHP admin (Website settings).
+ *
+ * @param array<string, mixed> $field
+ * @param mixed                $value
+ */
+function bl_blocks_render_admin_page_field(array $field, $value, string $input_name): void
+{
+	$multiple = !empty($field['multiple']);
+	$ids = [];
+	if ($multiple) {
+		$list = is_array($value) ? $value : ((is_scalar($value) && (string) $value !== '') ? [$value] : []);
+		foreach ($list as $item) {
+			$n = absint($item);
+			if ($n > 0) {
+				$ids[] = $n;
+			}
+		}
+	} else {
+		$n = absint(is_array($value) ? ($value[0] ?? 0) : $value);
+		if ($n > 0) {
+			$ids[] = $n;
+		}
+	}
+	$ids = array_values(array_unique($ids));
+	$summaries = bl_blocks_page_picker_summaries($ids);
+
+	$choose_label = $ids !== []
+		? ($multiple
+			? __('Change pages', 'baselayer-blocks')
+			: __('Change page', 'baselayer-blocks'))
+		: ($multiple
+			? __('Choose pages', 'baselayer-blocks')
+			: __('Choose page', 'baselayer-blocks'));
+
+	echo '<div class="bl-blocks-fields__page-picker" data-bl-blocks-page-picker data-multiple="' . esc_attr($multiple ? '1' : '0') . '" data-input-name="' . esc_attr($input_name) . '">';
+	echo '<div class="bl-blocks-fields__page-picker-row">';
+	echo '<div class="bl-blocks-fields__page-picker-summary" data-bl-page-summary>';
+	if ($ids === []) {
+		echo '<span class="description">' . esc_html(
+			$multiple
+				? __('Select one or more pages.', 'baselayer-blocks')
+				: __('Select a page.', 'baselayer-blocks')
+		) . '</span>';
+	} else {
+		foreach ($ids as $pid) {
+			$title = $summaries[$pid]['title'] ?? ('#' . $pid);
+			echo '<span class="bl-blocks-fields__page-picker-value">' . esc_html($title) . '</span>';
+		}
+	}
+	echo '</div>';
+	echo '<div class="bl-blocks-fields__page-picker-actions">';
+	printf(
+		'<button type="button" class="button bl-button-small" data-bl-page-choose>%s</button>',
+		esc_html($choose_label)
+	);
+	printf(
+		'<button type="button" class="button-link" data-bl-page-clear%s>%s</button>',
+		$ids === [] ? ' hidden' : '',
+		esc_html__('Clear', 'baselayer-blocks')
+	);
+	echo '</div>';
+	echo '</div>';
+	echo '<div data-bl-page-inputs>';
+	if ($ids === []) {
+		if ($multiple) {
+			printf('<input type="hidden" name="%s[]" value="">', esc_attr($input_name));
+		} else {
+			printf('<input type="hidden" name="%s" value="">', esc_attr($input_name));
+		}
+	} else {
+		foreach ($ids as $pid) {
+			$name = $multiple ? $input_name . '[]' : $input_name;
+			$meta = $summaries[$pid] ?? ['title' => '', 'url' => ''];
+			printf(
+				'<input type="hidden" name="%s" value="%s" data-title="%s" data-url="%s">',
+				esc_attr($name),
+				esc_attr((string) $pid),
+				esc_attr((string) ($meta['title'] ?? '')),
+				esc_attr((string) ($meta['url'] ?? ''))
+			);
+		}
+	}
+	echo '</div>';
+	echo '</div>';
 }
 
 /**
@@ -479,15 +612,31 @@ function bl_blocks_enqueue_field_ui_assets(): void
 	bl_blocks_enqueue_script('bl-blocks-admin', 'blocks-admin', [], true);
 
 	wp_localize_script('bl-blocks-admin', 'blBlocksFieldUi', [
-		'i18n' => [
-			'edit'        => __('Edit', 'baselayer-blocks'),
-			'save'        => __('Save', 'baselayer-blocks'),
-			'cancel'      => __('Cancel', 'baselayer-blocks'),
-			'close'       => __('Close', 'baselayer-blocks'),
-			'addRow'     => __('Add row', 'baselayer-blocks'),
-			'removeRow'  => __('Remove row', 'baselayer-blocks'),
-			'rowLabel'    => __('Row %d', 'baselayer-blocks'),
-			'repeater'    => __('Repeater', 'baselayer-blocks'),
+		'pagesRestUrl' => esc_url_raw(rest_url('wp/v2/pages')),
+		'restNonce'    => wp_create_nonce('wp_rest'),
+		'i18n'         => [
+			'edit'                   => __('Edit', 'baselayer-blocks'),
+			'save'                   => __('Save', 'baselayer-blocks'),
+			'cancel'                 => __('Cancel', 'baselayer-blocks'),
+			'close'                  => __('Close', 'baselayer-blocks'),
+			'addRow'                => __('Add row', 'baselayer-blocks'),
+			'removeRow'              => __('Remove row', 'baselayer-blocks'),
+			'rowLabel'               => __('Row %d', 'baselayer-blocks'),
+			'repeater'               => __('Repeater', 'baselayer-blocks'),
+			'choosePage'             => __('Choose page', 'baselayer-blocks'),
+			'choosePages'            => __('Choose pages', 'baselayer-blocks'),
+			'changePage'             => __('Change page', 'baselayer-blocks'),
+			'changePages'            => __('Change pages', 'baselayer-blocks'),
+			'clearPage'              => __('Clear', 'baselayer-blocks'),
+			'choosePageHelp'         => __('Select a page.', 'baselayer-blocks'),
+			'choosePagesHelp'        => __('Select one or more pages.', 'baselayer-blocks'),
+			'selectedPage'           => __('Selected page', 'baselayer-blocks'),
+			'pagePickerTitle'        => __('Select a page', 'baselayer-blocks'),
+			'pagePickerTitleMulti'   => __('Select pages', 'baselayer-blocks'),
+			'pagePickerSearch'       => __('Search pages…', 'baselayer-blocks'),
+			'pagePickerEmpty'        => __('No pages found.', 'baselayer-blocks'),
+			'pagePickerLoading'      => __('Loading…', 'baselayer-blocks'),
+			'selectPage'             => __('Select', 'baselayer-blocks'),
 		],
 	]);
 }

@@ -16,6 +16,14 @@ const {
   equalizeColumnRun,
 } = window.BlFormBuilder || {};
 
+/** Blocks-only field types — keep out of the Forms palette. */
+const EXCLUDED_TYPES = new Set(['page']);
+
+const FORMS_PALETTE = PALETTE_SECTIONS.map((section) => ({
+  ...section,
+  types: (section.types || []).filter((type) => !EXCLUDED_TYPES.has(type)),
+})).filter((section) => (section.types || []).length > 0);
+
 /**
  * Flatten legacy group fields into consecutive columns for the canvas.
  *
@@ -102,7 +110,7 @@ export function mountApp(root, initial) {
     ns: 'bl-forms-builder',
     groupName: 'bl-forms-fields',
     items: initial.fields || [],
-    sections: PALETTE_SECTIONS,
+    sections: FORMS_PALETTE,
     heading: t('canvasHeading', 'Form'),
     emptyText: t('empty', 'Drag a field here, or click a template to add it.'),
     handleSelector: '.bl-forms-builder__handle',

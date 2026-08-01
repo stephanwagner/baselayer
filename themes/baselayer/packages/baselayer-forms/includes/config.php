@@ -37,6 +37,7 @@ function bl_forms_field_types(): array
 		'hidden',
 		'honeypot',
 		'captcha',
+		'page',
 	];
 }
 
@@ -1557,7 +1558,7 @@ function bl_forms_sanitize_field($field): ?array
 	$out['disabled'] = !empty($field['disabled']);
 	$out['placeholder'] = sanitize_text_field((string) ($field['placeholder'] ?? ''));
 
-	$no_readonly = ['radio', 'checkboxes', 'button_group', 'toggle', 'terms', 'file', 'image'];
+	$no_readonly = ['radio', 'checkboxes', 'button_group', 'toggle', 'terms', 'file', 'image', 'page'];
 	if (in_array($type, $no_readonly, true)) {
 		unset($out['readonly']);
 	}
@@ -1666,7 +1667,7 @@ function bl_forms_sanitize_field($field): ?array
 		unset($out['placeholder']);
 	}
 
-	if (in_array($type, ['text', 'email', 'url', 'number', 'phone', 'textarea', 'date', 'time', 'datetime', 'file', 'image', 'toggle', 'select', 'radio', 'checkboxes', 'button_group', 'terms'], true)) {
+	if (in_array($type, ['text', 'email', 'url', 'number', 'phone', 'textarea', 'date', 'time', 'datetime', 'file', 'image', 'toggle', 'select', 'radio', 'checkboxes', 'button_group', 'terms', 'page'], true)) {
 		$out['description'] = sanitize_textarea_field((string) ($field['description'] ?? ''));
 	}
 
@@ -1698,8 +1699,12 @@ function bl_forms_sanitize_field($field): ?array
 		unset($out['min_selections'], $out['max_selections']);
 	}
 
-	if (in_array($type, ['select', 'button_group', 'file', 'image'], true)) {
+	if (in_array($type, ['select', 'button_group', 'file', 'image', 'page'], true)) {
 		$out['multiple'] = !empty($field['multiple']);
+	}
+
+	if ($type === 'page') {
+		unset($out['placeholder'], $out['default_value'], $out['readonly']);
 	}
 
 	if (in_array($type, ['file', 'image'], true)) {
@@ -1764,7 +1769,7 @@ function bl_forms_sanitize_field($field): ?array
 		$out['default_value'] = !empty($field['default_value']) ? '1' : '';
 	}
 
-	$no_default = ['file', 'image', 'honeypot', 'captcha'];
+	$no_default = ['file', 'image', 'honeypot', 'captcha', 'page'];
 	if (
 		!isset($out['default_value'])
 		&& !in_array($type, $no_default, true)

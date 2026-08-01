@@ -80,7 +80,7 @@ function normalizeDividerMargin(field) {
 }
 
 const OPTION_TYPES = ['radio', 'checkboxes', 'select', 'button_group'];
-const MULTIPLE_TYPES = ['select', 'button_group', 'file', 'image'];
+const MULTIPLE_TYPES = ['select', 'button_group', 'file', 'image', 'page'];
 
 const CAPTCHA_PROVIDERS = [
   {
@@ -454,6 +454,7 @@ const DESCRIPTION_TYPES = [
   'checkboxes',
   'button_group',
   'terms',
+  'page',
 ];
 const NO_PLACEHOLDER = [
   'terms',
@@ -476,6 +477,7 @@ const NO_PLACEHOLDER = [
   'date',
   'time',
   'datetime',
+  'page',
 ];
 const NO_REQUIRED = [
   'hidden',
@@ -498,6 +500,7 @@ const NO_READONLY = [
   'terms',
   'file',
   'image',
+  'page',
 ];
 const NO_DISABLED = [...NO_REQUIRED];
 const AUTOCOMPLETE_TYPES = [
@@ -530,6 +533,7 @@ const NO_DEFAULT = [
   'heading',
   'text_block',
   'html',
+  'page',
 ];
 const CHECKED_DEFAULT_TYPES = ['terms', 'toggle'];
 const NAMED_TYPES = [
@@ -552,6 +556,7 @@ const NAMED_TYPES = [
   'terms',
   'hidden',
   'honeypot',
+  'page',
 ];
 const HIDE_LABEL_TYPES = NAMED_TYPES.filter((type) => type !== 'hidden' && type !== 'honeypot');
 
@@ -3368,6 +3373,8 @@ export function createFieldCard(initial, open = false) {
           multipleLabel = t('selectMultiple', 'Allow multiple selection');
         } else if (field.type === 'file' || field.type === 'image') {
           multipleLabel = t('allowMultipleFiles', 'Allow multiple files');
+        } else if (field.type === 'page') {
+          multipleLabel = t('pageMultiple', 'Allow multiple pages');
         }
         optionToggles.push(
           createSwitchSetting('blMultiple', multipleLabel, !!field.multiple, (checked) => {

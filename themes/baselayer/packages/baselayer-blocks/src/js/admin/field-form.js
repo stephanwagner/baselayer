@@ -1,6 +1,7 @@
 /**
  * Shared admin field form renderer + modal shell for Blocks runtimes.
  */
+import { createPagePickerControl, bindPagePickers } from './page-field.js';
 
 function el(tag, props = {}, children = []) {
   const node = document.createElement(tag);
@@ -51,6 +52,9 @@ function isStatic(type) {
 function collectLeafValue(field, control, type) {
   const name = field.name;
   if (!name) return null;
+  if (type === 'page' && control && typeof control.getPageValue === 'function') {
+    return control.getPageValue();
+  }
   if (type === 'select') {
     if (control.multiple) {
       return Array.from(control.selectedOptions).map((o) => o.value);
@@ -185,6 +189,9 @@ function createLeafControl(field, values, controls) {
       id,
       value: current == null ? '' : String(current),
     });
+  } else if (type === 'page') {
+    control = createPagePickerControl(field, current);
+    if (control) control.id = id;
   } else {
     let inputType = 'text';
     if (type === 'email' || type === 'url' || type === 'number' || type === 'date' || type === 'time') {
@@ -510,4 +517,11 @@ export function openFieldsModal(opts) {
 window.blBlocksFieldUiApi = {
   createFieldForm,
   openFieldsModal,
+  bindPagePickers,
 };
+
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', () => {
+    bindPagePickers(document);
+  });
+}

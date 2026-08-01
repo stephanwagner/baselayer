@@ -1,4 +1,5 @@
 @use '../../../../src/scss/admin/button-small';
+@use '../../../../src/scss/admin/page-picker';
 
 // Blocks admin: definition editor extras + Website + field UI modal.
 
@@ -248,6 +249,42 @@ body.post-new-php.post-type-bl_block {
   display: flex;
   align-items: flex-start;
   gap: 6px;
+}
+
+.bl-blocks-fields__page-picker-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 16px;
+}
+
+.bl-blocks-fields__page-picker-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+  flex: 1 1 180px;
+}
+
+.bl-blocks-fields__page-picker-value {
+  font-weight: 600;
+  color: #1d2327;
+}
+
+.bl-blocks-fields__page-picker-url {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bl-blocks-fields__page-picker-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
 }
 
 .bl-blocks-fields__layout--column {

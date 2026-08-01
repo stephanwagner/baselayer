@@ -210,6 +210,9 @@ msgstr "Inhalt"
 msgid "Advanced"
 msgstr "Erweitert"
 
+msgid "Relations"
+msgstr "Beziehungen"
+
 #: includes/admin.php:416
 msgid "Add field"
 msgstr "Feld hinzufügen"
@@ -1543,6 +1546,9 @@ msgstr "Honeypot"
 #: includes/admin.php:761 includes/settings-page.php:16
 msgid "CAPTCHA"
 msgstr "CAPTCHA"
+
+msgid "Page"
+msgstr "Seite"
 
 #: includes/block.php:43
 msgid "Select a form…"

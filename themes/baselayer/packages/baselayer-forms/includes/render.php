@@ -779,6 +779,11 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 		return (string) ob_get_clean();
 	}
 
+	// Blocks-only field type — never render on public Forms.
+	if ($type === 'page') {
+		return '';
+	}
+
 	if ($type === 'heading') {
 		$content = (string) ($field['content'] ?? '');
 		if ($content === '') {

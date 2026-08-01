@@ -38,7 +38,8 @@
     "section",
     "hidden",
     "honeypot",
-    "captcha"
+    "captcha",
+    "page"
   ];
   var PALETTE_SECTIONS = [
     {
@@ -76,6 +77,12 @@
       headingKey: "paletteSectionContent",
       headingFallback: "Content",
       types: ["heading", "text_block", "html"]
+    },
+    {
+      id: "relations",
+      headingKey: "paletteSectionRelations",
+      headingFallback: "Relations",
+      types: ["page"]
     },
     {
       id: "layout",
@@ -343,7 +350,7 @@
     if (["radio", "checkboxes"].includes(type)) {
       base.layout = "vertical";
     }
-    if (["select", "button_group", "file", "image"].includes(type)) {
+    if (["select", "button_group", "file", "image", "page"].includes(type)) {
       base.multiple = false;
     }
     if (type === "file" || type === "image") {
@@ -447,6 +454,7 @@
         return [...OPS_TEMPORAL];
       case "file":
       case "image":
+      case "page":
         return [...OPS_FILE];
       case "text":
       case "textarea":
@@ -1565,7 +1573,7 @@
     field.margin_custom = "";
   }
   var OPTION_TYPES = ["radio", "checkboxes", "select", "button_group"];
-  var MULTIPLE_TYPES = ["select", "button_group", "file", "image"];
+  var MULTIPLE_TYPES = ["select", "button_group", "file", "image", "page"];
   function createCaptchaSettings(field, onChange) {
     unsetCaptchaFieldKeys(field);
     const configured = !!(window.blFormsAdmin && window.blFormsAdmin.captchaConfigured);
@@ -1834,7 +1842,8 @@
     "radio",
     "checkboxes",
     "button_group",
-    "terms"
+    "terms",
+    "page"
   ];
   var NO_PLACEHOLDER = [
     "terms",
@@ -1856,7 +1865,8 @@
     "section",
     "date",
     "time",
-    "datetime"
+    "datetime",
+    "page"
   ];
   var NO_REQUIRED = [
     "hidden",
@@ -1878,7 +1888,8 @@
     "toggle",
     "terms",
     "file",
-    "image"
+    "image",
+    "page"
   ];
   var NO_DISABLED = [...NO_REQUIRED];
   var AUTOCOMPLETE_TYPES = [
@@ -1909,7 +1920,8 @@
     "spacer",
     "heading",
     "text_block",
-    "html"
+    "html",
+    "page"
   ];
   var CHECKED_DEFAULT_TYPES = ["terms", "toggle"];
   var NAMED_TYPES = [
@@ -1931,7 +1943,8 @@
     "image",
     "terms",
     "hidden",
-    "honeypot"
+    "honeypot",
+    "page"
   ];
   var HIDE_LABEL_TYPES = NAMED_TYPES.filter((type) => type !== "hidden" && type !== "honeypot");
   function createOptionsEditor(options) {
@@ -4384,6 +4397,8 @@
             multipleLabel = t("selectMultiple", "Allow multiple selection");
           } else if (field.type === "file" || field.type === "image") {
             multipleLabel = t("allowMultipleFiles", "Allow multiple files");
+          } else if (field.type === "page") {
+            multipleLabel = t("pageMultiple", "Allow multiple pages");
           }
           optionToggles.push(
             createSwitchSetting("blMultiple", multipleLabel, !!field.multiple, (checked) => {

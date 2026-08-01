@@ -496,6 +496,14 @@ function bl_blocks_sanitize_leaf_field_fallback(array $field): array
 		$out['options'] = $options;
 	}
 
+	if (in_array($out['type'], ['select', 'button_group', 'file', 'image', 'page'], true)) {
+		$out['multiple'] = !empty($field['multiple']);
+	}
+	if ($out['type'] === 'page') {
+		$out['multiple'] = !empty($field['multiple']);
+		unset($out['placeholder'], $out['default_value']);
+	}
+
 	if (isset($field['conditional_logic']) && is_array($field['conditional_logic'])) {
 		$out['conditional_logic'] = $field['conditional_logic'];
 	}
@@ -771,6 +779,30 @@ function bl_blocks_sanitize_values(array $fields, $raw): array
 
 		if ($type === 'toggle' || $type === 'terms') {
 			$values[$name] = !empty($raw_value) ? '1' : '';
+			continue;
+		}
+
+		if ($type === 'page') {
+			$ids = [];
+			if (is_array($raw_value)) {
+				foreach ($raw_value as $item) {
+					$n = absint($item);
+					if ($n > 0) {
+						$ids[] = $n;
+					}
+				}
+			} elseif (is_scalar($raw_value) && (string) $raw_value !== '') {
+				$n = absint($raw_value);
+				if ($n > 0) {
+					$ids[] = $n;
+				}
+			}
+			$ids = array_values(array_unique($ids));
+			if (!empty($field['multiple'])) {
+				$values[$name] = $ids;
+			} else {
+				$values[$name] = $ids[0] ?? 0;
+			}
 			continue;
 		}
 

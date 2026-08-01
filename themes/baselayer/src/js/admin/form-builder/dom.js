@@ -43,6 +43,7 @@ export const TYPE_KEYS = [
   'hidden',
   'honeypot',
   'captcha',
+  'page',
 ];
 
 /** Palette accordion groups (Popular is default-open). */
@@ -82,6 +83,12 @@ export const PALETTE_SECTIONS = [
     headingKey: 'paletteSectionContent',
     headingFallback: 'Content',
     types: ['heading', 'text_block', 'html'],
+  },
+  {
+    id: 'relations',
+    headingKey: 'paletteSectionRelations',
+    headingFallback: 'Relations',
+    types: ['page'],
   },
   {
     id: 'layout',
@@ -412,7 +419,7 @@ export function defaultField(type = 'text') {
   if (['radio', 'checkboxes'].includes(type)) {
     base.layout = 'vertical';
   }
-  if (['select', 'button_group', 'file', 'image'].includes(type)) {
+  if (['select', 'button_group', 'file', 'image', 'page'].includes(type)) {
     base.multiple = false;
   }
   if (type === 'file' || type === 'image') {
