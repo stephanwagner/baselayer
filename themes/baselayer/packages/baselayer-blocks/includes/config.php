@@ -737,6 +737,75 @@ function bl_blocks_query_definitions(string $type, bool $active_only = false): a
 }
 
 /**
+ * Force an absolute https URL (strip any scheme).
+ * Intentionally loose — any non-empty host-like value is accepted.
+ */
+function bl_blocks_normalize_https_url(string $raw): string
+{
+	$trimmed = preg_replace('/^[\s\x{00A0}\x{2000}-\x{200B}\x{FEFF}]+|[\s\x{00A0}\x{2000}-\x{200B}\x{FEFF}]+$/u', '', $raw);
+	$trimmed = trim(is_string($trimmed) ? $trimmed : $raw);
+	if ($trimmed === '') {
+		return '';
+	}
+
+	$rest = (string) preg_replace('#^[a-z][a-z0-9+.\-]*:#i', '', $trimmed);
+	$rest = (string) preg_replace('#^//#', '', $rest);
+	$rest_trim = preg_replace('/^[\s\x{00A0}\x{2000}-\x{200B}\x{FEFF}]+|[\s\x{00A0}\x{2000}-\x{200B}\x{FEFF}]+$/u', '', $rest);
+	$rest = trim(is_string($rest_trim) ? $rest_trim : $rest);
+
+	if ($rest === '' || str_starts_with($rest, '/') || str_starts_with($rest, '#') || str_starts_with($rest, '?')) {
+		return '';
+	}
+
+	if (preg_match('/\s/u', $rest)) {
+		return '';
+	}
+
+	$host = explode('/', explode('?', explode('#', $rest, 2)[0], 2)[0], 2)[0];
+	$host = explode(':', $host, 2)[0];
+	if ($host === '' || !preg_match('/[a-z0-9]/i', $host)) {
+		return '';
+	}
+
+	$path_before = explode('?', explode('#', $rest, 2)[0], 2)[0];
+	$out = 'https://' . $rest;
+
+	$clean = esc_url_raw($out);
+	if (is_string($clean) && stripos($clean, 'https://') === 0) {
+		if (!str_ends_with($path_before, '/')) {
+			$stripped = preg_replace('~^(https://[^/?#]+)/$~i', '$1', $clean);
+			$clean = is_string($stripped) ? $stripped : $clean;
+		}
+		return $clean;
+	}
+
+	if (!str_ends_with($path_before, '/')) {
+		$stripped = preg_replace('~^(https://[^/?#]+)/$~i', '$1', $out);
+		$out = is_string($stripped) ? $stripped : $out;
+	}
+
+	return $out;
+}
+
+/**
+ * Soft-normalize a link field URL-type destination.
+ * Keeps relative paths, fragments, and existing schemes; bare hosts get https://.
+ */
+function bl_blocks_normalize_link_href(string $raw): string
+{
+	$v = trim($raw);
+	if ($v === '') {
+		return '';
+	}
+
+	if (preg_match('#^([/#?]|//|[a-z][a-z0-9+.\-]*:)#i', $v)) {
+		return sanitize_text_field($v);
+	}
+
+	return sanitize_text_field('https://' . $v);
+}
+
+/**
  * Sanitize a stored link field value.
  *
  * @param array<string, mixed> $field
@@ -785,7 +854,7 @@ function bl_blocks_sanitize_link_value(array $field, $raw): array
 		}
 		// Allow explicit url from editor hydrate when post lookup fails in REST-only contexts.
 		if ($url === '' && !empty($raw['url'])) {
-			$url = esc_url_raw((string) $raw['url']);
+			$url = sanitize_text_field((string) $raw['url']);
 		}
 	} elseif ($type === 'email') {
 		$addr = sanitize_email(preg_replace('/^mailto:/i', '', (string) ($raw['url'] ?? '')));
@@ -800,7 +869,8 @@ function bl_blocks_sanitize_link_value(array $field, $raw): array
 			$title = $num;
 		}
 	} else {
-		$url = esc_url_raw((string) ($raw['url'] ?? ''));
+		// Soft href: keep /…, #…, schemes; bare hosts get https://.
+		$url = bl_blocks_normalize_link_href((string) ($raw['url'] ?? ''));
 		if ($title === '' && $url !== '') {
 			$host = wp_parse_url($url, PHP_URL_HOST);
 			$title = is_string($host) && $host !== '' ? $host : $url;
@@ -935,6 +1005,11 @@ function bl_blocks_sanitize_values(array $fields, $raw): array
 
 		if (in_array($type, ['textarea', 'html'], true)) {
 			$values[$name] = sanitize_textarea_field(is_scalar($raw_value) ? (string) $raw_value : '');
+			continue;
+		}
+
+		if ($type === 'url') {
+			$values[$name] = bl_blocks_normalize_https_url(is_scalar($raw_value) ? (string) $raw_value : '');
 			continue;
 		}
 

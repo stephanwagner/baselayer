@@ -3396,7 +3396,7 @@
       case "email":
         return "email";
       case "url":
-        return "url";
+        return "text";
       case "phone":
         return "tel";
       case "date":
@@ -3421,12 +3421,7 @@
       return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
     }
     if (type === "url") {
-      try {
-        const parsed = new URL(v, window.location.origin);
-        return parsed.protocol === "http:" || parsed.protocol === "https:";
-      } catch (err) {
-        return false;
-      }
+      return /^https:\/\/\S+$/i.test(v);
     }
     if (type === "phone") {
       if (!/^\+?[\d\s.\-()]{6,}$/.test(v)) {
@@ -3446,9 +3441,36 @@
     }
     return true;
   }
+  function normalizeHttpsUrl(raw) {
+    let v = String(raw || "").replace(
+      /^[\s\u00A0\u2000-\u200B\uFEFF]+|[\s\u00A0\u2000-\u200B\uFEFF]+$/g,
+      ""
+    );
+    if (!v) return "";
+    v = v.replace(/^[a-z][a-z0-9+.\-]*:/i, "").replace(/^\/\//, "");
+    v = v.replace(/^[\s\u00A0\u2000-\u200B\uFEFF]+|[\s\u00A0\u2000-\u200B\uFEFF]+$/g, "");
+    if (!v || v.startsWith("/") || v.startsWith("#") || v.startsWith("?")) {
+      return "";
+    }
+    if (/\s/.test(v)) {
+      return "";
+    }
+    const host = v.split(/[/?#]/)[0].split(":")[0];
+    if (!host || !/[a-z0-9]/i.test(host)) {
+      return "";
+    }
+    return "https://" + v;
+  }
   function normalizeDefaultValue(type, value) {
     const v = String(value || "").trim();
-    if (v === "" || isValidDefaultValue(type, v)) {
+    if (v === "") {
+      return "";
+    }
+    if (type === "url") {
+      const next = normalizeHttpsUrl(v);
+      return next !== "" && isValidDefaultValue("url", next) ? next : "";
+    }
+    if (isValidDefaultValue(type, v)) {
       return v;
     }
     return "";

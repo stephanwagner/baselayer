@@ -35,6 +35,40 @@
       update();
     });
   }
+  function normalizeHttpsUrl(raw) {
+    let v = String(raw || "").replace(
+      /^[\s\u00A0\u2000-\u200B\uFEFF]+|[\s\u00A0\u2000-\u200B\uFEFF]+$/g,
+      ""
+    );
+    if (!v) return "";
+    v = v.replace(/^[a-z][a-z0-9+.\-]*:/i, "").replace(/^\/\//, "");
+    v = v.replace(/^[\s\u00A0\u2000-\u200B\uFEFF]+|[\s\u00A0\u2000-\u200B\uFEFF]+$/g, "");
+    if (!v || v.startsWith("/") || v.startsWith("#") || v.startsWith("?")) {
+      return "";
+    }
+    if (/\s/.test(v)) {
+      return "";
+    }
+    const host = v.split(/[/?#]/)[0].split(":")[0];
+    if (!host || !/[a-z0-9]/i.test(host)) {
+      return "";
+    }
+    return "https://" + v;
+  }
+  function applyHttpsUrlInput(input) {
+    if (!(input instanceof HTMLInputElement)) return;
+    const next = normalizeHttpsUrl(input.value);
+    if (next !== "") {
+      input.value = next;
+    }
+  }
+  function initHttpsUrlFields(root) {
+    root.querySelectorAll(".bl-form__field--url input.bl-form__control").forEach((input) => {
+      if (input.dataset.blHttpsUrlBound === "1") return;
+      input.dataset.blHttpsUrlBound = "1";
+      input.addEventListener("blur", () => applyHttpsUrlInput(input));
+    });
+  }
   function fileTypeStyles() {
     return window.blForms && window.blForms.fileTypes || {};
   }
@@ -611,6 +645,7 @@
     initFileUploads(root);
     initClassicFileLimits(root);
     initCharCounters(root);
+    initHttpsUrlFields(root);
     const evaluateLogic = initConditionalLogic(root);
     const progress = createProgressController(root);
     const jsField = form.querySelector("[data-bl-form-js-field]");
@@ -772,6 +807,9 @@
     };
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
+      form.querySelectorAll(".bl-form__field--url input.bl-form__control").forEach((input) => {
+        applyHttpsUrlInput(input);
+      });
       if (jsField && jsToken) {
         jsField.value = jsToken;
       }

@@ -50,6 +50,54 @@ function isStatic(type) {
   );
 }
 
+/**
+ * Strip any scheme and force https://. Loose check — any host-like value is fine.
+ */
+function normalizeHttpsUrl(raw) {
+  let v = String(raw || '').replace(
+    /^[\s\u00A0\u2000-\u200B\uFEFF]+|[\s\u00A0\u2000-\u200B\uFEFF]+$/g,
+    ''
+  );
+  if (!v) return '';
+  v = v.replace(/^[a-z][a-z0-9+.\-]*:/i, '').replace(/^\/\//, '');
+  v = v.replace(/^[\s\u00A0\u2000-\u200B\uFEFF]+|[\s\u00A0\u2000-\u200B\uFEFF]+$/g, '');
+  if (!v || v.startsWith('/') || v.startsWith('#') || v.startsWith('?')) {
+    return '';
+  }
+  if (/\s/.test(v)) {
+    return '';
+  }
+  const host = v.split(/[/?#]/)[0].split(':')[0];
+  if (!host || !/[a-z0-9]/i.test(host)) {
+    return '';
+  }
+  return 'https://' + v;
+}
+
+function bindHttpsUrlInput(input) {
+  if (!(input instanceof HTMLInputElement) || input.dataset.blHttpsUrlBound === '1') {
+    return;
+  }
+  input.dataset.blHttpsUrlBound = '1';
+  input.addEventListener('blur', () => {
+    const next = normalizeHttpsUrl(input.value);
+    if (next !== '') {
+      input.value = next;
+    }
+  });
+}
+
+/**
+ * Bind PHP-rendered URL fields (Website / classic admin).
+ *
+ * @param {ParentNode} [root=document]
+ */
+export function bindHttpsUrlFields(root = document) {
+  root.querySelectorAll('input[data-bl-blocks-https-url]').forEach((input) => {
+    bindHttpsUrlInput(input);
+  });
+}
+
 function collectLeafValue(field, control, type) {
   const name = field.name;
   if (!name) return null;
@@ -77,6 +125,13 @@ function collectLeafValue(field, control, type) {
   if (type === 'toggle' || type === 'terms') {
     const input = control.tagName === 'INPUT' ? control : control.querySelector('input');
     return input && input.checked ? '1' : '';
+  }
+  if (type === 'url' && control && 'value' in control) {
+    const next = normalizeHttpsUrl(control.value);
+    if (next !== '' && next !== control.value) {
+      control.value = next;
+    }
+    return next !== '' ? next : String(control.value || '').trim();
   }
   if (control && 'value' in control) {
     return control.value;
@@ -201,7 +256,7 @@ function createLeafControl(field, values, controls) {
     if (control) control.id = id;
   } else {
     let inputType = 'text';
-    if (type === 'email' || type === 'url' || type === 'number' || type === 'date' || type === 'time') {
+    if (type === 'email' || type === 'number' || type === 'date' || type === 'time') {
       inputType = type;
     } else if (type === 'phone') {
       inputType = 'tel';
@@ -215,6 +270,10 @@ function createLeafControl(field, values, controls) {
       value: current == null ? '' : String(current),
     });
     if (field.placeholder) control.placeholder = field.placeholder;
+    if (type === 'url') {
+      if (!control.placeholder) control.placeholder = 'https://';
+      bindHttpsUrlInput(control);
+    }
   }
 
   if (control) {
@@ -526,11 +585,13 @@ window.blBlocksFieldUiApi = {
   openFieldsModal,
   bindPagePickers,
   bindLinkFields,
+  bindHttpsUrlFields,
 };
 
 if (typeof document !== 'undefined') {
   document.addEventListener('DOMContentLoaded', () => {
     bindPagePickers(document);
     bindLinkFields(document);
+    bindHttpsUrlFields(document);
   });
 }

@@ -678,7 +678,7 @@ function bl_forms_message_fallbacks(): array
 		'char_count_empty' => __('No characters remaining', 'baselayer-forms'),
 		'number'     => __('Enter a valid number.', 'baselayer-forms'),
 		'email'      => __('Enter a valid email address.', 'baselayer-forms'),
-		'url'        => __('Enter a valid URL.', 'baselayer-forms'),
+		'url'        => __('Enter a valid https:// URL.', 'baselayer-forms'),
 		'phone'      => __('Enter a valid phone number.', 'baselayer-forms'),
 		'date'       => __('Enter a valid date.', 'baselayer-forms'),
 		'time'       => __('Enter a valid time.', 'baselayer-forms'),
@@ -1317,8 +1317,7 @@ function bl_forms_sanitize_typed_default(string $type, string $raw): string
 			$email = sanitize_email($value);
 			return is_email($email) ? $email : '';
 		case 'url':
-			$url = esc_url_raw($value);
-			return $url !== '' ? $url : '';
+			return bl_forms_normalize_https_url($value);
 		case 'phone':
 			return bl_forms_is_valid_phone($value) ? $value : '';
 		case 'date':

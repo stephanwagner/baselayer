@@ -131,12 +131,13 @@ function bl_blocks_enqueue_page_editor(string $hook): void
 			'linkTypeUrl'            => __('URL', 'baselayer-blocks'),
 			'linkTypeEmail'          => __('Email', 'baselayer-blocks'),
 			'linkTypePhone'          => __('Phone', 'baselayer-blocks'),
+			'linkTypeLabel'          => __('Link type', 'baselayer-blocks'),
+			'linkDestPage'           => __('Page', 'baselayer-blocks'),
+			'linkDestUrl'            => __('URL', 'baselayer-blocks'),
+			'linkDestEmail'          => __('Email address', 'baselayer-blocks'),
+			'linkDestPhone'          => __('Phone number', 'baselayer-blocks'),
 			'linkText'               => __('Link text', 'baselayer-blocks'),
-			'linkTextPlaceholder'    => __('Link text', 'baselayer-blocks'),
 			'linkOpenNewTab'         => __('Open in new tab', 'baselayer-blocks'),
-			'linkUrlPlaceholder'     => __('https://', 'baselayer-blocks'),
-			'linkEmailPlaceholder'   => __('name@example.com', 'baselayer-blocks'),
-			'linkPhonePlaceholder'   => __('+41 …', 'baselayer-blocks'),
 		],
 	]);
 

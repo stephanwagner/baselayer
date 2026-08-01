@@ -1119,7 +1119,8 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 	if ($type === 'email') {
 		$input_type = 'email';
 	} elseif ($type === 'url') {
-		$input_type = 'url';
+		// text + our https normalize (browser type=url is stricter than we want).
+		$input_type = 'text';
 	} elseif ($type === 'phone') {
 		$input_type = 'tel';
 	} elseif ($type === 'number') {

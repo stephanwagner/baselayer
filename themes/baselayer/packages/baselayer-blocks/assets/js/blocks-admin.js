@@ -2780,6 +2780,20 @@
     }
     return String(state.url || "");
   }
+  function normalizeLinkHref(raw) {
+    const v = String(raw || "").trim();
+    if (!v) return "";
+    if (/^([/#?]|\/\/|[a-z][a-z0-9+.\-]*:)/i.test(v)) {
+      return v;
+    }
+    return "https://" + v;
+  }
+  function destinationFieldLabel(type) {
+    if (type === "page") return i18n2("linkDestPage", "Page");
+    if (type === "email") return i18n2("linkDestEmail", "Email address");
+    if (type === "phone") return i18n2("linkDestPhone", "Phone number");
+    return i18n2("linkDestUrl", "URL");
+  }
   function createLinkControl(field, current) {
     const allowed = allowedLinkTypes(field);
     const allowTarget = field.allow_target !== false;
@@ -2790,12 +2804,13 @@
       dataset: { blBlocksLinkField: "1" }
     });
     const typeRow = el5("div", { className: "bl-blocks-fields__link-types" });
+    const destLabel = el5("label", { text: destinationFieldLabel(state.type) });
     const destWrap = el5("div", { className: "bl-blocks-fields__link-destination" });
+    const destRow = el5("div", { className: "bl-blocks-fields__link-dest" }, [destLabel, destWrap]);
     const titleInput = el5("input", {
       type: "text",
       className: "widefat",
-      value: state.title,
-      placeholder: i18n2("linkTextPlaceholder", "Link text")
+      value: state.title
     });
     const titleRow = el5("p", { className: "bl-blocks-fields__link-title" }, [
       el5("label", { text: i18n2("linkText", "Link text") }),
@@ -2815,6 +2830,7 @@
       }
     };
     const renderDestination = () => {
+      destLabel.textContent = destinationFieldLabel(state.type);
       destWrap.replaceChildren();
       if (state.type === "page") {
         const summary = el5("div", { className: "bl-blocks-fields__page-picker-summary" });
@@ -2898,25 +2914,33 @@
         );
         return;
       }
-      let inputType = "url";
-      let placeholder = i18n2("linkUrlPlaceholder", "https://");
+      let inputType = "text";
       let value = displayDestination(state);
       if (state.type === "email") {
         inputType = "email";
-        placeholder = i18n2("linkEmailPlaceholder", "name@example.com");
       } else if (state.type === "phone") {
         inputType = "tel";
-        placeholder = i18n2("linkPhonePlaceholder", "+41 \u2026");
+      } else if (state.type === "url") {
+        value = normalizeLinkHref(value);
+        state.url = value;
       }
       const input = el5("input", {
         type: inputType,
         className: "widefat",
-        value,
-        placeholder
+        value
       });
       input.addEventListener("input", () => {
         state.url = input.value;
       });
+      if (state.type === "url") {
+        input.addEventListener("blur", () => {
+          const next = normalizeLinkHref(input.value);
+          if (next !== input.value) {
+            input.value = next;
+          }
+          state.url = next;
+        });
+      }
       destWrap.appendChild(input);
     };
     if (allowed.length > 1) {
@@ -2949,7 +2973,12 @@
         });
         typeRow.appendChild(btn);
       });
-      root.appendChild(typeRow);
+      root.appendChild(
+        el5("div", { className: "bl-blocks-fields__link-type-block" }, [
+          el5("label", { text: i18n2("linkTypeLabel", "Link type") }),
+          typeRow
+        ])
+      );
     }
     titleInput.addEventListener("input", () => {
       state.title = titleInput.value;
@@ -2958,7 +2987,7 @@
     targetInput.addEventListener("change", () => {
       state.target = targetInput.checked ? "_blank" : "";
     });
-    root.append(destWrap, titleRow, targetRow);
+    root.append(destRow, titleRow, targetRow);
     syncTargetVisibility();
     renderDestination();
     if (state.type === "page" && state.page_id > 0 && (!pageMeta || !pageMeta.title)) {
@@ -3001,7 +3030,12 @@
         const phone = String(destInput ? destInput.value : state.url || "").replace(/^tel:/i, "").trim();
         out.url = phone ? "tel:" + phone : "";
       } else {
-        out.url = String(destInput ? destInput.value : state.url || "").trim();
+        const href = normalizeLinkHref(destInput ? destInput.value : state.url || "");
+        out.url = href;
+        if (destInput && destInput.value !== href) {
+          destInput.value = href;
+        }
+        state.url = href;
       }
       if (allowTarget && (state.type === "page" || state.type === "url") && targetInput.checked) {
         out.target = "_blank";
@@ -3113,6 +3147,43 @@
   function isStatic(type) {
     return type === "divider" || type === "spacer" || type === "heading" || type === "text_block" || type === "html" || type === "honeypot" || type === "captcha";
   }
+  function normalizeHttpsUrl(raw) {
+    let v = String(raw || "").replace(
+      /^[\s\u00A0\u2000-\u200B\uFEFF]+|[\s\u00A0\u2000-\u200B\uFEFF]+$/g,
+      ""
+    );
+    if (!v) return "";
+    v = v.replace(/^[a-z][a-z0-9+.\-]*:/i, "").replace(/^\/\//, "");
+    v = v.replace(/^[\s\u00A0\u2000-\u200B\uFEFF]+|[\s\u00A0\u2000-\u200B\uFEFF]+$/g, "");
+    if (!v || v.startsWith("/") || v.startsWith("#") || v.startsWith("?")) {
+      return "";
+    }
+    if (/\s/.test(v)) {
+      return "";
+    }
+    const host = v.split(/[/?#]/)[0].split(":")[0];
+    if (!host || !/[a-z0-9]/i.test(host)) {
+      return "";
+    }
+    return "https://" + v;
+  }
+  function bindHttpsUrlInput(input) {
+    if (!(input instanceof HTMLInputElement) || input.dataset.blHttpsUrlBound === "1") {
+      return;
+    }
+    input.dataset.blHttpsUrlBound = "1";
+    input.addEventListener("blur", () => {
+      const next = normalizeHttpsUrl(input.value);
+      if (next !== "") {
+        input.value = next;
+      }
+    });
+  }
+  function bindHttpsUrlFields(root = document) {
+    root.querySelectorAll("input[data-bl-blocks-https-url]").forEach((input) => {
+      bindHttpsUrlInput(input);
+    });
+  }
   function collectLeafValue(field, control, type) {
     const name = field.name;
     if (!name) return null;
@@ -3140,6 +3211,13 @@
     if (type === "toggle" || type === "terms") {
       const input = control.tagName === "INPUT" ? control : control.querySelector("input");
       return input && input.checked ? "1" : "";
+    }
+    if (type === "url" && control && "value" in control) {
+      const next = normalizeHttpsUrl(control.value);
+      if (next !== "" && next !== control.value) {
+        control.value = next;
+      }
+      return next !== "" ? next : String(control.value || "").trim();
     }
     if (control && "value" in control) {
       return control.value;
@@ -3251,7 +3329,7 @@
       if (control) control.id = id;
     } else {
       let inputType = "text";
-      if (type === "email" || type === "url" || type === "number" || type === "date" || type === "time") {
+      if (type === "email" || type === "number" || type === "date" || type === "time") {
         inputType = type;
       } else if (type === "phone") {
         inputType = "tel";
@@ -3265,6 +3343,10 @@
         value: current == null ? "" : String(current)
       });
       if (field.placeholder) control.placeholder = field.placeholder;
+      if (type === "url") {
+        if (!control.placeholder) control.placeholder = "https://";
+        bindHttpsUrlInput(control);
+      }
     }
     if (control) {
       row.appendChild(control);
@@ -3514,12 +3596,14 @@
     createFieldForm,
     openFieldsModal,
     bindPagePickers,
-    bindLinkFields
+    bindLinkFields,
+    bindHttpsUrlFields
   };
   if (typeof document !== "undefined") {
     document.addEventListener("DOMContentLoaded", () => {
       bindPagePickers(document);
       bindLinkFields(document);
+      bindHttpsUrlFields(document);
     });
   }
 

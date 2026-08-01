@@ -93,6 +93,26 @@ function displayDestination(state) {
 }
 
 /**
+ * Soft href normalize for link → URL type.
+ * Keeps /…, #…, ?…, //…, and any existing scheme; bare hosts get https://.
+ */
+function normalizeLinkHref(raw) {
+  const v = String(raw || '').trim();
+  if (!v) return '';
+  if (/^([/#?]|\/\/|[a-z][a-z0-9+.\-]*:)/i.test(v)) {
+    return v;
+  }
+  return 'https://' + v;
+}
+
+function destinationFieldLabel(type) {
+  if (type === 'page') return i18n('linkDestPage', 'Page');
+  if (type === 'email') return i18n('linkDestEmail', 'Email address');
+  if (type === 'phone') return i18n('linkDestPhone', 'Phone number');
+  return i18n('linkDestUrl', 'URL');
+}
+
+/**
  * @param {object} field
  * @param {unknown} current
  * @returns {HTMLElement & { getLinkValue: () => object }}
@@ -113,12 +133,13 @@ export function createLinkControl(field, current) {
   });
 
   const typeRow = el('div', { className: 'bl-blocks-fields__link-types' });
+  const destLabel = el('label', { text: destinationFieldLabel(state.type) });
   const destWrap = el('div', { className: 'bl-blocks-fields__link-destination' });
+  const destRow = el('div', { className: 'bl-blocks-fields__link-dest' }, [destLabel, destWrap]);
   const titleInput = el('input', {
     type: 'text',
     className: 'widefat',
     value: state.title,
-    placeholder: i18n('linkTextPlaceholder', 'Link text'),
   });
   const titleRow = el('p', { className: 'bl-blocks-fields__link-title' }, [
     el('label', { text: i18n('linkText', 'Link text') }),
@@ -140,6 +161,7 @@ export function createLinkControl(field, current) {
   };
 
   const renderDestination = () => {
+    destLabel.textContent = destinationFieldLabel(state.type);
     destWrap.replaceChildren();
     if (state.type === 'page') {
       const summary = el('div', { className: 'bl-blocks-fields__page-picker-summary' });
@@ -226,25 +248,33 @@ export function createLinkControl(field, current) {
       return;
     }
 
-    let inputType = 'url';
-    let placeholder = i18n('linkUrlPlaceholder', 'https://');
+    let inputType = 'text';
     let value = displayDestination(state);
     if (state.type === 'email') {
       inputType = 'email';
-      placeholder = i18n('linkEmailPlaceholder', 'name@example.com');
     } else if (state.type === 'phone') {
       inputType = 'tel';
-      placeholder = i18n('linkPhonePlaceholder', '+41 …');
+    } else if (state.type === 'url') {
+      value = normalizeLinkHref(value);
+      state.url = value;
     }
     const input = el('input', {
       type: inputType,
       className: 'widefat',
       value,
-      placeholder,
     });
     input.addEventListener('input', () => {
       state.url = input.value;
     });
+    if (state.type === 'url') {
+      input.addEventListener('blur', () => {
+        const next = normalizeLinkHref(input.value);
+        if (next !== input.value) {
+          input.value = next;
+        }
+        state.url = next;
+      });
+    }
     destWrap.appendChild(input);
   };
 
@@ -280,7 +310,12 @@ export function createLinkControl(field, current) {
       });
       typeRow.appendChild(btn);
     });
-    root.appendChild(typeRow);
+    root.appendChild(
+      el('div', { className: 'bl-blocks-fields__link-type-block' }, [
+        el('label', { text: i18n('linkTypeLabel', 'Link type') }),
+        typeRow,
+      ])
+    );
   }
 
   titleInput.addEventListener('input', () => {
@@ -291,7 +326,7 @@ export function createLinkControl(field, current) {
     state.target = targetInput.checked ? '_blank' : '';
   });
 
-  root.append(destWrap, titleRow, targetRow);
+  root.append(destRow, titleRow, targetRow);
   syncTargetVisibility();
   renderDestination();
 
@@ -344,7 +379,12 @@ export function createLinkControl(field, current) {
         .trim();
       out.url = phone ? 'tel:' + phone : '';
     } else {
-      out.url = String(destInput ? destInput.value : state.url || '').trim();
+      const href = normalizeLinkHref(destInput ? destInput.value : state.url || '');
+      out.url = href;
+      if (destInput && destInput.value !== href) {
+        destInput.value = href;
+      }
+      state.url = href;
     }
 
     if (allowTarget && (state.type === 'page' || state.type === 'url') && targetInput.checked) {

@@ -543,7 +543,13 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 		} elseif ($type === 'email') {
 			$value = sanitize_email($value);
 		} elseif ($type === 'url') {
-			$value = esc_url_raw($value);
+			$original_url = $value;
+			$value = bl_forms_normalize_https_url($value);
+			if ($original_url !== '' && $value === '') {
+				$values[$name] = sanitize_text_field($original_url);
+				$invalid[$name] = bl_forms_field_error_message('url', $field, $settings);
+				continue;
+			}
 		} elseif ($type === 'number') {
 			if ($value !== '' && !is_numeric($value)) {
 				$values[$name] = sanitize_text_field($value);
@@ -617,14 +623,9 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 			continue;
 		}
 
-		if ($type === 'url' && $value !== '') {
-			$valid_url = function_exists('wp_http_validate_url')
-				? (bool) wp_http_validate_url($value)
-				: (bool) filter_var($value, FILTER_VALIDATE_URL);
-			if (!$valid_url) {
-				$invalid[$name] = bl_forms_field_error_message('url', $field, $settings);
-				continue;
-			}
+		if ($type === 'url' && $value !== '' && !bl_forms_is_valid_https_url($value)) {
+			$invalid[$name] = bl_forms_field_error_message('url', $field, $settings);
+			continue;
 		}
 
 		if ($type === 'number' && $value !== '' && is_numeric($value)) {

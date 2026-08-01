@@ -383,16 +383,26 @@ function bl_blocks_render_admin_fields_walk(array $fields, array $values, string
 					$input_type = 'tel';
 				} elseif ($type === 'datetime') {
 					$input_type = 'datetime-local';
-				} elseif (in_array($type, ['email', 'url', 'number', 'date', 'time'], true)) {
+				} elseif (in_array($type, ['email', 'number', 'date', 'time'], true)) {
 					$input_type = $type;
+				} elseif ($type === 'url') {
+					$input_type = 'text';
+				}
+				$extra_attrs = '';
+				if ($type === 'url') {
+					$extra_attrs .= ' data-bl-blocks-https-url';
+					if ($placeholder === '') {
+						$placeholder = 'https://';
+					}
 				}
 				printf(
-					'<input class="widefat" type="%s" id="%s" name="%s" value="%s" placeholder="%s"%s>',
+					'<input class="widefat" type="%s" id="%s" name="%s" value="%s" placeholder="%s"%s%s>',
 					esc_attr($input_type),
 					esc_attr($id),
 					esc_attr($input_name),
 					esc_attr(is_scalar($value) ? (string) $value : ''),
 					esc_attr($placeholder),
+					$extra_attrs,
 					$required ? ' required' : ''
 				);
 				break;
@@ -708,12 +718,13 @@ function bl_blocks_enqueue_field_ui_assets(): void
 			'linkTypeUrl'            => __('URL', 'baselayer-blocks'),
 			'linkTypeEmail'          => __('Email', 'baselayer-blocks'),
 			'linkTypePhone'          => __('Phone', 'baselayer-blocks'),
+			'linkTypeLabel'          => __('Link type', 'baselayer-blocks'),
+			'linkDestPage'           => __('Page', 'baselayer-blocks'),
+			'linkDestUrl'            => __('URL', 'baselayer-blocks'),
+			'linkDestEmail'          => __('Email address', 'baselayer-blocks'),
+			'linkDestPhone'          => __('Phone number', 'baselayer-blocks'),
 			'linkText'               => __('Link text', 'baselayer-blocks'),
-			'linkTextPlaceholder'    => __('Link text', 'baselayer-blocks'),
 			'linkOpenNewTab'         => __('Open in new tab', 'baselayer-blocks'),
-			'linkUrlPlaceholder'     => __('https://', 'baselayer-blocks'),
-			'linkEmailPlaceholder'   => __('name@example.com', 'baselayer-blocks'),
-			'linkPhonePlaceholder'   => __('+41 …', 'baselayer-blocks'),
 		],
 	]);
 }

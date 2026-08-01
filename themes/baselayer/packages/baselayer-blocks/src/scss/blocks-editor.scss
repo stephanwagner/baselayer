@@ -205,6 +205,23 @@
   gap: 6px;
 }
 
+.bl-blocks-fields__link-type-block,
+.bl-blocks-fields__link-dest {
+  margin: 0;
+}
+
+.bl-blocks-fields__link-type-block > label,
+.bl-blocks-fields__link-dest > label,
+.bl-blocks-fields__link-title label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+
+.bl-blocks-fields__link-type-block .bl-blocks-fields__link-types {
+  margin-top: 0;
+}
+
 .bl-blocks-fields__link-type.is-active {
   border-color: #2271b1;
   color: #2271b1;
@@ -213,12 +230,6 @@
 
 .bl-blocks-fields__link-title {
   margin: 0;
-}
-
-.bl-blocks-fields__link-title label {
-  display: block;
-  margin-bottom: 4px;
-  font-weight: 600;
 }
 
 .bl-blocks-fields__layout--column {

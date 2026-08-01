@@ -227,6 +227,82 @@ function bl_forms_format_inline_emphasis(string $escaped): string
 }
 
 /**
+ * Trim ASCII + common Unicode spaces from both ends.
+ */
+function bl_forms_trim_url_input(string $raw): string
+{
+	$trimmed = preg_replace('/^[\s\x{00A0}\x{2000}-\x{200B}\x{FEFF}]+|[\s\x{00A0}\x{2000}-\x{200B}\x{FEFF}]+$/u', '', $raw);
+	return trim(is_string($trimmed) ? $trimmed : $raw);
+}
+
+/**
+ * Force an absolute https URL (strip any scheme).
+ *
+ * Intentionally loose: any non-empty host-like value is accepted (.test, made-up TLDs, etc.).
+ * Relative paths / fragments alone are rejected — use a text or link field for those.
+ */
+function bl_forms_normalize_https_url(string $raw): string
+{
+	$trimmed = bl_forms_trim_url_input($raw);
+	if ($trimmed === '') {
+		return '';
+	}
+
+	// Strip scheme (http:, https:, ftp:, javascript:, …) and optional //.
+	$rest = (string) preg_replace('#^[a-z][a-z0-9+.\-]*:#i', '', $trimmed);
+	$rest = (string) preg_replace('#^//#', '', $rest);
+	$rest = bl_forms_trim_url_input($rest);
+
+	if ($rest === '' || str_starts_with($rest, '/') || str_starts_with($rest, '#') || str_starts_with($rest, '?')) {
+		return '';
+	}
+
+	// No whitespace inside the value.
+	if (preg_match('/\s/u', $rest)) {
+		return '';
+	}
+
+	$host = explode('/', explode('?', explode('#', $rest, 2)[0], 2)[0], 2)[0];
+	$host = explode(':', $host, 2)[0]; // drop port for the emptiness check
+	if ($host === '' || !preg_match('/[a-z0-9]/i', $host)) {
+		return '';
+	}
+
+	$path_before = explode('?', explode('#', $rest, 2)[0], 2)[0];
+	$out = 'https://' . $rest;
+
+	// Soft clean only — never fail solely because esc_url_raw emptied the value.
+	$clean = esc_url_raw($out);
+	if (is_string($clean) && stripos($clean, 'https://') === 0) {
+		if (!str_ends_with($path_before, '/')) {
+			$stripped = preg_replace('~^(https://[^/?#]+)/$~i', '$1', $clean);
+			$clean = is_string($stripped) ? $stripped : $clean;
+		}
+		return $clean;
+	}
+
+	if (!str_ends_with($path_before, '/')) {
+		$stripped = preg_replace('~^(https://[^/?#]+)/$~i', '$1', $out);
+		$out = is_string($stripped) ? $stripped : $out;
+	}
+
+	return $out;
+}
+
+/**
+ * True when the value is already a usable absolute https URL.
+ */
+function bl_forms_is_valid_https_url(string $value): bool
+{
+	$trimmed = bl_forms_trim_url_input($value);
+	if ($trimmed === '' || stripos($trimmed, 'https://') !== 0) {
+		return false;
+	}
+
+	return bl_forms_normalize_https_url($trimmed) !== '';
+}
+
+/**
  * Soft phone number check (digits with common separators / leading +).
  */
 function bl_forms_is_valid_phone(string $value): bool
