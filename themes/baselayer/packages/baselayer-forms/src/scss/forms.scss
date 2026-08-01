@@ -154,6 +154,80 @@
   width: 100%;
 }
 
+.bl-form__tabs {
+  box-sizing: border-box;
+  flex: 0 1 100%;
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.bl-form__tablist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  border-bottom: 1px solid var(--bl-form-border);
+}
+
+.bl-form__tab {
+  appearance: none;
+  margin: 0 0 -1px;
+  padding: 8px 14px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: var(--bl-form-radius) var(--bl-form-radius) 0 0;
+  background: transparent;
+  color: var(--bl-form-muted, #646970);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--bl-form-text, inherit);
+  }
+
+  &.is-active {
+    border-color: var(--bl-form-border);
+    background: var(--bl-form-bg, #fff);
+    color: var(--bl-form-text, inherit);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--bl-form-accent, #2271b1);
+    outline-offset: 2px;
+  }
+}
+
+.bl-form__tab-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--bl-form-gap);
+  width: 100%;
+  min-width: 0;
+
+  &[hidden] {
+    display: none !important;
+  }
+
+  &--outline,
+  &--card {
+    padding: 16px;
+    border: 1px solid var(--bl-form-border);
+    border-radius: var(--bl-form-radius);
+
+    @media (max-width: $breakpoint-s) {
+      padding: 12px;
+    }
+  }
+
+  &--card {
+    background: color-mix(in srgb, var(--bl-form-muted) 8%, var(--bl-form-bg));
+  }
+}
+
 .bl-form__field-wrap {
   box-sizing: border-box;
   flex: 0 1 auto;

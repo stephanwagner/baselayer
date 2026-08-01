@@ -1,5 +1,11 @@
 import { el, t, typeLabel, uid, iconEl, uniqueFieldName, slugifyOption, readConfig, flattenFields, fieldIsActive, cloneFieldData } from './dom.js';
-import { createColumnCard, createSectionCard, serializeLayoutRow, equalizeColumnRun } from './layout.js';
+import {
+  createColumnCard,
+  createSectionCard,
+  createTabCard,
+  serializeLayoutRow,
+  equalizeColumnRun,
+} from './layout.js';
 import { createConditionalLogicEditor, readConditionalLogicFromDom, normalizeConditionalLogic } from './conditional-logic.js';
 import { getFieldCardHooks, useMediaLibraryFields } from './config.js';
 
@@ -221,7 +227,7 @@ function canConvertType(from, to) {
  */
 function hydrateFieldFromCard(row, field) {
   const data = serializeRow(row);
-  if (!data || data.type === 'column' || data.type === 'section') {
+  if (!data || data.type === 'column' || data.type === 'section' || data.type === 'tab') {
     return;
   }
   const keepId = field.id;
@@ -499,6 +505,7 @@ const NO_PLACEHOLDER = [
   'html',
   'column',
   'section',
+  'tab',
   'date',
   'time',
   'datetime',
@@ -516,6 +523,7 @@ const NO_REQUIRED = [
   'html',
   'column',
   'section',
+  'tab',
 ];
 const NO_READONLY = [
   ...NO_REQUIRED,
@@ -930,7 +938,9 @@ export function openFieldWidthModal(field, onApply) {
       ? t('columnWidthTitle', 'Column width')
       : field.type === 'section'
         ? t('sectionWidthTitle', 'Section width')
-        : t('width', 'Width');
+        : field.type === 'tab'
+          ? t('tabWidthTitle', 'Tab width')
+          : t('width', 'Width');
 
   const backdrop = el('div', {
     className: 'bl-forms-builder__modal',
@@ -2920,6 +2930,9 @@ export function createFieldCard(initial, open = false) {
   }
   if ((initial?.type || '') === 'section') {
     return createSectionCard(initial, open);
+  }
+  if ((initial?.type || '') === 'tab') {
+    return createTabCard(initial, open);
   }
 
   let field = {

@@ -40,6 +40,7 @@ export const TYPE_KEYS = [
   'html',
   'column',
   'section',
+  'tab',
   'hidden',
   'honeypot',
   'captcha',
@@ -95,7 +96,7 @@ export const PALETTE_SECTIONS = [
     id: 'layout',
     headingKey: 'paletteSectionLayout',
     headingFallback: 'Layout',
-    types: ['section', 'column', 'divider', 'spacer'],
+    types: ['section', 'tab', 'column', 'divider', 'spacer'],
   },
   {
     id: 'advanced',
@@ -396,6 +397,17 @@ export function defaultField(type = 'text') {
       children: [],
     };
   }
+  if (type === 'tab') {
+    return {
+      id,
+      type,
+      label: typeLabel(type),
+      width: '100',
+      width_custom: '',
+      design: 'standard',
+      children: [],
+    };
+  }
   const base = {
     id,
     type,
@@ -476,7 +488,12 @@ export function flattenFields(fields = []) {
   const walk = (list) => {
     (list || []).forEach((field) => {
       if (!field) return;
-      if (field.type === 'column' || field.type === 'section' || field.type === 'group') {
+      if (
+        field.type === 'column' ||
+        field.type === 'section' ||
+        field.type === 'tab' ||
+        field.type === 'group'
+      ) {
         walk(field.children || []);
         return;
       }

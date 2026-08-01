@@ -254,7 +254,7 @@ function bl_blocks_repeater_max_depth(): int
  */
 function bl_blocks_is_layout_field_type(string $type): bool
 {
-	return in_array($type, ['column', 'section', 'group'], true);
+	return in_array($type, ['column', 'section', 'tab', 'group'], true);
 }
 
 /**
@@ -423,13 +423,23 @@ function bl_blocks_sanitize_layout_field(array $field, int $repeater_depth): ?ar
 		$out['show_title'] = !array_key_exists('show_title', $field) || !empty($field['show_title']);
 	}
 
+	if ($type === 'tab') {
+		$out['label'] = sanitize_text_field((string) ($field['label'] ?? ''));
+	}
+
 	$children = [];
 	$raw_children = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
 	foreach ($raw_children as $child) {
 		$clean = bl_blocks_sanitize_field($child, $repeater_depth);
-		if ($clean !== null) {
-			$children[] = $clean;
+		if ($clean === null) {
+			continue;
 		}
+		$child_type = (string) ($clean['type'] ?? '');
+		// One level only — no nested columns/sections/tabs inside layout containers.
+		if (bl_blocks_is_layout_field_type($child_type)) {
+			continue;
+		}
+		$children[] = $clean;
 	}
 	$out['children'] = $children;
 

@@ -3652,7 +3652,7 @@
     return dict[key] || fallback || key;
   }
   function isLayout(type) {
-    return type === "column" || type === "section" || type === "group";
+    return type === "column" || type === "section" || type === "tab" || type === "group";
   }
   function isStatic(type) {
     return type === "divider" || type === "spacer" || type === "heading" || type === "text_block" || type === "html" || type === "honeypot" || type === "captcha";
@@ -3884,46 +3884,139 @@
     }
     const root = el4("div", rootAttrs);
     const entries = [];
+    const appendLayoutWrap = (field, type, parent, valueMap) => {
+      const design = compact ? "standard" : ["standard", "outline", "card"].includes(field.design) ? field.design : "standard";
+      const layoutClass = [
+        "bl-blocks-fields__layout",
+        "bl-blocks-fields__layout--" + type,
+        "bl-blocks-fields__layout--" + design
+      ];
+      if (field.css_class) {
+        layoutClass.push(String(field.css_class).trim());
+      }
+      const wrap = el4("div", { className: layoutClass.filter(Boolean).join(" ") });
+      const showTitle = type !== "section" || field.show_title !== false && field.show_title !== 0 && field.show_title !== "0";
+      if (type === "section" && showTitle && field.label) {
+        wrap.appendChild(el4("h3", { className: "bl-blocks-fields__section-title", text: field.label }));
+      }
+      parent.appendChild(wrap);
+      walk(field.children || [], wrap, valueMap);
+    };
+    const appendTabGroup = (tabs, parent, valueMap) => {
+      const activeTabs = (tabs || []).filter((tab) => tab && tab.active !== false);
+      if (!activeTabs.length) return;
+      const group = el4("div", {
+        className: "bl-blocks-fields__tabs",
+        dataset: { blBlocksTabs: "1" }
+      });
+      const tablist = el4("div", {
+        className: "bl-blocks-fields__tablist",
+        role: "tablist"
+      });
+      const panels = [];
+      activeTabs.forEach((tab, index2) => {
+        const tabId = String(tab.id || "tab" + index2);
+        const panelId = "bl-blocks-tab-panel-" + tabId;
+        const btnId = "bl-blocks-tab-" + tabId;
+        const label = String(tab.label || "").trim() || i18n4("tabType", "Tab") + " " + (index2 + 1);
+        const btn = el4("button", {
+          type: "button",
+          className: "bl-blocks-fields__tab" + (index2 === 0 ? " is-active" : ""),
+          role: "tab",
+          id: btnId,
+          "aria-controls": panelId,
+          "aria-selected": index2 === 0 ? "true" : "false",
+          tabindex: index2 === 0 ? "0" : "-1",
+          text: label,
+          dataset: { blBlocksTab: "1" }
+        });
+        tablist.appendChild(btn);
+        const design = compact ? "standard" : ["standard", "outline", "card"].includes(tab.design) ? tab.design : "standard";
+        const panelClass = [
+          "bl-blocks-fields__tab-panel",
+          "bl-blocks-fields__tab-panel--" + design
+        ];
+        if (tab.css_class) {
+          panelClass.push(String(tab.css_class).trim());
+        }
+        const panel = el4("div", {
+          className: panelClass.filter(Boolean).join(" "),
+          role: "tabpanel",
+          id: panelId,
+          "aria-labelledby": btnId,
+          hidden: index2 !== 0
+        });
+        walk(tab.children || [], panel, valueMap);
+        panels.push(panel);
+      });
+      const activate = (index2) => {
+        Array.from(tablist.children).forEach((btn, i) => {
+          const on2 = i === index2;
+          btn.classList.toggle("is-active", on2);
+          btn.setAttribute("aria-selected", on2 ? "true" : "false");
+          btn.tabIndex = on2 ? 0 : -1;
+          if (panels[i]) {
+            panels[i].hidden = !on2;
+          }
+        });
+      };
+      tablist.addEventListener("click", (evt) => {
+        const btn = evt.target.closest("[data-bl-blocks-tab]");
+        if (!btn || !tablist.contains(btn)) return;
+        const index2 = Array.from(tablist.children).indexOf(btn);
+        if (index2 >= 0) activate(index2);
+      });
+      group.appendChild(tablist);
+      panels.forEach((panel) => group.appendChild(panel));
+      parent.appendChild(group);
+    };
     const walk = (list, parent, valueMap) => {
-      (list || []).forEach((field) => {
-        if (!field || field.active === false) return;
+      const fields2 = list || [];
+      let i = 0;
+      while (i < fields2.length) {
+        const field = fields2[i];
+        if (!field || field.active === false) {
+          i += 1;
+          continue;
+        }
         const type = field.type || "text";
+        if (type === "tab") {
+          const run = [];
+          while (i < fields2.length && fields2[i] && fields2[i].type === "tab") {
+            run.push(fields2[i]);
+            i += 1;
+          }
+          appendTabGroup(run, parent, valueMap);
+          continue;
+        }
         if (isLayout(type)) {
-          const design = compact ? "standard" : ["standard", "outline", "card"].includes(field.design) ? field.design : "standard";
-          const layoutClass = [
-            "bl-blocks-fields__layout",
-            "bl-blocks-fields__layout--" + type,
-            "bl-blocks-fields__layout--" + design
-          ];
-          if (field.css_class) {
-            layoutClass.push(String(field.css_class).trim());
-          }
-          const wrap = el4("div", { className: layoutClass.filter(Boolean).join(" ") });
-          const showTitle = type !== "section" || field.show_title !== false && field.show_title !== 0 && field.show_title !== "0";
-          if (type === "section" && showTitle && field.label) {
-            wrap.appendChild(el4("h3", { className: "bl-blocks-fields__section-title", text: field.label }));
-          }
-          parent.appendChild(wrap);
-          walk(field.children || [], wrap, valueMap);
-          return;
+          appendLayoutWrap(field, type, parent, valueMap);
+          i += 1;
+          continue;
         }
         if (type === "heading") {
           if (field.label) {
             parent.appendChild(el4("h4", { className: "bl-blocks-fields__heading", text: field.label }));
           }
-          return;
+          i += 1;
+          continue;
         }
         if (type === "text_block" || type === "html") {
           const content = field.default_value || field.content || field.label || "";
           if (content) {
             parent.appendChild(el4("div", { className: "bl-blocks-fields__static", html: content }));
           }
-          return;
+          i += 1;
+          continue;
         }
-        if (isStatic(type)) return;
+        if (isStatic(type)) {
+          i += 1;
+          continue;
+        }
         if (type === "repeater") {
           parent.appendChild(createRepeaterControl(field, valueMap, entries, options));
-          return;
+          i += 1;
+          continue;
         }
         const leafControls = [];
         const row = createLeafControl(field, valueMap, leafControls);
@@ -3931,7 +4024,8 @@
           parent.appendChild(row);
           leafControls.forEach((c) => entries.push({ kind: "leaf", ...c }));
         }
-      });
+        i += 1;
+      }
     };
     walk(fields, root, values || {});
     const getValues = () => {
@@ -4117,13 +4211,44 @@
     }
     return { close, getValues: form.getValues };
   }
+  function bindFieldTabs(root = document) {
+    root.querySelectorAll("[data-bl-blocks-tabs]").forEach((group) => {
+      if (group.dataset.blBlocksTabsBound === "1") return;
+      group.dataset.blBlocksTabsBound = "1";
+      const tablist = group.querySelector(".bl-blocks-fields__tablist");
+      if (!tablist) return;
+      const buttons = Array.from(tablist.querySelectorAll("[data-bl-blocks-tab]"));
+      const panels = buttons.map((btn) => {
+        const id = btn.getAttribute("aria-controls");
+        return id ? group.querySelector("#" + CSS.escape(id)) : null;
+      });
+      const activate = (index2) => {
+        buttons.forEach((btn, i) => {
+          const on2 = i === index2;
+          btn.classList.toggle("is-active", on2);
+          btn.setAttribute("aria-selected", on2 ? "true" : "false");
+          btn.tabIndex = on2 ? 0 : -1;
+          if (panels[i]) {
+            panels[i].hidden = !on2;
+          }
+        });
+      };
+      tablist.addEventListener("click", (evt) => {
+        const btn = evt.target.closest("[data-bl-blocks-tab]");
+        if (!btn || !tablist.contains(btn)) return;
+        const index2 = buttons.indexOf(btn);
+        if (index2 >= 0) activate(index2);
+      });
+    });
+  }
   window.blBlocksFieldUiApi = {
     createFieldForm,
     openFieldsModal,
     bindPagePickers,
     bindLinkFields,
     bindMediaPickers,
-    bindHttpsUrlFields
+    bindHttpsUrlFields,
+    bindFieldTabs
   };
   if (typeof document !== "undefined") {
     document.addEventListener("DOMContentLoaded", () => {
@@ -4131,6 +4256,7 @@
       bindLinkFields(document);
       bindMediaPickers(document);
       bindHttpsUrlFields(document);
+      bindFieldTabs(document);
     });
   }
 

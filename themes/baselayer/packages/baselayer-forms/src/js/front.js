@@ -1012,6 +1012,40 @@ function initForm(root) {
 
 function boot() {
   document.querySelectorAll('[data-bl-form]').forEach(initForm);
+  initFormTabs(document);
+}
+
+function initFormTabs(root) {
+  root.querySelectorAll('[data-bl-form-tabs]').forEach((group) => {
+    if (group.dataset.blFormTabsBound === '1') return;
+    group.dataset.blFormTabsBound = '1';
+    const tablist = group.querySelector('.bl-form__tablist');
+    if (!tablist) return;
+    const buttons = Array.from(tablist.querySelectorAll('[data-bl-form-tab]'));
+    const panels = buttons.map((btn) => {
+      const id = btn.getAttribute('aria-controls');
+      return id ? group.querySelector('#' + CSS.escape(id)) : null;
+    });
+
+    const activate = (index) => {
+      buttons.forEach((btn, i) => {
+        const on = i === index;
+        btn.classList.toggle('is-active', on);
+        btn.setAttribute('aria-selected', on ? 'true' : 'false');
+        btn.tabIndex = on ? 0 : -1;
+        if (panels[i]) {
+          panels[i].hidden = !on;
+        }
+      });
+    };
+
+    tablist.addEventListener('click', (evt) => {
+      const btn = evt.target.closest('[data-bl-form-tab]');
+      if (!btn || !tablist.contains(btn)) return;
+      const index = buttons.indexOf(btn);
+      if (index >= 0) activate(index);
+    });
+  });
 }
 
 if (document.readyState === 'loading') {

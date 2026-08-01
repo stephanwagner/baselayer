@@ -390,6 +390,70 @@
   gap: 12px;
 }
 
+.bl-blocks-fields__tabs {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+}
+
+.bl-blocks-fields__tablist {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  border-bottom: 1px solid #c3c4c7;
+}
+
+.bl-blocks-fields__tab {
+  appearance: none;
+  margin: 0 0 -1px;
+  padding: 8px 12px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  background: transparent;
+  color: #646970;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    color: #1d2327;
+  }
+
+  &.is-active {
+    border-color: #c3c4c7;
+    background: #fff;
+    color: #1d2327;
+  }
+
+  &:focus-visible {
+    outline: 2px solid #2271b1;
+    outline-offset: 1px;
+  }
+}
+
+.bl-blocks-fields__tab-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  &[hidden] {
+    display: none !important;
+  }
+
+  &--outline,
+  &--card {
+    padding: 12px;
+    border: 1px solid #c3c4c7;
+    border-radius: 6px;
+  }
+
+  &--card {
+    background: #f6f7f7;
+  }
+}
+
 .bl-blocks-fields input.widefat,
 .bl-blocks-fields textarea.widefat,
 .bl-blocks-fields select.widefat {
@@ -482,6 +546,15 @@
   .bl-blocks-fields__section-title {
     margin: 0 0 4px;
     font-size: 13px;
+  }
+
+  .bl-blocks-fields__tab {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .bl-blocks-fields__tab-panel {
+    gap: 10px;
   }
 }
 

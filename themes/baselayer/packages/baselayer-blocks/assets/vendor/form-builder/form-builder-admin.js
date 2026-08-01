@@ -36,6 +36,7 @@
     "html",
     "column",
     "section",
+    "tab",
     "hidden",
     "honeypot",
     "captcha",
@@ -89,7 +90,7 @@
       id: "layout",
       headingKey: "paletteSectionLayout",
       headingFallback: "Layout",
-      types: ["section", "column", "divider", "spacer"]
+      types: ["section", "tab", "column", "divider", "spacer"]
     },
     {
       id: "advanced",
@@ -327,6 +328,17 @@
         children: []
       };
     }
+    if (type === "tab") {
+      return {
+        id,
+        type,
+        label: typeLabel(type),
+        width: "100",
+        width_custom: "",
+        design: "standard",
+        children: []
+      };
+    }
     const base = {
       id,
       type,
@@ -402,7 +414,7 @@
     const walk = (list) => {
       (list || []).forEach((field) => {
         if (!field) return;
-        if (field.type === "column" || field.type === "section" || field.type === "group") {
+        if (field.type === "column" || field.type === "section" || field.type === "tab" || field.type === "group") {
           walk(field.children || []);
           return;
         }
@@ -417,6 +429,7 @@
   var LOGIC_SOURCE_EXCLUDE = [
     "column",
     "section",
+    "tab",
     "divider",
     "spacer",
     "heading",
@@ -924,9 +937,10 @@
   }
 
   // themes/baselayer/src/js/admin/form-builder/layout.js
-  var NESTED_BLOCKED = ["column", "section", "hidden", "honeypot", "captcha"];
+  var NESTED_BLOCKED = ["column", "section", "tab", "hidden", "honeypot", "captcha"];
   var columnFieldByEl = /* @__PURE__ */ new WeakMap();
   var sectionFieldByEl = /* @__PURE__ */ new WeakMap();
+  var tabFieldByEl = /* @__PURE__ */ new WeakMap();
   function createNestedSortable(list, options) {
     const Builder = window.BlCanvasBuilder;
     if (!Builder || typeof Builder.createSortable !== "function") {
@@ -1444,6 +1458,158 @@
     updatePreview();
     return row;
   }
+  function createTabCard(initial = {}) {
+    let field = {
+      label: "",
+      children: [],
+      width: "100",
+      width_custom: "",
+      design: "standard",
+      css_class: "",
+      collapsed: false,
+      conditional_logic: { enabled: false, groups: [] },
+      ...initial,
+      id: initial.id || uid(),
+      type: "tab"
+    };
+    if (!["standard", "outline", "card"].includes(field.design)) {
+      field.design = "standard";
+    }
+    if (typeof field.css_class !== "string") {
+      field.css_class = "";
+    }
+    field.collapsed = isCollapsedFlag(field.collapsed);
+    field.conditional_logic = normalizeConditionalLogic(field.conditional_logic);
+    const row = el("div", {
+      className: "bl-forms-builder__field bl-forms-builder__tab-card",
+      dataset: {
+        blFormsField: "1",
+        fieldId: field.id,
+        fieldType: "tab",
+        fieldWidth: field.width || "100",
+        fieldDesign: field.design || "standard",
+        ...field.width === "custom" && field.width_custom ? { fieldWidthCustom: field.width_custom } : {}
+      }
+    });
+    tabFieldByEl.set(row, field);
+    const preview = el("span", { className: "bl-forms-builder__preview" });
+    const widthBadge = el("span", { className: "bl-forms-builder__width-badge" });
+    const designBtn = el("button", {
+      type: "button",
+      className: "bl-forms-builder__design-btn",
+      title: t("layoutSettingsTitle", "Settings"),
+      "aria-label": t("layoutSettingsTitle", "Settings")
+    });
+    designBtn.appendChild(iconEl("tune", "bl-forms-builder__design-btn-icon"));
+    const typeChip = el("span", {
+      className: "bl-forms-builder__field-type bl-forms-builder__field-type--tab"
+    });
+    const fieldsList = el("div", {
+      className: "bl-forms-builder__tab-fields",
+      dataset: { blTabFields: "1" }
+    });
+    const emptyHint = el("p", {
+      className: "description bl-forms-builder__tab-empty",
+      text: t("tabEmpty", "Drop fields here")
+    });
+    const syncEmpty = () => {
+      emptyHint.hidden = fieldsList.querySelector("[data-bl-forms-field]") != null;
+    };
+    const updatePreview = () => {
+      const width = field.width || "100";
+      const widthCustom = field.width_custom || "";
+      const design = field.design || "standard";
+      row.dataset.fieldWidth = width;
+      row.dataset.fieldDesign = design;
+      if (width === "custom") {
+        row.dataset.fieldWidthCustom = widthCustom || "";
+      } else {
+        delete row.dataset.fieldWidthCustom;
+      }
+      const title = (field.label || "").trim();
+      preview.textContent = title;
+      preview.hidden = title === "";
+      const text = widthBadgeText(width, widthCustom);
+      widthBadge.textContent = text;
+      widthBadge.hidden = text === "";
+      const typeChildren = [
+        iconEl("tab", "bl-forms-builder__field-type-icon"),
+        el("span", {
+          className: "bl-forms-builder__field-type-label",
+          text: window.blFormsAdmin?.i18n?.types?.tab || t("tabType", "Tab")
+        })
+      ];
+      const logic = field.conditional_logic;
+      if (logic && logic.enabled && Array.isArray(logic.groups) && logic.groups.length > 0) {
+        typeChildren.push(
+          el("span", {
+            className: "bl-forms-builder__field-logic-dot",
+            title: t("logicEnable", "Conditional logic"),
+            "aria-label": t("logicEnable", "Conditional logic")
+          })
+        );
+      }
+      typeChip.replaceChildren(...typeChildren);
+    };
+    const notify = () => document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+    const openWidthModal = () => {
+      openFieldWidthModal(field, () => {
+        updatePreview();
+        notify();
+      });
+    };
+    const openDesignModal = () => {
+      openLayoutSettingsModal(
+        field,
+        () => {
+          updatePreview();
+          notify();
+        },
+        {
+          tabs: ["settings", "design", "logic"],
+          withLabel: true,
+          withHideTitle: false,
+          onLiveUpdate: () => {
+            updatePreview();
+            notify();
+          },
+          logicHelp: t("logicHelpTab", "Show this tab only when the conditions below are met.")
+        }
+      );
+    };
+    (field.children || []).forEach((child) => {
+      fieldsList.appendChild(createFieldCard(child, false));
+    });
+    bindFieldListSortable(fieldsList, () => {
+      syncEmpty();
+      notify();
+    });
+    const fieldsWrap = el("div", { className: "bl-forms-builder__tab-fields-wrap" }, [
+      fieldsList,
+      emptyHint
+    ]);
+    syncEmpty();
+    widthBadge.classList.add("is-interactive");
+    widthBadge.title = t("tabWidthTitle", "Tab width");
+    widthBadge.addEventListener("click", openWidthModal);
+    designBtn.addEventListener("click", openDesignModal);
+    const header = el("div", { className: "bl-forms-builder__field-header" }, [
+      createDragHandle(),
+      preview,
+      el("div", { className: "bl-forms-builder__field-meta" }, [widthBadge, designBtn, typeChip]),
+      createContainerActions(
+        () => {
+          row.remove();
+          notify();
+        },
+        () => duplicateFieldCard(row),
+        createContainerCollapseBtn(row, field, notify)
+      )
+    ]);
+    row.append(header, fieldsWrap);
+    updatePreview();
+    return row;
+  }
   function serializeLayoutRow(row) {
     const type = row.dataset.fieldType || "";
     const id = row.dataset.fieldId || uid();
@@ -1483,6 +1649,27 @@
         width_custom: width === "custom" ? widthCustom : "",
         design,
         show_title: showTitle,
+        css_class: cssClass,
+        collapsed: !!live?.collapsed,
+        conditional_logic: normalizeConditionalLogic(live?.conditional_logic),
+        children: Array.from(fields?.children || []).filter((el2) => el2.matches("[data-bl-forms-field]") && !NESTED_BLOCKED.includes(el2.dataset.fieldType)).map((child) => serializeRow(child))
+      };
+    }
+    if (type === "tab") {
+      const fields = row.querySelector("[data-bl-tab-fields]");
+      const live = tabFieldByEl.get(row);
+      const label = live?.label ?? "";
+      const width = row.dataset.fieldWidth || live?.width || "100";
+      const widthCustom = row.dataset.fieldWidthCustom || live?.width_custom || "";
+      const design = row.dataset.fieldDesign || live?.design || "standard";
+      const cssClass = typeof live?.css_class === "string" ? live.css_class : "";
+      return {
+        id,
+        type: "tab",
+        label,
+        width,
+        width_custom: width === "custom" ? widthCustom : "",
+        design,
         css_class: cssClass,
         collapsed: !!live?.collapsed,
         conditional_logic: normalizeConditionalLogic(live?.conditional_logic),
@@ -1655,7 +1842,7 @@
   }
   function hydrateFieldFromCard(row, field) {
     const data = serializeRow(row);
-    if (!data || data.type === "column" || data.type === "section") {
+    if (!data || data.type === "column" || data.type === "section" || data.type === "tab") {
       return;
     }
     const keepId = field.id;
@@ -1901,6 +2088,7 @@
     "html",
     "column",
     "section",
+    "tab",
     "date",
     "time",
     "datetime",
@@ -1917,7 +2105,8 @@
     "text_block",
     "html",
     "column",
-    "section"
+    "section",
+    "tab"
   ];
   var NO_READONLY = [
     ...NO_REQUIRED,
@@ -2289,7 +2478,7 @@
       width: field.width || "100",
       width_custom: field.width_custom || ""
     };
-    const title = field.type === "column" ? t("columnWidthTitle", "Column width") : field.type === "section" ? t("sectionWidthTitle", "Section width") : t("width", "Width");
+    const title = field.type === "column" ? t("columnWidthTitle", "Column width") : field.type === "section" ? t("sectionWidthTitle", "Section width") : field.type === "tab" ? t("tabWidthTitle", "Tab width") : t("width", "Width");
     const backdrop = el("div", {
       className: "bl-forms-builder__modal",
       role: "dialog",
@@ -3998,6 +4187,9 @@
     if ((initial?.type || "") === "section") {
       return createSectionCard(initial, open);
     }
+    if ((initial?.type || "") === "tab") {
+      return createTabCard(initial, open);
+    }
     let field = {
       width: "100",
       width_custom: "",
@@ -4698,6 +4890,7 @@
     equalizeColumnRun,
     createColumnCard,
     createSectionCard,
+    createTabCard,
     serializeLayoutRow,
     LOGIC_SOURCE_EXCLUDE,
     operatorsForType,

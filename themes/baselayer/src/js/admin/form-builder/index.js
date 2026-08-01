@@ -45,6 +45,7 @@ import {
   equalizeColumnRun,
   createColumnCard,
   createSectionCard,
+  createTabCard,
   serializeLayoutRow,
 } from './layout.js';
 import {
@@ -96,6 +97,7 @@ export {
   equalizeColumnRun,
   createColumnCard,
   createSectionCard,
+  createTabCard,
   serializeLayoutRow,
   LOGIC_SOURCE_EXCLUDE,
   operatorsForType,
@@ -148,6 +150,7 @@ const BlFormBuilder = {
   equalizeColumnRun,
   createColumnCard,
   createSectionCard,
+  createTabCard,
   serializeLayoutRow,
   LOGIC_SOURCE_EXCLUDE,
   operatorsForType,

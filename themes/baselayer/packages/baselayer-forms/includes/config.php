@@ -34,6 +34,7 @@ function bl_forms_field_types(): array
 		'spacer',
 		'column',
 		'section',
+		'tab',
 		'hidden',
 		'honeypot',
 		'captcha',
@@ -49,7 +50,7 @@ function bl_forms_field_types(): array
  */
 function bl_forms_content_field_types(): array
 {
-	return ['heading', 'text_block', 'html', 'divider', 'spacer', 'column', 'section', 'captcha'];
+	return ['heading', 'text_block', 'html', 'divider', 'spacer', 'column', 'section', 'tab', 'captcha'];
 }
 
 /**
@@ -59,7 +60,7 @@ function bl_forms_content_field_types(): array
  */
 function bl_forms_layout_field_types(): array
 {
-	return ['column', 'section'];
+	return ['column', 'section', 'tab'];
 }
 
 /**
@@ -69,7 +70,7 @@ function bl_forms_layout_field_types(): array
  */
 function bl_forms_root_only_field_types(): array
 {
-	return ['column', 'section', 'hidden', 'honeypot', 'captcha'];
+	return ['column', 'section', 'tab', 'hidden', 'honeypot', 'captcha'];
 }
 
 /**
@@ -1415,7 +1416,7 @@ function bl_forms_sanitize_field($field): ?array
 				continue;
 			}
 			$child_type = (string) ($clean['type'] ?? '');
-			// One level only — no nested columns/sections.
+			// One level only — no nested columns/sections/tabs.
 			if (in_array($child_type, $blocked, true)) {
 				continue;
 			}
@@ -1430,6 +1431,34 @@ function bl_forms_sanitize_field($field): ?array
 		$out['design'] = $design;
 		// Default on when missing (no legacy “empty label hides title”).
 		$out['show_title'] = !array_key_exists('show_title', $field) || !empty($field['show_title']);
+		$out['collapsed'] = !empty($field['collapsed']);
+		unset($out['name'], $out['name_manual'], $out['hide_label']);
+
+		return bl_forms_attach_conditional_logic($out, $field);
+	}
+
+	if ($type === 'tab') {
+		$children_in = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
+		$children = [];
+		$blocked = bl_forms_root_only_field_types();
+		foreach ($children_in as $child) {
+			$clean = bl_forms_sanitize_field($child);
+			if ($clean === null) {
+				continue;
+			}
+			$child_type = (string) ($clean['type'] ?? '');
+			if (in_array($child_type, $blocked, true)) {
+				continue;
+			}
+			$children[] = $clean;
+		}
+		$out['label'] = sanitize_text_field((string) ($field['label'] ?? ''));
+		$out['children'] = $children;
+		$design = sanitize_key((string) ($field['design'] ?? 'standard'));
+		if (!in_array($design, ['standard', 'outline', 'card'], true)) {
+			$design = 'standard';
+		}
+		$out['design'] = $design;
 		$out['collapsed'] = !empty($field['collapsed']);
 		unset($out['name'], $out['name_manual'], $out['hide_label']);
 

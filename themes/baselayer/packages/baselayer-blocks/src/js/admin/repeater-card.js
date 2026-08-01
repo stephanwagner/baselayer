@@ -18,7 +18,7 @@ const {
 
 export const REPEATER_MAX_DEPTH = 3;
 
-const LAYOUT_BLOCKED = ['column', 'section', 'group'];
+const LAYOUT_BLOCKED = ['column', 'section', 'tab', 'group'];
 
 /** @type {WeakMap<HTMLElement, object>} */
 const repeaterFieldByEl = new WeakMap();

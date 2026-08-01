@@ -4,6 +4,7 @@ import { el, t, typeLabel, readConfig, flattenFields, iconEl } from './dom.js';
 export const LOGIC_SOURCE_EXCLUDE = [
   'column',
   'section',
+  'tab',
   'divider',
   'spacer',
   'heading',

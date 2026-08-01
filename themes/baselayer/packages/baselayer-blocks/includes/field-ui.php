@@ -38,6 +38,7 @@ function bl_blocks_palette_icons(): array
 		'spacer',
 		'column',
 		'section',
+		'tab',
 		'repeater',
 		'hidden',
 		'page',
@@ -93,7 +94,7 @@ function bl_blocks_field_types(): array
 			'checkboxes', 'radio', 'select', 'toggle', 'button_group',
 			'date', 'time', 'datetime', 'file', 'image',
 			'heading', 'text_block', 'divider', 'spacer', 'html',
-			'column', 'section', 'hidden', 'page', 'link',
+			'column', 'section', 'tab', 'hidden', 'page', 'link',
 		];
 	}
 
@@ -184,14 +185,30 @@ function bl_blocks_render_admin_fields(array $fields, array $values, string $nam
  */
 function bl_blocks_render_admin_fields_walk(array $fields, array $values, string $name_prefix): void
 {
-	foreach ($fields as $field) {
+	$count = count($fields);
+	$i = 0;
+	while ($i < $count) {
+		$field = $fields[$i];
 		if (!is_array($field)) {
+			$i++;
 			continue;
 		}
 		if (isset($field['active']) && empty($field['active'])) {
+			$i++;
 			continue;
 		}
 		$type = (string) ($field['type'] ?? 'text');
+
+		if ($type === 'tab') {
+			$run = [];
+			while ($i < $count && is_array($fields[$i]) && (($fields[$i]['type'] ?? '') === 'tab')) {
+				$run[] = $fields[$i];
+				$i++;
+			}
+			bl_blocks_render_admin_tab_group($run, $values, $name_prefix);
+			continue;
+		}
+
 		if (bl_blocks_is_layout_field_type($type)) {
 			$children = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
 			$class = 'bl-blocks-fields__layout bl-blocks-fields__layout--' . sanitize_html_class($type);
@@ -204,9 +221,11 @@ function bl_blocks_render_admin_fields_walk(array $fields, array $values, string
 			}
 			bl_blocks_render_admin_fields_walk($children, $values, $name_prefix);
 			echo '</div>';
+			$i++;
 			continue;
 		}
 		if (bl_blocks_is_static_field_type($type) && !in_array($type, ['heading', 'text_block', 'html'], true)) {
+			$i++;
 			continue;
 		}
 		if ($type === 'heading') {
@@ -214,6 +233,7 @@ function bl_blocks_render_admin_fields_walk(array $fields, array $values, string
 			if ($label !== '') {
 				echo '<h4 class="bl-blocks-fields__heading">' . esc_html($label) . '</h4>';
 			}
+			$i++;
 			continue;
 		}
 		if ($type === 'text_block' || $type === 'html') {
@@ -221,16 +241,19 @@ function bl_blocks_render_admin_fields_walk(array $fields, array $values, string
 			if ($content !== '') {
 				echo '<div class="bl-blocks-fields__static">' . wp_kses_post($content) . '</div>';
 			}
+			$i++;
 			continue;
 		}
 
 		$name = (string) ($field['name'] ?? '');
 		if ($name === '') {
+			$i++;
 			continue;
 		}
 
 		if ($type === 'repeater') {
 			bl_blocks_render_admin_repeater($field, $values[$name] ?? [], $name_prefix);
+			$i++;
 			continue;
 		}
 
@@ -309,13 +332,13 @@ function bl_blocks_render_admin_fields_walk(array $fields, array $values, string
 			case 'radio':
 			case 'button_group':
 				echo '<div class="bl-blocks-fields__choices">';
-				foreach ($options as $i => $opt) {
+				foreach ($options as $opt_i => $opt) {
 					if (!is_array($opt)) {
 						continue;
 					}
 					$ov = (string) ($opt['value'] ?? '');
 					$ol = (string) ($opt['label'] ?? $ov);
-					$oid = $id . '-' . $i;
+					$oid = $id . '-' . $opt_i;
 					printf(
 						'<label class="bl-blocks-fields__choice"><input type="radio" name="%s" id="%s" value="%s"%s> %s</label>',
 						esc_attr($input_name),
@@ -331,13 +354,13 @@ function bl_blocks_render_admin_fields_walk(array $fields, array $values, string
 			case 'checkboxes':
 				$list = is_array($value) ? $value : [];
 				echo '<div class="bl-blocks-fields__choices">';
-				foreach ($options as $i => $opt) {
+				foreach ($options as $opt_i => $opt) {
 					if (!is_array($opt)) {
 						continue;
 					}
 					$ov = (string) ($opt['value'] ?? '');
 					$ol = (string) ($opt['label'] ?? $ov);
-					$oid = $id . '-' . $i;
+					$oid = $id . '-' . $opt_i;
 					printf(
 						'<label class="bl-blocks-fields__choice"><input type="checkbox" name="%s[]" id="%s" value="%s"%s> %s</label>',
 						esc_attr($input_name),
@@ -417,7 +440,68 @@ function bl_blocks_render_admin_fields_walk(array $fields, array $values, string
 			echo '<p class="description">' . esc_html($desc) . '</p>';
 		}
 		echo '</div>';
+		$i++;
 	}
+}
+
+/**
+ * @param list<array<string, mixed>> $tabs
+ * @param array<string, mixed>       $values
+ */
+function bl_blocks_render_admin_tab_group(array $tabs, array $values, string $name_prefix): void
+{
+	$active = [];
+	foreach ($tabs as $tab) {
+		if (!is_array($tab)) {
+			continue;
+		}
+		if (isset($tab['active']) && empty($tab['active'])) {
+			continue;
+		}
+		$active[] = $tab;
+	}
+	if ($active === []) {
+		return;
+	}
+
+	$group_id = 'bl-blocks-tabs-' . sanitize_html_class((string) ($active[0]['id'] ?? wp_unique_id('t')));
+	echo '<div class="bl-blocks-fields__tabs" data-bl-blocks-tabs="' . esc_attr($group_id) . '">';
+	echo '<div class="bl-blocks-fields__tablist" role="tablist">';
+	foreach ($active as $index => $tab) {
+		$tab_id = (string) ($tab['id'] ?? ('tab' . $index));
+		$panel_id = $group_id . '-panel-' . sanitize_html_class($tab_id);
+		$btn_id = $group_id . '-tab-' . sanitize_html_class($tab_id);
+		$label = trim((string) ($tab['label'] ?? ''));
+		if ($label === '') {
+			$label = sprintf(
+				/* translators: %d: tab number */
+				__('Tab %d', 'baselayer-blocks'),
+				$index + 1
+			);
+		}
+		$selected = $index === 0 ? 'true' : 'false';
+		echo '<button type="button" class="bl-blocks-fields__tab' . ($index === 0 ? ' is-active' : '') . '"';
+		echo ' role="tab" id="' . esc_attr($btn_id) . '"';
+		echo ' aria-controls="' . esc_attr($panel_id) . '"';
+		echo ' aria-selected="' . esc_attr($selected) . '"';
+		echo ' data-bl-blocks-tab tabindex="' . ($index === 0 ? '0' : '-1') . '">';
+		echo esc_html($label);
+		echo '</button>';
+	}
+	echo '</div>';
+
+	foreach ($active as $index => $tab) {
+		$tab_id = (string) ($tab['id'] ?? ('tab' . $index));
+		$panel_id = $group_id . '-panel-' . sanitize_html_class($tab_id);
+		$btn_id = $group_id . '-tab-' . sanitize_html_class($tab_id);
+		$children = isset($tab['children']) && is_array($tab['children']) ? $tab['children'] : [];
+		$hidden = $index === 0 ? '' : ' hidden';
+		echo '<div class="bl-blocks-fields__tab-panel" role="tabpanel" id="' . esc_attr($panel_id) . '"';
+		echo ' aria-labelledby="' . esc_attr($btn_id) . '"' . $hidden . '>';
+		bl_blocks_render_admin_fields_walk($children, $values, $name_prefix);
+		echo '</div>';
+	}
+	echo '</div>';
 }
 
 /**

@@ -592,11 +592,95 @@ function bl_forms_render_fields(array $fields, string $uid, array $settings = []
 			continue;
 		}
 
+		if (($field['type'] ?? '') === 'tab') {
+			$flush();
+			$run = [];
+			while ($i < $count && is_array($fields[$i]) && ($fields[$i]['type'] ?? '') === 'tab') {
+				$run[] = $fields[$i];
+				$i++;
+			}
+			$html .= bl_forms_render_tab_group($run, $uid, $settings, $context);
+			continue;
+		}
+
 		$buffer[] = $field;
 		$i++;
 	}
 
 	$flush();
+
+	return $html;
+}
+
+/**
+ * Render consecutive tab containers as one tablist + panels.
+ *
+ * @param list<array<string, mixed>> $tabs
+ * @param array<string, mixed> $settings
+ * @param array{all_fields?: list<array<string, mixed>>, default_raw?: array<string, mixed>} $context
+ */
+function bl_forms_render_tab_group(array $tabs, string $uid, array $settings = [], array $context = []): string
+{
+	$active = [];
+	foreach ($tabs as $tab) {
+		if (!is_array($tab) || !bl_forms_field_is_active($tab)) {
+			continue;
+		}
+		$active[] = $tab;
+	}
+	if ($active === []) {
+		return '';
+	}
+
+	$group_id = $uid . '-tabs-' . sanitize_html_class((string) ($active[0]['id'] ?? wp_unique_id('t')));
+	$html = '<div class="bl-form__tabs" data-bl-form-tabs="' . esc_attr($group_id) . '">';
+	$html .= '<div class="bl-form__tablist" role="tablist">';
+	foreach ($active as $index => $tab) {
+		$tab_id = (string) ($tab['id'] ?? ('tab' . $index));
+		$panel_id = $group_id . '-panel-' . sanitize_html_class($tab_id);
+		$btn_id = $group_id . '-tab-' . sanitize_html_class($tab_id);
+		$label = trim((string) ($tab['label'] ?? ''));
+		if ($label === '') {
+			$label = sprintf(
+				/* translators: %d: tab number */
+				__('Tab %d', 'baselayer-forms'),
+				$index + 1
+			);
+		}
+		$selected = $index === 0 ? 'true' : 'false';
+		$html .= '<button type="button" class="bl-form__tab' . ($index === 0 ? ' is-active' : '') . '"';
+		$html .= ' role="tab" id="' . esc_attr($btn_id) . '"';
+		$html .= ' aria-controls="' . esc_attr($panel_id) . '"';
+		$html .= ' aria-selected="' . esc_attr($selected) . '"';
+		$html .= ' data-bl-form-tab tabindex="' . ($index === 0 ? '0' : '-1') . '">';
+		$html .= esc_html($label);
+		$html .= '</button>';
+	}
+	$html .= '</div>';
+
+	foreach ($active as $index => $tab) {
+		$tab_id = (string) ($tab['id'] ?? ('tab' . $index));
+		$panel_id = $group_id . '-panel-' . sanitize_html_class($tab_id);
+		$btn_id = $group_id . '-tab-' . sanitize_html_class($tab_id);
+		$children = isset($tab['children']) && is_array($tab['children']) ? $tab['children'] : [];
+		$inner = bl_forms_render_field_rows($children, $uid, $settings, $context);
+		$design = sanitize_key((string) ($tab['design'] ?? 'standard'));
+		if (!in_array($design, ['standard', 'outline', 'card'], true)) {
+			$design = 'standard';
+		}
+		$classes = 'bl-form__tab-panel bl-form__tab-panel--' . $design;
+		$extra = bl_forms_sanitize_css_class((string) ($tab['css_class'] ?? ''));
+		if ($extra !== '') {
+			$classes .= ' ' . $extra;
+		}
+		$hidden = $index === 0 ? '' : ' hidden';
+		$attrs = 'class="' . esc_attr($classes) . '" role="tabpanel" id="' . esc_attr($panel_id) . '"';
+		$attrs .= ' aria-labelledby="' . esc_attr($btn_id) . '"' . $hidden;
+		$attrs .= bl_forms_field_id_and_logic_attrs($tab, $context);
+		$html .= '<div ' . $attrs . '>' . $inner . '</div>';
+	}
+
+	$html .= '</div>';
 
 	return $html;
 }
@@ -617,6 +701,10 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 	$type = (string) ($field['type'] ?? 'text');
 	$id = (string) ($field['id'] ?? '');
 	$input_id = $uid . '-' . $id;
+
+	if ($type === 'tab') {
+		return bl_forms_render_tab_group([$field], $uid, $settings, $context);
+	}
 
 	if ($type === 'column') {
 		$children = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
