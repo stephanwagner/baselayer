@@ -19,6 +19,7 @@ import '../components/google-translate';
 
 // Blocks
 import '../../../acf/blocks/blocks.js';
+import '../../../blocks/blocks.js';
 
 // Delay initial animations
 setTimeout(function () {

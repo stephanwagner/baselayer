@@ -144,6 +144,7 @@ function watch() {
     ]),
     spawnWatch(chokidarBin, [
       `${themeDir}/acf/blocks/**/*.scss`,
+      `${themeDir}/blocks/**/*.scss`,
       '-c',
       'node scripts/bump-scss-entries.cjs'
     ])

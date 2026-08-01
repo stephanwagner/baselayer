@@ -278,6 +278,7 @@ require_once BL_BLOCKS_PATH . 'includes/config.php';
 require_once BL_BLOCKS_PATH . 'includes/cpt.php';
 require_once BL_BLOCKS_PATH . 'includes/builder-icons.php';
 require_once BL_BLOCKS_PATH . 'includes/field-ui.php';
+require_once BL_BLOCKS_PATH . 'includes/field-api.php';
 require_once BL_BLOCKS_PATH . 'includes/runtime-site.php';
 require_once BL_BLOCKS_PATH . 'includes/runtime-page.php';
 require_once BL_BLOCKS_PATH . 'includes/runtime-blocks.php';

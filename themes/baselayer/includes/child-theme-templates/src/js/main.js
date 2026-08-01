@@ -14,5 +14,8 @@
 // ACF blocks
 import '../../acf/blocks/blocks.js';
 
+// BaseLayer custom blocks
+import '../../blocks/blocks.js';
+
 // Test log message
 console.log('BaseLayer Child Theme JavaScript loaded.');

@@ -61,22 +61,11 @@ function bl_blocks_template_info(string $slug): array
 	if ($exists) {
 		if (str_starts_with($absolute, $stylesheet)) {
 			$display = ltrim(substr($absolute, strlen($stylesheet)), '/');
-			if (is_child_theme()) {
-				$display = basename(get_stylesheet()) . '/' . $display;
-			}
 		} elseif (str_starts_with($absolute, $template)) {
 			$display = ltrim(substr($absolute, strlen($template)), '/');
-			$display = basename(get_template()) . '/' . $display;
 		} else {
 			$display = $absolute;
 		}
-	}
-
-	$create_display = $relative;
-	if (is_child_theme()) {
-		$create_display = basename(get_stylesheet()) . '/' . $relative;
-	} else {
-		$create_display = basename(get_template()) . '/' . $relative;
 	}
 
 	return [
@@ -84,7 +73,7 @@ function bl_blocks_template_info(string $slug): array
 		'relative'     => $relative,
 		'absolute'     => $exists ? $absolute : $create_abs,
 		'display_path' => $display,
-		'create_path'  => $create_display,
+		'create_path'  => $relative,
 	];
 }
 
@@ -530,7 +519,7 @@ function bl_blocks_render_missing_template_notice(string $slug, array $def): str
  * Front/editor render: theme template when present, otherwise notice (editor) or field dump.
  *
  * Template path: blocks/{slug}/{slug}.php (child theme preferred).
- * Available in the template: $values, $fields, $block, $attributes, $def.
+ * Available in the template: bl_block_field(), $values, $fields, $block, $attributes, $def.
  *
  * @param array<string, mixed> $def
  * @param array<string, mixed> $attributes
@@ -556,9 +545,14 @@ function bl_blocks_render_block(array $def, array $attributes): string
 		return bl_blocks_render_block_fallback($def, $values);
 	}
 
+	bl_blocks_set_field_context($values, $fields);
 	ob_start();
-	include $path;
-	$html = trim((string) ob_get_clean());
+	try {
+		include $path;
+	} finally {
+		$html = trim((string) ob_get_clean());
+		bl_blocks_reset_field_context();
+	}
 	if ($html === '') {
 		return bl_blocks_render_block_fallback($def, $values);
 	}

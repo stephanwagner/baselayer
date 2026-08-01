@@ -14,3 +14,7 @@
 // Child ACF blocks
 @forward '../../acf/blocks/blocks';
 @forward '../../acf/blocks/blocks-editor';
+
+// Child BaseLayer custom blocks
+@forward '../../blocks/blocks';
+@forward '../../blocks/blocks-editor';

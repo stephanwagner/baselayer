@@ -120,6 +120,7 @@ function watch() {
     ]),
     spawnWatch(chokidarBin, [
       path.join(themeDir, 'acf/blocks/**/*.scss'),
+      path.join(themeDir, 'blocks/**/*.scss'),
       '-c',
       'node scripts/bump-scss-entries.mjs'
     ])
