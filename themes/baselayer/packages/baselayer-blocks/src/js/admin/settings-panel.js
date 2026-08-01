@@ -6,11 +6,11 @@ const { el, t, writeConfig } = window.BlFormBuilder || {};
 const MATERIAL_ICONS_URL = 'https://fonts.google.com/icons?icon.style=Rounded';
 
 function fieldRow(label, control, help = '') {
-  const children = [el('label', {}, [el('strong', { text: label })]), control];
+  const children = [el('p', {}, [el('label', { text: label }), control])];
   if (help) {
-    children.push(el('span', { className: 'description', text: help }));
+    children.push(el('p', { className: 'description', text: help }));
   }
-  return el('p', { className: 'bl-forms-builder__setting' }, children);
+  return el('div', { className: 'bl-forms-builder__setting' }, children);
 }
 
 function plainSwitch(label, { checked = false, onChange = null } = {}) {
@@ -107,7 +107,7 @@ function createBlockIconField(initial, onChange) {
       ]),
       textarea,
       el('p', { className: 'description' }, [
-        document.createTextNode(t('blockIconMaterialHelp', 'Browse Material Icons (Rounded), copy SVG, and paste here: ')),
+        document.createTextNode(t('blockIconMaterialHelp', 'Browse Material Icons, copy SVG, and paste here: ')),
         el('a', {
           href: MATERIAL_ICONS_URL,
           target: '_blank',
@@ -137,7 +137,7 @@ function createBlockIconField(initial, onChange) {
 
   const clearBtn = el('button', {
     type: 'button',
-    className: 'button-link-delete',
+    className: 'button button-link-delete',
     text: t('blockIconClear', 'Clear'),
     dataset: { blBlocksIconClear: '' },
   });
@@ -274,7 +274,7 @@ export function createSettingsPanel(initial, definitionType, onChange) {
 
   const slugInput = el('input', {
     type: 'text',
-    className: 'regular-text',
+    className: 'widefat',
     value: state.slug || '',
     pattern: '[a-z0-9\\-]*',
   });
@@ -319,7 +319,7 @@ export function createSettingsPanel(initial, definitionType, onChange) {
   }
 
   const descInput = el('textarea', {
-    className: 'large-text',
+    className: 'widefat',
     rows: 3,
     text: state.description || '',
   });
@@ -342,7 +342,7 @@ export function createSettingsPanel(initial, definitionType, onChange) {
     });
 
     const categories = (window.blBlocksAdmin && window.blBlocksAdmin.blockCategories) || [];
-    const categorySelect = el('select', { className: 'regular-text' });
+    const categorySelect = el('select', { className: 'widefat' });
     const currentCat = state.block_category || 'widgets';
     let hasCurrent = false;
     categories.forEach((cat) => {
@@ -375,7 +375,7 @@ export function createSettingsPanel(initial, definitionType, onChange) {
 
     const keywordsInput = el('input', {
       type: 'text',
-      className: 'regular-text',
+      className: 'widefat',
       value: state.block_keywords || '',
     });
     keywordsInput.addEventListener('input', () => {
@@ -421,7 +421,7 @@ export function createSettingsPanel(initial, definitionType, onChange) {
   if (definitionType === 'site_settings') {
     const labelInput = el('input', {
       type: 'text',
-      className: 'regular-text',
+      className: 'widefat',
       value: state.menu_label || '',
     });
     labelInput.addEventListener('input', () => {

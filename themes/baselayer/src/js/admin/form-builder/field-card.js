@@ -2091,19 +2091,7 @@ function widthBadgeLabel(field) {
 }
 
 function settingHeading(text) {
-  return el('p', { className: 'bl-forms-builder__setting-heading', text });
-}
-
-function createCheckboxSetting(key, label, checked, onChange) {
-  const input = el('input', {
-    type: 'checkbox',
-    dataset: { [key]: '1' },
-    checked: !!checked,
-  });
-  input.addEventListener('change', () => onChange(input.checked));
-  return el('p', { className: 'bl-forms-builder__check-setting' }, [
-    el('label', {}, [input, ' ' + label]),
-  ]);
+  return el('div', { className: 'bl-forms-builder__setting-heading', text });
 }
 
 function createSwitchSetting(key, label, checked, onChange) {
@@ -2211,12 +2199,13 @@ function createDefaultValueControl(field, updatePreview) {
 
   if (CHECKED_DEFAULT_TYPES.includes(field.type)) {
     return [
-      createCheckboxSetting(
+      createSwitchSetting(
         'blDefault',
         t('defaultChecked', 'Checked by default'),
         isDefaultChecked(field.default_value),
         (checked) => {
           field.default_value = checked ? '1' : '';
+          updatePreview();
           document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
         }
       ),
@@ -3268,7 +3257,10 @@ export function createFieldCard(initial, open = false) {
         const defaults = createDefaultValueControl(field, updatePreview);
         if (defaults) {
           if (CHECKED_DEFAULT_TYPES.includes(field.type)) {
-            generalSections.add(settingHeading(t('defaultValue', 'Default value')), ...defaults);
+            generalSections.add(
+              settingHeading(t('defaultValue', 'Default value')),
+              el('div', { className: 'bl-forms-builder__options-toggles' }, defaults)
+            );
           } else {
             generalSections.add(...defaults);
           }

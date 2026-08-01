@@ -632,3 +632,479 @@ msgstr ""
 #: includes/runtime-site.php:119
 msgid "Save Changes"
 msgstr ""
+
+#: includes/admin-editor.php
+msgid "Add option"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Add rule"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Add rule group"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Allow multiple"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Allow multiple files"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Allow multiple selection"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Allowed extensions"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Appearance"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Auto"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Autocomplete"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Automatic"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Button label"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "CAPTCHA keys are not configured yet. Add them under Forms → Settings."
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Checkbox text"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Checked"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Checked by default"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Choices"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Choose file"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Classic"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Collapse field"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Column width"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Columns"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Comma-separated list without dots, e.g. pdf, docx, xlsx. Leave empty to allow all WordPress-permitted types."
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Contains"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Current hour"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Custom"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Days relative to today"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Default value"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Delete"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Disabled"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Does not contain"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Drag to reorder"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Drop fields here"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Duplicate"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Expand field"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Field"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Fixed date"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Fixed date & time"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Fixed time"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "General"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Greater than"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Greater than or equal to"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Has any value"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Has no value"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Height"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Hidden from visitors. If filled, the submission is treated as spam."
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Hide"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Horizontal"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "I agree to the [Privacy Policy](page:privacy)."
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Is equal to"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Is not equal to"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Label"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Leave empty for no limit. When the maximum is reached, further options cannot be selected."
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Leave empty to use the global default (%s)."
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Leave empty to use the global default."
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Less than"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Less than or equal to"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Level"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "MB"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Margin"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Markdown is supported, e.g. <b>**Bold**</b>, <i>*Italic*</i>, and <span style=\\\"white-space: nowrap\\\">[Link](...)</span>. For the target you can use a URL (/agb), a WordPress page (page:123), or a standard page such as page:privacy."
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Maximum"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Maximum file size"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Maximum files"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Maximum length"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Maximum number of files visitors can upload."
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Maximum selections"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Minimum"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Minimum length"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Minimum selections"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Minutes relative to now"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Missing field"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Modern"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Must be after"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Must be before"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "No fields available"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "No limit"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "No relation"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "None"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Not checked"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Now"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Now ±"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Off"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Open settings"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Operator"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Option 1"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Option 2"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Options"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Placeholder"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Prefix"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Privacy Policy"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Read only"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Relation"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Required"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Rows"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Section title"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Section width"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Select field"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Show character count"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Show file preview"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Show on the frontend"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Show this field if"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Suffix"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "This field"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Today"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Today ±"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Type"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Use option slugs from the list above. For multiple values, separate with commas (e.g. option-1, option-2)."
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Uses the CAPTCHA keys from Forms → Settings."
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Value"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Vertical"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Width"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "and"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "days"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "e.g. 24px or 2rem"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "e.g. 40% or 280px"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "minutes"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "or"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "— Select —"
+msgstr ""

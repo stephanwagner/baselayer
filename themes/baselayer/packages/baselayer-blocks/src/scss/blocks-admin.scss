@@ -104,6 +104,39 @@ body.post-new-php.post-type-bl_block {
   }
 }
 
+// Match field-settings markup: label above control, description below.
+.bl-blocks-settings-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  > .bl-forms-builder__section-title {
+    margin: 0;
+  }
+
+  .bl-forms-builder__setting {
+    > p {
+      margin: 0;
+
+      > label {
+        display: block;
+        margin-bottom: 4px;
+        font-weight: 600;
+      }
+
+      &.description {
+        margin: 4px 0 0;
+      }
+    }
+
+    input.widefat,
+    textarea.widefat,
+    select.widefat {
+      max-width: 100%;
+    }
+  }
+}
+
 .bl-blocks-settings-post-types {
   display: flex;
   flex-direction: column;

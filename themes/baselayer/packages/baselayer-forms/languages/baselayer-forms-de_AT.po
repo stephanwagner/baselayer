@@ -473,29 +473,23 @@ msgstr "Bedingte Logik"
 
 #: includes/admin.php:486
 msgid "Show this field only when the conditions below are met."
-msgstr ""
-"Dieses Feld nur anzeigen, wenn die folgenden Bedingungen erfüllt sind."
+msgstr "Dieses Feld nur anzeigen, wenn die folgenden Bedingungen erfüllt sind."
 
 #: includes/admin.php:487
 msgid "Show this block only when the conditions below are met."
-msgstr ""
-"Diesen Block nur anzeigen, wenn die folgenden Bedingungen erfüllt sind."
+msgstr "Diesen Block nur anzeigen, wenn die folgenden Bedingungen erfüllt sind."
 
 #: includes/admin.php:488
 msgid "Show this section only when the conditions below are met."
-msgstr ""
-"Diesen Abschnitt nur anzeigen, wenn die folgenden Bedingungen erfüllt sind."
+msgstr "Diesen Abschnitt nur anzeigen, wenn die folgenden Bedingungen erfüllt sind."
 
 #: includes/admin.php:489
 msgid "Show this column only when the conditions below are met."
-msgstr ""
-"Diese Spalte nur anzeigen, wenn die folgenden Bedingungen erfüllt sind."
+msgstr "Diese Spalte nur anzeigen, wenn die folgenden Bedingungen erfüllt sind."
 
 #: includes/admin.php:490
 msgid "Show this repeater only when the conditions below are met."
-msgstr ""
-"Diese Wiederholung nur anzeigen, wenn die folgenden Bedingungen erfüllt "
-"sind."
+msgstr "Diesen Repeater nur anzeigen, wenn die folgenden Bedingungen erfüllt sind."
 
 #: includes/admin.php:491
 msgid "Min rows"

@@ -802,7 +802,7 @@
       group.forEach((_, ruleIndex) => {
         if (ruleIndex > 0) {
           rulesWrap.appendChild(
-            el("p", { className: "bl-forms-builder__logic-and", text: t("logicAnd", "and") })
+            el("div", { className: "bl-forms-builder__logic-and", text: t("logicAnd", "and") })
           );
         }
         rulesWrap.appendChild(renderRuleRow(groupIndex, ruleIndex, sources));
@@ -811,7 +811,7 @@
       box.appendChild(
         el("button", {
           type: "button",
-          className: "button bl-button-small",
+          className: "button bl-button-tiny",
           text: t("logicAddRule", "Add rule"),
           onClick: () => {
             const liveGroup = getGroup(groupIndex);
@@ -852,7 +852,7 @@
       groupsMount.appendChild(
         el("button", {
           type: "button",
-          className: "button bl-button-small bl-forms-builder__logic-add-group",
+          className: "button bl-button-tiny bl-forms-builder__logic-add-group",
           text: t("logicAddGroup", "Add rule group"),
           onClick: () => {
             field.conditional_logic.groups.push([emptyRule(getSources())]);
@@ -3203,17 +3203,6 @@
   function settingHeading(text) {
     return el("p", { className: "bl-forms-builder__setting-heading", text });
   }
-  function createCheckboxSetting(key, label, checked, onChange) {
-    const input = el("input", {
-      type: "checkbox",
-      dataset: { [key]: "1" },
-      checked: !!checked
-    });
-    input.addEventListener("change", () => onChange(input.checked));
-    return el("p", { className: "bl-forms-builder__check-setting" }, [
-      el("label", {}, [input, " " + label])
-    ]);
-  }
   function createSwitchSetting(key, label, checked, onChange) {
     const input = el("input", {
       type: "checkbox",
@@ -3302,12 +3291,13 @@
     }
     if (CHECKED_DEFAULT_TYPES.includes(field.type)) {
       return [
-        createCheckboxSetting(
+        createSwitchSetting(
           "blDefault",
           t("defaultChecked", "Checked by default"),
           isDefaultChecked(field.default_value),
           (checked) => {
             field.default_value = checked ? "1" : "";
+            updatePreview();
             document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
           }
         )
@@ -4239,7 +4229,10 @@
           const defaults = createDefaultValueControl(field, updatePreview);
           if (defaults) {
             if (CHECKED_DEFAULT_TYPES.includes(field.type)) {
-              generalSections.add(settingHeading(t("defaultValue", "Default value")), ...defaults);
+              generalSections.add(
+                settingHeading(t("defaultValue", "Default value")),
+                el("div", { className: "bl-forms-builder__options-toggles" }, defaults)
+              );
             } else {
               generalSections.add(...defaults);
             }

@@ -183,14 +183,6 @@ msgstr "Aktiv"
 msgid "Slug"
 msgstr "Slug"
 
-#: includes/admin-editor.php:273
-msgid ""
-"Internal key used in code and storage. Lowercase letters, numbers, and "
-"hyphens."
-msgstr ""
-"Interner Schlüssel für Code und Speicherung. Kleinbuchstaben, Zahlen und "
-"Bindestriche."
-
 #: includes/admin-editor.php:274
 msgid "Description"
 msgstr "Beschreibung"
@@ -216,9 +208,8 @@ msgid "No icon selected"
 msgstr "Kein Icon ausgewählt"
 
 #: includes/admin-editor.php:281
-msgid "Browse Material Icons (Rounded), copy SVG, and paste here: "
-msgstr ""
-"Material Icons (Rounded) durchsuchen, SVG kopieren und hier einfügen: "
+msgid "Browse Material Icons, copy SVG, and paste here: "
+msgstr "Material Icons durchsuchen, SVG kopieren und hier einfügen: "
 
 #: includes/admin-editor.php:282
 msgid "fonts.google.com/icons"
@@ -250,9 +241,7 @@ msgstr "Tab-Bezeichnung"
 
 #: includes/admin-editor.php:289
 msgid "Label in the Website settings sidebar. Defaults to the title."
-msgstr ""
-"Bezeichnung in der Website-Einstellungen-Seitenleiste. Standard ist der "
-"Titel."
+msgstr "Bezeichnung in der Website-Einstellungen-Seitenleiste. Standard ist der Titel."
 
 #: includes/admin-editor.php:290 includes/admin.php:317
 msgid "Order"
@@ -320,9 +309,7 @@ msgstr "Felder oder eine verschachtelte Wiederholung hier ablegen"
 
 #: includes/admin-editor.php:309
 msgid "Drop fields here (nested repeater not allowed at this depth)"
-msgstr ""
-"Felder hier ablegen (verschachtelte Wiederholung in dieser Tiefe nicht "
-"erlaubt)"
+msgstr "Felder hier ablegen (verschachtelte Wiederholung in dieser Tiefe nicht erlaubt)"
 
 #: includes/admin-editor.php:310 includes/field-ui.php:416
 #: includes/field-ui.php:497 includes/runtime-blocks.php:230
@@ -403,29 +390,23 @@ msgstr "Bedingte Logik"
 
 #: includes/admin-editor.php:330
 msgid "Show this field only when the conditions below are met."
-msgstr ""
-"Dieses Feld nur anzeigen, wenn die folgenden Bedingungen erfüllt sind."
+msgstr "Dieses Feld nur anzeigen, wenn die folgenden Bedingungen erfüllt sind."
 
 #: includes/admin-editor.php:331
 msgid "Show this block only when the conditions below are met."
-msgstr ""
-"Diesen Block nur anzeigen, wenn die folgenden Bedingungen erfüllt sind."
+msgstr "Diesen Block nur anzeigen, wenn die folgenden Bedingungen erfüllt sind."
 
 #: includes/admin-editor.php:332
 msgid "Show this section only when the conditions below are met."
-msgstr ""
-"Diesen Abschnitt nur anzeigen, wenn die folgenden Bedingungen erfüllt sind."
+msgstr "Diesen Abschnitt nur anzeigen, wenn die folgenden Bedingungen erfüllt sind."
 
 #: includes/admin-editor.php:333
 msgid "Show this column only when the conditions below are met."
-msgstr ""
-"Diese Spalte nur anzeigen, wenn die folgenden Bedingungen erfüllt sind."
+msgstr "Diese Spalte nur anzeigen, wenn die folgenden Bedingungen erfüllt sind."
 
 #: includes/admin-editor.php:334
 msgid "Show this repeater only when the conditions below are met."
-msgstr ""
-"Diese Wiederholung nur anzeigen, wenn die folgenden Bedingungen erfüllt "
-"sind."
+msgstr "Diesen Repeater nur anzeigen, wenn die folgenden Bedingungen erfüllt sind."
 
 #: includes/admin.php:58 includes/admin.php:59 includes/runtime-site.php:56
 msgid "Website"
@@ -447,18 +428,6 @@ msgstr "Seiteneinstellungen"
 #: includes/cpt.php:84
 msgid "Site Settings"
 msgstr "Website-Einstellungen"
-
-#: includes/admin.php:138
-msgid ""
-"BaseLayer Blocks and Block Creator both use the Blocks admin menu. Disable "
-"Block Creator (Developer → Features) to use the Blocks package, or disable "
-"the Blocks package to keep Block Creator. The Website menu remains "
-"available."
-msgstr ""
-"BaseLayer Blocks und Block Creator nutzen beide das Blöcke-Adminmenü. "
-"Deaktiviere Block Creator (Developer → Features), um das Blocks-Paket zu "
-"verwenden, oder deaktiviere das Blocks-Paket, um Block Creator zu behalten. "
-"Das Website-Menü bleibt verfügbar."
 
 #. translators: %s: definition type singular
 #: includes/admin.php:216
@@ -599,9 +568,7 @@ msgstr "Einstellungen gespeichert."
 
 #: includes/runtime-site.php:59
 msgid "No active site settings yet. Create one under Site Settings."
-msgstr ""
-"Noch keine aktiven Website-Einstellungen. Erstelle welche unter Website-"
-"Einstellungen."
+msgstr "Noch keine aktiven Website-Einstellungen. Erstelle welche unter Website-Einstellungen."
 
 #: includes/runtime-site.php:71
 msgid "Site settings"
@@ -614,3 +581,487 @@ msgstr "Ohne Titel"
 #: includes/runtime-site.php:119
 msgid "Save Changes"
 msgstr "Änderungen speichern"
+
+#: includes/admin-editor.php
+msgid "Add option"
+msgstr "Option hinzufügen"
+
+#: includes/admin-editor.php
+msgid "Add rule"
+msgstr "Regel hinzufügen"
+
+#: includes/admin-editor.php
+msgid "Add rule group"
+msgstr "Regelgruppe hinzufügen"
+
+#: includes/admin-editor.php
+msgid "Allow multiple"
+msgstr "Mehrfachauswahl erlauben"
+
+#: includes/admin-editor.php
+msgid "Allow multiple files"
+msgstr "Mehrere Dateien erlauben"
+
+#: includes/admin-editor.php
+msgid "Allow multiple selection"
+msgstr "Mehrfachauswahl erlauben"
+
+#: includes/admin-editor.php
+msgid "Allowed extensions"
+msgstr "Erlaubte Dateiendungen"
+
+#: includes/admin-editor.php
+msgid "Appearance"
+msgstr "Darstellung"
+
+#: includes/admin-editor.php
+msgid "Auto"
+msgstr "Auto"
+
+#: includes/admin-editor.php
+msgid "Autocomplete"
+msgstr "Autovervollständigung"
+
+#: includes/admin-editor.php
+msgid "Automatic"
+msgstr "Automatisch"
+
+#: includes/admin-editor.php
+msgid "BaseLayer Blocks and Block Creator both use the Blocks admin menu. Disable Block Creator (Developer → Features) to use the Blocks package, or disable the Blocks package to keep Block Creator. The Website menu remains available."
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Button label"
+msgstr "Button-Beschriftung"
+
+#: includes/admin-editor.php
+msgid "CAPTCHA keys are not configured yet. Add them under Forms → Settings."
+msgstr "CAPTCHA-Schlüssel sind noch nicht konfiguriert. Füge sie unter Formulare → Einstellungen hinzu."
+
+#: includes/admin-editor.php
+msgid "Checkbox text"
+msgstr "Checkbox-Text"
+
+#: includes/admin-editor.php
+msgid "Checked"
+msgstr "Aktiviert"
+
+#: includes/admin-editor.php
+msgid "Checked by default"
+msgstr "Standardmäßig ausgewählt"
+
+#: includes/admin-editor.php
+msgid "Choices"
+msgstr "Auswahlmöglichkeiten"
+
+#: includes/admin-editor.php
+msgid "Choose file"
+msgstr "Datei auswählen"
+
+#: includes/admin-editor.php
+msgid "Classic"
+msgstr "Klassisch"
+
+#: includes/admin-editor.php
+msgid "Collapse field"
+msgstr "Feld einklappen"
+
+#: includes/admin-editor.php
+msgid "Column width"
+msgstr "Spaltenbreite"
+
+#: includes/admin-editor.php
+msgid "Columns"
+msgstr "Spalten"
+
+#: includes/admin-editor.php
+msgid "Comma-separated list without dots, e.g. pdf, docx, xlsx. Leave empty to allow all WordPress-permitted types."
+msgstr "Kommagetrennte Liste ohne Punkte, z. B. pdf, docx, xlsx. Leer lassen, um alle von WordPress erlaubten Typen zuzulassen."
+
+#: includes/admin-editor.php
+msgid "Contains"
+msgstr "Enthält"
+
+#: includes/admin-editor.php
+msgid "Current hour"
+msgstr "Aktuelle Stunde"
+
+#: includes/admin-editor.php
+msgid "Custom"
+msgstr "Benutzerdefiniert"
+
+#: includes/admin-editor.php
+msgid "Days relative to today"
+msgstr "Tage relativ zu heute"
+
+#: includes/admin-editor.php
+msgid "Default value"
+msgstr "Standardwert"
+
+#: includes/admin-editor.php
+msgid "Delete"
+msgstr "Löschen"
+
+#: includes/admin-editor.php
+msgid "Disabled"
+msgstr "Deaktiviert"
+
+#: includes/admin-editor.php
+msgid "Does not contain"
+msgstr "Enthält nicht"
+
+#: includes/admin-editor.php
+msgid "Drag to reorder"
+msgstr "Zum Sortieren ziehen"
+
+#: includes/admin-editor.php
+msgid "Drop fields here"
+msgstr "Felder hier ablegen"
+
+#: includes/admin-editor.php
+msgid "Duplicate"
+msgstr "Duplizieren"
+
+#: includes/admin-editor.php
+msgid "Expand field"
+msgstr "Feld ausklappen"
+
+#: includes/admin-editor.php
+msgid "Field"
+msgstr "Feld"
+
+#: includes/admin-editor.php
+msgid "Fixed date"
+msgstr "Festes Datum"
+
+#: includes/admin-editor.php
+msgid "Fixed date & time"
+msgstr "Festes Datum & Uhrzeit"
+
+#: includes/admin-editor.php
+msgid "Fixed time"
+msgstr "Feste Uhrzeit"
+
+#: includes/admin-editor.php
+msgid "General"
+msgstr "Allgemein"
+
+#: includes/admin-editor.php
+msgid "Greater than"
+msgstr "Größer als"
+
+#: includes/admin-editor.php
+msgid "Greater than or equal to"
+msgstr "Größer oder gleich"
+
+#: includes/admin-editor.php
+msgid "Has any value"
+msgstr "Hat einen Wert"
+
+#: includes/admin-editor.php
+msgid "Has no value"
+msgstr "Hat keinen Wert"
+
+#: includes/admin-editor.php
+msgid "Height"
+msgstr "Höhe"
+
+#: includes/admin-editor.php
+msgid "Hidden from visitors. If filled, the submission is treated as spam."
+msgstr "Für Besucher ausgeblendet. Wird es ausgefüllt, gilt die Übermittlung als Spam."
+
+#: includes/admin-editor.php
+msgid "Hide"
+msgstr "Ausblenden"
+
+#: includes/admin-editor.php
+msgid "Horizontal"
+msgstr "Horizontal"
+
+#: includes/admin-editor.php
+msgid "I agree to the [Privacy Policy](page:privacy)."
+msgstr "Ich stimme der [Datenschutzerklärung](page:privacy) zu."
+
+#: includes/admin-editor.php
+msgid "Internal key used in code and storage. Lowercase letters, numbers, and hyphens."
+msgstr "Interner Schlüssel für Code und Speicherung. Kleinbuchstaben, Zahlen und Bindestriche."
+
+#: includes/admin-editor.php
+msgid "Is equal to"
+msgstr "Ist gleich"
+
+#: includes/admin-editor.php
+msgid "Is not equal to"
+msgstr "Ist ungleich"
+
+#: includes/admin-editor.php
+msgid "Label"
+msgstr "Bezeichnung"
+
+#: includes/admin-editor.php
+msgid "Leave empty for no limit. When the maximum is reached, further options cannot be selected."
+msgstr "Leer lassen für keine Begrenzung. Ist das Maximum erreicht, können keine weiteren Optionen ausgewählt werden."
+
+#: includes/admin-editor.php
+msgid "Leave empty to use the global default (%s)."
+msgstr "Leer lassen, um die globale Standardeinstellung (%s) zu verwenden."
+
+#: includes/admin-editor.php
+msgid "Leave empty to use the global default."
+msgstr "Leer lassen, um die globale Standardeinstellung zu verwenden."
+
+#: includes/admin-editor.php
+msgid "Less than"
+msgstr "Kleiner als"
+
+#: includes/admin-editor.php
+msgid "Less than or equal to"
+msgstr "Kleiner oder gleich"
+
+#: includes/admin-editor.php
+msgid "Level"
+msgstr "Ebene"
+
+#: includes/admin-editor.php
+msgid "MB"
+msgstr "MB"
+
+#: includes/admin-editor.php
+msgid "Margin"
+msgstr "Abstand"
+
+#: includes/admin-editor.php
+msgid "Markdown is supported, e.g. <b>**Bold**</b>, <i>*Italic*</i>, and <span style=\\\"white-space: nowrap\\\">[Link](...)</span>. For the target you can use a URL (/agb), a WordPress page (page:123), or a standard page such as page:privacy."
+msgstr "Markdown wird unterstützt, z. B. <b>**Fett**</b>, <i>*Kursiv*</i> und <span style=\\\"white-space: nowrap\\\">[Link](...)</span>. Als Ziel kannst du eine URL (/agb), eine WordPress-Seite (page:123) oder eine Standardseite wie page:privacy verwenden."
+
+#: includes/admin-editor.php
+msgid "Maximum"
+msgstr "Maximum"
+
+#: includes/admin-editor.php
+msgid "Maximum file size"
+msgstr "Maximale Dateigröße"
+
+#: includes/admin-editor.php
+msgid "Maximum files"
+msgstr "Maximale Dateianzahl"
+
+#: includes/admin-editor.php
+msgid "Maximum length"
+msgstr "Maximale Länge"
+
+#: includes/admin-editor.php
+msgid "Maximum number of files visitors can upload."
+msgstr "Maximale Anzahl Dateien, die Besucher hochladen können."
+
+#: includes/admin-editor.php
+msgid "Maximum selections"
+msgstr "Maximale Auswahl"
+
+#: includes/admin-editor.php
+msgid "Minimum"
+msgstr "Minimum"
+
+#: includes/admin-editor.php
+msgid "Minimum length"
+msgstr "Minimale Länge"
+
+#: includes/admin-editor.php
+msgid "Minimum selections"
+msgstr "Minimale Auswahl"
+
+#: includes/admin-editor.php
+msgid "Minutes relative to now"
+msgstr "Minuten relativ zu jetzt"
+
+#: includes/admin-editor.php
+msgid "Missing field"
+msgstr "Fehlendes Feld"
+
+#: includes/admin-editor.php
+msgid "Modern"
+msgstr "Modern"
+
+#: includes/admin-editor.php
+msgid "Must be after"
+msgstr "Muss nach"
+
+#: includes/admin-editor.php
+msgid "Must be before"
+msgstr "Muss vor"
+
+#: includes/admin-editor.php
+msgid "No fields available"
+msgstr "Keine Felder verfügbar"
+
+#: includes/admin-editor.php
+msgid "No limit"
+msgstr "Keine Beschränkung"
+
+#: includes/admin-editor.php
+msgid "No relation"
+msgstr "Kein Bezug"
+
+#: includes/admin-editor.php
+msgid "None"
+msgstr "Ohne"
+
+#: includes/admin-editor.php
+msgid "Not checked"
+msgstr "Nicht aktiviert"
+
+#: includes/admin-editor.php
+msgid "Now"
+msgstr "Jetzt"
+
+#: includes/admin-editor.php
+msgid "Now ±"
+msgstr "Jetzt ±"
+
+#: includes/admin-editor.php
+msgid "Off"
+msgstr "Aus"
+
+#: includes/admin-editor.php
+msgid "Open settings"
+msgstr "Einstellungen öffnen"
+
+#: includes/admin-editor.php
+msgid "Operator"
+msgstr "Operator"
+
+#: includes/admin-editor.php
+msgid "Option 1"
+msgstr "Option 1"
+
+#: includes/admin-editor.php
+msgid "Option 2"
+msgstr "Option 2"
+
+#: includes/admin-editor.php
+msgid "Options"
+msgstr "Optionen"
+
+#: includes/admin-editor.php
+msgid "Placeholder"
+msgstr "Platzhalter"
+
+#: includes/admin-editor.php
+msgid "Prefix"
+msgstr "Präfix"
+
+#: includes/admin-editor.php
+msgid "Privacy Policy"
+msgstr "Datenschutzerklärung"
+
+#: includes/admin-editor.php
+msgid "Read only"
+msgstr "Schreibgeschützt"
+
+#: includes/admin-editor.php
+msgid "Relation"
+msgstr "Bezug"
+
+#: includes/admin-editor.php
+msgid "Required"
+msgstr "Pflichtfeld"
+
+#: includes/admin-editor.php
+msgid "Rows"
+msgstr "Zeilen"
+
+#: includes/admin-editor.php
+msgid "Section title"
+msgstr "Abschnittsüberschrift"
+
+#: includes/admin-editor.php
+msgid "Section width"
+msgstr "Abschnittsbreite"
+
+#: includes/admin-editor.php
+msgid "Select field"
+msgstr "Feld wählen"
+
+#: includes/admin-editor.php
+msgid "Show character count"
+msgstr "Zeichenzähler anzeigen"
+
+#: includes/admin-editor.php
+msgid "Show file preview"
+msgstr "Dateivorschau anzeigen"
+
+#: includes/admin-editor.php
+msgid "Show on the frontend"
+msgstr "Im Frontend anzeigen"
+
+#: includes/admin-editor.php
+msgid "Show this field if"
+msgstr "Anzeigen wenn"
+
+#: includes/admin-editor.php
+msgid "Suffix"
+msgstr "Suffix"
+
+#: includes/admin-editor.php
+msgid "This field"
+msgstr "Dieses Feld"
+
+#: includes/admin-editor.php
+msgid "Today"
+msgstr "Heute"
+
+#: includes/admin-editor.php
+msgid "Today ±"
+msgstr "Heute ±"
+
+#: includes/admin-editor.php
+msgid "Type"
+msgstr "Typ"
+
+#: includes/admin-editor.php
+msgid "Use option slugs from the list above. For multiple values, separate with commas (e.g. option-1, option-2)."
+msgstr "Verwende die Option-Slugs aus der Liste oben. Mehrere Werte mit Kommas trennen (z. B. option-1, option-2)."
+
+#: includes/admin-editor.php
+msgid "Uses the CAPTCHA keys from Forms → Settings."
+msgstr "Verwendet die CAPTCHA-Schlüssel aus Formulare → Einstellungen."
+
+#: includes/admin-editor.php
+msgid "Value"
+msgstr "Wert"
+
+#: includes/admin-editor.php
+msgid "Vertical"
+msgstr "Vertikal"
+
+#: includes/admin-editor.php
+msgid "Width"
+msgstr "Breite"
+
+#: includes/admin-editor.php
+msgid "and"
+msgstr "und"
+
+#: includes/admin-editor.php
+msgid "days"
+msgstr "Tage"
+
+#: includes/admin-editor.php
+msgid "e.g. 24px or 2rem"
+msgstr "z. B. 24px oder 2rem"
+
+#: includes/admin-editor.php
+msgid "e.g. 40% or 280px"
+msgstr "z. B. 40% oder 280px"
+
+#: includes/admin-editor.php
+msgid "minutes"
+msgstr "Minuten"
+
+#: includes/admin-editor.php
+msgid "or"
+msgstr "oder"
+
+#: includes/admin-editor.php
+msgid "— Select —"
+msgstr "— Auswählen —"

@@ -733,6 +733,7 @@ function bl_forms_admin_enqueue(string $hook): void
 				'maxSelections'     => __('Maximum selections', 'baselayer-forms'),
 				'selectionBoundsHelp' => __('Leave empty for no limit. When the maximum is reached, further options cannot be selected.', 'baselayer-forms'),
 				'uploadButtonText'  => __('Button label', 'baselayer-forms'),
+				'uploadButtonDefault' => __('Choose file', 'baselayer-forms'),
 				'allowedExtensions' => __('Allowed extensions', 'baselayer-forms'),
 				'allowedExtensionsHelp' => __('Comma-separated list without dots, e.g. pdf, docx, xlsx. Leave empty to allow all WordPress-permitted types.', 'baselayer-forms'),
 				'maxFiles'          => __('Maximum files', 'baselayer-forms'),

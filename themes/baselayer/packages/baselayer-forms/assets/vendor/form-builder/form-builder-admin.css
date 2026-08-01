@@ -256,7 +256,7 @@ body.bl-forms-builder-fullscreen {
 
 .bl-forms-builder__palette {
   position: sticky;
-  top: 46px;
+  top: 44px;
   padding: 8px;
   border: 1px solid var(--bl-forms-admin-border);
   border-radius: var(--bl-forms-admin-radius);
@@ -267,6 +267,9 @@ body.bl-forms-builder-fullscreen {
     position: static;
     top: auto;
   }
+}
+.bl-forms-builder.is-fullscreen .bl-forms-builder__palette {
+  top: 12px;
 }
 .bl-forms-builder__palette.is-collapsed {
   position: static;
@@ -930,7 +933,7 @@ input.bl-forms-builder__section-label-input {
   width: auto;
   max-width: 100%;
   height: auto;
-  min-height: 0;
+  min-height: 0 !important;
   margin: 0;
   padding: 4px 8px;
   border: 0;
@@ -1534,10 +1537,10 @@ input.bl-forms-builder__section-label-input:focus {
 }
 
 .bl-forms-builder__field-body p {
-  margin: 0 0 10px;
+  margin: 0;
 }
 .bl-forms-builder__field-body p.description {
-  margin: -4px 0 0;
+  margin: 4px 0 0;
 }
 
 .bl-forms-builder__field-body label {

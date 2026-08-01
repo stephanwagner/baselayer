@@ -93,6 +93,31 @@ body.post-new-php.post-type-bl_block .page-title-action {
   -webkit-mask-size: contain;
 }
 
+.bl-blocks-settings-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.bl-blocks-settings-panel > .bl-forms-builder__section-title {
+  margin: 0;
+}
+.bl-blocks-settings-panel .bl-forms-builder__setting > p {
+  margin: 0;
+}
+.bl-blocks-settings-panel .bl-forms-builder__setting > p > label {
+  display: block;
+  margin-bottom: 4px;
+  font-weight: 600;
+}
+.bl-blocks-settings-panel .bl-forms-builder__setting > p.description {
+  margin: 4px 0 0;
+}
+.bl-blocks-settings-panel .bl-forms-builder__setting input.widefat,
+.bl-blocks-settings-panel .bl-forms-builder__setting textarea.widefat,
+.bl-blocks-settings-panel .bl-forms-builder__setting select.widefat {
+  max-width: 100%;
+}
+
 .bl-blocks-settings-post-types {
   display: flex;
   flex-direction: column;

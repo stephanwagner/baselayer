@@ -279,7 +279,7 @@ body.bl-forms-builder-fullscreen {
 
 .bl-forms-builder__palette {
   position: sticky;
-  top: 46px;
+  top: calc(32px + 12px);
   padding: 8px;
   border: 1px solid var(--bl-forms-admin-border);
   border-radius: var(--bl-forms-admin-radius);
@@ -288,6 +288,10 @@ body.bl-forms-builder-fullscreen {
   @media (max-width: 782px) {
     position: static;
     top: auto;
+  }
+
+  .bl-forms-builder.is-fullscreen & {
+    top: 12px;
   }
 
   &.is-collapsed {
@@ -1015,7 +1019,7 @@ input.bl-forms-builder__section-label-input {
   width: auto;
   max-width: 100%;
   height: auto;
-  min-height: 0;
+  min-height: 0 !important;
   margin: 0;
   padding: 4px 8px;
   border: 0;
