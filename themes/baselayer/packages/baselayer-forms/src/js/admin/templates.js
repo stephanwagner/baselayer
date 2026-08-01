@@ -1,4 +1,4 @@
-const { el, t, uid, iconEl, slugifyName } = window.BlFormBuilder || {};
+const { el, t, uid, slugifyName } = window.BlFormBuilder || {};
 
 /**
  * @param {object} partial
@@ -242,7 +242,7 @@ function openSimpleModal(title, message, options = {}) {
     el('button', {
       type: 'button',
       className: 'button',
-      text: options.onConfirm ? t('cancel', 'Cancel') : t('templatePremiumClose', 'Got it'),
+      text: options.onConfirm ? t('cancel', 'Cancel') : t('close', 'Close'),
       onClick: close,
     }),
   ];
@@ -274,39 +274,54 @@ function openSimpleModal(title, message, options = {}) {
 }
 
 function templateButton(label, onClick) {
-  const caret = iconEl('caret', 'bl-forms-templates__caret');
-  if (!caret.innerHTML) {
-    caret.textContent = '‹';
-  }
-  return el(
-    'button',
-    {
-      type: 'button',
-      className: 'button bl-button-small bl-forms-templates__btn',
-      onClick,
-    },
-    [caret, el('span', { className: 'bl-forms-templates__btn-label', text: label })]
-  );
+  return el('button', {
+    type: 'button',
+    className: 'button bl-button-small bl-forms-templates__btn',
+    text: label,
+    onClick,
+  });
 }
 
 /**
- * Mount starter templates + premium teaser into the Templates metabox.
+ * Browse starter templates in a modal.
  *
  * @param {{ replaceFields: (fields: array) => void }} canvas
  * @param {{ applySettings?: (partial: object) => void }} panels
  */
-export function bindTemplates(canvas, panels) {
-  const root = document.querySelector('[data-bl-forms-templates]');
-  if (!root || typeof canvas.replaceFields !== 'function') {
-    return;
-  }
+function openTemplatesBrowser(canvas, panels) {
+  document.querySelectorAll('.bl-forms-builder__modal').forEach((node) => node.remove());
 
-  root.replaceChildren();
+  const title = t('templates', 'Templates');
+  const backdrop = el('div', {
+    className: 'bl-forms-builder__modal',
+    role: 'dialog',
+    'aria-modal': 'true',
+    'aria-label': title,
+  });
+
+  const close = () => {
+    document.removeEventListener('keydown', onKey);
+    backdrop.remove();
+  };
+
+  const onKey = (evt) => {
+    if (evt.key === 'Escape') {
+      close();
+    }
+  };
+  document.addEventListener('keydown', onKey);
+
+  backdrop.addEventListener('click', (evt) => {
+    if (evt.target === backdrop) {
+      close();
+    }
+  });
 
   const list = el('div', { className: 'bl-forms-templates__list' });
   getStarterTemplates().forEach((tpl) => {
     list.appendChild(
       templateButton(tpl.label, () => {
+        close();
         openSimpleModal(
           t('templateApplyTitle', 'Apply template?'),
           t(
@@ -327,23 +342,52 @@ export function bindTemplates(canvas, panels) {
     );
   });
 
-  const premium = el(
-    'button',
-    {
-      type: 'button',
-      className: 'button bl-button-small bl-forms-templates__premium',
-      onClick: () => {
-        openSimpleModal(
-          t('templatePremiumTitle', 'Premium templates'),
-          t(
-            'templatePremiumMessage',
-            'A library of premium form templates is in development. Licensed Pro users will be able to browse and import polished templates from the cloud – including advanced layouts and optional styling packs.'
-          )
-        );
-      },
-    },
-    [el('span', { text: t('templatePremium', 'More templates…') })]
-  );
+  const body = el('div', { className: 'bl-forms-builder__modal-body bl-forms-templates__modal-body' }, [
+    el('p', {
+      className: 'description',
+      text: t(
+        'templatesBrowseHelp',
+        'Choose a template to create this form with predefined fields.'
+      ),
+    }),
+    list,
+  ]);
 
-  root.append(list, premium);
+  const dialog = el('div', {
+    className: 'bl-forms-builder__modal-dialog bl-forms-templates__modal-dialog',
+  });
+  dialog.append(
+    el('div', { className: 'bl-forms-builder__modal-header' }, [
+      el('h2', { className: 'bl-forms-builder__modal-title', text: title }),
+    ]),
+    body,
+    el('div', { className: 'bl-forms-builder__modal-footer' }, [
+      el('button', {
+        type: 'button',
+        className: 'button',
+        text: t('cancel', 'Cancel'),
+        onClick: close,
+      }),
+    ])
+  );
+  backdrop.appendChild(dialog);
+  document.body.appendChild(backdrop);
+}
+
+/**
+ * Bind Templates browse button in the Tools metabox.
+ *
+ * @param {{ replaceFields: (fields: array) => void }} canvas
+ * @param {{ applySettings?: (partial: object) => void }} panels
+ */
+export function bindTemplates(canvas, panels) {
+  const browseBtn = document.querySelector('[data-bl-forms-browse-templates]');
+  if (!browseBtn || typeof canvas.replaceFields !== 'function') {
+    return;
+  }
+
+  browseBtn.addEventListener('click', (evt) => {
+    evt.preventDefault();
+    openTemplatesBrowser(canvas, panels);
+  });
 }

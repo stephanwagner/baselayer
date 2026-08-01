@@ -1221,7 +1221,7 @@
   }
 
   // themes/baselayer/packages/baselayer-forms/src/js/admin/templates.js
-  var { el: el3, t: t3, uid, iconEl: iconEl2, slugifyName } = window.BlFormBuilder || {};
+  var { el: el3, t: t3, uid, slugifyName } = window.BlFormBuilder || {};
   function makeField(partial) {
     const type = partial.type || "text";
     const label = partial.label != null ? String(partial.label) : "";
@@ -1436,7 +1436,7 @@
       el3("button", {
         type: "button",
         className: "button",
-        text: options.onConfirm ? t3("cancel", "Cancel") : t3("templatePremiumClose", "Got it"),
+        text: options.onConfirm ? t3("cancel", "Cancel") : t3("close", "Close"),
         onClick: close
       })
     ];
@@ -1465,30 +1465,42 @@
     document.body.appendChild(backdrop);
   }
   function templateButton(label, onClick) {
-    const caret = iconEl2("caret", "bl-forms-templates__caret");
-    if (!caret.innerHTML) {
-      caret.textContent = "\u2039";
-    }
-    return el3(
-      "button",
-      {
-        type: "button",
-        className: "button bl-button-small bl-forms-templates__btn",
-        onClick
-      },
-      [caret, el3("span", { className: "bl-forms-templates__btn-label", text: label })]
-    );
+    return el3("button", {
+      type: "button",
+      className: "button bl-button-small bl-forms-templates__btn",
+      text: label,
+      onClick
+    });
   }
-  function bindTemplates(canvas, panels) {
-    const root = document.querySelector("[data-bl-forms-templates]");
-    if (!root || typeof canvas.replaceFields !== "function") {
-      return;
-    }
-    root.replaceChildren();
+  function openTemplatesBrowser(canvas, panels) {
+    document.querySelectorAll(".bl-forms-builder__modal").forEach((node) => node.remove());
+    const title = t3("templates", "Templates");
+    const backdrop = el3("div", {
+      className: "bl-forms-builder__modal",
+      role: "dialog",
+      "aria-modal": "true",
+      "aria-label": title
+    });
+    const close = () => {
+      document.removeEventListener("keydown", onKey);
+      backdrop.remove();
+    };
+    const onKey = (evt) => {
+      if (evt.key === "Escape") {
+        close();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    backdrop.addEventListener("click", (evt) => {
+      if (evt.target === backdrop) {
+        close();
+      }
+    });
     const list = el3("div", { className: "bl-forms-templates__list" });
     getStarterTemplates().forEach((tpl) => {
       list.appendChild(
         templateButton(tpl.label, () => {
+          close();
           openSimpleModal(
             t3("templateApplyTitle", "Apply template?"),
             t3(
@@ -1508,24 +1520,45 @@
         })
       );
     });
-    const premium = el3(
-      "button",
-      {
-        type: "button",
-        className: "button bl-button-small bl-forms-templates__premium",
-        onClick: () => {
-          openSimpleModal(
-            t3("templatePremiumTitle", "Premium templates"),
-            t3(
-              "templatePremiumMessage",
-              "A library of premium form templates is in development. Licensed Pro users will be able to browse and import polished templates from the cloud \u2013 including advanced layouts and optional styling packs."
-            )
-          );
-        }
-      },
-      [el3("span", { text: t3("templatePremium", "More templates\u2026") })]
+    const body = el3("div", { className: "bl-forms-builder__modal-body bl-forms-templates__modal-body" }, [
+      el3("p", {
+        className: "description",
+        text: t3(
+          "templatesBrowseHelp",
+          "Choose a template to create this form with predefined fields."
+        )
+      }),
+      list
+    ]);
+    const dialog = el3("div", {
+      className: "bl-forms-builder__modal-dialog bl-forms-templates__modal-dialog"
+    });
+    dialog.append(
+      el3("div", { className: "bl-forms-builder__modal-header" }, [
+        el3("h2", { className: "bl-forms-builder__modal-title", text: title })
+      ]),
+      body,
+      el3("div", { className: "bl-forms-builder__modal-footer" }, [
+        el3("button", {
+          type: "button",
+          className: "button",
+          text: t3("cancel", "Cancel"),
+          onClick: close
+        })
+      ])
     );
-    root.append(list, premium);
+    backdrop.appendChild(dialog);
+    document.body.appendChild(backdrop);
+  }
+  function bindTemplates(canvas, panels) {
+    const browseBtn = document.querySelector("[data-bl-forms-browse-templates]");
+    if (!browseBtn || typeof canvas.replaceFields !== "function") {
+      return;
+    }
+    browseBtn.addEventListener("click", (evt) => {
+      evt.preventDefault();
+      openTemplatesBrowser(canvas, panels);
+    });
   }
 
   // themes/baselayer/packages/baselayer-forms/src/js/admin/field-extras.js
@@ -1643,7 +1676,7 @@
     PALETTE_SECTIONS,
     defaultField,
     uniqueFieldName,
-    iconEl: iconEl3,
+    iconEl: iconEl2,
     createFieldCard,
     serializeRow,
     equalizeColumnRun
@@ -1783,7 +1816,7 @@
       fullscreenBtn.setAttribute("aria-label", label);
       fullscreenBtn.setAttribute("aria-pressed", fullscreen ? "true" : "false");
       fullscreenBtn.replaceChildren();
-      const icon = iconEl3(fullscreen ? "fullscreenExit" : "fullscreen");
+      const icon = iconEl2(fullscreen ? "fullscreenExit" : "fullscreen");
       if (icon.innerHTML) {
         fullscreenBtn.appendChild(icon);
       } else {
@@ -1809,7 +1842,7 @@
       "aria-pressed": "false",
       onClick: () => setFullscreen(!fullscreen)
     });
-    const enterIcon = iconEl3("fullscreen");
+    const enterIcon = iconEl2("fullscreen");
     if (enterIcon.innerHTML) {
       fullscreenBtn.appendChild(enterIcon);
     } else {

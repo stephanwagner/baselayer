@@ -2074,3 +2074,15 @@ msgstr ""
 #: includes/submit.php:927
 msgid "Upload failed."
 msgstr ""
+
+msgid "Export and Import"
+msgstr ""
+
+msgid "Browse Templates"
+msgstr ""
+
+msgid "Start from a ready-made form layout. Applying a template replaces the current fields."
+msgstr ""
+
+msgid "Choose a starter template to replace the fields on this form."
+msgstr ""

@@ -28,15 +28,6 @@ function bl_forms_admin_meta_boxes(): void
 	}
 
 	add_meta_box(
-		'bl_forms_templates',
-		__('Templates', 'baselayer-forms'),
-		'bl_forms_render_templates_metabox',
-		BL_FORM_POST_TYPE,
-		'side',
-		'default'
-	);
-
-	add_meta_box(
 		'bl_forms_tools',
 		__('Tools', 'baselayer-forms'),
 		'bl_forms_render_tools_metabox',
@@ -117,26 +108,30 @@ function bl_forms_render_builder_after_title(WP_Post $post): void
 add_action('edit_form_after_title', 'bl_forms_render_builder_after_title');
 
 /**
- * Starter + premium template packs (UI filled by forms-admin JS).
- */
-function bl_forms_render_templates_metabox(WP_Post $post): void
-{
-	echo '<div class="bl-forms-templates" data-bl-forms-templates></div>';
-}
-
-/**
- * Tools metabox (import/export) under Publish.
+ * Tools metabox (import/export + templates) under Publish.
  */
 function bl_forms_render_tools_metabox(WP_Post $post): void
 {
 	?>
 	<div class="bl-forms-tools">
-		<p class="description bl-forms-tools__help">
-			<?= esc_html__('Export the current form as JSON, or import a previously exported file.', 'baselayer-forms') ?>
-		</p>
-		<div class="bl-forms-tools__actions">
-			<button type="button" class="button bl-button-small" data-bl-forms-export><?= esc_html__('Export', 'baselayer-forms') ?></button>
-			<button type="button" class="button bl-button-small" data-bl-forms-import><?= esc_html__('Import', 'baselayer-forms') ?></button>
+		<div class="bl-forms-tools__section">
+			<h3 class="bl-forms-tools__heading"><?= esc_html__('Export and Import', 'baselayer-forms') ?></h3>
+			<p class="description bl-forms-tools__help">
+				<?= esc_html__('Export the current form as JSON, or import a previously exported file.', 'baselayer-forms') ?>
+			</p>
+			<div class="bl-forms-tools__actions">
+				<button type="button" class="button bl-button-small" data-bl-forms-export><?= esc_html__('Export', 'baselayer-forms') ?></button>
+				<button type="button" class="button bl-button-small" data-bl-forms-import><?= esc_html__('Import', 'baselayer-forms') ?></button>
+			</div>
+		</div>
+		<div class="bl-forms-tools__section">
+			<h3 class="bl-forms-tools__heading"><?= esc_html__('Templates', 'baselayer-forms') ?></h3>
+			<p class="description bl-forms-tools__help">
+				<?= esc_html__('Start with a ready-made form layout and adjust it as needed.', 'baselayer-forms') ?>
+			</p>
+			<button type="button" class="button bl-button-small bl-forms-tools__browse" data-bl-forms-browse-templates>
+				<?= esc_html__('Browse Templates', 'baselayer-forms') ?>
+			</button>
 		</div>
 	</div>
 	<?php
@@ -497,19 +492,19 @@ function bl_forms_admin_enqueue(string $hook): void
 				'cancel'            => __('Cancel', 'baselayer-forms'),
 				'apply'             => __('Apply', 'baselayer-forms'),
 				'tools'             => __('Tools', 'baselayer-forms'),
+				'exportImport'      => __('Export and Import', 'baselayer-forms'),
 				'export'            => __('Export', 'baselayer-forms'),
 				'import'            => __('Import', 'baselayer-forms'),
 				'templates'         => __('Templates', 'baselayer-forms'),
+				'templatesHelp'     => __('Start with a ready-made form layout and adjust it as needed.', 'baselayer-forms'),
+				'browseTemplates'   => __('Browse Templates', 'baselayer-forms'),
+				'templatesBrowseHelp' => __('Choose a template to create this form with predefined fields.', 'baselayer-forms'),
 				'templateContact'   => __('Contact Form', 'baselayer-forms'),
 				'templateNewsletter'=> __('Newsletter Signup', 'baselayer-forms'),
 				'templateJob'       => __('Job Application', 'baselayer-forms'),
 				'templateApplyTitle'=> __('Apply template?', 'baselayer-forms'),
 				'templateApplyMessage' => __('Applying this template will overwrite all existing fields on this form. Other settings stay as they are, except the submit button label when the template defines one.', 'baselayer-forms'),
 				'templateApplyConfirm' => __('Apply template', 'baselayer-forms'),
-				'templatePremium'   => __('More templates…', 'baselayer-forms'),
-				'templatePremiumTitle' => __('Premium templates', 'baselayer-forms'),
-				'templatePremiumMessage' => __('A library of premium form templates is in development. Licensed Pro users will be able to browse and import polished templates from the cloud – including advanced layouts and optional styling packs.', 'baselayer-forms'),
-				'templatePremiumClose' => __('Got it', 'baselayer-forms'),
 				'templateFieldName' => __('Name', 'baselayer-forms'),
 				'templateFieldEmail'=> __('Email', 'baselayer-forms'),
 				'templateFieldSubject' => __('Subject', 'baselayer-forms'),

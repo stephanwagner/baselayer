@@ -64,6 +64,18 @@ msgstr "Eintrags-ID: %d"
 msgid "Templates"
 msgstr "Vorlagen"
 
+msgid "Export and Import"
+msgstr "Export und Import"
+
+msgid "Browse Templates"
+msgstr "Vorlagen durchsuchen"
+
+msgid "Start with a ready-made form layout and adjust it as needed."
+msgstr "Starte mit einem fertigen Formular-Layout und passe es nach Bedarf an."
+
+msgid "Choose a template to create this form with predefined fields."
+msgstr "Wähle eine Vorlage, um dieses Formular mit vordefinierten Feldern zu erstellen und anzupassen."
+
 #: includes/admin.php:41 includes/admin.php:438
 msgid "Tools"
 msgstr "Werkzeuge"
