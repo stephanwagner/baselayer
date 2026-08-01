@@ -3,3 +3,7 @@
 !/assets/js/.gitkeep
 /assets/css/*
 !/assets/css/.gitkeep
+
+# Packages
+/packages/**/assets/css/*.map
+/packages/**/assets/js/*.map
