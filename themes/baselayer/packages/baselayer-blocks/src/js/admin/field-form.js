@@ -291,10 +291,19 @@ function createLeafControl(field, values, controls) {
  *
  * @param {array} fields
  * @param {object} values
+ * @param {{ layout?: 'default'|'compact' }} [options]
  * @returns {{ root: HTMLElement, getValues: () => object }}
  */
-export function createFieldForm(fields, values = {}) {
-  const root = el('div', { className: 'bl-blocks-fields', dataset: { blBlocksFields: '' } });
+export function createFieldForm(fields, values = {}, options = {}) {
+  const compact = options && options.layout === 'compact';
+  const rootAttrs = {
+    className: 'bl-blocks-fields' + (compact ? ' bl-blocks-fields--compact' : ''),
+    dataset: { blBlocksFields: '' },
+  };
+  if (compact) {
+    rootAttrs.dataset.layout = 'compact';
+  }
+  const root = el('div', rootAttrs);
   /** @type {Array<{ kind: 'leaf'|'repeater', field: object, control?: HTMLElement, type?: string, getRows?: Function }>} */
   const entries = [];
 
@@ -304,9 +313,11 @@ export function createFieldForm(fields, values = {}) {
       const type = field.type || 'text';
 
       if (isLayout(type)) {
-        const design = ['standard', 'outline', 'card'].includes(field.design)
-          ? field.design
-          : 'standard';
+        const design = compact
+          ? 'standard'
+          : ['standard', 'outline', 'card'].includes(field.design)
+            ? field.design
+            : 'standard';
         const layoutClass = [
           'bl-blocks-fields__layout',
           'bl-blocks-fields__layout--' + type,
@@ -343,7 +354,7 @@ export function createFieldForm(fields, values = {}) {
       if (isStatic(type)) return;
 
       if (type === 'repeater') {
-        parent.appendChild(createRepeaterControl(field, valueMap, entries));
+        parent.appendChild(createRepeaterControl(field, valueMap, entries, options));
         return;
       }
 
@@ -380,13 +391,18 @@ export function createFieldForm(fields, values = {}) {
   return { root, getValues };
 }
 
-function createRepeaterControl(field, valueMap, entries) {
+function createRepeaterControl(field, valueMap, entries, options = {}) {
+  const compact = options && options.layout === 'compact';
   const name = field.name || '';
   const children = Array.isArray(field.children) ? field.children : [];
   const minRows = Math.max(0, parseInt(field.min_rows, 10) || 0);
   const maxRows = Math.max(0, parseInt(field.max_rows, 10) || 0);
   const buttonLabel = field.button_label || i18n('addRow', 'Add row');
-  const design = ['standard', 'outline', 'card'].includes(field.design) ? field.design : 'standard';
+  const design = compact
+    ? 'standard'
+    : ['standard', 'outline', 'card'].includes(field.design)
+      ? field.design
+      : 'standard';
   const showTitle =
     field.show_title !== false && field.show_title !== 0 && field.show_title !== '0';
 
@@ -452,7 +468,7 @@ function createRepeaterControl(field, valueMap, entries) {
     header.appendChild(removeBtn);
     rowEl.appendChild(header);
 
-    const form = createFieldForm(children, rowValues || {});
+    const form = createFieldForm(children, rowValues || {}, options);
     rowEl.appendChild(form.root);
     rowsEl.appendChild(rowEl);
 

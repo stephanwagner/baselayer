@@ -113,18 +113,19 @@ function bl_blocks_block_definition_payload(WP_Post $post): ?array
 	$gutenberg_icon = bl_blocks_resolve_gutenberg_icon($raw_icon);
 
 	return [
-		'id'             => (int) $post->ID,
-		'name'           => bl_blocks_gutenberg_name($slug),
-		'slug'           => $slug,
-		'title'          => $title,
-		'description'    => (string) ($config['settings']['description'] ?? ''),
-		'icon'           => $gutenberg_icon,
-		'iconRaw'        => $raw_icon,
-		'category'       => (string) ($config['settings']['block_category'] ?? 'widgets'),
-		'keywords'       => $keywords,
-		'fields'         => $config['fields'],
-		'templateExists' => bl_blocks_locate_template($slug) !== '',
-		'createPath'     => bl_blocks_template_info($slug)['create_path'],
+		'id'              => (int) $post->ID,
+		'name'            => bl_blocks_gutenberg_name($slug),
+		'slug'            => $slug,
+		'title'           => $title,
+		'description'     => (string) ($config['settings']['description'] ?? ''),
+		'icon'            => $gutenberg_icon,
+		'iconRaw'         => $raw_icon,
+		'category'        => (string) ($config['settings']['block_category'] ?? 'widgets'),
+		'keywords'        => $keywords,
+		'fields'          => $config['fields'],
+		'sidebarEditing'  => !empty($config['settings']['sidebar_editing']),
+		'templateExists'  => bl_blocks_locate_template($slug) !== '',
+		'createPath'      => bl_blocks_template_info($slug)['create_path'],
 	];
 }
 
@@ -222,6 +223,7 @@ function bl_blocks_register_dynamic_blocks(): void
 			'restNonce'    => wp_create_nonce('wp_rest'),
 			'i18n'         => [
 				'edit'                   => __('Edit fields', 'baselayer-blocks'),
+				'openFieldEditor'        => __('Open field editor', 'baselayer-blocks'),
 				'save'                   => __('Apply', 'baselayer-blocks'),
 				'cancel'                 => __('Cancel', 'baselayer-blocks'),
 				'panelTitle'             => __('Block fields', 'baselayer-blocks'),
@@ -251,7 +253,7 @@ function bl_blocks_register_dynamic_blocks(): void
 				'linkTypeUrl'            => __('URL', 'baselayer-blocks'),
 				'linkTypeEmail'          => __('Email', 'baselayer-blocks'),
 				'linkTypePhone'          => __('Phone', 'baselayer-blocks'),
-				'linkTypeLabel'          => __('Link type', 'baselayer-blocks'),
+				'linkTypeLabel'          => __('Type', 'baselayer-blocks'),
 				'linkDestPage'           => __('Page', 'baselayer-blocks'),
 				'linkDestUrl'            => __('URL', 'baselayer-blocks'),
 				'linkDestEmail'          => __('Email address', 'baselayer-blocks'),

@@ -22,22 +22,23 @@ function bl_blocks_sanitize_definition_type($type): string
 }
 
 /**
- * @return array{active: bool, slug: string, description: string, block_icon: string, block_category: string, block_keywords: string, post_types: list<string>, menu_label: string, menu_order: int}
+ * @return array{active: bool, sidebar_editing: bool, slug: string, description: string, block_icon: string, block_category: string, block_keywords: string, post_types: list<string>, menu_label: string, menu_order: int}
  */
 function bl_blocks_default_settings(string $type = 'block'): array
 {
 	$type = bl_blocks_sanitize_definition_type($type);
 
 	return [
-		'active'         => true,
-		'slug'           => '',
-		'description'    => '',
-		'block_icon'     => 'block-default',
-		'block_category' => 'widgets',
-		'block_keywords' => '',
-		'post_types'     => $type === 'page_settings' ? ['page'] : [],
-		'menu_label'     => '',
-		'menu_order'     => 1,
+		'active'           => true,
+		'sidebar_editing'  => false,
+		'slug'             => '',
+		'description'      => '',
+		'block_icon'       => 'block-default',
+		'block_category'   => 'widgets',
+		'block_keywords'   => '',
+		'post_types'       => $type === 'page_settings' ? ['page'] : [],
+		'menu_label'       => '',
+		'menu_order'       => 1,
 	];
 }
 
@@ -210,6 +211,7 @@ function bl_blocks_sanitize_settings($settings, string $type = 'block'): array
 
 	$out = $defaults;
 	$out['active'] = array_key_exists('active', $settings) ? !empty($settings['active']) : true;
+	$out['sidebar_editing'] = $type === 'block' && !empty($settings['sidebar_editing']);
 	$out['slug'] = sanitize_key((string) ($settings['slug'] ?? ''));
 	$out['description'] = sanitize_textarea_field((string) ($settings['description'] ?? ''));
 	$out['block_icon'] = bl_blocks_sanitize_block_icon($settings['block_icon'] ?? 'block-default');

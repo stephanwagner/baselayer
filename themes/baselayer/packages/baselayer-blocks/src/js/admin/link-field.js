@@ -312,7 +312,7 @@ export function createLinkControl(field, current) {
     });
     root.appendChild(
       el('div', { className: 'bl-blocks-fields__link-type-block' }, [
-        el('label', { text: i18n('linkTypeLabel', 'Link type') }),
+        el('label', { text: i18n('linkTypeLabel', 'Type') }),
         typeRow,
       ])
     );

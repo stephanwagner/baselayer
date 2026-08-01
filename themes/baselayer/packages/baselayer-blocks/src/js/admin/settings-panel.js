@@ -272,6 +272,17 @@ export function createSettingsPanel(initial, definitionType, onChange) {
     },
   });
 
+  const { root: sidebarEditingRow } = plainSwitch(
+    t('settingsSidebarEditing', 'Allow editing directly in sidebar'),
+    {
+      checked: !!state.sidebar_editing,
+      onChange: (checked) => {
+        state.sidebar_editing = checked;
+        notify();
+      },
+    }
+  );
+
   const slugInput = el('input', {
     type: 'text',
     className: 'widefat',
@@ -331,9 +342,16 @@ export function createSettingsPanel(initial, definitionType, onChange) {
   const children = [
     el('h3', { className: 'bl-forms-builder__section-title', text: t('tabSettings', 'Settings') }),
     activeRow,
-    fieldRow(t('settingsSlug', 'Slug'), slugInput, t('settingsSlugHelp', '')),
-    fieldRow(t('settingsDescription', 'Description'), descInput),
   ];
+
+  if (definitionType === 'block') {
+    children.push(sidebarEditingRow);
+  }
+
+  children.push(
+    fieldRow(t('settingsSlug', 'Slug'), slugInput, t('settingsSlugHelp', '')),
+    fieldRow(t('settingsDescription', 'Description'), descInput)
+  );
 
   if (definitionType === 'block') {
     const iconField = createBlockIconField(state.block_icon || 'block-default', (next) => {

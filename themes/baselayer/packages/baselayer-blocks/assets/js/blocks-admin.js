@@ -1368,6 +1368,16 @@
         notify();
       }
     });
+    const { root: sidebarEditingRow } = plainSwitch(
+      t2("settingsSidebarEditing", "Allow editing directly in sidebar"),
+      {
+        checked: !!state.sidebar_editing,
+        onChange: (checked) => {
+          state.sidebar_editing = checked;
+          notify();
+        }
+      }
+    );
     const slugInput = el("input", {
       type: "text",
       className: "widefat",
@@ -1415,10 +1425,15 @@
     });
     const children = [
       el("h3", { className: "bl-forms-builder__section-title", text: t2("tabSettings", "Settings") }),
-      activeRow,
+      activeRow
+    ];
+    if (definitionType === "block") {
+      children.push(sidebarEditingRow);
+    }
+    children.push(
       fieldRow(t2("settingsSlug", "Slug"), slugInput, t2("settingsSlugHelp", "")),
       fieldRow(t2("settingsDescription", "Description"), descInput)
-    ];
+    );
     if (definitionType === "block") {
       const iconField = createBlockIconField(state.block_icon || "block-default", (next) => {
         state.block_icon = next;
@@ -2975,7 +2990,7 @@
       });
       root.appendChild(
         el5("div", { className: "bl-blocks-fields__link-type-block" }, [
-          el5("label", { text: i18n2("linkTypeLabel", "Link type") }),
+          el5("label", { text: i18n2("linkTypeLabel", "Type") }),
           typeRow
         ])
       );
@@ -3357,15 +3372,23 @@
     }
     return row;
   }
-  function createFieldForm(fields, values = {}) {
-    const root = el6("div", { className: "bl-blocks-fields", dataset: { blBlocksFields: "" } });
+  function createFieldForm(fields, values = {}, options = {}) {
+    const compact = options && options.layout === "compact";
+    const rootAttrs = {
+      className: "bl-blocks-fields" + (compact ? " bl-blocks-fields--compact" : ""),
+      dataset: { blBlocksFields: "" }
+    };
+    if (compact) {
+      rootAttrs.dataset.layout = "compact";
+    }
+    const root = el6("div", rootAttrs);
     const entries = [];
     const walk = (list, parent, valueMap) => {
       (list || []).forEach((field) => {
         if (!field || field.active === false) return;
         const type = field.type || "text";
         if (isLayout(type)) {
-          const design = ["standard", "outline", "card"].includes(field.design) ? field.design : "standard";
+          const design = compact ? "standard" : ["standard", "outline", "card"].includes(field.design) ? field.design : "standard";
           const layoutClass = [
             "bl-blocks-fields__layout",
             "bl-blocks-fields__layout--" + type,
@@ -3398,7 +3421,7 @@
         }
         if (isStatic(type)) return;
         if (type === "repeater") {
-          parent.appendChild(createRepeaterControl(field, valueMap, entries));
+          parent.appendChild(createRepeaterControl(field, valueMap, entries, options));
           return;
         }
         const leafControls = [];
@@ -3430,13 +3453,14 @@
     };
     return { root, getValues };
   }
-  function createRepeaterControl(field, valueMap, entries) {
+  function createRepeaterControl(field, valueMap, entries, options = {}) {
+    const compact = options && options.layout === "compact";
     const name = field.name || "";
     const children = Array.isArray(field.children) ? field.children : [];
     const minRows = Math.max(0, parseInt(field.min_rows, 10) || 0);
     const maxRows = Math.max(0, parseInt(field.max_rows, 10) || 0);
     const buttonLabel = field.button_label || i18n3("addRow", "Add row");
-    const design = ["standard", "outline", "card"].includes(field.design) ? field.design : "standard";
+    const design = compact ? "standard" : ["standard", "outline", "card"].includes(field.design) ? field.design : "standard";
     const showTitle = field.show_title !== false && field.show_title !== 0 && field.show_title !== "0";
     let rows = Array.isArray(valueMap[name]) ? valueMap[name].slice() : [];
     while (rows.length < minRows) {
@@ -3489,7 +3513,7 @@
       });
       header.appendChild(removeBtn);
       rowEl.appendChild(header);
-      const form = createFieldForm(children, rowValues || {});
+      const form = createFieldForm(children, rowValues || {}, options);
       rowEl.appendChild(form.root);
       rowsEl.appendChild(rowEl);
       const entry = { getValues: form.getValues, rowEl, removeBtn };

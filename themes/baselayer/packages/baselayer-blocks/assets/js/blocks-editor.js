@@ -830,7 +830,7 @@
       });
       root.appendChild(
         el2("div", { className: "bl-blocks-fields__link-type-block" }, [
-          el2("label", { text: i18n2("linkTypeLabel", "Link type") }),
+          el2("label", { text: i18n2("linkTypeLabel", "Type") }),
           typeRow
         ])
       );
@@ -1212,15 +1212,23 @@
     }
     return row;
   }
-  function createFieldForm(fields, values = {}) {
-    const root = el3("div", { className: "bl-blocks-fields", dataset: { blBlocksFields: "" } });
+  function createFieldForm(fields, values = {}, options = {}) {
+    const compact = options && options.layout === "compact";
+    const rootAttrs = {
+      className: "bl-blocks-fields" + (compact ? " bl-blocks-fields--compact" : ""),
+      dataset: { blBlocksFields: "" }
+    };
+    if (compact) {
+      rootAttrs.dataset.layout = "compact";
+    }
+    const root = el3("div", rootAttrs);
     const entries = [];
     const walk = (list, parent, valueMap) => {
       (list || []).forEach((field) => {
         if (!field || field.active === false) return;
         const type = field.type || "text";
         if (isLayout(type)) {
-          const design = ["standard", "outline", "card"].includes(field.design) ? field.design : "standard";
+          const design = compact ? "standard" : ["standard", "outline", "card"].includes(field.design) ? field.design : "standard";
           const layoutClass = [
             "bl-blocks-fields__layout",
             "bl-blocks-fields__layout--" + type,
@@ -1253,7 +1261,7 @@
         }
         if (isStatic(type)) return;
         if (type === "repeater") {
-          parent.appendChild(createRepeaterControl(field, valueMap, entries));
+          parent.appendChild(createRepeaterControl(field, valueMap, entries, options));
           return;
         }
         const leafControls = [];
@@ -1285,13 +1293,14 @@
     };
     return { root, getValues };
   }
-  function createRepeaterControl(field, valueMap, entries) {
+  function createRepeaterControl(field, valueMap, entries, options = {}) {
+    const compact = options && options.layout === "compact";
     const name = field.name || "";
     const children = Array.isArray(field.children) ? field.children : [];
     const minRows = Math.max(0, parseInt(field.min_rows, 10) || 0);
     const maxRows = Math.max(0, parseInt(field.max_rows, 10) || 0);
     const buttonLabel = field.button_label || i18n3("addRow", "Add row");
-    const design = ["standard", "outline", "card"].includes(field.design) ? field.design : "standard";
+    const design = compact ? "standard" : ["standard", "outline", "card"].includes(field.design) ? field.design : "standard";
     const showTitle = field.show_title !== false && field.show_title !== 0 && field.show_title !== "0";
     let rows = Array.isArray(valueMap[name]) ? valueMap[name].slice() : [];
     while (rows.length < minRows) {
@@ -1344,7 +1353,7 @@
       });
       header.appendChild(removeBtn);
       rowEl.appendChild(header);
-      const form = createFieldForm(children, rowValues || {});
+      const form = createFieldForm(children, rowValues || {}, options);
       rowEl.appendChild(form.root);
       rowsEl.appendChild(rowEl);
       const entry = { getValues: form.getValues, rowEl, removeBtn };
@@ -1507,6 +1516,55 @@
     function PreviewLoading() {
       return el4("div", { className: "bl-blocks-block-preview-loading" }, el4(Spinner, null));
     }
+    function SidebarFields({ fields, values, onChange, onOpenModal, mountId }) {
+      const hostRef = useRef(null);
+      const onChangeRef = useRef(onChange);
+      const valuesRef = useRef(values);
+      onChangeRef.current = onChange;
+      valuesRef.current = values;
+      useEffect(() => {
+        const host = hostRef.current;
+        if (!host) {
+          return void 0;
+        }
+        const form = createFieldForm(fields || [], valuesRef.current || {}, { layout: "compact" });
+        host.replaceChildren(form.root);
+        const sync = () => {
+          if (typeof onChangeRef.current === "function") {
+            onChangeRef.current(normalizeValues(form.getValues()));
+          }
+        };
+        const onRepeaterClick = (evt) => {
+          const target = evt.target;
+          if (target && typeof target.closest === "function" && target.closest(".bl-blocks-fields__repeater-add, .bl-blocks-fields__repeater-remove")) {
+            window.setTimeout(sync, 0);
+          }
+        };
+        form.root.addEventListener("input", sync);
+        form.root.addEventListener("change", sync);
+        form.root.addEventListener("click", onRepeaterClick);
+        return () => {
+          form.root.removeEventListener("input", sync);
+          form.root.removeEventListener("change", sync);
+          form.root.removeEventListener("click", onRepeaterClick);
+          host.replaceChildren();
+        };
+      }, [fields, mountId]);
+      return el4(
+        "div",
+        { className: "bl-blocks-sidebar-fields" },
+        typeof onOpenModal === "function" ? el4(
+          Button,
+          {
+            variant: "secondary",
+            className: "bl-blocks-edit-fields-button",
+            onClick: onOpenModal
+          },
+          blockI18n.openFieldEditor || "Open field editor"
+        ) : null,
+        el4("div", { className: "bl-blocks-sidebar-fields__host", ref: hostRef })
+      );
+    }
     function BlockServerPreview({ name, values }) {
       const [response, setResponse] = useState({ status: "idle" });
       const shouldDebounceRef = useRef(false);
@@ -1601,15 +1659,43 @@
         edit: function Edit(props) {
           const { attributes, setAttributes } = props;
           const values = normalizeValues(attributes.values);
-          const open = () => openBlockModal(def.fields || [], values, (next) => {
+          const [sidebarMountId, setSidebarMountId] = useState(0);
+          const sidebarEditing = !!def.sidebarEditing;
+          const applyValues = (next) => {
             setAttributes({ values: normalizeValues(next) });
-          }, def.title);
+          };
+          const open = () => openBlockModal(
+            def.fields || [],
+            values,
+            (next) => {
+              applyValues(next);
+              if (sidebarEditing) {
+                setSidebarMountId((id) => id + 1);
+              }
+            },
+            def.title
+          );
           const blockProps = useBlockProps ? useBlockProps({ className: "bl-blocks-block-editor" }) : { className: "bl-blocks-block-editor" };
           const preview = apiFetch ? el4(BlockServerPreview, { name: def.name, values }) : el4(
             "div",
             { className: "bl-blocks-block-editor__fallback" },
             el4("strong", null, def.title || def.slug),
             el4("p", null, blockI18n.preview || "Edit fields to configure this block.")
+          );
+          const inspectorBody = sidebarEditing ? el4(SidebarFields, {
+            fields: def.fields || [],
+            values,
+            mountId: sidebarMountId,
+            onChange: applyValues,
+            onOpenModal: open
+          }) : el4(
+            Button,
+            {
+              variant: "secondary",
+              className: "bl-blocks-edit-fields-button",
+              onClick: open
+            },
+            blockI18n.edit || "Edit fields"
           );
           return el4(
             Fragment,
@@ -1633,15 +1719,7 @@
               el4(
                 PanelBody,
                 { title: blockI18n.panelTitle || "Block fields", initialOpen: true },
-                el4(
-                  Button,
-                  {
-                    variant: "secondary",
-                    className: "bl-blocks-edit-fields-button",
-                    onClick: open
-                  },
-                  blockI18n.edit || "Edit fields"
-                )
+                inspectorBody
               )
             ) : null,
             el4("div", blockProps, preview)
@@ -1683,7 +1761,7 @@
               {
                 name: "bl-blocks-page-" + def.id,
                 title: def.title || pageI18n.panelTitle || "Page Settings",
-                className: "bl-blocks-page-panel"
+                className: "bl-blocks-page-settings-panel"
               },
               def.description ? el4("p", { className: "description" }, def.description) : null,
               el4(
@@ -1693,7 +1771,7 @@
                   className: "bl-blocks-edit-fields-button",
                   onClick: open
                 },
-                pageI18n.openFields || pageI18n.edit || "Edit fields"
+                pageI18n.edit || blockI18n.edit || "Edit fields"
               )
             );
           }

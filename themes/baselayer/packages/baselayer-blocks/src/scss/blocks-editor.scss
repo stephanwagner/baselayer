@@ -309,3 +309,42 @@
   }
 }
 
+// Compact inspector sidebar: stack columns, soften repeater chrome.
+.bl-blocks-fields[data-layout='compact'],
+.bl-blocks-fields--compact {
+  gap: 10px;
+
+  .bl-blocks-fields__layout--column {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    grid-template-columns: none;
+  }
+
+  .bl-blocks-fields__repeater-row {
+    padding: 8px;
+    border-color: #dcdcde;
+    border-radius: 4px;
+    background: transparent;
+  }
+
+  .bl-blocks-fields__repeater-row-header {
+    margin-bottom: 8px;
+  }
+
+  .bl-blocks-fields__section-title {
+    margin: 0 0 4px;
+    font-size: 13px;
+  }
+}
+
+.bl-blocks-sidebar-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bl-blocks-sidebar-fields__host {
+  min-width: 0;
+}
+

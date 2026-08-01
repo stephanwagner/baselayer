@@ -1,7 +1,7 @@
 /**
  * Block editor: dynamic Blocks + Page Settings document panels.
  */
-import { openFieldsModal } from './admin/field-form.js';
+import { createFieldForm, openFieldsModal } from './admin/field-form.js';
 
 (function (wp) {
   if (!wp || !wp.element || !wp.components || !wp.blocks) {
@@ -52,6 +52,73 @@ import { openFieldsModal } from './admin/field-form.js';
 
   function PreviewLoading() {
     return el('div', { className: 'bl-blocks-block-preview-loading' }, el(Spinner, null));
+  }
+
+  /**
+   * Imperative compact field form for the block inspector.
+   * Mounts once per mountId; remount only when the modal applies new values.
+   */
+  function SidebarFields({ fields, values, onChange, onOpenModal, mountId }) {
+    const hostRef = useRef(null);
+    const onChangeRef = useRef(onChange);
+    const valuesRef = useRef(values);
+    onChangeRef.current = onChange;
+    valuesRef.current = values;
+
+    useEffect(() => {
+      const host = hostRef.current;
+      if (!host) {
+        return undefined;
+      }
+
+      const form = createFieldForm(fields || [], valuesRef.current || {}, { layout: 'compact' });
+      host.replaceChildren(form.root);
+
+      const sync = () => {
+        if (typeof onChangeRef.current === 'function') {
+          onChangeRef.current(normalizeValues(form.getValues()));
+        }
+      };
+
+      const onRepeaterClick = (evt) => {
+        const target = evt.target;
+        if (
+          target &&
+          typeof target.closest === 'function' &&
+          target.closest('.bl-blocks-fields__repeater-add, .bl-blocks-fields__repeater-remove')
+        ) {
+          window.setTimeout(sync, 0);
+        }
+      };
+
+      form.root.addEventListener('input', sync);
+      form.root.addEventListener('change', sync);
+      form.root.addEventListener('click', onRepeaterClick);
+
+      return () => {
+        form.root.removeEventListener('input', sync);
+        form.root.removeEventListener('change', sync);
+        form.root.removeEventListener('click', onRepeaterClick);
+        host.replaceChildren();
+      };
+    }, [fields, mountId]);
+
+    return el(
+      'div',
+      { className: 'bl-blocks-sidebar-fields' },
+      typeof onOpenModal === 'function'
+        ? el(
+            Button,
+            {
+              variant: 'secondary',
+              className: 'bl-blocks-edit-fields-button',
+              onClick: onOpenModal,
+            },
+            blockI18n.openFieldEditor || 'Open field editor'
+          )
+        : null,
+      el('div', { className: 'bl-blocks-sidebar-fields__host', ref: hostRef })
+    );
   }
 
   /**
@@ -165,10 +232,25 @@ import { openFieldsModal } from './admin/field-form.js';
       edit: function Edit(props) {
         const { attributes, setAttributes } = props;
         const values = normalizeValues(attributes.values);
+        const [sidebarMountId, setSidebarMountId] = useState(0);
+        const sidebarEditing = !!def.sidebarEditing;
+
+        const applyValues = (next) => {
+          setAttributes({ values: normalizeValues(next) });
+        };
+
         const open = () =>
-          openBlockModal(def.fields || [], values, (next) => {
-            setAttributes({ values: normalizeValues(next) });
-          }, def.title);
+          openBlockModal(
+            def.fields || [],
+            values,
+            (next) => {
+              applyValues(next);
+              if (sidebarEditing) {
+                setSidebarMountId((id) => id + 1);
+              }
+            },
+            def.title
+          );
 
         const blockProps = useBlockProps
           ? useBlockProps({ className: 'bl-blocks-block-editor' })
@@ -181,6 +263,24 @@ import { openFieldsModal } from './admin/field-form.js';
               { className: 'bl-blocks-block-editor__fallback' },
               el('strong', null, def.title || def.slug),
               el('p', null, blockI18n.preview || 'Edit fields to configure this block.')
+            );
+
+        const inspectorBody = sidebarEditing
+          ? el(SidebarFields, {
+              fields: def.fields || [],
+              values,
+              mountId: sidebarMountId,
+              onChange: applyValues,
+              onOpenModal: open,
+            })
+          : el(
+              Button,
+              {
+                variant: 'secondary',
+                className: 'bl-blocks-edit-fields-button',
+                onClick: open,
+              },
+              blockI18n.edit || 'Edit fields'
             );
 
         return el(
@@ -208,15 +308,7 @@ import { openFieldsModal } from './admin/field-form.js';
                 el(
                   PanelBody,
                   { title: blockI18n.panelTitle || 'Block fields', initialOpen: true },
-                  el(
-                    Button,
-                    {
-                      variant: 'secondary',
-                      className: 'bl-blocks-edit-fields-button',
-                      onClick: open,
-                    },
-                    blockI18n.edit || 'Edit fields'
-                  )
+                  inspectorBody
                 )
               )
             : null,
@@ -266,9 +358,11 @@ import { openFieldsModal } from './admin/field-form.js';
             {
               name: 'bl-blocks-page-' + def.id,
               title: def.title || pageI18n.panelTitle || 'Page Settings',
-              className: 'bl-blocks-page-panel',
+              className: 'bl-blocks-page-settings-panel',
             },
-            def.description ? el('p', { className: 'description' }, def.description) : null,
+            def.description
+              ? el('p', { className: 'description' }, def.description)
+              : null,
             el(
               Button,
               {
@@ -276,7 +370,7 @@ import { openFieldsModal } from './admin/field-form.js';
                 className: 'bl-blocks-edit-fields-button',
                 onClick: open,
               },
-              pageI18n.openFields || pageI18n.edit || 'Edit fields'
+              pageI18n.edit || blockI18n.edit || 'Edit fields'
             )
           );
         },

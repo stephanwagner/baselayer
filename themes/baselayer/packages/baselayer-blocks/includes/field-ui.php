@@ -718,7 +718,7 @@ function bl_blocks_enqueue_field_ui_assets(): void
 			'linkTypeUrl'            => __('URL', 'baselayer-blocks'),
 			'linkTypeEmail'          => __('Email', 'baselayer-blocks'),
 			'linkTypePhone'          => __('Phone', 'baselayer-blocks'),
-			'linkTypeLabel'          => __('Link type', 'baselayer-blocks'),
+			'linkTypeLabel'          => __('Type', 'baselayer-blocks'),
 			'linkDestPage'           => __('Page', 'baselayer-blocks'),
 			'linkDestUrl'            => __('URL', 'baselayer-blocks'),
 			'linkDestEmail'          => __('Email address', 'baselayer-blocks'),
