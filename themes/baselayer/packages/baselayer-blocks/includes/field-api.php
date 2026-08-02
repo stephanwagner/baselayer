@@ -3,7 +3,7 @@
 defined('ABSPATH') || exit;
 
 /**
- * @var array{values: array<string, mixed>, fields: list<array<string, mixed>>, field_map: array<string, array<string, mixed>>}|null
+ * @var array{values: array<string, mixed>, fields: list<array<string, mixed>>, field_map: array<string, array<string, mixed>>, content: string}|null
  */
 $GLOBALS['bl_blocks_field_context'] = null;
 
@@ -54,13 +54,15 @@ function bl_blocks_field_map(array $fields): array
  *
  * @param array<string, mixed>       $values Sanitized values.
  * @param list<array<string, mixed>> $fields Field definitions.
+ * @param string                     $content Rendered InnerBlocks HTML from WordPress.
  */
-function bl_blocks_set_field_context(array $values, array $fields): void
+function bl_blocks_set_field_context(array $values, array $fields, string $content = ''): void
 {
 	$GLOBALS['bl_blocks_field_context'] = [
 		'values'    => $values,
 		'fields'    => $fields,
 		'field_map' => bl_blocks_field_map($fields),
+		'content'   => $content,
 	];
 }
 
@@ -70,6 +72,43 @@ function bl_blocks_set_field_context(array $values, array $fields): void
 function bl_blocks_reset_field_context(): void
 {
 	$GLOBALS['bl_blocks_field_context'] = null;
+}
+
+/**
+ * Rendered InnerBlocks HTML for the current block template (empty when none).
+ */
+function bl_block_inner_blocks(): string
+{
+	$ctx = $GLOBALS['bl_blocks_field_context'] ?? null;
+	if (!is_array($ctx)) {
+		return '';
+	}
+
+	$content = $ctx['content'] ?? '';
+	return is_string($content) ? $content : '';
+}
+
+/**
+ * Replace ACF-style <InnerBlocks /> tags in template HTML with rendered inner content.
+ */
+function bl_blocks_expand_inner_blocks_tags(string $html, string $content): string
+{
+	if ($html === '' || stripos($html, 'InnerBlocks') === false) {
+		return $html;
+	}
+
+	$html = (string) preg_replace(
+		'/<InnerBlocks\b[^>]*>.*?<\/InnerBlocks>/is',
+		$content,
+		$html
+	);
+	$html = (string) preg_replace(
+		'/<InnerBlocks\b[^>]*\/?\s*>/i',
+		$content,
+		$html
+	);
+
+	return $html;
 }
 
 /**

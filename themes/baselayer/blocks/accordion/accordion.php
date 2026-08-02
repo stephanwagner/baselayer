@@ -2,7 +2,8 @@
 /**
  * Accordion block (BaseLayer Blocks).
  *
- * Available: bl_block_field(), $values, $fields, $block, $attributes, $def, $content
+ * Available: bl_block_field(), bl_block_inner_blocks(), $values, $fields, $block, $attributes, $def, $content
+ * Inner content: <InnerBlocks /> or <?php echo bl_block_inner_blocks(); ?>
  */
 
 $title = bl_block_field('title');
@@ -28,7 +29,7 @@ if (empty($globalAccordionId)) {
 $globalAccordionId += 1;
 
 $accordion_id = is_string($id) && $id !== '' ? $id : 'accordion-' . $globalAccordionId;
-$inner = isset($content) && is_string($content) ? $content : '';
+$inner = bl_block_inner_blocks();
 ?>
 <div
 	<?php echo $wrapper_attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
@@ -58,7 +59,7 @@ $inner = isset($content) && is_string($content) ? $content : '';
 			id="accordion-content-<?php echo esc_attr($accordion_id); ?>"
 			aria-labelledby="accordion-header-<?php echo esc_attr($accordion_id); ?>">
 			<div class="accordion__content-inner">
-				<?php echo $inner; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- InnerBlocks HTML ?>
+				<InnerBlocks />
 			</div>
 		</div>
 	</div>

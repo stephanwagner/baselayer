@@ -4425,13 +4425,38 @@
       }
       return el5(RawHTML, null, response.content);
     }
-    function AccordionInnerEdit({ values, blockProps }) {
+    function innerBlocksProps(def) {
+      const props = {
+        renderAppender: InnerBlocks.ButtonBlockAppender
+      };
+      const allowed = Array.isArray(def && def.innerBlocksAllowed) ? def.innerBlocksAllowed.filter((name) => typeof name === "string" && name) : [];
+      if (allowed.length) {
+        props.allowedBlocks = allowed;
+      }
+      const template = def && def.innerBlocksTemplate;
+      if (Array.isArray(template) && template.length) {
+        props.template = template;
+      }
+      return props;
+    }
+    function AccordionInnerEdit({ values, blockProps, def, isSelected, clientId }) {
       const title = typeof values.title === "string" ? values.title : "";
-      const isOpen = !!values.accordion_is_open;
+      const isOpenByDefault = !!values.accordion_is_open;
+      const hasChildSelected = useSelect ? useSelect(
+        (select) => {
+          if (!clientId) {
+            return false;
+          }
+          const blockEditor = select("core/block-editor");
+          return !!(blockEditor && typeof blockEditor.hasSelectedInnerBlock === "function" && blockEditor.hasSelectedInnerBlock(clientId, true));
+        },
+        [clientId]
+      ) : false;
+      const editorOpen = isOpenByDefault || !!isSelected || !!hasChildSelected;
       const className = [
         "bl-wp-block",
         "accordion__wrapper",
-        isOpen ? "accordion-open" : "",
+        editorOpen ? "accordion-open" : "",
         blockProps.className || ""
       ].filter(Boolean).join(" ");
       return el5(
@@ -4439,7 +4464,7 @@
         {
           ...blockProps,
           className,
-          "data-accordion-is-open": isOpen ? "true" : "false"
+          "data-accordion-is-open": editorOpen ? "true" : "false"
         },
         el5(
           "div",
@@ -4450,7 +4475,7 @@
               className: "accordion__header noselect",
               role: "button",
               tabIndex: 0,
-              "aria-expanded": isOpen ? "true" : "false"
+              "aria-expanded": editorOpen ? "true" : "false"
             },
             el5("div", { className: "accordion__title" }, title || blockI18n.innerBlocksTitle || "Title"),
             el5(
@@ -4477,17 +4502,15 @@
             el5(
               "div",
               { className: "accordion__content-inner" },
-              InnerBlocks ? el5(InnerBlocks, {
-                renderAppender: InnerBlocks.ButtonBlockAppender
-              }) : null
+              InnerBlocks ? el5(InnerBlocks, innerBlocksProps(def)) : null
             )
           )
         )
       );
     }
-    function InnerBlocksShell({ values, blockProps, slug }) {
+    function InnerBlocksShell({ values, blockProps, slug, def, isSelected, clientId }) {
       if (slug === "accordion") {
-        return el5(AccordionInnerEdit, { values, blockProps });
+        return el5(AccordionInnerEdit, { values, blockProps, def, isSelected, clientId });
       }
       return el5(
         "div",
@@ -4497,7 +4520,7 @@
           { className: "bl-blocks-block-editor__inner-fields" },
           el5("strong", null, values.title || "")
         ),
-        InnerBlocks ? el5(InnerBlocks, { renderAppender: InnerBlocks.ButtonBlockAppender }) : null
+        InnerBlocks ? el5(InnerBlocks, innerBlocksProps(def)) : null
       );
     }
     (blockConfig.blocks || []).forEach((def) => {
@@ -4522,7 +4545,7 @@
           anchor: true
         },
         edit: function Edit(props) {
-          const { attributes, setAttributes } = props;
+          const { attributes, setAttributes, isSelected, clientId } = props;
           const values = normalizeValues(attributes.values);
           const [sidebarMountId, setSidebarMountId] = useState(0);
           const sidebarEditing = !!def.sidebarEditing;
@@ -4544,7 +4567,10 @@
           const preview = supportsInnerBlocks ? el5(InnerBlocksShell, {
             values,
             blockProps,
-            slug: def.slug || ""
+            slug: def.slug || "",
+            def,
+            isSelected,
+            clientId
           }) : apiFetch ? el5("div", blockProps, el5(BlockServerPreview, { name: def.name, values })) : el5(
             "div",
             blockProps,

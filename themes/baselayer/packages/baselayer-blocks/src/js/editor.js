@@ -208,13 +208,48 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
     return el(RawHTML, null, response.content);
   }
 
-  function AccordionInnerEdit({ values, blockProps }) {
+  function innerBlocksProps(def) {
+    const props = {
+      renderAppender: InnerBlocks.ButtonBlockAppender,
+    };
+    const allowed = Array.isArray(def && def.innerBlocksAllowed)
+      ? def.innerBlocksAllowed.filter((name) => typeof name === 'string' && name)
+      : [];
+    if (allowed.length) {
+      props.allowedBlocks = allowed;
+    }
+    const template = def && def.innerBlocksTemplate;
+    if (Array.isArray(template) && template.length) {
+      props.template = template;
+    }
+    return props;
+  }
+
+  function AccordionInnerEdit({ values, blockProps, def, isSelected, clientId }) {
     const title = typeof values.title === 'string' ? values.title : '';
-    const isOpen = !!values.accordion_is_open;
+    const isOpenByDefault = !!values.accordion_is_open;
+    const hasChildSelected = useSelect
+      ? useSelect(
+          (select) => {
+            if (!clientId) {
+              return false;
+            }
+            const blockEditor = select('core/block-editor');
+            return !!(
+              blockEditor &&
+              typeof blockEditor.hasSelectedInnerBlock === 'function' &&
+              blockEditor.hasSelectedInnerBlock(clientId, true)
+            );
+          },
+          [clientId]
+        )
+      : false;
+    // Match ACF: show content while this accordion or a nested block is focused.
+    const editorOpen = isOpenByDefault || !!isSelected || !!hasChildSelected;
     const className = [
       'bl-wp-block',
       'accordion__wrapper',
-      isOpen ? 'accordion-open' : '',
+      editorOpen ? 'accordion-open' : '',
       blockProps.className || '',
     ]
       .filter(Boolean)
@@ -225,7 +260,7 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
       {
         ...blockProps,
         className,
-        'data-accordion-is-open': isOpen ? 'true' : 'false',
+        'data-accordion-is-open': editorOpen ? 'true' : 'false',
       },
       el(
         'div',
@@ -236,7 +271,7 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
             className: 'accordion__header noselect',
             role: 'button',
             tabIndex: 0,
-            'aria-expanded': isOpen ? 'true' : 'false',
+            'aria-expanded': editorOpen ? 'true' : 'false',
           },
           el('div', { className: 'accordion__title' }, title || blockI18n.innerBlocksTitle || 'Title'),
           el(
@@ -263,20 +298,16 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
           el(
             'div',
             { className: 'accordion__content-inner' },
-            InnerBlocks
-              ? el(InnerBlocks, {
-                  renderAppender: InnerBlocks.ButtonBlockAppender,
-                })
-              : null
+            InnerBlocks ? el(InnerBlocks, innerBlocksProps(def)) : null
           )
         )
       )
     );
   }
 
-  function InnerBlocksShell({ values, blockProps, slug }) {
+  function InnerBlocksShell({ values, blockProps, slug, def, isSelected, clientId }) {
     if (slug === 'accordion') {
-      return el(AccordionInnerEdit, { values, blockProps });
+      return el(AccordionInnerEdit, { values, blockProps, def, isSelected, clientId });
     }
 
     return el(
@@ -285,9 +316,7 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
       el('div', { className: 'bl-blocks-block-editor__inner-fields' },
         el('strong', null, values.title || '')
       ),
-      InnerBlocks
-        ? el(InnerBlocks, { renderAppender: InnerBlocks.ButtonBlockAppender })
-        : null
+      InnerBlocks ? el(InnerBlocks, innerBlocksProps(def)) : null
     );
   }
 
@@ -315,7 +344,7 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
         anchor: true,
       },
       edit: function Edit(props) {
-        const { attributes, setAttributes } = props;
+        const { attributes, setAttributes, isSelected, clientId } = props;
         const values = normalizeValues(attributes.values);
         const [sidebarMountId, setSidebarMountId] = useState(0);
         const sidebarEditing = !!def.sidebarEditing;
@@ -346,6 +375,9 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
               values,
               blockProps,
               slug: def.slug || '',
+              def,
+              isSelected,
+              clientId,
             })
           : apiFetch
             ? el('div', blockProps, el(BlockServerPreview, { name: def.name, values }))

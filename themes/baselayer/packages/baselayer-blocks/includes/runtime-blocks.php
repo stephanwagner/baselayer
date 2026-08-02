@@ -111,11 +111,17 @@ function bl_blocks_block_definition_payload(WP_Post $post): ?array
 		'iconRaw'         => $raw_icon,
 		'category'        => (string) ($config['settings']['block_category'] ?? 'widgets'),
 		'keywords'        => $keywords,
-		'fields'             => $config['fields'],
-		'sidebarEditing'     => !empty($config['settings']['sidebar_editing']),
-		'supportsInnerBlocks'=> !empty($config['settings']['supports_inner_blocks']),
-		'templateExists'     => bl_blocks_locate_template($slug) !== '',
-		'createPath'         => bl_blocks_template_info($slug)['create_path'],
+		'fields'               => $config['fields'],
+		'sidebarEditing'       => !empty($config['settings']['sidebar_editing']),
+		'supportsInnerBlocks'  => !empty($config['settings']['supports_inner_blocks']),
+		'innerBlocksAllowed'   => !empty($config['settings']['supports_inner_blocks'])
+			? bl_blocks_parse_inner_blocks_allowed((string) ($config['settings']['inner_blocks_allowed'] ?? ''))
+			: [],
+		'innerBlocksTemplate'  => !empty($config['settings']['supports_inner_blocks'])
+			? bl_blocks_parse_inner_blocks_template((string) ($config['settings']['inner_blocks_template'] ?? ''))
+			: null,
+		'templateExists'       => bl_blocks_locate_template($slug) !== '',
+		'createPath'           => bl_blocks_template_info($slug)['create_path'],
 	];
 }
 
@@ -524,7 +530,8 @@ function bl_blocks_render_missing_template_notice(string $slug, array $def): str
  * Front/editor render: theme template when present, otherwise notice (editor) or field dump.
  *
  * Template path: blocks/{slug}/{slug}.php (child theme preferred).
- * Available in the template: bl_block_field(), $values, $fields, $block, $attributes, $def, $content.
+ * Available in the template: bl_block_field(), bl_block_inner_blocks(), $values, $fields,
+ * $block, $attributes, $def, $content. ACF-style <InnerBlocks /> tags are expanded to $content.
  *
  * @param array<string, mixed> $def
  * @param array<string, mixed> $attributes
@@ -550,7 +557,7 @@ function bl_blocks_render_block(array $def, array $attributes, string $content =
 		return bl_blocks_render_block_fallback($def, $values);
 	}
 
-	bl_blocks_set_field_context($values, $fields);
+	bl_blocks_set_field_context($values, $fields, $content);
 	ob_start();
 	try {
 		include $path;
@@ -562,5 +569,5 @@ function bl_blocks_render_block(array $def, array $attributes, string $content =
 		return bl_blocks_render_block_fallback($def, $values);
 	}
 
-	return $html;
+	return bl_blocks_expand_inner_blocks_tags($html, $content);
 }

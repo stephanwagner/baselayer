@@ -22,25 +22,180 @@ function bl_blocks_sanitize_definition_type($type): string
 }
 
 /**
- * @return array{active: bool, sidebar_editing: bool, supports_inner_blocks: bool, slug: string, description: string, block_icon: string, block_category: string, block_keywords: string, post_types: list<string>, menu_label: string, menu_order: int}
+ * @return array{active: bool, sidebar_editing: bool, supports_inner_blocks: bool, inner_blocks_allowed: string, inner_blocks_template: string, slug: string, description: string, block_icon: string, block_category: string, block_keywords: string, post_types: list<string>, menu_label: string, menu_order: int}
  */
 function bl_blocks_default_settings(string $type = 'block'): array
 {
 	$type = bl_blocks_sanitize_definition_type($type);
 
 	return [
-		'active'                => true,
-		'sidebar_editing'       => false,
-		'supports_inner_blocks' => false,
-		'slug'                 => '',
-		'description'          => '',
-		'block_icon'           => 'block-default',
-		'block_category'       => 'widgets',
-		'block_keywords'       => '',
-		'post_types'           => $type === 'page_settings' ? ['page'] : [],
-		'menu_label'           => '',
-		'menu_order'           => 1,
+		'active'                 => true,
+		'sidebar_editing'        => false,
+		'supports_inner_blocks'  => false,
+		'inner_blocks_allowed'   => '',
+		'inner_blocks_template'  => '',
+		'slug'                   => '',
+		'description'            => '',
+		'block_icon'             => 'block-default',
+		'block_category'         => 'widgets',
+		'block_keywords'         => '',
+		'post_types'             => $type === 'page_settings' ? ['page'] : [],
+		'menu_label'             => '',
+		'menu_order'             => 1,
 	];
+}
+
+/**
+ * Sanitize Gutenberg block names for InnerBlocks allow lists.
+ *
+ * Accepts a comma-separated string or list of strings. Empty input → ''.
+ *
+ * @param mixed $raw
+ */
+function bl_blocks_sanitize_inner_blocks_allowed($raw): string
+{
+	$names = [];
+	if (is_string($raw)) {
+		$parts = preg_split('/[\s,]+/', $raw) ?: [];
+		foreach ($parts as $part) {
+			$names[] = $part;
+		}
+	} elseif (is_array($raw)) {
+		foreach ($raw as $part) {
+			if (is_string($part)) {
+				$names[] = $part;
+			}
+		}
+	}
+
+	$out = [];
+	foreach ($names as $name) {
+		$name = strtolower(trim((string) $name));
+		if ($name === '' || !preg_match('/^[a-z0-9-]+\/[a-z0-9-]+$/', $name)) {
+			continue;
+		}
+		$out[] = $name;
+	}
+
+	return implode(', ', array_values(array_unique($out)));
+}
+
+/**
+ * Sanitize an InnerBlocks template (JSON string or array of [blockName, attrs]).
+ *
+ * Empty / invalid → ''.
+ *
+ * @param mixed $raw
+ */
+function bl_blocks_sanitize_inner_blocks_template($raw): string
+{
+	if (is_string($raw)) {
+		$raw = trim($raw);
+		if ($raw === '') {
+			return '';
+		}
+		$decoded = json_decode($raw);
+		if (!is_array($decoded)) {
+			return '';
+		}
+		$raw = $decoded;
+	}
+
+	if (!is_array($raw) || $raw === []) {
+		return '';
+	}
+
+	$template = [];
+	foreach ($raw as $entry) {
+		if (!is_array($entry) && !is_object($entry)) {
+			continue;
+		}
+		$entry = (array) $entry;
+		if ($entry === []) {
+			continue;
+		}
+		$name = bl_blocks_sanitize_inner_blocks_allowed((string) ($entry[0] ?? ''));
+		if ($name === '' || strpos($name, ',') !== false) {
+			continue;
+		}
+		$attrs = new stdClass();
+		if (isset($entry[1]) && (is_array($entry[1]) || is_object($entry[1]))) {
+			// Empty list from json_decode(..., true) of {} → keep as object for Gutenberg.
+			if (is_array($entry[1]) && $entry[1] === []) {
+				$attrs = new stdClass();
+			} else {
+				$encoded = wp_json_encode($entry[1]);
+				$decoded_attrs = is_string($encoded) ? json_decode($encoded) : null;
+				if (is_object($decoded_attrs)) {
+					$attrs = $decoded_attrs;
+				} elseif (is_array($decoded_attrs) && $decoded_attrs !== []) {
+					$attrs = $decoded_attrs;
+				}
+			}
+		}
+		$template[] = [$name, $attrs];
+	}
+
+	if ($template === []) {
+		return '';
+	}
+
+	$json = wp_json_encode($template, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+	return is_string($json) ? $json : '';
+}
+
+/**
+ * Parse stored allow-list string into a list of block names.
+ *
+ * @return list<string>
+ */
+function bl_blocks_parse_inner_blocks_allowed(string $allowed): array
+{
+	$sanitized = bl_blocks_sanitize_inner_blocks_allowed($allowed);
+	if ($sanitized === '') {
+		return [];
+	}
+
+	return array_values(array_filter(array_map('trim', explode(',', $sanitized))));
+}
+
+/**
+ * Parse stored template JSON into a Gutenberg template array.
+ *
+ * @return list<array{0: string, 1: object|array<string, mixed>}>|null
+ */
+function bl_blocks_parse_inner_blocks_template(string $template): ?array
+{
+	$sanitized = bl_blocks_sanitize_inner_blocks_template($template);
+	if ($sanitized === '') {
+		return null;
+	}
+
+	$decoded = json_decode($sanitized);
+	if (!is_array($decoded) || $decoded === []) {
+		return null;
+	}
+
+	$out = [];
+	foreach ($decoded as $entry) {
+		if (!is_array($entry) || !isset($entry[0]) || !is_string($entry[0])) {
+			continue;
+		}
+		if (!isset($entry[1])) {
+			$attrs = new stdClass();
+		} elseif (is_object($entry[1])) {
+			$attrs = $entry[1];
+		} elseif (is_array($entry[1]) && $entry[1] === []) {
+			$attrs = new stdClass();
+		} elseif (is_array($entry[1])) {
+			$attrs = $entry[1];
+		} else {
+			$attrs = new stdClass();
+		}
+		$out[] = [$entry[0], $attrs];
+	}
+
+	return $out !== [] ? $out : null;
 }
 
 /**
@@ -214,6 +369,12 @@ function bl_blocks_sanitize_settings($settings, string $type = 'block'): array
 	$out['active'] = array_key_exists('active', $settings) ? !empty($settings['active']) : true;
 	$out['sidebar_editing'] = $type === 'block' && !empty($settings['sidebar_editing']);
 	$out['supports_inner_blocks'] = $type === 'block' && !empty($settings['supports_inner_blocks']);
+	$out['inner_blocks_allowed'] = $type === 'block' && $out['supports_inner_blocks']
+		? bl_blocks_sanitize_inner_blocks_allowed($settings['inner_blocks_allowed'] ?? '')
+		: '';
+	$out['inner_blocks_template'] = $type === 'block' && $out['supports_inner_blocks']
+		? bl_blocks_sanitize_inner_blocks_template($settings['inner_blocks_template'] ?? '')
+		: '';
 	$out['slug'] = sanitize_key((string) ($settings['slug'] ?? ''));
 	$out['description'] = sanitize_textarea_field((string) ($settings['description'] ?? ''));
 	$out['block_icon'] = bl_blocks_sanitize_block_icon($settings['block_icon'] ?? 'block-default');

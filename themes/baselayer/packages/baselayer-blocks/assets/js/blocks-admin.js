@@ -1386,10 +1386,53 @@
         checked: !!state.supports_inner_blocks,
         onChange: (checked) => {
           state.supports_inner_blocks = checked;
+          syncInnerBlocksOptionsVisibility();
           notify();
         }
       }
     );
+    const allowedInput = el("input", {
+      type: "text",
+      className: "widefat",
+      value: state.inner_blocks_allowed || "",
+      placeholder: "core/heading, core/paragraph"
+    });
+    allowedInput.addEventListener("input", () => {
+      state.inner_blocks_allowed = allowedInput.value;
+      notify();
+    });
+    const templateInput = el("textarea", {
+      className: "widefat code",
+      rows: 3,
+      text: state.inner_blocks_template || "",
+      placeholder: '[["core/paragraph",{}]]'
+    });
+    templateInput.addEventListener("input", () => {
+      state.inner_blocks_template = templateInput.value;
+      notify();
+    });
+    const innerBlocksAllowedRow = fieldRow(
+      t2("settingsInnerBlocksAllowed", "Allowed nested blocks"),
+      allowedInput,
+      t2(
+        "settingsInnerBlocksAllowedHelp",
+        "Comma-separated block names (e.g. core/heading, core/paragraph). Leave empty to allow all blocks."
+      )
+    );
+    const innerBlocksTemplateRow = fieldRow(
+      t2("settingsInnerBlocksTemplate", "Default nested template"),
+      templateInput,
+      t2(
+        "settingsInnerBlocksTemplateHelp",
+        'Optional JSON array of [blockName, attributes] pairs, e.g. [["core/paragraph",{}]]. Leave empty for no default.'
+      )
+    );
+    const syncInnerBlocksOptionsVisibility = () => {
+      const show = !!state.supports_inner_blocks;
+      innerBlocksAllowedRow.hidden = !show;
+      innerBlocksTemplateRow.hidden = !show;
+    };
+    syncInnerBlocksOptionsVisibility();
     const slugInput = el("input", {
       type: "text",
       className: "widefat",
@@ -1442,6 +1485,8 @@
     if (definitionType === "block") {
       children.push(sidebarEditingRow);
       children.push(innerBlocksRow);
+      children.push(innerBlocksAllowedRow);
+      children.push(innerBlocksTemplateRow);
     }
     children.push(
       fieldRow(t2("settingsSlug", "Slug"), slugInput, t2("settingsSlugHelp", "")),

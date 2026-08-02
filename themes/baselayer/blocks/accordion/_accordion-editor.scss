@@ -12,10 +12,16 @@
   }
 }
 
-.editor-styles-wrapper .accordion__wrapper.accordion-open,
-.editor-styles-wrapper .wp-block-baselayer-accordion.is-selected,
-.editor-styles-wrapper .wp-block-baselayer-accordion.has-child-selected {
-  .accordion__content {
-    display: block !important;
+// Show nested content while editing (closed on the front; open when focused here).
+.editor-styles-wrapper {
+  .accordion__wrapper.accordion-open,
+  .accordion__wrapper[data-accordion-is-open='true'],
+  .wp-block-baselayer-accordion.is-selected,
+  .wp-block-baselayer-accordion.has-child-selected,
+  .wp-block-baselayer-accordion.is-selected .accordion__wrapper,
+  .wp-block-baselayer-accordion.has-child-selected .accordion__wrapper {
+    .accordion__content {
+      display: block !important;
+    }
   }
 }
