@@ -66,39 +66,9 @@ add_action('admin_enqueue_scripts', function ($hook_suffix) {
 		return;
 	}
 
-	wp_enqueue_script('wp-blocks');
-	wp_enqueue_script('wp-block-library');
-	wp_enqueue_script('wp-block-editor');
-	wp_enqueue_style('wp-block-editor');
-
-	if (function_exists('get_block_editor_server_block_settings')) {
-		wp_add_inline_script(
-			'wp-blocks',
-			'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode(get_block_editor_server_block_settings(), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES) . ');'
-		);
-
-		if (class_exists('WP_Block_Editor_Context') && function_exists('get_block_categories')) {
-			$block_editor_context = new WP_Block_Editor_Context(['name' => 'baselayer/block-settings']);
-			wp_add_inline_script(
-				'wp-blocks',
-				sprintf(
-					'wp.blocks.setCategories( %s );',
-					wp_json_encode(get_block_categories($block_editor_context), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES)
-				),
-				'after'
-			);
-		}
+	if (function_exists('bl_enqueue_admin_block_type_registry')) {
+		bl_enqueue_admin_block_type_registry('baselayer/block-settings');
 	}
-
-	wp_add_inline_script(
-		'wp-block-library',
-		'wp.domReady( function() {
-			if ( wp.blockLibrary && typeof wp.blockLibrary.registerCoreBlocks === "function" ) {
-				wp.blockLibrary.registerCoreBlocks();
-			}
-		} );',
-		'after'
-	);
 
 	if (!function_exists('bl_enqueue_theme_script')) {
 		return;

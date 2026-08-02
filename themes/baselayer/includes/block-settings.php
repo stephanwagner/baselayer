@@ -948,6 +948,10 @@ function bl_block_settings_admin_icon_map(): array
 /**
  * Resolve the icon markup for a block in the admin UI.
  *
+ * Core block icons are usually not strings in PHP — load the client block
+ * registry via bl_enqueue_admin_block_type_registry() and render with
+ * wp.blocks.getBlockType() + BlockIcon instead.
+ *
  * @param mixed $registry_icon
  */
 function bl_block_settings_admin_resolve_icon(string $block_name, $registry_icon): ?string
@@ -958,6 +962,54 @@ function bl_block_settings_admin_resolve_icon(string $block_name, $registry_icon
 	}
 
 	return bl_block_settings_admin_export_icon($registry_icon);
+}
+
+/**
+ * Bootstrap wp.blocks + core block library outside the post editor.
+ *
+ * Needed so admin UIs can resolve real core block icons via
+ * wp.blocks.getBlockType( name ).icon and wp.blockEditor.BlockIcon.
+ *
+ * @param string $context_name WP_Block_Editor_Context name (for categories).
+ */
+function bl_enqueue_admin_block_type_registry(string $context_name = 'baselayer/admin-block-registry'): void
+{
+	wp_enqueue_script('wp-blocks');
+	wp_enqueue_script('wp-block-library');
+	wp_enqueue_script('wp-block-editor');
+	wp_enqueue_script('wp-dom-ready');
+	wp_enqueue_script('wp-element');
+	wp_enqueue_script('wp-data');
+	wp_enqueue_style('wp-block-editor');
+
+	if (function_exists('get_block_editor_server_block_settings')) {
+		wp_add_inline_script(
+			'wp-blocks',
+			'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode(get_block_editor_server_block_settings(), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES) . ');'
+		);
+
+		if (class_exists('WP_Block_Editor_Context') && function_exists('get_block_categories')) {
+			$block_editor_context = new WP_Block_Editor_Context(['name' => $context_name]);
+			wp_add_inline_script(
+				'wp-blocks',
+				sprintf(
+					'wp.blocks.setCategories( %s );',
+					wp_json_encode(get_block_categories($block_editor_context), JSON_HEX_TAG | JSON_UNESCAPED_SLASHES)
+				),
+				'after'
+			);
+		}
+	}
+
+	wp_add_inline_script(
+		'wp-block-library',
+		'wp.domReady( function() {
+			if ( wp.blockLibrary && typeof wp.blockLibrary.registerCoreBlocks === "function" ) {
+				wp.blockLibrary.registerCoreBlocks();
+			}
+		} );',
+		'after'
+	);
 }
 
 /**

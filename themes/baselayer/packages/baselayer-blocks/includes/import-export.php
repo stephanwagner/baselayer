@@ -371,6 +371,40 @@ function bl_blocks_render_import_export_page(): void
 			</form>
 		</div>
 
+		<?php
+		$options_import_path = function_exists('bl_block_options_theme_import_path')
+			? bl_block_options_theme_import_path()
+			: '';
+		$options_is_seed = $options_import_path !== '' && str_contains($options_import_path, '/seed/block-options-import.json');
+		$options_notice_key = 'bl_block_options_import_notice_' . get_current_user_id();
+		$options_notice = get_transient($options_notice_key);
+		if (is_array($options_notice)) {
+			delete_transient($options_notice_key);
+		}
+		?>
+		<?php if (is_array($options_notice) && !empty($options_notice['message'])) : ?>
+			<div class="notice notice-<?php echo esc_attr((string) ($options_notice['type'] ?? 'info')); ?> is-dismissible">
+				<p><?php echo esc_html((string) $options_notice['message']); ?></p>
+			</div>
+		<?php endif; ?>
+
+		<div class="card" style="max-width: 720px; padding: 1em 1.5em; margin-top: 1.5em;">
+			<h2><?php echo esc_html__('Block Options defaults', 'baselayer-blocks'); ?></h2>
+			<?php if ($options_import_path !== '') : ?>
+				<p><?php echo esc_html(
+					$options_is_seed
+						? __('Import presets and block assignments from the package seed. This replaces the current Block Options store.', 'baselayer-blocks')
+						: __('Import presets and block assignments from the theme catalog. This replaces the current Block Options store.', 'baselayer-blocks')
+				); ?></p>
+				<form method="post">
+					<?php wp_nonce_field('bl_block_options_import_theme', 'bl_block_options_import_theme_nonce'); ?>
+					<?php submit_button(__('Import defaults', 'baselayer-blocks'), 'secondary', 'bl_block_options_import_theme', false); ?>
+				</form>
+			<?php else : ?>
+				<p class="description"><?php echo esc_html__('No Block Options catalog found.', 'baselayer-blocks'); ?></p>
+			<?php endif; ?>
+		</div>
+
 		<div class="card" style="max-width: 720px; padding: 1em 1.5em; margin-top: 1.5em;">
 			<h2><?php echo esc_html__('Import theme catalog', 'baselayer-blocks'); ?></h2>
 			<p><?php echo esc_html__('Import the bundled block definitions from the active theme. Existing definitions with the same type and slug are updated; missing catalog entries are left alone.', 'baselayer-blocks'); ?></p>

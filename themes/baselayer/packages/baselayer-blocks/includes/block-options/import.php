@@ -181,7 +181,11 @@ function bl_block_options_handle_admin_import(): void
 		update_option('bl_block_options_bootstrapped', 1, false);
 	}
 
-	wp_safe_redirect(admin_url('admin.php?page=' . BL_BLOCK_OPTIONS_PAGE));
+	$redirect = admin_url('admin.php?page=bl-blocks-import-export');
+	if (!defined('BL_BLOCK_POST_TYPE') || !post_type_exists(BL_BLOCK_POST_TYPE)) {
+		$redirect = admin_url('admin.php?page=' . BL_BLOCK_OPTIONS_PAGE);
+	}
+	wp_safe_redirect($redirect);
 	exit;
 }
 add_action('admin_init', 'bl_block_options_handle_admin_import', 4);

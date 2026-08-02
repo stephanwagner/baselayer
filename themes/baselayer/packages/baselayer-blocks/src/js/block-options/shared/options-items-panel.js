@@ -1083,10 +1083,11 @@ export function createOptionsPanel(initial, onChange, options = {}) {
   const makeAddButton = (label, onClick) => {
     const btn = el('button', {
       type: 'button',
-      className: 'button button-secondary bl-button-small bl-bo-add__btn',
+      className: 'button button-secondary bl-button-small bl-button-has-icon bl-bo-add__btn',
       onClick,
     });
-    const icon = typeof iconEl === 'function' ? iconEl('plus', 'bl-bo-add__icon') : null;
+    const icon =
+      typeof iconEl === 'function' ? iconEl('plus', 'bl-button-has-icon__icon') : null;
     if (icon?.innerHTML) {
       btn.appendChild(icon);
     }

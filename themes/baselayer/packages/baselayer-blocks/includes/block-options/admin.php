@@ -93,9 +93,42 @@ function bl_block_options_has_acf_blocks(): bool
 }
 
 /**
+ * Title + icon markup for a registered block.
+ *
+ * @return array{title: string, icon: string|null}
+ */
+function bl_block_options_block_meta(string $name): array
+{
+	$title = $name;
+	$icon = null;
+
+	if (class_exists('WP_Block_Type_Registry')) {
+		$type = WP_Block_Type_Registry::get_instance()->get_registered($name);
+		if ($type instanceof WP_Block_Type) {
+			if (is_string($type->title) && $type->title !== '') {
+				$title = $type->title;
+			}
+			$icon = $type->icon;
+		}
+	}
+
+	if (function_exists('bl_block_settings_admin_resolve_icon')) {
+		$resolved = bl_block_settings_admin_resolve_icon($name, $icon);
+		$icon = is_string($resolved) && $resolved !== '' ? $resolved : null;
+	} elseif (!is_string($icon) || $icon === '') {
+		$icon = null;
+	}
+
+	return [
+		'title' => $title,
+		'icon' => $icon,
+	];
+}
+
+/**
  * Store block assignments for admin lists.
  *
- * @return list<array{name: string, items: list<array<string, mixed>>}>
+ * @return list<array{name: string, title: string, icon: string|null, items: list<array<string, mixed>>}>
  */
 function bl_block_options_blocks_catalog(): array
 {
@@ -109,13 +142,95 @@ function bl_block_options_blocks_catalog(): array
 		if ($name === '' || $name === '*') {
 			continue;
 		}
+		if (function_exists('bl_block_settings_is_block_allowed') && !bl_block_settings_is_block_allowed($name)) {
+			continue;
+		}
+		$meta = bl_block_options_block_meta($name);
 		$list[] = [
 			'name' => $name,
+			'title' => $meta['title'],
+			'icon' => $meta['icon'],
 			'items' => isset($entry['items']) && is_array($entry['items']) ? $entry['items'] : [],
 		];
 	}
 	usort($list, static fn(array $a, array $b): int => strcasecmp($a['name'], $b['name']));
 	return $list;
+}
+
+/**
+ * Registered blocks that can be added to Block Options (not already assigned).
+ *
+ * @return list<array{name: string, title: string, icon: string|null}>
+ */
+function bl_block_options_available_blocks_catalog(): array
+{
+	if (!class_exists('WP_Block_Type_Registry') || !function_exists('bl_block_options_get_store')) {
+		return [];
+	}
+
+	$assigned = array_fill_keys(array_map('strval', array_keys(bl_block_options_get_store()['blocks'] ?? [])), true);
+	$list = [];
+
+	foreach (WP_Block_Type_Registry::get_instance()->get_all_registered() as $name => $type) {
+		$name = (string) $name;
+		if ($name === '' || isset($assigned[$name])) {
+			continue;
+		}
+		if (function_exists('bl_block_settings_is_manageable_block') && !bl_block_settings_is_manageable_block($name)) {
+			continue;
+		}
+		if (function_exists('bl_block_settings_is_hard_disallowed') && bl_block_settings_is_hard_disallowed($name)) {
+			continue;
+		}
+		if (function_exists('bl_block_settings_is_block_allowed') && !bl_block_settings_is_block_allowed($name)) {
+			continue;
+		}
+		$meta = bl_block_options_block_meta($name);
+		$list[] = [
+			'name' => $name,
+			'title' => $meta['title'],
+			'icon' => $meta['icon'],
+		];
+	}
+
+	usort($list, static fn(array $a, array $b): int => strcasecmp($a['title'], $b['title']));
+	return $list;
+}
+
+/**
+ * Ensure a block is allowed in Theme → Blocks settings.
+ */
+function bl_block_options_ensure_theme_block_allowed(string $block_name): bool
+{
+	$block_name = sanitize_text_field($block_name);
+	if ($block_name === '' || !defined('BL_BLOCK_SETTINGS_OPTION')) {
+		return false;
+	}
+	if (function_exists('bl_block_settings_is_hard_disallowed') && bl_block_settings_is_hard_disallowed($block_name)) {
+		return false;
+	}
+	if (function_exists('bl_block_settings_is_manageable_block') && !bl_block_settings_is_manageable_block($block_name)) {
+		return false;
+	}
+
+	$stored = get_option(BL_BLOCK_SETTINGS_OPTION, []);
+	if (!is_array($stored)) {
+		$stored = [];
+	}
+	$flags = isset($stored[$block_name]) && is_array($stored[$block_name]) ? $stored[$block_name] : [];
+	$stored[$block_name] = [
+		'allowed' => 1,
+		'hidden' => !empty($flags['hidden']) ? 1 : 0,
+		'favorite' => !empty($flags['favorite']) ? 1 : 0,
+	];
+
+	$sanitized = function_exists('bl_sanitize_block_settings')
+		? bl_sanitize_block_settings($stored)
+		: $stored;
+	update_option(BL_BLOCK_SETTINGS_OPTION, $sanitized, false);
+
+	return !function_exists('bl_block_settings_is_block_allowed')
+		|| bl_block_settings_is_block_allowed($block_name);
 }
 
 function bl_block_options_enqueue_admin_assets(): void
@@ -136,7 +251,12 @@ function bl_block_options_enqueue_admin_assets(): void
 		? bl_blocks_enqueue_form_builder_kit($form_builder_deps)
 		: '';
 
-	$style_deps = [];
+	// Core block icons only exist after the client block library registers them.
+	if (function_exists('bl_enqueue_admin_block_type_registry')) {
+		bl_enqueue_admin_block_type_registry('baselayer/block-options');
+	}
+
+	$style_deps = ['wp-block-editor'];
 	if ($form_builder_handle) {
 		$style_deps[] = $form_builder_handle;
 	} elseif ($builder_handle) {
@@ -147,7 +267,15 @@ function bl_block_options_enqueue_admin_assets(): void
 	}
 
 	$handle = 'bl-block-options-admin';
-	$deps = [];
+	$deps = [
+		'wp-blocks',
+		'wp-block-library',
+		'wp-block-editor',
+		'wp-components',
+		'wp-element',
+		'wp-data',
+		'wp-dom-ready',
+	];
 	if ($form_builder_handle) {
 		$deps[] = $form_builder_handle;
 	} elseif ($builder_handle) {
@@ -175,7 +303,7 @@ function bl_block_options_enqueue_admin_assets(): void
 		if (function_exists('bl_load_icons_textdomain')) {
 			bl_load_icons_textdomain();
 		}
-		bl_enqueue_theme_icons_style(['bl-blocks-admin', $handle]);
+		bl_enqueue_theme_icons_style(['bl-blocks-admin']);
 	}
 	if ($has_icon_picker) {
 		wp_localize_script($handle, 'baselayerIcons', bl_icons_localize_payload());
@@ -183,27 +311,38 @@ function bl_block_options_enqueue_admin_assets(): void
 
 	$i18n = [
 		'title' => __('Block Options', 'baselayer'),
-		'intro' => __('Manage sidebar options for blocks. Create reusable presets, then assign them to blocks.', 'baselayer'),
 		'tabBlocks' => __('Blocks', 'baselayer'),
 		'tabAll' => __('All', 'baselayer'),
 		'tabBaselayer' => __('BaseLayer', 'baselayer'),
 		'tabAcf' => __('ACF', 'baselayer'),
 		'tabCore' => __('Core', 'baselayer'),
+		'tabOther' => __('Other', 'baselayer'),
 		'tabPresets' => __('Presets', 'baselayer'),
-		'emptyAll' => __('No blocks with options yet. Import theme defaults, or assign presets from a block.', 'baselayer'),
-		'emptyBaselayer' => __('No BaseLayer blocks with options yet. Import theme defaults, or assign presets from a block.', 'baselayer'),
-		'emptyAcf' => __('No ACF blocks with options yet. Import theme defaults, or assign presets from a block.', 'baselayer'),
-		'emptySystem' => __('No system blocks with options yet. Import theme defaults above.', 'baselayer'),
-		'emptyPresets' => __('No presets yet. Add one, or import theme defaults above.', 'baselayer'),
+		'emptyAll' => __('No blocks with options yet. Add a block below, or import defaults under Blocks → Import / Export.', 'baselayer'),
+		'emptyBaselayer' => __('No BaseLayer blocks with options yet. Add a block below, or import defaults under Blocks → Import / Export.', 'baselayer'),
+		'emptyAcf' => __('No ACF blocks with options yet. Add a block below, or import defaults under Blocks → Import / Export.', 'baselayer'),
+		'emptySystem' => __('No Core blocks with options yet. Add a block below, or import defaults under Blocks → Import / Export.', 'baselayer'),
+		'emptyPresets' => __('No presets yet. Add one, or import defaults under Blocks → Import / Export.', 'baselayer'),
 		'addPreset' => __('Add preset', 'baselayer'),
-		'savePresets' => __('Save presets', 'baselayer'),
+		'addBlock' => __('Add block', 'baselayer'),
+		'chooseBlock' => __('Select a block…', 'baselayer'),
+		'addingBlock' => __('Adding…', 'baselayer'),
+		'addBlockFailed' => __('Could not add block.', 'baselayer'),
+		'noBlocksToAdd' => __('No more blocks available in this filter.', 'baselayer'),
+		'untitledPreset' => __('Untitled', 'baselayer'),
 		'saveBlocks' => __('Save block', 'baselayer'),
 		'presetLabel' => __('Label', 'baselayer'),
 		'presetSlug' => __('Slug', 'baselayer'),
 		'deletePreset' => __('Delete', 'baselayer'),
+		'deletePresetTitle' => __('Delete preset?', 'baselayer'),
+		/* translators: %s: preset label or slug */
+		'deletePresetConfirm' => __('Delete “%s”? This cannot be undone.', 'baselayer'),
+		'cancel' => __('Cancel', 'baselayer'),
+		'close' => __('Close', 'baselayer'),
 		'remove' => __('Remove', 'baselayer'),
-		'backToList' => __('← All blocks', 'baselayer'),
-		'backToPresets' => __('← All presets', 'baselayer'),
+		'backToList' => __('All blocks', 'baselayer'),
+		'backToPresets' => __('All presets', 'baselayer'),
+		'saving' => __('Saving…', 'baselayer'),
 		'addOption' => __('Add option', 'baselayer'),
 		'addPresetRef' => __('Preset', 'baselayer'),
 		'optionType' => __('Type', 'baselayer'),
@@ -234,15 +373,16 @@ function bl_block_options_enqueue_admin_assets(): void
 		'collapseField' => __('Collapse field', 'baselayer'),
 		'choosePreset' => __('Preset', 'baselayer'),
 		'presetDefaultsHelp' => __('Optional default overrides for this block:', 'baselayer'),
-		'presetItemsHelp' => __('These controls can be attached to blocks as a reusable preset.', 'baselayer'),
 		'presetItemsEmpty' => __('No options yet. Add a control.', 'baselayer'),
 		'blockOptionsEmpty' => __('No options yet. Add a control or attach a preset.', 'baselayer'),
 		'noPresetsYet' => __('No presets yet — create some under Block Options → Presets', 'baselayer'),
 		'saved' => __('Saved.', 'baselayer'),
 		'saveFailed' => __('Could not save.', 'baselayer'),
 		'items' => __('items', 'baselayer'),
-		'summaryPresets' => __('presets', 'baselayer'),
-		'summaryControls' => __('controls', 'baselayer'),
+		'summaryPresetOne' => __('preset', 'baselayer'),
+		'summaryPresetMany' => __('presets', 'baselayer'),
+		'summaryControlOne' => __('control', 'baselayer'),
+		'summaryControlMany' => __('controls', 'baselayer'),
 	];
 
 	wp_localize_script($handle, 'blBlockOptionsAdmin', [
@@ -255,6 +395,7 @@ function bl_block_options_enqueue_admin_assets(): void
 			? bl_block_options_presets_catalog()
 			: [],
 		'blocks' => bl_block_options_blocks_catalog(),
+		'availableBlocks' => bl_block_options_available_blocks_catalog(),
 		'ajaxUrl' => admin_url('admin-ajax.php'),
 		'nonce' => wp_create_nonce('bl_block_options_admin'),
 		'hasIconPicker' => $has_icon_picker,
@@ -271,58 +412,6 @@ function bl_block_options_enqueue_admin_assets(): void
 		'before'
 	);
 
-	$css = '
-	.bl-block-options-admin{
-		max-width:960px;
-		--bl-forms-admin-border:#c3c4c7;
-		--bl-forms-admin-muted:#646970;
-		--bl-forms-admin-surface:#f6f7f7;
-		--bl-forms-admin-accent:#2271b1;
-		--bl-forms-admin-radius:4px
-	}
-	.bl-block-options-admin .bl-bo-intro{color:#50575e;margin:0 0 20px;font-size:14px;line-height:1.5;max-width:40rem}
-	.bl-block-options-admin .bl-forms-builder__tabs{
-		display:flex;align-items:center;gap:0;
-		border-bottom:1px solid #dcdcde;background:#fff;
-		padding:0 8px 0 4px;border-radius:6px 6px 0 0;margin:0 0 0
-	}
-	.bl-block-options-admin .bl-forms-builder__tab{
-		appearance:none;border:0;border-bottom:3px solid transparent;background:transparent;
-		padding:12px 16px;margin-bottom:-1px;font-size:13px;font-weight:600;color:#646970;cursor:pointer
-	}
-	.bl-block-options-admin .bl-forms-builder__tab:hover{color:#1d2327}
-	.bl-block-options-admin .bl-forms-builder__tab.is-active{color:#1d2327;border-bottom-color:#2271b1}
-	.bl-block-options-admin .bl-bo-panel{
-		background:#fff;border:1px solid #dcdcde;border-top:0;border-radius:0 0 6px 6px;
-		padding:28px 24px;min-height:180px
-	}
-	.bl-block-options-admin .bl-bo-empty{margin:0;color:#646970;font-size:14px;line-height:1.5}
-	.bl-block-options-admin .bl-bo-preset-list{list-style:none;margin:0;padding:0}
-	.bl-block-options-admin .bl-bo-preset-list li{
-		display:flex;align-items:center;justify-content:space-between;gap:12px;
-		padding:12px 0;border-bottom:1px solid #f0f0f1
-	}
-	.bl-block-options-admin .bl-bo-preset-list button.linkish{
-		appearance:none;border:0;background:none;color:#2271b1;font-weight:600;cursor:pointer;padding:0;font-size:14px;text-align:left
-	}
-	.bl-block-options-admin .bl-bo-preset-list .meta{color:#646970;font-size:12px;font-weight:400}
-	.bl-block-options-admin .bl-bo-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 16px}
-	.bl-block-options-admin .bl-bo-subtabs{
-		display:flex;align-items:center;gap:4px;flex-wrap:wrap;
-		margin:0 0 20px;padding:0 0 12px;border-bottom:1px solid #f0f0f1
-	}
-	.bl-block-options-admin .bl-bo-subtabs__tab{
-		appearance:none;border:0;background:transparent;cursor:pointer;
-		padding:6px 12px;border-radius:4px;font-size:13px;font-weight:600;color:#646970
-	}
-	.bl-block-options-admin .bl-bo-subtabs__tab:hover{color:#1d2327;background:#f6f7f7}
-	.bl-block-options-admin .bl-bo-subtabs__tab.is-active{color:#1d2327;background:#f0f0f1}
-	.bl-block-options-admin .bl-bo-preset-editor .bl-blocks-options-panel,
-	.bl-block-options-admin .bl-bo-block-editor .bl-blocks-options-panel{margin-top:8px}
-	';
-	wp_register_style('bl-block-options-admin', false, array_filter(['bl-blocks-admin']), null);
-	wp_enqueue_style('bl-block-options-admin');
-	wp_add_inline_style('bl-block-options-admin', $css);
 }
 add_action('admin_enqueue_scripts', 'bl_block_options_enqueue_admin_assets');
 
@@ -396,11 +485,7 @@ function bl_block_options_ajax_save_blocks(): void
 				continue;
 			}
 			$items = isset($row['items']) && is_array($row['items']) ? $row['items'] : [];
-			$clean = bl_block_options_sanitize_items($items);
-			if ($clean === []) {
-				continue;
-			}
-			$blocks[$name] = ['items' => $clean];
+			$blocks[$name] = ['items' => bl_block_options_sanitize_items($items)];
 		}
 		$store['blocks'] = $blocks;
 	} else {
@@ -413,22 +498,67 @@ function bl_block_options_ajax_save_blocks(): void
 		if (!is_array($items)) {
 			wp_send_json_error(['message' => __('Invalid items payload.', 'baselayer')]);
 		}
-		$clean = bl_block_options_sanitize_items($items);
-		if ($clean === []) {
-			unset($store['blocks'][$name]);
-		} else {
-			$store['blocks'][$name] = ['items' => $clean];
-		}
+		$store['blocks'][$name] = ['items' => bl_block_options_sanitize_items($items)];
 	}
 
 	bl_block_options_save_store($store);
 
 	wp_send_json_success([
 		'blocks' => bl_block_options_blocks_catalog(),
+		'availableBlocks' => bl_block_options_available_blocks_catalog(),
 		'presets' => bl_block_options_presets_catalog(),
 	]);
 }
 add_action('wp_ajax_bl_block_options_save_blocks', 'bl_block_options_ajax_save_blocks');
+
+/**
+ * AJAX: add a block to the options store and enable it in theme block settings.
+ */
+function bl_block_options_ajax_add_block(): void
+{
+	if (!current_user_can('manage_options')) {
+		wp_send_json_error(['message' => 'Forbidden'], 403);
+	}
+	check_ajax_referer('bl_block_options_admin', 'nonce');
+
+	$name = sanitize_text_field((string) ($_POST['block'] ?? ''));
+	if ($name === '' || $name === '*') {
+		wp_send_json_error(['message' => __('Invalid block name.', 'baselayer')]);
+	}
+	if (!class_exists('WP_Block_Type_Registry') || !WP_Block_Type_Registry::get_instance()->is_registered($name)) {
+		wp_send_json_error(['message' => __('Block is not registered.', 'baselayer')]);
+	}
+	if (function_exists('bl_block_settings_is_hard_disallowed') && bl_block_settings_is_hard_disallowed($name)) {
+		wp_send_json_error(['message' => __('This block cannot be enabled.', 'baselayer')]);
+	}
+	if (function_exists('bl_block_settings_is_manageable_block') && !bl_block_settings_is_manageable_block($name)) {
+		wp_send_json_error(['message' => __('This block cannot be managed.', 'baselayer')]);
+	}
+
+	bl_block_options_ensure_theme_block_allowed($name);
+
+	$store = bl_block_options_get_store();
+	if (!isset($store['blocks'][$name]) || !is_array($store['blocks'][$name])) {
+		$store['blocks'][$name] = ['items' => []];
+		bl_block_options_save_store($store);
+	}
+
+	$blocks = bl_block_options_blocks_catalog();
+	$added = null;
+	foreach ($blocks as $row) {
+		if (($row['name'] ?? '') === $name) {
+			$added = $row;
+			break;
+		}
+	}
+
+	wp_send_json_success([
+		'block' => $added,
+		'blocks' => $blocks,
+		'availableBlocks' => bl_block_options_available_blocks_catalog(),
+	]);
+}
+add_action('wp_ajax_bl_block_options_add_block', 'bl_block_options_ajax_add_block');
 
 function bl_block_options_render_admin_page(): void
 {
@@ -436,46 +566,20 @@ function bl_block_options_render_admin_page(): void
 		return;
 	}
 
-	$notice_key = 'bl_block_options_import_notice_' . get_current_user_id();
-	$notice = get_transient($notice_key);
-	if (is_array($notice)) {
-		delete_transient($notice_key);
-		$type = ($notice['type'] ?? '') === 'error' ? 'error' : 'success';
-		$message = isset($notice['message']) ? (string) $notice['message'] : '';
-		if ($message !== '') {
-			printf(
-				'<div class="notice notice-%1$s is-dismissible"><p>%2$s</p></div>',
-				esc_attr($type),
-				esc_html($message)
-			);
-		}
-	}
-
-	$import_path = function_exists('bl_block_options_theme_import_path')
-		? bl_block_options_theme_import_path()
-		: '';
-
 	echo '<div class="wrap bl-block-options-admin">';
 	echo '<h1>' . esc_html__('Block Options', 'baselayer') . '</h1>';
-
-	$is_package_seed = $import_path !== '' && str_contains($import_path, '/seed/block-options-import.json');
-
-	echo '<div class="bl-bo-import" style="margin:0 0 20px;padding:16px 20px;background:#fff;border:1px solid #dcdcde;border-radius:6px;max-width:960px">';
-	echo '<h2 style="margin:0 0 8px;font-size:14px">' . esc_html__('Defaults', 'baselayer-blocks') . '</h2>';
-	if ($import_path !== '') {
-		$help = $is_package_seed
-			? __('Import presets and block assignments from the package seed. This replaces the current store.', 'baselayer-blocks')
-			: __('Import presets and block assignments from the theme catalog. This replaces the current store.', 'baselayer-blocks');
-		echo '<p class="description" style="margin:0 0 12px">' . esc_html($help) . '</p>';
-		echo '<form method="post">';
-		wp_nonce_field('bl_block_options_import_theme', 'bl_block_options_import_theme_nonce');
-		submit_button(__('Import defaults', 'baselayer-blocks'), 'secondary', 'bl_block_options_import_theme', false);
-		echo '</form>';
-	} else {
-		echo '<p class="description" style="margin:0">' . esc_html__('No catalog found.', 'baselayer-blocks') . '</p>';
-	}
-	echo '</div>';
-
-	echo '<div id="bl-block-options-app"><p class="description">' . esc_html__('Loading…', 'baselayer') . '</p></div>';
+	?>
+	<div id="bl-block-options-app">
+		<div class="bl-forms-builder bl-block-options-shell" aria-busy="true">
+			<div class="bl-forms-builder__skeleton" aria-hidden="true">
+				<div class="bl-forms-builder__skeleton-tabs">
+					<span class="bl-forms-builder__skeleton-tab"></span>
+					<span class="bl-forms-builder__skeleton-tab"></span>
+				</div>
+				<div class="bl-forms-builder__skeleton-body"></div>
+			</div>
+		</div>
+	</div>
+	<?php
 	echo '</div>';
 }

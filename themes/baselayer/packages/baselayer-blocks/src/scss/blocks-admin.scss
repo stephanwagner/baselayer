@@ -3,6 +3,48 @@
 
 // Blocks admin: definition editor extras + Website + field UI modal.
 
+// Shared list icon chrome (Blocks CPT list + Block Options).
+.bl-blocks-list-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  color: #1d2327;
+  background: #fff;
+  border: 1px solid #c3c4c7;
+  border-radius: 4px;
+  box-sizing: border-box;
+
+  .bl-blocks-list-icon__media,
+  .bl-block-type-icon__react,
+  .block-editor-block-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+  }
+
+  .bl-blocks-list-icon__media svg,
+  .bl-icon,
+  .block-editor-block-icon svg,
+  > svg {
+    width: 20px;
+    height: 20px;
+    display: block;
+    fill: currentColor;
+  }
+
+  .dashicons {
+    width: 20px;
+    height: 20px;
+    font-size: 20px;
+    line-height: 1;
+  }
+}
+
 // Hide WP “Add New” on the definition edit screens only (list keeps it).
 body.post-php.post-type-bl_block,
 body.post-new-php.post-type-bl_block {
@@ -43,39 +85,6 @@ body.post-new-php.post-type-bl_block {
     align-items: center;
     gap: 8px;
     max-width: 100%;
-  }
-
-  .bl-blocks-list-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    width: 28px;
-    height: 28px;
-    color: #1d2327;
-    background: #fff;
-    border: 1px solid #c3c4c7;
-    border-radius: 4px;
-  }
-
-  .bl-blocks-list-icon__media {
-    display: inline-flex;
-    width: 20px;
-    height: 20px;
-  }
-
-  .bl-blocks-list-icon__media svg,
-  .bl-blocks-list-icon .bl-icon {
-    width: 20px;
-    height: 20px;
-    display: block;
-  }
-
-  .bl-blocks-list-icon .dashicons {
-    width: 20px;
-    height: 20px;
-    font-size: 20px;
-    line-height: 1;
   }
 
   .bl-blocks-list-block-name code {
@@ -1104,23 +1113,6 @@ button.button.button.bl-bo-choices__add {
   margin-top: 8px;
 }
 
-.bl-bo-add__btn {
-  gap: 6px;
-}
-
-.bl-bo-add__icon {
-  display: inline-flex;
-  flex-shrink: 0;
-  width: 18px;
-  height: 18px;
-  margin-left: -6px;
-
-  svg {
-    width: 18px;
-    height: 18px;
-    display: block;
-  }
-}
 
 @media (max-width: 782px) {
   .bl-bo-field {
@@ -1129,5 +1121,290 @@ button.button.button.bl-bo-choices__add {
 
   .bl-bo-check {
     margin-left: 0;
+  }
+}
+
+// Blocks → Block Options admin shell (forms-builder chrome).
+.bl-block-options-admin {
+  max-width: 960px;
+  --bl-forms-admin-border: #c3c4c7;
+  --bl-forms-admin-muted: #646970;
+  --bl-forms-admin-surface: #f6f7f7;
+  --bl-forms-admin-accent: #2271b1;
+  --bl-forms-admin-radius: 4px;
+
+  #bl-block-options-app {
+    margin-top: 12px;
+  }
+
+  .bl-block-options-shell.bl-forms-builder {
+    margin-top: 0;
+  }
+
+  .bl-forms-builder__panels {
+    padding: 20px 24px;
+    min-height: 200px;
+    border-top: 0;
+    border-radius: 0 0 6px 6px;
+    background: #fff;
+  }
+
+  .bl-bo-empty {
+    margin: 0;
+    color: var(--bl-forms-admin-muted);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .bl-bo-preset-list,
+  .bl-bo-block-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    > li,
+    > .bl-bo-block-row {
+      display: flex;
+      align-items: center;
+      gap: 12px 16px;
+      width: 100%;
+      margin: 0;
+      padding: 12px 0;
+      border-bottom: 1px solid #e0e0e3;
+
+      &:last-child {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+    }
+
+    button.linkish {
+      appearance: none;
+      border: 0;
+      background: none;
+      color: var(--bl-forms-admin-accent);
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0;
+      font-size: 14px;
+      text-align: left;
+    }
+  }
+
+  .bl-bo-preset-delete {
+    flex: 0 0 auto;
+    margin-left: -8px;
+  }
+
+  .bl-bo-confirm-modal__message {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .bl-bo-toolbar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+    margin: 0 0 16px;
+  }
+
+  .bl-bo-toolbar--presets {
+    justify-content: flex-end;
+    margin: 0;
+    padding: 0 0 16px;
+    border-bottom: 1px solid #e0e0e3;
+  }
+
+  .bl-bo-editor-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 0 16px;
+    flex-wrap: wrap;
+
+    .bl-bo-back {
+      margin: 0;
+    }
+  }
+
+  .bl-bo-back {
+    margin: 0 0 16px;
+  }
+
+  .bl-bo-preset-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0 0 16px;
+    max-width: 640px;
+  }
+
+  .bl-bo-status-host:empty {
+    display: none;
+  }
+
+  .bl-bo-status {
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .bl-bo-status--success {
+    color: #1a7f37;
+  }
+
+  .bl-bo-status--error {
+    color: #b32d2e;
+  }
+
+  .bl-bo-status--muted {
+    color: var(--bl-forms-admin-muted);
+  }
+
+  .bl-bo-subtabs {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+    margin: 0;
+    padding: 0 0 8px;
+    border-bottom: 1px solid #e0e0e3;
+  }
+
+  .bl-bo-subtabs__tab {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: var(--bl-forms-admin-radius);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--bl-forms-admin-muted);
+
+    &:hover {
+      color: #1d2327;
+      background: var(--bl-forms-admin-surface);
+    }
+
+    &.is-active {
+      color: #1d2327;
+      background: #eef0f1;
+    }
+  }
+
+  .bl-bo-add-block {
+    margin: 0 0 20px;
+    padding: 14px 16px;
+    background: var(--bl-forms-admin-surface);
+    border: 1px solid var(--bl-forms-admin-border);
+    border-radius: 6px;
+  }
+
+  .bl-bo-add-block__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+  }
+
+  .bl-bo-add-block__fields {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .bl-bo-add-block__select {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+    max-width: none;
+  }
+
+  .bl-bo-add-block__fields .button {
+    flex: 0 0 auto;
+  }
+
+  .bl-bo-add-block__hint {
+    margin: 8px 0 0;
+  }
+
+  .bl-bo-block-row__lead {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .bl-bo-block-row__meta {
+    flex: 0 0 auto;
+    margin-left: auto;
+    color: var(--bl-forms-admin-muted);
+    font-size: 12px;
+    font-weight: 400;
+    white-space: nowrap;
+    text-align: right;
+  }
+
+  .bl-bo-block-row__code {
+    flex: 0 1 auto;
+    text-align: right;
+    font-size: 12px;
+    color: #1d2327;
+    background: #f0f0f1;
+    padding: 2px 6px;
+    border-radius: 3px;
+    overflow-wrap: anywhere;
+  }
+
+  .bl-bo-block-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 12px;
+    margin: 12px 0 16px;
+    font-size: 16px;
+  }
+
+  .bl-bo-block-heading__title {
+    font-weight: 600;
+  }
+
+  .bl-bo-block-heading__code {
+    font-size: 12px;
+    font-weight: 400;
+    color: #1d2327;
+    background: #f0f0f1;
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  .bl-bo-preset-editor .bl-blocks-options-panel,
+  .bl-bo-block-editor .bl-blocks-options-panel {
+    margin-top: 8px;
+  }
+
+  @media (max-width: 782px) {
+    .bl-bo-block-list > .bl-bo-block-row {
+      flex-wrap: wrap;
+    }
+
+    .bl-bo-block-row__lead {
+      flex: 1 1 calc(100% - 8rem);
+    }
+
+    .bl-bo-block-row__meta {
+      margin-left: 0;
+    }
+
+    .bl-bo-block-row__code {
+      flex: 1 1 100%;
+      text-align: left;
+    }
   }
 }

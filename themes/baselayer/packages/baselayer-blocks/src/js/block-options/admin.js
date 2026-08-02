@@ -2,6 +2,10 @@
  * Blocks → Block Options — Blocks (BaseLayer / ACF / Core) + Presets.
  */
 import { createOptionsPanel } from './shared/options-items-panel.js';
+import {
+  createBlockTypeIconEl,
+  whenBlockTypesReady,
+} from '../../../../../src/js/admin/utils/block-type-icon.js';
 
 function boot() {
   const root = document.getElementById('bl-block-options-app');
@@ -13,6 +17,8 @@ function boot() {
   const i18n = cfg.i18n || {};
   const t = (key, fallback) => i18n[key] || fallback;
   const customs = cfg.customs || {};
+  const iconEl =
+    typeof window.BlFormBuilder?.iconEl === 'function' ? window.BlFormBuilder.iconEl : null;
 
   let presets = Array.isArray(cfg.presets)
     ? JSON.parse(JSON.stringify(cfg.presets))
@@ -20,18 +26,35 @@ function boot() {
   let blocks = Array.isArray(cfg.blocks)
     ? JSON.parse(JSON.stringify(cfg.blocks))
     : [];
+  let availableBlocks = Array.isArray(cfg.availableBlocks)
+    ? JSON.parse(JSON.stringify(cfg.availableBlocks))
+    : [];
 
   let activeMain = 'blocks'; // 'blocks' | 'presets'
   let activeBlockSource = 'all'; // 'all' | 'baselayer' | 'acf' | 'core'
-  let editingPresetSlug = null;
+  /** @type {object|null} preset object currently open in the editor */
+  let editingPreset = null;
+  /** @type {Set<string>} presets whose slug was manually edited (or loaded from store) */
+  const slugManual = new Set(presets.map((p) => p.slug).filter(Boolean));
   let editingBlockName = null;
-  let saving = false;
+  let savingBlock = false;
+  let addingBlock = false;
+  let selectedAddBlock = '';
+  let blocksDirty = false;
+  let presetSaveTimer = null;
+  let presetSaveInFlight = false;
+  let presetSaveQueued = false;
+  /** @type {{ type: 'success'|'error'|'muted', text: string }|null} */
+  let statusMessage = null;
 
   const blockSources = [
     {
       id: 'all',
       label: t('tabAll', 'All'),
-      empty: t('emptyAll', 'No blocks with options yet. Import theme defaults, or assign presets from a block.'),
+      empty: t(
+        'emptyAll',
+        'No blocks with options yet. Add a block below, or import defaults under Blocks → Import / Export.'
+      ),
       prefix: null,
     },
   ];
@@ -79,6 +102,12 @@ function boot() {
         node.textContent = value;
       } else if (key === 'style' && typeof value === 'string') {
         node.setAttribute('style', value);
+      } else if (key === 'dataset' && value && typeof value === 'object') {
+        Object.entries(value).forEach(([dataKey, dataValue]) => {
+          if (dataValue != null && dataValue !== false) {
+            node.dataset[dataKey] = String(dataValue);
+          }
+        });
       } else if (key.startsWith('on') && typeof value === 'function') {
         node.addEventListener(key.slice(2).toLowerCase(), value);
       } else {
@@ -109,9 +138,11 @@ function boot() {
       .replace(/-+/g, '-');
   }
 
-  function uniqueSlug(base) {
+  function uniqueSlug(base, excludeSlug = null) {
     let slug = slugify(base) || 'preset';
-    const used = new Set(presets.map((p) => p.slug));
+    const used = new Set(
+      presets.map((p) => p.slug).filter((s) => s && s !== excludeSlug)
+    );
     if (!used.has(slug)) {
       return slug;
     }
@@ -130,18 +161,33 @@ function boot() {
     return blocks.find((b) => b.name === name);
   }
 
-  function blocksForTab(tab) {
+  function matchesSource(name, tab) {
+    const blockName = String(name || '');
     if (!tab) {
-      return [];
+      return false;
     }
     if (!tab.prefix) {
       const prefixes = blockSources.map((s) => s.prefix).filter(Boolean);
-      return blocks.filter((b) => {
-        const name = String(b.name || '');
-        return prefixes.some((prefix) => name.startsWith(prefix));
-      });
+      return prefixes.some((prefix) => blockName.startsWith(prefix));
     }
-    return blocks.filter((b) => String(b.name || '').startsWith(tab.prefix));
+    return blockName.startsWith(tab.prefix);
+  }
+
+  function blocksForTab(tab) {
+    return blocks.filter((b) => matchesSource(b.name, tab));
+  }
+
+  function availableBlocksForTab(tab) {
+    return availableBlocks.filter((b) => matchesSource(b.name, tab));
+  }
+
+  function blockTitle(block) {
+    return (block && block.title) || (block && block.name) || '';
+  }
+
+  function formatCount(n, oneKey, manyKey, oneFallback, manyFallback) {
+    const label = n === 1 ? t(oneKey, oneFallback) : t(manyKey, manyFallback);
+    return `${n} ${label}`;
   }
 
   function summarizeItems(items) {
@@ -150,22 +196,182 @@ function boot() {
     const controlCount = list.filter((i) => i?.kind === 'control').length;
     const parts = [];
     if (presetCount) {
-      parts.push(`${presetCount} ${t('summaryPresets', 'presets')}`);
+      parts.push(
+        formatCount(
+          presetCount,
+          'summaryPresetOne',
+          'summaryPresetMany',
+          'preset',
+          'presets'
+        )
+      );
     }
     if (controlCount) {
-      parts.push(`${controlCount} ${t('summaryControls', 'controls')}`);
+      parts.push(
+        formatCount(
+          controlCount,
+          'summaryControlOne',
+          'summaryControlMany',
+          'control',
+          'controls'
+        )
+      );
     }
     if (!parts.length) {
       parts.push(`0 ${t('items', 'items')}`);
     }
-    const slugs = list
-      .filter((i) => i?.kind === 'preset')
-      .map((i) => findPreset(i.slug)?.label || i.slug)
-      .filter(Boolean);
-    return {
-      counts: parts.join(', '),
-      detail: slugs.length ? slugs.join(', ') : '',
+    return { counts: parts.join(' · ') };
+  }
+
+  function setStatus(type, text) {
+    statusMessage = text ? { type, text } : null;
+  }
+
+  function renderStatus() {
+    if (!statusMessage) {
+      return null;
+    }
+    return el('span', {
+      className: 'bl-bo-status bl-bo-status--' + statusMessage.type,
+      text: statusMessage.text,
+      role: 'status',
+      dataset: { blBoStatus: '1' },
+    });
+  }
+
+  function paintStatus() {
+    root.querySelectorAll('[data-bl-bo-status-host]').forEach((host) => {
+      host.replaceChildren();
+      const node = renderStatus();
+      if (node) {
+        host.appendChild(node);
+      }
+    });
+  }
+
+  function statusHost() {
+    return el('div', { className: 'bl-bo-status-host', dataset: { blBoStatusHost: '1' } }, [
+      renderStatus(),
+    ]);
+  }
+
+  function makeBackButton(label, onClick) {
+    const btn = el('button', {
+      type: 'button',
+      className: 'button button-secondary bl-button-small bl-button-has-icon bl-bo-back',
+      onClick,
+    });
+    const icon =
+      typeof iconEl === 'function'
+        ? iconEl('arrow-left', 'bl-button-has-icon__icon')
+        : null;
+    if (icon?.innerHTML) {
+      btn.appendChild(icon);
+    }
+    btn.appendChild(document.createTextNode(label));
+    return btn;
+  }
+
+  function openConfirmModal({ title, message, confirmLabel, onConfirm }) {
+    const overlay = el('div', {
+      className: 'bl-blocks-modal-overlay',
+      role: 'presentation',
+    });
+    const dialog = el('div', {
+      className: 'bl-blocks-modal bl-bo-confirm-modal',
+      role: 'dialog',
+      'aria-modal': 'true',
+      'aria-label': title || '',
+    });
+
+    const close = () => {
+      document.removeEventListener('keydown', onKey);
+      overlay.remove();
     };
+
+    const onKey = (evt) => {
+      if (evt.key === 'Escape') {
+        evt.preventDefault();
+        close();
+      }
+    };
+
+    const confirmBtn = el('button', {
+      type: 'button',
+      className: 'button button-primary',
+      text: confirmLabel || t('delete', 'Delete'),
+      onClick: () => {
+        close();
+        if (typeof onConfirm === 'function') {
+          onConfirm();
+        }
+      },
+    });
+
+    dialog.append(
+      el('div', { className: 'bl-blocks-modal__header' }, [
+        el('h2', { className: 'bl-blocks-modal__title', text: title || '' }),
+        el('button', {
+          type: 'button',
+          className: 'bl-blocks-modal__close',
+          text: '×',
+          'aria-label': t('close', 'Close'),
+          onClick: close,
+        }),
+      ]),
+      el('div', { className: 'bl-blocks-modal__body' }, [
+        el('p', { className: 'bl-bo-confirm-modal__message', text: message || '' }),
+      ]),
+      el('div', { className: 'bl-blocks-modal__footer' }, [
+        el('button', {
+          type: 'button',
+          className: 'button',
+          text: t('cancel', 'Cancel'),
+          onClick: close,
+        }),
+        confirmBtn,
+      ])
+    );
+
+    overlay.appendChild(dialog);
+    overlay.addEventListener('click', (evt) => {
+      if (evt.target === overlay) {
+        close();
+      }
+    });
+    document.body.appendChild(overlay);
+    document.addEventListener('keydown', onKey);
+    setTimeout(() => confirmBtn.focus(), 0);
+  }
+
+  function deletePreset(preset) {
+    if (!preset) {
+      return;
+    }
+    if (preset.slug) {
+      slugManual.delete(preset.slug);
+    }
+    presets = presets.filter((p) => p !== preset);
+    if (editingPreset === preset) {
+      editingPreset = null;
+    }
+    setStatus(null, null);
+    render();
+    scheduleSavePresets({ immediate: true });
+  }
+
+  function confirmDeletePreset(preset) {
+    const name =
+      (preset && (preset.label || preset.slug)) || t('untitledPreset', 'Untitled');
+    openConfirmModal({
+      title: t('deletePresetTitle', 'Delete preset?'),
+      message: t(
+        'deletePresetConfirm',
+        'Delete “%s”? This cannot be undone.'
+      ).replace('%s', name),
+      confirmLabel: t('deletePreset', 'Delete'),
+      onConfirm: () => deletePreset(preset),
+    });
   }
 
   async function postAjax(action, fields) {
@@ -184,40 +390,96 @@ function boot() {
     return res.json();
   }
 
-  async function savePresets() {
-    if (saving) {
+  function retargetPresetSlug(fromSlug, toSlug) {
+    if (!fromSlug || !toSlug || fromSlug === toSlug) {
       return;
     }
-    saving = true;
-    render();
+    blocks.forEach((block) => {
+      (block.items || []).forEach((item) => {
+        if (item?.kind === 'preset' && item.slug === fromSlug) {
+          item.slug = toSlug;
+          blocksDirty = true;
+        }
+      });
+    });
+  }
+
+  function scheduleSavePresets({ immediate = false } = {}) {
+    if (presetSaveTimer) {
+      clearTimeout(presetSaveTimer);
+      presetSaveTimer = null;
+    }
+    if (immediate) {
+      void flushSavePresets();
+      return;
+    }
+    presetSaveTimer = setTimeout(() => {
+      presetSaveTimer = null;
+      void flushSavePresets();
+    }, 450);
+  }
+
+  async function flushSavePresets() {
+    if (presetSaveInFlight) {
+      presetSaveQueued = true;
+      return;
+    }
+    presetSaveInFlight = true;
+    const presetsPayload = JSON.stringify(presets);
+    const saveBlocksToo = blocksDirty;
+    const blocksPayload = saveBlocksToo ? JSON.stringify(blocks) : null;
+
+    setStatus('muted', t('saving', 'Saving…'));
+    paintStatus();
+
     try {
       const data = await postAjax('bl_block_options_save_presets', {
-        presets: JSON.stringify(presets),
+        presets: presetsPayload,
       });
       if (!data?.success) {
-        window.alert(data?.data?.message || t('saveFailed', 'Could not save.'));
+        setStatus('error', data?.data?.message || t('saveFailed', 'Could not save.'));
+        paintStatus();
         return;
       }
-      if (Array.isArray(data.data?.presets)) {
-        presets = data.data.presets;
+
+      if (saveBlocksToo && blocksPayload) {
+        const blockData = await postAjax('bl_block_options_save_blocks', {
+          blocks: blocksPayload,
+        });
+        if (!blockData?.success) {
+          setStatus('error', blockData?.data?.message || t('saveFailed', 'Could not save.'));
+          paintStatus();
+          return;
+        }
+        // Keep local objects stable while an editor is open; only clear the dirty flag
+        // when nothing else changed during the request.
+        if (JSON.stringify(blocks) === blocksPayload) {
+          blocksDirty = false;
+        }
+      } else {
+        blocksDirty = false;
       }
-      if (Array.isArray(data.data?.blocks)) {
-        blocks = data.data.blocks;
-      }
-      window.alert(t('saved', 'Saved.'));
+
+      setStatus('success', t('saved', 'Saved.'));
+      paintStatus();
     } catch (e) {
-      window.alert(t('saveFailed', 'Could not save.'));
+      setStatus('error', t('saveFailed', 'Could not save.'));
+      paintStatus();
     } finally {
-      saving = false;
-      render();
+      presetSaveInFlight = false;
+      if (presetSaveQueued) {
+        presetSaveQueued = false;
+        void flushSavePresets();
+      }
     }
   }
 
   async function saveBlock(block) {
-    if (saving || !block?.name) {
+    if (savingBlock || !block?.name) {
       return;
     }
-    saving = true;
+    savingBlock = true;
+    setStatus(null, null);
     render();
     try {
       const data = await postAjax('bl_block_options_save_blocks', {
@@ -225,40 +487,98 @@ function boot() {
         items: JSON.stringify(block.items || []),
       });
       if (!data?.success) {
-        window.alert(data?.data?.message || t('saveFailed', 'Could not save.'));
+        setStatus('error', data?.data?.message || t('saveFailed', 'Could not save.'));
         return;
       }
       if (Array.isArray(data.data?.blocks)) {
         blocks = data.data.blocks;
       }
+      if (Array.isArray(data.data?.availableBlocks)) {
+        availableBlocks = data.data.availableBlocks;
+      }
       if (Array.isArray(data.data?.presets)) {
         presets = data.data.presets;
       }
-      window.alert(t('saved', 'Saved.'));
+      setStatus('success', t('saved', 'Saved.'));
     } catch (e) {
-      window.alert(t('saveFailed', 'Could not save.'));
+      setStatus('error', t('saveFailed', 'Could not save.'));
     } finally {
-      saving = false;
+      savingBlock = false;
       render();
+    }
+  }
+
+  function applyPresetSlug(preset, nextSlug, { manual = false } = {}) {
+    const prev = preset.slug || '';
+    const cleaned = slugify(nextSlug);
+    const unique = cleaned === '' ? '' : uniqueSlug(cleaned, prev || null);
+    if (prev) {
+      slugManual.delete(prev);
+    }
+    if (manual) {
+      if (unique) {
+        slugManual.add(unique);
+      }
+    } else if (unique) {
+      slugManual.delete(unique);
+    }
+    preset.slug = unique;
+    if (prev !== unique) {
+      retargetPresetSlug(prev, unique);
+    }
+    return unique;
+  }
+
+  function isSlugAuto(preset) {
+    const slug = preset?.slug || '';
+    return !slug || !slugManual.has(slug);
+  }
+
+  function discardEmptyDraft(preset) {
+    if (!preset) {
+      return;
+    }
+    const empty =
+      !String(preset.label || '').trim() &&
+      !String(preset.slug || '').trim() &&
+      (!Array.isArray(preset.items) || preset.items.length === 0);
+    if (empty) {
+      presets = presets.filter((p) => p !== preset);
     }
   }
 
   function renderPresetEditor(preset) {
     const panel = el('div', { className: 'bl-bo-preset-editor' });
-    panel.appendChild(
-      el('button', {
-        type: 'button',
-        className: 'button-link',
-        text: t('backToPresets', '← All presets'),
-        onClick: () => {
-          editingPresetSlug = null;
-          render();
-        },
+    const header = el('div', { className: 'bl-bo-editor-header' });
+    header.appendChild(
+      makeBackButton(t('backToPresets', 'All presets'), () => {
+        discardEmptyDraft(preset);
+        editingPreset = null;
+        setStatus(null, null);
+        render();
       })
     );
+    header.appendChild(statusHost());
+    panel.appendChild(header);
 
-    panel.appendChild(
-      el('div', { className: 'bl-bo-field', style: 'margin:16px 0 8px' }, [
+    const meta = el('div', { className: 'bl-bo-preset-meta' });
+    const slugInput = el('input', {
+      type: 'text',
+      className: 'widefat',
+      value: preset.slug || '',
+      pattern: '[a-z0-9\\-]*',
+      spellcheck: 'false',
+      autocomplete: 'off',
+    });
+
+    slugInput.addEventListener('input', () => {
+      const next = applyPresetSlug(preset, slugInput.value, { manual: true });
+      slugInput.value = next;
+      scheduleSavePresets();
+    });
+
+    meta.appendChild(
+      el('div', { className: 'bl-bo-field' }, [
         el('label', { text: t('presetLabel', 'Label') }),
         el('input', {
           type: 'text',
@@ -266,16 +586,22 @@ function boot() {
           value: preset.label || '',
           onInput: (e) => {
             preset.label = e.target.value;
+            if (isSlugAuto(preset)) {
+              const next = applyPresetSlug(preset, preset.label, { manual: false });
+              slugInput.value = next;
+            }
+            scheduleSavePresets();
           },
         }),
       ])
     );
-    panel.appendChild(
-      el('p', {
-        className: 'description',
-        text: `${t('presetSlug', 'Slug')}: ${preset.slug}`,
-      })
+    meta.appendChild(
+      el('div', { className: 'bl-bo-field' }, [
+        el('label', { text: t('presetSlug', 'Slug') }),
+        slugInput,
+      ])
     );
+    panel.appendChild(meta);
 
     if (!Array.isArray(preset.items)) {
       preset.items = [];
@@ -285,62 +611,37 @@ function boot() {
       { items: preset.items },
       (next) => {
         preset.items = next.items;
+        scheduleSavePresets();
       },
       {
         allowCustoms: true,
         allowPresetRefs: false,
         customs: () => customs,
         presets: () => presets,
-        helpText: t(
-          'presetItemsHelp',
-          'Controls in this preset can be attached to blocks from the Options tab or below.'
-        ),
+        helpText: false,
         emptyText: t('presetItemsEmpty', 'No options yet. Add a control.'),
       }
     );
     panel.appendChild(optionsPanel);
-
-    const toolbar = el('div', { className: 'bl-bo-toolbar', style: 'margin-top:16px' });
-    toolbar.appendChild(
-      el('button', {
-        type: 'button',
-        className: 'button button-primary',
-        text: saving ? '…' : t('savePresets', 'Save presets'),
-        disabled: saving ? true : undefined,
-        onClick: () => savePresets(),
-      })
-    );
-    panel.appendChild(toolbar);
     return panel;
   }
 
   function renderPresetsList() {
     const panel = el('div');
-    const toolbar = el('div', { className: 'bl-bo-toolbar' });
+    const toolbar = el('div', { className: 'bl-bo-toolbar bl-bo-toolbar--presets' });
+    toolbar.appendChild(statusHost());
     toolbar.appendChild(
       el('button', {
         type: 'button',
-        className: 'button button-primary',
+        className: 'button button-primary bl-button-small',
         text: t('addPreset', 'Add preset'),
         onClick: () => {
-          const label = window.prompt(t('presetLabel', 'Label'), 'New preset');
-          if (label == null || !String(label).trim()) {
-            return;
-          }
-          const slug = uniqueSlug(label);
-          presets.push({ slug, label: String(label).trim(), items: [] });
-          editingPresetSlug = slug;
+          const preset = { slug: '', label: '', items: [] };
+          presets.push(preset);
+          editingPreset = preset;
+          setStatus(null, null);
           render();
         },
-      })
-    );
-    toolbar.appendChild(
-      el('button', {
-        type: 'button',
-        className: 'button',
-        text: saving ? '…' : t('savePresets', 'Save presets'),
-        disabled: saving ? true : undefined,
-        onClick: () => savePresets(),
       })
     );
     panel.appendChild(toolbar);
@@ -350,42 +651,48 @@ function boot() {
       return panel;
     }
 
-    const list = el('ul', { className: 'bl-bo-preset-list' });
+    const list = el('ul', { className: 'bl-bo-preset-list bl-bo-block-list' });
     presets.forEach((preset) => {
       const summary = summarizeItems(preset.items);
+      const deleteBtn = el('button', {
+        type: 'button',
+        className:
+          'bl-forms-builder__icon-btn bl-forms-builder__icon-btn--danger bl-bo-preset-delete',
+        title: t('deletePreset', 'Delete'),
+        'aria-label': t('deletePreset', 'Delete'),
+        onClick: (evt) => {
+          evt.preventDefault();
+          evt.stopPropagation();
+          confirmDeletePreset(preset);
+        },
+      });
+      const trashIcon = typeof iconEl === 'function' ? iconEl('trash') : null;
+      if (trashIcon?.innerHTML) {
+        deleteBtn.appendChild(trashIcon);
+      } else {
+        deleteBtn.textContent = '×';
+      }
+
       list.appendChild(
-        el('li', {}, [
-          el('div', {}, [
+        el('li', { className: 'bl-bo-block-row' }, [
+          el('div', { className: 'bl-bo-block-row__lead' }, [
             el('button', {
               type: 'button',
-              className: 'linkish',
-              text: preset.label || preset.slug,
+              className: 'linkish bl-bo-block-open',
+              text: preset.label || preset.slug || t('untitledPreset', 'Untitled'),
               onClick: () => {
-                editingPresetSlug = preset.slug;
+                editingPreset = preset;
+                setStatus(null, null);
                 render();
               },
             }),
-            el('span', {
-              className: 'meta',
-              style: 'display:block;margin-top:2px',
-              text: summary.counts + (summary.detail ? ` · ${summary.detail}` : ''),
-            }),
           ]),
-          el('button', {
-            type: 'button',
-            className: 'button-link-delete',
-            text: t('deletePreset', 'Delete'),
-            onClick: () => {
-              if (!window.confirm(`Delete preset “${preset.label || preset.slug}”?`)) {
-                return;
-              }
-              presets = presets.filter((p) => p.slug !== preset.slug);
-              if (editingPresetSlug === preset.slug) {
-                editingPresetSlug = null;
-              }
-              render();
-            },
+          el('span', { className: 'bl-bo-block-row__meta', text: summary.counts }),
+          el('code', {
+            className: 'bl-bo-block-row__code',
+            text: preset.slug || '—',
           }),
+          deleteBtn,
         ])
       );
     });
@@ -393,20 +700,54 @@ function boot() {
     return panel;
   }
 
+  async function addBlock(name) {
+    if (addingBlock || !name) {
+      return;
+    }
+    addingBlock = true;
+    setStatus(null, null);
+    render();
+    try {
+      const data = await postAjax('bl_block_options_add_block', { block: name });
+      if (!data?.success) {
+        setStatus('error', data?.data?.message || t('addBlockFailed', 'Could not add block.'));
+        return;
+      }
+      if (Array.isArray(data.data?.blocks)) {
+        blocks = data.data.blocks;
+      }
+      if (Array.isArray(data.data?.availableBlocks)) {
+        availableBlocks = data.data.availableBlocks;
+      }
+      selectedAddBlock = '';
+      editingBlockName = name;
+      setStatus('success', t('saved', 'Saved.'));
+    } catch (e) {
+      setStatus('error', t('addBlockFailed', 'Could not add block.'));
+    } finally {
+      addingBlock = false;
+      render();
+    }
+  }
+
   function renderBlockEditor(block) {
     const panel = el('div', { className: 'bl-bo-block-editor' });
     panel.appendChild(
-      el('button', {
-        type: 'button',
-        className: 'button-link',
-        text: t('backToList', '← All blocks'),
-        onClick: () => {
-          editingBlockName = null;
-          render();
-        },
+      makeBackButton(t('backToList', 'All blocks'), () => {
+        editingBlockName = null;
+        setStatus(null, null);
+        render();
       })
     );
-    panel.appendChild(el('h2', { text: block.name, style: 'margin:12px 0 16px;font-size:16px' }));
+    const heading = el('h2', { className: 'bl-bo-block-heading' });
+    heading.appendChild(
+      createBlockTypeIconEl(block.name, block.icon || null, 'bl-blocks-list-icon')
+    );
+    heading.appendChild(
+      el('span', { className: 'bl-bo-block-heading__title', text: blockTitle(block) })
+    );
+    heading.appendChild(el('code', { className: 'bl-bo-block-heading__code', text: block.name }));
+    panel.appendChild(heading);
 
     if (!Array.isArray(block.items)) {
       block.items = [];
@@ -436,13 +777,157 @@ function boot() {
       el('button', {
         type: 'button',
         className: 'button button-primary',
-        text: saving ? '…' : t('saveBlocks', 'Save block'),
-        disabled: saving ? true : undefined,
+        text: savingBlock ? '…' : t('saveBlocks', 'Save block'),
+        disabled: savingBlock ? true : undefined,
         onClick: () => saveBlock(block),
       })
     );
+    const status = renderStatus();
+    if (status) {
+      toolbar.appendChild(status);
+    }
     panel.appendChild(toolbar);
     return panel;
+  }
+
+  function blockOptionLabel(block) {
+    return block.title && block.title !== block.name
+      ? `${block.title} (${block.name})`
+      : block.name;
+  }
+
+  function appendBlockSelectOptions(select, choices) {
+    const groups = blockSources.filter((source) => source.prefix);
+    const assigned = new Set();
+
+    groups.forEach((group) => {
+      const rows = choices.filter((block) =>
+        String(block.name || '').startsWith(group.prefix)
+      );
+      if (!rows.length) {
+        return;
+      }
+      const optgroup = el('optgroup', { label: group.label });
+      rows.forEach((block) => {
+        assigned.add(block.name);
+        optgroup.appendChild(
+          el('option', { value: block.name, text: blockOptionLabel(block) })
+        );
+      });
+      select.appendChild(optgroup);
+    });
+
+    const other = choices.filter((block) => !assigned.has(block.name));
+    if (!other.length) {
+      return;
+    }
+    if (groups.length === 0) {
+      other.forEach((block) => {
+        select.appendChild(
+          el('option', { value: block.name, text: blockOptionLabel(block) })
+        );
+      });
+      return;
+    }
+    const optgroup = el('optgroup', { label: t('tabOther', 'Other') });
+    other.forEach((block) => {
+      optgroup.appendChild(
+        el('option', { value: block.name, text: blockOptionLabel(block) })
+      );
+    });
+    select.appendChild(optgroup);
+  }
+
+  function renderAddBlockBar(tab) {
+    const choices = availableBlocksForTab(tab);
+    const bar = el('div', { className: 'bl-bo-add-block' });
+    const row = el('div', { className: 'bl-bo-add-block__row' });
+    const select = el('select', {
+      className: 'bl-bo-add-block__select',
+      disabled: addingBlock || choices.length === 0 ? true : undefined,
+      onChange: (event) => {
+        selectedAddBlock = event.target.value || '';
+      },
+    });
+    select.appendChild(
+      el('option', {
+        value: '',
+        text: t('chooseBlock', 'Select a block…'),
+      })
+    );
+    appendBlockSelectOptions(select, choices);
+    if (selectedAddBlock && choices.some((b) => b.name === selectedAddBlock)) {
+      select.value = selectedAddBlock;
+    } else {
+      selectedAddBlock = '';
+      select.value = '';
+    }
+
+    const fields = el('div', { className: 'bl-bo-add-block__fields' });
+    fields.appendChild(select);
+    fields.appendChild(
+      el('button', {
+        type: 'button',
+        className: 'button button-primary bl-button-small',
+        text: addingBlock ? t('addingBlock', 'Adding…') : t('addBlock', 'Add block'),
+        disabled: addingBlock || choices.length === 0 ? true : undefined,
+        onClick: () => {
+          const name = select.value || selectedAddBlock;
+          if (name) {
+            void addBlock(name);
+          }
+        },
+      })
+    );
+    row.appendChild(fields);
+    bar.appendChild(row);
+    if (choices.length === 0) {
+      bar.appendChild(
+        el('p', {
+          className: 'description bl-bo-add-block__hint',
+          text: t('noBlocksToAdd', 'No more blocks available in this filter.'),
+        })
+      );
+    } else if (statusMessage?.text && statusMessage.type === 'error') {
+      bar.appendChild(
+        el('p', {
+          className: 'description bl-bo-add-block__hint bl-bo-status bl-bo-status--error',
+          text: statusMessage.text,
+          role: 'status',
+        })
+      );
+    }
+    return bar;
+  }
+
+  function renderBlockSourceTabs() {
+    if (blockSources.length <= 1) {
+      return null;
+    }
+    const subNav = el('nav', {
+      className: 'bl-bo-subtabs',
+      role: 'tablist',
+      'aria-label': t('tabBlocks', 'Blocks'),
+    });
+    blockSources.forEach((source) => {
+      subNav.appendChild(
+        el('button', {
+          type: 'button',
+          role: 'tab',
+          className: 'bl-bo-subtabs__tab' + (source.id === activeBlockSource ? ' is-active' : ''),
+          text: source.label,
+          'aria-selected': source.id === activeBlockSource ? 'true' : 'false',
+          onClick: () => {
+            activeBlockSource = source.id;
+            editingBlockName = null;
+            selectedAddBlock = '';
+            setStatus(null, null);
+            render();
+          },
+        })
+      );
+    });
+    return subNav;
   }
 
   function renderBlocksList(tab) {
@@ -453,24 +938,26 @@ function boot() {
       return panel;
     }
 
-    const list = el('ul', { className: 'bl-bo-preset-list' });
+    const list = el('ul', { className: 'bl-bo-preset-list bl-bo-block-list' });
     rows.forEach((block) => {
       const summary = summarizeItems(block.items);
       list.appendChild(
-        el('li', {}, [
-          el('button', {
-            type: 'button',
-            className: 'linkish',
-            text: block.title || block.name,
-            onClick: () => {
-              editingBlockName = block.name;
-              render();
-            },
-          }),
-          el('span', {
-            className: 'meta',
-            text: summary.counts + (summary.detail ? ` · ${summary.detail}` : ''),
-          }),
+        el('li', { className: 'bl-bo-block-row' }, [
+          el('div', { className: 'bl-bo-block-row__lead' }, [
+            createBlockTypeIconEl(block.name, block.icon || null, 'bl-blocks-list-icon'),
+            el('button', {
+              type: 'button',
+              className: 'linkish bl-bo-block-open',
+              text: blockTitle(block),
+              onClick: () => {
+                editingBlockName = block.name;
+                setStatus(null, null);
+                render();
+              },
+            }),
+          ]),
+          el('span', { className: 'bl-bo-block-row__meta', text: summary.counts }),
+          el('code', { className: 'bl-bo-block-row__code', text: block.name }),
         ])
       );
     });
@@ -480,8 +967,8 @@ function boot() {
 
   function render() {
     root.replaceChildren();
-    root.appendChild(el('p', { className: 'bl-bo-intro', text: t('intro', '') }));
 
+    const shell = el('div', { className: 'bl-forms-builder bl-block-options-shell' });
     const tabBar = el('nav', { className: 'bl-forms-builder__tabs', role: 'tablist' });
     mainTabs.forEach((tab) => {
       tabBar.appendChild(
@@ -493,21 +980,28 @@ function boot() {
           'aria-selected': tab.id === activeMain ? 'true' : 'false',
           onClick: () => {
             activeMain = tab.id;
-            editingPresetSlug = null;
+            if (editingPreset) {
+              discardEmptyDraft(editingPreset);
+            }
+            editingPreset = null;
             editingBlockName = null;
+            setStatus(null, null);
             render();
           },
         })
       );
     });
-    root.appendChild(tabBar);
+    shell.appendChild(tabBar);
 
-    const panel = el('div', { className: 'bl-bo-panel', role: 'tabpanel' });
+    const panels = el('div', { className: 'bl-forms-builder__panels' });
+    const panel = el('div', { className: 'bl-forms-builder__panel bl-bo-panel', role: 'tabpanel' });
     if (activeMain === 'presets') {
-      const preset = editingPresetSlug ? findPreset(editingPresetSlug) : null;
+      const preset =
+        editingPreset && presets.includes(editingPreset) ? editingPreset : null;
       if (preset) {
         panel.appendChild(renderPresetEditor(preset));
       } else {
+        editingPreset = null;
         panel.appendChild(renderPresetsList());
       }
     } else {
@@ -515,41 +1009,22 @@ function boot() {
       if (block) {
         panel.appendChild(renderBlockEditor(block));
       } else {
-        if (blockSources.length > 1) {
-          const subNav = el('nav', {
-            className: 'bl-bo-subtabs',
-            role: 'tablist',
-            'aria-label': t('tabBlocks', 'Blocks'),
-          });
-          blockSources.forEach((source) => {
-            subNav.appendChild(
-              el('button', {
-                type: 'button',
-                role: 'tab',
-                className: 'bl-bo-subtabs__tab' + (source.id === activeBlockSource ? ' is-active' : ''),
-                text: source.label,
-                'aria-selected': source.id === activeBlockSource ? 'true' : 'false',
-                onClick: () => {
-                  activeBlockSource = source.id;
-                  editingBlockName = null;
-                  render();
-                },
-              })
-            );
-          });
+        const source = currentBlockSource();
+        panel.appendChild(renderAddBlockBar(source));
+        const subNav = renderBlockSourceTabs();
+        if (subNav) {
           panel.appendChild(subNav);
         }
-        panel.appendChild(renderBlocksList(currentBlockSource()));
+        panel.appendChild(renderBlocksList(source));
       }
     }
-    root.appendChild(panel);
+    panels.appendChild(panel);
+    shell.appendChild(panels);
+    root.appendChild(shell);
   }
 
   render();
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', boot);
-} else {
-  boot();
-}
+// Wait for registerCoreBlocks so core icons resolve (same as Theme → Blocks).
+whenBlockTypesReady(boot);

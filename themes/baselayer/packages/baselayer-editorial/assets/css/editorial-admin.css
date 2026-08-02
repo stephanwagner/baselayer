@@ -150,6 +150,27 @@ body.bl-page-picker-open {
   font-size: 18px;
 }
 
+.wp-core-ui .button.bl-button-has-icon,
+.button.bl-button-has-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.wp-core-ui .button.bl-button-has-icon .bl-button-has-icon__icon,
+.button.bl-button-has-icon .bl-button-has-icon__icon {
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-left: -6px;
+}
+.wp-core-ui .button.bl-button-has-icon .bl-button-has-icon__icon svg,
+.button.bl-button-has-icon .bl-button-has-icon__icon svg {
+  width: 18px;
+  height: 18px;
+  display: block;
+}
+
 .bl-editorial-selected-pages {
   display: flex;
   flex-wrap: wrap;
