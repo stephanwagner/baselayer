@@ -1640,9 +1640,22 @@
     };
   }
 
-  // themes/baselayer/packages/baselayer-blocks/src/js/admin/options-panel.js
-  var { el: el2, t: t3, iconEl } = window.BlFormBuilder || {};
-  var Canvas = window.BlCanvasBuilder || {};
+  // themes/baselayer/packages/baselayer-blocks/src/js/block-options/shared/options-items-panel.js
+  function fb() {
+    return window.BlFormBuilder || {};
+  }
+  function canvasApi() {
+    return window.BlCanvasBuilder || {};
+  }
+  function el2(...args) {
+    return fb().el(...args);
+  }
+  function t3(key, fallback) {
+    return typeof fb().t === "function" ? fb().t(key, fallback) : fallback || key;
+  }
+  function iconEl(...args) {
+    return typeof fb().iconEl === "function" ? fb().iconEl(...args) : el2("span");
+  }
   var GENERIC_TYPES = [
     { id: "boolean", labelKey: "optionTypeToggle", labelFallback: "Toggle" },
     { id: "select", labelKey: "optionTypeSelect", labelFallback: "Select" },
@@ -1684,14 +1697,39 @@
     const parts = base.split("_").filter(Boolean);
     return parts[0] + parts.slice(1).map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join("");
   }
+  var panelOptions = {
+    allowCustoms: false,
+    allowPresetRefs: true,
+    customs: null,
+    presets: null,
+    helpText: void 0,
+    emptyText: null
+  };
   function customsCatalog() {
+    const raw = typeof panelOptions.customs === "function" ? panelOptions.customs() : panelOptions.customs;
+    if (raw && typeof raw === "object") {
+      return raw;
+    }
     return window.blBlocksAdmin?.blockOptionCustoms || {};
   }
   function presetsCatalog() {
+    const raw = typeof panelOptions.presets === "function" ? panelOptions.presets() : panelOptions.presets;
+    if (Array.isArray(raw)) {
+      return raw;
+    }
     return Array.isArray(window.blBlocksAdmin?.blockOptionPresets) ? window.blBlocksAdmin.blockOptionPresets : [];
   }
   function isCustomType(type) {
     return !!customsCatalog()[type];
+  }
+  function defaultCustom(type) {
+    const def = customsCatalog()[type] || {};
+    return {
+      id: newId("c"),
+      kind: "control",
+      type,
+      ...def.defaults ? JSON.parse(JSON.stringify(def.defaults)) : {}
+    };
   }
   function canOverridePresetParam(controlType, key) {
     if (key === "label") {
@@ -1779,7 +1817,15 @@
     const row = GENERIC_TYPES.find((o) => o.id === item?.type);
     return row ? t3(row.labelKey, row.labelFallback) : item?.type || "";
   }
-  function createOptionsPanel(initial, onChange) {
+  function createOptionsPanel(initial, onChange, options = {}) {
+    panelOptions = {
+      allowCustoms: !!options.allowCustoms,
+      allowPresetRefs: options.allowPresetRefs !== false,
+      customs: options.customs ?? null,
+      presets: options.presets ?? null,
+      helpText: options.helpText,
+      emptyText: options.emptyText || null
+    };
     let items = Array.isArray(initial?.items) ? JSON.parse(JSON.stringify(initial.items)) : [];
     const manualAttr = /* @__PURE__ */ new Set();
     items.forEach((item) => {
@@ -1793,12 +1839,10 @@
     });
     const canvas = el2("div", { className: "bl-forms-builder__canvas bl-bo-canvas" });
     const list = el2("div", { className: "bl-forms-builder__list bl-bo-stack" });
+    const emptyMessage = panelOptions.emptyText || (panelOptions.allowPresetRefs ? t3("blockOptionsEmpty", "No options yet. Add a control or attach a preset.") : t3("presetItemsEmpty", "No options yet. Add a control."));
     const empty = el2("p", {
       className: "bl-forms-builder__empty bl-bo-stack__empty",
-      text: t3(
-        "blockOptionsEmpty",
-        "No options yet. Add a control or attach a preset."
-      )
+      text: emptyMessage
     });
     canvas.append(list, empty);
     let openItemId = null;
@@ -1923,10 +1967,10 @@
             value: opt.label || "",
             placeholder: t3("choiceLabel", "Label"),
             onInput: (e) => {
-              const options = JSON.parse(JSON.stringify(item.options || []));
-              options[oi] = { ...options[oi], label: e.target.value };
-              patchById(item.id, { ...item, options });
-              item.options = options;
+              const options2 = JSON.parse(JSON.stringify(item.options || []));
+              options2[oi] = { ...options2[oi], label: e.target.value };
+              patchById(item.id, { ...item, options: options2 });
+              item.options = options2;
             }
           }),
           el2("input", {
@@ -1935,10 +1979,10 @@
             value: opt.value || "",
             placeholder: t3("choiceValue", "Value / class"),
             onInput: (e) => {
-              const options = JSON.parse(JSON.stringify(item.options || []));
-              options[oi] = { ...options[oi], value: e.target.value };
-              patchById(item.id, { ...item, options });
-              item.options = options;
+              const options2 = JSON.parse(JSON.stringify(item.options || []));
+              options2[oi] = { ...options2[oi], value: e.target.value };
+              patchById(item.id, { ...item, options: options2 });
+              item.options = options2;
             }
           })
         ];
@@ -1982,10 +2026,10 @@
           };
           const commitIcon = (slug) => {
             syncIconPreview(slug);
-            const options = JSON.parse(JSON.stringify(item.options || []));
-            options[oi] = { ...options[oi], icon: slug || "" };
-            patchById(item.id, { ...item, options });
-            item.options = options;
+            const options2 = JSON.parse(JSON.stringify(item.options || []));
+            options2[oi] = { ...options2[oi], icon: slug || "" };
+            patchById(item.id, { ...item, options: options2 });
+            item.options = options2;
           };
           syncIconPreview(currentIcon);
           pickBtn.addEventListener("click", async (evt) => {
@@ -2014,9 +2058,9 @@
           title: t3("delete", "Delete"),
           "aria-label": t3("delete", "Delete"),
           onClick: () => {
-            const options = JSON.parse(JSON.stringify(item.options || []));
-            options.splice(oi, 1);
-            replaceById(item.id, { ...item, options });
+            const options2 = JSON.parse(JSON.stringify(item.options || []));
+            options2.splice(oi, 1);
+            replaceById(item.id, { ...item, options: options2 });
           }
         });
         const removeIcon = typeof iconEl === "function" ? iconEl("close") : null;
@@ -2034,10 +2078,10 @@
           className: "button button-small bl-bo-choices__add",
           text: t3("addChoice", "Add choice"),
           onClick: () => {
-            const options = JSON.parse(JSON.stringify(item.options || []));
+            const options2 = JSON.parse(JSON.stringify(item.options || []));
             const next = item.type === "button-group" ? { label: "Option", value: "", icon: "" } : { label: "Option", value: "" };
-            options.push(next);
-            replaceById(item.id, { ...item, options });
+            options2.push(next);
+            replaceById(item.id, { ...item, options: options2 });
           }
         })
       );
@@ -2277,7 +2321,7 @@
       return editor;
     }
     function buildTypeSelect(item) {
-      if (isCustomType(item.type)) {
+      if (!panelOptions.allowCustoms && isCustomType(item.type)) {
         return el2("input", {
           type: "text",
           value: customsCatalog()[item.type]?.label || item.type,
@@ -2286,18 +2330,51 @@
         });
       }
       const typeSelect = el2("select", { className: "bl-bo-card__type" });
-      GENERIC_TYPES.forEach((row) => {
-        typeSelect.appendChild(
-          el2("option", {
-            value: row.id,
-            text: t3(row.labelKey, row.labelFallback),
-            selected: item.type === row.id ? true : void 0
-          })
-        );
-      });
+      if (panelOptions.allowCustoms) {
+        const defaultGroup = el2("optgroup", {
+          label: t3("optionGroupDefault", "Default")
+        });
+        GENERIC_TYPES.forEach((row) => {
+          defaultGroup.appendChild(
+            el2("option", {
+              value: row.id,
+              text: t3(row.labelKey, row.labelFallback),
+              selected: item.type === row.id ? true : void 0
+            })
+          );
+        });
+        typeSelect.appendChild(defaultGroup);
+        const customEntries = Object.entries(customsCatalog());
+        if (customEntries.length > 0) {
+          const customGroup = el2("optgroup", {
+            label: t3("optionGroupCustom", "Custom")
+          });
+          customEntries.forEach(([type, def]) => {
+            customGroup.appendChild(
+              el2("option", {
+                value: type,
+                text: def.label || type,
+                selected: item.type === type ? true : void 0
+              })
+            );
+          });
+          typeSelect.appendChild(customGroup);
+        }
+      } else {
+        GENERIC_TYPES.forEach((row) => {
+          typeSelect.appendChild(
+            el2("option", {
+              value: row.id,
+              text: t3(row.labelKey, row.labelFallback),
+              selected: item.type === row.id ? true : void 0
+            })
+          );
+        });
+      }
       typeSelect.value = item.type;
       typeSelect.addEventListener("change", () => {
-        const next = defaultGeneric(typeSelect.value);
+        const type = typeSelect.value;
+        const next = panelOptions.allowCustoms && isCustomType(type) ? defaultCustom(type) : defaultGeneric(type);
         next.id = item.id;
         replaceById(item.id, next);
       });
@@ -2428,6 +2505,7 @@
       return wrapOptionCard(item, renderControlEditor(item));
     }
     function bindSortable() {
+      const Canvas = canvasApi();
       if (sortable && typeof sortable.destroy === "function") {
         sortable.destroy();
         sortable = null;
@@ -2493,38 +2571,45 @@
         render();
       })
     );
-    addRow.appendChild(
-      makeAddButton(t3("addPreset", "Preset"), () => {
-        const presets = presetsCatalog();
-        if (presets.length === 0) {
-          window.alert(
-            t3("noPresetsYet", "No presets yet \u2014 create some under Block Options \u2192 Presets")
-          );
-          return;
-        }
-        const next = defaultPresetRef(presets[0].slug);
-        items.push(next);
-        openItemId = next.id;
-        sync();
-        render();
-      })
+    if (panelOptions.allowPresetRefs) {
+      addRow.appendChild(
+        makeAddButton(t3("addPresetRef", t3("addPreset", "Preset")), () => {
+          const presets = presetsCatalog();
+          if (presets.length === 0) {
+            window.alert(
+              t3("noPresetsYet", "No presets yet \u2014 create some under Block Options \u2192 Presets")
+            );
+            return;
+          }
+          const next = defaultPresetRef(presets[0].slug);
+          items.push(next);
+          openItemId = next.id;
+          sync();
+          render();
+        })
+      );
+    }
+    const helpText = panelOptions.helpText === false || panelOptions.helpText === null ? null : panelOptions.helpText !== void 0 ? panelOptions.helpText : t3(
+      "blockOptionsHelp",
+      "These controls appear in the block sidebar in the editor."
     );
-    panel.append(
-      el2("p", {
-        className: "description",
-        text: t3(
-          "blockOptionsHelp",
-          "These controls appear in the block sidebar in the editor."
-        )
-      }),
-      canvas,
-      addRow
-    );
+    if (helpText) {
+      panel.appendChild(el2("p", { className: "description", text: helpText }));
+    }
+    panel.append(canvas, addRow);
     render();
     return {
       panel,
       getBlockOptions: () => ({ items: JSON.parse(JSON.stringify(items)) })
     };
+  }
+
+  // themes/baselayer/packages/baselayer-blocks/src/js/admin/options-panel.js
+  function createOptionsPanel2(initial, onChange) {
+    return createOptionsPanel(initial, onChange, {
+      allowCustoms: false,
+      allowPresetRefs: true
+    });
   }
 
   // themes/baselayer/packages/baselayer-blocks/src/js/admin/repeater-card.js
@@ -3002,7 +3087,7 @@
       settingsState = next;
       syncAll();
     });
-    const optionsPanel = definitionType === "block" ? createOptionsPanel(blockOptionsState, (next) => {
+    const optionsPanel = definitionType === "block" ? createOptionsPanel2(blockOptionsState, (next) => {
       blockOptionsState = next;
       syncAll();
     }) : null;

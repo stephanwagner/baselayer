@@ -830,17 +830,27 @@ body.post-new-php.post-type-bl_block {
 }
 
 // Options tab — no bl-forms-builder__panel (avoids nested panel chrome inside __panels).
+// Tokens normally live on .bl-forms-builder; keep them here so the panel works outside that shell
+// (e.g. Block Options → Presets).
 .bl-blocks-options-panel {
   max-width: 960px;
+  --bl-forms-admin-border: #c3c4c7;
+  --bl-forms-admin-muted: #646970;
+  --bl-forms-admin-surface: #f6f7f7;
+  --bl-forms-admin-accent: #2271b1;
+  --bl-forms-admin-radius: 4px;
 }
 
 .bl-forms-builder__panels > [data-bl-forms-panel='options'][hidden] {
   display: none !important;
 }
 
-.bl-bo-canvas {
+.bl-bo-canvas.bl-forms-builder__canvas {
   margin: 16px 0;
   padding: 8px;
+  border: 1px dashed var(--bl-forms-admin-border, #c3c4c7);
+  border-radius: var(--bl-forms-admin-radius, 4px);
+  background: #fff;
 
   .bl-bo-stack {
     min-height: 0;
@@ -865,6 +875,8 @@ body.post-new-php.post-type-bl_block {
 // Options reuse field-card header/body chrome; editor content stays custom.
 .bl-bo-option.bl-forms-builder__field {
   margin: 0;
+  border: 1px solid var(--bl-forms-admin-border, #c3c4c7);
+  border-radius: var(--bl-forms-admin-radius, 4px);
 }
 
 .bl-bo-option__editor {

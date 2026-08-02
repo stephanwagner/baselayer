@@ -128,8 +128,31 @@ function bl_block_options_enqueue_admin_assets(): void
 		return;
 	}
 
+	$builder_handle = function_exists('bl_blocks_enqueue_canvas_builder_kit')
+		? bl_blocks_enqueue_canvas_builder_kit()
+		: '';
+	$form_builder_deps = $builder_handle ? [$builder_handle] : [];
+	$form_builder_handle = function_exists('bl_blocks_enqueue_form_builder_kit')
+		? bl_blocks_enqueue_form_builder_kit($form_builder_deps)
+		: '';
+
+	$style_deps = [];
+	if ($form_builder_handle) {
+		$style_deps[] = $form_builder_handle;
+	} elseif ($builder_handle) {
+		$style_deps[] = $builder_handle;
+	}
+	if (function_exists('bl_blocks_enqueue_style')) {
+		bl_blocks_enqueue_style('bl-blocks-admin', 'blocks-admin', $style_deps);
+	}
+
 	$handle = 'bl-block-options-admin';
 	$deps = [];
+	if ($form_builder_handle) {
+		$deps[] = $form_builder_handle;
+	} elseif ($builder_handle) {
+		$deps[] = $builder_handle;
+	}
 	if (function_exists('bl_blocks_enqueue_script')) {
 		bl_blocks_enqueue_script($handle, 'block-options-admin', $deps, true);
 	} else {
@@ -143,6 +166,85 @@ function bl_block_options_enqueue_admin_assets(): void
 		}
 	}
 
+	$icons = function_exists('bl_blocks_builder_icon_svgs')
+		? bl_blocks_builder_icon_svgs()
+		: [];
+	$has_icon_picker = function_exists('bl_icons_localize_payload')
+		&& function_exists('bl_enqueue_theme_icons_style');
+	if (function_exists('bl_enqueue_theme_icons_style')) {
+		if (function_exists('bl_load_icons_textdomain')) {
+			bl_load_icons_textdomain();
+		}
+		bl_enqueue_theme_icons_style(['bl-blocks-admin', $handle]);
+	}
+	if ($has_icon_picker) {
+		wp_localize_script($handle, 'baselayerIcons', bl_icons_localize_payload());
+	}
+
+	$i18n = [
+		'title' => __('Block Options', 'baselayer'),
+		'intro' => __('Manage sidebar options for blocks. Create reusable presets, then assign them to blocks.', 'baselayer'),
+		'tabBlocks' => __('Blocks', 'baselayer'),
+		'tabAll' => __('All', 'baselayer'),
+		'tabBaselayer' => __('BaseLayer', 'baselayer'),
+		'tabAcf' => __('ACF', 'baselayer'),
+		'tabCore' => __('Core', 'baselayer'),
+		'tabPresets' => __('Presets', 'baselayer'),
+		'emptyAll' => __('No blocks with options yet. Import theme defaults, or assign presets from a block.', 'baselayer'),
+		'emptyBaselayer' => __('No BaseLayer blocks with options yet. Import theme defaults, or assign presets from a block.', 'baselayer'),
+		'emptyAcf' => __('No ACF blocks with options yet. Import theme defaults, or assign presets from a block.', 'baselayer'),
+		'emptySystem' => __('No system blocks with options yet. Import theme defaults above.', 'baselayer'),
+		'emptyPresets' => __('No presets yet. Add one, or import theme defaults above.', 'baselayer'),
+		'addPreset' => __('Add preset', 'baselayer'),
+		'savePresets' => __('Save presets', 'baselayer'),
+		'saveBlocks' => __('Save block', 'baselayer'),
+		'presetLabel' => __('Label', 'baselayer'),
+		'presetSlug' => __('Slug', 'baselayer'),
+		'deletePreset' => __('Delete', 'baselayer'),
+		'remove' => __('Remove', 'baselayer'),
+		'backToList' => __('← All blocks', 'baselayer'),
+		'backToPresets' => __('← All presets', 'baselayer'),
+		'addOption' => __('Add option', 'baselayer'),
+		'addPresetRef' => __('Preset', 'baselayer'),
+		'optionType' => __('Type', 'baselayer'),
+		'optionLabel' => __('Label', 'baselayer'),
+		'optionDescription' => __('Description', 'baselayer'),
+		'optionTypeToggle' => __('Toggle', 'baselayer'),
+		'optionTypeSelect' => __('Select', 'baselayer'),
+		'optionTypeButtonGroup' => __('Button group', 'baselayer'),
+		'optionTypeIcon' => __('Icon', 'baselayer'),
+		'optionTypePreset' => __('Preset', 'baselayer'),
+		'optionGroupDefault' => __('Default', 'baselayer'),
+		'optionGroupCustom' => __('Custom', 'baselayer'),
+		'attributeName' => __('Attribute name', 'baselayer'),
+		'toggleLabel' => __('Toggle label', 'baselayer'),
+		'classWhenOn' => __('CSS class when on', 'baselayer'),
+		'defaultOn' => __('On by default', 'baselayer'),
+		'defaultValue' => __('Default', 'baselayer'),
+		'choices' => __('Choices', 'baselayer'),
+		'addChoice' => __('Add choice', 'baselayer'),
+		'choiceLabel' => __('Label', 'baselayer'),
+		'choiceValue' => __('Value / class', 'baselayer'),
+		'chooseIcon' => __('Choose icon', 'baselayer'),
+		'clearIcon' => __('Clear icon', 'baselayer'),
+		'icon' => __('Icon', 'baselayer'),
+		'delete' => __('Delete', 'baselayer'),
+		'dragField' => __('Drag to reorder', 'baselayer'),
+		'expandField' => __('Expand field', 'baselayer'),
+		'collapseField' => __('Collapse field', 'baselayer'),
+		'choosePreset' => __('Preset', 'baselayer'),
+		'presetDefaultsHelp' => __('Optional default overrides for this block:', 'baselayer'),
+		'presetItemsHelp' => __('These controls can be attached to blocks as a reusable preset.', 'baselayer'),
+		'presetItemsEmpty' => __('No options yet. Add a control.', 'baselayer'),
+		'blockOptionsEmpty' => __('No options yet. Add a control or attach a preset.', 'baselayer'),
+		'noPresetsYet' => __('No presets yet — create some under Block Options → Presets', 'baselayer'),
+		'saved' => __('Saved.', 'baselayer'),
+		'saveFailed' => __('Could not save.', 'baselayer'),
+		'items' => __('items', 'baselayer'),
+		'summaryPresets' => __('presets', 'baselayer'),
+		'summaryControls' => __('controls', 'baselayer'),
+	];
+
 	wp_localize_script($handle, 'blBlockOptionsAdmin', [
 		'hasBaselayer' => bl_block_options_has_baselayer_blocks(),
 		'hasAcf' => bl_block_options_has_acf_blocks(),
@@ -155,48 +257,29 @@ function bl_block_options_enqueue_admin_assets(): void
 		'blocks' => bl_block_options_blocks_catalog(),
 		'ajaxUrl' => admin_url('admin-ajax.php'),
 		'nonce' => wp_create_nonce('bl_block_options_admin'),
-		'i18n' => [
-			'title' => __('Block Options', 'baselayer'),
-			'intro' => __('Manage sidebar options for blocks. Create reusable presets, then assign them to blocks.', 'baselayer'),
-			'tabBaselayer' => __('BaseLayer blocks', 'baselayer'),
-			'tabAcf' => __('ACF blocks', 'baselayer'),
-			'tabSystem' => __('System blocks', 'baselayer'),
-			'tabPresets' => __('Presets', 'baselayer'),
-			'emptyBaselayer' => __('No BaseLayer blocks with options yet. Import theme defaults, or assign presets from a block.', 'baselayer'),
-			'emptyAcf' => __('No ACF blocks with options yet. Import theme defaults, or assign presets from a block.', 'baselayer'),
-			'emptySystem' => __('No system blocks with options yet. Import theme defaults above.', 'baselayer'),
-			'emptyPresets' => __('No presets yet. Add one, or import theme defaults above.', 'baselayer'),
-			'addPreset' => __('Add preset', 'baselayer'),
-			'savePresets' => __('Save presets', 'baselayer'),
-			'saveBlocks' => __('Save block', 'baselayer'),
-			'presetLabel' => __('Label', 'baselayer'),
-			'presetSlug' => __('Slug', 'baselayer'),
-			'deletePreset' => __('Delete', 'baselayer'),
-			'remove' => __('Remove', 'baselayer'),
-			'backToList' => __('← All blocks', 'baselayer'),
-			'backToPresets' => __('← All presets', 'baselayer'),
-			'addOption' => __('Add option', 'baselayer'),
-			'addToggle' => __('Toggle', 'baselayer'),
-			'addPresetRef' => __('Preset', 'baselayer'),
-			'optionType' => __('Type', 'baselayer'),
-			'optionLabel' => __('Label', 'baselayer'),
-			'optionDescription' => __('Description', 'baselayer'),
-			'defaultOn' => __('On by default', 'baselayer'),
-			'defaultValue' => __('Default', 'baselayer'),
-			'optionGroupDefault' => __('Default', 'baselayer'),
-			'optionGroupCustom' => __('Custom', 'baselayer'),
-			'choosePreset' => __('Preset', 'baselayer'),
-			'presetDefaultsHelp' => __('Optional default overrides for this block:', 'baselayer'),
-			'saved' => __('Saved.', 'baselayer'),
-			'saveFailed' => __('Could not save.', 'baselayer'),
-			'items' => __('items', 'baselayer'),
-			'summaryPresets' => __('presets', 'baselayer'),
-			'summaryControls' => __('controls', 'baselayer'),
-		],
+		'hasIconPicker' => $has_icon_picker,
+		'i18n' => $i18n,
 	]);
 
+	// Shared options panel reads BlFormBuilder.t / iconEl via blFormsAdmin.
+	wp_add_inline_script(
+		$handle,
+		'window.blFormsAdmin = window.blFormsAdmin || ' . wp_json_encode([
+			'icons' => $icons,
+			'i18n'  => $i18n,
+		]) . ';',
+		'before'
+	);
+
 	$css = '
-	.bl-block-options-admin{max-width:960px}
+	.bl-block-options-admin{
+		max-width:960px;
+		--bl-forms-admin-border:#c3c4c7;
+		--bl-forms-admin-muted:#646970;
+		--bl-forms-admin-surface:#f6f7f7;
+		--bl-forms-admin-accent:#2271b1;
+		--bl-forms-admin-radius:4px
+	}
 	.bl-block-options-admin .bl-bo-intro{color:#50575e;margin:0 0 20px;font-size:14px;line-height:1.5;max-width:40rem}
 	.bl-block-options-admin .bl-forms-builder__tabs{
 		display:flex;align-items:center;gap:0;
@@ -223,21 +306,21 @@ function bl_block_options_enqueue_admin_assets(): void
 		appearance:none;border:0;background:none;color:#2271b1;font-weight:600;cursor:pointer;padding:0;font-size:14px;text-align:left
 	}
 	.bl-block-options-admin .bl-bo-preset-list .meta{color:#646970;font-size:12px;font-weight:400}
-	.bl-block-options-admin .bl-bo-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 16px}
-	.bl-block-options-admin .bl-bo-edit-card{
-		border:1px solid #dcdcde;border-radius:8px;padding:14px 16px;margin:0 0 12px;background:#fcfcfc
+	.bl-block-options-admin .bl-bo-toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 16px}
+	.bl-block-options-admin .bl-bo-subtabs{
+		display:flex;align-items:center;gap:4px;flex-wrap:wrap;
+		margin:0 0 20px;padding:0 0 12px;border-bottom:1px solid #f0f0f1
 	}
-	.bl-block-options-admin .bl-bo-edit-card label{display:block;font-weight:600;margin:0 0 4px;font-size:12px}
-	.bl-block-options-admin .bl-bo-edit-card .row{margin:0 0 10px}
-	.bl-block-options-admin .bl-bo-edit-card select,
-	.bl-block-options-admin .bl-bo-edit-card input[type=text]{width:100%;max-width:360px}
-	.bl-block-options-admin .bl-bo-edit-card .bl-bo-card-badge{
-		display:inline-block;font-size:11px;font-weight:600;padding:2px 8px;border-radius:999px;
-		background:#f0f6fc;color:#135e96;margin:0 0 10px
+	.bl-block-options-admin .bl-bo-subtabs__tab{
+		appearance:none;border:0;background:transparent;cursor:pointer;
+		padding:6px 12px;border-radius:4px;font-size:13px;font-weight:600;color:#646970
 	}
-	.bl-block-options-admin .bl-bo-edit-card .bl-bo-card-badge.is-preset{background:#f6f7f7;color:#1d2327}
+	.bl-block-options-admin .bl-bo-subtabs__tab:hover{color:#1d2327;background:#f6f7f7}
+	.bl-block-options-admin .bl-bo-subtabs__tab.is-active{color:#1d2327;background:#f0f0f1}
+	.bl-block-options-admin .bl-bo-preset-editor .bl-blocks-options-panel,
+	.bl-block-options-admin .bl-bo-block-editor .bl-blocks-options-panel{margin-top:8px}
 	';
-	wp_register_style('bl-block-options-admin', false, [], null);
+	wp_register_style('bl-block-options-admin', false, array_filter(['bl-blocks-admin']), null);
 	wp_enqueue_style('bl-block-options-admin');
 	wp_add_inline_style('bl-block-options-admin', $css);
 }
