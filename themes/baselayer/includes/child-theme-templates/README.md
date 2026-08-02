@@ -52,7 +52,7 @@ Optional Events markup overrides (child wins via the same template paths as the 
 
 - Config stubs in `config/` (`theme.php`, `design.php`, `block-settings.php`, …) merge over the parent — see `config/README.md`
 - **Content types:** `config/content-types/` is copied from the parent on install (file-based CPTs such as `post` and `project`). With a child active, **only** those files are loaded (no parent fallback). An empty or missing folder means no file-based CPTs. Events are **not** defined here.
-- **`config/block-options.php`:** presets and assignments for editor sidebar options (merged over parent). Optional Block Creator UI (Developer → Features) can add an overlay without editing files.
+- **`config/block-options.php`:** presets and assignments for editor sidebar options (merged over parent).
 - Optional templates: `templates/…` (same paths as the parent; child wins)
 
 ## Add an ACF block

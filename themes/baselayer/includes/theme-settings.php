@@ -928,6 +928,8 @@ function bl_sanitize_features($value): array
 	}
 	$mode = isset($value['language_mode']) ? (string) $value['language_mode'] : 'content';
 	$out['language_mode'] = in_array($mode, ['content', 'google_translate'], true) ? $mode : 'content';
+	// Removed feature — never persist.
+	unset($out['enable_block_creator']);
 	if (empty($out['enable_webp'])) {
 		$out['enable_webp_convert_original'] = 0;
 	}

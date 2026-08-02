@@ -5,8 +5,7 @@ defined('ABSPATH') || exit;
 /**
  * Block options: presets + assignments (+ optional per-block extras).
  *
- * Hand-editable source of truth. The Block Creator UI can overlay the same shape
- * when Developer → Features → Block Creator is enabled.
+ * Hand-editable source of truth for editor block-option controls.
  *
  * @return array{
  *   presets?: array<string, array{label?: string, controls: list<array<string, mixed>>}>,

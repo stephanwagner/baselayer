@@ -38,7 +38,7 @@ const { Fragment, useEffect, useRef } = wp.element;
 const GALLERY_OWNED_IMAGE_ATTRIBUTES = ['showImageLabel', 'hasLightbox', 'alignWideContainer'];
 const GALLERY_OWNED_IMAGE_TYPES = ['container-margin'];
 
-/** Resolved from PHP (config/block-options.php + optional Block Creator UI overlay). */
+/** Resolved from PHP (config/block-options.php). */
 const blockOptions = Array.isArray(window.baselayerBlockOptions)
   ? window.baselayerBlockOptions
   : [];

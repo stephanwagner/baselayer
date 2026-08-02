@@ -46,7 +46,6 @@ function bl_blocks_menu_icon(): string
 
 /**
  * Top-level Website runtime page (Site Settings values).
- * Registered even when Block Creator owns the Blocks menu slug.
  */
 function bl_blocks_register_website_menu(): void
 {
@@ -75,13 +74,6 @@ add_action('admin_menu', 'bl_blocks_register_website_menu');
 function bl_blocks_register_admin_menu(): void
 {
 	if (!bl_blocks_user_can_manage()) {
-		return;
-	}
-
-	// Theme Block Creator uses the same `bl-blocks` menu slug — avoid collision.
-	if (function_exists('bl_block_creator_enabled') && bl_block_creator_enabled()) {
-		add_action('admin_notices', 'bl_blocks_block_creator_conflict_notice');
-
 		return;
 	}
 
@@ -125,22 +117,6 @@ function bl_blocks_register_admin_menu(): void
 	remove_submenu_page('bl-blocks', 'bl-blocks');
 }
 add_action('admin_menu', 'bl_blocks_register_admin_menu');
-
-/**
- * Notice when Blocks package and theme Block Creator are both enabled.
- */
-function bl_blocks_block_creator_conflict_notice(): void
-{
-	if (!bl_blocks_user_can_manage()) {
-		return;
-	}
-	echo '<div class="notice notice-warning"><p>';
-	echo esc_html__(
-		'BaseLayer Blocks and Block Creator both use the Blocks admin menu. Disable Block Creator (Developer → Features) to use the Blocks package, or disable the Blocks package to keep Block Creator. The Website menu remains available.',
-		'baselayer-blocks'
-	);
-	echo '</p></div>';
-}
 
 /**
  * Top-level click → Blocks list.

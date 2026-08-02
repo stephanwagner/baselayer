@@ -2,32 +2,6 @@
 
 defined('ABSPATH') || exit;
 
-const BL_BLOCK_CREATOR_OPTION = 'bl_block_creator_block_options';
-
-/**
- * Whether the Block Creator admin UI feature is enabled.
- */
-function bl_block_creator_enabled(): bool
-{
-	return function_exists('bl_theme_feature_enabled') && bl_theme_feature_enabled('block_creator');
-}
-
-/**
- * Whether the current user may open Block Creator admin screens.
- */
-function bl_block_creator_user_can_manage(): bool
-{
-	if (!current_user_can('manage_options')) {
-		return false;
-	}
-
-	if (function_exists('bl_is_developer_user')) {
-		return bl_is_developer_user((int) get_current_user_id());
-	}
-
-	return true;
-}
-
 /**
  * Load file-based block-options config (parent + child merge).
  *
@@ -43,71 +17,13 @@ function bl_block_options_load_file_config(): array
 }
 
 /**
- * UI overlay stored by Block Creator (same shape as the config file).
- *
- * @return array<string, mixed>
- */
-function bl_block_creator_load_ui_config(): array
-{
-	if (!bl_block_creator_enabled()) {
-		return [];
-	}
-
-	$stored = get_option(BL_BLOCK_CREATOR_OPTION, []);
-	return is_array($stored) ? $stored : [];
-}
-
-/**
- * Merge file config with optional UI overlay.
- *
- * @param array<string, mixed> $file
- * @param array<string, mixed> $ui
- * @return array<string, mixed>
- */
-function bl_block_options_merge_configs(array $file, array $ui): array
-{
-	if ($ui === []) {
-		return $file;
-	}
-
-	$presets = isset($file['presets']) && is_array($file['presets']) ? $file['presets'] : [];
-	$ui_presets = isset($ui['presets']) && is_array($ui['presets']) ? $ui['presets'] : [];
-	if ($ui_presets !== [] && function_exists('bl_config_merge_deep')) {
-		$presets = bl_config_merge_deep($presets, $ui_presets);
-	} elseif ($ui_presets !== []) {
-		$presets = array_merge($presets, $ui_presets);
-	}
-
-	$file_assignments = isset($file['assignments']) && is_array($file['assignments']) ? $file['assignments'] : [];
-	$ui_assignments = isset($ui['assignments']) && is_array($ui['assignments']) ? $ui['assignments'] : [];
-	$assignments = array_merge($file_assignments, $ui_assignments);
-
-	$blocks = isset($file['blocks']) && is_array($file['blocks']) ? $file['blocks'] : [];
-	$ui_blocks = isset($ui['blocks']) && is_array($ui['blocks']) ? $ui['blocks'] : [];
-	if ($ui_blocks !== [] && function_exists('bl_config_merge_deep')) {
-		$blocks = bl_config_merge_deep($blocks, $ui_blocks);
-	} elseif ($ui_blocks !== []) {
-		$blocks = array_merge($blocks, $ui_blocks);
-	}
-
-	return [
-		'presets' => $presets,
-		'assignments' => $assignments,
-		'blocks' => $blocks,
-	];
-}
-
-/**
- * Full block-options config after file + UI merge and filters.
+ * Full block-options config from file config and filters.
  *
  * @return array<string, mixed>
  */
 function bl_block_options_get_config(): array
 {
-	$config = bl_block_options_merge_configs(
-		bl_block_options_load_file_config(),
-		bl_block_creator_load_ui_config()
-	);
+	$config = bl_block_options_load_file_config();
 
 	/**
 	 * Filter the resolved block-options config (presets, assignments, blocks).
@@ -274,37 +190,6 @@ function bl_block_options_for_editor(): array
 		}
 	}
 
-	// Creator custom blocks: ordered option_presets on each block def.
-	if (
-		function_exists('bl_block_creator_enabled')
-		&& bl_block_creator_enabled()
-		&& function_exists('bl_block_creator_get_blocks')
-	) {
-		foreach (bl_block_creator_get_blocks() as $creator_block) {
-			if (!is_array($creator_block)) {
-				continue;
-			}
-			$slug = sanitize_key((string) ($creator_block['slug'] ?? ''));
-			$preset_slugs = isset($creator_block['option_presets']) && is_array($creator_block['option_presets'])
-				? $creator_block['option_presets']
-				: [];
-			if ($slug === '' || $preset_slugs === []) {
-				continue;
-			}
-			$block_name = 'baselayer/' . $slug;
-			$controls = bl_block_options_controls_for_presets($preset_slugs, $presets);
-			if ($controls === []) {
-				continue;
-			}
-			if (!isset($map[$block_name])) {
-				$map[$block_name] = [];
-			}
-			foreach ($controls as $control) {
-				$map[$block_name][] = $control;
-			}
-		}
-	}
-
 	$list = [];
 	foreach ($map as $name => $options) {
 		if ($options === []) {
@@ -320,58 +205,23 @@ function bl_block_options_for_editor(): array
 }
 
 /**
- * Preset library for admin pickers: slug => label.
- *
- * @return array<string, string>
+ * One-time cleanup of removed Block Creator options and feature flag.
  */
-function bl_block_options_preset_choices(): array
+function bl_block_options_cleanup_legacy_creator(): void
 {
-	$config = bl_block_options_get_config();
-	$presets = isset($config['presets']) && is_array($config['presets']) ? $config['presets'] : [];
-	$choices = [];
-	foreach ($presets as $slug => $preset) {
-		$slug = sanitize_key((string) $slug);
-		if ($slug === '' || !is_array($preset)) {
-			continue;
-		}
-		$label = sanitize_text_field((string) ($preset['label'] ?? $slug));
-		$choices[$slug] = $label !== '' ? $label : $slug;
+	if (get_option('bl_block_creator_cleaned')) {
+		return;
 	}
-	return $choices;
+
+	delete_option('bl_block_creator_block_options');
+	delete_option('bl_block_creator_blocks');
+
+	$features = get_option('baselayer_features', []);
+	if (is_array($features) && array_key_exists('enable_block_creator', $features)) {
+		unset($features['enable_block_creator']);
+		update_option('baselayer_features', $features, false);
+	}
+
+	update_option('bl_block_creator_cleaned', 1, false);
 }
-
-/**
- * Expand ordered preset slugs into a flat controls list.
- *
- * @param list<string>             $preset_slugs
- * @param array<string, mixed>|null $presets Optional presets map; defaults to config.
- * @return list<array<string, mixed>>
- */
-function bl_block_options_controls_for_presets(array $preset_slugs, ?array $presets = null): array
-{
-	if ($presets === null) {
-		$config = bl_block_options_get_config();
-		$presets = isset($config['presets']) && is_array($config['presets']) ? $config['presets'] : [];
-	}
-
-	$controls = [];
-	$seen = [];
-	foreach ($preset_slugs as $preset_slug) {
-		$preset_slug = sanitize_key((string) $preset_slug);
-		if ($preset_slug === '' || isset($seen[$preset_slug]) || !isset($presets[$preset_slug]) || !is_array($presets[$preset_slug])) {
-			continue;
-		}
-		$seen[$preset_slug] = true;
-		$preset_controls = $presets[$preset_slug]['controls'] ?? [];
-		if (!is_array($preset_controls)) {
-			continue;
-		}
-		foreach ($preset_controls as $control) {
-			if (is_array($control)) {
-				$controls[] = $control;
-			}
-		}
-	}
-
-	return $controls;
-}
+add_action('admin_init', 'bl_block_options_cleanup_legacy_creator', 1);

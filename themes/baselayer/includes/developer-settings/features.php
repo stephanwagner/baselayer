@@ -263,22 +263,6 @@ function bl_render_developer_features(): void
 					</tr>
 				</table>
 
-				<hr>
-
-				<table class="form-table" role="presentation">
-					<tr>
-						<th scope="row" class="form-table-checkbox-label">
-							<?= esc_html__('Block Creator', 'baselayer') ?>
-							<span class="bl-feature-beta"><?= esc_html__('Beta', 'baselayer') ?></span>
-						</th>
-						<td>
-							<input type="hidden" name="baselayer_features[enable_block_creator]" value="0">
-							<label><input type="checkbox" name="baselayer_features[enable_block_creator]" value="1" <?= checked($feat('enable_block_creator'), 1, false) ?>> <?= esc_html__('Enable Block Creator UI', 'baselayer') ?></label>
-							<p class="description bl-indent-checkbox"><?= esc_html__('Adds an admin UI to overlay block-option presets and assignments. File config (config/block-options.php) remains the baseline. Will become a standalone package later.', 'baselayer') ?></p>
-						</td>
-					</tr>
-				</table>
-
 			</div>
 
 			<h3 style="margin-top: 32px;"><?= esc_html__('Media', 'baselayer') ?></h3>

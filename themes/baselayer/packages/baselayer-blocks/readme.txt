@@ -20,10 +20,6 @@ BaseLayer Blocks provides three definition types under one admin menu:
 
 Definitions use a Fields + Settings editor (same canvas model as Forms). Values are stored as block attributes, post meta, or options respectively.
 
-== Conflict with Block Creator ==
-
-The theme’s **Block Creator** feature also registers an admin menu with the `bl-blocks` slug. Do not enable both at once. If both are on, the Blocks package skips its menu and shows an admin warning.
-
 == Installation ==
 
 1. Enable the Blocks package under Developer → Features (or activate as a plugin)

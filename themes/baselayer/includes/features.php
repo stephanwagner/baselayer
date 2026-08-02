@@ -28,7 +28,6 @@ function bl_theme_feature_defaults(): array
 		'enable_media_folders'      => 1,
 		'enable_matomo'             => 0,
 		'enable_blocks'             => 0,
-		'enable_block_creator'      => 0,
 	];
 }
 
@@ -39,7 +38,7 @@ function bl_theme_feature_defaults(): array
  */
 function bl_theme_feature_default_off_when_missing(): array
 {
-	return ['enable_languages', 'enable_editorial', 'enable_webp', 'enable_webp_convert_original', 'enable_matomo', 'enable_blocks', 'enable_block_creator'];
+	return ['enable_languages', 'enable_editorial', 'enable_webp', 'enable_webp_convert_original', 'enable_matomo', 'enable_blocks'];
 }
 
 /**
@@ -66,7 +65,6 @@ function bl_theme_feature_option_keys_map(): array
 		'media_folders'           => 'enable_media_folders',
 		'matomo'                  => 'enable_matomo',
 		'blocks'                  => 'enable_blocks',
-		'block_creator'           => 'enable_block_creator',
 	];
 }
 
@@ -110,6 +108,8 @@ function bl_theme_feature_enabled(string $feature): bool
 		if (!is_array($options)) {
 			$options = [];
 		}
+		// Drop removed Block Creator flag left in older installs.
+		unset($options['enable_block_creator']);
 	}
 
 	$map = bl_theme_feature_option_keys_map();

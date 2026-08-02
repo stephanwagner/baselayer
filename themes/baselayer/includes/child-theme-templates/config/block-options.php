@@ -7,13 +7,11 @@ defined('ABSPATH') || exit;
  *
  * Merged on top of the parent config/block-options.php.
  * - presets: associative — child slugs deep-merge / replace parent presets
- * - assignments: list — replaced wholesale by bl_config_merge_deep; prefer UI
- *   assignments (Block Creator) to append without copying the parent list, OR
- *   special-case is handled in resolve by concatenating file + UI only.
- *   For file child overrides of assignments, copy parent assignments and edit.
+ * - assignments: list — replaced wholesale by bl_config_merge_deep; for
+ *   file child overrides, copy parent assignments and edit.
  * - blocks: per-block extra controls (associative merge)
  *
- * Example — add a preset and assign it via Block Creator UI, or:
+ * Example — add a preset:
  *
  * return [
  *   'presets' => [
