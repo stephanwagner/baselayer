@@ -27,7 +27,7 @@ function bl_theme_feature_defaults(): array
 		'enable_webp_convert_original' => 0,
 		'enable_media_folders'      => 1,
 		'enable_matomo'             => 0,
-		'enable_blocks'             => 0,
+		'enable_blocks'             => 1,
 	];
 }
 
@@ -38,7 +38,7 @@ function bl_theme_feature_defaults(): array
  */
 function bl_theme_feature_default_off_when_missing(): array
 {
-	return ['enable_languages', 'enable_editorial', 'enable_webp', 'enable_webp_convert_original', 'enable_matomo', 'enable_blocks'];
+	return ['enable_languages', 'enable_editorial', 'enable_webp', 'enable_webp_convert_original', 'enable_matomo'];
 }
 
 /**

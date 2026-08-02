@@ -287,6 +287,7 @@ require_once BL_BLOCKS_PATH . 'includes/template-starter.php';
 if (is_admin()) {
 	require_once BL_BLOCKS_PATH . 'includes/admin.php';
 	require_once BL_BLOCKS_PATH . 'includes/admin-editor.php';
+	require_once BL_BLOCKS_PATH . 'includes/import-export.php';
 }
 
 /**

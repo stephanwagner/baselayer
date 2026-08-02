@@ -541,31 +541,6 @@ function bl_render_installer(): void
 
         <hr>
 
-        <h2><?= esc_html__('Advanced Custom Fields', 'baselayer') ?></h2>
-
-        <p class="description"><?= esc_html__('This theme relies heavily on ACF Pro for custom fields, blocks, and flexible content. A valid license keeps updates and Pro features available.', 'baselayer') ?></p>
-
-        <?php
-        $acf_license_defined = bl_install_acf_pro_license_is_defined();
-        $acf_license_submitted = (string) $bl_install_val(['install', 'acf_pro_key'], '');
-        ?>
-
-        <table class="form-table" role="presentation">
-          <tr>
-            <th scope="row"><label for="install_acf_pro_key"><?= esc_html__('ACF Pro license key', 'baselayer') ?></label></th>
-            <td>
-              <?php if ($acf_license_defined) : ?>
-                <p class="description" style="margin-top: 0;"><?= esc_html__('An ACF Pro license key is already defined in the configuration.', 'baselayer') ?></p>
-              <?php else : ?>
-                <input type="text" name="install[acf_pro_key]" id="install_acf_pro_key" value="<?= esc_attr($acf_license_submitted) ?>" class="large-text code bl-code-small" autocomplete="off" spellcheck="false" style="max-width: 600px;">
-                <p class="description"><?= esc_html__('Optional. If entered and not already present, it will be added to wp-config.php.', 'baselayer') ?></p>
-              <?php endif; ?>
-            </td>
-          </tr>
-        </table>
-
-        <hr>
-
         <h2><?= esc_html__('Administrator email', 'baselayer') ?></h2>
 
         <div style="margin-bottom: 16px;">
@@ -793,7 +768,6 @@ function baselayer_install_redirect_with_errors(array $errors): void
       'media' => !empty($_POST['install']['media']),
       'permalinks' => !empty($_POST['install']['permalinks']),
       'htaccess' => !empty($_POST['install']['htaccess']),
-      'acf_pro_key' => bl_install_sanitize_acf_pro_license((string) ($_POST['install']['acf_pro_key'] ?? '')),
       'content' => [
         'seed_mode' => (($_POST['install']['content']['seed_mode'] ?? '') === 'test') ? 'test' : 'sample',
         'post' => !empty($_POST['install']['content']['post']),
@@ -1019,21 +993,6 @@ function baselayer_run_install(): void
   if ($installHtaccess) {
     bl_write_htaccess();
   }
-
-  /**
-   * ACF Pro license in wp-config.php (when provided and not already defined).
-   */
-  $acf_license_result = bl_install_write_acf_pro_license(
-    (string) ($_POST['install']['acf_pro_key'] ?? '')
-  );
-  if (is_wp_error($acf_license_result)) {
-    baselayer_install_redirect_with_errors([$acf_license_result->get_error_message()]);
-  }
-
-  /**
-   * Activate ACF Pro when present but inactive.
-   */
-  bl_install_activate_acf_pro();
 
   /**
    * Standard pages (always). Menus are assigned after content types are registered.

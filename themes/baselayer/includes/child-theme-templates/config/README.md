@@ -16,9 +16,8 @@ Shipped stubs (edit as needed):
 `content-types/` is copied from the parent on install (`baselayer/config/content-types/`).
 When a child theme is active, only these files are loaded — there is no parent fallback.
 
-File-based CPTs only (e.g. `post.php`, `project.php`). **Events** are not content-types files: they are toggled under Developer → Features and configured in admin (each event type’s menu → Settings). Do not put `packages/` in the child; Forms/Events load from the parent.
+File-based CPTs only (e.g. `post.php`, `project.php`). **Events** are not content-types files: they are toggled under Developer → Features and configured in admin (each event type’s menu → Settings). Do not put `packages/` in the child; Forms/Events/Blocks load from the parent.
 
-## ACF blocks
+## Blocks
 
-Block registration lives under `acf/blocks.php`. See that stub for
-merge-by-name rules and how to override render templates.
+BaseLayer Blocks definitions live in the database (Blocks admin). Theme templates and assets go under `blocks/{slug}/`. Optional ACF support is a separate drop-in — copy repo `acf/` into the theme and see that package’s README.

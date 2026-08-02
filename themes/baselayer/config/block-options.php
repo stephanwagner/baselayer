@@ -363,7 +363,7 @@ return [
 		['preset' => 'container-margin', 'blocks' => ['core/buttons'], 'target' => 'block_option'],
 		['preset' => 'button-extras', 'blocks' => ['core/button'], 'target' => 'block_option'],
 
-		// ACF
+		// ACF (optional drop-in)
 		['preset' => 'icon-align', 'blocks' => ['acf/icon'], 'target' => 'block_option'],
 		['preset' => 'container-margin', 'blocks' => ['acf/icon'], 'target' => 'block_option'],
 		['preset' => 'icon-text-position', 'blocks' => ['acf/icon-text'], 'target' => 'block_option'],
@@ -371,6 +371,9 @@ return [
 		['preset' => 'align-wide-container', 'blocks' => ['acf/slider', 'acf/map', 'acf/article-list', 'acf/number-ticker'], 'target' => 'block_option'],
 		['preset' => 'container-margin-m', 'blocks' => ['acf/slider', 'acf/map', 'acf/article-list', 'acf/number-ticker'], 'target' => 'block_option'],
 		['preset' => 'container-padding-m', 'blocks' => ['acf/slider'], 'target' => 'block_option'],
+
+		// BaseLayer Blocks
+		['preset' => 'container-margin-m', 'blocks' => ['baselayer/accordion'], 'target' => 'block_option'],
 
 		// Forms
 		['preset' => 'container-margin-m', 'blocks' => ['baselayer/form'], 'target' => 'block_option'],

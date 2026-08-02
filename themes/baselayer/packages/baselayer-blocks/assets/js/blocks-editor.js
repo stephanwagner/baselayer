@@ -4267,7 +4267,7 @@
     }
     const { createElement: el5, Fragment, RawHTML, useState, useEffect, useRef } = wp2.element;
     const { Button, PanelBody, ToolbarGroup, ToolbarButton, Placeholder, Spinner } = wp2.components;
-    const { InspectorControls, BlockControls, useBlockProps } = wp2.blockEditor || {};
+    const { InspectorControls, BlockControls, useBlockProps, InnerBlocks } = wp2.blockEditor || {};
     const { registerBlockType } = wp2.blocks;
     const { registerPlugin } = wp2.plugins || {};
     const { PluginDocumentSettingPanel } = wp2.editPost || wp2.editor || {};
@@ -4425,8 +4425,84 @@
       }
       return el5(RawHTML, null, response.content);
     }
+    function AccordionInnerEdit({ values, blockProps }) {
+      const title = typeof values.title === "string" ? values.title : "";
+      const isOpen = !!values.accordion_is_open;
+      const className = [
+        "bl-wp-block",
+        "accordion__wrapper",
+        isOpen ? "accordion-open" : "",
+        blockProps.className || ""
+      ].filter(Boolean).join(" ");
+      return el5(
+        "div",
+        {
+          ...blockProps,
+          className,
+          "data-accordion-is-open": isOpen ? "true" : "false"
+        },
+        el5(
+          "div",
+          { className: "accordion__container" },
+          el5(
+            "div",
+            {
+              className: "accordion__header noselect",
+              role: "button",
+              tabIndex: 0,
+              "aria-expanded": isOpen ? "true" : "false"
+            },
+            el5("div", { className: "accordion__title" }, title || blockI18n.innerBlocksTitle || "Title"),
+            el5(
+              "div",
+              { className: "accordion__icon", "aria-hidden": "true" },
+              el5(
+                "svg",
+                {
+                  xmlns: "http://www.w3.org/2000/svg",
+                  height: "24px",
+                  viewBox: "0 -960 960 960",
+                  width: "24px",
+                  fill: "currentColor"
+                },
+                el5("path", {
+                  d: "M466.54-375.23q-6.23-2.31-11.85-7.92L274.92-562.92q-8.3-8.31-8.5-20.89-.19-12.57 8.5-21.27 8.7-8.69 21.08-8.69 12.38 0 21.08 8.69L480-442.15l162.92-162.93q8.31-8.3 20.89-8.5 12.57-.19 21.27 8.5 8.69 8.7 8.69 21.08 0 12.38-8.69 21.08L505.31-383.15q-5.62 5.61-11.85 7.92-6.23 2.31-13.46 2.31t-13.46-2.31Z"
+                })
+              )
+            )
+          ),
+          el5(
+            "div",
+            { className: "accordion__content" },
+            el5(
+              "div",
+              { className: "accordion__content-inner" },
+              InnerBlocks ? el5(InnerBlocks, {
+                renderAppender: InnerBlocks.ButtonBlockAppender
+              }) : null
+            )
+          )
+        )
+      );
+    }
+    function InnerBlocksShell({ values, blockProps, slug }) {
+      if (slug === "accordion") {
+        return el5(AccordionInnerEdit, { values, blockProps });
+      }
+      return el5(
+        "div",
+        { ...blockProps, className: (blockProps.className || "") + " bl-blocks-block-editor bl-blocks-block-editor--inner" },
+        el5(
+          "div",
+          { className: "bl-blocks-block-editor__inner-fields" },
+          el5("strong", null, values.title || "")
+        ),
+        InnerBlocks ? el5(InnerBlocks, { renderAppender: InnerBlocks.ButtonBlockAppender }) : null
+      );
+    }
     (blockConfig.blocks || []).forEach((def) => {
       if (!def || !def.name) return;
+      const supportsInnerBlocks = !!def.supportsInnerBlocks;
       registerBlockType(def.name, {
         apiVersion: 3,
         title: def.title || def.slug,
@@ -4465,11 +4541,19 @@
             def.title
           );
           const blockProps = useBlockProps ? useBlockProps({ className: "bl-blocks-block-editor" }) : { className: "bl-blocks-block-editor" };
-          const preview = apiFetch ? el5(BlockServerPreview, { name: def.name, values }) : el5(
+          const preview = supportsInnerBlocks ? el5(InnerBlocksShell, {
+            values,
+            blockProps,
+            slug: def.slug || ""
+          }) : apiFetch ? el5("div", blockProps, el5(BlockServerPreview, { name: def.name, values })) : el5(
             "div",
-            { className: "bl-blocks-block-editor__fallback" },
-            el5("strong", null, def.title || def.slug),
-            el5("p", null, blockI18n.preview || "Edit fields to configure this block.")
+            blockProps,
+            el5(
+              "div",
+              { className: "bl-blocks-block-editor__fallback" },
+              el5("strong", null, def.title || def.slug),
+              el5("p", null, blockI18n.preview || "Edit fields to configure this block.")
+            )
           );
           const inspectorBody = sidebarEditing ? el5(SidebarFields, {
             fields: def.fields || [],
@@ -4511,10 +4595,13 @@
                 inspectorBody
               )
             ) : null,
-            el5("div", blockProps, preview)
+            preview
           );
         },
         save: function save2() {
+          if (supportsInnerBlocks && InnerBlocks && InnerBlocks.Content) {
+            return el5(InnerBlocks.Content);
+          }
           return null;
         }
       });

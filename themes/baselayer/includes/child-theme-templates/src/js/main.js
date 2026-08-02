@@ -11,8 +11,8 @@
  *   npm run watch
  */
 
-// ACF blocks
-import '../../acf/blocks/blocks.js';
+// Optional ACF drop-in (copy repo acf/ into this child, then uncomment):
+// import '../../acf/blocks/blocks.js';
 
 // BaseLayer custom blocks
 import '../../blocks/blocks.js';

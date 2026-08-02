@@ -268,6 +268,7 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'empty'                    => __('Drag a field here.', 'baselayer-blocks'),
 		'settingsActive'           => __('Active', 'baselayer-blocks'),
 		'settingsSidebarEditing'   => __('Allow editing directly in sidebar', 'baselayer-blocks'),
+		'settingsSupportsInnerBlocks' => __('Allow nested blocks (InnerBlocks)', 'baselayer-blocks'),
 		'settingsSlug'             => __('Slug', 'baselayer-blocks'),
 		'settingsSlugHelp'         => __('Internal key used in code and storage. Lowercase letters, numbers, and hyphens.', 'baselayer-blocks'),
 		'settingsDescription'      => __('Description', 'baselayer-blocks'),

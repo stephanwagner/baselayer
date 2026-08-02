@@ -58,8 +58,6 @@
 @forward 'admin/field-builder';
 @forward 'admin/post-states';
 
-// Blocks
-@forward '../../acf/blocks/blocks';
-@forward '../../acf/blocks/blocks-editor';
+// Blocks (BaseLayer). Optional ACF: @forward '../../acf/blocks/blocks' (+ blocks-editor) after copying repo acf/ into the theme.
 @forward '../../blocks/blocks';
 @forward '../../blocks/blocks-editor';

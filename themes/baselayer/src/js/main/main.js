@@ -17,8 +17,7 @@ import '../components/modal';
 import '../components/lightbox';
 import '../components/google-translate';
 
-// Blocks
-import '../../../acf/blocks/blocks.js';
+// Blocks (BaseLayer). Optional ACF: import '../../../acf/blocks/blocks.js' after copying repo acf/ into the theme.
 import '../../../blocks/blocks.js';
 
 // Delay initial animations

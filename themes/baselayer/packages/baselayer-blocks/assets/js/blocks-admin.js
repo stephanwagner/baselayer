@@ -1380,6 +1380,16 @@
         }
       }
     );
+    const { root: innerBlocksRow } = plainSwitch(
+      t2("settingsSupportsInnerBlocks", "Allow nested blocks (InnerBlocks)"),
+      {
+        checked: !!state.supports_inner_blocks,
+        onChange: (checked) => {
+          state.supports_inner_blocks = checked;
+          notify();
+        }
+      }
+    );
     const slugInput = el("input", {
       type: "text",
       className: "widefat",
@@ -1431,6 +1441,7 @@
     ];
     if (definitionType === "block") {
       children.push(sidebarEditingRow);
+      children.push(innerBlocksRow);
     }
     children.push(
       fieldRow(t2("settingsSlug", "Slug"), slugInput, t2("settingsSlugHelp", "")),

@@ -10,7 +10,7 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
 
   const { createElement: el, Fragment, RawHTML, useState, useEffect, useRef } = wp.element;
   const { Button, PanelBody, ToolbarGroup, ToolbarButton, Placeholder, Spinner } = wp.components;
-  const { InspectorControls, BlockControls, useBlockProps } = wp.blockEditor || {};
+  const { InspectorControls, BlockControls, useBlockProps, InnerBlocks } = wp.blockEditor || {};
   const { registerBlockType } = wp.blocks;
   const { registerPlugin } = wp.plugins || {};
   const { PluginDocumentSettingPanel } = wp.editPost || wp.editor || {};
@@ -208,8 +208,93 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
     return el(RawHTML, null, response.content);
   }
 
+  function AccordionInnerEdit({ values, blockProps }) {
+    const title = typeof values.title === 'string' ? values.title : '';
+    const isOpen = !!values.accordion_is_open;
+    const className = [
+      'bl-wp-block',
+      'accordion__wrapper',
+      isOpen ? 'accordion-open' : '',
+      blockProps.className || '',
+    ]
+      .filter(Boolean)
+      .join(' ');
+
+    return el(
+      'div',
+      {
+        ...blockProps,
+        className,
+        'data-accordion-is-open': isOpen ? 'true' : 'false',
+      },
+      el(
+        'div',
+        { className: 'accordion__container' },
+        el(
+          'div',
+          {
+            className: 'accordion__header noselect',
+            role: 'button',
+            tabIndex: 0,
+            'aria-expanded': isOpen ? 'true' : 'false',
+          },
+          el('div', { className: 'accordion__title' }, title || blockI18n.innerBlocksTitle || 'Title'),
+          el(
+            'div',
+            { className: 'accordion__icon', 'aria-hidden': 'true' },
+            el(
+              'svg',
+              {
+                xmlns: 'http://www.w3.org/2000/svg',
+                height: '24px',
+                viewBox: '0 -960 960 960',
+                width: '24px',
+                fill: 'currentColor',
+              },
+              el('path', {
+                d: 'M466.54-375.23q-6.23-2.31-11.85-7.92L274.92-562.92q-8.3-8.31-8.5-20.89-.19-12.57 8.5-21.27 8.7-8.69 21.08-8.69 12.38 0 21.08 8.69L480-442.15l162.92-162.93q8.31-8.3 20.89-8.5 12.57-.19 21.27 8.5 8.69 8.7 8.69 21.08 0 12.38-8.69 21.08L505.31-383.15q-5.62 5.61-11.85 7.92-6.23 2.31-13.46 2.31t-13.46-2.31Z',
+              })
+            )
+          )
+        ),
+        el(
+          'div',
+          { className: 'accordion__content' },
+          el(
+            'div',
+            { className: 'accordion__content-inner' },
+            InnerBlocks
+              ? el(InnerBlocks, {
+                  renderAppender: InnerBlocks.ButtonBlockAppender,
+                })
+              : null
+          )
+        )
+      )
+    );
+  }
+
+  function InnerBlocksShell({ values, blockProps, slug }) {
+    if (slug === 'accordion') {
+      return el(AccordionInnerEdit, { values, blockProps });
+    }
+
+    return el(
+      'div',
+      { ...blockProps, className: (blockProps.className || '') + ' bl-blocks-block-editor bl-blocks-block-editor--inner' },
+      el('div', { className: 'bl-blocks-block-editor__inner-fields' },
+        el('strong', null, values.title || '')
+      ),
+      InnerBlocks
+        ? el(InnerBlocks, { renderAppender: InnerBlocks.ButtonBlockAppender })
+        : null
+    );
+  }
+
   (blockConfig.blocks || []).forEach((def) => {
     if (!def || !def.name) return;
+
+    const supportsInnerBlocks = !!def.supportsInnerBlocks;
 
     registerBlockType(def.name, {
       apiVersion: 3,
@@ -256,14 +341,24 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
           ? useBlockProps({ className: 'bl-blocks-block-editor' })
           : { className: 'bl-blocks-block-editor' };
 
-        const preview = apiFetch
-          ? el(BlockServerPreview, { name: def.name, values })
-          : el(
-              'div',
-              { className: 'bl-blocks-block-editor__fallback' },
-              el('strong', null, def.title || def.slug),
-              el('p', null, blockI18n.preview || 'Edit fields to configure this block.')
-            );
+        const preview = supportsInnerBlocks
+          ? el(InnerBlocksShell, {
+              values,
+              blockProps,
+              slug: def.slug || '',
+            })
+          : apiFetch
+            ? el('div', blockProps, el(BlockServerPreview, { name: def.name, values }))
+            : el(
+                'div',
+                blockProps,
+                el(
+                  'div',
+                  { className: 'bl-blocks-block-editor__fallback' },
+                  el('strong', null, def.title || def.slug),
+                  el('p', null, blockI18n.preview || 'Edit fields to configure this block.')
+                )
+              );
 
         const inspectorBody = sidebarEditing
           ? el(SidebarFields, {
@@ -312,10 +407,13 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
                 )
               )
             : null,
-          el('div', blockProps, preview)
+          preview
         );
       },
       save: function save() {
+        if (supportsInnerBlocks && InnerBlocks && InnerBlocks.Content) {
+          return el(InnerBlocks.Content);
+        }
         return null;
       },
     });

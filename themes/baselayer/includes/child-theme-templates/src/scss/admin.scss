@@ -11,9 +11,9 @@
 // Child-only CSS custom properties
 @forward 'root';
 
-// Child ACF blocks
-@forward '../../acf/blocks/blocks';
-@forward '../../acf/blocks/blocks-editor';
+// Optional ACF drop-in (copy repo acf/ into this child, then uncomment):
+// @forward '../../acf/blocks/blocks';
+// @forward '../../acf/blocks/blocks-editor';
 
 // Child BaseLayer custom blocks
 @forward '../../blocks/blocks';

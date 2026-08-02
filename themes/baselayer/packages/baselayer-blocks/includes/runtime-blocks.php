@@ -111,10 +111,11 @@ function bl_blocks_block_definition_payload(WP_Post $post): ?array
 		'iconRaw'         => $raw_icon,
 		'category'        => (string) ($config['settings']['block_category'] ?? 'widgets'),
 		'keywords'        => $keywords,
-		'fields'          => $config['fields'],
-		'sidebarEditing'  => !empty($config['settings']['sidebar_editing']),
-		'templateExists'  => bl_blocks_locate_template($slug) !== '',
-		'createPath'      => bl_blocks_template_info($slug)['create_path'],
+		'fields'             => $config['fields'],
+		'sidebarEditing'     => !empty($config['settings']['sidebar_editing']),
+		'supportsInnerBlocks'=> !empty($config['settings']['supports_inner_blocks']),
+		'templateExists'     => bl_blocks_locate_template($slug) !== '',
+		'createPath'         => bl_blocks_template_info($slug)['create_path'],
 	];
 }
 
@@ -194,9 +195,13 @@ function bl_blocks_register_dynamic_blocks(): void
 				'anchor'    => true,
 			],
 			'render_callback' => static function (array $attributes, string $content, $block) use ($def): string {
-				return bl_blocks_render_block($def, $attributes);
+				return bl_blocks_render_block($def, $attributes, $content);
 			},
 		];
+		if (!empty($def['supportsInnerBlocks'])) {
+			// Inner content is saved via InnerBlocks.Content in the editor script.
+			$args['supports']['innerBlocks'] = true;
+		}
 		if ($editor_script !== '') {
 			$args['editor_script'] = $editor_script;
 			$args['editor_style'] = 'bl-blocks-editor';
@@ -519,12 +524,12 @@ function bl_blocks_render_missing_template_notice(string $slug, array $def): str
  * Front/editor render: theme template when present, otherwise notice (editor) or field dump.
  *
  * Template path: blocks/{slug}/{slug}.php (child theme preferred).
- * Available in the template: bl_block_field(), $values, $fields, $block, $attributes, $def.
+ * Available in the template: bl_block_field(), $values, $fields, $block, $attributes, $def, $content.
  *
  * @param array<string, mixed> $def
  * @param array<string, mixed> $attributes
  */
-function bl_blocks_render_block(array $def, array $attributes): string
+function bl_blocks_render_block(array $def, array $attributes, string $content = ''): string
 {
 	$values = isset($attributes['values']) && is_array($attributes['values'])
 		? bl_blocks_sanitize_values($def['fields'], $attributes['values'])

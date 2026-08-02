@@ -1,7 +1,16 @@
 <?php
 
+defined('ABSPATH') || exit;
+
+/**
+ * Absolute path to this ACF drop-in package.
+ */
+if (!defined('BL_ACF_PATH')) {
+	define('BL_ACF_PATH', __DIR__ . '/');
+}
+
 // Import block filters
-include __DIR__ . '/block-filters.php';
+require_once BL_ACF_PATH . 'block-filters.php';
 
 /**
  * Load a blocks.php file if readable.
@@ -34,33 +43,30 @@ function bl_get_acf_blocks(): array
 		return $blocks;
 	}
 
-	$parent_path = get_template_directory() . '/acf/blocks.php';
+	// Prefer theme paths; fall back to this package's blocks.php (same folder when drop-in is copied).
+	$paths = [
+		get_template_directory() . '/acf/blocks.php',
+		get_stylesheet_directory() . '/acf/blocks.php',
+		BL_ACF_PATH . 'blocks.php',
+	];
+	$paths = array_values(array_unique($paths));
+
 	$by_name = [];
 	$order = [];
 
-	foreach (bl_load_acf_blocks_file($parent_path) as $block) {
-		if (!is_array($block) || empty($block['name']) || !is_string($block['name'])) {
-			continue;
-		}
-		$name = $block['name'];
-		$by_name[$name] = $block;
-		$order[] = $name;
-	}
-
-	if (is_child_theme()) {
-		$child_path = get_stylesheet_directory() . '/acf/blocks.php';
-		if ($child_path !== $parent_path) {
-			foreach (bl_load_acf_blocks_file($child_path) as $block) {
-				if (!is_array($block) || empty($block['name']) || !is_string($block['name'])) {
-					continue;
-				}
-				$name = $block['name'];
-				if (isset($by_name[$name])) {
-					$by_name[$name] = bl_config_merge_deep($by_name[$name], $block);
-				} else {
-					$by_name[$name] = $block;
-					$order[] = $name;
-				}
+	foreach ($paths as $catalog_path) {
+		foreach (bl_load_acf_blocks_file($catalog_path) as $block) {
+			if (!is_array($block) || empty($block['name']) || !is_string($block['name'])) {
+				continue;
+			}
+			$name = $block['name'];
+			if (isset($by_name[$name])) {
+				$by_name[$name] = function_exists('bl_config_merge_deep')
+					? bl_config_merge_deep($by_name[$name], $block)
+					: array_replace_recursive($by_name[$name], $block);
+			} else {
+				$by_name[$name] = $block;
+				$order[] = $name;
 			}
 		}
 	}
@@ -686,20 +692,58 @@ function bl_acf_inner_blocks_toolbar_config(): array
 }
 
 /**
- * Expose inner-blocks toolbar config to the block editor.
- *
- * @return void
+ * Public URL for a file inside this ACF drop-in (theme-relative when possible).
  */
-function bl_acf_inner_blocks_toolbar_localize(): void
+function bl_acf_package_url(string $relative): string
 {
-	if (!wp_script_is('baselayer-editor', 'registered')) {
+	$relative = ltrim(str_replace('\\', '/', $relative), '/');
+	$path = BL_ACF_PATH . $relative;
+
+	foreach (
+		[
+			[get_stylesheet_directory(), get_stylesheet_directory_uri()],
+			[get_template_directory(), get_template_directory_uri()],
+		] as [$dir, $uri]
+	) {
+		$root = trailingslashit($dir);
+		if (str_starts_with($path, $root)) {
+			return trailingslashit($uri) . ltrim(substr($path, strlen($root)), '/');
+		}
+	}
+
+	$content = trailingslashit(WP_CONTENT_DIR);
+	if (str_starts_with($path, $content)) {
+		return content_url(ltrim(substr($path, strlen($content)), '/'));
+	}
+
+	return '';
+}
+
+/**
+ * Enqueue ACF editor helpers (inner-blocks toolbar) and localize config.
+ */
+function bl_acf_enqueue_editor_assets(): void
+{
+	$config = bl_acf_inner_blocks_toolbar_config();
+	if ($config === []) {
 		return;
 	}
 
-	wp_localize_script(
-		'baselayer-editor',
-		'baselayerAcfInnerBlocksToolbar',
-		bl_acf_inner_blocks_toolbar_config()
+	$relative = 'assets/js/acf-inner-blocks-toolbar.js';
+	$src = bl_acf_package_url($relative);
+	$file = BL_ACF_PATH . $relative;
+	if ($src === '' || !is_readable($file)) {
+		return;
+	}
+
+	$handle = 'baselayer-acf-inner-blocks-toolbar';
+	wp_enqueue_script(
+		$handle,
+		$src,
+		['wp-block-editor', 'wp-blocks', 'wp-components', 'wp-compose', 'wp-data', 'wp-element', 'wp-hooks'],
+		(string) filemtime($file),
+		true
 	);
+	wp_localize_script($handle, 'baselayerAcfInnerBlocksToolbar', $config);
 }
-add_action('enqueue_block_editor_assets', 'bl_acf_inner_blocks_toolbar_localize', 11);
+add_action('enqueue_block_editor_assets', 'bl_acf_enqueue_editor_assets', 11);

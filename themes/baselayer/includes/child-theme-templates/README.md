@@ -35,10 +35,11 @@ Use as:
 
 They also appear under **Theme** in the icon picker. An example `logo-child.svg` is included.
 
-## Packages (Forms, Events)
+## Packages (Forms, Events, Blocks)
 
-Do **not** copy `packages/` into the child. Forms and Events always load from the parent theme (or as standalone plugins). Parent updates replace package code; site config stays in the database.
+Do **not** copy `packages/` into the child. Forms, Events, and Blocks always load from the parent theme (or as standalone plugins). Parent updates replace package code; site config stays in the database.
 
+- **Blocks:** on by default (Developer → Features). Custom block PHP/SCSS/JS live under `blocks/` in this theme. Import the Accordion starter via **Blocks → Import / Export** (`packages/baselayer-blocks/import/accordion.json` in the parent).
 - **Forms:** Developer → Features → Enable forms
 - **Events:** Developer → Features → Enable events, then configure each type under its menu → Settings (developers only; stored in `bl_events_instances` — not `config/content-types/`)
 
@@ -55,12 +56,14 @@ Optional Events markup overrides (child wins via the same template paths as the 
 - **`config/block-options.php`:** presets and assignments for editor sidebar options (merged over parent).
 - Optional templates: `templates/…` (same paths as the parent; child wins)
 
-## Add an ACF block
+## Optional ACF drop-in
 
-1. Register (or override) the block in `acf/blocks.php` (merged with parent by `name`)
-2. Add `acf/blocks/{name}/{name}.php`
-3. Add styles/scripts under `acf/blocks/{name}/`, then `@forward` / `import` them in `_blocks.scss`, `_blocks-editor.scss`, and `blocks.js`
-4. Create the block’s fields in **ACF** (WP admin) — field groups are not synced from theme files
-5. `npm run build`
+ACF is not shipped in the theme. To use ACF Pro blocks:
 
-See the commented `my-block` example under `acf/blocks/` for the file layout.
+1. Install/activate **ACF Pro**
+2. Copy the repo-root `acf/` folder into this child (or the parent) as `acf/`
+3. Uncomment the ACF `@forward` / `import` lines in `src/scss/main.scss`, `src/scss/admin.scss`, and `src/js/main.js`
+4. `npm run build`
+5. Optionally import field groups from `acf/acf-import-en.json` / `acf-import-de.json`
+
+See `acf/README.md` in the BaseLayer repository for details.

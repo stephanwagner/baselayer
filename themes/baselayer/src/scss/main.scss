@@ -54,8 +54,7 @@
 // Pages
 @forward 'layout/page-not-found';
 
-// Blocks
-@forward '../../acf/blocks/blocks';
+// Blocks (BaseLayer). Optional ACF: @forward '../../acf/blocks/blocks' after copying repo acf/ into the theme.
 @forward '../../blocks/blocks';
 
 // Block adjustments

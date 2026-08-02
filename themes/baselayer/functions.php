@@ -140,6 +140,12 @@ if (!function_exists('bl_breadcrumbs')) {
 	}
 }
 
-// ACF
-require_once __DIR__ . '/acf/acf.php';
-require_once __DIR__ . '/acf/acf-import-notice.php';
+// Optional ACF drop-in: copy repo `acf/` into the active theme or child as `acf/`.
+foreach ([get_stylesheet_directory(), get_template_directory()] as $bl_acf_dir) {
+	$bl_acf_bootstrap = $bl_acf_dir . '/acf/acf.php';
+	if (is_readable($bl_acf_bootstrap)) {
+		require_once $bl_acf_bootstrap;
+		break;
+	}
+}
+unset($bl_acf_dir, $bl_acf_bootstrap);

@@ -143,6 +143,9 @@ function bl_blocks_parent_file($file)
 	if (isset($_GET['page']) && $_GET['page'] === 'bl-blocks-website') {
 		return 'bl-blocks-website';
 	}
+	if (isset($_GET['page']) && $_GET['page'] === 'bl-blocks-import-export') {
+		return 'bl-blocks';
+	}
 
 	$screen = function_exists('get_current_screen') ? get_current_screen() : null;
 	if ($screen && $screen->post_type === BL_BLOCK_POST_TYPE) {
@@ -162,6 +165,9 @@ function bl_blocks_submenu_file($submenu_file, $parent_file)
 {
 	if (isset($_GET['page']) && $_GET['page'] === 'bl-blocks-website') {
 		return 'bl-blocks-website';
+	}
+	if (isset($_GET['page']) && $_GET['page'] === 'bl-blocks-import-export') {
+		return 'bl-blocks-import-export';
 	}
 	$screen = function_exists('get_current_screen') ? get_current_screen() : null;
 	if ($screen && $screen->post_type === BL_BLOCK_POST_TYPE) {

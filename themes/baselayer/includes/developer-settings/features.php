@@ -232,7 +232,7 @@ function bl_render_developer_features(): void
 						<td>
 							<input type="hidden" name="baselayer_features[enable_blocks]" value="0">
 							<label><input type="checkbox" name="baselayer_features[enable_blocks]" value="1" <?= checked($feat('enable_blocks'), 1, false) ?>> <?= esc_html__('Enable Blocks package', 'baselayer') ?></label>
-							<p class="description bl-indent-checkbox"><?= esc_html__('Adds an admin UI to create custom Gutenberg blocks.', 'baselayer') ?></p>
+							<p class="description bl-indent-checkbox"><?= esc_html__('Admin UI for custom Gutenberg blocks, Content fields, and Website definitions. Includes built-in blocks such as Accordion. Optional ACF support is a separate drop-in folder (see theme docs).', 'baselayer') ?></p>
 						</td>
 					</tr>
 				</table>
