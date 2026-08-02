@@ -305,9 +305,175 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
     );
   }
 
-  function InnerBlocksShell({ values, blockProps, slug, def, isSelected, clientId }) {
+  function openThemeIconPicker(current, onSelect, returnFocus) {
+    import('../../../../src/js/editor/icons/icon-picker-service.js')
+      .then(({ openIconPicker }) => {
+        openIconPicker({
+          currentValue: current || '',
+          onSelect,
+          returnFocus: returnFocus || null,
+        });
+      })
+      .catch(() => {});
+  }
+
+  function IconPickerButton({ value, onChange, isSelected }) {
+    const slug = typeof value === 'string' ? value : '';
+    if (!slug) {
+      return el(
+        'button',
+        {
+          type: 'button',
+          className: 'bl-inline-icon-control__placeholder',
+          onClick: (evt) => openThemeIconPicker('', onChange, evt.currentTarget),
+        },
+        el('span', { className: 'bl-inline-icon-control__placeholder-label' }, blockI18n.chooseIcon || 'Choose icon')
+      );
+    }
+    return el(
+      'div',
+      { className: 'bl-inline-icon-control__selected' },
+      el('span', { className: 'bl-icon -icon-' + slug, 'aria-hidden': 'true' }),
+      isSelected
+        ? el(
+            'button',
+            {
+              type: 'button',
+              className: 'bl-inline-icon-control__action',
+              onClick: (evt) => openThemeIconPicker(slug, onChange, evt.currentTarget),
+            },
+            el('span', { className: 'bl-icon -icon-edit', 'aria-hidden': 'true' })
+          )
+        : null
+    );
+  }
+
+  function IconInnerEdit({ values, blockProps, isSelected, onChangeValues }) {
+    const iconSlug = typeof values.icon === 'string' ? values.icon : '';
+    return el(
+      'div',
+      {
+        ...blockProps,
+        className: [blockProps.className || '', 'bl-wp-block', 'icon__wrapper'].filter(Boolean).join(' '),
+      },
+      el(
+        'div',
+        { className: 'icon__container' },
+        el(
+          'div',
+          { className: 'icon__icon' + (iconSlug ? ' -has-icon' : '') },
+          el('div', { className: 'bl-inline-icon-control' + (isSelected ? ' is-active' : '') },
+            el(IconPickerButton, {
+              value: iconSlug,
+              isSelected,
+              onChange: (next) => onChangeValues({ ...values, icon: next || '' }),
+            })
+          )
+        )
+      )
+    );
+  }
+
+  function IconTextInnerEdit({ values, blockProps, def, isSelected, onChangeValues }) {
+    const iconSlug = typeof values.icon === 'string' ? values.icon : '';
+    return el(
+      'div',
+      {
+        ...blockProps,
+        className: [blockProps.className || '', 'bl-wp-block', 'icon-text__wrapper'].filter(Boolean).join(' '),
+      },
+      el(
+        'div',
+        { className: 'icon-text__container' },
+        el(
+          'div',
+          { className: 'icon-text__content' },
+          el(
+            'div',
+            { className: 'icon-text__icon icon__icon' + (iconSlug ? ' -has-icon' : '') },
+            el('div', { className: 'bl-inline-icon-control' + (isSelected ? ' is-active' : '') },
+              el(IconPickerButton, {
+                value: iconSlug,
+                isSelected,
+                onChange: (next) => onChangeValues({ ...values, icon: next || '' }),
+              })
+            )
+          ),
+          el(
+            'div',
+            { className: 'icon-text__text-container' },
+            el(
+              'div',
+              { className: 'icon-text__text' },
+              InnerBlocks ? el(InnerBlocks, innerBlocksProps(def)) : null
+            )
+          )
+        )
+      )
+    );
+  }
+
+  function SliderInnerEdit({ values, blockProps, def }) {
+    const perView = values.slides_per_view || 1;
+    const hasContent = !!values.has_content;
+    return el(
+      'div',
+      {
+        ...blockProps,
+        className: [blockProps.className || '', 'bl-wp-block', 'slider__wrapper'].filter(Boolean).join(' '),
+        'data-slider-slides-per-view': String(perView),
+        'data-slider-has-content': hasContent ? 'true' : 'false',
+        style: {
+          ...(blockProps.style || {}),
+          '--slider-editor-slide-gap': (values.space_between != null ? values.space_between : 16) + 'px',
+        },
+      },
+      el(
+        'div',
+        { className: 'slider__container' },
+        el(
+          'div',
+          { className: 'slider__slides' },
+          el('div', { className: 'swiper' }, InnerBlocks ? el(InnerBlocks, innerBlocksProps(def)) : null)
+        )
+      )
+    );
+  }
+
+  function SliderSlideInnerEdit({ blockProps, def }) {
+    return el(
+      'div',
+      {
+        ...blockProps,
+        className: [blockProps.className || '', 'bl-wp-block', 'slider-slide__wrapper', 'swiper-slide'].filter(Boolean).join(' '),
+      },
+      el(
+        'div',
+        { className: 'slider-slide__container' },
+        el(
+          'div',
+          { className: 'slider-slide__content' },
+          InnerBlocks ? el(InnerBlocks, innerBlocksProps(def)) : null
+        )
+      )
+    );
+  }
+
+  function ClientBlockShell({ values, blockProps, slug, def, isSelected, clientId, onChangeValues }) {
     if (slug === 'accordion') {
       return el(AccordionInnerEdit, { values, blockProps, def, isSelected, clientId });
+    }
+    if (slug === 'icon') {
+      return el(IconInnerEdit, { values, blockProps, isSelected, onChangeValues });
+    }
+    if (slug === 'icon-text') {
+      return el(IconTextInnerEdit, { values, blockProps, def, isSelected, onChangeValues });
+    }
+    if (slug === 'slider') {
+      return el(SliderInnerEdit, { values, blockProps, def });
+    }
+    if (slug === 'slider-slide') {
+      return el(SliderSlideInnerEdit, { blockProps, def });
     }
 
     return el(
@@ -324,6 +490,7 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
     if (!def || !def.name) return;
 
     const supportsInnerBlocks = !!def.supportsInnerBlocks;
+    const usesClientShell = supportsInnerBlocks || def.slug === 'icon';
 
     registerBlockType(def.name, {
       apiVersion: 3,
@@ -370,14 +537,15 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
           ? useBlockProps({ className: 'bl-blocks-block-editor' })
           : { className: 'bl-blocks-block-editor' };
 
-        const preview = supportsInnerBlocks
-          ? el(InnerBlocksShell, {
+        const preview = usesClientShell
+          ? el(ClientBlockShell, {
               values,
               blockProps,
               slug: def.slug || '',
               def,
               isSelected,
               clientId,
+              onChangeValues: applyValues,
             })
           : apiFetch
             ? el('div', blockProps, el(BlockServerPreview, { name: def.name, values }))

@@ -296,7 +296,7 @@ function bl_blocks_starter_render_lines(array $entry, string $block_class): arra
  *
  * @param list<array<string, mixed>> $fields
  */
-function bl_blocks_build_starter_template(string $slug, string $title, array $fields): string
+function bl_blocks_build_starter_template(string $slug, string $title, array $fields, bool $supports_inner_blocks = false): string
 {
 	$slug = sanitize_key($slug);
 	if ($slug === '') {
@@ -355,6 +355,12 @@ function bl_blocks_build_starter_template(string $slug, string $title, array $fi
 				$lines[] = $render_line;
 			}
 		}
+	}
+
+	if ($supports_inner_blocks) {
+		$lines[] = "\t<div class=\"" . $class . '__inner">';
+		$lines[] = "\t\t<InnerBlocks />";
+		$lines[] = "\t</div>";
 	}
 
 	$lines[] = '</div>';

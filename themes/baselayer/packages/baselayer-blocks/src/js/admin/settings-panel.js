@@ -341,6 +341,41 @@ export function createSettingsPanel(initial, definitionType, onChange) {
   };
   syncInnerBlocksOptionsVisibility();
 
+  const parentInput = el('input', {
+    type: 'text',
+    className: 'widefat',
+    value: state.parent || '',
+    placeholder: 'baselayer/slider',
+  });
+  parentInput.addEventListener('input', () => {
+    state.parent = parentInput.value;
+    notify();
+  });
+  const parentRow = fieldRow(
+    t('settingsParent', 'Parent blocks'),
+    parentInput,
+    t(
+      'settingsParentHelp',
+      'Comma-separated block names this block may be inserted into (e.g. baselayer/slider). Leave empty for top-level.'
+    )
+  );
+
+  const alignInput = el('input', {
+    type: 'text',
+    className: 'widefat',
+    value: state.align || '',
+    placeholder: 'wide, full',
+  });
+  alignInput.addEventListener('input', () => {
+    state.align = alignInput.value;
+    notify();
+  });
+  const alignRow = fieldRow(
+    t('settingsAlign', 'Alignment supports'),
+    alignInput,
+    t('settingsAlignHelp', 'Comma-separated: wide, full (and optionally left, center, right). Leave empty for none.')
+  );
+
   const slugInput = el('input', {
     type: 'text',
     className: 'widefat',
@@ -407,6 +442,8 @@ export function createSettingsPanel(initial, definitionType, onChange) {
     children.push(innerBlocksRow);
     children.push(innerBlocksAllowedRow);
     children.push(innerBlocksTemplateRow);
+    children.push(parentRow);
+    children.push(alignRow);
   }
 
   children.push(

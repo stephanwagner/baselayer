@@ -1,0 +1,69 @@
+@use '../../src/scss/config' as *;
+@use '../../src/scss/mixins' as *;
+
+.number-ticker__wrapper {
+  position: relative;
+}
+
+.number-ticker__items {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 32px 24px;
+}
+
+.number-ticker__item {
+  position: relative;
+  text-align: center;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 25%;
+  text-align: center;
+
+  @media (max-width: $breakpoint-m) {
+    max-width: 100%;
+    width: calc(50% - 24px / 2);
+    flex: auto;
+  }
+
+  @media (max-width: $breakpoint-xs) {
+    width: 100%;
+  }
+}
+
+.number-ticker__number-container {
+  font-size: 48px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 4px;
+  line-height: 1;
+}
+
+.number-ticker__number {
+  font-weight: 600;
+}
+
+.number-ticker__prefix {
+  font-size: 32px;
+  transform: translateY(-6px);
+  margin-right: 4px;
+}
+
+.number-ticker__suffix {
+  font-size: 38px;
+  align-self: center;
+  font-weight: 600;
+}
+
+.number-ticker__label {
+  font-size: 16px;
+  text-wrap: balance;
+  border-top: 1px solid var(--bl-color-gray-300);
+  padding: 16px 12px 0;
+  margin: 16px 0 0;
+
+  @media (min-resolution: $high-density-dppx) {
+    border-width: 1.5px;
+  }
+}

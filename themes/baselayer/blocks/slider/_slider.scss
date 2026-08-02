@@ -1,0 +1,113 @@
+@use '../../src/scss/config' as *;
+@use '../../src/scss/mixins' as *;
+
+// Wrapper
+
+.slider__wrapper {
+  position: relative;
+
+  .swiper > .acf-innerblocks-container {
+    display: flex;
+    transition-property: transform;
+    box-sizing: content-box;
+  }
+}
+
+// Navigation
+
+.slider__navigation {
+  position: relative;
+  height: 24px;
+  margin: 8px 0 0;
+  display: none;
+
+  .slider__wrapper[data-slider-navigation='true'] &,
+  .slider__wrapper[data-slider-pagination='true'] & {
+    display: block;
+  }
+}
+
+.slider__button-next,
+.slider__button-prev {
+  position: absolute;
+  top: 0;
+  width: 24px;
+  height: 24px;
+  background: none;
+  border: 0;
+  padding: 0;
+  line-height: 0;
+  color: var(--bl-color-gray-500);
+  background: transparent;
+  box-shadow: none;
+  appearance: none;
+  cursor: pointer;
+  transition: transition('color');
+  display: none;
+
+  .slider__wrapper[data-slider-navigation='true'] & {
+    display: block;
+  }
+
+  svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    transition: transition('transform');
+    pointer-events: none;
+  }
+
+  &:hover {
+    color: var(--bl-color-primary);
+  }
+}
+
+.slider__button-next {
+  right: 0;
+
+  &:hover {
+    svg {
+      transform: translateX(3px);
+    }
+  }
+}
+
+.slider__button-prev {
+  left: 0;
+
+  &:hover {
+    svg {
+      transform: translateX(-3px);
+    }
+  }
+}
+
+// Pagination
+
+.slider__pagination.swiper-pagination-horizontal.swiper-pagination-bullets {
+  --swiper-pagination-color: var(--bl-color-gray-500);
+  --swiper-pagination-bullet-inactive-color: var(--bl-color-gray-300);
+  --swiper-pagination-bullet-inactive-opacity: 1;
+  --swiper-pagination-bullet-opacity: 1;
+  --swiper-pagination-bullet-height: 8px;
+  --swiper-pagination-bullet-width: 8px;
+  --swiper-pagination-bullet-horizontal-gap: 3px;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: auto;
+  height: 8px;
+  line-height: 0;
+  display: none;
+
+  .slider__wrapper[data-slider-pagination='true'] & {
+    display: block;
+  }
+
+  .swiper-pagination-bullet {
+    transition: transition('transform', 'left');
+    line-height: 0;
+  }
+}

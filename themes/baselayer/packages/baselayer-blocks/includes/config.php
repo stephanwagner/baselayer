@@ -22,7 +22,7 @@ function bl_blocks_sanitize_definition_type($type): string
 }
 
 /**
- * @return array{active: bool, sidebar_editing: bool, supports_inner_blocks: bool, inner_blocks_allowed: string, inner_blocks_template: string, slug: string, description: string, block_icon: string, block_category: string, block_keywords: string, post_types: list<string>, menu_label: string, menu_order: int}
+ * @return array{active: bool, sidebar_editing: bool, supports_inner_blocks: bool, inner_blocks_allowed: string, inner_blocks_template: string, parent: string, align: string, slug: string, description: string, block_icon: string, block_category: string, block_keywords: string, post_types: list<string>, menu_label: string, menu_order: int}
  */
 function bl_blocks_default_settings(string $type = 'block'): array
 {
@@ -34,6 +34,8 @@ function bl_blocks_default_settings(string $type = 'block'): array
 		'supports_inner_blocks'  => false,
 		'inner_blocks_allowed'   => '',
 		'inner_blocks_template'  => '',
+		'parent'                 => '',
+		'align'                  => '',
 		'slug'                   => '',
 		'description'            => '',
 		'block_icon'             => 'block-default',
@@ -43,6 +45,59 @@ function bl_blocks_default_settings(string $type = 'block'): array
 		'menu_label'             => '',
 		'menu_order'             => 1,
 	];
+}
+
+/**
+ * Sanitize parent block names (comma-separated or list). Empty → ''.
+ *
+ * @param mixed $raw
+ */
+function bl_blocks_sanitize_parent_blocks($raw): string
+{
+	return bl_blocks_sanitize_inner_blocks_allowed($raw);
+}
+
+/**
+ * Sanitize align supports: comma-separated wide/full (and optionally left/center/right).
+ *
+ * @param mixed $raw
+ */
+function bl_blocks_sanitize_align_supports($raw): string
+{
+	$allowed = ['wide', 'full', 'left', 'center', 'right'];
+	$parts = [];
+	if (is_string($raw)) {
+		$parts = preg_split('/[\s,]+/', $raw) ?: [];
+	} elseif (is_array($raw)) {
+		foreach ($raw as $part) {
+			if (is_string($part) || is_numeric($part)) {
+				$parts[] = (string) $part;
+			}
+		}
+	}
+
+	$out = [];
+	foreach ($parts as $part) {
+		$key = sanitize_key(trim((string) $part));
+		if ($key !== '' && in_array($key, $allowed, true)) {
+			$out[] = $key;
+		}
+	}
+
+	return implode(', ', array_values(array_unique($out)));
+}
+
+/**
+ * @return list<string>
+ */
+function bl_blocks_parse_align_supports(string $align): array
+{
+	$sanitized = bl_blocks_sanitize_align_supports($align);
+	if ($sanitized === '') {
+		return [];
+	}
+
+	return array_values(array_filter(array_map('trim', explode(',', $sanitized))));
 }
 
 /**
@@ -374,6 +429,12 @@ function bl_blocks_sanitize_settings($settings, string $type = 'block'): array
 		: '';
 	$out['inner_blocks_template'] = $type === 'block' && $out['supports_inner_blocks']
 		? bl_blocks_sanitize_inner_blocks_template($settings['inner_blocks_template'] ?? '')
+		: '';
+	$out['parent'] = $type === 'block'
+		? bl_blocks_sanitize_parent_blocks($settings['parent'] ?? '')
+		: '';
+	$out['align'] = $type === 'block'
+		? bl_blocks_sanitize_align_supports($settings['align'] ?? '')
 		: '';
 	$out['slug'] = sanitize_key((string) ($settings['slug'] ?? ''));
 	$out['description'] = sanitize_textarea_field((string) ($settings['description'] ?? ''));
@@ -1198,6 +1259,11 @@ function bl_blocks_sanitize_values(array $fields, $raw): array
 
 		if ($type === 'link') {
 			$values[$name] = bl_blocks_sanitize_link_value($field, $raw_value);
+			continue;
+		}
+
+		if ($type === 'icon') {
+			$values[$name] = sanitize_key(is_scalar($raw_value) ? (string) $raw_value : '');
 			continue;
 		}
 

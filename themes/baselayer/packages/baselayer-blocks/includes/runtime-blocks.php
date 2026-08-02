@@ -120,6 +120,8 @@ function bl_blocks_block_definition_payload(WP_Post $post): ?array
 		'innerBlocksTemplate'  => !empty($config['settings']['supports_inner_blocks'])
 			? bl_blocks_parse_inner_blocks_template((string) ($config['settings']['inner_blocks_template'] ?? ''))
 			: null,
+		'parent'               => bl_blocks_parse_inner_blocks_allowed((string) ($config['settings']['parent'] ?? '')),
+		'align'                => bl_blocks_parse_align_supports((string) ($config['settings']['align'] ?? '')),
 		'templateExists'       => bl_blocks_locate_template($slug) !== '',
 		'createPath'           => bl_blocks_template_info($slug)['create_path'],
 	];
@@ -208,6 +210,14 @@ function bl_blocks_register_dynamic_blocks(): void
 			// Inner content is saved via InnerBlocks.Content in the editor script.
 			$args['supports']['innerBlocks'] = true;
 		}
+		$parent = isset($def['parent']) && is_array($def['parent']) ? $def['parent'] : [];
+		if ($parent !== []) {
+			$args['parent'] = array_values($parent);
+		}
+		$align = isset($def['align']) && is_array($def['align']) ? $def['align'] : [];
+		if ($align !== []) {
+			$args['supports']['align'] = array_values($align);
+		}
 		if ($editor_script !== '') {
 			$args['editor_script'] = $editor_script;
 			$args['editor_style'] = 'bl-blocks-editor';
@@ -238,6 +248,7 @@ function bl_blocks_register_dynamic_blocks(): void
 				'choosePage'             => __('Choose page', 'baselayer-blocks'),
 				'choosePages'            => __('Choose pages', 'baselayer-blocks'),
 				'changePage'             => __('Change page', 'baselayer-blocks'),
+				'chooseIcon'             => __('Choose icon', 'baselayer-blocks'),
 				'changePages'            => __('Change pages', 'baselayer-blocks'),
 				'clearPage'              => __('Clear', 'baselayer-blocks'),
 				'choosePageHelp'         => __('Select a page.', 'baselayer-blocks'),
@@ -278,6 +289,15 @@ function bl_blocks_enqueue_block_editor_media(): void
 		return;
 	}
 	wp_enqueue_media();
+	if (function_exists('bl_enqueue_theme_icons_style')) {
+		if (function_exists('bl_load_icons_textdomain')) {
+			bl_load_icons_textdomain();
+		}
+		bl_enqueue_theme_icons_style(['bl-blocks-editor']);
+	}
+	if (function_exists('bl_icons_localize_payload') && wp_script_is('bl-blocks-editor', 'registered')) {
+		wp_localize_script('bl-blocks-editor', 'baselayerIcons', bl_icons_localize_payload());
+	}
 }
 add_action('enqueue_block_editor_assets', 'bl_blocks_enqueue_block_editor_media');
 
@@ -380,7 +400,8 @@ function bl_blocks_rest_starter_template(WP_REST_Request $request)
 		$title = $post->post_title !== '' ? $post->post_title : $slug;
 	}
 
-	$code = bl_blocks_build_starter_template($slug, $title, $fields);
+	$supports_inner = !empty($config['settings']['supports_inner_blocks']);
+	$code = bl_blocks_build_starter_template($slug, $title, $fields, $supports_inner);
 	$write = (bool) $request->get_param('write');
 
 	if (!$write) {

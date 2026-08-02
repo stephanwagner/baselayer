@@ -26,7 +26,7 @@ function blocksPalette() {
         id: 'media',
         headingKey: 'paletteSectionMedia',
         headingFallback: 'Media',
-        types: ['image', 'file'],
+        types: ['image', 'file', 'icon'],
       };
     }
     let types =

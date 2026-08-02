@@ -110,6 +110,10 @@ function bl_blocks_field_types(): array
 		$types[] = 'repeater';
 	}
 
+	if (!in_array('icon', $types, true)) {
+		$types[] = 'icon';
+	}
+
 	return $types;
 }
 

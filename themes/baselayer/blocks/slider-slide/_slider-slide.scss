@@ -1,0 +1,145 @@
+@use '../../src/scss/config' as *;
+
+$slider-content-wide-collapse: $content-width + ($container-wide-bleed * 2) + 24px + 24px;
+
+.slider-slide__wrapper {
+  position: relative;
+
+  .editor-styles-wrapper & {
+    z-index: 1;
+  }
+}
+
+.slider-slide__container {
+  position: relative;
+  overflow: hidden;
+
+  .slider__wrapper:not(.alignfull) & {
+    border-radius: var(--bl-border-radius-m);
+  }
+
+  &::after {
+    content: '';
+    display: block;
+    padding-top: var(--slider-padding-top, 100%);
+    position: relative;
+    z-index: 1;
+  }
+
+  .editor-styles-wrapper & {
+    background-color: var(--bl-color-gray-200);
+  }
+}
+
+.slider-slide__image-container,
+.slider-slide__video-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 2;
+}
+
+.slider-slide__image,
+.slider-slide__video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.slider-slide__content {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  padding-top: var(--bl-container-padding-y, 0);
+  padding-bottom: var(--bl-container-padding-y, 0);
+  padding-left: var(--bl-container-padding-x, var(--bl-page-padding));
+  padding-right: var(--bl-container-padding-x, var(--bl-page-padding));
+  align-items: center;
+  display: none;
+  color: #fff;
+
+  // Wide container + alignwide: same content inset until the shared collapse breakpoint.
+  .slider__wrapper.alignwide &,
+  .slider__wrapper.container-wide & {
+    padding-left: var(--bl-alignwide-bleed);
+    padding-right: var(--bl-alignwide-bleed);
+
+    @media (max-width: $slider-content-wide-collapse) {
+      padding-left: var(--bl-container-padding-x, var(--bl-page-padding));
+      padding-right: var(--bl-container-padding-x, var(--bl-page-padding));
+    }
+  }
+
+  .slider__wrapper.alignfull & {
+    padding-left: calc((100vw - var(--bl-content-width)) * 0.5);
+    padding-right: calc((100vw - var(--bl-content-width)) * 0.5);
+
+    @media (max-width: calc(#{$content-width} + #{$page-padding-l} + #{$page-padding-l})) {
+      padding-left: var(--bl-container-padding-x, var(--bl-page-padding));
+      padding-right: var(--bl-container-padding-x, var(--bl-page-padding));
+    }
+  }
+
+  .slider__wrapper[data-slider-has-content='true'] & {
+    display: flex;
+  }
+
+  .slider__wrapper[data-slider-has-content='true'][data-slider-content-visibility-mobile='false'] & {
+    @media (max-width: $breakpoint-s) {
+      display: none;
+    }
+  }
+
+  .slider__wrapper[data-slider-content-align='left'] & {
+    background-image: linear-gradient(to right, rgba(#000, 0.65), rgba(#000, 0) 75%);
+  }
+
+  .slider__wrapper[data-slider-content-align='right'] & {
+    background-image: linear-gradient(to left, rgba(#000, 0.65), rgba(#000, 0) 75%);
+  }
+
+  .slider__wrapper[data-slider-content-align='center'] & {
+    background-image: linear-gradient(to right, rgba(#000, 0) 0%, rgba(#000, 0.4) 25%, rgba(#000, 0.5) 50%, rgba(#000, 0.4) 75%, rgba(#000, 0) 100%);
+  }
+
+  > .acf-innerblocks-container {
+    width: 100%;
+
+    .slider__wrapper[data-slider-content-align='right'] & {
+      text-align: right;
+      justify-content: flex-end;
+    }
+
+    .wp-block-buttons {
+      .slider__wrapper[data-slider-content-align='right'] & {
+        justify-content: flex-end;
+      }
+    }
+
+    .slider__wrapper[data-slider-content-align='center'] & {
+      text-align: center;
+      justify-content: center;
+    }
+
+    .wp-block-buttons {
+      .slider__wrapper[data-slider-content-align='center'] & {
+        justify-content: center;
+      }
+    }
+  }
+
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    text-shadow: 0 0 12px rgba(0, 0, 0, 0.25);
+    text-wrap: balance;
+  }
+}

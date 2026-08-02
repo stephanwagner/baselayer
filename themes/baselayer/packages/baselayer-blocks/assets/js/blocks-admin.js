@@ -1433,6 +1433,39 @@
       innerBlocksTemplateRow.hidden = !show;
     };
     syncInnerBlocksOptionsVisibility();
+    const parentInput = el("input", {
+      type: "text",
+      className: "widefat",
+      value: state.parent || "",
+      placeholder: "baselayer/slider"
+    });
+    parentInput.addEventListener("input", () => {
+      state.parent = parentInput.value;
+      notify();
+    });
+    const parentRow = fieldRow(
+      t2("settingsParent", "Parent blocks"),
+      parentInput,
+      t2(
+        "settingsParentHelp",
+        "Comma-separated block names this block may be inserted into (e.g. baselayer/slider). Leave empty for top-level."
+      )
+    );
+    const alignInput = el("input", {
+      type: "text",
+      className: "widefat",
+      value: state.align || "",
+      placeholder: "wide, full"
+    });
+    alignInput.addEventListener("input", () => {
+      state.align = alignInput.value;
+      notify();
+    });
+    const alignRow = fieldRow(
+      t2("settingsAlign", "Alignment supports"),
+      alignInput,
+      t2("settingsAlignHelp", "Comma-separated: wide, full (and optionally left, center, right). Leave empty for none.")
+    );
     const slugInput = el("input", {
       type: "text",
       className: "widefat",
@@ -1487,6 +1520,8 @@
       children.push(innerBlocksRow);
       children.push(innerBlocksAllowedRow);
       children.push(innerBlocksTemplateRow);
+      children.push(parentRow);
+      children.push(alignRow);
     }
     children.push(
       fieldRow(t2("settingsSlug", "Slug"), slugInput, t2("settingsSlugHelp", "")),
@@ -2007,7 +2042,7 @@
           id: "media",
           headingKey: "paletteSectionMedia",
           headingFallback: "Media",
-          types: ["image", "file"]
+          types: ["image", "file", "icon"]
         };
       }
       let types = section.id === "popular" ? BLOCKS_POPULAR_TYPES : (section.types || []).filter((type) => !EXCLUDED_TYPES.has(type));
@@ -5944,6 +5979,9 @@
     if (type === "link" && control && typeof control.getLinkValue === "function") {
       return control.getLinkValue();
     }
+    if (type === "icon" && control && typeof control.getIconValue === "function") {
+      return control.getIconValue();
+    }
     if (type === "select") {
       if (control.multiple) {
         return Array.from(control.selectedOptions).map((o) => o.value);
@@ -6081,6 +6119,58 @@
     } else if (type === "link") {
       control = createLinkControl(field, current);
       if (control) control.id = id;
+    } else if (type === "icon") {
+      const hidden = el6("input", {
+        type: "hidden",
+        id,
+        value: current == null ? "" : String(current)
+      });
+      const preview = el6("span", {
+        className: "bl-blocks-fields__icon-preview",
+        "aria-hidden": "true"
+      });
+      const label = el6("span", {
+        className: "description",
+        text: current ? String(current) : "\u2014"
+      });
+      const chooseBtn = el6("button", {
+        type: "button",
+        className: "button",
+        text: "Choose icon"
+      });
+      const clearBtn = el6("button", {
+        type: "button",
+        className: "button-link",
+        text: "Clear"
+      });
+      const syncIconPreview = (slug) => {
+        hidden.value = slug || "";
+        label.textContent = slug || "\u2014";
+        preview.replaceChildren();
+        if (slug) {
+          preview.appendChild(el6("span", { className: "bl-icon -icon-" + slug, "aria-hidden": "true" }));
+        }
+      };
+      syncIconPreview(current == null ? "" : String(current));
+      chooseBtn.addEventListener("click", async () => {
+        try {
+          const { openIconPicker: openIconPicker2 } = await Promise.resolve().then(() => (init_icon_picker_service(), icon_picker_service_exports));
+          openIconPicker2({
+            currentValue: hidden.value || "",
+            returnFocus: chooseBtn,
+            onSelect: (iconName2) => syncIconPreview(iconName2 || "")
+          });
+        } catch (err) {
+        }
+      });
+      clearBtn.addEventListener("click", () => syncIconPreview(""));
+      control = el6("div", { className: "bl-blocks-fields__icon" }, [
+        preview,
+        label,
+        el6("div", { className: "bl-blocks-fields__icon-actions" }, [chooseBtn, clearBtn]),
+        hidden
+      ]);
+      control.getIconValue = () => hidden.value || "";
     } else {
       let inputType = "text";
       if (type === "email" || type === "number" || type === "date" || type === "time") {

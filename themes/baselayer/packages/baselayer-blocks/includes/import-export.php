@@ -23,6 +23,46 @@ function bl_blocks_register_import_export_page(): void
 add_action('admin_menu', 'bl_blocks_register_import_export_page', 20);
 
 /**
+ * Absolute path to the theme blocks catalog JSON (child → parent → legacy package starter).
+ */
+function bl_blocks_catalog_import_path(): string
+{
+	$relative = 'blocks/blocks-import.json';
+	$child = trailingslashit(get_stylesheet_directory()) . $relative;
+	if (is_readable($child)) {
+		return $child;
+	}
+
+	$parent = trailingslashit(get_template_directory()) . $relative;
+	if (is_readable($parent)) {
+		return $parent;
+	}
+
+	$legacy = bl_blocks_path('import/accordion.json');
+	return is_readable($legacy) ? $legacy : '';
+}
+
+/**
+ * Display path for the catalog (theme-relative when under a theme directory).
+ */
+function bl_blocks_catalog_import_display_path(string $path): string
+{
+	foreach ([get_stylesheet_directory(), get_template_directory()] as $base) {
+		$base = trailingslashit($base);
+		if ($path !== '' && strpos($path, $base) === 0) {
+			return substr($path, strlen($base));
+		}
+	}
+
+	$pkg = trailingslashit(bl_blocks_path(''));
+	if ($path !== '' && strpos($path, $pkg) === 0) {
+		return 'packages/baselayer-blocks/' . substr($path, strlen($pkg));
+	}
+
+	return $path;
+}
+
+/**
  * Export payload for one definition post.
  *
  * @return array{type: string, title: string, fields: list<array<string, mixed>>, settings: array<string, mixed>}|null
@@ -148,6 +188,74 @@ function bl_blocks_import_definition_item(array $item): array
 }
 
 /**
+ * Import definitions from a JSON string (single object or list).
+ *
+ * @return array{created: int, updated: int, errors: int}
+ */
+function bl_blocks_import_json_string(string $raw): array
+{
+	$data = json_decode($raw, true);
+	if (!is_array($data)) {
+		return ['created' => 0, 'updated' => 0, 'errors' => 1];
+	}
+
+	$items = isset($data['settings']) || isset($data['fields']) ? [$data] : $data;
+	$created = 0;
+	$updated = 0;
+	$errors = 0;
+
+	foreach ($items as $item) {
+		if (!is_array($item)) {
+			$errors++;
+			continue;
+		}
+		$result = bl_blocks_import_definition_item($item);
+		if (!$result['ok']) {
+			$errors++;
+			continue;
+		}
+		if ($result['action'] === 'created') {
+			$created++;
+		} else {
+			$updated++;
+		}
+	}
+
+	return compact('created', 'updated', 'errors');
+}
+
+/**
+ * Persist an import result notice and redirect back to Import / Export.
+ *
+ * @param array{created: int, updated: int, errors: int} $result
+ */
+function bl_blocks_redirect_import_result(array $result, string $error_text = ''): void
+{
+	$created = (int) ($result['created'] ?? 0);
+	$updated = (int) ($result['updated'] ?? 0);
+	$errors = (int) ($result['errors'] ?? 0);
+
+	if ($error_text !== '') {
+		$notice = ['type' => 'error', 'text' => $error_text];
+	} else {
+		$notice = [
+			'type' => $errors > 0 && ($created + $updated) === 0 ? 'error' : 'success',
+			'text' => sprintf(
+				/* translators: 1: created count, 2: updated count, 3: error count */
+				__('Import finished: %1$d created, %2$d updated, %3$d errors.', 'baselayer-blocks'),
+				$created,
+				$updated,
+				$errors
+			),
+		];
+	}
+
+	set_transient('bl_blocks_import_notice_' . get_current_user_id(), $notice, 60);
+	wp_safe_redirect(admin_url('admin.php?page=bl-blocks-import-export'));
+	exit;
+}
+
+/**
  * Handle export download / import upload before headers are sent.
  */
 function bl_blocks_handle_import_export_actions(): void
@@ -175,69 +283,45 @@ function bl_blocks_handle_import_export_actions(): void
 		exit;
 	}
 
+	if (isset($_POST['bl_blocks_import_catalog']) && check_admin_referer('bl_blocks_import_catalog', 'bl_blocks_import_catalog_nonce')) {
+		$path = bl_blocks_catalog_import_path();
+		if ($path === '' || !is_readable($path)) {
+			bl_blocks_redirect_import_result(
+				['created' => 0, 'updated' => 0, 'errors' => 1],
+				__('Theme catalog JSON not found (blocks/blocks-import.json).', 'baselayer-blocks')
+			);
+		}
+		$raw = file_get_contents($path);
+		if (!is_string($raw) || $raw === '') {
+			bl_blocks_redirect_import_result(
+				['created' => 0, 'updated' => 0, 'errors' => 1],
+				__('Could not read theme catalog JSON.', 'baselayer-blocks')
+			);
+		}
+		bl_blocks_redirect_import_result(bl_blocks_import_json_string($raw));
+	}
+
 	if (isset($_POST['bl_blocks_import']) && check_admin_referer('bl_blocks_import', 'bl_blocks_import_nonce')) {
 		if (empty($_FILES['bl_blocks_import_file']['tmp_name'])) {
-			set_transient(
-				'bl_blocks_import_notice_' . get_current_user_id(),
-				['type' => 'error', 'text' => __('No file uploaded.', 'baselayer-blocks')],
-				60
+			bl_blocks_redirect_import_result(
+				['created' => 0, 'updated' => 0, 'errors' => 1],
+				__('No file uploaded.', 'baselayer-blocks')
 			);
-			wp_safe_redirect(admin_url('admin.php?page=bl-blocks-import-export'));
-			exit;
 		}
 
 		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- binary upload read then JSON-decoded
 		$raw = file_get_contents((string) $_FILES['bl_blocks_import_file']['tmp_name']);
-		$data = is_string($raw) ? json_decode($raw, true) : null;
-		if (!is_array($data)) {
-			set_transient(
-				'bl_blocks_import_notice_' . get_current_user_id(),
-				['type' => 'error', 'text' => __('Invalid JSON file.', 'baselayer-blocks')],
-				60
+		if (!is_string($raw)) {
+			bl_blocks_redirect_import_result(
+				['created' => 0, 'updated' => 0, 'errors' => 1],
+				__('Invalid JSON file.', 'baselayer-blocks')
 			);
-			wp_safe_redirect(admin_url('admin.php?page=bl-blocks-import-export'));
-			exit;
 		}
-
-		// Allow a single object or a list.
-		$items = isset($data['settings']) || isset($data['fields']) ? [$data] : $data;
-		$created = 0;
-		$updated = 0;
-		$errors = 0;
-
-		foreach ($items as $item) {
-			if (!is_array($item)) {
-				$errors++;
-				continue;
-			}
-			$result = bl_blocks_import_definition_item($item);
-			if (!$result['ok']) {
-				$errors++;
-				continue;
-			}
-			if ($result['action'] === 'created') {
-				$created++;
-			} else {
-				$updated++;
-			}
+		$result = bl_blocks_import_json_string($raw);
+		if ($result['created'] + $result['updated'] === 0 && $result['errors'] > 0) {
+			bl_blocks_redirect_import_result($result, __('Invalid JSON file.', 'baselayer-blocks'));
 		}
-
-		set_transient(
-			'bl_blocks_import_notice_' . get_current_user_id(),
-			[
-				'type' => $errors > 0 && ($created + $updated) === 0 ? 'error' : 'success',
-				'text' => sprintf(
-					/* translators: 1: created count, 2: updated count, 3: error count */
-					__('Import finished: %1$d created, %2$d updated, %3$d errors.', 'baselayer-blocks'),
-					$created,
-					$updated,
-					$errors
-				),
-			],
-			60
-		);
-		wp_safe_redirect(admin_url('admin.php?page=bl-blocks-import-export'));
-		exit;
+		bl_blocks_redirect_import_result($result);
 	}
 }
 add_action('admin_init', 'bl_blocks_handle_import_export_actions');
@@ -257,7 +341,8 @@ function bl_blocks_render_import_export_page(): void
 		delete_transient($notice_key);
 	}
 
-	$bundled = bl_blocks_path('import/accordion.json');
+	$catalog_path = bl_blocks_catalog_import_path();
+	$catalog_display = $catalog_path !== '' ? bl_blocks_catalog_import_display_path($catalog_path) : '';
 	?>
 	<div class="wrap">
 		<h1><?php echo esc_html__('Import / Export', 'baselayer-blocks'); ?></h1>
@@ -270,7 +355,7 @@ function bl_blocks_render_import_export_page(): void
 
 		<div class="card" style="max-width: 720px; padding: 1em 1.5em; margin-top: 1.5em;">
 			<h2><?php echo esc_html__('Export', 'baselayer-blocks'); ?></h2>
-			<p><?php echo esc_html__('Download definitions as JSON. Matched later by type and slug.', 'baselayer-blocks'); ?></p>
+			<p><?php echo esc_html__('Download definitions as JSON. Re-import matches by type and slug (like ACF field group keys): the same slug updates in place, never duplicates.', 'baselayer-blocks'); ?></p>
 			<form method="post">
 				<?php wp_nonce_field('bl_blocks_export', 'bl_blocks_export_nonce'); ?>
 				<p>
@@ -287,25 +372,29 @@ function bl_blocks_render_import_export_page(): void
 		</div>
 
 		<div class="card" style="max-width: 720px; padding: 1em 1.5em; margin-top: 1.5em;">
-			<h2><?php echo esc_html__('Import', 'baselayer-blocks'); ?></h2>
+			<h2><?php echo esc_html__('Import theme catalog', 'baselayer-blocks'); ?></h2>
+			<p><?php echo esc_html__('Import the bundled block definitions from the active theme. Existing definitions with the same type and slug are updated; missing catalog entries are left alone.', 'baselayer-blocks'); ?></p>
+			<?php if ($catalog_path !== '') : ?>
+				<form method="post">
+					<?php wp_nonce_field('bl_blocks_import_catalog', 'bl_blocks_import_catalog_nonce'); ?>
+					<p class="description"><code><?php echo esc_html($catalog_display); ?></code></p>
+					<?php submit_button(__('Import theme catalog', 'baselayer-blocks'), 'primary', 'bl_blocks_import_catalog', false); ?>
+				</form>
+			<?php else : ?>
+				<p class="description"><?php echo esc_html__('No catalog found. Add blocks/blocks-import.json to the theme.', 'baselayer-blocks'); ?></p>
+			<?php endif; ?>
+		</div>
+
+		<div class="card" style="max-width: 720px; padding: 1em 1.5em; margin-top: 1.5em;">
+			<h2><?php echo esc_html__('Import file', 'baselayer-blocks'); ?></h2>
 			<p><?php echo esc_html__('Upload a JSON export. Existing definitions with the same type and slug are updated.', 'baselayer-blocks'); ?></p>
 			<form method="post" enctype="multipart/form-data">
 				<?php wp_nonce_field('bl_blocks_import', 'bl_blocks_import_nonce'); ?>
 				<p>
 					<input type="file" name="bl_blocks_import_file" accept="application/json,.json" required>
 				</p>
-				<?php submit_button(__('Import JSON', 'baselayer-blocks'), 'primary', 'bl_blocks_import', false); ?>
+				<?php submit_button(__('Import JSON', 'baselayer-blocks'), 'secondary', 'bl_blocks_import', false); ?>
 			</form>
-			<?php if (is_readable($bundled)) : ?>
-				<p class="description" style="margin-top: 1em;">
-					<?php
-					echo esc_html__(
-						'Bundled starter: packages/baselayer-blocks/import/accordion.json (Accordion block with InnerBlocks).',
-						'baselayer-blocks'
-					);
-					?>
-				</p>
-			<?php endif; ?>
 		</div>
 	</div>
 	<?php

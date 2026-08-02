@@ -111,6 +111,9 @@ function collectLeafValue(field, control, type) {
   if (type === 'link' && control && typeof control.getLinkValue === 'function') {
     return control.getLinkValue();
   }
+  if (type === 'icon' && control && typeof control.getIconValue === 'function') {
+    return control.getIconValue();
+  }
   if (type === 'select') {
     if (control.multiple) {
       return Array.from(control.selectedOptions).map((o) => o.value);
@@ -261,6 +264,61 @@ function createLeafControl(field, values, controls) {
   } else if (type === 'link') {
     control = createLinkControl(field, current);
     if (control) control.id = id;
+  } else if (type === 'icon') {
+    const hidden = el('input', {
+      type: 'hidden',
+      id,
+      value: current == null ? '' : String(current),
+    });
+    const preview = el('span', {
+      className: 'bl-blocks-fields__icon-preview',
+      'aria-hidden': 'true',
+    });
+    const label = el('span', {
+      className: 'description',
+      text: current ? String(current) : '—',
+    });
+    const chooseBtn = el('button', {
+      type: 'button',
+      className: 'button',
+      text: 'Choose icon',
+    });
+    const clearBtn = el('button', {
+      type: 'button',
+      className: 'button-link',
+      text: 'Clear',
+    });
+    const syncIconPreview = (slug) => {
+      hidden.value = slug || '';
+      label.textContent = slug || '—';
+      preview.replaceChildren();
+      if (slug) {
+        preview.appendChild(el('span', { className: 'bl-icon -icon-' + slug, 'aria-hidden': 'true' }));
+      }
+    };
+    syncIconPreview(current == null ? '' : String(current));
+    chooseBtn.addEventListener('click', async () => {
+      try {
+        const { openIconPicker } = await import(
+          '../../../../../src/js/editor/icons/icon-picker-service.js'
+        );
+        openIconPicker({
+          currentValue: hidden.value || '',
+          returnFocus: chooseBtn,
+          onSelect: (iconName) => syncIconPreview(iconName || ''),
+        });
+      } catch (err) {
+        // Icon picker unavailable — leave hidden input editable via clear only.
+      }
+    });
+    clearBtn.addEventListener('click', () => syncIconPreview(''));
+    control = el('div', { className: 'bl-blocks-fields__icon' }, [
+      preview,
+      label,
+      el('div', { className: 'bl-blocks-fields__icon-actions' }, [chooseBtn, clearBtn]),
+      hidden,
+    ]);
+    control.getIconValue = () => hidden.value || '';
   } else {
     let inputType = 'text';
     if (type === 'email' || type === 'number' || type === 'date' || type === 'time') {

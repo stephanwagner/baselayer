@@ -1,0 +1,183 @@
+import $ from 'jquery';
+import Swiper from 'swiper';
+import { Autoplay, EffectFade, Pagination, Navigation } from 'swiper/modules';
+
+const sliders = $('.slider__wrapper');
+
+$.each(sliders, function (index, slider) {
+  // Wrapper
+  const sliderWrapper = $(slider);
+
+  // Id
+  const id = sliderWrapper.attr('data-slider-id');
+
+  const slideCount = sliderWrapper.find('.slider-slide__wrapper').length;
+
+  // One slide: no nav, pagination, loop, or autoplay
+  if (slideCount <= 1) {
+    sliderWrapper.attr('data-slider-navigation', 'false');
+    sliderWrapper.attr('data-slider-pagination', 'false');
+    sliderWrapper.attr('data-slider-loop', 'false');
+    sliderWrapper.attr('data-slider-autoplay', 'false');
+  }
+
+  const paginationEl = sliderWrapper.find('.slider__pagination')[0];
+  const nextEl = sliderWrapper.find('.slider__button-next')[0];
+  const prevEl = sliderWrapper.find('.slider__button-prev')[0];
+
+  // Modules
+  const modules = [Autoplay, Pagination, Navigation];
+
+  // Construct config object
+  const sliderConfig = {
+    wrapperClass: 'acf-innerblocks-container',
+    effect: sliderWrapper.attr('data-slider-animation') || 'slide',
+    speed: 800,
+  };
+
+  // Animation effect
+  switch (sliderWrapper.attr('data-slider-animation')) {
+    case 'fade':
+      modules.push(EffectFade);
+      sliderConfig.fadeEffect = {
+        crossFade: true,
+      };
+      break;
+  }
+
+  // Loop
+  sliderConfig.loop = sliderWrapper.attr('data-slider-loop') === 'true';
+
+  // Space between
+  let spaceBetween = parseInt(sliderWrapper.attr('data-slider-space-between'));
+  sliderConfig.spaceBetween = spaceBetween || spaceBetween === 0 ? spaceBetween : 16;
+
+  // Slides per view
+  sliderConfig.slidesPerView = parseInt(sliderWrapper.attr('data-slider-slides-per-view')) || 1;
+
+  // Slides per group
+  sliderConfig.slidesPerGroup = parseInt(sliderWrapper.attr('data-slider-slides-per-group')) || 1;
+
+  if (sliderConfig.slidesPerView == 2) {
+    sliderConfig.breakpoints = {
+      600: {
+        slidesPerView: 2,
+        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, 2),
+      },
+      0: {
+        slidesPerView: 1,
+        slidesPerGroup: 1,
+      },
+    };
+  }
+  if (sliderConfig.slidesPerView == 3) {
+    sliderConfig.breakpoints = {
+      900: {
+        slidesPerView: 3,
+        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, 3),
+      },
+      600: {
+        slidesPerView: 2,
+        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, 2),
+      },
+      0: {
+        slidesPerView: 1,
+        slidesPerGroup: 1,
+      },
+    };
+  }
+  if (sliderConfig.slidesPerView == 4) {
+    sliderConfig.breakpoints = {
+      1200: {
+        slidesPerView: 4,
+        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, 4),
+      },
+      900: {
+        slidesPerView: 3,
+        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, 3),
+      },
+      600: {
+        slidesPerView: 2,
+        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, 2),
+      },
+      0: {
+        slidesPerView: 1,
+        slidesPerGroup: 1,
+      },
+    };
+  }
+  if (sliderConfig.slidesPerView >= 5) {
+    sliderConfig.breakpoints = {
+      1200: {
+        slidesPerView: sliderConfig.slidesPerView,
+        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, sliderConfig.slidesPerView),
+      },
+      900: {
+        slidesPerView: 4,
+        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, 4),
+      },
+      600: {
+        slidesPerView: 2,
+        slidesPerGroup: Math.min(sliderConfig.slidesPerGroup, 2),
+      },
+      0: {
+        slidesPerView: 1,
+        slidesPerGroup: 1,
+      },
+    };
+  }
+
+  // Pagination (scoped per slider — global selectors break with multiple blocks on one page)
+  const hasDynamicBullets = sliderWrapper.attr('data-slider-dynamic-bullets') === 'true';
+  if (slideCount > 1 && sliderWrapper.attr('data-slider-pagination') === 'true' && paginationEl) {
+    sliderConfig.pagination = {
+      el: paginationEl,
+      clickable: true,
+      dynamicBullets: hasDynamicBullets,
+      dynamicMainBullets: 3,
+    };
+  }
+
+  // Navigation
+  if (slideCount > 1 && sliderWrapper.attr('data-slider-navigation') === 'true' && nextEl && prevEl) {
+    sliderConfig.navigation = {
+      nextEl,
+      prevEl,
+    };
+  }
+
+  // Autoplay
+  if (sliderWrapper.attr('data-slider-autoplay') === 'true') {
+    let autoplayDelay = parseFloat(sliderWrapper.attr('data-slider-autoplay-delay'));
+    if (!autoplayDelay) {
+      autoplayDelay = 6000;
+    } else {
+      autoplayDelay *= 1000;
+    }
+
+    sliderConfig.autoplay = {
+      delay: autoplayDelay,
+      disableOnInteraction: true,
+      pauseOnMouseEnter: false,
+    };
+  }
+
+  // Modules
+  sliderConfig.modules = modules;
+
+  // Slider selector
+  const sliderSelector = '.slider__wrapper[data-slider-id="' + id + '"] .swiper';
+
+  // Init slider
+  const swiper = new Swiper(sliderSelector, sliderConfig);
+
+  // Stop autoplay then clicking on or in slide
+  sliderWrapper.find('.slider-slide__wrapper').on('click', function () {
+    swiper.autoplay.stop();
+  });
+
+  // Stop autoplay when starting to play video
+  sliderWrapper.find('video').on('play', function () {
+    swiper.autoplay.stop();
+  });
+});
