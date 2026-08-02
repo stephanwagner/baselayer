@@ -100,9 +100,18 @@ export function uid(prefix = 'blfb') {
   return `${prefix}_${Date.now().toString(36)}_${uidCounter}`;
 }
 
-export function formRow(labelText, control) {
-  return el('div', { className: 'bl-field-builder__form-row' }, [
+/**
+ * @param {string} labelText
+ * @param {HTMLElement} control
+ * @param {string} [description]
+ */
+export function formRow(labelText, control, description = '') {
+  const children = [
     el('div', { className: 'bl-field-builder__form-label', text: labelText }),
     control,
-  ]);
+  ];
+  if (description) {
+    children.push(el('p', { className: 'description', text: description }));
+  }
+  return el('div', { className: 'bl-field-builder__form-row' }, children);
 }

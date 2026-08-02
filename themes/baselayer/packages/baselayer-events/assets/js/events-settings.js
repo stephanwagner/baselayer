@@ -1426,7 +1426,7 @@
         open,
         className: "bl-events-meta-builder__group",
         dataset: { blEventsMetaGroup: "1" },
-        untitled: "(untitled group)",
+        untitled: i18n.untitledGroup || "(untitled group)",
         dragTitle: i18n.dragGroup || "Drag to reorder",
         deleteTitle: i18n.deleteGroup || "Delete",
         onDelete: () => {
@@ -1449,12 +1449,14 @@
         dataset: { blEventsMetaGroupTitle: "1" },
         value: data.title || ""
       });
-      body.appendChild(
-        el("div", { className: "bl-field-builder__form-row" }, [
-          el("div", { className: "bl-field-builder__form-label", text: i18n.groupId || "Group ID" }),
-          idInput
-        ])
-      );
+      const groupIdRow = [
+        el("div", { className: "bl-field-builder__form-label", text: i18n.groupId || "Group ID" }),
+        idInput
+      ];
+      if (i18n.groupIdHelp) {
+        groupIdRow.push(el("p", { className: "description", text: i18n.groupIdHelp }));
+      }
+      body.appendChild(el("div", { className: "bl-field-builder__form-row" }, groupIdRow));
       body.appendChild(
         el("div", { className: "bl-field-builder__form-row" }, [
           el("div", { className: "bl-field-builder__form-label", text: i18n.groupTitle || "Group title" }),

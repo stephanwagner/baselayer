@@ -1,4 +1,5 @@
 import { el, formRow } from '../dom';
+import { t } from '../i18n';
 
 function mark(input, key) {
   input.dataset.blFb = key;
@@ -55,20 +56,23 @@ export default {
       el('textarea', {
         className: 'widefat',
         rows: '5',
-        placeholder: 'Label : value (one per line)',
+        placeholder: t('optionsPlaceholder', 'Label : value (one per line)'),
       }),
       'options_text'
     );
-    container.appendChild(formRow('Options', optionsArea));
+    container.appendChild(formRow(t('options', 'Options'), optionsArea));
     container.appendChild(
       el('p', {
         className: 'description',
-        text: 'One option per line. Use “Label : value” or a single value.',
+        text: t(
+          'optionsHelp',
+          'One option per line. Use “Label : value” or a single value.'
+        ),
       })
     );
     container.appendChild(
       formRow(
-        'Default value',
+        t('defaultValue', 'Default value'),
         mark(el('input', { type: 'text', className: 'widefat' }), 'default_value')
       )
     );
@@ -76,7 +80,7 @@ export default {
     container.appendChild(
       el('label', { className: 'bl-field-builder__checkbox-label' }, [
         allowMultiple,
-        document.createTextNode(' Allow multiple'),
+        document.createTextNode(' ' + t('allowMultiple', 'Allow multiple')),
       ])
     );
   },

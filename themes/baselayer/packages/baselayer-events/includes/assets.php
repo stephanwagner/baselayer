@@ -241,6 +241,35 @@ function bl_events_resolve_field_builder_asset(string $kind): ?array
 }
 
 /**
+ * Localized UI strings for the shared field-builder kit (meta settings).
+ *
+ * @return array<string, mixed>
+ */
+function bl_events_field_builder_i18n(): array
+{
+	return [
+		'type' => __('Type', 'baselayer-events'),
+		'helpText' => __('Help text', 'baselayer-events'),
+		'placeholder' => __('Placeholder', 'baselayer-events'),
+		'defaultValue' => __('Default value', 'baselayer-events'),
+		'options' => __('Options', 'baselayer-events'),
+		'optionsHelp' => __('One option per line. Use “Label : value” or a single value.', 'baselayer-events'),
+		'optionsPlaceholder' => __('Label : value (one per line)', 'baselayer-events'),
+		'allowMultiple' => __('Allow multiple', 'baselayer-events'),
+		'rows' => __('Rows', 'baselayer-events'),
+		'types' => [
+			'text' => __('Text', 'baselayer-events'),
+			'textarea' => __('Textarea', 'baselayer-events'),
+			'number' => __('Number', 'baselayer-events'),
+			'email' => __('Email', 'baselayer-events'),
+			'phone' => __('Phone', 'baselayer-events'),
+			'url' => __('URL', 'baselayer-events'),
+			'select' => __('Select', 'baselayer-events'),
+		],
+	];
+}
+
+/**
  * Enqueue isolatable field-builder kit (JS + CSS). Theme first, vendor fallback.
  */
 function bl_events_enqueue_field_builder_kit(): string
@@ -281,6 +310,9 @@ function bl_events_enqueue_settings_assets(string $hook): void
 		$fb_handle = bl_events_enqueue_field_builder_kit();
 		if (wp_script_is($fb_handle, 'registered') || wp_script_is($fb_handle, 'enqueued')) {
 			$deps[] = $fb_handle;
+			if ($tab === 'meta') {
+				wp_localize_script($fb_handle, 'blFieldBuilderI18n', bl_events_field_builder_i18n());
+			}
 		}
 	}
 
@@ -318,7 +350,10 @@ function bl_events_enqueue_settings_assets(string $hook): void
 				'emptyGroups' => __('No metadata groups yet. Add a group to get started.', 'baselayer-events'),
 				'emptyFields' => __('No fields in this group.', 'baselayer-events'),
 				'groupId' => __('Group ID', 'baselayer-events'),
+				/* translators: Help under Group ID in the metadata settings builder. */
+				'groupIdHelp' => __('Stable key for templates and stored metadata. Use lowercase letters, numbers, and underscores.', 'baselayer-events'),
 				'groupTitle' => __('Group title', 'baselayer-events'),
+				'untitledGroup' => __('(untitled group)', 'baselayer-events'),
 				'fieldLabel' => __('Label', 'baselayer-events'),
 				'fieldId' => __('Field ID', 'baselayer-events'),
 				'fields' => __('Fields', 'baselayer-events'),

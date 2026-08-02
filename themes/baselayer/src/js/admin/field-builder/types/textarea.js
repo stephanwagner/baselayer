@@ -1,4 +1,5 @@
 import { el, formRow } from '../dom';
+import { t } from '../i18n';
 
 function mark(input, key) {
   input.dataset.blFb = key;
@@ -14,19 +15,19 @@ export default {
   renderOptions(container) {
     container.appendChild(
       formRow(
-        'Default value',
+        t('defaultValue', 'Default value'),
         mark(el('textarea', { className: 'widefat', rows: '3' }), 'default_value')
       )
     );
     container.appendChild(
       formRow(
-        'Placeholder',
+        t('placeholder', 'Placeholder'),
         mark(el('input', { type: 'text', className: 'widefat' }), 'placeholder')
       )
     );
     container.appendChild(
       formRow(
-        'Rows',
+        t('rows', 'Rows'),
         mark(el('input', { type: 'number', className: 'small-text', min: '2', max: '50', value: '4' }), 'rows')
       )
     );

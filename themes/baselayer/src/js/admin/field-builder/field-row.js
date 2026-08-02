@@ -4,6 +4,7 @@ import { defaultTypeId } from './config';
 import { renderPresentation, serializePresentation } from './presentation';
 import { createSwitch } from './controls';
 import { createListRow } from './list-row';
+import { t } from './i18n';
 
 /**
  * Build type <select> for the current mode.
@@ -85,6 +86,12 @@ const TAB_DEFS = {
   logic: 'Logic',
 };
 
+const TAB_I18N_KEYS = {
+  general: 'tabGeneral',
+  presentation: 'tabPresentation',
+  logic: 'tabLogic',
+};
+
 /**
  * Create a field row element (list-row chrome + field editors).
  *
@@ -117,8 +124,10 @@ export function createFieldRow({
     Array.isArray(tabs) && tabs.length
       ? tabs.filter((id) => TAB_DEFS[id])
       : ['general', 'presentation', 'logic'];
-  const titleLabel = labels.title || 'Title';
-  const slugLabel = labels.slug || 'Slug';
+  const titleLabel = labels.title || t('title', 'Title');
+  const slugLabel = labels.slug || t('slug', 'Slug');
+  const typeLabelText = labels.type || t('type', 'Type');
+  const helpLabel = labels.help || t('helpText', 'Help text');
 
   const typeChip = el('span', {
     className: 'bl-field-builder__type-chip',
@@ -149,7 +158,7 @@ export function createFieldRow({
           role: 'tab',
           dataset: { blFbTab: id },
           'aria-selected': index === 0 ? 'true' : 'false',
-          text: TAB_DEFS[id],
+          text: t(TAB_I18N_KEYS[id] || id, TAB_DEFS[id]),
         })
       );
     });
@@ -175,7 +184,7 @@ export function createFieldRow({
     dataset: { blFb: 'slug' },
     value: slug,
   });
-  panelGeneral.appendChild(formRow('Type', typeSelect));
+  panelGeneral.appendChild(formRow(typeLabelText, typeSelect));
   panelGeneral.appendChild(formRow(titleLabel, titleInput));
   panelGeneral.appendChild(formRow(slugLabel, slugInput));
 
@@ -186,13 +195,13 @@ export function createFieldRow({
       dataset: { blFb: 'help' },
       value: data.help != null ? String(data.help) : '',
     });
-    panelGeneral.appendChild(formRow('Help text', helpInput));
+    panelGeneral.appendChild(formRow(helpLabel, helpInput));
   }
 
   if (showRequired) {
     panelGeneral.appendChild(
       createSwitch({
-        label: 'Required',
+        label: t('required', 'Required'),
         checked: !!data.required,
         datasetKey: 'required',
       })

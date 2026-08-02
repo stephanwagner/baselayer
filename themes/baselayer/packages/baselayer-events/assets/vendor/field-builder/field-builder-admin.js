@@ -90,11 +90,28 @@
     uidCounter += 1;
     return `${prefix}_${Date.now().toString(36)}_${uidCounter}`;
   }
-  function formRow(labelText, control) {
-    return el("div", { className: "bl-field-builder__form-row" }, [
+  function formRow(labelText, control, description = "") {
+    const children = [
       el("div", { className: "bl-field-builder__form-label", text: labelText }),
       control
-    ]);
+    ];
+    if (description) {
+      children.push(el("p", { className: "description", text: description }));
+    }
+    return el("div", { className: "bl-field-builder__form-row" }, children);
+  }
+
+  // themes/baselayer/src/js/admin/field-builder/i18n.js
+  function t(key, fallback) {
+    const bag = typeof window !== "undefined" && window.blFieldBuilderI18n && typeof window.blFieldBuilderI18n === "object" ? window.blFieldBuilderI18n : {};
+    const value = bag[key];
+    return typeof value === "string" && value !== "" ? value : fallback;
+  }
+  function typeLabel(typeId, fallback) {
+    const bag = typeof window !== "undefined" && window.blFieldBuilderI18n && typeof window.blFieldBuilderI18n === "object" ? window.blFieldBuilderI18n : {};
+    const types2 = bag.types && typeof bag.types === "object" ? bag.types : {};
+    const value = types2[typeId];
+    return typeof value === "string" && value !== "" ? value : fallback;
   }
 
   // themes/baselayer/src/js/admin/field-builder/types/text.js
@@ -111,14 +128,14 @@
       renderOptions(container) {
         container.appendChild(
           formRow(
-            "Placeholder",
+            t("placeholder", "Placeholder"),
             mark(el("input", { type: "text", className: "widefat" }), "placeholder")
           )
         );
         if (inputType === "text" || inputType === "email" || inputType === "url" || inputType === "tel") {
           container.appendChild(
             formRow(
-              "Default value",
+              t("defaultValue", "Default value"),
               mark(el("input", { type: inputType === "tel" ? "text" : inputType, className: "widefat" }), "default_value")
             )
           );
@@ -163,19 +180,19 @@
     renderOptions(container) {
       container.appendChild(
         formRow(
-          "Default value",
+          t("defaultValue", "Default value"),
           mark2(el("textarea", { className: "widefat", rows: "3" }), "default_value")
         )
       );
       container.appendChild(
         formRow(
-          "Placeholder",
+          t("placeholder", "Placeholder"),
           mark2(el("input", { type: "text", className: "widefat" }), "placeholder")
         )
       );
       container.appendChild(
         formRow(
-          "Rows",
+          t("rows", "Rows"),
           mark2(el("input", { type: "number", className: "small-text", min: "2", max: "50", value: "4" }), "rows")
         )
       );
@@ -258,20 +275,23 @@
         el("textarea", {
           className: "widefat",
           rows: "5",
-          placeholder: "Label : value (one per line)"
+          placeholder: t("optionsPlaceholder", "Label : value (one per line)")
         }),
         "options_text"
       );
-      container.appendChild(formRow("Options", optionsArea));
+      container.appendChild(formRow(t("options", "Options"), optionsArea));
       container.appendChild(
         el("p", {
           className: "description",
-          text: "One option per line. Use \u201CLabel : value\u201D or a single value."
+          text: t(
+            "optionsHelp",
+            "One option per line. Use \u201CLabel : value\u201D or a single value."
+          )
         })
       );
       container.appendChild(
         formRow(
-          "Default value",
+          t("defaultValue", "Default value"),
           mark3(el("input", { type: "text", className: "widefat" }), "default_value")
         )
       );
@@ -279,7 +299,7 @@
       container.appendChild(
         el("label", { className: "bl-field-builder__checkbox-label" }, [
           allowMultiple,
-          document.createTextNode(" Allow multiple")
+          document.createTextNode(" " + t("allowMultiple", "Allow multiple"))
         ])
       );
     },
@@ -328,13 +348,20 @@
     modes: ["fields", "options"],
     renderOptions(container) {
       const defaultSelect = mark4(el("select", { className: "widefat" }), "default_value");
-      defaultSelect.appendChild(el("option", { value: "0", text: "No" }));
-      defaultSelect.appendChild(el("option", { value: "1", text: "Yes" }));
-      container.appendChild(formRow("Default value", defaultSelect));
+      defaultSelect.appendChild(el("option", { value: "0", text: t("no", "No") }));
+      defaultSelect.appendChild(el("option", { value: "1", text: t("yes", "Yes") }));
+      container.appendChild(formRow(t("defaultValue", "Default value"), defaultSelect));
       container.appendChild(
         formRow(
-          "CSS class when checked",
-          mark4(el("input", { type: "text", className: "widefat", placeholder: "e.g. -is-active" }), "class_name")
+          t("cssClassWhenChecked", "CSS class when checked"),
+          mark4(
+            el("input", {
+              type: "text",
+              className: "widefat",
+              placeholder: t("cssClassPlaceholder", "e.g. -is-active")
+            }),
+            "class_name"
+          )
         )
       );
     },
@@ -375,7 +402,7 @@
     renderOptions(container) {
       container.appendChild(
         formRow(
-          "Placeholder",
+          t("placeholder", "Placeholder"),
           mark5(el("input", { type: "text", className: "widefat" }), "placeholder")
         )
       );
@@ -409,7 +436,7 @@
     renderOptions(container) {
       container.appendChild(
         formRow(
-          "Placeholder",
+          t("placeholder", "Placeholder"),
           mark6(el("input", { type: "text", className: "widefat" }), "placeholder")
         )
       );
@@ -443,7 +470,7 @@
     renderOptions(container) {
       container.appendChild(
         formRow(
-          "Placeholder",
+          t("placeholder", "Placeholder"),
           mark7(el("input", { type: "text", className: "widefat" }), "placeholder")
         )
       );
@@ -477,7 +504,7 @@
     renderOptions(container) {
       container.appendChild(
         formRow(
-          "Placeholder",
+          t("placeholder", "Placeholder"),
           mark8(el("input", { type: "text", className: "widefat" }), "placeholder")
         )
       );
@@ -882,6 +909,11 @@
     presentation: "Presentation",
     logic: "Logic"
   };
+  var TAB_I18N_KEYS = {
+    general: "tabGeneral",
+    presentation: "tabPresentation",
+    logic: "tabLogic"
+  };
   function createFieldRow({
     mode = "fields",
     data = {},
@@ -898,8 +930,10 @@
     const title = data.title != null ? String(data.title) : data.label != null ? String(data.label) : "";
     const slug = data.slug != null ? String(data.slug) : data.id != null ? String(data.id) : "";
     const tabIds = Array.isArray(tabs) && tabs.length ? tabs.filter((id) => TAB_DEFS[id]) : ["general", "presentation", "logic"];
-    const titleLabel = labels.title || "Title";
-    const slugLabel = labels.slug || "Slug";
+    const titleLabel = labels.title || t("title", "Title");
+    const slugLabel = labels.slug || t("slug", "Slug");
+    const typeLabelText = labels.type || t("type", "Type");
+    const helpLabel = labels.help || t("helpText", "Help text");
     const typeChip = el("span", {
       className: "bl-field-builder__type-chip",
       text: getType(typeId) && getType(typeId).label || typeId
@@ -927,7 +961,7 @@
             role: "tab",
             dataset: { blFbTab: id },
             "aria-selected": index2 === 0 ? "true" : "false",
-            text: TAB_DEFS[id]
+            text: t(TAB_I18N_KEYS[id] || id, TAB_DEFS[id])
           })
         );
       });
@@ -951,7 +985,7 @@
       dataset: { blFb: "slug" },
       value: slug
     });
-    panelGeneral.appendChild(formRow("Type", typeSelect));
+    panelGeneral.appendChild(formRow(typeLabelText, typeSelect));
     panelGeneral.appendChild(formRow(titleLabel, titleInput));
     panelGeneral.appendChild(formRow(slugLabel, slugInput));
     if (showHelp || data.help != null) {
@@ -961,12 +995,12 @@
         dataset: { blFb: "help" },
         value: data.help != null ? String(data.help) : ""
       });
-      panelGeneral.appendChild(formRow("Help text", helpInput));
+      panelGeneral.appendChild(formRow(helpLabel, helpInput));
     }
     if (showRequired) {
       panelGeneral.appendChild(
         createSwitch({
-          label: "Required",
+          label: t("required", "Required"),
           checked: !!data.required,
           datasetKey: "required"
         })
@@ -1057,74 +1091,74 @@
   }
 
   // node_modules/sortablejs/modular/sortable.esm.js
-  function _defineProperty(e, r, t) {
+  function _defineProperty(e, r, t2) {
     return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, {
-      value: t,
+      value: t2,
       enumerable: true,
       configurable: true,
       writable: true
-    }) : e[r] = t, e;
+    }) : e[r] = t2, e;
   }
   function _extends() {
     return _extends = Object.assign ? Object.assign.bind() : function(n) {
       for (var e = 1; e < arguments.length; e++) {
-        var t = arguments[e];
-        for (var r in t) ({}).hasOwnProperty.call(t, r) && (n[r] = t[r]);
+        var t2 = arguments[e];
+        for (var r in t2) ({}).hasOwnProperty.call(t2, r) && (n[r] = t2[r]);
       }
       return n;
     }, _extends.apply(null, arguments);
   }
   function ownKeys(e, r) {
-    var t = Object.keys(e);
+    var t2 = Object.keys(e);
     if (Object.getOwnPropertySymbols) {
       var o = Object.getOwnPropertySymbols(e);
       r && (o = o.filter(function(r2) {
         return Object.getOwnPropertyDescriptor(e, r2).enumerable;
-      })), t.push.apply(t, o);
+      })), t2.push.apply(t2, o);
     }
-    return t;
+    return t2;
   }
   function _objectSpread2(e) {
     for (var r = 1; r < arguments.length; r++) {
-      var t = null != arguments[r] ? arguments[r] : {};
-      r % 2 ? ownKeys(Object(t), true).forEach(function(r2) {
-        _defineProperty(e, r2, t[r2]);
-      }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function(r2) {
-        Object.defineProperty(e, r2, Object.getOwnPropertyDescriptor(t, r2));
+      var t2 = null != arguments[r] ? arguments[r] : {};
+      r % 2 ? ownKeys(Object(t2), true).forEach(function(r2) {
+        _defineProperty(e, r2, t2[r2]);
+      }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t2)) : ownKeys(Object(t2)).forEach(function(r2) {
+        Object.defineProperty(e, r2, Object.getOwnPropertyDescriptor(t2, r2));
       });
     }
     return e;
   }
-  function _objectWithoutProperties(e, t) {
+  function _objectWithoutProperties(e, t2) {
     if (null == e) return {};
-    var o, r, i = _objectWithoutPropertiesLoose(e, t);
+    var o, r, i = _objectWithoutPropertiesLoose(e, t2);
     if (Object.getOwnPropertySymbols) {
       var n = Object.getOwnPropertySymbols(e);
-      for (r = 0; r < n.length; r++) o = n[r], -1 === t.indexOf(o) && {}.propertyIsEnumerable.call(e, o) && (i[o] = e[o]);
+      for (r = 0; r < n.length; r++) o = n[r], -1 === t2.indexOf(o) && {}.propertyIsEnumerable.call(e, o) && (i[o] = e[o]);
     }
     return i;
   }
   function _objectWithoutPropertiesLoose(r, e) {
     if (null == r) return {};
-    var t = {};
+    var t2 = {};
     for (var n in r) if ({}.hasOwnProperty.call(r, n)) {
       if (-1 !== e.indexOf(n)) continue;
-      t[n] = r[n];
+      t2[n] = r[n];
     }
-    return t;
+    return t2;
   }
-  function _toPrimitive(t, r) {
-    if ("object" != typeof t || !t) return t;
-    var e = t[Symbol.toPrimitive];
+  function _toPrimitive(t2, r) {
+    if ("object" != typeof t2 || !t2) return t2;
+    var e = t2[Symbol.toPrimitive];
     if (void 0 !== e) {
-      var i = e.call(t, r || "default");
+      var i = e.call(t2, r || "default");
       if ("object" != typeof i) return i;
       throw new TypeError("@@toPrimitive must return a primitive value.");
     }
-    return ("string" === r ? String : Number)(t);
+    return ("string" === r ? String : Number)(t2);
   }
-  function _toPropertyKey(t) {
-    var i = _toPrimitive(t, "string");
+  function _toPropertyKey(t2) {
+    var i = _toPrimitive(t2, "string");
     return "symbol" == typeof i ? i : i + "";
   }
   function _typeof(o) {
@@ -3335,11 +3369,21 @@
 
   // themes/baselayer/src/js/admin/field-builder/index.js
   var typesRegistered = false;
+  function applyTypeLabels() {
+    listTypeIds().forEach((id) => {
+      const def = getType(id);
+      if (!def) {
+        return;
+      }
+      def.label = typeLabel(id, def.label || id);
+    });
+  }
   function ensureTypes() {
     if (!typesRegistered) {
       registerAllTypes();
       typesRegistered = true;
     }
+    applyTypeLabels();
   }
   function mount2(mountEl, options = {}) {
     if (!mountEl) {

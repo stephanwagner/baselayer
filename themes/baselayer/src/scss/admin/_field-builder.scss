@@ -208,6 +208,10 @@
   &:last-child {
     margin-bottom: 0;
   }
+
+  > .description {
+    margin: 4px 0 0;
+  }
 }
 
 .bl-field-builder__form-label {

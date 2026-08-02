@@ -1,4 +1,5 @@
 import { el, formRow } from '../dom';
+import { t } from '../i18n';
 
 function mark(input, key) {
   input.dataset.blFb = key;
@@ -13,14 +14,21 @@ export default {
 
   renderOptions(container) {
     const defaultSelect = mark(el('select', { className: 'widefat' }), 'default_value');
-    defaultSelect.appendChild(el('option', { value: '0', text: 'No' }));
-    defaultSelect.appendChild(el('option', { value: '1', text: 'Yes' }));
-    container.appendChild(formRow('Default value', defaultSelect));
+    defaultSelect.appendChild(el('option', { value: '0', text: t('no', 'No') }));
+    defaultSelect.appendChild(el('option', { value: '1', text: t('yes', 'Yes') }));
+    container.appendChild(formRow(t('defaultValue', 'Default value'), defaultSelect));
 
     container.appendChild(
       formRow(
-        'CSS class when checked',
-        mark(el('input', { type: 'text', className: 'widefat', placeholder: 'e.g. -is-active' }), 'class_name')
+        t('cssClassWhenChecked', 'CSS class when checked'),
+        mark(
+          el('input', {
+            type: 'text',
+            className: 'widefat',
+            placeholder: t('cssClassPlaceholder', 'e.g. -is-active'),
+          }),
+          'class_name'
+        )
       )
     );
   },

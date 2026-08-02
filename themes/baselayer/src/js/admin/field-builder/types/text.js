@@ -1,4 +1,5 @@
 import { el, formRow } from '../dom';
+import { t } from '../i18n';
 
 function mark(input, key) {
   input.dataset.blFb = key;
@@ -15,14 +16,14 @@ function simpleTextType(id, label, inputType = 'text') {
     renderOptions(container) {
       container.appendChild(
         formRow(
-          'Placeholder',
+          t('placeholder', 'Placeholder'),
           mark(el('input', { type: 'text', className: 'widefat' }), 'placeholder')
         )
       );
       if (inputType === 'text' || inputType === 'email' || inputType === 'url' || inputType === 'tel') {
         container.appendChild(
           formRow(
-            'Default value',
+            t('defaultValue', 'Default value'),
             mark(el('input', { type: inputType === 'tel' ? 'text' : inputType, className: 'widefat' }), 'default_value')
           )
         );

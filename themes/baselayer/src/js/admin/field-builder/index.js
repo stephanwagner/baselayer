@@ -13,14 +13,26 @@ import { createSwitch, createSegmented, openModal } from './controls';
 import { el, empty, slugify, uid, formRow, bindTitleSlugSync } from './dom';
 import { iconEl } from './icons';
 import { getType, listTypesForMode, registerType, listTypeIds } from './registry';
+import { typeLabel } from './i18n';
 
 let typesRegistered = false;
+
+function applyTypeLabels() {
+  listTypeIds().forEach((id) => {
+    const def = getType(id);
+    if (!def) {
+      return;
+    }
+    def.label = typeLabel(id, def.label || id);
+  });
+}
 
 function ensureTypes() {
   if (!typesRegistered) {
     registerAllTypes();
     typesRegistered = true;
   }
+  applyTypeLabels();
 }
 
 /**

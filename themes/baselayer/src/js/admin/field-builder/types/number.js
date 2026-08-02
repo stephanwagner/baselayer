@@ -1,4 +1,5 @@
 import { el, formRow } from '../dom';
+import { t } from '../i18n';
 
 function mark(input, key) {
   input.dataset.blFb = key;
@@ -14,7 +15,7 @@ export default {
   renderOptions(container) {
     container.appendChild(
       formRow(
-        'Placeholder',
+        t('placeholder', 'Placeholder'),
         mark(el('input', { type: 'text', className: 'widefat' }), 'placeholder')
       )
     );

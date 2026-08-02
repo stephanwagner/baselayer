@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-30T10:10:54+00:00\n"
+"POT-Creation-Date: 2026-08-02T00:06:00+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: baselayer-events\n"
@@ -115,7 +115,7 @@ msgid "Some fields are customized."
 msgstr ""
 
 #: includes/assets.php:95
-msgid "Changed fields keep your edits when the master updates. This date is still removed if it leaves the series."
+msgid "Changed fields keep your edits when the master updates."
 msgstr ""
 
 #: includes/assets.php:96
@@ -330,8 +330,8 @@ msgid "Restore"
 msgstr ""
 
 #: includes/assets.php:184
-#: includes/assets.php:317
-#: includes/assets.php:353
+#: includes/assets.php:349
+#: includes/assets.php:388
 #: includes/settings-page.php:439
 msgid "Delete"
 msgstr ""
@@ -376,69 +376,144 @@ msgstr ""
 msgid "Something went wrong. Please try again."
 msgstr ""
 
-#: includes/assets.php:314
+#: includes/assets.php:251
+msgid "Type"
+msgstr ""
+
+#: includes/assets.php:252
+msgid "Help text"
+msgstr ""
+
+#: includes/assets.php:253
+msgid "Placeholder"
+msgstr ""
+
+#: includes/assets.php:254
+msgid "Default value"
+msgstr ""
+
+#: includes/assets.php:255
+msgid "Options"
+msgstr ""
+
+#: includes/assets.php:256
+msgid "One option per line. Use “Label : value” or a single value."
+msgstr ""
+
+#: includes/assets.php:257
+msgid "Label : value (one per line)"
+msgstr ""
+
+#: includes/assets.php:258
+msgid "Allow multiple"
+msgstr ""
+
+#: includes/assets.php:259
+msgid "Rows"
+msgstr ""
+
+#: includes/assets.php:261
+msgid "Text"
+msgstr ""
+
+#: includes/assets.php:262
+msgid "Textarea"
+msgstr ""
+
+#: includes/assets.php:263
+msgid "Number"
+msgstr ""
+
+#: includes/assets.php:264
+#: includes/i18n-defaults.php:31
+msgid "Email"
+msgstr ""
+
+#: includes/assets.php:265
+#: includes/i18n-defaults.php:34
+msgid "Phone"
+msgstr ""
+
+#: includes/assets.php:266
+msgid "URL"
+msgstr ""
+
+#: includes/assets.php:267
+msgid "Select"
+msgstr ""
+
+#: includes/assets.php:346
 msgid "Panel title"
 msgstr ""
 
-#: includes/assets.php:315
+#: includes/assets.php:347
 msgid "Add group"
 msgstr ""
 
-#: includes/assets.php:316
+#: includes/assets.php:348
 msgid "Add field"
 msgstr ""
 
-#: includes/assets.php:318
+#: includes/assets.php:350
 msgid "No metadata groups yet. Add a group to get started."
 msgstr ""
 
-#: includes/assets.php:319
+#: includes/assets.php:351
 msgid "No fields in this group."
 msgstr ""
 
-#: includes/assets.php:320
+#: includes/assets.php:352
 msgid "Group ID"
 msgstr ""
 
-#: includes/assets.php:321
+#. translators: Help under Group ID in the metadata settings builder.
+#: includes/assets.php:354
+msgid "Stable key for templates and stored metadata. Use lowercase letters, numbers, and underscores."
+msgstr ""
+
+#: includes/assets.php:355
 msgid "Group title"
 msgstr ""
 
-#: includes/assets.php:322
-#: includes/assets.php:355
-msgid "Label"
-msgstr ""
-
-#: includes/assets.php:323
-msgid "Field ID"
-msgstr ""
-
-#: includes/assets.php:324
-msgid "Fields"
-msgstr ""
-
-#: includes/assets.php:325
-#: includes/assets.php:354
-msgid "Drag to reorder"
-msgstr ""
-
-#: includes/assets.php:351
-msgid "Add status"
-msgstr ""
-
-#: includes/assets.php:352
-msgid "No statuses yet. Add a status to get started."
-msgstr ""
-
 #: includes/assets.php:356
-msgid "Color"
+msgid "(untitled group)"
 msgstr ""
 
 #: includes/assets.php:357
-msgid "Custom…"
+#: includes/assets.php:390
+msgid "Label"
 msgstr ""
 
 #: includes/assets.php:358
+msgid "Field ID"
+msgstr ""
+
+#: includes/assets.php:359
+msgid "Fields"
+msgstr ""
+
+#: includes/assets.php:360
+#: includes/assets.php:389
+msgid "Drag to reorder"
+msgstr ""
+
+#: includes/assets.php:386
+msgid "Add status"
+msgstr ""
+
+#: includes/assets.php:387
+msgid "No statuses yet. Add a status to get started."
+msgstr ""
+
+#: includes/assets.php:391
+msgid "Color"
+msgstr ""
+
+#: includes/assets.php:392
+msgid "Custom…"
+msgstr ""
+
+#: includes/assets.php:393
 msgid "Custom color"
 msgstr ""
 
@@ -469,9 +544,9 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: includes/events-recurrence.php:928
-#: includes/events-recurrence.php:1294
-#: includes/events-recurrence.php:1508
-#: includes/events-recurrence.php:1877
+#: includes/events-recurrence.php:1389
+#: includes/events-recurrence.php:1642
+#: includes/events-recurrence.php:2011
 msgid "Not an occurrence."
 msgstr ""
 
@@ -480,30 +555,30 @@ msgid "Sorry, you are not allowed to edit this event."
 msgstr ""
 
 #: includes/events-recurrence.php:936
-#: includes/events-recurrence.php:1298
+#: includes/events-recurrence.php:1393
 msgid "Master event not found."
 msgstr ""
 
 #: includes/events-recurrence.php:941
-#: includes/events-recurrence.php:1771
+#: includes/events-recurrence.php:1905
 msgid "Invalid date."
 msgstr ""
 
-#: includes/events-recurrence.php:1302
+#: includes/events-recurrence.php:1397
 msgid "Master event is not available."
 msgstr ""
 
-#: includes/events-recurrence.php:1746
-#: includes/events-recurrence.php:1768
-#: includes/events-recurrence.php:1863
+#: includes/events-recurrence.php:1880
+#: includes/events-recurrence.php:1902
+#: includes/events-recurrence.php:1997
 msgid "Not a recurring master event."
 msgstr ""
 
-#: includes/events-recurrence.php:1776
+#: includes/events-recurrence.php:1910
 msgid "This date is a standalone event and cannot be restored into the series."
 msgstr ""
 
-#: includes/events-recurrence.php:1880
+#: includes/events-recurrence.php:2014
 msgid "Occurrence does not belong to this master."
 msgstr ""
 
@@ -606,20 +681,12 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: includes/i18n-defaults.php:31
-msgid "Email"
-msgstr ""
-
 #: includes/i18n-defaults.php:32
 msgid "Website"
 msgstr ""
 
 #: includes/i18n-defaults.php:33
 msgid "Contact"
-msgstr ""
-
-#: includes/i18n-defaults.php:34
-msgid "Phone"
 msgstr ""
 
 #: includes/instances.php:352
