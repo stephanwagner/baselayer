@@ -102,18 +102,29 @@ function bl_blocks_register_admin_menu(): void
 		'edit.php?post_type=' . BL_BLOCK_POST_TYPE . '&bl_block_type=block'
 	);
 
+	if (defined('BL_BLOCK_OPTIONS_PAGE') && function_exists('bl_block_options_render_admin_page')) {
+		add_submenu_page(
+			'bl-blocks',
+			__('Block Options', 'baselayer-blocks'),
+			__('Block Options', 'baselayer-blocks'),
+			$cap,
+			BL_BLOCK_OPTIONS_PAGE,
+			'bl_block_options_render_admin_page'
+		);
+	}
+
 	add_submenu_page(
 		'bl-blocks',
-		__('Content fields', 'baselayer-blocks'),
-		__('Content fields', 'baselayer-blocks'),
+		__('Content Fields', 'baselayer-blocks'),
+		__('Content Fields', 'baselayer-blocks'),
 		$cap,
 		'edit.php?post_type=' . BL_BLOCK_POST_TYPE . '&bl_block_type=page_settings'
 	);
 
 	add_submenu_page(
 		'bl-blocks',
-		__('Website', 'baselayer-blocks'),
-		__('Website', 'baselayer-blocks'),
+		__('Website Fields', 'baselayer-blocks'),
+		__('Website Fields', 'baselayer-blocks'),
 		$cap,
 		'edit.php?post_type=' . BL_BLOCK_POST_TYPE . '&bl_block_type=site_settings'
 	);

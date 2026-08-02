@@ -900,6 +900,10 @@ body.post-new-php.post-type-bl_block .page-title-action {
   overflow: hidden;
 }
 
+.bl-blocks-modal.bl-bo-confirm-modal {
+  width: min(400px, 100%);
+}
+
 .bl-blocks-modal__header {
   display: flex;
   align-items: center;
@@ -1267,7 +1271,7 @@ button.button.button.bl-bo-choices__add {
   font-size: 14px;
   text-align: left;
 }
-.bl-block-options-admin .bl-bo-preset-delete {
+.bl-block-options-admin .bl-bo-row-delete {
   flex: 0 0 auto;
   margin-left: -8px;
 }
@@ -1282,6 +1286,11 @@ button.button.button.bl-bo-choices__add {
   flex-wrap: wrap;
   align-items: center;
   margin: 0 0 16px;
+}
+.bl-block-options-admin .bl-bo-toolbar--save {
+  margin: 16px 0 0;
+  padding: 16px 0 0;
+  border-top: 1px solid #e0e0e3;
 }
 .bl-block-options-admin .bl-bo-toolbar--presets {
   justify-content: flex-end;

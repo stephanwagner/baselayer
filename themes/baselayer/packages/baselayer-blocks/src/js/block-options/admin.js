@@ -38,12 +38,11 @@ function boot() {
   const slugManual = new Set(presets.map((p) => p.slug).filter(Boolean));
   let editingBlockName = null;
   let savingBlock = false;
+  let savingPreset = false;
   let addingBlock = false;
   let selectedAddBlock = '';
+  /** Block assignments changed by a preset slug rename — persisted with the next preset save. */
   let blocksDirty = false;
-  let presetSaveTimer = null;
-  let presetSaveInFlight = false;
-  let presetSaveQueued = false;
   /** @type {{ type: 'success'|'error'|'muted', text: string }|null} */
   let statusMessage = null;
 
@@ -345,7 +344,7 @@ function boot() {
   }
 
   function deletePreset(preset) {
-    if (!preset) {
+    if (!preset || savingPreset) {
       return;
     }
     if (preset.slug) {
@@ -357,7 +356,7 @@ function boot() {
     }
     setStatus(null, null);
     render();
-    scheduleSavePresets({ immediate: true });
+    void persistPresets({ keepEditing: false });
   }
 
   function confirmDeletePreset(preset) {
@@ -372,6 +371,76 @@ function boot() {
       confirmLabel: t('deletePreset', 'Delete'),
       onConfirm: () => deletePreset(preset),
     });
+  }
+
+  async function deleteBlock(block) {
+    if (!block?.name || savingBlock) {
+      return;
+    }
+    const name = block.name;
+    blocks = blocks.filter((row) => row.name !== name);
+    if (editingBlockName === name) {
+      editingBlockName = null;
+    }
+    savingBlock = true;
+    setStatus(null, null);
+    render();
+    try {
+      const data = await postAjax('bl_block_options_save_blocks', {
+        blocks: JSON.stringify(blocks),
+      });
+      if (!data?.success) {
+        setStatus('error', data?.data?.message || t('saveFailed', 'Could not save.'));
+        return;
+      }
+      if (Array.isArray(data.data?.blocks)) {
+        blocks = data.data.blocks;
+      }
+      if (Array.isArray(data.data?.availableBlocks)) {
+        availableBlocks = data.data.availableBlocks;
+      }
+      setStatus('success', t('saved', 'Saved.'));
+    } catch (e) {
+      setStatus('error', t('saveFailed', 'Could not save.'));
+    } finally {
+      savingBlock = false;
+      render();
+    }
+  }
+
+  function confirmDeleteBlock(block) {
+    const name = blockTitle(block);
+    openConfirmModal({
+      title: t('deleteBlockTitle', 'Remove block options?'),
+      message: t(
+        'deleteBlockConfirm',
+        'Remove options for “%s”? This cannot be undone.'
+      ).replace('%s', name),
+      confirmLabel: t('delete', 'Delete'),
+      onConfirm: () => deleteBlock(block),
+    });
+  }
+
+  function makeRowDeleteButton({ title, onClick }) {
+    const deleteBtn = el('button', {
+      type: 'button',
+      className:
+        'bl-forms-builder__icon-btn bl-forms-builder__icon-btn--danger bl-bo-row-delete',
+      title,
+      'aria-label': title,
+      onClick: (evt) => {
+        evt.preventDefault();
+        evt.stopPropagation();
+        onClick();
+      },
+    });
+    const trashIcon = typeof iconEl === 'function' ? iconEl('trash') : null;
+    if (trashIcon?.innerHTML) {
+      deleteBtn.appendChild(trashIcon);
+    } else {
+      deleteBtn.textContent = '×';
+    }
+    return deleteBtn;
   }
 
   async function postAjax(action, fields) {
@@ -404,33 +473,29 @@ function boot() {
     });
   }
 
-  function scheduleSavePresets({ immediate = false } = {}) {
-    if (presetSaveTimer) {
-      clearTimeout(presetSaveTimer);
-      presetSaveTimer = null;
+  /**
+   * Persist the in-memory presets map (and block refs if a slug was renamed).
+   * Keeps local preset object identity stable so an open editor is not remounted.
+   *
+   * @param {{ keepEditing?: boolean }} [opts]
+   * @returns {Promise<boolean>}
+   */
+  async function persistPresets({ keepEditing = true } = {}) {
+    if (savingPreset) {
+      return false;
     }
-    if (immediate) {
-      void flushSavePresets();
-      return;
-    }
-    presetSaveTimer = setTimeout(() => {
-      presetSaveTimer = null;
-      void flushSavePresets();
-    }, 450);
-  }
-
-  async function flushSavePresets() {
-    if (presetSaveInFlight) {
-      presetSaveQueued = true;
-      return;
-    }
-    presetSaveInFlight = true;
+    savingPreset = true;
     const presetsPayload = JSON.stringify(presets);
     const saveBlocksToo = blocksDirty;
     const blocksPayload = saveBlocksToo ? JSON.stringify(blocks) : null;
+    const openPreset = keepEditing ? editingPreset : null;
 
     setStatus('muted', t('saving', 'Saving…'));
-    paintStatus();
+    if (keepEditing) {
+      render();
+    } else {
+      paintStatus();
+    }
 
     try {
       const data = await postAjax('bl_block_options_save_presets', {
@@ -438,8 +503,7 @@ function boot() {
       });
       if (!data?.success) {
         setStatus('error', data?.data?.message || t('saveFailed', 'Could not save.'));
-        paintStatus();
-        return;
+        return false;
       }
 
       if (saveBlocksToo && blocksPayload) {
@@ -448,11 +512,8 @@ function boot() {
         });
         if (!blockData?.success) {
           setStatus('error', blockData?.data?.message || t('saveFailed', 'Could not save.'));
-          paintStatus();
-          return;
+          return false;
         }
-        // Keep local objects stable while an editor is open; only clear the dirty flag
-        // when nothing else changed during the request.
         if (JSON.stringify(blocks) === blocksPayload) {
           blocksDirty = false;
         }
@@ -460,18 +521,32 @@ function boot() {
         blocksDirty = false;
       }
 
+      // Keep editing the same object; do not replace `presets` from the response.
+      if (openPreset && presets.includes(openPreset)) {
+        editingPreset = openPreset;
+      }
       setStatus('success', t('saved', 'Saved.'));
-      paintStatus();
+      return true;
     } catch (e) {
       setStatus('error', t('saveFailed', 'Could not save.'));
-      paintStatus();
+      return false;
     } finally {
-      presetSaveInFlight = false;
-      if (presetSaveQueued) {
-        presetSaveQueued = false;
-        void flushSavePresets();
-      }
+      savingPreset = false;
+      render();
     }
+  }
+
+  async function savePreset(preset) {
+    if (savingPreset || !preset) {
+      return;
+    }
+    const slug = String(preset.slug || '').trim();
+    if (!slug) {
+      setStatus('error', t('presetSlugRequired', 'Add a slug before saving.'));
+      render();
+      return;
+    }
+    await persistPresets({ keepEditing: true });
   }
 
   async function saveBlock(block) {
@@ -558,7 +633,6 @@ function boot() {
         render();
       })
     );
-    header.appendChild(statusHost());
     panel.appendChild(header);
 
     const meta = el('div', { className: 'bl-bo-preset-meta' });
@@ -569,12 +643,12 @@ function boot() {
       pattern: '[a-z0-9\\-]*',
       spellcheck: 'false',
       autocomplete: 'off',
+      disabled: savingPreset ? true : undefined,
     });
 
     slugInput.addEventListener('input', () => {
       const next = applyPresetSlug(preset, slugInput.value, { manual: true });
       slugInput.value = next;
-      scheduleSavePresets();
     });
 
     meta.appendChild(
@@ -584,13 +658,13 @@ function boot() {
           type: 'text',
           className: 'widefat',
           value: preset.label || '',
+          disabled: savingPreset ? true : undefined,
           onInput: (e) => {
             preset.label = e.target.value;
             if (isSlugAuto(preset)) {
               const next = applyPresetSlug(preset, preset.label, { manual: false });
               slugInput.value = next;
             }
-            scheduleSavePresets();
           },
         }),
       ])
@@ -611,7 +685,6 @@ function boot() {
       { items: preset.items },
       (next) => {
         preset.items = next.items;
-        scheduleSavePresets();
       },
       {
         allowCustoms: true,
@@ -623,6 +696,22 @@ function boot() {
       }
     );
     panel.appendChild(optionsPanel);
+
+    const toolbar = el('div', { className: 'bl-bo-toolbar bl-bo-toolbar--save' });
+    toolbar.appendChild(
+      el('button', {
+        type: 'button',
+        className: 'button button-primary',
+        text: savingPreset ? t('saving', 'Saving…') : t('savePreset', 'Save preset'),
+        disabled: savingPreset ? true : undefined,
+        onClick: () => savePreset(preset),
+      })
+    );
+    const status = renderStatus();
+    if (status) {
+      toolbar.appendChild(status);
+    }
+    panel.appendChild(toolbar);
     return panel;
   }
 
@@ -654,25 +743,6 @@ function boot() {
     const list = el('ul', { className: 'bl-bo-preset-list bl-bo-block-list' });
     presets.forEach((preset) => {
       const summary = summarizeItems(preset.items);
-      const deleteBtn = el('button', {
-        type: 'button',
-        className:
-          'bl-forms-builder__icon-btn bl-forms-builder__icon-btn--danger bl-bo-preset-delete',
-        title: t('deletePreset', 'Delete'),
-        'aria-label': t('deletePreset', 'Delete'),
-        onClick: (evt) => {
-          evt.preventDefault();
-          evt.stopPropagation();
-          confirmDeletePreset(preset);
-        },
-      });
-      const trashIcon = typeof iconEl === 'function' ? iconEl('trash') : null;
-      if (trashIcon?.innerHTML) {
-        deleteBtn.appendChild(trashIcon);
-      } else {
-        deleteBtn.textContent = '×';
-      }
-
       list.appendChild(
         el('li', { className: 'bl-bo-block-row' }, [
           el('div', { className: 'bl-bo-block-row__lead' }, [
@@ -692,7 +762,10 @@ function boot() {
             className: 'bl-bo-block-row__code',
             text: preset.slug || '—',
           }),
-          deleteBtn,
+          makeRowDeleteButton({
+            title: t('deletePreset', 'Delete'),
+            onClick: () => confirmDeletePreset(preset),
+          }),
         ])
       );
     });
@@ -772,12 +845,12 @@ function boot() {
     );
     panel.appendChild(optionsPanel);
 
-    const toolbar = el('div', { className: 'bl-bo-toolbar', style: 'margin-top:16px' });
+    const toolbar = el('div', { className: 'bl-bo-toolbar bl-bo-toolbar--save' });
     toolbar.appendChild(
       el('button', {
         type: 'button',
         className: 'button button-primary',
-        text: savingBlock ? '…' : t('saveBlocks', 'Save block'),
+        text: savingBlock ? t('saving', 'Saving…') : t('saveBlocks', 'Save block'),
         disabled: savingBlock ? true : undefined,
         onClick: () => saveBlock(block),
       })
@@ -958,6 +1031,10 @@ function boot() {
           ]),
           el('span', { className: 'bl-bo-block-row__meta', text: summary.counts }),
           el('code', { className: 'bl-bo-block-row__code', text: block.name }),
+          makeRowDeleteButton({
+            title: t('delete', 'Delete'),
+            onClick: () => confirmDeleteBlock(block),
+          }),
         ])
       );
     });

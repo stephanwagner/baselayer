@@ -363,8 +363,8 @@ function bl_blocks_render_import_export_page(): void
 					<select name="bl_blocks_export_type" id="bl_blocks_export_type">
 						<option value="all"><?php echo esc_html__('All', 'baselayer-blocks'); ?></option>
 						<option value="block"><?php echo esc_html__('Blocks', 'baselayer-blocks'); ?></option>
-						<option value="page_settings"><?php echo esc_html__('Content fields', 'baselayer-blocks'); ?></option>
-						<option value="site_settings"><?php echo esc_html__('Website', 'baselayer-blocks'); ?></option>
+						<option value="page_settings"><?php echo esc_html__('Content Fields', 'baselayer-blocks'); ?></option>
+						<option value="site_settings"><?php echo esc_html__('Website Fields', 'baselayer-blocks'); ?></option>
 					</select>
 				</p>
 				<?php submit_button(__('Download JSON', 'baselayer-blocks'), 'primary', 'bl_blocks_export', false); ?>

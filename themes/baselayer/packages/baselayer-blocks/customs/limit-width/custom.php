@@ -12,7 +12,7 @@ if (!function_exists('bl_block_options_control_limit_width')) {
 	{
 		return [
 			'type' => 'limit-width',
-			'label' => 'Weite limitieren',
+			'label' => __('Limit width', 'baselayer-blocks'),
 			'defaultSize' => '',
 			'defaultAlign' => 'center',
 			'attributeNames' => [
@@ -25,16 +25,16 @@ if (!function_exists('bl_block_options_control_limit_width')) {
 
 
 return [
-	'label' => 'Limit width',
+	'label' => __('Limit width', 'baselayer-blocks'),
 	'params' => [
 		'label' => [
 			'type' => 'text',
-			'label' => 'Label',
-			'default' => 'Weite limitieren',
+			'label' => __('Label', 'baselayer-blocks'),
+			'default' => __('Limit width', 'baselayer-blocks'),
 		],
 		'defaultSize' => [
 			'type' => 'size',
-			'label' => 'Default size',
+			'label' => __('Default size', 'baselayer-blocks'),
 			'default' => '',
 			'choices' => [
 				'' => '—',
@@ -45,7 +45,7 @@ return [
 		],
 		'defaultAlign' => [
 			'type' => 'align',
-			'label' => 'Default align',
+			'label' => __('Default align', 'baselayer-blocks'),
 			'default' => 'center',
 		],
 	],

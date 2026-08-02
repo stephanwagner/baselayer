@@ -447,7 +447,7 @@ msgstr "Feld hinzufügen"
 
 #: includes/assets.php:350
 msgid "No metadata groups yet. Add a group to get started."
-msgstr "Noch keine Metadaten-Gruppen. Fügen Sie eine Gruppe hinzu, um zu starten."
+msgstr "Noch keine Metadaten-Gruppen. Füge eine Gruppe hinzu, um zu starten."
 
 #: includes/assets.php:351
 msgid "No fields in this group."
@@ -494,7 +494,7 @@ msgstr "Status hinzufügen"
 
 #: includes/assets.php:387
 msgid "No statuses yet. Add a status to get started."
-msgstr "Noch keine Status. Fügen Sie einen Status hinzu, um zu starten."
+msgstr "Noch keine Status. Füge einen Status hinzu, um zu starten."
 
 #: includes/assets.php:391
 msgid "Color"

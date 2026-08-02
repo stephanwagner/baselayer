@@ -56,7 +56,7 @@ function bl_blocks_render_website_page(): void
 	echo '<h1>' . esc_html__('Website', 'baselayer-blocks') . '</h1>';
 
 	if ($definitions === []) {
-		echo '<p>' . esc_html__('No active website settings yet. Create one under Website.', 'baselayer-blocks') . '</p>';
+		echo '<p>' . esc_html__('No active website settings yet. Create one under Website Fields.', 'baselayer-blocks') . '</p>';
 		echo '<p><a class="button button-primary" href="' . esc_url(admin_url('post-new.php?post_type=' . BL_BLOCK_POST_TYPE . '&bl_block_type=site_settings')) . '">';
 		echo esc_html__('Add fields', 'baselayer-blocks');
 		echo '</a></p></div>';

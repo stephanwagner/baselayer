@@ -74,14 +74,14 @@ function bl_blocks_type_labels(string $type): array
 	switch ($type) {
 		case 'page_settings':
 			return [
-				'plural'   => __('Content fields', 'baselayer-blocks'),
-				'singular' => __('Content fields', 'baselayer-blocks'),
+				'plural'   => __('Content Fields', 'baselayer-blocks'),
+				'singular' => __('Content Fields', 'baselayer-blocks'),
 				'add'      => __('Add fields', 'baselayer-blocks'),
 			];
 		case 'site_settings':
 			return [
-				'plural'   => __('Website', 'baselayer-blocks'),
-				'singular' => __('Website', 'baselayer-blocks'),
+				'plural'   => __('Website Fields', 'baselayer-blocks'),
+				'singular' => __('Website Fields', 'baselayer-blocks'),
 				'add'      => __('Add fields', 'baselayer-blocks'),
 			];
 		default:

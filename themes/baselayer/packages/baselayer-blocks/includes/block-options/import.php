@@ -58,7 +58,7 @@ function bl_block_options_import_json_string(string $raw, array $args = [])
 {
 	$decoded = json_decode($raw, true);
 	if (!is_array($decoded)) {
-		return new WP_Error('bl_block_options_import_json', __('Invalid block options JSON.', 'baselayer'));
+		return new WP_Error('bl_block_options_import_json', __('Invalid block options JSON.', 'baselayer-blocks'));
 	}
 
 	$replace = !empty($args['replace']);
@@ -67,7 +67,7 @@ function bl_block_options_import_json_string(string $raw, array $args = [])
 	if (!$replace && !bl_block_options_store_is_empty()) {
 		return new WP_Error(
 			'bl_block_options_import_not_empty',
-			__('Block options store is not empty. Use replace to overwrite.', 'baselayer')
+			__('Block options store is not empty. Use replace to overwrite.', 'baselayer-blocks')
 		);
 	}
 
@@ -90,7 +90,7 @@ function bl_block_options_import_from_file(string $path, array $args = [])
 	if ($path === '' || !is_readable($path)) {
 		return new WP_Error(
 			'bl_block_options_import_missing',
-			__('Block options import file not found.', 'baselayer')
+			__('Block options import file not found.', 'baselayer-blocks')
 		);
 	}
 
@@ -98,7 +98,7 @@ function bl_block_options_import_from_file(string $path, array $args = [])
 	if (!is_string($raw) || $raw === '') {
 		return new WP_Error(
 			'bl_block_options_import_empty',
-			__('Block options import file is empty.', 'baselayer')
+			__('Block options import file is empty.', 'baselayer-blocks')
 		);
 	}
 
@@ -173,7 +173,7 @@ function bl_block_options_handle_admin_import(): void
 			'type' => 'success',
 			'message' => sprintf(
 				/* translators: 1: preset count, 2: block count */
-				__('Imported %1$d presets and %2$d block assignments.', 'baselayer'),
+				__('Imported %1$d presets and %2$d block assignments.', 'baselayer-blocks'),
 				(int) $result['presets'],
 				(int) $result['blocks']
 			),

@@ -5,32 +5,21 @@ defined('ABSPATH') || exit;
 const BL_BLOCK_OPTIONS_PAGE = 'bl-block-options';
 
 /**
- * Register Blocks → Block Options.
+ * Fallback top-level menu when the Blocks package menu is unavailable.
+ * Normal order is registered in bl_blocks_register_admin_menu() (after Blocks).
  */
-function bl_block_options_register_admin_menu(): void
+function bl_block_options_register_admin_menu_fallback(): void
 {
 	if (!current_user_can('manage_options')) {
 		return;
 	}
 
-	$parent = (defined('BL_BLOCK_POST_TYPE') && post_type_exists(BL_BLOCK_POST_TYPE))
-		? 'bl-blocks'
-		: '';
-
-	$title = __('Block Options', 'baselayer');
-
-	if ($parent !== '') {
-		add_submenu_page(
-			$parent,
-			$title,
-			$title,
-			'manage_options',
-			BL_BLOCK_OPTIONS_PAGE,
-			'bl_block_options_render_admin_page'
-		);
+	// Already attached under Blocks → …
+	if (defined('BL_BLOCK_POST_TYPE') && post_type_exists(BL_BLOCK_POST_TYPE) && function_exists('bl_blocks_user_can_manage') && bl_blocks_user_can_manage()) {
 		return;
 	}
 
+	$title = __('Block Options', 'baselayer-blocks');
 	add_menu_page(
 		$title,
 		$title,
@@ -41,7 +30,7 @@ function bl_block_options_register_admin_menu(): void
 		82
 	);
 }
-add_action('admin_menu', 'bl_block_options_register_admin_menu', 25);
+add_action('admin_menu', 'bl_block_options_register_admin_menu_fallback', 25);
 
 /**
  * @param string|null $file
@@ -310,79 +299,84 @@ function bl_block_options_enqueue_admin_assets(): void
 	}
 
 	$i18n = [
-		'title' => __('Block Options', 'baselayer'),
-		'tabBlocks' => __('Blocks', 'baselayer'),
-		'tabAll' => __('All', 'baselayer'),
-		'tabBaselayer' => __('BaseLayer', 'baselayer'),
-		'tabAcf' => __('ACF', 'baselayer'),
-		'tabCore' => __('Core', 'baselayer'),
-		'tabOther' => __('Other', 'baselayer'),
-		'tabPresets' => __('Presets', 'baselayer'),
-		'emptyAll' => __('No blocks with options yet. Add a block below, or import defaults under Blocks → Import / Export.', 'baselayer'),
-		'emptyBaselayer' => __('No BaseLayer blocks with options yet. Add a block below, or import defaults under Blocks → Import / Export.', 'baselayer'),
-		'emptyAcf' => __('No ACF blocks with options yet. Add a block below, or import defaults under Blocks → Import / Export.', 'baselayer'),
-		'emptySystem' => __('No Core blocks with options yet. Add a block below, or import defaults under Blocks → Import / Export.', 'baselayer'),
-		'emptyPresets' => __('No presets yet. Add one, or import defaults under Blocks → Import / Export.', 'baselayer'),
-		'addPreset' => __('Add preset', 'baselayer'),
-		'addBlock' => __('Add block', 'baselayer'),
-		'chooseBlock' => __('Select a block…', 'baselayer'),
-		'addingBlock' => __('Adding…', 'baselayer'),
-		'addBlockFailed' => __('Could not add block.', 'baselayer'),
-		'noBlocksToAdd' => __('No more blocks available in this filter.', 'baselayer'),
-		'untitledPreset' => __('Untitled', 'baselayer'),
-		'saveBlocks' => __('Save block', 'baselayer'),
-		'presetLabel' => __('Label', 'baselayer'),
-		'presetSlug' => __('Slug', 'baselayer'),
-		'deletePreset' => __('Delete', 'baselayer'),
-		'deletePresetTitle' => __('Delete preset?', 'baselayer'),
+		'title' => __('Block Options', 'baselayer-blocks'),
+		'tabBlocks' => __('Blocks', 'baselayer-blocks'),
+		'tabAll' => __('All', 'baselayer-blocks'),
+		'tabBaselayer' => __('BaseLayer', 'baselayer-blocks'),
+		'tabAcf' => __('ACF', 'baselayer-blocks'),
+		'tabCore' => __('Core', 'baselayer-blocks'),
+		'tabOther' => __('Other', 'baselayer-blocks'),
+		'tabPresets' => __('Presets', 'baselayer-blocks'),
+		'emptyAll' => __('No blocks with options yet. Add a block below, or import defaults under Blocks → Import / Export.', 'baselayer-blocks'),
+		'emptyBaselayer' => __('No BaseLayer blocks with options yet. Add a block below, or import defaults under Blocks → Import / Export.', 'baselayer-blocks'),
+		'emptyAcf' => __('No ACF blocks with options yet. Add a block below, or import defaults under Blocks → Import / Export.', 'baselayer-blocks'),
+		'emptySystem' => __('No Core blocks with options yet. Add a block below, or import defaults under Blocks → Import / Export.', 'baselayer-blocks'),
+		'emptyPresets' => __('No presets yet. Add one, or import defaults under Blocks → Import / Export.', 'baselayer-blocks'),
+		'addPreset' => __('Add preset', 'baselayer-blocks'),
+		'savePreset' => __('Save preset', 'baselayer-blocks'),
+		'presetSlugRequired' => __('Add a slug before saving.', 'baselayer-blocks'),
+		'addBlock' => __('Add block', 'baselayer-blocks'),
+		'chooseBlock' => __('Select a block…', 'baselayer-blocks'),
+		'addingBlock' => __('Adding…', 'baselayer-blocks'),
+		'addBlockFailed' => __('Could not add block.', 'baselayer-blocks'),
+		'noBlocksToAdd' => __('No more blocks available in this filter.', 'baselayer-blocks'),
+		'untitledPreset' => __('Untitled', 'baselayer-blocks'),
+		'saveBlocks' => __('Save block', 'baselayer-blocks'),
+		'presetLabel' => __('Label', 'baselayer-blocks'),
+		'presetSlug' => __('Slug', 'baselayer-blocks'),
+		'deletePreset' => __('Delete', 'baselayer-blocks'),
+		'deletePresetTitle' => __('Delete preset?', 'baselayer-blocks'),
 		/* translators: %s: preset label or slug */
-		'deletePresetConfirm' => __('Delete “%s”? This cannot be undone.', 'baselayer'),
-		'cancel' => __('Cancel', 'baselayer'),
-		'close' => __('Close', 'baselayer'),
-		'remove' => __('Remove', 'baselayer'),
-		'backToList' => __('All blocks', 'baselayer'),
-		'backToPresets' => __('All presets', 'baselayer'),
-		'saving' => __('Saving…', 'baselayer'),
-		'addOption' => __('Add option', 'baselayer'),
-		'addPresetRef' => __('Preset', 'baselayer'),
-		'optionType' => __('Type', 'baselayer'),
-		'optionLabel' => __('Label', 'baselayer'),
-		'optionDescription' => __('Description', 'baselayer'),
-		'optionTypeToggle' => __('Toggle', 'baselayer'),
-		'optionTypeSelect' => __('Select', 'baselayer'),
-		'optionTypeButtonGroup' => __('Button group', 'baselayer'),
-		'optionTypeIcon' => __('Icon', 'baselayer'),
-		'optionTypePreset' => __('Preset', 'baselayer'),
-		'optionGroupDefault' => __('Default', 'baselayer'),
-		'optionGroupCustom' => __('Custom', 'baselayer'),
-		'attributeName' => __('Attribute name', 'baselayer'),
-		'toggleLabel' => __('Toggle label', 'baselayer'),
-		'classWhenOn' => __('CSS class when on', 'baselayer'),
-		'defaultOn' => __('On by default', 'baselayer'),
-		'defaultValue' => __('Default', 'baselayer'),
-		'choices' => __('Choices', 'baselayer'),
-		'addChoice' => __('Add choice', 'baselayer'),
-		'choiceLabel' => __('Label', 'baselayer'),
-		'choiceValue' => __('Value / class', 'baselayer'),
-		'chooseIcon' => __('Choose icon', 'baselayer'),
-		'clearIcon' => __('Clear icon', 'baselayer'),
-		'icon' => __('Icon', 'baselayer'),
-		'delete' => __('Delete', 'baselayer'),
-		'dragField' => __('Drag to reorder', 'baselayer'),
-		'expandField' => __('Expand field', 'baselayer'),
-		'collapseField' => __('Collapse field', 'baselayer'),
-		'choosePreset' => __('Preset', 'baselayer'),
-		'presetDefaultsHelp' => __('Optional default overrides for this block:', 'baselayer'),
-		'presetItemsEmpty' => __('No options yet. Add a control.', 'baselayer'),
-		'blockOptionsEmpty' => __('No options yet. Add a control or attach a preset.', 'baselayer'),
-		'noPresetsYet' => __('No presets yet — create some under Block Options → Presets', 'baselayer'),
-		'saved' => __('Saved.', 'baselayer'),
-		'saveFailed' => __('Could not save.', 'baselayer'),
-		'items' => __('items', 'baselayer'),
-		'summaryPresetOne' => __('preset', 'baselayer'),
-		'summaryPresetMany' => __('presets', 'baselayer'),
-		'summaryControlOne' => __('control', 'baselayer'),
-		'summaryControlMany' => __('controls', 'baselayer'),
+		'deletePresetConfirm' => __('Delete “%s”? This cannot be undone.', 'baselayer-blocks'),
+		'deleteBlockTitle' => __('Remove block options?', 'baselayer-blocks'),
+		/* translators: %s: block title */
+		'deleteBlockConfirm' => __('Remove options for “%s”? This cannot be undone.', 'baselayer-blocks'),
+		'cancel' => __('Cancel', 'baselayer-blocks'),
+		'close' => __('Close', 'baselayer-blocks'),
+		'remove' => __('Remove', 'baselayer-blocks'),
+		'backToList' => __('All blocks', 'baselayer-blocks'),
+		'backToPresets' => __('All presets', 'baselayer-blocks'),
+		'saving' => __('Saving…', 'baselayer-blocks'),
+		'addOption' => __('Add option', 'baselayer-blocks'),
+		'addPresetRef' => __('Preset', 'baselayer-blocks'),
+		'optionType' => __('Type', 'baselayer-blocks'),
+		'optionLabel' => __('Label', 'baselayer-blocks'),
+		'optionDescription' => __('Description', 'baselayer-blocks'),
+		'optionTypeToggle' => __('Toggle', 'baselayer-blocks'),
+		'optionTypeSelect' => __('Select', 'baselayer-blocks'),
+		'optionTypeButtonGroup' => __('Button group', 'baselayer-blocks'),
+		'optionTypeIcon' => __('Icon', 'baselayer-blocks'),
+		'optionTypePreset' => __('Preset', 'baselayer-blocks'),
+		'optionGroupDefault' => __('Default', 'baselayer-blocks'),
+		'optionGroupCustom' => __('Custom', 'baselayer-blocks'),
+		'attributeName' => __('Attribute name', 'baselayer-blocks'),
+		'toggleLabel' => __('Toggle label', 'baselayer-blocks'),
+		'classWhenOn' => __('CSS class when on', 'baselayer-blocks'),
+		'defaultOn' => __('On by default', 'baselayer-blocks'),
+		'defaultValue' => __('Default', 'baselayer-blocks'),
+		'choices' => __('Choices', 'baselayer-blocks'),
+		'addChoice' => __('Add choice', 'baselayer-blocks'),
+		'choiceLabel' => __('Label', 'baselayer-blocks'),
+		'choiceValue' => __('Value / class', 'baselayer-blocks'),
+		'chooseIcon' => __('Choose icon', 'baselayer-blocks'),
+		'clearIcon' => __('Clear icon', 'baselayer-blocks'),
+		'icon' => __('Icon', 'baselayer-blocks'),
+		'delete' => __('Delete', 'baselayer-blocks'),
+		'dragField' => __('Drag to reorder', 'baselayer-blocks'),
+		'expandField' => __('Expand field', 'baselayer-blocks'),
+		'collapseField' => __('Collapse field', 'baselayer-blocks'),
+		'choosePreset' => __('Preset', 'baselayer-blocks'),
+		'presetDefaultsHelp' => __('Optional default overrides for this block:', 'baselayer-blocks'),
+		'presetItemsEmpty' => __('No options yet. Add a control.', 'baselayer-blocks'),
+		'blockOptionsEmpty' => __('No options yet. Add a control or attach a preset.', 'baselayer-blocks'),
+		'noPresetsYet' => __('No presets yet — create some under Block Options → Presets', 'baselayer-blocks'),
+		'saved' => __('Saved.', 'baselayer-blocks'),
+		'saveFailed' => __('Could not save.', 'baselayer-blocks'),
+		'items' => __('items', 'baselayer-blocks'),
+		'summaryPresetOne' => __('preset', 'baselayer-blocks'),
+		'summaryPresetMany' => __('presets', 'baselayer-blocks'),
+		'summaryControlOne' => __('control', 'baselayer-blocks'),
+		'summaryControlMany' => __('controls', 'baselayer-blocks'),
 	];
 
 	wp_localize_script($handle, 'blBlockOptionsAdmin', [
@@ -428,7 +422,7 @@ function bl_block_options_ajax_save_presets(): void
 	$raw = isset($_POST['presets']) ? wp_unslash((string) $_POST['presets']) : '';
 	$decoded = json_decode($raw, true);
 	if (!is_array($decoded)) {
-		wp_send_json_error(['message' => __('Invalid presets payload.', 'baselayer')]);
+		wp_send_json_error(['message' => __('Invalid presets payload.', 'baselayer-blocks')]);
 	}
 
 	$store = bl_block_options_get_store();
@@ -473,7 +467,7 @@ function bl_block_options_ajax_save_blocks(): void
 		$raw = wp_unslash((string) $_POST['blocks']);
 		$decoded = json_decode($raw, true);
 		if (!is_array($decoded)) {
-			wp_send_json_error(['message' => __('Invalid blocks payload.', 'baselayer')]);
+			wp_send_json_error(['message' => __('Invalid blocks payload.', 'baselayer-blocks')]);
 		}
 		$blocks = [];
 		foreach ($decoded as $row) {
@@ -491,12 +485,12 @@ function bl_block_options_ajax_save_blocks(): void
 	} else {
 		$name = sanitize_text_field((string) ($_POST['block'] ?? ''));
 		if ($name === '' || $name === '*') {
-			wp_send_json_error(['message' => __('Invalid block name.', 'baselayer')]);
+			wp_send_json_error(['message' => __('Invalid block name.', 'baselayer-blocks')]);
 		}
 		$raw = isset($_POST['items']) ? wp_unslash((string) $_POST['items']) : '';
 		$items = json_decode($raw, true);
 		if (!is_array($items)) {
-			wp_send_json_error(['message' => __('Invalid items payload.', 'baselayer')]);
+			wp_send_json_error(['message' => __('Invalid items payload.', 'baselayer-blocks')]);
 		}
 		$store['blocks'][$name] = ['items' => bl_block_options_sanitize_items($items)];
 	}
@@ -523,16 +517,16 @@ function bl_block_options_ajax_add_block(): void
 
 	$name = sanitize_text_field((string) ($_POST['block'] ?? ''));
 	if ($name === '' || $name === '*') {
-		wp_send_json_error(['message' => __('Invalid block name.', 'baselayer')]);
+		wp_send_json_error(['message' => __('Invalid block name.', 'baselayer-blocks')]);
 	}
 	if (!class_exists('WP_Block_Type_Registry') || !WP_Block_Type_Registry::get_instance()->is_registered($name)) {
-		wp_send_json_error(['message' => __('Block is not registered.', 'baselayer')]);
+		wp_send_json_error(['message' => __('Block is not registered.', 'baselayer-blocks')]);
 	}
 	if (function_exists('bl_block_settings_is_hard_disallowed') && bl_block_settings_is_hard_disallowed($name)) {
-		wp_send_json_error(['message' => __('This block cannot be enabled.', 'baselayer')]);
+		wp_send_json_error(['message' => __('This block cannot be enabled.', 'baselayer-blocks')]);
 	}
 	if (function_exists('bl_block_settings_is_manageable_block') && !bl_block_settings_is_manageable_block($name)) {
-		wp_send_json_error(['message' => __('This block cannot be managed.', 'baselayer')]);
+		wp_send_json_error(['message' => __('This block cannot be managed.', 'baselayer-blocks')]);
 	}
 
 	bl_block_options_ensure_theme_block_allowed($name);
@@ -567,7 +561,7 @@ function bl_block_options_render_admin_page(): void
 	}
 
 	echo '<div class="wrap bl-block-options-admin">';
-	echo '<h1>' . esc_html__('Block Options', 'baselayer') . '</h1>';
+	echo '<h1>' . esc_html__('Block Options', 'baselayer-blocks') . '</h1>';
 	?>
 	<div id="bl-block-options-app">
 		<div class="bl-forms-builder bl-block-options-shell" aria-busy="true">

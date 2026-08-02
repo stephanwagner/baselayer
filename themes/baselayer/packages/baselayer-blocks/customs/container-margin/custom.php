@@ -15,7 +15,7 @@ if (!function_exists('bl_block_options_control_container_margin')) {
 
 		return [
 			'type' => 'container-margin',
-			'label' => 'Abstände',
+			'label' => __('Spacing', 'baselayer-blocks'),
 			'defaultSize' => $default_size,
 			'attributeNames' => [
 				'top' => 'containerMarginTop',
@@ -28,16 +28,16 @@ if (!function_exists('bl_block_options_control_container_margin')) {
 
 
 return [
-	'label' => 'Container margin',
+	'label' => __('Container margin', 'baselayer-blocks'),
 	'params' => [
 		'label' => [
 			'type' => 'text',
-			'label' => 'Label',
-			'default' => 'Abstände',
+			'label' => __('Label', 'baselayer-blocks'),
+			'default' => __('Spacing', 'baselayer-blocks'),
 		],
 		'defaultSize' => [
 			'type' => 'size',
-			'label' => 'Default size',
+			'label' => __('Default size', 'baselayer-blocks'),
 			'default' => '',
 		],
 	],
