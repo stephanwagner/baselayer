@@ -5844,7 +5844,11 @@
           el5(
             "div",
             { className: "slider__slides" },
-            el5("div", { className: "swiper" }, InnerBlocks ? el5(InnerBlocks, innerBlocksProps(def)) : null)
+            el5(
+              "div",
+              { className: "swiper" },
+              InnerBlocks ? el5(InnerBlocks, innerBlocksProps(def)) : null
+            )
           )
         )
       );

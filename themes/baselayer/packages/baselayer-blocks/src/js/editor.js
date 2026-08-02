@@ -434,7 +434,11 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
         el(
           'div',
           { className: 'slider__slides' },
-          el('div', { className: 'swiper' }, InnerBlocks ? el(InnerBlocks, innerBlocksProps(def)) : null)
+          el(
+            'div',
+            { className: 'swiper' },
+            InnerBlocks ? el(InnerBlocks, innerBlocksProps(def)) : null
+          )
         )
       )
     );

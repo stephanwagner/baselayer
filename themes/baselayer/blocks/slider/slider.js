@@ -30,7 +30,8 @@ $.each(sliders, function (index, slider) {
 
   // Construct config object
   const sliderConfig = {
-    wrapperClass: 'acf-innerblocks-container',
+    wrapperClass: 'swiper-wrapper',
+    slideClass: 'swiper-slide',
     effect: sliderWrapper.attr('data-slider-animation') || 'slide',
     speed: 800,
   };
@@ -165,19 +166,28 @@ $.each(sliders, function (index, slider) {
   // Modules
   sliderConfig.modules = modules;
 
-  // Slider selector
-  const sliderSelector = '.slider__wrapper[data-slider-id="' + id + '"] .swiper';
+  const swiperEl = sliderWrapper.find('.swiper').get(0);
+  const wrapperEl = swiperEl
+    ? swiperEl.querySelector('.' + sliderConfig.wrapperClass)
+    : null;
+  if (!swiperEl || !wrapperEl) {
+    return;
+  }
 
-  // Init slider
-  const swiper = new Swiper(sliderSelector, sliderConfig);
+  // Init on the element (avoids selector misses when data-slider-id is odd)
+  const swiper = new Swiper(swiperEl, sliderConfig);
 
   // Stop autoplay then clicking on or in slide
   sliderWrapper.find('.slider-slide__wrapper').on('click', function () {
-    swiper.autoplay.stop();
+    if (swiper.autoplay && typeof swiper.autoplay.stop === 'function') {
+      swiper.autoplay.stop();
+    }
   });
 
   // Stop autoplay when starting to play video
   sliderWrapper.find('video').on('play', function () {
-    swiper.autoplay.stop();
+    if (swiper.autoplay && typeof swiper.autoplay.stop === 'function') {
+      swiper.autoplay.stop();
+    }
   });
 });

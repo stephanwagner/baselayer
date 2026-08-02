@@ -62,7 +62,9 @@ $wrapper_attributes = get_block_wrapper_attributes([
 	<div class="slider__container">
 		<div class="slider__slides">
 			<div class="swiper">
-				<InnerBlocks />
+				<div class="swiper-wrapper">
+					<InnerBlocks />
+				</div>
 			</div>
 		</div>
 		<div class="slider__navigation">
