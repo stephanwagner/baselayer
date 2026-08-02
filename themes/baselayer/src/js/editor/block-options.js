@@ -38,31 +38,16 @@ const { Fragment, useEffect, useRef } = wp.element;
 const GALLERY_OWNED_IMAGE_ATTRIBUTES = ['showImageLabel', 'hasLightbox', 'alignWideContainer'];
 const GALLERY_OWNED_IMAGE_TYPES = ['container-margin'];
 
-/** Resolved from PHP (config/block-options.php). */
+/** Resolved from PHP (bl_block_options store → baselayerBlockOptions). */
 const blockOptions = Array.isArray(window.baselayerBlockOptions)
   ? window.baselayerBlockOptions
   : [];
 
-/** Ausblenden — injected for every block; not part of the PHP catalog. */
-const HIDE_BLOCK_OPTION = {
-  type: 'boolean',
-  label: 'Sichtbarkeit',
-  toggleLabel: 'Ausblenden',
-  default: false,
-  attributeName: 'hideBlock',
-  className: '-block-is-hidden',
-};
-const HIDE_BLOCK_CLASS = HIDE_BLOCK_OPTION.className;
-const HIDE_BLOCK_ATTRIBUTE = HIDE_BLOCK_OPTION.attributeName;
+/** Class for hide-block option — kept managed so leftovers are stripped. */
+const HIDE_BLOCK_CLASS = '-block-is-hidden';
 
 /** Class applied by getAlignWideContainerControl() — kept managed so leftovers are stripped. */
 const ALIGN_WIDE_CONTAINER_CLASS = 'container-wide';
-
-/** Merge global options ahead of block-specific options. */
-const effectiveBlockConfig = (name, blockConfig) => ({
-  name: blockConfig?.name || name,
-  options: [HIDE_BLOCK_OPTION, ...(blockConfig?.options || [])],
-});
 
 // Prefix used when an `icon` option is stored as a class name (e.g. `-icon-bolt`).
 const ICON_CLASS_PREFIX = '-icon-';
@@ -381,19 +366,6 @@ const blockOptionSyncDeps = (blockConfig, attributes) => {
   return keys.map((key) => attributes[key]);
 };
 
-// Global hide attribute on every block type.
-wp.hooks.addFilter('blocks.registerBlockType', 'baselayer/global-block-options/attributes', (settings) => {
-  settings.attributes = {
-    ...settings.attributes,
-    [HIDE_BLOCK_ATTRIBUTE]: {
-      type: 'boolean',
-      default: HIDE_BLOCK_OPTION.default,
-    },
-  };
-
-  return settings;
-});
-
 // Add attributes to the block
 blockOptions.forEach((block) => {
   const blockSlug = getBlockSlug(block.name);
@@ -461,7 +433,13 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
 
     // Find the block configuration based on the block name
     const listedConfig = blockOptions.find((block) => block.name === props.name);
-    const blockConfig = effectiveBlockConfig(props.name, listedConfig);
+    const blockConfig = listedConfig
+      ? { name: listedConfig.name || props.name, options: listedConfig.options || [] }
+      : { name: props.name, options: [] };
+
+    if (!blockConfig.options.length) {
+      return <BlockEdit {...props} />;
+    }
 
     const isImageInGallery = useSelect(
       (select) => {

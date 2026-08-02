@@ -1058,6 +1058,17 @@ function baselayer_run_install(): void
     bl_install_seed_testdata($content_flags);
   }
 
+  if (
+    function_exists('bl_block_options_store_is_empty')
+    && function_exists('bl_block_options_import_theme_defaults')
+    && bl_block_options_store_is_empty()
+  ) {
+    $block_options_import = bl_block_options_import_theme_defaults(['replace' => true]);
+    if (!is_wp_error($block_options_import)) {
+      update_option('bl_block_options_bootstrapped', 1, false);
+    }
+  }
+
   /**
    * Redirect
    */

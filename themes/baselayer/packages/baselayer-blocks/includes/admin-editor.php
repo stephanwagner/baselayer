@@ -115,6 +115,14 @@ function bl_blocks_render_builder_after_title(WP_Post $post): void
 		}
 	}
 
+	if ($type === 'block' && function_exists('bl_block_options_get_block_items') && function_exists('bl_blocks_gutenberg_name')) {
+		$slug = bl_blocks_definition_slug((int) $post->ID, $config['settings']);
+		$block_name = $slug !== '' ? bl_blocks_gutenberg_name($slug) : '';
+		$config['blockOptions'] = [
+			'items' => $block_name !== '' ? bl_block_options_get_block_items($block_name) : [],
+		];
+	}
+
 	wp_nonce_field('bl_blocks_save_config', 'bl_blocks_config_nonce');
 	?>
 	<input type="hidden" name="bl_block_type" value="<?= esc_attr($type) ?>">
@@ -132,6 +140,9 @@ function bl_blocks_render_builder_after_title(WP_Post $post): void
 			<div class="bl-forms-builder__skeleton-tabs">
 				<span class="bl-forms-builder__skeleton-tab"></span>
 				<span class="bl-forms-builder__skeleton-tab"></span>
+				<?php if ($type === 'block') : ?>
+					<span class="bl-forms-builder__skeleton-tab"></span>
+				<?php endif; ?>
 			</div>
 			<div class="bl-forms-builder__skeleton-body"></div>
 		</div>
@@ -265,6 +276,23 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 	$i18n = [
 		'tabFields'                => __('Fields', 'baselayer-blocks'),
 		'tabSettings'              => __('Settings', 'baselayer-blocks'),
+		'tabOptions'               => __('Options', 'baselayer-blocks'),
+		'blockOptionsHelp'         => __('These controls appear in the block sidebar in the editor.', 'baselayer-blocks'),
+		'blockOptionsEmpty'        => __('No options yet. Add a toggle, select, or button group for the block sidebar.', 'baselayer-blocks'),
+		'optionTypeToggle'         => __('Toggle', 'baselayer-blocks'),
+		'optionTypeSelect'         => __('Select', 'baselayer-blocks'),
+		'optionTypeButtonGroup'    => __('Button group', 'baselayer-blocks'),
+		'optionLabel'              => __('Label', 'baselayer-blocks'),
+		'optionType'               => __('Type', 'baselayer-blocks'),
+		'attributeName'            => __('Attribute name', 'baselayer-blocks'),
+		'toggleLabel'              => __('Toggle label', 'baselayer-blocks'),
+		'classWhenOn'              => __('CSS class when on', 'baselayer-blocks'),
+		'defaultOn'                => __('On by default', 'baselayer-blocks'),
+		'choices'                  => __('Choices', 'baselayer-blocks'),
+		'addChoice'                => __('Add choice', 'baselayer-blocks'),
+		'choiceLabel'              => __('Label', 'baselayer-blocks'),
+		'choiceValue'              => __('Value / class', 'baselayer-blocks'),
+		'remove'                   => __('Remove', 'baselayer-blocks'),
 		'canvasHeading'            => __('Fields', 'baselayer-blocks'),
 		'empty'                    => __('Drag a field here.', 'baselayer-blocks'),
 		'settingsActive'           => __('Active', 'baselayer-blocks'),

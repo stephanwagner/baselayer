@@ -404,10 +404,15 @@
     const input = document.getElementById("bl-forms-config-json");
     if (!input) return;
     const current = readConfig();
-    input.value = JSON.stringify({
+    const next = {
+      ...current,
       fields: partial.fields !== void 0 ? partial.fields : current.fields || [],
       settings: partial.settings !== void 0 ? partial.settings : current.settings || {}
-    });
+    };
+    if (partial.blockOptions !== void 0) {
+      next.blockOptions = partial.blockOptions;
+    }
+    input.value = JSON.stringify(next);
   }
   function flattenFields(fields = []) {
     const out = [];

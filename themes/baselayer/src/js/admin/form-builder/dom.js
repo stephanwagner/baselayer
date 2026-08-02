@@ -476,10 +476,15 @@ export function writeConfig(partial) {
   const input = document.getElementById('bl-forms-config-json');
   if (!input) return;
   const current = readConfig();
-  input.value = JSON.stringify({
+  const next = {
+    ...current,
     fields: partial.fields !== undefined ? partial.fields : current.fields || [],
     settings: partial.settings !== undefined ? partial.settings : current.settings || {},
-  });
+  };
+  if (partial.blockOptions !== undefined) {
+    next.blockOptions = partial.blockOptions;
+  }
+  input.value = JSON.stringify(next);
 }
 
 /** Flatten nested column trees to leaf fields. */

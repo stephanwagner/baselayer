@@ -2,6 +2,7 @@
  * Blocks definition editor — Fields + Settings (reuses form-builder field cards).
  */
 import { createSettingsPanel } from './settings-panel.js';
+import { createOptionsPanel } from './options-panel.js';
 import {
   createRepeaterCard,
   serializeRepeaterRow,
@@ -107,6 +108,9 @@ export function mountApp(root, initial, definitionType = 'block') {
   root.classList.add('bl-forms-builder--tabs');
 
   let settingsState = { ...(initial.settings || {}) };
+  let blockOptionsState = {
+    items: Array.isArray(initial.blockOptions?.items) ? initial.blockOptions.items : [],
+  };
   /** @type {{ canvas: object, getFields: Function, setFields: Function, addField: Function } | null} */
   let builderApi = null;
 
@@ -115,12 +119,24 @@ export function mountApp(root, initial, definitionType = 'block') {
     syncAll();
   });
 
+  const optionsPanel =
+    definitionType === 'block'
+      ? createOptionsPanel(blockOptionsState, (next) => {
+          blockOptionsState = next;
+          syncAll();
+        })
+      : null;
+
   const syncAll = () => {
     const fields = builderApi ? builderApi.getFields() : [];
-    writeConfig({
+    const payload = {
       fields,
       settings: panels.getSettings(),
-    });
+    };
+    if (optionsPanel) {
+      payload.blockOptions = optionsPanel.getBlockOptions();
+    }
+    writeConfig(payload);
     builderApi?.canvas?.syncEmpty?.();
   };
 
@@ -196,6 +212,13 @@ export function mountApp(root, initial, definitionType = 'block') {
     { id: 'fields', label: t('tabFields', 'Fields'), panel: fieldsPanel },
     { id: 'settings', label: t('tabSettings', 'Settings'), panel: panels.panel },
   ];
+  if (optionsPanel) {
+    tabs.push({
+      id: 'options',
+      label: t('tabOptions', 'Options'),
+      panel: optionsPanel.panel,
+    });
+  }
 
   const activate = (id) => {
     tabs.forEach((tab) => {
@@ -271,7 +294,15 @@ export function mountApp(root, initial, definitionType = 'block') {
   const panelsWrap = el('div', { className: 'bl-forms-builder__panels' }, [
     fieldsPanel,
     panels.panel,
-  ]);
+    optionsPanel ? optionsPanel.panel : null,
+  ].filter(Boolean));
+
+  panels.panel.hidden = true;
+  panels.panel.classList.remove('is-active');
+  if (optionsPanel) {
+    optionsPanel.panel.hidden = true;
+    optionsPanel.panel.classList.remove('is-active');
+  }
 
   root.append(
     el('div', { className: 'bl-forms-builder__scroll' }, [

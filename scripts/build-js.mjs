@@ -36,6 +36,11 @@ const themeBundles = [
     }
   },
   {
+    input: `${themeDir}/src/js/admin/block-options-admin.js`,
+    name: 'block-options-admin',
+    outDir: `${themeDir}/assets/js`
+  },
+  {
     input: `${themeDir}/src/js/admin/field-builder/admin-pages.js`,
     name: 'field-builder-admin',
     outDir: `${themeDir}/assets/js`

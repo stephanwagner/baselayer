@@ -3,9 +3,10 @@
 defined('ABSPATH') || exit;
 
 /**
- * Block options: presets + assignments (+ optional per-block extras).
+ * Legacy file-based block options (presets + assignments).
  *
- * Hand-editable source of truth for editor block-option controls.
+ * Runtime editor options come from the `bl_block_options` DB store.
+ * Theme seed for install/import: `config/block-options-import.json`.
  *
  * @return array{
  *   presets?: array<string, array{label?: string, controls: list<array<string, mixed>>}>,

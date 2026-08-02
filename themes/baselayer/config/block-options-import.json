@@ -1,0 +1,901 @@
+{
+    "version": 1,
+    "presets": {
+        "container-margin": {
+            "label": "Abstand",
+            "items": [
+                {
+                    "type": "container-margin",
+                    "label": "Abstände",
+                    "defaultSize": "",
+                    "allowUnset": true,
+                    "attributeNames": {
+                        "top": "containerMarginTop",
+                        "bottom": "containerMarginBottom",
+                        "linked": "containerMarginLinked"
+                    },
+                    "id": "c_0f7dbb8bf785",
+                    "kind": "control"
+                }
+            ]
+        },
+        "container-margin-m": {
+            "label": "Abstand (M)",
+            "items": [
+                {
+                    "type": "container-margin",
+                    "label": "Abstände",
+                    "defaultSize": "m",
+                    "allowUnset": false,
+                    "attributeNames": {
+                        "top": "containerMarginTop",
+                        "bottom": "containerMarginBottom",
+                        "linked": "containerMarginLinked"
+                    },
+                    "id": "c_784870d37856",
+                    "kind": "control"
+                }
+            ]
+        },
+        "container-padding-m": {
+            "label": "Innenabstand (M)",
+            "items": [
+                {
+                    "type": "container-padding",
+                    "label": "Innenabstand",
+                    "defaultSize": "m",
+                    "allowUnset": false,
+                    "attributeName": "containerPadding",
+                    "id": "c_83daec52fedf",
+                    "kind": "control"
+                }
+            ]
+        },
+        "container-padding-l": {
+            "label": "Innenabstand (L)",
+            "items": [
+                {
+                    "type": "container-padding",
+                    "label": "Innenabstand",
+                    "defaultSize": "l",
+                    "allowUnset": false,
+                    "attributeName": "containerPadding",
+                    "id": "c_f8d91019d0b7",
+                    "kind": "control"
+                }
+            ]
+        },
+        "container-padding-xl": {
+            "label": "Innenabstand (XL)",
+            "items": [
+                {
+                    "type": "container-padding",
+                    "label": "Innenabstand",
+                    "defaultSize": "xl",
+                    "allowUnset": false,
+                    "attributeName": "containerPadding",
+                    "id": "c_c5f054e604e9",
+                    "kind": "control"
+                }
+            ]
+        },
+        "limit-width": {
+            "label": "Weite limitieren",
+            "items": [
+                {
+                    "type": "limit-width",
+                    "label": "Weite limitieren",
+                    "defaultSize": "",
+                    "defaultAlign": "center",
+                    "attributeNames": {
+                        "size": "limitWidthSize",
+                        "align": "limitWidthAlign"
+                    },
+                    "id": "c_945f54137368",
+                    "kind": "control"
+                }
+            ]
+        },
+        "align-wide-container": {
+            "label": "Inhaltsbreite",
+            "items": [
+                {
+                    "type": "button-group",
+                    "label": "Inhaltsbreite",
+                    "description": "Verwendet den breiten Inhaltscontainer. Nicht zu verwechseln mit der WordPress-Ausrichtung „Erweiterte Breite“.",
+                    "default": "",
+                    "attributeName": "alignWideContainer",
+                    "options": [
+                        {
+                            "label": "Standard",
+                            "value": ""
+                        },
+                        {
+                            "label": "Erweitert",
+                            "value": "container-wide"
+                        }
+                    ],
+                    "id": "c_7fcb4024a91c",
+                    "kind": "control"
+                }
+            ]
+        },
+        "text-wrap": {
+            "label": "Text Wrap",
+            "items": [
+                {
+                    "type": "button-group",
+                    "label": "Text Wrap",
+                    "default": "",
+                    "attributeName": "textWrap",
+                    "options": [
+                        {
+                            "label": "Standard",
+                            "value": ""
+                        },
+                        {
+                            "label": "Balanced",
+                            "value": "text-wrap-balance"
+                        },
+                        {
+                            "label": "Pretty",
+                            "value": "text-wrap-pretty"
+                        }
+                    ],
+                    "id": "c_4d41be8469ac",
+                    "kind": "control"
+                }
+            ]
+        },
+        "spacer-responsive-height": {
+            "label": "Responsive Höhe",
+            "items": [
+                {
+                    "type": "spacer-responsive-height",
+                    "label": "Responsive Höhe",
+                    "description": "Reduziert den Abstand auf kleineren Bildschirmen automatisch.",
+                    "default": "",
+                    "attributeName": "spacerResponsiveHeight",
+                    "id": "c_5bcf35174e80",
+                    "kind": "control"
+                }
+            ]
+        },
+        "columns-layout": {
+            "label": "Spalten-Layout",
+            "items": [
+                {
+                    "type": "button-group",
+                    "label": "Spaltenabstand",
+                    "default": "-column-gap-m",
+                    "attributeName": "columnGap",
+                    "options": [
+                        {
+                            "label": "0",
+                            "value": "-column-gap-none"
+                        },
+                        {
+                            "label": "XS",
+                            "value": "-column-gap-xs"
+                        },
+                        {
+                            "label": "S",
+                            "value": "-column-gap-s"
+                        },
+                        {
+                            "label": "M",
+                            "value": "-column-gap-m"
+                        },
+                        {
+                            "label": "L",
+                            "value": "-column-gap-l"
+                        },
+                        {
+                            "label": "XL",
+                            "value": "-column-gap-xl"
+                        }
+                    ],
+                    "id": "c_ed3ec582fa97",
+                    "kind": "control"
+                },
+                {
+                    "type": "button-group",
+                    "label": "Umbruch",
+                    "description": "Legt fest, ab welcher Bildschirmbreite die Spalten gestapelt werden.",
+                    "default": "",
+                    "attributeName": "columnsStackBreakpoint",
+                    "options": [
+                        {
+                            "label": "—",
+                            "value": ""
+                        },
+                        {
+                            "label": "Nie",
+                            "value": "-columns-stack-never"
+                        },
+                        {
+                            "label": "Früh",
+                            "value": "-columns-stack-early"
+                        },
+                        {
+                            "label": "Mittel",
+                            "value": "-columns-stack-medium"
+                        },
+                        {
+                            "label": "Spät",
+                            "value": "-columns-stack-late"
+                        }
+                    ],
+                    "id": "c_a5a1cd73c632",
+                    "kind": "control"
+                },
+                {
+                    "type": "boolean",
+                    "label": "Media-Text Layout",
+                    "toggleLabel": "Text harmonisch ausrichten",
+                    "description": "Richtet die Textspalte mittig zum Bild oder Video aus.",
+                    "default": false,
+                    "attributeName": "harmonizeImageText",
+                    "className": "-media-text-layout",
+                    "id": "c_d27bd0bed424",
+                    "kind": "control"
+                },
+                {
+                    "type": "boolean",
+                    "label": "Mobile anordnung",
+                    "toggleLabel": "Spalten wenn gestapelt umkehren",
+                    "default": false,
+                    "attributeName": "columnReverseOrderOnMobile",
+                    "className": "-reverse-order-on-mobile",
+                    "id": "c_5ca84a6f83ff",
+                    "kind": "control"
+                }
+            ]
+        },
+        "column-center": {
+            "label": "Spalte zentrieren",
+            "items": [
+                {
+                    "type": "boolean",
+                    "toggleLabel": "Inhalt vertikal zentrieren",
+                    "default": false,
+                    "attributeName": "columnCenterContent",
+                    "className": "-center-content",
+                    "id": "c_6537d352be50",
+                    "kind": "control"
+                }
+            ]
+        },
+        "heading-show-as": {
+            "label": "Überschrift anzeigen als",
+            "items": [
+                {
+                    "type": "button-group",
+                    "label": "Anzeigen als",
+                    "default": "",
+                    "attributeName": "headingShowAs",
+                    "options": [
+                        {
+                            "label": "—",
+                            "value": ""
+                        },
+                        {
+                            "label": "H1",
+                            "value": "h1"
+                        },
+                        {
+                            "label": "H2",
+                            "value": "h2"
+                        },
+                        {
+                            "label": "H3",
+                            "value": "h3"
+                        },
+                        {
+                            "label": "H4",
+                            "value": "h4"
+                        },
+                        {
+                            "label": "H5",
+                            "value": "h5"
+                        },
+                        {
+                            "label": "H6",
+                            "value": "h6"
+                        }
+                    ],
+                    "id": "c_19eb071ee2f5",
+                    "kind": "control"
+                }
+            ]
+        },
+        "image-extras": {
+            "label": "Bild-Optionen",
+            "items": [
+                {
+                    "type": "boolean",
+                    "toggleLabel": "Untertitel anzeigen",
+                    "default": false,
+                    "attributeName": "showImageLabel",
+                    "className": "-show-image-caption",
+                    "id": "c_4531420a21fc",
+                    "kind": "control"
+                },
+                {
+                    "type": "boolean",
+                    "toggleLabel": "Bild bei Klick vergrößern",
+                    "noSeparator": true,
+                    "default": false,
+                    "attributeName": "hasLightbox",
+                    "className": "-has-lightbox",
+                    "id": "c_852ddb05a62a",
+                    "kind": "control"
+                }
+            ]
+        },
+        "video-caption": {
+            "label": "Video-Untertitel",
+            "items": [
+                {
+                    "type": "boolean",
+                    "toggleLabel": "Untertitel anzeigen",
+                    "noSeparator": true,
+                    "default": false,
+                    "attributeName": "showImageLabel",
+                    "className": "-show-image-caption",
+                    "id": "c_5c94f5529b91",
+                    "kind": "control"
+                }
+            ]
+        },
+        "gallery-extras": {
+            "label": "Galerie-Optionen",
+            "items": [
+                {
+                    "type": "boolean",
+                    "toggleLabel": "Untertitel anzeigen",
+                    "default": true,
+                    "attributeName": "showImageLabels",
+                    "className": "-show-image-captions",
+                    "id": "c_e5812de1600b",
+                    "kind": "control"
+                },
+                {
+                    "type": "boolean",
+                    "toggleLabel": "Bilder bei Klick vergrößern",
+                    "noSeparator": true,
+                    "default": true,
+                    "attributeName": "hasLightbox",
+                    "className": "-has-lightbox",
+                    "id": "c_9b9fdf084625",
+                    "kind": "control"
+                }
+            ]
+        },
+        "button-extras": {
+            "label": "Button-Optionen",
+            "items": [
+                {
+                    "type": "boolean",
+                    "label": "Darstellung",
+                    "toggleLabel": "Als Link anzeigen",
+                    "description": "",
+                    "default": false,
+                    "attributeName": "buttonIsLink",
+                    "className": "-is-link",
+                    "id": "c_66b8f811d67e",
+                    "kind": "control"
+                },
+                {
+                    "type": "button-group",
+                    "label": "Variante",
+                    "description": "",
+                    "default": "",
+                    "attributeName": "buttonVariant",
+                    "options": [
+                        {
+                            "label": "Primär",
+                            "value": ""
+                        },
+                        {
+                            "label": "Sekundär",
+                            "value": "-secondary"
+                        },
+                        {
+                            "label": "Weiss",
+                            "value": "-white"
+                        }
+                    ],
+                    "id": "c_c8615bd8ef16",
+                    "kind": "control"
+                },
+                {
+                    "type": "button-group",
+                    "label": "Größe",
+                    "default": "",
+                    "attributeName": "buttonSize",
+                    "options": [
+                        {
+                            "label": "S",
+                            "value": "-small"
+                        },
+                        {
+                            "label": "M",
+                            "value": ""
+                        },
+                        {
+                            "label": "L",
+                            "value": "-large"
+                        }
+                    ],
+                    "id": "c_a88bbc590282",
+                    "kind": "control"
+                },
+                {
+                    "type": "icon",
+                    "label": "Icon",
+                    "default": "",
+                    "attributeName": "buttonIcon",
+                    "id": "c_c0eef805f769",
+                    "kind": "control"
+                },
+                {
+                    "type": "button-group",
+                    "label": "Icon Position",
+                    "noSeparator": true,
+                    "default": "",
+                    "attributeName": "buttonIconPosition",
+                    "iconLabel": true,
+                    "options": [
+                        {
+                            "icon": "horizontal-align-left",
+                            "label": "Links",
+                            "value": ""
+                        },
+                        {
+                            "icon": "horizontal-align-right",
+                            "label": "Rechts",
+                            "value": "-icon-right",
+                            "iconPosition": "after"
+                        }
+                    ],
+                    "id": "c_65af8c0ee6de",
+                    "kind": "control"
+                }
+            ]
+        },
+        "icon-align": {
+            "label": "Icon-Ausrichtung",
+            "items": [
+                {
+                    "type": "button-group",
+                    "label": "Ausrichtung",
+                    "default": "",
+                    "attributeName": "iconAlign",
+                    "options": [
+                        {
+                            "icon": "image-left",
+                            "label": "Links",
+                            "value": "-icon-align-left"
+                        },
+                        {
+                            "icon": "image-center",
+                            "label": "Zentriert",
+                            "value": ""
+                        },
+                        {
+                            "icon": "image-right",
+                            "label": "Rechts",
+                            "value": "-icon-align-right"
+                        }
+                    ],
+                    "id": "c_f4f855d6b531",
+                    "kind": "control"
+                }
+            ]
+        },
+        "icon-text-position": {
+            "label": "Icon mit Text – Position",
+            "items": [
+                {
+                    "type": "button-group",
+                    "label": "Position",
+                    "default": "",
+                    "attributeName": "iconTextPosition",
+                    "options": [
+                        {
+                            "icon": "image-left-text",
+                            "label": "Links neben Text",
+                            "value": ""
+                        },
+                        {
+                            "icon": "image-right-text",
+                            "label": "Rechts neben Text",
+                            "value": "-icon-text-align-right"
+                        },
+                        {
+                            "icon": "image-left",
+                            "label": "Links",
+                            "value": "-icon-align-left"
+                        },
+                        {
+                            "icon": "image-center",
+                            "label": "Zentriert",
+                            "value": "-icon-align-center"
+                        },
+                        {
+                            "icon": "image-right",
+                            "label": "Rechts",
+                            "value": "-icon-align-right"
+                        }
+                    ],
+                    "id": "c_239386f15f1d",
+                    "kind": "control"
+                }
+            ]
+        },
+        "sichtbarkeit": {
+            "label": "Sichtbarkeit",
+            "items": [
+                {
+                    "type": "boolean",
+                    "label": "Sichtbarkeit",
+                    "toggleLabel": "Ausblenden",
+                    "default": false,
+                    "attributeName": "hideBlock",
+                    "className": "-block-is-hidden",
+                    "id": "c_sichtbarkeit_hide",
+                    "kind": "control"
+                }
+            ]
+        }
+    },
+    "blocks": {
+        "core/columns": {
+            "items": [
+                {
+                    "id": "p_e2bfae34be35",
+                    "kind": "preset",
+                    "slug": "container-margin-m"
+                },
+                {
+                    "id": "p_a00b51919da8",
+                    "kind": "preset",
+                    "slug": "limit-width"
+                },
+                {
+                    "id": "p_f3f223f619d0",
+                    "kind": "preset",
+                    "slug": "columns-layout"
+                }
+            ]
+        },
+        "core/column": {
+            "items": [
+                {
+                    "id": "p_d6606f4df8bd",
+                    "kind": "preset",
+                    "slug": "align-wide-container"
+                },
+                {
+                    "id": "p_34e91ab11f6c",
+                    "kind": "preset",
+                    "slug": "column-center"
+                }
+            ]
+        },
+        "core/heading": {
+            "items": [
+                {
+                    "id": "p_13c59f6421fd",
+                    "kind": "preset",
+                    "slug": "heading-show-as"
+                },
+                {
+                    "id": "p_321d920f637e",
+                    "kind": "preset",
+                    "slug": "container-margin"
+                },
+                {
+                    "id": "p_f798716dc336",
+                    "kind": "preset",
+                    "slug": "limit-width"
+                },
+                {
+                    "id": "p_f51dcedd271c",
+                    "kind": "preset",
+                    "slug": "text-wrap"
+                }
+            ]
+        },
+        "core/paragraph": {
+            "items": [
+                {
+                    "id": "p_b7c1d079be5a",
+                    "kind": "preset",
+                    "slug": "container-margin"
+                },
+                {
+                    "id": "p_9a830dffb70c",
+                    "kind": "preset",
+                    "slug": "limit-width"
+                },
+                {
+                    "id": "p_2511d006be39",
+                    "kind": "preset",
+                    "slug": "text-wrap"
+                }
+            ]
+        },
+        "core/image": {
+            "items": [
+                {
+                    "id": "p_2708db10983b",
+                    "kind": "preset",
+                    "slug": "align-wide-container"
+                },
+                {
+                    "id": "p_13a9d4b94c34",
+                    "kind": "preset",
+                    "slug": "container-margin"
+                },
+                {
+                    "id": "p_f9afb84a3472",
+                    "kind": "preset",
+                    "slug": "image-extras"
+                }
+            ]
+        },
+        "core/video": {
+            "items": [
+                {
+                    "id": "p_0af641dddee5",
+                    "kind": "preset",
+                    "slug": "container-margin"
+                },
+                {
+                    "id": "p_ea93ee0f5497",
+                    "kind": "preset",
+                    "slug": "video-caption"
+                }
+            ]
+        },
+        "core/gallery": {
+            "items": [
+                {
+                    "id": "p_9ed6df2ef92c",
+                    "kind": "preset",
+                    "slug": "container-margin-m"
+                },
+                {
+                    "id": "p_11ea5bd21d4d",
+                    "kind": "preset",
+                    "slug": "gallery-extras"
+                }
+            ]
+        },
+        "core/group": {
+            "items": [
+                {
+                    "id": "p_1eee5ffcb4e8",
+                    "kind": "preset",
+                    "slug": "align-wide-container"
+                },
+                {
+                    "id": "p_6aaa879012be",
+                    "kind": "preset",
+                    "slug": "container-margin-m"
+                },
+                {
+                    "id": "p_eb2e6e2356a5",
+                    "kind": "preset",
+                    "slug": "container-padding-m"
+                },
+                {
+                    "id": "p_3773e8d2c150",
+                    "kind": "preset",
+                    "slug": "limit-width"
+                }
+            ]
+        },
+        "core/quote": {
+            "items": [
+                {
+                    "id": "p_eee1bf757efd",
+                    "kind": "preset",
+                    "slug": "container-margin"
+                }
+            ]
+        },
+        "core/pullquote": {
+            "items": [
+                {
+                    "id": "p_c46782e2a317",
+                    "kind": "preset",
+                    "slug": "align-wide-container"
+                },
+                {
+                    "id": "p_4bc4e653e366",
+                    "kind": "preset",
+                    "slug": "container-margin-m"
+                },
+                {
+                    "id": "p_034cc6a48f45",
+                    "kind": "preset",
+                    "slug": "container-padding-l"
+                }
+            ]
+        },
+        "core/separator": {
+            "items": [
+                {
+                    "id": "p_5cc2cf84f5a2",
+                    "kind": "preset",
+                    "slug": "container-margin-m"
+                }
+            ]
+        },
+        "core/spacer": {
+            "items": [
+                {
+                    "id": "p_24d60b95852a",
+                    "kind": "preset",
+                    "slug": "spacer-responsive-height"
+                }
+            ]
+        },
+        "core/cover": {
+            "items": [
+                {
+                    "id": "p_b7e8fc1567b2",
+                    "kind": "preset",
+                    "slug": "align-wide-container"
+                },
+                {
+                    "id": "p_1dfc6a15aacb",
+                    "kind": "preset",
+                    "slug": "container-margin-m"
+                },
+                {
+                    "id": "p_7c7f8137f29b",
+                    "kind": "preset",
+                    "slug": "container-padding-xl"
+                }
+            ]
+        },
+        "core/buttons": {
+            "items": [
+                {
+                    "id": "p_04ffc875112f",
+                    "kind": "preset",
+                    "slug": "container-margin"
+                }
+            ]
+        },
+        "core/button": {
+            "items": [
+                {
+                    "id": "p_8fe932f45f54",
+                    "kind": "preset",
+                    "slug": "button-extras"
+                }
+            ]
+        },
+        "acf/icon": {
+            "items": [
+                {
+                    "id": "p_5617f0e89310",
+                    "kind": "preset",
+                    "slug": "icon-align"
+                },
+                {
+                    "id": "p_82e63c1e4230",
+                    "kind": "preset",
+                    "slug": "container-margin"
+                }
+            ]
+        },
+        "acf/icon-text": {
+            "items": [
+                {
+                    "id": "p_1596b7155508",
+                    "kind": "preset",
+                    "slug": "icon-text-position"
+                },
+                {
+                    "id": "p_8c4fd99c8364",
+                    "kind": "preset",
+                    "slug": "container-margin"
+                }
+            ]
+        },
+        "acf/slider": {
+            "items": [
+                {
+                    "id": "p_2761755f454f",
+                    "kind": "preset",
+                    "slug": "align-wide-container"
+                },
+                {
+                    "id": "p_2311625c4366",
+                    "kind": "preset",
+                    "slug": "container-margin-m"
+                },
+                {
+                    "id": "p_c78fedfdc984",
+                    "kind": "preset",
+                    "slug": "container-padding-m"
+                }
+            ]
+        },
+        "acf/map": {
+            "items": [
+                {
+                    "id": "p_7b827375e282",
+                    "kind": "preset",
+                    "slug": "align-wide-container"
+                },
+                {
+                    "id": "p_6bbeca7a22ba",
+                    "kind": "preset",
+                    "slug": "container-margin-m"
+                }
+            ]
+        },
+        "acf/article-list": {
+            "items": [
+                {
+                    "id": "p_eca8d58cb818",
+                    "kind": "preset",
+                    "slug": "align-wide-container"
+                },
+                {
+                    "id": "p_675e12cb975c",
+                    "kind": "preset",
+                    "slug": "container-margin-m"
+                }
+            ]
+        },
+        "acf/number-ticker": {
+            "items": [
+                {
+                    "id": "p_ae0473b4115f",
+                    "kind": "preset",
+                    "slug": "align-wide-container"
+                },
+                {
+                    "id": "p_99b77bb540f8",
+                    "kind": "preset",
+                    "slug": "container-margin-m"
+                }
+            ]
+        },
+        "baselayer/accordion": {
+            "items": [
+                {
+                    "id": "p_9c3587b801c8",
+                    "kind": "preset",
+                    "slug": "container-margin-m"
+                }
+            ]
+        },
+        "baselayer/form": {
+            "items": [
+                {
+                    "id": "p_bbd11748439b",
+                    "kind": "preset",
+                    "slug": "container-margin-m"
+                }
+            ]
+        },
+        "*": {
+            "items": [
+                {
+                    "id": "p_star_sichtbarkeit",
+                    "kind": "preset",
+                    "slug": "sichtbarkeit"
+                }
+            ]
+        }
+    }
+}

@@ -3,189 +3,104 @@
 defined('ABSPATH') || exit;
 
 /**
- * Load file-based block-options config (parent + child merge).
+ * Registered Gutenberg block names (for `*` expansion).
  *
- * @return array<string, mixed>
- */
-function bl_block_options_load_file_config(): array
-{
-	$config = function_exists('bl_load_theme_config_file')
-		? bl_load_theme_config_file('config/block-options.php')
-		: [];
-
-	return is_array($config) ? $config : [];
-}
-
-/**
- * Full block-options config from file config and filters.
- *
- * @return array<string, mixed>
- */
-function bl_block_options_get_config(): array
-{
-	$config = bl_block_options_load_file_config();
-
-	/**
-	 * Filter the resolved block-options config (presets, assignments, blocks).
-	 *
-	 * @param array<string, mixed> $config
-	 */
-	$filtered = apply_filters('bl_block_options_config', $config);
-
-	return is_array($filtered) ? $filtered : $config;
-}
-
-/**
- * Resolve assignment `blocks` target to a list of block names.
- *
- * @param string|list<string> $blocks
- * @param list<string>        $exclude
- * @param list<string>        $known_blocks Block names already collected (for `all`).
  * @return list<string>
  */
-function bl_block_options_resolve_assignment_blocks($blocks, array $exclude, array $known_blocks): array
+function bl_block_options_registered_block_names(): array
 {
-	if ($blocks === 'all' || $blocks === '*') {
-		$targets = $known_blocks;
-	} elseif (is_string($blocks) && $blocks !== '') {
-		$targets = [$blocks];
-	} elseif (is_array($blocks)) {
-		$targets = array_values(array_filter(array_map('strval', $blocks)));
-	} else {
-		$targets = [];
+	if (!class_exists('WP_Block_Type_Registry')) {
+		return [];
 	}
 
-	if ($exclude === []) {
-		return $targets;
+	$names = [];
+	foreach (WP_Block_Type_Registry::get_instance()->get_all_registered() as $block) {
+		if ($block instanceof WP_Block_Type && is_string($block->name) && $block->name !== '') {
+			$names[] = $block->name;
+		}
 	}
 
-	$exclude_map = array_fill_keys($exclude, true);
-
-	return array_values(array_filter(
-		$targets,
-		static fn(string $name): bool => !isset($exclude_map[$name])
-	));
+	return $names;
 }
 
 /**
- * Expand presets + assignments (+ per-block extras) into editor list payload.
+ * Expand store items (controls + preset refs) into editor option arrays.
+ *
+ * @param list<array<string, mixed>> $items
+ * @param array<string, array{label?: string, items?: list<array<string, mixed>>}> $presets
+ * @return list<array<string, mixed>>
+ */
+function bl_block_options_expand_items_for_editor(array $items, array $presets): array
+{
+	$out = [];
+	foreach ($items as $item) {
+		if (!is_array($item)) {
+			continue;
+		}
+		$kind = (string) ($item['kind'] ?? '');
+		if ($kind === 'preset') {
+			$slug = sanitize_title((string) ($item['slug'] ?? ''));
+			if ($slug === '' || !isset($presets[$slug]['items']) || !is_array($presets[$slug]['items'])) {
+				continue;
+			}
+			foreach (bl_block_options_expand_items_for_editor($presets[$slug]['items'], []) as $control) {
+				$out[] = $control;
+			}
+			continue;
+		}
+		if ($kind !== 'control') {
+			continue;
+		}
+		$control = $item;
+		unset($control['kind'], $control['id']);
+		$out[] = $control;
+	}
+	return $out;
+}
+
+/**
+ * Editor list payload from bl_block_options store only.
+ *
+ * Block key `*` is merged onto every registered block (and every explicit store block).
  *
  * @return list<array{name: string, options: list<array<string, mixed>>}>
  */
 function bl_block_options_for_editor(): array
 {
-	$config = bl_block_options_get_config();
-	$presets = isset($config['presets']) && is_array($config['presets']) ? $config['presets'] : [];
-	$assignments = isset($config['assignments']) && is_array($config['assignments']) ? $config['assignments'] : [];
-	$block_extras = isset($config['blocks']) && is_array($config['blocks']) ? $config['blocks'] : [];
+	if (!function_exists('bl_block_options_get_store')) {
+		return [];
+	}
+
+	$store = bl_block_options_get_store();
+	$presets = isset($store['presets']) && is_array($store['presets']) ? $store['presets'] : [];
+	$blocks = isset($store['blocks']) && is_array($store['blocks']) ? $store['blocks'] : [];
+
+	$star_items = [];
+	if (isset($blocks['*']['items']) && is_array($blocks['*']['items'])) {
+		$star_items = $blocks['*']['items'];
+	}
+	$star_controls = bl_block_options_expand_items_for_editor($star_items, $presets);
 
 	/** @var array<string, list<array<string, mixed>>> $map */
 	$map = [];
 
-	foreach ($block_extras as $block_name => $_extra) {
+	foreach ($blocks as $block_name => $entry) {
 		$block_name = (string) $block_name;
-		if ($block_name !== '' && !isset($map[$block_name])) {
-			$map[$block_name] = [];
+		if ($block_name === '' || $block_name === '*') {
+			continue;
 		}
+		$items = isset($entry['items']) && is_array($entry['items']) ? $entry['items'] : [];
+		$controls = bl_block_options_expand_items_for_editor($items, $presets);
+		if ($controls === [] && $star_controls === []) {
+			continue;
+		}
+		$map[$block_name] = array_merge($star_controls, $controls);
 	}
 
-	foreach ($assignments as $assignment) {
-		if (!is_array($assignment)) {
-			continue;
-		}
-
-		$target = (string) ($assignment['target'] ?? 'block_option');
-		if ($target !== '' && $target !== 'block_option') {
-			continue;
-		}
-
-		$preset_slug = (string) ($assignment['preset'] ?? '');
-		if ($preset_slug === '' || !isset($presets[$preset_slug]) || !is_array($presets[$preset_slug])) {
-			continue;
-		}
-
-		$controls = $presets[$preset_slug]['controls'] ?? [];
-		if (!is_array($controls) || $controls === []) {
-			continue;
-		}
-
-		$exclude = [];
-		if (isset($assignment['exclude']) && is_array($assignment['exclude'])) {
-			$exclude = array_values(array_filter(array_map('strval', $assignment['exclude'])));
-		}
-
-		// First pass: collect explicit block names so `all` can expand later if needed.
-		$blocks_spec = $assignment['blocks'] ?? [];
-		if (is_array($blocks_spec)) {
-			foreach ($blocks_spec as $name) {
-				$name = (string) $name;
-				if ($name !== '' && !isset($map[$name])) {
-					$map[$name] = [];
-				}
-			}
-		}
-	}
-
-	// Second pass: apply controls (now `all` can see known blocks from first pass + extras).
-	$known = array_keys($map);
-	foreach ($assignments as $assignment) {
-		if (!is_array($assignment)) {
-			continue;
-		}
-
-		$target = (string) ($assignment['target'] ?? 'block_option');
-		if ($target !== '' && $target !== 'block_option') {
-			continue;
-		}
-
-		$preset_slug = (string) ($assignment['preset'] ?? '');
-		if ($preset_slug === '' || !isset($presets[$preset_slug]) || !is_array($presets[$preset_slug])) {
-			continue;
-		}
-
-		$controls = $presets[$preset_slug]['controls'] ?? [];
-		if (!is_array($controls) || $controls === []) {
-			continue;
-		}
-
-		$exclude = [];
-		if (isset($assignment['exclude']) && is_array($assignment['exclude'])) {
-			$exclude = array_values(array_filter(array_map('strval', $assignment['exclude'])));
-		}
-
-		$block_names = bl_block_options_resolve_assignment_blocks(
-			$assignment['blocks'] ?? [],
-			$exclude,
-			$known
-		);
-
-		foreach ($block_names as $block_name) {
-			if (!isset($map[$block_name])) {
-				$map[$block_name] = [];
-			}
-			foreach ($controls as $control) {
-				if (is_array($control)) {
-					$map[$block_name][] = $control;
-				}
-			}
-		}
-	}
-
-	foreach ($block_extras as $block_name => $extra) {
-		$block_name = (string) $block_name;
-		if ($block_name === '' || !is_array($extra)) {
-			continue;
-		}
-		$extra_controls = $extra['controls'] ?? [];
-		if (!is_array($extra_controls)) {
-			continue;
-		}
-		if (!isset($map[$block_name])) {
-			$map[$block_name] = [];
-		}
-		foreach ($extra_controls as $control) {
-			if (is_array($control)) {
-				$map[$block_name][] = $control;
+	if ($star_controls !== []) {
+		foreach (bl_block_options_registered_block_names() as $name) {
+			if (!isset($map[$name])) {
+				$map[$name] = $star_controls;
 			}
 		}
 	}

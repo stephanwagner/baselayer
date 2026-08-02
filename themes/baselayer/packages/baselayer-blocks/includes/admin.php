@@ -262,11 +262,32 @@ function bl_blocks_save_post(int $post_id, WP_Post $post): void
 		}
 	}
 
+	$block_options_payload = null;
+	if (isset($decoded['blockOptions']) && is_array($decoded['blockOptions'])) {
+		$block_options_payload = $decoded['blockOptions'];
+		unset($decoded['blockOptions']);
+	}
+
 	$config = bl_blocks_sanitize_config($decoded, $type);
 	if (($config['settings']['slug'] ?? '') === '') {
 		$config['settings']['slug'] = bl_blocks_definition_slug($post_id, $config['settings']);
 	}
 	update_post_meta($post_id, BL_BLOCK_CONFIG_META, $config);
+
+	if (
+		$type === 'block'
+		&& $block_options_payload !== null
+		&& function_exists('bl_block_options_set_block_items')
+		&& function_exists('bl_blocks_gutenberg_name')
+	) {
+		$slug = (string) ($config['settings']['slug'] ?? '');
+		if ($slug !== '') {
+			$items = isset($block_options_payload['items']) && is_array($block_options_payload['items'])
+				? $block_options_payload['items']
+				: [];
+			bl_block_options_set_block_items(bl_blocks_gutenberg_name($slug), $items);
+		}
+	}
 }
 add_action('save_post', 'bl_blocks_save_post', 10, 2);
 

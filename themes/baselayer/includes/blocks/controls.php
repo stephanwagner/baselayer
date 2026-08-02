@@ -117,7 +117,7 @@ function bl_block_options_control_align_wide_container(): array
 }
 
 /**
- * Hide block on the frontend (injected globally in the editor; not used in config).
+ * Hide block on the frontend (seeded via sichtbarkeit preset in block-options-import.json).
  *
  * @return array<string, mixed>
  */
