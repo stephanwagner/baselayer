@@ -46,10 +46,15 @@ function bl_blocks_menu_icon(): string
 
 /**
  * Top-level Website runtime page (Site Settings values).
+ * Only registered when at least one active Website definition exists.
  */
 function bl_blocks_register_website_menu(): void
 {
 	if (!bl_blocks_user_can_manage()) {
+		return;
+	}
+
+	if (bl_blocks_query_definitions('site_settings', true) === []) {
 		return;
 	}
 
