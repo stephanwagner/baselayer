@@ -227,7 +227,9 @@ function bl_block_options_sanitize_preset_defaults(array $raw): array
 			} elseif (is_int($value) || is_float($value)) {
 				$clean[$key] = $value;
 			} elseif (is_string($value)) {
-				$clean[$key] = sanitize_text_field($value);
+				$clean[$key] = $key === 'description'
+					? sanitize_textarea_field($value)
+					: sanitize_text_field($value);
 			}
 		}
 		if ($clean !== []) {
@@ -291,7 +293,7 @@ function bl_block_options_sanitize_control_item(array $item): ?array
 
 	if (function_exists('bl_block_options_is_custom_type') && bl_block_options_is_custom_type($type)) {
 		$params = bl_block_options_sanitize_custom_params($type, $item);
-		return array_merge(
+		$out = array_merge(
 			[
 				'id' => $id,
 				'kind' => 'control',
@@ -299,6 +301,10 @@ function bl_block_options_sanitize_control_item(array $item): ?array
 			],
 			$params
 		);
+		if (array_key_exists('description', $item)) {
+			$out['description'] = sanitize_textarea_field((string) $item['description']);
+		}
+		return $out;
 	}
 
 	$generics = ['boolean', 'select', 'button-group', 'icon'];
@@ -314,6 +320,9 @@ function bl_block_options_sanitize_control_item(array $item): ?array
 		// Preserve camelCase (e.g. containerPadding); sanitize_key would lowercase.
 		'attributeName' => preg_replace('/[^a-zA-Z0-9_]/', '', (string) ($item['attributeName'] ?? '')) ?? '',
 	];
+	if (array_key_exists('description', $item)) {
+		$out['description'] = sanitize_textarea_field((string) $item['description']);
+	}
 
 	if ($type === 'boolean') {
 		$out['toggleLabel'] = sanitize_text_field((string) ($item['toggleLabel'] ?? ''));
@@ -323,9 +332,6 @@ function bl_block_options_sanitize_control_item(array $item): ?array
 			$out['className'] = preg_replace('/[^a-zA-Z0-9_\-]/', '', $item['className']) ?? '';
 		}
 		$out['default'] = !empty($item['default']);
-		if (isset($item['description'])) {
-			$out['description'] = sanitize_text_field((string) $item['description']);
-		}
 		if (!empty($item['noSeparator'])) {
 			$out['noSeparator'] = true;
 		}
@@ -342,9 +348,6 @@ function bl_block_options_sanitize_control_item(array $item): ?array
 
 	// select / button-group
 	$out['default'] = sanitize_text_field((string) ($item['default'] ?? ''));
-	if (isset($item['description'])) {
-		$out['description'] = sanitize_text_field((string) $item['description']);
-	}
 	if (!empty($item['noSeparator'])) {
 		$out['noSeparator'] = true;
 	}

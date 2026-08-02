@@ -910,8 +910,11 @@ body.post-new-php.post-type-bl_block .page-title-action {
 }
 
 .bl-blocks-options-panel {
-  padding: 12px 8px 32px;
   max-width: 720px;
+}
+
+.bl-forms-builder__panels > [data-bl-forms-panel=options][hidden] {
+  display: none !important;
 }
 
 .bl-bo-stack {
@@ -922,7 +925,7 @@ body.post-new-php.post-type-bl_block .page-title-action {
 }
 
 .bl-bo-stack__empty {
-  margin: 8px 0 16px;
+  margin: 8px 0 32px;
 }
 
 .bl-bo-card {
@@ -1000,7 +1003,8 @@ body.post-new-php.post-type-bl_block .page-title-action {
 }
 
 .bl-bo-field input[type=text],
-.bl-bo-field select {
+.bl-bo-field select,
+.bl-bo-field textarea {
   width: 100%;
   max-width: 100%;
 }

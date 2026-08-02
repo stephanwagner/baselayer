@@ -61,12 +61,23 @@ function presetsCatalog() {
     : [];
 }
 
-function customTypes() {
-  return Object.keys(customsCatalog());
-}
-
 function isCustomType(type) {
   return !!customsCatalog()[type];
+}
+
+/**
+ * Which custom params may be overridden when a preset is attached to a block.
+ * Label is shown via a universal field (skip catalog `label` to avoid duplicates).
+ * allowUnset is locked for Abstände (container-margin).
+ */
+function canOverridePresetParam(controlType, key) {
+  if (key === 'label') {
+    return false;
+  }
+  if (key === 'allowUnset' && controlType === 'container-margin') {
+    return false;
+  }
+  return true;
 }
 
 function defaultGeneric(type) {
@@ -154,7 +165,7 @@ export function createOptionsPanel(initial, onChange) {
   });
 
   const panel = el('div', {
-    className: 'bl-forms-builder__panel bl-blocks-options-panel',
+    className: 'bl-blocks-options-panel',
     dataset: { blFormsPanel: 'options' },
   });
 
@@ -236,6 +247,27 @@ export function createOptionsPanel(initial, onChange) {
         onInput: (e) => onUpdate(e.target.value),
       }),
     ]);
+  }
+
+  function renderDescriptionField(value, onUpdate) {
+    const textarea = el('textarea', {
+      className: 'widefat',
+      rows: 2,
+      text: value || '',
+    });
+    textarea.addEventListener('input', () => onUpdate(textarea.value));
+    return el('div', { className: 'bl-bo-field' }, [
+      el('label', { text: t('optionDescription', 'Description') }),
+      textarea,
+    ]);
+  }
+
+  function patchPresetDefault(item, index, controlId, patch) {
+    const defaults = { ...(item.defaults || {}) };
+    defaults[controlId] = { ...(defaults[controlId] || {}), ...patch };
+    const next = { ...item, defaults };
+    patchAt(index, next);
+    Object.assign(item, next);
   }
 
   function renderCustomParams(item, index) {
@@ -402,20 +434,45 @@ export function createOptionsPanel(initial, onChange) {
           control.id;
         section.appendChild(el('strong', { text: title }));
 
+        const controlId = control.id;
+        const overrideLabel =
+          item.defaults?.[controlId]?.label !== undefined
+            ? item.defaults[controlId].label
+            : control.label || '';
+        const overrideDescription =
+          item.defaults?.[controlId]?.description !== undefined
+            ? item.defaults[controlId].description
+            : control.description || '';
+
+        section.appendChild(
+          el('div', { className: 'bl-bo-field' }, [
+            el('label', { text: t('optionLabel', 'Label') }),
+            el('input', {
+              type: 'text',
+              value: overrideLabel,
+              onInput: (e) => patchPresetDefault(item, index, controlId, { label: e.target.value }),
+            }),
+          ])
+        );
+        section.appendChild(
+          renderDescriptionField(overrideDescription, (nextVal) =>
+            patchPresetDefault(item, index, controlId, { description: nextVal })
+          )
+        );
+
         if (isCustomType(control.type)) {
           const def = customsCatalog()[control.type];
           Object.entries(def?.params || {}).forEach(([key, paramDef]) => {
+            if (!canOverridePresetParam(control.type, key)) {
+              return;
+            }
             const current =
               item.defaults?.[control.id]?.[key] !== undefined
                 ? item.defaults[control.id][key]
                 : control[key];
             section.appendChild(
               renderParamField(key, paramDef, current, (nextVal) => {
-                const defaults = { ...(item.defaults || {}) };
-                defaults[control.id] = { ...(defaults[control.id] || {}), [key]: nextVal };
-                const next = { ...item, defaults };
-                patchAt(index, next);
-                Object.assign(item, next);
+                patchPresetDefault(item, index, control.id, { [key]: nextVal });
               })
             );
           });
@@ -425,11 +482,7 @@ export function createOptionsPanel(initial, onChange) {
             checked: !!(item.defaults?.[control.id]?.default ?? control.default),
           });
           check.addEventListener('change', () => {
-            const defaults = { ...(item.defaults || {}) };
-            defaults[control.id] = { ...(defaults[control.id] || {}), default: check.checked };
-            const next = { ...item, defaults };
-            patchAt(index, next);
-            Object.assign(item, next);
+            patchPresetDefault(item, index, control.id, { default: check.checked });
           });
           section.appendChild(
             el('label', { className: 'bl-bo-check' }, [
@@ -449,11 +502,7 @@ export function createOptionsPanel(initial, onChange) {
           });
           select.value = item.defaults?.[control.id]?.default ?? control.default ?? '';
           select.addEventListener('change', () => {
-            const defaults = { ...(item.defaults || {}) };
-            defaults[control.id] = { ...(defaults[control.id] || {}), default: select.value };
-            const next = { ...item, defaults };
-            patchAt(index, next);
-            Object.assign(item, next);
+            patchPresetDefault(item, index, control.id, { default: select.value });
           });
           section.appendChild(
             el('div', { className: 'bl-bo-field' }, [
@@ -471,43 +520,59 @@ export function createOptionsPanel(initial, onChange) {
     return card;
   }
 
-  function renderControlCard(item, index) {
-    const card = el('div', { className: 'bl-bo-card' });
-    const custom = isCustomType(item.type);
+  function buildTypeSelect(item, index) {
+    const typeSelect = el('select', { className: 'bl-bo-card__type' });
 
-    const categorySelect = el('select', { className: 'bl-bo-card__type' });
+    const defaultGroup = el('optgroup', {
+      label: t('optionGroupDefault', 'Default'),
+    });
     GENERIC_TYPES.forEach((row) => {
-      categorySelect.appendChild(
+      defaultGroup.appendChild(
         el('option', {
           value: row.id,
           text: t(row.labelKey, row.labelFallback),
-          selected: !custom && item.type === row.id ? true : undefined,
+          selected: !isCustomType(item.type) && item.type === row.id ? true : undefined,
         })
       );
     });
-    categorySelect.appendChild(
-      el('option', {
-        value: '__custom__',
-        text: t('optionTypeCustom', 'Custom'),
-        selected: custom ? true : undefined,
-      })
-    );
-    categorySelect.value = custom ? '__custom__' : item.type;
-    categorySelect.addEventListener('change', () => {
-      if (categorySelect.value === '__custom__') {
-        const first = customTypes()[0];
-        if (!first) {
-          return;
-        }
-        const next = defaultCustom(first);
+    typeSelect.appendChild(defaultGroup);
+
+    const customEntries = Object.entries(customsCatalog());
+    if (customEntries.length > 0) {
+      const customGroup = el('optgroup', {
+        label: t('optionGroupCustom', 'Custom'),
+      });
+      customEntries.forEach(([type, def]) => {
+        customGroup.appendChild(
+          el('option', {
+            value: type,
+            text: def?.label || type,
+            selected: item.type === type ? true : undefined,
+          })
+        );
+      });
+      typeSelect.appendChild(customGroup);
+    }
+
+    typeSelect.value = item.type;
+    typeSelect.addEventListener('change', () => {
+      const type = typeSelect.value;
+      if (isCustomType(type)) {
+        const next = defaultCustom(type);
         next.id = item.id;
         replaceAt(index, next);
         return;
       }
-      const next = defaultGeneric(categorySelect.value);
+      const next = defaultGeneric(type);
       next.id = item.id;
       replaceAt(index, next);
     });
+    return typeSelect;
+  }
+
+  function renderControlCard(item, index) {
+    const card = el('div', { className: 'bl-bo-card' });
+    const custom = isCustomType(item.type);
 
     const head = el('div', { className: 'bl-bo-card__head' }, [
       el('span', { className: 'bl-bo-card__badge', text: typeLabel(item) }),
@@ -518,34 +583,19 @@ export function createOptionsPanel(initial, onChange) {
     body.appendChild(
       el('div', { className: 'bl-bo-field' }, [
         el('label', { text: t('optionType', 'Type') }),
-        categorySelect,
+        buildTypeSelect(item, index),
       ])
     );
 
     if (custom) {
-      const customSelect = el('select');
-      customTypes().forEach((type) => {
-        customSelect.appendChild(
-          el('option', {
-            value: type,
-            text: customsCatalog()[type]?.label || type,
-            selected: item.type === type ? true : undefined,
-          })
-        );
-      });
-      customSelect.value = item.type;
-      customSelect.addEventListener('change', () => {
-        const next = defaultCustom(customSelect.value);
-        next.id = item.id;
-        replaceAt(index, next);
-      });
-      body.appendChild(
-        el('div', { className: 'bl-bo-field' }, [
-          el('label', { text: t('customControl', 'Custom control') }),
-          customSelect,
-        ])
-      );
       body.appendChild(renderCustomParams(item, index));
+      body.appendChild(
+        renderDescriptionField(item.description || '', (nextVal) => {
+          const next = { ...item, description: nextVal };
+          patchAt(index, next);
+          Object.assign(item, next);
+        })
+      );
       card.append(head, body);
       return card;
     }
@@ -570,6 +620,14 @@ export function createOptionsPanel(initial, onChange) {
           },
         }),
       ])
+    );
+
+    body.appendChild(
+      renderDescriptionField(item.description || '', (nextVal) => {
+        const next = { ...item, description: nextVal };
+        patchAt(index, next);
+        Object.assign(item, next);
+      })
     );
 
     const attrInput = el('input', {
@@ -665,7 +723,7 @@ export function createOptionsPanel(initial, onChange) {
     el('button', {
       type: 'button',
       className: 'button button-secondary',
-      text: '+ ' + t('addOption', 'Option'),
+      text: '+ ' + t('addOption', 'Add option'),
       onClick: () => {
         items.push(defaultGeneric('boolean'));
         sync();
@@ -677,23 +735,6 @@ export function createOptionsPanel(initial, onChange) {
     el('button', {
       type: 'button',
       className: 'button button-secondary',
-      text: '+ ' + t('addCustom', 'Custom'),
-      onClick: () => {
-        const first = customTypes()[0];
-        if (!first) {
-          window.alert(t('noCustoms', 'No custom controls registered.'));
-          return;
-        }
-        items.push(defaultCustom(first));
-        sync();
-        render();
-      },
-    })
-  );
-  addRow.appendChild(
-    el('button', {
-      type: 'button',
-      className: 'button button-primary',
       text: '+ ' + t('addPreset', 'Preset'),
       onClick: () => {
         const presets = presetsCatalog();
@@ -715,7 +756,7 @@ export function createOptionsPanel(initial, onChange) {
       className: 'description',
       text: t(
         'blockOptionsHelp',
-        'These controls appear in the block sidebar in the editor. Prefer presets for shared spacing and layout options.'
+        'These controls appear in the block sidebar in the editor.'
       ),
     }),
     list,

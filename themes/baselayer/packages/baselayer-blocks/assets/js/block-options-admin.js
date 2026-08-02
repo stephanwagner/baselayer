@@ -219,13 +219,21 @@
         render();
       }
     }
-    function renderParamEditors(item, onPatch) {
+    function renderParamEditors(item, onPatch, { presetDefaults = false } = {}) {
       const wrap = el("div");
       const def = customs[item.type];
       if (!def?.params) {
         return wrap;
       }
       Object.entries(def.params).forEach(([key, paramDef]) => {
+        if (presetDefaults) {
+          if (key === "label") {
+            return;
+          }
+          if (key === "allowUnset" && item.type === "container-margin") {
+            return;
+          }
+        }
         const row = el("div", { className: "row" });
         const label = paramDef.label || key;
         if (paramDef.type === "boolean") {
@@ -268,6 +276,18 @@
       });
       return wrap;
     }
+    function renderDescriptionRow(value, onUpdate) {
+      const textarea = el("textarea", {
+        className: "widefat",
+        rows: 2,
+        text: value || ""
+      });
+      textarea.addEventListener("input", () => onUpdate(textarea.value));
+      return el("div", { className: "row" }, [
+        el("label", { text: t("optionDescription", "Description") }),
+        textarea
+      ]);
+    }
     function renderControlCard(item, index, items, onChange) {
       const card = el("div", { className: "bl-bo-edit-card" });
       const isCustom = !!customs[item.type];
@@ -278,24 +298,36 @@
         })
       );
       const typeRow = el("div", { className: "row" });
-      typeRow.appendChild(el("label", { text: "Type" }));
+      typeRow.appendChild(el("label", { text: t("optionType", "Type") }));
       const typeSelect = el("select");
-      typeSelect.appendChild(
-        el("option", { value: "boolean", text: "Toggle", selected: item.type === "boolean" })
-      );
-      typeSelect.appendChild(
+      const defaultGroup = el("optgroup", { label: t("optionGroupDefault", "Default") });
+      defaultGroup.appendChild(
         el("option", {
-          value: "__custom__",
-          text: "Custom",
-          selected: isCustom ? true : void 0
+          value: "boolean",
+          text: t("addToggle", "Toggle"),
+          selected: item.type === "boolean" ? true : void 0
         })
       );
-      typeSelect.value = isCustom ? "__custom__" : item.type;
+      typeSelect.appendChild(defaultGroup);
+      const customEntries = Object.entries(customs);
+      if (customEntries.length > 0) {
+        const customGroup = el("optgroup", { label: t("optionGroupCustom", "Custom") });
+        customEntries.forEach(([type, def]) => {
+          customGroup.appendChild(
+            el("option", {
+              value: type,
+              text: def.label || type,
+              selected: item.type === type ? true : void 0
+            })
+          );
+        });
+        typeSelect.appendChild(customGroup);
+      }
+      typeSelect.value = item.type;
       typeSelect.addEventListener("change", () => {
-        if (typeSelect.value === "__custom__") {
-          const first = Object.keys(customs)[0];
-          if (!first) return;
-          items[index] = defaultCustom(first);
+        const type = typeSelect.value;
+        if (customs[type]) {
+          items[index] = defaultCustom(type);
         } else {
           items[index] = defaultToggle();
         }
@@ -304,25 +336,6 @@
       typeRow.appendChild(typeSelect);
       card.appendChild(typeRow);
       if (isCustom) {
-        const customRow = el("div", { className: "row" });
-        customRow.appendChild(el("label", { text: "Custom" }));
-        const customSelect = el("select");
-        Object.entries(customs).forEach(([type, def]) => {
-          customSelect.appendChild(
-            el("option", {
-              value: type,
-              text: def.label || type,
-              selected: item.type === type
-            })
-          );
-        });
-        customSelect.value = item.type;
-        customSelect.addEventListener("change", () => {
-          items[index] = defaultCustom(customSelect.value);
-          onChange();
-        });
-        customRow.appendChild(customSelect);
-        card.appendChild(customRow);
         card.appendChild(
           renderParamEditors(item, (patch) => {
             Object.assign(item, patch);
@@ -344,6 +357,11 @@
           );
         });
       }
+      card.appendChild(
+        renderDescriptionRow(item.description || "", (nextVal) => {
+          item.description = nextVal;
+        })
+      );
       card.appendChild(
         el("button", {
           type: "button",
@@ -402,6 +420,32 @@
           const section = el("div", { className: "row" });
           const title = control.label || customs[control.type]?.label || control.type || control.id;
           section.appendChild(el("strong", { text: title }));
+          const controlId = control.id;
+          const patchDefault = (patch) => {
+            item.defaults = item.defaults || {};
+            item.defaults[controlId] = {
+              ...item.defaults[controlId] || {},
+              ...patch
+            };
+          };
+          const overrideLabel = item.defaults?.[controlId]?.label !== void 0 ? item.defaults[controlId].label : control.label || "";
+          const overrideDescription = item.defaults?.[controlId]?.description !== void 0 ? item.defaults[controlId].description : control.description || "";
+          section.appendChild(
+            el("div", { className: "row" }, [
+              el("label", { text: t("optionLabel", "Label") }),
+              el("input", {
+                type: "text",
+                value: overrideLabel,
+                onInput: (e) => patchDefault({ label: e.target.value })
+              })
+            ])
+          );
+          section.appendChild(
+            renderDescriptionRow(
+              overrideDescription,
+              (nextVal) => patchDefault({ description: nextVal })
+            )
+          );
           if (customs[control.type]) {
             section.appendChild(
               renderParamEditors(
@@ -409,14 +453,36 @@
                   ...control,
                   ...item.defaults?.[control.id] || {}
                 },
-                (patch) => {
-                  item.defaults = item.defaults || {};
-                  item.defaults[control.id] = {
-                    ...item.defaults[control.id] || {},
-                    ...patch
-                  };
-                }
+                (patch) => patchDefault(patch),
+                { presetDefaults: true }
               )
+            );
+          } else if (control.type === "boolean") {
+            const check = el("input", {
+              type: "checkbox",
+              checked: !!(item.defaults?.[control.id]?.default ?? control.default)
+            });
+            check.addEventListener("change", () => patchDefault({ default: check.checked }));
+            section.appendChild(
+              el("label", {}, [check, document.createTextNode(" " + t("defaultOn", "On by default"))])
+            );
+          } else if (control.type === "select" || control.type === "button-group") {
+            const select = el("select");
+            (control.options || []).forEach((opt) => {
+              select.appendChild(
+                el("option", {
+                  value: opt.value ?? "",
+                  text: opt.label || opt.value || "\u2014"
+                })
+              );
+            });
+            select.value = item.defaults?.[control.id]?.default ?? control.default ?? "";
+            select.addEventListener("change", () => patchDefault({ default: select.value }));
+            section.appendChild(
+              el("div", { className: "row" }, [
+                el("label", { text: t("defaultValue", "Default") }),
+                select
+              ])
             );
           }
           card.appendChild(section);
@@ -466,6 +532,17 @@
       toolbar.appendChild(
         el("button", {
           type: "button",
+          className: "button",
+          text: "+ " + t("addOption", "Add option"),
+          onClick: () => {
+            block.items.push(defaultToggle());
+            render();
+          }
+        })
+      );
+      toolbar.appendChild(
+        el("button", {
+          type: "button",
           className: "button button-primary",
           text: "+ " + t("addPresetRef", "Preset"),
           onClick: () => {
@@ -474,30 +551,6 @@
               return;
             }
             block.items.push(defaultPresetRef(presets[0].slug));
-            render();
-          }
-        })
-      );
-      toolbar.appendChild(
-        el("button", {
-          type: "button",
-          className: "button",
-          text: "+ " + t("addCustom", "Custom"),
-          onClick: () => {
-            const first = Object.keys(customs)[0];
-            if (!first) return;
-            block.items.push(defaultCustom(first));
-            render();
-          }
-        })
-      );
-      toolbar.appendChild(
-        el("button", {
-          type: "button",
-          className: "button",
-          text: "+ " + t("addToggle", "Toggle"),
-          onClick: () => {
-            block.items.push(defaultToggle());
             render();
           }
         })
@@ -589,20 +642,7 @@
         el("button", {
           type: "button",
           className: "button",
-          text: "+ " + t("addCustom", "Custom"),
-          onClick: () => {
-            const first = Object.keys(customs)[0];
-            if (!first) return;
-            preset.items.push(defaultCustom(first));
-            render();
-          }
-        })
-      );
-      toolbar.appendChild(
-        el("button", {
-          type: "button",
-          className: "button",
-          text: "+ " + t("addToggle", "Toggle"),
+          text: "+ " + t("addOption", "Add option"),
           onClick: () => {
             preset.items.push(defaultToggle());
             render();

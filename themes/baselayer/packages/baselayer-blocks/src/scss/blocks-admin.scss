@@ -829,10 +829,13 @@ body.post-new-php.post-type-bl_block {
   background: #f6f7f7;
 }
 
-// Options tab
+// Options tab — no bl-forms-builder__panel (avoids nested panel chrome inside __panels).
 .bl-blocks-options-panel {
-  padding: 12px 8px 32px;
   max-width: 720px;
+}
+
+.bl-forms-builder__panels > [data-bl-forms-panel='options'][hidden] {
+  display: none !important;
 }
 
 .bl-bo-stack {
@@ -843,7 +846,7 @@ body.post-new-php.post-type-bl_block {
 }
 
 .bl-bo-stack__empty {
-  margin: 8px 0 16px;
+  margin: 8px 0 32px; // offset empty .bl-bo-stack vertical margin (16+16)
 }
 
 .bl-bo-card {
@@ -921,7 +924,8 @@ body.post-new-php.post-type-bl_block {
 }
 
 .bl-bo-field input[type='text'],
-.bl-bo-field select {
+.bl-bo-field select,
+.bl-bo-field textarea {
   width: 100%;
   max-width: 100%;
 }

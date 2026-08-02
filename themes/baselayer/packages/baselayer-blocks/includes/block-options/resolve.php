@@ -38,8 +38,9 @@ function bl_block_options_apply_control_defaults(array $item, array $overrides):
 	}
 
 	if (function_exists('bl_block_options_is_custom_type') && bl_block_options_is_custom_type($type)) {
-		$params = bl_block_options_sanitize_custom_params($type, array_merge($item, $overrides));
-		return array_merge(
+		$merged = array_merge($item, $overrides);
+		$params = bl_block_options_sanitize_custom_params($type, $merged);
+		$out = array_merge(
 			[
 				'id' => (string) ($item['id'] ?? ''),
 				'kind' => 'control',
@@ -47,6 +48,10 @@ function bl_block_options_apply_control_defaults(array $item, array $overrides):
 			],
 			$params
 		);
+		if (array_key_exists('description', $merged)) {
+			$out['description'] = sanitize_textarea_field((string) $merged['description']);
+		}
+		return $out;
 	}
 
 	$merged = array_merge($item, $overrides);

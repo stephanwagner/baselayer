@@ -178,6 +178,11 @@ function bl_block_options_build_custom_control(array $item): ?array
 
 	$params = bl_block_options_sanitize_custom_params($type, $item);
 	$built = ($registry[$type]['build'])($params);
-
-	return is_array($built) ? $built : null;
+	if (!is_array($built)) {
+		return null;
+	}
+	if (array_key_exists('description', $item)) {
+		$built['description'] = sanitize_textarea_field((string) $item['description']);
+	}
+	return $built;
 }
