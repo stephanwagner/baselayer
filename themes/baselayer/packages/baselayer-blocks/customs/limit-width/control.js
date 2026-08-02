@@ -3,9 +3,9 @@ import {
   LIMIT_WIDTH_SIZES,
   displayLimitWidthSize,
   storedLimitWidthSize,
-} from './limit-width-utils';
-import { BlockOptionToggleGroupOption } from './block-option-toggle-group-option';
-import { BlockOptionDescription } from './block-option-help';
+} from './utils';
+import { BlockOptionToggleGroupOption } from '../../src/js/block-options/shared/block-option-toggle-group-option';
+import { BlockOptionDescription } from '../../src/js/block-options/shared/block-option-help';
 
 const ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
 

@@ -951,6 +951,11 @@ body.post-new-php.post-type-bl_block .page-title-action {
   color: #135e96;
 }
 
+.bl-bo-card--preset .bl-bo-card__badge {
+  background: #f6f7f7;
+  color: #1d2327;
+}
+
 .bl-bo-card__actions {
   display: flex;
   gap: 6px;
@@ -961,6 +966,25 @@ body.post-new-php.post-type-bl_block .page-title-action {
   display: flex;
   flex-direction: column;
   gap: 10px;
+}
+
+.bl-bo-custom-params,
+.bl-bo-preset-defaults {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.bl-bo-preset-defaults {
+  padding: 12px;
+  border: 1px solid #f0f0f1;
+  border-radius: 6px;
+  background: #fcfcfc;
+}
+
+.bl-bo-preset-defaults > strong {
+  font-size: 12px;
+  margin-bottom: 2px;
 }
 
 .bl-bo-field {

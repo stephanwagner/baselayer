@@ -24,6 +24,55 @@ function bl_block_options_registered_block_names(): array
 }
 
 /**
+ * Apply assignment default overrides onto a thin control item.
+ *
+ * @param array<string, mixed> $item
+ * @param array<string, mixed> $overrides
+ * @return array<string, mixed>
+ */
+function bl_block_options_apply_control_defaults(array $item, array $overrides): array
+{
+	$type = sanitize_key((string) ($item['type'] ?? ''));
+	if ($type === '') {
+		return $item;
+	}
+
+	if (function_exists('bl_block_options_is_custom_type') && bl_block_options_is_custom_type($type)) {
+		$params = bl_block_options_sanitize_custom_params($type, array_merge($item, $overrides));
+		return array_merge(
+			[
+				'id' => (string) ($item['id'] ?? ''),
+				'kind' => 'control',
+				'type' => $type,
+			],
+			$params
+		);
+	}
+
+	$merged = array_merge($item, $overrides);
+	$clean = bl_block_options_sanitize_control_item($merged);
+	return $clean !== null ? $clean : $item;
+}
+
+/**
+ * Expand one thin control into an editor option array.
+ *
+ * @param array<string, mixed> $item
+ * @return array<string, mixed>|null
+ */
+function bl_block_options_expand_control_for_editor(array $item): ?array
+{
+	$type = sanitize_key((string) ($item['type'] ?? ''));
+	if (function_exists('bl_block_options_is_custom_type') && bl_block_options_is_custom_type($type)) {
+		return bl_block_options_build_custom_control($item);
+	}
+
+	$control = $item;
+	unset($control['kind'], $control['id']);
+	return $control;
+}
+
+/**
  * Expand store items (controls + preset refs) into editor option arrays.
  *
  * @param list<array<string, mixed>> $items
@@ -43,17 +92,30 @@ function bl_block_options_expand_items_for_editor(array $items, array $presets):
 			if ($slug === '' || !isset($presets[$slug]['items']) || !is_array($presets[$slug]['items'])) {
 				continue;
 			}
-			foreach (bl_block_options_expand_items_for_editor($presets[$slug]['items'], []) as $control) {
-				$out[] = $control;
+			$defaults = isset($item['defaults']) && is_array($item['defaults']) ? $item['defaults'] : [];
+			foreach ($presets[$slug]['items'] as $preset_item) {
+				if (!is_array($preset_item) || (($preset_item['kind'] ?? '') !== 'control')) {
+					continue;
+				}
+				$control_id = sanitize_key((string) ($preset_item['id'] ?? ''));
+				$merged = $preset_item;
+				if ($control_id !== '' && isset($defaults[$control_id]) && is_array($defaults[$control_id])) {
+					$merged = bl_block_options_apply_control_defaults($preset_item, $defaults[$control_id]);
+				}
+				$expanded = bl_block_options_expand_control_for_editor($merged);
+				if (is_array($expanded)) {
+					$out[] = $expanded;
+				}
 			}
 			continue;
 		}
 		if ($kind !== 'control') {
 			continue;
 		}
-		$control = $item;
-		unset($control['kind'], $control['id']);
-		$out[] = $control;
+		$expanded = bl_block_options_expand_control_for_editor($item);
+		if (is_array($expanded)) {
+			$out[] = $expanded;
+		}
 	}
 	return $out;
 }

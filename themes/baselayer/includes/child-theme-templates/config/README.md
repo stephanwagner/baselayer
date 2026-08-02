@@ -8,7 +8,7 @@ Shipped stubs (edit as needed):
 - `theme.php` — theme options
 - `design.php` — colors, typography, gradients, layout
 - `block-settings.php` — Theme → Blocks defaults
-- `block-options.php` — presets + assignments for editor sidebar options (merges over parent)
+- `block-options.php` — optional overrides (runtime seed is package `seed/block-options-import.json`; theme may ship `config/block-options/import.json`)
 - `icons.js` — child theme icons build metadata
 
 ## Content types

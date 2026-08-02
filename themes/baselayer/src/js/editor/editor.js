@@ -1,4 +1,3 @@
-import './block-options';
 import './block-layout';
 import './block-inserter-settings';
 import './embed-variations';

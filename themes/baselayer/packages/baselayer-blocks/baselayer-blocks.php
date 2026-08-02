@@ -283,6 +283,7 @@ require_once BL_BLOCKS_PATH . 'includes/runtime-site.php';
 require_once BL_BLOCKS_PATH . 'includes/runtime-page.php';
 require_once BL_BLOCKS_PATH . 'includes/runtime-blocks.php';
 require_once BL_BLOCKS_PATH . 'includes/template-starter.php';
+require_once BL_BLOCKS_PATH . 'includes/block-options/bootstrap.php';
 
 if (is_admin()) {
 	require_once BL_BLOCKS_PATH . 'includes/admin.php';

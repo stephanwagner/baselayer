@@ -277,11 +277,23 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'tabFields'                => __('Fields', 'baselayer-blocks'),
 		'tabSettings'              => __('Settings', 'baselayer-blocks'),
 		'tabOptions'               => __('Options', 'baselayer-blocks'),
-		'blockOptionsHelp'         => __('These controls appear in the block sidebar in the editor.', 'baselayer-blocks'),
-		'blockOptionsEmpty'        => __('No options yet. Add a toggle, select, or button group for the block sidebar.', 'baselayer-blocks'),
+		'blockOptionsHelp'         => __('These controls appear in the block sidebar in the editor. Prefer presets for shared spacing and layout options.', 'baselayer-blocks'),
+		'blockOptionsEmpty'        => __('No options yet. Add a control or attach a preset.', 'baselayer-blocks'),
 		'optionTypeToggle'         => __('Toggle', 'baselayer-blocks'),
 		'optionTypeSelect'         => __('Select', 'baselayer-blocks'),
 		'optionTypeButtonGroup'    => __('Button group', 'baselayer-blocks'),
+		'optionTypeIcon'           => __('Icon', 'baselayer-blocks'),
+		'optionTypeCustom'        => __('Custom', 'baselayer-blocks'),
+		'optionTypePreset'         => __('Preset', 'baselayer-blocks'),
+		'customControl'           => __('Custom control', 'baselayer-blocks'),
+		'addOption'                => __('Option', 'baselayer-blocks'),
+		'addCustom'               => __('Custom', 'baselayer-blocks'),
+		'addPreset'                => __('Preset', 'baselayer-blocks'),
+		'choosePreset'             => __('Preset', 'baselayer-blocks'),
+		'presetDefaultsHelp'       => __('Optional default overrides for this block:', 'baselayer-blocks'),
+		'defaultValue'             => __('Default', 'baselayer-blocks'),
+		'noPresetsYet'             => __('No presets yet — import theme defaults or create presets under Block Options.', 'baselayer-blocks'),
+		'noCustoms'               => __('No custom controls registered.', 'baselayer-blocks'),
 		'optionLabel'              => __('Label', 'baselayer-blocks'),
 		'optionType'               => __('Type', 'baselayer-blocks'),
 		'attributeName'            => __('Attribute name', 'baselayer-blocks'),
@@ -541,15 +553,21 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 	];
 
 	wp_localize_script('bl-blocks-admin', 'blBlocksAdmin', [
-		'type'             => $type,
-		'postTypes'        => $post_types,
-		'blockCategories'  => bl_blocks_block_category_choices(),
-		'hasIconPicker'    => $has_icon_picker,
-		'icons'            => $icons,
-		'pagesRestUrl'     => esc_url_raw(rest_url('wp/v2/pages')),
-		'starterPath'      => 'baselayer-blocks/v1/starter-template',
-		'restNonce'        => wp_create_nonce('wp_rest'),
-		'i18n'             => $i18n,
+		'type'                 => $type,
+		'postTypes'            => $post_types,
+		'blockCategories'      => bl_blocks_block_category_choices(),
+		'hasIconPicker'        => $has_icon_picker,
+		'icons'                => $icons,
+		'pagesRestUrl'         => esc_url_raw(rest_url('wp/v2/pages')),
+		'starterPath'          => 'baselayer-blocks/v1/starter-template',
+		'restNonce'            => wp_create_nonce('wp_rest'),
+		'blockOptionCustoms'  => function_exists('bl_block_options_customs_catalog')
+			? bl_block_options_customs_catalog()
+			: [],
+		'blockOptionPresets'   => function_exists('bl_block_options_presets_catalog')
+			? bl_block_options_presets_catalog()
+			: [],
+		'i18n'                 => $i18n,
 	]);
 	// Forms field-card modules read window.blFormsAdmin.
 	wp_add_inline_script(

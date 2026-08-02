@@ -3,27 +3,43 @@
 defined('ABSPATH') || exit;
 
 /**
- * Locate theme block-options import JSON (child overrides parent).
+ * Package default seed path.
+ */
+function bl_block_options_package_import_path(): string
+{
+	$path = dirname(__DIR__, 2) . '/seed/block-options-import.json';
+	return is_readable($path) ? $path : '';
+}
+
+/**
+ * Locate block-options import JSON.
+ * Theme/child overrides package seed when present.
  */
 function bl_block_options_theme_import_path(): string
 {
-	$relative = 'config/block-options-import.json';
-	$candidates = [];
+	$relatives = [
+		'config/block-options/import.json',
+		'config/block-options-import.json', // legacy path
+	];
+	$dirs = [];
 
 	if (function_exists('get_stylesheet_directory')) {
-		$candidates[] = trailingslashit(get_stylesheet_directory()) . $relative;
+		$dirs[] = trailingslashit(get_stylesheet_directory());
 	}
 	if (function_exists('get_template_directory')) {
-		$candidates[] = trailingslashit(get_template_directory()) . $relative;
+		$dirs[] = trailingslashit(get_template_directory());
 	}
 
-	foreach ($candidates as $path) {
-		if (is_string($path) && $path !== '' && is_readable($path)) {
-			return $path;
+	foreach ($dirs as $dir) {
+		foreach ($relatives as $relative) {
+			$path = $dir . $relative;
+			if (is_readable($path)) {
+				return $path;
+			}
 		}
 	}
 
-	return '';
+	return bl_block_options_package_import_path();
 }
 
 function bl_block_options_store_is_empty(): bool
@@ -90,7 +106,7 @@ function bl_block_options_import_from_file(string $path, array $args = [])
 }
 
 /**
- * Import theme defaults from config/block-options-import.json.
+ * Import defaults from theme override or package seed.
  *
  * @param array{replace?: bool} $args
  * @return array{presets: int, blocks: int}|WP_Error
@@ -101,7 +117,7 @@ function bl_block_options_import_theme_defaults(array $args = [])
 	if ($path === '') {
 		return new WP_Error(
 			'bl_block_options_import_missing',
-			__('Theme catalog JSON not found (config/block-options-import.json).', 'baselayer')
+			__('Block options catalog JSON not found.', 'baselayer-blocks')
 		);
 	}
 

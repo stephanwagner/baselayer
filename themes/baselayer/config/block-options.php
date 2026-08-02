@@ -3,56 +3,53 @@
 defined('ABSPATH') || exit;
 
 /**
- * Legacy file-based block options (presets + assignments).
+ * Theme seed source for block options (human-editable reference).
  *
- * Runtime editor options come from the `bl_block_options` DB store.
- * Theme seed for install/import: `config/block-options-import.json`.
+ * Runtime truth: `bl_block_options` DB store, seeded from package
+ * `seed/block-options-import.json` (or theme `config/block-options/import.json` override).
+ *
+ * Customs live in the baselayer-blocks package under `customs/<name>/`.
+ *
+ * Presets = only reusable layout packs (5).
+ * Block-specific controls live under `blocks[name].controls` (inline).
+ * Size variants use assignment `defaults`, not extra presets.
+ * Sichtbarkeit is forced in editor JS — not listed here.
  *
  * @return array{
- *   presets?: array<string, array{label?: string, controls: list<array<string, mixed>>}>,
- *   assignments?: list<array{preset: string, blocks: string|list<string>, exclude?: list<string>, target?: string}>,
+ *   presets: array<string, array{label?: string, controls: list<array<string, mixed>>}>,
+ *   assignments?: list<array{preset: string, blocks: string|list<string>, defaults?: array<string, mixed>, target?: string}>,
  *   blocks?: array<string, array{controls?: list<array<string, mixed>>}>
  * }
  */
 return [
 	'presets' => [
-		'container-margin' => [
+		'abstand' => [
 			'label' => 'Abstand',
 			'controls' => [
 				bl_block_options_control_container_margin(''),
 			],
 		],
-		'container-margin-m' => [
-			'label' => 'Abstand (M)',
+		'innenabstand' => [
+			'label' => 'Innenabstand',
 			'controls' => [
-				bl_block_options_control_container_margin('m'),
+				[
+					'type' => 'button-group',
+					'label' => 'Innenabstand',
+					'attributeName' => 'containerPadding',
+					'default' => '-container-padding-m',
+					'options' => [
+						['label' => '—', 'value' => ''],
+						['label' => '0', 'value' => '-container-padding-none'],
+						['label' => 'XS', 'value' => '-container-padding-xs'],
+						['label' => 'S', 'value' => '-container-padding-s'],
+						['label' => 'M', 'value' => '-container-padding-m'],
+						['label' => 'L', 'value' => '-container-padding-l'],
+						['label' => 'XL', 'value' => '-container-padding-xl'],
+					],
+				],
 			],
 		],
-		'container-padding-m' => [
-			'label' => 'Innenabstand (M)',
-			'controls' => [
-				bl_block_options_control_container_padding('m'),
-			],
-		],
-		'container-padding-l' => [
-			'label' => 'Innenabstand (L)',
-			'controls' => [
-				bl_block_options_control_container_padding('l'),
-			],
-		],
-		'container-padding-xl' => [
-			'label' => 'Innenabstand (XL)',
-			'controls' => [
-				bl_block_options_control_container_padding('xl'),
-			],
-		],
-		'limit-width' => [
-			'label' => 'Weite limitieren',
-			'controls' => [
-				bl_block_options_control_limit_width(),
-			],
-		],
-		'align-wide-container' => [
+		'inhaltsbreite' => [
 			'label' => 'Inhaltsbreite',
 			'controls' => [
 				bl_block_options_control_align_wide_container(),
@@ -64,14 +61,133 @@ return [
 				bl_block_options_control_text_wrap(),
 			],
 		],
-		'spacer-responsive-height' => [
-			'label' => 'Responsive Höhe',
+		'weite-limitieren' => [
+			'label' => 'Weite limitieren',
 			'controls' => [
-				bl_block_options_control_spacer_responsive_height(),
+				bl_block_options_control_limit_width(),
 			],
 		],
-		'columns-layout' => [
-			'label' => 'Spalten-Layout',
+	],
+
+	'assignments' => [
+		// Columns
+		[
+			'preset' => 'abstand',
+			'blocks' => ['core/columns'],
+			'defaults' => ['defaultSize' => 'm', 'allowUnset' => false],
+		],
+		['preset' => 'weite-limitieren', 'blocks' => ['core/columns']],
+
+		// Column
+		['preset' => 'inhaltsbreite', 'blocks' => ['core/column']],
+
+		// Heading
+		['preset' => 'abstand', 'blocks' => ['core/heading']],
+		['preset' => 'weite-limitieren', 'blocks' => ['core/heading']],
+		['preset' => 'text-wrap', 'blocks' => ['core/heading']],
+
+		// Paragraph
+		['preset' => 'abstand', 'blocks' => ['core/paragraph']],
+		['preset' => 'weite-limitieren', 'blocks' => ['core/paragraph']],
+		['preset' => 'text-wrap', 'blocks' => ['core/paragraph']],
+
+		// Image
+		['preset' => 'inhaltsbreite', 'blocks' => ['core/image']],
+		['preset' => 'abstand', 'blocks' => ['core/image']],
+
+		// Video
+		['preset' => 'abstand', 'blocks' => ['core/video']],
+
+		// Gallery
+		[
+			'preset' => 'abstand',
+			'blocks' => ['core/gallery'],
+			'defaults' => ['defaultSize' => 'm', 'allowUnset' => false],
+		],
+
+		// Group
+		['preset' => 'inhaltsbreite', 'blocks' => ['core/group']],
+		[
+			'preset' => 'abstand',
+			'blocks' => ['core/group'],
+			'defaults' => ['defaultSize' => 'm', 'allowUnset' => false],
+		],
+		[
+			'preset' => 'innenabstand',
+			'blocks' => ['core/group'],
+			'defaults' => ['default' => '-container-padding-m'],
+		],
+		['preset' => 'weite-limitieren', 'blocks' => ['core/group']],
+
+		// Quote
+		['preset' => 'abstand', 'blocks' => ['core/quote']],
+
+		// Pullquote
+		['preset' => 'inhaltsbreite', 'blocks' => ['core/pullquote']],
+		[
+			'preset' => 'abstand',
+			'blocks' => ['core/pullquote'],
+			'defaults' => ['defaultSize' => 'm', 'allowUnset' => false],
+		],
+		[
+			'preset' => 'innenabstand',
+			'blocks' => ['core/pullquote'],
+			'defaults' => ['default' => '-container-padding-l'],
+		],
+
+		// Separator
+		[
+			'preset' => 'abstand',
+			'blocks' => ['core/separator'],
+			'defaults' => ['defaultSize' => 'm', 'allowUnset' => false],
+		],
+
+		// Cover
+		['preset' => 'inhaltsbreite', 'blocks' => ['core/cover']],
+		[
+			'preset' => 'abstand',
+			'blocks' => ['core/cover'],
+			'defaults' => ['defaultSize' => 'm', 'allowUnset' => false],
+		],
+		[
+			'preset' => 'innenabstand',
+			'blocks' => ['core/cover'],
+			'defaults' => ['default' => '-container-padding-xl'],
+		],
+
+		// Buttons
+		['preset' => 'abstand', 'blocks' => ['core/buttons']],
+
+		// ACF
+		['preset' => 'abstand', 'blocks' => ['acf/icon']],
+		['preset' => 'abstand', 'blocks' => ['acf/icon-text']],
+		['preset' => 'inhaltsbreite', 'blocks' => ['acf/slider', 'acf/map', 'acf/article-list', 'acf/number-ticker']],
+		[
+			'preset' => 'abstand',
+			'blocks' => ['acf/slider', 'acf/map', 'acf/article-list', 'acf/number-ticker'],
+			'defaults' => ['defaultSize' => 'm', 'allowUnset' => false],
+		],
+		[
+			'preset' => 'innenabstand',
+			'blocks' => ['acf/slider'],
+			'defaults' => ['default' => '-container-padding-m'],
+		],
+
+		// BaseLayer / Forms
+		[
+			'preset' => 'abstand',
+			'blocks' => ['baselayer/accordion'],
+			'defaults' => ['defaultSize' => 'm', 'allowUnset' => false],
+		],
+		[
+			'preset' => 'abstand',
+			'blocks' => ['baselayer/form'],
+			'defaults' => ['defaultSize' => 'm', 'allowUnset' => false],
+		],
+	],
+
+	'blocks' => [
+		'core/columns' => [
 			'controls' => [
 				[
 					'type' => 'button-group',
@@ -120,8 +236,7 @@ return [
 				],
 			],
 		],
-		'column-center' => [
-			'label' => 'Spalte zentrieren',
+		'core/column' => [
 			'controls' => [
 				[
 					'type' => 'boolean',
@@ -132,8 +247,7 @@ return [
 				],
 			],
 		],
-		'heading-show-as' => [
-			'label' => 'Überschrift anzeigen als',
+		'core/heading' => [
 			'controls' => [
 				[
 					'type' => 'button-group',
@@ -152,8 +266,7 @@ return [
 				],
 			],
 		],
-		'image-extras' => [
-			'label' => 'Bild-Optionen',
+		'core/image' => [
 			'controls' => [
 				[
 					'type' => 'boolean',
@@ -172,8 +285,7 @@ return [
 				],
 			],
 		],
-		'video-caption' => [
-			'label' => 'Video-Untertitel',
+		'core/video' => [
 			'controls' => [
 				[
 					'type' => 'boolean',
@@ -185,8 +297,7 @@ return [
 				],
 			],
 		],
-		'gallery-extras' => [
-			'label' => 'Galerie-Optionen',
+		'core/gallery' => [
 			'controls' => [
 				[
 					'type' => 'boolean',
@@ -205,8 +316,26 @@ return [
 				],
 			],
 		],
-		'button-extras' => [
-			'label' => 'Button-Optionen',
+		'core/spacer' => [
+			'controls' => [
+				[
+					'type' => 'button-group',
+					'label' => 'Responsive Höhe',
+					'description' => 'Reduziert den Abstand auf kleineren Bildschirmen automatisch.',
+					'attributeName' => 'spacerResponsiveHeight',
+					'default' => '',
+					'options' => [
+						['label' => '—', 'value' => ''],
+						['label' => 'XS', 'value' => '-spacer-height-xs'],
+						['label' => 'S', 'value' => '-spacer-height-s'],
+						['label' => 'M', 'value' => '-spacer-height-m'],
+						['label' => 'L', 'value' => '-spacer-height-l'],
+						['label' => 'XL', 'value' => '-spacer-height-xl'],
+					],
+				],
+			],
+		],
+		'core/button' => [
 			'controls' => [
 				[
 					'type' => 'boolean',
@@ -265,8 +394,7 @@ return [
 				],
 			],
 		],
-		'icon-align' => [
-			'label' => 'Icon-Ausrichtung',
+		'acf/icon' => [
 			'controls' => [
 				[
 					'type' => 'button-group',
@@ -281,8 +409,7 @@ return [
 				],
 			],
 		],
-		'icon-text-position' => [
-			'label' => 'Icon mit Text – Position',
+		'acf/icon-text' => [
 			'controls' => [
 				[
 					'type' => 'button-group',
@@ -299,84 +426,5 @@ return [
 				],
 			],
 		],
-	],
-
-	'assignments' => [
-		// Columns
-		['preset' => 'container-margin-m', 'blocks' => ['core/columns'], 'target' => 'block_option'],
-		['preset' => 'limit-width', 'blocks' => ['core/columns'], 'target' => 'block_option'],
-		['preset' => 'columns-layout', 'blocks' => ['core/columns'], 'target' => 'block_option'],
-
-		// Column
-		['preset' => 'align-wide-container', 'blocks' => ['core/column'], 'target' => 'block_option'],
-		['preset' => 'column-center', 'blocks' => ['core/column'], 'target' => 'block_option'],
-
-		// Heading
-		['preset' => 'heading-show-as', 'blocks' => ['core/heading'], 'target' => 'block_option'],
-		['preset' => 'container-margin', 'blocks' => ['core/heading'], 'target' => 'block_option'],
-		['preset' => 'limit-width', 'blocks' => ['core/heading'], 'target' => 'block_option'],
-		['preset' => 'text-wrap', 'blocks' => ['core/heading'], 'target' => 'block_option'],
-
-		// Paragraph
-		['preset' => 'container-margin', 'blocks' => ['core/paragraph'], 'target' => 'block_option'],
-		['preset' => 'limit-width', 'blocks' => ['core/paragraph'], 'target' => 'block_option'],
-		['preset' => 'text-wrap', 'blocks' => ['core/paragraph'], 'target' => 'block_option'],
-
-		// Image
-		['preset' => 'align-wide-container', 'blocks' => ['core/image'], 'target' => 'block_option'],
-		['preset' => 'container-margin', 'blocks' => ['core/image'], 'target' => 'block_option'],
-		['preset' => 'image-extras', 'blocks' => ['core/image'], 'target' => 'block_option'],
-
-		// Video
-		['preset' => 'container-margin', 'blocks' => ['core/video'], 'target' => 'block_option'],
-		['preset' => 'video-caption', 'blocks' => ['core/video'], 'target' => 'block_option'],
-
-		// Gallery
-		['preset' => 'container-margin-m', 'blocks' => ['core/gallery'], 'target' => 'block_option'],
-		['preset' => 'gallery-extras', 'blocks' => ['core/gallery'], 'target' => 'block_option'],
-
-		// Group
-		['preset' => 'align-wide-container', 'blocks' => ['core/group'], 'target' => 'block_option'],
-		['preset' => 'container-margin-m', 'blocks' => ['core/group'], 'target' => 'block_option'],
-		['preset' => 'container-padding-m', 'blocks' => ['core/group'], 'target' => 'block_option'],
-		['preset' => 'limit-width', 'blocks' => ['core/group'], 'target' => 'block_option'],
-
-		// Quote
-		['preset' => 'container-margin', 'blocks' => ['core/quote'], 'target' => 'block_option'],
-
-		// Pullquote
-		['preset' => 'align-wide-container', 'blocks' => ['core/pullquote'], 'target' => 'block_option'],
-		['preset' => 'container-margin-m', 'blocks' => ['core/pullquote'], 'target' => 'block_option'],
-		['preset' => 'container-padding-l', 'blocks' => ['core/pullquote'], 'target' => 'block_option'],
-
-		// Separator
-		['preset' => 'container-margin-m', 'blocks' => ['core/separator'], 'target' => 'block_option'],
-
-		// Spacer
-		['preset' => 'spacer-responsive-height', 'blocks' => ['core/spacer'], 'target' => 'block_option'],
-
-		// Cover
-		['preset' => 'align-wide-container', 'blocks' => ['core/cover'], 'target' => 'block_option'],
-		['preset' => 'container-margin-m', 'blocks' => ['core/cover'], 'target' => 'block_option'],
-		['preset' => 'container-padding-xl', 'blocks' => ['core/cover'], 'target' => 'block_option'],
-
-		// Buttons / Button
-		['preset' => 'container-margin', 'blocks' => ['core/buttons'], 'target' => 'block_option'],
-		['preset' => 'button-extras', 'blocks' => ['core/button'], 'target' => 'block_option'],
-
-		// ACF (optional drop-in)
-		['preset' => 'icon-align', 'blocks' => ['acf/icon'], 'target' => 'block_option'],
-		['preset' => 'container-margin', 'blocks' => ['acf/icon'], 'target' => 'block_option'],
-		['preset' => 'icon-text-position', 'blocks' => ['acf/icon-text'], 'target' => 'block_option'],
-		['preset' => 'container-margin', 'blocks' => ['acf/icon-text'], 'target' => 'block_option'],
-		['preset' => 'align-wide-container', 'blocks' => ['acf/slider', 'acf/map', 'acf/article-list', 'acf/number-ticker'], 'target' => 'block_option'],
-		['preset' => 'container-margin-m', 'blocks' => ['acf/slider', 'acf/map', 'acf/article-list', 'acf/number-ticker'], 'target' => 'block_option'],
-		['preset' => 'container-padding-m', 'blocks' => ['acf/slider'], 'target' => 'block_option'],
-
-		// BaseLayer Blocks
-		['preset' => 'container-margin-m', 'blocks' => ['baselayer/accordion'], 'target' => 'block_option'],
-
-		// Forms
-		['preset' => 'container-margin-m', 'blocks' => ['baselayer/form'], 'target' => 'block_option'],
 	],
 ];

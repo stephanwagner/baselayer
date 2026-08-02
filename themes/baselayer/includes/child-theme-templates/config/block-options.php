@@ -5,24 +5,11 @@ defined('ABSPATH') || exit;
 /**
  * Block options overrides (child theme).
  *
- * Merged on top of the parent config/block-options.php.
- * - presets: associative — child slugs deep-merge / replace parent presets
- * - assignments: list — replaced wholesale by bl_config_merge_deep; for
- *   file child overrides, copy parent assignments and edit.
- * - blocks: per-block extra controls (associative merge)
+ * Package seed: packages/baselayer-blocks/seed/block-options-import.json.
+ * Optional theme override: config/block-options/import.json.
+ * Runtime: bl_block_options DB store.
  *
- * Example — add a preset:
- *
- * return [
- *   'presets' => [
- *     'my-spacing' => [
- *       'label' => 'My spacing',
- *       'controls' => [
- *         bl_block_options_control_container_margin('m'),
- *       ],
- *     ],
- *   ],
- * ];
+ * Customs are package-owned (customs/<name>/). Do not add custom types here.
  *
  * @return array<string, mixed>
  */

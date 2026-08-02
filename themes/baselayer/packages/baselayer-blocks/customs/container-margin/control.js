@@ -3,9 +3,9 @@ import {
   displayMarginSize,
   resetMarginSize,
   storedMarginSize,
-} from './container-margin-utils';
-import { BlockOptionToggleGroupOption } from './block-option-toggle-group-option';
-import { BlockOptionDescription } from './block-option-help';
+} from './utils';
+import { BlockOptionToggleGroupOption } from '../../src/js/block-options/shared/block-option-toggle-group-option';
+import { BlockOptionDescription } from '../../src/js/block-options/shared/block-option-help';
 
 const { Button } = wp.components;
 const ToggleGroupControl = wp.components.__experimentalToggleGroupControl;

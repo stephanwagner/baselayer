@@ -1,13 +1,30 @@
 /**
- * Options tab — sidebar options for this BaseLayer block (toggle, select, button group).
+ * Options tab — block sidebar options (generics, customs, preset refs).
  * Persisted via config.blockOptions → bl_block_options store on save.
  */
 const { el, t } = window.BlFormBuilder || {};
 
-const OPTION_TYPES = [
+const GENERIC_TYPES = [
   { id: 'boolean', labelKey: 'optionTypeToggle', labelFallback: 'Toggle' },
   { id: 'select', labelKey: 'optionTypeSelect', labelFallback: 'Select' },
   { id: 'button-group', labelKey: 'optionTypeButtonGroup', labelFallback: 'Button group' },
+  { id: 'icon', labelKey: 'optionTypeIcon', labelFallback: 'Icon' },
+];
+
+const SIZE_TOKENS = [
+  { value: '', label: '—' },
+  { value: 'none', label: 'None' },
+  { value: 'xs', label: 'XS' },
+  { value: 's', label: 'S' },
+  { value: 'm', label: 'M' },
+  { value: 'l', label: 'L' },
+  { value: 'xl', label: 'XL' },
+];
+
+const ALIGN_TOKENS = [
+  { value: 'left', label: 'Left' },
+  { value: 'center', label: 'Center' },
+  { value: 'right', label: 'Right' },
 ];
 
 function newId(prefix) {
@@ -34,7 +51,25 @@ function slugifyAttr(text) {
   return parts[0] + parts.slice(1).map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join('');
 }
 
-function defaultItem(type) {
+function customsCatalog() {
+  return window.blBlocksAdmin?.blockOptionCustoms || {};
+}
+
+function presetsCatalog() {
+  return Array.isArray(window.blBlocksAdmin?.blockOptionPresets)
+    ? window.blBlocksAdmin.blockOptionPresets
+    : [];
+}
+
+function customTypes() {
+  return Object.keys(customsCatalog());
+}
+
+function isCustomType(type) {
+  return !!customsCatalog()[type];
+}
+
+function defaultGeneric(type) {
   if (type === 'boolean') {
     return {
       id: newId('c'),
@@ -45,6 +80,16 @@ function defaultItem(type) {
       attributeName: 'customOption',
       className: '',
       default: false,
+    };
+  }
+  if (type === 'icon') {
+    return {
+      id: newId('c'),
+      kind: 'control',
+      type: 'icon',
+      label: 'Icon',
+      attributeName: 'customIcon',
+      default: '',
     };
   }
   return {
@@ -61,9 +106,35 @@ function defaultItem(type) {
   };
 }
 
-function typeLabel(type) {
-  const row = OPTION_TYPES.find((o) => o.id === type);
-  return row ? t(row.labelKey, row.labelFallback) : type;
+function defaultCustom(type) {
+  const def = customsCatalog()[type];
+  const defaults = def?.defaults || {};
+  return {
+    id: newId('c'),
+    kind: 'control',
+    type,
+    ...JSON.parse(JSON.stringify(defaults)),
+  };
+}
+
+function defaultPresetRef(slug) {
+  return {
+    id: newId('p'),
+    kind: 'preset',
+    slug: slug || '',
+    defaults: {},
+  };
+}
+
+function typeLabel(item) {
+  if (item?.kind === 'preset') {
+    return t('optionTypePreset', 'Preset');
+  }
+  if (isCustomType(item?.type)) {
+    return customsCatalog()[item.type]?.label || item.type;
+  }
+  const row = GENERIC_TYPES.find((o) => o.id === item?.type);
+  return row ? t(row.labelKey, row.labelFallback) : item?.type || '';
 }
 
 /**
@@ -75,10 +146,9 @@ export function createOptionsPanel(initial, onChange) {
     ? JSON.parse(JSON.stringify(initial.items))
     : [];
 
-  /** Track which attributes were auto-derived so we don't overwrite manual edits. */
   const manualAttr = new Set();
   items.forEach((item) => {
-    if (item && item.attributeName) {
+    if (item && item.kind === 'control' && item.attributeName && !isCustomType(item.type)) {
       manualAttr.add(item.id);
     }
   });
@@ -93,7 +163,7 @@ export function createOptionsPanel(initial, onChange) {
     className: 'description bl-bo-stack__empty',
     text: t(
       'blockOptionsEmpty',
-      'No options yet. Add a toggle, select, or button group for the block sidebar.'
+      'No options yet. Add a control or attach a preset.'
     ),
   });
 
@@ -127,6 +197,64 @@ export function createOptionsPanel(initial, onChange) {
     sync();
     render();
   };
+
+  function renderParamField(paramKey, paramDef, value, onUpdate) {
+    const ptype = paramDef?.type || 'text';
+    const label = paramDef?.label || paramKey;
+
+    if (ptype === 'boolean') {
+      const check = el('input', { type: 'checkbox', checked: !!value });
+      check.addEventListener('change', () => onUpdate(check.checked));
+      return el('label', { className: 'bl-bo-check' }, [
+        check,
+        document.createTextNode(' ' + label),
+      ]);
+    }
+
+    if (ptype === 'size' || ptype === 'align') {
+      const tokens = ptype === 'size' ? SIZE_TOKENS : ALIGN_TOKENS;
+      const select = el('select');
+      tokens.forEach((tok) => {
+        select.appendChild(
+          el('option', {
+            value: tok.value,
+            text: tok.label,
+            selected: value === tok.value ? true : undefined,
+          })
+        );
+      });
+      select.value = value ?? (ptype === 'align' ? 'center' : '');
+      select.addEventListener('change', () => onUpdate(select.value));
+      return el('div', { className: 'bl-bo-field' }, [el('label', { text: label }), select]);
+    }
+
+    return el('div', { className: 'bl-bo-field' }, [
+      el('label', { text: label }),
+      el('input', {
+        type: 'text',
+        value: value ?? '',
+        onInput: (e) => onUpdate(e.target.value),
+      }),
+    ]);
+  }
+
+  function renderCustomParams(item, index) {
+    const wrap = el('div', { className: 'bl-bo-custom-params' });
+    const def = customsCatalog()[item.type];
+    if (!def?.params) {
+      return wrap;
+    }
+    Object.entries(def.params).forEach(([key, paramDef]) => {
+      wrap.appendChild(
+        renderParamField(key, paramDef, item[key], (nextVal) => {
+          const next = { ...item, [key]: nextVal };
+          patchAt(index, next);
+          Object.assign(item, next);
+        })
+      );
+    });
+    return wrap;
+  }
 
   function renderChoices(item, index) {
     const wrap = el('div', { className: 'bl-bo-choices' });
@@ -185,51 +313,242 @@ export function createOptionsPanel(initial, onChange) {
     return wrap;
   }
 
-  function renderCard(item, index) {
-    const card = el('div', { className: 'bl-bo-card' });
+  function renderCardActions(index) {
+    return el('div', { className: 'bl-bo-card__actions' }, [
+      el('button', {
+        type: 'button',
+        className: 'button-link',
+        text: '↑',
+        onClick: () => move(index, index - 1),
+      }),
+      el('button', {
+        type: 'button',
+        className: 'button-link',
+        text: '↓',
+        onClick: () => move(index, index + 1),
+      }),
+      el('button', {
+        type: 'button',
+        className: 'button-link-delete',
+        text: t('remove', 'Remove'),
+        onClick: () => removeAt(index),
+      }),
+    ]);
+  }
 
-    const typeSelect = el('select', { className: 'bl-bo-card__type' });
-    OPTION_TYPES.forEach((row) => {
-      typeSelect.appendChild(
+  function renderPresetCard(item, index) {
+    const card = el('div', { className: 'bl-bo-card bl-bo-card--preset' });
+    const presets = presetsCatalog();
+
+    const slugSelect = el('select', { className: 'bl-bo-card__type' });
+    if (presets.length === 0) {
+      slugSelect.appendChild(
+        el('option', {
+          value: '',
+          text: t('noPresetsYet', 'No presets yet — create some under Block Options → Presets'),
+        })
+      );
+    } else {
+      presets.forEach((preset) => {
+        slugSelect.appendChild(
+          el('option', {
+            value: preset.slug,
+            text: preset.label || preset.slug,
+            selected: item.slug === preset.slug ? true : undefined,
+          })
+        );
+      });
+      if (item.slug && !presets.some((p) => p.slug === item.slug)) {
+        slugSelect.appendChild(
+          el('option', { value: item.slug, text: item.slug + ' (missing)', selected: true })
+        );
+      }
+      slugSelect.value = item.slug || presets[0].slug;
+    }
+    slugSelect.addEventListener('change', () => {
+      replaceAt(index, { ...item, slug: slugSelect.value, defaults: {} });
+    });
+
+    const head = el('div', { className: 'bl-bo-card__head' }, [
+      el('span', { className: 'bl-bo-card__badge', text: t('optionTypePreset', 'Preset') }),
+      renderCardActions(index),
+    ]);
+
+    const body = el('div', { className: 'bl-bo-card__body' }, [
+      el('div', { className: 'bl-bo-field' }, [
+        el('label', { text: t('choosePreset', 'Preset') }),
+        slugSelect,
+      ]),
+    ]);
+
+    const selected = presets.find((p) => p.slug === (slugSelect.value || item.slug));
+    const controls = Array.isArray(selected?.items)
+      ? selected.items.filter((c) => c && c.kind === 'control')
+      : [];
+
+    if (controls.length > 0) {
+      body.appendChild(
+        el('p', {
+          className: 'description',
+          text: t('presetDefaultsHelp', 'Optional default overrides for this block:'),
+        })
+      );
+      controls.forEach((control) => {
+        const section = el('div', { className: 'bl-bo-preset-defaults' });
+        const title =
+          control.label ||
+          customsCatalog()[control.type]?.label ||
+          control.type ||
+          control.id;
+        section.appendChild(el('strong', { text: title }));
+
+        if (isCustomType(control.type)) {
+          const def = customsCatalog()[control.type];
+          Object.entries(def?.params || {}).forEach(([key, paramDef]) => {
+            const current =
+              item.defaults?.[control.id]?.[key] !== undefined
+                ? item.defaults[control.id][key]
+                : control[key];
+            section.appendChild(
+              renderParamField(key, paramDef, current, (nextVal) => {
+                const defaults = { ...(item.defaults || {}) };
+                defaults[control.id] = { ...(defaults[control.id] || {}), [key]: nextVal };
+                const next = { ...item, defaults };
+                patchAt(index, next);
+                Object.assign(item, next);
+              })
+            );
+          });
+        } else if (control.type === 'boolean') {
+          const check = el('input', {
+            type: 'checkbox',
+            checked: !!(item.defaults?.[control.id]?.default ?? control.default),
+          });
+          check.addEventListener('change', () => {
+            const defaults = { ...(item.defaults || {}) };
+            defaults[control.id] = { ...(defaults[control.id] || {}), default: check.checked };
+            const next = { ...item, defaults };
+            patchAt(index, next);
+            Object.assign(item, next);
+          });
+          section.appendChild(
+            el('label', { className: 'bl-bo-check' }, [
+              check,
+              document.createTextNode(' ' + t('defaultOn', 'On by default')),
+            ])
+          );
+        } else if (control.type === 'select' || control.type === 'button-group') {
+          const select = el('select');
+          (control.options || []).forEach((opt) => {
+            select.appendChild(
+              el('option', {
+                value: opt.value ?? '',
+                text: opt.label || opt.value || '—',
+              })
+            );
+          });
+          select.value = item.defaults?.[control.id]?.default ?? control.default ?? '';
+          select.addEventListener('change', () => {
+            const defaults = { ...(item.defaults || {}) };
+            defaults[control.id] = { ...(defaults[control.id] || {}), default: select.value };
+            const next = { ...item, defaults };
+            patchAt(index, next);
+            Object.assign(item, next);
+          });
+          section.appendChild(
+            el('div', { className: 'bl-bo-field' }, [
+              el('label', { text: t('defaultValue', 'Default') }),
+              select,
+            ])
+          );
+        }
+
+        body.appendChild(section);
+      });
+    }
+
+    card.append(head, body);
+    return card;
+  }
+
+  function renderControlCard(item, index) {
+    const card = el('div', { className: 'bl-bo-card' });
+    const custom = isCustomType(item.type);
+
+    const categorySelect = el('select', { className: 'bl-bo-card__type' });
+    GENERIC_TYPES.forEach((row) => {
+      categorySelect.appendChild(
         el('option', {
           value: row.id,
           text: t(row.labelKey, row.labelFallback),
-          selected: item.type === row.id ? true : undefined,
+          selected: !custom && item.type === row.id ? true : undefined,
         })
       );
     });
-    typeSelect.value = item.type;
-    typeSelect.addEventListener('change', () => {
-      const next = defaultItem(typeSelect.value);
+    categorySelect.appendChild(
+      el('option', {
+        value: '__custom__',
+        text: t('optionTypeCustom', 'Custom'),
+        selected: custom ? true : undefined,
+      })
+    );
+    categorySelect.value = custom ? '__custom__' : item.type;
+    categorySelect.addEventListener('change', () => {
+      if (categorySelect.value === '__custom__') {
+        const first = customTypes()[0];
+        if (!first) {
+          return;
+        }
+        const next = defaultCustom(first);
+        next.id = item.id;
+        replaceAt(index, next);
+        return;
+      }
+      const next = defaultGeneric(categorySelect.value);
       next.id = item.id;
       replaceAt(index, next);
     });
 
     const head = el('div', { className: 'bl-bo-card__head' }, [
-      el('span', { className: 'bl-bo-card__badge', text: typeLabel(item.type) }),
-      el('div', { className: 'bl-bo-card__actions' }, [
-        el('button', {
-          type: 'button',
-          className: 'button-link',
-          text: '↑',
-          onClick: () => move(index, index - 1),
-        }),
-        el('button', {
-          type: 'button',
-          className: 'button-link',
-          text: '↓',
-          onClick: () => move(index, index + 1),
-        }),
-        el('button', {
-          type: 'button',
-          className: 'button-link-delete',
-          text: t('remove', 'Remove'),
-          onClick: () => removeAt(index),
-        }),
-      ]),
+      el('span', { className: 'bl-bo-card__badge', text: typeLabel(item) }),
+      renderCardActions(index),
     ]);
 
     const body = el('div', { className: 'bl-bo-card__body' });
+    body.appendChild(
+      el('div', { className: 'bl-bo-field' }, [
+        el('label', { text: t('optionType', 'Type') }),
+        categorySelect,
+      ])
+    );
+
+    if (custom) {
+      const customSelect = el('select');
+      customTypes().forEach((type) => {
+        customSelect.appendChild(
+          el('option', {
+            value: type,
+            text: customsCatalog()[type]?.label || type,
+            selected: item.type === type ? true : undefined,
+          })
+        );
+      });
+      customSelect.value = item.type;
+      customSelect.addEventListener('change', () => {
+        const next = defaultCustom(customSelect.value);
+        next.id = item.id;
+        replaceAt(index, next);
+      });
+      body.appendChild(
+        el('div', { className: 'bl-bo-field' }, [
+          el('label', { text: t('customControl', 'Custom control') }),
+          customSelect,
+        ])
+      );
+      body.appendChild(renderCustomParams(item, index));
+      card.append(head, body);
+      return card;
+    }
 
     body.appendChild(
       el('div', { className: 'bl-bo-field' }, [
@@ -267,13 +586,6 @@ export function createOptionsPanel(initial, onChange) {
       el('div', { className: 'bl-bo-field' }, [
         el('label', { text: t('attributeName', 'Attribute name') }),
         attrInput,
-      ])
-    );
-
-    body.appendChild(
-      el('div', { className: 'bl-bo-field' }, [
-        el('label', { text: t('optionType', 'Type') }),
-        typeSelect,
       ])
     );
 
@@ -333,6 +645,13 @@ export function createOptionsPanel(initial, onChange) {
     return card;
   }
 
+  function renderCard(item, index) {
+    if (item?.kind === 'preset') {
+      return renderPresetCard(item, index);
+    }
+    return renderControlCard(item, index);
+  }
+
   function render() {
     list.replaceChildren();
     empty.hidden = items.length > 0;
@@ -342,27 +661,61 @@ export function createOptionsPanel(initial, onChange) {
   }
 
   const addRow = el('div', { className: 'bl-bo-add' });
-  OPTION_TYPES.forEach((row) => {
-    addRow.appendChild(
-      el('button', {
-        type: 'button',
-        className: 'button button-secondary',
-        text: '+ ' + t(row.labelKey, row.labelFallback),
-        onClick: () => {
-          items.push(defaultItem(row.id));
-          sync();
-          render();
-        },
-      })
-    );
-  });
+  addRow.appendChild(
+    el('button', {
+      type: 'button',
+      className: 'button button-secondary',
+      text: '+ ' + t('addOption', 'Option'),
+      onClick: () => {
+        items.push(defaultGeneric('boolean'));
+        sync();
+        render();
+      },
+    })
+  );
+  addRow.appendChild(
+    el('button', {
+      type: 'button',
+      className: 'button button-secondary',
+      text: '+ ' + t('addCustom', 'Custom'),
+      onClick: () => {
+        const first = customTypes()[0];
+        if (!first) {
+          window.alert(t('noCustoms', 'No custom controls registered.'));
+          return;
+        }
+        items.push(defaultCustom(first));
+        sync();
+        render();
+      },
+    })
+  );
+  addRow.appendChild(
+    el('button', {
+      type: 'button',
+      className: 'button button-primary',
+      text: '+ ' + t('addPreset', 'Preset'),
+      onClick: () => {
+        const presets = presetsCatalog();
+        if (presets.length === 0) {
+          window.alert(
+            t('noPresetsYet', 'No presets yet — create some under Block Options → Presets')
+          );
+          return;
+        }
+        items.push(defaultPresetRef(presets[0].slug));
+        sync();
+        render();
+      },
+    })
+  );
 
   panel.append(
     el('p', {
       className: 'description',
       text: t(
         'blockOptionsHelp',
-        'These controls appear in the block sidebar in the editor.'
+        'These controls appear in the block sidebar in the editor. Prefer presets for shared spacing and layout options.'
       ),
     }),
     list,

@@ -25,9 +25,13 @@ require_once __DIR__ . '/includes/admin-theme.php';
 
 // Blocks
 require_once __DIR__ . '/includes/blocks.php';
-require_once __DIR__ . '/includes/blocks/blocks.php';
 require_once __DIR__ . '/includes/block-settings.php';
 require_once __DIR__ . '/includes/editor-icons.php';
+
+// Block options (package-owned; load even when Blocks CPT feature is off).
+if (!defined('BL_BLOCKS_LOADED')) {
+	require_once __DIR__ . '/packages/baselayer-blocks/includes/block-options/bootstrap.php';
+}
 
 // Theme settings
 require_once __DIR__ . '/includes/user-rights.php';
