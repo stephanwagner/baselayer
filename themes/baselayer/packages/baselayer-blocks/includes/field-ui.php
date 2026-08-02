@@ -10,66 +10,80 @@ defined('ABSPATH') || exit;
  */
 function bl_blocks_palette_icons(): array
 {
-	if (function_exists('bl_forms_palette_icons')) {
-		return bl_forms_palette_icons();
-	}
-
-	$keys = [
-		'text',
-		'textarea',
-		'email',
-		'url',
-		'number',
-		'phone',
-		'checkboxes',
-		'radio',
-		'select',
-		'toggle',
-		'button_group',
-		'date',
-		'time',
-		'datetime',
-		'file',
-		'image',
-		'heading',
-		'text_block',
-		'html',
-		'divider',
-		'spacer',
-		'column',
-		'section',
-		'tab',
-		'repeater',
-		'hidden',
-		'page',
-		'link',
-		'caret',
-		'expandContent',
-		'collapseContent',
-		'edit',
-		'done',
-		'trash',
-		'close',
-		'duplicate',
-		'drag',
-		'design',
-		'tune',
-		'fullscreen',
-		'fullscreenExit',
-	];
+	$icons = function_exists('bl_forms_palette_icons')
+		? bl_forms_palette_icons()
+		: [];
 
 	$registry = function_exists('bl_blocks_builder_icon_svgs')
 		? bl_blocks_builder_icon_svgs()
 		: [];
-	$icons = [];
-	foreach ($keys as $key) {
+
+	$add = static function (array &$icons, array $registry, string $key): void {
+		if (isset($icons[$key])) {
+			return;
+		}
 		$svg = $registry[$key] ?? '';
 		if ($svg === '' || stripos($svg, '<svg') === false) {
-			continue;
+			return;
 		}
 		$attrs = ' width="16" height="16" aria-hidden="true" focusable="false"';
 		$icons[$key] = (string) preg_replace('/<svg\b([^>]*)>/i', '<svg$1' . $attrs . '>', $svg, 1);
+	};
+
+	if ($icons === []) {
+		$keys = [
+			'text',
+			'textarea',
+			'email',
+			'url',
+			'number',
+			'phone',
+			'checkboxes',
+			'radio',
+			'select',
+			'toggle',
+			'button_group',
+			'date',
+			'time',
+			'datetime',
+			'file',
+			'image',
+			'heading',
+			'text_block',
+			'html',
+			'divider',
+			'spacer',
+			'column',
+			'section',
+			'tab',
+			'repeater',
+			'hidden',
+			'page',
+			'link',
+			'caret',
+			'expandContent',
+			'collapseContent',
+			'edit',
+			'done',
+			'trash',
+			'close',
+			'duplicate',
+			'drag',
+			'design',
+			'tune',
+			'fullscreen',
+			'fullscreenExit',
+		];
+		foreach ($keys as $key) {
+			$add($icons, $registry, $key);
+		}
 	}
+
+	// Blocks-specific glyphs (Forms palette has no `icon` / `extensions` / `plus` / `box` keys).
+	$add($icons, $registry, 'icon');
+	$add($icons, $registry, 'extensions');
+	$add($icons, $registry, 'plus');
+	$add($icons, $registry, 'box');
 
 	return $icons;
 }

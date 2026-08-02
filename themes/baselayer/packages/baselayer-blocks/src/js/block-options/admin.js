@@ -12,6 +12,24 @@ function boot() {
   const t = (key, fallback) => i18n[key] || fallback;
   const customs = cfg.customs || {};
 
+  const SPACING_SIZE_CHOICES = [
+    ['', '—'],
+    ['none', '0'],
+    ['xs', 'XS'],
+    ['s', 'S'],
+    ['m', 'M'],
+    ['l', 'L'],
+    ['xl', 'XL'],
+  ];
+
+  const sizeChoicesForParam = (paramDef) => {
+    const choices = paramDef?.choices;
+    if (choices && typeof choices === 'object' && !Array.isArray(choices)) {
+      return Object.entries(choices).map(([value, label]) => [value, String(label)]);
+    }
+    return SPACING_SIZE_CHOICES;
+  };
+
   let presets = Array.isArray(cfg.presets)
     ? JSON.parse(JSON.stringify(cfg.presets))
     : [];
@@ -270,9 +288,6 @@ function boot() {
         if (key === 'label') {
           return;
         }
-        if (key === 'allowUnset' && item.type === 'container-margin') {
-          return;
-        }
       }
       const row = el('div', { className: 'row' });
       const label = paramDef.label || key;
@@ -285,15 +300,7 @@ function boot() {
         const select = el('select');
         const opts =
           paramDef.type === 'size'
-            ? [
-                ['', '—'],
-                ['none', 'None'],
-                ['xs', 'XS'],
-                ['s', 'S'],
-                ['m', 'M'],
-                ['l', 'L'],
-                ['xl', 'XL'],
-              ]
+            ? sizeChoicesForParam(paramDef)
             : [
                 ['left', 'Left'],
                 ['center', 'Center'],

@@ -33,10 +33,6 @@
     { value: "l", label: "L" },
     { value: "xl", label: "XL" }
   ];
-  var containerMarginSizesForOption = (option) => {
-    const allowUnset = option.allowUnset === true;
-    return allowUnset ? CONTAINER_MARGIN_SIZES : CONTAINER_MARGIN_SIZES.filter((size) => size.value !== "unset");
-  };
   var CONTAINER_MARGIN_CLASS_TOKENS = ["none", "xs", "s", "m", "l", "xl"];
   var ALL_CONTAINER_MARGIN_CLASSES = CONTAINER_MARGIN_CLASS_TOKENS.flatMap((value) => [
     `-container-margin-${value}`,
@@ -61,12 +57,7 @@
     }
     return classes;
   };
-  var displayMarginSize = (storedSize, allowUnset = false) => {
-    if (storedSize === "") {
-      return allowUnset ? "unset" : "";
-    }
-    return storedSize;
-  };
+  var displayMarginSize = (storedSize) => storedSize === "" ? "unset" : storedSize;
   var storedMarginSize = (pickedSize) => pickedSize === "unset" ? "" : pickedSize;
   var resetMarginSize = (defaultSize) => defaultSize || "";
   var containerMarginAttributeKeys = (option) => {
@@ -149,13 +140,11 @@
   function ContainerMarginControl({ option, attributes, onChange }) {
     const { top, bottom, linked } = option.attributeNames;
     const defaultSize = option.defaultSize ?? "";
-    const allowUnset = option.allowUnset === true;
-    const sizes = containerMarginSizesForOption(option);
     const isLinked = attributes[linked] !== false;
     const topValue = attributes[top] ?? "";
     const bottomValue = attributes[bottom] ?? "";
-    const displayTop = displayMarginSize(topValue, allowUnset);
-    const displayBottom = displayMarginSize(bottomValue, allowUnset);
+    const displayTop = displayMarginSize(topValue);
+    const displayBottom = displayMarginSize(bottomValue);
     const setTop = (pickedSize) => {
       const stored = storedMarginSize(pickedSize);
       if (isLinked) {
@@ -205,7 +194,7 @@
           onChange: onSelect,
           __nextHasNoMarginBottom: true
         },
-        sizes.map((size) => /* @__PURE__ */ wp.element.createElement(
+        CONTAINER_MARGIN_SIZES.map((size) => /* @__PURE__ */ wp.element.createElement(
           BlockOptionToggleGroupOption,
           {
             key: size.value,

@@ -515,43 +515,21 @@ p.bl-forms-builder__palette-empty {
 
 .bl-forms-builder__canvas {
   position: relative;
-  padding: 8px 12px 48px;
+  padding: 8px 12px 12px;
   border: 1px dashed var(--bl-forms-admin-border);
   border-radius: var(--bl-forms-admin-radius);
   background: #fff;
 }
 
-.bl-forms-builder__canvas input[type=date],
-.bl-forms-builder__canvas input[type=datetime-local],
-.bl-forms-builder__canvas input[type=datetime],
-.bl-forms-builder__canvas input[type=email],
-.bl-forms-builder__canvas input[type=month],
-.bl-forms-builder__canvas input[type=number],
-.bl-forms-builder__canvas input[type=password],
-.bl-forms-builder__canvas input[type=search],
-.bl-forms-builder__canvas input[type=tel],
-.bl-forms-builder__canvas input[type=text],
-.bl-forms-builder__canvas input[type=time],
-.bl-forms-builder__canvas input[type=url],
-.bl-forms-builder__canvas input[type=week],
-.bl-forms-builder__modal-panel input[type=date],
-.bl-forms-builder__modal-panel input[type=datetime-local],
-.bl-forms-builder__modal-panel input[type=datetime],
-.bl-forms-builder__modal-panel input[type=email],
-.bl-forms-builder__modal-panel input[type=month],
-.bl-forms-builder__modal-panel input[type=number],
-.bl-forms-builder__modal-panel input[type=password],
-.bl-forms-builder__modal-panel input[type=search],
-.bl-forms-builder__modal-panel input[type=tel],
-.bl-forms-builder__modal-panel input[type=text],
-.bl-forms-builder__modal-panel input[type=time],
-.bl-forms-builder__modal-panel input[type=url],
-.bl-forms-builder__modal-panel input[type=week] {
+.bl-forms-builder select,
+.bl-forms-builder input[type=text],
+.bl-forms-builder__modal-panel select,
+.bl-forms-builder__modal-panel input[type=text] {
   min-height: 36px;
+  margin: 0;
 }
-.bl-forms-builder__canvas select,
+.bl-forms-builder select,
 .bl-forms-builder__modal-panel select {
-  min-height: 36px;
   line-height: 1.5;
 }
 
@@ -561,13 +539,12 @@ p.bl-forms-builder__palette-empty {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  min-height: 360px;
-  padding-bottom: 64px;
+  min-height: 260px;
 }
 
 .bl-forms-builder__empty {
   position: absolute;
-  top: 30%;
+  top: 40%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 420px;

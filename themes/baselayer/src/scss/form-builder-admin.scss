@@ -547,32 +547,21 @@ p.bl-forms-builder__palette-empty {
 
 .bl-forms-builder__canvas {
   position: relative;
-  padding: 8px 12px 48px;
+  padding: 8px 12px 12px;
   border: 1px dashed var(--bl-forms-admin-border);
   border-radius: var(--bl-forms-admin-radius);
   background: #fff;
 }
 
-.bl-forms-builder__canvas,
+.bl-forms-builder,
 .bl-forms-builder__modal-panel {
-  input[type='date'],
-  input[type='datetime-local'],
-  input[type='datetime'],
-  input[type='email'],
-  input[type='month'],
-  input[type='number'],
-  input[type='password'],
-  input[type='search'],
-  input[type='tel'],
-  input[type='text'],
-  input[type='time'],
-  input[type='url'],
-  input[type='week'] {
+  select,
+  input[type='text'] {
     min-height: 36px;
+    margin: 0;
   }
 
   select {
-    min-height: 36px;
     line-height: 1.5;
   }
 }
@@ -583,13 +572,12 @@ p.bl-forms-builder__palette-empty {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  min-height: 360px;
-  padding-bottom: 64px;
+  min-height: 260px;
 }
 
 .bl-forms-builder__empty {
   position: absolute;
-  top: 30%;
+  top: 40%;
   left: 50%;
   transform: translate(-50%, -50%);
   width: 420px;

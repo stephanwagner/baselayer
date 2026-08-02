@@ -17,7 +17,6 @@ if (!function_exists('bl_block_options_control_container_margin')) {
 			'type' => 'container-margin',
 			'label' => 'Abstände',
 			'defaultSize' => $default_size,
-			'allowUnset' => $default_size === '',
 			'attributeNames' => [
 				'top' => 'containerMarginTop',
 				'bottom' => 'containerMarginBottom',
@@ -41,19 +40,11 @@ return [
 			'label' => 'Default size',
 			'default' => '',
 		],
-		'allowUnset' => [
-			'type' => 'boolean',
-			'label' => 'Allow unset',
-			'default' => true,
-		],
 	],
 	'build' => static function (array $params): array {
 		$built = bl_block_options_control_container_margin((string) ($params['defaultSize'] ?? ''));
 		if (isset($params['label'])) {
 			$built['label'] = $params['label'];
-		}
-		if (array_key_exists('allowUnset', $params)) {
-			$built['allowUnset'] = (bool) $params['allowUnset'];
 		}
 		if (isset($params['defaultSize'])) {
 			$built['defaultSize'] = $params['defaultSize'];

@@ -1,5 +1,5 @@
 import {
-  containerMarginSizesForOption,
+  CONTAINER_MARGIN_SIZES,
   displayMarginSize,
   resetMarginSize,
   storedMarginSize,
@@ -16,14 +16,12 @@ const ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
 export function ContainerMarginControl({ option, attributes, onChange }) {
   const { top, bottom, linked } = option.attributeNames;
   const defaultSize = option.defaultSize ?? '';
-  const allowUnset = option.allowUnset === true;
-  const sizes = containerMarginSizesForOption(option);
   const isLinked = attributes[linked] !== false;
   const topValue = attributes[top] ?? '';
   const bottomValue = attributes[bottom] ?? '';
 
-  const displayTop = displayMarginSize(topValue, allowUnset);
-  const displayBottom = displayMarginSize(bottomValue, allowUnset);
+  const displayTop = displayMarginSize(topValue);
+  const displayBottom = displayMarginSize(bottomValue);
 
   const setTop = (pickedSize) => {
     const stored = storedMarginSize(pickedSize);
@@ -83,7 +81,7 @@ export function ContainerMarginControl({ option, attributes, onChange }) {
         onChange={onSelect}
         __nextHasNoMarginBottom
       >
-        {sizes.map((size) => (
+        {CONTAINER_MARGIN_SIZES.map((size) => (
           <BlockOptionToggleGroupOption
             key={size.value}
             value={size.value}

@@ -9,8 +9,7 @@
                     "kind": "control",
                     "type": "container-margin",
                     "label": "Abstände",
-                    "defaultSize": "",
-                    "allowUnset": true
+                    "defaultSize": ""
                 }
             ]
         },
@@ -131,8 +130,7 @@
                     "slug": "abstand",
                     "defaults": {
                         "c_abstand": {
-                            "defaultSize": "m",
-                            "allowUnset": false
+                            "defaultSize": "m"
                         }
                     }
                 },
@@ -383,8 +381,7 @@
                     "slug": "abstand",
                     "defaults": {
                         "c_abstand": {
-                            "defaultSize": "m",
-                            "allowUnset": false
+                            "defaultSize": "m"
                         }
                     }
                 },
@@ -422,8 +419,7 @@
                     "slug": "abstand",
                     "defaults": {
                         "c_abstand": {
-                            "defaultSize": "m",
-                            "allowUnset": false
+                            "defaultSize": "m"
                         }
                     }
                 },
@@ -466,8 +462,7 @@
                     "slug": "abstand",
                     "defaults": {
                         "c_abstand": {
-                            "defaultSize": "m",
-                            "allowUnset": false
+                            "defaultSize": "m"
                         }
                     }
                 },
@@ -491,8 +486,7 @@
                     "slug": "abstand",
                     "defaults": {
                         "c_abstand": {
-                            "defaultSize": "m",
-                            "allowUnset": false
+                            "defaultSize": "m"
                         }
                     }
                 }
@@ -511,8 +505,7 @@
                     "slug": "abstand",
                     "defaults": {
                         "c_abstand": {
-                            "defaultSize": "m",
-                            "allowUnset": false
+                            "defaultSize": "m"
                         }
                     }
                 },
@@ -628,8 +621,7 @@
                     "slug": "abstand",
                     "defaults": {
                         "c_abstand": {
-                            "defaultSize": "m",
-                            "allowUnset": false
+                            "defaultSize": "m"
                         }
                     }
                 },
@@ -658,8 +650,7 @@
                     "slug": "abstand",
                     "defaults": {
                         "c_abstand": {
-                            "defaultSize": "m",
-                            "allowUnset": false
+                            "defaultSize": "m"
                         }
                     }
                 }
@@ -678,8 +669,7 @@
                     "slug": "abstand",
                     "defaults": {
                         "c_abstand": {
-                            "defaultSize": "m",
-                            "allowUnset": false
+                            "defaultSize": "m"
                         }
                     }
                 }
@@ -698,8 +688,7 @@
                     "slug": "abstand",
                     "defaults": {
                         "c_abstand": {
-                            "defaultSize": "m",
-                            "allowUnset": false
+                            "defaultSize": "m"
                         }
                     }
                 }
@@ -713,8 +702,7 @@
                     "slug": "abstand",
                     "defaults": {
                         "c_abstand": {
-                            "defaultSize": "m",
-                            "allowUnset": false
+                            "defaultSize": "m"
                         }
                     }
                 }
@@ -728,8 +716,7 @@
                     "slug": "abstand",
                     "defaults": {
                         "c_abstand": {
-                            "defaultSize": "m",
-                            "allowUnset": false
+                            "defaultSize": "m"
                         }
                     }
                 }

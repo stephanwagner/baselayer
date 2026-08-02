@@ -36,6 +36,12 @@ return [
 			'type' => 'size',
 			'label' => 'Default size',
 			'default' => '',
+			'choices' => [
+				'' => '—',
+				's' => 'S',
+				'm' => 'M',
+				'l' => 'L',
+			],
 		],
 		'defaultAlign' => [
 			'type' => 'align',

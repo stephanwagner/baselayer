@@ -210,7 +210,6 @@ export function mountApp(root, initial, definitionType = 'block') {
   const tabBar = el('nav', { className: 'bl-forms-builder__tabs', role: 'tablist' });
   const tabs = [
     { id: 'fields', label: t('tabFields', 'Fields'), panel: fieldsPanel },
-    { id: 'settings', label: t('tabSettings', 'Settings'), panel: panels.panel },
   ];
   if (optionsPanel) {
     tabs.push({
@@ -219,6 +218,7 @@ export function mountApp(root, initial, definitionType = 'block') {
       panel: optionsPanel.panel,
     });
   }
+  tabs.push({ id: 'settings', label: t('tabSettings', 'Settings'), panel: panels.panel });
 
   const activate = (id) => {
     tabs.forEach((tab) => {
@@ -293,8 +293,8 @@ export function mountApp(root, initial, definitionType = 'block') {
 
   const panelsWrap = el('div', { className: 'bl-forms-builder__panels' }, [
     fieldsPanel,
-    panels.panel,
     optionsPanel ? optionsPanel.panel : null,
+    panels.panel,
   ].filter(Boolean));
 
   panels.panel.hidden = true;

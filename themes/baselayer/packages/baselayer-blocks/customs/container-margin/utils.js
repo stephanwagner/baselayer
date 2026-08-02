@@ -9,15 +9,6 @@ export const CONTAINER_MARGIN_SIZES = [
   { value: 'xl', label: 'XL' },
 ];
 
-/** Toggle options for a container-margin control (`—` only when unset is allowed). */
-export const containerMarginSizesForOption = (option) => {
-  const allowUnset = option.allowUnset === true;
-
-  return allowUnset
-    ? CONTAINER_MARGIN_SIZES
-    : CONTAINER_MARGIN_SIZES.filter((size) => size.value !== 'unset');
-};
-
 const CONTAINER_MARGIN_CLASS_TOKENS = ['none', 'xs', 's', 'm', 'l', 'xl'];
 
 /** Every class name this control may add or replace. */
@@ -63,14 +54,8 @@ export const containerMarginClassesFromAttributes = (option, attributes) => {
   return classes;
 };
 
-/** UI value for a stored attribute (`''` → unset / — when allowed). */
-export const displayMarginSize = (storedSize, allowUnset = false) => {
-  if (storedSize === '') {
-    return allowUnset ? 'unset' : '';
-  }
-
-  return storedSize;
-};
+/** UI value for a stored attribute (`''` → unset / —). */
+export const displayMarginSize = (storedSize) => (storedSize === '' ? 'unset' : storedSize);
 
 /** Persisted attribute value from a picked toggle value. */
 export const storedMarginSize = (pickedSize) => (pickedSize === 'unset' ? '' : pickedSize);

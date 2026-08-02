@@ -79,6 +79,13 @@ function bl_block_options_customs_registry(): array
 					'label' => sanitize_text_field((string) ($param['label'] ?? $key)),
 					'default' => $param['default'] ?? null,
 				];
+				if (isset($param['choices']) && is_array($param['choices'])) {
+					$choices = [];
+					foreach ($param['choices'] as $choice_value => $choice_label) {
+						$choices[(string) $choice_value] = sanitize_text_field((string) $choice_label);
+					}
+					$params[$key]['choices'] = $choices;
+				}
 			}
 		}
 
@@ -148,7 +155,12 @@ function bl_block_options_sanitize_custom_params(string $type, array $raw): arra
 			continue;
 		}
 		if ($ptype === 'size') {
-			$out[$key] = bl_block_options_sanitize_size_token($value);
+			$v = is_string($value) ? $value : '';
+			if (isset($param['choices']) && is_array($param['choices'])) {
+				$out[$key] = array_key_exists($v, $param['choices']) ? $v : '';
+			} else {
+				$out[$key] = bl_block_options_sanitize_size_token($v);
+			}
 			continue;
 		}
 		if ($ptype === 'align') {

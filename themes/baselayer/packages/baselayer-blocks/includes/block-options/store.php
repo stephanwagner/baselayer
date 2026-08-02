@@ -208,7 +208,7 @@ function bl_block_options_sanitize_preset_defaults(array $raw): array
 			continue;
 		}
 
-		// Legacy innenabstand overrides used defaultSize / allowUnset.
+		// Legacy innenabstand overrides used defaultSize.
 		if ($control_id === 'c_innenabstand' && array_key_exists('defaultSize', $params)) {
 			$params = [
 				'default' => bl_block_options_padding_token_to_class((string) ($params['defaultSize'] ?? '')),

@@ -74,7 +74,7 @@ return [
 		[
 			'preset' => 'abstand',
 			'blocks' => ['core/columns'],
-			'defaults' => ['defaultSize' => 'm', 'allowUnset' => false],
+			'defaults' => ['defaultSize' => 'm'],
 		],
 		['preset' => 'weite-limitieren', 'blocks' => ['core/columns']],
 
@@ -102,7 +102,7 @@ return [
 		[
 			'preset' => 'abstand',
 			'blocks' => ['core/gallery'],
-			'defaults' => ['defaultSize' => 'm', 'allowUnset' => false],
+			'defaults' => ['defaultSize' => 'm'],
 		],
 
 		// Group
@@ -110,7 +110,7 @@ return [
 		[
 			'preset' => 'abstand',
 			'blocks' => ['core/group'],
-			'defaults' => ['defaultSize' => 'm', 'allowUnset' => false],
+			'defaults' => ['defaultSize' => 'm'],
 		],
 		[
 			'preset' => 'innenabstand',
@@ -127,7 +127,7 @@ return [
 		[
 			'preset' => 'abstand',
 			'blocks' => ['core/pullquote'],
-			'defaults' => ['defaultSize' => 'm', 'allowUnset' => false],
+			'defaults' => ['defaultSize' => 'm'],
 		],
 		[
 			'preset' => 'innenabstand',
@@ -139,7 +139,7 @@ return [
 		[
 			'preset' => 'abstand',
 			'blocks' => ['core/separator'],
-			'defaults' => ['defaultSize' => 'm', 'allowUnset' => false],
+			'defaults' => ['defaultSize' => 'm'],
 		],
 
 		// Cover
@@ -147,7 +147,7 @@ return [
 		[
 			'preset' => 'abstand',
 			'blocks' => ['core/cover'],
-			'defaults' => ['defaultSize' => 'm', 'allowUnset' => false],
+			'defaults' => ['defaultSize' => 'm'],
 		],
 		[
 			'preset' => 'innenabstand',
@@ -165,7 +165,7 @@ return [
 		[
 			'preset' => 'abstand',
 			'blocks' => ['acf/slider', 'acf/map', 'acf/article-list', 'acf/number-ticker'],
-			'defaults' => ['defaultSize' => 'm', 'allowUnset' => false],
+			'defaults' => ['defaultSize' => 'm'],
 		],
 		[
 			'preset' => 'innenabstand',
@@ -177,12 +177,12 @@ return [
 		[
 			'preset' => 'abstand',
 			'blocks' => ['baselayer/accordion'],
-			'defaults' => ['defaultSize' => 'm', 'allowUnset' => false],
+			'defaults' => ['defaultSize' => 'm'],
 		],
 		[
 			'preset' => 'abstand',
 			'blocks' => ['baselayer/form'],
-			'defaults' => ['defaultSize' => 'm', 'allowUnset' => false],
+			'defaults' => ['defaultSize' => 'm'],
 		],
 	],
 
