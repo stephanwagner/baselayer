@@ -106,7 +106,7 @@ $slider-content-wide-collapse: $content-width + ($container-wide-bleed * 2) + 24
     background-image: linear-gradient(to right, rgba(#000, 0) 0%, rgba(#000, 0.4) 25%, rgba(#000, 0.5) 50%, rgba(#000, 0.4) 75%, rgba(#000, 0) 100%);
   }
 
-  > .acf-innerblocks-container {
+  > .slider-slide__inner {
     width: 100%;
 
     .slider__wrapper[data-slider-content-align='right'] & {

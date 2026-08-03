@@ -42,8 +42,11 @@
   box-shadow: none;
   appearance: none;
   cursor: pointer;
-  transition: transition('color');
   display: none;
+
+  body.-transition-init & {
+    transition: transition('color');
+  }
 
   .slider__wrapper[data-slider-navigation='true'] & {
     display: block;
@@ -53,12 +56,29 @@
     display: block;
     width: 100%;
     height: 100%;
-    transition: transition('transform');
     pointer-events: none;
+
+    body.-transition-init & {
+      transition: transition('transform');
+    }
   }
 
   &:hover {
     color: var(--bl-color-primary);
+  }
+
+  &.swiper-button-disabled {
+    color: var(--bl-color-gray-300);
+    cursor: default;
+    pointer-events: none;
+
+    &:hover {
+      color: var(--bl-color-gray-300);
+    }
+
+    &:hover svg {
+      transform: none;
+    }
   }
 }
 
@@ -107,7 +127,10 @@
   }
 
   .swiper-pagination-bullet {
-    transition: transition('transform', 'left');
     line-height: 0;
+
+    body.-transition-init & {
+      transition: transition('transform', 'left');
+    }
   }
 }

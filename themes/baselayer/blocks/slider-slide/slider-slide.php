@@ -47,7 +47,9 @@ $wrapper_attributes = get_block_wrapper_attributes([
 			</div>
 		<?php endif; ?>
 		<div class="slider-slide__content">
-			<InnerBlocks />
+			<div class="slider-slide__inner">
+				<InnerBlocks />
+			</div>
 		</div>
 	</div>
 </div>
