@@ -337,8 +337,54 @@ HTML;
 /**
  * Path to exported block HTML for an install page key (e.g. homepage → pages/homepage.html).
  */
+/**
+ * Custom blocks system chosen for this install request / saved features.
+ *
+ * @return 'baselayer'|'acf'|'none'
+ */
+function bl_install_blocks_system(): string
+{
+	if (function_exists('bl_theme_blocks_system')) {
+		return bl_theme_blocks_system();
+	}
+	if (function_exists('bl_theme_feature_enabled')) {
+		if (bl_theme_feature_enabled('blocks')) {
+			return 'baselayer';
+		}
+		if (bl_theme_feature_enabled('acf')) {
+			return 'acf';
+		}
+	}
+	return 'none';
+}
+
+/**
+ * Absolute path to install page HTML for a manifest key.
+ */
 function bl_install_page_html_path(string $page_key): string
 {
+	$system = bl_install_blocks_system();
+
+	if ($page_key === 'blocks') {
+		if ($system === 'baselayer') {
+			$baselayer = __DIR__ . '/pages/blocks-baselayer.html';
+			if (is_readable($baselayer)) {
+				return $baselayer;
+			}
+		}
+		if ($system === 'acf') {
+			return __DIR__ . '/pages/blocks.html';
+		}
+		return '';
+	}
+
+	if ($page_key === 'homepage' && $system === 'none') {
+		$none = __DIR__ . '/pages/homepage-none.html';
+		if (is_readable($none)) {
+			return $none;
+		}
+	}
+
 	return __DIR__ . '/pages/' . $page_key . '.html';
 }
 
@@ -425,8 +471,13 @@ function bl_install_create_pages(array $media = []): array
 {
 	$manifest = bl_install_page_manifest();
 	$page_ids = [];
+	$blocks_system = bl_install_blocks_system();
 
 	foreach ($manifest as $key => $def) {
+		if ($key === 'blocks' && $blocks_system === 'none') {
+			continue;
+		}
+
 		$post_id = wp_insert_post([
 			'post_type'    => 'page',
 			'post_status'  => 'publish',

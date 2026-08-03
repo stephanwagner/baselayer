@@ -228,11 +228,37 @@ function bl_render_developer_features(): void
 						</td>
 					</tr>
 					<tr>
-						<th scope="row" class="form-table-checkbox-label"><?= esc_html__('Blocks', 'baselayer') ?></th>
+						<th scope="row"><?= esc_html__('Custom blocks', 'baselayer') ?></th>
 						<td>
+							<?php
+							$blocks_system = 'none';
+							if ((int) $feat('enable_blocks') === 1) {
+								$blocks_system = 'baselayer';
+							} elseif ((int) $feat('enable_acf') === 1) {
+								$blocks_system = 'acf';
+							}
+							?>
+							<fieldset>
+								<label style="display:block;margin-bottom:8px;">
+									<input type="radio" name="baselayer_features[blocks_system]" value="baselayer" <?= checked($blocks_system, 'baselayer', false) ?>>
+									<strong><?= esc_html__('BaseLayer Custom Blocks', 'baselayer') ?></strong>
+								</label>
+								<p class="description" style="margin:0 0 12px 24px;"><?= esc_html__('Admin UI for custom Gutenberg blocks, Content Fields, and Website Fields. Includes built-in blocks such as Accordion.', 'baselayer') ?></p>
+
+								<label style="display:block;margin-bottom:8px;">
+									<input type="radio" name="baselayer_features[blocks_system]" value="acf" <?= checked($blocks_system, 'acf', false) ?>>
+									<strong><?= esc_html__('ACF Pro', 'baselayer') ?></strong>
+								</label>
+								<p class="description" style="margin:0 0 12px 24px;"><?= esc_html__('Theme ACF Pro blocks (requires the ACF Pro plugin). Block Options still apply to core and ACF blocks.', 'baselayer') ?></p>
+
+								<label style="display:block;margin-bottom:8px;">
+									<input type="radio" name="baselayer_features[blocks_system]" value="none" <?= checked($blocks_system, 'none', false) ?>>
+									<strong><?= esc_html__('None', 'baselayer') ?></strong>
+								</label>
+								<p class="description" style="margin:0 0 0 24px;"><?= esc_html__('Core Gutenberg only. You can enable BaseLayer Custom Blocks or ACF Pro later here.', 'baselayer') ?></p>
+							</fieldset>
 							<input type="hidden" name="baselayer_features[enable_blocks]" value="0">
-							<label><input type="checkbox" name="baselayer_features[enable_blocks]" value="1" <?= checked($feat('enable_blocks'), 1, false) ?>> <?= esc_html__('Enable Blocks package', 'baselayer') ?></label>
-							<p class="description bl-indent-checkbox"><?= esc_html__('Admin UI for custom Gutenberg blocks, Content Fields, and Website Fields. Includes built-in blocks such as Accordion. Optional ACF support is a separate drop-in folder (see theme docs).', 'baselayer') ?></p>
+							<input type="hidden" name="baselayer_features[enable_acf]" value="0">
 						</td>
 					</tr>
 				</table>

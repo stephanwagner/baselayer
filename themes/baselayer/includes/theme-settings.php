@@ -946,6 +946,27 @@ function bl_sanitize_features($value): array
 			wp_clear_scheduled_hook('bl_event_extend_recurring_series');
 		}
 	}
+	// Custom blocks system is exclusive: BaseLayer Blocks XOR ACF Pro XOR none.
+	$system = isset($value['blocks_system']) ? sanitize_key((string) $value['blocks_system']) : '';
+	if ($system === '') {
+		if (!empty($out['enable_blocks'])) {
+			$system = 'baselayer';
+		} elseif (!empty($out['enable_acf'])) {
+			$system = 'acf';
+		} else {
+			$system = 'none';
+		}
+	}
+	if ($system === 'baselayer') {
+		$out['enable_blocks'] = 1;
+		$out['enable_acf'] = 0;
+	} elseif ($system === 'acf') {
+		$out['enable_blocks'] = 0;
+		$out['enable_acf'] = 1;
+	} else {
+		$out['enable_blocks'] = 0;
+		$out['enable_acf'] = 0;
+	}
 	return $out;
 }
 

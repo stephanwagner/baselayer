@@ -144,12 +144,14 @@ if (!function_exists('bl_breadcrumbs')) {
 	}
 }
 
-// Optional ACF drop-in: copy repo `acf/` into the active theme or child as `acf/`.
-foreach ([get_stylesheet_directory(), get_template_directory()] as $bl_acf_dir) {
-	$bl_acf_bootstrap = $bl_acf_dir . '/acf/acf.php';
-	if (is_readable($bl_acf_bootstrap)) {
-		require_once $bl_acf_bootstrap;
-		break;
+// Optional ACF Pro theme integration (gated by Developer → Features / install choice).
+if (bl_theme_feature_enabled('acf')) {
+	foreach ([get_stylesheet_directory(), get_template_directory()] as $bl_acf_dir) {
+		$bl_acf_bootstrap = $bl_acf_dir . '/acf/acf.php';
+		if (is_readable($bl_acf_bootstrap)) {
+			require_once $bl_acf_bootstrap;
+			break;
+		}
 	}
+	unset($bl_acf_dir, $bl_acf_bootstrap);
 }
-unset($bl_acf_dir, $bl_acf_bootstrap);

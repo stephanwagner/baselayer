@@ -39,7 +39,7 @@ They also appear under **Theme** in the icon picker. An example `logo-child.svg`
 
 Do **not** copy `packages/` into the child. Forms, Events, and Blocks always load from the parent theme (or as standalone plugins). Parent updates replace package code; site config stays in the database.
 
-- **Blocks:** on by default (Developer → Features). Custom block PHP/SCSS/JS live under `blocks/` in this theme. Catalog JSON lives at `blocks/blocks-import.json` (parent or this child). Move definitions between sites via **Blocks → Settings → Import / Export** (match by type + slug; no duplicates).
+- **Blocks:** choose **BaseLayer Custom Blocks**, **ACF Pro**, or **None** at install (or under Developer → Features). BaseLayer custom block PHP/SCSS/JS live under `blocks/` in this theme. Catalog JSON lives at `blocks/blocks-import.json` (parent or this child). Move definitions between sites via **Blocks → Settings → Import / Export** (match by type + slug; no duplicates).
 - **Forms:** Developer → Features → Enable forms
 - **Events:** Developer → Features → Enable events, then configure each type under its menu → Settings (developers only; stored in `bl_events_instances` — not `config/content-types/`)
 
@@ -53,17 +53,18 @@ Optional Events markup overrides (child wins via the same template paths as the 
 
 - Config stubs in `config/` (`theme.php`, `design.php`, `block-settings.php`, …) merge over the parent — see `config/README.md`
 - **Content types:** `config/content-types/` is copied from the parent on install (file-based CPTs such as `post` and `project`). With a child active, **only** those files are loaded (no parent fallback). An empty or missing folder means no file-based CPTs. Events are **not** defined here.
-- **`config/block-options.php`:** presets and assignments for editor sidebar options (merged over parent).
+- **`config/block-options/import.json`:** runtime seed for Block Options (DB store). Prefer editing Block Options in admin, or replace-import deliberately. The PHP `config/block-options.php` stub is a human reference only.
 - Optional templates: `templates/…` (same paths as the parent; child wins)
 
-## Optional ACF drop-in
+## ACF Pro
 
-ACF is not shipped in the theme. To use ACF Pro blocks:
+ACF Pro ships in the **parent** theme (`baselayer/acf/`) and is enabled via **Developer → Features → Custom blocks → ACF Pro** (or the install radio). Parent SCSS/JS already include ACF block assets; child builds that forward parent `main` / `admin` inherit them.
 
-1. Install/activate **ACF Pro**
-2. Copy the repo-root `acf/` folder into this child (or the parent) as `acf/`
-3. Uncomment the ACF `@forward` / `import` lines in `src/scss/main.scss`, `src/scss/admin.scss`, and `src/js/main.js`
-4. `npm run build`
-5. Optionally import field groups from `acf/acf-import-en.json` / `acf-import-de.json`
+Only if you fork ACF into this child as `acf/`:
 
-See `acf/README.md` in the BaseLayer repository for details.
+1. Keep ACF Pro selected under Features
+2. Uncomment the ACF `@forward` / `import` lines in `src/scss/main.scss`, `src/scss/admin.scss`, and `src/js/main.js` if you override assets here
+3. `npm run build`
+4. Optionally import field groups from the parent’s `acf/acf-import-*.json` via **ACF → Tools**
+
+See `acf/README.md` in the parent theme for details.

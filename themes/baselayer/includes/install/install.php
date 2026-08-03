@@ -169,6 +169,22 @@ function bl_render_installer(): void
             ) ?></p>
       </div>
 
+      <?php
+      $install_notices = get_transient('baselayer_install_notices');
+      if (is_array($install_notices)) {
+        delete_transient('baselayer_install_notices');
+        foreach ($install_notices as $notice) {
+          if (!is_array($notice) || empty($notice['text'])) {
+            continue;
+          }
+          $type = in_array(($notice['type'] ?? ''), ['success', 'warning', 'error', 'info'], true)
+            ? (string) $notice['type']
+            : 'info';
+          echo '<div class="notice notice-' . esc_attr($type) . '"><p>' . esc_html((string) $notice['text']) . '</p></div>';
+        }
+      }
+      ?>
+
       <p>
         <a
           href="<?php echo esc_url(admin_url('options-general.php?page=bl-theme-settings')); ?>"
@@ -410,6 +426,60 @@ function bl_render_installer(): void
               <?php
               }
               ?>
+            </td>
+          </tr>
+        </table>
+
+        <hr>
+
+        <h2><?= esc_html__('Custom blocks', 'baselayer') ?></h2>
+
+        <p class="description"><?= esc_html__('Choose how this site provides custom blocks. You can change this later under Developer → Features.', 'baselayer') ?></p>
+
+        <?php
+        $blocks_system = (string) $bl_install_val(['install', 'blocks_system'], 'baselayer');
+        if (!in_array($blocks_system, ['baselayer', 'acf', 'none'], true)) {
+          $blocks_system = 'baselayer';
+        }
+        $acf_license_defined = function_exists('bl_install_acf_pro_license_is_defined') && bl_install_acf_pro_license_is_defined();
+        $acf_license_submitted = (string) $bl_install_val(['install', 'acf_pro_key'], '');
+        ?>
+
+        <table class="form-table" role="presentation">
+          <tr>
+            <th scope="row"><?= esc_html__('System', 'baselayer') ?></th>
+            <td>
+              <fieldset>
+                <label style="display: block; margin-bottom: 8px;">
+                  <input type="radio" name="install[blocks_system]" value="baselayer" <?= $blocks_system === 'baselayer' ? ' checked' : '' ?> data-bl-blocks-system-toggle>
+                  <strong><?= esc_html__('BaseLayer Custom Blocks', 'baselayer') ?></strong>
+                  <span class="bl-install-recommended" style="display:inline-block;margin-left:6px;padding:1px 7px;border-radius:3px;background:#2271b1;color:#fff;font-size:11px;font-weight:600;line-height:1.7;vertical-align:1px;"><?= esc_html__('Recommended', 'baselayer') ?></span>
+                </label>
+                <p class="description" style="margin: 0 0 12px 24px;"><?= esc_html__('Imports built-in block definitions and seeds Block Options. Manage blocks under the Blocks admin menu.', 'baselayer') ?></p>
+
+                <label style="display: block; margin-bottom: 8px;">
+                  <input type="radio" name="install[blocks_system]" value="acf" <?= $blocks_system === 'acf' ? ' checked' : '' ?> data-bl-blocks-system-toggle>
+                  <strong><?= esc_html__('ACF Pro', 'baselayer') ?></strong>
+                </label>
+                <p class="description" style="margin: 0 0 12px 24px;"><?= esc_html__('Uses the theme’s ACF Pro blocks. Requires the ACF Pro plugin. Block Options still apply to core and ACF blocks.', 'baselayer') ?></p>
+
+                <label style="display: block; margin-bottom: 8px;">
+                  <input type="radio" name="install[blocks_system]" value="none" <?= $blocks_system === 'none' ? ' checked' : '' ?> data-bl-blocks-system-toggle>
+                  <strong><?= esc_html__('None', 'baselayer') ?></strong>
+                </label>
+                <p class="description" style="margin: 0 0 12px 24px;"><?= esc_html__('Core Gutenberg only. You can enable BaseLayer Custom Blocks or ACF Pro later under Developer → Features.', 'baselayer') ?></p>
+              </fieldset>
+            </td>
+          </tr>
+          <tr data-bl-blocks-system-panel="acf" style="<?= $blocks_system === 'acf' ? '' : 'display: none;' ?>">
+            <th scope="row"><label for="install_acf_pro_key"><?= esc_html__('ACF Pro license key', 'baselayer') ?></label></th>
+            <td>
+              <?php if ($acf_license_defined) : ?>
+                <p class="description" style="margin-top: 0;"><?= esc_html__('An ACF Pro license key is already defined in the configuration.', 'baselayer') ?></p>
+              <?php else : ?>
+                <input type="text" name="install[acf_pro_key]" id="install_acf_pro_key" value="<?= esc_attr($acf_license_submitted) ?>" class="large-text code bl-code-small" autocomplete="off" spellcheck="false" style="max-width: 600px;">
+                <p class="description"><?= esc_html__('Optional. Written to wp-config.php as ACF_PRO_LICENSE when provided. The installer will also try to activate ACF Pro if the plugin is present.', 'baselayer') ?></p>
+              <?php endif; ?>
             </td>
           </tr>
         </table>
@@ -768,6 +838,12 @@ function baselayer_install_redirect_with_errors(array $errors): void
       'media' => !empty($_POST['install']['media']),
       'permalinks' => !empty($_POST['install']['permalinks']),
       'htaccess' => !empty($_POST['install']['htaccess']),
+      'blocks_system' => in_array(($_POST['install']['blocks_system'] ?? ''), ['baselayer', 'acf', 'none'], true)
+        ? (string) $_POST['install']['blocks_system']
+        : 'baselayer',
+      'acf_pro_key' => function_exists('bl_install_sanitize_acf_pro_license')
+        ? bl_install_sanitize_acf_pro_license((string) ($_POST['install']['acf_pro_key'] ?? ''))
+        : '',
       'content' => [
         'seed_mode' => (($_POST['install']['content']['seed_mode'] ?? '') === 'test') ? 'test' : 'sample',
         'post' => !empty($_POST['install']['content']['post']),
@@ -921,7 +997,7 @@ function baselayer_run_install(): void
   $theme_slug = bl_install_sanitize_theme_slug((string) ($_POST['theme']['slug'] ?? ''));
 
   /**
-   * Features: merge central defaults with existing.
+   * Features: merge central defaults, then apply Custom blocks system choice.
    */
   $defaults = function_exists('bl_theme_feature_defaults') ? bl_theme_feature_defaults() : [];
   $features = get_option('baselayer_features', []);
@@ -929,7 +1005,82 @@ function baselayer_run_install(): void
     $features = [];
   }
   $features = array_merge($defaults, $features);
+
+  $blocks_system = isset($_POST['install']['blocks_system']) ? sanitize_key((string) wp_unslash($_POST['install']['blocks_system'])) : 'baselayer';
+  if (!in_array($blocks_system, ['baselayer', 'acf', 'none'], true)) {
+    $blocks_system = 'baselayer';
+  }
+  if ($blocks_system === 'baselayer') {
+    $features['enable_blocks'] = 1;
+    $features['enable_acf'] = 0;
+  } elseif ($blocks_system === 'acf') {
+    $features['enable_blocks'] = 0;
+    $features['enable_acf'] = 1;
+  } else {
+    $features['enable_blocks'] = 0;
+    $features['enable_acf'] = 0;
+  }
+
   update_option('baselayer_features', $features);
+  if (function_exists('bl_theme_feature_flush_cache')) {
+    bl_theme_feature_flush_cache();
+  }
+
+  $install_notices = [];
+
+  if ($blocks_system === 'acf') {
+    $acf_license_result = bl_install_write_acf_pro_license(
+      (string) ($_POST['install']['acf_pro_key'] ?? '')
+    );
+    if (is_wp_error($acf_license_result)) {
+      baselayer_install_redirect_with_errors([$acf_license_result->get_error_message()]);
+    }
+    $license_key = function_exists('bl_install_sanitize_acf_pro_license')
+      ? bl_install_sanitize_acf_pro_license((string) ($_POST['install']['acf_pro_key'] ?? ''))
+      : '';
+    if ($license_key !== '' && !is_wp_error($acf_license_result)) {
+      $install_notices[] = [
+        'type' => 'success',
+        'text' => __('ACF Pro license key was written to wp-config.php.', 'baselayer'),
+      ];
+    }
+
+    $acf_activated = bl_install_activate_acf_pro();
+    if ($acf_activated) {
+      $install_notices[] = [
+        'type' => 'success',
+        'text' => __('ACF Pro plugin is active.', 'baselayer'),
+      ];
+    } else {
+      $install_notices[] = [
+        'type' => 'warning',
+        'text' => __('ACF Pro plugin was not found or could not be activated. Install and activate ACF Pro, then reload the site. Theme ACF blocks load when the feature is enabled.', 'baselayer'),
+      ];
+    }
+
+    // Ensure theme ACF bootstrap is available for the rest of this request.
+    foreach ([get_stylesheet_directory(), get_template_directory()] as $bl_acf_dir) {
+      $bl_acf_bootstrap = $bl_acf_dir . '/acf/acf.php';
+      if (is_readable($bl_acf_bootstrap) && !defined('BL_ACF_PATH')) {
+        require_once $bl_acf_bootstrap;
+        break;
+      }
+    }
+  }
+
+  if ($blocks_system === 'baselayer') {
+    if (!function_exists('bl_blocks_import_json_string')) {
+      $blocks_bootstrap = get_template_directory() . '/packages/baselayer-blocks/baselayer-blocks.php';
+      if (is_readable($blocks_bootstrap)) {
+        require_once $blocks_bootstrap;
+      }
+    }
+    bl_install_import_block_definitions();
+  }
+
+  if ($install_notices !== []) {
+    set_transient('baselayer_install_notices', $install_notices, 300);
+  }
 
   $profile_picture_default = defined('BL_PROFILE_PICTURE_MODE_DEFAULT') ? BL_PROFILE_PICTURE_MODE_DEFAULT : 'upload';
   update_option('baselayer_profile_picture_mode', $profile_picture_default);
@@ -1126,4 +1277,33 @@ function bl_assign_menu_to_location(string $location, int $menu_id): void
     $locations[$location] = $menu_id;
     set_theme_mod('nav_menu_locations', $locations);
   }
+}
+
+/**
+ * Import BaseLayer block definitions from the theme catalog JSON.
+ */
+function bl_install_import_block_definitions(): void
+{
+	if (!function_exists('bl_blocks_import_json_string')) {
+		return;
+	}
+
+	$path = '';
+	if (function_exists('bl_blocks_catalog_import_path')) {
+		$path = bl_blocks_catalog_import_path();
+	}
+	if ($path === '' || !is_readable($path)) {
+		$fallback = get_template_directory() . '/blocks/blocks-import.json';
+		$path = is_readable($fallback) ? $fallback : '';
+	}
+	if ($path === '') {
+		return;
+	}
+
+	$raw = file_get_contents($path);
+	if (!is_string($raw) || trim($raw) === '') {
+		return;
+	}
+
+	bl_blocks_import_json_string($raw);
 }

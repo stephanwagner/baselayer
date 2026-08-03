@@ -11,7 +11,7 @@
  *   npm run watch
  */
 
-// Optional ACF drop-in (copy repo acf/ into this child, then uncomment):
+// Override ACF scripts only if you fork parent acf/ into this child:
 // import '../../acf/blocks/blocks.js';
 
 // BaseLayer custom blocks

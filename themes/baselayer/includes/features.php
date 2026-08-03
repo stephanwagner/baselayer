@@ -28,6 +28,7 @@ function bl_theme_feature_defaults(): array
 		'enable_media_folders'      => 1,
 		'enable_matomo'             => 0,
 		'enable_blocks'             => 1,
+		'enable_acf'                => 0,
 	];
 }
 
@@ -38,7 +39,7 @@ function bl_theme_feature_defaults(): array
  */
 function bl_theme_feature_default_off_when_missing(): array
 {
-	return ['enable_languages', 'enable_editorial', 'enable_webp', 'enable_webp_convert_original', 'enable_matomo'];
+	return ['enable_languages', 'enable_editorial', 'enable_webp', 'enable_webp_convert_original', 'enable_matomo', 'enable_acf'];
 }
 
 /**
@@ -65,7 +66,37 @@ function bl_theme_feature_option_keys_map(): array
 		'media_folders'           => 'enable_media_folders',
 		'matomo'                  => 'enable_matomo',
 		'blocks'                  => 'enable_blocks',
+		'acf'                     => 'enable_acf',
 	];
+}
+
+/**
+ * Cached baselayer_features option (call bl_theme_feature_flush_cache() after update_option).
+ *
+ * @return array<string, mixed>
+ */
+function bl_theme_features_options(bool $refresh = false): array
+{
+	static $options = null;
+
+	if ($refresh || $options === null) {
+		$options = get_option('baselayer_features', []);
+		if (!is_array($options)) {
+			$options = [];
+		}
+		// Drop removed Block Creator flag left in older installs.
+		unset($options['enable_block_creator']);
+	}
+
+	return $options;
+}
+
+/**
+ * Clear the features option cache (e.g. after install writes baselayer_features).
+ */
+function bl_theme_feature_flush_cache(): void
+{
+	bl_theme_features_options(true);
 }
 
 /**
@@ -101,16 +132,7 @@ add_filter('admin_body_class', function (string $classes): string {
  */
 function bl_theme_feature_enabled(string $feature): bool
 {
-	static $options = null;
-
-	if ($options === null) {
-		$options = get_option('baselayer_features', []);
-		if (!is_array($options)) {
-			$options = [];
-		}
-		// Drop removed Block Creator flag left in older installs.
-		unset($options['enable_block_creator']);
-	}
+	$options = bl_theme_features_options();
 
 	$map = bl_theme_feature_option_keys_map();
 	$key = $map[$feature] ?? '';
@@ -128,6 +150,20 @@ function bl_theme_feature_enabled(string $feature): bool
 	}
 
 	return (int) $options[$key] === 1;
+}
+
+/**
+ * Active custom-blocks system: baselayer | acf | none.
+ */
+function bl_theme_blocks_system(): string
+{
+	if (bl_theme_feature_enabled('blocks')) {
+		return 'baselayer';
+	}
+	if (bl_theme_feature_enabled('acf')) {
+		return 'acf';
+	}
+	return 'none';
 }
 
 /**

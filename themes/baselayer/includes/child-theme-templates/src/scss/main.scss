@@ -20,8 +20,8 @@
 // Child-only CSS custom properties
 @forward 'root';
 
-// Optional ACF drop-in (copy repo acf/ into this child, then uncomment):
-// @forward '../../acf/blocks/blocks';
+// Override ACF assets only if you fork parent acf/ into this child:
+// @forward '../../acf/blocks/blocks' as acf-*;
 
 // Child BaseLayer custom blocks
 @forward '../../blocks/blocks';

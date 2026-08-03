@@ -113,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initDeveloperInstaller();
   initThemeNameDescriptionSync();
   initSeedModeToggle();
+  initBlocksSystemToggle();
 });
 
 /**
@@ -135,6 +136,34 @@ function initSeedModeToggle() {
     const mode = selected ? selected.value : 'sample';
     panels.forEach((panel) => {
       const show = panel.getAttribute('data-bl-seed-mode-panel') === mode;
+      panel.style.display = show ? '' : 'none';
+    });
+  }
+
+  radios.forEach((radio) => radio.addEventListener('change', sync));
+  sync();
+}
+
+/**
+ * Custom blocks system: show ACF Pro license field when ACF is selected.
+ */
+function initBlocksSystemToggle() {
+  const form = document.querySelector('form[data-bl-install-form]');
+  if (!form) {
+    return;
+  }
+
+  const radios = form.querySelectorAll('input[type="radio"][data-bl-blocks-system-toggle]');
+  const panels = form.querySelectorAll('[data-bl-blocks-system-panel]');
+  if (!radios.length) {
+    return;
+  }
+
+  function sync() {
+    const selected = form.querySelector('input[type="radio"][data-bl-blocks-system-toggle]:checked');
+    const mode = selected ? selected.value : 'baselayer';
+    panels.forEach((panel) => {
+      const show = panel.getAttribute('data-bl-blocks-system-panel') === mode;
       panel.style.display = show ? '' : 'none';
     });
   }

@@ -1,0 +1,183 @@
+<!-- wp:paragraph -->
+<p>This page showcases BaseLayer Custom Blocks and core blocks.<br>Use it as a reference while building your website, or start customizing the examples to match your design.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:separator {"className":"-container-margin-s","containerMarginTop":"s","containerMarginBottom":"s"} -->
+<hr class="wp-block-separator has-alpha-channel-opacity -container-margin-s"/>
+<!-- /wp:separator -->
+
+<!-- wp:buttons -->
+<div class="wp-block-buttons"><!-- wp:button {"className":"is-style-outline -small","buttonSize":"-small"} -->
+<div class="wp-block-button is-style-outline -small"><a class="wp-block-button__link wp-element-button" href="#icon">Icon</a></div>
+<!-- /wp:button -->
+
+<!-- wp:button {"className":"is-style-outline -small","buttonSize":"-small"} -->
+<div class="wp-block-button is-style-outline -small"><a class="wp-block-button__link wp-element-button" href="#accordion">Accordion</a></div>
+<!-- /wp:button -->
+
+<!-- wp:button {"className":"is-style-outline -small","buttonSize":"-small"} -->
+<div class="wp-block-button is-style-outline -small"><a class="wp-block-button__link wp-element-button" href="#number-ticker">Number ticker</a></div>
+<!-- /wp:button -->
+
+<!-- wp:button {"className":"is-style-outline -small","buttonSize":"-small"} -->
+<div class="wp-block-button is-style-outline -small"><a class="wp-block-button__link wp-element-button" href="#group">Group</a></div>
+<!-- /wp:button -->
+
+<!-- wp:button {"className":"is-style-outline -small","buttonSize":"-small"} -->
+<div class="wp-block-button is-style-outline -small"><a class="wp-block-button__link wp-element-button" href="#columns">Columns</a></div>
+<!-- /wp:button -->
+
+<!-- wp:button {"className":"is-style-outline -small","buttonSize":"-small"} -->
+<div class="wp-block-button is-style-outline -small"><a class="wp-block-button__link wp-element-button" href="#headline">Headline</a></div>
+<!-- /wp:button --></div>
+<!-- /wp:buttons -->
+
+<!-- wp:separator {"className":"-container-margin-top-s -container-margin-bottom-m","containerMarginTop":"s","containerMarginLinked":false} -->
+<hr class="wp-block-separator has-alpha-channel-opacity -container-margin-top-s -container-margin-bottom-m"/>
+<!-- /wp:separator -->
+
+<!-- wp:baselayer/anchor {"values":{"id":"icon","offset":"0"}} /-->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Icon</h2>
+<!-- /wp:heading -->
+
+<!-- wp:baselayer/icon {"values":{"icon":"planet"},"className":"-icon-align-left","iconAlign":"-icon-align-left"} /-->
+
+<!-- wp:columns {"className":"-container-margin-s","containerMarginTop":"s","containerMarginBottom":"s"} -->
+<div class="wp-block-columns -container-margin-s"><!-- wp:column -->
+<div class="wp-block-column"><!-- wp:baselayer/icon-text {"values":{"icon":"rocket-launch"}} -->
+<div class="wp-block-baselayer-icon-text"><!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Launch</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Pair an icon with a short supporting text block.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:baselayer/icon-text --></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"><!-- wp:baselayer/icon-text {"values":{"icon":"medal"},"className":"-icon-align-center","iconTextPosition":"-icon-align-center"} -->
+<div class="wp-block-baselayer-icon-text -icon-align-center"><!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Quality</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Use Block Options to adjust alignment and spacing.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:baselayer/icon-text --></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"><!-- wp:baselayer/icon-text {"values":{"icon":"partly-cloudy"},"className":"-icon-text-align-right","iconTextPosition":"-icon-text-align-right"} -->
+<div class="wp-block-baselayer-icon-text -icon-text-align-right"><!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Flexible</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Definitions live under Blocks and render from theme templates.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:baselayer/icon-text --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->
+
+<!-- wp:separator {"className":"-container-margin-s","containerMarginTop":"s","containerMarginBottom":"s"} -->
+<hr class="wp-block-separator has-alpha-channel-opacity -container-margin-s"/>
+<!-- /wp:separator -->
+
+<!-- wp:baselayer/anchor {"values":{"id":"accordion","offset":"0"}} /-->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Accordion</h2>
+<!-- /wp:heading -->
+
+<!-- wp:baselayer/accordion {"values":{"title":"What are BaseLayer Custom Blocks?","accordion_is_open":true}} -->
+<div class="wp-block-baselayer-accordion"><!-- wp:paragraph -->
+<p>They are custom Gutenberg blocks managed in the Blocks admin, with fields, templates under <code>blocks/{slug}/</code>, and optional Block Options in the sidebar.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:baselayer/accordion -->
+
+<!-- wp:baselayer/accordion {"values":{"title":"Where do I edit them?","accordion_is_open":false}} -->
+<div class="wp-block-baselayer-accordion"><!-- wp:paragraph -->
+<p>Open <strong>Blocks</strong> in wp-admin to edit definitions, Content Fields, Website Fields, and Block Options. Import or export JSON under Blocks → Settings.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:baselayer/accordion -->
+
+<!-- wp:separator {"className":"-container-margin-s","containerMarginTop":"s","containerMarginBottom":"s"} -->
+<hr class="wp-block-separator has-alpha-channel-opacity -container-margin-s"/>
+<!-- /wp:separator -->
+
+<!-- wp:baselayer/anchor {"values":{"id":"number-ticker","offset":"0"}} /-->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Number ticker</h2>
+<!-- /wp:heading -->
+
+<!-- wp:baselayer/number-ticker {"values":{"items":[{"number":"120","suffix":"+","label":"Projects"},{"number":"45","suffix":"","label":"Editors"},{"number":"98","suffix":"%","label":"Satisfaction"}]}} /-->
+
+<!-- wp:separator {"className":"-container-margin-s","containerMarginTop":"s","containerMarginBottom":"s"} -->
+<hr class="wp-block-separator has-alpha-channel-opacity -container-margin-s"/>
+<!-- /wp:separator -->
+
+<!-- wp:baselayer/anchor {"values":{"id":"group","offset":"0"}} /-->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Group</h2>
+<!-- /wp:heading -->
+
+<!-- wp:group {"className":"-container-margin-s -container-padding-m","layout":{"type":"constrained"},"containerMarginTop":"s","containerMarginBottom":"s","style":{"spacing":{"padding":{"top":"2rem","bottom":"2rem","left":"2rem","right":"2rem"}}},"backgroundColor":"cyan-bluish-gray"} -->
+<div class="wp-block-group -container-margin-s -container-padding-m has-cyan-bluish-gray-background-color has-background"><!-- wp:paragraph -->
+<p>Core blocks still work as usual. BaseLayer Block Options add spacing, width limits, and visibility controls in the sidebar.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:group -->
+
+<!-- wp:baselayer/anchor {"values":{"id":"columns","offset":"0"}} /-->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Columns</h2>
+<!-- /wp:heading -->
+
+<!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column -->
+<div class="wp-block-column"><!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">One</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Use columns for simple multi-column layouts.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column -->
+
+<!-- wp:column -->
+<div class="wp-block-column"><!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Two</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Combine them with BaseLayer blocks as needed.</p>
+<!-- /wp:paragraph --></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->
+
+<!-- wp:baselayer/anchor {"values":{"id":"headline","offset":"0"}} /-->
+
+<!-- wp:heading -->
+<h2 class="wp-block-heading">Headline</h2>
+<!-- /wp:heading -->
+
+<!-- wp:heading {"level":1} -->
+<h1 class="wp-block-heading">Heading level 1</h1>
+<!-- /wp:heading -->
+
+<!-- wp:heading {"level":2} -->
+<h2 class="wp-block-heading">Heading level 2</h2>
+<!-- /wp:heading -->
+
+<!-- wp:heading {"level":3} -->
+<h3 class="wp-block-heading">Heading level 3</h3>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>More built-in blocks (slider, map, article list, and others) are available in the inserter after install.</p>
+<!-- /wp:paragraph -->
