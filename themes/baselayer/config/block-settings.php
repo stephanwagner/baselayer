@@ -65,6 +65,7 @@ return [
 		'core/social-links',
 		'core/loginout',
 		'core/page-list',
+		'core/page-list-item',
 
 		// Template / query blocks — site structure, not page body
 		'core/post-template',
@@ -100,7 +101,12 @@ return [
 		'core/comment-edit-link',
 		'core/comment-date',
 		'core/comment-content',
+		'core/comment-template',
 		'core/comments-title',
+		'core/comments-pagination',
+		'core/comments-pagination-numbers',
+		'core/comments-pagination-next',
+		'core/comments-pagination-previous',
 		'core/post-comments',
 		'core/post-comments-link',
 		'core/post-comments-count',
@@ -127,6 +133,9 @@ return [
 		'core/more',
 		'core/nextpage',
 		'core/navigation-overlay-close',
+		'core/home-link',
+		'core/footnotes',
+		'core/social-icon',
 	],
 
 	'blocks' => [
@@ -180,7 +189,6 @@ return [
 		'core/breadcrumbs' => [
 			'allowed'  => false,
 		],
-
 	],
 
 	// Block inserter variations (shown in category grids alongside their parent block).
