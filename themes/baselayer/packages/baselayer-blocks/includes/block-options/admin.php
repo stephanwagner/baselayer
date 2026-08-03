@@ -101,6 +101,15 @@ function bl_block_options_block_meta(string $name): array
 		}
 	}
 
+	// ACF blocks are not client-registered on this admin page — always prefer the
+	// theme catalog SVG so list icons do not fall back to a generic dashicon.
+	if (str_starts_with($name, 'acf/') && function_exists('bl_block_settings_admin_icon_map')) {
+		$map = bl_block_settings_admin_icon_map();
+		if (isset($map[$name]) && is_string($map[$name]) && $map[$name] !== '') {
+			$icon = $map[$name];
+		}
+	}
+
 	if (function_exists('bl_block_settings_admin_resolve_icon')) {
 		$resolved = bl_block_settings_admin_resolve_icon($name, $icon);
 		$icon = is_string($resolved) && $resolved !== '' ? $resolved : null;
@@ -304,6 +313,14 @@ function bl_block_options_enqueue_admin_assets(): void
 		bl_block_options_enqueue_package_asset($handle, 'block-options-admin', 'js', $deps, true);
 	}
 
+	// ACF-only installs skip the full Blocks package; still need builder SVGs for
+	// field-type / drag-handle chrome in the shared options panel.
+	if (!function_exists('bl_blocks_builder_icon_svgs')) {
+		$builder_icons = dirname(__DIR__) . '/builder-icons.php';
+		if (is_readable($builder_icons)) {
+			require_once $builder_icons;
+		}
+	}
 	$icons = function_exists('bl_blocks_builder_icon_svgs')
 		? bl_blocks_builder_icon_svgs()
 		: [];
@@ -400,7 +417,7 @@ function bl_block_options_enqueue_admin_assets(): void
 		'summaryControlMany' => __('controls', 'baselayer-blocks'),
 	];
 
-	wp_localize_script($handle, 'blBlockOptionsAdmin', [
+	$admin_config = [
 		'hasBaselayer' => bl_block_options_has_baselayer_blocks(),
 		'hasAcf' => bl_block_options_has_acf_blocks(),
 		'customs' => function_exists('bl_block_options_customs_catalog')
@@ -415,7 +432,14 @@ function bl_block_options_enqueue_admin_assets(): void
 		'nonce' => wp_create_nonce('bl_block_options_admin'),
 		'hasIconPicker' => $has_icon_picker,
 		'i18n' => $i18n,
-	]);
+	];
+
+	// JSON_HEX_TAG keeps inline SVGs from breaking the admin <script> tag.
+	wp_add_inline_script(
+		$handle,
+		'window.blBlockOptionsAdmin = ' . wp_json_encode($admin_config, JSON_HEX_TAG | JSON_UNESCAPED_SLASHES) . ';',
+		'before'
+	);
 
 	// Shared options panel reads BlFormBuilder.t / iconEl via blFormsAdmin.
 	wp_add_inline_script(
@@ -423,7 +447,7 @@ function bl_block_options_enqueue_admin_assets(): void
 		'window.blFormsAdmin = window.blFormsAdmin || ' . wp_json_encode([
 			'icons' => $icons,
 			'i18n'  => $i18n,
-		]) . ';',
+		], JSON_HEX_TAG | JSON_UNESCAPED_SLASHES) . ';',
 		'before'
 	);
 
