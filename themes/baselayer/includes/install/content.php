@@ -809,7 +809,26 @@ function bl_install_content_flags_from_request(): array
 		? $_POST['install']['content']
 		: [];
 
-	$seed_mode = (($content['seed_mode'] ?? '') === 'test') ? 'test' : 'sample';
+	$seed_mode = (string) ($content['seed_mode'] ?? 'sample');
+	if (!in_array($seed_mode, ['sample', 'test', 'none'], true)) {
+		$seed_mode = 'sample';
+	}
+
+	if ($seed_mode === 'none') {
+		$post = !empty($content['post']);
+		$projects = !empty($content['projects']);
+		$event = !empty($content['event']);
+
+		return [
+			'seed_mode'         => 'none',
+			'post'              => $post,
+			'projects'          => $projects,
+			'event'             => $event,
+			'post_examples'     => false,
+			'projects_examples' => false,
+			'event_examples'    => false,
+		];
+	}
 
 	if ($seed_mode === 'test') {
 		return [

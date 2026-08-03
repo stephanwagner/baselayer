@@ -117,7 +117,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /**
- * Sample vs test data: show CPT checkboxes for sample, notice for test.
+ * Sample / test / no content: show type checkboxes for sample+none, notice for test,
+ * and example-post checkboxes only for sample.
  */
 function initSeedModeToggle() {
   const form = document.querySelector('form[data-bl-install-form]');
@@ -131,11 +132,18 @@ function initSeedModeToggle() {
     return;
   }
 
+  function panelModes(panel) {
+    return (panel.getAttribute('data-bl-seed-mode-panel') || '')
+      .split(/[\s,]+/)
+      .map((mode) => mode.trim())
+      .filter(Boolean);
+  }
+
   function sync() {
     const selected = form.querySelector('input[type="radio"][data-bl-seed-mode-toggle]:checked');
     const mode = selected ? selected.value : 'sample';
     panels.forEach((panel) => {
-      const show = panel.getAttribute('data-bl-seed-mode-panel') === mode;
+      const show = panelModes(panel).includes(mode);
       panel.style.display = show ? '' : 'none';
     });
   }

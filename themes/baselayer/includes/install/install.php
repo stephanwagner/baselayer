@@ -488,11 +488,11 @@ function bl_render_installer(): void
 
         <h2><?= esc_html__('Content', 'baselayer') ?></h2>
 
-        <p class="description"><?= esc_html__('Choose how much starter content to create. Blog and Projects use content-type config files; Events use the Events package (Developer → Features and each type’s Settings).', 'baselayer') ?></p>
+        <p class="description"><?= esc_html__('Choose how much starter content to create.', 'baselayer') ?></p>
 
         <?php
         $content_seed_mode = (string) $bl_install_val(['install', 'content', 'seed_mode'], 'sample');
-        if ($content_seed_mode !== 'test') {
+        if (!in_array($content_seed_mode, ['sample', 'test', 'none'], true)) {
           $content_seed_mode = 'sample';
         }
         $content_post = !empty($bl_install_val(['install', 'content', 'post'], true));
@@ -523,7 +523,7 @@ function bl_render_installer(): void
                   <input type="radio" name="install[content][seed_mode]" value="test" <?= $content_seed_mode === 'test' ? ' checked' : '' ?> data-bl-seed-mode-toggle>
                   <strong><?= esc_html__('Test data', 'baselayer') ?></strong>
                 </label>
-                <p class="description" style="margin: 0 0 12px 24px;"><?= esc_html__('Creates everything and many auto-generated items for layouts, filters, and performance testing.', 'baselayer') ?></p>
+                <p class="description" style="margin: 0 0 12px 24px;"><?= esc_html__('Creates extensive demo content for testing layouts, filters, pagination, and performance.', 'baselayer') ?></p>
 
                 <div data-bl-seed-mode-panel="test" style="<?= $content_seed_mode === 'test' ? '' : 'display: none;' ?>">
                   <div class="notice notice-info inline" style="margin: 0 0 12px;">
@@ -539,12 +539,18 @@ function bl_render_installer(): void
                     <?php endif; ?>
                   </div>
                 </div>
+
+                <label style="display: block; margin-bottom: 8px;">
+                  <input type="radio" name="install[content][seed_mode]" value="none" <?= $content_seed_mode === 'none' ? ' checked' : '' ?> data-bl-seed-mode-toggle>
+                  <strong><?= esc_html__('No content', 'baselayer') ?></strong>
+                </label>
+                <p class="description" style="margin: 0 0 12px 24px;"><?= esc_html__('Start with a clean installation.', 'baselayer') ?></p>
               </fieldset>
             </td>
           </tr>
         </table>
 
-        <div data-bl-seed-mode-panel="sample" style="<?= $content_seed_mode === 'sample' ? '' : 'display: none;' ?>">
+        <div data-bl-seed-mode-panel="sample none" style="<?= in_array($content_seed_mode, ['sample', 'none'], true) ? '' : 'display: none;' ?>">
         <table class="form-table" role="presentation">
           <tr>
             <th scope="row"><?= esc_html__('Blog posts', 'baselayer') ?></th>
@@ -555,12 +561,14 @@ function bl_render_installer(): void
                   <?= esc_html__('Enable blog posts', 'baselayer') ?>
                 </label>
                 <div class="bl-indent-checkbox">
-                  <p class="description" style="margin-top: 0;"><?= esc_html__('WordPress’s built-in posts – ideal for news, articles, or a classic blog archive.', 'baselayer') ?></p>
-                  <div data-bl-checkbox-toggle-content="content-post">
-                    <label>
-                      <input type="checkbox" name="install[content][post_examples]" value="1" <?= $content_post_examples ? ' checked' : '' ?>>
-                      <?= esc_html__('Create example posts', 'baselayer') ?>
-                    </label>
+                  <p class="description" style="margin-top: 0;"><?= esc_html__('The built-in WordPress posts.', 'baselayer') ?></p>
+                  <div data-bl-seed-mode-panel="sample" style="<?= $content_seed_mode === 'sample' ? '' : 'display: none;' ?>">
+                    <div data-bl-checkbox-toggle-content="content-post">
+                      <label>
+                        <input type="checkbox" name="install[content][post_examples]" value="1" <?= $content_post_examples ? ' checked' : '' ?>>
+                        <?= esc_html__('Create example posts', 'baselayer') ?>
+                      </label>
+                    </div>
                   </div>
                 </div>
               </fieldset>
@@ -575,12 +583,14 @@ function bl_render_installer(): void
                   <?= esc_html__('Enable custom post type: Projects', 'baselayer') ?>
                 </label>
                 <div class="bl-indent-checkbox">
-                  <p class="description" style="margin-top: 0;"><?= esc_html__('A flexible custom post type you can rename and reshape – for portfolios, case studies, or similar listings.', 'baselayer') ?></p>
-                  <div data-bl-checkbox-toggle-content="content-projects">
-                    <label>
-                      <input type="checkbox" name="install[content][projects_examples]" value="1" <?= $content_projects_examples ? ' checked' : '' ?>>
-                      <?= esc_html__('Create example posts', 'baselayer') ?>
-                    </label>
+                  <p class="description" style="margin-top: 0;"><?= esc_html__('A flexible custom post type for portfolios, case studies, and similar content.', 'baselayer') ?></p>
+                  <div data-bl-seed-mode-panel="sample" style="<?= $content_seed_mode === 'sample' ? '' : 'display: none;' ?>">
+                    <div data-bl-checkbox-toggle-content="content-projects">
+                      <label>
+                        <input type="checkbox" name="install[content][projects_examples]" value="1" <?= $content_projects_examples ? ' checked' : '' ?>>
+                        <?= esc_html__('Create example posts', 'baselayer') ?>
+                      </label>
+                    </div>
                   </div>
                 </div>
               </fieldset>
@@ -595,12 +605,14 @@ function bl_render_installer(): void
                   <?= esc_html__('Enable events', 'baselayer') ?>
                 </label>
                 <div class="bl-indent-checkbox">
-                  <p class="description" style="margin-top: 0;"><?= esc_html__('Dated items with archives, recurrence, and statuses. Configure event types later under each type’s menu → Settings (not content-types files).', 'baselayer') ?></p>
-                  <div data-bl-checkbox-toggle-content="content-event">
-                    <label>
-                      <input type="checkbox" name="install[content][event_examples]" value="1" <?= $content_event_examples ? ' checked' : '' ?>>
-                      <?= esc_html__('Create example posts', 'baselayer') ?>
-                    </label>
+                  <p class="description" style="margin-top: 0;"><?= esc_html__('Dated items with archives, recurrence, and statuses.', 'baselayer') ?></p>
+                  <div data-bl-seed-mode-panel="sample" style="<?= $content_seed_mode === 'sample' ? '' : 'display: none;' ?>">
+                    <div data-bl-checkbox-toggle-content="content-event">
+                      <label>
+                        <input type="checkbox" name="install[content][event_examples]" value="1" <?= $content_event_examples ? ' checked' : '' ?>>
+                        <?= esc_html__('Create example posts', 'baselayer') ?>
+                      </label>
+                    </div>
                   </div>
                 </div>
               </fieldset>
@@ -845,7 +857,9 @@ function baselayer_install_redirect_with_errors(array $errors): void
         ? bl_install_sanitize_acf_pro_license((string) ($_POST['install']['acf_pro_key'] ?? ''))
         : '',
       'content' => [
-        'seed_mode' => (($_POST['install']['content']['seed_mode'] ?? '') === 'test') ? 'test' : 'sample',
+        'seed_mode' => in_array(($_POST['install']['content']['seed_mode'] ?? ''), ['sample', 'test', 'none'], true)
+          ? (string) $_POST['install']['content']['seed_mode']
+          : 'sample',
         'post' => !empty($_POST['install']['content']['post']),
         'projects' => !empty($_POST['install']['content']['projects']),
         'event' => !empty($_POST['install']['content']['event']),
@@ -1146,9 +1160,13 @@ function baselayer_run_install(): void
   }
 
   /**
-   * Standard pages (always). Menus are assigned after content types are registered.
+   * Standard pages (skipped for seed_mode=none — leave WordPress content as-is).
    */
-  $page_ids = bl_install_seed_content();
+  $content_flags = bl_install_content_flags_from_request();
+  $page_ids = [];
+  if (($content_flags['seed_mode'] ?? 'sample') !== 'none') {
+    $page_ids = bl_install_seed_content();
+  }
 
   update_option('default_role', 'editor');
 
@@ -1162,7 +1180,6 @@ function baselayer_run_install(): void
   /**
    * Content types: copy with child theme (or patch parent), set enabled flags, seed examples.
    */
-  $content_flags = bl_install_content_flags_from_request();
   $content_types_dir = bl_install_content_types_dir_for_theme(get_template());
 
   /**
@@ -1203,10 +1220,12 @@ function baselayer_run_install(): void
   bl_install_bootstrap_content_types();
   flush_rewrite_rules(false);
 
-  bl_install_assign_menus($page_ids, $content_flags);
-  bl_install_seed_content_type_examples($content_flags);
-  if (($content_flags['seed_mode'] ?? 'sample') === 'test') {
-    bl_install_seed_testdata($content_flags);
+  if (($content_flags['seed_mode'] ?? 'sample') !== 'none') {
+    bl_install_assign_menus($page_ids, $content_flags);
+    bl_install_seed_content_type_examples($content_flags);
+    if (($content_flags['seed_mode'] ?? 'sample') === 'test') {
+      bl_install_seed_testdata($content_flags);
+    }
   }
 
   if (
