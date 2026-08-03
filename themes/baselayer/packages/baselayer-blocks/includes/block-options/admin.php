@@ -232,13 +232,32 @@ function bl_block_options_enqueue_admin_assets(): void
 		return;
 	}
 
+	// Load package strings when Blocks CPT package is off (e.g. ACF-only installs).
+	if (function_exists('bl_blocks_load_textdomain')) {
+		bl_blocks_load_textdomain();
+	} else {
+		$mofile = bl_block_options_package_root() . 'languages/baselayer-blocks-' . determine_locale() . '.mo';
+		if (is_readable($mofile)) {
+			load_textdomain('baselayer-blocks', $mofile);
+		}
+	}
+
 	$builder_handle = function_exists('bl_blocks_enqueue_canvas_builder_kit')
 		? bl_blocks_enqueue_canvas_builder_kit()
 		: '';
+	if ($builder_handle === '' && function_exists('bl_canvas_builder_enqueue_kit')) {
+		$builder_handle = bl_canvas_builder_enqueue_kit(bl_block_options_vendor_kit_args('canvas-builder'));
+	}
+
 	$form_builder_deps = $builder_handle ? [$builder_handle] : [];
 	$form_builder_handle = function_exists('bl_blocks_enqueue_form_builder_kit')
 		? bl_blocks_enqueue_form_builder_kit($form_builder_deps)
 		: '';
+	if ($form_builder_handle === '' && function_exists('bl_form_builder_enqueue_kit')) {
+		$form_builder_handle = bl_form_builder_enqueue_kit(
+			bl_block_options_vendor_kit_args('form-builder') + ['deps' => $form_builder_deps]
+		);
+	}
 
 	// Core block icons only exist after the client block library registers them.
 	if (function_exists('bl_enqueue_admin_block_type_registry')) {
@@ -253,6 +272,8 @@ function bl_block_options_enqueue_admin_assets(): void
 	}
 	if (function_exists('bl_blocks_enqueue_style')) {
 		bl_blocks_enqueue_style('bl-blocks-admin', 'blocks-admin', $style_deps);
+	} else {
+		bl_block_options_enqueue_package_asset('bl-blocks-admin', 'blocks-admin', 'css', $style_deps);
 	}
 
 	$handle = 'bl-block-options-admin';
@@ -273,14 +294,7 @@ function bl_block_options_enqueue_admin_assets(): void
 	if (function_exists('bl_blocks_enqueue_script')) {
 		bl_blocks_enqueue_script($handle, 'block-options-admin', $deps, true);
 	} else {
-		$asset = function_exists('bl_block_options_resolve_asset')
-			? bl_block_options_resolve_asset('block-options-admin', 'js')
-			: null;
-		if ($asset !== null) {
-			wp_enqueue_script($handle, $asset['uri'], $deps, $asset['ver'], true);
-		} elseif (function_exists('bl_enqueue_theme_script')) {
-			bl_enqueue_theme_script($handle, 'block-options-admin', $deps, true);
-		}
+		bl_block_options_enqueue_package_asset($handle, 'block-options-admin', 'js', $deps, true);
 	}
 
 	$icons = function_exists('bl_blocks_builder_icon_svgs')

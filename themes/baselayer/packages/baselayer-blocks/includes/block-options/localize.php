@@ -19,6 +19,41 @@ function bl_block_options_package_root(): string
 }
 
 /**
+ * Vendor kit paths under the package (for canvas/form builders when Blocks package helpers are absent).
+ *
+ * @return array{vendor_dir: string, vendor_url: string}
+ */
+function bl_block_options_vendor_kit_args(string $kit): array
+{
+	$kit = sanitize_key($kit);
+	$root = bl_block_options_package_root();
+	$rel = 'packages/baselayer-blocks/assets/vendor/' . $kit;
+
+	return [
+		'vendor_dir' => $root . 'assets/vendor/' . $kit,
+		'vendor_url' => trailingslashit(get_template_directory_uri()) . $rel,
+	];
+}
+
+/**
+ * Enqueue a package CSS/JS asset when Blocks package helpers are not loaded.
+ */
+function bl_block_options_enqueue_package_asset(string $handle, string $name, string $type, array $deps = [], bool $in_footer = true): bool
+{
+	$asset = bl_block_options_resolve_asset($name, $type);
+	if ($asset === null) {
+		return false;
+	}
+	if ($type === 'css') {
+		wp_enqueue_style($handle, $asset['uri'], $deps, $asset['ver']);
+	} else {
+		wp_enqueue_script($handle, $asset['uri'], $deps, $asset['ver'], $in_footer);
+	}
+
+	return true;
+}
+
+/**
  * Resolve a built asset under package assets/{css|js}/.
  *
  * @return array{uri: string, path: string, ver: string}|null
