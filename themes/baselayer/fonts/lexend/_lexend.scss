@@ -1,6 +1,6 @@
 @use '../../src/scss/config' as *;
 
-$font-path: #{$theme-path}/fonts/lexend/v26;
+$font-path: '#{$theme-path}/fonts/lexend/v26';
 
 /* vietnamese */
 @font-face {

@@ -1,6 +1,6 @@
 @use '../../src/scss/config' as *;
 
-$font-path: #{$theme-path}/fonts/lato/v25;
+$font-path: '#{$theme-path}/fonts/lato/v25';
 
 /* latin-ext */
 @font-face {

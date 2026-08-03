@@ -1,6 +1,6 @@
 @use '../../src/scss/config' as *;
 
-$font-path: #{$theme-path}/fonts/opensans/v44;
+$font-path: '#{$theme-path}/fonts/opensans/v44';
 
 /* cyrillic-ext */
 @font-face {

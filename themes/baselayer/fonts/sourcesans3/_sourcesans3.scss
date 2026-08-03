@@ -1,6 +1,6 @@
 @use '../../src/scss/config' as *;
 
-$font-path: #{$theme-path}/fonts/sourcesans3/v19;
+$font-path: '#{$theme-path}/fonts/sourcesans3/v19';
 
 /* cyrillic-ext */
 @font-face {

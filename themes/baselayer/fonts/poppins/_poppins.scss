@@ -1,6 +1,6 @@
 @use '../../src/scss/config' as *;
 
-$font-path: #{$theme-path}/fonts/poppins/v24;
+$font-path: '#{$theme-path}/fonts/poppins/v24';
 
 /* devanagari */
 @font-face {

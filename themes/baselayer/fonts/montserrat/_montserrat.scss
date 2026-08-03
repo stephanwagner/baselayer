@@ -1,6 +1,6 @@
 @use '../../src/scss/config' as *;
 
-$font-path: #{$theme-path}/fonts/montserrat/v31;
+$font-path: '#{$theme-path}/fonts/montserrat/v31';
 
 /* cyrillic-ext */
 @font-face {

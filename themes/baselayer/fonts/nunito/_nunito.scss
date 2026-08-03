@@ -1,6 +1,6 @@
 @use '../../src/scss/config' as *;
 
-$font-path: #{$theme-path}/fonts/nunito/v32;
+$font-path: '#{$theme-path}/fonts/nunito/v32';
 
 /* cyrillic-ext */
 @font-face {

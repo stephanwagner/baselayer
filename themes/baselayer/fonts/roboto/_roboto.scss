@@ -1,6 +1,6 @@
 @use '../../src/scss/config' as *;
 
-$font-path: #{$theme-path}/fonts/roboto/v51;
+$font-path: '#{$theme-path}/fonts/roboto/v51';
 
 /* cyrillic-ext */
 @font-face {
