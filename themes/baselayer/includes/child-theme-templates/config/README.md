@@ -8,8 +8,9 @@ Shipped stubs (edit as needed):
 - `theme.php` — theme options
 - `design.php` — colors, typography, gradients, layout
 - `block-settings.php` — Theme → Blocks defaults
-- `block-options.php` — optional overrides (runtime seed is package `seed/block-options-import.json`; theme may ship `config/block-options/import.json`)
 - `icons.js` — child theme icons build metadata
+
+Block Options are edited in admin (`bl_block_options` DB store), not via theme config.
 
 ## Content types
 

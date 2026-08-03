@@ -12,7 +12,7 @@ define('BL_BLOCK_OPTIONS_LOADED', true);
  *
  * Admin: Blocks → Block Options (store: bl_block_options).
  * Customs: customs/<name>/custom.php (auto-discovered).
- * Default seed: seed/block-options-import.json (theme may override).
+ * Install seed only: seed/block-options-import.json (fills empty store once).
  */
 
 require_once __DIR__ . '/store.php';

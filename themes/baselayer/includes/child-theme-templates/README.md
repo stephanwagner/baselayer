@@ -53,7 +53,7 @@ Optional Events markup overrides (child wins via the same template paths as the 
 
 - Config stubs in `config/` (`theme.php`, `design.php`, `block-settings.php`, …) merge over the parent — see `config/README.md`
 - **Content types:** `config/content-types/` is copied from the parent on install (file-based CPTs such as `post` and `project`). With a child active, **only** those files are loaded (no parent fallback). An empty or missing folder means no file-based CPTs. Events are **not** defined here.
-- **`config/block-options/import.json`:** runtime seed for Block Options (DB store). Prefer editing Block Options in admin, or replace-import deliberately. The PHP `config/block-options.php` stub is a human reference only.
+- **Block Options:** edit in admin (DB store). Package seed fills an empty store once at install/bootstrap — not a theme config file.
 - Optional templates: `templates/…` (same paths as the parent; child wins)
 
 ## ACF Pro

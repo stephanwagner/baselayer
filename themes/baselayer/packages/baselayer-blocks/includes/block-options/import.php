@@ -3,7 +3,10 @@
 defined('ABSPATH') || exit;
 
 /**
- * Package default seed path.
+ * Package install/bootstrap seed path.
+ *
+ * Ongoing Block Options live in the bl_block_options DB store (admin UI).
+ * This JSON only fills an empty store once (install / first bootstrap).
  */
 function bl_block_options_package_import_path(): string
 {
@@ -12,33 +15,10 @@ function bl_block_options_package_import_path(): string
 }
 
 /**
- * Locate block-options import JSON.
- * Theme/child overrides package seed when present.
+ * @deprecated Use bl_block_options_package_import_path(). Kept for callers of the old name.
  */
 function bl_block_options_theme_import_path(): string
 {
-	$relatives = [
-		'config/block-options/import.json',
-		'config/block-options-import.json', // legacy path
-	];
-	$dirs = [];
-
-	if (function_exists('get_stylesheet_directory')) {
-		$dirs[] = trailingslashit(get_stylesheet_directory());
-	}
-	if (function_exists('get_template_directory')) {
-		$dirs[] = trailingslashit(get_template_directory());
-	}
-
-	foreach ($dirs as $dir) {
-		foreach ($relatives as $relative) {
-			$path = $dir . $relative;
-			if (is_readable($path)) {
-				return $path;
-			}
-		}
-	}
-
 	return bl_block_options_package_import_path();
 }
 
@@ -106,14 +86,14 @@ function bl_block_options_import_from_file(string $path, array $args = [])
 }
 
 /**
- * Import defaults from theme override or package seed.
+ * Import package seed defaults into the store.
  *
  * @param array{replace?: bool} $args
  * @return array{presets: int, blocks: int}|WP_Error
  */
 function bl_block_options_import_theme_defaults(array $args = [])
 {
-	$path = bl_block_options_theme_import_path();
+	$path = bl_block_options_package_import_path();
 	if ($path === '') {
 		return new WP_Error(
 			'bl_block_options_import_missing',
@@ -125,7 +105,7 @@ function bl_block_options_import_theme_defaults(array $args = [])
 }
 
 /**
- * Auto-import theme defaults once when the store is empty.
+ * Auto-import package seed once when the store is empty.
  */
 function bl_block_options_maybe_bootstrap_from_theme(): void
 {
@@ -145,4 +125,3 @@ function bl_block_options_maybe_bootstrap_from_theme(): void
 	update_option('bl_block_options_bootstrapped', 1, false);
 }
 add_action('admin_init', 'bl_block_options_maybe_bootstrap_from_theme', 5);
-
