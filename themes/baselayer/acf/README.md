@@ -1,11 +1,11 @@
 # BaseLayer ACF Pro integration
 
-Ships inside the parent theme as `themes/baselayer/acf/`. Enabled when **Custom blocks → ACF Pro** is selected at install (or under **Developer → Features**).
+Ships inside the parent theme as `themes/baselayer/acf/`. Enabled when **Blocks → ACF Pro** is selected at install (or under **Developer → Features**).
 
 ## Requirements
 
 1. **ACF Pro** plugin installed and activated.
-2. Feature flag `enable_acf` on (install choice or Developer → Features). BaseLayer Custom Blocks (`enable_blocks`) stays off while ACF Pro is selected — the two systems are exclusive.
+2. Feature flag `enable_acf` on (install choice or Developer → Features). BaseLayer Blocks (`enable_blocks`) stays off while ACF Pro is selected — the two systems are exclusive.
 
 ## Assets
 
@@ -16,7 +16,7 @@ Parent builds exclusive block bundles and enqueues them only when `bl_theme_bloc
 
 Source entries: `src/js/blocks/blocks-acf.js`, `src/scss/blocks-acf.scss`, `src/scss/blocks-acf-editor.scss`.
 
-BaseLayer Custom Blocks uses the parallel `blocks-baselayer*` assets. Neither system is imported into `main` / `admin` core bundles.
+BaseLayer Blocks uses the parallel `blocks-baselayer*` assets. Neither system is imported into `main` / `admin` core bundles.
 
 If you fork ACF into a **child** theme as `acf/`, PHP loads the child’s `acf/acf.php` first. Add child SCSS/JS only when you override ACF assets in the child.
 

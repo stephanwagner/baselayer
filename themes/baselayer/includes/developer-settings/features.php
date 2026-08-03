@@ -180,7 +180,7 @@ function bl_render_developer_features(): void
 						<th scope="row" class="form-table-checkbox-label"><?= esc_html__('Languages', 'baselayer') ?></th>
 						<td>
 							<input type="hidden" name="baselayer_features[enable_languages]" value="0">
-							<label><input type="checkbox" name="baselayer_features[enable_languages]" id="baselayer_features_enable_languages" value="1" <?= checked($feat('enable_languages'), 1, false) ?>> <?= esc_html__('Enable languages', 'baselayer') ?></label>
+							<label><input type="checkbox" name="baselayer_features[enable_languages]" id="baselayer_features_enable_languages" value="1" <?= checked($feat('enable_languages'), 1, false) ?>> <?= esc_html__('Enable languages', 'baselayer') ?> <span style="display:inline-block;margin-left:6px;padding:0 6px;border-radius:3px;background:#BE123C;color:#fff;font-size:11px;font-weight:600;line-height:20px;vertical-align:1px;"><?= esc_html__('Beta', 'baselayer') ?></span></label>
 							<p class="description bl-indent-checkbox"><?= esc_html__('Enables built-in support for multiple content languages.', 'baselayer') ?></p>
 							<div id="bl-language-mode-wrap" class="bl-language-mode-wrap" style="margin-top: 12px; <?= $feat('enable_languages') ? '' : 'display:none;' ?>">
 								<fieldset>
@@ -227,8 +227,13 @@ function bl_render_developer_features(): void
 							<p class="description bl-indent-checkbox"><?= esc_html__('Adds a form builder, submissions, email notifications, and a Form block.', 'baselayer') ?></p>
 						</td>
 					</tr>
+				</table>
+
+				<hr>
+
+				<table class="form-table" role="presentation">
 					<tr>
-						<th scope="row"><?= esc_html__('Custom blocks', 'baselayer') ?></th>
+						<th scope="row"><?= esc_html__('Blocks', 'baselayer') ?></th>
 						<td>
 							<?php
 							$blocks_system = 'none';
@@ -241,21 +246,23 @@ function bl_render_developer_features(): void
 							<fieldset>
 								<label style="display:block;margin-bottom:8px;">
 									<input type="radio" name="baselayer_features[blocks_system]" value="baselayer" <?= checked($blocks_system, 'baselayer', false) ?>>
-									<strong><?= esc_html__('BaseLayer Custom Blocks', 'baselayer') ?></strong>
+									<strong><?= esc_html__('BaseLayer Blocks', 'baselayer') ?></strong>
+									<span style="display:inline-block;margin-left:6px;padding:0 6px;border-radius:3px;background:#2271b1;color:#fff;font-size:11px;font-weight:600;line-height:20px;vertical-align:1px;"><?= esc_html__('Recommended', 'baselayer') ?></span>
 								</label>
-								<p class="description" style="margin:0 0 12px 24px;"><?= esc_html__('Admin UI for custom Gutenberg blocks, Content Fields, and Website Fields. Includes built-in blocks such as Accordion.', 'baselayer') ?></p>
+								<p class="description" style="margin:0 0 12px 24px;"><?= esc_html__('Create and manage custom Gutenberg blocks, content fields, and website fields directly within BaseLayer. Includes built-in blocks such as Accordion.', 'baselayer') ?></p>
 
 								<label style="display:block;margin-bottom:8px;">
 									<input type="radio" name="baselayer_features[blocks_system]" value="acf" <?= checked($blocks_system, 'acf', false) ?>>
 									<strong><?= esc_html__('ACF Pro', 'baselayer') ?></strong>
+									<span style="display:inline-block;margin-left:6px;padding:0 6px;border-radius:3px;background:#D97706;color:#fff;font-size:11px;font-weight:600;line-height:20px;vertical-align:1px;"><?= esc_html__('Requires ACF Pro Plugin', 'baselayer') ?></span>
 								</label>
-								<p class="description" style="margin:0 0 12px 24px;"><?= esc_html__('Theme ACF Pro blocks (requires the ACF Pro plugin). Block Options still apply to core and ACF blocks.', 'baselayer') ?></p>
+								<p class="description" style="margin:0 0 12px 24px;"><?= esc_html__('Use ACF Pro to build custom Gutenberg blocks. BaseLayer block options remain available for both Core and ACF blocks.', 'baselayer') ?></p>
 
 								<label style="display:block;margin-bottom:8px;">
 									<input type="radio" name="baselayer_features[blocks_system]" value="none" <?= checked($blocks_system, 'none', false) ?>>
 									<strong><?= esc_html__('None', 'baselayer') ?></strong>
 								</label>
-								<p class="description" style="margin:0 0 0 24px;"><?= esc_html__('Core Gutenberg only. You can enable BaseLayer Custom Blocks or ACF Pro later here.', 'baselayer') ?></p>
+								<p class="description" style="margin:0 0 0 24px;"><?= esc_html__('Use the default WordPress block editor. BaseLayer Blocks and ACF Pro can be enabled at any time.', 'baselayer') ?></p>
 							</fieldset>
 							<input type="hidden" name="baselayer_features[enable_blocks]" value="0">
 							<input type="hidden" name="baselayer_features[enable_acf]" value="0">

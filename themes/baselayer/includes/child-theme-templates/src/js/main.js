@@ -11,7 +11,7 @@
  *   npm run watch
  *
  * Parent enqueues exclusive block scripts (blocks-baselayer / blocks-acf) based on
- * Developer → Features → Custom blocks. Add child-only block behaviour under
+ * Developer → Features → Blocks. Add child-only block behaviour under
  * blocks/ and import it here if needed.
  */
 

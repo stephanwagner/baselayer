@@ -20,4 +20,4 @@ File-based CPTs only (e.g. `post.php`, `project.php`). **Events** are not conten
 
 ## Blocks
 
-BaseLayer Custom Blocks definitions live in the database (Blocks admin). Theme templates and assets go under `blocks/{slug}/`. ACF Pro ships in the parent theme (`acf/`) and is enabled via Developer → Features (exclusive with BaseLayer Custom Blocks).
+BaseLayer Blocks definitions live in the database (Blocks admin). Theme templates and assets go under `blocks/{slug}/`. ACF Pro ships in the parent theme (`acf/`) and is enabled via Developer → Features (exclusive with BaseLayer Blocks).

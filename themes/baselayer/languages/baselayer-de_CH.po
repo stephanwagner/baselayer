@@ -773,26 +773,31 @@ msgstr "Starte mit einer sauberen Installation."
 msgid "Events"
 msgstr "Veranstaltungen"
 
-msgid "Custom blocks"
-msgstr "Individuelle Blöcke"
+msgid "Blocks"
+msgstr "Blöcke"
 
-msgid "Choose how this site provides custom blocks. You can change this later under Developer → Features."
-msgstr "Wähle aus, wie diese Website individuelle Blöcke bereitstellt. Du kannst das später unter Entwickler → Funktionen ändern."
+msgid "Choose how this site provides blocks. You can change this later under Developer → Features."
+msgstr "Wähle aus, wie diese Website Blöcke bereitstellt. Du kannst das später unter Entwickler → Funktionen ändern."
 
-msgid "BaseLayer Custom Blocks"
-msgstr "BaseLayer Custom Blocks"
+msgid "BaseLayer Blocks"
+msgstr "BaseLayer Blocks"
 
-msgid "Imports built-in block definitions and seeds Block Options. Manage blocks under the Blocks admin menu."
-msgstr "Importiert integrierte Block-Definitionen und richtet Block-Optionen ein. Blöcke verwaltest du im Admin-Menü Blöcke."
 
 msgid "ACF Pro"
 msgstr "ACF Pro"
 
-msgid "Uses the theme’s ACF Pro blocks. Requires the ACF Pro plugin. Block Options still apply to core and ACF blocks."
-msgstr "Nutzt die ACF-Pro-Blöcke des Themes. Erfordert das ACF-Pro-Plugin. Block-Optionen gelten weiterhin für Core- und ACF-Blöcke."
+msgid "Requires ACF Pro Plugin"
+msgstr "Erfordert ACF Pro Plugin"
 
-msgid "Core Gutenberg only. You can enable BaseLayer Custom Blocks or ACF Pro later under Developer → Features."
-msgstr "Nur Core-Gutenberg. BaseLayer Custom Blocks oder ACF Pro kannst du später unter Entwickler → Funktionen aktivieren."
+msgid "Create and manage custom Gutenberg blocks, content fields, and website fields directly within BaseLayer. Includes built-in blocks such as Accordion."
+msgstr "Erstelle und verwalte individuelle Gutenberg-Blöcke, Inhaltsfelder und Website-Felder direkt in BaseLayer. Enthält integrierte Blöcke wie Akkordeon."
+
+msgid "Use ACF Pro to build custom Gutenberg blocks. BaseLayer block options remain available for both Core and ACF blocks."
+msgstr "Nutze ACF Pro, um individuelle Gutenberg-Blöcke zu erstellen. BaseLayer-Block-Optionen bleiben für Core- und ACF-Blöcke verfügbar."
+
+msgid "Use the default WordPress block editor. BaseLayer Blocks and ACF Pro can be enabled at any time."
+msgstr "Nutze den Standard-WordPress-Block-Editor. BaseLayer Blocks und ACF Pro können jederzeit aktiviert werden."
+
 
 msgid "Administrator email"
 msgstr "Administrator-E-Mail"
@@ -1122,6 +1127,9 @@ msgstr "Sprachen"
 
 msgid "Enable languages"
 msgstr "Mehrsprachigkeit aktivieren"
+
+msgid "Beta"
+msgstr "Beta"
 
 msgid "Enables built-in support for multiple content languages."
 msgstr "Aktiviert die integrierte Mehrsprachigkeit für Inhalte."
@@ -2679,9 +2687,6 @@ msgid "Link to %s"
 msgstr "Link zu %s"
 
 # Blocks
-
-msgid "Blocks"
-msgstr "Blöcke"
 
 msgid "Control which blocks are available in the page editor inserter."
 msgstr "Lege fest, welche Blöcke im Seiten-Editor-Inserter verfügbar sind."

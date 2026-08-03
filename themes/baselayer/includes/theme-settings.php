@@ -946,7 +946,7 @@ function bl_sanitize_features($value): array
 			wp_clear_scheduled_hook('bl_event_extend_recurring_series');
 		}
 	}
-	// Custom blocks system is exclusive: BaseLayer Blocks XOR ACF Pro XOR none.
+	// Blocks system is exclusive: BaseLayer Blocks XOR ACF Pro XOR none.
 	$system = isset($value['blocks_system']) ? sanitize_key((string) $value['blocks_system']) : '';
 	if ($system === '') {
 		if (!empty($out['enable_blocks'])) {

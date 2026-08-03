@@ -248,7 +248,7 @@ function bl_render_installer(): void
               <label>
                 <input type="checkbox" name="install[create_child_theme]" value="1" <?= !empty($bl_install_val(['install', 'create_child_theme'], true)) ? ' checked' : '' ?> data-bl-checkbox-toggle="create-child-theme">
                 <?= esc_html__('Create child theme', 'baselayer') ?>
-                <span class="bl-install-recommended" style="display:inline-block;margin-left:6px;padding:1px 7px;border-radius:3px;background:#2271b1;color:#fff;font-size:11px;font-weight:600;line-height:1.7;vertical-align:1px;"><?= esc_html__('Recommended', 'baselayer') ?></span>
+                <span class="bl-install-recommended" style="display:inline-block;margin-left:6px;padding:0 6px;border-radius:3px;background:#2271b1;color:#fff;font-size:11px;font-weight:600;line-height:20px;vertical-align:1px;"><?= esc_html__('Recommended', 'baselayer') ?></span>
               </label>
               <p class="description"><?= esc_html__('Creates a project-specific child theme. BaseLayer remains installed for updates, while your custom styles, scripts, and templates live in the child theme.', 'baselayer') ?></p>
             </td>
@@ -432,9 +432,9 @@ function bl_render_installer(): void
 
         <hr>
 
-        <h2><?= esc_html__('Custom blocks', 'baselayer') ?></h2>
+        <h2><?= esc_html__('Blocks', 'baselayer') ?></h2>
 
-        <p class="description"><?= esc_html__('Choose how this site provides custom blocks. You can change this later under Developer → Features.', 'baselayer') ?></p>
+        <p class="description"><?= esc_html__('Choose how this site provides blocks. You can change this later under Developer → Features.', 'baselayer') ?></p>
 
         <?php
         $blocks_system = (string) $bl_install_val(['install', 'blocks_system'], 'baselayer');
@@ -452,22 +452,23 @@ function bl_render_installer(): void
               <fieldset>
                 <label style="display: block; margin-bottom: 8px;">
                   <input type="radio" name="install[blocks_system]" value="baselayer" <?= $blocks_system === 'baselayer' ? ' checked' : '' ?> data-bl-blocks-system-toggle>
-                  <strong><?= esc_html__('BaseLayer Custom Blocks', 'baselayer') ?></strong>
-                  <span class="bl-install-recommended" style="display:inline-block;margin-left:6px;padding:1px 7px;border-radius:3px;background:#2271b1;color:#fff;font-size:11px;font-weight:600;line-height:1.7;vertical-align:1px;"><?= esc_html__('Recommended', 'baselayer') ?></span>
+                  <strong><?= esc_html__('BaseLayer Blocks', 'baselayer') ?></strong>
+                  <span class="bl-install-recommended" style="display:inline-block;margin-left:6px;padding:0 6px;border-radius:3px;background:#2271b1;color:#fff;font-size:11px;font-weight:600;line-height:20px;vertical-align:1px;"><?= esc_html__('Recommended', 'baselayer') ?></span>
                 </label>
-                <p class="description" style="margin: 0 0 12px 24px;"><?= esc_html__('Imports built-in block definitions and seeds Block Options. Manage blocks under the Blocks admin menu.', 'baselayer') ?></p>
+                <p class="description" style="margin: 0 0 12px 24px;"><?= esc_html__('Create and manage custom Gutenberg blocks, content fields, and website fields directly within BaseLayer. Includes built-in blocks such as Accordion.', 'baselayer') ?></p>
 
                 <label style="display: block; margin-bottom: 8px;">
                   <input type="radio" name="install[blocks_system]" value="acf" <?= $blocks_system === 'acf' ? ' checked' : '' ?> data-bl-blocks-system-toggle>
                   <strong><?= esc_html__('ACF Pro', 'baselayer') ?></strong>
+                  <span style="display:inline-block;margin-left:6px;padding:0 6px;border-radius:3px;background:#D97706;color:#fff;font-size:11px;font-weight:600;line-height:20px;vertical-align:1px;"><?= esc_html__('Requires ACF Pro Plugin', 'baselayer') ?></span>
                 </label>
-                <p class="description" style="margin: 0 0 12px 24px;"><?= esc_html__('Uses the theme’s ACF Pro blocks. Requires the ACF Pro plugin. Block Options still apply to core and ACF blocks.', 'baselayer') ?></p>
+                <p class="description" style="margin: 0 0 12px 24px;"><?= esc_html__('Use ACF Pro to build custom Gutenberg blocks. BaseLayer block options remain available for both Core and ACF blocks.', 'baselayer') ?></p>
 
                 <label style="display: block; margin-bottom: 8px;">
                   <input type="radio" name="install[blocks_system]" value="none" <?= $blocks_system === 'none' ? ' checked' : '' ?> data-bl-blocks-system-toggle>
                   <strong><?= esc_html__('None', 'baselayer') ?></strong>
                 </label>
-                <p class="description" style="margin: 0 0 12px 24px;"><?= esc_html__('Core Gutenberg only. You can enable BaseLayer Custom Blocks or ACF Pro later under Developer → Features.', 'baselayer') ?></p>
+                <p class="description" style="margin: 0 0 12px 24px;"><?= esc_html__('Use the default WordPress block editor. BaseLayer Blocks and ACF Pro can be enabled at any time.', 'baselayer') ?></p>
               </fieldset>
             </td>
           </tr>
@@ -515,7 +516,7 @@ function bl_render_installer(): void
                 <label style="display: block; margin-bottom: 8px;">
                   <input type="radio" name="install[content][seed_mode]" value="sample" <?= $content_seed_mode === 'sample' ? ' checked' : '' ?> data-bl-seed-mode-toggle>
                   <strong><?= esc_html__('Sample data', 'baselayer') ?></strong>
-                  <span class="bl-install-recommended" style="display:inline-block;margin-left:6px;padding:1px 7px;border-radius:3px;background:#2271b1;color:#fff;font-size:11px;font-weight:600;line-height:1.7;vertical-align:1px;"><?= esc_html__('Recommended', 'baselayer') ?></span>
+                  <span class="bl-install-recommended" style="display:inline-block;margin-left:6px;padding:0 6px;border-radius:3px;background:#2271b1;color:#fff;font-size:11px;font-weight:600;line-height:20px;vertical-align:1px;"><?= esc_html__('Recommended', 'baselayer') ?></span>
                 </label>
                 <p class="description" style="margin: 0 0 12px 24px;"><?= esc_html__('Creates a few pages, images, and sample items so you can learn the theme.', 'baselayer') ?></p>
 
@@ -1011,7 +1012,7 @@ function baselayer_run_install(): void
   $theme_slug = bl_install_sanitize_theme_slug((string) ($_POST['theme']['slug'] ?? ''));
 
   /**
-   * Features: merge central defaults, then apply Custom blocks system choice.
+   * Features: merge central defaults, then apply Blocks system choice.
    */
   $defaults = function_exists('bl_theme_feature_defaults') ? bl_theme_feature_defaults() : [];
   $features = get_option('baselayer_features', []);

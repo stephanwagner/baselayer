@@ -153,7 +153,7 @@ function initSeedModeToggle() {
 }
 
 /**
- * Custom blocks system: show ACF Pro license field when ACF is selected.
+ * Blocks system: show ACF Pro license field when ACF is selected.
  */
 function initBlocksSystemToggle() {
   const form = document.querySelector('form[data-bl-install-form]');

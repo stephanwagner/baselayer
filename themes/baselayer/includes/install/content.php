@@ -338,7 +338,7 @@ HTML;
  * Path to exported block HTML for an install page key (e.g. homepage → pages/homepage.html).
  */
 /**
- * Custom blocks system chosen for this install request / saved features.
+ * Blocks system chosen for this install request / saved features.
  *
  * @return 'baselayer'|'acf'|'none'
  */
