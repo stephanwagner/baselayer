@@ -1471,7 +1471,7 @@
       return wrap;
     }
     function renderChoices(item) {
-      const wrap = el("div", { className: "bl-bo-choices" });
+      const wrap = el("div", { className: "bl-bo-choices bl-has-small-inputs" });
       const showIconPicker = item.type === "button-group";
       (item.options || []).forEach((opt, oi) => {
         const children = [
@@ -2268,7 +2268,7 @@
         label: t3("tabAll", "All"),
         empty: t3(
           "emptyAll",
-          "No blocks with options yet. Add a block below, or import defaults under Blocks \u2192 Import / Export."
+          "No blocks with options yet. Add a block below."
         ),
         prefix: null
       }
@@ -3039,7 +3039,7 @@
     }
     function renderAddBlockBar(tab) {
       const choices = availableBlocksForTab(tab);
-      const bar = el2("div", { className: "bl-bo-add-block" });
+      const bar = el2("div", { className: "bl-bo-add-block bl-has-small-inputs" });
       const row = el2("div", { className: "bl-bo-add-block__row" });
       const select = el2("select", {
         className: "bl-bo-add-block__select",

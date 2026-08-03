@@ -11,6 +11,22 @@
   line-height: normal;
 }
 
+.bl-has-small-inputs input[type=text],
+.bl-has-small-inputs input[type=search],
+.bl-has-small-inputs input[type=email],
+.bl-has-small-inputs input[type=url],
+.bl-has-small-inputs input[type=number],
+.bl-has-small-inputs input[type=password],
+.bl-has-small-inputs input:not([type]),
+.bl-has-small-inputs select {
+  box-sizing: border-box;
+  height: 36px;
+  min-height: 36px;
+}
+.bl-has-small-inputs select {
+  line-height: 1.5;
+}
+
 .wp-core-ui .button.bl-button-small.-icon-only,
 .button.bl-button-small.-icon-only {
   flex: 0 0 auto;

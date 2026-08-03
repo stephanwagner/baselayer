@@ -39,7 +39,7 @@ They also appear under **Theme** in the icon picker. An example `logo-child.svg`
 
 Do **not** copy `packages/` into the child. Forms, Events, and Blocks always load from the parent theme (or as standalone plugins). Parent updates replace package code; site config stays in the database.
 
-- **Blocks:** on by default (Developer → Features). Custom block PHP/SCSS/JS live under `blocks/` in this theme. Import the catalog via **Blocks → Import / Export → Import theme catalog** (`blocks/blocks-import.json` in the parent or this child). Re-import updates by type + slug (no duplicates).
+- **Blocks:** on by default (Developer → Features). Custom block PHP/SCSS/JS live under `blocks/` in this theme. Catalog JSON lives at `blocks/blocks-import.json` (parent or this child). Move definitions between sites via **Blocks → Settings → Import / Export** (match by type + slug; no duplicates).
 - **Forms:** Developer → Features → Enable forms
 - **Events:** Developer → Features → Enable events, then configure each type under its menu → Settings (developers only; stored in `bl_events_instances` — not `config/content-types/`)
 

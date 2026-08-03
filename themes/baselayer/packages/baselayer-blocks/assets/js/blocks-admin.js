@@ -1957,7 +1957,7 @@
       return wrap;
     }
     function renderChoices(item) {
-      const wrap = el2("div", { className: "bl-bo-choices" });
+      const wrap = el2("div", { className: "bl-bo-choices bl-has-small-inputs" });
       const showIconPicker = item.type === "button-group";
       (item.options || []).forEach((opt, oi) => {
         const children = [

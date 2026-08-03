@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-08-02T23:59:07+00:00\n"
+"POT-Creation-Date: 2026-08-03T00:23:23+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: baselayer-blocks\n"
@@ -274,6 +274,9 @@ msgstr ""
 #: includes/admin-editor.php:278
 #: includes/admin-editor.php:367
 #: includes/admin-editor.php:370
+#: includes/import-export.php:57
+#: includes/import-export.php:58
+#: includes/import-export.php:415
 #: includes/runtime-site.php:108
 msgid "Settings"
 msgstr ""
@@ -330,7 +333,7 @@ msgid "Optional default overrides for this block:"
 msgstr ""
 
 #: includes/admin-editor.php:296
-msgid "No presets yet — import theme defaults or create presets under Block Options."
+msgid "No presets yet — create some under Block Options → Presets."
 msgstr ""
 
 #: includes/admin-editor.php:297
@@ -349,7 +352,7 @@ msgstr ""
 #: includes/admin-editor.php:533
 #: includes/block-options/admin.php:342
 #: includes/field-ui.php:1034
-#: includes/import-export.php:362
+#: includes/import-export.php:443
 #: includes/runtime-blocks.php:267
 #: includes/runtime-page.php:135
 msgid "Type"
@@ -1213,6 +1216,7 @@ msgstr ""
 #: includes/admin-editor.php:534
 #: includes/field-ui.php:722
 #: includes/field-ui.php:971
+#: includes/import-export.php:411
 msgid "Choose file"
 msgstr ""
 
@@ -1292,7 +1296,7 @@ msgstr ""
 #: includes/cpt.php:21
 #: includes/cpt.php:22
 #: includes/cpt.php:89
-#: includes/import-export.php:365
+#: includes/import-export.php:447
 msgid "Blocks"
 msgstr ""
 
@@ -1308,7 +1312,7 @@ msgstr ""
 #: includes/admin.php:119
 #: includes/cpt.php:77
 #: includes/cpt.php:78
-#: includes/import-export.php:366
+#: includes/import-export.php:448
 #: includes/runtime-page.php:51
 #: includes/runtime-page.php:162
 msgid "Content Fields"
@@ -1318,7 +1322,7 @@ msgstr ""
 #: includes/admin.php:127
 #: includes/cpt.php:83
 #: includes/cpt.php:84
-#: includes/import-export.php:367
+#: includes/import-export.php:449
 msgid "Website Fields"
 msgstr ""
 
@@ -1333,7 +1337,7 @@ msgid "Block name"
 msgstr ""
 
 #: includes/block-options/admin.php:304
-#: includes/import-export.php:364
+#: includes/import-export.php:446
 msgid "All"
 msgstr ""
 
@@ -1354,23 +1358,23 @@ msgid "Presets"
 msgstr ""
 
 #: includes/block-options/admin.php:310
-msgid "No blocks with options yet. Add a block below, or import defaults under Blocks → Import / Export."
+msgid "No blocks with options yet. Add a block below."
 msgstr ""
 
 #: includes/block-options/admin.php:311
-msgid "No BaseLayer blocks with options yet. Add a block below, or import defaults under Blocks → Import / Export."
+msgid "No BaseLayer blocks with options yet. Add a block below."
 msgstr ""
 
 #: includes/block-options/admin.php:312
-msgid "No ACF blocks with options yet. Add a block below, or import defaults under Blocks → Import / Export."
+msgid "No ACF blocks with options yet. Add a block below."
 msgstr ""
 
 #: includes/block-options/admin.php:313
-msgid "No Core blocks with options yet. Add a block below, or import defaults under Blocks → Import / Export."
+msgid "No Core blocks with options yet. Add a block below."
 msgstr ""
 
 #: includes/block-options/admin.php:314
-msgid "No presets yet. Add one, or import defaults under Blocks → Import / Export."
+msgid "No presets yet. Add one."
 msgstr ""
 
 #: includes/block-options/admin.php:315
@@ -1533,12 +1537,6 @@ msgstr ""
 
 #: includes/block-options/import.php:120
 msgid "Block options catalog JSON not found."
-msgstr ""
-
-#. translators: 1: preset count, 2: block count
-#: includes/block-options/import.php:176
-#, php-format
-msgid "Imported %1$d presets and %2$d block assignments."
 msgstr ""
 
 #: includes/config.php:375
@@ -1782,103 +1780,68 @@ msgstr ""
 msgid "Loading…"
 msgstr ""
 
-#: includes/import-export.php:16
-#: includes/import-export.php:17
-#: includes/import-export.php:348
+#: includes/import-export.php:15
 msgid "Import / Export"
 msgstr ""
 
-#: includes/import-export.php:130
+#: includes/import-export.php:171
 msgid "Skipped item without a slug."
 msgstr ""
 
 #. translators: 1: definition title, 2: slug
-#: includes/import-export.php:183
+#: includes/import-export.php:224
 #, php-format
 msgid "%1$s (%2$s)"
 msgstr ""
 
 #. translators: 1: created count, 2: updated count, 3: error count
-#: includes/import-export.php:245
+#: includes/import-export.php:286
 #, php-format
 msgid "Import finished: %1$d created, %2$d updated, %3$d errors."
 msgstr ""
 
-#: includes/import-export.php:291
-msgid "Theme catalog JSON not found (blocks/blocks-import.json)."
-msgstr ""
-
-#: includes/import-export.php:298
-msgid "Could not read theme catalog JSON."
-msgstr ""
-
-#: includes/import-export.php:308
+#: includes/import-export.php:349
 msgid "No file uploaded."
 msgstr ""
 
-#: includes/import-export.php:317
-#: includes/import-export.php:322
+#: includes/import-export.php:358
+#: includes/import-export.php:363
 msgid "Invalid JSON file."
 msgstr ""
 
-#: includes/import-export.php:335
+#: includes/import-export.php:399
 msgid "You do not have permission to manage Blocks."
 msgstr ""
 
-#: includes/import-export.php:357
-msgid "Export"
-msgstr ""
-
-#: includes/import-export.php:358
-msgid "Download definitions as JSON. Re-import matches by type and slug (like ACF field group keys): the same slug updates in place, never duplicates."
-msgstr ""
-
-#: includes/import-export.php:370
-msgid "Download JSON"
-msgstr ""
-
-#: includes/import-export.php:392
-msgid "Block Options defaults"
-msgstr ""
-
-#: includes/import-export.php:396
-msgid "Import presets and block assignments from the package seed. This replaces the current Block Options store."
-msgstr ""
-
-#: includes/import-export.php:397
-msgid "Import presets and block assignments from the theme catalog. This replaces the current Block Options store."
-msgstr ""
-
-#: includes/import-export.php:401
-msgid "Import defaults"
-msgstr ""
-
-#: includes/import-export.php:404
-msgid "No Block Options catalog found."
-msgstr ""
-
-#: includes/import-export.php:409
-#: includes/import-export.php:415
-msgid "Import theme catalog"
-msgstr ""
-
-#: includes/import-export.php:410
-msgid "Import the bundled block definitions from the active theme. Existing definitions with the same type and slug are updated; missing catalog entries are left alone."
-msgstr ""
-
-#: includes/import-export.php:418
-msgid "No catalog found. Add blocks/blocks-import.json to the theme."
-msgstr ""
-
-#: includes/import-export.php:423
-msgid "Import file"
+#: includes/import-export.php:412
+msgid "No file chosen"
 msgstr ""
 
 #: includes/import-export.php:424
+msgid "Blocks settings sections"
+msgstr ""
+
+#: includes/import-export.php:439
+msgid "Export"
+msgstr ""
+
+#: includes/import-export.php:440
+msgid "Download definitions as JSON. Re-import matches by type and slug: the same slug updates in place, never duplicates."
+msgstr ""
+
+#: includes/import-export.php:451
+msgid "Download JSON"
+msgstr ""
+
+#: includes/import-export.php:457
+msgid "Import"
+msgstr ""
+
+#: includes/import-export.php:458
 msgid "Upload a JSON export. Existing definitions with the same type and slug are updated."
 msgstr ""
 
-#: includes/import-export.php:430
+#: includes/import-export.php:474
 msgid "Import JSON"
 msgstr ""
 

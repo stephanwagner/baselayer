@@ -52,7 +52,7 @@ function boot() {
       label: t('tabAll', 'All'),
       empty: t(
         'emptyAll',
-        'No blocks with options yet. Add a block below, or import defaults under Blocks → Import / Export.'
+        'No blocks with options yet. Add a block below.'
       ),
       prefix: null,
     },
@@ -913,7 +913,7 @@ function boot() {
 
   function renderAddBlockBar(tab) {
     const choices = availableBlocksForTab(tab);
-    const bar = el('div', { className: 'bl-bo-add-block' });
+    const bar = el('div', { className: 'bl-bo-add-block bl-has-small-inputs' });
     const row = el('div', { className: 'bl-bo-add-block__row' });
     const select = el('select', {
       className: 'bl-bo-add-block__select',

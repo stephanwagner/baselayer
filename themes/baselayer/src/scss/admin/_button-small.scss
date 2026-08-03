@@ -5,6 +5,27 @@
   @include button-small;
 }
 
+// Scope: text inputs / selects match bl-button-small (36px).
+.bl-has-small-inputs {
+  input[type='text'],
+  input[type='search'],
+  input[type='email'],
+  input[type='url'],
+  input[type='number'],
+  input[type='password'],
+  input:not([type]),
+  select {
+    box-sizing: border-box;
+    height: 36px;
+    min-height: 36px;
+  }
+
+  // Match form-builder: keep select text vertically centered at 36px.
+  select {
+    line-height: 1.5;
+  }
+}
+
 // Square icon-only control matching bl-button-small height.
 .wp-core-ui .button.bl-button-small.-icon-only,
 .button.bl-button-small.-icon-only {

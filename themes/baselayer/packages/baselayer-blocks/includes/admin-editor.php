@@ -293,7 +293,7 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'choosePreset'             => __('Preset', 'baselayer-blocks'),
 		'presetDefaultsHelp'       => __('Optional default overrides for this block:', 'baselayer-blocks'),
 		'defaultValue'             => __('Default', 'baselayer-blocks'),
-		'noPresetsYet'             => __('No presets yet — import theme defaults or create presets under Block Options.', 'baselayer-blocks'),
+		'noPresetsYet'             => __('No presets yet — create some under Block Options → Presets.', 'baselayer-blocks'),
 		'noCustoms'               => __('No custom controls registered.', 'baselayer-blocks'),
 		'optionLabel'              => __('Label', 'baselayer-blocks'),
 		'optionDescription'        => __('Description', 'baselayer-blocks'),
