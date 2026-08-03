@@ -12,6 +12,16 @@ const blocksPkg = 'themes/baselayer/packages/baselayer-blocks';
 
 const themeBundles = [
   { input: `${themeDir}/src/js/main/main.js`, name: 'baselayer', outDir: `${themeDir}/assets/js` },
+  {
+    input: `${themeDir}/src/js/blocks/blocks-baselayer.js`,
+    name: 'blocks-baselayer',
+    outDir: `${themeDir}/assets/js`
+  },
+  {
+    input: `${themeDir}/src/js/blocks/blocks-acf.js`,
+    name: 'blocks-acf',
+    outDir: `${themeDir}/assets/js`
+  },
   { input: `${themeDir}/src/js/admin/admin.js`, name: 'admin', outDir: `${themeDir}/assets/js` },
   {
     input: `${themeDir}/src/js/editor/editor.js`,

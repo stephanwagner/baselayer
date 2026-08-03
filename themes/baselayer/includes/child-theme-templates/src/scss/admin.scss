@@ -1,5 +1,8 @@
 /**
  * Complete child theme admin/editor bundle — compiled to assets/css/admin.css.
+ *
+ * Parent enqueues exclusive block editor CSS (blocks-baselayer-editor /
+ * blocks-acf-editor) for the active system. Child-only overrides under blocks/.
  */
 
 // Config
@@ -11,10 +14,6 @@
 // Child-only CSS custom properties
 @forward 'root';
 
-// Override ACF assets only if you fork parent acf/ into this child:
-// @forward '../../acf/blocks/blocks' as acf-*;
-// @forward '../../acf/blocks/blocks-editor' as acf-editor-*;
-
-// Child BaseLayer custom blocks
+// Child BaseLayer custom block overrides (front + editor tweaks)
 @forward '../../blocks/blocks';
 @forward '../../blocks/blocks-editor';

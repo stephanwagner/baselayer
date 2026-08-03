@@ -9,15 +9,16 @@ Ships inside the parent theme as `themes/baselayer/acf/`. Enabled when **Custom 
 
 ## Assets
 
-Parent theme SCSS/JS already include ACF block styles and scripts:
+Parent builds exclusive block bundles and enqueues them only when `bl_theme_blocks_system()` is `acf`:
 
-- `src/scss/main.scss` → `@forward '../../acf/blocks/blocks' as acf-*;`
-- `src/scss/admin.scss` → blocks + blocks-editor (namespaced)
-- `src/js/main/main.js` → `import '../../../acf/blocks/blocks.js'`
+- Front: `assets/js/blocks-acf.js`, `assets/css/blocks-acf.css`
+- Admin / editor canvas: `assets/css/blocks-acf-editor.css`
 
-Child themes that `@forward` parent `main` / `admin` inherit these assets. No uncommenting or copying is required for the default path.
+Source entries: `src/js/blocks/blocks-acf.js`, `src/scss/blocks-acf.scss`, `src/scss/blocks-acf-editor.scss`.
 
-If you fork ACF into a **child** theme as `acf/`, PHP loads the child’s `acf/acf.php` first. You only need child SCSS/JS imports when you override ACF assets in the child.
+BaseLayer Custom Blocks uses the parallel `blocks-baselayer*` assets. Neither system is imported into `main` / `admin` core bundles.
+
+If you fork ACF into a **child** theme as `acf/`, PHP loads the child’s `acf/acf.php` first. Add child SCSS/JS only when you override ACF assets in the child.
 
 ## Field groups
 

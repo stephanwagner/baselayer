@@ -1,15 +1,13 @@
-import $ from 'jquery';
 import { CountUp } from 'countup.js';
 import { onEnterViewport } from '../../src/js/utils/viewport.js';
 
 const containerSelector = '.bl-wp-block.-baselayer-block.number-ticker__wrapper';
 
-const tickerContainer = $(containerSelector);
-if (tickerContainer.length) {
+if (document.querySelector(containerSelector)) {
   onEnterViewport(containerSelector, function () {
-    $.each($(containerSelector + ' [data-countup]'), function (index, el) {
-      const startNumber = $(el).html();
-      const targetNumber = $(el).attr('data-countup');
+    document.querySelectorAll(`${containerSelector} [data-countup]`).forEach((el) => {
+      const startNumber = el.innerHTML;
+      const targetNumber = el.getAttribute('data-countup');
       const numAnim = new CountUp(el, targetNumber, {
         startVal: startNumber,
         separator: '',

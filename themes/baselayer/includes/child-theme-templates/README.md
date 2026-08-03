@@ -58,13 +58,20 @@ Optional Events markup overrides (child wins via the same template paths as the 
 
 ## ACF Pro
 
-ACF Pro ships in the **parent** theme (`baselayer/acf/`) and is enabled via **Developer → Features → Custom blocks → ACF Pro** (or the install radio). Parent SCSS/JS already include ACF block assets; child builds that forward parent `main` / `admin` inherit them.
+ACF Pro ships in the **parent** theme (`baselayer/acf/`) and is enabled via **Developer → Features → Custom blocks → ACF Pro** (or the install radio).
 
-Only if you fork ACF into this child as `acf/`:
+Parent builds exclusive block assets and enqueues only the active system:
+
+- BaseLayer → `blocks-baselayer.js` / `.css` (+ editor CSS in admin)
+- ACF Pro → `blocks-acf.js` / `.css` (+ editor CSS in admin)
+- None → no block system assets
+
+Child `main` / `admin` bundles forward parent core styles only; they should **not** re-forward parent ACF/BaseLayer block trees (parent already loads the chosen system separately). Keep child-only block overrides under this theme’s `blocks/`.
+
+Only if you fork ACF into this child as `acf/` and need local asset overrides:
 
 1. Keep ACF Pro selected under Features
-2. Uncomment the ACF `@forward` / `import` lines in `src/scss/main.scss`, `src/scss/admin.scss`, and `src/js/main.js` if you override assets here
-3. `npm run build`
-4. Optionally import field groups from the parent’s `acf/acf-import-*.json` via **ACF → Tools**
+2. Add child SCSS/JS entrypoints or imports for your forked `acf/blocks` and rebuild
+3. Optionally import field groups from the parent’s `acf/acf-import-*.json` via **ACF → Tools**
 
 See `acf/README.md` in the parent theme for details.

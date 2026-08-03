@@ -54,9 +54,7 @@
 // Pages
 @forward 'layout/page-not-found';
 
-// Blocks (BaseLayer + ACF Pro theme blocks).
-@forward '../../blocks/blocks';
-@forward '../../acf/blocks/blocks' as acf-*;
+// Block styles are exclusive bundles (blocks-baselayer / blocks-acf), enqueued by PHP.
 
 // Block adjustments
 @forward 'layout/shared/wordpress-blocks';

@@ -9,6 +9,10 @@
  *
  * Watch for changes and build automatically:
  *   npm run watch
+ *
+ * Parent ships exclusive block CSS (blocks-baselayer / blocks-acf) enqueued by
+ * Features/install. This child main bundle should not re-forward parent block
+ * trees. Child-only block style overrides live under blocks/ below.
  */
 
 // Config
@@ -20,8 +24,5 @@
 // Child-only CSS custom properties
 @forward 'root';
 
-// Override ACF assets only if you fork parent acf/ into this child:
-// @forward '../../acf/blocks/blocks' as acf-*;
-
-// Child BaseLayer custom blocks
+// Child BaseLayer custom block overrides
 @forward '../../blocks/blocks';

@@ -9,12 +9,13 @@
  *
  * Watch for changes and build automatically:
  *   npm run watch
+ *
+ * Parent enqueues exclusive block scripts (blocks-baselayer / blocks-acf) based on
+ * Developer → Features → Custom blocks. Add child-only block behaviour under
+ * blocks/ and import it here if needed.
  */
 
-// Override ACF scripts only if you fork parent acf/ into this child:
-// import '../../acf/blocks/blocks.js';
-
-// BaseLayer custom blocks
+// Child BaseLayer custom block overrides (optional)
 import '../../blocks/blocks.js';
 
 // Test log message

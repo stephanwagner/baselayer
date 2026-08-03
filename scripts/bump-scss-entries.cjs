@@ -10,7 +10,11 @@ const { themeDir } = require('./config.cjs');
 const root = path.join(__dirname, '..');
 const entries = [
   path.join(root, themeDir, 'src/scss/main.scss'),
-  path.join(root, themeDir, 'src/scss/admin.scss')
+  path.join(root, themeDir, 'src/scss/admin.scss'),
+  path.join(root, themeDir, 'src/scss/blocks-baselayer.scss'),
+  path.join(root, themeDir, 'src/scss/blocks-acf.scss'),
+  path.join(root, themeDir, 'src/scss/blocks-baselayer-editor.scss'),
+  path.join(root, themeDir, 'src/scss/blocks-acf-editor.scss'),
 ];
 
 const t = new Date();

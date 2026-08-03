@@ -1,3 +1,7 @@
+import { closeMenu, menuIsOpen, openMenu, syncMainMenuA11yState } from './menu-state';
+
+export { closeMenu, menuIsOpen, openMenu, syncMainMenuA11yState };
+
 // Menu toggler
 document.addEventListener('DOMContentLoaded', () => {
   syncMainMenuA11yState();
@@ -5,13 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     el.addEventListener('click', toggleMenu);
   });
 });
-
-function syncMainMenuA11yState() {
-  var expanded = menuIsOpen();
-  document.querySelectorAll('[data-toggle-menu]').forEach((el) => {
-    el.setAttribute('aria-expanded', expanded ? 'true' : 'false');
-  });
-}
 
 // Toggle menu
 export function toggleMenu() {
@@ -25,23 +22,6 @@ export function toggleMenu() {
   if (overlay) {
     overlay.addEventListener('click', closeMenu, { once: true });
   }
-}
-
-// Open menu
-export function openMenu() {
-  document.body.classList.add('-menu-open', '-menu-block-scroll');
-  syncMainMenuA11yState();
-}
-
-// Close menu
-export function closeMenu() {
-  document.body.classList.remove('-menu-open', '-menu-block-scroll');
-  syncMainMenuA11yState();
-}
-
-// Check if menu is open
-export function menuIsOpen() {
-  return document.body.classList.contains('-menu-open');
 }
 
 export function setSubmenuExpanded(btn, expanded) {

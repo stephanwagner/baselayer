@@ -1,9 +1,8 @@
-import $ from 'jquery';
-
+const SCOPE = '.bl-wp-block.-baselayer-block';
 const googleMapsLocalStorageKey = 'google-maps-accepted';
 
-const googleMapsWrappers = $('.bl-wp-block.-baselayer-block [data-google-maps-wrapper]');
-const googleMapsInitButtons = $('.bl-wp-block.-baselayer-block [data-google-maps-accept-button]');
+const googleMapsWrappers = document.querySelectorAll(`${SCOPE} [data-google-maps-wrapper]`);
+const googleMapsInitButtons = document.querySelectorAll(`${SCOPE} [data-google-maps-accept-button]`);
 
 if (googleMapsWrappers.length) {
   if (isGoogleMapsAccepted()) {
@@ -12,48 +11,38 @@ if (googleMapsWrappers.length) {
     showGoogleMapsDsgvo();
   }
 
-  googleMapsInitButtons.on('click', function (ev) {
-    ev.preventDefault();
-    setGoogleMapsAccepted();
-    initGoogleMaps();
+  googleMapsInitButtons.forEach((btn) => {
+    btn.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      setGoogleMapsAccepted();
+      initGoogleMaps();
+    });
   });
 }
 
 /**
- * Checks if Google Maps was accepted
- *
- * @returns {bool} - True if accepted, false otherwise
+ * @returns {boolean}
  */
 export function isGoogleMapsAccepted() {
   return (
-    localStorage.getItem(googleMapsLocalStorageKey) === '1' || (typeof window.BorlabsCookie !== 'undefined' && window.BorlabsCookie.Consents.hasConsent('maps'))
+    localStorage.getItem(googleMapsLocalStorageKey) === '1' ||
+    (typeof window.BorlabsCookie !== 'undefined' && window.BorlabsCookie.Consents.hasConsent('maps'))
   );
 }
 window.isGoogleMapsAccepted = isGoogleMapsAccepted;
 
-/**
- * Marks that google Maps was accepted
- */
 export function setGoogleMapsAccepted() {
   localStorage.setItem(googleMapsLocalStorageKey, '1');
 }
 window.setGoogleMapsAccepted = setGoogleMapsAccepted;
 
-/**
- * Removes that google Maps was accepted
- */
 export function removeGoogleMapsAccepted() {
   localStorage.removeItem(googleMapsLocalStorageKey);
 }
 window.removeGoogleMapsAccepted = removeGoogleMapsAccepted;
 
 /**
- * Creates the HTML of the Google maps iFrame
- *
- * @param {number} lat - The latitude of the location
- * @param {number} lng - The longitude of the location
- * @param {number} [zoom=14] - The zoom level (optional, default is 14)
- * @returns {HTMLIFrameElement} The generated iframe element
+ * @returns {HTMLIFrameElement}
  */
 function createGoogleMapsEmbed(type, lat, lng, address, zoom = 14) {
   let url;
@@ -79,47 +68,39 @@ function createGoogleMapsEmbed(type, lat, lng, address, zoom = 14) {
   return iframe;
 }
 
-/**
- * Show the DSGVO overlay
- */
 function showGoogleMapsDsgvo() {
-  $('.bl-wp-block.-baselayer-block [data-google-maps-notice-container]').addClass('-active');
+  document.querySelectorAll(`${SCOPE} [data-google-maps-notice-container]`).forEach((el) => {
+    el.classList.add('-active');
+  });
 }
 
-/**
- * Hide the DSGVO overlay
- */
 function hideGoogleMapsDsgvo() {
-  $('.bl-wp-block.-baselayer-block [data-google-maps-notice-container]').removeClass('-active');
+  document.querySelectorAll(`${SCOPE} [data-google-maps-notice-container]`).forEach((el) => {
+    el.classList.remove('-active');
+  });
 }
 
-/**
- * Show the Google Maps canvas
- */
 function showGoogleMapsCanvas() {
-  $('.bl-wp-block.-baselayer-block [data-google-maps-canvas]').addClass('-active');
+  document.querySelectorAll(`${SCOPE} [data-google-maps-canvas]`).forEach((el) => {
+    el.classList.add('-active');
+  });
 }
 
-/**
- * Add the Google Maps iFrame
- */
 function initGoogleMaps() {
   hideGoogleMapsDsgvo();
 
-  const googleMapsWrappers = $('.bl-wp-block.-baselayer-block [data-google-maps-wrapper]');
+  document.querySelectorAll(`${SCOPE} [data-google-maps-wrapper]`).forEach((wrapper) => {
+    const type = wrapper.getAttribute('data-type');
+    const address = wrapper.getAttribute('data-address');
+    const lat = wrapper.getAttribute('data-lat') || 0;
+    const lng = wrapper.getAttribute('data-lng') || 0;
+    const zoom = wrapper.getAttribute('data-zoom') || 14;
 
-  googleMapsWrappers.each(function (index, item) {
-    const wrapper = $(item);
-    const type = wrapper.attr('data-type');
-    const address = wrapper.attr('data-address');
-    const lat = wrapper.attr('data-lat') || 0;
-    const lng = wrapper.attr('data-lng') || 0;
-    const zoom = wrapper.attr('data-zoom') || 14;
-
-    const iFrameHtml = createGoogleMapsEmbed(type, lat, lng, address, zoom);
-    const target = wrapper.find('[data-google-maps-canvas]');
-
-    target.html(iFrameHtml);
+    const iframe = createGoogleMapsEmbed(type, lat, lng, address, zoom);
+    const target = wrapper.querySelector('[data-google-maps-canvas]');
+    if (target) {
+      target.replaceChildren(iframe);
+    }
     showGoogleMapsCanvas();
   });
 }

@@ -309,10 +309,12 @@ function bl_styles(): void
 	$child = bl_child_theme_built_asset('css', 'main');
 	if ($child !== null) {
 		wp_enqueue_style('baselayer-styles', $child['uri'], [], $child['ver']);
+		bl_enqueue_blocks_system_front_styles();
 		return;
 	}
 
 	bl_enqueue_theme_style('baselayer-styles', 'baselayer');
+	bl_enqueue_blocks_system_front_styles();
 }
 add_action('wp_enqueue_scripts', 'bl_styles');
 
@@ -495,10 +497,12 @@ function bl_enqueue_admin_styles(): void
 	$child = bl_child_theme_built_asset('css', 'admin');
 	if ($child !== null) {
 		wp_enqueue_style('main-admin-styles', $child['uri'], [], $child['ver']);
+		bl_enqueue_blocks_system_editor_assets();
 		return;
 	}
 
 	bl_enqueue_theme_style('main-admin-styles', 'admin');
+	bl_enqueue_blocks_system_editor_assets();
 }
 
 /**
@@ -584,8 +588,71 @@ function bl_scripts(): void
 			'triggerLabelEmpty' => __('Select language', 'baselayer'),
 		]);
 	}
+
+	bl_enqueue_blocks_system_front_scripts();
 }
 add_action('wp_enqueue_scripts', 'bl_scripts');
+
+/**
+ * Exclusive custom-blocks front styles for the active system (baselayer | acf | none).
+ */
+function bl_enqueue_blocks_system_front_styles(): void
+{
+	if (!function_exists('bl_theme_blocks_system')) {
+		return;
+	}
+
+	$system = bl_theme_blocks_system();
+	if ($system === 'baselayer') {
+		bl_enqueue_theme_style('baselayer-blocks-styles', 'blocks-baselayer', ['baselayer-styles']);
+		return;
+	}
+
+	if ($system === 'acf') {
+		bl_enqueue_theme_style('baselayer-blocks-styles', 'blocks-acf', ['baselayer-styles']);
+	}
+}
+
+/**
+ * Exclusive custom-blocks front scripts for the active system.
+ */
+function bl_enqueue_blocks_system_front_scripts(): void
+{
+	if (!function_exists('bl_theme_blocks_system')) {
+		return;
+	}
+
+	$system = bl_theme_blocks_system();
+	if ($system === 'baselayer') {
+		bl_enqueue_theme_script('baselayer-blocks-scripts', 'blocks-baselayer', ['baselayer-scripts'], true);
+		return;
+	}
+
+	if ($system === 'acf') {
+		bl_enqueue_theme_script('baselayer-blocks-scripts', 'blocks-acf', ['baselayer-scripts'], true);
+	}
+}
+
+/**
+ * Exclusive custom-blocks editor/admin canvas styles for the active system.
+ */
+function bl_enqueue_blocks_system_editor_assets(): void
+{
+	if (!function_exists('bl_theme_blocks_system')) {
+		return;
+	}
+
+	$system = bl_theme_blocks_system();
+	$deps = ['main-admin-styles'];
+	if ($system === 'baselayer') {
+		bl_enqueue_theme_style('baselayer-blocks-editor-styles', 'blocks-baselayer-editor', $deps);
+		return;
+	}
+
+	if ($system === 'acf') {
+		bl_enqueue_theme_style('baselayer-blocks-editor-styles', 'blocks-acf-editor', $deps);
+	}
+}
 
 /**
  * Enqueue admin scripts (admin.js).

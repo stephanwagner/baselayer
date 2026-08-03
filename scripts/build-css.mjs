@@ -18,6 +18,26 @@ const sassLoadPathArgs = ['--load-path', path.join(root, 'node_modules')];
 
 const entries = [
   { src: `${themeDir}/src/scss/main.scss`, name: 'baselayer', outDir: `${themeDir}/assets/css` },
+  {
+    src: `${themeDir}/src/scss/blocks-baselayer.scss`,
+    name: 'blocks-baselayer',
+    outDir: `${themeDir}/assets/css`
+  },
+  {
+    src: `${themeDir}/src/scss/blocks-acf.scss`,
+    name: 'blocks-acf',
+    outDir: `${themeDir}/assets/css`
+  },
+  {
+    src: `${themeDir}/src/scss/blocks-baselayer-editor.scss`,
+    name: 'blocks-baselayer-editor',
+    outDir: `${themeDir}/assets/css`
+  },
+  {
+    src: `${themeDir}/src/scss/blocks-acf-editor.scss`,
+    name: 'blocks-acf-editor',
+    outDir: `${themeDir}/assets/css`
+  },
   { src: `${themeDir}/src/scss/admin.scss`, name: 'admin', outDir: `${themeDir}/assets/css` },
   { src: `${themeDir}/src/scss/admin-bar.scss`, name: 'admin-bar', outDir: `${themeDir}/assets/css` },
   {

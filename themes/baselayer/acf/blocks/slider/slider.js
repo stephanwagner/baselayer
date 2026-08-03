@@ -1,42 +1,31 @@
-import $ from 'jquery';
 import Swiper from 'swiper';
 import { Autoplay, EffectFade, Pagination, Navigation } from 'swiper/modules';
 
-const sliders = $('.bl-wp-block.-acf-block.slider__wrapper');
+document.querySelectorAll('.bl-wp-block.-acf-block.slider__wrapper').forEach((slider) => {
+  const sliderWrapper = slider;
+  const id = sliderWrapper.getAttribute('data-slider-id');
+  const slideCount = sliderWrapper.querySelectorAll('.slider-slide__wrapper').length;
 
-$.each(sliders, function (index, slider) {
-  // Wrapper
-  const sliderWrapper = $(slider);
-
-  // Id
-  const id = sliderWrapper.attr('data-slider-id');
-
-  const slideCount = sliderWrapper.find('.slider-slide__wrapper').length;
-
-  // One slide: no nav, pagination, loop, or autoplay
   if (slideCount <= 1) {
-    sliderWrapper.attr('data-slider-navigation', 'false');
-    sliderWrapper.attr('data-slider-pagination', 'false');
-    sliderWrapper.attr('data-slider-loop', 'false');
-    sliderWrapper.attr('data-slider-autoplay', 'false');
+    sliderWrapper.setAttribute('data-slider-navigation', 'false');
+    sliderWrapper.setAttribute('data-slider-pagination', 'false');
+    sliderWrapper.setAttribute('data-slider-loop', 'false');
+    sliderWrapper.setAttribute('data-slider-autoplay', 'false');
   }
 
-  const paginationEl = sliderWrapper.find('.slider__pagination')[0];
-  const nextEl = sliderWrapper.find('.slider__button-next')[0];
-  const prevEl = sliderWrapper.find('.slider__button-prev')[0];
+  const paginationEl = sliderWrapper.querySelector('.slider__pagination');
+  const nextEl = sliderWrapper.querySelector('.slider__button-next');
+  const prevEl = sliderWrapper.querySelector('.slider__button-prev');
 
-  // Modules
   const modules = [Autoplay, Pagination, Navigation];
 
-  // Construct config object
   const sliderConfig = {
     wrapperClass: 'acf-innerblocks-container',
-    effect: sliderWrapper.attr('data-slider-animation') || 'slide',
+    effect: sliderWrapper.getAttribute('data-slider-animation') || 'slide',
     speed: 800,
   };
 
-  // Animation effect
-  switch (sliderWrapper.attr('data-slider-animation')) {
+  switch (sliderWrapper.getAttribute('data-slider-animation')) {
     case 'fade':
       modules.push(EffectFade);
       sliderConfig.fadeEffect = {
@@ -45,18 +34,13 @@ $.each(sliders, function (index, slider) {
       break;
   }
 
-  // Loop
-  sliderConfig.loop = sliderWrapper.attr('data-slider-loop') === 'true';
+  sliderConfig.loop = sliderWrapper.getAttribute('data-slider-loop') === 'true';
 
-  // Space between
-  let spaceBetween = parseInt(sliderWrapper.attr('data-slider-space-between'));
+  let spaceBetween = parseInt(sliderWrapper.getAttribute('data-slider-space-between'), 10);
   sliderConfig.spaceBetween = spaceBetween || spaceBetween === 0 ? spaceBetween : 16;
 
-  // Slides per view
-  sliderConfig.slidesPerView = parseInt(sliderWrapper.attr('data-slider-slides-per-view')) || 1;
-
-  // Slides per group
-  sliderConfig.slidesPerGroup = parseInt(sliderWrapper.attr('data-slider-slides-per-group')) || 1;
+  sliderConfig.slidesPerView = parseInt(sliderWrapper.getAttribute('data-slider-slides-per-view'), 10) || 1;
+  sliderConfig.slidesPerGroup = parseInt(sliderWrapper.getAttribute('data-slider-slides-per-group'), 10) || 1;
 
   if (sliderConfig.slidesPerView == 2) {
     sliderConfig.breakpoints = {
@@ -127,9 +111,8 @@ $.each(sliders, function (index, slider) {
     };
   }
 
-  // Pagination (scoped per slider — global selectors break with multiple blocks on one page)
-  const hasDynamicBullets = sliderWrapper.attr('data-slider-dynamic-bullets') === 'true';
-  if (slideCount > 1 && sliderWrapper.attr('data-slider-pagination') === 'true' && paginationEl) {
+  const hasDynamicBullets = sliderWrapper.getAttribute('data-slider-dynamic-bullets') === 'true';
+  if (slideCount > 1 && sliderWrapper.getAttribute('data-slider-pagination') === 'true' && paginationEl) {
     sliderConfig.pagination = {
       el: paginationEl,
       clickable: true,
@@ -138,17 +121,15 @@ $.each(sliders, function (index, slider) {
     };
   }
 
-  // Navigation
-  if (slideCount > 1 && sliderWrapper.attr('data-slider-navigation') === 'true' && nextEl && prevEl) {
+  if (slideCount > 1 && sliderWrapper.getAttribute('data-slider-navigation') === 'true' && nextEl && prevEl) {
     sliderConfig.navigation = {
       nextEl,
       prevEl,
     };
   }
 
-  // Autoplay
-  if (sliderWrapper.attr('data-slider-autoplay') === 'true') {
-    let autoplayDelay = parseFloat(sliderWrapper.attr('data-slider-autoplay-delay'));
+  if (sliderWrapper.getAttribute('data-slider-autoplay') === 'true') {
+    let autoplayDelay = parseFloat(sliderWrapper.getAttribute('data-slider-autoplay-delay'));
     if (!autoplayDelay) {
       autoplayDelay = 6000;
     } else {
@@ -162,22 +143,28 @@ $.each(sliders, function (index, slider) {
     };
   }
 
-  // Modules
   sliderConfig.modules = modules;
 
-  // Slider selector
-  const sliderSelector = '.slider__wrapper[data-slider-id="' + id + '"] .swiper';
+  const swiperEl = sliderWrapper.querySelector('.swiper');
+  if (!swiperEl) {
+    return;
+  }
 
-  // Init slider
-  const swiper = new Swiper(sliderSelector, sliderConfig);
+  const swiper = new Swiper(swiperEl, sliderConfig);
 
-  // Stop autoplay then clicking on or in slide
-  sliderWrapper.find('.slider-slide__wrapper').on('click', function () {
-    swiper.autoplay.stop();
+  sliderWrapper.querySelectorAll('.slider-slide__wrapper').forEach((slide) => {
+    slide.addEventListener('click', () => {
+      if (swiper.autoplay && typeof swiper.autoplay.stop === 'function') {
+        swiper.autoplay.stop();
+      }
+    });
   });
 
-  // Stop autoplay when starting to play video
-  sliderWrapper.find('video').on('play', function () {
-    swiper.autoplay.stop();
+  sliderWrapper.querySelectorAll('video').forEach((video) => {
+    video.addEventListener('play', () => {
+      if (swiper.autoplay && typeof swiper.autoplay.stop === 'function') {
+        swiper.autoplay.stop();
+      }
+    });
   });
 });

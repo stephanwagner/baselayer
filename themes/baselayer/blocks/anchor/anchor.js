@@ -1,7 +1,7 @@
-import $ from 'jquery';
-
 import { scrollToElement, getOffset } from '../../src/js/utils/scroll-to-element';
-import { closeMenu } from '../../src/js/main/menu';
+import { closeMenu } from '../../src/js/main/menu-state';
+
+const SCOPE = '.bl-wp-block.-baselayer-block';
 
 function getHashIdFromHref(href) {
   if (!href || typeof href !== 'string' || href.indexOf('#') === -1) {
@@ -34,24 +34,25 @@ function isAccordionHash(hashId) {
     return false;
   }
 
-  return $('.bl-wp-block.-baselayer-block.accordion__wrapper[data-accordion-id="' + hashId + '"]').length > 0;
+  return !!document.querySelector(`${SCOPE}.accordion__wrapper[data-accordion-id="${CSS.escape(hashId)}"]`);
 }
 
+/**
+ * @param {Element} anchorEl
+ */
 function scrollToAnchor(anchorEl) {
-  let targetEl = anchorEl;
-  if (anchorEl.next().length) {
-    targetEl = anchorEl.next();
-  }
-  if (!targetEl.length || !anchorEl.length) {
+  let targetEl = anchorEl.nextElementSibling || anchorEl;
+  if (!targetEl || !anchorEl) {
     return;
   }
 
   let offset = getOffset();
-  if (anchorEl.attr('data-anchor-offset')) {
-    offset += parseInt(anchorEl.attr('data-anchor-offset'), 10);
+  const offsetAttr = anchorEl.getAttribute('data-anchor-offset');
+  if (offsetAttr) {
+    offset += parseInt(offsetAttr, 10);
   }
 
-  scrollToElement(targetEl[0], offset);
+  scrollToElement(targetEl, offset);
 }
 
 function scrollToAnchorByHash(hash) {
@@ -64,29 +65,28 @@ function scrollToAnchorByHash(hash) {
     return;
   }
 
-  const anchorEl = $('.bl-wp-block.-baselayer-block[data-anchor-id="' + hashId + '"]').first();
-  if (anchorEl.length) {
+  const anchorEl = document.querySelector(`${SCOPE}[data-anchor-id="${CSS.escape(hashId)}"]`);
+  if (anchorEl) {
     scrollToAnchor(anchorEl);
   }
 }
 
-if ($('.bl-wp-block.-baselayer-block[data-anchor-id]').length) {
-  $('a[href*="#"]').each(function (index, item) {
-    const link = $(item);
-    const href = link.attr('href');
+if (document.querySelector(`${SCOPE}[data-anchor-id]`)) {
+  document.querySelectorAll('a[href*="#"]').forEach((link) => {
+    const href = link.getAttribute('href') || '';
     const hashId = getHashIdFromHref(href);
 
     if (!hashId || isAccordionHash(hashId)) {
       return;
     }
 
-    const anchorEl = $('.bl-wp-block.-baselayer-block[data-anchor-id="' + hashId + '"]').first();
-    if (!anchorEl.length) {
+    const anchorEl = document.querySelector(`${SCOPE}[data-anchor-id="${CSS.escape(hashId)}"]`);
+    if (!anchorEl) {
       return;
     }
 
-    link.on('click', function (e) {
-      const currentHref = link.attr('href');
+    link.addEventListener('click', (e) => {
+      const currentHref = link.getAttribute('href') || '';
       const currentHashId = getHashIdFromHref(currentHref);
 
       if (!currentHashId || isAccordionHash(currentHashId) || !isSamePageHashLink(currentHref)) {
@@ -105,30 +105,36 @@ if ($('.bl-wp-block.-baselayer-block[data-anchor-id]').length) {
   });
 }
 
-var checkActiveNav = function () {
-  $($('.bl-wp-block.-baselayer-block[data-anchor-id]').get().reverse()).each(function (index, item) {
-    var id = $(item).attr('data-anchor-id');
-    var windowTop = $(document).scrollTop();
-    let itemTop = $(item).offset().top;
-    if ($(item).next().length) {
-      itemTop = $(item).next().offset().top;
-    }
-    $('header .menu-item').removeClass('-current-active');
+function checkActiveNav() {
+  const anchors = Array.from(document.querySelectorAll(`${SCOPE}[data-anchor-id]`)).reverse();
+  const windowTop = window.scrollY || document.documentElement.scrollTop;
+  const menuItems = document.querySelectorAll('header .menu-item');
 
-    let offset = getOffset() * -1 + 4;
+  menuItems.forEach((item) => item.classList.remove('-current-active'));
+
+  for (const item of anchors) {
+    const id = item.getAttribute('data-anchor-id');
+    let itemTop = item.getBoundingClientRect().top + windowTop;
+    if (item.nextElementSibling) {
+      itemTop = item.nextElementSibling.getBoundingClientRect().top + windowTop;
+    }
+
+    const offset = getOffset() * -1 + 4;
 
     if (windowTop >= 16 && windowTop > itemTop - offset) {
-      $('header .menu-item').each(function (index, item) {
-        const link = $(item).find('> a[href*="#' + id + '"]');
-        if (link.length) {
-          $(item).addClass('-current-active');
+      menuItems.forEach((menuItem) => {
+        const link = menuItem.querySelector(`:scope > a[href*="#${CSS.escape(id)}"]`);
+        if (link) {
+          menuItem.classList.add('-current-active');
         }
       });
-      return false;
+      break;
     }
-  });
-};
-$(window).on('scroll resize', checkActiveNav);
+  }
+}
+
+window.addEventListener('scroll', checkActiveNav, { passive: true });
+window.addEventListener('resize', checkActiveNav);
 checkActiveNav();
 
 window.addEventListener('load', () => {
