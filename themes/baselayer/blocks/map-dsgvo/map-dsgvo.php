@@ -3,7 +3,7 @@
  * Map GDPR consent block (BaseLayer Blocks).
  */
 
-$class_names = ['bl-wp-block', 'map-dsgvo__wrapper', '-container-margin-xs'];
+$class_names = ['bl-wp-block', '-baselayer-block', 'map-dsgvo__wrapper', '-container-margin-xs'];
 $wrapper_attributes = get_block_wrapper_attributes([
 	'class' => implode(' ', $class_names),
 ]);

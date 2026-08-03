@@ -2,7 +2,7 @@ import $ from 'jquery';
 import Swiper from 'swiper';
 import { Autoplay, EffectFade, Pagination, Navigation } from 'swiper/modules';
 
-const sliders = $('.slider__wrapper');
+const sliders = $('.bl-wp-block.-acf-block.slider__wrapper');
 
 $.each(sliders, function (index, slider) {
   // Wrapper

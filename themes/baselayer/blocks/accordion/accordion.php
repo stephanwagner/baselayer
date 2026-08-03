@@ -13,7 +13,8 @@ $scroll_to_top = (bool) bl_block_field('scroll_to_accordion_top');
 $is_open = (bool) bl_block_field('accordion_is_open');
 $add_to_faq_schema = (bool) bl_block_field('add_to_faq_schema');
 
-$class_names = ['bl-wp-block', 'accordion__wrapper'];
+$class_names = ['bl-wp-block', '-baselayer-block', 'accordion__wrapper'];
+
 if ($is_open) {
 	$class_names[] = 'accordion-open';
 }

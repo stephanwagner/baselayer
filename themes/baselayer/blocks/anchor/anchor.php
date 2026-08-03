@@ -7,7 +7,7 @@ $id = bl_block_field('id');
 $offset = bl_block_field('offset');
 $offset = ($offset || $offset === 0 || $offset === '0' || $offset === -1) ? $offset : 0;
 
-$class_names = ['bl-wp-block', 'anchor__wrapper'];
+$class_names = ['bl-wp-block', '-baselayer-block', 'anchor__wrapper'];
 $wrapper_attributes = get_block_wrapper_attributes([
 	'class' => implode(' ', $class_names),
 ]);

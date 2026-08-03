@@ -6,7 +6,7 @@
 $items = bl_block_field('items');
 $items = is_array($items) ? $items : [];
 
-$class_names = ['bl-wp-block', 'number-ticker__wrapper'];
+$class_names = ['bl-wp-block', '-baselayer-block', 'number-ticker__wrapper'];
 $wrapper_attributes = get_block_wrapper_attributes([
 	'class' => implode(' ', $class_names),
 ]);

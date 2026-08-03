@@ -27,7 +27,7 @@ if ($video_id > 0) {
 	$video_mime = (string) get_post_mime_type($video_id);
 }
 
-$class_names = ['bl-wp-block', 'slider-slide__wrapper', 'swiper-slide', '-type-' . sanitize_html_class((string) $type)];
+$class_names = ['bl-wp-block', '-baselayer-block', 'slider-slide__wrapper', 'swiper-slide', '-type-' . sanitize_html_class((string) $type)];
 $wrapper_attributes = get_block_wrapper_attributes([
 	'class' => implode(' ', $class_names),
 ]);

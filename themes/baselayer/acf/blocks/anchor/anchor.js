@@ -34,7 +34,7 @@ function isAccordionHash(hashId) {
     return false;
   }
 
-  return $('.accordion__wrapper[data-accordion-id="' + hashId + '"]').length > 0;
+  return $('.bl-wp-block.-acf-block.accordion__wrapper[data-accordion-id="' + hashId + '"]').length > 0;
 }
 
 function scrollToAnchor(anchorEl) {
@@ -64,13 +64,13 @@ function scrollToAnchorByHash(hash) {
     return;
   }
 
-  const anchorEl = $('[data-anchor-id="' + hashId + '"]').first();
+  const anchorEl = $('.bl-wp-block.-acf-block[data-anchor-id="' + hashId + '"]').first();
   if (anchorEl.length) {
     scrollToAnchor(anchorEl);
   }
 }
 
-if ($('[data-anchor-id]').length) {
+if ($('.bl-wp-block.-acf-block[data-anchor-id]').length) {
   $('a[href*="#"]').each(function (index, item) {
     const link = $(item);
     const href = link.attr('href');
@@ -80,7 +80,7 @@ if ($('[data-anchor-id]').length) {
       return;
     }
 
-    const anchorEl = $('[data-anchor-id="' + hashId + '"]').first();
+    const anchorEl = $('.bl-wp-block.-acf-block[data-anchor-id="' + hashId + '"]').first();
     if (!anchorEl.length) {
       return;
     }
@@ -106,7 +106,7 @@ if ($('[data-anchor-id]').length) {
 }
 
 var checkActiveNav = function () {
-  $($('[data-anchor-id]').get().reverse()).each(function (index, item) {
+  $($('.bl-wp-block.-acf-block[data-anchor-id]').get().reverse()).each(function (index, item) {
     var id = $(item).attr('data-anchor-id');
     var windowTop = $(document).scrollTop();
     let itemTop = $(item).offset().top;

@@ -32,7 +32,7 @@ if ($ratio === 'custom' && $ratio_x > 0 && $ratio_y > 0) {
 $space_between = max(0, $space_between);
 
 $slider_id = 'slider-' . wp_unique_id();
-$class_names = ['bl-wp-block', 'slider__wrapper'];
+$class_names = ['bl-wp-block', '-baselayer-block', 'slider__wrapper'];
 $wrapper_attributes = get_block_wrapper_attributes([
 	'class' => implode(' ', $class_names),
 	'style' => '--slider-padding-top: ' . $padding_top . '%; --slider-editor-slide-gap: ' . $space_between . 'px;',

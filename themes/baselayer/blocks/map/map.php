@@ -27,7 +27,7 @@ if ($image_src === '') {
 	$image_src = $preview;
 }
 
-$class_names = ['bl-wp-block', 'map__wrapper'];
+$class_names = ['bl-wp-block', '-baselayer-block', 'map__wrapper'];
 $wrapper_attributes = get_block_wrapper_attributes([
 	'class' => implode(' ', $class_names),
 ]);

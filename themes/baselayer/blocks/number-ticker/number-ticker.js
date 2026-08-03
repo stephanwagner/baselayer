@@ -2,7 +2,7 @@ import $ from 'jquery';
 import { CountUp } from 'countup.js';
 import { onEnterViewport } from '../../src/js/utils/viewport.js';
 
-const containerSelector = '.number-ticker__wrapper';
+const containerSelector = '.bl-wp-block.-baselayer-block.number-ticker__wrapper';
 
 const tickerContainer = $(containerSelector);
 if (tickerContainer.length) {

@@ -2,7 +2,7 @@ import $ from 'jquery';
 import Swiper from 'swiper';
 import { Autoplay, EffectFade, Pagination, Navigation } from 'swiper/modules';
 
-const sliders = $('.slider__wrapper');
+const sliders = $('.bl-wp-block.-baselayer-block.slider__wrapper');
 
 $.each(sliders, function (index, slider) {
   // Wrapper
@@ -166,16 +166,11 @@ $.each(sliders, function (index, slider) {
   // Modules
   sliderConfig.modules = modules;
 
-  const swiperEl = sliderWrapper.find('.swiper').get(0);
-  const wrapperEl = swiperEl
-    ? swiperEl.querySelector('.' + sliderConfig.wrapperClass)
-    : null;
-  if (!swiperEl || !wrapperEl) {
-    return;
-  }
+  // Swiper element
+  const sliderSelector = '.slider__wrapper[data-slider-id="' + id + '"] .swiper';
 
   // Init on the element (avoids selector misses when data-slider-id is odd)
-  const swiper = new Swiper(swiperEl, sliderConfig);
+  const swiper = new Swiper(sliderSelector, sliderConfig);
 
   // Stop autoplay then clicking on or in slide
   sliderWrapper.find('.slider-slide__wrapper').on('click', function () {

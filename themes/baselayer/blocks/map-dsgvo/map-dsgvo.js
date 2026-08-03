@@ -5,7 +5,7 @@ import { isGoogleMapsAccepted, setGoogleMapsAccepted, removeGoogleMapsAccepted }
  * Initialize the Google Maps consent block
  */
 function initGoogleMapsConsentBlock() {
-  if ($('[data-google-maps-dsgvo-container]').length) {
+  if ($('.bl-wp-block.-baselayer-block[data-google-maps-dsgvo-container]').length) {
     const hasAcceptedTitle = 'Sie haben der Verbindung zu Google Maps zugestimmt.';
     const hasNotAcceptedTitle = 'Sie haben der Verbindung zu Google Maps derzeit nicht zugestimmt.';
 
@@ -38,7 +38,7 @@ function initGoogleMapsConsentBlock() {
     html += '  </div>';
     html += '</div>';
 
-    $('[data-google-maps-dsgvo-container]').html(html);
+    $('.bl-wp-block.-baselayer-block[data-google-maps-dsgvo-container]').html(html);
 
     $('.map-dsgvo__link').on('click', function () {
       if (isGoogleMapsAccepted()) {

@@ -6,11 +6,11 @@ import config from '../../../src/js/config';
 /**
  * Toggle an accordion
  */
-$('.accordion__header').on('click keydown', function (e) {
+$('.bl-wp-block.-acf-block .accordion__header').on('click keydown', function (e) {
   if (e.type === 'keydown' && e.key !== 'Enter') {
     return;
   }
-  var wrapper = $(this).parents('.accordion__wrapper');
+  var wrapper = $(this).parents('.bl-wp-block.-acf-block.accordion__wrapper');
   var accordionIsOpen = wrapper.hasClass('accordion-open');
   if (accordionIsOpen) {
     closeAccordion(wrapper);
@@ -39,16 +39,16 @@ function scrollToAccordionByHash(hash) {
     return;
   }
   const hashId = hash.replace('#', '');
-  const accordionWrapper = $('.accordion__wrapper[data-accordion-id="' + hashId + '"]').first();
+  const accordionWrapper = $('.bl-wp-block.-acf-block.accordion__wrapper[data-accordion-id="' + hashId + '"]').first();
   navigateToAccordion(accordionWrapper);
 }
 
-if ($('.accordion__wrapper[data-accordion-id]').length) {
+if ($('.bl-wp-block.-acf-block.accordion__wrapper[data-accordion-id]').length) {
   $('a[href*="#"]').each(function (index, item) {
     const link = $(item);
     const href = link.attr('href');
     const hrefSplit = href.split('#');
-    const accordionWrapper = $('.accordion__wrapper[data-accordion-id="' + hrefSplit[hrefSplit.length - 1] + '"]').first();
+    const accordionWrapper = $('.bl-wp-block.-acf-block.accordion__wrapper[data-accordion-id="' + hrefSplit[hrefSplit.length - 1] + '"]').first();
     if (accordionWrapper.length) {
       link.on('click', function () {
         closeMenu();
@@ -70,9 +70,9 @@ window.addEventListener('load', () => {
 function openAccordionWithNeighbours(wrapper, options = {}) {
   if (wrapper.attr('data-close-neighbouring-accordions') === 'true') {
     let wrapperSiblings = $();
-    wrapperSiblings = wrapperSiblings.add(wrapper.prevUntil(':not(.accordion__wrapper)'));
-    wrapperSiblings = wrapperSiblings.add(wrapper.nextUntil(':not(.accordion__wrapper)'));
-    wrapperSiblings.filter('.accordion__wrapper.accordion-open').each(function (index, item) {
+    wrapperSiblings = wrapperSiblings.add(wrapper.prevUntil(':not(.bl-wp-block.-acf-block.accordion__wrapper)'));
+    wrapperSiblings = wrapperSiblings.add(wrapper.nextUntil(':not(.bl-wp-block.-acf-block.accordion__wrapper)'));
+    wrapperSiblings.filter('.bl-wp-block.-acf-block.accordion__wrapper.accordion-open').each(function (index, item) {
       closeAccordion($(item));
     });
   }

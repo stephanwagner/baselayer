@@ -3,6 +3,9 @@
 // Class names
 $classNames = ['bl-wp-block'];
 
+// Scope
+$classNames[] = '-acf-block';
+
 // ID for specific styling
 $classNames[] = $block['id'];
 

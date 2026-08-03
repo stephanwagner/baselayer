@@ -102,7 +102,7 @@ if ($uses_pagination && $query->max_num_pages > 1) {
 	}
 }
 
-$class_names = ['bl-wp-block', 'article-list__wrapper', '-block'];
+$class_names = ['bl-wp-block', '-baselayer-block', 'article-list__wrapper', '-block'];
 $wrapper_attributes = get_block_wrapper_attributes([
 	'class' => implode(' ', $class_names),
 ]);

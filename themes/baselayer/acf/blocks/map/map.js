@@ -2,8 +2,8 @@ import $ from 'jquery';
 
 const googleMapsLocalStorageKey = 'google-maps-accepted';
 
-const googleMapsWrappers = $('[data-google-maps-wrapper]');
-const googleMapsInitButtons = $('[data-google-maps-accept-button]');
+const googleMapsWrappers = $('.bl-wp-block.-acf-block [data-google-maps-wrapper]');
+const googleMapsInitButtons = $('.bl-wp-block.-acf-block [data-google-maps-accept-button]');
 
 if (googleMapsWrappers.length) {
   if (isGoogleMapsAccepted()) {
@@ -84,21 +84,21 @@ function createGoogleMapsEmbed(type, lat, lng, address, zoom = 14) {
  * Show the DSGVO overlay
  */
 function showGoogleMapsDsgvo() {
-  $('[data-google-maps-notice-container]').addClass('-active');
+  $('.bl-wp-block.-acf-block [data-google-maps-notice-container]').addClass('-active');
 }
 
 /**
  * Hide the DSGVO overlay
  */
 function hideGoogleMapsDsgvo() {
-  $('[data-google-maps-notice-container]').removeClass('-active');
+  $('.bl-wp-block.-acf-block [data-google-maps-notice-container]').removeClass('-active');
 }
 
 /**
  * Show the Google Maps canvas
  */
 function showGoogleMapsCanvas() {
-  $('[data-google-maps-canvas]').addClass('-active');
+  $('.bl-wp-block.-acf-block [data-google-maps-canvas]').addClass('-active');
 }
 
 /**
@@ -107,7 +107,7 @@ function showGoogleMapsCanvas() {
 function initGoogleMaps() {
   hideGoogleMapsDsgvo();
 
-  const googleMapsWrappers = $('[data-google-maps-wrapper]');
+  const googleMapsWrappers = $('.bl-wp-block.-acf-block [data-google-maps-wrapper]');
 
   googleMapsWrappers.each(function (index, item) {
     const wrapper = $(item);

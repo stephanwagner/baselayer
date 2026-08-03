@@ -10,7 +10,7 @@ if ($icon_slug !== '') {
 	$icon_markup = '<span class="bl-icon -icon-' . esc_attr($icon_slug) . '" aria-hidden="true"></span>';
 }
 
-$class_names = ['bl-wp-block', 'icon-text__wrapper'];
+$class_names = ['bl-wp-block', '-baselayer-block', 'icon-text__wrapper'];
 $wrapper_attributes = get_block_wrapper_attributes([
 	'class' => implode(' ', $class_names),
 ]);
