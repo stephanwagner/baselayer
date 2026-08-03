@@ -373,7 +373,7 @@ function bl_install_page_html_path(string $page_key): string
 			}
 		}
 		if ($system === 'acf') {
-			return __DIR__ . '/pages/blocks.html';
+			return __DIR__ . '/pages/blocks-acf.html';
 		}
 		return '';
 	}
