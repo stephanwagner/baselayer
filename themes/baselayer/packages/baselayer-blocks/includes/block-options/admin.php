@@ -131,7 +131,12 @@ function bl_block_options_blocks_catalog(): array
 		if ($name === '' || $name === '*') {
 			continue;
 		}
-		if (function_exists('bl_block_settings_is_block_allowed') && !bl_block_settings_is_block_allowed($name)) {
+		$is_child = function_exists('bl_block_settings_is_internal_child_block')
+			&& bl_block_settings_is_internal_child_block($name);
+		if (function_exists('bl_block_settings_is_hard_disallowed') && bl_block_settings_is_hard_disallowed($name)) {
+			continue;
+		}
+		if (!$is_child && function_exists('bl_block_settings_is_block_allowed') && !bl_block_settings_is_block_allowed($name)) {
 			continue;
 		}
 		$meta = bl_block_options_block_meta($name);
@@ -165,13 +170,15 @@ function bl_block_options_available_blocks_catalog(): array
 		if ($name === '' || isset($assigned[$name])) {
 			continue;
 		}
-		if (function_exists('bl_block_settings_is_manageable_block') && !bl_block_settings_is_manageable_block($name)) {
+		$is_child = function_exists('bl_block_settings_is_internal_child_block')
+			&& bl_block_settings_is_internal_child_block($name);
+		if (!$is_child && function_exists('bl_block_settings_is_manageable_block') && !bl_block_settings_is_manageable_block($name)) {
 			continue;
 		}
 		if (function_exists('bl_block_settings_is_hard_disallowed') && bl_block_settings_is_hard_disallowed($name)) {
 			continue;
 		}
-		if (function_exists('bl_block_settings_is_block_allowed') && !bl_block_settings_is_block_allowed($name)) {
+		if (!$is_child && function_exists('bl_block_settings_is_block_allowed') && !bl_block_settings_is_block_allowed($name)) {
 			continue;
 		}
 		$meta = bl_block_options_block_meta($name);
