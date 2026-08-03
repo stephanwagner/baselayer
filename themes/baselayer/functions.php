@@ -154,4 +154,11 @@ if (bl_theme_feature_enabled('acf')) {
 		}
 	}
 	unset($bl_acf_dir, $bl_acf_bootstrap);
+
+	// Field-group import notice (parent copy; works with child or parent acf/).
+	$bl_acf_import_notice = get_template_directory() . '/acf/acf-import-notice.php';
+	if (is_readable($bl_acf_import_notice)) {
+		require_once $bl_acf_import_notice;
+	}
+	unset($bl_acf_import_notice);
 }

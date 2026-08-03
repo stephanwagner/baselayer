@@ -1072,12 +1072,46 @@ function baselayer_run_install(): void
       ];
     }
 
-    // Ensure theme ACF bootstrap is available for the rest of this request.
+    // Ensure theme ACF bootstrap + import helpers are available for the rest of this request.
     foreach ([get_stylesheet_directory(), get_template_directory()] as $bl_acf_dir) {
       $bl_acf_bootstrap = $bl_acf_dir . '/acf/acf.php';
       if (is_readable($bl_acf_bootstrap) && !defined('BL_ACF_PATH')) {
         require_once $bl_acf_bootstrap;
         break;
+      }
+    }
+    $bl_acf_import_notice = get_template_directory() . '/acf/acf-import-notice.php';
+    if (is_readable($bl_acf_import_notice) && !function_exists('bl_acf_import_run')) {
+      require_once $bl_acf_import_notice;
+    }
+
+    // Soft-try field-group import when Pro is active and the site has no groups yet.
+    if (
+      $acf_activated
+      && function_exists('bl_acf_import_run')
+      && function_exists('bl_acf_any_field_group_exists')
+      && !bl_acf_any_field_group_exists()
+    ) {
+      $acf_import_result = bl_acf_import_run();
+      if (is_wp_error($acf_import_result)) {
+        $install_notices[] = [
+          'type' => 'warning',
+          'text' => $acf_import_result->get_error_message(),
+        ];
+      } elseif (is_int($acf_import_result) && $acf_import_result > 0) {
+        $install_notices[] = [
+          'type' => 'success',
+          'text' => sprintf(
+            /* translators: %d: number of field groups */
+            _n(
+              'Imported %d ACF field group.',
+              'Imported %d ACF field groups.',
+              $acf_import_result,
+              'baselayer'
+            ),
+            $acf_import_result
+          ),
+        ];
       }
     }
   }
