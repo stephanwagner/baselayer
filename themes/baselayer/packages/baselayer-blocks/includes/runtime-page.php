@@ -35,7 +35,7 @@ add_action('init', 'bl_blocks_register_page_meta', 20);
 /**
  * Active page_settings definitions assigned to a post type.
  *
- * @return list<array{id: int, title: string, fields: list<array>, metaKey: string, description: string}>
+ * @return list<array{id: int, title: string, fields: list<array>, metaKey: string, description: string, sidebarEditing: bool}>
  */
 function bl_blocks_page_definitions_for_post_type(string $post_type): array
 {
@@ -47,11 +47,12 @@ function bl_blocks_page_definitions_for_post_type(string $post_type): array
 			continue;
 		}
 		$out[] = [
-			'id'          => (int) $post->ID,
-			'title'       => $post->post_title !== '' ? $post->post_title : __('Content Fields', 'baselayer-blocks'),
-			'description' => (string) ($config['settings']['description'] ?? ''),
-			'fields'      => $config['fields'],
-			'metaKey'     => bl_blocks_page_meta_key((int) $post->ID),
+			'id'             => (int) $post->ID,
+			'title'          => $post->post_title !== '' ? $post->post_title : __('Content Fields', 'baselayer-blocks'),
+			'description'    => (string) ($config['settings']['description'] ?? ''),
+			'fields'         => $config['fields'],
+			'metaKey'        => bl_blocks_page_meta_key((int) $post->ID),
+			'sidebarEditing' => !empty($config['settings']['sidebar_editing']),
 		];
 	}
 
@@ -156,11 +157,12 @@ function bl_blocks_enqueue_page_editor(string $hook): void
 	wp_localize_script('bl-blocks-editor', 'blBlocksPage', [
 		'definitions' => $payload,
 		'i18n'        => [
-			'edit'        => __('Edit', 'baselayer-blocks'),
-			'save'        => __('Update', 'baselayer-blocks'),
-			'cancel'      => __('Cancel', 'baselayer-blocks'),
-			'panelTitle'  => __('Content Fields', 'baselayer-blocks'),
-			'openFields'  => __('Edit fields', 'baselayer-blocks'),
+			'edit'            => __('Edit', 'baselayer-blocks'),
+			'save'            => __('Update', 'baselayer-blocks'),
+			'cancel'          => __('Cancel', 'baselayer-blocks'),
+			'panelTitle'      => __('Content Fields', 'baselayer-blocks'),
+			'openFields'      => __('Edit fields', 'baselayer-blocks'),
+			'openFieldEditor' => __('Open field editor', 'baselayer-blocks'),
 		],
 	]);
 }

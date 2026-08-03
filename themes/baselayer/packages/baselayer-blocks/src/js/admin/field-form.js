@@ -52,6 +52,25 @@ function isStatic(type) {
 }
 
 /**
+ * Coerce field lists that arrived as JSON objects (non-sequential keys).
+ *
+ * @param {unknown} fields
+ * @returns {array}
+ */
+function normalizeFieldList(fields) {
+  if (Array.isArray(fields)) {
+    return fields;
+  }
+  if (fields && typeof fields === 'object') {
+    return Object.keys(fields)
+      .sort((a, b) => Number(a) - Number(b))
+      .map((key) => fields[key])
+      .filter(Boolean);
+  }
+  return [];
+}
+
+/**
  * Strip any scheme and force https://. Loose check — any host-like value is fine.
  */
 function normalizeHttpsUrl(raw) {
@@ -371,6 +390,7 @@ export function createFieldForm(fields, values = {}, options = {}) {
   const root = el('div', rootAttrs);
   /** @type {Array<{ kind: 'leaf'|'repeater', field: object, control?: HTMLElement, type?: string, getRows?: Function }>} */
   const entries = [];
+  fields = normalizeFieldList(fields);
 
   const appendLayoutWrap = (field, type, parent, valueMap) => {
     const design = compact
@@ -697,7 +717,7 @@ function createRepeaterControl(field, valueMap, entries, options = {}) {
  */
 export function openFieldsModal(opts) {
   const title = opts.title || i18n('edit', 'Edit');
-  const form = createFieldForm(opts.fields || [], opts.values || {});
+  const form = createFieldForm(normalizeFieldList(opts.fields), opts.values || {});
 
   const overlay = el('div', { className: 'bl-blocks-modal-overlay', role: 'presentation' });
   const dialog = el('div', {

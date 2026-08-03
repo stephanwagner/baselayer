@@ -131,7 +131,7 @@
     if (!description) {
       return null;
     }
-    return /* @__PURE__ */ wp.element.createElement("p", { className: "components-base-control__help" }, description);
+    return /* @__PURE__ */ wp.element.createElement("p", { className: "components-base-control__help bl-block-option-help" }, description);
   }
 
   // themes/baselayer/packages/baselayer-blocks/customs/container-margin/control.js
@@ -1549,7 +1549,7 @@
     if (!description) {
       return null;
     }
-    return /* @__PURE__ */ wp.element.createElement("p", { className: "components-base-control__help" }, description);
+    return /* @__PURE__ */ wp.element.createElement("p", { className: "components-base-control__help bl-block-option-help" }, description);
   }
 
   // themes/baselayer/src/js/editor/icons/icon-picker.js

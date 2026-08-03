@@ -8,7 +8,7 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
     return;
   }
 
-  const { createElement: el, Fragment, RawHTML, useState, useEffect, useRef } = wp.element;
+  const { createElement: el, Fragment, RawHTML, useState, useEffect, useRef, useCallback } = wp.element;
   const { Button, PanelBody, ToolbarGroup, ToolbarButton, Placeholder, Spinner } = wp.components;
   const { InspectorControls, BlockControls, useBlockProps, InnerBlocks } = wp.blockEditor || {};
   const { registerBlockType } = wp.blocks;
@@ -55,53 +55,64 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
   }
 
   /**
-   * Imperative compact field form for the block inspector.
-   * Mounts once per mountId; remount only when the modal applies new values.
+   * Imperative compact field form for inspector / document sidebar.
+   * Callback ref mounts when the host attaches (Slot/Fill-safe); remount on mountId.
    */
   function SidebarFields({ fields, values, onChange, onOpenModal, mountId }) {
-    const hostRef = useRef(null);
     const onChangeRef = useRef(onChange);
     const valuesRef = useRef(values);
+    const fieldsRef = useRef(fields);
+    const cleanupRef = useRef(null);
     onChangeRef.current = onChange;
     valuesRef.current = values;
+    fieldsRef.current = Array.isArray(fields) ? fields : [];
 
-    useEffect(() => {
-      const host = hostRef.current;
-      if (!host) {
-        return undefined;
-      }
-
-      const form = createFieldForm(fields || [], valuesRef.current || {}, { layout: 'compact' });
-      host.replaceChildren(form.root);
-
-      const sync = () => {
-        if (typeof onChangeRef.current === 'function') {
-          onChangeRef.current(normalizeValues(form.getValues()));
+    // Only remount when mountId changes (modal apply). Read fields/values from refs
+    // so parent re-renders (meta edits) do not thrash the Slot/Fill host.
+    const setHost = useCallback(
+      (host) => {
+        if (typeof cleanupRef.current === 'function') {
+          cleanupRef.current();
+          cleanupRef.current = null;
         }
-      };
-
-      const onRepeaterClick = (evt) => {
-        const target = evt.target;
-        if (
-          target &&
-          typeof target.closest === 'function' &&
-          target.closest('.bl-blocks-fields__repeater-add, .bl-blocks-fields__repeater-remove')
-        ) {
-          window.setTimeout(sync, 0);
+        if (!host) {
+          return;
         }
-      };
 
-      form.root.addEventListener('input', sync);
-      form.root.addEventListener('change', sync);
-      form.root.addEventListener('click', onRepeaterClick);
+        const list = Array.isArray(fieldsRef.current) ? fieldsRef.current : [];
+        const form = createFieldForm(list, valuesRef.current || {}, { layout: 'compact' });
+        host.replaceChildren(form.root);
 
-      return () => {
-        form.root.removeEventListener('input', sync);
-        form.root.removeEventListener('change', sync);
-        form.root.removeEventListener('click', onRepeaterClick);
-        host.replaceChildren();
-      };
-    }, [fields, mountId]);
+        const sync = () => {
+          if (typeof onChangeRef.current === 'function') {
+            onChangeRef.current(normalizeValues(form.getValues()));
+          }
+        };
+
+        const onRepeaterClick = (evt) => {
+          const target = evt.target;
+          if (
+            target &&
+            typeof target.closest === 'function' &&
+            target.closest('.bl-blocks-fields__repeater-add, .bl-blocks-fields__repeater-remove')
+          ) {
+            window.setTimeout(sync, 0);
+          }
+        };
+
+        form.root.addEventListener('input', sync);
+        form.root.addEventListener('change', sync);
+        form.root.addEventListener('click', onRepeaterClick);
+
+        cleanupRef.current = () => {
+          form.root.removeEventListener('input', sync);
+          form.root.removeEventListener('change', sync);
+          form.root.removeEventListener('click', onRepeaterClick);
+          host.replaceChildren();
+        };
+      },
+      [mountId]
+    );
 
     return el(
       'div',
@@ -114,10 +125,10 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
               className: 'bl-blocks-edit-fields-button',
               onClick: onOpenModal,
             },
-            blockI18n.openFieldEditor || 'Open field editor'
+            blockI18n.openFieldEditor || pageI18n.openFieldEditor || 'Open field editor'
           )
         : null,
-      el('div', { className: 'bl-blocks-sidebar-fields__host', ref: hostRef })
+      el('div', { className: 'bl-blocks-sidebar-fields__host', ref: setHost })
     );
   }
 
@@ -636,7 +647,19 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
               }, [])
             : {};
           const { editPost } = useDispatch ? useDispatch('core/editor') : { editPost: null };
-          const values = (meta && meta[def.metaKey]) || def.values || {};
+          const values = normalizeValues((meta && meta[def.metaKey]) || def.values || {});
+          const [sidebarMountId, setSidebarMountId] = useState(0);
+          const sidebarEditing = !!def.sidebarEditing;
+
+          const applyValues = (next) => {
+            if (!editPost) return;
+            editPost({
+              meta: {
+                ...meta,
+                [def.metaKey]: normalizeValues(next),
+              },
+            });
+          };
 
           const open = () => {
             openFieldsModal({
@@ -644,16 +667,31 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
               fields: def.fields || [],
               values,
               onSave: (next) => {
-                if (!editPost) return;
-                editPost({
-                  meta: {
-                    ...meta,
-                    [def.metaKey]: next,
-                  },
-                });
+                applyValues(next);
+                if (sidebarEditing) {
+                  setSidebarMountId((id) => id + 1);
+                }
               },
             });
           };
+
+          const panelBody = sidebarEditing
+            ? el(SidebarFields, {
+                fields: def.fields || [],
+                values,
+                mountId: sidebarMountId,
+                onChange: applyValues,
+                onOpenModal: open,
+              })
+            : el(
+                Button,
+                {
+                  variant: 'secondary',
+                  className: 'bl-blocks-edit-fields-button',
+                  onClick: open,
+                },
+                pageI18n.edit || blockI18n.edit || 'Edit fields'
+              );
 
           return el(
             PluginDocumentSettingPanel,
@@ -665,15 +703,7 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
             def.description
               ? el('p', { className: 'description' }, def.description)
               : null,
-            el(
-              Button,
-              {
-                variant: 'secondary',
-                className: 'bl-blocks-edit-fields-button',
-                onClick: open,
-              },
-              pageI18n.edit || blockI18n.edit || 'Edit fields'
-            )
+            panelBody
           );
         },
       });

@@ -128,7 +128,20 @@ export function mountApp(root, initial, definitionType = 'block') {
       : null;
 
   const syncAll = () => {
-    const fields = builderApi ? builderApi.getFields() : [];
+    // Never replace fields with [] before the canvas API exists — settings toggles
+    // (e.g. sidebar_editing) call syncAll early and would wipe the definition.
+    let fields;
+    if (builderApi) {
+      fields = builderApi.getFields();
+    } else {
+      const current =
+        typeof FormBuilder.readConfig === 'function' ? FormBuilder.readConfig() : {};
+      fields = Array.isArray(current.fields)
+        ? current.fields
+        : Array.isArray(initial.fields)
+          ? initial.fields
+          : [];
+    }
     const payload = {
       fields,
       settings: panels.getSettings(),

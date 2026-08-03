@@ -319,6 +319,9 @@ body.bl-page-picker-open {
   flex-direction: column;
   gap: 14px;
 }
+.bl-blocks-fields .description {
+  white-space: pre-line;
+}
 
 .bl-blocks-fields__row {
   display: flex;
@@ -726,6 +729,10 @@ body.bl-page-picker-open {
 
 .bl-blocks-sidebar-fields__host {
   min-width: 0;
+}
+
+.bl-blocks-page-settings-panel > .description {
+  white-space: pre-line;
 }
 
 /*# sourceMappingURL=blocks-editor.css.map */

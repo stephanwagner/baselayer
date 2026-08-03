@@ -1515,8 +1515,10 @@
       el("h3", { className: "bl-forms-builder__section-title", text: t2("tabSettings", "Settings") }),
       activeRow
     ];
-    if (definitionType === "block") {
+    if (definitionType === "block" || definitionType === "page_settings") {
       children.push(sidebarEditingRow);
+    }
+    if (definitionType === "block") {
       children.push(innerBlocksRow);
       children.push(innerBlocksAllowedRow);
       children.push(innerBlocksTemplateRow);
@@ -3092,7 +3094,13 @@
       syncAll();
     }) : null;
     const syncAll = () => {
-      const fields = builderApi ? builderApi.getFields() : [];
+      let fields;
+      if (builderApi) {
+        fields = builderApi.getFields();
+      } else {
+        const current = typeof FormBuilder.readConfig === "function" ? FormBuilder.readConfig() : {};
+        fields = Array.isArray(current.fields) ? current.fields : Array.isArray(initial.fields) ? initial.fields : [];
+      }
       const payload = {
         fields,
         settings: panels.getSettings()
@@ -6927,6 +6935,15 @@
   function isStatic(type) {
     return type === "divider" || type === "spacer" || type === "heading" || type === "text_block" || type === "html" || type === "honeypot" || type === "captcha";
   }
+  function normalizeFieldList(fields) {
+    if (Array.isArray(fields)) {
+      return fields;
+    }
+    if (fields && typeof fields === "object") {
+      return Object.keys(fields).sort((a, b) => Number(a) - Number(b)).map((key) => fields[key]).filter(Boolean);
+    }
+    return [];
+  }
   function normalizeHttpsUrl(raw) {
     let v = String(raw || "").replace(
       /^[\s\u00A0\u2000-\u200B\uFEFF]+|[\s\u00A0\u2000-\u200B\uFEFF]+$/g,
@@ -7209,6 +7226,7 @@
     }
     const root = el7("div", rootAttrs);
     const entries = [];
+    fields = normalizeFieldList(fields);
     const appendLayoutWrap = (field, type, parent, valueMap) => {
       const design = compact ? "standard" : ["standard", "outline", "card"].includes(field.design) ? field.design : "standard";
       const layoutClass = [
@@ -7475,7 +7493,7 @@
   }
   function openFieldsModal(opts) {
     const title = opts.title || i18n4("edit", "Edit");
-    const form = createFieldForm(opts.fields || [], opts.values || {});
+    const form = createFieldForm(normalizeFieldList(opts.fields), opts.values || {});
     const overlay = el7("div", { className: "bl-blocks-modal-overlay", role: "presentation" });
     const dialog = el7("div", {
       className: "bl-blocks-modal",

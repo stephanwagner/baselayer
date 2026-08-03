@@ -397,6 +397,9 @@ body.post-new-php.post-type-bl_block .page-title-action {
   flex-direction: column;
   gap: 14px;
 }
+.bl-blocks-fields .description {
+  white-space: pre-line;
+}
 
 .bl-blocks-fields__row {
   display: flex;

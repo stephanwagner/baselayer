@@ -437,8 +437,11 @@ export function createSettingsPanel(initial, definitionType, onChange) {
     activeRow,
   ];
 
-  if (definitionType === 'block') {
+  if (definitionType === 'block' || definitionType === 'page_settings') {
     children.push(sidebarEditingRow);
+  }
+
+  if (definitionType === 'block') {
     children.push(innerBlocksRow);
     children.push(innerBlocksAllowedRow);
     children.push(innerBlocksTemplateRow);

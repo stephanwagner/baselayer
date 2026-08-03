@@ -10,5 +10,7 @@ export function BlockOptionDescription({ description }) {
     return null;
   }
 
-  return <p className="components-base-control__help">{description}</p>;
+  return (
+    <p className="components-base-control__help bl-block-option-help">{description}</p>
+  );
 }

@@ -244,6 +244,11 @@ body.post-new-php.post-type-bl_block {
   display: flex;
   flex-direction: column;
   gap: 14px;
+
+  // Field help text: preserve author line breaks from the description textarea.
+  .description {
+    white-space: pre-line;
+  }
 }
 
 .bl-blocks-fields__row {

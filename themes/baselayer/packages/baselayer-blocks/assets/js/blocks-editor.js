@@ -4812,6 +4812,15 @@
   function isStatic(type) {
     return type === "divider" || type === "spacer" || type === "heading" || type === "text_block" || type === "html" || type === "honeypot" || type === "captcha";
   }
+  function normalizeFieldList(fields) {
+    if (Array.isArray(fields)) {
+      return fields;
+    }
+    if (fields && typeof fields === "object") {
+      return Object.keys(fields).sort((a, b) => Number(a) - Number(b)).map((key) => fields[key]).filter(Boolean);
+    }
+    return [];
+  }
   function normalizeHttpsUrl(raw) {
     let v = String(raw || "").replace(
       /^[\s\u00A0\u2000-\u200B\uFEFF]+|[\s\u00A0\u2000-\u200B\uFEFF]+$/g,
@@ -5094,6 +5103,7 @@
     }
     const root = el4("div", rootAttrs);
     const entries = [];
+    fields = normalizeFieldList(fields);
     const appendLayoutWrap = (field, type, parent, valueMap) => {
       const design = compact ? "standard" : ["standard", "outline", "card"].includes(field.design) ? field.design : "standard";
       const layoutClass = [
@@ -5360,7 +5370,7 @@
   }
   function openFieldsModal(opts) {
     const title = opts.title || i18n4("edit", "Edit");
-    const form = createFieldForm(opts.fields || [], opts.values || {});
+    const form = createFieldForm(normalizeFieldList(opts.fields), opts.values || {});
     const overlay = el4("div", { className: "bl-blocks-modal-overlay", role: "presentation" });
     const dialog = el4("div", {
       className: "bl-blocks-modal",
@@ -5475,7 +5485,7 @@
     if (!wp2 || !wp2.element || !wp2.components || !wp2.blocks) {
       return;
     }
-    const { createElement: el5, Fragment, RawHTML, useState, useEffect, useRef } = wp2.element;
+    const { createElement: el5, Fragment, RawHTML, useState, useEffect, useRef, useCallback } = wp2.element;
     const { Button, PanelBody, ToolbarGroup, ToolbarButton, Placeholder, Spinner } = wp2.components;
     const { InspectorControls, BlockControls, useBlockProps, InnerBlocks } = wp2.blockEditor || {};
     const { registerBlockType } = wp2.blocks;
@@ -5516,39 +5526,48 @@
       return el5("div", { className: "bl-blocks-block-preview-loading" }, el5(Spinner, null));
     }
     function SidebarFields({ fields, values, onChange, onOpenModal, mountId }) {
-      const hostRef = useRef(null);
       const onChangeRef = useRef(onChange);
       const valuesRef = useRef(values);
+      const fieldsRef = useRef(fields);
+      const cleanupRef = useRef(null);
       onChangeRef.current = onChange;
       valuesRef.current = values;
-      useEffect(() => {
-        const host = hostRef.current;
-        if (!host) {
-          return void 0;
-        }
-        const form = createFieldForm(fields || [], valuesRef.current || {}, { layout: "compact" });
-        host.replaceChildren(form.root);
-        const sync = () => {
-          if (typeof onChangeRef.current === "function") {
-            onChangeRef.current(normalizeValues(form.getValues()));
+      fieldsRef.current = Array.isArray(fields) ? fields : [];
+      const setHost = useCallback(
+        (host) => {
+          if (typeof cleanupRef.current === "function") {
+            cleanupRef.current();
+            cleanupRef.current = null;
           }
-        };
-        const onRepeaterClick = (evt) => {
-          const target = evt.target;
-          if (target && typeof target.closest === "function" && target.closest(".bl-blocks-fields__repeater-add, .bl-blocks-fields__repeater-remove")) {
-            window.setTimeout(sync, 0);
+          if (!host) {
+            return;
           }
-        };
-        form.root.addEventListener("input", sync);
-        form.root.addEventListener("change", sync);
-        form.root.addEventListener("click", onRepeaterClick);
-        return () => {
-          form.root.removeEventListener("input", sync);
-          form.root.removeEventListener("change", sync);
-          form.root.removeEventListener("click", onRepeaterClick);
-          host.replaceChildren();
-        };
-      }, [fields, mountId]);
+          const list = Array.isArray(fieldsRef.current) ? fieldsRef.current : [];
+          const form = createFieldForm(list, valuesRef.current || {}, { layout: "compact" });
+          host.replaceChildren(form.root);
+          const sync = () => {
+            if (typeof onChangeRef.current === "function") {
+              onChangeRef.current(normalizeValues(form.getValues()));
+            }
+          };
+          const onRepeaterClick = (evt) => {
+            const target = evt.target;
+            if (target && typeof target.closest === "function" && target.closest(".bl-blocks-fields__repeater-add, .bl-blocks-fields__repeater-remove")) {
+              window.setTimeout(sync, 0);
+            }
+          };
+          form.root.addEventListener("input", sync);
+          form.root.addEventListener("change", sync);
+          form.root.addEventListener("click", onRepeaterClick);
+          cleanupRef.current = () => {
+            form.root.removeEventListener("input", sync);
+            form.root.removeEventListener("change", sync);
+            form.root.removeEventListener("click", onRepeaterClick);
+            host.replaceChildren();
+          };
+        },
+        [mountId]
+      );
       return el5(
         "div",
         { className: "bl-blocks-sidebar-fields" },
@@ -5559,9 +5578,9 @@
             className: "bl-blocks-edit-fields-button",
             onClick: onOpenModal
           },
-          blockI18n.openFieldEditor || "Open field editor"
+          blockI18n.openFieldEditor || pageI18n.openFieldEditor || "Open field editor"
         ) : null,
-        el5("div", { className: "bl-blocks-sidebar-fields__host", ref: hostRef })
+        el5("div", { className: "bl-blocks-sidebar-fields__host", ref: setHost })
       );
     }
     function BlockServerPreview({ name, values }) {
@@ -6018,23 +6037,46 @@
               return editor && editor.getEditedPostAttribute ? editor.getEditedPostAttribute("meta") || {} : {};
             }, []) : {};
             const { editPost } = useDispatch ? useDispatch("core/editor") : { editPost: null };
-            const values = meta && meta[def.metaKey] || def.values || {};
+            const values = normalizeValues(meta && meta[def.metaKey] || def.values || {});
+            const [sidebarMountId, setSidebarMountId] = useState(0);
+            const sidebarEditing = !!def.sidebarEditing;
+            const applyValues = (next) => {
+              if (!editPost) return;
+              editPost({
+                meta: {
+                  ...meta,
+                  [def.metaKey]: normalizeValues(next)
+                }
+              });
+            };
             const open = () => {
               openFieldsModal({
                 title: def.title || pageI18n.panelTitle || "Content Fields",
                 fields: def.fields || [],
                 values,
                 onSave: (next) => {
-                  if (!editPost) return;
-                  editPost({
-                    meta: {
-                      ...meta,
-                      [def.metaKey]: next
-                    }
-                  });
+                  applyValues(next);
+                  if (sidebarEditing) {
+                    setSidebarMountId((id) => id + 1);
+                  }
                 }
               });
             };
+            const panelBody = sidebarEditing ? el5(SidebarFields, {
+              fields: def.fields || [],
+              values,
+              mountId: sidebarMountId,
+              onChange: applyValues,
+              onOpenModal: open
+            }) : el5(
+              Button,
+              {
+                variant: "secondary",
+                className: "bl-blocks-edit-fields-button",
+                onClick: open
+              },
+              pageI18n.edit || blockI18n.edit || "Edit fields"
+            );
             return el5(
               PluginDocumentSettingPanel,
               {
@@ -6043,15 +6085,7 @@
                 className: "bl-blocks-page-settings-panel"
               },
               def.description ? el5("p", { className: "description" }, def.description) : null,
-              el5(
-                Button,
-                {
-                  variant: "secondary",
-                  className: "bl-blocks-edit-fields-button",
-                  onClick: open
-                },
-                pageI18n.edit || blockI18n.edit || "Edit fields"
-              )
+              panelBody
             );
           }
         });

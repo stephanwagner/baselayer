@@ -137,6 +137,11 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
+
+  // Field help text: preserve author line breaks from the description textarea.
+  .description {
+    white-space: pre-line;
+  }
 }
 
 .bl-blocks-fields__row {
@@ -566,5 +571,9 @@
 
 .bl-blocks-sidebar-fields__host {
   min-width: 0;
+}
+
+.bl-blocks-page-settings-panel > .description {
+  white-space: pre-line;
 }
 

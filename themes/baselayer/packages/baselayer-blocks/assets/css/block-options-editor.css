@@ -149,4 +149,9 @@
   text-transform: uppercase;
 }
 
+.bl-block-option .components-base-control__help,
+.components-base-control__help.bl-block-option-help {
+  white-space: pre-line;
+}
+
 /*# sourceMappingURL=block-options-editor.css.map */

@@ -422,7 +422,8 @@ function bl_blocks_sanitize_settings($settings, string $type = 'block'): array
 
 	$out = $defaults;
 	$out['active'] = array_key_exists('active', $settings) ? !empty($settings['active']) : true;
-	$out['sidebar_editing'] = $type === 'block' && !empty($settings['sidebar_editing']);
+	$out['sidebar_editing'] = in_array($type, ['block', 'page_settings'], true)
+		&& !empty($settings['sidebar_editing']);
 	$out['supports_inner_blocks'] = $type === 'block' && !empty($settings['supports_inner_blocks']);
 	$out['inner_blocks_allowed'] = $type === 'block' && $out['supports_inner_blocks']
 		? bl_blocks_sanitize_inner_blocks_allowed($settings['inner_blocks_allowed'] ?? '')
