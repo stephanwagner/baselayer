@@ -250,12 +250,12 @@ msgstr "Optionen"
 
 #: includes/admin-editor.php:280
 msgid "These controls appear in the block sidebar in the editor."
-msgstr "Diese Steuerelemente erscheinen in der Block-Seitenleiste im Editor."
+msgstr "Diese Optionen erscheinen in der Block-Seitenleiste im Editor."
 
 #: includes/admin-editor.php:281 includes/block-options/admin.php:371
 msgid "No options yet. Add a control or attach a preset."
 msgstr ""
-"Noch keine Optionen. Füge ein Steuerelement hinzu oder verknüpfe ein Preset."
+"Noch keine Optionen. Füge eine Option hinzu oder verknüpfe eine Vorlage."
 
 #: includes/admin-editor.php:286 includes/admin-editor.php:288
 #: includes/admin-editor.php:536 includes/block-options/admin.php:351
@@ -271,11 +271,11 @@ msgstr "Standard"
 #: includes/admin-editor.php:293 includes/block-options/admin.php:341
 #: includes/block-options/admin.php:349 includes/block-options/admin.php:368
 msgid "Preset"
-msgstr "Preset"
+msgstr "Vorlage"
 
 #: includes/admin-editor.php:290
 msgid "Custom control"
-msgstr "Eigenes Steuerelement"
+msgstr "Eigene Option"
 
 #: includes/admin-editor.php:291 includes/block-options/admin.php:340
 msgid "Add option"
@@ -287,11 +287,11 @@ msgstr "Optionale Standardwerte für diesen Block überschreiben:"
 
 #: includes/admin-editor.php:296
 msgid "No presets yet — create some under Block Options → Presets."
-msgstr "Noch keine Presets — erstelle welche unter Block-Optionen → Presets."
+msgstr "Noch keine Vorlagen — erstelle welche unter Block-Optionen → Vorlagen."
 
 #: includes/admin-editor.php:297
 msgid "No custom controls registered."
-msgstr "Keine eigenen Steuerelemente registriert."
+msgstr "Keine eigenen Optionen registriert."
 
 #: includes/admin-editor.php:299 includes/admin-editor.php:325
 #: includes/admin-editor.php:446 includes/block-options/admin.php:344
@@ -1256,7 +1256,7 @@ msgstr "Sonstige"
 
 #: includes/block-options/admin.php:309
 msgid "Presets"
-msgstr "Presets"
+msgstr "Vorlagen"
 
 #: includes/block-options/admin.php:310
 msgid "No blocks with options yet. Add a block below."
@@ -1277,15 +1277,15 @@ msgstr "Noch keine Core-Blöcke mit Optionen. Füge unten einen Block hinzu."
 
 #: includes/block-options/admin.php:314
 msgid "No presets yet. Add one."
-msgstr "Noch keine Presets. Füge eines hinzu."
+msgstr "Noch keine Vorlagen. Füge eine hinzu."
 
 #: includes/block-options/admin.php:315
 msgid "Add preset"
-msgstr "Preset hinzufügen"
+msgstr "Vorlage hinzufügen"
 
 #: includes/block-options/admin.php:316
 msgid "Save preset"
-msgstr "Preset speichern"
+msgstr "Vorlage speichern"
 
 #: includes/block-options/admin.php:317
 msgid "Add a slug before saving."
@@ -1321,7 +1321,7 @@ msgstr "Block speichern"
 
 #: includes/block-options/admin.php:328
 msgid "Delete preset?"
-msgstr "Preset löschen?"
+msgstr "Vorlage löschen?"
 
 #. translators: %s: preset label or slug
 #: includes/block-options/admin.php:330
@@ -1345,7 +1345,7 @@ msgstr "Alle Blöcke"
 
 #: includes/block-options/admin.php:338
 msgid "All presets"
-msgstr "Alle Presets"
+msgstr "Alle Vorlagen"
 
 #: includes/block-options/admin.php:339
 msgid "Saving…"
@@ -1357,11 +1357,11 @@ msgstr "Icon entfernen"
 
 #: includes/block-options/admin.php:370
 msgid "No options yet. Add a control."
-msgstr "Noch keine Optionen. Füge ein Steuerelement hinzu."
+msgstr "Noch keine Optionen. Füge eine Option hinzu."
 
 #: includes/block-options/admin.php:372
 msgid "No presets yet — create some under Block Options → Presets"
-msgstr "Noch keine Presets — erstelle welche unter Block-Optionen → Presets"
+msgstr "Noch keine Vorlagen — erstelle welche unter Block-Optionen → Vorlagen"
 
 #: includes/block-options/admin.php:373
 msgid "Saved."
@@ -1377,23 +1377,23 @@ msgstr "Einträge"
 
 #: includes/block-options/admin.php:376
 msgid "preset"
-msgstr "Preset"
+msgstr "Vorlage"
 
 #: includes/block-options/admin.php:377
 msgid "presets"
-msgstr "Presets"
+msgstr "Vorlagen"
 
 #: includes/block-options/admin.php:378
 msgid "control"
-msgstr "Steuerelement"
+msgstr "Option"
 
 #: includes/block-options/admin.php:379
 msgid "controls"
-msgstr "Steuerelemente"
+msgstr "Optionen"
 
 #: includes/block-options/admin.php:425
 msgid "Invalid presets payload."
-msgstr "Ungültige Preset-Daten."
+msgstr "Ungültige Vorlagen-Daten."
 
 #: includes/block-options/admin.php:470
 msgid "Invalid blocks payload."
