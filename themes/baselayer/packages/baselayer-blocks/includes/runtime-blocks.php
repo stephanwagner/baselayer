@@ -345,6 +345,11 @@ function bl_blocks_register_rest_routes(): void
 				'type'     => 'boolean',
 				'default'  => false,
 			],
+			'fromFile' => [
+				'required' => false,
+				'type'     => 'boolean',
+				'default'  => false,
+			],
 			'fields' => [
 				'required' => false,
 				'default'  => null,
@@ -386,6 +391,43 @@ function bl_blocks_rest_starter_template(WP_REST_Request $request)
 	}
 
 	$config = bl_blocks_get_config($post_id);
+	$slug = bl_blocks_definition_slug($post_id, $config['settings']);
+	$from_file = (bool) $request->get_param('fromFile');
+	$write = (bool) $request->get_param('write');
+
+	if ($from_file) {
+		if ($write) {
+			return new WP_Error(
+				'bl_blocks_invalid_from_file',
+				__('Cannot write when reading an existing template file.', 'baselayer-blocks'),
+				['status' => 400]
+			);
+		}
+		$info = bl_blocks_template_info($slug);
+		if (!$info['exists'] || $info['absolute'] === '' || !is_readable($info['absolute'])) {
+			return new WP_Error(
+				'bl_blocks_template_missing',
+				__('Could not read the template file.', 'baselayer-blocks'),
+				['status' => 404]
+			);
+		}
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- reading theme template for admin preview.
+		$code = file_get_contents($info['absolute']);
+		if (!is_string($code)) {
+			return new WP_Error(
+				'bl_blocks_template_read_failed',
+				__('Could not read the template file.', 'baselayer-blocks'),
+				['status' => 500]
+			);
+		}
+
+		return rest_ensure_response([
+			'code'     => $code,
+			'slug'     => $slug,
+			'fromFile' => true,
+		]);
+	}
+
 	$raw_fields = $request->get_param('fields');
 	if (is_array($raw_fields)) {
 		$sanitized = bl_blocks_sanitize_config(['fields' => $raw_fields, 'settings' => []], 'block');
@@ -394,7 +436,6 @@ function bl_blocks_rest_starter_template(WP_REST_Request $request)
 		$fields = isset($config['fields']) && is_array($config['fields']) ? $config['fields'] : [];
 	}
 
-	$slug = bl_blocks_definition_slug($post_id, $config['settings']);
 	$title = (string) $request->get_param('title');
 	if ($title === '') {
 		$title = $post->post_title !== '' ? $post->post_title : $slug;
@@ -402,7 +443,6 @@ function bl_blocks_rest_starter_template(WP_REST_Request $request)
 
 	$supports_inner = !empty($config['settings']['supports_inner_blocks']);
 	$code = bl_blocks_build_starter_template($slug, $title, $fields, $supports_inner);
-	$write = (bool) $request->get_param('write');
 
 	if (!$write) {
 		return rest_ensure_response([

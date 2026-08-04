@@ -90,6 +90,10 @@ msgstr ""
 msgid "Preview starter template"
 msgstr ""
 
+#: includes/admin-editor.php
+msgid "Preview template"
+msgstr ""
+
 #: includes/admin-editor.php:66
 msgid "No template found"
 msgstr ""
@@ -1258,6 +1262,10 @@ msgstr ""
 
 #: includes/admin-editor.php:545
 msgid "Could not create the template file."
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Could not read the template file."
 msgstr ""
 
 #: includes/admin.php:62

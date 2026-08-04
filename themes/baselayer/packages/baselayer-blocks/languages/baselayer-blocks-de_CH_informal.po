@@ -82,6 +82,10 @@ msgstr "Template"
 msgid "Preview starter template"
 msgstr "Starter-Template Vorschau"
 
+#: includes/admin-editor.php
+msgid "Preview template"
+msgstr "Template Vorschau"
+
 #: includes/admin-editor.php:66
 msgid "No template found"
 msgstr "Kein Template gefunden"
@@ -1202,6 +1206,10 @@ msgstr "Starter-Template konnte nicht erzeugt werden."
 #: includes/admin-editor.php:545
 msgid "Could not create the template file."
 msgstr "Template-Datei konnte nicht erstellt werden."
+
+#: includes/admin-editor.php
+msgid "Could not read the template file."
+msgstr "Template-Datei konnte nicht gelesen werden."
 
 #: includes/admin.php:62 includes/admin.php:63 includes/runtime-site.php:56
 #: includes/runtime-site.php:71

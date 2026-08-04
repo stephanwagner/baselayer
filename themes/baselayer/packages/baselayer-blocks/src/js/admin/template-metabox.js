@@ -24,13 +24,14 @@ function currentTitle() {
   return titleInput ? String(titleInput.value || '').trim() : '';
 }
 
-async function requestStarter({ postId, write }) {
+async function requestStarter({ postId, write, fromFile }) {
   const admin = window.blBlocksAdmin || {};
   const path = admin.starterPath || 'baselayer-blocks/v1/starter-template';
   const config = currentConfig();
   const body = {
     postId,
     write: !!write,
+    fromFile: !!fromFile,
     fields: Array.isArray(config.fields) ? config.fields : [],
     title: currentTitle(),
   };
@@ -56,7 +57,9 @@ async function requestStarter({ postId, write }) {
   if (!res.ok) {
     const message =
       (data && data.message) ||
-      i18n('starterGenerateFailed', 'Could not generate the starter template.');
+      (fromFile
+        ? i18n('templateReadFailed', 'Could not read the template file.')
+        : i18n('starterGenerateFailed', 'Could not generate the starter template.'));
     throw new Error(message);
   }
   return data;
@@ -84,9 +87,10 @@ function downloadStarterFile(code, slug) {
   window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-function openCodeModal(code, slug) {
+function openCodeModal(code, slug, title) {
   document.querySelectorAll('[data-bl-blocks-starter-modal]').forEach((node) => node.remove());
 
+  const modalTitle = title || i18n('starterPreviewTitle', 'Starter template');
   const sourceId = 'bl-blocks-starter-code-' + String(Date.now());
   const overlay = document.createElement('div');
   overlay.className = 'bl-blocks-modal-overlay';
@@ -97,19 +101,19 @@ function openCodeModal(code, slug) {
   dialog.className = 'bl-blocks-modal bl-blocks-modal--starter';
   dialog.setAttribute('role', 'dialog');
   dialog.setAttribute('aria-modal', 'true');
-  dialog.setAttribute('aria-label', i18n('starterPreviewTitle', 'Starter template'));
+  dialog.setAttribute('aria-label', modalTitle);
 
   const header = document.createElement('div');
   header.className = 'bl-blocks-modal__header';
-  const title = document.createElement('h2');
-  title.className = 'bl-blocks-modal__title';
-  title.textContent = i18n('starterPreviewTitle', 'Starter template');
+  const titleEl = document.createElement('h2');
+  titleEl.className = 'bl-blocks-modal__title';
+  titleEl.textContent = modalTitle;
   const closeBtn = document.createElement('button');
   closeBtn.type = 'button';
   closeBtn.className = 'bl-blocks-modal__close';
   closeBtn.setAttribute('aria-label', i18n('starterClose', 'Close'));
   closeBtn.textContent = '×';
-  header.append(title, closeBtn);
+  header.append(titleEl, closeBtn);
 
   const body = document.createElement('div');
   body.className = 'bl-blocks-modal__body';
@@ -220,11 +224,34 @@ async function onPreview(postId, trigger) {
   setBusy(trigger, true);
   try {
     const data = await requestStarter({ postId, write: false });
-    openCodeModal(String((data && data.code) || ''), (data && data.slug) || 'block');
+    openCodeModal(
+      String((data && data.code) || ''),
+      (data && data.slug) || 'block',
+      i18n('starterPreviewTitle', 'Starter template')
+    );
   } catch (err) {
     window.alert(
       (err && (err.message || err.error)) ||
         i18n('starterGenerateFailed', 'Could not generate the starter template.')
+    );
+  } finally {
+    setBusy(trigger, false);
+  }
+}
+
+async function onPreviewTemplate(postId, trigger) {
+  setBusy(trigger, true);
+  try {
+    const data = await requestStarter({ postId, write: false, fromFile: true });
+    openCodeModal(
+      String((data && data.code) || ''),
+      (data && data.slug) || 'block',
+      i18n('templatePreviewTitle', 'Template')
+    );
+  } catch (err) {
+    window.alert(
+      (err && (err.message || err.error)) ||
+        i18n('templateReadFailed', 'Could not read the template file.')
     );
   } finally {
     setBusy(trigger, false);
@@ -254,6 +281,10 @@ export function bindTemplateMetabox() {
 
   root.querySelectorAll('[data-bl-blocks-preview-starter]').forEach((btn) => {
     btn.addEventListener('click', () => onPreview(postId, btn));
+  });
+
+  root.querySelectorAll('[data-bl-blocks-preview-template]').forEach((btn) => {
+    btn.addEventListener('click', () => onPreviewTemplate(postId, btn));
   });
 
   const generateBtn = root.querySelector('[data-bl-blocks-generate-starter]');

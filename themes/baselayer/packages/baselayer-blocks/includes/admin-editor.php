@@ -55,7 +55,10 @@ function bl_blocks_render_template_metabox(WP_Post $post): void
 
 	if ($info['exists']) {
 		echo '<p class="bl-blocks-template-metabox__label"><label for="' . esc_attr($path_id) . '">' . esc_html__('Template', 'baselayer-blocks') . '</label></p>';
-		echo '<p class="bl-blocks-template-metabox__path"><code id="' . esc_attr($path_id) . '">' . esc_html($info['display_path']) . '</code></p>';
+		echo '<div class="bl-blocks-template-metabox__path-row">';
+		echo '<code id="' . esc_attr($path_id) . '" class="bl-blocks-template-metabox__path-code">' . esc_html($info['display_path']) . '</code>';
+		echo '<button type="button" class="button bl-button -has-icon -icon-only -icon-preview" data-bl-blocks-preview-template title="' . esc_attr__('Preview template', 'baselayer-blocks') . '" aria-label="' . esc_attr__('Preview template', 'baselayer-blocks') . '"></button>';
+		echo '</div>';
 		echo '<p class="bl-blocks-template-metabox__actions">';
 		echo '<button type="button" class="button bl-button" data-bl-blocks-preview-starter>';
 		echo esc_html__('Preview starter template', 'baselayer-blocks');
@@ -549,6 +552,7 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'widthCustomPlaceholder'  => __('e.g. 40% or 280px', 'baselayer-blocks'),
 
 		'starterPreviewTitle'     => __('Starter template', 'baselayer-blocks'),
+		'templatePreviewTitle'    => __('Template', 'baselayer-blocks'),
 		'starterCopyCode'         => __('Copy code', 'baselayer-blocks'),
 		'starterDownload'         => __('Download', 'baselayer-blocks'),
 		'starterCopied'           => __('Copied', 'baselayer-blocks'),
@@ -556,6 +560,9 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'starterGenerating'       => __('Generating…', 'baselayer-blocks'),
 		'starterGenerateFailed'   => __('Could not generate the starter template.', 'baselayer-blocks'),
 		'starterWriteFailed'      => __('Could not create the template file.', 'baselayer-blocks'),
+		'templateReadFailed'      => __('Could not read the template file.', 'baselayer-blocks'),
+		'previewTemplate'         => __('Preview template', 'baselayer-blocks'),
+		'previewStarterTemplate'  => __('Preview starter template', 'baselayer-blocks'),
 
 		'types'                    => $type_labels,
 	];
