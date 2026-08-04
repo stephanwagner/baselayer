@@ -12,7 +12,7 @@
   padding-top: 0;
   padding-bottom: 0;
   line-height: normal;
-  border-radius: var(--bl-admin-radius);
+  border-radius: var(--bl-form-radius);
 }
 
 // WP admin `.button.bl-button-small` — denser than bl-button.
@@ -29,7 +29,7 @@
   padding-right: 10px;
   line-height: normal;
   font-size: 12px;
-  border-radius: var(--bl-admin-radius-small);
+  border-radius: var(--bl-form-radius);
 }
 
 // Mask icon for ::before — same technique as frontend `@mixin bl-icon`,

@@ -1,16 +1,18 @@
-/* Layer 1: WP admin color scheme only (--wp-admin-theme-*). No BaseLayer component rules. */
 @import url('/wp-admin/css/colors/modern/colors.min.css');
 
 :root {
-  --wp-admin-theme-color: #3060bf; /* TODO */
+  --wp-admin-theme-color: #3060bf;
   --wp-admin-theme-color--rgb: 48, 96, 191;
-  --wp-admin-theme-color-darker-10: #0056a3;
-  --wp-admin-theme-color-darker-10--rgb: 0, 107, 160.5;
-  --wp-admin-theme-color-darker-20: #003f88;
-  --wp-admin-theme-color-lighter-10: #4387db;
-  --wp-admin-theme-color-lighter-20: #63a1f7;
-  --wp-admin-theme-color-darker-20--rgb: 0, 90, 135;
-  --wp-admin-theme-color-lighter-30: #81bcff;
+  --wp-admin-theme-color-darker-10: #004aa5;
+  --wp-admin-theme-color-darker-10--rgb: 0, 74, 165;
+  --wp-admin-theme-color-darker-20: #00348a;
+  --wp-admin-theme-color-darker-20--rgb: 0, 52, 138;
+  --wp-admin-theme-color-lighter-10: #527add;
+  --wp-admin-theme-color-lighter-10--rgb: 82, 122, 221;
+  --wp-admin-theme-color-lighter-20: #7093fa;
+  --wp-admin-theme-color-lighter-20--rgb: 112, 147, 250;
+  --wp-admin-theme-color-lighter-30: #8daeff;
+  --wp-admin-theme-color-lighter-30--rgb: 141, 174, 255;
 }
 
 a {
