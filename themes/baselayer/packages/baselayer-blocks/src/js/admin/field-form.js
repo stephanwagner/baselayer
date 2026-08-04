@@ -449,11 +449,7 @@ export function createFieldForm(fields, values = {}, options = {}) {
       });
       tablist.appendChild(btn);
 
-      const design = compact
-        ? 'standard'
-        : ['standard', 'outline', 'card'].includes(tab.design)
-          ? tab.design
-          : 'standard';
+      const design = 'standard';
       const panelClass = [
         'bl-blocks-fields__tab-panel',
         'bl-blocks-fields__tab-panel--' + design,
@@ -717,7 +713,9 @@ function createRepeaterControl(field, valueMap, entries, options = {}) {
  */
 export function openFieldsModal(opts) {
   const title = opts.title || i18n('edit', 'Edit');
-  const form = createFieldForm(normalizeFieldList(opts.fields), opts.values || {});
+  const form = createFieldForm(normalizeFieldList(opts.fields), opts.values || {}, {
+    layout: 'default',
+  });
 
   const overlay = el('div', { className: 'bl-blocks-modal-overlay', role: 'presentation' });
   const dialog = el('div', {

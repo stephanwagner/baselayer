@@ -756,6 +756,33 @@ body.post-new-php.post-type-bl_block {
   width: min(720px, 100%);
 }
 
+.bl-blocks-template-metabox__editor-wrap {
+  margin: 0;
+  border: 1px solid #dcdcde;
+  border-radius: 2px;
+  overflow: hidden;
+  background: #f6f7f7;
+
+  textarea {
+    margin: 0;
+    width: 100%;
+    min-height: 240px;
+    font-family: Consolas, Monaco, monospace;
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .CodeMirror {
+    height: auto;
+    max-height: min(520px, 58vh);
+    font-size: 12px;
+  }
+
+  .CodeMirror-scroll {
+    max-height: min(520px, 58vh);
+  }
+}
+
 .bl-blocks-template-metabox__code {
   margin: 0;
   padding: 12px 14px;
@@ -794,7 +821,7 @@ body.post-new-php.post-type-bl_block {
 }
 
 .bl-blocks-modal {
-  width: min(640px, 100%);
+  width: min(960px, 96vw);
   max-height: min(90vh, 800px);
   display: flex;
   flex-direction: column;

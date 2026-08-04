@@ -1232,6 +1232,10 @@ msgstr ""
 msgid "Copy code"
 msgstr ""
 
+#: includes/admin-editor.php
+msgid "Download file"
+msgstr ""
+
 #: includes/admin-editor.php:541
 msgid "Copied"
 msgstr ""

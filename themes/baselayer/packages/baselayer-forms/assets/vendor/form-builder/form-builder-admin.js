@@ -1571,7 +1571,7 @@
           notify();
         },
         {
-          tabs: ["settings", "design", "logic"],
+          tabs: ["settings", "logic"],
           withLabel: true,
           withHideTitle: false,
           onLiveUpdate: () => {

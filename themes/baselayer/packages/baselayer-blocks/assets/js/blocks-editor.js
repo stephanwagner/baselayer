@@ -5151,7 +5151,7 @@
           dataset: { blBlocksTab: "1" }
         });
         tablist.appendChild(btn);
-        const design = compact ? "standard" : ["standard", "outline", "card"].includes(tab.design) ? tab.design : "standard";
+        const design = "standard";
         const panelClass = [
           "bl-blocks-fields__tab-panel",
           "bl-blocks-fields__tab-panel--" + design
@@ -5370,7 +5370,9 @@
   }
   function openFieldsModal(opts) {
     const title = opts.title || i18n4("edit", "Edit");
-    const form = createFieldForm(normalizeFieldList(opts.fields), opts.values || {});
+    const form = createFieldForm(normalizeFieldList(opts.fields), opts.values || {}, {
+      layout: "default"
+    });
     const overlay = el4("div", { className: "bl-blocks-modal-overlay", role: "presentation" });
     const dialog = el4("div", {
       className: "bl-blocks-modal",

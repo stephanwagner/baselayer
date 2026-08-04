@@ -87,8 +87,8 @@ msgid "No template found"
 msgstr "Kein Template gefunden"
 
 #: includes/admin-editor.php:69
-msgid "Create this file:"
-msgstr "Diese Datei erstellen:"
+msgid "Create template file:"
+msgstr "Template Datei erstellen:"
 
 #: includes/admin-editor.php:73
 msgid "Copy filename"
@@ -1176,6 +1176,10 @@ msgstr "Starter-Template"
 #: includes/admin-editor.php:540
 msgid "Copy code"
 msgstr "Code kopieren"
+
+#: includes/admin-editor.php
+msgid "Download file"
+msgstr "Datei herunterladen"
 
 #: includes/admin-editor.php:541
 msgid "Copied"

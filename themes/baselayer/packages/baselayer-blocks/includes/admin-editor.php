@@ -66,7 +66,7 @@ function bl_blocks_render_template_metabox(WP_Post $post): void
 		echo esc_html__('No template found', 'baselayer-blocks');
 		echo '</div>';
 
-		echo '<p class="bl-blocks-template-metabox__label"><label>' . esc_html__('Create this file:', 'baselayer-blocks') . '</label></p>';
+		echo '<p class="bl-blocks-template-metabox__label"><label>' . esc_html__('Create template file:', 'baselayer-blocks') . '</label></p>';
 		echo '<div class="bl-blocks-template-metabox__path-row">';
 		echo '<code class="bl-blocks-template-metabox__path-code">' . esc_html($info['create_path']) . '</code>';
 		echo '<span id="' . esc_attr($path_id) . '" class="screen-reader-text">' . esc_html($filename) . '</span>';
@@ -198,6 +198,22 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		$deps[] = $builder_handle;
 	}
 	bl_blocks_enqueue_script('bl-blocks-admin', 'blocks-admin', $deps, true);
+
+	$code_editor_settings = false;
+	if (function_exists('wp_enqueue_code_editor')) {
+		$code_editor_settings = wp_enqueue_code_editor([
+			'type' => 'application/x-httpd-php',
+		]);
+		if (is_array($code_editor_settings)) {
+			$codemirror = isset($code_editor_settings['codemirror']) && is_array($code_editor_settings['codemirror'])
+				? $code_editor_settings['codemirror']
+				: [];
+			$codemirror['readOnly'] = true;
+			$code_editor_settings['codemirror'] = $codemirror;
+		} else {
+			$code_editor_settings = false;
+		}
+	}
 
 	$has_icon_picker = function_exists('bl_icons_localize_payload')
 		&& function_exists('bl_enqueue_theme_icons_style');
@@ -538,6 +554,7 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 
 		'starterPreviewTitle'     => __('Starter template', 'baselayer-blocks'),
 		'starterCopyCode'         => __('Copy code', 'baselayer-blocks'),
+		'starterDownloadFile'     => __('Download file', 'baselayer-blocks'),
 		'starterCopied'           => __('Copied', 'baselayer-blocks'),
 		'starterClose'            => __('Close', 'baselayer-blocks'),
 		'starterGenerating'       => __('Generating…', 'baselayer-blocks'),
@@ -556,6 +573,7 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'pagesRestUrl'         => esc_url_raw(rest_url('wp/v2/pages')),
 		'starterPath'          => 'baselayer-blocks/v1/starter-template',
 		'restNonce'            => wp_create_nonce('wp_rest'),
+		'codeEditorSettings'   => $code_editor_settings,
 		'blockOptionCustoms'  => function_exists('bl_block_options_customs_catalog')
 			? bl_block_options_customs_catalog()
 			: [],

@@ -7274,7 +7274,7 @@
           dataset: { blBlocksTab: "1" }
         });
         tablist.appendChild(btn);
-        const design = compact ? "standard" : ["standard", "outline", "card"].includes(tab.design) ? tab.design : "standard";
+        const design = "standard";
         const panelClass = [
           "bl-blocks-fields__tab-panel",
           "bl-blocks-fields__tab-panel--" + design
@@ -7493,7 +7493,9 @@
   }
   function openFieldsModal(opts) {
     const title = opts.title || i18n4("edit", "Edit");
-    const form = createFieldForm(normalizeFieldList(opts.fields), opts.values || {});
+    const form = createFieldForm(normalizeFieldList(opts.fields), opts.values || {}, {
+      layout: "default"
+    });
     const overlay = el7("div", { className: "bl-blocks-modal-overlay", role: "presentation" });
     const dialog = el7("div", {
       className: "bl-blocks-modal",
@@ -7658,7 +7660,20 @@
     overlay.remove();
     document.removeEventListener("keydown", overlay._onKey);
   }
-  function openCodeModal(code) {
+  function downloadStarterFile(code, slug) {
+    const safeSlug = String(slug || "block").replace(/[^a-z0-9_-]+/gi, "-").replace(/^-+|-+$/g, "").toLowerCase() || "block";
+    const filename = safeSlug + ".php";
+    const blob = new Blob([String(code || "")], { type: "application/x-httpd-php;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1e3);
+  }
+  function openCodeModal(code, slug) {
     document.querySelectorAll("[data-bl-blocks-starter-modal]").forEach((node) => node.remove());
     const sourceId = "bl-blocks-starter-code-" + String(Date.now());
     const overlay = document.createElement("div");
@@ -7683,13 +7698,28 @@
     header.append(title, closeBtn);
     const body = document.createElement("div");
     body.className = "bl-blocks-modal__body";
-    const pre = document.createElement("pre");
-    pre.className = "bl-blocks-template-metabox__code";
-    const codeEl = document.createElement("code");
-    codeEl.id = sourceId;
-    codeEl.textContent = code;
-    pre.appendChild(codeEl);
-    body.appendChild(pre);
+    const admin = window.blBlocksAdmin || {};
+    const editorSettings = admin.codeEditorSettings;
+    const canUseCodeEditor = editorSettings && window.wp && window.wp.codeEditor && typeof window.wp.codeEditor.initialize === "function";
+    if (canUseCodeEditor) {
+      const wrap = document.createElement("div");
+      wrap.className = "bl-blocks-template-metabox__editor-wrap";
+      const textarea = document.createElement("textarea");
+      textarea.id = sourceId;
+      textarea.className = "bl-blocks-template-metabox__editor";
+      textarea.setAttribute("readonly", "");
+      textarea.value = code;
+      wrap.appendChild(textarea);
+      body.appendChild(wrap);
+    } else {
+      const pre = document.createElement("pre");
+      pre.className = "bl-blocks-template-metabox__code";
+      const codeEl = document.createElement("code");
+      codeEl.id = sourceId;
+      codeEl.textContent = code;
+      pre.appendChild(codeEl);
+      body.appendChild(pre);
+    }
     const footer = document.createElement("div");
     footer.className = "bl-blocks-modal__footer";
     const copyBtn = document.createElement("button");
@@ -7701,17 +7731,37 @@
       i18n5("starterCopied", "Copied")
     );
     copyBtn.textContent = i18n5("starterCopyCode", "Copy code");
+    const downloadBtn = document.createElement("button");
+    downloadBtn.type = "button";
+    downloadBtn.className = "button";
+    downloadBtn.textContent = i18n5("starterDownloadFile", "Download file");
     const closeFooter = document.createElement("button");
     closeFooter.type = "button";
     closeFooter.className = "button";
     closeFooter.textContent = i18n5("starterClose", "Close");
-    footer.append(copyBtn, closeFooter);
+    footer.append(copyBtn, downloadBtn, closeFooter);
     dialog.append(header, body, footer);
     overlay.appendChild(dialog);
     document.body.appendChild(overlay);
+    if (canUseCodeEditor) {
+      const editor = window.wp.codeEditor.initialize(sourceId, editorSettings);
+      if (editor && editor.codemirror) {
+        window.setTimeout(() => {
+          editor.codemirror.refresh();
+        }, 0);
+        window.setTimeout(() => {
+          editor.codemirror.refresh();
+        }, 100);
+      }
+    }
     const onClose = () => closeModal(overlay);
     closeBtn.addEventListener("click", onClose);
     closeFooter.addEventListener("click", onClose);
+    downloadBtn.addEventListener("click", () => {
+      const source = document.getElementById(sourceId);
+      const text = source && source.value !== void 0 ? source.value : source ? source.textContent : code;
+      downloadStarterFile(text, slug);
+    });
     overlay.addEventListener("click", (evt) => {
       if (evt.target === overlay) onClose();
     });
@@ -7741,7 +7791,7 @@
     setBusy(trigger, true);
     try {
       const data = await requestStarter({ postId, write: false });
-      openCodeModal(String(data && data.code || ""));
+      openCodeModal(String(data && data.code || ""), data && data.slug || "block");
     } catch (err) {
       window.alert(
         err && (err.message || err.error) || i18n5("starterGenerateFailed", "Could not generate the starter template.")

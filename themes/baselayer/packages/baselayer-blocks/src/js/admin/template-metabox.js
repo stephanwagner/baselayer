@@ -67,7 +67,24 @@ function closeModal(overlay) {
   document.removeEventListener('keydown', overlay._onKey);
 }
 
-function openCodeModal(code) {
+function downloadStarterFile(code, slug) {
+  const safeSlug = String(slug || 'block')
+    .replace(/[^a-z0-9_-]+/gi, '-')
+    .replace(/^-+|-+$/g, '')
+    .toLowerCase() || 'block';
+  const filename = safeSlug + '.php';
+  const blob = new Blob([String(code || '')], { type: 'application/x-httpd-php;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function openCodeModal(code, slug) {
   document.querySelectorAll('[data-bl-blocks-starter-modal]').forEach((node) => node.remove());
 
   const sourceId = 'bl-blocks-starter-code-' + String(Date.now());
@@ -96,13 +113,34 @@ function openCodeModal(code) {
 
   const body = document.createElement('div');
   body.className = 'bl-blocks-modal__body';
-  const pre = document.createElement('pre');
-  pre.className = 'bl-blocks-template-metabox__code';
-  const codeEl = document.createElement('code');
-  codeEl.id = sourceId;
-  codeEl.textContent = code;
-  pre.appendChild(codeEl);
-  body.appendChild(pre);
+
+  const admin = window.blBlocksAdmin || {};
+  const editorSettings = admin.codeEditorSettings;
+  const canUseCodeEditor =
+    editorSettings &&
+    window.wp &&
+    window.wp.codeEditor &&
+    typeof window.wp.codeEditor.initialize === 'function';
+
+  if (canUseCodeEditor) {
+    const wrap = document.createElement('div');
+    wrap.className = 'bl-blocks-template-metabox__editor-wrap';
+    const textarea = document.createElement('textarea');
+    textarea.id = sourceId;
+    textarea.className = 'bl-blocks-template-metabox__editor';
+    textarea.setAttribute('readonly', '');
+    textarea.value = code;
+    wrap.appendChild(textarea);
+    body.appendChild(wrap);
+  } else {
+    const pre = document.createElement('pre');
+    pre.className = 'bl-blocks-template-metabox__code';
+    const codeEl = document.createElement('code');
+    codeEl.id = sourceId;
+    codeEl.textContent = code;
+    pre.appendChild(codeEl);
+    body.appendChild(pre);
+  }
 
   const footer = document.createElement('div');
   footer.className = 'bl-blocks-modal__footer';
@@ -115,19 +153,41 @@ function openCodeModal(code) {
     i18n('starterCopied', 'Copied')
   );
   copyBtn.textContent = i18n('starterCopyCode', 'Copy code');
+  const downloadBtn = document.createElement('button');
+  downloadBtn.type = 'button';
+  downloadBtn.className = 'button';
+  downloadBtn.textContent = i18n('starterDownloadFile', 'Download file');
   const closeFooter = document.createElement('button');
   closeFooter.type = 'button';
   closeFooter.className = 'button';
   closeFooter.textContent = i18n('starterClose', 'Close');
-  footer.append(copyBtn, closeFooter);
+  footer.append(copyBtn, downloadBtn, closeFooter);
 
   dialog.append(header, body, footer);
   overlay.appendChild(dialog);
   document.body.appendChild(overlay);
 
+  if (canUseCodeEditor) {
+    const editor = window.wp.codeEditor.initialize(sourceId, editorSettings);
+    if (editor && editor.codemirror) {
+      window.setTimeout(() => {
+        editor.codemirror.refresh();
+      }, 0);
+      window.setTimeout(() => {
+        editor.codemirror.refresh();
+      }, 100);
+    }
+  }
+
   const onClose = () => closeModal(overlay);
   closeBtn.addEventListener('click', onClose);
   closeFooter.addEventListener('click', onClose);
+  downloadBtn.addEventListener('click', () => {
+    const source = document.getElementById(sourceId);
+    const text =
+      source && source.value !== undefined ? source.value : source ? source.textContent : code;
+    downloadStarterFile(text, slug);
+  });
   overlay.addEventListener('click', (evt) => {
     if (evt.target === overlay) onClose();
   });
@@ -160,7 +220,7 @@ async function onPreview(postId, trigger) {
   setBusy(trigger, true);
   try {
     const data = await requestStarter({ postId, write: false });
-    openCodeModal(String((data && data.code) || ''));
+    openCodeModal(String((data && data.code) || ''), (data && data.slug) || 'block');
   } catch (err) {
     window.alert(
       (err && (err.message || err.error)) ||
