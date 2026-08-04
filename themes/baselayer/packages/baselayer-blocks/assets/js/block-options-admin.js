@@ -1471,7 +1471,7 @@
       return wrap;
     }
     function renderChoices(item) {
-      const wrap = el("div", { className: "bl-bo-choices bl-form" });
+      const wrap = el("div", { className: "bl-bo-choices bl-admin-form" });
       const showIconPicker = item.type === "button-group";
       (item.options || []).forEach((opt, oi) => {
         const children = [
@@ -3025,7 +3025,7 @@
     }
     function renderAddBlockBar(tab) {
       const choices = availableBlocksForTab(tab);
-      const bar = el2("div", { className: "bl-bo-add-block bl-form" });
+      const bar = el2("div", { className: "bl-bo-add-block bl-admin-form" });
       const row = el2("div", { className: "bl-bo-add-block__row" });
       const select = el2("select", {
         className: "bl-bo-add-block__select",

@@ -904,7 +904,7 @@ function boot() {
 
   function renderAddBlockBar(tab) {
     const choices = availableBlocksForTab(tab);
-    const bar = el('div', { className: 'bl-bo-add-block bl-form' });
+    const bar = el('div', { className: 'bl-bo-add-block bl-admin-form' });
     const row = el('div', { className: 'bl-bo-add-block__row' });
     const select = el('select', {
       className: 'bl-bo-add-block__select',

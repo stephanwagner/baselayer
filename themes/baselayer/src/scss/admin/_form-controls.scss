@@ -1,28 +1,21 @@
 @use 'mixins' as *;
 
-// Compact WP admin button (36px) — pair with core `.button`.
+// Compact WP admin button — pair with core `.button`.
 .wp-core-ui .button.bl-button,
 .button.bl-button {
   @include bl-button;
 }
 
-// Dense WP admin button (28px).
+// Dense WP admin button.
 .wp-core-ui .button.bl-button-small,
 .button.bl-button-small {
   @include bl-button-small;
 }
 
-// ---------------------------------------------------------------------------
-// Icon buttons — same API as frontend: -has-icon + -icon-{name} (+ -icon-only)
-// Icon glyph comes from theme-icons CSS (`--bl-icon` on .-icon-*).
-// ---------------------------------------------------------------------------
+// Buttons
 
 .wp-core-ui .button.-has-icon,
 .button.-has-icon {
-  --bl-admin-button-icon-size: var(--bl-button-icon-size, 18px);
-  --bl-admin-button-icon-inset: var(--bl-button-icon-inset, 10px);
-  --bl-admin-button-icon-gap: var(--bl-button-icon-gap, 6px);
-
   position: relative;
   text-align: left;
 
@@ -62,7 +55,7 @@
   }
 }
 
-// Square icon-only (default WP button height ≈ 30–40px; prefer bl-button sizing).
+// Square icon-only (prefer bl-button sizing).
 .wp-core-ui .button.-has-icon.-icon-only,
 .button.-has-icon.-icon-only {
   display: inline-flex;
@@ -70,10 +63,10 @@
   justify-content: center;
   flex: 0 0 auto;
   box-sizing: border-box;
-  width: 36px;
-  min-width: 36px;
-  height: 36px;
-  min-height: 36px;
+  width: var(--bl-admin-button-height);
+  min-width: var(--bl-admin-button-height);
+  height: var(--bl-admin-button-height);
+  min-height: var(--bl-admin-button-height);
   padding: 0 !important;
   line-height: 0 !important;
   text-align: center;
@@ -85,87 +78,67 @@
     right: auto;
     transform: none;
     flex-shrink: 0;
-    width: 18px;
-    height: 18px;
-  }
-}
-
-.wp-core-ui .button.bl-button.-has-icon.-icon-only,
-.button.bl-button.-has-icon.-icon-only {
-  width: 36px;
-  min-width: 36px;
-  height: 36px;
-  min-height: 36px;
-
-  &::before {
-    width: 18px;
-    height: 18px;
+    width: var(--bl-admin-button-icon-size);
+    height: var(--bl-admin-button-icon-size);
   }
 }
 
 .wp-core-ui .button.bl-button-small.-has-icon.-icon-only,
 .button.bl-button-small.-has-icon.-icon-only {
-  width: 28px;
-  min-width: 28px;
-  height: 28px;
-  min-height: 28px;
+  width: var(--bl-admin-button-height-small);
+  min-width: var(--bl-admin-button-height-small);
+  height: var(--bl-admin-button-height-small);
+  min-height: var(--bl-admin-button-height-small);
 
   &::before {
-    width: 16px;
-    height: 16px;
+    width: var(--bl-admin-button-icon-size-small);
+    height: var(--bl-admin-button-icon-size-small);
   }
 }
 
-// Labeled icons on compact buttons: slightly tighter inset.
-.wp-core-ui .button.bl-button.-has-icon:not(.-icon-only),
-.button.bl-button.-has-icon:not(.-icon-only) {
-  --bl-admin-button-icon-size: 18px;
-  --bl-admin-button-icon-inset: 10px;
-  --bl-admin-button-icon-gap: 6px;
-}
-
+// Dense labeled icon buttons.
 .wp-core-ui .button.bl-button-small.-has-icon:not(.-icon-only),
 .button.bl-button-small.-has-icon:not(.-icon-only) {
-  --bl-admin-button-icon-size: 16px;
-  --bl-admin-button-icon-inset: 8px;
-  --bl-admin-button-icon-gap: 4px;
+  --bl-admin-button-icon-size: var(--bl-admin-button-icon-size-small);
+  --bl-admin-button-icon-inset: var(--bl-admin-button-icon-inset-small);
+  --bl-admin-button-icon-gap: var(--bl-admin-button-icon-gap-small);
 }
 
-// Wrapper: shrink nested WP buttons + text fields to the compact 36px size.
-// Scoped to WP admin controls only — does not restyle frontend Forms BEM (`.bl-form__*`).
-.bl-form {
+// Wrapper: shrink nested WP buttons + text fields to the compact size.
+// Admin-only denseness scope — Forms package keeps `.bl-form` / `.bl-form__*`.
+.bl-admin-form {
   .wp-core-ui .button,
   .button {
     @include bl-button;
 
     &.-has-icon.-icon-only {
-      width: 36px;
-      min-width: 36px;
-      height: 36px;
-      min-height: 36px;
+      width: var(--bl-admin-button-height);
+      min-width: var(--bl-admin-button-height);
+      height: var(--bl-admin-button-height);
+      min-height: var(--bl-admin-button-height);
       padding: 0 !important;
 
       &::before {
-        width: 18px;
-        height: 18px;
+        width: var(--bl-admin-button-icon-size);
+        height: var(--bl-admin-button-icon-size);
       }
     }
   }
 
-  // Dense buttons inside a form keep the 28px size.
+  // Dense buttons inside a form keep the small size.
   .wp-core-ui .button.bl-button-small,
   .button.bl-button-small {
     @include bl-button-small;
 
     &.-has-icon.-icon-only {
-      width: 28px;
-      min-width: 28px;
-      height: 28px;
-      min-height: 28px;
+      width: var(--bl-admin-button-height-small);
+      min-width: var(--bl-admin-button-height-small);
+      height: var(--bl-admin-button-height-small);
+      min-height: var(--bl-admin-button-height-small);
 
       &::before {
-        width: 16px;
-        height: 16px;
+        width: var(--bl-admin-button-icon-size-small);
+        height: var(--bl-admin-button-icon-size-small);
       }
     }
   }
@@ -179,12 +152,12 @@
   input:not([type]),
   select {
     box-sizing: border-box;
-    height: 36px;
-    min-height: 36px;
-    max-height: 36px;
+    height: var(--bl-admin-button-height);
+    min-height: var(--bl-admin-button-height);
+    max-height: var(--bl-admin-button-height);
   }
 
-  // Match form-builder: keep select text vertically centered at 36px.
+  // Match form-builder: keep select text vertically centered.
   select {
     line-height: 1.5;
   }

@@ -447,7 +447,7 @@ function bl_blocks_render_settings_page(): void
 			</div>
 		<?php endif; ?>
 
-		<div class="bl-forms-builder bl-blocks-settings-shell bl-form">
+		<div class="bl-forms-builder bl-blocks-settings-shell bl-admin-form">
 			<nav class="bl-forms-builder__tabs" role="tablist" aria-label="<?php echo esc_attr__('Blocks settings sections', 'baselayer-blocks'); ?>">
 				<?php foreach ($tabs as $slug => $label) : ?>
 					<a

@@ -1,11 +1,8 @@
-// Configured CSS custom properties
-@forward 'root';
-
 // Fonts
 @forward 'fonts/fonts';
 
 // Admin tokens
-@forward 'admin/variables';
+@forward 'admin/root';
 
 // Shared
 @forward 'layout/shared/wordpress';
@@ -51,5 +48,3 @@
 @forward 'admin/media-library';
 @forward 'admin/field-builder';
 @forward 'admin/post-states';
-
-// Block styles are exclusive bundles (blocks-baselayer-editor / blocks-acf-editor), enqueued by PHP.

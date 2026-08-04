@@ -1,7 +1,3 @@
-@use '../config' as *;
-@use '../mixins' as *;
-@use '../icons/icons' as *;
-
 // System info
 
 .bl-system-info-table {
@@ -27,7 +23,7 @@
 .bl-warning-wrap {
   margin-top: 4px;
   font-size: 13px;
-  color: #b45309;
+  color: var(--bl-color-warning-text);
 }
 
 .bl-warning-label {
@@ -49,8 +45,8 @@
 
 .bl-language-flag-preview {
   align-items: center;
-  background: #f6f7f7;
-  border: 1px solid #dcdcde;
+  background: var(--bl-gray-50);
+  border: 1px solid var(--bl-color-border-light);
   border-radius: 4px;
   display: inline-flex;
   justify-content: center;
@@ -82,7 +78,7 @@
 }
 
 .bl-language-quick-add__sep {
-  color: #c3c4c7;
+  color: var(--bl-color-text-muted);
 }
 
 #bl-language-catalog-select {
@@ -94,7 +90,7 @@
 .bl-admin-group,
 .bl-feature-group {
   background: #fff;
-  border: 1px solid #c3c4c7;
+  border: 1px solid var(--bl-color-border-light);
   box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
   border-radius: 6px;
   padding: 14px 16px 16px;
@@ -106,7 +102,7 @@
   hr {
     margin: 0;
     border-bottom: 0;
-    border-top: 1px solid #dcdcde;
+    border-top: 1px solid var(--bl-color-border-light);
   }
 
   table {
@@ -120,19 +116,6 @@
 
 .bl-feature-group {
   padding: 0 20px;
-}
-
-.bl-feature-beta {
-  display: inline-block;
-  margin-left: 6px;
-  padding: 1px 6px;
-  border-radius: 3px;
-  background: #f97316;
-  color: #fff;
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 1.4;
-  vertical-align: middle;
 }
 
 // Helpers table
@@ -159,7 +142,7 @@
       white-space: nowrap;
 
       code {
-        color: #50575e;
+        color: var(--bl-color-text-muted);
       }
 
       @media (max-width: 600px) {
@@ -176,11 +159,11 @@
 .helpers-table__preview-pointer {
   display: inline-block;
   width: 18px;
-  background: #e9ecf0;
+  background: var(--bl-gray-100);
   border-radius: 3px;
   font-size: 12px;
   line-height: 18px;
-  color: #646970;
+  color: var(--bl-color-text-muted);
   text-align: center;
   margin: 0 4px 0 0;
 }
@@ -210,7 +193,7 @@
   max-width: 720px;
 
   &__code {
-    background: #f6f7f7;
+    background: var(--bl-gray-50);
     border: 1px solid #dcdcde;
     border-radius: 4px;
     margin: 0;
@@ -241,7 +224,7 @@
 
   .helpers-icons-demo__preview--inline {
     align-items: center;
-    color: #1d2327;
+    color: var(--bl-color-text);
     display: flex;
     flex: 0 0 auto;
     font-size: 16px;
@@ -288,7 +271,7 @@
   gap: 0;
 
   .button {
-    border-radius: 0;
+    border-radius: var(--bl-admin-radius-small);
     margin: 0;
 
     &:first-child {
@@ -303,8 +286,8 @@
     }
 
     &.is-active {
-      background: #2271b1;
-      border-color: #2271b1;
+      background: var(--bl-color-primary);
+      border-color: var(--bl-color-primary);
       color: #fff;
     }
   }
@@ -384,10 +367,10 @@
 
 .helpers-icons-demo__preview {
   align-items: center;
-  background: #f6f7f7;
+  background: var(--bl-gray-50);
   border: 1px solid #dcdcde;
   border-radius: 4px;
-  color: #1d2327;
+  color: var(--bl-color-text);
   display: flex;
   flex: 0 0 96px;
   height: 96px;
@@ -444,7 +427,7 @@ body.bl-dev-icon-modal-open {
 
 .bl-dev-icon-modal__header {
   align-items: center;
-  border-bottom: 1px solid #dcdcde;
+  border-bottom: 1px solid var(--bl-color-border-light);
   display: flex;
   flex: 0 0 auto;
   gap: 12px;
@@ -463,7 +446,7 @@ body.bl-dev-icon-modal-open {
   align-items: center;
   background: transparent;
   border: 0;
-  color: #50575e;
+  color: var(--bl-color-text-muted);
   cursor: pointer;
   display: inline-flex;
   height: 32px;
@@ -474,7 +457,7 @@ body.bl-dev-icon-modal-open {
 
   &:hover,
   &:focus {
-    color: #1d2327;
+    color: var(--bl-color-text);
   }
 
   .dashicons {
@@ -526,8 +509,8 @@ input[type='search'].bl-dev-icon-modal__search {
     }
 
     &.is-active {
-      background: #2271b1;
-      border-color: #2271b1;
+      background: var(--bl-color-primary);
+      border-color: var(--bl-color-primary);
       color: #fff;
     }
   }
@@ -613,11 +596,11 @@ input[type='search'].bl-dev-icon-modal__search {
 }
 
 .bl-media-cleanup__status-line--ok {
-  color: #1a5f29;
+  color: var(--bl-color-success-text);
 }
 
 .bl-media-cleanup__status-line--warn {
-  color: #9a6700;
+  color: var(--bl-color-warning-text);
 }
 
 .bl-media-cleanup__actions {

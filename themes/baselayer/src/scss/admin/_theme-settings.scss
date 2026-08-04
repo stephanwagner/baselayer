@@ -1,5 +1,13 @@
-@use '../config' as *;
-@use '../mixins' as *;
+// Custom CSS editor (Theme Settings → CSS)
+
+.bl-custom-css-editor-wrap {
+  border: 1px solid #e2e4e7;
+
+  .CodeMirror {
+    height: 480px;
+    resize: vertical;
+  }
+}
 
 // CSS tab — variable overview modal (_root.scss :root)
 

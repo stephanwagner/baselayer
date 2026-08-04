@@ -1,10 +1,149 @@
-@use '../config' as *;
-@use '../mixins' as *;
-
 // Toggle display
 
 .bl-hidden {
   display: none !important;
+}
+
+// CPT list with manual order: popover must not be clipped by table overflow.
+
+body.bl-cpt-reorder-list {
+  table.wp-list-table.widefat,
+  table.wp-list-table.widefat tbody,
+  table.wp-list-table.widefat tr,
+  td.column-bl_cpt_reorder {
+    overflow: visible;
+  }
+}
+
+// Notices
+
+.bl-notice-error {
+  ul {
+    list-style-type: none;
+
+    li {
+      position: relative;
+      margin: 0 0 8px;
+      padding-left: 12px;
+
+      &::before {
+        content: '›';
+        position: absolute;
+        left: 2px;
+        top: -1px;
+        transform: scale(1.25);
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+// Description links
+
+.bl-description-link {
+  &.-has-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+
+    .bl-description-link-icon {
+      width: 16px;
+      height: 16px;
+      transform: translateY(1px);
+
+      svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+
+  &:not(:hover) {
+    &.-gray {
+      color: #646970;
+    }
+  }
+}
+
+// Details summary
+
+.bl-details {
+  summary {
+    position: relative;
+    padding-left: 12px;
+    cursor: pointer;
+    list-style: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &::before {
+      content: '›';
+      position: absolute;
+      left: 0;
+      top: 0;
+      transition: transform 280ms;
+      transform: translateY(-1px) translateX(1px) scale(1.25);
+    }
+  }
+
+  &[open] summary::before {
+    transform: translateY(-1px) translateX(1px) scale(1.25) rotate(90deg);
+  }
+}
+
+// WP nav-tab icon badges (BaseLayer markup inside core tabs)
+
+.nav-tab {
+  .bl-tab-icons {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-right: -2px;
+  }
+
+  .bl-tab-icon {
+    width: 18px;
+    height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background-color: #72aee6;
+    color: #fff;
+
+    &.-warning {
+      background-color: #e6a772;
+    }
+
+    svg {
+      display: block;
+      fill: currentColor;
+      width: 12px;
+      height: 12px;
+    }
+  }
+}
+
+// Code modifiers
+
+code.bl-code-small,
+.code.bl-code-small,
+input.code.bl-code-small,
+textarea.code.bl-code-small {
+  font-size: 12px;
+}
+
+code.bl-code-text {
+  background: none;
+  padding: 0;
+  margin: 0;
+  color: #646970;
 }
 
 // Tabs

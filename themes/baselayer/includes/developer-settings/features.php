@@ -119,7 +119,7 @@ function bl_render_developer_features(): void
 						<th scope="row" class="form-table-checkbox-label"><?= esc_html__('Duplicate', 'baselayer') ?></th>
 						<td>
 							<input type="hidden" name="baselayer_features[enable_duplicate_post]" value="0">
-							<label><input type="checkbox" name="baselayer_features[enable_duplicate_post]" value="1" <?= checked($feat('enable_duplicate_post'), 1, false) ?>> <?= esc_html__('Allow duplication', 'baselayer') ?></label>
+							<label style="font-weight: 500;"><input type="checkbox" name="baselayer_features[enable_duplicate_post]" value="1" <?= checked($feat('enable_duplicate_post'), 1, false) ?>> <?= esc_html__('Allow duplication', 'baselayer') ?></label>
 							<p class="description bl-indent-checkbox"><?= esc_html__('Shows a "Duplicate" row action for pages and posts.', 'baselayer') ?></p>
 						</td>
 					</tr>
@@ -132,7 +132,7 @@ function bl_render_developer_features(): void
 						<th scope="row" class="form-table-checkbox-label"><?= esc_html__('Post expirator', 'baselayer') ?></th>
 						<td>
 							<input type="hidden" name="baselayer_features[enable_post_expirator]" value="0">
-							<label><input type="checkbox" name="baselayer_features[enable_post_expirator]" value="1" <?= checked($feat('enable_post_expirator'), 1, false) ?>> <?= esc_html__('Enable post expirator', 'baselayer') ?></label>
+							<label style="font-weight: 500;"><input type="checkbox" name="baselayer_features[enable_post_expirator]" value="1" <?= checked($feat('enable_post_expirator'), 1, false) ?>> <?= esc_html__('Enable post expirator', 'baselayer') ?></label>
 							<p class="description bl-indent-checkbox"><?= esc_html__('Adds an expiration date to pages and posts.', 'baselayer') ?></p>
 						</td>
 					</tr>
@@ -145,7 +145,7 @@ function bl_render_developer_features(): void
 						<th scope="row" class="form-table-checkbox-label"><?= esc_html__('SEO', 'baselayer') ?></th>
 						<td>
 							<input type="hidden" name="baselayer_features[enable_seo]" value="0">
-							<label><input type="checkbox" name="baselayer_features[enable_seo]" value="1" <?= checked($feat('enable_seo'), 1, false) ?>> <?= esc_html__('Enable SEO panel', 'baselayer') ?></label>
+							<label style="font-weight: 500;"><input type="checkbox" name="baselayer_features[enable_seo]" value="1" <?= checked($feat('enable_seo'), 1, false) ?>> <?= esc_html__('Enable SEO panel', 'baselayer') ?></label>
 							<p class="description bl-indent-checkbox"><?= esc_html__('Adds a section to pages and posts to enter SEO info.', 'baselayer') ?></p>
 						</td>
 					</tr>
@@ -158,7 +158,7 @@ function bl_render_developer_features(): void
 						<th scope="row" class="form-table-checkbox-label"><?= esc_html__('Breadcrumbs', 'baselayer') ?></th>
 						<td>
 							<input type="hidden" name="baselayer_features[enable_breadcrumbs]" value="0">
-							<label><input type="checkbox" name="baselayer_features[enable_breadcrumbs]" id="baselayer_features_enable_breadcrumbs" value="1" <?= checked($feat('enable_breadcrumbs'), 1, false) ?>> <?= esc_html__('Enable breadcrumbs', 'baselayer') ?></label>
+							<label style="font-weight: 500;"><input type="checkbox" name="baselayer_features[enable_breadcrumbs]" id="baselayer_features_enable_breadcrumbs" value="1" <?= checked($feat('enable_breadcrumbs'), 1, false) ?>> <?= esc_html__('Enable breadcrumbs', 'baselayer') ?></label>
 							<p class="description bl-indent-checkbox"><?= esc_html__('Shows breadcrumb navigation on pages, posts, archives, and search.', 'baselayer') ?></p>
 							<p class="description bl-indent-checkbox"><?= wp_kses(
 								__('Needs <code class="bl-code-small">bl_breadcrumbs()</code> in templates to show.', 'baselayer'),
@@ -166,7 +166,7 @@ function bl_render_developer_features(): void
 							) ?></p>
 							<div class="bl-feature-sub" id="bl-feature-sub-breadcrumbs" style="margin-top: 12px; <?= $feat('enable_breadcrumbs') !== 1 ? 'display:none;' : '' ?>">
 								<input type="hidden" name="baselayer_features[breadcrumbs_hide_first_level]" value="0">
-								<label><input type="checkbox" name="baselayer_features[breadcrumbs_hide_first_level]" value="1" <?= checked($feat('breadcrumbs_hide_first_level'), 1, false) ?>> <?= esc_html__('Hide on first level pages', 'baselayer') ?></label>
+								<label style="font-weight: 500;"><input type="checkbox" name="baselayer_features[breadcrumbs_hide_first_level]" value="1" <?= checked($feat('breadcrumbs_hide_first_level'), 1, false) ?>> <?= esc_html__('Hide on first level pages', 'baselayer') ?></label>
 								<p class="description bl-indent-checkbox"><?= esc_html__('Only show breadcrumbs when there is a parent page other than the home page.', 'baselayer') ?></p>
 							</div>
 						</td>
@@ -180,7 +180,7 @@ function bl_render_developer_features(): void
 						<th scope="row" class="form-table-checkbox-label"><?= esc_html__('Languages', 'baselayer') ?></th>
 						<td>
 							<input type="hidden" name="baselayer_features[enable_languages]" value="0">
-							<label><input type="checkbox" name="baselayer_features[enable_languages]" id="baselayer_features_enable_languages" value="1" <?= checked($feat('enable_languages'), 1, false) ?>> <?= esc_html__('Enable languages', 'baselayer') ?> <span style="display:inline-block;margin-left:6px;padding:0 6px;border-radius:3px;background:#BE123C;color:#fff;font-size:11px;font-weight:600;line-height:20px;vertical-align:1px;"><?= esc_html__('Beta', 'baselayer') ?></span></label>
+							<label style="font-weight: 500;"><input type="checkbox" name="baselayer_features[enable_languages]" id="baselayer_features_enable_languages" value="1" <?= checked($feat('enable_languages'), 1, false) ?>> <?= esc_html__('Enable languages', 'baselayer') ?> <span style="display:inline-block;margin-left:6px;padding:0 6px;border-radius:3px;background:#BE123C;color:#fff;font-size:11px;font-weight:600;line-height:20px;vertical-align:1px;"><?= esc_html__('Beta', 'baselayer') ?></span></label>
 							<p class="description bl-indent-checkbox"><?= esc_html__('Enables built-in support for multiple content languages.', 'baselayer') ?></p>
 							<div id="bl-language-mode-wrap" class="bl-language-mode-wrap" style="margin-top: 12px; <?= $feat('enable_languages') ? '' : 'display:none;' ?>">
 								<fieldset>
@@ -223,7 +223,7 @@ function bl_render_developer_features(): void
 						<th scope="row" class="form-table-checkbox-label"><?= esc_html__('Forms', 'baselayer') ?></th>
 						<td>
 							<input type="hidden" name="baselayer_features[enable_forms]" value="0">
-							<label><input type="checkbox" name="baselayer_features[enable_forms]" value="1" <?= checked($feat('enable_forms'), 1, false) ?>> <?= esc_html__('Enable forms', 'baselayer') ?></label>
+							<label style="font-weight: 500;"><input type="checkbox" name="baselayer_features[enable_forms]" value="1" <?= checked($feat('enable_forms'), 1, false) ?>> <?= esc_html__('Enable forms', 'baselayer') ?></label>
 							<p class="description bl-indent-checkbox"><?= esc_html__('Adds a form builder, submissions, email notifications, and a Form block.', 'baselayer') ?></p>
 						</td>
 					</tr>
@@ -277,7 +277,7 @@ function bl_render_developer_features(): void
 						<th scope="row" class="form-table-checkbox-label"><?= esc_html__('Events', 'baselayer') ?></th>
 						<td>
 							<input type="hidden" name="baselayer_features[enable_events]" value="0">
-							<label><input type="checkbox" name="baselayer_features[enable_events]" value="1" <?= checked($feat('enable_events'), 1, false) ?>> <?= esc_html__('Enable events', 'baselayer') ?></label>
+							<label style="font-weight: 500;"><input type="checkbox" name="baselayer_features[enable_events]" value="1" <?= checked($feat('enable_events'), 1, false) ?>> <?= esc_html__('Enable events', 'baselayer') ?></label>
 							<p class="description bl-indent-checkbox"><?= esc_html__('Adds event types with dates, recurrence, statuses, metadata, and archives. Developers manage each type under its menu → Settings.', 'baselayer') ?></p>
 						</td>
 					</tr>
@@ -290,7 +290,7 @@ function bl_render_developer_features(): void
 						<th scope="row" class="form-table-checkbox-label"><?= esc_html__('Editorial', 'baselayer') ?></th>
 						<td>
 							<input type="hidden" name="baselayer_features[enable_editorial]" value="0">
-							<label><input type="checkbox" name="baselayer_features[enable_editorial]" value="1" <?= checked($feat('enable_editorial'), 1, false) ?>> <?= esc_html__('Enable editorial rights', 'baselayer') ?></label>
+							<label style="font-weight: 500;"><input type="checkbox" name="baselayer_features[enable_editorial]" value="1" <?= checked($feat('enable_editorial'), 1, false) ?>> <?= esc_html__('Enable editorial rights', 'baselayer') ?></label>
 							<p class="description bl-indent-checkbox"><?= esc_html__('Per-editor content access, publishing approval, page allowlists, and media restrictions. Configure under Developer → Editorial and on editor profiles.', 'baselayer') ?></p>
 						</td>
 					</tr>
@@ -307,7 +307,7 @@ function bl_render_developer_features(): void
 						<th scope="row" class="form-table-checkbox-label"><?= esc_html__('Media folders', 'baselayer') ?></th>
 						<td>
 							<input type="hidden" name="baselayer_features[enable_media_folders]" value="0">
-							<label><input type="checkbox" name="baselayer_features[enable_media_folders]" value="1" <?= checked($feat('enable_media_folders'), 1, false) ?>> <?= esc_html__('Enable media folders', 'baselayer') ?></label>
+							<label style="font-weight: 500;"><input type="checkbox" name="baselayer_features[enable_media_folders]" value="1" <?= checked($feat('enable_media_folders'), 1, false) ?>> <?= esc_html__('Enable media folders', 'baselayer') ?></label>
 							<p class="description bl-indent-checkbox"><?= esc_html__('Adds folders to the Media Library with a sidebar for organizing.', 'baselayer') ?></p>
 						</td>
 					</tr>
@@ -320,7 +320,7 @@ function bl_render_developer_features(): void
 						<th scope="row" class="form-table-checkbox-label"><?= esc_html__('SVG support', 'baselayer') ?></th>
 						<td>
 							<input type="hidden" name="baselayer_features[enable_svg]" value="0">
-							<label><input type="checkbox" name="baselayer_features[enable_svg]" value="1" <?= checked($feat('enable_svg'), 1, false) ?>> <?= esc_html__('Allow SVG uploads', 'baselayer') ?></label>
+							<label style="font-weight: 500;"><input type="checkbox" name="baselayer_features[enable_svg]" value="1" <?= checked($feat('enable_svg'), 1, false) ?>> <?= esc_html__('Allow SVG uploads', 'baselayer') ?></label>
 							<p class="description bl-indent-checkbox"><?= esc_html__('Uploaded SVG files are automatically sanitized to remove potentially unsafe code.', 'baselayer') ?></p>
 						</td>
 					</tr>
@@ -333,11 +333,11 @@ function bl_render_developer_features(): void
 						<th scope="row" class="form-table-checkbox-label"><?= esc_html__('WebP images', 'baselayer') ?></th>
 						<td>
 							<input type="hidden" name="baselayer_features[enable_webp]" value="0">
-							<label><input type="checkbox" name="baselayer_features[enable_webp]" id="baselayer_features_enable_webp" value="1" <?= checked($feat('enable_webp'), 1, false) ?>> <?= esc_html__('Convert images to WebP', 'baselayer') ?></label>
+							<label style="font-weight: 500;"><input type="checkbox" name="baselayer_features[enable_webp]" id="baselayer_features_enable_webp" value="1" <?= checked($feat('enable_webp'), 1, false) ?>> <?= esc_html__('Convert images to WebP', 'baselayer') ?></label>
 							<p class="description bl-indent-checkbox"><?= esc_html__('Convert generated JPEG and PNG image to WebP. Requires GD or Imagick with WebP support.', 'baselayer') ?></p>
 							<div class="bl-feature-sub" id="bl-feature-sub-webp" style="margin-top: 12px; <?= $feat('enable_webp') !== 1 ? 'display:none;' : '' ?>">
 								<input type="hidden" name="baselayer_features[enable_webp_convert_original]" value="0">
-								<label><input type="checkbox" name="baselayer_features[enable_webp_convert_original]" value="1" <?= checked($feat('enable_webp_convert_original'), 1, false) ?>> <?= esc_html__('Also convert the original image', 'baselayer') ?></label>
+								<label style="font-weight: 500;"><input type="checkbox" name="baselayer_features[enable_webp_convert_original]" value="1" <?= checked($feat('enable_webp_convert_original'), 1, false) ?>> <?= esc_html__('Also convert the original image', 'baselayer') ?></label>
 								<p class="description bl-indent-checkbox"><?= esc_html__('By default, only resized versions of an image are converted. The original upload remains unchanged.', 'baselayer') ?></p>
 							</div>
 						</td>
@@ -355,7 +355,7 @@ function bl_render_developer_features(): void
 						<th scope="row" class="form-table-checkbox-label"><?= esc_html__('IP Blocking', 'baselayer') ?></th>
 						<td>
 							<input type="hidden" name="baselayer_features[enable_blocked_ips]" value="0">
-							<label><input type="checkbox" name="baselayer_features[enable_blocked_ips]" value="1" <?= checked($feat('enable_blocked_ips'), 1, false) ?>> <?= esc_html__('Enable IP blocking', 'baselayer') ?></label>
+							<label style="font-weight: 500;"><input type="checkbox" name="baselayer_features[enable_blocked_ips]" value="1" <?= checked($feat('enable_blocked_ips'), 1, false) ?>> <?= esc_html__('Enable IP blocking', 'baselayer') ?></label>
 							<p class="description bl-indent-checkbox"><?= esc_html__('Allows blocking specific IP addresses and detects suspicious login attempts.', 'baselayer') ?></p>
 						</td>
 					</tr>
@@ -372,7 +372,7 @@ function bl_render_developer_features(): void
 						<th scope="row" class="form-table-checkbox-label">Matomo</th>
 						<td>
 							<input type="hidden" name="baselayer_features[enable_matomo]" value="0">
-							<label><input type="checkbox" name="baselayer_features[enable_matomo]" value="1" <?= checked($feat('enable_matomo'), 1, false) ?>> <?= esc_html__('Enable Matomo analytics integration', 'baselayer') ?></label>
+							<label style="font-weight: 500;"><input type="checkbox" name="baselayer_features[enable_matomo]" value="1" <?= checked($feat('enable_matomo'), 1, false) ?>> <?= esc_html__('Enable Matomo analytics integration', 'baselayer') ?></label>
 							<p class="description bl-indent-checkbox"><?= esc_html__('Enables Matomo script loading on the frontend using the settings from Developer › Settings.', 'baselayer') ?></p>
 						</td>
 					</tr>

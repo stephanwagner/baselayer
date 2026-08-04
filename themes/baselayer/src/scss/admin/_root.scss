@@ -1,0 +1,90 @@
+// Admin design tokens
+
+:root {
+  // Neutral
+  --bl-gray-0: #ffffff;
+  --bl-gray-50: #f6f7f7;
+  --bl-gray-100: #f0f0f1;
+  --bl-gray-200: #dcdcde;
+  --bl-gray-300: #c3c4c7;
+  --bl-gray-400: #8c8f94;
+  --bl-gray-500: #646970;
+  --bl-gray-600: #50575e;
+  --bl-gray-700: #3c434a;
+  --bl-gray-800: #2c3338;
+  --bl-gray-900: #1d2327;
+
+  --bl-color-border-light: var(--bl-gray-200);
+  --bl-color-border: var(--bl-gray-300);
+  --bl-color-border-dark: var(--bl-gray-400);
+
+  --bl-color-text: var(--bl-gray-900);
+  --bl-color-text-light: var(--bl-gray-600);
+  --bl-color-text-muted: var(--bl-gray-500);
+  --bl-color-text-disabled: var(--bl-gray-400);
+
+  // Accent
+  --bl-color-primary: #3060bf;
+  --bl-color-primary-darker-10: #004aa5;
+  --bl-color-primary-darker-20: #00348a;
+  --bl-color-primary-lighter-10: #527add;
+  --bl-color-primary-lighter-20: #7093fa;
+
+  --wp-admin-theme-color: var(--bl-color-primary);
+  --wp-admin-theme-color--rgb: 48, 96, 191;
+
+  --wp-admin-theme-color-darker-10: var(--bl-color-primary-darker-10);
+  --wp-admin-theme-color-darker-10--rgb: 0, 74, 165;
+  --wp-admin-theme-color-darker-20: var(--bl-color-primary-darker-20);
+  --wp-admin-theme-color-darker-20--rgb: 0, 52, 138;
+
+  --wp-admin-theme-color-lighter-10: var(--bl-color-primary-lighter-10);
+  --wp-admin-theme-color-lighter-10--rgb: 82, 122, 221;
+  --wp-admin-theme-color-lighter-20: var(--bl-color-primary-lighter-20);
+  --wp-admin-theme-color-lighter-20--rgb: 112, 147, 250;
+
+  // States
+  --bl-color-success: #4ab866;
+  --bl-color-success-text: #2b9c4d;
+  --bl-color-warning: #f0b84a;
+  --bl-color-warning-text: #b45309;
+  --bl-color-error: #cc1818;
+  --bl-color-error-text: #cc1818;
+  --bl-color-info: #72aee6;
+  --bl-color-info-text: #4987bd;
+
+  // Surfaces
+  --bl-admin-radius: 6px;
+  --bl-admin-radius-small: 4px;
+
+  // Form
+  --bl-form-radius: var(--bl-admin-radius-small);
+  --bl-admin-input-height: 36px;
+  --bl-admin-input-height-small: 28px;
+  --bl-admin-button-height: 36px;
+  --bl-admin-button-height-small: 28px;
+  --bl-admin-button-icon-size: 18px;
+  --bl-admin-button-icon-size-small: 16px;
+  --bl-admin-button-icon-inset: 10px;
+  --bl-admin-button-icon-inset-small: 8px;
+  --bl-admin-button-icon-gap: 6px;
+  --bl-admin-button-icon-gap-small: 4px;
+
+  // Post states
+  --bl-post-state-draft-bg: #5d82d8;
+  --bl-post-state-draft-fg: #fff;
+  --bl-post-state-pending-bg: #ec8f34;
+  --bl-post-state-pending-fg: #fff;
+  --bl-post-state-scheduled-bg: #8471cf;
+  --bl-post-state-scheduled-fg: #fff;
+  --bl-post-state-private-bg: #687789;
+  --bl-post-state-private-fg: #fff;
+  --bl-post-state-protected-bg: #d1546e;
+  --bl-post-state-protected-fg: #fff;
+  --bl-post-state-recurring-bg: #38a898;
+  --bl-post-state-recurring-fg: #fff;
+  --bl-post-state-expiring-bg: #c9785a;
+  --bl-post-state-expiring-fg: #fff;
+  --bl-post-state-neutral-bg: #8793a1;
+  --bl-post-state-neutral-fg: #fff;
+}

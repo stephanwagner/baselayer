@@ -54,8 +54,6 @@
 // Pages
 @forward 'layout/page-not-found';
 
-// Block styles are exclusive bundles (blocks-baselayer / blocks-acf), enqueued by PHP.
-
 // Block adjustments
 @forward 'layout/shared/wordpress-blocks';
 

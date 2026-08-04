@@ -1,5 +1,3 @@
-@use '../config' as *;
-@use '../mixins' as *;
 @use 'form-controls';
 
 // Form
@@ -32,6 +30,35 @@ hr.bl-page-settings-divider {
 
 th.form-table-checkbox-label {
   padding-top: 15px;
+}
+
+.bl-table-in-form {
+  width: auto;
+
+  th {
+    width: auto;
+    font-weight: normal;
+  }
+
+  th,
+  td {
+    padding: 8px 6px;
+
+    &:first-child {
+      padding-left: 12px;
+    }
+
+    &:last-child {
+      padding-right: 12px;
+    }
+  }
+}
+
+.bl-table-small-gaps {
+  th:not(:first-child),
+  td:not(:first-child) {
+    padding-left: 0;
+  }
 }
 
 // Buttons

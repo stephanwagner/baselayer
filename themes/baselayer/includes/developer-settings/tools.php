@@ -109,7 +109,7 @@ function bl_render_developer_tools(): void
 
 		<?php bl_developer_settings_render_nav(); ?>
 
-		<div class="bl-page-settings-form">
+		<div class="bl-page-settings-form bl-admin-form">
 			<?php $asset_version = get_option('baselayer_asset_version', '1'); ?>
 			<h2 class="title"><?= esc_html__('Asset Cache', 'baselayer') ?></h2>
 			<p class="description"><?= esc_html__('Bump when static theme files using bl_asset_url have been changed so the cache of the files is updated.', 'baselayer') ?></p>
@@ -118,9 +118,15 @@ function bl_render_developer_tools(): void
 					<th scope="row"><?= esc_html__('Cache version', 'baselayer') ?></th>
 					<td>
 						<div style="display: flex; align-items: center;">
-							<code style="font-size: 14px; height: 30px; line-height: 30px; padding: 0 8px; min-width: 30px; text-align: center; box-sizing: border-box; border-radius: 3px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);">
-								<?= esc_html($asset_version) ?>
-							</code>
+							<input
+								type="text"
+								id="bl-asset-cache-version"
+								readonly
+								class="code"
+								value="<?= esc_attr($asset_version) ?>"
+								style="width: 36px; text-align: center;"
+								aria-label="<?= esc_attr__('Cache version', 'baselayer') ?>"
+							>
 							<?php $bump_url = wp_nonce_url(add_query_arg(['page' => bl_developer_settings_page_slug('tools'), 'baselayer_bump' => '1'], admin_url('options-general.php')), 'baselayer_bump_asset_version'); ?>
 							<a href="<?= esc_url($bump_url) ?>" class="button" style="margin-left: 8px;"><?= esc_html__('Bump version', 'baselayer') ?></a>
 						</div>

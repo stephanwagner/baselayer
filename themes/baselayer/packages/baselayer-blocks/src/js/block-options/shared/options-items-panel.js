@@ -407,7 +407,7 @@ export function createOptionsPanel(initial, onChange, options = {}) {
   }
 
   function renderChoices(item) {
-    const wrap = el('div', { className: 'bl-bo-choices bl-form' });
+    const wrap = el('div', { className: 'bl-bo-choices bl-admin-form' });
     const showIconPicker = item.type === 'button-group';
 
     (item.options || []).forEach((opt, oi) => {
