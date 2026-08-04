@@ -1724,6 +1724,9 @@ function bl_forms_sanitize_field($field): ?array
 		} else {
 			unset($out['max_selections']);
 		}
+		$out['show_as_checkbox'] = !array_key_exists('show_as_checkbox', $field)
+			? true
+			: !empty($field['show_as_checkbox']);
 	} else {
 		unset($out['min_selections'], $out['max_selections']);
 	}
@@ -1797,23 +1800,24 @@ function bl_forms_sanitize_field($field): ?array
 
 	if ($type === 'terms') {
 		$content = sanitize_textarea_field((string) ($field['content'] ?? ''));
-		// Legacy configs stored the checkbox text in `label`.
-		if ($content === '' && !array_key_exists('content', $field) && $out['label'] !== '') {
-			$content = $out['label'];
-			$out['label'] = '';
-		}
 		if ($content === '') {
 			$content = __('I agree to the [Privacy Policy](page:privacy).', 'baselayer-forms');
 		}
 		$out['content'] = $content;
 		$out['default_value'] = !empty($field['default_value']) ? '1' : '';
+		$out['show_as_checkbox'] = !array_key_exists('show_as_checkbox', $field)
+			? true
+			: !empty($field['show_as_checkbox']);
 	}
 
 	if ($type === 'toggle') {
-		$out['label'] = $out['label'] !== ''
-			? $out['label']
-			: __('Enable', 'baselayer-forms');
+		$out['content'] = sanitize_text_field((string) ($field['content'] ?? ''));
 		$out['default_value'] = !empty($field['default_value']) ? '1' : '';
+		$out['show_as_checkbox'] = !empty($field['show_as_checkbox']);
+	}
+
+	if (!in_array($type, ['toggle', 'terms', 'checkboxes'], true)) {
+		unset($out['show_as_checkbox']);
 	}
 
 	$no_default = ['file', 'image', 'honeypot', 'captcha', 'page', 'link'];

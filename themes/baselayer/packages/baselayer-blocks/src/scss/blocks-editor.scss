@@ -70,6 +70,7 @@
 .bl-blocks-edit-fields-button {
   width: 100%;
   justify-content: center;
+  border-radius: 4px;
 }
 
 .bl-blocks-sidebar-fields {
@@ -82,6 +83,12 @@
   min-width: 0;
 }
 
-.bl-blocks-page-settings-panel > .description {
+.bl-blocks-page-settings-panel > .description,
+.bl-blocks-page-settings-panel > .bl-blocks-fields__description {
   white-space: pre-line;
+}
+
+.bl-blocks-page-settings-panel > .bl-blocks-fields__description {
+  margin-top: 0;
+  margin-bottom: 8px;
 }

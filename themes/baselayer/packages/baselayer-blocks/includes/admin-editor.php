@@ -448,6 +448,8 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'boundTodayPlus'          => __('Today ±', 'baselayer-blocks'),
 		'buttonGroupMultiple'     => __('Allow multiple selection', 'baselayer-blocks'),
 		'checkboxText'            => __('Checkbox text', 'baselayer-blocks'),
+		'toggleText'              => __('Toggle text', 'baselayer-blocks'),
+		'showAsCheckbox'          => __('Show as checkbox', 'baselayer-blocks'),
 		'checkboxTextHelp'        => __('Markdown is supported, e.g. <b>**Bold**</b>, <i>*Italic*</i>, and <span style="white-space: nowrap">[Link](...)</span>. For the target you can use a URL (/agb), a WordPress page (page:123), or a standard page such as page:privacy.', 'baselayer-blocks'),
 		'choices'                 => __('Choices', 'baselayer-blocks'),
 		'collapseField'           => __('Collapse field', 'baselayer-blocks'),

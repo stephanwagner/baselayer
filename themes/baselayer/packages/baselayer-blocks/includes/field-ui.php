@@ -291,7 +291,7 @@ function bl_blocks_render_admin_fields_walk(array $fields, array $values, string
 		}
 
 		echo '<div class="' . esc_attr($width_class) . '" data-field-name="' . esc_attr($name) . '">';
-		if (!$hide_label && !in_array($type, ['toggle', 'terms'], true)) {
+		if (!$hide_label) {
 			echo '<label class="bl-blocks-fields__label" for="' . esc_attr($id) . '">';
 			echo esc_html($label);
 			if ($required) {
@@ -373,6 +373,9 @@ function bl_blocks_render_admin_fields_walk(array $fields, array $values, string
 
 			case 'checkboxes':
 				$list = is_array($value) ? $value : [];
+				$as_checkbox = function_exists('bl_forms_field_show_as_checkbox')
+					? bl_forms_field_show_as_checkbox($field)
+					: (!array_key_exists('show_as_checkbox', $field) || !empty($field['show_as_checkbox']));
 				echo '<div class="bl-blocks-fields__choices">';
 				foreach ($options as $opt_i => $opt) {
 					if (!is_array($opt)) {
@@ -381,27 +384,59 @@ function bl_blocks_render_admin_fields_walk(array $fields, array $values, string
 					$ov = (string) ($opt['value'] ?? '');
 					$ol = (string) ($opt['label'] ?? $ov);
 					$oid = $id . '-' . $opt_i;
-					printf(
-						'<label class="bl-blocks-fields__choice"><input type="checkbox" name="%s[]" id="%s" value="%s"%s> %s</label>',
-						esc_attr($input_name),
-						esc_attr($oid),
-						esc_attr($ov),
-						checked(in_array($ov, array_map('strval', $list), true), true, false),
-						esc_html($ol)
-					);
+					$is_checked = checked(in_array($ov, array_map('strval', $list), true), true, false);
+					if ($as_checkbox) {
+						printf(
+							'<label class="bl-blocks-fields__choice"><input type="checkbox" name="%s[]" id="%s" value="%s"%s> %s</label>',
+							esc_attr($input_name),
+							esc_attr($oid),
+							esc_attr($ov),
+							$is_checked,
+							esc_html($ol)
+						);
+					} else {
+						printf(
+							'<label class="bl-blocks-fields__switch"><input type="checkbox" name="%s[]" id="%s" value="%s"%s><span class="bl-blocks-fields__switch-ui" aria-hidden="true"></span><span class="bl-blocks-fields__switch-label">%s</span></label>',
+							esc_attr($input_name),
+							esc_attr($oid),
+							esc_attr($ov),
+							$is_checked,
+							esc_html($ol)
+						);
+					}
 				}
 				echo '</div>';
 				break;
 
 			case 'toggle':
 			case 'terms':
-				printf(
-					'<label class="bl-blocks-fields__toggle"><input type="checkbox" name="%s" id="%s" value="1"%s> %s</label>',
-					esc_attr($input_name),
-					esc_attr($id),
-					checked(!empty($value), true, false),
-					esc_html($label)
-				);
+				$adjacent = trim((string) ($field['content'] ?? ''));
+				if ($type === 'terms' && $adjacent === '') {
+					$adjacent = __('I agree to the [Privacy Policy](page:privacy).', 'baselayer-blocks');
+				}
+				$as_checkbox = function_exists('bl_forms_field_show_as_checkbox')
+					? bl_forms_field_show_as_checkbox($field)
+					: ($type === 'toggle' ? !empty($field['show_as_checkbox']) : (!array_key_exists('show_as_checkbox', $field) || !empty($field['show_as_checkbox'])));
+				$is_checked = checked(!empty($value), true, false);
+				if ($as_checkbox) {
+					printf(
+						'<label class="bl-blocks-fields__choice"><input type="checkbox" name="%s" id="%s" value="1"%s>%s</label>',
+						esc_attr($input_name),
+						esc_attr($id),
+						$is_checked,
+						$adjacent !== '' ? ' ' . esc_html($adjacent) : ''
+					);
+				} else {
+					printf(
+						'<label class="bl-blocks-fields__switch"><input type="checkbox" name="%s" id="%s" value="1"%s><span class="bl-blocks-fields__switch-ui" aria-hidden="true"></span>%s</label>',
+						esc_attr($input_name),
+						esc_attr($id),
+						$is_checked,
+						$adjacent !== ''
+							? '<span class="bl-blocks-fields__switch-label">' . esc_html($adjacent) . '</span>'
+							: ''
+					);
+				}
 				break;
 
 			case 'hidden':
@@ -457,7 +492,7 @@ function bl_blocks_render_admin_fields_walk(array $fields, array $values, string
 		}
 
 		if ($desc !== '') {
-			echo '<p class="description">' . esc_html($desc) . '</p>';
+			echo '<p class="description bl-blocks-fields__description">' . esc_html($desc) . '</p>';
 		}
 		echo '</div>';
 		$i++;
@@ -627,7 +662,7 @@ function bl_blocks_render_admin_page_field(array $field, $value, string $input_n
 	echo '<div class="bl-blocks-fields__page-picker-row">';
 	echo '<div class="bl-blocks-fields__page-picker-summary" data-bl-page-summary>';
 	if ($ids === []) {
-		echo '<span class="description">' . esc_html(
+		echo '<span class="description bl-blocks-fields__description bl-blocks-fields__page-empty">' . esc_html(
 			$multiple
 				? __('Select one or more pages.', 'baselayer-blocks')
 				: __('Select a page.', 'baselayer-blocks')
@@ -814,7 +849,7 @@ function bl_blocks_render_admin_media_field(array $field, $value, string $input_
 	}
 	echo '</div>';
 	printf(
-		'<span class="description bl-blocks-fields__media-empty" data-bl-media-empty%s>%s</span>',
+		'<span class="description bl-blocks-fields__description bl-blocks-fields__media-empty" data-bl-media-empty%s>%s</span>',
 		$ids !== [] ? ' hidden' : '',
 		esc_html($empty_help)
 	);
@@ -969,7 +1004,7 @@ function bl_blocks_render_admin_repeater(array $field, $rows, string $name_prefi
 	}
 	$desc = (string) ($field['description'] ?? '');
 	if ($desc !== '') {
-		echo '<p class="description">' . esc_html($desc) . '</p>';
+		echo '<p class="description bl-blocks-fields__description">' . esc_html($desc) . '</p>';
 	}
 	echo '<div class="bl-blocks-fields__repeater-rows">';
 	foreach ($rows as $i => $row_values) {

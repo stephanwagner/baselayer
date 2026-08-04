@@ -950,6 +950,12 @@ msgstr "Datenschutzerklärung"
 msgid "Checkbox text"
 msgstr "Checkbox-Text"
 
+msgid "Toggle text"
+msgstr "Schalter-Text"
+
+msgid "Show as checkbox"
+msgstr "Als Checkbox anzeigen"
+
 #: includes/admin.php:597
 msgid ""
 "Markdown is supported, e.g. <b>**Bold**</b>, <i>*Italic*</i>, and <span "

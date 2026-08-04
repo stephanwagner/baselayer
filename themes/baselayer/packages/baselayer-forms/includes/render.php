@@ -279,6 +279,26 @@ function bl_forms_field_hide_label(array $field): bool
 }
 
 /**
+ * Whether toggle / terms / checkboxes should use checkbox chrome (vs switch).
+ *
+ * Defaults: toggle off, terms/checkboxes on.
+ *
+ * @param array<string, mixed> $field
+ */
+function bl_forms_field_show_as_checkbox(array $field): bool
+{
+	$type = (string) ($field['type'] ?? '');
+	if ($type === 'toggle') {
+		return !empty($field['show_as_checkbox']);
+	}
+	if ($type === 'terms' || $type === 'checkboxes') {
+		return !array_key_exists('show_as_checkbox', $field) || !empty($field['show_as_checkbox']);
+	}
+
+	return true;
+}
+
+/**
  * Visible label / legend markup (empty when hide_label is set).
  *
  * @param array<string, mixed> $field
@@ -999,6 +1019,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 				bl_forms_field_error_message('selection_max', $field, $settings, (string) $max_sel)
 			) . '"';
 		}
+		$as_checkbox = bl_forms_field_show_as_checkbox($field);
 		?>
 		<fieldset <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--checkboxes', $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= $limit_attrs // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<?= bl_forms_field_label_html($field, $input_id, $req_mark, 'legend') // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
@@ -1007,13 +1028,27 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 				<?php foreach ($options as $i => $opt) :
 					$oid = $input_id . '-' . $i;
 					$opt_value = (string) ($opt['value'] ?? '');
+					$opt_label = (string) ($opt['label'] ?? '');
 					$checked = bl_forms_field_default_is($field, $opt_value) ? ' checked' : '';
-					?>
+					if ($as_checkbox) :
+						?>
 					<label class="bl-form__option" for="<?= esc_attr($oid) ?>">
 						<input type="checkbox" id="<?= esc_attr($oid) ?>" name="<?= esc_attr($field_name) ?>[]" value="<?= esc_attr($opt_value) ?>"<?= $checked ?><?= $disabled_attr ?>>
-						<span><?= esc_html((string) ($opt['label'] ?? '')) ?></span>
+						<span><?= esc_html($opt_label) ?></span>
 					</label>
-				<?php endforeach; ?>
+						<?php
+					else :
+						?>
+					<label class="bl-form__switch" for="<?= esc_attr($oid) ?>">
+						<input type="checkbox" id="<?= esc_attr($oid) ?>" name="<?= esc_attr($field_name) ?>[]" value="<?= esc_attr($opt_value) ?>"<?= $checked ?><?= $disabled_attr ?>>
+						<span class="bl-form__switch-ui" aria-hidden="true"></span>
+						<?php if ($opt_label !== '') : ?>
+							<span class="bl-form__switch-label"><?= esc_html($opt_label) ?></span>
+						<?php endif; ?>
+					</label>
+						<?php
+					endif;
+				endforeach; ?>
 			</div>
 		</fieldset>
 		<?php
@@ -1049,20 +1084,29 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 		if ($checkbox_text === '') {
 			$checkbox_text = __('I agree to the [Privacy Policy](page:privacy).', 'baselayer-forms');
 		}
+		$as_checkbox = bl_forms_field_show_as_checkbox($field);
 		$show_terms_label = $label !== '' && !bl_forms_field_hide_label($field);
 		$checked = bl_forms_field_default_checked($field) ? ' checked' : '';
 		$terms_name_attr = $show_terms_label
 			? ' aria-labelledby="' . esc_attr($input_id) . '-label"'
 			: bl_forms_field_aria_label_attr($field);
+		$control_class = $as_checkbox ? 'bl-form__option bl-form__option--terms' : 'bl-form__switch';
 		?>
 		<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--terms', $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
-			<?php if ($show_terms_label) : ?>
-				<div class="bl-form__label" id="<?= esc_attr($input_id) ?>-label"><?= esc_html($label) ?><?= $req_mark // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></div>
-			<?php endif; ?>
+			<?= bl_forms_field_label_html($field, $input_id, $req_mark, 'div') // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-			<label class="bl-form__option bl-form__option--terms" for="<?= esc_attr($input_id) ?>">
+			<label class="<?= esc_attr($control_class) ?>" for="<?= esc_attr($input_id) ?>">
 				<input type="checkbox" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" value="1"<?= $choice_attrs ?><?= $checked ?><?= $terms_name_attr // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
-				<span><?= bl_forms_format_inline_links($checkbox_text) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped/kses in helper. ?><?= !$show_terms_label ? $req_mark : '' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+				<?php if ($as_checkbox) : ?>
+					<span><?= bl_forms_format_inline_links($checkbox_text) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped/kses in helper. ?><?= !$show_terms_label ? $req_mark : '' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+				<?php else : ?>
+					<span class="bl-form__switch-ui" aria-hidden="true"></span>
+					<?php if ($checkbox_text !== '') : ?>
+						<span class="bl-form__switch-label"><?= bl_forms_format_inline_links($checkbox_text) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped/kses in helper. ?><?= !$show_terms_label ? $req_mark : '' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+					<?php elseif (!$show_terms_label) : ?>
+						<span class="bl-form__switch-label"><?= $req_mark // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+					<?php endif; ?>
+				<?php endif; ?>
 			</label>
 		</div>
 		<?php
@@ -1092,16 +1136,33 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 	}
 
 	if ($type === 'toggle') {
-		$hide_toggle_label = bl_forms_field_hide_label($field);
+		$adjacent = trim((string) ($field['content'] ?? ''));
+		$as_checkbox = bl_forms_field_show_as_checkbox($field);
+		$show_label = $label !== '' && !bl_forms_field_hide_label($field);
 		$checked = bl_forms_field_default_checked($field) ? ' checked' : '';
+		$name_attr = $show_label
+			? ' aria-labelledby="' . esc_attr($input_id) . '-label"'
+			: bl_forms_field_aria_label_attr($field);
+		$control_class = $as_checkbox ? 'bl-form__option' : 'bl-form__switch';
 		?>
 		<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--toggle', $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+			<?= bl_forms_field_label_html($field, $input_id, $req_mark, 'div') // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-			<label class="bl-form__switch" for="<?= esc_attr($input_id) ?>">
-				<input type="checkbox" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" value="1"<?= $choice_attrs ?><?= $checked ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
-				<span class="bl-form__switch-ui" aria-hidden="true"></span>
-				<?php if (!$hide_toggle_label) : ?>
-					<span class="bl-form__switch-label"><?= esc_html($label) ?><?= $req_mark // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+			<label class="<?= esc_attr($control_class) ?>" for="<?= esc_attr($input_id) ?>">
+				<input type="checkbox" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" value="1"<?= $choice_attrs ?><?= $checked ?><?= $name_attr // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+				<?php if ($as_checkbox) : ?>
+					<?php if ($adjacent !== '') : ?>
+						<span><?= esc_html($adjacent) ?><?= !$show_label ? $req_mark : '' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+					<?php elseif (!$show_label) : ?>
+						<span><?= $req_mark // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+					<?php endif; ?>
+				<?php else : ?>
+					<span class="bl-form__switch-ui" aria-hidden="true"></span>
+					<?php if ($adjacent !== '') : ?>
+						<span class="bl-form__switch-label"><?= esc_html($adjacent) ?><?= !$show_label ? $req_mark : '' // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+					<?php elseif (!$show_label) : ?>
+						<span class="bl-form__switch-label"><?= $req_mark // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></span>
+					<?php endif; ?>
 				<?php endif; ?>
 			</label>
 		</div>

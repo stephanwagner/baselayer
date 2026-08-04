@@ -659,6 +659,8 @@ function bl_forms_admin_enqueue(string $hook): void
 				'termsDefaultLabel' => __('I agree to the [Privacy Policy](page:privacy).', 'baselayer-forms'),
 				'termsDefaultFieldLabel' => __('Privacy Policy', 'baselayer-forms'),
 				'checkboxText'      => __('Checkbox text', 'baselayer-forms'),
+				'toggleText'        => __('Toggle text', 'baselayer-forms'),
+				'showAsCheckbox'    => __('Show as checkbox', 'baselayer-forms'),
 				'checkboxTextHelp'  => __(
 					'Markdown is supported, e.g. <b>**Bold**</b>, <i>*Italic*</i>, and <span style="white-space: nowrap">[Link](...)</span>. For the target you can use a URL (/agb), a WordPress page (page:123), or a standard page such as page:privacy.',
 					'baselayer-forms'

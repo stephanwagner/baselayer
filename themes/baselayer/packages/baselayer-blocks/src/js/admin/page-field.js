@@ -2,6 +2,7 @@
  * Page picker control for Blocks field value UIs (modal + PHP site settings).
  */
 import { openPagePicker } from '../../../../../src/js/admin/utils/page-picker.js';
+import { createSortable } from '../../../../../src/js/admin/canvas-builder/sortable.js';
 
 function el(tag, props = {}, children = []) {
   const node = document.createElement(tag);
@@ -124,6 +125,57 @@ export function buildPageCard(page, onRemove) {
 }
 
 /**
+ * Enable drag-reorder for multi-select page lists.
+ *
+ * @param {HTMLElement} preview
+ * @param {{ getSelected: () => Array<{id:number}>, setSelected: (next: Array) => void, onChange?: () => void }} api
+ * @returns {import('sortablejs').default|null}
+ */
+function bindPageSortable(preview, api) {
+  if (!preview) return null;
+  preview.classList.add('is-sortable');
+  return createSortable(preview, {
+    animation: 150,
+    draggable: '.bl-blocks-fields__page-card',
+    filter: '.bl-blocks-fields__card-remove',
+    preventOnFilter: true,
+    ghostClass: 'is-dragging-ghost',
+    chosenClass: 'is-dragging-chosen',
+    onEnd: () => {
+      const ids = Array.from(
+        preview.querySelectorAll('.bl-blocks-fields__page-card[data-page-id]')
+      )
+        .map((node) => Number(node.getAttribute('data-page-id')) || 0)
+        .filter((id) => id > 0);
+      const byId = new Map(api.getSelected().map((item) => [item.id, item]));
+      const next = [];
+      ids.forEach((id) => {
+        const item = byId.get(id);
+        if (item) next.push(item);
+      });
+      api.setSelected(next);
+      if (typeof api.onChange === 'function') {
+        api.onChange();
+      }
+    },
+  });
+}
+
+/**
+ * Render page cards into a preview host (keeps the host for Sortable).
+ *
+ * @param {HTMLElement} preview
+ * @param {Array<{id:number,title:string,url:string}>} pages
+ * @param {(id: number) => void} onRemove
+ */
+function renderPageCards(preview, pages, onRemove) {
+  preview.replaceChildren();
+  pages.forEach((page) => {
+    preview.appendChild(buildPageCard(page, () => onRemove(page.id)));
+  });
+}
+
+/**
  * @param {Array<{id:number,title:string,url:string}>} pages
  * @param {boolean} multiple
  * @param {(id: number) => void} onRemove
@@ -132,11 +184,10 @@ export function buildPageCard(page, onRemove) {
 export function buildPagePreview(pages, multiple, onRemove) {
   const preview = el('div', {
     className:
-      'bl-blocks-fields__page-preview' + (multiple ? ' is-multiple' : ' is-single'),
+      'bl-blocks-fields__page-preview' +
+      (multiple ? ' is-multiple is-sortable' : ' is-single'),
   });
-  pages.forEach((page) => {
-    preview.appendChild(buildPageCard(page, () => onRemove(page.id)));
-  });
+  renderPageCards(preview, pages, onRemove);
   return preview;
 }
 
@@ -172,7 +223,21 @@ export function createPagePickerControl(field, current) {
     url: '',
   }));
 
-  const summary = el('div', { className: 'bl-blocks-fields__page-picker-summary' });
+  const empty = el('span', {
+    className: 'description bl-blocks-fields__description bl-blocks-fields__page-empty',
+    text: multiple
+      ? i18n('choosePagesHelp', 'Select one or more pages.')
+      : i18n('choosePageHelp', 'Select a page.'),
+  });
+  const preview = el('div', {
+    className:
+      'bl-blocks-fields__page-preview' +
+      (multiple ? ' is-multiple is-sortable' : ' is-single'),
+  });
+  const summary = el('div', { className: 'bl-blocks-fields__page-picker-summary' }, [
+    empty,
+    preview,
+  ]);
   const pickBtn = el('button', {
     type: 'button',
     className: 'button bl-button',
@@ -200,35 +265,37 @@ export function createPagePickerControl(field, current) {
   };
 
   const syncUi = () => {
-    summary.replaceChildren();
-    if (selected.length === 0) {
-      summary.appendChild(
-        el('span', {
-          className: 'description',
-          text: multiple
-            ? i18n('choosePagesHelp', 'Select one or more pages.')
-            : i18n('choosePageHelp', 'Select a page.'),
-        })
-      );
+    const has = selected.length > 0;
+    empty.hidden = has;
+    preview.hidden = !has;
+    if (has) {
+      renderPageCards(preview, selected, (id) => {
+        selected = selected.filter((page) => page.id !== id);
+        syncUi();
+        dispatchChange();
+      });
     } else {
-      summary.appendChild(
-        buildPagePreview(selected, multiple, (id) => {
-          selected = selected.filter((page) => page.id !== id);
-          syncUi();
-          dispatchChange();
-        })
-      );
+      preview.replaceChildren();
     }
-    clearBtn.hidden = selected.length === 0;
-    pickBtn.textContent =
-      selected.length > 0
-        ? multiple
-          ? i18n('changePages', 'Change pages')
-          : i18n('changePage', 'Change page')
-        : multiple
-          ? i18n('choosePages', 'Choose pages')
-          : i18n('choosePage', 'Choose page');
+    clearBtn.hidden = !has;
+    pickBtn.textContent = has
+      ? multiple
+        ? i18n('changePages', 'Change pages')
+        : i18n('changePage', 'Change page')
+      : multiple
+        ? i18n('choosePages', 'Choose pages')
+        : i18n('choosePage', 'Choose page');
   };
+
+  if (multiple) {
+    bindPageSortable(preview, {
+      getSelected: () => selected,
+      setSelected: (next) => {
+        selected = next;
+      },
+      onChange: dispatchChange,
+    });
+  }
 
   const hydrateTitles = async () => {
     const missing = selected.filter((p) => !p.title);
@@ -300,11 +367,13 @@ export function createPagePickerControl(field, current) {
     });
     if (!result) return;
     if (multiple) {
-      selected = (Array.isArray(result) ? result : [result]).map((page) => ({
-        id: Number(page.id) || 0,
-        title: page.title || '',
-        url: page.url || '',
-      })).filter((p) => p.id > 0);
+      selected = (Array.isArray(result) ? result : [result])
+        .map((page) => ({
+          id: Number(page.id) || 0,
+          title: page.title || '',
+          url: page.url || '',
+        }))
+        .filter((p) => p.id > 0);
     } else {
       selected = [
         {
@@ -362,6 +431,19 @@ export function bindPagePickers(root = document) {
       }))
       .filter((p) => p.id > 0);
 
+    const empty = el('span', {
+      className: 'description bl-blocks-fields__description bl-blocks-fields__page-empty',
+      text: multiple
+        ? i18n('choosePagesHelp', 'Select one or more pages.')
+        : i18n('choosePageHelp', 'Select a page.'),
+    });
+    const preview = el('div', {
+      className:
+        'bl-blocks-fields__page-preview' +
+        (multiple ? ' is-multiple is-sortable' : ' is-single'),
+    });
+    summary.replaceChildren(empty, preview);
+
     const writeInputs = () => {
       inputsHost.replaceChildren();
       if (selected.length === 0) {
@@ -389,35 +471,37 @@ export function bindPagePickers(root = document) {
     };
 
     const syncUi = () => {
-      summary.replaceChildren();
-      if (selected.length === 0) {
-        summary.appendChild(
-          el('span', {
-            className: 'description',
-            text: multiple
-              ? i18n('choosePagesHelp', 'Select one or more pages.')
-              : i18n('choosePageHelp', 'Select a page.'),
-          })
-        );
+      const has = selected.length > 0;
+      empty.hidden = has;
+      preview.hidden = !has;
+      if (has) {
+        renderPageCards(preview, selected, (id) => {
+          selected = selected.filter((page) => page.id !== id);
+          syncUi();
+        });
       } else {
-        summary.appendChild(
-          buildPagePreview(selected, multiple, (id) => {
-            selected = selected.filter((page) => page.id !== id);
-            syncUi();
-          })
-        );
+        preview.replaceChildren();
       }
-      clearBtn.hidden = selected.length === 0;
-      pickBtn.textContent =
-        selected.length > 0
-          ? multiple
-            ? i18n('changePages', 'Change pages')
-            : i18n('changePage', 'Change page')
-          : multiple
-            ? i18n('choosePages', 'Choose pages')
-            : i18n('choosePage', 'Choose page');
+      clearBtn.hidden = !has;
+      pickBtn.textContent = has
+        ? multiple
+          ? i18n('changePages', 'Change pages')
+          : i18n('changePage', 'Change page')
+        : multiple
+          ? i18n('choosePages', 'Choose pages')
+          : i18n('choosePage', 'Choose page');
       writeInputs();
     };
+
+    if (multiple) {
+      bindPageSortable(preview, {
+        getSelected: () => selected,
+        setSelected: (next) => {
+          selected = next;
+        },
+        onChange: writeInputs,
+      });
+    }
 
     pickBtn.addEventListener('click', async () => {
       if (typeof openPagePicker !== 'function') {

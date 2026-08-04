@@ -70,6 +70,11 @@
   .description {
     white-space: pre-line;
   }
+
+  .bl-blocks-fields__description {
+    margin-top: 0;
+    margin-bottom: 8px;
+  }
 }
 
 // Denser actions than global admin form denseness (inputs stay 36px).
@@ -171,6 +176,74 @@
   gap: 6px;
 }
 
+.bl-blocks-fields__switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1.3;
+
+  input {
+    position: absolute;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    margin: 0;
+    pointer-events: none;
+  }
+}
+
+.bl-blocks-fields__switch-ui {
+  position: relative;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  width: 32px;
+  height: 18px;
+  border: 1px solid var(--bl-gray-300, #c3c4c7);
+  border-radius: 9px;
+  background: var(--bl-gray-100, #f0f0f1);
+  transition:
+    background 0.12s ease,
+    border-color 0.12s ease;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid var(--bl-gray-300, #c3c4c7);
+    box-sizing: border-box;
+    transition: transform 0.12s ease;
+  }
+
+  .bl-blocks-fields__switch input:checked + & {
+    background: var(--wp-admin-theme-color, #2271b1);
+    border-color: var(--wp-admin-theme-color, #2271b1);
+
+    &::after {
+      border-color: #fff;
+      transform: translateX(14px);
+    }
+  }
+
+  .bl-blocks-fields__switch input:focus-visible + & {
+    outline: 2px solid var(--wp-admin-theme-color, #2271b1);
+    outline-offset: 2px;
+  }
+}
+
+.bl-blocks-fields__switch-label {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
 .bl-blocks-fields__page-picker-row {
   display: flex;
   flex-direction: column;
@@ -201,6 +274,14 @@
     flex-wrap: wrap;
     gap: 6px;
   }
+
+  &.is-sortable .bl-blocks-fields__page-card {
+    cursor: grab;
+
+    &:active {
+      cursor: grabbing;
+    }
+  }
 }
 
 .bl-blocks-fields__page-card {
@@ -215,6 +296,14 @@
   border: 1px solid var(--bl-gray-300, #c3c4c7);
   border-radius: 4px;
   background: var(--bl-gray-50, #f6f7f7);
+
+  &.is-dragging-chosen {
+    opacity: 0.92;
+  }
+
+  &.is-dragging-ghost {
+    opacity: 0.4;
+  }
 }
 
 .bl-blocks-fields__page-card-body {
@@ -395,14 +484,14 @@ button.button-link.bl-blocks-fields__card-remove {
 }
 
 .description.bl-blocks-fields__media-empty {
-  margin: 0;
+  margin: 0 0 8px;
   color: var(--bl-gray-600);
 }
 
 .bl-blocks-fields__media-preview {
   + .description.bl-blocks-fields__media-empty {
     margin-top: -6px;
-    margin-bottom: 2px;
+    margin-bottom: 8px;
   }
 }
 

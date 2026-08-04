@@ -451,10 +451,17 @@ export function defaultField(type = 'text') {
     base.hide_label = true;
     base.content = t('termsDefaultLabel', 'I agree to the [Privacy Policy](page:privacy).');
     base.default_value = '';
+    base.show_as_checkbox = true;
   }
   if (type === 'toggle') {
     base.label = typeLabel(type);
+    base.content = '';
     base.default_value = '';
+    base.show_as_checkbox = false;
+  }
+  if (type === 'checkboxes') {
+    // layout already set above for radio/checkboxes
+    base.show_as_checkbox = true;
   }
   if (type === 'textarea') {
     base.rows = 5;

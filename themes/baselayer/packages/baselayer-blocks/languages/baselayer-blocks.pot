@@ -863,6 +863,12 @@ msgstr ""
 msgid "Checkbox text"
 msgstr ""
 
+msgid "Toggle text"
+msgstr ""
+
+msgid "Show as checkbox"
+msgstr ""
+
 #: includes/admin-editor.php:429
 msgid "Markdown is supported, e.g. <b>**Bold**</b>, <i>*Italic*</i>, and <span style=\"white-space: nowrap\">[Link](...)</span>. For the target you can use a URL (/agb), a WordPress page (page:123), or a standard page such as page:privacy."
 msgstr ""

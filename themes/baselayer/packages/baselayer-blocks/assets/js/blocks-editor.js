@@ -1399,782 +1399,6 @@
   }
   window.baselayerOpenPagePicker = openPagePicker;
 
-  // themes/baselayer/packages/baselayer-blocks/src/js/admin/page-field.js
-  function el(tag, props = {}, children = []) {
-    const node = document.createElement(tag);
-    Object.entries(props).forEach(([key, value]) => {
-      if (value == null || value === false) return;
-      if (key === "className") node.className = value;
-      else if (key === "text") node.textContent = value;
-      else if (key === "dataset") Object.assign(node.dataset, value);
-      else if (key.startsWith("on") && typeof value === "function") {
-        node.addEventListener(key.slice(2).toLowerCase(), value);
-      } else if (key === "checked") node.checked = Boolean(value);
-      else if (key === "value") node.value = value === true ? "" : String(value);
-      else node.setAttribute(key, value === true ? "" : String(value));
-    });
-    (Array.isArray(children) ? children : [children]).forEach((child) => {
-      if (child == null || child === false) return;
-      node.appendChild(typeof child === "string" ? document.createTextNode(child) : child);
-    });
-    return node;
-  }
-  function i18n(key, fallback) {
-    const dict = window.blBlocksFieldUi && window.blBlocksFieldUi.i18n || window.blBlocksEditor && window.blBlocksEditor.i18n || window.blBlocksPage && window.blBlocksPage.i18n || window.blBlocksAdmin && window.blBlocksAdmin.i18n || {};
-    return dict[key] || fallback || key;
-  }
-  function pickerConfig() {
-    const sources = [
-      window.blBlocksFieldUi,
-      window.blBlocksEditor,
-      window.blBlocksPage,
-      window.blBlocksAdmin
-    ];
-    let restUrl = "";
-    let restNonce = "";
-    sources.forEach((src) => {
-      if (!src) return;
-      if (!restUrl && src.pagesRestUrl) restUrl = src.pagesRestUrl;
-      if (!restNonce && src.restNonce) restNonce = src.restNonce;
-    });
-    return { restUrl, restNonce };
-  }
-  function pageUrlPath(url) {
-    const raw = String(url || "").trim();
-    if (!raw) return "";
-    try {
-      const base = typeof window !== "undefined" && window.location && window.location.origin ? window.location.origin : "https://example.com";
-      const parsed = new URL(raw, base);
-      return (parsed.pathname || "/") + (parsed.search || "") + (parsed.hash || "");
-    } catch (err) {
-      const stripped = raw.replace(/^[a-z][a-z0-9+.-]*:\/\/[^/?#]+/i, "");
-      if (!stripped) return "/";
-      return stripped.startsWith("/") ? stripped : "/" + stripped.replace(/^\/*/, "");
-    }
-  }
-  function buildPageCard(page, onRemove) {
-    const title = page.title || i18n("selectedPage", "Selected page") + " #" + page.id;
-    const path = pageUrlPath(page.url);
-    const body = el("div", { className: "bl-blocks-fields__page-card-body" }, [
-      el("span", {
-        className: "bl-blocks-fields__page-card-title",
-        text: title,
-        title
-      })
-    ]);
-    if (path) {
-      body.appendChild(
-        el("span", {
-          className: "description bl-blocks-fields__page-card-url",
-          text: path,
-          title: page.url || path
-        })
-      );
-    }
-    const removeBtn = el(
-      "button",
-      {
-        type: "button",
-        className: "button-link bl-blocks-fields__card-remove",
-        title: i18n("clearPage", "Clear"),
-        "aria-label": i18n("clearPage", "Clear")
-      },
-      [el("span", { className: "bl-icon -icon-close", "aria-hidden": "true" })]
-    );
-    removeBtn.addEventListener("click", (evt) => {
-      evt.preventDefault();
-      evt.stopPropagation();
-      onRemove();
-    });
-    return el(
-      "div",
-      {
-        className: "bl-blocks-fields__page-card",
-        dataset: { pageId: String(page.id) }
-      },
-      [body, removeBtn]
-    );
-  }
-  function buildPagePreview(pages, multiple, onRemove) {
-    const preview = el("div", {
-      className: "bl-blocks-fields__page-preview" + (multiple ? " is-multiple" : " is-single")
-    });
-    pages.forEach((page) => {
-      preview.appendChild(buildPageCard(page, () => onRemove(page.id)));
-    });
-    return preview;
-  }
-  function normalizePageIds(current, multiple) {
-    if (multiple) {
-      const list = Array.isArray(current) ? current : current != null && current !== "" ? [current] : [];
-      return list.map((id) => Number(id) || 0).filter((id) => id > 0);
-    }
-    const one = Number(Array.isArray(current) ? current[0] : current) || 0;
-    return one > 0 ? [one] : [];
-  }
-  function createPagePickerControl(field, current) {
-    const multiple = !!field.multiple;
-    let selected = normalizePageIds(current, multiple).map((id) => ({
-      id,
-      title: "",
-      url: ""
-    }));
-    const summary = el("div", { className: "bl-blocks-fields__page-picker-summary" });
-    const pickBtn = el("button", {
-      type: "button",
-      className: "button bl-button",
-      text: i18n("choosePage", "Choose page")
-    });
-    const clearBtn = el("button", {
-      type: "button",
-      className: "button-link",
-      text: i18n("clearPage", "Clear")
-    });
-    const actions = el("div", { className: "bl-blocks-fields__page-picker-actions" }, [
-      pickBtn,
-      clearBtn
-    ]);
-    const control = el("div", {
-      className: "bl-blocks-fields__page-picker",
-      dataset: { blBlocksPagePicker: "1" }
-    });
-    control.append(
-      el("div", { className: "bl-blocks-fields__page-picker-row" }, [summary, actions])
-    );
-    const dispatchChange = () => {
-      control.dispatchEvent(new Event("change", { bubbles: true }));
-    };
-    const syncUi = () => {
-      summary.replaceChildren();
-      if (selected.length === 0) {
-        summary.appendChild(
-          el("span", {
-            className: "description",
-            text: multiple ? i18n("choosePagesHelp", "Select one or more pages.") : i18n("choosePageHelp", "Select a page.")
-          })
-        );
-      } else {
-        summary.appendChild(
-          buildPagePreview(selected, multiple, (id) => {
-            selected = selected.filter((page) => page.id !== id);
-            syncUi();
-            dispatchChange();
-          })
-        );
-      }
-      clearBtn.hidden = selected.length === 0;
-      pickBtn.textContent = selected.length > 0 ? multiple ? i18n("changePages", "Change pages") : i18n("changePage", "Change page") : multiple ? i18n("choosePages", "Choose pages") : i18n("choosePage", "Choose page");
-    };
-    const hydrateTitles = async () => {
-      const missing = selected.filter((p) => !p.title);
-      if (missing.length === 0) return;
-      const { restUrl, restNonce } = pickerConfig();
-      if (!restUrl) return;
-      try {
-        const include = missing.map((p) => p.id).join(",");
-        const url = String(restUrl).replace(/\/?$/, "/") + "?include=" + encodeURIComponent(include) + "&per_page=" + missing.length + "&_fields=id,title,link";
-        const res = await fetch(url, {
-          headers: restNonce ? { "X-WP-Nonce": restNonce } : {}
-        });
-        if (!res.ok) return;
-        const rows = await res.json();
-        if (!Array.isArray(rows)) return;
-        const byId = new Map(
-          rows.map((row) => [
-            Number(row.id) || 0,
-            {
-              id: Number(row.id) || 0,
-              title: row.title && row.title.rendered || "",
-              url: row.link || ""
-            }
-          ])
-        );
-        selected = selected.map((page) => {
-          const hit = byId.get(page.id);
-          return hit ? { ...page, ...hit } : page;
-        });
-        syncUi();
-      } catch (err) {
-      }
-    };
-    pickBtn.addEventListener("click", async () => {
-      let open;
-      try {
-        open = openPagePicker;
-      } catch (err) {
-        console.error("Page picker failed to load.", err);
-        return;
-      }
-      if (typeof open !== "function") {
-        console.error("Page picker is unavailable.");
-        return;
-      }
-      const { restUrl, restNonce } = pickerConfig();
-      const result = await open({
-        multi: multiple,
-        selectedId: !multiple && selected[0] ? selected[0].id : 0,
-        selectedIds: multiple ? selected.map((p) => p.id) : [],
-        title: multiple ? i18n("pagePickerTitleMulti", "Select pages") : i18n("pagePickerTitle", "Select a page"),
-        searchPlaceholder: i18n("pagePickerSearch", "Search pages\u2026"),
-        empty: i18n("pagePickerEmpty", "No pages found."),
-        loading: i18n("pagePickerLoading", "Loading\u2026"),
-        cancelLabel: i18n("cancel", "Cancel"),
-        selectLabel: i18n("selectPage", "Select"),
-        restUrl,
-        restNonce
-      });
-      if (!result) return;
-      if (multiple) {
-        selected = (Array.isArray(result) ? result : [result]).map((page) => ({
-          id: Number(page.id) || 0,
-          title: page.title || "",
-          url: page.url || ""
-        })).filter((p) => p.id > 0);
-      } else {
-        selected = [
-          {
-            id: Number(result.id) || 0,
-            title: result.title || "",
-            url: result.url || ""
-          }
-        ].filter((p) => p.id > 0);
-      }
-      syncUi();
-      dispatchChange();
-    });
-    clearBtn.addEventListener("click", () => {
-      selected = [];
-      syncUi();
-      dispatchChange();
-    });
-    control.getPageValue = () => {
-      const ids = selected.map((p) => p.id).filter((id) => id > 0);
-      if (multiple) return ids;
-      return ids[0] || "";
-    };
-    syncUi();
-    hydrateTitles();
-    return control;
-  }
-  function bindPagePickers(root = document) {
-    root.querySelectorAll("[data-bl-blocks-page-picker]").forEach((wrap) => {
-      if (wrap.dataset.blPagePickerBound === "1") return;
-      wrap.dataset.blPagePickerBound = "1";
-      const multiple = wrap.dataset.multiple === "1";
-      const inputName = wrap.dataset.inputName || "";
-      const summary = wrap.querySelector("[data-bl-page-summary]");
-      const pickBtn = wrap.querySelector("[data-bl-page-choose]");
-      const clearBtn = wrap.querySelector("[data-bl-page-clear]");
-      const inputsHost = wrap.querySelector("[data-bl-page-inputs]");
-      if (!summary || !pickBtn || !clearBtn || !inputsHost || !inputName) return;
-      let selected = Array.from(inputsHost.querySelectorAll('input[type="hidden"]')).map((input) => ({
-        id: Number(input.value) || 0,
-        title: input.dataset.title || "",
-        url: input.dataset.url || ""
-      })).filter((p) => p.id > 0);
-      const writeInputs = () => {
-        inputsHost.replaceChildren();
-        if (selected.length === 0) {
-          if (multiple) {
-            inputsHost.appendChild(
-              el("input", { type: "hidden", name: inputName + "[]", value: "" })
-            );
-          } else {
-            inputsHost.appendChild(el("input", { type: "hidden", name: inputName, value: "" }));
-          }
-          return;
-        }
-        selected.forEach((page) => {
-          const name = multiple ? inputName + "[]" : inputName;
-          const input = el("input", {
-            type: "hidden",
-            name,
-            value: String(page.id)
-          });
-          if (page.title) input.dataset.title = page.title;
-          if (page.url) input.dataset.url = page.url;
-          inputsHost.appendChild(input);
-        });
-      };
-      const syncUi = () => {
-        summary.replaceChildren();
-        if (selected.length === 0) {
-          summary.appendChild(
-            el("span", {
-              className: "description",
-              text: multiple ? i18n("choosePagesHelp", "Select one or more pages.") : i18n("choosePageHelp", "Select a page.")
-            })
-          );
-        } else {
-          summary.appendChild(
-            buildPagePreview(selected, multiple, (id) => {
-              selected = selected.filter((page) => page.id !== id);
-              syncUi();
-            })
-          );
-        }
-        clearBtn.hidden = selected.length === 0;
-        pickBtn.textContent = selected.length > 0 ? multiple ? i18n("changePages", "Change pages") : i18n("changePage", "Change page") : multiple ? i18n("choosePages", "Choose pages") : i18n("choosePage", "Choose page");
-        writeInputs();
-      };
-      pickBtn.addEventListener("click", async () => {
-        if (typeof openPagePicker !== "function") {
-          console.error("Page picker is unavailable.");
-          return;
-        }
-        const { restUrl, restNonce } = pickerConfig();
-        const result = await openPagePicker({
-          multi: multiple,
-          selectedId: !multiple && selected[0] ? selected[0].id : 0,
-          selectedIds: multiple ? selected.map((p) => p.id) : [],
-          title: multiple ? i18n("pagePickerTitleMulti", "Select pages") : i18n("pagePickerTitle", "Select a page"),
-          searchPlaceholder: i18n("pagePickerSearch", "Search pages\u2026"),
-          empty: i18n("pagePickerEmpty", "No pages found."),
-          loading: i18n("pagePickerLoading", "Loading\u2026"),
-          cancelLabel: i18n("cancel", "Cancel"),
-          selectLabel: i18n("selectPage", "Select"),
-          restUrl,
-          restNonce
-        });
-        if (!result) return;
-        if (multiple) {
-          selected = (Array.isArray(result) ? result : [result]).map((page) => ({
-            id: Number(page.id) || 0,
-            title: page.title || "",
-            url: page.url || ""
-          })).filter((p) => p.id > 0);
-        } else {
-          selected = [
-            {
-              id: Number(result.id) || 0,
-              title: result.title || "",
-              url: result.url || ""
-            }
-          ].filter((p) => p.id > 0);
-        }
-        syncUi();
-      });
-      clearBtn.addEventListener("click", () => {
-        selected = [];
-        syncUi();
-      });
-      syncUi();
-    });
-  }
-
-  // themes/baselayer/packages/baselayer-blocks/src/js/admin/link-field.js
-  var LINK_TYPES = ["page", "url", "email", "phone"];
-  function el2(tag, props = {}, children = []) {
-    const node = document.createElement(tag);
-    Object.entries(props).forEach(([key, value]) => {
-      if (value == null || value === false) return;
-      if (key === "className") node.className = value;
-      else if (key === "text") node.textContent = value;
-      else if (key === "dataset") Object.assign(node.dataset, value);
-      else if (key.startsWith("on") && typeof value === "function") {
-        node.addEventListener(key.slice(2).toLowerCase(), value);
-      } else if (key === "checked") node.checked = Boolean(value);
-      else if (key === "value") node.value = value === true ? "" : String(value);
-      else node.setAttribute(key, value === true ? "" : String(value));
-    });
-    (Array.isArray(children) ? children : [children]).forEach((child) => {
-      if (child == null || child === false) return;
-      node.appendChild(typeof child === "string" ? document.createTextNode(child) : child);
-    });
-    return node;
-  }
-  function i18n2(key, fallback) {
-    const dict = window.blBlocksFieldUi && window.blBlocksFieldUi.i18n || window.blBlocksEditor && window.blBlocksEditor.i18n || window.blBlocksPage && window.blBlocksPage.i18n || window.blBlocksAdmin && window.blBlocksAdmin.i18n || {};
-    return dict[key] || fallback || key;
-  }
-  function pickerConfig2() {
-    const sources = [
-      window.blBlocksFieldUi,
-      window.blBlocksEditor,
-      window.blBlocksPage,
-      window.blBlocksAdmin
-    ];
-    let restUrl = "";
-    let restNonce = "";
-    sources.forEach((src) => {
-      if (!src) return;
-      if (!restUrl && src.pagesRestUrl) restUrl = src.pagesRestUrl;
-      if (!restNonce && src.restNonce) restNonce = src.restNonce;
-    });
-    return { restUrl, restNonce };
-  }
-  function allowedLinkTypes(field) {
-    const raw = Array.isArray(field.link_types) ? field.link_types : LINK_TYPES;
-    const list = raw.map(String).filter((t2) => LINK_TYPES.includes(t2));
-    return list.length ? list : [...LINK_TYPES];
-  }
-  function normalizeLinkValue(current, allowed) {
-    const empty = {
-      type: allowed[0] || "url",
-      url: "",
-      title: "",
-      page_id: 0,
-      target: ""
-    };
-    if (!current || typeof current !== "object" || Array.isArray(current)) {
-      return empty;
-    }
-    let type = String(current.type || "");
-    if (!allowed.includes(type)) {
-      type = allowed[0] || "url";
-    }
-    return {
-      type,
-      url: current.url != null ? String(current.url) : "",
-      title: current.title != null ? String(current.title) : "",
-      page_id: Number(current.page_id) || 0,
-      target: current.target === "_blank" ? "_blank" : ""
-    };
-  }
-  function displayDestination(state) {
-    if (state.type === "email") {
-      return String(state.url || "").replace(/^mailto:/i, "");
-    }
-    if (state.type === "phone") {
-      return String(state.url || "").replace(/^tel:/i, "");
-    }
-    return String(state.url || "");
-  }
-  function normalizeLinkHref(raw) {
-    const v = String(raw || "").trim();
-    if (!v) return "";
-    if (/^([/#?]|\/\/|[a-z][a-z0-9+.\-]*:)/i.test(v)) {
-      return v;
-    }
-    return "https://" + v;
-  }
-  function destinationFieldLabel(type) {
-    if (type === "page") return i18n2("linkDestPage", "Page");
-    if (type === "email") return i18n2("linkDestEmail", "Email address");
-    if (type === "phone") return i18n2("linkDestPhone", "Phone number");
-    return i18n2("linkDestUrl", "URL");
-  }
-  function createLinkControl(field, current) {
-    const allowed = allowedLinkTypes(field);
-    const allowTarget = field.allow_target !== false;
-    let state = normalizeLinkValue(current, allowed);
-    let pageMeta = state.type === "page" && state.page_id > 0 ? { id: state.page_id, title: state.title || "", url: state.url || "" } : null;
-    const root = el2("div", {
-      className: "bl-blocks-fields__link",
-      dataset: { blBlocksLinkField: "1" }
-    });
-    const dispatchChange = () => {
-      root.dispatchEvent(new Event("change", { bubbles: true }));
-    };
-    const typeRow = el2("div", { className: "bl-blocks-fields__link-types" });
-    const destLabel = el2("label", { text: destinationFieldLabel(state.type) });
-    const destWrap = el2("div", { className: "bl-blocks-fields__link-destination" });
-    const destRow = el2("div", { className: "bl-blocks-fields__link-dest" }, [destLabel, destWrap]);
-    const titleInput = el2("input", {
-      type: "text",
-      className: "widefat",
-      value: state.title
-    });
-    const titleRow = el2("p", { className: "bl-blocks-fields__link-title" }, [
-      el2("label", { text: i18n2("linkText", "Link text") }),
-      titleInput
-    ]);
-    const targetInput = el2("input", { type: "checkbox" });
-    const targetRow = el2("label", { className: "bl-blocks-fields__toggle bl-blocks-fields__link-target" }, [
-      targetInput,
-      document.createTextNode(" " + i18n2("linkOpenNewTab", "Open in new tab"))
-    ]);
-    const syncTargetVisibility = () => {
-      const show = allowTarget && (state.type === "page" || state.type === "url");
-      targetRow.hidden = !show;
-      if (!show) {
-        targetInput.checked = false;
-        state.target = "";
-      }
-    };
-    const renderDestination = () => {
-      destLabel.textContent = destinationFieldLabel(state.type);
-      destWrap.replaceChildren();
-      if (state.type === "page") {
-        const summary = el2("div", { className: "bl-blocks-fields__page-picker-summary" });
-        const pickBtn = el2("button", {
-          type: "button",
-          className: "button bl-button",
-          text: pageMeta ? i18n2("changePage", "Change page") : i18n2("choosePage", "Choose page")
-        });
-        const clearBtn = el2("button", {
-          type: "button",
-          className: "button-link",
-          text: i18n2("clearPage", "Clear"),
-          hidden: !pageMeta
-        });
-        if (pageMeta) {
-          summary.appendChild(
-            buildPagePreview([pageMeta], false, () => {
-              pageMeta = null;
-              state.page_id = 0;
-              state.url = "";
-              renderDestination();
-              dispatchChange();
-            })
-          );
-        } else {
-          summary.appendChild(
-            el2("span", {
-              className: "description",
-              text: i18n2("choosePageHelp", "Select a page.")
-            })
-          );
-        }
-        pickBtn.addEventListener("click", async () => {
-          if (typeof openPagePicker !== "function") {
-            console.error("Page picker is unavailable.");
-            return;
-          }
-          const { restUrl, restNonce } = pickerConfig2();
-          const page = await openPagePicker({
-            selectedId: pageMeta ? pageMeta.id : 0,
-            title: i18n2("pagePickerTitle", "Select a page"),
-            searchPlaceholder: i18n2("pagePickerSearch", "Search pages\u2026"),
-            empty: i18n2("pagePickerEmpty", "No pages found."),
-            loading: i18n2("pagePickerLoading", "Loading\u2026"),
-            cancelLabel: i18n2("cancel", "Cancel"),
-            selectLabel: i18n2("selectPage", "Select"),
-            restUrl,
-            restNonce
-          });
-          if (!page) return;
-          pageMeta = {
-            id: Number(page.id) || 0,
-            title: page.title || "",
-            url: page.url || ""
-          };
-          state.page_id = pageMeta.id;
-          state.url = pageMeta.url;
-          if (!String(titleInput.value || "").trim() && pageMeta.title) {
-            titleInput.value = pageMeta.title;
-            state.title = pageMeta.title;
-          }
-          renderDestination();
-          dispatchChange();
-        });
-        clearBtn.addEventListener("click", () => {
-          pageMeta = null;
-          state.page_id = 0;
-          state.url = "";
-          renderDestination();
-          dispatchChange();
-        });
-        destWrap.appendChild(
-          el2("div", { className: "bl-blocks-fields__page-picker-row" }, [
-            summary,
-            el2("div", { className: "bl-blocks-fields__page-picker-actions" }, [pickBtn, clearBtn])
-          ])
-        );
-        return;
-      }
-      let inputType = "text";
-      let value = displayDestination(state);
-      if (state.type === "email") {
-        inputType = "email";
-      } else if (state.type === "phone") {
-        inputType = "tel";
-      } else if (state.type === "url") {
-        value = normalizeLinkHref(value);
-        state.url = value;
-      }
-      const input = el2("input", {
-        type: inputType,
-        className: "widefat",
-        value
-      });
-      input.addEventListener("input", () => {
-        state.url = input.value;
-      });
-      if (state.type === "url") {
-        input.addEventListener("blur", () => {
-          const next = normalizeLinkHref(input.value);
-          if (next !== input.value) {
-            input.value = next;
-          }
-          state.url = next;
-        });
-      }
-      destWrap.appendChild(input);
-    };
-    if (allowed.length > 1) {
-      const labels = {
-        page: i18n2("linkTypePage", "Page"),
-        url: i18n2("linkTypeUrl", "URL"),
-        email: i18n2("linkTypeEmail", "Email"),
-        phone: i18n2("linkTypePhone", "Phone")
-      };
-      allowed.forEach((type) => {
-        const btn = el2("button", {
-          type: "button",
-          className: "button bl-button-small bl-blocks-fields__link-type" + (state.type === type ? " is-active" : ""),
-          text: labels[type] || type,
-          dataset: { linkType: type }
-        });
-        btn.addEventListener("click", () => {
-          if (state.type === type) return;
-          state.type = type;
-          state.url = "";
-          state.page_id = 0;
-          state.target = "";
-          pageMeta = null;
-          targetInput.checked = false;
-          typeRow.querySelectorAll("[data-link-type]").forEach((node) => {
-            node.classList.toggle("is-active", node.dataset.linkType === type);
-          });
-          syncTargetVisibility();
-          renderDestination();
-        });
-        typeRow.appendChild(btn);
-      });
-      root.appendChild(
-        el2("div", { className: "bl-blocks-fields__link-type-block" }, [
-          el2("label", { text: i18n2("linkTypeLabel", "Type") }),
-          typeRow
-        ])
-      );
-    }
-    titleInput.addEventListener("input", () => {
-      state.title = titleInput.value;
-    });
-    targetInput.checked = state.target === "_blank";
-    targetInput.addEventListener("change", () => {
-      state.target = targetInput.checked ? "_blank" : "";
-    });
-    root.append(destRow, titleRow, targetRow);
-    syncTargetVisibility();
-    renderDestination();
-    if (state.type === "page" && state.page_id > 0 && (!pageMeta || !pageMeta.title)) {
-      const { restUrl, restNonce } = pickerConfig2();
-      if (restUrl) {
-        fetch(String(restUrl).replace(/\/?$/, "/") + state.page_id + "?_fields=id,title,link", {
-          headers: restNonce ? { "X-WP-Nonce": restNonce } : {}
-        }).then((res) => res.ok ? res.json() : null).then((row) => {
-          if (!row || Number(row.id) !== state.page_id) return;
-          pageMeta = {
-            id: state.page_id,
-            title: row.title && row.title.rendered || "",
-            url: row.link || ""
-          };
-          state.url = pageMeta.url;
-          if (!String(titleInput.value || "").trim() && pageMeta.title) {
-            titleInput.value = pageMeta.title;
-            state.title = pageMeta.title;
-          }
-          renderDestination();
-        }).catch(() => {
-        });
-      }
-    }
-    root.getLinkValue = () => {
-      const destInput = destWrap.querySelector('input:not([type="hidden"])');
-      const title = String(titleInput.value || "").trim();
-      const out = {
-        type: state.type,
-        url: "",
-        title
-      };
-      if (state.type === "page") {
-        out.page_id = state.page_id > 0 ? state.page_id : 0;
-        out.url = pageMeta && pageMeta.url || state.url || "";
-      } else if (state.type === "email") {
-        const email = String(destInput ? destInput.value : state.url || "").replace(/^mailto:/i, "").trim();
-        out.url = email ? "mailto:" + email : "";
-      } else if (state.type === "phone") {
-        const phone = String(destInput ? destInput.value : state.url || "").replace(/^tel:/i, "").trim();
-        out.url = phone ? "tel:" + phone : "";
-      } else {
-        const href = normalizeLinkHref(destInput ? destInput.value : state.url || "");
-        out.url = href;
-        if (destInput && destInput.value !== href) {
-          destInput.value = href;
-        }
-        state.url = href;
-      }
-      if (allowTarget && (state.type === "page" || state.type === "url") && targetInput.checked) {
-        out.target = "_blank";
-      }
-      return out;
-    };
-    return root;
-  }
-  function bindLinkFields(root = document) {
-    root.querySelectorAll("[data-bl-blocks-link-field]").forEach((wrap) => {
-      if (wrap.dataset.blLinkBound === "1") return;
-      if (wrap.querySelector("[data-bl-link-interactive]")) return;
-      wrap.dataset.blLinkBound = "1";
-      const inputName = wrap.dataset.inputName || "";
-      if (!inputName) return;
-      let allowed = String(wrap.dataset.linkTypes || "").split(",").map((s) => s.trim()).filter((t2) => LINK_TYPES.includes(t2));
-      if (!allowed.length) allowed = [...LINK_TYPES];
-      const allowTarget = wrap.dataset.allowTarget === "1";
-      const readHidden = () => {
-        const get = (key) => {
-          const input = wrap.querySelector(`[data-bl-link-key="${key}"]`);
-          return input ? input.value : "";
-        };
-        return normalizeLinkValue(
-          {
-            type: get("type"),
-            url: get("url"),
-            title: get("title"),
-            page_id: get("page_id"),
-            target: get("target")
-          },
-          allowed
-        );
-      };
-      const field = { link_types: allowed, allow_target: allowTarget };
-      const control = createLinkControl(field, readHidden());
-      control.dataset.blLinkInteractive = "1";
-      const host = wrap.querySelector("[data-bl-link-ui]");
-      const inputsHost = wrap.querySelector("[data-bl-link-inputs]");
-      if (host) {
-        host.replaceChildren(control);
-      } else {
-        wrap.appendChild(control);
-      }
-      const writeInputs = () => {
-        if (!inputsHost) return;
-        const value = control.getLinkValue();
-        inputsHost.replaceChildren();
-        const keys = ["type", "url", "title", "page_id"];
-        keys.forEach((key) => {
-          const val = value[key] != null ? String(value[key]) : "";
-          const input = el2("input", {
-            type: "hidden",
-            name: `${inputName}[${key}]`,
-            value: val,
-            dataset: { blLinkKey: key }
-          });
-          inputsHost.appendChild(input);
-        });
-        if (value.target === "_blank") {
-          inputsHost.appendChild(
-            el2("input", {
-              type: "hidden",
-              name: `${inputName}[target]`,
-              value: "_blank",
-              dataset: { blLinkKey: "target" }
-            })
-          );
-        }
-      };
-      const form = wrap.closest("form");
-      if (form) {
-        form.addEventListener("submit", writeInputs);
-      }
-      wrap.addEventListener("change", writeInputs);
-      wrap.addEventListener("click", () => setTimeout(writeInputs, 0));
-      writeInputs();
-    });
-  }
-
   // node_modules/sortablejs/modular/sortable.esm.js
   function _defineProperty(e, r, t2) {
     return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, {
@@ -4380,6 +3604,839 @@
     return sortable_esm_default.create(el5, options);
   }
 
+  // themes/baselayer/packages/baselayer-blocks/src/js/admin/page-field.js
+  function el(tag, props = {}, children = []) {
+    const node = document.createElement(tag);
+    Object.entries(props).forEach(([key, value]) => {
+      if (value == null || value === false) return;
+      if (key === "className") node.className = value;
+      else if (key === "text") node.textContent = value;
+      else if (key === "dataset") Object.assign(node.dataset, value);
+      else if (key.startsWith("on") && typeof value === "function") {
+        node.addEventListener(key.slice(2).toLowerCase(), value);
+      } else if (key === "checked") node.checked = Boolean(value);
+      else if (key === "value") node.value = value === true ? "" : String(value);
+      else node.setAttribute(key, value === true ? "" : String(value));
+    });
+    (Array.isArray(children) ? children : [children]).forEach((child) => {
+      if (child == null || child === false) return;
+      node.appendChild(typeof child === "string" ? document.createTextNode(child) : child);
+    });
+    return node;
+  }
+  function i18n(key, fallback) {
+    const dict = window.blBlocksFieldUi && window.blBlocksFieldUi.i18n || window.blBlocksEditor && window.blBlocksEditor.i18n || window.blBlocksPage && window.blBlocksPage.i18n || window.blBlocksAdmin && window.blBlocksAdmin.i18n || {};
+    return dict[key] || fallback || key;
+  }
+  function pickerConfig() {
+    const sources = [
+      window.blBlocksFieldUi,
+      window.blBlocksEditor,
+      window.blBlocksPage,
+      window.blBlocksAdmin
+    ];
+    let restUrl = "";
+    let restNonce = "";
+    sources.forEach((src) => {
+      if (!src) return;
+      if (!restUrl && src.pagesRestUrl) restUrl = src.pagesRestUrl;
+      if (!restNonce && src.restNonce) restNonce = src.restNonce;
+    });
+    return { restUrl, restNonce };
+  }
+  function pageUrlPath(url) {
+    const raw = String(url || "").trim();
+    if (!raw) return "";
+    try {
+      const base = typeof window !== "undefined" && window.location && window.location.origin ? window.location.origin : "https://example.com";
+      const parsed = new URL(raw, base);
+      return (parsed.pathname || "/") + (parsed.search || "") + (parsed.hash || "");
+    } catch (err) {
+      const stripped = raw.replace(/^[a-z][a-z0-9+.-]*:\/\/[^/?#]+/i, "");
+      if (!stripped) return "/";
+      return stripped.startsWith("/") ? stripped : "/" + stripped.replace(/^\/*/, "");
+    }
+  }
+  function buildPageCard(page, onRemove) {
+    const title = page.title || i18n("selectedPage", "Selected page") + " #" + page.id;
+    const path = pageUrlPath(page.url);
+    const body = el("div", { className: "bl-blocks-fields__page-card-body" }, [
+      el("span", {
+        className: "bl-blocks-fields__page-card-title",
+        text: title,
+        title
+      })
+    ]);
+    if (path) {
+      body.appendChild(
+        el("span", {
+          className: "description bl-blocks-fields__page-card-url",
+          text: path,
+          title: page.url || path
+        })
+      );
+    }
+    const removeBtn = el(
+      "button",
+      {
+        type: "button",
+        className: "button-link bl-blocks-fields__card-remove",
+        title: i18n("clearPage", "Clear"),
+        "aria-label": i18n("clearPage", "Clear")
+      },
+      [el("span", { className: "bl-icon -icon-close", "aria-hidden": "true" })]
+    );
+    removeBtn.addEventListener("click", (evt) => {
+      evt.preventDefault();
+      evt.stopPropagation();
+      onRemove();
+    });
+    return el(
+      "div",
+      {
+        className: "bl-blocks-fields__page-card",
+        dataset: { pageId: String(page.id) }
+      },
+      [body, removeBtn]
+    );
+  }
+  function bindPageSortable(preview, api) {
+    if (!preview) return null;
+    preview.classList.add("is-sortable");
+    return createSortable(preview, {
+      animation: 150,
+      draggable: ".bl-blocks-fields__page-card",
+      filter: ".bl-blocks-fields__card-remove",
+      preventOnFilter: true,
+      ghostClass: "is-dragging-ghost",
+      chosenClass: "is-dragging-chosen",
+      onEnd: () => {
+        const ids = Array.from(
+          preview.querySelectorAll(".bl-blocks-fields__page-card[data-page-id]")
+        ).map((node) => Number(node.getAttribute("data-page-id")) || 0).filter((id) => id > 0);
+        const byId = new Map(api.getSelected().map((item) => [item.id, item]));
+        const next = [];
+        ids.forEach((id) => {
+          const item = byId.get(id);
+          if (item) next.push(item);
+        });
+        api.setSelected(next);
+        if (typeof api.onChange === "function") {
+          api.onChange();
+        }
+      }
+    });
+  }
+  function renderPageCards(preview, pages, onRemove) {
+    preview.replaceChildren();
+    pages.forEach((page) => {
+      preview.appendChild(buildPageCard(page, () => onRemove(page.id)));
+    });
+  }
+  function buildPagePreview(pages, multiple, onRemove) {
+    const preview = el("div", {
+      className: "bl-blocks-fields__page-preview" + (multiple ? " is-multiple is-sortable" : " is-single")
+    });
+    renderPageCards(preview, pages, onRemove);
+    return preview;
+  }
+  function normalizePageIds(current, multiple) {
+    if (multiple) {
+      const list = Array.isArray(current) ? current : current != null && current !== "" ? [current] : [];
+      return list.map((id) => Number(id) || 0).filter((id) => id > 0);
+    }
+    const one = Number(Array.isArray(current) ? current[0] : current) || 0;
+    return one > 0 ? [one] : [];
+  }
+  function createPagePickerControl(field, current) {
+    const multiple = !!field.multiple;
+    let selected = normalizePageIds(current, multiple).map((id) => ({
+      id,
+      title: "",
+      url: ""
+    }));
+    const empty = el("span", {
+      className: "description bl-blocks-fields__description bl-blocks-fields__page-empty",
+      text: multiple ? i18n("choosePagesHelp", "Select one or more pages.") : i18n("choosePageHelp", "Select a page.")
+    });
+    const preview = el("div", {
+      className: "bl-blocks-fields__page-preview" + (multiple ? " is-multiple is-sortable" : " is-single")
+    });
+    const summary = el("div", { className: "bl-blocks-fields__page-picker-summary" }, [
+      empty,
+      preview
+    ]);
+    const pickBtn = el("button", {
+      type: "button",
+      className: "button bl-button",
+      text: i18n("choosePage", "Choose page")
+    });
+    const clearBtn = el("button", {
+      type: "button",
+      className: "button-link",
+      text: i18n("clearPage", "Clear")
+    });
+    const actions = el("div", { className: "bl-blocks-fields__page-picker-actions" }, [
+      pickBtn,
+      clearBtn
+    ]);
+    const control = el("div", {
+      className: "bl-blocks-fields__page-picker",
+      dataset: { blBlocksPagePicker: "1" }
+    });
+    control.append(
+      el("div", { className: "bl-blocks-fields__page-picker-row" }, [summary, actions])
+    );
+    const dispatchChange = () => {
+      control.dispatchEvent(new Event("change", { bubbles: true }));
+    };
+    const syncUi = () => {
+      const has = selected.length > 0;
+      empty.hidden = has;
+      preview.hidden = !has;
+      if (has) {
+        renderPageCards(preview, selected, (id) => {
+          selected = selected.filter((page) => page.id !== id);
+          syncUi();
+          dispatchChange();
+        });
+      } else {
+        preview.replaceChildren();
+      }
+      clearBtn.hidden = !has;
+      pickBtn.textContent = has ? multiple ? i18n("changePages", "Change pages") : i18n("changePage", "Change page") : multiple ? i18n("choosePages", "Choose pages") : i18n("choosePage", "Choose page");
+    };
+    if (multiple) {
+      bindPageSortable(preview, {
+        getSelected: () => selected,
+        setSelected: (next) => {
+          selected = next;
+        },
+        onChange: dispatchChange
+      });
+    }
+    const hydrateTitles = async () => {
+      const missing = selected.filter((p) => !p.title);
+      if (missing.length === 0) return;
+      const { restUrl, restNonce } = pickerConfig();
+      if (!restUrl) return;
+      try {
+        const include = missing.map((p) => p.id).join(",");
+        const url = String(restUrl).replace(/\/?$/, "/") + "?include=" + encodeURIComponent(include) + "&per_page=" + missing.length + "&_fields=id,title,link";
+        const res = await fetch(url, {
+          headers: restNonce ? { "X-WP-Nonce": restNonce } : {}
+        });
+        if (!res.ok) return;
+        const rows = await res.json();
+        if (!Array.isArray(rows)) return;
+        const byId = new Map(
+          rows.map((row) => [
+            Number(row.id) || 0,
+            {
+              id: Number(row.id) || 0,
+              title: row.title && row.title.rendered || "",
+              url: row.link || ""
+            }
+          ])
+        );
+        selected = selected.map((page) => {
+          const hit = byId.get(page.id);
+          return hit ? { ...page, ...hit } : page;
+        });
+        syncUi();
+      } catch (err) {
+      }
+    };
+    pickBtn.addEventListener("click", async () => {
+      let open;
+      try {
+        open = openPagePicker;
+      } catch (err) {
+        console.error("Page picker failed to load.", err);
+        return;
+      }
+      if (typeof open !== "function") {
+        console.error("Page picker is unavailable.");
+        return;
+      }
+      const { restUrl, restNonce } = pickerConfig();
+      const result = await open({
+        multi: multiple,
+        selectedId: !multiple && selected[0] ? selected[0].id : 0,
+        selectedIds: multiple ? selected.map((p) => p.id) : [],
+        title: multiple ? i18n("pagePickerTitleMulti", "Select pages") : i18n("pagePickerTitle", "Select a page"),
+        searchPlaceholder: i18n("pagePickerSearch", "Search pages\u2026"),
+        empty: i18n("pagePickerEmpty", "No pages found."),
+        loading: i18n("pagePickerLoading", "Loading\u2026"),
+        cancelLabel: i18n("cancel", "Cancel"),
+        selectLabel: i18n("selectPage", "Select"),
+        restUrl,
+        restNonce
+      });
+      if (!result) return;
+      if (multiple) {
+        selected = (Array.isArray(result) ? result : [result]).map((page) => ({
+          id: Number(page.id) || 0,
+          title: page.title || "",
+          url: page.url || ""
+        })).filter((p) => p.id > 0);
+      } else {
+        selected = [
+          {
+            id: Number(result.id) || 0,
+            title: result.title || "",
+            url: result.url || ""
+          }
+        ].filter((p) => p.id > 0);
+      }
+      syncUi();
+      dispatchChange();
+    });
+    clearBtn.addEventListener("click", () => {
+      selected = [];
+      syncUi();
+      dispatchChange();
+    });
+    control.getPageValue = () => {
+      const ids = selected.map((p) => p.id).filter((id) => id > 0);
+      if (multiple) return ids;
+      return ids[0] || "";
+    };
+    syncUi();
+    hydrateTitles();
+    return control;
+  }
+  function bindPagePickers(root = document) {
+    root.querySelectorAll("[data-bl-blocks-page-picker]").forEach((wrap) => {
+      if (wrap.dataset.blPagePickerBound === "1") return;
+      wrap.dataset.blPagePickerBound = "1";
+      const multiple = wrap.dataset.multiple === "1";
+      const inputName = wrap.dataset.inputName || "";
+      const summary = wrap.querySelector("[data-bl-page-summary]");
+      const pickBtn = wrap.querySelector("[data-bl-page-choose]");
+      const clearBtn = wrap.querySelector("[data-bl-page-clear]");
+      const inputsHost = wrap.querySelector("[data-bl-page-inputs]");
+      if (!summary || !pickBtn || !clearBtn || !inputsHost || !inputName) return;
+      let selected = Array.from(inputsHost.querySelectorAll('input[type="hidden"]')).map((input) => ({
+        id: Number(input.value) || 0,
+        title: input.dataset.title || "",
+        url: input.dataset.url || ""
+      })).filter((p) => p.id > 0);
+      const empty = el("span", {
+        className: "description bl-blocks-fields__description bl-blocks-fields__page-empty",
+        text: multiple ? i18n("choosePagesHelp", "Select one or more pages.") : i18n("choosePageHelp", "Select a page.")
+      });
+      const preview = el("div", {
+        className: "bl-blocks-fields__page-preview" + (multiple ? " is-multiple is-sortable" : " is-single")
+      });
+      summary.replaceChildren(empty, preview);
+      const writeInputs = () => {
+        inputsHost.replaceChildren();
+        if (selected.length === 0) {
+          if (multiple) {
+            inputsHost.appendChild(
+              el("input", { type: "hidden", name: inputName + "[]", value: "" })
+            );
+          } else {
+            inputsHost.appendChild(el("input", { type: "hidden", name: inputName, value: "" }));
+          }
+          return;
+        }
+        selected.forEach((page) => {
+          const name = multiple ? inputName + "[]" : inputName;
+          const input = el("input", {
+            type: "hidden",
+            name,
+            value: String(page.id)
+          });
+          if (page.title) input.dataset.title = page.title;
+          if (page.url) input.dataset.url = page.url;
+          inputsHost.appendChild(input);
+        });
+      };
+      const syncUi = () => {
+        const has = selected.length > 0;
+        empty.hidden = has;
+        preview.hidden = !has;
+        if (has) {
+          renderPageCards(preview, selected, (id) => {
+            selected = selected.filter((page) => page.id !== id);
+            syncUi();
+          });
+        } else {
+          preview.replaceChildren();
+        }
+        clearBtn.hidden = !has;
+        pickBtn.textContent = has ? multiple ? i18n("changePages", "Change pages") : i18n("changePage", "Change page") : multiple ? i18n("choosePages", "Choose pages") : i18n("choosePage", "Choose page");
+        writeInputs();
+      };
+      if (multiple) {
+        bindPageSortable(preview, {
+          getSelected: () => selected,
+          setSelected: (next) => {
+            selected = next;
+          },
+          onChange: writeInputs
+        });
+      }
+      pickBtn.addEventListener("click", async () => {
+        if (typeof openPagePicker !== "function") {
+          console.error("Page picker is unavailable.");
+          return;
+        }
+        const { restUrl, restNonce } = pickerConfig();
+        const result = await openPagePicker({
+          multi: multiple,
+          selectedId: !multiple && selected[0] ? selected[0].id : 0,
+          selectedIds: multiple ? selected.map((p) => p.id) : [],
+          title: multiple ? i18n("pagePickerTitleMulti", "Select pages") : i18n("pagePickerTitle", "Select a page"),
+          searchPlaceholder: i18n("pagePickerSearch", "Search pages\u2026"),
+          empty: i18n("pagePickerEmpty", "No pages found."),
+          loading: i18n("pagePickerLoading", "Loading\u2026"),
+          cancelLabel: i18n("cancel", "Cancel"),
+          selectLabel: i18n("selectPage", "Select"),
+          restUrl,
+          restNonce
+        });
+        if (!result) return;
+        if (multiple) {
+          selected = (Array.isArray(result) ? result : [result]).map((page) => ({
+            id: Number(page.id) || 0,
+            title: page.title || "",
+            url: page.url || ""
+          })).filter((p) => p.id > 0);
+        } else {
+          selected = [
+            {
+              id: Number(result.id) || 0,
+              title: result.title || "",
+              url: result.url || ""
+            }
+          ].filter((p) => p.id > 0);
+        }
+        syncUi();
+      });
+      clearBtn.addEventListener("click", () => {
+        selected = [];
+        syncUi();
+      });
+      syncUi();
+    });
+  }
+
+  // themes/baselayer/packages/baselayer-blocks/src/js/admin/link-field.js
+  var LINK_TYPES = ["page", "url", "email", "phone"];
+  function el2(tag, props = {}, children = []) {
+    const node = document.createElement(tag);
+    Object.entries(props).forEach(([key, value]) => {
+      if (value == null || value === false) return;
+      if (key === "className") node.className = value;
+      else if (key === "text") node.textContent = value;
+      else if (key === "dataset") Object.assign(node.dataset, value);
+      else if (key.startsWith("on") && typeof value === "function") {
+        node.addEventListener(key.slice(2).toLowerCase(), value);
+      } else if (key === "checked") node.checked = Boolean(value);
+      else if (key === "value") node.value = value === true ? "" : String(value);
+      else node.setAttribute(key, value === true ? "" : String(value));
+    });
+    (Array.isArray(children) ? children : [children]).forEach((child) => {
+      if (child == null || child === false) return;
+      node.appendChild(typeof child === "string" ? document.createTextNode(child) : child);
+    });
+    return node;
+  }
+  function i18n2(key, fallback) {
+    const dict = window.blBlocksFieldUi && window.blBlocksFieldUi.i18n || window.blBlocksEditor && window.blBlocksEditor.i18n || window.blBlocksPage && window.blBlocksPage.i18n || window.blBlocksAdmin && window.blBlocksAdmin.i18n || {};
+    return dict[key] || fallback || key;
+  }
+  function pickerConfig2() {
+    const sources = [
+      window.blBlocksFieldUi,
+      window.blBlocksEditor,
+      window.blBlocksPage,
+      window.blBlocksAdmin
+    ];
+    let restUrl = "";
+    let restNonce = "";
+    sources.forEach((src) => {
+      if (!src) return;
+      if (!restUrl && src.pagesRestUrl) restUrl = src.pagesRestUrl;
+      if (!restNonce && src.restNonce) restNonce = src.restNonce;
+    });
+    return { restUrl, restNonce };
+  }
+  function allowedLinkTypes(field) {
+    const raw = Array.isArray(field.link_types) ? field.link_types : LINK_TYPES;
+    const list = raw.map(String).filter((t2) => LINK_TYPES.includes(t2));
+    return list.length ? list : [...LINK_TYPES];
+  }
+  function normalizeLinkValue(current, allowed) {
+    const empty = {
+      type: allowed[0] || "url",
+      url: "",
+      title: "",
+      page_id: 0,
+      target: ""
+    };
+    if (!current || typeof current !== "object" || Array.isArray(current)) {
+      return empty;
+    }
+    let type = String(current.type || "");
+    if (!allowed.includes(type)) {
+      type = allowed[0] || "url";
+    }
+    return {
+      type,
+      url: current.url != null ? String(current.url) : "",
+      title: current.title != null ? String(current.title) : "",
+      page_id: Number(current.page_id) || 0,
+      target: current.target === "_blank" ? "_blank" : ""
+    };
+  }
+  function displayDestination(state) {
+    if (state.type === "email") {
+      return String(state.url || "").replace(/^mailto:/i, "");
+    }
+    if (state.type === "phone") {
+      return String(state.url || "").replace(/^tel:/i, "");
+    }
+    return String(state.url || "");
+  }
+  function normalizeLinkHref(raw) {
+    const v = String(raw || "").trim();
+    if (!v) return "";
+    if (/^([/#?]|\/\/|[a-z][a-z0-9+.\-]*:)/i.test(v)) {
+      return v;
+    }
+    return "https://" + v;
+  }
+  function destinationFieldLabel(type) {
+    if (type === "page") return i18n2("linkDestPage", "Page");
+    if (type === "email") return i18n2("linkDestEmail", "Email address");
+    if (type === "phone") return i18n2("linkDestPhone", "Phone number");
+    return i18n2("linkDestUrl", "URL");
+  }
+  function createLinkControl(field, current) {
+    const allowed = allowedLinkTypes(field);
+    const allowTarget = field.allow_target !== false;
+    let state = normalizeLinkValue(current, allowed);
+    let pageMeta = state.type === "page" && state.page_id > 0 ? { id: state.page_id, title: state.title || "", url: state.url || "" } : null;
+    const root = el2("div", {
+      className: "bl-blocks-fields__link",
+      dataset: { blBlocksLinkField: "1" }
+    });
+    const dispatchChange = () => {
+      root.dispatchEvent(new Event("change", { bubbles: true }));
+    };
+    const typeRow = el2("div", { className: "bl-blocks-fields__link-types" });
+    const destLabel = el2("label", { text: destinationFieldLabel(state.type) });
+    const destWrap = el2("div", { className: "bl-blocks-fields__link-destination" });
+    const destRow = el2("div", { className: "bl-blocks-fields__link-dest" }, [destLabel, destWrap]);
+    const titleInput = el2("input", {
+      type: "text",
+      className: "widefat",
+      value: state.title
+    });
+    const titleRow = el2("p", { className: "bl-blocks-fields__link-title" }, [
+      el2("label", { text: i18n2("linkText", "Link text") }),
+      titleInput
+    ]);
+    const targetInput = el2("input", { type: "checkbox" });
+    const targetRow = el2("label", { className: "bl-blocks-fields__toggle bl-blocks-fields__link-target" }, [
+      targetInput,
+      document.createTextNode(" " + i18n2("linkOpenNewTab", "Open in new tab"))
+    ]);
+    const syncTargetVisibility = () => {
+      const show = allowTarget && (state.type === "page" || state.type === "url");
+      targetRow.hidden = !show;
+      if (!show) {
+        targetInput.checked = false;
+        state.target = "";
+      }
+    };
+    const renderDestination = () => {
+      destLabel.textContent = destinationFieldLabel(state.type);
+      destWrap.replaceChildren();
+      if (state.type === "page") {
+        const summary = el2("div", { className: "bl-blocks-fields__page-picker-summary" });
+        const pickBtn = el2("button", {
+          type: "button",
+          className: "button bl-button",
+          text: pageMeta ? i18n2("changePage", "Change page") : i18n2("choosePage", "Choose page")
+        });
+        const clearBtn = el2("button", {
+          type: "button",
+          className: "button-link",
+          text: i18n2("clearPage", "Clear"),
+          hidden: !pageMeta
+        });
+        if (pageMeta) {
+          summary.appendChild(
+            buildPagePreview([pageMeta], false, () => {
+              pageMeta = null;
+              state.page_id = 0;
+              state.url = "";
+              renderDestination();
+              dispatchChange();
+            })
+          );
+        } else {
+          summary.appendChild(
+            el2("span", {
+              className: "description",
+              text: i18n2("choosePageHelp", "Select a page.")
+            })
+          );
+        }
+        pickBtn.addEventListener("click", async () => {
+          if (typeof openPagePicker !== "function") {
+            console.error("Page picker is unavailable.");
+            return;
+          }
+          const { restUrl, restNonce } = pickerConfig2();
+          const page = await openPagePicker({
+            selectedId: pageMeta ? pageMeta.id : 0,
+            title: i18n2("pagePickerTitle", "Select a page"),
+            searchPlaceholder: i18n2("pagePickerSearch", "Search pages\u2026"),
+            empty: i18n2("pagePickerEmpty", "No pages found."),
+            loading: i18n2("pagePickerLoading", "Loading\u2026"),
+            cancelLabel: i18n2("cancel", "Cancel"),
+            selectLabel: i18n2("selectPage", "Select"),
+            restUrl,
+            restNonce
+          });
+          if (!page) return;
+          pageMeta = {
+            id: Number(page.id) || 0,
+            title: page.title || "",
+            url: page.url || ""
+          };
+          state.page_id = pageMeta.id;
+          state.url = pageMeta.url;
+          if (!String(titleInput.value || "").trim() && pageMeta.title) {
+            titleInput.value = pageMeta.title;
+            state.title = pageMeta.title;
+          }
+          renderDestination();
+          dispatchChange();
+        });
+        clearBtn.addEventListener("click", () => {
+          pageMeta = null;
+          state.page_id = 0;
+          state.url = "";
+          renderDestination();
+          dispatchChange();
+        });
+        destWrap.appendChild(
+          el2("div", { className: "bl-blocks-fields__page-picker-row" }, [
+            summary,
+            el2("div", { className: "bl-blocks-fields__page-picker-actions" }, [pickBtn, clearBtn])
+          ])
+        );
+        return;
+      }
+      let inputType = "text";
+      let value = displayDestination(state);
+      if (state.type === "email") {
+        inputType = "email";
+      } else if (state.type === "phone") {
+        inputType = "tel";
+      } else if (state.type === "url") {
+        value = normalizeLinkHref(value);
+        state.url = value;
+      }
+      const input = el2("input", {
+        type: inputType,
+        className: "widefat",
+        value
+      });
+      input.addEventListener("input", () => {
+        state.url = input.value;
+      });
+      if (state.type === "url") {
+        input.addEventListener("blur", () => {
+          const next = normalizeLinkHref(input.value);
+          if (next !== input.value) {
+            input.value = next;
+          }
+          state.url = next;
+        });
+      }
+      destWrap.appendChild(input);
+    };
+    if (allowed.length > 1) {
+      const labels = {
+        page: i18n2("linkTypePage", "Page"),
+        url: i18n2("linkTypeUrl", "URL"),
+        email: i18n2("linkTypeEmail", "Email"),
+        phone: i18n2("linkTypePhone", "Phone")
+      };
+      allowed.forEach((type) => {
+        const btn = el2("button", {
+          type: "button",
+          className: "button bl-button-small bl-blocks-fields__link-type" + (state.type === type ? " is-active" : ""),
+          text: labels[type] || type,
+          dataset: { linkType: type }
+        });
+        btn.addEventListener("click", () => {
+          if (state.type === type) return;
+          state.type = type;
+          state.url = "";
+          state.page_id = 0;
+          state.target = "";
+          pageMeta = null;
+          targetInput.checked = false;
+          typeRow.querySelectorAll("[data-link-type]").forEach((node) => {
+            node.classList.toggle("is-active", node.dataset.linkType === type);
+          });
+          syncTargetVisibility();
+          renderDestination();
+        });
+        typeRow.appendChild(btn);
+      });
+      root.appendChild(
+        el2("div", { className: "bl-blocks-fields__link-type-block" }, [
+          el2("label", { text: i18n2("linkTypeLabel", "Type") }),
+          typeRow
+        ])
+      );
+    }
+    titleInput.addEventListener("input", () => {
+      state.title = titleInput.value;
+    });
+    targetInput.checked = state.target === "_blank";
+    targetInput.addEventListener("change", () => {
+      state.target = targetInput.checked ? "_blank" : "";
+    });
+    root.append(destRow, titleRow, targetRow);
+    syncTargetVisibility();
+    renderDestination();
+    if (state.type === "page" && state.page_id > 0 && (!pageMeta || !pageMeta.title)) {
+      const { restUrl, restNonce } = pickerConfig2();
+      if (restUrl) {
+        fetch(String(restUrl).replace(/\/?$/, "/") + state.page_id + "?_fields=id,title,link", {
+          headers: restNonce ? { "X-WP-Nonce": restNonce } : {}
+        }).then((res) => res.ok ? res.json() : null).then((row) => {
+          if (!row || Number(row.id) !== state.page_id) return;
+          pageMeta = {
+            id: state.page_id,
+            title: row.title && row.title.rendered || "",
+            url: row.link || ""
+          };
+          state.url = pageMeta.url;
+          if (!String(titleInput.value || "").trim() && pageMeta.title) {
+            titleInput.value = pageMeta.title;
+            state.title = pageMeta.title;
+          }
+          renderDestination();
+        }).catch(() => {
+        });
+      }
+    }
+    root.getLinkValue = () => {
+      const destInput = destWrap.querySelector('input:not([type="hidden"])');
+      const title = String(titleInput.value || "").trim();
+      const out = {
+        type: state.type,
+        url: "",
+        title
+      };
+      if (state.type === "page") {
+        out.page_id = state.page_id > 0 ? state.page_id : 0;
+        out.url = pageMeta && pageMeta.url || state.url || "";
+      } else if (state.type === "email") {
+        const email = String(destInput ? destInput.value : state.url || "").replace(/^mailto:/i, "").trim();
+        out.url = email ? "mailto:" + email : "";
+      } else if (state.type === "phone") {
+        const phone = String(destInput ? destInput.value : state.url || "").replace(/^tel:/i, "").trim();
+        out.url = phone ? "tel:" + phone : "";
+      } else {
+        const href = normalizeLinkHref(destInput ? destInput.value : state.url || "");
+        out.url = href;
+        if (destInput && destInput.value !== href) {
+          destInput.value = href;
+        }
+        state.url = href;
+      }
+      if (allowTarget && (state.type === "page" || state.type === "url") && targetInput.checked) {
+        out.target = "_blank";
+      }
+      return out;
+    };
+    return root;
+  }
+  function bindLinkFields(root = document) {
+    root.querySelectorAll("[data-bl-blocks-link-field]").forEach((wrap) => {
+      if (wrap.dataset.blLinkBound === "1") return;
+      if (wrap.querySelector("[data-bl-link-interactive]")) return;
+      wrap.dataset.blLinkBound = "1";
+      const inputName = wrap.dataset.inputName || "";
+      if (!inputName) return;
+      let allowed = String(wrap.dataset.linkTypes || "").split(",").map((s) => s.trim()).filter((t2) => LINK_TYPES.includes(t2));
+      if (!allowed.length) allowed = [...LINK_TYPES];
+      const allowTarget = wrap.dataset.allowTarget === "1";
+      const readHidden = () => {
+        const get = (key) => {
+          const input = wrap.querySelector(`[data-bl-link-key="${key}"]`);
+          return input ? input.value : "";
+        };
+        return normalizeLinkValue(
+          {
+            type: get("type"),
+            url: get("url"),
+            title: get("title"),
+            page_id: get("page_id"),
+            target: get("target")
+          },
+          allowed
+        );
+      };
+      const field = { link_types: allowed, allow_target: allowTarget };
+      const control = createLinkControl(field, readHidden());
+      control.dataset.blLinkInteractive = "1";
+      const host = wrap.querySelector("[data-bl-link-ui]");
+      const inputsHost = wrap.querySelector("[data-bl-link-inputs]");
+      if (host) {
+        host.replaceChildren(control);
+      } else {
+        wrap.appendChild(control);
+      }
+      const writeInputs = () => {
+        if (!inputsHost) return;
+        const value = control.getLinkValue();
+        inputsHost.replaceChildren();
+        const keys = ["type", "url", "title", "page_id"];
+        keys.forEach((key) => {
+          const val = value[key] != null ? String(value[key]) : "";
+          const input = el2("input", {
+            type: "hidden",
+            name: `${inputName}[${key}]`,
+            value: val,
+            dataset: { blLinkKey: key }
+          });
+          inputsHost.appendChild(input);
+        });
+        if (value.target === "_blank") {
+          inputsHost.appendChild(
+            el2("input", {
+              type: "hidden",
+              name: `${inputName}[target]`,
+              value: "_blank",
+              dataset: { blLinkKey: "target" }
+            })
+          );
+        }
+      };
+      const form = wrap.closest("form");
+      if (form) {
+        form.addEventListener("submit", writeInputs);
+      }
+      wrap.addEventListener("change", writeInputs);
+      wrap.addEventListener("click", () => setTimeout(writeInputs, 0));
+      writeInputs();
+    });
+  }
+
   // themes/baselayer/packages/baselayer-blocks/src/js/admin/media-field.js
   function el3(tag, props = {}, children = []) {
     const node = document.createElement(tag);
@@ -4552,7 +4609,7 @@
       dataset: { blMediaPreview: "" }
     });
     const empty = el3("span", {
-      className: "description bl-blocks-fields__media-empty",
+      className: "description bl-blocks-fields__description bl-blocks-fields__media-empty",
       text: kind === "image" ? multiple ? i18n3("chooseImagesHelp", "Select one or more images.") : i18n3("chooseImageHelp", "Select an image.") : multiple ? i18n3("chooseFilesHelp", "Select one or more files.") : i18n3("chooseFileHelp", "Select a file."),
       dataset: { blMediaEmpty: "" }
     });
@@ -4978,6 +5035,41 @@
   function isStatic(type) {
     return type === "divider" || type === "spacer" || type === "heading" || type === "text_block" || type === "html" || type === "honeypot" || type === "captcha";
   }
+  function fieldShowAsCheckbox(field) {
+    const type = field && field.type ? field.type : "";
+    if (type === "toggle") {
+      return !!field.show_as_checkbox;
+    }
+    if (type === "terms" || type === "checkboxes") {
+      return field.show_as_checkbox === void 0 ? true : !!field.show_as_checkbox;
+    }
+    return true;
+  }
+  function createBooleanControl(field, id, checked) {
+    const asCheckbox = fieldShowAsCheckbox(field);
+    const adjacent = String(field.content || "").trim();
+    const input = el4("input", {
+      type: "checkbox",
+      id,
+      checked: !!checked
+    });
+    if (asCheckbox) {
+      const children2 = [input];
+      if (adjacent) {
+        children2.push(document.createTextNode(" "));
+        children2.push(el4("span", { text: adjacent }));
+      }
+      return el4("label", { className: "bl-blocks-fields__choice" }, children2);
+    }
+    const children = [
+      input,
+      el4("span", { className: "bl-blocks-fields__switch-ui", "aria-hidden": "true" })
+    ];
+    if (adjacent) {
+      children.push(el4("span", { className: "bl-blocks-fields__switch-label", text: adjacent }));
+    }
+    return el4("label", { className: "bl-blocks-fields__switch" }, children);
+  }
   function normalizeFieldList(fields) {
     if (Array.isArray(fields)) {
       return fields;
@@ -5080,7 +5172,7 @@
       dataset: { fieldName: name }
     });
     const id = "bl-blocks-ui-" + name.replace(/[^a-z0-9_-]/gi, "_") + "-" + Math.random().toString(36).slice(2, 7);
-    if (!field.hide_label && type !== "toggle" && type !== "terms") {
+    if (!field.hide_label) {
       const label = el4("label", { className: "bl-blocks-fields__label", text: field.label || name });
       label.setAttribute("for", id);
       if (field.required) {
@@ -5135,6 +5227,7 @@
     } else if (type === "checkboxes") {
       control = el4("div", { className: "bl-blocks-fields__choices" });
       const list = Array.isArray(current) ? current.map(String) : [];
+      const asCheckbox = fieldShowAsCheckbox(field);
       options.forEach((opt, i) => {
         const ov = String(opt.value ?? "");
         const oid = id + "-" + i;
@@ -5144,23 +5237,30 @@
           value: ov,
           checked: list.includes(ov)
         });
-        control.appendChild(
-          el4("label", { className: "bl-blocks-fields__choice" }, [
-            input,
-            document.createTextNode(" " + (opt.label || ov))
-          ])
-        );
+        const optLabel = opt.label || ov;
+        if (asCheckbox) {
+          control.appendChild(
+            el4("label", { className: "bl-blocks-fields__choice" }, [
+              input,
+              document.createTextNode(" " + optLabel)
+            ])
+          );
+        } else {
+          control.appendChild(
+            el4("label", { className: "bl-blocks-fields__switch" }, [
+              input,
+              el4("span", { className: "bl-blocks-fields__switch-ui", "aria-hidden": "true" }),
+              el4("span", { className: "bl-blocks-fields__switch-label", text: optLabel })
+            ])
+          );
+        }
       });
     } else if (type === "toggle" || type === "terms") {
-      const input = el4("input", {
-        type: "checkbox",
+      control = createBooleanControl(
+        field,
         id,
-        checked: !!current && current !== "0" && current !== ""
-      });
-      control = el4("label", { className: "bl-blocks-fields__toggle" }, [
-        input,
-        document.createTextNode(" " + (field.label || name))
-      ]);
+        !!current && current !== "0" && current !== ""
+      );
     } else if (type === "hidden") {
       control = el4("input", {
         type: "hidden",
@@ -5254,7 +5354,9 @@
       controls.push({ field, control, type });
     }
     if (field.description) {
-      row.appendChild(el4("p", { className: "description", text: field.description }));
+      row.appendChild(
+        el4("p", { className: "description bl-blocks-fields__description", text: field.description })
+      );
     }
     return row;
   }
@@ -5465,7 +5567,9 @@
       wrap.appendChild(el4("div", { className: "bl-blocks-fields__label", text: field.label }));
     }
     if (field.description) {
-      wrap.appendChild(el4("p", { className: "description", text: field.description }));
+      wrap.appendChild(
+        el4("p", { className: "description bl-blocks-fields__description", text: field.description })
+      );
     }
     const rowsEl = el4("div", { className: "bl-blocks-fields__repeater-rows is-sortable" });
     const emptyHelp = el4("p", {
@@ -6494,7 +6598,7 @@
                 title: def.title || pageI18n.panelTitle || "Content Fields",
                 className: "bl-blocks-page-settings-panel"
               },
-              def.description ? el5("p", { className: "description" }, def.description) : null,
+              def.description ? el5("p", { className: "description bl-blocks-fields__description" }, def.description) : null,
               panelBody
             );
           }

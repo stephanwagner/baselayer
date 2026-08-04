@@ -272,6 +272,19 @@ function convertFieldType(field, nextType) {
     delete field.layout;
   }
 
+  if (nextType === 'toggle' || nextType === 'terms' || nextType === 'checkboxes') {
+    if (nextType === 'toggle') {
+      field.show_as_checkbox = false;
+      if (field.content == null) {
+        field.content = '';
+      }
+    } else {
+      field.show_as_checkbox = true;
+    }
+  } else {
+    delete field.show_as_checkbox;
+  }
+
   if (nextType === 'checkboxes') {
     if (field.min_selections != null && field.min_selections !== '') {
       const min = parseInt(field.min_selections, 10);
@@ -1441,6 +1454,25 @@ function createLayoutControl(field) {
   });
   wrap.append(el('label', { text: t('layout', 'Layout') }), group);
   return wrap;
+}
+
+function defaultShowAsCheckbox(type) {
+  return type !== 'toggle';
+}
+
+function createShowAsCheckboxControl(field) {
+  if (field.show_as_checkbox === undefined) {
+    field.show_as_checkbox = defaultShowAsCheckbox(field.type);
+  }
+  return createSwitchSetting(
+    'blShowAsCheckbox',
+    t('showAsCheckbox', 'Show as checkbox'),
+    !!field.show_as_checkbox,
+    (checked) => {
+      field.show_as_checkbox = checked;
+      document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+    }
+  );
 }
 
 function headingLevelFallback(levels) {
@@ -2738,8 +2770,16 @@ export function serializeRow(row) {
   if (DESCRIPTION_TYPES.includes(type)) {
     data.description = q('[data-bl-description]')?.value || '';
   }
-  if (type === 'terms') {
+  if (type === 'terms' || type === 'toggle') {
     data.content = q('[data-bl-content]')?.value || '';
+  }
+  if (type === 'toggle' || type === 'terms' || type === 'checkboxes') {
+    const showEl = q('[data-bl-show-as-checkbox]');
+    data.show_as_checkbox = showEl
+      ? showEl.checked
+      : type === 'toggle'
+        ? false
+        : true;
   }
   if (OPTION_TYPES.includes(type)) {
     data.options = Array.from(body.querySelectorAll('[data-bl-option]')).map((opt) => ({
@@ -2954,9 +2994,6 @@ export function createFieldCard(initial, open = false) {
   };
   if (field.active === undefined) {
     field.active = true;
-  }
-  if (field.type === 'terms' && field.content == null && field.label) {
-    field = { ...field, content: field.label, label: '' };
   }
   if (field.type === 'spacer') {
     normalizeSpacerHeight(field);
@@ -3219,6 +3256,9 @@ export function createFieldCard(initial, open = false) {
     if (field.type === 'divider') {
       appearanceSections.add(createMarginControl(field, updatePreview));
     }
+    if (field.type === 'toggle' || field.type === 'terms' || field.type === 'checkboxes') {
+      appearanceSections.add(createShowAsCheckboxControl(field));
+    }
     if (field.type !== 'hidden' && field.type !== 'divider' && field.type !== 'spacer') {
       appearanceSections.add(createWidthControl(field, updatePreview));
     }
@@ -3404,6 +3444,22 @@ export function createFieldCard(initial, open = false) {
               'Markdown is supported, e.g. <b>**Bold**</b>, <i>*Italic*</i>, and <span style="white-space: nowrap">[Link](...)</span>. For the target you can use a URL (/agb), a WordPress page (page:123), or a standard page such as page:privacy.'
             ),
           })
+        );
+      }
+
+      if (field.type === 'toggle') {
+        const toggleText = el('input', {
+          type: 'text',
+          className: 'widefat',
+          dataset: { blContent: '1' },
+          value: field.content || '',
+        });
+        toggleText.addEventListener('input', () => {
+          field.content = toggleText.value;
+          updatePreview();
+        });
+        generalSections.add(
+          el('p', {}, [el('label', { text: t('toggleText', 'Toggle text') }), toggleText])
         );
       }
 

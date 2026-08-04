@@ -761,7 +761,7 @@ import {
               className: 'bl-blocks-page-settings-panel',
             },
             def.description
-              ? el('p', { className: 'description' }, def.description)
+              ? el('p', { className: 'description bl-blocks-fields__description' }, def.description)
               : null,
             panelBody
           );

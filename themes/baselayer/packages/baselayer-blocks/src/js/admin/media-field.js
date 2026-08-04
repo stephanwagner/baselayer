@@ -231,7 +231,7 @@ export function createMediaPickerControl(field, current) {
     dataset: { blMediaPreview: '' },
   });
   const empty = el('span', {
-    className: 'description bl-blocks-fields__media-empty',
+    className: 'description bl-blocks-fields__description bl-blocks-fields__media-empty',
     text:
       kind === 'image'
         ? multiple

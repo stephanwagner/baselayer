@@ -192,6 +192,45 @@ function isStatic(type) {
   );
 }
 
+/** @param {object} field */
+function fieldShowAsCheckbox(field) {
+  const type = field && field.type ? field.type : '';
+  if (type === 'toggle') {
+    return !!field.show_as_checkbox;
+  }
+  if (type === 'terms' || type === 'checkboxes') {
+    return field.show_as_checkbox === undefined ? true : !!field.show_as_checkbox;
+  }
+  return true;
+}
+
+/** Build checkbox or switch control with optional adjacent text. */
+function createBooleanControl(field, id, checked) {
+  const asCheckbox = fieldShowAsCheckbox(field);
+  const adjacent = String(field.content || '').trim();
+  const input = el('input', {
+    type: 'checkbox',
+    id,
+    checked: !!checked,
+  });
+  if (asCheckbox) {
+    const children = [input];
+    if (adjacent) {
+      children.push(document.createTextNode(' '));
+      children.push(el('span', { text: adjacent }));
+    }
+    return el('label', { className: 'bl-blocks-fields__choice' }, children);
+  }
+  const children = [
+    input,
+    el('span', { className: 'bl-blocks-fields__switch-ui', 'aria-hidden': 'true' }),
+  ];
+  if (adjacent) {
+    children.push(el('span', { className: 'bl-blocks-fields__switch-label', text: adjacent }));
+  }
+  return el('label', { className: 'bl-blocks-fields__switch' }, children);
+}
+
 /**
  * Coerce field lists that arrived as JSON objects (non-sequential keys).
  *
@@ -324,7 +363,7 @@ function createLeafControl(field, values, controls) {
   });
   const id = 'bl-blocks-ui-' + name.replace(/[^a-z0-9_-]/gi, '_') + '-' + Math.random().toString(36).slice(2, 7);
 
-  if (!field.hide_label && type !== 'toggle' && type !== 'terms') {
+  if (!field.hide_label) {
     const label = el('label', { className: 'bl-blocks-fields__label', text: field.label || name });
     label.setAttribute('for', id);
     if (field.required) {
@@ -383,6 +422,7 @@ function createLeafControl(field, values, controls) {
   } else if (type === 'checkboxes') {
     control = el('div', { className: 'bl-blocks-fields__choices' });
     const list = Array.isArray(current) ? current.map(String) : [];
+    const asCheckbox = fieldShowAsCheckbox(field);
     options.forEach((opt, i) => {
       const ov = String(opt.value ?? '');
       const oid = id + '-' + i;
@@ -392,23 +432,30 @@ function createLeafControl(field, values, controls) {
         value: ov,
         checked: list.includes(ov),
       });
-      control.appendChild(
-        el('label', { className: 'bl-blocks-fields__choice' }, [
-          input,
-          document.createTextNode(' ' + (opt.label || ov)),
-        ])
-      );
+      const optLabel = opt.label || ov;
+      if (asCheckbox) {
+        control.appendChild(
+          el('label', { className: 'bl-blocks-fields__choice' }, [
+            input,
+            document.createTextNode(' ' + optLabel),
+          ])
+        );
+      } else {
+        control.appendChild(
+          el('label', { className: 'bl-blocks-fields__switch' }, [
+            input,
+            el('span', { className: 'bl-blocks-fields__switch-ui', 'aria-hidden': 'true' }),
+            el('span', { className: 'bl-blocks-fields__switch-label', text: optLabel }),
+          ])
+        );
+      }
     });
   } else if (type === 'toggle' || type === 'terms') {
-    const input = el('input', {
-      type: 'checkbox',
+    control = createBooleanControl(
+      field,
       id,
-      checked: !!current && current !== '0' && current !== '',
-    });
-    control = el('label', { className: 'bl-blocks-fields__toggle' }, [
-      input,
-      document.createTextNode(' ' + (field.label || name)),
-    ]);
+      !!current && current !== '0' && current !== ''
+    );
   } else if (type === 'hidden') {
     control = el('input', {
       type: 'hidden',
@@ -506,7 +553,9 @@ function createLeafControl(field, values, controls) {
     controls.push({ field, control, type });
   }
   if (field.description) {
-    row.appendChild(el('p', { className: 'description', text: field.description }));
+    row.appendChild(
+      el('p', { className: 'description bl-blocks-fields__description', text: field.description })
+    );
   }
   return row;
 }
@@ -769,7 +818,9 @@ function createRepeaterControl(field, valueMap, entries, options = {}) {
     wrap.appendChild(el('div', { className: 'bl-blocks-fields__label', text: field.label }));
   }
   if (field.description) {
-    wrap.appendChild(el('p', { className: 'description', text: field.description }));
+    wrap.appendChild(
+      el('p', { className: 'description bl-blocks-fields__description', text: field.description })
+    );
   }
 
   const rowsEl = el('div', { className: 'bl-blocks-fields__repeater-rows is-sortable' });
