@@ -1247,7 +1247,7 @@
       field.show_in_list = !!partial.show_in_list;
     }
     if (type === "textarea") {
-      field.rows = partial.rows || 5;
+      field.rows = partial.rows || 4;
     }
     if (type === "terms") {
       field.hide_label = partial.hide_label !== false;
@@ -1328,7 +1328,7 @@
             label: t3("templateFieldMessage", "Message"),
             name: "message",
             required: true,
-            rows: 5,
+            rows: 4,
             placeholder: t3("templatePlaceholderMessage", "Tell us a bit more\u2026")
           }),
           consentField()

@@ -1680,7 +1680,7 @@ function bl_forms_sanitize_field($field): ?array
 	}
 
 	if ($type === 'textarea') {
-		$rows = absint($field['rows'] ?? 5);
+		$rows = absint($field['rows'] ?? 4);
 		if ($rows < 2) {
 			$rows = 2;
 		}

@@ -923,6 +923,8 @@ button.button-link.bl-blocks-fields__card-remove:focus {
   flex-wrap: wrap;
   gap: 4px;
   border-bottom: 1px solid #c3c4c7;
+  margin: 0 -16px;
+  padding: 0 16px;
 }
 
 .bl-blocks-fields__tab {

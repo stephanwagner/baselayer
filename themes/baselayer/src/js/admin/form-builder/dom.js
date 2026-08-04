@@ -464,7 +464,7 @@ export function defaultField(type = 'text') {
     base.show_as_checkbox = true;
   }
   if (type === 'textarea') {
-    base.rows = 5;
+    base.rows = 4;
   }
   return base;
 }

@@ -29,7 +29,7 @@ function makeField(partial) {
   }
 
   if (type === 'textarea') {
-    field.rows = partial.rows || 5;
+    field.rows = partial.rows || 4;
   }
   if (type === 'terms') {
     field.hide_label = partial.hide_label !== false;
@@ -121,7 +121,7 @@ export function getStarterTemplates() {
           label: t('templateFieldMessage', 'Message'),
           name: 'message',
           required: true,
-          rows: 5,
+          rows: 4,
           placeholder: t('templatePlaceholderMessage', 'Tell us a bit more…'),
         }),
         consentField(),

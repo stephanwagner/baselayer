@@ -393,7 +393,7 @@
       base.show_as_checkbox = true;
     }
     if (type === "textarea") {
-      base.rows = 5;
+      base.rows = 4;
     }
     return base;
   }
@@ -2026,7 +2026,7 @@
     }
     if (nextType === "textarea") {
       const rows = parseInt(field.rows, 10);
-      field.rows = Number.isFinite(rows) && rows >= 2 ? Math.min(50, rows) : 5;
+      field.rows = Number.isFinite(rows) && rows >= 2 ? Math.min(50, rows) : 4;
     } else {
       delete field.rows;
     }
@@ -2966,15 +2966,20 @@
     if (field.show_as_checkbox === void 0) {
       field.show_as_checkbox = defaultShowAsCheckbox(field.type);
     }
-    return createSwitchSetting(
-      "blShowAsCheckbox",
-      t("showAsCheckbox", "Show as checkbox"),
-      !!field.show_as_checkbox,
-      (checked) => {
-        field.show_as_checkbox = checked;
-        document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
-      }
+    const wrap = el("div", { className: "bl-forms-builder__design-style" });
+    wrap.append(
+      settingHeading(t("layoutDesignTitle", "Design")),
+      createSwitchSetting(
+        "blShowAsCheckbox",
+        t("showAsCheckbox", "Show as checkbox"),
+        !!field.show_as_checkbox,
+        (checked) => {
+          field.show_as_checkbox = checked;
+          document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+        }
+      )
     );
+    return wrap;
   }
   function headingLevelFallback(levels) {
     if (levels.includes("h4")) {
@@ -3214,7 +3219,7 @@
   }
   function createTextareaRowsControl(field) {
     const rows = parseInt(field.rows, 10);
-    const value = Number.isFinite(rows) && rows >= 2 ? String(Math.min(50, rows)) : "5";
+    const value = Number.isFinite(rows) && rows >= 2 ? String(Math.min(50, rows)) : "4";
     const input = el("input", {
       type: "number",
       className: "widefat",
@@ -3226,7 +3231,7 @@
     });
     const sync = () => {
       const next = parseInt(input.value, 10);
-      field.rows = Number.isFinite(next) && next >= 2 ? Math.min(50, next) : 5;
+      field.rows = Number.isFinite(next) && next >= 2 ? Math.min(50, next) : 4;
       input.value = String(field.rows);
       document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
     };
@@ -4173,7 +4178,7 @@
     }
     if (type === "textarea") {
       const rawRows = parseInt(q("[data-bl-rows]")?.value, 10);
-      data.rows = Number.isFinite(rawRows) && rawRows >= 2 ? Math.min(50, rawRows) : 5;
+      data.rows = Number.isFinite(rawRows) && rawRows >= 2 ? Math.min(50, rawRows) : 4;
     }
     if (type === "date" || type === "time" || type === "datetime") {
       data.placeholder = "";

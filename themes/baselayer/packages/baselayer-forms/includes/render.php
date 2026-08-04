@@ -410,13 +410,13 @@ function bl_forms_field_maxlength_attr(array $field): string
 }
 
 /**
- * Textarea rows (2–50, default 5).
+ * Textarea rows (2–50, default 4).
  *
  * @param array<string, mixed> $field
  */
 function bl_forms_field_rows(array $field): int
 {
-	$rows = absint($field['rows'] ?? 5);
+	$rows = absint($field['rows'] ?? 4);
 	if ($rows < 2) {
 		$rows = 2;
 	}
