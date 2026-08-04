@@ -40,8 +40,19 @@ export function IconPicker({ label, description, value, onChange }) {
 
       {selected ? (
         <div className="bl-icon-picker__value">
-          <span className={'bl-icon -icon-' + value} aria-hidden="true" />
-          <span className="bl-icon-picker__value-name">{iconName(selected.icon)}</span>
+          <div className="bl-icon-picker__value-body">
+            <span className={'bl-icon -icon-' + value} aria-hidden="true" />
+            <span className="bl-icon-picker__value-name">{iconName(selected.icon)}</span>
+          </div>
+          <button
+            type="button"
+            className="bl-icon-picker__clear"
+            title={t('remove', 'Remove')}
+            aria-label={t('remove', 'Remove')}
+            onClick={() => onChange('')}
+          >
+            <span className="bl-icon -icon-close" aria-hidden="true" />
+          </button>
         </div>
       ) : null}
 
@@ -49,12 +60,6 @@ export function IconPicker({ label, description, value, onChange }) {
         <Button ref={triggerRef} variant="secondary" className="bl-icon-picker__trigger" onClick={openPicker}>
           {t('choose', 'Choose icon')}
         </Button>
-
-        {value ? (
-          <Button variant="tertiary" isDestructive className="bl-icon-picker__clear" onClick={() => onChange('')}>
-            {t('remove', 'Remove')}
-          </Button>
-        ) : null}
       </div>
 
       <BlockOptionDescription description={description} />

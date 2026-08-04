@@ -259,6 +259,7 @@ function bl_blocks_register_dynamic_blocks(): void
 				'choosePages'            => __('Choose pages', 'baselayer-blocks'),
 				'changePage'             => __('Change page', 'baselayer-blocks'),
 				'chooseIcon'             => __('Choose icon', 'baselayer-blocks'),
+				'clearIcon'              => __('Remove', 'baselayer-blocks'),
 				'changePages'            => __('Change pages', 'baselayer-blocks'),
 				'clearPage'              => __('Clear', 'baselayer-blocks'),
 				'choosePageHelp'         => __('Select a page.', 'baselayer-blocks'),

@@ -472,38 +472,60 @@ function createLeafControl(field, values, controls) {
     control = createLinkControl(field, current);
     if (control) control.id = id;
   } else if (type === 'icon') {
+    const iconUi = (window.baselayerIcons && window.baselayerIcons.ui) || {};
+    const iconLabels = (window.baselayerIcons && window.baselayerIcons.labels) || {};
+    const chooseLabel = iconUi.choose || i18n('chooseIcon', 'Choose icon');
+    const removeLabel = iconUi.remove || i18n('clearIcon', 'Remove');
+    const humanizeIcon = (slug) =>
+      String(slug || '')
+        .replace(/-/g, ' ')
+        .replace(/^\w/, (char) => char.toUpperCase());
+    const iconDisplayName = (slug) => {
+      if (!slug) return '';
+      const base = String(slug).replace(/-fill$/, '');
+      return iconLabels[slug] || iconLabels[base] || humanizeIcon(base || slug);
+    };
+
     const hidden = el('input', {
       type: 'hidden',
       id,
       value: current == null ? '' : String(current),
     });
-    const preview = el('span', {
-      className: 'bl-blocks-fields__icon-preview',
-      'aria-hidden': 'true',
-    });
-    const label = el('span', {
-      className: 'description',
-      text: current ? String(current) : '—',
-    });
+    const valueBody = el('div', { className: 'bl-icon-picker__value-body' });
+    const clearBtn = el(
+      'button',
+      {
+        type: 'button',
+        className: 'button-link bl-blocks-fields__card-remove bl-icon-picker__clear',
+        title: removeLabel,
+        'aria-label': removeLabel,
+      },
+      [el('span', { className: 'bl-icon -icon-close', 'aria-hidden': 'true' })]
+    );
+    const valueRow = el('div', { className: 'bl-icon-picker__value' }, [valueBody, clearBtn]);
     const chooseBtn = el('button', {
       type: 'button',
-      className: 'button',
-      text: 'Choose icon',
+      className: 'button bl-icon-picker__trigger',
+      text: chooseLabel,
     });
-    const clearBtn = el('button', {
-      type: 'button',
-      className: 'button-link',
-      text: 'Clear',
-    });
+    const actions = el('div', { className: 'bl-icon-picker__control' }, [chooseBtn]);
+
     const syncIconPreview = (slug) => {
-      hidden.value = slug || '';
-      label.textContent = slug || '—';
-      preview.replaceChildren();
-      if (slug) {
-        preview.appendChild(el('span', { className: 'bl-icon -icon-' + slug, 'aria-hidden': 'true' }));
+      const next = slug ? String(slug) : '';
+      hidden.value = next;
+      valueBody.replaceChildren();
+      if (next) {
+        valueBody.append(
+          el('span', { className: 'bl-icon -icon-' + next, 'aria-hidden': 'true' }),
+          el('span', { className: 'bl-icon-picker__value-name', text: iconDisplayName(next) })
+        );
+        valueRow.hidden = false;
+      } else {
+        valueRow.hidden = true;
       }
     };
     syncIconPreview(current == null ? '' : String(current));
+
     chooseBtn.addEventListener('click', async () => {
       try {
         const { openIconPicker } = await import(
@@ -518,11 +540,15 @@ function createLeafControl(field, values, controls) {
         // Icon picker unavailable — leave hidden input editable via clear only.
       }
     });
-    clearBtn.addEventListener('click', () => syncIconPreview(''));
-    control = el('div', { className: 'bl-blocks-fields__icon' }, [
-      preview,
-      label,
-      el('div', { className: 'bl-blocks-fields__icon-actions' }, [chooseBtn, clearBtn]),
+    clearBtn.addEventListener('click', (evt) => {
+      evt.preventDefault();
+      evt.stopPropagation();
+      syncIconPreview('');
+    });
+
+    control = el('div', { className: 'bl-blocks-fields__icon bl-icon-picker' }, [
+      valueRow,
+      actions,
       hidden,
     ]);
     control.getIconValue = () => hidden.value || '';

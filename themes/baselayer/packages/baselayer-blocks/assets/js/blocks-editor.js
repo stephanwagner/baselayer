@@ -1400,74 +1400,74 @@
   window.baselayerOpenPagePicker = openPagePicker;
 
   // node_modules/sortablejs/modular/sortable.esm.js
-  function _defineProperty(e, r, t2) {
+  function _defineProperty(e, r, t3) {
     return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, {
-      value: t2,
+      value: t3,
       enumerable: true,
       configurable: true,
       writable: true
-    }) : e[r] = t2, e;
+    }) : e[r] = t3, e;
   }
   function _extends() {
     return _extends = Object.assign ? Object.assign.bind() : function(n) {
       for (var e = 1; e < arguments.length; e++) {
-        var t2 = arguments[e];
-        for (var r in t2) ({}).hasOwnProperty.call(t2, r) && (n[r] = t2[r]);
+        var t3 = arguments[e];
+        for (var r in t3) ({}).hasOwnProperty.call(t3, r) && (n[r] = t3[r]);
       }
       return n;
     }, _extends.apply(null, arguments);
   }
   function ownKeys(e, r) {
-    var t2 = Object.keys(e);
+    var t3 = Object.keys(e);
     if (Object.getOwnPropertySymbols) {
       var o = Object.getOwnPropertySymbols(e);
       r && (o = o.filter(function(r2) {
         return Object.getOwnPropertyDescriptor(e, r2).enumerable;
-      })), t2.push.apply(t2, o);
+      })), t3.push.apply(t3, o);
     }
-    return t2;
+    return t3;
   }
   function _objectSpread2(e) {
     for (var r = 1; r < arguments.length; r++) {
-      var t2 = null != arguments[r] ? arguments[r] : {};
-      r % 2 ? ownKeys(Object(t2), true).forEach(function(r2) {
-        _defineProperty(e, r2, t2[r2]);
-      }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t2)) : ownKeys(Object(t2)).forEach(function(r2) {
-        Object.defineProperty(e, r2, Object.getOwnPropertyDescriptor(t2, r2));
+      var t3 = null != arguments[r] ? arguments[r] : {};
+      r % 2 ? ownKeys(Object(t3), true).forEach(function(r2) {
+        _defineProperty(e, r2, t3[r2]);
+      }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t3)) : ownKeys(Object(t3)).forEach(function(r2) {
+        Object.defineProperty(e, r2, Object.getOwnPropertyDescriptor(t3, r2));
       });
     }
     return e;
   }
-  function _objectWithoutProperties(e, t2) {
+  function _objectWithoutProperties(e, t3) {
     if (null == e) return {};
-    var o, r, i = _objectWithoutPropertiesLoose(e, t2);
+    var o, r, i = _objectWithoutPropertiesLoose(e, t3);
     if (Object.getOwnPropertySymbols) {
       var n = Object.getOwnPropertySymbols(e);
-      for (r = 0; r < n.length; r++) o = n[r], -1 === t2.indexOf(o) && {}.propertyIsEnumerable.call(e, o) && (i[o] = e[o]);
+      for (r = 0; r < n.length; r++) o = n[r], -1 === t3.indexOf(o) && {}.propertyIsEnumerable.call(e, o) && (i[o] = e[o]);
     }
     return i;
   }
   function _objectWithoutPropertiesLoose(r, e) {
     if (null == r) return {};
-    var t2 = {};
+    var t3 = {};
     for (var n in r) if ({}.hasOwnProperty.call(r, n)) {
       if (-1 !== e.indexOf(n)) continue;
-      t2[n] = r[n];
+      t3[n] = r[n];
     }
-    return t2;
+    return t3;
   }
-  function _toPrimitive(t2, r) {
-    if ("object" != typeof t2 || !t2) return t2;
-    var e = t2[Symbol.toPrimitive];
+  function _toPrimitive(t3, r) {
+    if ("object" != typeof t3 || !t3) return t3;
+    var e = t3[Symbol.toPrimitive];
     if (void 0 !== e) {
-      var i = e.call(t2, r || "default");
+      var i = e.call(t3, r || "default");
       if ("object" != typeof i) return i;
       throw new TypeError("@@toPrimitive must return a primitive value.");
     }
-    return ("string" === r ? String : Number)(t2);
+    return ("string" === r ? String : Number)(t3);
   }
-  function _toPropertyKey(t2) {
-    var i = _toPrimitive(t2, "string");
+  function _toPropertyKey(t3) {
+    var i = _toPrimitive(t3, "string");
     return "symbol" == typeof i ? i : i + "";
   }
   function _typeof(o) {
@@ -4067,7 +4067,7 @@
   }
   function allowedLinkTypes(field) {
     const raw = Array.isArray(field.link_types) ? field.link_types : LINK_TYPES;
-    const list = raw.map(String).filter((t2) => LINK_TYPES.includes(t2));
+    const list = raw.map(String).filter((t3) => LINK_TYPES.includes(t3));
     return list.length ? list : [...LINK_TYPES];
   }
   function normalizeLinkValue(current, allowed) {
@@ -4372,7 +4372,7 @@
       wrap.dataset.blLinkBound = "1";
       const inputName = wrap.dataset.inputName || "";
       if (!inputName) return;
-      let allowed = String(wrap.dataset.linkTypes || "").split(",").map((s) => s.trim()).filter((t2) => LINK_TYPES.includes(t2));
+      let allowed = String(wrap.dataset.linkTypes || "").split(",").map((s) => s.trim()).filter((t3) => LINK_TYPES.includes(t3));
       if (!allowed.length) allowed = [...LINK_TYPES];
       const allowTarget = wrap.dataset.allowTarget === "1";
       const readHidden = () => {
@@ -5277,35 +5277,51 @@
       control = createLinkControl(field, current);
       if (control) control.id = id;
     } else if (type === "icon") {
+      const iconUi = window.baselayerIcons && window.baselayerIcons.ui || {};
+      const iconLabels2 = window.baselayerIcons && window.baselayerIcons.labels || {};
+      const chooseLabel = iconUi.choose || i18n4("chooseIcon", "Choose icon");
+      const removeLabel = iconUi.remove || i18n4("clearIcon", "Remove");
+      const humanizeIcon = (slug) => String(slug || "").replace(/-/g, " ").replace(/^\w/, (char) => char.toUpperCase());
+      const iconDisplayName = (slug) => {
+        if (!slug) return "";
+        const base = String(slug).replace(/-fill$/, "");
+        return iconLabels2[slug] || iconLabels2[base] || humanizeIcon(base || slug);
+      };
       const hidden = el4("input", {
         type: "hidden",
         id,
         value: current == null ? "" : String(current)
       });
-      const preview = el4("span", {
-        className: "bl-blocks-fields__icon-preview",
-        "aria-hidden": "true"
-      });
-      const label = el4("span", {
-        className: "description",
-        text: current ? String(current) : "\u2014"
-      });
+      const valueBody = el4("div", { className: "bl-icon-picker__value-body" });
+      const clearBtn = el4(
+        "button",
+        {
+          type: "button",
+          className: "button-link bl-blocks-fields__card-remove bl-icon-picker__clear",
+          title: removeLabel,
+          "aria-label": removeLabel
+        },
+        [el4("span", { className: "bl-icon -icon-close", "aria-hidden": "true" })]
+      );
+      const valueRow = el4("div", { className: "bl-icon-picker__value" }, [valueBody, clearBtn]);
       const chooseBtn = el4("button", {
         type: "button",
-        className: "button",
-        text: "Choose icon"
+        className: "button bl-icon-picker__trigger",
+        text: chooseLabel
       });
-      const clearBtn = el4("button", {
-        type: "button",
-        className: "button-link",
-        text: "Clear"
-      });
+      const actions = el4("div", { className: "bl-icon-picker__control" }, [chooseBtn]);
       const syncIconPreview = (slug) => {
-        hidden.value = slug || "";
-        label.textContent = slug || "\u2014";
-        preview.replaceChildren();
-        if (slug) {
-          preview.appendChild(el4("span", { className: "bl-icon -icon-" + slug, "aria-hidden": "true" }));
+        const next = slug ? String(slug) : "";
+        hidden.value = next;
+        valueBody.replaceChildren();
+        if (next) {
+          valueBody.append(
+            el4("span", { className: "bl-icon -icon-" + next, "aria-hidden": "true" }),
+            el4("span", { className: "bl-icon-picker__value-name", text: iconDisplayName(next) })
+          );
+          valueRow.hidden = false;
+        } else {
+          valueRow.hidden = true;
         }
       };
       syncIconPreview(current == null ? "" : String(current));
@@ -5320,11 +5336,14 @@
         } catch (err) {
         }
       });
-      clearBtn.addEventListener("click", () => syncIconPreview(""));
-      control = el4("div", { className: "bl-blocks-fields__icon" }, [
-        preview,
-        label,
-        el4("div", { className: "bl-blocks-fields__icon-actions" }, [chooseBtn, clearBtn]),
+      clearBtn.addEventListener("click", (evt) => {
+        evt.preventDefault();
+        evt.stopPropagation();
+        syncIconPreview("");
+      });
+      control = el4("div", { className: "bl-blocks-fields__icon bl-icon-picker" }, [
+        valueRow,
+        actions,
         hidden
       ]);
       control.getIconValue = () => hidden.value || "";
@@ -5954,12 +5973,63 @@
     });
   }
 
+  // themes/baselayer/src/js/editor/icons/inline-icon-control.js
+  init_icon_picker_service();
+  var { useRef } = wp.element;
+  var iconL10n3 = typeof window !== "undefined" && window.baselayerIcons || {};
+  var uiStrings2 = iconL10n3.ui || {};
+  var t2 = (key, fallback) => uiStrings2[key] || fallback;
+  function InlineIconControl({ value, onChange, isActive = false }) {
+    const placeholderRef = useRef(null);
+    const editRef = useRef(null);
+    const openPicker = (returnFocus) => {
+      openIconPicker({
+        currentValue: value,
+        onSelect: onChange,
+        returnFocus
+      });
+    };
+    if (!value) {
+      return /* @__PURE__ */ wp.element.createElement("div", { className: "bl-inline-icon-control" + (isActive ? " is-active" : "") }, /* @__PURE__ */ wp.element.createElement(
+        "button",
+        {
+          ref: placeholderRef,
+          type: "button",
+          className: "bl-inline-icon-control__placeholder",
+          onClick: () => openPicker(placeholderRef.current),
+          "aria-label": t2("choose", "Choose icon")
+        },
+        /* @__PURE__ */ wp.element.createElement("span", { className: "bl-inline-icon-control__placeholder-label" }, t2("choose", "Choose icon"))
+      ));
+    }
+    return /* @__PURE__ */ wp.element.createElement("div", { className: "bl-inline-icon-control" + (isActive ? " is-active" : "") }, /* @__PURE__ */ wp.element.createElement("div", { className: "bl-inline-icon-control__selected" }, /* @__PURE__ */ wp.element.createElement("span", { className: "bl-icon -icon-" + value, "aria-hidden": "true" }), /* @__PURE__ */ wp.element.createElement("div", { className: "bl-inline-icon-control__actions" }, /* @__PURE__ */ wp.element.createElement(
+      "button",
+      {
+        ref: editRef,
+        type: "button",
+        className: "bl-inline-icon-control__action",
+        "aria-label": t2("change", "Change icon"),
+        onClick: () => openPicker(editRef.current)
+      },
+      /* @__PURE__ */ wp.element.createElement("span", { className: "bl-icon -icon-edit", "aria-hidden": "true" })
+    ), /* @__PURE__ */ wp.element.createElement(
+      "button",
+      {
+        type: "button",
+        className: "bl-inline-icon-control__action is-destructive",
+        "aria-label": t2("remove", "Remove"),
+        onClick: () => onChange("")
+      },
+      /* @__PURE__ */ wp.element.createElement("span", { className: "bl-icon -icon-close", "aria-hidden": "true" })
+    ))));
+  }
+
   // themes/baselayer/packages/baselayer-blocks/src/js/editor.js
   (function(wp2) {
     if (!wp2 || !wp2.element || !wp2.components || !wp2.blocks) {
       return;
     }
-    const { createElement: el5, Fragment, RawHTML, useState, useEffect, useRef, useCallback } = wp2.element;
+    const { createElement: el5, Fragment, RawHTML, useState, useEffect, useRef: useRef2, useCallback } = wp2.element;
     const { Button, PanelBody, ToolbarGroup, ToolbarButton, Placeholder, Spinner } = wp2.components;
     const { InspectorControls, BlockControls, useBlockProps, InnerBlocks } = wp2.blockEditor || {};
     const { registerBlockType } = wp2.blocks;
@@ -6007,12 +6077,12 @@
       return el5("div", { className: "bl-blocks-block-preview-loading" }, el5(Spinner, null));
     }
     function SidebarFields({ fields, values, onChange, onOpenModal, mountId, uiState, onUiStateChange }) {
-      const onChangeRef = useRef(onChange);
-      const onUiStateChangeRef = useRef(onUiStateChange);
-      const valuesRef = useRef(values);
-      const uiStateRef = useRef(uiState);
-      const fieldsRef = useRef(fields);
-      const cleanupRef = useRef(null);
+      const onChangeRef = useRef2(onChange);
+      const onUiStateChangeRef = useRef2(onUiStateChange);
+      const valuesRef = useRef2(values);
+      const uiStateRef = useRef2(uiState);
+      const fieldsRef = useRef2(fields);
+      const cleanupRef = useRef2(null);
       onChangeRef.current = onChange;
       onUiStateChangeRef.current = onUiStateChange;
       valuesRef.current = values;
@@ -6078,7 +6148,7 @@
     }
     function BlockServerPreview({ name, values }) {
       const [response, setResponse] = useState({ status: "idle" });
-      const shouldDebounceRef = useRef(false);
+      const shouldDebounceRef = useRef2(false);
       const valuesKey = JSON.stringify(values || {});
       useEffect(() => {
         if (!apiFetch || !name) {
@@ -6118,8 +6188,8 @@
           debounced();
           cancelDebounce = () => debounced.cancel();
         } else if (shouldDebounceRef.current) {
-          const t2 = window.setTimeout(run, 500);
-          cancelDebounce = () => window.clearTimeout(t2);
+          const t3 = window.setTimeout(run, 500);
+          cancelDebounce = () => window.clearTimeout(t3);
         } else {
           run();
         }
@@ -6230,44 +6300,6 @@
         )
       );
     }
-    function openThemeIconPicker(current, onSelect, returnFocus) {
-      Promise.resolve().then(() => (init_icon_picker_service(), icon_picker_service_exports)).then(({ openIconPicker: openIconPicker2 }) => {
-        openIconPicker2({
-          currentValue: current || "",
-          onSelect,
-          returnFocus: returnFocus || null
-        });
-      }).catch(() => {
-      });
-    }
-    function IconPickerButton({ value, onChange, isSelected }) {
-      const slug = typeof value === "string" ? value : "";
-      if (!slug) {
-        return el5(
-          "button",
-          {
-            type: "button",
-            className: "bl-inline-icon-control__placeholder",
-            onClick: (evt) => openThemeIconPicker("", onChange, evt.currentTarget)
-          },
-          el5("span", { className: "bl-inline-icon-control__placeholder-label" }, blockI18n.chooseIcon || "Choose icon")
-        );
-      }
-      return el5(
-        "div",
-        { className: "bl-inline-icon-control__selected" },
-        el5("span", { className: "bl-icon -icon-" + slug, "aria-hidden": "true" }),
-        isSelected ? el5(
-          "button",
-          {
-            type: "button",
-            className: "bl-inline-icon-control__action",
-            onClick: (evt) => openThemeIconPicker(slug, onChange, evt.currentTarget)
-          },
-          el5("span", { className: "bl-icon -icon-edit", "aria-hidden": "true" })
-        ) : null
-      );
-    }
     function IconInnerEdit({ values, blockProps, isSelected, onChangeValues }) {
       const iconSlug = typeof values.icon === "string" ? values.icon : "";
       return el5(
@@ -6282,15 +6314,11 @@
           el5(
             "div",
             { className: "icon__icon" + (iconSlug ? " -has-icon" : "") },
-            el5(
-              "div",
-              { className: "bl-inline-icon-control" + (isSelected ? " is-active" : "") },
-              el5(IconPickerButton, {
-                value: iconSlug,
-                isSelected,
-                onChange: (next) => onChangeValues({ ...values, icon: next || "" })
-              })
-            )
+            el5(InlineIconControl, {
+              value: iconSlug,
+              isActive: isSelected,
+              onChange: (next) => onChangeValues({ ...values, icon: next || "" })
+            })
           )
         )
       );
@@ -6312,15 +6340,11 @@
             el5(
               "div",
               { className: "icon-text__icon icon__icon" + (iconSlug ? " -has-icon" : "") },
-              el5(
-                "div",
-                { className: "bl-inline-icon-control" + (isSelected ? " is-active" : "") },
-                el5(IconPickerButton, {
-                  value: iconSlug,
-                  isSelected,
-                  onChange: (next) => onChangeValues({ ...values, icon: next || "" })
-                })
-              )
+              el5(InlineIconControl, {
+                value: iconSlug,
+                isActive: isSelected,
+                onChange: (next) => onChangeValues({ ...values, icon: next || "" })
+              })
             ),
             el5(
               "div",
@@ -6462,14 +6486,22 @@
             applyUi
           );
           const blockProps = useBlockProps ? useBlockProps({ className: "bl-blocks-block-editor" }) : { className: "bl-blocks-block-editor" };
+          const slug = def.slug || "";
+          const isIconShell = slug === "icon" || slug === "icon-text";
+          const applyCanvasValues = (next) => {
+            applyValues(next);
+            if (isIconShell && sidebarEditing) {
+              setSidebarMountId((id) => id + 1);
+            }
+          };
           const preview = usesClientShell ? el5(ClientBlockShell, {
             values,
             blockProps,
-            slug: def.slug || "",
+            slug,
             def,
             isSelected,
             clientId,
-            onChangeValues: applyValues
+            onChangeValues: isIconShell ? applyCanvasValues : applyValues
           }) : apiFetch ? el5("div", blockProps, el5(BlockServerPreview, { name: def.name, values })) : el5(
             "div",
             blockProps,

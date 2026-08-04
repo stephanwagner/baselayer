@@ -516,6 +516,11 @@ function bl_blocks_sanitize_field($field, int $repeater_depth = 0): ?array
 		return bl_blocks_sanitize_layout_field($field, $repeater_depth);
 	}
 
+	// Blocks-only leaf: Forms coerces unknown types to text.
+	if ($type === 'icon') {
+		return bl_blocks_sanitize_icon_field($field);
+	}
+
 	if (function_exists('bl_forms_sanitize_field')) {
 		$clean = bl_forms_sanitize_field($field);
 		if ($clean === null) {
@@ -534,6 +539,59 @@ function bl_blocks_sanitize_field($field, int $repeater_depth = 0): ?array
 	}
 
 	return bl_blocks_sanitize_leaf_field_fallback($field);
+}
+
+/**
+ * Sanitize blocks-only icon field definition (theme catalog slug).
+ *
+ * @param array<string, mixed> $field
+ * @return array<string, mixed>
+ */
+function bl_blocks_sanitize_icon_field(array $field): array
+{
+	$id = sanitize_key((string) ($field['id'] ?? ''));
+	if ($id === '') {
+		$id = 'f' . wp_generate_password(8, false, false);
+	}
+	$name = sanitize_key((string) ($field['name'] ?? ''));
+	if ($name === '') {
+		$name = $id;
+	}
+
+	$width = ['width' => sanitize_text_field((string) ($field['width'] ?? '100')), 'width_custom' => sanitize_text_field((string) ($field['width_custom'] ?? ''))];
+	if (function_exists('bl_forms_sanitize_width')) {
+		$width = bl_forms_sanitize_width($field);
+	}
+
+	$out = [
+		'id'            => $id,
+		'type'          => 'icon',
+		'label'         => sanitize_text_field((string) ($field['label'] ?? '')),
+		'name'          => $name,
+		'name_manual'   => !empty($field['name_manual']),
+		'hide_label'    => !empty($field['hide_label']),
+		'css_class'     => function_exists('bl_forms_sanitize_css_class')
+			? bl_forms_sanitize_css_class((string) ($field['css_class'] ?? ''))
+			: sanitize_html_class((string) ($field['css_class'] ?? '')),
+		'width'         => $width['width'],
+		'width_custom'  => $width['width_custom'],
+		'active'        => function_exists('bl_forms_field_is_active')
+			? bl_forms_field_is_active($field)
+			: (!array_key_exists('active', $field) || !empty($field['active'])),
+		'required'      => !empty($field['required']),
+		'description'   => sanitize_textarea_field((string) ($field['description'] ?? '')),
+		'default_value' => sanitize_key((string) ($field['default_value'] ?? '')),
+	];
+
+	if (function_exists('bl_forms_attach_conditional_logic')) {
+		return bl_forms_attach_conditional_logic($out, $field);
+	}
+
+	if (isset($field['conditional_logic']) && is_array($field['conditional_logic'])) {
+		$out['conditional_logic'] = $field['conditional_logic'];
+	}
+
+	return $out;
 }
 
 /**
@@ -762,6 +820,10 @@ function bl_blocks_sanitize_leaf_field_fallback(array $field): array
 		$out['link_types'] = $types;
 		$out['allow_target'] = !array_key_exists('allow_target', $field) || !empty($field['allow_target']);
 		unset($out['placeholder'], $out['default_value'], $out['multiple']);
+	}
+	if ($out['type'] === 'icon') {
+		$out['default_value'] = sanitize_key((string) ($field['default_value'] ?? ''));
+		unset($out['placeholder'], $out['multiple']);
 	}
 
 	if (isset($field['conditional_logic']) && is_array($field['conditional_logic'])) {

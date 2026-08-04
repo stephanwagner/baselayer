@@ -108,7 +108,7 @@ function bl_blocks_field_types(): array
 			'checkboxes', 'radio', 'select', 'toggle', 'button_group',
 			'date', 'time', 'datetime', 'file', 'image',
 			'heading', 'text_block', 'divider', 'spacer', 'html',
-			'column', 'section', 'tab', 'hidden', 'page', 'link',
+			'column', 'section', 'tab', 'hidden', 'page', 'link', 'icon',
 		];
 	}
 
@@ -1126,6 +1126,8 @@ function bl_blocks_enqueue_field_ui_assets(): void
 			'linkDestPhone'          => __('Phone number', 'baselayer-blocks'),
 			'linkText'               => __('Link text', 'baselayer-blocks'),
 			'linkOpenNewTab'         => __('Open in new tab', 'baselayer-blocks'),
+			'chooseIcon'             => __('Choose icon', 'baselayer-blocks'),
+			'clearIcon'              => __('Remove', 'baselayer-blocks'),
 		] + bl_blocks_media_field_i18n(),
 	]);
 }

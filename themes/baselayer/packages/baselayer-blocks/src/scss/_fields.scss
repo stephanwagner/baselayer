@@ -614,6 +614,74 @@ button.button-link.bl-blocks-fields__card-remove {
   white-space: pre-line;
 }
 
+// Icon field — mirror theme .bl-icon-picker sidebar control (admin.css may be absent in Gutenberg).
+.bl-blocks-fields__icon.bl-icon-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  width: 100%;
+  max-width: 280px;
+}
+
+.bl-blocks-fields__icon .bl-icon-picker__value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  padding: 4px 4px 4px 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: #3c434a;
+  background: var(--bl-gray-50, #f6f7f7);
+  border: 1px solid var(--bl-gray-300, #c3c4c7);
+  border-radius: 4px;
+  box-sizing: border-box;
+
+  &[hidden] {
+    display: none !important;
+  }
+}
+
+.bl-blocks-fields__icon .bl-icon-picker__value-body {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1 1 auto;
+  min-width: 0;
+
+  > .bl-icon {
+    flex: 0 0 auto;
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+    line-height: 1;
+  }
+}
+
+.bl-blocks-fields__icon .bl-icon-picker__value-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bl-blocks-fields__icon .bl-icon-picker__control {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+}
+
+.bl-blocks-fields__icon .bl-icon-picker__trigger {
+  flex: 1 1 auto;
+  justify-content: center;
+  text-align: center;
+}
+
+.bl-blocks-fields__icon .bl-icon-picker__clear {
+  flex: 0 0 auto;
+}
+
 .bl-blocks-fields__tabs {
   display: flex;
   flex-direction: column;

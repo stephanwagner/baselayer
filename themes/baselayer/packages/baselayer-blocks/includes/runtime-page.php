@@ -123,6 +123,8 @@ function bl_blocks_enqueue_page_editor(string $hook): void
 			'choosePages'            => __('Choose pages', 'baselayer-blocks'),
 			'changePage'             => __('Change page', 'baselayer-blocks'),
 			'changePages'            => __('Change pages', 'baselayer-blocks'),
+			'chooseIcon'             => __('Choose icon', 'baselayer-blocks'),
+			'clearIcon'              => __('Remove', 'baselayer-blocks'),
 			'clearPage'              => __('Clear', 'baselayer-blocks'),
 			'choosePageHelp'         => __('Select a page.', 'baselayer-blocks'),
 			'choosePagesHelp'        => __('Select one or more pages.', 'baselayer-blocks'),

@@ -8,6 +8,7 @@ import {
   saveUiStateToStorage,
   pageRepeaterUiStorageKey,
 } from './admin/field-form.js';
+import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-control.js';
 
 (function (wp) {
   if (!wp || !wp.element || !wp.components || !wp.blocks) {
@@ -345,49 +346,6 @@ import {
     );
   }
 
-  function openThemeIconPicker(current, onSelect, returnFocus) {
-    import('../../../../src/js/editor/icons/icon-picker-service.js')
-      .then(({ openIconPicker }) => {
-        openIconPicker({
-          currentValue: current || '',
-          onSelect,
-          returnFocus: returnFocus || null,
-        });
-      })
-      .catch(() => {});
-  }
-
-  function IconPickerButton({ value, onChange, isSelected }) {
-    const slug = typeof value === 'string' ? value : '';
-    if (!slug) {
-      return el(
-        'button',
-        {
-          type: 'button',
-          className: 'bl-inline-icon-control__placeholder',
-          onClick: (evt) => openThemeIconPicker('', onChange, evt.currentTarget),
-        },
-        el('span', { className: 'bl-inline-icon-control__placeholder-label' }, blockI18n.chooseIcon || 'Choose icon')
-      );
-    }
-    return el(
-      'div',
-      { className: 'bl-inline-icon-control__selected' },
-      el('span', { className: 'bl-icon -icon-' + slug, 'aria-hidden': 'true' }),
-      isSelected
-        ? el(
-            'button',
-            {
-              type: 'button',
-              className: 'bl-inline-icon-control__action',
-              onClick: (evt) => openThemeIconPicker(slug, onChange, evt.currentTarget),
-            },
-            el('span', { className: 'bl-icon -icon-edit', 'aria-hidden': 'true' })
-          )
-        : null
-    );
-  }
-
   function IconInnerEdit({ values, blockProps, isSelected, onChangeValues }) {
     const iconSlug = typeof values.icon === 'string' ? values.icon : '';
     return el(
@@ -402,13 +360,11 @@ import {
         el(
           'div',
           { className: 'icon__icon' + (iconSlug ? ' -has-icon' : '') },
-          el('div', { className: 'bl-inline-icon-control' + (isSelected ? ' is-active' : '') },
-            el(IconPickerButton, {
-              value: iconSlug,
-              isSelected,
-              onChange: (next) => onChangeValues({ ...values, icon: next || '' }),
-            })
-          )
+          el(InlineIconControl, {
+            value: iconSlug,
+            isActive: isSelected,
+            onChange: (next) => onChangeValues({ ...values, icon: next || '' }),
+          })
         )
       )
     );
@@ -431,13 +387,11 @@ import {
           el(
             'div',
             { className: 'icon-text__icon icon__icon' + (iconSlug ? ' -has-icon' : '') },
-            el('div', { className: 'bl-inline-icon-control' + (isSelected ? ' is-active' : '') },
-              el(IconPickerButton, {
-                value: iconSlug,
-                isSelected,
-                onChange: (next) => onChangeValues({ ...values, icon: next || '' }),
-              })
-            )
+            el(InlineIconControl, {
+              value: iconSlug,
+              isActive: isSelected,
+              onChange: (next) => onChangeValues({ ...values, icon: next || '' }),
+            })
           ),
           el(
             'div',
@@ -592,15 +546,25 @@ import {
           ? useBlockProps({ className: 'bl-blocks-block-editor' })
           : { className: 'bl-blocks-block-editor' };
 
+        const slug = def.slug || '';
+        const isIconShell = slug === 'icon' || slug === 'icon-text';
+        const applyCanvasValues = (next) => {
+          applyValues(next);
+          // Remount sidebar field form so the icon card matches canvas picks.
+          if (isIconShell && sidebarEditing) {
+            setSidebarMountId((id) => id + 1);
+          }
+        };
+
         const preview = usesClientShell
           ? el(ClientBlockShell, {
               values,
               blockProps,
-              slug: def.slug || '',
+              slug,
               def,
               isSelected,
               clientId,
-              onChangeValues: applyValues,
+              onChangeValues: isIconShell ? applyCanvasValues : applyValues,
             })
           : apiFetch
             ? el('div', blockProps, el(BlockServerPreview, { name: def.name, values }))

@@ -1571,7 +1571,17 @@
         returnFocus: triggerRef.current
       });
     };
-    return /* @__PURE__ */ wp.element.createElement("div", { className: "bl-icon-picker" }, label ? /* @__PURE__ */ wp.element.createElement("span", { className: "bl-icon-picker__label" }, label) : null, selected ? /* @__PURE__ */ wp.element.createElement("div", { className: "bl-icon-picker__value" }, /* @__PURE__ */ wp.element.createElement("span", { className: "bl-icon -icon-" + value, "aria-hidden": "true" }), /* @__PURE__ */ wp.element.createElement("span", { className: "bl-icon-picker__value-name" }, iconName2(selected.icon))) : null, /* @__PURE__ */ wp.element.createElement("div", { className: "bl-icon-picker__control" }, /* @__PURE__ */ wp.element.createElement(Button2, { ref: triggerRef, variant: "secondary", className: "bl-icon-picker__trigger", onClick: openPicker }, t2("choose", "Choose icon")), value ? /* @__PURE__ */ wp.element.createElement(Button2, { variant: "tertiary", isDestructive: true, className: "bl-icon-picker__clear", onClick: () => onChange("") }, t2("remove", "Remove")) : null), /* @__PURE__ */ wp.element.createElement(BlockOptionDescription2, { description }));
+    return /* @__PURE__ */ wp.element.createElement("div", { className: "bl-icon-picker" }, label ? /* @__PURE__ */ wp.element.createElement("span", { className: "bl-icon-picker__label" }, label) : null, selected ? /* @__PURE__ */ wp.element.createElement("div", { className: "bl-icon-picker__value" }, /* @__PURE__ */ wp.element.createElement("div", { className: "bl-icon-picker__value-body" }, /* @__PURE__ */ wp.element.createElement("span", { className: "bl-icon -icon-" + value, "aria-hidden": "true" }), /* @__PURE__ */ wp.element.createElement("span", { className: "bl-icon-picker__value-name" }, iconName2(selected.icon))), /* @__PURE__ */ wp.element.createElement(
+      "button",
+      {
+        type: "button",
+        className: "bl-icon-picker__clear",
+        title: t2("remove", "Remove"),
+        "aria-label": t2("remove", "Remove"),
+        onClick: () => onChange("")
+      },
+      /* @__PURE__ */ wp.element.createElement("span", { className: "bl-icon -icon-close", "aria-hidden": "true" })
+    )) : null, /* @__PURE__ */ wp.element.createElement("div", { className: "bl-icon-picker__control" }, /* @__PURE__ */ wp.element.createElement(Button2, { ref: triggerRef, variant: "secondary", className: "bl-icon-picker__trigger", onClick: openPicker }, t2("choose", "Choose icon"))), /* @__PURE__ */ wp.element.createElement(BlockOptionDescription2, { description }));
   }
 
   // themes/baselayer/packages/baselayer-blocks/src/js/block-options/editor.js
