@@ -1622,12 +1622,9 @@ msgstr "Wähle eine oder mehrere Dateien."
 msgid "Select a file."
 msgstr "Wähle eine Datei."
 
-#. translators: %d: row number
-#: includes/field-ui.php:938 includes/field-ui.php:1014
-#: includes/runtime-blocks.php:246 includes/runtime-page.php:115
-#, php-format
-msgid "Row %d"
-msgstr "Zeile %d"
+#. translators: %d: entry number
+msgid "Entry %d"
+msgstr "Eintrag %d"
 
 #: includes/field-ui.php:980
 msgid "Select image"
@@ -1651,8 +1648,8 @@ msgstr "Speichern"
 
 #: includes/field-ui.php:1013 includes/runtime-blocks.php:245
 #: includes/runtime-page.php:114
-msgid "Remove row"
-msgstr "Zeile entfernen"
+msgid "Remove entry"
+msgstr "Eintrag entfernen"
 
 #: includes/field-ui.php:1023 includes/runtime-blocks.php:256
 #: includes/runtime-page.php:124

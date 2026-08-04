@@ -4,6 +4,11 @@
 import { createPagePickerControl, bindPagePickers } from './page-field.js';
 import { createLinkControl, bindLinkFields } from './link-field.js';
 import { createMediaPickerControl, bindMediaPickers } from './media-field.js';
+import {
+  createSortable,
+  dragStart,
+  dragEnd,
+} from '../../../../../src/js/admin/canvas-builder/sortable.js';
 
 function el(tag, props = {}, children = []) {
   const node = document.createElement(tag);
@@ -620,22 +625,37 @@ function createRepeaterControl(field, valueMap, entries, options = {}) {
     wrap.appendChild(el('p', { className: 'description', text: field.description }));
   }
 
-  const rowsEl = el('div', { className: 'bl-blocks-fields__repeater-rows' });
+  const rowsEl = el('div', { className: 'bl-blocks-fields__repeater-rows is-sortable' });
   const emptyHelp = el('p', {
     className: 'description bl-blocks-fields__repeater-empty',
     text: i18n('chooseEntriesHelp', 'Add one or more entries.'),
   });
-  /** @type {Array<{ getValues: Function }>} */
+  /** @type {Array<{ getValues: Function, rowEl: HTMLElement, removeBtn: HTMLElement }>} */
   const rowForms = [];
+
+  const dispatchChange = () => {
+    wrap.dispatchEvent(new Event('change', { bubbles: true }));
+  };
 
   const syncRowTitles = () => {
     Array.from(rowsEl.children).forEach((rowEl, i) => {
       const title = rowEl.querySelector('.bl-blocks-fields__repeater-row-title');
       if (title) {
-        const template = i18n('rowLabel', 'Row %d');
+        const template = i18n('rowLabel', 'Entry %d');
         title.textContent = template.replace('%d', String(i + 1));
       }
     });
+  };
+
+  const syncRowFormsOrder = () => {
+    const byEl = new Map(rowForms.map((entry) => [entry.rowEl, entry]));
+    const next = [];
+    Array.from(rowsEl.children).forEach((rowEl) => {
+      const entry = byEl.get(rowEl);
+      if (entry) next.push(entry);
+    });
+    rowForms.length = 0;
+    next.forEach((entry) => rowForms.push(entry));
   };
 
   const canAdd = () => maxRows === 0 || rowForms.length < maxRows;
@@ -655,27 +675,92 @@ function createRepeaterControl(field, valueMap, entries, options = {}) {
     addBtn.disabled = !canAdd();
   };
 
+  const refreshRemoveBtns = () => {
+    const allowRemove = canRemove();
+    rowForms.forEach((r) => {
+      r.removeBtn.disabled = !allowRemove;
+    });
+  };
+
+  const setCollapsed = (rowEl, collapsed) => {
+    rowEl.classList.toggle('is-collapsed', collapsed);
+    const toggle = rowEl.querySelector('.bl-blocks-fields__repeater-collapse');
+    const icon = toggle && toggle.querySelector('.bl-icon');
+    if (toggle) {
+      const label = collapsed
+        ? i18n('expandEntry', 'Expand')
+        : i18n('collapseEntry', 'Collapse');
+      toggle.title = label;
+      toggle.setAttribute('aria-label', label);
+      toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    }
+    if (icon) {
+      icon.className =
+        'bl-icon ' + (collapsed ? '-icon-expand-content' : '-icon-collapse-content');
+    }
+  };
+
   const mountRow = (rowValues) => {
     const rowEl = el('div', { className: 'bl-blocks-fields__repeater-row' });
-    const header = el('div', { className: 'bl-blocks-fields__repeater-row-header' }, [
-      el('span', { className: 'bl-blocks-fields__repeater-row-title', text: '' }),
+    const handle = el(
+      'button',
+      {
+        type: 'button',
+        className: 'bl-blocks-fields__repeater-handle',
+        title: i18n('dragEntry', 'Drag to reorder'),
+        'aria-label': i18n('dragEntry', 'Drag to reorder'),
+      },
+      [el('span', { className: 'bl-icon -icon-drag', 'aria-hidden': 'true' })]
+    );
+    const title = el('span', { className: 'bl-blocks-fields__repeater-row-title', text: '' });
+    const collapseBtn = el(
+      'button',
+      {
+        type: 'button',
+        className: 'button-link bl-blocks-fields__repeater-collapse',
+        title: i18n('collapseEntry', 'Collapse'),
+        'aria-label': i18n('collapseEntry', 'Collapse'),
+        'aria-expanded': 'true',
+      },
+      [el('span', { className: 'bl-icon -icon-collapse-content', 'aria-hidden': 'true' })]
+    );
+    const removeBtn = el(
+      'button',
+      {
+        type: 'button',
+        className: 'button-link bl-blocks-fields__repeater-remove',
+        title: i18n('removeRow', 'Remove entry'),
+        'aria-label': i18n('removeRow', 'Remove entry'),
+      },
+      [el('span', { className: 'bl-icon -icon-delete', 'aria-hidden': 'true' })]
+    );
+    const actions = el('div', { className: 'bl-blocks-fields__repeater-row-actions' }, [
+      collapseBtn,
+      removeBtn,
     ]);
-    const removeBtn = el('button', {
-      type: 'button',
-      className: 'button-link-delete bl-blocks-fields__repeater-remove',
-      text: i18n('removeRow', 'Remove row'),
-    });
-    header.appendChild(removeBtn);
-    rowEl.appendChild(header);
-
+    const header = el('div', { className: 'bl-blocks-fields__repeater-row-header' }, [
+      handle,
+      title,
+      actions,
+    ]);
+    const body = el('div', { className: 'bl-blocks-fields__repeater-row-body' });
     const form = createFieldForm(children, rowValues || {}, options);
-    rowEl.appendChild(form.root);
+    body.appendChild(form.root);
+    rowEl.append(header, body);
     rowsEl.appendChild(rowEl);
 
     const entry = { getValues: form.getValues, rowEl, removeBtn };
     rowForms.push(entry);
 
-    removeBtn.addEventListener('click', () => {
+    collapseBtn.addEventListener('click', (evt) => {
+      evt.preventDefault();
+      evt.stopPropagation();
+      setCollapsed(rowEl, !rowEl.classList.contains('is-collapsed'));
+    });
+
+    removeBtn.addEventListener('click', (evt) => {
+      evt.preventDefault();
+      evt.stopPropagation();
       if (!canRemove()) return;
       const idx = rowForms.indexOf(entry);
       if (idx >= 0) rowForms.splice(idx, 1);
@@ -683,9 +768,8 @@ function createRepeaterControl(field, valueMap, entries, options = {}) {
       syncRowTitles();
       refreshAddBtn();
       refreshEmptyHelp();
-      rowForms.forEach((r) => {
-        r.removeBtn.disabled = !canRemove();
-      });
+      refreshRemoveBtns();
+      dispatchChange();
     });
 
     removeBtn.disabled = !canRemove();
@@ -695,16 +779,29 @@ function createRepeaterControl(field, valueMap, entries, options = {}) {
   };
 
   rows.forEach((rowValues) => mountRow(rowValues));
-  if (rows.length === 0 && minRows === 0) {
-    // Start empty; user adds via button.
-  }
 
   addBtn.addEventListener('click', () => {
     if (!canAdd()) return;
     mountRow({});
-    rowForms.forEach((r) => {
-      r.removeBtn.disabled = !canRemove();
-    });
+    refreshRemoveBtns();
+    dispatchChange();
+  });
+
+  createSortable(rowsEl, {
+    animation: 150,
+    handle: '.bl-blocks-fields__repeater-handle',
+    draggable: '.bl-blocks-fields__repeater-row',
+    filter: '.bl-blocks-fields__repeater-collapse, .bl-blocks-fields__repeater-remove',
+    preventOnFilter: true,
+    ghostClass: 'is-dragging-ghost',
+    chosenClass: 'is-dragging-chosen',
+    onStart: () => dragStart(),
+    onEnd: () => {
+      dragEnd();
+      syncRowFormsOrder();
+      syncRowTitles();
+      dispatchChange();
+    },
   });
 
   wrap.appendChild(rowsEl);
@@ -716,7 +813,10 @@ function createRepeaterControl(field, valueMap, entries, options = {}) {
   entries.push({
     kind: 'repeater',
     field,
-    getRows: () => rowForms.map((r) => r.getValues()),
+    getRows: () => {
+      syncRowFormsOrder();
+      return rowForms.map((r) => r.getValues());
+    },
   });
 
   return wrap;

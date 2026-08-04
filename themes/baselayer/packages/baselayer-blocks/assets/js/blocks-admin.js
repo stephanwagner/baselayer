@@ -6540,6 +6540,17 @@
   var sortable_esm_default = Sortable;
 
   // themes/baselayer/src/js/admin/canvas-builder/sortable.js
+  var dragDepth = 0;
+  function dragStart2() {
+    dragDepth += 1;
+    document.body.classList.add("is-dragging");
+  }
+  function dragEnd() {
+    dragDepth = Math.max(0, dragDepth - 1);
+    if (dragDepth === 0) {
+      document.body.classList.remove("is-dragging");
+    }
+  }
   function createSortable(el8, options = {}) {
     return sortable_esm_default.create(el8, options);
   }
@@ -7525,20 +7536,33 @@
     if (field.description) {
       wrap.appendChild(el7("p", { className: "description", text: field.description }));
     }
-    const rowsEl = el7("div", { className: "bl-blocks-fields__repeater-rows" });
+    const rowsEl = el7("div", { className: "bl-blocks-fields__repeater-rows is-sortable" });
     const emptyHelp = el7("p", {
       className: "description bl-blocks-fields__repeater-empty",
       text: i18n4("chooseEntriesHelp", "Add one or more entries.")
     });
     const rowForms = [];
+    const dispatchChange = () => {
+      wrap.dispatchEvent(new Event("change", { bubbles: true }));
+    };
     const syncRowTitles = () => {
       Array.from(rowsEl.children).forEach((rowEl, i) => {
         const title = rowEl.querySelector(".bl-blocks-fields__repeater-row-title");
         if (title) {
-          const template = i18n4("rowLabel", "Row %d");
+          const template = i18n4("rowLabel", "Entry %d");
           title.textContent = template.replace("%d", String(i + 1));
         }
       });
+    };
+    const syncRowFormsOrder = () => {
+      const byEl = new Map(rowForms.map((entry) => [entry.rowEl, entry]));
+      const next = [];
+      Array.from(rowsEl.children).forEach((rowEl) => {
+        const entry = byEl.get(rowEl);
+        if (entry) next.push(entry);
+      });
+      rowForms.length = 0;
+      next.forEach((entry) => rowForms.push(entry));
     };
     const canAdd = () => maxRows === 0 || rowForms.length < maxRows;
     const canRemove = () => rowForms.length > minRows;
@@ -7553,24 +7577,84 @@
     const refreshAddBtn = () => {
       addBtn.disabled = !canAdd();
     };
+    const refreshRemoveBtns = () => {
+      const allowRemove = canRemove();
+      rowForms.forEach((r) => {
+        r.removeBtn.disabled = !allowRemove;
+      });
+    };
+    const setCollapsed = (rowEl, collapsed) => {
+      rowEl.classList.toggle("is-collapsed", collapsed);
+      const toggle = rowEl.querySelector(".bl-blocks-fields__repeater-collapse");
+      const icon = toggle && toggle.querySelector(".bl-icon");
+      if (toggle) {
+        const label = collapsed ? i18n4("expandEntry", "Expand") : i18n4("collapseEntry", "Collapse");
+        toggle.title = label;
+        toggle.setAttribute("aria-label", label);
+        toggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
+      }
+      if (icon) {
+        icon.className = "bl-icon " + (collapsed ? "-icon-expand-content" : "-icon-collapse-content");
+      }
+    };
     const mountRow = (rowValues) => {
       const rowEl = el7("div", { className: "bl-blocks-fields__repeater-row" });
-      const header = el7("div", { className: "bl-blocks-fields__repeater-row-header" }, [
-        el7("span", { className: "bl-blocks-fields__repeater-row-title", text: "" })
+      const handle = el7(
+        "button",
+        {
+          type: "button",
+          className: "bl-blocks-fields__repeater-handle",
+          title: i18n4("dragEntry", "Drag to reorder"),
+          "aria-label": i18n4("dragEntry", "Drag to reorder")
+        },
+        [el7("span", { className: "bl-icon -icon-drag", "aria-hidden": "true" })]
+      );
+      const title = el7("span", { className: "bl-blocks-fields__repeater-row-title", text: "" });
+      const collapseBtn = el7(
+        "button",
+        {
+          type: "button",
+          className: "button-link bl-blocks-fields__repeater-collapse",
+          title: i18n4("collapseEntry", "Collapse"),
+          "aria-label": i18n4("collapseEntry", "Collapse"),
+          "aria-expanded": "true"
+        },
+        [el7("span", { className: "bl-icon -icon-collapse-content", "aria-hidden": "true" })]
+      );
+      const removeBtn = el7(
+        "button",
+        {
+          type: "button",
+          className: "button-link bl-blocks-fields__repeater-remove",
+          title: i18n4("removeRow", "Remove entry"),
+          "aria-label": i18n4("removeRow", "Remove entry")
+        },
+        [el7("span", { className: "bl-icon -icon-delete", "aria-hidden": "true" })]
+      );
+      const actions = el7("div", { className: "bl-blocks-fields__repeater-row-actions" }, [
+        collapseBtn,
+        removeBtn
       ]);
-      const removeBtn = el7("button", {
-        type: "button",
-        className: "button-link-delete bl-blocks-fields__repeater-remove",
-        text: i18n4("removeRow", "Remove row")
-      });
-      header.appendChild(removeBtn);
-      rowEl.appendChild(header);
+      const header = el7("div", { className: "bl-blocks-fields__repeater-row-header" }, [
+        handle,
+        title,
+        actions
+      ]);
+      const body = el7("div", { className: "bl-blocks-fields__repeater-row-body" });
       const form = createFieldForm(children, rowValues || {}, options);
-      rowEl.appendChild(form.root);
+      body.appendChild(form.root);
+      rowEl.append(header, body);
       rowsEl.appendChild(rowEl);
       const entry = { getValues: form.getValues, rowEl, removeBtn };
       rowForms.push(entry);
-      removeBtn.addEventListener("click", () => {
+      collapseBtn.addEventListener("click", (evt) => {
+        evt.preventDefault();
+        evt.stopPropagation();
+        setCollapsed(rowEl, !rowEl.classList.contains("is-collapsed"));
+      });
+      removeBtn.addEventListener("click", (evt) => {
+        evt.preventDefault();
+        evt.stopPropagation();
         if (!canRemove()) return;
         const idx = rowForms.indexOf(entry);
         if (idx >= 0) rowForms.splice(idx, 1);
@@ -7578,9 +7662,8 @@
         syncRowTitles();
         refreshAddBtn();
         refreshEmptyHelp();
-        rowForms.forEach((r) => {
-          r.removeBtn.disabled = !canRemove();
-        });
+        refreshRemoveBtns();
+        dispatchChange();
       });
       removeBtn.disabled = !canRemove();
       syncRowTitles();
@@ -7588,14 +7671,27 @@
       refreshEmptyHelp();
     };
     rows.forEach((rowValues) => mountRow(rowValues));
-    if (rows.length === 0 && minRows === 0) {
-    }
     addBtn.addEventListener("click", () => {
       if (!canAdd()) return;
       mountRow({});
-      rowForms.forEach((r) => {
-        r.removeBtn.disabled = !canRemove();
-      });
+      refreshRemoveBtns();
+      dispatchChange();
+    });
+    createSortable(rowsEl, {
+      animation: 150,
+      handle: ".bl-blocks-fields__repeater-handle",
+      draggable: ".bl-blocks-fields__repeater-row",
+      filter: ".bl-blocks-fields__repeater-collapse, .bl-blocks-fields__repeater-remove",
+      preventOnFilter: true,
+      ghostClass: "is-dragging-ghost",
+      chosenClass: "is-dragging-chosen",
+      onStart: () => dragStart2(),
+      onEnd: () => {
+        dragEnd();
+        syncRowFormsOrder();
+        syncRowTitles();
+        dispatchChange();
+      }
     });
     wrap.appendChild(rowsEl);
     wrap.appendChild(emptyHelp);
@@ -7605,7 +7701,10 @@
     entries.push({
       kind: "repeater",
       field,
-      getRows: () => rowForms.map((r) => r.getValues())
+      getRows: () => {
+        syncRowFormsOrder();
+        return rowForms.map((r) => r.getValues());
+      }
     });
     return wrap;
   }

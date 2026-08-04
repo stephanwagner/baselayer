@@ -976,9 +976,11 @@ function bl_blocks_render_admin_repeater(array $field, $rows, string $name_prefi
 		$row_values = is_array($row_values) ? $row_values : [];
 		echo '<div class="bl-blocks-fields__repeater-row">';
 		echo '<div class="bl-blocks-fields__repeater-row-header">';
-		echo '<span class="bl-blocks-fields__repeater-row-title">' . esc_html(sprintf(/* translators: %d: row number */ __('Row %d', 'baselayer-blocks'), $i + 1)) . '</span>';
+		echo '<span class="bl-blocks-fields__repeater-row-title">' . esc_html(sprintf(/* translators: %d: entry number */ __('Entry %d', 'baselayer-blocks'), $i + 1)) . '</span>';
 		echo '</div>';
+		echo '<div class="bl-blocks-fields__repeater-row-body">';
 		bl_blocks_render_admin_fields_walk($children, $row_values, $input_base . '[' . $i . ']');
+		echo '</div>';
 		echo '</div>';
 	}
 	echo '</div>';
@@ -1058,8 +1060,11 @@ function bl_blocks_enqueue_field_ui_assets(): void
 			'close'                  => __('Close', 'baselayer-blocks'),
 			'addRow'                => __('Add entry', 'baselayer-blocks'),
 			'chooseEntriesHelp'      => __('Add one or more entries.', 'baselayer-blocks'),
-			'removeRow'              => __('Remove row', 'baselayer-blocks'),
-			'rowLabel'               => __('Row %d', 'baselayer-blocks'),
+			'removeRow'              => __('Remove entry', 'baselayer-blocks'),
+			'rowLabel'               => __('Entry %d', 'baselayer-blocks'),
+			'collapseEntry'          => __('Collapse', 'baselayer-blocks'),
+			'expandEntry'            => __('Expand', 'baselayer-blocks'),
+			'dragEntry'              => __('Drag to reorder', 'baselayer-blocks'),
 			'repeater'               => __('Repeater', 'baselayer-blocks'),
 			'choosePage'             => __('Choose page', 'baselayer-blocks'),
 			'choosePages'            => __('Choose pages', 'baselayer-blocks'),

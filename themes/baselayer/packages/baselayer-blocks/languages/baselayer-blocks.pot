@@ -1700,13 +1700,9 @@ msgstr ""
 msgid "Select a file."
 msgstr ""
 
-#. translators: %d: row number
-#: includes/field-ui.php:938
-#: includes/field-ui.php:1014
-#: includes/runtime-blocks.php:246
-#: includes/runtime-page.php:115
+#. translators: %d: entry number
 #, php-format
-msgid "Row %d"
+msgid "Entry %d"
 msgstr ""
 
 #: includes/field-ui.php:980
@@ -1732,7 +1728,7 @@ msgstr ""
 #: includes/field-ui.php:1013
 #: includes/runtime-blocks.php:245
 #: includes/runtime-page.php:114
-msgid "Remove row"
+msgid "Remove entry"
 msgstr ""
 
 #: includes/field-ui.php:1023
