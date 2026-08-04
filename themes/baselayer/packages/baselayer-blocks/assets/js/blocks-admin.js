@@ -7622,6 +7622,9 @@
           if (panels[i]) {
             panels[i].hidden = !on2;
           }
+          if (on2 && typeof btn.scrollIntoView === "function") {
+            btn.scrollIntoView({ inline: "nearest", block: "nearest" });
+          }
         });
       };
       tablist.addEventListener("click", (evt) => {
@@ -8066,6 +8069,9 @@
           btn.tabIndex = on2 ? 0 : -1;
           if (panels[i]) {
             panels[i].hidden = !on2;
+          }
+          if (on2 && typeof btn.scrollIntoView === "function") {
+            btn.scrollIntoView({ inline: "nearest", block: "nearest" });
           }
         });
       };

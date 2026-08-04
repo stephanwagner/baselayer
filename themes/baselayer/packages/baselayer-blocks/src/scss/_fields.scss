@@ -625,14 +625,16 @@ button.button-link.bl-blocks-fields__card-remove {
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
-  border-bottom: 1px solid #c3c4c7;
+  // Inset line (not border-bottom) so overflow-x scroll still lets the
+  // active tab's white background cover the rule.
   margin: 0 -16px;
   padding: 0 16px;
+  background-image: linear-gradient(to top, #dcdcde 1px, transparent 1px);
 }
 
 .bl-blocks-fields__tab {
   appearance: none;
-  margin: 0 0 -1px;
+  margin: 0;
   padding: 8px 12px;
   border: 1px solid transparent;
   border-bottom: none;
@@ -648,7 +650,7 @@ button.button-link.bl-blocks-fields__card-remove {
   }
 
   &.is-active {
-    border-color: #c3c4c7;
+    border-color: #dcdcde;
     background: #fff;
     color: #1d2327;
   }
@@ -974,7 +976,26 @@ button.button-link.bl-blocks-fields__repeater-remove {
     font-size: 15px;
   }
 
+  .bl-blocks-fields__tabs {
+    min-width: 0;
+  }
+
+  .bl-blocks-fields__tablist {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
   .bl-blocks-fields__tab {
+    flex: 0 0 auto;
+    white-space: nowrap;
     padding: 6px 10px;
     font-size: 12px;
   }

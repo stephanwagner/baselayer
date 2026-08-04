@@ -676,6 +676,9 @@ export function createFieldForm(fields, values = {}, options = {}) {
         if (panels[i]) {
           panels[i].hidden = !on;
         }
+        if (on && typeof btn.scrollIntoView === 'function') {
+          btn.scrollIntoView({ inline: 'nearest', block: 'nearest' });
+        }
       });
     };
 
@@ -1201,6 +1204,9 @@ export function bindFieldTabs(root = document) {
         btn.tabIndex = on ? 0 : -1;
         if (panels[i]) {
           panels[i].hidden = !on;
+        }
+        if (on && typeof btn.scrollIntoView === 'function') {
+          btn.scrollIntoView({ inline: 'nearest', block: 'nearest' });
         }
       });
     };
