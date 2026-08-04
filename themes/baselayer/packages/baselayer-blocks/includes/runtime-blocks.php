@@ -196,6 +196,12 @@ function bl_blocks_register_dynamic_blocks(): void
 					'default'              => [],
 					'additionalProperties' => true,
 				],
+				// Editor-only UI chrome (e.g. repeater collapsed flags). Not used in render.
+				'ui' => [
+					'type'                 => ['object', 'array'],
+					'default'              => [],
+					'additionalProperties' => true,
+				],
 			],
 			'supports'        => [
 				'html'      => false,

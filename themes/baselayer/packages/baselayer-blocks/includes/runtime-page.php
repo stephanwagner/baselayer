@@ -160,6 +160,7 @@ function bl_blocks_enqueue_page_editor(string $hook): void
 
 	wp_localize_script('bl-blocks-editor', 'blBlocksPage', [
 		'definitions' => $payload,
+		'postId'      => $post_id,
 		'i18n'        => [
 			'edit'            => __('Edit', 'baselayer-blocks'),
 			'save'            => __('Update', 'baselayer-blocks'),

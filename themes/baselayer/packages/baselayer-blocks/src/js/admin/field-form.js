@@ -40,6 +40,142 @@ function i18n(key, fallback) {
   return dict[key] || fallback || key;
 }
 
+/** @param {unknown} raw */
+function normalizeUiState(raw) {
+  const base = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+  const repeaters =
+    base.repeaters && typeof base.repeaters === 'object' && !Array.isArray(base.repeaters)
+      ? { ...base.repeaters }
+      : {};
+  return { ...base, repeaters };
+}
+
+/** @param {{ repeaters?: Record<string, unknown> }} state */
+function cloneUiState(state) {
+  const repeaters = {};
+  const src = (state && state.repeaters) || {};
+  Object.keys(src).forEach((key) => {
+    const flags = src[key];
+    repeaters[key] = Array.isArray(flags) ? flags.map((v) => !!v) : [];
+  });
+  return { ...(state || {}), repeaters };
+}
+
+/**
+ * Shared mutable UI state for a mounted field form tree.
+ * @param {object} options
+ */
+function getUiShared(options) {
+  if (options && options._uiShared) {
+    return options._uiShared;
+  }
+  const shared = {
+    state: normalizeUiState(options && options.uiState),
+    notify() {
+      if (options && typeof options.onUiStateChange === 'function') {
+        options.onUiStateChange(cloneUiState(this.state));
+      }
+    },
+  };
+  if (options) {
+    options._uiShared = shared;
+  }
+  return shared;
+}
+
+/** @param {string} parent @param {string} name */
+function joinUiPath(parent, name) {
+  const a = String(parent || '').replace(/^\.+|\.+$/g, '');
+  const b = String(name || '').replace(/^\.+|\.+$/g, '');
+  if (!a) return b;
+  if (!b) return a;
+  return a + '.' + b;
+}
+
+/** @param {object} options */
+function resolveUiPathPrefix(options) {
+  if (options && typeof options.getUiPath === 'function') {
+    return String(options.getUiPath() || '');
+  }
+  return String((options && options.uiPath) || '');
+}
+
+/**
+ * Clamp collapsed flags to row count (missing → expanded).
+ * @param {unknown} flags
+ * @param {number} length
+ */
+function clampCollapsedFlags(flags, length) {
+  const src = Array.isArray(flags) ? flags : [];
+  const out = [];
+  for (let i = 0; i < length; i += 1) {
+    out.push(i < src.length ? !!src[i] : false);
+  }
+  return out;
+}
+
+/**
+ * Remap nested repeater UI keys under path when row indices change.
+ * @param {Record<string, unknown>} repeaters
+ * @param {string} path
+ * @param {Record<number, number>} indexMap oldIndex → newIndex (-1 = removed)
+ */
+function remapNestedRepeaterKeys(repeaters, path, indexMap) {
+  const prefix = path + '.';
+  const next = {};
+  Object.keys(repeaters || {}).forEach((key) => {
+    if (key === path) {
+      next[key] = repeaters[key];
+      return;
+    }
+    if (!key.startsWith(prefix)) {
+      next[key] = repeaters[key];
+      return;
+    }
+    const rest = key.slice(prefix.length);
+    const match = rest.match(/^(\d+)([\s\S]*)$/);
+    if (!match) {
+      next[key] = repeaters[key];
+      return;
+    }
+    const oldIdx = parseInt(match[1], 10);
+    const newIdx = indexMap[oldIdx];
+    if (newIdx == null || newIdx < 0) {
+      return;
+    }
+    next[prefix + String(newIdx) + match[2]] = repeaters[key];
+  });
+  return next;
+}
+
+/** @param {number} length @param {number} from @param {number} to */
+function buildReorderIndexMap(length, from, to) {
+  const order = Array.from({ length }, (_, i) => i);
+  if (from < 0 || from >= length || to < 0 || to >= length || from === to) {
+    const identity = {};
+    for (let i = 0; i < length; i += 1) identity[i] = i;
+    return identity;
+  }
+  const [item] = order.splice(from, 1);
+  order.splice(to, 0, item);
+  const map = {};
+  order.forEach((oldIdx, newIdx) => {
+    map[oldIdx] = newIdx;
+  });
+  return map;
+}
+
+/** @param {number} length @param {number} removed */
+function buildRemoveIndexMap(length, removed) {
+  const map = {};
+  for (let i = 0; i < length; i += 1) {
+    if (i === removed) map[i] = -1;
+    else if (i > removed) map[i] = i - 1;
+    else map[i] = i;
+  }
+  return map;
+}
+
 function isLayout(type) {
   return type === 'column' || type === 'section' || type === 'tab' || type === 'group';
 }
@@ -380,11 +516,19 @@ function createLeafControl(field, values, controls) {
  *
  * @param {array} fields
  * @param {object} values
- * @param {{ layout?: 'default'|'compact' }} [options]
+ * @param {{
+ *   layout?: 'default'|'compact',
+ *   uiState?: object,
+ *   onUiStateChange?: (ui: object) => void,
+ *   uiPath?: string,
+ *   getUiPath?: () => string,
+ *   _uiShared?: object,
+ * }} [options]
  * @returns {{ root: HTMLElement, getValues: () => object }}
  */
 export function createFieldForm(fields, values = {}, options = {}) {
   const compact = options && options.layout === 'compact';
+  getUiShared(options);
   const rootAttrs = {
     className:
       'bl-blocks-fields bl-admin-form' + (compact ? ' bl-blocks-fields--compact' : ''),
@@ -603,6 +747,9 @@ function createRepeaterControl(field, valueMap, entries, options = {}) {
   const showTitle =
     field.show_title !== false && field.show_title !== 0 && field.show_title !== '0';
 
+  const uiShared = getUiShared(options);
+  const getRepeaterPath = () => joinUiPath(resolveUiPathPrefix(options), name);
+
   let rows = Array.isArray(valueMap[name]) ? valueMap[name].slice() : [];
   while (rows.length < minRows) {
     rows.push({});
@@ -630,11 +777,31 @@ function createRepeaterControl(field, valueMap, entries, options = {}) {
     className: 'description bl-blocks-fields__repeater-empty',
     text: i18n('chooseEntriesHelp', 'Add one or more entries.'),
   });
-  /** @type {Array<{ getValues: Function, rowEl: HTMLElement, removeBtn: HTMLElement }>} */
+  /** @type {Array<{ getValues: Function, rowEl: HTMLElement, removeBtn: HTMLElement, rowPathRef: { current: string }, collapsed: boolean }>} */
   const rowForms = [];
 
   const dispatchChange = () => {
     wrap.dispatchEvent(new Event('change', { bubbles: true }));
+  };
+
+  const readCollapsedFlags = () =>
+    rowForms.map((r) => !!(r.collapsed || r.rowEl.classList.contains('is-collapsed')));
+
+  const persistCollapsed = () => {
+    const path = getRepeaterPath();
+    if (!path) return;
+    if (!uiShared.state.repeaters) {
+      uiShared.state.repeaters = {};
+    }
+    uiShared.state.repeaters[path] = readCollapsedFlags();
+    uiShared.notify();
+  };
+
+  const syncRowPathRefs = () => {
+    const path = getRepeaterPath();
+    rowForms.forEach((entry, i) => {
+      entry.rowPathRef.current = joinUiPath(path, String(i));
+    });
   };
 
   const syncRowTitles = () => {
@@ -656,6 +823,7 @@ function createRepeaterControl(field, valueMap, entries, options = {}) {
     });
     rowForms.length = 0;
     next.forEach((entry) => rowForms.push(entry));
+    syncRowPathRefs();
   };
 
   const canAdd = () => maxRows === 0 || rowForms.length < maxRows;
@@ -682,25 +850,31 @@ function createRepeaterControl(field, valueMap, entries, options = {}) {
     });
   };
 
-  const setCollapsed = (rowEl, collapsed) => {
-    rowEl.classList.toggle('is-collapsed', collapsed);
-    const toggle = rowEl.querySelector('.bl-blocks-fields__repeater-collapse');
+  const setCollapsed = (entry, collapsed) => {
+    entry.collapsed = !!collapsed;
+    entry.rowEl.classList.toggle('is-collapsed', entry.collapsed);
+    const toggle = entry.rowEl.querySelector('.bl-blocks-fields__repeater-collapse');
     const icon = toggle && toggle.querySelector('.bl-icon');
     if (toggle) {
-      const label = collapsed
+      const label = entry.collapsed
         ? i18n('expandEntry', 'Expand')
         : i18n('collapseEntry', 'Collapse');
       toggle.title = label;
       toggle.setAttribute('aria-label', label);
-      toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+      toggle.setAttribute('aria-expanded', entry.collapsed ? 'false' : 'true');
     }
     if (icon) {
       icon.className =
-        'bl-icon ' + (collapsed ? '-icon-expand-content' : '-icon-collapse-content');
+        'bl-icon ' + (entry.collapsed ? '-icon-expand-content' : '-icon-collapse-content');
     }
   };
 
-  const mountRow = (rowValues) => {
+  const initialFlags = clampCollapsedFlags(
+    uiShared.state.repeaters[getRepeaterPath()],
+    rows.length
+  );
+
+  const mountRow = (rowValues, initialCollapsed = false) => {
     const rowEl = el('div', { className: 'bl-blocks-fields__repeater-row' });
     const handle = el(
       'button',
@@ -744,18 +918,36 @@ function createRepeaterControl(field, valueMap, entries, options = {}) {
       actions,
     ]);
     const body = el('div', { className: 'bl-blocks-fields__repeater-row-body' });
-    const form = createFieldForm(children, rowValues || {}, options);
+
+    const rowIndex = rowForms.length;
+    const rowPathRef = {
+      current: joinUiPath(getRepeaterPath(), String(rowIndex)),
+    };
+    const childOptions = {
+      ...options,
+      _uiShared: uiShared,
+      getUiPath: () => rowPathRef.current,
+    };
+    const form = createFieldForm(children, rowValues || {}, childOptions);
     body.appendChild(form.root);
     rowEl.append(header, body);
     rowsEl.appendChild(rowEl);
 
-    const entry = { getValues: form.getValues, rowEl, removeBtn };
+    const entry = {
+      getValues: form.getValues,
+      rowEl,
+      removeBtn,
+      rowPathRef,
+      collapsed: !!initialCollapsed,
+    };
     rowForms.push(entry);
+    setCollapsed(entry, entry.collapsed);
 
     collapseBtn.addEventListener('click', (evt) => {
       evt.preventDefault();
       evt.stopPropagation();
-      setCollapsed(rowEl, !rowEl.classList.contains('is-collapsed'));
+      setCollapsed(entry, !entry.collapsed);
+      persistCollapsed();
     });
 
     removeBtn.addEventListener('click', (evt) => {
@@ -763,12 +955,22 @@ function createRepeaterControl(field, valueMap, entries, options = {}) {
       evt.stopPropagation();
       if (!canRemove()) return;
       const idx = rowForms.indexOf(entry);
-      if (idx >= 0) rowForms.splice(idx, 1);
+      if (idx < 0) return;
+      const prevLen = rowForms.length;
+      const indexMap = buildRemoveIndexMap(prevLen, idx);
+      rowForms.splice(idx, 1);
       rowEl.remove();
+      uiShared.state.repeaters = remapNestedRepeaterKeys(
+        uiShared.state.repeaters,
+        getRepeaterPath(),
+        indexMap
+      );
+      syncRowPathRefs();
       syncRowTitles();
       refreshAddBtn();
       refreshEmptyHelp();
       refreshRemoveBtns();
+      persistCollapsed();
       dispatchChange();
     });
 
@@ -778,11 +980,12 @@ function createRepeaterControl(field, valueMap, entries, options = {}) {
     refreshEmptyHelp();
   };
 
-  rows.forEach((rowValues) => mountRow(rowValues));
+  rows.forEach((rowValues, i) => mountRow(rowValues, initialFlags[i]));
 
   addBtn.addEventListener('click', () => {
     if (!canAdd()) return;
-    mountRow({});
+    mountRow({}, false);
+    persistCollapsed();
     refreshRemoveBtns();
     dispatchChange();
   });
@@ -796,10 +999,22 @@ function createRepeaterControl(field, valueMap, entries, options = {}) {
     ghostClass: 'is-dragging-ghost',
     chosenClass: 'is-dragging-chosen',
     onStart: () => dragStart(),
-    onEnd: () => {
+    onEnd: (evt) => {
       dragEnd();
+      const oldIndex = typeof evt.oldIndex === 'number' ? evt.oldIndex : -1;
+      const newIndex = typeof evt.newIndex === 'number' ? evt.newIndex : -1;
+      const length = rowForms.length;
+      if (oldIndex >= 0 && newIndex >= 0 && oldIndex !== newIndex) {
+        const indexMap = buildReorderIndexMap(length, oldIndex, newIndex);
+        uiShared.state.repeaters = remapNestedRepeaterKeys(
+          uiShared.state.repeaters,
+          getRepeaterPath(),
+          indexMap
+        );
+      }
       syncRowFormsOrder();
       syncRowTitles();
+      persistCollapsed();
       dispatchChange();
     },
   });
@@ -825,12 +1040,21 @@ function createRepeaterControl(field, valueMap, entries, options = {}) {
 /**
  * Open a modal with field form.
  *
- * @param {{ title?: string, fields: array, values?: object, onSave?: (values: object) => void }} opts
+ * @param {{
+ *   title?: string,
+ *   fields: array,
+ *   values?: object,
+ *   uiState?: object,
+ *   onUiStateChange?: (ui: object) => void,
+ *   onSave?: (values: object) => void,
+ * }} opts
  */
 export function openFieldsModal(opts) {
   const title = opts.title || i18n('edit', 'Edit');
   const form = createFieldForm(normalizeFieldList(opts.fields), opts.values || {}, {
     layout: 'default',
+    uiState: opts.uiState,
+    onUiStateChange: opts.onUiStateChange,
   });
 
   const overlay = el('div', { className: 'bl-blocks-modal-overlay', role: 'presentation' });
@@ -939,10 +1163,50 @@ export function bindFieldTabs(root = document) {
   });
 }
 
+/**
+ * localStorage helpers for page/admin field UI collapse state.
+ * @param {string} storageKey
+ */
+export function loadUiStateFromStorage(storageKey) {
+  if (!storageKey || typeof window === 'undefined' || !window.localStorage) {
+    return normalizeUiState(null);
+  }
+  try {
+    const raw = window.localStorage.getItem(storageKey);
+    if (!raw) return normalizeUiState(null);
+    return normalizeUiState(JSON.parse(raw));
+  } catch (err) {
+    return normalizeUiState(null);
+  }
+}
+
+/**
+ * @param {string} storageKey
+ * @param {object} uiState
+ */
+export function saveUiStateToStorage(storageKey, uiState) {
+  if (!storageKey || typeof window === 'undefined' || !window.localStorage) {
+    return;
+  }
+  try {
+    window.localStorage.setItem(storageKey, JSON.stringify(cloneUiState(uiState)));
+  } catch (err) {
+    // Quota / private mode — ignore.
+  }
+}
+
+/** @param {number|string} postId @param {string} definitionKey */
+export function pageRepeaterUiStorageKey(postId, definitionKey) {
+  return 'bl-blocks-repeater-ui:' + String(postId || 0) + ':' + String(definitionKey || '');
+}
+
 // Expose for editor bundle / inline usage.
 window.blBlocksFieldUiApi = {
   createFieldForm,
   openFieldsModal,
+  loadUiStateFromStorage,
+  saveUiStateToStorage,
+  pageRepeaterUiStorageKey,
   bindPagePickers,
   bindLinkFields,
   bindMediaPickers,

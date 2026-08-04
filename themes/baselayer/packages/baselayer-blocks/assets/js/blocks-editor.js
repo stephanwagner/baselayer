@@ -4869,6 +4869,109 @@
     const dict = window.blBlocksFieldUi && window.blBlocksFieldUi.i18n || window.blBlocksEditor && window.blBlocksEditor.i18n || window.blBlocksPage && window.blBlocksPage.i18n || {};
     return dict[key] || fallback || key;
   }
+  function normalizeUiState(raw) {
+    const base = raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+    const repeaters = base.repeaters && typeof base.repeaters === "object" && !Array.isArray(base.repeaters) ? { ...base.repeaters } : {};
+    return { ...base, repeaters };
+  }
+  function cloneUiState(state) {
+    const repeaters = {};
+    const src = state && state.repeaters || {};
+    Object.keys(src).forEach((key) => {
+      const flags = src[key];
+      repeaters[key] = Array.isArray(flags) ? flags.map((v) => !!v) : [];
+    });
+    return { ...state || {}, repeaters };
+  }
+  function getUiShared(options) {
+    if (options && options._uiShared) {
+      return options._uiShared;
+    }
+    const shared = {
+      state: normalizeUiState(options && options.uiState),
+      notify() {
+        if (options && typeof options.onUiStateChange === "function") {
+          options.onUiStateChange(cloneUiState(this.state));
+        }
+      }
+    };
+    if (options) {
+      options._uiShared = shared;
+    }
+    return shared;
+  }
+  function joinUiPath(parent, name) {
+    const a = String(parent || "").replace(/^\.+|\.+$/g, "");
+    const b = String(name || "").replace(/^\.+|\.+$/g, "");
+    if (!a) return b;
+    if (!b) return a;
+    return a + "." + b;
+  }
+  function resolveUiPathPrefix(options) {
+    if (options && typeof options.getUiPath === "function") {
+      return String(options.getUiPath() || "");
+    }
+    return String(options && options.uiPath || "");
+  }
+  function clampCollapsedFlags(flags, length) {
+    const src = Array.isArray(flags) ? flags : [];
+    const out = [];
+    for (let i = 0; i < length; i += 1) {
+      out.push(i < src.length ? !!src[i] : false);
+    }
+    return out;
+  }
+  function remapNestedRepeaterKeys(repeaters, path, indexMap) {
+    const prefix = path + ".";
+    const next = {};
+    Object.keys(repeaters || {}).forEach((key) => {
+      if (key === path) {
+        next[key] = repeaters[key];
+        return;
+      }
+      if (!key.startsWith(prefix)) {
+        next[key] = repeaters[key];
+        return;
+      }
+      const rest = key.slice(prefix.length);
+      const match = rest.match(/^(\d+)([\s\S]*)$/);
+      if (!match) {
+        next[key] = repeaters[key];
+        return;
+      }
+      const oldIdx = parseInt(match[1], 10);
+      const newIdx = indexMap[oldIdx];
+      if (newIdx == null || newIdx < 0) {
+        return;
+      }
+      next[prefix + String(newIdx) + match[2]] = repeaters[key];
+    });
+    return next;
+  }
+  function buildReorderIndexMap(length, from, to) {
+    const order = Array.from({ length }, (_, i) => i);
+    if (from < 0 || from >= length || to < 0 || to >= length || from === to) {
+      const identity = {};
+      for (let i = 0; i < length; i += 1) identity[i] = i;
+      return identity;
+    }
+    const [item] = order.splice(from, 1);
+    order.splice(to, 0, item);
+    const map = {};
+    order.forEach((oldIdx, newIdx) => {
+      map[oldIdx] = newIdx;
+    });
+    return map;
+  }
+  function buildRemoveIndexMap(length, removed) {
+    const map = {};
+    for (let i = 0; i < length; i += 1) {
+      if (i === removed) map[i] = -1;
+      else if (i > removed) map[i] = i - 1;
+      else map[i] = i;
+    }
+    return map;
+  }
   function isLayout(type) {
     return type === "column" || type === "section" || type === "tab" || type === "group";
   }
@@ -5157,6 +5260,7 @@
   }
   function createFieldForm(fields, values = {}, options = {}) {
     const compact = options && options.layout === "compact";
+    getUiShared(options);
     const rootAttrs = {
       className: "bl-blocks-fields bl-admin-form" + (compact ? " bl-blocks-fields--compact" : ""),
       dataset: { blBlocksFields: "" }
@@ -5343,6 +5447,8 @@
     const buttonLabel = field.button_label || i18n4("addRow", "Add entry");
     const design = compact ? "standard" : ["standard", "outline", "card"].includes(field.design) ? field.design : "standard";
     const showTitle = field.show_title !== false && field.show_title !== 0 && field.show_title !== "0";
+    const uiShared = getUiShared(options);
+    const getRepeaterPath = () => joinUiPath(resolveUiPathPrefix(options), name);
     let rows = Array.isArray(valueMap[name]) ? valueMap[name].slice() : [];
     while (rows.length < minRows) {
       rows.push({});
@@ -5370,6 +5476,22 @@
     const dispatchChange = () => {
       wrap.dispatchEvent(new Event("change", { bubbles: true }));
     };
+    const readCollapsedFlags = () => rowForms.map((r) => !!(r.collapsed || r.rowEl.classList.contains("is-collapsed")));
+    const persistCollapsed = () => {
+      const path = getRepeaterPath();
+      if (!path) return;
+      if (!uiShared.state.repeaters) {
+        uiShared.state.repeaters = {};
+      }
+      uiShared.state.repeaters[path] = readCollapsedFlags();
+      uiShared.notify();
+    };
+    const syncRowPathRefs = () => {
+      const path = getRepeaterPath();
+      rowForms.forEach((entry, i) => {
+        entry.rowPathRef.current = joinUiPath(path, String(i));
+      });
+    };
     const syncRowTitles = () => {
       Array.from(rowsEl.children).forEach((rowEl, i) => {
         const title = rowEl.querySelector(".bl-blocks-fields__repeater-row-title");
@@ -5388,6 +5510,7 @@
       });
       rowForms.length = 0;
       next.forEach((entry) => rowForms.push(entry));
+      syncRowPathRefs();
     };
     const canAdd = () => maxRows === 0 || rowForms.length < maxRows;
     const canRemove = () => rowForms.length > minRows;
@@ -5408,21 +5531,26 @@
         r.removeBtn.disabled = !allowRemove;
       });
     };
-    const setCollapsed = (rowEl, collapsed) => {
-      rowEl.classList.toggle("is-collapsed", collapsed);
-      const toggle = rowEl.querySelector(".bl-blocks-fields__repeater-collapse");
+    const setCollapsed = (entry, collapsed) => {
+      entry.collapsed = !!collapsed;
+      entry.rowEl.classList.toggle("is-collapsed", entry.collapsed);
+      const toggle = entry.rowEl.querySelector(".bl-blocks-fields__repeater-collapse");
       const icon = toggle && toggle.querySelector(".bl-icon");
       if (toggle) {
-        const label = collapsed ? i18n4("expandEntry", "Expand") : i18n4("collapseEntry", "Collapse");
+        const label = entry.collapsed ? i18n4("expandEntry", "Expand") : i18n4("collapseEntry", "Collapse");
         toggle.title = label;
         toggle.setAttribute("aria-label", label);
-        toggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
+        toggle.setAttribute("aria-expanded", entry.collapsed ? "false" : "true");
       }
       if (icon) {
-        icon.className = "bl-icon " + (collapsed ? "-icon-expand-content" : "-icon-collapse-content");
+        icon.className = "bl-icon " + (entry.collapsed ? "-icon-expand-content" : "-icon-collapse-content");
       }
     };
-    const mountRow = (rowValues) => {
+    const initialFlags = clampCollapsedFlags(
+      uiShared.state.repeaters[getRepeaterPath()],
+      rows.length
+    );
+    const mountRow = (rowValues, initialCollapsed = false) => {
       const rowEl = el4("div", { className: "bl-blocks-fields__repeater-row" });
       const handle = el4(
         "button",
@@ -5466,28 +5594,55 @@
         actions
       ]);
       const body = el4("div", { className: "bl-blocks-fields__repeater-row-body" });
-      const form = createFieldForm(children, rowValues || {}, options);
+      const rowIndex = rowForms.length;
+      const rowPathRef = {
+        current: joinUiPath(getRepeaterPath(), String(rowIndex))
+      };
+      const childOptions = {
+        ...options,
+        _uiShared: uiShared,
+        getUiPath: () => rowPathRef.current
+      };
+      const form = createFieldForm(children, rowValues || {}, childOptions);
       body.appendChild(form.root);
       rowEl.append(header, body);
       rowsEl.appendChild(rowEl);
-      const entry = { getValues: form.getValues, rowEl, removeBtn };
+      const entry = {
+        getValues: form.getValues,
+        rowEl,
+        removeBtn,
+        rowPathRef,
+        collapsed: !!initialCollapsed
+      };
       rowForms.push(entry);
+      setCollapsed(entry, entry.collapsed);
       collapseBtn.addEventListener("click", (evt) => {
         evt.preventDefault();
         evt.stopPropagation();
-        setCollapsed(rowEl, !rowEl.classList.contains("is-collapsed"));
+        setCollapsed(entry, !entry.collapsed);
+        persistCollapsed();
       });
       removeBtn.addEventListener("click", (evt) => {
         evt.preventDefault();
         evt.stopPropagation();
         if (!canRemove()) return;
         const idx = rowForms.indexOf(entry);
-        if (idx >= 0) rowForms.splice(idx, 1);
+        if (idx < 0) return;
+        const prevLen = rowForms.length;
+        const indexMap = buildRemoveIndexMap(prevLen, idx);
+        rowForms.splice(idx, 1);
         rowEl.remove();
+        uiShared.state.repeaters = remapNestedRepeaterKeys(
+          uiShared.state.repeaters,
+          getRepeaterPath(),
+          indexMap
+        );
+        syncRowPathRefs();
         syncRowTitles();
         refreshAddBtn();
         refreshEmptyHelp();
         refreshRemoveBtns();
+        persistCollapsed();
         dispatchChange();
       });
       removeBtn.disabled = !canRemove();
@@ -5495,10 +5650,11 @@
       refreshAddBtn();
       refreshEmptyHelp();
     };
-    rows.forEach((rowValues) => mountRow(rowValues));
+    rows.forEach((rowValues, i) => mountRow(rowValues, initialFlags[i]));
     addBtn.addEventListener("click", () => {
       if (!canAdd()) return;
-      mountRow({});
+      mountRow({}, false);
+      persistCollapsed();
       refreshRemoveBtns();
       dispatchChange();
     });
@@ -5511,10 +5667,22 @@
       ghostClass: "is-dragging-ghost",
       chosenClass: "is-dragging-chosen",
       onStart: () => dragStart2(),
-      onEnd: () => {
+      onEnd: (evt) => {
         dragEnd();
+        const oldIndex2 = typeof evt.oldIndex === "number" ? evt.oldIndex : -1;
+        const newIndex2 = typeof evt.newIndex === "number" ? evt.newIndex : -1;
+        const length = rowForms.length;
+        if (oldIndex2 >= 0 && newIndex2 >= 0 && oldIndex2 !== newIndex2) {
+          const indexMap = buildReorderIndexMap(length, oldIndex2, newIndex2);
+          uiShared.state.repeaters = remapNestedRepeaterKeys(
+            uiShared.state.repeaters,
+            getRepeaterPath(),
+            indexMap
+          );
+        }
         syncRowFormsOrder();
         syncRowTitles();
+        persistCollapsed();
         dispatchChange();
       }
     });
@@ -5536,7 +5704,9 @@
   function openFieldsModal(opts) {
     const title = opts.title || i18n4("edit", "Edit");
     const form = createFieldForm(normalizeFieldList(opts.fields), opts.values || {}, {
-      layout: "default"
+      layout: "default",
+      uiState: opts.uiState,
+      onUiStateChange: opts.onUiStateChange
     });
     const overlay = el4("div", { className: "bl-blocks-modal-overlay", role: "presentation" });
     const dialog = el4("div", {
@@ -5628,9 +5798,36 @@
       });
     });
   }
+  function loadUiStateFromStorage(storageKey) {
+    if (!storageKey || typeof window === "undefined" || !window.localStorage) {
+      return normalizeUiState(null);
+    }
+    try {
+      const raw = window.localStorage.getItem(storageKey);
+      if (!raw) return normalizeUiState(null);
+      return normalizeUiState(JSON.parse(raw));
+    } catch (err) {
+      return normalizeUiState(null);
+    }
+  }
+  function saveUiStateToStorage(storageKey, uiState) {
+    if (!storageKey || typeof window === "undefined" || !window.localStorage) {
+      return;
+    }
+    try {
+      window.localStorage.setItem(storageKey, JSON.stringify(cloneUiState(uiState)));
+    } catch (err) {
+    }
+  }
+  function pageRepeaterUiStorageKey(postId, definitionKey) {
+    return "bl-blocks-repeater-ui:" + String(postId || 0) + ":" + String(definitionKey || "");
+  }
   window.blBlocksFieldUiApi = {
     createFieldForm,
     openFieldsModal,
+    loadUiStateFromStorage,
+    saveUiStateToStorage,
+    pageRepeaterUiStorageKey,
     bindPagePickers,
     bindLinkFields,
     bindMediaPickers,
@@ -5678,27 +5875,38 @@
       }
       return icon || "block-default";
     }
-    function openBlockModal(fields, values, onSave, title) {
+    function normalizeValues(raw) {
+      return raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+    }
+    function normalizeUi(raw) {
+      const base = normalizeValues(raw);
+      const repeaters = base.repeaters && typeof base.repeaters === "object" && !Array.isArray(base.repeaters) ? base.repeaters : {};
+      return { ...base, repeaters };
+    }
+    function openBlockModal(fields, values, onSave, title, uiState, onUiStateChange) {
       openFieldsModal({
         title: title || blockI18n.edit || "Edit fields",
         fields,
         values: values || {},
+        uiState: normalizeUi(uiState),
+        onUiStateChange,
         onSave
       });
-    }
-    function normalizeValues(raw) {
-      return raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
     }
     function PreviewLoading() {
       return el5("div", { className: "bl-blocks-block-preview-loading" }, el5(Spinner, null));
     }
-    function SidebarFields({ fields, values, onChange, onOpenModal, mountId }) {
+    function SidebarFields({ fields, values, onChange, onOpenModal, mountId, uiState, onUiStateChange }) {
       const onChangeRef = useRef(onChange);
+      const onUiStateChangeRef = useRef(onUiStateChange);
       const valuesRef = useRef(values);
+      const uiStateRef = useRef(uiState);
       const fieldsRef = useRef(fields);
       const cleanupRef = useRef(null);
       onChangeRef.current = onChange;
+      onUiStateChangeRef.current = onUiStateChange;
       valuesRef.current = values;
+      uiStateRef.current = uiState;
       fieldsRef.current = Array.isArray(fields) ? fields : [];
       const setHost = useCallback(
         (host) => {
@@ -5710,7 +5918,15 @@
             return;
           }
           const list = Array.isArray(fieldsRef.current) ? fieldsRef.current : [];
-          const form = createFieldForm(list, valuesRef.current || {}, { layout: "compact" });
+          const form = createFieldForm(list, valuesRef.current || {}, {
+            layout: "compact",
+            uiState: normalizeUi(uiStateRef.current),
+            onUiStateChange: (next) => {
+              if (typeof onUiStateChangeRef.current === "function") {
+                onUiStateChangeRef.current(normalizeUi(next));
+              }
+            }
+          });
           host.replaceChildren(form.root);
           const sync = () => {
             if (typeof onChangeRef.current === "function") {
@@ -6099,6 +6315,10 @@
           values: {
             type: "object",
             default: {}
+          },
+          ui: {
+            type: "object",
+            default: {}
           }
         },
         supports: {
@@ -6109,10 +6329,14 @@
         edit: function Edit(props) {
           const { attributes, setAttributes, isSelected, clientId } = props;
           const values = normalizeValues(attributes.values);
+          const ui = normalizeUi(attributes.ui);
           const [sidebarMountId, setSidebarMountId] = useState(0);
           const sidebarEditing = !!def.sidebarEditing;
           const applyValues = (next) => {
             setAttributes({ values: normalizeValues(next) });
+          };
+          const applyUi = (next) => {
+            setAttributes({ ui: normalizeUi(next) });
           };
           const open = () => openBlockModal(
             def.fields || [],
@@ -6123,7 +6347,9 @@
                 setSidebarMountId((id) => id + 1);
               }
             },
-            def.title
+            def.title,
+            ui,
+            applyUi
           );
           const blockProps = useBlockProps ? useBlockProps({ className: "bl-blocks-block-editor" }) : { className: "bl-blocks-block-editor" };
           const preview = usesClientShell ? el5(ClientBlockShell, {
@@ -6147,8 +6373,10 @@
           const inspectorBody = sidebarEditing ? el5(SidebarFields, {
             fields: def.fields || [],
             values,
+            uiState: ui,
             mountId: sidebarMountId,
             onChange: applyValues,
+            onUiStateChange: applyUi,
             onOpenModal: open
           }) : el5(
             Button,
@@ -6203,8 +6431,14 @@
               const editor = select("core/editor");
               return editor && editor.getEditedPostAttribute ? editor.getEditedPostAttribute("meta") || {} : {};
             }, []) : {};
+            const postId = useSelect ? useSelect((select) => {
+              const editor = select("core/editor");
+              return editor && editor.getCurrentPostId ? editor.getCurrentPostId() : 0;
+            }, []) : pageConfig.postId || 0;
             const { editPost } = useDispatch ? useDispatch("core/editor") : { editPost: null };
             const values = normalizeValues(meta && meta[def.metaKey] || def.values || {});
+            const storageKey = pageRepeaterUiStorageKey(postId || pageConfig.postId || 0, def.metaKey || def.id);
+            const [uiState, setUiState] = useState(() => loadUiStateFromStorage(storageKey));
             const [sidebarMountId, setSidebarMountId] = useState(0);
             const sidebarEditing = !!def.sidebarEditing;
             const applyValues = (next) => {
@@ -6216,11 +6450,18 @@
                 }
               });
             };
+            const applyUi = (next) => {
+              const normalized = normalizeUi(next);
+              setUiState(normalized);
+              saveUiStateToStorage(storageKey, normalized);
+            };
             const open = () => {
               openFieldsModal({
                 title: def.title || pageI18n.panelTitle || "Content Fields",
                 fields: def.fields || [],
                 values,
+                uiState,
+                onUiStateChange: applyUi,
                 onSave: (next) => {
                   applyValues(next);
                   if (sidebarEditing) {
@@ -6232,8 +6473,10 @@
             const panelBody = sidebarEditing ? el5(SidebarFields, {
               fields: def.fields || [],
               values,
+              uiState,
               mountId: sidebarMountId,
               onChange: applyValues,
+              onUiStateChange: applyUi,
               onOpenModal: open
             }) : el5(
               Button,

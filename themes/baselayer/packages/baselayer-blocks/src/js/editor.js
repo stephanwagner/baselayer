@@ -1,7 +1,13 @@
 /**
  * Block editor: dynamic Blocks + Content Fields document panels.
  */
-import { createFieldForm, openFieldsModal } from './admin/field-form.js';
+import {
+  createFieldForm,
+  openFieldsModal,
+  loadUiStateFromStorage,
+  saveUiStateToStorage,
+  pageRepeaterUiStorageKey,
+} from './admin/field-form.js';
 
 (function (wp) {
   if (!wp || !wp.element || !wp.components || !wp.blocks) {
@@ -37,17 +43,28 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
     return icon || 'block-default';
   }
 
-  function openBlockModal(fields, values, onSave, title) {
+  function normalizeValues(raw) {
+    return raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+  }
+
+  function normalizeUi(raw) {
+    const base = normalizeValues(raw);
+    const repeaters =
+      base.repeaters && typeof base.repeaters === 'object' && !Array.isArray(base.repeaters)
+        ? base.repeaters
+        : {};
+    return { ...base, repeaters };
+  }
+
+  function openBlockModal(fields, values, onSave, title, uiState, onUiStateChange) {
     openFieldsModal({
       title: title || blockI18n.edit || 'Edit fields',
       fields,
       values: values || {},
+      uiState: normalizeUi(uiState),
+      onUiStateChange,
       onSave,
     });
-  }
-
-  function normalizeValues(raw) {
-    return raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
   }
 
   function PreviewLoading() {
@@ -58,13 +75,17 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
    * Imperative compact field form for inspector / document sidebar.
    * Callback ref mounts when the host attaches (Slot/Fill-safe); remount on mountId.
    */
-  function SidebarFields({ fields, values, onChange, onOpenModal, mountId }) {
+  function SidebarFields({ fields, values, onChange, onOpenModal, mountId, uiState, onUiStateChange }) {
     const onChangeRef = useRef(onChange);
+    const onUiStateChangeRef = useRef(onUiStateChange);
     const valuesRef = useRef(values);
+    const uiStateRef = useRef(uiState);
     const fieldsRef = useRef(fields);
     const cleanupRef = useRef(null);
     onChangeRef.current = onChange;
+    onUiStateChangeRef.current = onUiStateChange;
     valuesRef.current = values;
+    uiStateRef.current = uiState;
     fieldsRef.current = Array.isArray(fields) ? fields : [];
 
     // Only remount when mountId changes (modal apply). Read fields/values from refs
@@ -80,7 +101,15 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
         }
 
         const list = Array.isArray(fieldsRef.current) ? fieldsRef.current : [];
-        const form = createFieldForm(list, valuesRef.current || {}, { layout: 'compact' });
+        const form = createFieldForm(list, valuesRef.current || {}, {
+          layout: 'compact',
+          uiState: normalizeUi(uiStateRef.current),
+          onUiStateChange: (next) => {
+            if (typeof onUiStateChangeRef.current === 'function') {
+              onUiStateChangeRef.current(normalizeUi(next));
+            }
+          },
+        });
         host.replaceChildren(form.root);
 
         const sync = () => {
@@ -519,6 +548,10 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
           type: 'object',
           default: {},
         },
+        ui: {
+          type: 'object',
+          default: {},
+        },
       },
       supports: {
         html: false,
@@ -528,11 +561,16 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
       edit: function Edit(props) {
         const { attributes, setAttributes, isSelected, clientId } = props;
         const values = normalizeValues(attributes.values);
+        const ui = normalizeUi(attributes.ui);
         const [sidebarMountId, setSidebarMountId] = useState(0);
         const sidebarEditing = !!def.sidebarEditing;
 
         const applyValues = (next) => {
           setAttributes({ values: normalizeValues(next) });
+        };
+
+        const applyUi = (next) => {
+          setAttributes({ ui: normalizeUi(next) });
         };
 
         const open = () =>
@@ -545,7 +583,9 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
                 setSidebarMountId((id) => id + 1);
               }
             },
-            def.title
+            def.title,
+            ui,
+            applyUi
           );
 
         const blockProps = useBlockProps
@@ -579,8 +619,10 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
           ? el(SidebarFields, {
               fields: def.fields || [],
               values,
+              uiState: ui,
               mountId: sidebarMountId,
               onChange: applyValues,
+              onUiStateChange: applyUi,
               onOpenModal: open,
             })
           : el(
@@ -646,8 +688,16 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
                   : {};
               }, [])
             : {};
+          const postId = useSelect
+            ? useSelect((select) => {
+                const editor = select('core/editor');
+                return editor && editor.getCurrentPostId ? editor.getCurrentPostId() : 0;
+              }, [])
+            : pageConfig.postId || 0;
           const { editPost } = useDispatch ? useDispatch('core/editor') : { editPost: null };
           const values = normalizeValues((meta && meta[def.metaKey]) || def.values || {});
+          const storageKey = pageRepeaterUiStorageKey(postId || pageConfig.postId || 0, def.metaKey || def.id);
+          const [uiState, setUiState] = useState(() => loadUiStateFromStorage(storageKey));
           const [sidebarMountId, setSidebarMountId] = useState(0);
           const sidebarEditing = !!def.sidebarEditing;
 
@@ -661,11 +711,19 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
             });
           };
 
+          const applyUi = (next) => {
+            const normalized = normalizeUi(next);
+            setUiState(normalized);
+            saveUiStateToStorage(storageKey, normalized);
+          };
+
           const open = () => {
             openFieldsModal({
               title: def.title || pageI18n.panelTitle || 'Content Fields',
               fields: def.fields || [],
               values,
+              uiState,
+              onUiStateChange: applyUi,
               onSave: (next) => {
                 applyValues(next);
                 if (sidebarEditing) {
@@ -679,8 +737,10 @@ import { createFieldForm, openFieldsModal } from './admin/field-form.js';
             ? el(SidebarFields, {
                 fields: def.fields || [],
                 values,
+                uiState,
                 mountId: sidebarMountId,
                 onChange: applyValues,
+                onUiStateChange: applyUi,
                 onOpenModal: open,
               })
             : el(
