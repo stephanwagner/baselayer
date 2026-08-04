@@ -58,7 +58,7 @@ import {
   collectLogicSourceFields,
   createConditionalLogicEditor,
 } from './conditional-logic.js';
-import { configure, resetConfig, getFieldCardHooks, useMediaLibraryFields } from './config.js';
+import { configure, resetConfig, getFieldCardHooks, getHeadingLevels, useMediaLibraryFields } from './config.js';
 
 export {
   formsDragStart,
@@ -110,6 +110,7 @@ export {
   configure,
   resetConfig,
   getFieldCardHooks,
+  getHeadingLevels,
   useMediaLibraryFields,
 };
 
@@ -163,6 +164,7 @@ const BlFormBuilder = {
   configure,
   resetConfig,
   getFieldCardHooks,
+  getHeadingLevels,
   useMediaLibraryFields,
 };
 

@@ -1685,13 +1685,32 @@
   }
 
   // themes/baselayer/src/js/admin/form-builder/config.js
+  var DEFAULT_HEADING_LEVELS = ["h1", "h2", "h3", "h4", "h5", "h6"];
   var state = {
     mediaLibraryFields: false,
+    headingLevels: [...DEFAULT_HEADING_LEVELS],
     fieldCard: {}
   };
+  function sanitizeHeadingLevels(levels) {
+    if (!Array.isArray(levels) || levels.length === 0) {
+      return [...DEFAULT_HEADING_LEVELS];
+    }
+    const allowed = new Set(DEFAULT_HEADING_LEVELS);
+    const out = [];
+    levels.forEach((raw) => {
+      const level = String(raw || "").toLowerCase();
+      if (allowed.has(level) && !out.includes(level)) {
+        out.push(level);
+      }
+    });
+    return out.length ? out : [...DEFAULT_HEADING_LEVELS];
+  }
   function configure(options = {}) {
     if (typeof options.mediaLibraryFields === "boolean") {
       state.mediaLibraryFields = options.mediaLibraryFields;
+    }
+    if (options.headingLevels !== void 0) {
+      state.headingLevels = sanitizeHeadingLevels(options.headingLevels);
     }
     if (options.fieldCard && typeof options.fieldCard === "object") {
       state.fieldCard = { ...state.fieldCard, ...options.fieldCard };
@@ -1699,10 +1718,14 @@
   }
   function resetConfig(options = {}) {
     state.mediaLibraryFields = !!options.mediaLibraryFields;
+    state.headingLevels = sanitizeHeadingLevels(options.headingLevels);
     state.fieldCard = options.fieldCard && typeof options.fieldCard === "object" ? { ...options.fieldCard } : {};
   }
   function getFieldCardHooks() {
     return state.fieldCard;
+  }
+  function getHeadingLevels() {
+    return state.headingLevels.length ? state.headingLevels : [...DEFAULT_HEADING_LEVELS];
   }
   function useMediaLibraryFields() {
     return !!state.mediaLibraryFields;
@@ -1960,8 +1983,7 @@
       field.content = "";
     }
     if (nextType === "heading") {
-      const level = String(field.level || "h2").toLowerCase();
-      field.level = ["h1", "h2", "h3", "h4", "h5", "h6"].includes(level) ? level : "h2";
+      normalizeHeadingLevel(field);
     } else {
       delete field.level;
     }
@@ -2752,7 +2774,7 @@
           type: "text",
           className: "widefat",
           value: draft.button_label || "",
-          placeholder: t("addRow", "Add row")
+          placeholder: t("addRow", "Add entry")
         });
         buttonInput.addEventListener("input", () => {
           draft.button_label = buttonInput.value;
@@ -2919,22 +2941,29 @@
     wrap.append(el("label", { text: t("layout", "Layout") }), group);
     return wrap;
   }
-  var HEADING_LEVELS = ["h1", "h2", "h3", "h4", "h5", "h6"];
+  function headingLevelFallback(levels) {
+    if (levels.includes("h4")) {
+      return "h4";
+    }
+    return levels[0] || "h2";
+  }
   function normalizeHeadingLevel(field) {
-    const level = String(field.level || "h2").toLowerCase();
-    field.level = HEADING_LEVELS.includes(level) ? level : "h2";
+    const levels = getHeadingLevels();
+    const level = String(field.level || "").toLowerCase();
+    field.level = levels.includes(level) ? level : headingLevelFallback(levels);
   }
   function createHeadingLevelControl(field, onChange = () => {
   }) {
     normalizeHeadingLevel(field);
+    const levels = getHeadingLevels();
     const wrap = el("div", { className: "bl-forms-builder__heading-level" });
     const group = createSegmentedControl(
-      HEADING_LEVELS.map((level) => ({
+      levels.map((level) => ({
         value: level,
         label: level.toUpperCase(),
         dataset: { blHeadingLevel: level }
       })),
-      field.level || "h2",
+      field.level || headingLevelFallback(levels),
       "blHeadingLevelGroup",
       (value) => {
         field.level = value;
@@ -3955,14 +3984,16 @@
       });
     }
     if (type === "heading") {
+      const levels = getHeadingLevels();
+      const fallback = headingLevelFallback(levels);
       const levelBtn = q("[data-bl-heading-level].is-active");
-      const level = levelBtn?.dataset.blHeadingLevel || "h2";
+      const level = levelBtn?.dataset.blHeadingLevel || fallback;
       return withConditionalLogic(body, {
         id,
         type,
         active,
         content: q("[data-bl-content]")?.value || "",
-        level: HEADING_LEVELS.includes(level) ? level : "h2",
+        level: levels.includes(level) ? level : fallback,
         ...appearancePayload(body, width, widthCustom)
       });
     }
@@ -4908,6 +4939,7 @@
     configure,
     resetConfig,
     getFieldCardHooks,
+    getHeadingLevels,
     useMediaLibraryFields
   };
   var index_default = BlFormBuilder;

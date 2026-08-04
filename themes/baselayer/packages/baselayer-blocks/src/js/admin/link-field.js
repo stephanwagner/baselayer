@@ -2,6 +2,7 @@
  * Link field control for Blocks value UIs (modal + PHP site settings).
  */
 import { openPagePicker } from '../../../../../src/js/admin/utils/page-picker.js';
+import { buildPagePreview } from './page-field.js';
 
 const LINK_TYPES = ['page', 'url', 'email', 'phone'];
 
@@ -180,20 +181,13 @@ export function createLinkControl(field, current) {
       });
       if (pageMeta) {
         summary.appendChild(
-          el('span', {
-            className: 'bl-blocks-fields__page-picker-value',
-            text: pageMeta.title || i18n('selectedPage', 'Selected page') + ' #' + pageMeta.id,
+          buildPagePreview([pageMeta], false, () => {
+            pageMeta = null;
+            state.page_id = 0;
+            state.url = '';
+            renderDestination();
           })
         );
-        if (pageMeta.url) {
-          summary.appendChild(
-            el('span', {
-              className: 'description bl-blocks-fields__page-picker-url',
-              text: pageMeta.url,
-              title: pageMeta.url,
-            })
-          );
-        }
       } else {
         summary.appendChild(
           el('span', {

@@ -210,6 +210,8 @@ hr.wp-block-separator.block-editor-block-list__block {
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
+    max-height: 32px;
+    white-space: nowrap;
   }
 }
 

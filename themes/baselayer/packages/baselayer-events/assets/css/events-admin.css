@@ -177,9 +177,14 @@
 .bl-admin-form input[type=text],
 .bl-admin-form input[type=search],
 .bl-admin-form input[type=email],
+.bl-admin-form input[type=tel],
 .bl-admin-form input[type=url],
 .bl-admin-form input[type=number],
 .bl-admin-form input[type=password],
+.bl-admin-form input[type=date],
+.bl-admin-form input[type=time],
+.bl-admin-form input[type=datetime],
+.bl-admin-form input[type=datetime-local],
 .bl-admin-form input:not([type]),
 .bl-admin-form select {
   box-sizing: border-box;

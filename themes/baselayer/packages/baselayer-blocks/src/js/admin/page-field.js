@@ -51,6 +51,93 @@ function pickerConfig() {
 }
 
 /**
+ * Path (+ query/hash) for a page URL, without the host.
+ *
+ * @param {string} url
+ * @returns {string}
+ */
+export function pageUrlPath(url) {
+  const raw = String(url || '').trim();
+  if (!raw) return '';
+  try {
+    const base =
+      typeof window !== 'undefined' && window.location && window.location.origin
+        ? window.location.origin
+        : 'https://example.com';
+    const parsed = new URL(raw, base);
+    return (parsed.pathname || '/') + (parsed.search || '') + (parsed.hash || '');
+  } catch (err) {
+    const stripped = raw.replace(/^[a-z][a-z0-9+.-]*:\/\/[^/?#]+/i, '');
+    if (!stripped) return '/';
+    return stripped.startsWith('/') ? stripped : '/' + stripped.replace(/^\/*/, '');
+  }
+}
+
+/**
+ * @param {{id:number,title:string,url:string}} page
+ * @param {() => void} onRemove
+ * @returns {HTMLElement}
+ */
+export function buildPageCard(page, onRemove) {
+  const title =
+    page.title || i18n('selectedPage', 'Selected page') + ' #' + page.id;
+  const path = pageUrlPath(page.url);
+  const body = el('div', { className: 'bl-blocks-fields__page-card-body' }, [
+    el('span', {
+      className: 'bl-blocks-fields__page-card-title',
+      text: title,
+      title,
+    }),
+  ]);
+  if (path) {
+    body.appendChild(
+      el('span', {
+        className: 'description bl-blocks-fields__page-card-url',
+        text: path,
+        title: page.url || path,
+      })
+    );
+  }
+  const removeBtn = el('button', {
+    type: 'button',
+    className: 'button-link bl-blocks-fields__page-remove',
+    text: '×',
+    title: i18n('clearPage', 'Clear'),
+    'aria-label': i18n('clearPage', 'Clear'),
+  });
+  removeBtn.addEventListener('click', (evt) => {
+    evt.preventDefault();
+    evt.stopPropagation();
+    onRemove();
+  });
+  return el(
+    'div',
+    {
+      className: 'bl-blocks-fields__page-card',
+      dataset: { pageId: String(page.id) },
+    },
+    [body, removeBtn]
+  );
+}
+
+/**
+ * @param {Array<{id:number,title:string,url:string}>} pages
+ * @param {boolean} multiple
+ * @param {(id: number) => void} onRemove
+ * @returns {HTMLElement}
+ */
+export function buildPagePreview(pages, multiple, onRemove) {
+  const preview = el('div', {
+    className:
+      'bl-blocks-fields__page-preview' + (multiple ? ' is-multiple' : ' is-single'),
+  });
+  pages.forEach((page) => {
+    preview.appendChild(buildPageCard(page, () => onRemove(page.id)));
+  });
+  return preview;
+}
+
+/**
  * Normalize stored value into positive page IDs.
  *
  * @param {unknown} current
@@ -116,32 +203,13 @@ export function createPagePickerControl(field, current) {
             : i18n('choosePageHelp', 'Select a page.'),
         })
       );
-    } else if (multiple) {
-      selected.forEach((page) => {
-        summary.appendChild(
-          el('span', {
-            className: 'bl-blocks-fields__page-picker-value',
-            text: page.title || i18n('selectedPage', 'Selected page') + ' #' + page.id,
-          })
-        );
-      });
     } else {
-      const page = selected[0];
       summary.appendChild(
-        el('span', {
-          className: 'bl-blocks-fields__page-picker-value',
-          text: page.title || i18n('selectedPage', 'Selected page') + ' #' + page.id,
+        buildPagePreview(selected, multiple, (id) => {
+          selected = selected.filter((page) => page.id !== id);
+          syncUi();
         })
       );
-      if (page.url) {
-        summary.appendChild(
-          el('span', {
-            className: 'description bl-blocks-fields__page-picker-url',
-            text: page.url,
-            title: page.url,
-          })
-        );
-      }
     }
     clearBtn.hidden = selected.length === 0;
     pickBtn.textContent =
@@ -322,14 +390,12 @@ export function bindPagePickers(root = document) {
           })
         );
       } else {
-        selected.forEach((page) => {
-          summary.appendChild(
-            el('span', {
-              className: 'bl-blocks-fields__page-picker-value',
-              text: page.title || i18n('selectedPage', 'Selected page') + ' #' + page.id,
-            })
-          );
-        });
+        summary.appendChild(
+          buildPagePreview(selected, multiple, (id) => {
+            selected = selected.filter((page) => page.id !== id);
+            syncUi();
+          })
+        );
       }
       clearBtn.hidden = selected.length === 0;
       pickBtn.textContent =

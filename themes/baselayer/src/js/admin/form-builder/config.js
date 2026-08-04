@@ -3,8 +3,11 @@
  * Nested cards pick these up automatically — no need to thread options through createFieldCard.
  */
 
+const DEFAULT_HEADING_LEVELS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
+
 /** @type {{
  *   mediaLibraryFields: boolean,
+ *   headingLevels: string[],
  *   fieldCard: {
  *     onInitField?: (field: object) => void,
  *     onNormalizeType?: (field: object, nextType: string) => void,
@@ -14,17 +17,40 @@
  * }} */
 const state = {
   mediaLibraryFields: false,
+  headingLevels: [...DEFAULT_HEADING_LEVELS],
   fieldCard: {},
 };
 
 /**
+ * @param {unknown} levels
+ * @returns {string[]}
+ */
+function sanitizeHeadingLevels(levels) {
+  if (!Array.isArray(levels) || levels.length === 0) {
+    return [...DEFAULT_HEADING_LEVELS];
+  }
+  const allowed = new Set(DEFAULT_HEADING_LEVELS);
+  const out = [];
+  levels.forEach((raw) => {
+    const level = String(raw || '').toLowerCase();
+    if (allowed.has(level) && !out.includes(level)) {
+      out.push(level);
+    }
+  });
+  return out.length ? out : [...DEFAULT_HEADING_LEVELS];
+}
+
+/**
  * Merge consumer hooks into the form-builder kit.
  *
- * @param {{ mediaLibraryFields?: boolean, fieldCard?: object }} options
+ * @param {{ mediaLibraryFields?: boolean, headingLevels?: string[], fieldCard?: object }} options
  */
 export function configure(options = {}) {
   if (typeof options.mediaLibraryFields === 'boolean') {
     state.mediaLibraryFields = options.mediaLibraryFields;
+  }
+  if (options.headingLevels !== undefined) {
+    state.headingLevels = sanitizeHeadingLevels(options.headingLevels);
   }
   if (options.fieldCard && typeof options.fieldCard === 'object') {
     state.fieldCard = { ...state.fieldCard, ...options.fieldCard };
@@ -34,10 +60,11 @@ export function configure(options = {}) {
 /**
  * Replace all hooks (mainly for tests).
  *
- * @param {{ mediaLibraryFields?: boolean, fieldCard?: object }} options
+ * @param {{ mediaLibraryFields?: boolean, headingLevels?: string[], fieldCard?: object }} options
  */
 export function resetConfig(options = {}) {
   state.mediaLibraryFields = !!options.mediaLibraryFields;
+  state.headingLevels = sanitizeHeadingLevels(options.headingLevels);
   state.fieldCard =
     options.fieldCard && typeof options.fieldCard === 'object' ? { ...options.fieldCard } : {};
 }
@@ -47,6 +74,15 @@ export function resetConfig(options = {}) {
  */
 export function getFieldCardHooks() {
   return state.fieldCard;
+}
+
+/**
+ * Allowed heading tag levels for the Level control (Forms: h1–h6, Blocks: h2–h4).
+ *
+ * @returns {string[]}
+ */
+export function getHeadingLevels() {
+  return state.headingLevels.length ? state.headingLevels : [...DEFAULT_HEADING_LEVELS];
 }
 
 /**

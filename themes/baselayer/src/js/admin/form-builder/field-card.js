@@ -7,7 +7,7 @@ import {
   equalizeColumnRun,
 } from './layout.js';
 import { createConditionalLogicEditor, readConditionalLogicFromDom, normalizeConditionalLogic } from './conditional-logic.js';
-import { getFieldCardHooks, useMediaLibraryFields } from './config.js';
+import { getFieldCardHooks, useMediaLibraryFields, getHeadingLevels } from './config.js';
 
 const WIDTH_PRESETS = [
   { value: '100', label: '100%' },
@@ -354,8 +354,7 @@ function convertFieldType(field, nextType) {
   }
 
   if (nextType === 'heading') {
-    const level = String(field.level || 'h2').toLowerCase();
-    field.level = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].includes(level) ? level : 'h2';
+    normalizeHeadingLevel(field);
   } else {
     delete field.level;
   }
@@ -1262,7 +1261,7 @@ export function openLayoutSettingsModal(field, onApply, options = {}) {
         type: 'text',
         className: 'widefat',
         value: draft.button_label || '',
-        placeholder: t('addRow', 'Add row'),
+        placeholder: t('addRow', 'Add entry'),
       });
       buttonInput.addEventListener('input', () => {
         draft.button_label = buttonInput.value;
@@ -1444,24 +1443,31 @@ function createLayoutControl(field) {
   return wrap;
 }
 
-const HEADING_LEVELS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
-
-function normalizeHeadingLevel(field) {
-  const level = String(field.level || 'h2').toLowerCase();
-  field.level = HEADING_LEVELS.includes(level) ? level : 'h2';
+function headingLevelFallback(levels) {
+  if (levels.includes('h4')) {
+    return 'h4';
+  }
+  return levels[0] || 'h2';
 }
 
-/** Heading tag level: H1–H6 (default H2). */
+function normalizeHeadingLevel(field) {
+  const levels = getHeadingLevels();
+  const level = String(field.level || '').toLowerCase();
+  field.level = levels.includes(level) ? level : headingLevelFallback(levels);
+}
+
+/** Heading tag level control (Forms: H1–H6, Blocks: H2–H4). */
 function createHeadingLevelControl(field, onChange = () => {}) {
   normalizeHeadingLevel(field);
+  const levels = getHeadingLevels();
   const wrap = el('div', { className: 'bl-forms-builder__heading-level' });
   const group = createSegmentedControl(
-    HEADING_LEVELS.map((level) => ({
+    levels.map((level) => ({
       value: level,
       label: level.toUpperCase(),
       dataset: { blHeadingLevel: level },
     })),
-    field.level || 'h2',
+    field.level || headingLevelFallback(levels),
     'blHeadingLevelGroup',
     (value) => {
       field.level = value;
@@ -2663,14 +2669,16 @@ export function serializeRow(row) {
   }
 
   if (type === 'heading') {
+    const levels = getHeadingLevels();
+    const fallback = headingLevelFallback(levels);
     const levelBtn = q('[data-bl-heading-level].is-active');
-    const level = levelBtn?.dataset.blHeadingLevel || 'h2';
+    const level = levelBtn?.dataset.blHeadingLevel || fallback;
     return withConditionalLogic(body, {
       id,
       type,
       active,
       content: q('[data-bl-content]')?.value || '',
-      level: HEADING_LEVELS.includes(level) ? level : 'h2',
+      level: levels.includes(level) ? level : fallback,
       ...appearancePayload(body, width, widthCustom),
     });
   }

@@ -9,7 +9,7 @@ import {
   defaultRepeater,
 } from './repeater-card.js';
 
-const EXCLUDED_TYPES = new Set(['honeypot', 'captcha', 'terms']);
+const EXCLUDED_TYPES = new Set(['honeypot', 'captcha', 'terms', 'divider']);
 
 /** Popular fields for block / page / site settings (not form contact fields). */
 const BLOCKS_POPULAR_TYPES = ['text', 'textarea', 'select', 'toggle'];
@@ -101,7 +101,10 @@ export function mountApp(root, initial, definitionType = 'block') {
   } = FormBuilder;
 
   if (typeof FormBuilder.configure === 'function') {
-    FormBuilder.configure({ mediaLibraryFields: true });
+    FormBuilder.configure({
+      mediaLibraryFields: true,
+      headingLevels: ['h2', 'h3', 'h4'],
+    });
   }
 
   root.replaceChildren();

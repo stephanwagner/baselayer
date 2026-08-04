@@ -335,7 +335,6 @@ wp.hooks.addFilter('blocks.registerBlockType', 'baselayer/block-hidden-default',
 });
 
 function initBlockInserterSettings() {
-  initEditorPreferenceDefaults();
   applyFavoriteCategories();
 
   const hiddenBlocks = getHiddenBlocks();

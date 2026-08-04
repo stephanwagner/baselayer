@@ -1439,6 +1439,68 @@
     });
     return { restUrl, restNonce };
   }
+  function pageUrlPath(url) {
+    const raw = String(url || "").trim();
+    if (!raw) return "";
+    try {
+      const base = typeof window !== "undefined" && window.location && window.location.origin ? window.location.origin : "https://example.com";
+      const parsed = new URL(raw, base);
+      return (parsed.pathname || "/") + (parsed.search || "") + (parsed.hash || "");
+    } catch (err) {
+      const stripped = raw.replace(/^[a-z][a-z0-9+.-]*:\/\/[^/?#]+/i, "");
+      if (!stripped) return "/";
+      return stripped.startsWith("/") ? stripped : "/" + stripped.replace(/^\/*/, "");
+    }
+  }
+  function buildPageCard(page, onRemove) {
+    const title = page.title || i18n("selectedPage", "Selected page") + " #" + page.id;
+    const path = pageUrlPath(page.url);
+    const body = el("div", { className: "bl-blocks-fields__page-card-body" }, [
+      el("span", {
+        className: "bl-blocks-fields__page-card-title",
+        text: title,
+        title
+      })
+    ]);
+    if (path) {
+      body.appendChild(
+        el("span", {
+          className: "description bl-blocks-fields__page-card-url",
+          text: path,
+          title: page.url || path
+        })
+      );
+    }
+    const removeBtn = el("button", {
+      type: "button",
+      className: "button-link bl-blocks-fields__page-remove",
+      text: "\xD7",
+      title: i18n("clearPage", "Clear"),
+      "aria-label": i18n("clearPage", "Clear")
+    });
+    removeBtn.addEventListener("click", (evt) => {
+      evt.preventDefault();
+      evt.stopPropagation();
+      onRemove();
+    });
+    return el(
+      "div",
+      {
+        className: "bl-blocks-fields__page-card",
+        dataset: { pageId: String(page.id) }
+      },
+      [body, removeBtn]
+    );
+  }
+  function buildPagePreview(pages, multiple, onRemove) {
+    const preview = el("div", {
+      className: "bl-blocks-fields__page-preview" + (multiple ? " is-multiple" : " is-single")
+    });
+    pages.forEach((page) => {
+      preview.appendChild(buildPageCard(page, () => onRemove(page.id)));
+    });
+    return preview;
+  }
   function normalizePageIds(current, multiple) {
     if (multiple) {
       const list = Array.isArray(current) ? current : current != null && current !== "" ? [current] : [];
@@ -1485,32 +1547,13 @@
             text: multiple ? i18n("choosePagesHelp", "Select one or more pages.") : i18n("choosePageHelp", "Select a page.")
           })
         );
-      } else if (multiple) {
-        selected.forEach((page) => {
-          summary.appendChild(
-            el("span", {
-              className: "bl-blocks-fields__page-picker-value",
-              text: page.title || i18n("selectedPage", "Selected page") + " #" + page.id
-            })
-          );
-        });
       } else {
-        const page = selected[0];
         summary.appendChild(
-          el("span", {
-            className: "bl-blocks-fields__page-picker-value",
-            text: page.title || i18n("selectedPage", "Selected page") + " #" + page.id
+          buildPagePreview(selected, multiple, (id) => {
+            selected = selected.filter((page) => page.id !== id);
+            syncUi();
           })
         );
-        if (page.url) {
-          summary.appendChild(
-            el("span", {
-              className: "description bl-blocks-fields__page-picker-url",
-              text: page.url,
-              title: page.url
-            })
-          );
-        }
       }
       clearBtn.hidden = selected.length === 0;
       pickBtn.textContent = selected.length > 0 ? multiple ? i18n("changePages", "Change pages") : i18n("changePage", "Change page") : multiple ? i18n("choosePages", "Choose pages") : i18n("choosePage", "Choose page");
@@ -1654,14 +1697,12 @@
             })
           );
         } else {
-          selected.forEach((page) => {
-            summary.appendChild(
-              el("span", {
-                className: "bl-blocks-fields__page-picker-value",
-                text: page.title || i18n("selectedPage", "Selected page") + " #" + page.id
-              })
-            );
-          });
+          summary.appendChild(
+            buildPagePreview(selected, multiple, (id) => {
+              selected = selected.filter((page) => page.id !== id);
+              syncUi();
+            })
+          );
         }
         clearBtn.hidden = selected.length === 0;
         pickBtn.textContent = selected.length > 0 ? multiple ? i18n("changePages", "Change pages") : i18n("changePage", "Change page") : multiple ? i18n("choosePages", "Choose pages") : i18n("choosePage", "Choose page");
@@ -1857,20 +1898,13 @@
         });
         if (pageMeta) {
           summary.appendChild(
-            el2("span", {
-              className: "bl-blocks-fields__page-picker-value",
-              text: pageMeta.title || i18n2("selectedPage", "Selected page") + " #" + pageMeta.id
+            buildPagePreview([pageMeta], false, () => {
+              pageMeta = null;
+              state.page_id = 0;
+              state.url = "";
+              renderDestination();
             })
           );
-          if (pageMeta.url) {
-            summary.appendChild(
-              el2("span", {
-                className: "description bl-blocks-fields__page-picker-url",
-                text: pageMeta.url,
-                title: pageMeta.url
-              })
-            );
-          }
         } else {
           summary.appendChild(
             el2("span", {
@@ -5095,7 +5129,7 @@
   function createFieldForm(fields, values = {}, options = {}) {
     const compact = options && options.layout === "compact";
     const rootAttrs = {
-      className: "bl-blocks-fields" + (compact ? " bl-blocks-fields--compact" : ""),
+      className: "bl-blocks-fields bl-admin-form" + (compact ? " bl-blocks-fields--compact" : ""),
       dataset: { blBlocksFields: "" }
     };
     if (compact) {
@@ -5215,8 +5249,11 @@
           continue;
         }
         if (type === "heading") {
-          if (field.label) {
-            parent.appendChild(el4("h4", { className: "bl-blocks-fields__heading", text: field.label }));
+          const content = String(field.content || field.label || "").trim();
+          if (content) {
+            const levelRaw = String(field.level || "h4").toLowerCase();
+            const tag = ["h2", "h3", "h4"].includes(levelRaw) ? levelRaw : "h4";
+            parent.appendChild(el4(tag, { className: "bl-blocks-fields__heading", text: content }));
           }
           i += 1;
           continue;
@@ -5274,7 +5311,7 @@
     const children = Array.isArray(field.children) ? field.children : [];
     const minRows = Math.max(0, parseInt(field.min_rows, 10) || 0);
     const maxRows = Math.max(0, parseInt(field.max_rows, 10) || 0);
-    const buttonLabel = field.button_label || i18n4("addRow", "Add row");
+    const buttonLabel = field.button_label || i18n4("addRow", "Add entry");
     const design = compact ? "standard" : ["standard", "outline", "card"].includes(field.design) ? field.design : "standard";
     const showTitle = field.show_title !== false && field.show_title !== 0 && field.show_title !== "0";
     let rows = Array.isArray(valueMap[name]) ? valueMap[name].slice() : [];
@@ -5296,6 +5333,10 @@
       wrap.appendChild(el4("p", { className: "description", text: field.description }));
     }
     const rowsEl = el4("div", { className: "bl-blocks-fields__repeater-rows" });
+    const emptyHelp = el4("p", {
+      className: "description bl-blocks-fields__repeater-empty",
+      text: i18n4("chooseEntriesHelp", "Add one or more entries.")
+    });
     const rowForms = [];
     const syncRowTitles = () => {
       Array.from(rowsEl.children).forEach((rowEl, i) => {
@@ -5313,6 +5354,9 @@
       className: "button bl-blocks-fields__repeater-add",
       text: buttonLabel
     });
+    const refreshEmptyHelp = () => {
+      emptyHelp.hidden = rowForms.length > 0;
+    };
     const refreshAddBtn = () => {
       addBtn.disabled = !canAdd();
     };
@@ -5340,6 +5384,7 @@
         rowEl.remove();
         syncRowTitles();
         refreshAddBtn();
+        refreshEmptyHelp();
         rowForms.forEach((r) => {
           r.removeBtn.disabled = !canRemove();
         });
@@ -5347,6 +5392,7 @@
       removeBtn.disabled = !canRemove();
       syncRowTitles();
       refreshAddBtn();
+      refreshEmptyHelp();
     };
     rows.forEach((rowValues) => mountRow(rowValues));
     if (rows.length === 0 && minRows === 0) {
@@ -5359,8 +5405,10 @@
       });
     });
     wrap.appendChild(rowsEl);
+    wrap.appendChild(emptyHelp);
     wrap.appendChild(addBtn);
     refreshAddBtn();
+    refreshEmptyHelp();
     entries.push({
       kind: "repeater",
       field,

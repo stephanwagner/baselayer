@@ -622,7 +622,10 @@ msgstr ""
 #: includes/field-ui.php:1012
 #: includes/runtime-blocks.php:244
 #: includes/runtime-page.php:113
-msgid "Add row"
+msgid "Add entry"
+msgstr ""
+
+msgid "Add one or more entries."
 msgstr ""
 
 #: includes/admin-editor.php:365

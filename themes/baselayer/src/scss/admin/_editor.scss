@@ -1,6 +1,13 @@
+@use '../theme-tokens' as *;
+
+// Layer 4: block editor chrome.
+// Frontend theme tokens are scoped to the canvas only (not wp-admin :root).
+
 // Editor
 
 .editor-styles-wrapper {
+  @include bl-theme-tokens;
+
   font-family: var(--bl-primary-font-family);
   font-size: var(--bl-default-font-size);
   line-height: 1.5;

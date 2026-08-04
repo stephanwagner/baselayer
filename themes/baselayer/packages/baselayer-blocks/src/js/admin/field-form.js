@@ -381,7 +381,8 @@ function createLeafControl(field, values, controls) {
 export function createFieldForm(fields, values = {}, options = {}) {
   const compact = options && options.layout === 'compact';
   const rootAttrs = {
-    className: 'bl-blocks-fields' + (compact ? ' bl-blocks-fields--compact' : ''),
+    className:
+      'bl-blocks-fields bl-admin-form' + (compact ? ' bl-blocks-fields--compact' : ''),
     dataset: { blBlocksFields: '' },
   };
   if (compact) {
@@ -520,8 +521,11 @@ export function createFieldForm(fields, values = {}, options = {}) {
       }
 
       if (type === 'heading') {
-        if (field.label) {
-          parent.appendChild(el('h4', { className: 'bl-blocks-fields__heading', text: field.label }));
+        const content = String(field.content || field.label || '').trim();
+        if (content) {
+          const levelRaw = String(field.level || 'h4').toLowerCase();
+          const tag = ['h2', 'h3', 'h4'].includes(levelRaw) ? levelRaw : 'h4';
+          parent.appendChild(el(tag, { className: 'bl-blocks-fields__heading', text: content }));
         }
         i += 1;
         continue;
@@ -585,7 +589,7 @@ function createRepeaterControl(field, valueMap, entries, options = {}) {
   const children = Array.isArray(field.children) ? field.children : [];
   const minRows = Math.max(0, parseInt(field.min_rows, 10) || 0);
   const maxRows = Math.max(0, parseInt(field.max_rows, 10) || 0);
-  const buttonLabel = field.button_label || i18n('addRow', 'Add row');
+  const buttonLabel = field.button_label || i18n('addRow', 'Add entry');
   const design = compact
     ? 'standard'
     : ['standard', 'outline', 'card'].includes(field.design)
@@ -617,6 +621,10 @@ function createRepeaterControl(field, valueMap, entries, options = {}) {
   }
 
   const rowsEl = el('div', { className: 'bl-blocks-fields__repeater-rows' });
+  const emptyHelp = el('p', {
+    className: 'description bl-blocks-fields__repeater-empty',
+    text: i18n('chooseEntriesHelp', 'Add one or more entries.'),
+  });
   /** @type {Array<{ getValues: Function }>} */
   const rowForms = [];
 
@@ -638,6 +646,10 @@ function createRepeaterControl(field, valueMap, entries, options = {}) {
     className: 'button bl-blocks-fields__repeater-add',
     text: buttonLabel,
   });
+
+  const refreshEmptyHelp = () => {
+    emptyHelp.hidden = rowForms.length > 0;
+  };
 
   const refreshAddBtn = () => {
     addBtn.disabled = !canAdd();
@@ -670,6 +682,7 @@ function createRepeaterControl(field, valueMap, entries, options = {}) {
       rowEl.remove();
       syncRowTitles();
       refreshAddBtn();
+      refreshEmptyHelp();
       rowForms.forEach((r) => {
         r.removeBtn.disabled = !canRemove();
       });
@@ -678,6 +691,7 @@ function createRepeaterControl(field, valueMap, entries, options = {}) {
     removeBtn.disabled = !canRemove();
     syncRowTitles();
     refreshAddBtn();
+    refreshEmptyHelp();
   };
 
   rows.forEach((rowValues) => mountRow(rowValues));
@@ -694,8 +708,10 @@ function createRepeaterControl(field, valueMap, entries, options = {}) {
   });
 
   wrap.appendChild(rowsEl);
+  wrap.appendChild(emptyHelp);
   wrap.appendChild(addBtn);
   refreshAddBtn();
+  refreshEmptyHelp();
 
   entries.push({
     kind: 'repeater',

@@ -524,6 +524,12 @@ function bl_blocks_sanitize_field($field, int $repeater_depth = 0): ?array
 		// Leaf fields must not keep a children tree.
 		unset($clean['children']);
 
+		// Block field UI only supports h2–h4 headings (Forms keep h1–h6).
+		if (($clean['type'] ?? '') === 'heading') {
+			$level = strtolower((string) ($clean['level'] ?? 'h4'));
+			$clean['level'] = in_array($level, ['h2', 'h3', 'h4'], true) ? $level : 'h4';
+		}
+
 		return $clean;
 	}
 

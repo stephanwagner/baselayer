@@ -590,8 +590,11 @@ msgstr ""
 #: includes/admin-editor.php:364 includes/field-ui.php:898
 #: includes/field-ui.php:1012 includes/runtime-blocks.php:244
 #: includes/runtime-page.php:113
-msgid "Add row"
-msgstr "Zeile hinzufügen"
+msgid "Add entry"
+msgstr "Eintrag hinzufügen"
+
+msgid "Add one or more entries."
+msgstr "Füge einen oder mehrere Einträge hinzu."
 
 #: includes/admin-editor.php:365
 msgid "Field name"

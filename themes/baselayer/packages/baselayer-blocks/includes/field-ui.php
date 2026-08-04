@@ -190,7 +190,7 @@ function bl_blocks_iter_fields(array $fields): array
 function bl_blocks_render_admin_fields(array $fields, array $values, string $name_prefix = 'bl_blocks_values'): string
 {
 	ob_start();
-	echo '<div class="bl-blocks-fields" data-bl-blocks-fields>';
+	echo '<div class="bl-blocks-fields bl-admin-form" data-bl-blocks-fields>';
 	bl_blocks_render_admin_fields_walk($fields, $values, $name_prefix);
 	echo '</div>';
 
@@ -247,9 +247,11 @@ function bl_blocks_render_admin_fields_walk(array $fields, array $values, string
 			continue;
 		}
 		if ($type === 'heading') {
-			$label = (string) ($field['label'] ?? '');
-			if ($label !== '') {
-				echo '<h4 class="bl-blocks-fields__heading">' . esc_html($label) . '</h4>';
+			$content = trim((string) ($field['content'] ?? $field['label'] ?? ''));
+			if ($content !== '') {
+				$level_raw = strtolower((string) ($field['level'] ?? 'h4'));
+				$tag = in_array($level_raw, ['h2', 'h3', 'h4'], true) ? $level_raw : 'h4';
+				echo '<' . $tag . ' class="bl-blocks-fields__heading">' . esc_html($content) . '</' . $tag . '>';
 			}
 			$i++;
 			continue;
@@ -560,6 +562,33 @@ function bl_blocks_page_picker_summaries(array $ids): array
 }
 
 /**
+ * Path (+ query/hash) for a page URL, without the host.
+ */
+function bl_blocks_page_url_path(string $url): string
+{
+	$url = trim($url);
+	if ($url === '') {
+		return '';
+	}
+	$parts = wp_parse_url($url);
+	if (!is_array($parts)) {
+		return $url;
+	}
+	$path = (string) ($parts['path'] ?? '/');
+	if ($path === '') {
+		$path = '/';
+	}
+	if (!empty($parts['query'])) {
+		$path .= '?' . $parts['query'];
+	}
+	if (!empty($parts['fragment'])) {
+		$path .= '#' . $parts['fragment'];
+	}
+
+	return $path;
+}
+
+/**
  * Render a page picker control for PHP admin (Website settings).
  *
  * @param array<string, mixed> $field
@@ -604,10 +633,22 @@ function bl_blocks_render_admin_page_field(array $field, $value, string $input_n
 				: __('Select a page.', 'baselayer-blocks')
 		) . '</span>';
 	} else {
+		echo '<div class="bl-blocks-fields__page-preview' . ($multiple ? ' is-multiple' : ' is-single') . '">';
 		foreach ($ids as $pid) {
-			$title = $summaries[$pid]['title'] ?? ('#' . $pid);
-			echo '<span class="bl-blocks-fields__page-picker-value">' . esc_html($title) . '</span>';
+			$meta = $summaries[$pid] ?? ['title' => '#' . $pid, 'url' => ''];
+			$title = (string) ($meta['title'] ?? ('#' . $pid));
+			$url = (string) ($meta['url'] ?? '');
+			$path = bl_blocks_page_url_path($url);
+			echo '<div class="bl-blocks-fields__page-card" data-page-id="' . esc_attr((string) $pid) . '">';
+			echo '<div class="bl-blocks-fields__page-card-body">';
+			echo '<span class="bl-blocks-fields__page-card-title" title="' . esc_attr($title) . '">' . esc_html($title) . '</span>';
+			if ($path !== '') {
+				echo '<span class="description bl-blocks-fields__page-card-url" title="' . esc_attr($url !== '' ? $url : $path) . '">' . esc_html($path) . '</span>';
+			}
+			echo '</div>';
+			echo '</div>';
 		}
+		echo '</div>';
 	}
 	echo '</div>';
 	echo '<div class="bl-blocks-fields__page-picker-actions">';
@@ -895,7 +936,7 @@ function bl_blocks_render_admin_repeater(array $field, $rows, string $name_prefi
 	$label = (string) ($field['label'] ?? $name);
 	$button = (string) ($field['button_label'] ?? '');
 	if ($button === '') {
-		$button = __('Add row', 'baselayer-blocks');
+		$button = __('Add entry', 'baselayer-blocks');
 	}
 	$min_rows = max(0, (int) ($field['min_rows'] ?? 0));
 	$max_rows = max(0, (int) ($field['max_rows'] ?? 0));
@@ -1009,7 +1050,8 @@ function bl_blocks_enqueue_field_ui_assets(): void
 			'save'                   => __('Save', 'baselayer-blocks'),
 			'cancel'                 => __('Cancel', 'baselayer-blocks'),
 			'close'                  => __('Close', 'baselayer-blocks'),
-			'addRow'                => __('Add row', 'baselayer-blocks'),
+			'addRow'                => __('Add entry', 'baselayer-blocks'),
+			'chooseEntriesHelp'      => __('Add one or more entries.', 'baselayer-blocks'),
 			'removeRow'              => __('Remove row', 'baselayer-blocks'),
 			'rowLabel'               => __('Row %d', 'baselayer-blocks'),
 			'repeater'               => __('Repeater', 'baselayer-blocks'),
