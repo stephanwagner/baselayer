@@ -1178,8 +1178,8 @@ msgid "Copy code"
 msgstr "Code kopieren"
 
 #: includes/admin-editor.php
-msgid "Download file"
-msgstr "Datei herunterladen"
+msgid "Download"
+msgstr "Herunterladen"
 
 #: includes/admin-editor.php:541
 msgid "Copied"

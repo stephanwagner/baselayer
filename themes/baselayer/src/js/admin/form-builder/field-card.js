@@ -692,7 +692,7 @@ function createOptionsEditor(options) {
   wrap.appendChild(
     el('button', {
       type: 'button',
-      className: 'button bl-button-small',
+      className: 'button bl-button',
       text: t('addOption', 'Add option'),
       onClick: () => addOption(),
     })

@@ -1,6 +1,6 @@
 // Events admin list — occurrences modal
 // Settings builders load without full theme admin.css; include small WP buttons + icon picker here.
-@use '../../../../src/scss/admin/button-small';
+@use '../../../../src/scss/admin/form-controls';
 @use '../../../../src/scss/admin/icon-picker';
 
 // Standalone fallbacks when BaseLayer theme tokens are absent (editor + settings).

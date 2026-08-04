@@ -1252,12 +1252,12 @@
       footer.className = "bl-page-picker__footer";
       const cancelBtn = document.createElement("button");
       cancelBtn.type = "button";
-      cancelBtn.className = "button bl-button-small";
+      cancelBtn.className = "button bl-button";
       cancelBtn.textContent = opts.cancelLabel;
       cancelBtn.addEventListener("click", () => finish(null));
       const selectBtn = document.createElement("button");
       selectBtn.type = "button";
-      selectBtn.className = "button button-primary bl-button-small";
+      selectBtn.className = "button button-primary bl-button";
       selectBtn.textContent = opts.selectLabel;
       const syncSelectEnabled = () => {
         selectBtn.disabled = selectedMap.size === 0;
@@ -1457,7 +1457,7 @@
     const summary = el("div", { className: "bl-blocks-fields__page-picker-summary" });
     const pickBtn = el("button", {
       type: "button",
-      className: "button bl-button-small",
+      className: "button bl-button",
       text: i18n("choosePage", "Choose page")
     });
     const clearBtn = el("button", {
@@ -1846,7 +1846,7 @@
         const summary = el2("div", { className: "bl-blocks-fields__page-picker-summary" });
         const pickBtn = el2("button", {
           type: "button",
-          className: "button bl-button-small",
+          className: "button bl-button",
           text: pageMeta ? i18n2("changePage", "Change page") : i18n2("choosePage", "Choose page")
         });
         const clearBtn = el2("button", {
@@ -1963,7 +1963,7 @@
       allowed.forEach((type) => {
         const btn = el2("button", {
           type: "button",
-          className: "button bl-button-tiny bl-blocks-fields__link-type" + (state.type === type ? " is-active" : ""),
+          className: "button bl-button-small bl-blocks-fields__link-type" + (state.type === type ? " is-active" : ""),
           text: labels[type] || type,
           dataset: { linkType: type }
         });
@@ -4495,7 +4495,7 @@
     });
     const chooseBtn = el3("button", {
       type: "button",
-      className: "button bl-button-small",
+      className: "button bl-button",
       text: "",
       dataset: { blMediaChoose: "" }
     });

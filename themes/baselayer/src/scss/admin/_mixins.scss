@@ -1,8 +1,8 @@
 // Admin-only mixins (not used on the frontend).
 
-// WP admin `.button.bl-button-small` at 36px.
+// WP admin `.button.bl-button` at 36px.
 // Do not reuse frontend `.button.-small` here — that modifier is for theme buttons.
-@mixin button-small {
+@mixin bl-button {
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
@@ -14,8 +14,8 @@
   line-height: normal;
 }
 
-// WP admin `.button.bl-button-tiny` at 28px — denser than bl-button-small.
-@mixin button-tiny {
+// WP admin `.button.bl-button-small` at 28px — denser than bl-button.
+@mixin bl-button-small {
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
@@ -28,4 +28,19 @@
   padding-right: 10px;
   line-height: normal;
   font-size: 12px;
+}
+
+// Mask icon for ::before — same technique as frontend `@mixin bl-icon`,
+// kept here so form-controls does not pull the full icons stylesheet.
+@mixin bl-admin-icon-mask {
+  display: inline-block;
+  background-color: currentColor;
+  mask-image: var(--bl-icon);
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-image: var(--bl-icon);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
 }

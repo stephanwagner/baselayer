@@ -242,7 +242,7 @@ export function createMediaPickerControl(field, current) {
 
   const chooseBtn = el('button', {
     type: 'button',
-    className: 'button bl-button-small',
+    className: 'button bl-button',
     text: '',
     dataset: { blMediaChoose: '' },
   });

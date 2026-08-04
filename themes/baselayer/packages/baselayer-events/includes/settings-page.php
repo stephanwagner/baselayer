@@ -435,8 +435,8 @@ function bl_events_render_settings_page(): void
 	echo '<div class="bl-events-settings__toolbar">';
 	echo '<p class="bl-events-settings__toolbar-desc description">' . esc_html__('Labels, archive, statuses, and metadata for this event type. Use Add type to create another post type (for example Courses or Workshops).', 'baselayer-events') . '</p>';
 	echo '<div class="bl-events-settings__toolbar-actions">';
-	echo '<button type="button" class="button bl-button-small" data-bl-events-dialog-open="bl-events-dialog-add">' . esc_html__('Add type', 'baselayer-events') . '</button>';
-	echo '<button type="button" class="button bl-button-small bl-button-danger" data-bl-events-dialog-open="bl-events-dialog-delete"' . ($can_delete ? '' : ' disabled') . '>' . esc_html__('Delete', 'baselayer-events') . '</button>';
+	echo '<button type="button" class="button bl-button" data-bl-events-dialog-open="bl-events-dialog-add">' . esc_html__('Add type', 'baselayer-events') . '</button>';
+	echo '<button type="button" class="button bl-button bl-button-danger" data-bl-events-dialog-open="bl-events-dialog-delete"' . ($can_delete ? '' : ' disabled') . '>' . esc_html__('Delete', 'baselayer-events') . '</button>';
 	echo '</div>';
 	echo '</div>';
 
@@ -631,9 +631,9 @@ function bl_events_settings_general_fields(array $cfg, string $post_type = ''): 
 		echo '</div>';
 		echo '<span class="bl-events-menu-icon-field__empty description" data-bl-events-menu-icon-empty' . ($saved_icon !== '' ? ' hidden' : '') . '>' . esc_html__('No icon selected', 'baselayer-events') . '</span>';
 		echo '<div class="bl-events-menu-icon-field__actions">';
-		echo '<button type="button" class="button bl-button-small" data-bl-events-menu-icon-choose>' . esc_html__('Choose icon', 'baselayer-events') . '</button>';
-		echo '<button type="button" class="button bl-button-small" data-bl-events-menu-icon-svg-toggle aria-expanded="false">' . esc_html__('SVG code', 'baselayer-events') . '</button>';
-		echo '<button type="button" class="button bl-button-small" data-bl-events-menu-icon-clear>' . esc_html__('Clear', 'baselayer-events') . '</button>';
+		echo '<button type="button" class="button bl-button" data-bl-events-menu-icon-choose>' . esc_html__('Choose icon', 'baselayer-events') . '</button>';
+		echo '<button type="button" class="button bl-button" data-bl-events-menu-icon-svg-toggle aria-expanded="false">' . esc_html__('SVG code', 'baselayer-events') . '</button>';
+		echo '<button type="button" class="button bl-button" data-bl-events-menu-icon-clear>' . esc_html__('Clear', 'baselayer-events') . '</button>';
 		echo '</div>';
 		echo '</div>';
 		echo '<div class="bl-events-menu-icon-field__svg-panel" data-bl-events-menu-icon-svg-panel hidden>';
@@ -650,8 +650,8 @@ function bl_events_settings_general_fields(array $cfg, string $post_type = ''): 
 		echo '</div>';
 		echo '<span class="bl-events-menu-icon-field__empty description" data-bl-events-menu-icon-empty hidden>' . esc_html__('No icon selected', 'baselayer-events') . '</span>';
 		echo '<div class="bl-events-menu-icon-field__actions">';
-		echo '<button type="button" class="button bl-button-small" data-bl-events-menu-icon-svg-toggle aria-expanded="false">' . esc_html__('SVG code', 'baselayer-events') . '</button>';
-		echo '<button type="button" class="button bl-button-small" data-bl-events-menu-icon-clear>' . esc_html__('Clear', 'baselayer-events') . '</button>';
+		echo '<button type="button" class="button bl-button" data-bl-events-menu-icon-svg-toggle aria-expanded="false">' . esc_html__('SVG code', 'baselayer-events') . '</button>';
+		echo '<button type="button" class="button bl-button" data-bl-events-menu-icon-clear>' . esc_html__('Clear', 'baselayer-events') . '</button>';
 		echo '</div>';
 		echo '</div>';
 		echo '<div class="bl-events-menu-icon-field__svg-panel" data-bl-events-menu-icon-svg-panel hidden>';

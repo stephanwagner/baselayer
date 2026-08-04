@@ -1,0 +1,191 @@
+@use 'mixins' as *;
+
+// Compact WP admin button (36px) — pair with core `.button`.
+.wp-core-ui .button.bl-button,
+.button.bl-button {
+  @include bl-button;
+}
+
+// Dense WP admin button (28px).
+.wp-core-ui .button.bl-button-small,
+.button.bl-button-small {
+  @include bl-button-small;
+}
+
+// ---------------------------------------------------------------------------
+// Icon buttons — same API as frontend: -has-icon + -icon-{name} (+ -icon-only)
+// Icon glyph comes from theme-icons CSS (`--bl-icon` on .-icon-*).
+// ---------------------------------------------------------------------------
+
+.wp-core-ui .button.-has-icon,
+.button.-has-icon {
+  --bl-admin-button-icon-size: var(--bl-button-icon-size, 18px);
+  --bl-admin-button-icon-inset: var(--bl-button-icon-inset, 10px);
+  --bl-admin-button-icon-gap: var(--bl-button-icon-gap, 6px);
+
+  position: relative;
+  text-align: left;
+
+  &::before {
+    @include bl-admin-icon-mask;
+    content: '';
+    line-height: 0;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: var(--bl-admin-button-icon-size);
+    height: var(--bl-admin-button-icon-size);
+  }
+}
+
+.wp-core-ui .button.-has-icon:not(.-icon-right):not(.-icon-only),
+.button.-has-icon:not(.-icon-right):not(.-icon-only) {
+  padding-left: calc(
+    var(--bl-admin-button-icon-inset) + var(--bl-admin-button-icon-size) +
+      var(--bl-admin-button-icon-gap)
+  );
+
+  &::before {
+    left: var(--bl-admin-button-icon-inset);
+  }
+}
+
+.wp-core-ui .button.-has-icon.-icon-right:not(.-icon-only),
+.button.-has-icon.-icon-right:not(.-icon-only) {
+  padding-right: calc(
+    var(--bl-admin-button-icon-inset) + var(--bl-admin-button-icon-size) +
+      var(--bl-admin-button-icon-gap)
+  );
+
+  &::before {
+    right: var(--bl-admin-button-icon-inset);
+  }
+}
+
+// Square icon-only (default WP button height ≈ 30–40px; prefer bl-button sizing).
+.wp-core-ui .button.-has-icon.-icon-only,
+.button.-has-icon.-icon-only {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0 !important;
+  line-height: 0 !important;
+  text-align: center;
+
+  &::before {
+    position: static;
+    top: auto;
+    left: auto;
+    right: auto;
+    transform: none;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.wp-core-ui .button.bl-button.-has-icon.-icon-only,
+.button.bl-button.-has-icon.-icon-only {
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  min-height: 36px;
+
+  &::before {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+.wp-core-ui .button.bl-button-small.-has-icon.-icon-only,
+.button.bl-button-small.-has-icon.-icon-only {
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  min-height: 28px;
+
+  &::before {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// Labeled icons on compact buttons: slightly tighter inset.
+.wp-core-ui .button.bl-button.-has-icon:not(.-icon-only),
+.button.bl-button.-has-icon:not(.-icon-only) {
+  --bl-admin-button-icon-size: 18px;
+  --bl-admin-button-icon-inset: 10px;
+  --bl-admin-button-icon-gap: 6px;
+}
+
+.wp-core-ui .button.bl-button-small.-has-icon:not(.-icon-only),
+.button.bl-button-small.-has-icon:not(.-icon-only) {
+  --bl-admin-button-icon-size: 16px;
+  --bl-admin-button-icon-inset: 8px;
+  --bl-admin-button-icon-gap: 4px;
+}
+
+// Wrapper: shrink nested WP buttons + text fields to the compact 36px size.
+// Scoped to WP admin controls only — does not restyle frontend Forms BEM (`.bl-form__*`).
+.bl-form {
+  .wp-core-ui .button,
+  .button {
+    @include bl-button;
+
+    &.-has-icon.-icon-only {
+      width: 36px;
+      min-width: 36px;
+      height: 36px;
+      min-height: 36px;
+      padding: 0 !important;
+
+      &::before {
+        width: 18px;
+        height: 18px;
+      }
+    }
+  }
+
+  // Dense buttons inside a form keep the 28px size.
+  .wp-core-ui .button.bl-button-small,
+  .button.bl-button-small {
+    @include bl-button-small;
+
+    &.-has-icon.-icon-only {
+      width: 28px;
+      min-width: 28px;
+      height: 28px;
+      min-height: 28px;
+
+      &::before {
+        width: 16px;
+        height: 16px;
+      }
+    }
+  }
+
+  input[type='text'],
+  input[type='search'],
+  input[type='email'],
+  input[type='url'],
+  input[type='number'],
+  input[type='password'],
+  input:not([type]),
+  select {
+    box-sizing: border-box;
+    height: 36px;
+    min-height: 36px;
+    max-height: 36px;
+  }
+
+  // Match form-builder: keep select text vertically centered at 36px.
+  select {
+    line-height: 1.5;
+  }
+}

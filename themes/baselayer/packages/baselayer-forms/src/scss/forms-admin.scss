@@ -1,7 +1,7 @@
 @use 'variables';
 @use 'tokens' as *;
 @use '../../../../src/scss/admin/page-picker';
-@use '../../../../src/scss/admin/button-small';
+@use '../../../../src/scss/admin/form-controls';
 
 // Forms-only admin chrome. Shared .bl-forms-builder UI is in theme
 // form-builder-admin (enqueued before this sheet).

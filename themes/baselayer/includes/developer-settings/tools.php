@@ -219,7 +219,7 @@ function bl_render_developer_tools(): void
 							</p>
 						</div>
 						<div class="bl-media-cleanup-modal__toolbar">
-							<button type="button" class="button bl-button-tiny" data-media-cleanup-select-toggle><?= esc_html__('Select all', 'baselayer') ?></button>
+							<button type="button" class="button bl-button-small" data-media-cleanup-select-toggle><?= esc_html__('Select all', 'baselayer') ?></button>
 						</div>
 						<div class="bl-media-cleanup-modal__list" data-media-cleanup-list role="list"></div>
 						<div class="bl-media-cleanup-modal__footer">

@@ -144,22 +144,22 @@ function openCodeModal(code, slug) {
 
   const footer = document.createElement('div');
   footer.className = 'bl-blocks-modal__footer';
+
   const copyBtn = document.createElement('button');
   copyBtn.type = 'button';
-  copyBtn.className = 'button button-primary';
+  copyBtn.className = 'button bl-button -has-icon -icon-only -icon-copy';
   copyBtn.setAttribute('data-bl-copy-from-source', sourceId);
-  copyBtn.setAttribute(
-    'data-bl-copy-feedback-text',
-    i18n('starterCopied', 'Copied')
-  );
-  copyBtn.textContent = i18n('starterCopyCode', 'Copy code');
+  copyBtn.setAttribute('title', i18n('starterCopyCode', 'Copy code'));
+  copyBtn.setAttribute('aria-label', i18n('starterCopyCode', 'Copy code'));
+
   const downloadBtn = document.createElement('button');
   downloadBtn.type = 'button';
-  downloadBtn.className = 'button';
-  downloadBtn.textContent = i18n('starterDownloadFile', 'Download file');
+  downloadBtn.className = 'button button-primary bl-button -has-icon -icon-download';
+  downloadBtn.textContent = i18n('starterDownload', 'Download');
+
   const closeFooter = document.createElement('button');
   closeFooter.type = 'button';
-  closeFooter.className = 'button';
+  closeFooter.className = 'button bl-button';
   closeFooter.textContent = i18n('starterClose', 'Close');
   footer.append(copyBtn, downloadBtn, closeFooter);
 

@@ -4,7 +4,7 @@
  */
 
 @use 'sass:color';
-@use 'admin/button-small';
+@use 'admin/form-controls';
 
 $color-neutral: #6f7882 !default;
 $color-neutral-bg: color.scale($color-neutral, $lightness: 90%) !default;

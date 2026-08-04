@@ -1345,7 +1345,7 @@
     });
     const addGroupBtn = el("button", {
       type: "button",
-      className: "button bl-button-small",
+      className: "button bl-button",
       text: i18n.addGroup || "Add group"
     });
     root.appendChild(titleRow);
@@ -1473,7 +1473,7 @@
       });
       const addFieldBtn = el("button", {
         type: "button",
-        className: "button bl-button-small",
+        className: "button bl-button",
         text: i18n.addField || "Add field"
       });
       body.appendChild(
@@ -1608,7 +1608,7 @@
     });
     const addBtn = el("button", {
       type: "button",
-      className: "button bl-button-small",
+      className: "button bl-button",
       text: i18n.addStatus || "Add status"
     });
     root.appendChild(list);

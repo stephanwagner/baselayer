@@ -842,7 +842,7 @@
       box.appendChild(
         el("button", {
           type: "button",
-          className: "button bl-button-tiny",
+          className: "button bl-button-small",
           text: t("logicAddRule", "Add rule"),
           onClick: () => {
             const liveGroup = getGroup(groupIndex);
@@ -883,7 +883,7 @@
       groupsMount.appendChild(
         el("button", {
           type: "button",
-          className: "button bl-button-tiny bl-forms-builder__logic-add-group",
+          className: "button bl-button-small bl-forms-builder__logic-add-group",
           text: t("logicAddGroup", "Add rule group"),
           onClick: () => {
             field.conditional_logic.groups.push([emptyRule(getSources())]);
@@ -2270,7 +2270,7 @@
     wrap.appendChild(
       el("button", {
         type: "button",
-        className: "button bl-button-small",
+        className: "button bl-button",
         text: t("addOption", "Add option"),
         onClick: () => addOption()
       })

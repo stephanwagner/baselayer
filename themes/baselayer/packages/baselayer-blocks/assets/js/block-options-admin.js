@@ -1471,7 +1471,7 @@
       return wrap;
     }
     function renderChoices(item) {
-      const wrap = el("div", { className: "bl-bo-choices bl-has-small-inputs" });
+      const wrap = el("div", { className: "bl-bo-choices bl-form" });
       const showIconPicker = item.type === "button-group";
       (item.options || []).forEach((opt, oi) => {
         const children = [
@@ -2063,19 +2063,11 @@
       bindSortable();
     }
     const addRow = el("div", { className: "bl-bo-add" });
-    const makeAddButton = (label, onClick) => {
-      const btn = el("button", {
-        type: "button",
-        className: "button button-secondary bl-button-small bl-button-has-icon bl-bo-add__btn",
-        onClick
-      });
-      const icon = typeof iconEl === "function" ? iconEl("plus", "bl-button-has-icon__icon") : null;
-      if (icon?.innerHTML) {
-        btn.appendChild(icon);
-      }
-      btn.appendChild(document.createTextNode(label));
-      return btn;
-    };
+    const makeAddButton = (label, onClick) => el("button", {
+      type: "button",
+      className: "button button-secondary bl-button -has-icon -icon-add bl-bo-add__btn",
+      onClick
+    }, [label]);
     addRow.appendChild(
       makeAddButton(t2("addOption", "Add option"), () => {
         const next = defaultGeneric("boolean");
@@ -2442,17 +2434,11 @@
       ]);
     }
     function makeBackButton(label, onClick) {
-      const btn = el2("button", {
+      return el2("button", {
         type: "button",
-        className: "button button-secondary bl-button-small bl-button-has-icon bl-bo-back",
+        className: "button button-secondary bl-button -has-icon -icon-arrow-left bl-bo-back",
         onClick
-      });
-      const icon = typeof iconEl2 === "function" ? iconEl2("arrow-left", "bl-button-has-icon__icon") : null;
-      if (icon?.innerHTML) {
-        btn.appendChild(icon);
-      }
-      btn.appendChild(document.createTextNode(label));
-      return btn;
+      }, [label]);
     }
     function openConfirmModal({ title, message, confirmLabel, onConfirm }) {
       const overlay = el2("div", {
@@ -2862,7 +2848,7 @@
       toolbar.appendChild(
         el2("button", {
           type: "button",
-          className: "button button-primary bl-button-small",
+          className: "button button-primary bl-button",
           text: t3("addPreset", "Add preset"),
           onClick: () => {
             const preset = { slug: "", label: "", items: [] };
@@ -3039,7 +3025,7 @@
     }
     function renderAddBlockBar(tab) {
       const choices = availableBlocksForTab(tab);
-      const bar = el2("div", { className: "bl-bo-add-block bl-has-small-inputs" });
+      const bar = el2("div", { className: "bl-bo-add-block bl-form" });
       const row = el2("div", { className: "bl-bo-add-block__row" });
       const select = el2("select", {
         className: "bl-bo-add-block__select",
@@ -3066,7 +3052,7 @@
       fields.appendChild(
         el2("button", {
           type: "button",
-          className: "button button-primary bl-button-small",
+          className: "button button-primary bl-button",
           text: addingBlock ? t3("addingBlock", "Adding\u2026") : t3("addBlock", "Add block"),
           disabled: addingBlock || choices.length === 0 ? true : void 0,
           onClick: () => {

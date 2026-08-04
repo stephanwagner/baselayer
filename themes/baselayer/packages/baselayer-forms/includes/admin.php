@@ -120,8 +120,8 @@ function bl_forms_render_tools_metabox(WP_Post $post): void
 				<?= esc_html__('Export the current form as JSON, or import a previously exported file.', 'baselayer-forms') ?>
 			</p>
 			<div class="bl-forms-tools__actions">
-				<button type="button" class="button bl-button-small" data-bl-forms-export><?= esc_html__('Export', 'baselayer-forms') ?></button>
-				<button type="button" class="button bl-button-small" data-bl-forms-import><?= esc_html__('Import', 'baselayer-forms') ?></button>
+				<button type="button" class="button bl-button" data-bl-forms-export><?= esc_html__('Export', 'baselayer-forms') ?></button>
+				<button type="button" class="button bl-button" data-bl-forms-import><?= esc_html__('Import', 'baselayer-forms') ?></button>
 			</div>
 		</div>
 		<div class="bl-forms-tools__section">
@@ -129,7 +129,7 @@ function bl_forms_render_tools_metabox(WP_Post $post): void
 			<p class="description bl-forms-tools__help">
 				<?= esc_html__('Start with a ready-made form layout and adjust it as needed.', 'baselayer-forms') ?>
 			</p>
-			<button type="button" class="button bl-button-small bl-forms-tools__browse" data-bl-forms-browse-templates>
+			<button type="button" class="button bl-button bl-forms-tools__browse" data-bl-forms-browse-templates>
 				<?= esc_html__('Browse Templates', 'baselayer-forms') ?>
 			</button>
 		</div>

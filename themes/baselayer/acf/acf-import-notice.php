@@ -274,8 +274,8 @@ function bl_acf_import_admin_notice(): void
 			<?= esc_html__('ACF Pro is active, but no field groups are installed yet. Import the theme’s block and website field groups now, or skip if you manage fields yourself.', 'baselayer') ?>
 		</p>
 		<p style="margin-top: 12px;">
-			<a href="<?= esc_url($import_url) ?>" class="button button-primary bl-button-small"><?= esc_html__('Import field groups', 'baselayer') ?></a>
-			<a href="<?= esc_url($skip_url) ?>" class="button bl-button-small"><?= esc_html__('Skip', 'baselayer') ?></a>
+			<a href="<?= esc_url($import_url) ?>" class="button button-primary bl-button"><?= esc_html__('Import field groups', 'baselayer') ?></a>
+			<a href="<?= esc_url($skip_url) ?>" class="button bl-button"><?= esc_html__('Skip', 'baselayer') ?></a>
 		</p>
 	</div>
 	<?php

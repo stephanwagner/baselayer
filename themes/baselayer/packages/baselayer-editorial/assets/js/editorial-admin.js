@@ -97,12 +97,12 @@
       footer.className = "bl-page-picker__footer";
       const cancelBtn = document.createElement("button");
       cancelBtn.type = "button";
-      cancelBtn.className = "button bl-button-small";
+      cancelBtn.className = "button bl-button";
       cancelBtn.textContent = opts.cancelLabel;
       cancelBtn.addEventListener("click", () => finish(null));
       const selectBtn = document.createElement("button");
       selectBtn.type = "button";
-      selectBtn.className = "button button-primary bl-button-small";
+      selectBtn.className = "button button-primary bl-button";
       selectBtn.textContent = opts.selectLabel;
       const syncSelectEnabled = () => {
         selectBtn.disabled = selectedMap.size === 0;

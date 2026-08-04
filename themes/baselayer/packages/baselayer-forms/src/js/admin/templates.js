@@ -276,7 +276,7 @@ function openSimpleModal(title, message, options = {}) {
 function templateButton(label, onClick) {
   return el('button', {
     type: 'button',
-    className: 'button bl-button-small bl-forms-templates__btn',
+    className: 'button bl-button bl-forms-templates__btn',
     text: label,
     onClick,
   });

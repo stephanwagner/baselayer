@@ -447,7 +447,7 @@ function bl_blocks_render_settings_page(): void
 			</div>
 		<?php endif; ?>
 
-		<div class="bl-forms-builder bl-blocks-settings-shell bl-has-small-inputs">
+		<div class="bl-forms-builder bl-blocks-settings-shell bl-form">
 			<nav class="bl-forms-builder__tabs" role="tablist" aria-label="<?php echo esc_attr__('Blocks settings sections', 'baselayer-blocks'); ?>">
 				<?php foreach ($tabs as $slug => $label) : ?>
 					<a
@@ -475,7 +475,7 @@ function bl_blocks_render_settings_page(): void
 										<option value="page_settings"><?php echo esc_html__('Content Fields', 'baselayer-blocks'); ?></option>
 										<option value="site_settings"><?php echo esc_html__('Website Fields', 'baselayer-blocks'); ?></option>
 									</select>
-									<?php submit_button(__('Download JSON', 'baselayer-blocks'), 'primary bl-button-small', 'bl_blocks_export', false); ?>
+									<?php submit_button(__('Download JSON', 'baselayer-blocks'), 'primary bl-button', 'bl_blocks_export', false); ?>
 								</div>
 							</form>
 						</section>
@@ -495,10 +495,10 @@ function bl_blocks_render_settings_page(): void
 											accept="application/json,.json"
 											required
 										>
-										<span class="button bl-button-small bl-blocks-settings__file-btn"><?php echo esc_html($choose_file); ?></span>
+										<span class="button bl-button bl-blocks-settings__file-btn"><?php echo esc_html($choose_file); ?></span>
 										<span class="bl-blocks-settings__file-name" data-empty="<?php echo esc_attr($no_file); ?>"><?php echo esc_html($no_file); ?></span>
 									</label>
-									<?php submit_button(__('Import', 'baselayer-blocks'), 'primary bl-button-small', 'bl_blocks_import', false); ?>
+									<?php submit_button(__('Import', 'baselayer-blocks'), 'primary bl-button', 'bl_blocks_import', false); ?>
 								</div>
 							</form>
 						</section>

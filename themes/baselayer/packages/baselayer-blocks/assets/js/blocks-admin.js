@@ -1959,7 +1959,7 @@
       return wrap;
     }
     function renderChoices(item) {
-      const wrap = el2("div", { className: "bl-bo-choices bl-has-small-inputs" });
+      const wrap = el2("div", { className: "bl-bo-choices bl-form" });
       const showIconPicker = item.type === "button-group";
       (item.options || []).forEach((opt, oi) => {
         const children = [
@@ -2551,19 +2551,11 @@
       bindSortable();
     }
     const addRow = el2("div", { className: "bl-bo-add" });
-    const makeAddButton = (label, onClick) => {
-      const btn = el2("button", {
-        type: "button",
-        className: "button button-secondary bl-button-small bl-button-has-icon bl-bo-add__btn",
-        onClick
-      });
-      const icon = typeof iconEl === "function" ? iconEl("plus", "bl-button-has-icon__icon") : null;
-      if (icon?.innerHTML) {
-        btn.appendChild(icon);
-      }
-      btn.appendChild(document.createTextNode(label));
-      return btn;
-    };
+    const makeAddButton = (label, onClick) => el2("button", {
+      type: "button",
+      className: "button button-secondary bl-button -has-icon -icon-add bl-bo-add__btn",
+      onClick
+    }, [label]);
     addRow.appendChild(
       makeAddButton(t3("addOption", "Add option"), () => {
         const next = defaultGeneric("boolean");
@@ -3375,12 +3367,12 @@
       footer.className = "bl-page-picker__footer";
       const cancelBtn = document.createElement("button");
       cancelBtn.type = "button";
-      cancelBtn.className = "button bl-button-small";
+      cancelBtn.className = "button bl-button";
       cancelBtn.textContent = opts.cancelLabel;
       cancelBtn.addEventListener("click", () => finish(null));
       const selectBtn = document.createElement("button");
       selectBtn.type = "button";
-      selectBtn.className = "button button-primary bl-button-small";
+      selectBtn.className = "button button-primary bl-button";
       selectBtn.textContent = opts.selectLabel;
       const syncSelectEnabled = () => {
         selectBtn.disabled = selectedMap.size === 0;
@@ -3580,7 +3572,7 @@
     const summary = el4("div", { className: "bl-blocks-fields__page-picker-summary" });
     const pickBtn = el4("button", {
       type: "button",
-      className: "button bl-button-small",
+      className: "button bl-button",
       text: i18n("choosePage", "Choose page")
     });
     const clearBtn = el4("button", {
@@ -3969,7 +3961,7 @@
         const summary = el5("div", { className: "bl-blocks-fields__page-picker-summary" });
         const pickBtn = el5("button", {
           type: "button",
-          className: "button bl-button-small",
+          className: "button bl-button",
           text: pageMeta ? i18n2("changePage", "Change page") : i18n2("choosePage", "Choose page")
         });
         const clearBtn = el5("button", {
@@ -4086,7 +4078,7 @@
       allowed.forEach((type) => {
         const btn = el5("button", {
           type: "button",
-          className: "button bl-button-tiny bl-blocks-fields__link-type" + (state.type === type ? " is-active" : ""),
+          className: "button bl-button-small bl-blocks-fields__link-type" + (state.type === type ? " is-active" : ""),
           text: labels[type] || type,
           dataset: { linkType: type }
         });
@@ -6618,7 +6610,7 @@
     });
     const chooseBtn = el6("button", {
       type: "button",
-      className: "button bl-button-small",
+      className: "button bl-button",
       text: "",
       dataset: { blMediaChoose: "" }
     });
@@ -7724,20 +7716,17 @@
     footer.className = "bl-blocks-modal__footer";
     const copyBtn = document.createElement("button");
     copyBtn.type = "button";
-    copyBtn.className = "button button-primary";
+    copyBtn.className = "button bl-button -has-icon -icon-only -icon-copy";
     copyBtn.setAttribute("data-bl-copy-from-source", sourceId);
-    copyBtn.setAttribute(
-      "data-bl-copy-feedback-text",
-      i18n5("starterCopied", "Copied")
-    );
-    copyBtn.textContent = i18n5("starterCopyCode", "Copy code");
+    copyBtn.setAttribute("title", i18n5("starterCopyCode", "Copy code"));
+    copyBtn.setAttribute("aria-label", i18n5("starterCopyCode", "Copy code"));
     const downloadBtn = document.createElement("button");
     downloadBtn.type = "button";
-    downloadBtn.className = "button";
-    downloadBtn.textContent = i18n5("starterDownloadFile", "Download file");
+    downloadBtn.className = "button button-primary bl-button -has-icon -icon-download";
+    downloadBtn.textContent = i18n5("starterDownload", "Download");
     const closeFooter = document.createElement("button");
     closeFooter.type = "button";
-    closeFooter.className = "button";
+    closeFooter.className = "button bl-button";
     closeFooter.textContent = i18n5("starterClose", "Close");
     footer.append(copyBtn, downloadBtn, closeFooter);
     dialog.append(header, body, footer);

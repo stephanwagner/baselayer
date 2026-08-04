@@ -407,7 +407,7 @@ export function createOptionsPanel(initial, onChange, options = {}) {
   }
 
   function renderChoices(item) {
-    const wrap = el('div', { className: 'bl-bo-choices bl-has-small-inputs' });
+    const wrap = el('div', { className: 'bl-bo-choices bl-form' });
     const showIconPicker = item.type === 'button-group';
 
     (item.options || []).forEach((opt, oi) => {
@@ -1080,20 +1080,12 @@ export function createOptionsPanel(initial, onChange, options = {}) {
 
   const addRow = el('div', { className: 'bl-bo-add' });
 
-  const makeAddButton = (label, onClick) => {
-    const btn = el('button', {
+  const makeAddButton = (label, onClick) =>
+    el('button', {
       type: 'button',
-      className: 'button button-secondary bl-button-small bl-button-has-icon bl-bo-add__btn',
+      className: 'button button-secondary bl-button -has-icon -icon-add bl-bo-add__btn',
       onClick,
-    });
-    const icon =
-      typeof iconEl === 'function' ? iconEl('plus', 'bl-button-has-icon__icon') : null;
-    if (icon?.innerHTML) {
-      btn.appendChild(icon);
-    }
-    btn.appendChild(document.createTextNode(label));
-    return btn;
-  };
+    }, [label]);
 
   addRow.appendChild(
     makeAddButton(t('addOption', 'Add option'), () => {

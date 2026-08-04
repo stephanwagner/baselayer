@@ -97,12 +97,12 @@
       footer.className = "bl-page-picker__footer";
       const cancelBtn = document.createElement("button");
       cancelBtn.type = "button";
-      cancelBtn.className = "button bl-button-small";
+      cancelBtn.className = "button bl-button";
       cancelBtn.textContent = opts.cancelLabel;
       cancelBtn.addEventListener("click", () => finish(null));
       const selectBtn = document.createElement("button");
       selectBtn.type = "button";
-      selectBtn.className = "button button-primary bl-button-small";
+      selectBtn.className = "button button-primary bl-button";
       selectBtn.textContent = opts.selectLabel;
       const syncSelectEnabled = () => {
         selectBtn.disabled = selectedMap.size === 0;
@@ -695,7 +695,7 @@
     const redirectSummary = el("div", { className: "bl-forms-builder__page-picker-summary" });
     const redirectPickBtn = el("button", {
       type: "button",
-      className: "button bl-button-small",
+      className: "button bl-button",
       text: t("choosePage", "Choose page")
     });
     const redirectClearBtn = el("button", {
@@ -1469,7 +1469,7 @@
   function templateButton(label, onClick) {
     return el3("button", {
       type: "button",
-      className: "button bl-button-small bl-forms-templates__btn",
+      className: "button bl-button bl-forms-templates__btn",
       text: label,
       onClick
     });

@@ -121,8 +121,8 @@ body.bl-page-picker-open {
   background: #f6f7f7;
 }
 
-.wp-core-ui .button.bl-button-small,
-.button.bl-button-small {
+.wp-core-ui .button.bl-button,
+.button.bl-button {
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
@@ -134,57 +134,203 @@ body.bl-page-picker-open {
   line-height: normal;
 }
 
-.bl-has-small-inputs input[type=text],
-.bl-has-small-inputs input[type=search],
-.bl-has-small-inputs input[type=email],
-.bl-has-small-inputs input[type=url],
-.bl-has-small-inputs input[type=number],
-.bl-has-small-inputs input[type=password],
-.bl-has-small-inputs input:not([type]),
-.bl-has-small-inputs select {
+.wp-core-ui .button.bl-button-small,
+.button.bl-button-small {
   box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  height: 28px;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 10px;
+  padding-right: 10px;
+  line-height: normal;
+  font-size: 12px;
+}
+
+.wp-core-ui .button.-has-icon,
+.button.-has-icon {
+  --bl-admin-button-icon-size: var(--bl-button-icon-size, 18px);
+  --bl-admin-button-icon-inset: var(--bl-button-icon-inset, 10px);
+  --bl-admin-button-icon-gap: var(--bl-button-icon-gap, 6px);
+  position: relative;
+  text-align: left;
+}
+.wp-core-ui .button.-has-icon::before,
+.button.-has-icon::before {
+  display: inline-block;
+  background-color: currentColor;
+  mask-image: var(--bl-icon);
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+  -webkit-mask-image: var(--bl-icon);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+  content: "";
+  line-height: 0;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: var(--bl-admin-button-icon-size);
+  height: var(--bl-admin-button-icon-size);
+}
+
+.wp-core-ui .button.-has-icon:not(.-icon-right):not(.-icon-only),
+.button.-has-icon:not(.-icon-right):not(.-icon-only) {
+  padding-left: calc(var(--bl-admin-button-icon-inset) + var(--bl-admin-button-icon-size) + var(--bl-admin-button-icon-gap));
+}
+.wp-core-ui .button.-has-icon:not(.-icon-right):not(.-icon-only)::before,
+.button.-has-icon:not(.-icon-right):not(.-icon-only)::before {
+  left: var(--bl-admin-button-icon-inset);
+}
+
+.wp-core-ui .button.-has-icon.-icon-right:not(.-icon-only),
+.button.-has-icon.-icon-right:not(.-icon-only) {
+  padding-right: calc(var(--bl-admin-button-icon-inset) + var(--bl-admin-button-icon-size) + var(--bl-admin-button-icon-gap));
+}
+.wp-core-ui .button.-has-icon.-icon-right:not(.-icon-only)::before,
+.button.-has-icon.-icon-right:not(.-icon-only)::before {
+  right: var(--bl-admin-button-icon-inset);
+}
+
+.wp-core-ui .button.-has-icon.-icon-only,
+.button.-has-icon.-icon-only {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0 !important;
+  line-height: 0 !important;
+  text-align: center;
+}
+.wp-core-ui .button.-has-icon.-icon-only::before,
+.button.-has-icon.-icon-only::before {
+  position: static;
+  top: auto;
+  left: auto;
+  right: auto;
+  transform: none;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+}
+
+.wp-core-ui .button.bl-button.-has-icon.-icon-only,
+.button.bl-button.-has-icon.-icon-only {
+  width: 36px;
+  min-width: 36px;
   height: 36px;
   min-height: 36px;
 }
-.bl-has-small-inputs select {
-  line-height: 1.5;
-}
-
-.wp-core-ui .button.bl-button-small.-icon-only,
-.button.bl-button-small.-icon-only {
-  flex: 0 0 auto;
-  width: 36px;
-  min-width: 36px;
-  padding-left: 0;
-  padding-right: 0;
-}
-.wp-core-ui .button.bl-button-small.-icon-only .bl-icon,
-.button.bl-button-small.-icon-only .bl-icon {
-  flex-shrink: 0;
+.wp-core-ui .button.bl-button.-has-icon.-icon-only::before,
+.button.bl-button.-has-icon.-icon-only::before {
   width: 18px;
   height: 18px;
-  font-size: 18px;
 }
 
-.wp-core-ui .button.bl-button-has-icon,
-.button.bl-button-has-icon {
+.wp-core-ui .button.bl-button-small.-has-icon.-icon-only,
+.button.bl-button-small.-has-icon.-icon-only {
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  min-height: 28px;
+}
+.wp-core-ui .button.bl-button-small.-has-icon.-icon-only::before,
+.button.bl-button-small.-has-icon.-icon-only::before {
+  width: 16px;
+  height: 16px;
+}
+
+.wp-core-ui .button.bl-button.-has-icon:not(.-icon-only),
+.button.bl-button.-has-icon:not(.-icon-only) {
+  --bl-admin-button-icon-size: 18px;
+  --bl-admin-button-icon-inset: 10px;
+  --bl-admin-button-icon-gap: 6px;
+}
+
+.wp-core-ui .button.bl-button-small.-has-icon:not(.-icon-only),
+.button.bl-button-small.-has-icon:not(.-icon-only) {
+  --bl-admin-button-icon-size: 16px;
+  --bl-admin-button-icon-inset: 8px;
+  --bl-admin-button-icon-gap: 4px;
+}
+
+.bl-form .wp-core-ui .button,
+.bl-form .button {
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  min-height: 36px;
+  height: 36px;
+  padding-top: 0;
+  padding-bottom: 0;
+  line-height: normal;
 }
-.wp-core-ui .button.bl-button-has-icon .bl-button-has-icon__icon,
-.button.bl-button-has-icon .bl-button-has-icon__icon {
+.bl-form .wp-core-ui .button.-has-icon.-icon-only,
+.bl-form .button.-has-icon.-icon-only {
+  width: 36px;
+  min-width: 36px;
+  height: 36px;
+  min-height: 36px;
+  padding: 0 !important;
+}
+.bl-form .wp-core-ui .button.-has-icon.-icon-only::before,
+.bl-form .button.-has-icon.-icon-only::before {
+  width: 18px;
+  height: 18px;
+}
+.bl-form .wp-core-ui .button.bl-button-small,
+.bl-form .button.bl-button-small {
+  box-sizing: border-box;
   display: inline-flex;
-  flex-shrink: 0;
-  width: 18px;
-  height: 18px;
-  margin-left: -6px;
+  align-items: center;
+  justify-content: center;
+  min-height: 28px;
+  height: 28px;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 10px;
+  padding-right: 10px;
+  line-height: normal;
+  font-size: 12px;
 }
-.wp-core-ui .button.bl-button-has-icon .bl-button-has-icon__icon svg,
-.button.bl-button-has-icon .bl-button-has-icon__icon svg {
-  width: 18px;
-  height: 18px;
-  display: block;
+.bl-form .wp-core-ui .button.bl-button-small.-has-icon.-icon-only,
+.bl-form .button.bl-button-small.-has-icon.-icon-only {
+  width: 28px;
+  min-width: 28px;
+  height: 28px;
+  min-height: 28px;
+}
+.bl-form .wp-core-ui .button.bl-button-small.-has-icon.-icon-only::before,
+.bl-form .button.bl-button-small.-has-icon.-icon-only::before {
+  width: 16px;
+  height: 16px;
+}
+.bl-form input[type=text],
+.bl-form input[type=search],
+.bl-form input[type=email],
+.bl-form input[type=url],
+.bl-form input[type=number],
+.bl-form input[type=password],
+.bl-form input:not([type]),
+.bl-form select {
+  box-sizing: border-box;
+  height: 36px;
+  min-height: 36px;
+  max-height: 36px;
+}
+.bl-form select {
+  line-height: 1.5;
 }
 
 .bl-editorial-selected-pages {

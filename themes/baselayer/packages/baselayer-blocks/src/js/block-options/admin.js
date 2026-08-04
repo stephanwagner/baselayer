@@ -255,20 +255,11 @@ function boot() {
   }
 
   function makeBackButton(label, onClick) {
-    const btn = el('button', {
+    return el('button', {
       type: 'button',
-      className: 'button button-secondary bl-button-small bl-button-has-icon bl-bo-back',
+      className: 'button button-secondary bl-button -has-icon -icon-arrow-left bl-bo-back',
       onClick,
-    });
-    const icon =
-      typeof iconEl === 'function'
-        ? iconEl('arrow-left', 'bl-button-has-icon__icon')
-        : null;
-    if (icon?.innerHTML) {
-      btn.appendChild(icon);
-    }
-    btn.appendChild(document.createTextNode(label));
-    return btn;
+    }, [label]);
   }
 
   function openConfirmModal({ title, message, confirmLabel, onConfirm }) {
@@ -722,7 +713,7 @@ function boot() {
     toolbar.appendChild(
       el('button', {
         type: 'button',
-        className: 'button button-primary bl-button-small',
+        className: 'button button-primary bl-button',
         text: t('addPreset', 'Add preset'),
         onClick: () => {
           const preset = { slug: '', label: '', items: [] };
@@ -913,7 +904,7 @@ function boot() {
 
   function renderAddBlockBar(tab) {
     const choices = availableBlocksForTab(tab);
-    const bar = el('div', { className: 'bl-bo-add-block bl-has-small-inputs' });
+    const bar = el('div', { className: 'bl-bo-add-block bl-form' });
     const row = el('div', { className: 'bl-bo-add-block__row' });
     const select = el('select', {
       className: 'bl-bo-add-block__select',
@@ -941,7 +932,7 @@ function boot() {
     fields.appendChild(
       el('button', {
         type: 'button',
-        className: 'button button-primary bl-button-small',
+        className: 'button button-primary bl-button',
         text: addingBlock ? t('addingBlock', 'Adding…') : t('addBlock', 'Add block'),
         disabled: addingBlock || choices.length === 0 ? true : undefined,
         onClick: () => {

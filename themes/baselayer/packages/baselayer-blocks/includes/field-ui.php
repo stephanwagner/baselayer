@@ -612,7 +612,7 @@ function bl_blocks_render_admin_page_field(array $field, $value, string $input_n
 	echo '</div>';
 	echo '<div class="bl-blocks-fields__page-picker-actions">';
 	printf(
-		'<button type="button" class="button bl-button-small" data-bl-page-choose>%s</button>',
+		'<button type="button" class="button bl-button" data-bl-page-choose>%s</button>',
 		esc_html($choose_label)
 	);
 	printf(
@@ -779,7 +779,7 @@ function bl_blocks_render_admin_media_field(array $field, $value, string $input_
 	);
 	echo '<div class="bl-blocks-fields__media-actions">';
 	printf(
-		'<button type="button" class="button bl-button-small" data-bl-media-choose>%s</button>',
+		'<button type="button" class="button bl-button" data-bl-media-choose>%s</button>',
 		esc_html($choose_label)
 	);
 	printf(

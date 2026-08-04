@@ -57,7 +57,7 @@ function bl_blocks_render_template_metabox(WP_Post $post): void
 		echo '<p class="bl-blocks-template-metabox__label"><label for="' . esc_attr($path_id) . '">' . esc_html__('Template', 'baselayer-blocks') . '</label></p>';
 		echo '<p class="bl-blocks-template-metabox__path"><code id="' . esc_attr($path_id) . '">' . esc_html($info['display_path']) . '</code></p>';
 		echo '<p class="bl-blocks-template-metabox__actions">';
-		echo '<button type="button" class="button bl-button-small" data-bl-blocks-preview-starter>';
+		echo '<button type="button" class="button bl-button" data-bl-blocks-preview-starter>';
 		echo esc_html__('Preview starter template', 'baselayer-blocks');
 		echo '</button>';
 		echo '</p>';
@@ -70,18 +70,14 @@ function bl_blocks_render_template_metabox(WP_Post $post): void
 		echo '<div class="bl-blocks-template-metabox__path-row">';
 		echo '<code class="bl-blocks-template-metabox__path-code">' . esc_html($info['create_path']) . '</code>';
 		echo '<span id="' . esc_attr($path_id) . '" class="screen-reader-text">' . esc_html($filename) . '</span>';
-		echo '<button type="button" class="button bl-button-small -icon-only" data-bl-copy-from-source="' . esc_attr($path_id) . '" title="' . esc_attr__('Copy filename', 'baselayer-blocks') . '" aria-label="' . esc_attr__('Copy filename', 'baselayer-blocks') . '">';
-		echo '<span class="bl-icon -icon-copy" aria-hidden="true"></span>';
-		echo '</button>';
+		echo '<button type="button" class="button bl-button -has-icon -icon-only -icon-copy" data-bl-copy-from-source="' . esc_attr($path_id) . '" title="' . esc_attr__('Copy filename', 'baselayer-blocks') . '" aria-label="' . esc_attr__('Copy filename', 'baselayer-blocks') . '"></button>';
 		echo '</div>';
 
 		echo '<p class="bl-blocks-template-metabox__actions">';
-		echo '<button type="button" class="button button-primary bl-button-small" data-bl-blocks-generate-starter>';
+		echo '<button type="button" class="button button-primary bl-button" data-bl-blocks-generate-starter>';
 		echo esc_html__('Generate starter template', 'baselayer-blocks');
 		echo '</button>';
-		echo '<button type="button" class="button bl-button-small -icon-only" data-bl-blocks-preview-starter title="' . esc_attr__('Preview starter template', 'baselayer-blocks') . '" aria-label="' . esc_attr__('Preview starter template', 'baselayer-blocks') . '">';
-		echo '<span class="bl-icon -icon-preview" aria-hidden="true"></span>';
-		echo '</button>';
+		echo '<button type="button" class="button bl-button -has-icon -icon-only -icon-preview" data-bl-blocks-preview-starter title="' . esc_attr__('Preview starter template', 'baselayer-blocks') . '" aria-label="' . esc_attr__('Preview starter template', 'baselayer-blocks') . '"></button>';
 		echo '</p>';
 	}
 
@@ -554,7 +550,7 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 
 		'starterPreviewTitle'     => __('Starter template', 'baselayer-blocks'),
 		'starterCopyCode'         => __('Copy code', 'baselayer-blocks'),
-		'starterDownloadFile'     => __('Download file', 'baselayer-blocks'),
+		'starterDownload'         => __('Download', 'baselayer-blocks'),
 		'starterCopied'           => __('Copied', 'baselayer-blocks'),
 		'starterClose'            => __('Close', 'baselayer-blocks'),
 		'starterGenerating'       => __('Generating…', 'baselayer-blocks'),

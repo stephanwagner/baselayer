@@ -85,7 +85,7 @@ export function createPagePickerControl(field, current) {
   const summary = el('div', { className: 'bl-blocks-fields__page-picker-summary' });
   const pickBtn = el('button', {
     type: 'button',
-    className: 'button bl-button-small',
+    className: 'button bl-button',
     text: i18n('choosePage', 'Choose page'),
   });
   const clearBtn = el('button', {

@@ -380,37 +380,6 @@
     height: auto;
     padding: 20px 24px;
   }
-
-  .button.-has-icon {
-    position: relative;
-    text-align: left;
-
-    &::before {
-      @include bl-icon;
-      content: '';
-      height: 24px;
-      line-height: 0;
-      position: absolute;
-      top: 7px;
-      width: 24px;
-    }
-  }
-
-  .button.-has-icon:not(.-icon-right) {
-    padding-left: 42px;
-
-    &::before {
-      left: 12px;
-    }
-  }
-
-  .button.-has-icon.-icon-right {
-    padding-right: 42px;
-
-    &::before {
-      right: 12px;
-    }
-  }
 }
 
 .helpers-icons-demo__preview {

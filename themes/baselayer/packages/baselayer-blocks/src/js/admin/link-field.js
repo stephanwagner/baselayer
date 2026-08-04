@@ -167,7 +167,7 @@ export function createLinkControl(field, current) {
       const summary = el('div', { className: 'bl-blocks-fields__page-picker-summary' });
       const pickBtn = el('button', {
         type: 'button',
-        className: 'button bl-button-small',
+        className: 'button bl-button',
         text: pageMeta
           ? i18n('changePage', 'Change page')
           : i18n('choosePage', 'Choose page'),
@@ -289,7 +289,7 @@ export function createLinkControl(field, current) {
       const btn = el('button', {
         type: 'button',
         className:
-          'button bl-button-tiny bl-blocks-fields__link-type' +
+          'button bl-button-small bl-blocks-fields__link-type' +
           (state.type === type ? ' is-active' : ''),
         text: labels[type] || type,
         dataset: { linkType: type },
