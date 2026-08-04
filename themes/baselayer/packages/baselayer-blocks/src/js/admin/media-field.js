@@ -151,14 +151,17 @@ function buildMediaCard(item, kind, onRemove) {
     })
   );
 
-  const removeBtn = el('button', {
-    type: 'button',
-    className: 'button-link bl-blocks-fields__media-remove',
-    text: '×',
-    title: i18n('removeMedia', 'Remove'),
-    'aria-label': i18n('removeMedia', 'Remove'),
-    dataset: { blMediaRemove: String(item.id) },
-  });
+  const removeBtn = el(
+    'button',
+    {
+      type: 'button',
+      className: 'button-link bl-blocks-fields__card-remove',
+      title: i18n('removeMedia', 'Remove'),
+      'aria-label': i18n('removeMedia', 'Remove'),
+      dataset: { blMediaRemove: String(item.id) },
+    },
+    [el('span', { className: 'bl-icon -icon-close', 'aria-hidden': 'true' })]
+  );
   removeBtn.addEventListener('click', (evt) => {
     evt.preventDefault();
     evt.stopPropagation();
@@ -182,7 +185,7 @@ function bindMediaSortable(preview, api) {
   return createSortable(preview, {
     animation: 150,
     draggable: '.bl-blocks-fields__media-card',
-    filter: '.bl-blocks-fields__media-remove',
+    filter: '.bl-blocks-fields__card-remove',
     preventOnFilter: true,
     ghostClass: 'is-dragging-ghost',
     chosenClass: 'is-dragging-chosen',

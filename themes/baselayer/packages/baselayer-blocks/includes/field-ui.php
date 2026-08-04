@@ -805,7 +805,7 @@ function bl_blocks_render_admin_media_field(array $field, $value, string $input_
 			esc_html((string) ($meta['filename'] ?? ''))
 		);
 		printf(
-			'<button type="button" class="button-link bl-blocks-fields__media-remove" data-bl-media-remove="%s" title="%s" aria-label="%s">×</button>',
+			'<button type="button" class="button-link bl-blocks-fields__card-remove" data-bl-media-remove="%s" title="%s" aria-label="%s"><span class="bl-icon -icon-close" aria-hidden="true"></span></button>',
 			esc_attr((string) $aid),
 			esc_attr__('Remove', 'baselayer-blocks'),
 			esc_attr__('Remove', 'baselayer-blocks')
@@ -1041,6 +1041,12 @@ function bl_blocks_enqueue_field_ui_assets(): void
 	wp_enqueue_media();
 	bl_blocks_enqueue_style('bl-blocks-admin', 'blocks-admin');
 	bl_blocks_enqueue_script('bl-blocks-admin', 'blocks-admin', [], true);
+	if (function_exists('bl_enqueue_theme_icons_style')) {
+		if (function_exists('bl_load_icons_textdomain')) {
+			bl_load_icons_textdomain();
+		}
+		bl_enqueue_theme_icons_style(['bl-blocks-admin']);
+	}
 
 	wp_localize_script('bl-blocks-admin', 'blBlocksFieldUi', [
 		'pagesRestUrl' => esc_url_raw(rest_url('wp/v2/pages')),

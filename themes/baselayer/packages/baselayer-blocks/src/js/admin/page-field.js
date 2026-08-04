@@ -98,13 +98,16 @@ export function buildPageCard(page, onRemove) {
       })
     );
   }
-  const removeBtn = el('button', {
-    type: 'button',
-    className: 'button-link bl-blocks-fields__page-remove',
-    text: '×',
-    title: i18n('clearPage', 'Clear'),
-    'aria-label': i18n('clearPage', 'Clear'),
-  });
+  const removeBtn = el(
+    'button',
+    {
+      type: 'button',
+      className: 'button-link bl-blocks-fields__card-remove',
+      title: i18n('clearPage', 'Clear'),
+      'aria-label': i18n('clearPage', 'Clear'),
+    },
+    [el('span', { className: 'bl-icon -icon-close', 'aria-hidden': 'true' })]
+  );
   removeBtn.addEventListener('click', (evt) => {
     evt.preventDefault();
     evt.stopPropagation();
@@ -192,6 +195,10 @@ export function createPagePickerControl(field, current) {
     el('div', { className: 'bl-blocks-fields__page-picker-row' }, [summary, actions])
   );
 
+  const dispatchChange = () => {
+    control.dispatchEvent(new Event('change', { bubbles: true }));
+  };
+
   const syncUi = () => {
     summary.replaceChildren();
     if (selected.length === 0) {
@@ -208,6 +215,7 @@ export function createPagePickerControl(field, current) {
         buildPagePreview(selected, multiple, (id) => {
           selected = selected.filter((page) => page.id !== id);
           syncUi();
+          dispatchChange();
         })
       );
     }
@@ -307,11 +315,13 @@ export function createPagePickerControl(field, current) {
       ].filter((p) => p.id > 0);
     }
     syncUi();
+    dispatchChange();
   });
 
   clearBtn.addEventListener('click', () => {
     selected = [];
     syncUi();
+    dispatchChange();
   });
 
   control.getPageValue = () => {

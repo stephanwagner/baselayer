@@ -133,6 +133,10 @@ export function createLinkControl(field, current) {
     dataset: { blBlocksLinkField: '1' },
   });
 
+  const dispatchChange = () => {
+    root.dispatchEvent(new Event('change', { bubbles: true }));
+  };
+
   const typeRow = el('div', { className: 'bl-blocks-fields__link-types' });
   const destLabel = el('label', { text: destinationFieldLabel(state.type) });
   const destWrap = el('div', { className: 'bl-blocks-fields__link-destination' });
@@ -186,6 +190,7 @@ export function createLinkControl(field, current) {
             state.page_id = 0;
             state.url = '';
             renderDestination();
+            dispatchChange();
           })
         );
       } else {
@@ -226,12 +231,14 @@ export function createLinkControl(field, current) {
           state.title = pageMeta.title;
         }
         renderDestination();
+        dispatchChange();
       });
       clearBtn.addEventListener('click', () => {
         pageMeta = null;
         state.page_id = 0;
         state.url = '';
         renderDestination();
+        dispatchChange();
       });
       destWrap.appendChild(
         el('div', { className: 'bl-blocks-fields__page-picker-row' }, [

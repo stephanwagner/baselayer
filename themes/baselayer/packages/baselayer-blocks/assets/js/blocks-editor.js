@@ -1471,13 +1471,16 @@
         })
       );
     }
-    const removeBtn = el("button", {
-      type: "button",
-      className: "button-link bl-blocks-fields__page-remove",
-      text: "\xD7",
-      title: i18n("clearPage", "Clear"),
-      "aria-label": i18n("clearPage", "Clear")
-    });
+    const removeBtn = el(
+      "button",
+      {
+        type: "button",
+        className: "button-link bl-blocks-fields__card-remove",
+        title: i18n("clearPage", "Clear"),
+        "aria-label": i18n("clearPage", "Clear")
+      },
+      [el("span", { className: "bl-icon -icon-close", "aria-hidden": "true" })]
+    );
     removeBtn.addEventListener("click", (evt) => {
       evt.preventDefault();
       evt.stopPropagation();
@@ -1538,6 +1541,9 @@
     control.append(
       el("div", { className: "bl-blocks-fields__page-picker-row" }, [summary, actions])
     );
+    const dispatchChange = () => {
+      control.dispatchEvent(new Event("change", { bubbles: true }));
+    };
     const syncUi = () => {
       summary.replaceChildren();
       if (selected.length === 0) {
@@ -1552,6 +1558,7 @@
           buildPagePreview(selected, multiple, (id) => {
             selected = selected.filter((page) => page.id !== id);
             syncUi();
+            dispatchChange();
           })
         );
       }
@@ -1633,10 +1640,12 @@
         ].filter((p) => p.id > 0);
       }
       syncUi();
+      dispatchChange();
     });
     clearBtn.addEventListener("click", () => {
       selected = [];
       syncUi();
+      dispatchChange();
     });
     control.getPageValue = () => {
       const ids = selected.map((p) => p.id).filter((id) => id > 0);
@@ -1854,6 +1863,9 @@
       className: "bl-blocks-fields__link",
       dataset: { blBlocksLinkField: "1" }
     });
+    const dispatchChange = () => {
+      root.dispatchEvent(new Event("change", { bubbles: true }));
+    };
     const typeRow = el2("div", { className: "bl-blocks-fields__link-types" });
     const destLabel = el2("label", { text: destinationFieldLabel(state.type) });
     const destWrap = el2("div", { className: "bl-blocks-fields__link-destination" });
@@ -1903,6 +1915,7 @@
               state.page_id = 0;
               state.url = "";
               renderDestination();
+              dispatchChange();
             })
           );
         } else {
@@ -1943,12 +1956,14 @@
             state.title = pageMeta.title;
           }
           renderDestination();
+          dispatchChange();
         });
         clearBtn.addEventListener("click", () => {
           pageMeta = null;
           state.page_id = 0;
           state.url = "";
           renderDestination();
+          dispatchChange();
         });
         destWrap.appendChild(
           el2("div", { className: "bl-blocks-fields__page-picker-row" }, [
@@ -4465,14 +4480,17 @@
         title: item.filename
       })
     );
-    const removeBtn = el3("button", {
-      type: "button",
-      className: "button-link bl-blocks-fields__media-remove",
-      text: "\xD7",
-      title: i18n3("removeMedia", "Remove"),
-      "aria-label": i18n3("removeMedia", "Remove"),
-      dataset: { blMediaRemove: String(item.id) }
-    });
+    const removeBtn = el3(
+      "button",
+      {
+        type: "button",
+        className: "button-link bl-blocks-fields__card-remove",
+        title: i18n3("removeMedia", "Remove"),
+        "aria-label": i18n3("removeMedia", "Remove"),
+        dataset: { blMediaRemove: String(item.id) }
+      },
+      [el3("span", { className: "bl-icon -icon-close", "aria-hidden": "true" })]
+    );
     removeBtn.addEventListener("click", (evt) => {
       evt.preventDefault();
       evt.stopPropagation();
@@ -4487,7 +4505,7 @@
     return createSortable(preview, {
       animation: 150,
       draggable: ".bl-blocks-fields__media-card",
-      filter: ".bl-blocks-fields__media-remove",
+      filter: ".bl-blocks-fields__card-remove",
       preventOnFilter: true,
       ghostClass: "is-dragging-ghost",
       chosenClass: "is-dragging-chosen",
