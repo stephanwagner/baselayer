@@ -63,6 +63,8 @@ function bl_forms_register_post_types(): void
 		'public'              => false,
 		'show_ui'             => true,
 		'show_in_menu'        => 'edit.php?post_type=' . BL_FORM_POST_TYPE,
+		// Entries are submissions only — never offer “Add New” in the admin bar.
+		'show_in_admin_bar'   => false,
 		'show_in_rest'        => false,
 		'capability_type'     => 'post',
 		'map_meta_cap'        => true,

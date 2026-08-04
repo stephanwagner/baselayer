@@ -740,6 +740,31 @@ body.post-new-php.post-type-bl_block .page-title-action {
   gap: 6px;
 }
 
+.bl-blocks-align-supports {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.bl-blocks-align-supports__sep {
+  display: inline-block;
+  width: 1px;
+  height: 22px;
+  margin: 0 2px;
+  background: #c3c4c7;
+  flex: 0 0 auto;
+}
+
+.bl-blocks-align-supports__btn.is-active,
+.bl-blocks-align-supports__btn.is-active:hover,
+.bl-blocks-align-supports__btn.is-active:focus {
+  background: #1d2327;
+  border-color: #1d2327;
+  color: #fff;
+  box-shadow: none;
+}
+
 .bl-blocks-fields__link-type-block,
 .bl-blocks-fields__link-dest {
   margin: 0;

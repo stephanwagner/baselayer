@@ -360,20 +360,86 @@ export function createSettingsPanel(initial, definitionType, onChange) {
     el('p', { className: 'description', text: parentHelp }),
   ]);
 
-  const alignInput = el('input', {
-    type: 'text',
-    className: 'widefat',
-    value: state.align || '',
-    placeholder: 'wide, full',
-  });
-  alignInput.addEventListener('input', () => {
-    state.align = alignInput.value;
+  const ALIGN_SUPPORT_OPTIONS = [
+    { value: 'wide', labelKey: 'settingsAlignWide', fallback: 'Wide (alignwide)' },
+    { value: 'full', labelKey: 'settingsAlignFull', fallback: 'Full (alignfull)' },
+    { value: 'left', labelKey: 'settingsAlignLeft', fallback: 'Left' },
+    { value: 'center', labelKey: 'settingsAlignCenter', fallback: 'Center' },
+    { value: 'right', labelKey: 'settingsAlignRight', fallback: 'Right' },
+  ];
+
+  const parseAlignSupports = (raw) => {
+    const allowed = new Set(ALIGN_SUPPORT_OPTIONS.map((o) => o.value));
+    return String(raw || '')
+      .split(/[\s,]+/)
+      .map((p) => p.trim().toLowerCase())
+      .filter((p) => p !== '' && allowed.has(p));
+  };
+
+  let selectedAlign = parseAlignSupports(state.align);
+
+  const syncAlignState = () => {
+    state.align = selectedAlign.join(', ');
     notify();
+  };
+
+  const syncAlignButtons = () => {
+    alignGroup.querySelectorAll('button[data-value]').forEach((node) => {
+      const on = selectedAlign.includes(node.dataset.value);
+      node.classList.toggle('is-active', on);
+      node.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  };
+
+  const alignGroup = el('div', {
+    className: 'bl-blocks-align-supports',
+    role: 'group',
+    'aria-label': t('settingsAlign', 'Alignment supports'),
   });
+
+  const appendAlignBtn = (opt) => {
+    const label = t(opt.labelKey, opt.fallback);
+    const btn = el('button', {
+      type: 'button',
+      className:
+        'button bl-button-small bl-blocks-align-supports__btn' +
+        (selectedAlign.includes(opt.value) ? ' is-active' : ''),
+      text: label,
+      dataset: { value: opt.value },
+      'aria-pressed': selectedAlign.includes(opt.value) ? 'true' : 'false',
+      onClick: () => {
+        if (selectedAlign.includes(opt.value)) {
+          selectedAlign = selectedAlign.filter((v) => v !== opt.value);
+        } else {
+          selectedAlign = [...selectedAlign, opt.value];
+        }
+        // Keep a stable option order in storage.
+        const order = ALIGN_SUPPORT_OPTIONS.map((o) => o.value);
+        selectedAlign = order.filter((v) => selectedAlign.includes(v));
+        syncAlignButtons();
+        syncAlignState();
+      },
+    });
+    alignGroup.appendChild(btn);
+  };
+
+  // Wide / full first, then left / center / right — separator between groups.
+  ALIGN_SUPPORT_OPTIONS.slice(0, 2).forEach(appendAlignBtn);
+  alignGroup.appendChild(
+    el('span', {
+      className: 'bl-blocks-align-supports__sep',
+      'aria-hidden': 'true',
+    })
+  );
+  ALIGN_SUPPORT_OPTIONS.slice(2).forEach(appendAlignBtn);
+
   const alignRow = fieldRow(
     t('settingsAlign', 'Alignment supports'),
-    alignInput,
-    t('settingsAlignHelp', 'Comma-separated: wide, full (and optionally left, center, right). Leave empty for none.')
+    alignGroup,
+    t(
+      'settingsAlignHelp',
+      'Select which alignments this block offers in the editor. Leave none selected for no alignment options.'
+    )
   );
 
   const slugInput = el('input', {

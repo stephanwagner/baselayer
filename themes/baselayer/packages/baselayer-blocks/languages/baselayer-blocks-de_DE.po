@@ -406,11 +406,31 @@ msgstr "Unterstützte Ausrichtungen"
 
 #: includes/admin-editor.php:322
 msgid ""
-"Comma-separated: wide, full (and optionally left, center, right). Leave "
-"empty for none."
+"Select which alignments this block offers in the editor. Leave none "
+"selected for no alignment options."
 msgstr ""
-"Kommagetrennt: wide, full (optional auch left, center, right). Leer lassen "
-"für keine."
+"Wähle, welche Ausrichtungen dieser Block im Editor anbietet. Keine Auswahl "
+"bedeutet keine Ausrichtungsoptionen."
+
+#: includes/admin-editor.php:339
+msgid "Left"
+msgstr "Links"
+
+#: includes/admin-editor.php:340
+msgid "Center"
+msgstr "Zentriert"
+
+#: includes/admin-editor.php:341
+msgid "Right"
+msgstr "Rechts"
+
+#: includes/admin-editor.php:342
+msgid "Wide (alignwide)"
+msgstr "Breit (alignwide)"
+
+#: includes/admin-editor.php:343
+msgid "Full (alignfull)"
+msgstr "Vollbreit (alignfull)"
 
 #: includes/admin-editor.php:323 includes/admin-editor.php:504
 #: includes/block-options/admin.php:326
