@@ -13,7 +13,7 @@
   padding-top: 0;
   padding-bottom: 0;
   line-height: normal;
-  border-radius: var(--bl-admin-button-radius);
+  border-radius: var(--bl-form-radius);
 }
 
 .wp-core-ui .button.bl-button-small,
@@ -30,6 +30,7 @@
   padding-right: 10px;
   line-height: normal;
   font-size: 12px;
+  border-radius: var(--bl-form-radius);
 }
 
 .wp-core-ui .button.-has-icon,
@@ -134,7 +135,7 @@
   padding-top: 0;
   padding-bottom: 0;
   line-height: normal;
-  border-radius: var(--bl-admin-button-radius);
+  border-radius: var(--bl-form-radius);
 }
 .bl-admin-form .wp-core-ui .button.-has-icon.-icon-only,
 .bl-admin-form .button.-has-icon.-icon-only {
@@ -163,6 +164,7 @@
   padding-right: 10px;
   line-height: normal;
   font-size: 12px;
+  border-radius: var(--bl-form-radius);
 }
 .bl-admin-form .wp-core-ui .button.bl-button-small.-has-icon.-icon-only,
 .bl-admin-form .button.bl-button-small.-has-icon.-icon-only {

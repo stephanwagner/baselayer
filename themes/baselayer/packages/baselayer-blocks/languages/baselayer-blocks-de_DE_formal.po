@@ -357,8 +357,12 @@ msgid "Allow editing directly in sidebar"
 msgstr "Bearbeitung direkt in der Seitenleiste erlauben"
 
 #: includes/admin-editor.php:314
-msgid "Allow nested blocks (InnerBlocks)"
-msgstr "Verschachtelte Blöcke erlauben (InnerBlocks)"
+msgid "Allow nested blocks"
+msgstr "Verschachtelte Blöcke erlauben"
+
+#: includes/admin-editor.php:330
+msgid "InnerBlocks"
+msgstr "InnerBlocks"
 
 #: includes/admin-editor.php:315
 msgid "Allowed nested blocks"

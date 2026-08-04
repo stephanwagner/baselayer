@@ -284,7 +284,7 @@ export function createSettingsPanel(initial, definitionType, onChange) {
   );
 
   const { root: innerBlocksRow } = plainSwitch(
-    t('settingsSupportsInnerBlocks', 'Allow nested blocks (InnerBlocks)'),
+    t('settingsSupportsInnerBlocks', 'Allow nested blocks'),
     {
       checked: !!state.supports_inner_blocks,
       onChange: (checked) => {
@@ -351,14 +351,14 @@ export function createSettingsPanel(initial, definitionType, onChange) {
     state.parent = parentInput.value;
     notify();
   });
-  const parentRow = fieldRow(
-    t('settingsParent', 'Parent blocks'),
-    parentInput,
-    t(
-      'settingsParentHelp',
-      'Comma-separated block names this block may be inserted into (e.g. baselayer/slider). Leave empty for top-level.'
-    )
+  const parentHelp = t(
+    'settingsParentHelp',
+    'Comma-separated block names this block may be inserted into (e.g. baselayer/slider). Leave empty for top-level.'
   );
+  const parentRow = el('div', { className: 'bl-forms-builder__setting' }, [
+    el('p', {}, [parentInput]),
+    el('p', { className: 'description', text: parentHelp }),
+  ]);
 
   const alignInput = el('input', {
     type: 'text',
@@ -441,14 +441,6 @@ export function createSettingsPanel(initial, definitionType, onChange) {
     children.push(sidebarEditingRow);
   }
 
-  if (definitionType === 'block') {
-    children.push(innerBlocksRow);
-    children.push(innerBlocksAllowedRow);
-    children.push(innerBlocksTemplateRow);
-    children.push(parentRow);
-    children.push(alignRow);
-  }
-
   children.push(
     fieldRow(t('settingsSlug', 'Slug'), slugInput, t('settingsSlugHelp', '')),
     fieldRow(t('settingsDescription', 'Description'), descInput)
@@ -508,7 +500,20 @@ export function createSettingsPanel(initial, definitionType, onChange) {
     children.push(
       fieldRow(t('blockIcon', 'Block icon'), iconField),
       fieldRow(t('blockCategory', 'Block category'), categorySelect),
-      fieldRow(t('blockKeywords', 'Keywords'), keywordsInput, t('blockKeywordsHelp', ''))
+      fieldRow(t('blockKeywords', 'Keywords'), keywordsInput, t('blockKeywordsHelp', '')),
+      alignRow,
+      el('h3', {
+        className: 'bl-forms-builder__section-title',
+        text: t('settingsInnerBlocksSection', 'InnerBlocks'),
+      }),
+      innerBlocksRow,
+      innerBlocksAllowedRow,
+      innerBlocksTemplateRow,
+      el('h3', {
+        className: 'bl-forms-builder__section-title',
+        text: t('settingsParent', 'Parent blocks'),
+      }),
+      parentRow
     );
   }
 
