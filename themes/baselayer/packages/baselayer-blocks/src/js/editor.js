@@ -8,6 +8,7 @@ import {
   saveUiStateToStorage,
   pageRepeaterUiStorageKey,
 } from './admin/field-form.js';
+import { parseJsxPreview } from './admin/parse-jsx-preview.js';
 import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-control.js';
 
 (function (wp) {
@@ -162,14 +163,59 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
     );
   }
 
+  function defaultInnerBlocksProps(def) {
+    const props = {};
+    const allowed = Array.isArray(def && def.innerBlocksAllowed)
+      ? def.innerBlocksAllowed.filter((name) => typeof name === 'string' && name)
+      : [];
+    if (allowed.length) {
+      props.allowedBlocks = allowed;
+    }
+    const template = def && def.innerBlocksTemplate;
+    if (Array.isArray(template) && template.length) {
+      props.template = template;
+    }
+    return props;
+  }
+
   /**
-   * Preview via package REST (name + values only). Avoids core /block-renderer
-   * attribute schema validation against theme-injected attrs (hideBlock, style, …).
+   * PHP template preview (source of truth). InnerBlocks tags become live holes;
+   * icon hosts can be hydrated with InlineIconControl.
    */
-  function BlockServerPreview({ name, values }) {
+  function BlockPhpPreview({
+    name,
+    values,
+    def,
+    slug,
+    isSelected,
+    clientId,
+    onChangeValues,
+  }) {
     const [response, setResponse] = useState({ status: 'idle' });
     const shouldDebounceRef = useRef(false);
     const valuesKey = JSON.stringify(values || {});
+    const supportsInner = !!(def && def.supportsInnerBlocks);
+    const needsJsx = supportsInner || slug === 'icon' || slug === 'icon-text';
+
+    const hasChildSelected = useSelect
+      ? useSelect(
+          (select) => {
+            if (!clientId || !supportsInner) {
+              return false;
+            }
+            const blockEditor = select('core/block-editor');
+            return !!(
+              blockEditor &&
+              typeof blockEditor.hasSelectedInnerBlock === 'function' &&
+              blockEditor.hasSelectedInnerBlock(clientId, true)
+            );
+          },
+          [clientId, supportsInner]
+        )
+      : false;
+
+    const accordionEditorOpen =
+      slug === 'accordion' && (!!isSelected || !!hasChildSelected || !!values.accordion_is_open);
 
     useEffect(() => {
       if (!apiFetch || !name) {
@@ -180,7 +226,13 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
       let cancelled = false;
 
       const run = () => {
-        setResponse({ status: 'loading' });
+        // Keep the last successful preview mounted while refetching after edits.
+        setResponse((prev) => {
+          if (prev.status === 'success' && typeof prev.content === 'string') {
+            return { ...prev, refreshing: true };
+          }
+          return { status: 'loading' };
+        });
         apiFetch({
           path: renderPath,
           method: 'POST',
@@ -198,9 +250,14 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
             if (cancelled || (error && error.name === 'AbortError')) {
               return;
             }
-            setResponse({
-              status: 'error',
-              error: (error && error.message) || String(error),
+            setResponse((prev) => {
+              if (prev.status === 'success' && typeof prev.content === 'string') {
+                return { ...prev, refreshing: false };
+              }
+              return {
+                status: 'error',
+                error: (error && error.message) || String(error),
+              };
             });
           })
           .finally(() => {
@@ -229,7 +286,10 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
       };
     }, [name, valuesKey]);
 
-    if (response.status === 'loading' || response.status === 'idle') {
+    if (
+      (response.status === 'loading' || response.status === 'idle') &&
+      typeof response.content !== 'string'
+    ) {
       return el(PreviewLoading, null);
     }
 
@@ -246,249 +306,52 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
       });
     }
 
-    return el(RawHTML, null, response.content);
-  }
-
-  function innerBlocksProps(def) {
-    const props = {
-      renderAppender: InnerBlocks.ButtonBlockAppender,
-    };
-    const allowed = Array.isArray(def && def.innerBlocksAllowed)
-      ? def.innerBlocksAllowed.filter((name) => typeof name === 'string' && name)
-      : [];
-    if (allowed.length) {
-      props.allowedBlocks = allowed;
+    if (!needsJsx) {
+      return el(RawHTML, null, response.content);
     }
-    const template = def && def.innerBlocksTemplate;
-    if (Array.isArray(template) && template.length) {
-      props.template = template;
-    }
-    return props;
-  }
 
-  function AccordionInnerEdit({ values, blockProps, def, isSelected, clientId }) {
-    const title = typeof values.title === 'string' ? values.title : '';
-    const isOpenByDefault = !!values.accordion_is_open;
-    const hasChildSelected = useSelect
-      ? useSelect(
-          (select) => {
-            if (!clientId) {
-              return false;
-            }
-            const blockEditor = select('core/block-editor');
-            return !!(
-              blockEditor &&
-              typeof blockEditor.hasSelectedInnerBlock === 'function' &&
-              blockEditor.hasSelectedInnerBlock(clientId, true)
-            );
-          },
-          [clientId]
-        )
-      : false;
-    // Match ACF: show content while this accordion or a nested block is focused.
-    const editorOpen = isOpenByDefault || !!isSelected || !!hasChildSelected;
-    const className = [
-      'bl-wp-block',
-      'accordion__wrapper',
-      editorOpen ? 'accordion-open' : '',
-      blockProps.className || '',
-    ]
-      .filter(Boolean)
-      .join(' ');
-
-    return el(
-      'div',
-      {
-        ...blockProps,
-        className,
-        'data-accordion-is-open': editorOpen ? 'true' : 'false',
-      },
-      el(
-        'div',
-        { className: 'accordion__container' },
-        el(
-          'div',
-          {
-            className: 'accordion__header noselect',
-            role: 'button',
-            tabIndex: 0,
-            'aria-expanded': editorOpen ? 'true' : 'false',
-          },
-          el('div', { className: 'accordion__title' }, title),
-          el(
-            'div',
-            { className: 'accordion__icon', 'aria-hidden': 'true' },
-            el(
-              'svg',
-              {
-                xmlns: 'http://www.w3.org/2000/svg',
-                height: '24px',
-                viewBox: '0 -960 960 960',
-                width: '24px',
-                fill: 'currentColor',
-              },
-              el('path', {
-                d: 'M466.54-375.23q-6.23-2.31-11.85-7.92L274.92-562.92q-8.3-8.31-8.5-20.89-.19-12.57 8.5-21.27 8.7-8.69 21.08-8.69 12.38 0 21.08 8.69L480-442.15l162.92-162.93q8.31-8.3 20.89-8.5 12.57-.19 21.27 8.5 8.69 8.7 8.69 21.08 0 12.38-8.69 21.08L505.31-383.15q-5.62 5.61-11.85 7.92-6.23 2.31-13.46 2.31t-13.46-2.31Z',
-              })
-            )
-          )
-        ),
-        el(
-          'div',
-          { className: 'accordion__content' },
-          el(
-            'div',
-            { className: 'accordion__content-inner' },
-            InnerBlocks ? el(InnerBlocks, innerBlocksProps(def)) : null
-          )
-        )
-      )
-    );
-  }
-
-  function IconInnerEdit({ values, blockProps, isSelected, onChangeValues }) {
     const iconSlug = typeof values.icon === 'string' ? values.icon : '';
-    return el(
-      'div',
-      {
-        ...blockProps,
-        className: [blockProps.className || '', 'bl-wp-block', 'icon__wrapper'].filter(Boolean).join(' '),
-      },
-      el(
-        'div',
-        { className: 'icon__container' },
-        el(
-          'div',
-          { className: 'icon__icon' + (iconSlug ? ' -has-icon' : '') },
-          el(InlineIconControl, {
+    const iconControl =
+      (slug === 'icon' || slug === 'icon-text') && typeof onChangeValues === 'function'
+        ? {
+            type: InlineIconControl,
             value: iconSlug,
-            isActive: isSelected,
-            onChange: (next) => onChangeValues({ ...values, icon: next || '' }),
-          })
-        )
-      )
-    );
-  }
-
-  function IconTextInnerEdit({ values, blockProps, def, isSelected, onChangeValues }) {
-    const iconSlug = typeof values.icon === 'string' ? values.icon : '';
-    return el(
-      'div',
-      {
-        ...blockProps,
-        className: [blockProps.className || '', 'bl-wp-block', 'icon-text__wrapper'].filter(Boolean).join(' '),
-      },
-      el(
-        'div',
-        { className: 'icon-text__container' },
-        el(
-          'div',
-          { className: 'icon-text__content' },
-          el(
-            'div',
-            { className: 'icon-text__icon icon__icon' + (iconSlug ? ' -has-icon' : '') },
-            el(InlineIconControl, {
+            props: {
               value: iconSlug,
-              isActive: isSelected,
+              isActive: !!isSelected,
               onChange: (next) => onChangeValues({ ...values, icon: next || '' }),
-            })
-          ),
-          el(
-            'div',
-            { className: 'icon-text__text-container' },
-            el(
-              'div',
-              { className: 'icon-text__text' },
-              InnerBlocks ? el(InnerBlocks, innerBlocksProps(def)) : null
-            )
-          )
-        )
-      )
-    );
-  }
+            },
+          }
+        : null;
 
-  function SliderInnerEdit({ values, blockProps, def }) {
-    const perView = values.slides_per_view || 1;
-    const hasContent = !!values.has_content;
-    return el(
-      'div',
-      {
-        ...blockProps,
-        className: [blockProps.className || '', 'bl-wp-block', 'slider__wrapper'].filter(Boolean).join(' '),
-        'data-slider-slides-per-view': String(perView),
-        'data-slider-has-content': hasContent ? 'true' : 'false',
-        style: {
-          ...(blockProps.style || {}),
-          '--slider-editor-slide-gap': (values.space_between != null ? values.space_between : 16) + 'px',
-        },
-      },
-      el(
-        'div',
-        { className: 'slider__container' },
-        el(
-          'div',
-          { className: 'slider__slides' },
-          el(
-            'div',
-            { className: 'swiper' },
-            InnerBlocks ? el(InnerBlocks, innerBlocksProps(def)) : null
-          )
-        )
-      )
-    );
-  }
-
-  function SliderSlideInnerEdit({ blockProps, def }) {
-    return el(
-      'div',
-      {
-        ...blockProps,
-        className: [blockProps.className || '', 'bl-wp-block', 'slider-slide__wrapper', 'swiper-slide'].filter(Boolean).join(' '),
-      },
-      el(
-        'div',
-        { className: 'slider-slide__container' },
-        el(
-          'div',
-          { className: 'slider-slide__content' },
-          InnerBlocks ? el(InnerBlocks, innerBlocksProps(def)) : null
-        )
-      )
-    );
-  }
-
-  function ClientBlockShell({ values, blockProps, slug, def, isSelected, clientId, onChangeValues }) {
-    if (slug === 'accordion') {
-      return el(AccordionInnerEdit, { values, blockProps, def, isSelected, clientId });
-    }
-    if (slug === 'icon') {
-      return el(IconInnerEdit, { values, blockProps, isSelected, onChangeValues });
-    }
-    if (slug === 'icon-text') {
-      return el(IconTextInnerEdit, { values, blockProps, def, isSelected, onChangeValues });
-    }
-    if (slug === 'slider') {
-      return el(SliderInnerEdit, { values, blockProps, def });
-    }
-    if (slug === 'slider-slide') {
-      return el(SliderSlideInnerEdit, { blockProps, def });
+    let tree = null;
+    try {
+      tree = parseJsxPreview(response.content, {
+        createElement: el,
+        Fragment,
+        InnerBlocks: supportsInner ? InnerBlocks : null,
+        defaultInnerBlocksProps: defaultInnerBlocksProps(def),
+        iconControl,
+        accordionEditorOpen: slug === 'accordion' ? accordionEditorOpen : false,
+      });
+    } catch (err) {
+      if (typeof console !== 'undefined' && console.warn) {
+        console.warn('Baselayer Blocks: failed to parse PHP preview as JSX', err);
+      }
+      tree = null;
     }
 
-    return el(
-      'div',
-      { ...blockProps, className: (blockProps.className || '') + ' bl-blocks-block-editor bl-blocks-block-editor--inner' },
-      el('div', { className: 'bl-blocks-block-editor__inner-fields' },
-        el('strong', null, values.title || '')
-      ),
-      InnerBlocks ? el(InnerBlocks, innerBlocksProps(def)) : null
-    );
+    if (tree == null) {
+      return el(RawHTML, null, response.content);
+    }
+
+    return tree;
   }
 
   (blockConfig.blocks || []).forEach((def) => {
     if (!def || !def.name) return;
 
     const supportsInnerBlocks = !!def.supportsInnerBlocks;
-    const usesClientShell = supportsInnerBlocks || def.slug === 'icon';
 
     registerBlockType(def.name, {
       apiVersion: 3,
@@ -550,34 +413,35 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
         const isIconShell = slug === 'icon' || slug === 'icon-text';
         const applyCanvasValues = (next) => {
           applyValues(next);
-          // Remount sidebar field form so the icon card matches canvas picks.
           if (isIconShell && sidebarEditing) {
             setSidebarMountId((id) => id + 1);
           }
         };
 
-        const preview = usesClientShell
-          ? el(ClientBlockShell, {
-              values,
+        const preview = apiFetch
+          ? el(
+              'div',
               blockProps,
-              slug,
-              def,
-              isSelected,
-              clientId,
-              onChangeValues: isIconShell ? applyCanvasValues : applyValues,
-            })
-          : apiFetch
-            ? el('div', blockProps, el(BlockServerPreview, { name: def.name, values }))
-            : el(
+              el(BlockPhpPreview, {
+                name: def.name,
+                values,
+                def,
+                slug,
+                isSelected,
+                clientId,
+                onChangeValues: isIconShell ? applyCanvasValues : null,
+              })
+            )
+          : el(
+              'div',
+              blockProps,
+              el(
                 'div',
-                blockProps,
-                el(
-                  'div',
-                  { className: 'bl-blocks-block-editor__fallback' },
-                  el('strong', null, def.title || def.slug),
-                  el('p', null, blockI18n.preview || 'Edit fields to configure this block.')
-                )
-              );
+                { className: 'bl-blocks-block-editor__fallback' },
+                el('strong', null, def.title || def.slug),
+                el('p', null, blockI18n.preview || 'Edit fields to configure this block.')
+              )
+            );
 
         const inspectorBody = sidebarEditing
           ? el(SidebarFields, {

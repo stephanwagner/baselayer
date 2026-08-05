@@ -428,7 +428,7 @@ msgid "Allowed nested blocks"
 msgstr ""
 
 #: includes/admin-editor.php:316
-msgid "Comma-separated block names (e.g. core/heading, core/paragraph). Leave empty to allow all blocks."
+msgid "Comma-separated block names (e.g. core/heading, core/paragraph). Used when generating the starter template; you can also set allowedBlocks on the InnerBlocks tag in the PHP file. Leave empty to allow all blocks."
 msgstr ""
 
 #: includes/admin-editor.php:317
@@ -436,7 +436,7 @@ msgid "Default nested template"
 msgstr ""
 
 #: includes/admin-editor.php:318
-msgid "Optional JSON array of [blockName, attributes] pairs, e.g. [[\"core/paragraph\",{}]]. Leave empty for no default."
+msgid "Optional JSON array of [blockName, attributes] pairs for the starter template, e.g. [[\"core/paragraph\",{}]]. Prefer the template attribute on the InnerBlocks tag in PHP for the live block. Leave empty for no default."
 msgstr ""
 
 #: includes/admin-editor.php:319
@@ -444,7 +444,7 @@ msgid "Parent blocks"
 msgstr ""
 
 #: includes/admin-editor.php:320
-msgid "Comma-separated block names this block may be inserted into (e.g. baselayer/slider). Leave empty for top-level."
+msgid "Comma-separated block names this block may be inserted into (e.g. baselayer/slider). Registration only — not part of the PHP markup. Leave empty for top-level."
 msgstr ""
 
 #: includes/admin-editor.php:321

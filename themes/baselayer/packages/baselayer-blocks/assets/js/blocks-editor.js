@@ -6509,6 +6509,249 @@
     });
   }
 
+  // themes/baselayer/packages/baselayer-blocks/src/js/admin/parse-jsx-preview.js
+  var ATTR_MAP = {
+    class: "className",
+    classname: "className",
+    for: "htmlFor",
+    tabindex: "tabIndex",
+    readonly: "readOnly",
+    maxlength: "maxLength",
+    minlength: "minLength",
+    cellpadding: "cellPadding",
+    cellspacing: "cellSpacing",
+    colspan: "colSpan",
+    rowspan: "rowSpan",
+    usemap: "useMap",
+    frameborder: "frameBorder",
+    allowfullscreen: "allowFullScreen",
+    autocomplete: "autoComplete",
+    crossorigin: "crossOrigin"
+  };
+  var INNER_MARKER = "data-bl-innerblocks";
+  var INNER_PROPS = "data-bl-innerblocks-props";
+  function prepareInnerBlocksMarkers(html) {
+    if (!html || typeof html !== "string" || !/innerblocks/i.test(html)) {
+      return html || "";
+    }
+    let out = html.replace(
+      /<InnerBlocks\b([^>]*)>([\s\S]*?)<\/InnerBlocks>/gi,
+      (_, attrs) => markerFromAttrs(attrs)
+    );
+    out = out.replace(/<InnerBlocks\b([^>]*)\/?\s*>/gi, (_, attrs) => markerFromAttrs(attrs));
+    return out;
+  }
+  function markerFromAttrs(attrs) {
+    const props = {};
+    const re = /([^\s=]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s"'=<>`]+)))?/g;
+    let match;
+    const raw = String(attrs || "");
+    while ((match = re.exec(raw)) !== null) {
+      const name = String(match[1] || "").trim();
+      if (!name || name === "/") continue;
+      const value = match[2] !== void 0 ? match[2] : match[3] !== void 0 ? match[3] : match[4] !== void 0 ? match[4] : true;
+      const key = name.toLowerCase();
+      if (key === "allowedblocks") {
+        props.allowedBlocks = parseJsonAttr(value);
+      } else if (key === "template") {
+        props.template = parseJsonAttr(value);
+      } else if (key === "templatelock") {
+        props.templateLock = value === true ? "all" : value;
+      } else {
+        props[name] = value === true ? true : value;
+      }
+    }
+    let encoded = "";
+    try {
+      encoded = encodeURIComponent(JSON.stringify(props));
+    } catch (err) {
+      encoded = encodeURIComponent("{}");
+    }
+    return `<div ${INNER_MARKER}="1" ${INNER_PROPS}="${encoded}"></div>`;
+  }
+  function parseJsonAttr(value) {
+    if (value === true || value == null || value === "") return void 0;
+    try {
+      return JSON.parse(String(value));
+    } catch (err) {
+      return void 0;
+    }
+  }
+  function parseStyle(styleText) {
+    const out = {};
+    String(styleText || "").split(";").forEach((part) => {
+      const idx = part.indexOf(":");
+      if (idx === -1) return;
+      const prop = part.slice(0, idx).trim();
+      const val = part.slice(idx + 1).trim();
+      if (!prop) return;
+      const camel = prop.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+      out[camel] = val;
+    });
+    return out;
+  }
+  function elementProps(el5) {
+    const props = {};
+    Array.from(el5.attributes || []).forEach((attr) => {
+      const rawName = attr.name;
+      const lower = rawName.toLowerCase();
+      if (lower === INNER_MARKER || lower === INNER_PROPS) return;
+      let name = ATTR_MAP[lower] || rawName;
+      if (lower.startsWith("data-") || lower.startsWith("aria-")) {
+        name = lower;
+      }
+      let value = attr.value;
+      if (lower === "style") {
+        props.style = parseStyle(value);
+        return;
+      }
+      if (value === "" && el5.hasAttribute(rawName)) {
+        if (!["value", "id", "class", "className", "name", "type", "role"].includes(name)) {
+          props[name] = true;
+          return;
+        }
+      }
+      props[name] = value;
+    });
+    return props;
+  }
+  function isIconHost(el5) {
+    if (!el5 || !el5.classList) return false;
+    return el5.classList.contains("icon__icon") || el5.classList.contains("icon-text__icon") || el5.classList.contains("icon__icon") && el5.classList.contains("icon-text__icon");
+  }
+  function isAccordionWrapper(el5) {
+    return !!(el5 && el5.classList && el5.classList.contains("accordion__wrapper"));
+  }
+  function walkNode(node, ctx) {
+    const { createElement, InnerBlocks, Fragment } = ctx;
+    if (node.nodeType === Node.TEXT_NODE) {
+      const text = node.textContent;
+      return text == null || text === "" ? null : text;
+    }
+    if (node.nodeType === Node.COMMENT_NODE) {
+      return null;
+    }
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+      return null;
+    }
+    const el5 = (
+      /** @type {Element} */
+      node
+    );
+    if (el5.getAttribute(INNER_MARKER) === "1") {
+      let fromTag = {};
+      try {
+        fromTag = JSON.parse(decodeURIComponent(el5.getAttribute(INNER_PROPS) || "") || "{}") || {};
+      } catch (err) {
+        fromTag = {};
+      }
+      if (!InnerBlocks) {
+        return null;
+      }
+      const props2 = {
+        ...ctx.defaultInnerBlocksProps || {},
+        ...fromTag
+      };
+      if (!props2.renderAppender && InnerBlocks.ButtonBlockAppender) {
+        props2.renderAppender = InnerBlocks.ButtonBlockAppender;
+      }
+      return createElement(InnerBlocks, props2);
+    }
+    const tag = el5.tagName.toLowerCase();
+    let props = elementProps(el5);
+    if (ctx.accordionEditorOpen && isAccordionWrapper(el5)) {
+      const className = String(props.className || "");
+      const classes = className.split(/\s+/).filter(Boolean);
+      if (!classes.includes("accordion-open")) {
+        classes.push("accordion-open");
+      }
+      props = {
+        ...props,
+        className: classes.join(" "),
+        "data-accordion-is-open": "true"
+      };
+    }
+    if (ctx.iconControl && isIconHost(el5)) {
+      const className = String(props.className || "");
+      const hasIcon = !!ctx.iconControl.value;
+      let nextClass = className.split(/\s+/).filter((c) => c && c !== "-has-icon").join(" ");
+      if (hasIcon) {
+        nextClass = (nextClass + " -has-icon").trim();
+      }
+      props = { ...props, className: nextClass };
+      return createElement(tag, props, createElement(ctx.iconControl.type, ctx.iconControl.props));
+    }
+    const childNodes = Array.from(el5.childNodes || []);
+    const children = [];
+    childNodes.forEach((child) => {
+      const rendered = walkNode(child, ctx);
+      if (rendered == null || rendered === false) return;
+      if (Array.isArray(rendered)) {
+        rendered.forEach((item) => {
+          if (item != null && item !== false) children.push(item);
+        });
+      } else {
+        children.push(rendered);
+      }
+    });
+    if (tag === "svg" || el5.namespaceURI === "http://www.w3.org/2000/svg") {
+    }
+    if (children.length === 0) {
+      return createElement(tag, props);
+    }
+    if (children.length === 1) {
+      return createElement(tag, props, children[0]);
+    }
+    return createElement(tag, props, ...children);
+  }
+  function parseJsxPreview(html, options) {
+    const createElement = options && options.createElement;
+    if (typeof createElement !== "function") {
+      return null;
+    }
+    const prepared = prepareInnerBlocksMarkers(html);
+    if (!prepared) {
+      return null;
+    }
+    let doc;
+    try {
+      doc = new DOMParser().parseFromString(
+        `<div id="bl-blocks-jsx-root">${prepared}</div>`,
+        "text/html"
+      );
+    } catch (err) {
+      return null;
+    }
+    const root = doc.getElementById("bl-blocks-jsx-root");
+    if (!root) {
+      return null;
+    }
+    const ctx = {
+      createElement,
+      Fragment: options.Fragment,
+      InnerBlocks: options.InnerBlocks,
+      defaultInnerBlocksProps: options.defaultInnerBlocksProps || {},
+      iconControl: options.iconControl || null,
+      accordionEditorOpen: !!options.accordionEditorOpen
+    };
+    const children = [];
+    Array.from(root.childNodes).forEach((child) => {
+      const rendered = walkNode(child, ctx);
+      if (rendered == null || rendered === false) return;
+      children.push(rendered);
+    });
+    if (children.length === 0) {
+      return null;
+    }
+    if (children.length === 1) {
+      return children[0];
+    }
+    if (options.Fragment) {
+      return createElement(options.Fragment, null, ...children);
+    }
+    return createElement("div", { className: "bl-blocks-jsx-preview" }, ...children);
+  }
+
   // themes/baselayer/src/js/editor/icons/inline-icon-control.js
   init_icon_picker_service();
   var { useRef } = wp.element;
@@ -6682,10 +6925,43 @@
         el5("div", { className: "bl-blocks-sidebar-fields__host", ref: setHost })
       );
     }
-    function BlockServerPreview({ name, values }) {
+    function defaultInnerBlocksProps(def) {
+      const props = {};
+      const allowed = Array.isArray(def && def.innerBlocksAllowed) ? def.innerBlocksAllowed.filter((name) => typeof name === "string" && name) : [];
+      if (allowed.length) {
+        props.allowedBlocks = allowed;
+      }
+      const template = def && def.innerBlocksTemplate;
+      if (Array.isArray(template) && template.length) {
+        props.template = template;
+      }
+      return props;
+    }
+    function BlockPhpPreview({
+      name,
+      values,
+      def,
+      slug,
+      isSelected,
+      clientId,
+      onChangeValues
+    }) {
       const [response, setResponse] = useState({ status: "idle" });
       const shouldDebounceRef = useRef2(false);
       const valuesKey = JSON.stringify(values || {});
+      const supportsInner = !!(def && def.supportsInnerBlocks);
+      const needsJsx = supportsInner || slug === "icon" || slug === "icon-text";
+      const hasChildSelected = useSelect ? useSelect(
+        (select) => {
+          if (!clientId || !supportsInner) {
+            return false;
+          }
+          const blockEditor = select("core/block-editor");
+          return !!(blockEditor && typeof blockEditor.hasSelectedInnerBlock === "function" && blockEditor.hasSelectedInnerBlock(clientId, true));
+        },
+        [clientId, supportsInner]
+      ) : false;
+      const accordionEditorOpen = slug === "accordion" && (!!isSelected || !!hasChildSelected || !!values.accordion_is_open);
       useEffect(() => {
         if (!apiFetch || !name) {
           return void 0;
@@ -6693,7 +6969,12 @@
         const controller = typeof AbortController !== "undefined" ? new AbortController() : null;
         let cancelled = false;
         const run = () => {
-          setResponse({ status: "loading" });
+          setResponse((prev) => {
+            if (prev.status === "success" && typeof prev.content === "string") {
+              return { ...prev, refreshing: true };
+            }
+            return { status: "loading" };
+          });
           apiFetch({
             path: renderPath,
             method: "POST",
@@ -6709,9 +6990,14 @@
             if (cancelled || error && error.name === "AbortError") {
               return;
             }
-            setResponse({
-              status: "error",
-              error: error && error.message || String(error)
+            setResponse((prev) => {
+              if (prev.status === "success" && typeof prev.content === "string") {
+                return { ...prev, refreshing: false };
+              }
+              return {
+                status: "error",
+                error: error && error.message || String(error)
+              };
             });
           }).finally(() => {
             shouldDebounceRef.current = true;
@@ -6737,7 +7023,7 @@
           cancelDebounce();
         };
       }, [name, valuesKey]);
-      if (response.status === "loading" || response.status === "idle") {
+      if ((response.status === "loading" || response.status === "idle") && typeof response.content !== "string") {
         return el5(PreviewLoading, null);
       }
       if (response.status === "error") {
@@ -6751,229 +7037,43 @@
           label: blockI18n.previewEmpty || "Block rendered as empty."
         });
       }
-      return el5(RawHTML, null, response.content);
-    }
-    function innerBlocksProps(def) {
-      const props = {
-        renderAppender: InnerBlocks.ButtonBlockAppender
-      };
-      const allowed = Array.isArray(def && def.innerBlocksAllowed) ? def.innerBlocksAllowed.filter((name) => typeof name === "string" && name) : [];
-      if (allowed.length) {
-        props.allowedBlocks = allowed;
+      if (!needsJsx) {
+        return el5(RawHTML, null, response.content);
       }
-      const template = def && def.innerBlocksTemplate;
-      if (Array.isArray(template) && template.length) {
-        props.template = template;
-      }
-      return props;
-    }
-    function AccordionInnerEdit({ values, blockProps, def, isSelected, clientId }) {
-      const title = typeof values.title === "string" ? values.title : "";
-      const isOpenByDefault = !!values.accordion_is_open;
-      const hasChildSelected = useSelect ? useSelect(
-        (select) => {
-          if (!clientId) {
-            return false;
-          }
-          const blockEditor = select("core/block-editor");
-          return !!(blockEditor && typeof blockEditor.hasSelectedInnerBlock === "function" && blockEditor.hasSelectedInnerBlock(clientId, true));
-        },
-        [clientId]
-      ) : false;
-      const editorOpen = isOpenByDefault || !!isSelected || !!hasChildSelected;
-      const className = [
-        "bl-wp-block",
-        "accordion__wrapper",
-        editorOpen ? "accordion-open" : "",
-        blockProps.className || ""
-      ].filter(Boolean).join(" ");
-      return el5(
-        "div",
-        {
-          ...blockProps,
-          className,
-          "data-accordion-is-open": editorOpen ? "true" : "false"
-        },
-        el5(
-          "div",
-          { className: "accordion__container" },
-          el5(
-            "div",
-            {
-              className: "accordion__header noselect",
-              role: "button",
-              tabIndex: 0,
-              "aria-expanded": editorOpen ? "true" : "false"
-            },
-            el5("div", { className: "accordion__title" }, title),
-            el5(
-              "div",
-              { className: "accordion__icon", "aria-hidden": "true" },
-              el5(
-                "svg",
-                {
-                  xmlns: "http://www.w3.org/2000/svg",
-                  height: "24px",
-                  viewBox: "0 -960 960 960",
-                  width: "24px",
-                  fill: "currentColor"
-                },
-                el5("path", {
-                  d: "M466.54-375.23q-6.23-2.31-11.85-7.92L274.92-562.92q-8.3-8.31-8.5-20.89-.19-12.57 8.5-21.27 8.7-8.69 21.08-8.69 12.38 0 21.08 8.69L480-442.15l162.92-162.93q8.31-8.3 20.89-8.5 12.57-.19 21.27 8.5 8.69 8.7 8.69 21.08 0 12.38-8.69 21.08L505.31-383.15q-5.62 5.61-11.85 7.92-6.23 2.31-13.46 2.31t-13.46-2.31Z"
-                })
-              )
-            )
-          ),
-          el5(
-            "div",
-            { className: "accordion__content" },
-            el5(
-              "div",
-              { className: "accordion__content-inner" },
-              InnerBlocks ? el5(InnerBlocks, innerBlocksProps(def)) : null
-            )
-          )
-        )
-      );
-    }
-    function IconInnerEdit({ values, blockProps, isSelected, onChangeValues }) {
       const iconSlug = typeof values.icon === "string" ? values.icon : "";
-      return el5(
-        "div",
-        {
-          ...blockProps,
-          className: [blockProps.className || "", "bl-wp-block", "icon__wrapper"].filter(Boolean).join(" ")
-        },
-        el5(
-          "div",
-          { className: "icon__container" },
-          el5(
-            "div",
-            { className: "icon__icon" + (iconSlug ? " -has-icon" : "") },
-            el5(InlineIconControl, {
-              value: iconSlug,
-              isActive: isSelected,
-              onChange: (next) => onChangeValues({ ...values, icon: next || "" })
-            })
-          )
-        )
-      );
-    }
-    function IconTextInnerEdit({ values, blockProps, def, isSelected, onChangeValues }) {
-      const iconSlug = typeof values.icon === "string" ? values.icon : "";
-      return el5(
-        "div",
-        {
-          ...blockProps,
-          className: [blockProps.className || "", "bl-wp-block", "icon-text__wrapper"].filter(Boolean).join(" ")
-        },
-        el5(
-          "div",
-          { className: "icon-text__container" },
-          el5(
-            "div",
-            { className: "icon-text__content" },
-            el5(
-              "div",
-              { className: "icon-text__icon icon__icon" + (iconSlug ? " -has-icon" : "") },
-              el5(InlineIconControl, {
-                value: iconSlug,
-                isActive: isSelected,
-                onChange: (next) => onChangeValues({ ...values, icon: next || "" })
-              })
-            ),
-            el5(
-              "div",
-              { className: "icon-text__text-container" },
-              el5(
-                "div",
-                { className: "icon-text__text" },
-                InnerBlocks ? el5(InnerBlocks, innerBlocksProps(def)) : null
-              )
-            )
-          )
-        )
-      );
-    }
-    function SliderInnerEdit({ values, blockProps, def }) {
-      const perView = values.slides_per_view || 1;
-      const hasContent = !!values.has_content;
-      return el5(
-        "div",
-        {
-          ...blockProps,
-          className: [blockProps.className || "", "bl-wp-block", "slider__wrapper"].filter(Boolean).join(" "),
-          "data-slider-slides-per-view": String(perView),
-          "data-slider-has-content": hasContent ? "true" : "false",
-          style: {
-            ...blockProps.style || {},
-            "--slider-editor-slide-gap": (values.space_between != null ? values.space_between : 16) + "px"
-          }
-        },
-        el5(
-          "div",
-          { className: "slider__container" },
-          el5(
-            "div",
-            { className: "slider__slides" },
-            el5(
-              "div",
-              { className: "swiper" },
-              InnerBlocks ? el5(InnerBlocks, innerBlocksProps(def)) : null
-            )
-          )
-        )
-      );
-    }
-    function SliderSlideInnerEdit({ blockProps, def }) {
-      return el5(
-        "div",
-        {
-          ...blockProps,
-          className: [blockProps.className || "", "bl-wp-block", "slider-slide__wrapper", "swiper-slide"].filter(Boolean).join(" ")
-        },
-        el5(
-          "div",
-          { className: "slider-slide__container" },
-          el5(
-            "div",
-            { className: "slider-slide__content" },
-            InnerBlocks ? el5(InnerBlocks, innerBlocksProps(def)) : null
-          )
-        )
-      );
-    }
-    function ClientBlockShell({ values, blockProps, slug, def, isSelected, clientId, onChangeValues }) {
-      if (slug === "accordion") {
-        return el5(AccordionInnerEdit, { values, blockProps, def, isSelected, clientId });
+      const iconControl = (slug === "icon" || slug === "icon-text") && typeof onChangeValues === "function" ? {
+        type: InlineIconControl,
+        value: iconSlug,
+        props: {
+          value: iconSlug,
+          isActive: !!isSelected,
+          onChange: (next) => onChangeValues({ ...values, icon: next || "" })
+        }
+      } : null;
+      let tree = null;
+      try {
+        tree = parseJsxPreview(response.content, {
+          createElement: el5,
+          Fragment,
+          InnerBlocks: supportsInner ? InnerBlocks : null,
+          defaultInnerBlocksProps: defaultInnerBlocksProps(def),
+          iconControl,
+          accordionEditorOpen: slug === "accordion" ? accordionEditorOpen : false
+        });
+      } catch (err) {
+        if (typeof console !== "undefined" && console.warn) {
+          console.warn("Baselayer Blocks: failed to parse PHP preview as JSX", err);
+        }
+        tree = null;
       }
-      if (slug === "icon") {
-        return el5(IconInnerEdit, { values, blockProps, isSelected, onChangeValues });
+      if (tree == null) {
+        return el5(RawHTML, null, response.content);
       }
-      if (slug === "icon-text") {
-        return el5(IconTextInnerEdit, { values, blockProps, def, isSelected, onChangeValues });
-      }
-      if (slug === "slider") {
-        return el5(SliderInnerEdit, { values, blockProps, def });
-      }
-      if (slug === "slider-slide") {
-        return el5(SliderSlideInnerEdit, { blockProps, def });
-      }
-      return el5(
-        "div",
-        { ...blockProps, className: (blockProps.className || "") + " bl-blocks-block-editor bl-blocks-block-editor--inner" },
-        el5(
-          "div",
-          { className: "bl-blocks-block-editor__inner-fields" },
-          el5("strong", null, values.title || "")
-        ),
-        InnerBlocks ? el5(InnerBlocks, innerBlocksProps(def)) : null
-      );
+      return tree;
     }
     (blockConfig.blocks || []).forEach((def) => {
       if (!def || !def.name) return;
       const supportsInnerBlocks = !!def.supportsInnerBlocks;
-      const usesClientShell = supportsInnerBlocks || def.slug === "icon";
       registerBlockType(def.name, {
         apiVersion: 3,
         title: def.title || def.slug,
@@ -7030,15 +7130,19 @@
               setSidebarMountId((id) => id + 1);
             }
           };
-          const preview = usesClientShell ? el5(ClientBlockShell, {
-            values,
+          const preview = apiFetch ? el5(
+            "div",
             blockProps,
-            slug,
-            def,
-            isSelected,
-            clientId,
-            onChangeValues: isIconShell ? applyCanvasValues : applyValues
-          }) : apiFetch ? el5("div", blockProps, el5(BlockServerPreview, { name: def.name, values })) : el5(
+            el5(BlockPhpPreview, {
+              name: def.name,
+              values,
+              def,
+              slug,
+              isSelected,
+              clientId,
+              onChangeValues: isIconShell ? applyCanvasValues : null
+            })
+          ) : el5(
             "div",
             blockProps,
             el5(

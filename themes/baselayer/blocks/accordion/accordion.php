@@ -46,8 +46,8 @@ $inner = bl_block_inner_blocks();
 			tabindex="0"
 			aria-expanded="<?php echo $is_open ? 'true' : 'false'; ?>"
 			aria-controls="accordion-content-<?php echo esc_attr($accordion_id); ?>">
-			<div class="accordion__title">AA
-				|<?= $title ? esc_html($title) : '&nbsp;' ?>|BB
+			<div class="accordion__title">
+				<?= $title ? esc_html($title) : '&nbsp;' ?>
 			</div>
 			<div class="accordion__icon">
 				<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor" aria-hidden="true">

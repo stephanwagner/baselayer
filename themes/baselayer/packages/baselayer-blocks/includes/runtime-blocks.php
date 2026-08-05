@@ -644,5 +644,11 @@ function bl_blocks_render_block(array $def, array $attributes, string $content =
 		return bl_blocks_render_block_fallback($def, $values);
 	}
 
+	// Editor canvas parses <InnerBlocks /> into a live React hole (ACF-style).
+	// Front / normal renders expand the tag to saved inner HTML.
+	if (bl_blocks_is_editor_render()) {
+		return $html;
+	}
+
 	return bl_blocks_expand_inner_blocks_tags($html, $content);
 }

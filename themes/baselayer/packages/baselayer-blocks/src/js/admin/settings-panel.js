@@ -322,7 +322,7 @@ export function createSettingsPanel(initial, definitionType, onChange) {
     allowedInput,
     t(
       'settingsInnerBlocksAllowedHelp',
-      'Comma-separated block names (e.g. core/heading, core/paragraph). Leave empty to allow all blocks.'
+      'Comma-separated block names (e.g. core/heading, core/paragraph). Used when generating the starter template; you can also set allowedBlocks on the InnerBlocks tag in the PHP file. Leave empty to allow all blocks.'
     )
   );
   const innerBlocksTemplateRow = fieldRow(
@@ -330,7 +330,7 @@ export function createSettingsPanel(initial, definitionType, onChange) {
     templateInput,
     t(
       'settingsInnerBlocksTemplateHelp',
-      'Optional JSON array of [blockName, attributes] pairs, e.g. [["core/paragraph",{}]]. Leave empty for no default.'
+      'Optional JSON array of [blockName, attributes] pairs for the starter template, e.g. [["core/paragraph",{}]]. Prefer the template attribute on the InnerBlocks tag in PHP for the live block. Leave empty for no default.'
     )
   );
 
@@ -353,7 +353,7 @@ export function createSettingsPanel(initial, definitionType, onChange) {
   });
   const parentHelp = t(
     'settingsParentHelp',
-    'Comma-separated block names this block may be inserted into (e.g. baselayer/slider). Leave empty for top-level.'
+    'Comma-separated block names this block may be inserted into (e.g. baselayer/slider). Registration only — not part of the PHP markup. Leave empty for top-level.'
   );
   const parentRow = el('div', { className: 'bl-forms-builder__setting' }, [
     el('p', {}, [parentInput]),

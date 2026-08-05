@@ -370,11 +370,14 @@ msgstr "Erlaubte verschachtelte Blöcke"
 
 #: includes/admin-editor.php:316
 msgid ""
-"Comma-separated block names (e.g. core/heading, core/paragraph). Leave empty "
-"to allow all blocks."
+"Comma-separated block names (e.g. core/heading, core/paragraph). Used when "
+"generating the starter template; you can also set allowedBlocks on the "
+"InnerBlocks tag in the PHP file. Leave empty to allow all blocks."
 msgstr ""
-"Kommagetrennte Blocknamen (z. B. core/heading, core/paragraph). Leer lassen, "
-"um alle Blöcke zu erlauben."
+"Kommagetrennte Blocknamen (z. B. core/heading, core/paragraph). Wird beim "
+"Erzeugen der Starter-Vorlage verwendet; allowedBlocks kannst du auch am "
+"InnerBlocks-Tag in der PHP-Datei setzen. Leer lassen, um alle Blöcke zu "
+"erlauben."
 
 #: includes/admin-editor.php:317
 msgid "Default nested template"
@@ -382,11 +385,14 @@ msgstr "Standard-Vorlage für verschachtelte Blöcke"
 
 #: includes/admin-editor.php:318
 msgid ""
-"Optional JSON array of [blockName, attributes] pairs, e.g. [[\"core/"
-"paragraph\",{}]]. Leave empty for no default."
+"Optional JSON array of [blockName, attributes] pairs for the starter "
+"template, e.g. [[\"core/paragraph\",{}]]. Prefer the template attribute on "
+"the InnerBlocks tag in PHP for the live block. Leave empty for no default."
 msgstr ""
-"Optionales JSON-Array aus [blockName, attributes]-Paaren, z. B. [[\"core/"
-"paragraph\",{}]]. Leer lassen für keinen Standard."
+"Optionales JSON-Array aus [blockName, attributes]-Paaren für die Starter-"
+"Vorlage, z. B. [[\"core/paragraph\",{}]]. Für den Live-Block bevorzugt das "
+"template-Attribut am InnerBlocks-Tag in PHP setzen. Leer lassen für keinen "
+"Standard."
 
 #: includes/admin-editor.php:319
 msgid "Parent blocks"
@@ -395,10 +401,12 @@ msgstr "Elternblöcke"
 #: includes/admin-editor.php:320
 msgid ""
 "Comma-separated block names this block may be inserted into (e.g. baselayer/"
-"slider). Leave empty for top-level."
+"slider). Registration only — not part of the PHP markup. Leave empty for "
+"top-level."
 msgstr ""
 "Kommagetrennte Blocknamen, in die dieser Block eingefügt werden darf (z. B. "
-"baselayer/slider). Leer lassen für die oberste Ebene."
+"baselayer/slider). Nur Registrierung — nicht Teil des PHP-Markups. Leer "
+"lassen für die oberste Ebene."
 
 #: includes/admin-editor.php:321
 msgid "Alignment supports"
