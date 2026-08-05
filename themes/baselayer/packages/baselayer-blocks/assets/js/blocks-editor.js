@@ -5495,6 +5495,96 @@
     }
     return "";
   }
+  function normalizeRuntimeLogic(raw) {
+    if (!raw || typeof raw !== "object") return null;
+    const logic = (
+      /** @type {{ enabled?: boolean, groups?: unknown }} */
+      raw
+    );
+    if (!logic.enabled || !Array.isArray(logic.groups) || !logic.groups.length) {
+      return null;
+    }
+    return (
+      /** @type {{ enabled: boolean, groups: array }} */
+      logic
+    );
+  }
+  function logicValueIsEmpty(value) {
+    if (Array.isArray(value)) return value.length === 0;
+    return String(value ?? "").trim() === "";
+  }
+  function logicCompare(left, right, operator) {
+    const a = Array.isArray(left) ? "" : String(left ?? "");
+    const b = Array.isArray(right) ? "" : String(right ?? "");
+    if (a === "" || b === "") return false;
+    if (a !== "" && b !== "" && !Number.isNaN(Number(a)) && !Number.isNaN(Number(b))) {
+      const an = Number(a);
+      const bn = Number(b);
+      if (operator === ">") return an > bn;
+      if (operator === "<") return an < bn;
+      if (operator === ">=") return an >= bn;
+      if (operator === "<=") return an <= bn;
+      return false;
+    }
+    const cmp = a < b ? -1 : a > b ? 1 : 0;
+    if (operator === ">") return cmp > 0;
+    if (operator === "<") return cmp < 0;
+    if (operator === ">=") return cmp >= 0;
+    if (operator === "<=") return cmp <= 0;
+    return false;
+  }
+  function logicRulePasses(rule, value) {
+    const operator = String(rule && rule.operator || "");
+    const expected = String((rule && rule.value) ?? "");
+    const empty = logicValueIsEmpty(value);
+    switch (operator) {
+      case "checked":
+        return !empty && !Array.isArray(value) && String(value) !== "0";
+      case "not_checked":
+        return empty || !Array.isArray(value) && String(value) === "0";
+      case "==empty":
+        return empty;
+      case "!=empty":
+        return !empty;
+      case "==":
+        return Array.isArray(value) ? value.includes(expected) : String(value) === expected;
+      case "!=":
+        return Array.isArray(value) ? !value.includes(expected) : String(value) !== expected;
+      case "contains":
+        return Array.isArray(value) ? value.includes(expected) : expected !== "" && String(value).includes(expected);
+      case "not_contains":
+        return Array.isArray(value) ? !value.includes(expected) : expected === "" || !String(value).includes(expected);
+      case ">":
+      case "<":
+      case ">=":
+      case "<=":
+        return logicCompare(value, expected, operator);
+      default:
+        return false;
+    }
+  }
+  function logicConditionsMet(logic, getSourceValue) {
+    const groups = logic && Array.isArray(logic.groups) ? logic.groups : [];
+    for (let g = 0; g < groups.length; g += 1) {
+      const group = groups[g];
+      if (!Array.isArray(group) || !group.length) continue;
+      let groupOk = true;
+      for (let r = 0; r < group.length; r += 1) {
+        const rule = group[r];
+        if (!rule || typeof rule !== "object") {
+          groupOk = false;
+          break;
+        }
+        const value = getSourceValue(String(rule.field || ""));
+        if (!logicRulePasses(rule, value)) {
+          groupOk = false;
+          break;
+        }
+      }
+      if (groupOk) return true;
+    }
+    return false;
+  }
   function createLeafControl(field, values, controls) {
     const type = field.type || "text";
     const name = field.name || "";
@@ -5724,9 +5814,38 @@
     }
     const root = el4("div", rootAttrs);
     const entries = [];
+    const fieldById = /* @__PURE__ */ Object.create(null);
+    const logicTargets = [];
     fields = normalizeFieldList(fields);
+    const registerField = (field) => {
+      const id = field && field.id != null ? String(field.id).trim() : "";
+      if (id) {
+        fieldById[id] = field;
+      }
+    };
+    const registerLogicTarget = (el5, field) => {
+      const logic = normalizeRuntimeLogic(field && field.conditional_logic);
+      if (!logic || !el5) return;
+      logicTargets.push({ el: el5, logic });
+    };
+    const getLogicSourceValue = (fieldId) => {
+      const def = fieldById[fieldId];
+      if (!def || !def.name) return "";
+      const entry = entries.find(
+        (e) => e.kind === "leaf" && e.field && e.field.name === def.name
+      );
+      if (!entry) return "";
+      const val = collectLeafValue(entry.field, entry.control, entry.type);
+      return val == null ? "" : val;
+    };
+    const evaluateLogic = () => {
+      logicTargets.forEach(({ el: el5, logic }) => {
+        el5.hidden = !logicConditionsMet(logic, getLogicSourceValue);
+      });
+    };
     const appendLayoutWrap = (field, type, parent, valueMap) => {
-      const design = compact ? "standard" : ["standard", "outline", "card"].includes(field.design) ? field.design : "standard";
+      registerField(field);
+      const design = ["standard", "outline", "card"].includes(field.design) ? field.design : "standard";
       const layoutClass = [
         "bl-blocks-fields__layout",
         "bl-blocks-fields__layout--" + type,
@@ -5743,6 +5862,7 @@
       if (type === "column" && !compact) {
         applyColumnWidth(wrap, field);
       }
+      registerLogicTarget(wrap, field);
       parent.appendChild(wrap);
       walk(field.children || [], wrap, valueMap);
       return wrap;
@@ -5771,6 +5891,7 @@
       });
       const panels = [];
       activeTabs.forEach((tab, index2) => {
+        registerField(tab);
         const tabId = String(tab.id || "tab" + index2);
         const panelId = "bl-blocks-tab-panel-" + tabId;
         const btnId = "bl-blocks-tab-" + tabId;
@@ -5831,11 +5952,17 @@
     };
     const flushLeafBuffer = (buffer, parent, valueMap) => {
       if (!buffer.length) return;
+      const appendLeafRow = (field, row) => {
+        registerField(field);
+        registerLogicTarget(row, field);
+        return row;
+      };
       if (compact) {
         buffer.forEach((field) => {
           const leafControls = [];
           const row = createLeafControl(field, valueMap, leafControls);
           if (!row) return;
+          appendLeafRow(field, row);
           parent.appendChild(row);
           leafControls.forEach((c) => entries.push({ kind: "leaf", ...c }));
         });
@@ -5847,6 +5974,7 @@
           const leafControls = [];
           const row = createLeafControl(field, valueMap, leafControls);
           if (!row) return;
+          appendLeafRow(field, row);
           leafControls.forEach((c) => entries.push({ kind: "leaf", ...c }));
           built.push({ field, row });
         });
@@ -5945,6 +6073,11 @@
       flushLeaves();
     };
     walk(fields, root, values || {});
+    if (logicTargets.length) {
+      root.addEventListener("change", evaluateLogic);
+      root.addEventListener("input", evaluateLogic);
+      evaluateLogic();
+    }
     const getValues = () => {
       const out = {};
       entries.forEach((entry) => {
@@ -5972,7 +6105,7 @@
     const minRows = Math.max(0, parseInt(field.min_rows, 10) || 0);
     const maxRows = Math.max(0, parseInt(field.max_rows, 10) || 0);
     const buttonLabel = field.button_label || i18n4("addRow", "Add entry");
-    const design = compact ? "standard" : ["standard", "outline", "card"].includes(field.design) ? field.design : "standard";
+    const design = ["standard", "outline", "card"].includes(field.design) ? field.design : "standard";
     const showTitle = field.show_title !== false && field.show_title !== 0 && field.show_title !== "0";
     const uiShared = getUiShared(options);
     const getRepeaterPath = () => joinUiPath(resolveUiPathPrefix(options), name);
@@ -6672,7 +6805,7 @@
               tabIndex: 0,
               "aria-expanded": editorOpen ? "true" : "false"
             },
-            el5("div", { className: "accordion__title" }, title || blockI18n.innerBlocksTitle || "Title"),
+            el5("div", { className: "accordion__title" }, title),
             el5(
               "div",
               { className: "accordion__icon", "aria-hidden": "true" },

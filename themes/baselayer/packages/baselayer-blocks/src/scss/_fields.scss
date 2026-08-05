@@ -633,23 +633,34 @@ button.button-link.bl-blocks-fields__card-remove {
   }
 }
 
-// Modal: keep card chrome; drop the field separator after cards.
+// Modal: keep outline/card chrome; drop the field separator after boxed layouts.
 .bl-blocks-modal__body {
   .bl-blocks-fields,
   .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column),
   .bl-blocks-fields__tab-panel {
-    // Section rule zeroes border-top/padding-top; restore the card chrome.
+    // Section rule zeroes border-top/padding-top; restore the box chrome.
+    > * + .bl-blocks-fields__layout--outline,
     > * + .bl-blocks-fields__layout--card,
+    > * + .bl-blocks-fields__repeater--outline,
     > * + .bl-blocks-fields__repeater--card,
+    > * + .bl-blocks-fields__tab-panel--outline,
     > * + .bl-blocks-fields__tab-panel--card {
       padding-top: 12px;
       border-top: 1px solid #c3c4c7;
     }
 
-    > .bl-blocks-fields__layout--card + *:not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--card),
-    > .bl-blocks-fields__repeater--card + *:not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--card),
+    > .bl-blocks-fields__layout--outline
+      + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+    > .bl-blocks-fields__layout--card
+      + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+    > .bl-blocks-fields__repeater--outline
+      + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+    > .bl-blocks-fields__repeater--card
+      + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+    > .bl-blocks-fields__tab-panel--outline
+      + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
     > .bl-blocks-fields__tab-panel--card
-      + *:not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--card) {
+      + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card) {
       margin-top: 16px;
       padding-top: 0;
       border-top: 0;
@@ -1021,6 +1032,45 @@ button.button-link.bl-blocks-fields__repeater-remove {
 
   > * + .bl-blocks-fields__layout--section {
     margin-top: 16px;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  // Tighter outline/card chrome in the inspector.
+  .bl-blocks-fields__layout--outline,
+  .bl-blocks-fields__layout--card,
+  .bl-blocks-fields__repeater--outline,
+  .bl-blocks-fields__repeater--card,
+  .bl-blocks-fields__tab-panel--outline,
+  .bl-blocks-fields__tab-panel--card {
+    padding: 8px;
+    border-radius: 4px;
+  }
+
+  // Section rule zeroes border-top; restore box chrome (tighter).
+  > * + .bl-blocks-fields__layout--outline,
+  > * + .bl-blocks-fields__layout--card,
+  > * + .bl-blocks-fields__repeater--outline,
+  > * + .bl-blocks-fields__repeater--card,
+  > * + .bl-blocks-fields__tab-panel--outline,
+  > * + .bl-blocks-fields__tab-panel--card {
+    padding-top: 8px;
+    border-top: 1px solid #c3c4c7;
+  }
+
+  > .bl-blocks-fields__layout--outline
+    + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+  > .bl-blocks-fields__layout--card
+    + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+  > .bl-blocks-fields__repeater--outline
+    + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+  > .bl-blocks-fields__repeater--card
+    + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+  > .bl-blocks-fields__tab-panel--outline
+    + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+  > .bl-blocks-fields__tab-panel--card
+    + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card) {
+    margin-top: 12px;
     padding-top: 0;
     border-top: 0;
   }

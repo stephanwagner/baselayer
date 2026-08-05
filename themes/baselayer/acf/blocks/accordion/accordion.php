@@ -59,9 +59,8 @@ $accordionId = $id ? $id : 'accordion-' . $globalAccordionId;
 			tabindex="0"
 			aria-expanded="<?= $isOpen ? 'true' : 'false' ?>"
 			aria-controls="accordion-content-<?= $accordionId ?>">
-			<div
-				class="accordion__title">
-				<?= $title ?>
+			<div class="accordion__title">
+				<?= $title ? esc_html($title) : '&nbsp;' ?>
 			</div>
 			<div class="accordion__icon">
 				<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor">

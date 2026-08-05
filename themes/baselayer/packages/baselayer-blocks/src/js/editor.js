@@ -314,7 +314,7 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
             tabIndex: 0,
             'aria-expanded': editorOpen ? 'true' : 'false',
           },
-          el('div', { className: 'accordion__title' }, title || blockI18n.innerBlocksTitle || 'Title'),
+          el('div', { className: 'accordion__title' }, title),
           el(
             'div',
             { className: 'accordion__icon', 'aria-hidden': 'true' },

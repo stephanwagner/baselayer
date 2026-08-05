@@ -11,7 +11,7 @@ $id = bl_block_field('id');
 $close_neighbouring = (bool) bl_block_field('close_neighbouring_accordions');
 $scroll_to_top = (bool) bl_block_field('scroll_to_accordion_top');
 $is_open = (bool) bl_block_field('accordion_is_open');
-$add_to_faq_schema = (bool) bl_block_field('add_to_faq_schema');
+$add_to_faq_schema = (bool) bl_block_field('has_advanced_settings') && (bool) bl_block_field('add_to_faq_schema');
 
 $class_names = ['bl-wp-block', '-baselayer-block', 'accordion__wrapper'];
 
@@ -46,8 +46,8 @@ $inner = bl_block_inner_blocks();
 			tabindex="0"
 			aria-expanded="<?php echo $is_open ? 'true' : 'false'; ?>"
 			aria-controls="accordion-content-<?php echo esc_attr($accordion_id); ?>">
-			<div class="accordion__title">
-				<?php echo esc_html(is_string($title) ? $title : ''); ?>
+			<div class="accordion__title">AA
+				|<?= $title ? esc_html($title) : '&nbsp;' ?>|BB
 			</div>
 			<div class="accordion__icon">
 				<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="currentColor" aria-hidden="true">

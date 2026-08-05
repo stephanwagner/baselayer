@@ -29,7 +29,9 @@
                 "label": "Open by default",
                 "required": false,
                 "width": "100",
-                "default_value": ""
+                "default_value": "",
+                "content": "Open by default",
+                "hide_label": true
             },
             {
                 "id": "fld_acc_close",
@@ -39,7 +41,9 @@
                 "required": false,
                 "width": "100",
                 "default_value": "1",
-                "description": "Automatically closes adjacent open accordions when this one is opened."
+                "description": "Automatically closes adjacent open accordions when this one is opened.",
+                "content": "Close adjacent accordions",
+                "hide_label": true
             },
             {
                 "id": "fld_acc_scroll",
@@ -49,17 +53,54 @@
                 "required": false,
                 "width": "100",
                 "default_value": "1",
-                "description": "Automatically scrolls to the start of the accordion when opened. Especially useful on mobile with long content."
+                "description": "Automatically scrolls to the start of the accordion when opened. Especially useful on mobile with long content.",
+                "content": "Scroll to accordion on open",
+                "hide_label": true
             },
             {
-                "id": "fld_acc_faq",
+                "id": "fld_acc_advanced",
                 "type": "toggle",
-                "name": "add_to_faq_schema",
-                "label": "Add to FAQ schema",
+                "name": "has_advanced_settings",
+                "label": "Advanced settings",
                 "required": false,
                 "width": "100",
                 "default_value": "",
-                "description": "Uses this accordion’s content as question and answer for structured FAQ data. Only use for real FAQs."
+                "content": "Advanced settings",
+                "hide_label": true
+            },
+            {
+                "id": "fld_acc_advanced_area",
+                "type": "section",
+                "label": "Advanced settings",
+                "show_title": false,
+                "design": "outline",
+                "width": "100",
+                "children": [
+                    {
+                        "id": "fld_acc_faq",
+                        "type": "toggle",
+                        "name": "add_to_faq_schema",
+                        "label": "Add to FAQ schema",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "description": "Uses this accordion’s content as question and answer for structured FAQ data. Only use for real FAQs.",
+                        "content": "Add to FAQ schema",
+                        "hide_label": true
+                    }
+                ],
+                "conditional_logic": {
+                    "enabled": true,
+                    "groups": [
+                        [
+                            {
+                                "field": "fld_acc_advanced",
+                                "operator": "checked",
+                                "value": ""
+                            }
+                        ]
+                    ]
+                }
             }
         ],
         "settings": {
@@ -161,7 +202,9 @@
                 "label": "Show category filter",
                 "required": false,
                 "width": "100",
-                "default_value": ""
+                "default_value": "",
+                "content": "Show category filter",
+                "hide_label": true
             },
             {
                 "id": "fld_al_has_limit",
@@ -170,7 +213,9 @@
                 "label": "Limit count",
                 "required": false,
                 "width": "100",
-                "default_value": ""
+                "default_value": "",
+                "content": "Limit count",
+                "hide_label": true
             },
             {
                 "id": "fld_al_limit_type",
@@ -626,7 +671,9 @@
                 "label": "Navigation",
                 "required": false,
                 "width": "100",
-                "default_value": "1"
+                "default_value": "1",
+                "content": "Navigation",
+                "hide_label": true
             },
             {
                 "id": "fld_sl_pag",
@@ -635,7 +682,9 @@
                 "label": "Pagination",
                 "required": false,
                 "width": "100",
-                "default_value": "1"
+                "default_value": "1",
+                "content": "Pagination",
+                "hide_label": true
             },
             {
                 "id": "fld_sl_dyn",
@@ -644,7 +693,9 @@
                 "label": "Dynamic bullets",
                 "required": false,
                 "width": "100",
-                "default_value": ""
+                "default_value": "",
+                "content": "Dynamic bullets",
+                "hide_label": true
             },
             {
                 "id": "fld_sl_loop",
@@ -653,7 +704,9 @@
                 "label": "Loop",
                 "required": false,
                 "width": "100",
-                "default_value": "1"
+                "default_value": "1",
+                "content": "Loop",
+                "hide_label": true
             },
             {
                 "id": "fld_sl_auto",
@@ -662,7 +715,9 @@
                 "label": "Autoplay",
                 "required": false,
                 "width": "100",
-                "default_value": "1"
+                "default_value": "1",
+                "content": "Autoplay",
+                "hide_label": true
             },
             {
                 "id": "fld_sl_delay",
@@ -680,7 +735,9 @@
                 "label": "Slide content",
                 "required": false,
                 "width": "100",
-                "default_value": ""
+                "default_value": "",
+                "content": "Slide content",
+                "hide_label": true
             },
             {
                 "id": "fld_sl_content_align",
@@ -712,7 +769,9 @@
                 "label": "Show content on mobile",
                 "required": false,
                 "width": "100",
-                "default_value": ""
+                "default_value": "",
+                "content": "Show content on mobile",
+                "hide_label": true
             }
         ],
         "settings": {
