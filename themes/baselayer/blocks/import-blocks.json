@@ -143,6 +143,7 @@
                 "required": true,
                 "width": "100",
                 "default_value": "",
+                "prefix": "#",
                 "description": "Unique ID for this anchor. Use lowercase letters and hyphens only. Use #my-id to link directly to this position or scroll there automatically when the page loads."
             },
             {
@@ -315,7 +316,7 @@
                 "id": "fld_al_order_dir",
                 "type": "button_group",
                 "name": "order_direction",
-                "label": "Order",
+                "label": "Direction",
                 "required": false,
                 "width": "50",
                 "default_value": "DESC",
@@ -561,16 +562,18 @@
                         "label": "Number",
                         "required": true,
                         "width": "100",
-                        "default_value": ""
+                        "default_value": "",
+                        "min": "1"
                     },
                     {
                         "id": "fld_nt_label",
                         "type": "textarea",
                         "name": "label",
-                        "label": "Label",
+                        "label": "Caption",
                         "required": false,
                         "width": "100",
-                        "default_value": ""
+                        "default_value": "",
+                        "description": "Text below the number."
                     },
                     {
                         "id": "fld_nt_prefix",
@@ -579,7 +582,8 @@
                         "label": "Prefix",
                         "required": false,
                         "width": "100",
-                        "default_value": ""
+                        "default_value": "",
+                        "description": "Text before the number."
                     },
                     {
                         "id": "fld_nt_suffix",
@@ -588,7 +592,8 @@
                         "label": "Suffix",
                         "required": false,
                         "width": "100",
-                        "default_value": ""
+                        "default_value": "",
+                        "description": "Text after the number."
                     }
                 ]
             }
@@ -1146,6 +1151,7 @@
                 "required": true,
                 "width": "100",
                 "default_value": "",
+                "mime_types": "mp4,webm",
                 "conditional_logic": {
                     "enabled": true,
                     "groups": [
@@ -1173,6 +1179,234 @@
             "block_icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\" viewBox=\"0 -960 960 960\" width=\"24px\" fill=\"currentColor\" style=\"display: block\"><path d=\"M212.31-140Q182-140 161-161q-21-21-21-51.31v-535.38Q140-778 161-799q21-21 51.31-21h535.38Q778-820 799-799q21 21 21 51.31v535.38Q820-182 799-161q-21 21-51.31 21H212.31Zm0-60h535.38q4.62 0 8.46-3.85 3.85-3.84 3.85-8.46v-535.38q0-4.62-3.85-8.46-3.84-3.85-8.46-3.85H212.31q-4.62 0-8.46 3.85-3.85 3.84-3.85 8.46v535.38q0 4.62 3.85 8.46 3.84 3.85 8.46 3.85ZM200-200v-560 560Zm106.16-90h350.76q10.85 0 16.08-9.85 5.23-9.84-1.62-19.07L576-446.69q-5.62-7.23-14.46-7.23-8.85 0-14.46 7.23l-97.85 127.46-65.54-84q-5.61-6.85-14.27-6.85-8.65 0-14.27 7.24l-63.07 83.92q-7.23 9.23-2 19.07 5.23 9.85 16.08 9.85Z\"/></svg>",
             "block_category": "design",
             "block_keywords": "Bild, Video, Slider, Carousel"
+        }
+    },
+    {
+        "type": "page_settings",
+        "title": "Hero",
+        "fields": [
+            {
+                "id": "fld_hero_enabled",
+                "type": "toggle",
+                "name": "hero_enabled",
+                "label": "Enable Hero section",
+                "required": false,
+                "width": "100",
+                "default_value": "",
+                "content": "Enable Hero section",
+                "hide_label": true
+            },
+            {
+                "id": "fld_hero_slides",
+                "type": "repeater",
+                "name": "hero_slides",
+                "label": "Slides",
+                "required": false,
+                "width": "100",
+                "default_value": "",
+                "description": "One slide shows a static hero. Two or more become a slider.",
+                "button_label": "Add slide",
+                "min_rows": 0,
+                "max_rows": 0,
+                "conditional_logic": {
+                    "enabled": true,
+                    "groups": [
+                        [
+                            {
+                                "field": "fld_hero_enabled",
+                                "operator": "checked",
+                                "value": ""
+                            }
+                        ]
+                    ]
+                },
+                "children": [
+                    {
+                        "id": "fld_hero_slide_background",
+                        "type": "select",
+                        "name": "background",
+                        "label": "Background",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "featured",
+                        "options": [
+                            { "value": "featured", "label": "Featured image" },
+                            { "value": "image", "label": "Image" },
+                            { "value": "video", "label": "Video" }
+                        ]
+                    },
+                    {
+                        "id": "fld_hero_slide_image",
+                        "type": "image",
+                        "name": "image",
+                        "label": "Image",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_hero_slide_background",
+                                        "operator": "==",
+                                        "value": "image"
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "fld_hero_slide_video",
+                        "type": "file",
+                        "name": "video",
+                        "label": "Video",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "mime_types": "mp4,webm",
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_hero_slide_background",
+                                        "operator": "==",
+                                        "value": "video"
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "fld_hero_slide_title_source",
+                        "type": "select",
+                        "name": "title_source",
+                        "label": "Title",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "page_title",
+                        "options": [
+                            { "value": "none", "label": "None" },
+                            { "value": "page_title", "label": "Page title" },
+                            { "value": "custom", "label": "Custom" }
+                        ]
+                    },
+                    {
+                        "id": "fld_hero_slide_title",
+                        "type": "textarea",
+                        "name": "title",
+                        "label": "Title text",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "rows": 2,
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_hero_slide_title_source",
+                                        "operator": "==",
+                                        "value": "custom"
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "fld_hero_slide_text_source",
+                        "type": "select",
+                        "name": "text_source",
+                        "label": "Text",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "none",
+                        "options": [
+                            { "value": "none", "label": "None" },
+                            { "value": "excerpt", "label": "Excerpt" },
+                            { "value": "custom", "label": "Custom" }
+                        ]
+                    },
+                    {
+                        "id": "fld_hero_slide_text",
+                        "type": "textarea",
+                        "name": "text",
+                        "label": "Text body",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_hero_slide_text_source",
+                                        "operator": "==",
+                                        "value": "custom"
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "fld_hero_slide_links_source",
+                        "type": "select",
+                        "name": "links_source",
+                        "label": "Links",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "none",
+                        "options": [
+                            { "value": "none", "label": "None" },
+                            { "value": "contact", "label": "Contact page" },
+                            { "value": "custom", "label": "Custom" }
+                        ]
+                    },
+                    {
+                        "id": "fld_hero_slide_links",
+                        "type": "repeater",
+                        "name": "links",
+                        "label": "Links",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "button_label": "Add link",
+                        "min_rows": 0,
+                        "max_rows": 0,
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_hero_slide_links_source",
+                                        "operator": "==",
+                                        "value": "custom"
+                                    }
+                                ]
+                            ]
+                        },
+                        "children": [
+                            {
+                                "id": "fld_hero_slide_link",
+                                "type": "link",
+                                "name": "link",
+                                "label": "Link",
+                                "required": false,
+                                "width": "100",
+                                "default_value": ""
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "settings": {
+            "active": true,
+            "sidebar_editing": true,
+            "slug": "hero",
+            "description": "",
+            "post_types": ["page", "post"]
         }
     }
 ]

@@ -1227,7 +1227,10 @@ export function createFieldForm(fields, values = {}, options = {}) {
 
       if (type === 'repeater') {
         flushLeaves();
-        parent.appendChild(createRepeaterControl(field, valueMap, entries, options));
+        registerField(field);
+        const repeater = createRepeaterControl(field, valueMap, entries, options);
+        registerLogicTarget(repeater, field);
+        parent.appendChild(repeater);
         i += 1;
         continue;
       }

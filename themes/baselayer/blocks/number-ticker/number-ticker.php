@@ -35,7 +35,7 @@ $wrapper_attributes = get_block_wrapper_attributes([
 							<span class="number-ticker__prefix"><?php echo esc_html($prefix); ?></span>
 						<?php endif; ?>
 						<span class="number-ticker__number" data-countup="<?php echo esc_attr((string) $number); ?>">
-							<?php echo esc_html(is_admin() ? (string) $number : '0'); ?>
+							<?php echo esc_html(function_exists('bl_is_block_editor_preview') && bl_is_block_editor_preview() ? (string) $number : '0'); ?>
 						</span>
 						<?php if ($suffix !== '') : ?>
 							<span class="number-ticker__suffix"><?php echo esc_html($suffix); ?></span>

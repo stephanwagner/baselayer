@@ -6981,8 +6981,27 @@
       }
     });
   }
+  function resolveMediaLibraryType(field, kind) {
+    if (kind === "image") {
+      return "image";
+    }
+    const raw = String(field && (field.mime_types || field.extensions) || "").toLowerCase().trim();
+    if (!raw) {
+      return "";
+    }
+    const tokens = raw.split(/[\s,]+/).filter(Boolean).map((t5) => t5.replace(/^video\//, ""));
+    if (!tokens.length) {
+      return "";
+    }
+    const videoExts = /* @__PURE__ */ new Set(["mp4", "webm", "ogg", "ogv", "mov", "m4v", "video"]);
+    if (tokens.every((t5) => videoExts.has(t5))) {
+      return "video";
+    }
+    return "";
+  }
   function createMediaPickerControl(field, current) {
     const kind = field.type === "image" ? "image" : "file";
+    const libraryType = resolveMediaLibraryType(field, kind);
     const multiple = !!field.multiple;
     const maxFiles = Math.max(1, Math.min(50, parseInt(field.max_files, 10) || 10));
     let selected = normalizeAttachmentIds(current, multiple).map((id) => ({
@@ -7025,7 +7044,8 @@
         dataset: {
           blBlocksMediaPicker: "",
           mediaKind: kind,
-          multiple: multiple ? "1" : "0"
+          multiple: multiple ? "1" : "0",
+          mimeTypes: String(field.mime_types || field.extensions || "")
         }
       },
       [preview, empty, actions]
@@ -7092,8 +7112,8 @@
         },
         multiple
       };
-      if (kind === "image") {
-        opts.library = { type: "image" };
+      if (libraryType) {
+        opts.library = { type: libraryType };
       }
       frame = wp.media(opts);
       frame.on("select", () => {
@@ -7152,6 +7172,10 @@
       const multiple = wrap.dataset.multiple === "1";
       const inputName = wrap.dataset.inputName || "";
       const maxFiles = Math.max(1, Math.min(50, parseInt(wrap.dataset.maxFiles || "10", 10) || 10));
+      const libraryType = resolveMediaLibraryType(
+        { mime_types: wrap.dataset.mimeTypes || "" },
+        kind
+      );
       const preview = wrap.querySelector("[data-bl-media-preview]");
       const empty = wrap.querySelector("[data-bl-media-empty]");
       const chooseBtn = wrap.querySelector("[data-bl-media-choose]");
@@ -7243,8 +7267,8 @@
           button: { text: i18n3("selectMedia", "Select") },
           multiple
         };
-        if (kind === "image") {
-          opts.library = { type: "image" };
+        if (libraryType) {
+          opts.library = { type: libraryType };
         }
         frame = wp.media(opts);
         frame.on("select", () => {
@@ -8288,7 +8312,10 @@
         }
         if (type === "repeater") {
           flushLeaves();
-          parent.appendChild(createRepeaterControl(field, valueMap, entries, options));
+          registerField(field);
+          const repeater = createRepeaterControl(field, valueMap, entries, options);
+          registerLogicTarget(repeater, field);
+          parent.appendChild(repeater);
           i += 1;
           continue;
         }

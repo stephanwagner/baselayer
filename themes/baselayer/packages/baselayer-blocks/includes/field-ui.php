@@ -804,12 +804,15 @@ function bl_blocks_render_admin_media_field(array $field, $value, string $input_
 			: __('Select a file.', 'baselayer-blocks');
 	}
 
+	$mime_types = sanitize_text_field((string) ($field['mime_types'] ?? ''));
+
 	printf(
-		'<div class="bl-blocks-fields__media-picker" data-bl-blocks-media-picker data-media-kind="%s" data-multiple="%s" data-max-files="%s" data-input-name="%s">',
+		'<div class="bl-blocks-fields__media-picker" data-bl-blocks-media-picker data-media-kind="%s" data-multiple="%s" data-max-files="%s" data-input-name="%s"%s>',
 		esc_attr($kind),
 		esc_attr($multiple ? '1' : '0'),
 		esc_attr((string) $max_files),
-		esc_attr($input_name)
+		esc_attr($input_name),
+		$mime_types !== '' ? ' data-mime-types="' . esc_attr($mime_types) . '"' : ''
 	);
 	echo '<div class="bl-blocks-fields__media-preview" data-bl-media-preview>';
 	foreach ($ids as $aid) {

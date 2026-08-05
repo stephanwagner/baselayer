@@ -208,12 +208,41 @@ function bindMediaSortable(preview, api) {
 }
 
 /**
+ * Resolve WP media library.type from field mime_types / extensions.
+ *
+ * @param {object} field
+ * @param {'image'|'file'} kind
+ * @returns {string} Empty string = no library filter (all files).
+ */
+function resolveMediaLibraryType(field, kind) {
+  if (kind === 'image') {
+    return 'image';
+  }
+  const raw = String((field && (field.mime_types || field.extensions)) || '')
+    .toLowerCase()
+    .trim();
+  if (!raw) {
+    return '';
+  }
+  const tokens = raw.split(/[\s,]+/).filter(Boolean).map((t) => t.replace(/^video\//, ''));
+  if (!tokens.length) {
+    return '';
+  }
+  const videoExts = new Set(['mp4', 'webm', 'ogg', 'ogv', 'mov', 'm4v', 'video']);
+  if (tokens.every((t) => videoExts.has(t))) {
+    return 'video';
+  }
+  return '';
+}
+
+/**
  * @param {object} field
  * @param {unknown} current
  * @returns {HTMLElement & { getMediaValue: () => number|number[] }}
  */
 export function createMediaPickerControl(field, current) {
   const kind = field.type === 'image' ? 'image' : 'file';
+  const libraryType = resolveMediaLibraryType(field, kind);
   const multiple = !!field.multiple;
   const maxFiles = Math.max(1, Math.min(50, parseInt(field.max_files, 10) || 10));
   /** @type {Array<{ id: number, url: string, filename: string, mime: string, type: string, alt: string }>} */
@@ -269,6 +298,7 @@ export function createMediaPickerControl(field, current) {
         blBlocksMediaPicker: '',
         mediaKind: kind,
         multiple: multiple ? '1' : '0',
+        mimeTypes: String(field.mime_types || field.extensions || ''),
       },
     },
     [preview, empty, actions]
@@ -360,8 +390,8 @@ export function createMediaPickerControl(field, current) {
       },
       multiple: multiple,
     };
-    if (kind === 'image') {
-      opts.library = { type: 'image' };
+    if (libraryType) {
+      opts.library = { type: libraryType };
     }
     frame = wp.media(opts);
     frame.on('select', () => {
@@ -429,6 +459,10 @@ export function bindMediaPickers(root = document) {
     const multiple = wrap.dataset.multiple === '1';
     const inputName = wrap.dataset.inputName || '';
     const maxFiles = Math.max(1, Math.min(50, parseInt(wrap.dataset.maxFiles || '10', 10) || 10));
+    const libraryType = resolveMediaLibraryType(
+      { mime_types: wrap.dataset.mimeTypes || '' },
+      kind
+    );
     const preview = wrap.querySelector('[data-bl-media-preview]');
     const empty = wrap.querySelector('[data-bl-media-empty]');
     const chooseBtn = wrap.querySelector('[data-bl-media-choose]');
@@ -547,8 +581,8 @@ export function bindMediaPickers(root = document) {
         button: { text: i18n('selectMedia', 'Select') },
         multiple,
       };
-      if (kind === 'image') {
-        opts.library = { type: 'image' };
+      if (libraryType) {
+        opts.library = { type: libraryType };
       }
       frame = wp.media(opts);
       frame.on('select', () => {

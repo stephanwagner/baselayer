@@ -535,6 +535,14 @@ function bl_blocks_sanitize_field($field, int $repeater_depth = 0): ?array
 			$clean['level'] = in_array($level, ['h2', 'h3', 'h4'], true) ? $level : 'h4';
 		}
 
+		// ACF-parity mime restriction for media library pickers (e.g. mp4,webm).
+		if (in_array(($clean['type'] ?? ''), ['file', 'image'], true)) {
+			$mime_types = sanitize_text_field((string) ($field['mime_types'] ?? ''));
+			if ($mime_types !== '') {
+				$clean['mime_types'] = $mime_types;
+			}
+		}
+
 		return $clean;
 	}
 
@@ -826,6 +834,12 @@ function bl_blocks_sanitize_leaf_field_fallback(array $field): array
 
 	if (in_array($out['type'], ['select', 'button_group', 'file', 'image', 'page'], true)) {
 		$out['multiple'] = !empty($field['multiple']);
+	}
+	if (in_array($out['type'], ['file', 'image'], true)) {
+		$mime_types = sanitize_text_field((string) ($field['mime_types'] ?? ''));
+		if ($mime_types !== '') {
+			$out['mime_types'] = $mime_types;
+		}
 	}
 	if (in_array($out['type'], ['radio', 'checkboxes'], true)) {
 		$out['layout'] = (($field['layout'] ?? 'vertical') === 'horizontal') ? 'horizontal' : 'vertical';
