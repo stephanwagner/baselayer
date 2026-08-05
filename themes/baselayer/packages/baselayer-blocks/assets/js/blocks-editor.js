@@ -5769,6 +5769,9 @@
         } else {
           valueRow.hidden = true;
         }
+        if (control) {
+          control.dispatchEvent(new Event("change", { bubbles: true }));
+        }
       };
       syncIconPreview(current == null ? "" : String(current));
       chooseBtn.addEventListener("click", async () => {
@@ -6683,6 +6686,10 @@
   function isSliderWrapper(el5) {
     return !!(el5 && el5.classList && el5.classList.contains("slider__wrapper"));
   }
+  function isStyleHostWrapper(el5) {
+    if (!el5 || !el5.classList) return false;
+    return el5.classList.contains("icon__wrapper") || el5.classList.contains("icon-text__wrapper");
+  }
   function applyBlockAlignClass(props, blockAlign) {
     const align = String(blockAlign || "").trim();
     if (!["wide", "full", "left", "center", "right"].includes(align)) {
@@ -6694,6 +6701,20 @@
     if (!classes.includes(alignClass)) {
       classes.push(alignClass);
     }
+    return { ...props, className: classes.join(" ") };
+  }
+  function applyBlockClassName(props, blockClassName) {
+    const extra = String(blockClassName || "").split(/\s+/).filter(Boolean);
+    if (!extra.length) {
+      return props;
+    }
+    const className = String(props.className || "");
+    const classes = className.split(/\s+/).filter(Boolean);
+    extra.forEach((c) => {
+      if (!classes.includes(c)) {
+        classes.push(c);
+      }
+    });
     return { ...props, className: classes.join(" ") };
   }
   function walkNode(node, ctx) {
@@ -6750,6 +6771,9 @@
     }
     if (ctx.blockAlign && isSliderWrapper(el5)) {
       props = applyBlockAlignClass(props, ctx.blockAlign);
+    }
+    if (ctx.blockClassName && isStyleHostWrapper(el5)) {
+      props = applyBlockClassName(props, ctx.blockClassName);
     }
     if (ctx.iconControl && isIconHost(el5)) {
       const className = String(props.className || "");
@@ -6814,7 +6838,8 @@
       iconControl: options.iconControl || null,
       accordionEditorOpen: !!options.accordionEditorOpen,
       sliderEditorExpanded: !!options.sliderEditorExpanded,
-      blockAlign: typeof options.blockAlign === "string" ? options.blockAlign : ""
+      blockAlign: typeof options.blockAlign === "string" ? options.blockAlign : "",
+      blockClassName: typeof options.blockClassName === "string" ? options.blockClassName : ""
     };
     const children = [];
     Array.from(root.childNodes).forEach((child) => {
@@ -7030,6 +7055,7 @@
       isSelected,
       clientId,
       blockAlign,
+      blockClassName,
       onChangeValues
     }) {
       const [response, setResponse] = useState({ status: "idle" });
@@ -7065,7 +7091,11 @@
           apiFetch({
             path: renderPath,
             method: "POST",
-            data: { name, values: values || {} },
+            data: {
+              name,
+              values: values || {},
+              className: typeof blockClassName === "string" ? blockClassName : ""
+            },
             signal: controller ? controller.signal : void 0
           }).then((res) => {
             if (cancelled) return;
@@ -7147,7 +7177,8 @@
           iconControl,
           accordionEditorOpen: slug === "accordion" ? accordionEditorOpen : false,
           sliderEditorExpanded: slug === "slider" ? sliderEditorExpanded : false,
-          blockAlign: typeof blockAlign === "string" ? blockAlign : ""
+          blockAlign: typeof blockAlign === "string" ? blockAlign : "",
+          blockClassName: typeof blockClassName === "string" ? blockClassName : ""
         });
       } catch (err) {
         if (typeof console !== "undefined" && console.warn) {
@@ -7191,6 +7222,7 @@
           const values = normalizeValues(attributes.values);
           const ui = normalizeUi(attributes.ui);
           const blockAlign = typeof attributes.align === "string" ? attributes.align : "";
+          const blockClassName = typeof attributes.className === "string" ? attributes.className : "";
           const [sidebarMountId, setSidebarMountId] = useState(0);
           const sidebarEditing = !!def.sidebarEditing;
           const applyValues = (next) => {
@@ -7232,6 +7264,7 @@
               isSelected,
               clientId,
               blockAlign,
+              blockClassName,
               onChangeValues: isIconShell ? applyCanvasValues : null
             })
           ) : el5(

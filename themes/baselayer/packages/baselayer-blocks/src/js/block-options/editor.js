@@ -615,6 +615,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                           isBlock
                           onChange={(newValue) => setOptionAttributes({ [option.attributeName]: newValue })}
                           __nextHasNoMarginBottom
+                          __next40pxDefaultSize
                           {...optionHelpProps(option)}
                         >
                           {option.options.map((opt) => (

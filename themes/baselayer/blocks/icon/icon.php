@@ -11,11 +11,18 @@ if ($icon_slug !== '') {
 }
 
 $class_names = ['bl-wp-block', '-baselayer-block', 'icon__wrapper'];
+if (!empty($attributes['className']) && is_string($attributes['className'])) {
+	$class_names[] = $attributes['className'];
+}
 $wrapper_attributes = get_block_wrapper_attributes([
 	'class' => implode(' ', $class_names),
 ]);
 
-if ($icon_markup || is_admin()) :
+if (
+	$icon_markup
+	|| (function_exists('bl_blocks_is_editor_render') && bl_blocks_is_editor_render())
+	|| is_admin()
+) :
 	?>
 	<div <?php echo $wrapper_attributes; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 		<div class="icon__container">

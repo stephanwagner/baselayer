@@ -313,14 +313,38 @@ div.baselayer-seo-panel {
   }
 }
 
+.bl-block-admin-preview,
 .admin-block-preview {
-  background: #eee;
-  border-radius: var(--bl-admin-radius);
-  border-left: 4px solid #000;
-  font-size: 13px;
-  padding: 12px 16px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  padding: 14px 16px;
+  border: 1px solid var(--bl-color-neutral);
+  border-left-width: 4px;
+  border-radius: var(--bl-admin-radius, 6px);
+  background: var(--bl-color-neutral-bg);
+  color: #1d2327;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
 
-  b {
+  @media (min-resolution: 1.9dppx) {
+    border-width: 1.5px;
+    border-left-width: 4px;
+  }
+
+  code {
+    font-weight: 500;
+  }
+
+  b,
+  strong {
     font-weight: 600;
   }
+}
+
+.bl-block-admin-preview__text {
+  min-width: 0;
 }

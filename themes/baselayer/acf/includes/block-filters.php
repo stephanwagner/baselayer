@@ -4,6 +4,39 @@
 
 global $bl_selected_article_list_post_type;
 
+/**
+ * Ensure repeater/group sub fields have ACF runtime keys (`_name`, `_valid`).
+ *
+ * When sub fields are stored embedded on the parent (no child acf-field posts),
+ * load_field keeps the raw export shape and format_value warns on missing `_name`,
+ * so template keys like `number` never appear.
+ *
+ * @param array<string, mixed> $field
+ * @return array<string, mixed>
+ */
+function bl_acf_ensure_sub_field_runtime_keys($field)
+{
+	if (!is_array($field) || empty($field['sub_fields']) || !is_array($field['sub_fields'])) {
+		return $field;
+	}
+
+	if (!function_exists('acf_get_valid_field')) {
+		return $field;
+	}
+
+	foreach ($field['sub_fields'] as $index => $sub_field) {
+		if (!is_array($sub_field)) {
+			continue;
+		}
+		$field['sub_fields'][$index] = acf_get_valid_field($sub_field);
+	}
+
+	return $field;
+}
+
+add_filter('acf/load_field/type=repeater', 'bl_acf_ensure_sub_field_runtime_keys', 20);
+add_filter('acf/load_field/type=group', 'bl_acf_ensure_sub_field_runtime_keys', 20);
+
 add_filter('acf/load_field/name=post_type', function ($field) {
 
     $field['choices'] = [];

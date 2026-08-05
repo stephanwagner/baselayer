@@ -339,6 +339,12 @@ function bl_blocks_register_rest_routes(): void
 					return $value === null || is_array($value) || is_object($value);
 				},
 			],
+			'className' => [
+				'required'          => false,
+				'default'           => '',
+				'type'              => 'string',
+				'sanitize_callback' => 'sanitize_text_field',
+			],
 		],
 	]);
 
@@ -495,6 +501,11 @@ function bl_blocks_rest_render_block(WP_REST_Request $request)
 		$values = [];
 	}
 
+	$class_name = $request->get_param('className');
+	if (!is_string($class_name)) {
+		$class_name = '';
+	}
+
 	$def = null;
 	foreach (bl_blocks_active_block_payloads() as $payload) {
 		if (($payload['name'] ?? '') === $name) {
@@ -510,8 +521,13 @@ function bl_blocks_rest_render_block(WP_REST_Request $request)
 		);
 	}
 
+	$attributes = ['values' => $values];
+	if ($class_name !== '') {
+		$attributes['className'] = $class_name;
+	}
+
 	return rest_ensure_response([
-		'rendered' => bl_blocks_render_block($def, ['values' => $values]),
+		'rendered' => bl_blocks_render_block($def, $attributes),
 	]);
 }
 

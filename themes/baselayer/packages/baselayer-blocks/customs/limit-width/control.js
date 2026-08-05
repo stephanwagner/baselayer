@@ -49,6 +49,7 @@ export function LimitWidthControl({ option, attributes, onChange }) {
           isBlock
           onChange={setSize}
           __nextHasNoMarginBottom
+          __next40pxDefaultSize
         >
           {LIMIT_WIDTH_SIZES.map((item) => (
             <BlockOptionToggleGroupOption
@@ -73,6 +74,7 @@ export function LimitWidthControl({ option, attributes, onChange }) {
             isBlock
             onChange={setAlign}
             __nextHasNoMarginBottom
+            __next40pxDefaultSize
           >
             {LIMIT_WIDTH_ALIGNS.map((item) => (
               <BlockOptionToggleGroupOption

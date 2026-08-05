@@ -192,7 +192,8 @@
           value,
           isBlock: true,
           onChange: onSelect,
-          __nextHasNoMarginBottom: true
+          __nextHasNoMarginBottom: true,
+          __next40pxDefaultSize: true
         },
         CONTAINER_MARGIN_SIZES.map((size) => /* @__PURE__ */ wp.element.createElement(
           BlockOptionToggleGroupOption,
@@ -373,7 +374,8 @@
         value: displaySize,
         isBlock: true,
         onChange: setSize,
-        __nextHasNoMarginBottom: true
+        __nextHasNoMarginBottom: true,
+        __next40pxDefaultSize: true
       },
       LIMIT_WIDTH_SIZES.map((item) => /* @__PURE__ */ wp.element.createElement(
         BlockOptionToggleGroupOption,
@@ -398,7 +400,8 @@
           value: storedAlign,
           isBlock: true,
           onChange: setAlign,
-          __nextHasNoMarginBottom: true
+          __nextHasNoMarginBottom: true,
+          __next40pxDefaultSize: true
         },
         LIMIT_WIDTH_ALIGNS.map((item) => /* @__PURE__ */ wp.element.createElement(
           BlockOptionToggleGroupOption,
@@ -2043,6 +2046,7 @@
                 isBlock: true,
                 onChange: (newValue) => setOptionAttributes({ [option.attributeName]: newValue }),
                 __nextHasNoMarginBottom: true,
+                __next40pxDefaultSize: true,
                 ...optionHelpProps(option)
               },
               option.options.map((opt) => /* @__PURE__ */ wp.element.createElement(

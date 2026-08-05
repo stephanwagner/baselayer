@@ -80,6 +80,7 @@ export function ContainerMarginControl({ option, attributes, onChange }) {
         isBlock
         onChange={onSelect}
         __nextHasNoMarginBottom
+        __next40pxDefaultSize
       >
         {CONTAINER_MARGIN_SIZES.map((size) => (
           <BlockOptionToggleGroupOption

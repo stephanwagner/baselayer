@@ -7944,6 +7944,9 @@
         } else {
           valueRow.hidden = true;
         }
+        if (control) {
+          control.dispatchEvent(new Event("change", { bubbles: true }));
+        }
       };
       syncIconPreview(current == null ? "" : String(current));
       chooseBtn.addEventListener("click", async () => {

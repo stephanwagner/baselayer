@@ -15,7 +15,7 @@ defined('ABSPATH') || exit;
  * default — fallback flags for blocks without a per-block entry in `blocks`.
  * blocks  — per-block defaults (used when nothing is saved in the database yet,
  *           and for newly registered blocks). Keys are block names, e.g.
- *           `core/paragraph`, `acf/slider`.
+ *           `core/paragraph`, `baselayer/slider`.
  *
  * Each block entry supports: allowed, hidden, favorite (all booleans).
  * `hidden` and `favorite` only apply when `allowed` is true.
@@ -159,7 +159,7 @@ return [
 			'allowed' => true,
 		],
 
-		// Allowed but hidden
+		// Allowed but hidden: core
 		'core/math' => [
 			'hidden'  => true,
 		],
@@ -169,10 +169,20 @@ return [
 		'core/html' => [
 			'hidden'  => true,
 		],
+
+		// Allowed but hidden: acf
 		'acf/map' => [
 			'hidden'  => true,
 		],
 		'acf/map-dsgvo' => [
+			'hidden'  => true,
+		],
+
+		// Allowed but hidden: baselayer
+		'baselayer/map' => [
+			'hidden'  => true,
+		],
+		'baselayer/map-dsgvo' => [
 			'hidden'  => true,
 		],
 

@@ -807,6 +807,10 @@ function createLeafControl(field, values, controls) {
       } else {
         valueRow.hidden = true;
       }
+      // SidebarFields syncs on bubbled change; picker updates do not fire input/change alone.
+      if (control) {
+        control.dispatchEvent(new Event('change', { bubbles: true }));
+      }
     };
     syncIconPreview(current == null ? '' : String(current));
 

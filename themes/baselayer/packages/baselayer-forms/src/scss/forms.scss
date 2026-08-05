@@ -1123,6 +1123,7 @@ select.bl-form__control {
   font-size: #{$font-size-s};
   font-weight: 600;
   line-height: 1.4;
+  font-size: 14px;
   border-left-width: 4px;
 
   @media (min-resolution: $high-density-dppx) {

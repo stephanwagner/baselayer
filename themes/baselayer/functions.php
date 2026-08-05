@@ -50,6 +50,7 @@ if (is_admin()) {
 // Helpers
 require_once __DIR__ . '/includes/helpers/page-blocker.php';
 require_once __DIR__ . '/includes/helpers/templates.php';
+require_once __DIR__ . '/includes/helpers/blocks.php';
 
 // Features
 require_once __DIR__ . '/includes/login-client-logo.php';

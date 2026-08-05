@@ -11,6 +11,9 @@ if ($icon_slug !== '') {
 }
 
 $class_names = ['bl-wp-block', '-baselayer-block', 'icon-text__wrapper'];
+if (!empty($attributes['className']) && is_string($attributes['className'])) {
+	$class_names[] = $attributes['className'];
+}
 $wrapper_attributes = get_block_wrapper_attributes([
 	'class' => implode(' ', $class_names),
 ]);

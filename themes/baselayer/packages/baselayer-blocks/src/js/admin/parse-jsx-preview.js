@@ -196,6 +196,15 @@ function isSliderWrapper(el) {
 }
 
 /**
+ * @param {Element} el
+ * @returns {boolean}
+ */
+function isStyleHostWrapper(el) {
+  if (!el || !el.classList) return false;
+  return el.classList.contains('icon__wrapper') || el.classList.contains('icon-text__wrapper');
+}
+
+/**
  * @param {Record<string, unknown>} props
  * @param {string} blockAlign
  * @returns {Record<string, unknown>}
@@ -213,6 +222,31 @@ function applyBlockAlignClass(props, blockAlign) {
   if (!classes.includes(alignClass)) {
     classes.push(alignClass);
   }
+  return { ...props, className: classes.join(' ') };
+}
+
+/**
+ * Merge block option / editor className onto the PHP style host (icon wrappers).
+ * useBlockProps puts className on the outer editor shell; CSS targets .icon-text__wrapper.*
+ *
+ * @param {Record<string, unknown>} props
+ * @param {string} blockClassName
+ * @returns {Record<string, unknown>}
+ */
+function applyBlockClassName(props, blockClassName) {
+  const extra = String(blockClassName || '')
+    .split(/\s+/)
+    .filter(Boolean);
+  if (!extra.length) {
+    return props;
+  }
+  const className = String(props.className || '');
+  const classes = className.split(/\s+/).filter(Boolean);
+  extra.forEach((c) => {
+    if (!classes.includes(c)) {
+      classes.push(c);
+    }
+  });
   return { ...props, className: classes.join(' ') };
 }
 
@@ -281,6 +315,10 @@ function walkNode(node, ctx) {
     props = applyBlockAlignClass(props, ctx.blockAlign);
   }
 
+  if (ctx.blockClassName && isStyleHostWrapper(el)) {
+    props = applyBlockClassName(props, ctx.blockClassName);
+  }
+
   if (ctx.iconControl && isIconHost(el)) {
     const className = String(props.className || '');
     const hasIcon = !!(ctx.iconControl.value);
@@ -335,6 +373,7 @@ function walkNode(node, ctx) {
  *   accordionEditorOpen?: boolean,
  *   sliderEditorExpanded?: boolean,
  *   blockAlign?: string,
+ *   blockClassName?: string,
  * }} options
  * @returns {unknown}
  */
@@ -371,6 +410,7 @@ export function parseJsxPreview(html, options) {
     accordionEditorOpen: !!options.accordionEditorOpen,
     sliderEditorExpanded: !!options.sliderEditorExpanded,
     blockAlign: typeof options.blockAlign === 'string' ? options.blockAlign : '',
+    blockClassName: typeof options.blockClassName === 'string' ? options.blockClassName : '',
   };
 
   const children = [];

@@ -195,6 +195,7 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
     isSelected,
     clientId,
     blockAlign,
+    blockClassName,
     onChangeValues,
   }) {
     const [response, setResponse] = useState({ status: 'idle' });
@@ -245,7 +246,11 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
         apiFetch({
           path: renderPath,
           method: 'POST',
-          data: { name, values: values || {} },
+          data: {
+            name,
+            values: values || {},
+            className: typeof blockClassName === 'string' ? blockClassName : '',
+          },
           signal: controller ? controller.signal : undefined,
         })
           .then((res) => {
@@ -344,6 +349,7 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
         accordionEditorOpen: slug === 'accordion' ? accordionEditorOpen : false,
         sliderEditorExpanded: slug === 'slider' ? sliderEditorExpanded : false,
         blockAlign: typeof blockAlign === 'string' ? blockAlign : '',
+        blockClassName: typeof blockClassName === 'string' ? blockClassName : '',
       });
     } catch (err) {
       if (typeof console !== 'undefined' && console.warn) {
@@ -393,6 +399,8 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
         const ui = normalizeUi(attributes.ui);
         const blockAlign =
           typeof attributes.align === 'string' ? attributes.align : '';
+        const blockClassName =
+          typeof attributes.className === 'string' ? attributes.className : '';
         const [sidebarMountId, setSidebarMountId] = useState(0);
         const sidebarEditing = !!def.sidebarEditing;
 
@@ -444,6 +452,7 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
                 isSelected,
                 clientId,
                 blockAlign,
+                blockClassName,
                 onChangeValues: isIconShell ? applyCanvasValues : null,
               })
             )
