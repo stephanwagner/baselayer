@@ -33,6 +33,7 @@
     );
 
   registerBlockType('baselayer/form', {
+    apiVersion: 3,
     icon: iconSvg
       ? {
           src: el(

@@ -60,7 +60,7 @@ function bl_forms_register_block(): void
 	}
 
 	register_block_type('baselayer/form', [
-		'api_version'     => 2,
+		'api_version'     => 3,
 		'title'           => __('Form', 'baselayer-forms'),
 		'description'     => __('Place a form created under Forms.', 'baselayer-forms'),
 		'category'        => 'widgets',

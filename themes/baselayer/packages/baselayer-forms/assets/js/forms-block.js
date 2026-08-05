@@ -26,6 +26,7 @@
       el("span", { className: "bl-form-block-placeholder__text" }, text)
     );
     registerBlockType("baselayer/form", {
+      apiVersion: 3,
       icon: iconSvg ? {
         src: el(
           "span",
