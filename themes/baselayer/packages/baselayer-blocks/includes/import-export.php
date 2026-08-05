@@ -68,7 +68,7 @@ add_action('admin_menu', 'bl_blocks_register_settings_page', 20);
  */
 function bl_blocks_catalog_import_path(): string
 {
-	$relative = 'blocks/blocks-import.json';
+	$relative = 'blocks/import-blocks.json';
 	$child = trailingslashit(get_stylesheet_directory()) . $relative;
 	if (is_readable($child)) {
 		return $child;
@@ -214,6 +214,15 @@ function bl_blocks_import_definition_item(array $item): array
 	$post_id = (int) $post_id;
 	update_post_meta($post_id, BL_BLOCK_TYPE_META, $type);
 	update_post_meta($post_id, BL_BLOCK_CONFIG_META, $config);
+
+	if (
+		$type === 'block'
+		&& isset($item['block_options'])
+		&& is_array($item['block_options'])
+		&& function_exists('bl_block_options_apply_from_block_definition')
+	) {
+		bl_block_options_apply_from_block_definition($slug, $item['block_options']);
+	}
 
 	return [
 		'ok'      => true,

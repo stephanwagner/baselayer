@@ -1060,6 +1060,18 @@ function baselayer_run_install(): void
 
   $install_notices = [];
 
+  // Always seed core block options (presets + core/*) before system-specific assignments.
+  if (function_exists('bl_block_options_import_core')) {
+    if (function_exists('bl_block_options_store_is_empty') && bl_block_options_store_is_empty()) {
+      $block_options_import = bl_block_options_import_core(['replace' => true]);
+      if (!is_wp_error($block_options_import)) {
+        update_option('bl_block_options_bootstrapped', 1, false);
+      }
+    } else {
+      bl_block_options_import_core(['merge' => true]);
+    }
+  }
+
   if ($blocks_system === 'acf') {
     $acf_license_result = bl_install_write_acf_pro_license(
       (string) ($_POST['install']['acf_pro_key'] ?? '')
@@ -1098,7 +1110,7 @@ function baselayer_run_install(): void
         break;
       }
     }
-    $bl_acf_import_notice = get_template_directory() . '/acf/acf-import-notice.php';
+    $bl_acf_import_notice = get_template_directory() . '/acf/includes/acf-import-notice.php';
     if (is_readable($bl_acf_import_notice) && !function_exists('bl_acf_import_run')) {
       require_once $bl_acf_import_notice;
     }
@@ -1141,7 +1153,11 @@ function baselayer_run_install(): void
         require_once $blocks_bootstrap;
       }
     }
+    // Also applies per-block block_options from import-blocks.json.
     bl_install_import_block_definitions();
+  } elseif ($blocks_system === 'acf' && function_exists('bl_block_options_import_acf')) {
+    // Ensure ACF assignments even when soft field-group import was skipped.
+    bl_block_options_import_acf(['merge' => true]);
   }
 
   if ($install_notices !== []) {
@@ -1280,17 +1296,6 @@ function baselayer_run_install(): void
     }
   }
 
-  if (
-    function_exists('bl_block_options_store_is_empty')
-    && function_exists('bl_block_options_import_theme_defaults')
-    && bl_block_options_store_is_empty()
-  ) {
-    $block_options_import = bl_block_options_import_theme_defaults(['replace' => true]);
-    if (!is_wp_error($block_options_import)) {
-      update_option('bl_block_options_bootstrapped', 1, false);
-    }
-  }
-
   /**
    * Redirect
    */
@@ -1364,7 +1369,7 @@ function bl_install_import_block_definitions(): void
 		$path = bl_blocks_catalog_import_path();
 	}
 	if ($path === '' || !is_readable($path)) {
-		$fallback = get_template_directory() . '/blocks/blocks-import.json';
+		$fallback = get_template_directory() . '/blocks/import-blocks.json';
 		$path = is_readable($fallback) ? $fallback : '';
 	}
 	if ($path === '') {

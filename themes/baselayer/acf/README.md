@@ -22,7 +22,7 @@ If you fork ACF into a **child** theme as `acf/`, PHP loads the child’s `acf/a
 
 ## Field groups
 
-Bundled exports: `acf-import-en.json` / `acf-import-de.json`.
+Bundled exports: `import-blocks-acf-en.json` / `import-blocks-acf-de.json`.
 
 When ACF Pro is enabled and the site has **no field groups**, developers see an admin notice (**Import field groups** / **Skip**). Choosing **ACF Pro** at install also soft-tries this import once Pro is active.
 
@@ -30,13 +30,13 @@ You can still import manually via **ACF → Tools**.
 
 ## Contents
 
-- `acf.php` — bootstrap, block registration, helpers (`BL_ACF_PATH`)
-- `acf-import-notice.php` — admin notice + import/skip handlers
+- `acf.php` — thin entry (`BL_ACF_PATH`); loads `includes/`
+- `includes/` — bootstrap, block filters, field-group import notice
 - `blocks.php` — block catalog
-- `block-filters.php` — editor filters
 - `blocks/` — PHP templates, SCSS, JS per block
 - `assets/js/` — editor helpers (inner-blocks toolbar)
-- `acf-import-*.json` — field-group exports
+- `import-blocks-acf-*.json` — field-group exports
+- `import-block-options-acf.json` — ACF block option assignments
 
 ## Install automation
 

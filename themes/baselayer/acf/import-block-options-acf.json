@@ -1,0 +1,169 @@
+{
+    "version": 1,
+    "blocks": {
+        "acf/icon": {
+            "items": [
+                {
+                    "id": "p_b751ea0329fb",
+                    "kind": "preset",
+                    "slug": "abstand"
+                },
+                {
+                    "id": "c_4c01e073ea4d",
+                    "kind": "control",
+                    "type": "button-group",
+                    "label": "Ausrichtung",
+                    "attributeName": "iconAlign",
+                    "default": "",
+                    "options": [
+                        {
+                            "icon": "image-left",
+                            "label": "Links",
+                            "value": "-icon-align-left"
+                        },
+                        {
+                            "icon": "image-center",
+                            "label": "Zentriert",
+                            "value": ""
+                        },
+                        {
+                            "icon": "image-right",
+                            "label": "Rechts",
+                            "value": "-icon-align-right"
+                        }
+                    ]
+                }
+            ]
+        },
+        "acf/icon-text": {
+            "items": [
+                {
+                    "id": "p_123dc27df96e",
+                    "kind": "preset",
+                    "slug": "abstand"
+                },
+                {
+                    "id": "c_70efa143dfed",
+                    "kind": "control",
+                    "type": "button-group",
+                    "label": "Position",
+                    "attributeName": "iconTextPosition",
+                    "default": "",
+                    "options": [
+                        {
+                            "icon": "image-left-text",
+                            "label": "Links neben Text",
+                            "value": ""
+                        },
+                        {
+                            "icon": "image-right-text",
+                            "label": "Rechts neben Text",
+                            "value": "-icon-text-align-right"
+                        },
+                        {
+                            "icon": "image-left",
+                            "label": "Links",
+                            "value": "-icon-align-left"
+                        },
+                        {
+                            "icon": "image-center",
+                            "label": "Zentriert",
+                            "value": "-icon-align-center"
+                        },
+                        {
+                            "icon": "image-right",
+                            "label": "Rechts",
+                            "value": "-icon-align-right"
+                        }
+                    ]
+                }
+            ]
+        },
+        "acf/slider": {
+            "items": [
+                {
+                    "id": "p_df106c5bb963",
+                    "kind": "preset",
+                    "slug": "inhaltsbreite"
+                },
+                {
+                    "id": "p_b87c06aaa719",
+                    "kind": "preset",
+                    "slug": "abstand",
+                    "defaults": {
+                        "c_abstand": {
+                            "defaultSize": "m"
+                        }
+                    }
+                },
+                {
+                    "id": "p_772afee70c26",
+                    "kind": "preset",
+                    "slug": "innenabstand",
+                    "defaults": {
+                        "c_innenabstand": {
+                            "default": "-container-padding-m"
+                        }
+                    }
+                }
+            ]
+        },
+        "acf/map": {
+            "items": [
+                {
+                    "id": "p_2f72c0f2fef6",
+                    "kind": "preset",
+                    "slug": "inhaltsbreite"
+                },
+                {
+                    "id": "p_fff1bda18a45",
+                    "kind": "preset",
+                    "slug": "abstand",
+                    "defaults": {
+                        "c_abstand": {
+                            "defaultSize": "m"
+                        }
+                    }
+                }
+            ]
+        },
+        "acf/article-list": {
+            "items": [
+                {
+                    "id": "p_bc6c1002ad71",
+                    "kind": "preset",
+                    "slug": "inhaltsbreite"
+                },
+                {
+                    "id": "p_ffc2b36e2c8a",
+                    "kind": "preset",
+                    "slug": "abstand",
+                    "defaults": {
+                        "c_abstand": {
+                            "defaultSize": "m"
+                        }
+                    }
+                }
+            ]
+        },
+        "acf/number-ticker": {
+            "items": [
+                {
+                    "id": "p_b9e7fcfc4ce6",
+                    "kind": "preset",
+                    "slug": "inhaltsbreite"
+                },
+                {
+                    "id": "p_6cc8c7db2a35",
+                    "kind": "preset",
+                    "slug": "abstand",
+                    "defaults": {
+                        "c_abstand": {
+                            "defaultSize": "m"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

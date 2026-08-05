@@ -108,6 +108,11 @@ async function main() {
     await copyDir(path.join(pkg, 'languages'), path.join(out, 'languages'));
   }
 
+  const coreSeed = path.join(root, 'themes/baselayer/blocks/import-block-options-core.json');
+  if (await exists(coreSeed)) {
+    await copyFile(coreSeed, path.join(out, 'seed/import-block-options-core.json'));
+  }
+
   console.log(`Done. Plugin files are in:\n  ${out}`);
   console.log('Copy that folder into wp-content/plugins or your WordPress.org SVN trunk.');
 }

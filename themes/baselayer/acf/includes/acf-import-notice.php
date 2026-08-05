@@ -34,15 +34,15 @@ function bl_acf_import_locale_key(): string
 /**
  * Absolute path to the bundled ACF field-group export JSON for the site language.
  *
- * Prefers acf-import-{lang}.json (e.g. -de, -en), then falls back to -en.
+ * Prefers import-blocks-acf-{lang}.json (e.g. -de, -en), then falls back to -en.
  */
 function bl_acf_import_json_path(): string
 {
 	$dir = (defined('BL_ACF_PATH') ? BL_ACF_PATH : get_template_directory() . '/acf/');
 	$lang = bl_acf_import_locale_key();
 	$candidates = [
-		$dir . 'acf-import-' . $lang . '.json',
-		$dir . 'acf-import-en.json',
+		$dir . 'import-blocks-acf-' . $lang . '.json',
+		$dir . 'import-blocks-acf-en.json',
 	];
 
 	foreach ($candidates as $path) {
@@ -51,7 +51,7 @@ function bl_acf_import_json_path(): string
 		}
 	}
 
-	return $dir . 'acf-import-en.json';
+	return $dir . 'import-blocks-acf-en.json';
 }
 
 /**
@@ -183,6 +183,10 @@ function bl_acf_import_run()
 	}
 
 	delete_option(BL_ACF_IMPORT_SKIPPED_OPTION);
+
+	if (function_exists('bl_block_options_import_acf')) {
+		bl_block_options_import_acf(['merge' => true]);
+	}
 
 	return $count;
 }

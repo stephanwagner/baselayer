@@ -39,7 +39,7 @@ They also appear under **Theme** in the icon picker. An example `logo-child.svg`
 
 Do **not** copy `packages/` into the child. Forms, Events, and Blocks always load from the parent theme (or as standalone plugins). Parent updates replace package code; site config stays in the database.
 
-- **Blocks:** choose **BaseLayer Blocks**, **ACF Pro**, or **None** at install (or under Developer → Features). BaseLayer block PHP/SCSS/JS live under `blocks/` in this theme. Catalog JSON lives at `blocks/blocks-import.json` (parent or this child). Move definitions between sites via **Blocks → Settings → Import / Export** (match by type + slug; no duplicates).
+- **Blocks:** choose **BaseLayer Blocks**, **ACF Pro**, or **None** at install (or under Developer → Features). BaseLayer block PHP/SCSS/JS live under `blocks/` in this theme. Catalog JSON lives at `blocks/import-blocks.json` (parent or this child). Move definitions between sites via **Blocks → Settings → Import / Export** (match by type + slug; no duplicates).
 - **Forms:** Developer → Features → Enable forms
 - **Events:** Developer → Features → Enable events, then configure each type under its menu → Settings (developers only; stored in `bl_events_instances` — not `config/content-types/`)
 
@@ -72,6 +72,6 @@ Only if you fork ACF into this child as `acf/` and need local asset overrides:
 
 1. Keep ACF Pro selected under Features
 2. Add child SCSS/JS entrypoints or imports for your forked `acf/blocks` and rebuild
-3. Optionally import field groups from the parent’s `acf/acf-import-*.json` via **ACF → Tools**
+3. Optionally import field groups from the parent’s `acf/import-blocks-acf-*.json` via **ACF → Tools**
 
 See `acf/README.md` in the parent theme for details.
