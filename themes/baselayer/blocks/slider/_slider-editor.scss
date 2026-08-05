@@ -1,19 +1,37 @@
 @use '../../src/scss/config' as *;
 @use '../../src/scss/mixins' as *;
 
-// Mixins
+// PHP templates wrap <InnerBlocks /> in .swiper-wrapper (front Swiper).
+// Legacy / ACF-shaped markup mounts InnerBlocks as a direct .swiper child.
+// Match both: .swiper > (.swiper-wrapper >)? .block-editor-inner-blocks > layout
+
+@mixin slider-editor-innerblocks-layout {
+  .swiper > .block-editor-inner-blocks > .block-editor-block-list__layout,
+  .swiper > .swiper-wrapper > .block-editor-inner-blocks > .block-editor-block-list__layout {
+    @content;
+  }
+}
+
+@mixin slider-editor-innerblocks-host {
+  .swiper > .block-editor-inner-blocks,
+  .swiper > .swiper-wrapper > .block-editor-inner-blocks {
+    @content;
+  }
+}
 
 @mixin slider-editor-innerblocks-wrap($max-slides-per-view: 12) {
   @for $n from 1 through $max-slides-per-view {
-    .slider__wrapper[data-slider-slides-per-view='#{$n}'] .swiper > .block-editor-inner-blocks > .block-editor-block-list__layout {
-      display: grid;
-      grid-template-columns: repeat(#{$n}, minmax(0, 1fr));
+    .slider__wrapper[data-slider-slides-per-view='#{$n}'] {
+      @include slider-editor-innerblocks-layout {
+        display: grid;
+        grid-template-columns: repeat(#{$n}, minmax(0, 1fr));
 
-      > .wp-block-baselayer-slider-slide {
-        flex: unset;
-        max-width: none;
-        min-width: 0;
-        margin: 0;
+        > .wp-block-baselayer-slider-slide {
+          flex: unset;
+          max-width: none;
+          min-width: 0;
+          margin: 0;
+        }
       }
     }
   }
@@ -21,8 +39,12 @@
 
 @mixin slider-editor-hide-extra-slides($max-slides-per-view: 12) {
   @for $n from 1 through $max-slides-per-view {
-    .slider__wrapper[data-slider-slides-per-view='#{$n}'] .swiper > .block-editor-inner-blocks > .block-editor-block-list__layout > .wp-block-baselayer-slider-slide:nth-child(n + #{$n + 1}) {
-      display: none;
+    .slider__wrapper[data-slider-slides-per-view='#{$n}'] {
+      @include slider-editor-innerblocks-layout {
+        > .wp-block-baselayer-slider-slide:nth-child(n + #{$n + 1}) {
+          display: none;
+        }
+      }
     }
   }
 }
@@ -39,15 +61,22 @@
       min-height: calc(30px + 8px + 8px);
     }
 
-    .swiper > .block-editor-inner-blocks > .block-editor-block-list__layout {
+    @include slider-editor-innerblocks-layout {
       display: block;
     }
 
     .slider__container,
     .slider__slides,
     .swiper,
-    .swiper > .block-editor-inner-blocks,
-    .swiper > .block-editor-inner-blocks > .block-editor-block-list__layout {
+    .swiper > .swiper-wrapper {
+      position: static;
+    }
+
+    @include slider-editor-innerblocks-host {
+      position: static;
+    }
+
+    @include slider-editor-innerblocks-layout {
       position: static;
     }
 
@@ -62,8 +91,10 @@
     display: none !important;
   }
 
-  .slider__wrapper .swiper > .block-editor-inner-blocks > .block-editor-block-list__layout {
-    gap: var(--slider-editor-slide-gap, 16px);
+  .slider__wrapper {
+    @include slider-editor-innerblocks-layout {
+      gap: var(--slider-editor-slide-gap, 16px);
+    }
   }
 
   // Badge
@@ -115,63 +146,71 @@
 
   // Add slide button
 
-  .slider__wrapper .swiper > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-list-appender {
-    display: none;
-    position: absolute;
-    top: auto;
-    right: auto;
-    bottom: 8px;
-    left: 8px;
-    z-index: 4;
-    grid-column: unset;
-    width: auto;
-    margin: 0;
-    pointer-events: auto;
+  .slider__wrapper {
+    @include slider-editor-innerblocks-layout {
+      > .block-list-appender {
+        display: none;
+        position: absolute;
+        top: auto;
+        right: auto;
+        bottom: 8px;
+        left: 8px;
+        z-index: 4;
+        grid-column: unset;
+        width: auto;
+        margin: 0;
+        pointer-events: auto;
 
-    .block-editor-button-block-appender {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 4px;
-      width: auto;
-      min-height: 0;
-      padding: 8px 16px 8px 10px !important;
-      font-size: 14px;
-      height: 30px;
-      border: none;
-      border-radius: 4px;
-      background: #000;
-      color: #fff;
-      box-shadow: 0 0 0 2px rgba(#fff, 0.2);
-      transition: transition('background-color', 'box-shadow', 'transform');
+        .block-editor-button-block-appender {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 4px;
+          width: auto;
+          min-height: 0;
+          padding: 8px 16px 8px 10px !important;
+          font-size: 14px;
+          height: 30px;
+          border: none;
+          border-radius: 4px;
+          background: #000;
+          color: #fff;
+          box-shadow: 0 0 0 2px rgba(#fff, 0.2);
+          transition: transition('background-color', 'box-shadow', 'transform');
 
-      &:hover {
-        background: #1d2327;
-        color: #fff;
-      }
+          &:hover {
+            background: #1d2327;
+            color: #fff;
+          }
 
-      &:active {
-        transform: translateY(1px);
-      }
+          &:active {
+            transform: translateY(1px);
+          }
 
-      svg {
-        width: 18px;
-        height: 18px;
-        fill: currentColor;
-      }
+          svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+          }
 
-      &::after {
-        content: 'Slide';
-        font-size: 14px;
-        font-weight: 600;
-        line-height: 1.2;
+          &::after {
+            content: 'Slide';
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.2;
+          }
+        }
       }
     }
   }
 
-  .wp-block-baselayer-slider.is-selected .slider__wrapper .swiper > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-list-appender,
-  .wp-block-baselayer-slider.has-child-selected .slider__wrapper .swiper > .block-editor-inner-blocks > .block-editor-block-list__layout > .block-list-appender {
-    display: block !important;
+  .wp-block-baselayer-slider.is-selected .slider__wrapper,
+  .wp-block-baselayer-slider.has-child-selected .slider__wrapper {
+    @include slider-editor-innerblocks-layout {
+      > .block-list-appender {
+        display: block !important;
+      }
+    }
   }
 
   // Hide extra slides when collapsed
@@ -181,7 +220,7 @@
 
   .wp-block-baselayer-slider.is-selected .slider__wrapper,
   .wp-block-baselayer-slider.has-child-selected .slider__wrapper {
-    .swiper > .block-editor-inner-blocks > .block-editor-block-list__layout {
+    @include slider-editor-innerblocks-layout {
       gap: max(8px, var(--slider-editor-slide-gap, 16px));
     }
 

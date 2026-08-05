@@ -661,7 +661,29 @@ function createLeafControl(field, values, controls) {
       if (selected.includes(ov)) option.selected = true;
       control.appendChild(option);
     });
-  } else if (type === 'radio' || type === 'button_group') {
+  } else if (type === 'button_group') {
+    control = el('div', {
+      className: 'bl-blocks-fields__button-group',
+      role: 'group',
+    });
+    options.forEach((opt, i) => {
+      const ov = String(opt.value ?? '');
+      const oid = id + '-' + i;
+      const input = el('input', {
+        type: 'radio',
+        name: id,
+        id: oid,
+        value: ov,
+        checked: String(current) === ov,
+      });
+      control.appendChild(
+        el('label', { className: 'bl-blocks-fields__btn-option', for: oid }, [
+          input,
+          el('span', { text: opt.label || ov }),
+        ])
+      );
+    });
+  } else if (type === 'radio') {
     control = el('div', { className: 'bl-blocks-fields__choices' });
     options.forEach((opt, i) => {
       const ov = String(opt.value ?? '');
@@ -829,6 +851,11 @@ function createLeafControl(field, values, controls) {
       value: current == null ? '' : String(current),
     });
     if (field.placeholder) control.placeholder = field.placeholder;
+    if (type === 'number') {
+      if (field.min != null && field.min !== '') control.min = String(field.min);
+      if (field.max != null && field.max !== '') control.max = String(field.max);
+      if (field.step != null && field.step !== '') control.step = String(field.step);
+    }
     if (type === 'url') {
       if (!control.placeholder) control.placeholder = 'https://';
       bindHttpsUrlInput(control);
@@ -836,7 +863,26 @@ function createLeafControl(field, values, controls) {
   }
 
   if (control) {
-    row.appendChild(control);
+    const prefix = field.prefix != null ? String(field.prefix).trim() : '';
+    const suffix = field.suffix != null ? String(field.suffix).trim() : '';
+    const affixTypes = ['text', 'email', 'phone', 'url', 'number', 'date', 'time', 'datetime'];
+    if ((prefix || suffix) && affixTypes.includes(type) && control.tagName === 'INPUT') {
+      const group = el('div', { className: 'bl-blocks-fields__input-group' });
+      if (prefix) {
+        group.appendChild(
+          el('span', { className: 'bl-blocks-fields__affix bl-blocks-fields__affix--prefix', text: prefix })
+        );
+      }
+      group.appendChild(control);
+      if (suffix) {
+        group.appendChild(
+          el('span', { className: 'bl-blocks-fields__affix bl-blocks-fields__affix--suffix', text: suffix })
+        );
+      }
+      row.appendChild(group);
+    } else {
+      row.appendChild(control);
+    }
     controls.push({ field, control, type });
   }
   if (field.description) {

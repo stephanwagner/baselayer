@@ -63,7 +63,10 @@ $wrapper_attributes = get_block_wrapper_attributes([
 		<div class="slider__slides">
 			<div class="swiper">
 				<div class="swiper-wrapper">
-					<InnerBlocks />
+					<InnerBlocks
+						allowedBlocks="<?php echo esc_attr(wp_json_encode(['baselayer/slider-slide'])); ?>"
+						template="<?php echo esc_attr(wp_json_encode([['baselayer/slider-slide', new stdClass()]])); ?>"
+					/>
 				</div>
 			</div>
 		</div>

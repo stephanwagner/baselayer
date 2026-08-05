@@ -778,6 +778,33 @@ function bl_blocks_sanitize_leaf_field_fallback(array $field): array
 		'default_value' => sanitize_text_field((string) ($field['default_value'] ?? '')),
 	];
 
+	$affix_types = ['text', 'email', 'phone', 'url', 'number', 'date', 'time', 'datetime'];
+	if (in_array($out['type'], $affix_types, true)) {
+		$prefix = sanitize_text_field((string) ($field['prefix'] ?? ''));
+		$suffix = sanitize_text_field((string) ($field['suffix'] ?? ''));
+		if ($prefix !== '') {
+			$out['prefix'] = $prefix;
+		}
+		if ($suffix !== '') {
+			$out['suffix'] = $suffix;
+		}
+	}
+
+	if ($out['type'] === 'number') {
+		$min = sanitize_text_field((string) ($field['min'] ?? ''));
+		$max = sanitize_text_field((string) ($field['max'] ?? ''));
+		$step = sanitize_text_field((string) ($field['step'] ?? ''));
+		if ($min !== '') {
+			$out['min'] = $min;
+		}
+		if ($max !== '') {
+			$out['max'] = $max;
+		}
+		if ($step !== '') {
+			$out['step'] = $step;
+		}
+	}
+
 	if (isset($field['options']) && is_array($field['options'])) {
 		$options = [];
 		foreach ($field['options'] as $opt) {
