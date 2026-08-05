@@ -1582,6 +1582,8 @@ button.button-link.bl-blocks-fields__repeater-remove:active {
 }
 
 .editor-styles-wrapper .bl-blocks-block-missing-template {
+  margin-top: 24px;
+  margin-bottom: 24px;
   padding: 14px 16px;
   border: 1px solid #f0b84a;
   border-left-width: 4px;
@@ -1608,7 +1610,7 @@ button.button-link.bl-blocks-fields__repeater-remove:active {
   margin: 0 0 8px;
 }
 .editor-styles-wrapper .bl-blocks-block-missing-template .bl-blocks-block-missing-template__name code {
-  padding: 2px 6px;
+  padding: 4px 6px;
   margin: 0;
   font-size: 14px;
 }
@@ -1627,6 +1629,8 @@ button.button-link.bl-blocks-fields__repeater-remove:active {
 }
 .editor-styles-wrapper .bl-blocks-block-missing-template .bl-blocks-block-missing-template__path code {
   font-size: 12px;
+  margin: 0;
+  padding: 2px 4px;
 }
 
 .bl-blocks-page-panel .components-button {
