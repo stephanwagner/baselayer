@@ -251,9 +251,6 @@ function walkNode(node, ctx) {
       ...(ctx.defaultInnerBlocksProps || {}),
       ...fromTag,
     };
-    if (!props.renderAppender && InnerBlocks.ButtonBlockAppender) {
-      props.renderAppender = InnerBlocks.ButtonBlockAppender;
-    }
     return createElement(InnerBlocks, props);
   }
 

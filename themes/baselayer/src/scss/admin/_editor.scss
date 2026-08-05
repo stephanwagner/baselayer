@@ -292,7 +292,6 @@ div.baselayer-seo-panel {
   }
 }
 
-
 // Pagination
 
 .pagination__link {
@@ -304,6 +303,14 @@ div.baselayer-seo-panel {
 .bl-wp-block {
   position: relative;
   z-index: 1;
+
+  .block-list-appender .block-editor-inserter__toggle.components-button.has-icon {
+    box-shadow: 0 0 0 2px rgba(#fff, 0.2);
+
+    @media (min-resolution: 1.9dppx) {
+      box-shadow: 0 0 0 1.5px rgba(#fff, 0.2);
+    }
+  }
 }
 
 .admin-block-preview {

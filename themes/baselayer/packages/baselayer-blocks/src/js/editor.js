@@ -175,6 +175,11 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
     if (Array.isArray(template) && template.length) {
       props.template = template;
     }
+    // Slider parent: ButtonBlockAppender so editor SCSS can style the black “Slide” pill.
+    // Accordion / slide content keep Gutenberg’s default small inserter (like ACF).
+    if (def && def.slug === 'slider' && InnerBlocks && InnerBlocks.ButtonBlockAppender) {
+      props.renderAppender = InnerBlocks.ButtonBlockAppender;
+    }
     return props;
   }
 

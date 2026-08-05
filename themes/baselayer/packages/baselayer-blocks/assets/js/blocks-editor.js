@@ -6726,9 +6726,6 @@
         ...ctx.defaultInnerBlocksProps || {},
         ...fromTag
       };
-      if (!props2.renderAppender && InnerBlocks.ButtonBlockAppender) {
-        props2.renderAppender = InnerBlocks.ButtonBlockAppender;
-      }
       return createElement(InnerBlocks, props2);
     }
     const tag = el5.tagName.toLowerCase();
@@ -7019,6 +7016,9 @@
       const template = def && def.innerBlocksTemplate;
       if (Array.isArray(template) && template.length) {
         props.template = template;
+      }
+      if (def && def.slug === "slider" && InnerBlocks && InnerBlocks.ButtonBlockAppender) {
+        props.renderAppender = InnerBlocks.ButtonBlockAppender;
       }
       return props;
     }
