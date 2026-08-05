@@ -34,7 +34,6 @@ You can still import manually via **ACF → Tools**.
 - `includes/` — bootstrap, block filters, field-group import notice
 - `blocks.php` — block catalog
 - `blocks/` — PHP templates, SCSS, JS per block
-- `assets/js/` — editor helpers (inner-blocks toolbar)
 - `import-blocks-acf-*.json` — field-group exports
 - `import-block-options-acf.json` — ACF block option assignments
 

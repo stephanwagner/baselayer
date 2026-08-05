@@ -6,7 +6,7 @@
 //
 // Per block: name, title, icon, keywords (required).
 // Optional: description (block inserter help text), preview (image path under acf/),
-//           supports, parent, innerBlocksToolbar.
+//           supports, parent.
 // Inserter preview data:  acf/blocks/{name}/preview.php
 // Inserter preview image: set `preview` or add acf/blocks/{name}/preview.jpg|png|webp
 
@@ -76,10 +76,6 @@ return [
 		'keywords' => ['Bild', 'Video', 'Slider', 'Carousel'],
 		'supports' => [
 			'align' => ['wide', 'full'],
-		],
-		'innerBlocksToolbar' => [
-			'insertBlock' => 'acf/slider-slide',
-			'label' => 'Slide hinzufügen',
 		],
 	],
 	[
