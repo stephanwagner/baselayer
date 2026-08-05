@@ -132,7 +132,8 @@
   // Heading → heading|paragraph|field: keep as one text/form block, no rule.
   > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
   > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-  > .bl-blocks-fields__heading + .bl-blocks-fields__row {
+  > .bl-blocks-fields__heading + .bl-blocks-fields__row,
+  > .bl-blocks-fields__heading + .bl-blocks-fields__field-row {
     margin-top: 6px;
     padding-top: 0;
     border-top: 0;
@@ -553,7 +554,8 @@ button.button-link.bl-blocks-fields__card-remove {
   margin: 0;
 }
 
-.bl-blocks-fields__columns {
+.bl-blocks-fields__columns,
+.bl-blocks-fields__field-row {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
@@ -561,6 +563,14 @@ button.button-link.bl-blocks-fields__card-remove {
   box-sizing: border-box;
   width: 100%;
   max-width: 100%;
+}
+
+.bl-blocks-fields__field-row {
+  > .bl-blocks-fields__row {
+    box-sizing: border-box;
+    min-width: 0;
+    max-width: 100%;
+  }
 }
 
 .bl-blocks-fields__layout--column {
@@ -578,7 +588,8 @@ button.button-link.bl-blocks-fields__card-remove {
 
   > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
   > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-  > .bl-blocks-fields__heading + .bl-blocks-fields__row {
+  > .bl-blocks-fields__heading + .bl-blocks-fields__row,
+  > .bl-blocks-fields__heading + .bl-blocks-fields__field-row {
     margin-top: 6px;
     padding-top: 0;
     border-top: 0;
@@ -995,7 +1006,8 @@ button.button-link.bl-blocks-fields__repeater-remove {
 
   > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
   > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-  > .bl-blocks-fields__heading + .bl-blocks-fields__row {
+  > .bl-blocks-fields__heading + .bl-blocks-fields__row,
+  > .bl-blocks-fields__heading + .bl-blocks-fields__field-row {
     margin-top: 6px;
     padding-top: 0;
     border-top: 0;
@@ -1013,7 +1025,8 @@ button.button-link.bl-blocks-fields__repeater-remove {
     border-top: 0;
   }
 
-  .bl-blocks-fields__columns {
+  .bl-blocks-fields__columns,
+  .bl-blocks-fields__field-row {
     flex-direction: column;
     gap: 0;
 
@@ -1022,6 +1035,12 @@ button.button-link.bl-blocks-fields__repeater-remove {
       padding-top: 12px;
       border-top: 1px solid #dcdcde;
     }
+  }
+
+  .bl-blocks-fields__field-row > .bl-blocks-fields__row {
+    flex: 0 1 auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
   }
 
   .bl-blocks-fields__layout--column {
@@ -1040,7 +1059,8 @@ button.button-link.bl-blocks-fields__repeater-remove {
 
     > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
     > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-    > .bl-blocks-fields__heading + .bl-blocks-fields__row {
+    > .bl-blocks-fields__heading + .bl-blocks-fields__row,
+    > .bl-blocks-fields__heading + .bl-blocks-fields__field-row {
       margin-top: 6px;
       padding-top: 0;
       border-top: 0;
@@ -1062,7 +1082,8 @@ button.button-link.bl-blocks-fields__repeater-remove {
 
     > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
     > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-    > .bl-blocks-fields__heading + .bl-blocks-fields__row {
+    > .bl-blocks-fields__heading + .bl-blocks-fields__row,
+    > .bl-blocks-fields__heading + .bl-blocks-fields__field-row {
       margin-top: 6px;
       padding-top: 0;
       border-top: 0;

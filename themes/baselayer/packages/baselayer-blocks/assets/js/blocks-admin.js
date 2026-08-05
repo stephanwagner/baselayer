@@ -7421,11 +7421,82 @@
   function isLayout(type) {
     return type === "column" || type === "section" || type === "tab" || type === "group";
   }
-  function applyColumnWidth(wrap, field) {
+  function fieldPackFactor(field) {
+    const width = String(field && field.width || "100");
+    if (width === "auto") {
+      return null;
+    }
+    if (width === "custom") {
+      const custom = String(field && field.width_custom || "").trim();
+      if (custom === "") {
+        return 1;
+      }
+      const match = custom.match(/^(\d+(?:\.\d+)?)%$/);
+      if (!match) {
+        return null;
+      }
+      return Math.max(0, Math.min(1, parseFloat(match[1]) / 100));
+    }
+    const map = {
+      100: 1,
+      75: 0.75,
+      66: 0.666667,
+      50: 0.5,
+      33: 0.333333,
+      25: 0.25
+    };
+    if (Object.prototype.hasOwnProperty.call(map, width)) {
+      return map[width];
+    }
+    const pct = parseInt(width, 10);
+    if (!Number.isFinite(pct) || pct <= 0) {
+      return 1;
+    }
+    return Math.max(0, Math.min(1, pct / 100));
+  }
+  function chunkFieldsIntoRows(fields) {
+    const rows = [];
+    let current = [];
+    let sum = 0;
+    (fields || []).forEach((field) => {
+      if (!field) return;
+      const factor = fieldPackFactor(field);
+      const pack = factor == null ? 1 : factor;
+      if (factor == null || pack >= 0.999) {
+        if (current.length) {
+          rows.push(current);
+          current = [];
+          sum = 0;
+        }
+        rows.push([field]);
+        return;
+      }
+      if (sum > 0 && sum + pack > 1.001) {
+        rows.push(current);
+        current = [];
+        sum = 0;
+      }
+      current.push(field);
+      sum += pack;
+    });
+    if (current.length) {
+      rows.push(current);
+    }
+    return rows;
+  }
+  function applyFieldWidth(wrap, field, opts = {}) {
     const width = String(field && field.width || "100");
     const gap = 12;
+    const autoClass = opts.autoClass || "";
     if (width === "auto") {
-      wrap.classList.add("bl-blocks-fields__layout--column-auto");
+      if (autoClass) {
+        wrap.classList.add(autoClass);
+      } else {
+        wrap.style.flex = "1 1 0";
+        wrap.style.width = "auto";
+        wrap.style.minWidth = "0";
+        wrap.style.maxWidth = "100%";
+      }
       return;
     }
     if (width === "custom") {
@@ -7441,8 +7512,19 @@
       wrap.style.width = "100%";
       return;
     }
-    const pct = parseInt(width, 10);
-    if (Number.isFinite(pct) && pct > 0 && pct < 100) {
+    const map = {
+      75: 75,
+      66: 66.6667,
+      50: 50,
+      33: 33.3333,
+      25: 25
+    };
+    let pct = map[width];
+    if (pct == null) {
+      const parsed = parseInt(width, 10);
+      pct = Number.isFinite(parsed) && parsed > 0 ? parsed : 100;
+    }
+    if (pct > 0 && pct < 100) {
       const factor = Math.max(0, Math.min(1, pct / 100));
       wrap.style.flex = "0 1 auto";
       wrap.style.width = `min(100%, calc(${pct}% - ${gap * (1 - factor)}px))`;
@@ -7452,6 +7534,11 @@
     }
     wrap.style.flex = "0 1 100%";
     wrap.style.width = "100%";
+  }
+  function applyColumnWidth(wrap, field) {
+    applyFieldWidth(wrap, field, {
+      autoClass: "bl-blocks-fields__layout--column-auto"
+    });
   }
   function isStatic(type) {
     return type === "divider" || type === "spacer" || type === "heading" || type === "text_block" || type === "html" || type === "honeypot" || type === "captcha";
@@ -7917,9 +8004,52 @@
       panels.forEach((panel) => group.appendChild(panel));
       parent.appendChild(group);
     };
+    const flushLeafBuffer = (buffer, parent, valueMap) => {
+      if (!buffer.length) return;
+      if (compact) {
+        buffer.forEach((field) => {
+          const leafControls = [];
+          const row = createLeafControl(field, valueMap, leafControls);
+          if (!row) return;
+          parent.appendChild(row);
+          leafControls.forEach((c) => entries.push({ kind: "leaf", ...c }));
+        });
+        return;
+      }
+      chunkFieldsIntoRows(buffer).forEach((rowFields) => {
+        const built = [];
+        rowFields.forEach((field) => {
+          const leafControls = [];
+          const row = createLeafControl(field, valueMap, leafControls);
+          if (!row) return;
+          leafControls.forEach((c) => entries.push({ kind: "leaf", ...c }));
+          built.push({ field, row });
+        });
+        if (!built.length) return;
+        const needsPack = built.length > 1 || built.some(({ field }) => {
+          const factor = fieldPackFactor(field);
+          return factor == null || factor < 0.999;
+        });
+        if (!needsPack) {
+          parent.appendChild(built[0].row);
+          return;
+        }
+        const group = el7("div", { className: "bl-blocks-fields__field-row" });
+        built.forEach(({ field, row }) => {
+          applyFieldWidth(row, field);
+          group.appendChild(row);
+        });
+        parent.appendChild(group);
+      });
+    };
     const walk = (list, parent, valueMap) => {
       const fields2 = list || [];
       let i = 0;
+      let leafBuffer = [];
+      const flushLeaves = () => {
+        flushLeafBuffer(leafBuffer, parent, valueMap);
+        leafBuffer = [];
+      };
       while (i < fields2.length) {
         const field = fields2[i];
         if (!field || field.active === false) {
@@ -7928,6 +8058,7 @@
         }
         const type = field.type || "text";
         if (type === "tab") {
+          flushLeaves();
           const run = [];
           while (i < fields2.length && fields2[i] && fields2[i].type === "tab") {
             run.push(fields2[i]);
@@ -7937,6 +8068,7 @@
           continue;
         }
         if (type === "column") {
+          flushLeaves();
           const run = [];
           while (i < fields2.length && fields2[i] && fields2[i].type === "column") {
             run.push(fields2[i]);
@@ -7946,11 +8078,13 @@
           continue;
         }
         if (isLayout(type)) {
+          flushLeaves();
           appendLayoutWrap(field, type, parent, valueMap);
           i += 1;
           continue;
         }
         if (type === "heading") {
+          flushLeaves();
           const content = String(field.content || field.label || "").trim();
           if (content) {
             const levelRaw = String(field.level || "h4").toLowerCase();
@@ -7961,6 +8095,7 @@
           continue;
         }
         if (type === "text_block" || type === "html") {
+          flushLeaves();
           const content = field.default_value || field.content || field.label || "";
           if (content) {
             parent.appendChild(el7("div", { className: "bl-blocks-fields__static", html: content }));
@@ -7969,22 +8104,20 @@
           continue;
         }
         if (isStatic(type)) {
+          flushLeaves();
           i += 1;
           continue;
         }
         if (type === "repeater") {
+          flushLeaves();
           parent.appendChild(createRepeaterControl(field, valueMap, entries, options));
           i += 1;
           continue;
         }
-        const leafControls = [];
-        const row = createLeafControl(field, valueMap, leafControls);
-        if (row) {
-          parent.appendChild(row);
-          leafControls.forEach((c) => entries.push({ kind: "leaf", ...c }));
-        }
+        leafBuffer.push(field);
         i += 1;
       }
+      flushLeaves();
     };
     walk(fields, root, values || {});
     const getValues = () => {

@@ -571,12 +571,15 @@ body.bl-page-picker-open {
 .bl-blocks-fields > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
 .bl-blocks-fields > .bl-blocks-fields__heading + .bl-blocks-fields__static,
 .bl-blocks-fields > .bl-blocks-fields__heading + .bl-blocks-fields__row,
+.bl-blocks-fields > .bl-blocks-fields__heading + .bl-blocks-fields__field-row,
 .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
 .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading + .bl-blocks-fields__static,
 .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading + .bl-blocks-fields__row,
+.bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading + .bl-blocks-fields__field-row,
 .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
 .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-.bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__row {
+.bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__row,
+.bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__field-row {
   margin-top: 6px;
   padding-top: 0;
   border-top: 0;
@@ -980,13 +983,20 @@ button.button-link.bl-blocks-fields__card-remove:focus {
   margin: 0;
 }
 
-.bl-blocks-fields__columns {
+.bl-blocks-fields__columns,
+.bl-blocks-fields__field-row {
   display: flex;
   flex-wrap: wrap;
   gap: 12px;
   align-items: flex-start;
   box-sizing: border-box;
   width: 100%;
+  max-width: 100%;
+}
+
+.bl-blocks-fields__field-row > .bl-blocks-fields__row {
+  box-sizing: border-box;
+  min-width: 0;
   max-width: 100%;
 }
 
@@ -1004,7 +1014,8 @@ button.button-link.bl-blocks-fields__card-remove:focus {
 }
 .bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
 .bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-.bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__row {
+.bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__row,
+.bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__field-row {
   margin-top: 6px;
   padding-top: 0;
   border-top: 0;
@@ -1393,9 +1404,11 @@ button.button-link.bl-blocks-fields__repeater-remove:active {
 .bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
 .bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__heading + .bl-blocks-fields__static,
 .bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__heading + .bl-blocks-fields__row,
+.bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__heading + .bl-blocks-fields__field-row,
 .bl-blocks-fields--compact > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
 .bl-blocks-fields--compact > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-.bl-blocks-fields--compact > .bl-blocks-fields__heading + .bl-blocks-fields__row {
+.bl-blocks-fields--compact > .bl-blocks-fields__heading + .bl-blocks-fields__row,
+.bl-blocks-fields--compact > .bl-blocks-fields__heading + .bl-blocks-fields__field-row {
   margin-top: 6px;
   padding-top: 0;
   border-top: 0;
@@ -1413,15 +1426,25 @@ button.button-link.bl-blocks-fields__repeater-remove:active {
   border-top: 0;
 }
 .bl-blocks-fields[data-layout=compact] .bl-blocks-fields__columns,
-.bl-blocks-fields--compact .bl-blocks-fields__columns {
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__field-row,
+.bl-blocks-fields--compact .bl-blocks-fields__columns,
+.bl-blocks-fields--compact .bl-blocks-fields__field-row {
   flex-direction: column;
   gap: 0;
 }
 .bl-blocks-fields[data-layout=compact] .bl-blocks-fields__columns > * + *,
-.bl-blocks-fields--compact .bl-blocks-fields__columns > * + * {
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__field-row > * + *,
+.bl-blocks-fields--compact .bl-blocks-fields__columns > * + *,
+.bl-blocks-fields--compact .bl-blocks-fields__field-row > * + * {
   margin-top: 12px;
   padding-top: 12px;
   border-top: 1px solid #dcdcde;
+}
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__field-row > .bl-blocks-fields__row,
+.bl-blocks-fields--compact .bl-blocks-fields__field-row > .bl-blocks-fields__row {
+  flex: 0 1 auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
 }
 .bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout--column,
 .bl-blocks-fields--compact .bl-blocks-fields__layout--column {
@@ -1441,9 +1464,11 @@ button.button-link.bl-blocks-fields__repeater-remove:active {
 .bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
 .bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__static,
 .bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__row,
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__field-row,
 .bl-blocks-fields--compact .bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
 .bl-blocks-fields--compact .bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-.bl-blocks-fields--compact .bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__row {
+.bl-blocks-fields--compact .bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__row,
+.bl-blocks-fields--compact .bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__field-row {
   margin-top: 6px;
   padding-top: 0;
   border-top: 0;
@@ -1464,15 +1489,19 @@ button.button-link.bl-blocks-fields__repeater-remove:active {
 .bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
 .bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading + .bl-blocks-fields__static,
 .bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading + .bl-blocks-fields__row,
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading + .bl-blocks-fields__field-row,
 .bl-blocks-fields[data-layout=compact] .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
 .bl-blocks-fields[data-layout=compact] .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__static,
 .bl-blocks-fields[data-layout=compact] .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__row,
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__field-row,
 .bl-blocks-fields--compact .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
 .bl-blocks-fields--compact .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading + .bl-blocks-fields__static,
 .bl-blocks-fields--compact .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading + .bl-blocks-fields__row,
+.bl-blocks-fields--compact .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading + .bl-blocks-fields__field-row,
 .bl-blocks-fields--compact .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
 .bl-blocks-fields--compact .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-.bl-blocks-fields--compact .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__row {
+.bl-blocks-fields--compact .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__row,
+.bl-blocks-fields--compact .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__field-row {
   margin-top: 6px;
   padding-top: 0;
   border-top: 0;
