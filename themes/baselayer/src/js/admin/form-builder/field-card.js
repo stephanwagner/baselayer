@@ -1,4 +1,4 @@
-import { el, t, typeLabel, uid, iconEl, uniqueFieldName, slugifyOption, readConfig, flattenFields, fieldIsActive, cloneFieldData } from './dom.js';
+import { el, t, typeLabel, uid, iconEl, uniqueFieldName, slugifyOption, readConfig, flattenFields, fieldIsActive, cloneFieldData, pickerPostTypeCatalog } from './dom.js';
 import {
   createColumnCard,
   createSectionCard,
@@ -349,6 +349,18 @@ function convertFieldType(field, nextType) {
   } else {
     delete field.link_types;
     delete field.allow_target;
+  }
+
+  if (nextType === 'page') {
+    const catalog = pickerPostTypeCatalog();
+    const allowedKeys = catalog.map((row) => row.value);
+    const raw = Array.isArray(field.post_types) ? field.post_types : [];
+    field.post_types = raw.filter((t) => allowedKeys.includes(t));
+    if (field.post_types.length === 0) {
+      field.post_types = [...allowedKeys];
+    }
+  } else {
+    delete field.post_types;
   }
 
   if (nextType === 'terms') {
@@ -2823,6 +2835,17 @@ export function serializeRow(row) {
     }
     data.allow_target = Boolean(q('[data-bl-allow-target]')?.checked);
   }
+  if (type === 'page') {
+    const catalog = pickerPostTypeCatalog();
+    const allowedKeys = catalog.map((row) => row.value);
+    const checked = Array.from(body.querySelectorAll('[data-bl-page-post-type]:checked')).map(
+      (input) => input.value
+    );
+    data.post_types = checked.filter((slug) => allowedKeys.includes(slug));
+    if (data.post_types.length === 0) {
+      data.post_types = [...allowedKeys];
+    }
+  }
   if (type === 'file' || type === 'image') {
     if (useMediaLibraryFields()) {
       if (data.multiple) {
@@ -3575,6 +3598,52 @@ export function createFieldCard(initial, open = false) {
             }
           )
         );
+      }
+
+      if (field.type === 'page') {
+        const catalog = pickerPostTypeCatalog();
+        const allowedKeys = catalog.map((row) => row.value);
+        const labelByValue = Object.fromEntries(
+          catalog.map((row) => [row.value, row.label || row.value])
+        );
+        let selected = Array.isArray(field.post_types)
+          ? field.post_types.filter((k) => allowedKeys.includes(k))
+          : [...allowedKeys];
+        if (selected.length === 0) {
+          selected = [...allowedKeys];
+        }
+        field.post_types = selected;
+
+        const typeChecks = allowedKeys.map((key) => {
+          const input = el('input', {
+            type: 'checkbox',
+            value: key,
+            dataset: { blPagePostType: '1' },
+            checked: selected.includes(key),
+          });
+          input.addEventListener('change', () => {
+            let next = Array.from(
+              body.querySelectorAll('[data-bl-page-post-type]:checked')
+            ).map((elInput) => elInput.value);
+            if (next.length === 0) {
+              input.checked = true;
+              next = [key];
+            }
+            field.post_types = next;
+            document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+          });
+          return el('label', {}, [
+            input,
+            document.createTextNode(' ' + (labelByValue[key] || key)),
+          ]);
+        });
+
+        if (allowedKeys.length > 0) {
+          generalSections.add(
+            settingHeading(t('pageAllowedPostTypes', 'Allowed post types')),
+            el('div', { className: 'bl-forms-builder__options-toggles' }, typeChecks)
+          );
+        }
       }
 
       if (field.type !== 'hidden') {

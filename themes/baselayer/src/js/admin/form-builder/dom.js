@@ -176,6 +176,33 @@ export function t(key, fallback = '') {
   return dict[key] || fallback || key;
 }
 
+/**
+ * Localized page-picker post type catalog ({ value, label, restBase }[]).
+ *
+ * @returns {Array<{value: string, label: string, restBase: string}>}
+ */
+export function pickerPostTypeCatalog() {
+  const sources = [
+    window.blFormsAdmin,
+    window.blBlocksAdmin,
+    window.blBlocksFieldUi,
+    window.blBlocksEditor,
+    window.blBlocksPage,
+  ];
+  for (const src of sources) {
+    if (src && Array.isArray(src.pickerPostTypes) && src.pickerPostTypes.length) {
+      return src.pickerPostTypes
+        .map((row) => ({
+          value: String(row.value || '').trim(),
+          label: String(row.label || row.value || '').trim(),
+          restBase: String(row.restBase || row.value || '').trim(),
+        }))
+        .filter((row) => row.value && row.restBase);
+    }
+  }
+  return [{ value: 'page', label: 'Pages', restBase: 'pages' }];
+}
+
 /** Inline SVG from localized blFormsAdmin.icons. */
 export function iconMarkup(key) {
   const icons = (window.blFormsAdmin && window.blFormsAdmin.icons) || {};
@@ -434,6 +461,9 @@ export function defaultField(type = 'text') {
   }
   if (['select', 'button_group', 'file', 'image', 'page'].includes(type)) {
     base.multiple = false;
+  }
+  if (type === 'page') {
+    base.post_types = pickerPostTypeCatalog().map((row) => row.value);
   }
   if (type === 'link') {
     base.link_types = ['page', 'url', 'email', 'phone'];

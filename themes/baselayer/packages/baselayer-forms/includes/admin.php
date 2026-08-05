@@ -439,6 +439,7 @@ function bl_forms_admin_enqueue(string $hook): void
 		wp_localize_script('bl-forms-admin', 'blFormsAdmin', [
 			'icons' => bl_forms_palette_icons(),
 			'pagesRestUrl' => esc_url_raw(rest_url('wp/v2/pages')),
+			'pickerPostTypes' => function_exists('bl_page_picker_post_types') ? bl_page_picker_post_types() : [],
 			'restNonce' => wp_create_nonce('wp_rest'),
 			'redirectPage' => $redirect_page,
 			'messageFallbacks' => bl_forms_form_message_placeholders(),
@@ -625,6 +626,9 @@ function bl_forms_admin_enqueue(string $hook): void
 				'boundMinutes'      => __('minutes', 'baselayer-forms'),
 				'allowMultiple'     => __('Allow multiple', 'baselayer-forms'),
 				'allowMultipleFiles'=> __('Allow multiple files', 'baselayer-forms'),
+				'pageMultiple'      => __('Allow multiple pages', 'baselayer-forms'),
+				'pageAllowedPostTypes' => __('Allowed post types', 'baselayer-forms'),
+				'pagePickerAll'     => __('All', 'baselayer-forms'),
 				'fieldStatus'       => __('Status', 'baselayer-forms'),
 				'fieldActive'       => __('Active', 'baselayer-forms'),
 				'fieldInactiveTitle'=> __('Not visible on the frontend', 'baselayer-forms'),

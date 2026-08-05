@@ -236,6 +236,7 @@ function bl_blocks_register_dynamic_blocks(): void
 			'blocks'       => bl_blocks_active_block_payloads(),
 			'renderPath'   => 'baselayer-blocks/v1/render',
 			'pagesRestUrl' => esc_url_raw(rest_url('wp/v2/pages')),
+			'pickerPostTypes' => function_exists('bl_page_picker_post_types') ? bl_page_picker_post_types() : [],
 			'restNonce'    => wp_create_nonce('wp_rest'),
 			'i18n'         => [
 				'edit'                   => __('Edit fields', 'baselayer-blocks'),
@@ -270,6 +271,8 @@ function bl_blocks_register_dynamic_blocks(): void
 				'pagePickerSearch'       => __('Search pages…', 'baselayer-blocks'),
 				'pagePickerEmpty'        => __('No pages found.', 'baselayer-blocks'),
 				'pagePickerLoading'      => __('Loading…', 'baselayer-blocks'),
+				'pagePickerMore'         => __('More results available. Refine your search to narrow them down.', 'baselayer-blocks'),
+				'pagePickerAll'          => __('All', 'baselayer-blocks'),
 				'selectPage'             => __('Select', 'baselayer-blocks'),
 				'linkTypePage'           => __('Page', 'baselayer-blocks'),
 				'linkTypeUrl'            => __('URL', 'baselayer-blocks'),

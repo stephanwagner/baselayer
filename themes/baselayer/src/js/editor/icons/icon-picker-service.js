@@ -162,6 +162,8 @@ function createIconPickerService() {
     syncVariantButtons();
     renderCategories();
 
+    // Keep above other admin overlays (e.g. field editor) that share the body.
+    document.body.appendChild(modal);
     modal.hidden = false;
     document.body.classList.add('bl-icon-picker-modal-open');
     modal.querySelector('[data-bl-icon-picker-search]').focus();

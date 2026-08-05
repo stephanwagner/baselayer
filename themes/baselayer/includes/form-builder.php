@@ -79,3 +79,82 @@ function bl_form_builder_enqueue_kit(array $args = []): string
 
 	return $enqueued ? $handle : '';
 }
+
+/**
+ * Public REST-enabled post types for the shared page picker (excludes attachment).
+ *
+ * @return list<array{value: string, label: string, restBase: string}>
+ */
+function bl_page_picker_post_types(): array
+{
+	$out = [];
+	foreach (get_post_types(['public' => true, 'show_in_rest' => true], 'objects') as $pt) {
+		if (!$pt instanceof WP_Post_Type || $pt->name === 'attachment') {
+			continue;
+		}
+		$rest_base = is_string($pt->rest_base) && $pt->rest_base !== ''
+			? $pt->rest_base
+			: $pt->name;
+		$out[] = [
+			'value'    => $pt->name,
+			'label'    => (string) ($pt->labels->name ?: $pt->name),
+			'restBase' => $rest_base,
+		];
+	}
+
+	return $out;
+}
+
+/**
+ * Sanitize a page-field post_types list. Empty / invalid → all known picker types.
+ *
+ * @param mixed $raw
+ * @return list<string>
+ */
+function bl_page_picker_sanitize_post_types($raw): array
+{
+	$catalog = bl_page_picker_post_types();
+	$allowed = array_values(array_map(static fn ($row) => $row['value'], $catalog));
+	if ($allowed === []) {
+		return ['page'];
+	}
+
+	$types = [];
+	if (is_array($raw)) {
+		foreach ($raw as $item) {
+			$key = sanitize_key((string) $item);
+			if ($key !== '' && in_array($key, $allowed, true) && !in_array($key, $types, true)) {
+				$types[] = $key;
+			}
+		}
+	}
+
+	return $types === [] ? $allowed : $types;
+}
+
+/**
+ * Keep only post IDs whose post_type is in $allowed_types.
+ *
+ * @param list<int>    $ids
+ * @param list<string> $allowed_types
+ * @return list<int>
+ */
+function bl_page_picker_filter_post_ids(array $ids, array $allowed_types): array
+{
+	if ($allowed_types === []) {
+		return [];
+	}
+	$out = [];
+	foreach ($ids as $id) {
+		$n = absint($id);
+		if ($n <= 0) {
+			continue;
+		}
+		$type = get_post_type($n);
+		if (is_string($type) && in_array($type, $allowed_types, true)) {
+			$out[] = $n;
+		}
+	}
+
+	return array_values(array_unique($out));
+}

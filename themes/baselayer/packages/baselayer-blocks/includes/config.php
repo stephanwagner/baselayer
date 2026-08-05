@@ -802,6 +802,14 @@ function bl_blocks_sanitize_leaf_field_fallback(array $field): array
 	}
 	if ($out['type'] === 'page') {
 		$out['multiple'] = !empty($field['multiple']);
+		$out['post_types'] = function_exists('bl_page_picker_sanitize_post_types')
+			? bl_page_picker_sanitize_post_types($field['post_types'] ?? null)
+			: (isset($field['post_types']) && is_array($field['post_types'])
+				? array_values(array_unique(array_filter(array_map('sanitize_key', $field['post_types']))))
+				: ['page']);
+		if ($out['post_types'] === []) {
+			$out['post_types'] = ['page'];
+		}
 		unset($out['placeholder'], $out['default_value']);
 	}
 	if ($out['type'] === 'link') {
@@ -1276,6 +1284,12 @@ function bl_blocks_sanitize_values(array $fields, $raw): array
 				}
 			}
 			$ids = array_values(array_unique($ids));
+			$allowed_types = function_exists('bl_page_picker_sanitize_post_types')
+				? bl_page_picker_sanitize_post_types($field['post_types'] ?? null)
+				: ['page'];
+			if (function_exists('bl_page_picker_filter_post_ids')) {
+				$ids = bl_page_picker_filter_post_ids($ids, $allowed_types);
+			}
 			if (!empty($field['multiple'])) {
 				$values[$name] = $ids;
 			} else {

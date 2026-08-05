@@ -8,16 +8,29 @@
       title: "Select a page",
       searchPlaceholder: "Search pages\u2026",
       empty: "No pages found.",
-      loading: "Loading\u2026",
+      moreNote: "More results available. Refine your search to narrow them down.",
       cancelLabel: "Cancel",
       selectLabel: "Select",
+      allLabel: "All",
       restUrl: "",
       restNonce: "",
+      postTypes: null,
       ...options
     };
     const api = window.wpApiSettings || {};
-    const restUrl = opts.restUrl || (api.root ? String(api.root).replace(/\/?$/, "/") + "wp/v2/pages" : "");
     const restNonce = opts.restNonce || api.nonce || "";
+    const restRoot = api.root ? String(api.root).replace(/\/?$/, "/") : "";
+    let postTypes = normalizePostTypes(opts.postTypes, opts.restUrl, restRoot);
+    if (postTypes.length === 0) {
+      postTypes = [
+        {
+          value: "page",
+          label: "Pages",
+          restBase: "pages",
+          restUrl: restRoot ? restRoot + "wp/v2/pages" : String(opts.restUrl || "")
+        }
+      ];
+    }
     return new Promise((resolve) => {
       let settled = false;
       const selectedMap = /* @__PURE__ */ new Map();
@@ -37,6 +50,8 @@
       }
       let debounceTimer = 0;
       let abort = null;
+      let fetchGen = 0;
+      let activeTab = postTypes.length > 1 ? "all" : postTypes[0].value;
       const finish = (value) => {
         if (settled) return;
         settled = true;
@@ -81,20 +96,66 @@
       search.placeholder = opts.searchPlaceholder;
       search.setAttribute("autocomplete", "off");
       searchWrap.appendChild(search);
+      let tabsEl = null;
+      if (postTypes.length > 1) {
+        tabsEl = document.createElement("div");
+        tabsEl.className = "bl-page-picker__tabs";
+        tabsEl.setAttribute("role", "group");
+        tabsEl.setAttribute("aria-label", opts.allLabel);
+        const tabDefs = [
+          { value: "all", label: opts.allLabel },
+          ...postTypes.map((pt) => ({ value: pt.value, label: pt.label }))
+        ];
+        tabDefs.forEach((tab) => {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "bl-page-picker__tab";
+          btn.dataset.value = tab.value;
+          btn.textContent = tab.label;
+          btn.setAttribute("aria-pressed", tab.value === activeTab ? "true" : "false");
+          if (tab.value === activeTab) {
+            btn.classList.add("is-active");
+          }
+          btn.addEventListener("click", () => {
+            if (activeTab === tab.value) return;
+            activeTab = tab.value;
+            tabsEl.querySelectorAll(".bl-page-picker__tab").forEach((node) => {
+              const on = node.dataset.value === activeTab;
+              node.classList.toggle("is-active", on);
+              node.setAttribute("aria-pressed", on ? "true" : "false");
+            });
+            fetchPages(search.value.trim());
+          });
+          tabsEl.appendChild(btn);
+        });
+      }
       const list = document.createElement("div");
       list.className = "bl-page-picker__list";
-      list.setAttribute("role", "listbox");
-      if (opts.multi) {
-        list.setAttribute("aria-multiselectable", "true");
-      }
       const status = document.createElement("p");
       status.className = "bl-page-picker__status description";
       status.hidden = true;
+      const results = document.createElement("div");
+      results.className = "bl-page-picker__results";
+      results.setAttribute("role", "listbox");
+      if (opts.multi) {
+        results.setAttribute("aria-multiselectable", "true");
+      }
+      list.append(status, results);
       const body = document.createElement("div");
       body.className = "bl-page-picker__body";
-      body.append(searchWrap, status, list);
+      if (tabsEl) {
+        body.append(searchWrap, tabsEl, list);
+      } else {
+        body.append(searchWrap, list);
+      }
       const footer = document.createElement("div");
       footer.className = "bl-page-picker__footer";
+      const spinner = document.createElement("span");
+      spinner.className = "bl-page-picker__spinner";
+      spinner.hidden = true;
+      spinner.setAttribute("aria-hidden", "true");
+      const footerActions = document.createElement("div");
+      footerActions.className = "bl-page-picker__footer-actions";
       const cancelBtn = document.createElement("button");
       cancelBtn.type = "button";
       cancelBtn.className = "button bl-button";
@@ -116,7 +177,8 @@
         }
         finish({ ...selectedMap.values().next().value });
       });
-      footer.append(cancelBtn, selectBtn);
+      footerActions.append(cancelBtn, selectBtn);
+      footer.append(spinner, footerActions);
       dialog.append(header, body, footer);
       backdrop.appendChild(dialog);
       backdrop.addEventListener("click", (evt) => {
@@ -129,8 +191,14 @@
         status.textContent = text || "";
         status.hidden = !text;
       };
-      const renderRows = (pages) => {
-        list.replaceChildren();
+      const setLoading = (loading) => {
+        list.classList.toggle("is-loading", loading);
+        list.setAttribute("aria-busy", loading ? "true" : "false");
+        spinner.hidden = !loading;
+        spinner.setAttribute("aria-hidden", loading ? "false" : "true");
+      };
+      const renderRows = (pages, hasMore = false) => {
+        results.replaceChildren();
         if (!pages.length) {
           setStatus(opts.empty);
           return;
@@ -169,18 +237,59 @@
               selectedMap.clear();
               selectedMap.set(id, item);
             }
-            list.querySelectorAll(".bl-page-picker__item").forEach((node) => {
+            results.querySelectorAll(".bl-page-picker__item").forEach((node) => {
               const on = selectedMap.has(Number(node.dataset.pageId) || 0);
               node.classList.toggle("is-selected", on);
               node.setAttribute("aria-selected", on ? "true" : "false");
             });
             syncSelectEnabled();
           });
-          list.appendChild(btn);
+          results.appendChild(btn);
         });
+        if (hasMore && opts.moreNote) {
+          const note = document.createElement("p");
+          note.className = "bl-page-picker__more-note description";
+          note.textContent = opts.moreNote;
+          results.appendChild(note);
+        }
+      };
+      const fetchType = async (restUrl, query, signal, perPage) => {
+        if (!restUrl) return { items: [], total: 0 };
+        const url = new URL(restUrl, window.location.origin);
+        url.searchParams.set("status", "publish");
+        url.searchParams.set("per_page", String(perPage));
+        url.searchParams.set("orderby", "modified");
+        url.searchParams.set("order", "desc");
+        url.searchParams.set("_fields", "id,title,link,modified");
+        if (query) {
+          url.searchParams.set("search", query);
+        }
+        const res = await fetch(url.toString(), {
+          credentials: "same-origin",
+          signal,
+          headers: restNonce ? {
+            "X-WP-Nonce": restNonce
+          } : {}
+        });
+        if (!res.ok) {
+          return { items: [], total: 0 };
+        }
+        const totalHeader = parseInt(res.headers.get("X-WP-Total") || "", 10);
+        const data = await res.json();
+        const items = (Array.isArray(data) ? data : []).map((row) => ({
+          id: Number(row.id) || 0,
+          title: row.title && typeof row.title.rendered === "string" ? row.title.rendered.replace(/<[^>]+>/g, "") : String(row.title || ""),
+          url: typeof row.link === "string" ? row.link : "",
+          modified: typeof row.modified === "string" ? row.modified : ""
+        }));
+        const total = Number.isFinite(totalHeader) ? totalHeader : items.length;
+        return { items, total };
       };
       const fetchPages = async (query = "") => {
-        if (!restUrl) {
+        const typesToFetch = activeTab === "all" ? postTypes : postTypes.filter((pt) => pt.value === activeTab);
+        if (typesToFetch.length === 0 || typesToFetch.every((pt) => !pt.restUrl)) {
+          setLoading(false);
+          results.replaceChildren();
           setStatus(opts.empty);
           return;
         }
@@ -188,46 +297,57 @@
           abort.abort();
         }
         abort = new AbortController();
-        setStatus(opts.loading);
-        list.replaceChildren();
-        const url = new URL(restUrl, window.location.origin);
-        url.searchParams.set("status", "publish");
-        url.searchParams.set("per_page", "20");
-        url.searchParams.set("orderby", "title");
-        url.searchParams.set("order", "asc");
-        url.searchParams.set("_fields", "id,title,link");
-        if (query) {
-          url.searchParams.set("search", query);
-        }
+        const gen = ++fetchGen;
+        setLoading(true);
+        setStatus("");
+        const perPage = 50;
         try {
-          const res = await fetch(url.toString(), {
-            credentials: "same-origin",
-            signal: abort.signal,
-            headers: restNonce ? {
-              "X-WP-Nonce": restNonce
-            } : {}
-          });
-          if (!res.ok) {
-            setStatus(opts.empty);
-            return;
+          const batches = await Promise.all(
+            typesToFetch.map(
+              (pt) => fetchType(pt.restUrl, query, abort.signal, perPage)
+            )
+          );
+          if (gen !== fetchGen) return;
+          let hasMore = batches.some(
+            (batch) => batch.total > batch.items.length
+          );
+          let pages = batches.flatMap((batch) => batch.items).filter((page) => page.id > 0);
+          if (activeTab === "all" && typesToFetch.length > 1) {
+            const seen = /* @__PURE__ */ new Set();
+            pages = pages.filter((page) => {
+              if (seen.has(page.id)) return false;
+              seen.add(page.id);
+              return true;
+            });
+            pages.sort(
+              (a, b) => String(b.modified || "").localeCompare(String(a.modified || ""))
+            );
+            if (pages.length > perPage) {
+              hasMore = true;
+              pages = pages.slice(0, perPage);
+            }
           }
-          const data = await res.json();
-          const pages = (Array.isArray(data) ? data : []).map((row) => ({
-            id: Number(row.id) || 0,
-            title: row.title && typeof row.title.rendered === "string" ? row.title.rendered.replace(/<[^>]+>/g, "") : String(row.title || ""),
-            url: typeof row.link === "string" ? row.link : ""
-          }));
           pages.forEach((page) => {
             if (selectedMap.has(page.id)) {
-              selectedMap.set(page.id, page);
+              selectedMap.set(page.id, {
+                id: page.id,
+                title: page.title,
+                url: page.url
+              });
             }
           });
-          renderRows(pages);
+          renderRows(pages, hasMore);
         } catch (err) {
           if (err && err.name === "AbortError") {
             return;
           }
+          if (gen !== fetchGen) return;
+          results.replaceChildren();
           setStatus(opts.empty);
+        } finally {
+          if (gen === fetchGen) {
+            setLoading(false);
+          }
         }
       };
       search.addEventListener("input", () => {
@@ -241,6 +361,29 @@
       search.focus();
       fetchPages("");
     });
+  }
+  function normalizePostTypes(raw, legacyRestUrl, restRoot) {
+    if (!Array.isArray(raw) || raw.length === 0) {
+      if (legacyRestUrl) {
+        return [
+          {
+            value: "page",
+            label: "Pages",
+            restBase: "pages",
+            restUrl: String(legacyRestUrl)
+          }
+        ];
+      }
+      return [];
+    }
+    return raw.map((row) => {
+      const value = String(row && row.value || "").trim();
+      const restBase = String(row && (row.restBase || row.value) || "").trim();
+      const label = String(row && row.label || value || "").trim() || value;
+      if (!value || !restBase) return null;
+      const restUrl = restRoot ? restRoot + "wp/v2/" + restBase.replace(/^\/+|\/+$/g, "") : "";
+      return { value, label, restBase, restUrl };
+    }).filter(Boolean);
   }
   window.baselayerOpenPagePicker = openPagePicker;
 
@@ -436,7 +579,6 @@
           title: i18n.selectPages || "Select pages",
           searchPlaceholder: i18n.searchPages || "Search pages\u2026",
           empty: i18n.noPages || "No pages found.",
-          loading: i18n.loading || "Loading\u2026",
           cancelLabel: i18n.cancel || "Cancel",
           selectLabel: i18n.select || "Select",
           restUrl: cfg.pagesRestUrl || "",

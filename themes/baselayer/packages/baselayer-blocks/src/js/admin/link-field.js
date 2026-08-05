@@ -212,7 +212,6 @@ export function createLinkControl(field, current) {
           title: i18n('pagePickerTitle', 'Select a page'),
           searchPlaceholder: i18n('pagePickerSearch', 'Search pages…'),
           empty: i18n('pagePickerEmpty', 'No pages found.'),
-          loading: i18n('pagePickerLoading', 'Loading…'),
           cancelLabel: i18n('cancel', 'Cancel'),
           selectLabel: i18n('selectPage', 'Select'),
           restUrl,

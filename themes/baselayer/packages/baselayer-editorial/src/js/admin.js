@@ -162,7 +162,6 @@ import { renderPageSelectionChips } from './admin/page-selection-chips.js';
         title: i18n.selectPages || 'Select pages',
         searchPlaceholder: i18n.searchPages || 'Search pages…',
         empty: i18n.noPages || 'No pages found.',
-        loading: i18n.loading || 'Loading…',
         cancelLabel: i18n.cancel || 'Cancel',
         selectLabel: i18n.select || 'Select',
         restUrl: cfg.pagesRestUrl || '',

@@ -659,7 +659,6 @@ export function createPanels(settings, builderRoot, onChange) {
       title: t('pagePickerTitle', 'Select a page'),
       searchPlaceholder: t('pagePickerSearch', 'Search pages…'),
       empty: t('pagePickerEmpty', 'No pages found.'),
-      loading: t('pagePickerLoading', 'Loading…'),
       cancelLabel: t('cancel', 'Cancel'),
       selectLabel: t('selectPage', 'Select'),
       restUrl: cfg.pagesRestUrl || '',

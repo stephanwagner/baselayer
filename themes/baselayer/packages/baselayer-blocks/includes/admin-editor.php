@@ -415,6 +415,8 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'maxMediaItems'           => __('Maximum items', 'baselayer-blocks'),
 		'maxMediaHelp'            => __('Maximum number of items that can be selected from the media library.', 'baselayer-blocks'),
 		'pageMultiple'            => __('Allow multiple pages', 'baselayer-blocks'),
+		'pageAllowedPostTypes'    => __('Allowed post types', 'baselayer-blocks'),
+		'pagePickerAll'           => __('All', 'baselayer-blocks'),
 		'linkAllowedTypes'        => __('Allowed types', 'baselayer-blocks'),
 		'linkAllowTarget'         => __('Allow editor to set target', 'baselayer-blocks'),
 		'linkTypePage'            => __('Page', 'baselayer-blocks'),
@@ -579,6 +581,7 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 	wp_localize_script('bl-blocks-admin', 'blBlocksAdmin', [
 		'type'                 => $type,
 		'postTypes'            => $post_types,
+		'pickerPostTypes'      => function_exists('bl_page_picker_post_types') ? bl_page_picker_post_types() : [],
 		'blockCategories'      => bl_blocks_block_category_choices(),
 		'hasIconPicker'        => $has_icon_picker,
 		'icons'                => $icons,
@@ -600,6 +603,7 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'window.blFormsAdmin = window.blFormsAdmin || ' . wp_json_encode([
 			'icons' => $icons,
 			'i18n'  => $i18n,
+			'pickerPostTypes' => function_exists('bl_page_picker_post_types') ? bl_page_picker_post_types() : [],
 		]) . ';',
 		'before'
 	);

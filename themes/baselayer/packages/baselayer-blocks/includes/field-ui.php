@@ -574,7 +574,7 @@ function bl_blocks_page_picker_summaries(array $ids): array
 			continue;
 		}
 		$post = get_post($id);
-		if (!$post || $post->post_type !== 'page') {
+		if (!$post instanceof WP_Post || $post->post_status === 'trash') {
 			$out[$id] = [
 				'id'    => $id,
 				'title' => sprintf(
@@ -648,6 +648,9 @@ function bl_blocks_render_admin_page_field(array $field, $value, string $input_n
 		}
 	}
 	$ids = array_values(array_unique($ids));
+	$allowed_types = function_exists('bl_page_picker_sanitize_post_types')
+		? bl_page_picker_sanitize_post_types($field['post_types'] ?? null)
+		: ['page'];
 	$summaries = bl_blocks_page_picker_summaries($ids);
 
 	$choose_label = $ids !== []
@@ -658,7 +661,7 @@ function bl_blocks_render_admin_page_field(array $field, $value, string $input_n
 			? __('Choose pages', 'baselayer-blocks')
 			: __('Choose page', 'baselayer-blocks'));
 
-	echo '<div class="bl-blocks-fields__page-picker" data-bl-blocks-page-picker data-multiple="' . esc_attr($multiple ? '1' : '0') . '" data-input-name="' . esc_attr($input_name) . '">';
+	echo '<div class="bl-blocks-fields__page-picker" data-bl-blocks-page-picker data-multiple="' . esc_attr($multiple ? '1' : '0') . '" data-input-name="' . esc_attr($input_name) . '" data-post-types="' . esc_attr(wp_json_encode($allowed_types)) . '">';
 	echo '<div class="bl-blocks-fields__page-picker-row">';
 	echo '<div class="bl-blocks-fields__page-picker-summary" data-bl-page-summary>';
 	if ($ids === []) {
@@ -1087,6 +1090,7 @@ function bl_blocks_enqueue_field_ui_assets(): void
 
 	wp_localize_script('bl-blocks-admin', 'blBlocksFieldUi', [
 		'pagesRestUrl' => esc_url_raw(rest_url('wp/v2/pages')),
+		'pickerPostTypes' => function_exists('bl_page_picker_post_types') ? bl_page_picker_post_types() : [],
 		'restNonce'    => wp_create_nonce('wp_rest'),
 		'i18n'         => [
 			'edit'                   => __('Edit', 'baselayer-blocks'),
@@ -1114,6 +1118,8 @@ function bl_blocks_enqueue_field_ui_assets(): void
 			'pagePickerSearch'       => __('Search pages…', 'baselayer-blocks'),
 			'pagePickerEmpty'        => __('No pages found.', 'baselayer-blocks'),
 			'pagePickerLoading'      => __('Loading…', 'baselayer-blocks'),
+			'pagePickerMore'         => __('More results available. Refine your search to narrow them down.', 'baselayer-blocks'),
+			'pagePickerAll'          => __('All', 'baselayer-blocks'),
 			'selectPage'             => __('Select', 'baselayer-blocks'),
 			'linkTypePage'           => __('Page', 'baselayer-blocks'),
 			'linkTypeUrl'            => __('URL', 'baselayer-blocks'),

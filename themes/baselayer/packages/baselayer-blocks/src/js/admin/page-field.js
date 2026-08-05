@@ -43,12 +43,138 @@ function pickerConfig() {
   ];
   let restUrl = '';
   let restNonce = '';
+  /** @type {Array<{value: string, label: string, restBase: string}>} */
+  let pickerPostTypes = [];
   sources.forEach((src) => {
     if (!src) return;
     if (!restUrl && src.pagesRestUrl) restUrl = src.pagesRestUrl;
     if (!restNonce && src.restNonce) restNonce = src.restNonce;
+    if (
+      !pickerPostTypes.length &&
+      Array.isArray(src.pickerPostTypes) &&
+      src.pickerPostTypes.length
+    ) {
+      pickerPostTypes = src.pickerPostTypes;
+    }
   });
-  return { restUrl, restNonce };
+  return { restUrl, restNonce, pickerPostTypes };
+}
+
+/**
+ * Resolve allowed post types for a page field against the localized catalog.
+ *
+ * @param {object} field
+ * @returns {Array<{value: string, label: string, restBase: string}>}
+ */
+function resolveFieldPostTypes(field) {
+  const { pickerPostTypes } = pickerConfig();
+  const catalog =
+    pickerPostTypes.length > 0
+      ? pickerPostTypes
+      : [{ value: 'page', label: 'Pages', restBase: 'pages' }];
+  const allowedKeys = catalog.map((row) => String(row.value || ''));
+  let selected = Array.isArray(field && field.post_types)
+    ? field.post_types.map((slug) => String(slug || '')).filter((slug) => allowedKeys.includes(slug))
+    : [];
+  if (selected.length === 0) {
+    selected = [...allowedKeys];
+  }
+  return catalog.filter((row) => selected.includes(String(row.value || '')));
+}
+
+/**
+ * Parse post_types from a data attribute (JSON array of slugs).
+ *
+ * @param {HTMLElement} wrap
+ * @returns {Array<{value: string, label: string, restBase: string}>}
+ */
+function resolveWrapPostTypes(wrap) {
+  const { pickerPostTypes } = pickerConfig();
+  const catalog =
+    pickerPostTypes.length > 0
+      ? pickerPostTypes
+      : [{ value: 'page', label: 'Pages', restBase: 'pages' }];
+  let selected = [];
+  try {
+    const raw = wrap.getAttribute('data-post-types');
+    const parsed = raw ? JSON.parse(raw) : null;
+    if (Array.isArray(parsed)) {
+      selected = parsed.map((slug) => String(slug || ''));
+    }
+  } catch (err) {
+    selected = [];
+  }
+  const allowedKeys = catalog.map((row) => String(row.value || ''));
+  selected = selected.filter((slug) => allowedKeys.includes(slug));
+  if (selected.length === 0) {
+    selected = [...allowedKeys];
+  }
+  return catalog.filter((row) => selected.includes(String(row.value || '')));
+}
+
+/**
+ * Hydrate titles for selected IDs across one or more REST endpoints.
+ *
+ * @param {Array<{id:number,title:string,url:string}>} selected
+ * @param {Array<{value: string, label: string, restBase: string}>} postTypes
+ * @param {string} restNonce
+ * @returns {Promise<Array<{id:number,title:string,url:string}>>}
+ */
+async function hydrateSelectedPages(selected, postTypes, restNonce) {
+  const missing = selected.filter((p) => !p.title);
+  if (missing.length === 0) return selected;
+  const api = window.wpApiSettings || {};
+  const restRoot = api.root ? String(api.root).replace(/\/?$/, '/') : '';
+  const include = missing.map((p) => p.id).join(',');
+  const urls = postTypes
+    .map((pt) => {
+      const base = String(pt.restBase || pt.value || '').replace(/^\/+|\/+$/g, '');
+      if (!base || !restRoot) return '';
+      return (
+        restRoot +
+        'wp/v2/' +
+        base +
+        '/?include=' +
+        encodeURIComponent(include) +
+        '&per_page=' +
+        missing.length +
+        '&_fields=id,title,link'
+      );
+    })
+    .filter(Boolean);
+  if (urls.length === 0) return selected;
+
+  try {
+    const batches = await Promise.all(
+      urls.map(async (url) => {
+        const res = await fetch(url, {
+          headers: restNonce ? { 'X-WP-Nonce': restNonce } : {},
+        });
+        if (!res.ok) return [];
+        const rows = await res.json();
+        return Array.isArray(rows) ? rows : [];
+      })
+    );
+    const byId = new Map();
+    batches.flat().forEach((row) => {
+      const id = Number(row.id) || 0;
+      if (id <= 0 || byId.has(id)) return;
+      byId.set(id, {
+        id,
+        title:
+          row.title && typeof row.title.rendered === 'string'
+            ? row.title.rendered.replace(/<[^>]+>/g, '')
+            : String((row.title && row.title.rendered) || row.title || ''),
+        url: typeof row.link === 'string' ? row.link : '',
+      });
+    });
+    return selected.map((page) => {
+      const hit = byId.get(page.id);
+      return hit ? { ...page, ...hit } : page;
+    });
+  } catch (err) {
+    return selected;
+  }
 }
 
 /**
@@ -298,43 +424,10 @@ export function createPagePickerControl(field, current) {
   }
 
   const hydrateTitles = async () => {
-    const missing = selected.filter((p) => !p.title);
-    if (missing.length === 0) return;
-    const { restUrl, restNonce } = pickerConfig();
-    if (!restUrl) return;
-    try {
-      const include = missing.map((p) => p.id).join(',');
-      const url =
-        String(restUrl).replace(/\/?$/, '/') +
-        '?include=' +
-        encodeURIComponent(include) +
-        '&per_page=' +
-        missing.length +
-        '&_fields=id,title,link';
-      const res = await fetch(url, {
-        headers: restNonce ? { 'X-WP-Nonce': restNonce } : {},
-      });
-      if (!res.ok) return;
-      const rows = await res.json();
-      if (!Array.isArray(rows)) return;
-      const byId = new Map(
-        rows.map((row) => [
-          Number(row.id) || 0,
-          {
-            id: Number(row.id) || 0,
-            title: (row.title && row.title.rendered) || '',
-            url: row.link || '',
-          },
-        ])
-      );
-      selected = selected.map((page) => {
-        const hit = byId.get(page.id);
-        return hit ? { ...page, ...hit } : page;
-      });
-      syncUi();
-    } catch (err) {
-      /* ignore hydrate errors */
-    }
+    const { restNonce } = pickerConfig();
+    const postTypes = resolveFieldPostTypes(field);
+    selected = await hydrateSelectedPages(selected, postTypes, restNonce);
+    syncUi();
   };
 
   pickBtn.addEventListener('click', async () => {
@@ -350,6 +443,7 @@ export function createPagePickerControl(field, current) {
       return;
     }
     const { restUrl, restNonce } = pickerConfig();
+    const postTypes = resolveFieldPostTypes(field);
     const result = await open({
       multi: multiple,
       selectedId: !multiple && selected[0] ? selected[0].id : 0,
@@ -359,11 +453,16 @@ export function createPagePickerControl(field, current) {
         : i18n('pagePickerTitle', 'Select a page'),
       searchPlaceholder: i18n('pagePickerSearch', 'Search pages…'),
       empty: i18n('pagePickerEmpty', 'No pages found.'),
-      loading: i18n('pagePickerLoading', 'Loading…'),
+      moreNote: i18n(
+        'pagePickerMore',
+        'More results available. Refine your search to narrow them down.'
+      ),
       cancelLabel: i18n('cancel', 'Cancel'),
       selectLabel: i18n('selectPage', 'Select'),
+      allLabel: i18n('pagePickerAll', 'All'),
       restUrl,
       restNonce,
+      postTypes,
     });
     if (!result) return;
     if (multiple) {
@@ -509,6 +608,7 @@ export function bindPagePickers(root = document) {
         return;
       }
       const { restUrl, restNonce } = pickerConfig();
+      const postTypes = resolveWrapPostTypes(wrap);
       const result = await openPagePicker({
         multi: multiple,
         selectedId: !multiple && selected[0] ? selected[0].id : 0,
@@ -518,11 +618,16 @@ export function bindPagePickers(root = document) {
           : i18n('pagePickerTitle', 'Select a page'),
         searchPlaceholder: i18n('pagePickerSearch', 'Search pages…'),
         empty: i18n('pagePickerEmpty', 'No pages found.'),
-        loading: i18n('pagePickerLoading', 'Loading…'),
+        moreNote: i18n(
+          'pagePickerMore',
+          'More results available. Refine your search to narrow them down.'
+        ),
         cancelLabel: i18n('cancel', 'Cancel'),
         selectLabel: i18n('selectPage', 'Select'),
+        allLabel: i18n('pagePickerAll', 'All'),
         restUrl,
         restNonce,
+        postTypes,
       });
       if (!result) return;
       if (multiple) {

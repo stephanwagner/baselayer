@@ -1736,6 +1736,14 @@ function bl_forms_sanitize_field($field): ?array
 	}
 
 	if ($type === 'page') {
+		$out['post_types'] = function_exists('bl_page_picker_sanitize_post_types')
+			? bl_page_picker_sanitize_post_types($field['post_types'] ?? null)
+			: (isset($field['post_types']) && is_array($field['post_types'])
+				? array_values(array_unique(array_filter(array_map('sanitize_key', $field['post_types']))))
+				: ['page']);
+		if ($out['post_types'] === []) {
+			$out['post_types'] = ['page'];
+		}
 		unset($out['placeholder'], $out['default_value'], $out['readonly']);
 	}
 

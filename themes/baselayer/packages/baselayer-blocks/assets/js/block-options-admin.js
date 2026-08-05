@@ -1098,6 +1098,7 @@
       modal.querySelector("[data-bl-icon-picker-search]").value = "";
       syncVariantButtons();
       renderCategories();
+      document.body.appendChild(modal);
       modal.hidden = false;
       document.body.classList.add("bl-icon-picker-modal-open");
       modal.querySelector("[data-bl-icon-picker-search]").focus();
