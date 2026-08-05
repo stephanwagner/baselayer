@@ -12,7 +12,7 @@
 }
 
 .bl-blocks-modal {
-  width: min(960px, 96vw);
+  width: min(800px, 96vw);
   max-height: min(90vh, 800px);
   display: flex;
   flex-direction: column;
@@ -259,6 +259,7 @@
 
   .description {
     color: var(--bl-gray-500, #50575e);
+    margin-bottom: 0;
   }
 }
 
@@ -491,7 +492,7 @@ button.button-link.bl-blocks-fields__card-remove {
 .bl-blocks-fields__media-preview {
   + .description.bl-blocks-fields__media-empty {
     margin-top: -6px;
-    margin-bottom: 8px;
+    margin-bottom: 2px;
   }
 }
 

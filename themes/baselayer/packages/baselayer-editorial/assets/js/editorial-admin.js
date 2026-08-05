@@ -197,6 +197,16 @@
         spinner.hidden = !loading;
         spinner.setAttribute("aria-hidden", loading ? "false" : "true");
       };
+      let lastFetchedPages = [];
+      let lastHasMore = false;
+      const buildDisplayPages = (fetched) => {
+        const selected = Array.from(selectedMap.values()).filter((page) => page.id > 0);
+        const selectedIds = new Set(selected.map((page) => page.id));
+        const rest = (Array.isArray(fetched) ? fetched : []).filter(
+          (page) => page.id > 0 && !selectedIds.has(page.id)
+        );
+        return [...selected, ...rest];
+      };
       const renderRows = (pages, hasMore = false) => {
         results.replaceChildren();
         if (!pages.length) {
@@ -237,12 +247,8 @@
               selectedMap.clear();
               selectedMap.set(id, item);
             }
-            results.querySelectorAll(".bl-page-picker__item").forEach((node) => {
-              const on = selectedMap.has(Number(node.dataset.pageId) || 0);
-              node.classList.toggle("is-selected", on);
-              node.setAttribute("aria-selected", on ? "true" : "false");
-            });
             syncSelectEnabled();
+            renderRows(buildDisplayPages(lastFetchedPages), lastHasMore);
           });
           results.appendChild(btn);
         });
@@ -289,8 +295,9 @@
         const typesToFetch = activeTab === "all" ? postTypes : postTypes.filter((pt) => pt.value === activeTab);
         if (typesToFetch.length === 0 || typesToFetch.every((pt) => !pt.restUrl)) {
           setLoading(false);
-          results.replaceChildren();
-          setStatus(opts.empty);
+          lastFetchedPages = [];
+          lastHasMore = false;
+          renderRows(buildDisplayPages([]), false);
           return;
         }
         if (abort) {
@@ -336,14 +343,17 @@
               });
             }
           });
-          renderRows(pages, hasMore);
+          lastFetchedPages = pages;
+          lastHasMore = hasMore;
+          renderRows(buildDisplayPages(pages), hasMore);
         } catch (err) {
           if (err && err.name === "AbortError") {
             return;
           }
           if (gen !== fetchGen) return;
-          results.replaceChildren();
-          setStatus(opts.empty);
+          lastFetchedPages = [];
+          lastHasMore = false;
+          renderRows(buildDisplayPages([]), false);
         } finally {
           if (gen === fetchGen) {
             setLoading(false);

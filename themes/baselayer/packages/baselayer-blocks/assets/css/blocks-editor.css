@@ -70,7 +70,7 @@ body.bl-page-picker-open {
 
 .bl-page-picker__tab {
   appearance: none;
-  flex: 1 1 0;
+  flex: auto;
   min-width: 0;
   margin: 0;
   border: 0;
@@ -80,17 +80,21 @@ body.bl-page-picker-open {
   box-shadow: none;
   height: auto;
   min-height: 0;
-  padding: 6px 4px;
+  padding: 6px 8px;
   font-size: 12px;
   font-weight: 500;
   line-height: 1.3;
   color: #646970;
   cursor: pointer;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .bl-page-picker__tab:last-child {
   border-right: 0;
 }
-.bl-page-picker__tab:hover {
+.bl-page-picker__tab:hover, .bl-page-picker__tab:focus {
   color: #1d2327;
   background: #f6f7f7;
 }
@@ -104,34 +108,6 @@ body.bl-page-picker-open {
   outline: 2px solid #2271b1;
   outline-offset: -2px;
   z-index: 1;
-}
-
-.wp-core-ui .bl-page-picker__tab {
-  border-radius: 0;
-  border-style: solid;
-  border-width: 0 1px 0 0;
-  border-color: #c3c4c7;
-  background: transparent;
-  box-shadow: none;
-  height: auto;
-  min-height: 0;
-  line-height: 1.3;
-  text-decoration: none;
-  text-shadow: none;
-}
-.wp-core-ui .bl-page-picker__tab:last-child {
-  border-right-width: 0;
-}
-.wp-core-ui .bl-page-picker__tab:hover, .wp-core-ui .bl-page-picker__tab:focus {
-  background: #f6f7f7;
-  border-color: #c3c4c7;
-  color: #1d2327;
-  box-shadow: none;
-}
-.wp-core-ui .bl-page-picker__tab.is-active {
-  background: #dcdcde;
-  color: #1d2327;
-  box-shadow: none;
 }
 
 .bl-page-picker__list {
@@ -177,6 +153,7 @@ body.bl-page-picker-open {
 }
 
 .bl-page-picker__item {
+  position: relative;
   appearance: none;
   display: flex;
   flex-direction: column;
@@ -198,9 +175,22 @@ body.bl-page-picker-open {
   background: #f0f6fc;
   outline: none;
 }
+.bl-page-picker__item::after {
+  content: "";
+  display: block;
+  width: 100%;
+  background: var(--wp-admin-theme-color);
+  position: absolute;
+  top: -1px;
+  bottom: -1px;
+  left: 0;
+  width: 0;
+}
 .bl-page-picker__item.is-selected {
   background: #e7f0fa;
-  box-shadow: inset 3px 0 0 #2271b1;
+}
+.bl-page-picker__item.is-selected::after {
+  width: 4px;
 }
 
 .bl-page-picker__item-title {
@@ -473,7 +463,7 @@ body.bl-page-picker-open {
 }
 
 .bl-blocks-modal {
-  width: min(960px, 96vw);
+  width: min(800px, 96vw);
   max-height: min(90vh, 800px);
   display: flex;
   flex-direction: column;
@@ -705,6 +695,7 @@ body.bl-page-picker-open {
 }
 .bl-blocks-fields__page-picker-summary .description {
   color: var(--bl-gray-500, #50575e);
+  margin-bottom: 0;
 }
 
 .bl-blocks-fields__page-preview {
@@ -929,7 +920,7 @@ button.button-link.bl-blocks-fields__card-remove:focus {
 
 .bl-blocks-fields__media-preview + .description.bl-blocks-fields__media-empty {
   margin-top: -6px;
-  margin-bottom: 8px;
+  margin-bottom: 2px;
 }
 
 .bl-blocks-fields__media-actions {
