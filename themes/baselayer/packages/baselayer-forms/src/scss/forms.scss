@@ -672,6 +672,21 @@ select.bl-form__control {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
+
+  &--vertical {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    align-items: stretch;
+
+    .bl-form__btn-option {
+      display: flex;
+
+      span {
+        flex: 1 1 auto;
+        width: 100%;
+      }
+    }
+  }
 }
 
 .bl-form__btn-option {

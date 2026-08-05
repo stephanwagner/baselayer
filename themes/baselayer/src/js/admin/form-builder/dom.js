@@ -459,6 +459,9 @@ export function defaultField(type = 'text') {
   if (['radio', 'checkboxes'].includes(type)) {
     base.layout = 'vertical';
   }
+  if (type === 'button_group') {
+    base.layout = 'horizontal';
+  }
   if (['select', 'button_group', 'file', 'image', 'page'].includes(type)) {
     base.multiple = false;
   }

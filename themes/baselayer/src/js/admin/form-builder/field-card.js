@@ -268,6 +268,10 @@ function convertFieldType(field, nextType) {
     if (field.layout !== 'horizontal') {
       field.layout = 'vertical';
     }
+  } else if (nextType === 'button_group') {
+    if (field.layout !== 'vertical') {
+      field.layout = 'horizontal';
+    }
   } else {
     delete field.layout;
   }
@@ -1448,12 +1452,28 @@ function syncWidthControlUi(scope, field) {
 
 function createLayoutControl(field) {
   const wrap = el('div', { className: 'bl-forms-builder__layout' });
-  const active = field.layout === 'horizontal' ? 'horizontal' : 'vertical';
+  const isButtonGroup = field.type === 'button_group';
+  const active = isButtonGroup
+    ? field.layout === 'vertical'
+      ? 'vertical'
+      : 'horizontal'
+    : field.layout === 'horizontal'
+      ? 'horizontal'
+      : 'vertical';
+  if (!field.layout) {
+    field.layout = active;
+  }
+  const options = isButtonGroup
+    ? [
+        { value: 'horizontal', label: t('layoutHorizontal', 'Horizontal') },
+        { value: 'vertical', label: t('layoutVertical', 'Vertical') },
+      ]
+    : [
+        { value: 'vertical', label: t('layoutVertical', 'Vertical') },
+        { value: 'horizontal', label: t('layoutHorizontal', 'Horizontal') },
+      ];
   const group = createSegmentedControl(
-    [
-      { value: 'vertical', label: t('layoutVertical', 'Vertical') },
-      { value: 'horizontal', label: t('layoutHorizontal', 'Horizontal') },
-    ],
+    options,
     active,
     'blLayoutGroup',
     (value) => {
@@ -2804,9 +2824,14 @@ export function serializeRow(row) {
       value: opt.querySelector('[data-bl-opt-value]')?.value || '',
     }));
   }
-  if (type === 'radio' || type === 'checkboxes') {
+  if (type === 'radio' || type === 'checkboxes' || type === 'button_group') {
     const layoutBtn = q('[data-bl-layout].is-active');
-    data.layout = layoutBtn?.dataset.blLayout === 'horizontal' ? 'horizontal' : 'vertical';
+    const raw = layoutBtn?.dataset.blLayout || '';
+    if (type === 'button_group') {
+      data.layout = raw === 'vertical' ? 'vertical' : 'horizontal';
+    } else {
+      data.layout = raw === 'horizontal' ? 'horizontal' : 'vertical';
+    }
   }
   if (type === 'checkboxes') {
     const parseLimit = (raw) => {
@@ -3287,14 +3312,14 @@ export function createFieldCard(initial, open = false) {
     if (field.type === 'toggle' || field.type === 'terms' || field.type === 'checkboxes') {
       appearanceSections.add(createShowAsCheckboxControl(field));
     }
+    if (field.type === 'radio' || field.type === 'checkboxes' || field.type === 'button_group') {
+      appearanceSections.add(createLayoutControl(field));
+    }
     if (field.type !== 'hidden' && field.type !== 'divider' && field.type !== 'spacer') {
       appearanceSections.add(createWidthControl(field, updatePreview));
     }
     if ((field.type === 'file' || field.type === 'image') && !useMediaLibraryFields()) {
       appearanceSections.add(createUploadAppearanceControls(field));
-    }
-    if (field.type === 'radio' || field.type === 'checkboxes') {
-      appearanceSections.add(createLayoutControl(field));
     }
     appearanceSections.add(createCssClassControl(field));
 

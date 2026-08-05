@@ -827,6 +827,12 @@ function bl_blocks_sanitize_leaf_field_fallback(array $field): array
 	if (in_array($out['type'], ['select', 'button_group', 'file', 'image', 'page'], true)) {
 		$out['multiple'] = !empty($field['multiple']);
 	}
+	if (in_array($out['type'], ['radio', 'checkboxes'], true)) {
+		$out['layout'] = (($field['layout'] ?? 'vertical') === 'horizontal') ? 'horizontal' : 'vertical';
+	}
+	if ($out['type'] === 'button_group') {
+		$out['layout'] = (($field['layout'] ?? 'horizontal') === 'vertical') ? 'vertical' : 'horizontal';
+	}
 	if ($out['type'] === 'page') {
 		$out['multiple'] = !empty($field['multiple']);
 		$out['post_types'] = function_exists('bl_page_picker_sanitize_post_types')

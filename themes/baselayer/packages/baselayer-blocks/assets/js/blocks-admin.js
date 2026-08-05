@@ -7804,8 +7804,9 @@
         control.appendChild(option2);
       });
     } else if (type === "button_group") {
+      const layout = field.layout === "vertical" ? "vertical" : "horizontal";
       control = el7("div", {
-        className: "bl-blocks-fields__button-group",
+        className: "bl-blocks-fields__button-group -" + layout,
         role: "group"
       });
       options.forEach((opt, i) => {

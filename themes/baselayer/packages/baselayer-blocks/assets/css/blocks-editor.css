@@ -674,6 +674,7 @@ body.bl-page-picker-open {
 .bl-blocks-fields__button-group {
   display: flex;
   flex: 0 0 auto;
+  flex-direction: row;
   width: 100%;
   margin: 0;
   border: 1px solid #c3c4c7;
@@ -681,6 +682,23 @@ body.bl-page-picker-open {
   background: #fff;
   box-sizing: border-box;
   overflow: hidden;
+}
+.bl-blocks-fields__button-group.-vertical {
+  flex-direction: column;
+}
+.bl-blocks-fields__button-group.-vertical > .bl-blocks-fields__btn-option {
+  border-right: 0;
+  border-bottom: 1px solid #c3c4c7;
+}
+.bl-blocks-fields__button-group.-vertical > .bl-blocks-fields__btn-option:last-child {
+  border-bottom: 0;
+}
+
+.bl-blocks-modal__body .bl-blocks-fields__button-group {
+  align-self: flex-start;
+  width: fit-content;
+  min-width: 260px;
+  max-width: 100%;
 }
 
 .bl-blocks-fields__btn-option {

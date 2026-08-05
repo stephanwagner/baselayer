@@ -644,6 +644,18 @@ select.bl-form__control {
   flex-wrap: wrap;
   gap: 6px;
 }
+.bl-form__button-group--vertical {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: stretch;
+}
+.bl-form__button-group--vertical .bl-form__btn-option {
+  display: flex;
+}
+.bl-form__button-group--vertical .bl-form__btn-option span {
+  flex: 1 1 auto;
+  width: 100%;
+}
 
 .bl-form__btn-option {
   position: relative;

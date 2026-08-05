@@ -1761,6 +1761,17 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
   overflow: hidden;
 }
 
+.bl-forms-builder__layout > .bl-forms-builder__segmented {
+  width: fit-content;
+  min-width: 260px;
+  max-width: 100%;
+}
+
+.bl-forms-builder__width > .bl-forms-builder__segmented {
+  width: 520px;
+  max-width: 100%;
+}
+
 .bl-forms-builder__segmented-btn {
   appearance: none;
   flex: 1 1 0;
@@ -1852,11 +1863,13 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
   }
 }
 
-.bl-forms-builder__width-custom,
-.bl-forms-builder__height-custom,
-.bl-forms-builder__margin-custom {
-  margin-top: 8px;
-  max-width: 280px;
+.bl-forms-builder {
+  input.bl-forms-builder__width-custom,
+  input.bl-forms-builder__height-custom,
+  input.bl-forms-builder__margin-custom {
+    margin-top: 8px;
+    max-width: 280px;
+  }
 }
 
 .bl-forms-builder__after-submit {

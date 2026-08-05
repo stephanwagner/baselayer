@@ -213,13 +213,19 @@ function bl_forms_field_control_attrs(array $field, bool $allow_readonly = true,
 }
 
 /**
- * Options layout for radio / checkboxes.
+ * Options layout for radio / checkboxes / button_group.
+ *
+ * Button groups default to horizontal; radio/checkboxes default to vertical.
  *
  * @param array<string, mixed> $field
  */
 function bl_forms_field_options_layout(array $field): string
 {
-	return (($field['layout'] ?? 'vertical') === 'horizontal') ? 'horizontal' : 'vertical';
+	$type = sanitize_key((string) ($field['type'] ?? ''));
+	$default = $type === 'button_group' ? 'horizontal' : 'vertical';
+	$layout = (string) ($field['layout'] ?? $default);
+
+	return $layout === 'vertical' || $layout === 'horizontal' ? $layout : $default;
 }
 
 /**
@@ -1058,11 +1064,13 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 	if ($type === 'button_group') {
 		$input_type = $multiple ? 'checkbox' : 'radio';
 		$input_name = $multiple ? $field_name . '[]' : $field_name;
+		$layout = bl_forms_field_options_layout($field);
+		$group_class = 'bl-form__button-group bl-form__button-group--' . $layout;
 		?>
 		<fieldset <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--button-group', $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<?= bl_forms_field_label_html($field, $input_id, $req_mark, 'legend') // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-			<div class="bl-form__button-group" role="group">
+			<div class="<?= esc_attr($group_class) ?>" role="group">
 				<?php foreach ($options as $i => $opt) :
 					$oid = $input_id . '-' . $i;
 					$opt_value = (string) ($opt['value'] ?? '');

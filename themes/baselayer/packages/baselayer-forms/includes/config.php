@@ -1708,6 +1708,10 @@ function bl_forms_sanitize_field($field): ?array
 		$out['layout'] = (($field['layout'] ?? 'vertical') === 'horizontal') ? 'horizontal' : 'vertical';
 	}
 
+	if ($type === 'button_group') {
+		$out['layout'] = (($field['layout'] ?? 'horizontal') === 'vertical') ? 'vertical' : 'horizontal';
+	}
+
 	if ($type === 'checkboxes') {
 		$min_sel = bl_forms_sanitize_selection_limit($field['min_selections'] ?? '');
 		$max_sel = bl_forms_sanitize_selection_limit($field['max_selections'] ?? '');
