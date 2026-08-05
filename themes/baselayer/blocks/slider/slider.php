@@ -3,7 +3,7 @@
  * Slider block (BaseLayer Blocks).
  */
 
-$slides_per_view = bl_block_field('slides_per_view') ?? 1;
+$slides_per_view = max(1, min(12, (int) (bl_block_field('slides_per_view') ?: 1)));
 $slides_per_group = bl_block_field('slides_per_group') ?? 1;
 $animation = bl_block_field('animation') ?: 'slide';
 $space_between = (int) (bl_block_field('space_between') ?? 16);
@@ -54,7 +54,7 @@ $wrapper_attributes = get_block_wrapper_attributes([
 	data-slider-has-content="<?php echo $has_content ? 'true' : 'false'; ?>"
 	data-slider-content-align="<?php echo esc_attr((string) $content_align); ?>"
 	data-slider-content-visibility-mobile="<?php echo $content_visibility_mobile ? 'true' : 'false'; ?>">
-	<?php if (is_admin()) : ?>
+	<?php if ((function_exists('bl_blocks_is_editor_render') && bl_blocks_is_editor_render()) || is_admin()) : ?>
 		<div class="slider__editor-badge" aria-hidden="true">
 			<span class="slider__editor-badge-label"><?php echo esc_html__('Slider', 'baselayer'); ?></span>
 		</div>

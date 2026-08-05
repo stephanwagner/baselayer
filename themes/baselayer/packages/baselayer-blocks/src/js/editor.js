@@ -189,6 +189,7 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
     slug,
     isSelected,
     clientId,
+    blockAlign,
     onChangeValues,
   }) {
     const [response, setResponse] = useState({ status: 'idle' });
@@ -216,6 +217,9 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
 
     const accordionEditorOpen =
       slug === 'accordion' && (!!isSelected || !!hasChildSelected || !!values.accordion_is_open);
+
+    const sliderEditorExpanded =
+      slug === 'slider' && (!!isSelected || !!hasChildSelected);
 
     useEffect(() => {
       if (!apiFetch || !name) {
@@ -333,6 +337,8 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
         defaultInnerBlocksProps: defaultInnerBlocksProps(def),
         iconControl,
         accordionEditorOpen: slug === 'accordion' ? accordionEditorOpen : false,
+        sliderEditorExpanded: slug === 'slider' ? sliderEditorExpanded : false,
+        blockAlign: typeof blockAlign === 'string' ? blockAlign : '',
       });
     } catch (err) {
       if (typeof console !== 'undefined' && console.warn) {
@@ -374,11 +380,14 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
         html: false,
         className: true,
         anchor: true,
+        ...(Array.isArray(def.align) && def.align.length ? { align: def.align } : {}),
       },
       edit: function Edit(props) {
         const { attributes, setAttributes, isSelected, clientId } = props;
         const values = normalizeValues(attributes.values);
         const ui = normalizeUi(attributes.ui);
+        const blockAlign =
+          typeof attributes.align === 'string' ? attributes.align : '';
         const [sidebarMountId, setSidebarMountId] = useState(0);
         const sidebarEditing = !!def.sidebarEditing;
 
@@ -429,6 +438,7 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
                 slug,
                 isSelected,
                 clientId,
+                blockAlign,
                 onChangeValues: isIconShell ? applyCanvasValues : null,
               })
             )

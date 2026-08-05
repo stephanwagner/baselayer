@@ -39,10 +39,10 @@
 
 @mixin slider-editor-hide-extra-slides($max-slides-per-view: 12) {
   @for $n from 1 through $max-slides-per-view {
-    .slider__wrapper[data-slider-slides-per-view='#{$n}'] {
+    .slider__wrapper:not([data-slider-editor-expanded='true'])[data-slider-slides-per-view='#{$n}'] {
       @include slider-editor-innerblocks-layout {
         > .wp-block-baselayer-slider-slide:nth-child(n + #{$n + 1}) {
-          display: none;
+          display: none !important;
         }
       }
     }
@@ -72,7 +72,16 @@
       position: static;
     }
 
+    // Front CSS keeps display:flex on .swiper-wrapper; that collapses
+    // percentage padding-top (slide aspect ratio) in the editor.
+    .swiper > .swiper-wrapper {
+      display: block;
+      width: 100%;
+    }
+
     @include slider-editor-innerblocks-host {
+      display: block;
+      width: 100%;
       position: static;
     }
 
@@ -124,6 +133,7 @@
     transition: transition('color');
   }
 
+  .slider__wrapper[data-slider-editor-expanded='true'] .slider__editor-badge-icon,
   .wp-block-baselayer-slider.is-selected .slider__wrapper .slider__editor-badge-icon,
   .wp-block-baselayer-slider.has-child-selected .slider__wrapper .slider__editor-badge-icon,
   .slider__editor-badge:hover .slider__editor-badge-icon {
@@ -138,6 +148,7 @@
     transition: transition('color');
   }
 
+  .slider__wrapper[data-slider-editor-expanded='true'] .slider__editor-badge-label,
   .wp-block-baselayer-slider.is-selected .slider__wrapper .slider__editor-badge-label,
   .wp-block-baselayer-slider.has-child-selected .slider__wrapper .slider__editor-badge-label,
   .slider__editor-badge:hover .slider__editor-badge-label {
@@ -165,6 +176,7 @@
           display: flex;
           align-items: center;
           justify-content: center;
+          flex-direction: row;
           gap: 4px;
           width: auto;
           min-height: 0;
@@ -204,6 +216,7 @@
     }
   }
 
+  .slider__wrapper[data-slider-editor-expanded='true'],
   .wp-block-baselayer-slider.is-selected .slider__wrapper,
   .wp-block-baselayer-slider.has-child-selected .slider__wrapper {
     @include slider-editor-innerblocks-layout {
@@ -213,11 +226,12 @@
     }
   }
 
-  // Hide extra slides when collapsed
+  // Hide extra slides when collapsed; expand when selected (or child selected).
 
   @include slider-editor-innerblocks-wrap(12);
   @include slider-editor-hide-extra-slides(12);
 
+  .slider__wrapper[data-slider-editor-expanded='true'],
   .wp-block-baselayer-slider.is-selected .slider__wrapper,
   .wp-block-baselayer-slider.has-child-selected .slider__wrapper {
     @include slider-editor-innerblocks-layout {

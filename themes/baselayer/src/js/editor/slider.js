@@ -1,6 +1,6 @@
 function getSliderClientId(element) {
   const sliderBlock = element.closest(
-    '.block-editor-block-list__block[data-type="acf/slider"]'
+    '.block-editor-block-list__block[data-type="acf/slider"], .block-editor-block-list__block[data-type="baselayer/slider"]'
   );
 
   return sliderBlock?.dataset?.block || null;

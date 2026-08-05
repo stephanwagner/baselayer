@@ -78,13 +78,33 @@ function markerFromAttrs(attrs) {
 }
 
 /**
+ * Decode common HTML entities used in esc_attr()'d JSON attribute values.
+ *
+ * @param {string} value
+ * @returns {string}
+ */
+function decodeHtmlAttr(value) {
+  const s = String(value);
+  if (!/[&]/.test(s)) {
+    return s;
+  }
+  return s
+    .replace(/&quot;/g, '"')
+    .replace(/&#0*39;/g, "'")
+    .replace(/&apos;/g, "'")
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&');
+}
+
+/**
  * @param {unknown} value
  * @returns {unknown}
  */
 function parseJsonAttr(value) {
   if (value === true || value == null || value === '') return undefined;
   try {
-    return JSON.parse(String(value));
+    return JSON.parse(decodeHtmlAttr(String(value)));
   } catch (err) {
     return undefined;
   }
@@ -104,6 +124,11 @@ function parseStyle(styleText) {
       const prop = part.slice(0, idx).trim();
       const val = part.slice(idx + 1).trim();
       if (!prop) return;
+      // React style objects keep custom properties in kebab-case.
+      if (prop.startsWith('--')) {
+        out[prop] = val;
+        return;
+      }
       const camel = prop.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
       out[camel] = val;
     });
@@ -163,6 +188,35 @@ function isAccordionWrapper(el) {
 }
 
 /**
+ * @param {Element} el
+ * @returns {boolean}
+ */
+function isSliderWrapper(el) {
+  return !!(el && el.classList && el.classList.contains('slider__wrapper'));
+}
+
+/**
+ * @param {Record<string, unknown>} props
+ * @param {string} blockAlign
+ * @returns {Record<string, unknown>}
+ */
+function applyBlockAlignClass(props, blockAlign) {
+  const align = String(blockAlign || '').trim();
+  if (!['wide', 'full', 'left', 'center', 'right'].includes(align)) {
+    return props;
+  }
+  const alignClass = 'align' + align;
+  const className = String(props.className || '');
+  const classes = className
+    .split(/\s+/)
+    .filter((c) => c && !/^align(wide|full|left|center|right)$/.test(c));
+  if (!classes.includes(alignClass)) {
+    classes.push(alignClass);
+  }
+  return { ...props, className: classes.join(' ') };
+}
+
+/**
  * @param {Node} node
  * @param {object} ctx
  * @returns {unknown}
@@ -219,6 +273,17 @@ function walkNode(node, ctx) {
     };
   }
 
+  if (ctx.sliderEditorExpanded && isSliderWrapper(el)) {
+    props = {
+      ...props,
+      'data-slider-editor-expanded': 'true',
+    };
+  }
+
+  if (ctx.blockAlign && isSliderWrapper(el)) {
+    props = applyBlockAlignClass(props, ctx.blockAlign);
+  }
+
   if (ctx.iconControl && isIconHost(el)) {
     const className = String(props.className || '');
     const hasIcon = !!(ctx.iconControl.value);
@@ -271,6 +336,8 @@ function walkNode(node, ctx) {
  *   defaultInnerBlocksProps?: object,
  *   iconControl?: { type: Function, props: object, value?: string }|null,
  *   accordionEditorOpen?: boolean,
+ *   sliderEditorExpanded?: boolean,
+ *   blockAlign?: string,
  * }} options
  * @returns {unknown}
  */
@@ -305,6 +372,8 @@ export function parseJsxPreview(html, options) {
     defaultInnerBlocksProps: options.defaultInnerBlocksProps || {},
     iconControl: options.iconControl || null,
     accordionEditorOpen: !!options.accordionEditorOpen,
+    sliderEditorExpanded: !!options.sliderEditorExpanded,
+    blockAlign: typeof options.blockAlign === 'string' ? options.blockAlign : '',
   };
 
   const children = [];

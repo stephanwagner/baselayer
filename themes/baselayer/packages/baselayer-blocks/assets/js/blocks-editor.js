@@ -6615,10 +6615,17 @@
     }
     return `<div ${INNER_MARKER}="1" ${INNER_PROPS}="${encoded}"></div>`;
   }
+  function decodeHtmlAttr(value) {
+    const s = String(value);
+    if (!/[&]/.test(s)) {
+      return s;
+    }
+    return s.replace(/&quot;/g, '"').replace(/&#0*39;/g, "'").replace(/&apos;/g, "'").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&");
+  }
   function parseJsonAttr(value) {
     if (value === true || value == null || value === "") return void 0;
     try {
-      return JSON.parse(String(value));
+      return JSON.parse(decodeHtmlAttr(String(value)));
     } catch (err) {
       return void 0;
     }
@@ -6631,6 +6638,10 @@
       const prop = part.slice(0, idx).trim();
       const val = part.slice(idx + 1).trim();
       if (!prop) return;
+      if (prop.startsWith("--")) {
+        out[prop] = val;
+        return;
+      }
       const camel = prop.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
       out[camel] = val;
     });
@@ -6667,6 +6678,22 @@
   }
   function isAccordionWrapper(el5) {
     return !!(el5 && el5.classList && el5.classList.contains("accordion__wrapper"));
+  }
+  function isSliderWrapper(el5) {
+    return !!(el5 && el5.classList && el5.classList.contains("slider__wrapper"));
+  }
+  function applyBlockAlignClass(props, blockAlign) {
+    const align = String(blockAlign || "").trim();
+    if (!["wide", "full", "left", "center", "right"].includes(align)) {
+      return props;
+    }
+    const alignClass = "align" + align;
+    const className = String(props.className || "");
+    const classes = className.split(/\s+/).filter((c) => c && !/^align(wide|full|left|center|right)$/.test(c));
+    if (!classes.includes(alignClass)) {
+      classes.push(alignClass);
+    }
+    return { ...props, className: classes.join(" ") };
   }
   function walkNode(node, ctx) {
     const { createElement, InnerBlocks, Fragment } = ctx;
@@ -6716,6 +6743,15 @@
         className: classes.join(" "),
         "data-accordion-is-open": "true"
       };
+    }
+    if (ctx.sliderEditorExpanded && isSliderWrapper(el5)) {
+      props = {
+        ...props,
+        "data-slider-editor-expanded": "true"
+      };
+    }
+    if (ctx.blockAlign && isSliderWrapper(el5)) {
+      props = applyBlockAlignClass(props, ctx.blockAlign);
     }
     if (ctx.iconControl && isIconHost(el5)) {
       const className = String(props.className || "");
@@ -6778,7 +6814,9 @@
       InnerBlocks: options.InnerBlocks,
       defaultInnerBlocksProps: options.defaultInnerBlocksProps || {},
       iconControl: options.iconControl || null,
-      accordionEditorOpen: !!options.accordionEditorOpen
+      accordionEditorOpen: !!options.accordionEditorOpen,
+      sliderEditorExpanded: !!options.sliderEditorExpanded,
+      blockAlign: typeof options.blockAlign === "string" ? options.blockAlign : ""
     };
     const children = [];
     Array.from(root.childNodes).forEach((child) => {
@@ -6990,6 +7028,7 @@
       slug,
       isSelected,
       clientId,
+      blockAlign,
       onChangeValues
     }) {
       const [response, setResponse] = useState({ status: "idle" });
@@ -7008,6 +7047,7 @@
         [clientId, supportsInner]
       ) : false;
       const accordionEditorOpen = slug === "accordion" && (!!isSelected || !!hasChildSelected || !!values.accordion_is_open);
+      const sliderEditorExpanded = slug === "slider" && (!!isSelected || !!hasChildSelected);
       useEffect(() => {
         if (!apiFetch || !name) {
           return void 0;
@@ -7104,7 +7144,9 @@
           InnerBlocks: supportsInner ? InnerBlocks : null,
           defaultInnerBlocksProps: defaultInnerBlocksProps(def),
           iconControl,
-          accordionEditorOpen: slug === "accordion" ? accordionEditorOpen : false
+          accordionEditorOpen: slug === "accordion" ? accordionEditorOpen : false,
+          sliderEditorExpanded: slug === "slider" ? sliderEditorExpanded : false,
+          blockAlign: typeof blockAlign === "string" ? blockAlign : ""
         });
       } catch (err) {
         if (typeof console !== "undefined" && console.warn) {
@@ -7140,12 +7182,14 @@
         supports: {
           html: false,
           className: true,
-          anchor: true
+          anchor: true,
+          ...Array.isArray(def.align) && def.align.length ? { align: def.align } : {}
         },
         edit: function Edit(props) {
           const { attributes, setAttributes, isSelected, clientId } = props;
           const values = normalizeValues(attributes.values);
           const ui = normalizeUi(attributes.ui);
+          const blockAlign = typeof attributes.align === "string" ? attributes.align : "";
           const [sidebarMountId, setSidebarMountId] = useState(0);
           const sidebarEditing = !!def.sidebarEditing;
           const applyValues = (next) => {
@@ -7186,6 +7230,7 @@
               slug,
               isSelected,
               clientId,
+              blockAlign,
               onChangeValues: isIconShell ? applyCanvasValues : null
             })
           ) : el5(
