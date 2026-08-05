@@ -980,10 +980,43 @@ button.button-link.bl-blocks-fields__card-remove:focus {
   margin: 0;
 }
 
-.bl-blocks-fields__layout--column {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+.bl-blocks-fields__columns {
+  display: flex;
+  flex-wrap: wrap;
   gap: 12px;
+  align-items: flex-start;
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+}
+
+.bl-blocks-fields__layout--column {
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+}
+.bl-blocks-fields__layout--column > * + * {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #dcdcde;
+}
+.bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
+.bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__static,
+.bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__row {
+  margin-top: 6px;
+  padding-top: 0;
+  border-top: 0;
+}
+.bl-blocks-fields__layout--column > .bl-blocks-fields__section-title + * {
+  margin-top: 6px;
+  padding-top: 0;
+  border-top: 0;
+}
+.bl-blocks-fields__layout--column.bl-blocks-fields__layout--column-auto {
+  flex: 1 1 0;
+  width: auto;
 }
 
 .bl-blocks-sidebar-fields .bl-blocks-fields__section-title,
@@ -1379,12 +1412,25 @@ button.button-link.bl-blocks-fields__repeater-remove:active {
   padding-top: 0;
   border-top: 0;
 }
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__columns,
+.bl-blocks-fields--compact .bl-blocks-fields__columns {
+  flex-direction: column;
+  gap: 0;
+}
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__columns > * + *,
+.bl-blocks-fields--compact .bl-blocks-fields__columns > * + * {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #dcdcde;
+}
 .bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout--column,
 .bl-blocks-fields--compact .bl-blocks-fields__layout--column {
   display: flex;
   flex-direction: column;
   gap: 0;
-  grid-template-columns: none;
+  flex: 0 1 auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
 }
 .bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout--column > * + *,
 .bl-blocks-fields--compact .bl-blocks-fields__layout--column > * + * {

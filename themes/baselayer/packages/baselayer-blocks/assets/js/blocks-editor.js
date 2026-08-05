@@ -5246,6 +5246,38 @@
   function isLayout(type) {
     return type === "column" || type === "section" || type === "tab" || type === "group";
   }
+  function applyColumnWidth(wrap, field) {
+    const width = String(field && field.width || "100");
+    const gap = 12;
+    if (width === "auto") {
+      wrap.classList.add("bl-blocks-fields__layout--column-auto");
+      return;
+    }
+    if (width === "custom") {
+      const custom = String(field && field.width_custom || "").trim();
+      if (custom) {
+        wrap.style.flex = "0 1 auto";
+        wrap.style.width = custom;
+        wrap.style.maxWidth = "100%";
+        wrap.style.minWidth = "0";
+        return;
+      }
+      wrap.style.flex = "0 1 100%";
+      wrap.style.width = "100%";
+      return;
+    }
+    const pct = parseInt(width, 10);
+    if (Number.isFinite(pct) && pct > 0 && pct < 100) {
+      const factor = Math.max(0, Math.min(1, pct / 100));
+      wrap.style.flex = "0 1 auto";
+      wrap.style.width = `min(100%, calc(${pct}% - ${gap * (1 - factor)}px))`;
+      wrap.style.maxWidth = "100%";
+      wrap.style.minWidth = "0";
+      return;
+    }
+    wrap.style.flex = "0 1 100%";
+    wrap.style.width = "100%";
+  }
   function isStatic(type) {
     return type === "divider" || type === "spacer" || type === "heading" || type === "text_block" || type === "html" || type === "honeypot" || type === "captcha";
   }
@@ -5621,8 +5653,23 @@
       if (type === "section" && showTitle && field.label) {
         wrap.appendChild(el4("h3", { className: "bl-blocks-fields__section-title", text: field.label }));
       }
+      if (type === "column" && !compact) {
+        applyColumnWidth(wrap, field);
+      }
       parent.appendChild(wrap);
       walk(field.children || [], wrap, valueMap);
+      return wrap;
+    };
+    const appendColumnGroup = (columns, parent, valueMap) => {
+      const active = (columns || []).filter((col) => col && col.active !== false);
+      if (!active.length) return;
+      if (compact || active.length === 1) {
+        active.forEach((col) => appendLayoutWrap(col, "column", parent, valueMap));
+        return;
+      }
+      const group = el4("div", { className: "bl-blocks-fields__columns" });
+      active.forEach((col) => appendLayoutWrap(col, "column", group, valueMap));
+      parent.appendChild(group);
     };
     const appendTabGroup = (tabs, parent, valueMap) => {
       const activeTabs = (tabs || []).filter((tab) => tab && tab.active !== false);
@@ -5712,6 +5759,15 @@
             i += 1;
           }
           appendTabGroup(run, parent, valueMap);
+          continue;
+        }
+        if (type === "column") {
+          const run = [];
+          while (i < fields2.length && fields2[i] && fields2[i].type === "column") {
+            run.push(fields2[i]);
+            i += 1;
+          }
+          appendColumnGroup(run, parent, valueMap);
           continue;
         }
         if (isLayout(type)) {

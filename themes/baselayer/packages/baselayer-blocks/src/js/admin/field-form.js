@@ -180,6 +180,45 @@ function isLayout(type) {
   return type === 'column' || type === 'section' || type === 'tab' || type === 'group';
 }
 
+/**
+ * Apply flex width for a column cell inside .bl-blocks-fields__columns.
+ *
+ * @param {HTMLElement} wrap
+ * @param {object} field
+ */
+function applyColumnWidth(wrap, field) {
+  const width = String((field && field.width) || '100');
+  const gap = 12;
+  if (width === 'auto') {
+    wrap.classList.add('bl-blocks-fields__layout--column-auto');
+    return;
+  }
+  if (width === 'custom') {
+    const custom = String((field && field.width_custom) || '').trim();
+    if (custom) {
+      wrap.style.flex = '0 1 auto';
+      wrap.style.width = custom;
+      wrap.style.maxWidth = '100%';
+      wrap.style.minWidth = '0';
+      return;
+    }
+    wrap.style.flex = '0 1 100%';
+    wrap.style.width = '100%';
+    return;
+  }
+  const pct = parseInt(width, 10);
+  if (Number.isFinite(pct) && pct > 0 && pct < 100) {
+    const factor = Math.max(0, Math.min(1, pct / 100));
+    wrap.style.flex = '0 1 auto';
+    wrap.style.width = `min(100%, calc(${pct}% - ${gap * (1 - factor)}px))`;
+    wrap.style.maxWidth = '100%';
+    wrap.style.minWidth = '0';
+    return;
+  }
+  wrap.style.flex = '0 1 100%';
+  wrap.style.width = '100%';
+}
+
 function isStatic(type) {
   return (
     type === 'divider' ||
@@ -638,8 +677,31 @@ export function createFieldForm(fields, values = {}, options = {}) {
     if (type === 'section' && showTitle && field.label) {
       wrap.appendChild(el('h3', { className: 'bl-blocks-fields__section-title', text: field.label }));
     }
+    if (type === 'column' && !compact) {
+      applyColumnWidth(wrap, field);
+    }
     parent.appendChild(wrap);
     walk(field.children || [], wrap, valueMap);
+    return wrap;
+  };
+
+  /**
+   * Consecutive column fields → flex row group (Forms-style).
+   *
+   * @param {object[]} columns
+   * @param {HTMLElement} parent
+   * @param {object} valueMap
+   */
+  const appendColumnGroup = (columns, parent, valueMap) => {
+    const active = (columns || []).filter((col) => col && col.active !== false);
+    if (!active.length) return;
+    if (compact || active.length === 1) {
+      active.forEach((col) => appendLayoutWrap(col, 'column', parent, valueMap));
+      return;
+    }
+    const group = el('div', { className: 'bl-blocks-fields__columns' });
+    active.forEach((col) => appendLayoutWrap(col, 'column', group, valueMap));
+    parent.appendChild(group);
   };
 
   const appendTabGroup = (tabs, parent, valueMap) => {
@@ -738,6 +800,16 @@ export function createFieldForm(fields, values = {}, options = {}) {
           i += 1;
         }
         appendTabGroup(run, parent, valueMap);
+        continue;
+      }
+
+      if (type === 'column') {
+        const run = [];
+        while (i < fields.length && fields[i] && fields[i].type === 'column') {
+          run.push(fields[i]);
+          i += 1;
+        }
+        appendColumnGroup(run, parent, valueMap);
         continue;
       }
 
