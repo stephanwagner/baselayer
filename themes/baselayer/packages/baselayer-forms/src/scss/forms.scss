@@ -170,6 +170,7 @@
   flex-wrap: wrap;
   gap: 4px;
   border-bottom: 1px solid var(--bl-form-border);
+  margin: 0 0 12px;
 }
 
 .bl-form__tab {
@@ -1101,7 +1102,7 @@ select.bl-form__control {
   margin: 0;
   padding: 14px 16px;
   border: 1px solid #{$color-neutral};
-  border-radius: var(--bl-form-radius);
+  border-radius: var(--bl-admin-radius);
   background: #{$color-neutral-bg};
   color: var(--bl-form-color);
   font-size: #{$font-size-s};

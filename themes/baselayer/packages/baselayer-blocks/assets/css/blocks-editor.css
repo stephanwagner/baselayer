@@ -1581,40 +1581,51 @@ button.button-link.bl-blocks-fields__repeater-remove:active {
   background: #fff;
 }
 
-.bl-blocks-block-missing-template {
+.editor-styles-wrapper .bl-blocks-block-missing-template {
   padding: 14px 16px;
-  border: 1px solid #f0b849;
+  border: 1px solid #f0b84a;
   border-left-width: 4px;
-  border-radius: 4px;
+  border-radius: 6px;
   background: #fcf9e8;
   color: #1d2327;
 }
-
-.bl-blocks-block-missing-template__title {
-  margin: 0 0 4px;
+@media (min-resolution: 1.9dppx) {
+  .editor-styles-wrapper .bl-blocks-block-missing-template {
+    border-width: 1.5px;
+    border-left-width: 4px;
+  }
 }
-
-.bl-blocks-block-missing-template__name {
+.editor-styles-wrapper .bl-blocks-block-missing-template p {
+  margin: 0 0 12px;
+}
+.editor-styles-wrapper .bl-blocks-block-missing-template p:last-child {
+  margin-bottom: 0;
+}
+.editor-styles-wrapper .bl-blocks-block-missing-template .bl-blocks-block-missing-template__title {
   margin: 0 0 8px;
 }
-
-.bl-blocks-block-missing-template__status {
+.editor-styles-wrapper .bl-blocks-block-missing-template .bl-blocks-block-missing-template__name {
+  margin: 0 0 8px;
+}
+.editor-styles-wrapper .bl-blocks-block-missing-template .bl-blocks-block-missing-template__name code {
+  padding: 2px 6px;
+  margin: 0;
+  font-size: 14px;
+}
+.editor-styles-wrapper .bl-blocks-block-missing-template .bl-blocks-block-missing-template__status {
   margin: 0 0 8px;
   font-weight: 600;
-  color: #996800;
+  color: #b45309;
 }
-
-.bl-blocks-block-missing-template__help {
-  margin: 0 0 4px;
+.editor-styles-wrapper .bl-blocks-block-missing-template .bl-blocks-block-missing-template__help {
+  margin: 0 0 8px;
   color: #646970;
 }
-
-.bl-blocks-block-missing-template__path {
+.editor-styles-wrapper .bl-blocks-block-missing-template .bl-blocks-block-missing-template__path {
   margin: 0;
   word-break: break-word;
 }
-
-.bl-blocks-block-missing-template__path code {
+.editor-styles-wrapper .bl-blocks-block-missing-template .bl-blocks-block-missing-template__path code {
   font-size: 12px;
 }
 

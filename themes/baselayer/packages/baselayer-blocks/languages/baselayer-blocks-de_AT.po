@@ -1799,8 +1799,8 @@ msgid "Unknown block."
 msgstr "Unbekannter Block."
 
 #: includes/runtime-blocks.php:543
-msgid "Create this PHP file in your theme (child theme preferred):"
-msgstr "Erstelle diese PHP-Datei in deinem Theme (Child-Theme bevorzugt):"
+msgid "Create this PHP file in your theme:"
+msgstr "Erstelle diese PHP-Datei in deinem Theme:"
 
 #: includes/runtime-page.php:160
 msgid "Update"

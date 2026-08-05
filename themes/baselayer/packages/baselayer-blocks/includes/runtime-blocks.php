@@ -594,7 +594,7 @@ function bl_blocks_render_missing_template_notice(string $slug, array $def): str
 	$html .= '<p class="bl-blocks-block-missing-template__title"><strong>' . esc_html($title) . '</strong></p>';
 	$html .= '<p class="bl-blocks-block-missing-template__name"><code>' . esc_html($name) . '</code></p>';
 	$html .= '<p class="bl-blocks-block-missing-template__status">' . esc_html__('Template missing.', 'baselayer-blocks') . '</p>';
-	$html .= '<p class="bl-blocks-block-missing-template__help">' . esc_html__('Create this PHP file in your theme (child theme preferred):', 'baselayer-blocks') . '</p>';
+	$html .= '<p class="bl-blocks-block-missing-template__help">' . esc_html__('Create this PHP file in your theme:', 'baselayer-blocks') . '</p>';
 	$html .= '<p class="bl-blocks-block-missing-template__path"><code>' . esc_html($info['create_path']) . '</code></p>';
 	$html .= '</div>';
 

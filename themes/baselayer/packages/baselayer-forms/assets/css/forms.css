@@ -191,6 +191,7 @@
   flex-wrap: wrap;
   gap: 4px;
   border-bottom: 1px solid var(--bl-form-border);
+  margin: 0 0 12px;
 }
 
 .bl-form__tab {
@@ -366,7 +367,7 @@
   outline-offset: 0;
   transition: border-color 0.15s ease;
 }
-@media (min-resolution: 1.5dppx) {
+@media (min-resolution: 1.9dppx) {
   .bl-form__control {
     border-width: 1.5px;
   }
@@ -389,7 +390,7 @@
   overflow: hidden;
   transition: border-color 0.15s ease;
 }
-@media (min-resolution: 1.5dppx) {
+@media (min-resolution: 1.9dppx) {
   .bl-form__input-group {
     border-width: 1.5px;
   }
@@ -431,7 +432,7 @@
 .bl-form__affix--suffix {
   border-left: 1px solid var(--bl-form-border);
 }
-@media (min-resolution: 1.5dppx) {
+@media (min-resolution: 1.9dppx) {
   .bl-form__affix--prefix {
     border-right-width: 1.5px;
   }
@@ -601,7 +602,7 @@ select.bl-form__control {
   outline-offset: 0;
   transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 }
-@media (min-resolution: 1.5dppx) {
+@media (min-resolution: 1.9dppx) {
   .bl-form__option input[type=checkbox],
   .bl-form__option input[type=radio] {
     border-width: 1.5px;
@@ -1020,7 +1021,7 @@ select.bl-form__control {
   background: var(--bl-form-bg);
   color: var(--bl-form-color);
 }
-@media (min-resolution: 1.5dppx) {
+@media (min-resolution: 1.9dppx) {
   .bl-form__message {
     border-width: 1.5px;
     border-left-width: 4px;
@@ -1045,7 +1046,7 @@ select.bl-form__control {
   margin: 0;
   padding: 14px 16px;
   border: 1px solid #6f7882;
-  border-radius: var(--bl-form-radius);
+  border-radius: var(--bl-admin-radius);
   background: rgb(94.3096574729%, 94.7036042633%, 95.1413229192%);
   color: var(--bl-form-color);
   font-size: 14px;
@@ -1053,7 +1054,7 @@ select.bl-form__control {
   line-height: 1.4;
   border-left-width: 4px;
 }
-@media (min-resolution: 1.5dppx) {
+@media (min-resolution: 1.9dppx) {
   .bl-form-block-placeholder {
     border-width: 1.5px;
     border-left-width: 4px;
