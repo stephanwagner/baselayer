@@ -28,8 +28,13 @@ if ($classes !== '') {
 }
 ?>
 
+<?php
+$preview_as_div = function_exists('bl_is_block_editor_preview')
+	? bl_is_block_editor_preview()
+	: is_admin();
+?>
 <article id="post-<?= $id ?>" <?php post_class($post_classes); ?>>
-	<<?= is_admin() ? 'div' : 'a href="' . esc_url($url) . '"' ?> class="article-preview__link read-more-link-trigger -button-trigger">
+	<<?= $preview_as_div ? 'div' : 'a href="' . esc_url($url) . '"' ?> class="article-preview__link read-more-link-trigger -button-trigger">
 		<div class="article-preview__image-container">
 			<?= bl_image_with_placeholder(get_post_thumbnail_id(), 'medium', ['class' => 'article-preview__image']); ?>
 		</div>
@@ -65,5 +70,5 @@ if ($classes !== '') {
 				<?php bl_render_template('read-more', ['class' => 'article-preview__read-more-link']); ?>
 			</div>
 		</div>
-	</<?= is_admin() ? 'div' : 'a' ?>>
+	</<?= $preview_as_div ? 'div' : 'a' ?>>
 </article>

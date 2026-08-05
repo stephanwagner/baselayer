@@ -6944,6 +6944,16 @@
     function normalizeValues(raw) {
       return raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
     }
+    function hasEditableFields(fields) {
+      return Array.isArray(fields) && fields.length > 0;
+    }
+    function NoEditableFieldsNotice() {
+      return el5(
+        "p",
+        { className: "description bl-blocks-no-editable-fields" },
+        blockI18n.noEditableFields || pageI18n.noEditableFields || "This block has no editable fields. Add fields to the block definition to configure it here."
+      );
+    }
     function normalizeUi(raw) {
       const base = normalizeValues(raw);
       const repeaters = base.repeaters && typeof base.repeaters === "object" && !Array.isArray(base.repeaters) ? base.repeaters : {};
@@ -7225,6 +7235,7 @@
           const blockClassName = typeof attributes.className === "string" ? attributes.className : "";
           const [sidebarMountId, setSidebarMountId] = useState(0);
           const sidebarEditing = !!def.sidebarEditing;
+          const editableFields = hasEditableFields(def.fields);
           const applyValues = (next) => {
             setAttributes({ values: normalizeValues(next) });
           };
@@ -7277,7 +7288,7 @@
               el5("p", null, blockI18n.preview || "Edit fields to configure this block.")
             )
           );
-          const inspectorBody = sidebarEditing ? el5(SidebarFields, {
+          const inspectorBody = !editableFields ? el5(NoEditableFieldsNotice) : sidebarEditing ? el5(SidebarFields, {
             fields: def.fields || [],
             values,
             uiState: ui,
@@ -7297,7 +7308,7 @@
           return el5(
             Fragment,
             null,
-            BlockControls ? el5(
+            editableFields && BlockControls ? el5(
               BlockControls,
               { group: "block" },
               el5(
@@ -7348,6 +7359,7 @@
             const [uiState, setUiState] = useState(() => loadUiStateFromStorage(storageKey));
             const [sidebarMountId, setSidebarMountId] = useState(0);
             const sidebarEditing = !!def.sidebarEditing;
+            const editableFields = hasEditableFields(def.fields);
             const applyValues = (next) => {
               if (!editPost) return;
               editPost({
@@ -7377,7 +7389,7 @@
                 }
               });
             };
-            const panelBody = sidebarEditing ? el5(SidebarFields, {
+            const panelBody = !editableFields ? el5(NoEditableFieldsNotice) : sidebarEditing ? el5(SidebarFields, {
               fields: def.fields || [],
               values,
               uiState,

@@ -179,7 +179,7 @@
                 "id": "fld_al_post_type",
                 "type": "select",
                 "name": "post_type",
-                "label": "Post type",
+                "label": "Content type",
                 "required": true,
                 "width": "100",
                 "default_value": "post",
@@ -202,11 +202,11 @@
                 "id": "fld_al_tax",
                 "type": "text",
                 "name": "post_taxonomy",
-                "label": "Default term ID",
+                "label": "Category",
                 "required": false,
                 "width": "100",
                 "default_value": "",
-                "description": "Optional term ID for the post type filter taxonomy."
+                "description": "Filters the list by a category."
             },
             {
                 "id": "fld_al_filters",
@@ -216,6 +216,7 @@
                 "required": false,
                 "width": "100",
                 "default_value": "",
+                "description": "Shows category filters above the list.",
                 "content": "Show category filter",
                 "hide_label": true
             },
@@ -236,7 +237,7 @@
                 "name": "limit_type",
                 "label": "Limit type",
                 "required": false,
-                "width": "100",
+                "width": "50",
                 "default_value": "pagination",
                 "options": [
                     {
@@ -245,26 +246,51 @@
                     },
                     {
                         "value": "limit",
-                        "label": "Fixed limit"
+                        "label": "Fixed number"
                     }
-                ]
+                ],
+                "conditional_logic": {
+                    "enabled": true,
+                    "groups": [
+                        [
+                            {
+                                "field": "fld_al_has_limit",
+                                "operator": "checked",
+                                "value": ""
+                            }
+                        ]
+                    ]
+                }
             },
             {
                 "id": "fld_al_limit",
                 "type": "number",
                 "name": "limit",
-                "label": "Limit",
+                "label": "Count",
                 "required": false,
-                "width": "100",
-                "default_value": "20"
+                "width": "50",
+                "default_value": "20",
+                "min": "1",
+                "conditional_logic": {
+                    "enabled": true,
+                    "groups": [
+                        [
+                            {
+                                "field": "fld_al_has_limit",
+                                "operator": "checked",
+                                "value": ""
+                            }
+                        ]
+                    ]
+                }
             },
             {
                 "id": "fld_al_order_by",
                 "type": "select",
                 "name": "order_by",
-                "label": "Order by",
+                "label": "Sorting",
                 "required": false,
-                "width": "100",
+                "width": "50",
                 "default_value": "date",
                 "options": [
                     {
@@ -277,21 +303,21 @@
                     },
                     {
                         "value": "menu_order",
-                        "label": "Menu order"
+                        "label": "Order"
                     },
                     {
                         "value": "modified",
-                        "label": "Modified"
+                        "label": "Last modified"
                     }
                 ]
             },
             {
                 "id": "fld_al_order_dir",
-                "type": "select",
+                "type": "button_group",
                 "name": "order_direction",
                 "label": "Order",
                 "required": false,
-                "width": "100",
+                "width": "50",
                 "default_value": "DESC",
                 "options": [
                     {
@@ -337,6 +363,23 @@
             "block_icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\" viewBox=\"0 -960 960 960\" width=\"24px\" fill=\"currentColor\" style=\"display: block\"><path d=\"M176.16-295q-15.37 0-25.76-10.4-10.4-10.39-10.4-25.75v-297.7q0-15.36 10.4-25.75 10.39-10.4 25.76-10.4h297.69q15.36 0 25.76 10.4Q510-644.21 510-628.85v297.7q0 15.36-10.39 25.75-10.4 10.4-25.76 10.4H176.16ZM200-355h250v-250H200v250Zm-30-405q-12.75 0-21.37-8.63-8.63-8.63-8.63-21.38 0-12.76 8.63-21.37Q157.25-820 170-820h620q12.75 0 21.37 8.63 8.63 8.63 8.63 21.38 0 12.76-8.63 21.37Q802.75-760 790-760H170Zm457.69 155q-12.75 0-21.37-8.63-8.63-8.63-8.63-21.38 0-12.76 8.63-21.37 8.62-8.62 21.37-8.62H790q12.75 0 21.37 8.63 8.63 8.63 8.63 21.38 0 12.76-8.63 21.37Q802.75-605 790-605H627.69Zm0 155q-12.75 0-21.37-8.63-8.63-8.63-8.63-21.38 0-12.76 8.63-21.37 8.62-8.62 21.37-8.62H790q12.75 0 21.37 8.63 8.63 8.63 8.63 21.38 0 12.76-8.63 21.37Q802.75-450 790-450H627.69Zm0 155q-12.75 0-21.37-8.63-8.63-8.63-8.63-21.38 0-12.76 8.63-21.37 8.62-8.62 21.37-8.62H790q12.75 0 21.37 8.63 8.63 8.63 8.63 21.38 0 12.76-8.63 21.37Q802.75-295 790-295H627.69ZM170-140q-12.75 0-21.37-8.63-8.63-8.63-8.63-21.38 0-12.76 8.63-21.37Q157.25-200 170-200h620q12.75 0 21.37 8.63 8.63 8.63 8.63 21.38 0 12.76-8.63 21.37Q802.75-140 790-140H170Zm155-340Z\"/></svg>",
             "block_category": "design",
             "block_keywords": "Artikel, Liste, Artikel-Liste, Article"
+        },
+        "block_options": {
+            "items": [
+                {
+                    "kind": "preset",
+                    "slug": "inhaltsbreite"
+                },
+                {
+                    "kind": "preset",
+                    "slug": "abstand",
+                    "defaults": {
+                        "c_abstand": {
+                            "defaultSize": "m"
+                        }
+                    }
+                }
+            ]
         }
     },
     {
@@ -367,27 +410,63 @@
                 "type": "textarea",
                 "name": "address",
                 "label": "Address",
-                "required": false,
+                "required": true,
                 "width": "100",
-                "default_value": ""
+                "default_value": "",
+                "conditional_logic": {
+                    "enabled": true,
+                    "groups": [
+                        [
+                            {
+                                "field": "fld_map_type",
+                                "operator": "==",
+                                "value": "address"
+                            }
+                        ]
+                    ]
+                }
             },
             {
                 "id": "fld_map_lat",
                 "type": "text",
                 "name": "lat",
                 "label": "Latitude",
-                "required": false,
+                "required": true,
                 "width": "100",
-                "default_value": ""
+                "default_value": "",
+                "conditional_logic": {
+                    "enabled": true,
+                    "groups": [
+                        [
+                            {
+                                "field": "fld_map_type",
+                                "operator": "==",
+                                "value": "latlng"
+                            }
+                        ]
+                    ]
+                }
             },
             {
                 "id": "fld_map_lng",
                 "type": "text",
                 "name": "lng",
                 "label": "Longitude",
-                "required": false,
+                "required": true,
                 "width": "100",
-                "default_value": ""
+                "default_value": "",
+                "conditional_logic": {
+                    "enabled": true,
+                    "groups": [
+                        [
+                            {
+                                "field": "fld_map_type",
+                                "operator": "==",
+                                "value": "latlng"
+                            }
+                        ]
+                    ]
+                }
             },
             {
                 "id": "fld_map_zoom",
@@ -421,6 +500,23 @@
             "block_icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\" viewBox=\"0 -960 960 960\" width=\"24px\" fill=\"currentColor\" style=\"display: block\"><path d=\"M576.69-149.77 360-225.54l-171.03 66.17q-9.2 3.68-17.79 2.32-8.58-1.36-15.81-5.89-7.23-4.53-11.3-12.24-4.07-7.7-4.07-17.67v-523.94q0-12.15 6.35-21.48 6.34-9.34 17.81-13.57l172.15-58.39q5.47-2 11.39-3 5.92-1 12.3-1 6.38 0 12.3 1 5.92 1 11.39 3L600-734.46l171.03-66.17q9.2-3.68 17.79-2.32 8.58 1.36 15.81 5.89 7.23 4.53 11.3 12.24 4.07 7.7 4.07 17.67v525.66q0 12.18-6.92 21.41-6.93 9.23-18.77 13.46l-171 57.23q-5.62 2-11.38 2.81-5.76.81-11.96.81-6.2 0-11.93-1-5.73-1-11.35-3ZM570-214.92v-468l-180-62.93v468l180 62.93Zm60 0L760-258v-474l-130 49.08v468ZM200-228l130-49.85v-468L200-702v474Zm430-454.92v468-468Zm-300-62.93v468-468Z\"/></svg>",
             "block_category": "design",
             "block_keywords": "Anfahrt, Karte, Map, Google"
+        },
+        "block_options": {
+            "items": [
+                {
+                    "kind": "preset",
+                    "slug": "inhaltsbreite"
+                },
+                {
+                    "kind": "preset",
+                    "slug": "abstand",
+                    "defaults": {
+                        "c_abstand": {
+                            "defaultSize": "m"
+                        }
+                    }
+                }
+            ]
         }
     },
     {

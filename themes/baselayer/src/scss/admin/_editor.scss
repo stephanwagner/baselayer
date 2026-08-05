@@ -11,6 +11,13 @@
   font-family: var(--bl-primary-font-family);
   font-size: var(--bl-default-font-size);
   line-height: 1.5;
+
+  // Preview HTML often includes real <a href> (article list, buttons, etc.).
+  // Disable hit-testing so clicks select the block instead of navigating away.
+  // Rich Text still works: events reach the contenteditable parent.
+  a[href] {
+    pointer-events: none;
+  }
 }
 
 .components-placeholder.components-placeholder {

@@ -1847,6 +1847,10 @@ button.button-link.bl-blocks-fields__repeater-remove:active {
   border-radius: 4px;
 }
 
+.bl-blocks-no-editable-fields {
+  margin: 0;
+}
+
 .bl-blocks-sidebar-fields {
   display: flex;
   flex-direction: column;

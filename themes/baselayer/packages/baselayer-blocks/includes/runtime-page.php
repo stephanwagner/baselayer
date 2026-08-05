@@ -108,6 +108,7 @@ function bl_blocks_enqueue_page_editor(string $hook): void
 			'save'                   => __('Apply', 'baselayer-blocks'),
 			'cancel'                 => __('Cancel', 'baselayer-blocks'),
 			'panelTitle'             => __('Block fields', 'baselayer-blocks'),
+			'noEditableFields'       => __('This block has no editable fields. Add fields to the block definition to configure it here.', 'baselayer-blocks'),
 			'preview'                => __('Edit fields to configure this block.', 'baselayer-blocks'),
 			'previewError'           => __('Error loading preview: %s', 'baselayer-blocks'),
 			'previewEmpty'           => __('Block rendered as empty.', 'baselayer-blocks'),
@@ -173,6 +174,7 @@ function bl_blocks_enqueue_page_editor(string $hook): void
 			'panelTitle'      => __('Content Fields', 'baselayer-blocks'),
 			'openFields'      => __('Edit fields', 'baselayer-blocks'),
 			'openFieldEditor' => __('Open field editor', 'baselayer-blocks'),
+			'noEditableFields' => __('This block has no editable fields. Add fields to the block definition to configure it here.', 'baselayer-blocks'),
 		],
 	]);
 }

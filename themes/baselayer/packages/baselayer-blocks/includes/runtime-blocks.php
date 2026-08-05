@@ -244,6 +244,7 @@ function bl_blocks_register_dynamic_blocks(): void
 				'save'                   => __('Apply', 'baselayer-blocks'),
 				'cancel'                 => __('Cancel', 'baselayer-blocks'),
 				'panelTitle'             => __('Block fields', 'baselayer-blocks'),
+				'noEditableFields'       => __('This block has no editable fields. Add fields to the block definition to configure it here.', 'baselayer-blocks'),
 				'preview'                => __('Edit fields to configure this block.', 'baselayer-blocks'),
 				'previewError'           => __('Error loading preview: %s', 'baselayer-blocks'),
 				'previewEmpty'           => __('Block rendered as empty.', 'baselayer-blocks'),

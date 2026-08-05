@@ -50,6 +50,7 @@
   flex-shrink: 0;
   border-radius: var(--bl-border-radius-m);
   overflow: hidden;
+  line-height: 0;
   width: 280px;
 
   @media (max-width: $breakpoint-m) {

@@ -49,6 +49,20 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
     return raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
   }
 
+  function hasEditableFields(fields) {
+    return Array.isArray(fields) && fields.length > 0;
+  }
+
+  function NoEditableFieldsNotice() {
+    return el(
+      'p',
+      { className: 'description bl-blocks-no-editable-fields' },
+      blockI18n.noEditableFields ||
+        pageI18n.noEditableFields ||
+        'This block has no editable fields. Add fields to the block definition to configure it here.'
+    );
+  }
+
   function normalizeUi(raw) {
     const base = normalizeValues(raw);
     const repeaters =
@@ -403,6 +417,7 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
           typeof attributes.className === 'string' ? attributes.className : '';
         const [sidebarMountId, setSidebarMountId] = useState(0);
         const sidebarEditing = !!def.sidebarEditing;
+        const editableFields = hasEditableFields(def.fields);
 
         const applyValues = (next) => {
           setAttributes({ values: normalizeValues(next) });
@@ -467,30 +482,32 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
               )
             );
 
-        const inspectorBody = sidebarEditing
-          ? el(SidebarFields, {
-              fields: def.fields || [],
-              values,
-              uiState: ui,
-              mountId: sidebarMountId,
-              onChange: applyValues,
-              onUiStateChange: applyUi,
-              onOpenModal: open,
-            })
-          : el(
-              Button,
-              {
-                variant: 'secondary',
-                className: 'bl-blocks-edit-fields-button',
-                onClick: open,
-              },
-              blockI18n.edit || 'Edit fields'
-            );
+        const inspectorBody = !editableFields
+          ? el(NoEditableFieldsNotice)
+          : sidebarEditing
+            ? el(SidebarFields, {
+                fields: def.fields || [],
+                values,
+                uiState: ui,
+                mountId: sidebarMountId,
+                onChange: applyValues,
+                onUiStateChange: applyUi,
+                onOpenModal: open,
+              })
+            : el(
+                Button,
+                {
+                  variant: 'secondary',
+                  className: 'bl-blocks-edit-fields-button',
+                  onClick: open,
+                },
+                blockI18n.edit || 'Edit fields'
+              );
 
         return el(
           Fragment,
           null,
-          BlockControls
+          editableFields && BlockControls
             ? el(
                 BlockControls,
                 { group: 'block' },
@@ -552,6 +569,7 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
           const [uiState, setUiState] = useState(() => loadUiStateFromStorage(storageKey));
           const [sidebarMountId, setSidebarMountId] = useState(0);
           const sidebarEditing = !!def.sidebarEditing;
+          const editableFields = hasEditableFields(def.fields);
 
           const applyValues = (next) => {
             if (!editPost) return;
@@ -585,25 +603,27 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
             });
           };
 
-          const panelBody = sidebarEditing
-            ? el(SidebarFields, {
-                fields: def.fields || [],
-                values,
-                uiState,
-                mountId: sidebarMountId,
-                onChange: applyValues,
-                onUiStateChange: applyUi,
-                onOpenModal: open,
-              })
-            : el(
-                Button,
-                {
-                  variant: 'secondary',
-                  className: 'bl-blocks-edit-fields-button',
-                  onClick: open,
-                },
-                pageI18n.edit || blockI18n.edit || 'Edit fields'
-              );
+          const panelBody = !editableFields
+            ? el(NoEditableFieldsNotice)
+            : sidebarEditing
+              ? el(SidebarFields, {
+                  fields: def.fields || [],
+                  values,
+                  uiState,
+                  mountId: sidebarMountId,
+                  onChange: applyValues,
+                  onUiStateChange: applyUi,
+                  onOpenModal: open,
+                })
+              : el(
+                  Button,
+                  {
+                    variant: 'secondary',
+                    className: 'bl-blocks-edit-fields-button',
+                    onClick: open,
+                  },
+                  pageI18n.edit || blockI18n.edit || 'Edit fields'
+                );
 
           return el(
             PluginDocumentSettingPanel,

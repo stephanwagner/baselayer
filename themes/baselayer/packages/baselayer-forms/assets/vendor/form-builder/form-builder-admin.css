@@ -1886,9 +1886,9 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
   box-shadow: none;
 }
 
-input.bl-forms-builder__width-custom,
-input.bl-forms-builder__height-custom,
-input.bl-forms-builder__margin-custom {
+.bl-forms-builder input.bl-forms-builder__width-custom,
+.bl-forms-builder input.bl-forms-builder__height-custom,
+.bl-forms-builder input.bl-forms-builder__margin-custom {
   margin-top: 8px;
   max-width: 280px;
 }
