@@ -443,6 +443,8 @@ function bl_render_installer(): void
         }
         $acf_license_defined = function_exists('bl_install_acf_pro_license_is_defined') && bl_install_acf_pro_license_is_defined();
         $acf_license_submitted = (string) $bl_install_val(['install', 'acf_pro_key'], '');
+        $acf_plugin = function_exists('bl_find_acf_pro_plugin') ? bl_find_acf_pro_plugin() : '';
+        $acf_plugin_found = $acf_plugin !== '';
         ?>
 
         <table class="form-table" role="presentation">
@@ -473,8 +475,23 @@ function bl_render_installer(): void
             </td>
           </tr>
           <tr data-bl-blocks-system-panel="acf" style="<?= $blocks_system === 'acf' ? '' : 'display: none;' ?>">
-            <th scope="row"><label for="install_acf_pro_key"><?= esc_html__('ACF Pro license key', 'baselayer') ?></label></th>
+            <th scope="row"><?= esc_html__('ACF Pro plugin', 'baselayer') ?></th>
             <td>
+              <?php if ($acf_plugin_found) : ?>
+                <p style="margin: 0 0 8px; display: flex; align-items: center; gap: 6px;">
+                  <span class="dashicons dashicons-yes-alt" style="color: #00a32a;" aria-hidden="true"></span>
+                  <strong><?= esc_html__('ACF Pro plugin found', 'baselayer') ?></strong>
+                </p>
+                <p class="description" style="margin: 0 0 16px;"><?= esc_html__('The installer will activate ACF Pro if it is not already active.', 'baselayer') ?></p>
+              <?php else : ?>
+                <p style="margin: 0 0 8px; display: flex; align-items: center; gap: 6px;">
+                  <span class="dashicons dashicons-dismiss" style="color: #d63638;" aria-hidden="true"></span>
+                  <strong><?= esc_html__('ACF Pro plugin missing', 'baselayer') ?></strong>
+                </p>
+                <p class="description" style="margin: 0 0 16px;"><?= esc_html__('Add the ACF Pro plugin to wp-content/plugins. You can finish BaseLayer setup now and install or activate ACF Pro later. Theme ACF blocks load once the plugin is active and the feature is enabled.', 'baselayer') ?></p>
+              <?php endif; ?>
+
+              <p style="margin: 0 0 6px;"><label for="install_acf_pro_key"><strong><?= esc_html__('License key', 'baselayer') ?></strong></label></p>
               <?php if ($acf_license_defined) : ?>
                 <p class="description" style="margin-top: 0;"><?= esc_html__('An ACF Pro license key is already defined in the configuration.', 'baselayer') ?></p>
               <?php else : ?>

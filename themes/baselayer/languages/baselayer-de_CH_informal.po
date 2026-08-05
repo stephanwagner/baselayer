@@ -789,6 +789,24 @@ msgstr "ACF Pro"
 msgid "Requires ACF Pro Plugin"
 msgstr "Erfordert ACF Pro Plugin"
 
+msgid "ACF Pro plugin"
+msgstr "ACF Pro Plugin"
+
+msgid "ACF Pro plugin found"
+msgstr "ACF Pro Plugin gefunden"
+
+msgid "The installer will activate ACF Pro if it is not already active."
+msgstr "Der Installer aktiviert ACF Pro, falls es noch nicht aktiv ist."
+
+msgid "ACF Pro plugin missing"
+msgstr "ACF Pro Plugin fehlt"
+
+msgid "Add the ACF Pro plugin to wp-content/plugins. You can finish BaseLayer setup now and install or activate ACF Pro later. Theme ACF blocks load once the plugin is active and the feature is enabled."
+msgstr "Lege das ACF-Pro-Plugin unter wp-content/plugins ab. Du kannst die BaseLayer-Einrichtung jetzt abschließen und ACF Pro später installieren oder aktivieren. Theme-ACF-Blöcke werden geladen, sobald das Plugin aktiv und die Funktion aktiviert ist."
+
+msgid "License key"
+msgstr "Lizenzschlüssel"
+
 msgid "Create and manage custom Gutenberg blocks, content fields, and website fields directly within BaseLayer. Includes built-in blocks such as Accordion."
 msgstr "Erstelle und verwalte individuelle Gutenberg-Blöcke, Inhaltsfelder und Website-Felder direkt in BaseLayer. Enthält integrierte Blöcke wie Akkordeon."
 
