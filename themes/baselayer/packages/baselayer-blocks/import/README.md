@@ -1,8 +1,11 @@
 # Block import starters
 
-The theme catalog lives at:
+The theme catalog lives at (locale-selected at install/import):
 
-`themes/baselayer/blocks/import-blocks.json`
+- `themes/baselayer/blocks/import-blocks-en.json`
+- `themes/baselayer/blocks/import-blocks-de.json`
+
+Site language (`WPLANG`) picks `import-blocks-{lang}.json`, then falls back to `-en`. Same pattern as ACF’s `import-blocks-acf-*.json`.
 
 Core block options (presets + `core/*` assignments):
 

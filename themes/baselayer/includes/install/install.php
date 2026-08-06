@@ -1153,7 +1153,7 @@ function baselayer_run_install(): void
         require_once $blocks_bootstrap;
       }
     }
-    // Also applies per-block block_options from import-blocks.json.
+    // Also applies per-block block_options from import-blocks-{lang}.json.
     bl_install_import_block_definitions();
   } elseif ($blocks_system === 'acf' && function_exists('bl_block_options_import_acf')) {
     // Ensure ACF assignments even when soft field-group import was skipped.
@@ -1369,8 +1369,14 @@ function bl_install_import_block_definitions(): void
 		$path = bl_blocks_catalog_import_path();
 	}
 	if ($path === '' || !is_readable($path)) {
-		$fallback = get_template_directory() . '/blocks/import-blocks.json';
-		$path = is_readable($fallback) ? $fallback : '';
+		$dir = get_template_directory() . '/blocks/';
+		foreach (['import-blocks-en.json', 'import-blocks.json'] as $file) {
+			$fallback = $dir . $file;
+			if (is_readable($fallback)) {
+				$path = $fallback;
+				break;
+			}
+		}
 	}
 	if ($path === '') {
 		return;

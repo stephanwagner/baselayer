@@ -13,7 +13,7 @@ define('BL_BLOCK_OPTIONS_LOADED', true);
  * Admin: Blocks → Block Options (store: bl_block_options).
  * Customs: customs/<name>/custom.php (auto-discovered).
  * Install seed: blocks/import-block-options-core.json (presets + core/*; fills empty store once).
- * Baselayer assignments: blocks/import-blocks.json → block_options on each block.
+ * Baselayer assignments: blocks/import-blocks-{lang}.json → block_options on each block.
  * ACF assignments: theme acf/import-block-options-acf.json (with field groups).
  */
 

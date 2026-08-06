@@ -64,19 +64,53 @@ function bl_blocks_register_settings_page(): void
 add_action('admin_menu', 'bl_blocks_register_settings_page', 20);
 
 /**
- * Absolute path to the theme blocks catalog JSON (child → parent → legacy package starter).
+ * Language key for bundled blocks catalog JSON (e.g. de_CH → de, en_US → en).
+ *
+ * Uses the site language (not the current admin user’s locale).
+ * Falls back to "en" when no matching language file exists.
+ */
+function bl_blocks_catalog_locale_key(): string
+{
+	$locale = get_option('WPLANG', '');
+	if (!is_string($locale) || $locale === '') {
+		$locale = function_exists('get_locale') ? (string) get_locale() : 'en_US';
+	}
+
+	$locale = strtolower(str_replace('-', '_', $locale));
+	if ($locale === '') {
+		return 'en';
+	}
+
+	$parts = explode('_', $locale);
+	$lang = $parts[0] !== '' ? $parts[0] : 'en';
+
+	return preg_match('/^[a-z]{2}$/', $lang) === 1 ? $lang : 'en';
+}
+
+/**
+ * Absolute path to the theme blocks catalog JSON for the site language.
+ *
+ * Prefers import-blocks-{lang}.json (e.g. -de, -en), then -en, then legacy
+ * import-blocks.json. Searches child theme, then parent theme, then the
+ * package accordion starter.
  */
 function bl_blocks_catalog_import_path(): string
 {
-	$relative = 'blocks/import-blocks.json';
-	$child = trailingslashit(get_stylesheet_directory()) . $relative;
-	if (is_readable($child)) {
-		return $child;
-	}
+	$lang = bl_blocks_catalog_locale_key();
+	$filenames = [
+		'import-blocks-' . $lang . '.json',
+		'import-blocks-en.json',
+		'import-blocks.json',
+	];
 
-	$parent = trailingslashit(get_template_directory()) . $relative;
-	if (is_readable($parent)) {
-		return $parent;
+	foreach ([get_stylesheet_directory(), get_template_directory()] as $base) {
+		$dir = trailingslashit($base) . 'blocks/';
+		foreach ($filenames as $file) {
+			$path = $dir . $file;
+			if (is_readable($path)) {
+				return $path;
+			}
+		}
 	}
 
 	$legacy = bl_blocks_path('import/accordion.json');

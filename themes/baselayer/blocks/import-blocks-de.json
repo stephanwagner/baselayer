@@ -1,0 +1,1451 @@
+[
+    {
+        "type": "block",
+        "title": "Accordeon",
+        "fields": [
+            {
+                "id": "fld_acc_title",
+                "type": "text",
+                "name": "title",
+                "label": "Titel",
+                "required": true,
+                "width": "100",
+                "default_value": ""
+            },
+            {
+                "id": "fld_acc_id",
+                "type": "text",
+                "name": "id",
+                "label": "ID",
+                "required": false,
+                "width": "100",
+                "default_value": "",
+                "description": "Optionale ID. Mit #meine-id direkt zu diesem Accordeon verlinken. Beim Öffnen über die URL öffnet sich das Accordeon automatisch und scrollt in den sichtbaren Bereich."
+            },
+            {
+                "id": "fld_acc_open",
+                "type": "toggle",
+                "name": "accordion_is_open",
+                "label": "Standardmäßig geöffnet",
+                "required": false,
+                "width": "100",
+                "default_value": "",
+                "content": "Standardmäßig geöffnet",
+                "hide_label": true
+            },
+            {
+                "id": "fld_acc_close",
+                "type": "toggle",
+                "name": "close_neighbouring_accordions",
+                "label": "Benachbarte Accordeons schließen",
+                "required": false,
+                "width": "100",
+                "default_value": "1",
+                "description": "Schließt automatisch benachbarte geöffnete Accordeons, wenn dieses geöffnet wird.",
+                "content": "Benachbarte Accordeons schließen",
+                "hide_label": true
+            },
+            {
+                "id": "fld_acc_scroll",
+                "type": "toggle",
+                "name": "scroll_to_accordion_top",
+                "label": "Beim Öffnen zum Accordeon scrollen",
+                "required": false,
+                "width": "100",
+                "default_value": "1",
+                "description": "Scrollt automatisch zum Anfang des Accordeons beim Öffnen. Besonders nützlich auf Mobilgeräten bei langem Inhalt.",
+                "content": "Beim Öffnen zum Accordeon scrollen",
+                "hide_label": true
+            },
+            {
+                "id": "fld_acc_advanced",
+                "type": "toggle",
+                "name": "has_advanced_settings",
+                "label": "Erweiterte Einstellungen",
+                "required": false,
+                "width": "100",
+                "default_value": "",
+                "content": "Erweiterte Einstellungen",
+                "hide_label": true
+            },
+            {
+                "id": "fld_acc_advanced_area",
+                "type": "section",
+                "label": "Erweiterte Einstellungen",
+                "show_title": false,
+                "design": "outline",
+                "width": "100",
+                "children": [
+                    {
+                        "id": "fld_acc_faq",
+                        "type": "toggle",
+                        "name": "add_to_faq_schema",
+                        "label": "Zum FAQ-Schema hinzufügen",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "description": "Verwendet den Inhalt dieses Accordeons als Frage und Antwort für strukturierte FAQ-Daten. Nur für echte FAQs verwenden.",
+                        "content": "Zum FAQ-Schema hinzufügen",
+                        "hide_label": true
+                    }
+                ],
+                "conditional_logic": {
+                    "enabled": true,
+                    "groups": [
+                        [
+                            {
+                                "field": "fld_acc_advanced",
+                                "operator": "checked",
+                                "value": ""
+                            }
+                        ]
+                    ]
+                }
+            }
+        ],
+        "settings": {
+            "parent": "",
+            "align": "",
+            "active": true,
+            "sidebar_editing": true,
+            "supports_inner_blocks": true,
+            "inner_blocks_allowed": "",
+            "inner_blocks_template": "",
+            "slug": "accordion",
+            "description": "Aufklappbarer Bereich mit Überschrift und freiem Inhalt.",
+            "block_icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\" viewBox=\"0 -960 960 960\" width=\"24px\" fill=\"currentColor\" style=\"display: block\"><path d=\"m480-339.38-82.31-82.31q-8.92-8.92-20.88-9.12-11.96-.19-21.27 9.12-9.31 9.31-9.31 21.38 0 12.08 9.31 21.39l99.15 99.77q10.85 10.84 25.31 10.84 14.46 0 25.31-10.84l99.77-99.77q8.92-8.93 9.11-21.2.19-12.26-9.11-21.57-9.31-9.31-21.39-9.31-12.07 0-21.38 9.31L480-339.38Zm0-281.24 82.31 82.31q8.92 8.92 20.88 9.12 11.96.19 21.27-9.12 9.31-9.31 9.31-21.38 0-12.08-9.31-21.39l-99.15-99.77q-10.85-10.84-25.31-10.84-14.46 0-25.31 10.84l-99.77 99.77q-8.92 8.93-8.8 20.89.11 11.96 9.42 21.27 9.31 9.3 21.38 9.3 12.08 0 21.39-9.3l81.69-81.7ZM212.31-140Q182-140 161-161q-21-21-21-51.31v-535.38Q140-778 161-799q21-21 51.31-21h535.38Q778-820 799-799q21 21 21 51.31v535.38Q820-182 799-161q-21 21-51.31 21H212.31Zm0-60h535.38q4.62 0 8.46-3.85 3.85-3.84 3.85-8.46v-535.38q0-4.62-3.85-8.46-3.84-3.85-8.46-3.85H212.31q-4.62 0-8.46 3.85-3.85 3.84-3.85 8.46v535.38q0 4.62 3.85 8.46 3.84 3.85 8.46 3.85ZM200-760v560-560Z\"/></svg>",
+            "block_category": "design",
+            "block_keywords": "Accordeon, Akkordeon, FAQ, Dropdown"
+        },
+        "block_options": {
+            "items": [
+                {
+                    "kind": "preset",
+                    "slug": "abstand",
+                    "defaults": {
+                        "c_abstand": {
+                            "defaultSize": "m"
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "type": "block",
+        "title": "Anker",
+        "fields": [
+            {
+                "id": "fld_anc_id",
+                "type": "text",
+                "name": "id",
+                "label": "Anker-ID",
+                "required": true,
+                "width": "100",
+                "default_value": "",
+                "prefix": "#",
+                "description": "Eindeutige ID für diesen Anker. Nur Kleinbuchstaben und Bindestriche verwenden. Mit #meine-id direkt zu dieser Position verlinken oder beim Laden der Seite automatisch dorthin scrollen."
+            },
+            {
+                "id": "fld_anc_offset",
+                "type": "number",
+                "name": "offset",
+                "label": "Versatz",
+                "required": false,
+                "width": "100",
+                "default_value": "0",
+                "description": "Optionaler Versatz in Pixeln beim automatischen Scrollen."
+            }
+        ],
+        "settings": {
+            "active": true,
+            "sidebar_editing": true,
+            "supports_inner_blocks": false,
+            "inner_blocks_allowed": "",
+            "inner_blocks_template": "",
+            "parent": "",
+            "align": "",
+            "slug": "anchor",
+            "description": "Unsichtbarer Sprungpunkt für interne Links (#anker-id) mit optionalem Scroll-Offset.",
+            "block_icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\" viewBox=\"0 -960 960 960\" width=\"24px\" fill=\"currentColor\" style=\"display: block\"><path d=\"M355.19-118.73q-61.5-21.04-109.65-57.5-48.15-36.46-78-85.73t-29.85-105.73v-60q0-10.85 9.85-16.08 9.85-5.23 19.08 1.62L238.77-388q12.84 9.85 14.34 26.42 1.5 16.58-10.34 28.43l-29.39 29.38q29 59.08 93.93 97.81 64.92 38.73 142.69 46.42v-358.92h-90q-12.77 0-21.38-8.62-8.62-8.61-8.62-21.38t8.62-21.38q8.61-8.62 21.38-8.62h90V-647q-34.61-10.69-57.31-39.27Q370-714.85 370-752.31q0-45.77 32.12-77.88 32.11-32.12 77.88-32.12 45.77 0 77.88 32.12Q590-798.08 590-752.31q0 37.46-22.69 66.04Q544.61-657.69 510-647v68.54h90q12.77 0 21.38 8.62 8.62 8.61 8.62 21.38t-8.62 21.38q-8.61 8.62-21.38 8.62h-90v358.92q77.77-7.69 142.88-46.23 65.12-38.54 93.74-97.62l-29.39-29.76q-11.84-11.85-10.54-28.43Q708-378.15 720.85-388l72.53-54.15q9.23-6.85 19.08-1.62 9.85 5.23 9.85 16.08v60q0 56.46-29.85 105.73t-78 85.73q-48.15 36.46-109.65 57.5Q543.31-97.69 480-97.69t-124.81-21.04ZM480-702.31q20.85 0 35.42-14.57Q530-731.46 530-752.31q0-20.84-14.58-35.42-14.57-14.58-35.42-14.58t-35.42 14.58Q430-773.15 430-752.31q0 20.85 14.58 35.43 14.57 14.57 35.42 14.57Z\"/></svg>",
+            "block_category": "design",
+            "block_keywords": "Anker, Anchor, Link"
+        }
+    },
+    {
+        "type": "block",
+        "title": "Artikel-Liste",
+        "fields": [
+            {
+                "id": "fld_al_post_type",
+                "type": "select",
+                "name": "post_type",
+                "label": "Inhaltstyp",
+                "required": true,
+                "width": "100",
+                "default_value": "post",
+                "options": [
+                    {
+                        "value": "post",
+                        "label": "Beiträge"
+                    },
+                    {
+                        "value": "projects",
+                        "label": "Projekte"
+                    },
+                    {
+                        "value": "bl_event",
+                        "label": "Events"
+                    }
+                ]
+            },
+            {
+                "id": "fld_al_tax",
+                "type": "text",
+                "name": "post_taxonomy",
+                "label": "Kategorie",
+                "required": false,
+                "width": "100",
+                "default_value": "",
+                "description": "Filtert die Liste nach einer Kategorie."
+            },
+            {
+                "id": "fld_al_filters",
+                "type": "toggle",
+                "name": "has_category_filters",
+                "label": "Kategoriefilter anzeigen",
+                "required": false,
+                "width": "100",
+                "default_value": "",
+                "description": "Zeigt Kategoriefilter oberhalb der Liste.",
+                "content": "Kategoriefilter anzeigen",
+                "hide_label": true
+            },
+            {
+                "id": "fld_al_has_limit",
+                "type": "toggle",
+                "name": "has_limit",
+                "label": "Anzahl begrenzen",
+                "required": false,
+                "width": "100",
+                "default_value": "",
+                "content": "Anzahl begrenzen",
+                "hide_label": true
+            },
+            {
+                "id": "fld_al_limit_type",
+                "type": "select",
+                "name": "limit_type",
+                "label": "Begrenzungstyp",
+                "required": false,
+                "width": "50",
+                "default_value": "pagination",
+                "options": [
+                    {
+                        "value": "pagination",
+                        "label": "Paginierung"
+                    },
+                    {
+                        "value": "limit",
+                        "label": "Feste Anzahl"
+                    }
+                ],
+                "conditional_logic": {
+                    "enabled": true,
+                    "groups": [
+                        [
+                            {
+                                "field": "fld_al_has_limit",
+                                "operator": "checked",
+                                "value": ""
+                            }
+                        ]
+                    ]
+                }
+            },
+            {
+                "id": "fld_al_limit",
+                "type": "number",
+                "name": "limit",
+                "label": "Anzahl",
+                "required": false,
+                "width": "50",
+                "default_value": "20",
+                "min": "1",
+                "conditional_logic": {
+                    "enabled": true,
+                    "groups": [
+                        [
+                            {
+                                "field": "fld_al_has_limit",
+                                "operator": "checked",
+                                "value": ""
+                            }
+                        ]
+                    ]
+                }
+            },
+            {
+                "id": "fld_al_order_by",
+                "type": "select",
+                "name": "order_by",
+                "label": "Sortierung",
+                "required": false,
+                "width": "50",
+                "default_value": "date",
+                "options": [
+                    {
+                        "value": "date",
+                        "label": "Datum"
+                    },
+                    {
+                        "value": "title",
+                        "label": "Titel"
+                    },
+                    {
+                        "value": "menu_order",
+                        "label": "Reihenfolge"
+                    },
+                    {
+                        "value": "modified",
+                        "label": "Zuletzt geändert"
+                    }
+                ]
+            },
+            {
+                "id": "fld_al_order_dir",
+                "type": "button_group",
+                "name": "order_direction",
+                "label": "Richtung",
+                "required": false,
+                "width": "50",
+                "default_value": "DESC",
+                "options": [
+                    {
+                        "value": "DESC",
+                        "label": "Absteigend"
+                    },
+                    {
+                        "value": "ASC",
+                        "label": "Aufsteigend"
+                    }
+                ]
+            },
+            {
+                "id": "fld_al_design",
+                "type": "button_group",
+                "name": "design",
+                "label": "Design",
+                "required": false,
+                "width": "100",
+                "default_value": "list",
+                "options": [
+                    {
+                        "value": "list",
+                        "label": "Liste"
+                    },
+                    {
+                        "value": "grid",
+                        "label": "Raster"
+                    }
+                ]
+            }
+        ],
+        "settings": {
+            "active": true,
+            "sidebar_editing": true,
+            "supports_inner_blocks": false,
+            "inner_blocks_allowed": "",
+            "inner_blocks_template": "",
+            "parent": "",
+            "align": "",
+            "slug": "article-list",
+            "description": "Listet Beiträge eines Inhaltstyps mit optionaler Filterung und Paginierung.",
+            "block_icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\" viewBox=\"0 -960 960 960\" width=\"24px\" fill=\"currentColor\" style=\"display: block\"><path d=\"M176.16-295q-15.37 0-25.76-10.4-10.4-10.39-10.4-25.75v-297.7q0-15.36 10.4-25.75 10.39-10.4 25.76-10.4h297.69q15.36 0 25.76 10.4Q510-644.21 510-628.85v297.7q0 15.36-10.39 25.75-10.4 10.4-25.76 10.4H176.16ZM200-355h250v-250H200v250Zm-30-405q-12.75 0-21.37-8.63-8.63-8.63-8.63-21.38 0-12.76 8.63-21.37Q157.25-820 170-820h620q12.75 0 21.37 8.63 8.63 8.63 8.63 21.38 0 12.76-8.63 21.37Q802.75-760 790-760H170Zm457.69 155q-12.75 0-21.37-8.63-8.63-8.63-8.63-21.38 0-12.76 8.63-21.37 8.62-8.62 21.37-8.62H790q12.75 0 21.37 8.63 8.63 8.63 8.63 21.38 0 12.76-8.63 21.37Q802.75-605 790-605H627.69Zm0 155q-12.75 0-21.37-8.63-8.63-8.63-8.63-21.38 0-12.76 8.63-21.37 8.62-8.62 21.37-8.62H790q12.75 0 21.37 8.63 8.63 8.63 8.63 21.38 0 12.76-8.63 21.37Q802.75-450 790-450H627.69Zm0 155q-12.75 0-21.37-8.63-8.63-8.63-8.63-21.38 0-12.76 8.63-21.37 8.62-8.62 21.37-8.62H790q12.75 0 21.37 8.63 8.63 8.63 8.63 21.38 0 12.76-8.63 21.37Q802.75-295 790-295H627.69ZM170-140q-12.75 0-21.37-8.63-8.63-8.63-8.63-21.38 0-12.76 8.63-21.37Q157.25-200 170-200h620q12.75 0 21.37 8.63 8.63 8.63 8.63 21.38 0 12.76-8.63 21.37Q802.75-140 790-140H170Zm155-340Z\"/></svg>",
+            "block_category": "design",
+            "block_keywords": "Artikel, Liste, Artikel-Liste, Article"
+        },
+        "block_options": {
+            "items": [
+                {
+                    "kind": "preset",
+                    "slug": "inhaltsbreite"
+                },
+                {
+                    "kind": "preset",
+                    "slug": "abstand",
+                    "defaults": {
+                        "c_abstand": {
+                            "defaultSize": "m"
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "type": "block",
+        "title": "Anfahrts-Karte",
+        "fields": [
+            {
+                "id": "fld_map_type",
+                "type": "button_group",
+                "name": "type",
+                "label": "Typ",
+                "required": true,
+                "width": "100",
+                "default_value": "address",
+                "options": [
+                    {
+                        "value": "address",
+                        "label": "Adresse"
+                    },
+                    {
+                        "value": "latlng",
+                        "label": "Koordinaten"
+                    }
+                ]
+            },
+            {
+                "id": "fld_map_address",
+                "type": "textarea",
+                "name": "address",
+                "label": "Adresse",
+                "required": true,
+                "width": "100",
+                "default_value": "",
+                "conditional_logic": {
+                    "enabled": true,
+                    "groups": [
+                        [
+                            {
+                                "field": "fld_map_type",
+                                "operator": "==",
+                                "value": "address"
+                            }
+                        ]
+                    ]
+                }
+            },
+            {
+                "id": "fld_map_lat",
+                "type": "text",
+                "name": "lat",
+                "label": "Breitengrad",
+                "required": true,
+                "width": "100",
+                "default_value": "",
+                "conditional_logic": {
+                    "enabled": true,
+                    "groups": [
+                        [
+                            {
+                                "field": "fld_map_type",
+                                "operator": "==",
+                                "value": "latlng"
+                            }
+                        ]
+                    ]
+                }
+            },
+            {
+                "id": "fld_map_lng",
+                "type": "text",
+                "name": "lng",
+                "label": "Längengrad",
+                "required": true,
+                "width": "100",
+                "default_value": "",
+                "conditional_logic": {
+                    "enabled": true,
+                    "groups": [
+                        [
+                            {
+                                "field": "fld_map_type",
+                                "operator": "==",
+                                "value": "latlng"
+                            }
+                        ]
+                    ]
+                }
+            },
+            {
+                "id": "fld_map_zoom",
+                "type": "text",
+                "name": "zoom",
+                "label": "Zoom",
+                "required": true,
+                "width": "100",
+                "default_value": "17"
+            },
+            {
+                "id": "fld_map_image",
+                "type": "image",
+                "name": "image",
+                "label": "Hintergrund vor Einwilligung",
+                "required": false,
+                "width": "100",
+                "default_value": ""
+            }
+        ],
+        "settings": {
+            "active": true,
+            "sidebar_editing": true,
+            "supports_inner_blocks": false,
+            "inner_blocks_allowed": "",
+            "inner_blocks_template": "",
+            "parent": "",
+            "align": "wide, full",
+            "slug": "map",
+            "description": "Google-Maps-Karte per Adresse oder Koordinaten. Vor dem Laden erscheint ein Einwilligungshinweis; die Karte wird erst nach Zustimmung eingebunden.",
+            "block_icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\" viewBox=\"0 -960 960 960\" width=\"24px\" fill=\"currentColor\" style=\"display: block\"><path d=\"M576.69-149.77 360-225.54l-171.03 66.17q-9.2 3.68-17.79 2.32-8.58-1.36-15.81-5.89-7.23-4.53-11.3-12.24-4.07-7.7-4.07-17.67v-523.94q0-12.15 6.35-21.48 6.34-9.34 17.81-13.57l172.15-58.39q5.47-2 11.39-3 5.92-1 12.3-1 6.38 0 12.3 1 5.92 1 11.39 3L600-734.46l171.03-66.17q9.2-3.68 17.79-2.32 8.58 1.36 15.81 5.89 7.23 4.53 11.3 12.24 4.07 7.7 4.07 17.67v525.66q0 12.18-6.92 21.41-6.93 9.23-18.77 13.46l-171 57.23q-5.62 2-11.38 2.81-5.76.81-11.96.81-6.2 0-11.93-1-5.73-1-11.35-3ZM570-214.92v-468l-180-62.93v468l180 62.93Zm60 0L760-258v-474l-130 49.08v468ZM200-228l130-49.85v-468L200-702v474Zm430-454.92v468-468Zm-300-62.93v468-468Z\"/></svg>",
+            "block_category": "design",
+            "block_keywords": "Anfahrt, Karte, Map, Google"
+        },
+        "block_options": {
+            "items": [
+                {
+                    "kind": "preset",
+                    "slug": "inhaltsbreite"
+                },
+                {
+                    "kind": "preset",
+                    "slug": "abstand",
+                    "defaults": {
+                        "c_abstand": {
+                            "defaultSize": "m"
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "type": "block",
+        "title": "Anfahrts-Karte: DSGVO",
+        "fields": [],
+        "settings": {
+            "active": true,
+            "sidebar_editing": true,
+            "supports_inner_blocks": false,
+            "inner_blocks_allowed": "",
+            "inner_blocks_template": "",
+            "parent": "",
+            "align": "",
+            "slug": "map-dsgvo",
+            "description": "Ermöglicht Besuchern, die Google-Maps-Einwilligung zu erteilen oder zu widerrufen – unabhängig von der Karte, z. B. auf der Datenschutzseite.",
+            "block_icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\" viewBox=\"0 -960 960 960\" width=\"24px\" fill=\"currentColor\" style=\"display: block\"><path d=\"M501.38-304q8.62-8.62 8.62-21.39v-173.07q0-12.77-8.62-21.39-8.61-8.61-21.38-8.61t-21.38 8.61q-8.62 8.62-8.62 21.39v173.07q0 12.77 8.62 21.39 8.61 8.61 21.38 8.61t21.38-8.61Zm1.54-305.38q9.39-9.39 9.39-22.93t-9.39-22.92q-9.38-9.38-22.92-9.38-13.54 0-22.92 9.38-9.39 9.38-9.39 22.92 0 13.54 9.39 22.93Q466.46-600 480-600q13.54 0 22.92-9.38Zm-35.15 503.22q-6-1-11.62-3-126.53-45-201.34-159.57Q180-383.31 180-516v-180.15q0-22.7 13.16-40.96 13.15-18.27 33.84-26.5l227.69-85q12.85-4.62 25.31-4.62 12.46 0 25.31 4.62l227.69 85q20.69 8.23 33.84 26.5Q780-718.85 780-696.15V-516q0 132.69-74.81 247.27-74.81 114.57-201.34 159.57-5.62 2-11.62 3-6 1-12.23 1t-12.23-1ZM480-164q104-33 172-132t68-220v-180.54q0-3.84-2.12-6.92-2.11-3.08-5.96-4.62l-227.69-85q-1.92-.77-4.23-.77-2.31 0-4.23.77l-227.69 85q-3.85 1.54-5.96 4.62-2.12 3.08-2.12 6.92V-516q0 121 68 220t172 132Zm0-315.23Z\"/></svg>",
+            "block_category": "design",
+            "block_keywords": "Anfahrt, Karte, Map, Google, DSGVO, Datenschutz, Privacy"
+        }
+    },
+    {
+        "type": "block",
+        "title": "Kennzahlen",
+        "fields": [
+            {
+                "id": "fld_nt_items",
+                "type": "repeater",
+                "name": "items",
+                "label": "Einträge",
+                "required": false,
+                "width": "100",
+                "default_value": "",
+                "button_label": "Eintrag hinzufügen",
+                "min_rows": 0,
+                "max_rows": 0,
+                "children": [
+                    {
+                        "id": "fld_nt_number",
+                        "type": "number",
+                        "name": "number",
+                        "label": "Zahl",
+                        "required": true,
+                        "width": "100",
+                        "default_value": "",
+                        "min": "1"
+                    },
+                    {
+                        "id": "fld_nt_label",
+                        "type": "textarea",
+                        "name": "label",
+                        "label": "Beschriftung",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "description": "Text unter der Zahl."
+                    },
+                    {
+                        "id": "fld_nt_prefix",
+                        "type": "text",
+                        "name": "prefix",
+                        "label": "Präfix",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "description": "Text vor der Zahl."
+                    },
+                    {
+                        "id": "fld_nt_suffix",
+                        "type": "text",
+                        "name": "suffix",
+                        "label": "Suffix",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "description": "Text nach der Zahl."
+                    }
+                ]
+            }
+        ],
+        "settings": {
+            "active": true,
+            "sidebar_editing": true,
+            "supports_inner_blocks": false,
+            "inner_blocks_allowed": "",
+            "inner_blocks_template": "",
+            "parent": "",
+            "align": "",
+            "slug": "number-ticker",
+            "description": "Animierte Kennzahlen mit Zähler-Effekt und optionalen Präfixen oder Suffixen.",
+            "block_icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\" viewBox=\"0 -960 960 960\" width=\"24px\" fill=\"currentColor\" style=\"display: block\"><path d=\"M172.31-180Q142-180 121-201q-21-21-21-51.31v-455.38Q100-738 121-759q21-21 51.31-21h615.38Q818-780 839-759q21 21 21 51.31v455.38Q860-222 839-201q-21 21-51.31 21H172.31Zm0-60h615.38q5.39 0 8.85-3.46t3.46-8.85v-455.38q0-5.39-3.46-8.85t-8.85-3.46H172.31q-5.39 0-8.85 3.46t-3.46 8.85v455.38q0 5.39 3.46 8.85t8.85 3.46ZM160-240v-480 480Zm136.62-127.85q5.53-5.53 5.53-14v-193.3q0-9.47-6.53-16-6.54-6.54-16-6.54-4.62 0-8.54 1.31-3.93 1.3-7.54 3.92l-45.77 32.77q-6.23 4.23-7.54 11.27-1.31 7.04 3.31 13.88 4.23 6.85 11.58 8.16 7.34 1.3 14.19-2.93l23.77-16.84v164.3q0 8.47 5.54 14 5.53 5.54 14 5.54 8.46 0 14-5.54Zm108.15 5.54H520q7.23 0 12.46-5.23t5.23-12.46q0-7.23-5.23-12.46T520-397.69h-79.39l-1.23-2.77q19.47-18.08 33.54-32.66 14.08-14.57 25.54-26.42 17.23-17.61 25.46-35.04 8.23-17.42 8.23-37.42 0-28.23-20.84-46.96-20.85-18.73-53.31-18.73-18.85 0-36.27 9.11-17.42 9.12-28.42 24.96-4.62 6.24-1.19 13.47 3.42 7.23 10.65 9.84 6.85 2.62 14.08.19 7.23-2.42 12.46-8.03 5.77-6.16 13.04-9.54 7.27-3.39 15.65-3.39 16.15 0 26.23 8.58 10.08 8.58 10.08 22.5 0 11.77-4.39 21.27-4.38 9.5-18.38 24.27-7.69 8.08-16.46 17.04-8.77 8.96-19.39 19.57l-43.77 43q-1.61 1.62-5.61 13.23v10.85q0 7.62 5.42 13.04 5.42 5.42 13.04 5.42Zm275.23 0q34.08 0 55.12-19.42 21.03-19.42 21.03-50.27 0-19.92-10.57-33.73Q735-479.54 715.85-486v-2q15.53-6.08 23.92-18.19 8.38-12.12 8.38-30.27 0-27-19.65-44.12-19.65-17.11-50.5-17.11-21.15 0-37 9.5-15.85 9.5-25.69 22.34-4.23 5.85-1 12.08 3.23 6.23 10.07 9.46 6.85 2.62 13.89.89 7.04-1.73 12.27-7.35 5.38-5.77 12.34-8.65 6.97-2.89 15.12-2.89 14.15 0 23.23 8.08t9.08 20.23q0 14.77-10.77 23.54T672-501.69q-7.23 0-12.46 5.23T654.31-484q0 7.23 5.23 12.46t12.46 5.23q21.15 0 33.73 8.58 12.58 8.58 12.58 23.73 0 14.15-11.58 24.62-11.58 10.46-26.73 10.46-12.77 0-21.54-4.39-8.77-4.38-15.54-14.15-4.23-6.23-10.96-8.35-6.73-2.11-13.58.5-7.46 3.23-10.88 9.58-3.42 6.35-.19 13.19 11 19.23 29.42 29.73t43.27 10.5Z\"/></svg>",
+            "block_category": "design",
+            "block_keywords": "Zahlen, Zählen, Nummer, Number, Ticker, Counter"
+        },
+        "block_options": {
+            "items": [
+                {
+                    "kind": "preset",
+                    "slug": "inhaltsbreite"
+                },
+                {
+                    "kind": "preset",
+                    "slug": "abstand",
+                    "defaults": {
+                        "c_abstand": {
+                            "defaultSize": "m"
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "type": "block",
+        "title": "Icon",
+        "fields": [
+            {
+                "id": "fld_icon",
+                "type": "icon",
+                "name": "icon",
+                "label": "Icon",
+                "required": true,
+                "width": "100",
+                "default_value": ""
+            }
+        ],
+        "settings": {
+            "active": true,
+            "sidebar_editing": true,
+            "supports_inner_blocks": false,
+            "inner_blocks_allowed": "",
+            "inner_blocks_template": "",
+            "parent": "",
+            "align": "",
+            "slug": "icon",
+            "description": "Ein einzelnes Icon aus der Theme-Bibliothek – z. B. für Hinweise oder visuelle Akzente.",
+            "block_icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\" viewBox=\"0 -960 960 960\" width=\"24px\" fill=\"currentColor\"><path d=\"m125.69-585.15 123.54-219.16q5.62-9.84 13.66-14.27 8.05-4.42 17.89-4.42t17.87 4.42q8.04 4.43 13.66 14.27l123.54 219.16q5 9.08 4.5 18.17-.5 9.09-5.17 17.27-4.66 8.17-12.65 13.17t-18.28 5H157.29q-10.29 0-18.28-5-7.99-5-12.65-13.17-4.67-8.18-5.17-17.27t4.5-18.17Zm49 411.61q-43.92-43.92-43.92-106.3 0-63.31 43.92-106.93 43.93-43.61 106.46-43.61 62.54 0 106.46 43.92 43.93 43.92 43.93 106.46 0 62.54-43.93 106.46-43.92 43.92-106.46 43.92-62.53 0-106.46-43.92ZM345.15-216q26.39-26.38 26.39-64 0-37.62-26.39-64-26.38-26.39-64-26.39-37.61 0-64 26.39-26.38 26.38-26.38 64 0 37.62 26.38 64 26.39 26.39 64 26.39 37.62 0 64-26.39ZM197.92-591.54H364l-83.23-145.77-82.85 145.77Zm332.47 425.77v-228.46q0-15.37 10.39-25.76 10.39-10.39 25.76-10.39H795q15.36 0 25.76 10.39 10.39 10.39 10.39 25.76v228.46q0 15.37-10.39 25.76-10.4 10.39-25.76 10.39H566.54q-15.37 0-25.76-10.39-10.39-10.39-10.39-25.76Zm59.99-23.84h180.77v-180.78H590.38v180.78Zm67.08-361.24-43.77-36.53q-60.53-49.93-88.65-84.77-28.12-34.85-28.12-76.23 0-40.39 27.47-67.54 27.46-27.16 69.07-27.16 25.46 0 47.61 12.12 22.16 12.12 39.7 34.88 17.54-22.38 40.08-34.69 22.53-12.31 47.61-12.31 41.08 0 68.62 27.77 27.53 27.77 27.53 68.08 0 41-28.11 75.46-28.12 34.46-88.65 84.39l-43.77 36.53q-9.87 8.85-23.32 8.85-13.45 0-23.3-8.85ZM680.77-610q70.85-56.92 97.35-86.15 26.5-29.23 26.5-50.23 0-16.08-9.81-26.39-9.81-10.31-25.5-10.31-11.46 0-22.35 6.66-10.88 6.65-28.73 24.5l-37.46 36.23-37.46-36.23q-18.23-18.23-28.89-24.7-10.65-6.46-22.19-6.46-16.08 0-25.69 9.73-9.62 9.73-9.62 26.2 0 21.77 26.5 51T680.77-610Zm0-86.85Zm-399.62 31.93Zm0 384.92Zm399.62 0Z\"/></svg>",
+            "block_category": "design",
+            "block_keywords": "Icon"
+        },
+        "block_options": {
+            "items": [
+                {
+                    "kind": "preset",
+                    "slug": "abstand"
+                },
+                {
+                    "kind": "control",
+                    "type": "button-group",
+                    "label": "Ausrichtung",
+                    "attributeName": "iconAlign",
+                    "default": "",
+                    "options": [
+                        {
+                            "icon": "image-left",
+                            "label": "Links",
+                            "value": "-icon-align-left"
+                        },
+                        {
+                            "icon": "image-center",
+                            "label": "Zentriert",
+                            "value": ""
+                        },
+                        {
+                            "icon": "image-right",
+                            "label": "Rechts",
+                            "value": "-icon-align-right"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "type": "block",
+        "title": "Icon mit Text",
+        "fields": [
+            {
+                "id": "fld_icon_text_icon",
+                "type": "icon",
+                "name": "icon",
+                "label": "Icon",
+                "required": true,
+                "width": "100",
+                "default_value": ""
+            }
+        ],
+        "settings": {
+            "active": true,
+            "sidebar_editing": true,
+            "supports_inner_blocks": true,
+            "inner_blocks_allowed": "core/heading, core/paragraph, core/buttons, core/separator",
+            "inner_blocks_template": "[[\"core/paragraph\",{}]]",
+            "parent": "",
+            "align": "",
+            "slug": "icon-text",
+            "description": "Icon mit begleitendem Inhalt – der Textbereich lässt sich frei mit Blöcken befüllen.",
+            "block_icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\" viewBox=\"0 -960 960 960\" width=\"24px\" fill=\"currentColor\"><path d=\"m125.69-585.15 123.54-219.16q5.62-9.84 13.66-14.27 8.05-4.42 17.89-4.42t17.87 4.42q8.04 4.43 13.66 14.27l123.54 219.16q5 9.08 4.5 18.17-.5 9.09-5.17 17.27-4.66 8.17-12.65 13.17t-18.28 5H157.29q-10.29 0-18.28-5-7.99-5-12.65-13.17-4.67-8.18-5.17-17.27t4.5-18.17Zm49 411.61q-43.92-43.92-43.92-106.3 0-63.31 43.92-106.93 43.93-43.61 106.46-43.61 62.54 0 106.46 43.92 43.93 43.92 43.93 106.46 0 62.54-43.93 106.46-43.92 43.92-106.46 43.92-62.53 0-106.46-43.92ZM345.15-216q26.39-26.38 26.39-64 0-37.62-26.39-64-26.38-26.39-64-26.39-37.61 0-64 26.39-26.38 26.38-26.38 64 0 37.62 26.38 64 26.39 26.39 64 26.39 37.62 0 64-26.39ZM197.92-591.54H364l-83.23-145.77-82.85 145.77Zm332.47 425.77v-228.46q0-15.37 10.39-25.76 10.39-10.39 25.76-10.39H795q15.36 0 25.76 10.39 10.39 10.39 10.39 25.76v228.46q0 15.37-10.39 25.76-10.4 10.39-25.76 10.39H566.54q-15.37 0-25.76-10.39-10.39-10.39-10.39-25.76Zm59.99-23.84h180.77v-180.78H590.38v180.78Zm67.08-361.24-43.77-36.53q-60.53-49.93-88.65-84.77-28.12-34.85-28.12-76.23 0-40.39 27.47-67.54 27.46-27.16 69.07-27.16 25.46 0 47.61 12.12 22.16 12.12 39.7 34.88 17.54-22.38 40.08-34.69 22.53-12.31 47.61-12.31 41.08 0 68.62 27.77 27.53 27.77 27.53 68.08 0 41-28.11 75.46-28.12 34.46-88.65 84.39l-43.77 36.53q-9.87 8.85-23.32 8.85-13.45 0-23.3-8.85ZM680.77-610q70.85-56.92 97.35-86.15 26.5-29.23 26.5-50.23 0-16.08-9.81-26.39-9.81-10.31-25.5-10.31-11.46 0-22.35 6.66-10.88 6.65-28.73 24.5l-37.46 36.23-37.46-36.23q-18.23-18.23-28.89-24.7-10.65-6.46-22.19-6.46-16.08 0-25.69 9.73-9.62 9.73-9.62 26.2 0 21.77 26.5 51T680.77-610Zm0-86.85Zm-399.62 31.93Zm0 384.92Zm399.62 0Z\"/></svg>",
+            "block_category": "design",
+            "block_keywords": "Icon, Text"
+        },
+        "block_options": {
+            "items": [
+                {
+                    "kind": "preset",
+                    "slug": "abstand"
+                },
+                {
+                    "kind": "control",
+                    "type": "button-group",
+                    "label": "Position",
+                    "attributeName": "iconTextPosition",
+                    "default": "",
+                    "options": [
+                        {
+                            "icon": "image-left-text",
+                            "label": "Links neben Text",
+                            "value": ""
+                        },
+                        {
+                            "icon": "image-right-text",
+                            "label": "Rechts neben Text",
+                            "value": "-icon-text-align-right"
+                        },
+                        {
+                            "icon": "image-left",
+                            "label": "Links",
+                            "value": "-icon-align-left"
+                        },
+                        {
+                            "icon": "image-center",
+                            "label": "Zentriert",
+                            "value": "-icon-align-center"
+                        },
+                        {
+                            "icon": "image-right",
+                            "label": "Rechts",
+                            "value": "-icon-align-right"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    {
+        "type": "block",
+        "title": "Slider",
+        "fields": [
+            {
+                "id": "fld_sl_per_view",
+                "type": "number",
+                "name": "slides_per_view",
+                "label": "Sichtbare Slides",
+                "required": false,
+                "width": "50",
+                "default_value": "1",
+                "min": "1",
+                "max": "12"
+            },
+            {
+                "id": "fld_sl_per_group",
+                "type": "number",
+                "name": "slides_per_group",
+                "label": "Slides pro Scroll",
+                "required": false,
+                "width": "50",
+                "default_value": "1"
+            },
+            {
+                "id": "fld_sl_space",
+                "type": "number",
+                "name": "space_between",
+                "label": "Abstand zwischen Slides",
+                "required": false,
+                "width": "100",
+                "default_value": "16",
+                "min": "0",
+                "max": "128",
+                "suffix": "px"
+            },
+            {
+                "id": "fld_sl_ratio",
+                "type": "select",
+                "name": "ratio",
+                "label": "Seitenverhältnis",
+                "required": false,
+                "width": "100",
+                "default_value": "2-1",
+                "options": [
+                    {
+                        "value": "1-1",
+                        "label": "Quadrat (1:1)"
+                    },
+                    {
+                        "value": "4-3",
+                        "label": "Klassisch (4:3)"
+                    },
+                    {
+                        "value": "3-2",
+                        "label": "Foto (3:2)"
+                    },
+                    {
+                        "value": "2-1",
+                        "label": "Panorama (2:1)"
+                    },
+                    {
+                        "value": "16-9",
+                        "label": "Breitbild (16:9)"
+                    },
+                    {
+                        "value": "21-9",
+                        "label": "Kino (21:9)"
+                    },
+                    {
+                        "value": "custom",
+                        "label": "Benutzerdefiniert"
+                    }
+                ]
+            },
+            {
+                "id": "fld_sl_ratio_x",
+                "type": "number",
+                "name": "ratio_x",
+                "label": "Breite",
+                "required": false,
+                "width": "50",
+                "default_value": "1",
+                "min": "1",
+                "prefix": "X",
+                "conditional_logic": {
+                    "enabled": true,
+                    "groups": [
+                        [
+                            {
+                                "field": "fld_sl_ratio",
+                                "operator": "==",
+                                "value": "custom"
+                            }
+                        ]
+                    ]
+                }
+            },
+            {
+                "id": "fld_sl_ratio_y",
+                "type": "number",
+                "name": "ratio_y",
+                "label": "Höhe",
+                "required": false,
+                "width": "50",
+                "default_value": "1",
+                "min": "1",
+                "prefix": "Y",
+                "conditional_logic": {
+                    "enabled": true,
+                    "groups": [
+                        [
+                            {
+                                "field": "fld_sl_ratio",
+                                "operator": "==",
+                                "value": "custom"
+                            }
+                        ]
+                    ]
+                }
+            },
+            {
+                "id": "fld_sl_anim",
+                "type": "button_group",
+                "name": "animation",
+                "label": "Animation",
+                "required": false,
+                "width": "100",
+                "default_value": "slide",
+                "options": [
+                    {
+                        "value": "slide",
+                        "label": "Slide"
+                    },
+                    {
+                        "value": "fade",
+                        "label": "Überblenden"
+                    }
+                ]
+            },
+            {
+                "id": "fld_sl_nav",
+                "type": "toggle",
+                "name": "navigation",
+                "label": "Navigation",
+                "required": false,
+                "width": "100",
+                "default_value": "1",
+                "description": "Zeigt Navigationspfeile für den vorherigen und nächsten Slide.",
+                "content": "Navigation",
+                "hide_label": true
+            },
+            {
+                "id": "fld_sl_pag",
+                "type": "toggle",
+                "name": "pagination",
+                "label": "Paginierung",
+                "required": false,
+                "width": "100",
+                "default_value": "1",
+                "description": "Zeigt die aktuelle Slider-Position unter den Slides.",
+                "content": "Paginierung",
+                "hide_label": true
+            },
+            {
+                "id": "fld_sl_dyn",
+                "type": "toggle",
+                "name": "dynamic_bullets",
+                "label": "Dynamische Paginierung",
+                "required": false,
+                "width": "100",
+                "default_value": "",
+                "description": "Zeigt nur Paginierungspunkte in der Nähe des aktuellen Slides.",
+                "content": "Dynamische Paginierung",
+                "hide_label": true
+            },
+            {
+                "id": "fld_sl_loop",
+                "type": "toggle",
+                "name": "loop",
+                "label": "Endlosschleife",
+                "required": false,
+                "width": "100",
+                "default_value": "1",
+                "description": "Nach dem letzten Slide beginnt der Slider wieder von vorne.",
+                "content": "Endlosschleife",
+                "hide_label": true
+            },
+            {
+                "id": "fld_sl_auto",
+                "type": "toggle",
+                "name": "autoplay",
+                "label": "Automatische Wiedergabe",
+                "required": false,
+                "width": "100",
+                "default_value": "1",
+                "description": "Der Slider startet automatisch. Nutzeraktionen wie Wischen oder Klicken unterbrechen die Wiedergabe.",
+                "content": "Automatische Wiedergabe",
+                "hide_label": true
+            },
+            {
+                "id": "fld_sl_delay",
+                "type": "number",
+                "name": "autoplay_delay",
+                "label": "Intervall",
+                "required": false,
+                "width": "100",
+                "default_value": "6",
+                "min": "1",
+                "max": "60",
+                "suffix": "seconds",
+                "description": "Zeit zwischen automatischen Slide-Wechseln in Sekunden.",
+                "conditional_logic": {
+                    "enabled": true,
+                    "groups": [
+                        [
+                            {
+                                "field": "fld_sl_auto",
+                                "operator": "checked",
+                                "value": ""
+                            }
+                        ]
+                    ]
+                }
+            },
+            {
+                "id": "fld_sl_has_content",
+                "type": "toggle",
+                "name": "has_content",
+                "label": "Slide-Inhalt",
+                "required": false,
+                "width": "100",
+                "default_value": "",
+                "description": "Aktiviert Überschrift, Text und Buttons auf allen Slides.",
+                "content": "Slide-Inhalt",
+                "hide_label": true
+            },
+            {
+                "id": "fld_sl_content_align",
+                "type": "button_group",
+                "name": "content_align",
+                "label": "Ausrichtung des Slide-Inhalts",
+                "required": false,
+                "width": "100",
+                "default_value": "left",
+                "options": [
+                    {
+                        "value": "left",
+                        "label": "Links"
+                    },
+                    {
+                        "value": "center",
+                        "label": "Zentriert"
+                    },
+                    {
+                        "value": "right",
+                        "label": "Rechts"
+                    }
+                ],
+                "conditional_logic": {
+                    "enabled": true,
+                    "groups": [
+                        [
+                            {
+                                "field": "fld_sl_has_content",
+                                "operator": "checked",
+                                "value": ""
+                            }
+                        ]
+                    ]
+                }
+            },
+            {
+                "id": "fld_sl_content_mobile",
+                "type": "toggle",
+                "name": "content_visibility_mobile",
+                "label": "Sichtbarkeit des Slide-Inhalts",
+                "required": false,
+                "width": "100",
+                "default_value": "",
+                "content": "Auf Mobilgeräten anzeigen",
+                "hide_label": false,
+                "conditional_logic": {
+                    "enabled": true,
+                    "groups": [
+                        [
+                            {
+                                "field": "fld_sl_has_content",
+                                "operator": "checked",
+                                "value": ""
+                            }
+                        ]
+                    ]
+                }
+            }
+        ],
+        "settings": {
+            "active": true,
+            "sidebar_editing": true,
+            "supports_inner_blocks": true,
+            "inner_blocks_allowed": "baselayer/slider-slide",
+            "inner_blocks_template": "[[\"baselayer/slider-slide\",{}]]",
+            "parent": "",
+            "align": "wide, full",
+            "slug": "slider",
+            "description": "Bild- oder Video-Slider mit Slides als Unterblöcke.",
+            "block_icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\" viewBox=\"0 -960 960 960\" width=\"24px\" fill=\"currentColor\" style=\"display: block\"><path d=\"M682.31-168.08v-624.23q28.38 1.93 48.04 22.73Q750-748.77 750-720v479.62q0 28.76-19.65 49.57-19.66 20.81-48.04 22.73ZM194.62-95.39q-29.92 0-51.12-21.19-21.19-21.19-21.19-51.11v-624.62q0-29.92 21.19-51.11 21.2-21.19 51.12-21.19H550q29.93 0 51.12 21.19 21.19 21.19 21.19 51.11v624.62q0 29.92-21.19 51.11Q579.93-95.39 550-95.39H194.62ZM810-240.38V-720q20.38 1.92 34.04 16.73 13.65 14.81 13.65 35.58v375q0 20.77-13.65 35.57-13.66 14.81-34.04 16.74Zm-615.38 85H550q4.62 0 8.46-3.85 3.85-3.85 3.85-8.46v-624.62q0-4.61-3.85-8.46-3.84-3.85-8.46-3.85H194.62q-4.62 0-8.46 3.85-3.85 3.85-3.85 8.46v624.62q0 4.61 3.85 8.46 3.84 3.85 8.46 3.85Zm-12.31-649.24v649.24-649.24Z\"/></svg>",
+            "block_category": "design",
+            "block_keywords": "Bild, Video, Slider, Carousel"
+        },
+        "block_options": {
+            "items": [
+                {
+                    "kind": "preset",
+                    "slug": "inhaltsbreite"
+                },
+                {
+                    "kind": "preset",
+                    "slug": "abstand",
+                    "defaults": {
+                        "c_abstand": {
+                            "defaultSize": "m"
+                        }
+                    }
+                },
+                {
+                    "kind": "preset",
+                    "slug": "innenabstand",
+                    "defaults": {
+                        "c_innenabstand": {
+                            "default": "-container-padding-m"
+                        }
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "type": "block",
+        "title": "Slider-Slide",
+        "fields": [
+            {
+                "id": "fld_ss_type",
+                "type": "button_group",
+                "name": "type",
+                "label": "Typ",
+                "required": false,
+                "width": "100",
+                "default_value": "image",
+                "options": [
+                    {
+                        "value": "image",
+                        "label": "Bild"
+                    },
+                    {
+                        "value": "video",
+                        "label": "Video"
+                    }
+                ]
+            },
+            {
+                "id": "fld_ss_image",
+                "type": "image",
+                "name": "image",
+                "label": "Bild",
+                "required": true,
+                "width": "100",
+                "default_value": "",
+                "conditional_logic": {
+                    "enabled": true,
+                    "groups": [
+                        [
+                            {
+                                "field": "fld_ss_type",
+                                "operator": "==",
+                                "value": "image"
+                            }
+                        ]
+                    ]
+                }
+            },
+            {
+                "id": "fld_ss_video",
+                "type": "file",
+                "name": "video",
+                "label": "Video",
+                "required": true,
+                "width": "100",
+                "default_value": "",
+                "mime_types": "mp4,webm",
+                "conditional_logic": {
+                    "enabled": true,
+                    "groups": [
+                        [
+                            {
+                                "field": "fld_ss_type",
+                                "operator": "==",
+                                "value": "video"
+                            }
+                        ]
+                    ]
+                }
+            }
+        ],
+        "settings": {
+            "active": true,
+            "sidebar_editing": true,
+            "supports_inner_blocks": true,
+            "inner_blocks_allowed": "core/heading, core/paragraph, core/buttons, core/separator",
+            "inner_blocks_template": "[[\"core/heading\",{}],[\"core/paragraph\",{}]]",
+            "parent": "baselayer/slider",
+            "align": "",
+            "slug": "slider-slide",
+            "description": "Einzelner Slide mit Bild oder Video und optionalem Text (Überschrift, Absatz, Buttons) – nur innerhalb eines Sliders verwendbar.",
+            "block_icon": "<svg xmlns=\"http://www.w3.org/2000/svg\" height=\"24px\" viewBox=\"0 -960 960 960\" width=\"24px\" fill=\"currentColor\" style=\"display: block\"><path d=\"M212.31-140Q182-140 161-161q-21-21-21-51.31v-535.38Q140-778 161-799q21-21 51.31-21h535.38Q778-820 799-799q21 21 21 51.31v535.38Q820-182 799-161q-21 21-51.31 21H212.31Zm0-60h535.38q4.62 0 8.46-3.85 3.85-3.84 3.85-8.46v-535.38q0-4.62-3.85-8.46-3.84-3.85-8.46-3.85H212.31q-4.62 0-8.46 3.85-3.85 3.84-3.85 8.46v535.38q0 4.62 3.85 8.46 3.84 3.85 8.46 3.85ZM200-200v-560 560Zm106.16-90h350.76q10.85 0 16.08-9.85 5.23-9.84-1.62-19.07L576-446.69q-5.62-7.23-14.46-7.23-8.85 0-14.46 7.23l-97.85 127.46-65.54-84q-5.61-6.85-14.27-6.85-8.65 0-14.27 7.24l-63.07 83.92q-7.23 9.23-2 19.07 5.23 9.85 16.08 9.85Z\"/></svg>",
+            "block_category": "design",
+            "block_keywords": "Bild, Video, Slider, Carousel"
+        }
+    },
+    {
+        "type": "page_settings",
+        "title": "Hero",
+        "fields": [
+            {
+                "id": "fld_hero_enabled",
+                "type": "toggle",
+                "name": "hero_enabled",
+                "label": "Hero-Bereich aktivieren",
+                "required": false,
+                "width": "100",
+                "default_value": "",
+                "content": "Hero-Bereich aktivieren",
+                "hide_label": true
+            },
+            {
+                "id": "fld_hero_slides",
+                "type": "repeater",
+                "name": "hero_slides",
+                "label": "Slides",
+                "required": false,
+                "width": "100",
+                "default_value": "",
+                "description": "Ein Slide zeigt einen statischen Hero. Zwei oder mehr werden zum Slider.",
+                "button_label": "Slide hinzufügen",
+                "min_rows": 0,
+                "max_rows": 0,
+                "conditional_logic": {
+                    "enabled": true,
+                    "groups": [
+                        [
+                            {
+                                "field": "fld_hero_enabled",
+                                "operator": "checked",
+                                "value": ""
+                            }
+                        ]
+                    ]
+                },
+                "children": [
+                    {
+                        "id": "fld_hero_slide_background",
+                        "type": "select",
+                        "name": "background",
+                        "label": "Hintergrund",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "featured",
+                        "options": [
+                            {
+                                "value": "featured",
+                                "label": "Beitragsbild"
+                            },
+                            {
+                                "value": "image",
+                                "label": "Bild"
+                            },
+                            {
+                                "value": "video",
+                                "label": "Video"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_hero_slide_image",
+                        "type": "image",
+                        "name": "image",
+                        "label": "Bild",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_hero_slide_background",
+                                        "operator": "==",
+                                        "value": "image"
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "fld_hero_slide_video",
+                        "type": "file",
+                        "name": "video",
+                        "label": "Video",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "mime_types": "mp4,webm",
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_hero_slide_background",
+                                        "operator": "==",
+                                        "value": "video"
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "fld_hero_slide_title_source",
+                        "type": "select",
+                        "name": "title_source",
+                        "label": "Titel",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "page_title",
+                        "options": [
+                            {
+                                "value": "none",
+                                "label": "Keiner"
+                            },
+                            {
+                                "value": "page_title",
+                                "label": "Seitentitel"
+                            },
+                            {
+                                "value": "custom",
+                                "label": "Benutzerdefiniert"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_hero_slide_title",
+                        "type": "textarea",
+                        "name": "title",
+                        "label": "Titeltext",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "rows": 2,
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_hero_slide_title_source",
+                                        "operator": "==",
+                                        "value": "custom"
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "fld_hero_slide_text_source",
+                        "type": "select",
+                        "name": "text_source",
+                        "label": "Text",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "none",
+                        "options": [
+                            {
+                                "value": "none",
+                                "label": "Keiner"
+                            },
+                            {
+                                "value": "excerpt",
+                                "label": "Auszug"
+                            },
+                            {
+                                "value": "custom",
+                                "label": "Benutzerdefiniert"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_hero_slide_text",
+                        "type": "textarea",
+                        "name": "text",
+                        "label": "Textinhalt",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_hero_slide_text_source",
+                                        "operator": "==",
+                                        "value": "custom"
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "fld_hero_slide_links_source",
+                        "type": "select",
+                        "name": "links_source",
+                        "label": "Links",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "none",
+                        "options": [
+                            {
+                                "value": "none",
+                                "label": "Keine"
+                            },
+                            {
+                                "value": "contact",
+                                "label": "Kontaktseite"
+                            },
+                            {
+                                "value": "custom",
+                                "label": "Benutzerdefiniert"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_hero_slide_links",
+                        "type": "repeater",
+                        "name": "links",
+                        "label": "Links",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "button_label": "Link hinzufügen",
+                        "min_rows": 0,
+                        "max_rows": 0,
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_hero_slide_links_source",
+                                        "operator": "==",
+                                        "value": "custom"
+                                    }
+                                ]
+                            ]
+                        },
+                        "children": [
+                            {
+                                "id": "fld_hero_slide_link",
+                                "type": "link",
+                                "name": "link",
+                                "label": "Link",
+                                "required": false,
+                                "width": "100",
+                                "default_value": ""
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "settings": {
+            "active": true,
+            "sidebar_editing": true,
+            "slug": "hero",
+            "description": "",
+            "post_types": [
+                "page",
+                "post"
+            ]
+        }
+    }
+]
