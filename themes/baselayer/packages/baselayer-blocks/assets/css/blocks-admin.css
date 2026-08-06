@@ -673,11 +673,11 @@ body.bl-page-picker-open {
 
 .bl-blocks-fields__button-group {
   display: flex;
-  flex: 0 0 auto;
+  flex: 0 1 auto;
   flex-direction: row;
   align-self: flex-start;
-  width: fit-content;
-  min-width: 280px;
+  width: max-content;
+  min-width: min(280px, 100%);
   max-width: 100%;
   margin: 0;
   border: 1px solid #c3c4c7;
@@ -1191,6 +1191,13 @@ button.button-link.bl-blocks-fields__card-remove:focus {
 .bl-blocks-fields__layout--column.bl-blocks-fields__layout--column-auto {
   flex: 1 1 0;
   width: auto;
+}
+
+.bl-blocks-sidebar-fields .bl-blocks-fields__button-group,
+.bl-blocks-page-settings-panel .bl-blocks-fields__button-group {
+  width: 100%;
+  min-width: 0;
+  align-self: stretch;
 }
 
 .bl-blocks-sidebar-fields .bl-blocks-fields__section-title,
@@ -1716,6 +1723,12 @@ button.button-link.bl-blocks-fields__repeater-remove:active {
   width: 100% !important;
   max-width: 100% !important;
 }
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__button-group,
+.bl-blocks-fields--compact .bl-blocks-fields__button-group {
+  width: 100%;
+  min-width: 0;
+  align-self: stretch;
+}
 .bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout--column,
 .bl-blocks-fields--compact .bl-blocks-fields__layout--column {
   display: flex;
@@ -2092,7 +2105,7 @@ body.post-new-php.post-type-bl_block .page-title-action {
   border-top-left-radius: var(--bl-admin-radius);
   border-top-right-radius: var(--bl-admin-radius);
 }
-.bl-blocks-website__tabs ul li:first-child:last-child a {
+.bl-blocks-website__tabs ul li:last-child a {
   border-bottom-left-radius: var(--bl-admin-radius);
   border-bottom-right-radius: var(--bl-admin-radius);
 }

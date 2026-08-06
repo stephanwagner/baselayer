@@ -206,11 +206,7 @@
     return slug || "option";
   }
   function collectFieldNames(exceptId = "") {
-    return Array.from(document.querySelectorAll("[data-bl-forms-field]")).filter((row) => !exceptId || row.dataset.fieldId !== exceptId).map((row) => {
-      const input = row.querySelector("[data-bl-name]");
-      const value = (input?.value || row.dataset.fieldName || "").trim();
-      return value;
-    }).filter(Boolean);
+    return Array.from(document.querySelectorAll("[data-bl-forms-field]")).filter((row) => !exceptId || row.dataset.fieldId !== exceptId).map((row) => (row.dataset.fieldName || "").trim()).filter(Boolean);
   }
   function uniqueFieldName(base, exceptId = "") {
     const root = slugifyName(base);

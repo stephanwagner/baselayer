@@ -299,12 +299,12 @@ body.post-new-php.post-type-bl_block {
         border-top-left-radius: var(--bl-admin-radius);
         border-top-right-radius: var(--bl-admin-radius);
       }
+    }
 
-      &:last-child {
-        a {
-          border-bottom-left-radius: var(--bl-admin-radius);
-          border-bottom-right-radius: var(--bl-admin-radius);
-        }
+    &:last-child {
+      a {
+        border-bottom-left-radius: var(--bl-admin-radius);
+        border-bottom-right-radius: var(--bl-admin-radius);
       }
     }
   }

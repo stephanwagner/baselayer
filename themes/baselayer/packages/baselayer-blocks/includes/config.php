@@ -600,7 +600,7 @@ function bl_blocks_sanitize_icon_field(array $field): array
 		'type'          => 'icon',
 		'label'         => sanitize_text_field((string) ($field['label'] ?? '')),
 		'name'          => $name,
-		'name_manual'   => !empty($field['name_manual']),
+		'name_manual'   => !empty($field['name_manual']) || $name !== '',
 		'hide_label'    => !empty($field['hide_label']),
 		'css_class'     => function_exists('bl_forms_sanitize_css_class')
 			? bl_forms_sanitize_css_class((string) ($field['css_class'] ?? ''))
@@ -679,7 +679,7 @@ function bl_blocks_sanitize_repeater_field(array $field, int $repeater_depth): ?
 		'type'          => 'repeater',
 		'label'         => sanitize_text_field((string) ($field['label'] ?? '')),
 		'name'          => $name,
-		'name_manual'   => !empty($field['name_manual']),
+		'name_manual'   => !empty($field['name_manual']) || $name !== '',
 		'hide_label'    => !empty($field['hide_label']),
 		'show_title'    => !array_key_exists('show_title', $field) || !empty($field['show_title']),
 		'css_class'     => function_exists('bl_forms_sanitize_css_class')
@@ -798,7 +798,7 @@ function bl_blocks_sanitize_leaf_field_fallback(array $field): array
 		'type'          => $type !== '' ? $type : 'text',
 		'label'         => sanitize_text_field((string) ($field['label'] ?? '')),
 		'name'          => $name,
-		'name_manual'   => !empty($field['name_manual']),
+		'name_manual'   => !empty($field['name_manual']) || $name !== '',
 		'hide_label'    => !empty($field['hide_label']),
 		'css_class'     => sanitize_html_class((string) ($field['css_class'] ?? '')),
 		'width'         => sanitize_text_field((string) ($field['width'] ?? '100')),

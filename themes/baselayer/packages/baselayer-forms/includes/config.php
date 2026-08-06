@@ -1371,7 +1371,7 @@ function bl_forms_sanitize_field($field): ?array
 		'type'         => $type,
 		'label'        => sanitize_text_field((string) ($field['label'] ?? '')),
 		'name'         => $name,
-		'name_manual'  => !empty($field['name_manual']),
+		'name_manual'  => !empty($field['name_manual']) || $name !== '',
 		'hide_label'   => !empty($field['hide_label']),
 		'css_class'    => bl_forms_sanitize_css_class((string) ($field['css_class'] ?? '')),
 		'width'        => $width['width'],

@@ -235,11 +235,11 @@
 
 .bl-blocks-fields__button-group {
   display: flex;
-  flex: 0 0 auto;
+  flex: 0 1 auto;
   flex-direction: row;
   align-self: flex-start;
-  width: fit-content;
-  min-width: 280px;
+  width: max-content;
+  min-width: min(280px, 100%);
   max-width: 100%;
   margin: 0;
   border: 1px solid #c3c4c7;
@@ -803,6 +803,15 @@ button.button-link.bl-blocks-fields__card-remove {
 }
 
 .bl-blocks-sidebar-fields,
+.bl-blocks-page-settings-panel {
+  .bl-blocks-fields__button-group {
+    width: 100%;
+    min-width: 0;
+    align-self: stretch;
+  }
+}
+
+.bl-blocks-sidebar-fields,
 .bl-blocks-modal__body,
 .bl-blocks-website__main {
   .bl-blocks-fields__section-title,
@@ -1289,6 +1298,12 @@ button.button-link.bl-blocks-fields__repeater-remove {
     flex: 0 1 auto !important;
     width: 100% !important;
     max-width: 100% !important;
+  }
+
+  .bl-blocks-fields__button-group {
+    width: 100%;
+    min-width: 0;
+    align-self: stretch;
   }
 
   .bl-blocks-fields__layout--column {
