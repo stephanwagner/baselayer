@@ -2441,7 +2441,7 @@
   }
   function createWidthControl(field, onChange = () => {
   }, { showLabel = true } = {}) {
-    const wrap = el("div", { className: "bl-forms-builder__width" });
+    const wrap = el("div", { className: "bl-forms-builder__width bl-admin-form" });
     const customInput = el("input", {
       type: "text",
       className: "widefat bl-forms-builder__width-custom",

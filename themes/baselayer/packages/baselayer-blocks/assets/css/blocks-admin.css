@@ -188,9 +188,9 @@
 .bl-admin-form input:not([type]),
 .bl-admin-form select {
   box-sizing: border-box;
-  height: var(--bl-admin-button-height);
-  min-height: var(--bl-admin-button-height);
-  max-height: var(--bl-admin-button-height);
+  height: var(--bl-admin-input-height);
+  min-height: var(--bl-admin-input-height);
+  max-height: var(--bl-admin-input-height);
 }
 .bl-admin-form select {
   line-height: 1.5;
@@ -532,6 +532,9 @@ body.bl-page-picker-open {
   display: flex;
   align-items: stretch;
   width: 100%;
+  height: var(--bl-admin-input-height, 36px);
+  min-height: var(--bl-admin-input-height, 36px);
+  max-height: var(--bl-admin-input-height, 36px);
   border: 1px solid #8c8f94;
   border-radius: 4px;
   background: #fff;
@@ -545,6 +548,9 @@ body.bl-page-picker-open {
 .bl-blocks-fields__input-group input.widefat {
   flex: 1 1 auto;
   min-width: 0;
+  height: 100%;
+  min-height: 0;
+  max-height: none;
   margin: 0;
   border: 0;
   box-shadow: none;
@@ -575,37 +581,6 @@ body.bl-page-picker-open {
   border-left: 1px solid #8c8f94;
 }
 
-.bl-blocks-fields.bl-admin-form {
-  --bl-admin-button-height: 32px;
-  --bl-admin-button-height-small: 24px;
-}
-.bl-blocks-fields.bl-admin-form .wp-core-ui .button:not(.-icon-only),
-.bl-blocks-fields.bl-admin-form .button:not(.-icon-only) {
-  padding-left: 12px;
-  padding-right: 12px;
-}
-.bl-blocks-fields.bl-admin-form .wp-core-ui .button.bl-button-small:not(.-icon-only),
-.bl-blocks-fields.bl-admin-form .button.bl-button-small:not(.-icon-only) {
-  padding-left: 6px;
-  padding-right: 6px;
-}
-.bl-blocks-fields.bl-admin-form input[type=text],
-.bl-blocks-fields.bl-admin-form input[type=search],
-.bl-blocks-fields.bl-admin-form input[type=email],
-.bl-blocks-fields.bl-admin-form input[type=tel],
-.bl-blocks-fields.bl-admin-form input[type=url],
-.bl-blocks-fields.bl-admin-form input[type=number],
-.bl-blocks-fields.bl-admin-form input[type=password],
-.bl-blocks-fields.bl-admin-form input[type=date],
-.bl-blocks-fields.bl-admin-form input[type=time],
-.bl-blocks-fields.bl-admin-form input[type=datetime-local],
-.bl-blocks-fields.bl-admin-form input[type=datetime],
-.bl-blocks-fields.bl-admin-form input:not([type]),
-.bl-blocks-fields.bl-admin-form textarea,
-.bl-blocks-fields.bl-admin-form select {
-  padding-left: 8px;
-  padding-right: 8px;
-}
 .bl-blocks-fields.bl-admin-form input[type=checkbox],
 .bl-blocks-fields.bl-admin-form input[type=radio] {
   margin: 1px 2px 0 0;
@@ -679,6 +654,7 @@ body.bl-page-picker-open {
   width: max-content;
   min-width: min(280px, 100%);
   max-width: 100%;
+  min-height: 32px;
   margin: 0;
   border: 1px solid #c3c4c7;
   border-radius: 4px;
@@ -722,7 +698,9 @@ body.bl-page-picker-open {
   flex: 1 1 auto;
   align-items: center;
   justify-content: center;
+  box-sizing: border-box;
   min-width: 0;
+  min-height: 30px;
   padding: 6px 12px;
   font-size: 12px;
   font-weight: 500;
@@ -1900,7 +1878,7 @@ body.post-new-php.post-type-bl_block .page-title-action {
   display: none;
 }
 .post-type-bl_block .column-bl_menu_order {
-  width: 74px;
+  width: 88px;
   text-align: center;
 }
 .post-type-bl_block .column-bl_block_name {

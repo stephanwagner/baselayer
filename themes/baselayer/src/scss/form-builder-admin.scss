@@ -1877,6 +1877,10 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
   }
 }
 
+.bl-forms-builder__segmented + .bl-forms-builder__width-custom {
+  margin-top: 12px;
+}
+
 .bl-forms-builder__after-submit {
   margin: 0 0 14px;
   max-width: 520px;

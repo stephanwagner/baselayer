@@ -157,9 +157,9 @@
   input:not([type]),
   select {
     box-sizing: border-box;
-    height: var(--bl-admin-button-height);
-    min-height: var(--bl-admin-button-height);
-    max-height: var(--bl-admin-button-height);
+    height: var(--bl-admin-input-height);
+    min-height: var(--bl-admin-input-height);
+    max-height: var(--bl-admin-input-height);
   }
 
   // Match form-builder: keep select text vertically centered.

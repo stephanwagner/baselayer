@@ -85,6 +85,9 @@
   display: flex;
   align-items: stretch;
   width: 100%;
+  height: var(--bl-admin-input-height, 36px);
+  min-height: var(--bl-admin-input-height, 36px);
+  max-height: var(--bl-admin-input-height, 36px);
   border: 1px solid #8c8f94;
   border-radius: 4px;
   background: #fff;
@@ -99,6 +102,9 @@
   input.widefat {
     flex: 1 1 auto;
     min-width: 0;
+    height: 100%;
+    min-height: 0;
+    max-height: none;
     margin: 0;
     border: 0;
     box-shadow: none;
@@ -133,41 +139,7 @@
   }
 }
 
-// Denser actions than global admin form denseness (inputs stay 36px).
 .bl-blocks-fields.bl-admin-form {
-  --bl-admin-button-height: 32px;
-  --bl-admin-button-height-small: 24px;
-
-  .wp-core-ui .button:not(.-icon-only),
-  .button:not(.-icon-only) {
-    padding-left: 12px;
-    padding-right: 12px;
-  }
-
-  .wp-core-ui .button.bl-button-small:not(.-icon-only),
-  .button.bl-button-small:not(.-icon-only) {
-    padding-left: 6px;
-    padding-right: 6px;
-  }
-
-  input[type='text'],
-  input[type='search'],
-  input[type='email'],
-  input[type='tel'],
-  input[type='url'],
-  input[type='number'],
-  input[type='password'],
-  input[type='date'],
-  input[type='time'],
-  input[type='datetime-local'],
-  input[type='datetime'],
-  input:not([type]),
-  textarea,
-  select {
-    padding-left: 8px;
-    padding-right: 8px;
-  }
-
   // Match WP admin spacing before the label text.
   input[type='checkbox'],
   input[type='radio'] {
@@ -241,6 +213,7 @@
   width: max-content;
   min-width: min(280px, 100%);
   max-width: 100%;
+  min-height: 32px;
   margin: 0;
   border: 1px solid #c3c4c7;
   border-radius: 4px;
@@ -289,7 +262,9 @@
     flex: 1 1 auto;
     align-items: center;
     justify-content: center;
+    box-sizing: border-box;
     min-width: 0;
+    min-height: 30px;
     padding: 6px 12px;
     font-size: 12px;
     font-weight: 500;
@@ -718,13 +693,7 @@ button.button-link.bl-blocks-fields__card-remove {
   > .bl-blocks-fields__row {
     box-sizing: border-box;
     flex: 0 1 auto;
-    flex-basis: min(
-      100%,
-      calc(
-        var(--bl-blocks-field-width, 100%) -
-          (var(--bl-blocks-field-gap) * (1 - var(--bl-blocks-field-width-factor, 1)))
-      )
-    );
+    flex-basis: min(100%, calc(var(--bl-blocks-field-width, 100%) - (var(--bl-blocks-field-gap) * (1 - var(--bl-blocks-field-width-factor, 1)))));
     max-width: 100%;
     min-width: 0;
     width: auto;
@@ -739,13 +708,7 @@ button.button-link.bl-blocks-fields__card-remove {
 .bl-blocks-fields__columns > .bl-blocks-fields__layout--column {
   box-sizing: border-box;
   flex: 0 1 auto;
-  flex-basis: min(
-    100%,
-    calc(
-      var(--bl-blocks-field-width, 100%) -
-        (var(--bl-blocks-field-gap) * (1 - var(--bl-blocks-field-width-factor, 1)))
-    )
-  );
+  flex-basis: min(100%, calc(var(--bl-blocks-field-width, 100%) - (var(--bl-blocks-field-gap) * (1 - var(--bl-blocks-field-width-factor, 1)))));
   max-width: 100%;
   min-width: 0;
   width: auto;
@@ -856,17 +819,29 @@ button.button-link.bl-blocks-fields__card-remove {
     }
 
     > .bl-blocks-fields__layout--outline
-      + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+      + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
+        .bl-blocks-fields__repeater--card
+      ):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
     > .bl-blocks-fields__layout--card
-      + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+      + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
+        .bl-blocks-fields__repeater--card
+      ):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
     > .bl-blocks-fields__repeater--outline
-      + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+      + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
+        .bl-blocks-fields__repeater--card
+      ):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
     > .bl-blocks-fields__repeater--card
-      + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+      + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
+        .bl-blocks-fields__repeater--card
+      ):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
     > .bl-blocks-fields__tab-panel--outline
-      + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+      + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
+        .bl-blocks-fields__repeater--card
+      ):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
     > .bl-blocks-fields__tab-panel--card
-      + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card) {
+      + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
+        .bl-blocks-fields__repeater--card
+      ):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card) {
       margin-top: 16px;
       padding-top: 0;
       border-top: 0;
@@ -1265,17 +1240,29 @@ button.button-link.bl-blocks-fields__repeater-remove {
   }
 
   > .bl-blocks-fields__layout--outline
-    + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+    + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
+      .bl-blocks-fields__repeater--card
+    ):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
   > .bl-blocks-fields__layout--card
-    + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+    + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
+      .bl-blocks-fields__repeater--card
+    ):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
   > .bl-blocks-fields__repeater--outline
-    + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+    + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
+      .bl-blocks-fields__repeater--card
+    ):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
   > .bl-blocks-fields__repeater--card
-    + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+    + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
+      .bl-blocks-fields__repeater--card
+    ):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
   > .bl-blocks-fields__tab-panel--outline
-    + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+    + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
+      .bl-blocks-fields__repeater--card
+    ):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
   > .bl-blocks-fields__tab-panel--card
-    + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card) {
+    + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
+      .bl-blocks-fields__repeater--card
+    ):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card) {
     margin-top: 12px;
     padding-top: 0;
     border-top: 0;

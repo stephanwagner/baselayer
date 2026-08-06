@@ -188,9 +188,9 @@
 .bl-admin-form input:not([type]),
 .bl-admin-form select {
   box-sizing: border-box;
-  height: var(--bl-admin-button-height);
-  min-height: var(--bl-admin-button-height);
-  max-height: var(--bl-admin-button-height);
+  height: var(--bl-admin-input-height);
+  min-height: var(--bl-admin-input-height);
+  max-height: var(--bl-admin-input-height);
 }
 .bl-admin-form select {
   line-height: 1.5;
