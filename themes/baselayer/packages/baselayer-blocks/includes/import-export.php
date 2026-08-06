@@ -138,9 +138,21 @@ function bl_blocks_catalog_import_display_path(string $path): string
 }
 
 /**
+ * Allowed export type keys for Settings → Export.
+ *
+ * @return list<string>
+ */
+function bl_blocks_export_type_keys(): array
+{
+	return array_merge(['all', 'block_options'], bl_blocks_definition_types());
+}
+
+/**
  * Export payload for one definition post.
  *
- * @return array{type: string, title: string, fields: list<array<string, mixed>>, settings: array<string, mixed>}|null
+ * Block definitions include live Block Options items (fields + options belong together).
+ *
+ * @return array<string, mixed>|null
  */
 function bl_blocks_export_definition_payload(WP_Post $post): ?array
 {
@@ -149,15 +161,31 @@ function bl_blocks_export_definition_payload(WP_Post $post): ?array
 	$settings = $config['settings'];
 	$settings['slug'] = bl_blocks_definition_slug((int) $post->ID, $settings);
 
-	return [
+	$payload = [
 		'type'     => $type,
 		'title'    => $post->post_title !== '' ? $post->post_title : $settings['slug'],
 		'fields'   => $config['fields'],
 		'settings' => $settings,
 	];
+
+	if (
+		$type === 'block'
+		&& function_exists('bl_block_options_get_block_items')
+		&& function_exists('bl_blocks_gutenberg_name')
+	) {
+		$slug = (string) ($settings['slug'] ?? '');
+		$block_name = $slug !== '' ? bl_blocks_gutenberg_name($slug) : '';
+		$payload['block_options'] = [
+			'items' => $block_name !== '' ? bl_block_options_get_block_items($block_name) : [],
+		];
+	}
+
+	return $payload;
 }
 
 /**
+ * Collect definition export items (not the full Block Options store).
+ *
  * @param string $type all|block|page_settings|site_settings
  * @return list<array<string, mixed>>
  */
@@ -178,6 +206,120 @@ function bl_blocks_collect_export_items(string $type): array
 	}
 
 	return $items;
+}
+
+/**
+ * Full Block Options store payload for export (presets + all assigned blocks).
+ *
+ * @return array{version: int, presets: array<string, mixed>, blocks: array<string, mixed>}
+ */
+function bl_blocks_export_block_options_store(): array
+{
+	if (!function_exists('bl_block_options_get_store')) {
+		return [
+			'version' => 1,
+			'presets' => [],
+			'blocks'  => [],
+		];
+	}
+
+	return bl_block_options_get_store();
+}
+
+/**
+ * Build download payload for an export type.
+ *
+ * - all → envelope { version, definitions, block_options }
+ * - block_options → store only
+ * - block|page_settings|site_settings → definition list
+ *
+ * @return array<string, mixed>|list<array<string, mixed>>
+ */
+function bl_blocks_build_export_payload(string $type)
+{
+	if ($type === 'block_options') {
+		return bl_blocks_export_block_options_store();
+	}
+
+	if ($type === 'all') {
+		return [
+			'version'        => 1,
+			'definitions'    => bl_blocks_collect_export_items('all'),
+			'block_options'  => bl_blocks_export_block_options_store(),
+		];
+	}
+
+	return bl_blocks_collect_export_items($type);
+}
+
+/**
+ * Whether an array is a list (PHP 8.0-safe; array_is_list is 8.1+).
+ *
+ * @param array<mixed> $data
+ */
+function bl_blocks_array_is_list(array $data): bool
+{
+	if (function_exists('array_is_list')) {
+		return array_is_list($data);
+	}
+
+	if ($data === []) {
+		return true;
+	}
+
+	return array_keys($data) === range(0, count($data) - 1);
+}
+
+/**
+ * Whether decoded JSON looks like a Block Options store (not a definition / envelope).
+ *
+ * @param array<string, mixed> $data
+ */
+function bl_blocks_import_is_block_options_store(array $data): bool
+{
+	if (bl_blocks_array_is_list($data)) {
+		return false;
+	}
+	if (isset($data['definitions']) || isset($data['type']) || isset($data['fields'])) {
+		return false;
+	}
+	if (isset($data['settings']) && is_array($data['settings']) && isset($data['settings']['slug'])) {
+		return false;
+	}
+
+	return isset($data['presets']) || isset($data['blocks']);
+}
+
+/**
+ * Import a list of definition items.
+ *
+ * @param list<mixed> $items
+ * @return array{created: int, updated: int, errors: int}
+ */
+function bl_blocks_import_definition_items(array $items): array
+{
+	$created = 0;
+	$updated = 0;
+	$errors = 0;
+
+	foreach ($items as $item) {
+		if (!is_array($item)) {
+			$errors++;
+			continue;
+		}
+		$result = bl_blocks_import_definition_item($item);
+		if (!$result['ok']) {
+			$errors++;
+			continue;
+		}
+		if ($result['action'] === 'created') {
+			$created++;
+		} else {
+			$updated++;
+		}
+	}
+
+	return compact('created', 'updated', 'errors');
 }
 
 /**
@@ -272,66 +414,134 @@ function bl_blocks_import_definition_item(array $item): array
 }
 
 /**
- * Import definitions from a JSON string (single object or list).
+ * Import definitions and/or Block Options from a JSON string.
  *
- * @return array{created: int, updated: int, errors: int}
+ * Accepts:
+ * - All envelope: { definitions, block_options }
+ * - Store-only: { version?, presets, blocks }
+ * - Legacy: definition list or single definition object
+ *
+ * @return array{created: int, updated: int, errors: int, options_presets: int, options_blocks: int}
  */
 function bl_blocks_import_json_string(string $raw): array
 {
+	$empty = [
+		'created'         => 0,
+		'updated'         => 0,
+		'errors'          => 1,
+		'options_presets' => 0,
+		'options_blocks'  => 0,
+	];
+
 	$data = json_decode($raw, true);
 	if (!is_array($data)) {
-		return ['created' => 0, 'updated' => 0, 'errors' => 1];
+		return $empty;
 	}
 
-	$items = isset($data['settings']) || isset($data['fields']) ? [$data] : $data;
 	$created = 0;
 	$updated = 0;
 	$errors = 0;
+	$options_presets = 0;
+	$options_blocks = 0;
 
-	foreach ($items as $item) {
-		if (!is_array($item)) {
-			$errors++;
-			continue;
+	$merge_options = static function ($store) use (&$options_presets, &$options_blocks): void {
+		if (!is_array($store) || !function_exists('bl_block_options_merge_store')) {
+			return;
 		}
-		$result = bl_blocks_import_definition_item($item);
-		if (!$result['ok']) {
-			$errors++;
-			continue;
+		$result = bl_block_options_merge_store($store);
+		$options_presets += (int) ($result['presets'] ?? 0);
+		$options_blocks += (int) ($result['blocks'] ?? 0);
+	};
+
+	// Envelope from Export → All.
+	if (!bl_blocks_array_is_list($data) && isset($data['definitions']) && is_array($data['definitions'])) {
+		$def_result = bl_blocks_import_definition_items($data['definitions']);
+		$created = $def_result['created'];
+		$updated = $def_result['updated'];
+		$errors = $def_result['errors'];
+		if (isset($data['block_options']) && is_array($data['block_options'])) {
+			$merge_options($data['block_options']);
 		}
-		if ($result['action'] === 'created') {
-			$created++;
-		} else {
-			$updated++;
-		}
+
+		return compact('created', 'updated', 'errors', 'options_presets', 'options_blocks');
 	}
 
-	return compact('created', 'updated', 'errors');
+	// Full Block Options store only.
+	if (bl_blocks_import_is_block_options_store($data)) {
+		$merge_options($data);
+
+		return compact('created', 'updated', 'errors', 'options_presets', 'options_blocks');
+	}
+
+	// Legacy: single definition or list.
+	$items = isset($data['settings']) || isset($data['fields']) || isset($data['type'])
+		? [$data]
+		: $data;
+	if (!is_array($items)) {
+		return $empty;
+	}
+
+	$def_result = bl_blocks_import_definition_items($items);
+
+	return [
+		'created'         => $def_result['created'],
+		'updated'         => $def_result['updated'],
+		'errors'          => $def_result['errors'],
+		'options_presets' => 0,
+		'options_blocks'  => 0,
+	];
 }
 
 /**
  * Persist an import result notice and redirect back to Settings → Import / Export.
  *
- * @param array{created: int, updated: int, errors: int} $result
+ * @param array{created?: int, updated?: int, errors?: int, options_presets?: int, options_blocks?: int} $result
  */
 function bl_blocks_redirect_import_result(array $result, string $error_text = ''): void
 {
 	$created = (int) ($result['created'] ?? 0);
 	$updated = (int) ($result['updated'] ?? 0);
 	$errors = (int) ($result['errors'] ?? 0);
+	$options_presets = (int) ($result['options_presets'] ?? 0);
+	$options_blocks = (int) ($result['options_blocks'] ?? 0);
+	$defs = $created + $updated;
+	$options = $options_presets + $options_blocks;
 
 	if ($error_text !== '') {
 		$notice = ['type' => 'error', 'text' => $error_text];
 	} else {
-		$notice = [
-			'type' => $errors > 0 && ($created + $updated) === 0 ? 'error' : 'success',
-			'text' => sprintf(
+		$parts = [];
+		if ($defs > 0 || ($errors > 0 && $options === 0)) {
+			$parts[] = sprintf(
 				/* translators: 1: created count, 2: updated count, 3: error count */
-				__('Import finished: %1$d created, %2$d updated, %3$d errors.', 'baselayer-blocks'),
+				__('Definitions: %1$d created, %2$d updated, %3$d errors.', 'baselayer-blocks'),
 				$created,
 				$updated,
 				$errors
-			),
-		];
+			);
+		}
+		if ($options > 0) {
+			$parts[] = sprintf(
+				/* translators: 1: preset count, 2: block assignment count */
+				__('Block options: %1$d presets, %2$d blocks merged.', 'baselayer-blocks'),
+				$options_presets,
+				$options_blocks
+			);
+		}
+
+		if ($parts === [] && $errors > 0) {
+			$notice = [
+				'type' => 'error',
+				'text' => __('Import failed.', 'baselayer-blocks'),
+			];
+		} else {
+			$notice = [
+				'type' => 'success',
+				'text' => $parts !== []
+					? implode(' ', $parts)
+					: __('Import finished.', 'baselayer-blocks'),
+			];
+		}
 	}
 
 	set_transient('bl_blocks_import_notice_' . get_current_user_id(), $notice, 60);
@@ -373,22 +583,24 @@ function bl_blocks_handle_settings_actions(): void
 
 	if (isset($_POST['bl_blocks_export']) && check_admin_referer('bl_blocks_export', 'bl_blocks_export_nonce')) {
 		$type = sanitize_key((string) wp_unslash($_POST['bl_blocks_export_type'] ?? 'all'));
-		if (!in_array($type, array_merge(['all'], bl_blocks_definition_types()), true)) {
+		if (!in_array($type, bl_blocks_export_type_keys(), true)) {
 			$type = 'all';
 		}
-		$items = bl_blocks_collect_export_items($type);
-		$filename = 'baselayer-blocks-' . $type . '-' . gmdate('Ymd-His') . '.json';
+		$payload = bl_blocks_build_export_payload($type);
+		$filename = $type === 'block_options'
+			? 'baselayer-block-options-' . gmdate('Ymd-His') . '.json'
+			: 'baselayer-blocks-' . $type . '-' . gmdate('Ymd-His') . '.json';
 		nocache_headers();
 		header('Content-Type: application/json; charset=utf-8');
 		header('Content-Disposition: attachment; filename="' . $filename . '"');
-		echo wp_json_encode($items, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+		echo wp_json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 		exit;
 	}
 
 	if (isset($_POST['bl_blocks_import']) && check_admin_referer('bl_blocks_import', 'bl_blocks_import_nonce')) {
 		if (empty($_FILES['bl_blocks_import_file']['tmp_name'])) {
 			bl_blocks_redirect_import_result(
-				['created' => 0, 'updated' => 0, 'errors' => 1],
+				['created' => 0, 'updated' => 0, 'errors' => 1, 'options_presets' => 0, 'options_blocks' => 0],
 				__('No file uploaded.', 'baselayer-blocks')
 			);
 		}
@@ -397,12 +609,14 @@ function bl_blocks_handle_settings_actions(): void
 		$raw = file_get_contents((string) $_FILES['bl_blocks_import_file']['tmp_name']);
 		if (!is_string($raw)) {
 			bl_blocks_redirect_import_result(
-				['created' => 0, 'updated' => 0, 'errors' => 1],
+				['created' => 0, 'updated' => 0, 'errors' => 1, 'options_presets' => 0, 'options_blocks' => 0],
 				__('Invalid JSON file.', 'baselayer-blocks')
 			);
 		}
 		$result = bl_blocks_import_json_string($raw);
-		if ($result['created'] + $result['updated'] === 0 && $result['errors'] > 0) {
+		$defs = (int) ($result['created'] ?? 0) + (int) ($result['updated'] ?? 0);
+		$options = (int) ($result['options_presets'] ?? 0) + (int) ($result['options_blocks'] ?? 0);
+		if ($defs === 0 && $options === 0 && (int) ($result['errors'] ?? 0) > 0) {
 			bl_blocks_redirect_import_result($result, __('Invalid JSON file.', 'baselayer-blocks'));
 		}
 		bl_blocks_redirect_import_result($result);
@@ -507,7 +721,7 @@ function bl_blocks_render_settings_page(): void
 					<div class="bl-blocks-settings__columns">
 						<section class="bl-blocks-settings__panel">
 							<h2><?php echo esc_html__('Export', 'baselayer-blocks'); ?></h2>
-							<p class="description"><?php echo esc_html__('Download definitions as JSON. Re-import matches by type and slug: the same slug updates in place, never duplicates.', 'baselayer-blocks'); ?></p>
+							<p class="description"><?php echo esc_html__('All downloads definitions plus the full Block Options store (presets, core, Baselayer, and ACF). Block options exports the store only. Blocks include each block’s options alongside its fields.', 'baselayer-blocks'); ?></p>
 							<form method="post" action="<?php echo esc_url(bl_blocks_settings_url('import-export')); ?>" class="bl-blocks-settings__form">
 								<?php wp_nonce_field('bl_blocks_export', 'bl_blocks_export_nonce'); ?>
 								<label class="screen-reader-text" for="bl_blocks_export_type"><?php echo esc_html__('Type', 'baselayer-blocks'); ?></label>
@@ -517,6 +731,7 @@ function bl_blocks_render_settings_page(): void
 										<option value="block"><?php echo esc_html__('Blocks', 'baselayer-blocks'); ?></option>
 										<option value="page_settings"><?php echo esc_html__('Content Fields', 'baselayer-blocks'); ?></option>
 										<option value="site_settings"><?php echo esc_html__('Website Fields', 'baselayer-blocks'); ?></option>
+										<option value="block_options"><?php echo esc_html__('Block options', 'baselayer-blocks'); ?></option>
 									</select>
 									<?php submit_button(__('Download JSON', 'baselayer-blocks'), 'primary bl-button', 'bl_blocks_export', false); ?>
 								</div>
@@ -525,7 +740,7 @@ function bl_blocks_render_settings_page(): void
 
 						<section class="bl-blocks-settings__panel">
 							<h2><?php echo esc_html__('Import', 'baselayer-blocks'); ?></h2>
-							<p class="description"><?php echo esc_html__('Upload a JSON export. Existing definitions with the same type and slug are updated.', 'baselayer-blocks'); ?></p>
+							<p class="description"><?php echo esc_html__('Upload an All envelope, a definition list, or a Block options store JSON. Definitions match by type and slug (update in place). Block options merge into the live store.', 'baselayer-blocks'); ?></p>
 							<form method="post" enctype="multipart/form-data" action="<?php echo esc_url(bl_blocks_settings_url('import-export')); ?>" class="bl-blocks-settings__form">
 								<?php wp_nonce_field('bl_blocks_import', 'bl_blocks_import_nonce'); ?>
 								<div class="bl-blocks-settings__row">
