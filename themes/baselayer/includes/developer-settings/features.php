@@ -90,6 +90,35 @@ function bl_render_developer_features(): void
 	};
 	$language_mode = function_exists('bl_language_mode') ? bl_language_mode() : 'content';
 
+	$blocks_system = 'none';
+	if ((int) $feat('enable_blocks') === 1) {
+		$blocks_system = 'baselayer';
+	} elseif ((int) $feat('enable_acf') === 1) {
+		$blocks_system = 'acf';
+	}
+
+	$blocks_systems = [
+		'baselayer' => [
+			'label'       => __('BaseLayer Blocks', 'baselayer'),
+			'badge'       => __('Recommended', 'baselayer'),
+			'badge_bg'    => '#2271b1',
+			'description' => __('Create and manage custom Gutenberg blocks, content fields, and website fields directly within BaseLayer.', 'baselayer'),
+		],
+		'acf' => [
+			'label'       => __('ACF Pro', 'baselayer'),
+			'badge'       => __('Requires ACF Pro Plugin', 'baselayer'),
+			'badge_bg'    => '#D97706',
+			'description' => __('Use ACF Pro to build custom Gutenberg blocks.', 'baselayer'),
+		],
+		'none' => [
+			'label'       => __('None', 'baselayer'),
+			'badge'       => '',
+			'badge_bg'    => '',
+			'description' => __('Use the default WordPress block editor.', 'baselayer'),
+		],
+	];
+	$current_blocks = $blocks_systems[$blocks_system] ?? $blocks_systems['none'];
+
 	if (!function_exists('bl_webp_supported')) {
 		require_once get_template_directory() . '/includes/image-webp.php';
 	}
@@ -107,7 +136,7 @@ function bl_render_developer_features(): void
 		<?php if (is_array($blocks_switched)) : ?>
 			<div class="notice notice-warning is-dismissible">
 				<p><strong><?= esc_html__('Blocks system changed', 'baselayer') ?></strong></p>
-				<p><?= esc_html__('Existing pages keep their current block markup (Baselayer ↔ ACF namespaces are not converted). Website and Hero storage also differs by engine. Prefer choosing the system at install and sticking with it. No definitions or field groups were imported automatically.', 'baselayer') ?></p>
+				<p><?= esc_html__('Existing pages keep their current block markup—Baselayer and ACF namespaces are not converted. Website and Hero storage also differs by engine, and nothing was imported or seeded automatically. Prefer choosing an engine at install and sticking with it.', 'baselayer') ?></p>
 			</div>
 		<?php endif; ?>
 
@@ -261,40 +290,19 @@ function bl_render_developer_features(): void
 					<tr>
 						<th scope="row"><?= esc_html__('Blocks', 'baselayer') ?></th>
 						<td>
-							<?php
-							$blocks_system = 'none';
-							if ((int) $feat('enable_blocks') === 1) {
-								$blocks_system = 'baselayer';
-							} elseif ((int) $feat('enable_acf') === 1) {
-								$blocks_system = 'acf';
-							}
-							?>
-							<fieldset>
-								<label style="display:block;margin-bottom:8px;">
-									<input type="radio" name="baselayer_features[blocks_system]" value="baselayer" <?= checked($blocks_system, 'baselayer', false) ?>>
-									<strong><?= esc_html__('BaseLayer Blocks', 'baselayer') ?></strong>
-									<span style="display:inline-block;margin-left:6px;padding:0 6px;border-radius:3px;background:#2271b1;color:#fff;font-size:11px;font-weight:600;line-height:20px;vertical-align:1px;"><?= esc_html__('Recommended', 'baselayer') ?></span>
+							<div class="bl-blocks-system" data-bl-blocks-system data-current="<?= esc_attr($blocks_system) ?>">
+								<label class="bl-blocks-system__current" style="font-weight: 500;">
+									<input type="checkbox" checked disabled>
+									<?= esc_html($current_blocks['label']) ?>
 								</label>
-								<p class="description" style="margin:0 0 12px 24px;"><?= esc_html__('Create and manage custom Gutenberg blocks, content fields, and website fields directly within BaseLayer.', 'baselayer') ?></p>
-
-								<label style="display:block;margin-bottom:8px;">
-									<input type="radio" name="baselayer_features[blocks_system]" value="acf" <?= checked($blocks_system, 'acf', false) ?>>
-									<strong><?= esc_html__('ACF Pro', 'baselayer') ?></strong>
-									<span style="display:inline-block;margin-left:6px;padding:0 6px;border-radius:3px;background:#D97706;color:#fff;font-size:11px;font-weight:600;line-height:20px;vertical-align:1px;"><?= esc_html__('Requires ACF Pro Plugin', 'baselayer') ?></span>
-								</label>
-								<p class="description" style="margin:0 0 12px 24px;"><?= esc_html__('Use ACF Pro to build custom Gutenberg blocks.', 'baselayer') ?></p>
-
-								<label style="display:block;margin-bottom:8px;">
-									<input type="radio" name="baselayer_features[blocks_system]" value="none" <?= checked($blocks_system, 'none', false) ?>>
-									<strong><?= esc_html__('None', 'baselayer') ?></strong>
-								</label>
-								<p class="description" style="margin:0 0 12px 24px;"><?= esc_html__('Use the default WordPress block editor.', 'baselayer') ?></p>
-							</fieldset>
-							<div class="notice notice-info inline" style="margin: 12px 0 0;">
-								<p style="margin: 0.5em 0;"><?= esc_html__('Switching engines after you have built content is not recommended. Pages are not migrated, and Website/Hero data lives in different storage. Choose at install when possible.', 'baselayer') ?></p>
+								<p class="description bl-indent-checkbox"><?= esc_html($current_blocks['description']) ?></p>
+								<p class="bl-blocks-system__change-wrap">
+									<button type="button" class="button-link bl-blocks-system__change" data-bl-blocks-system-open><?= esc_html__('Change', 'baselayer') ?></button>
+								</p>
+								<input type="hidden" name="baselayer_features[blocks_system]" value="<?= esc_attr($blocks_system) ?>" data-bl-blocks-system-value>
+								<input type="hidden" name="baselayer_features[enable_blocks]" value="0">
+								<input type="hidden" name="baselayer_features[enable_acf]" value="0">
 							</div>
-							<input type="hidden" name="baselayer_features[enable_blocks]" value="0">
-							<input type="hidden" name="baselayer_features[enable_acf]" value="0">
 						</td>
 					</tr>
 				</table>
@@ -320,7 +328,7 @@ function bl_render_developer_features(): void
 						<td>
 							<input type="hidden" name="baselayer_features[enable_editorial]" value="0">
 							<label style="font-weight: 500;"><input type="checkbox" name="baselayer_features[enable_editorial]" value="1" <?= checked($feat('enable_editorial'), 1, false) ?>> <?= esc_html__('Enable editorial rights', 'baselayer') ?></label>
-							<p class="description bl-indent-checkbox"><?= esc_html__('Per-editor content access, publishing approval, page allowlists, and media restrictions. Configure under Developer → Editorial and on editor profiles.', 'baselayer') ?></p>
+							<p class="description bl-indent-checkbox"><?= esc_html__('Manage editorial permissions, publishing approvals, page access, and media restrictions. Configure settings under Developer → Editorial and on editor profiles.', 'baselayer') ?></p>
 						</td>
 					</tr>
 				</table>
@@ -413,6 +421,37 @@ function bl_render_developer_features(): void
 				<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
 			</div>
 		</form>
+
+		<div id="bl-blocks-system-modal" class="bl-blocks-system-modal" aria-hidden="true" hidden>
+			<div class="bl-blocks-system-modal__backdrop" data-bl-blocks-system-close></div>
+			<div class="bl-blocks-system-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="bl-blocks-system-modal-title">
+				<h2 id="bl-blocks-system-modal-title"><?= esc_html__('Change blocks engine', 'baselayer') ?></h2>
+				<div class="notice notice-info notice-alt inline bl-blocks-system-modal__warning">
+					<p><?= esc_html__('Changing the blocks engine is not recommended once you\'ve started creating content. Existing content is not migrated automatically and may require manual adjustments. Only switch engines if your project is still in its early stages or you understand the implications.', 'baselayer') ?></p>
+				</div>
+				<fieldset class="bl-blocks-system-modal__choices">
+					<?php foreach ($blocks_systems as $value => $option) : ?>
+						<label class="bl-blocks-system-modal__choice">
+							<span class="bl-blocks-system-modal__choice-label">
+								<input type="radio" name="bl_blocks_system_choice" value="<?= esc_attr($value) ?>" <?= checked($blocks_system, $value, false) ?>>
+								<span class="bl-blocks-system-modal__choice-text">
+									<strong><?= esc_html($option['label']) ?></strong>
+									<?php if ($option['badge'] !== '') : ?>
+										<span class="bl-blocks-system__badge" style="background:<?= esc_attr($option['badge_bg']) ?>;"><?= esc_html($option['badge']) ?></span>
+									<?php endif; ?>
+								</span>
+							</span>
+							<span class="description"><?= esc_html($option['description']) ?></span>
+						</label>
+					<?php endforeach; ?>
+				</fieldset>
+				<div class="bl-blocks-system-modal__actions">
+					<button type="button" class="button" data-bl-blocks-system-close><?= esc_html__('Cancel') ?></button>
+					<button type="button" class="button button-primary" data-bl-blocks-system-switch disabled><?= esc_html__('Switch engine', 'baselayer') ?></button>
+				</div>
+			</div>
+		</div>
+
 		<script>
 			(function() {
 				function bindToggle(mainId, subId) {

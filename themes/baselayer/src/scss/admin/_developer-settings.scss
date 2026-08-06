@@ -804,3 +804,133 @@ body.bl-media-cleanup-modal-open {
   gap: 8px;
   margin-top: 16px;
 }
+
+.bl-blocks-system__badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 0 6px;
+  border-radius: 3px;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 20px;
+  vertical-align: middle;
+}
+
+.bl-blocks-system__change-wrap {
+  margin: 4px 0 0 24px;
+}
+
+.bl-blocks-system__change.button-link {
+  font-size: 12px;
+  text-decoration: none;
+}
+
+body.bl-blocks-system-modal-open {
+  overflow: hidden;
+}
+
+.bl-blocks-system-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100110;
+  display: none;
+}
+
+.bl-blocks-system-modal.is-open {
+  display: block;
+}
+
+.bl-blocks-system-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.bl-blocks-system-modal__dialog {
+  position: relative;
+  width: 520px;
+  max-width: calc(100vw - 64px);
+  max-height: calc(100vh - 64px);
+  margin: 12vh auto 0;
+  padding: 20px;
+  overflow: auto;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+
+  h2 {
+    margin: 0 0 12px;
+  }
+}
+
+.notice.notice-info.notice-alt.bl-blocks-system-modal__warning {
+  margin: 0 0 16px;
+  background: #f0f6fc;
+  background-color: #f0f6fc;
+
+  p {
+    margin: 0.5em 0;
+    text-wrap: pretty;
+  }
+}
+
+.bl-blocks-system-modal__choices {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.bl-blocks-system-modal__choice {
+  display: block;
+  margin: 0 0 14px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  .description {
+    display: block;
+    margin: 4px 0 0 1.75em;
+  }
+}
+
+.bl-blocks-system-modal__choice-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+
+  input[type='radio'] {
+    flex-shrink: 0;
+    width: 1rem;
+    height: 1rem;
+    margin: 0.2em 0 0;
+  }
+}
+
+.bl-blocks-system-modal__choice-text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  line-height: 1.4;
+
+  .bl-blocks-system__badge {
+    margin-left: 0;
+  }
+
+  strong {
+    font-weight: 600;
+  }
+}
+
+.bl-blocks-system-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #dcdcde;
+}
+

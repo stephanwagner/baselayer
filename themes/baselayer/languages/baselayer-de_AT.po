@@ -812,6 +812,12 @@ msgstr "Ein flexibler Custom Post Type für Portfolios, Fallstudien und ähnlich
 msgid "Enable events"
 msgstr "Veranstaltungen aktivieren"
 
+msgid "Enable editorial rights"
+msgstr "Editorial-Rechte aktivieren"
+
+msgid "Manage editorial permissions, publishing approvals, page access, and media restrictions. Configure settings under Developer → Editorial and on editor profiles."
+msgstr "Verwalte Berechtigungen, Freigaben, Seitenzugriffe und Medieneinschränkungen. Konfiguriere die Einstellungen unter Entwickler → Editorial sowie in den Profilen der Bearbeiter."
+
 msgid "Dated items with archives, recurrence, and statuses."
 msgstr "Datierte Einträge mit Archiven, Wiederholung und Status."
 
@@ -887,6 +893,25 @@ msgstr "Nutze ACF Pro, um individuelle Gutenberg-Blöcke zu erstellen."
 
 msgid "Use the default WordPress block editor."
 msgstr "Nutze den Standard-WordPress-Block-Editor."
+
+
+msgid "Change"
+msgstr "Ändern"
+
+msgid "Change blocks engine"
+msgstr "Blocks-Engine wechseln"
+
+msgid "Changing the blocks engine is not recommended once you've started creating content. Existing content is not migrated automatically and may require manual adjustments. Only switch engines if your project is still in its early stages or you understand the implications."
+msgstr "Ein Wechsel der Blocks-Engine wird nicht empfohlen, sobald bereits Inhalte erstellt wurden. Bestehende Inhalte werden nicht automatisch migriert und müssen gegebenenfalls manuell angepasst werden. Wechsle die Engine nur, wenn das Projekt noch am Anfang steht oder du die Auswirkungen kennst."
+
+msgid "Switch engine"
+msgstr "Engine wechseln"
+
+msgid "Blocks system changed"
+msgstr "Blocks-System geändert"
+
+msgid "Existing pages keep their current block markup—Baselayer and ACF namespaces are not converted. Website and Hero storage also differs by engine, and nothing was imported or seeded automatically. Prefer choosing an engine at install and sticking with it."
+msgstr "Bestehende Seiten behalten ihr aktuelles Block-Markup – Baselayer- und ACF-Namespaces werden nicht konvertiert. Website- und Hero-Speicher unterscheiden sich ebenfalls je Engine, und es wurde nichts automatisch importiert oder geseedet. Wähle die Engine möglichst bei der Installation und bleib dabei."
 
 
 msgid "Administrator email"
