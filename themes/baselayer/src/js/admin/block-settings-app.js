@@ -148,34 +148,41 @@ function VariationCard({ blockName, variation, allowed, parentAllowed, onChange 
   const i18n = config.i18n || {};
   const title = variation.title || variation.name;
   const slug = variation.name;
-
   const interactive = Boolean(parentAllowed);
+  const allowLabel = interactive
+    ? allowed
+      ? i18n.actionDisallow || __('Disallow from inserter', 'baselayer')
+      : i18n.actionAllow || __('Allow in inserter', 'baselayer')
+    : i18n.parentBlockDisabled || '';
 
   return el(
-    'article',
+    'li',
     {
-      className: `bl-block-card bl-block-card--variation${allowed && parentAllowed ? ' is-allowed' : ' is-disallowed'}${parentAllowed ? '' : ' is-parent-disabled'}`,
+      className: [
+        'bl-block-settings__row',
+        'bl-block-settings__row--variation',
+        allowed && parentAllowed ? 'is-allowed' : 'is-disallowed',
+        parentAllowed ? '' : 'is-parent-disabled',
+      ]
+        .filter(Boolean)
+        .join(' '),
     },
     el(
       'div',
-      { className: 'bl-block-card__top' },
-      el(
-        'div',
-        { className: 'bl-block-card__identity' },
-        el('span', { className: 'bl-block-settings__icon' }, renderBlockIcon(variation.icon)),
-        el(
-          'div',
-          { className: 'bl-block-card__meta' },
-          el('h4', { className: 'bl-block-card__title' }, title),
-          el('code', { className: 'bl-block-card__slug' }, `${blockName}/${slug}`),
-        ),
-      ),
+      { className: 'bl-block-settings__row-lead' },
+      el('span', { className: 'bl-block-settings__icon' }, renderBlockIcon(variation.icon)),
+      el('span', { className: 'bl-block-settings__row-title' }, title),
+    ),
+    el('code', { className: 'bl-block-settings__row-code' }, `${blockName}/${slug}`),
+    el(
+      'div',
+      { className: 'bl-block-settings__row-actions', role: 'group', 'aria-label': i18n.allowedInInserter || '' },
       el(
         'button',
         {
           type: 'button',
-          className: 'bl-block-card__allowed',
-          title: interactive ? i18n.allowedInInserter || '' : i18n.parentBlockDisabled || '',
+          className: `bl-block-settings__icon-btn bl-block-settings__icon-btn--allowed${allowed && parentAllowed ? ' is-active' : ''}`,
+          'aria-label': allowLabel,
           'aria-pressed': allowed && parentAllowed ? 'true' : 'false',
           disabled: !interactive,
           onClick: () => {
@@ -185,13 +192,12 @@ function VariationCard({ blockName, variation, allowed, parentAllowed, onChange 
             onChange({ allowed: !allowed });
           },
         },
-        el(
-          'span',
-          { className: 'bl-block-card__allowed-btn', 'aria-hidden': 'true' },
-          el('span', { className: 'dashicons dashicons-randomize', 'aria-hidden': 'true' }),
-          el('span', { className: 'bl-block-card__allowed-slash', 'aria-hidden': 'true' }),
-        ),
-        el('span', { className: 'screen-reader-text' }, i18n.allowedInInserter || ''),
+        el('span', {
+          className: `bl-icon ${allowed && parentAllowed ? '-icon-check-circle' : '-icon-cancel'}`,
+          'aria-hidden': 'true',
+        }),
+        renderButtonTip(allowLabel),
+        el('span', { className: 'screen-reader-text' }, allowLabel),
       ),
     ),
   );
@@ -202,6 +208,17 @@ function BlockCard({ block, flags, onChange }) {
   const i18n = config.i18n || {};
   const allowed = Boolean(flags.allowed);
   const mode = flags.hidden ? 'hidden' : flags.favorite ? 'favorite' : '';
+  const isHidden = mode === 'hidden';
+  const isFavorite = mode === 'favorite';
+  const allowLabel = allowed
+    ? i18n.actionDisallow || __('Disallow from inserter', 'baselayer')
+    : i18n.actionAllow || __('Allow in inserter', 'baselayer');
+  const hideLabel = isHidden
+    ? i18n.actionShow || __('Show', 'baselayer')
+    : i18n.actionHide || __('Hide', 'baselayer');
+  const favoriteLabel = isFavorite
+    ? i18n.actionUnfavorite || __('Remove from favorites', 'baselayer')
+    : i18n.actionFavorite || __('Add to favorites', 'baselayer');
 
   const setMode = (nextMode) => {
     if (!allowed) {
@@ -225,52 +242,28 @@ function BlockCard({ block, flags, onChange }) {
   };
 
   return el(
-    'article',
+    'li',
     {
       className: [
-        'bl-block-card',
+        'bl-block-settings__row',
         allowed ? 'is-allowed' : 'is-disallowed',
-        allowed && mode === 'hidden' ? 'is-mode-hidden' : '',
-        allowed && mode === 'favorite' ? 'is-mode-favorite' : '',
+        allowed && isHidden ? 'is-mode-hidden' : '',
+        allowed && isFavorite ? 'is-mode-favorite' : '',
       ]
         .filter(Boolean)
         .join(' '),
     },
     el(
       'div',
-      { className: 'bl-block-card__top' },
-      el(
-        'div',
-        { className: 'bl-block-card__identity' },
-        el(
-          'div',
-          { className: 'bl-block-card__meta' },
-          el('h4', { className: 'bl-block-card__title' }, block.title),
-          el('code', { className: 'bl-block-card__slug' }, block.name),
-        ),
-      ),
-      el(
-        'button',
-        {
-          type: 'button',
-          className: 'bl-block-card__allowed',
-          title: i18n.allowedInInserter || '',
-          'aria-pressed': allowed ? 'true' : 'false',
-          onClick: toggleAllowed,
-        },
-        el(
-          'span',
-          { className: 'bl-block-card__allowed-btn', 'aria-hidden': 'true' },
-          el(BlockTypeIcon, { blockName: block.name, serverIcon: block.icon }),
-          el('span', { className: 'bl-block-card__allowed-slash', 'aria-hidden': 'true' }),
-        ),
-        el('span', { className: 'screen-reader-text' }, i18n.allowedInInserter || ''),
-      ),
+      { className: 'bl-block-settings__row-lead' },
+      el(BlockTypeIcon, { blockName: block.name, serverIcon: block.icon }),
+      el('span', { className: 'bl-block-settings__row-title' }, block.title),
     ),
+    el('code', { className: 'bl-block-settings__row-code' }, block.name),
     el(
       'div',
       {
-        className: `bl-block-card__modes${allowed ? '' : ' is-disabled'}`,
+        className: 'bl-block-settings__row-actions',
         role: 'group',
         'aria-label': i18n.inserterVisibility || '',
       },
@@ -278,25 +271,51 @@ function BlockCard({ block, flags, onChange }) {
         'button',
         {
           type: 'button',
-          className: `bl-block-card__mode bl-block-card__mode--hidden${mode === 'hidden' ? ' is-active' : ''}`,
-          'aria-pressed': mode === 'hidden' ? 'true' : 'false',
-          disabled: !allowed,
-          onClick: () => setMode(mode === 'hidden' ? '' : 'hidden'),
+          className: `bl-block-settings__icon-btn bl-block-settings__icon-btn--allowed${allowed ? ' is-active' : ''}`,
+          'aria-label': allowLabel,
+          'aria-pressed': allowed ? 'true' : 'false',
+          onClick: toggleAllowed,
         },
-        el('span', { className: 'dashicons dashicons-hidden', 'aria-hidden': 'true' }),
-        el('span', null, i18n.hidden || __('Hidden', 'baselayer')),
+        el('span', {
+          className: `bl-icon ${allowed ? '-icon-check-circle' : '-icon-cancel'}`,
+          'aria-hidden': 'true',
+        }),
+        renderButtonTip(allowLabel),
+        el('span', { className: 'screen-reader-text' }, allowLabel),
       ),
       el(
         'button',
         {
           type: 'button',
-          className: `bl-block-card__mode bl-block-card__mode--favorite${mode === 'favorite' ? ' is-active' : ''}`,
-          'aria-pressed': mode === 'favorite' ? 'true' : 'false',
+          className: `bl-block-settings__icon-btn bl-block-settings__icon-btn--hidden${isHidden ? ' is-active' : ''}`,
+          'aria-label': hideLabel,
+          'aria-pressed': isHidden ? 'true' : 'false',
           disabled: !allowed,
-          onClick: () => setMode(mode === 'favorite' ? '' : 'favorite'),
+          onClick: () => setMode(isHidden ? '' : 'hidden'),
         },
-        el('span', { className: 'dashicons dashicons-star-filled', 'aria-hidden': 'true' }),
-        el('span', null, i18n.favorite || __('Favorite', 'baselayer')),
+        el('span', {
+          className: `bl-icon ${isHidden ? '-icon-visibility-off' : '-icon-visibility'}`,
+          'aria-hidden': 'true',
+        }),
+        renderButtonTip(hideLabel),
+        el('span', { className: 'screen-reader-text' }, hideLabel),
+      ),
+      el(
+        'button',
+        {
+          type: 'button',
+          className: `bl-block-settings__icon-btn bl-block-settings__icon-btn--favorite${isFavorite ? ' is-active' : ''}`,
+          'aria-label': favoriteLabel,
+          'aria-pressed': isFavorite ? 'true' : 'false',
+          disabled: !allowed,
+          onClick: () => setMode(isFavorite ? '' : 'favorite'),
+        },
+        el('span', {
+          className: `bl-icon ${isFavorite ? '-icon-star-filled' : '-icon-star'}`,
+          'aria-hidden': 'true',
+        }),
+        renderButtonTip(favoriteLabel),
+        el('span', { className: 'screen-reader-text' }, favoriteLabel),
       ),
     ),
   );
@@ -307,24 +326,20 @@ function SystemBlockCard({ block }) {
   const i18n = config.i18n || {};
 
   return el(
-    'article',
-    { className: 'bl-block-card bl-block-card--system' },
+    'li',
+    { className: 'bl-block-settings__row bl-block-settings__row--system' },
     el(
       'div',
-      { className: 'bl-block-card__top' },
+      { className: 'bl-block-settings__row-lead' },
+      el(BlockTypeIcon, { blockName: block.name, serverIcon: block.icon }),
       el(
         'div',
-        { className: 'bl-block-card__identity' },
-        el(BlockTypeIcon, { blockName: block.name, serverIcon: block.icon }),
-        el(
-          'div',
-          { className: 'bl-block-card__meta' },
-          el('h4', { className: 'bl-block-card__title' }, block.title),
-          el('code', { className: 'bl-block-card__slug' }, block.name),
-          el('p', { className: 'bl-block-card__system-note' }, i18n.hiddenBySystem || ''),
-        ),
+        { className: 'bl-block-settings__row-meta' },
+        el('span', { className: 'bl-block-settings__row-title' }, block.title),
+        el('p', { className: 'bl-block-settings__row-note' }, i18n.hiddenBySystem || ''),
       ),
     ),
+    el('code', { className: 'bl-block-settings__row-code' }, block.name),
   );
 }
 
@@ -335,24 +350,20 @@ function SystemVariationCard({ blockName, variation }) {
   const slug = variation.name;
 
   return el(
-    'article',
-    { className: 'bl-block-card bl-block-card--variation bl-block-card--system' },
+    'li',
+    { className: 'bl-block-settings__row bl-block-settings__row--variation bl-block-settings__row--system' },
     el(
       'div',
-      { className: 'bl-block-card__top' },
+      { className: 'bl-block-settings__row-lead' },
+      el('span', { className: 'bl-block-settings__icon' }, renderBlockIcon(variation.icon)),
       el(
         'div',
-        { className: 'bl-block-card__identity' },
-        el('span', { className: 'bl-block-settings__icon' }, renderBlockIcon(variation.icon)),
-        el(
-          'div',
-          { className: 'bl-block-card__meta' },
-          el('h4', { className: 'bl-block-card__title' }, title),
-          el('code', { className: 'bl-block-card__slug' }, `${blockName}/${slug}`),
-          el('p', { className: 'bl-block-card__system-note' }, i18n.hiddenBySystem || ''),
-        ),
+        { className: 'bl-block-settings__row-meta' },
+        el('span', { className: 'bl-block-settings__row-title' }, title),
+        el('p', { className: 'bl-block-settings__row-note' }, i18n.hiddenBySystem || ''),
       ),
     ),
+    el('code', { className: 'bl-block-settings__row-code' }, `${blockName}/${slug}`),
   );
 }
 
@@ -427,8 +438,15 @@ function matchesFilters(blockName, settings, filters) {
   return true;
 }
 
-function renderDashicon(icon) {
-  return el('span', { className: `dashicons ${icon}`, 'aria-hidden': 'true' });
+function renderThemeIcon(name) {
+  return el('span', {
+    className: `bl-icon -icon-${name}`,
+    'aria-hidden': 'true',
+  });
+}
+
+function renderButtonTip(label) {
+  return el('span', { className: 'bl-block-settings__tip', 'aria-hidden': 'true' }, label);
 }
 
 function FilterGroup({ label, value, options, onChange }) {
@@ -450,8 +468,8 @@ function FilterGroup({ label, value, options, onChange }) {
           'aria-label': option.label,
           onClick: () => onChange(option.value),
         },
-        renderDashicon(option.icon),
-        el('span', { className: 'bl-block-settings__filter-tip', 'aria-hidden': 'true' }, option.label),
+        renderThemeIcon(option.icon),
+        renderButtonTip(option.label),
       ),
     ),
   );
@@ -648,27 +666,27 @@ function BlockSettingsApp() {
 
   const allowedFilterOptions = useMemo(
     () => [
-      { value: 'all', label: i18n.filterAll || __('All', 'baselayer'), icon: 'dashicons-filter' },
-      { value: 'active', label: i18n.filterActive || __('Active', 'baselayer'), icon: 'dashicons-yes-alt' },
-      { value: 'inactive', label: i18n.filterInactive || __('Inactive', 'baselayer'), icon: 'dashicons-no-alt' },
+      { value: 'all', label: i18n.filterAll || __('All', 'baselayer'), icon: 'filter' },
+      { value: 'active', label: i18n.filterActive || __('Active', 'baselayer'), icon: 'check-circle' },
+      { value: 'inactive', label: i18n.filterInactive || __('Inactive', 'baselayer'), icon: 'cancel' },
     ],
     [i18n],
   );
 
   const hiddenFilterOptions = useMemo(
     () => [
-      { value: 'all', label: i18n.filterAll || __('All', 'baselayer'), icon: 'dashicons-filter' },
-      { value: 'hidden', label: i18n.hidden || __('Hidden', 'baselayer'), icon: 'dashicons-hidden' },
-      { value: 'not-hidden', label: i18n.filterNotHidden || __('Not hidden', 'baselayer'), icon: 'dashicons-visibility' },
+      { value: 'all', label: i18n.filterAll || __('All', 'baselayer'), icon: 'filter' },
+      { value: 'hidden', label: i18n.hidden || __('Hidden', 'baselayer'), icon: 'visibility-off' },
+      { value: 'not-hidden', label: i18n.filterNotHidden || __('Not hidden', 'baselayer'), icon: 'visibility' },
     ],
     [i18n],
   );
 
   const favoriteFilterOptions = useMemo(
     () => [
-      { value: 'all', label: i18n.filterAll || __('All', 'baselayer'), icon: 'dashicons-filter' },
-      { value: 'favorite', label: i18n.favorites || __('Favorites', 'baselayer'), icon: 'dashicons-star-filled' },
-      { value: 'not-favorite', label: i18n.filterNotFavorite || __('Not favorite', 'baselayer'), icon: 'dashicons-star-empty' },
+      { value: 'all', label: i18n.filterAll || __('All', 'baselayer'), icon: 'filter' },
+      { value: 'favorite', label: i18n.favorites || __('Favorites', 'baselayer'), icon: 'star-filled' },
+      { value: 'not-favorite', label: i18n.filterNotFavorite || __('Not favorite', 'baselayer'), icon: 'star' },
     ],
     [i18n],
   );
@@ -725,7 +743,7 @@ function BlockSettingsApp() {
       { className: 'bl-block-settings__toolbar' },
       el(
         'div',
-        { className: 'bl-block-settings__toolbar-row' },
+        { className: 'bl-block-settings__toolbar-row bl-admin-form' },
         el(
           'p',
           { className: 'bl-block-settings__search-wrap' },
@@ -771,8 +789,8 @@ function BlockSettingsApp() {
         { key: group.category, className: 'bl-block-settings__group' },
         el('h3', { className: 'bl-block-settings__category' }, group.label),
         el(
-          'div',
-          { className: 'bl-block-settings__grid' },
+          'ul',
+          { className: 'bl-block-settings__list' },
           group.items.map((item) => {
             if (item.kind === 'block') {
               const flags = settings[item.block.name] || { allowed: true, hidden: false, favorite: false };
@@ -833,8 +851,8 @@ function BlockSettingsApp() {
             el('p', { className: 'description' }, i18n.systemBlocksDescription || ''),
             el(SystemBlocksHelp, { help: config.systemBlocksHelp, i18n }),
             el(
-              'div',
-              { className: 'bl-block-settings__system-grid', style: { marginTop: 16 } },
+              'ul',
+              { className: 'bl-block-settings__list bl-block-settings__list--system', style: { marginTop: 16 } },
               systemBlocks.map((block) => el(SystemBlockCard, { key: block.name, block })),
               systemVariations.map(({ blockName, variation }) =>
                 el(SystemVariationCard, {

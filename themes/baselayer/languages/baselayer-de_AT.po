@@ -402,9 +402,6 @@ msgstr "Website-Berichte"
 msgid "Sends a weekly or monthly summary with analytics when Matomo is enabled."
 msgstr "Versendet eine wöchentliche oder monatliche Zusammenfassung mit Analysedaten, wenn Matomo aktiviert ist."
 
-msgid "Website report"
-msgstr "Website-Bericht"
-
 msgid "Recipents"
 msgstr "Empfänger"
 
@@ -2826,6 +2823,24 @@ msgstr "Versteckt"
 msgid "Allowed in inserter"
 msgstr "Im Inserter erlaubt"
 
+msgid "Allow in inserter"
+msgstr "Im Inserter erlauben"
+
+msgid "Disallow from inserter"
+msgstr "Im Inserter nicht erlauben"
+
+msgid "Hide"
+msgstr "Verstecken"
+
+msgid "Show"
+msgstr "Einblenden"
+
+msgid "Add to favorites"
+msgstr "Zu Favoriten hinzufügen"
+
+msgid "Remove from favorites"
+msgstr "Von Favoriten entfernen"
+
 msgid "Inserter visibility"
 msgstr "Sichtbarkeit im Inserter"
 
@@ -2858,7 +2873,7 @@ msgid "All"
 msgstr "Alle"
 
 msgid "Not hidden"
-msgstr "Nicht ausgeblendet"
+msgstr "Nicht versteckt"
 
 msgid "Not favorite"
 msgstr "Kein Favorit"
