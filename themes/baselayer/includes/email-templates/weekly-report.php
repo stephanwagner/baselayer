@@ -8,10 +8,11 @@
 		text-wrap: balance;
 		text-align: center;
 	">
-	<?= wp_kses(__('Your weekly<br>website report', 'baselayer'), ['br' => []]) ?>
+	<?= !empty($email_heading_html) ? $email_heading_html : wp_kses(__('Your weekly<br>website report', 'baselayer'), ['br' => []]) ?>
 </h1>
 <?php
 $insights = is_array($insights ?? null) ? $insights : [];
+$insight_titles = is_array($insight_titles ?? null) ? $insight_titles : [];
 
 $has_insights = !empty($insights['went_live_last_week'])
 	|| !empty($insights['scheduled_upcoming'])
@@ -32,35 +33,35 @@ if (!$has_insights && !$has_matomo) {
 			text-wrap: balance;
 			max-width: 400px;
 		">
-		<?= esc_html__('Everything stayed unchanged last week, no content updates to show.', 'baselayer') ?>
+		<?= !empty($email_empty_html) ? $email_empty_html : esc_html__('Everything stayed unchanged last week, no content updates to show.', 'baselayer') ?>
 	</div>
 	<?php
 } else {
 	foreach (
 		[
 			'went_live_last_week' => [
-				'title' => __('Published last week', 'baselayer'),
+				'title' => (string) ($insight_titles['went_live_last_week'] ?? __('Published last week', 'baselayer')),
 				'th' => [
 					'date' => __('Published on', 'baselayer'),
 					'label' => __('Page or post', 'baselayer'),
 				],
 			],
 			'scheduled_upcoming' => [
-				'title' => __('Upcoming scheduled pages or posts', 'baselayer'),
+				'title' => (string) ($insight_titles['scheduled_upcoming'] ?? __('Upcoming scheduled pages or posts', 'baselayer')),
 				'th' => [
 					'date' => __('Scheduled on', 'baselayer'),
 					'label' => __('Page or post', 'baselayer'),
 				],
 			],
 			'expired_last_week' => [
-				'title' => __('Expired last week', 'baselayer'),
+				'title' => (string) ($insight_titles['expired_last_week'] ?? __('Expired last week', 'baselayer')),
 				'th' => [
 					'date' => __('Expired on', 'baselayer'),
 					'label' => __('Page or post', 'baselayer'),
 				],
 			],
 			'expiring_upcoming' => [
-				'title' => __('Upcoming expirations', 'baselayer'),
+				'title' => (string) ($insight_titles['expiring_upcoming'] ?? __('Upcoming expirations', 'baselayer')),
 				'th' => [
 					'date' => __('Expires on', 'baselayer'),
 					'label' => __('Page or post', 'baselayer'),
@@ -123,7 +124,9 @@ if (!$has_insights && !$has_matomo) {
 			max-width: 320px;
 			font-weight: 600;
 		">
-		<?= wp_kses(__('Visitors and page views <div class="bl-mail__small-mobile-inline">of the last week</div>', 'baselayer'), ['br' => [], 'div' => ['class' => []]]) ?>
+		<?= !empty($daily_section_title_html)
+			? $daily_section_title_html
+			: wp_kses(__('Visitors and page views <div class="bl-mail__small-mobile-inline">of the last week</div>', 'baselayer'), ['br' => [], 'div' => ['class' => []]]) ?>
 	</div>
 	<?php if (!empty($daily_chart_url)) : ?>
 		<img

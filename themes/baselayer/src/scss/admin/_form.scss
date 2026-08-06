@@ -67,8 +67,8 @@ th.form-table-checkbox-label {
   &.active,
   &.active:hover,
   &.active:focus {
-    background: #2271b1;
-    border-color: #2271b1;
+    background: var(--bl-color-primary);
+    border-color: var(--bl-color-primary);
     color: #fff;
     box-shadow: none;
     outline: none;
@@ -80,14 +80,14 @@ button.is-link {
   margin: 0;
   border: none;
   background: none;
-  color: #2271b1;
+  color: var(--bl-color-primary);
   text-decoration: none;
   cursor: pointer;
 
   &:hover,
   &:focus {
     text-decoration: none;
-    color: #0056b3;
+    color: var(--bl-color-primary);
   }
 }
 

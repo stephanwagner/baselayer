@@ -366,26 +366,44 @@ msgstr "An"
 msgid "Please enter a valid email address."
 msgstr "Bitte eine gültige E-Mail-Adresse eingeben."
 
-msgid "Weekly report sender is not available."
-msgstr "Der Versand des wöchentlichen Berichts ist derzeit nicht verfügbar."
+msgid "Report sender is not available."
+msgstr "Der Versand des Berichts ist derzeit nicht verfügbar."
 
-msgid "Weekly website report could not be sent."
+msgid "Website report could not be sent."
 msgstr "Der wöchentliche Website-Bericht konnte nicht gesendet werden."
 
-msgid "Weekly website report sent to %s."
+msgid "Website report sent to %s."
 msgstr "Wöchentlicher Bericht wurde an %s gesendet."
 
-msgid "Weekly website report"
+msgid "Website report"
 msgstr "Wöchentlicher Website-Bericht"
 
 msgid "Sends a weekly summary with analytics when Matomo is enabled."
 msgstr "Versendet eine wöchentliche Zusammenfassung mit Analysedaten, wenn Matomo aktiviert ist."
 
-msgid "Weekly reports"
-msgstr "Wöchentliche Berichte"
-
 msgid "Enable reports"
 msgstr "Website-Berichte aktivieren"
+
+msgid "Day of month"
+msgstr "Tag im Monat"
+
+msgid "Monthly"
+msgstr "Monatlich"
+
+msgid "Weekly"
+msgstr "Wöchentlich"
+
+msgid "Frequency"
+msgstr "Häufigkeit"
+
+msgid "Website reports"
+msgstr "Website-Berichte"
+
+msgid "Sends a weekly or monthly summary with analytics when Matomo is enabled."
+msgstr "Versendet eine wöchentliche oder monatliche Zusammenfassung mit Analysedaten, wenn Matomo aktiviert ist."
+
+msgid "Website report"
+msgstr "Website-Bericht"
 
 msgid "Recipents"
 msgstr "Empfänger"
@@ -2190,7 +2208,37 @@ msgstr "Läuft ab am"
 
 # Weekly report
 
-msgid "Weekly website report – %s"
+msgid "Once Monthly"
+msgstr "Einmal monatlich"
+
+msgid "Sent once per month on the first visit after your chosen day and time."
+msgstr "Wird einmal pro Monat beim ersten Besuch nach deinem gewählten Tag und Zeitpunkt versendet."
+
+msgid "Your monthly<br>website report"
+msgstr "Ihr monatlicher<br>Website-Bericht"
+
+msgid "Visitors and page views <div class=\"bl-mail__small-mobile-inline\">of the last month</div>"
+msgstr "Besucherzahlen und Seitenaufrufe <div class=\"bl-mail__small-mobile-inline\">des letzten Monats</div>"
+
+msgid "Everything stayed unchanged last month, no content updates to show."
+msgstr "Letzten Monat ist alles beim Alten geblieben, es gibt keine Aktualisierungen anzuzeigen."
+
+msgid "Published last month"
+msgstr "Letzten Monat veröffentlicht"
+
+msgid "Expired last month"
+msgstr "Letzten Monat abgelaufen"
+
+msgid "Monthly website report – %s"
+msgstr "Monatlicher Website-Bericht – %s"
+
+msgid "Monthly report"
+msgstr "Monatlicher Bericht"
+
+msgid "If you no longer want to receive these reports, <a href=\"%1$s\">log in to WordPress</a> and disable website reports, or contact the <a href=\"%2$s\">developer</a> or <a href=\"%3$s\">admin</a>."
+msgstr "Wenn Sie diese Berichte nicht mehr erhalten möchten, <a href=\"%1$s\">melden Sie sich in WordPress an</a> und deaktivieren Sie die Website-Berichte oder kontaktieren Sie den <a href=\"%2$s\">Entwickler</a> bzw. den <a href=\"%3$s\">Administrator</a>."
+
+msgid "Website report – %s"
 msgstr "Wöchentlicher Website-Bericht – %s"
 
 msgid "Schedule"
@@ -2207,6 +2255,9 @@ msgstr "Wöchentlicher Bericht"
 
 msgid "Once Weekly"
 msgstr "Einmal wöchentlich"
+
+msgid "Sends the current report to the provided email address."
+msgstr "Sendet den aktuellen Bericht an die angegebene E-Mail-Adresse."
 
 # Media library
 

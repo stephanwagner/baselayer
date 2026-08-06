@@ -178,9 +178,17 @@ add_action('admin_init', function () {
  */
 function bl_theme_settings_save_general_options_from_post(): void
 {
-	$trio_opts = ['baselayer_weekly_report_wday', 'baselayer_weekly_report_hour', 'baselayer_weekly_report_minute'];
+	$trio_opts = [
+		'baselayer_weekly_report_frequency',
+		'baselayer_weekly_report_wday',
+		'baselayer_weekly_report_mday',
+		'baselayer_weekly_report_hour',
+		'baselayer_weekly_report_minute',
+	];
 	$schedule_before = [
+		'baselayer_weekly_report_frequency' => (string) get_option('baselayer_weekly_report_frequency', 'weekly'),
 		'baselayer_weekly_report_wday' => (string) get_option('baselayer_weekly_report_wday', '1'),
+		'baselayer_weekly_report_mday' => (string) get_option('baselayer_weekly_report_mday', '1'),
 		'baselayer_weekly_report_hour' => (string) get_option('baselayer_weekly_report_hour', '8'),
 		'baselayer_weekly_report_minute' => (string) get_option('baselayer_weekly_report_minute', '0'),
 	];
@@ -190,7 +198,9 @@ function bl_theme_settings_save_general_options_from_post(): void
 		'baselayer_weekly_report_enabled' => static function ($raw): string {
 			return !empty($raw) ? '1' : '0';
 		},
+		'baselayer_weekly_report_frequency' => 'bl_sanitize_weekly_report_frequency',
 		'baselayer_weekly_report_wday' => 'bl_sanitize_weekly_report_wday',
+		'baselayer_weekly_report_mday' => 'bl_sanitize_weekly_report_mday',
 		'baselayer_weekly_report_hour' => 'bl_sanitize_weekly_report_hour',
 		'baselayer_weekly_report_minute' => 'bl_sanitize_weekly_report_minute',
 		'baselayer_report_email' => 'bl_sanitize_report_email_list',
@@ -297,7 +307,7 @@ add_action('admin_init', function () {
 		exit;
 	}
 	if (!function_exists('bl_weekly_report_send')) {
-		set_transient('baselayer_weekly_report_send_error', __('Weekly report sender is not available.', 'baselayer'), 30);
+		set_transient('baselayer_weekly_report_send_error', __('Report sender is not available.', 'baselayer'), 30);
 		wp_safe_redirect($url);
 		exit;
 	}
@@ -305,7 +315,7 @@ add_action('admin_init', function () {
 	if ($sent) {
 		set_transient('baselayer_weekly_report_send_success', $recipient, 30);
 	} else {
-		set_transient('baselayer_weekly_report_send_error', __('Weekly website report could not be sent.', 'baselayer'), 30);
+		set_transient('baselayer_weekly_report_send_error', __('Website report could not be sent.', 'baselayer'), 30);
 	}
 	wp_safe_redirect($url);
 	exit;
@@ -537,6 +547,11 @@ add_action('admin_init', function () {
 			return !empty($value) ? '1' : '0';
 		},
 	]);
+	register_setting(BL_THEME_OPTION_GROUP_GENERAL, 'baselayer_weekly_report_frequency', [
+		'type' => 'string',
+		'sanitize_callback' => 'bl_sanitize_weekly_report_frequency',
+		'default' => 'weekly',
+	]);
 	register_setting(BL_THEME_OPTION_GROUP_GENERAL, 'baselayer_report_email', [
 		'type' => 'string',
 		'sanitize_callback' => 'bl_sanitize_report_email_list',
@@ -544,6 +559,11 @@ add_action('admin_init', function () {
 	register_setting(BL_THEME_OPTION_GROUP_GENERAL, 'baselayer_weekly_report_wday', [
 		'type' => 'string',
 		'sanitize_callback' => 'bl_sanitize_weekly_report_wday',
+		'default' => '1',
+	]);
+	register_setting(BL_THEME_OPTION_GROUP_GENERAL, 'baselayer_weekly_report_mday', [
+		'type' => 'string',
+		'sanitize_callback' => 'bl_sanitize_weekly_report_mday',
 		'default' => '1',
 	]);
 	register_setting(BL_THEME_OPTION_GROUP_GENERAL, 'baselayer_weekly_report_hour', [
@@ -1075,7 +1095,7 @@ function theme_settings_page(): void
 			$notices[] = ['type' => 'error', 'message' => __('Redirects were saved, but Apache .htaccess redirects are not available on this server (not Apache, mod_rewrite missing, or .htaccess not writable). Use redirects.method = wordpress in config/theme.php or fix the server.', 'baselayer')];
 		}
 		if ($weekly_send_success !== false) {
-			$notices[] = ['type' => 'success', 'message' => sprintf(__('Weekly website report sent to %s.', 'baselayer'), (string) $weekly_send_success)];
+			$notices[] = ['type' => 'success', 'message' => sprintf(__('Website report sent to %s.', 'baselayer'), (string) $weekly_send_success)];
 		}
 		if ($weekly_send_error !== false) {
 			$notices[] = ['type' => 'error', 'message' => (string) $weekly_send_error];
@@ -1268,53 +1288,108 @@ function theme_settings_page(): void
 
 				<hr>
 
-				<h2 class="title"><?= esc_html__('Weekly website report', 'baselayer') ?></h2>
-				<p class="description" style="margin-bottom: 12px;"><?= esc_html__('Sends a weekly summary with analytics when Matomo is enabled.', 'baselayer') ?></p>
+				<?php
+				$report_enabled = get_option('baselayer_weekly_report_enabled', '0') === '1';
+				$report_frequency = function_exists('bl_weekly_report_frequency')
+					? bl_weekly_report_frequency()
+					: (string) get_option('baselayer_weekly_report_frequency', 'weekly');
+				if ($report_frequency !== 'monthly') {
+					$report_frequency = 'weekly';
+				}
+				?>
+				<h2 class="title"><?= esc_html__('Website report', 'baselayer') ?></h2>
+				<p class="description" style="margin-bottom: 12px;"><?= esc_html__('Sends a weekly or monthly summary with analytics.', 'baselayer') ?></p>
 				<table class="form-table" role="presentation">
 					<tr>
-						<th scope="row"><?= esc_html__('Weekly reports', 'baselayer') ?></th>
+						<th scope="row"><?= esc_html__('Website reports', 'baselayer') ?></th>
 						<td>
 							<label>
 								<input type="hidden" name="baselayer_weekly_report_enabled" value="0">
-								<input type="checkbox" name="baselayer_weekly_report_enabled" value="1" <?= checked(get_option('baselayer_weekly_report_enabled', '0'), '1', false) ?>>
+								<input type="checkbox" name="baselayer_weekly_report_enabled" id="baselayer_weekly_report_enabled" value="1" <?= checked($report_enabled, true, false) ?>>
 								<?= esc_html__('Enable reports', 'baselayer') ?>
 							</label>
 						</td>
 					</tr>
-					<?php
-					if (function_exists('bl_weekly_report_render_schedule_settings_row')) {
-						bl_weekly_report_render_schedule_settings_row();
-					}
-					?>
-					<tr>
-						<th scope="row"><label for="baselayer_report_email"><?= esc_html__('Recipents', 'baselayer') ?></label></th>
-						<td>
-							<textarea name="baselayer_report_email" id="baselayer_report_email" rows="3" class="regular-text"><?= esc_textarea((string) get_option('baselayer_report_email', '')) ?></textarea>
-							<p class="description"><?= esc_html__('One email address per line.', 'baselayer') ?></p>
-						</td>
-					</tr>
-					<tr>
-						<th scope="row"><?= esc_html__('Send report', 'baselayer') ?></th>
-						<td>
-							<div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px; max-width:100%;">
-								<label for="baselayer_weekly_report_manual_recipient" class="screen-reader-text"><?= esc_html__('Recipient email', 'baselayer') ?></label>
-								<input
-									type="email"
-									name="baselayer_weekly_report_manual_recipient"
-									id="baselayer_weekly_report_manual_recipient"
-									form="bl-send-weekly-report-to-developer"
-									value="<?= esc_attr($weekly_manual_send_default_email) ?>"
-									class="regular-text"
-									autocomplete="email"
-								>
-								<button type="submit" form="bl-send-weekly-report-to-developer" class="button"><?= esc_html__('Send report', 'baselayer') ?></button>
-							</div>
-							<p class="description">
-								<?= esc_html__('Sends the current weekly report to provided email address.', 'baselayer') ?>
-							</p>
-						</td>
-					</tr>
 				</table>
+				<div id="bl-website-report-settings"<?= $report_enabled ? '' : ' hidden' ?>>
+					<table class="form-table" role="presentation">
+						<tr>
+							<th scope="row"><label for="baselayer_weekly_report_frequency"><?= esc_html__('Frequency', 'baselayer') ?></label></th>
+							<td>
+								<select name="baselayer_weekly_report_frequency" id="baselayer_weekly_report_frequency">
+									<option value="weekly" <?= selected($report_frequency, 'weekly', false) ?>><?= esc_html__('Weekly', 'baselayer') ?></option>
+									<option value="monthly" <?= selected($report_frequency, 'monthly', false) ?>><?= esc_html__('Monthly', 'baselayer') ?></option>
+								</select>
+							</td>
+						</tr>
+						<?php
+						if (function_exists('bl_weekly_report_render_schedule_settings_row')) {
+							bl_weekly_report_render_schedule_settings_row();
+						}
+						?>
+						<tr>
+							<th scope="row"><label for="baselayer_report_email"><?= esc_html__('Recipents', 'baselayer') ?></label></th>
+							<td>
+								<textarea name="baselayer_report_email" id="baselayer_report_email" rows="3" class="regular-text"><?= esc_textarea((string) get_option('baselayer_report_email', '')) ?></textarea>
+								<p class="description"><?= esc_html__('One email address per line.', 'baselayer') ?></p>
+							</td>
+						</tr>
+						<tr>
+							<th scope="row"><?= esc_html__('Send report', 'baselayer') ?></th>
+							<td>
+								<div style="display:flex; flex-wrap:wrap; align-items:center; gap:8px; max-width:100%;">
+									<label for="baselayer_weekly_report_manual_recipient" class="screen-reader-text"><?= esc_html__('Recipient email', 'baselayer') ?></label>
+									<input
+										type="email"
+										name="baselayer_weekly_report_manual_recipient"
+										id="baselayer_weekly_report_manual_recipient"
+										form="bl-send-weekly-report-to-developer"
+										value="<?= esc_attr($weekly_manual_send_default_email) ?>"
+										class="regular-text"
+										autocomplete="email"
+									>
+									<button type="submit" form="bl-send-weekly-report-to-developer" class="button"><?= esc_html__('Send report', 'baselayer') ?></button>
+								</div>
+								<p class="description">
+									<?= esc_html__('Sends the current report to the provided email address.', 'baselayer') ?>
+								</p>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<script>
+					(function() {
+						var enableEl = document.getElementById('baselayer_weekly_report_enabled');
+						var settingsEl = document.getElementById('bl-website-report-settings');
+						var freqEl = document.getElementById('baselayer_weekly_report_frequency');
+						var wdayWrap = document.getElementById('bl-website-report-wday-wrap');
+						var mdayWrap = document.getElementById('bl-website-report-mday-wrap');
+						var descWeekly = document.getElementById('bl-website-report-schedule-desc-weekly');
+						var descMonthly = document.getElementById('bl-website-report-schedule-desc-monthly');
+
+						function syncReportSettingsVisibility() {
+							if (!settingsEl || !enableEl) return;
+							settingsEl.hidden = !enableEl.checked;
+						}
+
+						function syncFrequencyFields() {
+							var monthly = freqEl && freqEl.value === 'monthly';
+							if (wdayWrap) wdayWrap.hidden = monthly;
+							if (mdayWrap) mdayWrap.hidden = !monthly;
+							if (descWeekly) descWeekly.hidden = monthly;
+							if (descMonthly) descMonthly.hidden = !monthly;
+						}
+
+						if (enableEl) {
+							enableEl.addEventListener('change', syncReportSettingsVisibility);
+						}
+						if (freqEl) {
+							freqEl.addEventListener('change', syncFrequencyFields);
+						}
+						syncReportSettingsVisibility();
+						syncFrequencyFields();
+					})();
+				</script>
 				<div class="bl-submit-row">
 					<button type="submit" class="button button-primary"><?= esc_html__('Save Changes') ?></button>
 				</div>

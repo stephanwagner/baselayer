@@ -9,6 +9,12 @@ add_filter('cron_schedules', function (array $schedules): array {
 			'display' => __('Once Weekly', 'baselayer'),
 		];
 	}
+	if (!isset($schedules['bl_monthly'])) {
+		$schedules['bl_monthly'] = [
+			'interval' => MONTH_IN_SECONDS,
+			'display' => __('Once Monthly', 'baselayer'),
+		];
+	}
 
 	return $schedules;
 });
@@ -21,6 +27,36 @@ function bl_weekly_report_uses_12h_time_format(): bool
 	$tf = get_option('time_format', 'H:i');
 
 	return is_string($tf) && preg_match('/a|A/', $tf) === 1;
+}
+
+/**
+ * Report frequency: weekly (default) or monthly.
+ */
+function bl_weekly_report_frequency(): string
+{
+	$f = (string) get_option('baselayer_weekly_report_frequency', 'weekly');
+
+	return $f === 'monthly' ? 'monthly' : 'weekly';
+}
+
+/**
+ * Sanitize frequency option.
+ *
+ * @param mixed $value Raw option value.
+ */
+function bl_sanitize_weekly_report_frequency($value): string
+{
+	return ((string) $value) === 'monthly' ? 'monthly' : 'weekly';
+}
+
+/**
+ * Sanitize day of month (1–28) for monthly schedule.
+ *
+ * @param mixed $value Raw option value.
+ */
+function bl_sanitize_weekly_report_mday($value): string
+{
+	return (string) max(1, min(28, (int) $value));
 }
 
 /**
@@ -75,19 +111,52 @@ function bl_sanitize_weekly_report_minute($value): string
 }
 
 /**
- * Next Unix timestamp for the configured weekday + time in site timezone (first run ≥ now).
+ * Hour/minute from options (0–23 / 0–55 step 5).
+ *
+ * @return array{0:int,1:int}
+ */
+function bl_weekly_report_schedule_hour_minute(): array
+{
+	$hour = max(0, min(23, (int) get_option('baselayer_weekly_report_hour', '8')));
+	$minute = (int) get_option('baselayer_weekly_report_minute', '0');
+	$minute = max(0, min(55, (int) round($minute / 5) * 5));
+
+	return [$hour, $minute];
+}
+
+/**
+ * Monthly slot for a given year/month at configured day-of-month + time.
+ */
+function bl_weekly_report_monthly_slot(\DateTimeImmutable $ref, int $year, int $month): \DateTimeImmutable
+{
+	$mday = max(1, min(28, (int) get_option('baselayer_weekly_report_mday', '1')));
+	[$hour, $minute] = bl_weekly_report_schedule_hour_minute();
+
+	return $ref->setDate($year, $month, $mday)->setTime($hour, $minute, 0);
+}
+
+/**
+ * Next Unix timestamp for the configured schedule in site timezone (first run > now).
  */
 function bl_weekly_report_next_run_timestamp(): int
 {
 	$tz = function_exists('wp_timezone') ? wp_timezone() : new \DateTimeZone(wp_timezone_string() ?: 'UTC');
 	$now = new \DateTimeImmutable('now', $tz);
-	$wday = (int) get_option('baselayer_weekly_report_wday', '1');
-	$wday = max(0, min(6, $wday));
-	$hour = (int) get_option('baselayer_weekly_report_hour', '8');
-	$hour = max(0, min(23, $hour));
-	$minute = (int) get_option('baselayer_weekly_report_minute', '0');
-	$minute = max(0, min(55, (int) round($minute / 5) * 5));
+	[$hour, $minute] = bl_weekly_report_schedule_hour_minute();
 
+	if (bl_weekly_report_frequency() === 'monthly') {
+		$year = (int) $now->format('Y');
+		$month = (int) $now->format('n');
+		$target = bl_weekly_report_monthly_slot($now, $year, $month);
+		if ($target <= $now) {
+			$next = $now->modify('first day of next month');
+			$target = bl_weekly_report_monthly_slot($now, (int) $next->format('Y'), (int) $next->format('n'));
+		}
+
+		return $target->getTimestamp();
+	}
+
+	$wday = max(0, min(6, (int) get_option('baselayer_weekly_report_wday', '1')));
 	$candidate = $now->setTime($hour, $minute, 0);
 	$current_w = (int) $candidate->format('w');
 	$delta = ($wday - $current_w + 7) % 7;
@@ -100,17 +169,25 @@ function bl_weekly_report_next_run_timestamp(): int
 }
 
 /**
- * Most recent scheduled weekday + time in the site timezone that is on or before $now.
+ * Most recent scheduled slot in the site timezone that is on or before $now.
  */
 function bl_weekly_report_previous_slot_immutable(\DateTimeImmutable $now): \DateTimeImmutable
 {
-	$wday = (int) get_option('baselayer_weekly_report_wday', '1');
-	$wday = max(0, min(6, $wday));
-	$hour = (int) get_option('baselayer_weekly_report_hour', '8');
-	$hour = max(0, min(23, $hour));
-	$minute = (int) get_option('baselayer_weekly_report_minute', '0');
-	$minute = max(0, min(55, (int) round($minute / 5) * 5));
+	[$hour, $minute] = bl_weekly_report_schedule_hour_minute();
 
+	if (bl_weekly_report_frequency() === 'monthly') {
+		$year = (int) $now->format('Y');
+		$month = (int) $now->format('n');
+		$target = bl_weekly_report_monthly_slot($now, $year, $month);
+		if ($target > $now) {
+			$prev = $now->modify('first day of last month');
+			$target = bl_weekly_report_monthly_slot($now, (int) $prev->format('Y'), (int) $prev->format('n'));
+		}
+
+		return $target;
+	}
+
+	$wday = max(0, min(6, (int) get_option('baselayer_weekly_report_wday', '1')));
 	$candidate = $now->setTime($hour, $minute, 0);
 	$current_w = (int) $candidate->format('w');
 	$delta_back = ($current_w - $wday + 7) % 7;
@@ -138,48 +215,69 @@ function bl_weekly_report_week_period_start_for_date(\DateTimeImmutable $local_m
 }
 
 /**
- * Reporting period for the send implied by $now: the 7 full local days ending the day before the slot’s calendar day (e.g. Fri–Thu when the send falls on Friday).
+ * Reporting period for the send implied by $now.
  *
- * @return array{slot:\DateTimeImmutable, week_start:\DateTimeImmutable, week_after_exclusive:\DateTimeImmutable}
+ * Weekly: 7 full local days ending the day before the slot’s calendar day.
+ * Monthly: 30 full local days ending the day before the slot’s calendar day.
+ *
+ * @return array{slot:\DateTimeImmutable, week_start:\DateTimeImmutable, week_after_exclusive:\DateTimeImmutable, period_key:string}
  */
 function bl_weekly_report_report_period_for_now(\DateTimeImmutable $now): array
 {
 	$slot = bl_weekly_report_previous_slot_immutable($now);
 	$week_after_exclusive = $slot->setTime(0, 0, 0);
-	$week_start = $week_after_exclusive->modify('-7 days');
+	$days = bl_weekly_report_frequency() === 'monthly' ? 30 : 7;
+	$week_start = $week_after_exclusive->modify(sprintf('-%d days', $days));
+	$period_key = bl_weekly_report_frequency() === 'monthly'
+		? $slot->format('Y-m')
+		: $week_start->format('Y-m-d');
 
 	return [
 		'slot' => $slot,
 		'week_start' => $week_start,
 		'week_after_exclusive' => $week_after_exclusive,
+		'period_key' => $period_key,
 	];
 }
 
 /**
- * Weekly email daily + insights: last 7 full site-local calendar days ending yesterday (today excluded).
+ * Email daily + insights window: last N full site-local calendar days ending yesterday (today excluded).
  *
  * @return array{start:\DateTimeImmutable, after_exclusive:\DateTimeImmutable}
  */
-function bl_weekly_report_email_daily_window_seven_through_yesterday(\DateTimeZone $tz): array
+function bl_weekly_report_email_daily_window(\DateTimeZone $tz, ?int $days = null): array
 {
+	if ($days === null) {
+		$days = bl_weekly_report_frequency() === 'monthly' ? 30 : 7;
+	}
+	$days = max(1, $days);
 	$today_start = new \DateTimeImmutable('today', $tz);
 	$yesterday_start = $today_start->modify('-1 day');
 
 	return [
-		'start' => $yesterday_start->modify('-6 days')->setTime(0, 0, 0),
+		'start' => $yesterday_start->modify(sprintf('-%d days', $days - 1))->setTime(0, 0, 0),
 		'after_exclusive' => $today_start->setTime(0, 0, 0),
 	];
 }
 
 /**
- * Matomo daily rows for the weekly email chart/table only.
+ * @deprecated Use bl_weekly_report_email_daily_window().
+ * @return array{start:\DateTimeImmutable, after_exclusive:\DateTimeImmutable}
+ */
+function bl_weekly_report_email_daily_window_seven_through_yesterday(\DateTimeZone $tz): array
+{
+	return bl_weekly_report_email_daily_window($tz, 7);
+}
+
+/**
+ * Matomo daily rows for the email chart/table only.
  *
  * @param array<int, array<string, mixed>> $daily_src
  * @return array<int, array<string, mixed>>
  */
-function bl_weekly_report_email_filter_daily_series_seven_through_yesterday(array $daily_src, \DateTimeZone $tz): array
+function bl_weekly_report_email_filter_daily_series(array $daily_src, \DateTimeZone $tz, ?int $days = null): array
 {
-	$window = bl_weekly_report_email_daily_window_seven_through_yesterday($tz);
+	$window = bl_weekly_report_email_daily_window($tz, $days);
 	$start = $window['start'];
 	$after = $window['after_exclusive'];
 	$out = [];
@@ -202,6 +300,16 @@ function bl_weekly_report_email_filter_daily_series_seven_through_yesterday(arra
 	);
 
 	return $out;
+}
+
+/**
+ * @deprecated Use bl_weekly_report_email_filter_daily_series().
+ * @param array<int, array<string, mixed>> $daily_src
+ * @return array<int, array<string, mixed>>
+ */
+function bl_weekly_report_email_filter_daily_series_seven_through_yesterday(array $daily_src, \DateTimeZone $tz): array
+{
+	return bl_weekly_report_email_filter_daily_series($daily_src, $tz, 7);
 }
 
 /**
@@ -263,7 +371,7 @@ function bl_weekly_report_weekly_chart_axis_labels(array $row): array
 }
 
 /**
- * Clear and reschedule the weekly report cron from current options.
+ * Clear and reschedule the website report cron from current options.
  */
 function bl_weekly_report_reschedule_cron(): void
 {
@@ -273,11 +381,12 @@ function bl_weekly_report_reschedule_cron(): void
 	while (($ts = wp_next_scheduled('bl_weekly_report_weekly')) !== false) {
 		wp_unschedule_event($ts, 'bl_weekly_report_weekly');
 	}
-	wp_schedule_event(bl_weekly_report_next_run_timestamp(), 'weekly', 'bl_weekly_report_weekly');
+	$recurrence = bl_weekly_report_frequency() === 'monthly' ? 'bl_monthly' : 'weekly';
+	wp_schedule_event(bl_weekly_report_next_run_timestamp(), $recurrence, 'bl_weekly_report_weekly');
 }
 
 /**
- * General settings: weekday + time (site timezone).
+ * General settings: weekday or day-of-month + time (site timezone).
  */
 function bl_weekly_report_render_schedule_settings_row(): void
 {
@@ -285,7 +394,9 @@ function bl_weekly_report_render_schedule_settings_row(): void
 	if (!$wp_locale instanceof \WP_Locale) {
 		return;
 	}
+	$frequency = bl_weekly_report_frequency();
 	$wday = (string) get_option('baselayer_weekly_report_wday', '1');
+	$mday = (string) get_option('baselayer_weekly_report_mday', '1');
 	$hour_stored = (int) get_option('baselayer_weekly_report_hour', '8');
 	$minute = (string) get_option('baselayer_weekly_report_minute', '0');
 	$use_12h = bl_weekly_report_uses_12h_time_format();
@@ -295,13 +406,21 @@ function bl_weekly_report_render_schedule_settings_row(): void
 		<th scope="row"><?= esc_html__('Schedule', 'baselayer') ?></th>
 		<td>
 			<div style="display:flex; flex-wrap:wrap; align-items:flex-end; gap:12px;">
-				<p style="margin:0;">
+				<p id="bl-website-report-wday-wrap" style="margin:0;"<?= $frequency === 'monthly' ? ' hidden' : '' ?>>
 					<label for="baselayer_weekly_report_wday" style="display: block;margin-bottom: 2px;"><?= esc_html__('Weekday', 'baselayer') ?></label>
 					<select name="baselayer_weekly_report_wday" id="baselayer_weekly_report_wday">
 						<?php for ($k = 0; $k < 7; $k++) :
 							$d = ($start + $k) % 7;
 							?>
 							<option value="<?= esc_attr((string) $d) ?>" <?= selected($wday, (string) $d, false) ?>><?= esc_html($wp_locale->weekday[$d]) ?></option>
+						<?php endfor; ?>
+					</select>
+				</p>
+				<p id="bl-website-report-mday-wrap" style="margin:0;"<?= $frequency !== 'monthly' ? ' hidden' : '' ?>>
+					<label for="baselayer_weekly_report_mday" style="display: block;margin-bottom: 2px;"><?= esc_html__('Day of month', 'baselayer') ?></label>
+					<select name="baselayer_weekly_report_mday" id="baselayer_weekly_report_mday">
+						<?php for ($d = 1; $d <= 28; $d++) : ?>
+							<option value="<?= esc_attr((string) $d) ?>" <?= selected($mday, (string) $d, false) ?>><?= esc_html((string) $d) ?></option>
 						<?php endfor; ?>
 					</select>
 				</p>
@@ -342,7 +461,8 @@ function bl_weekly_report_render_schedule_settings_row(): void
 					</span>
 				</p>
 			</div>
-			<p class="description"><?= esc_html__('Sent once per week on the first visit after your chosen day and time.', 'baselayer') ?></p>
+			<p class="description" id="bl-website-report-schedule-desc-weekly"<?= $frequency === 'monthly' ? ' hidden' : '' ?>><?= esc_html__('Sent once per week on the first visit after your chosen day and time.', 'baselayer') ?></p>
+			<p class="description" id="bl-website-report-schedule-desc-monthly"<?= $frequency !== 'monthly' ? ' hidden' : '' ?>><?= esc_html__('Sent once per month on the first visit after your chosen day and time.', 'baselayer') ?></p>
 		</td>
 	</tr>
 	<?php
@@ -512,7 +632,7 @@ function bl_weekly_report_parse_expiration_timestamp(string $raw): ?int
 }
 
 /**
- * Build the HTML body for weekly report.
+ * Build the HTML body for website report.
  */
 function bl_weekly_report_build_html(): string
 {
@@ -529,10 +649,11 @@ function bl_weekly_report_build_html(): string
 	$date_now = wp_date(get_option('date_format') . ' ' . get_option('time_format'));
 	$matomo_on = function_exists('bl_theme_feature_enabled') && bl_theme_feature_enabled('matomo');
 	$tz = function_exists('wp_timezone') ? wp_timezone() : new \DateTimeZone(wp_timezone_string() ?: 'UTC');
-	$email_daily = bl_weekly_report_email_daily_window_seven_through_yesterday($tz);
+	$frequency = bl_weekly_report_frequency();
+	$is_monthly = $frequency === 'monthly';
+	$email_daily = bl_weekly_report_email_daily_window($tz);
 	$email_daily_start = $email_daily['start'];
 	$email_daily_after_exclusive = $email_daily['after_exclusive'];
-	// CMS + Matomo daily in email only: rolling 7 days through yesterday (not send day / WP week).
 	$insights = bl_weekly_report_build_insights($email_daily_start, $email_daily_after_exclusive);
 
 	$daily = [];
@@ -543,7 +664,7 @@ function bl_weekly_report_build_html(): string
 	if ($matomo_on && function_exists('bl_matomo_get_statistics')) {
 		$series = bl_matomo_get_statistics();
 		$daily_src = isset($series['daily']) && is_array($series['daily']) ? $series['daily'] : [];
-		$daily = bl_weekly_report_email_filter_daily_series_seven_through_yesterday($daily_src, $tz);
+		$daily = bl_weekly_report_email_filter_daily_series($daily_src, $tz);
 
 		$weekly_src = isset($series['weekly']) && is_array($series['weekly']) ? $series['weekly'] : [];
 		$weekly_trend = [];
@@ -627,6 +748,19 @@ function bl_weekly_report_build_html(): string
 			'line'
 		);
 	}
+
+	$email_page_title = $is_monthly
+		? sprintf(
+			/* translators: %s: site name */
+			__('Monthly website report – %s', 'baselayer'),
+			$site_name
+		)
+		: sprintf(
+			/* translators: %s: site name */
+			__('Website report – %s', 'baselayer'),
+			$site_name
+		);
+
 	$template_args = [
 		'site_name' => $site_name,
 		'date_now' => $date_now,
@@ -643,16 +777,32 @@ function bl_weekly_report_build_html(): string
 		'developer_settings_url' => $developer_settings_url,
 		'developer_email_link' => $developer_email_link,
 		'admin_email_link' => $admin_email_link,
-		'email_page_title' => sprintf(
-			/* translators: %s: site name */
-			__('Weekly website report – %s', 'baselayer'),
-			$site_name
-		),
+		'report_frequency' => $frequency,
+		'email_heading_html' => $is_monthly
+			? wp_kses(__('Your monthly<br>website report', 'baselayer'), ['br' => []])
+			: wp_kses(__('Your weekly<br>website report', 'baselayer'), ['br' => []]),
+		'email_empty_html' => $is_monthly
+			? esc_html__('Everything stayed unchanged last month, no content updates to show.', 'baselayer')
+			: esc_html__('Everything stayed unchanged last week, no content updates to show.', 'baselayer'),
+		'insight_titles' => [
+			'went_live_last_week' => $is_monthly
+				? __('Published last month', 'baselayer')
+				: __('Published last week', 'baselayer'),
+			'scheduled_upcoming' => __('Upcoming scheduled pages or posts', 'baselayer'),
+			'expired_last_week' => $is_monthly
+				? __('Expired last month', 'baselayer')
+				: __('Expired last week', 'baselayer'),
+			'expiring_upcoming' => __('Upcoming expirations', 'baselayer'),
+		],
+		'daily_section_title_html' => $is_monthly
+			? wp_kses(__('Visitors and page views <div class="bl-mail__small-mobile-inline">of the last month</div>', 'baselayer'), ['br' => [], 'div' => ['class' => []]])
+			: wp_kses(__('Visitors and page views <div class="bl-mail__small-mobile-inline">of the last week</div>', 'baselayer'), ['br' => [], 'div' => ['class' => []]]),
+		'email_page_title' => $email_page_title,
 		'email_html_lang' => str_replace('_', '-', determine_locale()),
 		'email_footer_html' => wp_kses(
 			sprintf(
 				__(
-					'If you no longer want to receive these reports, <a href="%1$s">log in to WordPress</a> and disable weekly reports, or contact the <a href="%2$s">developer</a> or <a href="%3$s">admin</a>.',
+					'If you no longer want to receive these reports, <a href="%1$s">log in to WordPress</a> and disable website reports, or contact the <a href="%2$s">developer</a> or <a href="%3$s">admin</a>.',
 					'baselayer'
 				),
 				esc_url($theme_settings_url),
@@ -671,7 +821,9 @@ function bl_weekly_report_build_html(): string
 		return $template_html;
 	}
 
-	return '<h2>' . esc_html($site_name) . ' - ' . esc_html__('Weekly report', 'baselayer') . '</h2>';
+	$fallback_label = $is_monthly ? __('Monthly report', 'baselayer') : __('Weekly report', 'baselayer');
+
+	return '<h2>' . esc_html($site_name) . ' - ' . esc_html($fallback_label) . '</h2>';
 }
 
 /**
@@ -721,7 +873,7 @@ function bl_weekly_report_build_chart_url(array $labels, array $series, string $
 }
 
 /**
- * Send Weekly website report to one or many recipients.
+ * Send website report to one or many recipients.
  *
  * @param array<int, string> $emails Recipient list.
  */
@@ -733,11 +885,17 @@ function bl_weekly_report_send(array $emails): bool
 	if ($emails === []) {
 		return false;
 	}
-	$subject = sprintf(
-		/* translators: %s: site name */
-		__('Weekly website report – %s', 'baselayer'),
-		get_bloginfo('name')
-	);
+	$subject = bl_weekly_report_frequency() === 'monthly'
+		? sprintf(
+			/* translators: %s: site name */
+			__('Monthly website report – %s', 'baselayer'),
+			get_bloginfo('name')
+		)
+		: sprintf(
+			/* translators: %s: site name */
+			__('Website report – %s', 'baselayer'),
+			get_bloginfo('name')
+		);
 	$body = bl_weekly_report_build_html();
 	$headers = ['Content-Type: text/html; charset=UTF-8'];
 
@@ -745,7 +903,7 @@ function bl_weekly_report_send(array $emails): bool
 }
 
 /**
- * Weekly sender callback.
+ * Scheduled sender callback.
  */
 function bl_weekly_report_monday_send(): void
 {
@@ -763,7 +921,7 @@ function bl_weekly_report_monday_send(): void
 		$tz = function_exists('wp_timezone') ? wp_timezone() : new \DateTimeZone(wp_timezone_string() ?: 'UTC');
 		$now = new \DateTimeImmutable('now', $tz);
 		$period = bl_weekly_report_report_period_for_now($now);
-		$period_key = $period['week_start']->format('Y-m-d');
+		$period_key = (string) ($period['period_key'] ?? $period['week_start']->format('Y-m-d'));
 		$last_sent = (string) get_option('baselayer_weekly_report_last_sent_week', '');
 		if ($last_sent === $period_key) {
 			return;
@@ -781,7 +939,7 @@ function bl_weekly_report_monday_send(): void
 add_action('bl_weekly_report_weekly', 'bl_weekly_report_monday_send');
 
 /**
- * Ensure weekly cron exists (configured weekday/time, site timezone).
+ * Ensure report cron exists (configured schedule, site timezone).
  */
 add_action('init', function (): void {
 	if (wp_installing()) {
@@ -797,5 +955,6 @@ add_action('init', function (): void {
 	if (wp_next_scheduled('bl_weekly_report_weekly') !== false) {
 		return;
 	}
-	wp_schedule_event(bl_weekly_report_next_run_timestamp(), 'weekly', 'bl_weekly_report_weekly');
+	$recurrence = bl_weekly_report_frequency() === 'monthly' ? 'bl_monthly' : 'weekly';
+	wp_schedule_event(bl_weekly_report_next_run_timestamp(), $recurrence, 'bl_weekly_report_weekly');
 }, 35);
