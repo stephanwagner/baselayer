@@ -675,7 +675,10 @@ body.bl-page-picker-open {
   display: flex;
   flex: 0 0 auto;
   flex-direction: row;
-  width: 100%;
+  align-self: flex-start;
+  width: fit-content;
+  min-width: 280px;
+  max-width: 100%;
   margin: 0;
   border: 1px solid #c3c4c7;
   border-radius: 4px;
@@ -692,13 +695,6 @@ body.bl-page-picker-open {
 }
 .bl-blocks-fields__button-group.-vertical > .bl-blocks-fields__btn-option:last-child {
   border-bottom: 0;
-}
-
-.bl-blocks-modal__body .bl-blocks-fields__button-group {
-  align-self: flex-start;
-  width: fit-content;
-  min-width: 260px;
-  max-width: 100%;
 }
 
 .bl-blocks-fields__btn-option {
@@ -1129,17 +1125,44 @@ button.button-link.bl-blocks-fields__card-remove:focus {
   box-sizing: border-box;
   width: 100%;
   max-width: 100%;
+  --bl-blocks-field-gap: 12px;
 }
 
 .bl-blocks-fields__field-row > .bl-blocks-fields__row {
   box-sizing: border-box;
-  min-width: 0;
+  flex: 0 1 auto;
+  flex-basis: min(100%, var(--bl-blocks-field-width, 100%) - var(--bl-blocks-field-gap) * (1 - var(--bl-blocks-field-width-factor, 1)));
   max-width: 100%;
+  min-width: 0;
+  width: auto;
 }
 .bl-blocks-fields__field-row:not(:has(> :not([hidden]))) {
   display: none !important;
 }
 
+.bl-blocks-fields__columns > .bl-blocks-fields__layout--column {
+  box-sizing: border-box;
+  flex: 0 1 auto;
+  flex-basis: min(100%, var(--bl-blocks-field-width, 100%) - var(--bl-blocks-field-gap) * (1 - var(--bl-blocks-field-width-factor, 1)));
+  max-width: 100%;
+  min-width: 0;
+  width: auto;
+}
+.bl-blocks-fields__columns > .bl-blocks-fields__layout--column.bl-blocks-fields__layout--column-auto {
+  flex: 1 1 0;
+  flex-basis: auto;
+  width: auto;
+}
+
+@media (max-width: 600px) {
+  .bl-blocks-fields__field-row > .bl-blocks-fields__row,
+  .bl-blocks-fields__columns > .bl-blocks-fields__layout--column {
+    flex: 0 1 auto;
+    flex-basis: 100%;
+    width: 100% !important;
+    max-width: 100%;
+  }
+}
 .bl-blocks-fields__layout--column {
   display: flex;
   flex-direction: column;
@@ -1173,7 +1196,9 @@ button.button-link.bl-blocks-fields__card-remove:focus {
 .bl-blocks-sidebar-fields .bl-blocks-fields__section-title,
 .bl-blocks-sidebar-fields .bl-blocks-fields__heading,
 .bl-blocks-modal__body .bl-blocks-fields__section-title,
-.bl-blocks-modal__body .bl-blocks-fields__heading {
+.bl-blocks-modal__body .bl-blocks-fields__heading,
+.bl-blocks-website__main .bl-blocks-fields__section-title,
+.bl-blocks-website__main .bl-blocks-fields__heading {
   margin: 0;
   white-space: pre-line;
   font-weight: 600;
@@ -1182,17 +1207,22 @@ button.button-link.bl-blocks-fields__card-remove:focus {
   text-transform: none;
 }
 .bl-blocks-sidebar-fields h2.bl-blocks-fields__heading,
-.bl-blocks-modal__body h2.bl-blocks-fields__heading {
+.bl-blocks-modal__body h2.bl-blocks-fields__heading,
+.bl-blocks-website__main h2.bl-blocks-fields__heading {
   font-size: 17px;
 }
 .bl-blocks-sidebar-fields h3.bl-blocks-fields__heading,
 .bl-blocks-sidebar-fields h3.bl-blocks-fields__section-title,
 .bl-blocks-modal__body h3.bl-blocks-fields__heading,
-.bl-blocks-modal__body h3.bl-blocks-fields__section-title {
+.bl-blocks-modal__body h3.bl-blocks-fields__section-title,
+.bl-blocks-website__main h3.bl-blocks-fields__heading,
+.bl-blocks-website__main h3.bl-blocks-fields__section-title {
   font-size: 15px;
+  margin: 0 0 12px;
 }
 .bl-blocks-sidebar-fields h4.bl-blocks-fields__heading,
-.bl-blocks-modal__body h4.bl-blocks-fields__heading {
+.bl-blocks-modal__body h4.bl-blocks-fields__heading,
+.bl-blocks-website__main h4.bl-blocks-fields__heading {
   font-size: 13px;
 }
 
@@ -1213,7 +1243,25 @@ button.button-link.bl-blocks-fields__card-remove:focus {
 .bl-blocks-modal__body .bl-blocks-fields__tab-panel > * + .bl-blocks-fields__repeater--outline,
 .bl-blocks-modal__body .bl-blocks-fields__tab-panel > * + .bl-blocks-fields__repeater--card,
 .bl-blocks-modal__body .bl-blocks-fields__tab-panel > * + .bl-blocks-fields__tab-panel--outline,
-.bl-blocks-modal__body .bl-blocks-fields__tab-panel > * + .bl-blocks-fields__tab-panel--card {
+.bl-blocks-modal__body .bl-blocks-fields__tab-panel > * + .bl-blocks-fields__tab-panel--card,
+.bl-blocks-website__main .bl-blocks-fields > * + .bl-blocks-fields__layout--outline,
+.bl-blocks-website__main .bl-blocks-fields > * + .bl-blocks-fields__layout--card,
+.bl-blocks-website__main .bl-blocks-fields > * + .bl-blocks-fields__repeater--outline,
+.bl-blocks-website__main .bl-blocks-fields > * + .bl-blocks-fields__repeater--card,
+.bl-blocks-website__main .bl-blocks-fields > * + .bl-blocks-fields__tab-panel--outline,
+.bl-blocks-website__main .bl-blocks-fields > * + .bl-blocks-fields__tab-panel--card,
+.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > * + .bl-blocks-fields__layout--outline,
+.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > * + .bl-blocks-fields__layout--card,
+.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > * + .bl-blocks-fields__repeater--outline,
+.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > * + .bl-blocks-fields__repeater--card,
+.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > * + .bl-blocks-fields__tab-panel--outline,
+.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > * + .bl-blocks-fields__tab-panel--card,
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > * + .bl-blocks-fields__layout--outline,
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > * + .bl-blocks-fields__layout--card,
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > * + .bl-blocks-fields__repeater--outline,
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > * + .bl-blocks-fields__repeater--card,
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > * + .bl-blocks-fields__tab-panel--outline,
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > * + .bl-blocks-fields__tab-panel--card {
   padding-top: 12px;
   border-top: 1px solid #c3c4c7;
 }
@@ -1234,7 +1282,25 @@ button.button-link.bl-blocks-fields__card-remove:focus {
 .bl-blocks-modal__body .bl-blocks-fields__tab-panel > .bl-blocks-fields__repeater--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
 .bl-blocks-modal__body .bl-blocks-fields__tab-panel > .bl-blocks-fields__repeater--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
 .bl-blocks-modal__body .bl-blocks-fields__tab-panel > .bl-blocks-fields__tab-panel--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-modal__body .bl-blocks-fields__tab-panel > .bl-blocks-fields__tab-panel--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card) {
+.bl-blocks-modal__body .bl-blocks-fields__tab-panel > .bl-blocks-fields__tab-panel--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields > .bl-blocks-fields__layout--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields > .bl-blocks-fields__layout--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields > .bl-blocks-fields__repeater--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields > .bl-blocks-fields__repeater--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields > .bl-blocks-fields__tab-panel--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields > .bl-blocks-fields__tab-panel--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__layout--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__layout--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__repeater--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__repeater--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__tab-panel--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__tab-panel--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > .bl-blocks-fields__layout--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > .bl-blocks-fields__layout--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > .bl-blocks-fields__repeater--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > .bl-blocks-fields__repeater--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > .bl-blocks-fields__tab-panel--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > .bl-blocks-fields__tab-panel--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card) {
   margin-top: 16px;
   padding-top: 0;
   border-top: 0;
@@ -2012,9 +2078,23 @@ body.post-new-php.post-type-bl_block .page-title-action {
   padding: 0;
   list-style: none;
   border: 1px solid #c3c4c7;
-  border-radius: 4px;
+  border-radius: var(--bl-admin-radius);
   background: #fff;
-  overflow: hidden;
+}
+.bl-blocks-website__tabs ul li {
+  position: relative;
+  margin: 0;
+}
+.bl-blocks-website__tabs ul li:focus-within {
+  z-index: 1;
+}
+.bl-blocks-website__tabs ul li:first-child a {
+  border-top-left-radius: var(--bl-admin-radius);
+  border-top-right-radius: var(--bl-admin-radius);
+}
+.bl-blocks-website__tabs ul li:first-child:last-child a {
+  border-bottom-left-radius: var(--bl-admin-radius);
+  border-bottom-right-radius: var(--bl-admin-radius);
 }
 
 .bl-blocks-website__tabs a {
@@ -2023,6 +2103,7 @@ body.post-new-php.post-type-bl_block .page-title-action {
   text-decoration: none;
   color: #1d2327;
   border-bottom: 1px solid #dcdcde;
+  word-break: break-word;
 }
 
 .bl-blocks-website__tabs li:last-child a {
@@ -2037,8 +2118,13 @@ body.post-new-php.post-type-bl_block .page-title-action {
 .bl-blocks-website__main {
   background: #fff;
   border: 1px solid #c3c4c7;
-  border-radius: 4px;
+  border-radius: var(--bl-admin-radius);
   padding: 16px 20px 20px;
+}
+.bl-blocks-website__main p.submit {
+  padding-bottom: 0;
+  margin-bottom: 0;
+  margin-top: 16px;
 }
 
 .bl-blocks-website__title {

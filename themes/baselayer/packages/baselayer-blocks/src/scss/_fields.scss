@@ -237,7 +237,10 @@
   display: flex;
   flex: 0 0 auto;
   flex-direction: row;
-  width: 100%;
+  align-self: flex-start;
+  width: fit-content;
+  min-width: 280px;
+  max-width: 100%;
   margin: 0;
   border: 1px solid #c3c4c7;
   border-radius: 4px;
@@ -257,13 +260,6 @@
       }
     }
   }
-}
-
-.bl-blocks-modal__body .bl-blocks-fields__button-group {
-  align-self: flex-start;
-  width: fit-content;
-  min-width: 260px;
-  max-width: 100%;
 }
 
 .bl-blocks-fields__btn-option {
@@ -716,18 +712,59 @@ button.button-link.bl-blocks-fields__card-remove {
   box-sizing: border-box;
   width: 100%;
   max-width: 100%;
+  --bl-blocks-field-gap: 12px;
 }
 
 .bl-blocks-fields__field-row {
   > .bl-blocks-fields__row {
     box-sizing: border-box;
-    min-width: 0;
+    flex: 0 1 auto;
+    flex-basis: min(
+      100%,
+      calc(
+        var(--bl-blocks-field-width, 100%) -
+          (var(--bl-blocks-field-gap) * (1 - var(--bl-blocks-field-width-factor, 1)))
+      )
+    );
     max-width: 100%;
+    min-width: 0;
+    width: auto;
   }
 
   // All children hidden by conditional logic — drop wrapper + sibling separator.
   &:not(:has(> :not([hidden]))) {
     display: none !important;
+  }
+}
+
+.bl-blocks-fields__columns > .bl-blocks-fields__layout--column {
+  box-sizing: border-box;
+  flex: 0 1 auto;
+  flex-basis: min(
+    100%,
+    calc(
+      var(--bl-blocks-field-width, 100%) -
+        (var(--bl-blocks-field-gap) * (1 - var(--bl-blocks-field-width-factor, 1)))
+    )
+  );
+  max-width: 100%;
+  min-width: 0;
+  width: auto;
+
+  &.bl-blocks-fields__layout--column-auto {
+    flex: 1 1 0;
+    flex-basis: auto;
+    width: auto;
+  }
+}
+
+@media (max-width: 600px) {
+  .bl-blocks-fields__field-row > .bl-blocks-fields__row,
+  .bl-blocks-fields__columns > .bl-blocks-fields__layout--column {
+    flex: 0 1 auto;
+    flex-basis: 100%;
+    width: 100% !important;
+    max-width: 100%;
   }
 }
 
@@ -766,7 +803,8 @@ button.button-link.bl-blocks-fields__card-remove {
 }
 
 .bl-blocks-sidebar-fields,
-.bl-blocks-modal__body {
+.bl-blocks-modal__body,
+.bl-blocks-website__main {
   .bl-blocks-fields__section-title,
   .bl-blocks-fields__heading {
     margin: 0;
@@ -784,6 +822,7 @@ button.button-link.bl-blocks-fields__card-remove {
   h3.bl-blocks-fields__heading,
   h3.bl-blocks-fields__section-title {
     font-size: 15px;
+    margin: 0 0 12px;
   }
 
   h4.bl-blocks-fields__heading {
@@ -791,8 +830,9 @@ button.button-link.bl-blocks-fields__card-remove {
   }
 }
 
-// Modal: keep outline/card chrome; drop the field separator after boxed layouts.
-.bl-blocks-modal__body {
+// Modal + Website: keep outline/card chrome; drop the field separator after boxed layouts.
+.bl-blocks-modal__body,
+.bl-blocks-website__main {
   .bl-blocks-fields,
   .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column),
   .bl-blocks-fields__tab-panel {

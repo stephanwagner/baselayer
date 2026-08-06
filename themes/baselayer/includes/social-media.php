@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Social media links from Theme Settings (ACF options).
+ * Social media links from Website settings (ACF options or Baselayer site_settings).
  */
 
 defined('ABSPATH') || exit;
@@ -63,20 +63,43 @@ function bl_social_media_label_from_url(string $url): string
 }
 
 /**
+ * Preset channel map + custom channels raw data for the current storage backend.
+ *
+ * @return array{0: array<string, mixed>, 1: list<array<string, mixed>>}
+ */
+function bl_social_media_raw_sources(): array
+{
+	if (function_exists('bl_website_uses_acf') && bl_website_uses_acf()) {
+		if (!function_exists('get_field')) {
+			return [[], []];
+		}
+		$social = get_field('social_media', 'option');
+		$social = is_array($social) ? $social : [];
+		$custom = get_field('custom_channels', 'option');
+		$custom = is_array($custom) ? $custom : [];
+
+		return [$social, $custom];
+	}
+
+	$values = function_exists('bl_website_site_values') ? bl_website_site_values('social-media') : [];
+	$custom = isset($values['custom_channels']) && is_array($values['custom_channels'])
+		? $values['custom_channels']
+		: [];
+
+	return [$values, $custom];
+}
+
+/**
  * Collect social links from preset channels + custom repeater.
  *
  * @return list<array{url: string, label: string, icon_class?: string, svg?: string}>
  */
 function bl_get_social_media_links(): array
 {
-	if (!function_exists('get_field')) {
-		return [];
-	}
+	[$social, $custom] = bl_social_media_raw_sources();
 
 	$links = [];
 	$labels = bl_social_media_channel_labels();
-	$social = get_field('social_media', 'option');
-	$social = is_array($social) ? $social : [];
 
 	for ($i = 1; $i <= 6; $i++) {
 		$url = trim((string) ($social['url_' . $i] ?? ''));
@@ -92,11 +115,6 @@ function bl_get_social_media_links(): array
 			'label' => $labels[$channel],
 			'icon_class' => '-icon-' . $channel,
 		];
-	}
-
-	$custom = get_field('custom_channels', 'option');
-	if (!is_array($custom)) {
-		return $links;
 	}
 
 	foreach ($custom as $row) {

@@ -32,9 +32,13 @@ function bl_blocks_render_website_page(): void
 		}
 		if ($config !== null) {
 			$slug = bl_blocks_definition_slug($def_id, $config['settings']);
-			$raw = isset($_POST['bl_blocks_values']) && is_array($_POST['bl_blocks_values'])
-				? wp_unslash($_POST['bl_blocks_values'])
-				: [];
+			$raw = [];
+			if (isset($_POST['bl_blocks_values_json'])) {
+				$decoded = json_decode(wp_unslash((string) $_POST['bl_blocks_values_json']), true);
+				if (is_array($decoded)) {
+					$raw = $decoded;
+				}
+			}
 			$values = bl_blocks_sanitize_values($config['fields'], $raw);
 			update_option(bl_blocks_site_option_key($slug), $values, false);
 			echo '<div class="notice notice-success is-dismissible"><p>'
@@ -111,11 +115,23 @@ function bl_blocks_render_website_page(): void
 		if (!empty($config['settings']['description'])) {
 			echo '<p class="description">' . esc_html((string) $config['settings']['description']) . '</p>';
 		}
-		echo '<form method="post" action="">';
+		$payload = wp_json_encode(
+			[
+				'fields' => isset($config['fields']) && is_array($config['fields']) ? $config['fields'] : [],
+				'values' => $values,
+			],
+			JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE
+		);
+		if (!is_string($payload)) {
+			$payload = '{"fields":[],"values":{}}';
+		}
+		echo '<form method="post" action="" class="bl-blocks-website__form">';
 		wp_nonce_field('bl_blocks_save_website', 'bl_blocks_website_nonce');
 		echo '<input type="hidden" name="bl_blocks_definition_id" value="' . esc_attr((string) $current->ID) . '">';
-		// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside renderer.
-		echo bl_blocks_render_admin_fields($config['fields'], $values);
+		echo '<input type="hidden" name="bl_blocks_values_json" value="" data-bl-blocks-website-json>';
+		echo '<div data-bl-blocks-website-fields>';
+		echo '<script type="application/json" data-bl-blocks-website-config>' . $payload . '</script>';
+		echo '</div>';
 		echo '<p class="submit"><button type="submit" class="button button-primary">' . esc_html__('Save Changes', 'baselayer-blocks') . '</button></p>';
 		echo '</form>';
 	}

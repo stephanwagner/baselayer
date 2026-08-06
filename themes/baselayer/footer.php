@@ -2,8 +2,7 @@
 	<div class="footer__container container">
 		<div class="footer__text">
 			<?php
-			$company = function_exists('get_field') ? get_field('company', 'option') : null;
-			$company = is_array($company) ? $company : [];
+			$company = function_exists('bl_get_company') ? bl_get_company() : [];
 			$company_name = (string) ($company['name'] ?? '');
 			$company_address = (string) ($company['address'] ?? '');
 			$company_phone = (string) ($company['phone'] ?? '');

@@ -971,7 +971,12 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 			<?= bl_forms_field_label_html($field, $input_id, $req_mark) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<select class="bl-form__control" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($select_name) ?>"<?= $multiple ? ' multiple' : '' ?><?= $choice_attrs ?><?= $readonly_attr ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
-				<?php if (!$multiple) : ?>
+				<?php
+				$allow_null = !$multiple && (
+					!array_key_exists('allow_null', $field) || !empty($field['allow_null'])
+				);
+				if ($allow_null) :
+					?>
 					<option value=""<?= ($readonly && $has_defaults) ? ' disabled' : '' ?>><?= esc_html($placeholder !== '' ? $placeholder : __('Please select…', 'baselayer-forms')) ?></option>
 				<?php endif; ?>
 				<?php foreach ($options as $opt) :

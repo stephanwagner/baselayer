@@ -1739,6 +1739,19 @@ function bl_forms_sanitize_field($field): ?array
 		$out['multiple'] = !empty($field['multiple']);
 	}
 
+	if ($type === 'select') {
+		if (!empty($out['multiple'])) {
+			unset($out['allow_null']);
+		} else {
+			// Default true so existing definitions keep a blank option.
+			$out['allow_null'] = !array_key_exists('allow_null', $field)
+				? true
+				: !empty($field['allow_null']);
+		}
+	} else {
+		unset($out['allow_null']);
+	}
+
 	if ($type === 'page') {
 		$out['post_types'] = function_exists('bl_page_picker_sanitize_post_types')
 			? bl_page_picker_sanitize_post_types($field['post_types'] ?? null)

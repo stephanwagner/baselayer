@@ -1447,5 +1447,1067 @@
                 "post"
             ]
         }
+    },
+    {
+        "type": "site_settings",
+        "title": "General",
+        "fields": [
+            {
+                "id": "fld_ws_gen_company",
+                "type": "section",
+                "label": "Company details",
+                "show_title": true,
+                "design": "outline",
+                "width": "100",
+                "children": [
+                    {
+                        "id": "fld_ws_gen_name",
+                        "type": "text",
+                        "name": "name",
+                        "label": "Company name",
+                        "required": false,
+                        "width": "100",
+                        "default_value": ""
+                    },
+                    {
+                        "id": "fld_ws_gen_address",
+                        "type": "textarea",
+                        "name": "address",
+                        "label": "Address",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "rows": 3
+                    },
+                    {
+                        "id": "fld_ws_gen_phone",
+                        "type": "text",
+                        "name": "phone",
+                        "label": "Phone",
+                        "required": false,
+                        "width": "100",
+                        "default_value": ""
+                    },
+                    {
+                        "id": "fld_ws_gen_email",
+                        "type": "text",
+                        "name": "email",
+                        "label": "Email address",
+                        "required": false,
+                        "width": "100",
+                        "default_value": ""
+                    }
+                ]
+            }
+        ],
+        "settings": {
+            "active": true,
+            "slug": "general",
+            "description": "",
+            "menu_label": "General",
+            "menu_order": 10
+        }
+    },
+    {
+        "type": "site_settings",
+        "title": "Social media",
+        "fields": [
+            {
+                "id": "fld_ws_sm_channels",
+                "type": "section",
+                "label": "Social media channels",
+                "show_title": true,
+                "design": "outline",
+                "width": "100",
+                "children": [
+                    {
+                        "id": "fld_ws_sm_channel_1",
+                        "type": "select",
+                        "name": "channel_1",
+                        "label": "Channel",
+                        "required": false,
+                        "width": "20",
+                        "default_value": "facebook",
+                        "options": [
+                            {
+                                "value": "facebook",
+                                "label": "Facebook"
+                            },
+                            {
+                                "value": "instagram",
+                                "label": "Instagram"
+                            },
+                            {
+                                "value": "youtube",
+                                "label": "YouTube"
+                            },
+                            {
+                                "value": "linkedin",
+                                "label": "LinkedIn"
+                            },
+                            {
+                                "value": "x",
+                                "label": "X (Twitter)"
+                            },
+                            {
+                                "value": "tiktok",
+                                "label": "TikTok"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_ws_sm_url_1",
+                        "type": "url",
+                        "name": "url_1",
+                        "label": "URL",
+                        "required": false,
+                        "width": "80",
+                        "default_value": ""
+                    },
+                    {
+                        "id": "fld_ws_sm_channel_2",
+                        "type": "select",
+                        "name": "channel_2",
+                        "label": "Channel",
+                        "required": false,
+                        "width": "20",
+                        "default_value": "facebook",
+                        "options": [
+                            {
+                                "value": "facebook",
+                                "label": "Facebook"
+                            },
+                            {
+                                "value": "instagram",
+                                "label": "Instagram"
+                            },
+                            {
+                                "value": "youtube",
+                                "label": "YouTube"
+                            },
+                            {
+                                "value": "linkedin",
+                                "label": "LinkedIn"
+                            },
+                            {
+                                "value": "x",
+                                "label": "X (Twitter)"
+                            },
+                            {
+                                "value": "tiktok",
+                                "label": "TikTok"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_ws_sm_url_2",
+                        "type": "url",
+                        "name": "url_2",
+                        "label": "URL",
+                        "required": false,
+                        "width": "80",
+                        "default_value": ""
+                    },
+                    {
+                        "id": "fld_ws_sm_channel_3",
+                        "type": "select",
+                        "name": "channel_3",
+                        "label": "Channel",
+                        "required": false,
+                        "width": "20",
+                        "default_value": "facebook",
+                        "options": [
+                            {
+                                "value": "facebook",
+                                "label": "Facebook"
+                            },
+                            {
+                                "value": "instagram",
+                                "label": "Instagram"
+                            },
+                            {
+                                "value": "youtube",
+                                "label": "YouTube"
+                            },
+                            {
+                                "value": "linkedin",
+                                "label": "LinkedIn"
+                            },
+                            {
+                                "value": "x",
+                                "label": "X (Twitter)"
+                            },
+                            {
+                                "value": "tiktok",
+                                "label": "TikTok"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_ws_sm_url_3",
+                        "type": "url",
+                        "name": "url_3",
+                        "label": "URL",
+                        "required": false,
+                        "width": "80",
+                        "default_value": ""
+                    },
+                    {
+                        "id": "fld_ws_sm_channel_4",
+                        "type": "select",
+                        "name": "channel_4",
+                        "label": "Channel",
+                        "required": false,
+                        "width": "20",
+                        "default_value": "facebook",
+                        "options": [
+                            {
+                                "value": "facebook",
+                                "label": "Facebook"
+                            },
+                            {
+                                "value": "instagram",
+                                "label": "Instagram"
+                            },
+                            {
+                                "value": "youtube",
+                                "label": "YouTube"
+                            },
+                            {
+                                "value": "linkedin",
+                                "label": "LinkedIn"
+                            },
+                            {
+                                "value": "x",
+                                "label": "X (Twitter)"
+                            },
+                            {
+                                "value": "tiktok",
+                                "label": "TikTok"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_ws_sm_url_4",
+                        "type": "url",
+                        "name": "url_4",
+                        "label": "URL",
+                        "required": false,
+                        "width": "80",
+                        "default_value": ""
+                    },
+                    {
+                        "id": "fld_ws_sm_channel_5",
+                        "type": "select",
+                        "name": "channel_5",
+                        "label": "Channel",
+                        "required": false,
+                        "width": "20",
+                        "default_value": "facebook",
+                        "options": [
+                            {
+                                "value": "facebook",
+                                "label": "Facebook"
+                            },
+                            {
+                                "value": "instagram",
+                                "label": "Instagram"
+                            },
+                            {
+                                "value": "youtube",
+                                "label": "YouTube"
+                            },
+                            {
+                                "value": "linkedin",
+                                "label": "LinkedIn"
+                            },
+                            {
+                                "value": "x",
+                                "label": "X (Twitter)"
+                            },
+                            {
+                                "value": "tiktok",
+                                "label": "TikTok"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_ws_sm_url_5",
+                        "type": "url",
+                        "name": "url_5",
+                        "label": "URL",
+                        "required": false,
+                        "width": "80",
+                        "default_value": ""
+                    },
+                    {
+                        "id": "fld_ws_sm_channel_6",
+                        "type": "select",
+                        "name": "channel_6",
+                        "label": "Channel",
+                        "required": false,
+                        "width": "20",
+                        "default_value": "facebook",
+                        "options": [
+                            {
+                                "value": "facebook",
+                                "label": "Facebook"
+                            },
+                            {
+                                "value": "instagram",
+                                "label": "Instagram"
+                            },
+                            {
+                                "value": "youtube",
+                                "label": "YouTube"
+                            },
+                            {
+                                "value": "linkedin",
+                                "label": "LinkedIn"
+                            },
+                            {
+                                "value": "x",
+                                "label": "X (Twitter)"
+                            },
+                            {
+                                "value": "tiktok",
+                                "label": "TikTok"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_ws_sm_url_6",
+                        "type": "url",
+                        "name": "url_6",
+                        "label": "URL",
+                        "required": false,
+                        "width": "80",
+                        "default_value": ""
+                    }
+                ]
+            },
+            {
+                "id": "fld_ws_sm_custom",
+                "type": "repeater",
+                "name": "custom_channels",
+                "label": "More channels",
+                "required": false,
+                "width": "100",
+                "default_value": "",
+                "button_label": "Add channel",
+                "min_rows": 0,
+                "max_rows": 0,
+                "children": [
+                    {
+                        "id": "fld_ws_sm_icon_type",
+                        "type": "button_group",
+                        "name": "icon_type",
+                        "label": "Icon type",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "classname",
+                        "options": [
+                            {
+                                "value": "classname",
+                                "label": "Class name"
+                            },
+                            {
+                                "value": "code",
+                                "label": "SVG code"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_ws_sm_custom_url",
+                        "type": "url",
+                        "name": "url",
+                        "label": "URL",
+                        "required": false,
+                        "width": "100",
+                        "default_value": ""
+                    },
+                    {
+                        "id": "fld_ws_sm_classname",
+                        "type": "text",
+                        "name": "classname",
+                        "label": "Class name",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "description": "Enter the icon class in the format -icon-name. You can find and copy icons and classes in Developer settings.",
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_ws_sm_icon_type",
+                                        "operator": "==",
+                                        "value": "classname"
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "fld_ws_sm_svg",
+                        "type": "textarea",
+                        "name": "svg_code",
+                        "label": "Enter SVG code",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "rows": 4,
+                        "allow_html": "svg",
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_ws_sm_icon_type",
+                                        "operator": "==",
+                                        "value": "code"
+                                    }
+                                ]
+                            ]
+                        }
+                    }
+                ]
+            }
+        ],
+        "settings": {
+            "active": true,
+            "slug": "social-media",
+            "description": "",
+            "menu_label": "Social media",
+            "menu_order": 20
+        }
+    },
+    {
+        "type": "site_settings",
+        "title": "Search engines",
+        "fields": [
+            {
+                "id": "fld_ws_se_intro",
+                "type": "text_block",
+                "label": "",
+                "default_value": "Add structured data for your website here. This helps search engines understand your company and content and can improve how it appears in search results.",
+                "content": "Add structured data for your website here. This helps search engines understand your company and content and can improve how it appears in search results.",
+                "width": "100"
+            },
+            {
+                "id": "fld_ws_se_has_schema",
+                "type": "toggle",
+                "name": "has_schema",
+                "label": "Use Schema.org",
+                "required": false,
+                "width": "100",
+                "default_value": "",
+                "content": "Use Schema.org",
+                "hide_label": true
+            },
+            {
+                "id": "fld_ws_se_schema",
+                "type": "section",
+                "label": "Schema data",
+                "show_title": true,
+                "design": "outline",
+                "width": "100",
+                "children": [
+                    {
+                        "id": "fld_ws_se_type",
+                        "type": "select",
+                        "name": "type",
+                        "label": "Type",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "LocalBusiness",
+                        "options": [
+                            {
+                                "value": "LocalBusiness",
+                                "label": "Local business"
+                            },
+                            {
+                                "value": "Organization",
+                                "label": "Organization"
+                            },
+                            {
+                                "value": "Corporation",
+                                "label": "Company"
+                            },
+                            {
+                                "value": "ProfessionalService",
+                                "label": "Service"
+                            },
+                            {
+                                "value": "Store",
+                                "label": "Store"
+                            },
+                            {
+                                "value": "Restaurant",
+                                "label": "Restaurant"
+                            },
+                            {
+                                "value": "EducationalOrganization",
+                                "label": "Educational organization"
+                            },
+                            {
+                                "value": "NonprofitOrganization",
+                                "label": "Nonprofit organization"
+                            },
+                            {
+                                "value": "Person",
+                                "label": "Person"
+                            }
+                        ],
+                        "description": "Choose the Schema.org type that best describes the website or organization."
+                    },
+                    {
+                        "id": "fld_ws_se_org",
+                        "type": "text",
+                        "name": "organization_name",
+                        "label": "Company name",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "description": "The official name of the company or organization."
+                    },
+                    {
+                        "id": "fld_ws_se_desc",
+                        "type": "textarea",
+                        "name": "description",
+                        "label": "Description",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "rows": 3,
+                        "description": "A short description of the company. 120–160 characters recommended."
+                    },
+                    {
+                        "id": "fld_ws_se_logo",
+                        "type": "image",
+                        "name": "logo",
+                        "label": "Logo",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "description": "The main company logo. Preferably an SVG or high-resolution PNG."
+                    },
+                    {
+                        "id": "fld_ws_se_image",
+                        "type": "image",
+                        "name": "image",
+                        "label": "Image",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "description": "A representative image of the company, e.g. office, store, or team."
+                    },
+                    {
+                        "id": "fld_ws_se_phone",
+                        "type": "text",
+                        "name": "phone",
+                        "label": "Phone number",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "description": "The main phone number, preferably in international format (e.g. +49 821 123456)."
+                    },
+                    {
+                        "id": "fld_ws_se_email",
+                        "type": "text",
+                        "name": "email",
+                        "label": "Email address",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "description": "The main contact email address."
+                    },
+                    {
+                        "id": "fld_ws_se_website",
+                        "type": "url",
+                        "name": "website",
+                        "label": "Website",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "description": "The website URL. Leave empty to use the site address automatically."
+                    },
+                    {
+                        "id": "fld_ws_se_street",
+                        "type": "text",
+                        "name": "street",
+                        "label": "Street",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "description": "Street name and house number."
+                    },
+                    {
+                        "id": "fld_ws_se_zip",
+                        "type": "text",
+                        "name": "zip",
+                        "label": "Postal code",
+                        "required": false,
+                        "width": "33",
+                        "default_value": ""
+                    },
+                    {
+                        "id": "fld_ws_se_city",
+                        "type": "text",
+                        "name": "city",
+                        "label": "City",
+                        "required": false,
+                        "width": "33",
+                        "default_value": ""
+                    },
+                    {
+                        "id": "fld_ws_se_country",
+                        "type": "text",
+                        "name": "country",
+                        "label": "Country",
+                        "required": false,
+                        "width": "34",
+                        "default_value": "",
+                        "description": "Country name or ISO 3166-1 alpha-2 code (e.g. Germany or DE)."
+                    },
+                    {
+                        "id": "fld_ws_se_profiles",
+                        "type": "repeater",
+                        "name": "social_profiles",
+                        "label": "Social media profiles",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "button_label": "Add profile",
+                        "min_rows": 0,
+                        "max_rows": 0,
+                        "children": [
+                            {
+                                "id": "fld_ws_se_profile_url",
+                                "type": "url",
+                                "name": "url",
+                                "label": "URL",
+                                "required": false,
+                                "width": "100",
+                                "default_value": ""
+                            }
+                        ]
+                    }
+                ],
+                "conditional_logic": {
+                    "enabled": true,
+                    "groups": [
+                        [
+                            {
+                                "field": "fld_ws_se_has_schema",
+                                "operator": "checked",
+                                "value": ""
+                            }
+                        ]
+                    ]
+                }
+            }
+        ],
+        "settings": {
+            "active": true,
+            "slug": "search-engines",
+            "description": "",
+            "menu_label": "Search engines",
+            "menu_order": 30
+        }
+    },
+    {
+        "type": "site_settings",
+        "title": "Notices",
+        "fields": [
+            {
+                "id": "fld_ws_nt_intro",
+                "type": "text_block",
+                "label": "",
+                "default_value": "Show site-wide notice popups for visitors. If more than one notice is enabled and matches the current page and schedule, the first entry in the list is shown.",
+                "content": "Show site-wide notice popups for visitors. If more than one notice is enabled and matches the current page and schedule, the first entry in the list is shown.",
+                "width": "100"
+            },
+            {
+                "id": "fld_ws_nt_enabled",
+                "type": "toggle",
+                "name": "notices_enabled",
+                "label": "Enable notices",
+                "required": false,
+                "width": "100",
+                "default_value": "",
+                "content": "Enable notices",
+                "hide_label": true
+            },
+            {
+                "id": "fld_ws_nt_list",
+                "type": "repeater",
+                "name": "notices",
+                "label": "Notices",
+                "required": false,
+                "width": "100",
+                "default_value": "",
+                "button_label": "Add notice",
+                "min_rows": 0,
+                "max_rows": 0,
+                "children": [
+                    {
+                        "id": "fld_ws_nt_row_enabled",
+                        "type": "toggle",
+                        "name": "enabled",
+                        "label": "Enabled",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "1",
+                        "content": "Enabled",
+                        "hide_label": true,
+                        "description": "If more than one notice is enabled, the first matching notice takes priority."
+                    },
+                    {
+                        "id": "fld_ws_nt_title",
+                        "type": "textarea",
+                        "name": "title",
+                        "label": "Title",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "rows": 2
+                    },
+                    {
+                        "id": "fld_ws_nt_display",
+                        "type": "button_group",
+                        "name": "display",
+                        "label": "Display",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "always",
+                        "options": [
+                            {
+                                "value": "always",
+                                "label": "Always show"
+                            },
+                            {
+                                "value": "schedule",
+                                "label": "Schedule"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_ws_nt_start",
+                        "type": "datetime",
+                        "name": "start",
+                        "label": "Start date and time",
+                        "required": false,
+                        "width": "50",
+                        "default_value": "",
+                        "description": "If empty, the notice is treated as already started.",
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_ws_nt_display",
+                                        "operator": "==",
+                                        "value": "schedule"
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "fld_ws_nt_end",
+                        "type": "datetime",
+                        "name": "end",
+                        "label": "End date and time",
+                        "required": false,
+                        "width": "50",
+                        "default_value": "",
+                        "description": "If empty, the notice has no end date.",
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_ws_nt_display",
+                                        "operator": "==",
+                                        "value": "schedule"
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "fld_ws_nt_show_on",
+                        "type": "button_group",
+                        "name": "show_on",
+                        "label": "Show on",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "all",
+                        "options": [
+                            {
+                                "value": "all",
+                                "label": "Entire website"
+                            },
+                            {
+                                "value": "home",
+                                "label": "Homepage only"
+                            },
+                            {
+                                "value": "pages",
+                                "label": "Select pages"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_ws_nt_pages",
+                        "type": "page",
+                        "name": "pages",
+                        "label": "Pages",
+                        "required": false,
+                        "width": "100",
+                        "multiple": true,
+                        "post_types": [
+                            "page"
+                        ],
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_ws_nt_show_on",
+                                        "operator": "==",
+                                        "value": "pages"
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "fld_ws_nt_content",
+                        "type": "textarea",
+                        "name": "content",
+                        "label": "Content",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "rows": 6,
+                        "allow_html": true
+                    },
+                    {
+                        "id": "fld_ws_nt_buttons",
+                        "type": "repeater",
+                        "name": "buttons",
+                        "label": "Buttons",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "button_label": "Add button",
+                        "min_rows": 0,
+                        "max_rows": 0,
+                        "children": [
+                            {
+                                "id": "fld_ws_nt_btn_link",
+                                "type": "link",
+                                "name": "link",
+                                "label": "Link",
+                                "required": false,
+                                "width": "100",
+                                "default_value": ""
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_ws_nt_show_close",
+                        "type": "toggle",
+                        "name": "show_close_button",
+                        "label": "Show close button",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "1",
+                        "content": "Show close button",
+                        "hide_label": true
+                    },
+                    {
+                        "id": "fld_ws_nt_btn_align",
+                        "type": "button_group",
+                        "name": "buttons_alignment",
+                        "label": "Button alignment",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "right",
+                        "options": [
+                            {
+                                "value": "left",
+                                "label": "Left"
+                            },
+                            {
+                                "value": "center",
+                                "label": "Center"
+                            },
+                            {
+                                "value": "right",
+                                "label": "Right"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_ws_nt_close_text",
+                        "type": "text",
+                        "name": "close_button_text",
+                        "label": "Close button text",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_ws_nt_show_close",
+                                        "operator": "checked",
+                                        "value": ""
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "fld_ws_nt_close_style",
+                        "type": "button_group",
+                        "name": "close_button_style",
+                        "label": "Close button style",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "primary",
+                        "options": [
+                            {
+                                "value": "primary",
+                                "label": "Primary"
+                            },
+                            {
+                                "value": "secondary",
+                                "label": "Secondary"
+                            }
+                        ],
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_ws_nt_show_close",
+                                        "operator": "checked",
+                                        "value": ""
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "fld_ws_nt_close_outline",
+                        "type": "toggle",
+                        "name": "close_button_outline",
+                        "label": "Outline",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "content": "Outline",
+                        "hide_label": true,
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_ws_nt_show_close",
+                                        "operator": "checked",
+                                        "value": ""
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "fld_ws_nt_show_again",
+                        "type": "select",
+                        "name": "show_again",
+                        "label": "Show again",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "session",
+                        "options": [
+                            {
+                                "value": "never",
+                                "label": "Never"
+                            },
+                            {
+                                "value": "always",
+                                "label": "On every visit"
+                            },
+                            {
+                                "value": "session",
+                                "label": "In the next session"
+                            },
+                            {
+                                "value": "after",
+                                "label": "After …"
+                            }
+                        ],
+                        "description": "Controls when the notice appears again after it has been shown."
+                    },
+                    {
+                        "id": "fld_ws_nt_again_after",
+                        "type": "number",
+                        "name": "show_again_after",
+                        "label": "Show again after",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "7",
+                        "suffix": "days",
+                        "description": "Number of days after showing before the notice can appear again.",
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_ws_nt_show_again",
+                                        "operator": "==",
+                                        "value": "after"
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "fld_ws_nt_extra",
+                        "type": "text",
+                        "name": "extra_class",
+                        "label": "Extra CSS classes",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "description": "Separate multiple classes with spaces."
+                    }
+                ],
+                "conditional_logic": {
+                    "enabled": true,
+                    "groups": [
+                        [
+                            {
+                                "field": "fld_ws_nt_enabled",
+                                "operator": "checked",
+                                "value": ""
+                            }
+                        ]
+                    ]
+                }
+            }
+        ],
+        "settings": {
+            "active": true,
+            "slug": "notices",
+            "description": "",
+            "menu_label": "Notices",
+            "menu_order": 40
+        }
     }
 ]

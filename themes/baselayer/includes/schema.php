@@ -40,7 +40,7 @@ function bl_schema_resolve_image_url($image): string
 }
 
 /**
- * Build the Schema.org Organization/LocalBusiness graph from ACF options.
+ * Build the Schema.org Organization/LocalBusiness graph from Website settings.
  *
  * Requires Type and Name. Returns null when schema should not be output.
  *
@@ -48,24 +48,37 @@ function bl_schema_resolve_image_url($image): string
  */
 function bl_schema_get_data(): ?array
 {
-	if (!function_exists('get_field')) {
-		return null;
+	$has_schema = false;
+	$schema = [];
+
+	if (function_exists('bl_website_uses_acf') && bl_website_uses_acf()) {
+		if (!function_exists('get_field')) {
+			return null;
+		}
+		if (!get_field('has_schema', 'option')) {
+			return null;
+		}
+		$has_schema = true;
+		$raw = get_field('schema', 'option');
+		$schema = is_array($raw) ? $raw : [];
+	} else {
+		$values = function_exists('bl_website_site_values') ? bl_website_site_values('search-engines') : [];
+		if (!function_exists('bl_website_truthy') || !bl_website_truthy($values['has_schema'] ?? '')) {
+			return null;
+		}
+		$has_schema = true;
+		$schema = $values;
 	}
 
-	if (!get_field('has_schema', 'option')) {
-		return null;
-	}
-
-	$schema = get_field('schema', 'option');
-	if (!is_array($schema)) {
+	if (!$has_schema) {
 		return null;
 	}
 
 	$type = trim((string) ($schema['type'] ?? ''));
 	$name = trim((string) ($schema['organization_name'] ?? ''));
 	if ($name === '') {
-		$company = get_field('company', 'option');
-		$name = is_array($company) ? trim((string) ($company['name'] ?? '')) : '';
+		$company = function_exists('bl_get_company') ? bl_get_company() : [];
+		$name = trim((string) ($company['name'] ?? ''));
 	}
 
 	if ($type === '' || $name === '') {

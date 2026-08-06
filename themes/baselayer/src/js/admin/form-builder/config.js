@@ -13,6 +13,8 @@ const DEFAULT_HEADING_LEVELS = ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
  *     onNormalizeType?: (field: object, nextType: string) => void,
  *     extraSwitches?: (field: object) => (Node|null|undefined)[],
  *     onSerialize?: (data: object, ctx: { type: string, q: Function, body: Element, row: Element }) => void,
+ *     createFieldCard?: (initial: object, open: boolean) => HTMLElement|null|undefined,
+ *     serializeRow?: (row: HTMLElement) => object|null|undefined,
  *   }
  * }} */
 const state = {

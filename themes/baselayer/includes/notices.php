@@ -7,11 +7,17 @@ defined('ABSPATH') || exit;
  */
 function bl_notices_are_enabled(): bool
 {
-	if (!function_exists('get_field')) {
-		return false;
+	if (function_exists('bl_website_uses_acf') && bl_website_uses_acf()) {
+		if (!function_exists('get_field')) {
+			return false;
+		}
+
+		return (bool) get_field('notices_enabled', 'option');
 	}
 
-	return (bool) get_field('notices_enabled', 'option');
+	$values = function_exists('bl_website_site_values') ? bl_website_site_values('notices') : [];
+
+	return function_exists('bl_website_truthy') && bl_website_truthy($values['notices_enabled'] ?? '');
 }
 
 /**
@@ -24,8 +30,12 @@ function bl_notice_schedule_is_active(string $start, string $end): bool
 	$tz = wp_timezone();
 	$now = new DateTimeImmutable('now', $tz);
 
-	$start = trim($start);
-	$end = trim($end);
+	$start = function_exists('bl_website_normalize_datetime')
+		? bl_website_normalize_datetime($start)
+		: trim($start);
+	$end = function_exists('bl_website_normalize_datetime')
+		? bl_website_normalize_datetime($end)
+		: trim($end);
 
 	if ($start !== '') {
 		$start_dt = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $start, $tz);
@@ -159,7 +169,9 @@ function bl_notice_normalize_row(array $row, int $index): ?array
 		$buttons_alignment = 'right';
 	}
 
-	$show_close_button = !empty($row['show_close_button']);
+	$show_close_button = function_exists('bl_website_truthy')
+		? bl_website_truthy($row['show_close_button'] ?? '')
+		: !empty($row['show_close_button']);
 
 	$show_again = isset($row['show_again']) ? (string) $row['show_again'] : 'session';
 	if (!in_array($show_again, ['never', 'always', 'session', 'after'], true)) {
@@ -195,7 +207,9 @@ function bl_notice_normalize_row(array $row, int $index): ?array
 		'show_close_button' => $show_close_button,
 		'close_button_text' => $close_text,
 		'close_button_style' => $close_style,
-		'close_button_outline' => !empty($row['close_button_outline']),
+		'close_button_outline' => function_exists('bl_website_truthy')
+			? bl_website_truthy($row['close_button_outline'] ?? '')
+			: !empty($row['close_button_outline']),
 	];
 }
 
@@ -206,17 +220,32 @@ function bl_notice_normalize_row(array $row, int $index): ?array
  */
 function bl_notices_get_active(): ?array
 {
-	if (!bl_notices_are_enabled() || !function_exists('get_field')) {
+	if (!bl_notices_are_enabled()) {
 		return null;
 	}
 
-	$rows = get_field('notices', 'option');
+	if (function_exists('bl_website_uses_acf') && bl_website_uses_acf()) {
+		if (!function_exists('get_field')) {
+			return null;
+		}
+		$rows = get_field('notices', 'option');
+	} else {
+		$values = function_exists('bl_website_site_values') ? bl_website_site_values('notices') : [];
+		$rows = $values['notices'] ?? null;
+	}
+
 	if (!is_array($rows) || $rows === []) {
 		return null;
 	}
 
 	foreach ($rows as $index => $row) {
-		if (!is_array($row) || empty($row['enabled'])) {
+		if (!is_array($row)) {
+			continue;
+		}
+		$enabled = function_exists('bl_website_truthy')
+			? bl_website_truthy($row['enabled'] ?? '')
+			: !empty($row['enabled']);
+		if (!$enabled) {
 			continue;
 		}
 

@@ -1447,5 +1447,1067 @@
                 "post"
             ]
         }
+    },
+    {
+        "type": "site_settings",
+        "title": "Allgemein",
+        "fields": [
+            {
+                "id": "fld_ws_gen_company",
+                "type": "section",
+                "label": "Firmenangaben",
+                "show_title": true,
+                "design": "outline",
+                "width": "100",
+                "children": [
+                    {
+                        "id": "fld_ws_gen_name",
+                        "type": "text",
+                        "name": "name",
+                        "label": "Firmenname",
+                        "required": false,
+                        "width": "100",
+                        "default_value": ""
+                    },
+                    {
+                        "id": "fld_ws_gen_address",
+                        "type": "textarea",
+                        "name": "address",
+                        "label": "Adresse",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "rows": 3
+                    },
+                    {
+                        "id": "fld_ws_gen_phone",
+                        "type": "text",
+                        "name": "phone",
+                        "label": "Telefon",
+                        "required": false,
+                        "width": "100",
+                        "default_value": ""
+                    },
+                    {
+                        "id": "fld_ws_gen_email",
+                        "type": "text",
+                        "name": "email",
+                        "label": "E-Mail-Adresse",
+                        "required": false,
+                        "width": "100",
+                        "default_value": ""
+                    }
+                ]
+            }
+        ],
+        "settings": {
+            "active": true,
+            "slug": "general",
+            "description": "",
+            "menu_label": "Allgemein",
+            "menu_order": 10
+        }
+    },
+    {
+        "type": "site_settings",
+        "title": "Social-Media",
+        "fields": [
+            {
+                "id": "fld_ws_sm_channels",
+                "type": "section",
+                "label": "Social-Media Kanäle",
+                "show_title": true,
+                "design": "outline",
+                "width": "100",
+                "children": [
+                    {
+                        "id": "fld_ws_sm_channel_1",
+                        "type": "select",
+                        "name": "channel_1",
+                        "label": "Kanal",
+                        "required": false,
+                        "width": "20",
+                        "default_value": "facebook",
+                        "options": [
+                            {
+                                "value": "facebook",
+                                "label": "Facebook"
+                            },
+                            {
+                                "value": "instagram",
+                                "label": "Instagram"
+                            },
+                            {
+                                "value": "youtube",
+                                "label": "YouTube"
+                            },
+                            {
+                                "value": "linkedin",
+                                "label": "LinkedIn"
+                            },
+                            {
+                                "value": "x",
+                                "label": "X (Twitter)"
+                            },
+                            {
+                                "value": "tiktok",
+                                "label": "TikTok"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_ws_sm_url_1",
+                        "type": "url",
+                        "name": "url_1",
+                        "label": "URL",
+                        "required": false,
+                        "width": "80",
+                        "default_value": ""
+                    },
+                    {
+                        "id": "fld_ws_sm_channel_2",
+                        "type": "select",
+                        "name": "channel_2",
+                        "label": "Kanal",
+                        "required": false,
+                        "width": "20",
+                        "default_value": "facebook",
+                        "options": [
+                            {
+                                "value": "facebook",
+                                "label": "Facebook"
+                            },
+                            {
+                                "value": "instagram",
+                                "label": "Instagram"
+                            },
+                            {
+                                "value": "youtube",
+                                "label": "YouTube"
+                            },
+                            {
+                                "value": "linkedin",
+                                "label": "LinkedIn"
+                            },
+                            {
+                                "value": "x",
+                                "label": "X (Twitter)"
+                            },
+                            {
+                                "value": "tiktok",
+                                "label": "TikTok"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_ws_sm_url_2",
+                        "type": "url",
+                        "name": "url_2",
+                        "label": "URL",
+                        "required": false,
+                        "width": "80",
+                        "default_value": ""
+                    },
+                    {
+                        "id": "fld_ws_sm_channel_3",
+                        "type": "select",
+                        "name": "channel_3",
+                        "label": "Kanal",
+                        "required": false,
+                        "width": "20",
+                        "default_value": "facebook",
+                        "options": [
+                            {
+                                "value": "facebook",
+                                "label": "Facebook"
+                            },
+                            {
+                                "value": "instagram",
+                                "label": "Instagram"
+                            },
+                            {
+                                "value": "youtube",
+                                "label": "YouTube"
+                            },
+                            {
+                                "value": "linkedin",
+                                "label": "LinkedIn"
+                            },
+                            {
+                                "value": "x",
+                                "label": "X (Twitter)"
+                            },
+                            {
+                                "value": "tiktok",
+                                "label": "TikTok"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_ws_sm_url_3",
+                        "type": "url",
+                        "name": "url_3",
+                        "label": "URL",
+                        "required": false,
+                        "width": "80",
+                        "default_value": ""
+                    },
+                    {
+                        "id": "fld_ws_sm_channel_4",
+                        "type": "select",
+                        "name": "channel_4",
+                        "label": "Kanal",
+                        "required": false,
+                        "width": "20",
+                        "default_value": "facebook",
+                        "options": [
+                            {
+                                "value": "facebook",
+                                "label": "Facebook"
+                            },
+                            {
+                                "value": "instagram",
+                                "label": "Instagram"
+                            },
+                            {
+                                "value": "youtube",
+                                "label": "YouTube"
+                            },
+                            {
+                                "value": "linkedin",
+                                "label": "LinkedIn"
+                            },
+                            {
+                                "value": "x",
+                                "label": "X (Twitter)"
+                            },
+                            {
+                                "value": "tiktok",
+                                "label": "TikTok"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_ws_sm_url_4",
+                        "type": "url",
+                        "name": "url_4",
+                        "label": "URL",
+                        "required": false,
+                        "width": "80",
+                        "default_value": ""
+                    },
+                    {
+                        "id": "fld_ws_sm_channel_5",
+                        "type": "select",
+                        "name": "channel_5",
+                        "label": "Kanal",
+                        "required": false,
+                        "width": "20",
+                        "default_value": "facebook",
+                        "options": [
+                            {
+                                "value": "facebook",
+                                "label": "Facebook"
+                            },
+                            {
+                                "value": "instagram",
+                                "label": "Instagram"
+                            },
+                            {
+                                "value": "youtube",
+                                "label": "YouTube"
+                            },
+                            {
+                                "value": "linkedin",
+                                "label": "LinkedIn"
+                            },
+                            {
+                                "value": "x",
+                                "label": "X (Twitter)"
+                            },
+                            {
+                                "value": "tiktok",
+                                "label": "TikTok"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_ws_sm_url_5",
+                        "type": "url",
+                        "name": "url_5",
+                        "label": "URL",
+                        "required": false,
+                        "width": "80",
+                        "default_value": ""
+                    },
+                    {
+                        "id": "fld_ws_sm_channel_6",
+                        "type": "select",
+                        "name": "channel_6",
+                        "label": "Kanal",
+                        "required": false,
+                        "width": "20",
+                        "default_value": "facebook",
+                        "options": [
+                            {
+                                "value": "facebook",
+                                "label": "Facebook"
+                            },
+                            {
+                                "value": "instagram",
+                                "label": "Instagram"
+                            },
+                            {
+                                "value": "youtube",
+                                "label": "YouTube"
+                            },
+                            {
+                                "value": "linkedin",
+                                "label": "LinkedIn"
+                            },
+                            {
+                                "value": "x",
+                                "label": "X (Twitter)"
+                            },
+                            {
+                                "value": "tiktok",
+                                "label": "TikTok"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_ws_sm_url_6",
+                        "type": "url",
+                        "name": "url_6",
+                        "label": "URL",
+                        "required": false,
+                        "width": "80",
+                        "default_value": ""
+                    }
+                ]
+            },
+            {
+                "id": "fld_ws_sm_custom",
+                "type": "repeater",
+                "name": "custom_channels",
+                "label": "Weitere Kanäle",
+                "required": false,
+                "width": "100",
+                "default_value": "",
+                "button_label": "Kanal hinzufügen",
+                "min_rows": 0,
+                "max_rows": 0,
+                "children": [
+                    {
+                        "id": "fld_ws_sm_icon_type",
+                        "type": "button_group",
+                        "name": "icon_type",
+                        "label": "Icon-Typ",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "classname",
+                        "options": [
+                            {
+                                "value": "classname",
+                                "label": "Klassenname"
+                            },
+                            {
+                                "value": "code",
+                                "label": "SVG-Code"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_ws_sm_custom_url",
+                        "type": "url",
+                        "name": "url",
+                        "label": "URL",
+                        "required": false,
+                        "width": "100",
+                        "default_value": ""
+                    },
+                    {
+                        "id": "fld_ws_sm_classname",
+                        "type": "text",
+                        "name": "classname",
+                        "label": "Klassenname",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "description": "Gib die Icon-Klasse im Format -icon-name ein. Icons und Klassen findest du in den Developer-Einstellungen.",
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_ws_sm_icon_type",
+                                        "operator": "==",
+                                        "value": "classname"
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "fld_ws_sm_svg",
+                        "type": "textarea",
+                        "name": "svg_code",
+                        "label": "SVG-Code eingeben",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "rows": 4,
+                        "allow_html": "svg",
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_ws_sm_icon_type",
+                                        "operator": "==",
+                                        "value": "code"
+                                    }
+                                ]
+                            ]
+                        }
+                    }
+                ]
+            }
+        ],
+        "settings": {
+            "active": true,
+            "slug": "social-media",
+            "description": "",
+            "menu_label": "Social-Media",
+            "menu_order": 20
+        }
+    },
+    {
+        "type": "site_settings",
+        "title": "Suchmaschinen",
+        "fields": [
+            {
+                "id": "fld_ws_se_intro",
+                "type": "text_block",
+                "label": "",
+                "default_value": "Hier kannst du strukturierte Daten für deine Website hinterlegen. Diese Informationen helfen Suchmaschinen, dein Unternehmen und deine Inhalte besser zu verstehen und können die Darstellung in den Suchergebnissen verbessern.",
+                "content": "Hier kannst du strukturierte Daten für deine Website hinterlegen. Diese Informationen helfen Suchmaschinen, dein Unternehmen und deine Inhalte besser zu verstehen und können die Darstellung in den Suchergebnissen verbessern.",
+                "width": "100"
+            },
+            {
+                "id": "fld_ws_se_has_schema",
+                "type": "toggle",
+                "name": "has_schema",
+                "label": "Schema.org verwenden",
+                "required": false,
+                "width": "100",
+                "default_value": "",
+                "content": "Schema.org verwenden",
+                "hide_label": true
+            },
+            {
+                "id": "fld_ws_se_schema",
+                "type": "section",
+                "label": "Schema-Daten",
+                "show_title": true,
+                "design": "outline",
+                "width": "100",
+                "children": [
+                    {
+                        "id": "fld_ws_se_type",
+                        "type": "select",
+                        "name": "type",
+                        "label": "Typ",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "LocalBusiness",
+                        "options": [
+                            {
+                                "value": "LocalBusiness",
+                                "label": "Lokales Unternehmen"
+                            },
+                            {
+                                "value": "Organization",
+                                "label": "Organisation"
+                            },
+                            {
+                                "value": "Corporation",
+                                "label": "Unternehmen"
+                            },
+                            {
+                                "value": "ProfessionalService",
+                                "label": "Dienstleister"
+                            },
+                            {
+                                "value": "Store",
+                                "label": "Store"
+                            },
+                            {
+                                "value": "Restaurant",
+                                "label": "Restaurant"
+                            },
+                            {
+                                "value": "EducationalOrganization",
+                                "label": "Bildungsorganisation"
+                            },
+                            {
+                                "value": "NonprofitOrganization",
+                                "label": "Gemeinnützige Organisation"
+                            },
+                            {
+                                "value": "Person",
+                                "label": "Person"
+                            }
+                        ],
+                        "description": "Wähle den Schema.org-Typ, der die Website oder Organisation am besten beschreibt."
+                    },
+                    {
+                        "id": "fld_ws_se_org",
+                        "type": "text",
+                        "name": "organization_name",
+                        "label": "Name des Unternehmens",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "description": "Der offizielle Name des Unternehmens oder der Organisation."
+                    },
+                    {
+                        "id": "fld_ws_se_desc",
+                        "type": "textarea",
+                        "name": "description",
+                        "label": "Beschreibung",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "rows": 3,
+                        "description": "Eine kurze Beschreibung des Unternehmens. Empfohlen sind 120–160 Zeichen."
+                    },
+                    {
+                        "id": "fld_ws_se_logo",
+                        "type": "image",
+                        "name": "logo",
+                        "label": "Logo",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "description": "Das Hauptlogo des Unternehmens. Idealerweise als SVG oder hochauflösendes PNG."
+                    },
+                    {
+                        "id": "fld_ws_se_image",
+                        "type": "image",
+                        "name": "image",
+                        "label": "Bild",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "description": "Ein repräsentatives Bild des Unternehmens, z. B. vom Büro, Geschäft oder Team."
+                    },
+                    {
+                        "id": "fld_ws_se_phone",
+                        "type": "text",
+                        "name": "phone",
+                        "label": "Telefonnummer",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "description": "Die zentrale Telefonnummer, möglichst im internationalen Format (z. B. +49 821 123456)."
+                    },
+                    {
+                        "id": "fld_ws_se_email",
+                        "type": "text",
+                        "name": "email",
+                        "label": "E-Mail-Adresse",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "description": "Die zentrale Kontakt-E-Mail-Adresse."
+                    },
+                    {
+                        "id": "fld_ws_se_website",
+                        "type": "url",
+                        "name": "website",
+                        "label": "Website",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "description": "Die URL der Website. Leer lassen, um automatisch die Website-Adresse zu verwenden."
+                    },
+                    {
+                        "id": "fld_ws_se_street",
+                        "type": "text",
+                        "name": "street",
+                        "label": "Straße",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "description": "Straßenname und Hausnummer."
+                    },
+                    {
+                        "id": "fld_ws_se_zip",
+                        "type": "text",
+                        "name": "zip",
+                        "label": "Postleitzahl",
+                        "required": false,
+                        "width": "33",
+                        "default_value": ""
+                    },
+                    {
+                        "id": "fld_ws_se_city",
+                        "type": "text",
+                        "name": "city",
+                        "label": "Ort",
+                        "required": false,
+                        "width": "33",
+                        "default_value": ""
+                    },
+                    {
+                        "id": "fld_ws_se_country",
+                        "type": "text",
+                        "name": "country",
+                        "label": "Land",
+                        "required": false,
+                        "width": "34",
+                        "default_value": "",
+                        "description": "Ländername oder ISO-3166-1-Alpha-2-Code (z. B. Deutschland oder DE)."
+                    },
+                    {
+                        "id": "fld_ws_se_profiles",
+                        "type": "repeater",
+                        "name": "social_profiles",
+                        "label": "Social-Media-Profile",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "button_label": "Profil hinzufügen",
+                        "min_rows": 0,
+                        "max_rows": 0,
+                        "children": [
+                            {
+                                "id": "fld_ws_se_profile_url",
+                                "type": "url",
+                                "name": "url",
+                                "label": "URL",
+                                "required": false,
+                                "width": "100",
+                                "default_value": ""
+                            }
+                        ]
+                    }
+                ],
+                "conditional_logic": {
+                    "enabled": true,
+                    "groups": [
+                        [
+                            {
+                                "field": "fld_ws_se_has_schema",
+                                "operator": "checked",
+                                "value": ""
+                            }
+                        ]
+                    ]
+                }
+            }
+        ],
+        "settings": {
+            "active": true,
+            "slug": "search-engines",
+            "description": "",
+            "menu_label": "Suchmaschinen",
+            "menu_order": 30
+        }
+    },
+    {
+        "type": "site_settings",
+        "title": "Hinweise",
+        "fields": [
+            {
+                "id": "fld_ws_nt_intro",
+                "type": "text_block",
+                "label": "",
+                "default_value": "Zeige websiteweite Hinweis-Popups für Besucher. Wenn mehr als ein Hinweis aktiviert ist und zur aktuellen Seite sowie zum Zeitplan passt, wird der erste Eintrag in der Liste angezeigt.",
+                "content": "Zeige websiteweite Hinweis-Popups für Besucher. Wenn mehr als ein Hinweis aktiviert ist und zur aktuellen Seite sowie zum Zeitplan passt, wird der erste Eintrag in der Liste angezeigt.",
+                "width": "100"
+            },
+            {
+                "id": "fld_ws_nt_enabled",
+                "type": "toggle",
+                "name": "notices_enabled",
+                "label": "Hinweise aktivieren",
+                "required": false,
+                "width": "100",
+                "default_value": "",
+                "content": "Hinweise aktivieren",
+                "hide_label": true
+            },
+            {
+                "id": "fld_ws_nt_list",
+                "type": "repeater",
+                "name": "notices",
+                "label": "Hinweise",
+                "required": false,
+                "width": "100",
+                "default_value": "",
+                "button_label": "Hinweis hinzufügen",
+                "min_rows": 0,
+                "max_rows": 0,
+                "children": [
+                    {
+                        "id": "fld_ws_nt_row_enabled",
+                        "type": "toggle",
+                        "name": "enabled",
+                        "label": "Aktiviert",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "1",
+                        "content": "Aktiviert",
+                        "hide_label": true,
+                        "description": "Wenn mehr als ein Hinweis aktiviert ist, hat der erste passende Hinweis Vorrang."
+                    },
+                    {
+                        "id": "fld_ws_nt_title",
+                        "type": "textarea",
+                        "name": "title",
+                        "label": "Titel",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "rows": 2
+                    },
+                    {
+                        "id": "fld_ws_nt_display",
+                        "type": "button_group",
+                        "name": "display",
+                        "label": "Anzeige",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "always",
+                        "options": [
+                            {
+                                "value": "always",
+                                "label": "Immer anzeigen"
+                            },
+                            {
+                                "value": "schedule",
+                                "label": "Zeitplan"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_ws_nt_start",
+                        "type": "datetime",
+                        "name": "start",
+                        "label": "Startdatum und -zeit",
+                        "required": false,
+                        "width": "50",
+                        "default_value": "",
+                        "description": "Wenn leer, gilt der Hinweis als bereits gestartet.",
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_ws_nt_display",
+                                        "operator": "==",
+                                        "value": "schedule"
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "fld_ws_nt_end",
+                        "type": "datetime",
+                        "name": "end",
+                        "label": "Enddatum und -zeit",
+                        "required": false,
+                        "width": "50",
+                        "default_value": "",
+                        "description": "Wenn leer, hat der Hinweis kein Enddatum.",
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_ws_nt_display",
+                                        "operator": "==",
+                                        "value": "schedule"
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "fld_ws_nt_show_on",
+                        "type": "button_group",
+                        "name": "show_on",
+                        "label": "Anzeigen auf",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "all",
+                        "options": [
+                            {
+                                "value": "all",
+                                "label": "Gesamte Website"
+                            },
+                            {
+                                "value": "home",
+                                "label": "Nur Homepage"
+                            },
+                            {
+                                "value": "pages",
+                                "label": "Seiten auswählen"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_ws_nt_pages",
+                        "type": "page",
+                        "name": "pages",
+                        "label": "Seiten",
+                        "required": false,
+                        "width": "100",
+                        "multiple": true,
+                        "post_types": [
+                            "page"
+                        ],
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_ws_nt_show_on",
+                                        "operator": "==",
+                                        "value": "pages"
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "fld_ws_nt_content",
+                        "type": "textarea",
+                        "name": "content",
+                        "label": "Inhalt",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "rows": 6,
+                        "allow_html": true
+                    },
+                    {
+                        "id": "fld_ws_nt_buttons",
+                        "type": "repeater",
+                        "name": "buttons",
+                        "label": "Buttons",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "button_label": "Button hinzufügen",
+                        "min_rows": 0,
+                        "max_rows": 0,
+                        "children": [
+                            {
+                                "id": "fld_ws_nt_btn_link",
+                                "type": "link",
+                                "name": "link",
+                                "label": "Link",
+                                "required": false,
+                                "width": "100",
+                                "default_value": ""
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_ws_nt_show_close",
+                        "type": "toggle",
+                        "name": "show_close_button",
+                        "label": "Schließen-Button anzeigen",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "1",
+                        "content": "Schließen-Button anzeigen",
+                        "hide_label": true
+                    },
+                    {
+                        "id": "fld_ws_nt_btn_align",
+                        "type": "button_group",
+                        "name": "buttons_alignment",
+                        "label": "Ausrichtung der Buttons",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "right",
+                        "options": [
+                            {
+                                "value": "left",
+                                "label": "Links"
+                            },
+                            {
+                                "value": "center",
+                                "label": "Zentriert"
+                            },
+                            {
+                                "value": "right",
+                                "label": "Rechts"
+                            }
+                        ]
+                    },
+                    {
+                        "id": "fld_ws_nt_close_text",
+                        "type": "text",
+                        "name": "close_button_text",
+                        "label": "Text des Schließen-Buttons",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_ws_nt_show_close",
+                                        "operator": "checked",
+                                        "value": ""
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "fld_ws_nt_close_style",
+                        "type": "button_group",
+                        "name": "close_button_style",
+                        "label": "Stil des Schließen-Buttons",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "primary",
+                        "options": [
+                            {
+                                "value": "primary",
+                                "label": "Primär"
+                            },
+                            {
+                                "value": "secondary",
+                                "label": "Sekundär"
+                            }
+                        ],
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_ws_nt_show_close",
+                                        "operator": "checked",
+                                        "value": ""
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "fld_ws_nt_close_outline",
+                        "type": "toggle",
+                        "name": "close_button_outline",
+                        "label": "Outline",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "content": "Outline",
+                        "hide_label": true,
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_ws_nt_show_close",
+                                        "operator": "checked",
+                                        "value": ""
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "fld_ws_nt_show_again",
+                        "type": "select",
+                        "name": "show_again",
+                        "label": "Erneut anzeigen",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "session",
+                        "options": [
+                            {
+                                "value": "never",
+                                "label": "Nie"
+                            },
+                            {
+                                "value": "always",
+                                "label": "Bei jedem Besuch"
+                            },
+                            {
+                                "value": "session",
+                                "label": "In der nächsten Sitzung"
+                            },
+                            {
+                                "value": "after",
+                                "label": "Nach …"
+                            }
+                        ],
+                        "description": "Bestimmt, wann der Hinweis nach dem Anzeigen wieder erscheint."
+                    },
+                    {
+                        "id": "fld_ws_nt_again_after",
+                        "type": "number",
+                        "name": "show_again_after",
+                        "label": "Erneut anzeigen nach",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "7",
+                        "suffix": "Tage",
+                        "description": "Anzahl Tage nach dem Anzeigen, bevor der Hinweis erneut erscheinen kann.",
+                        "conditional_logic": {
+                            "enabled": true,
+                            "groups": [
+                                [
+                                    {
+                                        "field": "fld_ws_nt_show_again",
+                                        "operator": "==",
+                                        "value": "after"
+                                    }
+                                ]
+                            ]
+                        }
+                    },
+                    {
+                        "id": "fld_ws_nt_extra",
+                        "type": "text",
+                        "name": "extra_class",
+                        "label": "Extra CSS Klassen",
+                        "required": false,
+                        "width": "100",
+                        "default_value": "",
+                        "description": "Mehrere Klassen mit Leerzeichen trennen."
+                    }
+                ],
+                "conditional_logic": {
+                    "enabled": true,
+                    "groups": [
+                        [
+                            {
+                                "field": "fld_ws_nt_enabled",
+                                "operator": "checked",
+                                "value": ""
+                            }
+                        ]
+                    ]
+                }
+            }
+        ],
+        "settings": {
+            "active": true,
+            "slug": "notices",
+            "description": "",
+            "menu_label": "Hinweise",
+            "menu_order": 40
+        }
     }
 ]

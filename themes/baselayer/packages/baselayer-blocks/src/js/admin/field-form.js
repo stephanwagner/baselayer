@@ -4,6 +4,8 @@
 import { createPagePickerControl, bindPagePickers } from './page-field.js';
 import { createLinkControl, bindLinkFields } from './link-field.js';
 import { createMediaPickerControl, bindMediaPickers } from './media-field.js';
+import { bindIconPickers } from './icon-field.js';
+import { bindAdminRepeaters } from './admin-repeater.js';
 import {
   createSortable,
   dragStart,
@@ -264,6 +266,7 @@ function chunkFieldsIntoRows(fields) {
 
 /**
  * Apply flex width for a field/column cell in a modal flex row.
+ * Percent widths set CSS vars; SCSS owns flex-basis + gap share.
  *
  * @param {HTMLElement} wrap
  * @param {object} field
@@ -271,9 +274,26 @@ function chunkFieldsIntoRows(fields) {
  */
 function applyFieldWidth(wrap, field, opts = {}) {
   const width = String((field && field.width) || '100');
-  const gap = 12;
   const autoClass = opts.autoClass || '';
+
+  const clearLayoutStyles = () => {
+    wrap.style.flex = '';
+    wrap.style.width = '';
+    wrap.style.maxWidth = '';
+    wrap.style.minWidth = '';
+    wrap.style.removeProperty('--bl-blocks-field-width');
+    wrap.style.removeProperty('--bl-blocks-field-width-factor');
+  };
+
+  const setPercentVars = (pct) => {
+    const factor = Math.max(0, Math.min(1, pct / 100));
+    clearLayoutStyles();
+    wrap.style.setProperty('--bl-blocks-field-width', `${pct}%`);
+    wrap.style.setProperty('--bl-blocks-field-width-factor', String(factor));
+  };
+
   if (width === 'auto') {
+    clearLayoutStyles();
     if (autoClass) {
       wrap.classList.add(autoClass);
     } else {
@@ -287,17 +307,26 @@ function applyFieldWidth(wrap, field, opts = {}) {
   if (width === 'custom') {
     const custom = String((field && field.width_custom) || '').trim();
     if (custom) {
+      const match = custom.match(/^(\d+(?:\.\d+)?)%$/);
+      if (match) {
+        const pct = parseFloat(match[1]);
+        if (Number.isFinite(pct) && pct > 0) {
+          setPercentVars(pct);
+          return;
+        }
+      }
+      clearLayoutStyles();
       wrap.style.flex = '0 1 auto';
       wrap.style.width = custom;
       wrap.style.maxWidth = '100%';
       wrap.style.minWidth = '0';
       return;
     }
-    wrap.style.flex = '0 1 100%';
-    wrap.style.width = '100%';
+    setPercentVars(100);
     return;
   }
   const map = {
+    100: 100,
     75: 75,
     66: 66.6667,
     50: 50,
@@ -309,16 +338,7 @@ function applyFieldWidth(wrap, field, opts = {}) {
     const parsed = parseInt(width, 10);
     pct = Number.isFinite(parsed) && parsed > 0 ? parsed : 100;
   }
-  if (pct > 0 && pct < 100) {
-    const factor = Math.max(0, Math.min(1, pct / 100));
-    wrap.style.flex = '0 1 auto';
-    wrap.style.width = `min(100%, calc(${pct}% - ${gap * (1 - factor)}px))`;
-    wrap.style.maxWidth = '100%';
-    wrap.style.minWidth = '0';
-    return;
-  }
-  wrap.style.flex = '0 1 100%';
-  wrap.style.width = '100%';
+  setPercentVars(pct);
 }
 
 /**
@@ -647,10 +667,18 @@ function createLeafControl(field, values, controls) {
     if (field.placeholder) control.placeholder = field.placeholder;
   } else if (type === 'select') {
     const multiple = !!field.multiple;
+    const allowNull =
+      !multiple &&
+      (field.allow_null === undefined ||
+        (field.allow_null !== false && field.allow_null !== 0 && field.allow_null !== '0'));
     control = el('select', { className: 'widefat', id });
     if (multiple) control.multiple = true;
-    if (!multiple) {
-      control.appendChild(el('option', { value: '', text: '—' }));
+    if (field.required) control.required = true;
+    if (allowNull) {
+      const emptyLabel =
+        String(field.placeholder || '').trim() ||
+        i18n('selectEmptyOptionPlaceholder', 'Please select…');
+      control.appendChild(el('option', { value: '', text: emptyLabel }));
     }
     const selected = multiple
       ? (Array.isArray(current) ? current : []).map(String)
@@ -1743,6 +1771,54 @@ export function pageRepeaterUiStorageKey(postId, definitionKey) {
   return 'bl-blocks-repeater-ui:' + String(postId || 0) + ':' + String(definitionKey || '');
 }
 
+/**
+ * Mount Website settings field form (admin JS renderer).
+ */
+export function mountWebsiteFields(root = document) {
+  const host = root.querySelector('[data-bl-blocks-website-fields]');
+  if (!host) return null;
+
+  const cfgEl = host.querySelector('[data-bl-blocks-website-config]');
+  let fields = [];
+  let values = {};
+  if (cfgEl) {
+    try {
+      const parsed = JSON.parse(cfgEl.textContent || '{}') || {};
+      fields = Array.isArray(parsed.fields) ? parsed.fields : [];
+      values =
+        parsed.values && typeof parsed.values === 'object' && !Array.isArray(parsed.values)
+          ? parsed.values
+          : {};
+    } catch (err) {
+      fields = [];
+      values = {};
+    }
+  }
+
+  const form = createFieldForm(fields, values);
+  host.replaceChildren(form.root);
+
+  const formEl = host.closest('form');
+  if (formEl) {
+    let hidden = formEl.querySelector('[data-bl-blocks-website-json]');
+    if (!hidden) {
+      hidden = el('input', {
+        type: 'hidden',
+        name: 'bl_blocks_values_json',
+        dataset: { blBlocksWebsiteJson: '1' },
+      });
+      formEl.appendChild(hidden);
+    }
+    const sync = () => {
+      hidden.value = JSON.stringify(form.getValues());
+    };
+    sync();
+    formEl.addEventListener('submit', sync);
+  }
+
+  return form;
+}
+
 // Expose for editor bundle / inline usage.
 window.blBlocksFieldUiApi = {
   createFieldForm,
@@ -1753,16 +1829,23 @@ window.blBlocksFieldUiApi = {
   bindPagePickers,
   bindLinkFields,
   bindMediaPickers,
+  bindIconPickers,
+  bindAdminRepeaters,
   bindHttpsUrlFields,
   bindFieldTabs,
+  mountWebsiteFields,
 };
 
 if (typeof document !== 'undefined') {
   document.addEventListener('DOMContentLoaded', () => {
+    mountWebsiteFields(document);
+    // Legacy PHP-rendered pickers (no-op when Website uses createFieldForm).
     bindPagePickers(document);
     bindLinkFields(document);
     bindMediaPickers(document);
+    bindIconPickers(document);
     bindHttpsUrlFields(document);
     bindFieldTabs(document);
+    bindAdminRepeaters(document);
   });
 }

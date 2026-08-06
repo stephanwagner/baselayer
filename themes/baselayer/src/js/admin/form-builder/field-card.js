@@ -309,6 +309,17 @@ function convertFieldType(field, nextType) {
     delete field.multiple;
   }
 
+  if (nextType === 'select') {
+    if (field.allow_null === undefined) {
+      field.allow_null = true;
+    }
+    if (field.multiple) {
+      delete field.allow_null;
+    }
+  } else {
+    delete field.allow_null;
+  }
+
   if (nextType === 'file' || nextType === 'image') {
     if (useMediaLibraryFields()) {
       delete field.upload_style;
@@ -632,6 +643,10 @@ function createOptionsEditor(options) {
   list.appendChild(
     el('div', { className: 'bl-forms-builder__option bl-forms-builder__option--head' }, [
       el('span', {
+        className: 'bl-forms-builder__option-heading-spacer bl-forms-builder__option-heading-spacer--handle',
+        'aria-hidden': 'true',
+      }),
+      el('span', {
         className: 'bl-forms-builder__option-heading',
         text: t('optionLabel', 'Label'),
       }),
@@ -645,6 +660,21 @@ function createOptionsEditor(options) {
       }),
     ])
   );
+
+  const createOptionHandle = () => {
+    const handle = el('span', {
+      className: 'bl-forms-builder__option-handle bl-forms-builder__handle',
+      title: t('dragOption', 'Drag to reorder'),
+      'aria-hidden': 'true',
+    });
+    const dragIcon = iconEl('drag');
+    if (dragIcon.innerHTML) {
+      handle.appendChild(dragIcon);
+    } else {
+      handle.textContent = '⋮⋮';
+    }
+    return handle;
+  };
 
   const addOption = (opt = { label: '', value: '' }) => {
     const labelText = opt.label || '';
@@ -708,6 +738,7 @@ function createOptionsEditor(options) {
     }
 
     const row = el('div', { className: 'bl-forms-builder__option', dataset: { blOption: '1' } }, [
+      createOptionHandle(),
       labelInput,
       slugInput,
       deleteBtn,
@@ -725,6 +756,22 @@ function createOptionsEditor(options) {
       onClick: () => addOption(),
     })
   );
+
+  const Builder = window.BlCanvasBuilder;
+  if (Builder && typeof Builder.createSortable === 'function') {
+    const notify = () => {
+      document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+    };
+    Builder.createSortable(list, {
+      group: { name: 'bl-forms-options', pull: false, put: false },
+      handle: '.bl-forms-builder__option-handle',
+      draggable: '[data-bl-option]',
+      animation: 150,
+      onUpdate: notify,
+      onSort: notify,
+    });
+  }
+
   return wrap;
 }
 
@@ -2683,6 +2730,14 @@ function createSectionAppender(panel) {
 }
 
 export function serializeRow(row) {
+  const fieldCardHooks = getFieldCardHooks();
+  if (typeof fieldCardHooks.serializeRow === 'function') {
+    const custom = fieldCardHooks.serializeRow(row);
+    if (custom != null) {
+      return custom;
+    }
+  }
+
   const layoutData = serializeLayoutRow(row);
   if (layoutData) {
     return layoutData;
@@ -2848,6 +2903,14 @@ export function serializeRow(row) {
   }
   if (MULTIPLE_TYPES.includes(type)) {
     data.multiple = Boolean(q('[data-bl-multiple]')?.checked);
+  }
+  if (type === 'select') {
+    if (data.multiple) {
+      delete data.allow_null;
+    } else {
+      const allowEl = q('[data-bl-allow-null]');
+      data.allow_null = allowEl ? allowEl.checked : true;
+    }
   }
   if (type === 'link') {
     const allowed = ['page', 'url', 'email', 'phone'];
@@ -3026,6 +3089,14 @@ export function duplicateFieldCard(row) {
 }
 
 export function createFieldCard(initial, open = false) {
+  const hooks = getFieldCardHooks();
+  if (typeof hooks.createFieldCard === 'function') {
+    const custom = hooks.createFieldCard(initial, open);
+    if (custom) {
+      return custom;
+    }
+  }
+
   if ((initial?.type || '') === 'column') {
     return createColumnCard(initial, open);
   }
@@ -3545,19 +3616,75 @@ export function createFieldCard(initial, open = false) {
       }
 
       if (!NO_PLACEHOLDER.includes(field.type)) {
-        const ph = el('input', {
-          type: 'text',
-          className: 'widefat',
-          dataset: { blPlaceholder: '1' },
-        });
-        ph.value = field.placeholder || '';
-        ph.addEventListener('input', () => {
-          field.placeholder = ph.value;
-          updatePreview();
-        });
-        generalSections.add(
-          el('p', {}, [el('label', { text: t('placeholder', 'Placeholder') }), ph])
-        );
+        if (field.type === 'select' && field.multiple) {
+          // Multi-select has no empty option; skip placeholder.
+        } else if (field.type === 'select') {
+          if (field.allow_null === undefined) {
+            field.allow_null = true;
+          }
+          const allowNull = field.allow_null !== false && field.allow_null !== 0 && field.allow_null !== '0';
+          generalSections.add(
+            createSwitchSetting(
+              'blAllowNull',
+              t('selectAllowNull', 'Allow empty selection'),
+              allowNull,
+              (checked) => {
+                field.allow_null = checked;
+                renderBody('general');
+                document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+              }
+            )
+          );
+          if (allowNull) {
+            const ph = el('input', {
+              type: 'text',
+              className: 'widefat',
+              dataset: { blPlaceholder: '1' },
+              placeholder: t('selectEmptyOptionPlaceholder', 'Please select…'),
+            });
+            ph.value = field.placeholder || '';
+            ph.addEventListener('input', () => {
+              field.placeholder = ph.value;
+              updatePreview();
+            });
+            generalSections.add(
+              el('p', {}, [
+                el('label', { text: t('selectEmptyOptionLabel', 'Empty option label') }),
+                ph,
+              ]),
+              el('p', {
+                className: 'description',
+                text: t(
+                  'selectEmptyOptionHelp',
+                  'Label for the blank choice. Leave empty for “Please select…”. Required still shows this option, but the user must pick a real value.'
+                ),
+              })
+            );
+          } else {
+            // Preserve placeholder while empty selection is off.
+            generalSections.add(
+              el('input', {
+                type: 'hidden',
+                dataset: { blPlaceholder: '1' },
+                value: field.placeholder || '',
+              })
+            );
+          }
+        } else {
+          const ph = el('input', {
+            type: 'text',
+            className: 'widefat',
+            dataset: { blPlaceholder: '1' },
+          });
+          ph.value = field.placeholder || '';
+          ph.addEventListener('input', () => {
+            field.placeholder = ph.value;
+            updatePreview();
+          });
+          generalSections.add(
+            el('p', {}, [el('label', { text: t('placeholder', 'Placeholder') }), ph])
+          );
+        }
       }
 
       if (OPTION_TYPES.includes(field.type)) {
@@ -3715,6 +3842,8 @@ export function createFieldCard(initial, open = false) {
               if (checked && (field.max_files == null || field.max_files === '')) {
                 field.max_files = 10;
               }
+              renderBody('general');
+            } else if (field.type === 'select') {
               renderBody('general');
             }
             document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));

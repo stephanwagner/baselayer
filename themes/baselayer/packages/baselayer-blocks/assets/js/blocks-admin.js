@@ -3128,7 +3128,23 @@
     if (typeof FormBuilder.configure === "function") {
       FormBuilder.configure({
         mediaLibraryFields: true,
-        headingLevels: ["h2", "h3", "h4"]
+        headingLevels: ["h2", "h3", "h4"],
+        // Nested column/section/tab lists call createFieldCard/serializeRow directly;
+        // route Blocks-only repeater through these hooks (same as root createItem).
+        fieldCard: {
+          createFieldCard: (data, open) => {
+            if ((data?.type || "") === "repeater") {
+              return createRepeaterCard(data, open, 1);
+            }
+            return null;
+          },
+          serializeRow: (row) => {
+            if ((row?.dataset?.fieldType || "") === "repeater") {
+              return serializeRepeaterRow(row);
+            }
+            return null;
+          }
+        }
       });
     }
     root.replaceChildren();
@@ -7314,6 +7330,294 @@
     });
   }
 
+  // themes/baselayer/packages/baselayer-blocks/src/js/admin/icon-field.js
+  function i18n4(key, fallback) {
+    const dict = window.blBlocksFieldUi && window.blBlocksFieldUi.i18n || window.blBlocksEditor && window.blBlocksEditor.i18n || window.blBlocksAdmin && window.blBlocksAdmin.i18n || {};
+    return dict[key] || fallback || key;
+  }
+  function iconDisplayName(slug) {
+    if (!slug) return "";
+    const labels = window.baselayerIcons && window.baselayerIcons.labels || {};
+    const base = String(slug).replace(/-fill$/, "");
+    if (labels[slug]) return labels[slug];
+    if (labels[base]) return labels[base];
+    return base.replace(/-/g, " ").replace(/^\w/, (char) => char.toUpperCase());
+  }
+  function bindOneIconPicker(wrap) {
+    if (wrap.dataset.blIconBound === "1") return;
+    wrap.dataset.blIconBound = "1";
+    const hidden = wrap.querySelector("[data-bl-icon-input]");
+    const valueRow = wrap.querySelector(".bl-icon-picker__value");
+    const valueBody = wrap.querySelector(".bl-icon-picker__value-body");
+    const chooseBtn = wrap.querySelector("[data-bl-icon-choose], .bl-icon-picker__trigger");
+    const clearBtn = wrap.querySelector("[data-bl-icon-clear], .bl-icon-picker__clear");
+    if (!(hidden instanceof HTMLInputElement) || !valueBody || !chooseBtn) return;
+    const iconUi = window.baselayerIcons && window.baselayerIcons.ui || {};
+    const chooseLabel = iconUi.choose || i18n4("chooseIcon", "Choose icon");
+    const removeLabel = iconUi.remove || i18n4("clearIcon", "Remove");
+    chooseBtn.textContent = chooseLabel;
+    if (clearBtn) {
+      clearBtn.title = removeLabel;
+      clearBtn.setAttribute("aria-label", removeLabel);
+    }
+    const syncIconPreview = (slug) => {
+      const next = slug ? String(slug) : "";
+      hidden.value = next;
+      valueBody.replaceChildren();
+      if (next) {
+        const icon = document.createElement("span");
+        icon.className = "bl-icon -icon-" + next;
+        icon.setAttribute("aria-hidden", "true");
+        const name = document.createElement("span");
+        name.className = "bl-icon-picker__value-name";
+        name.textContent = iconDisplayName(next);
+        valueBody.append(icon, name);
+        if (valueRow) valueRow.hidden = false;
+      } else if (valueRow) {
+        valueRow.hidden = true;
+      }
+      wrap.dispatchEvent(new Event("change", { bubbles: true }));
+    };
+    syncIconPreview(hidden.value || "");
+    chooseBtn.addEventListener("click", async () => {
+      try {
+        const { openIconPicker: openIconPicker2 } = await Promise.resolve().then(() => (init_icon_picker_service(), icon_picker_service_exports));
+        openIconPicker2({
+          currentValue: hidden.value || "",
+          returnFocus: chooseBtn,
+          onSelect: (iconName2) => syncIconPreview(iconName2 || "")
+        });
+      } catch (err) {
+      }
+    });
+    if (clearBtn) {
+      clearBtn.addEventListener("click", (evt) => {
+        evt.preventDefault();
+        evt.stopPropagation();
+        syncIconPreview("");
+      });
+    }
+  }
+  function bindIconPickers(root = document) {
+    const scope = root && root.querySelectorAll ? root : document;
+    scope.querySelectorAll("[data-bl-blocks-icon-picker]").forEach((wrap) => {
+      if (wrap instanceof HTMLElement) {
+        bindOneIconPicker(wrap);
+      }
+    });
+  }
+
+  // themes/baselayer/packages/baselayer-blocks/src/js/admin/admin-repeater.js
+  function i18n5(key, fallback) {
+    const dict = window.blBlocksFieldUi && window.blBlocksFieldUi.i18n || window.blBlocksEditor && window.blBlocksEditor.i18n || window.blBlocksAdmin && window.blBlocksAdmin.i18n || {};
+    return dict[key] || fallback || key;
+  }
+  function rebindRowWidgets(scope) {
+    bindPagePickers(scope);
+    bindLinkFields(scope);
+    bindMediaPickers(scope);
+    bindIconPickers(scope);
+    const api = window.blBlocksFieldUiApi || {};
+    if (typeof api.bindHttpsUrlFields === "function") {
+      api.bindHttpsUrlFields(scope);
+    }
+    if (typeof api.bindFieldTabs === "function") {
+      api.bindFieldTabs(scope);
+    }
+  }
+  function rewriteName(name, nameBase, index2) {
+    if (!name || !nameBase) return name;
+    const escaped = nameBase.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const re = new RegExp("^" + escaped + "\\[\\d+\\]");
+    if (!re.test(name)) return name;
+    return name.replace(re, nameBase + "[" + index2 + "]");
+  }
+  function reindexRow(row, nameBase, index2) {
+    row.querySelectorAll("[name]").forEach((el8) => {
+      const name = el8.getAttribute("name");
+      if (!name) return;
+      el8.setAttribute("name", rewriteName(name, nameBase, index2));
+    });
+    row.querySelectorAll("[id]").forEach((el8) => {
+      const id = el8.getAttribute("id") || "";
+      if (!id || !id.includes("-")) return;
+      const cleaned = id.replace(/--row-\d+$/, "");
+      el8.setAttribute("id", cleaned + "--row-" + index2);
+    });
+    row.querySelectorAll("label[for]").forEach((label) => {
+      const forId = label.getAttribute("for") || "";
+      if (!forId) return;
+      const cleaned = forId.replace(/--row-\d+$/, "");
+      label.setAttribute("for", cleaned + "--row-" + index2);
+    });
+    const title = row.querySelector(".bl-blocks-fields__repeater-row-title");
+    if (title) {
+      const template = i18n5("rowLabel", "Entry %d");
+      title.textContent = template.replace("%d", String(index2 + 1));
+    }
+  }
+  function clearRowValues(row) {
+    row.querySelectorAll("input, textarea, select").forEach((el8) => {
+      if (!(el8 instanceof HTMLInputElement || el8 instanceof HTMLTextAreaElement || el8 instanceof HTMLSelectElement)) {
+        return;
+      }
+      const type = (el8 instanceof HTMLInputElement ? el8.type : "").toLowerCase();
+      if (type === "checkbox" || type === "radio") {
+        el8.checked = false;
+        return;
+      }
+      if (type === "hidden" && el8.closest("[data-bl-blocks-media-picker], [data-bl-blocks-icon-picker], [data-bl-blocks-page-picker], [data-bl-blocks-link]")) {
+        el8.value = "";
+        return;
+      }
+      if (type === "button" || type === "submit") return;
+      el8.value = "";
+    });
+    row.querySelectorAll("[data-bl-blocks-icon-picker]").forEach((wrap) => {
+      if (!(wrap instanceof HTMLElement)) return;
+      delete wrap.dataset.blIconBound;
+      const valueRow = wrap.querySelector(".bl-icon-picker__value");
+      const valueBody = wrap.querySelector(".bl-icon-picker__value-body");
+      if (valueBody) valueBody.replaceChildren();
+      if (valueRow) valueRow.hidden = true;
+    });
+    row.querySelectorAll("[data-bl-blocks-media-picker]").forEach((wrap) => {
+      if (!(wrap instanceof HTMLElement)) return;
+      delete wrap.dataset.blMediaBound;
+      const preview = wrap.querySelector("[data-bl-media-preview]");
+      const empty = wrap.querySelector("[data-bl-media-empty]");
+      const inputs = wrap.querySelector("[data-bl-media-inputs]");
+      if (preview) preview.replaceChildren();
+      if (empty) empty.hidden = false;
+      if (inputs) {
+        inputs.querySelectorAll("input").forEach((input) => {
+          input.value = "";
+        });
+      }
+    });
+    row.querySelectorAll("[data-bl-blocks-page-picker]").forEach((wrap) => {
+      if (wrap instanceof HTMLElement) {
+        delete wrap.dataset.blPageBound;
+      }
+    });
+    row.querySelectorAll("[data-bl-blocks-link]").forEach((wrap) => {
+      if (wrap instanceof HTMLElement) {
+        delete wrap.dataset.blLinkBound;
+      }
+    });
+  }
+  function bindOneAdminRepeater(wrap) {
+    if (wrap.dataset.blRepeaterBound === "1") return;
+    wrap.dataset.blRepeaterBound = "1";
+    const rowsEl = wrap.querySelector(":scope > .bl-blocks-fields__repeater-rows");
+    if (!rowsEl) return;
+    const nameBase = wrap.dataset.nameBase || "";
+    const minRows = Math.max(0, parseInt(wrap.dataset.minRows || "0", 10) || 0);
+    const maxRows = Math.max(0, parseInt(wrap.dataset.maxRows || "0", 10) || 0);
+    const emptyHelp = wrap.querySelector(":scope > .bl-blocks-fields__repeater-empty");
+    const addBtn = wrap.querySelector(":scope > .bl-blocks-fields__repeater-add") || wrap.querySelector(".bl-blocks-fields__repeater-add");
+    const getRows = () => Array.from(rowsEl.querySelectorAll(":scope > .bl-blocks-fields__repeater-row"));
+    const syncChrome = () => {
+      const rows = getRows();
+      const count = rows.length;
+      if (emptyHelp) {
+        emptyHelp.hidden = count > 0;
+      }
+      rowsEl.hidden = count === 0;
+      if (addBtn) {
+        addBtn.disabled = maxRows > 0 && count >= maxRows;
+      }
+      rows.forEach((row, i) => {
+        reindexRow(row, nameBase, i);
+        const removeBtn = row.querySelector(".bl-blocks-fields__repeater-remove");
+        if (removeBtn instanceof HTMLButtonElement) {
+          removeBtn.disabled = count <= minRows;
+        }
+      });
+    };
+    const addRow = () => {
+      const rows = getRows();
+      if (maxRows > 0 && rows.length >= maxRows) return;
+      const template = wrap.querySelector(":scope > template[data-bl-repeater-row-template]");
+      let row;
+      if (template instanceof HTMLTemplateElement && template.content.firstElementChild) {
+        row = template.content.firstElementChild.cloneNode(true);
+      } else if (rows[0]) {
+        row = rows[0].cloneNode(true);
+        clearRowValues(row);
+      } else {
+        return;
+      }
+      if (!(row instanceof HTMLElement)) return;
+      row.classList.remove("is-collapsed");
+      rowsEl.appendChild(row);
+      syncChrome();
+      rebindRowWidgets(row);
+      wrap.dispatchEvent(new Event("change", { bubbles: true }));
+    };
+    const removeRow = (row) => {
+      const rows = getRows();
+      if (rows.length <= minRows) return;
+      row.remove();
+      syncChrome();
+      wrap.dispatchEvent(new Event("change", { bubbles: true }));
+    };
+    rowsEl.addEventListener("click", (evt) => {
+      const target = evt.target instanceof Element ? evt.target : null;
+      if (!target) return;
+      const removeBtn = target.closest(".bl-blocks-fields__repeater-remove");
+      if (removeBtn && rowsEl.contains(removeBtn)) {
+        evt.preventDefault();
+        const row = removeBtn.closest(".bl-blocks-fields__repeater-row");
+        if (row) removeRow(row);
+        return;
+      }
+      const collapseBtn = target.closest(".bl-blocks-fields__repeater-collapse");
+      if (collapseBtn && rowsEl.contains(collapseBtn)) {
+        evt.preventDefault();
+        const row = collapseBtn.closest(".bl-blocks-fields__repeater-row");
+        if (!row) return;
+        const collapsed = row.classList.toggle("is-collapsed");
+        collapseBtn.setAttribute("aria-expanded", collapsed ? "false" : "true");
+        collapseBtn.title = collapsed ? i18n5("expandEntry", "Expand") : i18n5("collapseEntry", "Collapse");
+        collapseBtn.setAttribute("aria-label", collapseBtn.title);
+      }
+    });
+    if (addBtn) {
+      addBtn.addEventListener("click", (evt) => {
+        evt.preventDefault();
+        addRow();
+      });
+    }
+    const Builder = window.BlCanvasBuilder;
+    if (Builder && typeof Builder.createSortable === "function") {
+      rowsEl.classList.add("is-sortable");
+      Builder.createSortable(rowsEl, {
+        group: { name: "bl-blocks-admin-repeater", pull: false, put: false },
+        handle: ".bl-blocks-fields__repeater-handle",
+        draggable: ".bl-blocks-fields__repeater-row",
+        filter: ".bl-blocks-fields__repeater-collapse, .bl-blocks-fields__repeater-remove",
+        animation: 150,
+        onUpdate: () => {
+          syncChrome();
+          wrap.dispatchEvent(new Event("change", { bubbles: true }));
+        },
+        onSort: () => {
+          syncChrome();
+        }
+      });
+    }
+    syncChrome();
+  }
+  function bindAdminRepeaters(root = document) {
+    const scope = root && root.querySelectorAll ? root : document;
+    scope.querySelectorAll("[data-bl-blocks-repeater]").forEach((wrap) => {
+      if (wrap instanceof HTMLElement) {
+        bindOneAdminRepeater(wrap);
+      }
+    });
+  }
+
   // themes/baselayer/packages/baselayer-blocks/src/js/admin/field-form.js
   function el7(tag, props = {}, children = []) {
     const node = document.createElement(tag);
@@ -7335,7 +7639,7 @@
     });
     return node;
   }
-  function i18n4(key, fallback) {
+  function i18n6(key, fallback) {
     const dict = window.blBlocksFieldUi && window.blBlocksFieldUi.i18n || window.blBlocksEditor && window.blBlocksEditor.i18n || window.blBlocksPage && window.blBlocksPage.i18n || {};
     return dict[key] || fallback || key;
   }
@@ -7510,9 +7814,23 @@
   }
   function applyFieldWidth(wrap, field, opts = {}) {
     const width = String(field && field.width || "100");
-    const gap = 12;
     const autoClass = opts.autoClass || "";
+    const clearLayoutStyles = () => {
+      wrap.style.flex = "";
+      wrap.style.width = "";
+      wrap.style.maxWidth = "";
+      wrap.style.minWidth = "";
+      wrap.style.removeProperty("--bl-blocks-field-width");
+      wrap.style.removeProperty("--bl-blocks-field-width-factor");
+    };
+    const setPercentVars = (pct2) => {
+      const factor = Math.max(0, Math.min(1, pct2 / 100));
+      clearLayoutStyles();
+      wrap.style.setProperty("--bl-blocks-field-width", `${pct2}%`);
+      wrap.style.setProperty("--bl-blocks-field-width-factor", String(factor));
+    };
     if (width === "auto") {
+      clearLayoutStyles();
       if (autoClass) {
         wrap.classList.add(autoClass);
       } else {
@@ -7526,17 +7844,26 @@
     if (width === "custom") {
       const custom = String(field && field.width_custom || "").trim();
       if (custom) {
+        const match = custom.match(/^(\d+(?:\.\d+)?)%$/);
+        if (match) {
+          const pct2 = parseFloat(match[1]);
+          if (Number.isFinite(pct2) && pct2 > 0) {
+            setPercentVars(pct2);
+            return;
+          }
+        }
+        clearLayoutStyles();
         wrap.style.flex = "0 1 auto";
         wrap.style.width = custom;
         wrap.style.maxWidth = "100%";
         wrap.style.minWidth = "0";
         return;
       }
-      wrap.style.flex = "0 1 100%";
-      wrap.style.width = "100%";
+      setPercentVars(100);
       return;
     }
     const map = {
+      100: 100,
       75: 75,
       66: 66.6667,
       50: 50,
@@ -7548,16 +7875,7 @@
       const parsed = parseInt(width, 10);
       pct = Number.isFinite(parsed) && parsed > 0 ? parsed : 100;
     }
-    if (pct > 0 && pct < 100) {
-      const factor = Math.max(0, Math.min(1, pct / 100));
-      wrap.style.flex = "0 1 auto";
-      wrap.style.width = `min(100%, calc(${pct}% - ${gap * (1 - factor)}px))`;
-      wrap.style.maxWidth = "100%";
-      wrap.style.minWidth = "0";
-      return;
-    }
-    wrap.style.flex = "0 1 100%";
-    wrap.style.width = "100%";
+    setPercentVars(pct);
   }
   function applyColumnWidth(wrap, field) {
     applyFieldWidth(wrap, field, {
@@ -7815,10 +8133,13 @@
       if (field.placeholder) control.placeholder = field.placeholder;
     } else if (type === "select") {
       const multiple = !!field.multiple;
+      const allowNull = !multiple && (field.allow_null === void 0 || field.allow_null !== false && field.allow_null !== 0 && field.allow_null !== "0");
       control = el7("select", { className: "widefat", id });
       if (multiple) control.multiple = true;
-      if (!multiple) {
-        control.appendChild(el7("option", { value: "", text: "\u2014" }));
+      if (field.required) control.required = true;
+      if (allowNull) {
+        const emptyLabel = String(field.placeholder || "").trim() || i18n6("selectEmptyOptionPlaceholder", "Please select\u2026");
+        control.appendChild(el7("option", { value: "", text: emptyLabel }));
       }
       const selected = multiple ? (Array.isArray(current) ? current : []).map(String) : [String(current == null ? "" : current)];
       options.forEach((opt) => {
@@ -7924,10 +8245,10 @@
     } else if (type === "icon") {
       const iconUi = window.baselayerIcons && window.baselayerIcons.ui || {};
       const iconLabels2 = window.baselayerIcons && window.baselayerIcons.labels || {};
-      const chooseLabel = iconUi.choose || i18n4("chooseIcon", "Choose icon");
-      const removeLabel = iconUi.remove || i18n4("clearIcon", "Remove");
+      const chooseLabel = iconUi.choose || i18n6("chooseIcon", "Choose icon");
+      const removeLabel = iconUi.remove || i18n6("clearIcon", "Remove");
       const humanizeIcon = (slug) => String(slug || "").replace(/-/g, " ").replace(/^\w/, (char) => char.toUpperCase());
-      const iconDisplayName = (slug) => {
+      const iconDisplayName2 = (slug) => {
         if (!slug) return "";
         const base = String(slug).replace(/-fill$/, "");
         return iconLabels2[slug] || iconLabels2[base] || humanizeIcon(base || slug);
@@ -7962,7 +8283,7 @@
         if (next) {
           valueBody.append(
             el7("span", { className: "bl-icon -icon-" + next, "aria-hidden": "true" }),
-            el7("span", { className: "bl-icon-picker__value-name", text: iconDisplayName(next) })
+            el7("span", { className: "bl-icon-picker__value-name", text: iconDisplayName2(next) })
           );
           valueRow.hidden = false;
         } else {
@@ -8144,7 +8465,7 @@
         const tabId = String(tab.id || "tab" + index2);
         const panelId = "bl-blocks-tab-panel-" + tabId;
         const btnId = "bl-blocks-tab-" + tabId;
-        const label = String(tab.label || "").trim() || i18n4("tabType", "Tab") + " " + (index2 + 1);
+        const label = String(tab.label || "").trim() || i18n6("tabType", "Tab") + " " + (index2 + 1);
         const btn = el7("button", {
           type: "button",
           className: "bl-blocks-fields__tab" + (index2 === 0 ? " is-active" : ""),
@@ -8356,7 +8677,7 @@
     const children = Array.isArray(field.children) ? field.children : [];
     const minRows = Math.max(0, parseInt(field.min_rows, 10) || 0);
     const maxRows = Math.max(0, parseInt(field.max_rows, 10) || 0);
-    const buttonLabel = field.button_label || i18n4("addRow", "Add entry");
+    const buttonLabel = field.button_label || i18n6("addRow", "Add entry");
     const design = ["standard", "outline", "card"].includes(field.design) ? field.design : "standard";
     const showTitle = field.show_title !== false && field.show_title !== 0 && field.show_title !== "0";
     const uiShared = getUiShared(options);
@@ -8384,7 +8705,7 @@
     const rowsEl = el7("div", { className: "bl-blocks-fields__repeater-rows is-sortable" });
     const emptyHelp = el7("p", {
       className: "description bl-blocks-fields__repeater-empty",
-      text: i18n4("chooseEntriesHelp", "Add one or more entries.")
+      text: i18n6("chooseEntriesHelp", "Add one or more entries.")
     });
     const rowForms = [];
     const dispatchChange = () => {
@@ -8410,7 +8731,7 @@
       Array.from(rowsEl.children).forEach((rowEl, i) => {
         const title = rowEl.querySelector(".bl-blocks-fields__repeater-row-title");
         if (title) {
-          const template = i18n4("rowLabel", "Entry %d");
+          const template = i18n6("rowLabel", "Entry %d");
           title.textContent = template.replace("%d", String(i + 1));
         }
       });
@@ -8451,7 +8772,7 @@
       const toggle = entry.rowEl.querySelector(".bl-blocks-fields__repeater-collapse");
       const icon = toggle && toggle.querySelector(".bl-icon");
       if (toggle) {
-        const label = entry.collapsed ? i18n4("expandEntry", "Expand") : i18n4("collapseEntry", "Collapse");
+        const label = entry.collapsed ? i18n6("expandEntry", "Expand") : i18n6("collapseEntry", "Collapse");
         toggle.title = label;
         toggle.setAttribute("aria-label", label);
         toggle.setAttribute("aria-expanded", entry.collapsed ? "false" : "true");
@@ -8471,8 +8792,8 @@
         {
           type: "button",
           className: "bl-blocks-fields__repeater-handle",
-          title: i18n4("dragEntry", "Drag to reorder"),
-          "aria-label": i18n4("dragEntry", "Drag to reorder")
+          title: i18n6("dragEntry", "Drag to reorder"),
+          "aria-label": i18n6("dragEntry", "Drag to reorder")
         },
         [el7("span", { className: "bl-icon -icon-drag", "aria-hidden": "true" })]
       );
@@ -8482,8 +8803,8 @@
         {
           type: "button",
           className: "button-link bl-blocks-fields__repeater-collapse",
-          title: i18n4("collapseEntry", "Collapse"),
-          "aria-label": i18n4("collapseEntry", "Collapse"),
+          title: i18n6("collapseEntry", "Collapse"),
+          "aria-label": i18n6("collapseEntry", "Collapse"),
           "aria-expanded": "true"
         },
         [el7("span", { className: "bl-icon -icon-collapse-content", "aria-hidden": "true" })]
@@ -8493,8 +8814,8 @@
         {
           type: "button",
           className: "button-link bl-blocks-fields__repeater-remove",
-          title: i18n4("removeRow", "Remove entry"),
-          "aria-label": i18n4("removeRow", "Remove entry")
+          title: i18n6("removeRow", "Remove entry"),
+          "aria-label": i18n6("removeRow", "Remove entry")
         },
         [el7("span", { className: "bl-icon -icon-delete", "aria-hidden": "true" })]
       );
@@ -8616,7 +8937,7 @@
     return wrap;
   }
   function openFieldsModal(opts) {
-    const title = opts.title || i18n4("edit", "Edit");
+    const title = opts.title || i18n6("edit", "Edit");
     const form = createFieldForm(normalizeFieldList(opts.fields), opts.values || {}, {
       layout: "default",
       uiState: opts.uiState,
@@ -8645,7 +8966,7 @@
         type: "button",
         className: "bl-blocks-modal__close",
         text: "\xD7",
-        "aria-label": i18n4("close", "Close"),
+        "aria-label": i18n6("close", "Close"),
         onClick: close
       })
     ]);
@@ -8654,13 +8975,13 @@
       el7("button", {
         type: "button",
         className: "button",
-        text: i18n4("cancel", "Cancel"),
+        text: i18n6("cancel", "Cancel"),
         onClick: close
       }),
       el7("button", {
         type: "button",
         className: "button button-primary",
-        text: i18n4("save", "Save"),
+        text: i18n6("save", "Save"),
         onClick: () => {
           if (typeof opts.onSave === "function") {
             opts.onSave(form.getValues());
@@ -8739,6 +9060,43 @@
   function pageRepeaterUiStorageKey(postId, definitionKey) {
     return "bl-blocks-repeater-ui:" + String(postId || 0) + ":" + String(definitionKey || "");
   }
+  function mountWebsiteFields(root = document) {
+    const host = root.querySelector("[data-bl-blocks-website-fields]");
+    if (!host) return null;
+    const cfgEl = host.querySelector("[data-bl-blocks-website-config]");
+    let fields = [];
+    let values = {};
+    if (cfgEl) {
+      try {
+        const parsed = JSON.parse(cfgEl.textContent || "{}") || {};
+        fields = Array.isArray(parsed.fields) ? parsed.fields : [];
+        values = parsed.values && typeof parsed.values === "object" && !Array.isArray(parsed.values) ? parsed.values : {};
+      } catch (err) {
+        fields = [];
+        values = {};
+      }
+    }
+    const form = createFieldForm(fields, values);
+    host.replaceChildren(form.root);
+    const formEl = host.closest("form");
+    if (formEl) {
+      let hidden = formEl.querySelector("[data-bl-blocks-website-json]");
+      if (!hidden) {
+        hidden = el7("input", {
+          type: "hidden",
+          name: "bl_blocks_values_json",
+          dataset: { blBlocksWebsiteJson: "1" }
+        });
+        formEl.appendChild(hidden);
+      }
+      const sync = () => {
+        hidden.value = JSON.stringify(form.getValues());
+      };
+      sync();
+      formEl.addEventListener("submit", sync);
+    }
+    return form;
+  }
   window.blBlocksFieldUiApi = {
     createFieldForm,
     openFieldsModal,
@@ -8748,21 +9106,27 @@
     bindPagePickers,
     bindLinkFields,
     bindMediaPickers,
+    bindIconPickers,
+    bindAdminRepeaters,
     bindHttpsUrlFields,
-    bindFieldTabs
+    bindFieldTabs,
+    mountWebsiteFields
   };
   if (typeof document !== "undefined") {
     document.addEventListener("DOMContentLoaded", () => {
+      mountWebsiteFields(document);
       bindPagePickers(document);
       bindLinkFields(document);
       bindMediaPickers(document);
+      bindIconPickers(document);
       bindHttpsUrlFields(document);
       bindFieldTabs(document);
+      bindAdminRepeaters(document);
     });
   }
 
   // themes/baselayer/packages/baselayer-blocks/src/js/admin/template-metabox.js
-  function i18n5(key, fallback) {
+  function i18n7(key, fallback) {
     const dict = window.blBlocksAdmin && window.blBlocksAdmin.i18n || {};
     return dict[key] || fallback || key;
   }
@@ -8808,7 +9172,7 @@
     });
     const data = await res.json().catch(() => ({}));
     if (!res.ok) {
-      const message = data && data.message || (fromFile ? i18n5("templateReadFailed", "Could not read the template file.") : i18n5("starterGenerateFailed", "Could not generate the starter template."));
+      const message = data && data.message || (fromFile ? i18n7("templateReadFailed", "Could not read the template file.") : i18n7("starterGenerateFailed", "Could not generate the starter template."));
       throw new Error(message);
     }
     return data;
@@ -8832,7 +9196,7 @@
   }
   function openCodeModal(code, slug, title) {
     document.querySelectorAll("[data-bl-blocks-starter-modal]").forEach((node) => node.remove());
-    const modalTitle = title || i18n5("starterPreviewTitle", "Starter template");
+    const modalTitle = title || i18n7("starterPreviewTitle", "Starter template");
     const sourceId = "bl-blocks-starter-code-" + String(Date.now());
     const overlay = document.createElement("div");
     overlay.className = "bl-blocks-modal-overlay";
@@ -8851,7 +9215,7 @@
     const closeBtn = document.createElement("button");
     closeBtn.type = "button";
     closeBtn.className = "bl-blocks-modal__close";
-    closeBtn.setAttribute("aria-label", i18n5("starterClose", "Close"));
+    closeBtn.setAttribute("aria-label", i18n7("starterClose", "Close"));
     closeBtn.textContent = "\xD7";
     header.append(titleEl, closeBtn);
     const body = document.createElement("div");
@@ -8884,16 +9248,16 @@
     copyBtn.type = "button";
     copyBtn.className = "button bl-button -has-icon -icon-only -icon-copy";
     copyBtn.setAttribute("data-bl-copy-from-source", sourceId);
-    copyBtn.setAttribute("title", i18n5("starterCopyCode", "Copy code"));
-    copyBtn.setAttribute("aria-label", i18n5("starterCopyCode", "Copy code"));
+    copyBtn.setAttribute("title", i18n7("starterCopyCode", "Copy code"));
+    copyBtn.setAttribute("aria-label", i18n7("starterCopyCode", "Copy code"));
     const downloadBtn = document.createElement("button");
     downloadBtn.type = "button";
     downloadBtn.className = "button button-primary bl-button -has-icon -icon-download";
-    downloadBtn.textContent = i18n5("starterDownload", "Download");
+    downloadBtn.textContent = i18n7("starterDownload", "Download");
     const closeFooter = document.createElement("button");
     closeFooter.type = "button";
     closeFooter.className = "button bl-button";
-    closeFooter.textContent = i18n5("starterClose", "Close");
+    closeFooter.textContent = i18n7("starterClose", "Close");
     footer.append(copyBtn, downloadBtn, closeFooter);
     dialog.append(header, body, footer);
     overlay.appendChild(dialog);
@@ -8936,7 +9300,7 @@
     }
     if (busy) {
       button.dataset.blBusyLabel = button.textContent;
-      button.textContent = i18n5("starterGenerating", "Generating\u2026");
+      button.textContent = i18n7("starterGenerating", "Generating\u2026");
     } else if (button.dataset.blBusyLabel) {
       button.textContent = button.dataset.blBusyLabel;
       delete button.dataset.blBusyLabel;
@@ -8949,11 +9313,11 @@
       openCodeModal(
         String(data && data.code || ""),
         data && data.slug || "block",
-        i18n5("starterPreviewTitle", "Starter template")
+        i18n7("starterPreviewTitle", "Starter template")
       );
     } catch (err) {
       window.alert(
-        err && (err.message || err.error) || i18n5("starterGenerateFailed", "Could not generate the starter template.")
+        err && (err.message || err.error) || i18n7("starterGenerateFailed", "Could not generate the starter template.")
       );
     } finally {
       setBusy(trigger, false);
@@ -8966,11 +9330,11 @@
       openCodeModal(
         String(data && data.code || ""),
         data && data.slug || "block",
-        i18n5("templatePreviewTitle", "Template")
+        i18n7("templatePreviewTitle", "Template")
       );
     } catch (err) {
       window.alert(
-        err && (err.message || err.error) || i18n5("templateReadFailed", "Could not read the template file.")
+        err && (err.message || err.error) || i18n7("templateReadFailed", "Could not read the template file.")
       );
     } finally {
       setBusy(trigger, false);
@@ -8983,7 +9347,7 @@
       window.location.reload();
     } catch (err) {
       window.alert(
-        err && (err.message || err.error) || i18n5("starterWriteFailed", "Could not create the template file.")
+        err && (err.message || err.error) || i18n7("starterWriteFailed", "Could not create the template file.")
       );
       setBusy(trigger, false);
     }

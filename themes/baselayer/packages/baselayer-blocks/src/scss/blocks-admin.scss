@@ -283,9 +283,31 @@ body.post-new-php.post-type-bl_block {
   padding: 0;
   list-style: none;
   border: 1px solid #c3c4c7;
-  border-radius: 4px;
+  border-radius: var(--bl-admin-radius);
   background: #fff;
-  overflow: hidden;
+
+  li {
+    position: relative;
+    margin: 0;
+
+    &:focus-within {
+      z-index: 1;
+    }
+
+    &:first-child {
+      a {
+        border-top-left-radius: var(--bl-admin-radius);
+        border-top-right-radius: var(--bl-admin-radius);
+      }
+
+      &:last-child {
+        a {
+          border-bottom-left-radius: var(--bl-admin-radius);
+          border-bottom-right-radius: var(--bl-admin-radius);
+        }
+      }
+    }
+  }
 }
 
 .bl-blocks-website__tabs a {
@@ -294,6 +316,7 @@ body.post-new-php.post-type-bl_block {
   text-decoration: none;
   color: #1d2327;
   border-bottom: 1px solid #dcdcde;
+  word-break: break-word;
 }
 
 .bl-blocks-website__tabs li:last-child a {
@@ -308,8 +331,14 @@ body.post-new-php.post-type-bl_block {
 .bl-blocks-website__main {
   background: #fff;
   border: 1px solid #c3c4c7;
-  border-radius: 4px;
+  border-radius: var(--bl-admin-radius);
   padding: 16px 20px 20px;
+
+  p.submit {
+    padding-bottom: 0;
+    margin-bottom: 0;
+    margin-top: 16px;
+  }
 }
 
 .bl-blocks-website__title {
@@ -716,7 +745,6 @@ button.button.button.bl-bo-choices__add {
   gap: 8px;
   margin-top: 8px;
 }
-
 
 @media (max-width: 782px) {
   .bl-bo-field {

@@ -522,6 +522,20 @@ function bl_blocks_sanitize_field($field, int $repeater_depth = 0): ?array
 	}
 
 	if (function_exists('bl_forms_sanitize_field')) {
+		// Numeric widths outside Forms presets (e.g. 20/80) → custom % so packing survives import.
+		if (isset($field['width']) && is_scalar($field['width'])) {
+			$w = sanitize_key((string) $field['width']);
+			$presets = function_exists('bl_forms_width_presets')
+				? bl_forms_width_presets()
+				: ['100', '75', '66', '50', '33', '25', 'auto'];
+			if ($w !== '' && $w !== 'custom' && !in_array($w, $presets, true) && ctype_digit($w)) {
+				$n = (int) $w;
+				if ($n > 0 && $n < 100) {
+					$field['width'] = 'custom';
+					$field['width_custom'] = $n . '%';
+				}
+			}
+		}
 		$clean = bl_forms_sanitize_field($field);
 		if ($clean === null) {
 			return null;
@@ -540,6 +554,16 @@ function bl_blocks_sanitize_field($field, int $repeater_depth = 0): ?array
 			$mime_types = sanitize_text_field((string) ($field['mime_types'] ?? ''));
 			if ($mime_types !== '') {
 				$clean['mime_types'] = $mime_types;
+			}
+		}
+
+		// Allow HTML (or SVG) on specific textareas (e.g. notice content, custom channel SVG).
+		if (($clean['type'] ?? '') === 'textarea' && array_key_exists('allow_html', $field)) {
+			$allow = $field['allow_html'];
+			if ($allow === true || $allow === 1 || $allow === '1' || $allow === 'post') {
+				$clean['allow_html'] = true;
+			} elseif ($allow === 'svg') {
+				$clean['allow_html'] = 'svg';
 			}
 		}
 
@@ -835,6 +859,17 @@ function bl_blocks_sanitize_leaf_field_fallback(array $field): array
 	if (in_array($out['type'], ['select', 'button_group', 'file', 'image', 'page'], true)) {
 		$out['multiple'] = !empty($field['multiple']);
 	}
+	if ($out['type'] === 'select') {
+		if (!empty($out['multiple'])) {
+			unset($out['allow_null']);
+		} else {
+			$out['allow_null'] = !array_key_exists('allow_null', $field)
+				? true
+				: !empty($field['allow_null']);
+		}
+	} else {
+		unset($out['allow_null']);
+	}
 	if (in_array($out['type'], ['file', 'image'], true)) {
 		$mime_types = sanitize_text_field((string) ($field['mime_types'] ?? ''));
 		if ($mime_types !== '') {
@@ -879,6 +914,15 @@ function bl_blocks_sanitize_leaf_field_fallback(array $field): array
 	if ($out['type'] === 'icon') {
 		$out['default_value'] = sanitize_key((string) ($field['default_value'] ?? ''));
 		unset($out['placeholder'], $out['multiple']);
+	}
+
+	if ($out['type'] === 'textarea' && array_key_exists('allow_html', $field)) {
+		$allow = $field['allow_html'];
+		if ($allow === true || $allow === 1 || $allow === '1' || $allow === 'post') {
+			$out['allow_html'] = true;
+		} elseif ($allow === 'svg') {
+			$out['allow_html'] = 'svg';
+		}
 	}
 
 	if (isset($field['conditional_logic']) && is_array($field['conditional_logic'])) {
@@ -1417,7 +1461,17 @@ function bl_blocks_sanitize_values(array $fields, $raw): array
 		}
 
 		if (in_array($type, ['textarea', 'html'], true)) {
-			$values[$name] = sanitize_textarea_field(is_scalar($raw_value) ? (string) $raw_value : '');
+			$raw_str = is_scalar($raw_value) ? (string) $raw_value : '';
+			$allow = $field['allow_html'] ?? false;
+			if ($allow === true || $allow === 1 || $allow === '1' || $allow === 'post') {
+				$values[$name] = wp_kses_post($raw_str);
+			} elseif ($allow === 'svg' && function_exists('bl_svg_sanitize')) {
+				$values[$name] = bl_svg_sanitize($raw_str);
+			} elseif ($allow === 'svg') {
+				$values[$name] = $raw_str;
+			} else {
+				$values[$name] = sanitize_textarea_field($raw_str);
+			}
 			continue;
 		}
 

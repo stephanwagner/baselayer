@@ -96,6 +96,7 @@ if (bl_theme_feature_enabled('forms')) {
 if (bl_theme_feature_enabled('blocks')) {
 	require_once __DIR__ . '/packages/baselayer-blocks/baselayer-blocks.php';
 }
+require_once __DIR__ . '/includes/website-settings.php';
 if (bl_theme_feature_enabled('editorial')) {
 	require_once __DIR__ . '/packages/baselayer-editorial/baselayer-editorial.php';
 }

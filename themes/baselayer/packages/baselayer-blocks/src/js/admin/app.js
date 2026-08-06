@@ -104,6 +104,22 @@ export function mountApp(root, initial, definitionType = 'block') {
     FormBuilder.configure({
       mediaLibraryFields: true,
       headingLevels: ['h2', 'h3', 'h4'],
+      // Nested column/section/tab lists call createFieldCard/serializeRow directly;
+      // route Blocks-only repeater through these hooks (same as root createItem).
+      fieldCard: {
+        createFieldCard: (data, open) => {
+          if ((data?.type || '') === 'repeater') {
+            return createRepeaterCard(data, open, 1);
+          }
+          return null;
+        },
+        serializeRow: (row) => {
+          if ((row?.dataset?.fieldType || '') === 'repeater') {
+            return serializeRepeaterRow(row);
+          }
+          return null;
+        },
+      },
     });
   }
 

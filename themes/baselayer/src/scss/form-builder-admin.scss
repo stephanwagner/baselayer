@@ -1716,7 +1716,7 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
 
 .bl-forms-builder__option {
   display: grid;
-  grid-template-columns: 1fr 1fr auto;
+  grid-template-columns: auto 1fr 1fr auto;
   gap: 6px;
   align-items: center;
 }
@@ -1735,6 +1735,11 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
 
 .bl-forms-builder__option-heading-spacer {
   width: 28px;
+}
+
+.bl-forms-builder__option-handle {
+  flex: 0 0 auto;
+  cursor: grab;
 }
 
 .bl-forms-builder__width,
