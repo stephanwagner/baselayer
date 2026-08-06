@@ -126,6 +126,7 @@ function bl_notice_sanitize_extra_class(string $raw): string
  *   buttons: list<array{url: string, title: string, target: string}>,
  *   show_close_button: bool,
  *   close_button_text: string,
+ *   close_button_type: string,
  *   close_button_style: string,
  *   close_button_outline: bool
  * }|null
@@ -187,9 +188,32 @@ function bl_notice_normalize_row(array $row, int $index): ?array
 	if ($close_text === '') {
 		$close_text = __('Close', 'baselayer');
 	}
-	$close_style = isset($row['close_button_style']) ? (string) $row['close_button_style'] : 'primary';
-	if (!in_array($close_style, ['primary', 'secondary'], true)) {
-		$close_style = 'primary';
+
+	// New schema: close_button_type (primary|secondary) + close_button_style (filled|outline).
+	// Legacy: close_button_style held primary|secondary; close_button_outline was a toggle.
+	$close_type = isset($row['close_button_type']) ? (string) $row['close_button_type'] : '';
+	$close_style = isset($row['close_button_style']) ? (string) $row['close_button_style'] : '';
+	$close_outline = null;
+
+	if ($close_type === '' && in_array($close_style, ['primary', 'secondary'], true)) {
+		$close_type = $close_style;
+		$close_style = '';
+	}
+	if ($close_type === '') {
+		$close_type = 'primary';
+	}
+	if (!in_array($close_type, ['primary', 'secondary'], true)) {
+		$close_type = 'primary';
+	}
+
+	if (in_array($close_style, ['filled', 'outline'], true)) {
+		$close_outline = $close_style === 'outline';
+	} elseif (array_key_exists('close_button_outline', $row)) {
+		$close_outline = function_exists('bl_website_truthy')
+			? bl_website_truthy($row['close_button_outline'])
+			: !empty($row['close_button_outline']);
+	} else {
+		$close_outline = true;
 	}
 
 	// Content identity only — UI/timing tweaks must not reset visitor storage.
@@ -206,10 +230,9 @@ function bl_notice_normalize_row(array $row, int $index): ?array
 		'buttons' => $buttons,
 		'show_close_button' => $show_close_button,
 		'close_button_text' => $close_text,
-		'close_button_style' => $close_style,
-		'close_button_outline' => function_exists('bl_website_truthy')
-			? bl_website_truthy($row['close_button_outline'] ?? '')
-			: !empty($row['close_button_outline']),
+		'close_button_type' => $close_type,
+		'close_button_style' => $close_outline ? 'outline' : 'filled',
+		'close_button_outline' => $close_outline,
 	];
 }
 

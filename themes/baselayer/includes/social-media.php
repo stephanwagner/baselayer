@@ -63,57 +63,65 @@ function bl_social_media_label_from_url(string $url): string
 }
 
 /**
- * Preset channel map + custom channels raw data for the current storage backend.
+ * Channels repeater rows for the current storage backend.
  *
- * @return array{0: array<string, mixed>, 1: list<array<string, mixed>>}
+ * Prefers the unified `channels` schema; falls back to legacy channel_1…6 + custom_channels.
+ *
+ * @return list<array<string, mixed>>
  */
-function bl_social_media_raw_sources(): array
+function bl_social_media_channel_rows(): array
 {
 	if (function_exists('bl_website_uses_acf') && bl_website_uses_acf()) {
 		if (!function_exists('get_field')) {
-			return [[], []];
+			return [];
 		}
-		$social = get_field('social_media', 'option');
-		$social = is_array($social) ? $social : [];
-		$custom = get_field('custom_channels', 'option');
-		$custom = is_array($custom) ? $custom : [];
 
-		return [$social, $custom];
+		$channels = get_field('channels', 'option');
+		if (is_array($channels) && $channels !== []) {
+			return array_values(array_filter($channels, 'is_array'));
+		}
+
+		return bl_social_media_legacy_rows_from_sources(
+			get_field('social_media', 'option'),
+			get_field('custom_channels', 'option')
+		);
 	}
 
 	$values = function_exists('bl_website_site_values') ? bl_website_site_values('social-media') : [];
+	$channels = isset($values['channels']) && is_array($values['channels']) ? $values['channels'] : [];
+	if ($channels !== []) {
+		return array_values(array_filter($channels, 'is_array'));
+	}
+
 	$custom = isset($values['custom_channels']) && is_array($values['custom_channels'])
 		? $values['custom_channels']
 		: [];
 
-	return [$values, $custom];
+	return bl_social_media_legacy_rows_from_sources($values, $custom);
 }
 
 /**
- * Collect social links from preset channels + custom repeater.
+ * Convert legacy preset slots + custom repeater into unified channel rows.
  *
- * @return list<array{url: string, label: string, icon_class?: string, svg?: string}>
+ * @param mixed $social
+ * @param mixed $custom
+ * @return list<array<string, mixed>>
  */
-function bl_get_social_media_links(): array
+function bl_social_media_legacy_rows_from_sources($social, $custom): array
 {
-	[$social, $custom] = bl_social_media_raw_sources();
-
-	$links = [];
-	$labels = bl_social_media_channel_labels();
+	$social = is_array($social) ? $social : [];
+	$custom = is_array($custom) ? $custom : [];
+	$rows = [];
 
 	for ($i = 1; $i <= 6; $i++) {
 		$url = trim((string) ($social['url_' . $i] ?? ''));
-		if ($url === '') {
-			continue;
-		}
 		$channel = sanitize_key((string) ($social['channel_' . $i] ?? ''));
-		if ($channel === '' || !isset($labels[$channel])) {
+		if ($url === '' || $channel === '') {
 			continue;
 		}
-		$links[] = [
+		$rows[] = [
+			'channel' => $channel,
 			'url' => $url,
-			'label' => $labels[$channel],
-			'icon_class' => '-icon-' . $channel,
 		];
 	}
 
@@ -121,13 +129,56 @@ function bl_get_social_media_links(): array
 		if (!is_array($row)) {
 			continue;
 		}
+		$icon_type = (string) ($row['icon_type'] ?? 'classname');
+		if ($icon_type === 'classname') {
+			$icon_type = 'icon';
+		}
+		$rows[] = [
+			'channel' => 'custom',
+			'platform' => '',
+			'icon_type' => $icon_type,
+			'icon' => (string) ($row['classname'] ?? $row['icon'] ?? ''),
+			'svg_code' => (string) ($row['svg_code'] ?? ''),
+			'url' => (string) ($row['url'] ?? ''),
+		];
+	}
+
+	return $rows;
+}
+
+/**
+ * Collect social links from the channels repeater (or legacy fallback).
+ *
+ * @return list<array{url: string, label: string, icon_class?: string, svg?: string}>
+ */
+function bl_get_social_media_links(): array
+{
+	$links = [];
+	$labels = bl_social_media_channel_labels();
+
+	foreach (bl_social_media_channel_rows() as $row) {
 		$url = trim((string) ($row['url'] ?? ''));
 		if ($url === '') {
 			continue;
 		}
 
-		$icon_type = (string) ($row['icon_type'] ?? 'classname');
-		$label = bl_social_media_label_from_url($url);
+		$channel = sanitize_key((string) ($row['channel'] ?? $row['channel_2'] ?? ''));
+		if ($channel !== '' && $channel !== 'custom' && isset($labels[$channel])) {
+			$links[] = [
+				'url' => $url,
+				'label' => $labels[$channel],
+				'icon_class' => '-icon-' . $channel,
+			];
+			continue;
+		}
+
+		if ($channel !== 'custom' && $channel !== '') {
+			continue;
+		}
+
+		$platform = trim((string) ($row['platform'] ?? ''));
+		$label = $platform !== '' ? $platform : bl_social_media_label_from_url($url);
+		$icon_type = (string) ($row['icon_type'] ?? 'icon');
 
 		if ($icon_type === 'code') {
 			$raw_svg = trim((string) ($row['svg_code'] ?? ''));
@@ -146,7 +197,8 @@ function bl_get_social_media_links(): array
 			continue;
 		}
 
-		$icon_class = bl_social_media_normalize_icon_class((string) ($row['classname'] ?? ''));
+		$icon_raw = (string) ($row['icon'] ?? $row['classname'] ?? $row['fjwd70dk8'] ?? '');
+		$icon_class = bl_social_media_normalize_icon_class($icon_raw);
 		if ($icon_class === '') {
 			continue;
 		}

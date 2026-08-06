@@ -23,8 +23,16 @@ $content_html = isset($notice['content_html']) ? (string) $notice['content_html'
 $buttons = isset($notice['buttons']) && is_array($notice['buttons']) ? $notice['buttons'] : [];
 $show_close_button = !empty($notice['show_close_button']);
 $close_button_text = isset($notice['close_button_text']) ? (string) $notice['close_button_text'] : __('Close', 'baselayer');
-$close_button_style = isset($notice['close_button_style']) ? (string) $notice['close_button_style'] : 'primary';
-$close_button_outline = !empty($notice['close_button_outline']);
+$close_button_type = isset($notice['close_button_type']) ? (string) $notice['close_button_type'] : '';
+if ($close_button_type === '' && isset($notice['close_button_style']) && in_array((string) $notice['close_button_style'], ['primary', 'secondary'], true)) {
+	$close_button_type = (string) $notice['close_button_style'];
+}
+if ($close_button_type === '') {
+	$close_button_type = 'primary';
+}
+$close_button_outline = array_key_exists('close_button_outline', $notice)
+	? !empty($notice['close_button_outline'])
+	: ((string) ($notice['close_button_style'] ?? 'outline') !== 'filled');
 
 if ($id === '') {
 	return;
@@ -36,7 +44,7 @@ if ($extra_class !== '') {
 	$classes[] = $extra_class;
 }
 
-$close_classes = ['site-notice__close', 'button', '-small', '-' . sanitize_html_class($close_button_style)];
+$close_classes = ['site-notice__close', 'button', '-small', '-' . sanitize_html_class($close_button_type)];
 if ($close_button_outline) {
 	$close_classes[] = '-outline';
 }
