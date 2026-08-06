@@ -14,3 +14,4 @@ import './pages/install-theme';
 import './pages/developer-icons';
 import './pages/developer-features';
 import './pages/media-cleanup';
+import './pages/install-google-font';

@@ -3071,3 +3071,96 @@ msgstr "Auswahl"
 
 msgid "Privacy Policy"
 msgstr "Datenschutzerklärung"
+
+msgid "Install Google Font"
+msgstr "Google Font installieren"
+
+msgid "Download a Google Font into your theme as self-hosted files (same layout as the built-in Baselayer fonts)."
+msgstr "Lade eine Google Font als selbst gehostete Dateien in dein Theme (gleiches Layout wie die mitgelieferten Baselayer-Fonts)."
+
+msgid "Files will be saved to: %s"
+msgstr "Dateien werden gespeichert unter: %s"
+
+msgid "Child theme (%s)"
+msgstr "Child-Theme (%s)"
+
+msgid "Parent theme (%s)"
+msgstr "Parent-Theme (%s)"
+
+msgid "Choose fonts"
+msgstr "Fonts wählen"
+
+msgid "Search Google Fonts…"
+msgstr "Google Fonts suchen…"
+
+msgid "Searching…"
+msgstr "Suche…"
+
+msgid "No fonts match your search."
+msgstr "Keine Fonts entsprechen deiner Suche."
+
+msgid "Could not load fonts."
+msgstr "Fonts konnten nicht geladen werden."
+
+msgid "Select a font to preview and install."
+msgstr "Wähle einen Font zur Vorschau und Installation."
+
+msgid "The quick brown fox jumps over the lazy dog. 1234567890"
+msgstr "Franz jagt im komplett verwahrlosten Taxi quer durch Bayern. 1234567890"
+
+msgid "Installing…"
+msgstr "Installiere…"
+
+msgid "Install"
+msgstr "Installieren"
+
+msgid "Could not install the font."
+msgstr "Der Font konnte nicht installiert werden."
+
+msgid "Font installed."
+msgstr "Font installiert."
+
+msgid "Selected"
+msgstr "Ausgewählt"
+
+msgid "Could not load the Google Fonts catalog."
+msgstr "Der Google-Fonts-Katalog konnte nicht geladen werden."
+
+msgid "Could not parse the Google Fonts catalog."
+msgstr "Der Google-Fonts-Katalog konnte nicht gelesen werden."
+
+msgid "Choose a font family."
+msgstr "Wähle eine Font-Familie."
+
+msgid "Google did not return font CSS for this family."
+msgstr "Google hat für diese Familie kein Font-CSS zurückgegeben."
+
+msgid "Could not download Google Fonts CSS."
+msgstr "Google-Fonts-CSS konnte nicht heruntergeladen werden."
+
+msgid "No font files were found in the Google CSS."
+msgstr "In dem Google-CSS wurden keine Font-Dateien gefunden."
+
+msgid "Could not create the font directory."
+msgstr "Das Font-Verzeichnis konnte nicht erstellt werden."
+
+msgid "Could not download a font file."
+msgstr "Eine Font-Datei konnte nicht heruntergeladen werden."
+
+msgid "Could not write a font file."
+msgstr "Eine Font-Datei konnte nicht geschrieben werden."
+
+msgid "Could not write the font SCSS file."
+msgstr "Die Font-SCSS-Datei konnte nicht geschrieben werden."
+
+msgid "Invalid font file name from Google."
+msgstr "Ungültiger Font-Dateiname von Google."
+
+msgid "Add this to your child theme src/scss/main.scss (above the parent @forward), then rebuild CSS."
+msgstr "Füge dies in die Child-Theme-Datei src/scss/main.scss ein (oberhalb des Parent-@forward) und baue danach das CSS neu."
+
+msgid "Add this to themes/baselayer/src/scss/fonts/_fonts.scss, then rebuild CSS."
+msgstr "Füge dies in themes/baselayer/src/scss/fonts/_fonts.scss ein und baue danach das CSS neu."
+
+msgid "You do not have permission to install fonts."
+msgstr "Du hast keine Berechtigung, Fonts zu installieren."

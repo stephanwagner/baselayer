@@ -805,6 +805,206 @@ body.bl-media-cleanup-modal-open {
   margin-top: 16px;
 }
 
+.bl-google-font {
+  .bl-submit-row {
+    margin-top: 8px;
+  }
+}
+
+body.bl-google-font-modal-open {
+  overflow: hidden;
+}
+
+.bl-google-font-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 100110;
+  display: none;
+}
+
+.bl-google-font-modal.is-open {
+  display: block;
+}
+
+.bl-google-font-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.bl-google-font-modal__dialog {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 720px;
+  max-width: calc(100vw - 48px);
+  max-height: calc(100vh - 64px);
+  margin: 8vh auto 0;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+}
+
+.bl-google-font-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 20px 0;
+
+  h2 {
+    margin: 0;
+  }
+}
+
+.bl-google-font-modal__close {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  color: #646970;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+
+  .bl-icon {
+    display: block;
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+  }
+
+  &:hover {
+    color: #1d2327;
+  }
+}
+
+.bl-google-font-modal__body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px 20px;
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+}
+
+.bl-google-font-modal__search {
+  width: 100%;
+  max-width: none;
+}
+
+.bl-google-font-modal__layout {
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) 1fr;
+  gap: 16px;
+  min-height: 280px;
+  flex: 1 1 auto;
+  overflow: hidden;
+
+  @media (max-width: 782px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.bl-google-font-modal__results {
+  border: 1px solid #dcdcde;
+  border-radius: 4px;
+  overflow: auto;
+  background: #fff;
+  max-height: 360px;
+}
+
+.bl-google-font-modal__empty {
+  margin: 12px;
+}
+
+.bl-google-font-modal__result {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+  margin: 0;
+  padding: 8px 10px;
+  border: 0;
+  border-bottom: 1px solid #f0f0f1;
+  background: transparent;
+  color: #1d2327;
+  cursor: pointer;
+  text-align: left;
+  font-size: 13px;
+
+  &:last-child {
+    border-bottom: 0;
+  }
+
+  &:hover {
+    background: #f6f7f7;
+  }
+
+  &.is-selected {
+    background: #e7f3ff;
+    color: #135e96;
+  }
+}
+
+.bl-google-font-modal__result-meta {
+  color: #8c8f94;
+  font-size: 11px;
+  text-transform: capitalize;
+}
+
+.bl-google-font-modal__preview-pane {
+  border: 1px solid #dcdcde;
+  border-radius: 4px;
+  padding: 14px;
+  overflow: auto;
+  background: #fcfcfc;
+}
+
+.bl-google-font-modal__preview-name {
+  margin: 0 0 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.bl-google-font-modal__preview-sample {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.35;
+  text-wrap: pretty;
+}
+
+.bl-google-font-modal__snippet {
+  margin: 8px 0;
+  padding: 10px 12px;
+  background: #1d2327;
+  color: #f0f0f1;
+  border-radius: 4px;
+  overflow: auto;
+  font-size: 12px;
+}
+
+.bl-google-font-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 0;
+  padding: 16px 20px;
+  border-top: 1px solid #dcdcde;
+}
+
+.notice.notice-success.notice-alt.bl-google-font-modal__success {
+  margin: 0;
+  background: #edfaef;
+  background-color: #edfaef;
+
+  p {
+    margin: 0.4em 0;
+  }
+}
+
 .bl-blocks-system__badge {
   display: inline-block;
   margin-left: 6px;
