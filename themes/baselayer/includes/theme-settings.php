@@ -1434,6 +1434,9 @@ function theme_settings_page(): void
 						</tr>
 					</thead>
 					<tbody>
+						<tr class="bl-redirects-empty" id="bl-redirects-empty"<?= $redirects_list !== [] ? ' hidden' : '' ?>>
+							<td colspan="4" class="description" style="padding: 12px 10px;"><?= esc_html__('No redirects yet.', 'baselayer') ?></td>
+						</tr>
 						<?php foreach ($redirects_list as $i => $r) : ?>
 							<tr class="bl-redirect-row">
 								<td><input type="text" name="bl_redirects[<?= (int) $i ?>][from]" value="<?= esc_attr($r['from']) ?>" class="regular-text" style="width: 100%;" placeholder="<?= esc_attr__('/old-path', 'baselayer') ?>"></td>
@@ -1471,7 +1474,16 @@ function theme_settings_page(): void
 					if (!form) return;
 					var tbody = form.querySelector('#bl-redirects-table tbody');
 					var template = form.querySelector('.bl-redirect-template');
+					var emptyEl = form.querySelector('#bl-redirects-empty');
 					var index = tbody.querySelectorAll('.bl-redirect-row:not(.bl-redirect-template)').length;
+
+					function syncEmptyState() {
+						var count = tbody.querySelectorAll('.bl-redirect-row:not(.bl-redirect-template)').length;
+						if (emptyEl) {
+							emptyEl.hidden = count > 0;
+						}
+					}
+
 					form.querySelector('#bl-redirect-add').addEventListener('click', function() {
 						var tr = template.cloneNode(true);
 						tr.classList.remove('bl-redirect-template');
@@ -1482,10 +1494,12 @@ function theme_settings_page(): void
 						});
 						tbody.insertBefore(tr, template);
 						index++;
+						syncEmptyState();
 					});
 					tbody.addEventListener('click', function(e) {
 						if (e.target.classList.contains('bl-redirect-remove')) {
 							e.target.closest('tr').remove();
+							syncEmptyState();
 						}
 					});
 				})();

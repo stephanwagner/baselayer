@@ -96,6 +96,7 @@ function bl_render_developer_cheatsheet(): void
 							<code class="bl-code-text bl-code-small">PHP</code>
 						</td>
 						<td>
+							<code class="bl-code-small"><?= esc_html("bl_svg_code('/img/icon.svg');") ?></code><br>
 							<code class="bl-code-small"><?= esc_html("bl_svg_code('/img/icon.svg', ['class' => 'my-class']);") ?></code>
 							<div class="helpers-table__preview-code">
 								<span class="helpers-table__preview-pointer">→</span> <code class="bl-code-text bl-code-small">&lt;svg ...&gt;...&lt;/svg&gt;</code>
@@ -111,6 +112,7 @@ function bl_render_developer_cheatsheet(): void
 							<code class="bl-code-text bl-code-small">PHP</code>
 						</td>
 						<td>
+							<code class="bl-code-small"><?= esc_html("bl_img(123, 'large');") ?></code><br>
 							<code class="bl-code-small"><?= esc_html("bl_img(123, 'medium', ['class' => 'my-class', 'loading' => 'eager']);") ?></code>
 							<div class="helpers-table__preview-code">
 								<span class="helpers-table__preview-pointer">→</span> <code class="bl-code-text bl-code-small">&lt;img src="..." srcset="..." class="my-class" loading="eager" ...&gt;</code>
@@ -126,6 +128,7 @@ function bl_render_developer_cheatsheet(): void
 							<code class="bl-code-text bl-code-small">PHP</code>
 						</td>
 						<td>
+							<code class="bl-code-small"><?= esc_html("bl_image_with_placeholder(123, 'large');") ?></code><br>
 							<code class="bl-code-small"><?= esc_html("bl_image_with_placeholder(123, 'medium', ['class' => 'my-class', 'loading' => 'eager']);") ?></code><br>
 							<code class="bl-code-small"><?= esc_html("bl_image_with_placeholder_url(123, 'medium', [...]);") ?></code>
 						</td>
@@ -140,7 +143,7 @@ function bl_render_developer_cheatsheet(): void
 						</td>
 						<td>
 							<code class="bl-code-small"><?= esc_html("bl_config('headers.Cache-Control');") ?></code><br>
-							<code class="bl-code-small"><?= esc_html("bl_config_cpt('project');") ?></code>
+							<code class="bl-code-small"><?= esc_html("bl_config_cpt('projects');") ?></code>
 						</td>
 					</tr>
 					<?php if (function_exists('bl_theme_feature_enabled') && bl_theme_feature_enabled('breadcrumbs')) : ?>

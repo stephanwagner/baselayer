@@ -333,6 +333,9 @@ msgstr "302 (Temporär)"
 msgid "Add redirect"
 msgstr "Weiterleitung hinzufügen"
 
+msgid "No redirects yet."
+msgstr "Noch keine Weiterleitungen vorhanden."
+
 msgid "Custom CSS"
 msgstr "Eigenes CSS"
 

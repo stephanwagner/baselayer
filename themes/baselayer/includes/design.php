@@ -268,13 +268,61 @@ function bl_theme_json_dimensions_settings(): array
 }
 
 /**
- * Contents of `src/scss/_root.scss` — the `:root { … }` block only (readonly overview in Theme → CSS admin).
+ * Extract the body of `@mixin $name { … }` from SCSS (brace matching; skips line and block comments).
+ *
+ * @param string $scss Raw file contents.
+ * @param string $name Mixin name without `@mixin`.
+ * @return string Inner body (no braces), or empty string.
+ */
+function bl_extract_scss_mixin_body(string $scss, string $name): string
+{
+	$name = preg_quote($name, '/');
+	if (!preg_match('/@mixin\s+' . $name . '\s*\{/', $scss, $m, PREG_OFFSET_CAPTURE)) {
+		return '';
+	}
+	$start = (int) $m[0][1];
+	$openBrace = strpos($scss, '{', $start);
+	if ($openBrace === false) {
+		return '';
+	}
+	$depth = 0;
+	$len = strlen($scss);
+	for ($i = $openBrace; $i < $len; $i++) {
+		$c = $scss[$i];
+		if ($c === '/' && ($i + 1) < $len && $scss[$i + 1] === '/') {
+			$nl = strpos($scss, "\n", $i);
+			$i = $nl !== false ? $nl : $len - 1;
+			continue;
+		}
+		if ($c === '/' && ($i + 1) < $len && $scss[$i + 1] === '*') {
+			$end = strpos($scss, '*/', $i + 2);
+			if ($end === false) {
+				break;
+			}
+			$i = $end + 1;
+			continue;
+		}
+		if ($c === '{') {
+			$depth++;
+		} elseif ($c === '}') {
+			$depth--;
+			if ($depth === 0) {
+				return substr($scss, $openBrace + 1, $i - $openBrace - 1);
+			}
+		}
+	}
+	return '';
+}
+
+/**
+ * Frontend theme tokens from `src/scss/_theme-tokens.scss` as a `:root { … }` block
+ * (readonly overview fallback in Theme → CSS when compiled CSS is unavailable).
  *
  * @return string
  */
 function bl_variables_scss_root_block(): string
 {
-	$path = get_template_directory() . '/src/scss/_root.scss';
+	$path = get_template_directory() . '/src/scss/_theme-tokens.scss';
 	if (!is_readable($path)) {
 		return '';
 	}
@@ -282,32 +330,35 @@ function bl_variables_scss_root_block(): string
 	if (!is_string($raw) || $raw === '') {
 		return '';
 	}
-	$block = bl_extract_scss_root_block($raw);
-	if (!is_string($block) || $block === '') {
+	$body = bl_extract_scss_mixin_body($raw, 'bl-theme-tokens');
+	if (!is_string($body) || trim($body) === '') {
 		return '';
 	}
-	$block = trim($block);
+	$block = ":root {\n" . rtrim($body) . "\n}";
 	return bl_scss_line_comments_to_css_block($block);
 }
 
 /**
- * Resolved `:root { … }` block from compiled admin CSS (fallback when live collection is unavailable).
+ * Resolved frontend `:root { … }` block from compiled `baselayer.css`
+ * (readonly overview in Theme → CSS). Prefers the unminified build for readability.
  *
  * @return string
  */
 function bl_variables_compiled_root_block(): string
 {
-	$candidates = [];
+	$base = trailingslashit(get_template_directory());
+	$candidates = [
+		$base . 'assets/css/baselayer.css',
+		$base . 'assets/css/baselayer.min.css',
+		$base . 'assets/release/css/baselayer.min.css',
+	];
 	if (function_exists('bl_resolve_built_asset')) {
-		$asset = bl_resolve_built_asset('admin', 'css');
+		$asset = bl_resolve_built_asset('baselayer', 'css');
 		if ($asset !== null) {
+			// Prefer unminified first; append resolved path as a last resort.
 			$candidates[] = $asset['path'];
 		}
 	}
-	$min = function_exists('bl_is_debug') && bl_is_debug() ? '' : '.min';
-	$candidates[] = get_template_directory() . '/assets/css/admin' . $min . '.css';
-	$candidates[] = get_template_directory() . '/assets/css/admin.css';
-	$candidates[] = get_template_directory() . '/assets/release/css/admin.min.css';
 
 	foreach (array_unique($candidates) as $path) {
 		if (!is_readable($path)) {
