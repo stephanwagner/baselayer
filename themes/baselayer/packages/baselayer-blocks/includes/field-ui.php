@@ -294,6 +294,7 @@ function bl_blocks_enqueue_field_ui_assets(): void
 			'linkOpenNewTab'         => __('Open in new tab', 'baselayer-blocks'),
 			'chooseIcon'             => __('Choose icon', 'baselayer-blocks'),
 			'clearIcon'              => __('Remove', 'baselayer-blocks'),
+			'selectEmptyOptionPlaceholder' => __('Please select…', 'baselayer-blocks'),
 		] + bl_blocks_media_field_i18n(),
 	]);
 }

@@ -159,14 +159,6 @@ function bl_render_installer(): void
             )
           ) ?></p>
         <?php } ?>
-        <p><?= wp_kses(
-              sprintf(
-                /* translators: %s: link to Theme settings page */
-                __('You can change more settings in the <a href="%s">Theme settings</a> page.', 'baselayer'),
-                esc_url(admin_url('options-general.php?page=bl-theme-settings'))
-              ),
-              ['a' => ['href' => true]]
-            ) ?></p>
       </div>
 
       <?php
@@ -183,16 +175,103 @@ function bl_render_installer(): void
           echo '<div class="notice notice-' . esc_attr($type) . '"><p>' . esc_html((string) $notice['text']) . '</p></div>';
         }
       }
+
+      $summary = get_transient('baselayer_install_summary');
+      if (is_array($summary)) {
+        delete_transient('baselayer_install_summary');
+      } else {
+        $summary = [];
+      }
+
+      $blocks_system = (string) ($summary['blocks_system'] ?? (function_exists('bl_theme_blocks_system') ? bl_theme_blocks_system() : 'none'));
+      $system_label = [
+        'baselayer' => __('BaseLayer Blocks', 'baselayer'),
+        'acf'       => __('ACF Pro', 'baselayer'),
+        'none'      => __('None (core editor)', 'baselayer'),
+      ][$blocks_system] ?? $blocks_system;
+
+      $website_url = admin_url();
+      if ($blocks_system === 'baselayer') {
+        $website_url = admin_url('admin.php?page=bl-blocks-website');
+      } elseif ($blocks_system === 'acf') {
+        $website_url = admin_url('admin.php?page=theme-settings');
+      }
+
+      $homepage_id = isset($summary['page_ids']['homepage']) ? (int) $summary['page_ids']['homepage'] : (int) get_option('page_on_front');
+      $blocks_id = isset($summary['page_ids']['blocks']) ? (int) $summary['page_ids']['blocks'] : 0;
+      if ($blocks_id <= 0) {
+        foreach (['blocks', 'bloecke'] as $blocks_slug) {
+          $blocks_page = get_page_by_path($blocks_slug);
+          if ($blocks_page instanceof WP_Post) {
+            $blocks_id = (int) $blocks_page->ID;
+            break;
+          }
+        }
+      }
+      $acf_pending = !empty($summary['acf_pending']) || (function_exists('bl_acf_setup_is_pending') && bl_acf_setup_is_pending());
       ?>
 
-      <p>
-        <a
-          href="<?php echo esc_url(admin_url('options-general.php?page=bl-theme-settings')); ?>"
-          class="button button-primary"><?= esc_html__('Edit theme settings', 'baselayer') ?></a>
-        <a
-          href="<?php echo esc_url(admin_url()); ?>"
-          class="button button-secondary"><?= esc_html__('Go to dashboard', 'baselayer') ?></a>
-      </p>
+      <div class="notice notice-info" style="max-width: 720px; padding: 12px 16px; margin: 16px 0;">
+        <h2 style="margin: 0.5em 0;"><?= esc_html__('Welcome to BaseLayer!', 'baselayer') ?></h2>
+        <p><?= esc_html__('Your website is ready to go. Here\'s what was set up for you:', 'baselayer') ?></p>
+
+        <h3><?= esc_html__('What\'s been set up', 'baselayer') ?></h3>
+        <ul style="list-style: none; margin: 0 0 16px; padding: 0;">
+          <li style="margin: 0 0 6px;">✓ <?= esc_html(sprintf(/* translators: %s: blocks system label */ __('Block system: %s', 'baselayer'), $system_label)) ?></li>
+          <?php if ($blocks_system === 'acf') : ?>
+            <li style="margin: 0 0 6px;">
+              ✓
+              <?php if (!empty($summary['acf_ready'])) : ?>
+                <?= esc_html(sprintf(
+                  /* translators: %d: field group count */
+                  __('ACF field groups imported (%d)', 'baselayer'),
+                  (int) ($summary['acf_groups'] ?? 0)
+                )) ?>
+              <?php else : ?>
+                <?= esc_html__('ACF field groups pending — finish setup before editing Website / Hero / Blocks', 'baselayer') ?>
+              <?php endif; ?>
+            </li>
+          <?php endif; ?>
+          <?php if (!empty($summary['has_homepage']) || $homepage_id > 0) : ?>
+            <li style="margin: 0 0 6px;">✓ <?= esc_html__('Homepage and standard pages', 'baselayer') ?></li>
+          <?php endif; ?>
+          <?php if (!empty($summary['has_blocks_page']) || $blocks_id > 0) : ?>
+            <li style="margin: 0 0 6px;">
+              ✓ <?= esc_html__('Blocks showcase page', 'baselayer') ?>
+              <?php
+              $blocks_permalink = $blocks_id > 0 ? get_permalink($blocks_id) : false;
+              if (is_string($blocks_permalink) && $blocks_permalink !== '') :
+                ?>
+                — <a href="<?= esc_url($blocks_permalink) ?>" style="text-decoration: none;"><?= esc_html__('Preview', 'baselayer') ?></a>
+              <?php endif; ?>
+            </li>
+          <?php elseif ($blocks_system === 'acf' && $acf_pending) : ?>
+            <li style="margin: 0 0 6px;">✓ <?= esc_html__('Blocks showcase page skipped until ACF field groups are imported', 'baselayer') ?></li>
+          <?php endif; ?>
+        </ul>
+
+        <h3><?= esc_html__('Get started', 'baselayer') ?></h3>
+        <p style="display: flex; flex-wrap: wrap; gap: 8px; margin: 0;">
+          <?php if ($blocks_system === 'baselayer' || ($blocks_system === 'acf' && !$acf_pending)) : ?>
+            <a class="button button-primary -has-icon -icon-inbox-customize" href="<?= esc_url($website_url) ?>"><?= esc_html__('Website settings', 'baselayer') ?></a>
+          <?php endif; ?>
+          <a class="button -has-icon -icon-tune" href="<?= esc_url(admin_url('options-general.php?page=bl-theme-settings')) ?>"><?= esc_html__('Theme settings', 'baselayer') ?></a>
+        </p>
+        <p style="margin: 16px 0 0;">
+          <a href="<?= esc_url(admin_url()) ?>" style="text-decoration: none;"><?= esc_html__('Go to Dashboard', 'baselayer') ?></a>
+        </p>
+
+        <?php if ($acf_pending) : ?>
+          <div class="notice notice-warning inline" style="margin: 16px 0 0;">
+            <p><strong><?= esc_html__('Finish ACF setup', 'baselayer') ?></strong></p>
+            <ol style="margin-left: 1.25em;">
+              <li><?= esc_html__('Install and activate ACF Pro (and enter a license if needed).', 'baselayer') ?></li>
+              <li><?= esc_html__('Use the admin notice “Import field groups”, or import via ACF → Tools.', 'baselayer') ?></li>
+              <li><?= esc_html__('Then open Website settings and the Blocks showcase page.', 'baselayer') ?></li>
+            </ol>
+          </div>
+        <?php endif; ?>
+      </div>
 
     <?php } else { ?>
       <?php
@@ -434,7 +513,7 @@ function bl_render_installer(): void
 
         <h2><?= esc_html__('Blocks', 'baselayer') ?></h2>
 
-        <p class="description"><?= esc_html__('Choose how this site provides blocks. You can change this later under Developer → Features.', 'baselayer') ?></p>
+        <p class="description"><?= esc_html__('Choose how this site provides blocks.', 'baselayer') ?></p>
 
         <?php
         $blocks_system = (string) $bl_install_val(['install', 'blocks_system'], 'baselayer');
@@ -457,20 +536,20 @@ function bl_render_installer(): void
                   <strong><?= esc_html__('BaseLayer Blocks', 'baselayer') ?></strong>
                   <span class="bl-install-recommended" style="display:inline-block;margin-left:6px;padding:0 6px;border-radius:3px;background:#2271b1;color:#fff;font-size:11px;font-weight:600;line-height:20px;vertical-align:1px;"><?= esc_html__('Recommended', 'baselayer') ?></span>
                 </label>
-                <p class="description" style="margin: 0 0 12px 24px;"><?= esc_html__('Create and manage custom Gutenberg blocks, content fields, and website fields directly within BaseLayer. Includes built-in blocks such as Accordion.', 'baselayer') ?></p>
+                <p class="description" style="margin: 0 0 12px 24px;"><?= esc_html__('Create and manage custom Gutenberg blocks, content fields, and website fields directly within BaseLayer.', 'baselayer') ?></p>
 
                 <label style="display: block; margin-bottom: 8px;">
                   <input type="radio" name="install[blocks_system]" value="acf" <?= $blocks_system === 'acf' ? ' checked' : '' ?> data-bl-blocks-system-toggle>
                   <strong><?= esc_html__('ACF Pro', 'baselayer') ?></strong>
                   <span style="display:inline-block;margin-left:6px;padding:0 6px;border-radius:3px;background:#D97706;color:#fff;font-size:11px;font-weight:600;line-height:20px;vertical-align:1px;"><?= esc_html__('Requires ACF Pro Plugin', 'baselayer') ?></span>
                 </label>
-                <p class="description" style="margin: 0 0 12px 24px;"><?= esc_html__('Use ACF Pro to build custom Gutenberg blocks. BaseLayer block options remain available for both Core and ACF blocks.', 'baselayer') ?></p>
+                <p class="description" style="margin: 0 0 12px 24px;"><?= esc_html__('Use ACF Pro to build custom Gutenberg blocks.', 'baselayer') ?></p>
 
                 <label style="display: block; margin-bottom: 8px;">
                   <input type="radio" name="install[blocks_system]" value="none" <?= $blocks_system === 'none' ? ' checked' : '' ?> data-bl-blocks-system-toggle>
                   <strong><?= esc_html__('None', 'baselayer') ?></strong>
                 </label>
-                <p class="description" style="margin: 0 0 12px 24px;"><?= esc_html__('Use the default WordPress block editor. BaseLayer Blocks and ACF Pro can be enabled at any time.', 'baselayer') ?></p>
+                <p class="description" style="margin: 0 0 12px 24px;"><?= esc_html__('Use the default WordPress block editor.', 'baselayer') ?></p>
               </fieldset>
             </td>
           </tr>
@@ -1098,7 +1177,7 @@ function baselayer_run_install(): void
     } else {
       $install_notices[] = [
         'type' => 'warning',
-        'text' => __('ACF Pro plugin was not found or could not be activated. Install and activate ACF Pro, then reload the site. Theme ACF blocks load when the feature is enabled.', 'baselayer'),
+        'text' => __('ACF Pro is not active yet. The theme was installed, but the Blocks demo and ACF Website/Hero fields were skipped until Pro is ready.', 'baselayer'),
       ];
     }
 
@@ -1115,13 +1194,11 @@ function baselayer_run_install(): void
       require_once $bl_acf_import_notice;
     }
 
-    // Soft-try field-group import when Pro is active and the site has no groups yet.
-    if (
-      $acf_activated
-      && function_exists('bl_acf_import_run')
-      && function_exists('bl_acf_any_field_group_exists')
-      && !bl_acf_any_field_group_exists()
-    ) {
+    $acf_groups_count = 0;
+    $acf_ready = false;
+
+    // Key-aware upsert whenever Pro is active (safe even if other groups already exist).
+    if ($acf_activated && function_exists('bl_acf_import_run')) {
       $acf_import_result = bl_acf_import_run();
       if (is_wp_error($acf_import_result)) {
         $install_notices[] = [
@@ -1129,6 +1206,7 @@ function baselayer_run_install(): void
           'text' => $acf_import_result->get_error_message(),
         ];
       } elseif (is_int($acf_import_result) && $acf_import_result > 0) {
+        $acf_groups_count = $acf_import_result;
         $install_notices[] = [
           'type' => 'success',
           'text' => sprintf(
@@ -1143,6 +1221,29 @@ function baselayer_run_install(): void
           ),
         ];
       }
+    }
+
+    if (function_exists('bl_acf_theme_field_groups_ready')) {
+      $acf_ready = $acf_activated && bl_acf_theme_field_groups_ready();
+    }
+
+    if (function_exists('bl_acf_set_setup_pending')) {
+      bl_acf_set_setup_pending(!$acf_ready);
+    }
+
+    if (!$acf_ready) {
+      $install_notices[] = [
+        'type' => 'warning',
+        'text' => __('Finish ACF setup: activate ACF Pro, then import theme field groups from the admin notice (or ACF → Tools). The Blocks showcase page is created after import.', 'baselayer'),
+      ];
+    }
+
+    // Used by success summary + page seeding.
+    $GLOBALS['bl_install_acf_ready'] = $acf_ready;
+    $GLOBALS['bl_install_acf_groups'] = $acf_groups_count;
+  } else {
+    if (function_exists('bl_acf_set_setup_pending')) {
+      bl_acf_set_setup_pending(false);
     }
   }
 
@@ -1295,6 +1396,23 @@ function baselayer_run_install(): void
       bl_install_seed_testdata($content_flags);
     }
   }
+
+  // Summary for the post-install success screen.
+  $acf_ready = !empty($GLOBALS['bl_install_acf_ready']);
+  $acf_groups = isset($GLOBALS['bl_install_acf_groups']) ? (int) $GLOBALS['bl_install_acf_groups'] : 0;
+  set_transient(
+    'baselayer_install_summary',
+    [
+      'blocks_system' => $blocks_system,
+      'acf_ready'     => $acf_ready,
+      'acf_groups'    => $acf_groups,
+      'acf_pending'   => $blocks_system === 'acf' && !$acf_ready,
+      'has_blocks_page' => !empty($page_ids['blocks']),
+      'has_homepage'  => !empty($page_ids['homepage']),
+      'page_ids'      => $page_ids,
+    ],
+    600
+  );
 
   /**
    * Redirect

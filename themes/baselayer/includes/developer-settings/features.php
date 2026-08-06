@@ -43,9 +43,21 @@ add_action('admin_init', function () use ($bl_developer_page_slug) {
 		return;
 	}
 	$value = isset($_POST['baselayer_features']) && is_array($_POST['baselayer_features']) ? $_POST['baselayer_features'] : [];
+	$previous_system = function_exists('bl_theme_blocks_system') ? bl_theme_blocks_system() : 'none';
 	$sanitized = function_exists('bl_sanitize_features') ? bl_sanitize_features($value) : [];
 	update_option('baselayer_features', $sanitized);
+	if (function_exists('bl_theme_feature_flush_cache')) {
+		bl_theme_feature_flush_cache();
+	}
+	$next_system = function_exists('bl_theme_blocks_system') ? bl_theme_blocks_system() : 'none';
 	set_transient('baselayer_features_saved', '1', 30);
+	if ($previous_system !== $next_system) {
+		set_transient(
+			'baselayer_blocks_system_switched',
+			['from' => $previous_system, 'to' => $next_system],
+			120
+		);
+	}
 	wp_safe_redirect(admin_url('options-general.php?page=bl-developer-features'));
 	exit;
 }, 1);
@@ -59,6 +71,13 @@ function bl_render_developer_features(): void
 	$features_saved = get_transient('baselayer_features_saved');
 	if ($features_saved !== false) {
 		delete_transient('baselayer_features_saved');
+	}
+
+	$blocks_switched = get_transient('baselayer_blocks_system_switched');
+	if (is_array($blocks_switched)) {
+		delete_transient('baselayer_blocks_system_switched');
+	} else {
+		$blocks_switched = null;
 	}
 
 	$features = get_option('baselayer_features', []);
@@ -82,6 +101,13 @@ function bl_render_developer_features(): void
 		<?php if ($features_saved !== false) : ?>
 			<div class="notice notice-success is-dismissible">
 				<p><strong><?= esc_html(__('Settings saved.', 'baselayer')) ?></strong></p>
+			</div>
+		<?php endif; ?>
+
+		<?php if (is_array($blocks_switched)) : ?>
+			<div class="notice notice-warning is-dismissible">
+				<p><strong><?= esc_html__('Blocks system changed', 'baselayer') ?></strong></p>
+				<p><?= esc_html__('Existing pages keep their current block markup (Baselayer ↔ ACF namespaces are not converted). Website and Hero storage also differs by engine. Prefer choosing the system at install and sticking with it. No definitions or field groups were imported automatically.', 'baselayer') ?></p>
 			</div>
 		<?php endif; ?>
 
@@ -249,21 +275,24 @@ function bl_render_developer_features(): void
 									<strong><?= esc_html__('BaseLayer Blocks', 'baselayer') ?></strong>
 									<span style="display:inline-block;margin-left:6px;padding:0 6px;border-radius:3px;background:#2271b1;color:#fff;font-size:11px;font-weight:600;line-height:20px;vertical-align:1px;"><?= esc_html__('Recommended', 'baselayer') ?></span>
 								</label>
-								<p class="description" style="margin:0 0 12px 24px;"><?= esc_html__('Create and manage custom Gutenberg blocks, content fields, and website fields directly within BaseLayer. Includes built-in blocks such as Accordion.', 'baselayer') ?></p>
+								<p class="description" style="margin:0 0 12px 24px;"><?= esc_html__('Create and manage custom Gutenberg blocks, content fields, and website fields directly within BaseLayer.', 'baselayer') ?></p>
 
 								<label style="display:block;margin-bottom:8px;">
 									<input type="radio" name="baselayer_features[blocks_system]" value="acf" <?= checked($blocks_system, 'acf', false) ?>>
 									<strong><?= esc_html__('ACF Pro', 'baselayer') ?></strong>
 									<span style="display:inline-block;margin-left:6px;padding:0 6px;border-radius:3px;background:#D97706;color:#fff;font-size:11px;font-weight:600;line-height:20px;vertical-align:1px;"><?= esc_html__('Requires ACF Pro Plugin', 'baselayer') ?></span>
 								</label>
-								<p class="description" style="margin:0 0 12px 24px;"><?= esc_html__('Use ACF Pro to build custom Gutenberg blocks. BaseLayer block options remain available for both Core and ACF blocks.', 'baselayer') ?></p>
+								<p class="description" style="margin:0 0 12px 24px;"><?= esc_html__('Use ACF Pro to build custom Gutenberg blocks.', 'baselayer') ?></p>
 
 								<label style="display:block;margin-bottom:8px;">
 									<input type="radio" name="baselayer_features[blocks_system]" value="none" <?= checked($blocks_system, 'none', false) ?>>
 									<strong><?= esc_html__('None', 'baselayer') ?></strong>
 								</label>
-								<p class="description" style="margin:0 0 0 24px;"><?= esc_html__('Use the default WordPress block editor. BaseLayer Blocks and ACF Pro can be enabled at any time.', 'baselayer') ?></p>
+								<p class="description" style="margin:0 0 12px 24px;"><?= esc_html__('Use the default WordPress block editor.', 'baselayer') ?></p>
 							</fieldset>
+							<div class="notice notice-info inline" style="margin: 12px 0 0;">
+								<p style="margin: 0.5em 0;"><?= esc_html__('Switching engines after you have built content is not recommended. Pages are not migrated, and Website/Hero data lives in different storage. Choose at install when possible.', 'baselayer') ?></p>
+							</div>
 							<input type="hidden" name="baselayer_features[enable_blocks]" value="0">
 							<input type="hidden" name="baselayer_features[enable_acf]" value="0">
 						</td>

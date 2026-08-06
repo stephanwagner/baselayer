@@ -478,6 +478,16 @@ function bl_install_create_pages(array $media = []): array
 			continue;
 		}
 
+		// Avoid a hollow ACF Blocks demo when Pro/groups are not ready yet.
+		if (
+			$key === 'blocks'
+			&& $blocks_system === 'acf'
+			&& function_exists('bl_acf_theme_field_groups_ready')
+			&& !bl_acf_theme_field_groups_ready()
+		) {
+			continue;
+		}
+
 		$post_id = wp_insert_post([
 			'post_type'    => 'page',
 			'post_status'  => 'publish',

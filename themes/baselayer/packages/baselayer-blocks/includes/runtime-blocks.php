@@ -286,6 +286,7 @@ function bl_blocks_register_dynamic_blocks(): void
 				'linkDestPhone'          => __('Phone number', 'baselayer-blocks'),
 				'linkText'               => __('Link text', 'baselayer-blocks'),
 				'linkOpenNewTab'         => __('Open in new tab', 'baselayer-blocks'),
+				'selectEmptyOptionPlaceholder' => __('Please select…', 'baselayer-blocks'),
 			] + (function_exists('bl_blocks_media_field_i18n') ? bl_blocks_media_field_i18n() : []),
 		]);
 	}

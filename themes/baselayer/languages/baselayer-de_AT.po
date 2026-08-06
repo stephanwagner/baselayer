@@ -527,6 +527,60 @@ msgstr "BaseLayer installieren"
 msgid "BaseLayer is installed."
 msgstr "BaseLayer ist installiert."
 
+msgid "Welcome to BaseLayer!"
+msgstr "Willkommen bei BaseLayer!"
+
+msgid "Your website is ready to go. Here's what was set up for you:"
+msgstr "Deine Website ist bereit. Das wurde für dich eingerichtet:"
+
+msgid "What's been set up"
+msgstr "Was eingerichtet wurde"
+
+msgid "Block system: %s"
+msgstr "Block-System: %s"
+
+msgid "ACF field groups imported (%d)"
+msgstr "ACF-Feldgruppen importiert (%d)"
+
+msgid "ACF field groups pending — finish setup before editing Website / Hero / Blocks"
+msgstr "ACF-Feldgruppen ausstehend — Setup abschließen, bevor Website / Hero / Blöcke bearbeitet werden"
+
+msgid "Homepage and standard pages"
+msgstr "Startseite und Standardseiten"
+
+msgid "Blocks showcase page"
+msgstr "Blocks-Showcase-Seite"
+
+msgid "Preview"
+msgstr "Vorschau"
+
+msgid "Blocks showcase page skipped until ACF field groups are imported"
+msgstr "Blocks-Showcase-Seite übersprungen, bis ACF-Feldgruppen importiert sind"
+
+msgid "Get started"
+msgstr "Loslegen"
+
+msgid "Website settings"
+msgstr "Website Einstellungen"
+
+msgid "Go to Dashboard"
+msgstr "Zum Dashboard"
+
+msgid "Finish ACF setup"
+msgstr "ACF-Setup abschließen"
+
+msgid "Install and activate ACF Pro (and enter a license if needed)."
+msgstr "ACF Pro installieren und aktivieren (und ggf. eine Lizenz eingeben)."
+
+msgid "Use the admin notice “Import field groups”, or import via ACF → Tools."
+msgstr "Den Admin-Hinweis „Feldgruppen importieren“ nutzen, oder über ACF → Tools importieren."
+
+msgid "Then open Website settings and the Blocks showcase page."
+msgstr "Anschließend Website Einstellungen und die Blocks-Showcase-Seite öffnen."
+
+msgid "None (core editor)"
+msgstr "Keins (Core-Editor)"
+
 msgid "Edit theme settings"
 msgstr "Theme Einstellungen bearbeiten"
 
@@ -776,8 +830,8 @@ msgstr "Veranstaltungen"
 msgid "Blocks"
 msgstr "Blöcke"
 
-msgid "Choose how this site provides blocks. You can change this later under Developer → Features."
-msgstr "Wähle aus, wie diese Website Blöcke bereitstellt. Du kannst das später unter Entwickler → Funktionen ändern."
+msgid "Choose how this site provides blocks."
+msgstr "Wähle aus, wie diese Website Blöcke bereitstellt."
 
 msgid "BaseLayer Blocks"
 msgstr "BaseLayer Blocks"
@@ -807,14 +861,14 @@ msgstr "Lege das ACF-Pro-Plugin unter wp-content/plugins ab. Du kannst die BaseL
 msgid "License key"
 msgstr "Lizenzschlüssel"
 
-msgid "Create and manage custom Gutenberg blocks, content fields, and website fields directly within BaseLayer. Includes built-in blocks such as Accordion."
-msgstr "Erstelle und verwalte individuelle Gutenberg-Blöcke, Inhaltsfelder und Website-Felder direkt in BaseLayer. Enthält integrierte Blöcke wie Akkordeon."
+msgid "Create and manage custom Gutenberg blocks, content fields, and website fields directly within BaseLayer."
+msgstr "Erstelle und verwalte individuelle Gutenberg-Blöcke, Inhaltsfelder und Website-Felder direkt in BaseLayer."
 
-msgid "Use ACF Pro to build custom Gutenberg blocks. BaseLayer block options remain available for both Core and ACF blocks."
-msgstr "Nutze ACF Pro, um individuelle Gutenberg-Blöcke zu erstellen. BaseLayer-Block-Optionen bleiben für Core- und ACF-Blöcke verfügbar."
+msgid "Use ACF Pro to build custom Gutenberg blocks."
+msgstr "Nutze ACF Pro, um individuelle Gutenberg-Blöcke zu erstellen."
 
-msgid "Use the default WordPress block editor. BaseLayer Blocks and ACF Pro can be enabled at any time."
-msgstr "Nutze den Standard-WordPress-Block-Editor. BaseLayer Blocks und ACF Pro können jederzeit aktiviert werden."
+msgid "Use the default WordPress block editor."
+msgstr "Nutze den Standard-WordPress-Block-Editor."
 
 
 msgid "Administrator email"

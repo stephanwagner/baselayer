@@ -130,8 +130,8 @@ function createModal(uiStrings) {
         <div class="bl-icon-picker__toolbar">
           <input type="search" class="bl-dev-icon-modal__search" data-bl-dev-icon-modal-search placeholder="${t('search', 'Search icons…')}" autocomplete="off">
           <div class="bl-icon-picker__variant bl-dev-icon-modal__variant" role="group" aria-label="${t('style', 'Style')}">
-            <button type="button" class="button button-secondary" data-bl-dev-icon-modal-variant="outline">${t('outline', 'Outline')}</button>
-            <button type="button" class="button button-secondary" data-bl-dev-icon-modal-variant="fill">${t('filled', 'Filled')}</button>
+            <button type="button" class="bl-icon-picker__variant-btn" data-bl-dev-icon-modal-variant="outline">${t('outline', 'Outline')}</button>
+            <button type="button" class="bl-icon-picker__variant-btn" data-bl-dev-icon-modal-variant="fill">${t('filled', 'Filled')}</button>
           </div>
         </div>
         <div class="bl-icon-picker__categories" data-bl-dev-icon-modal-categories></div>

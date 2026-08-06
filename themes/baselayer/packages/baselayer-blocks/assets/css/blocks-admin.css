@@ -723,7 +723,7 @@ body.bl-page-picker-open {
   align-items: center;
   justify-content: center;
   min-width: 0;
-  padding: 6px 8px;
+  padding: 6px 12px;
   font-size: 12px;
   font-weight: 500;
   line-height: 1.3;
@@ -741,7 +741,6 @@ body.bl-page-picker-open {
 .bl-blocks-fields__btn-option input:checked + span {
   background: #dcdcde;
   color: #1d2327;
-  font-weight: 600;
 }
 .bl-blocks-fields__btn-option input:focus-visible + span {
   outline: 2px solid #2271b1;

@@ -1792,8 +1792,9 @@
             "name": "type",
             "label": "Typ",
             "required": false,
+            "allow_null": false,
             "width": "100",
-            "default_value": "LocalBusiness",
+            "default_value": "",
             "options": [
               {
                 "value": "LocalBusiness",
@@ -1921,7 +1922,7 @@
             "name": "zip",
             "label": "Postleitzahl",
             "required": false,
-            "width": "33",
+            "width": "25",
             "default_value": ""
           },
           {
@@ -1930,7 +1931,7 @@
             "name": "city",
             "label": "Ort",
             "required": false,
-            "width": "33",
+            "width": "75",
             "default_value": ""
           },
           {
@@ -1939,7 +1940,7 @@
             "name": "country",
             "label": "Land",
             "required": false,
-            "width": "34",
+            "width": "100",
             "default_value": "",
             "description": "Ländername oder ISO-3166-1-Alpha-2-Code (z. B. Deutschland oder DE)."
           },
@@ -2023,6 +2024,7 @@
         "button_label": "Hinweis hinzufügen",
         "min_rows": 0,
         "max_rows": 0,
+        "design": "outline",
         "children": [
           {
             "id": "fld_ws_nt_row_enabled",
@@ -2231,7 +2233,7 @@
             "label": "Text des Schließen-Buttons",
             "required": false,
             "width": "100",
-            "default_value": "",
+            "default_value": "Schließen",
             "conditional_logic": {
               "enabled": true,
               "groups": [

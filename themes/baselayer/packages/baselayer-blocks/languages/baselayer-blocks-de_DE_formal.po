@@ -828,6 +828,18 @@ msgstr "Heute ±"
 msgid "Allow multiple selection"
 msgstr "Mehrfachauswahl erlauben"
 
+msgid "Allow empty selection"
+msgstr "Leere Auswahl erlauben"
+
+msgid "Empty option label"
+msgstr "Beschriftung der leeren Option"
+
+msgid "Label for the blank choice. Leave empty for “Please select…”. Required still shows this option, but the user must pick a real value."
+msgstr "Beschriftung der leeren Option. Leer lassen für „Bitte auswählen…“. Bei Pflichtfeldern wird die Option angezeigt, aber der Nutzer muss einen echten Wert wählen."
+
+msgid "Please select…"
+msgstr "Bitte auswählen…"
+
 #: includes/admin-editor.php:428
 msgid "Checkbox text"
 msgstr "Checkbox-Text"

@@ -1792,8 +1792,9 @@
             "name": "type",
             "label": "Type",
             "required": false,
+            "allow_null": false,
             "width": "100",
-            "default_value": "LocalBusiness",
+            "default_value": "",
             "options": [
               {
                 "value": "LocalBusiness",
@@ -1921,7 +1922,7 @@
             "name": "zip",
             "label": "Postal code",
             "required": false,
-            "width": "33",
+            "width": "25",
             "default_value": ""
           },
           {
@@ -1930,7 +1931,7 @@
             "name": "city",
             "label": "City",
             "required": false,
-            "width": "33",
+            "width": "75",
             "default_value": ""
           },
           {
@@ -1939,7 +1940,7 @@
             "name": "country",
             "label": "Country",
             "required": false,
-            "width": "34",
+            "width": "100",
             "default_value": "",
             "description": "Country name or ISO 3166-1 alpha-2 code (e.g. Germany or DE)."
           },
@@ -2023,6 +2024,7 @@
         "button_label": "Add notice",
         "min_rows": 0,
         "max_rows": 0,
+        "design": "outline",
         "children": [
           {
             "id": "fld_ws_nt_row_enabled",
@@ -2231,7 +2233,7 @@
             "label": "Close button text",
             "required": false,
             "width": "100",
-            "default_value": "",
+            "default_value": "Close",
             "conditional_logic": {
               "enabled": true,
               "groups": [

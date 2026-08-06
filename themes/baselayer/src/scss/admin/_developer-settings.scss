@@ -485,37 +485,6 @@ input[type='search'].bl-dev-icon-modal__search {
   min-height: 36px;
 }
 
-.bl-dev-icon-modal__variant {
-  display: inline-flex;
-  gap: 0;
-
-  .button {
-    align-items: center;
-    border-radius: 0;
-    display: inline-flex;
-    height: 36px;
-    min-height: 36px;
-    margin: 0;
-
-    &:first-child {
-      border-bottom-right-radius: 0;
-      border-top-right-radius: 0;
-    }
-
-    &:last-child {
-      border-bottom-left-radius: 0;
-      border-left: 0;
-      border-top-left-radius: 0;
-    }
-
-    &.is-active {
-      background: var(--bl-color-primary);
-      border-color: var(--bl-color-primary);
-      color: #fff;
-    }
-  }
-}
-
 // Block editor inserter toggle
 
 .block-editor-inserter__search.bl-inserter-has-toggle {

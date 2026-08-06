@@ -8,6 +8,11 @@ defined('ABSPATH') || exit;
 const BL_ACF_IMPORT_SKIPPED_OPTION = 'baselayer_acf_import_skipped';
 
 /**
+ * Option set when ACF was chosen at install but Pro/groups were not ready yet.
+ */
+const BL_ACF_SETUP_PENDING_OPTION = 'baselayer_acf_setup_pending';
+
+/**
  * Language key for bundled ACF import JSON (e.g. de_CH → de, en_US → en).
  *
  * Uses the site language (not the current admin user’s locale).
@@ -101,16 +106,131 @@ function bl_acf_import_load_groups(): ?array
 }
 
 /**
- * Whether any ACF field group already exists in the site.
+ * Field group keys from the theme ACF catalog.
+ *
+ * @return list<string>
  */
-function bl_acf_any_field_group_exists(): bool
+function bl_acf_theme_field_group_keys(): array
+{
+	$groups = bl_acf_import_load_groups();
+	if ($groups === null) {
+		return [];
+	}
+
+	$keys = [];
+	foreach ($groups as $group) {
+		$key = sanitize_key((string) ($group['key'] ?? ''));
+		if ($key !== '') {
+			$keys[] = $key;
+		}
+	}
+
+	return array_values(array_unique($keys));
+}
+
+/**
+ * ACF field group keys currently registered on the site.
+ *
+ * @return list<string>
+ */
+function bl_acf_existing_field_group_keys(): array
 {
 	if (!function_exists('acf_get_field_groups')) {
-		return false;
+		return [];
 	}
 
 	$groups = acf_get_field_groups();
-	return is_array($groups) && $groups !== [];
+	if (!is_array($groups)) {
+		return [];
+	}
+
+	$keys = [];
+	foreach ($groups as $group) {
+		if (!is_array($group)) {
+			continue;
+		}
+		$key = sanitize_key((string) ($group['key'] ?? ''));
+		if ($key !== '') {
+			$keys[] = $key;
+		}
+	}
+
+	return array_values(array_unique($keys));
+}
+
+/**
+ * Theme catalog keys that are not yet present on the site.
+ *
+ * @return list<string>
+ */
+function bl_acf_missing_theme_field_group_keys(): array
+{
+	$theme = bl_acf_theme_field_group_keys();
+	if ($theme === []) {
+		return [];
+	}
+
+	$existing = array_fill_keys(bl_acf_existing_field_group_keys(), true);
+	$missing = [];
+	foreach ($theme as $key) {
+		if (!isset($existing[$key])) {
+			$missing[] = $key;
+		}
+	}
+
+	return $missing;
+}
+
+/**
+ * Whether ACF Pro is loaded enough to import field groups.
+ */
+function bl_acf_pro_is_active(): bool
+{
+	return function_exists('acf_import_field_group') && function_exists('acf_get_field_groups');
+}
+
+/**
+ * Whether all theme catalog field groups exist (key-aware).
+ */
+function bl_acf_theme_field_groups_ready(): bool
+{
+	$theme = bl_acf_theme_field_group_keys();
+	if ($theme === []) {
+		return false;
+	}
+
+	return bl_acf_missing_theme_field_group_keys() === [];
+}
+
+/**
+ * Whether ACF was chosen but setup is still incomplete.
+ */
+function bl_acf_setup_is_pending(): bool
+{
+	return (string) get_option(BL_ACF_SETUP_PENDING_OPTION, '') === '1';
+}
+
+/**
+ * Mark / clear pending ACF setup after install.
+ */
+function bl_acf_set_setup_pending(bool $pending): void
+{
+	if ($pending) {
+		update_option(BL_ACF_SETUP_PENDING_OPTION, '1', false);
+		return;
+	}
+
+	delete_option(BL_ACF_SETUP_PENDING_OPTION);
+}
+
+/**
+ * Whether any ACF field group already exists in the site.
+ *
+ * @deprecated Prefer bl_acf_missing_theme_field_group_keys() / bl_acf_theme_field_groups_ready().
+ */
+function bl_acf_any_field_group_exists(): bool
+{
+	return bl_acf_existing_field_group_keys() !== [];
 }
 
 /**
@@ -126,7 +246,7 @@ function bl_acf_import_should_show_notice(): bool
 		return false;
 	}
 
-	if (!function_exists('acf_import_field_group') || !function_exists('acf_get_field_groups')) {
+	if (!bl_acf_pro_is_active()) {
 		return false;
 	}
 
@@ -138,12 +258,12 @@ function bl_acf_import_should_show_notice(): bool
 		return false;
 	}
 
-	// Only prompt when the site has no field groups at all.
-	return !bl_acf_any_field_group_exists();
+	// Prompt when theme catalog groups are missing (even if other ACF groups exist).
+	return bl_acf_missing_theme_field_group_keys() !== [];
 }
 
 /**
- * Import all field groups from the bundled JSON.
+ * Import / update all field groups from the bundled JSON (matched by group key).
  *
  * @return int|WP_Error Number of groups imported/updated, or error.
  */
@@ -183,12 +303,75 @@ function bl_acf_import_run()
 	}
 
 	delete_option(BL_ACF_IMPORT_SKIPPED_OPTION);
+	bl_acf_set_setup_pending(false);
 
 	if (function_exists('bl_block_options_import_acf')) {
 		bl_block_options_import_acf(['merge' => true]);
 	}
 
 	return $count;
+}
+
+/**
+ * Create the Blocks showcase page (ACF markup) when missing after setup finishes.
+ *
+ * @return int Page ID or 0.
+ */
+function bl_acf_ensure_blocks_showcase_page(): int
+{
+	$content_file = get_template_directory() . '/includes/install/content.php';
+	if (is_readable($content_file)) {
+		require_once $content_file;
+	}
+
+	if (!function_exists('bl_install_page_manifest') || !function_exists('bl_install_page_post_content')) {
+		return 0;
+	}
+
+	// Prefer ACF markup for this page even if the runtime system flip-flops mid-request.
+	$acf_html = get_template_directory() . '/includes/install/pages/blocks-acf.html';
+	$manifest = bl_install_page_manifest();
+	$def = $manifest['blocks'] ?? null;
+	if (!is_array($def)) {
+		return 0;
+	}
+
+	$slug = sanitize_title((string) ($def['slug'] ?? 'blocks'));
+	$title = (string) ($def['title'] ?? 'Blocks');
+	if ($slug === '') {
+		return 0;
+	}
+
+	$existing = get_page_by_path($slug, OBJECT, 'page');
+	if ($existing instanceof WP_Post) {
+		return (int) $existing->ID;
+	}
+
+	$content = '';
+	if (is_readable($acf_html)) {
+		$raw = file_get_contents($acf_html);
+		if (is_string($raw) && $raw !== '' && function_exists('bl_install_replace_page_placeholders')) {
+			$content = bl_install_replace_page_placeholders($raw, $manifest, []);
+		} elseif (is_string($raw)) {
+			$content = $raw;
+		}
+	}
+	if ($content === '') {
+		$content = bl_install_page_post_content('blocks', $manifest, []);
+	}
+
+	$post_id = wp_insert_post(
+		[
+			'post_type'    => 'page',
+			'post_status'  => 'publish',
+			'post_title'   => $title,
+			'post_name'    => $slug,
+			'post_content' => $content,
+		],
+		true
+	);
+
+	return is_wp_error($post_id) ? 0 : (int) $post_id;
 }
 
 /**
@@ -231,20 +414,23 @@ function bl_acf_import_handle_actions(): void
 		exit;
 	}
 
+	$showcase_id = bl_acf_ensure_blocks_showcase_page();
+
 	if (function_exists('bl_admin_notice_current_user')) {
-		bl_admin_notice_current_user(
-			'success',
-			sprintf(
-				/* translators: %d: number of field groups */
-				_n(
-					'Imported %d ACF field group.',
-					'Imported %d ACF field groups.',
-					(int) $result,
-					'baselayer'
-				),
-				(int) $result
-			)
+		$message = sprintf(
+			/* translators: %d: number of field groups */
+			_n(
+				'Imported %d ACF field group.',
+				'Imported %d ACF field groups.',
+				(int) $result,
+				'baselayer'
+			),
+			(int) $result
 		);
+		if ($showcase_id > 0) {
+			$message .= ' ' . __('Blocks showcase page is ready.', 'baselayer');
+		}
+		bl_admin_notice_current_user('success', $message);
 	}
 
 	wp_safe_redirect($redirect);
@@ -261,6 +447,7 @@ function bl_acf_import_admin_notice(): void
 		return;
 	}
 
+	$missing = count(bl_acf_missing_theme_field_group_keys());
 	$import_url = wp_nonce_url(
 		add_query_arg('bl_acf_import_action', 'import'),
 		'bl_acf_import_import'
@@ -269,14 +456,38 @@ function bl_acf_import_admin_notice(): void
 		add_query_arg('bl_acf_import_action', 'skip'),
 		'bl_acf_import_skip'
 	);
+
+	$pending = bl_acf_setup_is_pending();
 	?>
 	<div class="notice notice-warning">
 		<p>
-			<strong><?= esc_html__('BaseLayer ACF field groups', 'baselayer') ?></strong>
+			<strong><?= esc_html__('BaseLayer ACF setup', 'baselayer') ?></strong>
 		</p>
-		<p>
-			<?= esc_html__('ACF Pro is active, but no field groups are installed yet. Import the theme’s block and website field groups now, or skip if you manage fields yourself.', 'baselayer') ?>
-		</p>
+		<?php if ($pending) : ?>
+			<p>
+				<?= esc_html__('ACF was selected during theme install, but field groups are not fully imported yet. Finish setup so Website settings, Hero, and the Blocks demo work.', 'baselayer') ?>
+			</p>
+			<ol style="margin-left: 1.25em;">
+				<li><?= esc_html__('Confirm ACF Pro is active.', 'baselayer') ?></li>
+				<li><?= esc_html__('Import the theme field groups (button below).', 'baselayer') ?></li>
+				<li><?= esc_html__('Open Website settings, then the Blocks page once it is created.', 'baselayer') ?></li>
+			</ol>
+		<?php else : ?>
+			<p>
+				<?= esc_html(
+					sprintf(
+						/* translators: %d: number of missing field groups */
+						_n(
+							'%d theme field group is missing. Import to update Website, Hero, and block fields.',
+							'%d theme field groups are missing. Import to update Website, Hero, and block fields.',
+							$missing,
+							'baselayer'
+						),
+						$missing
+					)
+				) ?>
+			</p>
+		<?php endif; ?>
 		<p style="margin-top: 12px;">
 			<a href="<?= esc_url($import_url) ?>" class="button button-primary bl-button"><?= esc_html__('Import field groups', 'baselayer') ?></a>
 			<a href="<?= esc_url($skip_url) ?>" class="button bl-button"><?= esc_html__('Skip', 'baselayer') ?></a>
