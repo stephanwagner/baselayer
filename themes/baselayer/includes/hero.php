@@ -250,7 +250,12 @@ function bl_hero_resolve_slide(array $row, int $post_id): array
 		}
 	} elseif ($text_source === 'custom') {
 		$custom_text = isset($row['text']) ? (string) $row['text'] : '';
-		$text_html = $custom_text;
+		// Textarea stores plain text; wrap for front-end (ACF uses new_lines=wpautop).
+		if ($custom_text !== '' && !preg_match('/<[a-z][\s\S]*>/i', $custom_text)) {
+			$text_html = wpautop(esc_html($custom_text));
+		} else {
+			$text_html = $custom_text;
+		}
 	}
 
 	$links_source = isset($row['links_source']) ? (string) $row['links_source'] : 'none';

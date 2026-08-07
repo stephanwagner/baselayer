@@ -335,9 +335,6 @@ HTML;
 }
 
 /**
- * Path to exported block HTML for an install page key (e.g. homepage → pages/homepage.html).
- */
-/**
  * Blocks system chosen for this install request / saved features.
  *
  * @return 'baselayer'|'acf'|'none'
@@ -360,32 +357,69 @@ function bl_install_blocks_system(): string
 
 /**
  * Absolute path to install page HTML for a manifest key.
+ *
+ * Homepage looks for pages/homepage-{system}-{locale}.html, then
+ * pages/homepage-{system}.html. No match → empty string (no last-resort fallback).
  */
 function bl_install_page_html_path(string $page_key): string
 {
 	$system = bl_install_blocks_system();
+	$locale = function_exists('bl_install_site_locale_key') ? bl_install_site_locale_key() : 'en';
+	$dir = __DIR__ . '/pages/';
 
 	if ($page_key === 'blocks') {
 		if ($system === 'baselayer') {
-			$baselayer = __DIR__ . '/pages/blocks-baselayer.html';
+			$baselayer = $dir . 'blocks-baselayer.html';
 			if (is_readable($baselayer)) {
 				return $baselayer;
 			}
 		}
 		if ($system === 'acf') {
-			return __DIR__ . '/pages/blocks-acf.html';
+			return $dir . 'blocks-acf.html';
 		}
 		return '';
 	}
 
-	if ($page_key === 'homepage' && $system === 'none') {
-		$none = __DIR__ . '/pages/homepage-none.html';
-		if (is_readable($none)) {
-			return $none;
+	if ($page_key === 'homepage') {
+		$candidates = [
+			$dir . 'homepage-' . $system . '-' . $locale . '.html',
+			$dir . 'homepage-' . $system . '.html',
+		];
+
+		foreach ($candidates as $path) {
+			if (is_readable($path)) {
+				return $path;
+			}
 		}
+
+		return '';
 	}
 
-	return __DIR__ . '/pages/' . $page_key . '.html';
+	return $dir . $page_key . '.html';
+}
+
+/**
+ * Admin URL for Website settings (ACF options page or Baselayer Website).
+ */
+function bl_install_website_settings_url(): string
+{
+	$system = bl_install_blocks_system();
+	if ($system === 'acf') {
+		return admin_url('admin.php?page=theme-settings');
+	}
+	if ($system === 'baselayer') {
+		return admin_url('admin.php?page=bl-blocks-website');
+	}
+
+	return admin_url('options-general.php?page=bl-theme-settings');
+}
+
+/**
+ * Admin URL for Theme settings.
+ */
+function bl_install_theme_settings_url(): string
+{
+	return admin_url('options-general.php?page=bl-theme-settings');
 }
 
 /**
@@ -393,14 +427,25 @@ function bl_install_page_html_path(string $page_key): string
  *
  * @param array<string, array{title: string, slug: string}> $manifest
  * @param array<string, array{id: int, url: string}>       $media
+ * @param array<string, string>                            $extra    Extra token => value map (e.g. homepage_edit_url).
  */
-function bl_install_replace_page_placeholders(string $html, array $manifest, array $media = []): string
+function bl_install_replace_page_placeholders(string $html, array $manifest, array $media = [], array $extra = []): string
 {
 	$blocks_slug = $manifest['blocks']['slug'] ?? 'blocks';
 	$replacements = [
-		'{{blocks_url}}' => home_url(user_trailingslashit($blocks_slug)),
-		'{{home_url}}'   => home_url('/'),
+		'{{blocks_url}}'           => home_url(user_trailingslashit($blocks_slug)),
+		'{{home_url}}'             => home_url('/'),
+		'{{website_settings_url}}' => bl_install_website_settings_url(),
+		'{{theme_settings_url}}'   => bl_install_theme_settings_url(),
 	];
+
+	foreach ($extra as $token => $value) {
+		if (!is_string($token) || $token === '' || !is_string($value)) {
+			continue;
+		}
+		$key = str_starts_with($token, '{{') ? $token : '{{' . $token . '}}';
+		$replacements[$key] = $value;
+	}
 
 	foreach ($media as $key => $item) {
 		if (!is_string($key) || $key === '' || !is_array($item)) {
@@ -455,9 +500,221 @@ function bl_install_page_post_content(string $page_key, array $manifest, array $
 		return $html;
 	}
 
+	if ($page_key === 'homepage') {
+		return '';
+	}
+
 	$title = $manifest[$page_key]['title'] ?? $page_key;
 
 	return bl_install_page_content($title);
+}
+
+/**
+ * Locale-aware copy for the seeded homepage Hero slides.
+ *
+ * @return array{slides: list<array{title: string, text: string, link_title: string}>}
+ */
+function bl_install_homepage_hero_copy(): array
+{
+	$locale = bl_install_site_locale_key();
+
+	if ($locale === 'de') {
+		return [
+			'slides' => [
+				[
+					'title' => 'Willkommen bei BaseLayer',
+					'text' => 'Eine strukturierte WordPress-Grundlage mit wiederverwendbaren Blöcken, sinnvollen Voreinstellungen und der Flexibilität, dein eigenes Design umzusetzen.',
+					'link_title' => 'Blöcke entdecken',
+				],
+				[
+					'title' => 'Mach BaseLayer zu deinem Projekt',
+					'text' => 'Konfiguriere deine Website, passe das Design an und ersetze die Beispielinhalte, sobald du mit der Entwicklung beginnen möchtest.',
+					'link_title' => 'Website-Einstellungen',
+				],
+			],
+		];
+	}
+
+	return [
+		'slides' => [
+			[
+				'title' => 'Welcome to BaseLayer',
+				'text' => 'A structured WordPress foundation with reusable blocks, sensible defaults, and the flexibility to build your own design.',
+				'link_title' => 'Explore Blocks',
+			],
+			[
+				'title' => 'Make it your own',
+				'text' => 'Configure your website settings, adapt the design, and replace the example content when you’re ready to start building.',
+				'link_title' => 'Website Settings',
+			],
+		],
+	];
+}
+
+/**
+ * Replace late homepage tokens (edit URL) after the page exists.
+ *
+ * @param array<string, array{title: string, slug: string}> $manifest
+ * @param array<string, array{id: int, url: string}>       $media
+ */
+function bl_install_finalize_homepage_content(int $page_id, array $manifest, array $media = []): void
+{
+	if ($page_id <= 0) {
+		return;
+	}
+
+	$post = get_post($page_id);
+	if (!$post instanceof WP_Post) {
+		return;
+	}
+
+	$content = (string) $post->post_content;
+	if ($content === '' || !str_contains($content, '{{homepage_edit_url}}')) {
+		return;
+	}
+
+	$updated = bl_install_replace_page_placeholders(
+		$content,
+		$manifest,
+		$media,
+		[
+			'homepage_edit_url' => admin_url('post.php?post=' . $page_id . '&action=edit'),
+		]
+	);
+
+	if ($updated === $content) {
+		return;
+	}
+
+	wp_update_post([
+		'ID'           => $page_id,
+		'post_content' => $updated,
+	]);
+}
+
+/**
+ * Build a hero slide link value (Baselayer page link or URL; ACF-compatible title/url/target).
+ *
+ * @return array{type: string, title: string, url: string, target: string, page_id?: int}
+ */
+function bl_install_homepage_hero_link(string $title, string $url, int $page_id = 0): array
+{
+	if ($page_id > 0) {
+		$permalink = get_permalink($page_id);
+		if (is_string($permalink) && $permalink !== '') {
+			$url = $permalink;
+		}
+
+		return [
+			'type'    => 'page',
+			'page_id' => $page_id,
+			'title'   => $title,
+			'url'     => $url,
+			'target'  => '',
+		];
+	}
+
+	return [
+		'type'   => 'url',
+		'title'  => $title,
+		'url'    => $url,
+		'target' => '',
+	];
+}
+
+/**
+ * Seed Hero page settings on the install homepage (ACF or Baselayer).
+ *
+ * @param array<string, array{id: int, url: string}> $media
+ * @param array<string, int>                         $page_ids Install page IDs (blocks, contact, …).
+ */
+function bl_install_seed_homepage_hero(int $page_id, array $media = [], array $page_ids = []): void
+{
+	if ($page_id <= 0) {
+		return;
+	}
+
+	$system = bl_install_blocks_system();
+	if ($system !== 'acf' && $system !== 'baselayer') {
+		return;
+	}
+
+	$image_1 = (int) ($media['sample-image-1']['id'] ?? 0);
+	$image_4 = (int) ($media['sample-image-4']['id'] ?? 0);
+	if ($image_1 <= 0 || $image_4 <= 0) {
+		return;
+	}
+
+	$copy = bl_install_homepage_hero_copy();
+	$manifest = bl_install_page_manifest();
+	$blocks_page_id = (int) ($page_ids['blocks'] ?? 0);
+	$blocks_url = home_url(user_trailingslashit($manifest['blocks']['slug'] ?? 'blocks'));
+	$website_url = bl_install_website_settings_url();
+
+	$slides = [];
+	$images = [$image_1, $image_4];
+	$link_defs = [
+		[
+			'title'   => $copy['slides'][0]['link_title'] ?? 'Explore Blocks',
+			'url'     => $blocks_url,
+			'page_id' => $blocks_page_id,
+		],
+		[
+			'title'   => $copy['slides'][1]['link_title'] ?? 'Website Settings',
+			'url'     => $website_url,
+			'page_id' => 0,
+		],
+	];
+
+	foreach ($copy['slides'] as $i => $slide_copy) {
+		$link_def = $link_defs[$i] ?? ['title' => '', 'url' => '', 'page_id' => 0];
+		$slides[] = [
+			'background'   => 'image',
+			'image'        => $images[$i],
+			'title_source' => 'custom',
+			'title'        => $slide_copy['title'],
+			'text_source'  => 'custom',
+			'text'         => $slide_copy['text'],
+			'links_source' => 'custom',
+			'links'        => [
+				[
+					'link' => bl_install_homepage_hero_link(
+						(string) $link_def['title'],
+						(string) $link_def['url'],
+						(int) $link_def['page_id']
+					),
+				],
+			],
+		];
+	}
+
+	if ($system === 'acf') {
+		if (!function_exists('update_field')) {
+			return;
+		}
+		update_field('hero_enabled', 1, $page_id);
+		update_field('hero_slides', $slides, $page_id);
+		return;
+	}
+
+	// Baselayer Content Fields (page_settings slug `hero`).
+	if (!function_exists('bl_hero_page_settings_definition_id') || !function_exists('bl_blocks_page_meta_key')) {
+		return;
+	}
+
+	$def_id = bl_hero_page_settings_definition_id();
+	if ($def_id <= 0) {
+		return;
+	}
+
+	update_post_meta(
+		$page_id,
+		bl_blocks_page_meta_key($def_id),
+		[
+			'hero_enabled' => true,
+			'hero_slides'  => $slides,
+		]
+	);
 }
 
 /**
@@ -511,6 +768,9 @@ function bl_install_create_pages(array $media = []): array
 		update_option('show_on_front', 'page');
 		update_option('page_on_front', $homepage_id);
 		update_option('page_for_posts', 0);
+
+		bl_install_finalize_homepage_content($homepage_id, $manifest, $media);
+		bl_install_seed_homepage_hero($homepage_id, $media, $page_ids);
 	}
 
 	update_option('posts_per_page', 20);
