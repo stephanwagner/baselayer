@@ -6,10 +6,14 @@
 .slider__wrapper {
   position: relative;
 
-  .swiper > .acf-innerblocks-container {
-    display: flex;
-    transition-property: transform;
-    box-sizing: content-box;
+  .swiper > {
+    border-radius: var(--bl-border-radius-m);
+
+    .acf-innerblocks-container {
+      display: flex;
+      transition-property: transform;
+      box-sizing: content-box;
+    }
   }
 }
 
