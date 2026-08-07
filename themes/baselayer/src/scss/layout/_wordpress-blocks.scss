@@ -981,6 +981,40 @@
     }
   }
 
+  // Separator width
+
+  .wp-block-separator {
+    &.-separator-width-xs {
+      width: 64px !important;
+      max-width: 100% !important;
+      margin-inline: auto;
+    }
+
+    &.-separator-width-s {
+      width: 128px !important;
+      max-width: 100% !important;
+      margin-inline: auto;
+    }
+
+    &.-separator-width-m {
+      width: 300px !important;
+      max-width: 100% !important;
+      margin-inline: auto;
+    }
+
+    &.-separator-width-l {
+      width: 600px !important;
+      max-width: 100% !important;
+      margin-inline: auto;
+    }
+
+    &.-separator-width-xl {
+      width: 900px !important;
+      max-width: 100% !important;
+      margin-inline: auto;
+    }
+  }
+
   // Text-wrap
 
   .text-wrap-balance {

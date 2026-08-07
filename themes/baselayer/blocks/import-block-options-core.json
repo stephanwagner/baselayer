@@ -489,6 +489,40 @@
                             "defaultSize": "m"
                         }
                     }
+                },
+                {
+                    "id": "c_separator_width",
+                    "kind": "control",
+                    "type": "button-group",
+                    "label": "Weite",
+                    "attributeName": "separatorWidth",
+                    "default": "",
+                    "options": [
+                        {
+                            "label": "—",
+                            "value": ""
+                        },
+                        {
+                            "label": "XS",
+                            "value": "-separator-width-xs"
+                        },
+                        {
+                            "label": "S",
+                            "value": "-separator-width-s"
+                        },
+                        {
+                            "label": "M",
+                            "value": "-separator-width-m"
+                        },
+                        {
+                            "label": "L",
+                            "value": "-separator-width-l"
+                        },
+                        {
+                            "label": "XL",
+                            "value": "-separator-width-xl"
+                        }
+                    ]
                 }
             ]
         },
