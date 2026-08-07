@@ -94,6 +94,30 @@ function bl_block_options_resolve_asset(string $name, string $type): ?array
 }
 
 /**
+ * Inspector UI strings for block-options customs (PHP → JS via localize).
+ *
+ * @return array<string, string>
+ */
+function bl_block_options_editor_i18n(): array
+{
+	return [
+		'default' => __('Default', 'baselayer-blocks'),
+		'wide' => __('Wide', 'baselayer-blocks'),
+		'alignContentToContentColumn' => __('Align content to content column', 'baselayer-blocks'),
+		'reset' => __('Reset', 'baselayer-blocks'),
+		'topAndBottom' => __('Top and bottom', 'baselayer-blocks'),
+		'top' => __('Top', 'baselayer-blocks'),
+		'bottom' => __('Bottom', 'baselayer-blocks'),
+		'linkSides' => __('Link sides', 'baselayer-blocks'),
+		'left' => __('Left', 'baselayer-blocks'),
+		'center' => __('Center', 'baselayer-blocks'),
+		'right' => __('Right', 'baselayer-blocks'),
+		'size' => __('Size', 'baselayer-blocks'),
+		'alignment' => __('Alignment', 'baselayer-blocks'),
+	];
+}
+
+/**
  * Enqueue block-options editor script + localize resolved options.
  */
 function bl_block_options_enqueue_editor_assets(): void
@@ -115,13 +139,8 @@ function bl_block_options_enqueue_editor_assets(): void
 		return;
 	}
 
-	wp_set_script_translations(
-		$handle,
-		'baselayer-blocks',
-		bl_block_options_package_root() . 'languages'
-	);
-
 	wp_localize_script($handle, 'baselayerBlockOptions', bl_block_options_for_editor());
+	wp_localize_script($handle, 'baselayerBlockOptionsI18n', bl_block_options_editor_i18n());
 
 	if (function_exists('bl_icons_localize_payload')) {
 		wp_localize_script($handle, 'baselayerIcons', bl_icons_localize_payload());

@@ -6,8 +6,8 @@ import {
 } from './utils';
 import { BlockOptionToggleGroupOption } from '../../src/js/block-options/shared/block-option-toggle-group-option';
 import { BlockOptionDescription } from '../../src/js/block-options/shared/block-option-help';
+import { t } from '../../src/js/block-options/shared/i18n';
 
-const { __ } = wp.i18n;
 const { Button } = wp.components;
 const ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
 
@@ -99,7 +99,7 @@ export function ContainerMarginControl({ option, attributes, onChange }) {
         <div className="bl-container-margin__header">
           <span className="bl-container-margin__side-label">{sideLabel}</span>
           <Button variant="link" className="bl-container-margin__reset" onClick={onReset}>
-            {__('Reset', 'baselayer-blocks')}
+            {t('reset', 'Reset')}
           </Button>
         </div>
         {control}
@@ -119,7 +119,7 @@ export function ContainerMarginControl({ option, attributes, onChange }) {
       {option.label ? <span className="bl-container-margin__label">{option.label}</span> : null}
 
       {renderSizeControl(
-        isLinked ? __('Top and bottom', 'baselayer-blocks') : __('Top', 'baselayer-blocks'),
+        isLinked ? t('topAndBottom', 'Top and bottom') : t('top', 'Top'),
         displayTop,
         setTop,
         resetTop
@@ -128,7 +128,7 @@ export function ContainerMarginControl({ option, attributes, onChange }) {
       {isLinked
         ? renderActionButton(
             'link-off',
-            __('Bottom', 'baselayer-blocks'),
+            t('bottom', 'Bottom'),
             revealBottom,
             'bl-container-margin__action--reveal'
           )
@@ -136,11 +136,11 @@ export function ContainerMarginControl({ option, attributes, onChange }) {
           <>
             {renderActionButton(
               'link',
-              __('Link sides', 'baselayer-blocks'),
+              t('linkSides', 'Link sides'),
               relink,
               'bl-container-margin__action--relink'
             )}
-            {renderSizeControl(__('Bottom', 'baselayer-blocks'), displayBottom, setBottom, resetBottom)}
+            {renderSizeControl(t('bottom', 'Bottom'), displayBottom, setBottom, resetBottom)}
           </>
         )}
       <BlockOptionDescription description={option.description} />

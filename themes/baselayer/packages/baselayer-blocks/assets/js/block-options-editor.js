@@ -113,13 +113,18 @@
     return /* @__PURE__ */ wp.element.createElement("p", { className: "components-base-control__help bl-block-option-help" }, description);
   }
 
+  // themes/baselayer/packages/baselayer-blocks/src/js/block-options/shared/i18n.js
+  function t(key, fallback) {
+    const dict = window.baselayerBlockOptionsI18n || {};
+    return dict[key] || fallback;
+  }
+
   // themes/baselayer/packages/baselayer-blocks/customs/align-wide/control.js
-  var { __ } = wp.i18n;
   var { ToggleControl, SelectControl } = wp.components;
   var ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
   var alignWideOptions = () => [
-    { label: __("Default", "baselayer-blocks"), value: "" },
-    { label: __("Wide", "baselayer-blocks"), value: ALIGN_WIDE_CONTAINER_CLASS }
+    { label: t("default", "Default"), value: "" },
+    { label: t("wide", "Wide"), value: ALIGN_WIDE_CONTAINER_CLASS }
   ];
   function AlignWideControl({ option, attributes, onChange }) {
     const { container, content } = option.attributeNames;
@@ -137,7 +142,7 @@
       ToggleControl,
       {
         className: "bl-align-wide-content-toggle",
-        label: __("Align content to content column", "baselayer-blocks"),
+        label: t("alignContentToContentColumn", "Align content to content column"),
         checked: Boolean(attributes[content]),
         onChange: (checked) => onChange({ [content]: checked })
       }
@@ -240,7 +245,6 @@
   };
 
   // themes/baselayer/packages/baselayer-blocks/customs/container-margin/control.js
-  var { __: __2 } = wp.i18n;
   var { Button } = wp.components;
   var ToggleGroupControl2 = wp.components.__experimentalToggleGroupControl;
   function ContainerMarginControl({ option, attributes, onChange }) {
@@ -311,25 +315,25 @@
           }
         ))
       ) : null;
-      return /* @__PURE__ */ wp.element.createElement("div", { className: "bl-container-margin__field" }, /* @__PURE__ */ wp.element.createElement("div", { className: "bl-container-margin__header" }, /* @__PURE__ */ wp.element.createElement("span", { className: "bl-container-margin__side-label" }, sideLabel), /* @__PURE__ */ wp.element.createElement(Button, { variant: "link", className: "bl-container-margin__reset", onClick: onReset }, __2("Reset", "baselayer-blocks"))), control);
+      return /* @__PURE__ */ wp.element.createElement("div", { className: "bl-container-margin__field" }, /* @__PURE__ */ wp.element.createElement("div", { className: "bl-container-margin__header" }, /* @__PURE__ */ wp.element.createElement("span", { className: "bl-container-margin__side-label" }, sideLabel), /* @__PURE__ */ wp.element.createElement(Button, { variant: "link", className: "bl-container-margin__reset", onClick: onReset }, t("reset", "Reset"))), control);
     };
     const renderActionButton = (icon, label, onClick, className) => /* @__PURE__ */ wp.element.createElement(Button, { variant: "link", className: "bl-container-margin__action " + className, onClick }, /* @__PURE__ */ wp.element.createElement("span", { className: "bl-icon -icon-" + icon, "aria-hidden": "true" }), label);
     return /* @__PURE__ */ wp.element.createElement("div", { className: "bl-container-margin" }, option.label ? /* @__PURE__ */ wp.element.createElement("span", { className: "bl-container-margin__label" }, option.label) : null, renderSizeControl(
-      isLinked ? __2("Top and bottom", "baselayer-blocks") : __2("Top", "baselayer-blocks"),
+      isLinked ? t("topAndBottom", "Top and bottom") : t("top", "Top"),
       displayTop,
       setTop,
       resetTop
     ), isLinked ? renderActionButton(
       "link-off",
-      __2("Bottom", "baselayer-blocks"),
+      t("bottom", "Bottom"),
       revealBottom,
       "bl-container-margin__action--reveal"
     ) : /* @__PURE__ */ wp.element.createElement(wp.element.Fragment, null, renderActionButton(
       "link",
-      __2("Link sides", "baselayer-blocks"),
+      t("linkSides", "Link sides"),
       relink,
       "bl-container-margin__action--relink"
-    ), renderSizeControl(__2("Bottom", "baselayer-blocks"), displayBottom, setBottom, resetBottom)), /* @__PURE__ */ wp.element.createElement(BlockOptionDescription, { description: option.description }));
+    ), renderSizeControl(t("bottom", "Bottom"), displayBottom, setBottom, resetBottom)), /* @__PURE__ */ wp.element.createElement(BlockOptionDescription, { description: option.description }));
   }
 
   // themes/baselayer/packages/baselayer-blocks/customs/container-margin/editor.js
@@ -404,12 +408,11 @@
   };
 
   // themes/baselayer/packages/baselayer-blocks/customs/limit-width/control.js
-  var { __: __3 } = wp.i18n;
   var ToggleGroupControl3 = wp.components.__experimentalToggleGroupControl;
   var limitWidthAligns = () => [
-    { ...LIMIT_WIDTH_ALIGN_VALUES[0], label: __3("Left", "baselayer-blocks") },
-    { ...LIMIT_WIDTH_ALIGN_VALUES[1], label: __3("Center", "baselayer-blocks") },
-    { ...LIMIT_WIDTH_ALIGN_VALUES[2], label: __3("Right", "baselayer-blocks") }
+    { ...LIMIT_WIDTH_ALIGN_VALUES[0], label: t("left", "Left") },
+    { ...LIMIT_WIDTH_ALIGN_VALUES[1], label: t("center", "Center") },
+    { ...LIMIT_WIDTH_ALIGN_VALUES[2], label: t("right", "Right") }
   ];
   function LimitWidthControl({ option, attributes, onChange }) {
     const { size, align } = option.attributeNames;
@@ -431,8 +434,10 @@
     if (!ToggleGroupControl3) {
       return null;
     }
-    const sizeLabel = option.label ? `${option.label} ${__3("Size", "baselayer-blocks")}` : __3("Size", "baselayer-blocks");
-    const alignLabel = option.label ? `${option.label} ${__3("Alignment", "baselayer-blocks")}` : __3("Alignment", "baselayer-blocks");
+    const sizeWord = t("size", "Size");
+    const alignWord = t("alignment", "Alignment");
+    const sizeLabel = option.label ? `${option.label} ${sizeWord}` : sizeWord;
+    const alignLabel = option.label ? `${option.label} ${alignWord}` : alignWord;
     return /* @__PURE__ */ wp.element.createElement("div", { className: "bl-limit-width" }, option.label ? /* @__PURE__ */ wp.element.createElement("span", { className: "bl-limit-width__label" }, option.label) : null, /* @__PURE__ */ wp.element.createElement("div", { className: "bl-limit-width__row bl-block-option-button-group" }, /* @__PURE__ */ wp.element.createElement(
       ToggleGroupControl3,
       {
@@ -1453,7 +1458,7 @@
   var iconLabels = () => iconL10n2().labels || {};
   var categoryLabels = () => iconL10n2().categories || {};
   var uiStrings = () => iconL10n2().ui || {};
-  var t = (key, fallback) => uiStrings()[key] || fallback;
+  var t2 = (key, fallback) => uiStrings()[key] || fallback;
   var humanize = (slug) => slug.replace(/-/g, " ").replace(/^\w/, (char) => char.toUpperCase());
   var iconName = (icon, labels) => icon.label || labels[icon.filename] || humanize(icon.filename);
   var categoryName = (category, labels) => category.label || labels[category.slug] || humanize(category.slug);
@@ -1468,17 +1473,17 @@
     <div class="bl-icon-picker-modal__backdrop" data-bl-icon-picker-close tabindex="-1"></div>
     <div class="bl-icon-picker-modal__panel">
       <header class="bl-icon-picker-modal__header">
-        <h2 id="bl-icon-picker-modal-title" class="bl-icon-picker-modal__title">${t("choose", "Choose icon")}</h2>
-        <button type="button" class="bl-icon-picker-modal__close" data-bl-icon-picker-close aria-label="${t("close", "Close")}">
+        <h2 id="bl-icon-picker-modal-title" class="bl-icon-picker-modal__title">${t2("choose", "Choose icon")}</h2>
+        <button type="button" class="bl-icon-picker-modal__close" data-bl-icon-picker-close aria-label="${t2("close", "Close")}">
           <span class="dashicons dashicons-no-alt" aria-hidden="true"></span>
         </button>
       </header>
       <div class="bl-icon-picker-modal__body bl-icon-picker__panel">
         <div class="bl-icon-picker__toolbar">
-          <input type="search" class="bl-icon-picker-modal__search" data-bl-icon-picker-search placeholder="${t("search", "Search icons\u2026")}" autocomplete="off">
-          <div class="bl-icon-picker__variant bl-icon-picker-modal__variant" role="group" aria-label="${t("style", "Style")}">
-            <button type="button" class="bl-icon-picker__variant-btn" data-bl-icon-picker-variant="outline">${t("outline", "Outline")}</button>
-            <button type="button" class="bl-icon-picker__variant-btn" data-bl-icon-picker-variant="fill">${t("filled", "Filled")}</button>
+          <input type="search" class="bl-icon-picker-modal__search" data-bl-icon-picker-search placeholder="${t2("search", "Search icons\u2026")}" autocomplete="off">
+          <div class="bl-icon-picker__variant bl-icon-picker-modal__variant" role="group" aria-label="${t2("style", "Style")}">
+            <button type="button" class="bl-icon-picker__variant-btn" data-bl-icon-picker-variant="outline">${t2("outline", "Outline")}</button>
+            <button type="button" class="bl-icon-picker__variant-btn" data-bl-icon-picker-variant="fill">${t2("filled", "Filled")}</button>
           </div>
         </div>
         <div class="bl-icon-picker__categories" data-bl-icon-picker-categories></div>
@@ -1628,7 +1633,7 @@
   var iconL10n3 = typeof window !== "undefined" && window.baselayerIcons || {};
   var iconLabels2 = iconL10n3.labels || {};
   var uiStrings2 = iconL10n3.ui || {};
-  var t2 = (key, fallback) => uiStrings2[key] || fallback;
+  var t3 = (key, fallback) => uiStrings2[key] || fallback;
   var humanize2 = (slug) => slug.replace(/-/g, " ").replace(/^\w/, (char) => char.toUpperCase());
   var iconName2 = (icon) => icon.label || iconLabels2[icon.filename] || humanize2(icon.filename);
   function IconPicker({ label, description, value, onChange }) {
@@ -1646,12 +1651,12 @@
       {
         type: "button",
         className: "bl-icon-picker__clear",
-        title: t2("remove", "Remove"),
-        "aria-label": t2("remove", "Remove"),
+        title: t3("remove", "Remove"),
+        "aria-label": t3("remove", "Remove"),
         onClick: () => onChange("")
       },
       /* @__PURE__ */ wp.element.createElement("span", { className: "bl-icon -icon-close", "aria-hidden": "true" })
-    )) : null, /* @__PURE__ */ wp.element.createElement("div", { className: "bl-icon-picker__control" }, /* @__PURE__ */ wp.element.createElement(Button2, { ref: triggerRef, variant: "secondary", className: "bl-icon-picker__trigger", onClick: openPicker }, t2("choose", "Choose icon"))), /* @__PURE__ */ wp.element.createElement(BlockOptionDescription2, { description }));
+    )) : null, /* @__PURE__ */ wp.element.createElement("div", { className: "bl-icon-picker__control" }, /* @__PURE__ */ wp.element.createElement(Button2, { ref: triggerRef, variant: "secondary", className: "bl-icon-picker__trigger", onClick: openPicker }, t3("choose", "Choose icon"))), /* @__PURE__ */ wp.element.createElement(BlockOptionDescription2, { description }));
   }
 
   // themes/baselayer/packages/baselayer-blocks/src/js/block-options/editor.js

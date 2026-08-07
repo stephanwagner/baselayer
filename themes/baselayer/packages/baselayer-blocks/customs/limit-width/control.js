@@ -6,14 +6,14 @@ import {
 } from './utils';
 import { BlockOptionToggleGroupOption } from '../../src/js/block-options/shared/block-option-toggle-group-option';
 import { BlockOptionDescription } from '../../src/js/block-options/shared/block-option-help';
+import { t } from '../../src/js/block-options/shared/i18n';
 
-const { __ } = wp.i18n;
 const ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
 
 const limitWidthAligns = () => [
-  { ...LIMIT_WIDTH_ALIGN_VALUES[0], label: __('Left', 'baselayer-blocks') },
-  { ...LIMIT_WIDTH_ALIGN_VALUES[1], label: __('Center', 'baselayer-blocks') },
-  { ...LIMIT_WIDTH_ALIGN_VALUES[2], label: __('Right', 'baselayer-blocks') },
+  { ...LIMIT_WIDTH_ALIGN_VALUES[0], label: t('left', 'Left') },
+  { ...LIMIT_WIDTH_ALIGN_VALUES[1], label: t('center', 'Center') },
+  { ...LIMIT_WIDTH_ALIGN_VALUES[2], label: t('right', 'Right') },
 ];
 
 /**
@@ -44,12 +44,10 @@ export function LimitWidthControl({ option, attributes, onChange }) {
     return null;
   }
 
-  const sizeLabel = option.label
-    ? `${option.label} ${__('Size', 'baselayer-blocks')}`
-    : __('Size', 'baselayer-blocks');
-  const alignLabel = option.label
-    ? `${option.label} ${__('Alignment', 'baselayer-blocks')}`
-    : __('Alignment', 'baselayer-blocks');
+  const sizeWord = t('size', 'Size');
+  const alignWord = t('alignment', 'Alignment');
+  const sizeLabel = option.label ? `${option.label} ${sizeWord}` : sizeWord;
+  const alignLabel = option.label ? `${option.label} ${alignWord}` : alignWord;
 
   return (
     <div className="bl-limit-width">

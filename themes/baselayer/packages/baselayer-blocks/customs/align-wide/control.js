@@ -3,14 +3,14 @@ import {
 } from './utils';
 import { BlockOptionToggleGroupOption } from '../../src/js/block-options/shared/block-option-toggle-group-option';
 import { BlockOptionDescription, optionHelpProps } from '../../src/js/block-options/shared/block-option-help';
+import { t } from '../../src/js/block-options/shared/i18n';
 
-const { __ } = wp.i18n;
 const { ToggleControl, SelectControl } = wp.components;
 const ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
 
 const alignWideOptions = () => [
-  { label: __('Default', 'baselayer-blocks'), value: '' },
-  { label: __('Wide', 'baselayer-blocks'), value: ALIGN_WIDE_CONTAINER_CLASS },
+  { label: t('default', 'Default'), value: '' },
+  { label: t('wide', 'Wide'), value: ALIGN_WIDE_CONTAINER_CLASS },
 ];
 
 /**
@@ -33,7 +33,7 @@ export function AlignWideControl({ option, attributes, onChange }) {
   const contentToggle = wideSelected ? (
     <ToggleControl
       className="bl-align-wide-content-toggle"
-      label={__('Align content to content column', 'baselayer-blocks')}
+      label={t('alignContentToContentColumn', 'Align content to content column')}
       checked={Boolean(attributes[content])}
       onChange={(checked) => onChange({ [content]: checked })}
     />
