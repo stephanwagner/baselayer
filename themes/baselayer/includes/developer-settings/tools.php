@@ -379,8 +379,16 @@ function bl_render_developer_tools(): void
 							</div>
 						</div>
 						<div class="bl-google-font-modal__actions">
-							<button type="button" class="button" data-bl-google-font-close><?= esc_html__('Close', 'baselayer') ?></button>
-							<button type="button" class="button button-primary" data-bl-google-font-install disabled><?= esc_html__('Install', 'baselayer') ?></button>
+							<span
+								class="bl-google-font-modal__spinner"
+								data-bl-google-font-spinner
+								hidden
+								aria-hidden="true"
+							></span>
+							<div class="bl-google-font-modal__actions-buttons">
+								<button type="button" class="button" data-bl-google-font-close><?= esc_html__('Close', 'baselayer') ?></button>
+								<button type="button" class="button button-primary" data-bl-google-font-install disabled><?= esc_html__('Install', 'baselayer') ?></button>
+							</div>
 						</div>
 					</div>
 				</div>

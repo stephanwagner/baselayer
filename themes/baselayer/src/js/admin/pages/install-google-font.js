@@ -42,6 +42,7 @@
   const linkNoteCopyBtn = root.querySelector('[data-bl-google-font-link-note-copy]');
   const linkNoteDismissBtn = root.querySelector('[data-bl-google-font-link-note-dismiss]');
   const installBtn = root.querySelector('[data-bl-google-font-install]');
+  const spinnerEl = root.querySelector('[data-bl-google-font-spinner]');
 
   const CONSENT_STORAGE_KEY = 'bl_google_font_preview_consent';
 
@@ -68,10 +69,42 @@
   let previewConsented = readPreviewConsent();
   /** Keep the post-install success pane visible until the user picks another font. */
   let showingInstallSuccess = false;
+  let searchLoading = false;
+  let installLoading = false;
   let searchTimer = null;
   let searchSeq = 0;
   /** @type {Array<{family: string, category?: string}>} */
   let lastItems = [];
+
+  const syncLoading = () => {
+    const loading = searchLoading || installLoading;
+    if (resultsEl) {
+      resultsEl.classList.toggle('is-loading', loading);
+      resultsEl.setAttribute('aria-busy', loading ? 'true' : 'false');
+    }
+    if (spinnerEl) {
+      spinnerEl.hidden = !loading;
+      spinnerEl.setAttribute('aria-hidden', loading ? 'false' : 'true');
+      const label = installLoading
+        ? i18n.installing || 'Installing…'
+        : i18n.searching || 'Searching…';
+      if (loading) {
+        spinnerEl.setAttribute('aria-label', label);
+      } else {
+        spinnerEl.removeAttribute('aria-label');
+      }
+    }
+  };
+
+  const setSearchLoading = (loading) => {
+    searchLoading = !!loading;
+    syncLoading();
+  };
+
+  const setInstallLoading = (loading) => {
+    installLoading = !!loading;
+    syncLoading();
+  };
 
   const tpl = (template, ...values) => {
     let out = String(template || '');
@@ -405,15 +438,14 @@
 
   const runSearch = (query) => {
     const seq = ++searchSeq;
-    if (resultsEl) {
-      resultsEl.innerHTML = '<p class="description">' + (i18n.searching || '') + '</p>';
-    }
+    setSearchLoading(true);
     post('bl_google_font_search', { q: query })
       .then((data) => {
         if (seq !== searchSeq) {
           return;
         }
         renderResults(Array.isArray(data.items) ? data.items : []);
+        setSearchLoading(false);
       })
       .catch((error) => {
         if (seq !== searchSeq || !resultsEl) {
@@ -424,6 +456,7 @@
         err.className = 'description';
         err.textContent = error.message || i18n.searchError || '';
         resultsEl.appendChild(err);
+        setSearchLoading(false);
       });
   };
 
@@ -452,6 +485,10 @@
     if (!modal) {
       return;
     }
+    window.clearTimeout(searchTimer);
+    searchSeq += 1;
+    setSearchLoading(false);
+    setInstallLoading(false);
     modal.classList.remove('is-open');
     modal.hidden = true;
     modal.setAttribute('aria-hidden', 'true');
@@ -543,11 +580,11 @@
   };
 
   installBtn?.addEventListener('click', () => {
-    if (!selected.length || installBtn.disabled) {
+    if (!selected.length || installBtn.disabled || installLoading) {
       return;
     }
     installBtn.disabled = true;
-    installBtn.textContent = i18n.installing || 'Installing…';
+    setInstallLoading(true);
     post('bl_google_font_install', { families: JSON.stringify(selected) })
       .then((data) => {
         if (successTitle) {
@@ -571,6 +608,7 @@
         selected = [];
         focusedFamily = '';
         showingInstallSuccess = true;
+        setInstallLoading(false);
         renderSelected();
         updatePreviewPane();
         installBtn.textContent = i18n.install || 'Install';
@@ -578,6 +616,7 @@
       })
       .catch((error) => {
         window.alert(error.message || i18n.installError || '');
+        setInstallLoading(false);
         installBtn.disabled = false;
         installBtn.textContent = i18n.install || 'Install';
       });
