@@ -1,5 +1,5 @@
 /**
- * Developer → Tools — Install Google Font modal.
+ * Developer → Tools — Install Google Font modal (explicit Add, preview consent).
  */
 (function () {
   const root = document.getElementById('bl-google-font');
@@ -9,6 +9,7 @@
 
   const ajaxUrl = root.getAttribute('data-ajax-url') || '';
   const nonce = root.getAttribute('data-nonce') || '';
+  const maxSelected = Math.max(1, parseInt(root.getAttribute('data-max-selected') || '3', 10) || 3);
   let i18n = {};
   try {
     i18n = JSON.parse(root.getAttribute('data-i18n') || '{}') || {};
@@ -20,24 +21,84 @@
   const openBtn = root.querySelector('[data-bl-google-font-open]');
   const searchInput = root.querySelector('[data-bl-google-font-search]');
   const resultsEl = root.querySelector('[data-bl-google-font-results]');
+  const selectedLabel = root.querySelector('[data-bl-google-font-selected-label]');
+  const selectedList = root.querySelector('[data-bl-google-font-selected-list]');
+  const maxWarning = root.querySelector('[data-bl-google-font-max-warning]');
   const previewEmpty = root.querySelector('[data-bl-google-font-preview-empty]');
   const previewPane = root.querySelector('[data-bl-google-font-preview]');
   const previewName = root.querySelector('[data-bl-google-font-preview-name]');
-  const previewSample = root.querySelector('[data-bl-google-font-preview-sample]');
+  const previewFrame = root.querySelector('[data-bl-google-font-preview-frame]');
+  const consentEl = root.querySelector('[data-bl-google-font-consent]');
+  const consentAcceptBtn = root.querySelector('[data-bl-google-font-consent-accept]');
+  const addBtn = root.querySelector('[data-bl-google-font-add]');
   const successEl = root.querySelector('[data-bl-google-font-success]');
   const successTitle = root.querySelector('[data-bl-google-font-success-title]');
   const successMeta = root.querySelector('[data-bl-google-font-success-meta]');
   const successHint = root.querySelector('[data-bl-google-font-success-hint]');
-  const successSnippet = root.querySelector('[data-bl-google-font-success-snippet]');
+  const linkNote = root.querySelector('[data-bl-google-font-link-note]');
+  const linkNoteTitle = root.querySelector('[data-bl-google-font-link-note-title]');
+  const linkNoteHint = root.querySelector('[data-bl-google-font-link-note-hint]');
+  const linkNoteSnippet = root.querySelector('[data-bl-google-font-link-note-snippet]');
+  const linkNoteCopyBtn = root.querySelector('[data-bl-google-font-link-note-copy]');
+  const linkNoteDismissBtn = root.querySelector('[data-bl-google-font-link-note-dismiss]');
   const installBtn = root.querySelector('[data-bl-google-font-install]');
-  const copyBtn = root.querySelector('[data-bl-google-font-copy]');
-  const previewLink = document.createElement('link');
-  previewLink.rel = 'stylesheet';
-  previewLink.setAttribute('data-bl-google-font-preview-link', '1');
 
-  let selectedFamily = '';
+  const CONSENT_STORAGE_KEY = 'bl_google_font_preview_consent';
+
+  const readPreviewConsent = () => {
+    try {
+      return window.localStorage.getItem(CONSENT_STORAGE_KEY) === '1';
+    } catch (e) {
+      return false;
+    }
+  };
+
+  const writePreviewConsent = () => {
+    try {
+      window.localStorage.setItem(CONSENT_STORAGE_KEY, '1');
+    } catch (e) {
+      // Ignore storage failures (private mode, quota, etc.).
+    }
+  };
+
+  /** @type {string[]} */
+  let selected = [];
+  /** Currently highlighted family in the results list (not yet added). */
+  let focusedFamily = '';
+  let previewConsented = readPreviewConsent();
   let searchTimer = null;
   let searchSeq = 0;
+  /** @type {Array<{family: string, category?: string}>} */
+  let lastItems = [];
+
+  const tpl = (template, ...values) => {
+    let out = String(template || '');
+    values.forEach((value) => {
+      out = out.replace('%d', String(value));
+      out = out.replace('%s', String(value));
+    });
+    return out;
+  };
+
+  const escapeHtml = (value) =>
+    String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+
+  const googleCssUrl = (families) => {
+    const list = Array.isArray(families) ? families.filter(Boolean) : [];
+    if (!list.length) {
+      return '';
+    }
+    return (
+      'https://fonts.googleapis.com/css2?' +
+      list.map((family) => 'family=' + encodeURIComponent(family)).join('&') +
+      '&display=swap'
+    );
+  };
 
   const post = (action, fields = {}) => {
     const body = new URLSearchParams();
@@ -64,30 +125,95 @@
     });
   };
 
-  const clearPreviewLink = () => {
-    if (previewLink.parentNode) {
-      previewLink.parentNode.removeChild(previewLink);
+  const clearPreviewFrame = () => {
+    if (!previewFrame) {
+      return;
     }
-    previewLink.removeAttribute('href');
+    previewFrame.hidden = true;
+    previewFrame.removeAttribute('srcdoc');
+    previewFrame.src = 'about:blank';
   };
 
-  const setPreviewFamily = (family) => {
-    selectedFamily = family || '';
+  /**
+   * Iframe isolates the sample from WP admin font CSS so Google Fonts can apply.
+   * Google CSS is only loaded inside this iframe — never in the admin document head.
+   */
+  const renderPreviewFrame = (family) => {
+    if (!previewFrame) {
+      return;
+    }
+    if (!family || !previewConsented) {
+      clearPreviewFrame();
+      return;
+    }
+
+    const cssHref = googleCssUrl([family]);
+    const sample = escapeHtml(i18n.previewSample || '');
+    const fontFamilyCss = JSON.stringify(family);
+    previewFrame.hidden = false;
+    previewFrame.srcdoc =
+      '<!DOCTYPE html><html><head><meta charset="utf-8">' +
+      '<link rel="stylesheet" href="' +
+      escapeHtml(cssHref) +
+      '">' +
+      '<style>' +
+      'html,body{margin:0;padding:0;height:100%;background:transparent;}' +
+      'body{box-sizing:border-box;padding:4px 0;font-family:' +
+      fontFamilyCss +
+      ',sans-serif;font-size:clamp(22px,4.2vw,36px);line-height:1.4;color:#1d2327;word-wrap:break-word;}' +
+      '</style></head><body>' +
+      sample +
+      '</body></html>';
+  };
+
+  const syncAddButton = () => {
+    if (!addBtn) {
+      return;
+    }
+    if (!focusedFamily) {
+      addBtn.disabled = true;
+      addBtn.textContent = i18n.add || 'Add';
+      return;
+    }
+    if (selected.includes(focusedFamily)) {
+      addBtn.disabled = true;
+      addBtn.textContent = i18n.alreadySelected || 'Already selected';
+      return;
+    }
+    if (selected.length >= maxSelected) {
+      addBtn.disabled = true;
+      addBtn.textContent = i18n.add || 'Add';
+      return;
+    }
+    addBtn.disabled = false;
+    addBtn.textContent = i18n.add || 'Add';
+  };
+
+  const syncInstallButton = () => {
+    if (!installBtn) {
+      return;
+    }
+    installBtn.disabled = selected.length === 0;
+    installBtn.textContent = i18n.install || 'Install';
+  };
+
+  const updatePreviewPane = () => {
     if (successEl) {
       successEl.hidden = true;
     }
-    if (!family) {
-      clearPreviewLink();
+
+    if (!focusedFamily) {
+      clearPreviewFrame();
       if (previewPane) {
         previewPane.hidden = true;
       }
       if (previewEmpty) {
         previewEmpty.hidden = false;
       }
-      if (installBtn) {
-        installBtn.disabled = true;
-        installBtn.textContent = i18n.install || 'Install';
+      if (consentEl) {
+        consentEl.hidden = true;
       }
+      syncAddButton();
       return;
     }
 
@@ -98,28 +224,120 @@
       previewPane.hidden = false;
     }
     if (previewName) {
-      previewName.textContent = family;
-    }
-    if (previewSample) {
-      previewSample.textContent = i18n.previewSample || '';
-      previewSample.style.fontFamily = `"${family}", sans-serif`;
+      previewName.textContent = focusedFamily;
     }
 
-    const href =
-      'https://fonts.googleapis.com/css2?family=' +
-      encodeURIComponent(family) +
-      ':ital,wght@0,100..900;1,100..900&display=swap';
-    clearPreviewLink();
-    previewLink.href = href;
-    document.head.appendChild(previewLink);
-
-    if (installBtn) {
-      installBtn.disabled = false;
-      installBtn.textContent = i18n.install || 'Install';
+    // Consent only when a focused family would load a Google preview.
+    if (previewConsented) {
+      if (consentEl) {
+        consentEl.hidden = true;
+      }
+      renderPreviewFrame(focusedFamily);
+    } else {
+      clearPreviewFrame();
+      if (consentEl) {
+        consentEl.hidden = false;
+      }
     }
+
+    syncAddButton();
+  };
+
+  const renderSelected = () => {
+    if (selectedLabel) {
+      selectedLabel.textContent =
+        selected.length === 0
+          ? i18n.selectedEmpty || 'No fonts selected yet.'
+          : i18n.selected || 'Selected';
+    }
+    if (maxWarning) {
+      maxWarning.hidden = selected.length < maxSelected;
+    }
+    if (selectedList) {
+      selectedList.innerHTML = '';
+      selected.forEach((family) => {
+        const chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'bl-google-font-modal__chip';
+        chip.setAttribute('role', 'listitem');
+        chip.title = i18n.remove || 'Remove';
+        const name = document.createElement('span');
+        name.className = 'bl-google-font-modal__chip-name';
+        name.textContent = family;
+        const remove = document.createElement('span');
+        remove.className = 'bl-google-font-modal__chip-remove';
+        remove.setAttribute('aria-hidden', 'true');
+        remove.innerHTML =
+          '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" width="10" height="10" fill="none" focusable="false">' +
+          '<path d="M3 3l6 6M9 3L3 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>' +
+          '</svg>';
+        chip.appendChild(name);
+        chip.appendChild(remove);
+        chip.addEventListener('click', () => {
+          removeFamily(family);
+        });
+        selectedList.appendChild(chip);
+      });
+    }
+    syncInstallButton();
+    syncAddButton();
+    syncResultState();
+  };
+
+  const syncResultState = () => {
+    if (!resultsEl) {
+      return;
+    }
+    resultsEl.querySelectorAll('.bl-google-font-modal__result').forEach((btn) => {
+      const family = btn.getAttribute('data-family') || '';
+      btn.classList.toggle('is-focused', family === focusedFamily);
+      btn.classList.toggle('is-added', selected.includes(family));
+      btn.setAttribute('aria-selected', family === focusedFamily ? 'true' : 'false');
+    });
+  };
+
+  const focusFamily = (family) => {
+    focusedFamily = family || '';
+    if (successEl) {
+      successEl.hidden = true;
+    }
+    syncResultState();
+    updatePreviewPane();
+  };
+
+  const addFocusedFamily = () => {
+    if (!focusedFamily) {
+      return;
+    }
+    if (selected.includes(focusedFamily)) {
+      return;
+    }
+    if (selected.length >= maxSelected) {
+      if (maxWarning) {
+        maxWarning.hidden = false;
+      }
+      return;
+    }
+    selected.push(focusedFamily);
+    if (successEl) {
+      successEl.hidden = true;
+    }
+    renderSelected();
+    updatePreviewPane();
+  };
+
+  const removeFamily = (family) => {
+    const index = selected.indexOf(family);
+    if (index < 0) {
+      return;
+    }
+    selected.splice(index, 1);
+    renderSelected();
+    updatePreviewPane();
   };
 
   const renderResults = (items) => {
+    lastItems = items;
     if (!resultsEl) {
       return;
     }
@@ -137,11 +355,18 @@
       btn.type = 'button';
       btn.className = 'bl-google-font-modal__result';
       btn.setAttribute('role', 'option');
-      btn.setAttribute('aria-selected', item.family === selectedFamily ? 'true' : 'false');
-      if (item.family === selectedFamily) {
-        btn.classList.add('is-selected');
+      btn.setAttribute('data-family', item.family);
+      if (item.family === focusedFamily) {
+        btn.classList.add('is-focused');
       }
-      btn.textContent = item.family;
+      if (selected.includes(item.family)) {
+        btn.classList.add('is-added');
+      }
+      btn.setAttribute('aria-selected', item.family === focusedFamily ? 'true' : 'false');
+      const label = document.createElement('span');
+      label.className = 'bl-google-font-modal__result-name';
+      label.textContent = item.family;
+      btn.appendChild(label);
       if (item.category) {
         const meta = document.createElement('span');
         meta.className = 'bl-google-font-modal__result-meta';
@@ -149,13 +374,7 @@
         btn.appendChild(meta);
       }
       btn.addEventListener('click', () => {
-        resultsEl.querySelectorAll('.bl-google-font-modal__result').forEach((el) => {
-          el.classList.remove('is-selected');
-          el.setAttribute('aria-selected', 'false');
-        });
-        btn.classList.add('is-selected');
-        btn.setAttribute('aria-selected', 'true');
-        setPreviewFamily(item.family);
+        focusFamily(item.family);
       });
       resultsEl.appendChild(btn);
     });
@@ -192,15 +411,18 @@
     if (successEl) {
       successEl.hidden = true;
     }
-    setPreviewFamily(selectedFamily);
+    renderSelected();
+    updatePreviewPane();
     modal.hidden = false;
     modal.classList.add('is-open');
     modal.setAttribute('aria-hidden', 'false');
     document.body.classList.add('bl-google-font-modal-open');
     if (searchInput) {
       searchInput.focus();
-      if (!resultsEl || resultsEl.childElementCount === 0) {
+      if (!lastItems.length) {
         runSearch(searchInput.value || '');
+      } else {
+        renderResults(lastItems);
       }
     }
   };
@@ -213,7 +435,7 @@
     modal.hidden = true;
     modal.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('bl-google-font-modal-open');
-    clearPreviewLink();
+    clearPreviewFrame();
     if (openBtn) {
       openBtn.focus();
     }
@@ -231,13 +453,81 @@
     }, 220);
   });
 
+  consentAcceptBtn?.addEventListener('click', () => {
+    previewConsented = true;
+    writePreviewConsent();
+    updatePreviewPane();
+    renderSelected();
+  });
+
+  addBtn?.addEventListener('click', () => {
+    addFocusedFamily();
+  });
+
+  const showLinkNote = (data) => {
+    if (!linkNote) {
+      return;
+    }
+    const title =
+      data.title ||
+      (data.count > 1
+        ? tpl(i18n.installSuccessMany || '%d fonts installed.', data.count)
+        : i18n.installSuccess || 'Font installed.');
+    if (linkNoteTitle) {
+      linkNoteTitle.textContent = title;
+    }
+    if (linkNoteHint) {
+      linkNoteHint.textContent = data.import_hint || '';
+    }
+    if (linkNoteSnippet) {
+      linkNoteSnippet.textContent = data.use || '';
+    }
+    linkNote.hidden = false;
+    // Keep the page notice in view when installing from the modal.
+    if (typeof linkNote.scrollIntoView === 'function') {
+      linkNote.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+  };
+
+  const hideLinkNote = () => {
+    if (!linkNote) {
+      return;
+    }
+    linkNote.hidden = true;
+    if (linkNoteTitle) {
+      linkNoteTitle.textContent = '';
+    }
+    if (linkNoteHint) {
+      linkNoteHint.textContent = '';
+    }
+    if (linkNoteSnippet) {
+      linkNoteSnippet.textContent = '';
+    }
+  };
+
+  const copySnippet = async (snippetEl, button) => {
+    const text = snippetEl?.textContent || '';
+    if (!text || !button) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(text);
+      button.textContent = i18n.copied || 'Copied';
+      window.setTimeout(() => {
+        button.textContent = i18n.copy || 'Copy';
+      }, 1500);
+    } catch (e) {
+      // Ignore clipboard failures.
+    }
+  };
+
   installBtn?.addEventListener('click', () => {
-    if (!selectedFamily || installBtn.disabled) {
+    if (!selected.length || installBtn.disabled) {
       return;
     }
     installBtn.disabled = true;
     installBtn.textContent = i18n.installing || 'Installing…';
-    post('bl_google_font_install', { family: selectedFamily })
+    post('bl_google_font_install', { families: JSON.stringify(selected) })
       .then((data) => {
         if (previewPane) {
           previewPane.hidden = true;
@@ -249,22 +539,38 @@
           successEl.hidden = false;
         }
         if (successTitle) {
-          successTitle.textContent = i18n.installSuccess || 'Font installed.';
+          successTitle.textContent =
+            data.title ||
+            (data.count > 1
+              ? tpl(i18n.installSuccessMany || '%d fonts installed.', data.count)
+              : i18n.installSuccess || 'Font installed.');
         }
         if (successMeta) {
-          const bits = [data.family, data.scss, data.files ? data.files + ' files' : '', data.target]
-            .filter(Boolean)
-            .join(' · ');
-          successMeta.textContent = bits;
+          const names = Array.isArray(data.families) ? data.families.join(', ') : selected.join(', ');
+          successMeta.textContent = names;
         }
         if (successHint) {
-          successHint.textContent = data.import_hint || '';
+          successHint.textContent =
+            data.import_hint ||
+            i18n.installSuccessHint ||
+            'They were added to src/scss/fonts/_fonts.scss. Rebuild your theme CSS to apply them.';
         }
-        if (successSnippet) {
-          successSnippet.textContent = data.use || '';
+        showLinkNote(data);
+        selected = [];
+        focusedFamily = '';
+        renderSelected();
+        // Keep success pane visible (updatePreviewPane would hide it).
+        if (successEl) {
+          successEl.hidden = false;
+        }
+        if (previewPane) {
+          previewPane.hidden = true;
+        }
+        if (previewEmpty) {
+          previewEmpty.hidden = true;
         }
         installBtn.textContent = i18n.install || 'Install';
-        installBtn.disabled = false;
+        installBtn.disabled = true;
       })
       .catch((error) => {
         window.alert(error.message || i18n.installError || '');
@@ -273,20 +579,23 @@
       });
   });
 
-  copyBtn?.addEventListener('click', async () => {
-    const text = successSnippet?.textContent || '';
-    if (!text) {
-      return;
-    }
-    try {
-      await navigator.clipboard.writeText(text);
-      copyBtn.textContent = i18n.copied || 'Copied';
-      window.setTimeout(() => {
-        copyBtn.textContent = i18n.copy || 'Copy';
-      }, 1500);
-    } catch (e) {
-      // Ignore clipboard failures.
-    }
+  linkNoteCopyBtn?.addEventListener('click', () => {
+    copySnippet(linkNoteSnippet, linkNoteCopyBtn);
+  });
+
+  linkNoteDismissBtn?.addEventListener('click', () => {
+    linkNoteDismissBtn.disabled = true;
+    post('bl_google_font_dismiss_link_note')
+      .then(() => {
+        hideLinkNote();
+      })
+      .catch(() => {
+        // Still hide locally if the request fails after a refresh it may return.
+        hideLinkNote();
+      })
+      .finally(() => {
+        linkNoteDismissBtn.disabled = false;
+      });
   });
 
   document.addEventListener('keydown', (event) => {

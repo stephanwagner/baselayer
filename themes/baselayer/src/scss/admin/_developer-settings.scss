@@ -805,9 +805,30 @@ body.bl-media-cleanup-modal-open {
   margin-top: 16px;
 }
 
+.notice.bl-google-font__link-note {
+  margin: 12px 0 16px;
+  max-width: 640px;
+  position: relative;
+
+  &[hidden] {
+    display: none !important;
+  }
+
+  .bl-google-font-modal__snippet {
+    margin: 8px 0 12px;
+  }
+}
+
+.bl-google-font__link-note-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+}
+
 .bl-google-font {
   .bl-submit-row {
-    margin-top: 8px;
+    margin-top: 12px;
   }
 }
 
@@ -823,7 +844,10 @@ body.bl-google-font-modal-open {
 }
 
 .bl-google-font-modal.is-open {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
 }
 
 .bl-google-font-modal__backdrop {
@@ -836,10 +860,10 @@ body.bl-google-font-modal-open {
   position: relative;
   display: flex;
   flex-direction: column;
-  width: 720px;
-  max-width: calc(100vw - 48px);
+  width: 640px;
+  max-width: 100%;
   max-height: calc(100vh - 64px);
-  margin: 8vh auto 0;
+  margin: 0;
   background: #fff;
   border-radius: 6px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -850,6 +874,7 @@ body.bl-google-font-modal-open {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex: 0 0 auto;
   gap: 12px;
   padding: 16px 20px 0;
 
@@ -889,18 +914,34 @@ body.bl-google-font-modal-open {
   overflow: hidden;
 }
 
+.bl-google-font-modal__search-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
 .bl-google-font-modal__search {
-  width: 100%;
+  flex: 1 1 auto;
+  width: auto;
   max-width: none;
+  min-width: 0;
+}
+
+.bl-google-font-modal__explore {
+  flex: 0 0 auto;
+  white-space: nowrap;
 }
 
 .bl-google-font-modal__layout {
   display: grid;
-  grid-template-columns: minmax(180px, 240px) 1fr;
+  grid-template-columns: minmax(160px, 220px) 1fr;
+  grid-template-rows: minmax(0, 1fr);
   gap: 16px;
-  min-height: 280px;
-  flex: 1 1 auto;
+  height: 289px;
+  flex: 0 0 auto;
   overflow: hidden;
+  align-items: stretch;
 
   @media (max-width: 782px) {
     grid-template-columns: 1fr;
@@ -908,11 +949,14 @@ body.bl-google-font-modal-open {
 }
 
 .bl-google-font-modal__results {
+  box-sizing: border-box;
   border: 1px solid #dcdcde;
   border-radius: 4px;
   overflow: auto;
   background: #fff;
-  max-height: 360px;
+  min-width: 0;
+  min-height: 0;
+  max-height: 100%;
 }
 
 .bl-google-font-modal__empty {
@@ -943,9 +987,13 @@ body.bl-google-font-modal-open {
     background: #f6f7f7;
   }
 
-  &.is-selected {
+  &.is-focused {
     background: #e7f3ff;
     color: #135e96;
+  }
+
+  &.is-added:not(.is-focused) {
+    background: #f0f6fc;
   }
 }
 
@@ -956,24 +1004,182 @@ body.bl-google-font-modal-open {
 }
 
 .bl-google-font-modal__preview-pane {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  max-height: 100%;
   border: 1px solid #dcdcde;
   border-radius: 4px;
   padding: 14px;
-  overflow: auto;
+  overflow: hidden;
   background: #fcfcfc;
+
+  > .description {
+    margin: 0;
+  }
+}
+
+.bl-google-font-modal__preview {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  min-width: 0;
+  overflow: auto;
+  gap: 12px;
+
+  &[hidden] {
+    display: none !important;
+  }
 }
 
 .bl-google-font-modal__preview-name {
-  margin: 0 0 8px;
+  margin: 0;
+  flex: 0 0 auto;
   font-size: 16px;
   font-weight: 600;
+  color: #646970;
 }
 
 .bl-google-font-modal__preview-sample {
-  margin: 0;
+  margin: 0 0 12px;
   font-size: 28px;
   line-height: 1.35;
   text-wrap: pretty;
+}
+
+.bl-google-font-modal__preview-frame {
+  display: block;
+  width: 100%;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  margin: 0;
+  border: 0;
+  background: transparent;
+
+  // Keep out of layout/hit-testing while consent is shown (class display
+  // must not override the HTML hidden attribute).
+  &[hidden] {
+    display: none !important;
+  }
+}
+
+.bl-google-font-modal__preview-actions {
+  margin: auto 0 0;
+  flex: 0 0 auto;
+}
+
+.notice.notice-info.notice-alt.bl-google-font-modal__consent {
+  margin: 0 0 12px;
+  flex: 0 0 auto;
+  background: #f0f6fc;
+  background-color: #f0f6fc;
+
+  &[hidden] {
+    display: none !important;
+  }
+
+  p {
+    margin: 0.4em 0;
+  }
+}
+
+.notice.notice-success.notice-alt.bl-google-font-modal__success {
+  min-height: 0;
+  overflow: auto;
+  margin: 0;
+  background: #edfaef;
+  background-color: #edfaef;
+
+  &[hidden] {
+    display: none !important;
+  }
+
+  p {
+    margin: 0.4em 0;
+  }
+}
+
+.bl-google-font-modal__selected {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  gap: 8px;
+  padding-top: 4px;
+}
+
+.bl-google-font-modal__selected-label {
+  margin: 0;
+  color: #646970;
+  font-size: 12px;
+}
+
+.notice.notice-warning.notice-alt.bl-google-font-modal__max-warning {
+  margin: 0 0 8px !important;
+  background: #fcf9e8;
+  background-color: #fcf9e8;
+}
+
+.bl-google-font-modal__selected-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-height: 28px;
+}
+
+.bl-google-font-modal__chip {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 0 6px 0 12px;
+  border: 1px solid #c3c4c7;
+  border-radius: 999px;
+  background: #fff;
+  color: #1d2327;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 26px;
+
+  &:hover {
+    border-color: #8c8f94;
+    background: #f6f7f7;
+
+    .bl-google-font-modal__chip-remove {
+      color: #d63638;
+      background: #fcebec;
+    }
+  }
+}
+
+.bl-google-font-modal__chip-name {
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bl-google-font-modal__chip-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  color: #646970;
+  background: transparent;
+  line-height: 0;
+
+  svg {
+    display: block;
+    width: 10px;
+    height: 10px;
+  }
 }
 
 .bl-google-font-modal__snippet {
@@ -984,25 +1190,17 @@ body.bl-google-font-modal-open {
   border-radius: 4px;
   overflow: auto;
   font-size: 12px;
+  white-space: pre-wrap;
 }
 
 .bl-google-font-modal__actions {
   display: flex;
   justify-content: flex-end;
+  flex: 0 0 auto;
   gap: 8px;
   margin-top: 0;
   padding: 16px 20px;
   border-top: 1px solid #dcdcde;
-}
-
-.notice.notice-success.notice-alt.bl-google-font-modal__success {
-  margin: 0;
-  background: #edfaef;
-  background-color: #edfaef;
-
-  p {
-    margin: 0.4em 0;
-  }
 }
 
 .bl-blocks-system__badge {
@@ -1133,4 +1331,3 @@ body.bl-blocks-system-modal-open {
   padding-top: 16px;
   border-top: 1px solid #dcdcde;
 }
-

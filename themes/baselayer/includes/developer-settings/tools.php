@@ -258,21 +258,32 @@ function bl_render_developer_tools(): void
 			<hr>
 
 			<?php
-			$google_font_target = function_exists('bl_google_font_install_target') ? bl_google_font_install_target() : null;
+			$google_font_link_note = function_exists('bl_google_font_get_link_note') ? bl_google_font_get_link_note() : null;
 			$google_font_i18n = [
 				'searchPlaceholder' => __('Search Google Fonts…', 'baselayer'),
 				'searching' => __('Searching…', 'baselayer'),
 				'noResults' => __('No fonts match your search.', 'baselayer'),
 				'searchError' => __('Could not load fonts.', 'baselayer'),
-				'selectPrompt' => __('Select a font to preview and install.', 'baselayer'),
+				'selectPrompt' => __('Choose a font from the list, then add it to install.', 'baselayer'),
 				'previewSample' => __('The quick brown fox jumps over the lazy dog. 1234567890', 'baselayer'),
 				'installing' => __('Installing…', 'baselayer'),
 				'install' => __('Install', 'baselayer'),
 				'installError' => __('Could not install the font.', 'baselayer'),
 				'installSuccess' => __('Font installed.', 'baselayer'),
+				'installSuccessMany' => __('%d fonts installed.', 'baselayer'),
+				'installSuccessHint' => __('They were added to src/scss/fonts/_fonts.scss. Rebuild your theme CSS to apply them.', 'baselayer'),
 				'copy' => __('Copy', 'baselayer'),
 				'copied' => __('Copied', 'baselayer'),
+				'dismiss' => __('Dismiss', 'baselayer'),
 				'selected' => __('Selected', 'baselayer'),
+				'selectedEmpty' => __('No fonts selected yet.', 'baselayer'),
+				'maxSelected' => __('You can select at most 3 fonts.', 'baselayer'),
+				'maxSelectedWarning' => __('Maximum of 3 fonts reached. Remove one to add another.', 'baselayer'),
+				'remove' => __('Remove', 'baselayer'),
+				'add' => __('Add', 'baselayer'),
+				'alreadySelected' => __('Already selected', 'baselayer'),
+				'previewConsent' => __('Font preview loads CSS and files from Google (fonts.googleapis.com / fonts.gstatic.com). Your IP address and the font name are sent to Google.', 'baselayer'),
+				'previewConsentAction' => __('Load preview from Google', 'baselayer'),
 			];
 			?>
 			<div
@@ -280,18 +291,25 @@ function bl_render_developer_tools(): void
 				class="bl-google-font"
 				data-ajax-url="<?= esc_url(admin_url('admin-ajax.php')) ?>"
 				data-nonce="<?= esc_attr(wp_create_nonce('bl_google_font')) ?>"
-				data-target-label="<?= esc_attr($google_font_target['label'] ?? '') ?>"
+				data-max-selected="3"
 				data-i18n="<?= esc_attr(wp_json_encode($google_font_i18n)) ?>"
 			>
 				<h2 class="title" style="margin-top: 28px;"><?= esc_html__('Install Google Font', 'baselayer') ?></h2>
-				<p class="description"><?= esc_html__('Download a Google Font into your theme as self-hosted files (same layout as the built-in Baselayer fonts).', 'baselayer') ?></p>
-				<?php if (is_array($google_font_target)) : ?>
-					<p class="description"><?= esc_html(sprintf(
-						/* translators: %s: child or parent theme label */
-						__('Files will be saved to: %s', 'baselayer'),
-						$google_font_target['label']
-					)) ?></p>
-				<?php endif; ?>
+				<p class="description"><?= esc_html__('Download Google Fonts and host them locally in your theme.', 'baselayer') ?></p>
+				<p class="description"><?= esc_html__('Files are saved under fonts/{slug}/ and registered in src/scss/fonts/_fonts.scss automatically.', 'baselayer') ?></p>
+				<div
+					class="notice notice-info inline bl-google-font__link-note"
+					data-bl-google-font-link-note
+					<?= $google_font_link_note ? '' : 'hidden' ?>
+				>
+					<p><strong data-bl-google-font-link-note-title><?= $google_font_link_note ? esc_html($google_font_link_note['title']) : '' ?></strong></p>
+					<p class="description" data-bl-google-font-link-note-hint><?= $google_font_link_note ? esc_html($google_font_link_note['import_hint']) : '' ?></p>
+					<pre class="bl-google-font-modal__snippet" data-bl-google-font-link-note-snippet><?= $google_font_link_note ? esc_html($google_font_link_note['use']) : '' ?></pre>
+					<p class="bl-google-font__link-note-actions">
+						<button type="button" class="button bl-button-small" data-bl-google-font-link-note-copy><?= esc_html__('Copy', 'baselayer') ?></button>
+						<button type="button" class="button bl-button-small" data-bl-google-font-link-note-dismiss><?= esc_html__('Dismiss', 'baselayer') ?></button>
+					</p>
+				</div>
 				<div class="bl-submit-row">
 					<button type="button" class="button button-primary" data-bl-google-font-open><?= esc_html__('Choose fonts', 'baselayer') ?></button>
 				</div>
@@ -306,35 +324,62 @@ function bl_render_developer_tools(): void
 							</button>
 						</div>
 						<div class="bl-google-font-modal__body">
-							<label class="screen-reader-text" for="bl-google-font-search"><?= esc_html__('Search Google Fonts…', 'baselayer') ?></label>
-							<input
-								type="search"
-								id="bl-google-font-search"
-								class="regular-text bl-google-font-modal__search"
-								placeholder="<?= esc_attr__('Search Google Fonts…', 'baselayer') ?>"
-								autocomplete="off"
-								data-bl-google-font-search
-							>
+							<div class="bl-google-font-modal__search-row">
+								<label class="screen-reader-text" for="bl-google-font-search"><?= esc_html__('Search Google Fonts…', 'baselayer') ?></label>
+								<input
+									type="search"
+									id="bl-google-font-search"
+									class="regular-text bl-google-font-modal__search"
+									placeholder="<?= esc_attr__('Search Google Fonts…', 'baselayer') ?>"
+									autocomplete="off"
+									data-bl-google-font-search
+								>
+								<a
+									class="button bl-button -has-icon -icon-open-in-new -icon-right bl-google-font-modal__explore"
+									href="https://fonts.google.com/"
+									target="_blank"
+									rel="noopener noreferrer"
+								><?= esc_html__('Explore on Google Fonts', 'baselayer') ?></a>
+							</div>
 							<div class="bl-google-font-modal__layout">
 								<div class="bl-google-font-modal__results" data-bl-google-font-results role="listbox" aria-label="<?= esc_attr__('Search results', 'baselayer') ?>"></div>
 								<div class="bl-google-font-modal__preview-pane">
-									<p class="description" data-bl-google-font-preview-empty><?= esc_html__('Select a font to preview and install.', 'baselayer') ?></p>
+									<p class="description" data-bl-google-font-preview-empty><?= esc_html__('Choose a font from the list, then add it to install.', 'baselayer') ?></p>
 									<div class="bl-google-font-modal__preview" data-bl-google-font-preview hidden>
 										<p class="bl-google-font-modal__preview-name" data-bl-google-font-preview-name></p>
-										<p class="bl-google-font-modal__preview-sample" data-bl-google-font-preview-sample></p>
+										<div class="notice notice-info notice-alt inline bl-google-font-modal__consent" data-bl-google-font-consent hidden>
+											<p><?= esc_html__('Font preview loads CSS and files from Google (fonts.googleapis.com / fonts.gstatic.com). Your IP address and the font name are sent to Google.', 'baselayer') ?></p>
+											<p>
+												<button type="button" class="button button-small" data-bl-google-font-consent-accept><?= esc_html__('Load preview from Google', 'baselayer') ?></button>
+											</p>
+										</div>
+										<iframe
+											class="bl-google-font-modal__preview-frame"
+											data-bl-google-font-preview-frame
+											title="<?= esc_attr__('Font preview', 'baselayer') ?>"
+											hidden
+										></iframe>
+										<p class="bl-google-font-modal__preview-actions">
+											<button type="button" class="button button-secondary bl-button -has-icon -icon-add" data-bl-google-font-add disabled><?= esc_html__('Add', 'baselayer') ?></button>
+										</p>
 									</div>
 									<div class="bl-google-font-modal__success notice notice-success notice-alt inline" data-bl-google-font-success hidden>
 										<p><strong data-bl-google-font-success-title></strong></p>
 										<p data-bl-google-font-success-meta></p>
 										<p class="description" data-bl-google-font-success-hint></p>
-										<pre class="bl-google-font-modal__snippet" data-bl-google-font-success-snippet></pre>
-										<button type="button" class="button bl-button-small" data-bl-google-font-copy><?= esc_html__('Copy', 'baselayer') ?></button>
 									</div>
 								</div>
 							</div>
+							<div class="bl-google-font-modal__selected" data-bl-google-font-selected>
+								<p class="bl-google-font-modal__selected-label" data-bl-google-font-selected-label><?= esc_html__('No fonts selected yet.', 'baselayer') ?></p>
+								<p class="notice notice-warning notice-alt inline bl-google-font-modal__max-warning" data-bl-google-font-max-warning hidden>
+									<span><?= esc_html__('Maximum of 3 fonts reached. Remove one to add another.', 'baselayer') ?></span>
+								</p>
+								<div class="bl-google-font-modal__selected-list" data-bl-google-font-selected-list role="list"></div>
+							</div>
 						</div>
 						<div class="bl-google-font-modal__actions">
-							<button type="button" class="button" data-bl-google-font-close><?= esc_html__('Cancel') ?></button>
+							<button type="button" class="button" data-bl-google-font-close><?= esc_html__('Close', 'baselayer') ?></button>
 							<button type="button" class="button button-primary" data-bl-google-font-install disabled><?= esc_html__('Install', 'baselayer') ?></button>
 						</div>
 					</div>

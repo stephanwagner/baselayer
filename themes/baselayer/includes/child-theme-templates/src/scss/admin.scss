@@ -8,6 +8,9 @@
 // Config
 @forward 'config';
 
+// Child theme fonts (Developer → Tools → Install Google Font)
+@forward 'fonts/fonts';
+
 // Parent admin/editor styles, compiled with the child config
 @forward '../../../baselayer/src/scss/admin';
 

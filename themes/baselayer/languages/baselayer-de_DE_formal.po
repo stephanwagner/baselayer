@@ -376,13 +376,7 @@ msgid "Website report sent to %s."
 msgstr "Wöchentlicher Bericht wurde an %s gesendet."
 
 msgid "Website report"
-msgstr "Wöchentlicher Website-Bericht"
-
-msgid "Sends a weekly summary with analytics when Matomo is enabled."
-msgstr "Versendet eine wöchentliche Zusammenfassung mit Analysedaten, wenn Matomo aktiviert ist."
-
-msgid "Weekly reports"
-msgstr "Wöchentliche Berichte"
+msgstr "Website-Bericht"
 
 msgid "Enable reports"
 msgstr "Website-Berichte aktivieren"
@@ -402,8 +396,8 @@ msgstr "Häufigkeit"
 msgid "Website reports"
 msgstr "Website-Berichte"
 
-msgid "Sends a weekly or monthly summary with analytics when Matomo is enabled."
-msgstr "Versendet eine wöchentliche oder monatliche Zusammenfassung mit Analysedaten, wenn Matomo aktiviert ist."
+msgid "Sends a weekly or monthly summary with analytics."
+msgstr "Versendet eine wöchentliche oder monatliche Zusammenfassung mit Analysedaten."
 
 msgid "Recipents"
 msgstr "Empfänger"
@@ -819,7 +813,7 @@ msgid "Enable editorial rights"
 msgstr "Editorial-Rechte aktivieren"
 
 msgid "Manage editorial permissions, publishing approvals, page access, and media restrictions. Configure settings under Developer → Editorial and on editor profiles."
-msgstr "Verwalten Sie Berechtigungen, Freigaben, Seitenzugriffe und Medieneinschränkungen. Konfigurieren Sie die Einstellungen unter Entwickler → Editorial sowie in den Profilen der Bearbeiter."
+msgstr "Verwalte Berechtigungen, Freigaben, Seitenzugriffe und Medieneinschränkungen. Konfiguriere die Einstellungen unter Entwickler → Editorial sowie in den Profilen der Bearbeiter."
 
 msgid "Dated items with archives, recurrence, and statuses."
 msgstr "Datierte Einträge mit Archiven, Wiederholung und Status."
@@ -905,7 +899,7 @@ msgid "Change blocks engine"
 msgstr "Blocks-Engine wechseln"
 
 msgid "Changing the blocks engine is not recommended once you've started creating content. Existing content is not migrated automatically and may require manual adjustments. Only switch engines if your project is still in its early stages or you understand the implications."
-msgstr "Ein Wechsel der Blocks-Engine wird nicht empfohlen, sobald bereits Inhalte erstellt wurden. Bestehende Inhalte werden nicht automatisch migriert und müssen gegebenenfalls manuell angepasst werden. Wechseln Sie die Engine nur, wenn das Projekt noch am Anfang steht oder Sie die Auswirkungen kennen."
+msgstr "Ein Wechsel der Blocks-Engine wird nicht empfohlen, sobald bereits Inhalte erstellt wurden. Bestehende Inhalte werden nicht automatisch migriert und müssen gegebenenfalls manuell angepasst werden. Wechsle die Engine nur, wenn das Projekt noch am Anfang steht oder du die Auswirkungen kennst."
 
 msgid "Switch engine"
 msgstr "Engine wechseln"
@@ -914,7 +908,7 @@ msgid "Blocks system changed"
 msgstr "Blocks-System geändert"
 
 msgid "Existing pages keep their current block markup—Baselayer and ACF namespaces are not converted. Website and Hero storage also differs by engine, and nothing was imported or seeded automatically. Prefer choosing an engine at install and sticking with it."
-msgstr "Bestehende Seiten behalten ihr aktuelles Block-Markup – Baselayer- und ACF-Namespaces werden nicht konvertiert. Website- und Hero-Speicher unterscheiden sich ebenfalls je Engine, und es wurde nichts automatisch importiert oder geseedet. Wählen Sie die Engine möglichst bei der Installation und bleiben Sie dabei."
+msgstr "Bestehende Seiten behalten ihr aktuelles Block-Markup – Baselayer- und ACF-Namespaces werden nicht konvertiert. Website- und Hero-Speicher unterscheiden sich ebenfalls je Engine, und es wurde nichts automatisch importiert oder geseedet. Wähle die Engine möglichst bei der Installation und bleib dabei."
 
 
 msgid "Administrator email"
@@ -1347,6 +1341,9 @@ msgstr "Code kopieren"
 
 msgid "Copied"
 msgstr "Kopiert"
+
+msgid "Dismiss"
+msgstr "Verwerfen"
 
 msgid "Choose icon"
 msgstr "Icon wählen"
@@ -2237,7 +2234,7 @@ msgid "Once Monthly"
 msgstr "Einmal monatlich"
 
 msgid "Sent once per month on the first visit after your chosen day and time."
-msgstr "Wird einmal pro Monat beim ersten Besuch nach Ihrem gewählten Tag und Zeitpunkt versendet."
+msgstr "Wird einmal pro Monat beim ersten Besuch nach deinem gewählten Tag und Zeitpunkt versendet."
 
 msgid "Your monthly<br>website report"
 msgstr "Ihr monatlicher<br>Website-Bericht"
@@ -3078,11 +3075,12 @@ msgstr "Datenschutzerklärung"
 msgid "Install Google Font"
 msgstr "Google Font installieren"
 
-msgid "Download a Google Font into your theme as self-hosted files (same layout as the built-in Baselayer fonts)."
-msgstr "Lade eine Google Font als selbst gehostete Dateien in Ihr Theme (gleiches Layout wie die mitgelieferten Baselayer-Fonts)."
+msgid "Download Google Fonts and host them locally in your theme."
+msgstr "Lade Google Fonts herunter und speichere sie als selbst gehostete Dateien in deinem Theme."
 
-msgid "Files will be saved to: %s"
-msgstr "Dateien werden gespeichert unter: %s"
+msgid "Files are saved under fonts/{slug}/ and registered in src/scss/fonts/_fonts.scss automatically."
+msgstr "Dateien werden unter fonts/{slug}/ abgelegt und automatisch in src/scss/fonts/_fonts.scss registriert."
+
 
 msgid "Child theme (%s)"
 msgstr "Child-Theme (%s)"
@@ -3096,17 +3094,20 @@ msgstr "Fonts wählen"
 msgid "Search Google Fonts…"
 msgstr "Google Fonts suchen…"
 
+msgid "Explore on Google Fonts"
+msgstr "Auf Google Fonts entdecken"
+
 msgid "Searching…"
 msgstr "Suche…"
 
 msgid "No fonts match your search."
-msgstr "Keine Fonts entsprechen Ihrer Suche."
+msgstr "Keine Fonts entsprechen deiner Suche."
 
 msgid "Could not load fonts."
 msgstr "Fonts konnten nicht geladen werden."
 
 msgid "Select a font to preview and install."
-msgstr "Wählen Sie einen Font zur Vorschau und Installation."
+msgstr "Wähle einen Font zur Vorschau und Installation."
 
 msgid "The quick brown fox jumps over the lazy dog. 1234567890"
 msgstr "Franz jagt im komplett verwahrlosten Taxi quer durch Bayern. 1234567890"
@@ -3133,7 +3134,7 @@ msgid "Could not parse the Google Fonts catalog."
 msgstr "Der Google-Fonts-Katalog konnte nicht gelesen werden."
 
 msgid "Choose a font family."
-msgstr "Wählen Sie eine Font-Familie."
+msgstr "Wähle eine Font-Familie."
 
 msgid "Google did not return font CSS for this family."
 msgstr "Google hat für diese Familie kein Font-CSS zurückgegeben."
@@ -3160,10 +3161,72 @@ msgid "Invalid font file name from Google."
 msgstr "Ungültiger Font-Dateiname von Google."
 
 msgid "Add this to your child theme src/scss/main.scss (above the parent @forward), then rebuild CSS."
-msgstr "Fügen Sie dies in die Child-Theme-Datei src/scss/main.scss ein (oberhalb des Parent-@forward) und bauen Sie danach das CSS neu."
+msgstr "Füge dies in die Child-Theme-Datei src/scss/main.scss ein (oberhalb des Parent-@forward) und baue danach das CSS neu."
 
 msgid "Add this to themes/baselayer/src/scss/fonts/_fonts.scss, then rebuild CSS."
-msgstr "Fügen Sie dies in themes/baselayer/src/scss/fonts/_fonts.scss ein und bauen Sie danach das CSS neu."
+msgstr "Füge dies in themes/baselayer/src/scss/fonts/_fonts.scss ein und baue danach das CSS neu."
 
 msgid "You do not have permission to install fonts."
-msgstr "Sie haben keine Berechtigung, Fonts zu installieren."
+msgstr "Du hast keine Berechtigung, Fonts zu installieren."
+
+msgid "Select up to 3 fonts to preview and install."
+msgstr "Wählen Sie bis zu 3 Fonts zur Vorschau und Installation."
+
+msgid "%d fonts installed."
+msgstr "%d Fonts installiert."
+
+msgid "No fonts selected yet."
+msgstr "Noch keine Fonts ausgewählt."
+
+msgid "Selected (%1$d/%2$d)"
+msgstr "Ausgewählt (%1$d/%2$d)"
+
+msgid "You can select at most 3 fonts."
+msgstr "Sie können höchstens 3 Fonts auswählen."
+
+msgid "You can install at most 3 fonts at a time."
+msgstr "Sie können höchstens 3 Fonts auf einmal installieren."
+
+msgid "Could not install %1$s: %2$s"
+msgstr "%1$s konnte nicht installiert werden: %2$s"
+
+msgid "%d font installed."
+msgid_plural "%d fonts installed."
+msgstr[0] "%d Font installiert."
+msgstr[1] "%d Fonts installiert."
+
+msgid "Choose a font from the list, then add it to install."
+msgstr "Wähle eine Font aus der Liste und füge sie zum Installieren hinzu."
+
+msgid "Maximum of 3 fonts reached. Remove one to add another."
+msgstr "Maximal 3 Fonts erreicht. Entfernen Sie eine, um eine weitere hinzuzufügen."
+
+msgid "Already selected"
+msgstr "Bereits ausgewählt"
+
+msgid "Font preview loads data from Google (fonts.googleapis.com / fonts.gstatic.com). Your IP address is sent to Google."
+msgstr "Die Font-Vorschau lädt Daten von Google (fonts.googleapis.com / fonts.gstatic.com). Deine IP-Adresse wird an Google gesendet."
+
+msgid "Load preview from Google"
+msgstr "Vorschau von Google laden"
+
+msgid "Font preview"
+msgstr "Font-Vorschau"
+
+
+
+msgid "They were added to src/scss/fonts/_fonts.scss. Rebuild your theme CSS to apply them."
+msgstr "Sie wurden in src/scss/fonts/_fonts.scss eingetragen. Bauen Sie das Theme-CSS neu, um sie anzuwenden."
+
+msgid "Fonts were added to src/scss/fonts/_fonts.scss. Rebuild your theme CSS to apply them."
+msgstr "Fonts wurden in src/scss/fonts/_fonts.scss eingetragen. Bauen Sie das Theme-CSS neu, um sie anzuwenden."
+
+msgid "Could not create the fonts SCSS directory."
+msgstr "Das Fonts-SCSS-Verzeichnis konnte nicht erstellt werden."
+
+msgid "Could not update the fonts SCSS file."
+msgstr "Die Fonts-SCSS-Datei konnte nicht aktualisiert werden."
+
+msgid "Could not update %s to load theme fonts."
+msgstr "%s konnte nicht aktualisiert werden, um Theme-Fonts zu laden."
+

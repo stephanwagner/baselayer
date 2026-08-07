@@ -376,13 +376,7 @@ msgid "Website report sent to %s."
 msgstr "Wöchentlicher Bericht wurde an %s gesendet."
 
 msgid "Website report"
-msgstr "Wöchentlicher Website-Bericht"
-
-msgid "Sends a weekly summary with analytics when Matomo is enabled."
-msgstr "Versendet eine wöchentliche Zusammenfassung mit Analysedaten, wenn Matomo aktiviert ist."
-
-msgid "Weekly reports"
-msgstr "Wöchentliche Berichte"
+msgstr "Website-Bericht"
 
 msgid "Enable reports"
 msgstr "Website-Berichte aktivieren"
@@ -402,8 +396,8 @@ msgstr "Häufigkeit"
 msgid "Website reports"
 msgstr "Website-Berichte"
 
-msgid "Sends a weekly or monthly summary with analytics when Matomo is enabled."
-msgstr "Versendet eine wöchentliche oder monatliche Zusammenfassung mit Analysedaten, wenn Matomo aktiviert ist."
+msgid "Sends a weekly or monthly summary with analytics."
+msgstr "Versendet eine wöchentliche oder monatliche Zusammenfassung mit Analysedaten."
 
 msgid "Recipents"
 msgstr "Empfänger"
@@ -1347,6 +1341,9 @@ msgstr "Code kopieren"
 
 msgid "Copied"
 msgstr "Kopiert"
+
+msgid "Dismiss"
+msgstr "Verwerfen"
 
 msgid "Choose icon"
 msgstr "Icon wählen"
@@ -3078,11 +3075,12 @@ msgstr "Datenschutzerklärung"
 msgid "Install Google Font"
 msgstr "Google Font installieren"
 
-msgid "Download a Google Font into your theme as self-hosted files (same layout as the built-in Baselayer fonts)."
-msgstr "Lade eine Google Font als selbst gehostete Dateien in dein Theme (gleiches Layout wie die mitgelieferten Baselayer-Fonts)."
+msgid "Download Google Fonts and host them locally in your theme."
+msgstr "Lade Google Fonts herunter und speichere sie als selbst gehostete Dateien in deinem Theme."
 
-msgid "Files will be saved to: %s"
-msgstr "Dateien werden gespeichert unter: %s"
+msgid "Files are saved under fonts/{slug}/ and registered in src/scss/fonts/_fonts.scss automatically."
+msgstr "Dateien werden unter fonts/{slug}/ abgelegt und automatisch in src/scss/fonts/_fonts.scss registriert."
+
 
 msgid "Child theme (%s)"
 msgstr "Child-Theme (%s)"
@@ -3095,6 +3093,9 @@ msgstr "Fonts wählen"
 
 msgid "Search Google Fonts…"
 msgstr "Google Fonts suchen…"
+
+msgid "Explore on Google Fonts"
+msgstr "Auf Google Fonts entdecken"
 
 msgid "Searching…"
 msgstr "Suche…"
@@ -3167,3 +3168,65 @@ msgstr "Füge dies in themes/baselayer/src/scss/fonts/_fonts.scss ein und baue d
 
 msgid "You do not have permission to install fonts."
 msgstr "Du hast keine Berechtigung, Fonts zu installieren."
+
+msgid "Select up to 3 fonts to preview and install."
+msgstr "Wähle bis zu 3 Fonts zur Vorschau und Installation."
+
+msgid "%d fonts installed."
+msgstr "%d Fonts installiert."
+
+msgid "No fonts selected yet."
+msgstr "Noch keine Fonts ausgewählt."
+
+msgid "Selected (%1$d/%2$d)"
+msgstr "Ausgewählt (%1$d/%2$d)"
+
+msgid "You can select at most 3 fonts."
+msgstr "Du kannst höchstens 3 Fonts auswählen."
+
+msgid "You can install at most 3 fonts at a time."
+msgstr "Du kannst höchstens 3 Fonts auf einmal installieren."
+
+msgid "Could not install %1$s: %2$s"
+msgstr "%1$s konnte nicht installiert werden: %2$s"
+
+msgid "%d font installed."
+msgid_plural "%d fonts installed."
+msgstr[0] "%d Font installiert."
+msgstr[1] "%d Fonts installiert."
+
+msgid "Choose a font from the list, then add it to install."
+msgstr "Wähle eine Font aus der Liste und füge sie zum Installieren hinzu."
+
+msgid "Maximum of 3 fonts reached. Remove one to add another."
+msgstr "Maximal 3 Fonts erreicht. Entferne eine, um eine weitere hinzuzufügen."
+
+msgid "Already selected"
+msgstr "Bereits ausgewählt"
+
+msgid "Font preview loads data from Google (fonts.googleapis.com / fonts.gstatic.com). Your IP address is sent to Google."
+msgstr "Die Font-Vorschau lädt Daten von Google (fonts.googleapis.com / fonts.gstatic.com). Deine IP-Adresse wird an Google gesendet."
+
+msgid "Load preview from Google"
+msgstr "Vorschau von Google laden"
+
+msgid "Font preview"
+msgstr "Font-Vorschau"
+
+
+
+msgid "They were added to src/scss/fonts/_fonts.scss. Rebuild your theme CSS to apply them."
+msgstr "Sie wurden in src/scss/fonts/_fonts.scss eingetragen. Baue das Theme-CSS neu, um sie anzuwenden."
+
+msgid "Fonts were added to src/scss/fonts/_fonts.scss. Rebuild your theme CSS to apply them."
+msgstr "Fonts wurden in src/scss/fonts/_fonts.scss eingetragen. Baue das Theme-CSS neu, um sie anzuwenden."
+
+msgid "Could not create the fonts SCSS directory."
+msgstr "Das Fonts-SCSS-Verzeichnis konnte nicht erstellt werden."
+
+msgid "Could not update the fonts SCSS file."
+msgstr "Die Fonts-SCSS-Datei konnte nicht aktualisiert werden."
+
+msgid "Could not update %s to load theme fonts."
+msgstr "%s konnte nicht aktualisiert werden, um Theme-Fonts zu laden."
+

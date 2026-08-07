@@ -2,7 +2,7 @@
 
 defined('ABSPATH') || exit;
 
-const BL_GOOGLE_FONT_METADATA_TRANSIENT = 'bl_google_fonts_metadata_v1';
+const BL_GOOGLE_FONT_METADATA_TRANSIENT = 'bl_google_fonts_metadata_v2';
 const BL_GOOGLE_FONT_METADATA_TTL = DAY_IN_SECONDS;
 const BL_GOOGLE_FONT_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
@@ -14,6 +14,19 @@ function bl_google_font_can_manage(): bool
 	return current_user_can('manage_options')
 		&& function_exists('bl_is_developer_user')
 		&& bl_is_developer_user((int) get_current_user_id());
+}
+
+/**
+ * Compare catalog items by Google popularity (lower = more popular).
+ */
+function bl_google_font_compare_popularity(array $a, array $b): int
+{
+	$pa = isset($a['popularity']) ? (int) $a['popularity'] : PHP_INT_MAX;
+	$pb = isset($b['popularity']) ? (int) $b['popularity'] : PHP_INT_MAX;
+	if ($pa === $pb) {
+		return strcasecmp((string) ($a['family'] ?? ''), (string) ($b['family'] ?? ''));
+	}
+	return $pa <=> $pb;
 }
 
 /**
@@ -67,7 +80,7 @@ function bl_google_font_family_slug(string $family): string
 }
 
 /**
- * @return array{family: string, category: string}[]|WP_Error
+ * @return array{family: string, category: string, popularity: int}[]|WP_Error
  */
 function bl_google_font_fetch_metadata()
 {
@@ -112,15 +125,11 @@ function bl_google_font_fetch_metadata()
 		$items[] = [
 			'family' => $row['family'],
 			'category' => isset($row['category']) && is_string($row['category']) ? $row['category'] : '',
+			'popularity' => isset($row['popularity']) ? (int) $row['popularity'] : PHP_INT_MAX,
 		];
 	}
 
-	usort(
-		$items,
-		static function (array $a, array $b): int {
-			return strcasecmp($a['family'], $b['family']);
-		}
-	);
+	usort($items, 'bl_google_font_compare_popularity');
 
 	set_transient(BL_GOOGLE_FONT_METADATA_TRANSIENT, ['items' => $items], BL_GOOGLE_FONT_METADATA_TTL);
 
@@ -128,8 +137,8 @@ function bl_google_font_fetch_metadata()
 }
 
 /**
- * @param array{family: string, category: string}[] $items
- * @return array{family: string, category: string}[]
+ * @param array{family: string, category: string, popularity?: int}[] $items
+ * @return array{family: string, category: string, popularity?: int}[]
  */
 function bl_google_font_search_items(array $items, string $query, int $limit = 40): array
 {
@@ -149,6 +158,9 @@ function bl_google_font_search_items(array $items, string $query, int $limit = 4
 			$contains[] = $item;
 		}
 	}
+
+	usort($starts, 'bl_google_font_compare_popularity');
+	usort($contains, 'bl_google_font_compare_popularity');
 
 	return array_slice(array_merge($starts, $contains), 0, $limit);
 }
@@ -316,14 +328,121 @@ function bl_google_font_css_to_scss(string $css, string $font_path_uri, array $u
 }
 
 /**
- * Relative @use snippet for the installed partial.
+ * Relative @use snippet for src/scss/fonts/_fonts.scss.
  */
-function bl_google_font_use_snippet(bool $is_child, string $slug): string
+function bl_google_font_use_snippet(string $slug): string
 {
-	if ($is_child) {
-		return "@use '../../fonts/{$slug}/{$slug}';";
-	}
 	return "@use '../../../fonts/{$slug}/{$slug}';";
+}
+
+/**
+ * Path to the theme fonts index partial.
+ */
+function bl_google_font_fonts_scss_path(array $target): string
+{
+	return $target['dir'] . 'src/scss/fonts/_fonts.scss';
+}
+
+/**
+ * Ensure child theme main/admin SCSS forward the local fonts index.
+ */
+function bl_google_font_ensure_child_fonts_forward(array $target): ?WP_Error
+{
+	if (empty($target['is_child'])) {
+		return null;
+	}
+
+	$forward = "@forward 'fonts/fonts';";
+	$marker = "\n// Child theme fonts (Developer → Tools → Install Google Font)\n{$forward}\n";
+	$files = [
+		$target['dir'] . 'src/scss/main.scss',
+		$target['dir'] . 'src/scss/admin.scss',
+	];
+
+	foreach ($files as $path) {
+		if (!is_readable($path)) {
+			continue;
+		}
+		$contents = (string) file_get_contents($path);
+		if ($contents === '') {
+			continue;
+		}
+		if (str_contains($contents, "@forward 'fonts/fonts'") || str_contains($contents, '@forward "fonts/fonts"')) {
+			continue;
+		}
+
+		// Prefer inserting after the child config forward.
+		if (preg_match("/@forward\\s+['\"]config['\"]\\s*;/", $contents, $m, PREG_OFFSET_CAPTURE)) {
+			$at = (int) $m[0][1] + strlen($m[0][0]);
+			$contents = substr($contents, 0, $at) . $marker . substr($contents, $at);
+		} else {
+			$contents = $marker . $contents;
+		}
+
+		if (file_put_contents($path, $contents) === false) {
+			return new WP_Error(
+				'bl_google_font_forward',
+				sprintf(
+					/* translators: %s: relative SCSS path */
+					__('Could not update %s to load theme fonts.', 'baselayer'),
+					str_replace($target['dir'], '', $path)
+				)
+			);
+		}
+	}
+
+	return null;
+}
+
+/**
+ * Create or append a font @use in src/scss/fonts/_fonts.scss.
+ *
+ * @return true|WP_Error
+ */
+function bl_google_font_register_in_fonts_scss(string $family, string $slug, array $target)
+{
+	$scss_path = bl_google_font_fonts_scss_path($target);
+	$dir = dirname($scss_path);
+	if (!wp_mkdir_p($dir)) {
+		return new WP_Error('bl_google_font_mkdir', __('Could not create the fonts SCSS directory.', 'baselayer'));
+	}
+
+	$forward_error = bl_google_font_ensure_child_fonts_forward($target);
+	if (is_wp_error($forward_error)) {
+		return $forward_error;
+	}
+
+	$use = bl_google_font_use_snippet($slug);
+	$existing = is_readable($scss_path) ? (string) file_get_contents($scss_path) : '';
+
+	// Already active.
+	if (preg_match('/^\s*' . preg_quote($use, '/') . '\s*$/m', $existing)) {
+		return true;
+	}
+
+	// Commented out — uncomment in place.
+	$commented = '// ' . $use;
+	if (str_contains($existing, $commented)) {
+		$updated = str_replace($commented, $use, $existing);
+		if (file_put_contents($scss_path, $updated) === false) {
+			return new WP_Error('bl_google_font_write', __('Could not update the fonts SCSS file.', 'baselayer'));
+		}
+		return true;
+	}
+
+	if ($existing === '') {
+		$existing = "/* Theme fonts — managed via Developer → Tools → Install Google Font */\n";
+	}
+
+	$block = "\n// " . $family . "\n" . $use . "\n";
+	if (!str_ends_with($existing, "\n")) {
+		$existing .= "\n";
+	}
+	if (file_put_contents($scss_path, $existing . $block) === false) {
+		return new WP_Error('bl_google_font_write', __('Could not update the fonts SCSS file.', 'baselayer'));
+	}
+
+	return true;
 }
 
 /**
@@ -398,10 +517,13 @@ function bl_google_font_install(string $family)
 		return new WP_Error('bl_google_font_write', __('Could not write the font SCSS file.', 'baselayer'));
 	}
 
-	$use = bl_google_font_use_snippet($target['is_child'], $slug);
-	$import_hint = $target['is_child']
-		? __('Add this to your child theme src/scss/main.scss (above the parent @forward), then rebuild CSS.', 'baselayer')
-		: __('Add this to themes/baselayer/src/scss/fonts/_fonts.scss, then rebuild CSS.', 'baselayer');
+	$registered = bl_google_font_register_in_fonts_scss($family, $slug, $target);
+	if (is_wp_error($registered)) {
+		return $registered;
+	}
+
+	$use = bl_google_font_use_snippet($slug);
+	$import_hint = __('Fonts were added to src/scss/fonts/_fonts.scss. Rebuild your theme CSS to apply them.', 'baselayer');
 
 	return [
 		'family' => $family,
@@ -411,10 +533,186 @@ function bl_google_font_install(string $family)
 		'is_child' => $target['is_child'],
 		'files' => count($files),
 		'scss' => 'fonts/' . $slug . '/_' . $slug . '.scss',
+		'fonts_index' => 'src/scss/fonts/_fonts.scss',
 		'use' => $use,
 		'import_hint' => $import_hint,
 		'preview_css' => $css,
 	];
+}
+
+/**
+ * Install up to 3 Google Font families.
+ *
+ * @param string[] $families
+ * @return array<string, mixed>|WP_Error
+ */
+function bl_google_font_install_many(array $families)
+{
+	$normalized = [];
+	foreach ($families as $family) {
+		$family = trim(wp_strip_all_tags((string) $family));
+		if ($family === '') {
+			continue;
+		}
+		$normalized[$family] = $family;
+	}
+	$normalized = array_values($normalized);
+
+	if ($normalized === []) {
+		return new WP_Error('bl_google_font_family', __('Choose a font family.', 'baselayer'));
+	}
+	if (count($normalized) > 3) {
+		return new WP_Error('bl_google_font_limit', __('You can install at most 3 fonts at a time.', 'baselayer'));
+	}
+
+	$installed = [];
+	$uses = [];
+	$files_total = 0;
+	$target_label = '';
+	$is_child = false;
+	$import_hint = '';
+
+	foreach ($normalized as $family) {
+		$result = bl_google_font_install($family);
+		if (is_wp_error($result)) {
+			return new WP_Error(
+				$result->get_error_code(),
+				sprintf(
+					/* translators: 1: font family name, 2: error message */
+					__('Could not install %1$s: %2$s', 'baselayer'),
+					$family,
+					$result->get_error_message()
+				)
+			);
+		}
+		$installed[] = $result;
+		$uses[] = (string) ($result['use'] ?? '');
+		$files_total += (int) ($result['files'] ?? 0);
+		$target_label = (string) ($result['target'] ?? $target_label);
+		$is_child = !empty($result['is_child']);
+		$import_hint = (string) ($result['import_hint'] ?? $import_hint);
+	}
+
+	$count = count($installed);
+	$title = $count === 1
+		? __('Font installed.', 'baselayer')
+		: sprintf(
+			/* translators: %d: number of fonts installed */
+			_n('%d font installed.', '%d fonts installed.', $count, 'baselayer'),
+			$count
+		);
+
+	return [
+		'count' => $count,
+		'title' => $title,
+		'installed' => $installed,
+		'families' => array_values(array_map(static fn($row) => (string) ($row['family'] ?? ''), $installed)),
+		'files' => $files_total,
+		'target' => $target_label,
+		'is_child' => $is_child,
+		'use' => implode("\n", array_filter($uses)),
+		'import_hint' => $import_hint,
+	];
+}
+
+const BL_GOOGLE_FONT_LINK_NOTE_OPTION = 'bl_google_font_link_note';
+
+/**
+ * @return array{title: string, import_hint: string, use: string, families: string[]}|null
+ */
+function bl_google_font_get_link_note(): ?array
+{
+	$note = get_option(BL_GOOGLE_FONT_LINK_NOTE_OPTION, null);
+	if (!is_array($note) || empty($note['use']) || !is_string($note['use'])) {
+		return null;
+	}
+	return [
+		'title' => isset($note['title']) && is_string($note['title']) ? $note['title'] : '',
+		'import_hint' => isset($note['import_hint']) && is_string($note['import_hint']) ? $note['import_hint'] : '',
+		'use' => $note['use'],
+		'families' => isset($note['families']) && is_array($note['families'])
+			? array_values(array_map('strval', $note['families']))
+			: [],
+	];
+}
+
+/**
+ * Persist post-install @use hint on the Tools page until dismissed.
+ *
+ * @param array{title?: string, import_hint?: string, use?: string, families?: string[]} $note
+ */
+function bl_google_font_save_link_note(array $note): void
+{
+	$use = isset($note['use']) ? trim((string) $note['use']) : '';
+	if ($use === '') {
+		return;
+	}
+
+	$existing = bl_google_font_get_link_note();
+	$uses = [];
+	if ($existing && $existing['use'] !== '') {
+		foreach (preg_split('/\R/', $existing['use']) ?: [] as $line) {
+			$line = trim((string) $line);
+			if ($line !== '') {
+				$uses[$line] = $line;
+			}
+		}
+	}
+	foreach (preg_split('/\R/', $use) ?: [] as $line) {
+		$line = trim((string) $line);
+		if ($line !== '') {
+			$uses[$line] = $line;
+		}
+	}
+
+	$families = [];
+	if ($existing && !empty($existing['families'])) {
+		foreach ($existing['families'] as $family) {
+			$family = trim((string) $family);
+			if ($family !== '') {
+				$families[$family] = $family;
+			}
+		}
+	}
+	if (!empty($note['families']) && is_array($note['families'])) {
+		foreach ($note['families'] as $family) {
+			$family = trim((string) $family);
+			if ($family !== '') {
+				$families[$family] = $family;
+			}
+		}
+	}
+
+	$count = count($families);
+	$title = $count > 1
+		? sprintf(
+			/* translators: %d: number of fonts installed */
+			_n('%d font installed.', '%d fonts installed.', $count, 'baselayer'),
+			$count
+		)
+		: (isset($note['title']) && is_string($note['title']) && $note['title'] !== ''
+			? $note['title']
+			: __('Font installed.', 'baselayer'));
+
+	$hint = isset($note['import_hint']) && is_string($note['import_hint']) && $note['import_hint'] !== ''
+		? $note['import_hint']
+		: ($existing['import_hint'] ?? '');
+
+	update_option(
+		BL_GOOGLE_FONT_LINK_NOTE_OPTION,
+		[
+			'title' => $title,
+			'import_hint' => $hint,
+			'use' => implode("\n", array_values($uses)),
+			'families' => array_values($families),
+		],
+		false
+	);
+}
+
+function bl_google_font_clear_link_note(): void
+{
+	delete_option(BL_GOOGLE_FONT_LINK_NOTE_OPTION);
 }
 
 add_action('wp_ajax_bl_google_font_search', function (): void {
@@ -439,10 +737,42 @@ add_action('wp_ajax_bl_google_font_install', function (): void {
 	}
 	check_ajax_referer('bl_google_font', 'nonce');
 
-	$family = isset($_POST['family']) ? sanitize_text_field(wp_unslash((string) $_POST['family'])) : '';
-	$result = bl_google_font_install($family);
+	$families = [];
+	if (isset($_POST['families'])) {
+		$raw = wp_unslash($_POST['families']);
+		if (is_string($raw)) {
+			$decoded = json_decode($raw, true);
+			$raw = is_array($decoded) ? $decoded : [];
+		}
+		if (is_array($raw)) {
+			$families = array_map('strval', $raw);
+		}
+	} elseif (isset($_POST['family'])) {
+		$families = [sanitize_text_field(wp_unslash((string) $_POST['family']))];
+	}
+
+	$result = bl_google_font_install_many($families);
 	if (is_wp_error($result)) {
 		wp_send_json_error(['message' => $result->get_error_message()], 500);
 	}
+
+	bl_google_font_save_link_note($result);
+	$note = bl_google_font_get_link_note();
+	if ($note) {
+		$result['title'] = $note['title'];
+		$result['import_hint'] = $note['import_hint'];
+		$result['use'] = $note['use'];
+		$result['families'] = $note['families'];
+	}
+
 	wp_send_json_success($result);
+});
+
+add_action('wp_ajax_bl_google_font_dismiss_link_note', function (): void {
+	if (!bl_google_font_can_manage()) {
+		wp_send_json_error(['message' => __('You do not have permission to install fonts.', 'baselayer')], 403);
+	}
+	check_ajax_referer('bl_google_font', 'nonce');
+	bl_google_font_clear_link_note();
+	wp_send_json_success(['dismissed' => true]);
 });
