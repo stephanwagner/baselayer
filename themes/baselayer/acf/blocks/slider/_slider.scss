@@ -6,10 +6,10 @@
 .slider__wrapper {
   position: relative;
 
-  .swiper > {
+  .swiper {
     border-radius: var(--bl-border-radius-m);
 
-    .acf-innerblocks-container {
+    > .acf-innerblocks-container {
       display: flex;
       transition-property: transform;
       box-sizing: content-box;
