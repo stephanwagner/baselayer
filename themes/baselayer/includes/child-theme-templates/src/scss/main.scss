@@ -19,7 +19,7 @@
 @forward 'config';
 
 // Child theme fonts (Developer → Tools → Install Google Font)
-@forward 'fonts/fonts';
+@forward 'fonts';
 
 // Parent frontend styles, compiled with the child config
 @forward '../../../baselayer/src/scss/main';

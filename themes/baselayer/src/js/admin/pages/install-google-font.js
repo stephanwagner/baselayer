@@ -66,6 +66,8 @@
   /** Currently highlighted family in the results list (not yet added). */
   let focusedFamily = '';
   let previewConsented = readPreviewConsent();
+  /** Keep the post-install success pane visible until the user picks another font. */
+  let showingInstallSuccess = false;
   let searchTimer = null;
   let searchSeq = 0;
   /** @type {Array<{family: string, category?: string}>} */
@@ -197,7 +199,32 @@
     installBtn.textContent = i18n.install || 'Install';
   };
 
+  const hideInstallSuccess = () => {
+    showingInstallSuccess = false;
+    if (successEl) {
+      successEl.hidden = true;
+    }
+  };
+
   const updatePreviewPane = () => {
+    if (showingInstallSuccess) {
+      clearPreviewFrame();
+      if (previewPane) {
+        previewPane.hidden = true;
+      }
+      if (previewEmpty) {
+        previewEmpty.hidden = true;
+      }
+      if (consentEl) {
+        consentEl.hidden = true;
+      }
+      if (successEl) {
+        successEl.hidden = false;
+      }
+      syncAddButton();
+      return;
+    }
+
     if (successEl) {
       successEl.hidden = true;
     }
@@ -298,9 +325,7 @@
 
   const focusFamily = (family) => {
     focusedFamily = family || '';
-    if (successEl) {
-      successEl.hidden = true;
-    }
+    hideInstallSuccess();
     syncResultState();
     updatePreviewPane();
   };
@@ -319,9 +344,7 @@
       return;
     }
     selected.push(focusedFamily);
-    if (successEl) {
-      successEl.hidden = true;
-    }
+    hideInstallSuccess();
     renderSelected();
     updatePreviewPane();
   };
@@ -408,9 +431,7 @@
     if (!modal) {
       return;
     }
-    if (successEl) {
-      successEl.hidden = true;
-    }
+    hideInstallSuccess();
     renderSelected();
     updatePreviewPane();
     modal.hidden = false;
@@ -529,15 +550,6 @@
     installBtn.textContent = i18n.installing || 'Installing…';
     post('bl_google_font_install', { families: JSON.stringify(selected) })
       .then((data) => {
-        if (previewPane) {
-          previewPane.hidden = true;
-        }
-        if (previewEmpty) {
-          previewEmpty.hidden = true;
-        }
-        if (successEl) {
-          successEl.hidden = false;
-        }
         if (successTitle) {
           successTitle.textContent =
             data.title ||
@@ -553,22 +565,14 @@
           successHint.textContent =
             data.import_hint ||
             i18n.installSuccessHint ||
-            'They were added to src/scss/fonts/_fonts.scss. Rebuild your theme CSS to apply them.';
+            'They were added to src/scss/_fonts.scss. Rebuild your theme CSS to apply them.';
         }
         showLinkNote(data);
         selected = [];
         focusedFamily = '';
+        showingInstallSuccess = true;
         renderSelected();
-        // Keep success pane visible (updatePreviewPane would hide it).
-        if (successEl) {
-          successEl.hidden = false;
-        }
-        if (previewPane) {
-          previewPane.hidden = true;
-        }
-        if (previewEmpty) {
-          previewEmpty.hidden = true;
-        }
+        updatePreviewPane();
         installBtn.textContent = i18n.install || 'Install';
         installBtn.disabled = true;
       })

@@ -271,7 +271,7 @@ function bl_render_developer_tools(): void
 				'installError' => __('Could not install the font.', 'baselayer'),
 				'installSuccess' => __('Font installed.', 'baselayer'),
 				'installSuccessMany' => __('%d fonts installed.', 'baselayer'),
-				'installSuccessHint' => __('They were added to src/scss/fonts/_fonts.scss. Rebuild your theme CSS to apply them.', 'baselayer'),
+				'installSuccessHint' => __('They were added to src/scss/_fonts.scss. Rebuild your theme CSS to apply them.', 'baselayer'),
 				'copy' => __('Copy', 'baselayer'),
 				'copied' => __('Copied', 'baselayer'),
 				'dismiss' => __('Dismiss', 'baselayer'),
@@ -296,7 +296,7 @@ function bl_render_developer_tools(): void
 			>
 				<h2 class="title" style="margin-top: 28px;"><?= esc_html__('Install Google Font', 'baselayer') ?></h2>
 				<p class="description"><?= esc_html__('Download Google Fonts and host them locally in your theme.', 'baselayer') ?></p>
-				<p class="description"><?= esc_html__('Files are saved under fonts/{slug}/ and registered in src/scss/fonts/_fonts.scss automatically.', 'baselayer') ?></p>
+				<p class="description"><?= esc_html__('Files are saved under fonts/{slug}/ and registered in src/scss/_fonts.scss automatically.', 'baselayer') ?></p>
 				<div
 					class="notice notice-info inline bl-google-font__link-note"
 					data-bl-google-font-link-note

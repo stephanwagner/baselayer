@@ -3078,8 +3078,8 @@ msgstr "Google Font installieren"
 msgid "Download Google Fonts and host them locally in your theme."
 msgstr "Lade Google Fonts herunter und speichere sie als selbst gehostete Dateien in deinem Theme."
 
-msgid "Files are saved under fonts/{slug}/ and registered in src/scss/fonts/_fonts.scss automatically."
-msgstr "Dateien werden unter fonts/{slug}/ abgelegt und automatisch in src/scss/fonts/_fonts.scss registriert."
+msgid "Files are saved under fonts/{slug}/ and registered in src/scss/_fonts.scss automatically."
+msgstr "Dateien werden unter fonts/{slug}/ abgelegt und automatisch in src/scss/_fonts.scss registriert."
 
 
 msgid "Child theme (%s)"
@@ -3163,8 +3163,8 @@ msgstr "Ungültiger Font-Dateiname von Google."
 msgid "Add this to your child theme src/scss/main.scss (above the parent @forward), then rebuild CSS."
 msgstr "Füge dies in die Child-Theme-Datei src/scss/main.scss ein (oberhalb des Parent-@forward) und baue danach das CSS neu."
 
-msgid "Add this to themes/baselayer/src/scss/fonts/_fonts.scss, then rebuild CSS."
-msgstr "Füge dies in themes/baselayer/src/scss/fonts/_fonts.scss ein und baue danach das CSS neu."
+msgid "Add this to themes/baselayer/src/scss/_fonts.scss, then rebuild CSS."
+msgstr "Füge dies in themes/baselayer/src/scss/_fonts.scss ein und baue danach das CSS neu."
 
 msgid "You do not have permission to install fonts."
 msgstr "Du hast keine Berechtigung, Fonts zu installieren."
@@ -3215,11 +3215,11 @@ msgstr "Font-Vorschau"
 
 
 
-msgid "They were added to src/scss/fonts/_fonts.scss. Rebuild your theme CSS to apply them."
-msgstr "Sie wurden in src/scss/fonts/_fonts.scss eingetragen. Baue das Theme-CSS neu, um sie anzuwenden."
+msgid "They were added to src/scss/_fonts.scss. Rebuild your theme CSS to apply them."
+msgstr "Sie wurden in src/scss/_fonts.scss eingetragen. Baue das Theme-CSS neu, um sie anzuwenden."
 
-msgid "Fonts were added to src/scss/fonts/_fonts.scss. Rebuild your theme CSS to apply them."
-msgstr "Fonts wurden in src/scss/fonts/_fonts.scss eingetragen. Baue das Theme-CSS neu, um sie anzuwenden."
+msgid "Fonts were added to src/scss/_fonts.scss. Rebuild your theme CSS to apply them."
+msgstr "Fonts wurden in src/scss/_fonts.scss eingetragen. Baue das Theme-CSS neu, um sie anzuwenden."
 
 msgid "Could not create the fonts SCSS directory."
 msgstr "Das Fonts-SCSS-Verzeichnis konnte nicht erstellt werden."

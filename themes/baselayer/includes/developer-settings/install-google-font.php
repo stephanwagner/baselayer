@@ -328,11 +328,11 @@ function bl_google_font_css_to_scss(string $css, string $font_path_uri, array $u
 }
 
 /**
- * Relative @use snippet for src/scss/fonts/_fonts.scss.
+ * Relative @use snippet for src/scss/_fonts.scss.
  */
 function bl_google_font_use_snippet(string $slug): string
 {
-	return "@use '../../../fonts/{$slug}/{$slug}';";
+	return "@use '../../fonts/{$slug}/{$slug}';";
 }
 
 /**
@@ -340,7 +340,27 @@ function bl_google_font_use_snippet(string $slug): string
  */
 function bl_google_font_fonts_scss_path(array $target): string
 {
+	return $target['dir'] . 'src/scss/_fonts.scss';
+}
+
+/**
+ * Legacy path used before fonts index moved to src/scss/_fonts.scss.
+ */
+function bl_google_font_legacy_fonts_scss_path(array $target): string
+{
 	return $target['dir'] . 'src/scss/fonts/_fonts.scss';
+}
+
+/**
+ * Rewrite legacy ../../../fonts/ @use paths to ../../fonts/ for src/scss/_fonts.scss.
+ */
+function bl_google_font_normalize_fonts_scss(string $contents): string
+{
+	return (string) preg_replace(
+		"/@use\\s+(['\"])\\.\\.\\/\\.\\.\\/\\.\\.\\/fonts\\//",
+		'@use $1../../fonts/',
+		$contents
+	);
 }
 
 /**
@@ -352,7 +372,7 @@ function bl_google_font_ensure_child_fonts_forward(array $target): ?WP_Error
 		return null;
 	}
 
-	$forward = "@forward 'fonts/fonts';";
+	$forward = "@forward 'fonts';";
 	$marker = "\n// Child theme fonts (Developer → Tools → Install Google Font)\n{$forward}\n";
 	$files = [
 		$target['dir'] . 'src/scss/main.scss',
@@ -367,16 +387,29 @@ function bl_google_font_ensure_child_fonts_forward(array $target): ?WP_Error
 		if ($contents === '') {
 			continue;
 		}
-		if (str_contains($contents, "@forward 'fonts/fonts'") || str_contains($contents, '@forward "fonts/fonts"')) {
-			continue;
+
+		$original = $contents;
+
+		// Migrate legacy nested forward.
+		$contents = str_replace(
+			["@forward 'fonts/fonts';", '@forward "fonts/fonts";'],
+			$forward,
+			$contents
+		);
+
+		$has_forward = (bool) preg_match("/@forward\\s+['\"]fonts['\"]\\s*;/", $contents);
+		if (!$has_forward) {
+			// Prefer inserting after the child config forward.
+			if (preg_match("/@forward\\s+['\"]config['\"]\\s*;/", $contents, $m, PREG_OFFSET_CAPTURE)) {
+				$at = (int) $m[0][1] + strlen($m[0][0]);
+				$contents = substr($contents, 0, $at) . $marker . substr($contents, $at);
+			} else {
+				$contents = $marker . $contents;
+			}
 		}
 
-		// Prefer inserting after the child config forward.
-		if (preg_match("/@forward\\s+['\"]config['\"]\\s*;/", $contents, $m, PREG_OFFSET_CAPTURE)) {
-			$at = (int) $m[0][1] + strlen($m[0][0]);
-			$contents = substr($contents, 0, $at) . $marker . substr($contents, $at);
-		} else {
-			$contents = $marker . $contents;
+		if ($contents === $original) {
+			continue;
 		}
 
 		if (file_put_contents($path, $contents) === false) {
@@ -395,13 +428,14 @@ function bl_google_font_ensure_child_fonts_forward(array $target): ?WP_Error
 }
 
 /**
- * Create or append a font @use in src/scss/fonts/_fonts.scss.
+ * Create or append a font @use in src/scss/_fonts.scss.
  *
  * @return true|WP_Error
  */
 function bl_google_font_register_in_fonts_scss(string $family, string $slug, array $target)
 {
 	$scss_path = bl_google_font_fonts_scss_path($target);
+	$legacy_path = bl_google_font_legacy_fonts_scss_path($target);
 	$dir = dirname($scss_path);
 	if (!wp_mkdir_p($dir)) {
 		return new WP_Error('bl_google_font_mkdir', __('Could not create the fonts SCSS directory.', 'baselayer'));
@@ -412,22 +446,45 @@ function bl_google_font_register_in_fonts_scss(string $family, string $slug, arr
 		return $forward_error;
 	}
 
-	$use = bl_google_font_use_snippet($slug);
 	$existing = is_readable($scss_path) ? (string) file_get_contents($scss_path) : '';
+	if ($existing === '' && is_readable($legacy_path)) {
+		$existing = bl_google_font_normalize_fonts_scss((string) file_get_contents($legacy_path));
+	} elseif ($existing !== '') {
+		$existing = bl_google_font_normalize_fonts_scss($existing);
+	}
 
-	// Already active.
-	if (preg_match('/^\s*' . preg_quote($use, '/') . '\s*$/m', $existing)) {
+	$use = bl_google_font_use_snippet($slug);
+	$legacy_use = "@use '../../../fonts/{$slug}/{$slug}';";
+
+	// Already active (new or leftover legacy path).
+	if (
+		preg_match('/^\s*' . preg_quote($use, '/') . '\s*$/m', $existing)
+		|| preg_match('/^\s*' . preg_quote($legacy_use, '/') . '\s*$/m', $existing)
+	) {
+		$existing = str_replace($legacy_use, $use, $existing);
+		if (file_put_contents($scss_path, $existing) === false) {
+			return new WP_Error('bl_google_font_write', __('Could not update the fonts SCSS file.', 'baselayer'));
+		}
+		if ($legacy_path !== $scss_path && is_file($legacy_path)) {
+			@unlink($legacy_path);
+		}
 		return true;
 	}
 
-	// Commented out — uncomment in place.
-	$commented = '// ' . $use;
-	if (str_contains($existing, $commented)) {
-		$updated = str_replace($commented, $use, $existing);
-		if (file_put_contents($scss_path, $updated) === false) {
-			return new WP_Error('bl_google_font_write', __('Could not update the fonts SCSS file.', 'baselayer'));
+	// Commented out — uncomment in place (new or legacy path form).
+	foreach ([$use, $legacy_use] as $candidate) {
+		$commented = '// ' . $candidate;
+		if (str_contains($existing, $commented)) {
+			$updated = str_replace($commented, $use, $existing);
+			$updated = str_replace($legacy_use, $use, $updated);
+			if (file_put_contents($scss_path, $updated) === false) {
+				return new WP_Error('bl_google_font_write', __('Could not update the fonts SCSS file.', 'baselayer'));
+			}
+			if ($legacy_path !== $scss_path && is_file($legacy_path)) {
+				@unlink($legacy_path);
+			}
+			return true;
 		}
-		return true;
 	}
 
 	if ($existing === '') {
@@ -440,6 +497,9 @@ function bl_google_font_register_in_fonts_scss(string $family, string $slug, arr
 	}
 	if (file_put_contents($scss_path, $existing . $block) === false) {
 		return new WP_Error('bl_google_font_write', __('Could not update the fonts SCSS file.', 'baselayer'));
+	}
+	if ($legacy_path !== $scss_path && is_file($legacy_path)) {
+		@unlink($legacy_path);
 	}
 
 	return true;
@@ -523,7 +583,7 @@ function bl_google_font_install(string $family)
 	}
 
 	$use = bl_google_font_use_snippet($slug);
-	$import_hint = __('Fonts were added to src/scss/fonts/_fonts.scss. Rebuild your theme CSS to apply them.', 'baselayer');
+	$import_hint = __('Fonts were added to src/scss/_fonts.scss. Rebuild your theme CSS to apply them.', 'baselayer');
 
 	return [
 		'family' => $family,
@@ -533,7 +593,7 @@ function bl_google_font_install(string $family)
 		'is_child' => $target['is_child'],
 		'files' => count($files),
 		'scss' => 'fonts/' . $slug . '/_' . $slug . '.scss',
-		'fonts_index' => 'src/scss/fonts/_fonts.scss',
+		'fonts_index' => 'src/scss/_fonts.scss',
 		'use' => $use,
 		'import_hint' => $import_hint,
 		'preview_css' => $css,
