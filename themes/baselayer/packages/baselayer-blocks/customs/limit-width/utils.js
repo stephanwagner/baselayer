@@ -6,10 +6,11 @@ export const LIMIT_WIDTH_SIZES = [
   { value: 'l', label: 'L' },
 ];
 
-export const LIMIT_WIDTH_ALIGNS = [
-  { value: 'left', label: 'Links', icon: 'align-left' },
-  { value: 'center', label: 'Zentriert', icon: 'align-center' },
-  { value: 'right', label: 'Rechts', icon: 'align-right' },
+/** Align tokens (labels translated in the control). */
+export const LIMIT_WIDTH_ALIGN_VALUES = [
+  { value: 'left', icon: 'align-left' },
+  { value: 'center', icon: 'align-center' },
+  { value: 'right', icon: 'align-right' },
 ];
 
 const WIDTH_CLASS_BY_SIZE = {
@@ -29,7 +30,7 @@ const CLASS_BY_SIZE_AND_ALIGN = LIMIT_WIDTH_SIZES.reduce((map, { value: size }) 
     return map;
   }
 
-  LIMIT_WIDTH_ALIGNS.forEach(({ value: align }) => {
+  LIMIT_WIDTH_ALIGN_VALUES.forEach(({ value: align }) => {
     const base = WIDTH_CLASS_BY_SIZE[size];
     map[`${size}:${align}`] =
       align === 'center' ? base : align === 'left' ? `${base}-left` : `${base}-right`;

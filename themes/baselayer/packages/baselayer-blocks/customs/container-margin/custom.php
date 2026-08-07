@@ -26,18 +26,25 @@ if (!function_exists('bl_block_options_control_container_margin')) {
 	}
 }
 
+// Catalog metadata: plain msgids (translated in bl_block_options_customs_catalog after textdomain load).
+if (false) {
+	__('Container margin', 'baselayer-blocks');
+	__('Label', 'baselayer-blocks');
+	__('Spacing', 'baselayer-blocks');
+	__('Default size', 'baselayer-blocks');
+}
 
 return [
-	'label' => __('Container margin', 'baselayer-blocks'),
+	'label' => 'Container margin',
 	'params' => [
 		'label' => [
 			'type' => 'text',
-			'label' => __('Label', 'baselayer-blocks'),
-			'default' => __('Spacing', 'baselayer-blocks'),
+			'label' => 'Label',
+			'default' => 'Spacing',
 		],
 		'defaultSize' => [
 			'type' => 'size',
-			'label' => __('Default size', 'baselayer-blocks'),
+			'label' => 'Default size',
 			'default' => '',
 		],
 	],

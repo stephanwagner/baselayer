@@ -111,19 +111,49 @@ function bl_block_options_is_custom_type(string $type): bool
 /**
  * Admin / builder catalog (no factories).
  *
+ * Translates labels here (after textdomain load). Registry may be built at
+ * bootstrap before translations exist, so do not reuse those strings as-is.
+ *
  * @return array<string, array{label: string, params: array<string, array<string, mixed>>, defaults: array<string, mixed>}>
  */
 function bl_block_options_customs_catalog(): array
 {
+	$domain = 'baselayer-blocks';
 	$out = [];
 	foreach (bl_block_options_customs_registry() as $type => $def) {
 		$defaults = [];
+		$params = [];
 		foreach ($def['params'] as $key => $param) {
-			$defaults[$key] = $param['default'] ?? null;
+			if (!is_array($param)) {
+				continue;
+			}
+			$row = $param;
+			if (!empty($row['label']) && is_string($row['label'])) {
+				$row['label'] = __($row['label'], $domain);
+			}
+			if (isset($row['choices']) && is_array($row['choices'])) {
+				$choices = [];
+				foreach ($row['choices'] as $choice_value => $choice_label) {
+					$choices[$choice_value] = is_string($choice_label)
+						? __($choice_label, $domain)
+						: $choice_label;
+				}
+				$row['choices'] = $choices;
+			}
+			$default = $row['default'] ?? null;
+			if (
+				($row['type'] ?? '') === 'text'
+				&& is_string($default)
+				&& $default !== ''
+			) {
+				$default = __($default, $domain);
+			}
+			$defaults[$key] = $default;
+			$params[$key] = $row;
 		}
 		$out[$type] = [
-			'label' => $def['label'],
-			'params' => $def['params'],
+			'label' => __((string) $def['label'], $domain),
+			'params' => $params,
 			'defaults' => $defaults,
 		];
 	}

@@ -99,7 +99,7 @@ function bl_block_options_resolve_asset(string $name, string $type): ?array
 function bl_block_options_enqueue_editor_assets(): void
 {
 	$handle = bl_block_options_editor_script_handle();
-	$deps = ['wp-blocks', 'wp-element', 'wp-components', 'wp-compose', 'wp-hooks', 'wp-block-editor', 'wp-data'];
+	$deps = ['wp-blocks', 'wp-element', 'wp-components', 'wp-compose', 'wp-hooks', 'wp-block-editor', 'wp-data', 'wp-i18n'];
 
 	if (function_exists('bl_blocks_enqueue_script')) {
 		bl_blocks_enqueue_script($handle, 'block-options-editor', $deps, true);
@@ -114,6 +114,12 @@ function bl_block_options_enqueue_editor_assets(): void
 	if (!wp_script_is($handle, 'enqueued') && !wp_script_is($handle, 'registered')) {
 		return;
 	}
+
+	wp_set_script_translations(
+		$handle,
+		'baselayer-blocks',
+		bl_block_options_package_root() . 'languages'
+	);
 
 	wp_localize_script($handle, 'baselayerBlockOptions', bl_block_options_for_editor());
 

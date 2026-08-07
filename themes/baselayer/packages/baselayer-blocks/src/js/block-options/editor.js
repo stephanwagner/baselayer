@@ -4,7 +4,7 @@
 import './load-customs.js';
 import { IconPicker } from '../../../../../src/js/editor/icons/icon-picker.js';
 import { BlockOptionToggleGroupOption } from './shared/block-option-toggle-group-option';
-import { BlockOptionDescription, optionHelpProps } from './shared/block-option-help';
+import { optionHelpProps } from './shared/block-option-help';
 import {
   getCustom,
   allCustomManagedClasses,
@@ -24,7 +24,7 @@ const GALLERY_OWNED_IMAGE_ATTRIBUTES = [
   'alignWideContainer',
   'alignWideContent',
 ];
-const GALLERY_OWNED_IMAGE_TYPES = ['container-margin'];
+const GALLERY_OWNED_IMAGE_TYPES = ['container-margin', 'align-wide'];
 
 /** Resolved from PHP (bl_block_options store → baselayerBlockOptions). */
 const blockOptions = Array.isArray(window.baselayerBlockOptions)
@@ -42,16 +42,6 @@ const HIDE_BLOCK_OPTION = {
 };
 const HIDE_BLOCK_CLASS = HIDE_BLOCK_OPTION.className;
 const HIDE_BLOCK_ATTRIBUTE = HIDE_BLOCK_OPTION.attributeName;
-
-/** Class applied by Inhaltsbreite → Erweitert. */
-const ALIGN_WIDE_CONTAINER_CLASS = 'container-wide';
-/** Pads wide container content back to the content column (overrides L/R inner padding). */
-const ALIGN_WIDE_CONTENT_CLASS = '-container-wide-content';
-const ALIGN_WIDE_CONTAINER_ATTRIBUTE = 'alignWideContainer';
-const ALIGN_WIDE_CONTENT_ATTRIBUTE = 'alignWideContent';
-
-const isAlignWideContainerOption = (option) =>
-  option?.type === 'button-group' && option.attributeName === ALIGN_WIDE_CONTAINER_ATTRIBUTE;
 
 /** Merge global hide ahead of block-specific options. */
 const effectiveBlockConfig = (name, blockConfig) => ({
@@ -222,28 +212,11 @@ const migrateLegacyButtonFontSizeAttributes = (attributes) => {
   return Object.keys(updates).length ? updates : null;
 };
 
-/** Legacy container-padding custom stored size tokens (`m`); button-group stores classes. */
-const migrateLegacyContainerPaddingAttributes = (attributes) => {
-  const value = attributes.containerPadding;
-  if (value === undefined || value === null || value === '') {
-    return null;
-  }
-  if (typeof value !== 'string' || value.indexOf('-container-padding-') === 0) {
-    return null;
-  }
-  if (!/^(none|xs|s|m|l|xl)$/.test(value)) {
-    return null;
-  }
-  return { containerPadding: `-container-padding-${value}` };
-};
-
 const managedStaticClasses = (blockConfig) => {
   const classes = new Set([
     HAS_ICON_CLASS,
     ICON_ONLY_CLASS,
     HIDE_BLOCK_CLASS,
-    ALIGN_WIDE_CONTAINER_CLASS,
-    ALIGN_WIDE_CONTENT_CLASS,
     ...allCustomManagedClasses(),
     ...LEGACY_IMAGE_TEXT_LAYOUT_CLASSES,
   ]);
@@ -297,14 +270,6 @@ const collectOptionClasses = (blockConfig, attributes) => {
       }
 
       classes.push(attributes[option.attributeName]);
-
-      if (
-        isAlignWideContainerOption(option) &&
-        attributes[option.attributeName] === ALIGN_WIDE_CONTAINER_CLASS &&
-        attributes[ALIGN_WIDE_CONTENT_ATTRIBUTE]
-      ) {
-        classes.push(ALIGN_WIDE_CONTENT_CLASS);
-      }
     }
   });
 
@@ -338,9 +303,6 @@ const blockOptionAttributeKeys = (blockConfig) =>
     const custom = getCustom(option.type);
     if (custom?.attributeKeys) {
       return custom.attributeKeys(option);
-    }
-    if (isAlignWideContainerOption(option)) {
-      return [option.attributeName, ALIGN_WIDE_CONTENT_ATTRIBUTE];
     }
     return [option.attributeName];
   });
@@ -392,19 +354,6 @@ blockOptions.forEach((block) => {
           },
         },
       };
-
-      if (isAlignWideContainerOption(option)) {
-        settings = {
-          ...settings,
-          attributes: {
-            ...settings.attributes,
-            [ALIGN_WIDE_CONTENT_ATTRIBUTE]: {
-              type: 'boolean',
-              default: false,
-            },
-          },
-        };
-      }
     });
 
     return settings;
@@ -500,18 +449,6 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
       attributes.buttonSize,
       attributes.style,
     ]);
-
-    // Legacy container-padding tokens → class values on the attribute.
-    useEffect(() => {
-      if (!listedConfig) {
-        return;
-      }
-
-      const migrated = migrateLegacyContainerPaddingAttributes(attributes);
-      if (migrated) {
-        setOptionAttributes(migrated);
-      }
-    }, [listedConfig?.name, props.clientId, attributes.containerPadding]);
 
     useEffect(() => {
       if (listedConfig?.name !== 'core/button') {
@@ -643,11 +580,6 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
 
                 if (option.type === 'button-group') {
                   if (ToggleGroupControl) {
-                    const wideSelected =
-                      isAlignWideContainerOption(option) &&
-                      (attributes[option.attributeName] ?? option.default ?? '') ===
-                        ALIGN_WIDE_CONTAINER_CLASS;
-
                     return (
                       <BlockOptionWrapper key={getBlockOptionKey(option, index)} option={option} index={index}>
                         <ToggleGroupControl
@@ -655,16 +587,9 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                           label={option.label}
                           value={attributes[option.attributeName] ?? option.default ?? ''}
                           isBlock
-                          onChange={(newValue) => {
-                            const next = { [option.attributeName]: newValue };
-                            if (
-                              isAlignWideContainerOption(option) &&
-                              newValue !== ALIGN_WIDE_CONTAINER_CLASS
-                            ) {
-                              next[ALIGN_WIDE_CONTENT_ATTRIBUTE] = false;
-                            }
-                            setOptionAttributes(next);
-                          }}
+                          onChange={(newValue) =>
+                            setOptionAttributes({ [option.attributeName]: newValue })
+                          }
                           __nextHasNoMarginBottom
                           __next40pxDefaultSize
                           {...optionHelpProps(option)}
@@ -681,16 +606,6 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                             />
                           ))}
                         </ToggleGroupControl>
-                        {wideSelected ? (
-                          <ToggleControl
-                            className="bl-align-wide-content-toggle"
-                            label="Inhalt am Content ausrichten"
-                            checked={Boolean(attributes[ALIGN_WIDE_CONTENT_ATTRIBUTE])}
-                            onChange={(checked) =>
-                              setOptionAttributes({ [ALIGN_WIDE_CONTENT_ATTRIBUTE]: checked })
-                            }
-                          />
-                        ) : null}
                       </BlockOptionWrapper>
                     );
                   }

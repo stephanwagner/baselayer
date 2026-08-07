@@ -65,26 +65,6 @@ function bl_block_options_control_text_wrap(): array
 }
 
 /**
- * Expand block to the wide container width.
- *
- * @return array<string, mixed>
- */
-function bl_block_options_control_align_wide_container(): array
-{
-	return [
-		'type' => 'button-group',
-		'label' => 'Inhaltsbreite',
-		'description' => 'Verwendet den breiten Inhaltscontainer. Nicht zu verwechseln mit der WordPress-Ausrichtung „Erweiterte Breite“.',
-		'default' => '',
-		'attributeName' => 'alignWideContainer',
-		'options' => [
-			['label' => 'Standard', 'value' => ''],
-			['label' => 'Erweitert', 'value' => 'container-wide'],
-		],
-	];
-}
-
-/**
  * Hide block on the frontend (forced in editor JS — not listed in store).
  *
  * @return array<string, mixed>

@@ -155,47 +155,6 @@ function bl_block_options_sanitize_preset_ref(array $item): ?array
 }
 
 /**
- * Map a legacy padding size token to a class value.
- */
-function bl_block_options_padding_token_to_class(string $token): string
-{
-	$token = trim($token);
-	if ($token === '' || $token === 'unset') {
-		return '';
-	}
-	if (str_starts_with($token, '-container-padding-')) {
-		return $token;
-	}
-	$map = [
-		'none' => '-container-padding-none',
-		'xs' => '-container-padding-xs',
-		's' => '-container-padding-s',
-		'm' => '-container-padding-m',
-		'l' => '-container-padding-l',
-		'xl' => '-container-padding-xl',
-	];
-	return $map[$token] ?? '';
-}
-
-/**
- * Standard Innenabstand button-group options.
- *
- * @return list<array{label: string, value: string}>
- */
-function bl_block_options_container_padding_button_options(): array
-{
-	return [
-		['label' => '—', 'value' => ''],
-		['label' => '0', 'value' => '-container-padding-none'],
-		['label' => 'XS', 'value' => '-container-padding-xs'],
-		['label' => 'S', 'value' => '-container-padding-s'],
-		['label' => 'M', 'value' => '-container-padding-m'],
-		['label' => 'L', 'value' => '-container-padding-l'],
-		['label' => 'XL', 'value' => '-container-padding-xl'],
-	];
-}
-
-/**
  * @param array<string, mixed> $raw
  * @return array<string, array<string, mixed>>
  */
@@ -206,13 +165,6 @@ function bl_block_options_sanitize_preset_defaults(array $raw): array
 		$control_id = sanitize_key((string) $control_id);
 		if ($control_id === '' || !is_array($params)) {
 			continue;
-		}
-
-		// Legacy innenabstand overrides used defaultSize.
-		if ($control_id === 'c_innenabstand' && array_key_exists('defaultSize', $params)) {
-			$params = [
-				'default' => bl_block_options_padding_token_to_class((string) ($params['defaultSize'] ?? '')),
-			];
 		}
 
 		// Type unknown here — keep only safe scalar knobs; expand re-validates per control type.
@@ -249,46 +201,6 @@ function bl_block_options_sanitize_control_item(array $item): ?array
 	$id = sanitize_key((string) ($item['id'] ?? ''));
 	if ($id === '') {
 		$id = 'c_' . substr(md5($type . uniqid('', true)), 0, 12);
-	}
-
-	// Legacy special → generic button-group (class values stored on the attribute).
-	if ($type === 'spacer-responsive-height') {
-		$item = [
-			'id' => $id,
-			'kind' => 'control',
-			'type' => 'button-group',
-			'label' => (string) ($item['label'] ?? 'Responsive Höhe'),
-			'description' => (string) ($item['description'] ?? 'Reduziert den Abstand auf kleineren Bildschirmen automatisch.'),
-			'attributeName' => 'spacerResponsiveHeight',
-			'default' => (string) ($item['default'] ?? ''),
-			'options' => [
-				['label' => '—', 'value' => ''],
-				['label' => 'XS', 'value' => '-spacer-height-xs'],
-				['label' => 'S', 'value' => '-spacer-height-s'],
-				['label' => 'M', 'value' => '-spacer-height-m'],
-				['label' => 'L', 'value' => '-spacer-height-l'],
-				['label' => 'XL', 'value' => '-spacer-height-xl'],
-			],
-		];
-		$type = 'button-group';
-	}
-
-	if ($type === 'container-padding') {
-		$token = (string) ($item['defaultSize'] ?? $item['default'] ?? 'm');
-		$migrated = [
-			'id' => $id,
-			'kind' => 'control',
-			'type' => 'button-group',
-			'label' => (string) ($item['label'] ?? 'Innenabstand'),
-			'attributeName' => 'containerPadding',
-			'default' => bl_block_options_padding_token_to_class($token),
-			'options' => bl_block_options_container_padding_button_options(),
-		];
-		if (!empty($item['description'])) {
-			$migrated['description'] = (string) $item['description'];
-		}
-		$item = $migrated;
-		$type = 'button-group';
 	}
 
 	if (function_exists('bl_block_options_is_custom_type') && bl_block_options_is_custom_type($type)) {

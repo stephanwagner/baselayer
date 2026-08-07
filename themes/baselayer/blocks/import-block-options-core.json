@@ -62,21 +62,10 @@
                 {
                     "id": "c_inhaltsbreite",
                     "kind": "control",
-                    "type": "button-group",
+                    "type": "align-wide",
                     "label": "Inhaltsbreite",
-                    "attributeName": "alignWideContainer",
                     "default": "",
-                    "description": "Verwendet den breiten Inhaltscontainer. Nicht zu verwechseln mit der WordPress-Ausrichtung „Erweiterte Breite“.",
-                    "options": [
-                        {
-                            "label": "Standard",
-                            "value": ""
-                        },
-                        {
-                            "label": "Erweitert",
-                            "value": "container-wide"
-                        }
-                    ]
+                    "description": "Verwendet den breiten Inhaltscontainer. Nicht zu verwechseln mit der WordPress-Ausrichtung „Erweiterte Breite“."
                 }
             ]
         },

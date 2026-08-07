@@ -1,5 +1,5 @@
 import {
-  LIMIT_WIDTH_ALIGNS,
+  LIMIT_WIDTH_ALIGN_VALUES,
   LIMIT_WIDTH_SIZES,
   displayLimitWidthSize,
   storedLimitWidthSize,
@@ -7,7 +7,14 @@ import {
 import { BlockOptionToggleGroupOption } from '../../src/js/block-options/shared/block-option-toggle-group-option';
 import { BlockOptionDescription } from '../../src/js/block-options/shared/block-option-help';
 
+const { __ } = wp.i18n;
 const ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
+
+const limitWidthAligns = () => [
+  { ...LIMIT_WIDTH_ALIGN_VALUES[0], label: __('Left', 'baselayer-blocks') },
+  { ...LIMIT_WIDTH_ALIGN_VALUES[1], label: __('Center', 'baselayer-blocks') },
+  { ...LIMIT_WIDTH_ALIGN_VALUES[2], label: __('Right', 'baselayer-blocks') },
+];
 
 /**
  * Width limit picker with separate size and alignment segments.
@@ -19,6 +26,7 @@ export function LimitWidthControl({ option, attributes, onChange }) {
   const storedAlign = attributes[align] ?? defaultAlign;
   const displaySize = displayLimitWidthSize(storedSize);
   const hasSize = Boolean(storedSize);
+  const aligns = limitWidthAligns();
 
   const setSize = (pickedSize) => {
     onChange({ [size]: storedLimitWidthSize(pickedSize) });
@@ -36,6 +44,13 @@ export function LimitWidthControl({ option, attributes, onChange }) {
     return null;
   }
 
+  const sizeLabel = option.label
+    ? `${option.label} ${__('Size', 'baselayer-blocks')}`
+    : __('Size', 'baselayer-blocks');
+  const alignLabel = option.label
+    ? `${option.label} ${__('Alignment', 'baselayer-blocks')}`
+    : __('Alignment', 'baselayer-blocks');
+
   return (
     <div className="bl-limit-width">
       {option.label ? <span className="bl-limit-width__label">{option.label}</span> : null}
@@ -43,7 +58,7 @@ export function LimitWidthControl({ option, attributes, onChange }) {
       <div className="bl-limit-width__row bl-block-option-button-group">
         <ToggleGroupControl
           className="bl-limit-width__sizes"
-          label={option.label ? option.label + ' Größe' : 'Größe'}
+          label={sizeLabel}
           hideLabelFromVision
           value={displaySize}
           isBlock
@@ -68,7 +83,7 @@ export function LimitWidthControl({ option, attributes, onChange }) {
         >
           <ToggleGroupControl
             className="bl-limit-width__align"
-            label={option.label ? option.label + ' Ausrichtung' : 'Ausrichtung'}
+            label={alignLabel}
             hideLabelFromVision
             value={storedAlign}
             isBlock
@@ -76,7 +91,7 @@ export function LimitWidthControl({ option, attributes, onChange }) {
             __nextHasNoMarginBottom
             __next40pxDefaultSize
           >
-            {LIMIT_WIDTH_ALIGNS.map((item) => (
+            {aligns.map((item) => (
               <BlockOptionToggleGroupOption
                 key={item.value}
                 value={item.value}

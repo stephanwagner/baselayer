@@ -23,18 +23,25 @@ if (!function_exists('bl_block_options_control_limit_width')) {
 	}
 }
 
+// Catalog metadata: plain msgids (translated in bl_block_options_customs_catalog after textdomain load).
+if (false) {
+	__('Limit width', 'baselayer-blocks');
+	__('Label', 'baselayer-blocks');
+	__('Default size', 'baselayer-blocks');
+	__('Default align', 'baselayer-blocks');
+}
 
 return [
-	'label' => __('Limit width', 'baselayer-blocks'),
+	'label' => 'Limit width',
 	'params' => [
 		'label' => [
 			'type' => 'text',
-			'label' => __('Label', 'baselayer-blocks'),
-			'default' => __('Limit width', 'baselayer-blocks'),
+			'label' => 'Label',
+			'default' => 'Limit width',
 		],
 		'defaultSize' => [
 			'type' => 'size',
-			'label' => __('Default size', 'baselayer-blocks'),
+			'label' => 'Default size',
 			'default' => '',
 			'choices' => [
 				'' => '—',
@@ -45,7 +52,7 @@ return [
 		],
 		'defaultAlign' => [
 			'type' => 'align',
-			'label' => __('Default align', 'baselayer-blocks'),
+			'label' => 'Default align',
 			'default' => 'center',
 		],
 	],
