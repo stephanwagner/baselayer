@@ -255,14 +255,6 @@
     ...Object.values(WIDTH_CLASS_BY_SIZE),
     ...Object.values(WIDTH_CLASS_BY_SIZE).flatMap((base) => [`${base}-left`, `${base}-right`])
   ];
-  var LEGACY_LIMIT_WIDTH_BY_CLASS = {
-    "-narrow": { size: "l", align: "center" },
-    "-very-narrow": { size: "m", align: "center" },
-    "-extra-narrow": { size: "s", align: "center" },
-    "-narrow-left": { size: "l", align: "left" },
-    "-very-narrow-left": { size: "m", align: "left" },
-    "-extra-narrow-left": { size: "s", align: "left" }
-  };
   var CLASS_BY_SIZE_AND_ALIGN = LIMIT_WIDTH_SIZES.reduce((map, { value: size }) => {
     if (size === "unset") {
       return map;
@@ -273,36 +265,6 @@
     });
     return map;
   }, {});
-  var parseLimitWidthClass = (className) => {
-    if (!className || typeof className !== "string") {
-      return null;
-    }
-    if (LEGACY_LIMIT_WIDTH_BY_CLASS[className]) {
-      return LEGACY_LIMIT_WIDTH_BY_CLASS[className];
-    }
-    for (const [size, base] of Object.entries(WIDTH_CLASS_BY_SIZE)) {
-      if (className === base) {
-        return { size, align: "center" };
-      }
-      if (className === `${base}-left`) {
-        return { size, align: "left" };
-      }
-      if (className === `${base}-right`) {
-        return { size, align: "right" };
-      }
-    }
-    return null;
-  };
-  var parseLimitWidthStateFromClassName = (className) => {
-    const classes = (className || "").split(/\s+/).filter(Boolean);
-    for (const name of classes) {
-      const parsed = parseLimitWidthClass(name);
-      if (parsed) {
-        return parsed;
-      }
-    }
-    return { size: "", align: "center" };
-  };
   var displayLimitWidthSize = (storedSize) => storedSize === "" ? "unset" : storedSize;
   var storedLimitWidthSize = (pickedSize) => pickedSize === "unset" ? "" : pickedSize;
   var limitWidthClassesFromAttributes = (option, attributes) => {
@@ -318,30 +280,6 @@
   var limitWidthAttributeKeys = (option) => {
     const { size, align } = option.attributeNames;
     return [size, align];
-  };
-  var migrateLegacyLimitWidthAttributes = (attributes, option) => {
-    const { size, align } = option.attributeNames;
-    if (attributes[size]) {
-      return null;
-    }
-    const legacyValue = attributes.limitWidth;
-    if (legacyValue && LEGACY_LIMIT_WIDTH_BY_CLASS[legacyValue]) {
-      const migrated = LEGACY_LIMIT_WIDTH_BY_CLASS[legacyValue];
-      return {
-        [size]: migrated.size,
-        [align]: migrated.align,
-        limitWidth: ""
-      };
-    }
-    const fromClassName = parseLimitWidthStateFromClassName(attributes.className);
-    if (fromClassName.size) {
-      return {
-        [size]: fromClassName.size,
-        [align]: fromClassName.align,
-        limitWidth: ""
-      };
-    }
-    return null;
   };
 
   // themes/baselayer/packages/baselayer-blocks/customs/limit-width/control.js
@@ -421,10 +359,9 @@
     type: "limit-width",
     Control: LimitWidthControl,
     managedClasses: ALL_LIMIT_WIDTH_CLASSES,
-    attributeKeys: (option) => [...limitWidthAttributeKeys(option), "limitWidth"],
+    attributeKeys: limitWidthAttributeKeys,
     classesFromAttributes: limitWidthClassesFromAttributes,
     optionKey: (_option, index) => "limit-width-" + index,
-    migrateAttributes: migrateLegacyLimitWidthAttributes,
     registerAttributes: (settings, option) => {
       const { size, align } = option.attributeNames;
       return {
@@ -432,8 +369,7 @@
         attributes: {
           ...settings.attributes,
           [size]: { type: "string", default: "" },
-          [align]: { type: "string", default: option.defaultAlign ?? "center" },
-          limitWidth: { type: "string", default: "" }
+          [align]: { type: "string", default: option.defaultAlign ?? "center" }
         }
       };
     }
@@ -1595,7 +1531,12 @@
   var { createHigherOrderComponent } = wp.compose;
   var { useSelect } = wp.data;
   var { Fragment, useEffect, useRef: useRef2 } = wp.element;
-  var GALLERY_OWNED_IMAGE_ATTRIBUTES = ["showImageLabel", "hasLightbox", "alignWideContainer"];
+  var GALLERY_OWNED_IMAGE_ATTRIBUTES = [
+    "showImageLabel",
+    "hasLightbox",
+    "alignWideContainer",
+    "alignWideContent"
+  ];
   var GALLERY_OWNED_IMAGE_TYPES = ["container-margin"];
   var blockOptions = Array.isArray(window.baselayerBlockOptions) ? window.baselayerBlockOptions : [];
   var HIDE_BLOCK_OPTION = {
@@ -1609,6 +1550,10 @@
   var HIDE_BLOCK_CLASS = HIDE_BLOCK_OPTION.className;
   var HIDE_BLOCK_ATTRIBUTE = HIDE_BLOCK_OPTION.attributeName;
   var ALIGN_WIDE_CONTAINER_CLASS = "container-wide";
+  var ALIGN_WIDE_CONTENT_CLASS = "-container-wide-content";
+  var ALIGN_WIDE_CONTAINER_ATTRIBUTE = "alignWideContainer";
+  var ALIGN_WIDE_CONTENT_ATTRIBUTE = "alignWideContent";
+  var isAlignWideContainerOption = (option) => option?.type === "button-group" && option.attributeName === ALIGN_WIDE_CONTAINER_ATTRIBUTE;
   var effectiveBlockConfig = (name, blockConfig) => ({
     name: blockConfig?.name || name,
     options: [HIDE_BLOCK_OPTION, ...blockConfig?.options || []]
@@ -1758,6 +1703,7 @@
       ICON_ONLY_CLASS,
       HIDE_BLOCK_CLASS,
       ALIGN_WIDE_CONTAINER_CLASS,
+      ALIGN_WIDE_CONTENT_CLASS,
       ...allCustomManagedClasses(),
       ...LEGACY_IMAGE_TEXT_LAYOUT_CLASSES
     ]);
@@ -1796,6 +1742,9 @@
           return;
         }
         classes.push(attributes[option.attributeName]);
+        if (isAlignWideContainerOption(option) && attributes[option.attributeName] === ALIGN_WIDE_CONTAINER_CLASS && attributes[ALIGN_WIDE_CONTENT_ATTRIBUTE]) {
+          classes.push(ALIGN_WIDE_CONTENT_CLASS);
+        }
       }
     });
     return classes;
@@ -1816,6 +1765,9 @@
     const custom = getCustom(option.type);
     if (custom?.attributeKeys) {
       return custom.attributeKeys(option);
+    }
+    if (isAlignWideContainerOption(option)) {
+      return [option.attributeName, ALIGN_WIDE_CONTENT_ATTRIBUTE];
     }
     return [option.attributeName];
   });
@@ -1858,6 +1810,18 @@
             }
           }
         };
+        if (isAlignWideContainerOption(option)) {
+          settings = {
+            ...settings,
+            attributes: {
+              ...settings.attributes,
+              [ALIGN_WIDE_CONTENT_ATTRIBUTE]: {
+                type: "boolean",
+                default: false
+              }
+            }
+          };
+        }
       });
       return settings;
     });
@@ -1907,7 +1871,7 @@
         if (Object.keys(updates).length) {
           setOptionAttributes(updates);
         }
-      }, [listedConfig?.name, props.clientId, attributes.limitWidth, attributes.className]);
+      }, [listedConfig?.name, props.clientId, attributes.className]);
       useEffect(() => {
         if (!listedConfig || listedConfig.name !== "core/columns") {
           return;
@@ -2037,6 +2001,7 @@
         }
         if (option.type === "button-group") {
           if (ToggleGroupControl3) {
+            const wideSelected = isAlignWideContainerOption(option) && (attributes[option.attributeName] ?? option.default ?? "") === ALIGN_WIDE_CONTAINER_CLASS;
             return /* @__PURE__ */ wp.element.createElement(BlockOptionWrapper, { key: getBlockOptionKey(option, index), option, index }, /* @__PURE__ */ wp.element.createElement(
               ToggleGroupControl3,
               {
@@ -2044,7 +2009,13 @@
                 label: option.label,
                 value: attributes[option.attributeName] ?? option.default ?? "",
                 isBlock: true,
-                onChange: (newValue) => setOptionAttributes({ [option.attributeName]: newValue }),
+                onChange: (newValue) => {
+                  const next = { [option.attributeName]: newValue };
+                  if (isAlignWideContainerOption(option) && newValue !== ALIGN_WIDE_CONTAINER_CLASS) {
+                    next[ALIGN_WIDE_CONTENT_ATTRIBUTE] = false;
+                  }
+                  setOptionAttributes(next);
+                },
                 __nextHasNoMarginBottom: true,
                 __next40pxDefaultSize: true,
                 ...optionHelpProps(option)
@@ -2061,7 +2032,15 @@
                   title: opt.title
                 }
               ))
-            ));
+            ), wideSelected ? /* @__PURE__ */ wp.element.createElement(
+              ToggleControl,
+              {
+                className: "bl-align-wide-content-toggle",
+                label: "Inhalt am Content ausrichten",
+                checked: Boolean(attributes[ALIGN_WIDE_CONTENT_ATTRIBUTE]),
+                onChange: (checked) => setOptionAttributes({ [ALIGN_WIDE_CONTENT_ATTRIBUTE]: checked })
+              }
+            ) : null);
           }
           return /* @__PURE__ */ wp.element.createElement(BlockOptionWrapper, { key: getBlockOptionKey(option, index), option, index }, /* @__PURE__ */ wp.element.createElement(
             SelectControl,

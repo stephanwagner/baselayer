@@ -10,9 +10,8 @@
 }
 
 .hero__wrapper.container-wide {
-  @media (min-width: calc(#{$content-wide-collapse} + 1px)) {
-    --hero-content-inset: var(--bl-container-wide-bleed);
-  }
+  // Use the wrapper's fluid bleed (from .container-wide); floor at normal container padding.
+  --hero-content-inset: max(var(--bl-wide-bleed, 0px), var(--bl-container-padding));
 }
 
 .hero__wrapper {

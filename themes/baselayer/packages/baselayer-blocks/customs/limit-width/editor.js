@@ -4,17 +4,15 @@ import {
   ALL_LIMIT_WIDTH_CLASSES,
   limitWidthAttributeKeys,
   limitWidthClassesFromAttributes,
-  migrateLegacyLimitWidthAttributes,
 } from './utils';
 
 registerCustom({
   type: 'limit-width',
   Control: LimitWidthControl,
   managedClasses: ALL_LIMIT_WIDTH_CLASSES,
-  attributeKeys: (option) => [...limitWidthAttributeKeys(option), 'limitWidth'],
+  attributeKeys: limitWidthAttributeKeys,
   classesFromAttributes: limitWidthClassesFromAttributes,
   optionKey: (_option, index) => 'limit-width-' + index,
-  migrateAttributes: migrateLegacyLimitWidthAttributes,
   registerAttributes: (settings, option) => {
     const { size, align } = option.attributeNames;
     return {
@@ -23,7 +21,6 @@ registerCustom({
         ...settings.attributes,
         [size]: { type: 'string', default: '' },
         [align]: { type: 'string', default: option.defaultAlign ?? 'center' },
-        limitWidth: { type: 'string', default: '' },
       },
     };
   },

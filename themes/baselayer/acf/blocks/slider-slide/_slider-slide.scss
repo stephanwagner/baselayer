@@ -1,7 +1,5 @@
 @use '../../../src/scss/config' as *;
 
-$slider-content-wide-collapse: $content-width + ($container-wide-bleed * 2) + 24px + 24px;
-
 .slider-slide__wrapper {
   position: relative;
 
@@ -62,16 +60,12 @@ $slider-content-wide-collapse: $content-width + ($container-wide-bleed * 2) + 24
   display: none;
   color: #fff;
 
-  // Wide container + alignwide: same content inset until the shared collapse breakpoint.
+  // Wide / alignwide: inset text by the wrapper bleed (inherited), never less than
+  // normal container/page padding so copy does not sit on the edge.
   .slider__wrapper.alignwide &,
   .slider__wrapper.container-wide & {
-    padding-left: var(--bl-alignwide-bleed);
-    padding-right: var(--bl-alignwide-bleed);
-
-    @media (max-width: $slider-content-wide-collapse) {
-      padding-left: var(--bl-container-padding-x, var(--bl-page-padding));
-      padding-right: var(--bl-container-padding-x, var(--bl-page-padding));
-    }
+    padding-left: max(var(--bl-wide-bleed, 0px), var(--bl-container-padding-x, var(--bl-page-padding)));
+    padding-right: max(var(--bl-wide-bleed, 0px), var(--bl-container-padding-x, var(--bl-page-padding)));
   }
 
   .slider__wrapper.alignfull & {
@@ -106,7 +100,7 @@ $slider-content-wide-collapse: $content-width + ($container-wide-bleed * 2) + 24
     background-image: linear-gradient(to right, rgba(#000, 0) 0%, rgba(#000, 0.4) 25%, rgba(#000, 0.5) 50%, rgba(#000, 0.4) 75%, rgba(#000, 0) 100%);
   }
 
-  > .acf-innerblocks-container {
+  > .slider-slide__inner {
     width: 100%;
 
     .slider__wrapper[data-slider-content-align='right'] & {

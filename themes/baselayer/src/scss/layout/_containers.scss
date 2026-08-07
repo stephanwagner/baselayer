@@ -10,53 +10,51 @@
   width: calc(100% - var(--bl-page-padding) - var(--bl-page-padding));
 }
 
-// Wide container
+// Wide container — fluid bleed capped by --bl-container-wide-bleed,
+// always leaving --bl-page-padding from the viewport edge.
 
 .container-wide {
-  margin-left: calc(var(--bl-container-wide-bleed) * -1);
-  margin-right: calc(var(--bl-container-wide-bleed) * -1);
-  width: calc(100% + var(--bl-container-wide-bleed) + var(--bl-container-wide-bleed));
+  --bl-wide-bleed: min(
+    var(--bl-container-wide-bleed),
+    max(0px, (100vw - 100%) / 2 - var(--bl-page-padding))
+  );
+  margin-left: calc(var(--bl-wide-bleed) * -1);
+  margin-right: calc(var(--bl-wide-bleed) * -1);
+  width: calc(100% + var(--bl-wide-bleed) + var(--bl-wide-bleed));
 
   &.has-background {
-    @media (min-width: calc(#{$content-wide-collapse} + 1px)) {
-      padding-left: var(--bl-container-wide-bleed);
-      padding-right: var(--bl-container-wide-bleed);
-    }
+    padding-left: var(--bl-wide-bleed);
+    padding-right: var(--bl-wide-bleed);
   }
 
-  @media (max-width: $content-wide-collapse) {
-    margin-left: 0;
-    margin-right: 0;
-    width: 100%;
+  // Keep content within the content column: L/R inset is at least the bleed,
+  // but larger container padding still applies.
+  &.-container-wide-content {
+    padding-left: max(var(--bl-container-padding-x, 0px), var(--bl-wide-bleed)) !important;
+    padding-right: max(var(--bl-container-padding-x, 0px), var(--bl-wide-bleed)) !important;
 
-    &.has-background {
-      padding-left: 0;
-      padding-right: 0;
+    // Sliders consume --bl-container-padding-x on the slide content, not the wrapper.
+    &.slider__wrapper {
+      padding-left: 0 !important;
+      padding-right: 0 !important;
     }
   }
 }
 
-// Alignwide
+// Alignwide — fluid bleed capped by --bl-alignwide-bleed,
+// always leaving --bl-page-padding from the viewport edge.
 
 .alignwide {
-  margin-left: calc(var(--bl-alignwide-bleed) * -1);
-  margin-right: calc(var(--bl-alignwide-bleed) * -1);
-
-  @media (max-width: $content-wide-collapse) {
-    margin-left: calc(var(--bl-page-padding) * -0.5);
-    margin-right: calc(var(--bl-page-padding) * -0.5);
-  }
+  --bl-wide-bleed: min(
+    var(--bl-alignwide-bleed),
+    max(0px, (100vw - 100%) / 2 - var(--bl-page-padding))
+  );
+  margin-left: calc(var(--bl-wide-bleed) * -1);
+  margin-right: calc(var(--bl-wide-bleed) * -1);
 
   &.has-background {
-    &.has-background {
-      padding-left: var(--bl-alignwide-bleed);
-      padding-right: var(--bl-alignwide-bleed);
-
-      @media (max-width: $content-wide-collapse) {
-        padding-left: var(--bl-container-padding-x, 0);
-        padding-right: var(--bl-container-padding-x, 0);
-      }
-    }
+    padding-left: var(--bl-wide-bleed);
+    padding-right: var(--bl-wide-bleed);
   }
 }
 

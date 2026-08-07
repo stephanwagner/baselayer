@@ -18,7 +18,12 @@ const { useSelect } = wp.data;
 const { Fragment, useEffect, useRef } = wp.element;
 
 /** Image options owned by the gallery when nested — skip in the image inspector. */
-const GALLERY_OWNED_IMAGE_ATTRIBUTES = ['showImageLabel', 'hasLightbox', 'alignWideContainer'];
+const GALLERY_OWNED_IMAGE_ATTRIBUTES = [
+  'showImageLabel',
+  'hasLightbox',
+  'alignWideContainer',
+  'alignWideContent',
+];
 const GALLERY_OWNED_IMAGE_TYPES = ['container-margin'];
 
 /** Resolved from PHP (bl_block_options store → baselayerBlockOptions). */
@@ -38,8 +43,15 @@ const HIDE_BLOCK_OPTION = {
 const HIDE_BLOCK_CLASS = HIDE_BLOCK_OPTION.className;
 const HIDE_BLOCK_ATTRIBUTE = HIDE_BLOCK_OPTION.attributeName;
 
-/** Class applied by getAlignWideContainerControl() — kept managed so leftovers are stripped. */
+/** Class applied by Inhaltsbreite → Erweitert. */
 const ALIGN_WIDE_CONTAINER_CLASS = 'container-wide';
+/** Pads wide container content back to the content column (overrides L/R inner padding). */
+const ALIGN_WIDE_CONTENT_CLASS = '-container-wide-content';
+const ALIGN_WIDE_CONTAINER_ATTRIBUTE = 'alignWideContainer';
+const ALIGN_WIDE_CONTENT_ATTRIBUTE = 'alignWideContent';
+
+const isAlignWideContainerOption = (option) =>
+  option?.type === 'button-group' && option.attributeName === ALIGN_WIDE_CONTAINER_ATTRIBUTE;
 
 /** Merge global hide ahead of block-specific options. */
 const effectiveBlockConfig = (name, blockConfig) => ({
@@ -231,6 +243,7 @@ const managedStaticClasses = (blockConfig) => {
     ICON_ONLY_CLASS,
     HIDE_BLOCK_CLASS,
     ALIGN_WIDE_CONTAINER_CLASS,
+    ALIGN_WIDE_CONTENT_CLASS,
     ...allCustomManagedClasses(),
     ...LEGACY_IMAGE_TEXT_LAYOUT_CLASSES,
   ]);
@@ -284,6 +297,14 @@ const collectOptionClasses = (blockConfig, attributes) => {
       }
 
       classes.push(attributes[option.attributeName]);
+
+      if (
+        isAlignWideContainerOption(option) &&
+        attributes[option.attributeName] === ALIGN_WIDE_CONTAINER_CLASS &&
+        attributes[ALIGN_WIDE_CONTENT_ATTRIBUTE]
+      ) {
+        classes.push(ALIGN_WIDE_CONTENT_CLASS);
+      }
     }
   });
 
@@ -317,6 +338,9 @@ const blockOptionAttributeKeys = (blockConfig) =>
     const custom = getCustom(option.type);
     if (custom?.attributeKeys) {
       return custom.attributeKeys(option);
+    }
+    if (isAlignWideContainerOption(option)) {
+      return [option.attributeName, ALIGN_WIDE_CONTENT_ATTRIBUTE];
     }
     return [option.attributeName];
   });
@@ -368,6 +392,19 @@ blockOptions.forEach((block) => {
           },
         },
       };
+
+      if (isAlignWideContainerOption(option)) {
+        settings = {
+          ...settings,
+          attributes: {
+            ...settings.attributes,
+            [ALIGN_WIDE_CONTENT_ATTRIBUTE]: {
+              type: 'boolean',
+              default: false,
+            },
+          },
+        };
+      }
     });
 
     return settings;
@@ -407,7 +444,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
       });
     };
 
-    // Custom migrate hooks (e.g. legacy limit-width).
+    // Custom migrate hooks.
     useEffect(() => {
       if (!listedConfig) {
         return;
@@ -428,7 +465,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
       if (Object.keys(updates).length) {
         setOptionAttributes(updates);
       }
-    }, [listedConfig?.name, props.clientId, attributes.limitWidth, attributes.className]);
+    }, [listedConfig?.name, props.clientId, attributes.className]);
 
     useEffect(() => {
       if (!listedConfig || listedConfig.name !== 'core/columns') {
@@ -606,6 +643,11 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
 
                 if (option.type === 'button-group') {
                   if (ToggleGroupControl) {
+                    const wideSelected =
+                      isAlignWideContainerOption(option) &&
+                      (attributes[option.attributeName] ?? option.default ?? '') ===
+                        ALIGN_WIDE_CONTAINER_CLASS;
+
                     return (
                       <BlockOptionWrapper key={getBlockOptionKey(option, index)} option={option} index={index}>
                         <ToggleGroupControl
@@ -613,7 +655,16 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                           label={option.label}
                           value={attributes[option.attributeName] ?? option.default ?? ''}
                           isBlock
-                          onChange={(newValue) => setOptionAttributes({ [option.attributeName]: newValue })}
+                          onChange={(newValue) => {
+                            const next = { [option.attributeName]: newValue };
+                            if (
+                              isAlignWideContainerOption(option) &&
+                              newValue !== ALIGN_WIDE_CONTAINER_CLASS
+                            ) {
+                              next[ALIGN_WIDE_CONTENT_ATTRIBUTE] = false;
+                            }
+                            setOptionAttributes(next);
+                          }}
                           __nextHasNoMarginBottom
                           __next40pxDefaultSize
                           {...optionHelpProps(option)}
@@ -630,6 +681,16 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                             />
                           ))}
                         </ToggleGroupControl>
+                        {wideSelected ? (
+                          <ToggleControl
+                            className="bl-align-wide-content-toggle"
+                            label="Inhalt am Content ausrichten"
+                            checked={Boolean(attributes[ALIGN_WIDE_CONTENT_ATTRIBUTE])}
+                            onChange={(checked) =>
+                              setOptionAttributes({ [ALIGN_WIDE_CONTENT_ATTRIBUTE]: checked })
+                            }
+                          />
+                        ) : null}
                       </BlockOptionWrapper>
                     );
                   }
