@@ -190,6 +190,52 @@ function bl_acf_pro_is_active(): bool
 }
 
 /**
+ * Ensure ACF field types (and post types) are registered before import.
+ *
+ * Theme install may activate ACF Pro after WordPress `init` has already
+ * fired. ACF registers group/repeater types in its own `init` callback, so
+ * that request never flattens nested `sub_fields` and imports leave embeds
+ * that later trigger "Undefined array key _name" warnings.
+ */
+function bl_acf_ensure_ready_for_import(): bool
+{
+	if (!function_exists('acf_import_field_group') || !function_exists('acf')) {
+		return false;
+	}
+
+	$acf = acf();
+	if (!is_object($acf)) {
+		return false;
+	}
+
+	$group_ready = function_exists('acf_get_field_type') && acf_get_field_type('group');
+	$repeater_ready = function_exists('acf_get_field_type') && acf_get_field_type('repeater');
+
+	if ((!$group_ready || !$repeater_ready) && method_exists($acf, 'init')) {
+		// Allow a late init when ACF was activated after WP `init` ran.
+		if (function_exists('acf_get_data') && function_exists('acf_set_data') && acf_get_data('acf_did_init')) {
+			acf_set_data('acf_did_init', null);
+		}
+		$acf->init();
+	}
+
+	if (!post_type_exists('acf-field-group') && method_exists($acf, 'register_post_types')) {
+		$acf->register_post_types();
+	}
+
+	if (method_exists($acf, 'register_post_status') && function_exists('get_post_status_object')) {
+		$status = get_post_status_object('acf-disabled');
+		if (!$status) {
+			$acf->register_post_status();
+		}
+	}
+
+	return (bool) (function_exists('acf_get_field_type')
+		&& acf_get_field_type('group')
+		&& acf_get_field_type('repeater'));
+}
+
+/**
  * Whether all theme catalog field groups exist (key-aware).
  */
 function bl_acf_theme_field_groups_ready(): bool
@@ -271,6 +317,13 @@ function bl_acf_import_run()
 {
 	if (!function_exists('acf_import_field_group')) {
 		return new WP_Error('bl_acf_missing', __('ACF Pro is required to import field groups.', 'baselayer'));
+	}
+
+	if (!bl_acf_ensure_ready_for_import()) {
+		return new WP_Error(
+			'bl_acf_not_ready',
+			__('ACF Pro field types are not ready yet. Activate ACF Pro and try the import again.', 'baselayer')
+		);
 	}
 
 	$groups = bl_acf_import_load_groups();

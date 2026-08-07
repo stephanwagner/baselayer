@@ -501,7 +501,7 @@
                 "choices": {
                     "post": "Beiträge",
                     "projects": "Projekte",
-                    "bl_event": "Events"
+                    "bl_events": "Veranstaltungen"
                 },
                 "default_value": "post",
                 "return_format": "value",
@@ -2937,6 +2937,7 @@
                         "collapsed": "",
                         "button_label": "Button hinzufügen",
                         "rows_per_page": 20,
+                        "parent_repeater": "field_bl_notices",
                         "sub_fields": [
                             {
                                 "key": "field_bl_notice_button_link",
@@ -2956,8 +2957,7 @@
                                 "allow_in_bindings": 0,
                                 "parent_repeater": "field_bl_notice_buttons"
                             }
-                        ],
-                        "parent_repeater": "field_bl_notices"
+                        ]
                     },
                     {
                         "key": "field_bl_notice_show_close_button",
