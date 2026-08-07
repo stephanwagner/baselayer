@@ -5,6 +5,39 @@ defined('ABSPATH') || exit;
 const BL_BLOCK_OPTIONS_PAGE = 'bl-block-options';
 
 /**
+ * Admin menu icon for Block Options (same glyph as Baselayer Blocks menu).
+ *
+ * Used when Block Options is a top-level menu (ACF / Blocks CPT off).
+ * When Blocks is on, Block Options is a submenu and inherits the parent icon.
+ */
+function bl_block_options_menu_icon(): string
+{
+	if (function_exists('bl_blocks_menu_icon')) {
+		return bl_blocks_menu_icon();
+	}
+
+	$svg = '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24" fill="currentColor"><path d="M633.77-486.08 486.85-633q-5.62-5.61-7.93-11.9-2.3-6.28-2.3-13.46 0-7.18 2.3-13.41 2.31-6.23 7.93-11.84l146.92-146.93q5.61-5.61 11.9-7.92 6.28-2.31 13.46-2.31 7.18 0 13.41 2.31t11.84 7.92l146.93 146.93q5.61 5.61 7.92 11.89 2.31 6.28 2.31 13.46 0 7.18-2.31 13.41-2.31 6.24-7.92 11.85L684.38-486.08q-5.61 5.62-11.89 7.92-6.29 2.31-13.46 2.31-7.18 0-13.42-2.31-6.23-2.3-11.84-7.92Zm-481.46-77.77v-207.69q0-15.36 10.39-25.76 10.4-10.39 25.76-10.39h207.69q15.37 0 25.76 10.39 10.4 10.4 10.4 25.76v207.69q0 15.37-10.4 25.76-10.39 10.4-25.76 10.4H188.46q-15.36 0-25.76-10.4-10.39-10.39-10.39-25.76Zm375.38 375.39v-207.69q0-15.37 10.4-25.76 10.39-10.4 25.76-10.4h207.69q15.36 0 25.76 10.4 10.39 10.39 10.39 25.76v207.69q0 15.36-10.39 25.76-10.4 10.39-25.76 10.39H563.85q-15.37 0-25.76-10.39-10.4-10.4-10.4-25.76Zm-375.38 0v-207.69q0-15.37 10.39-25.76 10.4-10.4 25.76-10.4h207.69q15.37 0 25.76 10.4 10.4 10.39 10.4 25.76v207.69q0 15.36-10.4 25.76-10.39 10.39-25.76 10.39H188.46q-15.36 0-25.76-10.39-10.39-10.4-10.39-25.76Zm60-399.23h160v-160h-160v160Zm447.77 43.38 113-113-113-113-113 113 113 113Zm-72.39 332h160v-160h-160v160Zm-375.38 0h160v-160h-160v160Zm160-375.38Zm174.77-69.62Zm-174.77 285Zm215.38 0Z"/></svg>';
+
+	if (function_exists('bl_blocks_svg_menu_icon')) {
+		return bl_blocks_svg_menu_icon($svg);
+	}
+
+	if (function_exists('bl_cpt_svg_to_data_uri')) {
+		return bl_cpt_svg_to_data_uri($svg);
+	}
+
+	$fill = '#f3f1f1';
+	$encoded = preg_replace('/\sfill="[^"]*"/i', ' fill="' . $fill . '"', $svg);
+	if (is_string($encoded) && stripos($encoded, ' fill=') === false) {
+		$encoded = preg_replace('/<svg\b/i', '<svg fill="' . $fill . '"', $encoded, 1);
+	}
+
+	return is_string($encoded) && $encoded !== ''
+		? 'data:image/svg+xml;base64,' . base64_encode($encoded)
+		: 'dashicons-admin-generic';
+}
+
+/**
  * Fallback top-level menu when the Blocks package menu is unavailable.
  * Normal order is registered in bl_blocks_register_admin_menu() (after Blocks).
  */
@@ -26,7 +59,7 @@ function bl_block_options_register_admin_menu_fallback(): void
 		'manage_options',
 		BL_BLOCK_OPTIONS_PAGE,
 		'bl_block_options_render_admin_page',
-		'dashicons-admin-generic',
+		bl_block_options_menu_icon(),
 		82
 	);
 }
