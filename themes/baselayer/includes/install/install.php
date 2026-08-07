@@ -233,7 +233,7 @@ function bl_render_installer(): void
             </li>
           <?php endif; ?>
           <?php if (!empty($summary['has_homepage']) || $homepage_id > 0) : ?>
-            <li style="margin: 0 0 6px;">✓ <?= esc_html__('Homepage and standard pages', 'baselayer') ?></li>
+            <li style="margin: 0 0 6px;">✓ <?= esc_html__('Homepage and standard pages created', 'baselayer') ?></li>
           <?php endif; ?>
           <?php if (!empty($summary['has_blocks_page']) || $blocks_id > 0) : ?>
             <li style="margin: 0 0 6px;">
@@ -1252,6 +1252,13 @@ function baselayer_run_install(): void
       $blocks_bootstrap = get_template_directory() . '/packages/baselayer-blocks/baselayer-blocks.php';
       if (is_readable($blocks_bootstrap)) {
         require_once $blocks_bootstrap;
+      }
+      // Package may already be loaded outside is_admin() (e.g. WP-CLI); import-export is admin-only.
+      if (!function_exists('bl_blocks_import_json_string')) {
+        $import_export = get_template_directory() . '/packages/baselayer-blocks/includes/import-export.php';
+        if (is_readable($import_export)) {
+          require_once $import_export;
+        }
       }
     }
     // Also applies per-block block_options from import-blocks-{lang}.json.

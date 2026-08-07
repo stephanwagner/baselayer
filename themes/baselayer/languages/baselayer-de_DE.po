@@ -560,8 +560,8 @@ msgstr "ACF-Feldgruppen importiert (%d)"
 msgid "ACF field groups pending — finish setup before editing Website / Hero / Blocks"
 msgstr "ACF-Feldgruppen ausstehend — Setup abschließen, bevor Website / Hero / Blöcke bearbeitet werden"
 
-msgid "Homepage and standard pages"
-msgstr "Startseite und Standardseiten"
+msgid "Homepage and standard pages created"
+msgstr "Startseite und Standardseiten erstellt"
 
 msgid "Blocks showcase page"
 msgstr "Blocks-Showcase-Seite"

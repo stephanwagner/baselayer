@@ -1,20 +1,6 @@
 {
     "version": 1,
     "blocks": {
-        "acf/accordion": {
-            "items": [
-                {
-                    "id": "p_acf_accordion_abstand",
-                    "kind": "preset",
-                    "slug": "abstand",
-                    "defaults": {
-                        "c_abstand": {
-                            "defaultSize": "m"
-                        }
-                    }
-                }
-            ]
-        },
         "acf/icon": {
             "items": [
                 {

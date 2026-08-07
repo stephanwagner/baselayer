@@ -560,8 +560,8 @@ msgstr "ACF-Feldgruppen importiert (%d)"
 msgid "ACF field groups pending — finish setup before editing Website / Hero / Blocks"
 msgstr "ACF-Feldgruppen ausstehend — Setup abschließen, bevor Website / Hero / Blöcke bearbeitet werden"
 
-msgid "Homepage and standard pages"
-msgstr "Startseite und Standardseiten"
+msgid "Homepage and standard pages created"
+msgstr "Startseite und Standardseiten erstellt"
 
 msgid "Blocks showcase page"
 msgstr "Blocks-Showcase-Seite"
@@ -3170,7 +3170,7 @@ msgid "You do not have permission to install fonts."
 msgstr "Du hast keine Berechtigung, Fonts zu installieren."
 
 msgid "Select up to 3 fonts to preview and install."
-msgstr "Wählen Sie bis zu 3 Fonts zur Vorschau und Installation."
+msgstr "Wähle bis zu 3 Fonts zur Vorschau und Installation."
 
 msgid "%d fonts installed."
 msgstr "%d Fonts installiert."
@@ -3182,10 +3182,10 @@ msgid "Selected (%1$d/%2$d)"
 msgstr "Ausgewählt (%1$d/%2$d)"
 
 msgid "You can select at most 3 fonts."
-msgstr "Sie können höchstens 3 Fonts auswählen."
+msgstr "Du kannst höchstens 3 Fonts auswählen."
 
 msgid "You can install at most 3 fonts at a time."
-msgstr "Sie können höchstens 3 Fonts auf einmal installieren."
+msgstr "Du kannst höchstens 3 Fonts auf einmal installieren."
 
 msgid "Could not install %1$s: %2$s"
 msgstr "%1$s konnte nicht installiert werden: %2$s"
@@ -3199,7 +3199,7 @@ msgid "Choose a font from the list, then add it to install."
 msgstr "Wähle eine Font aus der Liste und füge sie zum Installieren hinzu."
 
 msgid "Maximum of 3 fonts reached. Remove one to add another."
-msgstr "Maximal 3 Fonts erreicht. Entfernen Sie eine, um eine weitere hinzuzufügen."
+msgstr "Maximal 3 Fonts erreicht. Entferne eine, um eine weitere hinzuzufügen."
 
 msgid "Already selected"
 msgstr "Bereits ausgewählt"
@@ -3216,10 +3216,10 @@ msgstr "Font-Vorschau"
 
 
 msgid "They were added to src/scss/fonts/_fonts.scss. Rebuild your theme CSS to apply them."
-msgstr "Sie wurden in src/scss/fonts/_fonts.scss eingetragen. Bauen Sie das Theme-CSS neu, um sie anzuwenden."
+msgstr "Sie wurden in src/scss/fonts/_fonts.scss eingetragen. Baue das Theme-CSS neu, um sie anzuwenden."
 
 msgid "Fonts were added to src/scss/fonts/_fonts.scss. Rebuild your theme CSS to apply them."
-msgstr "Fonts wurden in src/scss/fonts/_fonts.scss eingetragen. Bauen Sie das Theme-CSS neu, um sie anzuwenden."
+msgstr "Fonts wurden in src/scss/fonts/_fonts.scss eingetragen. Baue das Theme-CSS neu, um sie anzuwenden."
 
 msgid "Could not create the fonts SCSS directory."
 msgstr "Das Fonts-SCSS-Verzeichnis konnte nicht erstellt werden."
