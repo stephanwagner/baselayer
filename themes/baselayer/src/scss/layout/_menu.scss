@@ -614,3 +614,14 @@ body.-menu-block-scroll {
     }
   }
 }
+
+// Suspend menu motion while the viewport is being resized
+body.-is-resizing {
+  .main-menu__wrapper,
+  .header__menu-overlay,
+  .main-menu__toggler-icon-line1,
+  .main-menu__toggler-icon-line2,
+  .main-menu__toggler-icon-line3 {
+    transition: none !important;
+  }
+}

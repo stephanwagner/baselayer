@@ -2,13 +2,39 @@ import { closeMenu, menuIsOpen, openMenu, syncMainMenuA11yState } from './menu-s
 
 export { closeMenu, menuIsOpen, openMenu, syncMainMenuA11yState };
 
-// Menu toggler
-document.addEventListener('DOMContentLoaded', () => {
-  syncMainMenuA11yState();
-  document.querySelectorAll('[data-toggle-menu]').forEach((el) => {
-    el.addEventListener('click', toggleMenu);
-  });
+// Menu resize settle time
+const RESIZE_SETTLE_MS = 240;
+let resizeSettleTimer = null;
+
+function beginViewportResize() {
+  const body = document.body;
+
+  if (!body) {
+    return;
+  }
+
+  body.classList.add('-is-resizing');
+
+  if (resizeSettleTimer) {
+    clearTimeout(resizeSettleTimer);
+  }
+
+  resizeSettleTimer = setTimeout(() => {
+    body.classList.remove('-is-resizing');
+    resizeSettleTimer = null;
+  }, RESIZE_SETTLE_MS);
+}
+
+function initViewportResizeSync() {
+  window.addEventListener('resize', beginViewportResize, { passive: true });
+}
+
+// Initialize menu
+syncMainMenuA11yState();
+document.querySelectorAll('[data-toggle-menu]').forEach((el) => {
+  el.addEventListener('click', toggleMenu);
 });
+initViewportResizeSync();
 
 // Toggle menu
 export function toggleMenu() {
@@ -70,11 +96,7 @@ function findSubmenuToggleForItem(item) {
   }
 
   var ownedToggle = item.querySelector('.sub-menu-toggle[aria-controls]');
-  if (
-    ownedToggle &&
-    ownedToggle.getAttribute('aria-controls') === submenu.id &&
-    ownedToggle.getAttribute('aria-expanded') === 'true'
-  ) {
+  if (ownedToggle && ownedToggle.getAttribute('aria-controls') === submenu.id && ownedToggle.getAttribute('aria-expanded') === 'true') {
     return ownedToggle;
   }
 
