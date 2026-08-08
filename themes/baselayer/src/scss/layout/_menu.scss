@@ -114,7 +114,8 @@
 
     &.-submenu-open > .menu-item__inner,
     &.current-menu-item > .menu-item__inner,
-    &.current-menu-parent > .menu-item__inner {
+    &.current-menu-parent > .menu-item__inner,
+    &.current-page-ancestor > .menu-item__inner {
       > a {
         color: var(--bl-link-color-hover);
       }
@@ -123,7 +124,9 @@
 
   a.active,
   button.bl-lang-item.active,
-  &.current-menu-item:not(.menu-item-has-children) > a {
+  &.current-menu-item:not(.menu-item-has-children) > a,
+  &.current-menu-parent:not(.menu-item-has-children) > a,
+  &.current-page-ancestor:not(.menu-item-has-children) > a {
     color: var(--bl-link-color-hover);
   }
 }
@@ -210,8 +213,9 @@
         }
       }
 
+      &.current-menu-item,
       &.current-menu-parent,
-      &.current-menu-item {
+      &.current-page-ancestor {
         > a,
         > .menu-item__inner > a {
           color: var(--bl-link-color-hover);
