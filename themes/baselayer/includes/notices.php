@@ -7,19 +7,41 @@ defined('ABSPATH') || exit;
  */
 function bl_notices_are_enabled(): bool
 {
-	if (function_exists('bl_website_uses_acf') && bl_website_uses_acf()) {
-		if (!function_exists('get_field')) {
-			return false;
-		}
+	$system = function_exists('bl_theme_blocks_system') ? bl_theme_blocks_system() : 'none';
 
-		return (bool) get_field('notices_enabled', 'option');
-	}
-
-	if (function_exists('bl_website_field')) {
+	if ($system === 'baselayer' && function_exists('bl_website_field')) {
 		return (bool) bl_website_field('notices', 'notices_enabled');
 	}
 
+	if ($system === 'acf' && function_exists('get_field')) {
+		return (bool) get_field('notices_enabled', 'option');
+	}
+
 	return false;
+}
+
+/**
+ * Notice repeater rows from Website settings.
+ *
+ * @return list<array<string, mixed>>
+ */
+function bl_notices_rows(): array
+{
+	$system = function_exists('bl_theme_blocks_system') ? bl_theme_blocks_system() : 'none';
+
+	if ($system === 'baselayer' && function_exists('bl_website_field')) {
+		$rows = bl_website_field('notices', 'notices');
+
+		return is_array($rows) ? array_values(array_filter($rows, 'is_array')) : [];
+	}
+
+	if ($system === 'acf' && function_exists('get_field')) {
+		$rows = get_field('notices', 'option');
+
+		return is_array($rows) ? array_values(array_filter($rows, 'is_array')) : [];
+	}
+
+	return [];
 }
 
 /**
@@ -249,16 +271,8 @@ function bl_notices_get_active(): ?array
 		return null;
 	}
 
-	if (function_exists('bl_website_uses_acf') && bl_website_uses_acf()) {
-		if (!function_exists('get_field')) {
-			return null;
-		}
-		$rows = get_field('notices', 'option');
-	} else {
-		$rows = function_exists('bl_website_field') ? bl_website_field('notices', 'notices') : null;
-	}
-
-	if (!is_array($rows) || $rows === []) {
+	$rows = bl_notices_rows();
+	if ($rows === []) {
 		return null;
 	}
 

@@ -63,44 +63,6 @@ function bl_social_media_label_from_url(string $url): string
 }
 
 /**
- * Channels repeater rows for the current storage backend.
- *
- * Prefers the unified `channels` schema; falls back to legacy channel_1…6 + custom_channels.
- *
- * @return list<array<string, mixed>>
- */
-function bl_social_media_channel_rows(): array
-{
-	if (function_exists('bl_website_uses_acf') && bl_website_uses_acf()) {
-		if (!function_exists('get_field')) {
-			return [];
-		}
-
-		$channels = get_field('channels', 'option');
-		if (is_array($channels) && $channels !== []) {
-			return array_values(array_filter($channels, 'is_array'));
-		}
-
-		return bl_social_media_legacy_rows_from_sources(
-			get_field('social_media', 'option'),
-			get_field('custom_channels', 'option')
-		);
-	}
-
-	$values = function_exists('bl_website_fields') ? bl_website_fields('social-media') : [];
-	$channels = isset($values['channels']) && is_array($values['channels']) ? $values['channels'] : [];
-	if ($channels !== []) {
-		return array_values(array_filter($channels, 'is_array'));
-	}
-
-	$custom = isset($values['custom_channels']) && is_array($values['custom_channels'])
-		? $values['custom_channels']
-		: [];
-
-	return bl_social_media_legacy_rows_from_sources($values, $custom);
-}
-
-/**
  * Convert legacy preset slots + custom repeater into unified channel rows.
  *
  * @param mixed $social
@@ -144,6 +106,44 @@ function bl_social_media_legacy_rows_from_sources($social, $custom): array
 	}
 
 	return $rows;
+}
+
+/**
+ * Channels repeater rows (Baselayer Website Fields, or ACF options).
+ *
+ * @return list<array<string, mixed>>
+ */
+function bl_social_media_channel_rows(): array
+{
+	$system = function_exists('bl_theme_blocks_system') ? bl_theme_blocks_system() : 'none';
+
+	if ($system === 'baselayer' && function_exists('bl_website_fields')) {
+		$values = bl_website_fields('social-media');
+		$channels = isset($values['channels']) && is_array($values['channels']) ? $values['channels'] : [];
+		if ($channels !== []) {
+			return array_values(array_filter($channels, 'is_array'));
+		}
+
+		$custom = isset($values['custom_channels']) && is_array($values['custom_channels'])
+			? $values['custom_channels']
+			: [];
+
+		return bl_social_media_legacy_rows_from_sources($values, $custom);
+	}
+
+	if ($system === 'acf' && function_exists('get_field')) {
+		$channels = get_field('channels', 'option');
+		if (is_array($channels) && $channels !== []) {
+			return array_values(array_filter($channels, 'is_array'));
+		}
+
+		return bl_social_media_legacy_rows_from_sources(
+			get_field('social_media', 'option'),
+			get_field('custom_channels', 'option')
+		);
+	}
+
+	return [];
 }
 
 /**

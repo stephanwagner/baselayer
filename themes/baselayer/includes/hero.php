@@ -25,40 +25,6 @@ function bl_hero_baselayer_values(int $post_id): array
 }
 
 /**
- * Whether Hero should use ACF field storage for this request.
- */
-function bl_hero_uses_acf(): bool
-{
-	if (function_exists('bl_theme_blocks_system')) {
-		return bl_theme_blocks_system() === 'acf';
-	}
-
-	return function_exists('get_field');
-}
-
-/**
- * Whether a stored toggle/checkbox value is on.
- *
- * @param mixed $value
- */
-function bl_hero_truthy($value): bool
-{
-	if (is_bool($value)) {
-		return $value;
-	}
-	if (is_int($value) || is_float($value)) {
-		return (int) $value !== 0;
-	}
-	if (is_string($value)) {
-		$v = strtolower(trim($value));
-
-		return $v !== '' && $v !== '0' && $v !== 'false' && $v !== 'off' && $v !== 'no';
-	}
-
-	return !empty($value);
-}
-
-/**
  * Attachment ID from a Baselayer/ACF media field value.
  *
  * @param mixed $value
@@ -109,6 +75,28 @@ function bl_hero_normalize_link($link): ?array
 }
 
 /**
+ * Whether a stored ACF toggle/checkbox value is on.
+ *
+ * @param mixed $value
+ */
+function bl_hero_truthy($value): bool
+{
+	if (is_bool($value)) {
+		return $value;
+	}
+	if (is_int($value) || is_float($value)) {
+		return (int) $value !== 0;
+	}
+	if (is_string($value)) {
+		$v = strtolower(trim($value));
+
+		return $v !== '' && $v !== '0' && $v !== 'false' && $v !== 'off' && $v !== 'no';
+	}
+
+	return !empty($value);
+}
+
+/**
  * Whether the page hero is enabled for a post.
  */
 function bl_hero_is_enabled(?int $post_id = null): bool
@@ -121,17 +109,45 @@ function bl_hero_is_enabled(?int $post_id = null): bool
 		return false;
 	}
 
-	if (bl_hero_uses_acf()) {
-		if (!function_exists('get_field')) {
-			return false;
-		}
+	$system = function_exists('bl_theme_blocks_system') ? bl_theme_blocks_system() : 'none';
 
+	if ($system === 'baselayer' && function_exists('bl_page_field')) {
+		return (bool) bl_page_field('hero', 'hero_enabled', $post_id);
+	}
+
+	if ($system === 'acf' && function_exists('get_field')) {
 		return bl_hero_truthy(get_field('hero_enabled', $post_id));
 	}
 
-	return (bool) (function_exists('bl_page_field')
-		? bl_page_field('hero', 'hero_enabled', $post_id)
-		: false);
+	return false;
+}
+
+/**
+ * Hero slide rows for a post.
+ *
+ * @return list<array<string, mixed>>
+ */
+function bl_hero_slide_rows(int $post_id): array
+{
+	$system = function_exists('bl_theme_blocks_system') ? bl_theme_blocks_system() : 'none';
+
+	if ($system === 'baselayer' && function_exists('bl_page_field')) {
+		$rows = bl_page_field('hero', 'hero_slides', $post_id);
+		if (!is_array($rows)) {
+			$values = bl_hero_baselayer_values($post_id);
+			$rows = $values['hero_slides'] ?? [];
+		}
+
+		return is_array($rows) ? array_values(array_filter($rows, 'is_array')) : [];
+	}
+
+	if ($system === 'acf' && function_exists('get_field')) {
+		$rows = get_field('hero_slides', $post_id);
+
+		return is_array($rows) ? array_values(array_filter($rows, 'is_array')) : [];
+	}
+
+	return [];
 }
 
 /**
@@ -272,28 +288,6 @@ function bl_hero_resolve_slide(array $row, int $post_id): array
 		'text_html' => $text_html,
 		'links' => $links,
 	];
-}
-
-/**
- * Hero slide rows for a post (ACF or Baselayer Content Fields).
- *
- * @return list<array<string, mixed>>
- */
-function bl_hero_slide_rows(int $post_id): array
-{
-	if (bl_hero_uses_acf()) {
-		if (!function_exists('get_field')) {
-			return [];
-		}
-		$rows = get_field('hero_slides', $post_id);
-
-		return is_array($rows) ? $rows : [];
-	}
-
-	$values = bl_hero_baselayer_values($post_id);
-	$rows = $values['hero_slides'] ?? [];
-
-	return is_array($rows) ? $rows : [];
 }
 
 /**

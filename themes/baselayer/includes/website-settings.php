@@ -4,6 +4,8 @@ defined('ABSPATH') || exit;
 
 /**
  * Whether Website settings should use ACF options storage.
+ *
+ * @deprecated Prefer exclusive *-data-acf.php / *-data-baselayer.php loaders.
  */
 function bl_website_uses_acf(): bool
 {
@@ -109,45 +111,6 @@ function bl_website_field(string $slug, string $name)
 	}
 
 	return bl_blocks_format_field_value($field, $raw);
-}
-
-/**
- * Company details from Website → General (or ACF company group).
- *
- * @return array{name: string, address: string, phone: string, email: string}
- */
-function bl_get_company(): array
-{
-	$empty = [
-		'name' => '',
-		'address' => '',
-		'phone' => '',
-		'email' => '',
-	];
-
-	if (bl_website_uses_acf()) {
-		if (!function_exists('get_field')) {
-			return $empty;
-		}
-		$company = get_field('company', 'option');
-		$company = is_array($company) ? $company : [];
-
-		return [
-			'name' => (string) ($company['name'] ?? ''),
-			'address' => (string) ($company['address'] ?? ''),
-			'phone' => (string) ($company['phone'] ?? ''),
-			'email' => (string) ($company['email'] ?? ''),
-		];
-	}
-
-	$values = bl_website_fields('general');
-
-	return [
-		'name' => (string) ($values['name'] ?? ''),
-		'address' => (string) ($values['address'] ?? ''),
-		'phone' => (string) ($values['phone'] ?? ''),
-		'email' => (string) ($values['email'] ?? ''),
-	];
 }
 
 /**

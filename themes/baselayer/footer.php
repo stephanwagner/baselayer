@@ -2,11 +2,29 @@
 	<div class="footer__container container">
 		<div class="footer__text">
 			<?php
-			$company = function_exists('bl_get_company') ? bl_get_company() : [];
-			$company_name = (string) ($company['name'] ?? '');
-			$company_address = (string) ($company['address'] ?? '');
-			$company_phone = (string) ($company['phone'] ?? '');
-			$company_email = (string) ($company['email'] ?? '');
+			$company_name = '';
+			$company_address = '';
+			$company_phone = '';
+			$company_email = '';
+
+			// ACF
+			// Remove this section if you don't use ACF
+			if (function_exists('bl_theme_blocks_system') && bl_theme_blocks_system() === 'acf' && function_exists('get_field')) {
+				$company = get_field('company', 'option');
+				$company = is_array($company) ? $company : [];
+				$company_name = (string) ($company['name'] ?? '');
+				$company_address = (string) ($company['address'] ?? '');
+				$company_phone = (string) ($company['phone'] ?? '');
+				$company_email = (string) ($company['email'] ?? '');
+
+			// BaseLayer Blocks
+			// Remove this section if you don't use BaseLayer Blocks
+			} elseif (function_exists('bl_website_field')) {
+				$company_name = (string) (bl_website_field('general', 'name') ?? '');
+				$company_address = (string) (bl_website_field('general', 'address') ?? '');
+				$company_phone = (string) (bl_website_field('general', 'phone') ?? '');
+				$company_email = (string) (bl_website_field('general', 'email') ?? '');
+			}
 			?>
 			<?php if ($company_name !== '') : ?>
 				<b><?= esc_html($company_name) ?></b><br>

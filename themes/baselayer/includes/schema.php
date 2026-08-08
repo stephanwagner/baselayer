@@ -48,36 +48,38 @@ function bl_schema_resolve_image_url($image): string
  */
 function bl_schema_get_data(): ?array
 {
-	$has_schema = false;
-	$schema = [];
+	$system = function_exists('bl_theme_blocks_system') ? bl_theme_blocks_system() : 'none';
+	$schema = null;
 
-	if (function_exists('bl_website_uses_acf') && bl_website_uses_acf()) {
-		if (!function_exists('get_field')) {
+	if ($system === 'baselayer' && function_exists('bl_website_field')) {
+		if (!bl_website_field('search-engines', 'has_schema')) {
 			return null;
 		}
+		$schema = function_exists('bl_website_fields') ? bl_website_fields('search-engines') : [];
+	} elseif ($system === 'acf' && function_exists('get_field')) {
 		if (!get_field('has_schema', 'option')) {
 			return null;
 		}
-		$has_schema = true;
 		$raw = get_field('schema', 'option');
 		$schema = is_array($raw) ? $raw : [];
 	} else {
-		if (!function_exists('bl_website_field') || !bl_website_field('search-engines', 'has_schema')) {
-			return null;
-		}
-		$has_schema = true;
-		$schema = function_exists('bl_website_fields') ? bl_website_fields('search-engines') : [];
+		return null;
 	}
 
-	if (!$has_schema) {
+	if (!is_array($schema)) {
 		return null;
 	}
 
 	$type = trim((string) ($schema['type'] ?? ''));
 	$name = trim((string) ($schema['organization_name'] ?? ''));
 	if ($name === '') {
-		$company = function_exists('bl_get_company') ? bl_get_company() : [];
-		$name = trim((string) ($company['name'] ?? ''));
+		if ($system === 'baselayer' && function_exists('bl_website_field')) {
+			$name = trim((string) (bl_website_field('general', 'name') ?? ''));
+		} elseif ($system === 'acf' && function_exists('get_field')) {
+			$company = get_field('company', 'option');
+			$company = is_array($company) ? $company : [];
+			$name = trim((string) ($company['name'] ?? ''));
+		}
 	}
 
 	if ($type === '' || $name === '') {
