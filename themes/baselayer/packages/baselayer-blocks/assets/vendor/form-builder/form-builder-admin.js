@@ -388,7 +388,7 @@
       base.post_types = pickerPostTypeCatalog().map((row) => row.value);
     }
     if (type === "link") {
-      base.link_types = ["page", "url", "email", "phone"];
+      base.link_types = ["page", "url", "email", "phone", "file"];
       base.allow_target = true;
     }
     if (type === "file" || type === "image") {
@@ -2011,7 +2011,7 @@
       delete field.button_text;
     }
     if (nextType === "link") {
-      const allowed = ["page", "url", "email", "phone"];
+      const allowed = ["page", "url", "email", "phone", "file"];
       const raw = Array.isArray(field.link_types) ? field.link_types : [];
       field.link_types = raw.filter((t2) => allowed.includes(t2));
       if (field.link_types.length === 0) {
@@ -4229,7 +4229,7 @@
       }
     }
     if (type === "link") {
-      const allowed = ["page", "url", "email", "phone"];
+      const allowed = ["page", "url", "email", "phone", "file"];
       const checked = Array.from(body.querySelectorAll("[data-bl-link-type]:checked")).map(
         (input) => input.value
       );
@@ -4934,12 +4934,13 @@
           );
         }
         if (field.type === "link") {
-          const allowedKeys = ["page", "url", "email", "phone"];
+          const allowedKeys = ["page", "url", "email", "phone", "file"];
           const labels = {
             page: t("linkTypePage", "Page"),
             url: t("linkTypeUrl", "URL"),
             email: t("linkTypeEmail", "Email"),
-            phone: t("linkTypePhone", "Phone")
+            phone: t("linkTypePhone", "Phone"),
+            file: t("linkTypeFile", "File")
           };
           let selected = Array.isArray(field.link_types) ? field.link_types.filter((k) => allowedKeys.includes(k)) : [...allowedKeys];
           if (selected.length === 0) {

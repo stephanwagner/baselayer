@@ -895,7 +895,7 @@ function bl_blocks_sanitize_leaf_field_fallback(array $field): array
 		unset($out['placeholder'], $out['default_value']);
 	}
 	if ($out['type'] === 'link') {
-		$allowed = ['page', 'url', 'email', 'phone'];
+		$allowed = ['page', 'url', 'email', 'phone', 'file'];
 		$raw_types = isset($field['link_types']) && is_array($field['link_types']) ? $field['link_types'] : $allowed;
 		$types = [];
 		foreach ($raw_types as $lt) {
@@ -1223,11 +1223,11 @@ function bl_blocks_normalize_link_href(string $raw): string
  *
  * @param array<string, mixed> $field
  * @param mixed                $raw
- * @return array{type:string,url:string,title:string,page_id?:int,target?:string}
+ * @return array{type:string,url:string,title:string,page_id?:int,attachment_id?:int,target?:string}
  */
 function bl_blocks_sanitize_link_value(array $field, $raw): array
 {
-	$allowed = ['page', 'url', 'email', 'phone'];
+	$allowed = ['page', 'url', 'email', 'phone', 'file'];
 	$link_types = [];
 	if (isset($field['link_types']) && is_array($field['link_types'])) {
 		foreach ($field['link_types'] as $lt) {
@@ -1251,6 +1251,7 @@ function bl_blocks_sanitize_link_value(array $field, $raw): array
 	$title = sanitize_text_field((string) ($raw['title'] ?? ''));
 	$url = '';
 	$page_id = 0;
+	$attachment_id = 0;
 
 	if ($type === 'page') {
 		$page_id = absint($raw['page_id'] ?? 0);
@@ -1268,6 +1269,24 @@ function bl_blocks_sanitize_link_value(array $field, $raw): array
 		// Allow explicit url from editor hydrate when post lookup fails in REST-only contexts.
 		if ($url === '' && !empty($raw['url'])) {
 			$url = sanitize_text_field((string) $raw['url']);
+		}
+	} elseif ($type === 'file') {
+		$attachment_id = absint($raw['attachment_id'] ?? 0);
+		if ($attachment_id > 0) {
+			$post = get_post($attachment_id);
+			if ($post && $post->post_type === 'attachment' && $post->post_status !== 'trash') {
+				$att_url = wp_get_attachment_url($attachment_id);
+				$url = is_string($att_url) ? $att_url : '';
+				if ($title === '') {
+					$file = get_attached_file($attachment_id);
+					$title = is_string($file) && $file !== '' ? wp_basename($file) : (get_the_title($post) ?: '');
+				}
+			} else {
+				$attachment_id = 0;
+			}
+		}
+		if ($url === '' && !empty($raw['url'])) {
+			$url = esc_url_raw((string) $raw['url']);
 		}
 	} elseif ($type === 'email') {
 		$addr = sanitize_email(preg_replace('/^mailto:/i', '', (string) ($raw['url'] ?? '')));
@@ -1298,7 +1317,10 @@ function bl_blocks_sanitize_link_value(array $field, $raw): array
 	if ($type === 'page') {
 		$out['page_id'] = $page_id;
 	}
-	if ($allow_target && in_array($type, ['page', 'url'], true) && (($raw['target'] ?? '') === '_blank')) {
+	if ($type === 'file') {
+		$out['attachment_id'] = $attachment_id;
+	}
+	if ($allow_target && in_array($type, ['page', 'url', 'file'], true) && (($raw['target'] ?? '') === '_blank')) {
 		$out['target'] = '_blank';
 	}
 

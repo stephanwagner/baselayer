@@ -1765,7 +1765,7 @@ function bl_forms_sanitize_field($field): ?array
 	}
 
 	if ($type === 'link') {
-		$allowed = ['page', 'url', 'email', 'phone'];
+		$allowed = ['page', 'url', 'email', 'phone', 'file'];
 		$raw_types = isset($field['link_types']) && is_array($field['link_types']) ? $field['link_types'] : $allowed;
 		$types = [];
 		foreach ($raw_types as $lt) {

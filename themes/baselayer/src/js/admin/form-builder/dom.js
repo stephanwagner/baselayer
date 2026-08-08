@@ -465,7 +465,7 @@ export function defaultField(type = 'text') {
     base.post_types = pickerPostTypeCatalog().map((row) => row.value);
   }
   if (type === 'link') {
-    base.link_types = ['page', 'url', 'email', 'phone'];
+    base.link_types = ['page', 'url', 'email', 'phone', 'file'];
     base.allow_target = true;
   }
   if (type === 'file' || type === 'image') {

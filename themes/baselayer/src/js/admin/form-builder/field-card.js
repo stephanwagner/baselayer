@@ -354,7 +354,7 @@ function convertFieldType(field, nextType) {
   }
 
   if (nextType === 'link') {
-    const allowed = ['page', 'url', 'email', 'phone'];
+    const allowed = ['page', 'url', 'email', 'phone', 'file'];
     const raw = Array.isArray(field.link_types) ? field.link_types : [];
     field.link_types = raw.filter((t) => allowed.includes(t));
     if (field.link_types.length === 0) {
@@ -2913,7 +2913,7 @@ export function serializeRow(row) {
     }
   }
   if (type === 'link') {
-    const allowed = ['page', 'url', 'email', 'phone'];
+    const allowed = ['page', 'url', 'email', 'phone', 'file'];
     const checked = Array.from(body.querySelectorAll('[data-bl-link-type]:checked')).map(
       (input) => input.value
     );
@@ -3695,12 +3695,13 @@ export function createFieldCard(initial, open = false) {
       }
 
       if (field.type === 'link') {
-        const allowedKeys = ['page', 'url', 'email', 'phone'];
+        const allowedKeys = ['page', 'url', 'email', 'phone', 'file'];
         const labels = {
           page: t('linkTypePage', 'Page'),
           url: t('linkTypeUrl', 'URL'),
           email: t('linkTypeEmail', 'Email'),
           phone: t('linkTypePhone', 'Phone'),
+          file: t('linkTypeFile', 'File'),
         };
         let selected = Array.isArray(field.link_types)
           ? field.link_types.filter((k) => allowedKeys.includes(k))

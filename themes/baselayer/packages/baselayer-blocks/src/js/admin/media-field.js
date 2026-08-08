@@ -50,11 +50,11 @@ export function normalizeAttachmentIds(current, multiple) {
 
 /**
  * @param {object} json
- * @returns {{ id: number, url: string, filename: string, mime: string, type: string, alt: string }}
+ * @returns {{ id: number, url: string, fileUrl: string, filename: string, mime: string, type: string, alt: string }}
  */
-function attachmentFromJson(json) {
+export function attachmentFromJson(json) {
   const sizes = json.sizes || {};
-  const url =
+  const previewUrl =
     (sizes.thumbnail && sizes.thumbnail.url) ||
     (sizes.medium && sizes.medium.url) ||
     json.url ||
@@ -62,7 +62,8 @@ function attachmentFromJson(json) {
     '';
   return {
     id: Number(json.id) || 0,
-    url: String(url || ''),
+    url: String(previewUrl || ''),
+    fileUrl: String(json.url || ''),
     filename: String(json.filename || json.title || ('#' + (json.id || ''))),
     mime: String(json.mime || json.mime_type || ''),
     type: String(json.type || ''),
@@ -72,12 +73,12 @@ function attachmentFromJson(json) {
 
 /**
  * @param {number} id
- * @returns {Promise<{ id: number, url: string, filename: string, mime: string, type: string, alt: string }>}
+ * @returns {Promise<{ id: number, url: string, fileUrl: string, filename: string, mime: string, type: string, alt: string }>}
  */
-function fetchAttachment(id) {
+export function fetchAttachment(id) {
   return new Promise((resolve) => {
     if (!id || typeof wp === 'undefined' || !wp.media || !wp.media.attachment) {
-      resolve({ id, url: '', filename: '#' + id, mime: '', type: '', alt: '' });
+      resolve({ id, url: '', fileUrl: '', filename: '#' + id, mime: '', type: '', alt: '' });
       return;
     }
     const att = wp.media.attachment(id);
@@ -85,7 +86,7 @@ function fetchAttachment(id) {
       try {
         resolve(attachmentFromJson(att.toJSON()));
       } catch (e) {
-        resolve({ id, url: '', filename: '#' + id, mime: '', type: '', alt: '' });
+        resolve({ id, url: '', fileUrl: '', filename: '#' + id, mime: '', type: '', alt: '' });
       }
     };
     if (att.get('url')) {
@@ -93,7 +94,7 @@ function fetchAttachment(id) {
       return;
     }
     att.fetch().done(done).fail(() => {
-      resolve({ id, url: '', filename: '#' + id, mime: '', type: '', alt: '' });
+      resolve({ id, url: '', fileUrl: '', filename: '#' + id, mime: '', type: '', alt: '' });
     });
   });
 }
@@ -110,7 +111,7 @@ function extensionBadge(filename) {
  * @param {(id: number) => void} onRemove
  * @returns {HTMLElement}
  */
-function buildMediaCard(item, kind, onRemove) {
+export function buildMediaCard(item, kind, onRemove) {
   const isImage = item.type === 'image' || kind === 'image';
   const card = el('div', {
     className: 'bl-blocks-fields__media-card' + (isImage ? ' is-image' : ' is-file'),

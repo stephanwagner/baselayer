@@ -3,8 +3,13 @@
  */
 import { openPagePicker } from '../../../../../src/js/admin/utils/page-picker.js';
 import { buildPagePreview } from './page-field.js';
+import {
+  attachmentFromJson,
+  buildMediaCard,
+  fetchAttachment,
+} from './media-field.js';
 
-const LINK_TYPES = ['page', 'url', 'email', 'phone'];
+const LINK_TYPES = ['page', 'url', 'email', 'phone', 'file'];
 
 function el(tag, props = {}, children = []) {
   const node = document.createElement(tag);
@@ -65,6 +70,7 @@ function normalizeLinkValue(current, allowed) {
     url: '',
     title: '',
     page_id: 0,
+    attachment_id: 0,
     target: '',
   };
   if (!current || typeof current !== 'object' || Array.isArray(current)) {
@@ -79,6 +85,7 @@ function normalizeLinkValue(current, allowed) {
     url: current.url != null ? String(current.url) : '',
     title: current.title != null ? String(current.title) : '',
     page_id: Number(current.page_id) || 0,
+    attachment_id: Number(current.attachment_id) || 0,
     target: current.target === '_blank' ? '_blank' : '',
   };
 }
@@ -108,6 +115,7 @@ function normalizeLinkHref(raw) {
 
 function destinationFieldLabel(type) {
   if (type === 'page') return i18n('linkDestPage', 'Page');
+  if (type === 'file') return i18n('linkDestFile', 'File');
   if (type === 'email') return i18n('linkDestEmail', 'Email address');
   if (type === 'phone') return i18n('linkDestPhone', 'Phone number');
   return i18n('linkDestUrl', 'URL');
@@ -127,6 +135,21 @@ export function createLinkControl(field, current) {
     state.type === 'page' && state.page_id > 0
       ? { id: state.page_id, title: state.title || '', url: state.url || '' }
       : null;
+  /** @type {{ id: number, url: string, fileUrl: string, filename: string, mime: string, type: string, alt: string }|null} */
+  let fileMeta =
+    state.type === 'file' && state.attachment_id > 0
+      ? {
+          id: state.attachment_id,
+          url: '',
+          fileUrl: state.url || '',
+          filename: state.title || '#' + state.attachment_id,
+          mime: '',
+          type: '',
+          alt: '',
+        }
+      : null;
+  /** @type {object|null} */
+  let fileFrame = null;
 
   const root = el('div', {
     className: 'bl-blocks-fields__link',
@@ -157,12 +180,25 @@ export function createLinkControl(field, current) {
   ]);
 
   const syncTargetVisibility = () => {
-    const show = allowTarget && (state.type === 'page' || state.type === 'url');
+    const show =
+      allowTarget && (state.type === 'page' || state.type === 'url' || state.type === 'file');
     targetRow.hidden = !show;
     if (!show) {
       targetInput.checked = false;
       state.target = '';
     }
+  };
+
+  const clearFile = () => {
+    fileMeta = null;
+    state.attachment_id = 0;
+    state.url = '';
+  };
+
+  const clearPage = () => {
+    pageMeta = null;
+    state.page_id = 0;
+    state.url = '';
   };
 
   const renderDestination = () => {
@@ -186,9 +222,7 @@ export function createLinkControl(field, current) {
       if (pageMeta) {
         summary.appendChild(
           buildPagePreview([pageMeta], false, () => {
-            pageMeta = null;
-            state.page_id = 0;
-            state.url = '';
+            clearPage();
             renderDestination();
             dispatchChange();
           })
@@ -233,9 +267,95 @@ export function createLinkControl(field, current) {
         dispatchChange();
       });
       clearBtn.addEventListener('click', () => {
-        pageMeta = null;
-        state.page_id = 0;
-        state.url = '';
+        clearPage();
+        renderDestination();
+        dispatchChange();
+      });
+      destWrap.appendChild(
+        el('div', { className: 'bl-blocks-fields__page-picker-row' }, [
+          summary,
+          el('div', { className: 'bl-blocks-fields__page-picker-actions' }, [pickBtn, clearBtn]),
+        ])
+      );
+      return;
+    }
+
+    if (state.type === 'file') {
+      const summary = el('div', { className: 'bl-blocks-fields__page-picker-summary' });
+      const pickBtn = el('button', {
+        type: 'button',
+        className: 'button bl-button',
+        text: fileMeta
+          ? i18n('changeFile', 'Change file')
+          : i18n('chooseFile', 'Choose file'),
+      });
+      const clearBtn = el('button', {
+        type: 'button',
+        className: 'button-link',
+        text: i18n('clearMedia', 'Clear'),
+        hidden: !fileMeta,
+      });
+      if (fileMeta) {
+        const preview = el('div', { className: 'bl-blocks-fields__media-preview' });
+        preview.appendChild(
+          buildMediaCard(fileMeta, 'file', () => {
+            clearFile();
+            renderDestination();
+            dispatchChange();
+          })
+        );
+        summary.appendChild(preview);
+      } else {
+        summary.appendChild(
+          el('span', {
+            className: 'description',
+            text: i18n('chooseFileHelp', 'Select a file.'),
+          })
+        );
+      }
+      pickBtn.addEventListener('click', () => {
+        if (typeof wp === 'undefined' || !wp.media) {
+          console.error('Media library is unavailable.');
+          return;
+        }
+        if (fileFrame) {
+          fileFrame.open();
+          return;
+        }
+        fileFrame = wp.media({
+          title: i18n('mediaPickerTitleFile', 'Select file'),
+          button: { text: i18n('selectMedia', 'Select') },
+          multiple: false,
+        });
+        fileFrame.on('select', () => {
+          const selection = fileFrame.state().get('selection');
+          const model = selection && selection.first ? selection.first() : null;
+          if (!model) return;
+          const json = model.toJSON();
+          fileMeta = attachmentFromJson(json);
+          state.attachment_id = fileMeta.id;
+          state.url = fileMeta.fileUrl || String(json.url || '');
+          if (!String(titleInput.value || '').trim() && fileMeta.filename) {
+            titleInput.value = fileMeta.filename;
+            state.title = fileMeta.filename;
+          }
+          renderDestination();
+          dispatchChange();
+        });
+        fileFrame.on('open', () => {
+          const selection = fileFrame.state().get('selection');
+          if (!selection) return;
+          selection.reset();
+          if (fileMeta && fileMeta.id > 0) {
+            const att = wp.media.attachment(fileMeta.id);
+            selection.add(att);
+            att.fetch();
+          }
+        });
+        fileFrame.open();
+      });
+      clearBtn.addEventListener('click', () => {
+        clearFile();
         renderDestination();
         dispatchChange();
       });
@@ -284,6 +404,7 @@ export function createLinkControl(field, current) {
       url: i18n('linkTypeUrl', 'URL'),
       email: i18n('linkTypeEmail', 'Email'),
       phone: i18n('linkTypePhone', 'Phone'),
+      file: i18n('linkTypeFile', 'File'),
     };
     allowed.forEach((type) => {
       const btn = el('button', {
@@ -299,8 +420,10 @@ export function createLinkControl(field, current) {
         state.type = type;
         state.url = '';
         state.page_id = 0;
+        state.attachment_id = 0;
         state.target = '';
         pageMeta = null;
+        fileMeta = null;
         targetInput.checked = false;
         typeRow.querySelectorAll('[data-link-type]').forEach((node) => {
           node.classList.toggle('is-active', node.dataset.linkType === type);
@@ -356,6 +479,22 @@ export function createLinkControl(field, current) {
     }
   }
 
+  // Hydrate file preview if only attachment id is known.
+  if (state.type === 'file' && state.attachment_id > 0) {
+    fetchAttachment(state.attachment_id).then((item) => {
+      if (!item || item.id !== state.attachment_id) return;
+      fileMeta = item;
+      if (item.fileUrl) {
+        state.url = item.fileUrl;
+      }
+      if (!String(titleInput.value || '').trim() && item.filename) {
+        titleInput.value = item.filename;
+        state.title = item.filename;
+      }
+      renderDestination();
+    });
+  }
+
   root.getLinkValue = () => {
     const destInput = destWrap.querySelector('input:not([type="hidden"])');
     const title = String(titleInput.value || '').trim();
@@ -368,6 +507,10 @@ export function createLinkControl(field, current) {
     if (state.type === 'page') {
       out.page_id = state.page_id > 0 ? state.page_id : 0;
       out.url = (pageMeta && pageMeta.url) || state.url || '';
+    } else if (state.type === 'file') {
+      out.attachment_id = state.attachment_id > 0 ? state.attachment_id : 0;
+      out.url =
+        (fileMeta && (fileMeta.fileUrl || fileMeta.url)) || state.url || '';
     } else if (state.type === 'email') {
       const email = String(destInput ? destInput.value : state.url || '')
         .replace(/^mailto:/i, '')
@@ -387,7 +530,11 @@ export function createLinkControl(field, current) {
       state.url = href;
     }
 
-    if (allowTarget && (state.type === 'page' || state.type === 'url') && targetInput.checked) {
+    if (
+      allowTarget &&
+      (state.type === 'page' || state.type === 'url' || state.type === 'file') &&
+      targetInput.checked
+    ) {
       out.target = '_blank';
     }
     return out;
@@ -428,6 +575,7 @@ export function bindLinkFields(root = document) {
           url: get('url'),
           title: get('title'),
           page_id: get('page_id'),
+          attachment_id: get('attachment_id'),
           target: get('target'),
         },
         allowed
@@ -450,7 +598,7 @@ export function bindLinkFields(root = document) {
       if (!inputsHost) return;
       const value = control.getLinkValue();
       inputsHost.replaceChildren();
-      const keys = ['type', 'url', 'title', 'page_id'];
+      const keys = ['type', 'url', 'title', 'page_id', 'attachment_id'];
       keys.forEach((key) => {
         const val = value[key] != null ? String(value[key]) : '';
         const input = el('input', {

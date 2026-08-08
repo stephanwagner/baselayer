@@ -213,6 +213,9 @@ function bl_blocks_format_field_value(array $field, $value)
 		if (isset($value['page_id'])) {
 			$out['page_id'] = absint($value['page_id']);
 		}
+		if (isset($value['attachment_id'])) {
+			$out['attachment_id'] = absint($value['attachment_id']);
+		}
 
 		return $out;
 	}

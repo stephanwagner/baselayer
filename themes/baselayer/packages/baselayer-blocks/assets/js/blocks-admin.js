@@ -6693,420 +6693,8 @@
     });
   }
 
-  // themes/baselayer/packages/baselayer-blocks/src/js/admin/link-field.js
-  var LINK_TYPES = ["page", "url", "email", "phone"];
-  function el5(tag, props = {}, children = []) {
-    const node = document.createElement(tag);
-    Object.entries(props).forEach(([key, value]) => {
-      if (value == null || value === false) return;
-      if (key === "className") node.className = value;
-      else if (key === "text") node.textContent = value;
-      else if (key === "dataset") Object.assign(node.dataset, value);
-      else if (key.startsWith("on") && typeof value === "function") {
-        node.addEventListener(key.slice(2).toLowerCase(), value);
-      } else if (key === "checked") node.checked = Boolean(value);
-      else if (key === "value") node.value = value === true ? "" : String(value);
-      else node.setAttribute(key, value === true ? "" : String(value));
-    });
-    (Array.isArray(children) ? children : [children]).forEach((child) => {
-      if (child == null || child === false) return;
-      node.appendChild(typeof child === "string" ? document.createTextNode(child) : child);
-    });
-    return node;
-  }
-  function i18n2(key, fallback) {
-    const dict = window.blBlocksFieldUi && window.blBlocksFieldUi.i18n || window.blBlocksEditor && window.blBlocksEditor.i18n || window.blBlocksPage && window.blBlocksPage.i18n || window.blBlocksAdmin && window.blBlocksAdmin.i18n || {};
-    return dict[key] || fallback || key;
-  }
-  function pickerConfig2() {
-    const sources = [
-      window.blBlocksFieldUi,
-      window.blBlocksEditor,
-      window.blBlocksPage,
-      window.blBlocksAdmin
-    ];
-    let restUrl = "";
-    let restNonce = "";
-    sources.forEach((src) => {
-      if (!src) return;
-      if (!restUrl && src.pagesRestUrl) restUrl = src.pagesRestUrl;
-      if (!restNonce && src.restNonce) restNonce = src.restNonce;
-    });
-    return { restUrl, restNonce };
-  }
-  function allowedLinkTypes(field) {
-    const raw = Array.isArray(field.link_types) ? field.link_types : LINK_TYPES;
-    const list = raw.map(String).filter((t6) => LINK_TYPES.includes(t6));
-    return list.length ? list : [...LINK_TYPES];
-  }
-  function normalizeLinkValue(current, allowed) {
-    const empty = {
-      type: allowed[0] || "url",
-      url: "",
-      title: "",
-      page_id: 0,
-      target: ""
-    };
-    if (!current || typeof current !== "object" || Array.isArray(current)) {
-      return empty;
-    }
-    let type = String(current.type || "");
-    if (!allowed.includes(type)) {
-      type = allowed[0] || "url";
-    }
-    return {
-      type,
-      url: current.url != null ? String(current.url) : "",
-      title: current.title != null ? String(current.title) : "",
-      page_id: Number(current.page_id) || 0,
-      target: current.target === "_blank" ? "_blank" : ""
-    };
-  }
-  function displayDestination(state) {
-    if (state.type === "email") {
-      return String(state.url || "").replace(/^mailto:/i, "");
-    }
-    if (state.type === "phone") {
-      return String(state.url || "").replace(/^tel:/i, "");
-    }
-    return String(state.url || "");
-  }
-  function normalizeLinkHref(raw) {
-    const v = String(raw || "").trim();
-    if (!v) return "";
-    if (/^([/#?]|\/\/|[a-z][a-z0-9+.\-]*:)/i.test(v)) {
-      return v;
-    }
-    return "https://" + v;
-  }
-  function destinationFieldLabel(type) {
-    if (type === "page") return i18n2("linkDestPage", "Page");
-    if (type === "email") return i18n2("linkDestEmail", "Email address");
-    if (type === "phone") return i18n2("linkDestPhone", "Phone number");
-    return i18n2("linkDestUrl", "URL");
-  }
-  function createLinkControl(field, current) {
-    const allowed = allowedLinkTypes(field);
-    const allowTarget = field.allow_target !== false;
-    let state = normalizeLinkValue(current, allowed);
-    let pageMeta = state.type === "page" && state.page_id > 0 ? { id: state.page_id, title: state.title || "", url: state.url || "" } : null;
-    const root = el5("div", {
-      className: "bl-blocks-fields__link",
-      dataset: { blBlocksLinkField: "1" }
-    });
-    const dispatchChange = () => {
-      root.dispatchEvent(new Event("change", { bubbles: true }));
-    };
-    const typeRow = el5("div", { className: "bl-blocks-fields__link-types" });
-    const destLabel = el5("label", { text: destinationFieldLabel(state.type) });
-    const destWrap = el5("div", { className: "bl-blocks-fields__link-destination" });
-    const destRow = el5("div", { className: "bl-blocks-fields__link-dest" }, [destLabel, destWrap]);
-    const titleInput = el5("input", {
-      type: "text",
-      className: "widefat",
-      value: state.title
-    });
-    const titleRow = el5("p", { className: "bl-blocks-fields__link-title" }, [
-      el5("label", { text: i18n2("linkText", "Link text") }),
-      titleInput
-    ]);
-    const targetInput = el5("input", { type: "checkbox" });
-    const targetRow = el5("label", { className: "bl-blocks-fields__toggle bl-blocks-fields__link-target" }, [
-      targetInput,
-      document.createTextNode(" " + i18n2("linkOpenNewTab", "Open in new tab"))
-    ]);
-    const syncTargetVisibility = () => {
-      const show = allowTarget && (state.type === "page" || state.type === "url");
-      targetRow.hidden = !show;
-      if (!show) {
-        targetInput.checked = false;
-        state.target = "";
-      }
-    };
-    const renderDestination = () => {
-      destLabel.textContent = destinationFieldLabel(state.type);
-      destWrap.replaceChildren();
-      if (state.type === "page") {
-        const summary = el5("div", { className: "bl-blocks-fields__page-picker-summary" });
-        const pickBtn = el5("button", {
-          type: "button",
-          className: "button bl-button",
-          text: pageMeta ? i18n2("changePage", "Change page") : i18n2("choosePage", "Choose page")
-        });
-        const clearBtn = el5("button", {
-          type: "button",
-          className: "button-link",
-          text: i18n2("clearPage", "Clear"),
-          hidden: !pageMeta
-        });
-        if (pageMeta) {
-          summary.appendChild(
-            buildPagePreview([pageMeta], false, () => {
-              pageMeta = null;
-              state.page_id = 0;
-              state.url = "";
-              renderDestination();
-              dispatchChange();
-            })
-          );
-        } else {
-          summary.appendChild(
-            el5("span", {
-              className: "description",
-              text: i18n2("choosePageHelp", "Select a page.")
-            })
-          );
-        }
-        pickBtn.addEventListener("click", async () => {
-          if (typeof openPagePicker !== "function") {
-            console.error("Page picker is unavailable.");
-            return;
-          }
-          const { restUrl, restNonce } = pickerConfig2();
-          const page = await openPagePicker({
-            selectedId: pageMeta ? pageMeta.id : 0,
-            title: i18n2("pagePickerTitle", "Select a page"),
-            searchPlaceholder: i18n2("pagePickerSearch", "Search pages\u2026"),
-            empty: i18n2("pagePickerEmpty", "No pages found."),
-            cancelLabel: i18n2("cancel", "Cancel"),
-            selectLabel: i18n2("selectPage", "Select"),
-            restUrl,
-            restNonce
-          });
-          if (!page) return;
-          pageMeta = {
-            id: Number(page.id) || 0,
-            title: page.title || "",
-            url: page.url || ""
-          };
-          state.page_id = pageMeta.id;
-          state.url = pageMeta.url;
-          if (!String(titleInput.value || "").trim() && pageMeta.title) {
-            titleInput.value = pageMeta.title;
-            state.title = pageMeta.title;
-          }
-          renderDestination();
-          dispatchChange();
-        });
-        clearBtn.addEventListener("click", () => {
-          pageMeta = null;
-          state.page_id = 0;
-          state.url = "";
-          renderDestination();
-          dispatchChange();
-        });
-        destWrap.appendChild(
-          el5("div", { className: "bl-blocks-fields__page-picker-row" }, [
-            summary,
-            el5("div", { className: "bl-blocks-fields__page-picker-actions" }, [pickBtn, clearBtn])
-          ])
-        );
-        return;
-      }
-      let inputType = "text";
-      let value = displayDestination(state);
-      if (state.type === "email") {
-        inputType = "email";
-      } else if (state.type === "phone") {
-        inputType = "tel";
-      } else if (state.type === "url") {
-        value = normalizeLinkHref(value);
-        state.url = value;
-      }
-      const input = el5("input", {
-        type: inputType,
-        className: "widefat",
-        value
-      });
-      input.addEventListener("input", () => {
-        state.url = input.value;
-      });
-      if (state.type === "url") {
-        input.addEventListener("blur", () => {
-          const next = normalizeLinkHref(input.value);
-          if (next !== input.value) {
-            input.value = next;
-          }
-          state.url = next;
-        });
-      }
-      destWrap.appendChild(input);
-    };
-    if (allowed.length > 1) {
-      const labels = {
-        page: i18n2("linkTypePage", "Page"),
-        url: i18n2("linkTypeUrl", "URL"),
-        email: i18n2("linkTypeEmail", "Email"),
-        phone: i18n2("linkTypePhone", "Phone")
-      };
-      allowed.forEach((type) => {
-        const btn = el5("button", {
-          type: "button",
-          className: "button bl-button-small bl-blocks-fields__link-type" + (state.type === type ? " is-active" : ""),
-          text: labels[type] || type,
-          dataset: { linkType: type }
-        });
-        btn.addEventListener("click", () => {
-          if (state.type === type) return;
-          state.type = type;
-          state.url = "";
-          state.page_id = 0;
-          state.target = "";
-          pageMeta = null;
-          targetInput.checked = false;
-          typeRow.querySelectorAll("[data-link-type]").forEach((node) => {
-            node.classList.toggle("is-active", node.dataset.linkType === type);
-          });
-          syncTargetVisibility();
-          renderDestination();
-        });
-        typeRow.appendChild(btn);
-      });
-      root.appendChild(
-        el5("div", { className: "bl-blocks-fields__link-type-block" }, [
-          el5("label", { text: i18n2("linkTypeLabel", "Type") }),
-          typeRow
-        ])
-      );
-    }
-    titleInput.addEventListener("input", () => {
-      state.title = titleInput.value;
-    });
-    targetInput.checked = state.target === "_blank";
-    targetInput.addEventListener("change", () => {
-      state.target = targetInput.checked ? "_blank" : "";
-    });
-    root.append(destRow, titleRow, targetRow);
-    syncTargetVisibility();
-    renderDestination();
-    if (state.type === "page" && state.page_id > 0 && (!pageMeta || !pageMeta.title)) {
-      const { restUrl, restNonce } = pickerConfig2();
-      if (restUrl) {
-        fetch(String(restUrl).replace(/\/?$/, "/") + state.page_id + "?_fields=id,title,link", {
-          headers: restNonce ? { "X-WP-Nonce": restNonce } : {}
-        }).then((res) => res.ok ? res.json() : null).then((row) => {
-          if (!row || Number(row.id) !== state.page_id) return;
-          pageMeta = {
-            id: state.page_id,
-            title: row.title && row.title.rendered || "",
-            url: row.link || ""
-          };
-          state.url = pageMeta.url;
-          if (!String(titleInput.value || "").trim() && pageMeta.title) {
-            titleInput.value = pageMeta.title;
-            state.title = pageMeta.title;
-          }
-          renderDestination();
-        }).catch(() => {
-        });
-      }
-    }
-    root.getLinkValue = () => {
-      const destInput = destWrap.querySelector('input:not([type="hidden"])');
-      const title = String(titleInput.value || "").trim();
-      const out = {
-        type: state.type,
-        url: "",
-        title
-      };
-      if (state.type === "page") {
-        out.page_id = state.page_id > 0 ? state.page_id : 0;
-        out.url = pageMeta && pageMeta.url || state.url || "";
-      } else if (state.type === "email") {
-        const email = String(destInput ? destInput.value : state.url || "").replace(/^mailto:/i, "").trim();
-        out.url = email ? "mailto:" + email : "";
-      } else if (state.type === "phone") {
-        const phone = String(destInput ? destInput.value : state.url || "").replace(/^tel:/i, "").trim();
-        out.url = phone ? "tel:" + phone : "";
-      } else {
-        const href = normalizeLinkHref(destInput ? destInput.value : state.url || "");
-        out.url = href;
-        if (destInput && destInput.value !== href) {
-          destInput.value = href;
-        }
-        state.url = href;
-      }
-      if (allowTarget && (state.type === "page" || state.type === "url") && targetInput.checked) {
-        out.target = "_blank";
-      }
-      return out;
-    };
-    return root;
-  }
-  function bindLinkFields(root = document) {
-    root.querySelectorAll("[data-bl-blocks-link-field]").forEach((wrap) => {
-      if (wrap.dataset.blLinkBound === "1") return;
-      if (wrap.querySelector("[data-bl-link-interactive]")) return;
-      wrap.dataset.blLinkBound = "1";
-      const inputName = wrap.dataset.inputName || "";
-      if (!inputName) return;
-      let allowed = String(wrap.dataset.linkTypes || "").split(",").map((s) => s.trim()).filter((t6) => LINK_TYPES.includes(t6));
-      if (!allowed.length) allowed = [...LINK_TYPES];
-      const allowTarget = wrap.dataset.allowTarget === "1";
-      const readHidden = () => {
-        const get = (key) => {
-          const input = wrap.querySelector(`[data-bl-link-key="${key}"]`);
-          return input ? input.value : "";
-        };
-        return normalizeLinkValue(
-          {
-            type: get("type"),
-            url: get("url"),
-            title: get("title"),
-            page_id: get("page_id"),
-            target: get("target")
-          },
-          allowed
-        );
-      };
-      const field = { link_types: allowed, allow_target: allowTarget };
-      const control = createLinkControl(field, readHidden());
-      control.dataset.blLinkInteractive = "1";
-      const host = wrap.querySelector("[data-bl-link-ui]");
-      const inputsHost = wrap.querySelector("[data-bl-link-inputs]");
-      if (host) {
-        host.replaceChildren(control);
-      } else {
-        wrap.appendChild(control);
-      }
-      const writeInputs = () => {
-        if (!inputsHost) return;
-        const value = control.getLinkValue();
-        inputsHost.replaceChildren();
-        const keys = ["type", "url", "title", "page_id"];
-        keys.forEach((key) => {
-          const val = value[key] != null ? String(value[key]) : "";
-          const input = el5("input", {
-            type: "hidden",
-            name: `${inputName}[${key}]`,
-            value: val,
-            dataset: { blLinkKey: key }
-          });
-          inputsHost.appendChild(input);
-        });
-        if (value.target === "_blank") {
-          inputsHost.appendChild(
-            el5("input", {
-              type: "hidden",
-              name: `${inputName}[target]`,
-              value: "_blank",
-              dataset: { blLinkKey: "target" }
-            })
-          );
-        }
-      };
-      const form = wrap.closest("form");
-      if (form) {
-        form.addEventListener("submit", writeInputs);
-      }
-      wrap.addEventListener("change", writeInputs);
-      wrap.addEventListener("click", () => setTimeout(writeInputs, 0));
-      writeInputs();
-    });
-  }
-
   // themes/baselayer/packages/baselayer-blocks/src/js/admin/media-field.js
-  function el6(tag, props = {}, children = []) {
+  function el5(tag, props = {}, children = []) {
     const node = document.createElement(tag);
     Object.entries(props).forEach(([key, value]) => {
       if (value == null || value === false) return;
@@ -7126,7 +6714,7 @@
     });
     return node;
   }
-  function i18n3(key, fallback) {
+  function i18n2(key, fallback) {
     const dict = window.blBlocksFieldUi && window.blBlocksFieldUi.i18n || window.blBlocksEditor && window.blBlocksEditor.i18n || window.blBlocksPage && window.blBlocksPage.i18n || window.blBlocksAdmin && window.blBlocksAdmin.i18n || {};
     return dict[key] || fallback || key;
   }
@@ -7140,10 +6728,11 @@
   }
   function attachmentFromJson(json) {
     const sizes = json.sizes || {};
-    const url = sizes.thumbnail && sizes.thumbnail.url || sizes.medium && sizes.medium.url || json.url || json.icon || "";
+    const previewUrl = sizes.thumbnail && sizes.thumbnail.url || sizes.medium && sizes.medium.url || json.url || json.icon || "";
     return {
       id: Number(json.id) || 0,
-      url: String(url || ""),
+      url: String(previewUrl || ""),
+      fileUrl: String(json.url || ""),
       filename: String(json.filename || json.title || "#" + (json.id || "")),
       mime: String(json.mime || json.mime_type || ""),
       type: String(json.type || ""),
@@ -7153,7 +6742,7 @@
   function fetchAttachment(id) {
     return new Promise((resolve) => {
       if (!id || typeof wp === "undefined" || !wp.media || !wp.media.attachment) {
-        resolve({ id, url: "", filename: "#" + id, mime: "", type: "", alt: "" });
+        resolve({ id, url: "", fileUrl: "", filename: "#" + id, mime: "", type: "", alt: "" });
         return;
       }
       const att = wp.media.attachment(id);
@@ -7161,7 +6750,7 @@
         try {
           resolve(attachmentFromJson(att.toJSON()));
         } catch (e) {
-          resolve({ id, url: "", filename: "#" + id, mime: "", type: "", alt: "" });
+          resolve({ id, url: "", fileUrl: "", filename: "#" + id, mime: "", type: "", alt: "" });
         }
       };
       if (att.get("url")) {
@@ -7169,7 +6758,7 @@
         return;
       }
       att.fetch().done(done).fail(() => {
-        resolve({ id, url: "", filename: "#" + id, mime: "", type: "", alt: "" });
+        resolve({ id, url: "", fileUrl: "", filename: "#" + id, mime: "", type: "", alt: "" });
       });
     });
   }
@@ -7180,13 +6769,13 @@
   }
   function buildMediaCard(item, kind, onRemove) {
     const isImage = item.type === "image" || kind === "image";
-    const card = el6("div", {
+    const card = el5("div", {
       className: "bl-blocks-fields__media-card" + (isImage ? " is-image" : " is-file"),
       dataset: { mediaId: String(item.id) }
     });
     if (isImage && item.url) {
       card.appendChild(
-        el6("img", {
+        el5("img", {
           className: "bl-blocks-fields__media-thumb",
           src: item.url,
           alt: item.alt || ""
@@ -7194,7 +6783,7 @@
       );
     } else if (isImage) {
       card.appendChild(
-        el6("span", {
+        el5("span", {
           className: "bl-blocks-fields__media-badge",
           text: "IMG",
           "aria-hidden": "true"
@@ -7202,7 +6791,7 @@
       );
     } else {
       card.appendChild(
-        el6("span", {
+        el5("span", {
           className: "bl-blocks-fields__media-badge",
           text: extensionBadge(item.filename),
           "aria-hidden": "true"
@@ -7210,22 +6799,22 @@
       );
     }
     card.appendChild(
-      el6("span", {
+      el5("span", {
         className: "bl-blocks-fields__media-name",
         text: item.filename,
         title: item.filename
       })
     );
-    const removeBtn = el6(
+    const removeBtn = el5(
       "button",
       {
         type: "button",
         className: "button-link bl-blocks-fields__card-remove",
-        title: i18n3("removeMedia", "Remove"),
-        "aria-label": i18n3("removeMedia", "Remove"),
+        title: i18n2("removeMedia", "Remove"),
+        "aria-label": i18n2("removeMedia", "Remove"),
         dataset: { blMediaRemove: String(item.id) }
       },
-      [el6("span", { className: "bl-icon -icon-close", "aria-hidden": "true" })]
+      [el5("span", { className: "bl-icon -icon-close", "aria-hidden": "true" })]
     );
     removeBtn.addEventListener("click", (evt) => {
       evt.preventDefault();
@@ -7291,32 +6880,32 @@
       type: kind === "image" ? "image" : "",
       alt: ""
     }));
-    const preview = el6("div", {
+    const preview = el5("div", {
       className: "bl-blocks-fields__media-preview" + (multiple ? " is-sortable" : ""),
       dataset: { blMediaPreview: "" }
     });
-    const empty = el6("span", {
+    const empty = el5("span", {
       className: "description bl-blocks-fields__description bl-blocks-fields__media-empty",
-      text: kind === "image" ? multiple ? i18n3("chooseImagesHelp", "Select one or more images.") : i18n3("chooseImageHelp", "Select an image.") : multiple ? i18n3("chooseFilesHelp", "Select one or more files.") : i18n3("chooseFileHelp", "Select a file."),
+      text: kind === "image" ? multiple ? i18n2("chooseImagesHelp", "Select one or more images.") : i18n2("chooseImageHelp", "Select an image.") : multiple ? i18n2("chooseFilesHelp", "Select one or more files.") : i18n2("chooseFileHelp", "Select a file."),
       dataset: { blMediaEmpty: "" }
     });
-    const chooseBtn = el6("button", {
+    const chooseBtn = el5("button", {
       type: "button",
       className: "button bl-button",
       text: "",
       dataset: { blMediaChoose: "" }
     });
-    const clearBtn = el6("button", {
+    const clearBtn = el5("button", {
       type: "button",
       className: "button-link",
-      text: i18n3("clearMedia", "Clear"),
+      text: i18n2("clearMedia", "Clear"),
       dataset: { blMediaClear: "" }
     });
-    const actions = el6("div", { className: "bl-blocks-fields__media-actions" }, [
+    const actions = el5("div", { className: "bl-blocks-fields__media-actions" }, [
       chooseBtn,
       clearBtn
     ]);
-    const wrap = el6(
+    const wrap = el5(
       "div",
       {
         className: "bl-blocks-fields__media-picker",
@@ -7336,9 +6925,9 @@
       empty.hidden = has;
       clearBtn.hidden = !has;
       if (kind === "image") {
-        chooseBtn.textContent = has ? multiple ? i18n3("changeImages", "Change images") : i18n3("changeImage", "Change image") : multiple ? i18n3("chooseImages", "Choose images") : i18n3("chooseImage", "Choose image");
+        chooseBtn.textContent = has ? multiple ? i18n2("changeImages", "Change images") : i18n2("changeImage", "Change image") : multiple ? i18n2("chooseImages", "Choose images") : i18n2("chooseImage", "Choose image");
       } else {
-        chooseBtn.textContent = has ? multiple ? i18n3("changeFiles", "Change files") : i18n3("changeFile", "Change file") : multiple ? i18n3("chooseFiles", "Choose files") : i18n3("chooseFile", "Choose file");
+        chooseBtn.textContent = has ? multiple ? i18n2("changeFiles", "Change files") : i18n2("changeFile", "Change file") : multiple ? i18n2("chooseFiles", "Choose files") : i18n2("chooseFile", "Choose file");
       }
     };
     const renderPreview = () => {
@@ -7385,9 +6974,9 @@
         return;
       }
       const opts = {
-        title: kind === "image" ? multiple ? i18n3("mediaPickerTitleImages", "Select images") : i18n3("mediaPickerTitleImage", "Select image") : multiple ? i18n3("mediaPickerTitleFiles", "Select files") : i18n3("mediaPickerTitleFile", "Select file"),
+        title: kind === "image" ? multiple ? i18n2("mediaPickerTitleImages", "Select images") : i18n2("mediaPickerTitleImage", "Select image") : multiple ? i18n2("mediaPickerTitleFiles", "Select files") : i18n2("mediaPickerTitleFile", "Select file"),
         button: {
-          text: i18n3("selectMedia", "Select")
+          text: i18n2("selectMedia", "Select")
         },
         multiple
       };
@@ -7479,15 +7068,15 @@
         inputsHost.replaceChildren();
         if (selected.length === 0) {
           if (multiple) {
-            inputsHost.appendChild(el6("input", { type: "hidden", name: inputName + "[]", value: "" }));
+            inputsHost.appendChild(el5("input", { type: "hidden", name: inputName + "[]", value: "" }));
           } else {
-            inputsHost.appendChild(el6("input", { type: "hidden", name: inputName, value: "" }));
+            inputsHost.appendChild(el5("input", { type: "hidden", name: inputName, value: "" }));
           }
           return;
         }
         selected.forEach((item) => {
           const name = multiple ? inputName + "[]" : inputName;
-          const input = el6("input", {
+          const input = el5("input", {
             type: "hidden",
             name,
             value: String(item.id)
@@ -7505,9 +7094,9 @@
         if (empty) empty.hidden = has;
         if (clearBtn) clearBtn.hidden = !has;
         if (kind === "image") {
-          chooseBtn.textContent = has ? multiple ? i18n3("changeImages", "Change images") : i18n3("changeImage", "Change image") : multiple ? i18n3("chooseImages", "Choose images") : i18n3("chooseImage", "Choose image");
+          chooseBtn.textContent = has ? multiple ? i18n2("changeImages", "Change images") : i18n2("changeImage", "Change image") : multiple ? i18n2("chooseImages", "Choose images") : i18n2("chooseImage", "Choose image");
         } else {
-          chooseBtn.textContent = has ? multiple ? i18n3("changeFiles", "Change files") : i18n3("changeFile", "Change file") : multiple ? i18n3("chooseFiles", "Choose files") : i18n3("chooseFile", "Choose file");
+          chooseBtn.textContent = has ? multiple ? i18n2("changeFiles", "Change files") : i18n2("changeFile", "Change file") : multiple ? i18n2("chooseFiles", "Choose files") : i18n2("chooseFile", "Choose file");
         }
       };
       const renderPreview = () => {
@@ -7542,8 +7131,8 @@
           return;
         }
         const opts = {
-          title: kind === "image" ? multiple ? i18n3("mediaPickerTitleImages", "Select images") : i18n3("mediaPickerTitleImage", "Select image") : multiple ? i18n3("mediaPickerTitleFiles", "Select files") : i18n3("mediaPickerTitleFile", "Select file"),
-          button: { text: i18n3("selectMedia", "Select") },
+          title: kind === "image" ? multiple ? i18n2("mediaPickerTitleImages", "Select images") : i18n2("mediaPickerTitleImage", "Select image") : multiple ? i18n2("mediaPickerTitleFiles", "Select files") : i18n2("mediaPickerTitleFile", "Select file"),
+          button: { text: i18n2("selectMedia", "Select") },
           multiple
         };
         if (libraryType) {
@@ -7590,6 +7179,543 @@
       } else {
         renderPreview();
       }
+    });
+  }
+
+  // themes/baselayer/packages/baselayer-blocks/src/js/admin/link-field.js
+  var LINK_TYPES = ["page", "url", "email", "phone", "file"];
+  function el6(tag, props = {}, children = []) {
+    const node = document.createElement(tag);
+    Object.entries(props).forEach(([key, value]) => {
+      if (value == null || value === false) return;
+      if (key === "className") node.className = value;
+      else if (key === "text") node.textContent = value;
+      else if (key === "dataset") Object.assign(node.dataset, value);
+      else if (key.startsWith("on") && typeof value === "function") {
+        node.addEventListener(key.slice(2).toLowerCase(), value);
+      } else if (key === "checked") node.checked = Boolean(value);
+      else if (key === "value") node.value = value === true ? "" : String(value);
+      else node.setAttribute(key, value === true ? "" : String(value));
+    });
+    (Array.isArray(children) ? children : [children]).forEach((child) => {
+      if (child == null || child === false) return;
+      node.appendChild(typeof child === "string" ? document.createTextNode(child) : child);
+    });
+    return node;
+  }
+  function i18n3(key, fallback) {
+    const dict = window.blBlocksFieldUi && window.blBlocksFieldUi.i18n || window.blBlocksEditor && window.blBlocksEditor.i18n || window.blBlocksPage && window.blBlocksPage.i18n || window.blBlocksAdmin && window.blBlocksAdmin.i18n || {};
+    return dict[key] || fallback || key;
+  }
+  function pickerConfig2() {
+    const sources = [
+      window.blBlocksFieldUi,
+      window.blBlocksEditor,
+      window.blBlocksPage,
+      window.blBlocksAdmin
+    ];
+    let restUrl = "";
+    let restNonce = "";
+    sources.forEach((src) => {
+      if (!src) return;
+      if (!restUrl && src.pagesRestUrl) restUrl = src.pagesRestUrl;
+      if (!restNonce && src.restNonce) restNonce = src.restNonce;
+    });
+    return { restUrl, restNonce };
+  }
+  function allowedLinkTypes(field) {
+    const raw = Array.isArray(field.link_types) ? field.link_types : LINK_TYPES;
+    const list = raw.map(String).filter((t6) => LINK_TYPES.includes(t6));
+    return list.length ? list : [...LINK_TYPES];
+  }
+  function normalizeLinkValue(current, allowed) {
+    const empty = {
+      type: allowed[0] || "url",
+      url: "",
+      title: "",
+      page_id: 0,
+      attachment_id: 0,
+      target: ""
+    };
+    if (!current || typeof current !== "object" || Array.isArray(current)) {
+      return empty;
+    }
+    let type = String(current.type || "");
+    if (!allowed.includes(type)) {
+      type = allowed[0] || "url";
+    }
+    return {
+      type,
+      url: current.url != null ? String(current.url) : "",
+      title: current.title != null ? String(current.title) : "",
+      page_id: Number(current.page_id) || 0,
+      attachment_id: Number(current.attachment_id) || 0,
+      target: current.target === "_blank" ? "_blank" : ""
+    };
+  }
+  function displayDestination(state) {
+    if (state.type === "email") {
+      return String(state.url || "").replace(/^mailto:/i, "");
+    }
+    if (state.type === "phone") {
+      return String(state.url || "").replace(/^tel:/i, "");
+    }
+    return String(state.url || "");
+  }
+  function normalizeLinkHref(raw) {
+    const v = String(raw || "").trim();
+    if (!v) return "";
+    if (/^([/#?]|\/\/|[a-z][a-z0-9+.\-]*:)/i.test(v)) {
+      return v;
+    }
+    return "https://" + v;
+  }
+  function destinationFieldLabel(type) {
+    if (type === "page") return i18n3("linkDestPage", "Page");
+    if (type === "file") return i18n3("linkDestFile", "File");
+    if (type === "email") return i18n3("linkDestEmail", "Email address");
+    if (type === "phone") return i18n3("linkDestPhone", "Phone number");
+    return i18n3("linkDestUrl", "URL");
+  }
+  function createLinkControl(field, current) {
+    const allowed = allowedLinkTypes(field);
+    const allowTarget = field.allow_target !== false;
+    let state = normalizeLinkValue(current, allowed);
+    let pageMeta = state.type === "page" && state.page_id > 0 ? { id: state.page_id, title: state.title || "", url: state.url || "" } : null;
+    let fileMeta = state.type === "file" && state.attachment_id > 0 ? {
+      id: state.attachment_id,
+      url: "",
+      fileUrl: state.url || "",
+      filename: state.title || "#" + state.attachment_id,
+      mime: "",
+      type: "",
+      alt: ""
+    } : null;
+    let fileFrame = null;
+    const root = el6("div", {
+      className: "bl-blocks-fields__link",
+      dataset: { blBlocksLinkField: "1" }
+    });
+    const dispatchChange = () => {
+      root.dispatchEvent(new Event("change", { bubbles: true }));
+    };
+    const typeRow = el6("div", { className: "bl-blocks-fields__link-types" });
+    const destLabel = el6("label", { text: destinationFieldLabel(state.type) });
+    const destWrap = el6("div", { className: "bl-blocks-fields__link-destination" });
+    const destRow = el6("div", { className: "bl-blocks-fields__link-dest" }, [destLabel, destWrap]);
+    const titleInput = el6("input", {
+      type: "text",
+      className: "widefat",
+      value: state.title
+    });
+    const titleRow = el6("p", { className: "bl-blocks-fields__link-title" }, [
+      el6("label", { text: i18n3("linkText", "Link text") }),
+      titleInput
+    ]);
+    const targetInput = el6("input", { type: "checkbox" });
+    const targetRow = el6("label", { className: "bl-blocks-fields__toggle bl-blocks-fields__link-target" }, [
+      targetInput,
+      document.createTextNode(" " + i18n3("linkOpenNewTab", "Open in new tab"))
+    ]);
+    const syncTargetVisibility = () => {
+      const show = allowTarget && (state.type === "page" || state.type === "url" || state.type === "file");
+      targetRow.hidden = !show;
+      if (!show) {
+        targetInput.checked = false;
+        state.target = "";
+      }
+    };
+    const clearFile = () => {
+      fileMeta = null;
+      state.attachment_id = 0;
+      state.url = "";
+    };
+    const clearPage = () => {
+      pageMeta = null;
+      state.page_id = 0;
+      state.url = "";
+    };
+    const renderDestination = () => {
+      destLabel.textContent = destinationFieldLabel(state.type);
+      destWrap.replaceChildren();
+      if (state.type === "page") {
+        const summary = el6("div", { className: "bl-blocks-fields__page-picker-summary" });
+        const pickBtn = el6("button", {
+          type: "button",
+          className: "button bl-button",
+          text: pageMeta ? i18n3("changePage", "Change page") : i18n3("choosePage", "Choose page")
+        });
+        const clearBtn = el6("button", {
+          type: "button",
+          className: "button-link",
+          text: i18n3("clearPage", "Clear"),
+          hidden: !pageMeta
+        });
+        if (pageMeta) {
+          summary.appendChild(
+            buildPagePreview([pageMeta], false, () => {
+              clearPage();
+              renderDestination();
+              dispatchChange();
+            })
+          );
+        } else {
+          summary.appendChild(
+            el6("span", {
+              className: "description",
+              text: i18n3("choosePageHelp", "Select a page.")
+            })
+          );
+        }
+        pickBtn.addEventListener("click", async () => {
+          if (typeof openPagePicker !== "function") {
+            console.error("Page picker is unavailable.");
+            return;
+          }
+          const { restUrl, restNonce } = pickerConfig2();
+          const page = await openPagePicker({
+            selectedId: pageMeta ? pageMeta.id : 0,
+            title: i18n3("pagePickerTitle", "Select a page"),
+            searchPlaceholder: i18n3("pagePickerSearch", "Search pages\u2026"),
+            empty: i18n3("pagePickerEmpty", "No pages found."),
+            cancelLabel: i18n3("cancel", "Cancel"),
+            selectLabel: i18n3("selectPage", "Select"),
+            restUrl,
+            restNonce
+          });
+          if (!page) return;
+          pageMeta = {
+            id: Number(page.id) || 0,
+            title: page.title || "",
+            url: page.url || ""
+          };
+          state.page_id = pageMeta.id;
+          state.url = pageMeta.url;
+          if (!String(titleInput.value || "").trim() && pageMeta.title) {
+            titleInput.value = pageMeta.title;
+            state.title = pageMeta.title;
+          }
+          renderDestination();
+          dispatchChange();
+        });
+        clearBtn.addEventListener("click", () => {
+          clearPage();
+          renderDestination();
+          dispatchChange();
+        });
+        destWrap.appendChild(
+          el6("div", { className: "bl-blocks-fields__page-picker-row" }, [
+            summary,
+            el6("div", { className: "bl-blocks-fields__page-picker-actions" }, [pickBtn, clearBtn])
+          ])
+        );
+        return;
+      }
+      if (state.type === "file") {
+        const summary = el6("div", { className: "bl-blocks-fields__page-picker-summary" });
+        const pickBtn = el6("button", {
+          type: "button",
+          className: "button bl-button",
+          text: fileMeta ? i18n3("changeFile", "Change file") : i18n3("chooseFile", "Choose file")
+        });
+        const clearBtn = el6("button", {
+          type: "button",
+          className: "button-link",
+          text: i18n3("clearMedia", "Clear"),
+          hidden: !fileMeta
+        });
+        if (fileMeta) {
+          const preview = el6("div", { className: "bl-blocks-fields__media-preview" });
+          preview.appendChild(
+            buildMediaCard(fileMeta, "file", () => {
+              clearFile();
+              renderDestination();
+              dispatchChange();
+            })
+          );
+          summary.appendChild(preview);
+        } else {
+          summary.appendChild(
+            el6("span", {
+              className: "description",
+              text: i18n3("chooseFileHelp", "Select a file.")
+            })
+          );
+        }
+        pickBtn.addEventListener("click", () => {
+          if (typeof wp === "undefined" || !wp.media) {
+            console.error("Media library is unavailable.");
+            return;
+          }
+          if (fileFrame) {
+            fileFrame.open();
+            return;
+          }
+          fileFrame = wp.media({
+            title: i18n3("mediaPickerTitleFile", "Select file"),
+            button: { text: i18n3("selectMedia", "Select") },
+            multiple: false
+          });
+          fileFrame.on("select", () => {
+            const selection = fileFrame.state().get("selection");
+            const model = selection && selection.first ? selection.first() : null;
+            if (!model) return;
+            const json = model.toJSON();
+            fileMeta = attachmentFromJson(json);
+            state.attachment_id = fileMeta.id;
+            state.url = fileMeta.fileUrl || String(json.url || "");
+            if (!String(titleInput.value || "").trim() && fileMeta.filename) {
+              titleInput.value = fileMeta.filename;
+              state.title = fileMeta.filename;
+            }
+            renderDestination();
+            dispatchChange();
+          });
+          fileFrame.on("open", () => {
+            const selection = fileFrame.state().get("selection");
+            if (!selection) return;
+            selection.reset();
+            if (fileMeta && fileMeta.id > 0) {
+              const att = wp.media.attachment(fileMeta.id);
+              selection.add(att);
+              att.fetch();
+            }
+          });
+          fileFrame.open();
+        });
+        clearBtn.addEventListener("click", () => {
+          clearFile();
+          renderDestination();
+          dispatchChange();
+        });
+        destWrap.appendChild(
+          el6("div", { className: "bl-blocks-fields__page-picker-row" }, [
+            summary,
+            el6("div", { className: "bl-blocks-fields__page-picker-actions" }, [pickBtn, clearBtn])
+          ])
+        );
+        return;
+      }
+      let inputType = "text";
+      let value = displayDestination(state);
+      if (state.type === "email") {
+        inputType = "email";
+      } else if (state.type === "phone") {
+        inputType = "tel";
+      } else if (state.type === "url") {
+        value = normalizeLinkHref(value);
+        state.url = value;
+      }
+      const input = el6("input", {
+        type: inputType,
+        className: "widefat",
+        value
+      });
+      input.addEventListener("input", () => {
+        state.url = input.value;
+      });
+      if (state.type === "url") {
+        input.addEventListener("blur", () => {
+          const next = normalizeLinkHref(input.value);
+          if (next !== input.value) {
+            input.value = next;
+          }
+          state.url = next;
+        });
+      }
+      destWrap.appendChild(input);
+    };
+    if (allowed.length > 1) {
+      const labels = {
+        page: i18n3("linkTypePage", "Page"),
+        url: i18n3("linkTypeUrl", "URL"),
+        email: i18n3("linkTypeEmail", "Email"),
+        phone: i18n3("linkTypePhone", "Phone"),
+        file: i18n3("linkTypeFile", "File")
+      };
+      allowed.forEach((type) => {
+        const btn = el6("button", {
+          type: "button",
+          className: "button bl-button-small bl-blocks-fields__link-type" + (state.type === type ? " is-active" : ""),
+          text: labels[type] || type,
+          dataset: { linkType: type }
+        });
+        btn.addEventListener("click", () => {
+          if (state.type === type) return;
+          state.type = type;
+          state.url = "";
+          state.page_id = 0;
+          state.attachment_id = 0;
+          state.target = "";
+          pageMeta = null;
+          fileMeta = null;
+          targetInput.checked = false;
+          typeRow.querySelectorAll("[data-link-type]").forEach((node) => {
+            node.classList.toggle("is-active", node.dataset.linkType === type);
+          });
+          syncTargetVisibility();
+          renderDestination();
+        });
+        typeRow.appendChild(btn);
+      });
+      root.appendChild(
+        el6("div", { className: "bl-blocks-fields__link-type-block" }, [
+          el6("label", { text: i18n3("linkTypeLabel", "Type") }),
+          typeRow
+        ])
+      );
+    }
+    titleInput.addEventListener("input", () => {
+      state.title = titleInput.value;
+    });
+    targetInput.checked = state.target === "_blank";
+    targetInput.addEventListener("change", () => {
+      state.target = targetInput.checked ? "_blank" : "";
+    });
+    root.append(destRow, titleRow, targetRow);
+    syncTargetVisibility();
+    renderDestination();
+    if (state.type === "page" && state.page_id > 0 && (!pageMeta || !pageMeta.title)) {
+      const { restUrl, restNonce } = pickerConfig2();
+      if (restUrl) {
+        fetch(String(restUrl).replace(/\/?$/, "/") + state.page_id + "?_fields=id,title,link", {
+          headers: restNonce ? { "X-WP-Nonce": restNonce } : {}
+        }).then((res) => res.ok ? res.json() : null).then((row) => {
+          if (!row || Number(row.id) !== state.page_id) return;
+          pageMeta = {
+            id: state.page_id,
+            title: row.title && row.title.rendered || "",
+            url: row.link || ""
+          };
+          state.url = pageMeta.url;
+          if (!String(titleInput.value || "").trim() && pageMeta.title) {
+            titleInput.value = pageMeta.title;
+            state.title = pageMeta.title;
+          }
+          renderDestination();
+        }).catch(() => {
+        });
+      }
+    }
+    if (state.type === "file" && state.attachment_id > 0) {
+      fetchAttachment(state.attachment_id).then((item) => {
+        if (!item || item.id !== state.attachment_id) return;
+        fileMeta = item;
+        if (item.fileUrl) {
+          state.url = item.fileUrl;
+        }
+        if (!String(titleInput.value || "").trim() && item.filename) {
+          titleInput.value = item.filename;
+          state.title = item.filename;
+        }
+        renderDestination();
+      });
+    }
+    root.getLinkValue = () => {
+      const destInput = destWrap.querySelector('input:not([type="hidden"])');
+      const title = String(titleInput.value || "").trim();
+      const out = {
+        type: state.type,
+        url: "",
+        title
+      };
+      if (state.type === "page") {
+        out.page_id = state.page_id > 0 ? state.page_id : 0;
+        out.url = pageMeta && pageMeta.url || state.url || "";
+      } else if (state.type === "file") {
+        out.attachment_id = state.attachment_id > 0 ? state.attachment_id : 0;
+        out.url = fileMeta && (fileMeta.fileUrl || fileMeta.url) || state.url || "";
+      } else if (state.type === "email") {
+        const email = String(destInput ? destInput.value : state.url || "").replace(/^mailto:/i, "").trim();
+        out.url = email ? "mailto:" + email : "";
+      } else if (state.type === "phone") {
+        const phone = String(destInput ? destInput.value : state.url || "").replace(/^tel:/i, "").trim();
+        out.url = phone ? "tel:" + phone : "";
+      } else {
+        const href = normalizeLinkHref(destInput ? destInput.value : state.url || "");
+        out.url = href;
+        if (destInput && destInput.value !== href) {
+          destInput.value = href;
+        }
+        state.url = href;
+      }
+      if (allowTarget && (state.type === "page" || state.type === "url" || state.type === "file") && targetInput.checked) {
+        out.target = "_blank";
+      }
+      return out;
+    };
+    return root;
+  }
+  function bindLinkFields(root = document) {
+    root.querySelectorAll("[data-bl-blocks-link-field]").forEach((wrap) => {
+      if (wrap.dataset.blLinkBound === "1") return;
+      if (wrap.querySelector("[data-bl-link-interactive]")) return;
+      wrap.dataset.blLinkBound = "1";
+      const inputName = wrap.dataset.inputName || "";
+      if (!inputName) return;
+      let allowed = String(wrap.dataset.linkTypes || "").split(",").map((s) => s.trim()).filter((t6) => LINK_TYPES.includes(t6));
+      if (!allowed.length) allowed = [...LINK_TYPES];
+      const allowTarget = wrap.dataset.allowTarget === "1";
+      const readHidden = () => {
+        const get = (key) => {
+          const input = wrap.querySelector(`[data-bl-link-key="${key}"]`);
+          return input ? input.value : "";
+        };
+        return normalizeLinkValue(
+          {
+            type: get("type"),
+            url: get("url"),
+            title: get("title"),
+            page_id: get("page_id"),
+            attachment_id: get("attachment_id"),
+            target: get("target")
+          },
+          allowed
+        );
+      };
+      const field = { link_types: allowed, allow_target: allowTarget };
+      const control = createLinkControl(field, readHidden());
+      control.dataset.blLinkInteractive = "1";
+      const host = wrap.querySelector("[data-bl-link-ui]");
+      const inputsHost = wrap.querySelector("[data-bl-link-inputs]");
+      if (host) {
+        host.replaceChildren(control);
+      } else {
+        wrap.appendChild(control);
+      }
+      const writeInputs = () => {
+        if (!inputsHost) return;
+        const value = control.getLinkValue();
+        inputsHost.replaceChildren();
+        const keys = ["type", "url", "title", "page_id", "attachment_id"];
+        keys.forEach((key) => {
+          const val = value[key] != null ? String(value[key]) : "";
+          const input = el6("input", {
+            type: "hidden",
+            name: `${inputName}[${key}]`,
+            value: val,
+            dataset: { blLinkKey: key }
+          });
+          inputsHost.appendChild(input);
+        });
+        if (value.target === "_blank") {
+          inputsHost.appendChild(
+            el6("input", {
+              type: "hidden",
+              name: `${inputName}[target]`,
+              value: "_blank",
+              dataset: { blLinkKey: "target" }
+            })
+          );
+        }
+      };
+      const form = wrap.closest("form");
+      if (form) {
+        form.addEventListener("submit", writeInputs);
+      }
+      wrap.addEventListener("change", writeInputs);
+      wrap.addEventListener("click", () => setTimeout(writeInputs, 0));
+      writeInputs();
     });
   }
 
