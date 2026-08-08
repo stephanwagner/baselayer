@@ -1673,6 +1673,9 @@
         state.menu_label = labelInput.value;
         notify();
       });
+      children.push(fieldRow(t2("menuLabel", "Tab label"), labelInput, t2("menuLabelHelp", "")));
+    }
+    if (definitionType === "page_settings" || definitionType === "site_settings") {
       const orderInput = el("input", {
         type: "number",
         className: "small-text",
@@ -1682,10 +1685,7 @@
         state.menu_order = parseInt(orderInput.value, 10) || 0;
         notify();
       });
-      children.push(
-        fieldRow(t2("menuLabel", "Tab label"), labelInput, t2("menuLabelHelp", "")),
-        fieldRow(t2("menuOrder", "Order"), orderInput)
-      );
+      children.push(fieldRow(t2("menuOrder", "Order"), orderInput));
     }
     panel.append(...children);
     return {

@@ -1889,6 +1889,9 @@ body.post-new-php.post-type-bl_block .page-title-action {
   width: 88px;
   text-align: center;
 }
+.post-type-bl_block .column-bl_post_types {
+  width: 14%;
+}
 .post-type-bl_block .column-bl_block_name {
   width: 28%;
 }

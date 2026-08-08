@@ -336,6 +336,7 @@ function bl_blocks_list_columns(array $columns): array
 			$out['bl_menu_order'] = __('Order', 'baselayer-blocks');
 		} elseif ($type === 'page_settings') {
 			$out['bl_post_types'] = __('Post types', 'baselayer-blocks');
+			$out['bl_menu_order'] = __('Order', 'baselayer-blocks');
 		}
 	}
 
@@ -428,13 +429,13 @@ function bl_blocks_list_column_content(string $column, int $post_id): void
 add_action('manage_' . BL_BLOCK_POST_TYPE . '_posts_custom_column', 'bl_blocks_list_column_content', 10, 2);
 
 /**
- * Sort Site Settings list by settings menu_order (ascending).
+ * Sort Content / Website Fields lists by settings menu_order (ascending).
  *
  * @param list<WP_Post>|array<int, mixed> $posts
  * @param WP_Query                        $query
  * @return list<WP_Post>|array<int, mixed>
  */
-function bl_blocks_sort_site_settings_list($posts, $query)
+function bl_blocks_sort_settings_list($posts, $query)
 {
 	if (!is_admin() || !($query instanceof WP_Query) || !$query->is_main_query()) {
 		return $posts;
@@ -443,7 +444,8 @@ function bl_blocks_sort_site_settings_list($posts, $query)
 	if (!$screen || $screen->post_type !== BL_BLOCK_POST_TYPE || $screen->base !== 'edit') {
 		return $posts;
 	}
-	if (bl_blocks_current_list_type() !== 'site_settings' || !is_array($posts) || $posts === []) {
+	$type = bl_blocks_current_list_type();
+	if (!in_array($type, ['site_settings', 'page_settings'], true) || !is_array($posts) || $posts === []) {
 		return $posts;
 	}
 
@@ -462,7 +464,7 @@ function bl_blocks_sort_site_settings_list($posts, $query)
 
 	return $posts;
 }
-add_filter('the_posts', 'bl_blocks_sort_site_settings_list', 10, 2);
+add_filter('the_posts', 'bl_blocks_sort_settings_list', 10, 2);
 
 /**
  * Whether a definition is inactive (settings.active empty/false).

@@ -1071,12 +1071,13 @@ function bl_blocks_definition_slug(int $post_id, array $settings = []): string
 }
 
 /**
- * Next Website tab order: existing site_settings count + 1.
+ * Next settings order for Website / Content Fields: existing definitions of type + 1.
  */
-function bl_blocks_next_site_settings_order(int $exclude_id = 0): int
+function bl_blocks_next_settings_order(string $type, int $exclude_id = 0): int
 {
+	$type = bl_blocks_sanitize_definition_type($type);
 	$count = 0;
-	foreach (bl_blocks_query_definitions('site_settings', false) as $post) {
+	foreach (bl_blocks_query_definitions($type, false) as $post) {
 		if ($exclude_id > 0 && (int) $post->ID === $exclude_id) {
 			continue;
 		}
@@ -1088,6 +1089,14 @@ function bl_blocks_next_site_settings_order(int $exclude_id = 0): int
 	}
 
 	return $count + 1;
+}
+
+/**
+ * @deprecated Use bl_blocks_next_settings_order( 'site_settings', $exclude_id ).
+ */
+function bl_blocks_next_site_settings_order(int $exclude_id = 0): int
+{
+	return bl_blocks_next_settings_order('site_settings', $exclude_id);
 }
 
 /**
@@ -1123,7 +1132,7 @@ function bl_blocks_query_definitions(string $type, bool $active_only = false): a
 		}
 	}
 
-	if ($type === 'site_settings') {
+	if (in_array($type, ['site_settings', 'page_settings'], true)) {
 		usort($out, static function (WP_Post $a, WP_Post $b): int {
 			$sa = bl_blocks_get_config((int) $a->ID)['settings'];
 			$sb = bl_blocks_get_config((int) $b->ID)['settings'];

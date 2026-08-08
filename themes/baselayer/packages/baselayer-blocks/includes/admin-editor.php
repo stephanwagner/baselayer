@@ -143,11 +143,11 @@ function bl_blocks_render_builder_after_title(WP_Post $post): void
 	$config = bl_blocks_get_config((int) $post->ID);
 	$config['settings'] = bl_blocks_sanitize_settings($config['settings'], $type);
 
-	// New site settings: order = existing tabs + 1.
-	if ($type === 'site_settings') {
+	// New Content / Website Fields: order = existing definitions + 1.
+	if (in_array($type, ['site_settings', 'page_settings'], true)) {
 		$saved = get_post_meta((int) $post->ID, BL_BLOCK_CONFIG_META, true);
 		if (!is_array($saved)) {
-			$config['settings']['menu_order'] = bl_blocks_next_site_settings_order((int) $post->ID);
+			$config['settings']['menu_order'] = bl_blocks_next_settings_order($type, (int) $post->ID);
 		}
 	}
 

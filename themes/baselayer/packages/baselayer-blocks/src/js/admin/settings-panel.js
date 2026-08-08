@@ -618,6 +618,10 @@ export function createSettingsPanel(initial, definitionType, onChange) {
       state.menu_label = labelInput.value;
       notify();
     });
+    children.push(fieldRow(t('menuLabel', 'Tab label'), labelInput, t('menuLabelHelp', '')));
+  }
+
+  if (definitionType === 'page_settings' || definitionType === 'site_settings') {
     const orderInput = el('input', {
       type: 'number',
       className: 'small-text',
@@ -627,10 +631,7 @@ export function createSettingsPanel(initial, definitionType, onChange) {
       state.menu_order = parseInt(orderInput.value, 10) || 0;
       notify();
     });
-    children.push(
-      fieldRow(t('menuLabel', 'Tab label'), labelInput, t('menuLabelHelp', '')),
-      fieldRow(t('menuOrder', 'Order'), orderInput)
-    );
+    children.push(fieldRow(t('menuOrder', 'Order'), orderInput));
   }
 
   panel.append(...children);
