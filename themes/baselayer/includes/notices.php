@@ -15,9 +15,11 @@ function bl_notices_are_enabled(): bool
 		return (bool) get_field('notices_enabled', 'option');
 	}
 
-	$values = function_exists('bl_website_site_values') ? bl_website_site_values('notices') : [];
+	if (function_exists('bl_website_field')) {
+		return (bool) bl_website_field('notices', 'notices_enabled');
+	}
 
-	return function_exists('bl_website_truthy') && bl_website_truthy($values['notices_enabled'] ?? '');
+	return false;
 }
 
 /**
@@ -253,8 +255,7 @@ function bl_notices_get_active(): ?array
 		}
 		$rows = get_field('notices', 'option');
 	} else {
-		$values = function_exists('bl_website_site_values') ? bl_website_site_values('notices') : [];
-		$rows = $values['notices'] ?? null;
+		$rows = function_exists('bl_website_field') ? bl_website_field('notices', 'notices') : null;
 	}
 
 	if (!is_array($rows) || $rows === []) {
@@ -265,10 +266,7 @@ function bl_notices_get_active(): ?array
 		if (!is_array($row)) {
 			continue;
 		}
-		$enabled = function_exists('bl_website_truthy')
-			? bl_website_truthy($row['enabled'] ?? '')
-			: !empty($row['enabled']);
-		if (!$enabled) {
+		if (empty($row['enabled'])) {
 			continue;
 		}
 

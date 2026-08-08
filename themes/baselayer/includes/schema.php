@@ -62,12 +62,11 @@ function bl_schema_get_data(): ?array
 		$raw = get_field('schema', 'option');
 		$schema = is_array($raw) ? $raw : [];
 	} else {
-		$values = function_exists('bl_website_site_values') ? bl_website_site_values('search-engines') : [];
-		if (!function_exists('bl_website_truthy') || !bl_website_truthy($values['has_schema'] ?? '')) {
+		if (!function_exists('bl_website_field') || !bl_website_field('search-engines', 'has_schema')) {
 			return null;
 		}
 		$has_schema = true;
-		$schema = $values;
+		$schema = function_exists('bl_website_fields') ? bl_website_fields('search-engines') : [];
 	}
 
 	if (!$has_schema) {

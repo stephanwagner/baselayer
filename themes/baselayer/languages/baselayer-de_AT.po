@@ -1006,6 +1006,30 @@ msgstr "Konfiguration"
 msgid "Helpers"
 msgstr "Helfer"
 
+msgid "Field getters"
+msgstr "Feld-Getter"
+
+msgid "Read Website, Page, and Block field values in templates and theme code. Plural helpers return all values for a definition slug; singular helpers return one formatted field."
+msgstr "Liest Website-, Seiten- und Blockfeldwerte in Templates und Theme-Code. Plural-Helfer liefern alle Werte einer Definition (Slug); Singular-Helfer ein formatiertes Feld."
+
+msgid "Website Fields"
+msgstr "Website-Felder"
+
+msgid "Values from Website Fields by definition slug."
+msgstr "Werte aus Website-Feldern anhand des Definitions-Slugs."
+
+msgid "Page Fields"
+msgstr "Seitenfelder"
+
+msgid "Values from Page Fields by definition slug for the current post, or a given post ID."
+msgstr "Werte aus Seitenfeldern anhand des Definitions-Slugs für den aktuellen Beitrag oder eine angegebene Beitrags-ID."
+
+msgid "Block Fields"
+msgstr "Blockfelder"
+
+msgid "One field inside a custom block template (only while the block is rendering)."
+msgstr "Ein Feld in einem Custom-Block-Template (nur während der Block gerendert wird)."
+
 msgid "Image HTML"
 msgstr "Bild-HTML"
 

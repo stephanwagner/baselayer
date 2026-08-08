@@ -7,27 +7,9 @@ defined('ABSPATH') || exit;
  */
 function bl_hero_page_settings_definition_id(): int
 {
-	static $cached = null;
-	if ($cached !== null) {
-		return $cached;
-	}
-
-	$cached = 0;
-	if (!function_exists('bl_blocks_query_definitions') || !function_exists('bl_blocks_definition_slug')) {
-		return 0;
-	}
-
-	foreach (bl_blocks_query_definitions('page_settings', true) as $post) {
-		if (!$post instanceof WP_Post) {
-			continue;
-		}
-		if (bl_blocks_definition_slug((int) $post->ID) === 'hero') {
-			$cached = (int) $post->ID;
-			break;
-		}
-	}
-
-	return $cached;
+	return function_exists('bl_page_fields_definition_id')
+		? bl_page_fields_definition_id('hero')
+		: 0;
 }
 
 /**
@@ -37,14 +19,9 @@ function bl_hero_page_settings_definition_id(): int
  */
 function bl_hero_baselayer_values(int $post_id): array
 {
-	$def_id = bl_hero_page_settings_definition_id();
-	if ($def_id <= 0 || $post_id <= 0 || !function_exists('bl_blocks_page_meta_key')) {
-		return [];
-	}
-
-	$raw = get_post_meta($post_id, bl_blocks_page_meta_key($def_id), true);
-
-	return is_array($raw) ? $raw : [];
+	return function_exists('bl_page_fields')
+		? bl_page_fields('hero', $post_id)
+		: [];
 }
 
 /**
@@ -152,9 +129,9 @@ function bl_hero_is_enabled(?int $post_id = null): bool
 		return bl_hero_truthy(get_field('hero_enabled', $post_id));
 	}
 
-	$values = bl_hero_baselayer_values($post_id);
-
-	return bl_hero_truthy($values['hero_enabled'] ?? null);
+	return (bool) (function_exists('bl_page_field')
+		? bl_page_field('hero', 'hero_enabled', $post_id)
+		: false);
 }
 
 /**

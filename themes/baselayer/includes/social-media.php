@@ -87,7 +87,7 @@ function bl_social_media_channel_rows(): array
 		);
 	}
 
-	$values = function_exists('bl_website_site_values') ? bl_website_site_values('social-media') : [];
+	$values = function_exists('bl_website_fields') ? bl_website_fields('social-media') : [];
 	$channels = isset($values['channels']) && is_array($values['channels']) ? $values['channels'] : [];
 	if ($channels !== []) {
 		return array_values(array_filter($channels, 'is_array'));

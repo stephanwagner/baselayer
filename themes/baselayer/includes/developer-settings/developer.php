@@ -187,6 +187,63 @@ function bl_render_developer_cheatsheet(): void
 				</tbody>
 			</table>
 
+			<?php if (function_exists('bl_website_fields') || function_exists('bl_page_fields') || function_exists('bl_block_field')) : ?>
+			<hr style="margin: 28px 0;">
+
+			<h2 class="title" style="margin-top: 0;"><?= esc_html__('Field getters', 'baselayer') ?></h2>
+			<p class="description"><?= esc_html__('Read Website, Page, and Block field values in templates and theme code. Plural helpers return all values for a definition slug; singular helpers return one formatted field.', 'baselayer') ?></p>
+
+			<table class="widefat -large-padding striped helpers-table__table">
+				<tbody>
+					<?php if (function_exists('bl_website_fields')) : ?>
+					<tr>
+						<td>
+							<strong><?= esc_html__('Website Fields', 'baselayer') ?></strong><br>
+							<span class="description"><?= esc_html__('Values from Website Fields by definition slug.', 'baselayer') ?></span>
+						</td>
+						<td>
+							<code class="bl-code-text bl-code-small">PHP</code>
+						</td>
+						<td>
+							<code class="bl-code-small"><?= esc_html("bl_website_fields('general');") ?></code><br>
+							<code class="bl-code-small"><?= esc_html("bl_website_field('general', 'phone');") ?></code>
+						</td>
+					</tr>
+					<?php endif; ?>
+					<?php if (function_exists('bl_page_fields')) : ?>
+					<tr>
+						<td>
+							<strong><?= esc_html__('Page Fields', 'baselayer') ?></strong><br>
+							<span class="description"><?= esc_html__('Values from Page Fields by definition slug for the current post, or a given post ID.', 'baselayer') ?></span>
+						</td>
+						<td>
+							<code class="bl-code-text bl-code-small">PHP</code>
+						</td>
+						<td>
+							<code class="bl-code-small"><?= esc_html("bl_page_fields('hero');") ?></code><br>
+							<code class="bl-code-small"><?= esc_html("bl_page_field('hero', 'title');") ?></code><br>
+							<code class="bl-code-small"><?= esc_html("bl_page_field('hero', 'title', \$post_id);") ?></code>
+						</td>
+					</tr>
+					<?php endif; ?>
+					<?php if (function_exists('bl_block_field')) : ?>
+					<tr>
+						<td>
+							<strong><?= esc_html__('Block Fields', 'baselayer') ?></strong><br>
+							<span class="description"><?= esc_html__('One field inside a custom block template (only while the block is rendering).', 'baselayer') ?></span>
+						</td>
+						<td>
+							<code class="bl-code-text bl-code-small">PHP</code>
+						</td>
+						<td>
+							<code class="bl-code-small"><?= esc_html("bl_block_field('title');") ?></code>
+						</td>
+					</tr>
+					<?php endif; ?>
+				</tbody>
+			</table>
+			<?php endif; ?>
+
 			<hr style="margin: 28px 0;">
 
 			<h2 class="title" style="margin-top: 0;"><?= esc_html__('Icons', 'baselayer') ?></h2>
