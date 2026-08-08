@@ -42,7 +42,7 @@ const ROOT_VAR_MAP = [
   },
   {
     key: 'headerHeightScrolled',
-    prop: '--bl-header-height-scrolled',
+    prop: '--bl-header-height-scrolled-current',
     parse: 'unit',
     fallback: 64,
   },

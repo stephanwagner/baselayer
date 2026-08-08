@@ -5,12 +5,21 @@
  * compiling the complete parent frontend and admin entrypoints.
  */
 
+@use 'config' as *;
 @use 'theme-tokens' as *;
 
 :root {
   @include bl-theme-tokens;
+
+  // Breakpoint-aware scrolled header height for JS scroll offsets
+  --bl-header-height-scrolled-current: var(--bl-header-height-scrolled);
+
+  @media (max-width: $breakpoint-mobile) {
+    --bl-header-height-scrolled-current: var(--bl-header-height-mobile-scrolled);
+  }
 }
 
+// Save admin bar height for use in JS
 body.admin-bar {
   --bl-admin-bar-height: 32px;
 
