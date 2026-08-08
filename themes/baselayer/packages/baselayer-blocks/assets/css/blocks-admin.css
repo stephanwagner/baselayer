@@ -2741,11 +2741,12 @@ button.button.button.bl-bo-choices__add {
   background: #eef0f1;
 }
 .bl-block-options-admin .bl-bo-add-block {
-  margin: 0 0 20px;
-  padding: 14px 16px;
-  background: var(--bl-forms-admin-surface);
-  border: 1px solid var(--bl-forms-admin-border);
-  border-radius: 6px;
+  margin: 0 0 16px;
+  padding: 0 0 16px;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid #e0e0e3;
+  border-radius: 0;
 }
 .bl-block-options-admin .bl-bo-add-block__row {
   display: flex;
@@ -2753,12 +2754,18 @@ button.button.button.bl-bo-choices__add {
   align-items: center;
   gap: 8px 12px;
 }
+.bl-block-options-admin .bl-bo-add-block__search {
+  flex: 1 1 180px;
+  min-width: 140px;
+  max-width: 280px;
+}
 .bl-block-options-admin .bl-bo-add-block__fields {
   display: flex;
   align-items: center;
   gap: 8px;
   min-width: 0;
-  width: 100%;
+  flex: 1 1 280px;
+  width: auto;
 }
 .bl-block-options-admin .bl-bo-add-block__select {
   flex: 1 1 auto;

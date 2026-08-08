@@ -2259,6 +2259,7 @@
     let savingPreset = false;
     let addingBlock = false;
     let selectedAddBlock = "";
+    let blockListQuery = "";
     let blocksDirty = false;
     let statusMessage = null;
     const blockSources = [
@@ -2375,6 +2376,15 @@
     }
     function blockTitle(block) {
       return block && block.title || block && block.name || "";
+    }
+    function matchesBlockSearch(block, query) {
+      const needle = String(query || "").trim().toLowerCase();
+      if (!needle) {
+        return true;
+      }
+      const title = blockTitle(block).toLowerCase();
+      const name = String(block && block.name || "").toLowerCase();
+      return title.includes(needle) || name.includes(needle);
     }
     function formatCount(n, oneKey, manyKey, oneFallback, manyFallback) {
       const label = n === 1 ? t3(oneKey, oneFallback) : t3(manyKey, manyFallback);
@@ -3034,6 +3044,32 @@
       const choices = availableBlocksForTab(tab);
       const bar = el2("div", { className: "bl-bo-add-block bl-admin-form" });
       const row = el2("div", { className: "bl-bo-add-block__row" });
+      const search = el2("input", {
+        type: "search",
+        className: "bl-bo-add-block__search",
+        placeholder: t3("searchBlocks", "Search blocks\u2026"),
+        value: blockListQuery,
+        "aria-label": t3("searchBlocks", "Search blocks\u2026"),
+        "data-bl-bo-block-search": "1",
+        onInput: (event) => {
+          const input = event.target;
+          const start = input.selectionStart;
+          const end = input.selectionEnd;
+          blockListQuery = input.value || "";
+          render();
+          const next = root.querySelector("[data-bl-bo-block-search]");
+          if (next) {
+            next.focus();
+            if (typeof start === "number" && typeof end === "number") {
+              try {
+                next.setSelectionRange(start, end);
+              } catch (err) {
+              }
+            }
+          }
+        }
+      });
+      row.appendChild(search);
       const select = el2("select", {
         className: "bl-bo-add-block__select",
         disabled: addingBlock || choices.length === 0 ? true : void 0,
@@ -3126,8 +3162,18 @@
         panel.appendChild(el2("p", { className: "bl-bo-empty", text: tab.empty || "" }));
         return panel;
       }
+      const filtered = rows.filter((block) => matchesBlockSearch(block, blockListQuery));
+      if (filtered.length === 0) {
+        panel.appendChild(
+          el2("p", {
+            className: "bl-bo-empty",
+            text: t3("noSearchResults", "No blocks match your search.")
+          })
+        );
+        return panel;
+      }
       const list = el2("ul", { className: "bl-bo-preset-list bl-bo-block-list" });
-      rows.forEach((block) => {
+      filtered.forEach((block) => {
         const summary = summarizeItems(block.items);
         list.appendChild(
           el2("li", { className: "bl-bo-block-row" }, [

@@ -388,6 +388,8 @@ function bl_block_options_enqueue_admin_assets(): void
 		'presetSlugRequired' => __('Add a slug before saving.', 'baselayer-blocks'),
 		'addBlock' => __('Add block', 'baselayer-blocks'),
 		'chooseBlock' => __('Select a block…', 'baselayer-blocks'),
+		'searchBlocks' => __('Search blocks…', 'baselayer-blocks'),
+		'noSearchResults' => __('No blocks match your search.', 'baselayer-blocks'),
 		'addingBlock' => __('Adding…', 'baselayer-blocks'),
 		'addBlockFailed' => __('Could not add block.', 'baselayer-blocks'),
 		'noBlocksToAdd' => __('No more blocks available in this filter.', 'baselayer-blocks'),
