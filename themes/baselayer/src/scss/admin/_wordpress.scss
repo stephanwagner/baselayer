@@ -54,6 +54,13 @@ body.bl-page-title-hidden {
   }
 }
 
+// Favicon in toolbar
+
+.edit-post-fullscreen-mode-close__view-mode-toggle .edit-post-fullscreen-mode-close__view-mode-toggle-icon img,
+.edit-post-fullscreen-mode-close__view-mode-toggle .edit-post-fullscreen-mode-close__view-mode-toggle-icon svg {
+  border: 3px solid transparent;
+}
+
 // Form
 
 input[type='color'],

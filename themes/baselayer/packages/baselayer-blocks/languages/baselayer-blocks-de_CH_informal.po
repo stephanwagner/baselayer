@@ -594,7 +594,7 @@ msgstr "Definition importieren?"
 
 #: includes/admin-editor.php
 msgid "Importing will overwrite your current fields and settings. Block options from the file are applied when present. This cannot be undone."
-msgstr "Beim Importieren werden Ihre aktuellen Felder und Einstellungen überschrieben. Blockoptionen aus der Datei werden übernommen, sofern vorhanden. Das kann nicht rückgängig gemacht werden."
+msgstr "Beim Importieren werden deine aktuellen Felder und Einstellungen überschrieben. Blockoptionen aus der Datei werden übernommen, sofern vorhanden. Das kann nicht rückgängig gemacht werden."
 
 #: includes/admin-editor.php
 msgid "Overwrite"

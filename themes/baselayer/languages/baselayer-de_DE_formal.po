@@ -40,6 +40,14 @@ msgstr "Beitragsseite"
 msgid "Draft"
 msgstr "Entwurf"
 
+msgctxt "post status"
+msgid "Draft"
+msgstr "Entwurf"
+
+msgid "Private"
+msgstr "Privat"
+
+msgctxt "post status"
 msgid "Private"
 msgstr "Privat"
 
@@ -155,6 +163,10 @@ msgstr "Fehler"
 msgid "Close"
 msgstr "Schließen"
 
+msgid "Small"
+msgstr "Klein"
+
+msgctxt "Image size"
 msgid "Small"
 msgstr "Klein"
 
@@ -1111,6 +1123,10 @@ msgstr "Verschlüsselung"
 msgid "None"
 msgstr "Ohne"
 
+msgctxt "expiration date empty"
+msgid "None"
+msgstr "Ohne"
+
 msgid "TLS"
 msgstr "TLS"
 
@@ -1469,6 +1485,10 @@ msgstr "%s Seiten"
 msgid "Average"
 msgstr "Durchschnitt"
 
+msgid "Clear"
+msgstr "Leeren"
+
+msgctxt "performance panel history"
 msgid "Clear"
 msgstr "Leeren"
 
@@ -1851,7 +1871,11 @@ msgid "Bump version"
 msgstr "Version erhöhen"
 
 msgid "Refresh Permalink Rules"
-msgstr "Permalink-Regeln aktualisieren"
+msgstr "Permalink-Regeln erneuern"
+
+msgctxt "Button text"
+msgid "Refresh Permalink Rules"
+msgstr "Permalink-Regeln erneuern"
 
 msgid "Updates the WordPress permalink structure and rewrite rules."
 msgstr "Aktualisiert die WordPress-Permalink-Struktur und Rewrite-Regeln."
@@ -2505,7 +2529,7 @@ msgid "Incorrect password."
 msgstr "Falsches Passwort."
 
 msgid "You are not allowed to access user data."
-msgstr ""
+msgstr "Du darfst nicht auf Benutzerdaten zugreifen."
 
 # Languages & URLs
 
@@ -3017,6 +3041,14 @@ msgstr "Wiederkehrend"
 msgid "Pending"
 msgstr "Ausstehend"
 
+msgctxt "post status"
+msgid "Pending"
+msgstr "Ausstehend"
+
+msgid "Scheduled"
+msgstr "Geplant"
+
+msgctxt "post status"
 msgid "Scheduled"
 msgstr "Geplant"
 
@@ -3237,8 +3269,6 @@ msgstr "Vorschau von Google laden"
 msgid "Font preview"
 msgstr "Font-Vorschau"
 
-
-
 msgid "They were added to src/scss/_fonts.scss. Rebuild your theme CSS to apply them."
 msgstr "Sie wurden in src/scss/_fonts.scss eingetragen. Baue das Theme-CSS neu, um sie anzuwenden."
 
@@ -3254,3 +3284,137 @@ msgstr "Die Fonts-SCSS-Datei konnte nicht aktualisiert werden."
 msgid "Could not update %s to load theme fonts."
 msgstr "%s konnte nicht aktualisiert werden, um Theme-Fonts zu laden."
 
+msgid "ACF Pro field types are not ready yet. Activate ACF Pro and try the import again."
+msgstr "ACF-Pro-Feldtypen sind noch nicht bereit. Aktiviere ACF Pro und versuche den Import erneut."
+
+msgid "ACF Pro is not active yet. The theme was installed, but the Blocks demo and ACF Website/Hero fields were skipped until Pro is ready."
+msgstr "ACF Pro ist noch nicht aktiv. Das Theme wurde installiert, aber die Blocks-Demo und die ACF-Website-/Hero-Felder wurden übersprungen, bis Pro bereit ist."
+
+msgid "ACF Pro license key was written to wp-config.php."
+msgstr "Der ACF-Pro-Lizenzschlüssel wurde in wp-config.php geschrieben."
+
+msgid "ACF Pro plugin is active."
+msgstr "Das ACF-Pro-Plugin ist aktiv."
+
+msgid "ACF was selected during theme install, but field groups are not fully imported yet. Finish setup so Website settings, Hero, and the Blocks demo work."
+msgstr "ACF wurde bei der Theme-Installation ausgewählt, aber die Feldgruppen sind noch nicht vollständig importiert. Schließe die Einrichtung ab, damit Website-Einstellungen, Hero und die Blocks-Demo funktionieren."
+
+msgid "Add <code class=\"bl-code-small\">-has-icon</code> and an icon class to the button. Use <code class=\"bl-code-small\">-icon-right</code> to place the icon after the label. With no label text, add <code class=\"bl-code-small\">-icon-only</code> for a square icon button (applied automatically in the block editor)."
+msgstr "Füge dem Button <code class=\"bl-code-small\">-has-icon</code> und eine Icon-Klasse hinzu. Mit <code class=\"bl-code-small\">-icon-right</code> erscheint das Icon nach dem Label. Ohne Label-Text <code class=\"bl-code-small\">-icon-only</code> für einen quadratischen Icon-Button (wird im Block-Editor automatisch gesetzt)."
+
+msgid "Add language from catalog"
+msgstr "Sprache aus Katalog hinzufügen"
+
+msgid "Adds event types with dates, recurrence, statuses, metadata, and archives. Developers manage each type under its menu → Settings."
+msgstr "Fügt Veranstaltungstypen mit Daten, Wiederholungen, Status, Metadaten und Archiven hinzu. Entwickler verwalten jeden Typ unter seinem Menü → Einstellungen."
+
+msgid "Agree and translate"
+msgstr "Zustimmen und übersetzen"
+
+msgid "Anchor:"
+msgstr "Anker:"
+
+msgid "Articles pagination"
+msgstr "Beitrags-Paginierung"
+
+msgid "At least one user must have developer rights. Add another developer before removing yours."
+msgstr "Mindestens ein Benutzer muss Entwicklerrechte haben. Füge einen weiteren Entwickler hinzu, bevor du deine entfernst."
+
+msgid "Automatic page translation"
+msgstr "Automatische Seitenübersetzung"
+
+msgid "BaseLayer"
+msgstr "BaseLayer"
+
+msgid "BaseLayer ACF setup"
+msgstr "BaseLayer-ACF-Einrichtung"
+
+msgid "Blocks showcase page is ready."
+msgstr "Die Blocks-Showcase-Seite ist bereit."
+
+msgid "By clicking “Show map”, a connection to Google Maps is established. Data will be transferred to Google."
+msgstr "Mit einem Klick auf „Karte anzeigen“ wird eine Verbindung zu Google Maps hergestellt. Daten werden an Google übertragen."
+
+msgid "Confirm ACF Pro is active."
+msgstr "Bestätige, dass ACF Pro aktiv ist."
+
+msgid "Content translations"
+msgstr "Inhaltsübersetzungen"
+
+msgid "Editorial"
+msgstr "Editorial"
+
+msgid "Finish ACF setup: activate ACF Pro, then import theme field groups from the admin notice (or ACF → Tools). The Blocks showcase page is created after import."
+msgstr "ACF-Einrichtung abschließen: Aktiviere ACF Pro und importiere anschließend die Theme-Feldgruppen über den Admin-Hinweis (oder ACF → Werkzeuge). Die Blocks-Showcase-Seite wird nach dem Import erstellt."
+
+msgid "Font preview loads CSS and files from Google (fonts.googleapis.com / fonts.gstatic.com). Your IP address and the font name are sent to Google."
+msgstr "Die Font-Vorschau lädt CSS und Dateien von Google (fonts.googleapis.com / fonts.gstatic.com). Deine IP-Adresse und der Font-Name werden an Google gesendet."
+
+msgid "Google Privacy Policy"
+msgstr "Google-Datenschutzerklärung"
+
+msgid "Google Translate"
+msgstr "Google Translate"
+
+msgid "If you agree, a connection to Google will be established to translate this page automatically. Content on this page and personal data such as your IP address may be transmitted to Google. Machine translations may contain errors."
+msgstr "Wenn du zustimmst, wird eine Verbindung zu Google hergestellt, um diese Seite automatisch zu übersetzen. Inhalte dieser Seite und personenbezogene Daten wie deine IP-Adresse können an Google übertragen werden. Maschinenübersetzungen können Fehler enthalten."
+
+msgid "Import the theme field groups (button below)."
+msgstr "Importiere die Theme-Feldgruppen (Schaltfläche unten)."
+
+msgid "Load map"
+msgstr "Karte laden"
+
+msgid "Map: GDPR"
+msgstr "Karte: DSGVO"
+
+msgid "Matomo"
+msgstr "Matomo"
+
+msgid "Menu: pages by language"
+msgstr "Menü: Seiten nach Sprache"
+
+msgid "More information is available in our %1$s and in the %2$s."
+msgstr "Weitere Informationen findest du in unserer %1$s und in der %2$s."
+
+msgid "More information is available in the %s."
+msgstr "Weitere Informationen findest du in der %s."
+
+msgid "Next page"
+msgstr "Nächste Seite"
+
+msgid "Only default-language pages and pages not linked to the default language are listed. Unlinked pages in other languages are marked with their language. The menu shows the correct translation per language on the frontend."
+msgstr "Es werden nur Seiten der Standardsprache und Seiten ohne Verknüpfung zur Standardsprache aufgelistet. Nicht verknüpfte Seiten in anderen Sprachen sind mit ihrer Sprache gekennzeichnet. Das Menü zeigt im Frontend die passende Übersetzung je Sprache."
+
+msgid "Open Website settings, then the Blocks page once it is created."
+msgstr "Öffne die Website-Einstellungen und anschließend die Blocks-Seite, sobald sie erstellt wurde."
+
+msgid "Packages"
+msgstr "Pakete"
+
+msgid "Previous page"
+msgstr "Vorherige Seite"
+
+msgid "Redis"
+msgstr "Redis"
+
+msgid "Select language"
+msgstr "Sprache wählen"
+
+msgid "Select language, current: %s"
+msgstr "Sprache wählen, aktuell: %s"
+
+msgid "Separate posts or pages per language with URL prefixes and editor translation panels."
+msgstr "Getrennte Beiträge oder Seiten pro Sprache mit URL-Präfixen und Übersetzungsbereichen im Editor."
+
+msgid "Show map"
+msgstr "Karte anzeigen"
+
+msgid "Single-language content with automatic on-page translation via Google Translate. Configure languages under Developer → Languages."
+msgstr "Einsprachiger Inhalt mit automatischer On-Page-Übersetzung über Google Translate. Sprachen unter Entwickler → Sprachen konfigurieren."
+
+msgid "Translation method"
+msgstr "Übersetzungsmethode"
+
+msgid "A WordPress foundation built for developers who want full control. By <a href=\"%1$s\" target=\"_blank\" rel=\"noopener\">Stephan Wagner</a> at <a href=\"%2$s\" target=\"_blank\" rel=\"noopener\">bytes and stripes</a>."
+msgstr "Eine WordPress-Grundlage für Entwickler, die volle Kontrolle möchten. Von <a href=\"%1$s\" target=\"_blank\" rel=\"noopener\">Stephan Wagner</a> bei <a href=\"%2$s\" target=\"_blank\" rel=\"noopener\">bytes and stripes</a>."

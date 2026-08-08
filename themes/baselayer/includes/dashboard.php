@@ -153,8 +153,24 @@ function bl_dashboard_panel()
 	<div class="bl-dashboard__panel">
 
 		<p class="bl-dashboard__description">
-			A developer-first foundation built for flexibility and control.<br>
-			Crafted with care by <a href="https://stephanwagner.me" target="_blank" rel="noopener">Stephan Wagner</a> from <a href="https://bytesandstripes.com/en" target="_blank" rel="noopener">bytes and stripes</a>.
+			<?php
+			echo wp_kses(
+				sprintf(
+					/* translators: 1: author URL, 2: agency URL */
+					__('A WordPress foundation built for developers who want full control. By <a href="%1$s" target="_blank" rel="noopener">Stephan Wagner</a> at <a href="%2$s" target="_blank" rel="noopener">bytes and stripes</a>.', 'baselayer'),
+					'https://stephanwagner.me',
+					'https://bytesandstripes.com/en'
+				),
+				[
+					'br' => [],
+					'a'  => [
+						'href'   => [],
+						'target' => [],
+						'rel'    => [],
+					],
+				]
+			);
+			?>
 		</p>
 
 		<?php
