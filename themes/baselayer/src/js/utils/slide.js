@@ -72,6 +72,8 @@ export function slideDown(el, options = {}) {
   active.set(el, animation);
 
   animation.onfinish = () => {
+    // Drop fill:forwards so height is not stuck at a fixed px value.
+    animation.cancel();
     finishVisible(el);
     active.delete(el);
     if (complete) {
@@ -120,6 +122,8 @@ export function slideUp(el, options = {}) {
   active.set(el, animation);
 
   animation.onfinish = () => {
+    // Drop fill:forwards so height is not stuck at a fixed px value.
+    animation.cancel();
     finishHidden(el);
     active.delete(el);
     if (complete) {
