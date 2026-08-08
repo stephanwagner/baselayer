@@ -89,6 +89,7 @@
   --bl-button-padding-x: #{$button-padding-x};
   --bl-button-border-radius: #{$button-border-radius};
   --bl-button-font-size: #{$button-font-size};
+  --bl-button-line-height: #{$button-line-height};
   --bl-button-icon-inset: #{$button-icon-inset};
   --bl-button-icon-size: #{$button-icon-size};
   --bl-button-icon-gap: #{$button-icon-gap};
@@ -98,12 +99,14 @@
   --bl-button-padding-x-s: #{$button-padding-x-s};
   --bl-button-border-radius-s: #{$button-border-radius-s};
   --bl-button-font-size-s: #{$button-font-size-s};
+  --bl-button-line-height-s: #{$button-line-height-s};
   --bl-button-icon-inset-s: #{$button-icon-inset-s};
 
   --bl-button-padding-y-l: #{$button-padding-y-l};
   --bl-button-padding-x-l: #{$button-padding-x-l};
   --bl-button-border-radius-l: #{$button-border-radius-l};
   --bl-button-font-size-l: #{$button-font-size-l};
+  --bl-button-line-height-l: #{$button-line-height-l};
   --bl-button-icon-inset-l: #{$button-icon-inset-l};
 
   // Page paddings

@@ -7,6 +7,7 @@
   --bl-button-padding-x: var(--bl-button-padding-x-#{$size});
   --bl-button-border-radius: var(--bl-button-border-radius-#{$size});
   --bl-button-font-size: var(--bl-button-font-size-#{$size});
+  --bl-button-line-height: var(--bl-button-line-height-#{$size});
   --bl-button-icon-inset: var(--bl-button-icon-inset-#{$size});
 }
 
@@ -74,7 +75,7 @@
     border: 0;
     color: var(--bl-button-primary-color);
     font-size: var(--bl-button-font-size);
-    line-height: 22px;
+    line-height: var(--bl-button-line-height);
     border-radius: var(--bl-button-border-radius);
     padding: var(--bl-button-padding-y) var(--bl-button-padding-x);
     overflow: hidden;
@@ -88,7 +89,7 @@
 
     @media (min-resolution: $high-density-dppx) {
       border-width: 1.5px;
-      line-height: 23px;
+      line-height: calc(var(--bl-button-line-height) + 1px);
     }
 
     body.-transition-init & {
@@ -98,21 +99,11 @@
     &.-small,
     &.has-s-font-size {
       @include button-size-vars(s);
-      line-height: 20px;
-
-      @media (min-resolution: $high-density-dppx) {
-        line-height: 21px;
-      }
     }
 
     &.-large,
     &.has-l-font-size {
       @include button-size-vars(l);
-      line-height: 24px;
-
-      @media (min-resolution: $high-density-dppx) {
-        line-height: 25px;
-      }
     }
 
     &:hover,
@@ -135,27 +126,11 @@
   .wp-block-button.-small,
   .button.-small {
     @include button-size-vars(s);
-
-    .wp-block-button__link {
-      line-height: 20px;
-
-      @media (min-resolution: $high-density-dppx) {
-        line-height: 21px;
-      }
-    }
   }
 
   .wp-block-button.-large,
   .button.-large {
     @include button-size-vars(l);
-
-    .wp-block-button__link {
-      line-height: 24px;
-
-      @media (min-resolution: $high-density-dppx) {
-        line-height: 25px;
-      }
-    }
   }
 
   .button.-outline,
