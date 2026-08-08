@@ -3063,11 +3063,11 @@
 
   // themes/baselayer/packages/baselayer-blocks/src/js/admin/import-export-shared.js
   function openConfirmModal(opts) {
-    document.querySelectorAll(".bl-forms-builder__modal").forEach((node) => node.remove());
+    document.querySelectorAll(".bl-blocks-confirm-modal").forEach((node) => node.remove());
     const title = opts.title || "Confirm";
     const hideCancel = !!opts.hideCancel;
     const backdrop = document.createElement("div");
-    backdrop.className = "bl-forms-builder__modal";
+    backdrop.className = "bl-blocks-confirm-modal";
     backdrop.setAttribute("role", "dialog");
     backdrop.setAttribute("aria-modal", "true");
     backdrop.setAttribute("aria-label", title);
@@ -3087,20 +3087,20 @@
       }
     });
     const dialog = document.createElement("div");
-    dialog.className = "bl-forms-builder__modal-dialog";
+    dialog.className = "bl-blocks-confirm-modal__dialog";
     const header = document.createElement("div");
-    header.className = "bl-forms-builder__modal-header";
+    header.className = "bl-blocks-confirm-modal__header";
     const heading = document.createElement("h2");
-    heading.className = "bl-forms-builder__modal-title";
+    heading.className = "bl-blocks-confirm-modal__title";
     heading.textContent = title;
     header.appendChild(heading);
     const body = document.createElement("div");
-    body.className = "bl-forms-builder__modal-body";
+    body.className = "bl-blocks-confirm-modal__body";
     const p = document.createElement("p");
     p.textContent = opts.message || "";
     body.appendChild(p);
     const footer = document.createElement("div");
-    footer.className = "bl-forms-builder__modal-footer";
+    footer.className = "bl-blocks-confirm-modal__footer";
     if (!hideCancel) {
       const cancelBtn = document.createElement("button");
       cancelBtn.type = "button";

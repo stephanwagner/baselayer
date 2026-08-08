@@ -1589,6 +1589,7 @@ button.button-link.bl-blocks-fields__repeater-remove:active {
 .description.bl-blocks-fields__repeater-empty {
   margin-top: -12px !important;
   margin-bottom: 2px;
+  text-wrap: pretty;
 }
 
 .bl-blocks-fields__repeater-add {

@@ -44,9 +44,9 @@
   }
 }
 
-// Confirm modal (Settings import + edit import). Edit screen also has form-builder styles;
-// Settings only loads blocks-admin, so keep a minimal copy here.
-.bl-forms-builder__modal {
+// Confirm / alert modal for import (edit Tools + Settings). Blocks-scoped so it
+// does not override form-builder field-edit modal padding (tabs / body).
+.bl-blocks-confirm-modal {
   position: fixed;
   inset: 0;
   z-index: 100100;
@@ -57,7 +57,7 @@
   background: rgba(0, 0, 0, 0.45);
 }
 
-.bl-forms-builder__modal-dialog {
+.bl-blocks-confirm-modal__dialog {
   width: min(480px, 100%);
   max-height: min(90vh, 640px);
   overflow: auto;
@@ -66,7 +66,7 @@
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
 }
 
-.bl-forms-builder__modal-header {
+.bl-blocks-confirm-modal__header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -76,14 +76,14 @@
   background: #f6f7f7;
 }
 
-.bl-forms-builder__modal-title {
+.bl-blocks-confirm-modal__title {
   margin: 0;
   font-size: 15px;
   font-weight: 600;
   line-height: 1.4;
 }
 
-.bl-forms-builder__modal-body {
+.bl-blocks-confirm-modal__body {
   padding: 16px;
   font-size: 13px;
   line-height: 1.5;
@@ -93,7 +93,7 @@
   }
 }
 
-.bl-forms-builder__modal-footer {
+.bl-blocks-confirm-modal__footer {
   display: flex;
   justify-content: flex-end;
   gap: 8px;
