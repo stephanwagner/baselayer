@@ -18,23 +18,49 @@ function bl_blocks_admin_meta_boxes($post_type = '', $post = null): void
 	if ($post_type !== BL_BLOCK_POST_TYPE || !($post instanceof WP_Post)) {
 		return;
 	}
-	if ($post->post_status === 'auto-draft') {
-		return;
-	}
-	if (bl_blocks_get_definition_type((int) $post->ID) !== 'block') {
-		return;
+
+	if ($post->post_status !== 'auto-draft' && bl_blocks_get_definition_type((int) $post->ID) === 'block') {
+		add_meta_box(
+			'bl_blocks_template',
+			__('Block', 'baselayer-blocks'),
+			'bl_blocks_render_template_metabox',
+			BL_BLOCK_POST_TYPE,
+			'side',
+			'default'
+		);
 	}
 
 	add_meta_box(
-		'bl_blocks_template',
-		__('Block', 'baselayer-blocks'),
-		'bl_blocks_render_template_metabox',
+		'bl_blocks_tools',
+		__('Tools', 'baselayer-blocks'),
+		'bl_blocks_render_tools_metabox',
 		BL_BLOCK_POST_TYPE,
 		'side',
 		'low'
 	);
 }
 add_action('add_meta_boxes', 'bl_blocks_admin_meta_boxes', 10, 2);
+
+/**
+ * Tools metabox: export / import the definition being edited.
+ */
+function bl_blocks_render_tools_metabox(WP_Post $post): void
+{
+	?>
+	<div class="bl-blocks-tools">
+		<div class="bl-blocks-tools__section">
+			<h3 class="bl-blocks-tools__heading"><?php echo esc_html__('Export and Import', 'baselayer-blocks'); ?></h3>
+			<p class="description bl-blocks-tools__help">
+				<?php echo esc_html__('Export as JSON, or import a previously exported file.', 'baselayer-blocks'); ?>
+			</p>
+			<div class="bl-blocks-tools__actions">
+				<button type="button" class="button bl-button" data-bl-blocks-export><?php echo esc_html__('Export', 'baselayer-blocks'); ?></button>
+				<button type="button" class="button bl-button" data-bl-blocks-import><?php echo esc_html__('Import', 'baselayer-blocks'); ?></button>
+			</div>
+		</div>
+	</div>
+	<?php
+}
 
 /**
  * Side panel: block ID + theme PHP template status / starter actions.
@@ -397,6 +423,17 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'menuLabel'                => __('Tab label', 'baselayer-blocks'),
 		'menuLabelHelp'            => __('Label in the Website sidebar. Defaults to the title.', 'baselayer-blocks'),
 		'menuOrder'                => __('Order', 'baselayer-blocks'),
+		'exportImport'             => __('Export and Import', 'baselayer-blocks'),
+		'export'                   => __('Export', 'baselayer-blocks'),
+		'import'                   => __('Import', 'baselayer-blocks'),
+		'importOverwriteTitle'     => __('Import definition?', 'baselayer-blocks'),
+		'importOverwriteMessage'   => __('Importing will overwrite your current fields and settings. Block options from the file are applied when present. This cannot be undone.', 'baselayer-blocks'),
+		'importOverwriteConfirm'   => __('Overwrite', 'baselayer-blocks'),
+		'importInvalid'            => __('This file is not a valid definition export.', 'baselayer-blocks'),
+		'importTypeMismatch'       => __('This file is for a different definition type.', 'baselayer-blocks'),
+		'importReadError'          => __('Could not read the selected file.', 'baselayer-blocks'),
+		'cancel'                   => __('Cancel', 'baselayer-blocks'),
+		'ok'                       => __('OK', 'baselayer-blocks'),
 		'fullscreenEnter'          => __('Fullscreen', 'baselayer-blocks'),
 		'fullscreenExit'           => __('Exit fullscreen', 'baselayer-blocks'),
 		'paletteSectionPopular'    => __('Popular', 'baselayer-blocks'),

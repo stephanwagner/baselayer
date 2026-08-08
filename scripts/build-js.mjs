@@ -80,6 +80,7 @@ const formsBundles = [
 
 const blocksBundles = [
   { input: `${blocksPkg}/src/js/admin.js`, name: 'blocks-admin', outDir: `${blocksPkg}/assets/js` },
+  { input: `${blocksPkg}/src/js/settings-import.js`, name: 'blocks-settings', outDir: `${blocksPkg}/assets/js` },
   {
     input: `${blocksPkg}/src/js/editor.js`,
     name: 'blocks-editor',

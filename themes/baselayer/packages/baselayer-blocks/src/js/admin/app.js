@@ -8,6 +8,7 @@ import {
   serializeRepeaterRow,
   defaultRepeater,
 } from './repeater-card.js';
+import { bindImportExport } from './import-export.js';
 
 const EXCLUDED_TYPES = new Set(['honeypot', 'captcha', 'terms', 'divider']);
 
@@ -95,8 +96,6 @@ export function mountApp(root, initial, definitionType = 'block') {
     defaultField,
     uniqueFieldName,
     iconEl,
-    createFieldCard,
-    serializeRow,
     equalizeColumnRun,
   } = FormBuilder;
 
@@ -132,13 +131,38 @@ export function mountApp(root, initial, definitionType = 'block') {
   };
   /** @type {{ canvas: object, getFields: Function, setFields: Function, addField: Function } | null} */
   let builderApi = null;
+  /** @type {{ panel: HTMLElement, getSettings: Function }} */
+  let panels;
+  /** @type {{ panel: HTMLElement, getBlockOptions: Function, setBlockOptions?: Function } | null} */
+  let optionsPanel = null;
+  /** @type {Array<{ id: string, label: string, panel: HTMLElement, button?: HTMLElement }>} */
+  let tabs = [];
 
-  const panels = createSettingsPanel(settingsState, definitionType, (next) => {
+  const onSettingsChange = (next) => {
     settingsState = next;
     syncAll();
-  });
+  };
 
-  const optionsPanel =
+  const mountSettingsPanel = (settings) => {
+    const next = createSettingsPanel(settings, definitionType, onSettingsChange);
+    if (panels?.panel?.parentNode) {
+      const wasHidden = panels.panel.hidden;
+      const wasActive = panels.panel.classList.contains('is-active');
+      panels.panel.replaceWith(next.panel);
+      next.panel.hidden = wasHidden;
+      next.panel.classList.toggle('is-active', wasActive);
+      const settingsTab = tabs.find((tab) => tab.id === 'settings');
+      if (settingsTab) {
+        settingsTab.panel = next.panel;
+      }
+    }
+    panels = next;
+    return next;
+  };
+
+  panels = mountSettingsPanel(settingsState);
+
+  optionsPanel =
     definitionType === 'block'
       ? createOptionsPanel(blockOptionsState, (next) => {
           blockOptionsState = next;
@@ -240,9 +264,7 @@ export function mountApp(root, initial, definitionType = 'block') {
   });
 
   const tabBar = el('nav', { className: 'bl-forms-builder__tabs', role: 'tablist' });
-  const tabs = [
-    { id: 'fields', label: t('tabFields', 'Fields'), panel: fieldsPanel },
-  ];
+  tabs = [{ id: 'fields', label: t('tabFields', 'Fields'), panel: fieldsPanel }];
   if (optionsPanel) {
     tabs.push({
       id: 'options',
@@ -349,6 +371,28 @@ export function mountApp(root, initial, definitionType = 'block') {
   root.addEventListener('input', syncAll);
   root.addEventListener('change', syncAll);
   document.addEventListener('bl-forms-builder-changed', syncAll);
+
+  bindImportExport(
+    {
+      getFields: () => builderApi.getFields(),
+      setFields: (fields) => builderApi.setFields(fields || []),
+      getSettings: () => panels.getSettings(),
+      applySettings: (next) => {
+        // Full replace so import overwrites (does not keep stale keys).
+        settingsState = { ...(next || {}) };
+        mountSettingsPanel(settingsState);
+      },
+      getBlockOptions: optionsPanel ? () => optionsPanel.getBlockOptions() : null,
+      setBlockOptions: optionsPanel
+        ? (next) => {
+            optionsPanel.setBlockOptions(next || { items: [] });
+            blockOptionsState = optionsPanel.getBlockOptions();
+          }
+        : null,
+      sync: syncAll,
+    },
+    definitionType
+  );
 
   syncAll();
 }

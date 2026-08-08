@@ -2652,7 +2652,13 @@
     render();
     return {
       panel,
-      getBlockOptions: () => ({ items: JSON.parse(JSON.stringify(items)) })
+      getBlockOptions: () => ({ items: JSON.parse(JSON.stringify(items)) }),
+      setBlockOptions: (next) => {
+        items = Array.isArray(next?.items) ? JSON.parse(JSON.stringify(next.items)) : [];
+        openItemId = null;
+        sync();
+        render();
+      }
     };
   }
 
@@ -3055,6 +3061,229 @@
     };
   }
 
+  // themes/baselayer/packages/baselayer-blocks/src/js/admin/import-export-shared.js
+  function openConfirmModal(opts) {
+    document.querySelectorAll(".bl-forms-builder__modal").forEach((node) => node.remove());
+    const title = opts.title || "Confirm";
+    const hideCancel = !!opts.hideCancel;
+    const backdrop = document.createElement("div");
+    backdrop.className = "bl-forms-builder__modal";
+    backdrop.setAttribute("role", "dialog");
+    backdrop.setAttribute("aria-modal", "true");
+    backdrop.setAttribute("aria-label", title);
+    const close = () => {
+      document.removeEventListener("keydown", onKey);
+      backdrop.remove();
+    };
+    const onKey = (evt) => {
+      if (evt.key === "Escape") {
+        close();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    backdrop.addEventListener("click", (evt) => {
+      if (evt.target === backdrop) {
+        close();
+      }
+    });
+    const dialog = document.createElement("div");
+    dialog.className = "bl-forms-builder__modal-dialog";
+    const header = document.createElement("div");
+    header.className = "bl-forms-builder__modal-header";
+    const heading = document.createElement("h2");
+    heading.className = "bl-forms-builder__modal-title";
+    heading.textContent = title;
+    header.appendChild(heading);
+    const body = document.createElement("div");
+    body.className = "bl-forms-builder__modal-body";
+    const p = document.createElement("p");
+    p.textContent = opts.message || "";
+    body.appendChild(p);
+    const footer = document.createElement("div");
+    footer.className = "bl-forms-builder__modal-footer";
+    if (!hideCancel) {
+      const cancelBtn = document.createElement("button");
+      cancelBtn.type = "button";
+      cancelBtn.className = "button";
+      cancelBtn.textContent = opts.cancelLabel || "Cancel";
+      cancelBtn.addEventListener("click", close);
+      footer.appendChild(cancelBtn);
+    }
+    const confirmBtn = document.createElement("button");
+    confirmBtn.type = "button";
+    confirmBtn.className = "button button-primary";
+    confirmBtn.textContent = opts.confirmLabel || (hideCancel ? "OK" : "Confirm");
+    confirmBtn.addEventListener("click", () => {
+      opts.onConfirm?.();
+      close();
+    });
+    footer.appendChild(confirmBtn);
+    dialog.append(header, body, footer);
+    backdrop.appendChild(dialog);
+    document.body.appendChild(backdrop);
+    confirmBtn.focus();
+  }
+  function openAlertModal(opts) {
+    openConfirmModal({
+      title: opts.title,
+      message: opts.message,
+      confirmLabel: opts.confirmLabel || "OK",
+      hideCancel: true
+    });
+  }
+  function normalizeDefinitionImport(data) {
+    if (!data || typeof data !== "object") {
+      return null;
+    }
+    if (Array.isArray(data)) {
+      if (data.length !== 1 || !data[0] || typeof data[0] !== "object") {
+        return null;
+      }
+      return data[0];
+    }
+    if (Array.isArray(data.definitions)) {
+      if (data.definitions.length === 1) {
+        return data.definitions[0];
+      }
+      return null;
+    }
+    if (data.presets != null || data.blocks != null && !data.type && !data.fields) {
+      return null;
+    }
+    if (data.type || data.fields || data.settings) {
+      return data;
+    }
+    return null;
+  }
+  function definitionTypeMatches(item, expectedType) {
+    if (!item || typeof item !== "object") {
+      return false;
+    }
+    const type = String(item.type || "");
+    return type === "" || type === expectedType;
+  }
+  function downloadJson(filename, payload) {
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {
+      type: "application/json"
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }
+  function slugifyFilename(text) {
+    return String(text || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "definition";
+  }
+
+  // themes/baselayer/packages/baselayer-blocks/src/js/admin/import-export.js
+  function t5(key, fallback) {
+    const dict = window.blBlocksAdmin && window.blBlocksAdmin.i18n || {};
+    return dict[key] || fallback;
+  }
+  function showImportError(message) {
+    openAlertModal({
+      title: t5("import", "Import"),
+      message,
+      confirmLabel: t5("ok", "OK")
+    });
+  }
+  function bindImportExport(api, definitionType) {
+    const exportBtn = document.querySelector("[data-bl-blocks-export]");
+    const importBtn = document.querySelector("[data-bl-blocks-import]");
+    if (!exportBtn && !importBtn) {
+      return;
+    }
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = "application/json,.json";
+    fileInput.hidden = true;
+    document.body.appendChild(fileInput);
+    exportBtn?.addEventListener("click", () => {
+      const titleInput = document.getElementById("title");
+      const title = titleInput && titleInput.value.trim() || document.querySelector("#title-prompt-text")?.textContent?.trim() || "";
+      const settings = { ...api.getSettings?.() || {} };
+      if (!settings.slug) {
+        settings.slug = slugifyFilename(title) || definitionType;
+      }
+      const payload = {
+        type: definitionType,
+        title: title || settings.slug || definitionType,
+        fields: api.getFields?.() || [],
+        settings
+      };
+      if (definitionType === "block" && typeof api.getBlockOptions === "function") {
+        payload.block_options = api.getBlockOptions() || { items: [] };
+      }
+      const typeSlug = definitionType === "page_settings" ? "content-fields" : definitionType === "site_settings" ? "website-fields" : "block";
+      downloadJson(`${slugifyFilename(payload.title)}-${typeSlug}.json`, payload);
+    });
+    importBtn?.addEventListener("click", () => {
+      fileInput.value = "";
+      fileInput.click();
+    });
+    fileInput.addEventListener("change", () => {
+      const file = fileInput.files?.[0];
+      if (!file) {
+        return;
+      }
+      const reader = new FileReader();
+      reader.onerror = () => {
+        showImportError(t5("importReadError", "Could not read the selected file."));
+      };
+      reader.onload = () => {
+        let parsed;
+        try {
+          parsed = JSON.parse(String(reader.result || ""));
+        } catch (e) {
+          showImportError(t5("importInvalid", "This file is not a valid definition export."));
+          return;
+        }
+        const item = normalizeDefinitionImport(parsed);
+        if (!item || !Array.isArray(item.fields)) {
+          showImportError(t5("importInvalid", "This file is not a valid definition export."));
+          return;
+        }
+        if (!definitionTypeMatches(item, definitionType)) {
+          showImportError(t5("importTypeMismatch", "This file is for a different definition type."));
+          return;
+        }
+        openConfirmModal({
+          title: t5("importOverwriteTitle", "Import definition?"),
+          message: t5(
+            "importOverwriteMessage",
+            "Importing will overwrite your current fields and settings. Block options from the file are applied when present. This cannot be undone."
+          ),
+          confirmLabel: t5("importOverwriteConfirm", "Overwrite"),
+          cancelLabel: t5("cancel", "Cancel"),
+          onConfirm: () => {
+            api.setFields?.(item.fields || []);
+            if (item.settings && typeof item.settings === "object") {
+              api.applySettings?.(item.settings);
+            }
+            if (definitionType === "block" && item.block_options && typeof api.setBlockOptions === "function") {
+              api.setBlockOptions({
+                items: Array.isArray(item.block_options.items) ? item.block_options.items : []
+              });
+            }
+            if (item.title) {
+              const titleInput = document.getElementById("title");
+              if (titleInput) {
+                titleInput.value = String(item.title);
+                titleInput.dispatchEvent(new Event("input", { bubbles: true }));
+              }
+            }
+            api.sync?.();
+          }
+        });
+      };
+      reader.readAsText(file);
+    });
+  }
+
   // themes/baselayer/packages/baselayer-blocks/src/js/admin/app.js
   var EXCLUDED_TYPES = /* @__PURE__ */ new Set(["honeypot", "captcha", "terms", "divider"]);
   var BLOCKS_POPULAR_TYPES = ["text", "textarea", "select", "toggle"];
@@ -3116,13 +3345,11 @@
     }
     const {
       el: el8,
-      t: t5,
+      t: t6,
       writeConfig: writeConfig2,
       defaultField: defaultField2,
       uniqueFieldName: uniqueFieldName2,
       iconEl: iconEl3,
-      createFieldCard: createFieldCard2,
-      serializeRow: serializeRow2,
       equalizeColumnRun
     } = FormBuilder;
     if (typeof FormBuilder.configure === "function") {
@@ -3154,11 +3381,31 @@
       items: Array.isArray(initial.blockOptions?.items) ? initial.blockOptions.items : []
     };
     let builderApi = null;
-    const panels = createSettingsPanel(settingsState, definitionType, (next) => {
+    let panels;
+    let optionsPanel = null;
+    let tabs = [];
+    const onSettingsChange = (next) => {
       settingsState = next;
       syncAll();
-    });
-    const optionsPanel = definitionType === "block" ? createOptionsPanel2(blockOptionsState, (next) => {
+    };
+    const mountSettingsPanel = (settings) => {
+      const next = createSettingsPanel(settings, definitionType, onSettingsChange);
+      if (panels?.panel?.parentNode) {
+        const wasHidden = panels.panel.hidden;
+        const wasActive = panels.panel.classList.contains("is-active");
+        panels.panel.replaceWith(next.panel);
+        next.panel.hidden = wasHidden;
+        next.panel.classList.toggle("is-active", wasActive);
+        const settingsTab = tabs.find((tab) => tab.id === "settings");
+        if (settingsTab) {
+          settingsTab.panel = next.panel;
+        }
+      }
+      panels = next;
+      return next;
+    };
+    panels = mountSettingsPanel(settingsState);
+    optionsPanel = definitionType === "block" ? createOptionsPanel2(blockOptionsState, (next) => {
       blockOptionsState = next;
       syncAll();
     }) : null;
@@ -3216,18 +3463,18 @@
       groupName: "bl-blocks-fields",
       items: initial.fields || [],
       sections: blocksPalette(),
-      heading: t5("canvasHeading", "Fields"),
-      emptyText: t5("empty", "Drag a field here."),
+      heading: t6("canvasHeading", "Fields"),
+      emptyText: t6("empty", "Drag a field here."),
       handleSelector: ".bl-forms-builder__handle",
       draggableSelector: ".bl-forms-builder__field, .bl-forms-builder__template",
       templateClass: "bl-forms-builder__template",
       itemAttr: "data-bl-forms-field",
       icons: window.blFormsAdmin && window.blFormsAdmin.icons || {},
-      t: t5,
+      t: t6,
       typeLabel: (type) => {
         const dict = window.blFormsAdmin && window.blFormsAdmin.i18n || {};
         if (type === "repeater") {
-          return dict.types && dict.types.repeater || t5("repeaterType", "Repeater");
+          return dict.types && dict.types.repeater || t6("repeaterType", "Repeater");
         }
         return dict.types && dict.types[type] || type;
       },
@@ -3245,17 +3492,15 @@
       }
     });
     const tabBar = el8("nav", { className: "bl-forms-builder__tabs", role: "tablist" });
-    const tabs = [
-      { id: "fields", label: t5("tabFields", "Fields"), panel: fieldsPanel }
-    ];
+    tabs = [{ id: "fields", label: t6("tabFields", "Fields"), panel: fieldsPanel }];
     if (optionsPanel) {
       tabs.push({
         id: "options",
-        label: t5("tabOptions", "Options"),
+        label: t6("tabOptions", "Options"),
         panel: optionsPanel.panel
       });
     }
-    tabs.push({ id: "settings", label: t5("tabSettings", "Settings"), panel: panels.panel });
+    tabs.push({ id: "settings", label: t6("tabSettings", "Settings"), panel: panels.panel });
     const activate = (id) => {
       tabs.forEach((tab) => {
         const active = tab.id === id;
@@ -3282,7 +3527,7 @@
       fullscreen = !!next;
       root.classList.toggle("is-fullscreen", fullscreen);
       document.body.classList.toggle("bl-forms-builder-fullscreen", fullscreen);
-      const label = fullscreen ? t5("fullscreenExit", "Exit fullscreen") : t5("fullscreenEnter", "Fullscreen");
+      const label = fullscreen ? t6("fullscreenExit", "Exit fullscreen") : t6("fullscreenEnter", "Fullscreen");
       fullscreenBtn.title = label;
       fullscreenBtn.setAttribute("aria-label", label);
       fullscreenBtn.setAttribute("aria-pressed", fullscreen ? "true" : "false");
@@ -3308,8 +3553,8 @@
     const fullscreenBtn = el8("button", {
       type: "button",
       className: "bl-forms-builder__icon-btn bl-forms-builder__fullscreen-btn",
-      title: t5("fullscreenEnter", "Fullscreen"),
-      "aria-label": t5("fullscreenEnter", "Fullscreen"),
+      title: t6("fullscreenEnter", "Fullscreen"),
+      "aria-label": t6("fullscreenEnter", "Fullscreen"),
       "aria-pressed": "false",
       onClick: () => setFullscreen(!fullscreen)
     });
@@ -3343,6 +3588,24 @@
     root.addEventListener("input", syncAll);
     root.addEventListener("change", syncAll);
     document.addEventListener("bl-forms-builder-changed", syncAll);
+    bindImportExport(
+      {
+        getFields: () => builderApi.getFields(),
+        setFields: (fields) => builderApi.setFields(fields || []),
+        getSettings: () => panels.getSettings(),
+        applySettings: (next) => {
+          settingsState = { ...next || {} };
+          mountSettingsPanel(settingsState);
+        },
+        getBlockOptions: optionsPanel ? () => optionsPanel.getBlockOptions() : null,
+        setBlockOptions: optionsPanel ? (next) => {
+          optionsPanel.setBlockOptions(next || { items: [] });
+          blockOptionsState = optionsPanel.getBlockOptions();
+        } : null,
+        sync: syncAll
+      },
+      definitionType
+    );
     syncAll();
   }
 
@@ -3745,74 +4008,74 @@
   window.baselayerOpenPagePicker = openPagePicker;
 
   // node_modules/sortablejs/modular/sortable.esm.js
-  function _defineProperty(e, r, t5) {
+  function _defineProperty(e, r, t6) {
     return (r = _toPropertyKey(r)) in e ? Object.defineProperty(e, r, {
-      value: t5,
+      value: t6,
       enumerable: true,
       configurable: true,
       writable: true
-    }) : e[r] = t5, e;
+    }) : e[r] = t6, e;
   }
   function _extends() {
     return _extends = Object.assign ? Object.assign.bind() : function(n) {
       for (var e = 1; e < arguments.length; e++) {
-        var t5 = arguments[e];
-        for (var r in t5) ({}).hasOwnProperty.call(t5, r) && (n[r] = t5[r]);
+        var t6 = arguments[e];
+        for (var r in t6) ({}).hasOwnProperty.call(t6, r) && (n[r] = t6[r]);
       }
       return n;
     }, _extends.apply(null, arguments);
   }
   function ownKeys(e, r) {
-    var t5 = Object.keys(e);
+    var t6 = Object.keys(e);
     if (Object.getOwnPropertySymbols) {
       var o = Object.getOwnPropertySymbols(e);
       r && (o = o.filter(function(r2) {
         return Object.getOwnPropertyDescriptor(e, r2).enumerable;
-      })), t5.push.apply(t5, o);
+      })), t6.push.apply(t6, o);
     }
-    return t5;
+    return t6;
   }
   function _objectSpread2(e) {
     for (var r = 1; r < arguments.length; r++) {
-      var t5 = null != arguments[r] ? arguments[r] : {};
-      r % 2 ? ownKeys(Object(t5), true).forEach(function(r2) {
-        _defineProperty(e, r2, t5[r2]);
-      }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t5)) : ownKeys(Object(t5)).forEach(function(r2) {
-        Object.defineProperty(e, r2, Object.getOwnPropertyDescriptor(t5, r2));
+      var t6 = null != arguments[r] ? arguments[r] : {};
+      r % 2 ? ownKeys(Object(t6), true).forEach(function(r2) {
+        _defineProperty(e, r2, t6[r2]);
+      }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t6)) : ownKeys(Object(t6)).forEach(function(r2) {
+        Object.defineProperty(e, r2, Object.getOwnPropertyDescriptor(t6, r2));
       });
     }
     return e;
   }
-  function _objectWithoutProperties(e, t5) {
+  function _objectWithoutProperties(e, t6) {
     if (null == e) return {};
-    var o, r, i = _objectWithoutPropertiesLoose(e, t5);
+    var o, r, i = _objectWithoutPropertiesLoose(e, t6);
     if (Object.getOwnPropertySymbols) {
       var n = Object.getOwnPropertySymbols(e);
-      for (r = 0; r < n.length; r++) o = n[r], -1 === t5.indexOf(o) && {}.propertyIsEnumerable.call(e, o) && (i[o] = e[o]);
+      for (r = 0; r < n.length; r++) o = n[r], -1 === t6.indexOf(o) && {}.propertyIsEnumerable.call(e, o) && (i[o] = e[o]);
     }
     return i;
   }
   function _objectWithoutPropertiesLoose(r, e) {
     if (null == r) return {};
-    var t5 = {};
+    var t6 = {};
     for (var n in r) if ({}.hasOwnProperty.call(r, n)) {
       if (-1 !== e.indexOf(n)) continue;
-      t5[n] = r[n];
+      t6[n] = r[n];
     }
-    return t5;
+    return t6;
   }
-  function _toPrimitive(t5, r) {
-    if ("object" != typeof t5 || !t5) return t5;
-    var e = t5[Symbol.toPrimitive];
+  function _toPrimitive(t6, r) {
+    if ("object" != typeof t6 || !t6) return t6;
+    var e = t6[Symbol.toPrimitive];
     if (void 0 !== e) {
-      var i = e.call(t5, r || "default");
+      var i = e.call(t6, r || "default");
       if ("object" != typeof i) return i;
       throw new TypeError("@@toPrimitive must return a primitive value.");
     }
-    return ("string" === r ? String : Number)(t5);
+    return ("string" === r ? String : Number)(t6);
   }
-  function _toPropertyKey(t5) {
-    var i = _toPrimitive(t5, "string");
+  function _toPropertyKey(t6) {
+    var i = _toPrimitive(t6, "string");
     return "symbol" == typeof i ? i : i + "";
   }
   function _typeof(o) {
@@ -6473,7 +6736,7 @@
   }
   function allowedLinkTypes(field) {
     const raw = Array.isArray(field.link_types) ? field.link_types : LINK_TYPES;
-    const list = raw.map(String).filter((t5) => LINK_TYPES.includes(t5));
+    const list = raw.map(String).filter((t6) => LINK_TYPES.includes(t6));
     return list.length ? list : [...LINK_TYPES];
   }
   function normalizeLinkValue(current, allowed) {
@@ -6777,7 +7040,7 @@
       wrap.dataset.blLinkBound = "1";
       const inputName = wrap.dataset.inputName || "";
       if (!inputName) return;
-      let allowed = String(wrap.dataset.linkTypes || "").split(",").map((s) => s.trim()).filter((t5) => LINK_TYPES.includes(t5));
+      let allowed = String(wrap.dataset.linkTypes || "").split(",").map((s) => s.trim()).filter((t6) => LINK_TYPES.includes(t6));
       if (!allowed.length) allowed = [...LINK_TYPES];
       const allowTarget = wrap.dataset.allowTarget === "1";
       const readHidden = () => {
@@ -7005,12 +7268,12 @@
     if (!raw) {
       return "";
     }
-    const tokens = raw.split(/[\s,]+/).filter(Boolean).map((t5) => t5.replace(/^video\//, ""));
+    const tokens = raw.split(/[\s,]+/).filter(Boolean).map((t6) => t6.replace(/^video\//, ""));
     if (!tokens.length) {
       return "";
     }
     const videoExts = /* @__PURE__ */ new Set(["mp4", "webm", "ogg", "ogv", "mov", "m4v", "video"]);
-    if (tokens.every((t5) => videoExts.has(t5))) {
+    if (tokens.every((t6) => videoExts.has(t6))) {
       return "video";
     }
     return "";

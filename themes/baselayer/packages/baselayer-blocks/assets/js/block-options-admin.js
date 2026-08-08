@@ -2107,7 +2107,13 @@
     render();
     return {
       panel,
-      getBlockOptions: () => ({ items: JSON.parse(JSON.stringify(items)) })
+      getBlockOptions: () => ({ items: JSON.parse(JSON.stringify(items)) }),
+      setBlockOptions: (next) => {
+        items = Array.isArray(next?.items) ? JSON.parse(JSON.stringify(next.items)) : [];
+        openItemId = null;
+        sync();
+        render();
+      }
     };
   }
 

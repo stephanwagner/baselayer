@@ -1532,6 +1532,60 @@ msgid "Remove options for “%s”? This cannot be undone."
 msgstr ""
 
 #: includes/block-options/admin.php:408
+
+#: includes/admin-editor.php
+msgid "Tools"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Export and Import"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Export as JSON, or import a previously exported file."
+msgstr ""
+
+
+#: includes/admin-editor.php
+msgid "Import definition?"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Importing will overwrite your current fields and settings. Block options from the file are applied when present. This cannot be undone."
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Overwrite"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "This file is not a valid definition export."
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "This file is for a different definition type."
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "Could not read the selected file."
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "OK"
+msgstr ""
+
+#: includes/import-export.php
+msgid "Import definitions?"
+msgstr ""
+
+#: includes/import-export.php
+msgid "Importing will create or update matching definitions by type and slug, and may merge block options into the live store. This cannot be undone."
+msgstr ""
+
+#: includes/import-export.php
+msgid "Import and overwrite"
+msgstr ""
+
 msgid "All blocks"
 msgstr ""
 

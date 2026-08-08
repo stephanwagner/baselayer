@@ -644,35 +644,19 @@ function bl_blocks_enqueue_settings_assets(string $hook): void
 	if (function_exists('bl_blocks_enqueue_style')) {
 		bl_blocks_enqueue_style('bl-blocks-admin', 'blocks-admin');
 	}
+	if (function_exists('bl_blocks_enqueue_script')) {
+		bl_blocks_enqueue_script('bl-blocks-settings', 'blocks-settings', [], true);
+		wp_localize_script('bl-blocks-settings', 'blBlocksSettings', [
+			'i18n' => [
+				'importOverwriteTitle'   => __('Import definitions?', 'baselayer-blocks'),
+				'importOverwriteMessage' => __('Importing will create or update matching definitions by type and slug, and may merge block options into the live store. This cannot be undone.', 'baselayer-blocks'),
+				'importOverwriteConfirm' => __('Import and overwrite', 'baselayer-blocks'),
+				'cancel'                 => __('Cancel', 'baselayer-blocks'),
+			],
+		]);
+	}
 }
 add_action('admin_enqueue_scripts', 'bl_blocks_enqueue_settings_assets');
-
-/**
- * File-name label for the Settings import picker (footer so the input exists).
- */
-function bl_blocks_settings_import_file_script(): void
-{
-	// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-	$page = isset($_GET['page']) ? sanitize_key((string) wp_unslash($_GET['page'])) : '';
-	if ($page !== BL_BLOCKS_SETTINGS_PAGE || !bl_blocks_user_can_manage()) {
-		return;
-	}
-	?>
-	<script>
-	(function () {
-		var input = document.getElementById('bl_blocks_import_file');
-		if (!input) return;
-		var nameEl = input.parentElement && input.parentElement.querySelector('.bl-blocks-settings__file-name');
-		if (!nameEl) return;
-		input.addEventListener('change', function () {
-			var empty = nameEl.getAttribute('data-empty') || '';
-			nameEl.textContent = (input.files && input.files[0] && input.files[0].name) || empty;
-		});
-	})();
-	</script>
-	<?php
-}
-add_action('admin_footer', 'bl_blocks_settings_import_file_script');
 
 /**
  * Render Blocks → Settings screen.

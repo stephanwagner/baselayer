@@ -575,6 +575,59 @@ msgstr "Beschriftung in der Website-Seitenleiste. Standard ist der Titel."
 msgid "Order"
 msgstr "Reihenfolge"
 
+#: includes/admin-editor.php
+msgid "Tools"
+msgstr "Werkzeuge"
+
+#: includes/admin-editor.php
+msgid "Export and Import"
+msgstr "Export und Import"
+
+#: includes/admin-editor.php
+msgid "Export as JSON, or import a previously exported file."
+msgstr "Als JSON exportieren oder eine zuvor exportierte Datei importieren."
+
+
+#: includes/admin-editor.php
+msgid "Import definition?"
+msgstr "Definition importieren?"
+
+#: includes/admin-editor.php
+msgid "Importing will overwrite your current fields and settings. Block options from the file are applied when present. This cannot be undone."
+msgstr "Beim Importieren werden Ihre aktuellen Felder und Einstellungen überschrieben. Blockoptionen aus der Datei werden übernommen, sofern vorhanden. Das kann nicht rückgängig gemacht werden."
+
+#: includes/admin-editor.php
+msgid "Overwrite"
+msgstr "Überschreiben"
+
+#: includes/admin-editor.php
+msgid "This file is not a valid definition export."
+msgstr "Diese Datei ist kein gültiger Definitions-Export."
+
+#: includes/admin-editor.php
+msgid "This file is for a different definition type."
+msgstr "Diese Datei gehört zu einem anderen Definitionstyp."
+
+#: includes/admin-editor.php
+msgid "Could not read the selected file."
+msgstr "Die ausgewählte Datei konnte nicht gelesen werden."
+
+#: includes/admin-editor.php
+msgid "OK"
+msgstr "OK"
+
+#: includes/import-export.php
+msgid "Import definitions?"
+msgstr "Definitionen importieren?"
+
+#: includes/import-export.php
+msgid "Importing will create or update matching definitions by type and slug, and may merge block options into the live store. This cannot be undone."
+msgstr "Beim Importieren werden passende Definitionen nach Typ und Slug erstellt oder aktualisiert. Blockoptionen können in den Live-Speicher übernommen werden. Das kann nicht rückgängig gemacht werden."
+
+#: includes/import-export.php
+msgid "Import and overwrite"
+msgstr "Importieren und überschreiben"
+
 #: includes/admin-editor.php:363
 msgid "Fullscreen"
 msgstr "Vollbild"
