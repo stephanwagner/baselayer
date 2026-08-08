@@ -20,7 +20,7 @@ return [
 	 * Registered navigation menus.
 	 *
 	 * Each menu: id, title, optional options (checkboxes on menu items).
-	 * Option: id, className (added to <li> when checked), label, default.
+	 * Option: id, className (on <li>), linkClassNames (on <a>), label, default.
 	 */
 	'menus' => [
 		[
@@ -30,6 +30,7 @@ return [
 				[
 					'id' => 'highlight',
 					'className' => '-highlight',
+					'linkClassNames' => 'button',
 					'label' => 'Highlight link',
 					'default' => false,
 				],

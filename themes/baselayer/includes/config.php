@@ -381,7 +381,7 @@ function bl_config_comments_enabled(): bool
 /**
  * Normalized theme menus from config (`id`, `title`, `options`).
  *
- * @return array<int, array{id: string, title: string, options: array<int, array{id: string, className: string, label: string, default: bool}>}>
+ * @return array<int, array{id: string, title: string, options: array<int, array{id: string, className: string, linkClassNames: string, label: string, default: bool}>}>
  */
 function bl_theme_menus_config(): array
 {
@@ -431,6 +431,7 @@ function bl_theme_menus_config(): array
 				$options[] = [
 					'id' => sanitize_key($option['id']),
 					'className' => isset($option['className']) && is_string($option['className']) ? $option['className'] : '',
+					'linkClassNames' => isset($option['linkClassNames']) && is_string($option['linkClassNames']) ? trim($option['linkClassNames']) : '',
 					'label' => isset($option['label']) && is_string($option['label']) ? $option['label'] : '',
 					'default' => !empty($option['default']),
 				];
@@ -460,7 +461,7 @@ function bl_theme_menu_register_map(): array
 }
 
 /**
- * @return array{id: string, title: string, options: array<int, array{id: string, className: string, label: string, default: bool}>}|null
+ * @return array{id: string, title: string, options: array<int, array{id: string, className: string, linkClassNames: string, label: string, default: bool}>}|null
  */
 function bl_theme_menu(string $menu_id): ?array
 {
@@ -481,7 +482,7 @@ function bl_theme_menu(string $menu_id): ?array
 /**
  * Menu item options for a theme location.
  *
- * @return array<int, array{id: string, className: string, label: string, default: bool}>
+ * @return array<int, array{id: string, className: string, linkClassNames: string, label: string, default: bool}>
  */
 function bl_theme_menu_options(string $menu_id): array
 {

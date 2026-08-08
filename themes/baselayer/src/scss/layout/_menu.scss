@@ -198,26 +198,35 @@
   }
 
   li {
-    a {
-      display: block;
-      color: var(--bl-default-text-color);
-      text-decoration: none;
-
-      &:hover {
-        color: var(--bl-link-color-hover);
+    &:not(.-highlight) {
+      a {
+        display: block;
+        color: var(--bl-default-text-color);
         text-decoration: none;
-      }
-    }
-
-    &.current-menu-parent,
-    &.current-menu-item {
-      > a,
-      > .menu-item__inner > a {
-        color: var(--bl-link-color-hover);
 
         &:hover {
           color: var(--bl-link-color-hover);
+          text-decoration: none;
         }
+      }
+
+      &.current-menu-parent,
+      &.current-menu-item {
+        > a,
+        > .menu-item__inner > a {
+          color: var(--bl-link-color-hover);
+
+          &:hover {
+            color: var(--bl-link-color-hover);
+          }
+        }
+      }
+    }
+
+    &.-highlight {
+      > a,
+      > .menu-item__inner > a {
+        text-decoration: none;
       }
     }
 
@@ -244,30 +253,32 @@
       width: 100%;
     }
 
-    > a,
-    > .menu-item__inner > a {
-      padding: 0 12px;
-      white-space: nowrap;
-
-      @media (max-width: $breakpoint-mobile) {
-        padding: 4px 0;
-      }
-    }
-
-    &:hover,
-    &.-current-active {
+    &:not(.-highlight) {
       > a,
       > .menu-item__inner > a {
-        color: var(--bl-link-color);
+        padding: 0 12px;
+        white-space: nowrap;
 
-        &:hover {
-          color: var(--bl-link-color-hover);
+        @media (max-width: $breakpoint-mobile) {
+          padding: 4px 0;
+        }
+      }
+
+      &:hover,
+      &.-current-active {
+        > a,
+        > .menu-item__inner > a {
+          color: var(--bl-link-color);
+
+          &:hover {
+            color: var(--bl-link-color-hover);
+          }
         }
       }
     }
 
     &.-highlight {
-      line-height: var(--bl-default-line-height);
+      line-height: 0;
       margin: 0 0 0 16px;
 
       @media (max-width: $breakpoint-mobile) {
@@ -276,20 +287,7 @@
 
       > a,
       > .menu-item__inner > a {
-        color: #fff;
-        background: var(--bl-link-color);
-        padding: 6px 20px;
-        border-radius: 32px;
-        text-decoration: none;
-        font-weight: 600;
-        transition: transition('background-color', 'color');
-        display: inline-block;
-
-        &:hover {
-          color: #fff;
-          background: var(--bl-link-color-hover);
-          text-decoration: none;
-        }
+        white-space: nowrap;
       }
     }
 

@@ -65,7 +65,7 @@ function bl_theme_menu_locations_for_menu(int $menu_term_id): array
 /**
  * Merged options for all theme locations on a menu (deduped by option id).
  *
- * @return array<int, array{id: string, className: string, label: string, default: bool}>
+ * @return array<int, array{id: string, className: string, linkClassNames: string, label: string, default: bool}>
  */
 function bl_theme_menu_options_for_menu_term(int $menu_term_id): array
 {
@@ -233,3 +233,47 @@ function bl_menu_item_option_css_classes(array $classes, object $item, object $a
 }
 
 add_filter('nav_menu_css_class', 'bl_menu_item_option_css_classes', 10, 4);
+
+/**
+ * Add configured linkClassNames to menu item anchors on the frontend.
+ *
+ * @param array<string, string|int|bool> $atts
+ * @return array<string, string|int|bool>
+ */
+function bl_menu_item_option_link_attributes(array $atts, object $item, object $args, int $depth): array
+{
+	unset($depth);
+
+	if (is_admin() || !isset($item->ID)) {
+		return $atts;
+	}
+
+	$theme_location = isset($args->theme_location) && is_string($args->theme_location) ? $args->theme_location : '';
+	if ($theme_location === '') {
+		return $atts;
+	}
+
+	$extra = [];
+	foreach (bl_theme_menu_options($theme_location) as $option) {
+		if (($option['linkClassNames'] ?? '') === '') {
+			continue;
+		}
+		if (!bl_menu_item_option_enabled((int) $item->ID, $option)) {
+			continue;
+		}
+		foreach (preg_split('/\s+/', $option['linkClassNames'], -1, PREG_SPLIT_NO_EMPTY) ?: [] as $class) {
+			$extra[] = $class;
+		}
+	}
+
+	if ($extra === []) {
+		return $atts;
+	}
+
+	$existing = isset($atts['class']) && is_scalar($atts['class']) ? (string) $atts['class'] : '';
+	$atts['class'] = trim($existing . ' ' . implode(' ', array_unique($extra)));
+
+	return $atts;
+}
+
+add_filter('nav_menu_link_attributes', 'bl_menu_item_option_link_attributes', 10, 4);
