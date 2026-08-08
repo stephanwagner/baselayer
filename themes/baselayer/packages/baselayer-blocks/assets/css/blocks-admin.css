@@ -1821,6 +1821,14 @@ button.button-link.bl-blocks-fields__repeater-remove:active {
   font-size: 12px;
 }
 
+.bl-blocks-back-wrap {
+  margin: 8px 0;
+}
+
+.bl-blocks-back {
+  margin: 0;
+}
+
 .bl-blocks-list-icon {
   display: inline-flex;
   align-items: center;

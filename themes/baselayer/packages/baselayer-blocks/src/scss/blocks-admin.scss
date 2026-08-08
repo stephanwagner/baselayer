@@ -4,6 +4,15 @@
 
 // Blocks admin: definition editor extras + Website + field UI modal.
 
+// Definition edit: back to Content / Website Fields list.
+.bl-blocks-back-wrap {
+  margin: 8px 0;
+}
+
+.bl-blocks-back {
+  margin: 0;
+}
+
 // Shared list icon chrome (Blocks CPT list + Block Options).
 .bl-blocks-list-icon {
   display: inline-flex;

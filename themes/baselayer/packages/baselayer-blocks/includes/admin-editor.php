@@ -88,6 +88,43 @@ function bl_blocks_render_template_metabox(WP_Post $post): void
 }
 
 /**
+ * Back link above the title on Content Fields / Website Fields edit screens.
+ */
+function bl_blocks_render_definition_back_link(WP_Post $post): void
+{
+	if ($post->post_type !== BL_BLOCK_POST_TYPE) {
+		return;
+	}
+	if (!bl_blocks_user_can_manage()) {
+		return;
+	}
+
+	$type = bl_blocks_get_definition_type((int) $post->ID);
+	if ($post->post_status === 'auto-draft' && isset($_GET['bl_block_type'])) {
+		$type = bl_blocks_sanitize_definition_type(wp_unslash((string) $_GET['bl_block_type']));
+	} elseif (isset($_GET['bl_block_type']) && get_post_meta((int) $post->ID, BL_BLOCK_TYPE_META, true) === '') {
+		$type = bl_blocks_sanitize_definition_type(wp_unslash((string) $_GET['bl_block_type']));
+	}
+
+	if ($type === 'page_settings') {
+		$label = __('All content fields', 'baselayer-blocks');
+	} elseif ($type === 'site_settings') {
+		$label = __('All website fields', 'baselayer-blocks');
+	} else {
+		return;
+	}
+
+	$url = admin_url('edit.php?post_type=' . BL_BLOCK_POST_TYPE . '&bl_block_type=' . rawurlencode($type));
+
+	echo '<p class="bl-blocks-back-wrap">';
+	echo '<a class="button button-secondary bl-button -has-icon -icon-arrow-left bl-blocks-back" href="' . esc_url($url) . '">';
+	echo esc_html($label);
+	echo '</a>';
+	echo '</p>';
+}
+add_action('edit_form_top', 'bl_blocks_render_definition_back_link');
+
+/**
  * Builder shell below the title.
  */
 function bl_blocks_render_builder_after_title(WP_Post $post): void

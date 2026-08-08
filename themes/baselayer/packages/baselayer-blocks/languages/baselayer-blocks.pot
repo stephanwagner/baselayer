@@ -1535,6 +1535,14 @@ msgstr ""
 msgid "All blocks"
 msgstr ""
 
+#: includes/admin-editor.php
+msgid "All content fields"
+msgstr ""
+
+#: includes/admin-editor.php
+msgid "All website fields"
+msgstr ""
+
 #: includes/block-options/admin.php:409
 msgid "All presets"
 msgstr ""

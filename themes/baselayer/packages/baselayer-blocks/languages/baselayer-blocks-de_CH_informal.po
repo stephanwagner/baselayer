@@ -1517,6 +1517,14 @@ msgstr "Optionen für „%s“ entfernen? Das kann nicht rückgängig gemacht we
 msgid "All blocks"
 msgstr "Alle Blöcke"
 
+#: includes/admin-editor.php
+msgid "All content fields"
+msgstr "Alle Inhaltsfelder"
+
+#: includes/admin-editor.php
+msgid "All website fields"
+msgstr "Alle Websitefelder"
+
 #: includes/block-options/admin.php:409
 msgid "All presets"
 msgstr "Alle Vorlagen"
