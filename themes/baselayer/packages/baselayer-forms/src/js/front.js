@@ -1,6 +1,8 @@
 /**
  * Frontend form AJAX submit + spinner + file upload UI + field errors.
  */
+import { setButtonLoading } from '../../../../src/js/utils/button-loading.js';
+
 function charLength(value) {
   return Array.from(String(value || '')).length;
 }
@@ -748,8 +750,6 @@ function initForm(root) {
   const form = root.querySelector('[data-bl-form-el]');
   const message = root.querySelector('[data-bl-form-message]');
   const submit = root.querySelector('[data-bl-form-submit]');
-  const spinner = root.querySelector('[data-bl-form-spinner]');
-  const label = root.querySelector('.bl-form__submit-label');
   if (!form || !submit) return;
 
   initFileUploads(root);
@@ -782,11 +782,19 @@ function initForm(root) {
   };
 
   const setLoading = (loading, { useProgress = false } = {}) => {
-    submit.disabled = loading;
     root.classList.toggle('is-loading', loading);
-    const showSpinner = loading && !useProgress;
-    if (spinner) spinner.hidden = !showSpinner;
-    if (label) label.hidden = showSpinner;
+    if (useProgress) {
+      // Progress UI replaces the overlay spinner; keep label visible.
+      submit.classList.remove('-is-loading');
+      submit.disabled = loading;
+      if (loading) {
+        submit.setAttribute('aria-busy', 'true');
+      } else {
+        submit.removeAttribute('aria-busy');
+      }
+    } else {
+      setButtonLoading(submit, loading);
+    }
     if (!loading) {
       progress.hide();
     }

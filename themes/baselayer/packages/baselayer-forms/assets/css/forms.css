@@ -28,7 +28,6 @@
   --bl-form-radius: var(--bl-radius, 6px);
   --bl-form-gap: 16px;
   --bl-form-control-padding: 10px 14px;
-  --bl-form-spinner-size: 18px;
 }
 
 .bl-form {
@@ -942,10 +941,6 @@ select.bl-form__control {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-}
-.bl-form__actions .button[data-bl-form-submit]:disabled {
-  cursor: wait;
 }
 
 .bl-form__progress {
@@ -1003,21 +998,6 @@ select.bl-form__control {
   }
   100% {
     transform: translateX(320%);
-  }
-}
-.bl-form__spinner {
-  width: var(--bl-form-spinner-size);
-  height: var(--bl-form-spinner-size);
-  border: 2px solid currentColor;
-  border-right-color: transparent;
-  border-radius: 50%;
-  opacity: 0.45;
-  animation: bl-form-spin 0.7s linear infinite;
-}
-
-@keyframes bl-form-spin {
-  to {
-    transform: rotate(360deg);
   }
 }
 .bl-form__message {

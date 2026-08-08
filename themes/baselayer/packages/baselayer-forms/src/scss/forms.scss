@@ -996,11 +996,6 @@ select.bl-form__control {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
-
-    &:disabled {
-      cursor: wait;
-    }
   }
 }
 
@@ -1059,22 +1054,6 @@ select.bl-form__control {
   }
   100% {
     transform: translateX(320%);
-  }
-}
-
-.bl-form__spinner {
-  width: var(--bl-form-spinner-size);
-  height: var(--bl-form-spinner-size);
-  border: 2px solid currentColor;
-  border-right-color: transparent;
-  border-radius: 50%;
-  opacity: 0.45;
-  animation: bl-form-spin 0.7s linear infinite;
-}
-
-@keyframes bl-form-spin {
-  to {
-    transform: rotate(360deg);
   }
 }
 

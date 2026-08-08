@@ -28,7 +28,6 @@
   --bl-form-radius: var(--bl-radius, 6px);
   --bl-form-gap: 16px;
   --bl-form-control-padding: 10px 14px;
-  --bl-form-spinner-size: 18px;
 }
 
 body.bl-page-picker-open {

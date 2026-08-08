@@ -92,7 +92,6 @@ function bl_forms_render(int $form_id, array $args = []): string
 				</div>
 				<button type="submit" class="<?= esc_attr($submit_btn_classes) ?>" data-bl-form-submit>
 					<span class="bl-form__submit-label"><?= esc_html($submit_label) ?></span>
-					<span class="bl-form__spinner" data-bl-form-spinner hidden aria-hidden="true"></span>
 				</button>
 			</div>
 		</form>

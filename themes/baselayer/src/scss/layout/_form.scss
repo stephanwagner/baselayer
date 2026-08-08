@@ -114,12 +114,44 @@
       color: var(--bl-button-primary-color-hover);
     }
 
-    &[disabled] {
+    &[disabled]:not(.-is-loading) {
       cursor: default !important;
       color: #ccc !important;
       background: #eee !important;
       border-color: #ccc !important;
       box-shadow: none !important;
+    }
+
+    // Size-stable busy state: label stays in layout, spinner overlays via ::after
+    &.-is-loading {
+      pointer-events: none;
+      cursor: wait !important;
+      -webkit-text-fill-color: transparent;
+
+      > * {
+        visibility: hidden;
+      }
+
+      &::before {
+        visibility: hidden;
+      }
+
+      &::after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        box-sizing: border-box;
+        width: 1.1em;
+        height: 1.1em;
+        margin: 0;
+        border: 2px solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+        opacity: 0.85;
+        transform: translate(-50%, -50%);
+        animation: bl-button-spin 0.7s linear infinite;
+      }
     }
   }
 
@@ -432,6 +464,12 @@
         transform: translateY(-50%) scaleY(-1);
       }
     }
+  }
+}
+
+@keyframes bl-button-spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
   }
 }
 

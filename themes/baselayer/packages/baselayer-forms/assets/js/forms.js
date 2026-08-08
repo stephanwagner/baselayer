@@ -1,4 +1,16 @@
 (() => {
+  // themes/baselayer/src/js/utils/button-loading.js
+  function setButtonLoading(button, loading = true) {
+    if (!button) return;
+    button.classList.toggle("-is-loading", loading);
+    button.disabled = loading;
+    if (loading) {
+      button.setAttribute("aria-busy", "true");
+    } else {
+      button.removeAttribute("aria-busy");
+    }
+  }
+
   // themes/baselayer/packages/baselayer-forms/src/js/front.js
   function charLength(value) {
     return Array.from(String(value || "")).length;
@@ -639,8 +651,6 @@
     const form = root.querySelector("[data-bl-form-el]");
     const message = root.querySelector("[data-bl-form-message]");
     const submit = root.querySelector("[data-bl-form-submit]");
-    const spinner = root.querySelector("[data-bl-form-spinner]");
-    const label = root.querySelector(".bl-form__submit-label");
     if (!form || !submit) return;
     initFileUploads(root);
     initClassicFileLimits(root);
@@ -667,11 +677,18 @@
       if (type) message.classList.add(type === "success" ? "is-success" : "is-error");
     };
     const setLoading = (loading, { useProgress = false } = {}) => {
-      submit.disabled = loading;
       root.classList.toggle("is-loading", loading);
-      const showSpinner = loading && !useProgress;
-      if (spinner) spinner.hidden = !showSpinner;
-      if (label) label.hidden = showSpinner;
+      if (useProgress) {
+        submit.classList.remove("-is-loading");
+        submit.disabled = loading;
+        if (loading) {
+          submit.setAttribute("aria-busy", "true");
+        } else {
+          submit.removeAttribute("aria-busy");
+        }
+      } else {
+        setButtonLoading(submit, loading);
+      }
       if (!loading) {
         progress.hide();
       }
