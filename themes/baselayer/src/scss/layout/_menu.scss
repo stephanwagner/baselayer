@@ -546,6 +546,12 @@ body.-menu-block-scroll {
   height: 42px;
   position: relative;
   cursor: pointer;
+  color: #000;
+  transition: transition('color');
+
+  &:hover {
+    color: var(--bl-link-color-hover);
+  }
 
   @media (max-width: $breakpoint-mobile) {
     display: block;
@@ -566,18 +572,14 @@ body.-menu-block-scroll {
 .main-menu__toggler-icon-line3 {
   content: '';
   position: absolute;
-  background: #000;
+  background: currentColor;
   height: 2px;
   width: 22px;
   border-radius: 1px;
   right: 0;
 
   body.-transition-init & {
-    transition: transition('width', 'transform', 'opacity', 'background-color', 'margin');
-  }
-
-  .main-menu__toggler:hover & {
-    background: var(--bl-link-color-hover);
+    transition: transition('width', 'transform', 'opacity', 'margin');
   }
 }
 
