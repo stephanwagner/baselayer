@@ -701,7 +701,10 @@ function createLeafControl(field, values, controls) {
     control._blInitWysiwyg = () => {
       initWysiwygEditor(id, field, {
         onChange: (html) => {
+          if (control.value === html) return;
           control.value = html;
+          // SidebarFields / logic sync on bubbled input|change (TinyMCE does not).
+          control.dispatchEvent(new Event('input', { bubbles: true }));
         },
       });
     };

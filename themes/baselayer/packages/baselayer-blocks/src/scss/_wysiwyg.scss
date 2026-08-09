@@ -63,4 +63,18 @@
   .mce-toolbar .mce-btn-group .mce-btn.mce-listbox {
     border-radius: 4px;
   }
+
+  .mce-edit-area,
+  .wp-editor-container {
+    box-shadow: none;
+  }
+
+  .wp-editor-container {
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .wp-editor-tools:has(.wp-editor-tabs) .wp-editor-container {
+    border-top-right-radius: 0;
+  }
 }

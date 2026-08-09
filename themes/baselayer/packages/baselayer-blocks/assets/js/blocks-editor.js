@@ -5688,12 +5688,23 @@
       toolbar3: "",
       toolbar4: "",
       setup(editor) {
+        let ready = false;
+        let last = null;
+        editor.on("init", () => {
+          last = editor.getContent();
+          ready = true;
+        });
         const emit = () => {
+          if (!ready) return;
+          if (typeof editor.isHidden === "function" && editor.isHidden()) return;
+          const html = editor.getContent();
+          if (html === last) return;
+          last = html;
           if (typeof opts.onChange === "function") {
-            opts.onChange(editor.getContent());
+            opts.onChange(html);
           }
         };
-        editor.on("change keyup NodeChange SetContent Undo Redo", emit);
+        editor.on("change keyup Undo Redo ExecCommand Paste SetContent", emit);
       }
     };
     if (heightPx != null) {
@@ -5719,6 +5730,9 @@
     if (!textarea || !textarea.id) return;
     const api = getWpEditorApi();
     const editor = window.tinymce && typeof window.tinymce.get === "function" ? window.tinymce.get(textarea.id) : null;
+    if (editor && typeof editor.isHidden === "function" && editor.isHidden()) {
+      return;
+    }
     if (editor && typeof editor.getContent === "function") {
       textarea.value = editor.getContent();
     } else if (api && typeof api.getContent === "function") {
@@ -6277,7 +6291,9 @@
       control._blInitWysiwyg = () => {
         initWysiwygEditor(id, field, {
           onChange: (html) => {
+            if (control.value === html) return;
             control.value = html;
+            control.dispatchEvent(new Event("input", { bubbles: true }));
           }
         });
       };

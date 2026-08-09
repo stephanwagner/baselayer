@@ -192,12 +192,24 @@ export function initWysiwygEditor(editorId, field, opts = {}) {
     toolbar3: '',
     toolbar4: '',
     setup(editor) {
+      // Skip init noise; skip while Code (HTML) tab is active — textarea is source of truth.
+      let ready = false;
+      let last = null;
+      editor.on('init', () => {
+        last = editor.getContent();
+        ready = true;
+      });
       const emit = () => {
+        if (!ready) return;
+        if (typeof editor.isHidden === 'function' && editor.isHidden()) return;
+        const html = editor.getContent();
+        if (html === last) return;
+        last = html;
         if (typeof opts.onChange === 'function') {
-          opts.onChange(editor.getContent());
+          opts.onChange(html);
         }
       };
-      editor.on('change keyup NodeChange SetContent Undo Redo', emit);
+      editor.on('change keyup Undo Redo ExecCommand Paste SetContent', emit);
     },
   };
   // Pass height to TinyMCE — CSS min-height fights the resize handle (adjusti).
@@ -228,6 +240,8 @@ export function removeWysiwygEditor(editorId) {
 
 /**
  * Sync TinyMCE content into the backing textarea (if present).
+ * When the Code (HTML) tab is active, TinyMCE is hidden and the textarea is
+ * the source of truth — do not overwrite in-progress code edits.
  * @param {HTMLTextAreaElement} textarea
  */
 export function syncWysiwygTextarea(textarea) {
@@ -237,6 +251,9 @@ export function syncWysiwygTextarea(textarea) {
     window.tinymce && typeof window.tinymce.get === 'function'
       ? window.tinymce.get(textarea.id)
       : null;
+  if (editor && typeof editor.isHidden === 'function' && editor.isHidden()) {
+    return;
+  }
   if (editor && typeof editor.getContent === 'function') {
     textarea.value = editor.getContent();
   } else if (api && typeof api.getContent === 'function') {
