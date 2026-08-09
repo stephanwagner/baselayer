@@ -2667,7 +2667,7 @@ button.button.button.bl-bo-choices__add {
   background: #fff;
 }
 .bl-block-options-admin .bl-bo-empty {
-  margin: 0;
+  margin: 16px 0 0;
   color: var(--bl-forms-admin-muted);
   font-size: 14px;
   line-height: 1.5;

@@ -592,6 +592,20 @@
                 }
             ]
         },
+        "baselayer/form": {
+            "items": [
+                {
+                    "id": "p_baselayer_form_abstand",
+                    "kind": "preset",
+                    "slug": "abstand",
+                    "defaults": {
+                        "c_abstand": {
+                            "defaultSize": "m"
+                        }
+                    }
+                }
+            ]
+        },
         "core/button": {
             "items": [
                 {
