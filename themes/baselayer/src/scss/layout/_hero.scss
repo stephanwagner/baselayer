@@ -14,6 +14,11 @@
   --hero-content-inset: max(var(--bl-wide-bleed, 0px), var(--bl-container-padding));
 }
 
+.hero__wrapper.alignwide {
+  // Alignwide sets --bl-wide-content-inset (half page-padding floor).
+  --hero-content-inset: var(--bl-wide-content-inset);
+}
+
 .hero__wrapper {
   position: relative;
 }

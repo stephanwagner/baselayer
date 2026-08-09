@@ -60,12 +60,22 @@
   display: none;
   color: #fff;
 
-  // Wide / alignwide: inset text by the wrapper bleed (inherited), never less than
-  // normal container/page padding so copy does not sit on the edge.
-  .slider__wrapper.alignwide &,
+  // Container-wide only: inset by bleed, floor at container/page padding.
   .slider__wrapper.container-wide & {
     padding-left: max(var(--bl-wide-bleed, 0px), var(--bl-container-padding-x, var(--bl-page-padding)));
     padding-right: max(var(--bl-wide-bleed, 0px), var(--bl-container-padding-x, var(--bl-page-padding)));
+  }
+
+  // Alignwide (alone or with container-wide): half page-padding floor via content inset.
+  .slider__wrapper.alignwide & {
+    padding-left: var(
+      --bl-wide-content-inset,
+      max(var(--bl-wide-bleed, 0px), calc(var(--bl-page-padding) * 0.5), var(--bl-container-padding-x, var(--bl-page-padding)))
+    );
+    padding-right: var(
+      --bl-wide-content-inset,
+      max(var(--bl-wide-bleed, 0px), calc(var(--bl-page-padding) * 0.5), var(--bl-container-padding-x, var(--bl-page-padding)))
+    );
   }
 
   .slider__wrapper.alignfull & {

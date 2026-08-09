@@ -42,19 +42,37 @@
 }
 
 // Alignwide — fluid bleed capped by --bl-alignwide-bleed,
-// always leaving --bl-page-padding from the viewport edge.
+// leaving half --bl-page-padding from the viewport edge (extends further than
+// .container-wide). Content inset floors at half page padding so copy can keep
+// a larger L/R inset on smaller screens.
 
 .alignwide {
   --bl-wide-bleed: min(
     var(--bl-alignwide-bleed),
-    max(0px, (100vw - 100%) / 2 - var(--bl-page-padding))
+    max(0px, (100vw - 100%) / 2 - var(--bl-page-padding) * 0.5)
+  );
+  --bl-wide-content-inset: max(
+    var(--bl-wide-bleed),
+    calc(var(--bl-page-padding) * 0.5),
+    var(--bl-container-padding-x, 0px)
   );
   margin-left: calc(var(--bl-wide-bleed) * -1);
   margin-right: calc(var(--bl-wide-bleed) * -1);
 
   &.has-background {
-    padding-left: var(--bl-wide-bleed);
-    padding-right: var(--bl-wide-bleed);
+    padding-left: var(--bl-wide-content-inset);
+    padding-right: var(--bl-wide-content-inset);
+  }
+
+  // Content-column align when also Inhaltsbreite content mode.
+  &.-container-wide-content {
+    padding-left: var(--bl-wide-content-inset) !important;
+    padding-right: var(--bl-wide-content-inset) !important;
+
+    &.slider__wrapper {
+      padding-left: 0 !important;
+      padding-right: 0 !important;
+    }
   }
 }
 
