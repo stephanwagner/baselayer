@@ -158,24 +158,24 @@
   }
 
   // Heading → heading|paragraph|field: keep as one text/form block, no rule.
-  > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
-  > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-  > .bl-blocks-fields__heading + .bl-blocks-fields__row,
-  > .bl-blocks-fields__heading + .bl-blocks-fields__field-row {
+  > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__heading:not([hidden]),
+  > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__static:not([hidden]),
+  > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__row:not([hidden]),
+  > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__field-row:not([hidden]) {
     margin-top: 6px;
     padding-top: 0;
     border-top: 0;
   }
 
   // Section (“area”) title → content: no rule.
-  > .bl-blocks-fields__section-title + * {
+  > .bl-blocks-fields__section-title:not([hidden]) + *:not([hidden]) {
     margin-top: 6px;
     padding-top: 0;
     border-top: 0;
   }
 
   // Section layout itself: spacing without a rule.
-  > * + .bl-blocks-fields__layout--section {
+  > *:not([hidden]) + .bl-blocks-fields__layout--section:not([hidden]) {
     margin-top: 16px;
     padding-top: 0;
     border-top: 0;
@@ -743,16 +743,16 @@ button.button-link.bl-blocks-fields__card-remove {
     border-top: 1px solid #dcdcde;
   }
 
-  > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
-  > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-  > .bl-blocks-fields__heading + .bl-blocks-fields__row,
-  > .bl-blocks-fields__heading + .bl-blocks-fields__field-row {
+  > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__heading:not([hidden]),
+  > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__static:not([hidden]),
+  > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__row:not([hidden]),
+  > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__field-row:not([hidden]) {
     margin-top: 6px;
     padding-top: 0;
     border-top: 0;
   }
 
-  > .bl-blocks-fields__section-title + * {
+  > .bl-blocks-fields__section-title:not([hidden]) + *:not([hidden]) {
     margin-top: 6px;
     padding-top: 0;
     border-top: 0;
@@ -808,38 +808,38 @@ button.button-link.bl-blocks-fields__card-remove {
   .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column),
   .bl-blocks-fields__tab-panel {
     // Section rule zeroes border-top/padding-top; restore the box chrome.
-    > * + .bl-blocks-fields__layout--outline,
-    > * + .bl-blocks-fields__layout--card,
-    > * + .bl-blocks-fields__repeater--outline,
-    > * + .bl-blocks-fields__repeater--card,
-    > * + .bl-blocks-fields__tab-panel--outline,
-    > * + .bl-blocks-fields__tab-panel--card {
+    > *:not([hidden]) + .bl-blocks-fields__layout--outline:not([hidden]),
+    > *:not([hidden]) + .bl-blocks-fields__layout--card:not([hidden]),
+    > *:not([hidden]) + .bl-blocks-fields__repeater--outline:not([hidden]),
+    > *:not([hidden]) + .bl-blocks-fields__repeater--card:not([hidden]),
+    > *:not([hidden]) + .bl-blocks-fields__tab-panel--outline:not([hidden]),
+    > *:not([hidden]) + .bl-blocks-fields__tab-panel--card:not([hidden]) {
       padding-top: 12px;
       border-top: 1px solid #c3c4c7;
     }
 
-    > .bl-blocks-fields__layout--outline
-      + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
+    > .bl-blocks-fields__layout--outline:not([hidden])
+      + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
         .bl-blocks-fields__repeater--card
       ):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-    > .bl-blocks-fields__layout--card
-      + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
+    > .bl-blocks-fields__layout--card:not([hidden])
+      + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
         .bl-blocks-fields__repeater--card
       ):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-    > .bl-blocks-fields__repeater--outline
-      + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
+    > .bl-blocks-fields__repeater--outline:not([hidden])
+      + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
         .bl-blocks-fields__repeater--card
       ):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-    > .bl-blocks-fields__repeater--card
-      + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
+    > .bl-blocks-fields__repeater--card:not([hidden])
+      + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
         .bl-blocks-fields__repeater--card
       ):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-    > .bl-blocks-fields__tab-panel--outline
-      + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
+    > .bl-blocks-fields__tab-panel--outline:not([hidden])
+      + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
         .bl-blocks-fields__repeater--card
       ):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-    > .bl-blocks-fields__tab-panel--card
-      + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
+    > .bl-blocks-fields__tab-panel--card:not([hidden])
+      + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
         .bl-blocks-fields__repeater--card
       ):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card) {
       margin-top: 16px;
@@ -1197,22 +1197,22 @@ button.button-link.bl-blocks-fields__repeater-remove {
     padding-top: 12px;
   }
 
-  > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
-  > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-  > .bl-blocks-fields__heading + .bl-blocks-fields__row,
-  > .bl-blocks-fields__heading + .bl-blocks-fields__field-row {
+  > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__heading:not([hidden]),
+  > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__static:not([hidden]),
+  > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__row:not([hidden]),
+  > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__field-row:not([hidden]) {
     margin-top: 6px;
     padding-top: 0;
     border-top: 0;
   }
 
-  > .bl-blocks-fields__section-title + * {
+  > .bl-blocks-fields__section-title:not([hidden]) + *:not([hidden]) {
     margin-top: 6px;
     padding-top: 0;
     border-top: 0;
   }
 
-  > * + .bl-blocks-fields__layout--section {
+  > *:not([hidden]) + .bl-blocks-fields__layout--section:not([hidden]) {
     margin-top: 16px;
     padding-top: 0;
     border-top: 0;
@@ -1230,38 +1230,38 @@ button.button-link.bl-blocks-fields__repeater-remove {
   }
 
   // Section rule zeroes border-top; restore box chrome (tighter).
-  > * + .bl-blocks-fields__layout--outline,
-  > * + .bl-blocks-fields__layout--card,
-  > * + .bl-blocks-fields__repeater--outline,
-  > * + .bl-blocks-fields__repeater--card,
-  > * + .bl-blocks-fields__tab-panel--outline,
-  > * + .bl-blocks-fields__tab-panel--card {
+  > *:not([hidden]) + .bl-blocks-fields__layout--outline:not([hidden]),
+  > *:not([hidden]) + .bl-blocks-fields__layout--card:not([hidden]),
+  > *:not([hidden]) + .bl-blocks-fields__repeater--outline:not([hidden]),
+  > *:not([hidden]) + .bl-blocks-fields__repeater--card:not([hidden]),
+  > *:not([hidden]) + .bl-blocks-fields__tab-panel--outline:not([hidden]),
+  > *:not([hidden]) + .bl-blocks-fields__tab-panel--card:not([hidden]) {
     padding-top: 8px;
     border-top: 1px solid #c3c4c7;
   }
 
-  > .bl-blocks-fields__layout--outline
-    + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
+  > .bl-blocks-fields__layout--outline:not([hidden])
+    + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
       .bl-blocks-fields__repeater--card
     ):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-  > .bl-blocks-fields__layout--card
-    + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
+  > .bl-blocks-fields__layout--card:not([hidden])
+    + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
       .bl-blocks-fields__repeater--card
     ):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-  > .bl-blocks-fields__repeater--outline
-    + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
+  > .bl-blocks-fields__repeater--outline:not([hidden])
+    + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
       .bl-blocks-fields__repeater--card
     ):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-  > .bl-blocks-fields__repeater--card
-    + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
+  > .bl-blocks-fields__repeater--card:not([hidden])
+    + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
       .bl-blocks-fields__repeater--card
     ):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-  > .bl-blocks-fields__tab-panel--outline
-    + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
+  > .bl-blocks-fields__tab-panel--outline:not([hidden])
+    + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
       .bl-blocks-fields__repeater--card
     ):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-  > .bl-blocks-fields__tab-panel--card
-    + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
+  > .bl-blocks-fields__tab-panel--card:not([hidden])
+    + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(
       .bl-blocks-fields__repeater--card
     ):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card) {
     margin-top: 12px;
@@ -1307,16 +1307,16 @@ button.button-link.bl-blocks-fields__repeater-remove {
       border-top: 1px solid #dcdcde;
     }
 
-    > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
-    > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-    > .bl-blocks-fields__heading + .bl-blocks-fields__row,
-    > .bl-blocks-fields__heading + .bl-blocks-fields__field-row {
+    > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__heading:not([hidden]),
+    > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__static:not([hidden]),
+    > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__row:not([hidden]),
+    > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__field-row:not([hidden]) {
       margin-top: 6px;
       padding-top: 0;
       border-top: 0;
     }
 
-    > .bl-blocks-fields__section-title + * {
+    > .bl-blocks-fields__section-title:not([hidden]) + *:not([hidden]) {
       margin-top: 6px;
       padding-top: 0;
       border-top: 0;
@@ -1330,22 +1330,22 @@ button.button-link.bl-blocks-fields__repeater-remove {
       padding-top: 12px;
     }
 
-    > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
-    > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-    > .bl-blocks-fields__heading + .bl-blocks-fields__row,
-    > .bl-blocks-fields__heading + .bl-blocks-fields__field-row {
+    > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__heading:not([hidden]),
+    > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__static:not([hidden]),
+    > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__row:not([hidden]),
+    > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__field-row:not([hidden]) {
       margin-top: 6px;
       padding-top: 0;
       border-top: 0;
     }
 
-    > .bl-blocks-fields__section-title + * {
+    > .bl-blocks-fields__section-title:not([hidden]) + *:not([hidden]) {
       margin-top: 6px;
       padding-top: 0;
       border-top: 0;
     }
 
-    > * + .bl-blocks-fields__layout--section {
+    > *:not([hidden]) + .bl-blocks-fields__layout--section:not([hidden]) {
       margin-top: 16px;
       padding-top: 0;
       border-top: 0;

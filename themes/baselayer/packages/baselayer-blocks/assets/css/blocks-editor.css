@@ -593,32 +593,32 @@ body.bl-page-picker-open {
   padding-top: 12px;
   border-top: 1px solid #dcdcde;
 }
-.bl-blocks-fields > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
-.bl-blocks-fields > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-.bl-blocks-fields > .bl-blocks-fields__heading + .bl-blocks-fields__row,
-.bl-blocks-fields > .bl-blocks-fields__heading + .bl-blocks-fields__field-row,
-.bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
-.bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-.bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading + .bl-blocks-fields__row,
-.bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading + .bl-blocks-fields__field-row,
-.bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
-.bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-.bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__row,
-.bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__field-row {
+.bl-blocks-fields > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__heading:not([hidden]),
+.bl-blocks-fields > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__static:not([hidden]),
+.bl-blocks-fields > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__row:not([hidden]),
+.bl-blocks-fields > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__field-row:not([hidden]),
+.bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__heading:not([hidden]),
+.bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__static:not([hidden]),
+.bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__row:not([hidden]),
+.bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__field-row:not([hidden]),
+.bl-blocks-fields__tab-panel > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__heading:not([hidden]),
+.bl-blocks-fields__tab-panel > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__static:not([hidden]),
+.bl-blocks-fields__tab-panel > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__row:not([hidden]),
+.bl-blocks-fields__tab-panel > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__field-row:not([hidden]) {
   margin-top: 6px;
   padding-top: 0;
   border-top: 0;
 }
-.bl-blocks-fields > .bl-blocks-fields__section-title + *,
-.bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__section-title + *,
-.bl-blocks-fields__tab-panel > .bl-blocks-fields__section-title + * {
+.bl-blocks-fields > .bl-blocks-fields__section-title:not([hidden]) + *:not([hidden]),
+.bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__section-title:not([hidden]) + *:not([hidden]),
+.bl-blocks-fields__tab-panel > .bl-blocks-fields__section-title:not([hidden]) + *:not([hidden]) {
   margin-top: 6px;
   padding-top: 0;
   border-top: 0;
 }
-.bl-blocks-fields > * + .bl-blocks-fields__layout--section,
-.bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > * + .bl-blocks-fields__layout--section,
-.bl-blocks-fields__tab-panel > * + .bl-blocks-fields__layout--section {
+.bl-blocks-fields > *:not([hidden]) + .bl-blocks-fields__layout--section:not([hidden]),
+.bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > *:not([hidden]) + .bl-blocks-fields__layout--section:not([hidden]),
+.bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__layout--section:not([hidden]) {
   margin-top: 16px;
   padding-top: 0;
   border-top: 0;
@@ -1152,15 +1152,15 @@ button.button-link.bl-blocks-fields__card-remove:focus {
   padding-top: 12px;
   border-top: 1px solid #dcdcde;
 }
-.bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
-.bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-.bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__row,
-.bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__field-row {
+.bl-blocks-fields__layout--column > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__heading:not([hidden]),
+.bl-blocks-fields__layout--column > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__static:not([hidden]),
+.bl-blocks-fields__layout--column > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__row:not([hidden]),
+.bl-blocks-fields__layout--column > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__field-row:not([hidden]) {
   margin-top: 6px;
   padding-top: 0;
   border-top: 0;
 }
-.bl-blocks-fields__layout--column > .bl-blocks-fields__section-title + * {
+.bl-blocks-fields__layout--column > .bl-blocks-fields__section-title:not([hidden]) + *:not([hidden]) {
   margin-top: 6px;
   padding-top: 0;
   border-top: 0;
@@ -1210,81 +1210,81 @@ button.button-link.bl-blocks-fields__card-remove:focus {
   font-size: 13px;
 }
 
-.bl-blocks-modal__body .bl-blocks-fields > * + .bl-blocks-fields__layout--outline,
-.bl-blocks-modal__body .bl-blocks-fields > * + .bl-blocks-fields__layout--card,
-.bl-blocks-modal__body .bl-blocks-fields > * + .bl-blocks-fields__repeater--outline,
-.bl-blocks-modal__body .bl-blocks-fields > * + .bl-blocks-fields__repeater--card,
-.bl-blocks-modal__body .bl-blocks-fields > * + .bl-blocks-fields__tab-panel--outline,
-.bl-blocks-modal__body .bl-blocks-fields > * + .bl-blocks-fields__tab-panel--card,
-.bl-blocks-modal__body .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > * + .bl-blocks-fields__layout--outline,
-.bl-blocks-modal__body .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > * + .bl-blocks-fields__layout--card,
-.bl-blocks-modal__body .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > * + .bl-blocks-fields__repeater--outline,
-.bl-blocks-modal__body .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > * + .bl-blocks-fields__repeater--card,
-.bl-blocks-modal__body .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > * + .bl-blocks-fields__tab-panel--outline,
-.bl-blocks-modal__body .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > * + .bl-blocks-fields__tab-panel--card,
-.bl-blocks-modal__body .bl-blocks-fields__tab-panel > * + .bl-blocks-fields__layout--outline,
-.bl-blocks-modal__body .bl-blocks-fields__tab-panel > * + .bl-blocks-fields__layout--card,
-.bl-blocks-modal__body .bl-blocks-fields__tab-panel > * + .bl-blocks-fields__repeater--outline,
-.bl-blocks-modal__body .bl-blocks-fields__tab-panel > * + .bl-blocks-fields__repeater--card,
-.bl-blocks-modal__body .bl-blocks-fields__tab-panel > * + .bl-blocks-fields__tab-panel--outline,
-.bl-blocks-modal__body .bl-blocks-fields__tab-panel > * + .bl-blocks-fields__tab-panel--card,
-.bl-blocks-website__main .bl-blocks-fields > * + .bl-blocks-fields__layout--outline,
-.bl-blocks-website__main .bl-blocks-fields > * + .bl-blocks-fields__layout--card,
-.bl-blocks-website__main .bl-blocks-fields > * + .bl-blocks-fields__repeater--outline,
-.bl-blocks-website__main .bl-blocks-fields > * + .bl-blocks-fields__repeater--card,
-.bl-blocks-website__main .bl-blocks-fields > * + .bl-blocks-fields__tab-panel--outline,
-.bl-blocks-website__main .bl-blocks-fields > * + .bl-blocks-fields__tab-panel--card,
-.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > * + .bl-blocks-fields__layout--outline,
-.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > * + .bl-blocks-fields__layout--card,
-.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > * + .bl-blocks-fields__repeater--outline,
-.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > * + .bl-blocks-fields__repeater--card,
-.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > * + .bl-blocks-fields__tab-panel--outline,
-.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > * + .bl-blocks-fields__tab-panel--card,
-.bl-blocks-website__main .bl-blocks-fields__tab-panel > * + .bl-blocks-fields__layout--outline,
-.bl-blocks-website__main .bl-blocks-fields__tab-panel > * + .bl-blocks-fields__layout--card,
-.bl-blocks-website__main .bl-blocks-fields__tab-panel > * + .bl-blocks-fields__repeater--outline,
-.bl-blocks-website__main .bl-blocks-fields__tab-panel > * + .bl-blocks-fields__repeater--card,
-.bl-blocks-website__main .bl-blocks-fields__tab-panel > * + .bl-blocks-fields__tab-panel--outline,
-.bl-blocks-website__main .bl-blocks-fields__tab-panel > * + .bl-blocks-fields__tab-panel--card {
+.bl-blocks-modal__body .bl-blocks-fields > *:not([hidden]) + .bl-blocks-fields__layout--outline:not([hidden]),
+.bl-blocks-modal__body .bl-blocks-fields > *:not([hidden]) + .bl-blocks-fields__layout--card:not([hidden]),
+.bl-blocks-modal__body .bl-blocks-fields > *:not([hidden]) + .bl-blocks-fields__repeater--outline:not([hidden]),
+.bl-blocks-modal__body .bl-blocks-fields > *:not([hidden]) + .bl-blocks-fields__repeater--card:not([hidden]),
+.bl-blocks-modal__body .bl-blocks-fields > *:not([hidden]) + .bl-blocks-fields__tab-panel--outline:not([hidden]),
+.bl-blocks-modal__body .bl-blocks-fields > *:not([hidden]) + .bl-blocks-fields__tab-panel--card:not([hidden]),
+.bl-blocks-modal__body .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > *:not([hidden]) + .bl-blocks-fields__layout--outline:not([hidden]),
+.bl-blocks-modal__body .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > *:not([hidden]) + .bl-blocks-fields__layout--card:not([hidden]),
+.bl-blocks-modal__body .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > *:not([hidden]) + .bl-blocks-fields__repeater--outline:not([hidden]),
+.bl-blocks-modal__body .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > *:not([hidden]) + .bl-blocks-fields__repeater--card:not([hidden]),
+.bl-blocks-modal__body .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > *:not([hidden]) + .bl-blocks-fields__tab-panel--outline:not([hidden]),
+.bl-blocks-modal__body .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > *:not([hidden]) + .bl-blocks-fields__tab-panel--card:not([hidden]),
+.bl-blocks-modal__body .bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__layout--outline:not([hidden]),
+.bl-blocks-modal__body .bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__layout--card:not([hidden]),
+.bl-blocks-modal__body .bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__repeater--outline:not([hidden]),
+.bl-blocks-modal__body .bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__repeater--card:not([hidden]),
+.bl-blocks-modal__body .bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__tab-panel--outline:not([hidden]),
+.bl-blocks-modal__body .bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__tab-panel--card:not([hidden]),
+.bl-blocks-website__main .bl-blocks-fields > *:not([hidden]) + .bl-blocks-fields__layout--outline:not([hidden]),
+.bl-blocks-website__main .bl-blocks-fields > *:not([hidden]) + .bl-blocks-fields__layout--card:not([hidden]),
+.bl-blocks-website__main .bl-blocks-fields > *:not([hidden]) + .bl-blocks-fields__repeater--outline:not([hidden]),
+.bl-blocks-website__main .bl-blocks-fields > *:not([hidden]) + .bl-blocks-fields__repeater--card:not([hidden]),
+.bl-blocks-website__main .bl-blocks-fields > *:not([hidden]) + .bl-blocks-fields__tab-panel--outline:not([hidden]),
+.bl-blocks-website__main .bl-blocks-fields > *:not([hidden]) + .bl-blocks-fields__tab-panel--card:not([hidden]),
+.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > *:not([hidden]) + .bl-blocks-fields__layout--outline:not([hidden]),
+.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > *:not([hidden]) + .bl-blocks-fields__layout--card:not([hidden]),
+.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > *:not([hidden]) + .bl-blocks-fields__repeater--outline:not([hidden]),
+.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > *:not([hidden]) + .bl-blocks-fields__repeater--card:not([hidden]),
+.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > *:not([hidden]) + .bl-blocks-fields__tab-panel--outline:not([hidden]),
+.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > *:not([hidden]) + .bl-blocks-fields__tab-panel--card:not([hidden]),
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__layout--outline:not([hidden]),
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__layout--card:not([hidden]),
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__repeater--outline:not([hidden]),
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__repeater--card:not([hidden]),
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__tab-panel--outline:not([hidden]),
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__tab-panel--card:not([hidden]) {
   padding-top: 12px;
   border-top: 1px solid #c3c4c7;
 }
-.bl-blocks-modal__body .bl-blocks-fields > .bl-blocks-fields__layout--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-modal__body .bl-blocks-fields > .bl-blocks-fields__layout--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-modal__body .bl-blocks-fields > .bl-blocks-fields__repeater--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-modal__body .bl-blocks-fields > .bl-blocks-fields__repeater--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-modal__body .bl-blocks-fields > .bl-blocks-fields__tab-panel--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-modal__body .bl-blocks-fields > .bl-blocks-fields__tab-panel--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-modal__body .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__layout--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-modal__body .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__layout--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-modal__body .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__repeater--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-modal__body .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__repeater--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-modal__body .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__tab-panel--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-modal__body .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__tab-panel--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-modal__body .bl-blocks-fields__tab-panel > .bl-blocks-fields__layout--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-modal__body .bl-blocks-fields__tab-panel > .bl-blocks-fields__layout--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-modal__body .bl-blocks-fields__tab-panel > .bl-blocks-fields__repeater--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-modal__body .bl-blocks-fields__tab-panel > .bl-blocks-fields__repeater--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-modal__body .bl-blocks-fields__tab-panel > .bl-blocks-fields__tab-panel--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-modal__body .bl-blocks-fields__tab-panel > .bl-blocks-fields__tab-panel--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-website__main .bl-blocks-fields > .bl-blocks-fields__layout--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-website__main .bl-blocks-fields > .bl-blocks-fields__layout--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-website__main .bl-blocks-fields > .bl-blocks-fields__repeater--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-website__main .bl-blocks-fields > .bl-blocks-fields__repeater--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-website__main .bl-blocks-fields > .bl-blocks-fields__tab-panel--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-website__main .bl-blocks-fields > .bl-blocks-fields__tab-panel--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__layout--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__layout--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__repeater--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__repeater--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__tab-panel--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__tab-panel--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-website__main .bl-blocks-fields__tab-panel > .bl-blocks-fields__layout--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-website__main .bl-blocks-fields__tab-panel > .bl-blocks-fields__layout--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-website__main .bl-blocks-fields__tab-panel > .bl-blocks-fields__repeater--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-website__main .bl-blocks-fields__tab-panel > .bl-blocks-fields__repeater--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-website__main .bl-blocks-fields__tab-panel > .bl-blocks-fields__tab-panel--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-website__main .bl-blocks-fields__tab-panel > .bl-blocks-fields__tab-panel--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card) {
+.bl-blocks-modal__body .bl-blocks-fields > .bl-blocks-fields__layout--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-modal__body .bl-blocks-fields > .bl-blocks-fields__layout--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-modal__body .bl-blocks-fields > .bl-blocks-fields__repeater--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-modal__body .bl-blocks-fields > .bl-blocks-fields__repeater--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-modal__body .bl-blocks-fields > .bl-blocks-fields__tab-panel--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-modal__body .bl-blocks-fields > .bl-blocks-fields__tab-panel--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-modal__body .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__layout--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-modal__body .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__layout--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-modal__body .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__repeater--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-modal__body .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__repeater--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-modal__body .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__tab-panel--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-modal__body .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__tab-panel--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-modal__body .bl-blocks-fields__tab-panel > .bl-blocks-fields__layout--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-modal__body .bl-blocks-fields__tab-panel > .bl-blocks-fields__layout--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-modal__body .bl-blocks-fields__tab-panel > .bl-blocks-fields__repeater--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-modal__body .bl-blocks-fields__tab-panel > .bl-blocks-fields__repeater--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-modal__body .bl-blocks-fields__tab-panel > .bl-blocks-fields__tab-panel--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-modal__body .bl-blocks-fields__tab-panel > .bl-blocks-fields__tab-panel--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields > .bl-blocks-fields__layout--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields > .bl-blocks-fields__layout--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields > .bl-blocks-fields__repeater--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields > .bl-blocks-fields__repeater--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields > .bl-blocks-fields__tab-panel--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields > .bl-blocks-fields__tab-panel--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__layout--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__layout--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__repeater--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__repeater--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__tab-panel--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__tab-panel--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > .bl-blocks-fields__layout--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > .bl-blocks-fields__layout--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > .bl-blocks-fields__repeater--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > .bl-blocks-fields__repeater--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > .bl-blocks-fields__tab-panel--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > .bl-blocks-fields__tab-panel--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card) {
   margin-top: 16px;
   padding-top: 0;
   border-top: 0;
@@ -1610,26 +1610,26 @@ button.button-link.bl-blocks-fields__repeater-remove:active {
   margin-top: 12px;
   padding-top: 12px;
 }
-.bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
-.bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-.bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__heading + .bl-blocks-fields__row,
-.bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__heading + .bl-blocks-fields__field-row,
-.bl-blocks-fields--compact > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
-.bl-blocks-fields--compact > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-.bl-blocks-fields--compact > .bl-blocks-fields__heading + .bl-blocks-fields__row,
-.bl-blocks-fields--compact > .bl-blocks-fields__heading + .bl-blocks-fields__field-row {
+.bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__heading:not([hidden]),
+.bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__static:not([hidden]),
+.bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__row:not([hidden]),
+.bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__field-row:not([hidden]),
+.bl-blocks-fields--compact > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__heading:not([hidden]),
+.bl-blocks-fields--compact > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__static:not([hidden]),
+.bl-blocks-fields--compact > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__row:not([hidden]),
+.bl-blocks-fields--compact > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__field-row:not([hidden]) {
   margin-top: 6px;
   padding-top: 0;
   border-top: 0;
 }
-.bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__section-title + *,
-.bl-blocks-fields--compact > .bl-blocks-fields__section-title + * {
+.bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__section-title:not([hidden]) + *:not([hidden]),
+.bl-blocks-fields--compact > .bl-blocks-fields__section-title:not([hidden]) + *:not([hidden]) {
   margin-top: 6px;
   padding-top: 0;
   border-top: 0;
 }
-.bl-blocks-fields[data-layout=compact] > * + .bl-blocks-fields__layout--section,
-.bl-blocks-fields--compact > * + .bl-blocks-fields__layout--section {
+.bl-blocks-fields[data-layout=compact] > *:not([hidden]) + .bl-blocks-fields__layout--section:not([hidden]),
+.bl-blocks-fields--compact > *:not([hidden]) + .bl-blocks-fields__layout--section:not([hidden]) {
   margin-top: 16px;
   padding-top: 0;
   border-top: 0;
@@ -1649,33 +1649,33 @@ button.button-link.bl-blocks-fields__repeater-remove:active {
   padding: 8px;
   border-radius: 4px;
 }
-.bl-blocks-fields[data-layout=compact] > * + .bl-blocks-fields__layout--outline,
-.bl-blocks-fields[data-layout=compact] > * + .bl-blocks-fields__layout--card,
-.bl-blocks-fields[data-layout=compact] > * + .bl-blocks-fields__repeater--outline,
-.bl-blocks-fields[data-layout=compact] > * + .bl-blocks-fields__repeater--card,
-.bl-blocks-fields[data-layout=compact] > * + .bl-blocks-fields__tab-panel--outline,
-.bl-blocks-fields[data-layout=compact] > * + .bl-blocks-fields__tab-panel--card,
-.bl-blocks-fields--compact > * + .bl-blocks-fields__layout--outline,
-.bl-blocks-fields--compact > * + .bl-blocks-fields__layout--card,
-.bl-blocks-fields--compact > * + .bl-blocks-fields__repeater--outline,
-.bl-blocks-fields--compact > * + .bl-blocks-fields__repeater--card,
-.bl-blocks-fields--compact > * + .bl-blocks-fields__tab-panel--outline,
-.bl-blocks-fields--compact > * + .bl-blocks-fields__tab-panel--card {
+.bl-blocks-fields[data-layout=compact] > *:not([hidden]) + .bl-blocks-fields__layout--outline:not([hidden]),
+.bl-blocks-fields[data-layout=compact] > *:not([hidden]) + .bl-blocks-fields__layout--card:not([hidden]),
+.bl-blocks-fields[data-layout=compact] > *:not([hidden]) + .bl-blocks-fields__repeater--outline:not([hidden]),
+.bl-blocks-fields[data-layout=compact] > *:not([hidden]) + .bl-blocks-fields__repeater--card:not([hidden]),
+.bl-blocks-fields[data-layout=compact] > *:not([hidden]) + .bl-blocks-fields__tab-panel--outline:not([hidden]),
+.bl-blocks-fields[data-layout=compact] > *:not([hidden]) + .bl-blocks-fields__tab-panel--card:not([hidden]),
+.bl-blocks-fields--compact > *:not([hidden]) + .bl-blocks-fields__layout--outline:not([hidden]),
+.bl-blocks-fields--compact > *:not([hidden]) + .bl-blocks-fields__layout--card:not([hidden]),
+.bl-blocks-fields--compact > *:not([hidden]) + .bl-blocks-fields__repeater--outline:not([hidden]),
+.bl-blocks-fields--compact > *:not([hidden]) + .bl-blocks-fields__repeater--card:not([hidden]),
+.bl-blocks-fields--compact > *:not([hidden]) + .bl-blocks-fields__tab-panel--outline:not([hidden]),
+.bl-blocks-fields--compact > *:not([hidden]) + .bl-blocks-fields__tab-panel--card:not([hidden]) {
   padding-top: 8px;
   border-top: 1px solid #c3c4c7;
 }
-.bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__layout--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__layout--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__repeater--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__repeater--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__tab-panel--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__tab-panel--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-fields--compact > .bl-blocks-fields__layout--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-fields--compact > .bl-blocks-fields__layout--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-fields--compact > .bl-blocks-fields__repeater--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-fields--compact > .bl-blocks-fields__repeater--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-fields--compact > .bl-blocks-fields__tab-panel--outline + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-fields--compact > .bl-blocks-fields__tab-panel--card + *:not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card) {
+.bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__layout--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__layout--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__repeater--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__repeater--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__tab-panel--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-fields[data-layout=compact] > .bl-blocks-fields__tab-panel--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-fields--compact > .bl-blocks-fields__layout--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-fields--compact > .bl-blocks-fields__layout--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-fields--compact > .bl-blocks-fields__repeater--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-fields--compact > .bl-blocks-fields__repeater--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-fields--compact > .bl-blocks-fields__tab-panel--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-fields--compact > .bl-blocks-fields__tab-panel--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card) {
   margin-top: 12px;
   padding-top: 0;
   border-top: 0;
@@ -1722,20 +1722,20 @@ button.button-link.bl-blocks-fields__repeater-remove:active {
   padding-top: 12px;
   border-top: 1px solid #dcdcde;
 }
-.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
-.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__row,
-.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__field-row,
-.bl-blocks-fields--compact .bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
-.bl-blocks-fields--compact .bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-.bl-blocks-fields--compact .bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__row,
-.bl-blocks-fields--compact .bl-blocks-fields__layout--column > .bl-blocks-fields__heading + .bl-blocks-fields__field-row {
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout--column > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__heading:not([hidden]),
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout--column > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__static:not([hidden]),
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout--column > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__row:not([hidden]),
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout--column > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__field-row:not([hidden]),
+.bl-blocks-fields--compact .bl-blocks-fields__layout--column > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__heading:not([hidden]),
+.bl-blocks-fields--compact .bl-blocks-fields__layout--column > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__static:not([hidden]),
+.bl-blocks-fields--compact .bl-blocks-fields__layout--column > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__row:not([hidden]),
+.bl-blocks-fields--compact .bl-blocks-fields__layout--column > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__field-row:not([hidden]) {
   margin-top: 6px;
   padding-top: 0;
   border-top: 0;
 }
-.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout--column > .bl-blocks-fields__section-title + *,
-.bl-blocks-fields--compact .bl-blocks-fields__layout--column > .bl-blocks-fields__section-title + * {
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout--column > .bl-blocks-fields__section-title:not([hidden]) + *:not([hidden]),
+.bl-blocks-fields--compact .bl-blocks-fields__layout--column > .bl-blocks-fields__section-title:not([hidden]) + *:not([hidden]) {
   margin-top: 6px;
   padding-top: 0;
   border-top: 0;
@@ -1747,38 +1747,38 @@ button.button-link.bl-blocks-fields__repeater-remove:active {
   margin-top: 12px;
   padding-top: 12px;
 }
-.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
-.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading + .bl-blocks-fields__row,
-.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading + .bl-blocks-fields__field-row,
-.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
-.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__row,
-.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__field-row,
-.bl-blocks-fields--compact .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
-.bl-blocks-fields--compact .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-.bl-blocks-fields--compact .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading + .bl-blocks-fields__row,
-.bl-blocks-fields--compact .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading + .bl-blocks-fields__field-row,
-.bl-blocks-fields--compact .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__heading,
-.bl-blocks-fields--compact .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__static,
-.bl-blocks-fields--compact .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__row,
-.bl-blocks-fields--compact .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading + .bl-blocks-fields__field-row {
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__heading:not([hidden]),
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__static:not([hidden]),
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__row:not([hidden]),
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__field-row:not([hidden]),
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__heading:not([hidden]),
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__static:not([hidden]),
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__row:not([hidden]),
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__field-row:not([hidden]),
+.bl-blocks-fields--compact .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__heading:not([hidden]),
+.bl-blocks-fields--compact .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__static:not([hidden]),
+.bl-blocks-fields--compact .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__row:not([hidden]),
+.bl-blocks-fields--compact .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__field-row:not([hidden]),
+.bl-blocks-fields--compact .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__heading:not([hidden]),
+.bl-blocks-fields--compact .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__static:not([hidden]),
+.bl-blocks-fields--compact .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__row:not([hidden]),
+.bl-blocks-fields--compact .bl-blocks-fields__tab-panel > .bl-blocks-fields__heading:not([hidden]) + .bl-blocks-fields__field-row:not([hidden]) {
   margin-top: 6px;
   padding-top: 0;
   border-top: 0;
 }
-.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__section-title + *,
-.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__tab-panel > .bl-blocks-fields__section-title + *,
-.bl-blocks-fields--compact .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__section-title + *,
-.bl-blocks-fields--compact .bl-blocks-fields__tab-panel > .bl-blocks-fields__section-title + * {
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__section-title:not([hidden]) + *:not([hidden]),
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__tab-panel > .bl-blocks-fields__section-title:not([hidden]) + *:not([hidden]),
+.bl-blocks-fields--compact .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__section-title:not([hidden]) + *:not([hidden]),
+.bl-blocks-fields--compact .bl-blocks-fields__tab-panel > .bl-blocks-fields__section-title:not([hidden]) + *:not([hidden]) {
   margin-top: 6px;
   padding-top: 0;
   border-top: 0;
 }
-.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > * + .bl-blocks-fields__layout--section,
-.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__tab-panel > * + .bl-blocks-fields__layout--section,
-.bl-blocks-fields--compact .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > * + .bl-blocks-fields__layout--section,
-.bl-blocks-fields--compact .bl-blocks-fields__tab-panel > * + .bl-blocks-fields__layout--section {
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > *:not([hidden]) + .bl-blocks-fields__layout--section:not([hidden]),
+.bl-blocks-fields[data-layout=compact] .bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__layout--section:not([hidden]),
+.bl-blocks-fields--compact .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > *:not([hidden]) + .bl-blocks-fields__layout--section:not([hidden]),
+.bl-blocks-fields--compact .bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__layout--section:not([hidden]) {
   margin-top: 16px;
   padding-top: 0;
   border-top: 0;

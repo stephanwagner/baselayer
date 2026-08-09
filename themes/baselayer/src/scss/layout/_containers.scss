@@ -1,6 +1,16 @@
 @use '../config' as *;
 @use '../mixins' as *;
 
+// Minimum L/R floor for wide content-align / hero / slider overlays.
+// Matches -container-padding-s: S by default, XS on very small screens.
+:root {
+  --bl-wide-edge-floor: var(--bl-container-padding-s);
+
+  @media (max-width: $breakpoint-xs) {
+    --bl-wide-edge-floor: var(--bl-container-padding-xs);
+  }
+}
+
 // Container
 
 .container {
@@ -27,13 +37,12 @@
     padding-right: var(--bl-wide-bleed);
   }
 
-  // Keep content within the content column: L/R inset is at least the bleed,
-  // but larger container padding still applies.
+  // Content-column align: bleed wins over Innenabstand; floor at S→XS for edge clearance.
   &.-container-wide-content {
-    padding-left: max(var(--bl-container-padding-x, 0px), var(--bl-wide-bleed)) !important;
-    padding-right: max(var(--bl-container-padding-x, 0px), var(--bl-wide-bleed)) !important;
+    padding-left: max(var(--bl-wide-bleed), var(--bl-wide-edge-floor)) !important;
+    padding-right: max(var(--bl-wide-bleed), var(--bl-wide-edge-floor)) !important;
 
-    // Sliders consume --bl-container-padding-x on the slide content, not the wrapper.
+    // Sliders apply L/R on the slide content, not the wrapper.
     &.slider__wrapper {
       padding-left: 0 !important;
       padding-right: 0 !important;
@@ -51,10 +60,11 @@
     var(--bl-alignwide-bleed),
     max(0px, (100vw - 100%) / 2 - var(--bl-page-padding) * 0.5)
   );
+  // Content-column inset: bleed + half page-padding floor, never below S→XS (no Innenabstand).
   --bl-wide-content-inset: max(
     var(--bl-wide-bleed),
     calc(var(--bl-page-padding) * 0.5),
-    var(--bl-container-padding-x, 0px)
+    var(--bl-wide-edge-floor)
   );
   margin-left: calc(var(--bl-wide-bleed) * -1);
   margin-right: calc(var(--bl-wide-bleed) * -1);

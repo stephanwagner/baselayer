@@ -33,7 +33,7 @@
     const classes = [];
     if (containerValue === ALIGN_WIDE_CONTAINER_CLASS) {
       classes.push(ALIGN_WIDE_CONTAINER_CLASS);
-      if (attributes[content]) {
+      if (option.showContentAlign !== false && attributes[content]) {
         classes.push(ALIGN_WIDE_CONTENT_CLASS);
       }
     }
@@ -130,15 +130,16 @@
     const { container, content } = option.attributeNames;
     const containerValue = attributes[container] ?? option.default ?? "";
     const wideSelected = containerValue === ALIGN_WIDE_CONTAINER_CLASS;
+    const showContentAlign = option.showContentAlign !== false;
     const options = alignWideOptions();
     const setContainer = (newValue) => {
       const next = { [container]: newValue };
-      if (newValue !== ALIGN_WIDE_CONTAINER_CLASS) {
+      if (newValue !== ALIGN_WIDE_CONTAINER_CLASS || !showContentAlign) {
         next[content] = false;
       }
       onChange(next);
     };
-    const contentToggle = wideSelected ? /* @__PURE__ */ wp.element.createElement(
+    const contentToggle = wideSelected && showContentAlign ? /* @__PURE__ */ wp.element.createElement(
       ToggleControl,
       {
         className: "bl-align-wide-content-toggle",

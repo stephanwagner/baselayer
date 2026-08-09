@@ -15,7 +15,7 @@ export const alignWideClassesFromAttributes = (option, attributes) => {
 
   if (containerValue === ALIGN_WIDE_CONTAINER_CLASS) {
     classes.push(ALIGN_WIDE_CONTAINER_CLASS);
-    if (attributes[content]) {
+    if (option.showContentAlign !== false && attributes[content]) {
       classes.push(ALIGN_WIDE_CONTENT_CLASS);
     }
   }

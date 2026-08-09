@@ -65,6 +65,7 @@
                     "type": "align-wide",
                     "label": "Inhaltsbreite",
                     "default": "",
+                    "showContentAlign": false,
                     "description": "Verwendet den breiten Inhaltscontainer. Nicht zu verwechseln mit der WordPress-Ausrichtung „Erweiterte Breite“."
                 }
             ]
@@ -113,6 +114,11 @@
     "blocks": {
         "core/columns": {
             "items": [
+                {
+                    "id": "p_7f3e9c21a804",
+                    "kind": "preset",
+                    "slug": "inhaltsbreite"
+                },
                 {
                     "id": "p_04380ac99abf",
                     "kind": "preset",
@@ -400,7 +406,12 @@
                 {
                     "id": "p_731ce805b148",
                     "kind": "preset",
-                    "slug": "inhaltsbreite"
+                    "slug": "inhaltsbreite",
+                    "defaults": {
+                        "c_inhaltsbreite": {
+                            "showContentAlign": true
+                        }
+                    }
                 },
                 {
                     "id": "p_9b7f59901180",
@@ -520,7 +531,12 @@
                 {
                     "id": "p_20e62b23a530",
                     "kind": "preset",
-                    "slug": "inhaltsbreite"
+                    "slug": "inhaltsbreite",
+                    "defaults": {
+                        "c_inhaltsbreite": {
+                            "showContentAlign": true
+                        }
+                    }
                 },
                 {
                     "id": "p_2a9ea412523e",

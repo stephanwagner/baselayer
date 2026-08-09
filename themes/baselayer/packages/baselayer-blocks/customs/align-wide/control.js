@@ -20,24 +20,26 @@ export function AlignWideControl({ option, attributes, onChange }) {
   const { container, content } = option.attributeNames;
   const containerValue = attributes[container] ?? option.default ?? '';
   const wideSelected = containerValue === ALIGN_WIDE_CONTAINER_CLASS;
+  const showContentAlign = option.showContentAlign !== false;
   const options = alignWideOptions();
 
   const setContainer = (newValue) => {
     const next = { [container]: newValue };
-    if (newValue !== ALIGN_WIDE_CONTAINER_CLASS) {
+    if (newValue !== ALIGN_WIDE_CONTAINER_CLASS || !showContentAlign) {
       next[content] = false;
     }
     onChange(next);
   };
 
-  const contentToggle = wideSelected ? (
-    <ToggleControl
-      className="bl-align-wide-content-toggle"
-      label={t('alignContentToContentColumn', 'Align content to content column')}
-      checked={Boolean(attributes[content])}
-      onChange={(checked) => onChange({ [content]: checked })}
-    />
-  ) : null;
+  const contentToggle =
+    wideSelected && showContentAlign ? (
+      <ToggleControl
+        className="bl-align-wide-content-toggle"
+        label={t('alignContentToContentColumn', 'Align content to content column')}
+        checked={Boolean(attributes[content])}
+        onChange={(checked) => onChange({ [content]: checked })}
+      />
+    ) : null;
 
   if (!ToggleGroupControl) {
     return (

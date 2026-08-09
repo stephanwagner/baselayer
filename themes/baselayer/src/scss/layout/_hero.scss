@@ -6,17 +6,36 @@
   --hero-padding-top: calc(100% / 16 * 9);
   --hero-padding-top-xs: calc(100% / 4 * 3);
   --hero-content-max-width: 600px;
-  --hero-content-inset: var(--bl-container-padding);
+  // Own L/R inner padding (mirrors Innenabstand L); not shared with groups.
+  --hero-overlay-padding-x: var(--bl-container-padding-l);
+
+  @media (max-width: $breakpoint-m) {
+    --hero-overlay-padding-x: var(--bl-container-padding-m);
+  }
+
+  @media (max-width: $breakpoint-s) {
+    --hero-overlay-padding-x: var(--bl-container-padding-s);
+  }
+
+  @media (max-width: $breakpoint-xs) {
+    --hero-overlay-padding-x: var(--bl-container-padding-xs);
+  }
+
+  --hero-content-inset: var(--hero-overlay-padding-x);
 }
 
 .hero__wrapper.container-wide {
-  // Use the wrapper's fluid bleed (from .container-wide); floor at normal container padding.
-  --hero-content-inset: max(var(--bl-wide-bleed, 0px), var(--bl-container-padding));
+  // Own L/R inset — bleed floored at overlay padding; ignore Innenabstand.
+  --hero-content-inset: max(var(--bl-wide-bleed, 0px), var(--hero-overlay-padding-x));
 }
 
 .hero__wrapper.alignwide {
-  // Alignwide sets --bl-wide-content-inset (half page-padding floor).
-  --hero-content-inset: var(--bl-wide-content-inset);
+  // Own L/R inset — bleed + half page-padding floor, never below overlay padding.
+  --hero-content-inset: max(
+    var(--bl-wide-bleed, 0px),
+    calc(var(--bl-page-padding) * 0.5),
+    var(--hero-overlay-padding-x)
+  );
 }
 
 .hero__wrapper {

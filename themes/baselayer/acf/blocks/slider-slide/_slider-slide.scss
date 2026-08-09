@@ -49,32 +49,48 @@
 }
 
 .slider-slide__content {
+  // Own L/R inner padding (mirrors Innenabstand L); not shared with groups.
+  --slider-overlay-padding-x: var(--bl-container-padding-l);
+
+  @media (max-width: $breakpoint-m) {
+    --slider-overlay-padding-x: var(--bl-container-padding-m);
+  }
+
+  @media (max-width: $breakpoint-s) {
+    --slider-overlay-padding-x: var(--bl-container-padding-s);
+  }
+
+  @media (max-width: $breakpoint-xs) {
+    --slider-overlay-padding-x: var(--bl-container-padding-xs);
+  }
+
   position: absolute;
   inset: 0;
   z-index: 3;
   padding-top: var(--bl-container-padding-y, 0);
   padding-bottom: var(--bl-container-padding-y, 0);
-  padding-left: var(--bl-container-padding-x, var(--bl-page-padding));
-  padding-right: var(--bl-container-padding-x, var(--bl-page-padding));
+  padding-left: max(var(--bl-page-padding), var(--slider-overlay-padding-x));
+  padding-right: max(var(--bl-page-padding), var(--slider-overlay-padding-x));
   align-items: center;
   display: none;
   color: #fff;
 
-  // Container-wide only: inset by bleed, floor at container/page padding.
+  // Own L/R padding — bleed + overlay padding floor; ignore Innenabstand X.
   .slider__wrapper.container-wide & {
-    padding-left: max(var(--bl-wide-bleed, 0px), var(--bl-container-padding-x, var(--bl-page-padding)));
-    padding-right: max(var(--bl-wide-bleed, 0px), var(--bl-container-padding-x, var(--bl-page-padding)));
+    padding-left: max(var(--bl-wide-bleed, 0px), var(--slider-overlay-padding-x));
+    padding-right: max(var(--bl-wide-bleed, 0px), var(--slider-overlay-padding-x));
   }
 
-  // Alignwide (alone or with container-wide): half page-padding floor via content inset.
   .slider__wrapper.alignwide & {
-    padding-left: var(
-      --bl-wide-content-inset,
-      max(var(--bl-wide-bleed, 0px), calc(var(--bl-page-padding) * 0.5), var(--bl-container-padding-x, var(--bl-page-padding)))
+    padding-left: max(
+      var(--bl-wide-bleed, 0px),
+      calc(var(--bl-page-padding) * 0.5),
+      var(--slider-overlay-padding-x)
     );
-    padding-right: var(
-      --bl-wide-content-inset,
-      max(var(--bl-wide-bleed, 0px), calc(var(--bl-page-padding) * 0.5), var(--bl-container-padding-x, var(--bl-page-padding)))
+    padding-right: max(
+      var(--bl-wide-bleed, 0px),
+      calc(var(--bl-page-padding) * 0.5),
+      var(--slider-overlay-padding-x)
     );
   }
 
@@ -83,8 +99,8 @@
     padding-right: calc((100vw - var(--bl-content-width)) * 0.5);
 
     @media (max-width: calc(#{$content-width} + #{$page-padding-l} + #{$page-padding-l})) {
-      padding-left: var(--bl-container-padding-x, var(--bl-page-padding));
-      padding-right: var(--bl-container-padding-x, var(--bl-page-padding));
+      padding-left: max(var(--bl-page-padding), var(--slider-overlay-padding-x));
+      padding-right: max(var(--bl-page-padding), var(--slider-overlay-padding-x));
     }
   }
 
