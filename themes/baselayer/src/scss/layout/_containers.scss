@@ -24,23 +24,20 @@
 // always leaving --bl-page-padding from the viewport edge.
 
 .container-wide {
-  --bl-wide-bleed: min(
-    var(--bl-container-wide-bleed),
-    max(0px, (100vw - 100%) / 2 - var(--bl-page-padding))
-  );
+  --bl-wide-bleed: min(var(--bl-container-wide-bleed), max(0px, (100vw - 100%) / 2 - var(--bl-page-padding)));
   margin-left: calc(var(--bl-wide-bleed) * -1);
   margin-right: calc(var(--bl-wide-bleed) * -1);
   width: calc(100% + var(--bl-wide-bleed) + var(--bl-wide-bleed));
 
-  &.has-background {
-    padding-left: var(--bl-wide-bleed);
-    padding-right: var(--bl-wide-bleed);
-  }
-
-  // Content-column align: bleed wins over Innenabstand; floor at S→XS for edge clearance.
+  // Content-column align only when “Inhalt am Content ausrichten”.
+  // Dedicated inset var so .alignwide does not overwrite --bl-wide-bleed used for margins.
   &.-container-wide-content {
-    padding-left: max(var(--bl-wide-bleed), var(--bl-wide-edge-floor)) !important;
-    padding-right: max(var(--bl-wide-bleed), var(--bl-wide-edge-floor)) !important;
+    --bl-container-wide-content-inset: max(
+      min(var(--bl-container-wide-bleed), max(0px, (100vw - 100%) / 2 - var(--bl-page-padding))),
+      var(--bl-wide-edge-floor)
+    );
+    padding-left: var(--bl-container-wide-content-inset) !important;
+    padding-right: var(--bl-container-wide-content-inset) !important;
 
     // Sliders apply L/R on the slide content, not the wrapper.
     &.slider__wrapper {
@@ -54,28 +51,22 @@
 // leaving half --bl-page-padding from the viewport edge (extends further than
 // .container-wide). Content inset floors at half page padding so copy can keep
 // a larger L/R inset on smaller screens.
+// When also .container-wide, Inhaltsbreite owns L/R inset (option-gated).
 
 .alignwide {
-  --bl-wide-bleed: min(
-    var(--bl-alignwide-bleed),
-    max(0px, (100vw - 100%) / 2 - var(--bl-page-padding) * 0.5)
-  );
+  --bl-wide-bleed: min(var(--bl-alignwide-bleed), max(0px, (100vw - 100%) / 2 - var(--bl-page-padding) * 0.5));
   // Content-column inset: bleed + half page-padding floor, never below S→XS (no Innenabstand).
-  --bl-wide-content-inset: max(
-    var(--bl-wide-bleed),
-    calc(var(--bl-page-padding) * 0.5),
-    var(--bl-wide-edge-floor)
-  );
+  --bl-wide-content-inset: max(var(--bl-wide-bleed), calc(var(--bl-page-padding) * 0.5), var(--bl-wide-edge-floor));
   margin-left: calc(var(--bl-wide-bleed) * -1);
   margin-right: calc(var(--bl-wide-bleed) * -1);
 
-  &.has-background {
+  &.has-background:not(.container-wide) {
     padding-left: var(--bl-wide-content-inset);
     padding-right: var(--bl-wide-content-inset);
   }
 
-  // Content-column align when also Inhaltsbreite content mode.
-  &.-container-wide-content {
+  // Alignwide-only content-align; combined with container-wide uses .container-wide rule.
+  &.-container-wide-content:not(.container-wide) {
     padding-left: var(--bl-wide-content-inset) !important;
     padding-right: var(--bl-wide-content-inset) !important;
 
