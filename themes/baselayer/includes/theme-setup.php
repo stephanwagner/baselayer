@@ -171,6 +171,26 @@ add_action('after_setup_theme', function (): void {
 }, 20);
 
 /**
+ * Whether page excerpts are enabled (Settings → Theme → General).
+ */
+function bl_page_excerpt_enabled(): bool
+{
+	return get_option('baselayer_page_excerpt', '0') === '1';
+}
+
+/**
+ * Add excerpt support to pages when enabled in Theme settings.
+ */
+function bl_maybe_add_page_excerpt_support(): void
+{
+	if (!bl_page_excerpt_enabled()) {
+		return;
+	}
+	add_post_type_support('page', 'excerpt');
+}
+add_action('init', 'bl_maybe_add_page_excerpt_support');
+
+/**
  * Filter excerpt length from Theme settings (Settings → Theme → General).
  *
  * @return int Length used when trimming excerpts.

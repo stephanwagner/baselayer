@@ -205,6 +205,9 @@ function bl_theme_settings_save_general_options_from_post(): void
 		'baselayer_weekly_report_minute' => 'bl_sanitize_weekly_report_minute',
 		'baselayer_report_email' => 'bl_sanitize_report_email_list',
 		'posts_per_page' => 'bl_sanitize_posts_per_page',
+		'baselayer_page_excerpt' => static function ($raw): string {
+			return !empty($raw) ? '1' : '0';
+		},
 		'baselayer_excerpt_length' => 'bl_sanitize_excerpt_length',
 		'baselayer_excerpt_more' => 'sanitize_text_field',
 		'baselayer_og_image_fallback' => 'bl_sanitize_og_image_fallback',
@@ -512,6 +515,13 @@ add_action('admin_init', function () {
 		'type' => 'string',
 		'default' => '1',
 		'sanitize_callback' => 'bl_sanitize_asset_version',
+	]);
+	register_setting(BL_THEME_OPTION_GROUP_GENERAL, 'baselayer_page_excerpt', [
+		'type' => 'string',
+		'default' => '0',
+		'sanitize_callback' => static function ($raw): string {
+			return !empty($raw) ? '1' : '0';
+		},
 	]);
 	register_setting(BL_THEME_OPTION_GROUP_GENERAL, 'baselayer_excerpt_length', [
 		'type' => 'string',
@@ -1239,29 +1249,30 @@ function theme_settings_page(): void
 						</td>
 					</tr>
 					<tr>
-						<th scope="row">
-							<label for="baselayer_excerpt_length"><?= esc_html__('Excerpt length', 'baselayer') ?></label>
-						</th>
-						<td>
+						<th scope="row"><?= esc_html__('Excerpt', 'baselayer') ?></th>
+						<td style="padding-top: 20px;">
 							<?php
+							$page_excerpt_enabled = get_option('baselayer_page_excerpt', '0') === '1';
 							$excerpt_length_opt = get_option('baselayer_excerpt_length', '');
 							$excerpt_length_val = $excerpt_length_opt !== '' ? $excerpt_length_opt : '40';
-							?>
-							<input type="number" name="baselayer_excerpt_length" id="baselayer_excerpt_length" value="<?= esc_attr($excerpt_length_val) ?>" min="1" max="999" step="1" class="small-text">
-							<p class="description"><?= esc_html__('Number of words used when trimming excerpts.', 'baselayer') ?></p>
-						</td>
-					</tr>
-					<tr>
-						<th scope="row">
-							<label for="baselayer_excerpt_more"><?= esc_html__('Excerpt "more" text', 'baselayer') ?></label>
-						</th>
-						<td>
-							<?php
 							$excerpt_more_opt = get_option('baselayer_excerpt_more');
 							$excerpt_more_val = $excerpt_more_opt !== false ? $excerpt_more_opt : '…';
 							?>
-							<input type="text" name="baselayer_excerpt_more" id="baselayer_excerpt_more" value="<?= esc_attr($excerpt_more_val) ?>" class="small-text" maxlength="20">
-							<p class="description"><?= esc_html__('Text shown after the excerpt when it is truncated (e.g. …). Leave blank for none.', 'baselayer') ?></p>
+							<label>
+								<input type="hidden" name="baselayer_page_excerpt" value="0">
+								<input type="checkbox" name="baselayer_page_excerpt" id="baselayer_page_excerpt" value="1" <?= checked($page_excerpt_enabled, true, false) ?>>
+								<?= esc_html__('Allow excerpts for pages', 'baselayer') ?>
+							</label>
+							<p style="margin: 12px 0 0;">
+								<label for="baselayer_excerpt_length"><strong><?= esc_html__('Length', 'baselayer') ?></strong></label><br>
+								<input type="number" name="baselayer_excerpt_length" id="baselayer_excerpt_length" value="<?= esc_attr($excerpt_length_val) ?>" min="1" max="999" step="1" class="small-text" style="margin-top: 4px;">
+							</p>
+							<p class="description"><?= esc_html__('Number of words used when trimming excerpts.', 'baselayer') ?></p>
+							<p style="margin: 12px 0 0;">
+								<label for="baselayer_excerpt_more"><strong><?= esc_html__('More text', 'baselayer') ?></strong></label><br>
+								<input type="text" name="baselayer_excerpt_more" id="baselayer_excerpt_more" value="<?= esc_attr($excerpt_more_val) ?>" maxlength="20" style="margin-top: 4px;">
+							</p>
+							<p class="description"><?= esc_html__('Text shown after the excerpt when it is truncated. Leave blank for none.', 'baselayer') ?></p>
 						</td>
 					</tr>
 				</table>

@@ -273,17 +273,20 @@ msgstr "Fallback-OG-Bild"
 msgid "Fallback featured image"
 msgstr "Fallback-Beitragsbild"
 
-msgid "Excerpt length"
-msgstr "Auszugslänge"
+msgid "Allow excerpts for pages"
+msgstr "Auszug für Seiten erlauben"
+
+msgid "Length"
+msgstr "Länge"
 
 msgid "Number of words used when trimming excerpts."
 msgstr "Anzahl der Wörter beim Kürzen von Auszügen."
 
-msgid "Excerpt \"more\" text"
-msgstr "Auszug „Weiterlesen“-Text"
+msgid "More text"
+msgstr "„Weiterlesen“-Text"
 
-msgid "Text shown after the excerpt when it is truncated (e.g. …). Leave blank for none."
-msgstr "Text, der nach dem Auszug angezeigt wird, wenn er gekürzt wurde (z. B. …). Leer lassen für keinen."
+msgid "Text shown after the excerpt when it is truncated. Leave blank for none."
+msgstr "Text, der nach dem Auszug angezeigt wird, wenn er gekürzt wurde. Leer lassen für keinen."
 
 msgid "Shown on the login page instead of the WordPress logo. Also used as the schema.org logo fallback when no schema logo is set."
 msgstr "Wird auf der Anmeldeseite anstelle des WordPress-Logos angezeigt. Dient auch als schema.org-Logo-Fallback, wenn kein Schema-Logo gesetzt ist."
