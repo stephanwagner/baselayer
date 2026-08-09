@@ -64,26 +64,27 @@
   }
 }
 
-@mixin container-padding-targets {
-  &.wp-block-group {
-    @content;
-  }
+// Pad the class holder (like margin). Cover pads its inner container; slider keeps vars only.
+@mixin apply-container-padding($y: null, $x: null, $responsive: ()) {
+  @include block-container-padding($y, $x, $responsive);
 
-  &.wp-block-pullquote {
-    @content;
-  }
-
-  &.wp-block-cover .wp-block-cover__inner-container {
-    @content;
-  }
-
-  // Vars only — `.slider-slide__content` consumes them; do not pad the wrapper.
-  &.slider__wrapper {
-    @content;
-    padding-left: 0;
-    padding-right: 0;
+  &.wp-block-cover {
     padding-top: 0;
+    padding-right: 0;
     padding-bottom: 0;
+    padding-left: 0;
+
+    .wp-block-cover__inner-container {
+      @include block-container-padding($y, $x, $responsive);
+    }
+  }
+
+  // Vars stay on the wrapper; `.slider-slide__content` consumes Y (and overlay owns X).
+  &.slider__wrapper {
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    padding-left: 0;
   }
 }
 
@@ -829,102 +830,90 @@
     );
   }
 
-  // Container padding (group wrapper / cover inner container)
+  // Container padding — any element with the class (Cover → inner; Slider → vars only)
 
   .-container-padding-none {
-    @include container-padding-targets {
-      @include block-container-padding(0, 0);
-    }
+    @include apply-container-padding(0, 0);
   }
 
   .-container-padding-xs {
-    @include container-padding-targets {
-      @include block-container-padding(var(--bl-container-padding-xs), var(--bl-container-padding-xs));
-    }
+    @include apply-container-padding(var(--bl-container-padding-xs), var(--bl-container-padding-xs));
   }
 
   .-container-padding-s {
-    @include container-padding-targets {
-      @include block-container-padding(
-        var(--bl-container-padding-s),
-        var(--bl-container-padding-s),
-        (
-          $breakpoint-xs: (
-            x: var(--bl-container-padding-xs),
-            y: var(--bl-container-padding-xs),
-          ),
-        )
-      );
-    }
+    @include apply-container-padding(
+      var(--bl-container-padding-s),
+      var(--bl-container-padding-s),
+      (
+        $breakpoint-xs: (
+          x: var(--bl-container-padding-xs),
+          y: var(--bl-container-padding-xs),
+        ),
+      )
+    );
   }
 
   .-container-padding-m {
-    @include container-padding-targets {
-      @include block-container-padding(
-        var(--bl-container-padding-m),
-        var(--bl-container-padding-m),
-        (
-          $breakpoint-s: (
-            x: var(--bl-container-padding-s),
-            y: var(--bl-container-padding-s),
-          ),
-          $breakpoint-xs: (
-            x: var(--bl-container-padding-xs),
-            y: var(--bl-container-padding-xs),
-          ),
-        )
-      );
-    }
+    @include apply-container-padding(
+      var(--bl-container-padding-m),
+      var(--bl-container-padding-m),
+      (
+        $breakpoint-s: (
+          x: var(--bl-container-padding-s),
+          y: var(--bl-container-padding-s),
+        ),
+        $breakpoint-xs: (
+          x: var(--bl-container-padding-xs),
+          y: var(--bl-container-padding-xs),
+        ),
+      )
+    );
   }
 
   .-container-padding-l {
-    @include container-padding-targets {
-      @include block-container-padding(
-        var(--bl-container-padding-l),
-        var(--bl-container-padding-l),
-        (
-          $breakpoint-m: (
-            x: var(--bl-container-padding-m),
-            y: var(--bl-container-padding-m),
-          ),
-          $breakpoint-s: (
-            x: var(--bl-container-padding-s),
-            y: var(--bl-container-padding-s),
-          ),
-          $breakpoint-xs: (
-            x: var(--bl-container-padding-xs),
-            y: var(--bl-container-padding-xs),
-          ),
-        )
-      );
-    }
+    @include apply-container-padding(
+      var(--bl-container-padding-l),
+      var(--bl-container-padding-l),
+      (
+        $breakpoint-m: (
+          x: var(--bl-container-padding-m),
+          y: var(--bl-container-padding-m),
+        ),
+        $breakpoint-s: (
+          x: var(--bl-container-padding-s),
+          y: var(--bl-container-padding-s),
+        ),
+        $breakpoint-xs: (
+          x: var(--bl-container-padding-xs),
+          y: var(--bl-container-padding-xs),
+        ),
+      )
+    );
   }
 
   .-container-padding-xl {
-    @include container-padding-targets {
-      @include block-container-padding(
-        var(--bl-container-padding-xl),
-        var(--bl-container-padding-xl),
-        (
-          $breakpoint-l: (
-            x: var(--bl-container-padding-m),
-            y: var(--bl-container-padding-l),
-          ),
-          $breakpoint-m: (
-            x: var(--bl-container-padding-m),
-            y: var(--bl-container-padding-m),
-          ),
-          $breakpoint-s: (
-            x: var(--bl-container-padding-s),
-            y: var(--bl-container-padding-s),
-          ),
-          $breakpoint-xs: (
-            x: var(--bl-container-padding-xs),
-            y: var(--bl-container-padding-xs),
-          ),
-        )
-      );
-    }
+    @include apply-container-padding(
+      var(--bl-container-padding-xl),
+      var(--bl-container-padding-xl),
+      (
+        $breakpoint-l: (
+          x: var(--bl-container-padding-m),
+          y: var(--bl-container-padding-l),
+        ),
+        $breakpoint-m: (
+          x: var(--bl-container-padding-m),
+          y: var(--bl-container-padding-m),
+        ),
+        $breakpoint-s: (
+          x: var(--bl-container-padding-s),
+          y: var(--bl-container-padding-s),
+        ),
+        $breakpoint-xs: (
+          x: var(--bl-container-padding-xs),
+          y: var(--bl-container-padding-xs),
+        ),
+      )
+    );
   }
 
   // Spacer responsive height
