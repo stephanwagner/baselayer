@@ -953,6 +953,9 @@ function createLeafControl(field, values, controls) {
         );
       }
       row.appendChild(group);
+    } else if (type === 'wysiwyg') {
+      // Wrapper keeps TinyMCE chrome (.mce-tinymce) targetable from admin/theme CSS.
+      row.appendChild(el('div', { className: 'bl-wysiwyg-editor' }, [control]));
     } else {
       row.appendChild(control);
     }

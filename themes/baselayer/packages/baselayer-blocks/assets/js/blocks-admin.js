@@ -3357,6 +3357,37 @@
     }
     return null;
   }
+  function resolveWysiwygContentCss() {
+    const sources = [window.blBlocksFieldUi, window.blBlocksAdmin, window.blBlocksEditor, window.blBlocksPage];
+    for (let i = 0; i < sources.length; i += 1) {
+      const url = sources[i] && sources[i].wysiwygContentCss;
+      if (typeof url === "string" && url.trim()) {
+        return url.trim();
+      }
+    }
+    return "";
+  }
+  function appendWysiwygContentCss(tinymceSettings) {
+    if (!tinymceSettings || typeof tinymceSettings !== "object") return;
+    const url = resolveWysiwygContentCss();
+    if (!url) return;
+    const current = tinymceSettings.content_css;
+    if (!current) {
+      tinymceSettings.content_css = url;
+      return;
+    }
+    if (Array.isArray(current)) {
+      if (!current.includes(url)) {
+        current.push(url);
+      }
+      return;
+    }
+    const parts = String(current).split(",").map((part) => part.trim()).filter(Boolean);
+    if (!parts.includes(url)) {
+      parts.push(url);
+    }
+    tinymceSettings.content_css = parts.join(",");
+  }
   function getWpEditorApi() {
     const wp2 = window.wp;
     if (!wp2) return null;
@@ -3399,6 +3430,7 @@
     if (heightPx != null) {
       tinymce.height = heightPx;
     }
+    appendWysiwygContentCss(tinymce);
     api.initialize(editorId, {
       tinymce,
       quicktags: !!field?.allow_code_editing,
@@ -9158,6 +9190,8 @@
           );
         }
         row.appendChild(group);
+      } else if (type === "wysiwyg") {
+        row.appendChild(el7("div", { className: "bl-wysiwyg-editor" }, [control]));
       } else {
         row.appendChild(control);
       }

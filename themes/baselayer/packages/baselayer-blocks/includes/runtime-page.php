@@ -106,6 +106,9 @@ function bl_blocks_enqueue_page_editor(string $hook): void
 		'pagesRestUrl' => esc_url_raw(rest_url('wp/v2/pages')),
 		'pickerPostTypes' => function_exists('bl_page_picker_post_types') ? bl_page_picker_post_types() : [],
 		'restNonce'    => wp_create_nonce('wp_rest'),
+		'wysiwygContentCss' => function_exists('bl_blocks_wysiwyg_content_css_url')
+			? bl_blocks_wysiwyg_content_css_url()
+			: '',
 		'i18n'         => [
 			'edit'                   => __('Edit fields', 'baselayer-blocks'),
 			'save'                   => __('Apply', 'baselayer-blocks'),

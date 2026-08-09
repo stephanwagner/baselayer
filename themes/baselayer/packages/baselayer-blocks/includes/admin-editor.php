@@ -685,6 +685,9 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'pagesRestUrl'         => esc_url_raw(rest_url('wp/v2/pages')),
 		'starterPath'          => 'baselayer-blocks/v1/starter-template',
 		'restNonce'            => wp_create_nonce('wp_rest'),
+		'wysiwygContentCss'    => function_exists('bl_blocks_wysiwyg_content_css_url')
+			? bl_blocks_wysiwyg_content_css_url()
+			: '',
 		'codeEditorSettings'   => $code_editor_settings,
 		'blockOptionCustoms'  => function_exists('bl_block_options_customs_catalog')
 			? bl_block_options_customs_catalog()

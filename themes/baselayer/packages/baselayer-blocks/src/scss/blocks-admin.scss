@@ -1,6 +1,7 @@
 @use '../../../../src/scss/admin/form-controls';
 @use '../../../../src/scss/admin/page-picker';
 @use 'fields';
+@use 'wysiwyg';
 
 // Blocks admin: definition editor extras + Website + field UI modal.
 
@@ -248,15 +249,6 @@ body.post-new-php.post-type-bl_block {
     textarea.widefat,
     select.widefat {
       max-width: 100%;
-    }
-
-    .bl-blocks-fields__wysiwyg,
-    .mce-tinymce {
-      max-width: 100%;
-    }
-
-    .mce-tinymce.mce-container {
-      box-sizing: border-box;
     }
   }
 }

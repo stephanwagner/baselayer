@@ -60,6 +60,11 @@ const entries = [
   { src: `${blocksPkg}/src/scss/blocks-admin.scss`, name: 'blocks-admin', outDir: `${blocksPkg}/assets/css` },
   { src: `${blocksPkg}/src/scss/blocks-editor.scss`, name: 'blocks-editor', outDir: `${blocksPkg}/assets/css` },
   {
+    src: `${blocksPkg}/src/scss/wysiwyg-content.scss`,
+    name: 'wysiwyg-content',
+    outDir: `${blocksPkg}/assets/css`
+  },
+  {
     src: `${blocksPkg}/src/scss/block-options-editor.scss`,
     name: 'block-options-editor',
     outDir: `${blocksPkg}/assets/css`

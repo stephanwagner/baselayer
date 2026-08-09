@@ -2,6 +2,7 @@
 @use '../../../../src/scss/admin/page-picker';
 @use '../../../../src/scss/admin/form-controls';
 @use 'fields';
+@use 'wysiwyg';
 
 .bl-blocks-block-editor {
   padding: 0;

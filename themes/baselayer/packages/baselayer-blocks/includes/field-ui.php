@@ -240,6 +240,33 @@ function bl_blocks_enqueue_wysiwyg_editor(): void
 }
 
 /**
+ * Absolute URL for TinyMCE content CSS (iframe), or empty when the asset is missing.
+ * Filterable for packages/plugins that need extra or replacement stylesheets.
+ *
+ * @return string
+ */
+function bl_blocks_wysiwyg_content_css_url(): string
+{
+	$asset = function_exists('bl_blocks_resolve_asset')
+		? bl_blocks_resolve_asset('wysiwyg-content', 'css')
+		: null;
+	$url = is_array($asset) ? (string) ($asset['uri'] ?? '') : '';
+	/**
+	 * Filter Rich Text TinyMCE content_css URL(s).
+	 *
+	 * Return a URL string, a comma-separated list, or an array of URLs.
+	 *
+	 * @param string $url Package default stylesheet URI (may be empty).
+	 */
+	$filtered = apply_filters('bl_blocks_wysiwyg_content_css', $url);
+	if (is_array($filtered)) {
+		$urls = array_values(array_filter(array_map('esc_url_raw', $filtered)));
+		return implode(',', $urls);
+	}
+	return esc_url_raw((string) $filtered);
+}
+
+/**
  * Shared admin field UI assets (createFieldForm + Website mount).
  */
 function bl_blocks_enqueue_field_ui_assets(): void
@@ -269,6 +296,9 @@ function bl_blocks_enqueue_field_ui_assets(): void
 		'pagesRestUrl' => esc_url_raw(rest_url('wp/v2/pages')),
 		'pickerPostTypes' => function_exists('bl_page_picker_post_types') ? bl_page_picker_post_types() : [],
 		'restNonce'    => wp_create_nonce('wp_rest'),
+		'wysiwygContentCss' => function_exists('bl_blocks_wysiwyg_content_css_url')
+			? bl_blocks_wysiwyg_content_css_url()
+			: '',
 		'i18n'         => [
 			'edit'                   => __('Edit', 'baselayer-blocks'),
 			'save'                   => __('Save', 'baselayer-blocks'),
