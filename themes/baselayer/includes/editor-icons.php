@@ -170,6 +170,7 @@ function bl_icon_labels(): array
 		'menu-book'              => _x('Menu book', 'icon name', 'baselayer-icons'),
 
 		// Rich text.
+		'wysiwyg'                 => _x('WYSIWYG', 'icon name', 'baselayer-icons'),
 		'text-format'             => _x('Text format', 'icon name', 'baselayer-icons'),
 		'bold'                    => _x('Bold', 'icon name', 'baselayer-icons'),
 		'italic'                  => _x('Italic', 'icon name', 'baselayer-icons'),

@@ -232,6 +232,9 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 	}
 
 	wp_enqueue_media();
+	if (function_exists('bl_blocks_enqueue_wysiwyg_editor')) {
+		bl_blocks_enqueue_wysiwyg_editor();
+	}
 
 	$type = bl_blocks_current_list_type();
 	$post_id = isset($_GET['post']) ? (int) $_GET['post'] : 0;
@@ -322,6 +325,7 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 	$type_labels = [
 		'text'         => __('Text', 'baselayer-blocks'),
 		'textarea'     => __('Textarea', 'baselayer-blocks'),
+		'wysiwyg'      => __('Rich Text', 'baselayer-blocks'),
 		'email'        => __('Email', 'baselayer-blocks'),
 		'phone'        => __('Phone', 'baselayer-blocks'),
 		'url'          => __('URL', 'baselayer-blocks'),
@@ -446,6 +450,19 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'paletteSectionContent'    => __('Content', 'baselayer-blocks'),
 		'paletteSectionAdvanced'   => __('Advanced', 'baselayer-blocks'),
 		'paletteSectionRelations'  => __('Relations', 'baselayer-blocks'),
+		'wysiwygToolbar'           => __('Toolbar', 'baselayer-blocks'),
+		'wysiwygToolbarBasic'      => __('Basic', 'baselayer-blocks'),
+		'wysiwygToolbarStandard'   => __('Standard', 'baselayer-blocks'),
+		'wysiwygToolbarFull'       => __('Full', 'baselayer-blocks'),
+		'wysiwygToolbarCustom'     => __('Custom', 'baselayer-blocks'),
+		'wysiwygToolbarHelp'       => __('Basic: bold, italic, link. Standard adds lists. Full adds headings and alignment.', 'baselayer-blocks'),
+		'wysiwygCustomButtons'     => __('Custom toolbar buttons', 'baselayer-blocks'),
+		/* translators: %s: URL to WordPress TinyMCE docs */
+		'wysiwygCustomButtonsHelp' => __('Comma-separated TinyMCE button IDs (e.g. bold,italic,link). Use | between commas to separate groups. Undo/redo are always included. See the <a href="%s" target="_blank" rel="noopener noreferrer">WordPress TinyMCE button docs</a>.', 'baselayer-blocks'),
+		'wysiwygAllowCodeEditing'  => __('Allow code editing', 'baselayer-blocks'),
+		'wysiwygAllowCodeEditingHelp' => __('Shows Visual and Text tabs so authors can edit HTML.', 'baselayer-blocks'),
+		'wysiwygHeight'            => __('Height', 'baselayer-blocks'),
+		'wysiwygHeightHelp'        => __('Editor height in pixels. Leave empty for the default.', 'baselayer-blocks'),
 		'repeaterType'             => __('Repeater', 'baselayer-blocks'),
 		'repeaterLabel'            => __('Repeater label', 'baselayer-blocks'),
 		'repeaterLabelPlaceholder' => __('Repeater label', 'baselayer-blocks'),

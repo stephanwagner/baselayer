@@ -203,11 +203,14 @@
         {
           slug: "rich-text",
           icons: [
-            { filename: "text-format", alternatives: [], keywords: ["text", "format", "typography", "font", "wysiwyg"] },
+            { filename: "wysiwyg", alternatives: [], keywords: ["wysiwyg", "rich text", "editor", "format", "tinymce"] },
+            { filename: "text-format", alternatives: [], keywords: ["text", "format", "typography", "font"] },
             { filename: "bold", alternatives: [], keywords: ["bold", "strong", "weight", "typography"] },
             { filename: "italic", alternatives: [], keywords: ["italic", "emphasis", "slant", "typography"] },
             { filename: "underlined", alternatives: [], keywords: ["underline", "typography", "text"] },
             { filename: "strikethrough", alternatives: ["fill"], keywords: ["strikethrough", "strike", "cross out", "typography"] },
+            { filename: "text-decrease", alternatives: [], keywords: ["text", "decrease", "smaller", "font", "size"] },
+            { filename: "text-increase", alternatives: [], keywords: ["text", "increase", "larger", "font", "size"] },
             { filename: "align-left", alternatives: [], keywords: ["align", "left", "text", "paragraph"] },
             { filename: "align-center", alternatives: [], keywords: ["align", "center", "text", "paragraph"] },
             { filename: "align-right", alternatives: [], keywords: ["align", "right", "text", "paragraph"] },
@@ -232,8 +235,6 @@
             { filename: "indent-increase", alternatives: [], keywords: ["indent", "increase", "margin"] },
             { filename: "line-spacing", alternatives: [], keywords: ["line", "spacing", "leading", "paragraph"] },
             { filename: "letter-spacing", alternatives: ["fill"], keywords: ["letter", "spacing", "tracking", "typography"] },
-            { filename: "text-decrease", alternatives: [], keywords: ["text", "decrease", "smaller", "font", "size"] },
-            { filename: "text-increase", alternatives: [], keywords: ["text", "increase", "larger", "font", "size"] },
             { filename: "colors", alternatives: [], keywords: ["colors", "palette", "swatches", "design"] },
             { filename: "color-fill", alternatives: [], keywords: ["highlight", "fill", "background", "color"] },
             { filename: "paintbrush", alternatives: ["fill"], keywords: ["paint", "brush", "draw", "color", "style"] },
@@ -5553,7 +5554,170 @@
     });
   }
 
+  // themes/baselayer/packages/baselayer-blocks/src/js/admin/wysiwyg-field.js
+  var WYSIWYG_MIN_HEIGHT_PX = 100;
+  var ALWAYS = ["undo", "redo"];
+  var PRESETS = {
+    basic: ["bold", "italic", "|", "link", "unlink"],
+    standard: ["bold", "italic", "|", "link", "unlink", "|", "bullist", "numlist"],
+    full: [
+      "formatselect",
+      "|",
+      "bold",
+      "italic",
+      "|",
+      "link",
+      "unlink",
+      "|",
+      "bullist",
+      "numlist",
+      "|",
+      "alignleft",
+      "aligncenter",
+      "alignright"
+    ]
+  };
+  function parseCustomToolbar(raw) {
+    return String(raw || "").split(",").map((part) => part.trim()).filter(Boolean).flatMap((part) => {
+      if (part === "|") return ["|"];
+      const cleaned = part.replace(/[^a-z0-9_|-]/gi, "");
+      return cleaned ? [cleaned] : [];
+    });
+  }
+  function resolveWysiwygToolbar(field) {
+    const preset = String(field?.toolbar || "basic").toLowerCase();
+    let buttons = [];
+    if (preset === "custom") {
+      buttons = parseCustomToolbar(field?.toolbar_custom);
+    } else if (preset === "standard") {
+      buttons = [...PRESETS.standard];
+    } else if (preset === "full") {
+      buttons = [...PRESETS.full];
+    } else {
+      buttons = [...PRESETS.basic];
+    }
+    const seen = /* @__PURE__ */ new Set();
+    const out = [];
+    [...ALWAYS, "|", ...buttons].forEach((btn) => {
+      if (btn === "|") {
+        if (out.length && out[out.length - 1] !== "|") {
+          out.push("|");
+        }
+        return;
+      }
+      const key = String(btn).toLowerCase();
+      if (!key || seen.has(key)) return;
+      seen.add(key);
+      out.push(key);
+      if (key === "link" && !seen.has("unlink")) {
+        seen.add("unlink");
+        out.push("unlink");
+      }
+    });
+    while (out.length && out[out.length - 1] === "|") {
+      out.pop();
+    }
+    return out.join(",");
+  }
+  function resolveWysiwygHeight(field) {
+    const heightPx = parseInt(field?.height, 10);
+    if (Number.isFinite(heightPx) && heightPx >= WYSIWYG_MIN_HEIGHT_PX) {
+      return heightPx;
+    }
+    return null;
+  }
+  function getWpEditorApi() {
+    const wp2 = window.wp;
+    if (!wp2) return null;
+    if (wp2.oldEditor && typeof wp2.oldEditor.initialize === "function") {
+      return wp2.oldEditor;
+    }
+    if (wp2.editor && typeof wp2.editor.initialize === "function") {
+      return wp2.editor;
+    }
+    return null;
+  }
+  function initWysiwygEditor(editorId, field, opts = {}) {
+    const api = getWpEditorApi();
+    if (!api || typeof api.initialize !== "function") {
+      return false;
+    }
+    if (typeof api.remove === "function") {
+      try {
+        api.remove(editorId);
+      } catch (err) {
+      }
+    }
+    const toolbar1 = resolveWysiwygToolbar(field);
+    const heightPx = resolveWysiwygHeight(field);
+    const tinymce = {
+      wpautop: true,
+      toolbar1,
+      toolbar2: "",
+      toolbar3: "",
+      toolbar4: "",
+      setup(editor) {
+        const emit = () => {
+          if (typeof opts.onChange === "function") {
+            opts.onChange(editor.getContent());
+          }
+        };
+        editor.on("change keyup NodeChange SetContent Undo Redo", emit);
+      }
+    };
+    if (heightPx != null) {
+      tinymce.height = heightPx;
+    }
+    api.initialize(editorId, {
+      tinymce,
+      quicktags: !!field?.allow_code_editing,
+      mediaButtons: false
+    });
+    return true;
+  }
+  function removeWysiwygEditor(editorId) {
+    const api = getWpEditorApi();
+    if (!api || typeof api.remove !== "function") return;
+    try {
+      api.remove(editorId);
+    } catch (err) {
+    }
+  }
+  function syncWysiwygTextarea(textarea) {
+    if (!textarea || !textarea.id) return;
+    const api = getWpEditorApi();
+    const editor = window.tinymce && typeof window.tinymce.get === "function" ? window.tinymce.get(textarea.id) : null;
+    if (editor && typeof editor.getContent === "function") {
+      textarea.value = editor.getContent();
+    } else if (api && typeof api.getContent === "function") {
+      try {
+        textarea.value = api.getContent(textarea.id) || textarea.value;
+      } catch (err) {
+      }
+    }
+  }
+  function destroyWysiwygEditors(root) {
+    if (!root || typeof root.querySelectorAll !== "function") return;
+    root.querySelectorAll("textarea[data-bl-wysiwyg]").forEach((ta) => {
+      if (ta.id) removeWysiwygEditor(ta.id);
+    });
+  }
+
   // themes/baselayer/packages/baselayer-blocks/src/js/admin/field-form.js
+  function whenInDocument(el5, cb) {
+    if (!el5 || typeof cb !== "function") return;
+    if (el5.isConnected) {
+      requestAnimationFrame(cb);
+      return;
+    }
+    const obs = new MutationObserver(() => {
+      if (el5.isConnected) {
+        obs.disconnect();
+        requestAnimationFrame(cb);
+      }
+    });
+    obs.observe(document.documentElement, { childList: true, subtree: true });
+  }
   function el4(tag, props = {}, children = []) {
     const node = document.createElement(tag);
     Object.entries(props).forEach(([key, value]) => {
@@ -5916,6 +6080,10 @@
     if (type === "icon" && control && typeof control.getIconValue === "function") {
       return control.getIconValue();
     }
+    if (type === "wysiwyg" && control && control.tagName === "TEXTAREA") {
+      syncWysiwygTextarea(control);
+      return control.value;
+    }
     if (type === "select") {
       if (control.multiple) {
         return Array.from(control.selectedOptions).map((o) => o.value);
@@ -6066,6 +6234,21 @@
         value: current == null ? "" : String(current)
       });
       if (field.placeholder) control.placeholder = field.placeholder;
+    } else if (type === "wysiwyg") {
+      control = el4("textarea", {
+        className: "widefat bl-blocks-fields__wysiwyg",
+        id,
+        rows: 8,
+        value: current == null ? "" : String(current),
+        dataset: { blWysiwyg: "1" }
+      });
+      control._blInitWysiwyg = () => {
+        initWysiwygEditor(id, field, {
+          onChange: (html) => {
+            control.value = html;
+          }
+        });
+      };
     } else if (type === "select") {
       const multiple = !!field.multiple;
       const allowNull = !multiple && (field.allow_null === void 0 || field.allow_null !== false && field.allow_null !== 0 && field.allow_null !== "0");
@@ -6297,6 +6480,14 @@
         row.appendChild(group);
       } else {
         row.appendChild(control);
+      }
+      if (type === "wysiwyg" && typeof control._blInitWysiwyg === "function") {
+        whenInDocument(control, () => {
+          if (typeof control._blInitWysiwyg === "function") {
+            control._blInitWysiwyg();
+            delete control._blInitWysiwyg;
+          }
+        });
       }
       controls.push({ field, control, type });
     }
@@ -6886,6 +7077,7 @@
       "aria-label": title
     });
     const close = () => {
+      destroyWysiwygEditors(dialog);
       document.removeEventListener("keydown", onKey);
       overlay.remove();
     };

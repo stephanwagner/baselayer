@@ -257,6 +257,7 @@ function bl_blocks_starter_render_lines(array $entry, string $block_class): arra
 		case 'textarea':
 		case 'text_block':
 		case 'html':
+		case 'wysiwyg':
 			return [
 				'<?php if (' . $var . ') : ?>',
 				"\t" . '<div class="' . $mod . '"><?php echo wp_kses_post(' . $var . '); ?></div>',

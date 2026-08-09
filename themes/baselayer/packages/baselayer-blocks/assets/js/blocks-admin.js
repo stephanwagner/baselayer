@@ -203,11 +203,14 @@
         {
           slug: "rich-text",
           icons: [
-            { filename: "text-format", alternatives: [], keywords: ["text", "format", "typography", "font", "wysiwyg"] },
+            { filename: "wysiwyg", alternatives: [], keywords: ["wysiwyg", "rich text", "editor", "format", "tinymce"] },
+            { filename: "text-format", alternatives: [], keywords: ["text", "format", "typography", "font"] },
             { filename: "bold", alternatives: [], keywords: ["bold", "strong", "weight", "typography"] },
             { filename: "italic", alternatives: [], keywords: ["italic", "emphasis", "slant", "typography"] },
             { filename: "underlined", alternatives: [], keywords: ["underline", "typography", "text"] },
             { filename: "strikethrough", alternatives: ["fill"], keywords: ["strikethrough", "strike", "cross out", "typography"] },
+            { filename: "text-decrease", alternatives: [], keywords: ["text", "decrease", "smaller", "font", "size"] },
+            { filename: "text-increase", alternatives: [], keywords: ["text", "increase", "larger", "font", "size"] },
             { filename: "align-left", alternatives: [], keywords: ["align", "left", "text", "paragraph"] },
             { filename: "align-center", alternatives: [], keywords: ["align", "center", "text", "paragraph"] },
             { filename: "align-right", alternatives: [], keywords: ["align", "right", "text", "paragraph"] },
@@ -232,8 +235,6 @@
             { filename: "indent-increase", alternatives: [], keywords: ["indent", "increase", "margin"] },
             { filename: "line-spacing", alternatives: [], keywords: ["line", "spacing", "leading", "paragraph"] },
             { filename: "letter-spacing", alternatives: ["fill"], keywords: ["letter", "spacing", "tracking", "typography"] },
-            { filename: "text-decrease", alternatives: [], keywords: ["text", "decrease", "smaller", "font", "size"] },
-            { filename: "text-increase", alternatives: [], keywords: ["text", "increase", "larger", "font", "size"] },
             { filename: "colors", alternatives: [], keywords: ["colors", "palette", "swatches", "design"] },
             { filename: "color-fill", alternatives: [], keywords: ["highlight", "fill", "background", "color"] },
             { filename: "paintbrush", alternatives: ["fill"], keywords: ["paint", "brush", "draw", "color", "style"] },
@@ -1374,7 +1375,7 @@
     const { root: sidebarEditingRow } = plainSwitch(
       t2("settingsSidebarEditing", "Allow editing directly in sidebar"),
       {
-        checked: !!state.sidebar_editing,
+        checked: state.sidebar_editing !== false,
         onChange: (checked) => {
           state.sidebar_editing = checked;
           notify();
@@ -3284,9 +3285,330 @@
     });
   }
 
+  // themes/baselayer/packages/baselayer-blocks/src/js/admin/wysiwyg-field.js
+  var WYSIWYG_MIN_HEIGHT_PX = 100;
+  var ALWAYS = ["undo", "redo"];
+  var PRESETS = {
+    basic: ["bold", "italic", "|", "link", "unlink"],
+    standard: ["bold", "italic", "|", "link", "unlink", "|", "bullist", "numlist"],
+    full: [
+      "formatselect",
+      "|",
+      "bold",
+      "italic",
+      "|",
+      "link",
+      "unlink",
+      "|",
+      "bullist",
+      "numlist",
+      "|",
+      "alignleft",
+      "aligncenter",
+      "alignright"
+    ]
+  };
+  function parseCustomToolbar(raw) {
+    return String(raw || "").split(",").map((part) => part.trim()).filter(Boolean).flatMap((part) => {
+      if (part === "|") return ["|"];
+      const cleaned = part.replace(/[^a-z0-9_|-]/gi, "");
+      return cleaned ? [cleaned] : [];
+    });
+  }
+  function resolveWysiwygToolbar(field) {
+    const preset = String(field?.toolbar || "basic").toLowerCase();
+    let buttons = [];
+    if (preset === "custom") {
+      buttons = parseCustomToolbar(field?.toolbar_custom);
+    } else if (preset === "standard") {
+      buttons = [...PRESETS.standard];
+    } else if (preset === "full") {
+      buttons = [...PRESETS.full];
+    } else {
+      buttons = [...PRESETS.basic];
+    }
+    const seen = /* @__PURE__ */ new Set();
+    const out = [];
+    [...ALWAYS, "|", ...buttons].forEach((btn) => {
+      if (btn === "|") {
+        if (out.length && out[out.length - 1] !== "|") {
+          out.push("|");
+        }
+        return;
+      }
+      const key = String(btn).toLowerCase();
+      if (!key || seen.has(key)) return;
+      seen.add(key);
+      out.push(key);
+      if (key === "link" && !seen.has("unlink")) {
+        seen.add("unlink");
+        out.push("unlink");
+      }
+    });
+    while (out.length && out[out.length - 1] === "|") {
+      out.pop();
+    }
+    return out.join(",");
+  }
+  function resolveWysiwygHeight(field) {
+    const heightPx = parseInt(field?.height, 10);
+    if (Number.isFinite(heightPx) && heightPx >= WYSIWYG_MIN_HEIGHT_PX) {
+      return heightPx;
+    }
+    return null;
+  }
+  function getWpEditorApi() {
+    const wp2 = window.wp;
+    if (!wp2) return null;
+    if (wp2.oldEditor && typeof wp2.oldEditor.initialize === "function") {
+      return wp2.oldEditor;
+    }
+    if (wp2.editor && typeof wp2.editor.initialize === "function") {
+      return wp2.editor;
+    }
+    return null;
+  }
+  function initWysiwygEditor(editorId, field, opts = {}) {
+    const api = getWpEditorApi();
+    if (!api || typeof api.initialize !== "function") {
+      return false;
+    }
+    if (typeof api.remove === "function") {
+      try {
+        api.remove(editorId);
+      } catch (err) {
+      }
+    }
+    const toolbar1 = resolveWysiwygToolbar(field);
+    const heightPx = resolveWysiwygHeight(field);
+    const tinymce = {
+      wpautop: true,
+      toolbar1,
+      toolbar2: "",
+      toolbar3: "",
+      toolbar4: "",
+      setup(editor) {
+        const emit = () => {
+          if (typeof opts.onChange === "function") {
+            opts.onChange(editor.getContent());
+          }
+        };
+        editor.on("change keyup NodeChange SetContent Undo Redo", emit);
+      }
+    };
+    if (heightPx != null) {
+      tinymce.height = heightPx;
+    }
+    api.initialize(editorId, {
+      tinymce,
+      quicktags: !!field?.allow_code_editing,
+      mediaButtons: false
+    });
+    return true;
+  }
+  function removeWysiwygEditor(editorId) {
+    const api = getWpEditorApi();
+    if (!api || typeof api.remove !== "function") return;
+    try {
+      api.remove(editorId);
+    } catch (err) {
+    }
+  }
+  function syncWysiwygTextarea(textarea) {
+    if (!textarea || !textarea.id) return;
+    const api = getWpEditorApi();
+    const editor = window.tinymce && typeof window.tinymce.get === "function" ? window.tinymce.get(textarea.id) : null;
+    if (editor && typeof editor.getContent === "function") {
+      textarea.value = editor.getContent();
+    } else if (api && typeof api.getContent === "function") {
+      try {
+        textarea.value = api.getContent(textarea.id) || textarea.value;
+      } catch (err) {
+      }
+    }
+  }
+  function destroyWysiwygEditors(root) {
+    if (!root || typeof root.querySelectorAll !== "function") return;
+    root.querySelectorAll("textarea[data-bl-wysiwyg]").forEach((ta) => {
+      if (ta.id) removeWysiwygEditor(ta.id);
+    });
+  }
+
+  // themes/baselayer/packages/baselayer-blocks/src/js/admin/wysiwyg-card.js
+  var TOOLBAR_OPTIONS = [
+    { value: "basic", labelKey: "wysiwygToolbarBasic", fallback: "Basic" },
+    { value: "standard", labelKey: "wysiwygToolbarStandard", fallback: "Standard" },
+    { value: "full", labelKey: "wysiwygToolbarFull", fallback: "Full" },
+    { value: "custom", labelKey: "wysiwygToolbarCustom", fallback: "Custom" }
+  ];
+  var CODEX_URL = "https://codex.wordpress.org/TinyMCE_Custom_Buttons";
+  function createWysiwygHeightSettings(field, FormBuilder) {
+    const { el: el8, t: t6 } = FormBuilder;
+    if (!el8 || !t6) return [];
+    const raw = parseInt(field.height, 10);
+    const value = Number.isFinite(raw) && raw >= WYSIWYG_MIN_HEIGHT_PX ? String(raw) : "";
+    const input = el8("input", {
+      type: "number",
+      className: "widefat",
+      min: String(WYSIWYG_MIN_HEIGHT_PX),
+      step: "1",
+      dataset: { blWysiwygHeight: "1" },
+      value,
+      placeholder: "200"
+    });
+    const sync = () => {
+      const next = parseInt(input.value, 10);
+      if (Number.isFinite(next) && next >= WYSIWYG_MIN_HEIGHT_PX) {
+        field.height = next;
+        input.value = String(next);
+      } else {
+        delete field.height;
+        input.value = "";
+      }
+      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+    };
+    input.addEventListener("change", sync);
+    input.addEventListener("blur", sync);
+    return [
+      el8("p", {}, [
+        el8("label", { text: t6("wysiwygHeight", "Height") }),
+        el8("div", { className: "bl-blocks-fields__input-group bl-forms-builder__wysiwyg-height" }, [
+          input,
+          el8("span", {
+            className: "bl-blocks-fields__affix bl-blocks-fields__affix--suffix",
+            text: "px"
+          })
+        ])
+      ]),
+      el8("p", {
+        className: "description",
+        text: t6("wysiwygHeightHelp", "Editor height in pixels. Leave empty for the default.")
+      })
+    ];
+  }
+  function createWysiwygToolbarSettings(field, FormBuilder) {
+    const { el: el8, t: t6 } = FormBuilder;
+    if (!el8 || !t6) return [];
+    const preset = ["basic", "standard", "full", "custom"].includes(field.toolbar) ? field.toolbar : "basic";
+    field.toolbar = preset;
+    if (field.toolbar_custom == null) {
+      field.toolbar_custom = "";
+    }
+    if (field.allow_code_editing == null) {
+      field.allow_code_editing = false;
+    }
+    const select = el8("select", {
+      className: "widefat",
+      dataset: { blWysiwygToolbar: "1" }
+    });
+    TOOLBAR_OPTIONS.forEach((opt) => {
+      const option2 = el8("option", {
+        value: opt.value,
+        text: t6(opt.labelKey, opt.fallback),
+        selected: preset === opt.value ? true : void 0
+      });
+      select.appendChild(option2);
+    });
+    const customWrap = el8("div", {
+      className: "bl-forms-builder__wysiwyg-custom",
+      hidden: preset !== "custom" ? true : void 0
+    });
+    const customInput = el8("input", {
+      type: "text",
+      className: "widefat",
+      dataset: { blWysiwygToolbarCustom: "1" },
+      value: field.toolbar_custom || "",
+      placeholder: "bold,italic,underline,link,bullist"
+    });
+    customInput.addEventListener("input", () => {
+      field.toolbar_custom = customInput.value;
+      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+    });
+    customWrap.append(
+      el8("p", {}, [
+        el8("label", { text: t6("wysiwygCustomButtons", "Custom toolbar buttons") }),
+        customInput
+      ]),
+      el8("p", {
+        className: "description",
+        html: t6(
+          "wysiwygCustomButtonsHelp",
+          'Comma-separated TinyMCE button IDs (e.g. bold,italic,link). Use | between commas to separate groups. Undo/redo are always included. See the <a href="%s" target="_blank" rel="noopener noreferrer">WordPress TinyMCE button docs</a>.'
+        ).replace("%s", CODEX_URL)
+      })
+    );
+    select.addEventListener("change", () => {
+      field.toolbar = select.value || "basic";
+      customWrap.hidden = field.toolbar !== "custom";
+      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+    });
+    const codeInput = el8("input", {
+      type: "checkbox",
+      dataset: { blWysiwygAllowCodeEditing: "1" },
+      checked: !!field.allow_code_editing
+    });
+    codeInput.addEventListener("change", () => {
+      field.allow_code_editing = codeInput.checked;
+      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+    });
+    const codeSwitch = el8("div", { className: "bl-forms-builder__switch-setting" }, [
+      el8("label", { className: "bl-forms-builder__switch" }, [
+        codeInput,
+        el8("span", { className: "bl-forms-builder__switch-ui", "aria-hidden": "true" }),
+        el8("span", {
+          className: "bl-forms-builder__switch-label",
+          text: t6("wysiwygAllowCodeEditing", "Allow code editing")
+        })
+      ]),
+      el8("p", {
+        className: "description",
+        text: t6(
+          "wysiwygAllowCodeEditingHelp",
+          "Shows Visual and Text tabs so authors can edit HTML."
+        )
+      })
+    ]);
+    return [
+      el8("div", { className: "bl-forms-builder__wysiwyg-toolbar" }, [
+        el8("p", {}, [
+          el8("label", { text: t6("wysiwygToolbar", "Toolbar") }),
+          select
+        ]),
+        el8("p", {
+          className: "description",
+          text: t6(
+            "wysiwygToolbarHelp",
+            "Basic: bold, italic, link. Standard adds lists. Full adds headings and alignment."
+          )
+        }),
+        customWrap
+      ]),
+      codeSwitch
+    ];
+  }
+  function serializeWysiwygToolbar(data, ctx) {
+    if (!data || data.type !== "wysiwyg") return;
+    const q = ctx.q;
+    const toolbar = q("[data-bl-wysiwyg-toolbar]")?.value || "basic";
+    data.toolbar = ["basic", "standard", "full", "custom"].includes(toolbar) ? toolbar : "basic";
+    const custom = q("[data-bl-wysiwyg-toolbar-custom]")?.value ?? "";
+    if (data.toolbar === "custom") {
+      data.toolbar_custom = String(custom).trim();
+    } else {
+      delete data.toolbar_custom;
+    }
+    data.allow_code_editing = !!q("[data-bl-wysiwyg-allow-code-editing]")?.checked;
+    const heightRaw = parseInt(q("[data-bl-wysiwyg-height]")?.value, 10);
+    if (Number.isFinite(heightRaw) && heightRaw >= WYSIWYG_MIN_HEIGHT_PX) {
+      data.height = heightRaw;
+    } else {
+      delete data.height;
+    }
+  }
+
   // themes/baselayer/packages/baselayer-blocks/src/js/admin/app.js
   var EXCLUDED_TYPES = /* @__PURE__ */ new Set(["honeypot", "captcha", "terms", "divider"]);
-  var BLOCKS_POPULAR_TYPES = ["text", "textarea", "select", "toggle"];
+  var BLOCKS_POPULAR_TYPES = ["text", "textarea", "wysiwyg", "select", "toggle"];
   function blocksPalette() {
     const { PALETTE_SECTIONS = [] } = window.BlFormBuilder || {};
     return PALETTE_SECTIONS.map((section) => {
@@ -3301,6 +3623,20 @@
       let types = section.id === "popular" ? BLOCKS_POPULAR_TYPES : (section.types || []).filter((type) => !EXCLUDED_TYPES.has(type));
       if (section.id === "advanced") {
         types = [...types.filter((type) => type !== "repeater"), "repeater"];
+      }
+      if (section.id === "popular" || section.id === "input") {
+        if (!types.includes("wysiwyg")) {
+          const textareaIdx = types.indexOf("textarea");
+          if (textareaIdx >= 0) {
+            types = [
+              ...types.slice(0, textareaIdx + 1),
+              "wysiwyg",
+              ...types.slice(textareaIdx + 1).filter((type) => type !== "wysiwyg")
+            ];
+          } else {
+            types = [...types, "wysiwyg"];
+          }
+        }
       }
       return { ...section, types };
     }).filter((section) => (section.types || []).length > 0);
@@ -3370,6 +3706,46 @@
               return serializeRepeaterRow(row);
             }
             return null;
+          },
+          onInitField: (field) => {
+            if ((field?.type || "") !== "wysiwyg") return;
+            if (!["basic", "standard", "full", "custom"].includes(field.toolbar)) {
+              field.toolbar = "basic";
+            }
+            if (field.toolbar === "custom" && field.toolbar_custom == null) {
+              field.toolbar_custom = "";
+            }
+            if (field.allow_code_editing == null) {
+              field.allow_code_editing = false;
+            }
+          },
+          onNormalizeType: (field, nextType) => {
+            if (nextType === "wysiwyg") {
+              if (!["basic", "standard", "full", "custom"].includes(field.toolbar)) {
+                field.toolbar = "basic";
+              }
+              if (field.allow_code_editing == null) {
+                field.allow_code_editing = false;
+              }
+              return;
+            }
+            delete field.toolbar;
+            delete field.toolbar_custom;
+            delete field.allow_code_editing;
+            if (typeof field.height === "number" || /^\d+$/.test(String(field.height || ""))) {
+              delete field.height;
+            }
+          },
+          extraAdvancedSections: (field) => {
+            if ((field?.type || "") !== "wysiwyg") return [];
+            return createWysiwygToolbarSettings(field, FormBuilder);
+          },
+          extraAppearanceSections: (field) => {
+            if ((field?.type || "") !== "wysiwyg") return [];
+            return createWysiwygHeightSettings(field, FormBuilder);
+          },
+          onSerialize: (data, ctx) => {
+            serializeWysiwygToolbar(data, ctx);
           }
         }
       });
@@ -8008,6 +8384,20 @@
   }
 
   // themes/baselayer/packages/baselayer-blocks/src/js/admin/field-form.js
+  function whenInDocument(el8, cb) {
+    if (!el8 || typeof cb !== "function") return;
+    if (el8.isConnected) {
+      requestAnimationFrame(cb);
+      return;
+    }
+    const obs = new MutationObserver(() => {
+      if (el8.isConnected) {
+        obs.disconnect();
+        requestAnimationFrame(cb);
+      }
+    });
+    obs.observe(document.documentElement, { childList: true, subtree: true });
+  }
   function el7(tag, props = {}, children = []) {
     const node = document.createElement(tag);
     Object.entries(props).forEach(([key, value]) => {
@@ -8370,6 +8760,10 @@
     if (type === "icon" && control && typeof control.getIconValue === "function") {
       return control.getIconValue();
     }
+    if (type === "wysiwyg" && control && control.tagName === "TEXTAREA") {
+      syncWysiwygTextarea(control);
+      return control.value;
+    }
     if (type === "select") {
       if (control.multiple) {
         return Array.from(control.selectedOptions).map((o) => o.value);
@@ -8520,6 +8914,21 @@
         value: current == null ? "" : String(current)
       });
       if (field.placeholder) control.placeholder = field.placeholder;
+    } else if (type === "wysiwyg") {
+      control = el7("textarea", {
+        className: "widefat bl-blocks-fields__wysiwyg",
+        id,
+        rows: 8,
+        value: current == null ? "" : String(current),
+        dataset: { blWysiwyg: "1" }
+      });
+      control._blInitWysiwyg = () => {
+        initWysiwygEditor(id, field, {
+          onChange: (html) => {
+            control.value = html;
+          }
+        });
+      };
     } else if (type === "select") {
       const multiple = !!field.multiple;
       const allowNull = !multiple && (field.allow_null === void 0 || field.allow_null !== false && field.allow_null !== 0 && field.allow_null !== "0");
@@ -8751,6 +9160,14 @@
         row.appendChild(group);
       } else {
         row.appendChild(control);
+      }
+      if (type === "wysiwyg" && typeof control._blInitWysiwyg === "function") {
+        whenInDocument(control, () => {
+          if (typeof control._blInitWysiwyg === "function") {
+            control._blInitWysiwyg();
+            delete control._blInitWysiwyg;
+          }
+        });
       }
       controls.push({ field, control, type });
     }
@@ -9340,6 +9757,7 @@
       "aria-label": title
     });
     const close = () => {
+      destroyWysiwygEditors(dialog);
       document.removeEventListener("keydown", onKey);
       overlay.remove();
     };

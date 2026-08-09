@@ -1427,6 +1427,15 @@ button.button-link.bl-blocks-fields__card-remove:focus {
   max-width: 100%;
 }
 
+.bl-blocks-fields .bl-blocks-fields__wysiwyg,
+.bl-blocks-fields .mce-tinymce {
+  max-width: 100%;
+}
+
+.bl-blocks-fields .mce-tinymce.mce-container {
+  box-sizing: border-box;
+}
+
 .bl-blocks-fields__repeater {
   display: flex;
   flex-direction: column;
@@ -2028,6 +2037,13 @@ body.post-new-php.post-type-bl_block .page-title-action {
 .bl-blocks-settings-panel .bl-forms-builder__setting textarea.widefat,
 .bl-blocks-settings-panel .bl-forms-builder__setting select.widefat {
   max-width: 100%;
+}
+.bl-blocks-settings-panel .bl-forms-builder__setting .bl-blocks-fields__wysiwyg,
+.bl-blocks-settings-panel .bl-forms-builder__setting .mce-tinymce {
+  max-width: 100%;
+}
+.bl-blocks-settings-panel .bl-forms-builder__setting .mce-tinymce.mce-container {
+  box-sizing: border-box;
 }
 
 .bl-blocks-settings-post-types {

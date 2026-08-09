@@ -11,6 +11,26 @@ import {
   dragStart,
   dragEnd,
 } from '../../../../../src/js/admin/canvas-builder/sortable.js';
+import {
+  destroyWysiwygEditors,
+  initWysiwygEditor,
+  syncWysiwygTextarea,
+} from './wysiwyg-field.js';
+
+function whenInDocument(el, cb) {
+  if (!el || typeof cb !== 'function') return;
+  if (el.isConnected) {
+    requestAnimationFrame(cb);
+    return;
+  }
+  const obs = new MutationObserver(() => {
+    if (el.isConnected) {
+      obs.disconnect();
+      requestAnimationFrame(cb);
+    }
+  });
+  obs.observe(document.documentElement, { childList: true, subtree: true });
+}
 
 function el(tag, props = {}, children = []) {
   const node = document.createElement(tag);
@@ -484,6 +504,10 @@ function collectLeafValue(field, control, type) {
   if (type === 'icon' && control && typeof control.getIconValue === 'function') {
     return control.getIconValue();
   }
+  if (type === 'wysiwyg' && control && control.tagName === 'TEXTAREA') {
+    syncWysiwygTextarea(control);
+    return control.value;
+  }
   if (type === 'select') {
     if (control.multiple) {
       return Array.from(control.selectedOptions).map((o) => o.value);
@@ -665,6 +689,22 @@ function createLeafControl(field, values, controls) {
       value: current == null ? '' : String(current),
     });
     if (field.placeholder) control.placeholder = field.placeholder;
+  } else if (type === 'wysiwyg') {
+    control = el('textarea', {
+      className: 'widefat bl-blocks-fields__wysiwyg',
+      id,
+      rows: 8,
+      value: current == null ? '' : String(current),
+      dataset: { blWysiwyg: '1' },
+    });
+    // TinyMCE init after the node is in the DOM (caller appends row first).
+    control._blInitWysiwyg = () => {
+      initWysiwygEditor(id, field, {
+        onChange: (html) => {
+          control.value = html;
+        },
+      });
+    };
   } else if (type === 'select') {
     const multiple = !!field.multiple;
     const allowNull =
@@ -915,6 +955,14 @@ function createLeafControl(field, values, controls) {
       row.appendChild(group);
     } else {
       row.appendChild(control);
+    }
+    if (type === 'wysiwyg' && typeof control._blInitWysiwyg === 'function') {
+      whenInDocument(control, () => {
+        if (typeof control._blInitWysiwyg === 'function') {
+          control._blInitWysiwyg();
+          delete control._blInitWysiwyg;
+        }
+      });
     }
     controls.push({ field, control, type });
   }
@@ -1634,6 +1682,7 @@ export function openFieldsModal(opts) {
   });
 
   const close = () => {
+    destroyWysiwygEditors(dialog);
     document.removeEventListener('keydown', onKey);
     overlay.remove();
   };

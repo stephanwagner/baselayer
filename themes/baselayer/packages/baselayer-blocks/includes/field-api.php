@@ -120,6 +120,7 @@ function bl_blocks_expand_inner_blocks_tags(string $html, string $content): stri
  * - false for empty toggles
  * - [] for empty lists (multiple media/page, checkboxes, repeater)
  * - formatted arrays for image/file/page/link (and lists of those when multiple)
+ * - HTML string for wysiwyg (stored via wp_kses_post; echo with wp_kses_post())
  *
  * @return mixed
  */

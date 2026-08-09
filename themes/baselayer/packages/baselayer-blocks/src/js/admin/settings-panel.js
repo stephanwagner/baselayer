@@ -275,7 +275,7 @@ export function createSettingsPanel(initial, definitionType, onChange) {
   const { root: sidebarEditingRow } = plainSwitch(
     t('settingsSidebarEditing', 'Allow editing directly in sidebar'),
     {
-      checked: !!state.sidebar_editing,
+      checked: state.sidebar_editing !== false,
       onChange: (checked) => {
         state.sidebar_editing = checked;
         notify();

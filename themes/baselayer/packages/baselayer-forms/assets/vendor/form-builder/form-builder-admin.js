@@ -2147,6 +2147,7 @@
     "number",
     "phone",
     "textarea",
+    "wysiwyg",
     "date",
     "time",
     "datetime",
@@ -2159,7 +2160,8 @@
     "button_group",
     "terms",
     "page",
-    "link"
+    "link",
+    "icon"
   ];
   var NO_PLACEHOLDER = [
     "terms",
@@ -2177,6 +2179,7 @@
     "heading",
     "text_block",
     "html",
+    "wysiwyg",
     "column",
     "section",
     "tab",
@@ -2248,6 +2251,7 @@
   var NAMED_TYPES = [
     "text",
     "textarea",
+    "wysiwyg",
     "email",
     "phone",
     "url",
@@ -2262,6 +2266,7 @@
     "datetime",
     "file",
     "image",
+    "icon",
     "terms",
     "hidden",
     "honeypot",
@@ -3877,7 +3882,7 @@
       ];
     }
     field.default_value = normalizeDefaultValue(field.type, field.default_value || "");
-    const def = field.type === "textarea" ? el("textarea", {
+    const def = field.type === "textarea" || field.type === "wysiwyg" ? el("textarea", {
       className: "widefat",
       rows: "2",
       dataset: { blDefault: "1" }
@@ -3887,7 +3892,7 @@
       dataset: { blDefault: "1" },
       value: field.default_value || ""
     });
-    if (field.type === "textarea") {
+    if (field.type === "textarea" || field.type === "wysiwyg") {
       def.value = field.default_value || "";
     }
     if (field.type === "number") {
@@ -3904,7 +3909,7 @@
       document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
     };
     def.addEventListener("input", () => {
-      if (["text", "textarea", "phone"].includes(field.type) || OPTION_TYPES.includes(field.type)) {
+      if (["text", "textarea", "wysiwyg", "phone"].includes(field.type) || OPTION_TYPES.includes(field.type)) {
         field.default_value = def.value;
         updatePreview();
         return;
@@ -4654,6 +4659,13 @@
       if (field.type !== "hidden" && field.type !== "divider" && field.type !== "spacer") {
         appearanceSections.add(createWidthControl(field, updatePreview));
       }
+      const appearanceHooks = getFieldCardHooks();
+      if (typeof appearanceHooks.extraAppearanceSections === "function") {
+        const extraAppearance = appearanceHooks.extraAppearanceSections(field, { updatePreview }) || [];
+        extraAppearance.forEach((node) => {
+          if (node) appearanceSections.add(node);
+        });
+      }
       if ((field.type === "file" || field.type === "image") && !useMediaLibraryFields()) {
         appearanceSections.add(createUploadAppearanceControls(field));
       }
@@ -4794,6 +4806,13 @@
         }
         if (AUTOCOMPLETE_TYPES.includes(field.type)) {
           advancedSections.add(createAutocompleteControl(field));
+        }
+        const fieldCardHooks = getFieldCardHooks();
+        if (typeof fieldCardHooks.extraAdvancedSections === "function") {
+          const extra = fieldCardHooks.extraAdvancedSections(field, { updatePreview }) || [];
+          extra.forEach((node) => {
+            if (node) advancedSections.add(node);
+          });
         }
         if (field.type === "terms") {
           const consentText = el("textarea", {

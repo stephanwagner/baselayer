@@ -692,8 +692,10 @@ p.bl-forms-builder__palette-empty {
 
 .bl-forms-builder select,
 .bl-forms-builder input[type=text],
+.bl-forms-builder input[type=number],
 .bl-forms-builder__modal-panel select,
-.bl-forms-builder__modal-panel input[type=text] {
+.bl-forms-builder__modal-panel input[type=text],
+.bl-forms-builder__modal-panel input[type=number] {
   min-height: 36px;
   margin: 0;
 }
@@ -2080,6 +2082,17 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
 .bl-forms-builder__template.sortable-ghost,
 .bl-forms-builder__field.sortable-ghost {
   opacity: 0.55;
+}
+
+.bl-forms-builder__wysiwyg-custom {
+  margin-top: 8px;
+}
+.bl-forms-builder__wysiwyg-custom > p:first-child {
+  margin-top: 0;
+}
+
+.bl-forms-builder__wysiwyg-height {
+  max-width: 120px;
 }
 
 /*# sourceMappingURL=form-builder-admin.css.map */

@@ -88,6 +88,9 @@ function bl_blocks_enqueue_page_editor(string $hook): void
 	}
 
 	wp_enqueue_media();
+	if (function_exists('bl_blocks_enqueue_wysiwyg_editor')) {
+		bl_blocks_enqueue_wysiwyg_editor();
+	}
 	wp_enqueue_script(
 		'bl-blocks-editor',
 		$asset['uri'],

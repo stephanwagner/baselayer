@@ -307,6 +307,9 @@ function bl_blocks_enqueue_block_editor_media(): void
 		return;
 	}
 	wp_enqueue_media();
+	if (function_exists('bl_blocks_enqueue_wysiwyg_editor')) {
+		bl_blocks_enqueue_wysiwyg_editor();
+	}
 	if (function_exists('bl_enqueue_theme_icons_style')) {
 		if (function_exists('bl_load_icons_textdomain')) {
 			bl_load_icons_textdomain();

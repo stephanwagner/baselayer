@@ -153,6 +153,9 @@ msgstr ""
 msgid "Textarea"
 msgstr ""
 
+msgid "Rich Text"
+msgstr ""
+
 #: includes/admin-editor.php:262
 #: includes/admin-editor.php:424
 #: includes/field-ui.php:286

@@ -30,7 +30,7 @@ function bl_blocks_default_settings(string $type = 'block'): array
 
 	return [
 		'active'                 => true,
-		'sidebar_editing'        => false,
+		'sidebar_editing'        => true,
 		'supports_inner_blocks'  => false,
 		'inner_blocks_allowed'   => '',
 		'inner_blocks_template'  => '',
@@ -422,8 +422,14 @@ function bl_blocks_sanitize_settings($settings, string $type = 'block'): array
 
 	$out = $defaults;
 	$out['active'] = array_key_exists('active', $settings) ? !empty($settings['active']) : true;
-	$out['sidebar_editing'] = in_array($type, ['block', 'page_settings'], true)
-		&& !empty($settings['sidebar_editing']);
+	// Sidebar editing defaults on for block + page settings (same pattern as active).
+	if (in_array($type, ['block', 'page_settings'], true)) {
+		$out['sidebar_editing'] = array_key_exists('sidebar_editing', $settings)
+			? !empty($settings['sidebar_editing'])
+			: true;
+	} else {
+		$out['sidebar_editing'] = false;
+	}
 	$out['supports_inner_blocks'] = $type === 'block' && !empty($settings['supports_inner_blocks']);
 	$out['inner_blocks_allowed'] = $type === 'block' && $out['supports_inner_blocks']
 		? bl_blocks_sanitize_inner_blocks_allowed($settings['inner_blocks_allowed'] ?? '')
@@ -521,6 +527,10 @@ function bl_blocks_sanitize_field($field, int $repeater_depth = 0): ?array
 		return bl_blocks_sanitize_icon_field($field);
 	}
 
+	if ($type === 'wysiwyg') {
+		return bl_blocks_sanitize_wysiwyg_field($field);
+	}
+
 	if (function_exists('bl_forms_sanitize_field')) {
 		// Numeric widths outside Forms presets (e.g. 20/80) → custom % so packing survives import.
 		if (isset($field['width']) && is_scalar($field['width'])) {
@@ -614,6 +624,78 @@ function bl_blocks_sanitize_icon_field(array $field): array
 		'description'   => sanitize_textarea_field((string) ($field['description'] ?? '')),
 		'default_value' => sanitize_key((string) ($field['default_value'] ?? '')),
 	];
+
+	if (function_exists('bl_forms_attach_conditional_logic')) {
+		return bl_forms_attach_conditional_logic($out, $field);
+	}
+
+	if (isset($field['conditional_logic']) && is_array($field['conditional_logic'])) {
+		$out['conditional_logic'] = $field['conditional_logic'];
+	}
+
+	return $out;
+}
+
+/**
+ * Sanitize blocks-only WYSIWYG field definition.
+ *
+ * @param array<string, mixed> $field
+ * @return array<string, mixed>
+ */
+function bl_blocks_sanitize_wysiwyg_field(array $field): array
+{
+	$id = sanitize_key((string) ($field['id'] ?? ''));
+	if ($id === '') {
+		$id = 'f' . wp_generate_password(8, false, false);
+	}
+	$name = sanitize_key((string) ($field['name'] ?? ''));
+	if ($name === '') {
+		$name = $id;
+	}
+
+	$width = ['width' => sanitize_text_field((string) ($field['width'] ?? '100')), 'width_custom' => sanitize_text_field((string) ($field['width_custom'] ?? ''))];
+	if (function_exists('bl_forms_sanitize_width')) {
+		$width = bl_forms_sanitize_width($field);
+	}
+
+	$toolbar = sanitize_key((string) ($field['toolbar'] ?? 'basic'));
+	if (!in_array($toolbar, ['basic', 'standard', 'full', 'custom'], true)) {
+		$toolbar = 'basic';
+	}
+
+	$out = [
+		'id'            => $id,
+		'type'          => 'wysiwyg',
+		'label'         => sanitize_text_field((string) ($field['label'] ?? '')),
+		'name'          => $name,
+		'name_manual'   => !empty($field['name_manual']) || $name !== '',
+		'hide_label'    => !empty($field['hide_label']),
+		'css_class'     => function_exists('bl_forms_sanitize_css_class')
+			? bl_forms_sanitize_css_class((string) ($field['css_class'] ?? ''))
+			: sanitize_html_class((string) ($field['css_class'] ?? '')),
+		'width'         => $width['width'],
+		'width_custom'  => $width['width_custom'],
+		'active'        => function_exists('bl_forms_field_is_active')
+			? bl_forms_field_is_active($field)
+			: (!array_key_exists('active', $field) || !empty($field['active'])),
+		'required'      => !empty($field['required']),
+		'description'   => sanitize_textarea_field((string) ($field['description'] ?? '')),
+		'default_value'       => wp_kses_post((string) ($field['default_value'] ?? '')),
+		'toolbar'             => $toolbar,
+		'allow_code_editing'  => !empty($field['allow_code_editing']),
+	];
+
+	$height = isset($field['height']) ? (int) $field['height'] : 0;
+	// TinyMCE will not shrink the edit area below 100px.
+	if ($height >= 100) {
+		$out['height'] = $height;
+	}
+
+	if ($toolbar === 'custom') {
+		$custom = strtolower((string) ($field['toolbar_custom'] ?? ''));
+		$custom = preg_replace('/[^a-z0-9_,|\s-]/', '', $custom) ?? '';
+		$out['toolbar_custom'] = trim(preg_replace('/\s+/', '', $custom) ?? '');
+	}
 
 	if (function_exists('bl_forms_attach_conditional_logic')) {
 		return bl_forms_attach_conditional_logic($out, $field);
@@ -1491,8 +1573,12 @@ function bl_blocks_sanitize_values(array $fields, $raw): array
 			continue;
 		}
 
-		if (in_array($type, ['textarea', 'html'], true)) {
+		if (in_array($type, ['textarea', 'html', 'wysiwyg'], true)) {
 			$raw_str = is_scalar($raw_value) ? (string) $raw_value : '';
+			if ($type === 'wysiwyg') {
+				$values[$name] = wp_kses_post($raw_str);
+				continue;
+			}
 			$allow = $field['allow_html'] ?? false;
 			if ($allow === true || $allow === 1 || $allow === '1' || $allow === 'post') {
 				$values[$name] = wp_kses_post($raw_str);

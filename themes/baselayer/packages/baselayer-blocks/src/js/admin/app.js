@@ -9,11 +9,16 @@ import {
   defaultRepeater,
 } from './repeater-card.js';
 import { bindImportExport } from './import-export.js';
+import {
+  createWysiwygToolbarSettings,
+  createWysiwygHeightSettings,
+  serializeWysiwygToolbar,
+} from './wysiwyg-card.js';
 
 const EXCLUDED_TYPES = new Set(['honeypot', 'captcha', 'terms', 'divider']);
 
 /** Popular fields for block / page / site settings (not form contact fields). */
-const BLOCKS_POPULAR_TYPES = ['text', 'textarea', 'select', 'toggle'];
+const BLOCKS_POPULAR_TYPES = ['text', 'textarea', 'wysiwyg', 'select', 'toggle'];
 
 /**
  * Palette sections for the definition canvas.
@@ -37,6 +42,21 @@ function blocksPalette() {
         : (section.types || []).filter((type) => !EXCLUDED_TYPES.has(type));
     if (section.id === 'advanced') {
       types = [...types.filter((type) => type !== 'repeater'), 'repeater'];
+    }
+    // Blocks-only rich text (not in Forms palette).
+    if (section.id === 'popular' || section.id === 'input') {
+      if (!types.includes('wysiwyg')) {
+        const textareaIdx = types.indexOf('textarea');
+        if (textareaIdx >= 0) {
+          types = [
+            ...types.slice(0, textareaIdx + 1),
+            'wysiwyg',
+            ...types.slice(textareaIdx + 1).filter((type) => type !== 'wysiwyg'),
+          ];
+        } else {
+          types = [...types, 'wysiwyg'];
+        }
+      }
     }
     return { ...section, types };
   }).filter((section) => (section.types || []).length > 0);
@@ -117,6 +137,47 @@ export function mountApp(root, initial, definitionType = 'block') {
             return serializeRepeaterRow(row);
           }
           return null;
+        },
+        onInitField: (field) => {
+          if ((field?.type || '') !== 'wysiwyg') return;
+          if (!['basic', 'standard', 'full', 'custom'].includes(field.toolbar)) {
+            field.toolbar = 'basic';
+          }
+          if (field.toolbar === 'custom' && field.toolbar_custom == null) {
+            field.toolbar_custom = '';
+          }
+          if (field.allow_code_editing == null) {
+            field.allow_code_editing = false;
+          }
+        },
+        onNormalizeType: (field, nextType) => {
+          if (nextType === 'wysiwyg') {
+            if (!['basic', 'standard', 'full', 'custom'].includes(field.toolbar)) {
+              field.toolbar = 'basic';
+            }
+            if (field.allow_code_editing == null) {
+              field.allow_code_editing = false;
+            }
+            return;
+          }
+          delete field.toolbar;
+          delete field.toolbar_custom;
+          delete field.allow_code_editing;
+          // Wysiwyg pixel height must not leak onto spacer/other types.
+          if (typeof field.height === 'number' || /^\d+$/.test(String(field.height || ''))) {
+            delete field.height;
+          }
+        },
+        extraAdvancedSections: (field) => {
+          if ((field?.type || '') !== 'wysiwyg') return [];
+          return createWysiwygToolbarSettings(field, FormBuilder);
+        },
+        extraAppearanceSections: (field) => {
+          if ((field?.type || '') !== 'wysiwyg') return [];
+          return createWysiwygHeightSettings(field, FormBuilder);
+        },
+        onSerialize: (data, ctx) => {
+          serializeWysiwygToolbar(data, ctx);
         },
       },
     });

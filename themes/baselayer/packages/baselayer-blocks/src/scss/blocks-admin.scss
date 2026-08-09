@@ -249,6 +249,15 @@ body.post-new-php.post-type-bl_block {
     select.widefat {
       max-width: 100%;
     }
+
+    .bl-blocks-fields__wysiwyg,
+    .mce-tinymce {
+      max-width: 100%;
+    }
+
+    .mce-tinymce.mce-container {
+      box-sizing: border-box;
+    }
   }
 }
 

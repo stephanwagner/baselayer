@@ -79,8 +79,9 @@ function bl_blocks_palette_icons(): array
 		}
 	}
 
-	// Blocks-specific glyphs (Forms palette has no `icon` / `extensions` / `plus` / `box` keys).
+	// Blocks-specific glyphs (Forms palette has no `icon` / `wysiwyg` / `extensions` / `plus` / `box` keys).
 	$add($icons, $registry, 'icon');
+	$add($icons, $registry, 'wysiwyg');
 	$add($icons, $registry, 'extensions');
 	$add($icons, $registry, 'plus');
 	$add($icons, $registry, 'box');
@@ -126,6 +127,10 @@ function bl_blocks_field_types(): array
 
 	if (!in_array('icon', $types, true)) {
 		$types[] = 'icon';
+	}
+
+	if (!in_array('wysiwyg', $types, true)) {
+		$types[] = 'wysiwyg';
 	}
 
 	return $types;
@@ -224,6 +229,17 @@ function bl_blocks_media_field_i18n(): array
 }
 
 /**
+ * Enqueue classic TinyMCE (`wp.editor` / `wp.oldEditor`) for Blocks WYSIWYG fields.
+ */
+function bl_blocks_enqueue_wysiwyg_editor(): void
+{
+	if (!function_exists('wp_enqueue_editor')) {
+		return;
+	}
+	wp_enqueue_editor();
+}
+
+/**
  * Shared admin field UI assets (createFieldForm + Website mount).
  */
 function bl_blocks_enqueue_field_ui_assets(): void
@@ -235,6 +251,7 @@ function bl_blocks_enqueue_field_ui_assets(): void
 	$done = true;
 
 	wp_enqueue_media();
+	bl_blocks_enqueue_wysiwyg_editor();
 	$builder_handle = function_exists('bl_blocks_enqueue_canvas_builder_kit')
 		? bl_blocks_enqueue_canvas_builder_kit()
 		: '';

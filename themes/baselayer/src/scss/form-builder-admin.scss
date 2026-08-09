@@ -556,7 +556,8 @@ p.bl-forms-builder__palette-empty {
 .bl-forms-builder,
 .bl-forms-builder__modal-panel {
   select,
-  input[type='text'] {
+  input[type='text'],
+  input[type='number'] {
     min-height: 36px;
     margin: 0;
   }
@@ -2069,4 +2070,16 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
 .bl-forms-builder__template.sortable-ghost,
 .bl-forms-builder__field.sortable-ghost {
   opacity: 0.55;
+}
+
+.bl-forms-builder__wysiwyg-custom {
+  margin-top: 8px;
+
+  > p:first-child {
+    margin-top: 0;
+  }
+}
+
+.bl-forms-builder__wysiwyg-height {
+  max-width: 120px;
 }

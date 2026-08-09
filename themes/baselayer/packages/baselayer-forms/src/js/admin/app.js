@@ -17,7 +17,7 @@ const {
 } = window.BlFormBuilder || {};
 
 /** Blocks-only field types — keep out of the Forms palette. */
-const EXCLUDED_TYPES = new Set(['page', 'link']);
+const EXCLUDED_TYPES = new Set(['page', 'link', 'wysiwyg', 'icon', 'repeater']);
 
 const FORMS_PALETTE = PALETTE_SECTIONS.map((section) => ({
   ...section,

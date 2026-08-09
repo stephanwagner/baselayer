@@ -512,6 +512,7 @@ const DESCRIPTION_TYPES = [
   'number',
   'phone',
   'textarea',
+  'wysiwyg',
   'date',
   'time',
   'datetime',
@@ -525,6 +526,7 @@ const DESCRIPTION_TYPES = [
   'terms',
   'page',
   'link',
+  'icon',
 ];
 const NO_PLACEHOLDER = [
   'terms',
@@ -542,6 +544,7 @@ const NO_PLACEHOLDER = [
   'heading',
   'text_block',
   'html',
+  'wysiwyg',
   'column',
   'section',
   'tab',
@@ -614,6 +617,7 @@ const CHECKED_DEFAULT_TYPES = ['terms', 'toggle'];
 const NAMED_TYPES = [
   'text',
   'textarea',
+  'wysiwyg',
   'email',
   'phone',
   'url',
@@ -628,6 +632,7 @@ const NAMED_TYPES = [
   'datetime',
   'file',
   'image',
+  'icon',
   'terms',
   'hidden',
   'honeypot',
@@ -2514,7 +2519,7 @@ function createDefaultValueControl(field, updatePreview) {
   field.default_value = normalizeDefaultValue(field.type, field.default_value || '');
 
   const def =
-    field.type === 'textarea'
+    field.type === 'textarea' || field.type === 'wysiwyg'
       ? el('textarea', {
           className: 'widefat',
           rows: '2',
@@ -2526,7 +2531,7 @@ function createDefaultValueControl(field, updatePreview) {
           dataset: { blDefault: '1' },
           value: field.default_value || '',
         });
-  if (field.type === 'textarea') {
+  if (field.type === 'textarea' || field.type === 'wysiwyg') {
     def.value = field.default_value || '';
   }
   if (field.type === 'number') {
@@ -2545,7 +2550,10 @@ function createDefaultValueControl(field, updatePreview) {
   };
 
   def.addEventListener('input', () => {
-    if (['text', 'textarea', 'phone'].includes(field.type) || OPTION_TYPES.includes(field.type)) {
+    if (
+      ['text', 'textarea', 'wysiwyg', 'phone'].includes(field.type) ||
+      OPTION_TYPES.includes(field.type)
+    ) {
       field.default_value = def.value;
       updatePreview();
       return;
@@ -3389,6 +3397,14 @@ export function createFieldCard(initial, open = false) {
     if (field.type !== 'hidden' && field.type !== 'divider' && field.type !== 'spacer') {
       appearanceSections.add(createWidthControl(field, updatePreview));
     }
+    const appearanceHooks = getFieldCardHooks();
+    if (typeof appearanceHooks.extraAppearanceSections === 'function') {
+      const extraAppearance =
+        appearanceHooks.extraAppearanceSections(field, { updatePreview }) || [];
+      extraAppearance.forEach((node) => {
+        if (node) appearanceSections.add(node);
+      });
+    }
     if ((field.type === 'file' || field.type === 'image') && !useMediaLibraryFields()) {
       appearanceSections.add(createUploadAppearanceControls(field));
     }
@@ -3546,6 +3562,14 @@ export function createFieldCard(initial, open = false) {
 
       if (AUTOCOMPLETE_TYPES.includes(field.type)) {
         advancedSections.add(createAutocompleteControl(field));
+      }
+
+      const fieldCardHooks = getFieldCardHooks();
+      if (typeof fieldCardHooks.extraAdvancedSections === 'function') {
+        const extra = fieldCardHooks.extraAdvancedSections(field, { updatePreview }) || [];
+        extra.forEach((node) => {
+          if (node) advancedSections.add(node);
+        });
       }
 
       if (field.type === 'terms') {

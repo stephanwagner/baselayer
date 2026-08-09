@@ -2267,6 +2267,10 @@ msgid "Categories"
 msgstr "Kategorien"
 
 msgctxt "icon name"
+msgid "WYSIWYG"
+msgstr "WYSIWYG"
+
+msgctxt "icon name"
 msgid "Text format"
 msgstr "Textformat"
 
