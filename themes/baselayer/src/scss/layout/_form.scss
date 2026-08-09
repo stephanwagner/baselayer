@@ -114,7 +114,7 @@
       color: var(--bl-button-primary-color-hover);
     }
 
-    &[disabled]:not(.-is-loading) {
+    &[disabled] {
       cursor: default !important;
       color: #ccc !important;
       background: #eee !important;
@@ -122,11 +122,10 @@
       box-shadow: none !important;
     }
 
-    // Size-stable busy state: label stays in layout, spinner overlays via ::after
     &.-is-loading {
       pointer-events: none;
-      cursor: wait !important;
-      -webkit-text-fill-color: transparent;
+      color: transparent !important;
+      -webkit-text-fill-color: transparent !important;;
 
       > * {
         visibility: hidden;

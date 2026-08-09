@@ -9,11 +9,14 @@ export function setButtonLoading(button, loading = true) {
   if (!button) return;
 
   button.classList.toggle('-is-loading', loading);
-  button.disabled = loading;
 
   if (loading) {
+    button.disabled = true;
+    button.setAttribute('disabled', 'disabled');
     button.setAttribute('aria-busy', 'true');
   } else {
+    button.disabled = false;
+    button.removeAttribute('disabled');
     button.removeAttribute('aria-busy');
   }
 }

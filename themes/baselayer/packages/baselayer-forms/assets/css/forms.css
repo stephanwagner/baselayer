@@ -938,11 +938,44 @@ select.bl-form__control {
   margin-top: 4px;
 }
 .bl-form__actions .button[data-bl-form-submit] {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
 }
+.bl-form__actions .button[data-bl-form-submit].-is-loading {
+  pointer-events: none;
+  cursor: wait !important;
+  -webkit-text-fill-color: transparent;
+}
+.bl-form__actions .button[data-bl-form-submit].-is-loading > * {
+  visibility: hidden;
+}
+.bl-form__actions .button[data-bl-form-submit].-is-loading::before {
+  visibility: hidden;
+}
+.bl-form__actions .button[data-bl-form-submit].-is-loading::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  box-sizing: border-box;
+  width: 1.1em;
+  height: 1.1em;
+  margin: 0;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  opacity: 0.85;
+  transform: translate(-50%, -50%);
+  animation: bl-form-button-spin 0.7s linear infinite;
+}
 
+@keyframes bl-form-button-spin {
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
 .bl-form__progress {
   box-sizing: border-box;
   width: 100%;

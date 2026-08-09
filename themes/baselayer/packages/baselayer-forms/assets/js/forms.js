@@ -3,10 +3,13 @@
   function setButtonLoading(button, loading = true) {
     if (!button) return;
     button.classList.toggle("-is-loading", loading);
-    button.disabled = loading;
     if (loading) {
+      button.disabled = true;
+      button.setAttribute("disabled", "disabled");
       button.setAttribute("aria-busy", "true");
     } else {
+      button.disabled = false;
+      button.removeAttribute("disabled");
       button.removeAttribute("aria-busy");
     }
   }
@@ -680,10 +683,13 @@
       root.classList.toggle("is-loading", loading);
       if (useProgress) {
         submit.classList.remove("-is-loading");
-        submit.disabled = loading;
         if (loading) {
+          submit.disabled = true;
+          submit.setAttribute("disabled", "disabled");
           submit.setAttribute("aria-busy", "true");
         } else {
+          submit.disabled = false;
+          submit.removeAttribute("disabled");
           submit.removeAttribute("aria-busy");
         }
       } else {

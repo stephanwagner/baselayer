@@ -786,10 +786,13 @@ function initForm(root) {
     if (useProgress) {
       // Progress UI replaces the overlay spinner; keep label visible.
       submit.classList.remove('-is-loading');
-      submit.disabled = loading;
       if (loading) {
+        submit.disabled = true;
+        submit.setAttribute('disabled', 'disabled');
         submit.setAttribute('aria-busy', 'true');
       } else {
+        submit.disabled = false;
+        submit.removeAttribute('disabled');
         submit.removeAttribute('aria-busy');
       }
     } else {
