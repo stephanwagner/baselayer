@@ -39,7 +39,7 @@ function bl_blocks_default_settings(string $type = 'block'): array
 		'slug'                   => '',
 		'description'            => '',
 		'block_icon'             => 'block-default',
-		'block_category'         => 'widgets',
+		'block_category'         => 'design',
 		'block_keywords'         => '',
 		'post_types'             => $type === 'page_settings' ? ['page'] : [],
 		'menu_label'             => '',
@@ -446,9 +446,9 @@ function bl_blocks_sanitize_settings($settings, string $type = 'block'): array
 	$out['slug'] = sanitize_key((string) ($settings['slug'] ?? ''));
 	$out['description'] = sanitize_textarea_field((string) ($settings['description'] ?? ''));
 	$out['block_icon'] = bl_blocks_sanitize_block_icon($settings['block_icon'] ?? 'block-default');
-	$out['block_category'] = sanitize_key((string) ($settings['block_category'] ?? 'widgets'));
+	$out['block_category'] = sanitize_key((string) ($settings['block_category'] ?? 'design'));
 	if ($out['block_category'] === '') {
-		$out['block_category'] = 'widgets';
+		$out['block_category'] = 'design';
 	}
 	$out['block_keywords'] = sanitize_text_field((string) ($settings['block_keywords'] ?? ''));
 	$out['menu_label'] = sanitize_text_field((string) ($settings['menu_label'] ?? ''));

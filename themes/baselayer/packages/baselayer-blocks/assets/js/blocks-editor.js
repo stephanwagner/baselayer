@@ -7951,7 +7951,7 @@
         apiVersion: 3,
         title: def.title || def.slug,
         description: def.description || "",
-        category: def.category || "widgets",
+        category: def.category || "design",
         icon: blockIcon(def.icon),
         keywords: def.keywords || [],
         attributes: {

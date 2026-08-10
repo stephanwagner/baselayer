@@ -109,7 +109,7 @@ function bl_blocks_block_definition_payload(WP_Post $post): ?array
 		'description'     => (string) ($config['settings']['description'] ?? ''),
 		'icon'            => $gutenberg_icon,
 		'iconRaw'         => $raw_icon,
-		'category'        => (string) ($config['settings']['block_category'] ?? 'widgets'),
+		'category'        => (string) ($config['settings']['block_category'] ?? 'design'),
 		'keywords'        => $keywords,
 		'fields'               => $config['fields'],
 		'sidebarEditing'       => !empty($config['settings']['sidebar_editing']),
@@ -186,7 +186,7 @@ function bl_blocks_register_dynamic_blocks(): void
 			'api_version'     => 3,
 			'title'           => $def['title'],
 			'description'     => $def['description'],
-			'category'        => $def['category'] !== '' ? $def['category'] : 'widgets',
+			'category'        => $def['category'] !== '' ? $def['category'] : 'design',
 			'icon'            => !empty($def['icon']) ? $def['icon'] : 'block-default',
 			'keywords'        => $def['keywords'],
 			'attributes'      => [

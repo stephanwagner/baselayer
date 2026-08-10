@@ -1582,7 +1582,7 @@
       });
       const categories = window.blBlocksAdmin && window.blBlocksAdmin.blockCategories || [];
       const categorySelect = el("select", { className: "widefat" });
-      const currentCat = state.block_category || "widgets";
+      const currentCat = state.block_category || "design";
       let hasCurrent = false;
       categories.forEach((cat) => {
         const opt = el("option", {
@@ -1608,7 +1608,7 @@
         });
       }
       categorySelect.addEventListener("change", () => {
-        state.block_category = categorySelect.value || "widgets";
+        state.block_category = categorySelect.value || "design";
         notify();
       });
       const keywordsInput = el("input", {
