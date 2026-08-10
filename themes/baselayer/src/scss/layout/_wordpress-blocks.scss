@@ -214,8 +214,7 @@
       flex-wrap: nowrap !important;
 
       > .wp-block-column {
-        flex-basis: 0 !important;
-        flex-grow: 1;
+        min-width: 0; // shrink with gap; keep WP flex-basis %
       }
     }
 
@@ -243,12 +242,12 @@
       }
 
       &.-columns-stack-late {
+        // nowrap until S so % + gap do not wrap early; do not equalize widths
         @media (min-width: #{$breakpoint-s + 1}) {
           flex-wrap: nowrap !important;
 
           > .wp-block-column {
-            flex-basis: 0 !important;
-            flex-grow: 1;
+            min-width: 0;
           }
         }
 
@@ -303,8 +302,7 @@
           flex-wrap: nowrap !important;
 
           > .wp-block-column {
-            flex-basis: 0 !important;
-            flex-grow: 1;
+            min-width: 0;
           }
         }
 
