@@ -54,18 +54,49 @@
 // When also .container-wide, Inhaltsbreite owns L/R inset (option-gated).
 
 .alignwide {
-  --bl-wide-bleed: min(var(--bl-alignwide-bleed), max(0px, (100vw - 100%) / 2 - var(--bl-page-padding) * 0.5));
+  --bl-wide-bleed: min(
+    var(--bl-alignwide-bleed),
+    max(0px, (100vw - 100%) / 2 - var(--bl-page-padding) * 0.5)
+  );
   // Content-column inset: bleed + half page-padding floor, never below S→XS (no Innenabstand).
-  --bl-wide-content-inset: max(var(--bl-wide-bleed), calc(var(--bl-page-padding) * 0.5), var(--bl-wide-edge-floor));
+  --bl-wide-content-inset: max(
+    var(--bl-wide-bleed),
+    calc(var(--bl-page-padding) * 0.5),
+    var(--bl-wide-edge-floor)
+  );
   margin-left: calc(var(--bl-wide-bleed) * -1);
   margin-right: calc(var(--bl-wide-bleed) * -1);
+
+  // Combined with Inhaltsbreite: same half page-padding edge, higher cap
+  // (alignwide bleed + half page-padding). Page padding already steps on small screens.
+  &.container-wide {
+    --bl-wide-bleed: min(
+      calc(var(--bl-alignwide-bleed) + var(--bl-page-padding) * 0.5),
+      max(0px, (100vw - 100%) / 2 - var(--bl-page-padding) * 0.5)
+    );
+    margin-left: calc(var(--bl-wide-bleed) * -1);
+    margin-right: calc(var(--bl-wide-bleed) * -1);
+    width: calc(100% + var(--bl-wide-bleed) + var(--bl-wide-bleed));
+
+    // Content-align inset must match actual bleed (capped container-wide inset under-insets).
+    &.-container-wide-content {
+      --bl-container-wide-content-inset: max(var(--bl-wide-bleed), var(--bl-wide-edge-floor));
+      padding-left: var(--bl-container-wide-content-inset) !important;
+      padding-right: var(--bl-container-wide-content-inset) !important;
+
+      &.slider__wrapper {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+      }
+    }
+  }
 
   &.has-background:not(.container-wide) {
     padding-left: var(--bl-wide-content-inset);
     padding-right: var(--bl-wide-content-inset);
   }
 
-  // Alignwide-only content-align; combined with container-wide uses .container-wide rule.
+  // Alignwide-only content-align; combined with container-wide uses rule above.
   &.-container-wide-content:not(.container-wide) {
     padding-left: var(--bl-wide-content-inset) !important;
     padding-right: var(--bl-wide-content-inset) !important;
