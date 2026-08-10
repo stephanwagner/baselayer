@@ -47,15 +47,14 @@
   }
 }
 
-// Alignwide — fluid bleed capped by --bl-alignwide-bleed,
-// leaving half --bl-page-padding from the viewport edge (extends further than
-// .container-wide). Content inset floors at half page padding so copy can keep
-// a larger L/R inset on smaller screens.
-// When also .container-wide, Inhaltsbreite owns L/R inset (option-gated).
+// Alignwide — spacious bleed capped at live --bl-page-padding; when space is
+// tight, leave half --bl-page-padding from the viewport edge. Content inset
+// floors at half page padding so copy can keep a larger L/R inset on smaller
+// screens. When also .container-wide, combo below is wider (unchanged).
 
 .alignwide {
   --bl-wide-bleed: min(
-    var(--bl-alignwide-bleed),
+    var(--bl-page-padding),
     max(0px, (100vw - 100%) / 2 - var(--bl-page-padding) * 0.5)
   );
   // Content-column inset: bleed + half page-padding floor, never below S→XS (no Innenabstand).
