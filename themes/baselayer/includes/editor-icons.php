@@ -1099,6 +1099,22 @@ function bl_icons_localize_payload(): array
 	$theme_category = bl_stylesheet_theme_icon_category();
 	if ($theme_category !== null) {
 		$payload['themeCategory'] = $theme_category;
+
+		// Selected-value UIs resolve names via labels[slug]; merge theme icon
+		// labels so child icons are not humanized from the full filename.
+		if (!empty($theme_category['icons']) && is_array($theme_category['icons'])) {
+			foreach ($theme_category['icons'] as $icon) {
+				if (!is_array($icon)) {
+					continue;
+				}
+				$filename = isset($icon['filename']) ? (string) $icon['filename'] : '';
+				$label = isset($icon['label']) ? (string) $icon['label'] : '';
+				if ($filename === '' || $label === '') {
+					continue;
+				}
+				$payload['labels'][$filename] = $label;
+			}
+		}
 	}
 
 	// Child theme icons live in assets/icons/; parent project icons in assets/icons-theme/.
