@@ -20,6 +20,13 @@
   }
 }
 
+// Soft hyphen markers: CSS Custom Highlight API (next character; no content HTML).
+// Style is also injected into the canvas iframe from soft-hyphen.js.
+::highlight(bl-soft-hyphen) {
+  background-color: rgba(255, 193, 7, 0.55);
+  color: inherit;
+}
+
 .components-placeholder.components-placeholder {
   -webkit-font-smoothing: antialiased;
 }

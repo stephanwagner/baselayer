@@ -9,4 +9,5 @@ import './exclude-from-search';
 import './page-pin-dashboard';
 import './seo';
 import './languages';
+import './soft-hyphen';
 import './blocks';
