@@ -706,5 +706,10 @@ function bl_editor_scripts(): void
 			bl_block_settings_editor_config()
 		);
 	}
+
+	wp_localize_script('baselayer-editor', 'baselayerSoftHyphen', [
+		'title'       => __('Soft hyphen', 'baselayer'),
+		'insertLabel' => __('Insert soft hyphen', 'baselayer'),
+	]);
 }
 add_action('enqueue_block_editor_assets', 'bl_editor_scripts');

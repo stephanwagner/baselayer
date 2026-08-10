@@ -3421,3 +3421,8 @@ msgstr "Übersetzungsmethode"
 
 msgid "A WordPress foundation built for developers who want full control. By <a href=\"%1$s\" target=\"_blank\" rel=\"noopener\">Stephan Wagner</a> at <a href=\"%2$s\" target=\"_blank\" rel=\"noopener\">bytes and stripes</a>."
 msgstr "Eine WordPress-Grundlage für Entwickler, die volle Kontrolle möchten. Von <a href=\"%1$s\" target=\"_blank\" rel=\"noopener\">Stephan Wagner</a> bei <a href=\"%2$s\" target=\"_blank\" rel=\"noopener\">bytes and stripes</a>."
+msgid "Soft hyphen"
+msgstr "Bedingter Trennstrich"
+
+msgid "Insert soft hyphen"
+msgstr "Bedingten Trennstrich einfügen"

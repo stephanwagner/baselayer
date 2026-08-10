@@ -17,6 +17,21 @@ const { registerFormatType, insert } = wp.richText;
 const { RichTextToolbarButton } = wp.blockEditor;
 const { __ } = wp.i18n;
 const { createElement: el } = wp.element;
+const { SVG, Path } = wp.primitives;
+
+const softHyphenIcon = el(
+  SVG,
+  {
+    xmlns: 'http://www.w3.org/2000/svg',
+    viewBox: '0 -960 960 960',
+    width: 24,
+    height: 24,
+  },
+  el(Path, {
+    d: 'M529.81-182.96q.19-11.96 9.11-20.89L665.08-330H292.31q-29.92 0-51.12-21.19Q220-372.39 220-402.31V-750q0-12.77 8.62-21.38Q237.23-780 250-780t21.38 8.62Q280-762.77 280-750v347.69q0 5.39 3.46 8.85t8.85 3.46h372.77L538.31-516.77q-9.31-9.31-9-21.08.31-11.76 9-21.07 9.31-9.31 21.27-9.42 11.96-.12 20.88 8.8l174.23 174.23q5.62 5.62 7.92 11.85 2.31 6.23 2.31 13.46t-2.31 13.46q-2.3 6.23-7.92 11.85l-173 173q-9.31 9.3-21.38 9.3-12.08 0-21.39-9.3-9.3-9.31-9.11-21.27Z',
+    fill: 'currentColor',
+  })
+);
 
 function getCanvasDocuments() {
   const docs = [];
@@ -120,10 +135,13 @@ function scheduleHighlightRefresh() {
   });
 }
 
+const softHyphenI18n =
+  (typeof baselayerSoftHyphen !== 'undefined' && baselayerSoftHyphen) || {};
+
 function SoftHyphenEdit({ value, onChange }) {
   return el(RichTextToolbarButton, {
-    icon: 'editor-break',
-    title: __('Insert soft hyphen', 'baselayer'),
+    icon: softHyphenIcon,
+    title: softHyphenI18n.insertLabel || __('Insert soft hyphen', 'baselayer'),
     onClick: () => {
       onChange(insert(value, SOFT_HYPHEN));
       scheduleHighlightRefresh();
@@ -134,7 +152,7 @@ function SoftHyphenEdit({ value, onChange }) {
 }
 
 registerFormatType('baselayer/soft-hyphen', {
-  title: __('Soft hyphen', 'baselayer'),
+  title: softHyphenI18n.title || __('Soft hyphen', 'baselayer'),
   tagName: 'span',
   className: 'bl-soft-hyphen',
   edit: SoftHyphenEdit,
