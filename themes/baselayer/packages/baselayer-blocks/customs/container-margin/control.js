@@ -1,7 +1,6 @@
 import {
   CONTAINER_MARGIN_SIZES,
   displayMarginSize,
-  resetMarginSize,
   storedMarginSize,
 } from './utils';
 import { BlockOptionToggleGroupOption } from '../../src/js/block-options/shared/block-option-toggle-group-option';
@@ -16,7 +15,6 @@ const ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
  */
 export function ContainerMarginControl({ option, attributes, onChange }) {
   const { top, bottom, linked } = option.attributeNames;
-  const defaultSize = option.defaultSize ?? '';
   const isLinked = attributes[linked] !== false;
   const topValue = attributes[top] ?? '';
   const bottomValue = attributes[bottom] ?? '';
@@ -42,21 +40,6 @@ export function ContainerMarginControl({ option, attributes, onChange }) {
     onChange({ [bottom]: storedMarginSize(pickedSize) });
   };
 
-  const resetTop = () => {
-    const stored = resetMarginSize(defaultSize);
-
-    if (isLinked) {
-      onChange({ [top]: stored, [bottom]: stored });
-      return;
-    }
-
-    onChange({ [top]: stored });
-  };
-
-  const resetBottom = () => {
-    onChange({ [bottom]: resetMarginSize(defaultSize) });
-  };
-
   const revealBottom = () => {
     onChange({
       [linked]: false,
@@ -71,7 +54,7 @@ export function ContainerMarginControl({ option, attributes, onChange }) {
     });
   };
 
-  const renderSizeControl = (sideLabel, value, onSelect, onReset) => {
+  const renderSizeControl = (sideLabel, value, onSelect) => {
     const control = ToggleGroupControl ? (
       <ToggleGroupControl
         className="bl-container-margin__sizes bl-block-option-button-group"
@@ -98,9 +81,6 @@ export function ContainerMarginControl({ option, attributes, onChange }) {
       <div className="bl-container-margin__field">
         <div className="bl-container-margin__header">
           <span className="bl-container-margin__side-label">{sideLabel}</span>
-          <Button variant="link" className="bl-container-margin__reset" onClick={onReset}>
-            {t('reset', 'Reset')}
-          </Button>
         </div>
         {control}
       </div>
@@ -121,8 +101,7 @@ export function ContainerMarginControl({ option, attributes, onChange }) {
       {renderSizeControl(
         isLinked ? t('topAndBottom', 'Top and bottom') : t('top', 'Top'),
         displayTop,
-        setTop,
-        resetTop
+        setTop
       )}
 
       {isLinked
@@ -140,7 +119,7 @@ export function ContainerMarginControl({ option, attributes, onChange }) {
               relink,
               'bl-container-margin__action--relink'
             )}
-            {renderSizeControl(t('bottom', 'Bottom'), displayBottom, setBottom, resetBottom)}
+            {renderSizeControl(t('bottom', 'Bottom'), displayBottom, setBottom)}
           </>
         )}
       <BlockOptionDescription description={option.description} />

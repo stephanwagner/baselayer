@@ -104,7 +104,6 @@ function bl_block_options_editor_i18n(): array
 		'default' => __('Default', 'baselayer-blocks'),
 		'wide' => __('Wide', 'baselayer-blocks'),
 		'alignContentToContentColumn' => __('Align content to content column', 'baselayer-blocks'),
-		'reset' => __('Reset', 'baselayer-blocks'),
 		'topAndBottom' => __('Top and bottom', 'baselayer-blocks'),
 		'top' => __('Top', 'baselayer-blocks'),
 		'bottom' => __('Bottom', 'baselayer-blocks'),

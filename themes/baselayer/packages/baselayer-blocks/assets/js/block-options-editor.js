@@ -239,7 +239,6 @@
   };
   var displayMarginSize = (storedSize) => storedSize === "" ? "unset" : storedSize;
   var storedMarginSize = (pickedSize) => pickedSize === "unset" ? "" : pickedSize;
-  var resetMarginSize = (defaultSize) => defaultSize || "";
   var containerMarginAttributeKeys = (option) => {
     const names = option.attributeNames;
     return [names.top, names.bottom, names.linked];
@@ -250,7 +249,6 @@
   var ToggleGroupControl2 = wp.components.__experimentalToggleGroupControl;
   function ContainerMarginControl({ option, attributes, onChange }) {
     const { top, bottom, linked } = option.attributeNames;
-    const defaultSize = option.defaultSize ?? "";
     const isLinked = attributes[linked] !== false;
     const topValue = attributes[top] ?? "";
     const bottomValue = attributes[bottom] ?? "";
@@ -270,17 +268,6 @@
     const setBottom = (pickedSize) => {
       onChange({ [bottom]: storedMarginSize(pickedSize) });
     };
-    const resetTop = () => {
-      const stored = resetMarginSize(defaultSize);
-      if (isLinked) {
-        onChange({ [top]: stored, [bottom]: stored });
-        return;
-      }
-      onChange({ [top]: stored });
-    };
-    const resetBottom = () => {
-      onChange({ [bottom]: resetMarginSize(defaultSize) });
-    };
     const revealBottom = () => {
       onChange({
         [linked]: false,
@@ -293,7 +280,7 @@
         [bottom]: topValue
       });
     };
-    const renderSizeControl = (sideLabel, value, onSelect, onReset) => {
+    const renderSizeControl = (sideLabel, value, onSelect) => {
       const control = ToggleGroupControl2 ? /* @__PURE__ */ wp.element.createElement(
         ToggleGroupControl2,
         {
@@ -316,14 +303,13 @@
           }
         ))
       ) : null;
-      return /* @__PURE__ */ wp.element.createElement("div", { className: "bl-container-margin__field" }, /* @__PURE__ */ wp.element.createElement("div", { className: "bl-container-margin__header" }, /* @__PURE__ */ wp.element.createElement("span", { className: "bl-container-margin__side-label" }, sideLabel), /* @__PURE__ */ wp.element.createElement(Button, { variant: "link", className: "bl-container-margin__reset", onClick: onReset }, t("reset", "Reset"))), control);
+      return /* @__PURE__ */ wp.element.createElement("div", { className: "bl-container-margin__field" }, /* @__PURE__ */ wp.element.createElement("div", { className: "bl-container-margin__header" }, /* @__PURE__ */ wp.element.createElement("span", { className: "bl-container-margin__side-label" }, sideLabel)), control);
     };
     const renderActionButton = (icon, label, onClick, className) => /* @__PURE__ */ wp.element.createElement(Button, { variant: "link", className: "bl-container-margin__action " + className, onClick }, /* @__PURE__ */ wp.element.createElement("span", { className: "bl-icon -icon-" + icon, "aria-hidden": "true" }), label);
     return /* @__PURE__ */ wp.element.createElement("div", { className: "bl-container-margin" }, option.label ? /* @__PURE__ */ wp.element.createElement("span", { className: "bl-container-margin__label" }, option.label) : null, renderSizeControl(
       isLinked ? t("topAndBottom", "Top and bottom") : t("top", "Top"),
       displayTop,
-      setTop,
-      resetTop
+      setTop
     ), isLinked ? renderActionButton(
       "link-off",
       t("bottom", "Bottom"),
@@ -334,7 +320,7 @@
       t("linkSides", "Link sides"),
       relink,
       "bl-container-margin__action--relink"
-    ), renderSizeControl(t("bottom", "Bottom"), displayBottom, setBottom, resetBottom)), /* @__PURE__ */ wp.element.createElement(BlockOptionDescription, { description: option.description }));
+    ), renderSizeControl(t("bottom", "Bottom"), displayBottom, setBottom)), /* @__PURE__ */ wp.element.createElement(BlockOptionDescription, { description: option.description }));
   }
 
   // themes/baselayer/packages/baselayer-blocks/customs/container-margin/editor.js

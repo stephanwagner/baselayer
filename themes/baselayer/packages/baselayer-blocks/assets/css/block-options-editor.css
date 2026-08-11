@@ -12,10 +12,6 @@
 }
 
 .bl-container-margin__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
   margin-bottom: 8px;
 }
 
@@ -23,16 +19,6 @@
   font-size: 13px;
   font-weight: 500;
   line-height: 1.4;
-}
-
-.bl-container-margin__reset.components-button.is-link {
-  height: auto;
-  margin: 0;
-  padding: 0;
-  font-size: 13px;
-  font-weight: 400;
-  line-height: 1.4;
-  text-decoration: none;
 }
 
 .bl-container-margin__sizes.components-toggle-group-control {

@@ -60,9 +60,6 @@ export const displayMarginSize = (storedSize) => (storedSize === '' ? 'unset' : 
 /** Persisted attribute value from a picked toggle value. */
 export const storedMarginSize = (pickedSize) => (pickedSize === 'unset' ? '' : pickedSize);
 
-/** Value applied by Reset: block default, or unset when no default is configured. */
-export const resetMarginSize = (defaultSize) => defaultSize || '';
-
 export const containerMarginAttributeKeys = (option) => {
   const names = option.attributeNames;
   return [names.top, names.bottom, names.linked];
