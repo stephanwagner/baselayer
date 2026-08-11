@@ -306,14 +306,14 @@
         "label": "Richtung",
         "required": false,
         "width": "50",
-        "default_value": "DESC",
+        "default_value": "desc",
         "options": [
           {
-            "value": "DESC",
+            "value": "desc",
             "label": "Absteigend"
           },
           {
-            "value": "ASC",
+            "value": "asc",
             "label": "Aufsteigend"
           }
         ]

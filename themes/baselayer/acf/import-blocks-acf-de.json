@@ -696,10 +696,10 @@
                     "id": ""
                 },
                 "choices": {
-                    "DESC": "Absteigend",
-                    "ASC": "Aufsteigend"
+                    "desc": "Absteigend",
+                    "asc": "Aufsteigend"
                 },
-                "default_value": "DESC",
+                "default_value": "desc",
                 "return_format": "value",
                 "multiple": 0,
                 "allow_null": 0,
