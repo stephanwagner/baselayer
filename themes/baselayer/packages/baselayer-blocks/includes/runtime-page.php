@@ -9,7 +9,8 @@ function bl_blocks_register_page_meta(): void
 {
 	$definitions = bl_blocks_query_definitions('page_settings', false);
 	foreach ($definitions as $post) {
-		$meta_key = bl_blocks_page_meta_key((int) $post->ID);
+		$slug = bl_blocks_definition_slug((int) $post->ID);
+		$meta_key = bl_blocks_page_meta_key($slug);
 		register_post_meta('', $meta_key, [
 			'type'              => 'object',
 			'single'            => true,
@@ -46,12 +47,14 @@ function bl_blocks_page_definitions_for_post_type(string $post_type): array
 		if (!is_array($types) || !in_array($post_type, $types, true)) {
 			continue;
 		}
+		$slug = bl_blocks_definition_slug((int) $post->ID, $config['settings']);
 		$out[] = [
 			'id'             => (int) $post->ID,
+			'slug'           => $slug,
 			'title'          => $post->post_title !== '' ? $post->post_title : __('Content Fields', 'baselayer-blocks'),
 			'description'    => (string) ($config['settings']['description'] ?? ''),
 			'fields'         => $config['fields'],
-			'metaKey'        => bl_blocks_page_meta_key((int) $post->ID),
+			'metaKey'        => bl_blocks_page_meta_key($slug),
 			'sidebarEditing' => !empty($config['settings']['sidebar_editing']),
 		];
 	}
@@ -167,7 +170,12 @@ function bl_blocks_enqueue_page_editor(string $hook): void
 	foreach ($defs as $def) {
 		$values = [];
 		if ($post_id > 0) {
-			$raw = get_post_meta($post_id, $def['metaKey'], true);
+			$def_id = (int) ($def['id'] ?? 0);
+			$slug = (string) ($def['slug'] ?? '');
+			if ($def_id > 0 && $slug !== '') {
+				bl_blocks_maybe_migrate_page_settings_meta($post_id, $slug, $def_id);
+			}
+			$raw = get_post_meta($post_id, (string) ($def['metaKey'] ?? ''), true);
 			$values = is_array($raw) ? $raw : [];
 		}
 		$payload[] = array_merge($def, ['values' => $values]);

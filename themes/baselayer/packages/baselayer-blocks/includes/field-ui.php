@@ -150,12 +150,111 @@ function bl_blocks_site_option_key(string $slug): string
 }
 
 /**
- * Page settings post meta key for a definition.
+ * Page settings post meta key for a definition slug (portable across site moves).
  */
-function bl_blocks_page_meta_key(int $definition_id): string
+function bl_blocks_page_meta_key(string $slug): string
+{
+	$slug = sanitize_key($slug);
+	if ($slug === '') {
+		$slug = 'default';
+	}
+
+	return '_bl_page_settings_' . $slug;
+}
+
+/**
+ * Legacy page settings meta key (definition post ID). Used only for migration.
+ */
+function bl_blocks_page_meta_key_legacy(int $definition_id): string
 {
 	return '_bl_page_settings_' . (int) $definition_id;
 }
+
+/**
+ * Copy legacy ID-keyed page settings meta to the slug key when needed.
+ */
+function bl_blocks_maybe_migrate_page_settings_meta(int $post_id, string $slug, int $definition_id): void
+{
+	if ($post_id <= 0 || $definition_id <= 0) {
+		return;
+	}
+
+	$slug = sanitize_key($slug);
+	if ($slug === '') {
+		return;
+	}
+
+	$new_key = bl_blocks_page_meta_key($slug);
+	$existing = get_post_meta($post_id, $new_key, true);
+	if (is_array($existing)) {
+		return;
+	}
+
+	$legacy_key = bl_blocks_page_meta_key_legacy($definition_id);
+	$legacy = get_post_meta($post_id, $legacy_key, true);
+	if (!is_array($legacy)) {
+		return;
+	}
+
+	update_post_meta($post_id, $new_key, $legacy);
+	delete_post_meta($post_id, $legacy_key);
+}
+
+/**
+ * One-time migration: `_bl_page_settings_{id}` → `_bl_page_settings_{slug}`.
+ */
+function bl_blocks_migrate_page_settings_meta_keys(): void
+{
+	if (get_option('bl_blocks_page_settings_meta_slug_migrated')) {
+		return;
+	}
+	if (!function_exists('bl_blocks_query_definitions') || !function_exists('bl_blocks_definition_slug')) {
+		return;
+	}
+
+	global $wpdb;
+	if (!$wpdb instanceof wpdb) {
+		return;
+	}
+
+	$id_to_slug = [];
+	foreach (bl_blocks_query_definitions('page_settings', false) as $post) {
+		if (!$post instanceof WP_Post) {
+			continue;
+		}
+		$def_id = (int) $post->ID;
+		$slug = bl_blocks_definition_slug($def_id);
+		if ($slug !== '') {
+			$id_to_slug[$def_id] = $slug;
+		}
+	}
+
+	if ($id_to_slug === []) {
+		update_option('bl_blocks_page_settings_meta_slug_migrated', 1, false);
+
+		return;
+	}
+
+	foreach ($id_to_slug as $def_id => $slug) {
+		$legacy_key = bl_blocks_page_meta_key_legacy((int) $def_id);
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- one-time meta key migration.
+		$post_ids = $wpdb->get_col(
+			$wpdb->prepare(
+				"SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = %s",
+				$legacy_key
+			)
+		);
+		if (!is_array($post_ids)) {
+			continue;
+		}
+		foreach ($post_ids as $post_id) {
+			bl_blocks_maybe_migrate_page_settings_meta((int) $post_id, $slug, (int) $def_id);
+		}
+	}
+
+	update_option('bl_blocks_page_settings_meta_slug_migrated', 1, false);
+}
+add_action('init', 'bl_blocks_migrate_page_settings_meta_keys', 15);
 
 /**
  * Flatten leaf fields from a definition tree.

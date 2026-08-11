@@ -55,7 +55,11 @@ function bl_page_fields(string $slug, int $post_id = 0): array
 		return [];
 	}
 
-	$raw = get_post_meta($post_id, bl_blocks_page_meta_key($def_id), true);
+	if (function_exists('bl_blocks_maybe_migrate_page_settings_meta')) {
+		bl_blocks_maybe_migrate_page_settings_meta($post_id, $slug, $def_id);
+	}
+
+	$raw = get_post_meta($post_id, bl_blocks_page_meta_key($slug), true);
 
 	return is_array($raw) ? $raw : [];
 }

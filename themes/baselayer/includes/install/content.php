@@ -698,18 +698,13 @@ function bl_install_seed_homepage_hero(int $page_id, array $media = [], array $p
 	}
 
 	// Baselayer Content Fields (page_settings slug `hero`).
-	if (!function_exists('bl_hero_page_settings_definition_id') || !function_exists('bl_blocks_page_meta_key')) {
-		return;
-	}
-
-	$def_id = bl_hero_page_settings_definition_id();
-	if ($def_id <= 0) {
+	if (!function_exists('bl_blocks_page_meta_key')) {
 		return;
 	}
 
 	update_post_meta(
 		$page_id,
-		bl_blocks_page_meta_key($def_id),
+		bl_blocks_page_meta_key('hero'),
 		[
 			'hero_enabled' => true,
 			'hero_slides'  => $slides,
