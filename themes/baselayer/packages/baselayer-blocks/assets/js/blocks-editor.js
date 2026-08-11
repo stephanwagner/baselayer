@@ -7902,10 +7902,11 @@
         return el5(Placeholder, { className: "bl-blocks-block-preview-error", label: message });
       }
       if (!response.content) {
-        return el5(Placeholder, {
-          className: "bl-blocks-block-preview-empty",
-          label: blockI18n.previewEmpty || "Block rendered as empty."
-        });
+        return el5(
+          "div",
+          { className: "bl-blocks-block-preview-empty" },
+          blockI18n.previewEmpty || "Block has no content."
+        );
       }
       if (!needsJsx) {
         return el5(RawHTML, null, response.content);

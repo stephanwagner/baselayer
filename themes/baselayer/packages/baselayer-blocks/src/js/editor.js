@@ -328,10 +328,11 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
     }
 
     if (!response.content) {
-      return el(Placeholder, {
-        className: 'bl-blocks-block-preview-empty',
-        label: blockI18n.previewEmpty || 'Block rendered as empty.',
-      });
+      return el(
+        'div',
+        { className: 'bl-blocks-block-preview-empty' },
+        blockI18n.previewEmpty || 'Block has no content.'
+      );
     }
 
     if (!needsJsx) {

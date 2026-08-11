@@ -1957,8 +1957,8 @@ msgstr "Fehler beim Laden der Vorschau: %s"
 
 #: includes/runtime-blocks.php:250
 #: includes/runtime-page.php:114
-msgid "Block rendered as empty."
-msgstr "Block wurde leer gerendert."
+msgid "Block has no content."
+msgstr "Block hat keinen Inhalt."
 
 #: includes/runtime-blocks.php:251
 #: includes/runtime-blocks.php:614

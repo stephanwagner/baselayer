@@ -2024,7 +2024,7 @@ msgstr ""
 
 #: includes/runtime-blocks.php:250
 #: includes/runtime-page.php:114
-msgid "Block rendered as empty."
+msgid "Block has no content."
 msgstr ""
 
 #: includes/runtime-blocks.php:251

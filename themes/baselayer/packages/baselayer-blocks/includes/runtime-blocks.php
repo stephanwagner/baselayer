@@ -250,7 +250,7 @@ function bl_blocks_register_dynamic_blocks(): void
 				'noEditableFields'       => __('This block has no editable fields. Add fields to the block definition to configure it here.', 'baselayer-blocks'),
 				'preview'                => __('Edit fields to configure this block.', 'baselayer-blocks'),
 				'previewError'           => __('Error loading preview: %s', 'baselayer-blocks'),
-				'previewEmpty'           => __('Block rendered as empty.', 'baselayer-blocks'),
+				'previewEmpty'           => __('Block has no content.', 'baselayer-blocks'),
 				'templateMissing'        => __('Template missing.', 'baselayer-blocks'),
 				'addRow'                => __('Add entry', 'baselayer-blocks'),
 				'chooseEntriesHelp'      => __('Add one or more entries.', 'baselayer-blocks'),
@@ -563,7 +563,7 @@ function bl_blocks_is_editor_render(): bool
 }
 
 /**
- * Field-value dump used when the theme template is missing (frontend) or empty.
+ * Field-value dump used when the theme template is missing on the frontend.
  *
  * @param array<string, mixed> $def
  * @param array<string, mixed> $values
@@ -665,9 +665,6 @@ function bl_blocks_render_block(array $def, array $attributes, string $content =
 	} finally {
 		$html = trim((string) ob_get_clean());
 		bl_blocks_reset_field_context();
-	}
-	if ($html === '') {
-		return bl_blocks_render_block_fallback($def, $values);
 	}
 
 	// Editor canvas parses <InnerBlocks /> into a live React hole (ACF-style).

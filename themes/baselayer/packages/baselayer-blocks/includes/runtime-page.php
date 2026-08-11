@@ -117,7 +117,7 @@ function bl_blocks_enqueue_page_editor(string $hook): void
 			'noEditableFields'       => __('This block has no editable fields. Add fields to the block definition to configure it here.', 'baselayer-blocks'),
 			'preview'                => __('Edit fields to configure this block.', 'baselayer-blocks'),
 			'previewError'           => __('Error loading preview: %s', 'baselayer-blocks'),
-			'previewEmpty'           => __('Block rendered as empty.', 'baselayer-blocks'),
+			'previewEmpty'           => __('Block has no content.', 'baselayer-blocks'),
 			'templateMissing'        => __('Template missing.', 'baselayer-blocks'),
 			'addRow'                => __('Add entry', 'baselayer-blocks'),
 			'chooseEntriesHelp'      => __('Add one or more entries.', 'baselayer-blocks'),
