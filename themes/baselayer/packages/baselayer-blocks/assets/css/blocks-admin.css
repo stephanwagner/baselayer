@@ -2514,7 +2514,7 @@ body.post-new-php.post-type-bl_block .page-title-action {
   box-sizing: border-box;
   height: 36px;
   border: 1px solid #949494;
-  border-radius: 2px;
+  border-radius: var(--bl-forms-admin-radius);
   background: #fff;
   overflow: hidden;
 }
@@ -2600,7 +2600,7 @@ body.post-new-php.post-type-bl_block .page-title-action {
   margin: 0;
   padding: 0;
   border: 1px solid #949494;
-  border-radius: 2px;
+  border-radius: var(--bl-forms-admin-radius);
   background: #fff;
   color: #1d2327;
   line-height: 1;
