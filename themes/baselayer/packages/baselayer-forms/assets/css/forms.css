@@ -963,7 +963,7 @@ select.bl-form__control {
   width: 1.1em;
   height: 1.1em;
   margin: 0;
-  border: 2px solid currentColor;
+  border: 2px solid #ccc;
   border-right-color: transparent;
   border-radius: 50%;
   opacity: 0.85;

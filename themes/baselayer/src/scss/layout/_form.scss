@@ -144,10 +144,10 @@
         width: 1.1em;
         height: 1.1em;
         margin: 0;
-        border: 2px solid currentColor;
+        border: 2px solid #ccc;
         border-right-color: transparent;
         border-radius: 50%;
-        opacity: 0.85;
+        opacity: 1;
         transform: translate(-50%, -50%);
         animation: bl-button-spin 0.7s linear infinite;
       }
