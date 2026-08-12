@@ -104,6 +104,16 @@ function bl_forms_render(int $form_id, array $args = []): string
 }
 
 /**
+ * Theme/template helper: render a published form by ID (alias of bl_forms_render).
+ *
+ * Usage: echo bl_render_form(123);
+ */
+function bl_render_form(int $form_id, array $args = []): string
+{
+	return bl_forms_render($form_id, $args);
+}
+
+/**
  * Ensure the form wrapper always has bl-form and a unique bl-form--{id} class.
  */
 function bl_forms_ensure_form_wrapper_attributes(int $form_id, string $attrs): string

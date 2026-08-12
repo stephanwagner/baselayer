@@ -21,22 +21,12 @@
     --hero-overlay-padding-x: var(--bl-container-padding-xs);
   }
 
-  --hero-content-inset: var(--hero-overlay-padding-x);
+  // Own L/R inset: overlay ladder only (ignore wide bleed). Never above XL.
+  --hero-content-inset: min(var(--bl-container-padding-xl), var(--hero-overlay-padding-x));
 }
 
-.hero__wrapper.container-wide {
-  // Own L/R inset — bleed floored at overlay padding; ignore Innenabstand.
-  --hero-content-inset: max(var(--bl-wide-bleed, 0px), var(--hero-overlay-padding-x));
-}
-
-.hero__wrapper.alignwide {
-  // Own L/R inset — bleed + half page-padding floor, never below overlay padding.
-  --hero-content-inset: max(
-    var(--bl-wide-bleed, 0px),
-    calc(var(--bl-page-padding) * 0.5),
-    var(--hero-overlay-padding-x)
-  );
-}
+// Wide/align classes own width + bleed in _containers.scss.
+// Do not raise --hero-content-inset with --bl-wide-bleed (combo can reach XL+).
 
 .hero__wrapper {
   position: relative;

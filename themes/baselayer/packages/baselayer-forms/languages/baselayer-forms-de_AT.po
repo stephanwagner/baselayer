@@ -115,9 +115,11 @@ msgid "Import"
 msgstr "Importieren"
 
 #: includes/admin.php:157
-msgid "Use the Form block to insert this form anywhere on your site."
-msgstr ""
-"Verwende den Formular-Block, um dieses Formular auf deiner Website einzufügen."
+msgid "Use the Form block to insert this form on your site, or call bl_render_form(%d) in PHP."
+msgstr "Verwende den Formular-Block, um dieses Formular auf deiner Website einzufügen, oder rufe bl_render_form(%d) in PHP auf."
+
+msgid "Use the Form block to insert this form on your site, or call bl_render_form(ID) in PHP."
+msgstr "Verwende den Formular-Block, um dieses Formular auf deiner Website einzufügen, oder rufe bl_render_form(ID) in PHP auf."
 
 #: includes/admin.php:394 includes/entries.php:18
 msgid "Fields"

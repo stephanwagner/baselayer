@@ -69,38 +69,20 @@
   z-index: 3;
   padding-top: var(--bl-container-padding-y, 0);
   padding-bottom: var(--bl-container-padding-y, 0);
-  padding-left: max(var(--bl-page-padding), var(--slider-overlay-padding-x));
-  padding-right: max(var(--bl-page-padding), var(--slider-overlay-padding-x));
+  // Own L/R: overlay L ladder, never above XL (ignore wide bleed / Innenabstand X).
+  padding-left: min(var(--bl-container-padding-xl), var(--slider-overlay-padding-x));
+  padding-right: min(var(--bl-container-padding-xl), var(--slider-overlay-padding-x));
   align-items: center;
   display: none;
   color: #fff;
-
-  // Own L/R padding — bleed + overlay padding floor; ignore Innenabstand X.
-  .slider__wrapper.container-wide & {
-    padding-left: max(var(--bl-wide-bleed, 0px), var(--slider-overlay-padding-x));
-    padding-right: max(var(--bl-wide-bleed, 0px), var(--slider-overlay-padding-x));
-  }
-
-  .slider__wrapper.alignwide & {
-    padding-left: max(
-      var(--bl-wide-bleed, 0px),
-      calc(var(--bl-page-padding) * 0.5),
-      var(--slider-overlay-padding-x)
-    );
-    padding-right: max(
-      var(--bl-wide-bleed, 0px),
-      calc(var(--bl-page-padding) * 0.5),
-      var(--slider-overlay-padding-x)
-    );
-  }
 
   .slider__wrapper.alignfull & {
     padding-left: calc((100vw - var(--bl-content-width)) * 0.5);
     padding-right: calc((100vw - var(--bl-content-width)) * 0.5);
 
     @media (max-width: calc(#{$content-width} + #{$page-padding-l} + #{$page-padding-l})) {
-      padding-left: max(var(--bl-page-padding), var(--slider-overlay-padding-x));
-      padding-right: max(var(--bl-page-padding), var(--slider-overlay-padding-x));
+      padding-left: min(var(--bl-container-padding-xl), max(var(--bl-page-padding), var(--slider-overlay-padding-x)));
+      padding-right: min(var(--bl-container-padding-xl), max(var(--bl-page-padding), var(--slider-overlay-padding-x)));
     }
   }
 

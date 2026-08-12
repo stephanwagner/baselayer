@@ -147,9 +147,22 @@ function bl_forms_submitbox_placement_help(): void
 		return;
 	}
 
+	$form_id = (int) get_the_ID();
 	?>
 	<div class="misc-pub-section bl-forms-submitbox-help">
-		<?= esc_html__('Use the Form block to insert this form anywhere on your site.', 'baselayer-forms') ?>
+		<?php
+		if ($form_id > 0) {
+			echo esc_html(
+				sprintf(
+					/* translators: %d: form post ID for bl_render_form() */
+					__('Use the Form block to insert this form on your site, or call bl_render_form(%d) in PHP.', 'baselayer-forms'),
+					$form_id
+				)
+			);
+		} else {
+			echo esc_html__('Use the Form block to insert this form on your site, or call bl_render_form(ID) in PHP.', 'baselayer-forms');
+		}
+		?>
 	</div>
 	<?php
 }

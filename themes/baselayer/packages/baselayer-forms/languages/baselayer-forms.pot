@@ -108,7 +108,10 @@ msgid "Import"
 msgstr ""
 
 #: includes/admin.php:157
-msgid "Use the Form block to insert this form anywhere on your site."
+msgid "Use the Form block to insert this form on your site, or call bl_render_form(%d) in PHP."
+msgstr ""
+
+msgid "Use the Form block to insert this form on your site, or call bl_render_form(ID) in PHP."
 msgstr ""
 
 #: includes/admin.php:394
