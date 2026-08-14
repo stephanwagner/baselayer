@@ -2,7 +2,7 @@
 
 defined('ABSPATH') || exit;
 
-const BL_GOOGLE_FONT_METADATA_TRANSIENT = 'bl_google_fonts_metadata_v2';
+const BL_GOOGLE_FONT_METADATA_TRANSIENT = 'bl_google_fonts_metadata_v3';
 const BL_GOOGLE_FONT_METADATA_TTL = DAY_IN_SECONDS;
 const BL_GOOGLE_FONT_UA = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36';
 
@@ -80,7 +80,37 @@ function bl_google_font_family_slug(string $family): string
 }
 
 /**
- * @return array{family: string, category: string, popularity: int}[]|WP_Error
+ * Parse wght axis min/max from a Google metadata row.
+ *
+ * @param array<string, mixed> $row
+ * @return array{min: int, max: int}|null
+ */
+function bl_google_font_parse_wght_axis(array $row): ?array
+{
+	if (empty($row['axes']) || !is_array($row['axes'])) {
+		return null;
+	}
+	foreach ($row['axes'] as $axis) {
+		if (!is_array($axis) || ($axis['tag'] ?? '') !== 'wght') {
+			continue;
+		}
+		if (!isset($axis['min'], $axis['max'])) {
+			return null;
+		}
+		$min = (int) round((float) $axis['min']);
+		$max = (int) round((float) $axis['max']);
+		if ($min < 1 || $max < $min) {
+			return null;
+		}
+
+		return ['min' => $min, 'max' => $max];
+	}
+
+	return null;
+}
+
+/**
+ * @return array{family: string, category: string, popularity: int, wght_min?: int, wght_max?: int}[]|WP_Error
  */
 function bl_google_font_fetch_metadata()
 {
@@ -122,11 +152,17 @@ function bl_google_font_fetch_metadata()
 		if (!is_array($row) || empty($row['family']) || !is_string($row['family'])) {
 			continue;
 		}
-		$items[] = [
+		$item = [
 			'family' => $row['family'],
 			'category' => isset($row['category']) && is_string($row['category']) ? $row['category'] : '',
 			'popularity' => isset($row['popularity']) ? (int) $row['popularity'] : PHP_INT_MAX,
 		];
+		$wght = bl_google_font_parse_wght_axis($row);
+		if ($wght !== null) {
+			$item['wght_min'] = $wght['min'];
+			$item['wght_max'] = $wght['max'];
+		}
+		$items[] = $item;
 	}
 
 	usort($items, 'bl_google_font_compare_popularity');
@@ -134,6 +170,38 @@ function bl_google_font_fetch_metadata()
 	set_transient(BL_GOOGLE_FONT_METADATA_TRANSIENT, ['items' => $items], BL_GOOGLE_FONT_METADATA_TTL);
 
 	return $items;
+}
+
+/**
+ * Variable wght axis for a family from the Google catalog.
+ *
+ * @return array{min: int, max: int}|false|null Range, false if catalog says no wght axis, null if unknown.
+ */
+function bl_google_font_wght_range(string $family)
+{
+	$family = trim($family);
+	if ($family === '') {
+		return null;
+	}
+	$items = bl_google_font_fetch_metadata();
+	if (is_wp_error($items)) {
+		return null;
+	}
+	foreach ($items as $item) {
+		if (($item['family'] ?? '') !== $family) {
+			continue;
+		}
+		if (!isset($item['wght_min'], $item['wght_max'])) {
+			return false;
+		}
+
+		return [
+			'min' => (int) $item['wght_min'],
+			'max' => (int) $item['wght_max'],
+		];
+	}
+
+	return null;
 }
 
 /**
@@ -166,7 +234,110 @@ function bl_google_font_search_items(array $items, string $query, int $limit = 4
 }
 
 /**
+ * Whether Google CSS uses variable font-weight ranges (e.g. "200 1000").
+ */
+function bl_google_font_css_is_variable(string $css): bool
+{
+	return (bool) preg_match('/font-weight:\s*\d+\s+\d+/i', $css);
+}
+
+/**
+ * Allowed unicode-subset comments kept when installing Google Fonts.
+ *
+ * @return string[]
+ */
+function bl_google_font_allowed_subsets(): array
+{
+	return ['cyrillic-ext', 'cyrillic', 'vietnamese', 'latin-ext', 'latin'];
+}
+
+/**
+ * HTTP GET Google Fonts CSS; returns body or null on failure.
+ *
+ * @param WP_Error|null $last_error
+ * @return string|null
+ */
+function bl_google_font_http_get_css(string $url, ?WP_Error &$last_error = null): ?string
+{
+	$response = wp_remote_get(
+		$url,
+		[
+			'timeout' => 20,
+			'headers' => [
+				'User-Agent' => BL_GOOGLE_FONT_UA,
+				'Accept' => 'text/css,*/*;q=0.1',
+			],
+		]
+	);
+	if (is_wp_error($response)) {
+		$last_error = $response;
+
+		return null;
+	}
+	$code = (int) wp_remote_retrieve_response_code($response);
+	$body = (string) wp_remote_retrieve_body($response);
+	if ($code >= 200 && $code < 300 && $body !== '' && str_contains($body, '@font-face')) {
+		return $body;
+	}
+	$last_error = new WP_Error('bl_google_font_css', __('Google did not return font CSS for this family.', 'baselayer'));
+
+	return null;
+}
+
+/**
+ * Keep only @font-face blocks for allowed Latin/Cyrillic/Vietnamese subsets.
+ *
+ * @return string|WP_Error Filtered CSS, or error when nothing remains.
+ */
+function bl_google_font_filter_allowed_subsets(string $css)
+{
+	$allowed = array_fill_keys(bl_google_font_allowed_subsets(), true);
+	$kept = [];
+
+	if (!preg_match_all('/(?:\/\*\s*([^*]+?)\s*\*\/\s*)?@font-face\s*\{[^{}]*\}/s', $css, $matches, PREG_SET_ORDER)) {
+		return new WP_Error('bl_google_font_subsets', __('No font faces were found in the Google CSS.', 'baselayer'));
+	}
+
+	foreach ($matches as $match) {
+		$subset = isset($match[1]) ? strtolower(trim((string) $match[1])) : '';
+		if ($subset === '' || !isset($allowed[$subset])) {
+			continue;
+		}
+		$face = (string) preg_replace('/^\/\*\s*[^*]+?\s*\*\/\s*/', '', $match[0]);
+		$kept[] = '/* ' . $subset . " */\n" . trim($face);
+	}
+
+	if ($kept === []) {
+		return new WP_Error(
+			'bl_google_font_subsets',
+			__('No Latin/Cyrillic/Vietnamese font faces were found for this family.', 'baselayer')
+		);
+	}
+
+	return implode("\n\n", $kept) . "\n";
+}
+
+/**
+ * Build CSS2 URLs for a variable wght (+ italic) request.
+ * Google rejects ranges outside the font’s declared axis (e.g. Nunito Sans is 200..1000, not 100..900).
+ *
+ * @param array{min: int, max: int} $range
+ * @return string[]
+ */
+function bl_google_font_variable_css_urls(string $encoded_family, array $range): array
+{
+	$axis = $range['min'] . '..' . $range['max'];
+	$base = 'https://fonts.googleapis.com/css2?family=' . $encoded_family;
+
+	return [
+		$base . ':ital,wght@0,' . $axis . ';1,' . $axis . '&display=block',
+		$base . ':wght@' . $axis . '&display=block',
+	];
+}
+
+/**
  * Fetch Google Fonts CSS2 for a family (woff2).
+ * Prefers variable axis CSS using the catalog wght range; falls back to static 300–900 (+ italic).
  *
  * @return string|WP_Error
  */
@@ -178,34 +349,48 @@ function bl_google_font_fetch_css(string $family)
 	}
 
 	$encoded = rawurlencode($family);
-	$urls = [
-		'https://fonts.googleapis.com/css2?family=' . $encoded . ':ital,wght@0,100..900;1,100..900&display=block',
-		'https://fonts.googleapis.com/css2?family=' . $encoded . ':wght@100..900&display=block',
-		'https://fonts.googleapis.com/css2?family=' . $encoded . '&display=block',
+	$base = 'https://fonts.googleapis.com/css2?family=' . $encoded;
+	$static_weights = '300;400;500;600;700;800;900';
+	$static_ital = '0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900';
+
+	$wght = bl_google_font_wght_range($family);
+	$variable_urls = [];
+	if (is_array($wght)) {
+		$variable_urls = bl_google_font_variable_css_urls($encoded, $wght);
+	} elseif ($wght === null) {
+		// Catalog miss / fetch failure: try common ranges before static.
+		foreach ([[100, 900], [200, 1000], [100, 1000], [300, 800]] as [$min, $max]) {
+			$variable_urls = array_merge(
+				$variable_urls,
+				bl_google_font_variable_css_urls($encoded, ['min' => $min, 'max' => $max])
+			);
+		}
+	}
+	// $wght === false → known static-only family; skip variable URLs.
+
+	$static_urls = [
+		$base . ':ital,wght@' . $static_ital . '&display=block',
+		$base . ':wght@' . $static_weights . '&display=block',
 	];
 
 	$last_error = null;
-	foreach ($urls as $url) {
-		$response = wp_remote_get(
-			$url,
-			[
-				'timeout' => 20,
-				'headers' => [
-					'User-Agent' => BL_GOOGLE_FONT_UA,
-					'Accept' => 'text/css,*/*;q=0.1',
-				],
-			]
-		);
-		if (is_wp_error($response)) {
-			$last_error = $response;
+
+	foreach ($variable_urls as $url) {
+		$body = bl_google_font_http_get_css($url, $last_error);
+		if ($body === null) {
 			continue;
 		}
-		$code = (int) wp_remote_retrieve_response_code($response);
-		$body = (string) wp_remote_retrieve_body($response);
-		if ($code >= 200 && $code < 300 && $body !== '' && str_contains($body, '@font-face')) {
+		if (bl_google_font_css_is_variable($body)) {
 			return $body;
 		}
-		$last_error = new WP_Error('bl_google_font_css', __('Google did not return font CSS for this family.', 'baselayer'));
+		// Non-variable response for an axis URL — keep trying other ranges / static.
+	}
+
+	foreach ($static_urls as $url) {
+		$body = bl_google_font_http_get_css($url, $last_error);
+		if ($body !== null) {
+			return $body;
+		}
 	}
 
 	return $last_error instanceof WP_Error
@@ -518,6 +703,11 @@ function bl_google_font_install(string $family)
 	}
 
 	$css = bl_google_font_fetch_css($family);
+	if (is_wp_error($css)) {
+		return $css;
+	}
+
+	$css = bl_google_font_filter_allowed_subsets($css);
 	if (is_wp_error($css)) {
 		return $css;
 	}
