@@ -7,11 +7,11 @@
   display: flex;
   justify-content: center;
 
-  &.-icon-align-left {
+  &.-justify-left {
     justify-content: flex-start;
   }
 
-  &.-icon-align-right {
+  &.-justify-right {
     justify-content: flex-end;
   }
 

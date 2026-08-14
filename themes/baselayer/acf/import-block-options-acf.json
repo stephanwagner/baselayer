@@ -19,7 +19,7 @@
                         {
                             "icon": "image-left",
                             "label": "Links",
-                            "value": "-icon-align-left"
+                            "value": "-justify-left"
                         },
                         {
                             "icon": "image-center",
@@ -29,7 +29,7 @@
                         {
                             "icon": "image-right",
                             "label": "Rechts",
-                            "value": "-icon-align-right"
+                            "value": "-justify-right"
                         }
                     ]
                 }
@@ -63,17 +63,17 @@
                         {
                             "icon": "image-left",
                             "label": "Links",
-                            "value": "-icon-align-left"
+                            "value": "-justify-left"
                         },
                         {
                             "icon": "image-center",
                             "label": "Zentriert",
-                            "value": "-icon-align-center"
+                            "value": "-justify-center"
                         },
                         {
                             "icon": "image-right",
                             "label": "Rechts",
-                            "value": "-icon-align-right"
+                            "value": "-justify-right"
                         }
                     ]
                 }

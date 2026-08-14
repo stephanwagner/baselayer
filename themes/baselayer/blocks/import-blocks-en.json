@@ -661,7 +661,7 @@
             {
               "icon": "image-left",
               "label": "Left",
-              "value": "-icon-align-left"
+              "value": "-justify-left"
             },
             {
               "icon": "image-center",
@@ -671,7 +671,7 @@
             {
               "icon": "image-right",
               "label": "Right",
-              "value": "-icon-align-right"
+              "value": "-justify-right"
             }
           ]
         }
@@ -732,17 +732,17 @@
             {
               "icon": "image-left",
               "label": "Left",
-              "value": "-icon-align-left"
+              "value": "-justify-left"
             },
             {
               "icon": "image-center",
               "label": "Center",
-              "value": "-icon-align-center"
+              "value": "-justify-center"
             },
             {
               "icon": "image-right",
               "label": "Right",
-              "value": "-icon-align-right"
+              "value": "-justify-right"
             }
           ]
         }
