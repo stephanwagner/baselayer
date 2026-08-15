@@ -7400,7 +7400,7 @@
         button: {
           text: i18n2("selectMedia", "Select")
         },
-        multiple
+        multiple: multiple ? "add" : false
       };
       if (libraryType) {
         opts.library = { type: libraryType };
@@ -7555,7 +7555,7 @@
         const opts = {
           title: kind === "image" ? multiple ? i18n2("mediaPickerTitleImages", "Select images") : i18n2("mediaPickerTitleImage", "Select image") : multiple ? i18n2("mediaPickerTitleFiles", "Select files") : i18n2("mediaPickerTitleFile", "Select file"),
           button: { text: i18n2("selectMedia", "Select") },
-          multiple
+          multiple: multiple ? "add" : false
         };
         if (libraryType) {
           opts.library = { type: libraryType };

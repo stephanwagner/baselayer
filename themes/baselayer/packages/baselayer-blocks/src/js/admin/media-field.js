@@ -389,7 +389,7 @@ export function createMediaPickerControl(field, current) {
       button: {
         text: i18n('selectMedia', 'Select'),
       },
-      multiple: multiple,
+      multiple: multiple ? 'add' : false,
     };
     if (libraryType) {
       opts.library = { type: libraryType };
@@ -580,7 +580,7 @@ export function bindMediaPickers(root = document) {
               ? i18n('mediaPickerTitleFiles', 'Select files')
               : i18n('mediaPickerTitleFile', 'Select file'),
         button: { text: i18n('selectMedia', 'Select') },
-        multiple,
+        multiple: multiple ? 'add' : false,
       };
       if (libraryType) {
         opts.library = { type: libraryType };
