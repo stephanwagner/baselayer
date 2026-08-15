@@ -87,6 +87,9 @@
   align-items: stretch;
   min-width: 0;
 }
+.bl-form__column[hidden] {
+  display: none !important;
+}
 .bl-form__column--auto {
   flex: 1 1 0;
   width: auto;
@@ -126,6 +129,9 @@
   flex-direction: column;
   gap: 10px;
   min-width: 0;
+}
+.bl-form__section[hidden] {
+  display: none !important;
 }
 .bl-form__section--auto {
   flex: 1 1 0;
