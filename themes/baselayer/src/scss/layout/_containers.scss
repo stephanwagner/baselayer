@@ -40,7 +40,10 @@
     padding-right: var(--bl-container-wide-content-inset) !important;
 
     // Sliders apply L/R on the slide content, not the wrapper.
-    &.slider__wrapper {
+    // Editor: option classes sit on the Gutenberg shell, not `.slider__wrapper`.
+    &.slider__wrapper,
+    &.wp-block-baselayer-slider,
+    &.wp-block-acf-slider {
       padding-left: 0 !important;
       padding-right: 0 !important;
     }
@@ -83,7 +86,9 @@
       padding-left: var(--bl-container-wide-content-inset) !important;
       padding-right: var(--bl-container-wide-content-inset) !important;
 
-      &.slider__wrapper {
+      &.slider__wrapper,
+      &.wp-block-baselayer-slider,
+      &.wp-block-acf-slider {
         padding-left: 0 !important;
         padding-right: 0 !important;
       }
@@ -100,7 +105,9 @@
     padding-left: var(--bl-wide-content-inset) !important;
     padding-right: var(--bl-wide-content-inset) !important;
 
-    &.slider__wrapper {
+    &.slider__wrapper,
+    &.wp-block-baselayer-slider,
+    &.wp-block-acf-slider {
       padding-left: 0 !important;
       padding-right: 0 !important;
     }
