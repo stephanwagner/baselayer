@@ -683,7 +683,13 @@ function logicConditionsMet(logic, form) {
 
 function setLogicFieldVisible(wrap, visible) {
   wrap.hidden = !visible;
-  wrap.setAttribute('aria-hidden', visible ? 'false' : 'true');
+  wrap.classList.toggle('is-bl-logic-hidden', !visible);
+  // Spacers are always decorative; keep aria-hidden true even when shown.
+  if (!wrap.classList.contains('bl-form__spacer-wrap')) {
+    wrap.setAttribute('aria-hidden', visible ? 'false' : 'true');
+  } else {
+    wrap.setAttribute('aria-hidden', 'true');
+  }
 
   wrap.querySelectorAll('input, select, textarea, button').forEach((el) => {
     if (visible) {

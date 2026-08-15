@@ -470,81 +470,7 @@ function bl_forms_field_char_count_html(array $field, string $input_id, array $s
 }
 
 /**
- * Group fields into flex rows the way percentage widths pack on desktop.
- *
- * @param list<array<string, mixed>> $fields
- * @return list<list<array<string, mixed>>>
- */
-function bl_forms_chunk_fields_into_rows(array $fields): array
-{
-	$rows = [];
-	$current = [];
-	$sum = 0.0;
-
-	foreach ($fields as $field) {
-		if (!is_array($field)) {
-			continue;
-		}
-
-		$factor = bl_forms_field_pack_factor($field);
-		$pack = $factor ?? 1.0;
-
-		// Full-width / unknown units start a fresh row alone.
-		if ($factor === null || $pack >= 0.999) {
-			if ($current !== []) {
-				$rows[] = $current;
-				$current = [];
-				$sum = 0.0;
-			}
-			$rows[] = [$field];
-			continue;
-		}
-
-		if ($sum > 0.0 && ($sum + $pack) > 1.001) {
-			$rows[] = $current;
-			$current = [];
-			$sum = 0.0;
-		}
-
-		$current[] = $field;
-		$sum += $pack;
-	}
-
-	if ($current !== []) {
-		$rows[] = $current;
-	}
-
-	return $rows;
-}
-
-/**
- * Whether a packed row should pair to ~50% columns at breakpoint-m.
- *
- * Rule: 2+ fields and every field is ≤50% (e.g. 25×4, 33×3, 50×2),
- * but not mixed rows like 75|25.
- *
- * @param list<array<string, mixed>> $row
- */
-function bl_forms_row_should_pair_at_m(array $row): bool
-{
-	if (count($row) < 2) {
-		return false;
-	}
-
-	$max = 0.0;
-	foreach ($row as $field) {
-		$factor = bl_forms_field_pack_factor($field);
-		if ($factor === null) {
-			return false;
-		}
-		$max = max($max, $factor);
-	}
-
-	return $max <= 0.5001;
-}
-
-/**
- * Render a list of fields wrapped in responsive rows.
+ * Render a flat list of fields (parent packs with flex-wrap).
  *
  * @param list<array<string, mixed>> $fields
  * @param array<string, mixed>       $settings
@@ -552,26 +478,18 @@ function bl_forms_row_should_pair_at_m(array $row): bool
 function bl_forms_render_field_rows(array $fields, string $uid, array $settings = [], array $context = []): string
 {
 	$html = '';
-	foreach (bl_forms_chunk_fields_into_rows($fields) as $row) {
-		$inner = '';
-		foreach ($row as $field) {
-			$inner .= bl_forms_render_field($field, $uid, $settings, $context);
-		}
-		if ($inner === '') {
+	foreach ($fields as $field) {
+		if (!is_array($field)) {
 			continue;
 		}
-		$classes = 'bl-form__row';
-		if (bl_forms_row_should_pair_at_m($row)) {
-			$classes .= ' bl-form__row--pair-m';
-		}
-		$html .= '<div class="' . esc_attr($classes) . '">' . $inner . '</div>';
+		$html .= bl_forms_render_field($field, $uid, $settings, $context);
 	}
 
 	return $html;
 }
 
 /**
- * Render root fields, wrapping consecutive columns in a group and other fields in rows.
+ * Render root fields, wrapping consecutive columns in a group; other fields pack flat.
  *
  * @param list<array<string, mixed>> $fields
  * @param array<string, mixed>       $settings

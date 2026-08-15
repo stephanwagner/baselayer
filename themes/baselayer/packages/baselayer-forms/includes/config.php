@@ -1254,27 +1254,6 @@ function bl_forms_field_width_style(array $field): string
 }
 
 /**
- * Pack factor (0–1) for flex row grouping, or null when width is not a shareable %.
- *
- * @param array<string, mixed> $field
- */
-function bl_forms_field_pack_factor(array $field): ?float
-{
-	$width = (string) ($field['width'] ?? '100');
-	if ($width === 'auto') {
-		return null;
-	}
-	if ($width === 'custom') {
-		$custom = trim((string) ($field['width_custom'] ?? ''));
-		if ($custom === '' || !preg_match('/^\d+(?:\.\d+)?%$/', $custom)) {
-			return null;
-		}
-	}
-
-	return (float) bl_forms_field_width_vars($field)['factor'];
-}
-
-/**
  * CSS width value for a field.
  *
  * @param array<string, mixed> $field

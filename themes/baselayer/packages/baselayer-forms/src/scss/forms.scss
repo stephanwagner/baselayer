@@ -6,6 +6,13 @@
   font-size: var(--bl-form-font-size);
   line-height: var(--bl-form-line-height);
   color: var(--bl-form-color);
+
+  // Conditional logic (and other UI) uses the HTML `hidden` attribute. Author
+  // `display`/`height` on sections, spacers, etc. must not keep them visible.
+  [hidden],
+  .is-bl-logic-hidden {
+    display: none !important;
+  }
 }
 
 .bl-form__form {
@@ -16,28 +23,9 @@
 
 .bl-form__fields {
   display: flex;
-  flex-direction: column;
-  gap: var(--bl-form-gap);
-}
-
-.bl-form__row {
-  display: flex;
   flex-wrap: wrap;
   gap: var(--bl-form-gap);
   align-items: flex-start;
-  box-sizing: border-box;
-  width: 100%;
-  max-width: 100%;
-}
-
-// Rows where every field is ≤50%: pair to 50/50 at -m (25×4 → 2×2, 33×3 → 2+1).
-// Mixed rows like 75|25 keep desktop widths until -s.
-.bl-form__row--pair-m {
-  @media (max-width: $breakpoint-m) {
-    > .bl-form__field-wrap {
-      width: min(100%, calc(50% - (var(--bl-form-gap) * 0.5)));
-    }
-  }
 }
 
 .bl-form__group {
@@ -49,6 +37,10 @@
   flex: 0 1 auto;
   width: 100%;
   max-width: 100%;
+
+  &:not(:has(> :not([hidden]))) {
+    display: none !important;
+  }
 }
 
 .bl-form__column {
@@ -56,11 +48,12 @@
   flex: 0 1 auto;
   width: min(100%, calc(var(--bl-form-field-width, 100%) - (var(--bl-form-gap) * (1 - var(--bl-form-field-width-factor, 1)))));
   max-width: 100%;
+  min-width: min(100%, 12rem);
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: var(--bl-form-gap);
-  align-items: stretch;
-  min-width: 0;
+  align-items: flex-start;
+  align-content: flex-start;
 
   &[hidden] {
     display: none !important;
@@ -69,6 +62,7 @@
   &--auto {
     flex: 1 1 0;
     width: auto;
+    min-width: min(100%, 12rem);
   }
 
   // Always stack to one column at -s.
@@ -76,6 +70,7 @@
     flex: 0 1 auto;
     flex-basis: 100%;
     width: 100% !important;
+    min-width: 0;
   }
 }
 
@@ -98,6 +93,7 @@
     .bl-form__column--auto {
       flex-basis: 100%;
       width: 100% !important;
+      min-width: 0;
     }
   }
 }
@@ -107,10 +103,10 @@
   flex: 0 1 auto;
   width: min(100%, calc(var(--bl-form-field-width, 100%) - (var(--bl-form-gap) * (1 - var(--bl-form-field-width-factor, 1)))));
   max-width: 100%;
+  min-width: min(100%, 12rem);
   display: flex;
   flex-direction: column;
   gap: 10px;
-  min-width: 0;
 
   &[hidden] {
     display: none !important;
@@ -119,12 +115,14 @@
   &--auto {
     flex: 1 1 0;
     width: auto;
+    min-width: min(100%, 12rem);
   }
 
   @media (max-width: $breakpoint-s) {
     flex: 0 1 auto;
     flex-basis: 100%;
     width: 100% !important;
+    min-width: 0;
   }
 }
 
@@ -157,8 +155,9 @@
 
 .bl-form__section-body {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   gap: var(--bl-form-gap);
+  align-items: flex-start;
   width: 100%;
 }
 
@@ -243,6 +242,7 @@
   // Share the row gap so 50% + 50% (and 33/33/33, etc.) fit on one line.
   width: min(100%, calc(var(--bl-form-field-width, 100%) - (var(--bl-form-gap) * (1 - var(--bl-form-field-width-factor, 1)))));
   max-width: 100%;
+  min-width: min(100%, 12rem);
 
   &[hidden] {
     display: none !important;
@@ -251,6 +251,7 @@
   @media (max-width: $breakpoint-s) {
     flex-basis: 100%;
     width: 100% !important;
+    min-width: 0;
   }
 }
 
@@ -258,8 +259,19 @@
 .bl-form__spacer-wrap[hidden],
 .bl-form__heading[hidden],
 .bl-form__text[hidden],
-.bl-form__html[hidden] {
+.bl-form__html[hidden],
+.bl-form__divider-wrap.is-bl-logic-hidden,
+.bl-form__spacer-wrap.is-bl-logic-hidden,
+.bl-form__heading.is-bl-logic-hidden,
+.bl-form__text.is-bl-logic-hidden,
+.bl-form__html.is-bl-logic-hidden {
   display: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  overflow: hidden !important;
 }
 
 .bl-form__honeypot {
