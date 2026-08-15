@@ -275,7 +275,7 @@ function bl_article_list_block_query_limit(array $block): array
 
 	if ($limit_type === 'limit') {
 		return [
-			'posts_per_page'  => $posts_per_page > 0 ? $posts_per_page : -1,
+			'posts_per_page'  => $posts_per_page > 0 ? $posts_per_page : 20,
 			'paged'           => 1,
 			'uses_pagination' => false,
 		];
@@ -285,7 +285,7 @@ function bl_article_list_block_query_limit(array $block): array
 	$paged = max(1, (int) get_query_var('paged'), (int) get_query_var('page'));
 
 	return [
-		'posts_per_page'  => $posts_per_page,
+		'posts_per_page'  => $posts_per_page > 0 ? $posts_per_page : 20,
 		'paged'           => $paged,
 		'uses_pagination' => $uses_pagination,
 	];

@@ -64,6 +64,9 @@ $queryArgs = [
     'order'          => $orderDirection,
     'paged'          => $paged,
 ];
+if (!$usesPagination) {
+    $queryArgs['no_found_rows'] = true;
+}
 
 $taxQuery = bl_article_list_build_tax_query($taxonomy, $selectedTermId);
 if ($taxQuery !== []) {

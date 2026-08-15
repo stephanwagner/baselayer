@@ -132,6 +132,28 @@ function bl_blocks_block_definition_payload(WP_Post $post): ?array
  */
 function bl_blocks_active_block_payloads(): array
 {
+	static $memo = null;
+	static $memo_v = 0;
+	$cache_v = bl_blocks_definitions_cache_version();
+	if ($memo_v !== $cache_v) {
+		$memo = null;
+		$memo_v = $cache_v;
+	}
+	if (is_array($memo)) {
+		return $memo;
+	}
+
+	$cache_key = bl_blocks_active_payloads_cache_key();
+	$cached = wp_cache_get($cache_key, 'bl_blocks');
+	if ($cached === false) {
+		$cached = get_transient($cache_key);
+	}
+	if (is_array($cached)) {
+		$memo = $cached;
+
+		return $memo;
+	}
+
 	$out = [];
 	foreach (bl_blocks_query_definitions('block', true) as $post) {
 		$payload = bl_blocks_block_definition_payload($post);
@@ -139,6 +161,10 @@ function bl_blocks_active_block_payloads(): array
 			$out[] = $payload;
 		}
 	}
+
+	wp_cache_set($cache_key, $out, 'bl_blocks', HOUR_IN_SECONDS);
+	set_transient($cache_key, $out, HOUR_IN_SECONDS);
+	$memo = $out;
 
 	return $out;
 }

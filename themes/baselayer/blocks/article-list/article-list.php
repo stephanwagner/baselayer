@@ -32,7 +32,7 @@ if ($has_limit) {
 	}
 	$posts_per_page = is_numeric($limit) ? (int) $limit : 0;
 	if ($limit_type === 'limit') {
-		$posts_per_page = $posts_per_page > 0 ? $posts_per_page : -1;
+		$posts_per_page = $posts_per_page > 0 ? $posts_per_page : 20;
 	} else {
 		$uses_pagination = true;
 		$paged = max(1, (int) get_query_var('paged'), (int) get_query_var('page'));
@@ -73,6 +73,9 @@ $query_args = [
 	'order'          => $order_direction,
 	'paged'          => $paged,
 ];
+if (!$uses_pagination) {
+	$query_args['no_found_rows'] = true;
+}
 
 $tax_query = function_exists('bl_article_list_build_tax_query')
 	? bl_article_list_build_tax_query($taxonomy, $selected_term_id)

@@ -1187,6 +1187,30 @@ function bl_blocks_next_site_settings_order(int $exclude_id = 0): int
 function bl_blocks_query_definitions(string $type, bool $active_only = false): array
 {
 	$type = bl_blocks_sanitize_definition_type($type);
+	$cache_key = bl_blocks_definitions_query_cache_key($type, $active_only);
+	$cache_v = bl_blocks_definitions_cache_version();
+
+	static $memo = [];
+	static $memo_v = 0;
+	if ($memo_v !== $cache_v) {
+		$memo = [];
+		$memo_v = $cache_v;
+	}
+	if (isset($memo[$cache_key])) {
+		return $memo[$cache_key];
+	}
+
+	$cached_ids = wp_cache_get($cache_key, 'bl_blocks');
+	if ($cached_ids === false) {
+		$cached_ids = get_transient($cache_key);
+	}
+	if (is_array($cached_ids)) {
+		$posts = bl_blocks_hydrate_definition_posts($cached_ids);
+		$memo[$cache_key] = $posts;
+
+		return $posts;
+	}
+
 	// Runtime (blocks / Website / page panels): published only.
 	// Admin lists / meta registration: include drafts & pending too.
 	$statuses = $active_only
@@ -1202,34 +1226,109 @@ function bl_blocks_query_definitions(string $type, bool $active_only = false): a
 		'meta_value'     => $type,
 	]);
 
-	if (!$active_only) {
-		return $posts;
-	}
-
-	$out = [];
-	foreach ($posts as $post) {
-		$config = bl_blocks_get_config((int) $post->ID);
-		if (!empty($config['settings']['active'])) {
-			$out[] = $post;
-		}
-	}
-
-	if (in_array($type, ['site_settings', 'page_settings'], true)) {
-		usort($out, static function (WP_Post $a, WP_Post $b): int {
-			$sa = bl_blocks_get_config((int) $a->ID)['settings'];
-			$sb = bl_blocks_get_config((int) $b->ID)['settings'];
-			$oa = (int) ($sa['menu_order'] ?? 1);
-			$ob = (int) ($sb['menu_order'] ?? 1);
-			if ($oa === $ob) {
-				return strcasecmp($a->post_title, $b->post_title);
+	if ($active_only) {
+		$out = [];
+		foreach ($posts as $post) {
+			$config = bl_blocks_get_config((int) $post->ID);
+			if (!empty($config['settings']['active'])) {
+				$out[] = $post;
 			}
+		}
 
-			return $oa <=> $ob;
-		});
+		if (in_array($type, ['site_settings', 'page_settings'], true)) {
+			usort($out, static function (WP_Post $a, WP_Post $b): int {
+				$sa = bl_blocks_get_config((int) $a->ID)['settings'];
+				$sb = bl_blocks_get_config((int) $b->ID)['settings'];
+				$oa = (int) ($sa['menu_order'] ?? 1);
+				$ob = (int) ($sb['menu_order'] ?? 1);
+				if ($oa === $ob) {
+					return strcasecmp($a->post_title, $b->post_title);
+				}
+
+				return $oa <=> $ob;
+			});
+		}
+		$posts = $out;
 	}
 
-	return $out;
+	$ids = array_map(static fn(WP_Post $p): int => (int) $p->ID, $posts);
+	wp_cache_set($cache_key, $ids, 'bl_blocks', HOUR_IN_SECONDS);
+	set_transient($cache_key, $ids, HOUR_IN_SECONDS);
+	$memo[$cache_key] = $posts;
+
+	return $posts;
 }
+
+/**
+ * Cache version for block-definition queries / payloads (bumped on save/delete).
+ */
+function bl_blocks_definitions_cache_version(): int
+{
+	return max(1, (int) get_option('bl_blocks_defs_cache_v', 1));
+}
+
+/**
+ * Invalidate cached definition lists and active block payloads.
+ */
+function bl_blocks_invalidate_definitions_cache(): void
+{
+	$next = bl_blocks_definitions_cache_version() + 1;
+	update_option('bl_blocks_defs_cache_v', $next, true);
+}
+
+/**
+ * @param string $type
+ */
+function bl_blocks_definitions_query_cache_key(string $type, bool $active_only): string
+{
+	return 'bl_blocks_defs_' . bl_blocks_definitions_cache_version() . '_' . $type . '_' . ($active_only ? 'a' : 'all');
+}
+
+function bl_blocks_active_payloads_cache_key(): string
+{
+	return 'bl_blocks_payloads_' . bl_blocks_definitions_cache_version();
+}
+
+/**
+ * @param list<int|string> $ids
+ * @return list<WP_Post>
+ */
+function bl_blocks_hydrate_definition_posts(array $ids): array
+{
+	$ids = array_values(array_filter(array_map('intval', $ids), static fn(int $id): bool => $id > 0));
+	if ($ids === []) {
+		return [];
+	}
+
+	$posts = get_posts([
+		'post_type'              => BL_BLOCK_POST_TYPE,
+		'post_status'            => 'any',
+		'post__in'               => $ids,
+		'orderby'                => 'post__in',
+		'posts_per_page'         => count($ids),
+		'no_found_rows'          => true,
+		'update_post_meta_cache' => true,
+		'update_post_term_cache' => false,
+	]);
+
+	return array_values(array_filter($posts, static fn($p): bool => $p instanceof WP_Post));
+}
+
+/**
+ * Bump definition caches when a bl_block post is saved, trashed, or deleted.
+ */
+function bl_blocks_maybe_invalidate_definitions_cache($post_id): void
+{
+	$post_id = (int) $post_id;
+	if ($post_id <= 0 || get_post_type($post_id) !== BL_BLOCK_POST_TYPE) {
+		return;
+	}
+	bl_blocks_invalidate_definitions_cache();
+}
+add_action('save_post_' . BL_BLOCK_POST_TYPE, 'bl_blocks_maybe_invalidate_definitions_cache', 99);
+add_action('trashed_post', 'bl_blocks_maybe_invalidate_definitions_cache', 99);
+add_action('untrashed_post', 'bl_blocks_maybe_invalidate_definitions_cache', 99);
+add_action('before_delete_post', 'bl_blocks_maybe_invalidate_definitions_cache', 99);
 
 /**
  * Force an absolute https URL (strip any scheme).
