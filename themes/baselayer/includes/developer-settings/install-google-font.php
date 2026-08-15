@@ -131,7 +131,7 @@ function bl_google_font_fetch_metadata()
 	);
 
 	if (is_wp_error($response)) {
-		return $response;
+		return bl_google_font_normalize_remote_error($response);
 	}
 
 	$code = (int) wp_remote_retrieve_response_code($response);
@@ -173,35 +173,54 @@ function bl_google_font_fetch_metadata()
 }
 
 /**
- * Variable wght axis for a family from the Google catalog.
+ * Exact catalog row for a family name.
  *
- * @return array{min: int, max: int}|false|null Range, false if catalog says no wght axis, null if unknown.
+ * @return array{family: string, category: string, popularity: int, wght_min?: int, wght_max?: int}|WP_Error
  */
-function bl_google_font_wght_range(string $family)
+function bl_google_font_catalog_item(string $family)
 {
 	$family = trim($family);
 	if ($family === '') {
-		return null;
+		return new WP_Error('bl_google_font_family', __('Choose a font family.', 'baselayer'));
 	}
+
 	$items = bl_google_font_fetch_metadata();
 	if (is_wp_error($items)) {
+		return $items;
+	}
+
+	foreach ($items as $item) {
+		if (($item['family'] ?? '') === $family) {
+			return $item;
+		}
+	}
+
+	return new WP_Error(
+		'bl_google_font_family',
+		sprintf(
+			/* translators: %s: font family name */
+			__('“%s” was not found in the Google Fonts catalog.', 'baselayer'),
+			$family
+		)
+	);
+}
+
+/**
+ * Variable wght axis from a catalog item, or null when static-only.
+ *
+ * @param array{wght_min?: int, wght_max?: int} $item
+ * @return array{min: int, max: int}|null
+ */
+function bl_google_font_item_wght_range(array $item): ?array
+{
+	if (!isset($item['wght_min'], $item['wght_max'])) {
 		return null;
 	}
-	foreach ($items as $item) {
-		if (($item['family'] ?? '') !== $family) {
-			continue;
-		}
-		if (!isset($item['wght_min'], $item['wght_max'])) {
-			return false;
-		}
 
-		return [
-			'min' => (int) $item['wght_min'],
-			'max' => (int) $item['wght_max'],
-		];
-	}
-
-	return null;
+	return [
+		'min' => (int) $item['wght_min'],
+		'max' => (int) $item['wght_max'],
+	];
 }
 
 /**
@@ -252,6 +271,45 @@ function bl_google_font_allowed_subsets(): array
 }
 
 /**
+ * Whether a WP_Error looks like an HTTP / cURL timeout.
+ */
+function bl_google_font_is_timeout_error(WP_Error $error): bool
+{
+	$message = strtolower($error->get_error_message());
+	if ($message === '') {
+		return false;
+	}
+
+	return str_contains($message, 'timed out')
+		|| str_contains($message, 'timeout')
+		|| str_contains($message, 'curl error 28')
+		|| str_contains($message, 'operation timed out');
+}
+
+/**
+ * User-facing message when a Google Font request times out.
+ */
+function bl_google_font_timeout_message(): string
+{
+	return __(
+		'The font download timed out. Try installing fewer fonts at once (one at a time if needed).',
+		'baselayer'
+	);
+}
+
+/**
+ * Prefer a clear timeout message over raw cURL / HTTP errors.
+ */
+function bl_google_font_normalize_remote_error(WP_Error $error): WP_Error
+{
+	if (bl_google_font_is_timeout_error($error)) {
+		return new WP_Error('bl_google_font_timeout', bl_google_font_timeout_message());
+	}
+
+	return $error;
+}
+
+/**
  * HTTP GET Google Fonts CSS; returns body or null on failure.
  *
  * @param WP_Error|null $last_error
@@ -270,7 +328,7 @@ function bl_google_font_http_get_css(string $url, ?WP_Error &$last_error = null)
 		]
 	);
 	if (is_wp_error($response)) {
-		$last_error = $response;
+		$last_error = bl_google_font_normalize_remote_error($response);
 
 		return null;
 	}
@@ -337,59 +395,56 @@ function bl_google_font_variable_css_urls(string $encoded_family, array $range):
 
 /**
  * Fetch Google Fonts CSS2 for a family (woff2).
- * Prefers variable axis CSS using the catalog wght range; falls back to static 300–900 (+ italic).
+ * Variable families use the catalog wght range only (no static fallback).
+ * Static-only families request 300–700 (+ italic when available).
  *
- * @return string|WP_Error
+ * @return array{css: string, mode: 'variable'|'static'}|WP_Error
  */
 function bl_google_font_fetch_css(string $family)
 {
-	$family = trim($family);
-	if ($family === '') {
-		return new WP_Error('bl_google_font_family', __('Choose a font family.', 'baselayer'));
+	$item = bl_google_font_catalog_item($family);
+	if (is_wp_error($item)) {
+		return $item;
 	}
 
+	$family = (string) $item['family'];
 	$encoded = rawurlencode($family);
 	$base = 'https://fonts.googleapis.com/css2?family=' . $encoded;
-	$static_weights = '300;400;500;600;700;800;900';
-	$static_ital = '0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,300;1,400;1,500;1,600;1,700;1,800;1,900';
+	$last_error = null;
+	$wght = bl_google_font_item_wght_range($item);
 
-	$wght = bl_google_font_wght_range($family);
-	$variable_urls = [];
-	if (is_array($wght)) {
-		$variable_urls = bl_google_font_variable_css_urls($encoded, $wght);
-	} elseif ($wght === null) {
-		// Catalog miss / fetch failure: try common ranges before static.
-		foreach ([[100, 900], [200, 1000], [100, 1000], [300, 800]] as [$min, $max]) {
-			$variable_urls = array_merge(
-				$variable_urls,
-				bl_google_font_variable_css_urls($encoded, ['min' => $min, 'max' => $max])
-			);
+	if ($wght !== null) {
+		foreach (bl_google_font_variable_css_urls($encoded, $wght) as $url) {
+			$body = bl_google_font_http_get_css($url, $last_error);
+			if ($body === null) {
+				continue;
+			}
+			if (bl_google_font_css_is_variable($body)) {
+				return ['css' => $body, 'mode' => 'variable'];
+			}
 		}
-	}
-	// $wght === false → known static-only family; skip variable URLs.
 
+		return new WP_Error(
+			'bl_google_font_css',
+			sprintf(
+				/* translators: %s: font family name */
+				__('Could not download the variable font for %s.', 'baselayer'),
+				$family
+			)
+		);
+	}
+
+	$static_weights = '300;400;500;600;700';
+	$static_ital = '0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700';
 	$static_urls = [
 		$base . ':ital,wght@' . $static_ital . '&display=block',
 		$base . ':wght@' . $static_weights . '&display=block',
 	];
 
-	$last_error = null;
-
-	foreach ($variable_urls as $url) {
-		$body = bl_google_font_http_get_css($url, $last_error);
-		if ($body === null) {
-			continue;
-		}
-		if (bl_google_font_css_is_variable($body)) {
-			return $body;
-		}
-		// Non-variable response for an axis URL — keep trying other ranges / static.
-	}
-
 	foreach ($static_urls as $url) {
 		$body = bl_google_font_http_get_css($url, $last_error);
 		if ($body !== null) {
-			return $body;
+			return ['css' => $body, 'mode' => 'static'];
 		}
 	}
 
@@ -407,7 +462,7 @@ function bl_google_font_is_allowed_asset_url(string $url): bool
 	if (!is_array($parts) || empty($parts['scheme']) || empty($parts['host']) || empty($parts['path'])) {
 		return false;
 	}
-	if (!in_array(strtolower((string) $parts['scheme']), ['https', 'http'], true)) {
+	if (!in_array(strtolower((string) $parts['scheme']), ['https'], true)) {
 		return false;
 	}
 	$host = strtolower((string) $parts['host']);
@@ -469,7 +524,7 @@ function bl_google_font_download_file(string $url, string $dest_path)
 		]
 	);
 	if (is_wp_error($response)) {
-		return $response;
+		return bl_google_font_normalize_remote_error($response);
 	}
 	$code = (int) wp_remote_retrieve_response_code($response);
 	$body = wp_remote_retrieve_body($response);
@@ -529,26 +584,6 @@ function bl_google_font_fonts_scss_path(array $target): string
 }
 
 /**
- * Legacy path used before fonts index moved to src/scss/_fonts.scss.
- */
-function bl_google_font_legacy_fonts_scss_path(array $target): string
-{
-	return $target['dir'] . 'src/scss/fonts/_fonts.scss';
-}
-
-/**
- * Rewrite legacy ../../../fonts/ @use paths to ../../fonts/ for src/scss/_fonts.scss.
- */
-function bl_google_font_normalize_fonts_scss(string $contents): string
-{
-	return (string) preg_replace(
-		"/@use\\s+(['\"])\\.\\.\\/\\.\\.\\/\\.\\.\\/fonts\\//",
-		'@use $1../../fonts/',
-		$contents
-	);
-}
-
-/**
  * Ensure child theme main/admin SCSS forward the local fonts index.
  */
 function bl_google_font_ensure_child_fonts_forward(array $target): ?WP_Error
@@ -574,14 +609,6 @@ function bl_google_font_ensure_child_fonts_forward(array $target): ?WP_Error
 		}
 
 		$original = $contents;
-
-		// Migrate legacy nested forward.
-		$contents = str_replace(
-			["@forward 'fonts/fonts';", '@forward "fonts/fonts";'],
-			$forward,
-			$contents
-		);
-
 		$has_forward = (bool) preg_match("/@forward\\s+['\"]fonts['\"]\\s*;/", $contents);
 		if (!$has_forward) {
 			// Prefer inserting after the child config forward.
@@ -620,7 +647,6 @@ function bl_google_font_ensure_child_fonts_forward(array $target): ?WP_Error
 function bl_google_font_register_in_fonts_scss(string $family, string $slug, array $target)
 {
 	$scss_path = bl_google_font_fonts_scss_path($target);
-	$legacy_path = bl_google_font_legacy_fonts_scss_path($target);
 	$dir = dirname($scss_path);
 	if (!wp_mkdir_p($dir)) {
 		return new WP_Error('bl_google_font_mkdir', __('Could not create the fonts SCSS directory.', 'baselayer'));
@@ -632,44 +658,22 @@ function bl_google_font_register_in_fonts_scss(string $family, string $slug, arr
 	}
 
 	$existing = is_readable($scss_path) ? (string) file_get_contents($scss_path) : '';
-	if ($existing === '' && is_readable($legacy_path)) {
-		$existing = bl_google_font_normalize_fonts_scss((string) file_get_contents($legacy_path));
-	} elseif ($existing !== '') {
-		$existing = bl_google_font_normalize_fonts_scss($existing);
-	}
-
 	$use = bl_google_font_use_snippet($slug);
-	$legacy_use = "@use '../../../fonts/{$slug}/{$slug}';";
 
-	// Already active (new or leftover legacy path).
-	if (
-		preg_match('/^\s*' . preg_quote($use, '/') . '\s*$/m', $existing)
-		|| preg_match('/^\s*' . preg_quote($legacy_use, '/') . '\s*$/m', $existing)
-	) {
-		$existing = str_replace($legacy_use, $use, $existing);
-		if (file_put_contents($scss_path, $existing) === false) {
-			return new WP_Error('bl_google_font_write', __('Could not update the fonts SCSS file.', 'baselayer'));
-		}
-		if ($legacy_path !== $scss_path && is_file($legacy_path)) {
-			@unlink($legacy_path);
-		}
+	// Already active.
+	if (preg_match('/^\s*' . preg_quote($use, '/') . '\s*$/m', $existing)) {
 		return true;
 	}
 
-	// Commented out — uncomment in place (new or legacy path form).
-	foreach ([$use, $legacy_use] as $candidate) {
-		$commented = '// ' . $candidate;
-		if (str_contains($existing, $commented)) {
-			$updated = str_replace($commented, $use, $existing);
-			$updated = str_replace($legacy_use, $use, $updated);
-			if (file_put_contents($scss_path, $updated) === false) {
-				return new WP_Error('bl_google_font_write', __('Could not update the fonts SCSS file.', 'baselayer'));
-			}
-			if ($legacy_path !== $scss_path && is_file($legacy_path)) {
-				@unlink($legacy_path);
-			}
-			return true;
+	// Commented out — uncomment in place.
+	$commented = '// ' . $use;
+	if (str_contains($existing, $commented)) {
+		$updated = str_replace($commented, $use, $existing);
+		if (file_put_contents($scss_path, $updated) === false) {
+			return new WP_Error('bl_google_font_write', __('Could not update the fonts SCSS file.', 'baselayer'));
 		}
+
+		return true;
 	}
 
 	if ($existing === '') {
@@ -683,8 +687,45 @@ function bl_google_font_register_in_fonts_scss(string $family, string $slug, arr
 	if (file_put_contents($scss_path, $existing . $block) === false) {
 		return new WP_Error('bl_google_font_write', __('Could not update the fonts SCSS file.', 'baselayer'));
 	}
-	if ($legacy_path !== $scss_path && is_file($legacy_path)) {
-		@unlink($legacy_path);
+
+	return true;
+}
+
+/**
+ * Remove all files inside a directory (non-recursive for nested dirs: recurse).
+ *
+ * @return true|WP_Error
+ */
+function bl_google_font_wipe_dir(string $dir)
+{
+	$dir = trailingslashit($dir);
+	if (!is_dir($dir)) {
+		return true;
+	}
+
+	$items = scandir($dir);
+	if ($items === false) {
+		return new WP_Error('bl_google_font_wipe', __('Could not clear the font directory.', 'baselayer'));
+	}
+
+	foreach ($items as $item) {
+		if ($item === '.' || $item === '..') {
+			continue;
+		}
+		$path = $dir . $item;
+		if (is_dir($path)) {
+			$result = bl_google_font_wipe_dir($path);
+			if (is_wp_error($result)) {
+				return $result;
+			}
+			if (!rmdir($path)) {
+				return new WP_Error('bl_google_font_wipe', __('Could not clear the font directory.', 'baselayer'));
+			}
+			continue;
+		}
+		if (!unlink($path)) {
+			return new WP_Error('bl_google_font_wipe', __('Could not clear the font directory.', 'baselayer'));
+		}
 	}
 
 	return true;
@@ -702,16 +743,20 @@ function bl_google_font_install(string $family)
 		return new WP_Error('bl_google_font_family', __('Choose a font family.', 'baselayer'));
 	}
 
-	$css = bl_google_font_fetch_css($family);
-	if (is_wp_error($css)) {
-		return $css;
+	$fetched = bl_google_font_fetch_css($family);
+	if (is_wp_error($fetched)) {
+		return $fetched;
 	}
+
+	$css = $fetched['css'];
+	$mode = $fetched['mode'];
 
 	$css = bl_google_font_filter_allowed_subsets($css);
 	if (is_wp_error($css)) {
 		return $css;
 	}
 
+	$faces = substr_count($css, '@font-face');
 	$urls = bl_google_font_extract_urls($css);
 	if ($urls === []) {
 		return new WP_Error('bl_google_font_urls', __('No font files were found in the Google CSS.', 'baselayer'));
@@ -725,6 +770,11 @@ function bl_google_font_install(string $family)
 
 	if (!wp_mkdir_p($version_dir)) {
 		return new WP_Error('bl_google_font_mkdir', __('Could not create the font directory.', 'baselayer'));
+	}
+
+	$wiped = bl_google_font_wipe_dir($version_dir);
+	if (is_wp_error($wiped)) {
+		return $wiped;
 	}
 
 	$url_to_filename = [];
@@ -782,6 +832,8 @@ function bl_google_font_install(string $family)
 		'target' => $target['label'],
 		'is_child' => $target['is_child'],
 		'files' => count($files),
+		'faces' => $faces,
+		'mode' => $mode,
 		'scss' => 'fonts/' . $slug . '/_' . $slug . '.scss',
 		'fonts_index' => 'src/scss/_fonts.scss',
 		'use' => $use,
@@ -825,6 +877,11 @@ function bl_google_font_install_many(array $families)
 	foreach ($normalized as $family) {
 		$result = bl_google_font_install($family);
 		if (is_wp_error($result)) {
+			$result = bl_google_font_normalize_remote_error($result);
+			if ($result->get_error_code() === 'bl_google_font_timeout') {
+				return $result;
+			}
+
 			return new WP_Error(
 				$result->get_error_code(),
 				sprintf(
