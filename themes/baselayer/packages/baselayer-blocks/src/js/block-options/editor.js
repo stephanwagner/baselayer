@@ -242,12 +242,16 @@ const managedStaticClasses = (blockConfig) => {
   return classes;
 };
 
-const collectOptionClasses = (blockConfig, attributes) => {
+const collectOptionClasses = (blockConfig, attributes, { isRootBlock = true } = {}) => {
   const classes = [];
 
   blockConfig.options.forEach((option) => {
     const custom = getCustom(option.type);
     if (custom?.classesFromAttributes) {
+      // Wide container only applies at root; keep attributes, skip classes when nested.
+      if (option.type === 'align-wide' && !isRootBlock) {
+        return;
+      }
       classes.push(...custom.classesFromAttributes(option, attributes));
       return;
     }
@@ -279,7 +283,7 @@ const collectOptionClasses = (blockConfig, attributes) => {
 const dedupeClasses = (classNames) =>
   [...new Set((classNames || '').split(/\s+/).filter(Boolean))].join(' ');
 
-const syncClassNameFromOptions = (attributes, blockConfig) => {
+const syncClassNameFromOptions = (attributes, blockConfig, { isRootBlock = true } = {}) => {
   const staticClasses = managedStaticClasses(blockConfig);
   const base = (attributes.className || '')
     .split(/\s+/)
@@ -293,7 +297,7 @@ const syncClassNameFromOptions = (attributes, blockConfig) => {
     })
     .join(' ');
 
-  const optionClasses = collectOptionClasses(blockConfig, attributes);
+  const optionClasses = collectOptionClasses(blockConfig, attributes, { isRootBlock });
 
   return dedupeClasses([base, ...optionClasses].filter(Boolean).join(' '));
 };
@@ -395,7 +399,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
 
     const setOptionAttributes = (updates) => {
       const nextAttributes = { ...attributes, ...updates };
-      const className = syncClassNameFromOptions(nextAttributes, blockConfig);
+      const className = syncClassNameFromOptions(nextAttributes, blockConfig, { isRootBlock });
 
       setAttributes({
         ...updates,
@@ -492,12 +496,12 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
     }, [props.name, attributes.height, attributes.spacerResponsiveHeight]);
 
     useEffect(() => {
-      const className = syncClassNameFromOptions(attributes, blockConfig);
+      const className = syncClassNameFromOptions(attributes, blockConfig, { isRootBlock });
 
       if (className !== (attributes.className || '')) {
         setAttributes({ className });
       }
-    }, blockOptionSyncDeps(blockConfig, attributes));
+    }, [...blockOptionSyncDeps(blockConfig, attributes), isRootBlock]);
 
     const buttonIconOnly = blockConfig.name === 'core/button' && isButtonIconOnly(attributes);
 

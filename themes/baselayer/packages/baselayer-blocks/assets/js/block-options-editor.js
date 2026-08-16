@@ -1827,11 +1827,14 @@
     });
     return classes;
   };
-  var collectOptionClasses = (blockConfig, attributes) => {
+  var collectOptionClasses = (blockConfig, attributes, { isRootBlock = true } = {}) => {
     const classes = [];
     blockConfig.options.forEach((option) => {
       const custom = getCustom(option.type);
       if (custom?.classesFromAttributes) {
+        if (option.type === "align-wide" && !isRootBlock) {
+          return;
+        }
         classes.push(...custom.classesFromAttributes(option, attributes));
         return;
       }
@@ -1850,7 +1853,7 @@
     return classes;
   };
   var dedupeClasses = (classNames) => [...new Set((classNames || "").split(/\s+/).filter(Boolean))].join(" ");
-  var syncClassNameFromOptions = (attributes, blockConfig) => {
+  var syncClassNameFromOptions = (attributes, blockConfig, { isRootBlock = true } = {}) => {
     const staticClasses = managedStaticClasses(blockConfig);
     const base = (attributes.className || "").split(/\s+/).filter(Boolean).filter((className) => {
       if (staticClasses.has(className) || isIconGlyphClass(className, blockConfig)) {
@@ -1858,7 +1861,7 @@
       }
       return true;
     }).join(" ");
-    const optionClasses = collectOptionClasses(blockConfig, attributes);
+    const optionClasses = collectOptionClasses(blockConfig, attributes, { isRootBlock });
     return dedupeClasses([base, ...optionClasses].filter(Boolean).join(" "));
   };
   var blockOptionAttributeKeys = (blockConfig) => blockConfig.options.flatMap((option) => {
@@ -1941,7 +1944,7 @@
       const prevHeightRef = useRef2(attributes.height);
       const setOptionAttributes = (updates) => {
         const nextAttributes = { ...attributes, ...updates };
-        const className = syncClassNameFromOptions(nextAttributes, blockConfig);
+        const className = syncClassNameFromOptions(nextAttributes, blockConfig, { isRootBlock });
         setAttributes({
           ...updates,
           className
@@ -2020,11 +2023,11 @@
         }
       }, [props.name, attributes.height, attributes.spacerResponsiveHeight]);
       useEffect(() => {
-        const className = syncClassNameFromOptions(attributes, blockConfig);
+        const className = syncClassNameFromOptions(attributes, blockConfig, { isRootBlock });
         if (className !== (attributes.className || "")) {
           setAttributes({ className });
         }
-      }, blockOptionSyncDeps(blockConfig, attributes));
+      }, [...blockOptionSyncDeps(blockConfig, attributes), isRootBlock]);
       const buttonIconOnly = blockConfig.name === "core/button" && isButtonIconOnly(attributes);
       return /* @__PURE__ */ wp.element.createElement(Fragment, null, /* @__PURE__ */ wp.element.createElement(BlockEdit, { ...props }), isSelected && /* @__PURE__ */ wp.element.createElement(InspectorControls, null, /* @__PURE__ */ wp.element.createElement(PanelBody, { title: "Block Einstellungen" }, blockConfig.options.map((option, index) => {
         if (buttonIconOnly && option.type === "button-group" && option.attributeName === "buttonIconPosition") {
