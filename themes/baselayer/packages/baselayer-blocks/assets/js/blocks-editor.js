@@ -7684,8 +7684,92 @@
       }
       return icon || "block-default";
     }
-    function normalizeValues(raw) {
-      return raw && typeof raw === "object" && !Array.isArray(raw) ? raw : {};
+    function isLayoutFieldType(type) {
+      return ["column", "section", "tab", "group"].includes(type);
+    }
+    function isStaticFieldType(type) {
+      return ["divider", "spacer", "heading", "text_block", "html", "captcha", "honeypot"].includes(
+        type
+      );
+    }
+    function defaultValueForField(field) {
+      if (!field || typeof field !== "object") {
+        return void 0;
+      }
+      const type = field.type || "text";
+      if (isLayoutFieldType(type) || isStaticFieldType(type)) {
+        return void 0;
+      }
+      if (["page", "link", "image", "file", "repeater"].includes(type)) {
+        return void 0;
+      }
+      if (field.active === false) {
+        return void 0;
+      }
+      if (type === "toggle" || type === "terms") {
+        const dv2 = field.default_value;
+        if (dv2 === "" || dv2 == null || dv2 === false || dv2 === 0 || dv2 === "0") {
+          return void 0;
+        }
+        return "1";
+      }
+      const multi = type === "checkboxes" || type === "button_group" && !!field.multiple || type === "select" && !!field.multiple;
+      const dv = field.default_value;
+      if (dv == null || dv === "") {
+        return void 0;
+      }
+      if (multi) {
+        if (Array.isArray(dv)) {
+          const list = dv.filter((item) => item != null && String(item) !== "").map((item) => String(item));
+          return list.length ? list : void 0;
+        }
+        return [String(dv)];
+      }
+      return String(dv);
+    }
+    function buildDefaultValues(fields) {
+      const out = {};
+      if (!Array.isArray(fields)) {
+        return out;
+      }
+      fields.forEach((field) => {
+        if (!field || typeof field !== "object") {
+          return;
+        }
+        const type = field.type || "";
+        if (isLayoutFieldType(type)) {
+          Object.assign(out, buildDefaultValues(field.children || []));
+          return;
+        }
+        if (isStaticFieldType(type) || type === "repeater") {
+          return;
+        }
+        if (field.active === false) {
+          return;
+        }
+        const name = field.name || "";
+        if (!name) {
+          return;
+        }
+        const seeded = defaultValueForField(field);
+        if (seeded !== void 0) {
+          out[name] = seeded;
+        }
+      });
+      return out;
+    }
+    function normalizeValues(raw, fields) {
+      const base = raw && typeof raw === "object" && !Array.isArray(raw) ? { ...raw } : {};
+      if (!fields) {
+        return base;
+      }
+      const defaults2 = buildDefaultValues(fields);
+      Object.keys(defaults2).forEach((key) => {
+        if (!Object.prototype.hasOwnProperty.call(base, key)) {
+          base[key] = defaults2[key];
+        }
+      });
+      return base;
     }
     function hasEditableFields(fields) {
       return Array.isArray(fields) && fields.length > 0;
@@ -7749,7 +7833,7 @@
           host.replaceChildren(form.root);
           const sync = () => {
             if (typeof onChangeRef.current === "function") {
-              onChangeRef.current(normalizeValues(form.getValues()));
+              onChangeRef.current(normalizeValues(form.getValues(), fieldsRef.current));
             }
           };
           const onRepeaterClick = (evt) => {
@@ -7761,6 +7845,7 @@
           form.root.addEventListener("input", sync);
           form.root.addEventListener("change", sync);
           form.root.addEventListener("click", onRepeaterClick);
+          sync();
           cleanupRef.current = () => {
             form.root.removeEventListener("input", sync);
             form.root.removeEventListener("change", sync);
@@ -7958,7 +8043,7 @@
         attributes: {
           values: {
             type: "object",
-            default: {}
+            default: buildDefaultValues(def.fields || [])
           },
           ui: {
             type: "object",
@@ -7973,21 +8058,32 @@
         },
         edit: function Edit(props) {
           const { attributes, setAttributes, isSelected, clientId } = props;
-          const values = normalizeValues(attributes.values);
+          const fieldList = def.fields || [];
+          const values = normalizeValues(attributes.values, fieldList);
           const ui = normalizeUi(attributes.ui);
           const blockAlign = typeof attributes.align === "string" ? attributes.align : "";
           const blockClassName = typeof attributes.className === "string" ? attributes.className : "";
           const [sidebarMountId, setSidebarMountId] = useState(0);
           const sidebarEditing = !!def.sidebarEditing;
-          const editableFields = hasEditableFields(def.fields);
+          const editableFields = hasEditableFields(fieldList);
           const applyValues = (next) => {
-            setAttributes({ values: normalizeValues(next) });
+            setAttributes({ values: normalizeValues(next, fieldList) });
           };
           const applyUi = (next) => {
             setAttributes({ ui: normalizeUi(next) });
           };
+          useEffect(() => {
+            const raw = attributes.values && typeof attributes.values === "object" && !Array.isArray(attributes.values) ? attributes.values : {};
+            const defaults2 = buildDefaultValues(fieldList);
+            const needsSeed = Object.keys(defaults2).some(
+              (key) => !Object.prototype.hasOwnProperty.call(raw, key)
+            );
+            if (needsSeed) {
+              setAttributes({ values: normalizeValues(raw, fieldList) });
+            }
+          }, [clientId]);
           const open = () => openBlockModal(
-            def.fields || [],
+            fieldList,
             values,
             (next) => {
               applyValues(next);
@@ -8033,7 +8129,7 @@
             )
           );
           const inspectorBody = !editableFields ? el5(NoEditableFieldsNotice) : sidebarEditing ? el5(SidebarFields, {
-            fields: def.fields || [],
+            fields: fieldList,
             values,
             uiState: ui,
             mountId: sidebarMountId,
@@ -8098,18 +8194,19 @@
               return editor && editor.getCurrentPostId ? editor.getCurrentPostId() : 0;
             }, []) : pageConfig.postId || 0;
             const { editPost } = useDispatch ? useDispatch("core/editor") : { editPost: null };
-            const values = normalizeValues(meta && meta[def.metaKey] || def.values || {});
+            const fieldList = def.fields || [];
+            const values = normalizeValues(meta && meta[def.metaKey] || def.values || {}, fieldList);
             const storageKey = pageRepeaterUiStorageKey(postId || pageConfig.postId || 0, def.metaKey || def.id);
             const [uiState, setUiState] = useState(() => loadUiStateFromStorage(storageKey));
             const [sidebarMountId, setSidebarMountId] = useState(0);
             const sidebarEditing = !!def.sidebarEditing;
-            const editableFields = hasEditableFields(def.fields);
+            const editableFields = hasEditableFields(fieldList);
             const applyValues = (next) => {
               if (!editPost) return;
               editPost({
                 meta: {
                   ...meta,
-                  [def.metaKey]: normalizeValues(next)
+                  [def.metaKey]: normalizeValues(next, fieldList)
                 }
               });
             };
@@ -8121,7 +8218,7 @@
             const open = () => {
               openFieldsModal({
                 title: def.title || pageI18n.panelTitle || "Content Fields",
-                fields: def.fields || [],
+                fields: fieldList,
                 values,
                 uiState,
                 onUiStateChange: applyUi,
@@ -8134,7 +8231,7 @@
               });
             };
             const panelBody = !editableFields ? el5(NoEditableFieldsNotice) : sidebarEditing ? el5(SidebarFields, {
-              fields: def.fields || [],
+              fields: fieldList,
               values,
               uiState,
               mountId: sidebarMountId,

@@ -261,10 +261,13 @@ const collectOptionClasses = (blockConfig, attributes, { isRootBlock = true } = 
     } else if (option.type === 'icon' && attributes[option.attributeName]) {
       classes.push(attributes[option.attributeName]);
       classes.push(option.hasIconClass || HAS_ICON_CLASS);
-    } else if (
-      (option.type === 'select' || option.type === 'button-group') &&
-      attributes[option.attributeName]
-    ) {
+    } else if (option.type === 'select' || option.type === 'button-group') {
+      // Match ToggleGroupControl: schema defaults may not be on the live attribute yet.
+      const value = attributes[option.attributeName] ?? option.default ?? '';
+      if (!value) {
+        return;
+      }
+
       if (
         blockConfig.name === 'core/button' &&
         option.attributeName === 'buttonIconPosition' &&
@@ -273,7 +276,7 @@ const collectOptionClasses = (blockConfig, attributes, { isRootBlock = true } = 
         return;
       }
 
-      classes.push(attributes[option.attributeName]);
+      classes.push(value);
     }
   });
 

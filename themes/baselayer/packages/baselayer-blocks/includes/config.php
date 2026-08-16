@@ -1509,6 +1509,136 @@ function bl_blocks_sanitize_link_value(array $field, $raw): array
 }
 
 /**
+ * Default stored value for a field when its key is absent from raw values.
+ * Returns null when the field should not be seeded (no meaningful default).
+ *
+ * @param array<string, mixed> $field
+ * @return mixed|null
+ */
+function bl_blocks_default_value_for_field(array $field)
+{
+	$type = (string) ($field['type'] ?? '');
+	if ($type === '' || bl_blocks_is_layout_field_type($type) || bl_blocks_is_static_field_type($type)) {
+		return null;
+	}
+	if (in_array($type, ['page', 'link', 'image', 'file', 'repeater'], true)) {
+		return null;
+	}
+	if (isset($field['active']) && empty($field['active'])) {
+		return null;
+	}
+
+	if ($type === 'toggle' || $type === 'terms') {
+		$dv = $field['default_value'] ?? '';
+		if ($dv === '' || $dv === null || $dv === false || $dv === 0 || $dv === '0') {
+			return null;
+		}
+
+		return '1';
+	}
+
+	$multi = $type === 'checkboxes'
+		|| ($type === 'button_group' && !empty($field['multiple']))
+		|| ($type === 'select' && !empty($field['multiple']));
+
+	$dv = $field['default_value'] ?? null;
+	if ($dv === null || $dv === '') {
+		return null;
+	}
+
+	if ($multi) {
+		$list = [];
+		if (is_array($dv)) {
+			foreach ($dv as $item) {
+				if (is_scalar($item) && (string) $item !== '') {
+					$list[] = sanitize_text_field((string) $item);
+				}
+			}
+		} elseif (is_scalar($dv) && (string) $dv !== '') {
+			$list[] = sanitize_text_field((string) $dv);
+		}
+
+		return $list === [] ? null : $list;
+	}
+
+	if ($type === 'icon') {
+		$key = sanitize_key(is_scalar($dv) ? (string) $dv : '');
+
+		return $key !== '' ? $key : null;
+	}
+
+	if ($type === 'wysiwyg') {
+		$html = wp_kses_post(is_scalar($dv) ? (string) $dv : '');
+
+		return $html !== '' ? $html : null;
+	}
+
+	if (in_array($type, ['textarea', 'html'], true)) {
+		$raw_str = is_scalar($dv) ? (string) $dv : '';
+		$allow = $field['allow_html'] ?? false;
+		if ($allow === true || $allow === 1 || $allow === '1' || $allow === 'post') {
+			$out = wp_kses_post($raw_str);
+		} elseif ($allow === 'svg' && function_exists('bl_svg_sanitize')) {
+			$out = bl_svg_sanitize($raw_str);
+		} elseif ($allow === 'svg') {
+			$out = $raw_str;
+		} else {
+			$out = sanitize_textarea_field($raw_str);
+		}
+
+		return $out !== '' ? $out : null;
+	}
+
+	if ($type === 'url') {
+		$url = bl_blocks_normalize_https_url(is_scalar($dv) ? (string) $dv : '');
+
+		return $url !== '' ? $url : null;
+	}
+
+	$str = sanitize_text_field(is_scalar($dv) ? (string) $dv : '');
+
+	return $str !== '' ? $str : null;
+}
+
+/**
+ * Build a values map of seedable field defaults (layout children included).
+ *
+ * @param list<array<string, mixed>> $fields
+ * @return array<string, mixed>
+ */
+function bl_blocks_default_values_from_fields(array $fields): array
+{
+	$out = [];
+	foreach ($fields as $field) {
+		if (!is_array($field)) {
+			continue;
+		}
+		$type = (string) ($field['type'] ?? '');
+		if (bl_blocks_is_layout_field_type($type)) {
+			$children = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
+			$out = array_merge($out, bl_blocks_default_values_from_fields($children));
+			continue;
+		}
+		if (bl_blocks_is_static_field_type($type) || $type === 'repeater') {
+			continue;
+		}
+		if (isset($field['active']) && empty($field['active'])) {
+			continue;
+		}
+		$name = (string) ($field['name'] ?? '');
+		if ($name === '') {
+			continue;
+		}
+		$seeded = bl_blocks_default_value_for_field($field);
+		if ($seeded !== null) {
+			$out[$name] = $seeded;
+		}
+	}
+
+	return $out;
+}
+
+/**
  * Sanitize a map of field values against a definition's fields.
  *
  * @param list<array<string, mixed>> $fields
@@ -1542,6 +1672,16 @@ function bl_blocks_sanitize_values(array $fields, $raw): array
 		if ($name === '') {
 			continue;
 		}
+
+		// Seed definition defaults only when the key was never set (not when cleared).
+		if (!array_key_exists($name, $raw)) {
+			$seeded = bl_blocks_default_value_for_field($field);
+			if ($seeded !== null) {
+				$values[$name] = $seeded;
+				continue;
+			}
+		}
+
 		$raw_value = $raw[$name] ?? null;
 
 		if ($type === 'repeater') {

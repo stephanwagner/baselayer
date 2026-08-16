@@ -219,7 +219,7 @@ function bl_blocks_register_dynamic_blocks(): void
 				'values' => [
 					// object|array: empty {} often arrives as [] over REST.
 					'type'                 => ['object', 'array'],
-					'default'              => [],
+					'default'              => bl_blocks_default_values_from_fields($def['fields'] ?? []),
 					'additionalProperties' => true,
 				],
 				// Editor-only UI chrome (e.g. repeater collapsed flags). Not used in render.

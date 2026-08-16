@@ -138,7 +138,13 @@ function bl_block_field(string $name)
 	}
 
 	$values = isset($ctx['values']) && is_array($ctx['values']) ? $ctx['values'] : [];
-	$raw = array_key_exists($name, $values) ? $values[$name] : null;
+	if (array_key_exists($name, $values)) {
+		$raw = $values[$name];
+	} elseif (function_exists('bl_blocks_default_value_for_field')) {
+		$raw = bl_blocks_default_value_for_field($field);
+	} else {
+		$raw = null;
+	}
 
 	return bl_blocks_format_field_value($field, $raw);
 }

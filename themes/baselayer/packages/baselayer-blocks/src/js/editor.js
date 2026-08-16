@@ -45,8 +45,108 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
     return icon || 'block-default';
   }
 
-  function normalizeValues(raw) {
-    return raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+  function isLayoutFieldType(type) {
+    return ['column', 'section', 'tab', 'group'].includes(type);
+  }
+
+  function isStaticFieldType(type) {
+    return ['divider', 'spacer', 'heading', 'text_block', 'html', 'captcha', 'honeypot'].includes(
+      type
+    );
+  }
+
+  /** Seedable default for one field; undefined when the key should stay absent. */
+  function defaultValueForField(field) {
+    if (!field || typeof field !== 'object') {
+      return undefined;
+    }
+    const type = field.type || 'text';
+    if (isLayoutFieldType(type) || isStaticFieldType(type)) {
+      return undefined;
+    }
+    if (['page', 'link', 'image', 'file', 'repeater'].includes(type)) {
+      return undefined;
+    }
+    if (field.active === false) {
+      return undefined;
+    }
+
+    if (type === 'toggle' || type === 'terms') {
+      const dv = field.default_value;
+      if (dv === '' || dv == null || dv === false || dv === 0 || dv === '0') {
+        return undefined;
+      }
+      return '1';
+    }
+
+    const multi =
+      type === 'checkboxes' ||
+      (type === 'button_group' && !!field.multiple) ||
+      (type === 'select' && !!field.multiple);
+
+    const dv = field.default_value;
+    if (dv == null || dv === '') {
+      return undefined;
+    }
+
+    if (multi) {
+      if (Array.isArray(dv)) {
+        const list = dv
+          .filter((item) => item != null && String(item) !== '')
+          .map((item) => String(item));
+        return list.length ? list : undefined;
+      }
+      return [String(dv)];
+    }
+
+    return String(dv);
+  }
+
+  function buildDefaultValues(fields) {
+    const out = {};
+    if (!Array.isArray(fields)) {
+      return out;
+    }
+    fields.forEach((field) => {
+      if (!field || typeof field !== 'object') {
+        return;
+      }
+      const type = field.type || '';
+      if (isLayoutFieldType(type)) {
+        Object.assign(out, buildDefaultValues(field.children || []));
+        return;
+      }
+      if (isStaticFieldType(type) || type === 'repeater') {
+        return;
+      }
+      if (field.active === false) {
+        return;
+      }
+      const name = field.name || '';
+      if (!name) {
+        return;
+      }
+      const seeded = defaultValueForField(field);
+      if (seeded !== undefined) {
+        out[name] = seeded;
+      }
+    });
+    return out;
+  }
+
+  function normalizeValues(raw, fields) {
+    const base =
+      raw && typeof raw === 'object' && !Array.isArray(raw) ? { ...raw } : {};
+    if (!fields) {
+      return base;
+    }
+    const defaults = buildDefaultValues(fields);
+    Object.keys(defaults).forEach((key) => {
+      if (!Object.prototype.hasOwnProperty.call(base, key)) {
+        base[key] = defaults[key];
+      }
+    });
+    return base;
   }
 
   function hasEditableFields(fields) {
@@ -130,7 +230,7 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
 
         const sync = () => {
           if (typeof onChangeRef.current === 'function') {
-            onChangeRef.current(normalizeValues(form.getValues()));
+            onChangeRef.current(normalizeValues(form.getValues(), fieldsRef.current));
           }
         };
 
@@ -148,6 +248,8 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
         form.root.addEventListener('input', sync);
         form.root.addEventListener('change', sync);
         form.root.addEventListener('click', onRepeaterClick);
+        // Persist UI-shown field defaults without requiring a control change.
+        sync();
 
         cleanupRef.current = () => {
           form.root.removeEventListener('input', sync);
@@ -395,7 +497,7 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
       attributes: {
         values: {
           type: 'object',
-          default: {},
+          default: buildDefaultValues(def.fields || []),
         },
         ui: {
           type: 'object',
@@ -410,7 +512,8 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
       },
       edit: function Edit(props) {
         const { attributes, setAttributes, isSelected, clientId } = props;
-        const values = normalizeValues(attributes.values);
+        const fieldList = def.fields || [];
+        const values = normalizeValues(attributes.values, fieldList);
         const ui = normalizeUi(attributes.ui);
         const blockAlign =
           typeof attributes.align === 'string' ? attributes.align : '';
@@ -418,19 +521,36 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
           typeof attributes.className === 'string' ? attributes.className : '';
         const [sidebarMountId, setSidebarMountId] = useState(0);
         const sidebarEditing = !!def.sidebarEditing;
-        const editableFields = hasEditableFields(def.fields);
+        const editableFields = hasEditableFields(fieldList);
 
         const applyValues = (next) => {
-          setAttributes({ values: normalizeValues(next) });
+          setAttributes({ values: normalizeValues(next, fieldList) });
         };
 
         const applyUi = (next) => {
           setAttributes({ ui: normalizeUi(next) });
         };
 
+        // Materialize missing field defaults into attributes on insert / first edit.
+        useEffect(() => {
+          const raw =
+            attributes.values &&
+            typeof attributes.values === 'object' &&
+            !Array.isArray(attributes.values)
+              ? attributes.values
+              : {};
+          const defaults = buildDefaultValues(fieldList);
+          const needsSeed = Object.keys(defaults).some(
+            (key) => !Object.prototype.hasOwnProperty.call(raw, key)
+          );
+          if (needsSeed) {
+            setAttributes({ values: normalizeValues(raw, fieldList) });
+          }
+        }, [clientId]);
+
         const open = () =>
           openBlockModal(
-            def.fields || [],
+            fieldList,
             values,
             (next) => {
               applyValues(next);
@@ -487,7 +607,7 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
           ? el(NoEditableFieldsNotice)
           : sidebarEditing
             ? el(SidebarFields, {
-                fields: def.fields || [],
+                fields: fieldList,
                 values,
                 uiState: ui,
                 mountId: sidebarMountId,
@@ -565,19 +685,20 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
               }, [])
             : pageConfig.postId || 0;
           const { editPost } = useDispatch ? useDispatch('core/editor') : { editPost: null };
-          const values = normalizeValues((meta && meta[def.metaKey]) || def.values || {});
+          const fieldList = def.fields || [];
+          const values = normalizeValues((meta && meta[def.metaKey]) || def.values || {}, fieldList);
           const storageKey = pageRepeaterUiStorageKey(postId || pageConfig.postId || 0, def.metaKey || def.id);
           const [uiState, setUiState] = useState(() => loadUiStateFromStorage(storageKey));
           const [sidebarMountId, setSidebarMountId] = useState(0);
           const sidebarEditing = !!def.sidebarEditing;
-          const editableFields = hasEditableFields(def.fields);
+          const editableFields = hasEditableFields(fieldList);
 
           const applyValues = (next) => {
             if (!editPost) return;
             editPost({
               meta: {
                 ...meta,
-                [def.metaKey]: normalizeValues(next),
+                [def.metaKey]: normalizeValues(next, fieldList),
               },
             });
           };
@@ -591,7 +712,7 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
           const open = () => {
             openFieldsModal({
               title: def.title || pageI18n.panelTitle || 'Content Fields',
-              fields: def.fields || [],
+              fields: fieldList,
               values,
               uiState,
               onUiStateChange: applyUi,
@@ -608,7 +729,7 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
             ? el(NoEditableFieldsNotice)
             : sidebarEditing
               ? el(SidebarFields, {
-                  fields: def.fields || [],
+                  fields: fieldList,
                   values,
                   uiState,
                   mountId: sidebarMountId,
