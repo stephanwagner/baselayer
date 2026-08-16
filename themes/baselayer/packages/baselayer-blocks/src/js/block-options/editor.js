@@ -381,6 +381,16 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
       [props.name, clientId]
     );
 
+    const isRootBlock = useSelect(
+      (select) => {
+        if (!clientId) {
+          return false;
+        }
+        return select('core/block-editor').getBlockRootClientId(clientId) === '';
+      },
+      [clientId]
+    );
+
     const prevHeightRef = useRef(attributes.height);
 
     const setOptionAttributes = (updates) => {
@@ -511,6 +521,10 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                   (GALLERY_OWNED_IMAGE_ATTRIBUTES.includes(option.attributeName) ||
                     GALLERY_OWNED_IMAGE_TYPES.includes(option.type))
                 ) {
+                  return null;
+                }
+
+                if (option.type === 'align-wide' && !isRootBlock) {
                   return null;
                 }
 

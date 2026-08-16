@@ -1929,6 +1929,15 @@
         },
         [props.name, clientId]
       );
+      const isRootBlock = useSelect(
+        (select) => {
+          if (!clientId) {
+            return false;
+          }
+          return select("core/block-editor").getBlockRootClientId(clientId) === "";
+        },
+        [clientId]
+      );
       const prevHeightRef = useRef2(attributes.height);
       const setOptionAttributes = (updates) => {
         const nextAttributes = { ...attributes, ...updates };
@@ -2022,6 +2031,9 @@
           return null;
         }
         if (isImageInGallery && (GALLERY_OWNED_IMAGE_ATTRIBUTES.includes(option.attributeName) || GALLERY_OWNED_IMAGE_TYPES.includes(option.type))) {
+          return null;
+        }
+        if (option.type === "align-wide" && !isRootBlock) {
           return null;
         }
         const custom = getCustom(option.type);
