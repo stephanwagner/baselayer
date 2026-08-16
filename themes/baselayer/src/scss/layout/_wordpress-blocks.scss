@@ -324,15 +324,8 @@
 
     &.-media-text-layout,
     &.-image-text-layout {
-      > .wp-block-column:has(.wp-block-image),
-      > .wp-block-column:has(.wp-block-video) {
-        align-self: flex-start;
-      }
-
       > .wp-block-column:not(:has(.wp-block-image)):not(:has(.wp-block-video)) {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+        align-content: center;
       }
     }
 
@@ -408,9 +401,7 @@
     }
 
     &.-center-content {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
+      align-content: center;
     }
   }
 
