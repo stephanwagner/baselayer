@@ -555,6 +555,10 @@
         }
       }
 
+      &::before {
+        display: none;
+      }
+
       figcaption.wp-element-caption,
       &:has(figcaption)::before {
         border-radius: 0 0 var(--bl-border-radius-m) var(--bl-border-radius-m);
@@ -563,6 +567,7 @@
 
     &.-show-image-captions {
       figure.wp-block-image {
+        &::before,
         figcaption.wp-element-caption {
           display: block;
         }
