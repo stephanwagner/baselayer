@@ -608,7 +608,7 @@ body.bl-page-picker-open {
   line-height: 1.35;
   white-space: nowrap;
 }
-.bl-forms-builder__security-badge--always {
+.bl-forms-builder__security-badge.-always {
   color: #6f7882;
   background: rgb(94.3096574729%, 94.7036042633%, 95.1413229192%);
 }

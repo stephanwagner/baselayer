@@ -90,7 +90,7 @@ function applyHttpsUrlInput(input) {
 }
 
 function initHttpsUrlFields(root) {
-  root.querySelectorAll('.bl-form__field--url input.bl-form__control').forEach((input) => {
+  root.querySelectorAll('.bl-form__field.-url input.bl-form__control').forEach((input) => {
     if (input.dataset.blHttpsUrlBound === '1') return;
     input.dataset.blHttpsUrlBound = '1';
     input.addEventListener('blur', () => applyHttpsUrlInput(input));
@@ -529,7 +529,7 @@ function postFormData(url, body, { onUploadProgress, onUploadComplete } = {}) {
 }
 
 function initClassicFileLimits(root) {
-  root.querySelectorAll('input.bl-form__control--file[data-bl-form-file-input]').forEach((input) => {
+  root.querySelectorAll('input.bl-form__control.-file[data-bl-form-file-input]').forEach((input) => {
     const maxFiles = Math.max(
       1,
       Number(input.getAttribute('data-bl-form-upload-max')) || (input.multiple ? 10 : 1)
@@ -636,8 +636,8 @@ function readLogicSourceValue(form, fieldId) {
   const checks = source.querySelectorAll('input[type="checkbox"]');
   if (checks.length) {
     if (
-      source.classList.contains('bl-form__field--toggle') ||
-      source.classList.contains('bl-form__field--terms')
+      source.classList.contains('-toggle') ||
+      source.classList.contains('-terms')
     ) {
       return checks[0].checked ? '1' : '';
     }
@@ -971,7 +971,7 @@ function initForm(root) {
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
-    form.querySelectorAll('.bl-form__field--url input.bl-form__control').forEach((input) => {
+    form.querySelectorAll('.bl-form__field.-url input.bl-form__control').forEach((input) => {
       applyHttpsUrlInput(input);
     });
     if (jsField && jsToken) {

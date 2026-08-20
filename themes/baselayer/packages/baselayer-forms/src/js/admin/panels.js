@@ -52,7 +52,7 @@ function securityBadge(kind) {
     return null;
   }
   const badge = el('span', {
-    className: 'bl-forms-builder__security-badge bl-forms-builder__security-badge--always',
+    className: 'bl-forms-builder__security-badge -always',
   });
   const icon = iconEl('lock', 'bl-forms-builder__security-badge-icon');
   if (icon.innerHTML) {

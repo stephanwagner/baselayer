@@ -152,7 +152,7 @@
   line-height: 1.35;
   white-space: nowrap;
 
-  &--always {
+  &.-always {
     color: #{$color-neutral};
     background: #{$color-neutral-bg};
   }

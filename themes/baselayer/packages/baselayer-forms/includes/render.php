@@ -176,10 +176,10 @@ function bl_forms_field_wrap_attrs(array $field, string $extra_class = '', strin
 	$is_auto = (($field['width'] ?? '') === 'auto');
 	$classes = trim('bl-form__field-wrap ' . $extra_class);
 	if ($is_auto) {
-		$classes .= ' bl-form__field-wrap--auto';
+		$classes .= ' -auto';
 	}
 	if (bl_forms_field_hide_label($field)) {
-		$classes .= ' bl-form__field-wrap--hide-label';
+		$classes .= ' -hide-label';
 	}
 	$css_class = trim((string) ($field['css_class'] ?? ''));
 	if ($css_class !== '') {
@@ -192,7 +192,7 @@ function bl_forms_field_wrap_attrs(array $field, string $extra_class = '', strin
 	if (function_exists('bl_forms_field_id_and_logic_attrs')) {
 		$attrs .= bl_forms_field_id_and_logic_attrs($field, $context);
 	}
-	// Auto uses flex grow via --auto; calc(auto - gap) is invalid CSS.
+	// Auto uses flex grow via .-auto; calc(auto - gap) is invalid CSS.
 	if (!$is_auto) {
 		$attrs .= ' style="' . esc_attr(bl_forms_field_width_style($field)) . '"';
 	}
@@ -545,7 +545,7 @@ function bl_forms_render_fields(array $fields, string $uid, array $settings = []
 				$cols = count($run);
 				$classes = 'bl-form__group';
 				if ($cols >= 4) {
-					$classes .= ' bl-form__group--wrap-m';
+					$classes .= ' -wrap-m';
 				}
 				$html .= '<div class="' . esc_attr($classes) . '" data-bl-form-cols="' . esc_attr((string) $cols) . '">' . $inner . '</div>';
 			}
@@ -628,7 +628,7 @@ function bl_forms_render_tab_group(array $tabs, string $uid, array $settings = [
 		if (!in_array($design, ['standard', 'outline', 'card'], true)) {
 			$design = 'standard';
 		}
-		$classes = 'bl-form__tab-panel bl-form__tab-panel--' . $design;
+		$classes = 'bl-form__tab-panel' . ($design !== 'standard' ? ' -' . $design : '');
 		$extra = bl_forms_sanitize_css_class((string) ($tab['css_class'] ?? ''));
 		if ($extra !== '') {
 			$classes .= ' ' . $extra;
@@ -674,9 +674,9 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 			$design = 'standard';
 		}
 		$is_auto = (($field['width'] ?? '') === 'auto');
-		$classes = 'bl-form__column bl-form__column--' . $design;
+		$classes = 'bl-form__column' . ($design !== 'standard' ? ' -' . $design : '');
 		if ($is_auto) {
-			$classes .= ' bl-form__column--auto';
+			$classes .= ' -auto';
 		}
 		$extra = bl_forms_sanitize_css_class((string) ($field['css_class'] ?? ''));
 		if ($extra !== '') {
@@ -701,9 +701,9 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 			$design = 'standard';
 		}
 		$is_auto = (($field['width'] ?? '') === 'auto');
-		$classes = 'bl-form__section bl-form__section--' . $design;
+		$classes = 'bl-form__section' . ($design !== 'standard' ? ' -' . $design : '');
 		if ($is_auto) {
-			$classes .= ' bl-form__section--auto';
+			$classes .= ' -auto';
 		}
 		$extra = bl_forms_sanitize_css_class((string) ($field['css_class'] ?? ''));
 		if ($extra !== '') {
@@ -736,7 +736,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 		}
 
 		if (in_array($margin, $presets, true)) {
-			$classes .= ' bl-form__divider-wrap--' . $margin;
+			$classes .= ' -size-' . $margin;
 		} else {
 			$custom = bl_forms_sanitize_css_length((string) ($field['margin_custom'] ?? ''), '24px');
 			if ($custom === '24px' && $margin !== 'custom' && $margin !== '') {
@@ -745,7 +745,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 					$custom = $maybe;
 				}
 			}
-			$classes .= ' bl-form__divider-wrap--custom';
+			$classes .= ' -size-custom';
 			$style = '--bl-form-divider-margin:' . $custom;
 		}
 
@@ -771,7 +771,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 		}
 
 		if (in_array($height, $presets, true)) {
-			$classes .= ' bl-form__spacer-wrap--' . $height;
+			$classes .= ' -size-' . $height;
 		} else {
 			$custom = bl_forms_sanitize_css_length((string) ($field['height_custom'] ?? ''), '24px');
 			// Legacy: height stored as a CSS length.
@@ -781,7 +781,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 					$custom = $maybe;
 				}
 			}
-			$classes .= ' bl-form__spacer-wrap--custom';
+			$classes .= ' -size-custom';
 			$style = '--bl-form-spacer-height:' . $custom;
 		}
 
@@ -816,7 +816,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 		$site_key = $creds['site_key'];
 
 		if ($site_key === '') {
-			return '<div ' . bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--captcha', '', $context) . '>'
+			return '<div ' . bl_forms_field_wrap_attrs($field, 'bl-form__field -captcha', '', $context) . '>'
 				. '<div class="bl-form__captcha-placeholder" role="note">'
 				. esc_html__('CAPTCHA is not configured yet.', 'baselayer-forms')
 				. '</div></div>';
@@ -826,7 +826,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 
 		ob_start();
 		?>
-		<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--captcha', '', $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field -captcha', '', $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<?php if ($provider === 'turnstile') : ?>
 				<div class="cf-turnstile" data-sitekey="<?= esc_attr($site_key) ?>"></div>
 			<?php elseif ($provider === 'hcaptcha') : ?>
@@ -898,7 +898,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 
 	if ($type === 'textarea') {
 		?>
-		<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--textarea', $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field -textarea', $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<?= bl_forms_field_label_html($field, $input_id, $req_mark) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<textarea class="bl-form__control" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" rows="<?= esc_attr((string) bl_forms_field_rows($field)) ?>" placeholder="<?= esc_attr($placeholder) ?>"<?= $control_attrs ?><?= bl_forms_field_minlength_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_maxlength_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?= esc_textarea($default_value) ?></textarea>
@@ -915,7 +915,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 		$readonly_attr = $readonly ? ' aria-readonly="true"' : '';
 		$has_defaults = bl_forms_field_default_values($field) !== [];
 		?>
-		<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--select', $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field -select', $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<?= bl_forms_field_label_html($field, $input_id, $req_mark) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<select class="bl-form__control" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($select_name) ?>"<?= $multiple ? ' multiple' : '' ?><?= $choice_attrs ?><?= $readonly_attr ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
@@ -942,9 +942,9 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 	}
 
 	if ($type === 'radio') {
-		$options_class = 'bl-form__options bl-form__options--' . bl_forms_field_options_layout($field);
+		$options_class = 'bl-form__options -' . bl_forms_field_options_layout($field);
 		?>
-		<fieldset <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--radio', $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<fieldset <?= bl_forms_field_wrap_attrs($field, 'bl-form__field -radio', $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<?= bl_forms_field_label_html($field, $input_id, $req_mark, 'legend') // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<div class="<?= esc_attr($options_class) ?>">
@@ -965,7 +965,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 	}
 
 	if ($type === 'checkboxes') {
-		$options_class = 'bl-form__options bl-form__options--' . bl_forms_field_options_layout($field);
+		$options_class = 'bl-form__options -' . bl_forms_field_options_layout($field);
 		$min_sel = bl_forms_field_min_selections($field);
 		$max_sel = bl_forms_field_max_selections($field);
 		$limit_attrs = '';
@@ -980,7 +980,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 		}
 		$as_checkbox = bl_forms_field_show_as_checkbox($field);
 		?>
-		<fieldset <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--checkboxes', $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= $limit_attrs // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<fieldset <?= bl_forms_field_wrap_attrs($field, 'bl-form__field -checkboxes', $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= $limit_attrs // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<?= bl_forms_field_label_html($field, $input_id, $req_mark, 'legend') // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<div class="<?= esc_attr($options_class) ?>">
@@ -1018,13 +1018,13 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 		$input_type = $multiple ? 'checkbox' : 'radio';
 		$input_name = $multiple ? $field_name . '[]' : $field_name;
 		$layout = bl_forms_field_options_layout($field);
-		$group_class = 'bl-form__button-group bl-form__button-group--' . $layout;
+		$group_class = 'bl-form__button-group -' . $layout;
 		$btn_extra = function_exists('bl_forms_sanitize_css_classes')
 			? bl_forms_sanitize_css_classes((string) ($field['button_class'] ?? ''))
 			: bl_forms_sanitize_css_class((string) ($field['button_class'] ?? ''));
 		$btn_classes = trim('button -muted' . ($btn_extra !== '' ? ' ' . $btn_extra : ''));
 		?>
-		<fieldset <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--button-group', $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<fieldset <?= bl_forms_field_wrap_attrs($field, 'bl-form__field -button-group', $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<?= bl_forms_field_label_html($field, $input_id, $req_mark, 'legend') // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<div class="<?= esc_attr($group_class) ?>" role="group">
@@ -1055,9 +1055,9 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 		$terms_name_attr = $show_terms_label
 			? ' aria-labelledby="' . esc_attr($input_id) . '-label"'
 			: bl_forms_field_aria_label_attr($field);
-		$control_class = $as_checkbox ? 'bl-form__option bl-form__option--terms' : 'bl-form__switch';
+		$control_class = $as_checkbox ? 'bl-form__option -terms' : 'bl-form__switch';
 		?>
-		<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--terms', $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field -terms', $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<?= bl_forms_field_label_html($field, $input_id, $req_mark, 'div') // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<label class="<?= esc_attr($control_class) ?>" for="<?= esc_attr($input_id) ?>">
@@ -1110,7 +1110,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 			: bl_forms_field_aria_label_attr($field);
 		$control_class = $as_checkbox ? 'bl-form__option' : 'bl-form__switch';
 		?>
-		<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--toggle', $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field -toggle', $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<?= bl_forms_field_label_html($field, $input_id, $req_mark, 'div') // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<label class="<?= esc_attr($control_class) ?>" for="<?= esc_attr($input_id) ?>">
@@ -1169,12 +1169,12 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 			$ext_hint = sprintf(__('max. %s', 'baselayer-forms'), $size_label);
 		}
 		?>
-		<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--' . $type, $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+		<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field -' . sanitize_html_class($type), $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<?= bl_forms_field_label_html($field, $input_id, $req_mark) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 			<?php if ($upload_style === 'classic') : ?>
 				<input
-					class="bl-form__control bl-form__control--file"
+					class="bl-form__control -file"
 					type="file"
 					id="<?= esc_attr($input_id) ?>"
 					name="<?= esc_attr($file_name) ?>"
@@ -1188,7 +1188,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 				>
 			<?php else : ?>
 				<div
-					class="bl-form__upload<?= $preview ? ' bl-form__upload--preview' : '' ?>"
+					class="bl-form__upload<?= $preview ? ' -preview' : '' ?>"
 					data-bl-form-upload
 					data-bl-form-upload-kind="<?= esc_attr($type) ?>"
 					data-bl-form-upload-preview="<?= $preview ? '1' : '0' ?>"
@@ -1272,19 +1272,19 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 	$suffix = sanitize_text_field((string) ($field['suffix'] ?? ''));
 	$has_affix = $prefix !== '' || $suffix !== '';
 	?>
-	<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--' . sanitize_html_class($type), $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+	<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field -' . sanitize_html_class($type), $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 		<?= bl_forms_field_label_html($field, $input_id, $req_mark) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		<?php if ($has_affix) : ?>
 		<div class="bl-form__input-group">
 			<?php if ($prefix !== '') : ?>
-			<span class="bl-form__affix bl-form__affix--prefix"><?= esc_html($prefix) ?></span>
+			<span class="bl-form__affix -prefix"><?= esc_html($prefix) ?></span>
 			<?php endif; ?>
 		<?php endif; ?>
 		<input class="bl-form__control" type="<?= esc_attr($input_type) ?>" id="<?= esc_attr($input_id) ?>" name="<?= esc_attr($field_name) ?>" value="<?= esc_attr($default_value) ?>"<?= $placeholder !== '' ? ' placeholder="' . esc_attr($placeholder) . '"' : '' ?><?= $control_attrs ?><?= $number_attrs // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_minlength_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_maxlength_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 		<?php if ($has_affix) : ?>
 			<?php if ($suffix !== '') : ?>
-			<span class="bl-form__affix bl-form__affix--suffix"><?= esc_html($suffix) ?></span>
+			<span class="bl-form__affix -suffix"><?= esc_html($suffix) ?></span>
 			<?php endif; ?>
 		</div>
 		<?php endif; ?>

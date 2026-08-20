@@ -75,7 +75,7 @@
     display: none !important;
   }
 
-  &--auto {
+  &.-auto {
     flex: 1 1 0;
     width: auto;
     min-width: min(100%, 12rem);
@@ -91,14 +91,14 @@
 }
 
 // 4+ columns: pair up (2/2, 2/2/2, …) at -m.
-.bl-form__group--wrap-m {
+.bl-form__group.-wrap-m {
   @media (max-width: $breakpoint-m) {
     .bl-form__column {
       flex: 0 1 auto;
       width: min(100%, calc(50% - (var(--bl-form-gap) * 0.5)));
     }
 
-    .bl-form__column--auto {
+    .bl-form__column.-auto {
       flex: 0 1 auto;
       width: min(100%, calc(50% - (var(--bl-form-gap) * 0.5)));
     }
@@ -106,7 +106,7 @@
 
   @media (max-width: $breakpoint-s) {
     .bl-form__column,
-    .bl-form__column--auto {
+    .bl-form__column.-auto {
       flex-basis: 100%;
       width: 100% !important;
       min-width: 0;
@@ -128,7 +128,7 @@
     display: none !important;
   }
 
-  &--auto {
+  &.-auto {
     flex: 1 1 0;
     width: auto;
     min-width: min(100%, 12rem);
@@ -144,8 +144,8 @@
 
 .bl-form__column,
 .bl-form__section {
-  &--outline,
-  &--card {
+  &.-outline,
+  &.-card {
     align-self: normal;
     padding: 16px;
     border: 1px solid var(--bl-form-border);
@@ -156,7 +156,7 @@
     }
   }
 
-  &--card {
+  &.-card {
     background: color-mix(in srgb, var(--bl-form-muted) 8%, var(--bl-form-bg));
   }
 }
@@ -231,8 +231,8 @@
     display: none !important;
   }
 
-  &--outline,
-  &--card {
+  &.-outline,
+  &.-card {
     padding: 16px;
     border: 1px solid var(--bl-form-border);
     border-radius: var(--bl-form-radius);
@@ -242,7 +242,7 @@
     }
   }
 
-  &--card {
+  &.-card {
     background: color-mix(in srgb, var(--bl-form-muted) 8%, var(--bl-form-bg));
   }
 }
@@ -255,7 +255,7 @@
   max-width: 100%;
   min-width: 0;
 
-  &--auto {
+  &.-auto {
     flex: 1 1 0;
     width: auto;
     min-width: 0; // allow shrink next to fixed custom widths
@@ -477,20 +477,20 @@
   white-space: nowrap;
   user-select: none;
 
-  &--prefix {
+  &.-prefix {
     border-right: 1px solid var(--bl-form-border);
   }
 
-  &--suffix {
+  &.-suffix {
     border-left: 1px solid var(--bl-form-border);
   }
 
   @media (min-resolution: $high-density-dppx) {
-    &--prefix {
+    &.-prefix {
       border-right-width: 1.5px;
     }
 
-    &--suffix {
+    &.-suffix {
       border-left-width: 1.5px;
     }
   }
@@ -530,11 +530,11 @@ select.bl-form__control {
 .bl-form__divider-wrap {
   width: 100%;
 
-  &--xs {
+  &.-size-xs {
     --bl-form-divider-margin: var(--bl-form-space-xs);
   }
 
-  &--s {
+  &.-size-s {
     --bl-form-divider-margin: var(--bl-form-space-s);
 
     @media (max-width: $breakpoint-xs) {
@@ -542,7 +542,7 @@ select.bl-form__control {
     }
   }
 
-  &--m {
+  &.-size-m {
     --bl-form-divider-margin: var(--bl-form-space-m);
 
     @media (max-width: $breakpoint-s) {
@@ -554,7 +554,7 @@ select.bl-form__control {
     }
   }
 
-  &--l {
+  &.-size-l {
     --bl-form-divider-margin: var(--bl-form-space-l);
 
     @media (max-width: $breakpoint-s) {
@@ -566,7 +566,7 @@ select.bl-form__control {
     }
   }
 
-  &--xl {
+  &.-size-xl {
     --bl-form-divider-margin: var(--bl-form-space-xl);
 
     @media (max-width: $breakpoint-s) {
@@ -591,11 +591,11 @@ select.bl-form__control {
   margin: 0;
   pointer-events: none;
 
-  &--xs {
+  &.-size-xs {
     height: var(--bl-form-space-xs);
   }
 
-  &--s {
+  &.-size-s {
     height: var(--bl-form-space-s);
 
     @media (max-width: $breakpoint-xs) {
@@ -603,7 +603,7 @@ select.bl-form__control {
     }
   }
 
-  &--m {
+  &.-size-m {
     height: var(--bl-form-space-m);
 
     @media (max-width: $breakpoint-s) {
@@ -615,7 +615,7 @@ select.bl-form__control {
     }
   }
 
-  &--l {
+  &.-size-l {
     height: var(--bl-form-space-l);
 
     @media (max-width: $breakpoint-s) {
@@ -627,7 +627,7 @@ select.bl-form__control {
     }
   }
 
-  &--xl {
+  &.-size-xl {
     height: var(--bl-form-space-xl);
 
     @media (max-width: $breakpoint-s) {
@@ -639,7 +639,7 @@ select.bl-form__control {
     }
   }
 
-  &--custom {
+  &.-size-custom {
     height: var(--bl-form-spacer-height, var(--bl-form-space-m));
   }
 }
@@ -672,7 +672,7 @@ select.bl-form__control {
   flex-direction: column;
   gap: 4px;
 
-  &--horizontal {
+  &.-horizontal {
     flex-direction: row;
     flex-wrap: wrap;
     gap: 10px 20px;
@@ -751,7 +751,7 @@ select.bl-form__control {
   flex-wrap: wrap;
   gap: 6px;
 
-  &--vertical {
+  &.-vertical {
     flex-direction: column;
     flex-wrap: nowrap;
     align-items: stretch;
@@ -843,7 +843,7 @@ select.bl-form__control {
   }
 }
 
-.bl-form__control--file {
+.bl-form__control.-file {
   padding: 7px;
 }
 
