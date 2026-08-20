@@ -461,6 +461,7 @@ export function defaultField(type = 'text') {
   }
   if (type === 'button_group') {
     base.layout = 'horizontal';
+    base.button_class = '';
   }
   if (['select', 'button_group', 'file', 'image', 'page'].includes(type)) {
     base.multiple = false;

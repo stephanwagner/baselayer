@@ -232,6 +232,34 @@
     }
   }
 
+  .button.-muted,
+  .wp-block-button.-muted .wp-block-button__link {
+    background: var(--bl-button-muted-background-color);
+    border-color: var(--bl-button-muted-background-color);
+    color: var(--bl-button-muted-color);
+
+    &:hover,
+    .-button-trigger:hover & {
+      background: var(--bl-button-muted-background-color-hover);
+      border-color: var(--bl-button-muted-background-color-hover);
+      color: var(--bl-button-muted-color-hover);
+    }
+  }
+
+  .button.-muted.-outline,
+  .wp-block-button.-muted.is-style-outline .wp-block-button__link {
+    background: transparent;
+    color: var(--bl-button-muted-color);
+    border-color: var(--bl-color-gray-300);
+
+    &:hover,
+    .-button-trigger:hover & {
+      background: var(--bl-button-muted-background-color);
+      border-color: var(--bl-button-muted-background-color);
+      color: var(--bl-button-muted-color-hover);
+    }
+  }
+
   .button.-has-icon,
   .wp-block-button.-has-icon .wp-block-button__link {
     text-align: left;

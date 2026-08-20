@@ -374,8 +374,8 @@
   border-color: var(--bl-form-danger-hover);
   outline-color: var(--bl-form-outline-danger-hover);
 }
-.bl-form__field.is-invalid .bl-form__btn-option:hover span {
-  border-color: var(--bl-form-danger-hover);
+.bl-form__field.is-invalid .bl-form__btn-option:hover .button {
+  outline-color: var(--bl-form-outline-danger-hover);
 }
 .bl-form__field.is-invalid .bl-form__switch:hover .bl-form__switch-ui {
   outline-color: var(--bl-form-outline-danger-hover);
@@ -724,7 +724,7 @@ select.bl-form__control {
 .bl-form__button-group--vertical .bl-form__btn-option {
   display: flex;
 }
-.bl-form__button-group--vertical .bl-form__btn-option span {
+.bl-form__button-group--vertical .bl-form__btn-option .button {
   flex: 1 1 auto;
   width: 100%;
 }
@@ -740,26 +740,14 @@ select.bl-form__control {
   opacity: 0;
   cursor: pointer;
 }
-.bl-form__btn-option span {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 36px;
-  padding: 6px 14px;
-  border: 1px solid var(--bl-form-border);
-  border-radius: var(--bl-form-radius);
-  background: var(--bl-form-bg);
-  font-weight: 600;
-  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
-}
-.bl-form__btn-option input:focus-visible + span {
+.bl-form__btn-option input:focus-visible + .button {
   outline: 2px solid var(--bl-form-outline-focus);
-  outline-offset: 0;
+  outline-offset: 2px;
 }
-.bl-form__btn-option input:checked + span {
-  border-color: var(--bl-form-border-focus);
-  background: color-mix(in srgb, var(--bl-form-border-focus) 12%, var(--bl-form-bg));
-  color: var(--bl-form-border-focus);
+.bl-form__btn-option input:checked + .button.-muted {
+  color: var(--bl-button-primary-color, #fff);
+  background: var(--bl-button-primary-background-color, var(--bl-form-border-focus));
+  border-color: var(--bl-button-primary-background-color, var(--bl-form-border-focus));
 }
 
 .bl-form__switch {

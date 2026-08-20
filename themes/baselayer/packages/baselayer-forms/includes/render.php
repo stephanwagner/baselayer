@@ -1019,6 +1019,10 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 		$input_name = $multiple ? $field_name . '[]' : $field_name;
 		$layout = bl_forms_field_options_layout($field);
 		$group_class = 'bl-form__button-group bl-form__button-group--' . $layout;
+		$btn_extra = function_exists('bl_forms_sanitize_css_classes')
+			? bl_forms_sanitize_css_classes((string) ($field['button_class'] ?? ''))
+			: bl_forms_sanitize_css_class((string) ($field['button_class'] ?? ''));
+		$btn_classes = trim('button -muted' . ($btn_extra !== '' ? ' ' . $btn_extra : ''));
 		?>
 		<fieldset <?= bl_forms_field_wrap_attrs($field, 'bl-form__field bl-form__field--button-group', $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<?= bl_forms_field_label_html($field, $input_id, $req_mark, 'legend') // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
@@ -1031,7 +1035,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 					?>
 					<label class="bl-form__btn-option" for="<?= esc_attr($oid) ?>">
 						<input type="<?= esc_attr($input_type) ?>" id="<?= esc_attr($oid) ?>" name="<?= esc_attr($input_name) ?>" value="<?= esc_attr($opt_value) ?>"<?= !$multiple ? $choice_attrs : $disabled_attr ?><?= $checked ?>>
-						<span><?= esc_html((string) ($opt['label'] ?? '')) ?></span>
+						<span class="<?= esc_attr($btn_classes) ?>"><?= esc_html((string) ($opt['label'] ?? '')) ?></span>
 					</label>
 				<?php endforeach; ?>
 			</div>

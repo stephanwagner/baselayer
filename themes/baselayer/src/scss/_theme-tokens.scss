@@ -43,11 +43,7 @@
   --bl-color-accent-bg: #{$color-accent-bg};
 
   // Gradients
-  --bl-gradient-primary: linear-gradient(
-    to right,
-    var(--bl-color-primary),
-    var(--bl-color-secondary)
-  );
+  --bl-gradient-primary: linear-gradient(to right, var(--bl-color-primary), var(--bl-color-secondary));
 
   // Font sizes
   --bl-font-size-s: #{$font-size-s};
@@ -83,6 +79,10 @@
   --bl-button-white-color-hover: var(--bl-default-text-color);
   --bl-button-white-background-color: var(--bl-color-white);
   --bl-button-white-background-color-hover: var(--bl-color-gray-200);
+  --bl-button-muted-color: var(--bl-color-gray-600);
+  --bl-button-muted-color-hover: var(--bl-color-gray-700);
+  --bl-button-muted-background-color: var(--bl-color-gray-200);
+  --bl-button-muted-background-color-hover: var(--bl-color-gray-300);
 
   // Button geometry
   --bl-button-padding-y: #{$button-padding-y};

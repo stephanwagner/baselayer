@@ -358,8 +358,8 @@
     outline-color: var(--bl-form-outline-danger-hover);
   }
 
-  &.is-invalid .bl-form__btn-option:hover span {
-    border-color: var(--bl-form-danger-hover);
+  &.is-invalid .bl-form__btn-option:hover .button {
+    outline-color: var(--bl-form-outline-danger-hover);
   }
 
   &.is-invalid .bl-form__switch:hover .bl-form__switch-ui {
@@ -734,7 +734,7 @@ select.bl-form__control {
     .bl-form__btn-option {
       display: flex;
 
-      span {
+      .button {
         flex: 1 1 auto;
         width: 100%;
       }
@@ -754,31 +754,16 @@ select.bl-form__control {
     cursor: pointer;
   }
 
-  span {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 36px;
-    padding: 6px 14px;
-    border: 1px solid var(--bl-form-border);
-    border-radius: var(--bl-form-radius);
-    background: var(--bl-form-bg);
-    font-weight: 600;
-    transition:
-      border-color 0.15s ease,
-      background 0.15s ease,
-      color 0.15s ease;
-  }
-
-  input:focus-visible + span {
+  input:focus-visible + .button {
     outline: 2px solid var(--bl-form-outline-focus);
-    outline-offset: 0;
+    outline-offset: 2px;
   }
 
-  input:checked + span {
-    border-color: var(--bl-form-border-focus);
-    background: color-mix(in srgb, var(--bl-form-border-focus) 12%, var(--bl-form-bg));
-    color: var(--bl-form-border-focus);
+  // Selected: drop muted look for theme primary button.
+  input:checked + .button.-muted {
+    color: var(--bl-button-primary-color, #fff);
+    background: var(--bl-button-primary-background-color, var(--bl-form-border-focus));
+    border-color: var(--bl-button-primary-background-color, var(--bl-form-border-focus));
   }
 }
 

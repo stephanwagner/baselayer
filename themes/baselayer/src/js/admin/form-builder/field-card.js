@@ -268,12 +268,17 @@ function convertFieldType(field, nextType) {
     if (field.layout !== 'horizontal') {
       field.layout = 'vertical';
     }
+    delete field.button_class;
   } else if (nextType === 'button_group') {
     if (field.layout !== 'vertical') {
       field.layout = 'horizontal';
     }
+    if (typeof field.button_class !== 'string') {
+      field.button_class = '';
+    }
   } else {
     delete field.layout;
+    delete field.button_class;
   }
 
   if (nextType === 'toggle' || nextType === 'terms' || nextType === 'checkboxes') {
@@ -2347,6 +2352,36 @@ export function createCssClassControl(field) {
   return wrap;
 }
 
+export function createButtonClassControl(field) {
+  if (typeof field.button_class !== 'string') {
+    field.button_class = '';
+  }
+  const input = el('input', {
+    type: 'text',
+    className: 'widefat',
+    dataset: { blButtonClass: '1' },
+    value: field.button_class || '',
+    placeholder: t('buttonClassPlaceholder', 'e.g. -outline or -small'),
+  });
+  input.addEventListener('input', () => {
+    field.button_class = input.value;
+  });
+  const wrap = el('div', { className: 'bl-forms-builder__button-class' });
+  wrap.appendChild(
+    el('p', {}, [el('label', { text: t('buttonClass', 'Button class') }), input])
+  );
+  wrap.appendChild(
+    el('p', {
+      className: 'description',
+      text: t(
+        'buttonClassHelp',
+        'Extra CSS classes on each option button (space-separated), e.g. -outline or -small.'
+      ),
+    })
+  );
+  return wrap;
+}
+
 function widthBadgeLabel(field) {
   const width = field.width || '100';
   if (width === '100') {
@@ -2904,6 +2939,7 @@ export function serializeRow(row) {
     const raw = layoutBtn?.dataset.blLayout || '';
     if (type === 'button_group') {
       data.layout = raw === 'vertical' ? 'vertical' : 'horizontal';
+      data.button_class = q('[data-bl-button-class]')?.value || '';
     } else {
       data.layout = raw === 'horizontal' ? 'horizontal' : 'vertical';
     }
@@ -3424,6 +3460,9 @@ export function createFieldCard(initial, open = false) {
     }
     if ((field.type === 'file' || field.type === 'image') && !useMediaLibraryFields()) {
       appearanceSections.add(createUploadAppearanceControls(field));
+    }
+    if (field.type === 'button_group') {
+      appearanceSections.add(createButtonClassControl(field));
     }
     appearanceSections.add(createCssClassControl(field));
 

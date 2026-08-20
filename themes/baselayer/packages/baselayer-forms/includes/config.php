@@ -1708,6 +1708,11 @@ function bl_forms_sanitize_field($field): ?array
 
 	if ($type === 'button_group') {
 		$out['layout'] = (($field['layout'] ?? 'horizontal') === 'vertical') ? 'vertical' : 'horizontal';
+		$out['button_class'] = function_exists('bl_forms_sanitize_css_classes')
+			? bl_forms_sanitize_css_classes((string) ($field['button_class'] ?? ''))
+			: bl_forms_sanitize_css_class((string) ($field['button_class'] ?? ''));
+	} else {
+		unset($out['button_class']);
 	}
 
 	if ($type === 'checkboxes') {
