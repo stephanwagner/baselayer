@@ -28,6 +28,11 @@
   --bl-form-radius: var(--bl-radius, 6px);
   --bl-form-gap: 16px;
   --bl-form-control-padding: 10px 14px;
+  --bl-form-space-xs: 8px;
+  --bl-form-space-s: 16px;
+  --bl-form-space-m: 24px;
+  --bl-form-space-l: 32px;
+  --bl-form-space-xl: 48px;
 }
 
 .bl-form {
@@ -529,23 +534,58 @@ select.bl-form__control {
   width: 100%;
 }
 .bl-form__divider-wrap--xs {
-  --bl-form-divider-margin: 8px;
+  --bl-form-divider-margin: var(--bl-form-space-xs);
 }
 .bl-form__divider-wrap--s {
-  --bl-form-divider-margin: 16px;
+  --bl-form-divider-margin: var(--bl-form-space-s);
+}
+@media (max-width: 400px) {
+  .bl-form__divider-wrap--s {
+    --bl-form-divider-margin: var(--bl-form-space-xs);
+  }
 }
 .bl-form__divider-wrap--m {
-  --bl-form-divider-margin: 24px;
+  --bl-form-divider-margin: var(--bl-form-space-m);
+}
+@media (max-width: 600px) {
+  .bl-form__divider-wrap--m {
+    --bl-form-divider-margin: var(--bl-form-space-s);
+  }
+}
+@media (max-width: 400px) {
+  .bl-form__divider-wrap--m {
+    --bl-form-divider-margin: var(--bl-form-space-xs);
+  }
 }
 .bl-form__divider-wrap--l {
-  --bl-form-divider-margin: 32px;
+  --bl-form-divider-margin: var(--bl-form-space-l);
+}
+@media (max-width: 600px) {
+  .bl-form__divider-wrap--l {
+    --bl-form-divider-margin: var(--bl-form-space-m);
+  }
+}
+@media (max-width: 400px) {
+  .bl-form__divider-wrap--l {
+    --bl-form-divider-margin: var(--bl-form-space-s);
+  }
 }
 .bl-form__divider-wrap--xl {
-  --bl-form-divider-margin: 48px;
+  --bl-form-divider-margin: var(--bl-form-space-xl);
+}
+@media (max-width: 600px) {
+  .bl-form__divider-wrap--xl {
+    --bl-form-divider-margin: var(--bl-form-space-l);
+  }
+}
+@media (max-width: 400px) {
+  .bl-form__divider-wrap--xl {
+    --bl-form-divider-margin: var(--bl-form-space-m);
+  }
 }
 
 .bl-form__divider {
-  margin: var(--bl-form-divider-margin, 24px) 0;
+  margin: var(--bl-form-divider-margin, var(--bl-form-space-m)) 0;
   border: 0;
   border-top: 1px solid var(--bl-form-border);
 }
@@ -557,62 +597,57 @@ select.bl-form__control {
   pointer-events: none;
 }
 .bl-form__spacer-wrap--xs {
-  height: var(--bl-container-margin-xs, 24px);
+  height: var(--bl-form-space-xs);
 }
 .bl-form__spacer-wrap--s {
-  height: var(--bl-container-margin-s, 32px);
+  height: var(--bl-form-space-s);
 }
 @media (max-width: 400px) {
   .bl-form__spacer-wrap--s {
-    height: var(--bl-container-margin-xs, 24px);
+    height: var(--bl-form-space-xs);
   }
 }
 .bl-form__spacer-wrap--m {
-  height: var(--bl-container-margin-m, 48px);
+  height: var(--bl-form-space-m);
 }
 @media (max-width: 600px) {
   .bl-form__spacer-wrap--m {
-    height: var(--bl-container-margin-s, 32px);
+    height: var(--bl-form-space-s);
   }
 }
 @media (max-width: 400px) {
   .bl-form__spacer-wrap--m {
-    height: var(--bl-container-margin-xs, 24px);
+    height: var(--bl-form-space-xs);
   }
 }
 .bl-form__spacer-wrap--l {
-  height: var(--bl-container-margin-l, 64px);
-}
-@media (max-width: 900px) {
-  .bl-form__spacer-wrap--l {
-    height: var(--bl-container-margin-m, 48px);
-  }
+  height: var(--bl-form-space-l);
 }
 @media (max-width: 600px) {
   .bl-form__spacer-wrap--l {
-    height: var(--bl-container-margin-s, 32px);
+    height: var(--bl-form-space-m);
+  }
+}
+@media (max-width: 400px) {
+  .bl-form__spacer-wrap--l {
+    height: var(--bl-form-space-s);
   }
 }
 .bl-form__spacer-wrap--xl {
-  height: var(--bl-container-margin-xl, 96px);
-}
-@media (max-width: 1200px) {
-  .bl-form__spacer-wrap--xl {
-    height: var(--bl-container-margin-l, 64px);
-  }
-}
-@media (max-width: 900px) {
-  .bl-form__spacer-wrap--xl {
-    height: var(--bl-container-margin-m, 48px);
-  }
+  height: var(--bl-form-space-xl);
 }
 @media (max-width: 600px) {
   .bl-form__spacer-wrap--xl {
-    height: var(--bl-container-margin-s, 32px);
+    height: var(--bl-form-space-l);
+  }
+}
+@media (max-width: 400px) {
+  .bl-form__spacer-wrap--xl {
+    height: var(--bl-form-space-m);
   }
 }
 .bl-form__spacer-wrap--custom {
-  height: var(--bl-form-spacer-height, 24px);
+  height: var(--bl-form-spacer-height, var(--bl-form-space-m));
 }
 
 .bl-form__row-break {

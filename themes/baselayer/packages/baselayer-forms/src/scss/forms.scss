@@ -531,28 +531,56 @@ select.bl-form__control {
   width: 100%;
 
   &--xs {
-    --bl-form-divider-margin: 8px;
+    --bl-form-divider-margin: var(--bl-form-space-xs);
   }
 
   &--s {
-    --bl-form-divider-margin: 16px;
+    --bl-form-divider-margin: var(--bl-form-space-s);
+
+    @media (max-width: $breakpoint-xs) {
+      --bl-form-divider-margin: var(--bl-form-space-xs);
+    }
   }
 
   &--m {
-    --bl-form-divider-margin: 24px;
+    --bl-form-divider-margin: var(--bl-form-space-m);
+
+    @media (max-width: $breakpoint-s) {
+      --bl-form-divider-margin: var(--bl-form-space-s);
+    }
+
+    @media (max-width: $breakpoint-xs) {
+      --bl-form-divider-margin: var(--bl-form-space-xs);
+    }
   }
 
   &--l {
-    --bl-form-divider-margin: 32px;
+    --bl-form-divider-margin: var(--bl-form-space-l);
+
+    @media (max-width: $breakpoint-s) {
+      --bl-form-divider-margin: var(--bl-form-space-m);
+    }
+
+    @media (max-width: $breakpoint-xs) {
+      --bl-form-divider-margin: var(--bl-form-space-s);
+    }
   }
 
   &--xl {
-    --bl-form-divider-margin: 48px;
+    --bl-form-divider-margin: var(--bl-form-space-xl);
+
+    @media (max-width: $breakpoint-s) {
+      --bl-form-divider-margin: var(--bl-form-space-l);
+    }
+
+    @media (max-width: $breakpoint-xs) {
+      --bl-form-divider-margin: var(--bl-form-space-m);
+    }
   }
 }
 
 .bl-form__divider {
-  margin: var(--bl-form-divider-margin, 24px) 0;
+  margin: var(--bl-form-divider-margin, var(--bl-form-space-m)) 0;
   border: 0;
   border-top: 1px solid var(--bl-form-border);
 }
@@ -564,59 +592,55 @@ select.bl-form__control {
   pointer-events: none;
 
   &--xs {
-    height: var(--bl-container-margin-xs, #{$container-margin-xs});
+    height: var(--bl-form-space-xs);
   }
 
   &--s {
-    height: var(--bl-container-margin-s, #{$container-margin-s});
+    height: var(--bl-form-space-s);
 
     @media (max-width: $breakpoint-xs) {
-      height: var(--bl-container-margin-xs, #{$container-margin-xs});
+      height: var(--bl-form-space-xs);
     }
   }
 
   &--m {
-    height: var(--bl-container-margin-m, #{$container-margin-m});
+    height: var(--bl-form-space-m);
 
     @media (max-width: $breakpoint-s) {
-      height: var(--bl-container-margin-s, #{$container-margin-s});
+      height: var(--bl-form-space-s);
     }
 
     @media (max-width: $breakpoint-xs) {
-      height: var(--bl-container-margin-xs, #{$container-margin-xs});
+      height: var(--bl-form-space-xs);
     }
   }
 
   &--l {
-    height: var(--bl-container-margin-l, #{$container-margin-l});
-
-    @media (max-width: $breakpoint-m) {
-      height: var(--bl-container-margin-m, #{$container-margin-m});
-    }
+    height: var(--bl-form-space-l);
 
     @media (max-width: $breakpoint-s) {
-      height: var(--bl-container-margin-s, #{$container-margin-s});
+      height: var(--bl-form-space-m);
+    }
+
+    @media (max-width: $breakpoint-xs) {
+      height: var(--bl-form-space-s);
     }
   }
 
   &--xl {
-    height: var(--bl-container-margin-xl, #{$container-margin-xl});
-
-    @media (max-width: $breakpoint-l) {
-      height: var(--bl-container-margin-l, #{$container-margin-l});
-    }
-
-    @media (max-width: $breakpoint-m) {
-      height: var(--bl-container-margin-m, #{$container-margin-m});
-    }
+    height: var(--bl-form-space-xl);
 
     @media (max-width: $breakpoint-s) {
-      height: var(--bl-container-margin-s, #{$container-margin-s});
+      height: var(--bl-form-space-l);
+    }
+
+    @media (max-width: $breakpoint-xs) {
+      height: var(--bl-form-space-m);
     }
   }
 
   &--custom {
-    height: var(--bl-form-spacer-height, 24px);
+    height: var(--bl-form-spacer-height, var(--bl-form-space-m));
   }
 }
 

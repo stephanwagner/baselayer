@@ -28,10 +28,11 @@ $breakpoint-s: 600px !default;
 $breakpoint-m: 900px !default;
 $breakpoint-l: 1200px !default;
 
-$container-margin-xs: 24px !default;
-$container-margin-s: 32px !default;
-$container-margin-m: 48px !default;
-$container-margin-l: 64px !default;
-$container-margin-xl: 96px !default;
+// Spacer / divider vertical scale (not theme container margins).
+$form-space-xs: 8px !default;
+$form-space-s: 16px !default;
+$form-space-m: 24px !default;
+$form-space-l: 32px !default;
+$form-space-xl: 48px !default;
 
 $high-density-dppx: 1.9dppx !default;

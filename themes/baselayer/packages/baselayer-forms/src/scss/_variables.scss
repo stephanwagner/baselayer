@@ -27,4 +27,9 @@
   --bl-form-radius: var(--bl-radius, 6px);
   --bl-form-gap: 16px;
   --bl-form-control-padding: 10px 14px;
+  --bl-form-space-xs: #{$form-space-xs};
+  --bl-form-space-s: #{$form-space-s};
+  --bl-form-space-m: #{$form-space-m};
+  --bl-form-space-l: #{$form-space-l};
+  --bl-form-space-xl: #{$form-space-xl};
 }
