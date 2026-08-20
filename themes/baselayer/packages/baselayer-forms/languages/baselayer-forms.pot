@@ -1548,6 +1548,9 @@ msgstr ""
 msgid "Spacer"
 msgstr ""
 
+msgid "Row break"
+msgstr ""
+
 #: includes/admin.php:759
 msgid "Hidden"
 msgstr ""

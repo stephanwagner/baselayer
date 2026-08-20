@@ -1552,6 +1552,9 @@ msgstr "Trennlinie"
 msgid "Spacer"
 msgstr "Abstandhalter"
 
+msgid "Row break"
+msgstr "Zeilenumbruch"
+
 #: includes/admin.php:759
 msgid "Hidden"
 msgstr "Versteckt"

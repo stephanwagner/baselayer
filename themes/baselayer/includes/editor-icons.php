@@ -68,6 +68,7 @@ function bl_icon_labels(): array
 		'arrow-split'            => _x('Arrow split', 'icon name', 'baselayer-icons'),
 		'arrow-split-up'         => _x('Arrow split up', 'icon name', 'baselayer-icons'),
 		'subdirectory-arrow'     => _x('Subdirectory arrow', 'icon name', 'baselayer-icons'),
+		'keyboard-return'        => _x('Keyboard return', 'icon name', 'baselayer-icons'),
 		'compare'                => _x('Compare', 'icon name', 'baselayer-icons'),
 		'swap-horizontal'        => _x('Swap horizontal', 'icon name', 'baselayer-icons'),
 		'swap-vertical'          => _x('Swap vertical', 'icon name', 'baselayer-icons'),

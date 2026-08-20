@@ -172,6 +172,10 @@ msgid "Subdirectory arrow"
 msgstr "Unterverzeichnis-Pfeil"
 
 msgctxt "icon name"
+msgid "Keyboard return"
+msgstr "Zeilenumbruch"
+
+msgctxt "icon name"
 msgid "Swap horizontal"
 msgstr "Horizontal tauschen"
 
