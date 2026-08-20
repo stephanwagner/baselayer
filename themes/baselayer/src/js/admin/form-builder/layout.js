@@ -299,7 +299,7 @@ export function createColumnCard(initial = {}) {
 
   const preview = el('span', {
     className: 'bl-forms-builder__preview',
-    text: (window.blFormsAdmin?.i18n?.types?.column) || t('columnType', 'Columns'),
+    text: (window.blFormsAdmin?.i18n?.types?.column) || t('columnType', 'Column'),
   });
   const widthBadge = el('span', { className: 'bl-forms-builder__width-badge' });
   const designBtn = el('button', {
@@ -344,7 +344,7 @@ export function createColumnCard(initial = {}) {
       iconEl('column', 'bl-forms-builder__field-type-icon'),
       el('span', {
         className: 'bl-forms-builder__field-type-label',
-        text: (window.blFormsAdmin?.i18n?.types?.column) || t('columnType', 'Columns'),
+        text: (window.blFormsAdmin?.i18n?.types?.column) || t('columnType', 'Column'),
       }),
     ];
     const logic = field.conditional_logic;

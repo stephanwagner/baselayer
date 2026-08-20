@@ -234,8 +234,8 @@ msgid "Drop fields here"
 msgstr "Felder hier ablegen"
 
 #: includes/admin.php:420 includes/admin.php:757
-msgid "Columns"
-msgstr "Spalten"
+msgid "Column"
+msgstr "Spalte"
 
 #: includes/admin.php:421
 msgid "Column width"
@@ -1070,6 +1070,20 @@ msgstr "z. B. my-field"
 #: includes/admin.php:627
 msgid "Optional class names added to this field’s wrapper."
 msgstr "Optionale Klassennamen für den Wrapper dieses Feldes."
+
+#: includes/admin.php:719
+msgid "Button class"
+msgstr "Button-Klasse"
+
+#: includes/admin.php:720
+msgid "e.g. -outline or -small"
+msgstr "z. B. -outline oder -small"
+
+#: includes/admin.php:721
+msgid "Extra CSS classes on each option button (space-separated), e.g. -outline or -small."
+msgstr ""
+"Zusätzliche CSS-Klassen für jeden Options-Button (durch Leerzeichen getrennt), "
+"z. B. -outline oder -small."
 
 #: includes/admin.php:628 includes/settings-page.php:426
 msgid "Submit button label"

@@ -1222,7 +1222,7 @@
     columnFieldByEl.set(row, field);
     const preview = el("span", {
       className: "bl-forms-builder__preview",
-      text: window.blFormsAdmin?.i18n?.types?.column || t("columnType", "Columns")
+      text: window.blFormsAdmin?.i18n?.types?.column || t("columnType", "Column")
     });
     const widthBadge = el("span", { className: "bl-forms-builder__width-badge" });
     const designBtn = el("button", {
@@ -1262,7 +1262,7 @@
         iconEl("column", "bl-forms-builder__field-type-icon"),
         el("span", {
           className: "bl-forms-builder__field-type-label",
-          text: window.blFormsAdmin?.i18n?.types?.column || t("columnType", "Columns")
+          text: window.blFormsAdmin?.i18n?.types?.column || t("columnType", "Column")
         })
       ];
       const logic = field.conditional_logic;
@@ -4523,15 +4523,12 @@
         title = typeLabel("captcha");
       } else if (field.type === "spacer") {
         const height = field.height || "m";
-        title = height === "custom" ? (field.height_custom || t("widthCustom", "Custom")).trim() : height.toUpperCase();
+        const size = height === "custom" ? (field.height_custom || t("widthCustom", "Custom")).trim() : SPACER_HEIGHT_PRESETS.find((item) => item.value === height)?.label || height.toUpperCase();
+        title = `${typeLabel("spacer")}: ${size}`;
       } else if (field.type === "divider") {
         const margin = field.margin || "m";
-        if (margin === "custom") {
-          title = (field.margin_custom || t("widthCustom", "Custom")).trim();
-        } else {
-          const preset = DIVIDER_MARGIN_PRESETS.find((item) => item.value === margin);
-          title = preset?.label || margin.toUpperCase();
-        }
+        const size = margin === "custom" ? (field.margin_custom || t("widthCustom", "Custom")).trim() : DIVIDER_MARGIN_PRESETS.find((item) => item.value === margin)?.label || margin.toUpperCase();
+        title = `${typeLabel("divider")}: ${size}`;
       } else if (field.type === "row_break") {
         title = typeLabel("row_break");
       } else if (field.type === "heading" || field.type === "text_block" || field.type === "html") {

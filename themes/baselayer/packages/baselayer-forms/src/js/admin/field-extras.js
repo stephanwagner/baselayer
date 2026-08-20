@@ -3,18 +3,30 @@
  * Registered via BlFormBuilder.configure({ fieldCard }) from the Forms admin app.
  */
 
+import { openSimpleModal } from './modal.js';
+
 function fb() {
   return window.BlFormBuilder || {};
 }
 
+const LIST_OVERVIEW_TYPES = ['text', 'email', 'phone'];
+
+/**
+ * Count other fields marked for the entries list.
+ * Uses live field data (not DOM querySelector into nested cards).
+ */
 function countOtherListOverviewFields(exceptId) {
+  const except = String(exceptId || '');
   let n = 0;
   document.querySelectorAll('.bl-forms-builder__field[data-bl-forms-field]').forEach((row) => {
-    if (exceptId && row.dataset.fieldId === exceptId) {
+    if (except && String(row.dataset.fieldId || '') === except) {
       return;
     }
-    const input = row.querySelector('[data-bl-show-in-list]');
-    if (input && input.checked) {
+    const field = row._blFieldRef;
+    if (!field || !LIST_OVERVIEW_TYPES.includes(field.type)) {
+      return;
+    }
+    if (field.show_in_list) {
       n += 1;
     }
   });
@@ -25,19 +37,20 @@ function countOtherListOverviewFields(exceptId) {
  * Whether another field of this type already has “show in list” enabled.
  */
 function hasShowInListForType(type, exceptId = '') {
+  const except = String(exceptId || '');
   let found = false;
   document.querySelectorAll('.bl-forms-builder__field[data-bl-forms-field]').forEach((row) => {
     if (found) {
       return;
     }
-    if (exceptId && row.dataset.fieldId === exceptId) {
+    if (except && String(row.dataset.fieldId || '') === except) {
       return;
     }
-    if ((row.dataset.fieldType || '') !== type) {
+    const field = row._blFieldRef;
+    if (!field || field.type !== type) {
       return;
     }
-    const input = row.querySelector('[data-bl-show-in-list]');
-    if (input && input.checked) {
+    if (field.show_in_list) {
       found = true;
     }
   });
@@ -67,7 +80,8 @@ function createListOverviewControl(field) {
   input.addEventListener('change', () => {
     if (input.checked && countOtherListOverviewFields(field.id) >= 3) {
       input.checked = false;
-      window.alert(
+      openSimpleModal(
+        t('showInList', 'Show in overview'),
         t('showInListMax', 'You can show at most 3 fields in the entries list.')
       );
       return;

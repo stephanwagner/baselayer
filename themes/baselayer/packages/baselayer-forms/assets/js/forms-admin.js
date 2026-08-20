@@ -1374,6 +1374,71 @@
     });
   }
 
+  // themes/baselayer/packages/baselayer-forms/src/js/admin/modal.js
+  function fb() {
+    return window.BlFormBuilder || {};
+  }
+  function openSimpleModal(title, message, options = {}) {
+    const { el: el5, t: t5 } = fb();
+    if (!el5 || !t5) {
+      window.alert(message);
+      return;
+    }
+    document.querySelectorAll(".bl-forms-builder__modal").forEach((node) => node.remove());
+    const backdrop = el5("div", {
+      className: "bl-forms-builder__modal",
+      role: "dialog",
+      "aria-modal": "true",
+      "aria-label": title
+    });
+    const close = () => {
+      document.removeEventListener("keydown", onKey);
+      backdrop.remove();
+    };
+    const onKey = (evt) => {
+      if (evt.key === "Escape") {
+        close();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    backdrop.addEventListener("click", (evt) => {
+      if (evt.target === backdrop) {
+        close();
+      }
+    });
+    const footerChildren = [
+      el5("button", {
+        type: "button",
+        className: "button",
+        text: options.onConfirm ? t5("cancel", "Cancel") : t5("close", "Close"),
+        onClick: close
+      })
+    ];
+    if (options.onConfirm) {
+      footerChildren.push(
+        el5("button", {
+          type: "button",
+          className: "button button-primary",
+          text: options.confirmLabel || t5("apply", "Apply"),
+          onClick: () => {
+            options.onConfirm();
+            close();
+          }
+        })
+      );
+    }
+    const dialog = el5("div", { className: "bl-forms-builder__modal-dialog" });
+    dialog.append(
+      el5("div", { className: "bl-forms-builder__modal-header" }, [
+        el5("h2", { className: "bl-forms-builder__modal-title", text: title })
+      ]),
+      el5("div", { className: "bl-forms-builder__modal-body" }, [el5("p", { text: message })]),
+      el5("div", { className: "bl-forms-builder__modal-footer" }, footerChildren)
+    );
+    backdrop.appendChild(dialog);
+    document.body.appendChild(backdrop);
+  }
+
   // themes/baselayer/packages/baselayer-forms/src/js/admin/templates.js
   var { el: el3, t: t3, uid, slugifyName } = window.BlFormBuilder || {};
   function makeField(partial) {
@@ -1563,61 +1628,6 @@
       }
     ];
   }
-  function openSimpleModal(title, message, options = {}) {
-    document.querySelectorAll(".bl-forms-builder__modal").forEach((node) => node.remove());
-    const backdrop = el3("div", {
-      className: "bl-forms-builder__modal",
-      role: "dialog",
-      "aria-modal": "true",
-      "aria-label": title
-    });
-    const close = () => {
-      document.removeEventListener("keydown", onKey);
-      backdrop.remove();
-    };
-    const onKey = (evt) => {
-      if (evt.key === "Escape") {
-        close();
-      }
-    };
-    document.addEventListener("keydown", onKey);
-    backdrop.addEventListener("click", (evt) => {
-      if (evt.target === backdrop) {
-        close();
-      }
-    });
-    const footerChildren = [
-      el3("button", {
-        type: "button",
-        className: "button",
-        text: options.onConfirm ? t3("cancel", "Cancel") : t3("close", "Close"),
-        onClick: close
-      })
-    ];
-    if (options.onConfirm) {
-      footerChildren.push(
-        el3("button", {
-          type: "button",
-          className: "button button-primary",
-          text: options.confirmLabel || t3("apply", "Apply"),
-          onClick: () => {
-            options.onConfirm();
-            close();
-          }
-        })
-      );
-    }
-    const dialog = el3("div", { className: "bl-forms-builder__modal-dialog" });
-    dialog.append(
-      el3("div", { className: "bl-forms-builder__modal-header" }, [
-        el3("h2", { className: "bl-forms-builder__modal-title", text: title })
-      ]),
-      el3("div", { className: "bl-forms-builder__modal-body" }, [el3("p", { text: message })]),
-      el3("div", { className: "bl-forms-builder__modal-footer" }, footerChildren)
-    );
-    backdrop.appendChild(dialog);
-    document.body.appendChild(backdrop);
-  }
   function templateButton(label, onClick) {
     return el3("button", {
       type: "button",
@@ -1716,36 +1726,42 @@
   }
 
   // themes/baselayer/packages/baselayer-forms/src/js/admin/field-extras.js
-  function fb() {
+  function fb2() {
     return window.BlFormBuilder || {};
   }
+  var LIST_OVERVIEW_TYPES = ["text", "email", "phone"];
   function countOtherListOverviewFields(exceptId) {
+    const except = String(exceptId || "");
     let n = 0;
     document.querySelectorAll(".bl-forms-builder__field[data-bl-forms-field]").forEach((row) => {
-      if (exceptId && row.dataset.fieldId === exceptId) {
+      if (except && String(row.dataset.fieldId || "") === except) {
         return;
       }
-      const input = row.querySelector("[data-bl-show-in-list]");
-      if (input && input.checked) {
+      const field = row._blFieldRef;
+      if (!field || !LIST_OVERVIEW_TYPES.includes(field.type)) {
+        return;
+      }
+      if (field.show_in_list) {
         n += 1;
       }
     });
     return n;
   }
   function hasShowInListForType(type, exceptId = "") {
+    const except = String(exceptId || "");
     let found = false;
     document.querySelectorAll(".bl-forms-builder__field[data-bl-forms-field]").forEach((row) => {
       if (found) {
         return;
       }
-      if (exceptId && row.dataset.fieldId === exceptId) {
+      if (except && String(row.dataset.fieldId || "") === except) {
         return;
       }
-      if ((row.dataset.fieldType || "") !== type) {
+      const field = row._blFieldRef;
+      if (!field || field.type !== type) {
         return;
       }
-      const input = row.querySelector("[data-bl-show-in-list]");
-      if (input && input.checked) {
+      if (field.show_in_list) {
         found = true;
       }
     });
@@ -1761,7 +1777,7 @@
     return !hasShowInListForType(type, exceptId);
   }
   function createListOverviewControl(field) {
-    const { el: el5, t: t5 } = fb();
+    const { el: el5, t: t5 } = fb2();
     const input = el5("input", {
       type: "checkbox",
       dataset: { blShowInList: "1" },
@@ -1770,7 +1786,8 @@
     input.addEventListener("change", () => {
       if (input.checked && countOtherListOverviewFields(field.id) >= 3) {
         input.checked = false;
-        window.alert(
+        openSimpleModal(
+          t5("showInList", "Show in overview"),
           t5("showInListMax", "You can show at most 3 fields in the entries list.")
         );
         return;
