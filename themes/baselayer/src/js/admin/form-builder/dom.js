@@ -37,6 +37,7 @@ export const TYPE_KEYS = [
   'text_block',
   'divider',
   'spacer',
+  'row_break',
   'html',
   'column',
   'section',
@@ -96,7 +97,7 @@ export const PALETTE_SECTIONS = [
     id: 'layout',
     headingKey: 'paletteSectionLayout',
     headingFallback: 'Layout',
-    types: ['section', 'tab', 'column', 'divider', 'spacer'],
+    types: ['section', 'tab', 'column', 'divider', 'spacer', 'row_break'],
   },
   {
     id: 'advanced',
@@ -333,6 +334,9 @@ export function defaultField(type = 'text') {
   const id = uid();
   if (type === 'divider') {
     return { id, type, margin: 'm', margin_custom: '', css_class: '' };
+  }
+  if (type === 'row_break') {
+    return { id, type, css_class: '' };
   }
   if (type === 'spacer') {
     return {

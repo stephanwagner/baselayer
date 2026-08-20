@@ -33,6 +33,7 @@
     "text_block",
     "divider",
     "spacer",
+    "row_break",
     "html",
     "column",
     "section",
@@ -90,7 +91,7 @@
       id: "layout",
       headingKey: "paletteSectionLayout",
       headingFallback: "Layout",
-      types: ["section", "tab", "column", "divider", "spacer"]
+      types: ["section", "tab", "column", "divider", "spacer", "row_break"]
     },
     {
       id: "advanced",
@@ -256,6 +257,9 @@
     const id = uid();
     if (type === "divider") {
       return { id, type, margin: "m", margin_custom: "", css_class: "" };
+    }
+    if (type === "row_break") {
+      return { id, type, css_class: "" };
     }
     if (type === "spacer") {
       return {
@@ -464,6 +468,7 @@
     "tab",
     "divider",
     "spacer",
+    "row_break",
     "heading",
     "text_block",
     "html",
@@ -2176,6 +2181,7 @@
     "captcha",
     "divider",
     "spacer",
+    "row_break",
     "heading",
     "text_block",
     "html",
@@ -2195,6 +2201,7 @@
     "captcha",
     "divider",
     "spacer",
+    "row_break",
     "heading",
     "text_block",
     "html",
@@ -2241,6 +2248,7 @@
     "captcha",
     "divider",
     "spacer",
+    "row_break",
     "heading",
     "text_block",
     "html",
@@ -4122,6 +4130,14 @@
         css_class: q("[data-bl-css-class]")?.value || ""
       });
     }
+    if (type === "row_break") {
+      return withConditionalLogic(body, {
+        id,
+        type,
+        active,
+        css_class: q("[data-bl-css-class]")?.value || ""
+      });
+    }
     if (type === "heading") {
       const levels = getHeadingLevels();
       const fallback = headingLevelFallback(levels);
@@ -4480,12 +4496,14 @@
           const preset = DIVIDER_MARGIN_PRESETS.find((item) => item.value === margin);
           title = preset?.label || margin.toUpperCase();
         }
+      } else if (field.type === "row_break") {
+        title = typeLabel("row_break");
       } else if (field.type === "heading" || field.type === "text_block" || field.type === "html") {
         title = (field.content || "").trim();
       }
       preview.textContent = title;
       preview.hidden = title === "";
-      const widthText = field.type === "hidden" || field.type === "divider" || field.type === "spacer" ? "" : widthBadgeLabel(field);
+      const widthText = field.type === "hidden" || field.type === "divider" || field.type === "spacer" || field.type === "row_break" ? "" : widthBadgeLabel(field);
       widthBadge.textContent = widthText;
       widthBadge.hidden = widthText === "";
       widthBadge.classList.toggle("is-interactive", widthText !== "");
@@ -4656,7 +4674,7 @@
       if (field.type === "radio" || field.type === "checkboxes" || field.type === "button_group") {
         appearanceSections.add(createLayoutControl(field));
       }
-      if (field.type !== "hidden" && field.type !== "divider" && field.type !== "spacer") {
+      if (field.type !== "hidden" && field.type !== "divider" && field.type !== "spacer" && field.type !== "row_break") {
         appearanceSections.add(createWidthControl(field, updatePreview));
       }
       const appearanceHooks = getFieldCardHooks();
@@ -4671,7 +4689,7 @@
       }
       appearanceSections.add(createCssClassControl(field));
       logicSections.add(createConditionalLogicEditor(field, void 0, updatePreview));
-      if (field.type === "divider" || field.type === "spacer") {
+      if (field.type === "divider" || field.type === "spacer" || field.type === "row_break") {
       } else if (field.type === "captcha") {
         generalSections.add(
           createCaptchaSettings(field, () => {
@@ -5141,7 +5159,7 @@
       typeChip
     ]);
     widthBadge.addEventListener("click", (evt) => {
-      if (widthBadge.hidden || field.type === "hidden" || field.type === "divider" || field.type === "spacer") {
+      if (widthBadge.hidden || field.type === "hidden" || field.type === "divider" || field.type === "spacer" || field.type === "row_break") {
         return;
       }
       evt.preventDefault();

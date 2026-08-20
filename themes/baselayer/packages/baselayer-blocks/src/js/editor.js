@@ -50,9 +50,16 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
   }
 
   function isStaticFieldType(type) {
-    return ['divider', 'spacer', 'heading', 'text_block', 'html', 'captcha', 'honeypot'].includes(
-      type
-    );
+    return [
+      'divider',
+      'spacer',
+      'row_break',
+      'heading',
+      'text_block',
+      'html',
+      'captcha',
+      'honeypot',
+    ].includes(type);
   }
 
   /** Seedable default for one field; undefined when the key should stay absent. */

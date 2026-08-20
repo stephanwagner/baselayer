@@ -6028,7 +6028,7 @@
     });
   }
   function isStatic(type) {
-    return type === "divider" || type === "spacer" || type === "heading" || type === "text_block" || type === "html" || type === "honeypot" || type === "captcha";
+    return type === "divider" || type === "spacer" || type === "row_break" || type === "heading" || type === "text_block" || type === "html" || type === "honeypot" || type === "captcha";
   }
   function fieldShowAsCheckbox(field) {
     const type = field && field.type ? field.type : "";
@@ -7688,9 +7688,16 @@
       return ["column", "section", "tab", "group"].includes(type);
     }
     function isStaticFieldType(type) {
-      return ["divider", "spacer", "heading", "text_block", "html", "captcha", "honeypot"].includes(
-        type
-      );
+      return [
+        "divider",
+        "spacer",
+        "row_break",
+        "heading",
+        "text_block",
+        "html",
+        "captcha",
+        "honeypot"
+      ].includes(type);
     }
     function defaultValueForField(field) {
       if (!field || typeof field !== "object") {

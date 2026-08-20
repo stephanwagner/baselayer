@@ -7,6 +7,7 @@ export const LOGIC_SOURCE_EXCLUDE = [
   'tab',
   'divider',
   'spacer',
+  'row_break',
   'heading',
   'text_block',
   'html',

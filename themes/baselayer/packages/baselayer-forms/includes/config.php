@@ -32,6 +32,7 @@ function bl_forms_field_types(): array
 		'html',
 		'divider',
 		'spacer',
+		'row_break',
 		'column',
 		'section',
 		'tab',
@@ -50,7 +51,7 @@ function bl_forms_field_types(): array
  */
 function bl_forms_content_field_types(): array
 {
-	return ['heading', 'text_block', 'html', 'divider', 'spacer', 'column', 'section', 'tab', 'captcha'];
+	return ['heading', 'text_block', 'html', 'divider', 'spacer', 'row_break', 'column', 'section', 'tab', 'captcha'];
 }
 
 /**
@@ -1526,6 +1527,24 @@ function bl_forms_sanitize_field($field): ?array
 			$out['placeholder'],
 			$out['width'],
 			$out['width_custom']
+		);
+
+		return bl_forms_attach_conditional_logic($out, $field);
+	}
+
+	if ($type === 'row_break') {
+		unset(
+			$out['name'],
+			$out['label'],
+			$out['name_manual'],
+			$out['hide_label'],
+			$out['placeholder'],
+			$out['width'],
+			$out['width_custom'],
+			$out['height'],
+			$out['height_custom'],
+			$out['margin'],
+			$out['margin_custom']
 		);
 
 		return bl_forms_attach_conditional_logic($out, $field);

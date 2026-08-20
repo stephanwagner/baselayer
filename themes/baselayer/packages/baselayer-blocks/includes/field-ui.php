@@ -53,6 +53,7 @@ function bl_blocks_palette_icons(): array
 			'html',
 			'divider',
 			'spacer',
+			'row_break',
 			'column',
 			'section',
 			'tab',
@@ -108,7 +109,7 @@ function bl_blocks_field_types(): array
 			'text', 'textarea', 'email', 'phone', 'url', 'number',
 			'checkboxes', 'radio', 'select', 'toggle', 'button_group',
 			'date', 'time', 'datetime', 'file', 'image',
-			'heading', 'text_block', 'divider', 'spacer', 'html',
+			'heading', 'text_block', 'divider', 'spacer', 'row_break', 'html',
 			'column', 'section', 'tab', 'hidden', 'page', 'link', 'icon',
 		];
 	}

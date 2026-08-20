@@ -493,7 +493,7 @@ function bl_blocks_is_layout_field_type(string $type): bool
  */
 function bl_blocks_is_static_field_type(string $type): bool
 {
-	return in_array($type, ['divider', 'spacer', 'heading', 'text_block', 'html', 'captcha', 'honeypot'], true);
+	return in_array($type, ['divider', 'spacer', 'row_break', 'heading', 'text_block', 'html', 'captcha', 'honeypot'], true);
 }
 
 /**

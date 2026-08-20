@@ -375,6 +375,7 @@ function isStatic(type) {
   return (
     type === 'divider' ||
     type === 'spacer' ||
+    type === 'row_break' ||
     type === 'heading' ||
     type === 'text_block' ||
     type === 'html' ||

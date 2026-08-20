@@ -844,6 +844,14 @@ p.bl-forms-builder__palette-empty {
   color: #1d2327;
 }
 
+// Canvas cue for row-break layout elements.
+.bl-forms-builder__field[data-field-type='row_break'] {
+  > .bl-forms-builder__field-header .bl-forms-builder__preview {
+    color: #8c8f94;
+    font-weight: 400;
+  }
+}
+
 .bl-forms-builder__handle {
   display: inline-flex;
   flex: 0 0 auto;

@@ -845,6 +845,7 @@ function bl_forms_admin_enqueue(string $hook): void
 					'html'         => __('HTML', 'baselayer-forms'),
 					'divider'      => __('Divider', 'baselayer-forms'),
 					'spacer'       => __('Spacer', 'baselayer-forms'),
+					'row_break'    => __('Row break', 'baselayer-forms'),
 					'column'       => __('Columns', 'baselayer-forms'),
 					'section'      => __('Section', 'baselayer-forms'),
 					'tab'          => __('Tab', 'baselayer-forms'),

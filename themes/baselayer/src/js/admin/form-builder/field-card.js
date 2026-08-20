@@ -541,6 +541,7 @@ const NO_PLACEHOLDER = [
   'captcha',
   'divider',
   'spacer',
+  'row_break',
   'heading',
   'text_block',
   'html',
@@ -560,6 +561,7 @@ const NO_REQUIRED = [
   'captcha',
   'divider',
   'spacer',
+  'row_break',
   'heading',
   'text_block',
   'html',
@@ -607,6 +609,7 @@ const NO_DEFAULT = [
   'captcha',
   'divider',
   'spacer',
+  'row_break',
   'heading',
   'text_block',
   'html',
@@ -2800,6 +2803,15 @@ export function serializeRow(row) {
     });
   }
 
+  if (type === 'row_break') {
+    return withConditionalLogic(body, {
+      id,
+      type,
+      active,
+      css_class: q('[data-bl-css-class]')?.value || '',
+    });
+  }
+
   if (type === 'heading') {
     const levels = getHeadingLevels();
     const fallback = headingLevelFallback(levels);
@@ -3201,6 +3213,8 @@ export function createFieldCard(initial, open = false) {
         const preset = DIVIDER_MARGIN_PRESETS.find((item) => item.value === margin);
         title = preset?.label || margin.toUpperCase();
       }
+    } else if (field.type === 'row_break') {
+      title = typeLabel('row_break');
     } else if (field.type === 'heading' || field.type === 'text_block' || field.type === 'html') {
       title = (field.content || '').trim();
     }
@@ -3208,7 +3222,10 @@ export function createFieldCard(initial, open = false) {
     preview.hidden = title === '';
 
     const widthText =
-      field.type === 'hidden' || field.type === 'divider' || field.type === 'spacer'
+      field.type === 'hidden' ||
+      field.type === 'divider' ||
+      field.type === 'spacer' ||
+      field.type === 'row_break'
         ? ''
         : widthBadgeLabel(field);
     widthBadge.textContent = widthText;
@@ -3394,7 +3411,7 @@ export function createFieldCard(initial, open = false) {
     if (field.type === 'radio' || field.type === 'checkboxes' || field.type === 'button_group') {
       appearanceSections.add(createLayoutControl(field));
     }
-    if (field.type !== 'hidden' && field.type !== 'divider' && field.type !== 'spacer') {
+    if (field.type !== 'hidden' && field.type !== 'divider' && field.type !== 'spacer' && field.type !== 'row_break') {
       appearanceSections.add(createWidthControl(field, updatePreview));
     }
     const appearanceHooks = getFieldCardHooks();
@@ -3412,7 +3429,7 @@ export function createFieldCard(initial, open = false) {
 
     logicSections.add(createConditionalLogicEditor(field, undefined, updatePreview));
 
-    if (field.type === 'divider' || field.type === 'spacer') {
+    if (field.type === 'divider' || field.type === 'spacer' || field.type === 'row_break') {
       // Appearance only.
     } else if (field.type === 'captcha') {
       generalSections.add(
@@ -3928,7 +3945,8 @@ export function createFieldCard(initial, open = false) {
       widthBadge.hidden ||
       field.type === 'hidden' ||
       field.type === 'divider' ||
-      field.type === 'spacer'
+      field.type === 'spacer' ||
+      field.type === 'row_break'
     ) {
       return;
     }

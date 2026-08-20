@@ -173,7 +173,11 @@ function bl_forms_enqueue_front_assets(): void
  */
 function bl_forms_field_wrap_attrs(array $field, string $extra_class = '', string $name = '', array $context = []): string
 {
+	$is_auto = (($field['width'] ?? '') === 'auto');
 	$classes = trim('bl-form__field-wrap ' . $extra_class);
+	if ($is_auto) {
+		$classes .= ' bl-form__field-wrap--auto';
+	}
 	if (bl_forms_field_hide_label($field)) {
 		$classes .= ' bl-form__field-wrap--hide-label';
 	}
@@ -188,7 +192,10 @@ function bl_forms_field_wrap_attrs(array $field, string $extra_class = '', strin
 	if (function_exists('bl_forms_field_id_and_logic_attrs')) {
 		$attrs .= bl_forms_field_id_and_logic_attrs($field, $context);
 	}
-	$attrs .= ' style="' . esc_attr(bl_forms_field_width_style($field)) . '"';
+	// Auto uses flex grow via --auto; calc(auto - gap) is invalid CSS.
+	if (!$is_auto) {
+		$attrs .= ' style="' . esc_attr(bl_forms_field_width_style($field)) . '"';
+	}
 
 	return $attrs;
 }
@@ -787,6 +794,20 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 		}
 
 		return '<div ' . $attrs . ' aria-hidden="true"></div>';
+	}
+
+	if ($type === 'row_break') {
+		$classes = 'bl-form__row-break';
+		$extra = bl_forms_sanitize_css_class((string) ($field['css_class'] ?? ''));
+		if ($extra !== '') {
+			$classes .= ' ' . $extra;
+		}
+		$attrs = 'class="' . esc_attr($classes) . '" aria-hidden="true"';
+		if (function_exists('bl_forms_field_id_and_logic_attrs')) {
+			$attrs .= bl_forms_field_id_and_logic_attrs($field, $context);
+		}
+
+		return '<div ' . $attrs . '></div>';
 	}
 
 	if ($type === 'captcha') {
