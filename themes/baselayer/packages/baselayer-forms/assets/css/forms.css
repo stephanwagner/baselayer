@@ -253,7 +253,7 @@
   flex: 0 1 auto;
   width: min(100%, var(--bl-form-field-width, 100%) - var(--bl-form-gap) * (1 - var(--bl-form-field-width-factor, 1)));
   max-width: 100%;
-  min-width: min(100%, 12rem);
+  min-width: 0;
 }
 .bl-form__field-wrap[hidden] {
   display: none !important;
@@ -653,7 +653,7 @@ select.bl-form__control {
 }
 .bl-form__option input[type=radio]:checked {
   border-color: var(--bl-form-border-focus);
-  background-image: radial-gradient(circle at center, var(--bl-form-border-focus) 0 38%, transparent 40%);
+  background-image: radial-gradient(circle at center, var(--bl-form-border-focus) 0 4px, transparent 4px);
 }
 
 .bl-form__button-group {
