@@ -1064,11 +1064,11 @@ msgid "Button class"
 msgstr ""
 
 #: includes/admin.php:720
-msgid "e.g. -outline or -small"
+msgid "e.g. button -outline"
 msgstr ""
 
 #: includes/admin.php:721
-msgid "Extra CSS classes on each option button (space-separated), e.g. -outline or -small."
+msgid "Optional CSS classes on each option (space-separated). Add “button” to use theme button styles."
 msgstr ""
 
 #: includes/admin.php:628

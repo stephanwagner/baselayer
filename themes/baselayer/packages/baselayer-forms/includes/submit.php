@@ -418,6 +418,9 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 	$values = [];
 	/** @var array<string, string> $invalid */
 	$invalid = [];
+	$ancestor_map = function_exists('bl_forms_build_logic_ancestor_map')
+		? bl_forms_build_logic_ancestor_map($fields)
+		: [];
 
 	foreach (bl_forms_iter_fields($fields) as $field) {
 		$type = (string) ($field['type'] ?? '');
@@ -437,8 +440,11 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 		$raw_value = $raw[$name] ?? null;
 		$multiple = !empty($field['multiple']);
 
-		// Conditionally hidden fields are not required and contribute empty values.
-		if (!bl_forms_field_conditions_met($field, $fields, $raw, $files)) {
+		// Conditionally hidden fields (own logic or ancestor layout) are not required.
+		$visible = function_exists('bl_forms_field_is_effectively_visible')
+			? bl_forms_field_is_effectively_visible($field, $fields, $raw, $files, $ancestor_map)
+			: bl_forms_field_conditions_met($field, $fields, $raw, $files);
+		if (!$visible) {
 			if (in_array($type, ['file', 'image'], true)) {
 				$values[$name] = [];
 			} elseif (

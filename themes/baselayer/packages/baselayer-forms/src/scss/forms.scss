@@ -2,8 +2,9 @@
 @use 'tokens' as *;
 
 // Flex-wrap field flows: column-gap for horizontal; content owns vertical margin.
-// Layout shells (group/column/section/tabs) get no margin — inner content margins
-// extend the shell. Avoids flex row-gap so row-break does not double the gap.
+// Unpadded shells let trailing content margins extend past the shell. Padded
+// shells (and section) cancel via an inner body wrapper + own the outer gap.
+// Avoids flex row-gap so row-break does not double the gap.
 // Spacers are excluded: their height alone is the vertical space they occupy.
 @mixin bl-form-wrap-flow {
   display: flex;
@@ -63,13 +64,11 @@
 }
 
 .bl-form__column {
-  @include bl-form-wrap-flow;
   box-sizing: border-box;
   flex: 0 1 auto;
   width: min(100%, calc(var(--bl-form-field-width, 100%) - (var(--bl-form-gap) * (1 - var(--bl-form-field-width-factor, 1)))));
   max-width: 100%;
   min-width: min(100%, 12rem);
-  align-content: flex-start;
 
   &[hidden] {
     display: none !important;
@@ -87,6 +86,23 @@
     flex-basis: 100%;
     width: 100% !important;
     min-width: 0;
+  }
+
+  &.-outline,
+  &.-card {
+    // Own outer gap; column-body cancels trailing field margins.
+    margin-bottom: var(--bl-form-gap);
+  }
+}
+
+.bl-form__column-body {
+  @include bl-form-wrap-flow;
+  width: 100%;
+  align-content: flex-start;
+
+  .bl-form__column.-outline &,
+  .bl-form__column.-card & {
+    margin-bottom: calc(-1 * var(--bl-form-gap));
   }
 }
 
@@ -123,6 +139,8 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
+  // Own outer gap; section-body cancels trailing field margins.
+  margin-bottom: var(--bl-form-gap);
 
   &[hidden] {
     display: none !important;
@@ -172,6 +190,7 @@
 .bl-form__section-body {
   @include bl-form-wrap-flow;
   width: 100%;
+  margin-bottom: calc(-1 * var(--bl-form-gap));
 }
 
 .bl-form__tabs {
@@ -223,7 +242,6 @@
 }
 
 .bl-form__tab-panel {
-  @include bl-form-wrap-flow;
   width: 100%;
   min-width: 0;
 
@@ -233,6 +251,7 @@
 
   &.-outline,
   &.-card {
+    margin-bottom: var(--bl-form-gap);
     padding: 16px;
     border: 1px solid var(--bl-form-border);
     border-radius: var(--bl-form-radius);
@@ -244,6 +263,17 @@
 
   &.-card {
     background: color-mix(in srgb, var(--bl-form-muted) 8%, var(--bl-form-bg));
+  }
+}
+
+.bl-form__tab-panel-body {
+  @include bl-form-wrap-flow;
+  width: 100%;
+  min-width: 0;
+
+  .bl-form__tab-panel.-outline &,
+  .bl-form__tab-panel.-card & {
+    margin-bottom: calc(-1 * var(--bl-form-gap));
   }
 }
 
@@ -358,8 +388,8 @@
     outline-color: var(--bl-form-outline-danger-hover);
   }
 
-  &.is-invalid .bl-form__btn-option:hover .button {
-    outline-color: var(--bl-form-outline-danger-hover);
+  &.is-invalid .bl-form__btn-option:hover span {
+    border-color: var(--bl-form-danger-hover);
   }
 
   &.is-invalid .bl-form__switch:hover .bl-form__switch-ui {
@@ -759,7 +789,7 @@ select.bl-form__control {
     .bl-form__btn-option {
       display: flex;
 
-      .button {
+      span {
         flex: 1 1 auto;
         width: 100%;
       }
@@ -779,16 +809,35 @@ select.bl-form__control {
     cursor: pointer;
   }
 
-  input:focus-visible + .button {
-    outline: 2px solid var(--bl-form-outline-focus);
-    outline-offset: 2px;
+  span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    padding: 6px 14px;
+    border: 1px solid var(--bl-form-border);
+    border-radius: var(--bl-form-radius);
+    background: var(--bl-form-bg);
+    font-weight: 600;
+    transition:
+      border-color 0.15s ease,
+      background 0.15s ease,
+      color 0.15s ease;
+
+    @media (min-resolution: $high-density-dppx) {
+      border-width: 1.5px;
+    }
   }
 
-  // Selected: drop muted look for theme primary button.
-  input:checked + .button.-muted {
-    color: var(--bl-button-primary-color, #fff);
-    background: var(--bl-button-primary-background-color, var(--bl-form-border-focus));
-    border-color: var(--bl-button-primary-background-color, var(--bl-form-border-focus));
+  input:focus-visible + span {
+    outline: 2px solid var(--bl-form-outline-focus);
+    outline-offset: 0;
+  }
+
+  input:checked + span {
+    border-color: var(--bl-form-border-focus);
+    background: color-mix(in srgb, var(--bl-form-border-focus) 12%, var(--bl-form-bg));
+    color: var(--bl-form-border-focus);
   }
 }
 

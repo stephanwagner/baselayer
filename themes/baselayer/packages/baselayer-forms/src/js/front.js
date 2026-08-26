@@ -693,6 +693,15 @@ function setLogicFieldVisible(wrap, visible) {
 
   wrap.querySelectorAll('input, select, textarea, button').forEach((el) => {
     if (visible) {
+      // Do not re-enable controls that belong to a nested logic-hidden wrap.
+      const nested = el.closest('[data-bl-conditional-logic]');
+      if (
+        nested &&
+        nested !== wrap &&
+        (nested.hidden || nested.classList.contains('is-bl-logic-hidden'))
+      ) {
+        return;
+      }
       if (el.dataset.blLogicDisabled === '1') {
         el.disabled = false;
         delete el.dataset.blLogicDisabled;

@@ -2361,7 +2361,7 @@ export function createButtonClassControl(field) {
     className: 'widefat',
     dataset: { blButtonClass: '1' },
     value: field.button_class || '',
-    placeholder: t('buttonClassPlaceholder', 'e.g. -outline or -small'),
+    placeholder: t('buttonClassPlaceholder', 'e.g. button -outline'),
   });
   input.addEventListener('input', () => {
     field.button_class = input.value;
@@ -2375,7 +2375,7 @@ export function createButtonClassControl(field) {
       className: 'description',
       text: t(
         'buttonClassHelp',
-        'Extra CSS classes on each option button (space-separated), e.g. -outline or -small.'
+        'Optional CSS classes on each option (space-separated). Add “button” to use theme button styles.'
       ),
     })
   );

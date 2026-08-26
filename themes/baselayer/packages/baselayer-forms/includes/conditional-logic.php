@@ -314,6 +314,74 @@ function bl_forms_field_conditions_met(array $field, array $all_fields, array $r
 }
 
 /**
+ * Map leaf field id → ancestor layout fields (column / section / tab).
+ *
+ * @param list<array<string, mixed>>       $fields
+ * @param list<array<string, mixed>>       $ancestors
+ * @return array<string, list<array<string, mixed>>>
+ */
+function bl_forms_build_logic_ancestor_map(array $fields, array $ancestors = []): array
+{
+	$map = [];
+	$layout_types = function_exists('bl_forms_layout_field_types')
+		? bl_forms_layout_field_types()
+		: ['column', 'section', 'tab'];
+
+	foreach ($fields as $field) {
+		if (!is_array($field)) {
+			continue;
+		}
+		$type = (string) ($field['type'] ?? '');
+		if (in_array($type, $layout_types, true)) {
+			$children = isset($field['children']) && is_array($field['children']) ? $field['children'] : [];
+			$next = $ancestors;
+			$next[] = $field;
+			foreach (bl_forms_build_logic_ancestor_map($children, $next) as $id => $chain) {
+				$map[$id] = $chain;
+			}
+			continue;
+		}
+		$id = (string) ($field['id'] ?? '');
+		if ($id !== '') {
+			$map[$id] = $ancestors;
+		}
+	}
+
+	return $map;
+}
+
+/**
+ * Whether a leaf field is visible given its own logic and ancestor layout logic.
+ *
+ * @param array<string, mixed>                        $field
+ * @param list<array<string, mixed>>                  $all_fields
+ * @param array<string, mixed>                        $raw
+ * @param array<string, mixed>                        $files
+ * @param array<string, list<array<string, mixed>>>   $ancestor_map
+ */
+function bl_forms_field_is_effectively_visible(
+	array $field,
+	array $all_fields,
+	array $raw,
+	array $files = [],
+	array $ancestor_map = []
+): bool {
+	$id = (string) ($field['id'] ?? '');
+	if ($id !== '' && isset($ancestor_map[$id]) && is_array($ancestor_map[$id])) {
+		foreach ($ancestor_map[$id] as $ancestor) {
+			if (!is_array($ancestor)) {
+				continue;
+			}
+			if (!bl_forms_field_conditions_met($ancestor, $all_fields, $raw, $files)) {
+				return false;
+			}
+		}
+	}
+
+	return bl_forms_field_conditions_met($field, $all_fields, $raw, $files);
+}
+
+/**
  * Whether render context says this field starts hidden by logic.
  *
  * @param array<string, mixed> $field

@@ -1076,14 +1076,14 @@ msgid "Button class"
 msgstr "Button-Klasse"
 
 #: includes/admin.php:720
-msgid "e.g. -outline or -small"
-msgstr "z. B. -outline oder -small"
+msgid "e.g. button -outline"
+msgstr "z. B. button -outline"
 
 #: includes/admin.php:721
-msgid "Extra CSS classes on each option button (space-separated), e.g. -outline or -small."
+msgid "Optional CSS classes on each option (space-separated). Add “button” to use theme button styles."
 msgstr ""
-"Zusätzliche CSS-Klassen für jeden Options-Button (durch Leerzeichen getrennt), "
-"z. B. -outline oder -small."
+"Optionale CSS-Klassen für jede Option (durch Leerzeichen getrennt). "
+"Mit „button“ Theme-Button-Styles verwenden."
 
 #: includes/admin.php:628 includes/settings-page.php:426
 msgid "Submit button label"

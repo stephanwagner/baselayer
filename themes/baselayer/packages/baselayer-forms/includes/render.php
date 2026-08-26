@@ -637,7 +637,7 @@ function bl_forms_render_tab_group(array $tabs, string $uid, array $settings = [
 		$attrs = 'class="' . esc_attr($classes) . '" role="tabpanel" id="' . esc_attr($panel_id) . '"';
 		$attrs .= ' aria-labelledby="' . esc_attr($btn_id) . '"' . $hidden;
 		$attrs .= bl_forms_field_id_and_logic_attrs($tab, $context);
-		$html .= '<div ' . $attrs . '>' . $inner . '</div>';
+		$html .= '<div ' . $attrs . '><div class="bl-form__tab-panel-body">' . $inner . '</div></div>';
 	}
 
 	$html .= '</div>';
@@ -689,7 +689,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 		}
 		$attrs .= bl_forms_field_id_and_logic_attrs($field, $context);
 
-		return '<div ' . $attrs . '>' . $inner . '</div>';
+		return '<div ' . $attrs . '><div class="bl-form__column-body">' . $inner . '</div></div>';
 	}
 
 	if ($type === 'section') {
@@ -1022,7 +1022,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 		$btn_extra = function_exists('bl_forms_sanitize_css_classes')
 			? bl_forms_sanitize_css_classes((string) ($field['button_class'] ?? ''))
 			: bl_forms_sanitize_css_class((string) ($field['button_class'] ?? ''));
-		$btn_classes = trim('button -muted' . ($btn_extra !== '' ? ' ' . $btn_extra : ''));
+		$span_class = $btn_extra !== '' ? ' class="' . esc_attr($btn_extra) . '"' : '';
 		?>
 		<fieldset <?= bl_forms_field_wrap_attrs($field, 'bl-form__field -button-group', $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
 			<?= bl_forms_field_label_html($field, $input_id, $req_mark, 'legend') // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
@@ -1035,7 +1035,7 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 					?>
 					<label class="bl-form__btn-option" for="<?= esc_attr($oid) ?>">
 						<input type="<?= esc_attr($input_type) ?>" id="<?= esc_attr($oid) ?>" name="<?= esc_attr($input_name) ?>" value="<?= esc_attr($opt_value) ?>"<?= !$multiple ? $choice_attrs : $disabled_attr ?><?= $checked ?>>
-						<span class="<?= esc_attr($btn_classes) ?>"><?= esc_html((string) ($opt['label'] ?? '')) ?></span>
+						<span<?= $span_class // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>><?= esc_html((string) ($opt['label'] ?? '')) ?></span>
 					</label>
 				<?php endforeach; ?>
 			</div>
