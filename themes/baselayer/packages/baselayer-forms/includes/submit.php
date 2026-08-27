@@ -267,7 +267,7 @@ function bl_forms_ajax_submit(): void
 		'created'    => time(),
 	]);
 
-	$mail = bl_forms_send_emails($form_id, $entry_id, $config, $values);
+	$mail = bl_forms_send_emails($form_id, $entry_id, $config, $values, $raw_fields, $_FILES);
 	update_post_meta($entry_id, BL_FORM_ENTRY_MAIL_META, $mail);
 
 	// Count only completed submissions (not failed validation / early rejects).

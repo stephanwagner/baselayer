@@ -49,14 +49,58 @@ function bl_forms_compose_email(string $body_template, array $args = []): string
 }
 
 /**
+ * Whether a field should appear in notification / confirmation emails.
+ *
+ * @param array<string, mixed>                        $field
+ * @param list<array<string, mixed>>                  $fields
+ * @param array<string, mixed>                        $raw
+ * @param array<string, mixed>                        $files
+ * @param array<string, list<array<string, mixed>>>   $ancestor_map
+ */
+function bl_forms_field_include_in_email(
+	array $field,
+	array $fields,
+	array $raw,
+	array $files = [],
+	array $ancestor_map = []
+): bool {
+	$type = (string) ($field['type'] ?? '');
+	if ($type === 'hidden') {
+		return false;
+	}
+
+	if ($ancestor_map === [] && function_exists('bl_forms_build_logic_ancestor_map')) {
+		$ancestor_map = bl_forms_build_logic_ancestor_map($fields);
+	}
+
+	if (function_exists('bl_forms_field_is_effectively_visible')) {
+		return bl_forms_field_is_effectively_visible($field, $fields, $raw, $files, $ancestor_map);
+	}
+
+	if (function_exists('bl_forms_field_conditions_met')) {
+		return bl_forms_field_conditions_met($field, $fields, $raw, $files);
+	}
+
+	return true;
+}
+
+/**
  * Send form notification emails and return status meta.
  *
  * @param array<string, mixed> $config
  * @param array<string, mixed> $values Sanitized field values keyed by name.
+ * @param array<string, mixed> $raw    Raw posted field values (for visibility at submit).
+ * @param array<string, mixed> $files  Raw $_FILES (for file-field logic during visibility).
  * @return array{admin_sent: bool, user_sent: bool, admin_error: string, user_error: string}
  */
-function bl_forms_send_emails(int $form_id, int $entry_id, array $config, array $values): array
-{
+function bl_forms_send_emails(
+	int $form_id,
+	int $entry_id,
+	array $config,
+	array $values,
+	array $raw = [],
+	array $files = []
+): array {
 	$status = [
 		'admin_sent'  => false,
 		'user_sent'   => false,
@@ -71,7 +115,7 @@ function bl_forms_send_emails(int $form_id, int $entry_id, array $config, array 
 	}
 
 	$site_name = wp_specialchars_decode(get_bloginfo('name'), ENT_QUOTES);
-	$admin_rows = bl_forms_email_field_rows($config['fields'], $values, true);
+	$admin_rows = bl_forms_email_field_rows($config['fields'], $values, true, $raw, $files);
 	$reply_to = '';
 	$email_name = bl_forms_primary_email_field_name($config);
 	if ($email_name !== '' && !empty($values[$email_name]) && is_email((string) $values[$email_name])) {
@@ -133,7 +177,7 @@ function bl_forms_send_emails(int $form_id, int $entry_id, array $config, array 
 			$intro = __('Thank you for your message. Here is a copy of what you sent:', 'baselayer-forms');
 		} else {
 			$intro = bl_forms_replace_placeholders($intro, $subject_vars);
-			$intro = bl_forms_replace_field_placeholders($intro, $config['fields'], $values);
+			$intro = bl_forms_replace_field_placeholders($intro, $config['fields'], $values, $raw, $files);
 		}
 
 		$footer = bl_forms_resolve_setting_string($settings, 'user_email_footer');
@@ -150,7 +194,7 @@ function bl_forms_send_emails(int $form_id, int $entry_id, array $config, array 
 			'title'            => $title,
 			'intro'            => $intro,
 			'footer'           => $footer,
-			'rows'             => bl_forms_email_field_rows($config['fields'], $values, false),
+			'rows'             => bl_forms_email_field_rows($config['fields'], $values, false, $raw, $files),
 			'site_url'         => home_url('/'),
 		]);
 
@@ -182,17 +226,31 @@ function bl_forms_replace_email_placeholders(string $text, array $vars): string
  *
  * @param list<array<string, mixed>> $fields
  * @param array<string, mixed>       $values
+ * @param array<string, mixed>       $raw
+ * @param array<string, mixed>       $files
  */
-function bl_forms_replace_field_placeholders(string $text, array $fields, array $values): string
-{
+function bl_forms_replace_field_placeholders(
+	string $text,
+	array $fields,
+	array $values,
+	array $raw = [],
+	array $files = []
+): string {
 	if ($text === '' || (!str_contains($text, '{') && !str_contains($text, '['))) {
 		return $text;
 	}
 
+	$eval_raw = $raw !== [] ? $raw : $values;
+	$ancestor_map = function_exists('bl_forms_build_logic_ancestor_map')
+		? bl_forms_build_logic_ancestor_map($fields)
+		: [];
 	$by_name = [];
 	foreach (bl_forms_iter_fields($fields) as $field) {
 		$name = sanitize_key((string) ($field['name'] ?? ''));
 		if ($name === '' || !array_key_exists($name, $values)) {
+			continue;
+		}
+		if (!bl_forms_field_include_in_email($field, $fields, $eval_raw, $files, $ancestor_map)) {
 			continue;
 		}
 		$by_name[$name] = bl_forms_format_field_display_value($field, $values[$name]);
@@ -221,10 +279,21 @@ function bl_forms_replace_field_placeholders(string $text, array $fields, array 
  *
  * @param list<array<string, mixed>> $fields
  * @param array<string, mixed>       $values
+ * @param array<string, mixed>       $raw
+ * @param array<string, mixed>       $files
  * @return list<array{label: string, value: string}>
  */
-function bl_forms_email_field_rows(array $fields, array $values, bool $link_files = false): array
-{
+function bl_forms_email_field_rows(
+	array $fields,
+	array $values,
+	bool $link_files = false,
+	array $raw = [],
+	array $files = []
+): array {
+	$eval_raw = $raw !== [] ? $raw : $values;
+	$ancestor_map = function_exists('bl_forms_build_logic_ancestor_map')
+		? bl_forms_build_logic_ancestor_map($fields)
+		: [];
 	$rows = [];
 	foreach (bl_forms_iter_fields($fields) as $field) {
 		$type = (string) ($field['type'] ?? '');
@@ -233,6 +302,9 @@ function bl_forms_email_field_rows(array $fields, array $values, bool $link_file
 		}
 		$name = (string) ($field['name'] ?? '');
 		if ($name === '' || !array_key_exists($name, $values)) {
+			continue;
+		}
+		if (!bl_forms_field_include_in_email($field, $fields, $eval_raw, $files, $ancestor_map)) {
 			continue;
 		}
 		$label = (string) ($field['label'] ?? $name);
