@@ -32,7 +32,13 @@ function bl_menu_item_matches_post_type_archive(object $item, string $post_type)
 		return false;
 	}
 
-	return bl_menu_url_path((string) $item->url) === bl_menu_url_path($archive_url);
+	$item_path = bl_menu_url_path((string) $item->url);
+	$archive_path = bl_menu_url_path($archive_url);
+	if ($item_path === '' || $archive_path === '') {
+		return false;
+	}
+
+	return $item_path === $archive_path;
 }
 
 /**
@@ -76,7 +82,7 @@ add_filter('nav_menu_css_class', function (array $classes, $item, $args, $depth)
 
 /**
  * Use archive menu label from config for post type archive nav items (not “Veranstaltung-Archive”).
- * Also applies to custom links that point at a content-type archive URL.
+ * Custom links keep their editor-defined title.
  */
 add_filter('nav_menu_item_title', function (string $title, $item, $args, $depth): string {
 	unset($args, $depth);
@@ -88,18 +94,6 @@ add_filter('nav_menu_item_title', function (string $title, $item, $args, $depth)
 	$post_type = '';
 	if ($item->type === 'post_type_archive' && isset($item->object) && is_string($item->object)) {
 		$post_type = $item->object;
-	} elseif ($item->type === 'custom' && !empty($item->url) && function_exists('bl_get_content_types')) {
-		foreach (array_keys(bl_get_content_types()) as $candidate) {
-			if (!is_string($candidate) || $candidate === '') {
-				continue;
-			}
-			if (function_exists('bl_menu_item_matches_post_type_archive')
-				&& bl_menu_item_matches_post_type_archive($item, $candidate)
-			) {
-				$post_type = $candidate;
-				break;
-			}
-		}
 	}
 
 	if ($post_type === '') {
