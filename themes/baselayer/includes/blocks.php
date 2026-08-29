@@ -137,6 +137,52 @@ add_filter('render_block', function (string $content, array $block): string {
 }, 10, 2);
 
 /**
+ * WP 7.1+: restore has-{slug}-gradient-background for background.gradient presets.
+ *
+ * Core moved Group (and other adopters) to style.background.gradient and only emits
+ * has-background + inline background-image. Reuse the color.gradient style-engine
+ * classname mapping (convert_vars_to_classnames) so presets get the same classes as before.
+ */
+add_filter('render_block', function (string $content, array $block): string {
+	if ($content === '') {
+		return $content;
+	}
+
+	$gradient = $block['attrs']['style']['background']['gradient'] ?? null;
+	if (!is_string($gradient) || $gradient === '') {
+		return $content;
+	}
+
+	// Custom gradients never received a slug class; only presets did.
+	if (!str_starts_with($gradient, 'var:preset|gradient|')) {
+		return $content;
+	}
+
+	$styles = wp_style_engine_get_styles(
+		['color' => ['gradient' => $gradient]],
+		['convert_vars_to_classnames' => true]
+	);
+
+	$classnames = trim((string) ($styles['classnames'] ?? ''));
+	if ($classnames === '') {
+		return $content;
+	}
+
+	$tags = new WP_HTML_Tag_Processor($content);
+	if (!$tags->next_tag()) {
+		return $content;
+	}
+
+	foreach (preg_split('/\s+/', $classnames) ?: [] as $class) {
+		if ($class !== '') {
+			$tags->add_class($class);
+		}
+	}
+
+	return $tags->get_updated_html();
+}, 11, 2);
+
+/**
  * Icon-only buttons: add front-end class and ensure link markup is non-empty.
  */
 add_filter('render_block', function ($content, $block) {
