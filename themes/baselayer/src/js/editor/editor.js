@@ -11,3 +11,4 @@ import './seo';
 import './languages';
 import './soft-hyphen';
 import './blocks';
+import './gradient-preset-classes';
