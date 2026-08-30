@@ -30,175 +30,14 @@ function bl_developer_can_access_debug(): bool
  */
 function bl_debug_container_widths_page_content(): string
 {
-	$p = '<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas vel metus finibus, luctus leo ac, aliquet nibh. Suspendisse consequat nisi velit, non varius lectus interdum sed. Curabitur ultrices lacus eget orci tincidunt rutrum. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus.</p>';
+	$path = __DIR__ . '/debug-container-widths-page.html';
+	if (!is_readable($path)) {
+		return '';
+	}
 
-	return <<<HTML
-<!-- wp:html -->
-<div>
-<p><strong>Width (bleed out)</strong></p>
-<ul>
-<li><code>.container</code> — content column</li>
-<li><code>.container-wide</code> — bleed, keep page-padding from the viewport</li>
-<li><code>.alignwide</code> — bleed, keep container-edge-spacing from the viewport</li>
-<li><code>.alignwide.container-wide</code> — stack both one-side bleeds</li>
-<li><code>.alignfull</code> — full viewport (not shown in overlay)</li>
-</ul>
-<p><strong>Negate (pad inward)</strong> — L/R uses <code>!important</code> and overrides inner-padding horizontal tokens. Add combo-only classes via Additional CSS class.</p>
-<ul>
-<li><code>.-content-to-container</code> (alias <code>.-container-wide-content</code>) — back to <code>.container</code></li>
-<li><code>.-content-to-container-wide</code> — combo only: pad the alignwide extra (content sits at container-wide)</li>
-<li><code>.-content-to-alignwide</code> — combo only: pad the container-wide extra (content sits at alignwide)</li>
-</ul>
-<p><strong>Inner padding</strong> — <code>-container-padding-auto</code> (A), <code>-container-padding-none</code> (0), <code>-container-padding-xs</code> … <code>xl</code>. Auto applies only with <code>.has-background</code> (combo → L).</p>
-</div>
-<!-- /wp:html -->
+	$html = file_get_contents($path);
 
-<!-- wp:paragraph -->
-{$p}
-<!-- /wp:paragraph -->
-
-<!-- wp:heading -->
-<h2 class="wp-block-heading">No background</h2>
-<!-- /wp:heading -->
-
-<!-- wp:heading {"level":3} -->
-<h3 class="wp-block-heading">Group .container</h3>
-<!-- /wp:heading -->
-
-<!-- wp:group {"className":"-container-margin-m -container-padding-auto","layout":{"type":"constrained"},"containerPadding":"-container-padding-auto"} -->
-<div class="wp-block-group -container-margin-m -container-padding-auto"><!-- wp:paragraph -->
-{$p}
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->
-
-<!-- wp:heading {"level":3} -->
-<h3 class="wp-block-heading">Group .alignwide</h3>
-<!-- /wp:heading -->
-
-<!-- wp:group {"align":"wide","className":"-container-margin-m -container-padding-auto","layout":{"type":"constrained"},"containerPadding":"-container-padding-auto"} -->
-<div class="wp-block-group alignwide -container-margin-m -container-padding-auto"><!-- wp:paragraph -->
-{$p}
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->
-
-<!-- wp:heading {"level":3} -->
-<h3 class="wp-block-heading">Group .container-wide</h3>
-<!-- /wp:heading -->
-
-<!-- wp:group {"className":"container-wide -container-margin-m -container-padding-auto","layout":{"type":"constrained"},"alignWideContainer":"container-wide","containerPadding":"-container-padding-auto"} -->
-<div class="wp-block-group container-wide -container-margin-m -container-padding-auto"><!-- wp:paragraph -->
-{$p}
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->
-
-<!-- wp:heading {"level":3} -->
-<h3 class="wp-block-heading">Group .alignwide.container-wide</h3>
-<!-- /wp:heading -->
-
-<!-- wp:group {"align":"wide","className":"container-wide -container-margin-m -container-padding-auto","layout":{"type":"constrained"},"alignWideContainer":"container-wide","containerPadding":"-container-padding-auto"} -->
-<div class="wp-block-group alignwide container-wide -container-margin-m -container-padding-auto"><!-- wp:paragraph -->
-{$p}
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->
-
-<!-- wp:heading -->
-<h2 class="wp-block-heading">Background + inner padding A</h2>
-<!-- /wp:heading -->
-
-<!-- wp:heading {"level":3} -->
-<h3 class="wp-block-heading">Group .container (Inner padding A)</h3>
-<!-- /wp:heading -->
-
-<!-- wp:group {"className":"-container-margin-m -container-padding-auto","backgroundColor":"gray-300","layout":{"type":"constrained"},"containerPadding":"-container-padding-auto"} -->
-<div class="wp-block-group -container-margin-m -container-padding-auto has-gray-300-background-color has-background"><!-- wp:paragraph -->
-{$p}
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->
-
-<!-- wp:heading {"level":3} -->
-<h3 class="wp-block-heading">Group .alignwide (Inner padding A)</h3>
-<!-- /wp:heading -->
-
-<!-- wp:group {"align":"wide","className":"-container-margin-m -container-padding-auto","backgroundColor":"gray-300","layout":{"type":"constrained"},"containerPadding":"-container-padding-auto"} -->
-<div class="wp-block-group alignwide -container-margin-m -container-padding-auto has-gray-300-background-color has-background"><!-- wp:paragraph -->
-{$p}
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->
-
-<!-- wp:heading {"level":3} -->
-<h3 class="wp-block-heading">Group .container-wide (Inner padding A)</h3>
-<!-- /wp:heading -->
-
-<!-- wp:group {"className":"container-wide -container-margin-m -container-padding-auto","backgroundColor":"gray-300","layout":{"type":"constrained"},"alignWideContainer":"container-wide","containerPadding":"-container-padding-auto"} -->
-<div class="wp-block-group container-wide -container-margin-m -container-padding-auto has-gray-300-background-color has-background"><!-- wp:paragraph -->
-{$p}
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->
-
-<!-- wp:heading {"level":3} -->
-<h3 class="wp-block-heading">Group .alignwide.container-wide (Inner padding A)</h3>
-<!-- /wp:heading -->
-
-<!-- wp:group {"align":"wide","className":"container-wide -container-margin-m -container-padding-auto","backgroundColor":"gray-300","layout":{"type":"constrained"},"alignWideContainer":"container-wide","containerPadding":"-container-padding-auto"} -->
-<div class="wp-block-group alignwide container-wide -container-margin-m -container-padding-auto has-gray-300-background-color has-background"><!-- wp:paragraph -->
-{$p}
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->
-
-<!-- wp:heading -->
-<h2 class="wp-block-heading">Negate / content align</h2>
-<!-- /wp:heading -->
-
-<!-- wp:heading {"level":3} -->
-<h3 class="wp-block-heading">Group .alignwide .-content-to-container</h3>
-<!-- /wp:heading -->
-
-<!-- wp:group {"align":"wide","className":"-container-margin-m -container-padding-auto -content-to-container","backgroundColor":"gray-300","layout":{"type":"constrained"},"containerPadding":"-container-padding-auto","alignContentToContainer":true} -->
-<div class="wp-block-group alignwide -container-margin-m -container-padding-auto -content-to-container has-gray-300-background-color has-background"><!-- wp:paragraph -->
-{$p}
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->
-
-<!-- wp:heading {"level":3} -->
-<h3 class="wp-block-heading">Group .container-wide .-content-to-container</h3>
-<!-- /wp:heading -->
-
-<!-- wp:group {"className":"container-wide -container-margin-m -container-padding-auto -content-to-container","backgroundColor":"gray-300","layout":{"type":"constrained"},"alignWideContainer":"container-wide","containerPadding":"-container-padding-auto","alignContentToContainer":true} -->
-<div class="wp-block-group container-wide -container-margin-m -container-padding-auto -content-to-container has-gray-300-background-color has-background"><!-- wp:paragraph -->
-{$p}
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->
-
-<!-- wp:heading {"level":3} -->
-<h3 class="wp-block-heading">Group .alignwide.container-wide .-content-to-container</h3>
-<!-- /wp:heading -->
-
-<!-- wp:group {"align":"wide","className":"container-wide -container-margin-m -container-padding-auto -content-to-container","backgroundColor":"gray-300","layout":{"type":"constrained"},"alignWideContainer":"container-wide","containerPadding":"-container-padding-auto","alignContentToContainer":true} -->
-<div class="wp-block-group alignwide container-wide -container-margin-m -container-padding-auto -content-to-container has-gray-300-background-color has-background"><!-- wp:paragraph -->
-{$p}
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->
-
-<!-- wp:heading {"level":3} -->
-<h3 class="wp-block-heading">Group .alignwide.container-wide .-content-to-container-wide</h3>
-<!-- /wp:heading -->
-
-<!-- wp:group {"align":"wide","className":"container-wide -container-margin-m -container-padding-auto -content-to-container-wide","backgroundColor":"gray-300","layout":{"type":"constrained"},"alignWideContainer":"container-wide","containerPadding":"-container-padding-auto"} -->
-<div class="wp-block-group alignwide container-wide -container-margin-m -container-padding-auto -content-to-container-wide has-gray-300-background-color has-background"><!-- wp:paragraph -->
-{$p}
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->
-
-<!-- wp:heading {"level":3} -->
-<h3 class="wp-block-heading">Group .alignwide.container-wide .-content-to-alignwide</h3>
-<!-- /wp:heading -->
-
-<!-- wp:group {"align":"wide","className":"container-wide -container-margin-m -container-padding-auto -content-to-alignwide","backgroundColor":"gray-300","layout":{"type":"constrained"},"alignWideContainer":"container-wide","containerPadding":"-container-padding-auto"} -->
-<div class="wp-block-group alignwide container-wide -container-margin-m -container-padding-auto -content-to-alignwide has-gray-300-background-color has-background"><!-- wp:paragraph -->
-{$p}
-<!-- /wp:paragraph --></div>
-<!-- /wp:group -->
-HTML;
+	return is_string($html) ? trim($html) : '';
 }
 
 /**
@@ -206,7 +45,8 @@ HTML;
  */
 function bl_debug_ensure_container_widths_page(): int
 {
-	$title = __('Container widths', 'baselayer');
+	$title = __('Container Spacings', 'baselayer');
+	$slug = 'container-spacings';
 	$content = bl_debug_container_widths_page_content();
 	$existing_id = (int) get_option(BL_DEBUG_CONTAINER_WIDTHS_PAGE_OPTION, 0);
 
@@ -216,6 +56,7 @@ function bl_debug_ensure_container_widths_page(): int
 			wp_update_post([
 				'ID' => $existing_id,
 				'post_title' => $title,
+				'post_name' => $slug,
 				'post_content' => $content,
 				'post_status' => 'publish',
 			]);
@@ -225,7 +66,7 @@ function bl_debug_ensure_container_widths_page(): int
 
 	$post_id = wp_insert_post([
 		'post_title' => $title,
-		'post_name' => 'debug-container-widths',
+		'post_name' => $slug,
 		'post_content' => $content,
 		'post_status' => 'publish',
 		'post_type' => 'page',
@@ -381,7 +222,7 @@ function bl_render_developer_debug(): void
 
 			<hr style="margin: 28px 0;">
 
-			<h3 class="title"><?= esc_html__('Debug page', 'baselayer') ?></h3>
+			<h3 class="title"><?= esc_html__('Container Spacings', 'baselayer') ?></h3>
 			<p class="description"><?= esc_html__('Creates (or refreshes) a page with sample groups for comparing padding and bleed behaviour.', 'baselayer') ?></p>
 			<form method="post" action="" style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
 				<?php wp_nonce_field('baselayer_create_debug_container_widths_page'); ?>
