@@ -156,6 +156,20 @@
       gap: 24px;
     }
 
+    &.has-background {
+      border-radius: var(--bl-border-radius-m);
+      @include apply-container-padding(
+        var(--bl-container-padding-s),
+        var(--bl-container-padding-s),
+        (
+          $breakpoint-xs: (
+            x: var(--bl-container-padding-xs),
+            y: var(--bl-container-padding-xs),
+          ),
+        )
+      );
+    }
+
     &.-column-gap-none {
       gap: 0;
     }
@@ -392,15 +406,16 @@
   .wp-block-column {
     &.has-background {
       border-radius: var(--bl-border-radius-m);
-      padding: 32px;
-
-      @media (max-width: $breakpoint-s) {
-        padding: 24px;
-      }
-
-      @media (max-width: $breakpoint-xs) {
-        padding: 16px;
-      }
+      @include apply-container-padding(
+        var(--bl-container-padding-s),
+        var(--bl-container-padding-s),
+        (
+          $breakpoint-xs: (
+            x: var(--bl-container-padding-xs),
+            y: var(--bl-container-padding-xs),
+          ),
+        )
+      );
     }
 
     &.-center-content {
