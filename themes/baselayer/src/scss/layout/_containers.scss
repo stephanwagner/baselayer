@@ -153,6 +153,14 @@
 // -----------------------------------------------------------------------------
 
 .alignfull {
+  // Same inset as the content column (matches debug overlay / .container).
+  --bl-inset-to-container: max(
+    var(--bl-page-padding),
+    calc((100vw - var(--bl-content-width)) * 0.5)
+  );
+  --bl-inset-to-container-wide: 0px;
+  --bl-inset-to-alignwide: 0px;
+
   margin-left: calc((100vw - var(--bl-content-width)) * -0.5);
   margin-right: calc((100vw - var(--bl-content-width)) * -0.5);
 
@@ -172,4 +180,15 @@
       }
     }
   }
+}
+
+.alignfull.container-wide {
+  width: auto;
+  --bl-wide-bleed: 0px;
+  --bl-inset-to-container: max(
+    var(--bl-page-padding),
+    calc((100vw - var(--bl-content-width)) * 0.5)
+  );
+  --bl-inset-to-container-wide: 0px;
+  --bl-inset-to-alignwide: 0px;
 }

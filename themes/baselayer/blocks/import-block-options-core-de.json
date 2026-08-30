@@ -492,12 +492,7 @@
                 {
                     "id": "p_20e62b23a530",
                     "kind": "preset",
-                    "slug": "container-wide",
-                    "defaults": {
-                        "c_container-wide": {
-                            "showContentAlign": true
-                        }
-                    }
+                    "slug": "container-wide"
                 },
                 {
                     "id": "p_2a9ea412523e",
@@ -515,7 +510,7 @@
                     "slug": "inner-padding",
                     "defaults": {
                         "c_inner-padding": {
-                            "default": "-container-padding-xl",
+                            "default": "-container-padding-auto",
                             "showContentAlign": true
                         }
                     }

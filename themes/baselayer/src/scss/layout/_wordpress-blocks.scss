@@ -64,20 +64,9 @@
   }
 }
 
-// Pad the class holder (like margin). Cover pads its inner container; slider keeps vars only.
+// Pad the class holder (like margin). Slider keeps vars only (overlay owns X).
 @mixin apply-container-padding($y: null, $x: null, $responsive: ()) {
   @include block-container-padding($y, $x, $responsive);
-
-  &.wp-block-cover {
-    padding-top: 0;
-    padding-right: 0;
-    padding-bottom: 0;
-    padding-left: 0;
-
-    .wp-block-cover__inner-container {
-      @include block-container-padding($y, $x, $responsive);
-    }
-  }
 
   // Vars stay on the wrapper; `.slider-slide__content` consumes Y (and overlay owns X).
   // Editor: option classes sit on the Gutenberg shell, not `.slider__wrapper`.
@@ -130,10 +119,24 @@
 
   .wp-block-cover {
     padding: 0;
-    min-height: 320px;
+    min-height: 280px;
+
+    .wp-block-cover__inner-container {
+      padding: 0;
+    }
 
     &:not(.alignfull) {
       border-radius: var(--bl-border-radius-m);
+    }
+
+    // Auto / unset keep min-height. Explicit padding tokens hug content.
+    &.-container-padding-none,
+    &.-container-padding-xs,
+    &.-container-padding-s,
+    &.-container-padding-m,
+    &.-container-padding-l,
+    &.-container-padding-xl {
+      min-height: 0 !important;
     }
   }
 
@@ -827,10 +830,10 @@
     );
   }
 
-  // Container padding — any element with the class (Cover → inner; Slider → vars only)
+  // Container padding — class holder (Cover included). Slider → vars only.
 
   // Auto: no background → no padding; .has-background → M; combo alignwide+container-wide → L.
-  // Content-column L/R is opt-in via .-content-to-container, not part of auto.
+  // Cover Auto is always L (below). Content-column L/R is opt-in via .-content-to-container.
   .-container-padding-auto.has-background {
     @include apply-container-padding(
       var(--bl-container-padding-m),
@@ -849,6 +852,28 @@
   }
 
   .alignwide.container-wide.-container-padding-auto.has-background {
+    @include apply-container-padding(
+      var(--bl-container-padding-l),
+      var(--bl-container-padding-l),
+      (
+        $breakpoint-m: (
+          x: var(--bl-container-padding-m),
+          y: var(--bl-container-padding-m),
+        ),
+        $breakpoint-s: (
+          x: var(--bl-container-padding-s),
+          y: var(--bl-container-padding-s),
+        ),
+        $breakpoint-xs: (
+          x: var(--bl-container-padding-xs),
+          y: var(--bl-container-padding-xs),
+        ),
+      )
+    );
+  }
+
+  // Cover Auto = L (all widths). Keeps min-height; explicit L would hug content.
+  .wp-block-cover.-container-padding-auto {
     @include apply-container-padding(
       var(--bl-container-padding-l),
       var(--bl-container-padding-l),

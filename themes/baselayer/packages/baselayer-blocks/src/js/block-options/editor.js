@@ -248,8 +248,8 @@ const collectOptionClasses = (blockConfig, attributes, { isRootBlock = true } = 
   blockConfig.options.forEach((option) => {
     const custom = getCustom(option.type);
     if (custom?.classesFromAttributes) {
-      // Wide container only applies at root; keep attributes, skip classes when nested.
-      if (option.type === 'container-wide' && !isRootBlock) {
+      // Wide container: root only; Full alignment owns width.
+      if (option.type === 'container-wide' && (!isRootBlock || attributes.align === 'full')) {
         return;
       }
       classes.push(...custom.classesFromAttributes(option, attributes, { isRootBlock }));
@@ -539,7 +539,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                   return null;
                 }
 
-                if (option.type === 'container-wide' && !isRootBlock) {
+                if (option.type === 'container-wide' && (!isRootBlock || attributes.align === 'full')) {
                   return null;
                 }
 

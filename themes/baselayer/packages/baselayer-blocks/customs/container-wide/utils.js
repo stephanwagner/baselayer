@@ -9,6 +9,10 @@ export const ALL_ALIGN_WIDE_CLASSES = [ALIGN_WIDE_CONTAINER_CLASS, ALIGN_WIDE_CO
 
 /** Class names implied by current container-wide attributes. */
 export const alignWideClassesFromAttributes = (option, attributes) => {
+  if (attributes.align === 'full') {
+    return [];
+  }
+
   const names = option.attributeNames || {};
   const container = names.container || 'alignWideContainer';
   const content = names.content || 'alignWideContent';
@@ -30,5 +34,6 @@ export const alignWideAttributeKeys = (option) => {
   return [
     names.container || 'alignWideContainer',
     names.content || 'alignWideContent',
+    'align',
   ];
 };

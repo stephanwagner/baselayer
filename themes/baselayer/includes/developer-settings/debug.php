@@ -449,7 +449,7 @@ function bl_render_developer_debug(): void
 				<tbody>
 					<tr>
 						<td><?= bl_debug_admin_class_label('.-content-to-container') ?></td>
-						<td><?= esc_html__('Pad back to the content column. Group inner-padding toggle. Alias: .-container-wide-content (Cover).', 'baselayer') ?></td>
+						<td><?= esc_html__('Pad back to the content column. Inner-padding toggle on Group and Cover. Alias: .-container-wide-content.', 'baselayer') ?></td>
 					</tr>
 					<tr>
 						<td><?= bl_debug_admin_class_label('.-content-to-container-wide') ?></td>

@@ -260,6 +260,9 @@
   var ALIGN_WIDE_CONTENT_CLASS = "-container-wide-content";
   var ALL_ALIGN_WIDE_CLASSES = [ALIGN_WIDE_CONTAINER_CLASS, ALIGN_WIDE_CONTENT_CLASS];
   var alignWideClassesFromAttributes = (option, attributes) => {
+    if (attributes.align === "full") {
+      return [];
+    }
     const names = option.attributeNames || {};
     const container = names.container || "alignWideContainer";
     const content = names.content || "alignWideContent";
@@ -277,7 +280,8 @@
     const names = option.attributeNames || {};
     return [
       names.container || "alignWideContainer",
-      names.content || "alignWideContent"
+      names.content || "alignWideContent",
+      "align"
     ];
   };
 
@@ -2030,7 +2034,7 @@
     blockConfig.options.forEach((option) => {
       const custom = getCustom(option.type);
       if (custom?.classesFromAttributes) {
-        if (option.type === "container-wide" && !isRootBlock) {
+        if (option.type === "container-wide" && (!isRootBlock || attributes.align === "full")) {
           return;
         }
         classes.push(...custom.classesFromAttributes(option, attributes, { isRootBlock }));
@@ -2244,7 +2248,7 @@
         if (isImageInGallery && (GALLERY_OWNED_IMAGE_ATTRIBUTES.includes(option.attributeName) || GALLERY_OWNED_IMAGE_TYPES.includes(option.type))) {
           return null;
         }
-        if (option.type === "container-wide" && !isRootBlock) {
+        if (option.type === "container-wide" && (!isRootBlock || attributes.align === "full")) {
           return null;
         }
         const custom = getCustom(option.type);

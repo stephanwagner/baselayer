@@ -160,6 +160,10 @@ body.bl-debug-container-widths {
 .bl-debug-container-widths__line.-content.-left .bl-debug-container-widths__label {
 	top: calc(var(--bl-debug-label-top) + 78px);
 }
+body.bl-debug-container-widths .content__content * {
+	outline-offset: -1px !important;
+	outline: 1px dashed rgba(0, 0, 0, 0.15) !important;
+}
 </style>
 	<?php
 }, 100);
