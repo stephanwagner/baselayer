@@ -1,14 +1,33 @@
 (() => {
   // themes/baselayer/packages/baselayer-blocks/src/js/block-options/registry.js
   var customs = /* @__PURE__ */ Object.create(null);
+  var TYPE_ALIASES = {
+    "align-wide": "container-wide"
+  };
   function registerCustom(def) {
     if (!def || !def.type || typeof def.Control !== "function") {
       return;
     }
     customs[def.type] = def;
   }
+  function resolveCustomType(type) {
+    if (!type) {
+      return type;
+    }
+    const canonical = TYPE_ALIASES[type];
+    if (canonical && customs[canonical]) {
+      return canonical;
+    }
+    return type;
+  }
+  function customTypeIs(type, canonical) {
+    return type === canonical || TYPE_ALIASES[type] === canonical;
+  }
   function getCustom(type) {
-    return customs[type];
+    if (!type) {
+      return void 0;
+    }
+    return customs[resolveCustomType(type)] || customs[type];
   }
   function getAllCustoms() {
     return Object.values(customs);
@@ -1862,7 +1881,12 @@
     "alignWideContainer",
     "alignWideContent"
   ];
-  var GALLERY_OWNED_IMAGE_TYPES = ["container-margin", "container-wide", "inner-padding"];
+  var GALLERY_OWNED_IMAGE_TYPES = [
+    "container-margin",
+    "container-wide",
+    "align-wide",
+    "inner-padding"
+  ];
   var blockOptions = Array.isArray(window.baselayerBlockOptions) ? window.baselayerBlockOptions : [];
   var HIDE_BLOCK_OPTION = {
     type: "boolean",
@@ -2034,7 +2058,7 @@
     blockConfig.options.forEach((option) => {
       const custom = getCustom(option.type);
       if (custom?.classesFromAttributes) {
-        if (option.type === "container-wide" && (!isRootBlock || attributes.align === "full")) {
+        if (customTypeIs(option.type, "container-wide") && (!isRootBlock || attributes.align === "full")) {
           return;
         }
         classes.push(...custom.classesFromAttributes(option, attributes, { isRootBlock }));
@@ -2248,7 +2272,7 @@
         if (isImageInGallery && (GALLERY_OWNED_IMAGE_ATTRIBUTES.includes(option.attributeName) || GALLERY_OWNED_IMAGE_TYPES.includes(option.type))) {
           return null;
         }
-        if (option.type === "container-wide" && (!isRootBlock || attributes.align === "full")) {
+        if (customTypeIs(option.type, "container-wide") && (!isRootBlock || attributes.align === "full")) {
           return null;
         }
         const custom = getCustom(option.type);

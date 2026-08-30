@@ -8,6 +8,7 @@ import { optionHelpProps } from './shared/block-option-help';
 import {
   getCustom,
   allCustomManagedClasses,
+  customTypeIs,
 } from './registry';
 
 const { InspectorControls } = wp.blockEditor;
@@ -24,7 +25,12 @@ const GALLERY_OWNED_IMAGE_ATTRIBUTES = [
   'alignWideContainer',
   'alignWideContent',
 ];
-const GALLERY_OWNED_IMAGE_TYPES = ['container-margin', 'container-wide', 'inner-padding'];
+const GALLERY_OWNED_IMAGE_TYPES = [
+  'container-margin',
+  'container-wide',
+  'align-wide',
+  'inner-padding',
+];
 
 /** Resolved from PHP (bl_block_options store → baselayerBlockOptions). */
 const blockOptions = Array.isArray(window.baselayerBlockOptions)
@@ -249,7 +255,7 @@ const collectOptionClasses = (blockConfig, attributes, { isRootBlock = true } = 
     const custom = getCustom(option.type);
     if (custom?.classesFromAttributes) {
       // Wide container: root only; Full alignment owns width.
-      if (option.type === 'container-wide' && (!isRootBlock || attributes.align === 'full')) {
+      if (customTypeIs(option.type, 'container-wide') && (!isRootBlock || attributes.align === 'full')) {
         return;
       }
       classes.push(...custom.classesFromAttributes(option, attributes, { isRootBlock }));
@@ -539,7 +545,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                   return null;
                 }
 
-                if (option.type === 'container-wide' && (!isRootBlock || attributes.align === 'full')) {
+                if (customTypeIs(option.type, 'container-wide') && (!isRootBlock || attributes.align === 'full')) {
                   return null;
                 }
 

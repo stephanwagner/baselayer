@@ -60,6 +60,48 @@ function bl_block_options_control_id_aliases(): array
 }
 
 /**
+ * Legacy custom control types → current type (one-way).
+ *
+ * Store rows may still say `align-wide`; the editor custom is `container-wide`.
+ *
+ * @return array<string, string>
+ */
+function bl_block_options_control_type_aliases(): array
+{
+	return [
+		'align-wide' => 'container-wide',
+	];
+}
+
+/**
+ * Resolve a custom control type to the live registry key.
+ */
+function bl_block_options_resolve_control_type(string $type): string
+{
+	$type = sanitize_key($type);
+	if ($type === '') {
+		return '';
+	}
+
+	$aliases = bl_block_options_control_type_aliases();
+	$canonical = $aliases[$type] ?? $type;
+
+	if (!function_exists('bl_block_options_customs_registry')) {
+		return $canonical;
+	}
+
+	$registry = bl_block_options_customs_registry();
+	if (isset($registry[$canonical])) {
+		return $canonical;
+	}
+	if (isset($registry[$type])) {
+		return $type;
+	}
+
+	return $canonical;
+}
+
+/**
  * Resolve a preset slug against the store, falling back to a renamed alias.
  *
  * @param array<string, mixed> $presets
@@ -113,9 +155,13 @@ function bl_block_options_apply_control_defaults(array $item, array $overrides):
 		return $item;
 	}
 
+	$schema_type = function_exists('bl_block_options_resolve_control_type')
+		? bl_block_options_resolve_control_type($type)
+		: $type;
+
 	if (function_exists('bl_block_options_is_custom_type') && bl_block_options_is_custom_type($type)) {
 		$merged = array_merge($item, $overrides);
-		$params = bl_block_options_sanitize_custom_params($type, $merged);
+		$params = bl_block_options_sanitize_custom_params($schema_type, $merged);
 		$out = array_merge(
 			[
 				'id' => (string) ($item['id'] ?? ''),

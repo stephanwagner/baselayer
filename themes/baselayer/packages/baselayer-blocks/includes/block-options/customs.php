@@ -104,8 +104,16 @@ function bl_block_options_customs_registry(): array
  */
 function bl_block_options_is_custom_type(string $type): bool
 {
+	$type = sanitize_key($type);
 	$registry = bl_block_options_customs_registry();
-	return isset($registry[$type]);
+	if ($type !== '' && isset($registry[$type])) {
+		return true;
+	}
+	if (function_exists('bl_block_options_resolve_control_type')) {
+		$resolved = bl_block_options_resolve_control_type($type);
+		return $resolved !== '' && isset($registry[$resolved]);
+	}
+	return false;
 }
 
 /**
@@ -120,7 +128,14 @@ function bl_block_options_customs_catalog(): array
 {
 	$domain = 'baselayer-blocks';
 	$out = [];
+	$legacy_types = function_exists('bl_block_options_control_type_aliases')
+		? bl_block_options_control_type_aliases()
+		: [];
+
 	foreach (bl_block_options_customs_registry() as $type => $def) {
+		if (isset($legacy_types[$type])) {
+			continue;
+		}
 		$defaults = [];
 		$params = [];
 		foreach ($def['params'] as $key => $param) {
@@ -168,6 +183,9 @@ function bl_block_options_customs_catalog(): array
  */
 function bl_block_options_sanitize_custom_params(string $type, array $raw): array
 {
+	if (function_exists('bl_block_options_resolve_control_type')) {
+		$type = bl_block_options_resolve_control_type($type);
+	}
 	$registry = bl_block_options_customs_registry();
 	if (!isset($registry[$type])) {
 		return [];
@@ -213,6 +231,9 @@ function bl_block_options_sanitize_custom_params(string $type, array $raw): arra
 function bl_block_options_build_custom_control(array $item): ?array
 {
 	$type = sanitize_key((string) ($item['type'] ?? ''));
+	if (function_exists('bl_block_options_resolve_control_type')) {
+		$type = bl_block_options_resolve_control_type($type);
+	}
 	$registry = bl_block_options_customs_registry();
 	if ($type === '' || !isset($registry[$type])) {
 		return null;
