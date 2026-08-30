@@ -62,6 +62,15 @@ function bl_render_developer_cheatsheet(): void
 							<code class="bl-code-small">define('BL_SIMULATE_CLIENT_IP', '127.0.0.22');</code>
 						</td>
 					</tr>
+					<tr>
+						<td>
+							<strong><?= esc_html__('Debug container widths', 'baselayer') ?></strong><br>
+							<span class="description"><?= esc_html__('Shows vertical guides for .container, .container-wide, .alignwide, and .alignwide.container-wide edges (front-end overlay).', 'baselayer') ?></span>
+						</td>
+						<td>
+							<code class="bl-code-small">define('DEBUG_CONTAINER_WIDTHS', true);</code>
+						</td>
+					</tr>
 				</tbody>
 			</table>
 

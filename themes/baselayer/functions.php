@@ -8,6 +8,10 @@ require_once __DIR__ . '/includes/config.php';
 require_once __DIR__ . '/includes/language.php';
 require_once __DIR__ . '/includes/features.php';
 
+if (defined('DEBUG_CONTAINER_WIDTHS') && DEBUG_CONTAINER_WIDTHS) {
+	require_once __DIR__ . '/includes/debug-container-widths.php';
+}
+
 // HTTP & Global
 require_once __DIR__ . '/includes/headers.php';
 require_once __DIR__ . '/includes/clean-up.php';
