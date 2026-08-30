@@ -1,9 +1,19 @@
 @use '../config' as *;
 @use '../mixins' as *;
 
-// Minimum L/R floor for wide content-align / hero / slider overlays.
-// Matches -container-padding-s: S by default, XS on very small screens.
+// -----------------------------------------------------------------------------
+// Container / wide / alignwide bleeds
+//
+// Parent is typically `.container`. Bleeds use (100vw - 100%) / 2 as space from
+// the parent edge to the viewport. Bleed tokens are one-side amounts.
+//
+// - `.container-wide`: min(token, space − page-padding)
+// - `.alignwide`: min(token, space − container-edge-spacing)
+// - `.alignwide.container-wide`: container-wide + alignwide (capped by edge-spacing)
+// -----------------------------------------------------------------------------
+
 :root {
+  // Minimum L/R floor for content-align / overlays (S → XS).
   --bl-wide-edge-floor: var(--bl-container-padding-s);
 
   @media (max-width: $breakpoint-xs) {
@@ -11,7 +21,52 @@
   }
 }
 
-// Container
+/// Shared space + bleed tokens (100% = containing block width).
+@mixin bl-wide-bleed-vars {
+  --bl-space-to-edge: max(0px, calc((100vw - 100%) / 2));
+
+  --bl-bleed-container-wide: min(
+    var(--bl-container-wide-bleed),
+    max(0px, calc(var(--bl-space-to-edge) - var(--bl-page-padding)))
+  );
+
+  --bl-bleed-alignwide: min(
+    var(--bl-alignwide-bleed),
+    max(0px, calc(var(--bl-space-to-edge) - var(--bl-container-edge-spacing)))
+  );
+
+  // Both classes: stack one-side bleeds, never closer than edge-spacing.
+  --bl-bleed-combo: min(
+    calc(var(--bl-bleed-container-wide) + var(--bl-alignwide-bleed)),
+    max(0px, calc(var(--bl-space-to-edge) - var(--bl-container-edge-spacing)))
+  );
+}
+
+@mixin bl-apply-wide-bleed($with-width: true) {
+  margin-left: calc(var(--bl-wide-bleed) * -1);
+  margin-right: calc(var(--bl-wide-bleed) * -1);
+
+  @if $with-width {
+    width: calc(100% + var(--bl-wide-bleed) + var(--bl-wide-bleed));
+  }
+}
+
+@mixin bl-content-edge-padding {
+  padding-left: var(--bl-content-edge-inset) !important;
+  padding-right: var(--bl-content-edge-inset) !important;
+
+  // Sliders apply L/R on slide content; option classes may sit on the shell.
+  &.slider__wrapper,
+  &.wp-block-baselayer-slider,
+  &.wp-block-acf-slider {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+}
+
+// -----------------------------------------------------------------------------
+// .container
+// -----------------------------------------------------------------------------
 
 .container {
   position: relative;
@@ -20,101 +75,95 @@
   width: calc(100% - var(--bl-page-padding) - var(--bl-page-padding));
 }
 
-// Wide container — fluid bleed capped by --bl-container-wide-bleed,
-// always leaving --bl-page-padding from the viewport edge.
+// -----------------------------------------------------------------------------
+// .container-wide — leave full page-padding from the viewport edge
+// -----------------------------------------------------------------------------
 
 .container-wide {
-  --bl-wide-bleed: min(var(--bl-container-wide-bleed), max(0px, (100vw - 100%) / 2 - var(--bl-page-padding)));
-  margin-left: calc(var(--bl-wide-bleed) * -1);
-  margin-right: calc(var(--bl-wide-bleed) * -1);
-  width: calc(100% + var(--bl-wide-bleed) + var(--bl-wide-bleed));
-
-  // Content-column align only when “Inhalt am Content ausrichten”.
-  // Dedicated inset var so .alignwide does not overwrite --bl-wide-bleed used for margins.
-  &.-container-wide-content {
-    --bl-container-wide-content-inset: max(
-      min(var(--bl-container-wide-bleed), max(0px, (100vw - 100%) / 2 - var(--bl-page-padding))),
-      var(--bl-wide-edge-floor)
-    );
-    padding-left: var(--bl-container-wide-content-inset) !important;
-    padding-right: var(--bl-container-wide-content-inset) !important;
-
-    // Sliders apply L/R on the slide content, not the wrapper.
-    // Editor: option classes sit on the Gutenberg shell, not `.slider__wrapper`.
-    &.slider__wrapper,
-    &.wp-block-baselayer-slider,
-    &.wp-block-acf-slider {
-      padding-left: 0 !important;
-      padding-right: 0 !important;
-    }
-  }
+  @include bl-wide-bleed-vars;
+  --bl-wide-bleed: var(--bl-bleed-container-wide);
+  @include bl-apply-wide-bleed;
 }
 
-// Alignwide — spacious bleed capped at live --bl-page-padding; when space is
-// tight, leave half --bl-page-padding from the viewport edge. Content inset
-// floors at half page padding so copy can keep a larger L/R inset on smaller
-// screens. When also .container-wide, combo below is wider (unchanged).
+// -----------------------------------------------------------------------------
+// .alignwide — leave container-edge-spacing from the viewport edge
+// -----------------------------------------------------------------------------
 
 .alignwide {
-  --bl-wide-bleed: min(
-    var(--bl-page-padding),
-    max(0px, (100vw - 100%) / 2 - var(--bl-page-padding) * 0.5)
-  );
-  // Content-column inset: bleed + half page-padding floor, never below S→XS (no Innenabstand).
+  @include bl-wide-bleed-vars;
+  --bl-wide-bleed: var(--bl-bleed-alignwide);
+  // Content-column inset when padding back (background / content-align).
   --bl-wide-content-inset: max(
     var(--bl-wide-bleed),
-    calc(var(--bl-page-padding) * 0.5),
+    var(--bl-container-edge-spacing),
     var(--bl-wide-edge-floor)
   );
-  margin-left: calc(var(--bl-wide-bleed) * -1);
-  margin-right: calc(var(--bl-wide-bleed) * -1);
-
-  // Combined with Inhaltsbreite: same half page-padding edge, higher cap
-  // (alignwide bleed + half page-padding). Page padding already steps on small screens.
-  &.container-wide {
-    --bl-wide-bleed: min(
-      calc(var(--bl-alignwide-bleed) + var(--bl-page-padding) * 0.5),
-      max(0px, (100vw - 100%) / 2 - var(--bl-page-padding) * 0.5)
-    );
-    margin-left: calc(var(--bl-wide-bleed) * -1);
-    margin-right: calc(var(--bl-wide-bleed) * -1);
-    width: calc(100% + var(--bl-wide-bleed) + var(--bl-wide-bleed));
-
-    // Content-align inset must match actual bleed (capped container-wide inset under-insets).
-    &.-container-wide-content {
-      --bl-container-wide-content-inset: max(var(--bl-wide-bleed), var(--bl-wide-edge-floor));
-      padding-left: var(--bl-container-wide-content-inset) !important;
-      padding-right: var(--bl-container-wide-content-inset) !important;
-
-      &.slider__wrapper,
-      &.wp-block-baselayer-slider,
-      &.wp-block-acf-slider {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-      }
-    }
-  }
+  @include bl-apply-wide-bleed($with-width: false);
 
   &.has-background:not(.container-wide) {
     padding-left: var(--bl-wide-content-inset);
     padding-right: var(--bl-wide-content-inset);
   }
-
-  // Alignwide-only content-align; combined with container-wide uses rule above.
-  &.-container-wide-content:not(.container-wide) {
-    padding-left: var(--bl-wide-content-inset) !important;
-    padding-right: var(--bl-wide-content-inset) !important;
-
-    &.slider__wrapper,
-    &.wp-block-baselayer-slider,
-    &.wp-block-acf-slider {
-      padding-left: 0 !important;
-      padding-right: 0 !important;
-    }
-  }
 }
 
-// Alignfull
+// -----------------------------------------------------------------------------
+// .alignwide.container-wide — stack both one-side bleeds (edge-spacing floor)
+// -----------------------------------------------------------------------------
+
+.alignwide.container-wide {
+  @include bl-wide-bleed-vars;
+  --bl-wide-bleed: var(--bl-bleed-combo);
+  @include bl-apply-wide-bleed;
+}
+
+// -----------------------------------------------------------------------------
+// Content-to-edge utilities (pad inward to a named edge)
+// -----------------------------------------------------------------------------
+
+// Back to .container (block option “Align content to content column”).
+.container-wide.-container-wide-content,
+.container-wide.-content-to-container,
+.alignwide.-container-wide-content:not(.container-wide),
+.alignwide.-content-to-container:not(.container-wide) {
+  @include bl-wide-bleed-vars;
+}
+
+.container-wide.-container-wide-content:not(.alignwide),
+.container-wide.-content-to-container:not(.alignwide) {
+  --bl-content-edge-inset: max(var(--bl-bleed-container-wide), var(--bl-wide-edge-floor));
+  @include bl-content-edge-padding;
+}
+
+.alignwide.container-wide.-container-wide-content,
+.alignwide.container-wide.-content-to-container {
+  --bl-content-edge-inset: max(var(--bl-wide-bleed), var(--bl-wide-edge-floor));
+  @include bl-content-edge-padding;
+}
+
+.alignwide.-container-wide-content:not(.container-wide),
+.alignwide.-content-to-container:not(.container-wide) {
+  --bl-content-edge-inset: var(--bl-wide-content-inset);
+  @include bl-content-edge-padding;
+}
+
+// Negate alignwide extra → content on .container-wide edges.
+.alignwide.container-wide.-content-to-container-wide {
+  --bl-content-edge-inset: max(
+    0px,
+    calc(var(--bl-wide-bleed) - var(--bl-bleed-container-wide))
+  );
+  @include bl-content-edge-padding;
+}
+
+// Negate container-wide portion → content on .alignwide edges.
+.alignwide.container-wide.-content-to-alignwide {
+  --bl-content-edge-inset: max(0px, calc(var(--bl-wide-bleed) - var(--bl-bleed-alignwide)));
+  @include bl-content-edge-padding;
+}
+
+// -----------------------------------------------------------------------------
+// .alignfull
+// -----------------------------------------------------------------------------
 
 .alignfull {
   margin-left: calc((100vw - var(--bl-content-width)) * -0.5);

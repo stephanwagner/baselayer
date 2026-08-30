@@ -1,36 +1,43 @@
 {
     "version": 1,
     "presets": {
-        "abstand": {
-            "label": "Abstand",
+        "margin": {
+            "label": "Spacing",
             "items": [
                 {
-                    "id": "c_abstand",
+                    "id": "c_margin",
                     "kind": "control",
                     "type": "container-margin",
-                    "label": "Abstände",
+                    "label": "Spacing",
                     "defaultSize": ""
                 }
             ]
         },
-        "innenabstand": {
-            "label": "Innenabstand",
+        "inner-padding": {
+            "label": "Inner padding",
             "items": [
                 {
-                    "id": "c_innenabstand",
+                    "id": "c_inner-padding",
                     "kind": "control",
                     "type": "button-group",
-                    "label": "Innenabstand",
+                    "label": "Inner padding",
                     "attributeName": "containerPadding",
-                    "default": "-container-padding-m",
+                    "default": "-container-padding-auto",
                     "options": [
                         {
                             "label": "—",
-                            "value": ""
+                            "value": "-container-padding-unset",
+                            "title": "Not set"
+                        },
+                        {
+                            "label": "A",
+                            "value": "-container-padding-auto",
+                            "title": "Auto"
                         },
                         {
                             "label": "0",
-                            "value": "-container-padding-none"
+                            "value": "-container-padding-none",
+                            "title": "No padding"
                         },
                         {
                             "label": "XS",
@@ -56,17 +63,17 @@
                 }
             ]
         },
-        "inhaltsbreite": {
-            "label": "Inhaltsbreite",
+        "container-wide": {
+            "label": "Content width",
             "items": [
                 {
-                    "id": "c_inhaltsbreite",
+                    "id": "c_container-wide",
                     "kind": "control",
-                    "type": "align-wide",
-                    "label": "Inhaltsbreite",
+                    "type": "container-wide",
+                    "label": "Content width",
                     "default": "",
                     "showContentAlign": false,
-                    "description": "Verwendet den breiten Inhaltscontainer. Nicht zu verwechseln mit der WordPress-Ausrichtung „Erweiterte Breite“."
+                    "description": "Uses the wide content container. Not to be confused with WordPress “Wide width” alignment."
                 }
             ]
         },
@@ -82,7 +89,7 @@
                     "default": "",
                     "options": [
                         {
-                            "label": "Standard",
+                            "label": "Default",
                             "value": ""
                         },
                         {
@@ -97,14 +104,14 @@
                 }
             ]
         },
-        "weite-limitieren": {
-            "label": "Weite limitieren",
+        "limit-width": {
+            "label": "Limit width",
             "items": [
                 {
-                    "id": "c_weite-limitieren",
+                    "id": "c_limit-width",
                     "kind": "control",
                     "type": "limit-width",
-                    "label": "Weite limitieren",
+                    "label": "Limit width",
                     "defaultSize": "",
                     "defaultAlign": "center"
                 }
@@ -117,14 +124,14 @@
                 {
                     "id": "p_7f3e9c21a804",
                     "kind": "preset",
-                    "slug": "inhaltsbreite"
+                    "slug": "container-wide"
                 },
                 {
                     "id": "p_04380ac99abf",
                     "kind": "preset",
-                    "slug": "abstand",
+                    "slug": "margin",
                     "defaults": {
-                        "c_abstand": {
+                        "c_margin": {
                             "defaultSize": "m"
                         }
                     }
@@ -132,13 +139,13 @@
                 {
                     "id": "p_ce18b9873b71",
                     "kind": "preset",
-                    "slug": "weite-limitieren"
+                    "slug": "limit-width"
                 },
                 {
                     "id": "c_0527fb77d203",
                     "kind": "control",
                     "type": "button-group",
-                    "label": "Spaltenabstand",
+                    "label": "Column gap",
                     "attributeName": "columnGap",
                     "default": "-column-gap-m",
                     "options": [
@@ -172,29 +179,29 @@
                     "id": "c_d41f82d23240",
                     "kind": "control",
                     "type": "button-group",
-                    "label": "Umbruch",
+                    "label": "Breakpoint",
                     "attributeName": "columnsStackBreakpoint",
                     "default": "",
-                    "description": "Legt fest, ab welcher Bildschirmbreite die Spalten gestapelt werden.",
+                    "description": "Sets from which screen width columns stack.",
                     "options": [
                         {
                             "label": "—",
-                            "value": ""
+                            "value": "-columns-stack-unset"
                         },
                         {
-                            "label": "Nie",
+                            "label": "Never",
                             "value": "-columns-stack-never"
                         },
                         {
-                            "label": "Früh",
+                            "label": "Early",
                             "value": "-columns-stack-early"
                         },
                         {
-                            "label": "Mittel",
+                            "label": "Medium",
                             "value": "-columns-stack-medium"
                         },
                         {
-                            "label": "Spät",
+                            "label": "Late",
                             "value": "-columns-stack-late"
                         }
                     ]
@@ -203,19 +210,19 @@
                     "id": "c_08a28fb58c3f",
                     "kind": "control",
                     "type": "boolean",
-                    "label": "Media-Text Layout",
-                    "toggleLabel": "Text harmonisch ausrichten",
+                    "label": "Media & text layout",
+                    "toggleLabel": "Balance text wrapping",
                     "attributeName": "harmonizeImageText",
                     "className": "-media-text-layout",
                     "default": false,
-                    "description": "Richtet die Textspalte mittig zum Bild oder Video aus."
+                    "description": "Aligns the text column to the center of the image or video."
                 },
                 {
                     "id": "c_8d7819b3263d",
                     "kind": "control",
                     "type": "boolean",
-                    "label": "Mobile anordnung",
-                    "toggleLabel": "Spalten wenn gestapelt umkehren",
+                    "label": "Mobile order",
+                    "toggleLabel": "Reverse columns when stacked",
                     "attributeName": "columnReverseOrderOnMobile",
                     "className": "-reverse-order-on-mobile",
                     "default": false
@@ -227,13 +234,13 @@
                 {
                     "id": "p_b49dc5f5984c",
                     "kind": "preset",
-                    "slug": "inhaltsbreite"
+                    "slug": "container-wide"
                 },
                 {
                     "id": "c_a8a3e5ab27e6",
                     "kind": "control",
                     "type": "boolean",
-                    "toggleLabel": "Inhalt vertikal zentrieren",
+                    "toggleLabel": "Center content vertically",
                     "attributeName": "columnCenterContent",
                     "className": "-center-content",
                     "default": false
@@ -245,12 +252,12 @@
                 {
                     "id": "p_824bcb2ea019",
                     "kind": "preset",
-                    "slug": "abstand"
+                    "slug": "margin"
                 },
                 {
                     "id": "p_b120f1617275",
                     "kind": "preset",
-                    "slug": "weite-limitieren"
+                    "slug": "limit-width"
                 },
                 {
                     "id": "p_09aaace88d0c",
@@ -261,7 +268,7 @@
                     "id": "c_61639db75248",
                     "kind": "control",
                     "type": "button-group",
-                    "label": "Anzeigen als",
+                    "label": "Display as",
                     "attributeName": "headingShowAs",
                     "default": "",
                     "options": [
@@ -302,12 +309,12 @@
                 {
                     "id": "p_09a203f6a3cf",
                     "kind": "preset",
-                    "slug": "abstand"
+                    "slug": "margin"
                 },
                 {
                     "id": "p_b96945d3ae79",
                     "kind": "preset",
-                    "slug": "weite-limitieren"
+                    "slug": "limit-width"
                 },
                 {
                     "id": "p_acd75dfff3fd",
@@ -321,18 +328,18 @@
                 {
                     "id": "p_4af877192138",
                     "kind": "preset",
-                    "slug": "inhaltsbreite"
+                    "slug": "container-wide"
                 },
                 {
                     "id": "p_d86bf9f9f2b1",
                     "kind": "preset",
-                    "slug": "abstand"
+                    "slug": "margin"
                 },
                 {
                     "id": "c_0e0461679035",
                     "kind": "control",
                     "type": "boolean",
-                    "toggleLabel": "Untertitel anzeigen",
+                    "toggleLabel": "Show caption",
                     "attributeName": "showImageLabel",
                     "className": "-show-image-caption",
                     "default": false
@@ -341,7 +348,7 @@
                     "id": "c_145fd35835ba",
                     "kind": "control",
                     "type": "boolean",
-                    "toggleLabel": "Bild bei Klick vergrößern",
+                    "toggleLabel": "Enlarge image on click",
                     "attributeName": "hasLightbox",
                     "className": "-has-lightbox",
                     "default": false,
@@ -354,13 +361,13 @@
                 {
                     "id": "p_344c3496c521",
                     "kind": "preset",
-                    "slug": "abstand"
+                    "slug": "margin"
                 },
                 {
                     "id": "c_b962ac184055",
                     "kind": "control",
                     "type": "boolean",
-                    "toggleLabel": "Untertitel anzeigen",
+                    "toggleLabel": "Show caption",
                     "attributeName": "showImageLabel",
                     "className": "-show-image-caption",
                     "default": false,
@@ -373,9 +380,9 @@
                 {
                     "id": "p_42a353e945a3",
                     "kind": "preset",
-                    "slug": "abstand",
+                    "slug": "margin",
                     "defaults": {
-                        "c_abstand": {
+                        "c_margin": {
                             "defaultSize": "m"
                         }
                     }
@@ -384,7 +391,7 @@
                     "id": "c_75fc32ad4af8",
                     "kind": "control",
                     "type": "boolean",
-                    "toggleLabel": "Untertitel anzeigen",
+                    "toggleLabel": "Show caption",
                     "attributeName": "showImageLabels",
                     "className": "-show-image-captions",
                     "default": true
@@ -393,7 +400,7 @@
                     "id": "c_2bb6c05e0f4e",
                     "kind": "control",
                     "type": "boolean",
-                    "toggleLabel": "Bilder bei Klick vergrößern",
+                    "toggleLabel": "Enlarge images on click",
                     "attributeName": "hasLightbox",
                     "className": "-has-lightbox",
                     "default": true,
@@ -406,9 +413,9 @@
                 {
                     "id": "p_731ce805b148",
                     "kind": "preset",
-                    "slug": "inhaltsbreite",
+                    "slug": "container-wide",
                     "defaults": {
-                        "c_inhaltsbreite": {
+                        "c_container-wide": {
                             "showContentAlign": true
                         }
                     }
@@ -416,9 +423,9 @@
                 {
                     "id": "p_9b7f59901180",
                     "kind": "preset",
-                    "slug": "abstand",
+                    "slug": "margin",
                     "defaults": {
-                        "c_abstand": {
+                        "c_margin": {
                             "defaultSize": "m"
                         }
                     }
@@ -426,17 +433,17 @@
                 {
                     "id": "p_51a251368ef8",
                     "kind": "preset",
-                    "slug": "innenabstand",
+                    "slug": "inner-padding",
                     "defaults": {
-                        "c_innenabstand": {
-                            "default": "-container-padding-m"
+                        "c_inner-padding": {
+                            "default": "-container-padding-auto"
                         }
                     }
                 },
                 {
                     "id": "p_22108dc28d9a",
                     "kind": "preset",
-                    "slug": "weite-limitieren"
+                    "slug": "limit-width"
                 }
             ]
         },
@@ -445,7 +452,7 @@
                 {
                     "id": "p_d1b77389e35f",
                     "kind": "preset",
-                    "slug": "abstand"
+                    "slug": "margin"
                 }
             ]
         },
@@ -454,14 +461,14 @@
                 {
                     "id": "p_3ab74a8a6207",
                     "kind": "preset",
-                    "slug": "inhaltsbreite"
+                    "slug": "container-wide"
                 },
                 {
                     "id": "p_1d4270aedfc0",
                     "kind": "preset",
-                    "slug": "abstand",
+                    "slug": "margin",
                     "defaults": {
-                        "c_abstand": {
+                        "c_margin": {
                             "defaultSize": "m"
                         }
                     }
@@ -469,9 +476,9 @@
                 {
                     "id": "p_607df290845b",
                     "kind": "preset",
-                    "slug": "innenabstand",
+                    "slug": "inner-padding",
                     "defaults": {
-                        "c_innenabstand": {
+                        "c_inner-padding": {
                             "default": "-container-padding-l"
                         }
                     }
@@ -483,9 +490,9 @@
                 {
                     "id": "p_d0d2288c987d",
                     "kind": "preset",
-                    "slug": "abstand",
+                    "slug": "margin",
                     "defaults": {
-                        "c_abstand": {
+                        "c_margin": {
                             "defaultSize": "m"
                         }
                     }
@@ -494,7 +501,7 @@
                     "id": "c_separator_width",
                     "kind": "control",
                     "type": "button-group",
-                    "label": "Weite",
+                    "label": "Width",
                     "attributeName": "separatorWidth",
                     "default": "",
                     "options": [
@@ -531,9 +538,9 @@
                 {
                     "id": "p_20e62b23a530",
                     "kind": "preset",
-                    "slug": "inhaltsbreite",
+                    "slug": "container-wide",
                     "defaults": {
-                        "c_inhaltsbreite": {
+                        "c_container-wide": {
                             "showContentAlign": true
                         }
                     }
@@ -541,9 +548,9 @@
                 {
                     "id": "p_2a9ea412523e",
                     "kind": "preset",
-                    "slug": "abstand",
+                    "slug": "margin",
                     "defaults": {
-                        "c_abstand": {
+                        "c_margin": {
                             "defaultSize": "m"
                         }
                     }
@@ -551,9 +558,9 @@
                 {
                     "id": "p_b2e030c3640e",
                     "kind": "preset",
-                    "slug": "innenabstand",
+                    "slug": "inner-padding",
                     "defaults": {
-                        "c_innenabstand": {
+                        "c_inner-padding": {
                             "default": "-container-padding-xl"
                         }
                     }
@@ -565,7 +572,7 @@
                 {
                     "id": "p_9714901c4b38",
                     "kind": "preset",
-                    "slug": "abstand"
+                    "slug": "margin"
                 }
             ]
         },
@@ -575,8 +582,8 @@
                     "id": "c_b89c68e8381a",
                     "kind": "control",
                     "type": "button-group",
-                    "label": "Responsive Höhe",
-                    "description": "Reduziert den Abstand auf kleineren Bildschirmen automatisch.",
+                    "label": "Responsive height",
+                    "description": "Automatically reduces spacing on smaller screens.",
                     "attributeName": "spacerResponsiveHeight",
                     "default": "",
                     "options": [
@@ -611,11 +618,11 @@
         "baselayer/form": {
             "items": [
                 {
-                    "id": "p_baselayer_form_abstand",
+                    "id": "p_baselayer_form_margin",
                     "kind": "preset",
-                    "slug": "abstand",
+                    "slug": "margin",
                     "defaults": {
-                        "c_abstand": {
+                        "c_margin": {
                             "defaultSize": "m"
                         }
                     }
@@ -628,8 +635,8 @@
                     "id": "c_24e2c987ea7b",
                     "kind": "control",
                     "type": "boolean",
-                    "label": "Darstellung",
-                    "toggleLabel": "Als Link anzeigen",
+                    "label": "Appearance",
+                    "toggleLabel": "Show as link",
                     "attributeName": "buttonIsLink",
                     "className": "-is-link",
                     "default": false,
@@ -639,21 +646,21 @@
                     "id": "c_06c39f484b52",
                     "kind": "control",
                     "type": "button-group",
-                    "label": "Variante",
+                    "label": "Variant",
                     "attributeName": "buttonVariant",
                     "default": "",
                     "description": "",
                     "options": [
                         {
-                            "label": "Primär",
+                            "label": "Primary",
                             "value": ""
                         },
                         {
-                            "label": "Sekundär",
+                            "label": "Secondary",
                             "value": "-secondary"
                         },
                         {
-                            "label": "Weiss",
+                            "label": "White",
                             "value": "-white"
                         }
                     ]
@@ -662,7 +669,7 @@
                     "id": "c_3b6043a83830",
                     "kind": "control",
                     "type": "button-group",
-                    "label": "Größe",
+                    "label": "Size",
                     "attributeName": "buttonSize",
                     "default": "",
                     "options": [
@@ -692,7 +699,7 @@
                     "id": "c_05be3011de70",
                     "kind": "control",
                     "type": "button-group",
-                    "label": "Icon Position",
+                    "label": "Icon position",
                     "attributeName": "buttonIconPosition",
                     "default": "",
                     "noSeparator": true,
@@ -700,12 +707,12 @@
                     "options": [
                         {
                             "icon": "horizontal-align-left",
-                            "label": "Links",
+                            "label": "Left",
                             "value": ""
                         },
                         {
                             "icon": "horizontal-align-right",
-                            "label": "Rechts",
+                            "label": "Right",
                             "value": "-icon-right",
                             "iconPosition": "after"
                         }

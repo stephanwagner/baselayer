@@ -1,5 +1,6 @@
 const ToggleGroupControlOption = wp.components.__experimentalToggleGroupControlOption;
 const ToggleGroupControlOptionIcon = wp.components.__experimentalToggleGroupControlOptionIcon;
+const Tooltip = wp.components.Tooltip;
 
 const themeIconComponents = new Map();
 
@@ -33,15 +34,17 @@ export function BlockOptionToggleGroupOption({
   title,
 }) {
   const tooltip = title || label;
+  const wrapTooltip = (node) =>
+    title && Tooltip ? <Tooltip text={title}>{node}</Tooltip> : node;
 
   if (icon && iconLabel && ToggleGroupControlOption) {
     const iconPlacement = iconPosition === 'after' ? '-icon-after' : '-icon-before';
 
-    return (
+    return wrapTooltip(
       <ToggleGroupControlOption
         value={value}
         label={label}
-        showTooltip
+        showTooltip={!title}
         aria-label={tooltip}
         className={'bl-toggle-group-option--icon-label ' + iconPlacement + ' -icon-' + icon}
       />
@@ -62,12 +65,12 @@ export function BlockOptionToggleGroupOption({
     return null;
   }
 
-  return (
+  return wrapTooltip(
     <ToggleGroupControlOption
       value={value}
       label={icon ? '—' : label}
-      showTooltip={Boolean(icon || title)}
-      aria-label={icon || title ? tooltip : undefined}
+      showTooltip={!title && Boolean(icon)}
+      aria-label={title || icon ? tooltip : undefined}
     />
   );
 }

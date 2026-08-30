@@ -7,9 +7,12 @@ The theme catalog lives at (locale-selected at install/import):
 
 Site language (`WPLANG`) picks `import-blocks-{lang}.json`, then falls back to `-en`. Same pattern as ACF’s `import-blocks-acf-*.json`.
 
-Core block options (presets + `core/*` assignments):
+Core block options (presets + `core/*` assignments), locale-selected like the blocks catalog:
 
-`themes/baselayer/blocks/import-block-options-core.json`
+- `themes/baselayer/blocks/import-block-options-core-de.json`
+- `themes/baselayer/blocks/import-block-options-core-en.json`
+
+Site language picks `import-block-options-core-{lang}.json`, then falls back to `-en`.
 
 Ship definitions in this catalog for theme bootstrap / programmatic import. In admin, move definitions between sites via **Blocks → Settings → Import / Export** (JSON download + upload). Definitions match by `type` + `settings.slug`; importing twice updates in place (no duplicates).
 

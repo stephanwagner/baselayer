@@ -89,12 +89,18 @@ $content-width-narrow: 800px !default;
 $content-width-very-narrow: 600px !default;
 $content-width-extra-narrow: 300px !default;
 
-// Content bleeds
-$container-wide-bleed: $page-padding-xl !default;
-$alignwide-bleed: $page-padding-xl !default;
+// Alignwide bleed
+$alignwide-bleed: $page-padding-m !default;
 
-// Content wide widths
-$content-wide-width: $content-width + ($container-wide-bleed * 2);
+// Container wide bleeds
+$container-wide-bleed: $page-padding-xl !default;
+
+// Minimum spacing from viewport edge for bled containers
+$container-edge-spacing-xs: $page-padding-xs * 0.5 !default;
+$container-edge-spacing-s: $page-padding-s * 0.5 !default;
+$container-edge-spacing-m: $page-padding-m * 0.5 !default;
+$container-edge-spacing-l: $page-padding-l * 0.5 !default;
+$container-edge-spacing-xl: $page-padding-xl * 0.5 !default;
 
 // Breakpoints
 $breakpoint-xs: 400px !default;

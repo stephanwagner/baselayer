@@ -16,8 +16,10 @@ const alignWideOptions = () => [
 /**
  * Inhaltsbreite picker with optional content-column align when Erweitert.
  */
-export function AlignWideControl({ option, attributes, onChange }) {
-  const { container, content } = option.attributeNames;
+export function ContainerWideControl({ option, attributes, onChange }) {
+  const names = option.attributeNames || {};
+  const container = names.container || 'alignWideContainer';
+  const content = names.content || 'alignWideContent';
   const containerValue = attributes[container] ?? option.default ?? '';
   const wideSelected = containerValue === ALIGN_WIDE_CONTAINER_CLASS;
   const showContentAlign = option.showContentAlign !== false;
@@ -80,3 +82,6 @@ export function AlignWideControl({ option, attributes, onChange }) {
     </div>
   );
 }
+
+/** @deprecated Use ContainerWideControl */
+export const AlignWideControl = ContainerWideControl;

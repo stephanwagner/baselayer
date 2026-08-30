@@ -2496,14 +2496,54 @@ body.post-new-php.post-type-bl_block .page-title-action {
   gap: 6px;
 }
 
+.bl-bo-choices__list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .bl-bo-choice {
   display: flex;
   gap: 6px;
   align-items: center;
 }
 
+.bl-bo-choice__handle {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 36px;
+  margin: 0;
+  padding: 0;
+  color: #757575;
+  cursor: grab;
+  touch-action: none;
+}
+.bl-bo-choice__handle:active {
+  cursor: grabbing;
+}
+.bl-bo-choice__handle svg {
+  display: block;
+  width: 16px;
+  height: 16px;
+}
+
+.bl-bo-choice__label {
+  flex: 0 1 4.5rem;
+  max-width: 5.5rem;
+}
+
+.bl-bo-choice__title {
+  flex: 1 1 6rem;
+}
+
+.bl-bo-choice__value {
+  flex: 1 1 8rem;
+}
+
 .bl-bo-choice input {
-  flex: 1;
   min-width: 0;
 }
 

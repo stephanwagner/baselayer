@@ -23,186 +23,6 @@
     return out;
   }
 
-  // themes/baselayer/packages/baselayer-blocks/customs/align-wide/utils.js
-  var ALIGN_WIDE_CONTAINER_CLASS = "container-wide";
-  var ALIGN_WIDE_CONTENT_CLASS = "-container-wide-content";
-  var ALL_ALIGN_WIDE_CLASSES = [ALIGN_WIDE_CONTAINER_CLASS, ALIGN_WIDE_CONTENT_CLASS];
-  var alignWideClassesFromAttributes = (option, attributes) => {
-    const { container, content } = option.attributeNames;
-    const containerValue = attributes[container] ?? option.default ?? "";
-    const classes = [];
-    if (containerValue === ALIGN_WIDE_CONTAINER_CLASS) {
-      classes.push(ALIGN_WIDE_CONTAINER_CLASS);
-      if (option.showContentAlign !== false && attributes[content]) {
-        classes.push(ALIGN_WIDE_CONTENT_CLASS);
-      }
-    }
-    return classes;
-  };
-  var alignWideAttributeKeys = (option) => {
-    const { container, content } = option.attributeNames;
-    return [container, content];
-  };
-
-  // themes/baselayer/packages/baselayer-blocks/src/js/block-options/shared/block-option-toggle-group-option.js
-  var ToggleGroupControlOption = wp.components.__experimentalToggleGroupControlOption;
-  var ToggleGroupControlOptionIcon = wp.components.__experimentalToggleGroupControlOptionIcon;
-  var themeIconComponents = /* @__PURE__ */ new Map();
-  function getThemeIconComponent(iconName3) {
-    if (!themeIconComponents.has(iconName3)) {
-      themeIconComponents.set(iconName3, function ThemeIcon() {
-        return /* @__PURE__ */ wp.element.createElement("span", { className: "bl-icon -icon-" + iconName3, "aria-hidden": "true" });
-      });
-    }
-    return themeIconComponents.get(iconName3);
-  }
-  function BlockOptionToggleGroupOption({
-    value,
-    label,
-    icon,
-    iconLabel,
-    iconPosition = "before",
-    title
-  }) {
-    const tooltip = title || label;
-    if (icon && iconLabel && ToggleGroupControlOption) {
-      const iconPlacement = iconPosition === "after" ? "-icon-after" : "-icon-before";
-      return /* @__PURE__ */ wp.element.createElement(
-        ToggleGroupControlOption,
-        {
-          value,
-          label,
-          showTooltip: true,
-          "aria-label": tooltip,
-          className: "bl-toggle-group-option--icon-label " + iconPlacement + " -icon-" + icon
-        }
-      );
-    }
-    if (icon && ToggleGroupControlOptionIcon) {
-      return /* @__PURE__ */ wp.element.createElement(
-        ToggleGroupControlOptionIcon,
-        {
-          value,
-          label: tooltip,
-          icon: getThemeIconComponent(icon)
-        }
-      );
-    }
-    if (!ToggleGroupControlOption) {
-      return null;
-    }
-    return /* @__PURE__ */ wp.element.createElement(
-      ToggleGroupControlOption,
-      {
-        value,
-        label: icon ? "\u2014" : label,
-        showTooltip: Boolean(icon || title),
-        "aria-label": icon || title ? tooltip : void 0
-      }
-    );
-  }
-
-  // themes/baselayer/packages/baselayer-blocks/src/js/block-options/shared/block-option-help.js
-  function optionHelpProps(option) {
-    return option.description ? { help: option.description } : {};
-  }
-  function BlockOptionDescription({ description }) {
-    if (!description) {
-      return null;
-    }
-    return /* @__PURE__ */ wp.element.createElement("p", { className: "components-base-control__help bl-block-option-help" }, description);
-  }
-
-  // themes/baselayer/packages/baselayer-blocks/src/js/block-options/shared/i18n.js
-  function t(key, fallback) {
-    const dict = window.baselayerBlockOptionsI18n || {};
-    return dict[key] || fallback;
-  }
-
-  // themes/baselayer/packages/baselayer-blocks/customs/align-wide/control.js
-  var { ToggleControl, SelectControl } = wp.components;
-  var ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
-  var alignWideOptions = () => [
-    { label: t("default", "Default"), value: "" },
-    { label: t("wide", "Wide"), value: ALIGN_WIDE_CONTAINER_CLASS }
-  ];
-  function AlignWideControl({ option, attributes, onChange }) {
-    const { container, content } = option.attributeNames;
-    const containerValue = attributes[container] ?? option.default ?? "";
-    const wideSelected = containerValue === ALIGN_WIDE_CONTAINER_CLASS;
-    const showContentAlign = option.showContentAlign !== false;
-    const options = alignWideOptions();
-    const setContainer = (newValue) => {
-      const next = { [container]: newValue };
-      if (newValue !== ALIGN_WIDE_CONTAINER_CLASS || !showContentAlign) {
-        next[content] = false;
-      }
-      onChange(next);
-    };
-    const contentToggle = wideSelected && showContentAlign ? /* @__PURE__ */ wp.element.createElement(
-      ToggleControl,
-      {
-        className: "bl-align-wide-content-toggle",
-        label: t("alignContentToContentColumn", "Align content to content column"),
-        checked: Boolean(attributes[content]),
-        onChange: (checked) => onChange({ [content]: checked })
-      }
-    ) : null;
-    if (!ToggleGroupControl) {
-      return /* @__PURE__ */ wp.element.createElement("div", { className: "bl-align-wide" }, /* @__PURE__ */ wp.element.createElement(
-        SelectControl,
-        {
-          label: option.label,
-          value: containerValue,
-          options,
-          onChange: setContainer,
-          ...optionHelpProps(option)
-        }
-      ), contentToggle);
-    }
-    return /* @__PURE__ */ wp.element.createElement("div", { className: "bl-align-wide" }, /* @__PURE__ */ wp.element.createElement(
-      ToggleGroupControl,
-      {
-        className: "bl-block-option-button-group",
-        label: option.label,
-        value: containerValue,
-        isBlock: true,
-        onChange: setContainer,
-        __nextHasNoMarginBottom: true,
-        __next40pxDefaultSize: true
-      },
-      options.map((opt) => /* @__PURE__ */ wp.element.createElement(
-        BlockOptionToggleGroupOption,
-        {
-          key: opt.value || "default",
-          value: opt.value,
-          label: opt.label
-        }
-      ))
-    ), contentToggle, /* @__PURE__ */ wp.element.createElement(BlockOptionDescription, { description: option.description }));
-  }
-
-  // themes/baselayer/packages/baselayer-blocks/customs/align-wide/editor.js
-  registerCustom({
-    type: "align-wide",
-    Control: AlignWideControl,
-    managedClasses: ALL_ALIGN_WIDE_CLASSES,
-    attributeKeys: alignWideAttributeKeys,
-    classesFromAttributes: alignWideClassesFromAttributes,
-    optionKey: (_option, index) => "align-wide-" + index,
-    registerAttributes: (settings, option) => {
-      const { container, content } = option.attributeNames;
-      return {
-        ...settings,
-        attributes: {
-          ...settings.attributes,
-          [container]: { type: "string", default: option.default ?? "" },
-          [content]: { type: "boolean", default: false }
-        }
-      };
-    }
-  });
-
   // themes/baselayer/packages/baselayer-blocks/customs/container-margin/utils.js
   var CONTAINER_MARGIN_SIZES = [
     { value: "unset", label: "\u2014" },
@@ -244,9 +64,97 @@
     return [names.top, names.bottom, names.linked];
   };
 
+  // themes/baselayer/packages/baselayer-blocks/src/js/block-options/shared/block-option-toggle-group-option.js
+  var ToggleGroupControlOption = wp.components.__experimentalToggleGroupControlOption;
+  var ToggleGroupControlOptionIcon = wp.components.__experimentalToggleGroupControlOptionIcon;
+  var Tooltip = wp.components.Tooltip;
+  var themeIconComponents = /* @__PURE__ */ new Map();
+  function getThemeIconComponent(iconName3) {
+    if (!themeIconComponents.has(iconName3)) {
+      themeIconComponents.set(iconName3, function ThemeIcon() {
+        return /* @__PURE__ */ wp.element.createElement("span", { className: "bl-icon -icon-" + iconName3, "aria-hidden": "true" });
+      });
+    }
+    return themeIconComponents.get(iconName3);
+  }
+  function BlockOptionToggleGroupOption({
+    value,
+    label,
+    icon,
+    iconLabel,
+    iconPosition = "before",
+    title
+  }) {
+    const tooltip = title || label;
+    const wrapTooltip = (node) => title && Tooltip ? /* @__PURE__ */ wp.element.createElement(Tooltip, { text: title }, node) : node;
+    if (icon && iconLabel && ToggleGroupControlOption) {
+      const iconPlacement = iconPosition === "after" ? "-icon-after" : "-icon-before";
+      return wrapTooltip(
+        /* @__PURE__ */ wp.element.createElement(
+          ToggleGroupControlOption,
+          {
+            value,
+            label,
+            showTooltip: !title,
+            "aria-label": tooltip,
+            className: "bl-toggle-group-option--icon-label " + iconPlacement + " -icon-" + icon
+          }
+        )
+      );
+    }
+    if (icon && ToggleGroupControlOptionIcon) {
+      return /* @__PURE__ */ wp.element.createElement(
+        ToggleGroupControlOptionIcon,
+        {
+          value,
+          label: tooltip,
+          icon: getThemeIconComponent(icon)
+        }
+      );
+    }
+    if (!ToggleGroupControlOption) {
+      return null;
+    }
+    return wrapTooltip(
+      /* @__PURE__ */ wp.element.createElement(
+        ToggleGroupControlOption,
+        {
+          value,
+          label: icon ? "\u2014" : label,
+          showTooltip: !title && Boolean(icon),
+          "aria-label": title || icon ? tooltip : void 0
+        }
+      )
+    );
+  }
+
+  // themes/baselayer/packages/baselayer-blocks/src/js/block-options/shared/block-option-help.js
+  function optionHelpProps(option) {
+    return option.description ? { help: option.description } : {};
+  }
+  function BlockOptionDescription({ description }) {
+    if (!description) {
+      return null;
+    }
+    return /* @__PURE__ */ wp.element.createElement("p", { className: "components-base-control__help bl-block-option-help" }, description);
+  }
+
+  // themes/baselayer/packages/baselayer-blocks/src/js/block-options/shared/i18n.js
+  function t(key, fallback) {
+    const dict = window.baselayerBlockOptionsI18n || {};
+    return dict[key] || fallback;
+  }
+
   // themes/baselayer/packages/baselayer-blocks/customs/container-margin/control.js
   var { Button } = wp.components;
-  var ToggleGroupControl2 = wp.components.__experimentalToggleGroupControl;
+  var ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
+  var marginSizeTitle = (value) => {
+    const titles = {
+      unset: t("notSet", "Not set"),
+      none: t("noSpacing", "No spacing")
+    };
+    return titles[value] || "";
+  };
   function ContainerMarginControl({ option, attributes, onChange }) {
     const { top, bottom, linked } = option.attributeNames;
     const isLinked = attributes[linked] !== false;
@@ -281,8 +189,8 @@
       });
     };
     const renderSizeControl = (sideLabel, value, onSelect) => {
-      const control = ToggleGroupControl2 ? /* @__PURE__ */ wp.element.createElement(
-        ToggleGroupControl2,
+      const control = ToggleGroupControl ? /* @__PURE__ */ wp.element.createElement(
+        ToggleGroupControl,
         {
           className: "bl-container-margin__sizes bl-block-option-button-group",
           label: sideLabel,
@@ -299,7 +207,8 @@
             key: size.value,
             value: size.value,
             label: size.label,
-            icon: size.icon
+            icon: size.icon,
+            title: marginSizeTitle(size.value)
           }
         ))
       ) : null;
@@ -344,6 +253,123 @@
         }
       };
     }
+  });
+
+  // themes/baselayer/packages/baselayer-blocks/customs/container-wide/utils.js
+  var ALIGN_WIDE_CONTAINER_CLASS = "container-wide";
+  var ALIGN_WIDE_CONTENT_CLASS = "-container-wide-content";
+  var ALL_ALIGN_WIDE_CLASSES = [ALIGN_WIDE_CONTAINER_CLASS, ALIGN_WIDE_CONTENT_CLASS];
+  var alignWideClassesFromAttributes = (option, attributes) => {
+    const { container, content } = option.attributeNames;
+    const containerValue = attributes[container] ?? option.default ?? "";
+    const classes = [];
+    if (containerValue === ALIGN_WIDE_CONTAINER_CLASS) {
+      classes.push(ALIGN_WIDE_CONTAINER_CLASS);
+      if (option.showContentAlign !== false && attributes[content]) {
+        classes.push(ALIGN_WIDE_CONTENT_CLASS);
+      }
+    }
+    return classes;
+  };
+  var alignWideAttributeKeys = (option) => {
+    const { container, content } = option.attributeNames;
+    return [container, content];
+  };
+
+  // themes/baselayer/packages/baselayer-blocks/customs/container-wide/control.js
+  var { ToggleControl, SelectControl } = wp.components;
+  var ToggleGroupControl2 = wp.components.__experimentalToggleGroupControl;
+  var alignWideOptions = () => [
+    { label: t("default", "Default"), value: "" },
+    { label: t("wide", "Wide"), value: ALIGN_WIDE_CONTAINER_CLASS }
+  ];
+  function ContainerWideControl({ option, attributes, onChange }) {
+    const names = option.attributeNames || {};
+    const container = names.container || "alignWideContainer";
+    const content = names.content || "alignWideContent";
+    const containerValue = attributes[container] ?? option.default ?? "";
+    const wideSelected = containerValue === ALIGN_WIDE_CONTAINER_CLASS;
+    const showContentAlign = option.showContentAlign !== false;
+    const options = alignWideOptions();
+    const setContainer = (newValue) => {
+      const next = { [container]: newValue };
+      if (newValue !== ALIGN_WIDE_CONTAINER_CLASS || !showContentAlign) {
+        next[content] = false;
+      }
+      onChange(next);
+    };
+    const contentToggle = wideSelected && showContentAlign ? /* @__PURE__ */ wp.element.createElement(
+      ToggleControl,
+      {
+        className: "bl-align-wide-content-toggle",
+        label: t("alignContentToContentColumn", "Align content to content column"),
+        checked: Boolean(attributes[content]),
+        onChange: (checked) => onChange({ [content]: checked })
+      }
+    ) : null;
+    if (!ToggleGroupControl2) {
+      return /* @__PURE__ */ wp.element.createElement("div", { className: "bl-align-wide" }, /* @__PURE__ */ wp.element.createElement(
+        SelectControl,
+        {
+          label: option.label,
+          value: containerValue,
+          options,
+          onChange: setContainer,
+          ...optionHelpProps(option)
+        }
+      ), contentToggle);
+    }
+    return /* @__PURE__ */ wp.element.createElement("div", { className: "bl-align-wide" }, /* @__PURE__ */ wp.element.createElement(
+      ToggleGroupControl2,
+      {
+        className: "bl-block-option-button-group",
+        label: option.label,
+        value: containerValue,
+        isBlock: true,
+        onChange: setContainer,
+        __nextHasNoMarginBottom: true,
+        __next40pxDefaultSize: true
+      },
+      options.map((opt) => /* @__PURE__ */ wp.element.createElement(
+        BlockOptionToggleGroupOption,
+        {
+          key: opt.value || "default",
+          value: opt.value,
+          label: opt.label
+        }
+      ))
+    ), contentToggle, /* @__PURE__ */ wp.element.createElement(BlockOptionDescription, { description: option.description }));
+  }
+
+  // themes/baselayer/packages/baselayer-blocks/customs/container-wide/editor.js
+  var containerWideDef = {
+    Control: ContainerWideControl,
+    managedClasses: ALL_ALIGN_WIDE_CLASSES,
+    attributeKeys: alignWideAttributeKeys,
+    classesFromAttributes: alignWideClassesFromAttributes,
+    registerAttributes: (settings, option) => {
+      const names = option.attributeNames || {};
+      const container = names.container || "alignWideContainer";
+      const content = names.content || "alignWideContent";
+      return {
+        ...settings,
+        attributes: {
+          ...settings.attributes,
+          [container]: { type: "string", default: option.default ?? "" },
+          [content]: { type: "boolean", default: false }
+        }
+      };
+    }
+  };
+  registerCustom({
+    ...containerWideDef,
+    type: "container-wide",
+    optionKey: (_option, index) => "container-wide-" + index
+  });
+  registerCustom({
+    ...containerWideDef,
+    type: "align-wide",
+    optionKey: (_option, index) => "align-wide-" + index
   });
 
   // themes/baselayer/packages/baselayer-blocks/customs/limit-width/utils.js
@@ -401,6 +427,12 @@
     { ...LIMIT_WIDTH_ALIGN_VALUES[1], label: t("center", "Center") },
     { ...LIMIT_WIDTH_ALIGN_VALUES[2], label: t("right", "Right") }
   ];
+  var limitWidthSizeTitle = (value) => {
+    const titles = {
+      unset: t("notSet", "Not set")
+    };
+    return titles[value] || "";
+  };
   function LimitWidthControl({ option, attributes, onChange }) {
     const { size, align } = option.attributeNames;
     const defaultAlign = option.defaultAlign ?? "center";
@@ -443,7 +475,8 @@
           key: item.value,
           value: item.value,
           label: item.label,
-          icon: item.icon
+          icon: item.icon,
+          title: limitWidthSizeTitle(item.value)
         }
       ))
     ), /* @__PURE__ */ wp.element.createElement(
@@ -1661,7 +1694,7 @@
     "alignWideContainer",
     "alignWideContent"
   ];
-  var GALLERY_OWNED_IMAGE_TYPES = ["container-margin", "align-wide"];
+  var GALLERY_OWNED_IMAGE_TYPES = ["container-margin", "container-wide", "align-wide"];
   var blockOptions = Array.isArray(window.baselayerBlockOptions) ? window.baselayerBlockOptions : [];
   var HIDE_BLOCK_OPTION = {
     type: "boolean",
@@ -1833,7 +1866,7 @@
     blockConfig.options.forEach((option) => {
       const custom = getCustom(option.type);
       if (custom?.classesFromAttributes) {
-        if (option.type === "align-wide" && !isRootBlock) {
+        if ((option.type === "container-wide" || option.type === "align-wide") && !isRootBlock) {
           return;
         }
         classes.push(...custom.classesFromAttributes(option, attributes));
@@ -1942,7 +1975,13 @@
           if (!clientId) {
             return false;
           }
-          return select("core/block-editor").getBlockRootClientId(clientId) === "";
+          const blockEditor = select("core/block-editor");
+          const rootClientId = blockEditor.getBlockRootClientId(clientId);
+          if (!rootClientId) {
+            return true;
+          }
+          const parentName = blockEditor.getBlock(rootClientId)?.name;
+          return parentName === "core/post-content";
         },
         [clientId]
       );
@@ -2041,7 +2080,7 @@
         if (isImageInGallery && (GALLERY_OWNED_IMAGE_ATTRIBUTES.includes(option.attributeName) || GALLERY_OWNED_IMAGE_TYPES.includes(option.type))) {
           return null;
         }
-        if (option.type === "align-wide" && !isRootBlock) {
+        if ((option.type === "container-wide" || option.type === "align-wide") && !isRootBlock) {
           return null;
         }
         const custom = getCustom(option.type);

@@ -6,7 +6,7 @@
                 {
                     "id": "p_b751ea0329fb",
                     "kind": "preset",
-                    "slug": "abstand"
+                    "slug": "margin"
                 },
                 {
                     "id": "c_4c01e073ea4d",
@@ -40,7 +40,7 @@
                 {
                     "id": "p_123dc27df96e",
                     "kind": "preset",
-                    "slug": "abstand"
+                    "slug": "margin"
                 },
                 {
                     "id": "c_70efa143dfed",
@@ -84,14 +84,14 @@
                 {
                     "id": "p_df106c5bb963",
                     "kind": "preset",
-                    "slug": "inhaltsbreite"
+                    "slug": "container-wide"
                 },
                 {
                     "id": "p_b87c06aaa719",
                     "kind": "preset",
-                    "slug": "abstand",
+                    "slug": "margin",
                     "defaults": {
-                        "c_abstand": {
+                        "c_margin": {
                             "defaultSize": "m"
                         }
                     }
@@ -99,9 +99,9 @@
                 {
                     "id": "p_772afee70c26",
                     "kind": "preset",
-                    "slug": "innenabstand",
+                    "slug": "inner-padding",
                     "defaults": {
-                        "c_innenabstand": {
+                        "c_inner-padding": {
                             "default": "-container-padding-m"
                         }
                     }
@@ -113,14 +113,14 @@
                 {
                     "id": "p_2f72c0f2fef6",
                     "kind": "preset",
-                    "slug": "inhaltsbreite"
+                    "slug": "container-wide"
                 },
                 {
                     "id": "p_fff1bda18a45",
                     "kind": "preset",
-                    "slug": "abstand",
+                    "slug": "margin",
                     "defaults": {
-                        "c_abstand": {
+                        "c_margin": {
                             "defaultSize": "m"
                         }
                     }
@@ -132,14 +132,14 @@
                 {
                     "id": "p_bc6c1002ad71",
                     "kind": "preset",
-                    "slug": "inhaltsbreite"
+                    "slug": "container-wide"
                 },
                 {
                     "id": "p_ffc2b36e2c8a",
                     "kind": "preset",
-                    "slug": "abstand",
+                    "slug": "margin",
                     "defaults": {
-                        "c_abstand": {
+                        "c_margin": {
                             "defaultSize": "m"
                         }
                     }
@@ -151,14 +151,14 @@
                 {
                     "id": "p_b9e7fcfc4ce6",
                     "kind": "preset",
-                    "slug": "inhaltsbreite"
+                    "slug": "container-wide"
                 },
                 {
                     "id": "p_6cc8c7db2a35",
                     "kind": "preset",
-                    "slug": "abstand",
+                    "slug": "margin",
                     "defaults": {
-                        "c_abstand": {
+                        "c_margin": {
                             "defaultSize": "m"
                         }
                     }

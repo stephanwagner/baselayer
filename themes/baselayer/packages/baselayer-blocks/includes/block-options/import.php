@@ -7,28 +7,48 @@ defined('ABSPATH') || exit;
  *
  * Ongoing Block Options live in the bl_block_options DB store (admin UI).
  * Core JSON fills an empty store on install / first bootstrap; later imports merge.
- * Resolution: child theme → parent theme → package seed (plugin export fallback).
+ *
+ * Prefers import-block-options-core-{lang}.json (site language), then -en, then
+ * legacy import-block-options-core.json. Child theme → parent → package seed.
  */
 function bl_block_options_core_import_path(): string
 {
-	$relative = 'blocks/import-block-options-core.json';
+	$lang = function_exists('bl_blocks_catalog_locale_key')
+		? bl_blocks_catalog_locale_key()
+		: 'en';
 
+	$filenames = [
+		'import-block-options-core-' . $lang . '.json',
+		'import-block-options-core-en.json',
+		'import-block-options-core.json',
+	];
+
+	$bases = [];
 	if (function_exists('get_stylesheet_directory')) {
-		$child = trailingslashit(get_stylesheet_directory()) . $relative;
-		if (is_readable($child)) {
-			return $child;
-		}
+		$bases[] = trailingslashit(get_stylesheet_directory()) . 'blocks/';
 	}
-
 	if (function_exists('get_template_directory')) {
-		$parent = trailingslashit(get_template_directory()) . $relative;
-		if (is_readable($parent)) {
-			return $parent;
+		$bases[] = trailingslashit(get_template_directory()) . 'blocks/';
+	}
+
+	foreach ($bases as $dir) {
+		foreach ($filenames as $file) {
+			$path = $dir . $file;
+			if (is_readable($path)) {
+				return $path;
+			}
 		}
 	}
 
-	$fallback = dirname(__DIR__, 2) . '/seed/import-block-options-core.json';
-	return is_readable($fallback) ? $fallback : '';
+	$pkg = dirname(__DIR__, 2) . '/seed/';
+	foreach ($filenames as $file) {
+		$path = $pkg . $file;
+		if (is_readable($path)) {
+			return $path;
+		}
+	}
+
+	return '';
 }
 
 /**

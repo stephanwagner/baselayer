@@ -356,13 +356,13 @@
       "items": [
         {
           "kind": "preset",
-          "slug": "inhaltsbreite"
+          "slug": "container-wide"
         },
         {
           "kind": "preset",
-          "slug": "abstand",
+          "slug": "margin",
           "defaults": {
-            "c_abstand": {
+            "c_margin": {
               "defaultSize": "m"
             }
           }
@@ -493,13 +493,13 @@
       "items": [
         {
           "kind": "preset",
-          "slug": "inhaltsbreite"
+          "slug": "container-wide"
         },
         {
           "kind": "preset",
-          "slug": "abstand",
+          "slug": "margin",
           "defaults": {
-            "c_abstand": {
+            "c_margin": {
               "defaultSize": "m"
             }
           }
@@ -603,13 +603,13 @@
       "items": [
         {
           "kind": "preset",
-          "slug": "inhaltsbreite"
+          "slug": "container-wide"
         },
         {
           "kind": "preset",
-          "slug": "abstand",
+          "slug": "margin",
           "defaults": {
-            "c_abstand": {
+            "c_margin": {
               "defaultSize": "m"
             }
           }
@@ -649,7 +649,7 @@
       "items": [
         {
           "kind": "preset",
-          "slug": "abstand"
+          "slug": "margin"
         },
         {
           "kind": "control",
@@ -710,7 +710,7 @@
       "items": [
         {
           "kind": "preset",
-          "slug": "abstand"
+          "slug": "margin"
         },
         {
           "kind": "control",
@@ -1063,22 +1063,22 @@
       "items": [
         {
           "kind": "preset",
-          "slug": "inhaltsbreite"
+          "slug": "container-wide"
         },
         {
           "kind": "preset",
-          "slug": "abstand",
+          "slug": "margin",
           "defaults": {
-            "c_abstand": {
+            "c_margin": {
               "defaultSize": "m"
             }
           }
         },
         {
           "kind": "preset",
-          "slug": "innenabstand",
+          "slug": "inner-padding",
           "defaults": {
-            "c_innenabstand": {
+            "c_inner-padding": {
               "default": "-container-padding-m"
             }
           }

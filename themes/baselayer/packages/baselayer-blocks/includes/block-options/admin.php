@@ -430,6 +430,7 @@ function bl_block_options_enqueue_admin_assets(): void
 		'choices' => __('Choices', 'baselayer-blocks'),
 		'addChoice' => __('Add choice', 'baselayer-blocks'),
 		'choiceLabel' => __('Label', 'baselayer-blocks'),
+		'choiceTitle' => __('Hover label', 'baselayer-blocks'),
 		'choiceValue' => __('Value / class', 'baselayer-blocks'),
 		'chooseIcon' => __('Choose icon', 'baselayer-blocks'),
 		'clearIcon' => __('Clear icon', 'baselayer-blocks'),

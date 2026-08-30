@@ -96,6 +96,11 @@ function bl_block_options_customs_registry(): array
 		];
 	}
 
+	// BC: folder/type was renamed align-wide → container-wide; stores may still use the old type.
+	if (isset($registry['container-wide']) && !isset($registry['align-wide'])) {
+		$registry['align-wide'] = $registry['container-wide'];
+	}
+
 	return $registry;
 }
 

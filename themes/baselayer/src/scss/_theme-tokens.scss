@@ -193,9 +193,34 @@
   --bl-content-width-very-narrow: #{$content-width-very-narrow};
   --bl-content-width-extra-narrow: #{$content-width-extra-narrow};
 
-  // Content bleeds
-  --bl-container-wide-bleed: #{$container-wide-bleed};
+  // Content bleeds (one-side amounts from .container)
   --bl-alignwide-bleed: #{$alignwide-bleed};
+  --bl-container-wide-bleed: #{$container-wide-bleed};
+
+  // Minimum spacing from viewport edge for bled containers
+  --bl-container-edge-spacing-xs: #{$container-edge-spacing-xs};
+  --bl-container-edge-spacing-s: #{$container-edge-spacing-s};
+  --bl-container-edge-spacing-m: #{$container-edge-spacing-m};
+  --bl-container-edge-spacing-l: #{$container-edge-spacing-l};
+  --bl-container-edge-spacing-xl: #{$container-edge-spacing-xl};
+
+  --bl-container-edge-spacing: var(--bl-container-edge-spacing-xl);
+
+  @media (max-width: #{$breakpoint-l}) {
+    --bl-container-edge-spacing: var(--bl-container-edge-spacing-l);
+  }
+
+  @media (max-width: #{$breakpoint-m}) {
+    --bl-container-edge-spacing: var(--bl-container-edge-spacing-m);
+  }
+
+  @media (max-width: #{$breakpoint-s}) {
+    --bl-container-edge-spacing: var(--bl-container-edge-spacing-s);
+  }
+
+  @media (max-width: #{$breakpoint-xs}) {
+    --bl-container-edge-spacing: var(--bl-container-edge-spacing-xs);
+  }
 
   // Breakpoints
   --bl-breakpoint-xs: #{$breakpoint-xs};

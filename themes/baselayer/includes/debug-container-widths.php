@@ -35,12 +35,13 @@ body.bl-debug-container-widths {
 		max(0px, calc(var(--bl-debug-content-inset) - var(--bl-page-padding)))
 	);
 	--bl-debug-aw-bleed: min(
-		var(--bl-page-padding),
-		max(0px, calc(var(--bl-debug-content-inset) - var(--bl-page-padding) * 0.5))
+		var(--bl-alignwide-bleed),
+		max(0px, calc(var(--bl-debug-content-inset) - var(--bl-container-edge-spacing)))
 	);
+	/* Stack both one-side bleeds (matches _containers.scss). */
 	--bl-debug-aw-cw-bleed: min(
-		calc(var(--bl-alignwide-bleed) + var(--bl-page-padding) * 0.5),
-		max(0px, calc(var(--bl-debug-content-inset) - var(--bl-page-padding) * 0.5))
+		calc(var(--bl-debug-cw-bleed) + var(--bl-alignwide-bleed)),
+		max(0px, calc(var(--bl-debug-content-inset) - var(--bl-container-edge-spacing)))
 	);
 	--bl-debug-label-top: calc(var(--bl-admin-bar-height, 0px) + 12px);
 }

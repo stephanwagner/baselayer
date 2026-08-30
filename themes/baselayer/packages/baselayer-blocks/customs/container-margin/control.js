@@ -10,6 +10,14 @@ import { t } from '../../src/js/block-options/shared/i18n';
 const { Button } = wp.components;
 const ToggleGroupControl = wp.components.__experimentalToggleGroupControl;
 
+const marginSizeTitle = (value) => {
+  const titles = {
+    unset: t('notSet', 'Not set'),
+    none: t('noSpacing', 'No spacing'),
+  };
+  return titles[value] || '';
+};
+
 /**
  * Linked top/bottom container margin picker for block options.
  */
@@ -72,6 +80,7 @@ export function ContainerMarginControl({ option, attributes, onChange }) {
             value={size.value}
             label={size.label}
             icon={size.icon}
+            title={marginSizeTitle(size.value)}
           />
         ))}
       </ToggleGroupControl>

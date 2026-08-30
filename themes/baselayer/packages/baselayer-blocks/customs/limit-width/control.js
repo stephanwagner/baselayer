@@ -16,6 +16,13 @@ const limitWidthAligns = () => [
   { ...LIMIT_WIDTH_ALIGN_VALUES[2], label: t('right', 'Right') },
 ];
 
+const limitWidthSizeTitle = (value) => {
+  const titles = {
+    unset: t('notSet', 'Not set'),
+  };
+  return titles[value] || '';
+};
+
 /**
  * Width limit picker with separate size and alignment segments.
  */
@@ -70,6 +77,7 @@ export function LimitWidthControl({ option, attributes, onChange }) {
               value={item.value}
               label={item.label}
               icon={item.icon}
+              title={limitWidthSizeTitle(item.value)}
             />
           ))}
         </ToggleGroupControl>

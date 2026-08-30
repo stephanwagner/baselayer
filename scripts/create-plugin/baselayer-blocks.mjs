@@ -108,9 +108,17 @@ async function main() {
     await copyDir(path.join(pkg, 'languages'), path.join(out, 'languages'));
   }
 
-  const coreSeed = path.join(root, 'themes/baselayer/blocks/import-block-options-core.json');
-  if (await exists(coreSeed)) {
-    await copyFile(coreSeed, path.join(out, 'seed/import-block-options-core.json'));
+  const seedDir = path.join(out, 'seed');
+  await fs.mkdir(seedDir, { recursive: true });
+  const blocksDir = path.join(root, 'themes/baselayer/blocks');
+  for (const file of [
+    'import-block-options-core-en.json',
+    'import-block-options-core-de.json',
+  ]) {
+    const coreSeed = path.join(blocksDir, file);
+    if (await exists(coreSeed)) {
+      await copyFile(coreSeed, path.join(seedDir, file));
+    }
   }
 
   console.log(`Done. Plugin files are in:\n  ${out}`);

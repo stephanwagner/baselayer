@@ -2,7 +2,7 @@
 
 defined('ABSPATH') || exit;
 
-if (!function_exists('bl_block_options_control_align_wide')) {
+if (!function_exists('bl_block_options_control_container_wide')) {
 	/**
 	 * Inhaltsbreite: wide container + optional content-column align.
 	 *
@@ -10,12 +10,12 @@ if (!function_exists('bl_block_options_control_align_wide')) {
 	 * @param bool   $show_content_align Whether to show the content-column align toggle.
 	 * @return array<string, mixed>
 	 */
-	function bl_block_options_control_align_wide(string $default = '', bool $show_content_align = false): array
+	function bl_block_options_control_container_wide(string $default = '', bool $show_content_align = false): array
 	{
 		$default = $default === 'container-wide' ? 'container-wide' : '';
 
 		return [
-			'type' => 'align-wide',
+			'type' => 'container-wide',
 			'label' => __('Inhaltsbreite', 'baselayer-blocks'),
 			'description' => __(
 				'Verwendet den breiten Inhaltscontainer. Nicht zu verwechseln mit der WordPress-Ausrichtung „Erweiterte Breite“.',
@@ -28,6 +28,19 @@ if (!function_exists('bl_block_options_control_align_wide')) {
 				'content' => 'alignWideContent',
 			],
 		];
+	}
+}
+
+if (!function_exists('bl_block_options_control_align_wide')) {
+	/**
+	 * @deprecated Use bl_block_options_control_container_wide().
+	 * @param string $default
+	 * @param bool   $show_content_align
+	 * @return array<string, mixed>
+	 */
+	function bl_block_options_control_align_wide(string $default = '', bool $show_content_align = false): array
+	{
+		return bl_block_options_control_container_wide($default, $show_content_align);
 	}
 }
 
@@ -68,7 +81,7 @@ return [
 		$show_content_align = array_key_exists('showContentAlign', $params)
 			? (bool) $params['showContentAlign']
 			: false;
-		$built = bl_block_options_control_align_wide(
+		$built = bl_block_options_control_container_wide(
 			(string) ($params['default'] ?? ''),
 			$show_content_align
 		);

@@ -24,7 +24,7 @@ const GALLERY_OWNED_IMAGE_ATTRIBUTES = [
   'alignWideContainer',
   'alignWideContent',
 ];
-const GALLERY_OWNED_IMAGE_TYPES = ['container-margin', 'align-wide'];
+const GALLERY_OWNED_IMAGE_TYPES = ['container-margin', 'container-wide', 'align-wide'];
 
 /** Resolved from PHP (bl_block_options store → baselayerBlockOptions). */
 const blockOptions = Array.isArray(window.baselayerBlockOptions)
@@ -249,7 +249,7 @@ const collectOptionClasses = (blockConfig, attributes, { isRootBlock = true } = 
     const custom = getCustom(option.type);
     if (custom?.classesFromAttributes) {
       // Wide container only applies at root; keep attributes, skip classes when nested.
-      if (option.type === 'align-wide' && !isRootBlock) {
+      if ((option.type === 'container-wide' || option.type === 'align-wide') && !isRootBlock) {
         return;
       }
       classes.push(...custom.classesFromAttributes(option, attributes));
@@ -388,12 +388,20 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
       [props.name, clientId]
     );
 
+    // Wide container is for document-level sections only (not nested in group/columns/…).
+    // Post/site canvas: top-level content is often a direct child of core/post-content.
     const isRootBlock = useSelect(
       (select) => {
         if (!clientId) {
           return false;
         }
-        return select('core/block-editor').getBlockRootClientId(clientId) === '';
+        const blockEditor = select('core/block-editor');
+        const rootClientId = blockEditor.getBlockRootClientId(clientId);
+        if (!rootClientId) {
+          return true;
+        }
+        const parentName = blockEditor.getBlock(rootClientId)?.name;
+        return parentName === 'core/post-content';
       },
       [clientId]
     );
@@ -531,7 +539,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                   return null;
                 }
 
-                if (option.type === 'align-wide' && !isRootBlock) {
+                if ((option.type === 'container-wide' || option.type === 'align-wide') && !isRootBlock) {
                   return null;
                 }
 

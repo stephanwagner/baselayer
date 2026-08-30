@@ -2161,3 +2161,30 @@ msgstr "Größe"
 msgid "Alignment"
 msgstr "Ausrichtung"
 
+
+msgid "Hover label"
+msgstr "Hover-Label"
+
+msgid "Not set"
+msgstr "Nicht gesetzt"
+
+msgid "No spacing"
+msgstr "Kein Abstand"
+
+msgid "No padding"
+msgstr "Kein Innenabstand"
+
+msgid "Extra small"
+msgstr "Extra klein"
+
+msgid "Small"
+msgstr "Klein"
+
+msgid "Medium"
+msgstr "Mittel"
+
+msgid "Large"
+msgstr "Groß"
+
+msgid "Extra large"
+msgstr "Extra groß"

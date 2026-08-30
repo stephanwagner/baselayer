@@ -2020,9 +2020,22 @@
     }
     function renderChoices(item) {
       const wrap = el2("div", { className: "bl-bo-choices bl-admin-form" });
+      const listEl = el2("div", { className: "bl-bo-choices__list" });
       const showIconPicker = item.type === "button-group";
       (item.options || []).forEach((opt, oi) => {
+        const handle = el2("span", {
+          className: "bl-bo-choice__handle",
+          title: t3("dragField", "Drag to reorder"),
+          "aria-label": t3("dragField", "Drag to reorder")
+        });
+        const dragIcon = typeof iconEl === "function" ? iconEl("drag") : null;
+        if (dragIcon?.innerHTML) {
+          handle.appendChild(dragIcon);
+        } else {
+          handle.textContent = "\u22EE\u22EE";
+        }
         const children = [
+          handle,
           el2("input", {
             type: "text",
             className: "bl-bo-choice__label",
@@ -2031,6 +2044,24 @@
             onInput: (e) => {
               const options2 = JSON.parse(JSON.stringify(item.options || []));
               options2[oi] = { ...options2[oi], label: e.target.value };
+              patchById(item.id, { ...item, options: options2 });
+              item.options = options2;
+            }
+          }),
+          el2("input", {
+            type: "text",
+            className: "bl-bo-choice__title",
+            value: opt.title || "",
+            placeholder: t3("choiceTitle", "Hover label"),
+            onInput: (e) => {
+              const options2 = JSON.parse(JSON.stringify(item.options || []));
+              const title = e.target.value;
+              options2[oi] = { ...options2[oi] };
+              if (title) {
+                options2[oi].title = title;
+              } else {
+                delete options2[oi].title;
+              }
               patchById(item.id, { ...item, options: options2 });
               item.options = options2;
             }
@@ -2132,8 +2163,11 @@
           deleteBtn.textContent = "\xD7";
         }
         children.push(deleteBtn);
-        wrap.appendChild(el2("div", { className: "bl-bo-choice" }, children));
+        listEl.appendChild(
+          el2("div", { className: "bl-bo-choice", dataset: { choiceIndex: String(oi) } }, children)
+        );
       });
+      wrap.appendChild(listEl);
       wrap.appendChild(
         el2("button", {
           type: "button",
@@ -2141,12 +2175,37 @@
           text: t3("addChoice", "Add choice"),
           onClick: () => {
             const options2 = JSON.parse(JSON.stringify(item.options || []));
-            const next = item.type === "button-group" ? { label: "Option", value: "", icon: "" } : { label: "Option", value: "" };
+            const next = item.type === "button-group" ? { label: "Option", value: "", title: "", icon: "" } : { label: "Option", value: "", title: "" };
             options2.push(next);
             replaceById(item.id, { ...item, options: options2 });
           }
         })
       );
+      const Canvas = canvasApi();
+      if (typeof Canvas.createSortable === "function" && (item.options || []).length > 1) {
+        Canvas.createSortable(listEl, {
+          handle: ".bl-bo-choice__handle",
+          draggable: ".bl-bo-choice",
+          animation: 150,
+          ghostClass: "is-dragging-ghost",
+          chosenClass: "is-dragging-chosen",
+          onStart: () => {
+            if (typeof Canvas.dragStart === "function") {
+              Canvas.dragStart();
+            }
+          },
+          onEnd: () => {
+            if (typeof Canvas.dragEnd === "function") {
+              Canvas.dragEnd();
+            }
+            const prev = item.options || [];
+            const ordered = Array.from(listEl.querySelectorAll(":scope > .bl-bo-choice")).map((row) => prev[Number(row.dataset.choiceIndex)]).filter((choice) => choice != null);
+            if (ordered.length === prev.length) {
+              replaceById(item.id, { ...item, options: ordered });
+            }
+          }
+        });
+      }
       return wrap;
     }
     function setOpen(row, header, nextOpen) {

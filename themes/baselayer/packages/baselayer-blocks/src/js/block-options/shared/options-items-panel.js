@@ -408,10 +408,24 @@ export function createOptionsPanel(initial, onChange, options = {}) {
 
   function renderChoices(item) {
     const wrap = el('div', { className: 'bl-bo-choices bl-admin-form' });
+    const listEl = el('div', { className: 'bl-bo-choices__list' });
     const showIconPicker = item.type === 'button-group';
 
     (item.options || []).forEach((opt, oi) => {
+      const handle = el('span', {
+        className: 'bl-bo-choice__handle',
+        title: t('dragField', 'Drag to reorder'),
+        'aria-label': t('dragField', 'Drag to reorder'),
+      });
+      const dragIcon = typeof iconEl === 'function' ? iconEl('drag') : null;
+      if (dragIcon?.innerHTML) {
+        handle.appendChild(dragIcon);
+      } else {
+        handle.textContent = '⋮⋮';
+      }
+
       const children = [
+        handle,
         el('input', {
           type: 'text',
           className: 'bl-bo-choice__label',
@@ -420,6 +434,24 @@ export function createOptionsPanel(initial, onChange, options = {}) {
           onInput: (e) => {
             const options = JSON.parse(JSON.stringify(item.options || []));
             options[oi] = { ...options[oi], label: e.target.value };
+            patchById(item.id, { ...item, options });
+            item.options = options;
+          },
+        }),
+        el('input', {
+          type: 'text',
+          className: 'bl-bo-choice__title',
+          value: opt.title || '',
+          placeholder: t('choiceTitle', 'Hover label'),
+          onInput: (e) => {
+            const options = JSON.parse(JSON.stringify(item.options || []));
+            const title = e.target.value;
+            options[oi] = { ...options[oi] };
+            if (title) {
+              options[oi].title = title;
+            } else {
+              delete options[oi].title;
+            }
             patchById(item.id, { ...item, options });
             item.options = options;
           },
@@ -533,8 +565,12 @@ export function createOptionsPanel(initial, onChange, options = {}) {
       }
       children.push(deleteBtn);
 
-      wrap.appendChild(el('div', { className: 'bl-bo-choice' }, children));
+      listEl.appendChild(
+        el('div', { className: 'bl-bo-choice', dataset: { choiceIndex: String(oi) } }, children)
+      );
     });
+
+    wrap.appendChild(listEl);
 
     wrap.appendChild(
       el('button', {
@@ -545,13 +581,45 @@ export function createOptionsPanel(initial, onChange, options = {}) {
           const options = JSON.parse(JSON.stringify(item.options || []));
           const next =
             item.type === 'button-group'
-              ? { label: 'Option', value: '', icon: '' }
-              : { label: 'Option', value: '' };
+              ? { label: 'Option', value: '', title: '', icon: '' }
+              : { label: 'Option', value: '', title: '' };
           options.push(next);
           replaceById(item.id, { ...item, options });
         },
       })
     );
+
+    const Canvas = canvasApi();
+    if (
+      typeof Canvas.createSortable === 'function' &&
+      (item.options || []).length > 1
+    ) {
+      Canvas.createSortable(listEl, {
+        handle: '.bl-bo-choice__handle',
+        draggable: '.bl-bo-choice',
+        animation: 150,
+        ghostClass: 'is-dragging-ghost',
+        chosenClass: 'is-dragging-chosen',
+        onStart: () => {
+          if (typeof Canvas.dragStart === 'function') {
+            Canvas.dragStart();
+          }
+        },
+        onEnd: () => {
+          if (typeof Canvas.dragEnd === 'function') {
+            Canvas.dragEnd();
+          }
+          const prev = item.options || [];
+          const ordered = Array.from(listEl.querySelectorAll(':scope > .bl-bo-choice'))
+            .map((row) => prev[Number(row.dataset.choiceIndex)])
+            .filter((choice) => choice != null);
+          if (ordered.length === prev.length) {
+            replaceById(item.id, { ...item, options: ordered });
+          }
+        },
+      });
+    }
+
     return wrap;
   }
 

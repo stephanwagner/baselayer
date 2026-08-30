@@ -113,6 +113,10 @@ function bl_block_options_editor_i18n(): array
 		'right' => __('Right', 'baselayer-blocks'),
 		'size' => __('Size', 'baselayer-blocks'),
 		'alignment' => __('Alignment', 'baselayer-blocks'),
+		'notSet' => __('Not set', 'baselayer-blocks'),
+		'noSpacing' => __('No spacing', 'baselayer-blocks'),
+		'noPadding' => __('No padding', 'baselayer-blocks'),
+		'auto' => __('Auto', 'baselayer-blocks'),
 	];
 }
 

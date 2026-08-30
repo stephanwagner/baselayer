@@ -1,0 +1,724 @@
+{
+    "version": 1,
+    "presets": {
+        "margin": {
+            "label": "Abstand",
+            "items": [
+                {
+                    "id": "c_margin",
+                    "kind": "control",
+                    "type": "container-margin",
+                    "label": "Abstände",
+                    "defaultSize": ""
+                }
+            ]
+        },
+        "inner-padding": {
+            "label": "Innenabstand",
+            "items": [
+                {
+                    "id": "c_inner-padding",
+                    "kind": "control",
+                    "type": "button-group",
+                    "label": "Innenabstand",
+                    "attributeName": "containerPadding",
+                    "default": "-container-padding-auto",
+                    "options": [
+                        {
+                            "label": "—",
+                            "value": "-container-padding-unset",
+                            "title": "Nicht gesetzt"
+                        },
+                        {
+                            "label": "A",
+                            "value": "-container-padding-auto",
+                            "title": "Automatisch"
+                        },
+                        {
+                            "label": "0",
+                            "value": "-container-padding-none",
+                            "title": "Kein Innenabstand"
+                        },
+                        {
+                            "label": "XS",
+                            "value": "-container-padding-xs"
+                        },
+                        {
+                            "label": "S",
+                            "value": "-container-padding-s"
+                        },
+                        {
+                            "label": "M",
+                            "value": "-container-padding-m"
+                        },
+                        {
+                            "label": "L",
+                            "value": "-container-padding-l"
+                        },
+                        {
+                            "label": "XL",
+                            "value": "-container-padding-xl"
+                        }
+                    ]
+                }
+            ]
+        },
+        "container-wide": {
+            "label": "Inhaltsbreite",
+            "items": [
+                {
+                    "id": "c_container-wide",
+                    "kind": "control",
+                    "type": "container-wide",
+                    "label": "Inhaltsbreite",
+                    "default": "",
+                    "showContentAlign": false,
+                    "description": "Verwendet den breiten Inhaltscontainer. Nicht zu verwechseln mit der WordPress-Ausrichtung „Erweiterte Breite“."
+                }
+            ]
+        },
+        "text-wrap": {
+            "label": "Text Wrap",
+            "items": [
+                {
+                    "id": "c_text-wrap",
+                    "kind": "control",
+                    "type": "button-group",
+                    "label": "Text Wrap",
+                    "attributeName": "textWrap",
+                    "default": "",
+                    "options": [
+                        {
+                            "label": "Standard",
+                            "value": ""
+                        },
+                        {
+                            "label": "Balanced",
+                            "value": "text-wrap-balance"
+                        },
+                        {
+                            "label": "Pretty",
+                            "value": "text-wrap-pretty"
+                        }
+                    ]
+                }
+            ]
+        },
+        "limit-width": {
+            "label": "Weite limitieren",
+            "items": [
+                {
+                    "id": "c_limit-width",
+                    "kind": "control",
+                    "type": "limit-width",
+                    "label": "Weite limitieren",
+                    "defaultSize": "",
+                    "defaultAlign": "center"
+                }
+            ]
+        }
+    },
+    "blocks": {
+        "core/columns": {
+            "items": [
+                {
+                    "id": "p_7f3e9c21a804",
+                    "kind": "preset",
+                    "slug": "container-wide"
+                },
+                {
+                    "id": "p_04380ac99abf",
+                    "kind": "preset",
+                    "slug": "margin",
+                    "defaults": {
+                        "c_margin": {
+                            "defaultSize": "m"
+                        }
+                    }
+                },
+                {
+                    "id": "p_ce18b9873b71",
+                    "kind": "preset",
+                    "slug": "limit-width"
+                },
+                {
+                    "id": "c_0527fb77d203",
+                    "kind": "control",
+                    "type": "button-group",
+                    "label": "Spaltenabstand",
+                    "attributeName": "columnGap",
+                    "default": "-column-gap-m",
+                    "options": [
+                        {
+                            "label": "0",
+                            "value": "-column-gap-none"
+                        },
+                        {
+                            "label": "XS",
+                            "value": "-column-gap-xs"
+                        },
+                        {
+                            "label": "S",
+                            "value": "-column-gap-s"
+                        },
+                        {
+                            "label": "M",
+                            "value": "-column-gap-m"
+                        },
+                        {
+                            "label": "L",
+                            "value": "-column-gap-l"
+                        },
+                        {
+                            "label": "XL",
+                            "value": "-column-gap-xl"
+                        }
+                    ]
+                },
+                {
+                    "id": "c_d41f82d23240",
+                    "kind": "control",
+                    "type": "button-group",
+                    "label": "Umbruch",
+                    "attributeName": "columnsStackBreakpoint",
+                    "default": "",
+                    "description": "Legt fest, ab welcher Bildschirmbreite die Spalten gestapelt werden.",
+                    "options": [
+                        {
+                            "label": "—",
+                            "value": "-columns-stack-unset"
+                        },
+                        {
+                            "label": "Nie",
+                            "value": "-columns-stack-never"
+                        },
+                        {
+                            "label": "Früh",
+                            "value": "-columns-stack-early"
+                        },
+                        {
+                            "label": "Mittel",
+                            "value": "-columns-stack-medium"
+                        },
+                        {
+                            "label": "Spät",
+                            "value": "-columns-stack-late"
+                        }
+                    ]
+                },
+                {
+                    "id": "c_08a28fb58c3f",
+                    "kind": "control",
+                    "type": "boolean",
+                    "label": "Media-Text Layout",
+                    "toggleLabel": "Text harmonisch ausrichten",
+                    "attributeName": "harmonizeImageText",
+                    "className": "-media-text-layout",
+                    "default": false,
+                    "description": "Richtet die Textspalte mittig zum Bild oder Video aus."
+                },
+                {
+                    "id": "c_8d7819b3263d",
+                    "kind": "control",
+                    "type": "boolean",
+                    "label": "Mobile anordnung",
+                    "toggleLabel": "Spalten wenn gestapelt umkehren",
+                    "attributeName": "columnReverseOrderOnMobile",
+                    "className": "-reverse-order-on-mobile",
+                    "default": false
+                }
+            ]
+        },
+        "core/column": {
+            "items": [
+                {
+                    "id": "p_b49dc5f5984c",
+                    "kind": "preset",
+                    "slug": "container-wide"
+                },
+                {
+                    "id": "c_a8a3e5ab27e6",
+                    "kind": "control",
+                    "type": "boolean",
+                    "toggleLabel": "Inhalt vertikal zentrieren",
+                    "attributeName": "columnCenterContent",
+                    "className": "-center-content",
+                    "default": false
+                }
+            ]
+        },
+        "core/heading": {
+            "items": [
+                {
+                    "id": "p_824bcb2ea019",
+                    "kind": "preset",
+                    "slug": "margin"
+                },
+                {
+                    "id": "p_b120f1617275",
+                    "kind": "preset",
+                    "slug": "limit-width"
+                },
+                {
+                    "id": "p_09aaace88d0c",
+                    "kind": "preset",
+                    "slug": "text-wrap"
+                },
+                {
+                    "id": "c_61639db75248",
+                    "kind": "control",
+                    "type": "button-group",
+                    "label": "Anzeigen als",
+                    "attributeName": "headingShowAs",
+                    "default": "",
+                    "options": [
+                        {
+                            "label": "—",
+                            "value": ""
+                        },
+                        {
+                            "label": "H1",
+                            "value": "h1"
+                        },
+                        {
+                            "label": "H2",
+                            "value": "h2"
+                        },
+                        {
+                            "label": "H3",
+                            "value": "h3"
+                        },
+                        {
+                            "label": "H4",
+                            "value": "h4"
+                        },
+                        {
+                            "label": "H5",
+                            "value": "h5"
+                        },
+                        {
+                            "label": "H6",
+                            "value": "h6"
+                        }
+                    ]
+                }
+            ]
+        },
+        "core/paragraph": {
+            "items": [
+                {
+                    "id": "p_09a203f6a3cf",
+                    "kind": "preset",
+                    "slug": "margin"
+                },
+                {
+                    "id": "p_b96945d3ae79",
+                    "kind": "preset",
+                    "slug": "limit-width"
+                },
+                {
+                    "id": "p_acd75dfff3fd",
+                    "kind": "preset",
+                    "slug": "text-wrap"
+                }
+            ]
+        },
+        "core/image": {
+            "items": [
+                {
+                    "id": "p_4af877192138",
+                    "kind": "preset",
+                    "slug": "container-wide"
+                },
+                {
+                    "id": "p_d86bf9f9f2b1",
+                    "kind": "preset",
+                    "slug": "margin"
+                },
+                {
+                    "id": "c_0e0461679035",
+                    "kind": "control",
+                    "type": "boolean",
+                    "toggleLabel": "Untertitel anzeigen",
+                    "attributeName": "showImageLabel",
+                    "className": "-show-image-caption",
+                    "default": false
+                },
+                {
+                    "id": "c_145fd35835ba",
+                    "kind": "control",
+                    "type": "boolean",
+                    "toggleLabel": "Bild bei Klick vergrößern",
+                    "attributeName": "hasLightbox",
+                    "className": "-has-lightbox",
+                    "default": false,
+                    "noSeparator": true
+                }
+            ]
+        },
+        "core/video": {
+            "items": [
+                {
+                    "id": "p_344c3496c521",
+                    "kind": "preset",
+                    "slug": "margin"
+                },
+                {
+                    "id": "c_b962ac184055",
+                    "kind": "control",
+                    "type": "boolean",
+                    "toggleLabel": "Untertitel anzeigen",
+                    "attributeName": "showImageLabel",
+                    "className": "-show-image-caption",
+                    "default": false,
+                    "noSeparator": true
+                }
+            ]
+        },
+        "core/gallery": {
+            "items": [
+                {
+                    "id": "p_42a353e945a3",
+                    "kind": "preset",
+                    "slug": "margin",
+                    "defaults": {
+                        "c_margin": {
+                            "defaultSize": "m"
+                        }
+                    }
+                },
+                {
+                    "id": "c_75fc32ad4af8",
+                    "kind": "control",
+                    "type": "boolean",
+                    "toggleLabel": "Untertitel anzeigen",
+                    "attributeName": "showImageLabels",
+                    "className": "-show-image-captions",
+                    "default": true
+                },
+                {
+                    "id": "c_2bb6c05e0f4e",
+                    "kind": "control",
+                    "type": "boolean",
+                    "toggleLabel": "Bilder bei Klick vergrößern",
+                    "attributeName": "hasLightbox",
+                    "className": "-has-lightbox",
+                    "default": true,
+                    "noSeparator": true
+                }
+            ]
+        },
+        "core/group": {
+            "items": [
+                {
+                    "id": "p_731ce805b148",
+                    "kind": "preset",
+                    "slug": "container-wide",
+                    "defaults": {
+                        "c_container-wide": {
+                            "showContentAlign": true
+                        }
+                    }
+                },
+                {
+                    "id": "p_9b7f59901180",
+                    "kind": "preset",
+                    "slug": "margin",
+                    "defaults": {
+                        "c_margin": {
+                            "defaultSize": "m"
+                        }
+                    }
+                },
+                {
+                    "id": "p_51a251368ef8",
+                    "kind": "preset",
+                    "slug": "inner-padding",
+                    "defaults": {
+                        "c_inner-padding": {
+                            "default": "-container-padding-auto"
+                        }
+                    }
+                },
+                {
+                    "id": "p_22108dc28d9a",
+                    "kind": "preset",
+                    "slug": "limit-width"
+                }
+            ]
+        },
+        "core/quote": {
+            "items": [
+                {
+                    "id": "p_d1b77389e35f",
+                    "kind": "preset",
+                    "slug": "margin"
+                }
+            ]
+        },
+        "core/pullquote": {
+            "items": [
+                {
+                    "id": "p_3ab74a8a6207",
+                    "kind": "preset",
+                    "slug": "container-wide"
+                },
+                {
+                    "id": "p_1d4270aedfc0",
+                    "kind": "preset",
+                    "slug": "margin",
+                    "defaults": {
+                        "c_margin": {
+                            "defaultSize": "m"
+                        }
+                    }
+                },
+                {
+                    "id": "p_607df290845b",
+                    "kind": "preset",
+                    "slug": "inner-padding",
+                    "defaults": {
+                        "c_inner-padding": {
+                            "default": "-container-padding-l"
+                        }
+                    }
+                }
+            ]
+        },
+        "core/separator": {
+            "items": [
+                {
+                    "id": "p_d0d2288c987d",
+                    "kind": "preset",
+                    "slug": "margin",
+                    "defaults": {
+                        "c_margin": {
+                            "defaultSize": "m"
+                        }
+                    }
+                },
+                {
+                    "id": "c_separator_width",
+                    "kind": "control",
+                    "type": "button-group",
+                    "label": "Weite",
+                    "attributeName": "separatorWidth",
+                    "default": "",
+                    "options": [
+                        {
+                            "label": "—",
+                            "value": ""
+                        },
+                        {
+                            "label": "XS",
+                            "value": "-separator-width-xs"
+                        },
+                        {
+                            "label": "S",
+                            "value": "-separator-width-s"
+                        },
+                        {
+                            "label": "M",
+                            "value": "-separator-width-m"
+                        },
+                        {
+                            "label": "L",
+                            "value": "-separator-width-l"
+                        },
+                        {
+                            "label": "XL",
+                            "value": "-separator-width-xl"
+                        }
+                    ]
+                }
+            ]
+        },
+        "core/cover": {
+            "items": [
+                {
+                    "id": "p_20e62b23a530",
+                    "kind": "preset",
+                    "slug": "container-wide",
+                    "defaults": {
+                        "c_container-wide": {
+                            "showContentAlign": true
+                        }
+                    }
+                },
+                {
+                    "id": "p_2a9ea412523e",
+                    "kind": "preset",
+                    "slug": "margin",
+                    "defaults": {
+                        "c_margin": {
+                            "defaultSize": "m"
+                        }
+                    }
+                },
+                {
+                    "id": "p_b2e030c3640e",
+                    "kind": "preset",
+                    "slug": "inner-padding",
+                    "defaults": {
+                        "c_inner-padding": {
+                            "default": "-container-padding-xl"
+                        }
+                    }
+                }
+            ]
+        },
+        "core/buttons": {
+            "items": [
+                {
+                    "id": "p_9714901c4b38",
+                    "kind": "preset",
+                    "slug": "margin"
+                }
+            ]
+        },
+        "core/spacer": {
+            "items": [
+                {
+                    "id": "c_b89c68e8381a",
+                    "kind": "control",
+                    "type": "button-group",
+                    "label": "Responsive Höhe",
+                    "description": "Reduziert den Abstand auf kleineren Bildschirmen automatisch.",
+                    "attributeName": "spacerResponsiveHeight",
+                    "default": "",
+                    "options": [
+                        {
+                            "label": "—",
+                            "value": ""
+                        },
+                        {
+                            "label": "XS",
+                            "value": "-spacer-height-xs"
+                        },
+                        {
+                            "label": "S",
+                            "value": "-spacer-height-s"
+                        },
+                        {
+                            "label": "M",
+                            "value": "-spacer-height-m"
+                        },
+                        {
+                            "label": "L",
+                            "value": "-spacer-height-l"
+                        },
+                        {
+                            "label": "XL",
+                            "value": "-spacer-height-xl"
+                        }
+                    ]
+                }
+            ]
+        },
+        "baselayer/form": {
+            "items": [
+                {
+                    "id": "p_baselayer_form_margin",
+                    "kind": "preset",
+                    "slug": "margin",
+                    "defaults": {
+                        "c_margin": {
+                            "defaultSize": "m"
+                        }
+                    }
+                }
+            ]
+        },
+        "core/button": {
+            "items": [
+                {
+                    "id": "c_24e2c987ea7b",
+                    "kind": "control",
+                    "type": "boolean",
+                    "label": "Darstellung",
+                    "toggleLabel": "Als Link anzeigen",
+                    "attributeName": "buttonIsLink",
+                    "className": "-is-link",
+                    "default": false,
+                    "description": ""
+                },
+                {
+                    "id": "c_06c39f484b52",
+                    "kind": "control",
+                    "type": "button-group",
+                    "label": "Variante",
+                    "attributeName": "buttonVariant",
+                    "default": "",
+                    "description": "",
+                    "options": [
+                        {
+                            "label": "Primär",
+                            "value": ""
+                        },
+                        {
+                            "label": "Sekundär",
+                            "value": "-secondary"
+                        },
+                        {
+                            "label": "Weiss",
+                            "value": "-white"
+                        }
+                    ]
+                },
+                {
+                    "id": "c_3b6043a83830",
+                    "kind": "control",
+                    "type": "button-group",
+                    "label": "Größe",
+                    "attributeName": "buttonSize",
+                    "default": "",
+                    "options": [
+                        {
+                            "label": "S",
+                            "value": "-small"
+                        },
+                        {
+                            "label": "M",
+                            "value": ""
+                        },
+                        {
+                            "label": "L",
+                            "value": "-large"
+                        }
+                    ]
+                },
+                {
+                    "id": "c_66a730e5fd48",
+                    "kind": "control",
+                    "type": "icon",
+                    "label": "Icon",
+                    "attributeName": "buttonIcon",
+                    "default": ""
+                },
+                {
+                    "id": "c_05be3011de70",
+                    "kind": "control",
+                    "type": "button-group",
+                    "label": "Icon Position",
+                    "attributeName": "buttonIconPosition",
+                    "default": "",
+                    "noSeparator": true,
+                    "iconLabel": true,
+                    "options": [
+                        {
+                            "icon": "horizontal-align-left",
+                            "label": "Links",
+                            "value": ""
+                        },
+                        {
+                            "icon": "horizontal-align-right",
+                            "label": "Rechts",
+                            "value": "-icon-right",
+                            "iconPosition": "after"
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

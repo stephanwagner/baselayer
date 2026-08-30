@@ -276,6 +276,9 @@ function bl_block_options_sanitize_control_item(array $item): ?array
 				'label' => sanitize_text_field((string) ($opt['label'] ?? '')),
 				'value' => sanitize_text_field((string) ($opt['value'] ?? '')),
 			];
+			if (isset($opt['title']) && is_string($opt['title']) && $opt['title'] !== '') {
+				$row['title'] = sanitize_text_field($opt['title']);
+			}
 			if (isset($opt['icon'])) {
 				$row['icon'] = sanitize_text_field((string) $opt['icon']);
 			}

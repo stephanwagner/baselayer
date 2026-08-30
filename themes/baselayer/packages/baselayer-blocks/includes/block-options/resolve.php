@@ -24,6 +24,82 @@ function bl_block_options_registered_block_names(): array
 }
 
 /**
+ * Legacy preset slugs (German) ↔ current English slugs.
+ *
+ * @return array<string, string>
+ */
+function bl_block_options_preset_slug_aliases(): array
+{
+	return [
+		'inhaltsbreite' => 'container-wide',
+		'container-wide' => 'inhaltsbreite',
+		'abstand' => 'margin',
+		'margin' => 'abstand',
+		'innenabstand' => 'inner-padding',
+		'inner-padding' => 'innenabstand',
+		'weite-limitieren' => 'limit-width',
+		'limit-width' => 'weite-limitieren',
+	];
+}
+
+/**
+ * Legacy control ids inside preset defaults.
+ *
+ * @return array<string, string>
+ */
+function bl_block_options_control_id_aliases(): array
+{
+	return [
+		'c_inhaltsbreite' => 'c_container-wide',
+		'c_container-wide' => 'c_inhaltsbreite',
+		'c_abstand' => 'c_margin',
+		'c_margin' => 'c_abstand',
+		'c_innenabstand' => 'c_inner-padding',
+		'c_inner-padding' => 'c_innenabstand',
+	];
+}
+
+/**
+ * Resolve a preset slug against the store, falling back to a renamed alias.
+ *
+ * @param array<string, mixed> $presets
+ */
+function bl_block_options_resolve_preset_slug(string $slug, array $presets): string
+{
+	if ($slug !== '' && isset($presets[$slug])) {
+		return $slug;
+	}
+	$aliases = bl_block_options_preset_slug_aliases();
+	$alt = $aliases[$slug] ?? '';
+	if ($alt !== '' && isset($presets[$alt])) {
+		return $alt;
+	}
+	return $slug;
+}
+
+/**
+ * Look up per-control default overrides, including renamed control ids.
+ *
+ * @param array<string, array<string, mixed>> $defaults
+ * @return array<string, mixed>|null
+ */
+function bl_block_options_preset_defaults_for_control(array $defaults, string $control_id): ?array
+{
+	if ($control_id === '') {
+		return null;
+	}
+	if (isset($defaults[$control_id]) && is_array($defaults[$control_id])) {
+		return $defaults[$control_id];
+	}
+	$aliases = bl_block_options_control_id_aliases();
+	$alt = $aliases[$control_id] ?? '';
+	if ($alt !== '' && isset($defaults[$alt]) && is_array($defaults[$alt])) {
+		return $defaults[$alt];
+	}
+	return null;
+}
+
+/**
  * Apply assignment default overrides onto a thin control item.
  *
  * @param array<string, mixed> $item
@@ -94,6 +170,7 @@ function bl_block_options_expand_items_for_editor(array $items, array $presets):
 		$kind = (string) ($item['kind'] ?? '');
 		if ($kind === 'preset') {
 			$slug = sanitize_title((string) ($item['slug'] ?? ''));
+			$slug = bl_block_options_resolve_preset_slug($slug, $presets);
 			if ($slug === '' || !isset($presets[$slug]['items']) || !is_array($presets[$slug]['items'])) {
 				continue;
 			}
@@ -104,8 +181,9 @@ function bl_block_options_expand_items_for_editor(array $items, array $presets):
 				}
 				$control_id = sanitize_key((string) ($preset_item['id'] ?? ''));
 				$merged = $preset_item;
-				if ($control_id !== '' && isset($defaults[$control_id]) && is_array($defaults[$control_id])) {
-					$merged = bl_block_options_apply_control_defaults($preset_item, $defaults[$control_id]);
+				$override = bl_block_options_preset_defaults_for_control($defaults, $control_id);
+				if ($override !== null) {
+					$merged = bl_block_options_apply_control_defaults($preset_item, $override);
 				}
 				$expanded = bl_block_options_expand_control_for_editor($merged);
 				if (is_array($expanded)) {
