@@ -1,5 +1,7 @@
 // Block-options editor control styles (package-owned customs).
 @use '../../customs/container-margin/style' as *;
+@use '../../customs/container-wide/style' as *;
+@use '../../customs/inner-padding/style' as *;
 @use '../../customs/limit-width/style' as *;
 
 .bl-block-option {
@@ -30,9 +32,4 @@
 .bl-block-option .components-base-control__help,
 .components-base-control__help.bl-block-option-help {
   white-space: pre-line;
-}
-
-.bl-align-wide-content-toggle.components-toggle-control {
-  margin-top: -4px;
-  margin-bottom: 0;
 }

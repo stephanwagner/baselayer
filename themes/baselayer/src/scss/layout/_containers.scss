@@ -10,6 +10,11 @@
 // - `.container-wide`: min(token, space − page-padding)
 // - `.alignwide`: min(token, space − container-edge-spacing)
 // - `.alignwide.container-wide`: container-wide + alignwide (capped by edge-spacing)
+//
+// Content-edge inset vars (one per case; utilities + auto padding consume them):
+// - `--bl-inset-to-container`       → back to .container
+// - `--bl-inset-to-container-wide`  → combo only: alignwide extra
+// - `--bl-inset-to-alignwide`       → combo only: container-wide extra
 // -----------------------------------------------------------------------------
 
 :root {
@@ -82,6 +87,9 @@
 .container-wide {
   @include bl-wide-bleed-vars;
   --bl-wide-bleed: var(--bl-bleed-container-wide);
+  --bl-inset-to-container: max(var(--bl-bleed-container-wide), var(--bl-wide-edge-floor));
+  --bl-inset-to-container-wide: 0px;
+  --bl-inset-to-alignwide: 0px;
   @include bl-apply-wide-bleed;
 }
 
@@ -98,12 +106,10 @@
     var(--bl-container-edge-spacing),
     var(--bl-wide-edge-floor)
   );
+  --bl-inset-to-container: var(--bl-wide-content-inset);
+  --bl-inset-to-container-wide: 0px;
+  --bl-inset-to-alignwide: 0px;
   @include bl-apply-wide-bleed($with-width: false);
-
-  &.has-background:not(.container-wide) {
-    padding-left: var(--bl-wide-content-inset);
-    padding-right: var(--bl-wide-content-inset);
-  }
 }
 
 // -----------------------------------------------------------------------------
@@ -113,51 +119,32 @@
 .alignwide.container-wide {
   @include bl-wide-bleed-vars;
   --bl-wide-bleed: var(--bl-bleed-combo);
+  --bl-inset-to-container: max(var(--bl-wide-bleed), var(--bl-wide-edge-floor));
+  --bl-inset-to-container-wide: max(
+    0px,
+    calc(var(--bl-wide-bleed) - var(--bl-bleed-container-wide))
+  );
+  --bl-inset-to-alignwide: max(0px, calc(var(--bl-wide-bleed) - var(--bl-bleed-alignwide)));
   @include bl-apply-wide-bleed;
 }
 
 // -----------------------------------------------------------------------------
-// Content-to-edge utilities (pad inward to a named edge)
+// Content-to-edge utilities (pad inward; consume inset vars)
 // -----------------------------------------------------------------------------
 
-// Back to .container (block option “Align content to content column”).
-.container-wide.-container-wide-content,
-.container-wide.-content-to-container,
-.alignwide.-container-wide-content:not(.container-wide),
-.alignwide.-content-to-container:not(.container-wide) {
-  @include bl-wide-bleed-vars;
-}
-
-.container-wide.-container-wide-content:not(.alignwide),
-.container-wide.-content-to-container:not(.alignwide) {
-  --bl-content-edge-inset: max(var(--bl-bleed-container-wide), var(--bl-wide-edge-floor));
+.-content-to-container,
+.-container-wide-content {
+  --bl-content-edge-inset: var(--bl-inset-to-container);
   @include bl-content-edge-padding;
 }
 
-.alignwide.container-wide.-container-wide-content,
-.alignwide.container-wide.-content-to-container {
-  --bl-content-edge-inset: max(var(--bl-wide-bleed), var(--bl-wide-edge-floor));
+.-content-to-container-wide {
+  --bl-content-edge-inset: var(--bl-inset-to-container-wide);
   @include bl-content-edge-padding;
 }
 
-.alignwide.-container-wide-content:not(.container-wide),
-.alignwide.-content-to-container:not(.container-wide) {
-  --bl-content-edge-inset: var(--bl-wide-content-inset);
-  @include bl-content-edge-padding;
-}
-
-// Negate alignwide extra → content on .container-wide edges.
-.alignwide.container-wide.-content-to-container-wide {
-  --bl-content-edge-inset: max(
-    0px,
-    calc(var(--bl-wide-bleed) - var(--bl-bleed-container-wide))
-  );
-  @include bl-content-edge-padding;
-}
-
-// Negate container-wide portion → content on .alignwide edges.
-.alignwide.container-wide.-content-to-alignwide {
-  --bl-content-edge-inset: max(0px, calc(var(--bl-wide-bleed) - var(--bl-bleed-alignwide)));
+.-content-to-alignwide {
+  --bl-content-edge-inset: var(--bl-inset-to-alignwide);
   @include bl-content-edge-padding;
 }
 

@@ -829,6 +829,46 @@
 
   // Container padding — any element with the class (Cover → inner; Slider → vars only)
 
+  // Auto: no background → no padding; .has-background → M; combo alignwide+container-wide → L.
+  // Content-column L/R is opt-in via .-content-to-container, not part of auto.
+  .-container-padding-auto.has-background {
+    @include apply-container-padding(
+      var(--bl-container-padding-m),
+      var(--bl-container-padding-m),
+      (
+        $breakpoint-s: (
+          x: var(--bl-container-padding-s),
+          y: var(--bl-container-padding-s),
+        ),
+        $breakpoint-xs: (
+          x: var(--bl-container-padding-xs),
+          y: var(--bl-container-padding-xs),
+        ),
+      )
+    );
+  }
+
+  .alignwide.container-wide.-container-padding-auto.has-background {
+    @include apply-container-padding(
+      var(--bl-container-padding-l),
+      var(--bl-container-padding-l),
+      (
+        $breakpoint-m: (
+          x: var(--bl-container-padding-m),
+          y: var(--bl-container-padding-m),
+        ),
+        $breakpoint-s: (
+          x: var(--bl-container-padding-s),
+          y: var(--bl-container-padding-s),
+        ),
+        $breakpoint-xs: (
+          x: var(--bl-container-padding-xs),
+          y: var(--bl-container-padding-xs),
+        ),
+      )
+    );
+  }
+
   .-container-padding-none {
     @include apply-container-padding(0, 0);
   }

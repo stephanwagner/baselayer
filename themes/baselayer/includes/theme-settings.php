@@ -1012,6 +1012,10 @@ function bl_sanitize_admin_access($value): array
 			'admin' => !empty($value[$item]['admin']) ? 1 : 0,
 			'developer' => !empty($value[$item]['developer']) ? 1 : 0,
 		];
+		// Debug is developer-only; never grant to plain admins.
+		if ($item === 'developer_debug') {
+			$out[$item]['admin'] = 0;
+		}
 	}
 	return $out;
 }

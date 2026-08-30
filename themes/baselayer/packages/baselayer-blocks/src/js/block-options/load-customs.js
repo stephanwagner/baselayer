@@ -4,4 +4,5 @@
  */
 import '../../../customs/container-margin/editor.js';
 import '../../../customs/container-wide/editor.js';
+import '../../../customs/inner-padding/editor.js';
 import '../../../customs/limit-width/editor.js';

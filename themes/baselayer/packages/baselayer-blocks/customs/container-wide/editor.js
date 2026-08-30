@@ -6,11 +6,13 @@ import {
   alignWideClassesFromAttributes,
 } from './utils';
 
-const containerWideDef = {
+registerCustom({
+  type: 'container-wide',
   Control: ContainerWideControl,
   managedClasses: ALL_ALIGN_WIDE_CLASSES,
   attributeKeys: alignWideAttributeKeys,
   classesFromAttributes: alignWideClassesFromAttributes,
+  optionKey: (_option, index) => 'container-wide-' + index,
   registerAttributes: (settings, option) => {
     const names = option.attributeNames || {};
     const container = names.container || 'alignWideContainer';
@@ -24,17 +26,4 @@ const containerWideDef = {
       },
     };
   },
-};
-
-registerCustom({
-  ...containerWideDef,
-  type: 'container-wide',
-  optionKey: (_option, index) => 'container-wide-' + index,
-});
-
-// BC: stores / seeds that still use type "align-wide".
-registerCustom({
-  ...containerWideDef,
-  type: 'align-wide',
-  optionKey: (_option, index) => 'align-wide-' + index,
 });

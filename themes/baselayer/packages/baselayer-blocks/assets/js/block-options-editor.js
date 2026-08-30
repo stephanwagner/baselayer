@@ -260,20 +260,25 @@
   var ALIGN_WIDE_CONTENT_CLASS = "-container-wide-content";
   var ALL_ALIGN_WIDE_CLASSES = [ALIGN_WIDE_CONTAINER_CLASS, ALIGN_WIDE_CONTENT_CLASS];
   var alignWideClassesFromAttributes = (option, attributes) => {
-    const { container, content } = option.attributeNames;
+    const names = option.attributeNames || {};
+    const container = names.container || "alignWideContainer";
+    const content = names.content || "alignWideContent";
     const containerValue = attributes[container] ?? option.default ?? "";
     const classes = [];
     if (containerValue === ALIGN_WIDE_CONTAINER_CLASS) {
       classes.push(ALIGN_WIDE_CONTAINER_CLASS);
-      if (option.showContentAlign !== false && attributes[content]) {
+      if (option.showContentAlign && attributes[content]) {
         classes.push(ALIGN_WIDE_CONTENT_CLASS);
       }
     }
     return classes;
   };
   var alignWideAttributeKeys = (option) => {
-    const { container, content } = option.attributeNames;
-    return [container, content];
+    const names = option.attributeNames || {};
+    return [
+      names.container || "alignWideContainer",
+      names.content || "alignWideContent"
+    ];
   };
 
   // themes/baselayer/packages/baselayer-blocks/customs/container-wide/control.js
@@ -289,7 +294,7 @@
     const content = names.content || "alignWideContent";
     const containerValue = attributes[container] ?? option.default ?? "";
     const wideSelected = containerValue === ALIGN_WIDE_CONTAINER_CLASS;
-    const showContentAlign = option.showContentAlign !== false;
+    const showContentAlign = Boolean(option.showContentAlign);
     const options = alignWideOptions();
     const setContainer = (newValue) => {
       const next = { [container]: newValue };
@@ -342,11 +347,13 @@
   }
 
   // themes/baselayer/packages/baselayer-blocks/customs/container-wide/editor.js
-  var containerWideDef = {
+  registerCustom({
+    type: "container-wide",
     Control: ContainerWideControl,
     managedClasses: ALL_ALIGN_WIDE_CLASSES,
     attributeKeys: alignWideAttributeKeys,
     classesFromAttributes: alignWideClassesFromAttributes,
+    optionKey: (_option, index) => "container-wide-" + index,
     registerAttributes: (settings, option) => {
       const names = option.attributeNames || {};
       const container = names.container || "alignWideContainer";
@@ -360,16 +367,173 @@
         }
       };
     }
-  };
-  registerCustom({
-    ...containerWideDef,
-    type: "container-wide",
-    optionKey: (_option, index) => "container-wide-" + index
   });
+
+  // themes/baselayer/packages/baselayer-blocks/customs/inner-padding/utils.js
+  var CONTENT_TO_CONTAINER_CLASS = "-content-to-container";
+  var INNER_PADDING_SIZES = [
+    { value: "unset", label: "\u2014", stored: "" },
+    { value: "auto", label: "A", stored: "-container-padding-auto" },
+    { value: "none", label: "0", stored: "-container-padding-none" },
+    { value: "xs", label: "XS", stored: "-container-padding-xs" },
+    { value: "s", label: "S", stored: "-container-padding-s" },
+    { value: "m", label: "M", stored: "-container-padding-m" },
+    { value: "l", label: "L", stored: "-container-padding-l" },
+    { value: "xl", label: "XL", stored: "-container-padding-xl" }
+  ];
+  var STORED_BY_UI = Object.fromEntries(INNER_PADDING_SIZES.map((s) => [s.value, s.stored]));
+  var UI_BY_STORED = Object.fromEntries(
+    INNER_PADDING_SIZES.filter((s) => s.stored !== "").map((s) => [s.stored, s.value])
+  );
+  UI_BY_STORED["-container-padding-unset"] = "unset";
+  var ALL_INNER_PADDING_CLASSES = [
+    ...INNER_PADDING_SIZES.map((s) => s.stored).filter(Boolean),
+    "-container-padding-unset",
+    CONTENT_TO_CONTAINER_CLASS
+  ];
+  var displayInnerPadding = (stored) => {
+    if (!stored) {
+      return "unset";
+    }
+    return UI_BY_STORED[stored] || "unset";
+  };
+  var storedInnerPadding = (uiValue) => STORED_BY_UI[uiValue] ?? "";
+  var innerPaddingAllowsContentAlign = (attributes) => {
+    const containerValue = attributes.alignWideContainer ?? "";
+    const align = attributes.align ?? "";
+    return containerValue === ALIGN_WIDE_CONTAINER_CLASS || align === "wide" || align === "full";
+  };
+  var innerPaddingClassesFromAttributes = (option, attributes, ctx = {}) => {
+    const isRootBlock = ctx.isRootBlock !== false;
+    const names = option.attributeNames || {};
+    const padding = names.padding || "containerPadding";
+    const contentAlign = names.contentAlign || "alignContentToContainer";
+    const classes = [];
+    const value = attributes[padding] ?? option.default ?? "";
+    if (value && value !== "-container-padding-unset") {
+      classes.push(value);
+    }
+    if (option.showContentAlign && isRootBlock && innerPaddingAllowsContentAlign(attributes) && attributes[contentAlign]) {
+      classes.push(CONTENT_TO_CONTAINER_CLASS);
+    }
+    return classes;
+  };
+  var innerPaddingAttributeKeys = (option) => {
+    const names = option.attributeNames || {};
+    return [
+      names.padding || "containerPadding",
+      names.contentAlign || "alignContentToContainer",
+      // Width gates for content-align class sync (owned by container-wide / core).
+      "alignWideContainer",
+      "align"
+    ];
+  };
+
+  // themes/baselayer/packages/baselayer-blocks/customs/inner-padding/control.js
+  var { ToggleControl: ToggleControl2, SelectControl: SelectControl2 } = wp.components;
+  var ToggleGroupControl3 = wp.components.__experimentalToggleGroupControl;
+  var { useEffect } = wp.element;
+  var sizeTitle = (value) => {
+    const titles = {
+      unset: t("notSet", "Not set"),
+      auto: t("auto", "Auto"),
+      none: t("noPadding", "No padding")
+    };
+    return titles[value] || "";
+  };
+  function InnerPaddingControl({ option, attributes, onChange, isRootBlock = true }) {
+    const names = option.attributeNames || {};
+    const padding = names.padding || "containerPadding";
+    const contentAlign = names.contentAlign || "alignContentToContainer";
+    const stored = attributes[padding] ?? option.default ?? "";
+    const display = displayInnerPadding(stored);
+    const showContentAlign = Boolean(option.showContentAlign) && isRootBlock && innerPaddingAllowsContentAlign(attributes);
+    useEffect(() => {
+      if (!showContentAlign && attributes[contentAlign]) {
+        onChange({ [contentAlign]: false });
+      }
+    }, [
+      showContentAlign,
+      attributes[contentAlign],
+      contentAlign,
+      onChange
+    ]);
+    const setPadding = (uiValue) => {
+      const next = { [padding]: storedInnerPadding(uiValue) };
+      if (!showContentAlign) {
+        next[contentAlign] = false;
+      }
+      onChange(next);
+    };
+    const contentToggle = showContentAlign ? /* @__PURE__ */ wp.element.createElement(
+      ToggleControl2,
+      {
+        className: "bl-inner-padding-content-toggle",
+        label: t("alignContentToContentColumn", "Align content to content column"),
+        checked: Boolean(attributes[contentAlign]),
+        onChange: (checked) => onChange({ [contentAlign]: checked }),
+        __nextHasNoMarginBottom: true
+      }
+    ) : null;
+    if (!ToggleGroupControl3) {
+      return /* @__PURE__ */ wp.element.createElement("div", { className: "bl-inner-padding" }, /* @__PURE__ */ wp.element.createElement(
+        SelectControl2,
+        {
+          label: option.label,
+          value: display,
+          options: INNER_PADDING_SIZES.map((s) => ({
+            label: s.label,
+            value: s.value
+          })),
+          onChange: setPadding,
+          ...optionHelpProps(option)
+        }
+      ), contentToggle);
+    }
+    return /* @__PURE__ */ wp.element.createElement("div", { className: "bl-inner-padding" }, /* @__PURE__ */ wp.element.createElement(
+      ToggleGroupControl3,
+      {
+        className: "bl-block-option-button-group",
+        label: option.label,
+        value: display,
+        isBlock: true,
+        onChange: setPadding,
+        __nextHasNoMarginBottom: true,
+        __next40pxDefaultSize: true
+      },
+      INNER_PADDING_SIZES.map((opt) => /* @__PURE__ */ wp.element.createElement(
+        BlockOptionToggleGroupOption,
+        {
+          key: opt.value,
+          value: opt.value,
+          label: opt.label,
+          title: sizeTitle(opt.value)
+        }
+      ))
+    ), contentToggle, /* @__PURE__ */ wp.element.createElement(BlockOptionDescription, { description: option.description }));
+  }
+
+  // themes/baselayer/packages/baselayer-blocks/customs/inner-padding/editor.js
   registerCustom({
-    ...containerWideDef,
-    type: "align-wide",
-    optionKey: (_option, index) => "align-wide-" + index
+    type: "inner-padding",
+    Control: InnerPaddingControl,
+    managedClasses: ALL_INNER_PADDING_CLASSES,
+    attributeKeys: innerPaddingAttributeKeys,
+    classesFromAttributes: innerPaddingClassesFromAttributes,
+    optionKey: (_option, index) => "inner-padding-" + index,
+    registerAttributes: (settings, option) => {
+      const names = option.attributeNames || {};
+      const padding = names.padding || "containerPadding";
+      const contentAlign = names.contentAlign || "alignContentToContainer";
+      return {
+        ...settings,
+        attributes: {
+          ...settings.attributes,
+          [padding]: { type: "string", default: option.default ?? "" },
+          [contentAlign]: { type: "boolean", default: false }
+        }
+      };
+    }
   });
 
   // themes/baselayer/packages/baselayer-blocks/customs/limit-width/utils.js
@@ -421,7 +585,7 @@
   };
 
   // themes/baselayer/packages/baselayer-blocks/customs/limit-width/control.js
-  var ToggleGroupControl3 = wp.components.__experimentalToggleGroupControl;
+  var ToggleGroupControl4 = wp.components.__experimentalToggleGroupControl;
   var limitWidthAligns = () => [
     { ...LIMIT_WIDTH_ALIGN_VALUES[0], label: t("left", "Left") },
     { ...LIMIT_WIDTH_ALIGN_VALUES[1], label: t("center", "Center") },
@@ -450,7 +614,7 @@
       }
       onChange({ [align]: pickedAlign });
     };
-    if (!ToggleGroupControl3) {
+    if (!ToggleGroupControl4) {
       return null;
     }
     const sizeWord = t("size", "Size");
@@ -458,7 +622,7 @@
     const sizeLabel = option.label ? `${option.label} ${sizeWord}` : sizeWord;
     const alignLabel = option.label ? `${option.label} ${alignWord}` : alignWord;
     return /* @__PURE__ */ wp.element.createElement("div", { className: "bl-limit-width" }, option.label ? /* @__PURE__ */ wp.element.createElement("span", { className: "bl-limit-width__label" }, option.label) : null, /* @__PURE__ */ wp.element.createElement("div", { className: "bl-limit-width__row bl-block-option-button-group" }, /* @__PURE__ */ wp.element.createElement(
-      ToggleGroupControl3,
+      ToggleGroupControl4,
       {
         className: "bl-limit-width__sizes",
         label: sizeLabel,
@@ -485,7 +649,7 @@
         className: "bl-limit-width__align-wrap" + (hasSize ? "" : " bl-limit-width__align-wrap--is-disabled")
       },
       /* @__PURE__ */ wp.element.createElement(
-        ToggleGroupControl3,
+        ToggleGroupControl4,
         {
           className: "bl-limit-width__align",
           label: alignLabel,
@@ -1683,18 +1847,18 @@
 
   // themes/baselayer/packages/baselayer-blocks/src/js/block-options/editor.js
   var { InspectorControls } = wp.blockEditor;
-  var { PanelBody, ToggleControl: ToggleControl2, SelectControl: SelectControl2 } = wp.components;
-  var ToggleGroupControl4 = wp.components.__experimentalToggleGroupControl;
+  var { PanelBody, ToggleControl: ToggleControl3, SelectControl: SelectControl3 } = wp.components;
+  var ToggleGroupControl5 = wp.components.__experimentalToggleGroupControl;
   var { createHigherOrderComponent } = wp.compose;
   var { useSelect } = wp.data;
-  var { Fragment, useEffect, useRef: useRef2 } = wp.element;
+  var { Fragment, useEffect: useEffect2, useRef: useRef2 } = wp.element;
   var GALLERY_OWNED_IMAGE_ATTRIBUTES = [
     "showImageLabel",
     "hasLightbox",
     "alignWideContainer",
     "alignWideContent"
   ];
-  var GALLERY_OWNED_IMAGE_TYPES = ["container-margin", "container-wide", "align-wide"];
+  var GALLERY_OWNED_IMAGE_TYPES = ["container-margin", "container-wide", "inner-padding"];
   var blockOptions = Array.isArray(window.baselayerBlockOptions) ? window.baselayerBlockOptions : [];
   var HIDE_BLOCK_OPTION = {
     type: "boolean",
@@ -1866,10 +2030,10 @@
     blockConfig.options.forEach((option) => {
       const custom = getCustom(option.type);
       if (custom?.classesFromAttributes) {
-        if ((option.type === "container-wide" || option.type === "align-wide") && !isRootBlock) {
+        if (option.type === "container-wide" && !isRootBlock) {
           return;
         }
-        classes.push(...custom.classesFromAttributes(option, attributes));
+        classes.push(...custom.classesFromAttributes(option, attributes, { isRootBlock }));
         return;
       }
       if (option.type === "boolean" && attributes[option.attributeName]) {
@@ -1994,7 +2158,7 @@
           className
         });
       };
-      useEffect(() => {
+      useEffect2(() => {
         if (!listedConfig) {
           return;
         }
@@ -2013,7 +2177,7 @@
           setOptionAttributes(updates);
         }
       }, [listedConfig?.name, props.clientId, attributes.className]);
-      useEffect(() => {
+      useEffect2(() => {
         if (!listedConfig || listedConfig.name !== "core/columns") {
           return;
         }
@@ -2028,7 +2192,7 @@
         attributes.className,
         attributes.harmonizeImageText
       ]);
-      useEffect(() => {
+      useEffect2(() => {
         if (listedConfig?.name !== "core/button") {
           return;
         }
@@ -2043,7 +2207,7 @@
         attributes.buttonSize,
         attributes.style
       ]);
-      useEffect(() => {
+      useEffect2(() => {
         if (listedConfig?.name !== "core/button") {
           return;
         }
@@ -2052,7 +2216,7 @@
           setAttributes(synced);
         }
       }, [listedConfig?.name, props.clientId, attributes.buttonIcon, attributes.text]);
-      useEffect(() => {
+      useEffect2(() => {
         if (props.name !== "core/spacer" || !listedConfig) {
           return;
         }
@@ -2066,7 +2230,7 @@
           setOptionAttributes({ spacerResponsiveHeight: "" });
         }
       }, [props.name, attributes.height, attributes.spacerResponsiveHeight]);
-      useEffect(() => {
+      useEffect2(() => {
         const className = syncClassNameFromOptions(attributes, blockConfig, { isRootBlock });
         if (className !== (attributes.className || "")) {
           setAttributes({ className });
@@ -2080,7 +2244,7 @@
         if (isImageInGallery && (GALLERY_OWNED_IMAGE_ATTRIBUTES.includes(option.attributeName) || GALLERY_OWNED_IMAGE_TYPES.includes(option.type))) {
           return null;
         }
-        if ((option.type === "container-wide" || option.type === "align-wide") && !isRootBlock) {
+        if (option.type === "container-wide" && !isRootBlock) {
           return null;
         }
         const custom = getCustom(option.type);
@@ -2091,14 +2255,15 @@
             {
               option,
               attributes,
-              onChange: setOptionAttributes
+              onChange: setOptionAttributes,
+              isRootBlock
             }
           ));
         }
         if (option.type === "boolean") {
           const { rowLabel, toggleLabel } = getBooleanOptionLabels(option);
           return /* @__PURE__ */ wp.element.createElement(BlockOptionWrapper, { key: getBlockOptionKey(option, index), option, index }, rowLabel ? /* @__PURE__ */ wp.element.createElement("span", { className: "bl-block-option__label" }, rowLabel) : null, /* @__PURE__ */ wp.element.createElement(
-            ToggleControl2,
+            ToggleControl3,
             {
               label: toggleLabel,
               checked: attributes[option.attributeName],
@@ -2110,7 +2275,7 @@
         }
         if (option.type === "select") {
           return /* @__PURE__ */ wp.element.createElement(BlockOptionWrapper, { key: getBlockOptionKey(option, index), option, index }, /* @__PURE__ */ wp.element.createElement(
-            SelectControl2,
+            SelectControl3,
             {
               label: option.label,
               value: attributes[option.attributeName],
@@ -2135,9 +2300,9 @@
           ));
         }
         if (option.type === "button-group") {
-          if (ToggleGroupControl4) {
+          if (ToggleGroupControl5) {
             return /* @__PURE__ */ wp.element.createElement(BlockOptionWrapper, { key: getBlockOptionKey(option, index), option, index }, /* @__PURE__ */ wp.element.createElement(
-              ToggleGroupControl4,
+              ToggleGroupControl5,
               {
                 className: "bl-block-option-button-group",
                 label: option.label,
@@ -2163,7 +2328,7 @@
             ));
           }
           return /* @__PURE__ */ wp.element.createElement(BlockOptionWrapper, { key: getBlockOptionKey(option, index), option, index }, /* @__PURE__ */ wp.element.createElement(
-            SelectControl2,
+            SelectControl3,
             {
               label: option.label,
               value: attributes[option.attributeName],

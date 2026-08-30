@@ -22,7 +22,7 @@ export function ContainerWideControl({ option, attributes, onChange }) {
   const content = names.content || 'alignWideContent';
   const containerValue = attributes[container] ?? option.default ?? '';
   const wideSelected = containerValue === ALIGN_WIDE_CONTAINER_CLASS;
-  const showContentAlign = option.showContentAlign !== false;
+  const showContentAlign = Boolean(option.showContentAlign);
   const options = alignWideOptions();
 
   const setContainer = (newValue) => {
@@ -82,6 +82,3 @@ export function ContainerWideControl({ option, attributes, onChange }) {
     </div>
   );
 }
-
-/** @deprecated Use ContainerWideControl */
-export const AlignWideControl = ContainerWideControl;

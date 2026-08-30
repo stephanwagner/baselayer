@@ -5,12 +5,28 @@ defined('ABSPATH') || exit;
 /**
  * Container/bleed width guides (front-end only).
  *
- * Loaded only when enabled in wp-config.php:
- *   define('DEBUG_CONTAINER_WIDTHS', true);
+ * Enabled via Developer → Debug (option baselayer_debug_container_widths).
+ * Shown only for logged-in users who can edit posts.
  */
 
+if (!defined('BL_DEBUG_CONTAINER_WIDTHS_OPTION')) {
+	define('BL_DEBUG_CONTAINER_WIDTHS_OPTION', 'baselayer_debug_container_widths');
+}
+
+/**
+ * Whether front-end container-width guides should render.
+ */
+function bl_debug_container_widths_enabled(): bool
+{
+	if (!is_user_logged_in() || !current_user_can('edit_posts')) {
+		return false;
+	}
+
+	return (string) get_option(BL_DEBUG_CONTAINER_WIDTHS_OPTION, '') === '1';
+}
+
 add_filter('body_class', function (array $classes): array {
-	if (is_admin()) {
+	if (is_admin() || !bl_debug_container_widths_enabled()) {
 		return $classes;
 	}
 
@@ -20,7 +36,7 @@ add_filter('body_class', function (array $classes): array {
 });
 
 add_action('wp_head', function (): void {
-	if (is_admin()) {
+	if (is_admin() || !bl_debug_container_widths_enabled()) {
 		return;
 	}
 	?>
@@ -149,7 +165,7 @@ body.bl-debug-container-widths {
 }, 100);
 
 add_action('wp_footer', function (): void {
-	if (is_admin()) {
+	if (is_admin() || !bl_debug_container_widths_enabled()) {
 		return;
 	}
 	?>

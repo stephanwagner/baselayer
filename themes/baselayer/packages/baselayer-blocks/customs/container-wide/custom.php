@@ -31,19 +31,6 @@ if (!function_exists('bl_block_options_control_container_wide')) {
 	}
 }
 
-if (!function_exists('bl_block_options_control_align_wide')) {
-	/**
-	 * @deprecated Use bl_block_options_control_container_wide().
-	 * @param string $default
-	 * @param bool   $show_content_align
-	 * @return array<string, mixed>
-	 */
-	function bl_block_options_control_align_wide(string $default = '', bool $show_content_align = false): array
-	{
-		return bl_block_options_control_container_wide($default, $show_content_align);
-	}
-}
-
 // Catalog metadata: plain msgids (translated in bl_block_options_customs_catalog after textdomain load).
 if (false) {
 	__('Inhaltsbreite', 'baselayer-blocks');

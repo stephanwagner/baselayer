@@ -11,6 +11,7 @@ const BL_DEVELOPER_TABS_BASE = [
 	'developer' => ['label' => 'Developer'],
 	'system'   => ['label' => 'Settings'],
 	'tools'    => ['label' => 'Tools'],
+	'debug'    => ['label' => 'Debug'],
 	'features' => ['label' => 'Features'],
 	'access'   => ['label' => 'Benutzerrechte'],
 	'security' => ['label' => 'Sicherheit'],
@@ -28,7 +29,7 @@ function bl_developer_settings_available_tabs(): array
 		$inject['editorial'] = ['label' => 'Editorial'];
 	}
 	if ($inject === []) {
-		return $tabs;
+		return apply_filters('bl_developer_settings_available_tabs', $tabs);
 	}
 
 	$out = [];
@@ -40,7 +41,7 @@ function bl_developer_settings_available_tabs(): array
 		}
 		$out[$key] = $val;
 	}
-	return $out;
+	return apply_filters('bl_developer_settings_available_tabs', $out);
 }
 
 /**
@@ -131,6 +132,7 @@ function bl_developer_settings_screen_heading(): void
 }
 
 // Non-developer: redirect to Theme settings when opening any Developer page.
+// Debug: also redirect when the Benutzerrechte gate is off.
 // Set global $title so admin-header.php doesn't get null (we hide submenu items below).
 foreach (bl_developer_settings_page_slugs() as $slug) {
 	add_action(bl_developer_settings_load_hook($slug), function () use ($slug) {
@@ -139,11 +141,14 @@ foreach (bl_developer_settings_page_slugs() as $slug) {
 		if (!current_user_can('manage_options')) {
 			return;
 		}
-		if (function_exists('bl_is_developer_user') && bl_is_developer_user((int) get_current_user_id())) {
-			return;
+		if (!function_exists('bl_is_developer_user') || !bl_is_developer_user((int) get_current_user_id())) {
+			wp_safe_redirect(admin_url('options-general.php?page=bl-theme-settings'));
+			exit;
 		}
-		wp_safe_redirect(admin_url('options-general.php?page=bl-theme-settings'));
-		exit;
+		if ($slug === 'bl-developer-debug' && function_exists('bl_developer_can_access_debug') && !bl_developer_can_access_debug()) {
+			wp_safe_redirect(admin_url('options-general.php?page=bl-developer-system'));
+			exit;
+		}
 	}, 1);
 }
 
@@ -235,6 +240,7 @@ require_once $bl_developer_settings_dir . 'developer.php';
 require_once $bl_developer_settings_dir . 'email.php';
 require_once $bl_developer_settings_dir . 'system.php';
 require_once $bl_developer_settings_dir . 'tools.php';
+require_once $bl_developer_settings_dir . 'debug.php';
 require_once $bl_developer_settings_dir . 'media-cleanup.php';
 require_once $bl_developer_settings_dir . 'install-google-font.php';
 require_once $bl_developer_settings_dir . 'features.php';

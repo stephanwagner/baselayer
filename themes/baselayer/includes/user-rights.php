@@ -174,6 +174,7 @@ function bl_admin_access_defaults(): array
     'theme_settings_blocks' => ['admin' => 0, 'developer' => 1],
     'theme_settings_css' => ['admin' => 0, 'developer' => 1],
     'theme_settings_redirects' => ['admin' => 1, 'developer' => 1],
+    'developer_debug' => ['admin' => 0, 'developer' => 1],
   ];
 }
 

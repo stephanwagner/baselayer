@@ -428,6 +428,7 @@ function bl_block_options_enqueue_admin_assets(): void
 		'defaultOn' => __('On by default', 'baselayer-blocks'),
 		'defaultValue' => __('Default', 'baselayer-blocks'),
 		'choices' => __('Choices', 'baselayer-blocks'),
+		'showContentAlign' => __('Show content align', 'baselayer-blocks'),
 		'addChoice' => __('Add choice', 'baselayer-blocks'),
 		'choiceLabel' => __('Label', 'baselayer-blocks'),
 		'choiceTitle' => __('Hover label', 'baselayer-blocks'),

@@ -19,47 +19,10 @@
                 {
                     "id": "c_inner-padding",
                     "kind": "control",
-                    "type": "button-group",
+                    "type": "inner-padding",
                     "label": "Innenabstand",
-                    "attributeName": "containerPadding",
                     "default": "-container-padding-auto",
-                    "options": [
-                        {
-                            "label": "—",
-                            "value": "-container-padding-unset",
-                            "title": "Nicht gesetzt"
-                        },
-                        {
-                            "label": "A",
-                            "value": "-container-padding-auto",
-                            "title": "Automatisch"
-                        },
-                        {
-                            "label": "0",
-                            "value": "-container-padding-none",
-                            "title": "Kein Innenabstand"
-                        },
-                        {
-                            "label": "XS",
-                            "value": "-container-padding-xs"
-                        },
-                        {
-                            "label": "S",
-                            "value": "-container-padding-s"
-                        },
-                        {
-                            "label": "M",
-                            "value": "-container-padding-m"
-                        },
-                        {
-                            "label": "L",
-                            "value": "-container-padding-l"
-                        },
-                        {
-                            "label": "XL",
-                            "value": "-container-padding-xl"
-                        }
-                    ]
+                    "showContentAlign": false
                 }
             ]
         },
@@ -231,11 +194,6 @@
         },
         "core/column": {
             "items": [
-                {
-                    "id": "p_b49dc5f5984c",
-                    "kind": "preset",
-                    "slug": "container-wide"
-                },
                 {
                     "id": "c_a8a3e5ab27e6",
                     "kind": "control",
@@ -413,12 +371,7 @@
                 {
                     "id": "p_731ce805b148",
                     "kind": "preset",
-                    "slug": "container-wide",
-                    "defaults": {
-                        "c_container-wide": {
-                            "showContentAlign": true
-                        }
-                    }
+                    "slug": "container-wide"
                 },
                 {
                     "id": "p_9b7f59901180",
@@ -436,7 +389,8 @@
                     "slug": "inner-padding",
                     "defaults": {
                         "c_inner-padding": {
-                            "default": "-container-padding-auto"
+                            "default": "-container-padding-auto",
+                            "showContentAlign": true
                         }
                     }
                 },
@@ -561,7 +515,8 @@
                     "slug": "inner-padding",
                     "defaults": {
                         "c_inner-padding": {
-                            "default": "-container-padding-xl"
+                            "default": "-container-padding-xl",
+                            "showContentAlign": true
                         }
                     }
                 }

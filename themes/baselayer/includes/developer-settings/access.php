@@ -84,6 +84,9 @@ function bl_render_developer_access(): void
 			'theme_settings_css' => __('CSS', 'baselayer'),
 			'theme_settings_redirects' => __('Redirects', 'baselayer'),
 		]],
+		['title' => __('Developer', 'baselayer'), 'items' => [
+			'developer_debug' => __('Debug', 'baselayer'),
+		]],
 	];
 	?>
 	<div class="wrap">
@@ -117,12 +120,17 @@ function bl_render_developer_access(): void
 							$val = isset($admin_access[$key]) ? $admin_access[$key] : ['admin' => 0, 'developer' => 1];
 							$admin_checked = !empty($val['admin']);
 							$dev_checked = !empty($val['developer']);
+							$admin_locked_off = ($key === 'developer_debug');
 						?>
 							<tr>
 								<td class="row-title" style="width: 180px;"><?= esc_html($label) ?></td>
 								<td style="width: auto; min-width: 80px;">
 									<input type="hidden" name="baselayer_admin_access[<?= esc_attr($key) ?>][admin]" value="0">
-									<label><input type="checkbox" name="baselayer_admin_access[<?= esc_attr($key) ?>][admin]" value="1" <?= checked($admin_checked, true, false) ?>></label>
+									<?php if ($admin_locked_off) : ?>
+										<span class="description" title="<?= esc_attr__('Debug is only available to developers.', 'baselayer') ?>">—</span>
+									<?php else : ?>
+										<label><input type="checkbox" name="baselayer_admin_access[<?= esc_attr($key) ?>][admin]" value="1" <?= checked($admin_checked, true, false) ?>></label>
+									<?php endif; ?>
 								</td>
 								<td style="width: auto; min-width: 100px;">
 									<input type="hidden" name="baselayer_admin_access[<?= esc_attr($key) ?>][developer]" value="0">

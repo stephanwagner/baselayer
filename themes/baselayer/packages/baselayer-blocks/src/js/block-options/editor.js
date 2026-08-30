@@ -24,7 +24,7 @@ const GALLERY_OWNED_IMAGE_ATTRIBUTES = [
   'alignWideContainer',
   'alignWideContent',
 ];
-const GALLERY_OWNED_IMAGE_TYPES = ['container-margin', 'container-wide', 'align-wide'];
+const GALLERY_OWNED_IMAGE_TYPES = ['container-margin', 'container-wide', 'inner-padding'];
 
 /** Resolved from PHP (bl_block_options store → baselayerBlockOptions). */
 const blockOptions = Array.isArray(window.baselayerBlockOptions)
@@ -249,10 +249,10 @@ const collectOptionClasses = (blockConfig, attributes, { isRootBlock = true } = 
     const custom = getCustom(option.type);
     if (custom?.classesFromAttributes) {
       // Wide container only applies at root; keep attributes, skip classes when nested.
-      if ((option.type === 'container-wide' || option.type === 'align-wide') && !isRootBlock) {
+      if (option.type === 'container-wide' && !isRootBlock) {
         return;
       }
-      classes.push(...custom.classesFromAttributes(option, attributes));
+      classes.push(...custom.classesFromAttributes(option, attributes, { isRootBlock }));
       return;
     }
 
@@ -539,7 +539,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                   return null;
                 }
 
-                if ((option.type === 'container-wide' || option.type === 'align-wide') && !isRootBlock) {
+                if (option.type === 'container-wide' && !isRootBlock) {
                   return null;
                 }
 
@@ -553,6 +553,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                         option={option}
                         attributes={attributes}
                         onChange={setOptionAttributes}
+                        isRootBlock={isRootBlock}
                       />
                     </BlockOptionWrapper>
                   );

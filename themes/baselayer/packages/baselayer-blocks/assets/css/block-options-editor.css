@@ -71,6 +71,24 @@
   margin: 0;
 }
 
+.bl-align-wide {
+  margin-bottom: 0;
+}
+
+.bl-align-wide-content-toggle.components-toggle-control {
+  margin-top: -4px;
+  margin-bottom: 0;
+}
+
+.bl-inner-padding {
+  margin-bottom: 0;
+}
+
+.bl-inner-padding-content-toggle.components-toggle-control {
+  margin-top: -4px;
+  margin-bottom: 0;
+}
+
 .bl-limit-width {
   margin-bottom: 0;
 }
@@ -138,11 +156,6 @@
 .bl-block-option .components-base-control__help,
 .components-base-control__help.bl-block-option-help {
   white-space: pre-line;
-}
-
-.bl-align-wide-content-toggle.components-toggle-control {
-  margin-top: -4px;
-  margin-bottom: 0;
 }
 
 /*# sourceMappingURL=block-options-editor.css.map */
