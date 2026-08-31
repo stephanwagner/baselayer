@@ -241,6 +241,132 @@ function bl_blocks_add_new_url($url, $path)
 add_filter('admin_url', 'bl_blocks_add_new_url', 10, 2);
 
 /**
+ * Keep status tabs (All / Trash / …) on the current definition type.
+ *
+ * Core builds `edit.php?post_status=trash&post_type=bl_block` without
+ * `bl_block_type`, so Trash would list Blocks instead of Website Fields.
+ *
+ * @param array<string, string> $views
+ * @return array<string, string>
+ */
+function bl_blocks_preserve_type_in_views(array $views): array
+{
+	$type = bl_blocks_current_list_type();
+	foreach ($views as $key => $html) {
+		if (!is_string($html) || !preg_match('/href=(["\'])([^"\']+)\1/', $html, $m)) {
+			continue;
+		}
+		$url = html_entity_decode($m[2], ENT_QUOTES, 'UTF-8');
+		$url = add_query_arg('bl_block_type', $type, $url);
+		$views[$key] = str_replace($m[0], 'href=' . $m[1] . esc_url($url) . $m[1], $html);
+	}
+
+	return $views;
+}
+add_filter('views_edit-' . BL_BLOCK_POST_TYPE, 'bl_blocks_preserve_type_in_views');
+
+/**
+ * Keep search / bulk filters on the current definition type.
+ *
+ * @param string $post_type
+ * @param string $which
+ */
+function bl_blocks_list_type_hidden_field(string $post_type, string $which = 'top'): void
+{
+	if ($post_type !== BL_BLOCK_POST_TYPE || $which !== 'top') {
+		return;
+	}
+	echo '<input type="hidden" name="bl_block_type" value="' . esc_attr(bl_blocks_current_list_type()) . '" />';
+}
+add_action('restrict_manage_posts', 'bl_blocks_list_type_hidden_field', 10, 2);
+
+/**
+ * After trash / untrash from the editor, land on the typed list.
+ *
+ * @param string $location
+ * @return string
+ */
+function bl_blocks_preserve_type_on_list_redirect($location)
+{
+	if (!is_admin() || !is_string($location) || $location === '') {
+		return $location;
+	}
+	$path = (string) wp_parse_url($location, PHP_URL_PATH);
+	if (!str_ends_with($path, '/edit.php') && !str_ends_with($path, 'edit.php')) {
+		return $location;
+	}
+	$query = (string) wp_parse_url($location, PHP_URL_QUERY);
+	$args = [];
+	if ($query !== '') {
+		wp_parse_str($query, $args);
+	}
+	if (($args['post_type'] ?? '') !== BL_BLOCK_POST_TYPE) {
+		return $location;
+	}
+	if (!empty($args['bl_block_type'])) {
+		return $location;
+	}
+
+	return add_query_arg('bl_block_type', bl_blocks_current_list_type(), $location);
+}
+add_filter('wp_redirect', 'bl_blocks_preserve_type_on_list_redirect');
+
+/**
+ * Count list-table statuses for the current definition type only.
+ *
+ * @param object $counts
+ * @param string $type
+ * @param string $perm
+ * @return object
+ */
+function bl_blocks_count_posts_by_definition_type($counts, $type, $perm)
+{
+	if ($type !== BL_BLOCK_POST_TYPE || !is_admin()) {
+		return $counts;
+	}
+	if (!function_exists('get_current_screen')) {
+		return $counts;
+	}
+	$screen = get_current_screen();
+	if (!$screen || $screen->id !== 'edit-' . BL_BLOCK_POST_TYPE) {
+		return $counts;
+	}
+
+	global $wpdb;
+	$def_type = bl_blocks_current_list_type();
+	$rows = $wpdb->get_results(
+		$wpdb->prepare(
+			"SELECT p.post_status, COUNT(*) AS num
+			 FROM {$wpdb->posts} p
+			 INNER JOIN {$wpdb->postmeta} m ON p.ID = m.post_id AND m.meta_key = %s
+			 WHERE p.post_type = %s AND m.meta_value = %s
+			 GROUP BY p.post_status",
+			BL_BLOCK_TYPE_META,
+			BL_BLOCK_POST_TYPE,
+			$def_type
+		),
+		ARRAY_A
+	);
+
+	$out = is_object($counts) ? clone $counts : new stdClass();
+	foreach (array_keys((array) $out) as $status) {
+		$out->{$status} = 0;
+	}
+	if (is_array($rows)) {
+		foreach ($rows as $row) {
+			$status = (string) ($row['post_status'] ?? '');
+			if ($status === '') {
+				continue;
+			}
+			$out->{$status} = (int) ($row['num'] ?? 0);
+		}
+	}
+
+	return $out;
+}
+add_filter('wp_count_posts', 'bl_blocks_count_posts_by_definition_type', 10, 3);
+
+/**
  * Save definition config + type.
  */
 function bl_blocks_save_post(int $post_id, WP_Post $post): void
