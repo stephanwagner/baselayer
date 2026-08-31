@@ -2,33 +2,47 @@
 
 defined('ABSPATH') || exit;
 
+if (!function_exists('bl_block_options_normalize_inner_padding_token')) {
+	/**
+	 * Map a stored default (token or legacy class) to a short size token.
+	 */
+	function bl_block_options_normalize_inner_padding_token(string $value): string
+	{
+		$map = [
+			'' => '',
+			'unset' => '',
+			'-container-padding-unset' => '',
+			'auto' => 'auto',
+			'-container-padding-auto' => 'auto',
+			'none' => 'none',
+			'-container-padding-none' => 'none',
+			'xs' => 'xs',
+			'-container-padding-xs' => 'xs',
+			's' => 's',
+			'-container-padding-s' => 's',
+			'm' => 'm',
+			'-container-padding-m' => 'm',
+			'l' => 'l',
+			'-container-padding-l' => 'l',
+			'xl' => 'xl',
+			'-container-padding-xl' => 'xl',
+		];
+
+		return $map[$value] ?? '';
+	}
+}
+
 if (!function_exists('bl_block_options_control_inner_padding')) {
 	/**
 	 * Innenabstand: size tokens + optional content-column align.
 	 *
-	 * @param string $default Padding class, e.g. `-container-padding-auto`, or '' for unset.
+	 * @param string $default Padding token (`auto`, `m`, …) or legacy class, or '' for unset.
 	 * @param bool   $show_content_align Whether to show the content-column align toggle.
 	 * @return array<string, mixed>
 	 */
 	function bl_block_options_control_inner_padding(string $default = '', bool $show_content_align = false): array
 	{
-		$allowed = [
-			'',
-			'-container-padding-unset',
-			'-container-padding-auto',
-			'-container-padding-none',
-			'-container-padding-xs',
-			'-container-padding-s',
-			'-container-padding-m',
-			'-container-padding-l',
-			'-container-padding-xl',
-		];
-		if (!in_array($default, $allowed, true)) {
-			$default = '';
-		}
-		if ($default === '-container-padding-unset') {
-			$default = '';
-		}
+		$default = bl_block_options_normalize_inner_padding_token($default);
 
 		return [
 			'type' => 'inner-padding',
@@ -66,16 +80,16 @@ return [
 		'default' => [
 			'type' => 'size',
 			'label' => 'Default',
-			'default' => '-container-padding-auto',
+			'default' => 'auto',
 			'choices' => [
 				'' => '—',
-				'-container-padding-auto' => 'A',
-				'-container-padding-none' => '0',
-				'-container-padding-xs' => 'XS',
-				'-container-padding-s' => 'S',
-				'-container-padding-m' => 'M',
-				'-container-padding-l' => 'L',
-				'-container-padding-xl' => 'XL',
+				'auto' => 'A',
+				'none' => '0',
+				'xs' => 'XS',
+				's' => 'S',
+				'm' => 'M',
+				'l' => 'L',
+				'xl' => 'XL',
 			],
 		],
 		'showContentAlign' => [

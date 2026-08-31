@@ -21,7 +21,7 @@
                     "kind": "control",
                     "type": "inner-padding",
                     "label": "Innenabstand",
-                    "default": "-container-padding-auto",
+                    "default": "auto",
                     "showContentAlign": false
                 }
             ]
@@ -389,7 +389,7 @@
                     "slug": "inner-padding",
                     "defaults": {
                         "c_inner-padding": {
-                            "default": "-container-padding-auto",
+                            "default": "auto",
                             "showContentAlign": true
                         }
                     }
@@ -433,7 +433,7 @@
                     "slug": "inner-padding",
                     "defaults": {
                         "c_inner-padding": {
-                            "default": "-container-padding-l"
+                            "default": "l"
                         }
                     }
                 }
@@ -510,7 +510,7 @@
                     "slug": "inner-padding",
                     "defaults": {
                         "c_inner-padding": {
-                            "default": "-container-padding-auto",
+                            "default": "auto",
                             "showContentAlign": true
                         }
                     }

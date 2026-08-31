@@ -1079,7 +1079,7 @@
           "slug": "inner-padding",
           "defaults": {
             "c_inner-padding": {
-              "default": "-container-padding-m"
+              "default": "m"
             }
           }
         }

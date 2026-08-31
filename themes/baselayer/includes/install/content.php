@@ -742,7 +742,7 @@ function bl_install_create_pages(array $media = []): array
 
 		$post_id = wp_insert_post([
 			'post_type'    => 'page',
-			'post_status'  => 'publish',
+			'post_status'  => $key === 'blocks' ? 'private' : 'publish',
 			'post_title'   => $def['title'],
 			'post_name'    => $def['slug'],
 			'post_content' => bl_install_page_post_content($key, $manifest, $media),

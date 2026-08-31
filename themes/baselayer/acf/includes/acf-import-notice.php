@@ -416,7 +416,7 @@ function bl_acf_ensure_blocks_showcase_page(): int
 	$post_id = wp_insert_post(
 		[
 			'post_type'    => 'page',
-			'post_status'  => 'publish',
+			'post_status'  => 'private',
 			'post_title'   => $title,
 			'post_name'    => $slug,
 			'post_content' => $content,
