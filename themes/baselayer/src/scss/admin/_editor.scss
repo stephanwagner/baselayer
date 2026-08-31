@@ -1,4 +1,5 @@
 @use '../theme-tokens' as *;
+@use '../config' as *;
 
 // Layer 4: block editor chrome.
 // Frontend theme tokens are scoped to the canvas only (not wp-admin :root).
@@ -321,7 +322,7 @@ div.baselayer-seo-panel {
   .block-list-appender .block-editor-inserter__toggle.components-button.has-icon {
     box-shadow: 0 0 0 2px rgba(#fff, 0.2);
 
-    @media (min-resolution: 1.9dppx) {
+    @media (min-resolution: $high-density-dppx) {
       box-shadow: 0 0 0 1.5px rgba(#fff, 0.2);
     }
   }
@@ -344,7 +345,7 @@ div.baselayer-seo-panel {
   font-weight: 600;
   line-height: 1.4;
 
-  @media (min-resolution: 1.9dppx) {
+  @media (min-resolution: $high-density-dppx) {
     border-width: 1.5px;
     border-left-width: 4px;
   }
