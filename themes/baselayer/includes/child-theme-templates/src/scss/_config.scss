@@ -1,24 +1,47 @@
 /**
  * Parent theme Sass configuration.
  *
- * Add only the values you want to override. The available variables and their
- * defaults are in baselayer/src/scss/_config.scss.
- *
- * The child build compiles the complete parent frontend and admin styles with
- * these values, so overrides also apply to Sass-only values such as breakpoints.
+ * Live lines are parent defaults (first build is a no-op). Change a value and
+ * rebuild CSS. Comment a live line out to give that knob back to the parent
+ * (aliases start working again). Uncomment a commented line only when you need
+ * it to differ from its parent alias.
  */
+
+@use 'sass:color';
 
 // Path for assets that belong to this child theme.
 $child-theme-path: '{{child_theme_path}}';
 
 // Parent theme Sass configuration.
 @forward '../../../baselayer/src/scss/config' with (
+  // Page
+  // $page-background-color: #fff,
+  // $content-padding-top: 32px,
+  // $content-padding-bottom: 48px,
+
   // Colors
   $color-primary: #4080ff,
+  $color-primary-dark: #{color.adjust(#4080ff, $lightness: -8%)},
+  $color-primary-light: #{color.adjust(#4080ff, $lightness: 8%)},
   $color-secondary: #00aaff,
+  $color-secondary-dark: #{color.adjust(#00aaff, $lightness: -8%)},
+  $color-secondary-light: #{color.adjust(#00aaff, $lightness: 8%)},
 
-  // Font families
+  // Grayscale
+  $color-white: #fff,
+  $color-black: #000,
+  $color-gray-900: #23292e,
+  $color-gray-800: #3c434a,
+  $color-gray-700: #58616b,
+  $color-gray-600: #6f7882,
+  $color-gray-500: #8b959e,
+  $color-gray-400: #afb8c1,
+  $color-gray-300: #d0d7de,
+  $color-gray-200: #eaeef2,
+  $color-gray-100: #f6f8fa,
+
   $primary-font-family: ('Nunito Sans', sans-serif),
+  // $secondary-font-family: ('Nunito Sans', sans-serif),
 
   // Font sizes
   $font-size-s: 14px,
@@ -29,11 +52,84 @@ $child-theme-path: '{{child_theme_path}}';
   // Line heights
   $line-height-s: 1.4,
   $line-height-m: 1.5,
-  $line-height-l: 1.6,
-  $line-height-xl: 1.7,
+  $line-height-l: 1.5,
+  $line-height-xl: 1.4,
+
+  // Text
+  // $default-text-color: $color-gray-900,
+  // $gray-text-color: $color-gray-600,
+  // $default-font-size: $font-size-m,
+  // $default-line-height: $line-height-m,
+  // $link-color: $color-primary,
+  // $link-color-hover: $color-primary-dark,
+  // $text-margin-top: 0,
+  // $text-margin-bottom: 16px,
+
+  // Headlines
+  // $heading-font-family: $secondary-font-family,
+  // $heading-font-weight: 600,
+  // $heading-line-height: 1.3,
+
+  // $h1-font-size: 32px,
+  // $h1-line-height: $heading-line-height,
+  // $h1-margin-top: 48px,
+  // $h1-margin-bottom: 24px,
+
+  // $h2-font-size: 28px,
+  // $h2-line-height: $heading-line-height,
+  // $h2-margin-top: 32px,
+  // $h2-margin-bottom: 16px,
+
+  // $h3-font-size: 24px,
+  // $h3-line-height: $heading-line-height,
+  // $h3-margin-top: 24px,
+  // $h3-margin-bottom: 12px,
+
+  // $h4-font-size: 20px,
+  // $h4-line-height: $heading-line-height,
+  // $h4-margin-top: 20px,
+  // $h4-margin-bottom: 8px,
+
+  // $h5-font-size: $font-size-l,
+  // $h5-line-height: $line-height-l,
+  // $h5-margin-top: 16px,
+  // $h5-margin-bottom: 6px,
+
+  // $h6-font-size: $default-font-size,
+  // $h6-line-height: $default-line-height,
+  // $h6-margin-top: 16px,
+  // $h6-margin-bottom: 4px,
+
+  // Page paddings
+  // $page-padding-xs: 16px,
+  // $page-padding-s: 24px,
+  // $page-padding-m: 32px,
+  // $page-padding-l: 48px,
+  // $page-padding-xl: 64px,
+
+  // Container margins
+  // $container-margin-xs: 24px,
+  // $container-margin-s: 32px,
+  // $container-margin-m: 48px,
+  // $container-margin-l: 64px,
+  // $container-margin-xl: 96px,
+
+  // Container paddings
+  // $container-padding-xs: 24px,
+  // $container-padding-s: 32px,
+  // $container-padding-m: 48px,
+  // $container-padding-l: 64px,
+  // $container-padding-xl: 96px,
 
   // Content
-  $content-width: 1200px,
+  $content-width: 960px,
+
+  // Bleeds
+  // $alignwide-bleed: $page-padding-m,
+  // $container-wide-bleed: $page-padding-xl,
+
+  // Breakpoints
+  $breakpoint-mobile: 900px,
 
   // Header
   $header-height: 96px,
@@ -42,30 +138,68 @@ $child-theme-path: '{{child_theme_path}}';
   $header-height-mobile-scrolled: 56px,
   $header-start-scrolled: 64px,
 
-  // Breakpoints
-  $breakpoint-mobile: 900px,
+  // Mobile menu
+  $mobile-menu-width: 280px,
 
-  // Buttons (default)
-  // $button-icon-size: 1.25em,
-  // $button-icon-gap: 0.375em,
-  // $button-padding-y: 7px,
+  // Border radius
+  $border-radius-s: 4px,
+  $border-radius-m: 8px,
+  $border-radius-l: 16px,
+
+  // Buttons
+  // $button-primary-color: $color-white,
+  // $button-primary-color-hover: $color-white,
+  // $button-primary-background-color: $color-primary,
+  // $button-primary-background-color-hover: $color-primary-dark,
+  // $button-primary-border-color: $button-primary-background-color,
+  // $button-primary-border-color-hover: $button-primary-background-color-hover,
+
+  // $button-secondary-color: $color-white,
+  // $button-secondary-color-hover: $color-white,
+  // $button-secondary-background-color: $color-secondary,
+  // $button-secondary-background-color-hover: $color-secondary-dark,
+  // $button-secondary-border-color: $button-secondary-background-color,
+  // $button-secondary-border-color-hover: $button-secondary-background-color-hover,
+
+  // $button-white-color: $default-text-color,
+  // $button-white-color-hover: $button-white-color,
+  // $button-white-background-color: $color-white,
+  // $button-white-background-color-hover: $color-gray-200,
+  // $button-white-border-color: $button-white-background-color,
+  // $button-white-border-color-hover: $button-white-background-color-hover,
+
+  // $button-muted-color: $color-gray-600,
+  // $button-muted-color-hover: $color-gray-700,
+  // $button-muted-background-color: $color-gray-200,
+  // $button-muted-background-color-hover: $color-gray-300,
+  // $button-muted-border-color: $button-muted-background-color,
+  // $button-muted-border-color-hover: $button-muted-background-color-hover,
+
+  // $button-disabled-color: #ccc,
+  // $button-disabled-background-color: #eee,
+  // $button-disabled-border-color: $button-disabled-color,
+
+  // $button-padding-y: 8px,
   // $button-padding-x: 20px,
   // $button-border-radius: 21px,
-  // $button-font-size: 16px,
+  // $button-font-size: $font-size-m,
+  // $button-line-height: 22px,
   // $button-icon-inset: 12px,
-  // Buttons (small)
-  // $button-padding-y-s: 3px,
+
+  // $button-padding-y-s: 5px,
   // $button-padding-x-s: 14px,
   // $button-border-radius-s: 17px,
-  // $button-font-size-s: 14px,
+  // $button-font-size-s: $font-size-s,
+  // $button-line-height-s: 20px,
   // $button-icon-inset-s: 9px,
-  // Buttons (large)
+
   // $button-padding-y-l: 11px,
   // $button-padding-x-l: 26px,
   // $button-border-radius-l: 25px,
-  // $button-font-size-l: 18px,
-   // $button-icon-inset-l: 14px,
-);
+  // $button-font-size-l: $font-size-l,
+  // $button-line-height-l: 24px,
+  // $button-icon-inset-l: 14px,
 
-// Copy more settings from parent theme config
-// baselayer/src/scss/_config.scss
+  // $button-icon-size: 1.25em,
+  // $button-icon-gap: 0.375em,
+);
