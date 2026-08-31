@@ -81,7 +81,7 @@
     overflow: hidden;
     text-align: center;
     background: var(--bl-button-primary-background-color);
-    border: 2px solid var(--bl-button-primary-background-color);
+    border: 2px solid var(--bl-button-primary-border-color);
     font-weight: 600;
     height: auto;
     text-decoration: none !important;
@@ -110,15 +110,15 @@
     .-button-trigger:hover & {
       text-decoration: none !important;
       background: var(--bl-button-primary-background-color-hover);
-      border-color: var(--bl-button-primary-background-color-hover);
+      border-color: var(--bl-button-primary-border-color-hover);
       color: var(--bl-button-primary-color-hover);
     }
 
     &[disabled] {
       cursor: default !important;
-      color: #ccc !important;
-      background: #eee !important;
-      border-color: #ccc !important;
+      color: var(--bl-button-disabled-color) !important;
+      background: var(--bl-button-disabled-background-color) !important;
+      border-color: var(--bl-button-disabled-border-color) !important;
       box-shadow: none !important;
     }
 
@@ -172,7 +172,7 @@
     &:hover,
     .-button-trigger:hover & {
       background: var(--bl-button-primary-background-color);
-      border-color: var(--bl-button-primary-background-color);
+      border-color: var(--bl-button-primary-border-color);
       color: var(--bl-button-primary-color);
     }
   }
@@ -180,13 +180,13 @@
   .button.-secondary,
   .wp-block-button.-secondary .wp-block-button__link {
     background: var(--bl-button-secondary-background-color);
-    border-color: var(--bl-button-secondary-background-color);
+    border-color: var(--bl-button-secondary-border-color);
     color: var(--bl-button-secondary-color);
 
     &:hover,
     .-button-trigger:hover & {
       background: var(--bl-button-secondary-background-color-hover);
-      border-color: var(--bl-button-secondary-background-color-hover);
+      border-color: var(--bl-button-secondary-border-color-hover);
       color: var(--bl-button-secondary-color-hover);
     }
   }
@@ -199,7 +199,7 @@
     &:hover,
     .-button-trigger:hover & {
       background: var(--bl-button-secondary-background-color);
-      border-color: var(--bl-button-secondary-background-color);
+      border-color: var(--bl-button-secondary-border-color);
       color: var(--bl-button-secondary-color);
     }
   }
@@ -207,13 +207,13 @@
   .button.-white,
   .wp-block-button.-white .wp-block-button__link {
     background: var(--bl-button-white-background-color);
-    border-color: var(--bl-button-white-background-color);
+    border-color: var(--bl-button-white-border-color);
     color: var(--bl-button-white-color);
 
     &:hover,
     .-button-trigger:hover & {
       background: var(--bl-button-white-background-color-hover);
-      border-color: var(--bl-button-white-background-color-hover);
+      border-color: var(--bl-button-white-border-color-hover);
       color: var(--bl-button-white-color-hover);
     }
   }
@@ -221,13 +221,13 @@
   .button.-white.-outline,
   .wp-block-button.-white.is-style-outline .wp-block-button__link {
     background: transparent;
-    border-color: var(--bl-color-white);
+    border-color: var(--bl-button-white-border-color);
     color: var(--bl-color-white);
 
     &:hover,
     .-button-trigger:hover & {
       background: var(--bl-button-white-background-color);
-      border-color: var(--bl-button-white-background-color);
+      border-color: var(--bl-button-white-border-color);
       color: var(--bl-button-white-color);
     }
   }
@@ -235,13 +235,13 @@
   .button.-muted,
   .wp-block-button.-muted .wp-block-button__link {
     background: var(--bl-button-muted-background-color);
-    border-color: var(--bl-button-muted-background-color);
+    border-color: var(--bl-button-muted-border-color);
     color: var(--bl-button-muted-color);
 
     &:hover,
     .-button-trigger:hover & {
       background: var(--bl-button-muted-background-color-hover);
-      border-color: var(--bl-button-muted-background-color-hover);
+      border-color: var(--bl-button-muted-border-color-hover);
       color: var(--bl-button-muted-color-hover);
     }
   }
@@ -255,7 +255,7 @@
     &:hover,
     .-button-trigger:hover & {
       background: var(--bl-button-muted-background-color);
-      border-color: var(--bl-button-muted-background-color);
+      border-color: var(--bl-button-muted-border-color);
       color: var(--bl-button-muted-color-hover);
     }
   }

@@ -70,6 +70,51 @@ $line-height-m: 1.5 !default;
 $line-height-l: 1.5 !default;
 $line-height-xl: 1.4 !default;
 
+// Text
+$default-text-color: $color-gray-900 !default;
+$gray-text-color: $color-gray-600 !default;
+$default-font-size: $font-size-m !default;
+$default-line-height: $line-height-m !default;
+$link-color: $color-primary !default;
+$link-color-hover: $color-primary-dark !default;
+$text-margin-top: 0 !default;
+$text-margin-bottom: 16px !default;
+
+// Headlines
+$heading-font-family: $secondary-font-family !default;
+$heading-font-weight: 600 !default;
+$heading-line-height: 1.3 !default;
+
+$h1-font-size: 32px !default;
+$h1-line-height: $heading-line-height !default;
+$h1-margin-top: 48px !default;
+$h1-margin-bottom: 24px !default;
+
+$h2-font-size: 28px !default;
+$h2-line-height: $heading-line-height !default;
+$h2-margin-top: 32px !default;
+$h2-margin-bottom: 16px !default;
+
+$h3-font-size: 24px !default;
+$h3-line-height: $heading-line-height !default;
+$h3-margin-top: 24px !default;
+$h3-margin-bottom: 12px !default;
+
+$h4-font-size: 20px !default;
+$h4-line-height: $heading-line-height !default;
+$h4-margin-top: 20px !default;
+$h4-margin-bottom: 8px !default;
+
+$h5-font-size: $font-size-l !default;
+$h5-line-height: $line-height-l !default;
+$h5-margin-top: 16px !default;
+$h5-margin-bottom: 6px !default;
+
+$h6-font-size: $default-font-size !default;
+$h6-line-height: $default-line-height !default;
+$h6-margin-top: 16px !default;
+$h6-margin-bottom: 4px !default;
+
 // Page paddings
 $page-padding-xs: 16px !default;
 $page-padding-s: 24px !default;
@@ -139,6 +184,38 @@ $border-radius-m: 8px !default;
 $border-radius-l: 16px !default;
 
 // Buttons
+$button-primary-color: $color-white !default;
+$button-primary-color-hover: $color-white !default;
+$button-primary-background-color: $color-primary !default;
+$button-primary-background-color-hover: $color-primary-dark !default;
+$button-primary-border-color: $button-primary-background-color !default;
+$button-primary-border-color-hover: $button-primary-background-color-hover !default;
+
+$button-secondary-color: $color-white !default;
+$button-secondary-color-hover: $color-white !default;
+$button-secondary-background-color: $color-secondary !default;
+$button-secondary-background-color-hover: $color-secondary-dark !default;
+$button-secondary-border-color: $button-secondary-background-color !default;
+$button-secondary-border-color-hover: $button-secondary-background-color-hover !default;
+
+$button-white-color: $default-text-color !default;
+$button-white-color-hover: $button-white-color !default;
+$button-white-background-color: $color-white !default;
+$button-white-background-color-hover: $color-gray-200 !default;
+$button-white-border-color: $button-white-background-color !default;
+$button-white-border-color-hover: $button-white-background-color-hover !default;
+
+$button-muted-color: $color-gray-600 !default;
+$button-muted-color-hover: $color-gray-700 !default;
+$button-muted-background-color: $color-gray-200 !default;
+$button-muted-background-color-hover: $color-gray-300 !default;
+$button-muted-border-color: $button-muted-background-color !default;
+$button-muted-border-color-hover: $button-muted-background-color-hover !default;
+
+$button-disabled-color: #ccc !default;
+$button-disabled-background-color: #eee !default;
+$button-disabled-border-color: $button-disabled-color !default;
+
 $button-padding-y: 8px !default;
 $button-padding-x: 20px !default;
 $button-border-radius: 21px !default;
