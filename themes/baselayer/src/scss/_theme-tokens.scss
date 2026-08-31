@@ -45,6 +45,10 @@
   // Gradients
   --bl-gradient-primary: linear-gradient(to right, var(--bl-color-primary), var(--bl-color-secondary));
 
+  // Font families
+  --bl-primary-font-family: #{$primary-font-family};
+  --bl-secondary-font-family: #{$secondary-font-family};
+
   // Font sizes
   --bl-font-size-s: #{$font-size-s};
   --bl-font-size-m: #{$font-size-m};
