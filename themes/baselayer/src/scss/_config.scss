@@ -17,8 +17,10 @@ $icon-path: '#{$theme-path}/assets/icons' !default;
 // Colors
 $color-primary: #4080ff !default;
 $color-primary-dark: #{color.adjust($color-primary, $lightness: -8%)} !default;
+$color-primary-light: #{color.adjust($color-primary, $lightness: 8%)} !default;
 $color-secondary: #00aaff !default;
 $color-secondary-dark: #{color.adjust($color-secondary, $lightness: -8%)} !default;
+$color-secondary-light: #{color.adjust($color-secondary, $lightness: 8%)} !default;
 
 // Grayscale
 $color-white: #fff !default;

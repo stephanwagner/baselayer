@@ -1,7 +1,75 @@
 @use '../config' as *;
 @use '../mixins' as *;
 
-// Global
+// Tag styles
+
+:root {
+  // Text
+  --bl-text-margin-top: 0;
+  --bl-text-margin-bottom: 16px;
+
+  // Headlines
+  --bl-heading-font-weight: 600;
+
+  --bl-h1-font-size: 32px;
+  --bl-h1-line-height: 1.3;
+  --bl-h1-font-weight: var(--bl-heading-font-weight);
+  --bl-h1-margin-top: 48px;
+  --bl-h1-margin-bottom: 24px;
+
+  --bl-h2-font-size: 28px;
+  --bl-h2-line-height: 1.3;
+  --bl-h2-font-weight: var(--bl-heading-font-weight);
+  --bl-h2-margin-top: 32px;
+  --bl-h2-margin-bottom: 16px;
+
+  --bl-h3-font-size: 24px;
+  --bl-h3-line-height: 1.3;
+  --bl-h3-font-weight: var(--bl-heading-font-weight);
+  --bl-h3-margin-top: 24px;
+  --bl-h3-margin-bottom: 12px;
+
+  --bl-h4-font-size: 20px;
+  --bl-h4-line-height: 1.4;
+  --bl-h4-font-weight: var(--bl-heading-font-weight);
+  --bl-h4-margin-top: 16px;
+  --bl-h4-margin-bottom: 8px;
+
+  --bl-h5-font-size: var(--bl-font-size-l);
+  --bl-h5-line-height: var(--bl-line-height-l);
+  --bl-h5-font-weight: var(--bl-heading-font-weight);
+  --bl-h5-margin-top: 16px;
+  --bl-h5-margin-bottom: 6px;
+
+  --bl-h6-font-size: var(--bl-default-font-size);
+  --bl-h6-line-height: var(--bl-default-line-height);
+  --bl-h6-font-weight: var(--bl-heading-font-weight);
+  --bl-h6-margin-top: 16px;
+  --bl-h6-margin-bottom: 4px;
+
+  @media (max-width: $breakpoint-m) {
+    --bl-h1-font-size: 28px;
+    --bl-h2-font-size: 26px;
+  }
+
+  @media (max-width: $breakpoint-s) {
+    --bl-h1-font-size: 26px;
+    --bl-h1-margin-top: 32px;
+    --bl-h1-margin-bottom: 16px;
+    --bl-h2-font-size: 24px;
+    --bl-h2-margin-top: 32px;
+    --bl-h2-margin-bottom: 8px;
+    --bl-h3-font-size: 22px;
+  }
+}
+
+@mixin heading-level($n) {
+  font-size: var(--bl-h#{$n}-font-size);
+  line-height: var(--bl-h#{$n}-line-height);
+  font-weight: var(--bl-h#{$n}-font-weight);
+  margin-top: var(--bl-h#{$n}-margin-top);
+  margin-bottom: var(--bl-h#{$n}-margin-bottom);
+}
 
 @mixin tags {
   *,
@@ -13,7 +81,7 @@
 
   // Links
 
-  a {
+  :where(a) {
     color: var(--bl-link-color);
     text-decoration: none;
 
@@ -22,18 +90,24 @@
     }
 
     &:hover {
-      text-decoration: none;
       color: var(--bl-link-color-hover);
+      text-decoration: none;
     }
   }
 
   // Paragraphs
 
-  p {
-    margin-top: 0;
-    margin-bottom: 16px;
+  :where(p),
+  :where(ul),
+  :where(ol) {
+    margin-top: var(--bl-text-margin-top);
+    margin-bottom: var(--bl-text-margin-bottom);
 
-    &:last-child {
+    &:where(:first-child) {
+      margin-bottom: 0;
+    }
+
+    &:where(:last-child) {
       margin-bottom: 0;
     }
 
@@ -44,149 +118,48 @@
         border-radius: var(--bl-border-radius-m);
       }
 
-      @media (max-width: $breakpoint-s) {
+      @media (max-width: $breakpoint-xs) {
         padding: 12px 16px;
       }
     }
   }
 
   // Headlines
-  
-  h1,
-  .h1,
-  h2,
-  .h2,
-  h3.h1,
-  h3.h2,
-  h4.h1,
-  h4.h2,
-  h5.h1,
-  h5.h2,
-  h6.h1,
-  h6.h2 {
-    font-size: 32px;
-    line-height: 1.3;
-    font-weight: 600;
-    margin-top: 48px;
-    margin-bottom: 20px;
-
-    &:first-child {
-      margin-top: 0;
-    }
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-
-    @media (max-width: $breakpoint-l) {
-      font-size: 30px;
-    }
-
-    @media (max-width: $breakpoint-m) {
-      font-size: 28px;
-      line-height: 1.4;
-    }
-
-    @media (max-width: $breakpoint-s) {
-      font-size: 26px;
-      margin-top: 32px;
-      margin-bottom: 12px;
-    }
+  :where(h1:not(.h2, .h3, .h4, .h5, .h6), .h1) {
+    @include heading-level(1);
   }
 
-  h3,
-  .h3,
-  h1.h3,
-  h2.h3,
-  h4.h3,
-  h5.h3 {
-    font-size: 24px;
-    line-height: 1.3;
-    font-weight: 600;
-    margin-top: 24px;
-    margin-bottom: 12px;
-
-    &:first-child {
-      margin-top: 0;
-    }
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-
-    @media (max-width: $breakpoint-s) {
-      font-size: 22px;
-    }
+  :where(h2:not(.h1, .h3, .h4, .h5, .h6), .h2) {
+    @include heading-level(2);
   }
 
-  h4,
-  .h4,
-  h1.h4,
-  h2.h4,
-  h3.h4,
-  h5.h4,
-  h6.h4 {
-    font-size: 20px;
-    line-height: 1.4;
-    font-weight: 600;
-    margin-top: 16px;
-    margin-bottom: 8px;
-
-    &:first-child {
-      margin-top: 0;
-    }
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-
-    @media (max-width: $breakpoint-xs) {
-      font-size: 18px;
-      line-height: 1.5;
-    }
+  :where(h3:not(.h1, .h2, .h4, .h5, .h6), .h3) {
+    @include heading-level(3);
   }
 
-  h5,
-  .h5,
-  h1.h5,
-  h2.h5,
-  h3.h5,
-  h4.h5,
-  h6.h5 {
-    font-size: var(--bl-font-size-l);
-    line-height: var(--bl-line-height-l);
-    font-weight: 600;
-    margin-top: 16px;
-    margin-bottom: 6px;
-
-    &:first-child {
-      margin-top: 0;
-    }
-
-    &:last-child {
-      margin-bottom: 0;
-    }
+  :where(h4:not(.h1, .h2, .h3, .h5, .h6), .h4) {
+    @include heading-level(4);
   }
 
-  h6,
-  .h6,
-  h1.h6,
-  h2.h6,
-  h3.h6,
-  h4.h6,
-  h5.h6 {
-    font-size: var(--bl-default-font-size);
-    line-height: var(--bl-default-line-height);
-    font-weight: 600;
-    margin-top: 16px;
-    margin-bottom: 4px;
+  :where(h5:not(.h1, .h2, .h3, .h4, .h6), .h5) {
+    @include heading-level(5);
+  }
 
-    &:first-child {
+  :where(h6:not(.h1, .h2, .h3, .h4, .h5), .h6) {
+    @include heading-level(6);
+  }
+
+  :where(h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6) {
+    &:where(:first-child) {
       margin-top: 0;
     }
 
-    &:last-child {
+    &:where(:last-child) {
       margin-bottom: 0;
+    }
+
+    & + :where(h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6) {
+      margin-top: 0;
     }
   }
 
