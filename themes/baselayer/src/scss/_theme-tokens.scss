@@ -9,6 +9,11 @@
 @use 'config' as *;
 
 @mixin bl-theme-tokens {
+  // Page
+  --bl-page-background-color: #{$page-background-color};
+  --bl-content-padding-top: #{$content-padding-top};
+  --bl-content-padding-bottom: #{$content-padding-bottom};
+
   // Colors
   --bl-color-primary: #{$color-primary};
   --bl-color-primary-dark: #{$color-primary-dark};
@@ -208,6 +213,7 @@
   --bl-container-edge-spacing-l: #{$container-edge-spacing-l};
   --bl-container-edge-spacing-xl: #{$container-edge-spacing-xl};
 
+  // Current container edge spacing
   --bl-container-edge-spacing: var(--bl-container-edge-spacing-xl);
 
   @media (max-width: #{$breakpoint-l}) {

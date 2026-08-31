@@ -6,7 +6,7 @@ body {
   font-size: var(--bl-default-font-size);
   line-height: var(--bl-default-line-height);
   color: var(--bl-default-text-color);
-  background: #fff;
+  background: var(--bl-page-background-color);
 }
 
 @view-transition {
@@ -24,15 +24,7 @@ body {
 
 .content__wrapper {
   flex: 1;
-  padding: 32px 0 48px;
-
-  @media (max-width: $breakpoint-m) {
-    padding: 32px 0;
-  }
-
-  @media (max-width: $breakpoint-s) {
-    padding: 24px 0;
-  }
+  padding: var(--bl-content-padding-top) 0 var(--bl-content-padding-bottom);
 }
 
 .content__content {

@@ -14,6 +14,11 @@ $theme-path: '/wp-content/themes/baselayer';
 // Icon path
 $icon-path: '#{$theme-path}/assets/icons' !default;
 
+// Page
+$page-background-color: #fff !default;
+$content-padding-top: 32px !default;
+$content-padding-bottom: 48px !default;
+
 // Colors
 $color-primary: #4080ff !default;
 $color-primary-dark: #{color.adjust($color-primary, $lightness: -8%)} !default;

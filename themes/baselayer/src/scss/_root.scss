@@ -17,13 +17,24 @@
   @media (max-width: $breakpoint-mobile) {
     --bl-header-height-scrolled-current: var(--bl-header-height-mobile-scrolled);
   }
+
+  // Content padding
+  @media (max-width: $breakpoint-m) {
+    --bl-content-padding-top: 32px;
+    --bl-content-padding-bottom: 32px;
+  }
+
+  @media (max-width: $breakpoint-s) {
+    --bl-content-padding-top: 24px;
+    --bl-content-padding-bottom: 24px;
+  }
 }
 
 // Save admin bar height for use in JS
 body.admin-bar {
   --bl-admin-bar-height: 32px;
 
-  @media (max-width: 782px) {
+  @media (max-width: $breakpoint-wordpress) {
     --bl-admin-bar-height: 46px;
   }
 }
