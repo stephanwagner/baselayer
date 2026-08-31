@@ -75,6 +75,7 @@ $default-text-color: $color-gray-900 !default;
 $gray-text-color: $color-gray-600 !default;
 $default-font-size: $font-size-m !default;
 $default-line-height: $line-height-m !default;
+$default-font-weight: 400 !default;
 $link-color: $color-primary !default;
 $link-color-hover: $color-primary-dark !default;
 $text-margin-top: 0 !default;
@@ -184,6 +185,8 @@ $border-radius-m: 8px !default;
 $border-radius-l: 16px !default;
 
 // Buttons
+$button-font-weight: 600 !default;
+
 $button-primary-color: $color-white !default;
 $button-primary-color-hover: $color-white !default;
 $button-primary-background-color: $color-primary !default;

@@ -11,7 +11,8 @@
 
   font-family: var(--bl-primary-font-family);
   font-size: var(--bl-default-font-size);
-  line-height: 1.5;
+  font-weight: var(--bl-default-font-weight);
+  line-height: var(--bl-default-line-height);
 
   // Preview HTML often includes real <a href> (article list, buttons, etc.).
   // Disable hit-testing so clicks select the block instead of navigating away.

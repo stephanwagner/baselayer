@@ -2,11 +2,12 @@
 @use '../mixins' as *;
 
 body {
+  background: var(--bl-page-background-color);
   font-family: var(--bl-primary-font-family);
   font-size: var(--bl-default-font-size);
+  font-weight: var(--bl-default-font-weight);
   line-height: var(--bl-default-line-height);
   color: var(--bl-default-text-color);
-  background: var(--bl-page-background-color);
 }
 
 @view-transition {

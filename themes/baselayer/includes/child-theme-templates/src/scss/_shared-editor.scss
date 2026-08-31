@@ -1,0 +1,5 @@
+@use 'layout/tags' as tags;
+
+.editor-styles-wrapper {
+  @include tags.shared();
+}

@@ -82,7 +82,7 @@
     text-align: center;
     background: var(--bl-button-primary-background-color);
     border: 2px solid var(--bl-button-primary-border-color);
-    font-weight: 600;
+    font-weight: var(--bl-button-font-weight);
     height: auto;
     text-decoration: none !important;
     cursor: pointer;
@@ -309,7 +309,7 @@
     padding: 0 !important;
     color: var(--bl-link-color);
     font-size: var(--bl-button-font-size) !important;
-    font-weight: 600;
+    font-weight: var(--bl-button-font-weight);
     line-height: 1.4;
     overflow: visible;
     text-decoration: none !important;

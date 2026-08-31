@@ -71,6 +71,7 @@
   --bl-gray-text-color: #{$gray-text-color};
   --bl-default-font-size: #{$default-font-size};
   --bl-default-line-height: #{$default-line-height};
+  --bl-default-font-weight: #{$default-font-weight};
   --bl-link-color: #{$link-color};
   --bl-link-color-hover: #{$link-color-hover};
   --bl-text-margin-top: #{$text-margin-top};
@@ -127,30 +128,36 @@
   }
 
   // Buttons
+  --bl-button-font-weight: #{$button-font-weight};
+
   --bl-button-primary-color: #{$button-primary-color};
   --bl-button-primary-color-hover: #{$button-primary-color-hover};
   --bl-button-primary-background-color: #{$button-primary-background-color};
   --bl-button-primary-background-color-hover: #{$button-primary-background-color-hover};
   --bl-button-primary-border-color: #{$button-primary-border-color};
   --bl-button-primary-border-color-hover: #{$button-primary-border-color-hover};
+
   --bl-button-secondary-color: #{$button-secondary-color};
   --bl-button-secondary-color-hover: #{$button-secondary-color-hover};
   --bl-button-secondary-background-color: #{$button-secondary-background-color};
   --bl-button-secondary-background-color-hover: #{$button-secondary-background-color-hover};
   --bl-button-secondary-border-color: #{$button-secondary-border-color};
   --bl-button-secondary-border-color-hover: #{$button-secondary-border-color-hover};
+
   --bl-button-white-color: #{$button-white-color};
   --bl-button-white-color-hover: #{$button-white-color-hover};
   --bl-button-white-background-color: #{$button-white-background-color};
   --bl-button-white-background-color-hover: #{$button-white-background-color-hover};
   --bl-button-white-border-color: #{$button-white-border-color};
   --bl-button-white-border-color-hover: #{$button-white-border-color-hover};
+
   --bl-button-muted-color: #{$button-muted-color};
   --bl-button-muted-color-hover: #{$button-muted-color-hover};
   --bl-button-muted-background-color: #{$button-muted-background-color};
   --bl-button-muted-background-color-hover: #{$button-muted-background-color-hover};
   --bl-button-muted-border-color: #{$button-muted-border-color};
   --bl-button-muted-border-color-hover: #{$button-muted-border-color-hover};
+  
   --bl-button-disabled-color: #{$button-disabled-color};
   --bl-button-disabled-background-color: #{$button-disabled-background-color};
   --bl-button-disabled-border-color: #{$button-disabled-border-color};
