@@ -92,7 +92,7 @@
   :where(h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6) {
     font-family: var(--bl-heading-font-family);
     font-weight: var(--bl-heading-font-weight);
-    color: var(--bl-heading-color);
+    color: var(--bl-heading-text-color);
 
     &:where(:first-child) {
       margin-top: 0;

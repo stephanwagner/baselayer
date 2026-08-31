@@ -85,6 +85,7 @@ $text-margin-bottom: 16px !default;
 $heading-font-family: $secondary-font-family !default;
 $heading-font-weight: 600 !default;
 $heading-line-height: 1.3 !default;
+$heading-text-color: $default-text-color !default;
 
 $h1-font-size: 32px !default;
 $h1-line-height: $heading-line-height !default;
@@ -186,6 +187,8 @@ $border-radius-l: 16px !default;
 
 // Buttons
 $button-font-weight: 600 !default;
+$button-icon-size: 1.25em !default;
+$button-icon-gap: 0.375em !default;
 
 $button-primary-color: $color-white !default;
 $button-primary-color-hover: $color-white !default;
@@ -239,9 +242,6 @@ $button-border-radius-l: 25px !default;
 $button-font-size-l: $font-size-l !default;
 $button-line-height-l: 24px !default;
 $button-icon-inset-l: 14px !default;
-
-$button-icon-size: 1.25em !default;
-$button-icon-gap: 0.375em !default;
 
 // Pixel density
 $high-density-dppx: 1.9dppx !default;

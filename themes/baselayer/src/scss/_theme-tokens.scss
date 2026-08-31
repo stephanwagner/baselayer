@@ -80,7 +80,7 @@
   // Headlines
   --bl-heading-font-family: #{$heading-font-family};
   --bl-heading-font-weight: #{$heading-font-weight};
-  --bl-heading-color: #{$default-text-color};
+  --bl-heading-text-color: #{$heading-text-color};
 
   --bl-h1-font-size: #{$h1-font-size};
   --bl-h1-line-height: #{$h1-line-height};
@@ -129,6 +129,8 @@
 
   // Buttons
   --bl-button-font-weight: #{$button-font-weight};
+  --bl-button-icon-size: #{$button-icon-size};
+  --bl-button-icon-gap: #{$button-icon-gap};
 
   --bl-button-primary-color: #{$button-primary-color};
   --bl-button-primary-color-hover: #{$button-primary-color-hover};
@@ -169,8 +171,6 @@
   --bl-button-font-size: #{$button-font-size};
   --bl-button-line-height: #{$button-line-height};
   --bl-button-icon-inset: #{$button-icon-inset};
-  --bl-button-icon-size: #{$button-icon-size};
-  --bl-button-icon-gap: #{$button-icon-gap};
 
   // Button size scale
   --bl-button-padding-y-s: #{$button-padding-y-s};

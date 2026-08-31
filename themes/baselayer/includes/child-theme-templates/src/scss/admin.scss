@@ -8,15 +8,18 @@
 // Config
 @forward 'config';
 
-// Child theme fonts (Developer → Tools → Install Google Font)
+// Child theme fonts
 @forward 'fonts';
 
 // Parent admin/editor styles, compiled with the child config
 @forward '../../../baselayer/src/scss/admin';
 
-// Child-only CSS custom properties
+// Child theme CSS custom properties
 @forward 'root';
 
-// Child BaseLayer custom block overrides (front + editor tweaks)
+// Child theme shared styles
+@forward 'shared-editor';
+
+// Child theme custom block overrides
 @forward '../../blocks/blocks';
 @forward '../../blocks/blocks-editor';

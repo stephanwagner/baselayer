@@ -18,14 +18,21 @@
 // Config
 @forward 'config';
 
-// Child theme fonts (Developer → Tools → Install Google Font)
+// Child theme fonts
 @forward 'fonts';
 
 // Parent frontend styles, compiled with the child config
 @forward '../../../baselayer/src/scss/main';
 
-// Child-only CSS custom properties
+// Child theme CSS custom properties
 @forward 'root';
 
-// Child BaseLayer custom block overrides
+// Child theme shared styles
+@forward 'shared-editor';
+
+// Child theme layout styles
+@forward 'layout/header';
+@forward 'layout/footer';
+
+// Child theme custom block overrides
 @forward '../../blocks/blocks';
