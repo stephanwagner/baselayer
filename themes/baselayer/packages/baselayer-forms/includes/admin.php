@@ -213,6 +213,7 @@ function bl_forms_palette_icons(): array
 		'email',
 		'url',
 		'number',
+		'range',
 		'phone',
 		'checkboxes',
 		'radio',

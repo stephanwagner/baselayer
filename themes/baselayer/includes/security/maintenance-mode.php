@@ -41,9 +41,10 @@ function bl_maintenance_show_page(): void
 {
 	// Load text domain for maintenance page
 	if (!is_textdomain_loaded('baselayer')) {
-		load_theme_textdomain('baselayer');
+		$languages = get_template_directory() . '/languages';
+		load_theme_textdomain('baselayer', $languages);
 		if (!is_textdomain_loaded('baselayer')) {
-			$mofile = get_template_directory() . '/languages/baselayer-' . determine_locale() . '.mo';
+			$mofile = $languages . '/baselayer-' . determine_locale() . '.mo';
 			if (file_exists($mofile)) {
 				load_textdomain('baselayer', $mofile);
 			}

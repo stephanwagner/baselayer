@@ -198,14 +198,65 @@ if (is_admin()) {
 }
 
 /**
+ * Packaged .mo path for a locale, with a short regional fallback (de_CH_informal → de_CH).
+ */
+function bl_editorial_packaged_mofile(?string $locale = null): string
+{
+	$domain = BL_EDITORIAL_TEXTDOMAIN;
+	$locale = $locale ?: (function_exists('determine_locale') ? determine_locale() : get_locale());
+	$dir = BL_EDITORIAL_PATH . 'languages/';
+	$candidates = [$locale];
+	if (preg_match('/^([a-z]{2,3}_[A-Z]{2})/', $locale, $m) && $m[1] !== $locale) {
+		$candidates[] = $m[1];
+	}
+
+	foreach (array_unique($candidates) as $loc) {
+		$file = $dir . $domain . '-' . $loc . '.mo';
+		if (is_readable($file)) {
+			return $file;
+		}
+	}
+
+	return '';
+}
+
+/**
+ * Point JIT / WP_LANG_DIR lookups at the packaged catalog when the domain is not loaded yet,
+ * so a partial Loco or language-pack file cannot become the only catalog.
+ */
+function bl_editorial_load_textdomain_mofile(string $mofile, string $domain): string
+{
+	if ($domain !== BL_EDITORIAL_TEXTDOMAIN) {
+		return $mofile;
+	}
+
+	$locale = function_exists('determine_locale') ? determine_locale() : get_locale();
+	$packaged = bl_editorial_packaged_mofile($locale);
+	if ($packaged === '') {
+		return $mofile;
+	}
+
+	$requested = function_exists('wp_normalize_path') ? wp_normalize_path($mofile) : $mofile;
+	$packaged_norm = function_exists('wp_normalize_path') ? wp_normalize_path($packaged) : $packaged;
+	if ($requested === $packaged_norm) {
+		return $mofile;
+	}
+
+	if (!is_textdomain_loaded($domain) || !is_readable($mofile)) {
+		return $packaged;
+	}
+
+	return $mofile;
+}
+
+/**
  * Load package translations.
  */
 function bl_editorial_load_textdomain(): void
 {
 	$domain = BL_EDITORIAL_TEXTDOMAIN;
-	$locale = function_exists('determine_locale') ? determine_locale() : get_locale();
-	$mofile = BL_EDITORIAL_PATH . 'languages/' . $domain . '-' . $locale . '.mo';
-	if (is_readable($mofile)) {
+	$mofile = bl_editorial_packaged_mofile();
+	if ($mofile !== '') {
 		load_textdomain($domain, $mofile);
 	}
 
@@ -213,4 +264,5 @@ function bl_editorial_load_textdomain(): void
 		load_plugin_textdomain($domain, false, dirname(plugin_basename(BL_EDITORIAL_FILE)) . '/languages');
 	}
 }
+add_filter('load_textdomain_mofile', 'bl_editorial_load_textdomain_mofile', 10, 2);
 add_action('init', 'bl_editorial_load_textdomain', 1);

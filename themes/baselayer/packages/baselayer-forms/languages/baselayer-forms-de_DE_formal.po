@@ -2142,7 +2142,7 @@ msgstr "Standard bis"
 
 #: includes/admin.php
 msgid "Mode"
-msgstr "Modus"
+msgstr "Auswahl"
 
 #: includes/admin.php
 msgid "Single value"
