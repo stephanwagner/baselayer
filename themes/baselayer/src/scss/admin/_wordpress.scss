@@ -309,3 +309,11 @@ hr.wp-block-separator.block-editor-block-list__block {
     }
   }
 }
+
+// Fix overflow text in gallery button
+
+.wp-block-gallery__source-settings {
+  button {
+    white-space: normal !important;
+  }
+}
