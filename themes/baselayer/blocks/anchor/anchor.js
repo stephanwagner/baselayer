@@ -1,7 +1,8 @@
 import { scrollToElement, getOffset } from '../../src/js/utils/scroll-to-element';
 import { closeMenu } from '../../src/js/main/menu-state';
 
-const SCOPE = '.bl-wp-block.-baselayer-block';
+const ANCHOR = '[data-anchor-id]';
+const ACCORDION = '.bl-wp-block.-baselayer-block.accordion__wrapper';
 
 function getHashIdFromHref(href) {
   if (!href || typeof href !== 'string' || href.indexOf('#') === -1) {
@@ -34,7 +35,7 @@ function isAccordionHash(hashId) {
     return false;
   }
 
-  return !!document.querySelector(`${SCOPE}.accordion__wrapper[data-accordion-id="${CSS.escape(hashId)}"]`);
+  return !!document.querySelector(`${ACCORDION}[data-accordion-id="${CSS.escape(hashId)}"]`);
 }
 
 /**
@@ -65,13 +66,13 @@ function scrollToAnchorByHash(hash) {
     return;
   }
 
-  const anchorEl = document.querySelector(`${SCOPE}[data-anchor-id="${CSS.escape(hashId)}"]`);
+  const anchorEl = document.querySelector(`[data-anchor-id="${CSS.escape(hashId)}"]`);
   if (anchorEl) {
     scrollToAnchor(anchorEl);
   }
 }
 
-if (document.querySelector(`${SCOPE}[data-anchor-id]`)) {
+if (document.querySelector(ANCHOR)) {
   document.querySelectorAll('a[href*="#"]').forEach((link) => {
     const href = link.getAttribute('href') || '';
     const hashId = getHashIdFromHref(href);
@@ -80,7 +81,7 @@ if (document.querySelector(`${SCOPE}[data-anchor-id]`)) {
       return;
     }
 
-    const anchorEl = document.querySelector(`${SCOPE}[data-anchor-id="${CSS.escape(hashId)}"]`);
+    const anchorEl = document.querySelector(`[data-anchor-id="${CSS.escape(hashId)}"]`);
     if (!anchorEl) {
       return;
     }
@@ -106,7 +107,7 @@ if (document.querySelector(`${SCOPE}[data-anchor-id]`)) {
 }
 
 function checkActiveNav() {
-  const anchors = Array.from(document.querySelectorAll(`${SCOPE}[data-anchor-id]`)).reverse();
+  const anchors = Array.from(document.querySelectorAll(ANCHOR)).reverse();
   const windowTop = window.scrollY || document.documentElement.scrollTop;
   const menuItems = document.querySelectorAll('header .menu-item');
 
