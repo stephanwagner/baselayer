@@ -261,6 +261,31 @@ function bl_blocks_format_field_value(array $field, $value)
 		return $items[0] ?? null;
 	}
 
+	if ($type === 'range') {
+		if (function_exists('bl_blocks_range_mode') && bl_blocks_range_mode($field) === 'single') {
+			if (is_array($value)) {
+				$value = $value['from'] ?? ($value['value'] ?? '');
+			}
+			if (!is_scalar($value) || !is_numeric($value)) {
+				return '';
+			}
+
+			return (string) $value;
+		}
+
+		$pair = is_array($value) ? $value : [];
+		$from = isset($pair['from']) && is_numeric($pair['from']) ? (string) $pair['from'] : '';
+		$to = isset($pair['to']) && is_numeric($pair['to']) ? (string) $pair['to'] : '';
+		if ($from === '' && $to === '') {
+			return null;
+		}
+
+		return [
+			'from' => $from,
+			'to'   => $to,
+		];
+	}
+
 	$multi = $type === 'checkboxes'
 		|| ($type === 'button_group' && !empty($field['multiple']))
 		|| ($type === 'select' && !empty($field['multiple']));

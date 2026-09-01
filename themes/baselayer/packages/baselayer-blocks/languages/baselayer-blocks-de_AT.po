@@ -158,6 +158,22 @@ msgstr "URL"
 msgid "Number"
 msgstr "Zahl"
 
+#: includes/admin-editor.php:333
+msgid "Value range"
+msgstr "Wertebereich"
+
+#: includes/admin-editor.php:626
+msgid "Mode"
+msgstr "Modus"
+
+#: includes/admin-editor.php:627
+msgid "Single value"
+msgstr "Einzelwert"
+
+#: includes/admin-editor.php:628
+msgid "Range"
+msgstr "Bereich"
+
 #: includes/admin-editor.php:266
 msgid "Checkboxes"
 msgstr "Checkboxen"
@@ -1043,6 +1059,18 @@ msgstr "Ohne"
 #: includes/admin-editor.php:469
 msgid "Default value"
 msgstr "Standardwert"
+
+#: includes/admin-editor.php:623
+msgid "Step"
+msgstr "Schrittweite"
+
+#: includes/admin-editor.php:624
+msgid "Default from"
+msgstr "Standard von"
+
+#: includes/admin-editor.php:625
+msgid "Default to"
+msgstr "Standard bis"
 
 #: includes/admin-editor.php:470
 msgid "Use option slugs from the list above. For multiple values, separate with commas (e.g. option-1, option-2)."

@@ -22,6 +22,7 @@ export const TYPE_KEYS = [
   'phone',
   'url',
   'number',
+  'range',
   'terms',
   'checkboxes',
   'radio',
@@ -499,6 +500,12 @@ export function defaultField(type = 'text') {
   }
   if (type === 'textarea') {
     base.rows = 4;
+  }
+  if (type === 'range') {
+    base.min = '0';
+    base.max = '10';
+    base.mode = 'range';
+    base.default_value = { from: '', to: '' };
   }
   return base;
 }

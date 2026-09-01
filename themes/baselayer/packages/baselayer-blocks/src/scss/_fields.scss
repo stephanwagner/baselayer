@@ -118,6 +118,26 @@
   }
 }
 
+.bl-blocks-fields__range {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+
+  .bl-blocks-fields__input-group {
+    width: auto;
+    min-width: 0;
+  }
+}
+
+.bl-blocks-fields__range-sep {
+  color: #50575e;
+  font-size: 13px;
+  line-height: 1;
+  user-select: none;
+}
+
 .bl-blocks-fields__affix {
   display: inline-flex;
   align-items: center;
@@ -775,7 +795,8 @@ button.button-link.bl-blocks-fields__card-remove {
 
 .bl-blocks-sidebar-fields,
 .bl-blocks-modal__body,
-.bl-blocks-website__main {
+.bl-blocks-website__main,
+.bl-blocks-content-fields {
   .bl-blocks-fields__section-title,
   .bl-blocks-fields__heading {
     margin: 0;
@@ -803,7 +824,8 @@ button.button-link.bl-blocks-fields__card-remove {
 
 // Modal + Website: keep outline/card chrome; drop the field separator after boxed layouts.
 .bl-blocks-modal__body,
-.bl-blocks-website__main {
+.bl-blocks-website__main,
+.bl-blocks-content-fields {
   .bl-blocks-fields,
   .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column),
   .bl-blocks-fields__tab-panel {

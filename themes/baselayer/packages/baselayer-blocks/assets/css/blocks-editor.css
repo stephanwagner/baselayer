@@ -562,6 +562,25 @@ body.bl-page-picker-open {
   outline: none;
 }
 
+.bl-blocks-fields__range {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+.bl-blocks-fields__range .bl-blocks-fields__input-group {
+  width: auto;
+  min-width: 0;
+}
+
+.bl-blocks-fields__range-sep {
+  color: #50575e;
+  font-size: 13px;
+  line-height: 1;
+  user-select: none;
+}
+
 .bl-blocks-fields__affix {
   display: inline-flex;
   align-items: center;
@@ -1182,7 +1201,9 @@ button.button-link.bl-blocks-fields__card-remove:focus {
 .bl-blocks-modal__body .bl-blocks-fields__section-title,
 .bl-blocks-modal__body .bl-blocks-fields__heading,
 .bl-blocks-website__main .bl-blocks-fields__section-title,
-.bl-blocks-website__main .bl-blocks-fields__heading {
+.bl-blocks-website__main .bl-blocks-fields__heading,
+.bl-blocks-content-fields .bl-blocks-fields__section-title,
+.bl-blocks-content-fields .bl-blocks-fields__heading {
   margin: 0;
   white-space: pre-line;
   font-weight: 600;
@@ -1192,7 +1213,8 @@ button.button-link.bl-blocks-fields__card-remove:focus {
 }
 .bl-blocks-sidebar-fields h2.bl-blocks-fields__heading,
 .bl-blocks-modal__body h2.bl-blocks-fields__heading,
-.bl-blocks-website__main h2.bl-blocks-fields__heading {
+.bl-blocks-website__main h2.bl-blocks-fields__heading,
+.bl-blocks-content-fields h2.bl-blocks-fields__heading {
   font-size: 17px;
 }
 .bl-blocks-sidebar-fields h3.bl-blocks-fields__heading,
@@ -1200,13 +1222,16 @@ button.button-link.bl-blocks-fields__card-remove:focus {
 .bl-blocks-modal__body h3.bl-blocks-fields__heading,
 .bl-blocks-modal__body h3.bl-blocks-fields__section-title,
 .bl-blocks-website__main h3.bl-blocks-fields__heading,
-.bl-blocks-website__main h3.bl-blocks-fields__section-title {
+.bl-blocks-website__main h3.bl-blocks-fields__section-title,
+.bl-blocks-content-fields h3.bl-blocks-fields__heading,
+.bl-blocks-content-fields h3.bl-blocks-fields__section-title {
   font-size: 15px;
   margin: 0 0 12px;
 }
 .bl-blocks-sidebar-fields h4.bl-blocks-fields__heading,
 .bl-blocks-modal__body h4.bl-blocks-fields__heading,
-.bl-blocks-website__main h4.bl-blocks-fields__heading {
+.bl-blocks-website__main h4.bl-blocks-fields__heading,
+.bl-blocks-content-fields h4.bl-blocks-fields__heading {
   font-size: 13px;
 }
 
@@ -1245,7 +1270,25 @@ button.button-link.bl-blocks-fields__card-remove:focus {
 .bl-blocks-website__main .bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__repeater--outline:not([hidden]),
 .bl-blocks-website__main .bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__repeater--card:not([hidden]),
 .bl-blocks-website__main .bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__tab-panel--outline:not([hidden]),
-.bl-blocks-website__main .bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__tab-panel--card:not([hidden]) {
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__tab-panel--card:not([hidden]),
+.bl-blocks-content-fields .bl-blocks-fields > *:not([hidden]) + .bl-blocks-fields__layout--outline:not([hidden]),
+.bl-blocks-content-fields .bl-blocks-fields > *:not([hidden]) + .bl-blocks-fields__layout--card:not([hidden]),
+.bl-blocks-content-fields .bl-blocks-fields > *:not([hidden]) + .bl-blocks-fields__repeater--outline:not([hidden]),
+.bl-blocks-content-fields .bl-blocks-fields > *:not([hidden]) + .bl-blocks-fields__repeater--card:not([hidden]),
+.bl-blocks-content-fields .bl-blocks-fields > *:not([hidden]) + .bl-blocks-fields__tab-panel--outline:not([hidden]),
+.bl-blocks-content-fields .bl-blocks-fields > *:not([hidden]) + .bl-blocks-fields__tab-panel--card:not([hidden]),
+.bl-blocks-content-fields .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > *:not([hidden]) + .bl-blocks-fields__layout--outline:not([hidden]),
+.bl-blocks-content-fields .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > *:not([hidden]) + .bl-blocks-fields__layout--card:not([hidden]),
+.bl-blocks-content-fields .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > *:not([hidden]) + .bl-blocks-fields__repeater--outline:not([hidden]),
+.bl-blocks-content-fields .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > *:not([hidden]) + .bl-blocks-fields__repeater--card:not([hidden]),
+.bl-blocks-content-fields .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > *:not([hidden]) + .bl-blocks-fields__tab-panel--outline:not([hidden]),
+.bl-blocks-content-fields .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > *:not([hidden]) + .bl-blocks-fields__tab-panel--card:not([hidden]),
+.bl-blocks-content-fields .bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__layout--outline:not([hidden]),
+.bl-blocks-content-fields .bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__layout--card:not([hidden]),
+.bl-blocks-content-fields .bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__repeater--outline:not([hidden]),
+.bl-blocks-content-fields .bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__repeater--card:not([hidden]),
+.bl-blocks-content-fields .bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__tab-panel--outline:not([hidden]),
+.bl-blocks-content-fields .bl-blocks-fields__tab-panel > *:not([hidden]) + .bl-blocks-fields__tab-panel--card:not([hidden]) {
   padding-top: 12px;
   border-top: 1px solid #c3c4c7;
 }
@@ -1284,7 +1327,25 @@ button.button-link.bl-blocks-fields__card-remove:focus {
 .bl-blocks-website__main .bl-blocks-fields__tab-panel > .bl-blocks-fields__repeater--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
 .bl-blocks-website__main .bl-blocks-fields__tab-panel > .bl-blocks-fields__repeater--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
 .bl-blocks-website__main .bl-blocks-fields__tab-panel > .bl-blocks-fields__tab-panel--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
-.bl-blocks-website__main .bl-blocks-fields__tab-panel > .bl-blocks-fields__tab-panel--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card) {
+.bl-blocks-website__main .bl-blocks-fields__tab-panel > .bl-blocks-fields__tab-panel--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-content-fields .bl-blocks-fields > .bl-blocks-fields__layout--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-content-fields .bl-blocks-fields > .bl-blocks-fields__layout--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-content-fields .bl-blocks-fields > .bl-blocks-fields__repeater--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-content-fields .bl-blocks-fields > .bl-blocks-fields__repeater--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-content-fields .bl-blocks-fields > .bl-blocks-fields__tab-panel--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-content-fields .bl-blocks-fields > .bl-blocks-fields__tab-panel--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-content-fields .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__layout--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-content-fields .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__layout--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-content-fields .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__repeater--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-content-fields .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__repeater--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-content-fields .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__tab-panel--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-content-fields .bl-blocks-fields__layout:not(.bl-blocks-fields__layout--column) > .bl-blocks-fields__tab-panel--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-content-fields .bl-blocks-fields__tab-panel > .bl-blocks-fields__layout--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-content-fields .bl-blocks-fields__tab-panel > .bl-blocks-fields__layout--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-content-fields .bl-blocks-fields__tab-panel > .bl-blocks-fields__repeater--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-content-fields .bl-blocks-fields__tab-panel > .bl-blocks-fields__repeater--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-content-fields .bl-blocks-fields__tab-panel > .bl-blocks-fields__tab-panel--outline:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card),
+.bl-blocks-content-fields .bl-blocks-fields__tab-panel > .bl-blocks-fields__tab-panel--card:not([hidden]) + *:not([hidden]):not(.bl-blocks-fields__layout--outline):not(.bl-blocks-fields__layout--card):not(.bl-blocks-fields__repeater--outline):not(.bl-blocks-fields__repeater--card):not(.bl-blocks-fields__tab-panel--outline):not(.bl-blocks-fields__tab-panel--card) {
   margin-top: 16px;
   padding-top: 0;
   border-top: 0;

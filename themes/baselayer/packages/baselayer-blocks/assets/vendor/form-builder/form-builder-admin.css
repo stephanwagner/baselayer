@@ -1784,14 +1784,16 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
 .bl-forms-builder__height,
 .bl-forms-builder__margin,
 .bl-forms-builder__heading-level,
-.bl-forms-builder__layout {
+.bl-forms-builder__layout,
+.bl-forms-builder__range-mode {
   margin: 0 0 12px;
 }
 .bl-forms-builder__width > label,
 .bl-forms-builder__height > label,
 .bl-forms-builder__margin > label,
 .bl-forms-builder__heading-level > label,
-.bl-forms-builder__layout > label {
+.bl-forms-builder__layout > label,
+.bl-forms-builder__range-mode > label {
   display: block;
   margin-bottom: 6px;
   font-weight: 600;
@@ -1808,6 +1810,12 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
 }
 
 .bl-forms-builder__layout > .bl-forms-builder__segmented {
+  width: fit-content;
+  min-width: 260px;
+  max-width: 100%;
+}
+
+.bl-forms-builder__range-mode > .bl-forms-builder__segmented {
   width: fit-content;
   min-width: 260px;
   max-width: 100%;

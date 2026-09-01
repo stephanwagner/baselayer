@@ -36,7 +36,7 @@ add_action('init', 'bl_blocks_register_page_meta', 20);
 /**
  * Active page_settings definitions assigned to a post type.
  *
- * @return list<array{id: int, title: string, fields: list<array>, metaKey: string, description: string, sidebarEditing: bool}>
+ * @return list<array{id: int, title: string, fields: list<array>, metaKey: string, description: string, sidebarEditing: bool, contentEditing: bool}>
  */
 function bl_blocks_page_definitions_for_post_type(string $post_type): array
 {
@@ -49,17 +49,32 @@ function bl_blocks_page_definitions_for_post_type(string $post_type): array
 		}
 		$slug = bl_blocks_definition_slug((int) $post->ID, $config['settings']);
 		$out[] = [
-			'id'             => (int) $post->ID,
-			'slug'           => $slug,
-			'title'          => $post->post_title !== '' ? $post->post_title : __('Content Fields', 'baselayer-blocks'),
-			'description'    => (string) ($config['settings']['description'] ?? ''),
-			'fields'         => $config['fields'],
-			'metaKey'        => bl_blocks_page_meta_key($slug),
-			'sidebarEditing' => !empty($config['settings']['sidebar_editing']),
+			'id'              => (int) $post->ID,
+			'slug'            => $slug,
+			'title'           => $post->post_title !== '' ? $post->post_title : __('Content Fields', 'baselayer-blocks'),
+			'description'     => (string) ($config['settings']['description'] ?? ''),
+			'fields'          => $config['fields'],
+			'metaKey'         => bl_blocks_page_meta_key($slug),
+			'sidebarEditing'  => !empty($config['settings']['sidebar_editing']),
+			'contentEditing'  => !empty($config['settings']['content_editing']),
 		];
 	}
 
 	return $out;
+}
+
+/**
+ * Whether this definition should render as a content-column metabox on this screen.
+ *
+ * @param array{contentEditing?: bool} $def
+ */
+function bl_blocks_page_def_uses_content_metabox(array $def, bool $is_block_editor): bool
+{
+	if (!empty($def['contentEditing'])) {
+		return true;
+	}
+
+	return !$is_block_editor;
 }
 
 /**
@@ -73,15 +88,29 @@ function bl_blocks_enqueue_page_editor(string $hook): void
 		return;
 	}
 	$screen = function_exists('get_current_screen') ? get_current_screen() : null;
-	if (!$screen || !$screen->is_block_editor()) {
-		return;
-	}
-	if ($screen->post_type === BL_BLOCK_POST_TYPE) {
+	if (!$screen || $screen->post_type === BL_BLOCK_POST_TYPE) {
 		return;
 	}
 
 	$defs = bl_blocks_page_definitions_for_post_type($screen->post_type);
 	if ($defs === []) {
+		return;
+	}
+
+	$is_block_editor = $screen->is_block_editor();
+	$needs_metabox = false;
+	foreach ($defs as $def) {
+		if (bl_blocks_page_def_uses_content_metabox($def, $is_block_editor)) {
+			$needs_metabox = true;
+			break;
+		}
+	}
+
+	if ($needs_metabox && function_exists('bl_blocks_enqueue_field_ui_assets')) {
+		bl_blocks_enqueue_field_ui_assets();
+	}
+
+	if (!$is_block_editor) {
 		return;
 	}
 
@@ -196,3 +225,139 @@ function bl_blocks_enqueue_page_editor(string $hook): void
 	]);
 }
 add_action('admin_enqueue_scripts', 'bl_blocks_enqueue_page_editor');
+
+/**
+ * Content-column metaboxes for page_settings (classic screens, or content_editing).
+ */
+function bl_blocks_register_page_content_metaboxes(): void
+{
+	$screen = function_exists('get_current_screen') ? get_current_screen() : null;
+	if (!$screen || $screen->post_type === '' || $screen->post_type === BL_BLOCK_POST_TYPE) {
+		return;
+	}
+
+	$defs = bl_blocks_page_definitions_for_post_type($screen->post_type);
+	if ($defs === []) {
+		return;
+	}
+
+	$is_block_editor = $screen->is_block_editor();
+	foreach ($defs as $def) {
+		if (!bl_blocks_page_def_uses_content_metabox($def, $is_block_editor)) {
+			continue;
+		}
+		add_meta_box(
+			'bl_blocks_page_content_' . (int) $def['id'],
+			(string) $def['title'],
+			'bl_blocks_render_page_content_metabox',
+			$screen->post_type,
+			'normal',
+			'high',
+			[
+				'def' => $def,
+				'__block_editor_compatible_meta_box' => true,
+			]
+		);
+	}
+}
+add_action('add_meta_boxes', 'bl_blocks_register_page_content_metaboxes');
+
+/**
+ * @param WP_Post $post
+ * @param array{args?: array{def?: array}} $box
+ */
+function bl_blocks_render_page_content_metabox($post, array $box): void
+{
+	$def = is_array($box['args']['def'] ?? null) ? $box['args']['def'] : [];
+	if ($def === []) {
+		return;
+	}
+
+	static $nonce_printed = false;
+	if (!$nonce_printed) {
+		wp_nonce_field('bl_blocks_save_page_fields', 'bl_blocks_page_fields_nonce');
+		$nonce_printed = true;
+	}
+
+	$post_id = (int) $post->ID;
+	$def_id = (int) ($def['id'] ?? 0);
+	$slug = (string) ($def['slug'] ?? '');
+	$meta_key = (string) ($def['metaKey'] ?? '');
+	if ($post_id > 0 && $def_id > 0 && $slug !== '') {
+		bl_blocks_maybe_migrate_page_settings_meta($post_id, $slug, $def_id);
+	}
+	$values = [];
+	if ($post_id > 0 && $meta_key !== '') {
+		$raw = get_post_meta($post_id, $meta_key, true);
+		$values = is_array($raw) ? $raw : [];
+	}
+
+	$payload = wp_json_encode(
+		[
+			'fields' => isset($def['fields']) && is_array($def['fields']) ? $def['fields'] : [],
+			'values' => $values,
+		],
+		JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_UNICODE
+	);
+	if (!is_string($payload)) {
+		$payload = '{"fields":[],"values":{}}';
+	}
+
+	if (!empty($def['description'])) {
+		echo '<p class="description bl-blocks-fields__description">' . esc_html((string) $def['description']) . '</p>';
+	}
+
+	echo '<div class="bl-blocks-content-fields">';
+	echo '<input type="hidden" name="bl_blocks_page_values[' . esc_attr($meta_key) . ']" value="" data-bl-blocks-classic-json>';
+	echo '<div data-bl-blocks-classic-fields>';
+	echo '<script type="application/json" data-bl-blocks-classic-config>' . $payload . '</script>';
+	echo '</div></div>';
+}
+
+/**
+ * Save content-column page field values from the post form.
+ */
+function bl_blocks_save_page_content_fields(int $post_id, WP_Post $post): void
+{
+	if ($post->post_type === BL_BLOCK_POST_TYPE) {
+		return;
+	}
+	if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+		return;
+	}
+	if (wp_is_post_revision($post_id) || wp_is_post_autosave($post_id)) {
+		return;
+	}
+	if (!isset($_POST['bl_blocks_page_fields_nonce'])
+		|| !wp_verify_nonce((string) $_POST['bl_blocks_page_fields_nonce'], 'bl_blocks_save_page_fields')
+	) {
+		return;
+	}
+	if (!current_user_can('edit_post', $post_id)) {
+		return;
+	}
+
+	$raw_map = $_POST['bl_blocks_page_values'] ?? null;
+	if (!is_array($raw_map)) {
+		return;
+	}
+
+	$is_block_editor = function_exists('use_block_editor_for_post')
+		? (bool) use_block_editor_for_post($post)
+		: false;
+	$defs = bl_blocks_page_definitions_for_post_type($post->post_type);
+	foreach ($defs as $def) {
+		if (!bl_blocks_page_def_uses_content_metabox($def, $is_block_editor)) {
+			continue;
+		}
+		$meta_key = (string) ($def['metaKey'] ?? '');
+		if ($meta_key === '' || !array_key_exists($meta_key, $raw_map)) {
+			continue;
+		}
+		$decoded = json_decode(wp_unslash((string) $raw_map[$meta_key]), true);
+		$fields = isset($def['fields']) && is_array($def['fields']) ? $def['fields'] : [];
+		$values = bl_blocks_sanitize_values($fields, is_array($decoded) ? $decoded : []);
+		update_post_meta($post_id, $meta_key, $values);
+	}
+}
+add_action('save_post', 'bl_blocks_save_page_content_fields', 10, 2);

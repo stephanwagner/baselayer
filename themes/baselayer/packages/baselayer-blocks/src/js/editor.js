@@ -86,6 +86,40 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
       return '1';
     }
 
+    if (type === 'range') {
+      const mode = field.mode === 'single' ? 'single' : 'range';
+      const min =
+        field.min != null && field.min !== '' ? String(field.min) : '';
+      const max =
+        field.max != null && field.max !== '' ? String(field.max) : '';
+      if (mode === 'single') {
+        const dv = field.default_value;
+        let value = '';
+        if (dv != null && typeof dv === 'object' && !Array.isArray(dv)) {
+          value = dv.from != null && dv.from !== '' ? String(dv.from) : '';
+        } else if (dv != null && String(dv).trim() !== '') {
+          value = String(dv).trim();
+        }
+        if (value === '') {
+          value = min;
+        }
+        return value !== '' ? value : undefined;
+      }
+      const dv = field.default_value;
+      let from = '';
+      let to = '';
+      if (dv && typeof dv === 'object' && !Array.isArray(dv)) {
+        from = dv.from != null && dv.from !== '' ? String(dv.from) : '';
+        to = dv.to != null && dv.to !== '' ? String(dv.to) : '';
+      }
+      if (from === '') from = min;
+      if (to === '') to = max;
+      if (from === '' && to === '') {
+        return undefined;
+      }
+      return { from, to };
+    }
+
     const multi =
       type === 'checkboxes' ||
       (type === 'button_group' && !!field.multiple) ||

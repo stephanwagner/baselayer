@@ -505,6 +505,9 @@ function collectLeafValue(field, control, type) {
   if (type === 'icon' && control && typeof control.getIconValue === 'function') {
     return control.getIconValue();
   }
+  if (type === 'range' && control && typeof control.getRangeValue === 'function') {
+    return control.getRangeValue();
+  }
   if (type === 'wysiwyg' && control && control.tagName === 'TEXTAREA') {
     syncWysiwygTextarea(control);
     return control.value;
@@ -912,6 +915,117 @@ function createLeafControl(field, values, controls) {
       hidden,
     ]);
     control.getIconValue = () => hidden.value || '';
+  } else if (type === 'range') {
+    const mode = field.mode === 'single' ? 'single' : 'range';
+    const minFallback =
+      field.min != null && field.min !== '' ? String(field.min) : '';
+    const maxFallback =
+      field.max != null && field.max !== '' ? String(field.max) : '';
+    const resolveCurrent = () => {
+      const hasStored = values[name] !== undefined && values[name] !== null;
+      if (mode === 'single') {
+        if (hasStored) {
+          if (typeof current === 'object' && !Array.isArray(current)) {
+            return current.from != null && current.from !== ''
+              ? String(current.from)
+              : '';
+          }
+          return current === '' ? '' : String(current);
+        }
+        const dv = field.default_value;
+        if (dv != null && typeof dv === 'object' && !Array.isArray(dv)) {
+          if (dv.from != null && dv.from !== '') return String(dv.from);
+        } else if (dv != null && String(dv).trim() !== '') {
+          return String(dv).trim();
+        }
+        return minFallback;
+      }
+      if (hasStored && typeof current === 'object' && !Array.isArray(current)) {
+        return {
+          from: current.from != null && current.from !== '' ? String(current.from) : '',
+          to: current.to != null && current.to !== '' ? String(current.to) : '',
+        };
+      }
+      if (hasStored && (typeof current === 'string' || typeof current === 'number')) {
+        return { from: String(current), to: '' };
+      }
+      const dv = field.default_value;
+      const fromDv =
+        dv && typeof dv === 'object' && !Array.isArray(dv) && dv.from != null && dv.from !== ''
+          ? String(dv.from)
+          : '';
+      const toDv =
+        dv && typeof dv === 'object' && !Array.isArray(dv) && dv.to != null && dv.to !== ''
+          ? String(dv.to)
+          : '';
+      return {
+        from: fromDv !== '' ? fromDv : minFallback,
+        to: toDv !== '' ? toDv : maxFallback,
+      };
+    };
+    const resolved = resolveCurrent();
+    const prefix = field.prefix != null ? String(field.prefix).trim() : '';
+    const suffix = field.suffix != null ? String(field.suffix).trim() : '';
+    const applyBounds = (input) => {
+      if (field.min != null && field.min !== '') input.min = String(field.min);
+      if (field.max != null && field.max !== '') input.max = String(field.max);
+      if (field.step != null && field.step !== '') input.step = String(field.step);
+    };
+    const wrapAffix = (input) => {
+      if (!prefix && !suffix) return input;
+      const group = el('div', { className: 'bl-blocks-fields__input-group' });
+      if (prefix) {
+        group.appendChild(
+          el('span', { className: 'bl-blocks-fields__affix bl-blocks-fields__affix--prefix', text: prefix })
+        );
+      }
+      group.appendChild(input);
+      if (suffix) {
+        group.appendChild(
+          el('span', { className: 'bl-blocks-fields__affix bl-blocks-fields__affix--suffix', text: suffix })
+        );
+      }
+      return group;
+    };
+
+    if (mode === 'single') {
+      const input = el('input', {
+        className: 'widefat',
+        type: 'number',
+        id,
+        value: resolved == null ? '' : String(resolved),
+      });
+      applyBounds(input);
+      control = wrapAffix(input);
+      control.getRangeValue = () => input.value.trim();
+    } else {
+      const pair = resolved && typeof resolved === 'object' ? resolved : { from: '', to: '' };
+      const fromInput = el('input', {
+        className: 'widefat',
+        type: 'number',
+        id,
+        value: pair.from,
+        'aria-label': i18n('rangeFrom', 'From'),
+      });
+      const toInput = el('input', {
+        className: 'widefat',
+        type: 'number',
+        id: id + '-to',
+        value: pair.to,
+        'aria-label': i18n('rangeTo', 'To'),
+      });
+      applyBounds(fromInput);
+      applyBounds(toInput);
+      control = el('div', { className: 'bl-blocks-fields__range' }, [
+        wrapAffix(fromInput),
+        el('span', { className: 'bl-blocks-fields__range-sep', text: '–' }),
+        wrapAffix(toInput),
+      ]);
+      control.getRangeValue = () => ({
+        from: fromInput.value.trim(),
+        to: toInput.value.trim(),
+      });
+    }
   } else {
     let inputType = 'text';
     if (type === 'email' || type === 'number' || type === 'date' || type === 'time') {
@@ -1828,13 +1942,14 @@ export function pageRepeaterUiStorageKey(postId, definitionKey) {
 }
 
 /**
- * Mount Website settings field form (admin JS renderer).
+ * Parse JSON config from a classic / Website field host.
+ *
+ * @param {Element} host
+ * @param {string} selector
+ * @return {{ fields: array, values: object }}
  */
-export function mountWebsiteFields(root = document) {
-  const host = root.querySelector('[data-bl-blocks-website-fields]');
-  if (!host) return null;
-
-  const cfgEl = host.querySelector('[data-bl-blocks-website-config]');
+function parseClassicHostConfig(host, selector) {
+  const cfgEl = host.querySelector(selector);
   let fields = [];
   let values = {};
   if (cfgEl) {
@@ -1850,29 +1965,102 @@ export function mountWebsiteFields(root = document) {
       values = {};
     }
   }
+  return { fields, values };
+}
 
-  const form = createFieldForm(fields, values);
-  host.replaceChildren(form.root);
+/**
+ * Mount one classic field host (Website page or content-column metabox).
+ *
+ * @param {HTMLElement} host
+ */
+function mountClassicFieldHost(host) {
+  if (!host || host.dataset.blBlocksFieldsMounted === '1') {
+    return;
+  }
+  host.dataset.blBlocksFieldsMounted = '1';
+
+  const isWebsite = host.hasAttribute('data-bl-blocks-website-fields');
+  const cfgSelector = isWebsite ? '[data-bl-blocks-website-config]' : '[data-bl-blocks-classic-config]';
+  const parsed = parseClassicHostConfig(host, cfgSelector);
+  const fields = parsed.fields;
+  let values = parsed.values;
 
   const formEl = host.closest('form');
-  if (formEl) {
-    let hidden = formEl.querySelector('[data-bl-blocks-website-json]');
-    if (!hidden) {
-      hidden = el('input', {
-        type: 'hidden',
-        name: 'bl_blocks_values_json',
-        dataset: { blBlocksWebsiteJson: '1' },
-      });
-      formEl.appendChild(hidden);
-    }
-    const sync = () => {
-      hidden.value = JSON.stringify(form.getValues());
-    };
-    sync();
-    formEl.addEventListener('submit', sync);
+  const wrap = host.parentElement;
+  let hidden = isWebsite
+    ? formEl && formEl.querySelector('[data-bl-blocks-website-json]')
+    : (wrap && wrap.querySelector('[data-bl-blocks-classic-json]')) ||
+      host.querySelector('[data-bl-blocks-classic-json]');
+
+  if (isWebsite && formEl && !hidden) {
+    hidden = el('input', {
+      type: 'hidden',
+      name: 'bl_blocks_values_json',
+      dataset: { blBlocksWebsiteJson: '1' },
+    });
+    formEl.appendChild(hidden);
   }
 
-  return form;
+  const allowModal = host.hasAttribute('data-bl-blocks-classic-modal');
+  const modalTitle = host.getAttribute('data-title') || i18n('edit', 'Edit');
+  const state = { form: null };
+
+  const syncHidden = () => {
+    if (!hidden || !state.form) {
+      return;
+    }
+    hidden.value = JSON.stringify(state.form.getValues());
+  };
+
+  const render = (nextValues) => {
+    destroyWysiwygEditors(host);
+    state.form = createFieldForm(fields, nextValues || {}, { layout: 'default' });
+    host.replaceChildren(state.form.root);
+    syncHidden();
+  };
+
+  render(values);
+
+  if (formEl && host.dataset.blBlocksSubmitBound !== '1') {
+    host.dataset.blBlocksSubmitBound = '1';
+    formEl.addEventListener('submit', syncHidden);
+  }
+
+  if (allowModal && wrap && !wrap.querySelector(':scope > .bl-blocks-edit-fields-button')) {
+    const btn = el('button', {
+      type: 'button',
+      className: 'button bl-blocks-edit-fields-button',
+      text: i18n('openFieldEditor', 'Open field editor'),
+    });
+    btn.addEventListener('click', () => {
+      openFieldsModal({
+        title: modalTitle,
+        fields,
+        values: state.form ? state.form.getValues() : values,
+        onSave: (next) => {
+          values = next && typeof next === 'object' ? next : {};
+          render(values);
+        },
+      });
+    });
+    wrap.insertBefore(btn, host);
+  }
+
+  return state.form;
+}
+
+/**
+ * Mount Website settings + content-column field forms (admin JS renderer).
+ */
+export function mountWebsiteFields(root = document) {
+  const hosts = root.querySelectorAll(
+    '[data-bl-blocks-website-fields], [data-bl-blocks-classic-fields]'
+  );
+  let last = null;
+  hosts.forEach((host) => {
+    last = mountClassicFieldHost(host);
+  });
+  return last;
 }
 
 // Expose for editor bundle / inline usage.

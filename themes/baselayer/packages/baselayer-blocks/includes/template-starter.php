@@ -271,6 +271,22 @@ function bl_blocks_starter_render_lines(array $entry, string $block_class): arra
 				'<?php endif; ?>',
 			];
 
+		case 'range':
+			$mode = (string) ($entry['mode'] ?? 'range');
+			if ($mode === 'single') {
+				return [
+					'<?php if (' . $var . ' !== \'\' && ' . $var . ' !== null) : ?>',
+					"\t" . '<p class="' . $mod . '"><?php echo esc_html(' . $var . '); ?></p>',
+					'<?php endif; ?>',
+				];
+			}
+
+			return [
+				'<?php if (is_array(' . $var . ') && ((' . $var . '[\'from\'] ?? \'\') !== \'\' || (' . $var . '[\'to\'] ?? \'\') !== \'\')) : ?>',
+				"\t" . '<p class="' . $mod . '"><?php echo esc_html(trim((' . $var . '[\'from\'] ?? \'\') . \'–\' . (' . $var . '[\'to\'] ?? \'\'), \'–\')); ?></p>',
+				'<?php endif; ?>',
+			];
+
 		default:
 			if (bl_blocks_starter_is_multi_value($entry)) {
 				return [

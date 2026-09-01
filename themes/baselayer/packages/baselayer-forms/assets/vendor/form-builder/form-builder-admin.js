@@ -18,6 +18,7 @@
     "phone",
     "url",
     "number",
+    "range",
     "terms",
     "checkboxes",
     "radio",
@@ -421,6 +422,12 @@
     if (type === "textarea") {
       base.rows = 4;
     }
+    if (type === "range") {
+      base.min = "0";
+      base.max = "10";
+      base.mode = "range";
+      base.default_value = { from: "", to: "" };
+    }
     return base;
   }
   function readConfig() {
@@ -474,7 +481,8 @@
     "text_block",
     "html",
     "captcha",
-    "honeypot"
+    "honeypot",
+    "range"
   ];
   var OPS_TOGGLE = ["checked", "not_checked"];
   var OPS_CHOICE = ["==", "!=", "==empty", "!=empty"];
@@ -2087,7 +2095,7 @@
     } else {
       delete field.rows;
     }
-    if (nextType === "number") {
+    if (nextType === "number" || nextType === "range") {
       delete field.min_mode;
       delete field.max_mode;
       delete field.min_offset;
@@ -2111,6 +2119,37 @@
       }
       delete field.relation;
       delete field.relation_field;
+    }
+    if (nextType === "range") {
+      if (field.min == null || field.min === "") {
+        field.min = "0";
+      }
+      if (field.max == null || field.max === "") {
+        field.max = "10";
+      }
+      field.mode = field.mode === "single" ? "single" : "range";
+      if (field.mode === "range") {
+        if (field.default_value && typeof field.default_value === "object" && !Array.isArray(field.default_value)) {
+          field.default_value = {
+            from: field.default_value.from != null && field.default_value.from !== "" ? String(field.default_value.from) : "",
+            to: field.default_value.to != null && field.default_value.to !== "" ? String(field.default_value.to) : ""
+          };
+        } else if (field.default_value != null && String(field.default_value).trim() !== "") {
+          field.default_value = { from: String(field.default_value).trim(), to: "" };
+        } else {
+          field.default_value = { from: "", to: "" };
+        }
+      } else if (field.default_value && typeof field.default_value === "object" && !Array.isArray(field.default_value)) {
+        const from = field.default_value.from != null ? String(field.default_value.from) : "";
+        field.default_value = from;
+      } else {
+        field.default_value = field.default_value != null ? String(field.default_value) : "";
+      }
+    } else {
+      delete field.mode;
+    }
+    if (nextType !== "number" && nextType !== "range") {
+      delete field.step;
     }
     const hooks = getFieldCardHooks();
     if (typeof hooks.onNormalizeType === "function") {
@@ -2156,6 +2195,7 @@
     "email",
     "url",
     "number",
+    "range",
     "phone",
     "textarea",
     "wysiwyg",
@@ -2199,7 +2239,8 @@
     "time",
     "datetime",
     "page",
-    "link"
+    "link",
+    "range"
   ];
   var NO_REQUIRED = [
     "hidden",
@@ -2243,6 +2284,7 @@
     "phone",
     "url",
     "number",
+    "range",
     "date",
     "time",
     "datetime"
@@ -2270,6 +2312,7 @@
     "phone",
     "url",
     "number",
+    "range",
     "checkboxes",
     "radio",
     "select",
@@ -3168,16 +3211,144 @@
     const sync = () => {
       field.min = minInput.value.trim();
       field.max = maxInput.value.trim();
+      if (stepInput) {
+        field.step = stepInput.value.trim();
+      }
       document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
     };
     minInput.addEventListener("change", sync);
     maxInput.addEventListener("change", sync);
     minInput.addEventListener("blur", sync);
     maxInput.addEventListener("blur", sync);
-    return el("div", { className: "bl-forms-builder__number-bounds" }, [
+    const parts = [
       el("p", {}, [el("label", { text: t("minValue", "Minimum") }), minInput]),
       el("p", {}, [el("label", { text: t("maxValue", "Maximum") }), maxInput])
-    ]);
+    ];
+    let stepInput = null;
+    if (field.type === "number" || field.type === "range") {
+      stepInput = el("input", {
+        type: "number",
+        className: "widefat",
+        dataset: { blStep: "1" },
+        value: field.step != null && field.step !== "" ? String(field.step) : "",
+        step: "any"
+      });
+      stepInput.addEventListener("change", sync);
+      stepInput.addEventListener("blur", sync);
+      parts.push(el("p", {}, [el("label", { text: t("stepValue", "Step") }), stepInput]));
+    }
+    return el("div", { className: "bl-forms-builder__number-bounds" }, parts);
+  }
+  function parseRangeDefault(raw) {
+    if (raw && typeof raw === "object" && !Array.isArray(raw)) {
+      return {
+        from: raw.from != null && raw.from !== "" ? String(raw.from) : "",
+        to: raw.to != null && raw.to !== "" ? String(raw.to) : ""
+      };
+    }
+    return { from: "", to: "" };
+  }
+  function rangeFieldMode(field) {
+    return field?.mode === "single" ? "single" : "range";
+  }
+  function createRangeModeControl(field, onModeChange) {
+    if (field.mode !== "single" && field.mode !== "range") {
+      field.mode = "range";
+    }
+    const wrap = el("div", { className: "bl-forms-builder__range-mode" });
+    const group = createSegmentedControl(
+      [
+        { value: "single", label: t("rangeModeSingle", "Single value") },
+        { value: "range", label: t("rangeModeRange", "Range") }
+      ],
+      rangeFieldMode(field),
+      "blRangeModeGroup",
+      (value) => {
+        const next = value === "single" ? "single" : "range";
+        const prev = rangeFieldMode(field);
+        if (next === prev) {
+          return;
+        }
+        if (next === "single") {
+          const pair = parseRangeDefault(field.default_value);
+          field.default_value = pair.from || "";
+        } else {
+          const raw = field.default_value != null && typeof field.default_value !== "object" ? String(field.default_value).trim() : "";
+          field.default_value = { from: raw, to: "" };
+        }
+        field.mode = next;
+        if (typeof onModeChange === "function") {
+          onModeChange(next);
+        }
+        document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+      }
+    );
+    group.querySelectorAll("button").forEach((btn) => {
+      btn.dataset.blRangeMode = btn.dataset.value;
+    });
+    wrap.append(el("label", { text: t("rangeMode", "Mode") }), group);
+    return wrap;
+  }
+  function createRangeDefaultControl(field, updatePreview) {
+    if (rangeFieldMode(field) === "single") {
+      if (field.default_value && typeof field.default_value === "object" && !Array.isArray(field.default_value)) {
+        field.default_value = field.default_value.from != null && field.default_value.from !== "" ? String(field.default_value.from) : "";
+      } else {
+        field.default_value = field.default_value != null && field.default_value !== "" ? String(field.default_value) : "";
+      }
+      const def = el("input", {
+        type: "number",
+        className: "widefat",
+        dataset: { blDefault: "1" },
+        value: field.default_value || "",
+        step: field.step != null && field.step !== "" ? String(field.step) : "any",
+        placeholder: field.min != null && field.min !== "" ? String(field.min) : ""
+      });
+      const sync2 = () => {
+        field.default_value = def.value.trim();
+        updatePreview();
+        document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+      };
+      def.addEventListener("change", sync2);
+      def.addEventListener("blur", sync2);
+      return [el("p", {}, [el("label", { text: t("defaultValue", "Default value") }), def])];
+    }
+    const parsed = parseRangeDefault(field.default_value);
+    field.default_value = parsed;
+    const fromInput = el("input", {
+      type: "number",
+      className: "widefat",
+      dataset: { blRangeDefaultFrom: "1" },
+      value: parsed.from,
+      step: field.step != null && field.step !== "" ? String(field.step) : "any",
+      placeholder: field.min != null && field.min !== "" ? String(field.min) : ""
+    });
+    const toInput = el("input", {
+      type: "number",
+      className: "widefat",
+      dataset: { blRangeDefaultTo: "1" },
+      value: parsed.to,
+      step: field.step != null && field.step !== "" ? String(field.step) : "any",
+      placeholder: field.max != null && field.max !== "" ? String(field.max) : ""
+    });
+    const sync = () => {
+      field.default_value = {
+        from: fromInput.value.trim(),
+        to: toInput.value.trim()
+      };
+      updatePreview();
+      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+    };
+    fromInput.addEventListener("change", sync);
+    toInput.addEventListener("change", sync);
+    fromInput.addEventListener("blur", sync);
+    toInput.addEventListener("blur", sync);
+    return [
+      el("div", { className: "bl-forms-builder__number-bounds" }, [
+        el("p", {}, [el("label", { text: t("rangeDefaultFrom", "Default from") }), fromInput]),
+        el("p", {}, [el("label", { text: t("rangeDefaultTo", "Default to") }), toInput])
+      ])
+    ];
   }
   function createSelectionBoundsControl(field) {
     const parseLimit = (raw) => {
@@ -3924,6 +4095,9 @@
         })
       ];
     }
+    if (field.type === "range") {
+      return createRangeDefaultControl(field, updatePreview);
+    }
     field.default_value = normalizeDefaultValue(field.type, field.default_value || "");
     const def = field.type === "textarea" || field.type === "wysiwyg" ? el("textarea", {
       className: "widefat",
@@ -4342,9 +4516,22 @@
       data.prefix = q("[data-bl-prefix]")?.value ?? "";
       data.suffix = q("[data-bl-suffix]")?.value ?? "";
     }
-    if (type === "number") {
+    if (type === "number" || type === "range") {
       data.min = q("[data-bl-min]")?.value?.trim() || "";
       data.max = q("[data-bl-max]")?.value?.trim() || "";
+      data.step = q("[data-bl-step]")?.value?.trim() || "";
+    }
+    if (type === "range") {
+      const modeBtn = q("[data-bl-range-mode].is-active");
+      data.mode = modeBtn?.dataset.blRangeMode === "single" ? "single" : "range";
+      if (data.mode === "single") {
+        data.default_value = q("[data-bl-default]")?.value?.trim() || "";
+      } else {
+        data.default_value = {
+          from: q("[data-bl-range-default-from]")?.value?.trim() || "",
+          to: q("[data-bl-range-default-to]")?.value?.trim() || ""
+        };
+      }
     }
     if (type === "text" || type === "textarea") {
       data.min_length = q("[data-bl-min-length]")?.value?.trim() || "";
@@ -4404,7 +4591,7 @@
     if (NO_REQUIRED.includes(type)) {
       delete data.required;
     }
-    if (!NO_DEFAULT.includes(type) && type !== "date" && type !== "time" && type !== "datetime") {
+    if (!NO_DEFAULT.includes(type) && type !== "date" && type !== "time" && type !== "datetime" && type !== "range") {
       const defEl = q("[data-bl-default]");
       if (defEl) {
         data.default_value = defEl.type === "checkbox" ? defEl.checked ? "1" : "" : defEl.value || "";
@@ -4806,6 +4993,14 @@
                 "Internal field key used in submissions, emails, and entry data."
               )
             })
+          );
+        }
+        if (field.type === "range") {
+          generalSections.add(
+            createRangeModeControl(field, () => {
+              renderBody("general");
+            }),
+            createNumberBoundsControl(field)
           );
         }
         if (DESCRIPTION_TYPES.includes(field.type)) {

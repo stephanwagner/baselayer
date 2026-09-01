@@ -13,6 +13,7 @@ export const LOGIC_SOURCE_EXCLUDE = [
   'html',
   'captcha',
   'honeypot',
+  'range',
 ];
 
 const OPS_TOGGLE = ['checked', 'not_checked'];

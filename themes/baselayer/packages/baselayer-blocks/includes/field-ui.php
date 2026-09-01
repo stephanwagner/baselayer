@@ -37,6 +37,7 @@ function bl_blocks_palette_icons(): array
 			'email',
 			'url',
 			'number',
+			'range',
 			'phone',
 			'checkboxes',
 			'radio',
@@ -83,6 +84,7 @@ function bl_blocks_palette_icons(): array
 	// Blocks-specific glyphs (Forms palette has no `icon` / `wysiwyg` / `extensions` / `plus` / `box` keys).
 	$add($icons, $registry, 'icon');
 	$add($icons, $registry, 'wysiwyg');
+	$add($icons, $registry, 'range');
 	$add($icons, $registry, 'extensions');
 	$add($icons, $registry, 'plus');
 	$add($icons, $registry, 'box');
@@ -106,7 +108,7 @@ function bl_blocks_field_types(): array
 		));
 	} else {
 		$types = [
-			'text', 'textarea', 'email', 'phone', 'url', 'number',
+			'text', 'textarea', 'email', 'phone', 'url', 'number', 'range',
 			'checkboxes', 'radio', 'select', 'toggle', 'button_group',
 			'date', 'time', 'datetime', 'file', 'image',
 			'heading', 'text_block', 'divider', 'spacer', 'row_break', 'html',
@@ -132,6 +134,10 @@ function bl_blocks_field_types(): array
 
 	if (!in_array('wysiwyg', $types, true)) {
 		$types[] = 'wysiwyg';
+	}
+
+	if (!in_array('range', $types, true)) {
+		$types[] = 'range';
 	}
 
 	return $types;
@@ -412,6 +418,8 @@ function bl_blocks_enqueue_field_ui_assets(): void
 			'expandEntry'            => __('Expand', 'baselayer-blocks'),
 			'dragEntry'              => __('Drag to reorder', 'baselayer-blocks'),
 			'repeater'               => __('Repeater', 'baselayer-blocks'),
+			'rangeFrom'              => __('From', 'baselayer-blocks'),
+			'rangeTo'                => __('To', 'baselayer-blocks'),
 			'choosePage'             => __('Choose page', 'baselayer-blocks'),
 			'choosePages'            => __('Choose pages', 'baselayer-blocks'),
 			'changePage'             => __('Change page', 'baselayer-blocks'),
@@ -441,6 +449,7 @@ function bl_blocks_enqueue_field_ui_assets(): void
 			'linkDestFile'           => __('File', 'baselayer-blocks'),
 			'linkText'               => __('Link text', 'baselayer-blocks'),
 			'linkOpenNewTab'         => __('Open in new tab', 'baselayer-blocks'),
+			'openFieldEditor'        => __('Open field editor', 'baselayer-blocks'),
 			'chooseIcon'             => __('Choose icon', 'baselayer-blocks'),
 			'clearIcon'              => __('Remove', 'baselayer-blocks'),
 			'selectEmptyOptionPlaceholder' => __('Please select…', 'baselayer-blocks'),

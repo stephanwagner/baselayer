@@ -22,7 +22,7 @@ function bl_blocks_sanitize_definition_type($type): string
 }
 
 /**
- * @return array{active: bool, sidebar_editing: bool, supports_inner_blocks: bool, inner_blocks_allowed: string, inner_blocks_template: string, parent: string, align: string, slug: string, description: string, block_icon: string, block_category: string, block_keywords: string, post_types: list<string>, menu_label: string, menu_order: int}
+ * @return array{active: bool, sidebar_editing: bool, content_editing: bool, supports_inner_blocks: bool, inner_blocks_allowed: string, inner_blocks_template: string, parent: string, align: string, slug: string, description: string, block_icon: string, block_category: string, block_keywords: string, post_types: list<string>, menu_label: string, menu_order: int}
  */
 function bl_blocks_default_settings(string $type = 'block'): array
 {
@@ -31,6 +31,7 @@ function bl_blocks_default_settings(string $type = 'block'): array
 	return [
 		'active'                 => true,
 		'sidebar_editing'        => true,
+		'content_editing'        => false,
 		'supports_inner_blocks'  => false,
 		'inner_blocks_allowed'   => '',
 		'inner_blocks_template'  => '',
@@ -430,6 +431,7 @@ function bl_blocks_sanitize_settings($settings, string $type = 'block'): array
 	} else {
 		$out['sidebar_editing'] = false;
 	}
+	$out['content_editing'] = $type === 'page_settings' && !empty($settings['content_editing']);
 	$out['supports_inner_blocks'] = $type === 'block' && !empty($settings['supports_inner_blocks']);
 	$out['inner_blocks_allowed'] = $type === 'block' && $out['supports_inner_blocks']
 		? bl_blocks_sanitize_inner_blocks_allowed($settings['inner_blocks_allowed'] ?? '')
@@ -529,6 +531,10 @@ function bl_blocks_sanitize_field($field, int $repeater_depth = 0): ?array
 
 	if ($type === 'wysiwyg') {
 		return bl_blocks_sanitize_wysiwyg_field($field);
+	}
+
+	if ($type === 'range') {
+		return bl_blocks_sanitize_range_field($field);
 	}
 
 	if (function_exists('bl_forms_sanitize_field')) {
@@ -695,6 +701,258 @@ function bl_blocks_sanitize_wysiwyg_field(array $field): array
 		$custom = strtolower((string) ($field['toolbar_custom'] ?? ''));
 		$custom = preg_replace('/[^a-z0-9_,|\s-]/', '', $custom) ?? '';
 		$out['toolbar_custom'] = trim(preg_replace('/\s+/', '', $custom) ?? '');
+	}
+
+	if (function_exists('bl_forms_attach_conditional_logic')) {
+		return bl_forms_attach_conditional_logic($out, $field);
+	}
+
+	if (isset($field['conditional_logic']) && is_array($field['conditional_logic'])) {
+		$out['conditional_logic'] = $field['conditional_logic'];
+	}
+
+	return $out;
+}
+
+/**
+ * Sanitize one numeric endpoint for a range field.
+ *
+ * @param mixed $raw
+ */
+function bl_blocks_sanitize_range_endpoint($raw): string
+{
+	if (!is_scalar($raw) || (string) $raw === '') {
+		return '';
+	}
+
+	$value = function_exists('bl_forms_sanitize_optional_number')
+		? bl_forms_sanitize_optional_number((string) $raw)
+		: (is_numeric($raw) ? (string) $raw : '');
+
+	return is_numeric($value) ? $value : '';
+}
+
+/**
+ * @param array<string, mixed> $field
+ */
+function bl_blocks_range_mode(array $field): string
+{
+	return (($field['mode'] ?? '') === 'single') ? 'single' : 'range';
+}
+
+/**
+ * Clamp a single numeric value to field min/max.
+ *
+ * @param array<string, mixed> $field
+ */
+function bl_blocks_clamp_range_single(array $field, string $value): string
+{
+	if ($value === '' || !is_numeric($value)) {
+		return $value;
+	}
+
+	$min = isset($field['min']) ? bl_blocks_sanitize_range_endpoint($field['min']) : '';
+	$max = isset($field['max']) ? bl_blocks_sanitize_range_endpoint($field['max']) : '';
+	$v = (float) $value;
+	if ($min !== '' && is_numeric($min) && $v < (float) $min) {
+		$value = $min;
+		$v = (float) $value;
+	}
+	if ($max !== '' && is_numeric($max) && $v > (float) $max) {
+		$value = $max;
+	}
+
+	return $value;
+}
+
+/**
+ * Clamp from/to to field min/max and ensure from <= to.
+ *
+ * @param array<string, mixed> $field
+ * @return array{from: string, to: string}
+ */
+function bl_blocks_clamp_range_pair(array $field, string $from, string $to): array
+{
+	$min = isset($field['min']) ? bl_blocks_sanitize_range_endpoint($field['min']) : '';
+	$max = isset($field['max']) ? bl_blocks_sanitize_range_endpoint($field['max']) : '';
+
+	$clamp = static function (string $n) use ($min, $max): string {
+		if ($n === '' || !is_numeric($n)) {
+			return $n;
+		}
+		$v = (float) $n;
+		if ($min !== '' && is_numeric($min) && $v < (float) $min) {
+			$n = $min;
+			$v = (float) $n;
+		}
+		if ($max !== '' && is_numeric($max) && $v > (float) $max) {
+			$n = $max;
+		}
+
+		return $n;
+	};
+
+	$from = $clamp($from);
+	$to = $clamp($to);
+
+	if ($from !== '' && $to !== '' && is_numeric($from) && is_numeric($to) && (float) $from > (float) $to) {
+		[$from, $to] = [$to, $from];
+	}
+
+	return [
+		'from' => $from,
+		'to'   => $to,
+	];
+}
+
+/**
+ * @param mixed $raw
+ * @return array{from: string, to: string}
+ */
+function bl_blocks_sanitize_range_value(array $field, $raw): array
+{
+	$from = '';
+	$to = '';
+	if (is_array($raw)) {
+		$from = bl_blocks_sanitize_range_endpoint($raw['from'] ?? '');
+		$to = bl_blocks_sanitize_range_endpoint($raw['to'] ?? '');
+	}
+
+	return bl_blocks_clamp_range_pair($field, $from, $to);
+}
+
+/**
+ * Sanitize stored/editor value for a range field (scalar or from/to pair).
+ *
+ * @param array<string, mixed> $field
+ * @param mixed $raw
+ * @return array{from: string, to: string}|string
+ */
+function bl_blocks_sanitize_range_stored_value(array $field, $raw)
+{
+	if (bl_blocks_range_mode($field) === 'single') {
+		$value = '';
+		if (is_array($raw)) {
+			$value = bl_blocks_sanitize_range_endpoint($raw['from'] ?? ($raw['value'] ?? ''));
+		} else {
+			$value = bl_blocks_sanitize_range_endpoint($raw);
+		}
+
+		return bl_blocks_clamp_range_single($field, $value);
+	}
+
+	return bl_blocks_sanitize_range_value($field, $raw);
+}
+
+/**
+ * Effective default when empty defaults should fall back to min/max.
+ *
+ * @param array<string, mixed> $field
+ * @return array{from: string, to: string}|string|null
+ */
+function bl_blocks_effective_range_default(array $field)
+{
+	$min = bl_blocks_sanitize_range_endpoint($field['min'] ?? '');
+	$max = bl_blocks_sanitize_range_endpoint($field['max'] ?? '');
+
+	if (bl_blocks_range_mode($field) === 'single') {
+		$raw = $field['default_value'] ?? '';
+		if (is_array($raw)) {
+			$raw = $raw['from'] ?? '';
+		}
+		$value = bl_blocks_sanitize_range_endpoint($raw);
+		if ($value === '') {
+			$value = $min;
+		}
+		$value = bl_blocks_clamp_range_single(['min' => $min, 'max' => $max], $value);
+
+		return $value !== '' ? $value : null;
+	}
+
+	$pair = bl_blocks_sanitize_range_value(['min' => $min, 'max' => $max], $field['default_value'] ?? null);
+	if ($pair['from'] === '') {
+		$pair['from'] = $min;
+	}
+	if ($pair['to'] === '') {
+		$pair['to'] = $max;
+	}
+	$pair = bl_blocks_clamp_range_pair(['min' => $min, 'max' => $max], $pair['from'], $pair['to']);
+	if ($pair['from'] === '' && $pair['to'] === '') {
+		return null;
+	}
+
+	return $pair;
+}
+
+/**
+ * Sanitize blocks-only from/to number field.
+ *
+ * @param array<string, mixed> $field
+ * @return array<string, mixed>
+ */
+function bl_blocks_sanitize_range_field(array $field): array
+{
+	$id = sanitize_key((string) ($field['id'] ?? ''));
+	if ($id === '') {
+		$id = 'f' . wp_generate_password(8, false, false);
+	}
+	$name = sanitize_key((string) ($field['name'] ?? ''));
+	if ($name === '') {
+		$name = $id;
+	}
+
+	$width = ['width' => sanitize_text_field((string) ($field['width'] ?? '100')), 'width_custom' => sanitize_text_field((string) ($field['width_custom'] ?? ''))];
+	if (function_exists('bl_forms_sanitize_width')) {
+		$width = bl_forms_sanitize_width($field);
+	}
+
+	$min = bl_blocks_sanitize_range_endpoint($field['min'] ?? '');
+	$max = bl_blocks_sanitize_range_endpoint($field['max'] ?? '');
+	if ($min !== '' && $max !== '' && (float) $min > (float) $max) {
+		$max = '';
+	}
+	$step = bl_blocks_sanitize_range_endpoint($field['step'] ?? '');
+	$mode = bl_blocks_range_mode($field);
+	$bounds = ['min' => $min, 'max' => $max];
+
+	$out = [
+		'id'            => $id,
+		'type'          => 'range',
+		'label'         => sanitize_text_field((string) ($field['label'] ?? '')),
+		'name'          => $name,
+		'name_manual'   => !empty($field['name_manual']) || $name !== '',
+		'hide_label'    => !empty($field['hide_label']),
+		'css_class'     => function_exists('bl_forms_sanitize_css_class')
+			? bl_forms_sanitize_css_class((string) ($field['css_class'] ?? ''))
+			: sanitize_html_class((string) ($field['css_class'] ?? '')),
+		'width'         => $width['width'],
+		'width_custom'  => $width['width_custom'],
+		'active'        => function_exists('bl_forms_field_is_active')
+			? bl_forms_field_is_active($field)
+			: (!array_key_exists('active', $field) || !empty($field['active'])),
+		'required'      => !empty($field['required']),
+		'description'   => sanitize_textarea_field((string) ($field['description'] ?? '')),
+		'mode'          => $mode,
+		'default_value' => bl_blocks_sanitize_range_stored_value($bounds + ['mode' => $mode], $field['default_value'] ?? null),
+	];
+
+	if ($min !== '') {
+		$out['min'] = $min;
+	}
+	if ($max !== '') {
+		$out['max'] = $max;
+	}
+	if ($step !== '') {
+		$out['step'] = $step;
+	}
+
+	$suffix = sanitize_text_field((string) ($field['suffix'] ?? ''));
+	if ($suffix !== '') {
+		$out['suffix'] = $suffix;
+	}
+	$prefix = sanitize_text_field((string) ($field['prefix'] ?? ''));
+	if ($prefix !== '') {
+		$out['prefix'] = $prefix;
 	}
 
 	if (function_exists('bl_forms_attach_conditional_logic')) {
@@ -1537,6 +1795,10 @@ function bl_blocks_default_value_for_field(array $field)
 		return '1';
 	}
 
+	if ($type === 'range') {
+		return bl_blocks_effective_range_default($field);
+	}
+
 	$multi = $type === 'checkboxes'
 		|| ($type === 'button_group' && !empty($field['multiple']))
 		|| ($type === 'select' && !empty($field['multiple']));
@@ -1790,6 +2052,11 @@ function bl_blocks_sanitize_values(array $fields, $raw): array
 
 		if ($type === 'icon') {
 			$values[$name] = sanitize_key(is_scalar($raw_value) ? (string) $raw_value : '');
+			continue;
+		}
+
+		if ($type === 'range') {
+			$values[$name] = bl_blocks_sanitize_range_stored_value($field, $raw_value);
 			continue;
 		}
 

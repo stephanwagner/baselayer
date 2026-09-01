@@ -58,6 +58,13 @@ function blocksPalette() {
         }
       }
     }
+    // Blocks-only value range (not in Forms palette) — under Choice / Auswahl.
+    if (section.id === 'choice' && !types.includes('range')) {
+      types = [...types, 'range'];
+    }
+    if (section.id === 'input') {
+      types = types.filter((type) => type !== 'range');
+    }
     return { ...section, types };
   }).filter((section) => (section.types || []).length > 0);
 }

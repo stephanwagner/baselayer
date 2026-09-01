@@ -1755,7 +1755,8 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
 .bl-forms-builder__height,
 .bl-forms-builder__margin,
 .bl-forms-builder__heading-level,
-.bl-forms-builder__layout {
+.bl-forms-builder__layout,
+.bl-forms-builder__range-mode {
   margin: 0 0 12px;
 
   > label {
@@ -1776,6 +1777,12 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
 }
 
 .bl-forms-builder__layout > .bl-forms-builder__segmented {
+  width: fit-content;
+  min-width: 260px;
+  max-width: 100%;
+}
+
+.bl-forms-builder__range-mode > .bl-forms-builder__segmented {
   width: fit-content;
   min-width: 260px;
   max-width: 100%;

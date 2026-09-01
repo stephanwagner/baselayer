@@ -283,6 +283,17 @@ export function createSettingsPanel(initial, definitionType, onChange) {
     }
   );
 
+  const { root: contentEditingRow } = plainSwitch(
+    t('settingsContentEditing', 'Show fields in the content column'),
+    {
+      checked: !!state.content_editing,
+      onChange: (checked) => {
+        state.content_editing = checked;
+        notify();
+      },
+    }
+  );
+
   const { root: innerBlocksRow } = plainSwitch(
     t('settingsSupportsInnerBlocks', 'Allow nested blocks'),
     {
@@ -505,6 +516,9 @@ export function createSettingsPanel(initial, definitionType, onChange) {
 
   if (definitionType === 'block' || definitionType === 'page_settings') {
     children.push(sidebarEditingRow);
+  }
+  if (definitionType === 'page_settings') {
+    children.push(contentEditingRow);
   }
 
   children.push(
