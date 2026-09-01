@@ -1890,6 +1890,43 @@
     )) : null, /* @__PURE__ */ wp.element.createElement("div", { className: "bl-icon-picker__control" }, /* @__PURE__ */ wp.element.createElement(Button2, { ref: triggerRef, variant: "secondary", className: "bl-icon-picker__trigger", onClick: openPicker }, t3("choose", "Choose icon"))), /* @__PURE__ */ wp.element.createElement(BlockOptionDescription2, { description }));
   }
 
+  // themes/baselayer/packages/baselayer-blocks/src/js/block-options/shared/columns-stack-breakpoint-title.js
+  var STACK_BREAKPOINT_SPEC = {
+    "-columns-stack-unset": { prop: null, fallback: 782 },
+    "-columns-stack-early": { prop: "--bl-breakpoint-l", fallback: 1200 },
+    "-columns-stack-medium": { prop: "--bl-breakpoint-m", fallback: 900 },
+    "-columns-stack-late": { prop: "--bl-breakpoint-s", fallback: 600 }
+  };
+  function editorStylesRoot() {
+    const iframe = document.querySelector('iframe[name="editor-canvas"]');
+    const doc = iframe && iframe.contentDocument;
+    if (doc) {
+      return doc.querySelector(".editor-styles-wrapper") || doc.documentElement;
+    }
+    return document.querySelector(".editor-styles-wrapper") || document.documentElement;
+  }
+  function cssPx(prop, fallback) {
+    if (!prop) {
+      return `${fallback}px`;
+    }
+    try {
+      const raw = getComputedStyle(editorStylesRoot()).getPropertyValue(prop).trim();
+      const n = parseFloat(raw);
+      if (Number.isFinite(n) && n > 0) {
+        return `${Math.round(n)}px`;
+      }
+    } catch {
+    }
+    return `${fallback}px`;
+  }
+  function columnsStackBreakpointTitle(value) {
+    const spec = STACK_BREAKPOINT_SPEC[value];
+    if (!spec) {
+      return "";
+    }
+    return cssPx(spec.prop, spec.fallback);
+  }
+
   // themes/baselayer/packages/baselayer-blocks/src/js/block-options/editor.js
   var { InspectorControls } = wp.blockEditor;
   var { PanelBody, ToggleControl: ToggleControl3, SelectControl: SelectControl3 } = wp.components;
@@ -2372,7 +2409,7 @@
                   icon: opt.icon,
                   iconLabel: option.iconLabel,
                   iconPosition: opt.iconPosition,
-                  title: opt.title
+                  title: columnsStackBreakpointTitle(opt.value) || opt.title
                 }
               ))
             ));

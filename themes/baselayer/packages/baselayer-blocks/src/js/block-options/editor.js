@@ -5,6 +5,7 @@ import './load-customs.js';
 import { IconPicker } from '../../../../../src/js/editor/icons/icon-picker.js';
 import { BlockOptionToggleGroupOption } from './shared/block-option-toggle-group-option';
 import { optionHelpProps } from './shared/block-option-help';
+import { columnsStackBreakpointTitle } from './shared/columns-stack-breakpoint-title';
 import {
   getCustom,
   allCustomManagedClasses,
@@ -638,7 +639,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                               icon={opt.icon}
                               iconLabel={option.iconLabel}
                               iconPosition={opt.iconPosition}
-                              title={opt.title}
+                              title={columnsStackBreakpointTitle(opt.value) || opt.title}
                             />
                           ))}
                         </ToggleGroupControl>
