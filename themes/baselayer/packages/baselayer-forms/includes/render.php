@@ -252,7 +252,18 @@ function bl_forms_field_options_layout(array $field): string
  */
 function bl_forms_field_default_values(array $field): array
 {
-	$raw = trim((string) ($field['default_value'] ?? ''));
+	$raw = $field['default_value'] ?? '';
+	if (is_array($raw)) {
+		$parts = [];
+		foreach ($raw as $item) {
+			if (is_scalar($item) && trim((string) $item) !== '') {
+				$parts[] = trim((string) $item);
+			}
+		}
+
+		return array_values($parts);
+	}
+	$raw = trim((string) $raw);
 	if ($raw === '') {
 		return [];
 	}
@@ -462,7 +473,8 @@ function bl_forms_field_char_count_html(array $field, string $input_id, array $s
 	}
 
 	$max = bl_forms_field_max_length($field);
-	$count = bl_forms_string_length((string) ($field['default_value'] ?? ''));
+	$raw_default = $field['default_value'] ?? '';
+	$count = bl_forms_string_length(is_scalar($raw_default) ? (string) $raw_default : '');
 	$remaining = max(0, $max - $count);
 	$template = bl_forms_resolve_char_count_text($settings);
 	$empty = bl_forms_resolve_char_count_empty_text($settings);
@@ -882,10 +894,16 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 	$required = !empty($field['required']) && empty($field['disabled']);
 	$placeholder = (string) ($field['placeholder'] ?? '');
 	$multiple = !empty($field['multiple']);
-	$default_value = (string) ($field['default_value'] ?? '');
+	$default_value = '';
+	if (is_scalar($field['default_value'] ?? null)) {
+		$default_value = (string) $field['default_value'];
+	}
 	if (in_array($type, ['date', 'time', 'datetime'], true)) {
 		$placeholder = '';
 		$default_value = bl_forms_resolve_temporal_bound($field, 'default');
+	}
+	if ($type === 'range') {
+		return bl_forms_render_range_field($field, $uid, $settings, $context);
 	}
 	$control_attrs = bl_forms_field_control_attrs($field);
 	$choice_attrs = bl_forms_field_control_attrs($field, false);
@@ -1293,6 +1311,109 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 		</div>
 		<?php endif; ?>
 		<?= bl_forms_field_char_count_html($field, $input_id, $settings) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+	</div>
+	<?php
+
+	return (string) ob_get_clean();
+}
+
+/**
+ * Render a Wertebereich / range field (single or dual handle slider).
+ *
+ * @param array<string, mixed> $field
+ * @param array<string, mixed> $settings
+ * @param array<string, mixed> $context
+ */
+function bl_forms_render_range_field(array $field, string $uid, array $settings = [], array $context = []): string
+{
+	unset($settings);
+	$id = (string) ($field['id'] ?? '');
+	$input_id = $uid . '-' . $id;
+	$name = (string) ($field['name'] ?? $id);
+	$label = (string) ($field['label'] ?? '');
+	$required = !empty($field['required']) && empty($field['disabled']);
+	$req_mark = $required ? ' <span class="bl-form__required" aria-hidden="true">*</span>' : '';
+	$slider_attrs = bl_forms_field_control_attrs($field, false);
+	$number_attrs = bl_forms_field_control_attrs($field, true, true);
+	$readonly = empty($field['disabled']) && !empty($field['readonly']);
+	$mode = bl_forms_range_mode($field);
+	$show_inputs = !empty($field['show_inputs']);
+	$bounds = bl_forms_range_bounds($field);
+	$min = $bounds['min'];
+	$max = $bounds['max'];
+	$step = $bounds['step'];
+
+	$prefix = bl_forms_sanitize_affix($field['prefix'] ?? '');
+	$suffix = bl_forms_sanitize_affix($field['suffix'] ?? '');
+	$format = static function (string $value) use ($prefix, $suffix): string {
+		if ($value === '') {
+			return '';
+		}
+
+		return $prefix . $value . $suffix;
+	};
+
+	$resolved = bl_forms_resolve_range_default($field);
+	$bound_attrs = ' min="' . esc_attr($min) . '" max="' . esc_attr($max) . '"';
+	if ($step !== '') {
+		$bound_attrs .= ' step="' . esc_attr($step) . '"';
+	}
+
+	$classes = 'bl-form__field -range' . ($mode === 'single' ? ' is-single' : ' is-dual') . ($show_inputs ? ' has-inputs' : '');
+
+	ob_start();
+	?>
+	<div <?= bl_forms_field_wrap_attrs($field, $classes, $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> data-bl-form-range data-bl-form-range-mode="<?= esc_attr($mode) ?>" data-bl-form-range-min="<?= esc_attr($min) ?>" data-bl-form-range-max="<?= esc_attr($max) ?>"<?= $step !== '' ? ' data-bl-form-range-step="' . esc_attr($step) . '"' : '' ?> data-bl-form-range-prefix="<?= esc_attr($prefix) ?>" data-bl-form-range-suffix="<?= esc_attr($suffix) ?>"<?= $readonly ? ' data-bl-form-range-readonly' : '' ?>>
+		<?= bl_forms_field_label_html($field, $input_id, $req_mark) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+		<?= bl_forms_field_description_html($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+		<?php if ($mode === 'single') :
+			$start = is_scalar($resolved) ? (string) $resolved : $min;
+			?>
+			<div class="bl-form__range is-single<?= $show_inputs ? ' has-inputs' : '' ?>">
+				<div class="bl-form__range-control-row">
+					<?php if ($show_inputs) : ?>
+						<input class="bl-form__range-number" type="number" value="<?= esc_attr($start) ?>"<?= $bound_attrs // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> inputmode="decimal" aria-label="<?= esc_attr($label !== '' ? $label : $name) ?>" data-bl-form-range-number<?= $number_attrs // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+					<?php endif; ?>
+					<div class="bl-form__range-track-row">
+						<span class="bl-form__range-bound is-min"><?= esc_html($format($min)) ?></span>
+						<div class="bl-form__range-stack">
+							<div class="bl-form__range-track" aria-hidden="true"><div class="bl-form__range-fill" data-bl-form-range-fill></div></div>
+							<output class="bl-form__range-thumb-value" for="<?= esc_attr($input_id) ?>" data-bl-form-range-thumb><?= esc_html($format($start)) ?></output>
+							<input class="bl-form__range-input" type="range" id="<?= esc_attr($input_id) ?>" name="fields[<?= esc_attr($name) ?>]" value="<?= esc_attr($start) ?>"<?= $bound_attrs // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> data-bl-form-range-slider<?= $slider_attrs // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_aria_label_attr($field) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+						</div>
+						<span class="bl-form__range-bound is-max"><?= esc_html($format($max)) ?></span>
+					</div>
+				</div>
+			</div>
+		<?php else :
+			$pair = is_array($resolved) ? $resolved : ['from' => $min, 'to' => $max];
+			$from = (string) ($pair['from'] ?? $min);
+			$to = (string) ($pair['to'] ?? $max);
+			$from_id = $input_id;
+			$to_id = $input_id . '-to';
+			?>
+			<div class="bl-form__range is-dual<?= $show_inputs ? ' has-inputs' : '' ?>">
+				<div class="bl-form__range-control-row">
+					<?php if ($show_inputs) : ?>
+						<input class="bl-form__range-number" type="number" value="<?= esc_attr($from) ?>"<?= $bound_attrs // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> inputmode="decimal" aria-label="<?= esc_attr__('From', 'baselayer-forms') ?>" data-bl-form-range-number="from"<?= $number_attrs // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+					<?php endif; ?>
+					<div class="bl-form__range-track-row">
+						<span class="bl-form__range-bound is-min"><?= esc_html($format($min)) ?></span>
+						<div class="bl-form__range-stack">
+							<div class="bl-form__range-track" aria-hidden="true"><div class="bl-form__range-fill" data-bl-form-range-fill></div></div>
+							<output class="bl-form__range-thumb-value" for="<?= esc_attr($from_id) ?>" data-bl-form-range-thumb="from"><?= esc_html($format($from)) ?></output>
+							<output class="bl-form__range-thumb-value" for="<?= esc_attr($to_id) ?>" data-bl-form-range-thumb="to"><?= esc_html($format($to)) ?></output>
+							<input class="bl-form__range-input" type="range" id="<?= esc_attr($from_id) ?>" name="fields[<?= esc_attr($name) ?>][from]" value="<?= esc_attr($from) ?>"<?= $bound_attrs // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> data-bl-form-range-slider="from" aria-label="<?= esc_attr__('From', 'baselayer-forms') ?>"<?= $slider_attrs // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?><?= bl_forms_field_describedby_attr($field, $input_id) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+							<input class="bl-form__range-input" type="range" id="<?= esc_attr($to_id) ?>" name="fields[<?= esc_attr($name) ?>][to]" value="<?= esc_attr($to) ?>"<?= $bound_attrs // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> data-bl-form-range-slider="to" aria-label="<?= esc_attr__('To', 'baselayer-forms') ?>"<?= $slider_attrs // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+						</div>
+						<span class="bl-form__range-bound is-max"><?= esc_html($format($max)) ?></span>
+					</div>
+					<?php if ($show_inputs) : ?>
+						<input class="bl-form__range-number" type="number" value="<?= esc_attr($to) ?>"<?= $bound_attrs // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?> inputmode="decimal" aria-label="<?= esc_attr__('To', 'baselayer-forms') ?>" data-bl-form-range-number="to"<?= $number_attrs // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>
+					<?php endif; ?>
+				</div>
+			</div>
+		<?php endif; ?>
 	</div>
 	<?php
 

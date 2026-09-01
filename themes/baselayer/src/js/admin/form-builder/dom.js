@@ -68,7 +68,7 @@ export const PALETTE_SECTIONS = [
     id: 'choice',
     headingKey: 'paletteSectionChoice',
     headingFallback: 'Choice',
-    types: ['checkboxes', 'radio', 'select', 'toggle', 'button_group'],
+    types: ['checkboxes', 'radio', 'select', 'toggle', 'button_group', 'range'],
   },
   {
     id: 'datetime',

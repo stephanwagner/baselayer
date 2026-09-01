@@ -842,3 +842,317 @@ function bl_forms_string_length(string $value): int
 	return strlen($value);
 }
 
+/**
+ * Whether a range field is in single-value mode.
+ *
+ * @param array<string, mixed> $field
+ */
+function bl_forms_range_mode(array $field): string
+{
+	return (($field['mode'] ?? '') === 'single') ? 'single' : 'range';
+}
+
+/**
+ * Resolved min/max/step for a range slider (0–10 when unset, matching the builder).
+ *
+ * @param array<string, mixed> $field
+ * @return array{min: string, max: string, step: string}
+ */
+function bl_forms_range_bounds(array $field): array
+{
+	$min = bl_forms_sanitize_range_endpoint($field['min'] ?? '');
+	$max = bl_forms_sanitize_range_endpoint($field['max'] ?? '');
+	$step = bl_forms_sanitize_range_endpoint($field['step'] ?? '');
+	if ($min === '') {
+		$min = '0';
+	}
+	if ($max === '') {
+		$max = '10';
+	}
+	if ((float) $min > (float) $max) {
+		[$min, $max] = [$max, $min];
+	}
+
+	return [
+		'min'  => $min,
+		'max'  => $max,
+		'step' => $step,
+	];
+}
+
+/**
+ * Sanitize one numeric range endpoint.
+ *
+ * @param mixed $raw
+ */
+function bl_forms_sanitize_range_endpoint($raw): string
+{
+	if (!is_scalar($raw) || (string) $raw === '') {
+		return '';
+	}
+
+	$value = trim(sanitize_text_field((string) $raw));
+	if ($value === '' || !is_numeric($value)) {
+		return '';
+	}
+
+	return $value;
+}
+
+/**
+ * Resolve effective default for a range field (scalar or from/to pair).
+ *
+ * @param array<string, mixed> $field
+ * @return string|array{from: string, to: string}
+ */
+function bl_forms_resolve_range_default(array $field)
+{
+	if (function_exists('bl_blocks_effective_range_default')) {
+		$resolved = bl_blocks_effective_range_default($field);
+		if ($resolved === null) {
+			return bl_forms_range_mode($field) === 'single'
+				? bl_forms_sanitize_range_endpoint($field['min'] ?? '0')
+				: [
+					'from' => bl_forms_sanitize_range_endpoint($field['min'] ?? '0'),
+					'to' => bl_forms_sanitize_range_endpoint($field['max'] ?? '10'),
+				];
+		}
+
+		return $resolved;
+	}
+
+	$min = bl_forms_sanitize_range_endpoint($field['min'] ?? '');
+	$max = bl_forms_sanitize_range_endpoint($field['max'] ?? '');
+	if ($min === '') {
+		$min = '0';
+	}
+	if ($max === '') {
+		$max = '10';
+	}
+
+	if (bl_forms_range_mode($field) === 'single') {
+		$raw = $field['default_value'] ?? '';
+		if (is_array($raw)) {
+			$raw = $raw['from'] ?? ($raw['value'] ?? '');
+		}
+		$value = bl_forms_sanitize_range_endpoint($raw);
+
+		return $value !== '' ? $value : $min;
+	}
+
+	$raw = $field['default_value'] ?? null;
+	$from = '';
+	$to = '';
+	if (is_array($raw)) {
+		$from = bl_forms_sanitize_range_endpoint($raw['from'] ?? '');
+		$to = bl_forms_sanitize_range_endpoint($raw['to'] ?? '');
+	} elseif (is_scalar($raw) && (string) $raw !== '') {
+		$from = bl_forms_sanitize_range_endpoint($raw);
+	}
+
+	return [
+		'from' => $from !== '' ? $from : $min,
+		'to' => $to !== '' ? $to : $max,
+	];
+}
+
+/**
+ * Format a range value for display (entries/mail).
+ *
+ * @param array<string, mixed> $field
+ * @param mixed                $value
+ */
+function bl_forms_format_range_display_value(array $field, $value): string
+{
+	$prefix = function_exists('bl_forms_sanitize_affix')
+		? bl_forms_sanitize_affix($field['prefix'] ?? '')
+		: (string) ($field['prefix'] ?? '');
+	$suffix = function_exists('bl_forms_sanitize_affix')
+		? bl_forms_sanitize_affix($field['suffix'] ?? '')
+		: (string) ($field['suffix'] ?? '');
+
+	$wrap = static function (string $text) use ($prefix, $suffix): string {
+		if ($text === '') {
+			return '';
+		}
+
+		return $prefix . $text . $suffix;
+	};
+
+	if (bl_forms_range_mode($field) === 'single') {
+		if (is_array($value)) {
+			$value = $value['from'] ?? ($value['value'] ?? '');
+		}
+		if (!is_scalar($value) || (string) $value === '') {
+			return '';
+		}
+
+		return $wrap((string) $value);
+	}
+
+	$from = '';
+	$to = '';
+	if (is_array($value)) {
+		$from = is_scalar($value['from'] ?? null) ? (string) $value['from'] : '';
+		$to = is_scalar($value['to'] ?? null) ? (string) $value['to'] : '';
+	} elseif (is_scalar($value) && (string) $value !== '') {
+		$from = (string) $value;
+	}
+
+	$from_label = $wrap($from);
+	$to_label = $wrap($to);
+	if ($from_label === '' && $to_label === '') {
+		return '';
+	}
+	if ($from_label === '') {
+		return $to_label;
+	}
+	if ($to_label === '') {
+		return $from_label;
+	}
+
+	return $from_label . ' – ' . $to_label;
+}
+
+/**
+ * Sanitize posted/submitted range value.
+ *
+ * @param array<string, mixed> $field
+ * @param mixed                $raw
+ * @return string|array{from: string, to: string}
+ */
+function bl_forms_sanitize_range_submitted_value(array $field, $raw)
+{
+	if (function_exists('bl_blocks_sanitize_range_stored_value')) {
+		return bl_blocks_sanitize_range_stored_value($field, $raw);
+	}
+
+	$min = bl_forms_sanitize_range_endpoint($field['min'] ?? '');
+	$max = bl_forms_sanitize_range_endpoint($field['max'] ?? '');
+
+	$clamp = static function (string $value) use ($min, $max): string {
+		if ($value === '' || !is_numeric($value)) {
+			return '';
+		}
+		$n = (float) $value;
+		if ($min !== '' && is_numeric($min) && $n < (float) $min) {
+			$n = (float) $min;
+		}
+		if ($max !== '' && is_numeric($max) && $n > (float) $max) {
+			$n = (float) $max;
+		}
+
+		return (string) $n;
+	};
+
+	if (bl_forms_range_mode($field) === 'single') {
+		if (is_array($raw)) {
+			$raw = $raw['from'] ?? ($raw['value'] ?? '');
+		}
+		$value = $clamp(bl_forms_sanitize_range_endpoint($raw));
+
+		return $value;
+	}
+
+	$from = '';
+	$to = '';
+	if (is_array($raw)) {
+		$from = $clamp(bl_forms_sanitize_range_endpoint($raw['from'] ?? ''));
+		$to = $clamp(bl_forms_sanitize_range_endpoint($raw['to'] ?? ''));
+	} elseif (is_scalar($raw)) {
+		$from = $clamp(bl_forms_sanitize_range_endpoint($raw));
+	}
+
+	if ($from !== '' && $to !== '' && (float) $from > (float) $to) {
+		[$from, $to] = [$to, $from];
+	}
+
+	return ['from' => $from, 'to' => $to];
+}
+
+/**
+ * Fallback field sanitizer when Blocks package helpers are unavailable.
+ *
+ * @param array<string, mixed> $field
+ * @return array<string, mixed>
+ */
+function bl_forms_sanitize_range_field_fallback(array $field): array
+{
+	$id = sanitize_key((string) ($field['id'] ?? ''));
+	if ($id === '') {
+		$id = 'f' . wp_generate_password(8, false, false);
+	}
+	$name = sanitize_key((string) ($field['name'] ?? ''));
+	if ($name === '') {
+		$name = $id;
+	}
+
+	$width = function_exists('bl_forms_sanitize_width')
+		? bl_forms_sanitize_width($field)
+		: ['width' => '100', 'width_custom' => ''];
+
+	$min = bl_forms_sanitize_range_endpoint($field['min'] ?? '');
+	$max = bl_forms_sanitize_range_endpoint($field['max'] ?? '');
+	if ($min !== '' && $max !== '' && (float) $min > (float) $max) {
+		$max = '';
+	}
+	$step = bl_forms_sanitize_range_endpoint($field['step'] ?? '');
+	$mode = bl_forms_range_mode($field);
+
+	$out = [
+		'id'            => $id,
+		'type'          => 'range',
+		'label'         => sanitize_text_field((string) ($field['label'] ?? '')),
+		'name'          => $name,
+		'name_manual'   => !empty($field['name_manual']) || $name !== '',
+		'hide_label'    => !empty($field['hide_label']),
+		'css_class'     => function_exists('bl_forms_sanitize_css_class')
+			? bl_forms_sanitize_css_class((string) ($field['css_class'] ?? ''))
+			: sanitize_html_class((string) ($field['css_class'] ?? '')),
+		'width'         => $width['width'],
+		'width_custom'  => $width['width_custom'],
+		'active'        => function_exists('bl_forms_field_is_active')
+			? bl_forms_field_is_active($field)
+			: (!array_key_exists('active', $field) || !empty($field['active'])),
+		'required'      => !empty($field['required']),
+		'description'   => sanitize_textarea_field((string) ($field['description'] ?? '')),
+		'mode'          => $mode,
+		'show_inputs'   => !empty($field['show_inputs']),
+		'default_value' => bl_forms_sanitize_range_submitted_value(
+			['min' => $min, 'max' => $max, 'mode' => $mode],
+			$field['default_value'] ?? null
+		),
+	];
+	if (!empty($field['readonly'])) {
+		$out['readonly'] = true;
+	}
+	if (!empty($field['disabled'])) {
+		$out['disabled'] = true;
+	}
+
+	if ($min !== '') {
+		$out['min'] = $min;
+	}
+	if ($max !== '') {
+		$out['max'] = $max;
+	}
+	if ($step !== '') {
+		$out['step'] = $step;
+	}
+
+	$prefix = bl_forms_sanitize_affix($field['prefix'] ?? '');
+	$suffix = bl_forms_sanitize_affix($field['suffix'] ?? '');
+	if ($prefix !== '') {
+		$out['prefix'] = $prefix;
+	}
+	if ($suffix !== '') {
+		$out['suffix'] = $suffix;
+	}
+
+	if (function_exists('bl_forms_attach_conditional_logic')) {
+		return bl_forms_attach_conditional_logic($out, $field);
+	}
+
+	return $out;
+}
+

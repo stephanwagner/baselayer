@@ -2127,3 +2127,35 @@ msgstr "Einklappen"
 
 msgid "Expand"
 msgstr "Ausklappen"
+
+#: includes/admin.php
+msgid "Value range"
+msgstr "Wertebereich"
+
+#: includes/admin.php
+msgid "Default from"
+msgstr "Standard von"
+
+#: includes/admin.php
+msgid "Default to"
+msgstr "Standard bis"
+
+#: includes/admin.php
+msgid "Mode"
+msgstr "Modus"
+
+#: includes/admin.php
+msgid "Single value"
+msgstr "Einzelwert"
+
+#: includes/admin.php
+msgid "Range"
+msgstr "Bereich"
+
+#: includes/admin.php
+msgid "Allow number input"
+msgstr "Zahleingabe erlauben"
+
+#: includes/admin.php
+msgid "Step"
+msgstr "Schritt"

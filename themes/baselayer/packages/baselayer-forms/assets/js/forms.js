@@ -50,6 +50,155 @@
       update();
     });
   }
+  function initRangeFields(root) {
+    root.querySelectorAll("[data-bl-form-range]").forEach((wrap) => {
+      const mode = wrap.getAttribute("data-bl-form-range-mode") === "single" ? "single" : "range";
+      const min = parseFloat(wrap.getAttribute("data-bl-form-range-min") || "0");
+      const max = parseFloat(wrap.getAttribute("data-bl-form-range-max") || "10");
+      const stepRaw = parseFloat(wrap.getAttribute("data-bl-form-range-step") || "");
+      const step = Number.isFinite(stepRaw) && stepRaw > 0 ? stepRaw : null;
+      const prefix = wrap.getAttribute("data-bl-form-range-prefix") || "";
+      const suffix = wrap.getAttribute("data-bl-form-range-suffix") || "";
+      const span = max - min || 1;
+      const fill = wrap.querySelector("[data-bl-form-range-fill]");
+      const format = (value) => `${prefix}${value}${suffix}`;
+      const normalize = (raw, fallback) => {
+        let n = parseFloat(raw);
+        if (!Number.isFinite(n)) {
+          n = Number.isFinite(fallback) ? fallback : min;
+        }
+        n = Math.max(min, Math.min(max, n));
+        if (step) {
+          n = min + Math.round((n - min) / step) * step;
+          n = Math.max(min, Math.min(max, n));
+        }
+        return String(n);
+      };
+      const updateFill = (fromRaw, toRaw) => {
+        if (!fill) return;
+        const from = Math.min(parseFloat(fromRaw), parseFloat(toRaw));
+        const to = Math.max(parseFloat(fromRaw), parseFloat(toRaw));
+        const left = (from - min) / span * 100;
+        const width = (to - from) / span * 100;
+        fill.style.left = `${left}%`;
+        fill.style.width = `${width}%`;
+      };
+      const positionThumb = (el, raw) => {
+        if (!el) return;
+        const value = parseFloat(raw);
+        const pct = Math.min(100, Math.max(0, (value - min) / span * 100));
+        el.style.left = `${pct}%`;
+        el.textContent = format(raw);
+      };
+      const readonly = wrap.hasAttribute("data-bl-form-range-readonly");
+      if (mode === "single") {
+        const slider = wrap.querySelector("[data-bl-form-range-slider]");
+        const number = wrap.querySelector("[data-bl-form-range-number]");
+        const thumb = wrap.querySelector("[data-bl-form-range-thumb]");
+        if (!slider) return;
+        const sync = (source = "range") => {
+          let value = slider.value;
+          if (source === "number" && number) {
+            value = normalize(number.value, parseFloat(slider.value));
+            slider.value = value;
+            number.value = value;
+          } else if (number) {
+            number.value = value;
+          }
+          positionThumb(thumb, value);
+          updateFill(min, value);
+        };
+        if (readonly) {
+          slider.addEventListener("input", () => {
+            slider.value = slider.defaultValue;
+            sync("range");
+          });
+        } else {
+          slider.addEventListener("input", () => sync("range"));
+          if (number) {
+            ["input", "change", "blur"].forEach((evt) => {
+              number.addEventListener(evt, () => sync("number"));
+            });
+          }
+        }
+        sync("range");
+        return;
+      }
+      const fromSlider = wrap.querySelector('[data-bl-form-range-slider="from"]');
+      const toSlider = wrap.querySelector('[data-bl-form-range-slider="to"]');
+      const fromNumber = wrap.querySelector('[data-bl-form-range-number="from"]');
+      const toNumber = wrap.querySelector('[data-bl-form-range-number="to"]');
+      const fromThumb = wrap.querySelector('[data-bl-form-range-thumb="from"]');
+      const toThumb = wrap.querySelector('[data-bl-form-range-thumb="to"]');
+      if (!fromSlider || !toSlider) return;
+      const raise = (which) => {
+        fromSlider.style.zIndex = which === "from" ? "2" : "1";
+        toSlider.style.zIndex = which === "to" ? "2" : "1";
+        fromThumb?.classList.toggle("is-active", which === "from");
+        toThumb?.classList.toggle("is-active", which === "to");
+      };
+      const syncValues = () => {
+        positionThumb(fromThumb, fromSlider.value);
+        positionThumb(toThumb, toSlider.value);
+        updateFill(fromSlider.value, toSlider.value);
+        if (fromNumber) fromNumber.value = fromSlider.value;
+        if (toNumber) toNumber.value = toSlider.value;
+      };
+      const syncFrom = (source = "range") => {
+        if (source === "number" && fromNumber) {
+          fromSlider.value = normalize(fromNumber.value, parseFloat(fromSlider.value));
+          fromNumber.value = fromSlider.value;
+        }
+        if (parseFloat(fromSlider.value) > parseFloat(toSlider.value)) {
+          fromSlider.value = toSlider.value;
+          if (fromNumber) fromNumber.value = fromSlider.value;
+        }
+        syncValues();
+      };
+      const syncTo = (source = "range") => {
+        if (source === "number" && toNumber) {
+          toSlider.value = normalize(toNumber.value, parseFloat(toSlider.value));
+          toNumber.value = toSlider.value;
+        }
+        if (parseFloat(toSlider.value) < parseFloat(fromSlider.value)) {
+          toSlider.value = fromSlider.value;
+          if (toNumber) toNumber.value = toSlider.value;
+        }
+        syncValues();
+      };
+      if (readonly) {
+        const lock = (el) => {
+          el.addEventListener("input", () => {
+            el.value = el.defaultValue;
+            syncValues();
+          });
+        };
+        lock(fromSlider);
+        lock(toSlider);
+      } else {
+        fromSlider.addEventListener("input", () => syncFrom("range"));
+        toSlider.addEventListener("input", () => syncTo("range"));
+        fromSlider.addEventListener("pointerdown", () => raise("from"));
+        toSlider.addEventListener("pointerdown", () => raise("to"));
+        fromSlider.addEventListener("focus", () => raise("from"));
+        toSlider.addEventListener("focus", () => raise("to"));
+        fromSlider.addEventListener("blur", () => fromThumb?.classList.remove("is-active"));
+        toSlider.addEventListener("blur", () => toThumb?.classList.remove("is-active"));
+        if (fromNumber) {
+          ["input", "change", "blur"].forEach((evt) => {
+            fromNumber.addEventListener(evt, () => syncFrom("number"));
+          });
+        }
+        if (toNumber) {
+          ["input", "change", "blur"].forEach((evt) => {
+            toNumber.addEventListener(evt, () => syncTo("number"));
+          });
+        }
+      }
+      toSlider.style.zIndex = "2";
+      syncValues();
+    });
+  }
   function normalizeHttpsUrl(raw) {
     let v = String(raw || "").replace(
       /^[\s\u00A0\u2000-\u200B\uFEFF]+|[\s\u00A0\u2000-\u200B\uFEFF]+$/g,
@@ -668,6 +817,7 @@
     initClassicFileLimits(root);
     initCharCounters(root);
     initHttpsUrlFields(root);
+    initRangeFields(root);
     const evaluateLogic = initConditionalLogic(root);
     const progress = createProgressController(root);
     const jsField = form.querySelector("[data-bl-form-js-field]");

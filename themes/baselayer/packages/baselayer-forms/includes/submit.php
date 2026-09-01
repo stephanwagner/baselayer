@@ -453,6 +453,8 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 				|| ($type === 'select' && $multiple)
 			) {
 				$values[$name] = [];
+			} elseif ($type === 'range' && bl_forms_range_mode($field) !== 'single') {
+				$values[$name] = ['from' => '', 'to' => ''];
 			} else {
 				$values[$name] = '';
 			}
@@ -469,8 +471,27 @@ function bl_forms_validate_submission(array $fields, array $raw, array $files = 
 				$values[$name] = bl_forms_field_default_checked($field) ? '1' : '';
 			} elseif (in_array($type, ['date', 'time', 'datetime'], true)) {
 				$values[$name] = bl_forms_resolve_temporal_bound($field, 'default');
+			} elseif ($type === 'range') {
+				$values[$name] = bl_forms_resolve_range_default($field);
 			} else {
-				$values[$name] = sanitize_text_field((string) ($field['default_value'] ?? ''));
+				$default = $field['default_value'] ?? '';
+				$values[$name] = is_scalar($default) ? sanitize_text_field((string) $default) : '';
+			}
+			continue;
+		}
+
+		if ($type === 'range') {
+			$value = bl_forms_sanitize_range_submitted_value($field, $raw_value);
+			$values[$name] = $value;
+			$empty = false;
+			if (bl_forms_range_mode($field) === 'single') {
+				$empty = !is_scalar($value) || (string) $value === '';
+			} else {
+				$empty = !is_array($value)
+					|| (($value['from'] ?? '') === '' && ($value['to'] ?? '') === '');
+			}
+			if ($required && $empty) {
+				$invalid[$name] = bl_forms_field_error_message('required', $field, $settings);
 			}
 			continue;
 		}

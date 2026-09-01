@@ -44,7 +44,12 @@ function bl_forms_fields_default_raw(array $fields): array
 			$raw[$name] = bl_forms_resolve_temporal_bound($field, 'default');
 			continue;
 		}
-		$raw[$name] = (string) ($field['default_value'] ?? '');
+		if ($type === 'range') {
+			$raw[$name] = bl_forms_resolve_range_default($field);
+			continue;
+		}
+		$default = $field['default_value'] ?? '';
+		$raw[$name] = is_scalar($default) ? (string) $default : '';
 	}
 
 	return $raw;

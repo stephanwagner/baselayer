@@ -14,6 +14,7 @@ function bl_forms_field_types(): array
 		'email',
 		'url',
 		'number',
+		'range',
 		'phone',
 		'textarea',
 		'radio',
@@ -1001,6 +1002,10 @@ function bl_forms_format_field_display_value(array $field, $value): string
 			: __('No', 'baselayer-forms');
 	}
 
+	if ($type === 'range') {
+		return bl_forms_format_range_display_value($field, $value);
+	}
+
 	if (in_array($type, ['file', 'image'], true) || bl_forms_value_looks_like_files($value)) {
 		return bl_forms_format_file_display_value($value);
 	}
@@ -1072,6 +1077,18 @@ function bl_forms_entry_schema_from_config(array $fields, array $values): array
 
 		if (in_array($type, ['text', 'email', 'phone'], true)) {
 			$item['show_in_list'] = !empty($field['show_in_list']);
+		}
+
+		if ($type === 'range') {
+			$item['mode'] = function_exists('bl_forms_range_mode')
+				? bl_forms_range_mode($field)
+				: ((($field['mode'] ?? '') === 'single') ? 'single' : 'range');
+			if (isset($field['prefix']) && (string) $field['prefix'] !== '') {
+				$item['prefix'] = (string) $field['prefix'];
+			}
+			if (isset($field['suffix']) && (string) $field['suffix'] !== '') {
+				$item['suffix'] = (string) $field['suffix'];
+			}
 		}
 
 		if (in_array($type, $choice_types, true) && isset($field['options']) && is_array($field['options'])) {
@@ -1578,6 +1595,25 @@ function bl_forms_sanitize_field($field): ?array
 		unset($out['required'], $out['placeholder'], $out['hide_label']);
 
 		return bl_forms_attach_conditional_logic($out, $field);
+	}
+
+	if ($type === 'range') {
+		$out = function_exists('bl_blocks_sanitize_range_field')
+			? bl_blocks_sanitize_range_field($field)
+			: bl_forms_sanitize_range_field_fallback($field);
+		$out['required'] = !empty($field['required']);
+		if (!empty($field['readonly'])) {
+			$out['readonly'] = true;
+		} else {
+			unset($out['readonly']);
+		}
+		if (!empty($field['disabled'])) {
+			$out['disabled'] = true;
+		} else {
+			unset($out['disabled']);
+		}
+
+		return $out;
 	}
 
 	$out['required'] = !empty($field['required']);
