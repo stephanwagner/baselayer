@@ -43,7 +43,7 @@
     margin-bottom: var(--bl-text-margin-bottom);
 
     &:where(:first-child) {
-      margin-bottom: 0;
+      margin-top: 0;
     }
 
     &:where(:last-child) {

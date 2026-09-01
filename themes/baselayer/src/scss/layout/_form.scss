@@ -125,7 +125,7 @@
     &.-is-loading {
       pointer-events: none;
       color: transparent !important;
-      -webkit-text-fill-color: transparent !important;;
+      -webkit-text-fill-color: transparent !important;
 
       > * {
         visibility: hidden;
@@ -501,6 +501,11 @@
 }
 
 // Inputs
+
+input,
+textarea {
+  font-weight: var(--bl-default-font-weight);
+}
 
 input[type='search'] {
   outline-offset: 1px;
