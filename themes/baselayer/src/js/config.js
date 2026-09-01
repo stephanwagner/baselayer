@@ -41,6 +41,12 @@ const ROOT_VAR_MAP = [
     fallback: 900,
   },
   {
+    key: 'breakpointWordpress',
+    prop: '--bl-breakpoint-wordpress',
+    parse: 'unit',
+    fallback: 782,
+  },
+  {
     key: 'headerHeightScrolled',
     prop: '--bl-header-height-scrolled-current',
     parse: 'unit',

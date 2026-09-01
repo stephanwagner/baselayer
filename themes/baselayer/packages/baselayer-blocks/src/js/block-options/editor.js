@@ -639,7 +639,7 @@ const addControl = createHigherOrderComponent((BlockEdit) => {
                               icon={opt.icon}
                               iconLabel={option.iconLabel}
                               iconPosition={opt.iconPosition}
-                              title={columnsStackBreakpointTitle(opt.value) || opt.title}
+                              title={columnsStackBreakpointTitle(opt.value, option) || opt.title}
                             />
                           ))}
                         </ToggleGroupControl>

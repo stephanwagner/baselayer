@@ -1891,8 +1891,10 @@
   }
 
   // themes/baselayer/packages/baselayer-blocks/src/js/block-options/shared/columns-stack-breakpoint-title.js
+  var WORDPRESS_STACK = { prop: "--bl-breakpoint-wordpress", fallback: 782 };
   var STACK_BREAKPOINT_SPEC = {
-    "-columns-stack-unset": { prop: null, fallback: 782 },
+    "": WORDPRESS_STACK,
+    "-columns-stack-unset": WORDPRESS_STACK,
     "-columns-stack-early": { prop: "--bl-breakpoint-l", fallback: 1200 },
     "-columns-stack-medium": { prop: "--bl-breakpoint-m", fallback: 900 },
     "-columns-stack-late": { prop: "--bl-breakpoint-s", fallback: 600 }
@@ -1919,8 +1921,11 @@
     }
     return `${fallback}px`;
   }
-  function columnsStackBreakpointTitle(value) {
-    const spec = STACK_BREAKPOINT_SPEC[value];
+  function columnsStackBreakpointTitle(value, option) {
+    if (option && option.attributeName !== "columnsStackBreakpoint") {
+      return "";
+    }
+    const spec = STACK_BREAKPOINT_SPEC[value || ""];
     if (!spec) {
       return "";
     }
@@ -2409,7 +2414,7 @@
                   icon: opt.icon,
                   iconLabel: option.iconLabel,
                   iconPosition: opt.iconPosition,
-                  title: columnsStackBreakpointTitle(opt.value) || opt.title
+                  title: columnsStackBreakpointTitle(opt.value, option) || opt.title
                 }
               ))
             ));
