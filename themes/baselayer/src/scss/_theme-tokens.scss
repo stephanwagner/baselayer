@@ -113,12 +113,12 @@
   --bl-h6-margin-bottom: #{$h6-margin-bottom};
 
   @media (max-width: #{$breakpoint-m}) {
-    --bl-h1-font-size: min(#{$h1-font-size}, 28px);
-    --bl-h2-font-size: min(#{$h2-font-size}, 26px);
+    --bl-h1-font-size: min(#{$h1-font-size}, 32px);
+    --bl-h2-font-size: min(#{$h2-font-size}, 28px);
   }
 
   @media (max-width: #{$breakpoint-s}) {
-    --bl-h1-font-size: min(#{$h1-font-size}, 26px);
+    --bl-h1-font-size: min(#{$h1-font-size}, 28px);
     --bl-h1-margin-top: min(#{$h1-margin-top}, 32px);
     --bl-h1-margin-bottom: min(#{$h1-margin-bottom}, 12px);
     --bl-h2-font-size: min(#{$h2-font-size}, 24px);
