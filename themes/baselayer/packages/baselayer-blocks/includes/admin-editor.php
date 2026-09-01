@@ -626,6 +626,7 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'rangeMode'               => __('Mode', 'baselayer-blocks'),
 		'rangeModeSingle'         => __('Single value', 'baselayer-blocks'),
 		'rangeModeRange'          => __('Range', 'baselayer-blocks'),
+		'showRangeInputs'         => __('Allow number input', 'baselayer-blocks'),
 		'optionLabel'             => __('Label', 'baselayer-blocks'),
 		'optionOne'               => __('Option 1', 'baselayer-blocks'),
 		'optionSlug'              => __('Slug', 'baselayer-blocks'),

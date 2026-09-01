@@ -498,6 +498,7 @@ function convertFieldType(field, nextType) {
     }
   } else {
     delete field.mode;
+    delete field.show_inputs;
   }
 
   if (nextType !== 'number' && nextType !== 'range') {
@@ -1785,6 +1786,19 @@ function createRangeModeControl(field, onModeChange) {
   });
   wrap.append(el('label', { text: t('rangeMode', 'Mode') }), group);
   return wrap;
+}
+
+function createRangeShowInputsControl(field) {
+  const sync = (checked) => {
+    field.show_inputs = !!checked;
+    document.dispatchEvent(new CustomEvent('bl-forms-builder-changed'));
+  };
+  return createSwitchSetting(
+    'blRangeShowInputs',
+    t('showRangeInputs', 'Allow number input'),
+    !!field.show_inputs,
+    sync
+  );
 }
 
 function createRangeDefaultControl(field, updatePreview) {
@@ -3225,6 +3239,7 @@ export function serializeRow(row) {
   if (type === 'range') {
     const modeBtn = q('[data-bl-range-mode].is-active');
     data.mode = modeBtn?.dataset.blRangeMode === 'single' ? 'single' : 'range';
+    data.show_inputs = Boolean(q('[data-bl-range-show-inputs]')?.checked);
     if (data.mode === 'single') {
       data.default_value = q('[data-bl-default]')?.value?.trim() || '';
     } else {
@@ -3774,7 +3789,8 @@ export function createFieldCard(initial, open = false) {
           createRangeModeControl(field, () => {
             renderBody('general');
           }),
-          createNumberBoundsControl(field)
+          createNumberBoundsControl(field),
+          createRangeShowInputsControl(field)
         );
       }
 

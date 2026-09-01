@@ -918,9 +918,9 @@ function createLeafControl(field, values, controls) {
   } else if (type === 'range') {
     const mode = field.mode === 'single' ? 'single' : 'range';
     const minFallback =
-      field.min != null && field.min !== '' ? String(field.min) : '';
+      field.min != null && field.min !== '' ? String(field.min) : '0';
     const maxFallback =
-      field.max != null && field.max !== '' ? String(field.max) : '';
+      field.max != null && field.max !== '' ? String(field.max) : '10';
     const resolveCurrent = () => {
       const hasStored = values[name] !== undefined && values[name] !== null;
       if (mode === 'single') {
@@ -964,63 +964,282 @@ function createLeafControl(field, values, controls) {
       };
     };
     const resolved = resolveCurrent();
-    const prefix = field.prefix != null ? String(field.prefix).trim() : '';
-    const suffix = field.suffix != null ? String(field.suffix).trim() : '';
+    const prefix = field.prefix != null ? String(field.prefix) : '';
+    const suffix = field.suffix != null ? String(field.suffix) : '';
+    const formatRangeLabel = (value) => {
+      const text = value == null || value === '' ? '' : String(value);
+      if (!text) return '';
+      return `${prefix}${text}${suffix}`;
+    };
     const applyBounds = (input) => {
       if (field.min != null && field.min !== '') input.min = String(field.min);
       if (field.max != null && field.max !== '') input.max = String(field.max);
       if (field.step != null && field.step !== '') input.step = String(field.step);
     };
-    const wrapAffix = (input) => {
-      if (!prefix && !suffix) return input;
-      const group = el('div', { className: 'bl-blocks-fields__input-group' });
-      if (prefix) {
-        group.appendChild(
-          el('span', { className: 'bl-blocks-fields__affix bl-blocks-fields__affix--prefix', text: prefix })
-        );
+    const initialRangeValue = (raw, fallback) => {
+      const next = raw != null && String(raw).trim() !== '' ? String(raw).trim() : fallback;
+      return next === '' ? fallback : next;
+    };
+    const parseBound = (raw, fallback) => {
+      const n = parseFloat(raw);
+      return Number.isFinite(n) ? n : parseFloat(fallback);
+    };
+    const minNum = parseBound(field.min, minFallback);
+    const maxNum = parseBound(field.max, maxFallback);
+    const rangeSpan = maxNum - minNum || 1;
+    const showInputs = !!field.show_inputs;
+
+    const normalizeValue = (raw, fallback) => {
+      const parsed = parseFloat(raw);
+      if (!Number.isFinite(parsed)) {
+        return initialRangeValue(raw, fallback);
       }
-      group.appendChild(input);
-      if (suffix) {
-        group.appendChild(
-          el('span', { className: 'bl-blocks-fields__affix bl-blocks-fields__affix--suffix', text: suffix })
-        );
+      let clamped = Math.max(minNum, Math.min(maxNum, parsed));
+      const stepRaw =
+        field.step != null && field.step !== '' ? parseFloat(field.step) : Number.NaN;
+      if (Number.isFinite(stepRaw) && stepRaw > 0) {
+        clamped = minNum + Math.round((clamped - minNum) / stepRaw) * stepRaw;
+        clamped = Math.max(minNum, Math.min(maxNum, clamped));
       }
-      return group;
+      return String(clamped);
     };
 
-    if (mode === 'single') {
-      const input = el('input', {
-        className: 'widefat',
-        type: 'number',
-        id,
-        value: resolved == null ? '' : String(resolved),
+    const updateFill = (fillEl, fromRaw, toRaw) => {
+      const from = parseBound(fromRaw, minFallback);
+      const to = parseBound(toRaw, maxFallback);
+      const safeFrom = Math.min(from, to);
+      const safeTo = Math.max(from, to);
+      const left = ((safeFrom - minNum) / rangeSpan) * 100;
+      const width = ((safeTo - safeFrom) / rangeSpan) * 100;
+      fillEl.style.left = `${left}%`;
+      fillEl.style.width = `${width}%`;
+    };
+
+    const positionThumbValue = (labelEl, rawValue) => {
+      const value = parseBound(rawValue, minFallback);
+      const pct = Math.min(100, Math.max(0, ((value - minNum) / rangeSpan) * 100));
+      labelEl.style.left = `${pct}%`;
+      labelEl.textContent = formatRangeLabel(rawValue);
+    };
+
+    const createThumbValue = (className, forId) =>
+      el('output', {
+        className: `bl-blocks-fields__range-thumb-value ${className}`.trim(),
+        for: forId,
       });
+
+    const createRangeInput = (rowId, className, startValue, fallback, ariaLabel) => {
+      const input = el('input', {
+        type: 'range',
+        className: `bl-blocks-fields__range-input ${className}`,
+        id: rowId,
+        value: initialRangeValue(startValue, fallback),
+      });
+      if (ariaLabel) {
+        input.setAttribute('aria-label', ariaLabel);
+      }
       applyBounds(input);
-      control = wrapAffix(input);
-      control.getRangeValue = () => input.value.trim();
+      return input;
+    };
+
+    const createNumberInput = (rowId, className, startValue, fallback, ariaLabel) => {
+      const input = el('input', {
+        type: 'number',
+        className: `bl-blocks-fields__range-number ${className}`.trim(),
+        id: rowId,
+        value: initialRangeValue(startValue, fallback),
+      });
+      if (ariaLabel) {
+        input.setAttribute('aria-label', ariaLabel);
+      }
+      applyBounds(input);
+      input.setAttribute('inputmode', 'decimal');
+      return input;
+    };
+
+    const createBoundLabel = (kind) =>
+      el('span', {
+        className: `bl-blocks-fields__range-bound is-${kind}`,
+        text: formatRangeLabel(kind === 'min' ? minFallback : maxFallback),
+      });
+
+    const createTrackRow = (stackEl) =>
+      el('div', { className: 'bl-blocks-fields__range-track-row' }, [
+        createBoundLabel('min'),
+        stackEl,
+        createBoundLabel('max'),
+      ]);
+
+    const bindNumberInput = (numberInput, onSync) => {
+      numberInput.addEventListener('input', onSync);
+      numberInput.addEventListener('change', onSync);
+      numberInput.addEventListener('blur', onSync);
+    };
+
+    const track = el('div', { className: 'bl-blocks-fields__range-track', 'aria-hidden': 'true' });
+    const fill = el('div', { className: 'bl-blocks-fields__range-fill' });
+    track.appendChild(fill);
+    const stack = el('div', { className: 'bl-blocks-fields__range-stack' }, [track]);
+
+    if (mode === 'single') {
+      const start = initialRangeValue(resolved == null ? '' : String(resolved), minFallback);
+      const rangeInput = createRangeInput(
+        id,
+        'bl-blocks-fields__range-input--single',
+        start,
+        minFallback,
+        field.label || name || undefined
+      );
+      const valueOut = createThumbValue('bl-blocks-fields__range-thumb-value--single', id);
+      let numberInput = null;
+      const sync = (source = 'range') => {
+        let value = rangeInput.value;
+        if (source === 'number' && numberInput) {
+          value = normalizeValue(numberInput.value, minFallback);
+          rangeInput.value = value;
+          numberInput.value = value;
+        } else if (numberInput) {
+          numberInput.value = value;
+        }
+        positionThumbValue(valueOut, value);
+        updateFill(fill, minFallback, value);
+        document.dispatchEvent(new CustomEvent('bl-blocks-fields-changed'));
+      };
+      rangeInput.addEventListener('input', () => sync('range'));
+      if (showInputs) {
+        numberInput = createNumberInput(
+          id + '-number',
+          'bl-blocks-fields__range-number--single',
+          start,
+          minFallback,
+          field.label || name || undefined
+        );
+        bindNumberInput(numberInput, () => sync('number'));
+      }
+      stack.appendChild(valueOut);
+      stack.appendChild(rangeInput);
+      sync('range');
+
+      const trackRow = createTrackRow(stack);
+      const row = showInputs
+        ? el('div', { className: 'bl-blocks-fields__range-control-row' }, [numberInput, trackRow])
+        : trackRow;
+
+      control = el('div', {
+        className: `bl-blocks-fields__range is-single${showInputs ? ' has-inputs' : ''}`,
+      }, [row]);
+      control.getRangeValue = () => rangeInput.value.trim();
     } else {
       const pair = resolved && typeof resolved === 'object' ? resolved : { from: '', to: '' };
-      const fromInput = el('input', {
-        className: 'widefat',
-        type: 'number',
+      const fromInput = createRangeInput(
         id,
-        value: pair.from,
-        'aria-label': i18n('rangeFrom', 'From'),
+        'bl-blocks-fields__range-input--from',
+        pair.from,
+        minFallback,
+        i18n('rangeFrom', 'From')
+      );
+      const toInput = createRangeInput(
+        id + '-to',
+        'bl-blocks-fields__range-input--to',
+        pair.to,
+        maxFallback,
+        i18n('rangeTo', 'To')
+      );
+      const raise = (input) => {
+        fromInput.style.zIndex = input === fromInput ? '2' : '1';
+        toInput.style.zIndex = input === toInput ? '2' : '1';
+        fromOut.classList.toggle('is-active', input === fromInput);
+        toOut.classList.toggle('is-active', input === toInput);
+      };
+      const fromOut = createThumbValue('bl-blocks-fields__range-thumb-value--from', id);
+      const toOut = createThumbValue('bl-blocks-fields__range-thumb-value--to', id + '-to');
+      let fromNumber = null;
+      let toNumber = null;
+      const syncValues = () => {
+        positionThumbValue(fromOut, fromInput.value);
+        positionThumbValue(toOut, toInput.value);
+        updateFill(fill, fromInput.value, toInput.value);
+        if (fromNumber) {
+          fromNumber.value = fromInput.value;
+        }
+        if (toNumber) {
+          toNumber.value = toInput.value;
+        }
+      };
+      const syncFrom = (source = 'range') => {
+        if (source === 'number' && fromNumber) {
+          fromInput.value = normalizeValue(fromNumber.value, minFallback);
+          fromNumber.value = fromInput.value;
+        }
+        if (parseFloat(fromInput.value) > parseFloat(toInput.value)) {
+          fromInput.value = toInput.value;
+          if (fromNumber) {
+            fromNumber.value = fromInput.value;
+          }
+        }
+        syncValues();
+        document.dispatchEvent(new CustomEvent('bl-blocks-fields-changed'));
+      };
+      const syncTo = (source = 'range') => {
+        if (source === 'number' && toNumber) {
+          toInput.value = normalizeValue(toNumber.value, maxFallback);
+          toNumber.value = toInput.value;
+        }
+        if (parseFloat(toInput.value) < parseFloat(fromInput.value)) {
+          toInput.value = fromInput.value;
+          if (toNumber) {
+            toNumber.value = toInput.value;
+          }
+        }
+        syncValues();
+        document.dispatchEvent(new CustomEvent('bl-blocks-fields-changed'));
+      };
+      fromInput.addEventListener('input', () => syncFrom('range'));
+      toInput.addEventListener('input', () => syncTo('range'));
+      if (showInputs) {
+        fromNumber = createNumberInput(
+          id + '-from-number',
+          'bl-blocks-fields__range-number--from',
+          pair.from,
+          minFallback,
+          i18n('rangeFrom', 'From')
+        );
+        toNumber = createNumberInput(
+          id + '-to-number',
+          'bl-blocks-fields__range-number--to',
+          pair.to,
+          maxFallback,
+          i18n('rangeTo', 'To')
+        );
+        bindNumberInput(fromNumber, () => syncFrom('number'));
+        bindNumberInput(toNumber, () => syncTo('number'));
+      }
+      fromInput.addEventListener('pointerdown', () => raise(fromInput));
+      toInput.addEventListener('pointerdown', () => raise(toInput));
+      fromInput.addEventListener('focus', () => raise(fromInput));
+      toInput.addEventListener('focus', () => raise(toInput));
+      fromInput.addEventListener('blur', () => {
+        fromOut.classList.remove('is-active');
       });
-      const toInput = el('input', {
-        className: 'widefat',
-        type: 'number',
-        id: id + '-to',
-        value: pair.to,
-        'aria-label': i18n('rangeTo', 'To'),
+      toInput.addEventListener('blur', () => {
+        toOut.classList.remove('is-active');
       });
-      applyBounds(fromInput);
-      applyBounds(toInput);
-      control = el('div', { className: 'bl-blocks-fields__range' }, [
-        wrapAffix(fromInput),
-        el('span', { className: 'bl-blocks-fields__range-sep', text: '–' }),
-        wrapAffix(toInput),
-      ]);
+      stack.appendChild(fromOut);
+      stack.appendChild(toOut);
+      stack.appendChild(fromInput);
+      stack.appendChild(toInput);
+      syncValues();
+      toInput.style.zIndex = '2';
+
+      const trackRow = createTrackRow(stack);
+      const rowChildren = showInputs ? [fromNumber, trackRow, toNumber] : [trackRow];
+      const row = showInputs
+        ? el('div', { className: 'bl-blocks-fields__range-control-row' }, rowChildren)
+        : trackRow;
+
+      control = el('div', {
+        className: `bl-blocks-fields__range is-dual${showInputs ? ' has-inputs' : ''}`,
+      }, [row]);
       control.getRangeValue = () => ({
         from: fromInput.value.trim(),
         to: toInput.value.trim(),
@@ -1054,8 +1273,8 @@ function createLeafControl(field, values, controls) {
   }
 
   if (control) {
-    const prefix = field.prefix != null ? String(field.prefix).trim() : '';
-    const suffix = field.suffix != null ? String(field.suffix).trim() : '';
+    const prefix = field.prefix != null ? String(field.prefix) : '';
+    const suffix = field.suffix != null ? String(field.suffix) : '';
     const affixTypes = ['text', 'email', 'phone', 'url', 'number', 'date', 'time', 'datetime'];
     if ((prefix || suffix) && affixTypes.includes(type) && control.tagName === 'INPUT') {
       const group = el('div', { className: 'bl-blocks-fields__input-group' });

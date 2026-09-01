@@ -1268,8 +1268,12 @@ function bl_forms_render_field(array $field, string $uid, array $settings = [], 
 			$number_attrs .= ' max="' . esc_attr($max) . '"';
 		}
 	}
-	$prefix = sanitize_text_field((string) ($field['prefix'] ?? ''));
-	$suffix = sanitize_text_field((string) ($field['suffix'] ?? ''));
+	$prefix = function_exists('bl_forms_sanitize_affix')
+		? bl_forms_sanitize_affix($field['prefix'] ?? '')
+		: (string) ($field['prefix'] ?? '');
+	$suffix = function_exists('bl_forms_sanitize_affix')
+		? bl_forms_sanitize_affix($field['suffix'] ?? '')
+		: (string) ($field['suffix'] ?? '');
 	$has_affix = $prefix !== '' || $suffix !== '';
 	?>
 	<div <?= bl_forms_field_wrap_attrs($field, 'bl-form__field -' . sanitize_html_class($type), $name, $context) // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>>

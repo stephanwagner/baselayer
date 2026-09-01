@@ -3,6 +3,35 @@
 defined('ABSPATH') || exit;
 
 /**
+ * Sanitize a field prefix/suffix while preserving leading/trailing spaces.
+ *
+ * WordPress `sanitize_text_field()` trims edges, but affixes often need a
+ * deliberate space for display (e.g. "EUR " → "EUR 34", " m" → "28 m").
+ *
+ * @param mixed $raw
+ */
+function bl_forms_sanitize_affix($raw): string
+{
+	$str = (string) $raw;
+	if ($str === '') {
+		return '';
+	}
+
+	$leading = preg_match('/^\s+/u', $str, $m) ? (string) $m[0] : '';
+	$trailing = preg_match('/\s+$/u', $str, $m) ? (string) $m[0] : '';
+	$core = sanitize_text_field($str);
+	if ($core === '') {
+		return '';
+	}
+
+	// Keep edge spacing as regular spaces (length preserved).
+	$leading = preg_replace('/\s/u', ' ', $leading) ?? '';
+	$trailing = preg_replace('/\s/u', ' ', $trailing) ?? '';
+
+	return $leading . $core . $trailing;
+}
+
+/**
  * Sanitize a space-separated CSS class list (allows Baselayer modifiers like -primary).
  */
 function bl_forms_sanitize_css_classes(string $raw): string

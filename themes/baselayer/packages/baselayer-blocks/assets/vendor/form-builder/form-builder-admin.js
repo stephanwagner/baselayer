@@ -2147,6 +2147,7 @@
       }
     } else {
       delete field.mode;
+      delete field.show_inputs;
     }
     if (nextType !== "number" && nextType !== "range") {
       delete field.step;
@@ -3288,6 +3289,18 @@
     });
     wrap.append(el("label", { text: t("rangeMode", "Mode") }), group);
     return wrap;
+  }
+  function createRangeShowInputsControl(field) {
+    const sync = (checked) => {
+      field.show_inputs = !!checked;
+      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+    };
+    return createSwitchSetting(
+      "blRangeShowInputs",
+      t("showRangeInputs", "Allow number input"),
+      !!field.show_inputs,
+      sync
+    );
   }
   function createRangeDefaultControl(field, updatePreview) {
     if (rangeFieldMode(field) === "single") {
@@ -4524,6 +4537,7 @@
     if (type === "range") {
       const modeBtn = q("[data-bl-range-mode].is-active");
       data.mode = modeBtn?.dataset.blRangeMode === "single" ? "single" : "range";
+      data.show_inputs = Boolean(q("[data-bl-range-show-inputs]")?.checked);
       if (data.mode === "single") {
         data.default_value = q("[data-bl-default]")?.value?.trim() || "";
       } else {
@@ -5000,7 +5014,8 @@
             createRangeModeControl(field, () => {
               renderBody("general");
             }),
-            createNumberBoundsControl(field)
+            createNumberBoundsControl(field),
+            createRangeShowInputsControl(field)
           );
         }
         if (DESCRIPTION_TYPES.includes(field.type)) {

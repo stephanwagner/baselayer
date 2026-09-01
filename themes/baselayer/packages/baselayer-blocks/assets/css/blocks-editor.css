@@ -563,15 +563,192 @@ body.bl-page-picker-open {
 }
 
 .bl-blocks-fields__range {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  align-items: center;
+  display: flex;
+  flex-direction: column;
   gap: 8px;
   width: 100%;
+  padding-top: 16px;
 }
-.bl-blocks-fields__range .bl-blocks-fields__input-group {
-  width: auto;
+
+.bl-blocks-fields__range-track-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1 1 auto;
+  width: 100%;
   min-width: 0;
+}
+
+.bl-blocks-fields__range-control-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+}
+
+.bl-blocks-fields__range-number {
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  width: 5.5em;
+  height: 30px;
+  margin: 0;
+  padding: 4px 8px;
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.4;
+  border: 1px solid #8c8f94;
+  border-radius: 4px;
+  background: #fff;
+  color: #1d2327;
+}
+.bl-blocks-fields__range-number:focus {
+  border-color: var(--bl-forms-admin-accent, #2271b1);
+  box-shadow: 0 0 0 1px var(--bl-forms-admin-accent, #2271b1);
+  outline: none;
+}
+
+.bl-blocks-fields__range-bound {
+  flex: 0 0 auto;
+  min-width: 1.5em;
+  font-size: 12px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: #50575e;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+.bl-blocks-fields__range-bound.is-min {
+  text-align: left;
+}
+.bl-blocks-fields__range-bound.is-max {
+  text-align: right;
+}
+
+.bl-blocks-fields__range-stack {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 30px;
+}
+
+.bl-blocks-fields__range-thumb-value {
+  position: absolute;
+  left: 0;
+  bottom: calc(100% + 2px);
+  transform: translateX(-50%);
+  font-size: 12px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: #50575e;
+  line-height: 1.2;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+
+.bl-blocks-fields__range.is-dual .bl-blocks-fields__range-thumb-value {
+  opacity: 0;
+  transition: opacity 0.12s ease;
+}
+.bl-blocks-fields__range.is-dual .bl-blocks-fields__range-thumb-value.is-active {
+  opacity: 1;
+}
+
+.bl-blocks-fields__range-track {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 6px;
+  margin-top: -3px;
+  border-radius: 999px;
+  background: #dcdcde;
+  pointer-events: none;
+}
+
+.bl-blocks-fields__range-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--bl-forms-admin-accent, #2271b1);
+  pointer-events: none;
+}
+
+.bl-blocks-fields__range.is-single .bl-blocks-fields__range-stack {
+  width: 100%;
+}
+
+.bl-blocks-fields__range-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  pointer-events: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  cursor: pointer;
+}
+.bl-blocks-fields__range-input::-webkit-slider-runnable-track {
+  height: 6px;
+  border: 0;
+  background: transparent;
+}
+.bl-blocks-fields__range-input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  pointer-events: auto;
+  width: 18px;
+  height: 18px;
+  margin-top: -6px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: var(--bl-forms-admin-accent, #2271b1);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  cursor: grab;
+}
+.bl-blocks-fields__range-input::-webkit-slider-thumb:active {
+  cursor: grabbing;
+}
+.bl-blocks-fields__range-input::-moz-range-track {
+  height: 6px;
+  border: 0;
+  background: transparent;
+}
+.bl-blocks-fields__range-input::-moz-range-thumb {
+  pointer-events: auto;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  background: var(--bl-forms-admin-accent, #2271b1);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.18);
+  cursor: grab;
+}
+.bl-blocks-fields__range-input::-moz-range-thumb:active {
+  cursor: grabbing;
+}
+.bl-blocks-fields__range-input:focus-visible {
+  outline: none;
+}
+.bl-blocks-fields__range-input:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--bl-forms-admin-accent, #2271b1);
+  outline-offset: 2px;
+}
+.bl-blocks-fields__range-input:focus-visible::-moz-range-thumb {
+  outline: 2px solid var(--bl-forms-admin-accent, #2271b1);
+  outline-offset: 2px;
+}
+
+.bl-blocks-fields__range-input--from,
+.bl-blocks-fields__range-input--to {
+  z-index: 1;
 }
 
 .bl-blocks-fields__range-sep {

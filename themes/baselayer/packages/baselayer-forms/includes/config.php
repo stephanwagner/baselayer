@@ -1599,8 +1599,8 @@ function bl_forms_sanitize_field($field): ?array
 
 	$affix_types = ['text', 'email', 'phone', 'url', 'number', 'date', 'time', 'datetime'];
 	if (in_array($type, $affix_types, true)) {
-		$prefix = sanitize_text_field((string) ($field['prefix'] ?? ''));
-		$suffix = sanitize_text_field((string) ($field['suffix'] ?? ''));
+		$prefix = bl_forms_sanitize_affix($field['prefix'] ?? '');
+		$suffix = bl_forms_sanitize_affix($field['suffix'] ?? '');
 		if ($prefix !== '') {
 			$out['prefix'] = $prefix;
 		} else {

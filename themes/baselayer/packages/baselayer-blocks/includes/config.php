@@ -733,6 +733,35 @@ function bl_blocks_sanitize_range_endpoint($raw): string
 }
 
 /**
+ * Sanitize prefix/suffix while keeping leading/trailing spaces.
+ *
+ * @param mixed $raw
+ */
+function bl_blocks_sanitize_affix($raw): string
+{
+	if (function_exists('bl_forms_sanitize_affix')) {
+		return bl_forms_sanitize_affix($raw);
+	}
+
+	$str = (string) $raw;
+	if ($str === '') {
+		return '';
+	}
+
+	$leading = preg_match('/^\s+/u', $str, $m) ? (string) $m[0] : '';
+	$trailing = preg_match('/\s+$/u', $str, $m) ? (string) $m[0] : '';
+	$core = sanitize_text_field($str);
+	if ($core === '') {
+		return '';
+	}
+
+	$leading = preg_replace('/\s/u', ' ', $leading) ?? '';
+	$trailing = preg_replace('/\s/u', ' ', $trailing) ?? '';
+
+	return $leading . $core . $trailing;
+}
+
+/**
  * @param array<string, mixed> $field
  */
 function bl_blocks_range_mode(array $field): string
@@ -933,6 +962,7 @@ function bl_blocks_sanitize_range_field(array $field): array
 		'required'      => !empty($field['required']),
 		'description'   => sanitize_textarea_field((string) ($field['description'] ?? '')),
 		'mode'          => $mode,
+		'show_inputs'   => !empty($field['show_inputs']),
 		'default_value' => bl_blocks_sanitize_range_stored_value($bounds + ['mode' => $mode], $field['default_value'] ?? null),
 	];
 
@@ -946,11 +976,11 @@ function bl_blocks_sanitize_range_field(array $field): array
 		$out['step'] = $step;
 	}
 
-	$suffix = sanitize_text_field((string) ($field['suffix'] ?? ''));
+	$suffix = bl_blocks_sanitize_affix($field['suffix'] ?? '');
 	if ($suffix !== '') {
 		$out['suffix'] = $suffix;
 	}
-	$prefix = sanitize_text_field((string) ($field['prefix'] ?? ''));
+	$prefix = bl_blocks_sanitize_affix($field['prefix'] ?? '');
 	if ($prefix !== '') {
 		$out['prefix'] = $prefix;
 	}
@@ -1152,8 +1182,8 @@ function bl_blocks_sanitize_leaf_field_fallback(array $field): array
 
 	$affix_types = ['text', 'email', 'phone', 'url', 'number', 'date', 'time', 'datetime'];
 	if (in_array($out['type'], $affix_types, true)) {
-		$prefix = sanitize_text_field((string) ($field['prefix'] ?? ''));
-		$suffix = sanitize_text_field((string) ($field['suffix'] ?? ''));
+		$prefix = bl_blocks_sanitize_affix($field['prefix'] ?? '');
+		$suffix = bl_blocks_sanitize_affix($field['suffix'] ?? '');
 		if ($prefix !== '') {
 			$out['prefix'] = $prefix;
 		}
