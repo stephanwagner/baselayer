@@ -918,10 +918,6 @@ msgstr ""
 msgid "Maximum number of items that can be selected from the media library."
 msgstr ""
 
-#: includes/admin-editor.php:508
-msgid "Allow multiple pages"
-msgstr ""
-
 #: includes/admin-editor.php:509
 msgid "Allowed post types"
 msgstr ""

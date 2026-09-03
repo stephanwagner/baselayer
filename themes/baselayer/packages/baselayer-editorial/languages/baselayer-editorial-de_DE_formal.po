@@ -41,8 +41,8 @@ msgid "Select pages"
 msgstr "Seiten auswählen"
 
 #: includes/assets.php:67
-msgid "Search pages…"
-msgstr "Seiten suchen…"
+msgid "Search…"
+msgstr "Suchen…"
 
 #: includes/assets.php:68
 msgid "No pages found."

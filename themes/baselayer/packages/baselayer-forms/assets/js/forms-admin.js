@@ -6,7 +6,7 @@
       selectedId: 0,
       selectedIds: [],
       title: "Select a page",
-      searchPlaceholder: "Search pages\u2026",
+      searchPlaceholder: "Search\u2026",
       empty: "No pages found.",
       moreNote: "More results available. Refine your search to narrow them down.",
       cancelLabel: "Cancel",
@@ -909,7 +909,7 @@
       const page = await openPagePicker({
         selectedId: state.redirect_page_id || 0,
         title: t("pagePickerTitle", "Select a page"),
-        searchPlaceholder: t("pagePickerSearch", "Search pages\u2026"),
+        searchPlaceholder: t("pagePickerSearch", "Search\u2026"),
         empty: t("pagePickerEmpty", "No pages found."),
         cancelLabel: t("cancel", "Cancel"),
         selectLabel: t("selectPage", "Select"),

@@ -2060,6 +2060,40 @@ button.button-link.bl-blocks-fields__repeater-remove:active {
   font-size: 12px;
 }
 
+.bl-blocks-after-title {
+  margin: 16px 0 24px;
+  padding: 8px 12px 12px;
+  background: #fff;
+  border: 1px solid #c3c4c7;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+  border-radius: 6px;
+}
+
+.bl-blocks-after-title__title {
+  margin: 8px 0 12px !important;
+  padding: 0 !important;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.postbox.bl-blocks-postbox--fixed .handlediv,
+.postbox.bl-blocks-postbox--fixed .handle-actions,
+.postbox.bl-blocks-postbox--fixed .postbox-header .handle-order-higher,
+.postbox.bl-blocks-postbox--fixed .postbox-header .handle-order-lower,
+.postbox.bl-blocks-postbox--fixed .postbox-header .toggle-indicator {
+  display: none !important;
+}
+.postbox.bl-blocks-postbox--fixed.closed .inside,
+.postbox.bl-blocks-postbox--fixed .inside {
+  display: block !important;
+}
+.postbox.bl-blocks-postbox--fixed .postbox-header h2.hndle,
+.postbox.bl-blocks-postbox--fixed .hndle {
+  cursor: default;
+  pointer-events: none;
+}
+
 .bl-wysiwyg-editor .bl-blocks-fields__wysiwyg,
 .bl-wysiwyg-editor .mce-tinymce {
   max-width: 100%;
@@ -2326,6 +2360,17 @@ body.post-new-php.post-type-bl_block .page-title-action {
 .bl-blocks-settings-panel .bl-forms-builder__setting input.widefat,
 .bl-blocks-settings-panel .bl-forms-builder__setting textarea.widefat,
 .bl-blocks-settings-panel .bl-forms-builder__setting select.widefat {
+  max-width: 100%;
+}
+
+.bl-blocks-settings-positioning {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.bl-blocks-settings-positioning .bl-forms-builder__segmented {
+  width: fit-content;
+  min-width: 260px;
   max-width: 100%;
 }
 

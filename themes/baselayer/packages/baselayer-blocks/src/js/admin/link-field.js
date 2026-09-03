@@ -244,7 +244,7 @@ export function createLinkControl(field, current) {
         const page = await openPagePicker({
           selectedId: pageMeta ? pageMeta.id : 0,
           title: i18n('pagePickerTitle', 'Select a page'),
-          searchPlaceholder: i18n('pagePickerSearch', 'Search pages…'),
+          searchPlaceholder: i18n('pagePickerSearch', 'Search…'),
           empty: i18n('pagePickerEmpty', 'No pages found.'),
           cancelLabel: i18n('cancel', 'Cancel'),
           selectLabel: i18n('selectPage', 'Select'),

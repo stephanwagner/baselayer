@@ -192,6 +192,10 @@ msgstr "Radio"
 msgid "Select"
 msgstr "Auswahl"
 
+msgctxt "verb"
+msgid "Select"
+msgstr "Auswählen"
+
 #: includes/admin-editor.php:269
 #: includes/admin-editor.php:297
 #: includes/block-options/admin.php:416
@@ -288,6 +292,39 @@ msgstr "Versteckt"
 #: includes/runtime-page.php:147
 msgid "Page"
 msgstr "Seite"
+
+msgid "Page / Relation"
+msgstr "Seite / Verknüpfung"
+
+msgid "Pages"
+msgstr "Seiten"
+
+msgid "Text singular"
+msgstr "Text Singular"
+
+msgid "Text plural"
+msgstr "Text Plural"
+
+msgid "Choose %s"
+msgstr "%s wählen"
+
+msgid "Change %s"
+msgstr "%s ändern"
+
+msgid "Select %s"
+msgstr "%s auswählen"
+
+msgid "Select a %s"
+msgstr "%s auswählen"
+
+msgid "Select one or more %s."
+msgstr "Wähle eine oder mehrere %s."
+
+msgid "Search…"
+msgstr "Suchen…"
+
+msgid "No %s found."
+msgstr "Keine %s gefunden."
 
 #: includes/admin-editor.php:288
 msgid "Link"
@@ -443,11 +480,27 @@ msgstr "Ziehe ein Feld hierher."
 msgid "Active"
 msgstr "Aktiv"
 
-#: includes/admin-editor.php:328
-msgid "Allow editing directly in sidebar"
-msgstr "Bearbeitung direkt in der Seitenleiste erlauben"
+msgid "Positioning"
+msgstr "Positionierung"
 
-#: includes/admin-editor.php:329
+msgid "Sidebar"
+msgstr "Seitenleiste"
+
+msgid "Allow editing directly in the sidebar"
+msgstr "Erlaube das Bearbeiten direkt in der Seitenleiste"
+
+msgid "Show fields in the block sidebar"
+msgstr "Felder in der Block-Seitenleiste anzeigen"
+
+msgid "When off, editors open a modal instead."
+msgstr "Wenn deaktiviert, wird ein Modal geöffnet."
+
+msgid "Meta box"
+msgstr "Metabox"
+
+msgid "Below the title"
+msgstr "Unter dem Titel"
+
 msgid "Allow nested blocks"
 msgstr "Verschachtelte Blöcke erlauben"
 
@@ -856,10 +909,6 @@ msgstr "Maximale Anzahl"
 #: includes/admin-editor.php:416
 msgid "Maximum number of items that can be selected from the media library."
 msgstr "Maximale Anzahl der Elemente, die aus der Mediathek ausgewählt werden können."
-
-#: includes/admin-editor.php:417
-msgid "Allow multiple pages"
-msgstr "Mehrere Seiten erlauben"
 
 #: includes/admin-editor.php:420
 msgid "Allowed types"
@@ -1906,7 +1955,7 @@ msgstr "Seiten auswählen"
 #: includes/runtime-blocks.php:272
 #: includes/runtime-page.php:136
 msgid "Search pages…"
-msgstr "Seiten suchen…"
+msgstr "Suchen…"
 
 #: includes/field-ui.php:279
 #: includes/runtime-blocks.php:273

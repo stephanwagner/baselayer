@@ -81,6 +81,58 @@ function bl_form_builder_enqueue_kit(array $args = []): string
 }
 
 /**
+ * Sanitize page-field noun overrides. Empty values are omitted so the UI
+ * falls back to the translated Page / Pages defaults.
+ *
+ * @param mixed $singular
+ * @param mixed $plural
+ * @return array{text_singular?: string, text_plural?: string}
+ */
+function bl_page_picker_sanitize_nouns($singular, $plural): array
+{
+	$out = [];
+	$s = sanitize_text_field(trim((string) $singular));
+	$p = sanitize_text_field(trim((string) $plural));
+	if ($s !== '') {
+		$out['text_singular'] = $s;
+	}
+	if ($p !== '') {
+		$out['text_plural'] = $p;
+	}
+
+	return $out;
+}
+
+/**
+ * i18n strings for page-picker field nouns and interpolated picker copy.
+ *
+ * @param string $domain Text domain (baselayer-forms or baselayer-blocks).
+ * @return array<string, string>
+ */
+function bl_page_picker_field_i18n(string $domain): array
+{
+	return [
+		'pageNounSingular' => __('Page', $domain),
+		'pageNounPlural'   => __('Pages', $domain),
+		'textSingular'     => __('Text singular', $domain),
+		'textPlural'       => __('Text plural', $domain),
+		/* translators: %s: singular or plural noun, e.g. Page or Pages */
+		'chooseNoun'       => __('Choose %s', $domain),
+		/* translators: %s: singular or plural noun, e.g. Page or Pages */
+		'changeNoun'       => __('Change %s', $domain),
+		/* translators: %s: plural noun, e.g. Pages */
+		'selectNoun'       => __('Select %s', $domain),
+		/* translators: %s: singular noun, e.g. Page */
+		'selectANoun'      => __('Select a %s', $domain),
+		/* translators: %s: plural noun, e.g. Pages */
+		'selectNounsHelp'  => __('Select one or more %s.', $domain),
+		'searchNouns'      => __('Search…', $domain),
+		/* translators: %s: plural noun, e.g. Pages */
+		'noNounsFound'     => __('No %s found.', $domain),
+	];
+}
+
+/**
  * Public REST-enabled post types for the shared page picker (excludes attachment).
  *
  * @return list<array{value: string, label: string, restBase: string}>

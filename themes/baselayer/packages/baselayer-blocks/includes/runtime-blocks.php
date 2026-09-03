@@ -298,12 +298,13 @@ function bl_blocks_register_dynamic_blocks(): void
 				'selectedPage'           => __('Selected page', 'baselayer-blocks'),
 				'pagePickerTitle'        => __('Select a page', 'baselayer-blocks'),
 				'pagePickerTitleMulti'   => __('Select pages', 'baselayer-blocks'),
-				'pagePickerSearch'       => __('Search pages…', 'baselayer-blocks'),
+				'pagePickerSearch'       => __('Search…', 'baselayer-blocks'),
 				'pagePickerEmpty'        => __('No pages found.', 'baselayer-blocks'),
 				'pagePickerLoading'      => __('Loading…', 'baselayer-blocks'),
 				'pagePickerMore'         => __('More results available. Refine your search to narrow them down.', 'baselayer-blocks'),
 				'pagePickerAll'          => __('All', 'baselayer-blocks'),
-				'selectPage'             => __('Select', 'baselayer-blocks'),
+				/* translators: Confirm button in the page/relation picker modal. */
+				'selectPage'             => _x('Select', 'verb', 'baselayer-blocks'),
 				'linkTypePage'           => __('Page', 'baselayer-blocks'),
 				'linkTypeUrl'            => __('URL', 'baselayer-blocks'),
 				'linkTypeEmail'          => __('Email', 'baselayer-blocks'),
@@ -318,7 +319,8 @@ function bl_blocks_register_dynamic_blocks(): void
 				'linkText'               => __('Link text', 'baselayer-blocks'),
 				'linkOpenNewTab'         => __('Open in new tab', 'baselayer-blocks'),
 				'selectEmptyOptionPlaceholder' => __('Please select…', 'baselayer-blocks'),
-			] + (function_exists('bl_blocks_media_field_i18n') ? bl_blocks_media_field_i18n() : []),
+			] + (function_exists('bl_blocks_media_field_i18n') ? bl_blocks_media_field_i18n() : [])
+			  + (function_exists('bl_page_picker_field_i18n') ? bl_page_picker_field_i18n('baselayer-blocks') : []),
 		]);
 	}
 }

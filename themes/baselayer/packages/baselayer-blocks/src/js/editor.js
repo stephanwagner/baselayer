@@ -709,6 +709,9 @@ import { InlineIconControl } from '../../../../src/js/editor/icons/inline-icon-c
 
   if (registerPlugin && PluginDocumentSettingPanel && Array.isArray(pageConfig.definitions)) {
     pageConfig.definitions.forEach((def) => {
+      if (def.contentEditing) {
+        return;
+      }
       registerPlugin('bl-blocks-page-' + def.id, {
         render: function PageSettingsPanel() {
           const meta = useSelect

@@ -1800,7 +1800,22 @@ function bl_forms_sanitize_field($field): ?array
 		if ($out['post_types'] === []) {
 			$out['post_types'] = ['page'];
 		}
+		$nouns = function_exists('bl_page_picker_sanitize_nouns')
+			? bl_page_picker_sanitize_nouns($field['text_singular'] ?? '', $field['text_plural'] ?? '')
+			: [];
+		if (isset($nouns['text_singular'])) {
+			$out['text_singular'] = $nouns['text_singular'];
+		} else {
+			unset($out['text_singular']);
+		}
+		if (isset($nouns['text_plural'])) {
+			$out['text_plural'] = $nouns['text_plural'];
+		} else {
+			unset($out['text_plural']);
+		}
 		unset($out['placeholder'], $out['default_value'], $out['readonly']);
+	} else {
+		unset($out['text_singular'], $out['text_plural']);
 	}
 
 	if ($type === 'link') {

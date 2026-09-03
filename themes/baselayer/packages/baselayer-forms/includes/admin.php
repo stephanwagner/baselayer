@@ -648,7 +648,6 @@ function bl_forms_admin_enqueue(string $hook): void
 				'boundMinutes'      => __('minutes', 'baselayer-forms'),
 				'allowMultiple'     => __('Allow multiple', 'baselayer-forms'),
 				'allowMultipleFiles'=> __('Allow multiple files', 'baselayer-forms'),
-				'pageMultiple'      => __('Allow multiple pages', 'baselayer-forms'),
 				'pageAllowedPostTypes' => __('Allowed post types', 'baselayer-forms'),
 				'pagePickerAll'     => __('All', 'baselayer-forms'),
 				'fieldStatus'       => __('Status', 'baselayer-forms'),
@@ -800,10 +799,11 @@ function bl_forms_admin_enqueue(string $hook): void
 				'choosePageHelp'    => __('Select the page visitors should land on.', 'baselayer-forms'),
 				'selectedPage'      => __('Selected page', 'baselayer-forms'),
 				'pagePickerTitle'   => __('Select a page', 'baselayer-forms'),
-				'pagePickerSearch'  => __('Search pages…', 'baselayer-forms'),
+				'pagePickerSearch'  => __('Search…', 'baselayer-forms'),
 				'pagePickerEmpty'   => __('No pages found.', 'baselayer-forms'),
 				'pagePickerLoading' => __('Loading…', 'baselayer-forms'),
-				'selectPage'        => __('Select', 'baselayer-forms'),
+				/* translators: Confirm button in the page/relation picker modal. */
+				'selectPage'        => _x('Select', 'verb', 'baselayer-forms'),
 				'confirmationEmail' => __('Confirmation email', 'baselayer-forms'),
 				'notifyUser'        => __('Enable', 'baselayer-forms'),
 				'notifyUserHelp'    => __('Requires an Email field on the form.', 'baselayer-forms'),
@@ -865,10 +865,10 @@ function bl_forms_admin_enqueue(string $hook): void
 					'hidden'       => __('Hidden', 'baselayer-forms'),
 					'honeypot'     => __('Honeypot', 'baselayer-forms'),
 					'captcha'      => __('CAPTCHA', 'baselayer-forms'),
-					'page'         => __('Page', 'baselayer-forms'),
+					'page'         => __('Page / Relation', 'baselayer-forms'),
 					'link'         => __('Link', 'baselayer-forms'),
 				],
-			],
+			] + (function_exists('bl_page_picker_field_i18n') ? bl_page_picker_field_i18n('baselayer-forms') : []),
 		]);
 	}
 }

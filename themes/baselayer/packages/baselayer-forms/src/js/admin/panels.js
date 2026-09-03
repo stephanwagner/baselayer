@@ -657,7 +657,7 @@ export function createPanels(settings, builderRoot, onChange) {
     const page = await openPagePicker({
       selectedId: state.redirect_page_id || 0,
       title: t('pagePickerTitle', 'Select a page'),
-      searchPlaceholder: t('pagePickerSearch', 'Search pages…'),
+      searchPlaceholder: t('pagePickerSearch', 'Search…'),
       empty: t('pagePickerEmpty', 'No pages found.'),
       cancelLabel: t('cancel', 'Cancel'),
       selectLabel: t('selectPage', 'Select'),

@@ -1164,7 +1164,7 @@
       selectedId: 0,
       selectedIds: [],
       title: "Select a page",
-      searchPlaceholder: "Search pages\u2026",
+      searchPlaceholder: "Search\u2026",
       empty: "No pages found.",
       moreNote: "More results available. Refine your search to narrow them down.",
       cancelLabel: "Cancel",
@@ -3784,6 +3784,41 @@
     const dict = window.blBlocksFieldUi && window.blBlocksFieldUi.i18n || window.blBlocksEditor && window.blBlocksEditor.i18n || window.blBlocksPage && window.blBlocksPage.i18n || window.blBlocksAdmin && window.blBlocksAdmin.i18n || {};
     return dict[key] || fallback || key;
   }
+  function formatNoun(template, noun) {
+    return String(template || "").replace(/%s/g, String(noun || ""));
+  }
+  function pickerNouns(source) {
+    const singular = String(source && (source.text_singular || source.textSingular) || "").trim() || i18n("pageNounSingular", "Page");
+    const plural = String(source && (source.text_plural || source.textPlural) || "").trim() || i18n("pageNounPlural", "Pages");
+    return { singular, plural };
+  }
+  function pickerCopy(source, multiple) {
+    const { singular, plural } = pickerNouns(source);
+    const noun = multiple ? plural : singular;
+    return {
+      singular,
+      plural,
+      noun,
+      choose: formatNoun(i18n("chooseNoun", "Choose %s"), noun),
+      change: formatNoun(i18n("changeNoun", "Change %s"), noun),
+      title: formatNoun(
+        multiple ? i18n("selectNoun", "Select %s") : i18n("selectANoun", "Select a %s"),
+        noun
+      ),
+      search: i18n("searchNouns", "Search\u2026") || i18n("pagePickerSearch", "Search\u2026"),
+      empty: formatNoun(i18n("noNounsFound", "No %s found."), plural),
+      help: formatNoun(
+        multiple ? i18n("selectNounsHelp", "Select one or more %s.") : i18n("selectANoun", "Select a %s"),
+        multiple ? plural : singular
+      )
+    };
+  }
+  function wrapNounSource(wrap) {
+    return {
+      text_singular: wrap.getAttribute("data-text-singular") || "",
+      text_plural: wrap.getAttribute("data-text-plural") || ""
+    };
+  }
   function pickerConfig() {
     const sources = [
       window.blBlocksFieldUi,
@@ -3981,6 +4016,7 @@
   }
   function createPagePickerControl(field, current) {
     const multiple = !!field.multiple;
+    const copy = pickerCopy(field, multiple);
     let selected = normalizePageIds(current, multiple).map((id) => ({
       id,
       title: "",
@@ -3988,7 +4024,7 @@
     }));
     const empty = el("span", {
       className: "description bl-blocks-fields__description bl-blocks-fields__page-empty",
-      text: multiple ? i18n("choosePagesHelp", "Select one or more pages.") : i18n("choosePageHelp", "Select a page.")
+      text: copy.help
     });
     const preview = el("div", {
       className: "bl-blocks-fields__page-preview" + (multiple ? " is-multiple is-sortable" : " is-single")
@@ -4000,7 +4036,7 @@
     const pickBtn = el("button", {
       type: "button",
       className: "button bl-button",
-      text: i18n("choosePage", "Choose page")
+      text: copy.choose
     });
     const clearBtn = el("button", {
       type: "button",
@@ -4013,7 +4049,11 @@
     ]);
     const control = el("div", {
       className: "bl-blocks-fields__page-picker",
-      dataset: { blBlocksPagePicker: "1" }
+      dataset: {
+        blBlocksPagePicker: "1",
+        textSingular: field.text_singular || "",
+        textPlural: field.text_plural || ""
+      }
     });
     control.append(
       el("div", { className: "bl-blocks-fields__page-picker-row" }, [summary, actions])
@@ -4035,7 +4075,7 @@
         preview.replaceChildren();
       }
       clearBtn.hidden = !has;
-      pickBtn.textContent = has ? multiple ? i18n("changePages", "Change pages") : i18n("changePage", "Change page") : multiple ? i18n("choosePages", "Choose pages") : i18n("choosePage", "Choose page");
+      pickBtn.textContent = has ? copy.change : copy.choose;
     };
     if (multiple) {
       bindPageSortable(preview, {
@@ -4070,9 +4110,9 @@
         multi: multiple,
         selectedId: !multiple && selected[0] ? selected[0].id : 0,
         selectedIds: multiple ? selected.map((p) => p.id) : [],
-        title: multiple ? i18n("pagePickerTitleMulti", "Select pages") : i18n("pagePickerTitle", "Select a page"),
-        searchPlaceholder: i18n("pagePickerSearch", "Search pages\u2026"),
-        empty: i18n("pagePickerEmpty", "No pages found."),
+        title: copy.title,
+        searchPlaceholder: copy.search,
+        empty: copy.empty,
         moreNote: i18n(
           "pagePickerMore",
           "More results available. Refine your search to narrow them down."
@@ -4122,6 +4162,7 @@
       if (wrap.dataset.blPagePickerBound === "1") return;
       wrap.dataset.blPagePickerBound = "1";
       const multiple = wrap.dataset.multiple === "1";
+      const copy = pickerCopy(wrapNounSource(wrap), multiple);
       const inputName = wrap.dataset.inputName || "";
       const summary = wrap.querySelector("[data-bl-page-summary]");
       const pickBtn = wrap.querySelector("[data-bl-page-choose]");
@@ -4135,7 +4176,7 @@
       })).filter((p) => p.id > 0);
       const empty = el("span", {
         className: "description bl-blocks-fields__description bl-blocks-fields__page-empty",
-        text: multiple ? i18n("choosePagesHelp", "Select one or more pages.") : i18n("choosePageHelp", "Select a page.")
+        text: copy.help
       });
       const preview = el("div", {
         className: "bl-blocks-fields__page-preview" + (multiple ? " is-multiple is-sortable" : " is-single")
@@ -4178,7 +4219,7 @@
           preview.replaceChildren();
         }
         clearBtn.hidden = !has;
-        pickBtn.textContent = has ? multiple ? i18n("changePages", "Change pages") : i18n("changePage", "Change page") : multiple ? i18n("choosePages", "Choose pages") : i18n("choosePage", "Choose page");
+        pickBtn.textContent = has ? copy.change : copy.choose;
         writeInputs();
       };
       if (multiple) {
@@ -4201,9 +4242,9 @@
           multi: multiple,
           selectedId: !multiple && selected[0] ? selected[0].id : 0,
           selectedIds: multiple ? selected.map((p) => p.id) : [],
-          title: multiple ? i18n("pagePickerTitleMulti", "Select pages") : i18n("pagePickerTitle", "Select a page"),
-          searchPlaceholder: i18n("pagePickerSearch", "Search pages\u2026"),
-          empty: i18n("pagePickerEmpty", "No pages found."),
+          title: copy.title,
+          searchPlaceholder: copy.search,
+          empty: copy.empty,
           moreNote: i18n(
             "pagePickerMore",
             "More results available. Refine your search to narrow them down."
@@ -4924,7 +4965,7 @@
           const page = await openPagePicker({
             selectedId: pageMeta ? pageMeta.id : 0,
             title: i18n3("pagePickerTitle", "Select a page"),
-            searchPlaceholder: i18n3("pagePickerSearch", "Search pages\u2026"),
+            searchPlaceholder: i18n3("pagePickerSearch", "Search\u2026"),
             empty: i18n3("pagePickerEmpty", "No pages found."),
             cancelLabel: i18n3("cancel", "Cancel"),
             selectLabel: i18n3("selectPage", "Select"),
@@ -8573,6 +8614,9 @@
     });
     if (registerPlugin && PluginDocumentSettingPanel && Array.isArray(pageConfig.definitions)) {
       pageConfig.definitions.forEach((def) => {
+        if (def.contentEditing) {
+          return;
+        }
         registerPlugin("bl-blocks-page-" + def.id, {
           render: function PageSettingsPanel() {
             const meta = useSelect ? useSelect((select) => {

@@ -352,7 +352,7 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'tab'          => __('Tab', 'baselayer-blocks'),
 		'repeater'     => __('Repeater', 'baselayer-blocks'),
 		'hidden'       => __('Hidden', 'baselayer-blocks'),
-		'page'         => __('Page', 'baselayer-blocks'),
+		'page'         => __('Page / Relation', 'baselayer-blocks'),
 		'link'         => __('Link', 'baselayer-blocks'),
 	];
 
@@ -393,8 +393,14 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'canvasHeading'            => __('Fields', 'baselayer-blocks'),
 		'empty'                    => __('Drag a field here.', 'baselayer-blocks'),
 		'settingsActive'           => __('Active', 'baselayer-blocks'),
-		'settingsSidebarEditing'   => __('Allow editing directly in sidebar', 'baselayer-blocks'),
-		'settingsContentEditing'   => __('Show fields in the content column', 'baselayer-blocks'),
+		'settingsPositioning'      => __('Positioning', 'baselayer-blocks'),
+		'settingsPositionSidebar'  => __('Sidebar', 'baselayer-blocks'),
+		'settingsPositionContent'  => __('Content', 'baselayer-blocks'),
+		'settingsSidebarEditing'   => __('Allow editing directly in the sidebar', 'baselayer-blocks'),
+		'settingsBlockSidebarEditing' => __('Show fields in the block sidebar', 'baselayer-blocks'),
+		'settingsBlockSidebarEditingHelp' => __('When off, editors open a modal instead.', 'baselayer-blocks'),
+		'settingsContentPlacementMetabox' => __('Meta box', 'baselayer-blocks'),
+		'settingsContentPlacementAfterTitle' => __('Below the title', 'baselayer-blocks'),
 		'settingsSupportsInnerBlocks' => __('Allow nested blocks', 'baselayer-blocks'),
 		'settingsInnerBlocksSection' => __('InnerBlocks', 'baselayer-blocks'),
 		'settingsInnerBlocksAllowed' => __('Allowed nested blocks', 'baselayer-blocks'),
@@ -507,7 +513,6 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'allowMultipleMedia'      => __('Allow multiple', 'baselayer-blocks'),
 		'maxMediaItems'           => __('Maximum items', 'baselayer-blocks'),
 		'maxMediaHelp'            => __('Maximum number of items that can be selected from the media library.', 'baselayer-blocks'),
-		'pageMultiple'            => __('Allow multiple pages', 'baselayer-blocks'),
 		'pageAllowedPostTypes'    => __('Allowed post types', 'baselayer-blocks'),
 		'pagePickerAll'           => __('All', 'baselayer-blocks'),
 		'linkAllowedTypes'        => __('Allowed types', 'baselayer-blocks'),
@@ -682,7 +687,7 @@ function bl_blocks_enqueue_definition_editor(string $hook): void
 		'previewStarterTemplate'  => __('Preview starter template', 'baselayer-blocks'),
 
 		'types'                    => $type_labels,
-	];
+	] + (function_exists('bl_page_picker_field_i18n') ? bl_page_picker_field_i18n('baselayer-blocks') : []);
 
 	wp_localize_script('bl-blocks-admin', 'blBlocksAdmin', [
 		'type'                 => $type,

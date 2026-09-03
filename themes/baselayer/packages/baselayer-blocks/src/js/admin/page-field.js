@@ -34,6 +34,64 @@ function i18n(key, fallback) {
   return dict[key] || fallback || key;
 }
 
+function formatNoun(template, noun) {
+  return String(template || '').replace(/%s/g, String(noun || ''));
+}
+
+/**
+ * @param {{text_singular?: string, text_plural?: string, textSingular?: string, textPlural?: string}|null|undefined} source
+ * @returns {{singular: string, plural: string}}
+ */
+function pickerNouns(source) {
+  const singular =
+    String((source && (source.text_singular || source.textSingular)) || '').trim() ||
+    i18n('pageNounSingular', 'Page');
+  const plural =
+    String((source && (source.text_plural || source.textPlural)) || '').trim() ||
+    i18n('pageNounPlural', 'Pages');
+  return { singular, plural };
+}
+
+/**
+ * Localized picker copy with field-noun interpolation.
+ *
+ * @param {{text_singular?: string, text_plural?: string}|null|undefined} source
+ * @param {boolean} multiple
+ */
+function pickerCopy(source, multiple) {
+  const { singular, plural } = pickerNouns(source);
+  const noun = multiple ? plural : singular;
+  return {
+    singular,
+    plural,
+    noun,
+    choose: formatNoun(i18n('chooseNoun', 'Choose %s'), noun),
+    change: formatNoun(i18n('changeNoun', 'Change %s'), noun),
+    title: formatNoun(
+      multiple ? i18n('selectNoun', 'Select %s') : i18n('selectANoun', 'Select a %s'),
+      noun
+    ),
+    search: i18n('searchNouns', 'Search…') || i18n('pagePickerSearch', 'Search…'),
+    empty: formatNoun(i18n('noNounsFound', 'No %s found.'), plural),
+    help: formatNoun(
+      multiple
+        ? i18n('selectNounsHelp', 'Select one or more %s.')
+        : i18n('selectANoun', 'Select a %s'),
+      multiple ? plural : singular
+    ),
+  };
+}
+
+/**
+ * @param {HTMLElement} wrap
+ */
+function wrapNounSource(wrap) {
+  return {
+    text_singular: wrap.getAttribute('data-text-singular') || '',
+    text_plural: wrap.getAttribute('data-text-plural') || '',
+  };
+}
+
 function pickerConfig() {
   const sources = [
     window.blBlocksFieldUi,
@@ -342,6 +400,7 @@ export function normalizePageIds(current, multiple) {
  */
 export function createPagePickerControl(field, current) {
   const multiple = !!field.multiple;
+  const copy = pickerCopy(field, multiple);
   /** @type {Array<{id:number,title:string,url:string}>} */
   let selected = normalizePageIds(current, multiple).map((id) => ({
     id,
@@ -351,9 +410,7 @@ export function createPagePickerControl(field, current) {
 
   const empty = el('span', {
     className: 'description bl-blocks-fields__description bl-blocks-fields__page-empty',
-    text: multiple
-      ? i18n('choosePagesHelp', 'Select one or more pages.')
-      : i18n('choosePageHelp', 'Select a page.'),
+    text: copy.help,
   });
   const preview = el('div', {
     className:
@@ -367,7 +424,7 @@ export function createPagePickerControl(field, current) {
   const pickBtn = el('button', {
     type: 'button',
     className: 'button bl-button',
-    text: i18n('choosePage', 'Choose page'),
+    text: copy.choose,
   });
   const clearBtn = el('button', {
     type: 'button',
@@ -380,7 +437,11 @@ export function createPagePickerControl(field, current) {
   ]);
   const control = el('div', {
     className: 'bl-blocks-fields__page-picker',
-    dataset: { blBlocksPagePicker: '1' },
+    dataset: {
+      blBlocksPagePicker: '1',
+      textSingular: field.text_singular || '',
+      textPlural: field.text_plural || '',
+    },
   });
   control.append(
     el('div', { className: 'bl-blocks-fields__page-picker-row' }, [summary, actions])
@@ -404,13 +465,7 @@ export function createPagePickerControl(field, current) {
       preview.replaceChildren();
     }
     clearBtn.hidden = !has;
-    pickBtn.textContent = has
-      ? multiple
-        ? i18n('changePages', 'Change pages')
-        : i18n('changePage', 'Change page')
-      : multiple
-        ? i18n('choosePages', 'Choose pages')
-        : i18n('choosePage', 'Choose page');
+    pickBtn.textContent = has ? copy.change : copy.choose;
   };
 
   if (multiple) {
@@ -448,11 +503,9 @@ export function createPagePickerControl(field, current) {
       multi: multiple,
       selectedId: !multiple && selected[0] ? selected[0].id : 0,
       selectedIds: multiple ? selected.map((p) => p.id) : [],
-      title: multiple
-        ? i18n('pagePickerTitleMulti', 'Select pages')
-        : i18n('pagePickerTitle', 'Select a page'),
-      searchPlaceholder: i18n('pagePickerSearch', 'Search pages…'),
-      empty: i18n('pagePickerEmpty', 'No pages found.'),
+      title: copy.title,
+      searchPlaceholder: copy.search,
+      empty: copy.empty,
       moreNote: i18n(
         'pagePickerMore',
         'More results available. Refine your search to narrow them down.'
@@ -514,6 +567,7 @@ export function bindPagePickers(root = document) {
     wrap.dataset.blPagePickerBound = '1';
 
     const multiple = wrap.dataset.multiple === '1';
+    const copy = pickerCopy(wrapNounSource(wrap), multiple);
     const inputName = wrap.dataset.inputName || '';
     const summary = wrap.querySelector('[data-bl-page-summary]');
     const pickBtn = wrap.querySelector('[data-bl-page-choose]');
@@ -532,9 +586,7 @@ export function bindPagePickers(root = document) {
 
     const empty = el('span', {
       className: 'description bl-blocks-fields__description bl-blocks-fields__page-empty',
-      text: multiple
-        ? i18n('choosePagesHelp', 'Select one or more pages.')
-        : i18n('choosePageHelp', 'Select a page.'),
+      text: copy.help,
     });
     const preview = el('div', {
       className:
@@ -582,13 +634,7 @@ export function bindPagePickers(root = document) {
         preview.replaceChildren();
       }
       clearBtn.hidden = !has;
-      pickBtn.textContent = has
-        ? multiple
-          ? i18n('changePages', 'Change pages')
-          : i18n('changePage', 'Change page')
-        : multiple
-          ? i18n('choosePages', 'Choose pages')
-          : i18n('choosePage', 'Choose page');
+      pickBtn.textContent = has ? copy.change : copy.choose;
       writeInputs();
     };
 
@@ -613,11 +659,9 @@ export function bindPagePickers(root = document) {
         multi: multiple,
         selectedId: !multiple && selected[0] ? selected[0].id : 0,
         selectedIds: multiple ? selected.map((p) => p.id) : [],
-        title: multiple
-          ? i18n('pagePickerTitleMulti', 'Select pages')
-          : i18n('pagePickerTitle', 'Select a page'),
-        searchPlaceholder: i18n('pagePickerSearch', 'Search pages…'),
-        empty: i18n('pagePickerEmpty', 'No pages found.'),
+        title: copy.title,
+        searchPlaceholder: copy.search,
+        empty: copy.empty,
         moreNote: i18n(
           'pagePickerMore',
           'More results available. Refine your search to narrow them down.'

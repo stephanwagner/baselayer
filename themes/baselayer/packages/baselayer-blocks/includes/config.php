@@ -22,7 +22,7 @@ function bl_blocks_sanitize_definition_type($type): string
 }
 
 /**
- * @return array{active: bool, sidebar_editing: bool, content_editing: bool, supports_inner_blocks: bool, inner_blocks_allowed: string, inner_blocks_template: string, parent: string, align: string, slug: string, description: string, block_icon: string, block_category: string, block_keywords: string, post_types: list<string>, menu_label: string, menu_order: int}
+ * @return array{active: bool, sidebar_editing: bool, content_editing: bool, content_placement: string, supports_inner_blocks: bool, inner_blocks_allowed: string, inner_blocks_template: string, parent: string, align: string, slug: string, description: string, block_icon: string, block_category: string, block_keywords: string, post_types: list<string>, menu_label: string, menu_order: int}
  */
 function bl_blocks_default_settings(string $type = 'block'): array
 {
@@ -32,6 +32,7 @@ function bl_blocks_default_settings(string $type = 'block'): array
 		'active'                 => true,
 		'sidebar_editing'        => true,
 		'content_editing'        => false,
+		'content_placement'      => 'metabox',
 		'supports_inner_blocks'  => false,
 		'inner_blocks_allowed'   => '',
 		'inner_blocks_template'  => '',
@@ -432,6 +433,12 @@ function bl_blocks_sanitize_settings($settings, string $type = 'block'): array
 		$out['sidebar_editing'] = false;
 	}
 	$out['content_editing'] = $type === 'page_settings' && !empty($settings['content_editing']);
+	if ($type === 'page_settings') {
+		$placement = sanitize_key((string) ($settings['content_placement'] ?? 'metabox'));
+		$out['content_placement'] = $placement === 'after_title' ? 'after_title' : 'metabox';
+	} else {
+		unset($out['content_placement']);
+	}
 	$out['supports_inner_blocks'] = $type === 'block' && !empty($settings['supports_inner_blocks']);
 	$out['inner_blocks_allowed'] = $type === 'block' && $out['supports_inner_blocks']
 		? bl_blocks_sanitize_inner_blocks_allowed($settings['inner_blocks_allowed'] ?? '')
@@ -1262,7 +1269,22 @@ function bl_blocks_sanitize_leaf_field_fallback(array $field): array
 		if ($out['post_types'] === []) {
 			$out['post_types'] = ['page'];
 		}
+		$nouns = function_exists('bl_page_picker_sanitize_nouns')
+			? bl_page_picker_sanitize_nouns($field['text_singular'] ?? '', $field['text_plural'] ?? '')
+			: [];
+		if (isset($nouns['text_singular'])) {
+			$out['text_singular'] = $nouns['text_singular'];
+		} else {
+			unset($out['text_singular']);
+		}
+		if (isset($nouns['text_plural'])) {
+			$out['text_plural'] = $nouns['text_plural'];
+		} else {
+			unset($out['text_plural']);
+		}
 		unset($out['placeholder'], $out['default_value']);
+	} else {
+		unset($out['text_singular'], $out['text_plural']);
 	}
 	if ($out['type'] === 'link') {
 		$allowed = ['page', 'url', 'email', 'phone', 'file'];

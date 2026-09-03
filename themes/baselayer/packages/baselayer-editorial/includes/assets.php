@@ -64,7 +64,7 @@ function bl_editorial_enqueue_admin_assets(): void
 		'restNonce'    => $api['nonce'],
 		'i18n'         => [
 			'selectPages'       => __('Select pages', 'baselayer-editorial'),
-			'searchPages'       => __('Search pages…', 'baselayer-editorial'),
+			'searchPages'       => __('Search…', 'baselayer-editorial'),
 			'noPages'           => __('No pages found.', 'baselayer-editorial'),
 			'loading'           => __('Loading…', 'baselayer-editorial'),
 			'cancel'            => __('Cancel', 'baselayer-editorial'),

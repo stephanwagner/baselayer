@@ -1167,6 +1167,37 @@
     }
     return el("div", { className: "bl-forms-builder__setting" }, children);
   }
+  function createSegmentedControl(options, active, onSelect) {
+    const group = el("div", {
+      className: "bl-forms-builder__segmented",
+      role: "group"
+    });
+    const sync = (value) => {
+      group.querySelectorAll("button").forEach((btn) => {
+        const on2 = btn.dataset.value === value;
+        btn.classList.toggle("is-active", on2);
+        btn.setAttribute("aria-pressed", on2 ? "true" : "false");
+      });
+    };
+    options.forEach((opt) => {
+      const btn = el("button", {
+        type: "button",
+        className: "bl-forms-builder__segmented-btn",
+        dataset: { value: opt.value }
+      });
+      btn.textContent = opt.label;
+      btn.setAttribute("aria-pressed", opt.value === active ? "true" : "false");
+      if (opt.value === active) {
+        btn.classList.add("is-active");
+      }
+      btn.addEventListener("click", () => {
+        sync(opt.value);
+        onSelect(opt.value);
+      });
+      group.appendChild(btn);
+    });
+    return group;
+  }
   function plainSwitch(label, { checked = false, onChange = null } = {}) {
     const input = el("input", { type: "checkbox", checked: !!checked });
     if (onChange) {
@@ -1373,8 +1404,8 @@
         notify();
       }
     });
-    const { root: sidebarEditingRow } = plainSwitch(
-      t2("settingsSidebarEditing", "Allow editing directly in sidebar"),
+    const { root: blockSidebarEditingRow } = plainSwitch(
+      t2("settingsBlockSidebarEditing", "Show fields in the block sidebar"),
       {
         checked: state.sidebar_editing !== false,
         onChange: (checked) => {
@@ -1383,16 +1414,70 @@
         }
       }
     );
-    const { root: contentEditingRow } = plainSwitch(
-      t2("settingsContentEditing", "Show fields in the content column"),
+    blockSidebarEditingRow.appendChild(
+      el("p", {
+        className: "description",
+        text: t2(
+          "settingsBlockSidebarEditingHelp",
+          "When off, editors open a modal instead."
+        )
+      })
+    );
+    const { root: pageSidebarEditingRow } = plainSwitch(
+      t2("settingsSidebarEditing", "Allow editing directly in the sidebar"),
       {
-        checked: !!state.content_editing,
+        checked: state.sidebar_editing !== false,
         onChange: (checked) => {
-          state.content_editing = checked;
+          state.sidebar_editing = checked;
           notify();
         }
       }
     );
+    const locationValue = state.content_editing ? "content" : "sidebar";
+    if (state.content_placement !== "after_title") {
+      state.content_placement = "metabox";
+    }
+    const locationControl = createSegmentedControl(
+      [
+        { value: "sidebar", label: t2("settingsPositionSidebar", "Sidebar") },
+        { value: "content", label: t2("settingsPositionContent", "Content") }
+      ],
+      locationValue,
+      (value) => {
+        state.content_editing = value === "content";
+        syncPositioningExtras();
+        notify();
+      }
+    );
+    const locationRow = fieldRow(t2("settingsPositioning", "Positioning"), locationControl);
+    const placementControl = createSegmentedControl(
+      [
+        { value: "metabox", label: t2("settingsContentPlacementMetabox", "Meta box") },
+        {
+          value: "after_title",
+          label: t2("settingsContentPlacementAfterTitle", "Below the title")
+        }
+      ],
+      state.content_placement === "after_title" ? "after_title" : "metabox",
+      (value) => {
+        state.content_placement = value === "after_title" ? "after_title" : "metabox";
+        notify();
+      }
+    );
+    const placementRow = el("div", { className: "bl-forms-builder__setting" }, [
+      placementControl
+    ]);
+    const syncPositioningExtras = () => {
+      const isContent = !!state.content_editing;
+      pageSidebarEditingRow.hidden = isContent;
+      placementRow.hidden = !isContent;
+    };
+    syncPositioningExtras();
+    const positioningSection = el("div", { className: "bl-blocks-settings-positioning" }, [
+      locationRow,
+      pageSidebarEditingRow,
+      placementRow
+    ]);
     const { root: innerBlocksRow } = plainSwitch(
       t2("settingsSupportsInnerBlocks", "Allow nested blocks"),
       {
@@ -1579,11 +1664,11 @@
       el("h3", { className: "bl-forms-builder__section-title", text: t2("tabSettings", "Settings") }),
       activeRow
     ];
-    if (definitionType === "block" || definitionType === "page_settings") {
-      children.push(sidebarEditingRow);
+    if (definitionType === "block") {
+      children.push(blockSidebarEditingRow);
     }
     if (definitionType === "page_settings") {
-      children.push(contentEditingRow);
+      children.push(positioningSection);
     }
     children.push(
       fieldRow(t2("settingsSlug", "Slug"), slugInput, t2("settingsSlugHelp", "")),
@@ -4114,7 +4199,7 @@
       selectedId: 0,
       selectedIds: [],
       title: "Select a page",
-      searchPlaceholder: "Search pages\u2026",
+      searchPlaceholder: "Search\u2026",
       empty: "No pages found.",
       moreNote: "More results available. Refine your search to narrow them down.",
       cancelLabel: "Cancel",
@@ -6734,6 +6819,41 @@
     const dict = window.blBlocksFieldUi && window.blBlocksFieldUi.i18n || window.blBlocksEditor && window.blBlocksEditor.i18n || window.blBlocksPage && window.blBlocksPage.i18n || window.blBlocksAdmin && window.blBlocksAdmin.i18n || {};
     return dict[key] || fallback || key;
   }
+  function formatNoun(template, noun) {
+    return String(template || "").replace(/%s/g, String(noun || ""));
+  }
+  function pickerNouns(source) {
+    const singular = String(source && (source.text_singular || source.textSingular) || "").trim() || i18n("pageNounSingular", "Page");
+    const plural = String(source && (source.text_plural || source.textPlural) || "").trim() || i18n("pageNounPlural", "Pages");
+    return { singular, plural };
+  }
+  function pickerCopy(source, multiple) {
+    const { singular, plural } = pickerNouns(source);
+    const noun = multiple ? plural : singular;
+    return {
+      singular,
+      plural,
+      noun,
+      choose: formatNoun(i18n("chooseNoun", "Choose %s"), noun),
+      change: formatNoun(i18n("changeNoun", "Change %s"), noun),
+      title: formatNoun(
+        multiple ? i18n("selectNoun", "Select %s") : i18n("selectANoun", "Select a %s"),
+        noun
+      ),
+      search: i18n("searchNouns", "Search\u2026") || i18n("pagePickerSearch", "Search\u2026"),
+      empty: formatNoun(i18n("noNounsFound", "No %s found."), plural),
+      help: formatNoun(
+        multiple ? i18n("selectNounsHelp", "Select one or more %s.") : i18n("selectANoun", "Select a %s"),
+        multiple ? plural : singular
+      )
+    };
+  }
+  function wrapNounSource(wrap) {
+    return {
+      text_singular: wrap.getAttribute("data-text-singular") || "",
+      text_plural: wrap.getAttribute("data-text-plural") || ""
+    };
+  }
   function pickerConfig() {
     const sources = [
       window.blBlocksFieldUi,
@@ -6931,6 +7051,7 @@
   }
   function createPagePickerControl(field, current) {
     const multiple = !!field.multiple;
+    const copy = pickerCopy(field, multiple);
     let selected = normalizePageIds(current, multiple).map((id) => ({
       id,
       title: "",
@@ -6938,7 +7059,7 @@
     }));
     const empty = el4("span", {
       className: "description bl-blocks-fields__description bl-blocks-fields__page-empty",
-      text: multiple ? i18n("choosePagesHelp", "Select one or more pages.") : i18n("choosePageHelp", "Select a page.")
+      text: copy.help
     });
     const preview = el4("div", {
       className: "bl-blocks-fields__page-preview" + (multiple ? " is-multiple is-sortable" : " is-single")
@@ -6950,7 +7071,7 @@
     const pickBtn = el4("button", {
       type: "button",
       className: "button bl-button",
-      text: i18n("choosePage", "Choose page")
+      text: copy.choose
     });
     const clearBtn = el4("button", {
       type: "button",
@@ -6963,7 +7084,11 @@
     ]);
     const control = el4("div", {
       className: "bl-blocks-fields__page-picker",
-      dataset: { blBlocksPagePicker: "1" }
+      dataset: {
+        blBlocksPagePicker: "1",
+        textSingular: field.text_singular || "",
+        textPlural: field.text_plural || ""
+      }
     });
     control.append(
       el4("div", { className: "bl-blocks-fields__page-picker-row" }, [summary, actions])
@@ -6985,7 +7110,7 @@
         preview.replaceChildren();
       }
       clearBtn.hidden = !has;
-      pickBtn.textContent = has ? multiple ? i18n("changePages", "Change pages") : i18n("changePage", "Change page") : multiple ? i18n("choosePages", "Choose pages") : i18n("choosePage", "Choose page");
+      pickBtn.textContent = has ? copy.change : copy.choose;
     };
     if (multiple) {
       bindPageSortable(preview, {
@@ -7020,9 +7145,9 @@
         multi: multiple,
         selectedId: !multiple && selected[0] ? selected[0].id : 0,
         selectedIds: multiple ? selected.map((p) => p.id) : [],
-        title: multiple ? i18n("pagePickerTitleMulti", "Select pages") : i18n("pagePickerTitle", "Select a page"),
-        searchPlaceholder: i18n("pagePickerSearch", "Search pages\u2026"),
-        empty: i18n("pagePickerEmpty", "No pages found."),
+        title: copy.title,
+        searchPlaceholder: copy.search,
+        empty: copy.empty,
         moreNote: i18n(
           "pagePickerMore",
           "More results available. Refine your search to narrow them down."
@@ -7072,6 +7197,7 @@
       if (wrap.dataset.blPagePickerBound === "1") return;
       wrap.dataset.blPagePickerBound = "1";
       const multiple = wrap.dataset.multiple === "1";
+      const copy = pickerCopy(wrapNounSource(wrap), multiple);
       const inputName = wrap.dataset.inputName || "";
       const summary = wrap.querySelector("[data-bl-page-summary]");
       const pickBtn = wrap.querySelector("[data-bl-page-choose]");
@@ -7085,7 +7211,7 @@
       })).filter((p) => p.id > 0);
       const empty = el4("span", {
         className: "description bl-blocks-fields__description bl-blocks-fields__page-empty",
-        text: multiple ? i18n("choosePagesHelp", "Select one or more pages.") : i18n("choosePageHelp", "Select a page.")
+        text: copy.help
       });
       const preview = el4("div", {
         className: "bl-blocks-fields__page-preview" + (multiple ? " is-multiple is-sortable" : " is-single")
@@ -7128,7 +7254,7 @@
           preview.replaceChildren();
         }
         clearBtn.hidden = !has;
-        pickBtn.textContent = has ? multiple ? i18n("changePages", "Change pages") : i18n("changePage", "Change page") : multiple ? i18n("choosePages", "Choose pages") : i18n("choosePage", "Choose page");
+        pickBtn.textContent = has ? copy.change : copy.choose;
         writeInputs();
       };
       if (multiple) {
@@ -7151,9 +7277,9 @@
           multi: multiple,
           selectedId: !multiple && selected[0] ? selected[0].id : 0,
           selectedIds: multiple ? selected.map((p) => p.id) : [],
-          title: multiple ? i18n("pagePickerTitleMulti", "Select pages") : i18n("pagePickerTitle", "Select a page"),
-          searchPlaceholder: i18n("pagePickerSearch", "Search pages\u2026"),
-          empty: i18n("pagePickerEmpty", "No pages found."),
+          title: copy.title,
+          searchPlaceholder: copy.search,
+          empty: copy.empty,
           moreNote: i18n(
             "pagePickerMore",
             "More results available. Refine your search to narrow them down."
@@ -7874,7 +8000,7 @@
           const page = await openPagePicker({
             selectedId: pageMeta ? pageMeta.id : 0,
             title: i18n3("pagePickerTitle", "Select a page"),
-            searchPlaceholder: i18n3("pagePickerSearch", "Search pages\u2026"),
+            searchPlaceholder: i18n3("pagePickerSearch", "Search\u2026"),
             empty: i18n3("pagePickerEmpty", "No pages found."),
             cancelLabel: i18n3("cancel", "Cancel"),
             selectLabel: i18n3("selectPage", "Select"),

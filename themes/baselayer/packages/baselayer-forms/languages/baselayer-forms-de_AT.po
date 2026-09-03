@@ -1368,7 +1368,7 @@ msgstr "Seite auswählen"
 
 #: includes/admin.php:700
 msgid "Search pages…"
-msgstr "Seiten suchen…"
+msgstr "Suchen…"
 
 #: includes/admin.php:701
 msgid "No pages found."
@@ -1381,6 +1381,10 @@ msgstr "Wird geladen…"
 #: includes/admin.php:703 includes/admin.php:743
 msgid "Select"
 msgstr "Auswahl"
+
+msgctxt "verb"
+msgid "Select"
+msgstr "Auswählen"
 
 #: includes/admin.php:704 includes/settings-page.php:378
 msgid "Confirmation email"
@@ -1583,6 +1587,39 @@ msgstr "CAPTCHA"
 
 msgid "Page"
 msgstr "Seite"
+
+msgid "Page / Relation"
+msgstr "Seite / Verknüpfung"
+
+msgid "Pages"
+msgstr "Seiten"
+
+msgid "Text singular"
+msgstr "Text Singular"
+
+msgid "Text plural"
+msgstr "Text Plural"
+
+msgid "Choose %s"
+msgstr "%s wählen"
+
+msgid "Change %s"
+msgstr "%s ändern"
+
+msgid "Select %s"
+msgstr "%s auswählen"
+
+msgid "Select a %s"
+msgstr "%s auswählen"
+
+msgid "Select one or more %s."
+msgstr "Wähle eine oder mehrere %s."
+
+msgid "Search…"
+msgstr "Suchen…"
+
+msgid "No %s found."
+msgstr "Keine %s gefunden."
 
 msgid "Link"
 msgstr "Link"

@@ -253,6 +253,19 @@ body.post-new-php.post-type-bl_block {
   }
 }
 
+.bl-blocks-settings-positioning {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  // Same compact width as Forms range-mode / layout segmented groups.
+  .bl-forms-builder__segmented {
+    width: fit-content;
+    min-width: 260px;
+    max-width: 100%;
+  }
+}
+
 .bl-blocks-settings-post-types {
   display: flex;
   flex-direction: column;

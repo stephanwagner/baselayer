@@ -3113,8 +3113,8 @@ msgstr "Empfohlen"
 msgid "Select a page"
 msgstr "Seite auswählen"
 
-msgid "Search pages…"
-msgstr "Seiten suchen…"
+msgid "Search…"
+msgstr "Suchen…"
 
 msgid "No pages found."
 msgstr "Keine Seiten gefunden."

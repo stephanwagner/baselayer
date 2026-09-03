@@ -160,7 +160,7 @@ import { renderPageSelectionChips } from './admin/page-selection-chips.js';
         multi: true,
         selectedIds: current.map((p) => p.id),
         title: i18n.selectPages || 'Select pages',
-        searchPlaceholder: i18n.searchPages || 'Search pages…',
+        searchPlaceholder: i18n.searchPages || 'Search…',
         empty: i18n.noPages || 'No pages found.',
         cancelLabel: i18n.cancel || 'Cancel',
         selectLabel: i18n.select || 'Select',

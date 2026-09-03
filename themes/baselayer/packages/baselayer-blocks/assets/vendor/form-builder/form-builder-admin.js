@@ -2051,6 +2051,8 @@
       }
     } else {
       delete field.post_types;
+      delete field.text_singular;
+      delete field.text_plural;
     }
     if (nextType === "terms") {
       if (field.content == null || String(field.content).trim() === "") {
@@ -3416,6 +3418,45 @@
       })
     ]);
   }
+  function createPageNounsControl(field) {
+    const singularInput = el("input", {
+      type: "text",
+      className: "widefat",
+      dataset: { blTextSingular: "1" },
+      value: field.text_singular != null ? String(field.text_singular) : "",
+      placeholder: t("pageNounSingular", "Page")
+    });
+    const pluralInput = el("input", {
+      type: "text",
+      className: "widefat",
+      dataset: { blTextPlural: "1" },
+      value: field.text_plural != null ? String(field.text_plural) : "",
+      placeholder: t("pageNounPlural", "Pages")
+    });
+    const sync = () => {
+      const singular = singularInput.value.trim();
+      const plural = pluralInput.value.trim();
+      if (singular) {
+        field.text_singular = singular;
+      } else {
+        delete field.text_singular;
+      }
+      if (plural) {
+        field.text_plural = plural;
+      } else {
+        delete field.text_plural;
+      }
+      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+    };
+    singularInput.addEventListener("input", sync);
+    pluralInput.addEventListener("input", sync);
+    singularInput.addEventListener("change", sync);
+    pluralInput.addEventListener("change", sync);
+    return el("div", { className: "bl-forms-builder__affix-bounds" }, [
+      el("p", {}, [el("label", { text: t("textSingular", "Text singular") }), singularInput]),
+      el("p", {}, [el("label", { text: t("textPlural", "Text plural") }), pluralInput])
+    ]);
+  }
   function createPrefixSuffixControl(field) {
     const prefixInput = el("input", {
       type: "text",
@@ -4493,6 +4534,18 @@
       if (data.post_types.length === 0) {
         data.post_types = [...allowedKeys];
       }
+      const singular = q("[data-bl-text-singular]")?.value?.trim() || "";
+      const plural = q("[data-bl-text-plural]")?.value?.trim() || "";
+      if (singular) {
+        data.text_singular = singular;
+      } else {
+        delete data.text_singular;
+      }
+      if (plural) {
+        data.text_plural = plural;
+      } else {
+        delete data.text_plural;
+      }
     }
     if (type === "file" || type === "image") {
       if (useMediaLibraryFields()) {
@@ -5035,6 +5088,9 @@
         if (AFFIX_TYPES.includes(field.type)) {
           advancedSections.add(createPrefixSuffixControl(field));
         }
+        if (field.type === "page") {
+          advancedSections.add(createPageNounsControl(field));
+        }
         if (field.type === "textarea") {
           advancedSections.add(createTextareaRowsControl(field));
         }
@@ -5338,12 +5394,10 @@
           let multipleLabel = t("allowMultiple", "Allow multiple");
           if (field.type === "button_group") {
             multipleLabel = t("buttonGroupMultiple", "Allow multiple selection");
-          } else if (field.type === "select") {
+          } else if (field.type === "select" || field.type === "page") {
             multipleLabel = t("selectMultiple", "Allow multiple selection");
           } else if (field.type === "file" || field.type === "image") {
             multipleLabel = useMediaLibraryFields() ? t("allowMultipleMedia", "Allow multiple") : t("allowMultipleFiles", "Allow multiple files");
-          } else if (field.type === "page") {
-            multipleLabel = t("pageMultiple", "Allow multiple pages");
           }
           optionToggles.push(
             createSwitchSetting("blMultiple", multipleLabel, !!field.multiple, (checked) => {

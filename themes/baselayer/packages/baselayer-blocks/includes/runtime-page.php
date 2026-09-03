@@ -36,7 +36,7 @@ add_action('init', 'bl_blocks_register_page_meta', 20);
 /**
  * Active page_settings definitions assigned to a post type.
  *
- * @return list<array{id: int, title: string, fields: list<array>, metaKey: string, description: string, sidebarEditing: bool, contentEditing: bool}>
+ * @return list<array{id: int, title: string, fields: list<array>, metaKey: string, description: string, sidebarEditing: bool, contentEditing: bool, contentPlacement: string}>
  */
 function bl_blocks_page_definitions_for_post_type(string $post_type): array
 {
@@ -48,15 +48,19 @@ function bl_blocks_page_definitions_for_post_type(string $post_type): array
 			continue;
 		}
 		$slug = bl_blocks_definition_slug((int) $post->ID, $config['settings']);
+		$placement = ($config['settings']['content_placement'] ?? 'metabox') === 'after_title'
+			? 'after_title'
+			: 'metabox';
 		$out[] = [
-			'id'              => (int) $post->ID,
-			'slug'            => $slug,
-			'title'           => $post->post_title !== '' ? $post->post_title : __('Content Fields', 'baselayer-blocks'),
-			'description'     => (string) ($config['settings']['description'] ?? ''),
-			'fields'          => $config['fields'],
-			'metaKey'         => bl_blocks_page_meta_key($slug),
-			'sidebarEditing'  => !empty($config['settings']['sidebar_editing']),
-			'contentEditing'  => !empty($config['settings']['content_editing']),
+			'id'               => (int) $post->ID,
+			'slug'             => $slug,
+			'title'            => $post->post_title !== '' ? $post->post_title : __('Content Fields', 'baselayer-blocks'),
+			'description'      => (string) ($config['settings']['description'] ?? ''),
+			'fields'           => $config['fields'],
+			'metaKey'          => bl_blocks_page_meta_key($slug),
+			'sidebarEditing'   => !empty($config['settings']['sidebar_editing']),
+			'contentEditing'   => !empty($config['settings']['content_editing']),
+			'contentPlacement' => $placement,
 		];
 	}
 
@@ -64,17 +68,65 @@ function bl_blocks_page_definitions_for_post_type(string $post_type): array
 }
 
 /**
- * Whether this definition should render as a content-column metabox on this screen.
+ * Whether this definition uses the content column (not the Gutenberg sidebar).
  *
  * @param array{contentEditing?: bool} $def
  */
+function bl_blocks_page_def_location_is_content(array $def): bool
+{
+	return !empty($def['contentEditing']);
+}
+
+/**
+ * @param array{contentPlacement?: string} $def
+ */
+function bl_blocks_page_def_content_placement(array $def): string
+{
+	return (($def['contentPlacement'] ?? 'metabox') === 'after_title') ? 'after_title' : 'metabox';
+}
+
+/**
+ * Classic after-title panel (non-postbox). Gutenberg after_title uses a fixed metabox instead.
+ *
+ * @param array{contentEditing?: bool, contentPlacement?: string} $def
+ */
+function bl_blocks_page_def_uses_after_title(array $def, bool $is_block_editor): bool
+{
+	return !$is_block_editor
+		&& bl_blocks_page_def_location_is_content($def)
+		&& bl_blocks_page_def_content_placement($def) === 'after_title';
+}
+
+/**
+ * Whether this definition should render as a content-column metabox on this screen.
+ *
+ * Classic + Sidebar location still gets a metabox (no document sidebar).
+ * Gutenberg after_title falls back to a non-collapsible metabox.
+ *
+ * @param array{contentEditing?: bool, contentPlacement?: string} $def
+ */
 function bl_blocks_page_def_uses_content_metabox(array $def, bool $is_block_editor): bool
 {
-	if (!empty($def['contentEditing'])) {
+	if (bl_blocks_page_def_uses_after_title($def, $is_block_editor)) {
+		return false;
+	}
+
+	if (bl_blocks_page_def_location_is_content($def)) {
 		return true;
 	}
 
 	return !$is_block_editor;
+}
+
+/**
+ * Whether the post form should include this definition's content-column values.
+ *
+ * @param array{contentEditing?: bool, contentPlacement?: string} $def
+ */
+function bl_blocks_page_def_uses_content_form(array $def, bool $is_block_editor): bool
+{
+	return bl_blocks_page_def_uses_content_metabox($def, $is_block_editor)
+		|| bl_blocks_page_def_uses_after_title($def, $is_block_editor);
 }
 
 /**
@@ -98,15 +150,15 @@ function bl_blocks_enqueue_page_editor(string $hook): void
 	}
 
 	$is_block_editor = $screen->is_block_editor();
-	$needs_metabox = false;
+	$needs_content_ui = false;
 	foreach ($defs as $def) {
-		if (bl_blocks_page_def_uses_content_metabox($def, $is_block_editor)) {
-			$needs_metabox = true;
+		if (bl_blocks_page_def_uses_content_form($def, $is_block_editor)) {
+			$needs_content_ui = true;
 			break;
 		}
 	}
 
-	if ($needs_metabox && function_exists('bl_blocks_enqueue_field_ui_assets')) {
+	if ($needs_content_ui && function_exists('bl_blocks_enqueue_field_ui_assets')) {
 		bl_blocks_enqueue_field_ui_assets();
 	}
 
@@ -171,12 +223,13 @@ function bl_blocks_enqueue_page_editor(string $hook): void
 			'selectedPage'           => __('Selected page', 'baselayer-blocks'),
 			'pagePickerTitle'        => __('Select a page', 'baselayer-blocks'),
 			'pagePickerTitleMulti'   => __('Select pages', 'baselayer-blocks'),
-			'pagePickerSearch'       => __('Search pages…', 'baselayer-blocks'),
+			'pagePickerSearch'       => __('Search…', 'baselayer-blocks'),
 			'pagePickerEmpty'        => __('No pages found.', 'baselayer-blocks'),
 			'pagePickerLoading'      => __('Loading…', 'baselayer-blocks'),
 			'pagePickerMore'         => __('More results available. Refine your search to narrow them down.', 'baselayer-blocks'),
 			'pagePickerAll'          => __('All', 'baselayer-blocks'),
-			'selectPage'             => __('Select', 'baselayer-blocks'),
+			/* translators: Confirm button in the page/relation picker modal. */
+			'selectPage'             => _x('Select', 'verb', 'baselayer-blocks'),
 			'linkTypePage'           => __('Page', 'baselayer-blocks'),
 			'linkTypeUrl'            => __('URL', 'baselayer-blocks'),
 			'linkTypeEmail'          => __('Email', 'baselayer-blocks'),
@@ -191,7 +244,8 @@ function bl_blocks_enqueue_page_editor(string $hook): void
 			'linkText'               => __('Link text', 'baselayer-blocks'),
 			'linkOpenNewTab'         => __('Open in new tab', 'baselayer-blocks'),
 			'selectEmptyOptionPlaceholder' => __('Please select…', 'baselayer-blocks'),
-		] + (function_exists('bl_blocks_media_field_i18n') ? bl_blocks_media_field_i18n() : []),
+		] + (function_exists('bl_blocks_media_field_i18n') ? bl_blocks_media_field_i18n() : [])
+		  + (function_exists('bl_page_picker_field_i18n') ? bl_page_picker_field_i18n('baselayer-blocks') : []),
 	]);
 
 	$post_id = isset($_GET['post']) ? (int) $_GET['post'] : 0;
@@ -246,8 +300,12 @@ function bl_blocks_register_page_content_metaboxes(): void
 		if (!bl_blocks_page_def_uses_content_metabox($def, $is_block_editor)) {
 			continue;
 		}
+		$box_id = 'bl_blocks_page_content_' . (int) $def['id'];
+		$fixed = $is_block_editor
+			&& bl_blocks_page_def_location_is_content($def)
+			&& bl_blocks_page_def_content_placement($def) === 'after_title';
 		add_meta_box(
-			'bl_blocks_page_content_' . (int) $def['id'],
+			$box_id,
 			(string) $def['title'],
 			'bl_blocks_render_page_content_metabox',
 			$screen->post_type,
@@ -258,9 +316,48 @@ function bl_blocks_register_page_content_metaboxes(): void
 				'__block_editor_compatible_meta_box' => true,
 			]
 		);
+		if ($fixed) {
+			$screen_id = (string) $screen->id;
+			add_filter(
+				'postbox_classes_' . $screen_id . '_' . $box_id,
+				static function (array $classes): array {
+					$classes[] = 'bl-blocks-postbox--fixed';
+					return $classes;
+				}
+			);
+		}
 	}
 }
 add_action('add_meta_boxes', 'bl_blocks_register_page_content_metaboxes');
+
+/**
+ * Classic after-title panel for content_placement=after_title.
+ */
+function bl_blocks_render_page_after_title(WP_Post $post): void
+{
+	$screen = function_exists('get_current_screen') ? get_current_screen() : null;
+	if (!$screen || $screen->post_type === '' || $screen->post_type === BL_BLOCK_POST_TYPE) {
+		return;
+	}
+	if ($screen->is_block_editor()) {
+		return;
+	}
+
+	$defs = bl_blocks_page_definitions_for_post_type($screen->post_type);
+	foreach ($defs as $def) {
+		if (!bl_blocks_page_def_uses_after_title($def, false)) {
+			continue;
+		}
+		$title = (string) ($def['title'] ?? '');
+		echo '<div class="bl-blocks-after-title" id="bl_blocks_page_content_' . esc_attr((string) (int) ($def['id'] ?? 0)) . '">';
+		if ($title !== '') {
+			echo '<h2 class="bl-blocks-after-title__title">' . esc_html($title) . '</h2>';
+		}
+		bl_blocks_render_page_content_metabox($post, ['args' => ['def' => $def]]);
+		echo '</div>';
+	}
+}
+add_action('edit_form_after_title', 'bl_blocks_render_page_after_title');
 
 /**
  * @param WP_Post $post
@@ -347,7 +444,7 @@ function bl_blocks_save_page_content_fields(int $post_id, WP_Post $post): void
 		: false;
 	$defs = bl_blocks_page_definitions_for_post_type($post->post_type);
 	foreach ($defs as $def) {
-		if (!bl_blocks_page_def_uses_content_metabox($def, $is_block_editor)) {
+		if (!bl_blocks_page_def_uses_content_form($def, $is_block_editor)) {
 			continue;
 		}
 		$meta_key = (string) ($def['metaKey'] ?? '');

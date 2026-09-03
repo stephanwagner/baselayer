@@ -1602,3 +1602,43 @@ button.button-link.bl-blocks-fields__repeater-remove {
     font-size: 12px;
   }
 }
+
+// Content location: classic after-title (non-postbox, always open).
+.bl-blocks-after-title {
+  margin: 16px 0 24px;
+  padding: 8px 12px 12px;
+  background: #fff;
+  border: 1px solid #c3c4c7;
+  box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
+  border-radius: 6px;
+}
+
+.bl-blocks-after-title__title {
+  margin: 8px 0 12px !important;
+  padding: 0 !important;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+// Gutenberg fallback for after-title: metabox that cannot collapse.
+.postbox.bl-blocks-postbox--fixed {
+  .handlediv,
+  .handle-actions,
+  .postbox-header .handle-order-higher,
+  .postbox-header .handle-order-lower,
+  .postbox-header .toggle-indicator {
+    display: none !important;
+  }
+
+  &.closed .inside,
+  .inside {
+    display: block !important;
+  }
+
+  .postbox-header h2.hndle,
+  .hndle {
+    cursor: default;
+    pointer-events: none;
+  }
+}

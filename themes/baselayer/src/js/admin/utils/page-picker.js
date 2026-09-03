@@ -32,7 +32,7 @@ export function openPagePicker(options = {}) {
     selectedId: 0,
     selectedIds: [],
     title: 'Select a page',
-    searchPlaceholder: 'Search pages…',
+    searchPlaceholder: 'Search…',
     empty: 'No pages found.',
     moreNote:
       'More results available. Refine your search to narrow them down.',

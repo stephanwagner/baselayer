@@ -13,6 +13,46 @@ function fieldRow(label, control, help = '') {
   return el('div', { className: 'bl-forms-builder__setting' }, children);
 }
 
+/**
+ * @param {Array<{value: string, label: string}>} options
+ * @param {string} active
+ * @param {(value: string) => void} onSelect
+ */
+function createSegmentedControl(options, active, onSelect) {
+  const group = el('div', {
+    className: 'bl-forms-builder__segmented',
+    role: 'group',
+  });
+
+  const sync = (value) => {
+    group.querySelectorAll('button').forEach((btn) => {
+      const on = btn.dataset.value === value;
+      btn.classList.toggle('is-active', on);
+      btn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+  };
+
+  options.forEach((opt) => {
+    const btn = el('button', {
+      type: 'button',
+      className: 'bl-forms-builder__segmented-btn',
+      dataset: { value: opt.value },
+    });
+    btn.textContent = opt.label;
+    btn.setAttribute('aria-pressed', opt.value === active ? 'true' : 'false');
+    if (opt.value === active) {
+      btn.classList.add('is-active');
+    }
+    btn.addEventListener('click', () => {
+      sync(opt.value);
+      onSelect(opt.value);
+    });
+    group.appendChild(btn);
+  });
+
+  return group;
+}
+
 function plainSwitch(label, { checked = false, onChange = null } = {}) {
   const input = el('input', { type: 'checkbox', checked: !!checked });
   if (onChange) {
@@ -272,8 +312,28 @@ export function createSettingsPanel(initial, definitionType, onChange) {
     },
   });
 
-  const { root: sidebarEditingRow } = plainSwitch(
-    t('settingsSidebarEditing', 'Allow editing directly in sidebar'),
+  const { root: blockSidebarEditingRow } = plainSwitch(
+    t('settingsBlockSidebarEditing', 'Show fields in the block sidebar'),
+    {
+      checked: state.sidebar_editing !== false,
+      onChange: (checked) => {
+        state.sidebar_editing = checked;
+        notify();
+      },
+    }
+  );
+  blockSidebarEditingRow.appendChild(
+    el('p', {
+      className: 'description',
+      text: t(
+        'settingsBlockSidebarEditingHelp',
+        'When off, editors open a modal instead.'
+      ),
+    })
+  );
+
+  const { root: pageSidebarEditingRow } = plainSwitch(
+    t('settingsSidebarEditing', 'Allow editing directly in the sidebar'),
     {
       checked: state.sidebar_editing !== false,
       onChange: (checked) => {
@@ -283,16 +343,55 @@ export function createSettingsPanel(initial, definitionType, onChange) {
     }
   );
 
-  const { root: contentEditingRow } = plainSwitch(
-    t('settingsContentEditing', 'Show fields in the content column'),
-    {
-      checked: !!state.content_editing,
-      onChange: (checked) => {
-        state.content_editing = checked;
-        notify();
-      },
+  const locationValue = state.content_editing ? 'content' : 'sidebar';
+  if (state.content_placement !== 'after_title') {
+    state.content_placement = 'metabox';
+  }
+
+  const locationControl = createSegmentedControl(
+    [
+      { value: 'sidebar', label: t('settingsPositionSidebar', 'Sidebar') },
+      { value: 'content', label: t('settingsPositionContent', 'Content') },
+    ],
+    locationValue,
+    (value) => {
+      state.content_editing = value === 'content';
+      syncPositioningExtras();
+      notify();
     }
   );
+  const locationRow = fieldRow(t('settingsPositioning', 'Positioning'), locationControl);
+
+  const placementControl = createSegmentedControl(
+    [
+      { value: 'metabox', label: t('settingsContentPlacementMetabox', 'Meta box') },
+      {
+        value: 'after_title',
+        label: t('settingsContentPlacementAfterTitle', 'Below the title'),
+      },
+    ],
+    state.content_placement === 'after_title' ? 'after_title' : 'metabox',
+    (value) => {
+      state.content_placement = value === 'after_title' ? 'after_title' : 'metabox';
+      notify();
+    }
+  );
+  const placementRow = el('div', { className: 'bl-forms-builder__setting' }, [
+    placementControl,
+  ]);
+
+  const syncPositioningExtras = () => {
+    const isContent = !!state.content_editing;
+    pageSidebarEditingRow.hidden = isContent;
+    placementRow.hidden = !isContent;
+  };
+  syncPositioningExtras();
+
+  const positioningSection = el('div', { className: 'bl-blocks-settings-positioning' }, [
+    locationRow,
+    pageSidebarEditingRow,
+    placementRow,
+  ]);
 
   const { root: innerBlocksRow } = plainSwitch(
     t('settingsSupportsInnerBlocks', 'Allow nested blocks'),
@@ -514,11 +613,11 @@ export function createSettingsPanel(initial, definitionType, onChange) {
     activeRow,
   ];
 
-  if (definitionType === 'block' || definitionType === 'page_settings') {
-    children.push(sidebarEditingRow);
+  if (definitionType === 'block') {
+    children.push(blockSidebarEditingRow);
   }
   if (definitionType === 'page_settings') {
-    children.push(contentEditingRow);
+    children.push(positioningSection);
   }
 
   children.push(
