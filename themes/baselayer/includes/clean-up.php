@@ -105,3 +105,31 @@ if (!function_exists('bl_config_comments_enabled') || !bl_config_comments_enable
 		}
 	}, 1);
 }
+
+/**
+ * Hide WordPress’s Custom Fields metabox (classic + Gutenberg).
+ *
+ * Keep `custom-fields` post type support: Gutenberg needs it to persist registered post meta.
+ */
+function bl_remove_custom_fields_metabox(string $post_type): void
+{
+	remove_meta_box('postcustom', $post_type, 'normal');
+}
+add_action('add_meta_boxes', 'bl_remove_custom_fields_metabox', 99);
+
+/**
+ * Hide Custom Fields by default if the box is still registered (e.g. a plugin re-adds it).
+ *
+ * @param array<int, string> $hidden
+ * @param WP_Screen          $screen
+ * @return array<int, string>
+ */
+function bl_hide_custom_fields_metabox_by_default(array $hidden, $screen): array
+{
+	if (!in_array('postcustom', $hidden, true)) {
+		$hidden[] = 'postcustom';
+	}
+
+	return $hidden;
+}
+add_filter('default_hidden_meta_boxes', 'bl_hide_custom_fields_metabox_by_default', 10, 2);
