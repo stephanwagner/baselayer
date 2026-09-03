@@ -1337,6 +1337,29 @@ body.is-dragging .sortable-drag .bl-forms-builder__handle {
   }
 }
 
+.bl-forms-builder__page-order {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+
+  .bl-forms-builder__type-select {
+    margin: 0;
+
+    > p {
+      margin: 0;
+    }
+
+    > p.description {
+      margin-top: 4px;
+    }
+  }
+
+  .bl-forms-builder__switch-setting {
+    margin: 0;
+  }
+}
+
 .bl-forms-builder__date-relation {
   display: flex;
   flex-direction: column;

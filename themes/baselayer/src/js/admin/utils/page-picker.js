@@ -23,9 +23,112 @@
  * @param {string} [options.allLabel]
  * @param {string} [options.restUrl] - Legacy single-type URL (wp/v2/pages). Ignored when postTypes is set.
  * @param {string} [options.restNonce] - Defaults to wpApiSettings.nonce
- * @param {Array<{value: string, label: string, restBase: string}>} [options.postTypes]
+ * @param {Array<{value: string, label: string, restBase: string, orderby?: string, order?: string, supportsMenuOrder?: boolean}>} [options.postTypes]
+ * @param {string} [options.orderby] - Field orderby: automatic | title | menu_order | date | modified
  * @returns {Promise<{id:number,title:string,url:string}|Array<{id:number,title:string,url:string}>|null>}
  */
+const PAGE_ORDERBY = ['automatic', 'title', 'menu_order', 'date', 'modified'];
+
+/**
+ * @param {unknown} raw
+ * @returns {'automatic'|'title'|'menu_order'|'date'|'modified'}
+ */
+export function sanitizePageOrderby(raw) {
+  const key = String(raw || 'automatic');
+  return PAGE_ORDERBY.includes(key) ? key : 'automatic';
+}
+
+/**
+ * @param {string} orderby
+ * @returns {'asc'|'desc'}
+ */
+export function defaultPageOrder(orderby) {
+  return orderby === 'date' || orderby === 'modified' ? 'desc' : 'asc';
+}
+
+/**
+ * REST orderby/order for one catalog type given the field-level orderby.
+ *
+ * @param {{orderby?: string, order?: string, supportsMenuOrder?: boolean}} pt
+ * @param {string} [fieldOrderby]
+ * @returns {{orderby: string, order: string}}
+ */
+export function restOrderForPostType(pt, fieldOrderby) {
+  const fieldKey = sanitizePageOrderby(fieldOrderby);
+  let orderby;
+  let order;
+  if (fieldKey === 'automatic') {
+    orderby = String((pt && pt.orderby) || 'modified');
+    order = String((pt && pt.order) || 'desc').toLowerCase();
+  } else {
+    orderby = fieldKey;
+    order = defaultPageOrder(orderby);
+  }
+  if (order !== 'asc' && order !== 'desc') {
+    order = defaultPageOrder(orderby);
+  }
+  if (orderby === 'menu_order' && pt && pt.supportsMenuOrder === false) {
+    return { orderby: 'title', order: 'asc' };
+  }
+  if (!['title', 'menu_order', 'date', 'modified'].includes(orderby)) {
+    return { orderby: 'modified', order: 'desc' };
+  }
+  return { orderby, order };
+}
+
+/**
+ * @param {{title?: string, date?: string, modified?: string, menu_order?: number}} a
+ * @param {{title?: string, date?: string, modified?: string, menu_order?: number}} b
+ * @param {string} orderby
+ * @param {string} order
+ */
+export function comparePageItems(a, b, orderby, order) {
+  const dir = String(order).toLowerCase() === 'asc' ? 1 : -1;
+  if (orderby === 'title') {
+    return (
+      dir *
+      String(a.title || '').localeCompare(String(b.title || ''), undefined, {
+        sensitivity: 'base',
+      })
+    );
+  }
+  if (orderby === 'menu_order') {
+    const diff = (Number(a.menu_order) || 0) - (Number(b.menu_order) || 0);
+    if (diff !== 0) return dir * diff;
+    return String(b.date || '').localeCompare(String(a.date || ''));
+  }
+  const key = orderby === 'date' ? 'date' : 'modified';
+  return dir * String(a[key] || '').localeCompare(String(b[key] || ''));
+}
+
+/**
+ * Sort selected items when Allow reorder is off.
+ *
+ * @template {{id:number,title?:string,date?:string,modified?:string,menu_order?:number}} T
+ * @param {T[]} items
+ * @param {string} fieldOrderby
+ * @param {Array<{orderby?: string, order?: string, supportsMenuOrder?: boolean}>} postTypes
+ * @returns {T[]}
+ */
+export function sortPageItems(items, fieldOrderby, postTypes) {
+  if (!Array.isArray(items) || items.length < 2) return items;
+  const fieldKey = sanitizePageOrderby(fieldOrderby);
+  const types = Array.isArray(postTypes) ? postTypes : [];
+  let resolved;
+  if (fieldKey === 'automatic') {
+    if (types.length === 1) {
+      resolved = restOrderForPostType(types[0], 'automatic');
+    } else {
+      resolved = { orderby: 'modified', order: 'desc' };
+    }
+  } else {
+    resolved = restOrderForPostType(types[0] || {}, fieldKey);
+  }
+  return [...items].sort((a, b) =>
+    comparePageItems(a, b, resolved.orderby, resolved.order)
+  );
+}
+
 export function openPagePicker(options = {}) {
   const opts = {
     multi: false,
@@ -42,8 +145,10 @@ export function openPagePicker(options = {}) {
     restUrl: '',
     restNonce: '',
     postTypes: null,
+    orderby: 'automatic',
     ...options,
   };
+  opts.orderby = sanitizePageOrderby(opts.orderby);
 
   const api = window.wpApiSettings || {};
   const restNonce = opts.restNonce || api.nonce || '';
@@ -51,7 +156,7 @@ export function openPagePicker(options = {}) {
     ? String(api.root).replace(/\/?$/, '/')
     : '';
 
-  /** @type {Array<{value: string, label: string, restBase: string, restUrl: string}>} */
+  /** @type {Array<{value: string, label: string, restBase: string, restUrl: string, orderby: string, order: string, supportsMenuOrder: boolean}>} */
   let postTypes = normalizePostTypes(opts.postTypes, opts.restUrl, restRoot);
   if (postTypes.length === 0) {
     postTypes = [
@@ -60,6 +165,9 @@ export function openPagePicker(options = {}) {
         label: 'Pages',
         restBase: 'pages',
         restUrl: restRoot ? restRoot + 'wp/v2/pages' : String(opts.restUrl || ''),
+        orderby: 'modified',
+        order: 'DESC',
+        supportsMenuOrder: true,
       },
     ];
   }
@@ -312,6 +420,9 @@ export function openPagePicker(options = {}) {
             id,
             title: page.title || '',
             url: page.url || '',
+            date: page.date || '',
+            modified: page.modified || '',
+            menu_order: Number(page.menu_order) || 0,
           };
           if (opts.multi) {
             if (selectedMap.has(id)) {
@@ -337,38 +448,14 @@ export function openPagePicker(options = {}) {
     };
 
     /**
-     * @param {string} restUrl
+     * @param {{restUrl: string, orderby?: string, order?: string, supportsMenuOrder?: boolean}} pt
      * @param {string} query
      * @param {AbortSignal} signal
      * @param {number} perPage
-     * @returns {Promise<{items: Array<{id:number,title:string,url:string,modified:string}>, total: number}>}
+     * @returns {Promise<{items: Array<{id:number,title:string,url:string,modified:string,date:string,menu_order:number}>, total: number}>}
      */
-    const fetchType = async (restUrl, query, signal, perPage) => {
-      if (!restUrl) return { items: [], total: 0 };
-      const url = new URL(restUrl, window.location.origin);
-      url.searchParams.set('status', 'publish');
-      url.searchParams.set('per_page', String(perPage));
-      url.searchParams.set('orderby', 'modified');
-      url.searchParams.set('order', 'desc');
-      url.searchParams.set('_fields', 'id,title,link,modified');
-      if (query) {
-        url.searchParams.set('search', query);
-      }
-      const res = await fetch(url.toString(), {
-        credentials: 'same-origin',
-        signal,
-        headers: restNonce
-          ? {
-              'X-WP-Nonce': restNonce,
-            }
-          : {},
-      });
-      if (!res.ok) {
-        return { items: [], total: 0 };
-      }
-      const totalHeader = parseInt(res.headers.get('X-WP-Total') || '', 10);
-      const data = await res.json();
-      const items = (Array.isArray(data) ? data : []).map((row) => ({
+    const mapRestItems = (data) =>
+      (Array.isArray(data) ? data : []).map((row) => ({
         id: Number(row.id) || 0,
         title:
           row.title && typeof row.title.rendered === 'string'
@@ -376,7 +463,46 @@ export function openPagePicker(options = {}) {
             : String(row.title || ''),
         url: typeof row.link === 'string' ? row.link : '',
         modified: typeof row.modified === 'string' ? row.modified : '',
+        date: typeof row.date === 'string' ? row.date : '',
+        menu_order: Number(row.menu_order) || 0,
       }));
+
+    const fetchType = async (pt, query, signal, perPage) => {
+      const restUrl = pt && pt.restUrl;
+      if (!restUrl) return { items: [], total: 0 };
+      const rest = restOrderForPostType(pt, opts.orderby);
+      const url = new URL(restUrl, window.location.origin);
+      url.searchParams.set('status', 'publish');
+      url.searchParams.set('per_page', String(perPage));
+      url.searchParams.set('orderby', rest.orderby);
+      url.searchParams.set('order', rest.order);
+      url.searchParams.set('_fields', 'id,title,link,modified,date,menu_order');
+      if (query) {
+        url.searchParams.set('search', query);
+      }
+      const doFetch = async (orderby, order) => {
+        url.searchParams.set('orderby', orderby);
+        url.searchParams.set('order', order);
+        return fetch(url.toString(), {
+          credentials: 'same-origin',
+          signal,
+          headers: restNonce
+            ? {
+                'X-WP-Nonce': restNonce,
+              }
+            : {},
+        });
+      };
+      let res = await doFetch(rest.orderby, rest.order);
+      if (!res.ok && rest.orderby === 'menu_order') {
+        res = await doFetch('title', 'asc');
+      }
+      if (!res.ok) {
+        return { items: [], total: 0 };
+      }
+      const totalHeader = parseInt(res.headers.get('X-WP-Total') || '', 10);
+      const data = await res.json();
+      const items = mapRestItems(data);
       const total = Number.isFinite(totalHeader) ? totalHeader : items.length;
       return { items, total };
     };
@@ -406,7 +532,7 @@ export function openPagePicker(options = {}) {
       try {
         const batches = await Promise.all(
           typesToFetch.map((pt) =>
-            fetchType(pt.restUrl, query, abort.signal, perPage)
+            fetchType(pt, query, abort.signal, perPage)
           )
         );
         if (gen !== fetchGen) return;
@@ -423,9 +549,16 @@ export function openPagePicker(options = {}) {
             seen.add(page.id);
             return true;
           });
-          pages.sort((a, b) =>
-            String(b.modified || '').localeCompare(String(a.modified || ''))
-          );
+          if (opts.orderby === 'automatic') {
+            pages.sort((a, b) =>
+              String(b.modified || '').localeCompare(String(a.modified || ''))
+            );
+          } else {
+            const merge = restOrderForPostType({}, opts.orderby);
+            pages.sort((a, b) =>
+              comparePageItems(a, b, merge.orderby, merge.order)
+            );
+          }
           if (pages.length > perPage) {
             hasMore = true;
             pages = pages.slice(0, perPage);
@@ -437,6 +570,9 @@ export function openPagePicker(options = {}) {
               id: page.id,
               title: page.title,
               url: page.url,
+              date: page.date,
+              modified: page.modified,
+              menu_order: page.menu_order,
             });
           }
         });
@@ -476,7 +612,7 @@ export function openPagePicker(options = {}) {
  * @param {unknown} raw
  * @param {string} legacyRestUrl
  * @param {string} restRoot
- * @returns {Array<{value: string, label: string, restBase: string, restUrl: string}>}
+ * @returns {Array<{value: string, label: string, restBase: string, restUrl: string, orderby: string, order: string, supportsMenuOrder: boolean}>}
  */
 function normalizePostTypes(raw, legacyRestUrl, restRoot) {
   if (!Array.isArray(raw) || raw.length === 0) {
@@ -487,6 +623,9 @@ function normalizePostTypes(raw, legacyRestUrl, restRoot) {
           label: 'Pages',
           restBase: 'pages',
           restUrl: String(legacyRestUrl),
+          orderby: 'modified',
+          order: 'DESC',
+          supportsMenuOrder: true,
         },
       ];
     }
@@ -501,7 +640,21 @@ function normalizePostTypes(raw, legacyRestUrl, restRoot) {
       const restUrl = restRoot
         ? restRoot + 'wp/v2/' + restBase.replace(/^\/+|\/+$/g, '')
         : '';
-      return { value, label, restBase, restUrl };
+      const orderby = String((row && row.orderby) || 'modified');
+      const order = String((row && row.order) || 'DESC');
+      const supportsMenuOrder =
+        row && Object.prototype.hasOwnProperty.call(row, 'supportsMenuOrder')
+          ? !!row.supportsMenuOrder
+          : value === 'page';
+      return {
+        value,
+        label,
+        restBase,
+        restUrl,
+        orderby,
+        order,
+        supportsMenuOrder,
+      };
     })
     .filter(Boolean);
 }

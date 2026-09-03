@@ -1621,6 +1621,27 @@ msgstr "Suchen…"
 msgid "No %s found."
 msgstr "Keine %s gefunden."
 
+msgid "Order"
+msgstr "Reihenfolge"
+
+msgid "Menu Order"
+msgstr "Menüreihenfolge"
+
+msgid "Created"
+msgstr "Erstellt"
+
+msgid "Last edited"
+msgstr "Zuletzt bearbeitet"
+
+msgid "Automatic uses the post type’s own order."
+msgstr "Automatisch verwendet die Reihenfolge des Inhaltstyps."
+
+msgid "Allow reorder"
+msgstr "Umsortieren erlauben"
+
+msgid "Allowed post types"
+msgstr "Erlaubte Inhaltstypen"
+
 msgid "Link"
 msgstr "Link"
 

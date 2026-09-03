@@ -247,6 +247,14 @@ function bl_blocks_format_field_value(array $field, $value)
 
 	if ($type === 'page') {
 		$ids = bl_blocks_normalize_id_list($value);
+		if (
+			!empty($field['multiple'])
+			&& array_key_exists('allow_reorder', $field)
+			&& empty($field['allow_reorder'])
+			&& function_exists('bl_page_picker_sort_ids')
+		) {
+			$ids = bl_page_picker_sort_ids($ids, $field);
+		}
 		$items = [];
 		foreach ($ids as $id) {
 			$item = bl_blocks_format_page_value($id);

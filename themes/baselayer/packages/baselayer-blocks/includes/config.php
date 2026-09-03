@@ -1282,9 +1282,15 @@ function bl_blocks_sanitize_leaf_field_fallback(array $field): array
 		} else {
 			unset($out['text_plural']);
 		}
+		$out['orderby'] = function_exists('bl_page_picker_sanitize_orderby')
+			? bl_page_picker_sanitize_orderby($field['orderby'] ?? 'automatic')
+			: 'automatic';
+		$out['allow_reorder'] = !array_key_exists('allow_reorder', $field)
+			? true
+			: !empty($field['allow_reorder']);
 		unset($out['placeholder'], $out['default_value']);
 	} else {
-		unset($out['text_singular'], $out['text_plural']);
+		unset($out['text_singular'], $out['text_plural'], $out['orderby'], $out['allow_reorder']);
 	}
 	if ($out['type'] === 'link') {
 		$allowed = ['page', 'url', 'email', 'phone', 'file'];

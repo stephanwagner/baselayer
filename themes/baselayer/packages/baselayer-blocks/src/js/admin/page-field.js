@@ -1,7 +1,7 @@
 /**
  * Page picker control for Blocks field value UIs (modal + PHP site settings).
  */
-import { openPagePicker } from '../../../../../src/js/admin/utils/page-picker.js';
+import { openPagePicker, sanitizePageOrderby, sortPageItems } from '../../../../../src/js/admin/utils/page-picker.js';
 import { createSortable } from '../../../../../src/js/admin/canvas-builder/sortable.js';
 
 function el(tag, props = {}, children = []) {
@@ -90,6 +90,27 @@ function wrapNounSource(wrap) {
     text_singular: wrap.getAttribute('data-text-singular') || '',
     text_plural: wrap.getAttribute('data-text-plural') || '',
   };
+}
+
+function fieldAllowsReorder(source) {
+  if (!source) return true;
+  const raw =
+    source.allow_reorder !== undefined
+      ? source.allow_reorder
+      : source.allowReorder;
+  return raw !== false && raw !== 0 && raw !== '0';
+}
+
+function fieldOrderby(source) {
+  return sanitizePageOrderby(source && (source.orderby || source.orderBy));
+}
+
+function previewClass(multiple, sortable) {
+  if (!multiple) return 'bl-blocks-fields__page-preview is-single';
+  return (
+    'bl-blocks-fields__page-preview is-multiple' +
+    (sortable ? ' is-sortable' : '')
+  );
 }
 
 function pickerConfig() {
@@ -196,7 +217,7 @@ async function hydrateSelectedPages(selected, postTypes, restNonce) {
         encodeURIComponent(include) +
         '&per_page=' +
         missing.length +
-        '&_fields=id,title,link'
+        '&_fields=id,title,link,date,modified,menu_order'
       );
     })
     .filter(Boolean);
@@ -224,6 +245,9 @@ async function hydrateSelectedPages(selected, postTypes, restNonce) {
             ? row.title.rendered.replace(/<[^>]+>/g, '')
             : String((row.title && row.title.rendered) || row.title || ''),
         url: typeof row.link === 'string' ? row.link : '',
+        date: typeof row.date === 'string' ? row.date : '',
+        modified: typeof row.modified === 'string' ? row.modified : '',
+        menu_order: Number(row.menu_order) || 0,
       });
     });
     return selected.map((page) => {
@@ -367,9 +391,7 @@ function renderPageCards(preview, pages, onRemove) {
  */
 export function buildPagePreview(pages, multiple, onRemove) {
   const preview = el('div', {
-    className:
-      'bl-blocks-fields__page-preview' +
-      (multiple ? ' is-multiple is-sortable' : ' is-single'),
+    className: previewClass(multiple, !!multiple),
   });
   renderPageCards(preview, pages, onRemove);
   return preview;
@@ -400,8 +422,10 @@ export function normalizePageIds(current, multiple) {
  */
 export function createPagePickerControl(field, current) {
   const multiple = !!field.multiple;
+  const sortable = multiple && fieldAllowsReorder(field);
+  const orderby = fieldOrderby(field);
   const copy = pickerCopy(field, multiple);
-  /** @type {Array<{id:number,title:string,url:string}>} */
+  /** @type {Array<{id:number,title:string,url:string,date?:string,modified?:string,menu_order?:number}>} */
   let selected = normalizePageIds(current, multiple).map((id) => ({
     id,
     title: '',
@@ -413,9 +437,7 @@ export function createPagePickerControl(field, current) {
     text: copy.help,
   });
   const preview = el('div', {
-    className:
-      'bl-blocks-fields__page-preview' +
-      (multiple ? ' is-multiple is-sortable' : ' is-single'),
+    className: previewClass(multiple, sortable),
   });
   const summary = el('div', { className: 'bl-blocks-fields__page-picker-summary' }, [
     empty,
@@ -441,11 +463,30 @@ export function createPagePickerControl(field, current) {
       blBlocksPagePicker: '1',
       textSingular: field.text_singular || '',
       textPlural: field.text_plural || '',
+      allowReorder: sortable ? '1' : '0',
+      orderby,
     },
   });
   control.append(
     el('div', { className: 'bl-blocks-fields__page-picker-row' }, [summary, actions])
   );
+
+  const applySelected = (pages, postTypes) => {
+    const next = (Array.isArray(pages) ? pages : [pages])
+      .map((page) => ({
+        id: Number(page.id) || 0,
+        title: page.title || '',
+        url: page.url || '',
+        date: page.date || '',
+        modified: page.modified || '',
+        menu_order: Number(page.menu_order) || 0,
+      }))
+      .filter((p) => p.id > 0);
+    if (multiple && !sortable) {
+      return sortPageItems(next, orderby, postTypes);
+    }
+    return next;
+  };
 
   const dispatchChange = () => {
     control.dispatchEvent(new Event('change', { bubbles: true }));
@@ -468,7 +509,7 @@ export function createPagePickerControl(field, current) {
     pickBtn.textContent = has ? copy.change : copy.choose;
   };
 
-  if (multiple) {
+  if (sortable) {
     bindPageSortable(preview, {
       getSelected: () => selected,
       setSelected: (next) => {
@@ -482,6 +523,9 @@ export function createPagePickerControl(field, current) {
     const { restNonce } = pickerConfig();
     const postTypes = resolveFieldPostTypes(field);
     selected = await hydrateSelectedPages(selected, postTypes, restNonce);
+    if (multiple && !sortable) {
+      selected = sortPageItems(selected, orderby, postTypes);
+    }
     syncUi();
   };
 
@@ -516,25 +560,10 @@ export function createPagePickerControl(field, current) {
       restUrl,
       restNonce,
       postTypes,
+      orderby,
     });
     if (!result) return;
-    if (multiple) {
-      selected = (Array.isArray(result) ? result : [result])
-        .map((page) => ({
-          id: Number(page.id) || 0,
-          title: page.title || '',
-          url: page.url || '',
-        }))
-        .filter((p) => p.id > 0);
-    } else {
-      selected = [
-        {
-          id: Number(result.id) || 0,
-          title: result.title || '',
-          url: result.url || '',
-        },
-      ].filter((p) => p.id > 0);
-    }
+    selected = applySelected(result, postTypes);
     syncUi();
     dispatchChange();
   });
@@ -567,6 +596,8 @@ export function bindPagePickers(root = document) {
     wrap.dataset.blPagePickerBound = '1';
 
     const multiple = wrap.dataset.multiple === '1';
+    const sortable = multiple && fieldAllowsReorder(wrap.dataset);
+    const orderby = fieldOrderby(wrap.dataset);
     const copy = pickerCopy(wrapNounSource(wrap), multiple);
     const inputName = wrap.dataset.inputName || '';
     const summary = wrap.querySelector('[data-bl-page-summary]');
@@ -575,7 +606,7 @@ export function bindPagePickers(root = document) {
     const inputsHost = wrap.querySelector('[data-bl-page-inputs]');
     if (!summary || !pickBtn || !clearBtn || !inputsHost || !inputName) return;
 
-    /** @type {Array<{id:number,title:string,url:string}>} */
+    /** @type {Array<{id:number,title:string,url:string,date?:string,modified?:string,menu_order?:number}>} */
     let selected = Array.from(inputsHost.querySelectorAll('input[type="hidden"]'))
       .map((input) => ({
         id: Number(input.value) || 0,
@@ -589,9 +620,7 @@ export function bindPagePickers(root = document) {
       text: copy.help,
     });
     const preview = el('div', {
-      className:
-        'bl-blocks-fields__page-preview' +
-        (multiple ? ' is-multiple is-sortable' : ' is-single'),
+      className: previewClass(multiple, sortable),
     });
     summary.replaceChildren(empty, preview);
 
@@ -638,7 +667,7 @@ export function bindPagePickers(root = document) {
       writeInputs();
     };
 
-    if (multiple) {
+    if (sortable) {
       bindPageSortable(preview, {
         getSelected: () => selected,
         setSelected: (next) => {
@@ -672,25 +701,20 @@ export function bindPagePickers(root = document) {
         restUrl,
         restNonce,
         postTypes,
+        orderby,
       });
       if (!result) return;
-      if (multiple) {
-        selected = (Array.isArray(result) ? result : [result])
-          .map((page) => ({
-            id: Number(page.id) || 0,
-            title: page.title || '',
-            url: page.url || '',
-          }))
-          .filter((p) => p.id > 0);
-      } else {
-        selected = [
-          {
-            id: Number(result.id) || 0,
-            title: result.title || '',
-            url: result.url || '',
-          },
-        ].filter((p) => p.id > 0);
-      }
+      const next = (Array.isArray(result) ? result : [result])
+        .map((page) => ({
+          id: Number(page.id) || 0,
+          title: page.title || '',
+          url: page.url || '',
+          date: page.date || '',
+          modified: page.modified || '',
+          menu_order: Number(page.menu_order) || 0,
+        }))
+        .filter((p) => p.id > 0);
+      selected = multiple && !sortable ? sortPageItems(next, orderby, postTypes) : next;
       syncUi();
     });
 

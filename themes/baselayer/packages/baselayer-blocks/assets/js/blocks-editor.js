@@ -1158,6 +1158,69 @@
   });
 
   // themes/baselayer/src/js/admin/utils/page-picker.js
+  var PAGE_ORDERBY = ["automatic", "title", "menu_order", "date", "modified"];
+  function sanitizePageOrderby(raw) {
+    const key = String(raw || "automatic");
+    return PAGE_ORDERBY.includes(key) ? key : "automatic";
+  }
+  function defaultPageOrder(orderby) {
+    return orderby === "date" || orderby === "modified" ? "desc" : "asc";
+  }
+  function restOrderForPostType(pt, fieldOrderby2) {
+    const fieldKey = sanitizePageOrderby(fieldOrderby2);
+    let orderby;
+    let order;
+    if (fieldKey === "automatic") {
+      orderby = String(pt && pt.orderby || "modified");
+      order = String(pt && pt.order || "desc").toLowerCase();
+    } else {
+      orderby = fieldKey;
+      order = defaultPageOrder(orderby);
+    }
+    if (order !== "asc" && order !== "desc") {
+      order = defaultPageOrder(orderby);
+    }
+    if (orderby === "menu_order" && pt && pt.supportsMenuOrder === false) {
+      return { orderby: "title", order: "asc" };
+    }
+    if (!["title", "menu_order", "date", "modified"].includes(orderby)) {
+      return { orderby: "modified", order: "desc" };
+    }
+    return { orderby, order };
+  }
+  function comparePageItems(a, b, orderby, order) {
+    const dir = String(order).toLowerCase() === "asc" ? 1 : -1;
+    if (orderby === "title") {
+      return dir * String(a.title || "").localeCompare(String(b.title || ""), void 0, {
+        sensitivity: "base"
+      });
+    }
+    if (orderby === "menu_order") {
+      const diff = (Number(a.menu_order) || 0) - (Number(b.menu_order) || 0);
+      if (diff !== 0) return dir * diff;
+      return String(b.date || "").localeCompare(String(a.date || ""));
+    }
+    const key = orderby === "date" ? "date" : "modified";
+    return dir * String(a[key] || "").localeCompare(String(b[key] || ""));
+  }
+  function sortPageItems(items, fieldOrderby2, postTypes) {
+    if (!Array.isArray(items) || items.length < 2) return items;
+    const fieldKey = sanitizePageOrderby(fieldOrderby2);
+    const types = Array.isArray(postTypes) ? postTypes : [];
+    let resolved;
+    if (fieldKey === "automatic") {
+      if (types.length === 1) {
+        resolved = restOrderForPostType(types[0], "automatic");
+      } else {
+        resolved = { orderby: "modified", order: "desc" };
+      }
+    } else {
+      resolved = restOrderForPostType(types[0] || {}, fieldKey);
+    }
+    return [...items].sort(
+      (a, b) => comparePageItems(a, b, resolved.orderby, resolved.order)
+    );
+  }
   function openPagePicker(options = {}) {
     const opts = {
       multi: false,
@@ -1173,8 +1236,10 @@
       restUrl: "",
       restNonce: "",
       postTypes: null,
+      orderby: "automatic",
       ...options
     };
+    opts.orderby = sanitizePageOrderby(opts.orderby);
     const api = window.wpApiSettings || {};
     const restNonce = opts.restNonce || api.nonce || "";
     const restRoot = api.root ? String(api.root).replace(/\/?$/, "/") : "";
@@ -1185,7 +1250,10 @@
           value: "page",
           label: "Pages",
           restBase: "pages",
-          restUrl: restRoot ? restRoot + "wp/v2/pages" : String(opts.restUrl || "")
+          restUrl: restRoot ? restRoot + "wp/v2/pages" : String(opts.restUrl || ""),
+          orderby: "modified",
+          order: "DESC",
+          supportsMenuOrder: true
         }
       ];
     }
@@ -1393,7 +1461,10 @@
             const item = {
               id,
               title: page.title || "",
-              url: page.url || ""
+              url: page.url || "",
+              date: page.date || "",
+              modified: page.modified || "",
+              menu_order: Number(page.menu_order) || 0
             };
             if (opts.multi) {
               if (selectedMap.has(id)) {
@@ -1417,35 +1488,48 @@
           results.appendChild(note);
         }
       };
-      const fetchType = async (restUrl, query, signal, perPage) => {
+      const mapRestItems = (data) => (Array.isArray(data) ? data : []).map((row) => ({
+        id: Number(row.id) || 0,
+        title: row.title && typeof row.title.rendered === "string" ? row.title.rendered.replace(/<[^>]+>/g, "") : String(row.title || ""),
+        url: typeof row.link === "string" ? row.link : "",
+        modified: typeof row.modified === "string" ? row.modified : "",
+        date: typeof row.date === "string" ? row.date : "",
+        menu_order: Number(row.menu_order) || 0
+      }));
+      const fetchType = async (pt, query, signal, perPage) => {
+        const restUrl = pt && pt.restUrl;
         if (!restUrl) return { items: [], total: 0 };
+        const rest = restOrderForPostType(pt, opts.orderby);
         const url = new URL(restUrl, window.location.origin);
         url.searchParams.set("status", "publish");
         url.searchParams.set("per_page", String(perPage));
-        url.searchParams.set("orderby", "modified");
-        url.searchParams.set("order", "desc");
-        url.searchParams.set("_fields", "id,title,link,modified");
+        url.searchParams.set("orderby", rest.orderby);
+        url.searchParams.set("order", rest.order);
+        url.searchParams.set("_fields", "id,title,link,modified,date,menu_order");
         if (query) {
           url.searchParams.set("search", query);
         }
-        const res = await fetch(url.toString(), {
-          credentials: "same-origin",
-          signal,
-          headers: restNonce ? {
-            "X-WP-Nonce": restNonce
-          } : {}
-        });
+        const doFetch = async (orderby, order) => {
+          url.searchParams.set("orderby", orderby);
+          url.searchParams.set("order", order);
+          return fetch(url.toString(), {
+            credentials: "same-origin",
+            signal,
+            headers: restNonce ? {
+              "X-WP-Nonce": restNonce
+            } : {}
+          });
+        };
+        let res = await doFetch(rest.orderby, rest.order);
+        if (!res.ok && rest.orderby === "menu_order") {
+          res = await doFetch("title", "asc");
+        }
         if (!res.ok) {
           return { items: [], total: 0 };
         }
         const totalHeader = parseInt(res.headers.get("X-WP-Total") || "", 10);
         const data = await res.json();
-        const items = (Array.isArray(data) ? data : []).map((row) => ({
-          id: Number(row.id) || 0,
-          title: row.title && typeof row.title.rendered === "string" ? row.title.rendered.replace(/<[^>]+>/g, "") : String(row.title || ""),
-          url: typeof row.link === "string" ? row.link : "",
-          modified: typeof row.modified === "string" ? row.modified : ""
-        }));
+        const items = mapRestItems(data);
         const total = Number.isFinite(totalHeader) ? totalHeader : items.length;
         return { items, total };
       };
@@ -1469,7 +1553,7 @@
         try {
           const batches = await Promise.all(
             typesToFetch.map(
-              (pt) => fetchType(pt.restUrl, query, abort.signal, perPage)
+              (pt) => fetchType(pt, query, abort.signal, perPage)
             )
           );
           if (gen !== fetchGen) return;
@@ -1484,9 +1568,16 @@
               seen.add(page.id);
               return true;
             });
-            pages.sort(
-              (a, b) => String(b.modified || "").localeCompare(String(a.modified || ""))
-            );
+            if (opts.orderby === "automatic") {
+              pages.sort(
+                (a, b) => String(b.modified || "").localeCompare(String(a.modified || ""))
+              );
+            } else {
+              const merge = restOrderForPostType({}, opts.orderby);
+              pages.sort(
+                (a, b) => comparePageItems(a, b, merge.orderby, merge.order)
+              );
+            }
             if (pages.length > perPage) {
               hasMore = true;
               pages = pages.slice(0, perPage);
@@ -1497,7 +1588,10 @@
               selectedMap.set(page.id, {
                 id: page.id,
                 title: page.title,
-                url: page.url
+                url: page.url,
+                date: page.date,
+                modified: page.modified,
+                menu_order: page.menu_order
               });
             }
           });
@@ -1538,7 +1632,10 @@
             value: "page",
             label: "Pages",
             restBase: "pages",
-            restUrl: String(legacyRestUrl)
+            restUrl: String(legacyRestUrl),
+            orderby: "modified",
+            order: "DESC",
+            supportsMenuOrder: true
           }
         ];
       }
@@ -1550,7 +1647,18 @@
       const label = String(row && row.label || value || "").trim() || value;
       if (!value || !restBase) return null;
       const restUrl = restRoot ? restRoot + "wp/v2/" + restBase.replace(/^\/+|\/+$/g, "") : "";
-      return { value, label, restBase, restUrl };
+      const orderby = String(row && row.orderby || "modified");
+      const order = String(row && row.order || "DESC");
+      const supportsMenuOrder = row && Object.prototype.hasOwnProperty.call(row, "supportsMenuOrder") ? !!row.supportsMenuOrder : value === "page";
+      return {
+        value,
+        label,
+        restBase,
+        restUrl,
+        orderby,
+        order,
+        supportsMenuOrder
+      };
     }).filter(Boolean);
   }
   window.baselayerOpenPagePicker = openPagePicker;
@@ -3819,6 +3927,18 @@
       text_plural: wrap.getAttribute("data-text-plural") || ""
     };
   }
+  function fieldAllowsReorder(source) {
+    if (!source) return true;
+    const raw = source.allow_reorder !== void 0 ? source.allow_reorder : source.allowReorder;
+    return raw !== false && raw !== 0 && raw !== "0";
+  }
+  function fieldOrderby(source) {
+    return sanitizePageOrderby(source && (source.orderby || source.orderBy));
+  }
+  function previewClass(multiple, sortable) {
+    if (!multiple) return "bl-blocks-fields__page-preview is-single";
+    return "bl-blocks-fields__page-preview is-multiple" + (sortable ? " is-sortable" : "");
+  }
   function pickerConfig() {
     const sources = [
       window.blBlocksFieldUi,
@@ -3878,7 +3998,7 @@
     const urls = postTypes.map((pt) => {
       const base = String(pt.restBase || pt.value || "").replace(/^\/+|\/+$/g, "");
       if (!base || !restRoot) return "";
-      return restRoot + "wp/v2/" + base + "/?include=" + encodeURIComponent(include) + "&per_page=" + missing.length + "&_fields=id,title,link";
+      return restRoot + "wp/v2/" + base + "/?include=" + encodeURIComponent(include) + "&per_page=" + missing.length + "&_fields=id,title,link,date,modified,menu_order";
     }).filter(Boolean);
     if (urls.length === 0) return selected;
     try {
@@ -3899,7 +4019,10 @@
         byId.set(id, {
           id,
           title: row.title && typeof row.title.rendered === "string" ? row.title.rendered.replace(/<[^>]+>/g, "") : String(row.title && row.title.rendered || row.title || ""),
-          url: typeof row.link === "string" ? row.link : ""
+          url: typeof row.link === "string" ? row.link : "",
+          date: typeof row.date === "string" ? row.date : "",
+          modified: typeof row.modified === "string" ? row.modified : "",
+          menu_order: Number(row.menu_order) || 0
         });
       });
       return selected.map((page) => {
@@ -4001,7 +4124,7 @@
   }
   function buildPagePreview(pages, multiple, onRemove) {
     const preview = el("div", {
-      className: "bl-blocks-fields__page-preview" + (multiple ? " is-multiple is-sortable" : " is-single")
+      className: previewClass(multiple, !!multiple)
     });
     renderPageCards(preview, pages, onRemove);
     return preview;
@@ -4016,6 +4139,8 @@
   }
   function createPagePickerControl(field, current) {
     const multiple = !!field.multiple;
+    const sortable = multiple && fieldAllowsReorder(field);
+    const orderby = fieldOrderby(field);
     const copy = pickerCopy(field, multiple);
     let selected = normalizePageIds(current, multiple).map((id) => ({
       id,
@@ -4027,7 +4152,7 @@
       text: copy.help
     });
     const preview = el("div", {
-      className: "bl-blocks-fields__page-preview" + (multiple ? " is-multiple is-sortable" : " is-single")
+      className: previewClass(multiple, sortable)
     });
     const summary = el("div", { className: "bl-blocks-fields__page-picker-summary" }, [
       empty,
@@ -4052,12 +4177,28 @@
       dataset: {
         blBlocksPagePicker: "1",
         textSingular: field.text_singular || "",
-        textPlural: field.text_plural || ""
+        textPlural: field.text_plural || "",
+        allowReorder: sortable ? "1" : "0",
+        orderby
       }
     });
     control.append(
       el("div", { className: "bl-blocks-fields__page-picker-row" }, [summary, actions])
     );
+    const applySelected = (pages, postTypes) => {
+      const next = (Array.isArray(pages) ? pages : [pages]).map((page) => ({
+        id: Number(page.id) || 0,
+        title: page.title || "",
+        url: page.url || "",
+        date: page.date || "",
+        modified: page.modified || "",
+        menu_order: Number(page.menu_order) || 0
+      })).filter((p) => p.id > 0);
+      if (multiple && !sortable) {
+        return sortPageItems(next, orderby, postTypes);
+      }
+      return next;
+    };
     const dispatchChange = () => {
       control.dispatchEvent(new Event("change", { bubbles: true }));
     };
@@ -4077,7 +4218,7 @@
       clearBtn.hidden = !has;
       pickBtn.textContent = has ? copy.change : copy.choose;
     };
-    if (multiple) {
+    if (sortable) {
       bindPageSortable(preview, {
         getSelected: () => selected,
         setSelected: (next) => {
@@ -4090,6 +4231,9 @@
       const { restNonce } = pickerConfig();
       const postTypes = resolveFieldPostTypes(field);
       selected = await hydrateSelectedPages(selected, postTypes, restNonce);
+      if (multiple && !sortable) {
+        selected = sortPageItems(selected, orderby, postTypes);
+      }
       syncUi();
     };
     pickBtn.addEventListener("click", async () => {
@@ -4122,24 +4266,11 @@
         allLabel: i18n("pagePickerAll", "All"),
         restUrl,
         restNonce,
-        postTypes
+        postTypes,
+        orderby
       });
       if (!result) return;
-      if (multiple) {
-        selected = (Array.isArray(result) ? result : [result]).map((page) => ({
-          id: Number(page.id) || 0,
-          title: page.title || "",
-          url: page.url || ""
-        })).filter((p) => p.id > 0);
-      } else {
-        selected = [
-          {
-            id: Number(result.id) || 0,
-            title: result.title || "",
-            url: result.url || ""
-          }
-        ].filter((p) => p.id > 0);
-      }
+      selected = applySelected(result, postTypes);
       syncUi();
       dispatchChange();
     });
@@ -4162,6 +4293,8 @@
       if (wrap.dataset.blPagePickerBound === "1") return;
       wrap.dataset.blPagePickerBound = "1";
       const multiple = wrap.dataset.multiple === "1";
+      const sortable = multiple && fieldAllowsReorder(wrap.dataset);
+      const orderby = fieldOrderby(wrap.dataset);
       const copy = pickerCopy(wrapNounSource(wrap), multiple);
       const inputName = wrap.dataset.inputName || "";
       const summary = wrap.querySelector("[data-bl-page-summary]");
@@ -4179,7 +4312,7 @@
         text: copy.help
       });
       const preview = el("div", {
-        className: "bl-blocks-fields__page-preview" + (multiple ? " is-multiple is-sortable" : " is-single")
+        className: previewClass(multiple, sortable)
       });
       summary.replaceChildren(empty, preview);
       const writeInputs = () => {
@@ -4222,7 +4355,7 @@
         pickBtn.textContent = has ? copy.change : copy.choose;
         writeInputs();
       };
-      if (multiple) {
+      if (sortable) {
         bindPageSortable(preview, {
           getSelected: () => selected,
           setSelected: (next) => {
@@ -4254,24 +4387,19 @@
           allLabel: i18n("pagePickerAll", "All"),
           restUrl,
           restNonce,
-          postTypes
+          postTypes,
+          orderby
         });
         if (!result) return;
-        if (multiple) {
-          selected = (Array.isArray(result) ? result : [result]).map((page) => ({
-            id: Number(page.id) || 0,
-            title: page.title || "",
-            url: page.url || ""
-          })).filter((p) => p.id > 0);
-        } else {
-          selected = [
-            {
-              id: Number(result.id) || 0,
-              title: result.title || "",
-              url: result.url || ""
-            }
-          ].filter((p) => p.id > 0);
-        }
+        const next = (Array.isArray(result) ? result : [result]).map((page) => ({
+          id: Number(page.id) || 0,
+          title: page.title || "",
+          url: page.url || "",
+          date: page.date || "",
+          modified: page.modified || "",
+          menu_order: Number(page.menu_order) || 0
+        })).filter((p) => p.id > 0);
+        selected = multiple && !sortable ? sortPageItems(next, orderby, postTypes) : next;
         syncUi();
       });
       clearBtn.addEventListener("click", () => {

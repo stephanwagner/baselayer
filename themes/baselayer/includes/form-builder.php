@@ -129,13 +129,212 @@ function bl_page_picker_field_i18n(string $domain): array
 		'searchNouns'      => __('Search…', $domain),
 		/* translators: %s: plural noun, e.g. Pages */
 		'noNounsFound'     => __('No %s found.', $domain),
+		'pageOrder'           => __('Order', $domain),
+		'pageOrderAutomatic'  => __('Automatic', $domain),
+		'pageOrderTitle'      => __('Title', $domain),
+		'pageOrderMenuOrder'  => __('Menu Order', $domain),
+		'pageOrderCreated'    => __('Created', $domain),
+		'pageOrderModified'   => __('Last edited', $domain),
+		'pageOrderHelp'       => __('Automatic uses the post type’s own order.', $domain),
+		'pageAllowReorder'    => __('Allow reorder', $domain),
 	];
+}
+
+/**
+ * Allowed page-field orderby keys.
+ *
+ * @return list<string>
+ */
+function bl_page_picker_orderby_choices(): array
+{
+	return ['automatic', 'title', 'menu_order', 'date', 'modified'];
+}
+
+/**
+ * Sanitize a page-field orderby value. Invalid / empty → automatic.
+ *
+ * @param mixed $raw
+ */
+function bl_page_picker_sanitize_orderby($raw): string
+{
+	$key = sanitize_key((string) $raw);
+	$allowed = bl_page_picker_orderby_choices();
+
+	return in_array($key, $allowed, true) ? $key : 'automatic';
+}
+
+/**
+ * Implied sort direction for a resolved (non-automatic) orderby.
+ */
+function bl_page_picker_default_order(string $orderby): string
+{
+	return in_array($orderby, ['date', 'modified'], true) ? 'DESC' : 'ASC';
+}
+
+/**
+ * CPT archive/admin order for Automatic picker sorting.
+ * Types without a content-type query fall back to last-edited, newest first.
+ *
+ * @return array{orderby: string, order: string}
+ */
+function bl_page_picker_cpt_order(string $post_type): array
+{
+	$fallback = [
+		'orderby' => 'modified',
+		'order'   => 'DESC',
+	];
+	if ($post_type === '' || !function_exists('bl_content_type_query') || !function_exists('bl_config_cpt')) {
+		return $fallback;
+	}
+	if (!is_array(bl_config_cpt($post_type))) {
+		return $fallback;
+	}
+
+	$query = bl_content_type_query($post_type);
+	$has_order = !empty($query['menu_order']);
+	$raw_orderby = isset($query['orderby']) && is_string($query['orderby'])
+		? strtolower(trim($query['orderby']))
+		: '';
+	if ($raw_orderby === 'publish_date' || $raw_orderby === 'published') {
+		$raw_orderby = 'date';
+	}
+	$allowed = ['date', 'title', 'menu_order', 'modified'];
+	if ($raw_orderby !== '' && in_array($raw_orderby, $allowed, true)) {
+		$orderby = $raw_orderby;
+	} elseif ($has_order) {
+		$orderby = 'menu_order';
+	} else {
+		return $fallback;
+	}
+
+	$raw_order = isset($query['order']) && is_string($query['order'])
+		? strtoupper(trim($query['order']))
+		: '';
+	if ($raw_order !== 'ASC' && $raw_order !== 'DESC') {
+		$raw_order = bl_page_picker_default_order($orderby);
+	}
+
+	if ($orderby === 'menu_order' && !post_type_supports($post_type, 'page-attributes')) {
+		return [
+			'orderby' => 'title',
+			'order'   => 'ASC',
+		];
+	}
+
+	return [
+		'orderby' => $orderby,
+		'order'   => $raw_order,
+	];
+}
+
+/**
+ * Resolve REST / WP_Query order for one post type given the field orderby.
+ *
+ * @return array{orderby: string, order: string}
+ */
+function bl_page_picker_resolve_order(string $field_orderby, string $post_type): array
+{
+	$field_orderby = bl_page_picker_sanitize_orderby($field_orderby);
+	if ($field_orderby === 'automatic') {
+		return bl_page_picker_cpt_order($post_type);
+	}
+
+	$orderby = $field_orderby;
+	$order = bl_page_picker_default_order($orderby);
+	if ($orderby === 'menu_order' && $post_type !== '' && !post_type_supports($post_type, 'page-attributes')) {
+		return [
+			'orderby' => 'title',
+			'order'   => 'ASC',
+		];
+	}
+
+	return [
+		'orderby' => $orderby,
+		'order'   => $order,
+	];
+}
+
+/**
+ * Sort selected post IDs when Allow reorder is off (same order as the picker / CPT).
+ *
+ * @param list<int>            $ids
+ * @param array<string, mixed> $field
+ * @return list<int>
+ */
+function bl_page_picker_sort_ids(array $ids, array $field): array
+{
+	$ids = array_values(array_filter(array_map('absint', $ids)));
+	if (count($ids) < 2) {
+		return $ids;
+	}
+
+	$allowed_types = function_exists('bl_page_picker_sanitize_post_types')
+		? bl_page_picker_sanitize_post_types($field['post_types'] ?? null)
+		: ['page'];
+	if ($allowed_types === []) {
+		$allowed_types = ['page'];
+	}
+
+	$field_orderby = bl_page_picker_sanitize_orderby($field['orderby'] ?? 'automatic');
+	if ($field_orderby === 'automatic') {
+		if (count($allowed_types) === 1) {
+			$resolved = bl_page_picker_resolve_order('automatic', $allowed_types[0]);
+			$orderby = $resolved['orderby'];
+			$order = $resolved['order'];
+		} else {
+			$orderby = 'modified';
+			$order = 'DESC';
+		}
+	} else {
+		$orderby = $field_orderby;
+		$order = bl_page_picker_default_order($orderby);
+		if ($orderby === 'menu_order') {
+			$supports = false;
+			foreach ($allowed_types as $pt) {
+				if (post_type_supports($pt, 'page-attributes')) {
+					$supports = true;
+					break;
+				}
+			}
+			if (!$supports) {
+				$orderby = 'title';
+				$order = 'ASC';
+			}
+		}
+	}
+
+	$query_args = [
+		'post_type'           => $allowed_types,
+		'post__in'            => $ids,
+		'posts_per_page'      => count($ids),
+		'post_status'         => 'any',
+		'ignore_sticky_posts' => true,
+		'no_found_rows'       => true,
+		'suppress_filters'    => false,
+	];
+	if ($orderby === 'menu_order') {
+		$query_args['orderby'] = ['menu_order' => $order, 'date' => 'DESC'];
+	} else {
+		$query_args['orderby'] = $orderby;
+		$query_args['order'] = $order;
+	}
+
+	$query = new WP_Query($query_args);
+	$sorted = [];
+	foreach ($query->posts as $post) {
+		if ($post instanceof WP_Post) {
+			$sorted[] = (int) $post->ID;
+		}
+	}
+	$missing = array_values(array_diff($ids, $sorted));
+
+	return array_values(array_merge($sorted, $missing));
 }
 
 /**
  * Public REST-enabled post types for the shared page picker (excludes attachment).
  *
- * @return list<array{value: string, label: string, restBase: string}>
+ * @return list<array{value: string, label: string, restBase: string, orderby: string, order: string, supportsMenuOrder: bool}>
  */
 function bl_page_picker_post_types(): array
 {
@@ -147,10 +346,14 @@ function bl_page_picker_post_types(): array
 		$rest_base = is_string($pt->rest_base) && $pt->rest_base !== ''
 			? $pt->rest_base
 			: $pt->name;
+		$resolved = bl_page_picker_cpt_order($pt->name);
 		$out[] = [
-			'value'    => $pt->name,
-			'label'    => (string) ($pt->labels->name ?: $pt->name),
-			'restBase' => $rest_base,
+			'value'              => $pt->name,
+			'label'              => (string) ($pt->labels->name ?: $pt->name),
+			'restBase'           => $rest_base,
+			'orderby'            => $resolved['orderby'],
+			'order'              => $resolved['order'],
+			'supportsMenuOrder'  => post_type_supports($pt->name, 'page-attributes'),
 		];
 	}
 

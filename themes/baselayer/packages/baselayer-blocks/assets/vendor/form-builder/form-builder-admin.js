@@ -2049,10 +2049,16 @@
       if (field.post_types.length === 0) {
         field.post_types = [...allowedKeys];
       }
+      field.orderby = sanitizePageOrderby(field.orderby);
+      if (field.allow_reorder === void 0) {
+        field.allow_reorder = true;
+      }
     } else {
       delete field.post_types;
       delete field.text_singular;
       delete field.text_plural;
+      delete field.orderby;
+      delete field.allow_reorder;
     }
     if (nextType === "terms") {
       if (field.content == null || String(field.content).trim() === "") {
@@ -3457,6 +3463,51 @@
       el("p", {}, [el("label", { text: t("textPlural", "Text plural") }), pluralInput])
     ]);
   }
+  var PAGE_ORDERBY_CHOICES = [
+    { value: "automatic", labelKey: "pageOrderAutomatic", fallback: "Automatic" },
+    { value: "title", labelKey: "pageOrderTitle", fallback: "Title" },
+    { value: "menu_order", labelKey: "pageOrderMenuOrder", fallback: "Menu Order" },
+    { value: "date", labelKey: "pageOrderCreated", fallback: "Created" },
+    { value: "modified", labelKey: "pageOrderModified", fallback: "Last edited" }
+  ];
+  function sanitizePageOrderby(raw) {
+    const key = String(raw || "automatic");
+    return PAGE_ORDERBY_CHOICES.some((item) => item.value === key) ? key : "automatic";
+  }
+  function createPageOrderControl(field) {
+    if (!PAGE_ORDERBY_CHOICES.some((item) => item.value === field.orderby)) {
+      field.orderby = "automatic";
+    }
+    const select = el("select", {
+      className: "widefat",
+      dataset: { blPageOrderby: "1" },
+      "aria-label": t("pageOrder", "Order")
+    });
+    PAGE_ORDERBY_CHOICES.forEach((item) => {
+      const option = el("option", {
+        value: item.value,
+        text: t(item.labelKey, item.fallback)
+      });
+      if (field.orderby === item.value) {
+        option.selected = true;
+      }
+      select.appendChild(option);
+    });
+    select.addEventListener("change", () => {
+      field.orderby = sanitizePageOrderby(select.value);
+      document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+    });
+    return el("div", { className: "bl-forms-builder__type-select" }, [
+      el("p", {}, [el("label", { text: t("pageOrder", "Order") }), select]),
+      el("p", {
+        className: "description",
+        text: t(
+          "pageOrderHelp",
+          "Automatic uses the post type\u2019s own order."
+        )
+      })
+    ]);
+  }
   function createPrefixSuffixControl(field) {
     const prefixInput = el("input", {
       type: "text",
@@ -4546,6 +4597,9 @@
       } else {
         delete data.text_plural;
       }
+      data.orderby = sanitizePageOrderby(q("[data-bl-page-orderby]")?.value);
+      const reorderEl = q("[data-bl-allow-reorder]");
+      data.allow_reorder = reorderEl ? Boolean(reorderEl.checked) : true;
     }
     if (type === "file" || type === "image") {
       if (useMediaLibraryFields()) {
@@ -5133,6 +5187,22 @@
           extra.forEach((node) => {
             if (node) advancedSections.add(node);
           });
+        }
+        if (field.type === "page") {
+          advancedSections.add(
+            el("div", { className: "bl-forms-builder__page-order" }, [
+              createPageOrderControl(field),
+              createSwitchSetting(
+                "blAllowReorder",
+                t("pageAllowReorder", "Allow reorder"),
+                field.allow_reorder !== false && field.allow_reorder !== 0 && field.allow_reorder !== "0",
+                (checked) => {
+                  field.allow_reorder = checked;
+                  document.dispatchEvent(new CustomEvent("bl-forms-builder-changed"));
+                }
+              )
+            ])
+          );
         }
         if (field.type === "terms") {
           const consentText = el("textarea", {
