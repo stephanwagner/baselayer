@@ -165,14 +165,6 @@
       height: calc(100vh - var(--bl-header-height-mobile-scrolled) - var(--bl-admin-bar-height) - 8px - 8px);
     }
 
-    @media (max-width: $breakpoint-s) {
-      padding-left: 24px;
-    }
-
-    @media (max-width: $breakpoint-xs) {
-      width: calc(100vw - 8px - 8px);
-    }
-
     body.-menu-open & {
       visibility: visible;
       pointer-events: all;
@@ -182,6 +174,14 @@
         right var(--bl-transition-duration),
         visibility 0s;
     }
+  }
+
+  @media (max-width: $breakpoint-s) {
+    padding-left: 24px;
+  }
+
+  @media (max-width: $breakpoint-xs) {
+    width: calc(100vw - 8px - 8px);
   }
 }
 
